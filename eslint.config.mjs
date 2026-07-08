@@ -90,6 +90,7 @@ export default [
             'shared_components/js/builders/scp/quote-lifecycle.js',
             'shared_components/js/builders/scp/save-output.js',
             'shared_components/js/builders/scp/push.js',
+            'shared_components/js/builders/scp/adapter.js',
         ],
         rules: {
             'no-unsanitized/property': 'off',

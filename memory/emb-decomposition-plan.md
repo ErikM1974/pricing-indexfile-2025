@@ -143,6 +143,21 @@ full battery exit 0, 1551 tests, browser smoke identical money ($528/$614.36),
 capture 552 fields 0 mismatches. Dead-in-monolith kept+disabled: saveQuote,
 handleDiscountPresetChange, handleDiscountReasonPresetChange.
 
+**S2 ✅ (2026-07-08) — SCP DECOMPOSITION COMPLETE.** state.js (scpState, 236
+refs swept via the lexer; window-backed childRowMap/hasChanges — same two
+contract fields as EMB, same shared classic consumers) + ScpAdapter (init
+listener verbatim into setupPage/initPricingAndRoute; QuoteOrderSummary
+.configure at module tail keeps its parse-time timing) + base boot from
+index.js (46 bridges total) + applyRushPercent → quote-lifecycle. Monolith =
+24-line tombstone; script tag REMOVED — the SCP page is 100% bundle.
+scp-save-parity harness updated to stub `scpState` instead of bare names.
+Verified: battery exit 0, 1551 tests, browser boot-to-money identical
+($528/$614.36; FB back → 2 screens → $885.20), capture 552 fields 0
+mismatches. Lexer bugs re-encountered & audited out: template `${name}` →
+shorthand misfire (4 sites — the audit step caught them; node --check does
+NOT), spread `...printConfig` lookbehind skip (1 site). The residual-audit
+step is NOT optional.
+
 - Latent monolith bugs preserved verbatim (fix post-move, attribution-clean):
   persistence `updateRowQuantityTotal` (defined nowhere; draft-restore path),
   product-rows deleteRow tail `updateCapLogoSectionVisibility` (EMB-only —

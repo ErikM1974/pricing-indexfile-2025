@@ -5,40 +5,36 @@
  * (the Rule-7 reset checklist). Moved verbatim.
  */
 // @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions; typing lands with the render/state split).
-/* global QuotePersistence, QuoteSession, printConfig:writable, productCache:writable,
-   products:writable, rowCounter:writable, _darkNudgeDismissed:writable,
-   childRowMap:writable, editingQuoteId:writable, editingRevision:writable,
-   hasChanges:writable, spPersistence:writable, spSession:writable,
-   quoteService:writable, _scpPushQuoteId:writable,
-   screenPrintPersistence, Event, history,
+/* global QuotePersistence, QuoteSession, screenPrintPersistence, Event, history,
    addNewRow, collectProductsFromTable, createChildRow, onSizeChange, onStyleChange,
    selectColor, recalculatePricing, showScpPushButton, updateAdditionalCharges,
    updateDiscountType, updateFeeTableRows, updatePrintConfig, updateScpPushButtonState,
    escapeHtml, showToast, markAsSaved, markAsUnsaved, assertQuoteEditable,
    updateEditModeUI, setLtmControlState, getServicePrice, applyMethodSwitchCustomer,
    clearQuickQuoteParams, populateCustomerInfo, setOrderShippingData */
+import { scpState } from './state.js';
 
 export function initScreenPrintPersistence() {
     if (typeof QuotePersistence !== 'undefined') {
-        spPersistence = new QuotePersistence({
+        scpState.spPersistence = new QuotePersistence({
             prefix: 'SPC',
             autoSaveInterval: 30000,
             debug: false
         });
 
         // Setup auto-save callback
-        spPersistence.onAutoSave = () => {
+        scpState.spPersistence.onAutoSave = () => {
             const data = getScreenPrintQuoteData();
             if (data && (data.products.length > 0 || data.customerName)) {
-                spPersistence.save(data);
+                scpState.spPersistence.save(data);
             }
         };
     }
 
-    if (typeof QuoteSession !== 'undefined' && spPersistence) {
-        spSession = new QuoteSession({
+    if (typeof QuoteSession !== 'undefined' && scpState.spPersistence) {
+        scpState.spSession = new QuoteSession({
             prefix: 'SPC',
-            persistence: spPersistence,
+            persistence: scpState.spPersistence,
             debug: false
         });
     }
@@ -47,7 +43,7 @@ export function initScreenPrintPersistence() {
 function getScreenPrintQuoteData() {
     return {
         products: collectProductsFromTable(),
-        printConfig: { ...printConfig },
+        printConfig: { ...scpState.printConfig },
         customerName: document.getElementById('customer-name')?.value || '',
         customerEmail: document.getElementById('customer-email')?.value || '',
         companyName: document.getElementById('company-name')?.value || '',
@@ -183,8 +179,8 @@ export function restoreScreenPrintDraft(draft) {
 }
 
 export function markScreenPrintDirty() {
-    if (spPersistence) {
-        spPersistence.markDirty();
+    if (scpState.spPersistence) {
+        scpState.spPersistence.markDirty();
     }
 }
 
@@ -536,7 +532,7 @@ export async function loadQuoteForEditing(quoteId, opts = {}) {
     showToast('Loading quote...', 'info');
 
     try {
-        const result = await quoteService.loadQuote(quoteId);
+        const result = await scpState.quoteService.loadQuote(quoteId);
         if (!result.success) {
             throw new Error(result.error || 'Failed to load quote');
         }
@@ -554,11 +550,11 @@ export async function loadQuoteForEditing(quoteId, opts = {}) {
         }
 
         // Store edit mode state (duplicate mode clears it right after — see duplicateQuote)
-        editingQuoteId = quoteId;
-        editingRevision = session.RevisionNumber || 1;
+        scpState.editingQuoteId = quoteId;
+        scpState.editingRevision = session.RevisionNumber || 1;
 
         // Update page header to show edit mode (duplicate mode sets its own banner)
-        if (!opts.forDuplicate) updateEditModeUI(quoteId, editingRevision);
+        if (!opts.forDuplicate) updateEditModeUI(quoteId, scpState.editingRevision);
 
         // Populate customer information
         populateCustomerInfo(session);
@@ -606,7 +602,7 @@ export async function loadQuoteForEditing(quoteId, opts = {}) {
         // calls showScpPushButton with the FRESH id).
         if (!opts.forDuplicate && typeof showScpPushButton === 'function') showScpPushButton(quoteId);
 
-        if (!opts.forDuplicate) showToast(`Editing ${quoteId} (Rev ${editingRevision})`, 'success');
+        if (!opts.forDuplicate) showToast(`Editing ${quoteId} (Rev ${scpState.editingRevision})`, 'success');
 
         return true;
 
@@ -614,8 +610,8 @@ export async function loadQuoteForEditing(quoteId, opts = {}) {
         console.error('[EditMode] Error loading quote:', error);
         showToast('Error loading quote: ' + error.message, 'error');
         // Clear edit mode and start fresh
-        editingQuoteId = null;
-        editingRevision = null;
+        scpState.editingQuoteId = null;
+        scpState.editingRevision = null;
         addNewRow();
         return false;
     }
@@ -633,9 +629,9 @@ export async function duplicateQuote(sourceQuoteId) {
     if (!loaded) return;   // load failed — error already shown
 
     // Clear edit/push state (mirrors the resetQuote checklist) so save → NEW quote
-    editingQuoteId = null;
-    editingRevision = null;
-    _scpPushQuoteId = null;   // belt-and-suspenders: never let a push target the SOURCE id
+    scpState.editingQuoteId = null;
+    scpState.editingRevision = null;
+    scpState._scpPushQuoteId = null;   // belt-and-suspenders: never let a push target the SOURCE id
     if (typeof updateScpPushButtonState === 'function') { try { updateScpPushButtonState(); } catch (_) {} }
 
     // Order-specific fields must not carry over — order #/PO/dates belong to the ORIGINAL order
@@ -668,8 +664,8 @@ export async function duplicateQuote(sourceQuoteId) {
 
 export function resetQuote() {
     // Clear the "already pushed" lock + reset the Push button so the fresh quote is pushable. (review fix 2026-06-14)
-    _scpPushQuoteId = null;
-    _darkNudgeDismissed = false;   // re-arm the dark-garment underbase nudge for the next quote
+    scpState._scpPushQuoteId = null;
+    scpState._darkNudgeDismissed = false;   // re-arm the dark-garment underbase nudge for the next quote
     document.getElementById('dark-garment-nudge')?.remove();
     const _scpPush = document.getElementById('scp-push-shopworks-btn');
     if (_scpPush) {
@@ -691,13 +687,13 @@ export function resetQuote() {
     `;
 
     // Reset row counter and product cache
-    rowCounter = 0;
-    products = [];
-    productCache = {};
-    childRowMap = {};
+    scpState.rowCounter = 0;
+    scpState.products = [];
+    scpState.productCache = {};
+    scpState.childRowMap = {};
 
     // Reset print config to defaults
-    printConfig = {
+    scpState.printConfig = {
         frontLocation: 'LC',
         frontColors: 1,
         backLocation: '',
@@ -793,8 +789,8 @@ export function resetQuote() {
     if (graphicDesignHours) graphicDesignHours.value = '';
 
     // Clear edit mode
-    editingQuoteId = null;
-    editingRevision = null;
+    scpState.editingQuoteId = null;
+    scpState.editingRevision = null;
 
     // Reset the edit/duplicate banner + strip ?edit=/?duplicate= from the URL so a
     // refresh after "New Quote" doesn't reload/re-duplicate the old quote (DTF parity 2026-07-05)

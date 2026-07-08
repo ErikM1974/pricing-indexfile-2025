@@ -6,7 +6,8 @@
 // @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions; typing lands with the render/state split).
 /* global recalculatePricing, updateTaxCalculation, markScreenPrintDirty,
    escapeHtml, formatPrice, getServicePrice, autoExpandFeesOnFirstCharge,
-   printConfig, SCREEN_FEE */
+   getSharedRushRate, Event, showToast */
+import { scpState, SCREEN_FEE } from './state.js';
 
 export function updateAdditionalCharges() {
     const artChargeToggle = document.getElementById('art-charge-toggle');
@@ -143,11 +144,11 @@ export function updateFeeTableRows() {
     const setupScreensLabel = document.getElementById('setup-screens-label');
     const setupFeeUnit = document.getElementById('setup-fee-unit');
     const setupFeeTotal = document.getElementById('setup-fee-total');
-    if (setupFeeRow && printConfig) {
-        const screens = printConfig.totalScreens || 1;
+    if (setupFeeRow && scpState.printConfig) {
+        const screens = scpState.printConfig.totalScreens || 1;
         // Use the already-computed API-driven setup fee so the displayed row
         // (read back into discountableSubtotal) matches the charged value.
-        const fee = (printConfig.setupFee != null) ? printConfig.setupFee : screens * SCREEN_FEE;
+        const fee = (scpState.printConfig.setupFee != null) ? scpState.printConfig.setupFee : screens * SCREEN_FEE;
         // SPSU "Screen Print Set Up Charge" — per-screen price from Caspio (Pricing=API).
         const perScreen = getServicePrice('SPSU', SCREEN_FEE);
         const perEl = document.getElementById('setup-per-screen-label');
@@ -270,3 +271,28 @@ export function updateFeeTableRows() {
         }
     }
 }
+
+/**
+ * "auto %" rush chip (old-audit P2, 2026-07-07): the rush box was CSR mental
+ * math on a moving subtotal — inconsistent rep-to-rep and stale after quote
+ * changes. Fills the input from the live Caspio RUSH rate × everything-except-
+ * rush (same base the % discount uses); the value stays a plain editable
+ * dollar amount, so re-click after the quote changes.
+ */
+export function applyRushPercent() {
+    const rate = (typeof getSharedRushRate === 'function') ? getSharedRushRate() : 0.25;
+    const productsSubtotal = parseFloat(document.getElementById('subtotal')?.textContent?.replace(/[$,]/g, '')) || 0;
+    if (!(productsSubtotal > 0)) { showToast('Add products first — rush is a % of the quote.', 'info'); return; }
+    const artCharge = document.getElementById('art-charge-toggle')?.checked
+        ? (parseFloat(document.getElementById('art-charge')?.value) || 0) : 0;
+    const designFee = (parseFloat(document.getElementById('graphic-design-hours')?.value) || 0) * getServicePrice('GRT-75', 75);
+    const setupFee = parseFloat(document.getElementById('setup-fee-total')?.textContent?.replace(/[$,]/g, '')) || 0;
+    const xf = (typeof getScpExtraFees === 'function') ? getScpExtraFees() : { vellumFee: 0, colorChangeFee: 0 };
+    const base = productsSubtotal + artCharge + designFee + setupFee + xf.vellumFee + xf.colorChangeFee;
+    const el = document.getElementById('rush-fee');
+    if (!el) return;
+    el.value = (base * rate).toFixed(2);
+    el.dispatchEvent(new Event('change', { bubbles: true }));   // runs updateAdditionalCharges()
+    showToast(`Rush set to ${(rate * 100).toFixed(0)}% of $${base.toFixed(2)} — adjust if needed; re-click if the quote changes.`, 'success');
+}
+// (window bridge moved to builders/scp/index.js)

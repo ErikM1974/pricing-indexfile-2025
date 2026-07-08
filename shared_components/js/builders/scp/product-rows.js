@@ -5,12 +5,11 @@
  * keyboard nav, and the page-level click-away listener. Moved verbatim.
  */
 // @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions; typing lands with the render/state split).
-/* global exactMatchSearcher:writable, rowCounter:writable, productCache:writable,
-   childRowMap:writable, SIZE06_EXTENDED_SIZES, API_BASE,
-   SIZE_TO_SUFFIX, EXTENDED_SIZE_ORDER, getAvailableExtendedSizes,
+/* global SIZE_TO_SUFFIX, EXTENDED_SIZE_ORDER, getAvailableExtendedSizes,
    markScreenPrintDirty, recalculatePricing, escapeHtml, showToast,
    SKUValidationService, ProductCategoryFilter, cleanProductTitle,
    getSwatchStyle, productThumbnailModal, Event */
+import { scpState, API_BASE, SIZE06_EXTENDED_SIZES } from './state.js';
 
 export function setupSearchAutocomplete() {
     const searchInput = document.getElementById('product-search');
@@ -22,7 +21,7 @@ export function setupSearchAutocomplete() {
     }
 
     // Initialize ExactMatchSearch with full keyboard navigation
-    exactMatchSearcher = new window.ExactMatchSearch({
+    scpState.exactMatchSearcher = new window.ExactMatchSearch({
         apiBase: API_BASE,
         debounceMs: 300,  // Standardized debounce
 
@@ -64,13 +63,13 @@ export function setupSearchAutocomplete() {
             return;
         }
 
-        exactMatchSearcher.search(query);
+        scpState.exactMatchSearcher.search(query);
     });
 
     // Handle keyboard navigation
     searchInput.addEventListener('keydown', function(e) {
         // Let ExactMatchSearch handle navigation keys
-        if (exactMatchSearcher && exactMatchSearcher.handleKeyDown(e)) {
+        if (scpState.exactMatchSearcher && scpState.exactMatchSearcher.handleKeyDown(e)) {
             return; // Event was handled
         }
 
@@ -79,7 +78,7 @@ export function setupSearchAutocomplete() {
             e.preventDefault();
             const query = searchInput.value.trim();
             if (query.length >= 2) {
-                exactMatchSearcher.searchImmediate(query);
+                scpState.exactMatchSearcher.searchImmediate(query);
             }
         }
     });
@@ -88,7 +87,7 @@ export function setupSearchAutocomplete() {
     document.addEventListener('click', function(e) {
         if (!e.target.closest('.search-input-wrapper')) {
             suggestions.classList.remove('show');
-            if (exactMatchSearcher) exactMatchSearcher.resetNavigation();
+            if (scpState.exactMatchSearcher) scpState.exactMatchSearcher.resetNavigation();
         }
     });
 
@@ -120,7 +119,7 @@ function showSearchSuggestions(products) {
 
     // Cache product data (convert to expected format)
     products.forEach(p => {
-        productCache[p.value] = {
+        scpState.productCache[p.value] = {
             STYLE: p.value,
             PRODUCT_TITLE: p.label
         };
@@ -161,7 +160,7 @@ export async function selectProduct(styleNumber) {
 
 export function addNewRow() {
     const tbody = document.getElementById('product-tbody');
-    const rowId = ++rowCounter;
+    const rowId = ++scpState.rowCounter;
 
     // Hide empty state message when adding first row
     const emptyStateRow = document.getElementById('empty-state-row');
@@ -264,7 +263,7 @@ export async function onStyleChange(input, rowId) {
 
     try {
         // Fetch product data using stylesearch API
-        let product = productCache[styleNumber];
+        let product = scpState.productCache[styleNumber];
         if (!product) {
             const response = await fetch(`${API_BASE}/api/stylesearch?term=${styleNumber}`);
             const data = await response.json();
@@ -276,7 +275,7 @@ export async function onStyleChange(input, rowId) {
                     STYLE: result.value,
                     PRODUCT_TITLE: result.label
                 };
-                productCache[styleNumber] = product;
+                scpState.productCache[styleNumber] = product;
             }
         }
 
@@ -1255,9 +1254,9 @@ export function selectColor(rowId, optionEl) {
  * Cascade color selection to child rows (for extended sizes)
  */
 function cascadeColorToChildRows(parentRowId, colorName, catalogColor, swatchUrl, hex) {
-    if (!childRowMap[parentRowId]) return;
+    if (!scpState.childRowMap[parentRowId]) return;
 
-    Object.values(childRowMap[parentRowId]).forEach(childRowId => {
+    Object.values(scpState.childRowMap[parentRowId]).forEach(childRowId => {
         const childRow = document.getElementById(`row-${childRowId}`);
         if (childRow && childRow.dataset.colorManuallySet !== 'true') {
             childRow.dataset.color = colorName;
@@ -1425,9 +1424,9 @@ async function onColorChange(select, rowId) {
     });
 
     // Cascade color change to child rows that haven't been manually edited
-    if (childRowMap[rowId]) {
+    if (scpState.childRowMap[rowId]) {
         // eslint-disable-next-line no-unused-vars -- verbatim (S1a): destructured size key unused in monolith
-        Object.entries(childRowMap[rowId]).forEach(([size, childRowId]) => {
+        Object.entries(scpState.childRowMap[rowId]).forEach(([size, childRowId]) => {
             const childRow = document.getElementById(`row-${childRowId}`);
             if (childRow && childRow.dataset.colorManuallySet !== 'true') {
                 // Update child row color
@@ -1485,8 +1484,8 @@ function updateChildRowColorIndicators(parentRowId) {
 
     const parentCatalogColor = parentRow.dataset.catalogColor;
 
-    if (childRowMap[parentRowId]) {
-        Object.values(childRowMap[parentRowId]).forEach(childRowId => {
+    if (scpState.childRowMap[parentRowId]) {
+        Object.values(scpState.childRowMap[parentRowId]).forEach(childRowId => {
             const childRow = document.getElementById(`row-${childRowId}`);
             if (childRow) {
                 if (childRow.dataset.catalogColor !== parentCatalogColor) {
@@ -1590,8 +1589,8 @@ export function onSizeChange(rowId) {
     if (xxlInput) {
         const qty = parseInt(xxlInput.value) || 0;
         // Check for both 2XL and XXL child rows (XXL is distinct for Ladies/Womens products)
-        const existingChildId = childRowMap[rowId]?.['2XL'] || childRowMap[rowId]?.['XXL'];
-        const existingChildSize = childRowMap[rowId]?.['2XL'] ? '2XL' : (childRowMap[rowId]?.['XXL'] ? 'XXL' : '2XL');
+        const existingChildId = scpState.childRowMap[rowId]?.['2XL'] || scpState.childRowMap[rowId]?.['XXL'];
+        const existingChildSize = scpState.childRowMap[rowId]?.['2XL'] ? '2XL' : (scpState.childRowMap[rowId]?.['XXL'] ? 'XXL' : '2XL');
 
         if (qty > 0) {
             // Need a child row for 2XL (or XXL if that's what exists)
@@ -1647,7 +1646,7 @@ export function createChildRow(parentRowId, size, qty) {
     const parentRow = document.getElementById(`row-${parentRowId}`);
     if (!parentRow) return;
 
-    const childRowId = ++rowCounter;
+    const childRowId = ++scpState.rowCounter;
     const baseStyle = parentRow.dataset.style;
     const partNumber = getPartNumber(baseStyle, size);
 
@@ -1777,10 +1776,10 @@ export function createChildRow(parentRowId, size, qty) {
     }
 
     // Track child row
-    if (!childRowMap[parentRowId]) {
-        childRowMap[parentRowId] = {};
+    if (!scpState.childRowMap[parentRowId]) {
+        scpState.childRowMap[parentRowId] = {};
     }
-    childRowMap[parentRowId][size] = childRowId;
+    scpState.childRowMap[parentRowId][size] = childRowId;
 
 }
 
@@ -1803,13 +1802,13 @@ function updateChildRow(childRowId, qty) {
  * Remove a child row
  */
 function removeChildRow(parentRowId, size) {
-    const childRowId = childRowMap[parentRowId]?.[size];
+    const childRowId = scpState.childRowMap[parentRowId]?.[size];
     if (childRowId) {
         const childRow = document.getElementById(`row-${childRowId}`);
         if (childRow) {
             childRow.remove();
         }
-        delete childRowMap[parentRowId][size];
+        delete scpState.childRowMap[parentRowId][size];
     }
 }
 
@@ -1870,15 +1869,15 @@ export function deleteRow(rowId) {
     if (!row) return;
 
     // If this is a parent row, also remove all child rows
-    if (!row.classList.contains('child-row') && childRowMap[rowId]) {
-        Object.keys(childRowMap[rowId]).forEach(size => {
-            const childRowId = childRowMap[rowId][size];
+    if (!row.classList.contains('child-row') && scpState.childRowMap[rowId]) {
+        Object.keys(scpState.childRowMap[rowId]).forEach(size => {
+            const childRowId = scpState.childRowMap[rowId][size];
             const childRow = document.getElementById(`row-${childRowId}`);
             if (childRow) {
                 childRow.remove();
             }
         });
-        delete childRowMap[rowId];
+        delete scpState.childRowMap[rowId];
     }
 
 

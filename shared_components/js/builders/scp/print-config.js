@@ -5,8 +5,8 @@
  * from screenprint-quote-builder.js.
  */
 // @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions; typing lands with the render/state split).
-/* global printConfig, SCREEN_FEE, SCP_DARK_COLOR_WORDS, _darkNudgeDismissed:writable,
-   markScreenPrintDirty, recalculateAllPrices, getServicePrice */
+/* global markScreenPrintDirty, recalculateAllPrices, getServicePrice */
+import { scpState, SCREEN_FEE, SCP_DARK_COLOR_WORDS } from './state.js';
 
 // Update print configuration from UI selections
 export function updatePrintConfig() {
@@ -16,29 +16,29 @@ export function updatePrintConfig() {
     const frontColorsRadio = document.querySelector('input[name="front-colors"]:checked');
     const backColorsRadio = document.querySelector('input[name="back-colors"]:checked');
 
-    printConfig.frontLocation = frontRadio ? frontRadio.value : 'LC';
-    printConfig.backLocation = backRadio ? backRadio.value : '';
-    printConfig.frontColors = frontColorsRadio ? parseInt(frontColorsRadio.value) : 1;
-    printConfig.backColors = backColorsRadio ? parseInt(backColorsRadio.value) : 1;
-    printConfig.isDarkGarment = document.getElementById('dark-garment-toggle').checked;
-    printConfig.isSafetyStripes = document.getElementById('safety-stripes-toggle').checked;
+    scpState.printConfig.frontLocation = frontRadio ? frontRadio.value : 'LC';
+    scpState.printConfig.backLocation = backRadio ? backRadio.value : '';
+    scpState.printConfig.frontColors = frontColorsRadio ? parseInt(frontColorsRadio.value) : 1;
+    scpState.printConfig.backColors = backColorsRadio ? parseInt(backColorsRadio.value) : 1;
+    scpState.printConfig.isDarkGarment = document.getElementById('dark-garment-toggle').checked;
+    scpState.printConfig.isSafetyStripes = document.getElementById('safety-stripes-toggle').checked;
 
     // Sleeves — each checked sleeve is its OWN additional print location at its own ink-color count
     const leftSleeveOn = document.getElementById('left-sleeve-toggle')?.checked;
     const rightSleeveOn = document.getElementById('right-sleeve-toggle')?.checked;
     const leftSleeveColorsRadio = document.querySelector('input[name="left-sleeve-colors"]:checked');
     const rightSleeveColorsRadio = document.querySelector('input[name="right-sleeve-colors"]:checked');
-    printConfig.leftSleeveColors = leftSleeveOn ? (leftSleeveColorsRadio ? parseInt(leftSleeveColorsRadio.value) : 1) : 0;
-    printConfig.rightSleeveColors = rightSleeveOn ? (rightSleeveColorsRadio ? parseInt(rightSleeveColorsRadio.value) : 1) : 0;
+    scpState.printConfig.leftSleeveColors = leftSleeveOn ? (leftSleeveColorsRadio ? parseInt(leftSleeveColorsRadio.value) : 1) : 0;
+    scpState.printConfig.rightSleeveColors = rightSleeveOn ? (rightSleeveColorsRadio ? parseInt(rightSleeveColorsRadio.value) : 1) : 0;
     // engine-canonical list: one entry per checked sleeve (left, right). Pricing is order-independent.
-    printConfig.sleeveColorsList = [];
-    if (printConfig.leftSleeveColors > 0) printConfig.sleeveColorsList.push(printConfig.leftSleeveColors);
-    if (printConfig.rightSleeveColors > 0) printConfig.sleeveColorsList.push(printConfig.rightSleeveColors);
+    scpState.printConfig.sleeveColorsList = [];
+    if (scpState.printConfig.leftSleeveColors > 0) scpState.printConfig.sleeveColorsList.push(scpState.printConfig.leftSleeveColors);
+    if (scpState.printConfig.rightSleeveColors > 0) scpState.printConfig.sleeveColorsList.push(scpState.printConfig.rightSleeveColors);
 
     // Show/hide back colors section
     const backColorsSection = document.getElementById('back-colors-section');
     const backIcon = document.getElementById('back-icon');
-    if (printConfig.backLocation) {
+    if (scpState.printConfig.backLocation) {
         backColorsSection.style.display = 'block';
         backIcon.className = 'fas fa-check-circle';
         backIcon.style.color = '#28a745';
@@ -55,75 +55,75 @@ export function updatePrintConfig() {
     if (rightSleeveSection) rightSleeveSection.style.display = rightSleeveOn ? 'block' : 'none';
     const sleeveIcon = document.getElementById('sleeve-icon');
     if (sleeveIcon) {
-        const anySleeve = printConfig.sleeveColorsList.length > 0;
+        const anySleeve = scpState.printConfig.sleeveColorsList.length > 0;
         sleeveIcon.className = anySleeve ? 'fas fa-check-circle' : 'fas fa-plus-circle';
         sleeveIcon.style.color = anySleeve ? '#28a745' : '#888';
     }
 
     // Calculate screens — front + back + EACH sleeve's colors; dark garments add +1 white-underbase
     // screen PER printed location (front, back, and each sleeve). Mirrors engine quote-cart-engine.js.
-    let frontScreens = printConfig.frontColors;
-    let backScreens = printConfig.backLocation ? printConfig.backColors : 0;
-    let leftSleeveScreens = printConfig.leftSleeveColors > 0 ? printConfig.leftSleeveColors : 0;
-    let rightSleeveScreens = printConfig.rightSleeveColors > 0 ? printConfig.rightSleeveColors : 0;
+    let frontScreens = scpState.printConfig.frontColors;
+    let backScreens = scpState.printConfig.backLocation ? scpState.printConfig.backColors : 0;
+    let leftSleeveScreens = scpState.printConfig.leftSleeveColors > 0 ? scpState.printConfig.leftSleeveColors : 0;
+    let rightSleeveScreens = scpState.printConfig.rightSleeveColors > 0 ? scpState.printConfig.rightSleeveColors : 0;
 
     // Add underbase for dark garments — one extra screen per printed location (incl. each sleeve)
-    if (printConfig.isDarkGarment) {
+    if (scpState.printConfig.isDarkGarment) {
         frontScreens += 1;
-        if (printConfig.backLocation) {
+        if (scpState.printConfig.backLocation) {
             backScreens += 1;
         }
-        if (printConfig.leftSleeveColors > 0) leftSleeveScreens += 1;
-        if (printConfig.rightSleeveColors > 0) rightSleeveScreens += 1;
+        if (scpState.printConfig.leftSleeveColors > 0) leftSleeveScreens += 1;
+        if (scpState.printConfig.rightSleeveColors > 0) rightSleeveScreens += 1;
     }
 
-    printConfig.totalScreens = frontScreens + backScreens + leftSleeveScreens + rightSleeveScreens;
+    scpState.printConfig.totalScreens = frontScreens + backScreens + leftSleeveScreens + rightSleeveScreens;
     // Per-screen setup fee from Caspio Service_Codes 'SPSU' (fallback SCREEN_FEE). (Pricing=API)
     // Use the SAME perScreen value in the breakdown strings so a Caspio SPSU change can't make
     // the displayed "× $X" math disagree with the charged total. (2026-06-20 audit SCP-4)
     const perScreen = (typeof getServicePrice === 'function' ? getServicePrice('SPSU', SCREEN_FEE) : SCREEN_FEE);
-    printConfig.setupFee = printConfig.totalScreens * perScreen;
+    scpState.printConfig.setupFee = scpState.printConfig.totalScreens * perScreen;
     const _ps = perScreen.toFixed(2);
 
     // Update front setup display
     const frontSetupEl = document.getElementById('front-setup-display');
-    if (printConfig.isDarkGarment) {
-        frontSetupEl.textContent = `${printConfig.frontColors} + 1 underbase = ${frontScreens} screens × $${_ps} = $${(frontScreens * perScreen).toFixed(2)}`;
+    if (scpState.printConfig.isDarkGarment) {
+        frontSetupEl.textContent = `${scpState.printConfig.frontColors} + 1 underbase = ${frontScreens} screens × $${_ps} = $${(frontScreens * perScreen).toFixed(2)}`;
     } else {
         frontSetupEl.textContent = `${frontScreens} screen${frontScreens > 1 ? 's' : ''} × $${_ps} = $${(frontScreens * perScreen).toFixed(2)}`;
     }
 
     // Update back setup display (if visible)
-    if (printConfig.backLocation) {
+    if (scpState.printConfig.backLocation) {
         const backSetupEl = document.getElementById('back-setup-display');
-        if (printConfig.isDarkGarment) {
-            backSetupEl.textContent = `${printConfig.backColors} + 1 underbase = ${backScreens} screens × $${_ps} = $${(backScreens * perScreen).toFixed(2)}`;
+        if (scpState.printConfig.isDarkGarment) {
+            backSetupEl.textContent = `${scpState.printConfig.backColors} + 1 underbase = ${backScreens} screens × $${_ps} = $${(backScreens * perScreen).toFixed(2)}`;
         } else {
             backSetupEl.textContent = `${backScreens} screen${backScreens > 1 ? 's' : ''} × $${_ps} = $${(backScreens * perScreen).toFixed(2)}`;
         }
     }
 
     // Update sleeve setup displays (if a sleeve is on)
-    if (printConfig.leftSleeveColors > 0) {
+    if (scpState.printConfig.leftSleeveColors > 0) {
         const lsEl = document.getElementById('left-sleeve-setup-display');
-        if (lsEl) lsEl.textContent = printConfig.isDarkGarment
-            ? `${printConfig.leftSleeveColors} + 1 underbase = ${leftSleeveScreens} screens × $${_ps} = $${(leftSleeveScreens * perScreen).toFixed(2)}`
+        if (lsEl) lsEl.textContent = scpState.printConfig.isDarkGarment
+            ? `${scpState.printConfig.leftSleeveColors} + 1 underbase = ${leftSleeveScreens} screens × $${_ps} = $${(leftSleeveScreens * perScreen).toFixed(2)}`
             : `${leftSleeveScreens} screen${leftSleeveScreens > 1 ? 's' : ''} × $${_ps} = $${(leftSleeveScreens * perScreen).toFixed(2)}`;
     }
-    if (printConfig.rightSleeveColors > 0) {
+    if (scpState.printConfig.rightSleeveColors > 0) {
         const rsEl = document.getElementById('right-sleeve-setup-display');
-        if (rsEl) rsEl.textContent = printConfig.isDarkGarment
-            ? `${printConfig.rightSleeveColors} + 1 underbase = ${rightSleeveScreens} screens × $${_ps} = $${(rightSleeveScreens * perScreen).toFixed(2)}`
+        if (rsEl) rsEl.textContent = scpState.printConfig.isDarkGarment
+            ? `${scpState.printConfig.rightSleeveColors} + 1 underbase = ${rightSleeveScreens} screens × $${_ps} = $${(rightSleeveScreens * perScreen).toFixed(2)}`
             : `${rightSleeveScreens} screen${rightSleeveScreens > 1 ? 's' : ''} × $${_ps} = $${(rightSleeveScreens * perScreen).toFixed(2)}`;
     }
 
     // Update total setup fee display
-    document.getElementById('total-screens-display').textContent = `${printConfig.totalScreens} screen${printConfig.totalScreens > 1 ? 's' : ''} total`;
-    document.getElementById('setup-fee-display').textContent = `$${printConfig.setupFee.toFixed(2)}`;
+    document.getElementById('total-screens-display').textContent = `${scpState.printConfig.totalScreens} screen${scpState.printConfig.totalScreens > 1 ? 's' : ''} total`;
+    document.getElementById('setup-fee-display').textContent = `$${scpState.printConfig.setupFee.toFixed(2)}`;
 
     // Show/hide dark garment note
     const darkNote = document.getElementById('dark-garment-note');
-    if (printConfig.isDarkGarment) {
+    if (scpState.printConfig.isDarkGarment) {
         darkNote.style.display = 'block';
     } else {
         darkNote.style.display = 'none';
@@ -145,7 +145,7 @@ export function updateDarkGarmentNudge(productList) {
         return SCP_DARK_COLOR_WORDS.some(w => c.includes(w));
     });
 
-    if (toggle.checked || _darkNudgeDismissed || !hasDarkRows) {
+    if (toggle.checked || scpState._darkNudgeDismissed || !hasDarkRows) {
         if (chip) chip.remove();
         return;
     }
@@ -165,7 +165,7 @@ export function updateDarkGarmentNudge(productList) {
         if (typeof markScreenPrintDirty === 'function') markScreenPrintDirty();
     });
     chip.querySelector('.dark-garment-nudge-dismiss').addEventListener('click', () => {
-        _darkNudgeDismissed = true;   // per-quote: resetQuote() re-arms it
+        scpState._darkNudgeDismissed = true;   // per-quote: resetQuote() re-arms it
         chip.remove();
     });
     host.insertAdjacentElement('afterend', chip);

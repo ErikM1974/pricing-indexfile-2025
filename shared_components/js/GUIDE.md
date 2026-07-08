@@ -24,7 +24,9 @@
 | `builders/emb/adapter.js` | **EmbAdapter (2026-07-08)** — MethodAdapter contract + the EMB init verbatim (services bar, customer panel wiring, ?edit/?duplicate/QQ/method-switch routing) |
 | `builders/shared/quote-model.js` | **0.5 (2026-07-08)** — createQuoteItem + QuoteState store (line CRUD, totals, caps-vs-garments tierGroups). Zero price math |
 | `builders/emb/state.js` | **0.5 (2026-07-08)** — embState (all EMB mutable state; 3 window-backed contract fields for classic consumers) + constants + the quoteState instance |
-| `builders/scp/index.js` | **SCP ESM entry point (roadmap 0.4; real since 2026-07-08 S1a)** — the ONE sanctioned window re-export surface for the SCP decomposition (26 bridges, parse-time). S1b adds pricing-sync/lifecycle/save/push; S2 adds adapter+state |
+| `builders/scp/index.js` | **SCP ESM entry point (decomposition COMPLETE 2026-07-08)** — 46 window bridges + `QuoteBuilderBase(new ScpAdapter()).init()` boot + `__scpState` handle. The page's ONLY builder script (monolith = tombstone) |
+| `builders/scp/state.js` | **SCP S2 (2026-07-08)** — scpState (all SCP mutable state; window-backed childRowMap/hasChanges for shared classics) + constants + the quoteState instance |
+| `builders/scp/adapter.js` | **ScpAdapter (2026-07-08)** — MethodAdapter contract + the SCP init verbatim (chips, service-code labels, safety recs, artwork, customer lookup, ?edit/?duplicate/QQ/method-switch routing); QoS configure at module tail |
 | `builders/scp/print-config.js` | **SCP S1a (2026-07-08)** — `updatePrintConfig` (locations/ink colors/dark-garment/safety-stripes) + dark-garment nudge. Verbatim move |
 | `builders/scp/persistence.js` | **SCP S1a (2026-07-08)** — draft autosave/restore, edit/duplicate load, QQ + method-switch prefills, resetQuote. Verbatim move; latent monolith bug preserved (`updateRowQuantityTotal` undefined on draft-restore path) |
 | `builders/scp/product-rows.js` | **SCP S1a (2026-07-08)** — search/rows/size engine/color picker + child rows (dup-row auto-merge) + keyboard nav + click-away listener. Verbatim move; latent bug preserved (deleteRow tail calls EMB-only `updateCapLogoSectionVisibility`) |

@@ -2,15 +2,15 @@
  * SCP push-to-ShopWorks module — SCP decomposition S1b (2026-07-08).
  * One-click save+push (push-button-binding locks the single-async-decl rule
  * against THIS file), review/confirm preview, button state. Moved verbatim.
- * _scpPushQuoteId/_scpPushInFlight stay in the shell until S2 state.js.
+ * Push state (_scpPushQuoteId/_scpPushInFlight) lives on scpState since S2.
  */
 // @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions; typing lands with the render/state split).
-/* global _scpPushQuoteId:writable, _scpPushInFlight:writable,
-   saveAndGetLink, editingQuoteId, escapeHtml, showToast, API_BASE,
+/* global saveAndGetLink, escapeHtml, showToast,
    renderBuilderPushReadiness, collectProductsFromTable, confirm */
+import { scpState } from './state.js';
 
 export function showScpPushButton(quoteId) {
-    _scpPushQuoteId = quoteId;
+    scpState._scpPushQuoteId = quoteId;
     // The Push button is ALWAYS visible now (disabled-until-ready, EMB parity 2026-06-14); this just
     // records the saved quote id (the /preview endpoint needs it) and re-gates the button.
     if (typeof updateScpPushButtonState === 'function') updateScpPushButtonState();
@@ -29,8 +29,8 @@ export function updateScpPushButtonState() {
 // (window bridge moved to builders/scp/index.js)
 
 export async function scpPushToShopWorks() {
-    if (_scpPushInFlight) return;                 // re-entrancy guard (a double-click must not save/push twice)
-    _scpPushInFlight = true;
+    if (scpState._scpPushInFlight) return;                 // re-entrancy guard (a double-click must not save/push twice)
+    scpState._scpPushInFlight = true;
     const label = document.getElementById('scp-push-shopworks-label');
     if (label) label.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing preview…';
     try {
@@ -42,7 +42,7 @@ export async function scpPushToShopWorks() {
         if (!savedId) return;                              // this save failed / was blocked (error already shown)
         await openScpPushPreview();
     } finally {
-        _scpPushInFlight = false;
+        scpState._scpPushInFlight = false;
         const _b = document.getElementById('scp-push-shopworks-btn');
         // Don't clobber the "Pushed ✓" success label once the push completed.
         if (label && (!_b || _b.dataset.pushed !== '1')) label.textContent = 'Push to ShopWorks';
@@ -65,7 +65,7 @@ function _scpEsc(s) {
 // confirm()-push so the rep is never blocked.
 export async function openScpPushPreview() {
     const btn = document.getElementById('scp-push-shopworks-btn');
-    if (!btn || btn.disabled || !_scpPushQuoteId) return;
+    if (!btn || btn.disabled || !scpState._scpPushQuoteId) return;
     // Warn before pushing with no ShopWorks Customer # — the order would silently
     // attach to placeholder customer 3739 instead of the real customer. EMB gates its
     // button on this; SCP/DTF warn at push time for parity. (2026-06-01)
@@ -92,7 +92,7 @@ export async function openScpPushPreview() {
 
     try {
         const apiBase = window.APP_CONFIG.API.BASE_URL;
-        const resp = await fetch(`${apiBase}/api/scp-push/preview/${encodeURIComponent(_scpPushQuoteId)}`);
+        const resp = await fetch(`${apiBase}/api/scp-push/preview/${encodeURIComponent(scpState._scpPushQuoteId)}`);
         const data = await resp.json();
         if (!resp.ok) throw new Error(data.error || data.details || `HTTP ${resp.status}`);
         renderScpPushPreview(data.orderJson || {});
@@ -160,10 +160,10 @@ export async function confirmScpPush(directFallback) {
     const mainLabel = document.getElementById('scp-push-shopworks-label');
     const confirmBtn = document.getElementById('scp-push-confirm');
     const statusEl = document.getElementById('scp-push-status');
-    if (!_scpPushQuoteId) return;
+    if (!scpState._scpPushQuoteId) return;
 
     if (directFallback) {
-        if (!confirm(`Push quote ${_scpPushQuoteId} to ShopWorks?\n\nThis creates a new screen print order in OnSite.`)) return;
+        if (!confirm(`Push quote ${scpState._scpPushQuoteId} to ShopWorks?\n\nThis creates a new screen print order in OnSite.`)) return;
         if (mainBtn) { mainBtn.disabled = true; mainBtn.style.opacity = '0.6'; }
         if (mainLabel) mainLabel.textContent = 'Pushing...';
     } else if (confirmBtn) {
@@ -177,7 +177,7 @@ export async function confirmScpPush(directFallback) {
         const response = await fetch(`${apiBase}/api/scp-push/push-quote`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ quoteId: _scpPushQuoteId, isTest: false, force: false }),
+            body: JSON.stringify({ quoteId: scpState._scpPushQuoteId, isTest: false, force: false }),
         });
         const data = await response.json();
 

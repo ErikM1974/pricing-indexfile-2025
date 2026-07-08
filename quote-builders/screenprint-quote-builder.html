@@ -802,18 +802,18 @@
     <script src="/shared_components/js/inventory-badges.js?v=2026.05.23.1"></script>
     <!-- Phase 11.1: customer-aware design lookup -->
     <script src="/shared_components/js/customer-design-combobox.js?v=2026.05.24.1"></script>
-    <!-- [2026-06-08] Shared order-summary band — MUST load after quote-builder-utils.js + before screenprint-quote-builder.js (configure() runs at its eval) -->
+    <!-- [2026-06-08] Shared order-summary band — MUST load after quote-builder-utils.js + before the builders/scp bundle (configure() runs at its eval) -->
     <script src="/shared_components/js/quote-order-summary.js?v=2026.06.08.12"></script>
     <script src="/shared_components/js/safety-stripe-recs.js?v=2026.06.28.4"></script>
-    <script src="/shared_components/js/screenprint-quote-builder.js?v=2026.07.08.1"></script>
 
     <!-- Guided Quote shell (Phase B, 2026-07-07) — 4-step flow over the existing
          sections, sidebar stays the price rail; "Show everything" restores the
          workbench. Loads LAST so it recomposes after the builder's own init. -->
     <script src="/shared_components/js/quote-builder-guided.js?v=2026.07.07.7"></script>
 
-    <!-- Phase 0 strangler entry (roadmap 0.4): modules extracted from
-         screenprint-quote-builder.js land in this esbuild bundle. Loads last. -->
+    <!-- The SCP builder (roadmap 0.4, decomposition complete 2026-07-08):
+         builders/scp modules + QuoteBuilderBase boot, esbuild bundle. The old
+         screenprint-quote-builder.js monolith is a tombstone. Loads last. -->
     <script src="/shared_components/js/builders/scp/index.js"></script>
 
 </body>

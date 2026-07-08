@@ -5,16 +5,13 @@
  * quote text. Moved verbatim.
  */
 // @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions; typing lands with the render/state split).
-/* global quoteService:writable, screenPrintPricingService, printConfig,
-   products, childRowMap, editingQuoteId:writable, editingRevision:writable,
-   hasChanges:writable, spPersistence, spSession, collectProductsFromTable,
-   recalculatePricing, updateTaxCalculation, getScpExtraFees,
-   updateEditModeUI, markAsSaved, assertQuoteEditable, showScpPushButton,
-   updateScpPushButtonState, escapeHtml, showToast, formatPrice,
-   getLtmControlState, LOCATION_NAMES, SCREEN_FEE, _scpPushQuoteId,
-   showLoading, EmbroideryInvoiceGenerator, getOrderShippingData,
-   getServicePrice, isValidEmail, QuoteShareModal, alert,
-   hasUnsavedChanges, emailQuote */
+/* global collectProductsFromTable, recalculatePricing, updateTaxCalculation,
+   getScpExtraFees, updateEditModeUI, markAsSaved, assertQuoteEditable,
+   showScpPushButton, updateScpPushButtonState, escapeHtml, showToast,
+   formatPrice, getLtmControlState, showLoading, EmbroideryInvoiceGenerator,
+   getOrderShippingData, getServicePrice, isValidEmail, QuoteShareModal,
+   alert, hasUnsavedChanges, emailQuote */
+import { scpState, LOCATION_NAMES } from './state.js';
 
 export async function printQuote() {
     const products = collectProductsFromTable();
@@ -28,7 +25,7 @@ export async function printQuote() {
     // interactive) the products would price to $0, so Print would emit a silent $0.00
     // customer PDF with no error. Erik's #1 rule: visible failure, never a silent wrong
     // price. Two-part — (1) pricing loaded, (2) products subtotal > 0.
-    if (!window.currentPricingData || typeof screenPrintPricingService === 'undefined' || !screenPrintPricingService) {
+    if (!window.currentPricingData || typeof scpState.screenPrintPricingService === 'undefined' || !scpState.screenPrintPricingService) {
         showToast('Pricing data is not loaded — cannot print. Please refresh and try again.', 'error');
         return;
     }
@@ -98,7 +95,7 @@ function buildScreenprintPricingData(products) {
     // No #quote-id element exists in this page — the old DOM read made EVERY printed
     // PDF show a fabricated `SPC-<epoch>` number that matches nothing in Quote Mgmt.
     // Use the real saved id; null lets the shared generator print "DRAFT" when unsaved.
-    const quoteId = (typeof editingQuoteId !== 'undefined' && editingQuoteId) || (typeof _scpPushQuoteId !== 'undefined' && _scpPushQuoteId) || null;
+    const quoteId = (typeof scpState.editingQuoteId !== 'undefined' && scpState.editingQuoteId) || (typeof scpState._scpPushQuoteId !== 'undefined' && scpState._scpPushQuoteId) || null;
 
     // Build products array with line items for invoice
     const invoiceProducts = [];
@@ -169,7 +166,7 @@ function buildScreenprintPricingData(products) {
             if (baseSizes.includes(size)) return;             // already in the grouped base line
             if (size === 'OSFA' && baseQty === 0) return;     // OSFA-only handled above
             // Read the child row's price cell (carries any size upcharge)
-            const childRowId = childRowMap[rowId]?.[size];
+            const childRowId = scpState.childRowMap[rowId]?.[size];
             const childPriceCell = document.getElementById(`row-price-${childRowId}`);
             const childPriceText = childPriceCell?.textContent || '';
             let unitPrice = parseFloat(childPriceText.replace(/[^0-9.]/g, '')) || 0;
@@ -205,16 +202,16 @@ function buildScreenprintPricingData(products) {
     });
 
     // Build print config description for invoice
-    const frontDesc = getLocationName(printConfig.frontLocation) + ` (${printConfig.frontColors}-color)`;
-    const backDesc = printConfig.backLocation ? getLocationName(printConfig.backLocation) + ` (${printConfig.backColors}-color)` : null;
+    const frontDesc = getLocationName(scpState.printConfig.frontLocation) + ` (${scpState.printConfig.frontColors}-color)`;
+    const backDesc = scpState.printConfig.backLocation ? getLocationName(scpState.printConfig.backLocation) + ` (${scpState.printConfig.backColors}-color)` : null;
     const sleeveParts = [];
-    if (printConfig.leftSleeveColors > 0) sleeveParts.push(`Left Sleeve (${printConfig.leftSleeveColors}-color)`);
-    if (printConfig.rightSleeveColors > 0) sleeveParts.push(`Right Sleeve (${printConfig.rightSleeveColors}-color)`);
+    if (scpState.printConfig.leftSleeveColors > 0) sleeveParts.push(`Left Sleeve (${scpState.printConfig.leftSleeveColors}-color)`);
+    if (scpState.printConfig.rightSleeveColors > 0) sleeveParts.push(`Right Sleeve (${scpState.printConfig.rightSleeveColors}-color)`);
     const sleeveDesc = sleeveParts.length ? sleeveParts.join(', ') : null;
 
     // Calculate safety stripes total for display as separate line item
-    const locationCount = printConfig.backLocation ? 2 : 1;
-    const safetyStripesTotal = printConfig.isSafetyStripes
+    const locationCount = scpState.printConfig.backLocation ? 2 : 1;
+    const safetyStripesTotal = scpState.printConfig.isSafetyStripes
         ? (currentPricing.totalQuantity * getServicePrice('SP-STRIPE', 2.00) * locationCount)
         : 0;
 
@@ -266,7 +263,7 @@ function buildScreenprintPricingData(products) {
         taxRate: taxRateRaw,
         // Itemized on the PDF so the rows foot to the total (already inside preTaxSubtotal).
         shippingFee: parseFloat(document.querySelector('#spc-order-fields .os-shipping-fee')?.value) || 0,
-        setupFees: currentPricing.setupFees || printConfig.setupFee || 0,
+        setupFees: currentPricing.setupFees || scpState.printConfig.setupFee || 0,
         additionalServicesTotal: 0,
         // Empty logos means embroidery specs section will be skipped
         logos: [],
@@ -275,9 +272,9 @@ function buildScreenprintPricingData(products) {
             front: frontDesc,
             back: backDesc,
             sleeves: sleeveDesc,
-            isDarkGarment: printConfig.isDarkGarment,
-            hasSafetyStripes: printConfig.isSafetyStripes,
-            totalScreens: printConfig.totalScreens || 1
+            isDarkGarment: scpState.printConfig.isDarkGarment,
+            hasSafetyStripes: scpState.printConfig.isSafetyStripes,
+            totalScreens: scpState.printConfig.totalScreens || 1
         },
         ltmFee: currentPricing.ltmFee || 0,
         ltmDistributed: ltmDistributed,
@@ -390,7 +387,7 @@ export async function saveAndGetLink(opts = {}) {
         const discountType = document.getElementById('discount-type')?.value || 'fixed';
         const discountReason = document.getElementById('discount-reason')?.value || '';
         // Calculate discountable subtotal for percentage discount (products + additional services + setup fees)
-        const discountableSubtotal = (pricing.subtotal || 0) + artCharge + graphicDesignCharge + rushFee + (printConfig.setupFee || 0) + (pricing.ltmFee || 0)
+        const discountableSubtotal = (pricing.subtotal || 0) + artCharge + graphicDesignCharge + rushFee + (scpState.printConfig.setupFee || 0) + (pricing.ltmFee || 0)
             + _xf.vellumFee + _xf.colorChangeFee;
         const discount = discountType === 'percent' ? (discountableSubtotal * discountAmount / 100) : discountAmount;
         const discountPercent = discountType === 'percent' ? discountAmount : 0;
@@ -425,29 +422,29 @@ export async function saveAndGetLink(opts = {}) {
             totalQuantity: pricing.totalQuantity || items.reduce((sum, p) => sum + p.quantity, 0),
             subtotal: pricing.subtotal || 0,
             ltmFee: pricing.ltmFee || 0,
-            setupFees: printConfig.setupFee || 0,
+            setupFees: scpState.printConfig.setupFee || 0,
             grandTotal: pricing.grandTotal || 0,
-            frontLocation: printConfig.frontLocation,
-            frontColors: printConfig.frontColors,
-            backLocation: printConfig.backLocation,
-            backColors: printConfig.backColors,
-            leftSleeveColors: printConfig.leftSleeveColors,
-            rightSleeveColors: printConfig.rightSleeveColors,
-            sleeveColorsList: printConfig.sleeveColorsList,
-            totalScreens: printConfig.totalScreens,
-            isDarkGarment: printConfig.isDarkGarment,
-            hasSafetyStripes: printConfig.isSafetyStripes,
+            frontLocation: scpState.printConfig.frontLocation,
+            frontColors: scpState.printConfig.frontColors,
+            backLocation: scpState.printConfig.backLocation,
+            backColors: scpState.printConfig.backColors,
+            leftSleeveColors: scpState.printConfig.leftSleeveColors,
+            rightSleeveColors: scpState.printConfig.rightSleeveColors,
+            sleeveColorsList: scpState.printConfig.sleeveColorsList,
+            totalScreens: scpState.printConfig.totalScreens,
+            isDarkGarment: scpState.printConfig.isDarkGarment,
+            hasSafetyStripes: scpState.printConfig.isSafetyStripes,
             printSetup: {
-                frontLocation: printConfig.frontLocation,
-                frontColors: printConfig.frontColors,
-                backLocation: printConfig.backLocation,
-                backColors: printConfig.backColors,
-                leftSleeveColors: printConfig.leftSleeveColors,
-                rightSleeveColors: printConfig.rightSleeveColors,
-                sleeveColorsList: printConfig.sleeveColorsList,
-                totalScreens: printConfig.totalScreens,
-                isDarkGarment: printConfig.isDarkGarment,
-                isSafetyStripes: printConfig.isSafetyStripes
+                frontLocation: scpState.printConfig.frontLocation,
+                frontColors: scpState.printConfig.frontColors,
+                backLocation: scpState.printConfig.backLocation,
+                backColors: scpState.printConfig.backColors,
+                leftSleeveColors: scpState.printConfig.leftSleeveColors,
+                rightSleeveColors: scpState.printConfig.rightSleeveColors,
+                sleeveColorsList: scpState.printConfig.sleeveColorsList,
+                totalScreens: scpState.printConfig.totalScreens,
+                isDarkGarment: scpState.printConfig.isDarkGarment,
+                isSafetyStripes: scpState.printConfig.isSafetyStripes
             },
             // Additional charges (2026 fee refactor)
             artCharge: artCharge,
@@ -481,25 +478,25 @@ export async function saveAndGetLink(opts = {}) {
         };
 
         let result;
-        if (editingQuoteId) {
+        if (scpState.editingQuoteId) {
             // Update existing quote
-            result = await quoteService.updateQuote(editingQuoteId, quoteData);
+            result = await scpState.quoteService.updateQuote(scpState.editingQuoteId, quoteData);
             if (result && result.success) {
-                result.quoteID = editingQuoteId;
+                result.quoteID = scpState.editingQuoteId;
                 // Update revision number
-                editingRevision = result.revision;
-                updateEditModeUI(editingQuoteId, editingRevision);
+                scpState.editingRevision = result.revision;
+                updateEditModeUI(scpState.editingQuoteId, scpState.editingRevision);
             }
         } else {
             // Create new quote
-            result = await quoteService.saveQuote(quoteData);
+            result = await scpState.quoteService.saveQuote(quoteData);
         }
 
         if (result.success) {
 
             // Clear auto-save draft on successful save (2026 consolidation)
-            if (spPersistence) {
-                spPersistence.clearDraft();
+            if (scpState.spPersistence) {
+                scpState.spPersistence.clearDraft();
             }
 
             // Phase 8 (2026-05-23): reveal Push-to-ShopWorks button after save.
@@ -514,12 +511,12 @@ export async function saveAndGetLink(opts = {}) {
             if (opts.skipShareModal) {
                 /* auto-saved for Push to ShopWorks — no share modal */
             } else if (typeof QuoteShareModal !== 'undefined' && QuoteShareModal.show) {
-                QuoteShareModal.show(result.quoteID, editingQuoteId ? `Updated to Rev ${editingRevision}` : null);
+                QuoteShareModal.show(result.quoteID, scpState.editingQuoteId ? `Updated to Rev ${scpState.editingRevision}` : null);
             } else {
                 // Fallback
                 const url = `${window.location.origin}/quote/${result.quoteID}`;
-                const message = editingQuoteId
-                    ? `Quote updated!\n\nQuote ID: ${result.quoteID}\nRevision: ${editingRevision}\n\nShareable Link:\n${url}`
+                const message = scpState.editingQuoteId
+                    ? `Quote updated!\n\nQuote ID: ${result.quoteID}\nRevision: ${scpState.editingRevision}\n\nShareable Link:\n${url}`
                     : `Quote saved!\n\nQuote ID: ${result.quoteID}\n\nShareable Link:\n${url}`;
                 alert(message);
             }
@@ -555,7 +552,7 @@ export async function spcEmailQuote() {
     // was a dead end on every NEW quote ("save first" loop). Mirror EMB embEmailQuote:
     // accept the just-saved id, and auto-save when unsaved OR edited-since-save so the
     // customer never receives a stale revision. (expert audit 2026-07-07)
-    let quoteId = editingQuoteId || _scpPushQuoteId;
+    let quoteId = scpState.editingQuoteId || scpState._scpPushQuoteId;
     const dirty = (typeof hasUnsavedChanges === 'function') ? hasUnsavedChanges() : false;
     if (!quoteId || dirty) {
         showToast('Saving quote before emailing…', 'info', 2500);
@@ -584,8 +581,8 @@ export async function copyToClipboard() {
             tier: '24-47',
             subtotal: 0,
             ltmFee: 0,
-            setupFees: printConfig.setupFee,
-            grandTotal: printConfig.setupFee
+            setupFees: scpState.printConfig.setupFee,
+            grandTotal: scpState.printConfig.setupFee
         };
 
         const text = generateQuoteText(products, pricing);
@@ -610,29 +607,29 @@ function generateQuoteText(products, pricing) {
     // Print Configuration
     lines.push('');
     lines.push('PRINT CONFIGURATION:');
-    const frontName = LOCATION_NAMES[printConfig.frontLocation] || printConfig.frontLocation;
-    lines.push(`  Front: ${frontName} (${printConfig.frontColors}-color)`);
-    if (printConfig.backLocation) {
-        const backName = LOCATION_NAMES[printConfig.backLocation] || printConfig.backLocation;
-        lines.push(`  Back: ${backName} (${printConfig.backColors}-color)`);
+    const frontName = LOCATION_NAMES[scpState.printConfig.frontLocation] || scpState.printConfig.frontLocation;
+    lines.push(`  Front: ${frontName} (${scpState.printConfig.frontColors}-color)`);
+    if (scpState.printConfig.backLocation) {
+        const backName = LOCATION_NAMES[scpState.printConfig.backLocation] || scpState.printConfig.backLocation;
+        lines.push(`  Back: ${backName} (${scpState.printConfig.backColors}-color)`);
     }
     // Sleeve locations — mirror buildScreenprintPricingData's sleeveDesc so the copied
     // text lists them (were silently omitted; sleeves are their own print locations). (2026-07-04)
-    if (printConfig.leftSleeveColors > 0) {
-        lines.push(`  Left Sleeve: (${printConfig.leftSleeveColors}-color)`);
+    if (scpState.printConfig.leftSleeveColors > 0) {
+        lines.push(`  Left Sleeve: (${scpState.printConfig.leftSleeveColors}-color)`);
     }
-    if (printConfig.rightSleeveColors > 0) {
-        lines.push(`  Right Sleeve: (${printConfig.rightSleeveColors}-color)`);
+    if (scpState.printConfig.rightSleeveColors > 0) {
+        lines.push(`  Right Sleeve: (${scpState.printConfig.rightSleeveColors}-color)`);
     }
-    if (printConfig.isDarkGarment) {
+    if (scpState.printConfig.isDarkGarment) {
         lines.push(`  Dark Garment: Yes (includes white underbase)`);
     }
-    if (printConfig.isSafetyStripes) {
-        const locationCount = printConfig.backLocation ? 2 : 1;
+    if (scpState.printConfig.isSafetyStripes) {
+        const locationCount = scpState.printConfig.backLocation ? 2 : 1;
         lines.push(`  Safety Stripes: +$${(getServicePrice('SP-STRIPE', 2.00) * locationCount).toFixed(2)}/piece`);
     }
-    lines.push(`  Total Screens: ${printConfig.totalScreens}`);
-    lines.push(`  Setup Fee: $${printConfig.setupFee.toFixed(2)}`);
+    lines.push(`  Total Screens: ${scpState.printConfig.totalScreens}`);
+    lines.push(`  Setup Fee: $${scpState.printConfig.setupFee.toFixed(2)}`);
 
     // Products
     lines.push('');
@@ -653,7 +650,7 @@ function generateQuoteText(products, pricing) {
     lines.push(`Total Pieces: ${pricing.totalQuantity || 0}`);
     lines.push(`Pricing Tier: ${pricing.tier || '24-47'}`);
     lines.push(`Products Subtotal: $${(pricing.subtotal || 0).toFixed(2)}`);
-    lines.push(`Setup Fee (${printConfig.totalScreens} screens): $${(pricing.setupFees || 0).toFixed(2)}`);
+    lines.push(`Setup Fee (${scpState.printConfig.totalScreens} screens): $${(pricing.setupFees || 0).toFixed(2)}`);
     if (pricing.ltmFee > 0) {
         lines.push(`Less Than Minimum Fee: $${pricing.ltmFee.toFixed(2)}`);
     }

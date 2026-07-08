@@ -127,15 +127,18 @@ function loadPdfBuilder({ cells, parentRows, childRowMap, currentPricingData }) 
     },
   };
   const printConfig = { frontLocation: 'FF', frontColors: 2, backLocation: null, backColors: 0, isDarkGarment: false, isSafetyStripes: false, setupFee: 60 };
+  // S2 (2026-07-08): the builder's state moved onto scpState (builders/scp/state.js)
+  // — the extracted fn now reads scpState.printConfig / scpState.childRowMap.
+  const scpState = { printConfig, childRowMap };
   const getLocationName = (c) => String(c);
   const getServicePrice = (code, fallback) => fallback;
   const getLtmControlState = () => ({ enabled: true, displayMode: 'builtin' });
   // eslint-disable-next-line no-new-func
   const factory = new Function(
-    'window', 'document', 'childRowMap', 'printConfig', 'getLocationName', 'getServicePrice', 'getLtmControlState',
+    'window', 'document', 'scpState', 'getLocationName', 'getServicePrice', 'getLtmControlState',
     PDF_FN_SRC + '\nreturn buildScreenprintPricingData;'
   );
-  return factory(win, doc, childRowMap, printConfig, getLocationName, getServicePrice, getLtmControlState);
+  return factory(win, doc, scpState, getLocationName, getServicePrice, getLtmControlState);
 }
 
 describe('SCP print parity — buildScreenprintPricingData (2026-06-11 fix)', () => {

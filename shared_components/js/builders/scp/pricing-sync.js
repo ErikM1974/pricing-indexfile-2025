@@ -6,14 +6,13 @@
  * tail), row/summary display sync, tax + wholesale. Moved verbatim.
  */
 // @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions; typing lands with the render/state split).
-/* global screenPrintPricingService, printConfig, childRowMap, products:writable,
-   SCREEN_FEE, LOCATION_NAMES, SIZE06_EXTENDED_SIZES, Event,
-   updatePrintConfig, updateDarkGarmentNudge, updateFeeTableRows,
+/* global Event, updatePrintConfig, updateDarkGarmentNudge, updateFeeTableRows,
    getScpExtraFees, updateAdditionalCharges, markScreenPrintDirty,
    updateScpPushButtonState, escapeHtml, showToast, formatPrice,
    wrapWithRepricingIndicator, renderOrderRecap, getServicePrice,
    renderLtmControlPanel, initLtmControlListeners, setLtmControlState,
    getLtmControlState, updatePerUnitPrice, updateQuantityNudge */
+import { scpState, LOCATION_NAMES, SIZE06_EXTENDED_SIZES } from './state.js';
 
 // Alias for backward compatibility
 export function recalculateAllPrices() {
@@ -70,8 +69,8 @@ async function _recalculatePricingImpl() {
             tier: '24-47',
             subtotal: 0,
             ltmFee: 0,
-            setupFees: printConfig.setupFee,
-            grandTotal: printConfig.setupFee
+            setupFees: scpState.printConfig.setupFee,
+            grandTotal: scpState.printConfig.setupFee
         });
         // Clear all price and total cells
         document.querySelectorAll('.cell-price').forEach(cell => {
@@ -107,7 +106,7 @@ async function _recalculatePricingImpl() {
     const _ltmStyle = productList.find(p => p.style)?.style;
     if (_ltmStyle) {
         try {
-            const _ltmBundle = await screenPrintPricingService.fetchPricingData(_ltmStyle);
+            const _ltmBundle = await scpState.screenPrintPricingService.fetchPricingData(_ltmStyle);
             const _plp = _ltmBundle && _ltmBundle.primaryLocationPricing;
             const _anyTiers = _plp ? (Object.values(_plp).find(p => p && Array.isArray(p.tiers))?.tiers || []) : [];
             let _m = _anyTiers.find(t => totalQty >= t.minQty && totalQty <= (t.maxQty ?? Infinity));
@@ -156,8 +155,8 @@ async function _recalculatePricingImpl() {
 
     // Safety stripes: per-piece-per-location surcharge from Caspio Service_Codes
     // 'SP-STRIPE' (fallback $2). (Pricing=API)
-    const locationCount = printConfig.backLocation ? 2 : 1;
-    const safetyStripesPerPiece = printConfig.isSafetyStripes ? (getServicePrice('SP-STRIPE', 2.00) * locationCount) : 0;
+    const locationCount = scpState.printConfig.backLocation ? 2 : 1;
+    const safetyStripesPerPiece = scpState.printConfig.isSafetyStripes ? (getServicePrice('SP-STRIPE', 2.00) * locationCount) : 0;
 
     let subtotal = 0;
     const pricedProducts = [];
@@ -171,7 +170,7 @@ async function _recalculatePricingImpl() {
             const style = product.style;
 
             // Fetch Screen Print pricing data for this style
-            const pricingData = await screenPrintPricingService.fetchPricingData(style);
+            const pricingData = await scpState.screenPrintPricingService.fetchPricingData(style);
 
             if (!pricingData) {
                 console.warn(`No pricing data for ${style}`);
@@ -180,7 +179,7 @@ async function _recalculatePricingImpl() {
             }
 
             // Get primary location pricing (garment + print)
-            const frontColors = printConfig.frontColors.toString();
+            const frontColors = scpState.printConfig.frontColors.toString();
             const primaryPricing = pricingData.primaryLocationPricing?.[frontColors];
 
             if (!primaryPricing || !primaryPricing.tiers) {
@@ -205,8 +204,8 @@ async function _recalculatePricingImpl() {
 
             // Get additional location pricing if back location enabled
             let additionalPricePerPiece = 0;
-            if (printConfig.backLocation) {
-                const backColors = printConfig.backColors.toString();
+            if (scpState.printConfig.backLocation) {
+                const backColors = scpState.printConfig.backColors.toString();
                 const additionalPricing = pricingData.additionalLocationPricing?.[backColors];
                 const additionalTier = (additionalPricing && additionalPricing.tiers)
                     ? findPricingTier(additionalPricing.tiers, totalQty)
@@ -226,7 +225,7 @@ async function _recalculatePricingImpl() {
             // quote-cart-engine.js priceScpGroup so the builder matches the engine/Quick Quote to the cent.
             let sleeveAddlPerPiece = 0;
             let sleeveDropped = false;
-            for (const c of (printConfig.sleeveColorsList || [])) {
+            for (const c of (scpState.printConfig.sleeveColorsList || [])) {
                 const sleevePricing = pricingData.additionalLocationPricing?.[String(c)];
                 if (!sleevePricing || !sleevePricing.tiers) {
                     droppedProducts.push({ style, reason: `no add-location pricing for a ${c}-color sleeve` });
@@ -297,7 +296,7 @@ async function _recalculatePricingImpl() {
                     }
                 } else {
                     // Extended size - find child row
-                    const childRowId = childRowMap[rowId]?.[size];
+                    const childRowId = scpState.childRowMap[rowId]?.[size];
                     if (childRowId) {
                         const childPriceCell = document.getElementById(`row-price-${childRowId}`);
                         if (childPriceCell) {
@@ -360,7 +359,7 @@ async function _recalculatePricingImpl() {
         }
 
         // Calculate grand total — in builtin mode LTM is already in subtotal via inflated unit prices
-        const setupFees = printConfig.setupFee;
+        const setupFees = scpState.printConfig.setupFee;
         const grandTotal = (ltmDisplayMode === 'builtin') ? subtotal + setupFees : subtotal + ltmFee + setupFees;
 
         // Compute per-piece savings for next tier nudge
@@ -409,33 +408,33 @@ function updateRowBreakdownScreenPrint(rowId, product, tierData) {
     const breakdownEl = document.getElementById(`breakdown-${rowId}`);
     if (!breakdownEl) return;
 
-    const frontName = LOCATION_NAMES[printConfig.frontLocation] || printConfig.frontLocation;
+    const frontName = LOCATION_NAMES[scpState.printConfig.frontLocation] || scpState.printConfig.frontLocation;
     const basePrice = tierData.prices?.['M'] || tierData.prices?.['L'] || 0;
 
     let breakdownHtml = `
-        <span class="breakdown-item">${frontName} (${printConfig.frontColors}-color)</span>
+        <span class="breakdown-item">${frontName} (${scpState.printConfig.frontColors}-color)</span>
         <span class="breakdown-separator">|</span>
         <span class="breakdown-item">$${basePrice.toFixed(2)}/ea</span>
     `;
 
-    if (printConfig.backLocation) {
-        const backName = LOCATION_NAMES[printConfig.backLocation] || printConfig.backLocation;
+    if (scpState.printConfig.backLocation) {
+        const backName = LOCATION_NAMES[scpState.printConfig.backLocation] || scpState.printConfig.backLocation;
         breakdownHtml += `
             <span class="breakdown-separator">+</span>
-            <span class="breakdown-item">${backName} (${printConfig.backColors}-color)</span>
+            <span class="breakdown-item">${backName} (${scpState.printConfig.backColors}-color)</span>
         `;
     }
 
-    if (printConfig.leftSleeveColors > 0) {
+    if (scpState.printConfig.leftSleeveColors > 0) {
         breakdownHtml += `
             <span class="breakdown-separator">+</span>
-            <span class="breakdown-item">L Sleeve (${printConfig.leftSleeveColors}-color)</span>
+            <span class="breakdown-item">L Sleeve (${scpState.printConfig.leftSleeveColors}-color)</span>
         `;
     }
-    if (printConfig.rightSleeveColors > 0) {
+    if (scpState.printConfig.rightSleeveColors > 0) {
         breakdownHtml += `
             <span class="breakdown-separator">+</span>
-            <span class="breakdown-item">R Sleeve (${printConfig.rightSleeveColors}-color)</span>
+            <span class="breakdown-item">R Sleeve (${scpState.printConfig.rightSleeveColors}-color)</span>
         `;
     }
 
@@ -595,14 +594,14 @@ function updatePricingDisplay(pricing) {
 
 // Update sidebar to reflect current print configuration
 function updateSidebarPrintConfig() {
-    const frontName = LOCATION_NAMES[printConfig.frontLocation] || printConfig.frontLocation;
-    document.getElementById('sidebar-front').textContent = `${frontName} (${printConfig.frontColors}-color)`;
+    const frontName = LOCATION_NAMES[scpState.printConfig.frontLocation] || scpState.printConfig.frontLocation;
+    document.getElementById('sidebar-front').textContent = `${frontName} (${scpState.printConfig.frontColors}-color)`;
 
     // Back location
     const backRow = document.getElementById('sidebar-back-row');
-    if (printConfig.backLocation) {
-        const backName = LOCATION_NAMES[printConfig.backLocation] || printConfig.backLocation;
-        document.getElementById('sidebar-back').textContent = `${backName} (${printConfig.backColors}-color)`;
+    if (scpState.printConfig.backLocation) {
+        const backName = LOCATION_NAMES[scpState.printConfig.backLocation] || scpState.printConfig.backLocation;
+        document.getElementById('sidebar-back').textContent = `${backName} (${scpState.printConfig.backColors}-color)`;
         backRow.style.display = 'flex';
     } else {
         backRow.style.display = 'none';
@@ -612,8 +611,8 @@ function updateSidebarPrintConfig() {
     const sleevesRow = document.getElementById('sidebar-sleeves-row');
     if (sleevesRow) {
         const sleeveBits = [];
-        if (printConfig.leftSleeveColors > 0) sleeveBits.push(`L ${printConfig.leftSleeveColors}-color`);
-        if (printConfig.rightSleeveColors > 0) sleeveBits.push(`R ${printConfig.rightSleeveColors}-color`);
+        if (scpState.printConfig.leftSleeveColors > 0) sleeveBits.push(`L ${scpState.printConfig.leftSleeveColors}-color`);
+        if (scpState.printConfig.rightSleeveColors > 0) sleeveBits.push(`R ${scpState.printConfig.rightSleeveColors}-color`);
         if (sleeveBits.length) {
             document.getElementById('sidebar-sleeves').textContent = sleeveBits.join(', ');
             sleevesRow.style.display = 'flex';
@@ -623,15 +622,15 @@ function updateSidebarPrintConfig() {
     }
 
     // Total screens
-    document.getElementById('sidebar-screens').textContent = printConfig.totalScreens;
+    document.getElementById('sidebar-screens').textContent = scpState.printConfig.totalScreens;
 
     // Dark garment
-    document.getElementById('sidebar-dark-row').style.display = printConfig.isDarkGarment ? 'flex' : 'none';
+    document.getElementById('sidebar-dark-row').style.display = scpState.printConfig.isDarkGarment ? 'flex' : 'none';
 
     // Safety stripes
     const stripesRow = document.getElementById('sidebar-stripes-row');
-    if (printConfig.isSafetyStripes) {
-        const locationCount = printConfig.backLocation ? 2 : 1;
+    if (scpState.printConfig.isSafetyStripes) {
+        const locationCount = scpState.printConfig.backLocation ? 2 : 1;
         document.getElementById('sidebar-stripes-cost').textContent = `+$${(getServicePrice('SP-STRIPE', 2.00) * locationCount).toFixed(2)}/pc`;
         stripesRow.style.display = 'flex';
     } else {

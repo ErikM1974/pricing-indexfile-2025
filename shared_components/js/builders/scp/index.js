@@ -15,9 +15,15 @@
  * S1a (2026-07-08): print-config, persistence, product-rows.
  * S1b (2026-07-08): pricing-sync (recalculatePricing = live export let,
  * reprice-pill wrapped), quote-lifecycle, save-output, push.
- * S2: ScpAdapter + QuoteBuilderBase boot + state module (shell → tombstone).
+ * S2 (2026-07-08): state.js (scpState + constants; window-backed
+ * childRowMap/hasChanges) + ScpAdapter carrying the page init verbatim +
+ * QuoteBuilderBase boot. The monolith is a tombstone; this bundle IS the
+ * SCP builder.
  */
 
+import { QuoteBuilderBase } from '../shared/quote-builder-base.js';
+import { ScpAdapter } from './adapter.js';
+import { scpState, quoteState } from './state.js';
 import { updatePrintConfig, updateDarkGarmentNudge } from './print-config.js';
 import {
     recalculatePricing,
@@ -31,6 +37,7 @@ import {
     updateDiscountType,
     getScpExtraFees,
     updateFeeTableRows,
+    applyRushPercent,
 } from './quote-lifecycle.js';
 import { printQuote, saveAndGetLink, spcEmailQuote, copyToClipboard } from './save-output.js';
 import {
@@ -113,11 +120,12 @@ window.collectProductsFromTable = collectProductsFromTable;
 window.updateTaxCalculation = updateTaxCalculation;
 window.toggleWholesale = toggleWholesale;
 
-// ---- quote lifecycle (S1b) ----
+// ---- quote lifecycle (S1b; applyRushPercent joined in S2) ----
 window.updateAdditionalCharges = updateAdditionalCharges;
 window.updateDiscountType = updateDiscountType;
 window.getScpExtraFees = getScpExtraFees;
 window.updateFeeTableRows = updateFeeTableRows;
+window.applyRushPercent = applyRushPercent;
 
 // ---- save / print / email output (S1b) ----
 window.printQuote = printQuote;
@@ -134,5 +142,12 @@ window.closeScpPushPreview = closeScpPushPreview;
 window.openScpPushPreview = openScpPushPreview;
 window.renderScpPushPreview = renderScpPushPreview;
 
+// ---- state handles (debug + test hooks; NOT an API for page code) ----
+window.__scpState = scpState;
+window.__scpQuoteState = quoteState;
+
+// ---- boot: the ONE base drives the page lifecycle (roadmap 0.4) ----
+new QuoteBuilderBase(new ScpAdapter()).init();
+
 window.__QB_BUILD = window.__QB_BUILD || {};
-window.__QB_BUILD.scp = { entry: 'builders/scp/index.js', stage: 'S1b' };
+window.__QB_BUILD.scp = { entry: 'builders/scp/index.js', stage: 'S2-complete' };

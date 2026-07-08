@@ -45,6 +45,8 @@ interface Window {
     /** builders/emb state handles (state.js via index.js). */
     __embState?: any;
     __quoteState?: any;
+    __scpState?: any;
+    __scpQuoteState?: any;
     /** builders/emb debug handle for the active method adapter. */
     __embAdapter?: any;
     /** quote-builder-utils.js loading overlay (classic function declaration → window prop). */
@@ -232,6 +234,7 @@ interface Window {
     /* SCP bridges (builders/scp/*, S1a + S1b) — names shared with EMB are typed above */
     recalculateAllPrices?: (...args: any[]) => any;
     getScpExtraFees?: (...args: any[]) => any;
+    applyRushPercent?: (...args: any[]) => any;
     spcEmailQuote?: (...args: any[]) => any;
     scpPushToShopWorks?: (...args: any[]) => any;
     openScpPushPreview?: (...args: any[]) => any;
