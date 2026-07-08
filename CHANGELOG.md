@@ -1,3 +1,9 @@
+## v2026.07.08.3 (2026.07.08)
+
+- feat(scp): 0.4 SCP decomposition S1a — print-config + persistence + product-rows -> builders/scp/ (shell 5,406->2,507)
+- feat(scp): 0.4 SCP decomposition S1b — pricing-sync + quote-lifecycle + save-output + push -> builders/scp/ (shell 2,507->618)
+- feat(scp): 0.4/0.5 SCP decomposition S2 COMPLETE — state.js + ScpAdapter + base boot; monolith -> tombstone
+
 ## v2026.07.08.2 (2026.07.08)
 
 - feat(emb): 0.4 base+adapter — QuoteBuilderBase revived, EmbAdapter drives the page (shell = 289 lines)
