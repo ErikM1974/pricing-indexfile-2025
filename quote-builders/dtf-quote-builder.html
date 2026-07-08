@@ -212,7 +212,7 @@
                                 <th class="size-col">L</th>
                                 <th class="size-col">XL</th>
                                 <th class="size-col">2XL</th>
-                                <th class="size-col extended-col" style="line-height: 1.1;" title="Click to add extended sizes (3XL, 4XL, 5XL, etc.)">More<br><span style="font-size: 10px; font-weight: 400;">Sizes</span></th>
+                                <th class="size-col extended-col qb-lh11" title="Click to add extended sizes (3XL, 4XL, 5XL, etc.)">More<br><span class="qb-fs10-w400">Sizes</span></th>
                                 <th class="qty-col">Qty</th>
                                 <th class="price-col">Unit $</th>
                                 <th class="total-col">Total</th>
@@ -222,8 +222,8 @@
                         <tbody id="product-tbody">
                             <!-- Empty State Message - shown until products added -->
                             <tr id="empty-state-row">
-                                <td colspan="14" style="text-align: center; padding: 40px 20px; color: #64748b; background: #f8fafc;">
-                                    <div style="font-size: 32px; margin-bottom: 12px;">&#128085;</div>
+                                <td colspan="14" class="qb-empty-state">
+                                    <div class="qb-empty-state-emoji">&#128085;</div>
                                     <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">Getting Started</div>
                                     <div style="font-size: 13px; color: #94a3b8; line-height: 1.8;">
                                         <span class="step-badge step-1">1</span> Select transfer locations above
@@ -320,7 +320,7 @@
                 </div>
                 <div id="fees-charges-content" class="charges-content hidden" style="display:none">
                     <div style="display:flex; flex-wrap:wrap; gap:24px; align-items:flex-end; padding-top:8px;">
-                        <div class="charge-field" style="margin:0;">
+                        <div class="charge-field qb-m0">
                             <label class="d-flex align-items-center gap-2" style="cursor: pointer;">
                                 <input type="checkbox" id="art-charge-toggle" onchange="toggleArtCharge(); updateAdditionalCharges();">
                                 <span>Logo Mockup &amp; Review</span>
@@ -332,17 +332,17 @@
                                        onchange="updateArtworkCharges(); updateAdditionalCharges();" oninput="updateArtworkCharges(); updateAdditionalCharges();">
                             </div>
                         </div>
-                        <div class="charge-field" style="margin:0;">
+                        <div class="charge-field qb-m0">
                             <label class="quote-label">Graphic Design ($<span id="design-rate-label-sidebar">75</span>/hr)</label>
                             <div class="d-flex align-items-center gap-2">
-                                <input type="number" id="graphic-design-hours" class="quote-input" style="width: 80px;"
+                                <input type="number" id="graphic-design-hours" class="quote-input qb-w80"
                                        min="0" step="0.5" placeholder="0"
                                        onchange="updateArtworkCharges(); updateAdditionalCharges();" oninput="updateArtworkCharges(); updateAdditionalCharges();">
                                 <span class="text-muted">hrs</span>
                                 <span class="text-muted">= $<span id="graphic-design-total">0.00</span></span>
                             </div>
                         </div>
-                        <div class="charge-field" style="margin:0;">
+                        <div class="charge-field qb-m0">
                             <label class="quote-label">Rush Fee</label>
                             <div class="input-with-prefix">
                                 <span class="prefix">$</span>
@@ -378,37 +378,37 @@
                             <div class="d-flex flex-column gap-2" style="padding: 8px 0;">
                                 <!-- Order Info Row -->
                                 <div class="d-flex gap-2">
-                                    <div class="customer-field" style="flex: 1;">
-                                        <label class="quote-label" style="font-size: 11px;">Order #</label>
-                                        <input type="text" id="order-number" placeholder="ShopWorks #" class="quote-input" style="font-size: 12px; padding: 6px 8px;">
+                                    <div class="customer-field qb-flex1">
+                                        <label class="quote-label qb-fs11">Order #</label>
+                                        <input type="text" id="order-number" placeholder="ShopWorks #" class="quote-input qb-compact">
                                     </div>
-                                    <div class="customer-field" style="flex: 1;">
-                                        <label class="quote-label" style="font-size: 11px;">PO #</label>
-                                        <input type="text" id="po-number" placeholder="Purchase Order" class="quote-input" style="font-size: 12px; padding: 6px 8px;">
+                                    <div class="customer-field qb-flex1">
+                                        <label class="quote-label qb-fs11">PO #</label>
+                                        <input type="text" id="po-number" placeholder="Purchase Order" class="quote-input qb-compact">
                                     </div>
                                 </div>
                                 <!-- Dates Row -->
                                 <div class="d-flex gap-2">
-                                    <div class="customer-field" style="flex: 1;">
-                                        <label class="quote-label" style="font-size: 11px;">Ship Date</label>
-                                        <input type="date" id="req-ship-date" class="quote-input" style="font-size: 12px; padding: 6px 8px;">
+                                    <div class="customer-field qb-flex1">
+                                        <label class="quote-label qb-fs11">Ship Date</label>
+                                        <input type="date" id="req-ship-date" class="quote-input qb-compact">
                                     </div>
-                                    <div class="customer-field" style="flex: 1;">
-                                        <label class="quote-label" style="font-size: 11px;">Drop Dead Date</label>
-                                        <input type="date" id="drop-dead-date" class="quote-input" style="font-size: 12px; padding: 6px 8px;">
+                                    <div class="customer-field qb-flex1">
+                                        <label class="quote-label qb-fs11">Drop Dead Date</label>
+                                        <input type="date" id="drop-dead-date" class="quote-input qb-compact">
                                     </div>
                                 </div>
                                 <!-- Shipping Address -->
                                 <div class="customer-field">
-                                    <label class="quote-label" style="font-size: 11px;">Ship To</label>
-                                    <input type="text" id="ship-to-name" placeholder="Recipient name" class="quote-input" style="font-size: 12px; padding: 6px 8px;">
+                                    <label class="quote-label qb-fs11">Ship To</label>
+                                    <input type="text" id="ship-to-name" placeholder="Recipient name" class="quote-input qb-compact">
                                 </div>
                                 <div class="customer-field">
-                                    <input type="text" id="ship-address" placeholder="Street address" class="quote-input" style="font-size: 12px; padding: 6px 8px;" oninput="if(window.renderOrderRecap)renderOrderRecap()">
+                                    <input type="text" id="ship-address" placeholder="Street address" class="quote-input qb-compact" oninput="if(window.renderOrderRecap)renderOrderRecap()">
                                 </div>
                                 <div class="d-flex gap-2">
                                     <div class="customer-field" style="flex: 2;">
-                                        <input type="text" id="ship-city" placeholder="City" class="quote-input" style="font-size: 12px; padding: 6px 8px;" oninput="if(window.renderOrderRecap)renderOrderRecap()">
+                                        <input type="text" id="ship-city" placeholder="City" class="quote-input qb-compact" oninput="if(window.renderOrderRecap)renderOrderRecap()">
                                     </div>
                                     <div class="customer-field" style="flex: 0 0 60px;">
                                         <select id="ship-state" class="quote-input" style="font-size: 12px; padding: 6px 4px;" onchange="onShipStateChange();if(window.renderOrderRecap)renderOrderRecap()">
@@ -433,8 +433,8 @@
                                         </select>
                                     </div>
                                     <div class="customer-field" style="flex: 0 0 80px;">
-                                        <input type="text" id="ship-zip" placeholder="ZIP" maxlength="10" class="quote-input"
-                                               onblur="onShipZipBlur()" oninput="if(window.renderOrderRecap)renderOrderRecap()" style="font-size: 12px; padding: 6px 8px;">
+                                        <input type="text" id="ship-zip" placeholder="ZIP" maxlength="10" class="quote-input qb-compact"
+                                               onblur="onShipZipBlur()" oninput="if(window.renderOrderRecap)renderOrderRecap()">
                                     </div>
                                     <button type="button" class="btn-tax-lookup" onclick="lookupTaxRate()" title="Look up tax rate">
                                         <i class="fas fa-search"></i>
@@ -443,8 +443,8 @@
                                 <div id="tax-lookup-status" style="font-size: 11px; color: #64748b; min-height: 14px;"></div>
                                 <!-- Shipping Method -->
                                 <div class="customer-field">
-                                    <label class="quote-label" style="font-size: 11px;">Shipping Method</label>
-                                    <select id="ship-method" class="quote-input" style="font-size: 12px; padding: 6px 8px;" onchange="if(window.renderOrderRecap)renderOrderRecap()">
+                                    <label class="quote-label qb-fs11">Shipping Method</label>
+                                    <select id="ship-method" class="quote-input qb-compact" onchange="if(window.renderOrderRecap)renderOrderRecap()">
                                         <option value="">Select...</option>
                                         <option value="Ground">Ground</option>
                                         <option value="2-Day">2-Day</option>
@@ -455,7 +455,7 @@
                                 </div>
                                 <!-- Shipping Fee -->
                                 <div class="customer-field">
-                                    <label class="quote-label" style="font-size: 11px;">Shipping Fee</label>
+                                    <label class="quote-label qb-fs11">Shipping Fee</label>
                                     <div style="position: relative;">
                                         <span style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); color: #666; font-size: 12px;">$</span>
                                         <input type="number" id="dtf-shipping-fee" min="0" step="0.01" placeholder="0.00" value="0"
@@ -473,7 +473,7 @@
                                 </div>
                                 <!-- Notes -->
                                 <div class="customer-field" style="margin-top: 4px;">
-                                    <label class="quote-label" style="font-size: 11px;"><i class="fas fa-sticky-note" style="color: #f9a825;"></i> Notes</label>
+                                    <label class="quote-label qb-fs11"><i class="fas fa-sticky-note" style="color: #f9a825;"></i> Notes</label>
                                     <textarea id="dtf-notes" placeholder="Special instructions, employee names, etc."
                                               class="quote-input" style="font-size: 12px; padding: 6px 8px; min-height: 60px; resize: vertical; font-family: inherit;"></textarea>
                                 </div>
@@ -531,7 +531,7 @@
             <div class="sidebar-scroll-container">
             <!-- Customer Info (moved above Quote Summary 2026-03-23) -->
             <div class="customer-panel" style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb; margin: -16px -16px 16px -16px;">
-                <div class="customer-panel-header" onclick="document.getElementById('dtf-customer-fields').classList.toggle('hidden')" style="margin-bottom: 8px;" tabindex="0" role="button" aria-label="Toggle customer details" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
+                <div class="customer-panel-header qb-mb8" onclick="document.getElementById('dtf-customer-fields').classList.toggle('hidden')" tabindex="0" role="button" aria-label="Toggle customer details" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
                     <h4 style="display: flex; align-items: center; gap: 6px;"><i class="fas fa-user" style="color: #2e5827;"></i> Customer</h4>
                     <i class="fas fa-chevron-down" style="font-size: 12px; color: #999;"></i>
                 </div>
@@ -540,7 +540,7 @@
                          hero; manual fields collapse below and auto-open when a pick or an
                          edit-load fills them (syncCustomerManualDetails). All input ids
                          unchanged — save/load key off getElementById. -->
-                    <div class="customer-field customer-lookup-container customer-lookup-hero" style="margin-bottom: 8px;">
+                    <div class="customer-field customer-lookup-container customer-lookup-hero qb-mb8">
                         <label class="quote-label"><i class="fas fa-search" style="margin-right: 4px;"></i> FIND CUSTOMER</label>
                         <input type="text" id="customer-lookup" placeholder="Company, name, or email — fills everything below" class="quote-input customer-lookup-input">
 
@@ -587,12 +587,12 @@
                             <label class="quote-label">PHONE</label>
                             <input type="tel" id="customer-phone" placeholder="(253) 555-1234" class="quote-input">
                         </div>
-                        <div class="customer-field" style="grid-column: 1 / -1;">
+                        <div class="customer-field qb-span-all">
                             <label class="quote-label">PROJECT NAME</label>
                             <input type="text" id="project-name" placeholder="e.g., Spring Fundraiser Tees" class="quote-input">
                         </div>
                         <!-- Phase 11.1 (2026-05-24): customer-aware Design # lookup -->
-                        <div class="customer-field" style="grid-column: 1 / -1;">
+                        <div class="customer-field qb-span-all">
                             <label class="quote-label" for="design-number">
                                 DESIGN # <span style="color:#9ca3af;font-weight:400;">(pick from this customer's DTF designs)</span>
                             </label>

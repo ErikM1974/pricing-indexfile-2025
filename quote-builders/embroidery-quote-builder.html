@@ -357,7 +357,7 @@
                                 <th class="size-col">L</th>
                                 <th class="size-col">XL</th>
                                 <th class="size-col">2XL</th>
-                                <th class="size-col" style="line-height: 1.1;" title="Click to add extended sizes (3XL, 4XL, 5XL, etc.)">More<br><span style="font-size: 10px; font-weight: 400;">Sizes</span></th>
+                                <th class="size-col qb-lh11" title="Click to add extended sizes (3XL, 4XL, 5XL, etc.)">More<br><span class="qb-fs10-w400">Sizes</span></th>
                                 <th class="qty-col">Qty</th>
                                 <th class="price-col">Unit $</th>
                                 <th class="total-col">Total</th>
@@ -367,8 +367,8 @@
                         <tbody id="product-tbody">
                             <!-- Empty State Message - shown until products added -->
                             <tr id="empty-state-row">
-                                <td colspan="14" style="text-align: center; padding: 40px 20px; color: #64748b; background: #f8fafc;">
-                                    <div style="font-size: 32px; margin-bottom: 12px;">&#128085;</div>
+                                <td colspan="14" class="qb-empty-state">
+                                    <div class="qb-empty-state-emoji">&#128085;</div>
                                     <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">Getting Started</div>
                                     <div style="font-size: 13px; color: #64748b; line-height: 1.8;">
                                         <span style="background:#eef2ff; padding:2px 8px; border-radius:4px; color:#4f46e5;">1</span> Type a style # above (e.g., PC54, G500, C112)
@@ -604,23 +604,23 @@
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                                 <div>
                                     <label for="po-number">PO #</label>
-                                    <input type="text" id="po-number" placeholder="Purchase Order #" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                                    <input type="text" id="po-number" placeholder="Purchase Order #" class="qb-field--p5">
                                 </div>
                                 <div>
                                     <label for="date-order-placed">Date Placed</label>
-                                    <input type="date" id="date-order-placed" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                                    <input type="date" id="date-order-placed" class="qb-field--p5">
                                 </div>
                                 <div>
                                     <label for="req-ship-date">Req Ship Date</label>
-                                    <input type="date" id="req-ship-date" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                                    <input type="date" id="req-ship-date" class="qb-field--p5">
                                 </div>
                                 <div>
                                     <label for="drop-dead-date">Drop Dead Date</label>
-                                    <input type="date" id="drop-dead-date" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                                    <input type="date" id="drop-dead-date" class="qb-field--p5">
                                 </div>
-                                <div style="grid-column: 1 / -1;">
+                                <div class="qb-span-all">
                                     <label for="payment-terms">Terms <span id="customer-terms-note" hidden></span></label>
-                                    <input type="text" id="payment-terms" placeholder="Payment terms" style="width: 100%; padding: 5px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                                    <input type="text" id="payment-terms" placeholder="Payment terms" class="qb-field--p5">
                                 </div>
                                 <div style="grid-column: 1 / -1; margin-top: 2px;">
                                     <label for="order-number">ShopWorks Order # <span class="field-hint-muted">— filled after you import</span></label>
@@ -719,28 +719,28 @@
                         <summary>Enter details manually <span class="cm-hint">— the search fills these for you</span></summary>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
                             <div class="customer-field" style="grid-column: span 2;">
-                                <label for="customer-name" style="font-size: 11px; color: #64748b; display: block;">Name *</label>
-                                <input type="text" id="customer-name" placeholder="Customer name" style="width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                                <label for="customer-name" class="qb-label">Name *</label>
+                                <input type="text" id="customer-name" placeholder="Customer name" class="qb-field">
                             </div>
                             <div class="customer-field" style="grid-column: span 2;">
-                                <label for="customer-email" style="font-size: 11px; color: #64748b; display: block;">Email *</label>
-                                <input type="email" id="customer-email" placeholder="email@company.com" style="width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                                <label for="customer-email" class="qb-label">Email *</label>
+                                <input type="email" id="customer-email" placeholder="email@company.com" class="qb-field">
                             </div>
                             <div class="customer-field">
-                                <label for="company-name" style="font-size: 11px; color: #64748b; display: block;">Company</label>
-                                <input type="text" id="company-name" placeholder="Company name" style="width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                                <label for="company-name" class="qb-label">Company</label>
+                                <input type="text" id="company-name" placeholder="Company name" class="qb-field">
                             </div>
                             <div class="customer-field">
-                                <label for="customer-number" style="font-size: 11px; color: #64748b; display: block;">Customer #</label>
-                                <input type="text" id="customer-number" placeholder="ShopWorks ID" style="width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                                <label for="customer-number" class="qb-label">Customer #</label>
+                                <input type="text" id="customer-number" placeholder="ShopWorks ID" class="qb-field">
                                 <span id="customer-number-resolved" hidden></span>
                             </div>
                             <div class="customer-field">
-                                <label for="customer-phone" style="font-size: 11px; color: #64748b; display: block;">Phone</label>
-                                <input type="tel" id="customer-phone" placeholder="(XXX) XXX-XXXX" style="width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                                <label for="customer-phone" class="qb-label">Phone</label>
+                                <input type="tel" id="customer-phone" placeholder="(XXX) XXX-XXXX" class="qb-field">
                             </div>
                             <div class="customer-field">
-                                <label for="sales-rep" style="font-size: 11px; color: #64748b; display: block;">Sales Rep</label>
+                                <label for="sales-rep" class="qb-label">Sales Rep</label>
                                 <select id="sales-rep" style="width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; background: white; box-sizing: border-box;">
                                     <option value="sales@nwcustomapparel.com">General Sales</option>
                                     <option value="bradley@nwcustomapparel.com">Bradley Wright</option>
@@ -752,9 +752,9 @@
                                     <option value="taneisha@nwcustomapparel.com">Taneisha Clark</option>
                                 </select>
                             </div>
-                            <div class="customer-field" style="grid-column: 1 / -1;">
-                                <label for="project-name" style="font-size: 11px; color: #64748b; display: block;">Project Name</label>
-                                <input type="text" id="project-name" placeholder="e.g., Spring Fundraiser Tees" style="width: 100%; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; box-sizing: border-box;">
+                            <div class="customer-field qb-span-all">
+                                <label for="project-name" class="qb-label">Project Name</label>
+                                <input type="text" id="project-name" placeholder="e.g., Spring Fundraiser Tees" class="qb-field">
                             </div>
                         </div>
                         </details>
@@ -778,11 +778,11 @@
                 </div>
                 <!-- Quantity breakdown for mixed quotes -->
                 <div class="pricing-row sub-breakdown" id="garment-qty-row" style="display: none;">
-                    <span class="label"><i class="fas fa-tshirt" style="font-size: 11px; margin-right: 4px;"></i> Garments:</span>
+                    <span class="label"><i class="fas fa-tshirt qb-fs11-mr4"></i> Garments:</span>
                     <span class="value sub-value" id="garment-qty">0</span>
                 </div>
                 <div class="pricing-row sub-breakdown" id="cap-qty-row" style="display: none;">
-                    <span class="label"><i class="fas fa-hat-cowboy" style="font-size: 11px; margin-right: 4px;"></i> Caps:</span>
+                    <span class="label"><i class="fas fa-hat-cowboy qb-fs11-mr4"></i> Caps:</span>
                     <span class="value sub-value" id="cap-qty">0</span>
                 </div>
 
@@ -792,11 +792,11 @@
                 </div>
                 <!-- Tier breakdown for mixed quotes -->
                 <div class="pricing-row sub-breakdown" id="garment-tier-row" style="display: none;">
-                    <span class="label"><i class="fas fa-tshirt" style="font-size: 11px; margin-right: 4px;"></i> Garment Tier:</span>
+                    <span class="label"><i class="fas fa-tshirt qb-fs11-mr4"></i> Garment Tier:</span>
                     <span class="tier-badge small" id="garment-tier">1-7</span>
                 </div>
                 <div class="pricing-row sub-breakdown" id="cap-tier-row" style="display: none;">
-                    <span class="label"><i class="fas fa-hat-cowboy" style="font-size: 11px; margin-right: 4px;"></i> Cap Tier:</span>
+                    <span class="label"><i class="fas fa-hat-cowboy qb-fs11-mr4"></i> Cap Tier:</span>
                     <span class="tier-badge small" id="cap-tier">1-7</span>
                 </div>
                 <div class="quantity-nudge" id="quantity-nudge" style="display: none;"></div>
@@ -812,11 +812,11 @@
 
                 <!-- Mixed Quote Breakdown (caps + garments) -->
                 <div class="pricing-row sub-breakdown" id="garment-subtotal-row" style="display: none;">
-                    <span class="label"><i class="fas fa-tshirt" style="font-size: 11px; margin-right: 4px;"></i> Garments:</span>
+                    <span class="label"><i class="fas fa-tshirt qb-fs11-mr4"></i> Garments:</span>
                     <span class="value sub-value" id="garment-subtotal">$0.00</span>
                 </div>
                 <div class="pricing-row sub-breakdown" id="cap-subtotal-row" style="display: none;">
-                    <span class="label"><i class="fas fa-hat-cowboy" style="font-size: 11px; margin-right: 4px;"></i> Caps:</span>
+                    <span class="label"><i class="fas fa-hat-cowboy qb-fs11-mr4"></i> Caps:</span>
                     <span class="value sub-value" id="cap-subtotal">$0.00</span>
                 </div>
 
@@ -1095,18 +1095,18 @@ Company:Absher Construction Company
                         <div id="spr-garment-config" style="display: none; padding: 12px; border-bottom: 1px solid #e2e8f0;">
                             <div style="font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 8px;">&#128085; Garment</div>
                             <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                                <div style="flex: 1; min-width: 130px;">
-                                    <label style="font-size: 11px; color: #64748b; display: block; margin-bottom: 3px;">Position</label>
-                                    <select id="spr-garment-position" onchange="onSprGarmentPositionChange()" style="width: 100%; padding: 5px 8px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 12px;">
+                                <div class="qb-flex1-minw130">
+                                    <label class="qb-label--mb3">Position</label>
+                                    <select id="spr-garment-position" onchange="onSprGarmentPositionChange()" class="qb-field--gray">
                                         <option value="Left Chest">Left Chest</option>
                                         <option value="Right Chest">Right Chest</option>
                                         <option value="Center Chest">Center Chest</option>
                                         <option value="Full Back">Full Back</option>
                                     </select>
                                 </div>
-                                <div style="flex: 1; min-width: 130px;">
-                                    <label style="font-size: 11px; color: #64748b; display: block; margin-bottom: 3px;">Design Size</label>
-                                    <select id="spr-garment-stitch-tier" onchange="onSprGarmentStitchTierChange()" style="width: 100%; padding: 5px 8px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 12px;">
+                                <div class="qb-flex1-minw130">
+                                    <label class="qb-label--mb3">Design Size</label>
+                                    <select id="spr-garment-stitch-tier" onchange="onSprGarmentStitchTierChange()" class="qb-field--gray">
                                         <option value="8000">Standard (&le;10K)</option>
                                         <option value="12000">Mid (&le;15K)</option>
                                         <option value="18000">Large (&le;25K)</option>
@@ -1125,17 +1125,17 @@ Company:Absher Construction Company
                         <div id="spr-cap-config" style="display: none; padding: 12px; border-bottom: 1px solid #e2e8f0;">
                             <div style="font-size: 13px; font-weight: 600; color: #334155; margin-bottom: 8px;">&#129506; Cap</div>
                             <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                                <div style="flex: 1; min-width: 130px;">
-                                    <label style="font-size: 11px; color: #64748b; display: block; margin-bottom: 3px;">Type</label>
-                                    <select id="spr-cap-embellishment" onchange="onSprCapEmbellishmentChange()" style="width: 100%; padding: 5px 8px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 12px;">
+                                <div class="qb-flex1-minw130">
+                                    <label class="qb-label--mb3">Type</label>
+                                    <select id="spr-cap-embellishment" onchange="onSprCapEmbellishmentChange()" class="qb-field--gray">
                                         <option value="embroidery">Flat Embroidery</option>
                                         <option value="3d-puff">3D Puff</option>
                                         <option value="laser-patch">Laser Patch</option>
                                     </select>
                                 </div>
-                                <div id="spr-cap-stitch-tier-wrapper" style="flex: 1; min-width: 130px;">
-                                    <label style="font-size: 11px; color: #64748b; display: block; margin-bottom: 3px;">Design Size</label>
-                                    <select id="spr-cap-stitch-tier" style="width: 100%; padding: 5px 8px; border: 1px solid #d1d5db; border-radius: 4px; font-size: 12px;">
+                                <div id="spr-cap-stitch-tier-wrapper" class="qb-flex1-minw130">
+                                    <label class="qb-label--mb3">Design Size</label>
+                                    <select id="spr-cap-stitch-tier" class="qb-field--gray">
                                         <option value="8000">Standard (&le;10K)</option>
                                         <option value="12000">Mid (&le;15K)</option>
                                         <option value="18000">Large (&le;25K)</option>
