@@ -1,3 +1,8 @@
+## v2026.07.07.10 (2026.07.07)
+
+- feat(quote-builders): logo status chips — On file / New / TBD (all 3 builders)
+- Deploy v2026.07.07.10: 4 files (dtf-quote-builder.html,dtg-quote-builder.html,embroidery-quote-builder.html...)
+
 ## v2026.07.07.9 (2026.07.07)
 
 - fix(quote-builders): Caspio 400 on blank dates (SCP save outage) + Save-as-PDF button
