@@ -120,8 +120,11 @@ class DTFQuoteService {
             ShipToState: quoteData.shipState || '',
             ShipToZip: quoteData.shipZip || '',
             ShipMethod: quoteData.shipMethod || '',
-            ReqShipDate: quoteData.reqShipDate || '',
-            DropDeadDate: quoteData.dropDeadDate || ''
+            // null, never '' — Caspio 400s InvalidInputValue on empty strings in
+            // Date/Time fields (live SCP incident 2026-07-07; DTF had the same
+            // latent bug). null blanks the field, EMB's proven convention.
+            ReqShipDate: quoteData.reqShipDate || null,
+            DropDeadDate: quoteData.dropDeadDate || null
         };
     }
 

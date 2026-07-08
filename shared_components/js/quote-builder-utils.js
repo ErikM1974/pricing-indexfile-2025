@@ -2094,6 +2094,25 @@ function getSharedRushRate() {
 }
 if (typeof window !== 'undefined') window.getSharedRushRate = getSharedRushRate;
 
+/**
+ * "Save as PDF" (Erik 2026-07-07): reps asked for a plain PDF download of the
+ * quote. The browser's print dialog IS the PDF engine (destination "Save as
+ * PDF" — no extra library, identical output to Print, and Chrome remembers the
+ * last destination so it's one click after the first use). This button exists
+ * for DISCOVERABILITY: same shared invoice window as Print, plus a toast that
+ * says which destination to pick. All three builders expose a global
+ * printQuote() (DTF's page wrapper included).
+ */
+function saveQuotePdf() {
+    if (typeof showToast === 'function') {
+        showToast("In the print window, set the destination/printer to 'Save as PDF' — that downloads the quote as a PDF file.", 'info', 8000);
+    }
+    if (typeof window.printQuote === 'function') {
+        window.printQuote();
+    }
+}
+if (typeof window !== 'undefined') window.saveQuotePdf = saveQuotePdf;
+
 // ============================================================
 // "Recent orders" panel after customer selection (item #13, 2026-07-05)
 // ============================================================
