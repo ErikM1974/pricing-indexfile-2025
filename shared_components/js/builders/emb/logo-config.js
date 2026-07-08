@@ -12,7 +12,7 @@
  */
 // @ts-nocheck — MOVED legacy DOM code: pre-existing checkJs frictions; typing
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
-/* global showToast, Event */
+/* global showToast, Event, escapeHtml */
 import { recalculatePricing } from './pricing-sync.js';
 import { embState } from './state.js';
 
@@ -126,8 +126,9 @@ export function openStitchEstimator(selId, kind, anchorBtn) {
         const tierVal = mapStitchCountToTierValue(est, '');
         const tierName = { '8000': 'Standard (≤10K)', '12000': 'Mid (10–15K)', '18000': 'Large (15–25K)', '25000': 'Full Back (25K+)' }[tierVal] || tierVal;
         const resEl = document.getElementById('se-result');
+        // eslint-disable-next-line no-unsanitized/property -- audited (1.4): escapeHtml-wrapped estimate + internal tier name (ternary shape the rule cannot parse)
         if (resEl) resEl.innerHTML = (w > 0 && h > 0)
-            ? `≈ <strong>${est.toLocaleString()}</strong> stitches → <strong>${tierName}</strong>`
+            ? `≈ <strong>${escapeHtml(est.toLocaleString())}</strong> stitches → <strong>${escapeHtml(tierName)}</strong>`
             : 'Enter the logo dimensions';
         return { est, tierVal };
     };

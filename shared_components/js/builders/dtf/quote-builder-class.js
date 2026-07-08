@@ -1177,6 +1177,7 @@ export class DTFQuoteBuilder {
             </div>
         `).join('');
 
+        // eslint-disable-next-line no-unsanitized/property -- audited (1.4): suggestion rows escapeHtml p.value/p.label at build (stage-1 fix)
         suggestionsContainer.innerHTML = html;
         suggestionsContainer.style.display = 'block';
 
@@ -1496,6 +1497,7 @@ export class DTFQuoteBuilder {
         });
 
         // Render the size inputs
+        // eslint-disable-next-line no-unsanitized/property -- audited (1.4): size codes from internal extended-sizes config; qty numeric
         body.innerHTML = `
             <div class="extended-sizes-grid">
                 ${extendedSizes.map(size => {
@@ -1795,7 +1797,7 @@ export class DTFQuoteBuilder {
                 if (ltmTableTotal) ltmTableTotal.textContent = `(included)`;
                 // Update fee label to clarify it's informational
                 const feeLabel = ltmTableRow.querySelector('.fee-label');
-                if (feeLabel) feeLabel.innerHTML = '<i class="fas fa-info-circle"></i> LTM Fee ($' + effectiveLtmFee.toFixed(2) + ' included in unit prices)';
+                if (feeLabel) feeLabel.innerHTML = '<i class="fas fa-info-circle"></i> LTM Fee ($' + escapeHtml(effectiveLtmFee.toFixed(2)) + ' included in unit prices)';
             }
         } else {
             // builtin mode or LTM waived — hide fee row
@@ -2426,6 +2428,7 @@ export class DTFQuoteBuilder {
             const config = this.locationConfig[loc];
             return `<span class="summary-badge">${config.label} (${config.size})</span>`;
         }).join('');
+        // eslint-disable-next-line no-unsanitized/property -- audited (1.4): internal locationConfig labels/sizes only
         document.getElementById('summary-locations').innerHTML = locationsHTML;
 
         // Build products summary (including child row quantities)
@@ -2467,6 +2470,7 @@ export class DTFQuoteBuilder {
                 </div>
             `;
         }).filter(Boolean).join('');
+        // eslint-disable-next-line no-unsanitized/property -- audited (1.4): summary rows escapeHtml style/description/color/sizes at build (stage-1 fix)
         document.getElementById('summary-products').innerHTML = productsHTML || '<div>No products</div>';
 
         // Build pricing summary
@@ -2475,6 +2479,7 @@ export class DTFQuoteBuilder {
         // DTF uses grand-total-with-tax (not grand-total)
         const grandTotal = parseFloat(document.getElementById('grand-total-with-tax')?.textContent?.replace(/[$,]/g, '') || '0');
 
+        // eslint-disable-next-line no-unsanitized/property -- audited (1.4): numeric totals + internal tier label only
         document.getElementById('summary-pricing').innerHTML = `
             <div class="summary-pricing-row">
                 <span>Total Quantity:</span>
@@ -2898,6 +2903,7 @@ export class DTFQuoteBuilder {
         } finally {
             // Restore button state
             if (saveBtn) {
+                // eslint-disable-next-line no-unsanitized/property -- self-restore of markup captured from this element
                 saveBtn.innerHTML = originalText;
                 saveBtn.disabled = false;
             }
@@ -2982,6 +2988,7 @@ export class DTFQuoteBuilder {
             const invoiceHTML = invoiceGenerator.generateInvoiceHTML(pricingData, customerData);
 
             const printWindow = window.open('', '_blank');
+            // eslint-disable-next-line no-unsanitized/method -- print window: invoiceHTML from embroidery-quote-invoice.js, which esc()-escapes every customer/product field
             printWindow.document.write(invoiceHTML);
             printWindow.document.close();
 
@@ -3261,7 +3268,7 @@ export class DTFQuoteBuilder {
         const toast = document.createElement('div');
         toast.className = `dtf-toast dtf-toast-${type}`;
         toast.innerHTML = `
-            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'}"></i>
+            <i class="fas ${escapeHtml(type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle')}"></i>
             <span>${escapeHtml(message)}</span>
         `;
 
@@ -3386,6 +3393,7 @@ export class DTFQuoteBuilder {
                 copyBtn.classList.add('success');
 
                 setTimeout(() => {
+                    // eslint-disable-next-line no-unsanitized/property -- self-restore of markup captured from this element
                     copyBtn.innerHTML = originalHTML;
                     copyBtn.classList.remove('success');
                 }, 2000);

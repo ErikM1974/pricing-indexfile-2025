@@ -180,6 +180,7 @@ async function _saveAndGetLinkInner(opts = {}) {
         // (not falsy) so the DECG-only branch above — which builds a pricing object with no `success`
         // field — is NOT blocked. (review C4 — Erik's #1 rule)
         if (pricing && pricing.success === false) {
+            // eslint-disable-next-line no-unsanitized/property -- self-restore of markup captured from this element
             if (saveBtn) { saveBtn.innerHTML = originalText; saveBtn.disabled = false; }
             try { showLoading(false); } catch (_) {}
             showToast(pricing.message || 'Pricing unavailable — cannot save this quote. Refresh and try again.', 'error', 6000);
@@ -189,6 +190,7 @@ async function _saveAndGetLinkInner(opts = {}) {
         // Don't save an UNDER-total either — if any product's pricing failed it was left out of the
         // subtotal (review C5). Block the save so a wrong (low) price never reaches Caspio/ShopWorks.
         if (pricing && Array.isArray(pricing.failedProducts) && pricing.failedProducts.length > 0) {
+            // eslint-disable-next-line no-unsanitized/property -- self-restore of markup captured from this element
             if (saveBtn) { saveBtn.innerHTML = originalText; saveBtn.disabled = false; }
             try { showLoading(false); } catch (_) {}
             showToast(`Can't save — pricing failed for ${pricing.failedProducts.length} item(s) (${pricing.failedProducts.map(f => f.style).join(', ')}). Refresh until all prices load.`, 'error', 7000);
@@ -490,6 +492,7 @@ async function _saveAndGetLinkInner(opts = {}) {
         showLoading(false);
         // Restore button state
         if (saveBtn) {
+            // eslint-disable-next-line no-unsanitized/property -- self-restore of markup captured from this element
             saveBtn.innerHTML = originalText;
             saveBtn.disabled = false;
         }
@@ -587,6 +590,7 @@ export function renderPushReadiness() {
     } else {
         const item = (ok, label) =>
             `<div class="pr-item ${ok ? 'pr-ok' : 'pr-no'}"><i class="fas fa-${ok ? 'check-circle' : 'circle'}"></i>${label}</div>`;
+        // eslint-disable-next-line no-unsanitized/property -- audited (1.4): internal literal checklist labels only
         el.innerHTML = '<div class="pr-title">Before you push</div>' +
             item(r.hasCustomer, 'ShopWorks Customer #') +
             item(r.hasProducts, 'At least one item') +
@@ -716,6 +720,7 @@ function renderPushPreview(data) {
     const lines = Array.isArray(o.LinesOE) ? o.LinesOE : [];
 
     if (data.alreadyPushed && statusEl) {
+        // eslint-disable-next-line no-unsanitized/property -- audited (1.4): pushedAt escapeHtml-wrapped; rest literal
         statusEl.innerHTML = '<div class="preview-warnings"><h5><i class="fas fa-exclamation-triangle"></i> ' +
             'Already pushed to ShopWorks</h5><ul><li>This quote was pushed' +
             (data.pushedAt ? ' on ' + escapeHtml(String(data.pushedAt)) : '') +
@@ -805,6 +810,7 @@ function renderPushPreview(data) {
             '</ul></div>';
     }
 
+    // eslint-disable-next-line no-unsanitized/property -- audited (1.4): preview build escapeHtml-wraps every dynamic value (thumb/DesignName/warnings/taxLines)
     previewEl.innerHTML = html;
 }
 
@@ -840,6 +846,7 @@ export async function confirmPushToShopWorks() {
             if (response.status === 409) {
                 // Caspio says already pushed — offer a guarded force re-push.
                 if (statusEl) {
+                    // eslint-disable-next-line no-unsanitized/property -- audited (1.4): pushedAt escapeHtml-wrapped; rest literal
                     statusEl.innerHTML = '<div class="preview-warnings"><h5><i class="fas fa-exclamation-triangle"></i> ' +
                         'Already pushed</h5><ul><li>This quote was already pushed' +
                         (data.pushedAt ? ' on ' + escapeHtml(String(data.pushedAt)) : '') +
@@ -892,6 +899,7 @@ export async function confirmPushToShopWorks() {
                 'Push failed</h5><ul><li>' + escapeHtml(error.message) + '</li></ul></div>';
         }
         confirmBtn.disabled = false;
+        // eslint-disable-next-line no-unsanitized/property -- self-restore of markup captured from this element
         confirmBtn.innerHTML = origHtml;
         showToast(`Push failed: ${error.message}`, 'error');
     }

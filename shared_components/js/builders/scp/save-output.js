@@ -70,6 +70,7 @@ export async function printQuote() {
 
         const invoiceHTML = invoiceGenerator.generateInvoiceHTML(pricingData, customerData);
         const printWindow = window.open('', '_blank');
+        // eslint-disable-next-line no-unsanitized/method -- print window: invoiceHTML from embroidery-quote-invoice.js, which esc()-escapes every customer/product field
         printWindow.document.write(invoiceHTML);
         printWindow.document.close();
 
@@ -535,6 +536,7 @@ export async function saveAndGetLink(opts = {}) {
     } finally {
         // Restore button state
         if (saveBtn) {
+            // eslint-disable-next-line no-unsanitized/property -- self-restore of markup captured from this element
             saveBtn.innerHTML = originalText;
             saveBtn.disabled = false;
         }

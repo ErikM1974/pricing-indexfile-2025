@@ -188,13 +188,17 @@ function buildDesignSearchCompanyChips(designs) {
 
     let html = '<button class="design-search-company-chip active" data-company="all" onclick="filterDesignSearchByCompany(\'all\')">All <span class="chip-count">(' + designs.length + ')</span></button>';
     companies.forEach(name => {
-        const escapedName = name.replace(/'/g, "\\'");
+        // JS-escape (' and \) THEN HTML-escape: the browser HTML-decodes the
+        // attribute before the JS string parses, so escapeHtml alone can't protect
+        // the JS literal and \' alone can't protect the "-delimited attr (1.4).
+        const escapedName = escapeHtml(name.replace(/\\/g, '\\\\').replace(/'/g, "\\'"));
         html += '<button class="design-search-company-chip" data-company="' + escapeHtml(name) + '" '
             + 'onclick="filterDesignSearchByCompany(\'' + escapedName + '\')" title="' + escapeHtml(name) + '">'
             + escapeHtml(name.length > 28 ? name.substring(0, 26) + '...' : name)
             + ' <span class="chip-count">(' + companyCounts[name] + ')</span></button>';
     });
 
+    // eslint-disable-next-line no-unsanitized/property -- audited (1.4): card/chip/badge builders escapeHtml every API string (extraction #2 audit + the 1.4 chip attr fix); counts numeric
     container.innerHTML = html;
     container.style.display = 'flex';
 }
@@ -218,6 +222,7 @@ function updateDesignSearchResultsHeader() {
         ? '<span class="results-count">' + total + ' designs</span>'
         : '<span class="results-count">' + filtered + ' of ' + total + ' designs</span>';
 
+    // eslint-disable-next-line no-unsanitized/property -- audited (1.4): card/chip/badge builders escapeHtml every API string (extraction #2 audit + the 1.4 chip attr fix); counts numeric
     header.innerHTML = countText;
     header.style.display = 'flex';
 }
@@ -354,6 +359,7 @@ async function applyDesignToCard(type, designNum, design) {
     }
 
     infoBadge.className = 'design-info-badge design-info-found';
+    // eslint-disable-next-line no-unsanitized/property -- audited (1.4): card/chip/badge builders escapeHtml every API string (extraction #2 audit + the 1.4 chip attr fix); counts numeric
     infoBadge.innerHTML = badgeHtml;
     infoBadge.style.display = 'block';
     clearBtn.style.display = 'inline-flex';
@@ -796,12 +802,14 @@ function renderDesignSearchGrid(designs) {
 
     // Batch render first N cards
     const initialBatch = designs.slice(0, DESIGN_SEARCH_INITIAL_RENDER);
+    // eslint-disable-next-line no-unsanitized/property -- audited (1.4): card/chip/badge builders escapeHtml every API string (extraction #2 audit + the 1.4 chip attr fix); counts numeric
     results.innerHTML = initialBatch.map(buildDesignSearchCardHtml).join('');
     _designSearchState.displayedCount = initialBatch.length;
 
     // Add "Show more" button if there are more results
     if (designs.length > DESIGN_SEARCH_INITIAL_RENDER) {
         const remaining = designs.length - DESIGN_SEARCH_INITIAL_RENDER;
+        // eslint-disable-next-line no-unsanitized/property -- audited (1.4): card/chip/badge builders escapeHtml every API string (extraction #2 audit + the 1.4 chip attr fix); counts numeric
         results.innerHTML += '<div class="design-search-show-more"><button onclick="showMoreDesignSearchResults()"><i class="fas fa-chevron-down"></i> Show all ' + designs.length + ' designs (' + remaining + ' more)</button></div>';
     }
 
@@ -865,6 +873,7 @@ export function showMoreDesignSearchResults() {
     // Append remaining cards
     const remaining = _designSearchState.filteredResults.slice(DESIGN_SEARCH_INITIAL_RENDER);
     const temp = document.createElement('div');
+    // eslint-disable-next-line no-unsanitized/property -- audited (1.4): card/chip/badge builders escapeHtml every API string (extraction #2 audit + the 1.4 chip attr fix); counts numeric
     temp.innerHTML = remaining.map(buildDesignSearchCardHtml).join('');
     while (temp.firstChild) {
         results.appendChild(temp.firstChild);
