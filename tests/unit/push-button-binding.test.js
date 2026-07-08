@@ -87,7 +87,7 @@ const CASES = [
     },
     {
         method: 'DTF',
-        file: 'shared_components/js/dtf-quote-builder.js',
+        file: 'shared_components/js/builders/dtf/push.js',
         name: 'dtfPushToShopWorks',
         stubs: {
             dtfQuoteBuilder: { saveAndGetLink: async () => {} },

@@ -91,6 +91,9 @@ export default [
             'shared_components/js/builders/scp/save-output.js',
             'shared_components/js/builders/scp/push.js',
             'shared_components/js/builders/scp/adapter.js',
+            'shared_components/js/builders/dtf/quote-builder-class.js',
+            'shared_components/js/builders/dtf/output.js',
+            'shared_components/js/builders/dtf/push.js',
         ],
         rules: {
             'no-unsanitized/property': 'off',
