@@ -3,7 +3,7 @@
 // ============================================================
 
 // Use centralized config (fallback to hardcoded URL for backwards compatibility)
-const API_BASE = window.APP_CONFIG?.API?.BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+const API_BASE = window.APP_CONFIG.API.BASE_URL;
 
 // NOTE: SIZE_MODIFIERS was removed - use SIZE_TO_SUFFIX (line ~1520) instead
 // SIZE_TO_SUFFIX contains ALL size suffixes including tall, youth, toddler, etc.
@@ -5196,9 +5196,7 @@ async function openScpPushPreview() {
     modal.classList.add('show');
 
     try {
-        const apiBase = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.API?.BASE_URL)
-            ? APP_CONFIG.API.BASE_URL
-            : 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        const apiBase = window.APP_CONFIG.API.BASE_URL;
         const resp = await fetch(`${apiBase}/api/scp-push/preview/${encodeURIComponent(_scpPushQuoteId)}`);
         const data = await resp.json();
         if (!resp.ok) throw new Error(data.error || data.details || `HTTP ${resp.status}`);
@@ -5280,9 +5278,7 @@ async function confirmScpPush(directFallback) {
     }
 
     try {
-        const apiBase = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.API?.BASE_URL)
-            ? APP_CONFIG.API.BASE_URL
-            : 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        const apiBase = window.APP_CONFIG.API.BASE_URL;
         const response = await fetch(`${apiBase}/api/scp-push/push-quote`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

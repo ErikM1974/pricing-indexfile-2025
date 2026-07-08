@@ -18,7 +18,7 @@ class DTFQuoteService {
 
         // Initialize EmailJS
         if (typeof emailjs !== 'undefined') {
-            emailjs.init('4qSbDO-SQs19TbP80');
+            emailjs.init(window.APP_CONFIG.EMAIL.PUBLIC_KEY);
         }
 
         console.log('[DTFQuoteService] Service initialized');

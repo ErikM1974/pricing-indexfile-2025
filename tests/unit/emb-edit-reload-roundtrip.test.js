@@ -96,7 +96,7 @@ async function buildBuilder(routes) {
   const { window } = dom;
 
   // Globals normally provided by the external scripts the HTML loads (not fetched by jsdom).
-  window.APP_CONFIG = { API: { BASE_URL: PROXY } };
+  window.APP_CONFIG = { API: { BASE_URL: PROXY }, EMAIL: { PUBLIC_KEY: 'test_public_key', SERVICE_ID: 'test_service', TEMPLATES: { QUOTE_SHARE: 'test_template' } }, COMPANY: { NAME: 'Test Shop', PHONE: '000-000-0000', PHONE_DISPLAY: '(000) 000-0000', EMAIL: 'test@shop.test', WEBSITE: 'www.shop.test', LOGO_URL: 'http://test/logo.png', ADDRESS: { STREET: '1 Test St', CITY: 'Testville', STATE: 'WA', ZIP: '00000' } } };
   window.emailjs = { init() {} };
   window.scrollTo = () => {};
   if (!window.matchMedia) {

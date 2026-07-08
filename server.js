@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 const fetch = require('node-fetch');
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
@@ -121,6 +122,8 @@ dotenv.config();
 //
 // STATIC FILE SERVING
 //   /robots.txt — staff/internal dirs + credential share-links disallowed (2026-06-11)
+//   GET /api/tenants/:id/config — runtime tenant config for config/tenant.js
+//        (backed by config/tenants/<id>.json; strict id allowlist) (2026-07-07)
 //   /dist/* — content-hashed build output (scripts/build.js), Cache-Control immutable (2026-07-07)
 //   GET /quote-builders/:page — the 3 builder HTMLs served with script/link tags
 //        rewritten to hashed /dist assets via dist/asset-manifest.json; falls
@@ -3007,6 +3010,29 @@ console.log('✓ CRM API proxy routes loaded (session-protected)');
 // robots.txt — staff/internal paths + credential-bearing share links disallowed (2026-06-11)
 app.get('/robots.txt', (req, res) => {
   res.sendFile(path.join(__dirname, 'robots.txt'));
+});
+
+// ── Tenant config (roadmap 0.3) ─────────────────────────────────────────────
+// Runtime tenant hydration for config/tenant.js. Backed by config/tenants/
+// <id>.json today; the Phase 2 admin console swaps the backing store without
+// changing this contract. Strict id allowlist pattern — the param never
+// touches the filesystem un-validated.
+app.get('/api/tenants/:id/config', (req, res) => {
+  const id = String(req.params.id || '').toLowerCase();
+  if (!/^[a-z0-9][a-z0-9-]{0,31}$/.test(id)) {
+    return res.status(400).json({ error: 'Invalid tenant id' });
+  }
+  const tenantPath = path.join(__dirname, 'config', 'tenants', `${id}.json`);
+  fs.readFile(tenantPath, 'utf8', (err, raw) => {
+    if (err) return res.status(404).json({ error: 'Unknown tenant' });
+    try {
+      res.setHeader('Cache-Control', 'no-cache');
+      res.json(JSON.parse(raw));
+    } catch (parseErr) {
+      console.error(`[tenants] config/tenants/${id}.json is not valid JSON:`, parseErr.message);
+      res.status(500).json({ error: 'Tenant config unreadable' });
+    }
+  });
 });
 
 // ── Build pipeline (roadmap 0.1/0.2) ────────────────────────────────────────

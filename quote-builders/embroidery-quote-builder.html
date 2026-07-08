@@ -48,8 +48,10 @@
     <!-- EmailJS -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 
-    <!-- App Configuration (centralized API URLs, settings) -->
+    <!-- App Configuration (centralized API URLs, settings) + runtime tenant
+         resolution (roadmap 0.3 — ?tenant= / hostname → window.TENANT) -->
     <script src="/config/app.config.js"></script>
+    <script src="/config/tenant.js"></script>
 
     <!-- Extended Sizes Shared Module (2026-03-21 consolidation) -->
     <script src="/shared_components/js/extended-sizes-config.js?v=20260321"></script>

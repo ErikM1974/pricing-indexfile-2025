@@ -3,7 +3,7 @@
 // ============================================================
 
 // Use centralized config (fallback to hardcoded URL for backwards compatibility)
-const API_BASE = window.APP_CONFIG?.API?.BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+const API_BASE = window.APP_CONFIG.API.BASE_URL;
 
 /**
  * Service-fee prices = the Caspio **Service_Codes** table (single source of truth),
@@ -2547,8 +2547,7 @@ async function lookupDesignNumber(type) {
     infoBadge.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Looking up design #' + escapeHtml(designNum) + '...';
 
     try {
-        const apiBase = (window.APP_CONFIG && APP_CONFIG.API && APP_CONFIG.API.BASE_URL)
-            || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        const apiBase = window.APP_CONFIG.API.BASE_URL;
         const resp = await fetch(`${apiBase}/api/digitized-designs/lookup?designs=${designNum}`);
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
         const data = await resp.json();
@@ -2739,8 +2738,7 @@ async function autoFillCustomerFromCompany(companyName) {
     if (!customerInput || customerInput.value.trim()) return; // Already has value
 
     try {
-        const apiBase = (window.APP_CONFIG && APP_CONFIG.API && APP_CONFIG.API.BASE_URL)
-            || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        const apiBase = window.APP_CONFIG.API.BASE_URL;
 
         // The contacts search API strips apostrophes from the query,
         // so "Aaberg's Rentals" → "Aabergs Rentals" which won't match.
@@ -3010,8 +3008,7 @@ async function loadCustomerDesignGallery(customerId) {
     resetDesignSearchFilters();
 
     try {
-        const apiBase = (window.APP_CONFIG && APP_CONFIG.API && APP_CONFIG.API.BASE_URL)
-            || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        const apiBase = window.APP_CONFIG.API.BASE_URL;
         const resp = await fetch(`${apiBase}/api/digitized-designs/by-customer?customerId=${encodeURIComponent(customerId)}`);
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
         const data = await resp.json();
@@ -3231,8 +3228,7 @@ async function runDesignSearch() {
     resetDesignSearchFilters();
 
     try {
-        const apiBase = (window.APP_CONFIG && APP_CONFIG.API && APP_CONFIG.API.BASE_URL)
-            || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        const apiBase = window.APP_CONFIG.API.BASE_URL;
         const searchCustomerId = document.getElementById('customer-number')?.value?.trim() || '';
         const customerParam = searchCustomerId ? `&customerId=${encodeURIComponent(searchCustomerId)}` : '';
         const resp = await fetch(`${apiBase}/api/digitized-designs/search-all?q=${encodeURIComponent(q)}${customerParam}&limit=100`);
@@ -8849,9 +8845,7 @@ async function openPushPreview() {
     }
 
     try {
-        const apiBase = typeof APP_CONFIG !== 'undefined'
-            ? APP_CONFIG.API.BASE_URL
-            : 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        const apiBase = window.APP_CONFIG.API.BASE_URL;
         const resp = await fetch(`${apiBase}/api/embroidery-push/preview/${encodeURIComponent(_pushQuoteId)}`);
         const data = await resp.json();
         if (!resp.ok) throw new Error(data.error || data.details || `HTTP ${resp.status}`);
@@ -8989,9 +8983,7 @@ async function confirmPushToShopWorks() {
     confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Pushing…';
 
     try {
-        const apiBase = typeof APP_CONFIG !== 'undefined'
-            ? APP_CONFIG.API.BASE_URL
-            : 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        const apiBase = window.APP_CONFIG.API.BASE_URL;
         const response = await fetch(`${apiBase}/api/embroidery-push/push-quote`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -9072,9 +9064,7 @@ async function verifyShopWorksImport(extOrderId) {
     if (!extOrderId || !out) return;
     out.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking ShopWorks…';
     try {
-        const apiBase = typeof APP_CONFIG !== 'undefined'
-            ? APP_CONFIG.API.BASE_URL
-            : 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        const apiBase = window.APP_CONFIG.API.BASE_URL;
         const resp = await fetch(`${apiBase}/api/manageorders/getorderno/${encodeURIComponent(extOrderId)}`);
         const data = await resp.json();
         if (!resp.ok) throw new Error(data.error || data.details || `HTTP ${resp.status}`);

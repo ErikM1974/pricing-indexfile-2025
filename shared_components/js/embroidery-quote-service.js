@@ -23,7 +23,7 @@ class EmbroideryQuoteService {
         ];
         
         // Initialize EmailJS
-        emailjs.init('4qSbDO-SQs19TbP80');
+        emailjs.init(window.APP_CONFIG.EMAIL.PUBLIC_KEY);
     }
 
     /**

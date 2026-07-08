@@ -501,17 +501,21 @@ class EmbroideryInvoiceGenerator {
         const quoteTypeInfo = this.getQuoteTypeInfo(pricingData);
         const quoteId = pricingData.quoteId;
         const fmtD = (s) => { if (!s) return ''; const d = new Date(String(s).length <= 10 ? s + 'T00:00:00' : s); return isNaN(d) ? s : d.toLocaleDateString(); };
+        // Tenant branding (roadmap 0.3) — every builder page loads
+        // /config/app.config.js first, so COMPANY delegates to window.TENANT.
+        const co = window.APP_CONFIG.COMPANY;
+        const addr = co.ADDRESS;
 
         return `
             <div class="invoice-header">
                 <div class="company-info">
-                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
-                         alt="Northwest Custom Apparel" class="company-logo">
+                    ${co.LOGO_URL ? `<img src="${co.LOGO_URL}?ver=1"
+                         alt="${this.esc(co.NAME)}" class="company-logo">` : `<div class="company-logo company-logo--text">${this.esc(co.NAME)}</div>`}
                     <div class="company-details">
-                        2025 Freeman Road East<br>
-                        Milton, WA 98354<br>
-                        Phone: (253) 922-5793<br>
-                        www.nwcustomapparel.com
+                        ${this.esc(addr.STREET)}<br>
+                        ${this.esc(addr.CITY)}, ${this.esc(addr.STATE)} ${this.esc(addr.ZIP)}<br>
+                        Phone: ${this.esc(co.PHONE_DISPLAY)}<br>
+                        ${this.esc(co.WEBSITE)}
                     </div>
                 </div>
                 <div class="quote-info">

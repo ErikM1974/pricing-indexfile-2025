@@ -17,8 +17,7 @@
 (function () {
     'use strict';
 
-    var API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-        || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    var API_BASE = window.APP_CONFIG.API.BASE_URL;
 
     function $(id) { return document.getElementById(id); }
     function r2(v) { return Math.round((v + Number.EPSILON) * 100) / 100; }

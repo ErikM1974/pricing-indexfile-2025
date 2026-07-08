@@ -22,8 +22,7 @@
 if (typeof window !== 'undefined' && typeof window.loadServiceCodePrices !== 'function') {
     window.loadServiceCodePrices = async function loadServiceCodePrices() {
         try {
-            const base = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-                || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+            const base = window.APP_CONFIG.API.BASE_URL;
             const resp = await fetch(`${base}/api/service-codes`);
             if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
             const json = await resp.json();
@@ -1442,7 +1441,7 @@ function initOrderShippingListeners(containerId, options = {}) {
     if (container.dataset.osInitialized) return;
     container.dataset.osInitialized = 'true';
 
-    const apiBase = options.apiBaseUrl || (typeof APP_CONFIG !== 'undefined' ? APP_CONFIG.API.BASE_URL : 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com');
+    const apiBase = options.apiBaseUrl || window.APP_CONFIG.API.BASE_URL;
 
     // State change → auto lookup or zero tax
     const stateSelect = container.querySelector('.os-ship-state');
@@ -1656,7 +1655,7 @@ async function emailQuote(options = {}) {
 
     try {
         showToast('Sending email...', 'info');
-        await emailjs.send('service_jgrave3', 'template_quote_email', {
+        await emailjs.send(window.APP_CONFIG.EMAIL.SERVICE_ID, window.APP_CONFIG.EMAIL.TEMPLATES.QUOTE_SHARE, {
             to_email: options.customerEmail,
             customer_name: options.customerName || 'Customer',
             quote_id: options.quoteId,
