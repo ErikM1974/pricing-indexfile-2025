@@ -1,3 +1,7 @@
+## v2026.07.08.5 (2026.07.08)
+
+- feat(security): 1.1+1.2+1.11 — helmet CSP(report-only)+HSTS, exact-match CORS allowlist, /healthz+/readyz+/api/version
+
 ## v2026.07.08.4 (2026.07.08)
 
 - feat(dtf): 0.4 DTF decomposition D1 — DTFQuoteBuilder class + output + push -> builders/dtf/ (shell 4,082->164)
