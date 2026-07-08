@@ -110,3 +110,4 @@ Morning-Huddle-*.pptx
 tests/caspio-datapages.json
 .claude/settings.local.json
 dist/
+tests/dom/.bundles/
