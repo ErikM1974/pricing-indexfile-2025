@@ -17,6 +17,8 @@
  * fails LOUDLY at boot, not silently at click time.
  */
 
+import { showErrorBanner } from './errors.js';
+
 /** Methods every adapter must implement (see MethodAdapter in types/quote.d.ts). */
 const ADAPTER_CONTRACT = [
     'getPricingService',
@@ -67,9 +69,11 @@ export class QuoteBuilderBase {
         try {
             await this.adapter.initPricingAndRoute();
         } catch (err) {
-            // Never a silent wrong price: pricing init failure is loud, but the
-            // rest of the page (search, layout) stays usable.
+            // Never a silent wrong price: pricing init failure is loud AND
+            // persistent (1.15 — a 5s toast can be missed), but the rest of
+            // the page (search, layout) stays usable.
             console.error('Failed to initialize pricing:', err);
+            showErrorBanner('Pricing is unavailable — do not send quotes until this clears. Product search still works; refresh to retry.');
             if (typeof window.showToast === 'function') {
                 window.showToast('Pricing unavailable. Search still works.', 'warning');
             }

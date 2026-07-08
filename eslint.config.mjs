@@ -54,8 +54,10 @@ export default [
                         'New window.* globals are banned in extracted modules — export from the module and re-export via builders/*/index.js during the strangler transition (roadmap 0.4).',
                 },
             ],
-            'no-unsanitized/method': 'error',
-            'no-unsanitized/property': 'error',
+            // escapeHtml/_dtfEsc/_scpEsc are recognized sanitizers (roadmap 1.4):
+            // a template whose every interpolation is wrapped passes; raw ones fail.
+            'no-unsanitized/method': ['error', { escape: { methods: ['escapeHtml', 'escapeHTML', '_dtfEsc', '_scpEsc'], taggedTemplates: [] } }],
+            'no-unsanitized/property': ['error', { escape: { methods: ['escapeHtml', 'escapeHTML', '_dtfEsc', '_scpEsc'], taggedTemplates: [] } }],
         },
     },
     {

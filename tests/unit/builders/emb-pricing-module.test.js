@@ -14,16 +14,22 @@
  *     is missing, the cache is absent, or SellPrice is non-numeric
  */
 
-const fs = require('fs');
 const path = require('path');
 const esbuild = require('esbuild');
 
 function loadModule(win) {
-    const src = fs.readFileSync(
-        path.join(__dirname, '../../../shared_components/js/builders/emb/pricing.js'),
-        'utf8'
-    );
-    const { code } = esbuild.transformSync(src, { format: 'cjs', target: 'es2020' });
+    // bundle:true (not a single-file transform) — pricing.js imports the shared
+    // errors module (1.15 fallback badge), so the test loads the same graph the
+    // real build ships.
+    const result = esbuild.buildSync({
+        entryPoints: [path.join(__dirname, '../../../shared_components/js/builders/emb/pricing.js')],
+        bundle: true,
+        format: 'cjs',
+        target: 'es2020',
+        write: false,
+        logLevel: 'silent',
+    });
+    const code = result.outputFiles[0].text;
     const moduleObj = { exports: {} };
     // eslint-disable-next-line no-new-func
     new Function('module', 'exports', 'window', 'fetch', 'console', code)(

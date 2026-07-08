@@ -214,7 +214,8 @@ import {
     showMoreDesignSearchResults,
     invalidateDesignGalleryCache,
     resetDesignSearchState,
-} from './design-search.js';
+} from './design-search.js';
+import { showErrorBanner, hideErrorBanner, showFallbackPricingWarning } from '../shared/errors.js';
 
 // Strangler bridges — bare-identifier callers in the monolith resolve
 // through the global object, so these keep every existing call site,
@@ -433,6 +434,12 @@ new QuoteBuilderBase(embAdapter).init();
 window.__embAdapter = embAdapter; // inspection/debug handle
 window.__embState = embState; // state handle (tests + console diagnostics)
 window.__quoteState = quoteState; // canonical line-item store (0.5)
+
+// ---- shared error surfaces (roadmap 1.15) — classic scripts (quote-builder-
+// utils.js) reach these behind typeof guards; pages without a bundle keep toasts ----
+window.showErrorBanner = showErrorBanner;
+window.hideErrorBanner = hideErrorBanner;
+window.showFallbackPricingWarning = showFallbackPricingWarning;
 
 window.__QB_BUILD = window.__QB_BUILD || {};
 window.__QB_BUILD.emb = { entry: 'builders/emb/index.js', modules: ['pricing', 'design-search', 'spr-modal', 'shopworks-import', 'persistence', 'output', 'save-push', 'quote-lifecycle', 'pricing-sync', 'logo-config', 'product-rows', 'adapter+base'] };

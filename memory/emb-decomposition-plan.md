@@ -82,6 +82,19 @@ cluster, never ahead of it.
 - **For the 1.4 sink audit**: company-chip `onclick` escapes `'` but not `"` inside
   a double-quoted attribute (company names from the design DB) — attribute-injection
   nuance, pre-existing, low severity; fix during 1.4 with proper attr encoding.
+- **1.4 STAGE 1 SHIPPED (2026-07-08)**: escapeHtml/_dtfEsc/_scpEsc registered as
+  eslint no-unsanitized `escape.methods` (fully-escaped templates now PASS); REAL
+  drift fixes: SCP+DTF suggestion dropdowns and DTF summary/toast/ext-popup were
+  UNESCAPED clones of EMB's escaped originals (SanMar "Port & Co" proved it live).
+  **STAGE 2 REMAINING** (~70 flags — regenerate worklist by deleting the two
+  `no-unsanitized/* : off` lines from the moved-legacy override and running lint):
+  every remaining flag is (a) accumulated-`html`-var sink → verify build site,
+  per-line disable + audit note; (b) numeric-only template → wrap or disable;
+  (c) `= originalText` self-restore / parent.innerHTML copy / print
+  `document.write(invoiceHTML)` (renderer escapes via `esc()`, embroidery-quote-invoice.js:22)
+  → disable + note. THEN delete the override's no-unsanitized lines for good and
+  add `quote-builder-utils.js` to lint scope with a sinks-only override (7 flags
+  there, all verified-escaped or static — recent-orders map + toast already escape).
 - `renderDesignGallery` (dead 1-line alias, zero callers incl. generated markup)
   deleted during the move.
 
