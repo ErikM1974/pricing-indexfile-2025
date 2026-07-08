@@ -180,8 +180,11 @@ class ScreenPrintQuoteService {
                 ShipToZip: quoteData.shipZip || '',
                 ShipMethod: quoteData.shipMethod || '',
                 ShippingFee: parseFloat(quoteData.shippingFee) || 0,
-                ReqShipDate: quoteData.reqShipDate ? this.formatDateForCaspio(new Date(quoteData.reqShipDate + 'T12:00:00')) : '',
-                DropDeadDate: quoteData.dropDeadDate ? this.formatDateForCaspio(new Date(quoteData.dropDeadDate + 'T12:00:00')) : ''
+                // '' 400s on Caspio Date/Time fields (InvalidInputValue — live incident
+                // 2026-07-07, every blank-date SCP save failed); null blanks them, the
+                // convention EMB's _toISODate has proven in production. (2026-07-07)
+                ReqShipDate: quoteData.reqShipDate ? this.formatDateForCaspio(new Date(quoteData.reqShipDate + 'T12:00:00')) : null,
+                DropDeadDate: quoteData.dropDeadDate ? this.formatDateForCaspio(new Date(quoteData.dropDeadDate + 'T12:00:00')) : null
             };
 
             // Save session
@@ -502,8 +505,9 @@ class ScreenPrintQuoteService {
                 ShipToZip: quoteData.shipZip || '',
                 ShipMethod: quoteData.shipMethod || '',
                 ShippingFee: parseFloat(quoteData.shippingFee) || 0,
-                ReqShipDate: quoteData.reqShipDate ? new Date(quoteData.reqShipDate + 'T12:00:00').toISOString().replace(/\.\d{3}Z$/, '') : '',
-                DropDeadDate: quoteData.dropDeadDate ? new Date(quoteData.dropDeadDate + 'T12:00:00').toISOString().replace(/\.\d{3}Z$/, '') : ''
+                // null, never '' — see saveQuote's date note (Caspio 400s on '') (2026-07-07)
+                ReqShipDate: quoteData.reqShipDate ? new Date(quoteData.reqShipDate + 'T12:00:00').toISOString().replace(/\.\d{3}Z$/, '') : null,
+                DropDeadDate: quoteData.dropDeadDate ? new Date(quoteData.dropDeadDate + 'T12:00:00').toISOString().replace(/\.\d{3}Z$/, '') : null
             };
 
             // Update session via PUT

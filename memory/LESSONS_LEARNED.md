@@ -29,6 +29,12 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 **(b) Rule 8 applies to FIXES, not just features.** SCP's Email dead end was the EXACT bug DTF fixed 2026-06-11; SCP's fabricated PDF quote # was EMB's 2026-06-04 fix; only EMB re-saved dirty quotes before emailing (SCP/DTF emailed stale revisions). **Prevention:** when you fix save/print/email/push in ONE builder, grep the other three for the same pattern the same day — the endgame functions are near-copies and drift silently.
 **(c) Shipped-but-never-switched-on.** `body.qb-shell-body` — the ENTIRE 2026 PNW re-skin — had zero adopters for a month (trio rendered Segoe-on-gray; only the token aliases took); the guided bar pinned `top:66px` under a header that is not sticky; `--pnw-forest-tint` was referenced but defined nowhere (fallback always won). **Prevention:** an opt-in class/flag is NOT live until something opts in — the ship checklist ends with "grep for adopters"; and every `var(--x, fallback)` fallback must equal the token's real value or it lies wherever the sheet loads alone.
 
+### Caspio Date/Time fields 400 on empty STRING — blank with null (live SCP save outage, 2026-07-07)
+**Problem:** Every SCP quote save with a blank Req Ship / Drop Dead date failed 400 InvalidInputValue (`ReqShipDate`,`DropDeadDate`) — reps burned 5 sequence IDs retrying; DTF had the identical latent `|| ''` bug.
+**Root Cause:** Caspio REST rejects `''` as a Date/Time value; the three builders had THREE conventions: EMB `_toISODate() → null` (works), SCP `: ''`, DTF `|| ''` (both 400).
+**Solution:** null on blank in both SCP payloads (save + update) and DTF; E2E-verified a blank-date save (SP-2026-006).
+**Prevention:** A blankable Caspio Date/Time field is `value || null`, NEVER `|| ''` — and when one builder's convention provably works in prod (EMB's null), sibling builders must copy it, not invent a third (Rule 8 applies to PAYLOADS too).
+
 ## Art Hub
 
 ### Nightly mockup-recovery cron silently dead after PII gating — a cron is a "caller" too (2026-07-07)
