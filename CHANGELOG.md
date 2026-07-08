@@ -1,3 +1,9 @@
+## v2026.07.08.12 (2026.07.08)
+
+- fix(quotes): handle proxy 404 on quote deletes + LESSONS entry
+- feat(a11y): 1.8 stage 1 — BOTH axe baselines to ZERO across all 4 builders
+- Deploy v2026.07.08.12: cache-bust bumps
+
 ## v2026.07.08.11 (2026.07.08)
 
 - feat(testing): 1.14 jsdom DOM suite + 1.9 axe a11y ratchet, wired into CI
