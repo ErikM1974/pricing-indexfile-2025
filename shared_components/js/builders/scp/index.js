@@ -76,7 +76,8 @@ import {
     clearExtendedSize,
     deleteRow,
     handleCellKeydown,
-} from './product-rows.js';
+} from './product-rows.js';
+import { showErrorBanner, hideErrorBanner, showFallbackPricingWarning } from '../shared/errors.js';
 
 // ---- print-config ----
 window.updatePrintConfig = updatePrintConfig;
@@ -148,6 +149,12 @@ window.__scpQuoteState = quoteState;
 
 // ---- boot: the ONE base drives the page lifecycle (roadmap 0.4) ----
 new QuoteBuilderBase(new ScpAdapter()).init();
+
+// ---- shared error surfaces (roadmap 1.15) — classic scripts (quote-builder-
+// utils.js) reach these behind typeof guards; pages without a bundle keep toasts ----
+window.showErrorBanner = showErrorBanner;
+window.hideErrorBanner = hideErrorBanner;
+window.showFallbackPricingWarning = showFallbackPricingWarning;
 
 window.__QB_BUILD = window.__QB_BUILD || {};
 window.__QB_BUILD.scp = { entry: 'builders/scp/index.js', stage: 'S2-complete' };

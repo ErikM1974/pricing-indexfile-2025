@@ -23,6 +23,7 @@
 | `builders/shared/quote-builder-base.js` | **QuoteBuilderBase (2026-07-08)** — the ONE base: lifecycle (setupPage → initPricingAndRoute → focus), loud pricing-failure path, adapter-contract validation at boot |
 | `builders/emb/adapter.js` | **EmbAdapter (2026-07-08)** — MethodAdapter contract + the EMB init verbatim (services bar, customer panel wiring, ?edit/?duplicate/QQ/method-switch routing) |
 | `builders/shared/quote-model.js` | **0.5 (2026-07-08)** — createQuoteItem + QuoteState store (line CRUD, totals, caps-vs-garments tierGroups). Zero price math |
+| `builders/shared/errors.js` | **1.15 (2026-07-08)** — structural no-silent-wrong-price: `showErrorBanner` (persistent role=alert strip), `showFallbackPricingWarning` (persistent amber badge, accumulates labels), `safeExecute` (loud-failure wrapper), `assertPriceOrThrow` (money-math guard). Bridged to window by all 3 index.js; classic scripts call behind typeof guards. CSS in quote-builder-common.css |
 | `builders/emb/state.js` | **0.5 (2026-07-08)** — embState (all EMB mutable state; 3 window-backed contract fields for classic consumers) + constants + the quoteState instance |
 | `builders/scp/index.js` | **SCP ESM entry point (decomposition COMPLETE 2026-07-08)** — 46 window bridges + `QuoteBuilderBase(new ScpAdapter()).init()` boot + `__scpState` handle. The page's ONLY builder script (monolith = tombstone) |
 | `builders/scp/state.js` | **SCP S2 (2026-07-08)** — scpState (all SCP mutable state; window-backed childRowMap/hasChanges for shared classics) + constants + the quoteState instance |

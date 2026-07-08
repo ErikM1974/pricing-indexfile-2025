@@ -15,7 +15,10 @@
  *   - getServicePrice(code, fallback) returns the live SellPrice, or the
  *     documented fallback WITH a visible warning toast if the API was
  *     unreachable — never a silent wrong price (Erik's #1 rule, 2026-06-03).
+ *     1.15 adds the PERSISTENT fallback badge on top of the transient toast.
  */
+
+import { showFallbackPricingWarning } from '../shared/errors.js';
 
 /**
  * Fetch all Service_Codes rows and cache them for getServicePrice().
@@ -34,6 +37,7 @@ export async function loadServiceCodePrices() {
     } catch (e) {
         console.error('[ServiceCodes] Could not load live prices from /api/service-codes:', e);
         if (typeof window.showToast === 'function') window.showToast("Couldn't reach the pricing service — using default service prices", 'warning', 5000);
+        showFallbackPricingWarning('service prices'); // persistent badge (1.15) — outlives the 5s toast
         return null;
     }
 }

@@ -28,7 +28,8 @@ import {
     closeDtfPushPreview,
     openDtfPushPreview,
     renderDtfPushPreview,
-} from './push.js';
+} from './push.js';
+import { showErrorBanner, hideErrorBanner, showFallbackPricingWarning } from '../shared/errors.js';
 
 // ---- the builder class (the shell's init listener instantiates it) ----
 window.DTFQuoteBuilder = DTFQuoteBuilder;
@@ -54,6 +55,12 @@ window.__dtfQuoteState = quoteState;
 
 // ---- boot: the ONE base drives the page lifecycle (roadmap 0.4) ----
 new QuoteBuilderBase(new DtfAdapter()).init();
+
+// ---- shared error surfaces (roadmap 1.15) — classic scripts (quote-builder-
+// utils.js) reach these behind typeof guards; pages without a bundle keep toasts ----
+window.showErrorBanner = showErrorBanner;
+window.hideErrorBanner = hideErrorBanner;
+window.showFallbackPricingWarning = showFallbackPricingWarning;
 
 window.__QB_BUILD = window.__QB_BUILD || {};
 window.__QB_BUILD.dtf = { entry: 'builders/dtf/index.js', stage: 'D2-complete' };

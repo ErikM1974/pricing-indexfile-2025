@@ -33,6 +33,9 @@ if (typeof window !== 'undefined' && typeof window.loadServiceCodePrices !== 'fu
         } catch (e) {
             console.error('[ServiceCodes] Could not load live prices from /api/service-codes:', e);
             if (typeof showToast === 'function') showToast("Couldn't reach the pricing service — using default service prices", 'warning', 5000);
+            // Persistent badge (roadmap 1.15) — the toast vanishes in 5s; the
+            // estimate warning must outlive it. Bundle-less pages (DTG) skip.
+            if (typeof window.showFallbackPricingWarning === 'function') window.showFallbackPricingWarning('service prices');
             return null;
         }
     };
@@ -68,6 +71,8 @@ if (typeof window !== 'undefined' && typeof window.warnIfServiceCodeMissing !== 
         const name = label || code;
         const m = `${name} rate is an estimate ($${rate.toFixed(2)}) — live pricing didn't return it. Verify before saving.`;
         if (typeof showToast === 'function') showToast(m, 'warning', 5000);
+        // Persistent badge (roadmap 1.15) alongside the transient toast.
+        if (typeof window.showFallbackPricingWarning === 'function') window.showFallbackPricingWarning(name);
         return true;
     };
 }

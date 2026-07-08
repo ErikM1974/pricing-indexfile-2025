@@ -4102,3 +4102,51 @@ body.guided-on .product-table thead th { top: 64px; }
     font-weight: 600;
 }
 .pr-item.pr-warn .fa-triangle-exclamation { color: var(--qb-state-warn, #f59e0b); }
+
+/* ============================================================
+   Shared error surfaces (roadmap 1.15 — builders/shared/errors.js)
+   One banner + one fallback badge for ALL builders (Rule 8 sync).
+   ============================================================ */
+.qb-error-banner {
+    position: sticky;
+    top: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    background: #b91c1c; /* deep red — hard failure, 4.5:1 on white text */
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.95rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+.qb-error-banner .qb-error-banner-text { flex: 1; }
+.qb-error-banner .qb-error-banner-close {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 2px 8px;
+    min-width: 32px;
+    min-height: 32px;
+}
+.qb-error-banner .qb-error-banner-close:hover { opacity: 0.8; }
+
+.qb-fallback-badge {
+    position: fixed;
+    bottom: 14px;
+    left: 14px;
+    z-index: 9500;
+    max-width: 380px;
+    padding: 8px 14px;
+    background: #fef3c7; /* amber bg */
+    color: #92400e;      /* amber-text — AA on the light bg */
+    border: 1px solid #f59e0b;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+}
