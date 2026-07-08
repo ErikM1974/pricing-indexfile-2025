@@ -1054,32 +1054,7 @@ Company:Absher Construction Company
         </div>
     </div>
 
-    <!-- DECG Stitch Count Modal (shown after import with customer-supplied items) -->
-    <div class="shopworks-import-modal" id="decg-stitch-modal" role="dialog" aria-modal="true" aria-labelledby="decg-stitch-modal-title">
-        <div class="shopworks-import-content" style="max-width: 500px;">
-            <div class="shopworks-import-header" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
-                <h3 id="decg-stitch-modal-title"><i class="fas fa-ruler"></i> Confirm Stitch Counts</h3>
-                <button class="shopworks-import-close" onclick="closeDECGStitchModal()" aria-label="Close">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="shopworks-import-body">
-                <p class="shopworks-import-hint">
-                    <i class="fas fa-info-circle"></i>
-                    Enter the stitch count for each customer-supplied item to calculate accurate pricing
-                </p>
-                <div id="decg-stitch-items" class="decg-stitch-items">
-                    <!-- Populated by JavaScript -->
-                </div>
-            </div>
-            <div class="shopworks-import-footer">
-                <button class="btn-cancel-import" onclick="closeDECGStitchModal()">Skip (Use 8K Default)</button>
-                <button class="btn-parse-import" id="btn-confirm-stitches" onclick="confirmDECGStitches()">
-                    <i class="fas fa-calculator"></i> Recalculate Prices
-                </button>
-            </div>
-        </div>
-    </div>
+    <!-- DECG stitch-count modal removed 2026-07-07 — dead UI (no opener); the SPR review modal owns DECG/DECC stitch confirmation -->
 
     <!-- Pricing Review Modal (shown during ShopWorks import for products + services) -->
     <div class="shopworks-import-modal" id="service-pricing-review-modal" role="dialog" aria-modal="true" aria-labelledby="service-pricing-review-modal-title">

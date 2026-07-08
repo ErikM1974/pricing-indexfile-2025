@@ -39,7 +39,7 @@
 | 6 | Save + link + push (8182-9111: `saveAndGetLink`, `_saveAndGetLinkInner` 450L, push preview/confirm) | ~930 | `persistence.js` | ⬜ |
 | 7 | Quote-level UI: reset/fees/discounts (9112-9800: `resetQuote` 243L, `updateAdditionalCharges`, fee table) | ~690 | `state.js` + `events.js` | ⬜ |
 | 8 | Service-pricing-review modal (`showServicePricingReview` 615L + `onSpr*`) — 941-line cut, 12 bridges (ALL 5 onSpr row handlers live in generated template-literal markup — python scan, shell grep quoting lies), `getSprEmbConfigOptions()` accessor for the import cluster's read | ~940 | `spr-modal.js` (domain) | ✅ 2026-07-07 (extraction #2) |
-| 9 | DECG stitch modal (10728-10935) | ~210 | `decg-modal.js` (domain) | ⬜ |
+| 9 | DECG stitch modal — audit found it DEAD (openDECGStitchModal: zero callers repo-wide incl. generated markup + DOM-id manipulation; superseded by the SPR modal which owns DECG/DECC during import). Block + static HTML markup DELETED, not extracted | ~200 | (deleted) | ✅ 2026-07-07 (deleted) |
 | 10 | ShopWorks import (10936-12920: import modal, `renderImportPreview`, `confirmShopWorksImport` 999L, `importProductRow`) | ~1,990 | `shopworks-import.js` (domain) | ⬜ |
 | 11 | Output/diagnostics (12921-13703: `diagnoseQuote`, `buildEmbroideryPricingData`, print/email/copy) | ~780 | `persistence.js` | ⬜ |
 
