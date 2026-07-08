@@ -72,7 +72,7 @@
 .guided-step .gs-txt { display: flex; flex-direction: column; min-width: 0; }
 .guided-step .gs-title { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .guided-step .gs-title i { margin-right: 4px; font-size: 11px; opacity: .8; }
-.guided-step .gs-hint { font-size: 11px; color: var(--pnw-stone, #6b7280); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.guided-step .gs-hint { font-size: 11px; color: var(--pnw-stone-strong, #55606e); /* 1.8: 4.5:1 on the active-step wash */ white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
 .guided-toggle {
     flex: none;

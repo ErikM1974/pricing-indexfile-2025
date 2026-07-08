@@ -854,21 +854,21 @@ let hasChanges = false;
                             <div class="dcp-row">
                                 <div>
                                     <div class="dcp-field-label">First name</div>
-                                    <input type="text" id="dtgFirstName" autocomplete="off">
+                                    <input type="text" id="dtgFirstName" aria-label="First name" autocomplete="off">
                                 </div>
                                 <div>
                                     <div class="dcp-field-label">Last name</div>
-                                    <input type="text" id="dtgLastName" autocomplete="off">
+                                    <input type="text" id="dtgLastName" aria-label="Last name" autocomplete="off">
                                 </div>
                             </div>
                             <div class="dcp-field-wrap dcp-field-email">
                                 <div class="dcp-field-label">Email</div>
-                                <input type="email" id="dtgEmail" autocomplete="off">
+                                <input type="email" id="dtgEmail" aria-label="Customer email" autocomplete="off">
                             </div>
                             <div class="dcp-row">
                                 <div>
                                     <div class="dcp-field-label">Phone</div>
-                                    <input type="tel" id="dtgPhone" autocomplete="off">
+                                    <input type="tel" id="dtgPhone" aria-label="Customer phone" autocomplete="off">
                                 </div>
                                 <div>
                                     <div class="dcp-field-label">Company ID (optional)</div>
@@ -887,7 +887,7 @@ let hasChanges = false;
                                             <input type="text" id="dtgDesignNumber" autocomplete="off" placeholder="Pick a customer first to see their DTG designs">
                                             <i class="fas fa-caret-down dtg-combobox-chevron" aria-hidden="true"></i>
                                         </div>
-                                        <a id="dtgDesignThumbAnchor" class="dtg-design-thumb-anchor" href="#" hidden>
+                                        <a id="dtgDesignThumbAnchor" class="dtg-design-thumb-anchor" href="#" aria-label="Open design preview" hidden>
                                             <img id="dtgDesignThumbImg" alt="" loading="lazy">
                                             <span class="dtg-design-thumb-zoom" aria-hidden="true">
                                                 <i class="fas fa-search-plus"></i>
@@ -902,7 +902,7 @@ let hasChanges = false;
                                               style="font-size:11px;color:#92400e;font-weight:600;margin-left:6px;"
                                               title="Customer's CRM term mapped to a term NWCA currently offers"></span>
                                     </div>
-                                    <select id="dtgTerms">
+                                    <select id="dtgTerms" aria-label="Payment terms">
                                         <option value="Prepaid">Prepaid</option>
                                         <option value="Net 10">Net 10</option>
                                         <option value="Pay On Pickup">Pay On Pickup</option>
@@ -952,13 +952,13 @@ let hasChanges = false;
                             <div class="dcp-row">
                                 <div>
                                     <div class="dcp-field-label">Sales rep</div>
-                                    <select id="dtgSalesRep">
+                                    <select id="dtgSalesRep" aria-label="Sales rep">
                                         ${SALES_REPS.map(r => `<option value="${escapeHtml(r.code)}"${state.customer.salesRepCode === r.code ? ' selected' : ''}>${escapeHtml(r.name)}</option>`).join('')}
                                     </select>
                                 </div>
                                 <div>
                                     <div class="dcp-field-label">Ship method</div>
-                                    <select id="dtgShipMethod">
+                                    <select id="dtgShipMethod" aria-label="Shipping method">
                                         ${SHIP_METHODS.map(m => `<option value="${escapeHtml(m.code)}"${state.shipping.method === m.code ? ' selected' : ''}>${escapeHtml(m.label)}</option>`).join('')}
                                     </select>
                                 </div>
@@ -978,14 +978,14 @@ let hasChanges = false;
                                         <div class="dcp-field-label">
                                             Due date <span class="dcp-field-sub">production ready</span>
                                         </div>
-                                        <input type="date" id="dtgDueDate" value="${escapeHtml(state.scheduling.dueDate || '')}">
+                                        <input type="date" id="dtgDueDate" aria-label="Due date" value="${escapeHtml(state.scheduling.dueDate || '')}">
                                         <div class="dcp-date-hint" id="dtgDueDateHint">${escapeHtml(state.scheduling.autoDueDate ? dueDateAutoLabel(combinedQty()) : 'Manual override')}</div>
                                     </div>
                                     <div>
                                         <div class="dcp-field-label">
                                             Drop dead <span class="dcp-optional">(optional — customer event)</span>
                                         </div>
-                                        <input type="date" id="dtgDropDeadDate" value="${escapeHtml(state.scheduling.dropDeadDate || '')}">
+                                        <input type="date" id="dtgDropDeadDate" aria-label="Drop dead date" value="${escapeHtml(state.scheduling.dropDeadDate || '')}">
                                         <div class="dcp-date-hint">Customer's hard deadline</div>
                                     </div>
                                 </div>

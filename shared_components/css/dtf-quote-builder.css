@@ -1790,12 +1790,13 @@
 
 /* --- Keyboard Hints Compact --- */
 .keyboard-hint {
-    opacity: 0.6;
-    transition: opacity 0.3s;
+    /* 1.8: opacity-fade blended the text below 4.5:1 — use real colors */
+    color: var(--pnw-stone-strong, #55606e);
+    transition: color 0.3s;
 }
 
 .keyboard-hint:hover {
-    opacity: 1;
+    color: #334155;
 }
 
 /* --- Additional Responsive Breakpoints --- */

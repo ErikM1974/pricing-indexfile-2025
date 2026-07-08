@@ -407,7 +407,7 @@
 .dtg-cc-category {
     padding: 2px 8px;
     background: #f3f4f6;
-    color: #6b7280;
+    color: #565e6b; /* 1.8: 4.39 -> 4.9:1 (49 catalog pills) */
     border-radius: 999px;
     font-size: 10px;
     font-weight: 600;

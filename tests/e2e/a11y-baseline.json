@@ -1,21 +1,6 @@
 {
-  "embroidery-quote-builder.html": {
-    "aria-required-children": 1,
-    "color-contrast": 4
-  },
-  "screenprint-quote-builder.html": {
-    "aria-required-children": 1,
-    "color-contrast": 10
-  },
-  "dtf-quote-builder.html": {
-    "aria-required-children": 1,
-    "color-contrast": 9
-  },
-  "dtg-quote-builder.html": {
-    "aria-hidden-focus": 1,
-    "color-contrast": 49,
-    "label": 6,
-    "link-name": 1,
-    "select-name": 3
-  }
+  "embroidery-quote-builder.html": {},
+  "screenprint-quote-builder.html": {},
+  "dtf-quote-builder.html": {},
+  "dtg-quote-builder.html": {}
 }

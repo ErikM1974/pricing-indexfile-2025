@@ -1983,3 +1983,8 @@ body {
     }
     .ai-chat-panel.open { transform: translateX(0); }
 }
+
+/* 1.8: an aria-hidden chat panel still held focusable children (axe
+   aria-hidden-focus). visibility:hidden drops them from the tab order +
+   a11y tree; JS flipping aria-hidden restores them. */
+.ai-chat-panel[aria-hidden="true"] { visibility: hidden; }

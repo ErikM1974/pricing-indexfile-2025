@@ -93,9 +93,9 @@
         const shellEl = document.createElement('div');
         shellEl.className = 'guided-shell';
         shellEl.innerHTML =
-            '<div class="guided-steps" role="tablist" aria-label="Quote steps">'
+            '<div class="guided-steps" role="navigation" aria-label="Quote steps">'
             + cfg.steps.map((s, i) =>
-                '<button type="button" class="guided-step" role="tab" data-step="' + i + '" aria-selected="false">'
+                '<button type="button" class="guided-step" data-step="' + i + '">'
                 + '<span class="gs-num"><span class="gs-n">' + (i + 1) + '</span><i class="fas fa-check gs-check"></i></span>'
                 + '<span class="gs-txt"><span class="gs-title"><i class="fas ' + s.icon + '"></i> ' + s.title + '</span>'
                 + '<span class="gs-hint">' + s.hint + '</span></span>'
@@ -211,7 +211,8 @@
         current = Math.max(0, Math.min(cfg.steps.length - 1, i));
         shell.querySelectorAll('.guided-step').forEach((btn, idx) => {
             btn.classList.toggle('active', idx === current);
-            btn.setAttribute('aria-selected', idx === current ? 'true' : 'false');
+            if (idx === current) btn.setAttribute('aria-current', 'step');
+            else btn.removeAttribute('aria-current');
             btn.classList.toggle('done', idx !== current && stepDone(idx));
         });
         stepped.forEach(entry => {
