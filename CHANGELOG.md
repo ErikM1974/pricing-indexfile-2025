@@ -1,3 +1,9 @@
+## v2026.07.08.6 (2026.07.08)
+
+- feat(builders): 1.15 shared errors.js — persistent banner + fallback badge; loud-failure primitives
+- fix(security): 1.4 stage 1 — escape SCP/DTF suggestion+summary+toast sinks; register escapers in lint
+- Deploy v2026.07.08.6: 4 files (dtf-quote-builder.html, dtg-quote-builder.html, embroidery-quote-builder.html...)
+
 ## v2026.07.08.5 (2026.07.08)
 
 - feat(security): 1.1+1.2+1.11 — helmet CSP(report-only)+HSTS, exact-match CORS allowlist, /healthz+/readyz+/api/version
