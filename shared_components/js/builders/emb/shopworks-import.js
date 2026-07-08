@@ -18,7 +18,7 @@
  */
 // @ts-nocheck — MOVED legacy DOM code: pre-existing checkJs frictions; typing
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
-/* global API_BASE, SIZE06_EXTENDED_SIZES, reorderRowByProductType, escapeHtml, showToast,
+/* global reorderRowByProductType, escapeHtml, showToast,
    createOrUpdateExtendedChildRow, ShopWorksImportParser, updateArtworkCharges,
    Event, APP_CONFIG, setLtmControlState, markAsUnsaved */
 import { showServicePricingReview, getSprEmbConfigOptions } from './spr-modal.js';
@@ -26,6 +26,7 @@ import { lookupTaxRate, onShipMethodChange, recalculatePricing, updateTaxCalcula
 import { applyDesignFromCache, lookupDesignNumber } from './design-search.js';
 import { _syncALArrays, handleCapEmbellishmentChange, updateNotesBadge } from './logo-config.js';
 import { addNewRow, createServiceProductRow, dateToInputValue, hideVariantOnlyParents, isCapProduct, onSizeChange, onStyleChange, parseShopWorksDescription, populateNonSanmarRow, selectColor, selectNonSanmarColor, updateCapLogoSectionVisibility, updateLogoCardHeader, updateNonSanmarPriceCell } from './product-rows.js';
+import { embState, SIZE06_EXTENDED_SIZES, API_BASE } from './state.js';
 
 
 // DECG stitch-count modal DELETED 2026-07-07 (roadmap 0.4 cluster #9 audit):
@@ -71,7 +72,7 @@ export function openShopWorksImportModal() {
     document.getElementById('shopworks-import-preview').classList.remove('active');
     document.getElementById('btn-parse-import').style.display = '';
     document.getElementById('btn-confirm-import').style.display = 'none';
-    pendingShopWorksImport = null;
+    embState.pendingShopWorksImport = null;
 
     // Focus textarea
     setTimeout(() => {
@@ -85,7 +86,7 @@ export function openShopWorksImportModal() {
 export function closeShopWorksImportModal() {
     const modal = document.getElementById('shopworks-import-modal');
     modal.classList.remove('active');
-    pendingShopWorksImport = null;
+    embState.pendingShopWorksImport = null;
 }
 
 /**
@@ -434,7 +435,7 @@ export async function parseAndPreviewShopWorks() {
 
         // Consolidate products by partNumber + color (merges size-split SKUs like ST253, ST253_2X into one row)
         result.products = parser.consolidateProducts(result.products);
-        pendingShopWorksImport = result;
+        embState.pendingShopWorksImport = result;
 
         result.products.forEach((p, _i) => {
             // eslint-disable-next-line no-unused-vars -- pre-existing write-only local (verbatim move)
@@ -578,7 +579,7 @@ function renderImportPreview(data) {
         servicesHtml += `<span class="preview-service-badge"><i class="fas fa-cog"></i> Digitizing (${codes.join(', ')})</span>`;
     }
     if (data.services.patchSetup) {
-        servicesHtml += `<span class="preview-service-badge"><i class="fas fa-layer-group"></i> Patch Setup ($${Number.isFinite(parseFloat(pricingCalculator?.patchSetupFee)) ? parseFloat(pricingCalculator.patchSetupFee) : 50})</span>`;
+        servicesHtml += `<span class="preview-service-badge"><i class="fas fa-layer-group"></i> Patch Setup ($${Number.isFinite(parseFloat(embState.pricingCalculator?.patchSetupFee)) ? parseFloat(embState.pricingCalculator.patchSetupFee) : 50})</span>`;
     }
 
     // Handle new additionalLogos array
@@ -717,12 +718,12 @@ function renderImportPreview(data) {
  * Confirm and execute the import
  */
 export async function confirmShopWorksImport() {
-    if (!pendingShopWorksImport) {
+    if (!embState.pendingShopWorksImport) {
         showToast('No import data available', 'error');
         return;
     }
 
-    const data = pendingShopWorksImport;
+    const data = embState.pendingShopWorksImport;
     const btn = document.getElementById('btn-confirm-import');
 
     // Filter products by exclude checkboxes
@@ -986,9 +987,9 @@ export async function confirmShopWorksImport() {
         for (const product of data.products) {
             const isCap = isCapProduct(product.partNumber, product.description || '');
             let sizePrices = null;
-            if (pricingCalculator) {
+            if (embState.pricingCalculator) {
                 try {
-                    sizePrices = await pricingCalculator.getProductSizePrices(
+                    sizePrices = await embState.pricingCalculator.getProductSizePrices(
                         product.partNumber, totalProductQty, isCap
                     );
                 } catch (e) {
@@ -1020,8 +1021,8 @@ export async function confirmShopWorksImport() {
             const firstAL = additionalLogos[0];
             const alStitchCount = firstAL.stitchCount || 8000;
             const swPrice = firstAL.unitPrice || 0;
-            const apiPrice = pricingCalculator
-                ? pricingCalculator.getServiceUnitPrice('al', alStitchCount, alQty, false)
+            const apiPrice = embState.pricingCalculator
+                ? embState.pricingCalculator.getServiceUnitPrice('al', alStitchCount, alQty, false)
                 : null;
 
             serviceReviewItems.push({
@@ -1097,8 +1098,8 @@ export async function confirmShopWorksImport() {
         // 9c. Collect Monogram items
         if (data.services.monograms && data.services.monograms.length > 0) {
             const totalNames = data.services.monograms.reduce((sum, m) => sum + m.quantity, 0);
-            const monogramApiPrice = pricingCalculator
-                ? pricingCalculator.getServiceUnitPrice('monogram', 0, totalNames, false)
+            const monogramApiPrice = embState.pricingCalculator
+                ? embState.pricingCalculator.getServiceUnitPrice('monogram', 0, totalNames, false)
                 : 12.50;
 
             serviceReviewItems.push({
@@ -1209,9 +1210,9 @@ export async function confirmShopWorksImport() {
         const embConfig = reviewResults ? reviewResults.embConfig : null;
         if (embConfig) {
             // Garment logo config
-            primaryLogo.position = embConfig.garmentPosition;
-            primaryLogo.stitchCount = embConfig.garmentStitchTier;
-            primaryLogo.needsDigitizing = embConfig.garmentDigitizing;
+            embState.primaryLogo.position = embConfig.garmentPosition;
+            embState.primaryLogo.stitchCount = embConfig.garmentStitchTier;
+            embState.primaryLogo.needsDigitizing = embConfig.garmentDigitizing;
             document.getElementById('primary-position').value = embConfig.garmentPosition;
             document.getElementById('primary-stitches').value = embConfig.garmentStitchTier;
             const digitizingEl = document.getElementById('primary-digitizing');
@@ -1228,9 +1229,9 @@ export async function confirmShopWorksImport() {
                 if (fbField) fbField.style.display = '';
                 if (fbInput) fbInput.value = embConfig.garmentStitchTier;
                 // Attach design-specific FB tier pricing for pricing engine
-                primaryLogo.fbPriceTiers = embConfig.fbPriceTiers || null;
+                embState.primaryLogo.fbPriceTiers = embConfig.fbPriceTiers || null;
             } else {
-                primaryLogo.fbPriceTiers = null;
+                embState.primaryLogo.fbPriceTiers = null;
             }
 
             // Cap config
@@ -1240,8 +1241,8 @@ export async function confirmShopWorksImport() {
                     capEmbEl.value = embConfig.capEmbellishment;
                     handleCapEmbellishmentChange();
                 }
-                if (typeof capPrimaryLogo !== 'undefined') {
-                    capPrimaryLogo.stitchCount = embConfig.capStitchTier;
+                if (typeof embState.capPrimaryLogo !== 'undefined') {
+                    embState.capPrimaryLogo.stitchCount = embConfig.capStitchTier;
                     const capStitchEl = document.getElementById('cap-primary-stitches');
                     if (capStitchEl) capStitchEl.value = embConfig.capStitchTier;
                 }
@@ -1260,8 +1261,8 @@ export async function confirmShopWorksImport() {
             // Use cached design lookup data to avoid redundant API calls
             const _importDesignLookup = getSprEmbConfigOptions()?.designLookup;
             if (embConfig.garmentDesignNumber) {
-                primaryLogo.designNumber = embConfig.garmentDesignNumber;
-                primaryLogo.designName = embConfig.garmentDesignName || '';
+                embState.primaryLogo.designNumber = embConfig.garmentDesignNumber;
+                embState.primaryLogo.designName = embConfig.garmentDesignName || '';
                 updateLogoCardHeader('garment', embConfig.garmentDesignNumber);
                 const gdi = document.getElementById('garment-design-number');
                 if (gdi) gdi.value = embConfig.garmentDesignNumber;
@@ -1276,8 +1277,8 @@ export async function confirmShopWorksImport() {
                 }
             }
             if (embConfig.capDesignNumber) {
-                capPrimaryLogo.designNumber = embConfig.capDesignNumber;
-                capPrimaryLogo.designName = embConfig.capDesignName || '';
+                embState.capPrimaryLogo.designNumber = embConfig.capDesignNumber;
+                embState.capPrimaryLogo.designName = embConfig.capDesignName || '';
                 updateLogoCardHeader('cap', embConfig.capDesignNumber);
                 const cdi = document.getElementById('cap-design-number');
                 if (cdi) cdi.value = embConfig.capDesignNumber;
@@ -1364,11 +1365,11 @@ export async function confirmShopWorksImport() {
 
                 if (typeUpper === 'AL') {
                     if (data.products.length > 0 || (data.customProducts && data.customProducts.length > 0)) {
-                        globalAL.garment.enabled = true;
-                        globalAL.garment.position = 'AL';
-                        globalAL.garment.stitchCount = result.stitchCount;
+                        embState.globalAL.garment.enabled = true;
+                        embState.globalAL.garment.position = 'AL';
+                        embState.globalAL.garment.stitchCount = result.stitchCount;
                         if (result.originalData && result.originalData.needsDigitizing) {
-                            globalAL.garment.needsDigitizing = true;
+                            embState.globalAL.garment.needsDigitizing = true;
                         }
 
                         const alToggle = document.getElementById('garment-al-toggle');
@@ -1381,7 +1382,7 @@ export async function confirmShopWorksImport() {
                         if (alConfig) alConfig.classList.add('visible');
 
                         const digitizingEl = document.getElementById('garment-al-digitizing-checkbox');
-                        if (digitizingEl) digitizingEl.checked = globalAL.garment.needsDigitizing;
+                        if (digitizingEl) digitizingEl.checked = embState.globalAL.garment.needsDigitizing;
 
                         if (result.originalData && result.originalData.additionalLogos && result.originalData.additionalLogos.length > 1) {
                             const positions = result.originalData.additionalLogos.map(al => al.position || 'Additional Location');
@@ -1609,7 +1610,7 @@ export async function confirmShopWorksImport() {
         markAsUnsaved();
 
         // Store import metadata for Caspio save (design numbers, warnings, unmatched lines)
-        lastImportMetadata = {
+        embState.lastImportMetadata = {
             designNumbers: data.designNumbers || [],
             digitizingCodes: data.services?.digitizingCodes || [],
             warnings: data.warnings || [],

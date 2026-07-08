@@ -16,6 +16,7 @@
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
 /* global escapeHtml, DesignThumbnailService */
 import { mapStitchCountToTierValue } from './logo-config.js';
+import { embState } from './state.js';
 
 // ============================================================
 // SERVICE PRICING REVIEW MODAL
@@ -811,8 +812,8 @@ export function onSprStitchChange(idx) {
 
     // Recalculate API price
     const apiPriceEl = document.getElementById(`spr-api-price-${idx}`);
-    if (apiPriceEl && pricingCalculator) {
-        const newApiPrice = pricingCalculator.getServiceUnitPrice(
+    if (apiPriceEl && embState.pricingCalculator) {
+        const newApiPrice = embState.pricingCalculator.getServiceUnitPrice(
             item.type.toLowerCase(), newStitch, item.quantity, item.isCap
         );
         if (newApiPrice != null) {

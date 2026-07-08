@@ -15,7 +15,7 @@
  */
 // @ts-nocheck — MOVED legacy DOM code: pre-existing checkJs frictions; typing
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
-/* global API_BASE, EMB_DEFAULTS, SIZE06_EXTENDED_SIZES,
+/* global
    updatePushButtonState, escapeHtml, showToast,
    QuotePersistence, QuoteSession, getLtmControlState, setLtmControlState,
    assertQuoteEditable, updateEditModeUI, setQuoteDateDefaults, markAsUnsaved,
@@ -25,28 +25,29 @@ import { collectProductsFromTable, onShipMethodChange, recalculatePricing, updat
 import { updateAdditionalCharges, updateDiscountType } from './quote-lifecycle.js';
 import { _syncALArrays, handleCapEmbellishmentChange, mapStitchCountToTierValue, updateNotesBadge } from './logo-config.js';
 import { addManualServiceRow, addNewRow, createChildRow, createServiceProductRow, dateFromInputValue, dateToInputValue, onSizeChange, onStyleChange, selectColor, updateCapLogoSectionVisibility, updateGarmentLogoSectionVisibility, updateLogoCardHeader } from './product-rows.js';
+import { embState, EMB_DEFAULTS, SIZE06_EXTENDED_SIZES, API_BASE } from './state.js';
 
 export function initEmbroideryPersistence() {
     if (typeof QuotePersistence !== 'undefined') {
-        embPersistence = new QuotePersistence({
+        embState.embPersistence = new QuotePersistence({
             prefix: 'EMB',
             autoSaveInterval: 30000,
             debug: false
         });
 
         // Setup auto-save callback
-        embPersistence.onAutoSave = () => {
+        embState.embPersistence.onAutoSave = () => {
             const data = getEmbroideryQuoteData();
             if (data && (data.products.length > 0 || data.customerName)) {
-                embPersistence.save(data);
+                embState.embPersistence.save(data);
             }
         };
     }
 
-    if (typeof QuoteSession !== 'undefined' && embPersistence) {
-        embSession = new QuoteSession({
+    if (typeof QuoteSession !== 'undefined' && embState.embPersistence) {
+        embState.embSession = new QuoteSession({
             prefix: 'EMB',
-            persistence: embPersistence,
+            persistence: embState.embPersistence,
             debug: false
         });
     }
@@ -55,19 +56,19 @@ export function initEmbroideryPersistence() {
 export function getEmbroideryQuoteData() {
     return {
         products: collectProductsFromTable(),
-        primaryLogo: { ...primaryLogo },
-        capPrimaryLogo: typeof capPrimaryLogo !== 'undefined' ? { ...capPrimaryLogo } : null,
+        primaryLogo: { ...embState.primaryLogo },
+        capPrimaryLogo: typeof embState.capPrimaryLogo !== 'undefined' ? { ...embState.capPrimaryLogo } : null,
         garmentAL: {
-            enabled: globalAL.garment.enabled,
+            enabled: embState.globalAL.garment.enabled,
             position: 'AL',
-            stitches: globalAL.garment.stitchCount,
-            needsDigitizing: globalAL.garment.needsDigitizing
+            stitches: embState.globalAL.garment.stitchCount,
+            needsDigitizing: embState.globalAL.garment.needsDigitizing
         },
         capAL: {
-            enabled: globalAL.cap.enabled,
+            enabled: embState.globalAL.cap.enabled,
             position: 'AL-Cap',
-            stitches: globalAL.cap.stitchCount,
-            needsDigitizing: globalAL.cap.needsDigitizing
+            stitches: embState.globalAL.cap.stitchCount,
+            needsDigitizing: embState.globalAL.cap.needsDigitizing
         },
         customerName: document.getElementById('customer-name')?.value || '',
         customerEmail: document.getElementById('customer-email')?.value || '',
@@ -95,8 +96,8 @@ export function getEmbroideryQuoteData() {
         dropDeadDate: dateFromInputValue(document.getElementById('drop-dead-date')?.value),
         paymentTerms: document.getElementById('payment-terms')?.value || '',
         // Cached design data for instant restore (no API call needed)
-        garmentDesignData: primaryLogo._designData || null,
-        capDesignData: (typeof capPrimaryLogo !== 'undefined' && capPrimaryLogo._designData) ? capPrimaryLogo._designData : null,
+        garmentDesignData: embState.primaryLogo._designData || null,
+        capDesignData: (typeof embState.capPrimaryLogo !== 'undefined' && embState.capPrimaryLogo._designData) ? embState.capPrimaryLogo._designData : null,
         timestamp: Date.now()
     };
 }
@@ -140,7 +141,7 @@ export function restoreEmbroideryDraft(draft) {
 
     // Restore primary logo configuration
     if (draft.primaryLogo) {
-        primaryLogo = { ...primaryLogo, ...draft.primaryLogo };
+        embState.primaryLogo = { ...embState.primaryLogo, ...draft.primaryLogo };
         const positionEl = document.getElementById('primary-position');
         if (positionEl) positionEl.value = draft.primaryLogo.position || 'Left Chest';
         const stitchesEl = document.getElementById('primary-stitches');
@@ -179,8 +180,8 @@ export function restoreEmbroideryDraft(draft) {
     }
 
     // Restore cap primary logo if present
-    if (draft.capPrimaryLogo && typeof capPrimaryLogo !== 'undefined') {
-        capPrimaryLogo = { ...capPrimaryLogo, ...draft.capPrimaryLogo };
+    if (draft.capPrimaryLogo && typeof embState.capPrimaryLogo !== 'undefined') {
+        embState.capPrimaryLogo = { ...embState.capPrimaryLogo, ...draft.capPrimaryLogo };
         const capStitchesEl = document.getElementById('cap-primary-stitches');
         if (capStitchesEl) capStitchesEl.value = mapStitchCountToTierValue(
             draft.capPrimaryLogo.stitchCount || 8000,
@@ -262,10 +263,10 @@ export function restoreEmbroideryDraft(draft) {
 
     // Restore garment AL configuration
     if (draft.garmentAL && draft.garmentAL.enabled) {
-        globalAL.garment.enabled = true;
-        globalAL.garment.position = 'AL';
-        globalAL.garment.stitchCount = parseInt(draft.garmentAL.stitches) || 8000;
-        globalAL.garment.needsDigitizing = draft.garmentAL.needsDigitizing || false;
+        embState.globalAL.garment.enabled = true;
+        embState.globalAL.garment.position = 'AL';
+        embState.globalAL.garment.stitchCount = parseInt(draft.garmentAL.stitches) || 8000;
+        embState.globalAL.garment.needsDigitizing = draft.garmentAL.needsDigitizing || false;
 
         // Update UI toggle
         const garmentALSwitch = document.getElementById('garment-al-switch');
@@ -278,15 +279,15 @@ export function restoreEmbroideryDraft(draft) {
         if (garmentALToggle) garmentALToggle.checked = true;
 
         const digitizingEl = document.getElementById('garment-al-digitizing-checkbox');
-        if (digitizingEl) digitizingEl.checked = globalAL.garment.needsDigitizing;
+        if (digitizingEl) digitizingEl.checked = embState.globalAL.garment.needsDigitizing;
     }
 
     // Restore cap AL configuration
     if (draft.capAL && draft.capAL.enabled) {
-        globalAL.cap.enabled = true;
-        globalAL.cap.position = 'AL-Cap';
-        globalAL.cap.stitchCount = parseInt(draft.capAL.stitches) || 5000;
-        globalAL.cap.needsDigitizing = draft.capAL.needsDigitizing || false;
+        embState.globalAL.cap.enabled = true;
+        embState.globalAL.cap.position = 'AL-Cap';
+        embState.globalAL.cap.stitchCount = parseInt(draft.capAL.stitches) || 5000;
+        embState.globalAL.cap.needsDigitizing = draft.capAL.needsDigitizing || false;
 
         // Update UI toggle
         const capALSwitch = document.getElementById('cap-al-switch');
@@ -299,7 +300,7 @@ export function restoreEmbroideryDraft(draft) {
         if (capALToggle) capALToggle.checked = true;
 
         const digitizingEl = document.getElementById('cap-al-digitizing-checkbox');
-        if (digitizingEl) digitizingEl.checked = globalAL.cap.needsDigitizing;
+        if (digitizingEl) digitizingEl.checked = embState.globalAL.cap.needsDigitizing;
     }
 
     _syncALArrays();
@@ -354,8 +355,8 @@ async function restoreDraftProducts(draft) {
 }
 
 export function markEmbroideryDirty() {
-    if (embPersistence) {
-        embPersistence.markDirty();
+    if (embState.embPersistence) {
+        embState.embPersistence.markDirty();
     }
 }
 
@@ -381,7 +382,7 @@ export async function loadQuoteForEditing(quoteId, opts = {}) {
     window._restoringQuote = true;
 
     try {
-        const result = await quoteService.loadQuote(quoteId);
+        const result = await embState.quoteService.loadQuote(quoteId);
         if (!result.success) {
             throw new Error(result.error || 'Failed to load quote');
         }
@@ -399,11 +400,11 @@ export async function loadQuoteForEditing(quoteId, opts = {}) {
         }
 
         // Store edit mode state
-        editingQuoteId = quoteId;
-        editingRevision = session.RevisionNumber || 1;
+        embState.editingQuoteId = quoteId;
+        embState.editingRevision = session.RevisionNumber || 1;
 
         // Update page header to show edit mode (duplicate mode sets its own banner)
-        if (!opts.forDuplicate) updateEditModeUI(quoteId, editingRevision);
+        if (!opts.forDuplicate) updateEditModeUI(quoteId, embState.editingRevision);
 
         // Populate customer information
         populateCustomerInfo(session);
@@ -506,7 +507,7 @@ export async function loadQuoteForEditing(quoteId, opts = {}) {
                 || parseFloat(session.PaidToDate) > 0 || session.OrderNotes || session.Carrier
                 || session.TrackingNumber || parseFloat(session.SWTotal) > 0 || savedNotes.length;
             if (!hasImportData) return;   // nothing imported — keep null (save writes defaults)
-            lastImportMetadata = {
+            embState.lastImportMetadata = {
                 designNumbers,
                 digitizingCodes,
                 parsedServices: { digitizingFees },
@@ -619,13 +620,13 @@ export async function loadQuoteForEditing(quoteId, opts = {}) {
             recalculatePricing();
         }
 
-        if (!opts.forDuplicate) showToast(`Editing ${quoteId} (Rev ${editingRevision})`, 'success');
+        if (!opts.forDuplicate) showToast(`Editing ${quoteId} (Rev ${embState.editingRevision})`, 'success');
 
         // Enable the action-bar push button for this saved quote (gated on
         // Customer #). Reflect already-pushed state if applicable.
         // (Duplicate mode clears all of this right after — see duplicateQuote.)
-        _pushQuoteId = quoteId;
-        _pushAlreadyDone = !!session.PushedToShopWorks;
+        embState._pushQuoteId = quoteId;
+        embState._pushAlreadyDone = !!session.PushedToShopWorks;
         updatePushButtonState();
 
         // "Customer viewed" badge (2026-06-10): /quote/:id records a customer_view
@@ -650,8 +651,8 @@ export async function loadQuoteForEditing(quoteId, opts = {}) {
         console.error('[EditMode] Error loading quote:', error);
         showToast('Error loading quote: ' + error.message, 'error');
         // Clear edit mode and start fresh
-        editingQuoteId = null;
-        editingRevision = null;
+        embState.editingQuoteId = null;
+        embState.editingRevision = null;
         addNewRow();
     } finally {
          
@@ -671,11 +672,11 @@ export async function duplicateQuote(sourceQuoteId) {
     if (!document.querySelector('#product-tbody tr')) return;   // load failed — error already shown
 
     // Clear edit/push state (mirrors the resetQuote checklist) so save → NEW quote
-    editingQuoteId = null;
-    editingRevision = null;
-    lastImportMetadata = null;          // PaidToDate / SW audit / order # belong to the ORIGINAL order
-    _pushAlreadyDone = false;
-    _pushQuoteId = null;
+    embState.editingQuoteId = null;
+    embState.editingRevision = null;
+    embState.lastImportMetadata = null;          // PaidToDate / SW audit / order # belong to the ORIGINAL order
+    embState._pushAlreadyDone = false;
+    embState._pushQuoteId = null;
     if (typeof updatePushButtonState === 'function') { try { updatePushButtonState(); } catch (_) {} }
 
     // Order-specific fields must not carry over
@@ -758,12 +759,12 @@ export function populateLogoConfig(session, items) {
     if (session.PrintLocation) {
         const posSelect = document.getElementById('primary-position');
         if (posSelect) posSelect.value = session.PrintLocation;
-        primaryLogo.position = session.PrintLocation;
+        embState.primaryLogo.position = session.PrintLocation;
     }
     if (session.StitchCount) {
         const stitchInput = document.getElementById('primary-stitches');
         if (stitchInput) stitchInput.value = mapStitchCountToTierValue(session.StitchCount, session.PrintLocation);
-        primaryLogo.stitchCount = session.StitchCount;
+        embState.primaryLogo.stitchCount = session.StitchCount;
         // Sync position dropdown disabled state and FB stitch input for Full Back
         if (session.PrintLocation === 'Full Back') {
             const posEl = document.getElementById('primary-position');
@@ -782,7 +783,7 @@ export function populateLogoConfig(session, items) {
             const container = digitizingCb.closest('.digitizing-checkbox');
             if (container) container.classList.add('checked');
         }
-        primaryLogo.needsDigitizing = true;
+        embState.primaryLogo.needsDigitizing = true;
     }
 
     // Additional logo on garments — LEGACY globalAL path. The current row-based flow saves the AL as an
@@ -793,9 +794,9 @@ export function populateLogoConfig(session, items) {
     const hasALRow = items.some(i => i.EmbellishmentType === 'embroidery-additional' ||
         ['AL', 'AL-CAP', 'DECG-FB'].includes((i.StyleNumber || '').toUpperCase()));
     if (session.AdditionalLogoLocation && !hasALRow) {
-        globalAL.garment.enabled = true;
-        globalAL.garment.position = 'AL';
-        globalAL.garment.stitchCount = session.AdditionalStitchCount || EMB_DEFAULTS.AL_GARMENT_STITCH_COUNT;
+        embState.globalAL.garment.enabled = true;
+        embState.globalAL.garment.position = 'AL';
+        embState.globalAL.garment.stitchCount = session.AdditionalStitchCount || EMB_DEFAULTS.AL_GARMENT_STITCH_COUNT;
 
         // Update UI
         const alSwitch = document.getElementById('garment-al-switch');
@@ -814,12 +815,12 @@ export function populateLogoConfig(session, items) {
     if (session.CapPrintLocation) {
         const capPosSelect = document.getElementById('cap-primary-position');
         if (capPosSelect) capPosSelect.value = session.CapPrintLocation;
-        capPrimaryLogo.position = session.CapPrintLocation;
+        embState.capPrimaryLogo.position = session.CapPrintLocation;
     }
     if (session.CapStitchCount) {
         const capStitchInput = document.getElementById('cap-primary-stitches');
         if (capStitchInput) capStitchInput.value = mapStitchCountToTierValue(session.CapStitchCount, 'CF');
-        capPrimaryLogo.stitchCount = session.CapStitchCount;
+        embState.capPrimaryLogo.stitchCount = session.CapStitchCount;
     }
     if (session.CapDigitizingFee > 0) {
         const capDigitizingCb = document.getElementById('cap-primary-digitizing');
@@ -828,7 +829,7 @@ export function populateLogoConfig(session, items) {
             const container = capDigitizingCb.closest('.digitizing-checkbox');
             if (container) container.classList.add('checked');
         }
-        capPrimaryLogo.needsDigitizing = true;
+        embState.capPrimaryLogo.needsDigitizing = true;
     }
 
     // Cap embellishment type (flat embroidery / 3D puff / laser patch). RESTORING THIS IS
@@ -842,7 +843,7 @@ export function populateLogoConfig(session, items) {
         const capEmbSel = document.getElementById('cap-embellishment-type');
         if (capEmbSel) {
             capEmbSel.value = session.CapEmbellishmentType;
-            capPrimaryLogo.embellishmentType = session.CapEmbellishmentType;
+            embState.capPrimaryLogo.embellishmentType = session.CapEmbellishmentType;
             if (typeof handleCapEmbellishmentChange === 'function') {
                 try { handleCapEmbellishmentChange(); } catch (_) {}
             }
@@ -851,7 +852,7 @@ export function populateLogoConfig(session, items) {
 
     // Design number assignments (2026-02-19)
     if (session.GarmentDesignNumber) {
-        primaryLogo.designNumber = session.GarmentDesignNumber;
+        embState.primaryLogo.designNumber = session.GarmentDesignNumber;
         updateLogoCardHeader('garment', session.GarmentDesignNumber);
         const gDesignInput = document.getElementById('garment-design-number');
         if (gDesignInput) gDesignInput.value = session.GarmentDesignNumber;
@@ -860,7 +861,7 @@ export function populateLogoConfig(session, items) {
         lookupDesignNumber('garment');
     }
     if (session.CapDesignNumber) {
-        capPrimaryLogo.designNumber = session.CapDesignNumber;
+        embState.capPrimaryLogo.designNumber = session.CapDesignNumber;
         updateLogoCardHeader('cap', session.CapDesignNumber);
         const cDesignInput = document.getElementById('cap-design-number');
         if (cDesignInput) cDesignInput.value = session.CapDesignNumber;
@@ -1108,7 +1109,7 @@ export async function addProductFromQuote(product) {
     // Restore per-size price overrides on child rows
     if (product.sizeOverrides && Object.keys(product.sizeOverrides).length > 0) {
         for (const [size, price] of Object.entries(product.sizeOverrides)) {
-            const childRowId = childRowMap[rowIdNum]?.[size];
+            const childRowId = embState.childRowMap[rowIdNum]?.[size];
             if (childRowId) {
                 const childRow = document.getElementById(`row-${childRowId}`);
                 if (childRow) childRow.dataset.sellPrice = price.toString();

@@ -14,22 +14,23 @@
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
 /* global showToast, Event */
 import { recalculatePricing } from './pricing-sync.js';
+import { embState } from './state.js';
 
 // Sync module-level AL arrays from globalAL state
 // Called whenever globalAL changes so all existing references (save, invoice, etc.) get correct data
 export function _syncALArrays() {
-    additionalLogos = globalAL.garment.enabled ? [{
+    embState.additionalLogos = embState.globalAL.garment.enabled ? [{
         id: 'global-al-garment',
         position: 'AL',
-        stitchCount: globalAL.garment.stitchCount,
-        needsDigitizing: globalAL.garment.needsDigitizing,
+        stitchCount: embState.globalAL.garment.stitchCount,
+        needsDigitizing: embState.globalAL.garment.needsDigitizing,
         isPrimary: false
     }] : [];
-    capAdditionalLogos = globalAL.cap.enabled ? [{
+    embState.capAdditionalLogos = embState.globalAL.cap.enabled ? [{
         id: 'global-al-cap',
         position: 'AL-Cap',
-        stitchCount: globalAL.cap.stitchCount,
-        needsDigitizing: globalAL.cap.needsDigitizing,
+        stitchCount: embState.globalAL.cap.stitchCount,
+        needsDigitizing: embState.globalAL.cap.needsDigitizing,
         isPrimary: false
     }] : [];
 }
@@ -157,20 +158,20 @@ export function onPrimaryPositionChange() {
     const posSelect = document.getElementById('primary-position');
     const tierSelect = document.getElementById('primary-stitches');
     const fbField = document.getElementById('fb-stitch-count-field');
-    primaryLogo.position = posSelect.value;
+    embState.primaryLogo.position = posSelect.value;
 
     if (posSelect.value === 'Full Back') {
         tierSelect.value = '25000';
         fbField.style.display = '';
         const fbInput = document.getElementById('fb-stitch-count');
-        primaryLogo.stitchCount = parseInt(fbInput.value) || 25000;
+        embState.primaryLogo.stitchCount = parseInt(fbInput.value) || 25000;
         showToast('Full Back requires minimum 25,000 stitches', 'info');
     } else {
         fbField.style.display = 'none';
         if (parseInt(tierSelect.value) >= 25000) {
             // Switching away from Full Back — reset tier
             tierSelect.value = '8000';
-            primaryLogo.stitchCount = 8000;
+            embState.primaryLogo.stitchCount = 8000;
         }
     }
     recalculatePricing();
@@ -186,19 +187,19 @@ export function onPrimaryStitchTierChange() {
     if (sc >= 25000) {
         // Full Back tier selected — sync position, show stitch input
         posSelect.value = 'Full Back';
-        primaryLogo.position = 'Full Back';
+        embState.primaryLogo.position = 'Full Back';
         posSelect.disabled = true;
         fbField.style.display = '';
         const fbInput = document.getElementById('fb-stitch-count');
-        primaryLogo.stitchCount = parseInt(fbInput.value) || 25000;
+        embState.primaryLogo.stitchCount = parseInt(fbInput.value) || 25000;
     } else {
         // Standard/Mid/Large — hide FB stitch input
         fbField.style.display = 'none';
-        primaryLogo.stitchCount = sc;
+        embState.primaryLogo.stitchCount = sc;
         if (posSelect.disabled) {
             posSelect.disabled = false;
             posSelect.value = 'Left Chest';
-            primaryLogo.position = 'Left Chest';
+            embState.primaryLogo.position = 'Left Chest';
         }
     }
     recalculatePricing();
@@ -208,20 +209,20 @@ export function onPrimaryStitchTierChange() {
 export function onFullBackStitchCountChange() {
     const fbInput = document.getElementById('fb-stitch-count');
     const val = parseInt(fbInput.value) || 25000;
-    primaryLogo.stitchCount = Math.max(val, 25000);
+    embState.primaryLogo.stitchCount = Math.max(val, 25000);
     recalculatePricing();
 }
 
 // Handle cap stitch tier dropdown change
 export function onCapStitchTierChange() {
     const select = document.getElementById('cap-primary-stitches');
-    capPrimaryLogo.stitchCount = parseInt(select.value) || 8000;
+    embState.capPrimaryLogo.stitchCount = parseInt(select.value) || 8000;
     recalculatePricing();
 }
 
 // Update dropdown labels from API-driven surcharge data
 export function updateStitchTierDropdownLabels() {
-    const data = pricingCalculator && pricingCalculator.stitchSurchargeData;
+    const data = embState.pricingCalculator && embState.pricingCalculator.stitchSurchargeData;
     if (!data) return; // API didn't load, keep hardcoded labels
 
     const selects = [
@@ -246,7 +247,7 @@ export function updateStitchTierDropdownLabels() {
 export function updateGlobalAL(type) {
     // Stitch count is always base (no input field — simplified)
     const digitizingCheckbox = document.getElementById(`${type}-al-digitizing-checkbox`);
-    if (digitizingCheckbox) globalAL[type].needsDigitizing = digitizingCheckbox.checked;
+    if (digitizingCheckbox) embState.globalAL[type].needsDigitizing = digitizingCheckbox.checked;
 
     _syncALArrays();
     recalculatePricing();
@@ -268,7 +269,7 @@ export function toggleGlobalALNew(type) {
     hiddenCheckbox.checked = isActive;
 
     // Update global state
-    globalAL[type].enabled = isActive;
+    embState.globalAL[type].enabled = isActive;
 
     // Sync module-level arrays and recalculate
     _syncALArrays();
@@ -314,11 +315,11 @@ export function toggleDigitizingCheckbox(element, checkboxId) {
 
     // Update the corresponding logo object based on checkbox ID
     if (checkboxId === 'primary-digitizing') {
-        primaryLogo.needsDigitizing = checkbox.checked;
+        embState.primaryLogo.needsDigitizing = checkbox.checked;
     } else if (checkboxId === 'cap-primary-digitizing') {
-        capPrimaryLogo.needsDigitizing = checkbox.checked;
+        embState.capPrimaryLogo.needsDigitizing = checkbox.checked;
     } else if (checkboxId === 'cap-patch-setup') {
-        capPrimaryLogo.needsSetup = checkbox.checked;
+        embState.capPrimaryLogo.needsSetup = checkbox.checked;
     }
 
     // Trigger pricing recalculation
@@ -335,28 +336,28 @@ export function handleCapEmbellishmentChange() {
     const patchOptions = document.getElementById('cap-patch-options');
 
     // Update the capPrimaryLogo object with new embellishment type
-    capPrimaryLogo.embellishmentType = embellishmentType;
+    embState.capPrimaryLogo.embellishmentType = embellishmentType;
 
     if (embellishmentType === 'laser-patch') {
         // Show patch options, hide embroidery options (AL toggle is inside embroidery options)
         embroideryOptions.style.display = 'none';
         patchOptions.style.display = 'block';
         // Disable AL if it was enabled (toggle is hidden with embroidery options)
-        if (globalAL.cap.enabled) {
+        if (embState.globalAL.cap.enabled) {
             toggleGlobalALNew('cap'); // Turn it off
         }
         // For patches: no stitches needed, use setup fee instead of digitizing
-        capPrimaryLogo.stitchCount = 0;
-        capPrimaryLogo.needsDigitizing = false;
-        capPrimaryLogo.needsSetup = document.getElementById('cap-patch-setup')?.checked ?? true;
+        embState.capPrimaryLogo.stitchCount = 0;
+        embState.capPrimaryLogo.needsDigitizing = false;
+        embState.capPrimaryLogo.needsSetup = document.getElementById('cap-patch-setup')?.checked ?? true;
     } else {
         // Show embroidery options (for both flat and 3D puff) — AL toggle is inline
         embroideryOptions.style.display = 'block';
         patchOptions.style.display = 'none';
         // Restore stitch count from input
-        capPrimaryLogo.stitchCount = parseInt(document.getElementById('cap-primary-stitches')?.value) || 8000;
-        capPrimaryLogo.needsDigitizing = document.getElementById('cap-primary-digitizing')?.checked ?? false;
-        capPrimaryLogo.needsSetup = false; // Not applicable for embroidery
+        embState.capPrimaryLogo.stitchCount = parseInt(document.getElementById('cap-primary-stitches')?.value) || 8000;
+        embState.capPrimaryLogo.needsDigitizing = document.getElementById('cap-primary-digitizing')?.checked ?? false;
+        embState.capPrimaryLogo.needsSetup = false; // Not applicable for embroidery
     }
 
 
@@ -373,12 +374,12 @@ export function getCapEmbellishmentType() {
 // Update embellishment dropdown labels with prices from API
 // Rule: ALWAYS pull pricing from Caspio API - never hardcode
 export function updateEmbellishmentDropdownLabels() {
-    if (!pricingCalculator || !pricingCalculator.capInitialized) return;
+    if (!embState.pricingCalculator || !embState.pricingCalculator.capInitialized) return;
 
     const dropdown = document.getElementById('cap-embellishment-type');
     if (!dropdown) return;
 
-    const upcharges = pricingCalculator.getEmbellishmentUpcharges();
+    const upcharges = embState.pricingCalculator.getEmbellishmentUpcharges();
 
     // Update 3D Puff option
     const puffOption = dropdown.querySelector('option[value="3d-puff"]');

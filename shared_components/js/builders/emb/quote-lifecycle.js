@@ -12,7 +12,7 @@
  */
 // @ts-nocheck — MOVED legacy DOM code: pre-existing checkJs frictions; typing
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
-/* global EMB_DEFAULTS, showToast, markAsUnsaved,
+/* global showToast, markAsUnsaved,
    DesignThumbnailService, setLtmControlState, setQuoteDateDefaults,
    markAsSaved */
 import { resetDesignSearchState, showDesignThumbnail } from './design-search.js';
@@ -21,6 +21,7 @@ import { calculateDiscountableSubtotal, onShipMethodChange, recalculatePricing }
 import { updatePushButtonState } from './save-push.js';
 import { _syncALArrays, handleCapEmbellishmentChange, updateNotesBadge } from './logo-config.js';
 import { updateLogoCardHeader } from './product-rows.js';
+import { embState, EMB_DEFAULTS } from './state.js';
 
 /**
  * Toggle Additional Charges panel visibility
@@ -160,8 +161,8 @@ export function resetQuote() {
 
     // Reset row counter + the child-row map (module-level) — else a previous quote's 2XL/3XL child-row
     // references leak into the next quote and can mis-map size overrides on save. (audit #13c 2026-06-05)
-    rowCounter = 0;
-    childRowMap = {};
+    embState.rowCounter = 0;
+    embState.childRowMap = {};
     // [2026-06-07] Clear the wholesale flag + checkbox so it doesn't leak into the next quote.
      
     window._isWholesale = false;
@@ -180,12 +181,12 @@ export function resetQuote() {
     try { window._embArtwork?.clear?.(); } catch (_) {}
 
     // Reset logo configurations to defaults
-    primaryLogo.position = 'Left Chest';
-    primaryLogo.stitchCount = EMB_DEFAULTS.GARMENT_STITCH_COUNT;
-    primaryLogo.needsDigitizing = false;
-    primaryLogo.designNumber = null;
-    primaryLogo.designName = null;
-    primaryLogo.thumbnailUrl = null;
+    embState.primaryLogo.position = 'Left Chest';
+    embState.primaryLogo.stitchCount = EMB_DEFAULTS.GARMENT_STITCH_COUNT;
+    embState.primaryLogo.needsDigitizing = false;
+    embState.primaryLogo.designNumber = null;
+    embState.primaryLogo.designName = null;
+    embState.primaryLogo.thumbnailUrl = null;
     updateLogoCardHeader('garment', null);
     // Clear design number inputs
     const gDesignInput = document.getElementById('garment-design-number');
@@ -195,11 +196,11 @@ export function resetQuote() {
     const gDesignClear = document.getElementById('garment-design-clear');
     if (gDesignClear) gDesignClear.style.display = 'none';
     showDesignThumbnail('garment', null);
-    if (typeof capPrimaryLogo !== 'undefined') {
-        capPrimaryLogo.designNumber = null;
-        capPrimaryLogo.designName = null;
-        capPrimaryLogo.thumbnailUrl = null;
-        capPrimaryLogo.embellishmentType = 'embroidery';  // else a prior quote's 3D-puff / laser-patch bleeds into the next (audit #13c 2026-06-05)
+    if (typeof embState.capPrimaryLogo !== 'undefined') {
+        embState.capPrimaryLogo.designNumber = null;
+        embState.capPrimaryLogo.designName = null;
+        embState.capPrimaryLogo.thumbnailUrl = null;
+        embState.capPrimaryLogo.embellishmentType = 'embroidery';  // else a prior quote's 3D-puff / laser-patch bleeds into the next (audit #13c 2026-06-05)
         const cEmbSel = document.getElementById('cap-embellishment-type');
         if (cEmbSel) { cEmbSel.value = 'embroidery'; if (typeof handleCapEmbellishmentChange === 'function') handleCapEmbellishmentChange(); }
         updateLogoCardHeader('cap', null);
@@ -215,8 +216,8 @@ export function resetQuote() {
     if (typeof DesignThumbnailService !== 'undefined') DesignThumbnailService.clearCache();
     resetDesignSearchState(); // gallery cache + search state live in builders/emb/design-search.js
     // Clear cached design data from logo objects
-    primaryLogo._designData = null;
-    if (typeof capPrimaryLogo !== 'undefined') capPrimaryLogo._designData = null;
+    embState.primaryLogo._designData = null;
+    if (typeof embState.capPrimaryLogo !== 'undefined') embState.capPrimaryLogo._designData = null;
     document.getElementById('primary-position').value = 'Left Chest';
     document.getElementById('primary-stitches').value = EMB_DEFAULTS.GARMENT_STITCH_COUNT;
     document.getElementById('primary-digitizing').checked = false;
@@ -239,8 +240,8 @@ export function resetQuote() {
     if (capTierEl) capTierEl.value = '8000';
 
     // Reset additional logo toggles and globalAL state
-    globalAL.garment = { enabled: false, position: 'AL', stitchCount: EMB_DEFAULTS.AL_GARMENT_STITCH_COUNT, needsDigitizing: false };
-    globalAL.cap = { enabled: false, position: 'AL-Cap', stitchCount: EMB_DEFAULTS.CAP_STITCH_COUNT, needsDigitizing: false };
+    embState.globalAL.garment = { enabled: false, position: 'AL', stitchCount: EMB_DEFAULTS.AL_GARMENT_STITCH_COUNT, needsDigitizing: false };
+    embState.globalAL.cap = { enabled: false, position: 'AL-Cap', stitchCount: EMB_DEFAULTS.CAP_STITCH_COUNT, needsDigitizing: false };
     _syncALArrays();
 
     const garmentALSwitch = document.getElementById('garment-al-switch');
@@ -341,21 +342,21 @@ export function resetQuote() {
     }
 
     // Clear edit mode and import metadata
-    editingQuoteId = null;
-    editingRevision = null;
-    lastImportMetadata = null;
+    embState.editingQuoteId = null;
+    embState.editingRevision = null;
+    embState.lastImportMetadata = null;
 
     // Clear ShopWorks push state — else a brand-new quote inherits the PREVIOUS quote's _pushQuoteId
     // (could preview/push the OLD order from a blank form — wrong order to production) and its
     // _pushAlreadyDone "Sent ✓" state (stuck disabled button + blank readiness checklist). showPushButton
     // only resets these on save, which New-Quote-without-save never reaches. (review C3/C7 2026-06-05)
-    _pushAlreadyDone = false;
-    _pushQuoteId = null;
+    embState._pushAlreadyDone = false;
+    embState._pushQuoteId = null;
     if (typeof updatePushButtonState === 'function') { try { updatePushButtonState(); } catch (_) {} }
 
     // Clear draft storage
-    if (embPersistence) {
-        embPersistence.clearDraft();
+    if (embState.embPersistence) {
+        embState.embPersistence.clearDraft();
     }
 
     // Recalculate pricing (will show zeros)

@@ -100,9 +100,7 @@ in builders/emb/, real inter-module imports, 130+ window bridges via index.js.
 
 Next for 0.4 completion (fresh session):
 1. ~~Formalize QuoteBuilderBase + EmbAdapter~~ ✅ DONE 2026-07-08: builders/shared/quote-builder-base.js (lifecycle + contract validation) + builders/emb/adapter.js (contract + verbatim init in setupPage/initPricingAndRoute hooks); index.js boots `new QuoteBuilderBase(new EmbAdapter()).init()`; shell = 289 lines of pure state; dormant classic base → pointer stub.
-2. Task 0.5 quote-model: migrate the monolith state vars into
-   builders/shared/quote-model.js — requires converting every config-level
-   writable global to imports (the lexical-global constraint dies with it).
+2. ~~Task 0.5 quote-model~~ ✅ DONE 2026-07-08: builders/shared/quote-model.js (QuoteState/createQuoteItem, caps-vs-garments tierGroups) + builders/emb/state.js (embState — 347 refs swept across 11 modules via the string/template/regex-aware lexer; spread `...name` needed a follow-up pass; residual audit = 0). THREE window-backed contract fields (childRowMap/hasChanges/pricingCalculator) keep classic multi-builder consumers on one slot. Shell = tombstone, script tag REMOVED — the EMB page is 100% bundle. eslint writable-globals block deleted.
 3. Repeat SCP (5,409 lines) then DTF (4,086) with this playbook.
 
 ## After EMB

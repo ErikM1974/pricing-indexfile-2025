@@ -15,7 +15,7 @@
  */
 // @ts-nocheck — MOVED legacy DOM code: pre-existing checkJs frictions; typing
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
-/* global API_BASE, SIZE06_EXTENDED_SIZES, productColorsCache, sizeDetectionCache,
+/* global
    escapeHtml, showToast, renderOrderRecap, QuoteOrderSummary, markAsUnsaved,
    Event, cleanProductTitle, getSwatchStyle, productThumbnailModal, formatPrice,
    ProductCategoryFilter, SKUValidationService, SIZE_TO_SUFFIX,
@@ -25,6 +25,7 @@ import { recalculatePricing, updateTaxCalculation, collectProductsFromTable, get
 import { updateNotesBadge, updateEmbellishmentDropdownLabels, getCapEmbellishmentType } from './logo-config.js';
 import { updateAdditionalCharges } from './quote-lifecycle.js';
 import { showAddNonSanmarModal } from './shopworks-import.js';
+import { embState, SIZE06_EXTENDED_SIZES, sizeDetectionCache, productColorsCache, API_BASE } from './state.js';
 
 export function updateLogoCardHeader(type, designNumber) {
     const cardId = type === 'garment' ? 'garment-logo-card' : 'cap-logo-card';
@@ -88,12 +89,12 @@ if (typeof QuoteOrderSummary !== 'undefined') {
             logos: function () {
                 var out = [];
                 try {
-                    if (typeof primaryLogo !== 'undefined' && primaryLogo && primaryLogo.designNumber) {
+                    if (typeof embState.primaryLogo !== 'undefined' && embState.primaryLogo && embState.primaryLogo.designNumber) {
                         var pos = document.getElementById('primary-position')?.value || '';
-                        out.push({ text: '#' + primaryLogo.designNumber + (pos ? ' · ' + pos : ''), thumbUrl: primaryLogo.thumbnailUrl || '', label: '#' + primaryLogo.designNumber });
+                        out.push({ text: '#' + embState.primaryLogo.designNumber + (pos ? ' · ' + pos : ''), thumbUrl: embState.primaryLogo.thumbnailUrl || '', label: '#' + embState.primaryLogo.designNumber });
                     }
-                    if (typeof capPrimaryLogo !== 'undefined' && capPrimaryLogo && capPrimaryLogo.designNumber) {
-                        out.push({ text: 'Cap #' + capPrimaryLogo.designNumber, thumbUrl: capPrimaryLogo.thumbnailUrl || '', label: 'Cap #' + capPrimaryLogo.designNumber });
+                    if (typeof embState.capPrimaryLogo !== 'undefined' && embState.capPrimaryLogo && embState.capPrimaryLogo.designNumber) {
+                        out.push({ text: 'Cap #' + embState.capPrimaryLogo.designNumber, thumbUrl: embState.capPrimaryLogo.thumbnailUrl || '', label: 'Cap #' + embState.capPrimaryLogo.designNumber });
                     }
                 } catch (_) {}
                 return out;
@@ -129,7 +130,7 @@ export function setupPrimaryLogoHandlers() {
     const digitizingCheckbox = document.getElementById('primary-digitizing');
     if (digitizingCheckbox) {
         digitizingCheckbox.addEventListener('change', function() {
-            primaryLogo.needsDigitizing = this.checked;
+            embState.primaryLogo.needsDigitizing = this.checked;
             recalculatePricing();
         });
     }
@@ -185,7 +186,7 @@ export function setupCapPrimaryLogoHandlers() {
 
     if (digitizingCheckbox) {
         digitizingCheckbox.addEventListener('change', function() {
-            capPrimaryLogo.needsDigitizing = this.checked;
+            embState.capPrimaryLogo.needsDigitizing = this.checked;
             recalculatePricing();
         });
     }
@@ -315,7 +316,7 @@ function showSearchSuggestions(products) {
 
     // Cache product data (convert to expected format)
     products.forEach(p => {
-        productCache[p.value] = {
+        embState.productCache[p.value] = {
             STYLE: p.value,
             PRODUCT_TITLE: p.label
         };
@@ -359,7 +360,7 @@ export async function selectProduct(styleNumber) {
 
 export function addNewRow() {
     const tbody = document.getElementById('product-tbody');
-    const rowId = ++rowCounter;
+    const rowId = ++embState.rowCounter;
 
     // Hide empty state message when adding first row
     const emptyStateRow = document.getElementById('empty-state-row');
@@ -480,7 +481,7 @@ window.addNonSanmarFromSearch = addNonSanmarFromSearch;
  */
 export function createServiceProductRow(serviceType, data) {
     const tbody = document.getElementById('product-tbody');
-    const rowId = ++rowCounter;
+    const rowId = ++embState.rowCounter;
 
     // Hide empty state message
     const emptyStateRow = document.getElementById('empty-state-row');
@@ -950,7 +951,7 @@ export async function onStyleChange(input, rowId) {
 
     try {
         // Fetch product data using stylesearch API
-        let product = productCache[styleNumber];
+        let product = embState.productCache[styleNumber];
         if (!product) {
             const response = await fetch(`${API_BASE}/api/stylesearch?term=${styleNumber}`);
             if (!response.ok) throw new Error(`Style search API returned ${response.status}`);
@@ -963,7 +964,7 @@ export async function onStyleChange(input, rowId) {
                     STYLE: result.value,
                     PRODUCT_TITLE: result.label
                 };
-                productCache[styleNumber] = product;
+                embState.productCache[styleNumber] = product;
             }
         }
 
@@ -981,7 +982,7 @@ export async function onStyleChange(input, rowId) {
                         STYLE: result.value,
                         PRODUCT_TITLE: result.label
                     };
-                    productCache[baseStyle] = product;
+                    embState.productCache[baseStyle] = product;
                     const strippedSuffix = styleNumber.substring(styleNumber.lastIndexOf('_'));
                     row.dataset.originalPartNumber = styleNumber;
                     input.value = baseStyle;
@@ -2350,9 +2351,9 @@ export function selectColor(rowId, optionEl, skipDuplicateCheck) {
  * Cascade color selection to child rows (for extended sizes)
  */
 function cascadeColorToChildRows(parentRowId, colorName, catalogColor, swatchUrl, hex) {
-    if (!childRowMap[parentRowId]) return;
+    if (!embState.childRowMap[parentRowId]) return;
 
-    Object.values(childRowMap[parentRowId]).forEach(childRowId => {
+    Object.values(embState.childRowMap[parentRowId]).forEach(childRowId => {
         const childRow = document.getElementById(`row-${childRowId}`);
         if (childRow && childRow.dataset.colorManuallySet !== 'true') {
             childRow.dataset.color = colorName;
@@ -2503,8 +2504,8 @@ function updateChildRowColorIndicators(parentRowId) {
 
     const parentCatalogColor = parentRow.dataset.catalogColor;
 
-    if (childRowMap[parentRowId]) {
-        Object.values(childRowMap[parentRowId]).forEach(childRowId => {
+    if (embState.childRowMap[parentRowId]) {
+        Object.values(embState.childRowMap[parentRowId]).forEach(childRowId => {
             const childRow = document.getElementById(`row-${childRowId}`);
             if (childRow) {
                 if (childRow.dataset.catalogColor !== parentCatalogColor) {
@@ -2561,8 +2562,8 @@ export function onSizeChange(rowId) {
     if (xxlInput) {
         const qty = parseInt(xxlInput.value) || 0;
         // Check for both 2XL and XXL child rows (XXL is distinct for Ladies/Womens products)
-        const existingChildId = childRowMap[rowId]?.['2XL'] || childRowMap[rowId]?.['XXL'];
-        const existingChildSize = childRowMap[rowId]?.['2XL'] ? '2XL' : (childRowMap[rowId]?.['XXL'] ? 'XXL' : '2XL');
+        const existingChildId = embState.childRowMap[rowId]?.['2XL'] || embState.childRowMap[rowId]?.['XXL'];
+        const existingChildSize = embState.childRowMap[rowId]?.['2XL'] ? '2XL' : (embState.childRowMap[rowId]?.['XXL'] ? 'XXL' : '2XL');
 
         if (qty > 0) {
             // Need a child row for 2XL (or XXL if that's what exists)
@@ -2622,8 +2623,8 @@ function updateParentQtyDisplay(rowId) {
     } else {
         // Variant-only: show child row total so parent doesn't display "0"
         let childTotal = 0;
-        if (childRowMap[rowId]) {
-            Object.values(childRowMap[rowId]).forEach(childRowId => {
+        if (embState.childRowMap[rowId]) {
+            Object.values(embState.childRowMap[rowId]).forEach(childRowId => {
                 const childRow = document.getElementById(`row-${childRowId}`);
                 if (childRow) {
                     const qtyDisplay = childRow.querySelector('.qty-display');
@@ -2647,7 +2648,7 @@ export function hideVariantOnlyParents() {
     const parentRows = tbody.querySelectorAll('tr:not(.child-row):not(.service-product-row)');
     parentRows.forEach(parentRow => {
         const rowId = parseInt(parentRow.dataset.rowId);
-        if (!rowId || !childRowMap[rowId]) return;
+        if (!rowId || !embState.childRowMap[rowId]) return;
         if (parentRow.dataset.isOsfaOnly === 'true') return;
 
         // Check if ALL standard size inputs are empty/zero
@@ -2708,7 +2709,7 @@ export function createChildRow(parentRowId, size, qty) {
     const parentRow = document.getElementById(`row-${parentRowId}`);
     if (!parentRow) return;
 
-    const childRowId = ++rowCounter;
+    const childRowId = ++embState.rowCounter;
     const baseStyle = parentRow.dataset.style;
     const partNumber = getPartNumber(baseStyle, size);
 
@@ -2843,10 +2844,10 @@ export function createChildRow(parentRowId, size, qty) {
     }
 
     // Track child row
-    if (!childRowMap[parentRowId]) {
-        childRowMap[parentRowId] = {};
+    if (!embState.childRowMap[parentRowId]) {
+        embState.childRowMap[parentRowId] = {};
     }
-    childRowMap[parentRowId][size] = childRowId;
+    embState.childRowMap[parentRowId][size] = childRowId;
 
 }
 
@@ -2869,13 +2870,13 @@ function updateChildRow(childRowId, qty) {
  * Remove a child row
  */
 export function removeChildRow(parentRowId, size) {
-    const childRowId = childRowMap[parentRowId]?.[size];
+    const childRowId = embState.childRowMap[parentRowId]?.[size];
     if (childRowId) {
         const childRow = document.getElementById(`row-${childRowId}`);
         if (childRow) {
             childRow.remove();
         }
-        delete childRowMap[parentRowId][size];
+        delete embState.childRowMap[parentRowId][size];
     }
 }
 
@@ -2973,15 +2974,15 @@ export function deleteRow(rowId) {
     if (!row) return;
 
     // If this is a parent row, also remove all child rows
-    if (!row.classList.contains('child-row') && childRowMap[rowId]) {
-        Object.keys(childRowMap[rowId]).forEach(size => {
-            const childRowId = childRowMap[rowId][size];
+    if (!row.classList.contains('child-row') && embState.childRowMap[rowId]) {
+        Object.keys(embState.childRowMap[rowId]).forEach(size => {
+            const childRowId = embState.childRowMap[rowId][size];
             const childRow = document.getElementById(`row-${childRowId}`);
             if (childRow) {
                 childRow.remove();
             }
         });
-        delete childRowMap[rowId];
+        delete embState.childRowMap[rowId];
     }
 
 

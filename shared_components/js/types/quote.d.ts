@@ -33,6 +33,10 @@ export interface QuoteItem {
     decoration?: Record<string, unknown>;
     unitPrice?: number;
     lineTotal?: number;
+    /** Service line (AL/DECG/monogram/fee) vs product line. */
+    isService?: boolean;
+    /** Caps tier separately from garments (EMB rule). */
+    isCap?: boolean;
 }
 
 /** A pricing tier row (from Caspio Pricing_Tiers via /api/pricing-bundle). */

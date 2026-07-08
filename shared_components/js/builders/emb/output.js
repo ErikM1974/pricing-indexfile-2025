@@ -17,7 +17,7 @@
  */
 // @ts-nocheck — MOVED legacy DOM code: pre-existing checkJs frictions; typing
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
-/* global EMB_DEFAULTS,
+/* global
    saveAndGetLink, showToast, getLtmControlState,
    parseRatePercent, showLoading, EmbroideryInvoiceGenerator,
    hasUnsavedChanges, emailQuote */
@@ -26,6 +26,7 @@ import { buildLogoConfiguration, calculateDiscountableSubtotal, collectProductsF
 import { getAdditionalCharges, collectDECGItems } from './quote-lifecycle.js';
 import { getCapEmbellishmentType } from './logo-config.js';
 import { dateFromInputValue } from './product-rows.js';
+import { embState, EMB_DEFAULTS } from './state.js';
 
 // ============================================================
 // DIAGNOSTIC TOOL — diagnoseQuote()
@@ -57,22 +58,22 @@ export async function diagnoseQuote() {
 
     try {
         // Re-run pricing engine (same as recalculatePricing)
-        const garmentALForDiag = globalAL.garment.enabled ? [{
+        const garmentALForDiag = embState.globalAL.garment.enabled ? [{
             id: 'global-al-garment', position: 'AL',
-            stitchCount: globalAL.garment.stitchCount,
-            needsDigitizing: globalAL.garment.needsDigitizing
+            stitchCount: embState.globalAL.garment.stitchCount,
+            needsDigitizing: embState.globalAL.garment.needsDigitizing
         }] : [];
-        const capALForDiag = globalAL.cap.enabled ? [{
+        const capALForDiag = embState.globalAL.cap.enabled ? [{
             id: 'global-al-cap', position: 'AL-Cap',
-            stitchCount: globalAL.cap.stitchCount,
-            needsDigitizing: globalAL.cap.needsDigitizing
+            stitchCount: embState.globalAL.cap.stitchCount,
+            needsDigitizing: embState.globalAL.cap.needsDigitizing
         }] : [];
 
         const logoConfigs = {
-            garment: { primary: { ...primaryLogo, id: 'primary' }, additional: garmentALForDiag },
-            cap: { primary: { ...capPrimaryLogo, id: 'cap-primary' }, additional: capALForDiag }
+            garment: { primary: { ...embState.primaryLogo, id: 'primary' }, additional: garmentALForDiag },
+            cap: { primary: { ...embState.capPrimaryLogo, id: 'cap-primary' }, additional: capALForDiag }
         };
-        const allLogos = [{ ...primaryLogo, id: 'primary' }, ...garmentALForDiag];
+        const allLogos = [{ ...embState.primaryLogo, id: 'primary' }, ...garmentALForDiag];
 
         let pricing;
         if (products.length === 0) {
@@ -89,7 +90,7 @@ export async function diagnoseQuote() {
             };
         } else {
             const ltmEnabledDiag = getLtmControlState('emb-ltm-panel').enabled;
-            pricing = await pricingCalculator.calculateQuote(products, allLogos, logoConfigs, { ltmEnabled: ltmEnabledDiag });
+            pricing = await embState.pricingCalculator.calculateQuote(products, allLogos, logoConfigs, { ltmEnabled: ltmEnabledDiag });
         }
 
         // Include service item totals (same as recalculatePricing)
@@ -186,8 +187,8 @@ export async function diagnoseQuote() {
         }
 
         // ---- CHECK 5: AL module arrays in sync with globalAL ----
-        const garmentALEnabled = globalAL.garment.enabled;
-        const capALEnabled = globalAL.cap.enabled;
+        const garmentALEnabled = embState.globalAL.garment.enabled;
+        const capALEnabled = embState.globalAL.cap.enabled;
         const garmentALInPricing = (pricing.additionalServices || []).filter(s => s.type === 'additional_logo' && !s.isCap);
         const capALInPricing = (pricing.additionalServices || []).filter(s => s.type === 'additional_logo' && s.isCap);
 
@@ -252,7 +253,7 @@ export async function diagnoseQuote() {
         // Build diagnostic output
         const diagnostic = {
             timestamp: new Date().toISOString(),
-            quoteId: editingQuoteId || 'DRAFT',
+            quoteId: embState.editingQuoteId || 'DRAFT',
             checks: checks,
             summary: { pass: passCount, warn: warnCount, fail: failCount, total: checks.length },
             state: {
@@ -272,8 +273,8 @@ export async function diagnoseQuote() {
                 capSetupFees: pricing.capSetupFees || 0,
                 garmentStitchTotal: pricing.garmentStitchTotal || 0,
                 capStitchTotal: pricing.capStitchTotal || 0,
-                garmentAL: garmentALEnabled ? { stitchCount: globalAL.garment.stitchCount, total: garmentALInPricing.reduce((s, a) => s + a.total, 0) } : null,
-                capAL: capALEnabled ? { stitchCount: globalAL.cap.stitchCount, total: capALInPricing.reduce((s, a) => s + a.total, 0) } : null,
+                garmentAL: garmentALEnabled ? { stitchCount: embState.globalAL.garment.stitchCount, total: garmentALInPricing.reduce((s, a) => s + a.total, 0) } : null,
+                capAL: capALEnabled ? { stitchCount: embState.globalAL.cap.stitchCount, total: capALInPricing.reduce((s, a) => s + a.total, 0) } : null,
                 fees: {
                     artCharge: additionalCharges.artCharge || 0,
                     graphicDesign: additionalCharges.graphicDesignCharge || 0,
@@ -328,8 +329,8 @@ export function buildEmbroideryPricingData(allItems) {
     // The legacy #quote-id element was removed in a refactor, so this ALWAYS fell back to a
     // Date.now() temp ID: every printed PDF showed a garbage quote # (e.g. EMB-1780608435889)
     // instead of EMB-2026-276. Only a brand-new, never-saved quote keeps the temp. (2026-06-04 audit)
-    const quoteId = (typeof editingQuoteId !== 'undefined' && editingQuoteId)
-        || (typeof _pushQuoteId !== 'undefined' && _pushQuoteId)
+    const quoteId = (typeof embState.editingQuoteId !== 'undefined' && embState.editingQuoteId)
+        || (typeof embState._pushQuoteId !== 'undefined' && embState._pushQuoteId)
         || document.getElementById('quote-id')?.textContent?.trim()
         || `EMB-${Date.now()}`;
 
@@ -397,7 +398,7 @@ export function buildEmbroideryPricingData(allItems) {
                 if (size === 'SVC') return;                       // service pseudo-size
                 if (baseSizes.includes(size)) return;             // already in the grouped base line
                 if (size === 'OSFA' && baseQty === 0) return;     // OSFA-only handled above
-                const childRowId = childRowMap[rowId]?.[size];
+                const childRowId = embState.childRowMap[rowId]?.[size];
                 const childPriceCell = document.getElementById(`row-price-${childRowId}`);
                 const childPriceText = childPriceCell?.textContent || '';
                 let unitPrice = parseFloat(childPriceText.replace(/[^0-9.]/g, '')) || 0;
@@ -495,8 +496,8 @@ export function buildEmbroideryPricingData(allItems) {
 
     // Logo configurations for embroidery specs section
     const { logoConfigs, allLogos } = buildLogoConfiguration();
-    const garmentLogos = [primaryLogo, ...additionalLogos];
-    const capLogos = [capPrimaryLogo, ...capAdditionalLogos];
+    const garmentLogos = [embState.primaryLogo, ...embState.additionalLogos];
+    const capLogos = [embState.capPrimaryLogo, ...embState.capAdditionalLogos];
 
     // Determine what's in the quote
     const hasGarments = productList.some(p => !p.isCap) || serviceItems.some(s => s.serviceType === 'decg');
@@ -508,8 +509,8 @@ export function buildEmbroideryPricingData(allItems) {
     // Fees / Subtotal lines never diverge from the screen when Erik changes the
     // Caspio digitizing fee. (Theme F, 2026-06-09)
     const digitizingCount = allLogos.filter(l => l.needsDigitizing).length;
-    const perLogoDigitizing = (pricingCalculator && Number(pricingCalculator.digitizingFee) > 0)
-        ? Number(pricingCalculator.digitizingFee)
+    const perLogoDigitizing = (embState.pricingCalculator && Number(embState.pricingCalculator.digitizingFee) > 0)
+        ? Number(embState.pricingCalculator.digitizingFee)
         : (typeof getServicePrice === 'function' ? getServicePrice('DD', 100) : 100);
     const setupFees = digitizingCount * perLogoDigitizing;
 
@@ -518,10 +519,10 @@ export function buildEmbroideryPricingData(allItems) {
 
     // Patch setup fee
     const capHasStyle = hasCaps;
-    const showPatchSetup = capEmbType === 'laser-patch' && capHasStyle && capPrimaryLogo.needsSetup;
+    const showPatchSetup = capEmbType === 'laser-patch' && capHasStyle && embState.capPrimaryLogo.needsSetup;
     // Engine's patchSetupFee is the live Service_Codes GRT-50 value; EMB_DEFAULTS is fallback-only.
     const capPatchSetupFee = showPatchSetup
-        ? (Number.isFinite(pricingCalculator?.patchSetupFee) ? pricingCalculator.patchSetupFee : EMB_DEFAULTS.PATCH_SETUP_FEE)
+        ? (Number.isFinite(embState.pricingCalculator?.patchSetupFee) ? embState.pricingCalculator.patchSetupFee : EMB_DEFAULTS.PATCH_SETUP_FEE)
         : 0;
 
     // LTM state
@@ -535,8 +536,8 @@ export function buildEmbroideryPricingData(allItems) {
     // (embroidery-quote-pricing.js:574) — there is NO '3d-puff' key, so the old
     // lookup always resolved to 0 and the PDF silently dropped the "3D Puff
     // Upcharge" spec line (the charge was still in the total). Use .puff.
-    const puffUpchargePerCap = (capEmbType === '3d-puff' && pricingCalculator)
-        ? (pricingCalculator.getEmbellishmentUpcharges?.()?.puff || 0)
+    const puffUpchargePerCap = (capEmbType === '3d-puff' && embState.pricingCalculator)
+        ? (embState.pricingCalculator.getEmbellishmentUpcharges?.()?.puff || 0)
         : 0;
 
     // Tax rate read here (was post-overridden in printQuote pre-3.1.0; contract
@@ -631,17 +632,17 @@ export function generateEmbQuoteText(products, serviceItems) {
 
     // Embroidery configuration
     lines.push('EMBROIDERY CONFIGURATION:');
-    lines.push(`  Primary: ${primaryLogo.position} (${primaryLogo.stitchCount.toLocaleString()} stitches)`);
-    if (primaryLogo.needsDigitizing) lines.push('    Needs Digitizing: Yes');
-    if (globalAL.garment.enabled) {
-        lines.push(`  Additional Location: ${globalAL.garment.stitchCount.toLocaleString()} stitches`);
+    lines.push(`  Primary: ${embState.primaryLogo.position} (${embState.primaryLogo.stitchCount.toLocaleString()} stitches)`);
+    if (embState.primaryLogo.needsDigitizing) lines.push('    Needs Digitizing: Yes');
+    if (embState.globalAL.garment.enabled) {
+        lines.push(`  Additional Location: ${embState.globalAL.garment.stitchCount.toLocaleString()} stitches`);
     }
 
     const hasCaps = products.some(p => p.isCap) || serviceItems.some(s => s.isCap);
     if (hasCaps) {
-        lines.push(`  Cap: ${capTypeLabel} (${capPrimaryLogo.stitchCount.toLocaleString()} stitches)`);
-        if (globalAL.cap.enabled) {
-            lines.push(`  Cap AL: ${globalAL.cap.stitchCount.toLocaleString()} stitches`);
+        lines.push(`  Cap: ${capTypeLabel} (${embState.capPrimaryLogo.stitchCount.toLocaleString()} stitches)`);
+        if (embState.globalAL.cap.enabled) {
+            lines.push(`  Cap AL: ${embState.globalAL.cap.stitchCount.toLocaleString()} stitches`);
         }
     }
 
@@ -790,7 +791,7 @@ export async function printQuote() {
  * Email embroidery quote — requires save first, then calls shared emailQuote()
  */
 export async function embEmailQuote() {
-    let quoteId = (typeof editingQuoteId !== 'undefined' && editingQuoteId) || (typeof _pushQuoteId !== 'undefined' && _pushQuoteId);  // also allow a just-saved NEW quote, mirroring printQuote (round-2 N3)
+    let quoteId = (typeof embState.editingQuoteId !== 'undefined' && embState.editingQuoteId) || (typeof embState._pushQuoteId !== 'undefined' && embState._pushQuoteId);  // also allow a just-saved NEW quote, mirroring printQuote (round-2 N3)
     // Unsaved (or edited-since-save) → auto-save first, exactly like Push does.
     // The old dead-end ("save first" error) made the most common send action a
     // two-step chore. saveAndGetLink validates + shows its own errors. (audit 2026-06-10)
@@ -798,7 +799,7 @@ export async function embEmailQuote() {
     if (!quoteId || dirty) {
         showToast('Saving quote before emailing…', 'info', 2500);
         await saveAndGetLink({ skipShareModal: true });
-        quoteId = (typeof editingQuoteId !== 'undefined' && editingQuoteId) || (typeof _pushQuoteId !== 'undefined' && _pushQuoteId);
+        quoteId = (typeof embState.editingQuoteId !== 'undefined' && embState.editingQuoteId) || (typeof embState._pushQuoteId !== 'undefined' && embState._pushQuoteId);
         if (!quoteId) return;   // save failed/blocked — its error is already on screen
     }
     await emailQuote({

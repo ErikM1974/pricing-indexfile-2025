@@ -73,20 +73,18 @@ const PROXY = 'https://proxy.test';
 // Appended to the builder script (same injected <script>, so it closes over the module `let`s).
 const TEST_HOOKS = `
 ;(function(){
+  // 0.5: state lives in builders/emb/state.js (exposed as window.__embState by
+  // the bundle); pricingCalculator is window-backed by design.
   window.__embTest = {
-    get globalAL(){ return globalAL; },
-    get primaryLogo(){ return primaryLogo; },
-    get capPrimaryLogo(){ return capPrimaryLogo; },
-    get editingQuoteId(){ return editingQuoteId; },
+    get globalAL(){ return window.__embState.globalAL; },
+    get primaryLogo(){ return window.__embState.primaryLogo; },
+    get capPrimaryLogo(){ return window.__embState.capPrimaryLogo; },
+    get editingQuoteId(){ return window.__embState.editingQuoteId; },
     get restoring(){ return window._restoringQuote; },
-    set quoteService(v){ quoteService = v; },
-    get quoteService(){ return quoteService; },
-    set pricingCalculator(v){ pricingCalculator = v; },
+    set quoteService(v){ window.__embState.quoteService = v; },
+    get quoteService(){ return window.__embState.quoteService; },
+    set pricingCalculator(v){ window.pricingCalculator = v; },
   };
-  // Re-export the monolith-resident functions under test (defensive — already
-  // globals via function decls). loadQuoteForEditing/populateLogoConfig now
-  // arrive via the injected builders/emb bundle (window bridges).
-  window.lookupTaxRate = lookupTaxRate;
 })();
 `;
 
@@ -147,8 +145,9 @@ async function buildBuilder(routes) {
   inject(PCF_SRC);
   inject(SERVICE_SRC + '\n;window.EmbroideryQuoteService = EmbroideryQuoteService;');
   inject(SUMMARY_SRC);  // shared order-summary band — must load before the builder (matches production) so the builder's QuoteOrderSummary.configure() wires #order-recap / #ship-to-card
-  inject(BUILDER_SRC + TEST_HOOKS);
+  inject(BUILDER_SRC);
   inject(EMB_BUNDLE_SRC);  // builders/emb bridges (loads last, like the page)
+  inject(TEST_HOOKS);       // hooks read window.__embState — must follow the bundle
 
   // Wire the two module-level deps that init() would normally create, without running init().
   window.__embTest.pricingCalculator = {

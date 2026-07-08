@@ -26,6 +26,7 @@
  *                      (driven by builders/shared/quote-builder-base.js)
  */
 import { QuoteBuilderBase } from '../shared/quote-builder-base.js';
+import { embState, quoteState } from './state.js';
 import { EmbAdapter } from './adapter.js';
 import { loadServiceCodePrices, getServicePrice } from './pricing.js';
 import {
@@ -430,6 +431,8 @@ window.buildPricingBreakdown = buildPricingBreakdown;
 const embAdapter = new EmbAdapter();
 new QuoteBuilderBase(embAdapter).init();
 window.__embAdapter = embAdapter; // inspection/debug handle
+window.__embState = embState; // state handle (tests + console diagnostics)
+window.__quoteState = quoteState; // canonical line-item store (0.5)
 
 window.__QB_BUILD = window.__QB_BUILD || {};
 window.__QB_BUILD.emb = { entry: 'builders/emb/index.js', modules: ['pricing', 'design-search', 'spr-modal', 'shopworks-import', 'persistence', 'output', 'save-push', 'quote-lifecycle', 'pricing-sync', 'logo-config', 'product-rows', 'adapter+base'] };

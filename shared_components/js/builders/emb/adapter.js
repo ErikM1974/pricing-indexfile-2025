@@ -24,6 +24,7 @@ import { lookupTaxRate, updateTaxCalculation, recalculatePricing, collectProduct
 import { invalidateDesignGalleryCache } from './design-search.js';
 import { clearCustomerContextBanners, setupUnsavedChangesTracking, updateAdditionalCharges } from './quote-lifecycle.js';
 import { updateNotesBadge, updateStitchTierDropdownLabels, initStitchEstimators } from './logo-config.js';
+import { embState } from './state.js';
 import { initEmbroideryPersistence, loadQuoteForEditing, duplicateQuote, addProductFromQuote,
          restoreEmbroideryDraft } from './persistence.js';
 
@@ -34,14 +35,14 @@ export class EmbAdapter {
 
     /** The live pricing authority (EmbroideryPricingCalculator instance). */
     getPricingService() {
-        return pricingCalculator;
+        return embState.pricingCalculator;
     }
 
     /** EMB tier facts from the live pricing service (LTM threshold qty<=7; caps+garments tier separately). */
     getTierConfig() {
         // EmbroideryPricingCalculator hangs tiers + margins directly off the instance
         // (tiers, marginDenominator, ltmFee — all hydrated from /api/pricing-bundle).
-        return (pricingCalculator && pricingCalculator.tiers) || null;
+        return (embState.pricingCalculator && embState.pricingCalculator.tiers) || null;
     }
 
     /** Logo/decoration location model (primary + AL placements). */
@@ -373,13 +374,13 @@ export class EmbAdapter {
     async initPricingAndRoute() {
         try {
             // Initialize pricing calculator
-            pricingCalculator = new EmbroideryPricingCalculator();
-            await pricingCalculator.initializeConfig();
+            embState.pricingCalculator = new EmbroideryPricingCalculator();
+            await embState.pricingCalculator.initializeConfig();
             updateStitchTierDropdownLabels();
             initStitchEstimators();   // 📐 estimate-from-logo-size buttons (2026-06-10)
 
             // Initialize quote service
-            quoteService = new EmbroideryQuoteService();
+            embState.quoteService = new EmbroideryQuoteService();
 
             // Check for edit mode (loading existing quote for revision)
             // Logo status chips — On file / New / TBD (Erik 2026-07-07). "New" auto-adds
@@ -402,7 +403,7 @@ export class EmbAdapter {
                         if (cb && !cb.checked) {
                             cb.checked = true;
                             cb.closest('.digitizing-checkbox')?.classList.add('checked');
-                            if (typeof primaryLogo !== 'undefined' && primaryLogo) primaryLogo.needsDigitizing = true;
+                            if (typeof embState.primaryLogo !== 'undefined' && embState.primaryLogo) embState.primaryLogo.needsDigitizing = true;
                             showToast('New logo — added the one-time new-logo setup. Uncheck it if we\'ve stitched this logo before.', 'info', 6000);
                             recalculatePricing();
                         }
@@ -488,11 +489,11 @@ export class EmbAdapter {
                 if (typeof setQuoteDateDefaults === 'function') setQuoteDateDefaults();
 
                 // Check for draft recovery
-                if (embSession && embSession.shouldShowRecovery()) {
-                    embSession.showRecoveryDialog(
+                if (embState.embSession && embState.embSession.shouldShowRecovery()) {
+                    embState.embSession.showRecoveryDialog(
                         (draft) => restoreEmbroideryDraft(draft),
                         () => {
-                            if (embPersistence) embPersistence.clearDraft();
+                            if (embState.embPersistence) embState.embPersistence.clearDraft();
                             // No auto-row - user starts with empty state
                         }
                     );
