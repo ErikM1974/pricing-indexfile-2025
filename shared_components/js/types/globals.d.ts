@@ -35,7 +35,7 @@ interface TenantConfig {
 interface Window {
     TENANT?: TenantConfig;
     APP_CONFIG?: any;
-    __QB_BUILD?: Record<string, { entry: string; modules?: string[] }>;
+    __QB_BUILD?: Record<string, { entry: string; modules?: string[]; stage?: string }>;
     /** Service_Codes cache (builders/emb/pricing.js) — legacy cross-file contract. */
     _serviceCodes?: Record<string, any> | null;
     /** window-backed EMB contract fields (state.js): classic multi-builder consumers. */
@@ -45,6 +45,8 @@ interface Window {
     /** builders/emb state handles (state.js via index.js). */
     __embState?: any;
     __quoteState?: any;
+    __scpState?: any;
+    __scpQuoteState?: any;
     /** builders/emb debug handle for the active method adapter. */
     __embAdapter?: any;
     /** quote-builder-utils.js loading overlay (classic function declaration → window prop). */
@@ -99,7 +101,7 @@ interface Window {
     getEmbroideryQuoteData?: () => any;
     restoreEmbroideryDraft?: (draft: any) => Promise<void> | void;
     markEmbroideryDirty?: () => void;
-    loadQuoteForEditing?: (quoteId: string, revision?: any) => Promise<void>;
+    loadQuoteForEditing?: (quoteId: string, revision?: any) => Promise<any>;
     duplicateQuote?: (quoteId: string) => Promise<void>;
     addProductFromQuote?: (item: any, opts?: any) => Promise<void>;
     populateLogoConfig?: (session: any) => void;
@@ -229,6 +231,29 @@ interface Window {
     handleCellKeydown?: (...args: any[]) => any;
     updateRowBreakdown?: (...args: any[]) => any;
     buildPricingBreakdown?: (...args: any[]) => any;
+    /* SCP bridges (builders/scp/*, S1a + S1b) — names shared with EMB are typed above */
+    recalculateAllPrices?: (...args: any[]) => any;
+    getScpExtraFees?: (...args: any[]) => any;
+    applyRushPercent?: (...args: any[]) => any;
+    spcEmailQuote?: (...args: any[]) => any;
+    scpPushToShopWorks?: (...args: any[]) => any;
+    openScpPushPreview?: (...args: any[]) => any;
+    renderScpPushPreview?: (...args: any[]) => any;
+    confirmScpPush?: (...args: any[]) => any;
+    closeScpPushPreview?: (...args: any[]) => any;
+    showScpPushButton?: (...args: any[]) => any;
+    updateScpPushButtonState?: (...args: any[]) => any;
+    updatePrintConfig?: (...args: any[]) => any;
+    updateDarkGarmentNudge?: (...args: any[]) => any;
+    initScreenPrintPersistence?: (...args: any[]) => any;
+    restoreScreenPrintDraft?: (...args: any[]) => any;
+    markScreenPrintDirty?: (...args: any[]) => any;
+    applyMethodSwitchPrefillScp?: (...args: any[]) => any;
+    applyQuickQuotePrefillScp?: (...args: any[]) => any;
+    skuValidationService?: any;
+    _isWholesale?: boolean;
+    _taxExempt?: boolean;
+    _lastShipEstimate?: any;
 }
 
 /*

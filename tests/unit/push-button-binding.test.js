@@ -74,7 +74,7 @@ const isPromise = (v) => !!v && typeof v.then === 'function';
 const CASES = [
     {
         method: 'SCP',
-        file: 'shared_components/js/screenprint-quote-builder.js',
+        file: 'shared_components/js/builders/scp/push.js',
         name: 'scpPushToShopWorks',
         stubs: {
             saveAndGetLink: async () => {},

@@ -108,3 +108,71 @@ Next for 0.4 completion (fresh session):
 Repeat SCP (5,409 lines) → DTF (4,086) using the same cluster shapes; shared
 behavior graduates from `builders/emb/` into `quote-builder-base.js` (the kept
 base) + `builders/shared/` as the second consumer appears (rule of two).
+
+## SCP decomposition (started 2026-07-08)
+
+Plan: 3 commits — S1a (print-config + persistence + product-rows), S1b
+(pricing-sync + quote-lifecycle + save-output + push; re-point
+web-quote-cart-parity's findPricingTier source path when pricing-sync moves),
+S2 (ScpAdapter + base boot + state.js sweep; shell → tombstone).
+
+**S1a ✅ (2026-07-08)** — shell 5,406 → 2,507 lines. `builders/scp/`:
+print-config.js (161L), persistence.js (816L), product-rows.js (1,944L);
+26 window bridges via index.js. Verified: lint/typecheck/build exit 0,
+1551 unit tests, browser smoke on :3010 (PC54 → Jet Black → 48 pcs → $528
+line / $614.36 grand), capture parity **552 locked fields, 0 mismatches**.
+- SCP state stays in the shell until S2 → modules WRITE lexical globals they
+  never read (products/rowCounter/productCache/childRowMap/editingQuoteId/
+  hasChanges/spSession/_scpPushQuoteId/_darkNudgeDismissed). Default
+  no-unused-vars flags write-only `/* global */` names — the scp files'
+  eslint override adds `vars: 'local'` (skips global-comment names, keeps
+  module-local checks). Remove it in S2 when state.js lands.
+- SCP builds row markup with addEventListener + SOME inline `onchange="fn(...)"`
+  in template literals (onStyleChange, handleCellKeydown, selectProduct, size/
+  color handlers…). All 14 generated-handler names living in moved modules are
+  bridged; `openExtendedSizePopup` in generated markup is defined only in
+  dtf-quote-page.js which the SCP page does NOT load — pre-existing dead ref.
+**S1b ✅ (2026-07-08)** — shell 2,507 → 618 lines. pricing-sync.js (744L,
+recalculatePricing = `export let` + reprice-pill wrap at tail, EMB pattern),
+quote-lifecycle.js (260L), save-output.js (683L), push.js (219L; the
+_scpPushQuoteId/_scpPushInFlight `let`s stay shell-side — cross-module lexical
+state until S2). 20 more bridges (46 total). Tests RE-POINTED to module homes:
+web-quote-cart-parity findPricingTier → pricing-sync.js; scp-save-parity
+BUILDER_SRC → save-output.js; push-button-binding SCP file → push.js. Verified:
+full battery exit 0, 1551 tests, browser smoke identical money ($528/$614.36),
+capture 552 fields 0 mismatches. Dead-in-monolith kept+disabled: saveQuote,
+handleDiscountPresetChange, handleDiscountReasonPresetChange.
+
+**S2 ✅ (2026-07-08) — SCP DECOMPOSITION COMPLETE.** state.js (scpState, 236
+refs swept via the lexer; window-backed childRowMap/hasChanges — same two
+contract fields as EMB, same shared classic consumers) + ScpAdapter (init
+listener verbatim into setupPage/initPricingAndRoute; QuoteOrderSummary
+.configure at module tail keeps its parse-time timing) + base boot from
+index.js (46 bridges total) + applyRushPercent → quote-lifecycle. Monolith =
+24-line tombstone; script tag REMOVED — the SCP page is 100% bundle.
+scp-save-parity harness updated to stub `scpState` instead of bare names.
+Verified: battery exit 0, 1551 tests, browser boot-to-money identical
+($528/$614.36; FB back → 2 screens → $885.20), capture 552 fields 0
+mismatches. Lexer bugs re-encountered & audited out: template `${name}` →
+shorthand misfire (4 sites — the audit step caught them; node --check does
+NOT), spread `...printConfig` lookbehind skip (1 site). The residual-audit
+step is NOT optional.
+
+- Latent monolith bugs preserved verbatim (fix post-move, attribution-clean):
+  persistence `updateRowQuantityTotal` (defined nowhere; draft-restore path),
+  product-rows deleteRow tail `updateCapLogoSectionVisibility` (EMB-only —
+  swallowed ReferenceError on every SCP row delete), dead fns onColorChange/
+  onChildColorChange/isPantsProduct/detectProductTypeAndAdjustUI + consts
+  POSITION_ABBREV/POSITION_FULL_NAMES (zero callers repo-wide).
+
+### ⚠ Tooling lesson — bash-heredoc python scans
+
+A `\\` inside a Bash-tool heredoc arrives HALVED (`\\?` became regex `\?`),
+which made the generated-markup scan silently return ZERO matches. Rules:
+(1) never put `\\` in heredoc python — build backslashes with `chr(92)`;
+(2) treat a zero-match scan as suspect — re-test the regex against one line
+you can SEE in the file before trusting it; (3) the canonical scan is
+`re.findall(r'on[a-z]+\s*=\s*["\x27]\s*([A-Za-z_$][\w$]*)\(', body)` run per
+module + shell + HTML (single `\s`-class escapes pass through fine).
+Related: gate lint on EXIT CODE, never `grep -c " error "` (a crashed eslint
+config printed 0 matches and masked itself — caught 2026-07-08).
