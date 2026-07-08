@@ -38,7 +38,8 @@ export default [
         plugins: { 'no-unsanitized': noUnsanitized },
         rules: {
             ...js.configs.recommended.rules,
-            'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+            'no-unused-vars': ['error', { argsIgnorePattern: '^_', caughtErrors: 'none' }],
+            'no-empty': ['error', { allowEmptyCatch: true }],
             eqeqeq: ['error', 'smart'],
             'no-implicit-globals': 'error',
             'no-var': 'off', // dual browser/Node files still use var deliberately
@@ -47,7 +48,7 @@ export default [
             'no-restricted-syntax': [
                 'error',
                 {
-                    selector: "AssignmentExpression > MemberExpression[object.name='window']",
+                    selector: "AssignmentExpression > MemberExpression.left[object.name='window']",
                     message:
                         'New window.* globals are banned in extracted modules — export from the module and re-export via builders/*/index.js during the strangler transition (roadmap 0.4).',
                 },
@@ -64,6 +65,39 @@ export default [
         },
     },
     {
+        // Monolith STATE seams the extracted EMB modules still reach through
+        // the global scope chain (lexical globals declared in
+        // embroidery-quote-builder.js — window.* can NOT reach them). Declared
+        // here (not per-file /* global */ comments) so write-only access
+        // doesn't trip no-unused-vars. Each migrates with its owning cluster;
+        // shrink this list as state moves into builders/emb modules.
+        files: ['shared_components/js/builders/emb/*.js'],
+        languageOptions: {
+            globals: {
+                products: 'writable',
+                primaryLogo: 'writable',
+                capPrimaryLogo: 'writable',
+                additionalLogos: 'writable',
+                capAdditionalLogos: 'writable',
+                globalAL: 'writable',
+                editingQuoteId: 'writable',
+                editingRevision: 'writable',
+                embPersistence: 'writable',
+                embSession: 'writable',
+                hasChanges: 'writable',
+                rowCounter: 'writable',
+                productCache: 'writable',
+                childRowMap: 'writable',
+                _pushQuoteId: 'writable',
+                _pushAlreadyDone: 'writable',
+                pendingShopWorksImport: 'writable',
+                lastImportMetadata: 'writable',
+                quoteService: 'writable',
+                pricingCalculator: 'writable',
+            },
+        },
+    },
+    {
         // MOVED legacy render code (0.4 extractions) — innerHTML sinks predate
         // the modules and interpolations are escapeHtml-wrapped or numeric
         // (hand-audited per extraction; nuances logged in the plan doc for the
@@ -73,6 +107,7 @@ export default [
             'shared_components/js/builders/emb/design-search.js',
             'shared_components/js/builders/emb/spr-modal.js',
             'shared_components/js/builders/emb/shopworks-import.js',
+            'shared_components/js/builders/emb/persistence.js',
         ],
         rules: {
             'no-unsanitized/property': 'off',

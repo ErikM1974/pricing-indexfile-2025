@@ -15,6 +15,7 @@
  *   design-search.js — design lookup/gallery modal (cluster #1, 2026-07-07)
  *   spr-modal.js     — service-pricing-review modal (cluster #2, 2026-07-07)
  *   shopworks-import.js — paste-from-ShopWorks import flow (cluster #3, 2026-07-07)
+ *   persistence.js   — autosave/draft/edit-load/duplicate (cluster #4, 2026-07-07)
  */
 import { loadServiceCodePrices, getServicePrice } from './pricing.js';
 import {
@@ -44,6 +45,16 @@ import {
     dismissImportBanner,
     scrollToProductRow,
 } from './shopworks-import.js';
+import {
+    initEmbroideryPersistence,
+    getEmbroideryQuoteData,
+    restoreEmbroideryDraft,
+    markEmbroideryDirty,
+    loadQuoteForEditing,
+    duplicateQuote,
+    addProductFromQuote,
+    populateLogoConfig,
+} from './persistence.js';
 import {
     applyDesignFromCache,
     filterDesignSearchByTier,
@@ -117,5 +128,17 @@ window.confirmShopWorksImport = confirmShopWorksImport;
 window.dismissImportBanner = dismissImportBanner;
 window.scrollToProductRow = scrollToProductRow;
 
+// persistence (callers: the DOMContentLoaded init in the monolith — autosave
+// wiring, draft restore, ?edit=/?duplicate= flows — plus dirty-marking from
+// change tracking and QQ-handoff/import product adds)
+window.initEmbroideryPersistence = initEmbroideryPersistence;
+window.getEmbroideryQuoteData = getEmbroideryQuoteData;
+window.restoreEmbroideryDraft = restoreEmbroideryDraft;
+window.markEmbroideryDirty = markEmbroideryDirty;
+window.loadQuoteForEditing = loadQuoteForEditing;
+window.duplicateQuote = duplicateQuote;
+window.addProductFromQuote = addProductFromQuote;
+window.populateLogoConfig = populateLogoConfig; // consumer: emb-edit-reload-roundtrip harness
+
 window.__QB_BUILD = window.__QB_BUILD || {};
-window.__QB_BUILD.emb = { entry: 'builders/emb/index.js', modules: ['pricing', 'design-search', 'spr-modal', 'shopworks-import'] };
+window.__QB_BUILD.emb = { entry: 'builders/emb/index.js', modules: ['pricing', 'design-search', 'spr-modal', 'shopworks-import', 'persistence'] };

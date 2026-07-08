@@ -18,17 +18,15 @@
  */
 // @ts-nocheck — MOVED legacy DOM code: pre-existing checkJs frictions; typing
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
-/* global API_BASE, SIZE06_EXTENDED_SIZES, _syncALArrays, addNewRow,
-   capPrimaryLogo, createServiceProductRow, dateToInputValue, globalAL,
+/* global API_BASE, SIZE06_EXTENDED_SIZES, _syncALArrays, addNewRow, createServiceProductRow, dateToInputValue,
    handleCapEmbellishmentChange, hideVariantOnlyParents, isCapProduct,
    lookupTaxRate, onShipMethodChange, onSizeChange, onStyleChange,
-   parseShopWorksDescription, populateNonSanmarRow, pricingCalculator, primaryLogo,
+   parseShopWorksDescription, populateNonSanmarRow,
    recalculatePricing, reorderRowByProductType, selectColor, selectNonSanmarColor,
    updateCapLogoSectionVisibility, updateLogoCardHeader, updateNonSanmarPriceCell,
    updateNotesBadge, updateTaxCalculation, escapeHtml, showToast,
    createOrUpdateExtendedChildRow, ShopWorksImportParser, updateArtworkCharges,
-   Event, APP_CONFIG, setLtmControlState, markAsUnsaved,
-   pendingShopWorksImport:writable */
+   Event, APP_CONFIG, setLtmControlState, markAsUnsaved */
 import { showServicePricingReview, getSprEmbConfigOptions } from './spr-modal.js';
 import { applyDesignFromCache, lookupDesignNumber } from './design-search.js';
 
@@ -1614,7 +1612,6 @@ export async function confirmShopWorksImport() {
         markAsUnsaved();
 
         // Store import metadata for Caspio save (design numbers, warnings, unmatched lines)
-        // eslint-disable-next-line no-undef -- monolith-declared lexical global (26 outside readers; migrates with clusters 6/11)
         lastImportMetadata = {
             designNumbers: data.designNumbers || [],
             digitizingCodes: data.services?.digitizingCodes || [],

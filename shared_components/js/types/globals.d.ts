@@ -83,6 +83,15 @@ interface Window {
     confirmShopWorksImport?: () => Promise<void>;
     dismissImportBanner?: () => void;
     scrollToProductRow?: (rowId: number | string) => void;
+    /* persistence bridges (builders/emb/persistence.js, extraction #4) */
+    initEmbroideryPersistence?: () => void;
+    getEmbroideryQuoteData?: () => any;
+    restoreEmbroideryDraft?: (draft: any) => Promise<void> | void;
+    markEmbroideryDirty?: () => void;
+    loadQuoteForEditing?: (quoteId: string, revision?: any) => Promise<void>;
+    duplicateQuote?: (quoteId: string) => Promise<void>;
+    addProductFromQuote?: (item: any, opts?: any) => Promise<void>;
+    populateLogoConfig?: (session: any) => void;
 }
 
 /*
