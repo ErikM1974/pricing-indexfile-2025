@@ -13,12 +13,12 @@
 
 class DTFQuoteService {
     constructor() {
-        this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
+        this.baseURL = `${window.APP_CONFIG.API.BASE_URL}/api`;
         this.quotePrefix = 'DTF';
 
         // Initialize EmailJS
         if (typeof emailjs !== 'undefined') {
-            emailjs.init('4qSbDO-SQs19TbP80');
+            emailjs.init(window.APP_CONFIG.EMAIL.PUBLIC_KEY);
         }
 
         console.log('[DTFQuoteService] Service initialized');

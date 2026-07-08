@@ -1,0 +1,52 @@
+# CI pipeline (roadmap 0.6). Deterministic jobs gate merges; the
+# live-integration capture job is diagnostic (external Caspio dependency —
+# never let a vendor outage block a release; the /deploy skill runs the
+# capture with a real server as its own pre-flight gate).
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [develop, main]
+
+jobs:
+  test:
+    name: Unit tests + pricing parity + guards
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: npm
+      - run: npm ci
+      - name: Build pipeline (hashed assets + manifest)
+        run: npm run build
+      - name: Unit suite (includes web-quote-cart-parity, quick-quote-parity, no-hardcoded-hosts)
+        run: npm run test:unit
+      - name: npm audit (advisory — 15 pre-existing vulns as of 2026-07-07; tighten to a hard gate once cleared)
+        run: npm audit --audit-level=high || echo "::warning::npm audit found high+ vulnerabilities — see log"
+
+  lint:
+    name: ESLint (new-code scope)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+
+  typecheck:
+    name: tsc checkJs (builders scope)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck

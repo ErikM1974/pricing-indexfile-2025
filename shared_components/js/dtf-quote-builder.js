@@ -74,7 +74,7 @@ class DTFQuoteBuilder {
 
         // Initialize EmailJS
         if (typeof emailjs !== 'undefined') {
-            emailjs.init('4qSbDO-SQs19TbP80');
+            emailjs.init(window.APP_CONFIG.EMAIL.PUBLIC_KEY);
         }
 
         // Initialize
@@ -416,7 +416,7 @@ class DTFQuoteBuilder {
 
     async loadPricingData() {
         try {
-            const response = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/pricing-bundle?method=DTF');
+            const response = await fetch(`${window.APP_CONFIG.API.BASE_URL}/api/pricing-bundle?method=DTF`);
             if (!response.ok) {
                 throw new Error(`API returned ${response.status}`);
             }
@@ -3907,9 +3907,7 @@ async function openDtfPushPreview() {
     modal.classList.add('show');
 
     try {
-        const apiBase = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.API?.BASE_URL)
-            ? APP_CONFIG.API.BASE_URL
-            : 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        const apiBase = window.APP_CONFIG.API.BASE_URL;
         const resp = await fetch(`${apiBase}/api/dtf-push/preview/${encodeURIComponent(_dtfPushQuoteId)}`);
         const data = await resp.json();
         if (!resp.ok) throw new Error(data.error || data.details || `HTTP ${resp.status}`);
@@ -4002,9 +4000,7 @@ async function confirmDtfPush(directFallback) {
     };
 
     try {
-        const apiBase = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.API?.BASE_URL)
-            ? APP_CONFIG.API.BASE_URL
-            : 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        const apiBase = window.APP_CONFIG.API.BASE_URL;
         const response = await fetch(`${apiBase}/api/dtf-push/push-quote`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

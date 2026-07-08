@@ -1,0 +1,20 @@
+{
+  "id": "demo",
+  "branding": {
+    "name": "Cascade Custom Threads",
+    "phone": "555-010-2026",
+    "phoneDisplay": "(555) 010-2026",
+    "email": "quotes@cascadethreads.example",
+    "website": "www.cascadethreads.example",
+    "logoUrl": "",
+    "address": {
+      "street": "500 Demo Way",
+      "city": "Portland",
+      "state": "OR",
+      "zip": "97201"
+    },
+    "palette": {}
+  },
+  "tax": { "mode": "flat", "defaultRateDisplay": 0 },
+  "methods": { "emb": true, "dtf": true, "scp": true, "dtg": false }
+}

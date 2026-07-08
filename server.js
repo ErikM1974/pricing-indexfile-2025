@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 const fetch = require('node-fetch');
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
@@ -121,6 +122,12 @@ dotenv.config();
 //
 // STATIC FILE SERVING
 //   /robots.txt — staff/internal dirs + credential share-links disallowed (2026-06-11)
+//   GET /api/tenants/:id/config — runtime tenant config for config/tenant.js
+//        (backed by config/tenants/<id>.json; strict id allowlist) (2026-07-07)
+//   /dist/* — content-hashed build output (scripts/build.js), Cache-Control immutable (2026-07-07)
+//   GET /quote-builders/:page — the 3 builder HTMLs served with script/link tags
+//        rewritten to hashed /dist assets via dist/asset-manifest.json; falls
+//        through to the plain static mount when no build exists (2026-07-07)
 //   L567  Static directories (calculators, dashboards, quote-builders, etc.)
 //   L624  Directory-to-static mappings (20+ directories)
 //
@@ -203,6 +210,9 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+// Caspio pricing proxy — the ONE server-side home for this host (roadmap 0.3).
+// Every route derives from this constant; override per-deploy via env.
+const CASPIO_PROXY_BASE = process.env.CASPIO_PROXY_BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 
 // =============================================================================
 // SECURITY: Input Sanitization
@@ -676,7 +686,7 @@ function alert3DT(text) {
 // a failed lookup (err.httpStatus carries the upstream code) so callers can
 // distinguish "no record" (resolves null) from "lookup unavailable" (throws).
 async function fetchQuoteSessionRow(quoteID) {
-  const url = `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_sessions?quoteID=${encodeURIComponent(quoteID)}&refresh=true`;
+  const url = `${CASPIO_PROXY_BASE}/api/quote_sessions?quoteID=${encodeURIComponent(quoteID)}&refresh=true`;
   const resp = await fetch(url);
   if (!resp.ok) {
     const err = new Error(`Quote lookup failed: HTTP ${resp.status}`);
@@ -1294,7 +1304,7 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
         }
 
         // Update status to Payment Confirmed (+ email/status-token stamps)
-        const updateUrl = `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_sessions/${quoteSession.PK_ID}`;
+        const updateUrl = `${CASPIO_PROXY_BASE}/api/quote_sessions/${quoteSession.PK_ID}`;
         await fetch(updateUrl, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
@@ -1505,7 +1515,7 @@ async function handleSamplesOrderPaid(session, quoteID, res) {
       paymentAmount: session.amount_total,
       serviceBanner: chCfg.push.serviceBanner(false)
     });
-    const pushResp = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/orders/create', {
+    const pushResp = await fetch(`${CASPIO_PROXY_BASE}/api/manageorders/orders/create`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -1603,7 +1613,7 @@ async function save3DTQuoteSession(data) {
     OrderSettingsJSON: orderSettings ? JSON.stringify(orderSettings) : '{}'
   };
 
-  const apiUrl = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_sessions';
+  const apiUrl = `${CASPIO_PROXY_BASE}/api/quote_sessions`;
   const response = await fetch(apiUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -1623,7 +1633,7 @@ async function save3DTQuoteSession(data) {
   // touches quote_items (verified 2026-06-12), so no duplicate risk.
   try {
     const lineItems = buildStorefrontQuoteItems(quoteID, colorConfigs, orderTotals, orderSettings);
-    const itemsUrl = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_items';
+    const itemsUrl = `${CASPIO_PROXY_BASE}/api/quote_items`;
     const results = await Promise.allSettled(lineItems.map((item) =>
       fetch(itemsUrl, {
         method: 'POST',
@@ -1650,7 +1660,7 @@ async function save3DTQuoteSession(data) {
 // same TDT_PRICING module the page runs. A client/server mismatch over 1¢
 // rejects the checkout visibly — never charge a number we didn't derive.
 
-const TDT_PROXY = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+const TDT_PROXY = CASPIO_PROXY_BASE;
 const TDT_SIZES = ['S', 'M', 'L', 'XL', '2XL', '3XL'];
 let _tdtCfgCache = null;
 let _tdtCfgAt = 0;
@@ -2774,7 +2784,7 @@ app.get('/dashboards/customer-portal-admin.html', requireCrmRole(PORTAL_ADMIN_RO
 // to caspio-pricing-proxy with a server-side secret. The API never exposed to browser.
 // =============================================================================
 
-const CRM_API_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+const CRM_API_BASE = CASPIO_PROXY_BASE;
 const CRM_API_SECRET = process.env.CRM_API_SECRET;
 
 // Fetch a staff member's app-RBAC role from Caspio (Staff_App_Roles via the proxy),
@@ -3003,6 +3013,69 @@ console.log('✓ CRM API proxy routes loaded (session-protected)');
 // robots.txt — staff/internal paths + credential-bearing share links disallowed (2026-06-11)
 app.get('/robots.txt', (req, res) => {
   res.sendFile(path.join(__dirname, 'robots.txt'));
+});
+
+// ── Tenant config (roadmap 0.3) ─────────────────────────────────────────────
+// Runtime tenant hydration for config/tenant.js. Backed by config/tenants/
+// <id>.json today; the Phase 2 admin console swaps the backing store without
+// changing this contract. Strict id allowlist pattern — the param never
+// touches the filesystem un-validated.
+app.get('/api/tenants/:id/config', (req, res) => {
+  const id = String(req.params.id || '').toLowerCase();
+  if (!/^[a-z0-9][a-z0-9-]{0,31}$/.test(id)) {
+    return res.status(400).json({ error: 'Invalid tenant id' });
+  }
+  const tenantPath = path.join(__dirname, 'config', 'tenants', `${id}.json`);
+  fs.readFile(tenantPath, 'utf8', (err, raw) => {
+    if (err) return res.status(404).json({ error: 'Unknown tenant' });
+    try {
+      res.setHeader('Cache-Control', 'no-cache');
+      res.json(JSON.parse(raw));
+    } catch (parseErr) {
+      console.error(`[tenants] config/tenants/${id}.json is not valid JSON:`, parseErr.message);
+      res.status(500).json({ error: 'Tenant config unreadable' });
+    }
+  });
+});
+
+// ── Build pipeline (roadmap 0.1/0.2) ────────────────────────────────────────
+// scripts/build.js emits content-hashed, minified copies of the quote-builder
+// assets into /dist + dist/asset-manifest.json. Hashed filenames make these
+// safe to cache forever (the name changes when the content does) — unlike the
+// no-cache staticOptions everything else needs. HTML stays no-cache so new
+// manifest refs are picked up on the next load.
+app.use('/dist', express.static(path.join(__dirname, 'dist'), {
+  setHeaders: (res) => {
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+  }
+}));
+
+// Serve the three builder pages with script/link tags rewritten to the hashed
+// /dist assets. No manifest (build not run) → fall through to the plain
+// static mount below and serve the original source paths — the build is an
+// overlay, never a requirement.
+const { rewriteHtmlAssets, createManifestLoader, createHtmlLoader } = require('./lib/asset-manifest');
+const loadAssetManifest = createManifestLoader(path.join(__dirname, 'dist', 'asset-manifest.json'));
+const loadBuilderHtml = createHtmlLoader();
+const REWRITTEN_BUILDER_PAGES = new Set([
+  'embroidery-quote-builder.html',
+  'screenprint-quote-builder.html',
+  'dtf-quote-builder.html'
+]);
+app.get('/quote-builders/:page', (req, res, next) => {
+  if (!REWRITTEN_BUILDER_PAGES.has(req.params.page)) return next();
+  const manifest = loadAssetManifest();
+  if (!manifest) return next();
+  try {
+    const html = loadBuilderHtml(path.join(__dirname, 'quote-builders', req.params.page));
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.type('html').send(rewriteHtmlAssets(html, manifest));
+  } catch (err) {
+    console.error('[asset-manifest] builder page rewrite failed, falling back to static:', err.message);
+    next();
+  }
 });
 
 // Serve specific directories as static
@@ -4988,7 +5061,7 @@ app.get('/catalog-search.css', (req, res) => {
 });
 
 // API configuration
-const API_BASE_URL = process.env.API_BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
+const API_BASE_URL = process.env.API_BASE_URL || `${CASPIO_PROXY_BASE}/api`;
 
 // Helper function to make requests to the API
 async function makeApiRequest(endpoint, method = 'GET', body = null) {
@@ -6155,7 +6228,7 @@ TAX: ${taxPct ? `APPLY ${taxPartDescription}` : 'DO NOT APPLY - out-of-state shi
     console.log('[3-Day Order] Submitting to ManageOrders:', JSON.stringify(manageOrdersPayload, null, 2));
 
     // Forward to ManageOrders PUSH API on caspio-pricing-proxy
-    const MANAGEORDERS_API = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/orders/create';
+    const MANAGEORDERS_API = `${CASPIO_PROXY_BASE}/api/manageorders/orders/create`;
 
     const response = await fetch(MANAGEORDERS_API, {
       method: 'POST',
@@ -6564,7 +6637,7 @@ function buildArtNote({ info, files }) {
 // on Status=Processed will catch any accidental re-use. Revisit this if we actually hit it.
 async function generateOrderFormDraftId() {
   try {
-    const r = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote-sequence/OF');
+    const r = await fetch(`${CASPIO_PROXY_BASE}/api/quote-sequence/OF`);
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const j = await r.json();
     const n = Number(j && j.sequence);
@@ -6605,7 +6678,7 @@ app.post('/api/order-form-drafts', async (req, res) => {
       Notes: JSON.stringify({ info, rows, ship, orderNotes, files, staffFilled })
     };
 
-    const apiUrl = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_sessions';
+    const apiUrl = `${CASPIO_PROXY_BASE}/api/quote_sessions`;
     const r = await fetch(apiUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -6637,7 +6710,7 @@ app.post('/api/order-form-drafts/:draftId/approve', async (req, res) => {
     if (!/^OF-\d+$/.test(draftId)) {
       return res.status(400).json({ success: false, error: 'Invalid draft ID format' });
     }
-    const PROXY = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    const PROXY = CASPIO_PROXY_BASE;
 
     // 1. Look up the session by QuoteID to get its PK_ID + Notes payload
     const lookupUrl = `${PROXY}/api/quote_sessions?quoteID=${encodeURIComponent(draftId)}`;
@@ -6879,7 +6952,7 @@ app.post('/api/submit-order-form', async (req, res) => {
           ExpiresAt: formattedExpiresAt,
           Notes: JSON.stringify({ info, rows, ship, orderNotes, files, decoConfig, staffFilled: [], submitFlow: 'staff-direct' })
         };
-        const createResp = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_sessions', {
+        const createResp = await fetch(`${CASPIO_PROXY_BASE}/api/quote_sessions`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(sessionData)
@@ -7033,7 +7106,7 @@ app.post('/api/submit-order-form', async (req, res) => {
     // them — server-side validation against KNOWN_FEE_PNS lives at the
     // proxy layer (caspio-pricing-proxy v608+).
     if (Array.isArray(addOns) && addOns.length > 0) {
-      const serviceCodesUrl = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/service-codes';
+      const serviceCodesUrl = `${CASPIO_PROXY_BASE}/api/service-codes`;
       let serviceCodes = [];
       try {
         const r = await fetch(serviceCodesUrl);
@@ -7590,7 +7663,7 @@ app.post('/api/submit-order-form', async (req, res) => {
       return res.json({ success: true, mode: 'dry-run', extOrderId, payload: manageOrdersPayload, skippedLines });
     }
 
-    const MANAGEORDERS_API = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/manageorders/orders/create';
+    const MANAGEORDERS_API = `${CASPIO_PROXY_BASE}/api/manageorders/orders/create`;
     const response = await fetch(MANAGEORDERS_API, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -7637,7 +7710,7 @@ app.post('/api/submit-order-form', async (req, res) => {
       // builders. Failure here doesn't fail the order — push already succeeded.
       try {
         if (breakdown?.supported && breakdown.byRow) {
-          const QUOTE_ITEMS_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_items';
+          const QUOTE_ITEMS_URL = `${CASPIO_PROXY_BASE}/api/quote_items`;
           const decoMethod = decoConfig?.method || rows.find(r => r?.deco)?.deco || '';
           const cfg = decoConfig || {};
           const primaryLocation = cfg.primaryLocation || cfg.locationCombo || cfg.size || '';
@@ -7698,7 +7771,7 @@ app.post('/api/submit-order-form', async (req, res) => {
           ? Array.from(new Set(addOns.filter(a => a?.code).map(a => String(a.code))))
           : [];
         if (company && uniqueCodes.length > 0) {
-          const HIST_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/order-form/customer-suggestions/history';
+          const HIST_URL = `${CASPIO_PROXY_BASE}/api/order-form/customer-suggestions/history`;
           // Fire all upserts in parallel — Caspio handles concurrent writes
           // fine since the table's composite unique index serializes the
           // (Customer_Company, Service_Code) pair.
@@ -9186,7 +9259,7 @@ app.get('/api/public/quote/:quoteId', async (req, res) => {
 // ManageOrders after the initial /create push.
 // ============================================================================
 
-const SYNC_PROXY_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+const SYNC_PROXY_BASE = CASPIO_PROXY_BASE;
 const SYNC_SLACK_DELETE_WEBHOOK = process.env.SLACK_QUOTE_DELETE_WEBHOOK_URL || '';
 
 /**
@@ -9671,8 +9744,7 @@ app.get('/api/quote-sessions/:quoteId/full', async (req, res) => {
       null;
     if (idCustomer) {
       try {
-        const PROXY_BASE = process.env.CASPIO_PROXY_BASE_URL
-          || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        const PROXY_BASE = CASPIO_PROXY_BASE;
         const resp = await fetch(
           `${PROXY_BASE}/api/company-contacts/by-customer/${encodeURIComponent(idCustomer)}`,
           { method: 'GET' }
@@ -10121,8 +10193,7 @@ app.post('/api/quote-sessions/:quoteId/send-to-shipstation', async (req, res) =>
     const idCustomer = order?.id_Customer || originalSubmission?.info?.companyId || null;
     if (idCustomer) {
       try {
-        const PROXY_BASE = process.env.CASPIO_PROXY_BASE_URL
-          || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        const PROXY_BASE = CASPIO_PROXY_BASE;
         const resp = await fetch(`${PROXY_BASE}/api/company-contacts/by-customer/${encodeURIComponent(idCustomer)}`);
         if (resp.ok) {
           const data = await resp.json();
@@ -10317,8 +10388,7 @@ app.post('/api/quote-sessions/:quoteId/send-to-shipstation', async (req, res) =>
     };
 
     // 9. POST to proxy
-    const PROXY_BASE = process.env.CASPIO_PROXY_BASE_URL
-      || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    const PROXY_BASE = CASPIO_PROXY_BASE;
     let proxyResp = await fetch(`${PROXY_BASE}/api/shipstation/create-order`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'X-CRM-API-Secret': CRM_API_SECRET },
@@ -10400,8 +10470,7 @@ async function lookupProductMeta(styleNumber, color) {
   }
 
   try {
-    const PROXY = process.env.CASPIO_PROXY_BASE_URL
-      || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    const PROXY = CASPIO_PROXY_BASE;
     const url = `${PROXY}/api/inventory?styleNumber=${encodeURIComponent(styleNumber)}&color=${encodeURIComponent(color || '')}`;
     const resp = await fetch(url);
     if (!resp.ok) {
@@ -11013,8 +11082,7 @@ app.post('/api/quote-sessions/bulk-sync-shipstation-tracking', async (req, res) 
     }
 
     // 2-3. For each candidate, ask proxy for shipments. If shipped, write.
-    const SYNC_PROXY_BASE_LOCAL = process.env.CASPIO_PROXY_BASE_URL
-      || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    const SYNC_PROXY_BASE_LOCAL = CASPIO_PROXY_BASE;
     const stats = { checked: 0, newlyShipped: 0, stillPending: 0, voided: 0, errors: 0, errorDetails: [] };
 
     for (const s of candidates) {

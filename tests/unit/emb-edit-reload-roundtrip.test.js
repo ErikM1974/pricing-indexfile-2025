@@ -52,8 +52,21 @@ const SERVICE_SRC = read('shared_components/js/embroidery-quote-service.js');
 const SUMMARY_SRC = read('shared_components/js/quote-order-summary.js');
 const BUILDER_SRC = read('shared_components/js/embroidery-quote-builder.js');
 
-// Source the builder once for the lightweight source-guard backstop tests at the bottom.
-const SRC = BUILDER_SRC;
+// The builders/emb bundle (roadmap 0.4): loadQuoteForEditing/populateLogoConfig
+// and friends now live in ES modules, bridged onto window by the bundle — build
+// it here exactly like scripts/build.js does and inject it AFTER the monolith
+// (same order as the real page).
+const esbuild = require('esbuild');
+const EMB_BUNDLE_SRC = esbuild.buildSync({
+  entryPoints: [path.join(ROOT, 'shared_components/js/builders/emb/index.js')],
+  bundle: true, format: 'iife', target: 'es2020', write: false, logLevel: 'silent',
+}).outputFiles[0].text;
+
+// Source-guard backstop tests scan the builder + its extracted modules.
+const SRC = BUILDER_SRC
+  + read('shared_components/js/builders/emb/persistence.js')
+  + read('shared_components/js/builders/emb/design-search.js')
+  + read('shared_components/js/builders/emb/pricing-sync.js');
 
 const PROXY = 'https://proxy.test';
 
@@ -70,10 +83,10 @@ const TEST_HOOKS = `
     get quoteService(){ return quoteService; },
     set pricingCalculator(v){ pricingCalculator = v; },
   };
-  // Re-export the functions under test (defensive — already globals via function decls).
-  window.loadQuoteForEditing = loadQuoteForEditing;
+  // Re-export the monolith-resident functions under test (defensive — already
+  // globals via function decls). loadQuoteForEditing/populateLogoConfig now
+  // arrive via the injected builders/emb bundle (window bridges).
   window.lookupTaxRate = lookupTaxRate;
-  window.populateLogoConfig = populateLogoConfig;
 })();
 `;
 
@@ -96,7 +109,7 @@ async function buildBuilder(routes) {
   const { window } = dom;
 
   // Globals normally provided by the external scripts the HTML loads (not fetched by jsdom).
-  window.APP_CONFIG = { API: { BASE_URL: PROXY } };
+  window.APP_CONFIG = { API: { BASE_URL: PROXY }, EMAIL: { PUBLIC_KEY: 'test_public_key', SERVICE_ID: 'test_service', TEMPLATES: { QUOTE_SHARE: 'test_template' } }, COMPANY: { NAME: 'Test Shop', PHONE: '000-000-0000', PHONE_DISPLAY: '(000) 000-0000', EMAIL: 'test@shop.test', WEBSITE: 'www.shop.test', LOGO_URL: 'http://test/logo.png', ADDRESS: { STREET: '1 Test St', CITY: 'Testville', STATE: 'WA', ZIP: '00000' } } };
   window.emailjs = { init() {} };
   window.scrollTo = () => {};
   if (!window.matchMedia) {
@@ -135,6 +148,7 @@ async function buildBuilder(routes) {
   inject(SERVICE_SRC + '\n;window.EmbroideryQuoteService = EmbroideryQuoteService;');
   inject(SUMMARY_SRC);  // shared order-summary band — must load before the builder (matches production) so the builder's QuoteOrderSummary.configure() wires #order-recap / #ship-to-card
   inject(BUILDER_SRC + TEST_HOOKS);
+  inject(EMB_BUNDLE_SRC);  // builders/emb bridges (loads last, like the page)
 
   // Wire the two module-level deps that init() would normally create, without running init().
   window.__embTest.pricingCalculator = {

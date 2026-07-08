@@ -1,0 +1,22 @@
+{
+    // JSDoc typechecking (roadmap 0.6) — checkJs over the NEW module scope
+    // only. No emit, no TS migration (roadmap ground rule: vanilla JS).
+    // Widen `include` as task 0.4 extracts modules; the MethodAdapter and
+    // pricing typedefs live in shared_components/js/types/quote.d.ts.
+    "compilerOptions": {
+        "allowJs": true,
+        "checkJs": true,
+        "noEmit": true,
+        "strict": false,
+        "target": "es2022",
+        "module": "es2022",
+        "moduleResolution": "bundler",
+        "lib": ["es2022", "dom"],
+        "types": ["node"]
+    },
+    "include": [
+        "shared_components/js/builders/**/*.js",
+        "shared_components/js/types/*.d.ts",
+        "lib/**/*.js"
+    ]
+}

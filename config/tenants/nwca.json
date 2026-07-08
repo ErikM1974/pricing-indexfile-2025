@@ -1,0 +1,45 @@
+{
+  "id": "nwca",
+  "branding": {
+    "name": "Northwest Custom Apparel",
+    "phone": "253-922-5793",
+    "phoneDisplay": "(253) 922-5793",
+    "email": "sales@nwcustomapparel.com",
+    "website": "www.nwcustomapparel.com",
+    "logoUrl": "https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png",
+    "founded": 1977,
+    "address": {
+      "street": "2025 Freeman Road East",
+      "city": "Milton",
+      "state": "WA",
+      "zip": "98354"
+    },
+    "palette": {}
+  },
+  "api": {
+    "baseUrl": "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com"
+  },
+  "email": {
+    "provider": "emailjs",
+    "publicKey": "4qSbDO-SQs19TbP80",
+    "serviceId": "service_jgrave3",
+    "templates": {
+      "DTG": "template_dtg_quote",
+      "RICH": "template_rich_quote",
+      "EMB": "template_emb_quote",
+      "EMBC": "template_embc_quote",
+      "LT": "template_lt_quote",
+      "PATCH": "template_patch_quote",
+      "SPC": "template_spc_quote",
+      "SSC": "template_ssc_quote",
+      "WEB": "template_web_quote",
+      "ART": "template_art_invoice",
+      "QUOTE_SHARE": "template_quote_email"
+    }
+  },
+  "tax": { "mode": "lookup", "defaultRateDisplay": 0.102 },
+  "methods": { "emb": true, "dtf": true, "scp": true, "dtg": true },
+  "currency": { "code": "USD", "symbol": "$", "decimals": 2 },
+  "units": "imperial",
+  "features": {}
+}
