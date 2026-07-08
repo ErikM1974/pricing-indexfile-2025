@@ -1,3 +1,8 @@
+## v2026.07.08.9 (2026.07.08)
+
+- feat(observability): 1.10 — Sentry error tracking, release-tagged + PII-scrubbed (env-gated)
+- Deploy v2026.07.08.9: cache-bust bumps
+
 ## v2026.07.08.8 (2026.07.08)
 
 - feat(security): 1.3 — vendor all third-party code the builders execute (no more CDNs)
