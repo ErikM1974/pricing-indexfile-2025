@@ -38,7 +38,7 @@
 | 5 | Pricing recalc + display + AL/DECG/rush sync (6379-8181: `recalculatePricing`, `collectProductsFromTable`, `updatePricingDisplay`, tax UI) | ~1,800 | `pricing.js` + `render.js` | ⬜ |
 | 6 | Save + link + push (8182-9111: `saveAndGetLink`, `_saveAndGetLinkInner` 450L, push preview/confirm) | ~930 | `persistence.js` | ⬜ |
 | 7 | Quote-level UI: reset/fees/discounts (9112-9800: `resetQuote` 243L, `updateAdditionalCharges`, fee table) | ~690 | `state.js` + `events.js` | ⬜ |
-| 8 | Service-pricing-review modal (9801-10727: `showServicePricingReview` 615L + `onSpr*`) | ~900 | `spr-modal.js` (domain) | ⬜ |
+| 8 | Service-pricing-review modal (`showServicePricingReview` 615L + `onSpr*`) — 941-line cut, 12 bridges (ALL 5 onSpr row handlers live in generated template-literal markup — python scan, shell grep quoting lies), `getSprEmbConfigOptions()` accessor for the import cluster's read | ~940 | `spr-modal.js` (domain) | ✅ 2026-07-07 (extraction #2) |
 | 9 | DECG stitch modal (10728-10935) | ~210 | `decg-modal.js` (domain) | ⬜ |
 | 10 | ShopWorks import (10936-12920: import modal, `renderImportPreview`, `confirmShopWorksImport` 999L, `importProductRow`) | ~1,990 | `shopworks-import.js` (domain) | ⬜ |
 | 11 | Output/diagnostics (12921-13703: `diagnoseQuote`, `buildEmbroideryPricingData`, print/email/copy) | ~780 | `persistence.js` | ⬜ |
@@ -70,6 +70,7 @@ cluster, never ahead of it.
 
 ## Extraction-#1 learnings + debt (2026-07-07)
 
+- **Generated-markup scan is STEP ONE per cluster, in python** (shell grep quoting mangles the pattern): `re.findall(r'on[a-z]+="([A-Za-z_$][\w$]*)\(', body)` over the cut body — extraction #2's five onSpr handlers were ALL generated-only.
 - **Generated-markup handlers**: static caller grep MISSES `onclick="fn()"` built
   inside template strings — scan the extracted body for `on(click|error|…)="` and
   bridge those too (`selectDesignFromSearch`, `showMoreDesignSearchResults`,

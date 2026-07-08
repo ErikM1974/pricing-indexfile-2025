@@ -13,8 +13,23 @@
  * Extracted so far (map → memory/emb-decomposition-plan.md):
  *   pricing.js       — Service_Codes fee loading (cluster #0, 2026-07-07)
  *   design-search.js — design lookup/gallery modal (cluster #1, 2026-07-07)
+ *   spr-modal.js     — service-pricing-review modal (cluster #2, 2026-07-07)
  */
 import { loadServiceCodePrices, getServicePrice } from './pricing.js';
+import {
+    showServicePricingReview,
+    onSprProductSourceChange,
+    onSprCustomProductFocus,
+    onSprSourceChange,
+    onSprCustomServiceFocus,
+    onSprGarmentPositionChange,
+    onSprGarmentStitchTierChange,
+    onSprCapEmbellishmentChange,
+    onSprStitchChange,
+    cancelServicePricingReview,
+    applyServicePricingReview,
+    getSprEmbConfigOptions,
+} from './spr-modal.js';
 import {
     applyDesignFromCache,
     filterDesignSearchByTier,
@@ -58,5 +73,21 @@ window.showMoreDesignSearchResults = showMoreDesignSearchResults;
 window.invalidateDesignGalleryCache = invalidateDesignGalleryCache;
 window.resetDesignSearchState = resetDesignSearchState;
 
+// spr-modal (callers: the monolith import flow awaits showServicePricingReview;
+// static HTML handlers + onchange/onfocus/oninput handlers the modal renders
+// into its product/service tables; import cluster reads getSprEmbConfigOptions)
+window.showServicePricingReview = showServicePricingReview;
+window.onSprProductSourceChange = onSprProductSourceChange;
+window.onSprCustomProductFocus = onSprCustomProductFocus;
+window.onSprSourceChange = onSprSourceChange;
+window.onSprCustomServiceFocus = onSprCustomServiceFocus;
+window.onSprGarmentPositionChange = onSprGarmentPositionChange;
+window.onSprGarmentStitchTierChange = onSprGarmentStitchTierChange;
+window.onSprCapEmbellishmentChange = onSprCapEmbellishmentChange;
+window.onSprStitchChange = onSprStitchChange;
+window.cancelServicePricingReview = cancelServicePricingReview;
+window.applyServicePricingReview = applyServicePricingReview;
+window.getSprEmbConfigOptions = getSprEmbConfigOptions;
+
 window.__QB_BUILD = window.__QB_BUILD || {};
-window.__QB_BUILD.emb = { entry: 'builders/emb/index.js', modules: ['pricing', 'design-search'] };
+window.__QB_BUILD.emb = { entry: 'builders/emb/index.js', modules: ['pricing', 'design-search', 'spr-modal'] };

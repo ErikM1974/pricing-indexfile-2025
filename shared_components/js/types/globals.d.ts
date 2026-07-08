@@ -58,6 +58,19 @@ interface Window {
     showMoreDesignSearchResults?: () => void;
     invalidateDesignGalleryCache?: () => void;
     resetDesignSearchState?: () => void;
+    /* spr-modal bridges (builders/emb/spr-modal.js, extraction #2) */
+    showServicePricingReview?: (serviceItems: any[], productItems: any[], embConfigOptions?: any) => Promise<any>;
+    onSprProductSourceChange?: (pIdx: number) => void;
+    onSprCustomProductFocus?: (pIdx: number) => void;
+    onSprSourceChange?: (idx: number) => void;
+    onSprCustomServiceFocus?: (idx: number) => void;
+    onSprGarmentPositionChange?: () => void;
+    onSprGarmentStitchTierChange?: () => void;
+    onSprCapEmbellishmentChange?: () => void;
+    onSprStitchChange?: (idx: number) => void;
+    cancelServicePricingReview?: () => void;
+    applyServicePricingReview?: () => void;
+    getSprEmbConfigOptions?: () => any;
 }
 
 /*
@@ -76,3 +89,5 @@ declare function escapeHtml(s: any): string;
 declare function showToast(msg: string, type?: string, duration?: number): void;
 declare let DesignThumbnailService: any;
 declare function renderOrderRecap(): void;
+declare function mapStitchCountToTierValue(stitchCount: number): string;
+declare let pricingCalculator: any;

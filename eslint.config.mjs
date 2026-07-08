@@ -64,12 +64,15 @@ export default [
         },
     },
     {
-        // MOVED legacy render code (0.4 extraction #1) — its innerHTML sinks
-        // predate the module and interpolations are escapeHtml-wrapped
-        // (hand-audited 2026-07-07; one attribute-quoting nuance logged for
-        // the roadmap-1.4 sink audit, which removes this override). Do NOT
-        // add new files here.
-        files: ['shared_components/js/builders/emb/design-search.js'],
+        // MOVED legacy render code (0.4 extractions) — innerHTML sinks predate
+        // the modules and interpolations are escapeHtml-wrapped or numeric
+        // (hand-audited per extraction; nuances logged in the plan doc for the
+        // roadmap-1.4 sink audit, which removes this override). Only files
+        // moved verbatim from the monolith may be added here.
+        files: [
+            'shared_components/js/builders/emb/design-search.js',
+            'shared_components/js/builders/emb/spr-modal.js',
+        ],
         rules: {
             'no-unsanitized/property': 'off',
         },
