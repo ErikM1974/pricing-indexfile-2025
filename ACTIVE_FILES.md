@@ -602,9 +602,12 @@
 | `/shared_components/js/golf-tournament-product.js` | **NEW** Product detail page logic — fetches /api/products/search for colors/sizes/description + embroidery pricing for full tier table | embroidery-pricing-service.js, /api/products/search, /api/pricing-bundle | ✅ Active |
 
 ### Quote System Components
+
+> `quote-builder-core.js` (684 lines) + `INTEGRATION-EXAMPLE.js` (329) DELETED 2026-07-07 (roadmap 0.4 base audit, Erik-approved): zero `<script>` tags and zero JS references repo-wide — 2026-01 consolidation scaffolding nobody adopted. `quote-builder-base.js` won the keep-ONE-base decision.
+
 | File | Purpose | Used By | Status |
 |------|---------|---------|--------|
-| `/shared_components/js/quote-builder-base.js` | Base functionality | All quote builders | ✅ Active |
+| `/shared_components/js/quote-builder-base.js` | **DORMANT — being revived (roadmap 0.4, 2026-07-07)**: class QuoteBuilderBase was never instantiated/extended anywhere (the lone DTF `<script>` tag was a zombie, removed 2026-07-07). Kept as the ONE base — the 0.4 decomposition reworks it into the shared ES-module base + MethodAdapter contract. Do NOT re-add a `<script>` tag; it will ship via the builders bundle. | (none yet — revived by builders/emb extraction) | 🚧 Being revived |
 | `/shared_components/js/quote-builder-utils.js` | **NEW** Shared utilities: escapeHtml, formatPrice, showToast, etc. (2026-01-30 consolidation) | All quote builders | ✅ Active |
 | `/shared_components/js/quote-builder-guided.js` | **NEW (2026-07-07, guided-quote Phase B)** Guided Quote shell for the TRIO: 4-step flow (Products → Decoration → Customer → Review & send) via tag-don't-wrap visibility on existing sections + exactly 2 id-preserving relocations (sidebar customer panel → step 3, action panel → step 4, hidden anchors restore them); "Show everything" workbench toggle persisted in localStorage `nwca-guided-mode`; defensive no-op if any section is missing. DTG excluded by design. | EMB/SCP/DTF builder HTMLs, quote-builder-guided.css | ✅ Active |
 | `/shared_components/js/builders/emb/index.js` | **NEW (2026-07-07, roadmap 0.1/0.4)** EMB ESM entry point — Phase 0 strangler shell; modules extracted from `embroidery-quote-builder.js` (13,712 lines) land here (state/pricing/render/persistence/events), re-exported onto `window` until callers migrate. Bundled to IIFE by scripts/build.js; loads last on the EMB page. | scripts/build.js; embroidery-quote-builder.html | ✅ Active |
@@ -642,14 +645,12 @@
 | `/shared_components/js/color-picker-component.js` | **NEW** Shared color picker module (2026 consolidation) | All quote builders | ✅ Active |
 | `/shared_components/js/extended-sizes-config.js` | **NEW** Shared extended sizes config (2026 consolidation) | All quote builders | ✅ Active |
 | `/shared_components/js/quote-extended-sizes.js` | **NEW** Shared extended size popup functions (2026-03-21 extraction) | EMB, DTG, Screenprint | ✅ Active |
-| `/shared_components/js/quote-builder-core.js` | **NEW** Core quote builder functionality (2026 consolidation) | All quote builders | ✅ Active |
 | `/shared_components/js/pricing-sidebar-component.js` | **NEW** Unified pricing sidebar (2026 consolidation) | All quote builders | ✅ Active |
 | `/shared_components/js/quote-share-modal.js` | **NEW** Shareable URL success modal (2026 consolidation) | All quote builders | ✅ Active |
 | `/shared_components/js/customer-lookup-service.js` | **NEW** Customer autocomplete search (2026-01-29) | All quote builders | ✅ Active |
 | `/shared_components/js/customer-context-banners.js` | **NEW** Customer Warning banner + Tax Exempt chip + Account Tier badge + Payment Terms autofill with legacy-CRM mapping (2026-05-23). Exposes `window.surfaceCustomerContext(contact, config)` + `window.mapToOfferedTerms()` | EMB, DTF, SCP quote builders + customer-lookup-service.js | ✅ Active |
 | `/shared_components/js/product-thumbnail-modal.js` | **NEW** Product image thumbnail + click-to-enlarge modal (2026-01-29) | DTG, Screen Print, Embroidery builders | ✅ Active |
 | `/shared_components/js/shopworks-import-parser.js` | **NEW** ShopWorks order text parser (2026-01-31) | Embroidery quote builder | ✅ Active |
-| `/shared_components/js/INTEGRATION-EXAMPLE.js` | **NEW** Integration example/docs (2026 consolidation) | Reference only | 📚 Docs |
 
 ### Customer Lookup System (NEW 2026-01-29)
 | File | Purpose | Dependencies | Status |

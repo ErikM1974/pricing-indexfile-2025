@@ -7,8 +7,7 @@
 | File | Purpose |
 |------|---------|
 | `base-quote-service.js` | Base class for all quote save/email services |
-| `quote-builder-base.js` | Base quote builder functionality |
-| `quote-builder-core.js` | Core quote builder shared logic (2026 consolidation) |
+| `quote-builder-base.js` | **DORMANT — being revived (roadmap 0.4)**: never instantiated/extended; zombie DTF tag removed 2026-07-07. Becomes the shared ES-module base + adapter contract as the EMB decomposition lands | 
 | `builders/emb/index.js` | **ESM entry point (roadmap 0.1/0.4, 2026-07-07)** — Phase 0 strangler shell for the EMB decomposition; modules extracted from `embroidery-quote-builder.js` land here (state/pricing/render/persistence/events) and are re-exported onto `window` until callers migrate. Bundled to a hashed IIFE by `scripts/build.js` (see `/dist` + `dist/asset-manifest.json`); loads last on the EMB page |
 | `builders/scp/index.js` | **ESM entry point (roadmap 0.1/0.4, 2026-07-07)** — SCP strangler shell, mirrors `builders/emb/` (filled after the EMB pilot) |
 | `builders/dtf/index.js` | **ESM entry point (roadmap 0.1/0.4, 2026-07-07)** — DTF strangler shell, mirrors `builders/emb/` (filled after the EMB pilot) |
@@ -39,7 +38,6 @@
 | `shopworks-import-parser.js` | ShopWorks order text parser |
 | `shopworks-guide-generator.js` | ShopWorks data entry guide generator |
 | `staff-auth-helper.js` | Staff authentication helper |
-| `INTEGRATION-EXAMPLE.js` | Integration reference/docs (not runtime) |
 | `fetch-timeout.js` | Global fetch() wrapper with 15s timeout |
 | `dash-page-helpers.js` | Canonical helpers for staff-dashboard child pages — `DashPage.showError/hideError/apiUrl/fetchJson`. Loaded by every page scaffolded via the `/dash-page` skill. Wraps APP_CONFIG + fetch-timeout, enforces CLAUDE.md API-error rule (no silent fallback). |
 | `caspio-date-utils.js` | Parse Caspio timestamps (Pacific server time → correct UTC instant, DST-aware). `window.CaspioDate.parse/formatDateTime/formatDate/formatAge`. Use this — never `+ 'Z'`. |
