@@ -205,6 +205,54 @@ function updatePrintConfig() {
     recalculateAllPrices();
 }
 
+// ── Dark-garment underbase nudge (expert audit 2026-07-07) ──────────────────
+// The builder defaults isDarkGarment OFF while the standalone calculator defaults
+// it ON (screenprint-pricing-v2.js:81), so forgetting the toggle on a black-hoodie
+// job silently under-quotes setup by one $30 underbase screen per print location —
+// per-piece price is unaffected in the house model, so nothing else looks wrong.
+// Non-blocking by design: no-white-ink designs on darks are legitimate, the rep
+// stays in charge. Color words mirror the calculator's darkColors list.
+const SCP_DARK_COLOR_WORDS = ['black', 'navy', 'charcoal', 'forest', 'maroon', 'purple', 'brown', 'dark'];
+let _darkNudgeDismissed = false;
+
+function updateDarkGarmentNudge(productList) {
+    const toggle = document.getElementById('dark-garment-toggle');
+    if (!toggle) return;
+    const host = toggle.closest('label');
+    if (!host || !host.parentElement) return;
+    let chip = document.getElementById('dark-garment-nudge');
+
+    const hasDarkRows = (productList || []).some(p => {
+        const c = String(p.color || p.catalogColor || '').toLowerCase();
+        return SCP_DARK_COLOR_WORDS.some(w => c.includes(w));
+    });
+
+    if (toggle.checked || _darkNudgeDismissed || !hasDarkRows) {
+        if (chip) chip.remove();
+        return;
+    }
+    if (chip) return; // already showing
+
+    chip = document.createElement('span');
+    chip.id = 'dark-garment-nudge';
+    chip.className = 'dark-garment-nudge';
+    chip.innerHTML = '<i class="fas fa-exclamation-triangle"></i>' +
+        ' Dark garments in this quote — add white underbase screens?' +
+        ' <button type="button" class="dark-garment-nudge-apply">Enable</button>' +
+        ' <button type="button" class="dark-garment-nudge-dismiss" aria-label="Dismiss underbase reminder" title="Dismiss">&times;</button>';
+    chip.querySelector('.dark-garment-nudge-apply').addEventListener('click', () => {
+        toggle.checked = true;
+        chip.remove();
+        updatePrintConfig();   // re-derives screens + setup fee, ends in recalculateAllPrices()
+        if (typeof markScreenPrintDirty === 'function') markScreenPrintDirty();
+    });
+    chip.querySelector('.dark-garment-nudge-dismiss').addEventListener('click', () => {
+        _darkNudgeDismissed = true;   // per-quote: resetQuote() re-arms it
+        chip.remove();
+    });
+    host.insertAdjacentElement('afterend', chip);
+}
+
 // Extended sizes available for Size06 (Other) column
 // Note: Actual available sizes are fetched dynamically per product via API
 // Includes OSFA for beanies, bags, and other one-size-fits-all items
@@ -875,6 +923,8 @@ window.duplicateQuote = duplicateQuote;
 function resetQuote() {
     // Clear the "already pushed" lock + reset the Push button so the fresh quote is pushable. (review fix 2026-06-14)
     _scpPushQuoteId = null;
+    _darkNudgeDismissed = false;   // re-arm the dark-garment underbase nudge for the next quote
+    document.getElementById('dark-garment-nudge')?.remove();
     const _scpPush = document.getElementById('scp-push-shopworks-btn');
     if (_scpPush) {
         delete _scpPush.dataset.pushed;
@@ -968,7 +1018,7 @@ function resetQuote() {
     var _shipFeeReset = document.querySelector('#spc-order-fields .os-shipping-fee');
     if (_shipFeeReset) _shipFeeReset.value = '0';
     const taxRateReset = document.getElementById('tax-rate-input');
-    if (taxRateReset) taxRateReset.value = '10.1';
+    if (taxRateReset) taxRateReset.value = '10.2';
 
     // Reset additional charges
     const rushFee = document.getElementById('rush-fee');
@@ -1049,7 +1099,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     // forget — getServicePrice() returns the documented fallback until it resolves,
     // and recalculatePricing() re-reads live values on the next interaction. (2026-06-09)
     if (typeof loadServiceCodePrices === 'function') { loadServiceCodePrices().then(() => {
-        try { recalculatePricing(); } catch (_) {}
+        // updatePrintConfig() re-derives printConfig.setupFee from the now-live SPSU rate
+        // and ends in recalculateAllPrices(); the old bare recalculatePricing() left the
+        // stale fallback $30/screen CHARGED while the fee-row label showed the live rate
+        // until the rep happened to click a print-config control. (expert audit 2026-07-07)
+        try { if (typeof updatePrintConfig === 'function') { updatePrintConfig(); } else { recalculatePricing(); } } catch (_) {}
         // Sync the static "$75/hr", "$10 ea", "$15 ea" labels with the live Service_Codes
         // rates (mirror DTF's #design-rate-label pattern). The math was already API-driven,
         // but a Caspio price change left the on-screen labels contradicting the charged
@@ -1241,7 +1295,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                     if (typeof updateTaxCalculation === 'function') updateTaxCalculation();
                 } else if (_wasExempt) {
                     if (_incTax) _incTax.checked = true;
-                    if (_rateEl && _rateEl.value === '0') _rateEl.value = '10.1';
+                    if (_rateEl && _rateEl.value === '0') _rateEl.value = '10.2';
                     if (typeof updateTaxCalculation === 'function') updateTaxCalculation();
                 }
 
@@ -3258,16 +3312,19 @@ function recalculateAllPrices() {
     recalculatePricing();
 }
 
-// Screen Print tier mapping (different from DTG)
+// Screen Print tier mapping — FALLBACK ONLY (used when the Caspio-matched tier label
+// is unavailable). Boundaries follow the 2026-06-19 remap (24-47/48-71/72-144/145+);
+// the old 24-36/37-72/73-144 labels survived here and printed nonexistent tiers on
+// failure-path saves/PDFs. (expert audit 2026-07-07)
 const SCREENPRINT_TIERS = [
-    { label: '24-36', min: 24, max: 36 },
-    { label: '37-72', min: 37, max: 72 },
-    { label: '73-144', min: 73, max: 144 },
+    { label: '24-47', min: 24, max: 47 },
+    { label: '48-71', min: 48, max: 71 },
+    { label: '72-144', min: 72, max: 144 },
     { label: '145+', min: 145, max: Infinity }
 ];
 
 function getScreenPrintTier(qty) {
-    // Under 24 uses 24-36 pricing (+ LTM fee applied separately)
+    // Under 24 uses 24-47 pricing (+ LTM fee applied separately)
     if (qty < 24) return SCREENPRINT_TIERS[0];
     for (const tier of SCREENPRINT_TIERS) {
         if (qty >= tier.min && qty <= tier.max) return tier;
@@ -3295,10 +3352,14 @@ async function recalculatePricing() {
     // Collect products from table (parent rows only)
     const productList = collectProductsFromTable();
 
+    // Dark-garment reminder — evaluated on every reprice so a navy hoodie added
+    // mid-quote still nudges while the underbase toggle is off.
+    try { updateDarkGarmentNudge(productList); } catch (_) {}
+
     if (productList.length === 0) {
         updatePricingDisplay({
             totalQuantity: 0,
-            tier: '24-36',
+            tier: '24-47',
             subtotal: 0,
             ltmFee: 0,
             setupFees: printConfig.setupFee,
@@ -3439,10 +3500,16 @@ async function recalculatePricing() {
             if (printConfig.backLocation) {
                 const backColors = printConfig.backColors.toString();
                 const additionalPricing = pricingData.additionalLocationPricing?.[backColors];
-                if (additionalPricing && additionalPricing.tiers) {
-                    const additionalTier = findPricingTier(additionalPricing.tiers, totalQty);
-                    additionalPricePerPiece = additionalTier?.pricePerPiece || 0;
+                const additionalTier = (additionalPricing && additionalPricing.tiers)
+                    ? findPricingTier(additionalPricing.tiers, totalQty)
+                    : null;
+                if (!additionalTier || typeof additionalTier.pricePerPiece !== 'number') {
+                    // Never silently price the back print at $0 (Rule 4) — same guard the
+                    // sleeve loop below already has; the engine hard-throws this case.
+                    droppedProducts.push({ style, reason: `no add-location pricing for a ${backColors}-color back print` });
+                    continue;
                 }
+                additionalPricePerPiece = additionalTier.pricePerPiece;
             }
 
             // Sleeves — each checked sleeve is its OWN additional print location at its own color count,
@@ -3468,6 +3535,16 @@ async function recalculatePricing() {
             }
             if (sleeveDropped) continue; // never silently price a sleeve at $0 (Rule 4)
 
+            // No silent M/L substitution for an unpriced size — the engine refuses the
+            // same case (quote-cart-engine.js:726-731) and substituting drops the
+            // extended-size upcharge, so builder and engine would disagree per SKU.
+            const unpricedSize = Object.entries(product.sizeBreakdown || {})
+                .find(([sz, q]) => q > 0 && typeof tierData.prices?.[sz] !== 'number');
+            if (unpricedSize) {
+                droppedProducts.push({ style, reason: `no price for size ${unpricedSize[0]} at tier ${caspioTierLabel || (tierData.minQty + '+')}` });
+                continue;
+            }
+
             // Find parent row for this product
             const parentRow = document.querySelector(`tr[data-style="${style}"][data-catalog-color="${product.catalogColor}"]:not(.child-row)`);
             if (!parentRow) continue;
@@ -3480,12 +3557,10 @@ async function recalculatePricing() {
             Object.entries(product.sizeBreakdown || {}).forEach(([size, qty]) => {
                 if (qty <= 0) return;
 
-                // Get base price for this size from primary location
-                let sizePrice = tierData.prices?.[size];
-                if (typeof sizePrice !== 'number') {
-                    // Try common fallbacks
-                    sizePrice = tierData.prices?.['M'] || tierData.prices?.['L'] || 0;
-                }
+                // Base price for this size from primary location — guaranteed present by
+                // the unpricedSize guard above (no M/L fallback: that silently dropped
+                // extended-size upcharges and broke builder↔engine parity).
+                let sizePrice = tierData.prices[size];
 
                 // Add additional location price (back)
                 sizePrice += additionalPricePerPiece;
@@ -3765,10 +3840,13 @@ function updatePricingDisplay(pricing) {
     updatePerUnitPrice(pricing.subtotal || 0, pricing.totalQuantity || 0);
     updateQuantityNudge(pricing.totalQuantity || 0, 'scp', window.currentPricingData?.nextTierSavings);
 
-    // Minimum order warning banner (show when qty > 0 but < 24)
+    // Small-batch warning banner — Caspio charges the $50 LTM through the 24-47 tier,
+    // so the banner must show whenever the fee applies (<48), not just under the
+    // 24-piece minimum. The old <24 gate had reps promising "the fee disappears at 24"
+    // and getting contradicted by their own 30-piece quote. (expert audit 2026-07-07)
     const minWarning = document.getElementById('min-order-warning');
     if (minWarning) {
-        minWarning.style.display = (totalQty > 0 && totalQty < 24) ? 'flex' : 'none';
+        minWarning.style.display = (totalQty > 0 && totalQty < 48) ? 'flex' : 'none';
     }
 
     // Update pre-tax subtotal for tax calculation (grand total before tax)
@@ -3780,7 +3858,7 @@ function updatePricingDisplay(pricing) {
 
     // Pricing tier
     const pricingTierEl = document.getElementById('pricing-tier');
-    pricingTierEl.textContent = pricing.tier || '24-36';
+    pricingTierEl.textContent = pricing.tier || '24-47';
 
     // LTM display — show table row only in "separate" mode
     const ltmTableRow = document.getElementById('ltm-fee-row');
@@ -3914,7 +3992,7 @@ function updateTaxCalculation() {
     // [2026-06-08] P0 (#1 rule): Number.isFinite so an exempt/out-of-state rate of 0 STAYS 0% — `parseFloat('0')||10.1`
     // is the falsy trap that re-taxed exempt orders at 10.1% on screen when include-tax was still checked.
     const _scpRate = parseFloat(document.getElementById('tax-rate-input')?.value);
-    const taxRateInput = Number.isFinite(_scpRate) ? _scpRate : 10.1;
+    const taxRateInput = Number.isFinite(_scpRate) ? _scpRate : 10.2;
     const taxRate = taxRateInput / 100;
 
     // Sales Tax row stays visible for invoice transparency; label shows the rate when charged,
@@ -3963,7 +4041,7 @@ function toggleWholesale() {
             const _st = (document.querySelector('#spc-order-fields .os-ship-state')?.value || 'WA').toUpperCase();
             const _zip = document.querySelector('#spc-order-fields .os-ship-zip');
             if (_st === 'WA') {
-                if (rateInput) rateInput.value = '10.1';  // fallback until the async DOR lookup (ZIP blur) returns
+                if (rateInput) rateInput.value = '10.2';  // fallback until the async DOR lookup (ZIP blur) returns — Milton 10.2% since 2026-07-06
                 if (_zip && (_zip.value || '').trim().length >= 5) { _zip.dispatchEvent(new Event('blur')); }
             } else if (rateInput) {
                 rateInput.value = '0';  // out-of-state — no WA tax
@@ -4265,6 +4343,11 @@ async function printQuote() {
     showLoading(true);
 
     try {
+        // Settle pricing before scraping the DOM — SCP was the only builder printing
+        // without a pre-print recalc, leaving a stale-price window (EMB awaits its
+        // recalc, DTF prints from state math). (expert audit 2026-07-07)
+        await recalculatePricing();
+
         // Build pricing data structure for invoice generator
         const pricingData = buildScreenprintPricingData(products);
 
@@ -4301,7 +4384,10 @@ async function printQuote() {
  */
 function buildScreenprintPricingData(products) {
     const currentPricing = window.currentPricingData || {};
-    const quoteId = document.getElementById('quote-id')?.textContent || `SPC-${Date.now()}`;
+    // No #quote-id element exists in this page — the old DOM read made EVERY printed
+    // PDF show a fabricated `SPC-<epoch>` number that matches nothing in Quote Mgmt.
+    // Use the real saved id; null lets the shared generator print "DRAFT" when unsaved.
+    const quoteId = (typeof editingQuoteId !== 'undefined' && editingQuoteId) || (typeof _scpPushQuoteId !== 'undefined' && _scpPushQuoteId) || null;
 
     // Build products array with line items for invoice
     const invoiceProducts = [];
@@ -4447,7 +4533,7 @@ function buildScreenprintPricingData(products) {
     // Read tax + LTM state here (was post-overridden in printQuote pre-3.1.0).
     // '10.1' fallback preserves pre-3.1 behavior: an empty input previously fell
     // through to the generator's hardcoded WA standard rate.
-    const taxRateRaw = document.getElementById('tax-rate-input')?.value || '10.1';
+    const taxRateRaw = document.getElementById('tax-rate-input')?.value || '10.2';
     const ltmState = getLtmControlState('spc-ltm-panel');
     const ltmDistributed = (ltmState.displayMode === 'builtin');
 
@@ -4457,7 +4543,7 @@ function buildScreenprintPricingData(products) {
     return window.QuotePricingData.buildPricingData({
         method: 'SCP',
         quoteId: quoteId,
-        tier: currentPricing.tier || '24-36',
+        tier: currentPricing.tier || '24-47',
         products: invoiceProducts,
         subtotal: subtotal,
         grandTotal: currentPricing.grandTotal || subtotal,
@@ -4530,6 +4616,15 @@ async function saveAndGetLink(opts = {}) {
         showToast('Please enter customer name and email', 'error');
         if (!customerName) document.getElementById('customer-name')?.focus();
         else if (!customerEmail) document.getElementById('customer-email')?.focus();
+        return;
+    }
+
+    // Format-validate like EMB/DTF do — SCP was the only builder that saved (then
+    // emailed to) a malformed address; EmailJS "succeeds" at shape-valid junk and
+    // the follow-up call is "I never got it". (expert audit 2026-07-07)
+    if (typeof isValidEmail === 'function' && !isValidEmail(customerEmail)) {
+        showToast('Customer email looks invalid — please correct it before saving', 'error');
+        document.getElementById('customer-email')?.focus();
         return;
     }
 
@@ -4669,7 +4764,7 @@ async function saveAndGetLink(opts = {}) {
             // billed full WA tax while the rep saw $0 = silent wrong price (Erik's #1 rule). Unchecked → save TaxRate 0.
             taxRate: (document.getElementById('include-tax') && !document.getElementById('include-tax').checked)
                 ? 0
-                : parseFloat(document.getElementById('tax-rate-input')?.value || '10.1'),
+                : parseFloat(document.getElementById('tax-rate-input')?.value || '10.2'),
             // Order & shipping fields (2026-03-22)
             ...getOrderShippingData('spc-order-fields')
         };
@@ -4744,10 +4839,16 @@ async function saveQuote() {
 }
 
 async function spcEmailQuote() {
-    const quoteId = editingQuoteId;
-    if (!quoteId) {
-        showToast('Please save the quote first before emailing', 'error');
-        return;
+    // editingQuoteId only exists on ?edit= loads — a fresh save never set it, so Email
+    // was a dead end on every NEW quote ("save first" loop). Mirror EMB embEmailQuote:
+    // accept the just-saved id, and auto-save when unsaved OR edited-since-save so the
+    // customer never receives a stale revision. (expert audit 2026-07-07)
+    let quoteId = editingQuoteId || _scpPushQuoteId;
+    const dirty = (typeof hasUnsavedChanges === 'function') ? hasUnsavedChanges() : false;
+    if (!quoteId || dirty) {
+        showToast('Saving quote before emailing…', 'info', 2500);
+        quoteId = await saveAndGetLink({ skipShareModal: true });
+        if (!quoteId) return;   // save failed/blocked — its error is already on screen
     }
     await emailQuote({
         quoteId,
@@ -4768,7 +4869,7 @@ async function copyToClipboard() {
         // Get current pricing from sidebar
         const pricing = window.currentPricingData || {
             totalQuantity: 0,
-            tier: '24-36',
+            tier: '24-47',
             subtotal: 0,
             ltmFee: 0,
             setupFees: printConfig.setupFee,
@@ -4837,7 +4938,7 @@ function generateQuoteText(products, pricing) {
     lines.push('');
     lines.push('------------------------------------------------');
     lines.push(`Total Pieces: ${pricing.totalQuantity || 0}`);
-    lines.push(`Pricing Tier: ${pricing.tier || '24-36'}`);
+    lines.push(`Pricing Tier: ${pricing.tier || '24-47'}`);
     lines.push(`Products Subtotal: $${(pricing.subtotal || 0).toFixed(2)}`);
     lines.push(`Setup Fee (${printConfig.totalScreens} screens): $${(pricing.setupFees || 0).toFixed(2)}`);
     if (pricing.ltmFee > 0) {

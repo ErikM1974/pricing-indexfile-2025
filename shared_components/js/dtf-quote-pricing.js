@@ -178,6 +178,19 @@ class DTFQuotePricing {
         return tier;
     }
 
+    /**
+     * Smallest orderable quantity = the lowest tier's minQuantity from the API
+     * (10 today; Erik can change it in Caspio with no deploy). Hardcoded 10 is
+     * the documented fallback for the not-yet-loaded window only — money gates
+     * run after ensureLoaded(). (expert audit 2026-07-07: the literal 10 was
+     * hardcoded 3× in the builder)
+     */
+    getMinimumQuantity() {
+        const tiers = this.pricingData?.pricingTiers;
+        if (!tiers || !tiers.length) return 10;
+        return Math.min(...tiers.map(t => Number(t.minQuantity) || 10));
+    }
+
     calculateLTMPerUnit(aggregateQuantity) {
         const tierData = this.getTierData(aggregateQuantity);
         const ltmFee = tierData.ltmFee || 0;
@@ -235,213 +248,17 @@ class DTFQuotePricing {
         return this.pricingService.applyRounding(price);
     }
 
-    /**
-     * Calculate unit price for a garment - REQUIRES API DATA
-     * @throws {Error} if API data not loaded
-     */
-    calculateUnitPrice(garmentCost, selectedLocations, aggregateQuantity) {
-        const tierData = this.getTierData(aggregateQuantity);
-        const tierLabel = this.getTierForQuantity(aggregateQuantity);
-        const locationCount = selectedLocations.length;
-
-        // marginDenominator comes from API - no fallback
-        const marginDenominator = tierData.marginDenominator;
-        const garmentWithMargin = garmentCost / marginDenominator;
-
-        const transferBreakdown = this.calculateTransferCosts(selectedLocations, aggregateQuantity);
-        const totalTransferCost = transferBreakdown.total;
-
-        const laborCostPerLoc = this.getLaborCostPerLocation();
-        const totalLaborCost = laborCostPerLoc * locationCount;
-
-        const freightPerTransfer = this.getFreightPerTransfer(aggregateQuantity);
-        const totalFreightCost = freightPerTransfer * locationCount;
-
-        const ltmPerUnit = this.calculateLTMPerUnit(aggregateQuantity);
-
-        const subtotalBeforeRounding =
-            garmentWithMargin +
-            totalTransferCost +
-            totalLaborCost +
-            totalFreightCost +
-            ltmPerUnit;
-
-        const finalUnitPrice = this.applyRounding(subtotalBeforeRounding);
-
-        return {
-            garmentCost,
-            garmentWithMargin,
-            marginDenominator,
-            transferBreakdown,
-            totalTransferCost,
-            laborCostPerLocation: laborCostPerLoc,
-            totalLaborCost,
-            freightPerTransfer,
-            totalFreightCost,
-            ltmFee: tierData.ltmFee || 0,
-            ltmPerUnit,
-            subtotalBeforeRounding,
-            finalUnitPrice,
-            tierLabel,
-            locationCount,
-            hasLTM: ltmPerUnit > 0
-        };
-    }
-
-    calculateProductPricing(product, selectedLocations, aggregateQuantity) {
-        const sizeGroups = [];
-        let productSubtotal = 0;
-        let productQuantity = 0;
-
-        const tierLabel = this.getTierForQuantity(aggregateQuantity);
-        const ltmPerUnit = this.calculateLTMPerUnit(aggregateQuantity);
-
-        const sizesByUpcharge = new Map();
-
-        Object.entries(product.sizeQuantities || {}).forEach(([size, quantity]) => {
-            if (quantity > 0) {
-                const upcharge = product.sizeUpcharges?.[size] || 0;
-                const key = upcharge.toFixed(2);
-
-                if (!sizesByUpcharge.has(key)) {
-                    sizesByUpcharge.set(key, { sizes: {}, quantity: 0, upcharge: upcharge });
-                }
-
-                const group = sizesByUpcharge.get(key);
-                group.sizes[size] = quantity;
-                group.quantity += quantity;
-            }
-        });
-
-        sizesByUpcharge.forEach((group) => {
-            const effectiveCost = product.baseCost + group.upcharge;
-            const pricing = this.calculateUnitPrice(effectiveCost, selectedLocations, aggregateQuantity);
-            const groupTotal = pricing.finalUnitPrice * group.quantity;
-
-            sizeGroups.push({
-                sizes: group.sizes,
-                quantity: group.quantity,
-                baseCost: product.baseCost,
-                sizeUpcharge: group.upcharge,
-                effectiveCost: effectiveCost,
-                unitPrice: pricing.finalUnitPrice,
-                total: groupTotal,
-                pricing: pricing,
-                sizeRange: this.determineSizeRange(Object.keys(group.sizes)[0])
-            });
-
-            productSubtotal += groupTotal;
-            productQuantity += group.quantity;
-        });
-
-        sizeGroups.sort((a, b) => {
-            if (a.sizeRange === 'standard' && b.sizeRange !== 'standard') return -1;
-            if (a.sizeRange !== 'standard' && b.sizeRange === 'standard') return 1;
-            return a.effectiveCost - b.effectiveCost;
-        });
-
-        return {
-            sizeGroups,
-            subtotal: productSubtotal,
-            totalQuantity: productQuantity,
-            tierLabel,
-            ltmPerUnit,
-            hasLTM: ltmPerUnit > 0,
-            selectedLocations
-        };
-    }
-
-    calculateQuoteTotals(products, selectedLocations) {
-        let aggregateQuantity = 0;
-        products.forEach(product => {
-            Object.values(product.sizeQuantities || {}).forEach(qty => {
-                aggregateQuantity += qty || 0;
-            });
-        });
-
-        const tierLabel = this.getTierForQuantity(aggregateQuantity);
-        const tierData = this.getTierData(aggregateQuantity);
-        const ltmPerUnit = this.calculateLTMPerUnit(aggregateQuantity);
-        const totalLtmFee = tierData.ltmFee || 0;
-
-        let quoteSubtotal = 0;
-        const processedProducts = products.map((product) => {
-            const pricing = this.calculateProductPricing(product, selectedLocations, aggregateQuantity);
-            quoteSubtotal += pricing.subtotal;
-            return {
-                ...product,
-                pricing,
-                subtotal: pricing.subtotal,
-                quantity: pricing.totalQuantity,
-                sizeGroups: pricing.sizeGroups.map(g => this.formatSizeGroup(g))
-            };
-        });
-
-        const transferBreakdown = this.calculateTransferCosts(selectedLocations, aggregateQuantity);
-
-        return {
-            products: processedProducts,
-            subtotal: quoteSubtotal,
-            total: quoteSubtotal,
-            totalQuantity: aggregateQuantity,
-            tierLabel,
-            hasLTM: totalLtmFee > 0,
-            ltmFee: totalLtmFee,
-            ltmPerUnit,
-            selectedLocations,
-            locationCount: selectedLocations.length,
-            transferBreakdown,
-            laborCostPerLocation: this.getLaborCostPerLocation(),
-            freightPerTransfer: this.getFreightPerTransfer(aggregateQuantity),
-            marginDenominator: tierData.marginDenominator
-        };
-    }
-
-    formatSizeGroup(group) {
-        const sizeList = Object.entries(group.sizes)
-            .map(([size, qty]) => `${size}(${qty})`)
-            .join(' ');
-
-        const sizes = Object.keys(group.sizes);
-        let label = '';
-
-        if (group.sizeRange === 'standard') {
-            const standardOrder = ['XS', 'S', 'M', 'L', 'XL'];
-            const includedSizes = sizes.filter(s => standardOrder.includes(s));
-
-            if (includedSizes.length === 1) {
-                label = includedSizes[0];
-            } else if (includedSizes.length > 0) {
-                const minIndex = Math.min(...includedSizes.map(s => standardOrder.indexOf(s)));
-                const maxIndex = Math.max(...includedSizes.map(s => standardOrder.indexOf(s)));
-                label = `${standardOrder[minIndex]}-${standardOrder[maxIndex]}`;
-            } else {
-                label = sizeList;
-            }
-        } else {
-            label = sizes.join(', ');
-        }
-
-        return {
-            label,
-            details: sizeList,
-            sizes: group.sizes,
-            quantity: group.quantity,
-            baseCost: group.baseCost,
-            sizeUpcharge: group.sizeUpcharge,
-            effectiveCost: group.effectiveCost,
-            unitPrice: group.unitPrice,
-            total: group.total
-        };
-    }
-
-    determineSizeRange(size) {
-        const standardSizes = ['XS', 'S', 'M', 'L', 'XL'];
-        const extendedSizes = ['2XL', 'XXL', '3XL', '4XL', '5XL', '6XL', '2XLT', '3XLT', '4XLT', 'LT', 'XLT'];
-        if (standardSizes.includes(size)) return 'standard';
-        if (extendedSizes.includes(size)) return 'extended';
-        return 'other';
-    }
+    // calculateUnitPrice() / calculateProductPricing() / calculateQuoteTotals() /
+    // formatSizeGroup() / determineSizeRange() DELETED 2026-07-07 (expert audit).
+    // They margined the size upcharge — effectiveCost = (baseCost + upcharge) /
+    // marginDenominator — while every billed path adds the upcharge AFTER margin
+    // (dtf-quote-builder.js updatePricing()/calculateFromState(); the engine comment
+    // at quote-cart-engine.js ~:804 explicitly forbids this path: it overcharges
+    // 2XL+ by ~$1.70–$6/pc). Zero live callers; the tempting name
+    // calculateQuoteTotals was a standing foot-gun for the next integration.
+    // Compose per-unit DTF pricing from getTierData()/calculateTransferCosts()/
+    // getLaborCostPerLocation()/getFreightPerTransfer()/calculateLTMPerUnit()
+    // with the size upcharge added AFTER margin, like the builder does.
 
     getLocationName(locationCode) {
         const location = DTFConfig.transferLocations.find(l => l.value === locationCode);

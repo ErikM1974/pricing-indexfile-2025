@@ -2903,3 +2903,107 @@ td.size-disabled input {
 }
 
 /* Share/email hover counter-rules moved to shared quote-builder-common.css (2026-06-14). */
+
+/* No-design-number digitizing nudge (expert audit 2026-07-07) — soft hint rendered
+   by updateDigitizingNudges() beside the New-logo-setup checkbox when a logo card
+   has no Design # linked and digitizing is unchecked. */
+.digitizing-nudge {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 8px;
+    padding: 2px 8px;
+    border: 1px dashed var(--qb-state-warn, #f59e0b);
+    border-radius: var(--qb-radius-md, 8px);
+    background: var(--qb-state-warn-bg, #fef3c7);
+    color: var(--pnw-bark, #4b5563);
+    font-size: 11.5px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* "Add to quote" chip on the design badge's extra-color warning (expert audit
+   2026-07-07 F2) — turns the warn-only surcharge into a billable line. */
+.btn-add-extra-colors {
+    border: 1px solid var(--qb-state-warn, #f59e0b);
+    background: var(--pnw-paper, #fff);
+    color: var(--pnw-bark-shadow, #374151);
+    border-radius: 4px;
+    padding: 1px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    vertical-align: 1px;
+}
+.btn-add-extra-colors:hover { background: var(--qb-state-warn, #f59e0b); color: #fff; }
+.btn-add-extra-colors:focus-visible { outline: 2px solid var(--builder-primary, #2e5827); outline-offset: 1px; }
+
+/* Monogram/Name-Number names dialog (expert audit 2026-07-07 F6) */
+.monogram-names-dialog {
+    position: fixed;
+    inset: 0;
+    background: rgba(31, 41, 55, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10050;
+}
+.monogram-names-dialog .mnd-card {
+    background: var(--pnw-paper, #fff);
+    border-radius: var(--qb-radius-md, 8px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.22);
+    padding: 18px 20px;
+    width: min(440px, calc(100vw - 32px));
+}
+.monogram-names-dialog .mnd-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--pnw-forest-deep, #1f4922);
+    margin-bottom: 4px;
+}
+.monogram-names-dialog .mnd-hint {
+    font-size: 12px;
+    color: var(--pnw-stone, #6b7280);
+    margin-bottom: 10px;
+}
+.monogram-names-dialog .mnd-names {
+    width: 100%;
+    border: 1px solid var(--pnw-rule, #d1d5db);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 13px;
+    resize: vertical;
+    box-sizing: border-box;
+}
+.monogram-names-dialog .mnd-names:focus-visible {
+    outline: none;
+    border-color: var(--pnw-forest, #2e5827);
+    box-shadow: var(--pnw-glow-focus, 0 0 0 3px rgba(46, 88, 39, 0.2));
+}
+.monogram-names-dialog .mnd-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 12px;
+}
+.monogram-names-dialog .mnd-skip {
+    border: 1px solid var(--pnw-rule, #d1d5db);
+    background: transparent;
+    color: var(--pnw-stone, #6b7280);
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.monogram-names-dialog .mnd-apply {
+    border: 1px solid var(--pnw-forest, #2e5827);
+    background: var(--pnw-forest, #2e5827);
+    color: #fff;
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.monogram-names-dialog .mnd-apply:hover { background: var(--pnw-forest-deep, #1f4922); }
+.monogram-names-dialog button:focus-visible { outline: 2px solid var(--pnw-forest, #2e5827); outline-offset: 1px; }

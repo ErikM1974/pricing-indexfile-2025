@@ -1574,12 +1574,26 @@ function updatePerUnitPrice(productsSubtotal, totalPieces) {
 // ============================================
 
 /**
+ * Shared email format check (expert audit 2026-07-07). EMB/DTF validated at save
+ * while SCP presence-checked only, and emailQuote() accepted any shape — EmailJS
+ * "sends" to malformed addresses without error, so a typo surfaced days later as
+ * a customer "I never got it" call. One regex, every surface (Rule 8).
+ */
+function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email || '').trim());
+}
+
+/**
  * Send a quote email to the customer via EmailJS.
  * @param {object} options - { quoteId, customerEmail, customerName, salesRepEmail, quoteUrl }
  */
 async function emailQuote(options = {}) {
     if (!options.customerEmail) {
         showToast('Please enter customer email before sending', 'error');
+        return false;
+    }
+    if (!isValidEmail(options.customerEmail)) {
+        showToast('Customer email looks invalid — please correct it before sending', 'error');
         return false;
     }
     if (!options.quoteId) {

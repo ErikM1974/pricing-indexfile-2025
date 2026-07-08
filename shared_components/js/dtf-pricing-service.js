@@ -213,52 +213,52 @@ class DTFPricingService {
     }
 
     /**
-     * Build transfer sizes structure from API data
+     * Build transfer sizes structure from API data — DATA-DRIVEN (expert audit
+     * 2026-07-07). The old version hardcoded exactly three size entries and a
+     * literal sizeMap, so a NEW Caspio size row (e.g. an oversize 'Up to 13" x
+     * 19"') was silently dropped and could never be quoted. The three known
+     * sizes keep their legacy keys (locationConfig/DTFConfig reference them);
+     * unknown sizes build their own entry from the API row, no deploy needed.
      */
     buildTransferSizes(dtfCosts) {
-        const sizes = {
-            'small': {
-                name: 'Up to 5" x 5"',
-                displayName: 'Small (Up to 5" x 5")',
-                maxWidth: 5,
-                maxHeight: 5,
-                pricingTiers: []
-            },
-            'medium': {
-                name: 'Up to 9" x 12"',
-                displayName: 'Medium (Up to 9" x 12")',
-                maxWidth: 9,
-                maxHeight: 12,
-                pricingTiers: []
-            },
-            'large': {
-                name: 'Up to 12" x 16.5"',
-                displayName: 'Large (Up to 12" x 16.5")',
-                maxWidth: 12,
-                maxHeight: 16.5,
-                pricingTiers: []
-            }
-        };
-
-        // Map API sizes to our size keys
+        // Legacy keys stay stable for existing location mappings
         const sizeMap = {
             'Up to 5" x 5"': 'small',
             'Up to 9" x 12"': 'medium',
             'Up to 12" x 16.5"': 'large'
         };
+        const legacyDisplay = { small: 'Small', medium: 'Medium', large: 'Large' };
+        const sizes = {};
 
-        // Process each cost record
-        dtfCosts.forEach(cost => {
-            const sizeKey = sizeMap[cost.size];
-            if (sizeKey && sizes[sizeKey]) {
-                sizes[sizeKey].pricingTiers.push({
-                    minQty: cost.min_quantity,
-                    maxQty: cost.max_quantity,
-                    unitPrice: cost.unit_price,
-                    range: cost.quantity_range,
-                    laborCost: cost.PressingLaborCost
-                });
+        const keyFor = (apiName) => sizeMap[apiName]
+            || String(apiName || '').toLowerCase().replace(/[^a-z0-9.]+/g, '-').replace(/^-+|-+$/g, '');
+
+        (dtfCosts || []).forEach(cost => {
+            const key = keyFor(cost.size);
+            if (!key) return;
+            if (!sizes[key]) {
+                // Parse `Up to W" x H"` for dimension metadata on any size
+                const m = /([\d.]+)"\s*x\s*([\d.]+)"/i.exec(String(cost.size || ''));
+                sizes[key] = {
+                    name: cost.size,
+                    displayName: legacyDisplay[key]
+                        ? `${legacyDisplay[key]} (${cost.size})`
+                        : String(cost.size),
+                    maxWidth: m ? parseFloat(m[1]) : null,
+                    maxHeight: m ? parseFloat(m[2]) : null,
+                    pricingTiers: []
+                };
+                if (!legacyDisplay[key]) {
+                    console.info(`[DTFPricingService] New Caspio transfer size detected: "${cost.size}" → key "${key}"`);
+                }
             }
+            sizes[key].pricingTiers.push({
+                minQty: cost.min_quantity,
+                maxQty: cost.max_quantity,
+                unitPrice: cost.unit_price,
+                range: cost.quantity_range,
+                laborCost: cost.PressingLaborCost
+            });
         });
 
         // Sort pricing tiers by minQty

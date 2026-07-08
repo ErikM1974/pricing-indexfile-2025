@@ -137,6 +137,12 @@
                                         <option value="Left Chest" selected>Left Chest</option>
                                         <option value="Right Chest">Right Chest</option>
                                         <option value="Center Chest">Center Chest</option>
+                                        <!-- Sleeve/nape options (expert audit 2026-07-07): position is production
+                                             metadata (only stitch tier prices it), but sleeve-primary workwear was
+                                             being labeled "Left Chest" or mis-priced as an Additional Logo. -->
+                                        <option value="Left Sleeve">Left Sleeve</option>
+                                        <option value="Right Sleeve">Right Sleeve</option>
+                                        <option value="Back Yoke">Back of Neck / Yoke</option>
                                         <option value="Full Back">Full Back (25K min)</option>
                                     </select>
                                 </div>
@@ -155,13 +161,17 @@
                                            min="25000" max="100000" step="1000"
                                            oninput="onFullBackStitchCountChange()">
                                 </div>
-                                <div class="digitizing-checkbox" style="display:none;" onclick="toggleDigitizingCheckbox(this, 'primary-digitizing')" tabindex="0" role="button" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
+                                <!-- Visible again 2026-07-07 (expert audit): this was display:none with no JS
+                                     unhide, so the $100 new-logo-setup decision was invisible at the moment the
+                                     logo is configured — the classic new-CSR under-quote, and an imported quote's
+                                     engine-set digitizing fee had no visible control to audit/uncheck. -->
+                                <div class="digitizing-checkbox" onclick="toggleDigitizingCheckbox(this, 'primary-digitizing')" tabindex="0" role="button" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
                                     <input type="checkbox" id="primary-digitizing">
                                     <div class="digitizing-checkbox-indicator">
                                         <i class="fas fa-check"></i>
                                     </div>
                                     <span class="digitizing-checkbox-label" title="Digitizing — converting the art into a stitch file. One-time charge per new logo; skip it if we've embroidered this logo before.">New-logo setup</span>
-                                    <span class="digitizing-checkbox-price">$100</span>
+                                    <span class="digitizing-checkbox-price" data-dd-price>$100</span>
                                 </div>
                                 <!-- Vertical divider -->
                                 <div class="logo-form-divider"></div>
@@ -246,13 +256,13 @@
                                             <option value="18000">Large +$10/pc (15-25K)</option>
                                         </select>
                                     </div>
-                                    <div class="digitizing-checkbox" style="display:none;" onclick="toggleDigitizingCheckbox(this, 'cap-primary-digitizing')" tabindex="0" role="button" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
+                                    <div class="digitizing-checkbox" onclick="toggleDigitizingCheckbox(this, 'cap-primary-digitizing')" tabindex="0" role="button" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
                                         <input type="checkbox" id="cap-primary-digitizing">
                                         <div class="digitizing-checkbox-indicator">
                                             <i class="fas fa-check"></i>
                                         </div>
-                                        <span class="digitizing-checkbox-label">Digitizing</span>
-                                        <span class="digitizing-checkbox-price">$100</span>
+                                        <span class="digitizing-checkbox-label" title="Digitizing — converting the art into a stitch file. One-time charge per new logo; skip it if we've embroidered this logo before.">New-logo setup</span>
+                                        <span class="digitizing-checkbox-price" data-dd-price>$100</span>
                                     </div>
                                     <!-- Vertical divider -->
                                     <div class="logo-form-divider"></div>
@@ -625,7 +635,7 @@
                             <label class="it-tax-label">
                                 <input type="checkbox" id="include-tax" checked onchange="updateTaxCalculation()">
                                 <span id="tax-label">Sales Tax</span>
-                                <input type="number" id="tax-rate-input" value="10.1" min="0" max="20" step="0.1" aria-label="Sales tax rate (percent)"
+                                <input type="number" id="tax-rate-input" value="10.2" min="0" max="20" step="0.1" aria-label="Sales tax rate (percent)"
                                        class="it-tax-rate" onchange="updateTaxCalculation()" onclick="event.stopPropagation()">
                                 <span>%</span>
                             </label>

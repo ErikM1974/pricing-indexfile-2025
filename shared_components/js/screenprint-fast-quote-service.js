@@ -4,7 +4,7 @@
  */
 class ScreenPrintFastQuoteService {
     constructor() {
-        this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        this.baseURL = window.APP_CONFIG?.API?.BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
         this.quotePrefix = 'SPC';  // Screen Print Contract
         this.emailjsServiceId = 'service_jgrave3';
         this.emailjsPublicKey = '4qSbDO-SQs19TbP80';
@@ -18,41 +18,29 @@ class ScreenPrintFastQuoteService {
     }
 
     /**
-     * Generate unique quote ID
-     * Format: SPC[MMDD]-[sequence]
+     * Generate unique quote ID using the Caspio-backed sequence counter
+     * (format SPC-2026-001; resets annually, persists across sessions/browsers).
+     * The old sessionStorage daily counter restarted at 1 per browser AND ran
+     * independently of the main builder's counter, so fast-quote and builder
+     * quotes could collide on the same day. (expert audit 2026-07-07)
      */
-    generateQuoteID() {
-        const now = new Date();
-        const month = (now.getMonth() + 1).toString().padStart(2, '0');
-        const day = now.getDate().toString().padStart(2, '0');
-        const dateKey = `${month}${day}`;
-
-        // Daily sequence using sessionStorage
-        const storageKey = `spc_fast_quote_sequence_${dateKey}`;
-        let sequence = parseInt(sessionStorage.getItem(storageKey) || '0') + 1;
-        sessionStorage.setItem(storageKey, sequence.toString());
-
-        // Clean up old sequences (older than today)
-        this.cleanupOldSequences(dateKey);
-
-        return `${this.quotePrefix}${dateKey}-${sequence}`;
-    }
-
-    /**
-     * Clean up old sequence keys from sessionStorage
-     */
-    cleanupOldSequences(currentDateKey) {
+    async generateQuoteID() {
         try {
-            const keysToRemove = [];
-            for (let i = 0; i < sessionStorage.length; i++) {
-                const key = sessionStorage.key(i);
-                if (key && key.startsWith('spc_fast_quote_sequence_') && !key.includes(currentDateKey)) {
-                    keysToRemove.push(key);
-                }
-            }
-            keysToRemove.forEach(key => sessionStorage.removeItem(key));
+            const response = await fetch(`${this.baseURL}/api/quote-sequence/${this.quotePrefix}`);
+            if (!response.ok) throw new Error(`API returned ${response.status}`);
+            const { prefix, year, sequence } = await response.json();
+            return `${prefix}-${year}-${String(sequence).padStart(3, '0')}`;
         } catch (error) {
-            console.error('[FastQuoteService] Cleanup error:', error);
+            // Visible fallback (Erik's #1 rule) — random suffix, NOT a per-browser counter
+            console.warn('[FastQuoteService] Quote sequence API failed, using fallback:', error);
+            if (typeof showToast === 'function') {
+                showToast('Quote numbering service unreachable — using a temporary quote # (format SPCmmdd-nnnn).', 'warning', 6000);
+            }
+            const now = new Date();
+            const month = (now.getMonth() + 1).toString().padStart(2, '0');
+            const day = now.getDate().toString().padStart(2, '0');
+            const sequence = Math.floor(Math.random() * 9000) + 1000;
+            return `${this.quotePrefix}${month}${day}-${sequence}`;
         }
     }
 
@@ -61,7 +49,7 @@ class ScreenPrintFastQuoteService {
      */
     async submitQuote(formData) {
         try {
-            const quoteId = this.generateQuoteID();
+            const quoteId = await this.generateQuoteID();  // async now (server sequence)
             console.log('[FastQuoteService] Submitting quote:', quoteId);
 
             // Save to database

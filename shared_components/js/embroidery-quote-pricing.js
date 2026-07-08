@@ -789,11 +789,15 @@ class EmbroideryPricingCalculator {
                 patchUpcharge: patchUpcharge,  // Track patch upcharge for display
                 embellishmentType: embellishmentType,  // Track embellishment type
                 alCost: 0,
-                total: roundedBase * qty,  // Use base price for line total (extra stitches shown separately)
+                // finalPrice (base + SIZE upcharge) × qty — extra STITCHES stay a separate
+                // AS-CAP line, but the size upcharge was in unitPrice while totals used
+                // roundedBase, so unit × qty ≠ total and sized caps under-billed the
+                // upcharge. (expert audit 2026-07-07; mirrors the garment path)
+                total: finalPrice * qty,
                 isCap: true
             });
 
-            lineSubtotal += roundedBase * qty;  // CHANGED: Use base price for subtotal (extra stitches shown separately)
+            lineSubtotal += finalPrice * qty;  // size upcharge included (extra stitches still shown separately)
         }
 
         return {

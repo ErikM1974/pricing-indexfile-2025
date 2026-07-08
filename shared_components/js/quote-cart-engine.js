@@ -682,7 +682,8 @@
                 tierLabel = labelRow ? labelRow.label : (tierRow.minQty + '-' + tierRow.maxQty);
             }
 
-            // LTM from the MATCHED tier row (extends to 71 pcs — $50 at 48!).
+            // LTM from the MATCHED tier row (Caspio charges $50 through the 24-47
+            // tier; 48-71 and up carry LTM_Fee 0 — verified vs scp-bundle fixture 2026-07-07).
             if (ltmFee === null) ltmFee = Number(tierRow.ltmFee) || 0;
 
             // Back/additional location: matrix price is pre-margined in Caspio,

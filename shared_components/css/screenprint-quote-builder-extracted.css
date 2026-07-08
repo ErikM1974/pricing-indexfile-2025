@@ -781,3 +781,43 @@ td.size-disabled input {
     .safety-stripes-example img { transition: none; }
     .safety-stripes-example:hover img { transform: none; }
 }
+
+/* Dark-garment underbase nudge chip (expert audit 2026-07-07) — rendered by
+   updateDarkGarmentNudge() when product rows contain dark colors while the
+   underbase toggle is off. Non-blocking reminder; rep can Enable or dismiss. */
+.dark-garment-nudge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 8px;
+    padding: 3px 10px;
+    border: 1px solid var(--qb-state-warn, #f59e0b);
+    border-radius: var(--qb-radius-md, 8px);
+    background: var(--qb-state-warn-bg, #fef3c7);
+    color: var(--pnw-bark, #4b5563);
+    font-size: 12px;
+    font-weight: 600;
+}
+.dark-garment-nudge .fa-exclamation-triangle { color: var(--qb-state-warn, #f59e0b); }
+.dark-garment-nudge-apply {
+    border: 1px solid var(--qb-state-warn, #f59e0b);
+    background: var(--pnw-paper, #fff);
+    color: var(--pnw-bark-shadow, #374151);
+    border-radius: 4px;
+    padding: 1px 8px;
+    font-size: 11.5px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.dark-garment-nudge-apply:hover { background: var(--qb-state-warn, #f59e0b); color: #fff; }
+.dark-garment-nudge-apply:focus-visible { outline: 2px solid var(--builder-primary, #2e5827); outline-offset: 1px; }
+.dark-garment-nudge-dismiss {
+    border: 0;
+    background: transparent;
+    color: var(--pnw-stone, #6b7280);
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 2px;
+}
+.dark-garment-nudge-dismiss:focus-visible { outline: 2px solid var(--builder-primary, #2e5827); outline-offset: 1px; }

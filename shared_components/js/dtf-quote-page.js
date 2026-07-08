@@ -184,70 +184,10 @@ function updateAdditionalCharges() {
     updateTaxCalculation();
 }
 
-function updateDiscountType() {
-    const discountType = document.getElementById('discount-type')?.value;
-    const prefix = document.getElementById('discount-prefix');
-    const inputWrapper = document.getElementById('discount-input-wrapper');
-    const presetDropdown = document.getElementById('discount-preset');
-    const amountInput = document.getElementById('discount-amount');
-
-    if (discountType === 'percent') {
-        // Show preset dropdown, hide number input
-        if (inputWrapper) inputWrapper.style.display = 'none';
-        if (presetDropdown) presetDropdown.style.display = 'block';
-        // Set amount from preset (unless custom is selected)
-        if (presetDropdown && presetDropdown.value !== 'custom') {
-            if (amountInput) amountInput.value = presetDropdown.value;
-        }
-    } else {
-        // Show number input, hide preset dropdown
-        if (inputWrapper) inputWrapper.style.display = 'flex';
-        if (presetDropdown) presetDropdown.style.display = 'none';
-        if (prefix) prefix.textContent = '$';
-    }
-
-    updateAdditionalCharges();
-}
-
-function handleDiscountPresetChange() {
-    const preset = document.getElementById('discount-preset')?.value;
-    const inputWrapper = document.getElementById('discount-input-wrapper');
-    const amountInput = document.getElementById('discount-amount');
-    const prefix = document.getElementById('discount-prefix');
-
-    if (preset === 'custom') {
-        // Show number input for custom entry
-        if (inputWrapper) inputWrapper.style.display = 'flex';
-        if (prefix) prefix.textContent = '%';
-        if (amountInput) amountInput.focus();
-    } else {
-        // Use preset value
-        if (inputWrapper) inputWrapper.style.display = 'none';
-        if (amountInput) amountInput.value = preset;
-    }
-    updateFeeTableRows();
-}
-
-function handleDiscountReasonPresetChange() {
-    const preset = document.getElementById('discount-reason-preset')?.value;
-    const customInput = document.getElementById('discount-reason');
-
-    if (preset === 'custom') {
-        // Show custom input and focus it
-        if (customInput) {
-            customInput.style.display = 'block';
-            customInput.value = '';
-            customInput.focus();
-        }
-    } else {
-        // Hide custom input and use preset value
-        if (customInput) {
-            customInput.style.display = 'none';
-            customInput.value = preset;
-        }
-    }
-    updateFeeTableRows();
-}
+// updateDiscountType()/handleDiscountPresetChange()/handleDiscountReasonPresetChange()
+// DELETED 2026-07-07 (expert audit): the DTF discount UI was removed 2026-03-23, so
+// these page-local copies had zero references in dtf-quote-builder.html and only
+// shadowed the shared quote-builder-utils.js versions that EMB/SCP still use.
 
 // ============================================
 // TAX LOOKUP & SHIPPING FUNCTIONS
