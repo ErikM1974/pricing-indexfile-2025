@@ -149,7 +149,7 @@ Detailed sync manifest lives in **[.claude/rules/quote-builders.md](.claude/rule
 When adding endpoints or rendering user data:
 - **SQL injection**: use `sanitizeFilterInput()` for Caspio filter params.
 - **XSS**: use `escapeHTML()` when rendering external/user data via `innerHTML`.
-- **CORS**: update `ALLOWED_ORIGINS` in server.js for new domains.
+- **CORS**: EXACT-match allowlist in `lib/cors-allowlist.js` (or `CORS_ALLOWED_ORIGINS` env — no deploy needed) — never substring/wildcard matching (roadmap 1.2, jest-locked).
 - **Rate limit**: sensitive endpoints use `strictLimiter`.
 - **🔐 Staff RBAC = two Caspio tables (Erik-editable, no deploy)**: `Staff_App_Roles` (Email→Role: admin/accountant/sales/art/shipping/production/staff) drives `permissionsFromRole()` at SAML login; `Staff_Page_Access` (Page→Allowed_Roles/Allowed_Emails) gates `/dashboards/*.html` via the table-driven middleware (admin override; unlisted=any-staff). **When you build a NEW staff dashboard page that should be RESTRICTED, add a `Staff_Page_Access` row** (else it defaults to any logged-in staff). Detail → [memory/STAFF_AUTH_DESIGN.md](memory/STAFF_AUTH_DESIGN.md).
 

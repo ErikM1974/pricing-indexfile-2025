@@ -9,6 +9,9 @@ const stripe = require('stripe');
 const rateLimit = require('express-rate-limit');
 const cookieSession = require('cookie-session');
 const crypto = require('crypto');
+const helmet = require('helmet');
+// CORS exact-match allowlist (roadmap 1.2) — jest-locked in tests/unit/cors-origin-allowlist.test.js
+const { buildAllowlist, isOriginAllowed } = require('./lib/cors-allowlist');
 
 // 3-Day Tees shared modules — the SAME files the browser loads, so the
 // server-side authoritative reprice + binding ship-date stamp can never
@@ -52,7 +55,10 @@ dotenv.config();
 //
 // INFRASTRUCTURE
 //   L17   Security: Input sanitization (sanitizeFilterInput, isValidIdentifier)
-//   L67   Security: CORS configuration
+//   L67   Security: helmet headers + CSP report-only (roadmap 1.1)
+//   L67   Security: CORS exact-match allowlist (lib/cors-allowlist.js, roadmap 1.2)
+//   ~L520 Health/observability: GET /healthz, GET /readyz (pricing-proxy probe),
+//         GET /api/version, POST /api/csp-report (roadmap 1.11/1.1)
 //   L146  Session management (cookie-session — durable across deploys, #8)
 //   L166  Rate limiting (apiLimiter, strictLimiter)
 //   L414  Body parsing (JSON, urlencoded)
@@ -384,40 +390,128 @@ if (process.env.ENABLE_MONITORING === 'true') {
 }
 
 // =============================================================================
-// SECURITY: CORS Configuration
+// SECURITY: HTTP security headers (helmet — roadmap 1.1)
 // =============================================================================
-const ALLOWED_ORIGINS = [
-  'https://nwcustom.caspio.com',
-  'https://c2aby672.caspio.com',
-  'https://www.teamnwca.com',
-  'https://teamnwca.com',
-  /\.herokuapp\.com$/,      // Heroku apps
-  /localhost:\d+$/,         // Local development
-  /127\.0\.0\.1:\d+$/       // Local IP
-];
+// Mounted at the very top of the middleware stack so every response (static
+// files included) carries them. CSP runs REPORT-ONLY for now: violations
+// POST to /api/csp-report (logged, never enforced) until the report stream
+// is quiet, then the policy flips to enforcing. frameguard (X-Frame-Options)
+// stays OFF until then too — frame-ancestors in the report-only CSP collects
+// the data on who legitimately embeds us without breaking them today.
+const CSP_DIRECTIVES = {
+  defaultSrc: ["'self'"],
+  // Target policy: NO 'unsafe-inline' scripts (Top-9 Rule 3 bans inline JS).
+  // Report-only violations tell us which legacy pages still cheat before we enforce.
+  scriptSrc: [
+    "'self'",
+    'https://cdnjs.cloudflare.com',
+    'https://cdn.jsdelivr.net',
+    'https://unpkg.com',
+    'https://form.jotform.com',
+    // Caspio DataPage embed loaders (staff dashboards / legacy pages)
+    'https://c3eku948.caspio.com',
+    'https://c2aby672.caspio.com',
+    'https://nwcustom.caspio.com',
+  ],
+  // 'unsafe-inline' styles stay until the 368 inline style="" migrate (1.7/3.7)
+  styleSrc: [
+    "'self'",
+    "'unsafe-inline'",
+    'https://fonts.googleapis.com',
+    'https://cdnjs.cloudflare.com',
+    'https://cdn.jsdelivr.net',
+    'https://cdn.caspio.com',
+  ],
+  fontSrc: ["'self'", 'data:', 'https://fonts.gstatic.com', 'https://cdnjs.cloudflare.com', 'https://cdn.jsdelivr.net'],
+  imgSrc: [
+    "'self'",
+    'data:',
+    'blob:',
+    'https://cdn.caspio.com',
+    // Caspio DataPage file storage (/dp/.../files/N) — homepage hero/product
+    // images live there (first real catch from the report-only stream).
+    'https://c3eku948.caspio.com',
+    'https://c2aby672.caspio.com',
+    'https://nwcustom.caspio.com',
+    'https://cdnm.sanmar.com',
+    'https://cdni.sanmar.com',
+    'https://www.sanmar.com',
+    'https://northwestcustomapparel.box.com',
+    'https://*.boxcloud.com',
+    'https://via.placeholder.com',
+    'https://images.squarespace-cdn.com',
+  ],
+  connectSrc: [
+    "'self'",
+    CASPIO_PROXY_BASE,
+    'https://api.emailjs.com',
+    'https://c3eku948.caspio.com',
+    'https://c2aby672.caspio.com',
+    'https://nwcustom.caspio.com',
+  ],
+  frameSrc: [
+    "'self'",
+    // Embedded Caspio DataPages, Box previews, Jotform, YouTube how-tos
+    'https://c3eku948.caspio.com',
+    'https://c2aby672.caspio.com',
+    'https://nwcustom.caspio.com',
+    'https://northwestcustomapparel.box.com',
+    'https://app.box.com',
+    'https://www.jotform.com',
+    'https://form.jotform.com',
+    'https://www.youtube.com',
+  ],
+  frameAncestors: ["'self'"],
+  objectSrc: ["'none'"],
+  baseUri: ["'self'"],
+  reportUri: ['/api/csp-report'],
+};
 
-function isOriginAllowed(origin) {
-  if (!origin) return true; // Allow same-origin requests
-  return ALLOWED_ORIGINS.some(allowed => {
-    if (allowed instanceof RegExp) {
-      return allowed.test(origin);
-    }
-    return origin === allowed || origin.endsWith(allowed);
-  });
-}
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: CSP_DIRECTIVES,
+      reportOnly: true,
+    },
+    // Enforced X-Frame-Options would break legit embedders TODAY with zero
+    // violation data; frame-ancestors (report-only, above) gathers it first.
+    frameguard: false,
+    // Our images/JS are consumed cross-origin (Caspio DataPages load
+    // /api/cart-integration.js; teamnwca.com hotlinks assets) — 'same-origin'
+    // (helmet's default) would silently break them.
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    crossOriginEmbedderPolicy: false,
+    strictTransportSecurity: { maxAge: 15552000, includeSubDomains: false }, // 180 days
+    referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
+  })
+);
+
+// =============================================================================
+// SECURITY: CORS Configuration (roadmap 1.2 — exact-match allowlist)
+// =============================================================================
+// Matching logic lives in lib/cors-allowlist.js (jest-locked). NO substring/
+// endsWith matching, NO *.herokuapp.com wildcard, and Allow-Credentials is
+// only ever paired with a specific echoed origin — never '*'. Add origins
+// without a deploy via the CORS_ALLOWED_ORIGINS env var (comma-separated).
+const ALLOWED_ORIGINS = buildAllowlist();
 
 // CORS middleware - MUST be before other middleware
 app.use((req, res, next) => {
   const origin = req.headers.origin;
 
-  if (isOriginAllowed(origin)) {
-    res.header('Access-Control-Allow-Origin', origin || '*');
+  // Responses differ by Origin — caches must key on it (poisoning guard).
+  // res.vary() APPENDS (compression() adds Accept-Encoding later; both survive).
+  res.vary('Origin');
+
+  if (isOriginAllowed(origin, { allowlist: ALLOWED_ORIGINS })) {
+    res.header('Access-Control-Allow-Origin', origin);
+    res.header('Access-Control-Allow-Credentials', 'true');
   }
-  // If origin not allowed, don't set the header (browser will block)
+  // If origin not allowed (or absent — same-origin/server-to-server needs no
+  // CORS), don't set the headers; the browser blocks cross-origin reads.
 
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  res.header('Access-Control-Allow-Credentials', 'true');
 
   // Handle preflight requests
   if (req.method === 'OPTIONS') {
@@ -426,6 +520,71 @@ app.use((req, res, next) => {
 
   next();
 });
+
+// =============================================================================
+// HEALTH & OBSERVABILITY ROUTES (roadmap 1.11) — registered before the /api
+// rate limiter so a violation storm or aggressive monitor can't starve them.
+// =============================================================================
+const SERVER_STARTED_AT = Date.now();
+// Populated when Heroku dyno metadata is enabled (heroku labs:enable runtime-dyno-metadata)
+const RELEASE_SHA_FULL = process.env.HEROKU_SLUG_COMMIT || null;
+const RELEASE_SHA = RELEASE_SHA_FULL ? RELEASE_SHA_FULL.slice(0, 7) : null;
+const RELEASE_VERSION = process.env.HEROKU_RELEASE_VERSION || null;
+
+// Liveness: is the process up at all. Cheap, no dependencies.
+app.get('/healthz', (req, res) => {
+  res.json({
+    status: 'ok',
+    release: RELEASE_VERSION,
+    sha: RELEASE_SHA,
+    uptimeSeconds: Math.round((Date.now() - SERVER_STARTED_AT) / 1000),
+  });
+});
+
+// Readiness: can this app actually PRICE quotes right now. Probes the pricing
+// proxy with a 2s timebox; 503 makes "pricing API down" externally monitorable
+// (Erik's #1 rule: a dead pricing dependency must be loud, never silent).
+app.get('/readyz', async (req, res) => {
+  try {
+    const probe = await fetch(`${CASPIO_PROXY_BASE}/api/service-codes`, { timeout: 2000 });
+    if (!probe.ok) throw new Error(`pricing proxy responded ${probe.status}`);
+    res.json({ status: 'ready', pricingApi: 'ok' });
+  } catch (err) {
+    console.error('[readyz] pricing API unreachable:', err.message);
+    res.status(503).json({ status: 'not-ready', pricingApi: 'unreachable', error: err.message });
+  }
+});
+
+// Exact release identification — the deploy skill's live-verify (step 14a)
+// prefers this over scraping ?v= from HTML.
+app.get('/api/version', (req, res) => {
+  res.json({ sha: RELEASE_SHA, fullSha: RELEASE_SHA_FULL, release: RELEASE_VERSION });
+});
+
+// CSP violation intake (roadmap 1.1 — report-only phase). Own tiny limiter so
+// a noisy page can't eat the shared /api budget; logs a compact single line.
+const cspReportLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 100, standardHeaders: false, legacyHeaders: false });
+app.post(
+  '/api/csp-report',
+  cspReportLimiter,
+  express.json({ type: () => true, limit: '50kb' }), // browsers send application/csp-report, not application/json
+  (req, res) => {
+    try {
+      const r = (req.body && (req.body['csp-report'] || req.body)) || {};
+      console.warn(
+        '[CSP-Report]',
+        JSON.stringify({
+          doc: r['document-uri'] || r.documentURL || null,
+          directive: r['violated-directive'] || r.effectiveDirective || null,
+          blocked: r['blocked-uri'] || r.blockedURL || null,
+        }).slice(0, 500)
+      );
+    } catch (_) {
+      // never let a malformed report 500
+    }
+    res.sendStatus(204);
+  }
+);
 
 // Force HTTPS in production (Heroku)
 app.use((req, res, next) => {
