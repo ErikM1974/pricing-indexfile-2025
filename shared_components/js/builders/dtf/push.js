@@ -147,6 +147,7 @@ export function renderDtfPushPreview(o) {
         html += '<div style="margin-top:10px; padding:8px 10px; background:#fffbeb; border:1px solid #fde68a; border-radius:6px; font-size:12px; color:#92400e;">' +
             '<i class="fas fa-exclamation-triangle"></i> No design linked — a rep must assign the design in ShopWorks.</div>';
     }
+    // eslint-disable-next-line no-unsanitized/property -- audited (1.4): preview html built above with _dtfEsc on every dynamic value
     previewEl.innerHTML = html;
 }
 

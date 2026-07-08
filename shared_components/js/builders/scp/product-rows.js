@@ -105,6 +105,7 @@ function showSearchSuggestions(products) {
         return;
     }
 
+    // eslint-disable-next-line no-unsanitized/property -- audited (1.4): map rows escapeHtml every value (stage-1 fix; rule cannot trace map/join chains)
     suggestions.innerHTML = products.map(product => {
         // Extract product name (remove style prefix from label)
         const productName = (product.label || '').split(' - ').slice(1).join(' - ') || '';
@@ -171,6 +172,7 @@ export function addNewRow() {
     row.className = 'new-row';
     row.dataset.rowId = rowId;
 
+    // eslint-disable-next-line no-unsanitized/property -- audited (1.4): interpolations escapeHtml-wrapped or numeric at build
     row.innerHTML = `
         <td>
             <input type="text" class="cell-input style-input"
@@ -304,6 +306,7 @@ export async function onStyleChange(input, rowId) {
 
             if (colors && colors.length > 0) {
                 // Populate custom color picker dropdown with swatches
+                // eslint-disable-next-line no-unsanitized/property -- audited (1.4): COLOR_NAME/CATALOG_COLOR escapeHtml-wrapped; swatch via hardened getSwatchStyle (C32)
                 pickerDropdown.innerHTML = colors.map(c => `
                     <div class="color-picker-option"
                          data-color-name="${escapeHtml(c.COLOR_NAME)}"
@@ -1671,10 +1674,13 @@ export function createChildRow(parentRowId, size, qty) {
         </div>`
     ).join('');
 
-    // Build current color display
-    const currentSwatchStyle = parentSwatchUrl
-        ? `background-image: url('${parentSwatchUrl}'); background-size: cover; background-position: center;`
-        : `background-color: ${parentHex};`;
+    // Build current color display — sanitize before interpolating into style="" (CSS/attribute
+    // breakout); ports EMB's hardened block (review C32) that never synced here (1.4 audit).
+    const _swUrl = String(parentSwatchUrl || '').replace(/["'()\\\s]/g, '');
+    const _swHex = (parentHex && /^#[0-9a-fA-F]{3,8}$/.test(parentHex)) ? parentHex : '#ccc';
+    const currentSwatchStyle = /^https?:\/\//i.test(_swUrl)
+        ? `background-image: url('${_swUrl}'); background-size: cover; background-position: center;`
+        : `background-color: ${_swHex};`;
 
     const childRow = document.createElement('tr');
     childRow.id = `row-${childRowId}`;
@@ -1711,6 +1717,7 @@ export function createChildRow(parentRowId, size, qty) {
     }
 
     // Create cell content - only the specific size column is editable
+    // eslint-disable-next-line no-unsanitized/property -- audited (1.4): colorOptionsHtml escapes colors (C32); sanitized swatch (C32 port); size codes internal; qty numeric
     childRow.innerHTML = `
         <td>
             <span class="child-indicator">└</span>

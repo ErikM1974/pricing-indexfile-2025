@@ -123,6 +123,7 @@ export function showServicePricingReview(serviceItems, productItems, embConfigOp
                 pHtml += `</tbody></table></div></div>`;
             });
 
+            // eslint-disable-next-line no-unsanitized/property -- audited (1.4): numeric prices/indices + internal enums; typeUpper escapeHtml-wrapped
             productsContainer.innerHTML = pHtml;
         } else {
             productsSection.style.display = 'none';
@@ -225,11 +226,13 @@ export function showServicePricingReview(serviceItems, productItems, embConfigOp
                 const warningDiv = document.createElement('div');
                 warningDiv.id = 'spr-delta-warning';
                 warningDiv.className = 'spr-delta-warning';
-                warningDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> <span>${issueCount} service item${issueCount > 1 ? 's have' : ' has'} significant price differences from 2026 pricing</span>`;
+                // eslint-disable-next-line no-unsanitized/property -- audited (1.4): numeric prices/indices + internal enums; typeUpper escapeHtml-wrapped
+                warningDiv.innerHTML = `<i class="fas fa-exclamation-triangle"></i> <span>${escapeHtml(String(issueCount))} service item${issueCount > 1 ? 's have' : ' has'} significant price differences from 2026 pricing</span>`;
                 const tableWrapper = servicesSection.querySelector('.spr-table-wrapper');
                 servicesSection.insertBefore(warningDiv, tableWrapper);
             }
 
+            // eslint-disable-next-line no-unsanitized/property -- audited (1.4): numeric prices/indices + internal enums; typeUpper escapeHtml-wrapped
             tbody.innerHTML = html;
         } else {
             servicesSection.style.display = 'none';
@@ -430,6 +433,7 @@ export function showServicePricingReview(serviceItems, productItems, embConfigOp
                 designBanner.style.display = '';
                 designBanner.style.background = '#eff6ff';
                 const headerText = showAssignment ? '' : '<div style="font-size:11px;font-weight:600;color:#1e40af;margin-bottom:4px;"><i class="fas fa-search" style="margin-right:4px;"></i>Design Stitch Lookup</div>';
+                // eslint-disable-next-line no-unsanitized/property -- audited (1.4): numeric prices/indices + internal enums; typeUpper escapeHtml-wrapped
                 designBanner.innerHTML = headerText + bannerHtml;
 
                 // Fetch design thumbnails for the banner (non-blocking)

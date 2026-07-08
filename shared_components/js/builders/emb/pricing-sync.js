@@ -17,7 +17,7 @@
  */
 // @ts-nocheck — MOVED legacy DOM code: pre-existing checkJs frictions; typing
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
-/* global showToast,
+/* global showToast, escapeHtml,
    wrapWithRepricingIndicator, parseRatePercent, getLtmControlState,
    setLtmControlState, renderOrderRecap, markAsUnsaved, QuoteOrderSummary, structuredClone, updateQuantityNudge,
    renderLtmControlPanel, initLtmControlListeners,
@@ -566,7 +566,7 @@ async function _recalculatePricingImpl() {
             if (siPriceCell) {
                 if (siHasOverride) {
                     siPriceCell.classList.add('price-overridden');
-                    siPriceCell.innerHTML = `<span class="price-override-wrapper">$${si.unitPrice.toFixed(2)}<button class="btn-clear-override" onclick="event.stopPropagation(); clearPriceOverride(${si.rowId})" title="Clear override">&times;</button></span>`;
+                    siPriceCell.innerHTML = `<span class="price-override-wrapper">$${escapeHtml(si.unitPrice.toFixed(2))}<button class="btn-clear-override" onclick="event.stopPropagation(); clearPriceOverride(${escapeHtml(String(si.rowId))})" title="Clear override">&times;</button></span>`;
                 } else {
                     siPriceCell.classList.remove('price-overridden');
                     siPriceCell.textContent = `$${si.unitPrice.toFixed(2)}`;
@@ -708,10 +708,10 @@ async function _recalculatePricingImpl() {
                                     // Non-SanMar: pencil icon, no clear button (price override IS the price)
                                     priceCell.classList.remove('price-overridden');
                                     priceCell.classList.remove('ns-price-zero');
-                                    priceCell.innerHTML = `<span class="ns-price-display" onclick="enablePriceOverride(${rowId})" title="Click to edit price">$${displayPrice.toFixed(2)} <i class="fas fa-pencil-alt"></i></span>`;
+                                    priceCell.innerHTML = `<span class="ns-price-display" onclick="enablePriceOverride(${escapeHtml(String(rowId))})" title="Click to edit price">$${escapeHtml(displayPrice.toFixed(2))} <i class="fas fa-pencil-alt"></i></span>`;
                                 } else if (hasOverride) {
                                     priceCell.classList.add('price-overridden');
-                                    priceCell.innerHTML = `<span class="price-override-wrapper">$${displayPrice.toFixed(2)}<button class="btn-clear-override" onclick="event.stopPropagation(); clearPriceOverride(${rowId})" title="Clear override">&times;</button></span>`;
+                                    priceCell.innerHTML = `<span class="price-override-wrapper">$${escapeHtml(displayPrice.toFixed(2))}<button class="btn-clear-override" onclick="event.stopPropagation(); clearPriceOverride(${escapeHtml(String(rowId))})" title="Clear override">&times;</button></span>`;
                                 } else {
                                     priceCell.classList.remove('price-overridden');
                                     priceCell.textContent = `$${displayPrice.toFixed(2)}`;
@@ -814,7 +814,7 @@ async function _recalculatePricingImpl() {
                     if (siPriceCell) {
                         if (siHasOverride) {
                             siPriceCell.classList.add('price-overridden');
-                            siPriceCell.innerHTML = `<span class="price-override-wrapper">$${si.unitPrice.toFixed(2)}<button class="btn-clear-override" onclick="event.stopPropagation(); clearPriceOverride(${si.rowId})" title="Clear override">&times;</button></span>`;
+                            siPriceCell.innerHTML = `<span class="price-override-wrapper">$${escapeHtml(si.unitPrice.toFixed(2))}<button class="btn-clear-override" onclick="event.stopPropagation(); clearPriceOverride(${escapeHtml(String(si.rowId))})" title="Clear override">&times;</button></span>`;
                         } else {
                             siPriceCell.classList.remove('price-overridden');
                             siPriceCell.textContent = `$${si.unitPrice.toFixed(2)}`;
@@ -847,7 +847,7 @@ async function _recalculatePricingImpl() {
 
                 // Override display
                 childPriceCell.classList.add('price-overridden');
-                childPriceCell.innerHTML = `<span class="price-override-wrapper">$${childOverride.toFixed(2)}<button class="btn-clear-override" onclick="event.stopPropagation(); clearPriceOverride(${childRowId})" title="Clear override">&times;</button></span>`;
+                childPriceCell.innerHTML = `<span class="price-override-wrapper">$${escapeHtml(childOverride.toFixed(2))}<button class="btn-clear-override" onclick="event.stopPropagation(); clearPriceOverride(${escapeHtml(String(childRowId))})" title="Clear override">&times;</button></span>`;
 
                 if (childTotalCell && qty > 0) {
                     childTotalCell.textContent = `$${(childOverride * qty).toFixed(2)}`;
@@ -1296,6 +1296,7 @@ export function updatePricingDisplay(pricing) {
     if (garmentALTotal > 0) {
         const garmentALSideQty = garmentALServices.reduce((sum, s) => sum + s.quantity, 0);
         const garmentALSideUnit = garmentALSideQty > 0 ? garmentALTotal / garmentALSideQty : 0;
+        // eslint-disable-next-line no-unsanitized/property -- audited (1.4): AL sync rows — internal labels + numeric qty/fees only
         alContainer.innerHTML = `
             <div class="pricing-row al-pricing-row">
                 <span class="label"><i class="fas fa-tshirt" style="font-size: 10px; margin-right: 3px;"></i> AL:</span>
@@ -1314,6 +1315,7 @@ export function updatePricingDisplay(pricing) {
     if (capALTotal > 0) {
         const capALSideQty = capALServices.reduce((sum, s) => sum + s.quantity, 0);
         const capALSideUnit = capALSideQty > 0 ? capALTotal / capALSideQty : 0;
+        // eslint-disable-next-line no-unsanitized/property -- audited (1.4): AL sync rows — internal labels + numeric qty/fees only
         capAlContainer.innerHTML = `
             <div class="pricing-row al-pricing-row cap-al">
                 <span class="label"><i class="fas fa-hat-cowboy" style="font-size: 10px; margin-right: 3px;"></i> AL-Cap:</span>
@@ -1466,7 +1468,8 @@ function showTaxStatus(message, type) {
     };
 
     el.style.color = colors[type] || '#64748b';
-    el.innerHTML = (icons[type] || '') + message;
+    // eslint-disable-next-line no-unsanitized/property -- icons = internal literal map; message escapeHtml'd (1.4 audit: callers pass literals + DOR API strings)
+    el.innerHTML = (icons[type] || '') + escapeHtml(message);
 }
 
 // [2026-06-07] Wholesale / reseller toggle (per-order checkbox by the sales tax). ON → zero the tax, uncheck

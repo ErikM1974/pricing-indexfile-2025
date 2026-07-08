@@ -211,6 +211,7 @@ function showImportSummaryBanner(sanMarCount, nonSanMarItems) {
     const banner = document.createElement('div');
     banner.id = 'import-summary-banner';
     banner.className = `import-summary-banner ${bannerClass}`;
+    // eslint-disable-next-line no-unsanitized/property -- audited (1.4): every user/API string escapeHtml-wrapped at build; icons/notes internal or numeric
     banner.innerHTML = html;
 
     // Insert before the product table
@@ -360,6 +361,7 @@ async function reImportNonSanmarRow(row, rowId, importData) {
                     <span class="color-swatch" style="background-color:#ccc"></span>
                     <span class="color-name">${escapeHtml(importData.color)}</span>
                 </div>`;
+                // eslint-disable-next-line no-unsanitized/method -- audited (1.4): every user/API string escapeHtml-wrapped at build; icons/notes internal or numeric
                 pickerDropdown.insertAdjacentHTML('afterbegin', optHtml);
                 selectNonSanmarColor(rowId, pickerDropdown.querySelector('.color-picker-option'));
             }
@@ -468,6 +470,7 @@ function renderImportPreview(data) {
     // Customer & order info grid
     const pricingIcon = data.pricingSource === 'caspio' ? '✓' : '⚠';
     const pricingColor = data.pricingSource === 'caspio' ? '#28a745' : '#ffc107';
+    // eslint-disable-next-line no-unsanitized/property -- audited (1.4): every user/API string escapeHtml-wrapped at build; icons/notes internal or numeric
     grid.innerHTML = `
         <div class="preview-item">
             <div class="preview-item-label">Order #</div>
@@ -570,6 +573,7 @@ function renderImportPreview(data) {
         }
         productsHtml += '</div>';
     }
+    // eslint-disable-next-line no-unsanitized/property -- audited (1.4): every user/API string escapeHtml-wrapped at build; icons/notes internal or numeric
     products.innerHTML = productsHtml;
 
     // Services badges
@@ -630,6 +634,7 @@ function renderImportPreview(data) {
     }
 
     if (servicesHtml) {
+        // eslint-disable-next-line no-unsanitized/property -- audited (1.4): every user/API string escapeHtml-wrapped at build; icons/notes internal or numeric
         services.innerHTML = '<h5>Services</h5><div class="preview-services-list">' + servicesHtml + '</div>';
     } else {
         services.innerHTML = '';
@@ -659,6 +664,7 @@ function renderImportPreview(data) {
             warningsHtml += `<li>${escapeHtml(note)}</li>`;
         }
         warningsHtml += '</ul>';
+        // eslint-disable-next-line no-unsanitized/property -- audited (1.4): every user/API string escapeHtml-wrapped at build; icons/notes internal or numeric
         warnings.innerHTML = warningsHtml;
         warnings.style.display = '';
     } else {
@@ -704,6 +710,7 @@ function renderImportPreview(data) {
             </label>`;
         });
         reviewHtml += '</div>';
+        // eslint-disable-next-line no-unsanitized/property -- audited (1.4): every user/API string escapeHtml-wrapped at build; icons/notes internal or numeric
         warnings.innerHTML = (warnings.innerHTML || '') + reviewHtml;
         warnings.style.display = '';
     }

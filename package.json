@@ -9,7 +9,7 @@
     "build": "node scripts/build.js",
     "build:watch": "node scripts/build.js --watch",
     "heroku-postbuild": "npm run build",
-    "lint": "eslint shared_components/js/builders lib scripts/build.js config/tenant.js",
+    "lint": "eslint shared_components/js/builders shared_components/js/quote-builder-utils.js lib scripts/build.js config/tenant.js",
     "typecheck": "tsc -p tsconfig.json",
     "test:parity": "jest tests/unit/web-quote-cart-parity.test.js tests/unit/quick-quote-parity.test.js --verbose",
     "test:guards": "jest tests/unit/no-hardcoded-hosts.test.js tests/unit/build/ --verbose",

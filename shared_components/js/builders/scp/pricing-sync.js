@@ -438,6 +438,7 @@ function updateRowBreakdownScreenPrint(rowId, product, tierData) {
         `;
     }
 
+    // eslint-disable-next-line no-unsanitized/property -- audited (1.4): internal LOCATION_NAMES labels + numeric colors/prices only
     breakdownEl.innerHTML = breakdownHtml;
 }
 

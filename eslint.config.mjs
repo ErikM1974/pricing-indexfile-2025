@@ -99,8 +99,10 @@ export default [
             'shared_components/js/builders/dtf/adapter.js',
         ],
         rules: {
-            'no-unsanitized/property': 'off',
-            'no-unsanitized/method': 'off',
+            // no-unsanitized/* now ENFORCED here too (roadmap 1.4 stage 2) — every
+            // sink below is escapeHtml-wrapped, numeric-only, or carries a per-line
+            // audited disable. New raw innerHTML in moved files fails CI like
+            // everywhere else.
             // pricing-sync carries ~20 pre-existing window-flag writes (tax/ship/
             // caches — inventoried in emb-decomposition-plan.md); they migrate
             // with their reader clusters. Applies ONLY to moved-legacy files.
@@ -117,6 +119,21 @@ export default [
         files: ['lib/**/*.js', 'scripts/build.js'],
         languageOptions: {
             sourceType: 'commonjs',
+        },
+    },
+    {
+        // quote-builder-utils.js (classic script shared by all 4 builders):
+        // SINK rules only for now (roadmap 1.4) — the full ruleset lands when
+        // it modularizes. Widening, never loosening (the ratchet).
+        files: ['shared_components/js/quote-builder-utils.js'],
+        languageOptions: {
+            ecmaVersion: 2022,
+            sourceType: 'script',
+        },
+        plugins: { 'no-unsanitized': noUnsanitized },
+        rules: {
+            'no-unsanitized/method': ['error', { escape: { methods: ['escapeHtml', 'escapeHTML', '_dtfEsc', '_scpEsc'], taggedTemplates: [] } }],
+            'no-unsanitized/property': ['error', { escape: { methods: ['escapeHtml', 'escapeHTML', '_dtfEsc', '_scpEsc'], taggedTemplates: [] } }],
         },
     },
 ];

@@ -173,7 +173,7 @@ function showToast(message, type = 'info', duration = 3000) {
     };
     const icon = icons[type] || 'info-circle';
 
-    toast.innerHTML = `<i class="fas fa-${icon}"></i> ${escapeHtml(message)}`;
+    toast.innerHTML = `<i class="fas fa-${escapeHtml(icon)}"></i> ${escapeHtml(message)}`;
     container.appendChild(toast);
 
     // Add 'show' class after brief delay for CSS transition (required by quote-builder-common.css)
@@ -768,6 +768,7 @@ function renderLtmControlPanel(containerId, options = {}) {
     const mode = options.defaultMode || 'builtin';
     const prefix = containerId; // unique prefix for radio name groups
 
+    // eslint-disable-next-line no-unsanitized/property -- audited (1.4): feeLabel escapeHtml-wrapped; rest numeric/internal ids
     container.innerHTML = `
         <div class="ltm-control-panel">
             <div class="ltm-control-header">
@@ -1135,6 +1136,7 @@ function renderPushChecklist(el, blockers) {
     const tbdWarn = (typeof window !== 'undefined' && window._logoStatus === 'tbd')
         ? '<div class="pr-item pr-warn"><i class="fas fa-triangle-exclamation"></i> Artwork TBD — confirm the logo before pushing to production</div>'
         : '';
+    // eslint-disable-next-line no-unsanitized/property -- audited (1.4): internal literal checklist labels only
     el.innerHTML = '<div class="pr-title">Before you push</div>' + blockers.map(item).join('') + tbdWarn;
     if (!el.dataset.prFocusWired) {
         el.dataset.prFocusWired = '1';
@@ -1327,6 +1329,7 @@ function renderOrderShippingFields(containerId) {
         `<option value="${s}"${s === 'WA' ? ' selected' : ''}>${s}</option>`
     ).join('');
 
+    // eslint-disable-next-line no-unsanitized/property -- audited (1.4): US_STATES internal const only
     container.innerHTML = `
         <div class="order-shipping-panel">
             <div class="charges-header" onclick="toggleOrderShippingPanel('${containerId}')">
@@ -1744,6 +1747,7 @@ function updateQuantityNudge(totalQty, method, savingsPerPiece = null, container
         // Clickable nudge (2026-07-06, UX audit P1 #3): one click adds the missing
         // pieces, scaled proportionally across the sizes already entered.
         html += ` <span class="nudge-apply-hint">· click to add</span>`;
+        // eslint-disable-next-line no-unsanitized/property -- audited (1.4): numeric counts + internal tier label/piece word only
         container.innerHTML = html;
         container.style.display = 'block';
         container.classList.add('quantity-nudge-clickable');
@@ -1938,6 +1942,7 @@ function initMethodSwitchMenu(cfg) {
         .filter(([key]) => key !== cfg.current)
         .map(([key, t]) => `<option value="${key}">${t.label}</option>`)
         .join('');
+    // eslint-disable-next-line no-unsanitized/property -- audited (1.4): METHOD_SWITCH_TARGETS internal const labels only
     wrap.innerHTML = '<i class="fas fa-exchange-alt" aria-hidden="true"></i> Switch method' +
         `<select aria-label="Switch to another quote builder"><option value="">…</option>${options}</select>`;
     host.appendChild(wrap);
@@ -2339,6 +2344,7 @@ function _renderRecentOrdersPanel(anchor, orders, cfg) {
             + ' style="background:#fff;border:1px solid #cbd5e1;border-radius:4px;padding:2px 8px;font-size:11px;color:#334155;cursor:pointer;">Reference</button>'
             + '</div>';
     }).join('');
+    // eslint-disable-next-line no-unsanitized/property -- audited (1.4): recent-orders rows escapeHtml every ShopWorks value at build
     panel.innerHTML = '<div style="display:flex;align-items:center;margin-bottom:4px;">'
         + '<strong style="flex:1;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:#64748b;">'
         + '<i class="fas fa-history" style="margin-right:5px;"></i>Recent ShopWorks orders</strong>'

@@ -146,7 +146,9 @@ for ASSET in $CHANGED_ASSETS; do
   # Windows git-bash, the deploy host; an empty MATCH would bump EVERY ?v=).
   BASE="${ASSET##*/}"; DIR="${ASSET%/*}"
   if [ "$DIR" = "$ASSET" ]; then MATCH="$BASE"; else MATCH="${DIR##*/}/$BASE"; fi
-  for HTML in $(grep -rl --include="*.html" "${MATCH}?v=" .); do
+  # --exclude-dir=.claude: NEVER write into .claude/worktrees/* — those are OTHER
+  # sessions' checkouts; bumping them mutates cross-session state (caught 2026-07-08).
+  for HTML in $(grep -rl --include="*.html" --exclude-dir=.claude "${MATCH}?v=" .); do
     perl -i -pe "s|(\Q${MATCH}\E\?v=)[^\"' >]+|\${1}${DEPLOY_VERSION}|g" "$HTML"
     BUMPED_HTML="$BUMPED_HTML $HTML"
     echo "  bumped ${MATCH} in $HTML → ?v=${DEPLOY_VERSION}"

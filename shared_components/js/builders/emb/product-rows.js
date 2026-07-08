@@ -294,14 +294,15 @@ function showSearchSuggestions(products) {
         // style input already had this; the TOP search just said "No products
         // found" and stranded the rep. (audit ux-flow 2026-06-10)
         const q = (document.getElementById('product-search')?.value || '').trim();
-        const safeQ = escapeHtml(q);
+        // eslint-disable-next-line no-unsanitized/property -- audited (1.4): only escapeHtml(q) interpolations (nested-ternary shape the rule cannot parse)
         suggestions.innerHTML = `
-            <div class="suggestion-item"><span>No SanMar products found${q ? ` for "${safeQ}"` : ''}</span></div>
-            ${q ? `<div class="suggestion-item suggestion-add-nonsanmar" onclick="addNonSanmarFromSearch()" style="cursor:pointer; color:#16a34a; font-weight:600;"><span><i class="fas fa-plus-circle"></i> Add "${safeQ}" as a non-SanMar product…</span></div>` : ''}`;
+            <div class="suggestion-item"><span>No SanMar products found${q ? ` for "${escapeHtml(q)}"` : ''}</span></div>
+            ${q ? `<div class="suggestion-item suggestion-add-nonsanmar" onclick="addNonSanmarFromSearch()" style="cursor:pointer; color:#16a34a; font-weight:600;"><span><i class="fas fa-plus-circle"></i> Add "${escapeHtml(q)}" as a non-SanMar product…</span></div>` : ''}`;
         suggestions.classList.add('show');
         return;
     }
 
+    // eslint-disable-next-line no-unsanitized/property -- audited (1.4): map rows escapeHtml every value (rule cannot trace map/join chains)
     suggestions.innerHTML = products.map(product => {
         // Extract product name (remove style prefix from label)
         const productName = (product.label || '').split(' - ').slice(1).join(' - ') || '';
@@ -371,6 +372,7 @@ export function addNewRow() {
     row.className = 'new-row';
     row.dataset.rowId = rowId;
 
+    // eslint-disable-next-line no-unsanitized/property -- audited (1.4): interpolations escapeHtml-wrapped or numeric at build
     row.innerHTML = `
         <td>
             <input type="text" class="cell-input style-input"
@@ -554,6 +556,7 @@ export function createServiceProductRow(serviceType, data) {
     row.dataset.position = position;
     row.dataset.unitPrice = unitPrice.toString();
 
+    // eslint-disable-next-line no-unsanitized/property -- audited (1.4): internal service-type enums + numeric qty/rowId only
     row.innerHTML = `
         <td>
             <span class="service-style-badge" style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; background: ${isCap ? '#dbeafe' : '#fef3c7'}; color: ${isCap ? '#1e40af' : '#92400e'}; border-radius: 4px; font-weight: 600; font-size: 12px;">
@@ -910,6 +913,7 @@ export function onServiceQtyChange(rowId) {
     if (priceCell) {
         if (overridePrice > 0) {
             priceCell.classList.add('price-overridden');
+            // eslint-disable-next-line no-unsanitized/property -- audited (1.4): numeric unit price + rowId only
             priceCell.innerHTML = `<span class="price-override-wrapper">$${unitPrice.toFixed(2)}<button class="btn-clear-override" onclick="event.stopPropagation(); clearPriceOverride(${rowId})" title="Clear override">&times;</button></span>`;
         } else {
             priceCell.classList.remove('price-overridden');
@@ -1043,6 +1047,7 @@ export async function onStyleChange(input, rowId) {
 
             if (colors && colors.length > 0) {
                 // Populate custom color picker dropdown with swatches
+                // eslint-disable-next-line no-unsanitized/property -- audited (1.4): COLOR_NAME/CATALOG_COLOR escapeHtml-wrapped; swatch via hardened getSwatchStyle (C32)
                 pickerDropdown.innerHTML = colors.map(c => `
                     <div class="color-picker-option"
                          data-color-name="${escapeHtml(c.COLOR_NAME)}"
@@ -1164,6 +1169,7 @@ export function populateNonSanmarRow(row, rowId, product) {
     // Populate color dropdown from DefaultColors (comma-separated text)
     const defaultColors = (product.DefaultColors || '').split(',').map(c => c.trim()).filter(Boolean);
     if (defaultColors.length > 0 && pickerDropdown) {
+        // eslint-disable-next-line no-unsanitized/property -- audited (1.4): COLOR_NAME/CATALOG_COLOR escapeHtml-wrapped; swatch via hardened getSwatchStyle (C32)
         pickerDropdown.innerHTML = defaultColors.map(color => `
             <div class="color-picker-option"
                  data-color-name="${escapeHtml(color)}"
@@ -1216,9 +1222,11 @@ export function updateNonSanmarPriceCell(row, rowId) {
 
     const sellPrice = parseFloat(row.dataset.sellPrice) || 0;
     if (sellPrice > 0) {
+        // eslint-disable-next-line no-unsanitized/property -- audited (1.4): numeric price + rowId only
         priceCell.innerHTML = `<span class="ns-price-display" onclick="enablePriceOverride(${rowId})" title="Click to edit price">$${sellPrice.toFixed(2)} <i class="fas fa-pencil-alt"></i></span>`;
         priceCell.classList.remove('ns-price-zero');
     } else {
+        // eslint-disable-next-line no-unsanitized/property -- audited (1.4): numeric price + rowId only
         priceCell.innerHTML = `<span class="ns-price-display" onclick="enablePriceOverride(${rowId})" title="Click to set price">$0.00 &#9888; <i class="fas fa-pencil-alt"></i></span>`;
         priceCell.classList.add('ns-price-zero');
         row.classList.add('price-warning');
@@ -1537,6 +1545,7 @@ export function updateRowBreakdown(rowId, product, lineItem, logoConfig) {
 
     const breakdownHtml = buildPricingBreakdown(product, lineItem, logoConfig);
     if (breakdownHtml) {
+        // eslint-disable-next-line no-unsanitized/property -- audited (1.4): formatPrice output + internal position labels + numerics only
         breakdownEl.innerHTML = breakdownHtml;
         breakdownEl.classList.add('visible');
     } else {
@@ -2672,6 +2681,7 @@ export function hideVariantOnlyParents() {
             const parentThumbCell = parentRow.querySelector('.thumbnail-col');
             const childThumbCell = childRow.querySelector('.thumbnail-col');
             if (parentThumbCell && childThumbCell && parentThumbCell.innerHTML.trim()) {
+                // eslint-disable-next-line no-unsanitized/property -- copy of already-rendered sibling DOM
                 childThumbCell.innerHTML = parentThumbCell.innerHTML;
             }
         });
@@ -2777,6 +2787,7 @@ export function createChildRow(parentRowId, size, qty) {
     }
 
     // Create cell content - only the specific size column is editable
+    // eslint-disable-next-line no-unsanitized/property -- audited (1.4): colorOptionsHtml escapes colors (C32); partNumber/size internal codes; qty numeric
     childRow.innerHTML = `
         <td>
             <span class="child-indicator">└</span>
@@ -3063,6 +3074,7 @@ export function enablePriceOverride(rowId) {
     const currentPrice = parseFloat(currentText) || 0;
 
     // Replace cell content with input
+    // eslint-disable-next-line no-unsanitized/property -- audited (1.4): numeric price value + rowId only
     priceCell.innerHTML = `<input type="number" class="price-override-input"
         step="0.01" min="0" value="${currentPrice.toFixed(2)}">`;
 
