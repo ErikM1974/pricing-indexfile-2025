@@ -19,6 +19,7 @@
  *   output.js        — print/email/copy + diagnostics (cluster #5, 2026-07-07)
  *   save-push.js     — save orchestrator + ShopWorks push (cluster #6, 2026-07-07)
  *   quote-lifecycle.js — resetQuote/discounts/fees panel/tracking (cluster #7, 2026-07-07)
+ *   pricing-sync.js  — recalculatePricing + display + tax/ship UI (cluster #8, 2026-07-07)
  */
 import { loadServiceCodePrices, getServicePrice } from './pricing.js';
 import {
@@ -94,6 +95,35 @@ import {
     getAdditionalCharges,
     collectDECGItems,
 } from './quote-lifecycle.js';
+import {
+    recalculatePricing,
+    debouncedRecalculatePricing,
+    debounce,
+    collectProductsFromTable,
+    updatePricingDisplay,
+    calculateDiscountableSubtotal,
+    buildLogoConfiguration,
+    getOrderPieceCounts,
+    syncALRows,
+    syncDECGRows,
+    _syncDecgLtmRow,
+    syncRushRow,
+    getRushRate,
+    estimateShipping,
+    syncDigitizingPriceLabels,
+    updateDigitizingNudges,
+    retryRowPricing,
+    toggleWholesale,
+    lookupTaxRate,
+    updateTaxCalculation,
+    onShipStateChange,
+    onShipZipBlur,
+    onShipMethodChange,
+    setShipMode,
+    updateShippingSummary,
+    openShippingModal,
+    closeShippingModal,
+} from './pricing-sync.js';
 import {
     applyDesignFromCache,
     filterDesignSearchByTier,
@@ -219,5 +249,37 @@ window.updateFeeTableRows = updateFeeTableRows;
 window.getAdditionalCharges = getAdditionalCharges;
 window.collectDECGItems = collectDECGItems;
 
+// pricing-sync (callers: the monolith's row/size/logo handlers funnel into
+// recalculatePricing — 40 call sites — plus static HTML tax/ship handlers
+// and generated retry markup). recalculatePricing arrives pre-wrapped with
+// the reprice pill (live export let; module tail rewraps before this runs).
+window.recalculatePricing = recalculatePricing;
+window.debouncedRecalculatePricing = debouncedRecalculatePricing;
+window.debounce = debounce;
+window.collectProductsFromTable = collectProductsFromTable;
+window.updatePricingDisplay = updatePricingDisplay;
+window.calculateDiscountableSubtotal = calculateDiscountableSubtotal;
+window.buildLogoConfiguration = buildLogoConfiguration;
+window.getOrderPieceCounts = getOrderPieceCounts;
+window.syncALRows = syncALRows;
+window.syncDECGRows = syncDECGRows;
+window._syncDecgLtmRow = _syncDecgLtmRow;
+window.syncRushRow = syncRushRow;
+window.getRushRate = getRushRate;
+window.estimateShipping = estimateShipping;
+window.syncDigitizingPriceLabels = syncDigitizingPriceLabels;
+window.updateDigitizingNudges = updateDigitizingNudges;
+window.retryRowPricing = retryRowPricing;
+window.toggleWholesale = toggleWholesale;
+window.lookupTaxRate = lookupTaxRate;
+window.updateTaxCalculation = updateTaxCalculation;
+window.onShipStateChange = onShipStateChange;
+window.onShipZipBlur = onShipZipBlur;
+window.onShipMethodChange = onShipMethodChange;
+window.setShipMode = setShipMode;
+window.updateShippingSummary = updateShippingSummary;
+window.openShippingModal = openShippingModal;
+window.closeShippingModal = closeShippingModal;
+
 window.__QB_BUILD = window.__QB_BUILD || {};
-window.__QB_BUILD.emb = { entry: 'builders/emb/index.js', modules: ['pricing', 'design-search', 'spr-modal', 'shopworks-import', 'persistence', 'output', 'save-push', 'quote-lifecycle'] };
+window.__QB_BUILD.emb = { entry: 'builders/emb/index.js', modules: ['pricing', 'design-search', 'spr-modal', 'shopworks-import', 'persistence', 'output', 'save-push', 'quote-lifecycle', 'pricing-sync'] };

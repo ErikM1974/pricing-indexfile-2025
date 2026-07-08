@@ -15,13 +15,12 @@
  */
 // @ts-nocheck — MOVED legacy DOM code: pre-existing checkJs frictions; typing
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
-/* global buildLogoConfiguration,
-   collectProductsFromTable, dateFromInputValue,
-   getCapEmbellishmentType, getOrderPieceCounts, recalculatePricing,
-   syncALRows, syncDECGRows, escapeHtml, showToast, showLoading,
+/* global dateFromInputValue,
+   getCapEmbellishmentType, escapeHtml, showToast, showLoading,
    getLtmControlState, parseRatePercent, markAsSaved, updateEditModeUI,
    QuoteShareModal, renderPushChecklist, getPushBlockers, hasUnsavedChanges */
 import { getServicePrice } from './pricing.js';
+import { buildLogoConfiguration, collectProductsFromTable, getOrderPieceCounts, recalculatePricing, syncALRows, syncDECGRows } from './pricing-sync.js';
 import { getAdditionalCharges, collectDECGItems } from './quote-lifecycle.js';
 
 /**
@@ -36,12 +35,12 @@ export async function saveAndGetLink(opts = {}) {
         showToast('Save already in progress…', 'info');
         return;
     }
-    // eslint-disable-next-line no-restricted-syntax -- cross-file re-entrancy flag (documented seam)
+     
     window._embSaveInFlight = true;
     try {
         return await _saveAndGetLinkInner(opts);
     } finally {
-        // eslint-disable-next-line no-restricted-syntax -- cross-file re-entrancy flag (documented seam)
+         
         window._embSaveInFlight = false;
     }
 }
@@ -672,7 +671,7 @@ export async function openPushPreview() {
     // P2-16 (audit 2026-06-06): focus management for the load-bearing push-confirm modal — remember the
     // opener, move focus into the modal, trap Tab inside it, and close on Escape (a11y; stops focus leaking
     // to the page behind the modal).
-    // eslint-disable-next-line no-restricted-syntax -- focus-return handle for the push modal (documented seam)
+     
     window._pushModalOpener = document.activeElement;
     setTimeout(() => { try { const f = modal.querySelector('button:not([disabled])'); if (f) f.focus(); } catch (_) {} }, 0);
     if (!modal._embKeyBound) {

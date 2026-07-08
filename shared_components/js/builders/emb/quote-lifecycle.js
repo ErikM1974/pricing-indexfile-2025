@@ -12,13 +12,14 @@
  */
 // @ts-nocheck — MOVED legacy DOM code: pre-existing checkJs frictions; typing
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
-/* global EMB_DEFAULTS, _syncALArrays, calculateDiscountableSubtotal,
-   handleCapEmbellishmentChange, onShipMethodChange, recalculatePricing,
+/* global EMB_DEFAULTS, _syncALArrays,
+   handleCapEmbellishmentChange,
    updateLogoCardHeader, updateNotesBadge, showToast, markAsUnsaved,
    DesignThumbnailService, setLtmControlState, setQuoteDateDefaults,
    markAsSaved */
 import { resetDesignSearchState, showDesignThumbnail } from './design-search.js';
 import { getServicePrice } from './pricing.js';
+import { calculateDiscountableSubtotal, onShipMethodChange, recalculatePricing } from './pricing-sync.js';
 import { updatePushButtonState } from './save-push.js';
 
 /**
@@ -134,7 +135,7 @@ export function clearCustomerContextBanners() {
     });
     // [B8] (audit 2026-06-06): clear the persisted tax-exemption so it can't leak into the next quote and
     // suppress a legitimate tax lookup.
-    // eslint-disable-next-line no-restricted-syntax -- cross-file contract flag reset (documented seam)
+     
     window._taxExempt = false;
 }
 
@@ -162,7 +163,7 @@ export function resetQuote() {
     rowCounter = 0;
     childRowMap = {};
     // [2026-06-07] Clear the wholesale flag + checkbox so it doesn't leak into the next quote.
-    // eslint-disable-next-line no-restricted-syntax -- cross-file contract flag reset (documented seam)
+     
     window._isWholesale = false;
     const _wholesaleReset = document.getElementById('wholesale-checkbox');
     if (_wholesaleReset) _wholesaleReset.checked = false;
@@ -303,7 +304,7 @@ export function resetQuote() {
     document.getElementById('customer-number').value = '';
     document.getElementById('ship-method').value = 'Customer Pickup';
     document.getElementById('ship-method-other').value = '';
-    // eslint-disable-next-line no-restricted-syntax -- cross-file contract flag reset (documented seam)
+     
     window._lastCustomerShipTo = null;
     onShipMethodChange();
     document.getElementById('date-order-placed').value = '';

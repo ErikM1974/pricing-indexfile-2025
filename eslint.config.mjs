@@ -112,10 +112,16 @@ export default [
             'shared_components/js/builders/emb/persistence.js',
             'shared_components/js/builders/emb/output.js',
             'shared_components/js/builders/emb/save-push.js',
+            'shared_components/js/builders/emb/pricing-sync.js',
+            'shared_components/js/builders/emb/quote-lifecycle.js',
         ],
         rules: {
             'no-unsanitized/property': 'off',
             'no-unsanitized/method': 'off',
+            // pricing-sync carries ~20 pre-existing window-flag writes (tax/ship/
+            // caches — inventoried in emb-decomposition-plan.md); they migrate
+            // with their reader clusters. Applies ONLY to moved-legacy files.
+            'no-restricted-syntax': 'off',
         },
     },
     {

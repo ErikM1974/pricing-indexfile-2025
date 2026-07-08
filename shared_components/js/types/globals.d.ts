@@ -125,6 +125,34 @@ interface Window {
     updateFeeTableRows?: () => void;
     getAdditionalCharges?: () => any;
     collectDECGItems?: () => any[];
+    /* pricing-sync bridges (builders/emb/pricing-sync.js, extraction #8) */
+    recalculatePricing?: () => Promise<void>;
+    debouncedRecalculatePricing?: () => void;
+    debounce?: (fn: any, ms: number) => any;
+    collectProductsFromTable?: () => any[];
+    updatePricingDisplay?: (data?: any) => void;
+    calculateDiscountableSubtotal?: () => any;
+    buildLogoConfiguration?: () => any;
+    getOrderPieceCounts?: () => any;
+    syncALRows?: () => Promise<void>;
+    syncDECGRows?: () => Promise<void>;
+    _syncDecgLtmRow?: (state?: any) => void;
+    syncRushRow?: () => void;
+    getRushRate?: () => number;
+    estimateShipping?: () => Promise<void>;
+    syncDigitizingPriceLabels?: () => void;
+    updateDigitizingNudges?: () => void;
+    retryRowPricing?: (rowId: any) => Promise<void>;
+    toggleWholesale?: () => void;
+    lookupTaxRate?: () => Promise<boolean> | Promise<void>;
+    updateTaxCalculation?: () => void;
+    onShipStateChange?: () => void;
+    onShipZipBlur?: () => void;
+    onShipMethodChange?: () => void;
+    setShipMode?: (mode: string) => void;
+    updateShippingSummary?: () => void;
+    openShippingModal?: () => void;
+    closeShippingModal?: () => void;
 }
 
 /*
@@ -137,8 +165,6 @@ declare function onPrimaryPositionChange(): void;
 declare function onPrimaryStitchTierChange(): void;
 declare function onCapStitchTierChange(): void;
 declare function updateLogoCardHeader(type: string): void;
-declare function lookupTaxRate(): Promise<void> | void;
-declare function updatePushButtonState(): void;
 declare function escapeHtml(s: any): string;
 declare function showToast(msg: string, type?: string, duration?: number): void;
 declare let DesignThumbnailService: any;

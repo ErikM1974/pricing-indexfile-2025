@@ -19,15 +19,14 @@
 // @ts-nocheck — MOVED legacy DOM code: pre-existing checkJs frictions; typing
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
 /* global API_BASE, SIZE06_EXTENDED_SIZES, _syncALArrays, addNewRow, createServiceProductRow, dateToInputValue,
-   handleCapEmbellishmentChange, hideVariantOnlyParents, isCapProduct,
-   lookupTaxRate, onShipMethodChange, onSizeChange, onStyleChange,
-   parseShopWorksDescription, populateNonSanmarRow,
-   recalculatePricing, reorderRowByProductType, selectColor, selectNonSanmarColor,
+   handleCapEmbellishmentChange, hideVariantOnlyParents, isCapProduct, onSizeChange, onStyleChange,
+   parseShopWorksDescription, populateNonSanmarRow, reorderRowByProductType, selectColor, selectNonSanmarColor,
    updateCapLogoSectionVisibility, updateLogoCardHeader, updateNonSanmarPriceCell,
-   updateNotesBadge, updateTaxCalculation, escapeHtml, showToast,
+   updateNotesBadge, escapeHtml, showToast,
    createOrUpdateExtendedChildRow, ShopWorksImportParser, updateArtworkCharges,
    Event, APP_CONFIG, setLtmControlState, markAsUnsaved */
 import { showServicePricingReview, getSprEmbConfigOptions } from './spr-modal.js';
+import { lookupTaxRate, onShipMethodChange, recalculatePricing, updateTaxCalculation } from './pricing-sync.js';
 import { applyDesignFromCache, lookupDesignNumber } from './design-search.js';
 
 

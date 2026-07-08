@@ -65,7 +65,8 @@ const EMB_BUNDLE_SRC = esbuild.buildSync({
 // Source-guard backstop tests scan the builder + its extracted modules.
 const SRC = BUILDER_SRC
   + read('shared_components/js/builders/emb/persistence.js')
-  + read('shared_components/js/builders/emb/design-search.js');
+  + read('shared_components/js/builders/emb/design-search.js')
+  + read('shared_components/js/builders/emb/pricing-sync.js');
 
 const PROXY = 'https://proxy.test';
 

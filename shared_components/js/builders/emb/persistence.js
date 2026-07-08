@@ -16,16 +16,17 @@
 // @ts-nocheck — MOVED legacy DOM code: pre-existing checkJs frictions; typing
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
 /* global API_BASE, EMB_DEFAULTS, SIZE06_EXTENDED_SIZES, _syncALArrays,
-   addManualServiceRow, addNewRow, collectProductsFromTable, createChildRow,
+   addManualServiceRow, addNewRow, createChildRow,
    createServiceProductRow, dateFromInputValue, dateToInputValue,
-   handleCapEmbellishmentChange, mapStitchCountToTierValue, onShipMethodChange,
-   onSizeChange, onStyleChange, recalculatePricing, selectColor, updateCapLogoSectionVisibility,
+   handleCapEmbellishmentChange, mapStitchCountToTierValue,
+   onSizeChange, onStyleChange, selectColor, updateCapLogoSectionVisibility,
    updateGarmentLogoSectionVisibility, updateLogoCardHeader, updateNotesBadge,
-   updatePushButtonState, updateTaxCalculation, escapeHtml, showToast,
+   updatePushButtonState, escapeHtml, showToast,
    QuotePersistence, QuoteSession, getLtmControlState, setLtmControlState,
    assertQuoteEditable, updateEditModeUI, setQuoteDateDefaults, markAsUnsaved,
    updateArtworkCharges, Event */
 import { applyDesignFromCache, showDesignThumbnail, lookupDesignNumber } from './design-search.js';
+import { collectProductsFromTable, onShipMethodChange, recalculatePricing, updateTaxCalculation } from './pricing-sync.js';
 import { updateAdditionalCharges, updateDiscountType } from './quote-lifecycle.js';
 
 export function initEmbroideryPersistence() {
@@ -379,7 +380,7 @@ export async function loadQuoteForEditing(quoteId, opts = {}) {
     showToast('Loading quote...', 'info');
     // P0 guard (audit 2026-06-06): a pickup quote's restore re-fires the live Milton tax lookup async;
     // block lookupTaxRate() for the whole restore so it can't overwrite the saved rate. finally re-enables.
-    // eslint-disable-next-line no-restricted-syntax -- cross-file contract flag (documented seam; migrates with its reader cluster)
+     
     window._restoringQuote = true;
 
     try {
@@ -586,11 +587,11 @@ export async function loadQuoteForEditing(quoteId, opts = {}) {
             includeTaxEl.checked = !taxExempt;
             // [B8-R2] (audit 2026-06-06): also persist the exemption so a later Pickup→Ship toggle on a
             // reloaded exempt quote doesn't re-apply WA tax (lookupTaxRate reads window._taxExempt). #1 rule.
-            // eslint-disable-next-line no-restricted-syntax -- cross-file contract flag (documented seam; migrates with its reader cluster)
+             
             window._taxExempt = taxExempt;
         }
         // [2026-06-07] Restore the wholesale flag + checkbox so a reloaded wholesale order stays 0-tax / acct 2203.
-        // eslint-disable-next-line no-restricted-syntax -- cross-file contract flag (documented seam; migrates with its reader cluster)
+         
         window._isWholesale = (session.IsWholesale === 'Yes' || session.IsWholesale === true || session.IsWholesale === 1);
         const _wholesaleEl = document.getElementById('wholesale-checkbox');
         if (_wholesaleEl) _wholesaleEl.checked = window._isWholesale;
@@ -603,7 +604,7 @@ export async function loadQuoteForEditing(quoteId, opts = {}) {
         if (session.LTM_Display_Mode || session.LTM_Waived) {
             // Ensure LTM panel is rendered before setting state
             // (recalculatePricing will render it, but we need state set first)
-            // eslint-disable-next-line no-restricted-syntax -- cross-file contract flag (documented seam; migrates with its reader cluster)
+             
             window._pendingLtmState = {
                 enabled: !session.LTM_Waived,
                 displayMode: session.LTM_Display_Mode || 'builtin'
@@ -656,7 +657,7 @@ export async function loadQuoteForEditing(quoteId, opts = {}) {
         editingRevision = null;
         addNewRow();
     } finally {
-        // eslint-disable-next-line no-restricted-syntax -- cross-file contract flag (documented seam; migrates with its reader cluster)
+         
         window._restoringQuote = false;  // restore complete — re-enable live tax lookups for the rep
     }
 }
