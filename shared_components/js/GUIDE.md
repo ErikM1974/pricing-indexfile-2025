@@ -79,9 +79,7 @@
 | `embroidery-pricing-service.js` | Embroidery pricing adapter (Caspio API) |
 | `embroidery-quote-adapter.js` | Embroidery data adapter for pricing engine |
 | `embroidery-quote-invoice.js` | Invoice generation (ShopWorks format) |
-| `embroidery-quote-logos.js` | Logo card management (positions, tiers, AL) |
 | `embroidery-quote-pricing.js` | Pricing engine (tiers, LTM, stitch, FB) |
-| `embroidery-quote-products.js` | Product row management |
 | `embroidery-quote-service.js` | Quote save/update/email service |
 | `additional-logo-embroidery-simple.js` | AL pricing for garment embroidery calculator |
 | `additional-logo-cap-simple.js` | AL pricing for cap embroidery calculator |

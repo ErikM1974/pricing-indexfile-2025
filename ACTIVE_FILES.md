@@ -431,9 +431,9 @@
 | `/shared_components/js/embroidery-quote-invoice.js` | Embroidery invoice generation (ShopWorks format) | — | ✅ Active |
 | `/shared_components/js/quote-pricing-data.js` | Shared `pricingData` contract (Phase 3.1) — builds + validates the shape all 4 quote builders pass to `embroidery-quote-invoice.js`. Normalizes method→flags, percent tax→decimal, zero-fills fee fields. | — | ✅ Active |
 | `/shared_components/js/quote-services-bar.js` | Persistent, catalog-driven "Add to order" services bar (2026-06-03) — `QuoteServicesBar.render(mountId, catalog, onAdd)`; clicking a chip adds that service as a line item. Reusable across EMB/SCP/DTG/DTF (each passes its own catalog). | quote builders | ✅ Active |
-| `/shared_components/js/embroidery-quote-products.js` | Embroidery product row management | SanMar API | ✅ Active |
-| `/shared_components/js/embroidery-quote-logos.js` | Logo card management (positions, stitch tiers, AL) | — | ✅ Active |
 | `/shared_components/js/embroidery-quote-adapter.js` | Embroidery data adapter (Caspio → pricing engine) | Caspio API | ✅ Active |
+
+> `embroidery-quote-logos.js` + `embroidery-quote-products.js` DELETED 2026-07-07 (expert audit): zero `<script>` references repo-wide, encoded an OLDER ruleset than the live builder (a fix applied there was a silent no-op), yet were documented ✅ Active — exactly the drift ACTIVE_FILES.md exists to prevent. Live logo/product logic is all in `embroidery-quote-builder.js`.
 
 ### Screen Print System
 | File | Purpose | Dependencies | Status |

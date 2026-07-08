@@ -4,9 +4,42 @@
 > CSS architect), every finding code-verified with file:line. Complements the 2026-07-06 click
 > audit ([QUOTE_BUILDER_UX_AUDIT_2026-07.md](QUOTE_BUILDER_UX_AUDIT_2026-07.md)) — nothing here
 > re-reports it or the shipped v2026.07.07.x guided-quote work. Full narrative = session
-> artifact 2026-07-07; this file = durable actionable core. **NONE of these are fixed yet.**
+> artifact 2026-07-07; this file = durable actionable core.
 > Line numbers = 2026-07-07 (commit 5b12991e); re-grep before editing.
 > Abbrev: emb/scp/dtf = shared_components/js/{method}-quote-builder.js · utils = quote-builder-utils.js.
+
+## ✅ IMPLEMENTED same day (2026-07-07, commits 11c592fc → wave-6; ?v=2026.07.07.7; NOT yet deployed)
+
+**~55 of 62 findings FIXED across 6 waves** — all money leaks, trust/copy, endgame,
+guided-shell, and CSS/look items below are DONE unless listed here. Unit suite (5,881)
++ both parity suites green; browser-verified EMB/SCP/DTF (shell on, zero console errors).
+Bonus fixes found while implementing (not in the audit): share-modal `show()` treated
+SCP/DTF's "Updated to Rev N" note as a base URL → broken share link on every update-save;
+SCP main service minted `SP{MMDD}-N` (not SPC) — both SCP services now server-sequenced;
+DTF `--dtf-primary` fallback + save-path tax fallbacks were still lime/10.1.
+
+**⏳ QUEUED (needs work I couldn't safely do client-side):**
+- `emailedAt` stamp on email send — needs a proxy Notes-JSON-merge endpoint (client writes
+  would clobber EMB's plain-text Notes; the /accept endpoint is the pattern to copy).
+- DTF ship-to autofill from the MO customer record — needs an address field on the
+  authed `/api/mo/*` forwarder (verify what the customer endpoint returns first).
+- DTF/SCP "Rush +25%" chip — EMB's `getRushRate()` (`RUSH.UnitCost`) is the pattern;
+  blocked on Erik defining the BASE the % applies to (EMB uses grand-minus-rush).
+- SCP back-only jobs / blanks-in-run — pricing service already builds the 0-color tier
+  set; needs engine front-0 contract extension + parity re-runs (deliberate, not quick).
+- EMB inline-style extraction (137 attrs) + full invoice-template class pass — mechanical
+  but large; drift-guard value only.
+- SCP builtin-LTM floor drift (≤47¢) — WON'T FIX: floor matches the deliberate DTG/order-form
+  convention (MEMORY.md); making modes foot identically would require reallocating saved
+  item prices + push-transformer parity for pennies.
+
+**🧑‍⚖️ POLICY — Erik decides, then wire (all would be Service_Codes-driven, no deploy):**
+- Specialty-ink charges (SCP puff/metallic/discharge/poly) + EMB applique/metallic/sewout
+  chips — IF the shop charges, add the codes + chips (SP-STRIPE pattern).
+- DTF customer-supplied garment + transfer-only sales — needs a press-fee code (DECG is
+  the EMB precedent; invoice already renders customer-supplied tables).
+- Confirm DECG $50 fee intent (now CHARGED, matching the public calculator + import path;
+  waive-by-delete honored) and the accepted-quote policy (warn-banner shipped; hard-lock optional).
 
 ## 💰 P1 money leaks (Rule 9: any fix → re-run web-quote-cart-parity + quick-quote-parity, verify 3 surfaces)
 
