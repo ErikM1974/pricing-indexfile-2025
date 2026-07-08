@@ -14,6 +14,7 @@
  *   pricing.js       — Service_Codes fee loading (cluster #0, 2026-07-07)
  *   design-search.js — design lookup/gallery modal (cluster #1, 2026-07-07)
  *   spr-modal.js     — service-pricing-review modal (cluster #2, 2026-07-07)
+ *   shopworks-import.js — paste-from-ShopWorks import flow (cluster #3, 2026-07-07)
  */
 import { loadServiceCodePrices, getServicePrice } from './pricing.js';
 import {
@@ -30,6 +31,19 @@ import {
     applyServicePricingReview,
     getSprEmbConfigOptions,
 } from './spr-modal.js';
+import {
+    openShopWorksImportModal,
+    closeShopWorksImportModal,
+    showAddNonSanmarModal,
+    closeAddNonSanmarModal,
+    toggleNsMoreOptions,
+    validateNsModalFields,
+    saveNonSanmarProduct,
+    parseAndPreviewShopWorks,
+    confirmShopWorksImport,
+    dismissImportBanner,
+    scrollToProductRow,
+} from './shopworks-import.js';
 import {
     applyDesignFromCache,
     filterDesignSearchByTier,
@@ -89,5 +103,19 @@ window.cancelServicePricingReview = cancelServicePricingReview;
 window.applyServicePricingReview = applyServicePricingReview;
 window.getSprEmbConfigOptions = getSprEmbConfigOptions;
 
+// shopworks-import (callers: static HTML modal handlers, generated banner
+// markup, and the search cluster's add-non-SanMar entry point)
+window.openShopWorksImportModal = openShopWorksImportModal;
+window.closeShopWorksImportModal = closeShopWorksImportModal;
+window.showAddNonSanmarModal = showAddNonSanmarModal;
+window.closeAddNonSanmarModal = closeAddNonSanmarModal;
+window.toggleNsMoreOptions = toggleNsMoreOptions;
+window.validateNsModalFields = validateNsModalFields;
+window.saveNonSanmarProduct = saveNonSanmarProduct;
+window.parseAndPreviewShopWorks = parseAndPreviewShopWorks;
+window.confirmShopWorksImport = confirmShopWorksImport;
+window.dismissImportBanner = dismissImportBanner;
+window.scrollToProductRow = scrollToProductRow;
+
 window.__QB_BUILD = window.__QB_BUILD || {};
-window.__QB_BUILD.emb = { entry: 'builders/emb/index.js', modules: ['pricing', 'design-search', 'spr-modal'] };
+window.__QB_BUILD.emb = { entry: 'builders/emb/index.js', modules: ['pricing', 'design-search', 'spr-modal', 'shopworks-import'] };

@@ -72,9 +72,11 @@ export default [
         files: [
             'shared_components/js/builders/emb/design-search.js',
             'shared_components/js/builders/emb/spr-modal.js',
+            'shared_components/js/builders/emb/shopworks-import.js',
         ],
         rules: {
             'no-unsanitized/property': 'off',
+            'no-unsanitized/method': 'off',
         },
     },
     {

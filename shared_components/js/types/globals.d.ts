@@ -71,6 +71,18 @@ interface Window {
     cancelServicePricingReview?: () => void;
     applyServicePricingReview?: () => void;
     getSprEmbConfigOptions?: () => any;
+    /* shopworks-import bridges (builders/emb/shopworks-import.js, extraction #3) */
+    openShopWorksImportModal?: () => void;
+    closeShopWorksImportModal?: () => void;
+    showAddNonSanmarModal?: (opts?: any) => void;
+    closeAddNonSanmarModal?: () => void;
+    toggleNsMoreOptions?: () => void;
+    validateNsModalFields?: () => void;
+    saveNonSanmarProduct?: () => Promise<void>;
+    parseAndPreviewShopWorks?: () => Promise<void> | void;
+    confirmShopWorksImport?: () => Promise<void>;
+    dismissImportBanner?: () => void;
+    scrollToProductRow?: (rowId: number | string) => void;
 }
 
 /*
