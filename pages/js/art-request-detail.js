@@ -2539,22 +2539,28 @@
     };
 
     function autoRecoverInBackground(thumb, fieldKey) {
-        // Only Box_File_Mockup is recoverable today (route writes that field only).
-        if (fieldKey !== 'Box_File_Mockup') return;
+        // Slot-aware since 2026-07-07 (broken-mockups audit): the backend route
+        // accepts slotField and recoverBrokenMockup() heals ANY of the 8 slot
+        // fields — the old Box_File_Mockup-only guard left every other broken
+        // slot with zero display-time self-heal, and the slotField-less payload
+        // blind-wrote Box_File_Mockup even when a different slot was broken.
         if (!currentRequest) return;
         var pkId = currentRequest.PK_ID;
         var designNumber = currentRequest.Design_Num_SW || currentRequest.Design_Number;
         var companyName = currentRequest.CompanyName || '';
         if (!pkId || !designNumber) return;
-        if (_autoRecoverState.attempted[pkId]) return;
+        // Dedup per (pkId, slot) so two different broken slots on one record
+        // each get their own recovery attempt.
+        var dedupKey = pkId + '|' + fieldKey;
+        if (_autoRecoverState.attempted[dedupKey]) return;
         if (_autoRecoverState.fired >= _autoRecoverState.cap) return;
-        _autoRecoverState.attempted[pkId] = true;
+        _autoRecoverState.attempted[dedupKey] = true;
         _autoRecoverState.fired++;
 
         fetch(API_BASE + '/api/art-requests/' + encodeURIComponent(pkId) + '/auto-recover-mockup', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ designNumber: String(designNumber), companyName: companyName })
+            body: JSON.stringify({ designNumber: String(designNumber), companyName: companyName, slotField: fieldKey })
         })
         .then(function (r) {
             return r.json().then(function (j) { return { ok: r.ok, body: j }; });
@@ -3139,6 +3145,14 @@
             formData.append('pkId', String(pkId));
             formData.append('customerId', String(currentRequest.Shopwork_customer_number || currentRequest.id_customer || ''));
             formData.append('companyName', currentRequest.CompanyName || '');
+            // Name the slot explicitly (2026-07-07, broken-mockups audit): the
+            // backend overwrites THIS slot in place. Before this, uploads went to
+            // the first EMPTY slot and a "swap" PUT wrote the OLD broken URL into
+            // that other slot — Caspio kept the dead link and the record stayed
+            // on the broken-mockups list; re-upload also 409'd when all slots
+            // were full. Backends: upload-mockup + upload-additional-art both
+            // validate targetSlotField against their field whitelists.
+            formData.append('targetSlotField', fieldKey);
 
             var uploadEndpoint = ADDITIONAL_ART_KEYS.indexOf(fieldKey) !== -1
                 ? '/api/art-requests/' + designId + '/upload-additional-art'
@@ -3153,19 +3167,20 @@
             }
 
             var result = await resp.json();
-            // Backend auto-finds next empty slot. If it went to wrong field, swap.
             if (result.field !== fieldKey) {
-                // Need to swap: move uploaded URL to correct slot
+                // Defensive only (older backend without targetSlotField): move the
+                // new URL to the requested slot and CLEAR the slot the backend
+                // used — never preserve the old (broken) URL anywhere.
                 var swapBody = {};
                 swapBody[fieldKey] = result.url;
-                swapBody[result.field] = currentRequest[fieldKey] || '';
+                swapBody[result.field] = '';
                 await fetch(API_BASE + '/api/artrequests/' + pkId, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(swapBody)
                 });
                 currentRequest[fieldKey] = result.url;
-                currentRequest[result.field] = currentRequest[fieldKey] || '';
+                currentRequest[result.field] = '';
             } else {
                 currentRequest[result.field] = result.url;
             }

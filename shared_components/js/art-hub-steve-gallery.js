@@ -194,8 +194,12 @@
         // Artwork_Status + Approval_Status are in the PRIMARY select only — if the
         // ArtRequests table doesn't have them yet (pre-migration), the request 500s
         // and falls back to selectFallback which omits them. Graceful degradation.
-        var selectFields = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,User_Email,Due_Date,Date_Created,Revision_Count,Order_Type,Order_Type_Source,Item_Type,JDS_SKU,Is_Rush,Artwork_Status,Approval_Status,Artwork_Locations,Color_Mode,Exact_Text,Garment_Placement,Box_File_Mockup,BoxFileLink,Company_Mockup,File_Upload_One,File_Upload_Two,CDN_Link,CDN_Link_Two,Is_On_Hold,On_Hold_Since,On_Hold_Note';
-        var selectFallback = 'ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,User_Email,Due_Date,Date_Created,Revision_Count,Order_Type,Order_Type_Source,Item_Type,JDS_SKU,Box_File_Mockup,BoxFileLink,Company_Mockup,File_Upload_One,File_Upload_Two,CDN_Link,CDN_Link_Two,Is_On_Hold,On_Hold_Since,On_Hold_Note';
+        // PK_ID MUST stay in every select variant: handleThumbError's display-time
+        // auto-recover posts to /api/art-requests/{PK_ID}/auto-recover-mockup and
+        // guards on req.PK_ID — it was dead code from the original commit until
+        // 2026-07-07 because PK_ID was never fetched (broken-mockups audit).
+        var selectFields = 'PK_ID,ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,User_Email,Due_Date,Date_Created,Revision_Count,Order_Type,Order_Type_Source,Item_Type,JDS_SKU,Is_Rush,Artwork_Status,Approval_Status,Artwork_Locations,Color_Mode,Exact_Text,Garment_Placement,Box_File_Mockup,BoxFileLink,Company_Mockup,File_Upload_One,File_Upload_Two,CDN_Link,CDN_Link_Two,Is_On_Hold,On_Hold_Since,On_Hold_Note';
+        var selectFallback = 'PK_ID,ID_Design,CompanyName,Design_Num_SW,Status,Sales_Rep,User_Email,Due_Date,Date_Created,Revision_Count,Order_Type,Order_Type_Source,Item_Type,JDS_SKU,Box_File_Mockup,BoxFileLink,Company_Mockup,File_Upload_One,File_Upload_Two,CDN_Link,CDN_Link_Two,Is_On_Hold,On_Hold_Since,On_Hold_Note';
         // 2-level fallback for legacy ArtRequests installs that don't have
         // Item_Type, JDS_SKU, or Order_Type_Source yet — strip them and retry.
         // NULL Item_Type = treated as 'Garment' at render time (see
@@ -747,23 +751,54 @@
         cap: 10
     };
 
+    function paintBrokenTile(thumb) {
+        thumb.innerHTML =
+            '<div class="card-thumb-broken" title="Click card to open detail page and re-upload">' +
+                '<div class="card-thumb-broken-icon">&#9888;</div>' +
+                '<div class="card-thumb-broken-title">Link broken</div>' +
+                '<div class="card-thumb-broken-hint">Click to re-upload</div>' +
+            '</div>';
+    }
+
+    function paintNeutralTile(thumb) {
+        // Transient failure (proxy 5xx, cold start, network blip) — NOT a broken
+        // link. Muted placeholder instead of the alarming red tile; a refresh
+        // re-tries the real image.
+        thumb.innerHTML =
+            '<div class="card-thumb-empty" title="Image temporarily unavailable — refresh to retry">' +
+                '<i class="fas fa-image" aria-hidden="true"></i>' +
+            '</div>';
+    }
+
     function handleThumbError(img) {
-        // Image had a src that failed to load → the Box link is broken (file
-        // deleted, fileId stale, shared-link expired). Show a clear warning,
-        // then kick off background auto-recovery — ~97% of breaks self-heal
-        // when the design's Box folder still has the file.
-        var thumb;
+        // Image src failed to load. Confirm it is a REAL broken link (HTTP 404 —
+        // Box file trashed/deleted, fileId stale, shared link revoked) before
+        // painting the red tile: any transient error used to render as
+        // "Link broken" for the whole session (2026-07-07 audit). Mirrors the
+        // detail page's handleImageError HEAD-confirm.
+        var thumb, src;
         try {
             thumb = img.parentNode;
-            thumb.innerHTML =
-                '<div class="card-thumb-broken" title="Click card to open detail page and re-upload">' +
-                    '<div class="card-thumb-broken-icon">&#9888;</div>' +
-                    '<div class="card-thumb-broken-title">Link broken</div>' +
-                    '<div class="card-thumb-broken-hint">Click to re-upload</div>' +
-                '</div>';
+            src = img.src;
         } catch (e) { return; /* img already detached */ }
 
-        // Background auto-recover ─────────────────────────────────────
+        fetch(src, { method: 'HEAD' })
+            .then(function (r) { return r.status; })
+            .catch(function () { return 0; /* network error → unknown, not broken */ })
+            .then(function (status) {
+                if (!thumb || !thumb.parentNode) return;
+                if (status !== 404) { paintNeutralTile(thumb); return; }
+                paintBrokenTile(thumb);
+                autoRecoverThumb(thumb);
+            });
+    }
+
+    function autoRecoverThumb(thumb) {
+        // Background auto-recover — ~97% of breaks self-heal when the design's
+        // Box folder still has a matching file. Slot-aware since 2026-07-07:
+        // the recover request names the SAME field the card rendered from
+        // (buildCard's priority chain), so BoxFileLink/Company_Mockup breaks
+        // heal their own slot instead of blind-writing Box_File_Mockup.
         try {
             var card = thumb && thumb.closest ? thumb.closest('.mockup-card') : null;
             var designId = card && card.dataset ? card.dataset.designId : '';
@@ -776,20 +811,25 @@
             _galleryAutoRecover.attempted[pkId] = true;
             _galleryAutoRecover.fired++;
 
+            // Same priority chain buildCard used to pick the rendered URL.
+            var slotField = req.Box_File_Mockup ? 'Box_File_Mockup'
+                : (req.BoxFileLink ? 'BoxFileLink' : 'Company_Mockup');
+
             fetch(API_BASE + '/api/art-requests/' + encodeURIComponent(pkId) + '/auto-recover-mockup', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     designNumber: String(req.Design_Num_SW),
-                    companyName: req.CompanyName || ''
+                    companyName: req.CompanyName || '',
+                    slotField: slotField
                 })
             })
             .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, body: j }; }); })
             .then(function (resp) {
                 if (resp.ok && resp.body && resp.body.success && resp.body.newUrl
                         && resp.body.confidence === 'high' && thumb && thumb.parentNode) {
-                    // Mutate the in-memory record so a re-render keeps the URL.
-                    req.Box_File_Mockup = resp.body.newUrl;
+                    // Mutate the in-memory record's SAME slot so a re-render keeps the URL.
+                    req[slotField] = resp.body.newUrl;
                     // Swap the broken card for a fresh image without touching the rest of the card.
                     thumb.innerHTML = '<img src="' + resp.body.newUrl + '"' +
                         ' alt="' + (req.CompanyName || 'mockup') + '" loading="lazy"' +
