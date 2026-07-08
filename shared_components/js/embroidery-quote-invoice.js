@@ -145,7 +145,8 @@ class EmbroideryInvoiceGenerator {
                 /* Protect ROWS, not the whole table — forcing an entire 12+ line
                    table to one page shoved it to page 2 and left page 1 half-empty
                    on exactly the big B2B quotes that must look best. (2026-07-07) */
-                .products-table tr { page-break-inside: avoid; }
+                .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+            .products-table tr { page-break-inside: avoid; }
                 .products-table thead { display: table-header-group; }
             }
             
@@ -1067,15 +1068,16 @@ class EmbroideryInvoiceGenerator {
                     👕 Products (${totalPieces} pieces total)
                 </div>
                 <table class="products-table">
+                    <caption class="sr-only">Quoted products with sizes, unit prices, and line totals</caption>
                     <thead>
                         <tr>
-                            <th style="width: 70px;">Part #</th>
-                            <th style="width: 180px;">Description</th>
-                            <th style="width: 80px;">Color</th>
-                            <th style="width: 50px; text-align: center;">Size</th>
-                            <th style="width: 40px; text-align: center;">Qty</th>
-                            <th style="width: 60px; text-align: right;">Unit</th>
-                            <th style="width: 70px; text-align: right;">Total</th>
+                            <th scope="col" style="width: 70px;">Part #</th>
+                            <th scope="col" style="width: 180px;">Description</th>
+                            <th scope="col" style="width: 80px;">Color</th>
+                            <th scope="col" style="width: 50px; text-align: center;">Size</th>
+                            <th scope="col" style="width: 40px; text-align: center;">Qty</th>
+                            <th scope="col" style="width: 60px; text-align: right;">Unit</th>
+                            <th scope="col" style="width: 70px; text-align: right;">Total</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1317,17 +1319,17 @@ class EmbroideryInvoiceGenerator {
                 <table class="size-matrix">
                     <thead>
                         <tr>
-                            <th class="part-col" style="width: 55px;">Style</th>
-                            <th class="desc-col" style="width: 180px;">Description</th>
-                            <th class="color-col" style="width: 90px;">Color</th>
-                            <th class="size-col" style="width: 28px;">S</th>
-                            <th class="size-col" style="width: 28px;">M</th>
-                            <th class="size-col" style="width: 28px;">L</th>
-                            <th class="size-col" style="width: 28px;">XL</th>
-                            <th class="size-col" style="width: 28px;">2XL</th>
-                            <th class="size-col" style="width: 40px;">3XL+<br><span style="font-size: 7px; font-weight: normal;">(Other)</span></th>
-                            <th style="width: 32px; text-align: center;">Qty</th>
-                            <th style="width: 55px; text-align: right;">Unit $</th>
+                            <th scope="col" class="part-col" style="width: 55px;">Style</th>
+                            <th scope="col" class="desc-col" style="width: 180px;">Description</th>
+                            <th scope="col" class="color-col" style="width: 90px;">Color</th>
+                            <th scope="col" class="size-col" style="width: 28px;">S</th>
+                            <th scope="col" class="size-col" style="width: 28px;">M</th>
+                            <th scope="col" class="size-col" style="width: 28px;">L</th>
+                            <th scope="col" class="size-col" style="width: 28px;">XL</th>
+                            <th scope="col" class="size-col" style="width: 28px;">2XL</th>
+                            <th scope="col" class="size-col" style="width: 40px;">3XL+<br><span style="font-size: 7px; font-weight: normal;">(Other)</span></th>
+                            <th scope="col" style="width: 32px; text-align: center;">Qty</th>
+                            <th scope="col" style="width: 55px; text-align: right;">Unit $</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1476,11 +1478,11 @@ class EmbroideryInvoiceGenerator {
                 <table class="size-matrix">
                     <thead>
                         <tr>
-                            <th class="part-col" style="width: 80px;">Part #</th>
-                            <th style="width: 300px;">Description</th>
-                            <th style="width: 60px; text-align: center;">Qty</th>
-                            <th style="width: 80px; text-align: right;">Unit Price</th>
-                            <th style="width: 80px; text-align: right;">Total</th>
+                            <th scope="col" class="part-col" style="width: 80px;">Part #</th>
+                            <th scope="col" style="width: 300px;">Description</th>
+                            <th scope="col" style="width: 60px; text-align: center;">Qty</th>
+                            <th scope="col" style="width: 80px; text-align: right;">Unit Price</th>
+                            <th scope="col" style="width: 80px; text-align: right;">Total</th>
                         </tr>
                     </thead>
                     <tbody>

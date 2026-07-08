@@ -63,7 +63,8 @@
     <script src="/shared_components/js/quote-extended-sizes.js?v=20260321"></script>
 
 </head>
-<body class="emb-builder qb-shell-body"><!-- qb-shell-body: 2026 PNW shell (Inter + tabular numerals + birch ground) — built 2026-06, had ZERO adopters until 2026-07-07 (expert audit) --><!-- scoping hook: EMB-only re-skin overrides (indigo) target .emb-builder so they don't leak into DTF/SCP/DTG via shared CSS (review C33/C34) -->
+<body class="emb-builder qb-shell-body">
+    <nav aria-label="Skip link"><a href="#" class="qb-skip-link" onclick="document.querySelector('[role=main]').focus(); return false;">Skip to quote builder</a></nav><!-- qb-shell-body: 2026 PNW shell (Inter + tabular numerals + birch ground) — built 2026-06, had ZERO adopters until 2026-07-07 (expert audit) --><!-- scoping hook: EMB-only re-skin overrides (indigo) target .emb-builder so they don't leak into DTF/SCP/DTG via shared CSS (review C33/C34) -->
     <!-- Loading Overlay -->
     <div id="loading-overlay" class="loading-overlay" role="status" aria-live="polite">
         <div class="loading-spinner"></div>
@@ -94,7 +95,7 @@
     </header>
 
     <!-- Main Layout -->
-    <div class="power-main" role="main">
+    <div class="power-main" role="main" tabindex="-1">
         <!-- Left: Content Area -->
         <div class="power-content">
             <!-- 2026 Modernized Logo Configuration Section -->

@@ -663,3 +663,26 @@ body.qb-shell-body {
     color: var(--pnw-stone-soft, #9ca3af);
     border-color: #d1d5db;
 }
+
+/* ============================================================
+   1.8 stage 2 — keyboard visibility + motion preferences
+   ============================================================ */
+/* One consistent, high-contrast focus ring for keyboard users across the
+   builders (mouse users are unaffected — :focus-visible only). */
+.qb-shell-body :focus-visible {
+    outline: 2px solid var(--pnw-forest, #1f4922);
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+
+/* Vestibular safety: kill decorative motion when the OS asks for it. */
+@media (prefers-reduced-motion: reduce) {
+    .qb-shell-body *,
+    .qb-shell-body *::before,
+    .qb-shell-body *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

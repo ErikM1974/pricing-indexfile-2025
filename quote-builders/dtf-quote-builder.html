@@ -50,7 +50,8 @@
     <script src="/shared_components/js/quote-formatter.js?v=20250911"></script>
     <script src="/shared_components/js/product-thumbnail-modal.js?v=20260424"></script>
 </head>
-<body class="dtf-builder qb-shell-body"><!-- qb-shell-body: 2026 PNW shell (Inter + tabular numerals + birch ground) — built 2026-06, had ZERO adopters until 2026-07-07 (expert audit) --><!-- scoping hook for Option C page-flow overrides (2026-06-07) -->
+<body class="dtf-builder qb-shell-body">
+    <nav aria-label="Skip link"><a href="#" class="qb-skip-link" onclick="document.querySelector('[role=main]').focus(); return false;">Skip to quote builder</a></nav><!-- qb-shell-body: 2026 PNW shell (Inter + tabular numerals + birch ground) — built 2026-06, had ZERO adopters until 2026-07-07 (expert audit) --><!-- scoping hook for Option C page-flow overrides (2026-06-07) -->
     <!-- Loading Overlay -->
     <div id="loading-overlay" class="loading-overlay">
         <div class="loading-spinner"></div>
@@ -86,7 +87,7 @@
     </header>
 
     <!-- Main Layout -->
-    <div class="power-main dtf-quote-builder" role="main">
+    <div class="power-main dtf-quote-builder" role="main" tabindex="-1">
         <!-- Left: Content Area -->
         <div class="power-content">
             <!-- Location Selection Section -->

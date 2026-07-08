@@ -5,7 +5,7 @@
  * Push state (_dtfPushQuoteId/_dtfPushInFlight) lives on dtfState since D2.
  */
 // @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions; typing lands with the render/state split).
-/* global dtfQuoteBuilder, escapeHtml, showToast, renderBuilderPushReadiness, confirm */
+/* global openAccessibleModal, closeAccessibleModal, dtfQuoteBuilder, escapeHtml, showToast, renderBuilderPushReadiness, confirm */
 import { dtfState } from './state.js';
 
 export function showDtfPushButton(quoteId) {
@@ -86,6 +86,7 @@ export async function openDtfPushPreview() {
     confirmBtn.style.opacity = '0.6';
     confirmBtn.innerHTML = '<i class="fas fa-upload"></i> Push to ShopWorks';
     modal.classList.add('show');
+    if (typeof openAccessibleModal === 'function') openAccessibleModal(modal, { label: 'Push to ShopWorks preview', onEsc: closeDtfPushPreview }); // 1.8
 
     try {
         const apiBase = window.APP_CONFIG.API.BASE_URL;
@@ -222,6 +223,7 @@ export async function confirmDtfPush(directFallback) {
 export function closeDtfPushPreview() {
     const modal = document.getElementById('dtf-push-modal');
     if (modal) modal.classList.remove('show');
+    if (typeof closeAccessibleModal === 'function') closeAccessibleModal(modal); // 1.8
 }
 
 // NOTE: dtfPushToShopWorks (async, auto-save → preview) is declared above near the
