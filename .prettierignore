@@ -1,0 +1,7 @@
+# Prettier is for NEW Phase-0+ code only (same scope as eslint.config.mjs).
+# Never bulk-format legacy files — it destroys blame and bloats diffs.
+*
+!shared_components/js/builders/**/*.js
+!lib/**/*.js
+!scripts/build.js
+!config/tenant.js

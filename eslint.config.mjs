@@ -1,0 +1,72 @@
+// ESLint flat config (roadmap 0.6) — scoped to NEW Phase-0+ code only.
+// Legacy files are grandfathered; they come under lint as task 0.4 migrates
+// them into shared_components/js/builders/**. Widening the scope is the
+// ratchet — never loosen a rule to admit a file.
+import js from '@eslint/js';
+import noUnsanitized from 'eslint-plugin-no-unsanitized';
+
+export default [
+    {
+        // New-code scope
+        files: [
+            'shared_components/js/builders/**/*.js',
+            'lib/**/*.js',
+            'scripts/build.js',
+            'config/tenant.js',
+        ],
+        languageOptions: {
+            ecmaVersion: 2022,
+            sourceType: 'module',
+            globals: {
+                window: 'readonly',
+                document: 'readonly',
+                fetch: 'readonly',
+                console: 'readonly',
+                URLSearchParams: 'readonly',
+                CustomEvent: 'readonly',
+                sessionStorage: 'readonly',
+                localStorage: 'readonly',
+                module: 'writable',
+                require: 'readonly',
+                process: 'readonly',
+                __dirname: 'readonly',
+                Buffer: 'readonly',
+                setTimeout: 'readonly',
+                clearTimeout: 'readonly',
+            },
+        },
+        plugins: { 'no-unsanitized': noUnsanitized },
+        rules: {
+            ...js.configs.recommended.rules,
+            eqeqeq: ['error', 'smart'],
+            'no-implicit-globals': 'error',
+            'no-var': 'off', // dual browser/Node files still use var deliberately
+            // Stranger-pattern discipline: window.* re-exports are allowed ONLY
+            // in each builder's index.js (the designated transition surface).
+            'no-restricted-syntax': [
+                'error',
+                {
+                    selector: "AssignmentExpression > MemberExpression[object.name='window']",
+                    message:
+                        'New window.* globals are banned in extracted modules — export from the module and re-export via builders/*/index.js during the strangler transition (roadmap 0.4).',
+                },
+            ],
+            'no-unsanitized/method': 'error',
+            'no-unsanitized/property': 'error',
+        },
+    },
+    {
+        // The designated window re-export surface + the config seed file.
+        files: ['shared_components/js/builders/*/index.js', 'config/tenant.js'],
+        rules: {
+            'no-restricted-syntax': 'off',
+        },
+    },
+    {
+        // Node-side build/server helpers — CommonJS, not ESM.
+        files: ['lib/**/*.js', 'scripts/build.js'],
+        languageOptions: {
+            sourceType: 'commonjs',
+        },
+    },
+];

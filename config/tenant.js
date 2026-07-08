@@ -32,7 +32,7 @@
         try {
             var fromQuery = new URLSearchParams(window.location.search).get('tenant');
             if (fromQuery && VALID_ID.test(fromQuery)) return fromQuery;
-        } catch (e) { /* URLSearchParams unavailable → fall through */ }
+        } catch { /* URLSearchParams unavailable → fall through */ }
 
         // Hostname → tenant map. Subdomain-style resolution
         // (acme.quotebuilder.app → acme) activates with Phase 2 hosting.
