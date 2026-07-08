@@ -6,8 +6,7 @@
  * reprice-pill prototype wrap rides at the tail (monolith-verbatim).
  */
 // @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions; typing lands with the render/state split).
-/* global sizeDetectionCache, hasChanges:writable, _dtfPushQuoteId:writable,
-   dtfQuoteBuilder, DTFPricingService, DTFQuoteService, escapeHtml, showToast,
+/* global dtfQuoteBuilder, DTFPricingService, DTFQuoteService, escapeHtml, showToast,
    formatPrice, Event, emailjs, QuotePersistence, QuoteSession,
    initLogoStatusChips, initMethodSwitchMenu, getQuickQuotePrefill,
    takeMethodSwitchPrefill, StaffAuthHelper, CustomerLookupService,
@@ -21,6 +20,7 @@
    isValidEmail, QuoteShareModal, showSaveModal, EmbroideryInvoiceGenerator,
    confirm, requestAnimationFrame, QuoteOrderSummary,
    wrapWithRepricingIndicator, showDtfPushButton, updateDtfPushButtonState */
+import { dtfState, sizeDetectionCache } from './state.js';
 
 export class DTFQuoteBuilder {
     constructor() {
@@ -3412,7 +3412,7 @@ export class DTFQuoteBuilder {
 
     markAsUnsaved() {
         this.hasChanges = true;
-        hasChanges = true;  // module-level mirror read by the shared beforeunload guard
+        dtfState.hasChanges = true;  // module-level mirror read by the shared beforeunload guard
         const indicator = document.getElementById('unsaved-indicator');
         if (indicator) {
             indicator.style.display = 'inline';
@@ -3421,7 +3421,7 @@ export class DTFQuoteBuilder {
 
     markAsSaved() {
         this.hasChanges = false;
-        hasChanges = false;  // module-level mirror read by the shared beforeunload guard
+        dtfState.hasChanges = false;  // module-level mirror read by the shared beforeunload guard
         const indicator = document.getElementById('unsaved-indicator');
         if (indicator) {
             indicator.style.display = 'none';
@@ -3429,7 +3429,7 @@ export class DTFQuoteBuilder {
     }
 
     hasUnsavedChanges() {
-        return this.hasChanges || hasChanges;
+        return this.hasChanges || dtfState.hasChanges;
     }
 
     /**
@@ -3487,7 +3487,7 @@ export class DTFQuoteBuilder {
 
     resetQuote() {
         // Clear the "already pushed" lock + reset the Push button so the fresh quote is pushable. (review fix 2026-06-14)
-        _dtfPushQuoteId = null;
+        dtfState._dtfPushQuoteId = null;
         const _dtfPush = document.getElementById('dtf-push-shopworks-btn');
         if (_dtfPush) {
             delete _dtfPush.dataset.pushed;
@@ -3614,7 +3614,7 @@ export class DTFQuoteBuilder {
         if (dtfNotesEl) dtfNotesEl.value = '';
         const pushBtnReset = document.getElementById('dtf-push-shopworks-btn');
         if (pushBtnReset) pushBtnReset.style.display = 'none';
-        if (typeof _dtfPushQuoteId !== 'undefined') _dtfPushQuoteId = null;
+        if (typeof dtfState._dtfPushQuoteId !== 'undefined') dtfState._dtfPushQuoteId = null;
         // Hide + zero the sidebar TOTAL bar (re-shown on first recalc — EMB parity)
         const _stb = document.getElementById('sidebar-total-bar');
         if (_stb) _stb.hidden = true;

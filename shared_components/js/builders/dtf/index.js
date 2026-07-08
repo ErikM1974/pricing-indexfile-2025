@@ -10,9 +10,14 @@
  *
  * D1 (2026-07-08): quote-builder-class (incl. the reprice-pill prototype
  * wrap at its tail), output (+ applyRushPercent), push.
- * D2: DtfAdapter + QuoteBuilderBase boot + state (shell → tombstone).
+ * D2 (2026-07-08): state.js (dtfState + window-backed hasChanges) +
+ * DtfAdapter (the init listener verbatim) + QuoteBuilderBase boot. The
+ * monolith is a tombstone; this bundle IS the DTF builder.
  */
 
+import { QuoteBuilderBase } from '../shared/quote-builder-base.js';
+import { DtfAdapter } from './adapter.js';
+import { dtfState, quoteState } from './state.js';
 import { DTFQuoteBuilder } from './quote-builder-class.js';
 import { copyToClipboard, copyQuoteToClipboard, printQuote, applyRushPercent } from './output.js';
 import {
@@ -43,5 +48,12 @@ window.closeDtfPushPreview = closeDtfPushPreview;
 window.openDtfPushPreview = openDtfPushPreview;
 window.renderDtfPushPreview = renderDtfPushPreview;
 
+// ---- state handles (debug + test hooks; NOT an API for page code) ----
+window.__dtfState = dtfState;
+window.__dtfQuoteState = quoteState;
+
+// ---- boot: the ONE base drives the page lifecycle (roadmap 0.4) ----
+new QuoteBuilderBase(new DtfAdapter()).init();
+
 window.__QB_BUILD = window.__QB_BUILD || {};
-window.__QB_BUILD.dtf = { entry: 'builders/dtf/index.js', stage: 'D1' };
+window.__QB_BUILD.dtf = { entry: 'builders/dtf/index.js', stage: 'D2-complete' };

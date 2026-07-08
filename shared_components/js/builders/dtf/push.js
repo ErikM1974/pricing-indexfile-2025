@@ -2,14 +2,14 @@
  * DTF push-to-ShopWorks module — DTF decomposition D1 (2026-07-08).
  * One-click save+push (push-button-binding locks the single-async-decl rule
  * against THIS file), review/confirm preview, button state. Moved verbatim.
- * _dtfPushQuoteId/_dtfPushInFlight stay in the shell until D2 state.js.
+ * Push state (_dtfPushQuoteId/_dtfPushInFlight) lives on dtfState since D2.
  */
 // @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions; typing lands with the render/state split).
-/* global _dtfPushQuoteId:writable, _dtfPushInFlight:writable, dtfQuoteBuilder,
-   escapeHtml, showToast, renderBuilderPushReadiness, confirm */
+/* global dtfQuoteBuilder, escapeHtml, showToast, renderBuilderPushReadiness, confirm */
+import { dtfState } from './state.js';
 
 export function showDtfPushButton(quoteId) {
-    _dtfPushQuoteId = quoteId;
+    dtfState._dtfPushQuoteId = quoteId;
     // The Push button is ALWAYS visible now (disabled-until-ready, EMB parity 2026-06-14); this just
     // records the saved quote id (the /preview endpoint needs it) and re-gates the button.
     if (typeof updateDtfPushButtonState === 'function') updateDtfPushButtonState();
@@ -27,8 +27,8 @@ export function updateDtfPushButtonState() {
 // (window bridge moved to builders/dtf/index.js)
 
 export async function dtfPushToShopWorks() {
-    if (_dtfPushInFlight) return;
-    _dtfPushInFlight = true;
+    if (dtfState._dtfPushInFlight) return;
+    dtfState._dtfPushInFlight = true;
     const label = document.getElementById('dtf-push-shopworks-label');
     if (label) label.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing preview…';
     try {
@@ -39,7 +39,7 @@ export async function dtfPushToShopWorks() {
         if (!savedId) return;
         await openDtfPushPreview();
     } finally {
-        _dtfPushInFlight = false;
+        dtfState._dtfPushInFlight = false;
         const _b = document.getElementById('dtf-push-shopworks-btn');
         // Don't clobber the "Pushed ✓" success label once the push completed.
         if (label && (!_b || _b.dataset.pushed !== '1')) label.textContent = 'Push to ShopWorks';
@@ -62,7 +62,7 @@ function _dtfEsc(s) {
 // confirm()-push so the rep is never blocked.
 export async function openDtfPushPreview() {
     const btn = document.getElementById('dtf-push-shopworks-btn');
-    if (!btn || btn.disabled || !_dtfPushQuoteId) return;
+    if (!btn || btn.disabled || !dtfState._dtfPushQuoteId) return;
     // Warn before pushing with no ShopWorks Customer # — the order would silently
     // attach to placeholder customer 3739 instead of the real customer. EMB gates its
     // button on this; SCP/DTF warn at push time for parity. (2026-06-01)
@@ -89,7 +89,7 @@ export async function openDtfPushPreview() {
 
     try {
         const apiBase = window.APP_CONFIG.API.BASE_URL;
-        const resp = await fetch(`${apiBase}/api/dtf-push/preview/${encodeURIComponent(_dtfPushQuoteId)}`);
+        const resp = await fetch(`${apiBase}/api/dtf-push/preview/${encodeURIComponent(dtfState._dtfPushQuoteId)}`);
         const data = await resp.json();
         if (!resp.ok) throw new Error(data.error || data.details || `HTTP ${resp.status}`);
         renderDtfPushPreview(data.orderJson || {});
@@ -157,14 +157,14 @@ export async function confirmDtfPush(directFallback) {
     const mainLabel = document.getElementById('dtf-push-shopworks-label');
     const confirmBtn = document.getElementById('dtf-push-confirm');
     const statusEl = document.getElementById('dtf-push-status');
-    if (!_dtfPushQuoteId) return;
+    if (!dtfState._dtfPushQuoteId) return;
 
     if (directFallback) {
         const customerName = document.getElementById('customer-name')?.value?.trim() || '';
         const companyName = document.getElementById('company-name')?.value?.trim() || '';
         const displayName = companyName || customerName || 'N/A';
         if (!confirm(
-            `Push to ShopWorks?\n\nQuote: ${_dtfPushQuoteId}\nCustomer: ${displayName}\n\n` +
+            `Push to ShopWorks?\n\nQuote: ${dtfState._dtfPushQuoteId}\nCustomer: ${displayName}\n\n` +
             `This creates a new DTF order in ShopWorks OnSite with the products, sizes, charges, and ship-to from this quote.`
         )) return;
         if (mainBtn) { mainBtn.disabled = true; mainBtn.style.opacity = '0.6'; }
@@ -185,7 +185,7 @@ export async function confirmDtfPush(directFallback) {
         const response = await fetch(`${apiBase}/api/dtf-push/push-quote`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ quoteId: _dtfPushQuoteId, isTest: false, force: false }),
+            body: JSON.stringify({ quoteId: dtfState._dtfPushQuoteId, isTest: false, force: false }),
         });
         const data = await response.json();
 

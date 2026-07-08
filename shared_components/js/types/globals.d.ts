@@ -47,6 +47,8 @@ interface Window {
     __quoteState?: any;
     __scpState?: any;
     __scpQuoteState?: any;
+    __dtfState?: any;
+    __dtfQuoteState?: any;
     /** builders/emb debug handle for the active method adapter. */
     __embAdapter?: any;
     /** quote-builder-utils.js loading overlay (classic function declaration → window prop). */
