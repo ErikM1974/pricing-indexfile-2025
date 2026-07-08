@@ -1,3 +1,27 @@
+## v2026.07.08.1 (2026.07.08)
+
+- docs: A+ resale roadmap for Fable (9-expert grading workflow)
+- feat(build): Phase 0.1+0.2 esbuild pipeline — hashed, minified, immutable assets for the 3 quote builders
+- feat(config): Phase 0.3 tenant config spine — window.TENANT + APP_CONFIG shim, hardcoded hosts/EmailJS IDs removed from builder path
+- refactor(server): Phase 0.3 backend — 23 proxy-host literals → one CASPIO_PROXY_BASE constant
+- feat(ci): Phase 0.6 CI pipeline + lint/typecheck gates + Rule-6 hardcoded-literal guard
+- chore(builders): 0.4 base audit — delete dead quote-builder-core.js + INTEGRATION-EXAMPLE.js, drop DTF's zombie base tag
+- feat(emb): 0.4 extraction #0 — Service_Codes fees → builders/emb/pricing.js (strangler seam proven)
+- feat(emb): 0.4 extraction #1 — design-search modal cluster → builders/emb/design-search.js (986 lines out)
+- feat(emb): 0.4 extraction #2 — service-pricing-review modal → builders/emb/spr-modal.js (941 lines out)
+- chore(emb): 0.4 cluster #9 audit — DECG stitch modal is dead code, deleted (200 lines + markup)
+- feat(emb): 0.4 extraction #3 — ShopWorks import flow → builders/emb/shopworks-import.js (2,012 lines out)
+- feat(emb): 0.4 extraction #4 — draft/edit-load persistence → builders/emb/persistence.js (1,195 lines out)
+- feat(emb): 0.4 extraction #5 — output/diagnostics → builders/emb/output.js (780 lines out)
+- feat(emb): 0.4 extraction #6 — save + ShopWorks push → builders/emb/save-push.js (918 lines out)
+- feat(emb): 0.4 extraction #7 — quote lifecycle (reset/fees/discounts) → builders/emb/quote-lifecycle.js (643 lines out)
+- docs(emb): checkpoint plan + memory at 8 extracted modules (pre-cluster-5)
+- feat(emb): 0.4 extraction #8 — the hot pricing path → builders/emb/pricing-sync.js (1,795 lines out)
+- feat(emb): 0.4 extraction #9 — logo-config UI → builders/emb/logo-config.js (378 lines out)
+- feat(emb): 0.4 extraction #10 — product-rows mega-cut; ALL CLUSTERS DONE, monolith = 728-line shell
+- docs(emb): plan/ACTIVE_FILES/GUIDE entries for extraction #10 (all clusters done)
+- Deploy v2026.07.08.1: 11 files (dtf-prints-prototype.html,index.html,quote-management.html...)
+
 ## v2026.07.07.10 (2026.07.07)
 
 - feat(quote-builders): logo status chips — On file / New / TBD (all 3 builders)
