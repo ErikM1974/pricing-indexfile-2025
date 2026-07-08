@@ -785,8 +785,8 @@ describe('SCP parity (ScreenPrintPricingService bundle + exact builder tier/roun
         expect(res.warnings.join(' ')).toMatch(/service fees unavailable/i);
     });
 
-    test('CANARY: engine findPricingTier is a byte-equal copy of screenprint-quote-builder.js:2975-2985', () => {
-        const builderSrc = fs.readFileSync(path.join(ROOT, 'shared_components', 'js', 'screenprint-quote-builder.js'), 'utf8');
+    test('CANARY: engine findPricingTier is a byte-equal copy of the SCP builder tier authority (builders/scp/pricing-sync.js)', () => {
+        const builderSrc = fs.readFileSync(path.join(ROOT, 'shared_components', 'js', 'builders', 'scp', 'pricing-sync.js'), 'utf8');
         const match = builderSrc.match(/function findPricingTier\(tiers, qty\) \{[\s\S]*?\n\}/);
         expect(match).toBeTruthy();
         const normalize = (s) => s.replace(/\/\/[^\n]*/g, '').replace(/\s+/g, ''); // token-exact, formatting-immune

@@ -107,7 +107,7 @@ function extractFunction(src, name) {
   return src.slice(start, end);
 }
 
-const BUILDER_SRC = fs.readFileSync(path.join(ROOT, 'shared_components/js/screenprint-quote-builder.js'), 'utf8');
+const BUILDER_SRC = fs.readFileSync(path.join(ROOT, 'shared_components/js/builders/scp/save-output.js'), 'utf8');
 const PDF_FN_SRC = extractFunction(BUILDER_SRC, 'buildScreenprintPricingData');
 
 function loadPdfBuilder({ cells, parentRows, childRowMap, currentPricingData }) {

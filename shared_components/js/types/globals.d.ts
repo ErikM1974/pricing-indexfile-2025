@@ -229,7 +229,17 @@ interface Window {
     handleCellKeydown?: (...args: any[]) => any;
     updateRowBreakdown?: (...args: any[]) => any;
     buildPricingBreakdown?: (...args: any[]) => any;
-    /* SCP bridges (builders/scp/*, S1a) — names shared with EMB are typed above */
+    /* SCP bridges (builders/scp/*, S1a + S1b) — names shared with EMB are typed above */
+    recalculateAllPrices?: (...args: any[]) => any;
+    getScpExtraFees?: (...args: any[]) => any;
+    spcEmailQuote?: (...args: any[]) => any;
+    scpPushToShopWorks?: (...args: any[]) => any;
+    openScpPushPreview?: (...args: any[]) => any;
+    renderScpPushPreview?: (...args: any[]) => any;
+    confirmScpPush?: (...args: any[]) => any;
+    closeScpPushPreview?: (...args: any[]) => any;
+    showScpPushButton?: (...args: any[]) => any;
+    updateScpPushButtonState?: (...args: any[]) => any;
     updatePrintConfig?: (...args: any[]) => any;
     updateDarkGarmentNudge?: (...args: any[]) => any;
     initScreenPrintPersistence?: (...args: any[]) => any;

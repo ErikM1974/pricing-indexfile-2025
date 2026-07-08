@@ -132,6 +132,17 @@ line / $614.36 grand), capture parity **552 locked fields, 0 mismatches**.
   color handlers…). All 14 generated-handler names living in moved modules are
   bridged; `openExtendedSizePopup` in generated markup is defined only in
   dtf-quote-page.js which the SCP page does NOT load — pre-existing dead ref.
+**S1b ✅ (2026-07-08)** — shell 2,507 → 618 lines. pricing-sync.js (744L,
+recalculatePricing = `export let` + reprice-pill wrap at tail, EMB pattern),
+quote-lifecycle.js (260L), save-output.js (683L), push.js (219L; the
+_scpPushQuoteId/_scpPushInFlight `let`s stay shell-side — cross-module lexical
+state until S2). 20 more bridges (46 total). Tests RE-POINTED to module homes:
+web-quote-cart-parity findPricingTier → pricing-sync.js; scp-save-parity
+BUILDER_SRC → save-output.js; push-button-binding SCP file → push.js. Verified:
+full battery exit 0, 1551 tests, browser smoke identical money ($528/$614.36),
+capture 552 fields 0 mismatches. Dead-in-monolith kept+disabled: saveQuote,
+handleDiscountPresetChange, handleDiscountReasonPresetChange.
+
 - Latent monolith bugs preserved verbatim (fix post-move, attribution-clean):
   persistence `updateRowQuantityTotal` (defined nowhere; draft-restore path),
   product-rows deleteRow tail `updateCapLogoSectionVisibility` (EMB-only —

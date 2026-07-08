@@ -86,6 +86,10 @@ export default [
             'shared_components/js/builders/scp/print-config.js',
             'shared_components/js/builders/scp/persistence.js',
             'shared_components/js/builders/scp/product-rows.js',
+            'shared_components/js/builders/scp/pricing-sync.js',
+            'shared_components/js/builders/scp/quote-lifecycle.js',
+            'shared_components/js/builders/scp/save-output.js',
+            'shared_components/js/builders/scp/push.js',
         ],
         rules: {
             'no-unsanitized/property': 'off',

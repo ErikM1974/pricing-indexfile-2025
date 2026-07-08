@@ -13,11 +13,35 @@
  * user interaction can call it.
  *
  * S1a (2026-07-08): print-config, persistence, product-rows.
- * S1b next: pricing-sync, quote-lifecycle, save-output, push.
+ * S1b (2026-07-08): pricing-sync (recalculatePricing = live export let,
+ * reprice-pill wrapped), quote-lifecycle, save-output, push.
  * S2: ScpAdapter + QuoteBuilderBase boot + state module (shell → tombstone).
  */
 
 import { updatePrintConfig, updateDarkGarmentNudge } from './print-config.js';
+import {
+    recalculatePricing,
+    recalculateAllPrices,
+    collectProductsFromTable,
+    updateTaxCalculation,
+    toggleWholesale,
+} from './pricing-sync.js';
+import {
+    updateAdditionalCharges,
+    updateDiscountType,
+    getScpExtraFees,
+    updateFeeTableRows,
+} from './quote-lifecycle.js';
+import { printQuote, saveAndGetLink, spcEmailQuote, copyToClipboard } from './save-output.js';
+import {
+    showScpPushButton,
+    updateScpPushButtonState,
+    scpPushToShopWorks,
+    confirmScpPush,
+    closeScpPushPreview,
+    openScpPushPreview,
+    renderScpPushPreview,
+} from './push.js';
 import {
     initScreenPrintPersistence,
     restoreScreenPrintDraft,
@@ -79,5 +103,36 @@ window.clearExtendedSize = clearExtendedSize;
 window.deleteRow = deleteRow;
 window.handleCellKeydown = handleCellKeydown;
 
+// ---- pricing sync (S1b) ----
+// recalculatePricing is pricing-sync's live `export let` — its module tail
+// applies the reprice-pill wrap BEFORE this import evaluates, so the bridge
+// (and every bare-global caller) gets the wrapped version.
+window.recalculatePricing = recalculatePricing;
+window.recalculateAllPrices = recalculateAllPrices;
+window.collectProductsFromTable = collectProductsFromTable;
+window.updateTaxCalculation = updateTaxCalculation;
+window.toggleWholesale = toggleWholesale;
+
+// ---- quote lifecycle (S1b) ----
+window.updateAdditionalCharges = updateAdditionalCharges;
+window.updateDiscountType = updateDiscountType;
+window.getScpExtraFees = getScpExtraFees;
+window.updateFeeTableRows = updateFeeTableRows;
+
+// ---- save / print / email output (S1b) ----
+window.printQuote = printQuote;
+window.saveAndGetLink = saveAndGetLink;
+window.spcEmailQuote = spcEmailQuote;
+window.copyToClipboard = copyToClipboard;
+
+// ---- push to ShopWorks (S1b) ----
+window.showScpPushButton = showScpPushButton;
+window.updateScpPushButtonState = updateScpPushButtonState;
+window.scpPushToShopWorks = scpPushToShopWorks;
+window.confirmScpPush = confirmScpPush;
+window.closeScpPushPreview = closeScpPushPreview;
+window.openScpPushPreview = openScpPushPreview;
+window.renderScpPushPreview = renderScpPushPreview;
+
 window.__QB_BUILD = window.__QB_BUILD || {};
-window.__QB_BUILD.scp = { entry: 'builders/scp/index.js', stage: 'S1a' };
+window.__QB_BUILD.scp = { entry: 'builders/scp/index.js', stage: 'S1b' };
