@@ -1,3 +1,8 @@
+## v2026.07.08.4 (2026.07.08)
+
+- feat(dtf): 0.4 DTF decomposition D1 — DTFQuoteBuilder class + output + push -> builders/dtf/ (shell 4,082->164)
+- feat(dtf): 0.4/0.5 DTF decomposition D2 COMPLETE — state.js + DtfAdapter + base boot; monolith -> tombstone
+
 ## v2026.07.08.3 (2026.07.08)
 
 - feat(scp): 0.4 SCP decomposition S1a — print-config + persistence + product-rows -> builders/scp/ (shell 5,406->2,507)
