@@ -17,7 +17,7 @@
  */
 // @ts-nocheck — MOVED legacy DOM code: pre-existing checkJs frictions; typing
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
-/* global API_BASE, EMB_DEFAULTS, SIZE06_EXTENDED_SIZES, showToast,
+/* global showToast,
    wrapWithRepricingIndicator, parseRatePercent, getLtmControlState,
    setLtmControlState, renderOrderRecap, markAsUnsaved, QuoteOrderSummary, structuredClone, updateQuantityNudge,
    renderLtmControlPanel, initLtmControlListeners,
@@ -28,6 +28,7 @@ import { renderPushReadiness } from './save-push.js';
 import { markEmbroideryDirty } from './persistence.js';
 import { getCapEmbellishmentType } from './logo-config.js';
 import { createServiceProductRow, updateRowBreakdown } from './product-rows.js';
+import { embState, EMB_DEFAULTS, SIZE06_EXTENDED_SIZES, API_BASE } from './state.js';
 
 // Debounce utility for input handlers that fire on every keystroke
 export function debounce(fn, delay) {
@@ -43,34 +44,34 @@ export function debounce(fn, delay) {
  * Shared between recalculatePricing() and saveAndGetLink() to avoid duplication.
  */
 export function buildLogoConfiguration() {
-    const garmentAL = globalAL.garment.enabled ? [{
+    const garmentAL = embState.globalAL.garment.enabled ? [{
         id: 'global-al-garment',
         position: 'AL',
-        stitchCount: globalAL.garment.stitchCount,
-        needsDigitizing: globalAL.garment.needsDigitizing
+        stitchCount: embState.globalAL.garment.stitchCount,
+        needsDigitizing: embState.globalAL.garment.needsDigitizing
     }] : [];
-    const capAL = globalAL.cap.enabled ? [{
+    const capAL = embState.globalAL.cap.enabled ? [{
         id: 'global-al-cap',
         position: 'AL-Cap',
-        stitchCount: globalAL.cap.stitchCount,
-        needsDigitizing: globalAL.cap.needsDigitizing
+        stitchCount: embState.globalAL.cap.stitchCount,
+        needsDigitizing: embState.globalAL.cap.needsDigitizing
     }] : [];
 
     const logoConfigs = {
         garment: {
-            primary: { ...primaryLogo, id: 'primary' },
+            primary: { ...embState.primaryLogo, id: 'primary' },
             additional: garmentAL
         },
         cap: {
-            primary: { ...capPrimaryLogo, id: 'cap-primary' },
+            primary: { ...embState.capPrimaryLogo, id: 'cap-primary' },
             additional: capAL
         }
     };
 
     const allLogos = [
-        { ...primaryLogo, id: 'primary' },
+        { ...embState.primaryLogo, id: 'primary' },
         ...garmentAL,
-        { ...capPrimaryLogo, id: 'cap-primary' },
+        { ...embState.capPrimaryLogo, id: 'cap-primary' },
         ...capAL
     ];
 
@@ -450,7 +451,7 @@ async function computeNudgeSavingsAsync(productList, allLogos, logoConfigs, ltmE
             const k = Object.keys(sb).find(key => sb[key] > 0) || 'L';
             sb[k] = (Number(sb[k]) || 0) + t.needed;
         }
-        const sim = await pricingCalculator.calculateQuote(clone, allLogos, logoConfigs, { ltmEnabled });
+        const sim = await embState.pricingCalculator.calculateQuote(clone, allLogos, logoConfigs, { ltmEnabled });
         if (mySeq !== window._embRecalcSeq) return;   // a newer recalc superseded this sim
         if (!sim || sim.success === false) return;
         const unitOf = (res) => {
@@ -481,8 +482,8 @@ async function computeNudgeSavingsAsync(productList, allLogos, logoConfigs, ltmE
  * two different digitizing prices.
  */
 export function syncDigitizingPriceLabels() {
-    const bundleFee = (typeof pricingCalculator !== 'undefined' && pricingCalculator && Number(pricingCalculator.digitizingFee) > 0)
-        ? Number(pricingCalculator.digitizingFee) : null;
+    const bundleFee = (typeof embState.pricingCalculator !== 'undefined' && embState.pricingCalculator && Number(embState.pricingCalculator.digitizingFee) > 0)
+        ? Number(embState.pricingCalculator.digitizingFee) : null;
     const ddFee = (typeof getServicePrice === 'function') ? getServicePrice('DD', bundleFee ?? 100) : (bundleFee ?? 100);
     const billed = bundleFee ?? ddFee;
     document.querySelectorAll('[data-dd-price]').forEach(el => {
@@ -579,10 +580,10 @@ async function _recalculatePricingImpl() {
         // Check for laser-patch cap setup fee
         const capEmbType = getCapEmbellishmentType();
         const capHasStyle = document.querySelector('tr[data-style]:not(.child-row) .cap-badge') !== null || hasCaps;
-        const showPatchSetup = capEmbType === 'laser-patch' && capHasStyle && capPrimaryLogo.needsSetup;
+        const showPatchSetup = capEmbType === 'laser-patch' && capHasStyle && embState.capPrimaryLogo.needsSetup;
         // Engine's patchSetupFee is the live Service_Codes GRT-50 value; EMB_DEFAULTS is fallback-only.
         const patchSetupFee = showPatchSetup
-            ? (Number.isFinite(pricingCalculator?.patchSetupFee) ? pricingCalculator.patchSetupFee : EMB_DEFAULTS.PATCH_SETUP_FEE)
+            ? (Number.isFinite(embState.pricingCalculator?.patchSetupFee) ? embState.pricingCalculator.patchSetupFee : EMB_DEFAULTS.PATCH_SETUP_FEE)
             : 0;
 
         // Determine tier based on total quantity
@@ -623,7 +624,7 @@ async function _recalculatePricingImpl() {
         if (wouldHaveLTM) {
             ltmWrapper.style.display = '';
             // Engine's ltmFee is the API-loaded LTM (Service_Codes); 50 is fallback-only.
-            const apiLtmFee = Number.isFinite(parseFloat(pricingCalculator?.ltmFee)) ? parseFloat(pricingCalculator.ltmFee) : 50;
+            const apiLtmFee = Number.isFinite(parseFloat(embState.pricingCalculator?.ltmFee)) ? parseFloat(embState.pricingCalculator.ltmFee) : 50;
             const garmentLtmFee = garmentHasLTM ? apiLtmFee : 0;
             const capLtmFee = capHasLTM ? apiLtmFee : 0;
             const totalLtmFee = garmentLtmFee + capLtmFee;
@@ -661,7 +662,7 @@ async function _recalculatePricingImpl() {
     const ltmDisplayMode = ltmState.displayMode || 'builtin';
 
     try {
-        const pricing = await pricingCalculator.calculateQuote(productList, allLogos, logoConfigs, { ltmEnabled });
+        const pricing = await embState.pricingCalculator.calculateQuote(productList, allLogos, logoConfigs, { ltmEnabled });
 
         // A newer recalc started while we were awaiting — discard this stale result.
         if (mySeq !== window._embRecalcSeq) return;
@@ -760,7 +761,7 @@ async function _recalculatePricingImpl() {
                         }
 
                         sizesToCheck.forEach(size => {
-                            const childRowId = childRowMap[rowId]?.[size];
+                            const childRowId = embState.childRowMap[rowId]?.[size];
                             if (childRowId) {
                                 const childRow = document.getElementById(`row-${childRowId}`);
                                 // Only update price if child row's color matches this product's color
@@ -1003,7 +1004,7 @@ export function collectProductsFromTable() {
                 const isCap = row.dataset.isCap === 'true';
 
                 // Get global AL config for this product type
-                const alConfig = isCap ? globalAL.cap : globalAL.garment;
+                const alConfig = isCap ? embState.globalAL.cap : embState.globalAL.garment;
                 const additionalLogos = alConfig.enabled ? [{
                     id: `global-al-${isCap ? 'cap' : 'garment'}`,
                     position: alConfig.position,
@@ -1069,7 +1070,7 @@ export function updatePricingDisplay(pricing) {
         const cLtm = cQ > 0 && cQ <= 7;
         minWarning.style.display = (gLtm || cLtm) ? 'flex' : 'none';
         const msgEl = minWarning.querySelector('.min-order-warning-text') || minWarning.querySelector('span') || minWarning;
-        const fee = Number.isFinite(parseFloat(pricingCalculator?.ltmFee)) ? parseFloat(pricingCalculator.ltmFee) : 50;
+        const fee = Number.isFinite(parseFloat(embState.pricingCalculator?.ltmFee)) ? parseFloat(embState.pricingCalculator.ltmFee) : 50;
         if (gLtm && cLtm) {
             msgEl.textContent = `Garments (${gQ} pcs) and caps (${cQ} pcs) are each under the 8-piece minimum — two $${fee} small-order fees apply.`;
         } else if (gLtm) {
@@ -1363,7 +1364,7 @@ export function updatePricingDisplay(pricing) {
     const garmentAlDigitizingRow = document.getElementById('garment-al-digitizing-row');
     const garmentAlDigitizingPosition = document.getElementById('garment-al-digitizing-position');
 
-    if (globalAL.garment.enabled && globalAL.garment.needsDigitizing && pricing.garmentQuantity > 0) {
+    if (embState.globalAL.garment.enabled && embState.globalAL.garment.needsDigitizing && pricing.garmentQuantity > 0) {
         if (garmentAlDigitizingRow) garmentAlDigitizingRow.style.display = 'table-row';
         if (garmentAlDigitizingPosition) garmentAlDigitizingPosition.textContent = 'AL';
     } else {
@@ -1373,7 +1374,7 @@ export function updatePricingDisplay(pricing) {
     const capAlDigitizingRow = document.getElementById('cap-al-digitizing-row');
     const capAlDigitizingPosition = document.getElementById('cap-al-digitizing-position');
 
-    if (globalAL.cap.enabled && globalAL.cap.needsDigitizing && pricing.capQuantity > 0) {
+    if (embState.globalAL.cap.enabled && embState.globalAL.cap.needsDigitizing && pricing.capQuantity > 0) {
         if (capAlDigitizingRow) capAlDigitizingRow.style.display = 'table-row';
         if (capAlDigitizingPosition) capAlDigitizingPosition.textContent = 'AL-Cap';
     } else {

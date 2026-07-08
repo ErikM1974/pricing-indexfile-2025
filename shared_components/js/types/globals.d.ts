@@ -38,6 +38,17 @@ interface Window {
     __QB_BUILD?: Record<string, { entry: string; modules?: string[] }>;
     /** Service_Codes cache (builders/emb/pricing.js) — legacy cross-file contract. */
     _serviceCodes?: Record<string, any> | null;
+    /** window-backed EMB contract fields (state.js): classic multi-builder consumers. */
+    childRowMap?: Record<string, Record<string, any>>;
+    hasChanges?: boolean;
+    pricingCalculator?: any;
+    /** builders/emb state handles (state.js via index.js). */
+    __embState?: any;
+    __quoteState?: any;
+    /** builders/emb debug handle for the active method adapter. */
+    __embAdapter?: any;
+    /** quote-builder-utils.js loading overlay (classic function declaration → window prop). */
+    showLoading?: (show: boolean, message?: string) => void;
     /** quote-builder-utils.js toast (classic function declaration → window prop). */
     showToast?: (msg: string, type?: string, duration?: number) => void;
     loadServiceCodePrices?: () => Promise<Record<string, any> | null>;
@@ -224,10 +235,7 @@ interface Window {
  * Monolith lexical globals the extracted modules still reach through the
  * global scope chain (strangler seams — each migrates with its own cluster).
  */
-declare let primaryLogo: any;
-declare let capPrimaryLogo: any;
 declare function escapeHtml(s: any): string;
 declare function showToast(msg: string, type?: string, duration?: number): void;
 declare let DesignThumbnailService: any;
 declare function renderOrderRecap(): void;
-declare let pricingCalculator: any;

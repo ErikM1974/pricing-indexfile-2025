@@ -7,7 +7,7 @@
 | File | Purpose |
 |------|---------|
 | `base-quote-service.js` | Base class for all quote save/email services |
-| `quote-builder-base.js` | **DORMANT — being revived (roadmap 0.4)**: never instantiated/extended; zombie DTF tag removed 2026-07-07. Becomes the shared ES-module base + adapter contract as the EMB decomposition lands | 
+| `quote-builder-base.js` | **RETIRED → pointer stub (2026-07-08)** — the ONE base lives at `builders/shared/quote-builder-base.js`; per-method adapters implement the MethodAdapter contract (`builders/emb/adapter.js` first) |
 | `builders/emb/index.js` | **ESM entry point (roadmap 0.1/0.4)** — the ONE sanctioned window re-export surface for the EMB decomposition (eslint-enforced); runs before DOMContentLoaded. Extracted so far: `pricing.js`, `design-search.js`, `spr-modal.js`, `shopworks-import.js`, `persistence.js`, output.js. Map → memory/emb-decomposition-plan.md |
 | `builders/emb/pricing.js` | **Extraction #0 (2026-07-07)** — Service_Codes fees: `loadServiceCodePrices()` (window._serviceCodes cache = cross-file contract) + `getServicePrice(code, fallback)` (live price, fallback + visible toast on API failure). Becomes the only module talking to the pricing APIs |
 | `builders/emb/design-search.js` | **Extraction #1 (2026-07-07)** — design lookup/gallery modal (search, filters, batched grid, apply-to-logo-card, customer autofill). 15 window bridges via index.js; reset accessors for the monolith's customer-change/resetQuote paths |
@@ -20,6 +20,10 @@
 | `builders/emb/pricing-sync.js` | **Extraction #8 (2026-07-07)** — recalculatePricing (live export let, pre-wrapped w/ reprice pill) + display + AL/DECG/rush sync + tax/ship UI. 27 bridges; siblings real-import the live binding |
 | `builders/emb/logo-config.js` | **Extraction #9 (2026-07-07)** — stitch/logo/embellishment UI + `_syncALArrays` global-AL sync + notes badge. 18 bridges; siblings real-import |
 | `builders/emb/product-rows.js` | **Extraction #10, final cluster (2026-07-07)** — search/rows/sizes/colors machinery (45 bridges; size-category engine, color picker, child rows). Siblings real-import its helpers |
+| `builders/shared/quote-builder-base.js` | **QuoteBuilderBase (2026-07-08)** — the ONE base: lifecycle (setupPage → initPricingAndRoute → focus), loud pricing-failure path, adapter-contract validation at boot |
+| `builders/emb/adapter.js` | **EmbAdapter (2026-07-08)** — MethodAdapter contract + the EMB init verbatim (services bar, customer panel wiring, ?edit/?duplicate/QQ/method-switch routing) |
+| `builders/shared/quote-model.js` | **0.5 (2026-07-08)** — createQuoteItem + QuoteState store (line CRUD, totals, caps-vs-garments tierGroups). Zero price math |
+| `builders/emb/state.js` | **0.5 (2026-07-08)** — embState (all EMB mutable state; 3 window-backed contract fields for classic consumers) + constants + the quoteState instance |
 | `builders/scp/index.js` | **ESM entry point (roadmap 0.1/0.4, 2026-07-07)** — SCP strangler shell, mirrors `builders/emb/` (filled after the EMB pilot) |
 | `builders/dtf/index.js` | **ESM entry point (roadmap 0.1/0.4, 2026-07-07)** — DTF strangler shell, mirrors `builders/emb/` (filled after the EMB pilot) |
 | `quote-builder-guided.js` | **Guided Quote shell (Phase B, 2026-07-07)** — 4-step flow (Products → Decoration → Customer → Review & send) over the TRIO's existing sections: tag-don't-wrap visibility (`data-guided-step` + `.guided-hidden`), exactly 2 id-preserving relocations (sidebar customer panel → step 3, action panel → step 4; hidden anchors restore), "Show everything" workbench toggle (localStorage `nwca-guided-mode`), push-readiness rows jump to the fixing step. Defensive no-op if any configured section is missing. DTG excluded (inline-form architecture) |

@@ -65,38 +65,6 @@ export default [
             'no-restricted-syntax': 'off',
         },
     },
-    {
-        // Monolith STATE seams the extracted EMB modules still reach through
-        // the global scope chain (lexical globals declared in
-        // embroidery-quote-builder.js — window.* can NOT reach them). Declared
-        // here (not per-file /* global */ comments) so write-only access
-        // doesn't trip no-unused-vars. Each migrates with its owning cluster;
-        // shrink this list as state moves into builders/emb modules.
-        files: ['shared_components/js/builders/emb/*.js'],
-        languageOptions: {
-            globals: {
-                products: 'writable',
-                primaryLogo: 'writable',
-                capPrimaryLogo: 'writable',
-                additionalLogos: 'writable',
-                capAdditionalLogos: 'writable',
-                globalAL: 'writable',
-                editingQuoteId: 'writable',
-                editingRevision: 'writable',
-                embPersistence: 'writable',
-                embSession: 'writable',
-                hasChanges: 'writable',
-                rowCounter: 'writable',
-                productCache: 'writable',
-                childRowMap: 'writable',
-                _pushQuoteId: 'writable',
-                _pushAlreadyDone: 'writable',
-                _pushInFlight: 'writable',
-                pendingShopWorksImport: 'writable',
-                lastImportMetadata: 'writable',
-                quoteService: 'writable',
-                pricingCalculator: 'writable',
-            },
         },
     },
     {
@@ -116,6 +84,7 @@ export default [
             'shared_components/js/builders/emb/quote-lifecycle.js',
             'shared_components/js/builders/emb/logo-config.js',
             'shared_components/js/builders/emb/product-rows.js',
+            'shared_components/js/builders/emb/adapter.js',
         ],
         rules: {
             'no-unsanitized/property': 'off',

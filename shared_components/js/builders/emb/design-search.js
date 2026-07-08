@@ -29,6 +29,7 @@
 import { lookupTaxRate } from './pricing-sync.js';
 import { onCapStitchTierChange, onPrimaryPositionChange, onPrimaryStitchTierChange } from './logo-config.js';
 import { updateLogoCardHeader } from './product-rows.js';
+import { embState } from './state.js';
 //  it resolves via window at click time; the monolith still owns it.)
 
 // ============================================================
@@ -88,7 +89,7 @@ export async function applyDesignFromCache(type, designData) {
 
     // Store on logo object for draft persistence
     if (type === 'garment') {
-        primaryLogo._designData = design;
+        embState.primaryLogo._designData = design;
         // [expert audit 2026-07-07 F5] Negotiated Full-Back design-tier pricing was
         // applied ONLY by the ShopWorks-import flow; a hand-built quote of the SAME
         // design fell back to the $1.25/1K formula — two prices depending on how the
@@ -96,15 +97,15 @@ export async function applyDesignFromCache(type, designData) {
         // the import's extraction. The engine only consumes fbPriceTiers when the
         // primary position is Full Back, so setting it here is inert otherwise.
         const _fbVariant = (design.variants || []).find(v => parseFloat(v.fbPrice1_7) > 0);
-        primaryLogo.fbPriceTiers = _fbVariant ? {
+        embState.primaryLogo.fbPriceTiers = _fbVariant ? {
             fbPrice1_7: _fbVariant.fbPrice1_7,
             fbPrice8_23: _fbVariant.fbPrice8_23,
             fbPrice24_47: _fbVariant.fbPrice24_47,
             fbPrice48_71: _fbVariant.fbPrice48_71,
             fbPrice72plus: _fbVariant.fbPrice72plus
         } : null;
-    } else if (typeof capPrimaryLogo !== 'undefined') {
-        capPrimaryLogo._designData = design;
+    } else if (typeof embState.capPrimaryLogo !== 'undefined') {
+        embState.capPrimaryLogo._designData = design;
     }
 
     await applyDesignToCard(type, designNum, design);
@@ -396,18 +397,18 @@ async function applyDesignToCard(type, designNum, design) {
     if (thumbUrl) {
         showDesignThumbnail(type, thumbUrl);
         if (type === 'garment') {
-            primaryLogo.thumbnailUrl = thumbUrl;
-        } else if (typeof capPrimaryLogo !== 'undefined') {
-            capPrimaryLogo.thumbnailUrl = thumbUrl;
+            embState.primaryLogo.thumbnailUrl = thumbUrl;
+        } else if (typeof embState.capPrimaryLogo !== 'undefined') {
+            embState.capPrimaryLogo.thumbnailUrl = thumbUrl;
         }
     } else if (typeof DesignThumbnailService !== 'undefined') {
         // Fallback: legacy thumbnail service if unified table has no image
         DesignThumbnailService.fetchThumbnail(designNum).then(imageUrl => {
             showDesignThumbnail(type, imageUrl);
             if (type === 'garment') {
-                primaryLogo.thumbnailUrl = imageUrl || null;
-            } else if (typeof capPrimaryLogo !== 'undefined') {
-                capPrimaryLogo.thumbnailUrl = imageUrl || null;
+                embState.primaryLogo.thumbnailUrl = imageUrl || null;
+            } else if (typeof embState.capPrimaryLogo !== 'undefined') {
+                embState.capPrimaryLogo.thumbnailUrl = imageUrl || null;
             }
         });
     }
@@ -533,10 +534,10 @@ async function autoFillCustomerFromCompany(companyName) {
  */
 function setDesignNumberOnLogo(type, designNum) {
     if (type === 'garment') {
-        primaryLogo.designNumber = designNum;
+        embState.primaryLogo.designNumber = designNum;
     } else if (type === 'cap') {
-        if (typeof capPrimaryLogo !== 'undefined') {
-            capPrimaryLogo.designNumber = designNum;
+        if (typeof embState.capPrimaryLogo !== 'undefined') {
+            embState.capPrimaryLogo.designNumber = designNum;
         }
     }
 }
@@ -613,10 +614,10 @@ export function clearDesignNumber(type) {
     // Hide design thumbnail and clear cached URL
     showDesignThumbnail(type, null);
     if (type === 'garment') {
-        primaryLogo.thumbnailUrl = null;
-        primaryLogo.fbPriceTiers = null;   // unlinked design takes its negotiated FB tiers with it (2026-07-07)
-    } else if (typeof capPrimaryLogo !== 'undefined') {
-        capPrimaryLogo.thumbnailUrl = null;
+        embState.primaryLogo.thumbnailUrl = null;
+        embState.primaryLogo.fbPriceTiers = null;   // unlinked design takes its negotiated FB tiers with it (2026-07-07)
+    } else if (typeof embState.capPrimaryLogo !== 'undefined') {
+        embState.capPrimaryLogo.thumbnailUrl = null;
     }
 
     showToast('Design unlinked', 'info');
@@ -1011,8 +1012,8 @@ export async function selectDesignFromSearch(designNum) {
         const previewUrl = cached?.mockupUrl || cached?.artworkUrl || cached?.thumbnailUrl || null;
         if (previewUrl) {
             showDesignThumbnail(_designSearchTarget, previewUrl);
-            if (_designSearchTarget === 'garment') primaryLogo.thumbnailUrl = previewUrl;
-            else if (typeof capPrimaryLogo !== 'undefined') capPrimaryLogo.thumbnailUrl = previewUrl;
+            if (_designSearchTarget === 'garment') embState.primaryLogo.thumbnailUrl = previewUrl;
+            else if (typeof embState.capPrimaryLogo !== 'undefined') embState.capPrimaryLogo.thumbnailUrl = previewUrl;
         }
 
         await lookupDesignNumber(_designSearchTarget);

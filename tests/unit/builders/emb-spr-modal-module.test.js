@@ -41,7 +41,7 @@ function loadModule() {
     const moduleObj = { exports: {} };
     // eslint-disable-next-line no-new-func
     new Function('module', 'exports', 'window', 'document', 'console', code)(
-        moduleObj, moduleObj.exports, { document: doc }, doc, { log() {}, warn() {}, error() {} }
+        moduleObj, moduleObj.exports, { document: doc, APP_CONFIG: { API: { BASE_URL: 'http://test' } } }, doc, { log() {}, warn() {}, error() {} }
     );
     return moduleObj.exports;
 }

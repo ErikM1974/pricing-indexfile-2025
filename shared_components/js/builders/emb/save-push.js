@@ -23,6 +23,7 @@ import { buildLogoConfiguration, collectProductsFromTable, getOrderPieceCounts, 
 import { getAdditionalCharges, collectDECGItems } from './quote-lifecycle.js';
 import { getCapEmbellishmentType } from './logo-config.js';
 import { dateFromInputValue } from './product-rows.js';
+import { embState } from './state.js';
 
 /**
  * Save quote and get shareable link
@@ -172,7 +173,7 @@ async function _saveAndGetLinkInner(opts = {}) {
                 capQuantity: 0
             };
         } else {
-            pricing = await pricingCalculator.calculateQuote(products, allLogos, logoConfigs, { ltmEnabled });
+            pricing = await embState.pricingCalculator.calculateQuote(products, allLogos, logoConfigs, { ltmEnabled });
         }
 
         // Don't SAVE a quote at a silently-wrong (zero) price on a hard pricing failure. `=== false`
@@ -256,9 +257,9 @@ async function _saveAndGetLinkInner(opts = {}) {
             dropDeadDate: dateFromInputValue(document.getElementById('drop-dead-date')?.value),
             paymentTerms: document.getElementById('payment-terms')?.value?.trim() || '',
             // Frozen tax & design data for Caspio (2026-02-12)
-            designNumbers: lastImportMetadata?.designNumbers || [],
-            digitizingCodes: lastImportMetadata?.digitizingCodes || [],
-            digitizingFees: lastImportMetadata?.parsedServices?.digitizingFees || [],
+            designNumbers: embState.lastImportMetadata?.designNumbers || [],
+            digitizingCodes: embState.lastImportMetadata?.digitizingCodes || [],
+            digitizingFees: embState.lastImportMetadata?.parsedServices?.digitizingFees || [],
             taxRate: (() => {
                 const includeTax = document.getElementById('include-tax')?.checked;
                 if (!includeTax) return 0;
@@ -278,8 +279,8 @@ async function _saveAndGetLinkInner(opts = {}) {
                 // again — that double-counted shipping in the saved/pushed TaxAmount. (round-2 N1/N6 — pre-existing bug)
                 return Math.round(preTaxSubtotal * (rateVal / 100) * 100) / 100;
             })(),
-            importNotes: lastImportMetadata
-                ? [...(lastImportMetadata.warnings || []), ...(lastImportMetadata.unmatchedLines || []), ...(lastImportMetadata.reviewItems || [])]
+            importNotes: embState.lastImportMetadata
+                ? [...(embState.lastImportMetadata.warnings || []), ...(embState.lastImportMetadata.unmatchedLines || []), ...(embState.lastImportMetadata.reviewItems || [])]
                 : [],
             // Phase 11.3 (2026-05-24) — rich-mode artwork data.
             // Persisted by quote-service.js into the ImportNotes JSON column
@@ -292,25 +293,25 @@ async function _saveAndGetLinkInner(opts = {}) {
             newDesignName: (window._embArtwork && typeof window._embArtwork.getDesignName === 'function')
                 ? (window._embArtwork.getDesignName() || '').trim()
                 : '',
-            paidToDate: lastImportMetadata?.paidToDate ?? 0,
-            balanceAmount: lastImportMetadata?.balanceAmount ?? 0,
-            orderNotes: lastImportMetadata?.orderNotes ?? '',
+            paidToDate: embState.lastImportMetadata?.paidToDate ?? 0,
+            balanceAmount: embState.lastImportMetadata?.balanceAmount ?? 0,
+            orderNotes: embState.lastImportMetadata?.orderNotes ?? '',
             // Package tracking (2026-02-14)
-            carrier: lastImportMetadata?.carrier || '',
-            trackingNumber: lastImportMetadata?.trackingNumber || '',
+            carrier: embState.lastImportMetadata?.carrier || '',
+            trackingNumber: embState.lastImportMetadata?.trackingNumber || '',
             // Design assignments (2026-02-19)
-            garmentDesignNumber: primaryLogo.designNumber || '',
-            capDesignNumber: (typeof capPrimaryLogo !== 'undefined' ? capPrimaryLogo.designNumber : '') || '',
+            garmentDesignNumber: embState.primaryLogo.designNumber || '',
+            capDesignNumber: (typeof embState.capPrimaryLogo !== 'undefined' ? embState.capPrimaryLogo.designNumber : '') || '',
             // ShopWorks pricing audit (2026-02-13)
-            swTotal: lastImportMetadata?.swTotal ?? 0,
-            swSubtotal: lastImportMetadata?.swSubtotal ?? 0,
+            swTotal: embState.lastImportMetadata?.swTotal ?? 0,
+            swSubtotal: embState.lastImportMetadata?.swSubtotal ?? 0,
             priceAuditJSON: (() => {
-                if (!lastImportMetadata || !lastImportMetadata.swSubtotal) return '';
+                if (!embState.lastImportMetadata || !embState.lastImportMetadata.swSubtotal) return '';
                 // Reloaded quotes have no per-row _swUnitPrice (it only exists right after a
                 // paste-import), so recomputing here would write false MISMATCH flags. Keep
                 // the audit captured at import time verbatim. (audit 2026-06-10)
-                if (lastImportMetadata.restoredFromSession) return lastImportMetadata.priceAuditJSONSnapshot || '';
-                const swSub = lastImportMetadata.swSubtotal;
+                if (embState.lastImportMetadata.restoredFromSession) return embState.lastImportMetadata.priceAuditJSONSnapshot || '';
+                const swSub = embState.lastImportMetadata.swSubtotal;
                 const ourSub = pricing.grandTotal || 0;
                 const delta = ourSub - swSub;
                 const pct = swSub > 0 ? Math.abs(delta / swSub) * 100 : 0;
@@ -332,7 +333,7 @@ async function _saveAndGetLinkInner(opts = {}) {
                     };
                 });
                 // Append service items (AL, Monogram, Weight, Digitizing) to audit
-                const svc = lastImportMetadata.parsedServices || {};
+                const svc = embState.lastImportMetadata.parsedServices || {};
                 const alFeePerUnit = pricing.additionalServices?.length > 0
                     ? (pricing.additionalServices[0]?.unitPrice || 6.50)
                     : 6.50;
@@ -383,7 +384,7 @@ async function _saveAndGetLinkInner(opts = {}) {
                         swUnit: parseFloat(swU.toFixed(2)), ourUnit: parseFloat(ourU.toFixed(2)),
                         delta: parseFloat(d.toFixed(2)), flag: p <= 5 ? 'OK' : p <= 15 ? 'REVIEW' : 'MISMATCH', isService: true });
                 });
-                return JSON.stringify({ swTotal: lastImportMetadata.swTotal, swSubtotal: swSub,
+                return JSON.stringify({ swTotal: embState.lastImportMetadata.swTotal, swSubtotal: swSub,
                     ourSubtotal: parseFloat(ourSub.toFixed(2)), deltaSubtotal: parseFloat(delta.toFixed(2)),
                     deltaPct: parseFloat(pct.toFixed(1)), flag, products: prods });
             })()
@@ -417,12 +418,12 @@ async function _saveAndGetLinkInner(opts = {}) {
         pricing.manualServiceItems = manualServiceItems;
 
         let result;
-        if (editingQuoteId) {
+        if (embState.editingQuoteId) {
             // Edit mode: Update existing quote (save revision)
-            result = await quoteService.updateQuote(editingQuoteId, quoteData, customerData, pricing);
+            result = await embState.quoteService.updateQuote(embState.editingQuoteId, quoteData, customerData, pricing);
         } else {
             // New quote mode: Create new quote
-            result = await quoteService.saveQuote(quoteData, customerData, pricing);
+            result = await embState.quoteService.saveQuote(quoteData, customerData, pricing);
         }
 
         if (result && result.quoteID) {
@@ -436,10 +437,10 @@ async function _saveAndGetLinkInner(opts = {}) {
                 return;
             }
 
-            const isUpdate = !!editingQuoteId;
+            const isUpdate = !!embState.editingQuoteId;
             // Clear auto-save draft on successful save (2026 consolidation)
-            if (embPersistence) {
-                embPersistence.clearDraft();
+            if (embState.embPersistence) {
+                embState.embPersistence.clearDraft();
             }
 
             // Mark as saved (no unsaved changes)
@@ -447,8 +448,8 @@ async function _saveAndGetLinkInner(opts = {}) {
 
             if (isUpdate) {
                 // Update mode: Show revision success message
-                const newRevision = result.revision || (editingRevision + 1);
-                editingRevision = newRevision;
+                const newRevision = result.revision || (embState.editingRevision + 1);
+                embState.editingRevision = newRevision;
                 updateEditModeUI(result.quoteID, newRevision);
                 showToast(`Revision ${newRevision} saved successfully!`, 'success');
 
@@ -514,7 +515,7 @@ export function updatePushButtonState() {
     if (!btn) return;  // [2026-06-07] do NOT bail when the label is transiently missing → still enable/disable the button
     renderPushReadiness();
 
-    if (_pushAlreadyDone) {
+    if (embState._pushAlreadyDone) {
         // "Sent" — not "Pushed/Imported". The order reached ManageOrders; OnSite
         // import is confirmed separately (Verify in ShopWorks in the push modal).
         if (label) label.textContent = 'Sent to ShopWorks ✓';
@@ -577,7 +578,7 @@ export function getPushReadiness() {
 export function renderPushReadiness() {
     const el = document.getElementById('push-readiness');
     if (!el) return;
-    if (_pushAlreadyDone) { el.innerHTML = ''; return; }   // already sent — nothing to check
+    if (embState._pushAlreadyDone) { el.innerHTML = ''; return; }   // already sent — nothing to check
     const r = getPushReadiness();
     // Shared clickable checklist (quote-builder-utils.js) — unmet items focus their field
     // (item #8, 2026-07-05). Fallback keeps the old plain markup if utils didn't load.
@@ -596,7 +597,7 @@ export function renderPushReadiness() {
     // renderPushReadiness() callers (e.g. a product change at ~line 6341) updated the checklist green but
     // never re-gated the button → it stayed stale-disabled even with all checks green (the bug Erik hit).
     const _pbtn = document.getElementById('emb-push-shopworks-btn');
-    if (_pbtn && !_pushAlreadyDone) {
+    if (_pbtn && !embState._pushAlreadyDone) {
         const enabled = r.hasCustomer && r.hasProducts && r.hasName && r.hasEmail;
         _pbtn.disabled = !enabled;
         _pbtn.style.opacity = enabled ? '1' : '0.5';
@@ -607,10 +608,10 @@ export function renderPushReadiness() {
 
 // Called after a successful save and when loading a saved quote for editing.
 export function showPushButton(quoteId, opts = {}) {
-    _pushQuoteId = quoteId;
+    embState._pushQuoteId = quoteId;
     // [B5] (audit 2026-06-06): only CLEAR the "already pushed" lock for a genuinely NEW quote. A re-save of
     // an already-pushed quote must NOT wipe it (else the rep can push again → a duplicate ShopWorks order).
-    if (opts.resetPushed === true) _pushAlreadyDone = false;
+    if (opts.resetPushed === true) embState._pushAlreadyDone = false;
     updatePushButtonState();
 }
 
@@ -621,8 +622,8 @@ export async function pushToShopWorks() {
         document.getElementById('customer-number')?.focus();
         return;
     }
-    if (_pushInFlight) return;             // already saving/pushing — ignore the double-click
-    _pushInFlight = true;
+    if (embState._pushInFlight) return;             // already saving/pushing — ignore the double-click
+    embState._pushInFlight = true;
     const pushBtn = document.getElementById('emb-push-shopworks-btn');
     if (pushBtn) {
         pushBtn.disabled = true;  // disable synchronously, BEFORE the first await
@@ -635,13 +636,13 @@ export async function pushToShopWorks() {
     }
     try {
         const dirty = (typeof hasUnsavedChanges === 'function') ? hasUnsavedChanges() : true;
-        if (!_pushQuoteId || dirty) {
+        if (!embState._pushQuoteId || dirty) {
             await saveAndGetLink({ skipShareModal: true });   // silent save → showPushButton sets _pushQuoteId
         }
-        if (!_pushQuoteId) return;            // save failed / validation blocked it — error already shown
+        if (!embState._pushQuoteId) return;            // save failed / validation blocked it — error already shown
         await openPushPreview();
     } finally {
-        _pushInFlight = false;
+        embState._pushInFlight = false;
         updatePushButtonState();          // resets the label text + re-enables via the gate (respects blank-cust# / "Sent ✓")
     }
 }
@@ -652,7 +653,7 @@ export async function pushToShopWorks() {
 // items, designs and notes before the order is created.
 export async function openPushPreview() {
     const btn = document.getElementById('emb-push-shopworks-btn');
-    if (!btn || btn.disabled || !_pushQuoteId) return;
+    if (!btn || btn.disabled || !embState._pushQuoteId) return;
 
     const modal = document.getElementById('emb-sw-push-modal');
     const statusEl = document.getElementById('emb-sw-push-status');
@@ -690,7 +691,7 @@ export async function openPushPreview() {
 
     try {
         const apiBase = window.APP_CONFIG.API.BASE_URL;
-        const resp = await fetch(`${apiBase}/api/embroidery-push/preview/${encodeURIComponent(_pushQuoteId)}`);
+        const resp = await fetch(`${apiBase}/api/embroidery-push/preview/${encodeURIComponent(embState._pushQuoteId)}`);
         const data = await resp.json();
         if (!resp.ok) throw new Error(data.error || data.details || `HTTP ${resp.status}`);
         renderPushPreview(data);
@@ -812,12 +813,12 @@ function renderPushPreview(data) {
 export async function confirmPushToShopWorks() {
     const confirmBtn = document.getElementById('emb-sw-push-confirm');
     const statusEl = document.getElementById('emb-sw-push-status');
-    if (!_pushQuoteId || !confirmBtn) return;
+    if (!embState._pushQuoteId || !confirmBtn) return;
     const force = confirmBtn.dataset.force === 'true';
 
     // [B5] (audit 2026-06-06): defense-in-depth — never silently re-push an already-pushed quote unless the
     // rep explicitly armed the duplicate button (force). Belt-and-suspenders behind the showPushButton lock.
-    if (_pushAlreadyDone && !force) {
+    if (embState._pushAlreadyDone && !force) {
         showToast('Already sent to ShopWorks this session — use the "Push Again (creates duplicate)" button if you really mean to.', 'warning');
         return;
     }
@@ -831,7 +832,7 @@ export async function confirmPushToShopWorks() {
         const response = await fetch(`${apiBase}/api/embroidery-push/push-quote`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ quoteId: _pushQuoteId, isTest: false, force }),
+            body: JSON.stringify({ quoteId: embState._pushQuoteId, isTest: false, force }),
         });
         const data = await response.json();
 
@@ -860,9 +861,9 @@ export async function confirmPushToShopWorks() {
         // we report "Sent to ManageOrders" and verify the REAL OnSite import via
         // getorderno. (EMB-2026-269 false-success — MO said uploaded, OnSite never
         // imported it — 2026-06-02.)
-        _pushAlreadyDone = true;
+        embState._pushAlreadyDone = true;
         updatePushButtonState();
-        const extId = data.extOrderId || _pushQuoteId;
+        const extId = data.extOrderId || embState._pushQuoteId;
         if (statusEl) {
             statusEl.innerHTML = '<div class="shopworks-import-preview active" style="background:#eff6ff; border-color:#bfdbfe;">' +
                 '<h4><i class="fas fa-paper-plane"></i> Sent to ManageOrders</h4>' +
