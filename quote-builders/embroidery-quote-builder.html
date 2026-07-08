@@ -1562,5 +1562,9 @@ Company:Absher Construction Company
     <!-- Backdrop dimmer (`hidden` paired with the aside above — JS removes both on open) -->
     <div class="ai-chat-backdrop" id="aiChatBackdrop" aria-hidden="true" hidden></div>
 
+    <!-- Phase 0 strangler entry (roadmap 0.4): modules extracted from
+         embroidery-quote-builder.js land in this esbuild bundle. Loads last. -->
+    <script src="/shared_components/js/builders/emb/index.js"></script>
+
 </body>
 </html>

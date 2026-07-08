@@ -121,6 +121,10 @@ dotenv.config();
 //
 // STATIC FILE SERVING
 //   /robots.txt — staff/internal dirs + credential share-links disallowed (2026-06-11)
+//   /dist/* — content-hashed build output (scripts/build.js), Cache-Control immutable (2026-07-07)
+//   GET /quote-builders/:page — the 3 builder HTMLs served with script/link tags
+//        rewritten to hashed /dist assets via dist/asset-manifest.json; falls
+//        through to the plain static mount when no build exists (2026-07-07)
 //   L567  Static directories (calculators, dashboards, quote-builders, etc.)
 //   L624  Directory-to-static mappings (20+ directories)
 //
@@ -3003,6 +3007,46 @@ console.log('✓ CRM API proxy routes loaded (session-protected)');
 // robots.txt — staff/internal paths + credential-bearing share links disallowed (2026-06-11)
 app.get('/robots.txt', (req, res) => {
   res.sendFile(path.join(__dirname, 'robots.txt'));
+});
+
+// ── Build pipeline (roadmap 0.1/0.2) ────────────────────────────────────────
+// scripts/build.js emits content-hashed, minified copies of the quote-builder
+// assets into /dist + dist/asset-manifest.json. Hashed filenames make these
+// safe to cache forever (the name changes when the content does) — unlike the
+// no-cache staticOptions everything else needs. HTML stays no-cache so new
+// manifest refs are picked up on the next load.
+app.use('/dist', express.static(path.join(__dirname, 'dist'), {
+  setHeaders: (res) => {
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+  }
+}));
+
+// Serve the three builder pages with script/link tags rewritten to the hashed
+// /dist assets. No manifest (build not run) → fall through to the plain
+// static mount below and serve the original source paths — the build is an
+// overlay, never a requirement.
+const { rewriteHtmlAssets, createManifestLoader, createHtmlLoader } = require('./lib/asset-manifest');
+const loadAssetManifest = createManifestLoader(path.join(__dirname, 'dist', 'asset-manifest.json'));
+const loadBuilderHtml = createHtmlLoader();
+const REWRITTEN_BUILDER_PAGES = new Set([
+  'embroidery-quote-builder.html',
+  'screenprint-quote-builder.html',
+  'dtf-quote-builder.html'
+]);
+app.get('/quote-builders/:page', (req, res, next) => {
+  if (!REWRITTEN_BUILDER_PAGES.has(req.params.page)) return next();
+  const manifest = loadAssetManifest();
+  if (!manifest) return next();
+  try {
+    const html = loadBuilderHtml(path.join(__dirname, 'quote-builders', req.params.page));
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.type('html').send(rewriteHtmlAssets(html, manifest));
+  } catch (err) {
+    console.error('[asset-manifest] builder page rewrite failed, falling back to static:', err.message);
+    next();
+  }
 });
 
 // Serve specific directories as static
