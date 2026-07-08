@@ -1,3 +1,8 @@
+## v2026.07.08.2 (2026.07.08)
+
+- feat(emb): 0.4 base+adapter — QuoteBuilderBase revived, EmbAdapter drives the page (shell = 289 lines)
+- feat(emb): 0.5 quote-model + state migration — the monolith is GONE (EMB page is 100% modules)
+
 ## v2026.07.08.1 (2026.07.08)
 
 - docs: A+ resale roadmap for Fable (9-expert grading workflow)
