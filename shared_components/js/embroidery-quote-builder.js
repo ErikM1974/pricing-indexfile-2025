@@ -5,35 +5,10 @@
 // Use centralized config (fallback to hardcoded URL for backwards compatibility)
 const API_BASE = window.APP_CONFIG.API.BASE_URL;
 
-/**
- * Service-fee prices = the Caspio **Service_Codes** table (single source of truth),
- * via the proxy `GET /api/service-codes`. Fetched once at startup, cached on
- * window._serviceCodes. `getServicePrice(code, fallback)` returns the live SellPrice,
- * or the documented fallback WITH a visible warning if the API was unreachable —
- * never a silent wrong price (Erik's #1 rule). (2026-06-03)
- */
-async function loadServiceCodePrices() {
-    try {
-        const resp = await fetch(`${API_BASE}/api/service-codes`);
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-        const json = await resp.json();
-        const map = {};
-        (json.data || []).forEach(sc => { if (sc.ServiceCode) map[String(sc.ServiceCode).toUpperCase()] = sc; });
-        window._serviceCodes = map;
-        return map;
-    } catch (e) {
-        console.error('[ServiceCodes] Could not load live prices from /api/service-codes:', e);
-        if (typeof showToast === 'function') showToast("Couldn't reach the pricing service — using default service prices", 'warning', 5000);
-        return null;
-    }
-}
-function getServicePrice(code, fallback) {
-    const sc = window._serviceCodes && window._serviceCodes[String(code).toUpperCase()];
-    if (!sc) return fallback;
-    const sell = parseFloat(sc.SellPrice);
-    return isNaN(sell) ? fallback : sell;
-}
-window.getServicePrice = getServicePrice;
+// loadServiceCodePrices() + getServicePrice() MOVED to
+// builders/emb/pricing.js (roadmap 0.4 extraction #0, 2026-07-07).
+// The builders/emb bundle re-exports both onto window before
+// DOMContentLoaded, so every call site below keeps working unchanged.
 
 // API response caches (prevent 429 rate limit errors)
 const sizeDetectionCache = new Map();   // key: "style-color" → size detection result

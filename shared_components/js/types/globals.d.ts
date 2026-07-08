@@ -35,5 +35,11 @@ interface TenantConfig {
 interface Window {
     TENANT?: TenantConfig;
     APP_CONFIG?: any;
-    __QB_BUILD?: Record<string, { entry: string }>;
+    __QB_BUILD?: Record<string, { entry: string; modules?: string[] }>;
+    /** Service_Codes cache (builders/emb/pricing.js) — legacy cross-file contract. */
+    _serviceCodes?: Record<string, any> | null;
+    /** quote-builder-utils.js toast (classic function declaration → window prop). */
+    showToast?: (msg: string, type?: string, duration?: number) => void;
+    loadServiceCodePrices?: () => Promise<Record<string, any> | null>;
+    getServicePrice?: (code: string, fallback: number) => number;
 }

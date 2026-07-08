@@ -48,6 +48,7 @@ _Single sources of truth for pricing._
 _How the 4 builders are built/changed._
 
 - [quote-builder-architecture.md](quote-builder-architecture.md) — ⭐ active change-routing manifest (cited by CLAUDE.md)
+- [emb-decomposition-plan.md](emb-decomposition-plan.md) — ⭐ roadmap-0.4 working map: cluster table + proven strangler mechanics for splitting embroidery-quote-builder.js into builders/emb/* (update as clusters land)
 - [QUOTE_BUILDER_BEST_PRACTICES.md](QUOTE_BUILDER_BEST_PRACTICES.md)
 - [QUOTE_BUILDER_API_INTEGRATION.md](QUOTE_BUILDER_API_INTEGRATION.md)
 - [QUOTE_BUILDER_LINE_ITEMS.md](QUOTE_BUILDER_LINE_ITEMS.md)

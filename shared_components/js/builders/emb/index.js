@@ -3,15 +3,24 @@
  *
  * Task 0.4 extracts embroidery-quote-builder.js (13,712 lines) into modules
  * here: state.js, pricing.js, render.js, persistence.js, events.js. Each
- * extracted function is re-exported onto window from this entry until every
- * caller is migrated, then the window copy is dropped.
+ * extracted function is re-exported onto window from THIS file (the one
+ * sanctioned re-export surface — see eslint.config.mjs) until every caller
+ * is migrated, then the window copy is dropped.
  *
- * Built by scripts/build.js into an IIFE bundle (dist/); the page loads the
- * hashed bundle via the asset manifest. Keep this file import-free until the
- * first real module lands, so the raw path also works without a build.
+ * Built by scripts/build.js into a hashed IIFE bundle; the page loads it
+ * LAST (after the monolith), and it executes at parse time — strictly
+ * before DOMContentLoaded, so init-time callers always find the bridges.
+ *
+ * Extracted so far:
+ *   pricing.js — Service_Codes fee loading (cluster #0, 2026-07-07)
  */
-(function () {
-    'use strict';
-    window.__QB_BUILD = window.__QB_BUILD || {};
-    window.__QB_BUILD.emb = { entry: 'builders/emb/index.js' };
-})();
+import { loadServiceCodePrices, getServicePrice } from './pricing.js';
+
+// Strangler bridges — bare-identifier callers in the monolith resolve
+// through the global object, so these keep every existing call site and
+// inline handler working. Drop each line only when its callers migrate.
+window.loadServiceCodePrices = loadServiceCodePrices;
+window.getServicePrice = getServicePrice;
+
+window.__QB_BUILD = window.__QB_BUILD || {};
+window.__QB_BUILD.emb = { entry: 'builders/emb/index.js', modules: ['pricing'] };

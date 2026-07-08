@@ -1,0 +1,82 @@
+# EMB Decomposition Plan — roadmap 0.4 working map
+
+> Working document for the strangler extraction of `embroidery-quote-builder.js`
+> (13,703 lines → `shared_components/js/builders/emb/*`). Update the checklist as
+> clusters land. Mechanics proven by extraction #0 (2026-07-07). Raw function
+> inventory: regenerate with the mapper (see "Tooling" below) — don't trust stale
+> line numbers after edits.
+
+## The proven mechanics (follow EXACTLY per cluster)
+
+1. Move the cluster's functions verbatim into an ES module under `builders/emb/`
+   (JSDoc-typed; no behavior edits in the same commit as the move).
+2. Re-export each moved function onto `window` from `builders/emb/index.js` —
+   the ONE sanctioned re-export surface (eslint enforces). Bare-identifier
+   callers in the monolith resolve through the global object, and the bundle
+   executes at parse time (body-end tag) — strictly before `DOMContentLoaded`,
+   so init-time callers always find the bridges.
+3. Delete the monolith copy, leave a one-line MOVED pointer comment.
+4. Cross-module state stays where its READERS are: a `window.*` location that
+   other files read (e.g. `_serviceCodes`) is a CONTRACT — keep it until the
+   last reader migrates (eslint-disable with the WHY inline).
+5. Verify before commit: module unit test (esbuild `transformSync` → CJS →
+   `new Function` — see `tests/unit/builders/emb-pricing-module.test.js`) ·
+   `npm run build` · lint · typecheck · full `test:unit` · browser (bridges
+   resolve, zero console errors, live behavior) · pricing capture vs locked
+   (`captureAll({baseUrl})` against this session's server) · parity locks.
+6. A cluster = one commit. Never mix a move with a behavior change.
+
+## Cluster map (from the 2026-07-07 inventory: 224 top-level fns, 46 vars, 59 HTML handlers)
+
+| # | Cluster (monolith lines, 2026-07-07) | ≈Lines | Target module | Status |
+|---|---|---|---|---|
+| 0 | Service_Codes fees (`loadServiceCodePrices`/`getServicePrice`, was 8-36) | 30 | `pricing.js` | ✅ 2026-07-07 |
+| 1 | Design-search modal (2321-3303: `openDesignSearchModal`, gallery, filters, `lookupDesignNumber`, `applyDesignToCard`, thumbnails) — self-contained domain + own `_designSearch*` state | ~980 | `design-search.js` (events+render domain) | ⬜ next |
+| 2 | Stitch estimators + logo-config UI (126-570: stitch tiers, logo cards, AL toggles, embellishment dropdowns) | ~440 | `logo-config.js` | ⬜ |
+| 3 | Draft/persistence + edit-load (570-2320: `getEmbroideryQuoteData`, `restoreEmbroideryDraft`, `loadQuoteForEditing`, `populate*`) | ~1,750 | `persistence.js` | ⬜ |
+| 4 | Product search + rows + sizes + colors (3304-6378: `addNewRow`, `onStyleChange`, size-category, color picker, child rows, price override) | ~3,000 | `state.js` + `render.js` + `events.js` (split during move) | ⬜ biggest |
+| 5 | Pricing recalc + display + AL/DECG/rush sync (6379-8181: `recalculatePricing`, `collectProductsFromTable`, `updatePricingDisplay`, tax UI) | ~1,800 | `pricing.js` + `render.js` | ⬜ |
+| 6 | Save + link + push (8182-9111: `saveAndGetLink`, `_saveAndGetLinkInner` 450L, push preview/confirm) | ~930 | `persistence.js` | ⬜ |
+| 7 | Quote-level UI: reset/fees/discounts (9112-9800: `resetQuote` 243L, `updateAdditionalCharges`, fee table) | ~690 | `state.js` + `events.js` | ⬜ |
+| 8 | Service-pricing-review modal (9801-10727: `showServicePricingReview` 615L + `onSpr*`) | ~900 | `spr-modal.js` (domain) | ⬜ |
+| 9 | DECG stitch modal (10728-10935) | ~210 | `decg-modal.js` (domain) | ⬜ |
+| 10 | ShopWorks import (10936-12920: import modal, `renderImportPreview`, `confirmShopWorksImport` 999L, `importProductRow`) | ~1,990 | `shopworks-import.js` (domain) | ⬜ |
+| 11 | Output/diagnostics (12921-13703: `diagnoseQuote`, `buildEmbroideryPricingData`, print/email/copy) | ~780 | `persistence.js` | ⬜ |
+
+Order rationale: cohesive low-coupling domains first (1, 8, 9, 10 are modals with
+their own state), then persistence (3, 6, 11), then the entangled heart (4, 5, 7)
+last — by then the bridges + tests make the big moves routine. `QuoteBuilderBase`
++ `EmbAdapter` (`getPricingService/getTierConfig/getLocationModel/getNudgeTiers/
+renderMethodSpecificRow`) crystallize out of clusters 4-7; the shared quote-item
+model is task 0.5 and lands with cluster 4.
+
+## Top-level state (46 vars) — future `state.js` inventory
+
+Groups: services (`pricingCalculator`, `quoteService`, `embPersistence`, `embSession`) ·
+edit session (`editingQuoteId`, `editingRevision`, `hasChanges`) · logos
+(`primaryLogo`, `additionalLogos`, `capPrimaryLogo`, `capAdditionalLogos`, `globalAL`) ·
+rows (`products`, `rowCounter`, `productCache`, `childRowMap`) · design search
+(`_designSearch*`, `_customerDesignGallery`, `_galleryFilterTimeout`) · push
+(`_pushQuoteId`, `_pushAlreadyDone`, `_pushInFlight`) · import (`pendingShopWorksImport`,
+`lastImportMetadata`, `pendingDECGItems`, `_spr*`) · caches/constants
+(`sizeDetectionCache`, `productColorsCache`, `EMB_DEFAULTS`, `EXTENDED_SIZES`,
+`SIZE_TO_SLOT`, `STITCH_DENSITY`, `SIZE06_EXTENDED_SIZES`, `POSITION_*`).
+
+⚠️ Monolith top-level `let`/`const` are LEXICAL globals — visible to other classic
+scripts but NOT on `window`, and NOT writable from the bundle. Moving a VARIABLE
+therefore means migrating every monolith reference in the same commit (unlike
+functions, which bridge via `window`). That's why state moves ride WITH their
+cluster, never ahead of it.
+
+## Tooling
+
+Function/var/handler inventory script (regenerate the map after each cluster):
+scratch `emb-map.js` pattern — top-level decl scan + HTML `on*=` handler scan;
+flags per fn: window-exported / html-handler / async. Keep runs in the session
+scratchpad, only conclusions here.
+
+## After EMB
+
+Repeat SCP (5,409 lines) → DTF (4,086) using the same cluster shapes; shared
+behavior graduates from `builders/emb/` into `quote-builder-base.js` (the kept
+base) + `builders/shared/` as the second consumer appears (rule of two).
