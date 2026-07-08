@@ -1,3 +1,8 @@
+## v2026.07.08.14 (2026.07.08)
+
+- feat(dtg): carry-over batch — shared error surfaces + accessible catalog modal
+- Deploy v2026.07.08.14: cache-bust bumps
+
 ## v2026.07.08.13 (2026.07.08)
 
 - feat(a11y): 1.8 stage 2 — accessible-modal engine, live region, skip links, focus-visible, semantic invoice table
