@@ -16,6 +16,7 @@
  *   spr-modal.js     — service-pricing-review modal (cluster #2, 2026-07-07)
  *   shopworks-import.js — paste-from-ShopWorks import flow (cluster #3, 2026-07-07)
  *   persistence.js   — autosave/draft/edit-load/duplicate (cluster #4, 2026-07-07)
+ *   output.js        — print/email/copy + diagnostics (cluster #5, 2026-07-07)
  */
 import { loadServiceCodePrices, getServicePrice } from './pricing.js';
 import {
@@ -55,6 +56,14 @@ import {
     addProductFromQuote,
     populateLogoConfig,
 } from './persistence.js';
+import {
+    diagnoseQuote,
+    buildEmbroideryPricingData,
+    copyToClipboard,
+    generateEmbQuoteText,
+    printQuote,
+    embEmailQuote,
+} from './output.js';
 import {
     applyDesignFromCache,
     filterDesignSearchByTier,
@@ -140,5 +149,14 @@ window.duplicateQuote = duplicateQuote;
 window.addProductFromQuote = addProductFromQuote;
 window.populateLogoConfig = populateLogoConfig; // consumer: emb-edit-reload-roundtrip harness
 
+// output (callers: static HTML print/email/copy buttons; diagnoseQuote from
+// the import flow's diagnostics hook; the rest internal)
+window.diagnoseQuote = diagnoseQuote;
+window.buildEmbroideryPricingData = buildEmbroideryPricingData;
+window.copyToClipboard = copyToClipboard;
+window.generateEmbQuoteText = generateEmbQuoteText;
+window.printQuote = printQuote;
+window.embEmailQuote = embEmailQuote;
+
 window.__QB_BUILD = window.__QB_BUILD || {};
-window.__QB_BUILD.emb = { entry: 'builders/emb/index.js', modules: ['pricing', 'design-search', 'spr-modal', 'shopworks-import', 'persistence'] };
+window.__QB_BUILD.emb = { entry: 'builders/emb/index.js', modules: ['pricing', 'design-search', 'spr-modal', 'shopworks-import', 'persistence', 'output'] };

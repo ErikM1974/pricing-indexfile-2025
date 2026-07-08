@@ -41,7 +41,7 @@
 | 8 | Service-pricing-review modal (`showServicePricingReview` 615L + `onSpr*`) — 941-line cut, 12 bridges (ALL 5 onSpr row handlers live in generated template-literal markup — python scan, shell grep quoting lies), `getSprEmbConfigOptions()` accessor for the import cluster's read | ~940 | `spr-modal.js` (domain) | ✅ 2026-07-07 (extraction #2) |
 | 9 | DECG stitch modal — audit found it DEAD (openDECGStitchModal: zero callers repo-wide incl. generated markup + DOM-id manipulation; superseded by the SPR modal which owns DECG/DECC during import). Block + static HTML markup DELETED, not extracted | ~200 | (deleted) | ✅ 2026-07-07 (deleted) |
 | 10 | ShopWorks import (import modal, `renderImportPreview`, `confirmShopWorksImport` 999L, `importProductRow`, non-SanMar modal, summary banner) — 2,012-line cut, 11 bridges, FIRST real inter-module imports (spr-modal + design-search); `pendingShopWorksImport`+`lastImportMetadata` stay monolith-declared (26 outside readers → clusters 6/11) | ~2,010 | `shopworks-import.js` (domain) | ✅ 2026-07-07 (extraction #3) |
-| 11 | Output/diagnostics (12921-13703: `diagnoseQuote`, `buildEmbroideryPricingData`, print/email/copy) | ~780 | `persistence.js` | ⬜ |
+| 11 | Output/diagnostics (`diagnoseQuote`, `buildEmbroideryPricingData`, print/email/copy) — 780-line tail cut to its own `output.js` (cleaner than folding into persistence.js); the wrapWithRepricingIndicator tail statement STAYS in the monolith (rewraps recalculatePricing, cluster 5) | ~780 | `output.js` | ✅ 2026-07-07 (extraction #5) |
 
 Order rationale: cohesive low-coupling domains first (1, 8, 9, 10 are modals with
 their own state), then persistence (3, 6, 11), then the entangled heart (4, 5, 7)

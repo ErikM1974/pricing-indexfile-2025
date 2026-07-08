@@ -92,6 +92,13 @@ interface Window {
     duplicateQuote?: (quoteId: string) => Promise<void>;
     addProductFromQuote?: (item: any, opts?: any) => Promise<void>;
     populateLogoConfig?: (session: any) => void;
+    /* output bridges (builders/emb/output.js, extraction #5) */
+    diagnoseQuote?: () => any;
+    buildEmbroideryPricingData?: () => any;
+    copyToClipboard?: () => Promise<void> | void;
+    generateEmbQuoteText?: () => string;
+    printQuote?: () => Promise<void> | void;
+    embEmailQuote?: () => Promise<void>;
 }
 
 /*

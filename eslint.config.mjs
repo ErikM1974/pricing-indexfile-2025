@@ -20,6 +20,7 @@ export default [
             globals: {
                 window: 'readonly',
                 document: 'readonly',
+                navigator: 'readonly',
                 fetch: 'readonly',
                 console: 'readonly',
                 URLSearchParams: 'readonly',
@@ -108,6 +109,7 @@ export default [
             'shared_components/js/builders/emb/spr-modal.js',
             'shared_components/js/builders/emb/shopworks-import.js',
             'shared_components/js/builders/emb/persistence.js',
+            'shared_components/js/builders/emb/output.js',
         ],
         rules: {
             'no-unsanitized/property': 'off',
