@@ -1117,6 +1117,24 @@ function resetQuote() {
 
 document.addEventListener('DOMContentLoaded', async function() {
 
+    // Logo status chips — On file / New / TBD (Erik 2026-07-07). SCP's TBD
+    // assumption is the COLOR COUNT: the one thing the art changes about price.
+    if (typeof initLogoStatusChips === 'function') {
+        initLogoStatusChips({
+            mountSel: '.logo-section.reference-artwork-section',
+            artworkMountSel: '#scp-artwork-mount',
+            designFocusId: 'design-number',
+            notesSel: '#spc-order-fields .os-notes',
+            assumption: () => {
+                const front = document.querySelector('input[name="front-colors"]:checked')?.value || '1';
+                const backOn = !!(typeof printConfig !== 'undefined' && printConfig && printConfig.backLocation);
+                const back = backOn ? (document.querySelector('input[name="back-colors"]:checked')?.value || '1') : null;
+                const dark = document.getElementById('dark-garment-toggle')?.checked;
+                return `Pricing assumes a ${front}-color front print${back ? ` + ${back}-color back` : ''}${dark ? ' with white underbase' : ''}. Color count is confirmed after artwork review — each added color adds a screen and changes the per-piece price.`;
+            }
+        });
+    }
+
     // Mid-call method-switch menu (expert audit 2026-07-07) — serializes IDENTITY
     // only (customer + style/color/sizes); the target builder reprices natively.
     if (typeof initMethodSwitchMenu === 'function') {

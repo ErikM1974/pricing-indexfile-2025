@@ -2071,6 +2071,34 @@ document.addEventListener('DOMContentLoaded', async function() {
         quoteService = new EmbroideryQuoteService();
 
         // Check for edit mode (loading existing quote for revision)
+        // Logo status chips — On file / New / TBD (Erik 2026-07-07). "New" auto-adds
+        // the new-logo setup (the most-forgotten $100); "TBD" writes the pricing
+        // assumption into #notes so it saves/prints/emails with the quote.
+        if (typeof initLogoStatusChips === 'function') {
+            initLogoStatusChips({
+                mountSel: '.logo-config-container',
+                artworkMountSel: '#emb-artwork-mount',
+                designFocusId: 'garment-design-number',
+                notesSel: '#notes',
+                assumption: () => {
+                    const tierSel = document.getElementById('primary-stitches');
+                    const tierText = tierSel ? (tierSel.options[tierSel.selectedIndex]?.text || 'Standard (≤10K)') : 'Standard (≤10K)';
+                    const pos = document.getElementById('primary-position')?.value || 'Left Chest';
+                    return `Pricing assumes a ${tierText} embroidered logo at ${pos}. Final pricing is confirmed after artwork review; a new logo adds a one-time new-logo setup fee.`;
+                },
+                onNew: () => {
+                    const cb = document.getElementById('primary-digitizing');
+                    if (cb && !cb.checked) {
+                        cb.checked = true;
+                        cb.closest('.digitizing-checkbox')?.classList.add('checked');
+                        if (typeof primaryLogo !== 'undefined' && primaryLogo) primaryLogo.needsDigitizing = true;
+                        showToast('New logo — added the one-time new-logo setup. Uncheck it if we\'ve stitched this logo before.', 'info', 6000);
+                        recalculatePricing();
+                    }
+                }
+            });
+        }
+
         // Mid-call method-switch menu (expert audit 2026-07-07) — serializes IDENTITY
         // only (customer + style/color/sizes); the target builder reprices natively.
         if (typeof initMethodSwitchMenu === 'function') {
