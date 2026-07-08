@@ -42,4 +42,37 @@ interface Window {
     showToast?: (msg: string, type?: string, duration?: number) => void;
     loadServiceCodePrices?: () => Promise<Record<string, any> | null>;
     getServicePrice?: (code: string, fallback: number) => number;
+    /* design-search bridges (builders/emb/design-search.js, extraction #1) */
+    applyDesignFromCache?: (type: string, designData: any) => Promise<void> | void;
+    filterDesignSearchByTier?: (tier: string) => void;
+    filterDesignSearchByCompany?: (company: string) => void;
+    lookupDesignNumber?: (type: string) => Promise<void>;
+    showDesignThumbnail?: (type: string, url: string | null) => void;
+    openThumbnailFullSize?: (imgEl: any) => void;
+    clearDesignNumber?: (type: string) => void;
+    openDesignSearchModal?: (type: string) => void;
+    closeDesignSearchModal?: () => void;
+    onDesignSearchInput?: (ev?: any) => void;
+    runDesignSearch?: () => Promise<void>;
+    selectDesignFromSearch?: (designNumber: string) => Promise<void> | void;
+    showMoreDesignSearchResults?: () => void;
+    invalidateDesignGalleryCache?: () => void;
+    resetDesignSearchState?: () => void;
 }
+
+/*
+ * Monolith lexical globals the extracted modules still reach through the
+ * global scope chain (strangler seams — each migrates with its own cluster).
+ */
+declare let primaryLogo: any;
+declare let capPrimaryLogo: any;
+declare function onPrimaryPositionChange(): void;
+declare function onPrimaryStitchTierChange(): void;
+declare function onCapStitchTierChange(): void;
+declare function updateLogoCardHeader(type: string): void;
+declare function lookupTaxRate(): Promise<void> | void;
+declare function updatePushButtonState(): void;
+declare function escapeHtml(s: any): string;
+declare function showToast(msg: string, type?: string, duration?: number): void;
+declare let DesignThumbnailService: any;
+declare function renderOrderRecap(): void;

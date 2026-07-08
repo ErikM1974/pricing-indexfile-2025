@@ -1,8 +1,7 @@
 /**
  * Embroidery quote builder — ESM entry point (Phase 0 strangler shell).
  *
- * Task 0.4 extracts embroidery-quote-builder.js (13,712 lines) into modules
- * here: state.js, pricing.js, render.js, persistence.js, events.js. Each
+ * Task 0.4 extracts embroidery-quote-builder.js into modules here. Each
  * extracted function is re-exported onto window from THIS file (the one
  * sanctioned re-export surface — see eslint.config.mjs) until every caller
  * is migrated, then the window copy is dropped.
@@ -11,16 +10,53 @@
  * LAST (after the monolith), and it executes at parse time — strictly
  * before DOMContentLoaded, so init-time callers always find the bridges.
  *
- * Extracted so far:
- *   pricing.js — Service_Codes fee loading (cluster #0, 2026-07-07)
+ * Extracted so far (map → memory/emb-decomposition-plan.md):
+ *   pricing.js       — Service_Codes fee loading (cluster #0, 2026-07-07)
+ *   design-search.js — design lookup/gallery modal (cluster #1, 2026-07-07)
  */
 import { loadServiceCodePrices, getServicePrice } from './pricing.js';
+import {
+    applyDesignFromCache,
+    filterDesignSearchByTier,
+    filterDesignSearchByCompany,
+    lookupDesignNumber,
+    showDesignThumbnail,
+    openThumbnailFullSize,
+    clearDesignNumber,
+    openDesignSearchModal,
+    closeDesignSearchModal,
+    onDesignSearchInput,
+    runDesignSearch,
+    selectDesignFromSearch,
+    showMoreDesignSearchResults,
+    invalidateDesignGalleryCache,
+    resetDesignSearchState,
+} from './design-search.js';
 
 // Strangler bridges — bare-identifier callers in the monolith resolve
-// through the global object, so these keep every existing call site and
-// inline handler working. Drop each line only when its callers migrate.
+// through the global object, so these keep every existing call site,
+// static inline handler, and GENERATED-markup handler working. Drop each
+// line only when its callers migrate.
 window.loadServiceCodePrices = loadServiceCodePrices;
 window.getServicePrice = getServicePrice;
 
+// design-search (callers: monolith draft-restore/import + static HTML
+// handlers + onclick= handlers the module renders into the grid/chips)
+window.applyDesignFromCache = applyDesignFromCache;
+window.filterDesignSearchByTier = filterDesignSearchByTier;
+window.filterDesignSearchByCompany = filterDesignSearchByCompany;
+window.lookupDesignNumber = lookupDesignNumber;
+window.showDesignThumbnail = showDesignThumbnail;
+window.openThumbnailFullSize = openThumbnailFullSize;
+window.clearDesignNumber = clearDesignNumber;
+window.openDesignSearchModal = openDesignSearchModal;
+window.closeDesignSearchModal = closeDesignSearchModal;
+window.onDesignSearchInput = onDesignSearchInput;
+window.runDesignSearch = runDesignSearch;
+window.selectDesignFromSearch = selectDesignFromSearch;
+window.showMoreDesignSearchResults = showMoreDesignSearchResults;
+window.invalidateDesignGalleryCache = invalidateDesignGalleryCache;
+window.resetDesignSearchState = resetDesignSearchState;
+
 window.__QB_BUILD = window.__QB_BUILD || {};
-window.__QB_BUILD.emb = { entry: 'builders/emb/index.js', modules: ['pricing'] };
+window.__QB_BUILD.emb = { entry: 'builders/emb/index.js', modules: ['pricing', 'design-search'] };

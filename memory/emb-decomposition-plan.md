@@ -31,7 +31,7 @@
 | # | Cluster (monolith lines, 2026-07-07) | ≈Lines | Target module | Status |
 |---|---|---|---|---|
 | 0 | Service_Codes fees (`loadServiceCodePrices`/`getServicePrice`, was 8-36) | 30 | `pricing.js` | ✅ 2026-07-07 |
-| 1 | Design-search modal (2321-3303: `openDesignSearchModal`, gallery, filters, `lookupDesignNumber`, `applyDesignToCard`, thumbnails) — self-contained domain + own `_designSearch*` state | ~980 | `design-search.js` (events+render domain) | ⬜ next |
+| 1 | Design-search modal (`openDesignSearchModal`, gallery, filters, `lookupDesignNumber`, `applyDesignToCard`, thumbnails) — 986-line contiguous cut, 15 bridges (incl. 3 GENERATED-markup handlers static grep missed), 2 reset accessors for the monolith's outside touch points, `window._designSearchCache` → module-private | ~980 | `design-search.js` (events+render domain) | ✅ 2026-07-07 |
 | 2 | Stitch estimators + logo-config UI (126-570: stitch tiers, logo cards, AL toggles, embellishment dropdowns) | ~440 | `logo-config.js` | ⬜ |
 | 3 | Draft/persistence + edit-load (570-2320: `getEmbroideryQuoteData`, `restoreEmbroideryDraft`, `loadQuoteForEditing`, `populate*`) | ~1,750 | `persistence.js` | ⬜ |
 | 4 | Product search + rows + sizes + colors (3304-6378: `addNewRow`, `onStyleChange`, size-category, color picker, child rows, price override) | ~3,000 | `state.js` + `render.js` + `events.js` (split during move) | ⬜ biggest |
@@ -67,6 +67,22 @@ scripts but NOT on `window`, and NOT writable from the bundle. Moving a VARIABLE
 therefore means migrating every monolith reference in the same commit (unlike
 functions, which bridge via `window`). That's why state moves ride WITH their
 cluster, never ahead of it.
+
+## Extraction-#1 learnings + debt (2026-07-07)
+
+- **Generated-markup handlers**: static caller grep MISSES `onclick="fn()"` built
+  inside template strings — scan the extracted body for `on(click|error|…)="` and
+  bridge those too (`selectDesignFromSearch`, `showMoreDesignSearchResults`,
+  `filterDesignSearchByCompany` were caught only by eslint no-unused-vars).
+- **Debt to burn down when this cluster gets typed** (render/state split):
+  `design-search.js` carries `// @ts-nocheck` (~45 legacy DOM frictions) and an
+  eslint `no-unsanitized/property` file override (13 innerHTML sinks, hand-audited:
+  escapeHtml-wrapped or static). Roadmap 1.4 removes the override.
+- **For the 1.4 sink audit**: company-chip `onclick` escapes `'` but not `"` inside
+  a double-quoted attribute (company names from the design DB) — attribute-injection
+  nuance, pre-existing, low severity; fix during 1.4 with proper attr encoding.
+- `renderDesignGallery` (dead 1-line alias, zero callers incl. generated markup)
+  deleted during the move.
 
 ## Tooling
 

@@ -38,6 +38,7 @@ export default [
         plugins: { 'no-unsanitized': noUnsanitized },
         rules: {
             ...js.configs.recommended.rules,
+            'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
             eqeqeq: ['error', 'smart'],
             'no-implicit-globals': 'error',
             'no-var': 'off', // dual browser/Node files still use var deliberately
@@ -60,6 +61,17 @@ export default [
         files: ['shared_components/js/builders/*/index.js', 'config/tenant.js'],
         rules: {
             'no-restricted-syntax': 'off',
+        },
+    },
+    {
+        // MOVED legacy render code (0.4 extraction #1) — its innerHTML sinks
+        // predate the module and interpolations are escapeHtml-wrapped
+        // (hand-audited 2026-07-07; one attribute-quoting nuance logged for
+        // the roadmap-1.4 sink audit, which removes this override). Do NOT
+        // add new files here.
+        files: ['shared_components/js/builders/emb/design-search.js'],
+        rules: {
+            'no-unsanitized/property': 'off',
         },
     },
     {
