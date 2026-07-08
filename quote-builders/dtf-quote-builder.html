@@ -86,7 +86,7 @@
     </header>
 
     <!-- Main Layout -->
-    <div class="power-main dtf-quote-builder">
+    <div class="power-main dtf-quote-builder" role="main">
         <!-- Left: Content Area -->
         <div class="power-content">
             <!-- Location Selection Section -->
@@ -204,7 +204,7 @@
                         <thead>
                             <tr>
                                 <th class="style-col">Style</th>
-                                <th class="thumbnail-col"></th>
+                                <th class="thumbnail-col" scope="col"><span class="sr-only">Product image</span></th>
                                 <th class="desc-col">Description</th>
                                 <th class="color-col">Color</th>
                                 <th class="size-col">S</th>
@@ -216,7 +216,7 @@
                                 <th class="qty-col">Qty</th>
                                 <th class="price-col">Unit $</th>
                                 <th class="total-col">Total</th>
-                                <th class="actions-col"></th>
+                                <th class="actions-col" scope="col"><span class="sr-only">Row actions</span></th>
                             </tr>
                         </thead>
                         <tbody id="product-tbody">
@@ -225,7 +225,7 @@
                                 <td colspan="14" class="qb-empty-state">
                                     <div class="qb-empty-state-emoji">&#128085;</div>
                                     <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">Getting Started</div>
-                                    <div style="font-size: 13px; color: #94a3b8; line-height: 1.8;">
+                                    <div style="font-size: 13px; color: #55606e; line-height: 1.8;">
                                         <span class="step-badge step-1">1</span> Select transfer locations above
                                         &nbsp;&bull;&nbsp;
                                         <span class="step-badge step-2">2</span> Type a style # (e.g., PC54, G500)
@@ -313,7 +313,7 @@
                     <div class="d-flex align-items-center gap-2">
                         <i class="fas fa-plus-circle"></i>
                         <span>More services &amp; fees</span>
-                        <span style="font-size:11px;color:#94a3b8;font-weight:400;">mockups · design time · rush</span>
+                        <span style="font-size:11px;color:#55606e;font-weight:400;">mockups · design time · rush</span>
                         <span id="charges-badge" class="charges-badge hidden">$0.00</span>
                     </div>
                     <i id="charges-chevron" class="fas fa-chevron-down collapsible-chevron"></i>
@@ -391,11 +391,11 @@
                                 <div class="d-flex gap-2">
                                     <div class="customer-field qb-flex1">
                                         <label class="quote-label qb-fs11">Ship Date</label>
-                                        <input type="date" id="req-ship-date" class="quote-input qb-compact">
+                                        <input type="date" id="req-ship-date" aria-label="Requested ship date" class="quote-input qb-compact">
                                     </div>
                                     <div class="customer-field qb-flex1">
                                         <label class="quote-label qb-fs11">Drop Dead Date</label>
-                                        <input type="date" id="drop-dead-date" class="quote-input qb-compact">
+                                        <input type="date" id="drop-dead-date" aria-label="Drop dead date" class="quote-input qb-compact">
                                     </div>
                                 </div>
                                 <!-- Shipping Address -->
@@ -411,7 +411,7 @@
                                         <input type="text" id="ship-city" placeholder="City" class="quote-input qb-compact" oninput="if(window.renderOrderRecap)renderOrderRecap()">
                                     </div>
                                     <div class="customer-field" style="flex: 0 0 60px;">
-                                        <select id="ship-state" class="quote-input" style="font-size: 12px; padding: 6px 4px;" onchange="onShipStateChange();if(window.renderOrderRecap)renderOrderRecap()">
+                                        <select id="ship-state" aria-label="Shipping state" class="quote-input" style="font-size: 12px; padding: 6px 4px;" onchange="onShipStateChange();if(window.renderOrderRecap)renderOrderRecap()">
                                             <option value="WA" selected>WA</option>
                                             <option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option>
                                             <option value="AR">AR</option><option value="CA">CA</option><option value="CO">CO</option>
@@ -444,7 +444,7 @@
                                 <!-- Shipping Method -->
                                 <div class="customer-field">
                                     <label class="quote-label qb-fs11">Shipping Method</label>
-                                    <select id="ship-method" class="quote-input qb-compact" onchange="if(window.renderOrderRecap)renderOrderRecap()">
+                                    <select id="ship-method" aria-label="Shipping method" class="quote-input qb-compact" onchange="if(window.renderOrderRecap)renderOrderRecap()">
                                         <option value="">Select...</option>
                                         <option value="Ground">Ground</option>
                                         <option value="2-Day">2-Day</option>
@@ -496,7 +496,7 @@
                         </label>
                         <!-- Wrapped input + % so space-between keeps them grouped on the right (parity with SCP, 2026-06-14) -->
                         <div class="d-flex align-items-center gap-1">
-                            <input type="number" id="tax-rate-input" value="10.1" step="0.1" min="0" max="20"
+                            <input type="number" id="tax-rate-input" aria-label="Sales tax rate percent" value="10.1" step="0.1" min="0" max="20"
                                    style="width: 52px; font-size: 11px; text-align: center; border: 1px solid #ddd; border-radius: 4px; padding: 2px 4px;"
                                    onchange="updateTaxCalculation()" title="Tax rate %">
                             <span style="font-size: 11px; color: #64748b;">%</span>
@@ -702,7 +702,7 @@
     <div id="size-popup-backdrop" class="size-popup-backdrop hidden" onclick="closeExtendedSizePopup()"></div>
 
     <!-- Extended Size Picker Popup -->
-    <div id="extended-size-popup" class="size-popup hidden">
+    <div id="extended-size-popup" class="size-popup hidden" role="dialog" aria-modal="true" aria-label="Extended sizes">
         <div class="size-popup-header">
             <h4><i class="fas fa-ruler"></i> Extended Sizes</h4>
             <button class="close-popup" onclick="closeExtendedSizePopup()" aria-label="Close extended sizes popup">&times;</button>
@@ -797,7 +797,7 @@
     </div>
 
     <!-- Push to ShopWorks Preview Modal (review-before-push parity with EMB/SCP) -->
-    <div id="dtf-push-modal" class="modal-overlay">
+    <div id="dtf-push-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Push to ShopWorks">
         <div class="modal-content" style="width: 660px; max-width: 94%;">
             <div class="modal-header">
                 <h3><i class="fas fa-upload"></i> Push to ShopWorks — Review Order</h3>

@@ -974,7 +974,7 @@ body {
 }
 .ai-action-btn.submit-shopworks-btn:disabled {
     background: var(--paper-3, #e5e7eb);
-    color: var(--ink-3, #9ca3af);
+    color: var(--pnw-stone-strong, #55606e); /* 1.8: ink-3 text 2.4:1 */
     border-color: var(--rule, #d1d5db);
 }
 .shopworks-success-card {
@@ -1206,7 +1206,7 @@ body > .header::after,
 .pricing-footer {
     background: var(--pnw-mist);
     border-top: 1px solid var(--pnw-rule);
-    color: var(--pnw-stone);
+    color: var(--pnw-stone-strong, #55606e); /* 1.8 */
 }
 
 /* Catalog tabs (All / T-Shirt / etc.) — selected state uses forest-deep */

@@ -1225,9 +1225,13 @@ details.customer-manual > summary .cm-hint {
 
 .keyboard-hint kbd {
     background: #e0e0e0;
+    color: #334155; /* 1.8: kbd chips inherited near-white text — 7.6:1 now */
     padding: 2px 6px;
     border-radius: 3px;
     font-family: monospace;
+}
+.keyboard-hint {
+    color: var(--pnw-stone-strong, #55606e); /* 1.8: was inherited #999 (2.6:1) */
 }
 
 /* ============================================
@@ -3919,10 +3923,10 @@ input.sci-num { width: 92px; cursor: text; }
     padding: 4px 8px;
     font-size: 12px;
     font-weight: 600;
-    color: var(--pnw-stone, #6b7280);
+    color: #d1d5db; /* 1.8: lives on the forest header — stone gray was 2.1:1 */
     white-space: nowrap;
 }
-.method-switch .fa-exchange-alt { color: var(--builder-primary, #2e5827); }
+.method-switch .fa-exchange-alt { color: inherit; }
 .method-switch select {
     border: 1px solid var(--pnw-rule, #d1d5db);
     border-radius: 6px;

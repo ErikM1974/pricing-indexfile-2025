@@ -34,7 +34,7 @@
 @keyframes drbi-slide { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
 .dtg-resume-banner-inline .drbi-icon {
     flex: 0 0 auto;
-    color: #b45309;
+    color: #92400e /* 1.8: amber text on tan wash was 4.0:1 */;
     font-size: 14px;
 }
 .dtg-resume-banner-inline .drbi-msg {
@@ -104,7 +104,7 @@
 .dtg-form-header .dfh-title i { color: var(--pnw-forest); }
 .dtg-form-header .dfh-sub {
     font-size: 12px;
-    color: #6b7280;
+    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
 }
 
 /* Location chooser at the top */
@@ -115,7 +115,7 @@
 .dtg-form-section .dfs-label {
     font-size: 11px;
     font-weight: 700;
-    color: #6b7280;
+    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin-bottom: 10px;
@@ -178,7 +178,7 @@
 }
 .dtg-location-pill .dim {
     font-size: 10px;
-    color: #9ca3af;
+    color: var(--pnw-stone-strong, #55606e); /* 1.8: was 2.26:1 on birch */
     margin-left: 4px;
 }
 .dtg-location-pill.selected .dim { color: rgba(255, 255, 255, 0.7); }
@@ -247,7 +247,7 @@
 .dtg-rows-empty {
     padding: 18px;
     text-align: center;
-    color: #9ca3af;
+    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone-soft text 2.4:1 */;
     font-style: italic;
     border: 1.5px dashed rgba(0, 0, 0, 0.08);
     border-radius: 8px;
@@ -344,7 +344,7 @@
     background: transparent;
     border: 1px solid transparent;
     border-radius: 5px;
-    color: #9ca3af;
+    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone-soft text 2.4:1 */;
     font-size: 13px;
     line-height: 1;
     cursor: pointer;
@@ -378,7 +378,7 @@
     right: 9px;
     top: 50%;
     transform: translateY(-50%);
-    color: #9ca3af;
+    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone-soft text 2.4:1 */;
     font-size: 11px;
     pointer-events: none;
     transition: color 120ms ease;
@@ -397,7 +397,7 @@
 .dtg-line-desc {
     margin: 6px 0 8px;
     font-size: 11.5px;
-    color: #6b7280;
+    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -432,7 +432,7 @@
     text-align: center;
     font-size: 9.5px;
     font-weight: 700;
-    color: #6b7280;
+    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
     text-transform: uppercase;
     letter-spacing: 0.04em;
     line-height: 1;
@@ -469,7 +469,7 @@
     border: 1px dashed #d1d5db;
     border-radius: 4px;
     background: rgba(0, 0, 0, 0.025);
-    color: #9ca3af;
+    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone-soft text 2.4:1 */;
     font-size: 9.5px;
     font-weight: 700;
     display: flex;
@@ -542,7 +542,7 @@
     padding-top: 8px;
     border-top: 1px dashed rgba(0, 0, 0, 0.06);
     font-size: 12px;
-    color: #6b7280;
+    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
 }
 .dtg-line-qty { flex: 0 0 auto; }
 .dtg-line-qty strong { color: var(--pnw-pine); font-size: 14px; font-variant-numeric: tabular-nums; }
@@ -568,7 +568,7 @@
     text-align: left;
     font-size: 10px;
     font-weight: 700;
-    color: #6b7280;
+    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
     text-transform: uppercase;
     letter-spacing: 0.04em;
     padding: 4px 3px;
@@ -640,7 +640,7 @@
 .dtg-row-style { width: 78px; min-width: 78px; }
 .dtg-row-desc {
     min-width: 0;
-    color: #6b7280;
+    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
     font-size: 11px;
     line-height: 1.3;
     max-width: 240px;
@@ -733,7 +733,7 @@
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: #9ca3af;
+    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone-soft text 2.4:1 */;
     text-align: center;
     line-height: 1.6;
     user-select: none;
@@ -751,14 +751,14 @@
     margin-top: 2px;
     line-height: 1.2;
     user-select: none;
-    color: #6b7280;
+    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
     transition: opacity 0.15s ease;
 }
 .dtg-rows-table td .sz-inv-good     { color: #15803d; }     /* green — plenty */
-.dtg-rows-table td .sz-inv-low      { color: #b45309; }     /* amber — qty close to available */
+.dtg-rows-table td .sz-inv-low      { color: #92400e /* 1.8: amber text on tan wash was 4.0:1 */; }     /* amber — qty close to available */
 .dtg-rows-table td .sz-inv-over     { color: #b91c1c; font-weight: 700; }  /* red — qty > available */
 .dtg-rows-table td .sz-inv-oos      { color: #b91c1c; font-weight: 700; }  /* red — out of stock */
-.dtg-rows-table td .sz-inv-unknown  { color: #9ca3af; font-style: italic; }
+.dtg-rows-table td .sz-inv-unknown  { color: var(--pnw-stone-strong, #55606e) /* 1.8: stone-soft text 2.4:1 */; font-style: italic; }
 .dtg-rows-table td .sz-inv-not-local { color: #475569; font-style: italic; font-size: 8px; }
 /* Sz-overflow: red-tinted background when qty > available. */
 .dtg-rows-table td.sz-overflow {
@@ -828,14 +828,14 @@
     color: var(--pnw-pine);
 }
 .dtg-combobox-item .ci-secondary {
-    color: #6b7280;
+    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
     font-size: 11px;
     margin-top: 1px;
 }
 .dtg-combobox-empty {
     padding: 10px 12px;
     text-align: center;
-    color: #9ca3af;
+    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone-soft text 2.4:1 */;
     font-size: 12px;
     font-style: italic;
 }
@@ -854,7 +854,7 @@
     font-weight: 700;
 }
 .dtg-combobox-hint em {
-    color: #6b7280;
+    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
     font-style: italic;
 }
 .dtg-combobox-item .ci-swatches {
@@ -1031,7 +1031,7 @@
 .dtg-customer-pane .dcp-label {
     font-size: 11px;
     font-weight: 700;
-    color: #6b7280;
+    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin-bottom: 10px;
@@ -1044,7 +1044,7 @@
 .dtg-customer-pane .dcp-search-label {
     font-size: 10px;
     font-weight: 700;
-    color: #9ca3af;
+    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone-soft text 2.4:1 */;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin-bottom: 4px;
@@ -1083,7 +1083,7 @@
 .dtg-customer-pane .dcp-field-label {
     font-size: 10px;
     font-weight: 700;
-    color: #9ca3af;
+    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone-soft text 2.4:1 */;
     text-transform: uppercase;
     margin: 6px 0 3px;
     letter-spacing: 0.04em;
@@ -1118,7 +1118,7 @@
 .dcp-contact-row .dcp-field-label i { color: var(--pnw-forest); font-size: 11px; }
 .dcp-contact-count {
     font-weight: 500;
-    color: #6b7280;
+    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
     text-transform: none;
     letter-spacing: 0;
     font-size: 10.5px;
@@ -1144,7 +1144,7 @@
 .dtg-customer-pane .dcp-divider {
     margin: 14px 0 8px;
     text-align: center;
-    color: #9ca3af;
+    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone-soft text 2.4:1 */;
     font-size: 11px;
     font-weight: 600;
     text-transform: uppercase;
@@ -1314,7 +1314,7 @@
 }
 .dtg-stock-confirm-modal .dscm-head-icon {
     font-size: 22px;
-    color: #b45309;
+    color: #92400e /* 1.8: amber text on tan wash was 4.0:1 */;
 }
 .dtg-stock-confirm-modal .dscm-title {
     margin: 0;
@@ -1405,7 +1405,7 @@
     background: var(--pnw-birch);
     border-top: 1px solid var(--rule, rgba(0, 0, 0, 0.06));
     font-size: 11px;
-    color: #6b7280;
+    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1441,7 +1441,7 @@
     color: #78350f;
     line-height: 1.45;
 }
-.dtg-validation-banner i { margin-right: 6px; color: #b45309; }
+.dtg-validation-banner i { margin-right: 6px; color: #92400e /* 1.8: amber text on tan wash was 4.0:1 */; }
 .dtg-validation-banner .dvb-item {
     display: inline-block;
     font-weight: 600;
@@ -1541,7 +1541,7 @@
 }
 .dpp-item--clickable::after {
     content: "›";
-    color: #9ca3af;
+    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone-soft text 2.4:1 */;
     flex: 0 0 auto;
     font-weight: 700;
 }
@@ -1650,7 +1650,7 @@
 }
 .dtg-design-row-text .ci-secondary {
     font-size: 10.5px;
-    color: #6b7280;
+    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -1662,7 +1662,7 @@
 .dcp-field-label .dcp-optional {
     font-size: 9px;
     font-weight: 600;
-    color: #6b7280;
+    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
     text-transform: lowercase;
     letter-spacing: 0.02em;
     margin-left: 4px;
@@ -1743,7 +1743,7 @@
 }
 .dtg-submit-status .dts-copy-btn:hover {
     background: var(--pnw-birch);
-    border-color: #6b7280;
+    border-color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
     color: var(--pnw-pine);
 }
 
@@ -1820,7 +1820,7 @@
 }
 .dcp-toggle-sub {
     font-size: 12px;
-    color: #6b7280;
+    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
 }
 
 /* --- Ship-to block (visible when pickup is OFF) --- */
@@ -1845,7 +1845,7 @@
 .dcp-shipto-sub {
     font-size: 11px;
     font-weight: 400;
-    color: #6b7280;
+    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
     margin-left: auto;
 }
 
@@ -1868,7 +1868,7 @@
 .dcp-tax-status--info    { color: #64748b; }
 .dcp-tax-status--warning { color: #d97706; }
 .dcp-tax-status--error   { color: #dc2626; }
-.dcp-tax-status--loading { color: #6b7280; font-style: italic; }
+.dcp-tax-status--loading { color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */; font-style: italic; }
 .dcp-tax-status--loading::before {
     content: "⏳ ";
 }
@@ -1967,14 +1967,14 @@
 }
 .dhp-meta {
     font-size: 11px;
-    color: #6b7280;
+    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
     font-style: italic;
     margin-left: 4px;
 }
 
 /* Suggestion rows have a subtle accent so they stand out from informational rows */
 .dhp-row.dhp-suggest .dhp-label {
-    color: #b45309;
+    color: #92400e /* 1.8: amber text on tan wash was 4.0:1 */;
 }
 .dhp-row.dhp-warn .dhp-label {
     color: #b91c1c;
@@ -2012,7 +2012,7 @@
 
 .dhp-source .dhp-meta {
     font-size: 10px;
-    color: #9ca3af;
+    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone-soft text 2.4:1 */;
     margin-left: 0;
 }
 
@@ -2055,13 +2055,13 @@
 .dcp-date-hint {
     margin-top: 4px;
     font-size: 11px;
-    color: #6b7280;
+    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
     line-height: 1.3;
 }
 .dcp-field-sub {
     font-weight: 400;
     font-size: 11px;
-    color: #6b7280;
+    color: var(--pnw-stone-strong, #55606e) /* 1.8: stone on tinted washes */;
     margin-left: 4px;
 }
 
@@ -2229,7 +2229,7 @@
 .dcp-newart-sub {
     font-size: 11px;
     font-weight: 400;
-    color: var(--pnw-stone);
+    color: var(--pnw-stone-strong, #55606e); /* 1.8 */
     margin-left: auto;
 }
 
@@ -2238,7 +2238,7 @@
     margin-left: 4px;
     padding: 1px 6px;
     background: rgba(180, 83, 9, 0.12);
-    color: #b45309;
+    color: #92400e /* 1.8: amber text on tan wash was 4.0:1 */;
     border-radius: 4px;
     font-size: 10px;
     font-weight: 700;
@@ -2249,7 +2249,7 @@
 .dcp-field-hint {
     margin-top: 4px;
     font-size: 11px;
-    color: var(--pnw-stone);
+    color: var(--pnw-stone-strong, #55606e); /* 1.8 */
     line-height: 1.3;
 }
 
@@ -2298,7 +2298,7 @@
 }
 .dcp-newart-dropzone-sub {
     font-size: 11px;
-    color: var(--pnw-stone);
+    color: var(--pnw-stone-strong, #55606e); /* 1.8 */
 }
 
 /* --- Status line (upload progress, errors, success) --- */
@@ -2306,7 +2306,7 @@
     margin-top: 8px;
     font-size: 12px;
     line-height: 1.4;
-    color: var(--pnw-stone);
+    color: var(--pnw-stone-strong, #55606e); /* 1.8 */
     min-height: 1.4em;
 }
 .dcp-newart-status--success { color: #16a34a; font-weight: 500; }
@@ -2365,7 +2365,7 @@
 .dcp-newart-thumb-ext {
     font-size: 9px;
     font-weight: 700;
-    color: var(--pnw-stone);
+    color: var(--pnw-stone-strong, #55606e); /* 1.8 */
     letter-spacing: 0.05em;
 }
 
@@ -2382,7 +2382,7 @@
 }
 .dcp-newart-card-meta {
     font-size: 11px;
-    color: var(--pnw-stone);
+    color: var(--pnw-stone-strong, #55606e); /* 1.8 */
     margin-top: 2px;
 }
 .dcp-newart-card-placement {
@@ -2393,7 +2393,7 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    color: var(--pnw-stone);
+    color: var(--pnw-stone-strong, #55606e); /* 1.8 */
     font-weight: 500;
 }
 .dcp-newart-placement-select {
@@ -2420,7 +2420,7 @@
     background: transparent;
     border: 1px solid var(--pnw-rule);
     border-radius: 50%;
-    color: var(--pnw-stone);
+    color: var(--pnw-stone-strong, #55606e); /* 1.8 */
     cursor: pointer;
     display: flex;
     align-items: center;

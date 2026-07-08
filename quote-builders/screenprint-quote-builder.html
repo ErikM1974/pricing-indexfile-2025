@@ -87,7 +87,7 @@
     </header>
 
     <!-- Main Layout -->
-    <div class="power-main">
+    <div class="power-main" role="main">
         <!-- Left: Content Area -->
         <div class="power-content">
             <!-- Screen Print Configuration Section -->
@@ -269,7 +269,7 @@
                         <thead>
                             <tr>
                                 <th class="style-col">Style</th>
-                                <th class="thumbnail-col"></th>
+                                <th class="thumbnail-col" scope="col"><span class="sr-only">Product image</span></th>
                                 <th class="desc-col">Description</th>
                                 <th class="color-col">Color</th>
                                 <th class="size-col">S</th>
@@ -281,7 +281,7 @@
                                 <th class="qty-col">Qty</th>
                                 <th class="price-col">Unit $</th>
                                 <th class="total-col">Total</th>
-                                <th class="actions-col"></th>
+                                <th class="actions-col" scope="col"><span class="sr-only">Row actions</span></th>
                             </tr>
                         </thead>
                         <tbody id="product-tbody">
@@ -290,7 +290,7 @@
                                 <td colspan="13" class="qb-empty-state">
                                     <div class="qb-empty-state-emoji">&#128085;</div>
                                     <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">Enter a style number to get started</div>
-                                    <div style="font-size: 13px; color: #94a3b8;">Type a style # in the search bar above (e.g., PC54, G500, C112)</div>
+                                    <div style="font-size: 13px; color: #55606e;">Type a style # in the search bar above (e.g., PC54, G500, C112)</div>
                                 </td>
                             </tr>
                             <!-- Product rows will be added here -->
@@ -413,7 +413,7 @@
                     <div class="d-flex align-items-center gap-2">
                         <i class="fas fa-plus-circle"></i>
                         <span>More services &amp; fees</span>
-                        <span style="font-size:11px;color:#94a3b8;font-weight:400;">mockups · design time · rush · vellum</span>
+                        <span style="font-size:11px;color:#55606e;font-weight:400;">mockups · design time · rush · vellum</span>
                         <span id="charges-badge" class="charges-badge hidden">$0.00</span>
                     </div>
                     <i id="charges-chevron" class="fas fa-chevron-down collapsible-chevron"></i>
@@ -507,7 +507,7 @@
                                 <span style="font-size: 12px;">Include Tax</span>
                             </label>
                             <div class="d-flex align-items-center gap-1">
-                                <input type="number" id="tax-rate-input" value="10.1" step="0.1" min="0" max="20"
+                                <input type="number" id="tax-rate-input" aria-label="Sales tax rate percent" value="10.1" step="0.1" min="0" max="20"
                                        style="width: 52px; font-size: 11px; text-align: center; border: 1px solid #ddd; border-radius: 4px; padding: 2px 4px;"
                                        onchange="updateTaxCalculation()" title="Tax rate %">
                                 <span style="font-size: 11px; color: #64748b;">%</span>
@@ -748,7 +748,7 @@
          were never defined anywhere; nothing opened it (same dead copy deleted from EMB). -->
 
     <!-- Push to ShopWorks Preview Modal (review-before-push parity with EMB) -->
-    <div id="scp-push-modal" class="modal-overlay">
+    <div id="scp-push-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-label="Push to ShopWorks">
         <div class="modal-content" style="width: 660px; max-width: 94%;">
             <div class="modal-header">
                 <h3><i class="fas fa-upload"></i> Push to ShopWorks — Review Order</h3>

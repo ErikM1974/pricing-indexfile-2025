@@ -1202,7 +1202,7 @@ td.size-disabled input {
 
 .keyboard-hint-trigger {
     font-size: 12px;
-    color: #94a3b8;
+    color: var(--pnw-stone-strong, #55606e); /* 1.8: was 2.35:1 */
     cursor: pointer;
     padding: 4px 12px;
     border-radius: 4px;

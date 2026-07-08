@@ -94,7 +94,7 @@
     </header>
 
     <!-- Main Layout -->
-    <div class="power-main">
+    <div class="power-main" role="main">
         <!-- Left: Content Area -->
         <div class="power-content">
             <!-- 2026 Modernized Logo Configuration Section -->
@@ -349,7 +349,7 @@
                         <thead>
                             <tr>
                                 <th class="style-col">Style</th>
-                                <th class="thumbnail-col"></th>
+                                <th class="thumbnail-col" scope="col"><span class="sr-only">Product image</span></th>
                                 <th class="desc-col">Description</th>
                                 <th class="color-col">Color</th>
                                 <th class="size-col">S</th>
@@ -361,7 +361,7 @@
                                 <th class="qty-col">Qty</th>
                                 <th class="price-col">Unit $</th>
                                 <th class="total-col">Total</th>
-                                <th class="actions-col"></th>
+                                <th class="actions-col" scope="col"><span class="sr-only">Row actions</span></th>
                             </tr>
                         </thead>
                         <tbody id="product-tbody">
@@ -373,7 +373,7 @@
                                     <div style="font-size: 13px; color: #64748b; line-height: 1.8;">
                                         <span style="background:#eef2ff; padding:2px 8px; border-radius:4px; color:#4f46e5;">1</span> Type a style # above (e.g., PC54, G500, C112)
                                         &nbsp;&bull;&nbsp;
-                                        <span style="background:#f0fdf4; padding:2px 8px; border-radius:4px; color:#166534;">2</span> <a href="javascript:void(0)" onclick="openShopWorksImportModal()" style="color:#6366f1; text-decoration:underline; cursor:pointer;">Paste from ShopWorks</a>
+                                        <span style="background:#f0fdf4; padding:2px 8px; border-radius:4px; color:#166534;">2</span> <a href="javascript:void(0)" onclick="openShopWorksImportModal()" style="color:#4f46e5; text-decoration:underline; cursor:pointer;">Paste from ShopWorks</a>
                                         &nbsp;&bull;&nbsp;
                                         <span style="background:#fef3c7; padding:2px 8px; border-radius:4px; color:#92400e;">3</span> Use the <strong>Add to order</strong> bar below for Monogram, Additional Logo, Rush, etc.
                                     </div>
@@ -999,7 +999,7 @@
     </div>
 
     <!-- Import Progress Overlay -->
-    <div class="import-progress-overlay" id="import-progress-overlay">
+    <div class="import-progress-overlay" id="import-progress-overlay" role="dialog" aria-modal="true" aria-label="Import progress">
         <div class="import-progress-card">
             <h3 id="import-progress-title">Importing Order...</h3>
             <p class="import-progress-status" id="import-progress-status">Preparing...</p>
@@ -1213,7 +1213,7 @@ Company:Absher Construction Company
                 <div class="ns-form-grid">
                     <div class="ns-form-group ns-full-width">
                         <label>Style Number</label>
-                        <input type="text" id="ns-style-number" readonly class="ns-input ns-input-readonly">
+                        <input type="text" id="ns-style-number" readonly class="ns-input ns-input-readonly" aria-label="Non-SanMar style number">
                     </div>
                     <div class="ns-form-group">
                         <label>Brand <span class="ns-required">*</span></label>
@@ -1234,7 +1234,7 @@ Company:Absher Construction Company
                 <div class="ns-more-options-section" id="ns-more-options">
                     <div class="ns-form-group">
                         <label>Category</label>
-                        <select id="ns-category" class="ns-input">
+                        <select id="ns-category" class="ns-input" aria-label="Product category">
                             <option value="">Auto-detect</option>
                             <option value="Caps">Caps</option>
                             <option value="T-Shirts">T-Shirts</option>
