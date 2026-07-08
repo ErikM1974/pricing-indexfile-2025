@@ -18,15 +18,14 @@
  */
 // @ts-nocheck — MOVED legacy DOM code: pre-existing checkJs frictions; typing
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
-/* global API_BASE, SIZE06_EXTENDED_SIZES, addNewRow, createServiceProductRow, dateToInputValue, hideVariantOnlyParents, isCapProduct, onSizeChange, onStyleChange,
-   parseShopWorksDescription, populateNonSanmarRow, reorderRowByProductType, selectColor, selectNonSanmarColor,
-   updateCapLogoSectionVisibility, updateLogoCardHeader, updateNonSanmarPriceCell, escapeHtml, showToast,
+/* global API_BASE, SIZE06_EXTENDED_SIZES, reorderRowByProductType, escapeHtml, showToast,
    createOrUpdateExtendedChildRow, ShopWorksImportParser, updateArtworkCharges,
    Event, APP_CONFIG, setLtmControlState, markAsUnsaved */
 import { showServicePricingReview, getSprEmbConfigOptions } from './spr-modal.js';
 import { lookupTaxRate, onShipMethodChange, recalculatePricing, updateTaxCalculation } from './pricing-sync.js';
 import { applyDesignFromCache, lookupDesignNumber } from './design-search.js';
 import { _syncALArrays, handleCapEmbellishmentChange, updateNotesBadge } from './logo-config.js';
+import { addNewRow, createServiceProductRow, dateToInputValue, hideVariantOnlyParents, isCapProduct, onSizeChange, onStyleChange, parseShopWorksDescription, populateNonSanmarRow, selectColor, selectNonSanmarColor, updateCapLogoSectionVisibility, updateLogoCardHeader, updateNonSanmarPriceCell } from './product-rows.js';
 
 
 // DECG stitch-count modal DELETED 2026-07-07 (roadmap 0.4 cluster #9 audit):

@@ -37,7 +37,7 @@ function loadModule() {
         logLevel: 'silent',
     });
     const code = result.outputFiles[0].text;
-    const doc = { getElementById: () => null, querySelectorAll: () => [] };
+    const doc = { getElementById: () => null, querySelectorAll: () => [], addEventListener() {}, body: { appendChild() {} } };
     const moduleObj = { exports: {} };
     // eslint-disable-next-line no-new-func
     new Function('module', 'exports', 'window', 'document', 'console', code)(

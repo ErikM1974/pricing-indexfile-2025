@@ -21,6 +21,7 @@
  *   quote-lifecycle.js — resetQuote/discounts/fees panel/tracking (cluster #7, 2026-07-07)
  *   pricing-sync.js  — recalculatePricing + display + tax/ship UI (cluster #8, 2026-07-07)
  *   logo-config.js   — stitch/logo/embellishment UI + AL state sync (cluster #9, 2026-07-07)
+ *   product-rows.js  — search/rows/sizes/colors machinery (cluster #10, 2026-07-07)
  */
 import { loadServiceCodePrices, getServicePrice } from './pricing.js';
 import {
@@ -145,6 +146,53 @@ import {
     getCapEmbellishmentType,
     updateEmbellishmentDropdownLabels,
 } from './logo-config.js';
+import {
+    updateLogoCardHeader,
+    dateToInputValue,
+    dateFromInputValue,
+    setupPrimaryLogoHandlers,
+    setupCapPrimaryLogoHandlers,
+    updateCapLogoSectionVisibility,
+    updateGarmentLogoSectionVisibility,
+    updateArtworkServicesVisibility,
+    setupSearchAutocomplete,
+    selectProduct,
+    addNewRow,
+    addProductRow,
+    addNonSanmarFromSearch,
+    createServiceProductRow,
+    addManualServiceRow,
+    addALLineItem,
+    addDECGLineItem,
+    addExtraColorSurchargeRow,
+    openMonogramNamesDialog,
+    onServiceQtyChange,
+    deleteServiceRow,
+    onStyleChange,
+    populateNonSanmarRow,
+    updateNonSanmarPriceCell,
+    selectNonSanmarColor,
+    parseShopWorksDescription,
+    isCapProduct,
+    detectAndAdjustSizeUI,
+    toggleColorPicker,
+    selectColor,
+    handleColorPickerKeydown,
+    selectChildColor,
+    onSizeChange,
+    hideVariantOnlyParents,
+    createChildRow,
+    removeChildRow,
+    onChildSizeChange,
+    clearExtendedSize,
+    deleteRow,
+    duplicateRowNewColor,
+    enablePriceOverride,
+    clearPriceOverride,
+    handleCellKeydown,
+    updateRowBreakdown,
+    buildPricingBreakdown,
+} from './product-rows.js';
 import {
     applyDesignFromCache,
     filterDesignSearchByTier,
@@ -323,5 +371,54 @@ window.handleCapEmbellishmentChange = handleCapEmbellishmentChange;
 window.getCapEmbellishmentType = getCapEmbellishmentType;
 window.updateEmbellishmentDropdownLabels = updateEmbellishmentDropdownLabels;
 
+// product-rows (callers: static HTML search/row/color handlers, the size
+// grid + color picker + child-row GENERATED markup, and the monolith's
+// composition root wiring)
+window.updateLogoCardHeader = updateLogoCardHeader;
+window.dateToInputValue = dateToInputValue;
+window.dateFromInputValue = dateFromInputValue;
+window.setupPrimaryLogoHandlers = setupPrimaryLogoHandlers;
+window.setupCapPrimaryLogoHandlers = setupCapPrimaryLogoHandlers;
+window.updateCapLogoSectionVisibility = updateCapLogoSectionVisibility;
+window.updateGarmentLogoSectionVisibility = updateGarmentLogoSectionVisibility;
+window.updateArtworkServicesVisibility = updateArtworkServicesVisibility;
+window.setupSearchAutocomplete = setupSearchAutocomplete;
+window.selectProduct = selectProduct;
+window.addNewRow = addNewRow;
+window.addProductRow = addProductRow;
+window.addNonSanmarFromSearch = addNonSanmarFromSearch;
+window.createServiceProductRow = createServiceProductRow;
+window.addManualServiceRow = addManualServiceRow;
+window.addALLineItem = addALLineItem;
+window.addDECGLineItem = addDECGLineItem;
+window.addExtraColorSurchargeRow = addExtraColorSurchargeRow;
+window.openMonogramNamesDialog = openMonogramNamesDialog;
+window.onServiceQtyChange = onServiceQtyChange;
+window.deleteServiceRow = deleteServiceRow;
+window.onStyleChange = onStyleChange;
+window.populateNonSanmarRow = populateNonSanmarRow;
+window.updateNonSanmarPriceCell = updateNonSanmarPriceCell;
+window.selectNonSanmarColor = selectNonSanmarColor;
+window.parseShopWorksDescription = parseShopWorksDescription;
+window.isCapProduct = isCapProduct;
+window.detectAndAdjustSizeUI = detectAndAdjustSizeUI;
+window.toggleColorPicker = toggleColorPicker;
+window.selectColor = selectColor;
+window.handleColorPickerKeydown = handleColorPickerKeydown;
+window.selectChildColor = selectChildColor;
+window.onSizeChange = onSizeChange;
+window.hideVariantOnlyParents = hideVariantOnlyParents;
+window.createChildRow = createChildRow;
+window.removeChildRow = removeChildRow;
+window.onChildSizeChange = onChildSizeChange;
+window.clearExtendedSize = clearExtendedSize;
+window.deleteRow = deleteRow;
+window.duplicateRowNewColor = duplicateRowNewColor;
+window.enablePriceOverride = enablePriceOverride;
+window.clearPriceOverride = clearPriceOverride;
+window.handleCellKeydown = handleCellKeydown;
+window.updateRowBreakdown = updateRowBreakdown;
+window.buildPricingBreakdown = buildPricingBreakdown;
+
 window.__QB_BUILD = window.__QB_BUILD || {};
-window.__QB_BUILD.emb = { entry: 'builders/emb/index.js', modules: ['pricing', 'design-search', 'spr-modal', 'shopworks-import', 'persistence', 'output', 'save-push', 'quote-lifecycle', 'pricing-sync', 'logo-config'] };
+window.__QB_BUILD.emb = { entry: 'builders/emb/index.js', modules: ['pricing', 'design-search', 'spr-modal', 'shopworks-import', 'persistence', 'output', 'save-push', 'quote-lifecycle', 'pricing-sync', 'logo-config', 'product-rows'] };

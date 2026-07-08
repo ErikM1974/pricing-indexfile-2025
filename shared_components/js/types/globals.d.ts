@@ -172,6 +172,52 @@ interface Window {
     handleCapEmbellishmentChange?: () => void;
     getCapEmbellishmentType?: () => string;
     updateEmbellishmentDropdownLabels?: () => void;
+    /* product-rows bridges (builders/emb/product-rows.js, extraction #10) */
+    updateLogoCardHeader?: (...args: any[]) => any;
+    dateToInputValue?: (...args: any[]) => any;
+    dateFromInputValue?: (...args: any[]) => any;
+    setupPrimaryLogoHandlers?: (...args: any[]) => any;
+    setupCapPrimaryLogoHandlers?: (...args: any[]) => any;
+    updateCapLogoSectionVisibility?: (...args: any[]) => any;
+    updateGarmentLogoSectionVisibility?: (...args: any[]) => any;
+    updateArtworkServicesVisibility?: (...args: any[]) => any;
+    setupSearchAutocomplete?: (...args: any[]) => any;
+    selectProduct?: (...args: any[]) => any;
+    addNewRow?: (...args: any[]) => any;
+    addProductRow?: (...args: any[]) => any;
+    addNonSanmarFromSearch?: (...args: any[]) => any;
+    createServiceProductRow?: (...args: any[]) => any;
+    addManualServiceRow?: (...args: any[]) => any;
+    addALLineItem?: (...args: any[]) => any;
+    addDECGLineItem?: (...args: any[]) => any;
+    addExtraColorSurchargeRow?: (...args: any[]) => any;
+    openMonogramNamesDialog?: (...args: any[]) => any;
+    onServiceQtyChange?: (...args: any[]) => any;
+    deleteServiceRow?: (...args: any[]) => any;
+    onStyleChange?: (...args: any[]) => any;
+    populateNonSanmarRow?: (...args: any[]) => any;
+    updateNonSanmarPriceCell?: (...args: any[]) => any;
+    selectNonSanmarColor?: (...args: any[]) => any;
+    parseShopWorksDescription?: (...args: any[]) => any;
+    isCapProduct?: (...args: any[]) => any;
+    detectAndAdjustSizeUI?: (...args: any[]) => any;
+    toggleColorPicker?: (...args: any[]) => any;
+    selectColor?: (...args: any[]) => any;
+    handleColorPickerKeydown?: (...args: any[]) => any;
+    selectChildColor?: (...args: any[]) => any;
+    onSizeChange?: (...args: any[]) => any;
+    hideVariantOnlyParents?: (...args: any[]) => any;
+    createChildRow?: (...args: any[]) => any;
+    removeChildRow?: (...args: any[]) => any;
+    onChildSizeChange?: (...args: any[]) => any;
+    clearExtendedSize?: (...args: any[]) => any;
+    deleteRow?: (...args: any[]) => any;
+    duplicateRowNewColor?: (...args: any[]) => any;
+    enablePriceOverride?: (...args: any[]) => any;
+    clearPriceOverride?: (...args: any[]) => any;
+    handleCellKeydown?: (...args: any[]) => any;
+    updateRowBreakdown?: (...args: any[]) => any;
+    buildPricingBreakdown?: (...args: any[]) => any;
 }
 
 /*
@@ -180,7 +226,6 @@ interface Window {
  */
 declare let primaryLogo: any;
 declare let capPrimaryLogo: any;
-declare function updateLogoCardHeader(type: string): void;
 declare function escapeHtml(s: any): string;
 declare function showToast(msg: string, type?: string, duration?: number): void;
 declare let DesignThumbnailService: any;
