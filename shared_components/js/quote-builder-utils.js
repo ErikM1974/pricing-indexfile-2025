@@ -2024,6 +2024,77 @@ if (typeof window !== 'undefined') {
 }
 
 // ============================================================
+// In-flight reprice indicator (old-audit price-display #5, 2026-07-07)
+// ============================================================
+// During a slow /api/pricing-bundle refresh the table shows the PREVIOUS
+// prices with no cue — a rep can read a stale number aloud. Saves were always
+// safe (they re-run the recalc); this is purely the on-screen honesty pill.
+// 300ms show-delay so fast recalcs never flicker; depth-counted so overlapping
+// recalcs keep it up until the LAST one settles. Builders wrap their recalc
+// entry points with wrapWithRepricingIndicator() at file end.
+
+function setRepricingIndicator(on) {
+    if (on) {
+        if (window._repriceShowTimer || document.getElementById('repricing-indicator')) return;
+        window._repriceShowTimer = setTimeout(() => {
+            window._repriceShowTimer = null;
+            if (document.getElementById('repricing-indicator')) return;
+            const el = document.createElement('div');
+            el.id = 'repricing-indicator';
+            el.className = 'repricing-indicator';
+            el.setAttribute('role', 'status');
+            el.innerHTML = '<i class="fas fa-circle-notch fa-spin" aria-hidden="true"></i> Updating prices…';
+            document.body.appendChild(el);
+        }, 300);
+    } else {
+        if (window._repriceShowTimer) { clearTimeout(window._repriceShowTimer); window._repriceShowTimer = null; }
+        document.getElementById('repricing-indicator')?.remove();
+    }
+}
+
+/**
+ * Wrap an async recalc function so the indicator shows while ANY call is in
+ * flight (depth counter handles the overlapping-recalc case the EMB stale-seq
+ * guard exists for). Returns the wrapped function.
+ */
+function wrapWithRepricingIndicator(fn) {
+    return async function () {
+        window._repriceDepth = (window._repriceDepth || 0) + 1;
+        setRepricingIndicator(true);
+        try {
+            return await fn.apply(this, arguments);
+        } finally {
+            window._repriceDepth = Math.max(0, (window._repriceDepth || 1) - 1);
+            if (window._repriceDepth === 0) setRepricingIndicator(false);
+        }
+    };
+}
+
+if (typeof window !== 'undefined') {
+    window.setRepricingIndicator = setRepricingIndicator;
+    window.wrapWithRepricingIndicator = wrapWithRepricingIndicator;
+}
+
+/**
+ * Live rush rate for the SCP/DTF "auto %" chips (2026-07-07) — identical logic
+ * to EMB's getRushRate(): Caspio Service_Codes RUSH carries the percent in
+ * UnitCost (SellPrice is 0 for CALCULATED codes, so getServicePrice() can't be
+ * reused). Falls back to 25% with a ONE-TIME visible warning (Erik's #1 rule).
+ */
+let _sharedRushWarned = false;
+function getSharedRushRate() {
+    const sc = window._serviceCodes && window._serviceCodes['RUSH'];
+    const pct = sc ? parseFloat(sc.UnitCost) : NaN;
+    if (!isNaN(pct) && pct > 0) return pct / 100;
+    if (!_sharedRushWarned) {
+        _sharedRushWarned = true;
+        if (typeof showToast === 'function') showToast('Using default 25% rush — live rate not loaded from the pricing service', 'warning', 5000);
+    }
+    return 0.25;
+}
+if (typeof window !== 'undefined') window.getSharedRushRate = getSharedRushRate;
+
+// ============================================================
 // "Recent orders" panel after customer selection (item #13, 2026-07-05)
 // ============================================================
 // ADVISORY feature: shows the picked customer's 3 most recent ShopWorks orders

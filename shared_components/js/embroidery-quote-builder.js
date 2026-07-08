@@ -6419,6 +6419,41 @@ const debouncedRecalculatePricing = debounce(() => recalculatePricing(), 250);
  * guessed price: if the API is unreachable, it shows a visible error and leaves the row at $0
  * (Erik's #1 rule — wrong pricing is worse than an error). (2026-06-03)
  */
+/**
+ * "Retry pricing" on failed AL/DECG rows (old-audit P2 #9, shipped 2026-07-07):
+ * an API blip flagged rows with data-price-error and the only recovery was a FULL
+ * PAGE REFRESH — losing unsaved work mid-call. The button clears the pricing
+ * caches and re-runs the same live syncs; the save gate stays closed until a
+ * retry actually succeeds.
+ */
+function renderPriceErrorRetries() {
+    document.querySelectorAll('#product-tbody tr.service-product-row[data-price-error="true"]').forEach(row => {
+        const rid = row.dataset.rowId;
+        const cell = document.getElementById(`row-price-${rid}`);
+        if (!cell || cell.querySelector('.btn-retry-pricing')) return;
+        cell.innerHTML = '<button type="button" class="btn-retry-pricing" onclick="retryRowPricing()" title="Pricing failed to load — retry without refreshing the page"><i class="fas fa-rotate-right"></i> Retry</button>';
+    });
+}
+
+async function retryRowPricing() {
+    showToast('Retrying pricing…', 'info', 2000);
+    window._alPricingCache = null;     // force fresh fetches — a stale snapshot is
+    window._decgPricingCache = null;   // exactly what a failed row must not reuse
+    try {
+        await syncALRows();
+        await syncDECGRows();
+        await recalculatePricing();
+    } catch (e) {
+        console.error('[RetryPricing] resync failed', e);
+    }
+    const still = document.querySelectorAll('#product-tbody tr[data-price-error="true"]').length;
+    showToast(
+        still ? 'Pricing is still unavailable — check the connection and retry.' : 'Pricing recovered — rows repriced.',
+        still ? 'error' : 'success'
+    );
+}
+window.retryRowPricing = retryRowPricing;
+
 async function loadALPricing() {
     if (window._alPricingCache) return window._alPricingCache;
     if (!window.EmbroideryPricingService) { console.error('[AL] EmbroideryPricingService unavailable'); return null; }
@@ -6428,7 +6463,7 @@ async function loadALPricing() {
         return window._alPricingCache;
     } catch (e) {
         console.error('[AL] fetchALPricing failed', e);
-        showToast("Couldn't load Additional Logo pricing from the server — refresh and try again.", 'error');
+        showToast("Couldn't load Additional Logo pricing from the server — click Retry on the affected row (no refresh needed).", 'error');
         return null;
     }
 }
@@ -6511,7 +6546,7 @@ async function loadDECGPricing() {
         return window._decgPricingCache;
     } catch (e) {
         console.error('[DECG] fetchDECGPricing failed', e);
-        showToast("Couldn't load Customer-Supplied (DECG) pricing from the server — refresh and try again.", 'error');
+        showToast("Couldn't load Customer-Supplied (DECG) pricing from the server — click Retry on the affected row (no refresh needed).", 'error');
         return null;
     }
 }
@@ -7329,6 +7364,9 @@ function collectProductsFromTable() {
 }
 
 function updatePricingDisplay(pricing) {
+    // Failed AL/DECG rows get their Retry button here — this runs AFTER the recalc
+    // body has repainted service-row cells, so the button isn't overwritten. (2026-07-07)
+    try { renderPriceErrorRetries(); } catch (_) { }
     const totalQty = pricing.totalQuantity || 0;
     document.getElementById('total-qty').textContent = totalQty;
     document.getElementById('subtotal').textContent = `$${((pricing.subtotal || 0) + (pricing.ltmFee || 0)).toFixed(2)}`;
@@ -13636,4 +13674,11 @@ async function embEmailQuote() {
         customerName: document.getElementById('customer-name')?.value?.trim(),
         salesRepEmail: document.getElementById('sales-rep')?.value
     });
+}
+
+// In-flight reprice pill (old-audit price-display #5, 2026-07-07): wrap the
+// recalc entry point so slow /api/pricing-bundle refreshes show "Updating
+// prices…" instead of silently displaying the previous numbers.
+if (typeof wrapWithRepricingIndicator === 'function') {
+    recalculatePricing = wrapWithRepricingIndicator(recalculatePricing);
 }

@@ -2589,13 +2589,13 @@ function selectColor(rowId, optionEl) {
     const imageUrl = optionEl.dataset.imageUrl;
     const style = row.dataset.style;
 
-    // Check for duplicate row (same style + color)
+    // Check for duplicate row (same style + color) — MERGE, don't just focus
     const existingRow = findExistingRow(style, catalogColor, rowId);
     if (existingRow) {
-        showToast(`${style} in ${colorName} already exists. Adding to existing row.`, 'info');
         row.querySelector('.color-picker-dropdown').classList.add('hidden');
-        const existingFirstSize = existingRow.querySelector('.size-input:not([disabled])');
-        if (existingFirstSize) existingFirstSize.focus();
+        const moved = mergeDuplicateRowInto(existingRow, rowId);
+        showToast(`${style} in ${colorName} is already on the quote — ${moved > 0 ? `merged ${moved} pc into` : 'jumped to'} that row.`, 'info');
+        if (typeof markScreenPrintDirty === 'function') markScreenPrintDirty();
         return;
     }
 
@@ -2820,18 +2820,12 @@ async function onColorChange(select, rowId) {
     const catalogColor = selectedOption.dataset.catalog || '';
     const style = row.dataset.style;
 
-    // Check for duplicate row (same style + color)
+    // Check for duplicate row (same style + color) — MERGE, don't just focus
     const existingRow = findExistingRow(style, catalogColor, rowId);
     if (existingRow) {
-        // Show toast and focus on existing row
-        showToast(`${style} in ${color} already exists. Adding to existing row.`, 'info');
-
-        // Clear this row's color selection
-        select.value = '';
-
-        // Focus on the existing row's first size input
-        const existingFirstSize = existingRow.querySelector('.size-input:not([disabled])');
-        if (existingFirstSize) existingFirstSize.focus();
+        const moved = mergeDuplicateRowInto(existingRow, rowId);
+        showToast(`${style} in ${color} is already on the quote — ${moved > 0 ? `merged ${moved} pc into` : 'jumped to'} that row.`, 'info');
+        if (typeof markScreenPrintDirty === 'function') markScreenPrintDirty();
         return;
     }
 
@@ -2919,6 +2913,38 @@ function updateChildRowColorIndicators(parentRowId) {
 /**
  * Find an existing row with the same style and catalogColor (excluding current row)
  */
+/**
+ * Auto-merge a duplicate style+color row into the existing one (old-audit P2 #5,
+ * shipped 2026-07-07): the toast SAID "Adding to existing row" but only focused
+ * it — the half-configured duplicate stayed behind and could double-bill once
+ * quantities landed in both. Standard-size quantities already typed on the
+ * duplicate SUM into the existing row's inputs (real change events, so pricing
+ * and child-row machinery run); the duplicate then deletes via the normal
+ * deleteRow() path. Extended-size CHILD rows can't exist on a row that hasn't
+ * picked a color yet, so standard sizes cover every reachable case.
+ * @returns {number} pieces moved
+ */
+function mergeDuplicateRowInto(existingRow, dupRowId) {
+    const dupRow = document.getElementById(`row-${dupRowId}`);
+    if (!dupRow || !existingRow) return 0;
+    let moved = 0;
+    dupRow.querySelectorAll('.size-input:not(.xxxl-picker-btn)').forEach(inp => {
+        const qty = parseInt(inp.value, 10) || 0;
+        if (qty <= 0) return;
+        const size = inp.dataset.size;
+        const target = existingRow.querySelector(`.size-input[data-size="${size}"]:not(.xxxl-picker-btn)`);
+        if (target && !target.disabled) {
+            target.value = String((parseInt(target.value, 10) || 0) + qty);
+            target.dispatchEvent(new Event('change', { bubbles: true }));
+            moved += qty;
+        }
+    });
+    deleteRow(dupRowId);
+    const firstSize = existingRow.querySelector('.size-input:not([disabled])');
+    if (firstSize) firstSize.focus();
+    return moved;
+}
+
 function findExistingRow(style, catalogColor, excludeRowId) {
     const rows = document.querySelectorAll('#product-tbody tr:not(.child-row)');
     for (const row of rows) {
@@ -5331,3 +5357,35 @@ if (typeof QuoteOrderSummary !== 'undefined') {
         },
     });
 }
+
+// In-flight reprice pill (old-audit price-display #5, 2026-07-07): wrap the
+// recalc entry point so slow /api/pricing-bundle refreshes show "Updating
+// prices…" instead of silently displaying the previous numbers.
+if (typeof wrapWithRepricingIndicator === 'function') {
+    recalculatePricing = wrapWithRepricingIndicator(recalculatePricing);
+}
+
+/**
+ * "auto %" rush chip (old-audit P2, 2026-07-07): the rush box was CSR mental
+ * math on a moving subtotal — inconsistent rep-to-rep and stale after quote
+ * changes. Fills the input from the live Caspio RUSH rate × everything-except-
+ * rush (same base the % discount uses); the value stays a plain editable
+ * dollar amount, so re-click after the quote changes.
+ */
+function applyRushPercent() {
+    const rate = (typeof getSharedRushRate === 'function') ? getSharedRushRate() : 0.25;
+    const productsSubtotal = parseFloat(document.getElementById('subtotal')?.textContent?.replace(/[$,]/g, '')) || 0;
+    if (!(productsSubtotal > 0)) { showToast('Add products first — rush is a % of the quote.', 'info'); return; }
+    const artCharge = document.getElementById('art-charge-toggle')?.checked
+        ? (parseFloat(document.getElementById('art-charge')?.value) || 0) : 0;
+    const designFee = (parseFloat(document.getElementById('graphic-design-hours')?.value) || 0) * getServicePrice('GRT-75', 75);
+    const setupFee = parseFloat(document.getElementById('setup-fee-total')?.textContent?.replace(/[$,]/g, '')) || 0;
+    const xf = (typeof getScpExtraFees === 'function') ? getScpExtraFees() : { vellumFee: 0, colorChangeFee: 0 };
+    const base = productsSubtotal + artCharge + designFee + setupFee + xf.vellumFee + xf.colorChangeFee;
+    const el = document.getElementById('rush-fee');
+    if (!el) return;
+    el.value = (base * rate).toFixed(2);
+    el.dispatchEvent(new Event('change', { bubbles: true }));   // runs updateAdditionalCharges()
+    showToast(`Rush set to ${(rate * 100).toFixed(0)}% of $${base.toFixed(2)} — adjust if needed; re-click if the quote changes.`, 'success');
+}
+window.applyRushPercent = applyRushPercent;
