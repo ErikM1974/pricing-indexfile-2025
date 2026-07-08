@@ -1,3 +1,9 @@
+## v2026.07.08.8 (2026.07.08)
+
+- feat(security): 1.3 — vendor all third-party code the builders execute (no more CDNs)
+- chore: .gitattributes — vendor/** exempt from EOL normalization (byte-exact upstream diffs)
+- Deploy v2026.07.08.8: 7 files (vendored-lib ?v= bumps)
+
 ## v2026.07.08.7 (2026.07.08)
 
 - fix(deploy-skill): exclude .claude/worktrees from the cache-bust sweep
