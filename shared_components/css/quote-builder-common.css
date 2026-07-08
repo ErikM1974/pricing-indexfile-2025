@@ -3885,3 +3885,55 @@ input.sci-num { width: 92px; cursor: text; }
 .sci-check-lbl { cursor: pointer; white-space: nowrap; }
 .sci-check { padding: 0; border: none; max-width: none; width: auto; cursor: pointer; accent-color: #16a34a; }
 .sci-preset:hover { background: #e0e7ff; }
+/* Accepted-quote edit banner (expert audit 2026-07-07) — rendered by
+   assertQuoteEditable() when a customer-accepted quote is opened for editing.
+   Warns, never locks: a re-saved revision mutates the offer the customer
+   approved (consent mismatch now that online deposits are live). */
+.accepted-quote-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 12px;
+    padding: 10px 14px;
+    border: 1px solid var(--qb-state-warn, #f59e0b);
+    border-left-width: 4px;
+    border-radius: var(--qb-radius-md, 8px);
+    background: var(--qb-state-warn-bg, #fef3c7);
+    color: var(--pnw-bark-shadow, #374151);
+    font-size: 13.5px;
+    line-height: 1.45;
+}
+.accepted-quote-banner .fa-file-signature {
+    color: var(--qb-state-warn, #f59e0b);
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+/* Mid-call method-switch menu (expert audit 2026-07-07) — header control that
+   carries customer + product identity into another builder. */
+.method-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+    padding: 4px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--pnw-stone, #6b7280);
+    white-space: nowrap;
+}
+.method-switch .fa-exchange-alt { color: var(--builder-primary, #2e5827); }
+.method-switch select {
+    border: 1px solid var(--pnw-rule, #d1d5db);
+    border-radius: 6px;
+    padding: 3px 6px;
+    font-size: 12px;
+    background: var(--pnw-paper, #fff);
+    color: var(--pnw-bark-shadow, #374151);
+    cursor: pointer;
+}
+.method-switch select:focus-visible {
+    outline: none;
+    border-color: var(--builder-primary, #2e5827);
+    box-shadow: var(--pnw-glow-focus, 0 0 0 3px rgba(46, 88, 39, 0.2));
+}

@@ -752,6 +752,29 @@ async function addProductFromQuote(product) {
  * addProductFromQuote() only fills the standard S–2XL parent inputs — without this,
  * Quick Quote pieces would be silently dropped. (item #6, 2026-07-05)
  */
+/**
+ * Mid-call method switch (expert audit 2026-07-07): fill the customer, then replay
+ * every carried product through the SAME add path Quick Quote uses.
+ */
+async function applyMethodSwitchPrefillScp(ms) {
+    if (typeof applyMethodSwitchCustomer === 'function') applyMethodSwitchCustomer(ms.customer);
+    let added = 0;
+    for (const p of (ms.products || [])) {
+        try {
+            await applyQuickQuotePrefillScp({
+                style: p.style, color: p.color, colorName: p.colorName,
+                qty: 0, sizeBreakdown: p.sizeBreakdown || {}, location: ''
+            });
+            added++;
+        } catch (e) {
+            console.error('[MethodSwitch] product prefill failed', p.style, e);
+            showToast(`Could not carry ${p.style} over — add it manually`, 'warning');
+        }
+    }
+    showToast(`Switched from ${ms.fromLabel || 'another builder'} — customer + ${added} product${added === 1 ? '' : 's'} carried over. Set the print colors.`, 'success');
+    try { history.replaceState(null, '', window.location.pathname); } catch (_) { }
+}
+
 async function applyQuickQuotePrefillScp(qq) {
     try {
         await addProductFromQuote({
@@ -1094,6 +1117,21 @@ function resetQuote() {
 
 document.addEventListener('DOMContentLoaded', async function() {
 
+    // Mid-call method-switch menu (expert audit 2026-07-07) — serializes IDENTITY
+    // only (customer + style/color/sizes); the target builder reprices natively.
+    if (typeof initMethodSwitchMenu === 'function') {
+        initMethodSwitchMenu({
+            current: 'scp',
+            collect: () => (typeof collectProductsFromTable === 'function' ? collectProductsFromTable() : [])
+                .filter(p => !p.isService)
+                .map(p => ({
+                    style: p.style, color: p.catalogColor || '', colorName: p.color || '',
+                    sizeBreakdown: Object.fromEntries(Object.entries(p.sizeBreakdown || {}).filter(([, q]) => (parseInt(q, 10) || 0) > 0))
+                }))
+                .filter(i => i.style && Object.keys(i.sizeBreakdown).length)
+        });
+    }
+
     // Load Caspio Service_Codes (SPSU screen-setup, GRT-75 design) so fees come
     // from the API, not hardcoded literals (Erik's Pricing=API rule). Fire-and-
     // forget — getServicePrice() returns the documented fallback until it resolves,
@@ -1238,6 +1276,10 @@ document.addEventListener('DOMContentLoaded', async function() {
         } else if (qqPrefill) {
             initScreenPrintPersistence();
             await applyQuickQuotePrefillScp(qqPrefill);
+        } else if (typeof takeMethodSwitchPrefill === 'function' && (window._msPrefillScp = takeMethodSwitchPrefill())) {
+            // Mid-call method switch (expert audit 2026-07-07): customer + rows from another builder
+            initScreenPrintPersistence();
+            await applyMethodSwitchPrefillScp(window._msPrefillScp);
         } else {
             // Initialize auto-save & draft recovery (2026 consolidation)
             initScreenPrintPersistence();
@@ -4353,10 +4395,24 @@ async function printQuote() {
 
         // Generate and open print window
         const invoiceGenerator = new EmbroideryInvoiceGenerator();
+        // Full reference block for the PDF (expert audit 2026-07-07): SCP collected
+        // phone / project / PO / ship date / notes on-page and then dropped them ALL
+        // from the printed quote — reps promised "the PO number is on the quote" and
+        // it was only true on the other builders.
+        const _osd = (typeof getOrderShippingData === 'function') ? getOrderShippingData('spc-order-fields') : {};
         const customerData = {
             name: document.getElementById('customer-name')?.value || 'Customer',
             company: document.getElementById('company-name')?.value || '',
             email: document.getElementById('customer-email')?.value || '',
+            phone: document.getElementById('customer-phone')?.value?.trim() || _osd.phone || '',
+            project: document.getElementById('project-name')?.value?.trim() || '',
+            poNumber: _osd.poNumber || '',
+            orderNumber: _osd.orderNumber || '',
+            reqShipDate: _osd.reqShipDate || '',
+            notes: _osd.notes || '',
+            shipping: (_osd.shipAddress || _osd.shipZip)
+                ? { address: _osd.shipAddress, city: _osd.shipCity, state: _osd.shipState, zip: _osd.shipZip, method: _osd.shipMethod }
+                : null,
             salesRepEmail: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com'
         };
 

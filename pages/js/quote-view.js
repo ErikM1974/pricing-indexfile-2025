@@ -156,8 +156,11 @@ class QuoteViewPage {
         // analytics fetch. Push/ShopWorks events re-render via applyShopWorksOverlay.
         this._initTimeline();
 
-        // Setup push-to-ShopWorks button (staff only, EMB quotes only)
-        if (this.isStaff && this.quoteId && this.quoteId.startsWith('EMB')) {
+        // Setup push-to-ShopWorks button (staff only; EMB + SCP/SP + DTF).
+        // Expert audit 2026-07-07: the acceptance email lands staff on THIS page,
+        // but only EMB could push from here — SCP/DTF staff had to round-trip
+        // through the builder (?edit=), where acceptance isn't even visible.
+        if (this.isStaff && this.quoteId && this._pushRoute()) {
             this.setupPushButton();
         }
 
@@ -4873,6 +4876,20 @@ class QuoteViewPage {
     /**
      * Setup the Push to ShopWorks button (staff-only, EMB quotes only)
      */
+    /**
+     * Per-method push route (expert audit 2026-07-07). All three proxy routes
+     * share the same POST contract ({ quoteId, isTest, force }); 'SP' covers the
+     * main SCP builder's SP-2026-NNN ids plus legacy SP0707-N and the SPC
+     * fast-quote prefix. Returns null for prefixes with no push pipeline.
+     */
+    _pushRoute() {
+        const id = this.quoteId || '';
+        if (id.startsWith('EMB')) return { api: '/api/embroidery-push/push-quote', extPrefix: 'NWCA-EMB', itemFilter: (i) => i.EmbellishmentType === 'embroidery' };
+        if (id.startsWith('SP')) return { api: '/api/scp-push/push-quote', extPrefix: 'NWCA-SCP', itemFilter: null };
+        if (id.startsWith('DTF')) return { api: '/api/dtf-push/push-quote', extPrefix: 'NWCA-DTF', itemFilter: null };
+        return null;
+    }
+
     setupPushButton() {
         const btn = document.getElementById('push-shopworks-btn');
         if (!btn) return;
@@ -4896,11 +4913,13 @@ class QuoteViewPage {
         const btn = document.getElementById('push-shopworks-btn');
         if (!btn || btn.disabled) return;
 
-        const extOrderId = `NWCA-EMB-${this.quoteId}`;
+        const route = this._pushRoute();
+        if (!route) return;
+        const extOrderId = `${route.extPrefix}-${this.quoteId}`;
         const totalAmount = this.quoteData.TotalAmount
             ? `$${parseFloat(this.quoteData.TotalAmount).toFixed(2)}`
             : 'N/A';
-        const itemCount = this.items.filter(i => i.EmbellishmentType === 'embroidery').length;
+        const itemCount = (route.itemFilter ? this.items.filter(route.itemFilter) : this.items).length;
 
         const confirmed = confirm(
             `Push to ShopWorks?\n\n` +
@@ -4922,7 +4941,7 @@ class QuoteViewPage {
         btn.style.opacity = '0.6';
 
         try {
-            const response = await fetch(`${this.apiBaseUrl}/api/embroidery-push/push-quote`, {
+            const response = await fetch(`${this.apiBaseUrl}${route.api}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

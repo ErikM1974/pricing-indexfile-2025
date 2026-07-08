@@ -233,6 +233,32 @@ class DTFQuoteBuilder {
         this.setupSearchListeners();
         this.setupGlobalListeners();
 
+        // Mid-call method-switch menu (expert audit 2026-07-07) — serializes
+        // IDENTITY only (customer + style/color/sizes); target reprices natively.
+        if (typeof initMethodSwitchMenu === 'function') {
+            initMethodSwitchMenu({
+                current: 'dtf',
+                collect: () => {
+                    const items = new Map();
+                    (this.products || []).forEach(p => {
+                        const sizes = {};
+                        ['XS', 'S', 'M', 'L', 'XL'].forEach(s => {
+                            const q = parseInt(p.quantities?.[s], 10) || 0;
+                            if (q > 0) sizes[s] = q;
+                        });
+                        items.set(Number(p.id), { style: p.styleNumber, color: p.catalogColor || '', colorName: p.color || '', sizeBreakdown: sizes });
+                    });
+                    // Extended sizes live in childRows (single source of truth) —
+                    // reading them from parent quantities too would double-count.
+                    (this.childRows || new Map()).forEach(ch => {
+                        const it = items.get(Number(ch.parentId));
+                        if (it && ch.qty > 0 && ch.size) it.sizeBreakdown[ch.size] = (it.sizeBreakdown[ch.size] || 0) + ch.qty;
+                    });
+                    return Array.from(items.values()).filter(i => i.style && Object.keys(i.sizeBreakdown).length);
+                }
+            });
+        }
+
         // Check for edit mode (loading existing quote for revision)
         const editQuoteId = this.checkForEditMode();
         // Duplicate mode (?duplicate=DTF-...): load a copy as a NEW quote (EMB parity 2026-06-11)
@@ -241,6 +267,9 @@ class DTFQuoteBuilder {
         // in quote-builder-utils.js). Prefill wins over draft recovery for this visit,
         // same as ?edit=/?duplicate=. (item #6, 2026-07-05)
         const qqPrefill = (typeof getQuickQuotePrefill === 'function') ? getQuickQuotePrefill() : null;
+        // Mid-call method switch (?from=methodswitch — expert audit 2026-07-07):
+        // customer + product rows carried over from another builder.
+        const msPrefill = (typeof takeMethodSwitchPrefill === 'function') ? takeMethodSwitchPrefill() : null;
         if (duplicateQuoteId) {
             await this.duplicateQuote(duplicateQuoteId);
         } else if (editQuoteId) {
@@ -248,6 +277,8 @@ class DTFQuoteBuilder {
             await this.loadQuoteForEditing(editQuoteId);
         } else if (qqPrefill) {
             await this.applyQuickQuotePrefill(qqPrefill);
+        } else if (msPrefill) {
+            await this.applyMethodSwitchPrefill(msPrefill);
         } else {
             // Check for draft recovery (after DOM is ready)
             if (this.session && this.session.shouldShowRecovery()) {
@@ -712,6 +743,30 @@ class DTFQuoteBuilder {
      * edit-loader uses (parent row + createChildRow for extended sizes), so color/size
      * handling + pricing are identical to a hand-added row. (item #6, 2026-07-05)
      */
+    /**
+     * Mid-call method switch (expert audit 2026-07-07): fill the customer, then
+     * replay every carried product through the SAME add path Quick Quote uses —
+     * pricing comes from THIS builder's engine, never from the payload.
+     */
+    async applyMethodSwitchPrefill(ms) {
+        if (typeof applyMethodSwitchCustomer === 'function') applyMethodSwitchCustomer(ms.customer);
+        let added = 0;
+        for (const p of (ms.products || [])) {
+            try {
+                await this.applyQuickQuotePrefill({
+                    style: p.style, color: p.color, colorName: p.colorName,
+                    qty: 0, sizeBreakdown: p.sizeBreakdown || {}, location: ''
+                });
+                added++;
+            } catch (e) {
+                console.error('[MethodSwitch] product prefill failed', p.style, e);
+                this.showToast(`Could not carry ${p.style} over — add it manually`, 'warning');
+            }
+        }
+        this.showToast(`Switched from ${ms.fromLabel || 'another builder'} — customer + ${added} product${added === 1 ? '' : 's'} carried over. Pick the transfer locations.`, 'success');
+        try { history.replaceState(null, '', window.location.pathname); } catch (_) { }
+    }
+
     async applyQuickQuotePrefill(qq) {
         try {
             await this.addProductFromQuote({
@@ -2882,6 +2937,9 @@ class DTFQuoteBuilder {
                 email: document.getElementById('customer-email')?.value || '',
                 phone: document.getElementById('customer-phone')?.value || '',
                 salesRepEmail: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com',
+                // The shared generator reads `.project` — the old `projectName`-only key
+                // meant DTF project names NEVER printed. Keep both. (expert audit 2026-07-07)
+                project: document.getElementById('project-name')?.value || '',
                 projectName: document.getElementById('project-name')?.value || '',
                 orderNumber: document.getElementById('order-number')?.value || '',
                 poNumber: document.getElementById('po-number')?.value || '',

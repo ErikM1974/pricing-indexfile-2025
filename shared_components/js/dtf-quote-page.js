@@ -317,8 +317,17 @@ function onShipZipBlur() {
 
 async function dtfEmailQuote() {
     // [2026-06-11] also accept lastSavedQuoteId — a fresh save never set
-    // editingQuoteId, so Email Quote was a dead end for never-edited quotes
-    const quoteId = window.dtfQuoteBuilder?.editingQuoteId || window.dtfQuoteBuilder?.lastSavedQuoteId;
+    // editingQuoteId, so Email Quote was a dead end for never-edited quotes.
+    // [2026-07-07 expert audit] save-if-dirty first, like EMB: the /quote link
+    // renders the SAVED row, so emailing after an un-saved edit silently sent
+    // the customer the OLD prices while the rep read the new ones aloud.
+    let quoteId = window.dtfQuoteBuilder?.editingQuoteId || window.dtfQuoteBuilder?.lastSavedQuoteId;
+    const dirty = (typeof hasUnsavedChanges === 'function') ? hasUnsavedChanges() : false;
+    if ((!quoteId || dirty) && window.dtfQuoteBuilder?.saveAndGetLink) {
+        showToast('Saving quote before emailing…', 'info', 2500);
+        await window.dtfQuoteBuilder.saveAndGetLink({ skipShareModal: true });
+        quoteId = window.dtfQuoteBuilder?.editingQuoteId || window.dtfQuoteBuilder?.lastSavedQuoteId;
+    }
     if (!quoteId) {
         showToast('Please save the quote first before emailing', 'error');
         return;

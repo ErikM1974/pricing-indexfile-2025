@@ -961,6 +961,34 @@ function assertQuoteEditable(session, opts = {}) {
     // imports, so a freshly-pushed quote can still read 'Open' — PushedToShopWorks
     // catches that window. (2026-06-01)
     const isPushed = !!(session && session.PushedToShopWorks);
+
+    // Customer-ACCEPTED quotes stay editable (legit fixups happen) but must not
+    // mutate silently under the URL the customer approved — with online deposits
+    // live, a re-saved revision is a consent mismatch. Persistent banner, never a
+    // lock. (expert audit 2026-07-07)
+    if (status === 'Accepted' && !isPushed && !opts.silent) {
+        try {
+            let banner = document.getElementById('accepted-quote-banner');
+            if (!banner) {
+                banner = document.createElement('div');
+                banner.id = 'accepted-quote-banner';
+                banner.className = 'accepted-quote-banner';
+                const host = document.querySelector('.power-content') || document.body;
+                host.insertBefore(banner, host.firstChild);
+            }
+            let acceptedOn = '';
+            try {
+                const notes = JSON.parse(session.Notes || '{}');   // EMB stores plain text here — parse failure is fine
+                if (notes.acceptedAt) acceptedOn = ' on ' + new Date(notes.acceptedAt).toLocaleDateString();
+                if (notes.acceptedByName) acceptedOn += ' by ' + notes.acceptedByName;
+            } catch (_) { }
+            const rev = session.RevisionNumber != null ? ` (Rev ${session.RevisionNumber})` : '';
+            banner.innerHTML = '<i class="fas fa-file-signature"></i> ' +
+                '<strong>Customer accepted this quote' + escapeHtml(acceptedOn) + escapeHtml(rev) + '.</strong> ' +
+                'Saving creates a revision they have <u>not</u> re-approved — re-send for approval after any price change.';
+        } catch (_) { /* banner is best-effort; never block the edit-load */ }
+    }
+
     if (!lockedStatuses.has(status) && !isPushed) return true;
 
     if (opts.silent) return false;
@@ -1066,8 +1094,17 @@ function getPushBlockers(r, focus) {
 function focusPushBlockerField(focusId) {
     const target = focusId && document.getElementById(focusId);
     if (!target) return;
-    try { target.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (_) { target.scrollIntoView(); }
-    try { target.focus({ preventScroll: true }); } catch (_) { target.focus(); }
+    // Guided mode: the field may live on ANOTHER step (display:none), where a bare
+    // focus() is a silent no-op — navigate to its step first. guidedRevealField
+    // returns false when guided is off/absent, and the classic scroll+focus below
+    // then runs as before. (expert audit 2026-07-07)
+    const revealed = (typeof window !== 'undefined' && typeof window.guidedRevealField === 'function')
+        ? window.guidedRevealField(focusId)
+        : false;
+    if (!revealed) {
+        try { target.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (_) { target.scrollIntoView(); }
+        try { target.focus({ preventScroll: true }); } catch (_) { target.focus(); }
+    }
     const prevOutline = target.style.outline;
     const prevOffset = target.style.outlineOffset;
     target.style.outline = '2px solid #f59e0b';
@@ -1176,12 +1213,19 @@ function toggleSaveShare() {
  * Requires builder to define: hasUnsavedChanges(), resetQuote()
  */
 function confirmNewQuote() {
+    // Quoting happens in streaks: after Push/Email → New Quote, the guided shell
+    // was left parked on "Review & send" with an EMPTY review — every call after
+    // the first started one navigation behind. guidedGoToStep no-ops when the
+    // shell is off or absent. (expert audit 2026-07-07)
+    const _resetToFirstStep = () => { if (typeof window !== 'undefined' && typeof window.guidedGoToStep === 'function') window.guidedGoToStep(0); };
     if (typeof hasUnsavedChanges === 'function' && hasUnsavedChanges()) {
         if (confirm('You have unsaved changes. Start a new quote?')) {
             resetQuote();
+            _resetToFirstStep();
         }
     } else {
         resetQuote();
+        _resetToFirstStep();
     }
 }
 
@@ -1840,6 +1884,143 @@ function clearQuickQuoteParams() {
             history.replaceState(null, '', window.location.pathname);
         }
     } catch (_) { /* history unavailable — harmless */ }
+}
+
+// ============================================================
+// Mid-call METHOD SWITCH (expert audit 2026-07-07)
+// ============================================================
+// "Actually, at 36 pieces screen print is cheaper" used to mean re-typing the
+// customer AND every product row into the other builder while the customer
+// waited — reps avoided the correct method to avoid the re-entry. The switch
+// serializes IDENTITY only (customer fields + style/color/size rows) through
+// sessionStorage and replays it through each builder's EXISTING
+// applyQuickQuotePrefill add-product path, so pricing always comes from the
+// target's own engine/services (same guarantee as the Quick Quote handoff).
+// Decoration config (stitches / ink colors / transfer locations) is method-
+// specific and intentionally re-entered. DTG is a TARGET via the existing
+// single-product Quick Quote URL schema (its own architecture; first product
+// only, no customer fields — the menu says so).
+
+const METHOD_SWITCH_KEY = 'nwca-method-switch';
+const METHOD_SWITCH_TARGETS = {
+    emb: { label: 'Embroidery', url: '/quote-builders/embroidery-quote-builder.html' },
+    scp: { label: 'Screen Print', url: '/quote-builders/screenprint-quote-builder.html' },
+    dtf: { label: 'DTF Transfers', url: '/quote-builders/dtf-quote-builder.html' },
+    dtg: { label: 'DTG (1st product only)', url: '/quote-builders/dtg-quote-builder.html' }
+};
+
+/**
+ * Render the compact "Switch method" menu into the builder header.
+ * @param {Object} cfg
+ *   current — 'emb' | 'scp' | 'dtf' (source method; excluded from the menu)
+ *   collect — () => [{style, color, colorName, sizeBreakdown}] parent-row snapshot
+ */
+function initMethodSwitchMenu(cfg) {
+    if (!cfg || !cfg.current || typeof cfg.collect !== 'function') return;
+    const host = document.querySelector('.power-header');
+    if (!host || document.getElementById('method-switch-menu')) return;
+
+    const wrap = document.createElement('label');
+    wrap.id = 'method-switch-menu';
+    wrap.className = 'method-switch';
+    wrap.title = 'Carry the customer + products into another quote builder (decoration details are re-entered there)';
+    const options = Object.entries(METHOD_SWITCH_TARGETS)
+        .filter(([key]) => key !== cfg.current)
+        .map(([key, t]) => `<option value="${key}">${t.label}</option>`)
+        .join('');
+    wrap.innerHTML = '<i class="fas fa-exchange-alt" aria-hidden="true"></i> Switch method' +
+        `<select aria-label="Switch to another quote builder"><option value="">…</option>${options}</select>`;
+    host.appendChild(wrap);
+
+    wrap.querySelector('select').addEventListener('change', (e) => {
+        const key = e.target.value;
+        const target = METHOD_SWITCH_TARGETS[key];
+        e.target.value = '';
+        if (!target) return;
+        let products = [];
+        try { products = cfg.collect() || []; } catch (err) { console.warn('[MethodSwitch] collect failed', err); }
+        const customer = {
+            name: document.getElementById('customer-name')?.value?.trim() || '',
+            email: document.getElementById('customer-email')?.value?.trim() || '',
+            company: document.getElementById('company-name')?.value?.trim() || '',
+            customerNumber: document.getElementById('customer-number')?.value?.trim() || '',
+            phone: document.getElementById('customer-phone')?.value?.trim() || ''
+        };
+        if (key === 'dtg') {
+            // DTG: reuse the proven single-product Quick Quote URL schema untouched
+            const p = products[0];
+            const params = new URLSearchParams({ from: 'quickquote' });
+            if (p) {
+                params.set('style', p.style || '');
+                params.set('color', p.color || '');
+                params.set('colorName', p.colorName || '');
+                const sizes = Object.entries(p.sizeBreakdown || {}).map(([s, q]) => `${s}:${q}`).join(',');
+                if (sizes) params.set('sizes', sizes);
+                params.set('qty', String(Object.values(p.sizeBreakdown || {}).reduce((a, b) => a + (b || 0), 0)));
+            }
+            if (products.length > 1 && typeof showToast === 'function') {
+                showToast('DTG handoff carries the FIRST product only — add the rest there.', 'info', 5000);
+            }
+            window.location.href = target.url + '?' + params.toString();
+            return;
+        }
+        try {
+            sessionStorage.setItem(METHOD_SWITCH_KEY, JSON.stringify({
+                from: cfg.current,
+                fromLabel: (METHOD_SWITCH_TARGETS[cfg.current] || {}).label || cfg.current,
+                customer,
+                products
+            }));
+        } catch (err) {
+            console.error('[MethodSwitch] sessionStorage failed', err);
+            if (typeof showToast === 'function') showToast('Could not carry the quote over — open the other builder manually.', 'error');
+            return;
+        }
+        window.location.href = target.url + '?from=methodswitch';
+    });
+}
+
+/**
+ * One-shot reader for the switch payload — only fires on ?from=methodswitch,
+ * and always clears the stash so a refresh can't double-add products.
+ * @returns {null | {from, fromLabel, customer, products:[]}}
+ */
+function takeMethodSwitchPrefill() {
+    try {
+        if (!window.location.search.includes('from=methodswitch')) return null;
+        const raw = sessionStorage.getItem(METHOD_SWITCH_KEY);
+        sessionStorage.removeItem(METHOD_SWITCH_KEY);
+        const p = JSON.parse(raw || 'null');
+        return (p && Array.isArray(p.products)) ? p : null;
+    } catch (_) { return null; }
+}
+
+/**
+ * Fill the shared customer fields from a switch payload (all builders use the
+ * same ids) + reveal the manual panel + refresh recap/push state.
+ */
+function applyMethodSwitchCustomer(cust) {
+    if (!cust) return;
+    const set = (id, val) => {
+        const el = document.getElementById(id);
+        if (el && val) {
+            el.value = val;
+            el.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+    };
+    set('customer-name', cust.name);
+    set('customer-email', cust.email);
+    set('company-name', cust.company);
+    set('customer-number', cust.customerNumber);
+    set('customer-phone', cust.phone);
+    if (typeof syncCustomerManualDetails === 'function') syncCustomerManualDetails();
+    if (typeof window.renderOrderRecap === 'function') { try { window.renderOrderRecap(); } catch (_) { } }
+}
+
+if (typeof window !== 'undefined') {
+    window.initMethodSwitchMenu = initMethodSwitchMenu;
+    window.takeMethodSwitchPrefill = takeMethodSwitchPrefill;
+    window.applyMethodSwitchCustomer = applyMethodSwitchCustomer;
 }
 
 // ============================================================

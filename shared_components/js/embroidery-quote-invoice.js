@@ -5,7 +5,7 @@
 
 class EmbroideryInvoiceGenerator {
     constructor() {
-        this.taxRate = 0.101; // 10.1% WA Sales Tax
+        this.taxRate = 0.102; // Milton WA 10.2% (2026-07-06) — fallback only; builders pass the live rate
         
         this.salesRepMap = {
             'taneisha@nwcustomapparel.com': 'Taneisha Clark',
@@ -1622,7 +1622,7 @@ class EmbroideryInvoiceGenerator {
                     <span>$${adjustedSubtotal.toFixed(2)}</span>
                 </div>` : ''}
                 ${taxAmount > 0 ? `<div class="total-row tax-row">
-                    <span>${Math.abs(Number(taxPct) - 10.1) < 0.01 ? 'WA Sales Tax' : 'Sales Tax'} (${taxPct}%):</span>
+                    <span>Sales Tax (${taxPct}%):</span>
                     <span>$${taxAmount.toFixed(2)}</span>
                 </div>` : ''}
                 <div class="total-row grand-total">

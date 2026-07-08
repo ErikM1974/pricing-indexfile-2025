@@ -2071,6 +2071,21 @@ document.addEventListener('DOMContentLoaded', async function() {
         quoteService = new EmbroideryQuoteService();
 
         // Check for edit mode (loading existing quote for revision)
+        // Mid-call method-switch menu (expert audit 2026-07-07) — serializes IDENTITY
+        // only (customer + style/color/sizes); the target builder reprices natively.
+        if (typeof initMethodSwitchMenu === 'function') {
+            initMethodSwitchMenu({
+                current: 'emb',
+                collect: () => (typeof collectProductsFromTable === 'function' ? collectProductsFromTable() : [])
+                    .filter(p => !p.isService)
+                    .map(p => ({
+                        style: p.style, color: p.catalogColor || '', colorName: p.color || '',
+                        sizeBreakdown: Object.fromEntries(Object.entries(p.sizeBreakdown || {}).filter(([, q]) => (parseInt(q, 10) || 0) > 0))
+                    }))
+                    .filter(i => i.style && Object.keys(i.sizeBreakdown).length)
+            });
+        }
+
         const editQuoteId = checkForEditMode();
         // Duplicate mode (?duplicate=EMB-2026-123): load a copy as a NEW quote (2026-06-10)
         const duplicateQuoteId = new URLSearchParams(window.location.search).get('duplicate');
@@ -2100,6 +2115,30 @@ document.addEventListener('DOMContentLoaded', async function() {
                 showToast('Could not prefill ' + qqPrefill.style + ' from Quick Quote — add it manually', 'warning', 6000);
             }
             if (typeof clearQuickQuoteParams === 'function') clearQuickQuoteParams();
+        } else if (typeof takeMethodSwitchPrefill === 'function' && (window._msPrefillEmb = takeMethodSwitchPrefill())) {
+            // Mid-call method switch (?from=methodswitch — expert audit 2026-07-07):
+            // customer + product rows carried over from another builder; each row
+            // replays through the SAME addProductFromQuote() path as Quick Quote.
+            const ms = window._msPrefillEmb;
+            initEmbroideryPersistence();
+            if (typeof setQuoteDateDefaults === 'function') setQuoteDateDefaults();
+            if (typeof applyMethodSwitchCustomer === 'function') applyMethodSwitchCustomer(ms.customer);
+            let msAdded = 0;
+            for (const p of (ms.products || [])) {
+                try {
+                    await addProductFromQuote({
+                        styleNumber: p.style,
+                        color: p.color || p.colorName,
+                        sizeBreakdown: p.sizeBreakdown || {}
+                    });
+                    msAdded++;
+                } catch (e) {
+                    console.error('[MethodSwitch] product prefill failed:', p.style, e);
+                    showToast('Could not carry ' + p.style + ' over — add it manually', 'warning', 6000);
+                }
+            }
+            showToast(`Switched from ${ms.fromLabel || 'another builder'} — customer + ${msAdded} product${msAdded === 1 ? '' : 's'} carried over. Configure the logos.`, 'success', 7000);
+            try { history.replaceState(null, '', window.location.pathname); } catch (_) { }
         } else {
             // Initialize auto-save & draft recovery (2026 consolidation)
             initEmbroideryPersistence();
@@ -13547,6 +13586,9 @@ async function printQuote() {
             email: document.getElementById('customer-email')?.value || '',
             phone: document.getElementById('customer-phone')?.value || '',
             salesRepEmail: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com',
+            // Special Notes footer — EMB was the only builder NOT printing its own
+            // notes textarea (DTF passes it; the generator supports it). (2026-07-07)
+            notes: document.getElementById('notes')?.value?.trim() || '',
             // Production/customer reference fields (2026-06-04 audit: were never on the PDF)
             poNumber: document.getElementById('po-number')?.value?.trim() || '',
             dateOrderPlaced: dateFromInputValue(document.getElementById('date-order-placed')?.value),
