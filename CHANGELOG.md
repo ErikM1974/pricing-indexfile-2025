@@ -1,3 +1,7 @@
+## v2026.07.08.10 (2026.07.08)
+
+- fix(observability): Sentry init before express require (v8 instrumentation order)
+
 ## v2026.07.08.9 (2026.07.08)
 
 - feat(observability): 1.10 — Sentry error tracking, release-tagged + PII-scrubbed (env-gated)
