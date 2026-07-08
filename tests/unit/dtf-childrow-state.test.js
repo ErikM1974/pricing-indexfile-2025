@@ -22,7 +22,14 @@ const fs = require('fs');
 const path = require('path');
 
 function loadBuilderClass() {
-  const code = fs.readFileSync(path.join(__dirname, '../../shared_components/js/dtf-quote-builder.js'), 'utf8');
+  // D1 (2026-07-08): the class moved to builders/dtf/quote-builder-class.js — strip the
+  // `export ` prefix so the classic new Function() harness can evaluate it.
+  const code = fs.readFileSync(path.join(__dirname, '../../shared_components/js/builders/dtf/quote-builder-class.js'), 'utf8')
+      .replace(/^export (class|function|let|const)/gm, '$1')
+      // D2: the module imports { dtfState, sizeDetectionCache } from state.js —
+      // strip the import and inject equivalent stubs for the classic harness.
+      .replace(/^import .*$/gm, '')
+      .replace(/^/, 'const dtfState = { _dtfPushQuoteId: null, _dtfPushInFlight: false, hasChanges: false };\nconst sizeDetectionCache = new Map();\n');
   const win = {};
   // Lenient stubs for load time (the file registers a DOMContentLoaded handler
   // and window.* exports at top level). Tests re-arm these as tripwires.

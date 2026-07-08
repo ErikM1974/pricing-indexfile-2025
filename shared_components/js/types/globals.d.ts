@@ -47,6 +47,8 @@ interface Window {
     __quoteState?: any;
     __scpState?: any;
     __scpQuoteState?: any;
+    __dtfState?: any;
+    __dtfQuoteState?: any;
     /** builders/emb debug handle for the active method adapter. */
     __embAdapter?: any;
     /** quote-builder-utils.js loading overlay (classic function declaration → window prop). */
@@ -231,6 +233,16 @@ interface Window {
     handleCellKeydown?: (...args: any[]) => any;
     updateRowBreakdown?: (...args: any[]) => any;
     buildPricingBreakdown?: (...args: any[]) => any;
+    /* DTF bridges (builders/dtf/*, D1) — names shared with EMB/SCP are typed above */
+    DTFQuoteBuilder?: any;
+    copyQuoteToClipboard?: (...args: any[]) => any;
+    showDtfPushButton?: (...args: any[]) => any;
+    updateDtfPushButtonState?: (...args: any[]) => any;
+    dtfPushToShopWorks?: (...args: any[]) => any;
+    confirmDtfPush?: (...args: any[]) => any;
+    closeDtfPushPreview?: (...args: any[]) => any;
+    openDtfPushPreview?: (...args: any[]) => any;
+    renderDtfPushPreview?: (...args: any[]) => any;
     /* SCP bridges (builders/scp/*, S1a + S1b) — names shared with EMB are typed above */
     recalculateAllPrices?: (...args: any[]) => any;
     getScpExtraFees?: (...args: any[]) => any;

@@ -158,6 +158,28 @@ shorthand misfire (4 sites — the audit step caught them; node --check does
 NOT), spread `...printConfig` lookbehind skip (1 site). The residual-audit
 step is NOT optional.
 
+## DTF decomposition (2026-07-08) — 0.4 COMPLETE ACROSS ALL THREE BUILDERS
+
+DTF is ONE class (state `this.`-scoped) + small tail → 2 commits, not 3:
+**D1 ✅** class → quote-builder-class.js VERBATIM (+ reprice-pill prototype
+wrap at tail) + output.js (copy/print + applyRushPercent) + push.js; 12
+bridges incl. window.DTFQuoteBuilder (shell listener instantiates from the
+bundle). Tests re-pointed: dtf-childrow-state + dtf-size-upcharge-fallback →
+class module (harness strips `export `), push-button-binding DTF → push.js.
+**D2 ✅** state.js (dtfState push flags + window-backed hasChanges — DTF's
+ONLY classic-contract global; the instance itself is window.dtfQuoteBuilder,
+reached by dtf-quote-page.js 27x + HTML) + DtfAdapter (instantiate-then-wire
+listener → whole body verbatim in initPricingAndRoute; setupPage = documented
+no-op) + base boot; monolith → tombstone, tag removed. Test harnesses inject
+dtfState/sizeDetectionCache stubs + strip imports. Template-`${name}`
+lexer misfire hit AGAIN (push.js, 1 site) — the residual audit caught it.
+Both commits: battery exit 0, 1551 tests, browser instance-from-bundle +
+dirty-contract probes, capture 552 fields 0 mismatches.
+
+dtf-quote-page.js (1,473L rows/sizes/colors classic) intentionally NOT
+decomposed — separate file, reaches the builder only via window.dtfQuoteBuilder.
+Candidate for a later builders/dtf/product-rows.js migration.
+
 - Latent monolith bugs preserved verbatim (fix post-move, attribution-clean):
   persistence `updateRowQuantityTotal` (defined nowhere; draft-restore path),
   product-rows deleteRow tail `updateCapLogoSectionVisibility` (EMB-only —
