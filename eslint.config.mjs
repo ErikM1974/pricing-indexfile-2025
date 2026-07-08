@@ -65,8 +65,6 @@ export default [
             'no-restricted-syntax': 'off',
         },
     },
-        },
-    },
     {
         // MOVED legacy render code (0.4 extractions) — innerHTML sinks predate
         // the modules and interpolations are escapeHtml-wrapped or numeric
@@ -85,6 +83,9 @@ export default [
             'shared_components/js/builders/emb/logo-config.js',
             'shared_components/js/builders/emb/product-rows.js',
             'shared_components/js/builders/emb/adapter.js',
+            'shared_components/js/builders/scp/print-config.js',
+            'shared_components/js/builders/scp/persistence.js',
+            'shared_components/js/builders/scp/product-rows.js',
         ],
         rules: {
             'no-unsanitized/property': 'off',
@@ -93,6 +94,11 @@ export default [
             // caches — inventoried in emb-decomposition-plan.md); they migrate
             // with their reader clusters. Applies ONLY to moved-legacy files.
             'no-restricted-syntax': 'off',
+            // SCP S1a: state (productCache/childRowMap/editingQuoteId/hasChanges)
+            // still lives in the monolith shell until S2 — modules WRITE those
+            // lexical globals without reading them, which default no-unused-vars
+            // flags. vars:'local' skips /* global */ names, keeps module-local checks.
+            'no-unused-vars': ['error', { argsIgnorePattern: '^_', caughtErrors: 'none', vars: 'local' }],
         },
     },
     {
