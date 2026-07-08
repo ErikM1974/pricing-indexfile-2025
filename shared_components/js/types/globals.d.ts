@@ -38,6 +38,10 @@ interface Window {
     __QB_BUILD?: Record<string, { entry: string; modules?: string[] }>;
     /** Service_Codes cache (builders/emb/pricing.js) — legacy cross-file contract. */
     _serviceCodes?: Record<string, any> | null;
+    /** builders/emb debug handle for the active method adapter. */
+    __embAdapter?: any;
+    /** quote-builder-utils.js loading overlay (classic function declaration → window prop). */
+    showLoading?: (show: boolean, message?: string) => void;
     /** quote-builder-utils.js toast (classic function declaration → window prop). */
     showToast?: (msg: string, type?: string, duration?: number) => void;
     loadServiceCodePrices?: () => Promise<Record<string, any> | null>;

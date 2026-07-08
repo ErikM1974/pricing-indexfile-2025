@@ -99,9 +99,7 @@ All 12 clusters extracted or deleted. embroidery-quote-builder.js = 728 lines
 in builders/emb/, real inter-module imports, 130+ window bridges via index.js.
 
 Next for 0.4 completion (fresh session):
-1. Formalize QuoteBuilderBase + EmbAdapter (getPricingService/getTierConfig/
-   getLocationModel/getNudgeTiers/renderMethodSpecificRow) — carve the base
-   from the module commons; the monolith init listener becomes index.js init.
+1. ~~Formalize QuoteBuilderBase + EmbAdapter~~ ✅ DONE 2026-07-08: builders/shared/quote-builder-base.js (lifecycle + contract validation) + builders/emb/adapter.js (contract + verbatim init in setupPage/initPricingAndRoute hooks); index.js boots `new QuoteBuilderBase(new EmbAdapter()).init()`; shell = 289 lines of pure state; dormant classic base → pointer stub.
 2. Task 0.5 quote-model: migrate the monolith state vars into
    builders/shared/quote-model.js — requires converting every config-level
    writable global to imports (the lexical-global constraint dies with it).

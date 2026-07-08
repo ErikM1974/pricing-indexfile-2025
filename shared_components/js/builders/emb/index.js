@@ -22,7 +22,11 @@
  *   pricing-sync.js  — recalculatePricing + display + tax/ship UI (cluster #8, 2026-07-07)
  *   logo-config.js   — stitch/logo/embellishment UI + AL state sync (cluster #9, 2026-07-07)
  *   product-rows.js  — search/rows/sizes/colors machinery (cluster #10, 2026-07-07)
+ *   adapter.js       — EmbAdapter: MethodAdapter contract + verbatim page init
+ *                      (driven by builders/shared/quote-builder-base.js)
  */
+import { QuoteBuilderBase } from '../shared/quote-builder-base.js';
+import { EmbAdapter } from './adapter.js';
 import { loadServiceCodePrices, getServicePrice } from './pricing.js';
 import {
     showServicePricingReview,
@@ -420,5 +424,12 @@ window.handleCellKeydown = handleCellKeydown;
 window.updateRowBreakdown = updateRowBreakdown;
 window.buildPricingBreakdown = buildPricingBreakdown;
 
+// ── Boot: the base drives the page lifecycle through the EMB adapter ──────
+// (registers the DOMContentLoaded listener now, at bundle parse time —
+// exactly when the monolith's own listener used to register).
+const embAdapter = new EmbAdapter();
+new QuoteBuilderBase(embAdapter).init();
+window.__embAdapter = embAdapter; // inspection/debug handle
+
 window.__QB_BUILD = window.__QB_BUILD || {};
-window.__QB_BUILD.emb = { entry: 'builders/emb/index.js', modules: ['pricing', 'design-search', 'spr-modal', 'shopworks-import', 'persistence', 'output', 'save-push', 'quote-lifecycle', 'pricing-sync', 'logo-config', 'product-rows'] };
+window.__QB_BUILD.emb = { entry: 'builders/emb/index.js', modules: ['pricing', 'design-search', 'spr-modal', 'shopworks-import', 'persistence', 'output', 'save-push', 'quote-lifecycle', 'pricing-sync', 'logo-config', 'product-rows', 'adapter+base'] };

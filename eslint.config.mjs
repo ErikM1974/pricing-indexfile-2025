@@ -116,6 +116,7 @@ export default [
             'shared_components/js/builders/emb/quote-lifecycle.js',
             'shared_components/js/builders/emb/logo-config.js',
             'shared_components/js/builders/emb/product-rows.js',
+            'shared_components/js/builders/emb/adapter.js',
         ],
         rules: {
             'no-unsanitized/property': 'off',
