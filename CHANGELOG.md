@@ -1,3 +1,10 @@
+## v2026.07.08.13 (2026.07.08)
+
+- feat(a11y): 1.8 stage 2 — accessible-modal engine, live region, skip links, focus-visible, semantic invoice table
+- feat(observability): 1.12 — structured JSON request logs with cross-app correlation ids
+- docs(roadmap): Phase 2 DEFERRED BY DECISION (Erik, 2026-07-08) — single-shop for now, not blocked
+- Deploy v2026.07.08.13: cache-bust bumps
+
 ## v2026.07.08.12 (2026.07.08)
 
 - fix(quotes): handle proxy 404 on quote deletes + LESSONS entry
