@@ -193,6 +193,7 @@
 | `/pages/js/3-day-tees-success.js` | Success-page logic (status polling w/ refresh=true, EmailJS once-guard) | TDTShipDate, app.config.js | ✅ Active |
 | `/pages/css/3-day-tees.css` | Studio design system ("press-room editorial": paper/ink-green/safety-orange, Bricolage Grotesque) | — | ✅ Active |
 | `/pages/css/3-day-tees-success.css` | Success page styles (rides 3-day-tees.css tokens) | 3-day-tees.css | ✅ Active |
+| `/tests/unit/cors-origin-allowlist.test.js` | **NEW (2026-07-08, roadmap 1.2)** Locks the CORS exact-match allowlist: look-alike domains (evil-teamnwca.com) + arbitrary *.herokuapp.com + prod localhost all REJECTED; env-list replaces defaults | jest, lib/cors-allowlist.js | ✅ Active |
 | `/tests/unit/parse-rate-percent.test.js` | Regression lock: 2026-06-10 falsy-zero tax fix (0% is a valid rate, NaN falls back) | jest, quote-builder-utils.js | ✅ Active |
 | `/tests/unit/parse-bulk-sizes.test.js` | **NEW (2026-07-06)** Locks the shared bulk-size-paste parser (UX audit P1 #2): "S:2 M:4 L:6" formats, XXL→2XL, non-size text → {} so plain pastes fall through | jest, quote-builder-utils.js | ✅ Active |
 | `/tests/unit/distribute-proportionally.test.js` | **NEW (2026-07-06)** Locks the clickable quantity-nudge math (UX audit P1 #3): additions sum to EXACTLY delta (largest remainder), zero-qty cells excluded, deterministic ties | jest, quote-builder-utils.js | ✅ Active |
@@ -330,6 +331,7 @@
 | `/pages/js/customer-login.js` | Login logic — POSTs `/auth/customer/request-link`; always shows the same "check your email" state (no account enumeration) | server.js POST /auth/customer/request-link | ✅ Active |
 | `/pages/css/customer-login.css` | Login page styling (branded green card) | — | ✅ Active |
 | `/lib/customer-magic-link.js` | Magic-link + session token crypto (HMAC mint/verify; MAGIC_LINK_SECRET link / SESSION_SECRET cookie) for the authenticated customer portal | server.js (loadCustomerSession, /auth/customer/*) | ✅ Active |
+| `/lib/cors-allowlist.js` | CORS EXACT-match origin allowlist (roadmap 1.2) — kills endsWith look-alike + *.herokuapp.com wildcard; env-extensible via CORS_ALLOWED_ORIGINS; dev localhost gated out of production | server.js CORS middleware; tests/unit/cors-origin-allowlist.test.js | ✅ Active |
 | `/pages/customer-invoice.html` | ShopWorks-style invoice page at `/portal/invoice/:orderNo` (session-gated) — on-screen + Download PDF (html2pdf) | customer-invoice.js/.css | ✅ Active |
 | `/pages/js/customer-invoice.js` | Fetches `/api/portal/invoice/:orderNo` (ownership-checked), renders the invoice (header/line-items/sizes/totals), wires html2pdf download | server.js GET /api/portal/invoice | ✅ Active |
 | `/pages/css/customer-invoice.css` | Invoice paper styling (print-friendly) | — | ✅ Active |
