@@ -1,3 +1,22 @@
+// =============================================================================
+// OBSERVABILITY: Sentry (roadmap 1.10) — MUST be the first require: v8
+// auto-instruments express only if Sentry.init runs before express loads.
+// dotenv first so a local .env SENTRY_DSN works; env-gated no-op otherwise.
+// =============================================================================
+require('dotenv').config();
+const Sentry = require('@sentry/node');
+const { scrubPII } = require('./lib/sentry-scrub');
+if (process.env.SENTRY_DSN) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    environment: process.env.TENANT_ID || 'nwca',
+    release: process.env.HEROKU_SLUG_COMMIT ? process.env.HEROKU_SLUG_COMMIT.slice(0, 7) : 'dev',
+    tracesSampleRate: 0, // errors only — no performance events (volume/cost control)
+    beforeSend: (event) => scrubPII(event), // never leak a customer email/phone (lib/sentry-scrub.js)
+  });
+  console.log('[Sentry] server error tracking ON (release ' + (process.env.HEROKU_SLUG_COMMIT || 'dev').slice(0, 7) + ')');
+}
+
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
@@ -45,30 +64,11 @@ const { buildSamplesPushPayload } = require('./shared_components/js/samples-orde
 // "Staff" directory App Connection (IdP). Replaces the forgeable /api/crm-session.
 const staffSaml = require('./lib/staff-saml.js');
 
-// Load environment variables
+// Environment variables loaded at the very top of this file (dotenv before
+// Sentry before express — see the 1.10 block at line 1). This second call is
+// a harmless no-op kept so nothing below can regress if the top block moves.
 // Preboot disabled 2026-04-24 — deploys now go live in ~20s instead of sticky-session purgatory.
 dotenv.config();
-
-// =============================================================================
-// OBSERVABILITY: Sentry error tracking (roadmap 1.10) — env-gated no-op
-// =============================================================================
-// Init IMMEDIATELY after env load so every later require/route is instrumented.
-// No SENTRY_DSN → tracking off, zero behavior change (dev/test default).
-// Release = the 7-char slug SHA (same identity /api/version reports), so a
-// dashboard error maps to an exact deploy. PII scrubbed in beforeSend — an
-// error event must never leak a customer email/phone (lib/sentry-scrub.js).
-const Sentry = require('@sentry/node');
-const { scrubPII } = require('./lib/sentry-scrub');
-if (process.env.SENTRY_DSN) {
-  Sentry.init({
-    dsn: process.env.SENTRY_DSN,
-    environment: process.env.TENANT_ID || 'nwca',
-    release: process.env.HEROKU_SLUG_COMMIT ? process.env.HEROKU_SLUG_COMMIT.slice(0, 7) : 'dev',
-    tracesSampleRate: 0, // errors only — no performance events (volume/cost control)
-    beforeSend: (event) => scrubPII(event),
-  });
-  console.log('[Sentry] server error tracking ON (release ' + (process.env.HEROKU_SLUG_COMMIT || 'dev').slice(0, 7) + ')');
-}
 
 // =============================================================================
 // ROUTE TABLE OF CONTENTS (~2,900 lines)
