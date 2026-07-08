@@ -33,6 +33,7 @@
 
 | File | Purpose | Notes | Status |
 |------|---------|-------|--------|
+| `/BUILDER_A_GRADE_PLAN.md` | **NEW (2026-07-08)** Executable plan taking each quote builder's CODE to A-grade (7 batches: correctness → safety net → EMB/DTF/DTG structure → formula collapse → polish); evidence file:lines from 5 parallel audits. Companion to `A_PLUS_ROADMAP_FOR_FABLE.md` | Erik go/cherry-pick pending | 📖 Plan |
 | `/index.html` | Main catalog page | See "Main Pages" section | ✅ Active |
 | `/product.html` | Product display page | See "Main Pages" section | ✅ Active |
 | `/brands.html` | Brands listing page | brands.js, brands.css, brands-flyout.js | ✅ Active |
