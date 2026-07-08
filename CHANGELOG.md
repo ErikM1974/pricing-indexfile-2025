@@ -1,3 +1,10 @@
+## v2026.07.08.11 (2026.07.08)
+
+- feat(testing): 1.14 jsdom DOM suite + 1.9 axe a11y ratchet, wired into CI
+- feat(testing): 1.13 Playwright money-path E2E + 1.9 rendered axe ratchet, CI e2e job
+- feat(ui): 1.7 stage 1 — 91 inline styles → qb-* utility classes; fields adopt the skin's 44px touch treatment
+- Deploy v2026.07.08.11: cache-bust bumps
+
 ## v2026.07.08.10 (2026.07.08)
 
 - fix(observability): Sentry init before express require (v8 instrumentation order)
