@@ -9110,7 +9110,19 @@ app.delete('/api/quote_sessions/:id', async (req, res) => {
     }
 
     // 3. Authorized — perform the delete.
-    await makeApiRequest(`/quote_sessions/${pkId}`, 'DELETE');
+    try {
+      await makeApiRequest(`/quote_sessions/${pkId}`, 'DELETE');
+    } catch (err) {
+      // The proxy 404s when the PK matches no row (2026-07-08 fix — it used to
+      // answer 200 recordsAffected:0 for hits AND misses). Already-gone is the
+      // desired end state (double-click, stale list row): report success with
+      // a flag rather than a scary 500.
+      if (String(err.message).includes('status 404')) {
+        console.log(`[quote-delete] PK ${pkId} already gone (proxy 404) — treating as deleted`);
+        return res.json({ success: true, alreadyGone: true });
+      }
+      throw err;
+    }
     console.log(`[quote-delete] ${caller.name || callerEmail} deleted quote PK ${pkId}${isMaster ? ' (master)' : ' (owner)'}`);
     res.json({ success: true });
   } catch (error) {
@@ -9235,6 +9247,11 @@ app.delete('/api/quote_items/:id', async (req, res) => {
     await makeApiRequest(`/quote_items/${req.params.id}`, 'DELETE');
     res.json({ success: true });
   } catch (error) {
+    // Proxy 404 = no row matched that PK (2026-07-08 fix) — pass it through
+    // instead of masking it as a 500.
+    if (String(error.message).includes('status 404')) {
+      return res.status(404).json({ error: 'Quote item not found — nothing deleted' });
+    }
     console.error('Error deleting quote item:', error);
     res.status(500).json({ error: 'Failed to delete quote item' });
   }
@@ -9298,6 +9315,11 @@ app.delete('/api/quote_analytics/:id', async (req, res) => {
     await makeApiRequest(`/quote_analytics/${req.params.id}`, 'DELETE');
     res.json({ success: true });
   } catch (error) {
+    // Proxy 404 = no row matched that PK (2026-07-08 fix) — pass it through
+    // instead of masking it as a 500.
+    if (String(error.message).includes('status 404')) {
+      return res.status(404).json({ error: 'Quote analytics record not found — nothing deleted' });
+    }
     console.error('Error deleting quote analytics:', error);
     res.status(500).json({ error: 'Failed to delete quote analytics' });
   }
