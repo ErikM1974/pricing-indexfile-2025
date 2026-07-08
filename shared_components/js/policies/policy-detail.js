@@ -662,7 +662,7 @@
         if (window.DOMPurify) return;
         return new Promise((resolve, reject) => {
             const s = document.createElement('script');
-            s.src = 'https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js';
+            s.src = '/shared_components/vendor/dompurify/purify.min.js?v=20260708'; // vendored (roadmap 1.3) — pinned 3.0.6
             s.onload = resolve;
             s.onerror = () => reject(new Error('DOMPurify failed to load'));
             document.head.appendChild(s);

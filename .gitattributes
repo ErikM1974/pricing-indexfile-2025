@@ -1,0 +1,3 @@
+# Vendored third-party files (roadmap 1.3): keep bytes EXACTLY as upstream ships them
+# so a diff against the official release is clean — no EOL normalization ever.
+shared_components/vendor/** -text
