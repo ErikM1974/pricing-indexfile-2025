@@ -20,7 +20,7 @@
 (function () {
     'use strict';
 
-    var FA_HREF = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
+    var FA_HREF = '/shared_components/vendor/fontawesome/css/all.min.css?v=20260708'; // vendored 6.6.0 (roadmap 1.3)
 
     function apiBase() {
         return (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) ||

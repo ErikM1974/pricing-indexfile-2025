@@ -190,7 +190,7 @@
         if (_dompurifyPromise) return _dompurifyPromise;
         _dompurifyPromise = new Promise((resolve) => {
             const s = document.createElement('script');
-            s.src = 'https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js';
+            s.src = '/shared_components/vendor/dompurify/purify.min.js?v=20260708'; // vendored (roadmap 1.3) — pinned 3.0.6, no CDN in the builder
             s.async = true;
             s.onload = () => resolve();
             s.onerror = () => resolve(); // proceed without sanitizer if CDN fails — escape+regex still applies
