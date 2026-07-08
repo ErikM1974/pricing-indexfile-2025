@@ -1171,9 +1171,9 @@ export class DTFQuoteBuilder {
         }
 
         const html = products.slice(0, 10).map(p => `
-            <div class="suggestion-item" data-style="${p.value}">
-                <span class="style-number">${p.value}</span>
-                <span class="style-name">${p.label ? p.label.split(' - ')[1] || p.label : ''}</span>
+            <div class="suggestion-item" data-style="${escapeHtml(p.value)}">
+                <span class="style-number">${escapeHtml(p.value)}</span>
+                <span class="style-name">${escapeHtml(p.label ? p.label.split(' - ')[1] || p.label : '')}</span>
             </div>
         `).join('');
 
@@ -1468,7 +1468,7 @@ export class DTFQuoteBuilder {
             body.innerHTML = `
                 <div class="ext-popup-error" style="padding: 20px; text-align: center; color: #c00;">
                     <i class="fas fa-exclamation-triangle"></i>
-                    <p>${message}</p>
+                    <p>${escapeHtml(message)}</p>
                 </div>
             `;
             return;
@@ -2462,8 +2462,8 @@ export class DTFQuoteBuilder {
 
             return `
                 <div class="summary-product">
-                    <strong>${p.styleNumber}</strong> - ${p.description}
-                    <br><small>Color: ${p.color || 'Not selected'} | ${sizesStr}</small>
+                    <strong>${escapeHtml(p.styleNumber)}</strong> - ${escapeHtml(p.description)}
+                    <br><small>Color: ${escapeHtml(p.color || 'Not selected')} | ${escapeHtml(sizesStr)}</small>
                 </div>
             `;
         }).filter(Boolean).join('');
@@ -3262,7 +3262,7 @@ export class DTFQuoteBuilder {
         toast.className = `dtf-toast dtf-toast-${type}`;
         toast.innerHTML = `
             <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'}"></i>
-            <span>${message}</span>
+            <span>${escapeHtml(message)}</span>
         `;
 
         document.body.appendChild(toast);

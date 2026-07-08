@@ -109,9 +109,9 @@ function showSearchSuggestions(products) {
         // Extract product name (remove style prefix from label)
         const productName = (product.label || '').split(' - ').slice(1).join(' - ') || '';
         return `
-            <div class="suggestion-item" onclick="selectProduct('${product.value}')">
-                <span class="style">${product.value}</span>
-                <span class="name">${productName}</span>
+            <div class="suggestion-item" onclick="selectProduct('${escapeHtml(product.value)}')">
+                <span class="style">${escapeHtml(product.value)}</span>
+                <span class="name">${escapeHtml(productName)}</span>
             </div>
         `;
     }).join('');
