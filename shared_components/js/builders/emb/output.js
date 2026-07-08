@@ -17,13 +17,12 @@
  */
 // @ts-nocheck — MOVED legacy DOM code: pre-existing checkJs frictions; typing
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
-/* global EMB_DEFAULTS, buildLogoConfiguration, calculateDiscountableSubtotal,
-   collectDECGItems, collectProductsFromTable, dateFromInputValue,
-   getAdditionalCharges, getCapEmbellishmentType, recalculatePricing,
+/* global EMB_DEFAULTS, buildLogoConfiguration, calculateDiscountableSubtotal, collectProductsFromTable, dateFromInputValue, getCapEmbellishmentType, recalculatePricing,
    saveAndGetLink, syncALRows, syncDECGRows, showToast, getLtmControlState,
    parseRatePercent, showLoading, EmbroideryInvoiceGenerator,
    hasUnsavedChanges, emailQuote */
 import { getServicePrice } from './pricing.js';
+import { getAdditionalCharges, collectDECGItems } from './quote-lifecycle.js';
 
 // ============================================================
 // DIAGNOSTIC TOOL — diagnoseQuote()

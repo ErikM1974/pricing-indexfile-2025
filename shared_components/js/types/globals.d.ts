@@ -111,6 +111,20 @@ interface Window {
     confirmPushToShopWorks?: () => Promise<void>;
     verifyShopWorksImport?: () => Promise<void>;
     closePushPreview?: () => void;
+    /* quote-lifecycle bridges (builders/emb/quote-lifecycle.js, extraction #7) */
+    toggleAdditionalCharges?: () => void;
+    toggleOrderDetails?: () => void;
+    setupUnsavedChangesTracking?: () => void;
+    clearCustomerContextBanners?: () => void;
+    resetQuote?: (opts?: any) => void;
+    updateDiscountType?: () => void;
+    handleDiscountPresetChange?: () => void;
+    handleDiscountReasonPresetChange?: () => void;
+    onLtmOverrideChange?: () => void;
+    updateAdditionalCharges?: () => void;
+    updateFeeTableRows?: () => void;
+    getAdditionalCharges?: () => any;
+    collectDECGItems?: () => any[];
 }
 
 /*

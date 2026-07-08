@@ -19,14 +19,14 @@
    addManualServiceRow, addNewRow, collectProductsFromTable, createChildRow,
    createServiceProductRow, dateFromInputValue, dateToInputValue,
    handleCapEmbellishmentChange, mapStitchCountToTierValue, onShipMethodChange,
-   onSizeChange, onStyleChange, recalculatePricing, selectColor,
-   updateAdditionalCharges, updateCapLogoSectionVisibility, updateDiscountType,
+   onSizeChange, onStyleChange, recalculatePricing, selectColor, updateCapLogoSectionVisibility,
    updateGarmentLogoSectionVisibility, updateLogoCardHeader, updateNotesBadge,
    updatePushButtonState, updateTaxCalculation, escapeHtml, showToast,
    QuotePersistence, QuoteSession, getLtmControlState, setLtmControlState,
    assertQuoteEditable, updateEditModeUI, setQuoteDateDefaults, markAsUnsaved,
    updateArtworkCharges, Event */
 import { applyDesignFromCache, showDesignThumbnail, lookupDesignNumber } from './design-search.js';
+import { updateAdditionalCharges, updateDiscountType } from './quote-lifecycle.js';
 
 export function initEmbroideryPersistence() {
     if (typeof QuotePersistence !== 'undefined') {

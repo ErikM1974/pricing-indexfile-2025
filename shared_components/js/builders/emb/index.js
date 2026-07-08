@@ -18,6 +18,7 @@
  *   persistence.js   — autosave/draft/edit-load/duplicate (cluster #4, 2026-07-07)
  *   output.js        — print/email/copy + diagnostics (cluster #5, 2026-07-07)
  *   save-push.js     — save orchestrator + ShopWorks push (cluster #6, 2026-07-07)
+ *   quote-lifecycle.js — resetQuote/discounts/fees panel/tracking (cluster #7, 2026-07-07)
  */
 import { loadServiceCodePrices, getServicePrice } from './pricing.js';
 import {
@@ -78,6 +79,21 @@ import {
     verifyShopWorksImport,
     closePushPreview,
 } from './save-push.js';
+import {
+    toggleAdditionalCharges,
+    toggleOrderDetails,
+    setupUnsavedChangesTracking,
+    clearCustomerContextBanners,
+    resetQuote,
+    updateDiscountType,
+    handleDiscountPresetChange,
+    handleDiscountReasonPresetChange,
+    onLtmOverrideChange,
+    updateAdditionalCharges,
+    updateFeeTableRows,
+    getAdditionalCharges,
+    collectDECGItems,
+} from './quote-lifecycle.js';
 import {
     applyDesignFromCache,
     filterDesignSearchByTier,
@@ -186,5 +202,22 @@ window.confirmPushToShopWorks = confirmPushToShopWorks;
 window.verifyShopWorksImport = verifyShopWorksImport;
 window.closePushPreview = closePushPreview;
 
+// quote-lifecycle (callers: static HTML fee/discount/panel handlers, utils'
+// confirmNewQuote → resetQuote, extended-sizes/pricing sync → fee table,
+// monolith init → tracking setup)
+window.toggleAdditionalCharges = toggleAdditionalCharges;
+window.toggleOrderDetails = toggleOrderDetails;
+window.setupUnsavedChangesTracking = setupUnsavedChangesTracking;
+window.clearCustomerContextBanners = clearCustomerContextBanners;
+window.resetQuote = resetQuote;
+window.updateDiscountType = updateDiscountType;
+window.handleDiscountPresetChange = handleDiscountPresetChange;
+window.handleDiscountReasonPresetChange = handleDiscountReasonPresetChange;
+window.onLtmOverrideChange = onLtmOverrideChange;
+window.updateAdditionalCharges = updateAdditionalCharges;
+window.updateFeeTableRows = updateFeeTableRows;
+window.getAdditionalCharges = getAdditionalCharges;
+window.collectDECGItems = collectDECGItems;
+
 window.__QB_BUILD = window.__QB_BUILD || {};
-window.__QB_BUILD.emb = { entry: 'builders/emb/index.js', modules: ['pricing', 'design-search', 'spr-modal', 'shopworks-import', 'persistence', 'output', 'save-push'] };
+window.__QB_BUILD.emb = { entry: 'builders/emb/index.js', modules: ['pricing', 'design-search', 'spr-modal', 'shopworks-import', 'persistence', 'output', 'save-push', 'quote-lifecycle'] };

@@ -15,13 +15,14 @@
  */
 // @ts-nocheck — MOVED legacy DOM code: pre-existing checkJs frictions; typing
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
-/* global buildLogoConfiguration, collectDECGItems,
-   collectProductsFromTable, dateFromInputValue, getAdditionalCharges,
+/* global buildLogoConfiguration,
+   collectProductsFromTable, dateFromInputValue,
    getCapEmbellishmentType, getOrderPieceCounts, recalculatePricing,
    syncALRows, syncDECGRows, escapeHtml, showToast, showLoading,
    getLtmControlState, parseRatePercent, markAsSaved, updateEditModeUI,
    QuoteShareModal, renderPushChecklist, getPushBlockers, hasUnsavedChanges */
 import { getServicePrice } from './pricing.js';
+import { getAdditionalCharges, collectDECGItems } from './quote-lifecycle.js';
 
 /**
  * Save quote and get shareable link
