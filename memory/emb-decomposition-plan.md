@@ -34,7 +34,7 @@
 | 1 | Design-search modal (`openDesignSearchModal`, gallery, filters, `lookupDesignNumber`, `applyDesignToCard`, thumbnails) — 986-line contiguous cut, 15 bridges (incl. 3 GENERATED-markup handlers static grep missed), 2 reset accessors for the monolith's outside touch points, `window._designSearchCache` → module-private | ~980 | `design-search.js` (events+render domain) | ✅ 2026-07-07 |
 | 2 | Stitch estimators + logo-config UI (stitch tiers, logo cards, global-AL sync `_syncALArrays`, embellishment types, notes badge) — 378-line fragment-1 cut (updateLogoCardHeader + date helpers + setup*Handlers wiring ride with cluster 4); 18 bridges; 8 siblings real-import its helpers | ~380 | `logo-config.js` | ✅ 2026-07-07 (extraction #9) |
 | 3 | Draft/persistence + edit-load (`getEmbroideryQuoteData`, `restoreEmbroideryDraft`, `loadQuoteForEditing`, `duplicateQuote`, `populate*`) — 1,195-line cut (region up to the DOMContentLoaded init listener; logo-config UI + date helpers ride with cluster 2), 8 bridges, imports design-search directly; state seams moved to eslint-config-level writable globals; roundtrip harness now injects the emb bundle after the monolith (like the page) | ~1,195 | `persistence.js` | ✅ 2026-07-07 (extraction #4) |
-| 4 | Product search + rows + sizes + colors (3304-6378: `addNewRow`, `onStyleChange`, size-category, color picker, child rows, price override) | ~3,000 | `state.js` + `render.js` + `events.js` (split during move) | ⬜ biggest |
+| 4 | Product search + rows + sizes + colors — 3,164-line mega-cut to ONE `product-rows.js` (state/render/events split happens as typing lands); 45 bridges; siblings real-import 25+ helpers. MONOLITH NOW 728 LINES (state + composition root) | ~3,164 | `product-rows.js` | ✅ 2026-07-07 (extraction #10 — ALL CLUSTERS DONE) |
 | 5 | Pricing recalc + display + AL/DECG/rush sync (`recalculatePricing` 353L, `collectProductsFromTable`, `updatePricingDisplay` 351L, tax/shipping UI) — 1,795-line cut; the wrap-tail became impl + `export let` + module-tail rewrap (live binding: internal callers + importers + window bridge ALL get the pill-wrapped fn); 27 bridges; 6 modules real-import from it (incl. live recalculatePricing binding); ~20 window-flag writes inventoried, no-restricted-syntax off for moved-legacy files only | ~1,795 | `pricing-sync.js` | ✅ 2026-07-07 (extraction #8) |
 | 6 | Save + link + push (`saveAndGetLink`, `_saveAndGetLinkInner` 450L, push readiness/preview/confirm/verify) — 918-line cut to its own `save-push.js`; the 3 push-state vars HOISTED BACK to the monolith (persistence/output modules read them via scope chain) | ~915 | `save-push.js` | ✅ 2026-07-07 (extraction #6) |
 | 7 | Quote-level UI: reset/fees/discounts (`resetQuote` 243L, discounts, fee table, tracking, collectors) — 643-line cut to `quote-lifecycle.js`; persistence/output/save-push now REAL-import its collectors (getAdditionalCharges/collectDECGItems/update*) | ~640 | `quote-lifecycle.js` | ✅ 2026-07-07 (extraction #7) |
@@ -91,6 +91,21 @@ Function/var/handler inventory script (regenerate the map after each cluster):
 scratch `emb-map.js` pattern — top-level decl scan + HTML `on*=` handler scan;
 flags per fn: window-exported / html-handler / async. Keep runs in the session
 scratchpad, only conclusions here.
+
+## EMB decomposition status (2026-07-07): CLUSTERS COMPLETE
+
+All 12 clusters extracted or deleted. embroidery-quote-builder.js = 728 lines
+(state vars + the DOMContentLoaded composition root + pointers). 11 ES modules
+in builders/emb/, real inter-module imports, 130+ window bridges via index.js.
+
+Next for 0.4 completion (fresh session):
+1. Formalize QuoteBuilderBase + EmbAdapter (getPricingService/getTierConfig/
+   getLocationModel/getNudgeTiers/renderMethodSpecificRow) — carve the base
+   from the module commons; the monolith init listener becomes index.js init.
+2. Task 0.5 quote-model: migrate the monolith state vars into
+   builders/shared/quote-model.js — requires converting every config-level
+   writable global to imports (the lexical-global constraint dies with it).
+3. Repeat SCP (5,409 lines) then DTF (4,086) with this playbook.
 
 ## After EMB
 
