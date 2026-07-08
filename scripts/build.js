@@ -51,6 +51,7 @@ const BUILDER_HTML = [
     'quote-builders/embroidery-quote-builder.html',
     'quote-builders/screenprint-quote-builder.html',
     'quote-builders/dtf-quote-builder.html',
+    'quote-builders/dtg-quote-builder.html',
 ];
 
 // Per-builder ESM entry points (bundled IIFE). outbase keeps the dist path
@@ -59,6 +60,7 @@ const ENTRY_POINTS = [
     'shared_components/js/builders/emb/index.js',
     'shared_components/js/builders/scp/index.js',
     'shared_components/js/builders/dtf/index.js',
+    'shared_components/js/builders/dtg/index.js',
 ];
 
 let esbuild;

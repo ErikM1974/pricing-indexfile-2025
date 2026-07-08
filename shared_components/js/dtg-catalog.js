@@ -587,6 +587,7 @@
         modal.hidden = false;
         backdrop.hidden = false;
         document.body.classList.add('dtg-catalog-modal-open');
+        if (typeof openAccessibleModal === 'function') openAccessibleModal(modal, { label: 'Product quick view', onEsc: closeModal }); // 1.8: trap + Esc + restore
         try {
             const data = await fetchJSON(`${API_BASE}/api/dtg/top-sellers?style=${encodeURIComponent(style)}`);
             renderModal(data.records || []);
@@ -600,6 +601,7 @@
         const backdrop = document.getElementById('dtgCatalogModalBackdrop');
         if (modal) modal.hidden = true;
         if (backdrop) backdrop.hidden = true;
+        if (typeof closeAccessibleModal === 'function') closeAccessibleModal(modal); // 1.8: restore focus to opener
         document.body.classList.remove('dtg-catalog-modal-open');
     }
 
