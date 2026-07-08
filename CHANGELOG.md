@@ -1,3 +1,9 @@
+## v2026.07.08.7 (2026.07.08)
+
+- fix(deploy-skill): exclude .claude/worktrees from the cache-bust sweep
+- feat(security): 1.4 stage 2 COMPLETE — sink audit done, moved-legacy lint override REMOVED, utils in scope
+- Deploy v2026.07.08.7: 4 files (dtf-quote-builder.html, dtg-quote-builder.html, embroidery-quote-builder.html...)
+
 ## v2026.07.08.6 (2026.07.08)
 
 - feat(builders): 1.15 shared errors.js — persistent banner + fallback badge; loud-failure primitives
