@@ -1,3 +1,14 @@
+## v2026.07.07.7 (2026.07.07)
+
+- docs(memory): lesson — recovery cron silently dead after gating (fixed fc56a3d, 11/21 healed)
+- docs(memory): 5-expert quote-builder audit 2026-07-07 (EMB/DTF/SCP) — 62 findings, punch list
+- fix(quote-builders): expert-audit wave 1-3 — SCP/DTF/EMB money leaks, endgame, domain gaps
+- feat(quote-builders): expert-audit wave 4 — endgame + guided-shell + method switch
+- style(quote-builders): expert-audit wave 5 — PNW shell ON, print rebrand, one chrome
+- chore(quote-builders): expert-audit wave 6 — dead code, lessons, audit status
+- fix(art-hub): box-url follow-up frontend fixes (prior session 2026-07-07, uncommitted)
+- Deploy v2026.07.07.7: 6 files (dtf-prints-prototype.html,index.html,customer-product.html...)
+
 ## v2026.07.07.6 (2026.07.07)
 
 - style(dashboard): New Quote CTA redesign + drop the card's explainer line
