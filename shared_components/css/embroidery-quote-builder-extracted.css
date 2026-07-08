@@ -3009,3 +3009,20 @@ td.size-disabled input {
 }
 .monogram-names-dialog .mnd-apply:hover { background: var(--pnw-forest-deep, #1f4922); }
 .monogram-names-dialog button:focus-visible { outline: 2px solid var(--pnw-forest, #2e5827); outline-offset: 1px; }
+
+/* Retry button on failed AL/DECG pricing rows (old-audit P2 #9, 2026-07-07) */
+.btn-retry-pricing {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    border: 1px solid var(--qb-state-error, #dc2626);
+    background: var(--qb-state-error-bg, #fef2f2);
+    color: var(--qb-state-error, #dc2626);
+    border-radius: 5px;
+    padding: 3px 9px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.btn-retry-pricing:hover { background: var(--qb-state-error, #dc2626); color: #fff; }
+.btn-retry-pricing:focus-visible { outline: 2px solid var(--builder-primary, #2e5827); outline-offset: 1px; }

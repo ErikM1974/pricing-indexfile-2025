@@ -3974,3 +3974,44 @@ input.sci-num { width: 92px; cursor: text; }
 /* Guided mode: the step bar pins at top:8px (~48px tall) — keep the sticky
    thead below it instead of sliding underneath. */
 body.guided-on .product-table thead th { top: 64px; }
+
+/* In-flight reprice pill (old-audit price-display #5, 2026-07-07) — fixed
+   bottom-right so no layout shifts; only appears when a recalc runs >300ms. */
+.repricing-indicator {
+    position: fixed;
+    bottom: 14px;
+    right: 14px;
+    z-index: 9000;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 13px;
+    border: 1px solid var(--pnw-forest, #2e5827);
+    border-radius: 999px;
+    background: var(--pnw-paper, #fff);
+    color: var(--pnw-forest-deep, #1f4922);
+    font-size: 12.5px;
+    font-weight: 700;
+    box-shadow: 0 4px 14px rgba(31, 73, 34, 0.18);
+}
+.repricing-indicator .fa-circle-notch { color: var(--pnw-forest, #2e5827); }
+
+/* "auto %" rush chip (old-audit P2, 2026-07-07) — fills the rush input from the
+   live Caspio RUSH rate instead of CSR mental math. */
+.btn-rush-percent {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 6px;
+    border: 1px solid var(--pnw-rule, #d1d5db);
+    background: var(--pnw-fog, #f4f6f3);
+    color: var(--pnw-forest-deep, #1f4922);
+    border-radius: 6px;
+    padding: 5px 9px;
+    font-size: 11.5px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.btn-rush-percent:hover { background: var(--pnw-forest, #2e5827); color: #fff; border-color: var(--pnw-forest, #2e5827); }
+.btn-rush-percent:focus-visible { outline: 2px solid var(--builder-primary, #2e5827); outline-offset: 1px; }

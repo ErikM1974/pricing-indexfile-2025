@@ -33,13 +33,14 @@ DTF `--dtf-primary` fallback + save-path tax fallbacks were still lime/10.1.
   convention (MEMORY.md); making modes foot identically would require reallocating saved
   item prices + push-transformer parity for pennies.
 
-**🧑‍⚖️ POLICY — Erik decides, then wire (all would be Service_Codes-driven, no deploy):**
-- Specialty-ink charges (SCP puff/metallic/discharge/poly) + EMB applique/metallic/sewout
-  chips — IF the shop charges, add the codes + chips (SP-STRIPE pattern).
-- DTF customer-supplied garment + transfer-only sales — needs a press-fee code (DECG is
-  the EMB precedent; invoice already renders customer-supplied tables).
-- Confirm DECG $50 fee intent (now CHARGED, matching the public calculator + import path;
-  waive-by-delete honored) and the accepted-quote policy (warn-banner shipped; hard-lock optional).
+**🧑‍⚖️ POLICY — Erik DECIDED 2026-07-07 (do NOT re-propose):**
+- Specialty-ink charges (SCP) + EMB applique chips — **DECLINED** ("we don't need
+  specialty ink or applique"). Do not build; do not re-surface.
+- DTF customer-supplied press fee (+ transfer-only sales path) — **ON HOLD** per Erik
+  ("hold off for now"). Revisit only when he raises it; the DECG pattern + invoice
+  customer-supplied tables remain the build plan when he does.
+- DECG $50 fee + accepted-quote warn-banner — shipped as implemented; no objection raised.
+- Deployed v2026.07.07.7 (Heroku, live-verified) same day.
 
 ## 💰 P1 money leaks (Rule 9: any fix → re-run web-quote-cart-parity + quick-quote-parity, verify 3 surfaces)
 
