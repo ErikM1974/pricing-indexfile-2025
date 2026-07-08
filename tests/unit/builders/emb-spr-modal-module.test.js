@@ -28,11 +28,15 @@ const BRIDGED = [
 ];
 
 function loadModule() {
-    const src = fs.readFileSync(
-        path.join(__dirname, '../../../shared_components/js/builders/emb/spr-modal.js'),
-        'utf8'
-    );
-    const { code } = esbuild.transformSync(src, { format: 'cjs', target: 'es2020' });
+    const result = esbuild.buildSync({
+        entryPoints: [path.join(__dirname, '../../../shared_components/js/builders/emb/spr-modal.js')],
+        bundle: true,
+        format: 'cjs',
+        target: 'es2020',
+        write: false,
+        logLevel: 'silent',
+    });
+    const code = result.outputFiles[0].text;
     const doc = { getElementById: () => null, querySelectorAll: () => [] };
     const moduleObj = { exports: {} };
     // eslint-disable-next-line no-new-func

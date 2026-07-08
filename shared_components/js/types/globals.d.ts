@@ -153,6 +153,25 @@ interface Window {
     updateShippingSummary?: () => void;
     openShippingModal?: () => void;
     closeShippingModal?: () => void;
+    /* logo-config bridges (builders/emb/logo-config.js, extraction #9) */
+    _syncALArrays?: () => void;
+    mapStitchCountToTierValue?: (sc: number) => string;
+    initStitchEstimators?: () => void;
+    openStitchEstimator?: (type: string) => void;
+    onPrimaryPositionChange?: () => void;
+    onPrimaryStitchTierChange?: () => void;
+    onFullBackStitchCountChange?: () => void;
+    onCapStitchTierChange?: () => void;
+    updateStitchTierDropdownLabels?: () => void;
+    updateGlobalAL?: (type: string) => void;
+    toggleGlobalALNew?: (type: string) => void;
+    toggleLogoCard?: (type: string) => void;
+    toggleNotesSection?: () => void;
+    updateNotesBadge?: () => void;
+    toggleDigitizingCheckbox?: (type: string) => void;
+    handleCapEmbellishmentChange?: () => void;
+    getCapEmbellishmentType?: () => string;
+    updateEmbellishmentDropdownLabels?: () => void;
 }
 
 /*
@@ -161,13 +180,9 @@ interface Window {
  */
 declare let primaryLogo: any;
 declare let capPrimaryLogo: any;
-declare function onPrimaryPositionChange(): void;
-declare function onPrimaryStitchTierChange(): void;
-declare function onCapStitchTierChange(): void;
 declare function updateLogoCardHeader(type: string): void;
 declare function escapeHtml(s: any): string;
 declare function showToast(msg: string, type?: string, duration?: number): void;
 declare let DesignThumbnailService: any;
 declare function renderOrderRecap(): void;
-declare function mapStitchCountToTierValue(stitchCount: number): string;
 declare let pricingCalculator: any;

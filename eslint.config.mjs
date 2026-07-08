@@ -114,6 +114,7 @@ export default [
             'shared_components/js/builders/emb/save-push.js',
             'shared_components/js/builders/emb/pricing-sync.js',
             'shared_components/js/builders/emb/quote-lifecycle.js',
+            'shared_components/js/builders/emb/logo-config.js',
         ],
         rules: {
             'no-unsanitized/property': 'off',

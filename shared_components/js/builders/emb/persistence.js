@@ -15,12 +15,11 @@
  */
 // @ts-nocheck — MOVED legacy DOM code: pre-existing checkJs frictions; typing
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
-/* global API_BASE, EMB_DEFAULTS, SIZE06_EXTENDED_SIZES, _syncALArrays,
+/* global API_BASE, EMB_DEFAULTS, SIZE06_EXTENDED_SIZES,
    addManualServiceRow, addNewRow, createChildRow,
    createServiceProductRow, dateFromInputValue, dateToInputValue,
-   handleCapEmbellishmentChange, mapStitchCountToTierValue,
    onSizeChange, onStyleChange, selectColor, updateCapLogoSectionVisibility,
-   updateGarmentLogoSectionVisibility, updateLogoCardHeader, updateNotesBadge,
+   updateGarmentLogoSectionVisibility, updateLogoCardHeader,
    updatePushButtonState, escapeHtml, showToast,
    QuotePersistence, QuoteSession, getLtmControlState, setLtmControlState,
    assertQuoteEditable, updateEditModeUI, setQuoteDateDefaults, markAsUnsaved,
@@ -28,6 +27,7 @@
 import { applyDesignFromCache, showDesignThumbnail, lookupDesignNumber } from './design-search.js';
 import { collectProductsFromTable, onShipMethodChange, recalculatePricing, updateTaxCalculation } from './pricing-sync.js';
 import { updateAdditionalCharges, updateDiscountType } from './quote-lifecycle.js';
+import { _syncALArrays, handleCapEmbellishmentChange, mapStitchCountToTierValue, updateNotesBadge } from './logo-config.js';
 
 export function initEmbroideryPersistence() {
     if (typeof QuotePersistence !== 'undefined') {

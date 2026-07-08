@@ -23,11 +23,11 @@
 // checkJs frictions (.value/.dataset/expandos on HTMLElement). Typing lands
 // when this cluster's render/state split happens (see emb-decomposition-plan.md
 // follow-ups); new builders/** modules stay strictly checked.
-/* global onPrimaryPositionChange, onPrimaryStitchTierChange,
-   onCapStitchTierChange, updateLogoCardHeader,
+/* global updateLogoCardHeader,
    updatePushButtonState, escapeHtml, showToast, DesignThumbnailService, renderOrderRecap */
 // (addExtraColorSurchargeRow is also a seam, but only inside generated onclick markup —
 import { lookupTaxRate } from './pricing-sync.js';
+import { onCapStitchTierChange, onPrimaryPositionChange, onPrimaryStitchTierChange } from './logo-config.js';
 //  it resolves via window at click time; the monolith still owns it.)
 
 // ============================================================

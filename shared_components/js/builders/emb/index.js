@@ -20,6 +20,7 @@
  *   save-push.js     — save orchestrator + ShopWorks push (cluster #6, 2026-07-07)
  *   quote-lifecycle.js — resetQuote/discounts/fees panel/tracking (cluster #7, 2026-07-07)
  *   pricing-sync.js  — recalculatePricing + display + tax/ship UI (cluster #8, 2026-07-07)
+ *   logo-config.js   — stitch/logo/embellishment UI + AL state sync (cluster #9, 2026-07-07)
  */
 import { loadServiceCodePrices, getServicePrice } from './pricing.js';
 import {
@@ -124,6 +125,26 @@ import {
     openShippingModal,
     closeShippingModal,
 } from './pricing-sync.js';
+import {
+    _syncALArrays,
+    mapStitchCountToTierValue,
+    initStitchEstimators,
+    openStitchEstimator,
+    onPrimaryPositionChange,
+    onPrimaryStitchTierChange,
+    onFullBackStitchCountChange,
+    onCapStitchTierChange,
+    updateStitchTierDropdownLabels,
+    updateGlobalAL,
+    toggleGlobalALNew,
+    toggleLogoCard,
+    toggleNotesSection,
+    updateNotesBadge,
+    toggleDigitizingCheckbox,
+    handleCapEmbellishmentChange,
+    getCapEmbellishmentType,
+    updateEmbellishmentDropdownLabels,
+} from './logo-config.js';
 import {
     applyDesignFromCache,
     filterDesignSearchByTier,
@@ -281,5 +302,26 @@ window.updateShippingSummary = updateShippingSummary;
 window.openShippingModal = openShippingModal;
 window.closeShippingModal = closeShippingModal;
 
+// logo-config (callers: static HTML logo-card/stitch/AL/embellishment
+// handlers + monolith init wiring + notes badge updates)
+window._syncALArrays = _syncALArrays;
+window.mapStitchCountToTierValue = mapStitchCountToTierValue;
+window.initStitchEstimators = initStitchEstimators;
+window.openStitchEstimator = openStitchEstimator;
+window.onPrimaryPositionChange = onPrimaryPositionChange;
+window.onPrimaryStitchTierChange = onPrimaryStitchTierChange;
+window.onFullBackStitchCountChange = onFullBackStitchCountChange;
+window.onCapStitchTierChange = onCapStitchTierChange;
+window.updateStitchTierDropdownLabels = updateStitchTierDropdownLabels;
+window.updateGlobalAL = updateGlobalAL;
+window.toggleGlobalALNew = toggleGlobalALNew;
+window.toggleLogoCard = toggleLogoCard;
+window.toggleNotesSection = toggleNotesSection;
+window.updateNotesBadge = updateNotesBadge;
+window.toggleDigitizingCheckbox = toggleDigitizingCheckbox;
+window.handleCapEmbellishmentChange = handleCapEmbellishmentChange;
+window.getCapEmbellishmentType = getCapEmbellishmentType;
+window.updateEmbellishmentDropdownLabels = updateEmbellishmentDropdownLabels;
+
 window.__QB_BUILD = window.__QB_BUILD || {};
-window.__QB_BUILD.emb = { entry: 'builders/emb/index.js', modules: ['pricing', 'design-search', 'spr-modal', 'shopworks-import', 'persistence', 'output', 'save-push', 'quote-lifecycle', 'pricing-sync'] };
+window.__QB_BUILD.emb = { entry: 'builders/emb/index.js', modules: ['pricing', 'design-search', 'spr-modal', 'shopworks-import', 'persistence', 'output', 'save-push', 'quote-lifecycle', 'pricing-sync', 'logo-config'] };

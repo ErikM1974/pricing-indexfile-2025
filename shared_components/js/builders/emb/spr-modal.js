@@ -14,7 +14,8 @@
  */
 // @ts-nocheck — MOVED legacy DOM code: pre-existing checkJs frictions; typing
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
-/* global escapeHtml, mapStitchCountToTierValue, DesignThumbnailService */
+/* global escapeHtml, DesignThumbnailService */
+import { mapStitchCountToTierValue } from './logo-config.js';
 
 // ============================================================
 // SERVICE PRICING REVIEW MODAL

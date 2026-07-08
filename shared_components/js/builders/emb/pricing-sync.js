@@ -18,7 +18,7 @@
 // @ts-nocheck — MOVED legacy DOM code: pre-existing checkJs frictions; typing
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
 /* global API_BASE, EMB_DEFAULTS, SIZE06_EXTENDED_SIZES,
-   createServiceProductRow, getCapEmbellishmentType, updateRowBreakdown, showToast,
+   createServiceProductRow, updateRowBreakdown, showToast,
    wrapWithRepricingIndicator, parseRatePercent, getLtmControlState,
    setLtmControlState, renderOrderRecap, markAsUnsaved, QuoteOrderSummary, structuredClone, updateQuantityNudge,
    renderLtmControlPanel, initLtmControlListeners, updatePerUnitPrice,
@@ -27,6 +27,7 @@ import { getServicePrice } from './pricing.js';
 import { updateAdditionalCharges } from './quote-lifecycle.js';
 import { renderPushReadiness } from './save-push.js';
 import { markEmbroideryDirty } from './persistence.js';
+import { getCapEmbellishmentType } from './logo-config.js';
 
 // Debounce utility for input handlers that fire on every keystroke
 export function debounce(fn, delay) {

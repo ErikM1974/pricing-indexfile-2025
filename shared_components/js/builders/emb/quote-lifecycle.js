@@ -12,15 +12,15 @@
  */
 // @ts-nocheck — MOVED legacy DOM code: pre-existing checkJs frictions; typing
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
-/* global EMB_DEFAULTS, _syncALArrays,
-   handleCapEmbellishmentChange,
-   updateLogoCardHeader, updateNotesBadge, showToast, markAsUnsaved,
+/* global EMB_DEFAULTS,
+   updateLogoCardHeader, showToast, markAsUnsaved,
    DesignThumbnailService, setLtmControlState, setQuoteDateDefaults,
    markAsSaved */
 import { resetDesignSearchState, showDesignThumbnail } from './design-search.js';
 import { getServicePrice } from './pricing.js';
 import { calculateDiscountableSubtotal, onShipMethodChange, recalculatePricing } from './pricing-sync.js';
 import { updatePushButtonState } from './save-push.js';
+import { _syncALArrays, handleCapEmbellishmentChange, updateNotesBadge } from './logo-config.js';
 
 /**
  * Toggle Additional Charges panel visibility
