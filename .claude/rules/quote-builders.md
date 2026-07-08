@@ -33,4 +33,5 @@ Loads automatically when you open any of the 4 quote builders or their shared fi
 - `Embroidery_Costs` uses `StitchCount` (NOT `StitchCountRange`). Beanie = flat, NOT cap (`ProductCategoryFilter.isFlatHeadwear()`). Detail: `memory/emb-builder-details.md`.
 
 ## Quantity nudge tiers
-DTG 12/24/48/72 · DTF 10/24/48/72 · SCP 24/37/73/145 · EMB 8/24/48/72.
+DTG 12/24/48/72 · DTF 10/24/48/72 · SCP 24/48/72/145 (2026-06-19 remap — old 24/37/73/145 labels linger only in the stale `SCREENPRINT_TIERS` fallback) · EMB 8/24/48/72.
+⚠️ SCP LTM: Caspio charges the $50 fee through the **24-47 tier** (not `<24`-only like DTG/DTF).

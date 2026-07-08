@@ -35,7 +35,11 @@
             decorTitle: 'Logos', decorIcon: 'fa-shirt',
             steps: [
                 { title: 'Products', icon: 'fa-tshirt', hint: 'Style, color, sizes', sel: ['.power-content > .product-grid-section'] },
-                { title: 'Logos', icon: 'fa-compact-disc', hint: 'Placement & stitch size', sel: ['.power-content > .logo-config-container'] },
+                // #emb-services-bar moves INTO the Logos step (expert audit 2026-07-07):
+                // Additional Logo / Digitizing / Monogram chips were stranded in step 1
+                // (the bar lives inside .product-grid-section), invisible exactly when
+                // the rep is reasoning about placements. Anchor restores it on toggle.
+                { title: 'Logos', icon: 'fa-compact-disc', hint: 'Placement & stitch size', sel: ['.power-content > .logo-config-container'], move: ['#emb-services-bar'] },
                 { title: 'Customer', icon: 'fa-user', hint: 'One search fills it', move: ['.power-sidebar .customer-info-section'] },
                 // EMB nests the invoice footer INSIDE .product-grid-section (unlike
                 // SCP/DTF) — a hidden parent would hide it in step 4, so it MOVES
@@ -162,12 +166,45 @@
             document.querySelectorAll('#product-tbody .cell-qty').forEach(c => { qty += parseInt(c.textContent, 10) || 0; });
             return qty > 0;
         }
+        if (i === 1) {
+            // Per-builder decoration signal (expert audit 2026-07-07: an always-false
+            // step teaches reps to ignore the checkmarks entirely). Display only.
+            if (document.body.classList.contains('scp-builder')) {
+                const front = document.querySelector('input[name="front-location"]:checked');
+                return !!(front && front.value);
+            }
+            if (document.body.classList.contains('dtf-builder')) {
+                const disp = document.getElementById('location-display');
+                return !!(disp && disp.textContent.trim() && disp.textContent.trim() !== 'None selected');
+            }
+            if (document.body.classList.contains('emb-builder')) {
+                // A linked design # (either card) is the honest "logo configured"
+                // signal — the position/stitch selects always hold valid defaults.
+                return !!(document.getElementById('garment-design-number')?.value.trim()
+                    || document.getElementById('cap-design-number')?.value.trim());
+            }
+            return false;
+        }
         if (i === 2) {
             const n = document.getElementById('customer-name');
             const e = document.getElementById('customer-email');
             return !!(n && n.value.trim() && e && e.value.trim());
         }
-        return false; // decoration + review have no cheap universal predicate
+        return false; // review has no meaningful "done" (it's the last step)
+    }
+
+    // Re-tick the step checkmarks as the rep types — they previously refreshed
+    // only on navigation, so filling name/email on step 3 didn't tick the tab
+    // until the next click. Debounced; display only. (expert audit 2026-07-07)
+    let _doneTimer = null;
+    function refreshDoneTicks() {
+        if (!guidedOn || !shell) return;
+        clearTimeout(_doneTimer);
+        _doneTimer = setTimeout(() => {
+            shell.querySelectorAll('.guided-step').forEach((btn, idx) => {
+                btn.classList.toggle('done', idx !== current && stepDone(idx));
+            });
+        }, 350);
     }
 
     function goToStep(i, opts) {
@@ -213,6 +250,11 @@
             if (/customer|name|email/.test(t)) goToStep(2);
             else if (/product|item/.test(t)) goToStep(0);
         });
+
+        // Live checkmarks while typing (input covers text fields; change covers
+        // selects/radios/checkboxes like SCP's location radios).
+        document.addEventListener('input', refreshDoneTicks);
+        document.addEventListener('change', refreshDoneTicks);
     }
 
     function init() {
@@ -249,5 +291,27 @@
 
     if (typeof window !== 'undefined') {
         window.guidedGoToStep = function (i) { if (cfg && shell && guidedOn) goToStep(i); };
+
+        /**
+         * Navigate to the step that CONTAINS a field, then focus it (expert audit
+         * 2026-07-07): save-validation and the push checklist used to focus() fields
+         * that were display:none on another step — a silent no-op that left the rep
+         * hunting for a field the toast had just named. Returns true when handled;
+         * callers keep their plain focus() as the workbench-mode fallback.
+         */
+        window.guidedRevealField = function (id) {
+            if (!cfg || !shell || !guidedOn) return false;
+            const el = document.getElementById(id);
+            if (!el) return false;
+            const host = el.closest('[data-guided-step]');
+            if (!host) return false;
+            const step = parseInt(host.getAttribute('data-guided-step'), 10);
+            if (Number.isFinite(step) && step !== current) goToStep(step);
+            try {
+                el.focus();
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } catch (_) { }
+            return true;
+        };
     }
 })();

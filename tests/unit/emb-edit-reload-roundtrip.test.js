@@ -186,7 +186,7 @@ describe('P0 — pickup quote reload keeps the saved tax rate', () => {
   test('restored #tax-rate-input keeps 8.8 and the DOR lookup never fires during restore', async () => {
     const { window, fetchCalls } = await buildBuilder(taxRoutes(pickupSession, taxItem));
     const rateInput = window.document.getElementById('tax-rate-input');
-    expect(rateInput.value).toBe('10.1'); // HTML default before load
+    expect(rateInput.value).toBe('10.2'); // HTML default before load (Milton 10.2% since 2026-07-06; 10.1 residuals swept 2026-07-07)
 
     await window.loadQuoteForEditing('EMB-PICKUP-1');
     await flush(); // give any would-be deferred DOR lookup time to resolve + clobber

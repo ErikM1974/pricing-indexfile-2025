@@ -233,6 +233,32 @@ class DTFQuoteBuilder {
         this.setupSearchListeners();
         this.setupGlobalListeners();
 
+        // Mid-call method-switch menu (expert audit 2026-07-07) — serializes
+        // IDENTITY only (customer + style/color/sizes); target reprices natively.
+        if (typeof initMethodSwitchMenu === 'function') {
+            initMethodSwitchMenu({
+                current: 'dtf',
+                collect: () => {
+                    const items = new Map();
+                    (this.products || []).forEach(p => {
+                        const sizes = {};
+                        ['XS', 'S', 'M', 'L', 'XL'].forEach(s => {
+                            const q = parseInt(p.quantities?.[s], 10) || 0;
+                            if (q > 0) sizes[s] = q;
+                        });
+                        items.set(Number(p.id), { style: p.styleNumber, color: p.catalogColor || '', colorName: p.color || '', sizeBreakdown: sizes });
+                    });
+                    // Extended sizes live in childRows (single source of truth) —
+                    // reading them from parent quantities too would double-count.
+                    (this.childRows || new Map()).forEach(ch => {
+                        const it = items.get(Number(ch.parentId));
+                        if (it && ch.qty > 0 && ch.size) it.sizeBreakdown[ch.size] = (it.sizeBreakdown[ch.size] || 0) + ch.qty;
+                    });
+                    return Array.from(items.values()).filter(i => i.style && Object.keys(i.sizeBreakdown).length);
+                }
+            });
+        }
+
         // Check for edit mode (loading existing quote for revision)
         const editQuoteId = this.checkForEditMode();
         // Duplicate mode (?duplicate=DTF-...): load a copy as a NEW quote (EMB parity 2026-06-11)
@@ -241,6 +267,9 @@ class DTFQuoteBuilder {
         // in quote-builder-utils.js). Prefill wins over draft recovery for this visit,
         // same as ?edit=/?duplicate=. (item #6, 2026-07-05)
         const qqPrefill = (typeof getQuickQuotePrefill === 'function') ? getQuickQuotePrefill() : null;
+        // Mid-call method switch (?from=methodswitch — expert audit 2026-07-07):
+        // customer + product rows carried over from another builder.
+        const msPrefill = (typeof takeMethodSwitchPrefill === 'function') ? takeMethodSwitchPrefill() : null;
         if (duplicateQuoteId) {
             await this.duplicateQuote(duplicateQuoteId);
         } else if (editQuoteId) {
@@ -248,6 +277,8 @@ class DTFQuoteBuilder {
             await this.loadQuoteForEditing(editQuoteId);
         } else if (qqPrefill) {
             await this.applyQuickQuotePrefill(qqPrefill);
+        } else if (msPrefill) {
+            await this.applyMethodSwitchPrefill(msPrefill);
         } else {
             // Check for draft recovery (after DOM is ready)
             if (this.session && this.session.shouldShowRecovery()) {
@@ -273,6 +304,16 @@ class DTFQuoteBuilder {
                 document.getElementById('customer-email').value = contact.ContactNumbersEmail || '';
                 document.getElementById('company-name').value = contact.CustomerCompanyName || '';
 
+                // ShopWorks Customer # — the lookup already holds it, yet DTF made the
+                // rep re-type it (it gates Push, filters the design combobox, and a typo
+                // attaches the pushed order to the wrong customer; blank falls to the
+                // 3739 placeholder). EMB has auto-filled since June. (expert audit 2026-07-07)
+                const custNumEl = document.getElementById('customer-number');
+                if (custNumEl) {
+                    custNumEl.value = contact.id_Customer || '';
+                    custNumEl.dispatchEvent(new Event('input', { bubbles: true }));  // refresh recap + push-button state
+                }
+
                 // [2026-06-08] P0 (Erik's #1 rule): honor tax-exempt customers — the CRM "TAX EXEMPT" chip was
                 // cosmetic; the quote/PDF/push still billed WA tax. Mirror EMB. Also restore tax for a taxable
                 // customer selected right after an exempt one (else the prior 0% bleeds → under-charge).
@@ -286,7 +327,7 @@ class DTFQuoteBuilder {
                     if (typeof updateTaxCalculation === 'function') updateTaxCalculation();
                 } else if (_wasExempt) {
                     if (_incTax) _incTax.checked = true;
-                    if (_rateEl && _rateEl.value === '0') _rateEl.value = '10.1';
+                    if (_rateEl && _rateEl.value === '0') _rateEl.value = '10.2';
                     if (typeof updateTaxCalculation === 'function') updateTaxCalculation();
                 }
 
@@ -317,6 +358,11 @@ class DTFQuoteBuilder {
                     document.getElementById('customer-name').value = '';
                     document.getElementById('customer-email').value = '';
                     document.getElementById('company-name').value = '';
+                    const _custNumClear = document.getElementById('customer-number');
+                    if (_custNumClear) {
+                        _custNumClear.value = '';   // never leave the PREVIOUS customer's ShopWorks # armed for Push
+                        _custNumClear.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
                     window._taxExempt = false;  // [2026-06-08] P0: customer cleared → no longer exempt
                     if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();  // [2026-06-08] empty the recap when the lookup is cleared
                     if (typeof removeRecentOrdersPanel === 'function') removeRecentOrdersPanel();  // item #13: no stale orders for the next customer
@@ -522,21 +568,18 @@ class DTFQuoteBuilder {
             rushFeeInput.value = session.RushFee;
         }
 
-        // Discount
-        const discountAmountInput = document.getElementById('discount-amount');
-        const discountTypeSelect = document.getElementById('discount-type');
-        const discountReasonInput = document.getElementById('discount-reason');
-        if ((session.Discount > 0 || session.DiscountPercent > 0) && discountAmountInput) {
-            if (session.DiscountPercent > 0) {
-                if (discountTypeSelect) discountTypeSelect.value = 'percent';
-                discountAmountInput.value = session.DiscountPercent;
-            } else {
-                if (discountTypeSelect) discountTypeSelect.value = 'fixed';
-                discountAmountInput.value = session.Discount;
-            }
-            if (discountReasonInput && session.DiscountReason) {
-                discountReasonInput.value = session.DiscountReason;
-            }
+        // Discount — the DTF discount UI was REMOVED 2026-03-23, so a legacy saved
+        // discount can no longer be applied: the old code wrote to nonexistent
+        // #discount-amount/#discount-type fields, computeFeesAndTotals() read them
+        // as 0, and a Save Revision silently repriced the quote UPWARD (the exact
+        // silent-price-change class Erik's #1 rule targets). Surface it loudly and
+        // persistently instead. (expert audit 2026-07-07)
+        if (session.Discount > 0 || session.DiscountPercent > 0) {
+            const amt = session.DiscountPercent > 0
+                ? `${session.DiscountPercent}%`
+                : `$${Number(session.Discount).toFixed(2)}`;
+            const reason = session.DiscountReason ? ` (${session.DiscountReason})` : '';
+            this.showError(`Heads up: this quote was saved with a ${amt} discount${reason} that this builder no longer supports. Saving a revision will REMOVE the discount and raise the total — re-quote or adjust before sending.`);
         }
 
         // Shipping fee
@@ -700,6 +743,30 @@ class DTFQuoteBuilder {
      * edit-loader uses (parent row + createChildRow for extended sizes), so color/size
      * handling + pricing are identical to a hand-added row. (item #6, 2026-07-05)
      */
+    /**
+     * Mid-call method switch (expert audit 2026-07-07): fill the customer, then
+     * replay every carried product through the SAME add path Quick Quote uses —
+     * pricing comes from THIS builder's engine, never from the payload.
+     */
+    async applyMethodSwitchPrefill(ms) {
+        if (typeof applyMethodSwitchCustomer === 'function') applyMethodSwitchCustomer(ms.customer);
+        let added = 0;
+        for (const p of (ms.products || [])) {
+            try {
+                await this.applyQuickQuotePrefill({
+                    style: p.style, color: p.color, colorName: p.colorName,
+                    qty: 0, sizeBreakdown: p.sizeBreakdown || {}, location: ''
+                });
+                added++;
+            } catch (e) {
+                console.error('[MethodSwitch] product prefill failed', p.style, e);
+                this.showToast(`Could not carry ${p.style} over — add it manually`, 'warning');
+            }
+        }
+        this.showToast(`Switched from ${ms.fromLabel || 'another builder'} — customer + ${added} product${added === 1 ? '' : 's'} carried over. Pick the transfer locations.`, 'success');
+        try { history.replaceState(null, '', window.location.pathname); } catch (_) { }
+    }
+
     async applyQuickQuotePrefill(qq) {
         try {
             await this.addProductFromQuote({
@@ -1427,8 +1494,8 @@ class DTFQuoteBuilder {
             <div class="ext-popup-note">
                 <i class="fas fa-info-circle"></i>
                 ${extendedSizes.length > 5
-                    ? 'Extended sizes available for this product. Additional upcharges may apply.'
-                    : 'These sizes have additional upcharges for transfers.'}
+                    ? 'Extended sizes available for this product. Garment size upcharges may apply.'
+                    : 'Larger garment sizes carry a garment upcharge — the transfer price is the same for every size.'}
             </div>
         `;
 
@@ -1549,12 +1616,37 @@ class DTFQuoteBuilder {
 
     // ==================== PRICING CALCULATIONS ====================
 
+    /**
+     * Heat-sensitive garment warning (expert audit 2026-07-07): DTF cure temps
+     * scorch nylon and delaminate waterproof/PU coatings — a quoted-then-ruined
+     * jacket order costs the garments AND the relationship. Non-blocking (the
+     * shop may run low-temp film), once per style per session; keyword approach
+     * mirrors the cap filter in dtf-quote-products.js.
+     */
+    _warnHeatSensitiveProducts() {
+        if (!this._heatWarnedStyles) this._heatWarnedStyles = new Set();
+        const HEAT_WORDS = /nylon|anorak|rain(?:wear|\s?(?:jacket|shell|coat))|waterproof|packable|windbreaker|puffer|pu[-\s]?coated/i;
+        (this.products || []).forEach(p => {
+            if (!p.styleNumber || this._heatWarnedStyles.has(p.styleNumber)) return;
+            const m = HEAT_WORDS.exec(`${p.description || ''} ${p.styleNumber || ''}`);
+            if (m) {
+                this._heatWarnedStyles.add(p.styleNumber);
+                this.showToast(`${p.styleNumber} looks heat-sensitive ("${m[0]}") — confirm DTF low-temp compatibility before quoting.`, 'warning');
+            }
+        });
+    }
+
     async updatePricing() {
         const totalQty = this.getTotalQuantity();
         const locationCount = this.selectedLocations.length;
 
-        // Track if under minimum quantity (10 pieces)
-        const isUnderMinimum = totalQty > 0 && totalQty < 10;
+        // Heat-sensitive check on every reprice so edit-load / duplicate / search
+        // adds are all covered (warned styles only toast once).
+        this._warnHeatSensitiveProducts();
+
+        // Track if under the API-derived minimum (10 today, Caspio-changeable)
+        const minQty = this.getMinimumQuantity();
+        const isUnderMinimum = totalQty > 0 && totalQty < minQty;
 
         // Show/hide minimum order warning
         const minOrderWarning = document.getElementById('min-order-warning');
@@ -1583,9 +1675,10 @@ class DTFQuoteBuilder {
             return;
         }
 
-        // For quantities under 10, use minimum tier (10) for pricing calculation
-        // This shows estimated pricing so users understand costs
-        const pricingQty = isUnderMinimum ? 10 : totalQty;
+        // For quantities under the minimum, price at the minimum tier — on-screen
+        // ESTIMATE only so users understand costs; saveAndGetLink() blocks actually
+        // saving/pushing a sub-minimum quote. (expert audit 2026-07-07)
+        const pricingQty = isUnderMinimum ? minQty : totalQty;
 
         // Ensure pricing data is loaded from API
         try {
@@ -1602,7 +1695,7 @@ class DTFQuoteBuilder {
         // Update sidebar displays
         document.getElementById('total-qty').textContent = totalQty;
         // Show tier with warning if under minimum
-        const tierDisplay = isUnderMinimum ? `${totalQty} (Min 10)` : tier;
+        const tierDisplay = isUnderMinimum ? `${totalQty} (Min ${minQty})` : tier;
         document.getElementById('pricing-tier').textContent = tierDisplay;
 
         // Calculate costs from API using pricingQty (ensures valid tier pricing)
@@ -1740,7 +1833,15 @@ class DTFQuoteBuilder {
             // Support both class-based (.row-price) and ID-based (#row-price-{id}) selectors
             const rowId = row.dataset.rowId || row.dataset.productId || product.id;
             const priceSpan = row.querySelector('.row-price') || document.getElementById(`row-price-${rowId}`);
-            if (priceSpan) priceSpan.textContent = `$${baseDisplayPrice.toFixed(2)}`;
+            if (priceSpan) {
+                priceSpan.textContent = `$${baseDisplayPrice.toFixed(2)}`;
+                // Separate mode shows the LTM-stripped unit while the Total column is
+                // LTM-inclusive — annotate so unit × qty visibly reconciles instead of
+                // looking like broken math. (expert audit 2026-07-07)
+                priceSpan.title = (baseDisplayPrice !== baseUnitPrice)
+                    ? `+$${effectiveLtmPerUnit.toFixed(2)}/pc small-batch fee — itemized in the fee row; the Total column includes it`
+                    : '';
+            }
 
             // Update row total (all standard sizes for this product)
             const totalCell = row.querySelector('.cell-total') || document.getElementById(`row-total-${rowId}`);
@@ -1784,12 +1885,20 @@ class DTFQuoteBuilder {
                 const childRow = document.getElementById(`row-${childRowId}`);
                 if (childRow) {
                     const priceCell = childRow.querySelector('.cell-price');
-                    if (priceCell) priceCell.textContent = `$${displayPrice.toFixed(2)}`;
+                    if (priceCell) {
+                        priceCell.textContent = `$${displayPrice.toFixed(2)}`;
+                        priceCell.title = (displayPrice !== roundedPrice)
+                            ? `+$${effectiveLtmPerUnit.toFixed(2)}/pc small-batch fee — itemized in the fee row; the Total column includes it`
+                            : '';
+                    }
 
-                    // Update child row total (qty × price)
+                    // Child row total is LTM-INCLUSIVE like parent rows (roundedPrice,
+                    // the billed amount) — it painted the stripped displayPrice before,
+                    // so in separate mode child totals didn't foot to the subtotal and
+                    // the table visibly contradicted itself. (expert audit 2026-07-07)
                     const childTotalCell = childRow.querySelector('.cell-total');
                     if (childTotalCell) {
-                        childTotalCell.textContent = `$${(displayPrice * qty).toFixed(2)}`;
+                        childTotalCell.textContent = `$${(roundedPrice * qty).toFixed(2)}`;
                     }
                 }
 
@@ -1851,7 +1960,7 @@ class DTFQuoteBuilder {
         // Enable/disable continue button
         const continueBtn = document.getElementById('continue-btn');
         if (continueBtn) {
-            continueBtn.disabled = totalQty < 10 || this.selectedLocations.length === 0;
+            continueBtn.disabled = totalQty < this.getMinimumQuantity() || this.selectedLocations.length === 0;
         }
     }
 
@@ -1875,11 +1984,23 @@ class DTFQuoteBuilder {
     }
 
     getTierForQuantity(qty) {
-        if (qty < 10) return 'Min 10';
+        const m = this.getMinimumQuantity();
+        if (qty < m) return `Min ${m}`;
         if (qty <= 23) return '10-23';
         if (qty <= 47) return '24-47';
         if (qty <= 71) return '48-71';
         return '72+';
+    }
+
+    /**
+     * API-derived order minimum (lowest tier's minQuantity; fallback 10 until the
+     * bundle loads). Single source for the save gate, the under-minimum clamp,
+     * and the tier display. (expert audit 2026-07-07)
+     */
+    getMinimumQuantity() {
+        return (this.pricingCalculator && typeof this.pricingCalculator.getMinimumQuantity === 'function')
+            ? this.pricingCalculator.getMinimumQuantity()
+            : 10;
     }
 
     /**
@@ -1898,7 +2019,7 @@ class DTFQuoteBuilder {
 
         const totalQty = this.getTotalQuantity();
         const locationCount = this.selectedLocations.length;
-        const isUnderMinimum = totalQty > 0 && totalQty < 10;
+        const isUnderMinimum = totalQty > 0 && totalQty < this.getMinimumQuantity();
         const pricingQty = isUnderMinimum ? 10 : totalQty;
 
         const { marginDenom, ltmPerUnit, transferBreakdown, laborCostPerLoc, freightPerTransfer } = this.currentPricingData;
@@ -2008,9 +2129,9 @@ class DTFQuoteBuilder {
         const includeTax = document.getElementById('include-tax') ? !!document.getElementById('include-tax').checked : true;
         // Shared parseRatePercent: 0 is a VALID rate; only NaN/empty falls back (2026-06-10 EMB fix, synced)
         const taxRatePct = (typeof parseRatePercent === 'function')
-            ? parseRatePercent(document.getElementById('tax-rate-input')?.value, 10.1)
+            ? parseRatePercent(document.getElementById('tax-rate-input')?.value, 10.2)
             : (Number.isFinite(parseFloat(document.getElementById('tax-rate-input')?.value))
-                ? parseFloat(document.getElementById('tax-rate-input')?.value) : 10.1);
+                ? parseFloat(document.getElementById('tax-rate-input')?.value) : 10.2);
         const taxAmount = includeTax ? Math.round(preTaxSubtotal * (taxRatePct / 100) * 100) / 100 : 0;
         const grandTotal = preTaxSubtotal + taxAmount;
         return {
@@ -2365,36 +2486,58 @@ class DTFQuoteBuilder {
         const companyName = document.getElementById('company-name')?.value?.trim() || '';
         const salesRep = document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com';
 
-        // Validate required fields
+        // Validate required fields — toast + focus like EMB/SCP; the old alert()
+        // cascade stole keyboard focus mid-call and had to be dismissed one dialog
+        // at a time. (expert audit 2026-07-07)
         if (!customerName) {
-            alert('Please enter customer name');
+            this.showError('Please enter customer name');
             document.getElementById('customer-name')?.focus();
             return;
         }
 
         if (!customerEmail) {
-            alert('Please enter customer email');
+            this.showError('Please enter customer email');
             document.getElementById('customer-email')?.focus();
             return;
         }
 
-        // Validate email format
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(customerEmail)) {
-            alert('Please enter a valid email address');
+        // Validate email format (shared isValidEmail, Rule 8; local regex fallback)
+        const emailOk = (typeof isValidEmail === 'function')
+            ? isValidEmail(customerEmail)
+            : /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail);
+        if (!emailOk) {
+            this.showError('Please enter a valid email address');
             document.getElementById('customer-email')?.focus();
             return;
         }
 
         // Check if there are products
         if (!this.products || this.products.length === 0) {
-            alert('Please add at least one product to the quote');
+            this.showError('Please add at least one product to the quote');
             return;
         }
 
         const totalQty = this.getTotalQuantity();
         if (totalQty === 0) {
-            alert('Please add quantities to your products');
+            this.showError('Please add quantities to your products');
+            return;
+        }
+
+        // A quote with ZERO transfer locations prices garment-only (no transfer,
+        // labor, or freight — roughly half the real price) and would save/print/
+        // push that way. Only the clipboard path blocked it. (expert audit 2026-07-07)
+        if (!this.selectedLocations || this.selectedLocations.length === 0) {
+            this.showError('Select at least one transfer location — the quote is garment-only right now.');
+            return;
+        }
+
+        // DTF's hard minimum (banner + the customer engine's BELOW_MINIMUM both say
+        // 10): save/push previously accepted 6-pc quotes that also under-collected
+        // the small-batch fee (fee computed at the clamped 10, billed × actual 6 =
+        // $30 of $50). Block at the boundary the engine enforces. (expert audit 2026-07-07)
+        const minQty = this.getMinimumQuantity();
+        if (totalQty < minQty) {
+            this.showError(`DTF minimum is ${minQty} pieces — add ${minQty - totalQty} more piece${(minQty - totalQty) === 1 ? '' : 's'} to save this quote.`);
             return;
         }
 
@@ -2741,7 +2884,7 @@ class DTFQuoteBuilder {
         };
 
         localStorage.setItem('dtf-quote-draft', JSON.stringify(draftData));
-        alert('Draft saved to browser storage');
+        this.showToast('Draft saved to browser storage', 'success');
     }
 
     /**
@@ -2751,8 +2894,23 @@ class DTFQuoteBuilder {
     printQuote() {
         // Validate we have products
         if (this.products.length === 0 || this.getTotalQuantity() === 0) {
-            alert('Add products before printing');
+            this.showError('Add products before printing');
             return;
+        }
+
+        // Same money gates as saveAndGetLink (expert audit 2026-07-07): a zero-
+        // location quote prints garment-only (~half the real price), and a sub-
+        // minimum quote prints an under-collected small-batch fee.
+        if (!this.selectedLocations || this.selectedLocations.length === 0) {
+            this.showError('Select at least one transfer location — the quote is garment-only right now.');
+            return;
+        }
+        {
+            const _printMin = this.getMinimumQuantity();
+            if (this.getTotalQuantity() < _printMin) {
+                this.showError(`DTF minimum is ${_printMin} pieces — the on-screen price is an estimate and can't be printed as a quote.`);
+                return;
+            }
         }
 
         // Pricing-loaded guard (parity with saveAndGetLink L2332/L2342): if the pricing snapshot is
@@ -2779,6 +2937,9 @@ class DTFQuoteBuilder {
                 email: document.getElementById('customer-email')?.value || '',
                 phone: document.getElementById('customer-phone')?.value || '',
                 salesRepEmail: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com',
+                // The shared generator reads `.project` — the old `projectName`-only key
+                // meant DTF project names NEVER printed. Keep both. (expert audit 2026-07-07)
+                project: document.getElementById('project-name')?.value || '',
                 projectName: document.getElementById('project-name')?.value || '',
                 orderNumber: document.getElementById('order-number')?.value || '',
                 poNumber: document.getElementById('po-number')?.value || '',
@@ -2802,7 +2963,7 @@ class DTFQuoteBuilder {
 
         } catch (error) {
             console.error('Print error:', error);
-            alert('Error generating PDF. Please try again.');
+            this.showError('Error generating PDF. Please try again.');
         }
     }
 
@@ -2822,7 +2983,13 @@ class DTFQuoteBuilder {
         // $1,018.98 GRAND TOTAL (true unit price $39.50, true subtotal $925.50).
         const stateCalc = this.calculateFromState();
         const totals = this.computeFeesAndTotals(stateCalc);
-        const quoteId = document.getElementById('quote-id')?.textContent || this.editingQuoteId || `DTF-${Date.now()}`;
+        // Real quote # chain — lastSavedQuoteId was omitted, so a just-saved NEW
+        // quote printed a fabricated `DTF-<epoch>` that matches nothing in Quote
+        // Mgmt; null lets the shared generator print "DRAFT" when truly unsaved.
+        const quoteId = document.getElementById('quote-id')?.textContent
+            || this.editingQuoteId
+            || this.lastSavedQuoteId
+            || null;
 
         // Build products array with line items
         const products = [];
@@ -3375,7 +3542,7 @@ class DTFQuoteBuilder {
 
         // Reset tax rate to default
         const taxRateInput = document.getElementById('tax-rate-input');
-        if (taxRateInput) taxRateInput.value = '10.1';
+        if (taxRateInput) taxRateInput.value = '10.2';
 
         // Collapse order details panel
         const orderContent = document.getElementById('order-details-content');

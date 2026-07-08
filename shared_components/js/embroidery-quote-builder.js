@@ -143,6 +143,17 @@ function _syncALArrays() {
 // Handle primary logo position change (for Full Back 25K minimum)
 // Map arbitrary stitch count to nearest tier dropdown value
 function mapStitchCountToTierValue(stitchCount, position) {
+    // Cap positions max at '18000' ("Large 15K-25K") — #cap-primary-stitches has NO
+    // 25000 option, and assigning one left the select at '' which the change handler
+    // parseInt-fell to 8000: a silent $10/cap downgrade on edit-reload. Design
+    // lookups return the MAX stitch count across DST variants, so a jacket-back
+    // file on a cap design triggers this routinely. (expert audit 2026-07-07)
+    const isCapPosition = position === 'CF' || position === 'CB' || position === 'CS';
+    if (isCapPosition) {
+        if (stitchCount > 15000) return '18000';
+        if (stitchCount > 10000) return '12000';
+        return '8000';
+    }
     if (position === 'Full Back' || stitchCount >= 25000) return '25000';
     if (stitchCount > 15000) return '18000';
     if (stitchCount > 10000) return '12000';
@@ -606,7 +617,7 @@ function getEmbroideryQuoteData() {
         notes: document.getElementById('notes')?.value || '',
         ltmEnabled: getLtmControlState('emb-ltm-panel').enabled,
         ltmDisplayMode: getLtmControlState('emb-ltm-panel').displayMode || 'builtin',
-        taxRate: document.getElementById('tax-rate-input')?.value || '10.1',
+        taxRate: document.getElementById('tax-rate-input')?.value || '10.2',
         includeTax: document.getElementById('include-tax')?.checked ?? true,
         shippingFee: document.getElementById('shipping-fee')?.value || '0',
         shipAddress: document.getElementById('ship-address')?.value || '',
@@ -1100,7 +1111,7 @@ async function loadQuoteForEditing(quoteId, opts = {}) {
                 // legacy value (>1) instead of restoring "1010" into the input.
                 const sessionPct = sessionRate > 1 ? sessionRate : sessionRate * 100;
                 rateInput.value = Number.isFinite(sessionRate) ? Math.round(sessionPct * 1000) / 1000
-                    : (Number.isFinite(itemRate) ? itemRate : 10.1);
+                    : (Number.isFinite(itemRate) ? itemRate : 10.2);
             }
         }
         // Tax-exempt quotes save with NO TAX fee line + TaxRate 0; #include-tax defaults CHECKED in the
@@ -1817,6 +1828,15 @@ document.addEventListener('DOMContentLoaded', async function() {
         // a visible warning if the API is unreachable). Change a price in Caspio → the
         // bar reflects it on next load, no deploy needed.
         loadServiceCodePrices().finally(() => {
+            // Digitizing labels + new-logo nudge react to live Service_Codes and to
+            // design-number typing (recalc doesn't fire on keystrokes). (2026-07-07)
+            try {
+                syncDigitizingPriceLabels();
+                updateDigitizingNudges();
+                ['garment-design-number', 'cap-design-number'].forEach(id => {
+                    document.getElementById(id)?.addEventListener('input', updateDigitizingNudges);
+                });
+            } catch (_) {}
             const sp = (code, fb) => getServicePrice(code, fb);
             const EMB_SERVICE_CATALOG = [
                 { group: 'Artwork', icon: 'fa-palette', items: [
@@ -2051,6 +2071,21 @@ document.addEventListener('DOMContentLoaded', async function() {
         quoteService = new EmbroideryQuoteService();
 
         // Check for edit mode (loading existing quote for revision)
+        // Mid-call method-switch menu (expert audit 2026-07-07) — serializes IDENTITY
+        // only (customer + style/color/sizes); the target builder reprices natively.
+        if (typeof initMethodSwitchMenu === 'function') {
+            initMethodSwitchMenu({
+                current: 'emb',
+                collect: () => (typeof collectProductsFromTable === 'function' ? collectProductsFromTable() : [])
+                    .filter(p => !p.isService)
+                    .map(p => ({
+                        style: p.style, color: p.catalogColor || '', colorName: p.color || '',
+                        sizeBreakdown: Object.fromEntries(Object.entries(p.sizeBreakdown || {}).filter(([, q]) => (parseInt(q, 10) || 0) > 0))
+                    }))
+                    .filter(i => i.style && Object.keys(i.sizeBreakdown).length)
+            });
+        }
+
         const editQuoteId = checkForEditMode();
         // Duplicate mode (?duplicate=EMB-2026-123): load a copy as a NEW quote (2026-06-10)
         const duplicateQuoteId = new URLSearchParams(window.location.search).get('duplicate');
@@ -2080,6 +2115,30 @@ document.addEventListener('DOMContentLoaded', async function() {
                 showToast('Could not prefill ' + qqPrefill.style + ' from Quick Quote — add it manually', 'warning', 6000);
             }
             if (typeof clearQuickQuoteParams === 'function') clearQuickQuoteParams();
+        } else if (typeof takeMethodSwitchPrefill === 'function' && (window._msPrefillEmb = takeMethodSwitchPrefill())) {
+            // Mid-call method switch (?from=methodswitch — expert audit 2026-07-07):
+            // customer + product rows carried over from another builder; each row
+            // replays through the SAME addProductFromQuote() path as Quick Quote.
+            const ms = window._msPrefillEmb;
+            initEmbroideryPersistence();
+            if (typeof setQuoteDateDefaults === 'function') setQuoteDateDefaults();
+            if (typeof applyMethodSwitchCustomer === 'function') applyMethodSwitchCustomer(ms.customer);
+            let msAdded = 0;
+            for (const p of (ms.products || [])) {
+                try {
+                    await addProductFromQuote({
+                        styleNumber: p.style,
+                        color: p.color || p.colorName,
+                        sizeBreakdown: p.sizeBreakdown || {}
+                    });
+                    msAdded++;
+                } catch (e) {
+                    console.error('[MethodSwitch] product prefill failed:', p.style, e);
+                    showToast('Could not carry ' + p.style + ' over — add it manually', 'warning', 6000);
+                }
+            }
+            showToast(`Switched from ${ms.fromLabel || 'another builder'} — customer + ${msAdded} product${msAdded === 1 ? '' : 's'} carried over. Configure the logos.`, 'success', 7000);
+            try { history.replaceState(null, '', window.location.pathname); } catch (_) { }
         } else {
             // Initialize auto-save & draft recovery (2026 consolidation)
             initEmbroideryPersistence();
@@ -2284,6 +2343,20 @@ async function applyDesignFromCache(type, designData) {
     // Store on logo object for draft persistence
     if (type === 'garment') {
         primaryLogo._designData = design;
+        // [expert audit 2026-07-07 F5] Negotiated Full-Back design-tier pricing was
+        // applied ONLY by the ShopWorks-import flow; a hand-built quote of the SAME
+        // design fell back to the $1.25/1K formula — two prices depending on how the
+        // quote was born. The lookup payload already carries the variants, so mirror
+        // the import's extraction. The engine only consumes fbPriceTiers when the
+        // primary position is Full Back, so setting it here is inert otherwise.
+        const _fbVariant = (design.variants || []).find(v => parseFloat(v.fbPrice1_7) > 0);
+        primaryLogo.fbPriceTiers = _fbVariant ? {
+            fbPrice1_7: _fbVariant.fbPrice1_7,
+            fbPrice8_23: _fbVariant.fbPrice8_23,
+            fbPrice24_47: _fbVariant.fbPrice24_47,
+            fbPrice48_71: _fbVariant.fbPrice48_71,
+            fbPrice72plus: _fbVariant.fbPrice72plus
+        } : null;
     } else if (typeof capPrimaryLogo !== 'undefined') {
         capPrimaryLogo._designData = design;
     }
@@ -2526,9 +2599,12 @@ async function applyDesignToCard(type, designNum, design) {
         badgeHtml += '<br><span style="font-size:11px;color:#6366f1;">📦 ' + escapeHtml(orderText) + '</span>';
     }
 
-    // Extra color surcharge warning
+    // Extra color surcharge — warn AND collect (expert audit 2026-07-07 F2: this
+    // badge announced the per-piece surcharge and then billed nothing, a permanent
+    // margin leak on every multi-color design).
     if (design.extraColors > 0 && design.extraColorSurcharge > 0) {
-        badgeHtml += '<br><span style="font-size:11px;color:#d97706;font-weight:600;">⚠ +' + design.extraColors + ' extra colors (+$' + design.extraColorSurcharge.toFixed(2) + '/pc surcharge)</span>';
+        badgeHtml += '<br><span style="font-size:11px;color:#d97706;font-weight:600;">⚠ +' + design.extraColors + ' extra colors (+$' + design.extraColorSurcharge.toFixed(2) + '/pc surcharge)</span>'
+            + ' <button type="button" class="btn-add-extra-colors" onclick="addExtraColorSurchargeRow(\'' + type + '\', ' + Number(design.extraColors) + ', ' + Number(design.extraColorSurcharge) + ')">Add to quote</button>';
     }
 
     infoBadge.className = 'design-info-badge design-info-found';
@@ -2741,6 +2817,17 @@ function autoSetStitchTier(type, stitchCount, tierName) {
         tierValue = '8000';
     }
 
+    // Cap dropdown has no 25000 option — setting it left the select at '' and
+    // onCapStitchTierChange's parseInt('') || 8000 silently booked Standard: the
+    // $10/cap Large surcharge vanished ($480 on 48 caps). Clamp + tell the rep
+    // to verify which DST variant actually runs on caps. (expert audit 2026-07-07)
+    if (type !== 'garment' && tierValue === '25000') {
+        tierValue = '18000';
+        if (typeof showToast === 'function') {
+            showToast(`This design's largest file is ${Number(stitchCount).toLocaleString()} stitches — cap front maxes at Large (15K–25K). Verify which DST variant runs on caps.`, 'warning', 9000);
+        }
+    }
+
     dropdown.value = tierValue;
     // Trigger change events
     if (type === 'garment') {
@@ -2783,6 +2870,7 @@ function clearDesignNumber(type) {
     showDesignThumbnail(type, null);
     if (type === 'garment') {
         primaryLogo.thumbnailUrl = null;
+        primaryLogo.fbPriceTiers = null;   // unlinked design takes its negotiated FB tiers with it (2026-07-07)
     } else if (typeof capPrimaryLogo !== 'undefined') {
         capPrimaryLogo.thumbnailUrl = null;
     }
@@ -3582,7 +3670,14 @@ function createServiceProductRow(serviceType, data) {
         'GRT-50': { description: 'Logo Mockup & Print Review', icon: 'fa-palette', isCap: false },
         'GRT-75': { description: 'Graphic Design Services', icon: 'fa-pencil-ruler', isCap: false },
         'DD': { description: 'Digitizing Setup', icon: 'fa-cog', isCap: false },
-        'RUSH': { description: 'Rush Charge', icon: 'fa-bolt', isCap: false }
+        'RUSH': { description: 'Rush Charge', icon: 'fa-bolt', isCap: false },
+        // Synthesized by _syncDecgLtmRow() when customer-supplied qty is under the
+        // small-batch threshold; PN 'LTM' is proxy-registered (KNOWN_FEE_PNS) so it
+        // pushes as a real ShopWorks line item. (expert audit 2026-07-07)
+        'LTM': { description: 'Customer-Supplied Small-Batch Fee', icon: 'fa-exclamation-circle', isCap: false },
+        // Extra thread colors from the design badge (addExtraColorSurchargeRow);
+        // ShopWorks part 'Color Chg' verbatim (proxy KNOWN_FEE_PNS). (2026-07-07)
+        'Color Chg': { description: 'Extra Thread Colors', icon: 'fa-palette', isCap: false }
     };
 
     const meta = SERVICE_META[serviceType] || { description: serviceType, icon: 'fa-cog', isCap: false };
@@ -3598,7 +3693,7 @@ function createServiceProductRow(serviceType, data) {
     if (position) {
         displayDescription += `: ${position}`;
     }
-    if (stitchCount && serviceType !== 'MONOGRAM' && serviceType !== 'Monogram' && serviceType !== 'Laser Patch' && serviceType !== '3D-EMB' && serviceType !== 'GRT-50' && serviceType !== 'GRT-75' && serviceType !== 'DD' && serviceType !== 'RUSH') {
+    if (stitchCount && serviceType !== 'MONOGRAM' && serviceType !== 'Monogram' && serviceType !== 'Laser Patch' && serviceType !== '3D-EMB' && serviceType !== 'GRT-50' && serviceType !== 'GRT-75' && serviceType !== 'DD' && serviceType !== 'RUSH' && serviceType !== 'LTM' && serviceType !== 'Color Chg') {
         displayDescription += ` (${(stitchCount / 1000).toFixed(0)}K stitches)`;
     }
 
@@ -3714,6 +3809,13 @@ function addManualServiceRow(serviceType, priceOverride) {
             markAsUnsaved();
             recalculatePricing();
             showToast('Rush Fee added — 25% of subtotal', 'success');
+        } else if (serviceType === 'Monogram' || serviceType === 'Name/Number') {
+            // Names capture (expert audit 2026-07-07 F6): "12 monograms" with no
+            // names/sizes pairing is an unrunnable production order — the manual
+            // path had no prompt, so quotes regularly went out without them.
+            markAsUnsaved();
+            recalculatePricing();
+            openMonogramNamesDialog(row, serviceType);
         } else {
             // Focus the quantity input so user can immediately set count
             const qtyInput = row.querySelector('.service-qty');
@@ -3831,6 +3933,101 @@ async function addDECGLineItem(itemType, stitches, heavyweight) {
     showToast(`Customer-Supplied ${itemType === 'cap' ? 'Cap (DECC)' : 'Garment (DECG)'} added — set the quantity`, 'success');
 }
 window.addDECGLineItem = addDECGLineItem;
+
+/**
+ * Extra-thread-color surcharge row (expert audit 2026-07-07 F2). The design badge
+ * has always WARNED "+N extra colors (+$X/pc)" and then billed nothing — the
+ * system announced money it didn't collect. One click adds it as a service row
+ * (pushes as ShopWorks part 'Color Chg'); the $/pc comes from the design record
+ * (API-sourced), qty auto-tallies to the category piece count and stays editable.
+ */
+function addExtraColorSurchargeRow(type, extraColors, perPiece) {
+    perPiece = parseFloat(perPiece);
+    if (!(perPiece > 0)) return;
+    const existing = document.querySelector(`#product-tbody tr.service-product-row[data-extra-colors="${type}"]`);
+    if (existing) {
+        existing.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        showToast('Extra-color surcharge is already on the quote — adjust its quantity there.', 'info');
+        return;
+    }
+    const items = (typeof collectProductsFromTable === 'function') ? collectProductsFromTable() : [];
+    const isCapType = type === 'cap';
+    const autoQty = items.filter(p => !p.isService && (!!p.isCap === isCapType))
+        .reduce((s, p) => s + (p.totalQuantity || 0), 0);
+    const row = createServiceProductRow('Color Chg', {
+        quantity: autoQty || 1,
+        unitPrice: perPiece,
+        total: (autoQty || 1) * perPiece,
+        isCap: isCapType,
+        position: `${extraColors} extra color${extraColors === 1 ? '' : 's'}`
+    });
+    if (!row) return;
+    row.dataset.extraColors = type;
+    markAsUnsaved();
+    recalculatePricing();
+    showToast(autoQty > 0
+        ? `Extra-color surcharge added — qty auto-set to ${autoQty} (all ${type} pieces). Adjust if needed.`
+        : 'Extra-color surcharge added — set the quantity', 'success');
+}
+window.addExtraColorSurchargeRow = addExtraColorSurchargeRow;
+
+/**
+ * Lightweight names dialog for Monogram / Name-Number rows (expert audit
+ * 2026-07-07 F6). One name per line → the count auto-fills the row qty and the
+ * list lands in Special Notes under the SAME '--- Names/Monograms ---' header the
+ * ShopWorks-import path writes, so print/push/notes downstream already handle it.
+ * Skippable — the rep can always type qty by hand like before.
+ */
+function openMonogramNamesDialog(row, serviceType) {
+    document.getElementById('monogram-names-dialog')?.remove();
+    const wrap = document.createElement('div');
+    wrap.id = 'monogram-names-dialog';
+    wrap.className = 'monogram-names-dialog';
+    wrap.innerHTML =
+        '<div class="mnd-card" role="dialog" aria-modal="true" aria-labelledby="mnd-title">' +
+        '  <div id="mnd-title" class="mnd-title"><i class="fas fa-font"></i> ' + escapeHtml(serviceType) + ' — who gets one?</div>' +
+        '  <div class="mnd-hint">One name per line (add size/placement after a comma if needed, e.g. "Sarah M, L"). The line count becomes the quantity.</div>' +
+        '  <textarea class="mnd-names" rows="6" placeholder="Sarah M&#10;John D, XL&#10;Riley P"></textarea>' +
+        '  <div class="mnd-actions">' +
+        '    <button type="button" class="mnd-skip">Skip — set qty by hand</button>' +
+        '    <button type="button" class="mnd-apply">Add names</button>' +
+        '  </div>' +
+        '</div>';
+    document.body.appendChild(wrap);
+    const ta = wrap.querySelector('.mnd-names');
+    const close = () => { wrap.remove(); document.removeEventListener('keydown', onKey); };
+    const onKey = (e) => { if (e.key === 'Escape') { close(); focusQty(); } };
+    const focusQty = () => {
+        const q = row.querySelector('.service-qty');
+        if (q) { q.focus(); q.select(); }
+    };
+    wrap.querySelector('.mnd-skip').addEventListener('click', () => { close(); focusQty(); });
+    wrap.addEventListener('click', (e) => { if (e.target === wrap) { close(); focusQty(); } });
+    document.addEventListener('keydown', onKey);
+    wrap.querySelector('.mnd-apply').addEventListener('click', () => {
+        const names = ta.value.split('\n').map(s => s.trim()).filter(Boolean);
+        close();
+        if (!names.length) { focusQty(); return; }
+        const q = row.querySelector('.service-qty');
+        if (q) {
+            q.value = String(names.length);
+            q.dispatchEvent(new Event('change', { bubbles: true }));   // reprices via onServiceQtyChange
+        }
+        const notesEl = document.getElementById('notes');
+        if (notesEl) {
+            notesEl.value = (notesEl.value ? notesEl.value + '\n' : '') +
+                '--- Names/Monograms ---\n' + names.join('\n');
+            if (typeof updateNotesBadge === 'function') updateNotesBadge();
+        }
+        const desc = row.querySelector('.service-description');
+        if (desc) desc.textContent = desc.textContent.replace(/: \d+ names$/, '') + `: ${names.length} names`;
+        markAsUnsaved();
+        recalculatePricing();
+        showToast(`${names.length} name${names.length === 1 ? '' : 's'} captured — qty set to ${names.length}; list saved to Special Notes.`, 'success');
+    });
+    setTimeout(() => ta.focus(), 50);
+}
+window.openMonogramNamesDialog = openMonogramNamesDialog;
 
 /**
  * Handle quantity change for service product rows
@@ -6321,24 +6518,55 @@ async function loadDECGPricing() {
 
 async function syncDECGRows() {
     const rows = document.querySelectorAll('#product-tbody tr.service-product-row[data-decg-priced="true"]');
-    if (!rows.length) return;
+    if (!rows.length) {
+        // Last DECG row deleted → the synthesized small-batch fee goes with it.
+        _syncDecgLtmRow({ garment: 0, cap: 0 }, { garment: 0, cap: 0 });
+        return;
+    }
     const cache = await loadDECGPricing();
     // [A3 + A3-DECG fix] (audit 2026-06-06): API down → flag rows so saveAndGetLink's priceError gate blocks
     // (Erik's #1 rule). But a MANUALLY-overridden DECG row (sellPrice>0) is independent of the API → don't
     // over-block it (fail-closed otherwise). Toast already surfaced.
     if (!cache) { rows.forEach(r => { if (!(parseFloat(r.dataset.sellPrice) > 0)) r.dataset.priceError = 'true'; }); return; }
     const svc = window._alPricingSvc;
+
+    // [expert audit 2026-07-07 F10] Tier at the POOLED same-category quantity: 15
+    // supplied jackets + 15 supplied hoodies run as ONE 30-pc job (tier 24-47), not
+    // two tier-8-23 rows — per-row tiering over-charged vs how the shop runs and vs
+    // purchased-garment pooling. Overridden rows still occupy the machine run, so
+    // their qty counts toward the tier/fee even though their price isn't touched.
+    const pooledQty = { garment: 0, cap: 0 };
+    rows.forEach(r => {
+        const t = r.dataset.decgItemType === 'cap' ? 'cap' : 'garment';
+        pooledQty[t] += parseFloat(r.querySelector('.service-qty')?.value) || 0;
+    });
+    const decgLtm = { garment: 0, cap: 0 };
+
     for (const row of rows) {
-        if (parseFloat(row.dataset.sellPrice) > 0) continue;  // manual override — recalc handles the display
         const rid = row.dataset.rowId;
         const qty = parseFloat(row.querySelector('.service-qty')?.value) || 0;
         const stitch = parseInt(row.dataset.stitchCount, 10) || 8000;
         const itemType = row.dataset.decgItemType === 'cap' ? 'cap' : 'garment';
         const heavyweight = row.dataset.decgHeavyweight === 'true';
+        const tierQty = Math.max(pooledQty[itemType], qty || 1, 1);
+        if (parseFloat(row.dataset.sellPrice) > 0) {
+            // manual override — recalc handles the display; still capture the
+            // category's small-batch fee so the fee row stays correct.
+            try {
+                const probe = await svc.calculateDECGPrice(tierQty, stitch, itemType, cache, heavyweight);
+                if (probe && probe.ltmFee > 0) decgLtm[itemType] = probe.ltmFee;
+            } catch (_) { /* an override row never blocks */ }
+            continue;
+        }
         let unit = 0;
         try {
-            const res = await svc.calculateDECGPrice(qty || 1, stitch, itemType, cache, heavyweight);
+            const res = await svc.calculateDECGPrice(tierQty, stitch, itemType, cache, heavyweight);
             unit = res.unitPrice || 0;
+            // [expert audit 2026-07-07 F1] the service has ALWAYS returned the ≤7-pc
+            // small-batch fee here — the old code read only unitPrice, so every
+            // bring-your-own order under the threshold left $50 on the table (the
+            // public DECG calculator and the ShopWorks import path both charge it).
+            if (res.ltmFee > 0) decgLtm[itemType] = res.ltmFee;
             delete row.dataset.priceError;
         } catch (e) {
             // P1-4 (audit 2026-06-06): never silently bill a customer-supplied row at $0 (Erik's #1 rule).
@@ -6354,8 +6582,69 @@ async function syncDECGRows() {
         if (priceCell) priceCell.textContent = '$' + unit.toFixed(2);
         if (totalCell) totalCell.textContent = '$' + (unit * qty).toFixed(2);
     }
+
+    _syncDecgLtmRow(decgLtm, pooledQty);
 }
 window.syncDECGRows = syncDECGRows;
+
+/**
+ * Synthesized "Customer-Supplied Small-Batch Fee" service row (expert audit
+ * 2026-07-07 F1). A real ROW — not sidebar math — so it rides every money path
+ * for free: recalc totals, saved quote_items, the printed PDF, and the ShopWorks
+ * push (PN 'LTM' is proxy-registered in KNOWN_FEE_PNS). Amount comes from the
+ * DECG API response (ltmFee at the pooled category qty), never hardcoded.
+ * Deleting the row = waiving the fee — it won't re-add until the pooled DECG
+ * quantities change the fee (a fresh decision point). Reloaded saved quotes are
+ * re-adopted via data-service-type="ltm" so edits keep the amount live.
+ */
+function _syncDecgLtmRow(decgLtm, pooledQty) {
+    const total = (decgLtm.garment || 0) + (decgLtm.cap || 0);
+    const sig = `${decgLtm.garment || 0}|${decgLtm.cap || 0}`;
+    const st = (window._decgLtmState = window._decgLtmState || { rowId: null, sig: null, waivedSig: null });
+
+    let row = st.rowId ? document.getElementById(`row-${st.rowId}`) : null;
+    if (!row) row = document.querySelector('#product-tbody tr.service-product-row[data-service-type="ltm"]');
+
+    if (!(total > 0)) {
+        if (row) row.remove();
+        st.rowId = null; st.sig = null; st.waivedSig = null;
+        return;
+    }
+
+    if (!row) {
+        if (st.sig !== null) {
+            // We rendered a fee this session and the row is gone → the rep deleted
+            // it (waive). Honor it until the fee itself changes.
+            st.waivedSig = st.sig;
+            st.rowId = null; st.sig = null;
+        }
+        if (st.waivedSig === sig) return;
+        row = createServiceProductRow('LTM', { quantity: 1, unitPrice: total, total: total, isCap: false });
+        if (!row) return;
+        row.dataset.decgLtm = 'true';
+        const qtyIn = row.querySelector('.service-qty');
+        if (qtyIn) { qtyIn.value = 1; qtyIn.readOnly = true; qtyIn.title = 'Small-batch fee — one per order (delete the row to waive)'; }
+        st.rowId = row.dataset.rowId; st.sig = sig; st.waivedSig = null;
+        const parts = [];
+        if (decgLtm.garment > 0) parts.push(`${pooledQty.garment} supplied garment pc`);
+        if (decgLtm.cap > 0) parts.push(`${pooledQty.cap} supplied cap pc`);
+        if (typeof showToast === 'function') {
+            showToast(`Customer-supplied small-batch fee added: $${total.toFixed(2)} (${parts.join(' + ')} under the 8-pc minimum). Delete the row to waive it.`, 'info', 8000);
+        }
+        return;
+    }
+
+    // Row exists → adopt + keep the amount live (unless the rep price-overrode it)
+    st.rowId = row.dataset.rowId; st.sig = sig;
+    row.dataset.decgLtm = 'true';
+    if (!(parseFloat(row.dataset.sellPrice) > 0)) {
+        row.dataset.unitPrice = String(total);
+        const pc = document.getElementById(`row-price-${row.dataset.rowId}`);
+        const tc = document.getElementById(`row-total-${row.dataset.rowId}`);
+        if (pc) pc.textContent = '$' + total.toFixed(2);
+        if (tc) tc.textContent = '$' + total.toFixed(2);
+    }
+}
 
 // Rush surcharge rate — sourced from the Service_Codes API (RUSH.UnitCost = 25 → 25%), NOT hardcoded,
 // so Erik can change it in Caspio with no deploy (CLAUDE.md "Pricing = API" rule). getServicePrice()
@@ -6469,7 +6758,62 @@ async function computeNudgeSavingsAsync(productList, allLogos, logoConfigs, ltmE
     }
 }
 
+/**
+ * Digitizing fee has TWO Caspio homes (expert audit 2026-07-07): the logo-card
+ * checkboxes bill the pricing-bundle's Embroidery_Costs.DigitizingFee
+ * (embroidery-quote-pricing.js loadPricingData → engine :1811/:1823) while the
+ * services-bar DD chip bills Service_Codes['DD']. Keep the static "$100" card
+ * labels synced to the value the checkbox actually bills, and WARN once if the
+ * two Caspio sources diverge — a silent mismatch is how the same quote grows
+ * two different digitizing prices.
+ */
+function syncDigitizingPriceLabels() {
+    const bundleFee = (typeof pricingCalculator !== 'undefined' && pricingCalculator && Number(pricingCalculator.digitizingFee) > 0)
+        ? Number(pricingCalculator.digitizingFee) : null;
+    const ddFee = (typeof getServicePrice === 'function') ? getServicePrice('DD', bundleFee ?? 100) : (bundleFee ?? 100);
+    const billed = bundleFee ?? ddFee;
+    document.querySelectorAll('[data-dd-price]').forEach(el => {
+        el.textContent = `$${Number(billed).toFixed(0)}`;
+    });
+    if (bundleFee != null && Math.abs(ddFee - bundleFee) > 0.005 && !window._ddFeeMismatchWarned) {
+        window._ddFeeMismatchWarned = true;
+        if (typeof showToast === 'function') {
+            showToast(`Digitizing fee mismatch in Caspio: Embroidery_Costs says $${bundleFee} (logo-card checkbox) but Service_Codes DD says $${ddFee} (services bar). Align them so both paths bill the same.`, 'warning', 10000);
+        }
+    }
+}
+
+/**
+ * No-design-number nudge (expert audit 2026-07-07): a logo with no Design #
+ * linked is usually a NEW logo, and forgetting the $100 new-logo setup is the
+ * classic new-CSR under-quote. Soft hint only — repeat logos legitimately skip it.
+ */
+function updateDigitizingNudges() {
+    [
+        { designId: 'garment-design-number', checkboxId: 'primary-digitizing', nudgeId: 'garment-digitizing-nudge' },
+        { designId: 'cap-design-number', checkboxId: 'cap-primary-digitizing', nudgeId: 'cap-digitizing-nudge' }
+    ].forEach(({ designId, checkboxId, nudgeId }) => {
+        const designEl = document.getElementById(designId);
+        const cb = document.getElementById(checkboxId);
+        const host = cb ? cb.closest('.digitizing-checkbox') : null;
+        if (!designEl || !cb || !host) return;
+        let nudge = document.getElementById(nudgeId);
+        const cardVisible = host.offsetParent !== null;   // hidden card (e.g. no caps in quote) → no nudge
+        const show = cardVisible && !designEl.value.trim() && !cb.checked;
+        if (!show) { if (nudge) nudge.remove(); return; }
+        if (nudge) return;   // already showing
+        nudge = document.createElement('span');
+        nudge.id = nudgeId;
+        nudge.className = 'digitizing-nudge';
+        nudge.textContent = 'No design # — new logo? Add new-logo setup';
+        host.insertAdjacentElement('afterend', nudge);
+    });
+}
+
 async function recalculatePricing() {
+    // Keep the digitizing card labels honest + surface the new-logo nudge on every
+    // reprice (both are cheap, idempotent DOM updates). (expert audit 2026-07-07)
+    try { syncDigitizingPriceLabels(); updateDigitizingNudges(); } catch (_) {}
     // Stale-response guard: rapid edits fire overlapping recalcs, and an OLDER
     // calculateQuote resolving after a newer one overwrote fresher totals on
     // screen (the save path then snapshotted them). Only the latest call may
@@ -7519,7 +7863,7 @@ function onShipStateChange() {
             lookupTaxRate();
         } else {
             // Reset to WA default
-            document.getElementById('tax-rate-input').value = '10.1';
+            document.getElementById('tax-rate-input').value = '10.2';
             updateTaxCalculation();
             showTaxStatus('', 'info');
         }
@@ -7688,7 +8032,7 @@ function updateTaxCalculation() {
     const rateInput = document.getElementById('tax-rate-input');
     // parseRatePercent: an empty/cleared input rendered "$NaN" and saved a
     // "Sales Tax (NaN%)" item; 0 stays a valid rate. Same fallback as the save path.
-    const taxRate = parseRatePercent(rateInput?.value, 10.1) / 100;
+    const taxRate = parseRatePercent(rateInput?.value, 10.2) / 100;
 
     const taxRow = document.getElementById('tax-row');
     const taxAmountEl = document.getElementById('tax-amount');
@@ -8007,13 +8351,13 @@ async function _saveAndGetLinkInner(opts = {}) {
                 if (!includeTax) return 0;
                 // parseRatePercent: 0 is a VALID rate (out-of-state) — `|| 10.1` was
                 // silently saving WA tax on quotes the screen showed at $0 tax.
-                const rateVal = parseRatePercent(document.getElementById('tax-rate-input')?.value, 10.1);
+                const rateVal = parseRatePercent(document.getElementById('tax-rate-input')?.value, 10.2);
                 return rateVal / 100;
             })(),
             taxAmount: (() => {
                 const includeTax = document.getElementById('include-tax')?.checked;
                 if (!includeTax) return 0;
-                const rateVal = parseRatePercent(document.getElementById('tax-rate-input')?.value, 10.1);
+                const rateVal = parseRatePercent(document.getElementById('tax-rate-input')?.value, 10.2);
                 const preTaxText = document.getElementById('pre-tax-subtotal')?.textContent || '$0.00';
                 const preTaxSubtotal = parseFloat(preTaxText.replace(/[$,]/g, '')) || 0;
                 // #pre-tax-subtotal is ALREADY the full pre-tax base incl. shipping (= the on-screen
@@ -8974,7 +9318,7 @@ function resetQuote() {
     // Reset additional charges
     document.getElementById('shipping-fee').value = '0';
     const taxRateInput = document.getElementById('tax-rate-input');
-    if (taxRateInput) taxRateInput.value = '10.1';
+    if (taxRateInput) taxRateInput.value = '10.2';
     document.getElementById('include-tax').checked = true;
     document.getElementById('rush-fee').value = '';
 
@@ -13028,7 +13372,7 @@ function buildEmbroideryPricingData(allItems) {
     // normalizes percent → decimal at the boundary). The '10.1' fallback preserves
     // the pre-3.1 behavior: an empty input previously fell through to the
     // generator's hardcoded WA standard rate.
-    const taxRateRaw = document.getElementById('tax-rate-input')?.value || '10.1';
+    const taxRateRaw = document.getElementById('tax-rate-input')?.value || '10.2';
 
     return window.QuotePricingData.buildPricingData({
         method: 'EMB',
@@ -13158,7 +13502,7 @@ function generateEmbQuoteText(products, serviceItems) {
     const tier = document.getElementById('pricing-tier')?.textContent || '1-7';
     const { baseSubtotal, additionalCharges, discount, adjustedSubtotal } = calculateDiscountableSubtotal();
     const includeTax = document.getElementById('include-tax')?.checked;
-    const taxRatePct = includeTax ? parseRatePercent(document.getElementById('tax-rate-input')?.value, 10.1) : 0;
+    const taxRatePct = includeTax ? parseRatePercent(document.getElementById('tax-rate-input')?.value, 10.2) : 0;
     const taxAmount = Math.round(adjustedSubtotal * (taxRatePct / 100) * 100) / 100;
     const copyTotal = adjustedSubtotal + taxAmount;
 
@@ -13242,6 +13586,9 @@ async function printQuote() {
             email: document.getElementById('customer-email')?.value || '',
             phone: document.getElementById('customer-phone')?.value || '',
             salesRepEmail: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com',
+            // Special Notes footer — EMB was the only builder NOT printing its own
+            // notes textarea (DTF passes it; the generator supports it). (2026-07-07)
+            notes: document.getElementById('notes')?.value?.trim() || '',
             // Production/customer reference fields (2026-06-04 audit: were never on the PDF)
             poNumber: document.getElementById('po-number')?.value?.trim() || '',
             dateOrderPlaced: dateFromInputValue(document.getElementById('date-order-placed')?.value),

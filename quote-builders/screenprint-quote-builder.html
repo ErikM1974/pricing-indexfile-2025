@@ -10,27 +10,28 @@
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><!-- PNW shell typography (expert audit 2026-07-07): DTG loaded Inter, the trio never did -->
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Quote Builder Common Styles (loads FIRST — base styles) -->
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=2026.07.07.2">
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=2026.07.07.7">
 
     <!-- Quote Builder Shell (Phase 2a — PNW palette + tokens; overrides common's legacy --builder-* tokens) -->
     <link rel="stylesheet" href="/shared_components/css/quote-builder-shell.css?v=2026.06.05.5">
 
     <!-- Guided Quote shell (Phase B, 2026-07-07) -->
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-guided.css?v=2026.07.07.3">
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-guided.css?v=2026.07.07.7">
 
     <!-- Screen Print Quote Builder Styles (overrides common + shell) -->
-    <link rel="stylesheet" href="/shared_components/css/screenprint-quote-builder-extracted.css?v=2026.06.20.3">
+    <link rel="stylesheet" href="/shared_components/css/screenprint-quote-builder-extracted.css?v=2026.07.07.7">
 
     <!-- Shared Color Picker Component -->
-    <link rel="stylesheet" href="/shared_components/css/color-picker-shared.css?v=20260106">
+    <link rel="stylesheet" href="/shared_components/css/color-picker-shared.css?v=2026.07.07.7">
 
     <!-- Shared Quote Share Modal (2026 consolidation) -->
-    <link rel="stylesheet" href="/shared_components/css/quote-share-modal.css?v=20260113">
+    <link rel="stylesheet" href="/shared_components/css/quote-share-modal.css?v=2026.07.07.7">
 
     <!-- Customer Lookup Autocomplete -->
     <link rel="stylesheet" href="/shared_components/css/customer-lookup.css?v=2026.05.26.1">
@@ -49,7 +50,7 @@
     <script src="/shared_components/js/quote-extended-sizes.js?v=20260321"></script>
 
 </head>
-<body class="scp-builder"><!-- scoping hook for Option C page-flow overrides (2026-06-07) -->
+<body class="scp-builder qb-shell-body"><!-- qb-shell-body: 2026 PNW shell (Inter + tabular numerals + birch ground) — built 2026-06, had ZERO adopters until 2026-07-07 (expert audit) --><!-- scoping hook for Option C page-flow overrides (2026-06-07) -->
     <!-- Loading Overlay -->
     <div id="loading-overlay" class="loading-overlay">
         <div class="loading-spinner"></div>
@@ -252,7 +253,7 @@
                 <div id="min-order-warning" style="display: none;">
                     <i class="fas fa-exclamation-triangle"></i>
                     <strong>Minimum Order: 24 pieces</strong> -
-                    Orders under 24 pieces include a $50 small-batch fee — it disappears at 24+.
+                    Orders under 48 pieces include a $50 small-batch fee — it drops off at 48+.
                 </div>
 
                 <!-- Excel-Style Product Table -->
@@ -533,7 +534,7 @@
             <!-- Customer Info (moved above Quote Summary 2026-03-23) -->
             <div class="customer-panel" style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb; margin: -16px -16px 16px -16px;">
                 <div class="customer-panel-header" onclick="document.getElementById('spc-customer-fields').classList.toggle('hidden')" style="margin-bottom: 8px;" tabindex="0" role="button" aria-label="Toggle customer details" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
-                    <h4 style="display: flex; align-items: center; gap: 6px;"><i class="fas fa-user" style="color: #4cb354;"></i> Customer</h4>
+                    <h4 style="display: flex; align-items: center; gap: 6px;"><i class="fas fa-user" style="color: #2e5827;"></i> Customer</h4>
                     <i class="fas fa-chevron-down" style="font-size: 12px; color: #999;"></i>
                 </div>
                 <div id="spc-customer-fields">
@@ -760,14 +761,14 @@
 
     <!-- Core Dependencies -->
     <script src="/shared_components/js/product-category-filter.js"></script>
-    <script src="/shared_components/js/quote-builder-utils.js?v=2026.07.07.2"></script>
+    <script src="/shared_components/js/quote-builder-utils.js?v=2026.07.07.7"></script>
     <script src="/shared_components/js/exact-match-search.js?v=20260106"></script>
-    <script src="/shared_components/js/quote-share-modal.js?v=20260113"></script>
+    <script src="/shared_components/js/quote-share-modal.js?v=2026.07.07.7"></script>
     <script src="/shared_components/js/screenprint-pricing-service.js"></script>
-    <script src="/shared_components/js/screenprint-quote-service.js?v=2026.06.27.1"></script>
+    <script src="/shared_components/js/screenprint-quote-service.js?v=2026.07.07.7"></script>
     <script src="/shared_components/js/sku-validation-service.js?v=20260220-xxl-fix"></script>
     <script src="/shared_components/js/quote-pricing-data.js?v=2026.06.27.1"></script>
-    <script src="/shared_components/js/embroidery-quote-invoice.js?v=2026.06.27.1"></script>
+    <script src="/shared_components/js/embroidery-quote-invoice.js?v=2026.07.07.7"></script>
 
     <!-- Auto-Save & Draft Recovery (2026 consolidation) -->
     <script src="/shared_components/js/quote-persistence.js?v=20260113"></script>
@@ -798,12 +799,12 @@
     <!-- [2026-06-08] Shared order-summary band — MUST load after quote-builder-utils.js + before screenprint-quote-builder.js (configure() runs at its eval) -->
     <script src="/shared_components/js/quote-order-summary.js?v=2026.06.08.12"></script>
     <script src="/shared_components/js/safety-stripe-recs.js?v=2026.06.28.4"></script>
-    <script src="/shared_components/js/screenprint-quote-builder.js?v=2026.07.07.2"></script>
+    <script src="/shared_components/js/screenprint-quote-builder.js?v=2026.07.07.7"></script>
 
     <!-- Guided Quote shell (Phase B, 2026-07-07) — 4-step flow over the existing
          sections, sidebar stays the price rail; "Show everything" restores the
          workbench. Loads LAST so it recomposes after the builder's own init. -->
-    <script src="/shared_components/js/quote-builder-guided.js?v=2026.07.07.3"></script>
+    <script src="/shared_components/js/quote-builder-guided.js?v=2026.07.07.7"></script>
 
 </body>
 </html>

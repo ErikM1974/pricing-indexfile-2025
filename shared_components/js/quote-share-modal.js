@@ -40,7 +40,7 @@ const QuoteShareModal = {
                     <h3 id="quote-share-title">Quote Saved!</h3>
                 </div>
                 <div class="quote-share-modal-body">
-                    <p>Quote ID: <strong id="quote-share-modal-id">---</strong></p>
+                    <p>Quote ID: <strong id="quote-share-modal-id">---</strong> <span id="quote-share-note" class="quote-share-note" style="display:none;"></span></p>
                     <p id="quote-share-instructions">Share this link with your customer:</p>
                     <div class="quote-share-url-container">
                         <input type="text" id="quote-share-url" class="quote-share-url-input" readonly aria-label="Shareable quote URL" aria-describedby="quote-share-instructions">
@@ -50,6 +50,9 @@ const QuoteShareModal = {
                     </div>
                 </div>
                 <div class="quote-share-modal-footer">
+                    <button class="quote-share-btn-email" id="quote-share-email-btn" aria-label="Email this quote to the customer">
+                        <i class="fas fa-envelope" aria-hidden="true"></i> Email to customer
+                    </button>
                     <button class="quote-share-btn-view" id="quote-share-view-btn" aria-label="Open quote in new tab">
                         <i class="fas fa-external-link-alt" aria-hidden="true"></i> View Quote
                     </button>
@@ -68,11 +71,13 @@ const QuoteShareModal = {
         const copyBtn = document.getElementById('quote-share-copy-btn');
         const viewBtn = document.getElementById('quote-share-view-btn');
         const closeBtn = document.getElementById('quote-share-close-btn');
+        const emailBtn = document.getElementById('quote-share-email-btn');
         const overlay = document.getElementById('quote-share-modal');
 
         if (copyBtn) copyBtn.onclick = () => this.copyUrl();
         if (viewBtn) viewBtn.onclick = () => this.viewQuote();
         if (closeBtn) closeBtn.onclick = () => this.close();
+        if (emailBtn) emailBtn.onclick = () => this.emailToCustomer();
 
         // Close on backdrop click
         if (overlay) {
@@ -91,24 +96,89 @@ const QuoteShareModal = {
 
     /**
      * Show the modal with the saved quote ID
-     * @param {string} quoteId - The quote ID (e.g., "DTF0113-1234")
-     * @param {string} [baseUrl] - Optional custom base URL (defaults to current origin)
+     * @param {string} quoteId - The quote ID (e.g., "DTF-2026-001")
+     * @param {string|object} [opts] - Optional. A string is treated as a status
+     *   note ("Updated to Rev 2") unless it starts with http(s), in which case it
+     *   is a base URL (legacy). An object accepts { baseUrl, note, customerEmail,
+     *   customerName, salesRepEmail } — the customer fields feed the Email button.
+     *
+     *   Back-compat note (2026-07-07): SCP/DTF historically passed "Updated to Rev
+     *   N" into what this method used as baseUrl, so every UPDATE-save rendered a
+     *   broken shareable URL ("Updated to Rev 2/quote/SP-…"). Strings are now
+     *   sniffed and shown as the note they were always meant to be.
      */
-    show(quoteId, baseUrl) {
+    show(quoteId, opts) {
         this.init(); // Ensure modal exists
+
+        let baseUrl = null;
+        let note = null;
+        this._customerEmail = null;
+        this._customerName = null;
+        this._salesRepEmail = null;
+        if (typeof opts === 'string' && opts) {
+            if (/^https?:\/\//i.test(opts)) baseUrl = opts;
+            else note = opts;
+        } else if (opts && typeof opts === 'object') {
+            baseUrl = opts.baseUrl || null;
+            note = opts.note || null;
+            this._customerEmail = opts.customerEmail || null;
+            this._customerName = opts.customerName || null;
+            this._salesRepEmail = opts.salesRepEmail || null;
+        }
 
         const origin = baseUrl || window.location.origin;
         const url = `${origin}/quote/${quoteId}`;
 
         document.getElementById('quote-share-modal-id').textContent = quoteId;
         document.getElementById('quote-share-url').value = url;
+        const noteEl = document.getElementById('quote-share-note');
+        if (noteEl) {
+            noteEl.textContent = note || '';
+            noteEl.style.display = note ? '' : 'none';
+        }
         document.getElementById('quote-share-modal').style.display = 'flex';
 
-        // Reset copy button state
+        // Reset button states
         const copyBtn = document.getElementById('quote-share-copy-btn');
         if (copyBtn) {
             copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy';
             copyBtn.classList.remove('copied');
+        }
+        const emailBtn = document.getElementById('quote-share-email-btn');
+        if (emailBtn) {
+            emailBtn.disabled = false;
+            emailBtn.innerHTML = '<i class="fas fa-envelope"></i> Email to customer';
+            // Only offer Email when the shared helper is loaded and an address is reachable
+            const hasEmail = !!(this._customerEmail || document.getElementById('customer-email')?.value?.trim());
+            emailBtn.style.display = (typeof emailQuote === 'function' && hasEmail) ? '' : 'none';
+        }
+    },
+
+    /**
+     * Email the just-saved quote straight from the share modal (expert audit
+     * 2026-07-07): "in the customer's inbox" is the end state of nearly every
+     * phone quote, but it took Save → Copy → Close → find the Email button.
+     * Reads the shared field ids every builder uses when no override was passed.
+     */
+    async emailToCustomer() {
+        const btn = document.getElementById('quote-share-email-btn');
+        const quoteId = document.getElementById('quote-share-modal-id')?.textContent;
+        if (!quoteId || quoteId === '---' || typeof emailQuote !== 'function') return;
+        const customerEmail = this._customerEmail || document.getElementById('customer-email')?.value?.trim();
+        const customerName = this._customerName || document.getElementById('customer-name')?.value?.trim();
+        const salesRepEmail = this._salesRepEmail || document.getElementById('sales-rep')?.value;
+        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending…'; }
+        let ok = false;
+        try {
+            ok = await emailQuote({ quoteId, customerEmail, customerName, salesRepEmail });
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = ok
+                    ? '<i class="fas fa-check"></i> Emailed!'
+                    : '<i class="fas fa-envelope"></i> Email to customer';
+                if (ok) setTimeout(() => { btn.innerHTML = '<i class="fas fa-envelope"></i> Email to customer'; }, 2500);
+            }
         }
     },
 

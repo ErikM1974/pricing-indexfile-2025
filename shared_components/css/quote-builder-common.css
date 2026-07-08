@@ -675,14 +675,14 @@ body {
 .customer-lookup-hero .customer-lookup-input {
     padding: 11px 12px !important;
     font-size: 14px !important;
-    border: 2px solid #4cb354 !important;
+    border: 2px solid var(--pnw-forest, #2e5827) !important;
     border-radius: 8px !important;
     background: #fff;
 }
 
 .customer-lookup-hero .customer-lookup-input:focus {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.18);
+    box-shadow: 0 0 0 3px rgba(46, 88, 39, 0.18);
 }
 
 details.customer-manual {
@@ -1380,7 +1380,7 @@ details.customer-manual > summary .cm-hint {
 .size-popup-cancel:hover { background: #f0f0f0; }
 .size-popup-apply {
     padding: 10px 24px;
-    background: #28a745;
+    background: var(--pnw-forest, #2e5827);
     color: white;
     border: none;
     border-radius: 6px;
@@ -1640,7 +1640,7 @@ details.customer-manual > summary .cm-hint {
 
 /* Toast Types */
 .toast-success {
-    background: linear-gradient(135deg, #28a745 0%, #20c24c 100%);
+    background: linear-gradient(135deg, var(--pnw-forest, #2e5827) 0%, #20c24c 100%);
 }
 
 .toast-error {
@@ -1733,7 +1733,7 @@ details.customer-manual > summary .cm-hint {
 }
 
 .form-control.is-valid {
-    border-color: #28a745 !important;
+    border-color: var(--pnw-forest, #2e5827) !important;
     padding-right: calc(1.5em + 0.75rem);
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
     background-repeat: no-repeat;
@@ -1864,11 +1864,11 @@ label.required::after {
 }
 
 .progress-step.completed {
-    color: #28a745;
+    color: var(--pnw-forest, #2e5827);
 }
 
 .progress-step.completed::before {
-    background: #28a745;
+    background: var(--pnw-forest, #2e5827);
     color: white;
     content: '✓';
 }
@@ -1886,7 +1886,7 @@ label.required::after {
 }
 
 .progress-step.completed:not(:last-child)::after {
-    background: #28a745;
+    background: var(--pnw-forest, #2e5827);
 }
 
 /* ============================================
@@ -1929,7 +1929,7 @@ input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 a:focus-visible {
-    outline: 2px solid #4169E1;
+    outline: 2px solid var(--builder-primary, #2e5827);
     outline-offset: 2px;
 }
 
@@ -2201,7 +2201,7 @@ textarea:disabled {
 }
 
 .quote-input:focus {
-    border-color: #4169E1;
+    border-color: var(--builder-primary, #2e5827);
     outline: none;
 }
 
@@ -2414,14 +2414,14 @@ textarea:disabled {
 
 /* Colors */
 .text-primary { color: var(--nwca-blue, #003f7f) !important; }
-.text-success { color: #28a745 !important; }
+.text-success { color: var(--pnw-forest, #2e5827) !important; }
 .text-danger { color: #dc3545 !important; }
 .text-warning { color: #ffc107 !important; }
 .text-info { color: #17a2b8 !important; }
 .text-muted { color: #6c757d !important; }
 
 .bg-primary { background-color: var(--nwca-blue, #003f7f) !important; }
-.bg-success { background-color: #28a745 !important; }
+.bg-success { background-color: var(--pnw-forest, #2e5827) !important; }
 .bg-danger { background-color: #dc3545 !important; }
 .bg-warning { background-color: #ffc107 !important; }
 .bg-info { background-color: #17a2b8 !important; }
@@ -2434,7 +2434,7 @@ textarea:disabled {
 .border-top { border-top: 1px solid #dee2e6 !important; }
 .border-bottom { border-bottom: 1px solid #dee2e6 !important; }
 .border-primary { border-color: var(--nwca-blue, #003f7f) !important; }
-.border-success { border-color: #28a745 !important; }
+.border-success { border-color: var(--pnw-forest, #2e5827) !important; }
 .border-danger { border-color: #dc3545 !important; }
 
 .rounded { border-radius: 0.25rem !important; }
@@ -2721,7 +2721,7 @@ textarea:disabled {
 .quote-input:focus {
     outline: none;
     border-color: var(--builder-primary, #4cb354);
-    box-shadow: 0 0 0 2px rgba(76, 179, 84, 0.15);
+    box-shadow: 0 0 0 2px rgba(46, 88, 39, 0.15);
 }
 
 .quote-input:disabled {
@@ -2994,7 +2994,7 @@ input[type="number"]:not(.size-input):focus,
 input[type="search"]:focus {
     outline: none;
     border-color: var(--builder-primary, #4cb354);
-    box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.15);
+    box-shadow: 0 0 0 3px rgba(46, 88, 39, 0.15);
 }
 
 /* Hover state for discoverability */
@@ -3024,7 +3024,7 @@ input[type="search"]:hover:not(:focus) {
 /* Tab order visual indicator */
 .tab-active,
 tr:focus-within {
-    background-color: rgba(76, 179, 84, 0.03);
+    background-color: rgba(46, 88, 39, 0.03);
 }
 
 /* ============================================
@@ -3126,7 +3126,7 @@ button[type="submit"]:active {
 .btn-secondary:hover,
 .btn-outline:hover {
     border-color: var(--builder-primary, #4cb354);
-    background-color: rgba(76, 179, 84, 0.03);
+    background-color: rgba(46, 88, 39, 0.03);
 }
 
 /* ============================================
@@ -3149,13 +3149,13 @@ button[type="submit"]:active {
 
 .config-option:hover {
     border-color: var(--builder-primary, #4cb354);
-    background-color: rgba(76, 179, 84, 0.03);
+    background-color: rgba(46, 88, 39, 0.03);
 }
 
 .config-option.selected,
 .config-option:has(input:checked) {
     border-color: var(--builder-primary, #4cb354);
-    background-color: rgba(76, 179, 84, 0.08);
+    background-color: rgba(46, 88, 39, 0.08);
 }
 
 .config-option input[type="checkbox"],
@@ -3885,3 +3885,92 @@ input.sci-num { width: 92px; cursor: text; }
 .sci-check-lbl { cursor: pointer; white-space: nowrap; }
 .sci-check { padding: 0; border: none; max-width: none; width: auto; cursor: pointer; accent-color: #16a34a; }
 .sci-preset:hover { background: #e0e7ff; }
+/* Accepted-quote edit banner (expert audit 2026-07-07) — rendered by
+   assertQuoteEditable() when a customer-accepted quote is opened for editing.
+   Warns, never locks: a re-saved revision mutates the offer the customer
+   approved (consent mismatch now that online deposits are live). */
+.accepted-quote-banner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 0 12px;
+    padding: 10px 14px;
+    border: 1px solid var(--qb-state-warn, #f59e0b);
+    border-left-width: 4px;
+    border-radius: var(--qb-radius-md, 8px);
+    background: var(--qb-state-warn-bg, #fef3c7);
+    color: var(--pnw-bark-shadow, #374151);
+    font-size: 13.5px;
+    line-height: 1.45;
+}
+.accepted-quote-banner .fa-file-signature {
+    color: var(--qb-state-warn, #f59e0b);
+    font-size: 16px;
+    flex-shrink: 0;
+}
+
+/* Mid-call method-switch menu (expert audit 2026-07-07) — header control that
+   carries customer + product identity into another builder. */
+.method-switch {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+    padding: 4px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--pnw-stone, #6b7280);
+    white-space: nowrap;
+}
+.method-switch .fa-exchange-alt { color: var(--builder-primary, #2e5827); }
+.method-switch select {
+    border: 1px solid var(--pnw-rule, #d1d5db);
+    border-radius: 6px;
+    padding: 3px 6px;
+    font-size: 12px;
+    background: var(--pnw-paper, #fff);
+    color: var(--pnw-bark-shadow, #374151);
+    cursor: pointer;
+}
+.method-switch select:focus-visible {
+    outline: none;
+    border-color: var(--builder-primary, #2e5827);
+    box-shadow: var(--pnw-glow-focus, 0 0 0 3px rgba(46, 88, 39, 0.2));
+}
+
+/* ============================================================
+   MONEY TYPOGRAPHY + DENSITY (expert audit 2026-07-07)
+   Prices are what a CSR scans all day, yet money cells sat at 13px —
+   the same size as description text — with proportional figures that
+   jitter in columns, qty cells on a legacy BLUE island, and three
+   different grand-total sizes across the trio. Appended last so it
+   wins the cascade at equal specificity.
+   ============================================================ */
+.cell-qty, .cell-price, .cell-total, .qty-cell, .price-cell,
+.pricing-row .value, .al-unit-price, .it-amt, .stb-value {
+    font-variant-numeric: tabular-nums;
+}
+
+.cell-price, .price-cell { font-size: 14px; }
+
+.cell-total {
+    font-size: 14px;
+    color: var(--pnw-forest-deep, #1f4922);
+    background: var(--pnw-mist, #e8eee7);
+}
+
+.cell-qty {
+    background: var(--pnw-fog, #f4f6f3);
+    color: var(--pnw-pine, #1a3517);
+}
+
+/* one grand-total size across the trio (EMB footer already sits at 20px) */
+.grand-total-row .value { font-size: 20px; }
+
+/* DTG proved 36px cells at laptop widths; the trio never adopted them.
+   Reclaims ~40-70px of table height on a 10-row order. */
+.cell-input, .cell-select { height: 36px; }
+
+/* Guided mode: the step bar pins at top:8px (~48px tall) — keep the sticky
+   thead below it instead of sliding underneath. */
+body.guided-on .product-table thead th { top: 64px; }

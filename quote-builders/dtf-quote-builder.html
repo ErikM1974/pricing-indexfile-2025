@@ -10,6 +10,7 @@
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><!-- PNW shell typography (expert audit 2026-07-07): DTG loaded Inter, the trio never did -->
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -21,26 +22,26 @@
     <script src="/config/app.config.js"></script>
 
     <!-- Quote Builder Common Styles (loads FIRST — base styles) -->
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=2026.07.07.2">
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=2026.07.07.7">
 
     <!-- Quote Builder Shell (Phase 2a — PNW palette + tokens; overrides common's legacy --builder-* tokens) -->
     <link rel="stylesheet" href="/shared_components/css/quote-builder-shell.css?v=2026.06.05.5">
 
     <!-- Guided Quote shell (Phase B, 2026-07-07) -->
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-guided.css?v=2026.07.07.3">
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-guided.css?v=2026.07.07.7">
 
     <!-- DTF Quote Builder Styles (overrides common + shell) -->
-    <link rel="stylesheet" href="/shared_components/css/dtf-quote-builder.css?v=2026.06.14.7">
-    <link rel="stylesheet" href="/shared_components/css/quote-print.css?v=20250911">
-    <link rel="stylesheet" href="/shared_components/css/color-picker-shared.css?v=20260106">
-    <link rel="stylesheet" href="/shared_components/css/quote-share-modal.css?v=20260113">
+    <link rel="stylesheet" href="/shared_components/css/dtf-quote-builder.css?v=2026.07.07.7">
+    <link rel="stylesheet" href="/shared_components/css/quote-print.css?v=2026.07.07.7">
+    <link rel="stylesheet" href="/shared_components/css/color-picker-shared.css?v=2026.07.07.7">
+    <link rel="stylesheet" href="/shared_components/css/quote-share-modal.css?v=2026.07.07.7">
     <link rel="stylesheet" href="/shared_components/css/customer-lookup.css?v=2026.05.26.1">
     <link rel="stylesheet" href="/shared_components/css/safety-stripe-recs.css?v=2026.06.28.4">
     <script src="/shared_components/js/quote-builder-base.js?v=20250911"></script>
     <script src="/shared_components/js/quote-formatter.js?v=20250911"></script>
     <script src="/shared_components/js/product-thumbnail-modal.js?v=20260424"></script>
 </head>
-<body class="dtf-builder"><!-- scoping hook for Option C page-flow overrides (2026-06-07) -->
+<body class="dtf-builder qb-shell-body"><!-- qb-shell-body: 2026 PNW shell (Inter + tabular numerals + birch ground) — built 2026-06, had ZERO adopters until 2026-07-07 (expert audit) --><!-- scoping hook for Option C page-flow overrides (2026-06-07) -->
     <!-- Loading Overlay -->
     <div id="loading-overlay" class="loading-overlay">
         <div class="loading-spinner"></div>
@@ -97,19 +98,19 @@
                         </label>
                         <label class="location-radio">
                             <input type="radio" name="front-location" value="left-chest" data-size="Small">
-                            <span>Left Chest <small>(5"x5")</small></span>
+                            <span>Left Chest <small>(up to 5"x5")</small></span>
                         </label>
                         <label class="location-radio">
                             <input type="radio" name="front-location" value="right-chest" data-size="Small">
-                            <span>Right Chest <small>(5"x5")</small></span>
+                            <span>Right Chest <small>(up to 5"x5")</small></span>
                         </label>
                         <label class="location-radio">
                             <input type="radio" name="front-location" value="center-front" data-size="Medium">
-                            <span>Center Front <small>(9"x12")</small></span>
+                            <span>Center Front <small>(up to 9"x12")</small></span>
                         </label>
                         <label class="location-radio">
                             <input type="radio" name="front-location" value="full-front" data-size="Large">
-                            <span>Full Front <small>(12"x16.5")</small></span>
+                            <span>Full Front <small>(up to 12"x16.5")</small></span>
                         </label>
                     </div>
 
@@ -122,15 +123,15 @@
                         </label>
                         <label class="location-radio">
                             <input type="radio" name="back-location" value="back-of-neck" data-size="Small">
-                            <span>Back of Neck <small>(5"x5")</small></span>
+                            <span>Back of Neck <small>(up to 5"x5")</small></span>
                         </label>
                         <label class="location-radio">
                             <input type="radio" name="back-location" value="center-back" data-size="Medium">
-                            <span>Center Back <small>(9"x12")</small></span>
+                            <span>Center Back <small>(up to 9"x12")</small></span>
                         </label>
                         <label class="location-radio">
                             <input type="radio" name="back-location" value="full-back" data-size="Large">
-                            <span>Full Back <small>(12"x16.5")</small></span>
+                            <span>Full Back <small>(up to 12"x16.5")</small></span>
                         </label>
                     </div>
 
@@ -139,11 +140,11 @@
                         <div class="column-header">SLEEVES (add-on)</div>
                         <label class="location-checkbox">
                             <input type="checkbox" name="sleeve-location" value="left-sleeve" data-size="Small">
-                            <span>Left Sleeve <small>(5"x5")</small></span>
+                            <span>Left Sleeve <small>(up to 5"x5")</small></span>
                         </label>
                         <label class="location-checkbox">
                             <input type="checkbox" name="sleeve-location" value="right-sleeve" data-size="Small">
-                            <span>Right Sleeve <small>(5"x5")</small></span>
+                            <span>Right Sleeve <small>(up to 5"x5")</small></span>
                         </label>
                     </div>
                 </div>
@@ -521,7 +522,7 @@
             <!-- Customer Info (moved above Quote Summary 2026-03-23) -->
             <div class="customer-panel" style="padding: 12px 16px; border-bottom: 1px solid #e5e7eb; margin: -16px -16px 16px -16px;">
                 <div class="customer-panel-header" onclick="document.getElementById('dtf-customer-fields').classList.toggle('hidden')" style="margin-bottom: 8px;" tabindex="0" role="button" aria-label="Toggle customer details" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
-                    <h4 style="display: flex; align-items: center; gap: 6px;"><i class="fas fa-user" style="color: #4cb354;"></i> Customer</h4>
+                    <h4 style="display: flex; align-items: center; gap: 6px;"><i class="fas fa-user" style="color: #2e5827;"></i> Customer</h4>
                     <i class="fas fa-chevron-down" style="font-size: 12px; color: #999;"></i>
                 </div>
                 <div id="dtf-customer-fields">
@@ -706,13 +707,13 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- Quote Builder Shared Utilities (2026 consolidation) -->
-    <script src="/shared_components/js/quote-builder-utils.js?v=2026.07.07.2"></script>
+    <script src="/shared_components/js/quote-builder-utils.js?v=2026.07.07.7"></script>
 
     <!-- Exact Match Search Module -->
     <script src="/shared_components/js/exact-match-search.js?v=20251023"></script>
 
     <!-- Shared Quote Share Modal (2026 consolidation) -->
-    <script src="/shared_components/js/quote-share-modal.js?v=20260113"></script>
+    <script src="/shared_components/js/quote-share-modal.js?v=2026.07.07.7"></script>
 
     <!-- DTF Quote Builder Scripts (4 files - consolidated architecture) -->
     <!-- Shared Quote Builder Components (2026 Consolidation) -->
@@ -735,12 +736,12 @@
 
     <!-- Invoice Generator (for professional PDF output) -->
     <script src="/shared_components/js/quote-pricing-data.js?v=2026.06.27.1"></script>
-    <script src="/shared_components/js/embroidery-quote-invoice.js?v=2026.06.27.1"></script>
+    <script src="/shared_components/js/embroidery-quote-invoice.js?v=2026.07.07.7"></script>
 
     <!-- DTF-specific Scripts -->
     <script src="/shared_components/js/product-category-filter.js?v=20260127"></script>
     <script src="/shared_components/js/dtf-pricing-service.js"></script>
-    <script src="/shared_components/js/dtf-quote-pricing.js?v=20260106r"></script>
+    <script src="/shared_components/js/dtf-quote-pricing.js?v=2026.07.07.7"></script>
     <script src="/shared_components/js/dtf-quote-products.js?v=2026.06.11.12"></script>
     <script src="/shared_components/js/dtf-quote-service.js?v=2026.06.11.12"></script>
     <!-- Phase 9 → Phase 11.3 artwork upload (rich mode: design name + per-file placement) -->
@@ -753,7 +754,7 @@
     <!-- [2026-06-08] Shared order-summary band — MUST load before dtf-quote-builder.js (which calls QuoteOrderSummary.configure() at eval) -->
     <script src="/shared_components/js/quote-order-summary.js?v=2026.06.08.12"></script>
     <script src="/shared_components/js/safety-stripe-recs.js?v=2026.06.28.4"></script>
-    <script src="/shared_components/js/dtf-quote-builder.js?v=2026.07.05.2"></script>
+    <script src="/shared_components/js/dtf-quote-builder.js?v=2026.07.07.7"></script>
 
     <!-- Save Success Modal (must be before dtf-quote-page.js which references it) -->
     <div id="save-success-modal" class="save-modal-overlay" style="display: none;">
@@ -804,12 +805,12 @@
     </div>
 
     <!-- Page controller + modal functions (extracted to external JS) -->
-    <script src="/shared_components/js/dtf-quote-page.js?v=2026.07.07.2"></script>
+    <script src="/shared_components/js/dtf-quote-page.js?v=2026.07.07.7"></script>
 
     <!-- Guided Quote shell (Phase B, 2026-07-07) — 4-step flow over the existing
          sections, sidebar stays the price rail; "Show everything" restores the
          workbench. Loads LAST so it recomposes after the builder's own init. -->
-    <script src="/shared_components/js/quote-builder-guided.js?v=2026.07.07.3"></script>
+    <script src="/shared_components/js/quote-builder-guided.js?v=2026.07.07.7"></script>
 
 </body>
 </html>

@@ -5,7 +5,7 @@
 
 class EmbroideryInvoiceGenerator {
     constructor() {
-        this.taxRate = 0.101; // 10.1% WA Sales Tax
+        this.taxRate = 0.102; // Milton WA 10.2% (2026-07-06) — fallback only; builders pass the live rate
         
         this.salesRepMap = {
             'taneisha@nwcustomapparel.com': 'Taneisha Clark',
@@ -121,7 +121,7 @@ class EmbroideryInvoiceGenerator {
             }
             
             body {
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;   /* PNW shell face when the opener loaded it (expert audit 2026-07-07) */
                 color: #333;
                 line-height: 1.6;
             }
@@ -142,7 +142,11 @@ class EmbroideryInvoiceGenerator {
                 body { margin: 0; }
                 .invoice-container { padding: 0; }
                 .invoice-header { page-break-inside: avoid; }
-                .products-table { page-break-inside: avoid; }
+                /* Protect ROWS, not the whole table — forcing an entire 12+ line
+                   table to one page shoved it to page 2 and left page 1 half-empty
+                   on exactly the big B2B quotes that must look best. (2026-07-07) */
+                .products-table tr { page-break-inside: avoid; }
+                .products-table thead { display: table-header-group; }
             }
             
             /* Header */
@@ -151,7 +155,7 @@ class EmbroideryInvoiceGenerator {
                 justify-content: space-between;
                 align-items: start;
                 padding-bottom: 8px;
-                border-bottom: 2px solid #4cb354;
+                border-bottom: 2px solid #2e5827;
                 margin-bottom: 10px;
             }
             
@@ -179,7 +183,7 @@ class EmbroideryInvoiceGenerator {
             .quote-title {
                 font-size: 18px;
                 font-weight: bold;
-                color: #4cb354;
+                color: #2e5827;
                 margin-bottom: 5px;
             }
             
@@ -209,7 +213,7 @@ class EmbroideryInvoiceGenerator {
             .section-title {
                 font-size: 11px;
                 font-weight: bold;
-                color: #4cb354;
+                color: #2e5827;
                 margin-bottom: 3px;
             }
             
@@ -227,7 +231,7 @@ class EmbroideryInvoiceGenerator {
             }
             
             .products-table thead {
-                background: #4cb354;
+                background: #2e5827;
                 color: white;
             }
             
@@ -255,12 +259,12 @@ class EmbroideryInvoiceGenerator {
             .products-table td {
                 padding: 3px;
                 border-bottom: 1px solid #e0e0e0;
-                font-size: 9px;
+                font-size: 10.5px;   /* was 9px — receipt-sized on the artifact customers forward (expert audit 2026-07-07) */
                 vertical-align: top;
             }
             
             .price-breakdown {
-                font-size: 8px;
+                font-size: 10px;
                 line-height: 1.3;
                 color: #666;
             }
@@ -290,7 +294,7 @@ class EmbroideryInvoiceGenerator {
             }
             
             .stitch-count {
-                font-size: 8px;
+                font-size: 10px;
                 color: #666;
                 display: inline;
                 margin-left: 3px;
@@ -298,7 +302,7 @@ class EmbroideryInvoiceGenerator {
             
             .size-breakdown {
                 font-family: 'Courier New', monospace;
-                font-size: 9px;
+                font-size: 10px;
                 word-break: break-word;
                 line-height: 1.2;
             }
@@ -331,13 +335,13 @@ class EmbroideryInvoiceGenerator {
                 color: #666;
             }
             
-            .total-row.grand-total {
-                border-top: 2px solid #4cb354;
+            .total-row.grand-total {   /* the number the customer is looking for */
+                border-top: 2px solid #2e5827;
                 padding-top: 10px;
                 margin-top: 5px;
-                font-size: 16px;
+                font-size: 18px;
                 font-weight: bold;
-                color: #4cb354;
+                color: #2e5827;
             }
             
             /* Footer */
@@ -354,7 +358,7 @@ class EmbroideryInvoiceGenerator {
             .footer-title {
                 font-size: 12px;
                 font-weight: bold;
-                color: #4cb354;
+                color: #2e5827;
                 margin-bottom: 5px;
             }
             
@@ -380,7 +384,7 @@ class EmbroideryInvoiceGenerator {
                 .invoice-container {
                     padding: 0;
                 }
-                .products-table {
+                .products-table tr {
                     page-break-inside: avoid;
                 }
                 .no-print {
@@ -405,10 +409,10 @@ class EmbroideryInvoiceGenerator {
                 margin-bottom: 10px;
             }
             .size-matrix th {
-                background: #4cb354;
+                background: #2e5827;
                 color: white;
                 padding: 5px 3px;
-                font-size: 9px;
+                font-size: 10px;
                 text-align: center;
                 font-weight: 600;
             }
@@ -424,7 +428,7 @@ class EmbroideryInvoiceGenerator {
             .size-matrix td {
                 padding: 5px 3px;
                 border-bottom: 1px solid #e0e0e0;
-                font-size: 9px;
+                font-size: 10px;
                 vertical-align: middle;
             }
             .size-matrix td.part-cell,
@@ -434,7 +438,7 @@ class EmbroideryInvoiceGenerator {
                 padding-left: 6px;
             }
             .size-matrix td.desc-cell {
-                font-size: 8px;
+                font-size: 10px;
                 max-width: 180px;
                 overflow: hidden;
                 text-overflow: ellipsis;
@@ -456,7 +460,7 @@ class EmbroideryInvoiceGenerator {
             .size-matrix tr.totals-row {
                 background: #f0f0f0;
                 font-weight: 600;
-                border-top: 2px solid #4cb354;
+                border-top: 2px solid #2e5827;
             }
             .size-matrix tr.totals-row td {
                 padding-top: 8px;
@@ -474,13 +478,13 @@ class EmbroideryInvoiceGenerator {
                 color: #333;
             }
             .price-legend {
-                font-size: 9px;
+                font-size: 10px;
                 color: #666;
                 margin: 8px 0 15px 0;
                 padding: 6px 10px;
                 background: #f8f9fa;
                 border-radius: 3px;
-                border-left: 3px solid #4cb354;
+                border-left: 3px solid #2e5827;
             }
             @media print {
                 .size-matrix tr {
@@ -778,7 +782,7 @@ class EmbroideryInvoiceGenerator {
         }
 
         let specsHTML = `
-            <div class="method-specs" style="margin: 10px 0; padding: 10px; background: #e8f5e9; border: 1px solid #4cb354; border-radius: 5px;">
+            <div class="method-specs" style="margin: 10px 0; padding: 10px; background: #e8f5e9; border: 1px solid #2e5827; border-radius: 5px;">
         `;
 
         // ---- Additional Logo (AL) per-piece prices actually charged -------------
@@ -826,7 +830,7 @@ class EmbroideryInvoiceGenerator {
         if (hasLogoConfigs) {
             // GARMENT EMBROIDERY SECTION
             if (pricingData.garmentLogos && pricingData.garmentLogos.length > 0 && pricingData.hasGarments) {
-                specsHTML += `<div style="font-size: 12px; font-weight: bold; color: #4cb354; margin-bottom: 8px;">GARMENT EMBROIDERY:</div>`;
+                specsHTML += `<div style="font-size: 12px; font-weight: bold; color: #2e5827; margin-bottom: 8px;">GARMENT EMBROIDERY:</div>`;
                 specsHTML += this.generateLogoListHTML(pricingData.garmentLogos, alBaseRate, 'garment', logoListOpts);
             }
 
@@ -872,7 +876,7 @@ class EmbroideryInvoiceGenerator {
             }
         } else {
             // Legacy: All logos are garment logos
-            specsHTML += `<div style="font-size: 12px; font-weight: bold; color: #4cb354; margin-bottom: 8px;">EMBROIDERY PACKAGE FOR THIS ORDER:</div>`;
+            specsHTML += `<div style="font-size: 12px; font-weight: bold; color: #2e5827; margin-bottom: 8px;">EMBROIDERY PACKAGE FOR THIS ORDER:</div>`;
             specsHTML += this.generateLogoListHTML(pricingData.logos, alBaseRate, 'garment', logoListOpts);
         }
 
@@ -893,7 +897,7 @@ class EmbroideryInvoiceGenerator {
         if (pricingData.ltmFee > 0 && !pricingData.ltmDistributed) {
             const ltmPerPiece = (pricingData.ltmFee / pricingData.totalQuantity).toFixed(2);
             specsHTML += `
-                <div style="font-size: 9px; color: #dc3545; margin-top: 5px; font-style: italic;">
+                <div style="font-size: 10px; color: #dc3545; margin-top: 5px; font-style: italic;">
                     ⚠ Small Batch Fee: +$${ltmPerPiece} per piece (orders under 24)
                 </div>
             `;
@@ -944,7 +948,7 @@ class EmbroideryInvoiceGenerator {
             html += `
                 <div style="font-size: 11px; color: #333; margin: 4px 0;">
                     ✓ <strong>${this.esc(position)}</strong> (${stitchCount.toLocaleString()} stitches)${primaryLogo.designNumber ? ` &middot; Design #${this.esc(primaryLogo.designNumber)}` : ''} -
-                    <span style="color: #4cb354;">BASE (8K INCLUDED)</span>
+                    <span style="color: #2e5827;">BASE (8K INCLUDED)</span>
                 </div>
             `;
 
@@ -1055,7 +1059,7 @@ class EmbroideryInvoiceGenerator {
 
         let tableHTML = `
             <div style="margin: 15px 0;">
-                <div style="font-size: 14px; font-weight: bold; color: #4cb354; margin-bottom: 10px;">
+                <div style="font-size: 14px; font-weight: bold; color: #2e5827; margin-bottom: 10px;">
                     👕 Products (${totalPieces} pieces total)
                 </div>
                 <table class="products-table">
@@ -1303,7 +1307,7 @@ class EmbroideryInvoiceGenerator {
         // Build header
         let tableHTML = `
             <div style="margin: 15px 0;">
-                <div style="font-size: 14px; font-weight: bold; color: #4cb354; margin-bottom: 10px;">
+                <div style="font-size: 14px; font-weight: bold; color: #2e5827; margin-bottom: 10px;">
                     Products
                 </div>
                 <table class="size-matrix">
@@ -1345,7 +1349,7 @@ class EmbroideryInvoiceGenerator {
                     <tr class="product-row service-row" style="background: ${isCap ? '#eff6ff' : '#fffbeb'};">
                         <td class="part-cell" style="font-weight: 600; color: ${isCap ? '#1e40af' : '#92400e'};">${this.esc(serviceType)}</td>
                         <td class="desc-cell" colspan="2">${this.esc(description)}${position && !String(description).includes(position) ? ' - ' + this.esc(position) : ''}</td>
-                        <td colspan="6" style="text-align: center; color: #94a3b8; font-size: 8px; font-style: italic;">
+                        <td colspan="6" style="text-align: center; color: #94a3b8; font-size: 10px; font-style: italic;">
                             Service item
                         </td>
                         <td class="qty-cell" style="text-align: center;">${quantity}</td>
@@ -1393,7 +1397,7 @@ class EmbroideryInvoiceGenerator {
                     // Base row with extended sizes below - show checkmark in 3XL+
                     sizeColumns.forEach(col => {
                         if (col === '3XL+') {
-                            sizeCells += `<td class="size-cell" style="color: #4cb354; font-weight: bold;">✓</td>`;
+                            sizeCells += `<td class="size-cell" style="color: #2e5827; font-weight: bold;">✓</td>`;
                         } else {
                             // Map legacy formats: LG -> L, XXL -> 2XL
                             let qty = sizes[col];
@@ -1462,7 +1466,7 @@ class EmbroideryInvoiceGenerator {
 
         let tableHTML = `
             <div style="margin: 15px 0;">
-                <div style="font-size: 14px; font-weight: bold; color: #4cb354; margin-bottom: 10px;">
+                <div style="font-size: 14px; font-weight: bold; color: #2e5827; margin-bottom: 10px;">
                     Products
                 </div>
                 <table class="size-matrix">
@@ -1622,7 +1626,7 @@ class EmbroideryInvoiceGenerator {
                     <span>$${adjustedSubtotal.toFixed(2)}</span>
                 </div>` : ''}
                 ${taxAmount > 0 ? `<div class="total-row tax-row">
-                    <span>${Math.abs(Number(taxPct) - 10.1) < 0.01 ? 'WA Sales Tax' : 'Sales Tax'} (${taxPct}%):</span>
+                    <span>Sales Tax (${taxPct}%):</span>
                     <span>$${taxAmount.toFixed(2)}</span>
                 </div>` : ''}
                 <div class="total-row grand-total">

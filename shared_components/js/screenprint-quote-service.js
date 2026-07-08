@@ -5,44 +5,38 @@
 
 class ScreenPrintQuoteService {
     constructor() {
-        this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        this.baseURL = window.APP_CONFIG?.API?.BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
         this.quotePrefix = 'SP';
-        this.taxRate = 0.101; // 10.1% WA sales tax
+        this.taxRate = 0.102; // Milton WA 10.2% (2026-07-06) — fallback only when quoteData.taxRate is absent
         console.log('[ScreenPrintQuoteService] Initialized');
     }
 
     /**
-     * Generate unique quote ID with date-based sequence
+     * Generate unique quote ID using the Caspio-backed sequence counter
+     * (format SP-2026-001; resets annually, persists across sessions/browsers).
+     * The old sessionStorage daily counter restarted at 1 in every browser, so
+     * two reps (or two tabs) could mint the SAME QuoteID on the same day — the
+     * shared /quote link, edit-load, and push then resolve the OTHER customer's
+     * quote. Same migration DTF/EMB made 2026-06-11. (expert audit 2026-07-07)
      */
-    generateQuoteID() {
-        const now = new Date();
-        const month = (now.getMonth() + 1).toString().padStart(2, '0');
-        const day = now.getDate().toString().padStart(2, '0');
-        const dateKey = `${month}${day}`;
-        
-        // Daily sequence reset using sessionStorage
-        const storageKey = `${this.quotePrefix}_quote_sequence_${dateKey}`;
-        let sequence = parseInt(sessionStorage.getItem(storageKey) || '0') + 1;
-        sessionStorage.setItem(storageKey, sequence.toString());
-        
-        // Clean up old sequences
-        this.cleanupOldSequences(dateKey);
-        
-        return `${this.quotePrefix}${dateKey}-${sequence}`;
-    }
-
-    /**
-     * Clean up old sequence keys from sessionStorage
-     */
-    cleanupOldSequences(currentDateKey) {
-        const keysToRemove = [];
-        for (let i = 0; i < sessionStorage.length; i++) {
-            const key = sessionStorage.key(i);
-            if (key && key.startsWith(`${this.quotePrefix}_quote_sequence_`) && !key.includes(currentDateKey)) {
-                keysToRemove.push(key);
+    async generateQuoteID() {
+        try {
+            const response = await fetch(`${this.baseURL}/api/quote-sequence/${this.quotePrefix}`);
+            if (!response.ok) throw new Error(`API returned ${response.status}`);
+            const { prefix, year, sequence } = await response.json();
+            return `${prefix}-${year}-${String(sequence).padStart(3, '0')}`;
+        } catch (error) {
+            // Visible fallback (Erik's #1 rule) — random suffix, NOT a per-browser counter
+            console.warn('[ScreenPrintQuoteService] Quote sequence API failed, using fallback:', error);
+            if (typeof showToast === 'function') {
+                showToast('Quote numbering service unreachable — using a temporary quote # (format SPmmdd-nnnn).', 'warning', 6000);
             }
+            const now = new Date();
+            const month = (now.getMonth() + 1).toString().padStart(2, '0');
+            const day = now.getDate().toString().padStart(2, '0');
+            const sequence = Math.floor(Math.random() * 9000) + 1000;
+            return `${this.quotePrefix}${month}${day}-${sequence}`;
         }
-        keysToRemove.forEach(key => sessionStorage.removeItem(key));
     }
 
     /**
@@ -57,7 +51,7 @@ class ScreenPrintQuoteService {
      */
     async saveQuote(quoteData) {
         try {
-            const quoteID = this.generateQuoteID();
+            const quoteID = await this.generateQuoteID();  // async now (server sequence)
             const sessionID = this.generateSessionID();
             
             console.log('[ScreenPrintQuoteService] Saving quote:', quoteID);
@@ -171,7 +165,7 @@ class ScreenPrintQuoteService {
                 LTM_Display_Mode: quoteData.ltmDisplayMode || 'builtin',
                 LTM_Waived: quoteData.ltmWaived ? true : false,
                 // Tax rate (2026-03-23)
-                TaxRate: Number.isFinite(parseFloat(quoteData.taxRate)) ? parseFloat(quoteData.taxRate) : 10.1,  // [2026-06-08] P0: NOT `|| 10.1` — an exempt/0% quote (rate 0) is falsy and was stored as 10.1, re-taxing via the /quote+/invoice mirror + push GL
+                TaxRate: Number.isFinite(parseFloat(quoteData.taxRate)) ? parseFloat(quoteData.taxRate) : 10.2,  // [2026-06-08] P0: NOT `|| rate` — an exempt/0% quote (rate 0) is falsy and was stored as 10.1, re-taxing via the /quote+/invoice mirror + push GL
                 // Tax amount — informational, drives the ShopWorks push tax note
                 // (was never persisted → note always read "$0.00"). (2026-06-01)
                 TaxAmount: salesTax,
@@ -493,7 +487,7 @@ class ScreenPrintQuoteService {
                 LTM_Display_Mode: quoteData.ltmDisplayMode || 'builtin',
                 LTM_Waived: quoteData.ltmWaived ? true : false,
                 // Tax rate (2026-03-23)
-                TaxRate: Number.isFinite(parseFloat(quoteData.taxRate)) ? parseFloat(quoteData.taxRate) : 10.1,  // [2026-06-08] P0: NOT `|| 10.1` — an exempt/0% quote (rate 0) is falsy and was stored as 10.1, re-taxing via the /quote+/invoice mirror + push GL
+                TaxRate: Number.isFinite(parseFloat(quoteData.taxRate)) ? parseFloat(quoteData.taxRate) : 10.2,  // [2026-06-08] P0: NOT `|| rate` — an exempt/0% quote (rate 0) is falsy and was stored as 10.1, re-taxing via the /quote+/invoice mirror + push GL
                 // Tax amount — informational, drives the ShopWorks push tax note
                 // (was never persisted → note always read "$0.00"). (2026-06-01)
                 TaxAmount: salesTax,
