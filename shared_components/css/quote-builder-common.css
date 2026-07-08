@@ -4015,3 +4015,90 @@ body.guided-on .product-table thead th { top: 64px; }
 }
 .btn-rush-percent:hover { background: var(--pnw-forest, #2e5827); color: #fff; border-color: var(--pnw-forest, #2e5827); }
 .btn-rush-percent:focus-visible { outline: 2px solid var(--builder-primary, #2e5827); outline-offset: 1px; }
+
+/* Logo status chips — On file / New / TBD (Erik 2026-07-07) */
+.logo-status-chips {
+    margin: 0 0 12px;
+    padding: 10px 12px;
+    border: 1px solid var(--pnw-rule, rgba(31, 73, 34, 0.1));
+    border-radius: var(--qb-radius-md, 8px);
+    background: var(--pnw-paper, #fff);
+}
+.logo-status-chips .lsc-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.logo-status-chips .lsc-label {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--pnw-forest-deep, #1f4922);
+    white-space: nowrap;
+}
+.logo-status-chips .lsc-group {
+    display: inline-flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+.logo-status-chips .lsc-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid var(--pnw-rule, #d1d5db);
+    background: var(--pnw-fog, #f4f6f3);
+    color: var(--pnw-bark-shadow, #374151);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.logo-status-chips .lsc-chip:hover { border-color: var(--pnw-forest, #2e5827); color: var(--pnw-forest-deep, #1f4922); }
+.logo-status-chips .lsc-chip.active {
+    background: var(--pnw-forest, #2e5827);
+    border-color: var(--pnw-forest, #2e5827);
+    color: #fff;
+}
+.logo-status-chips .lsc-chip:focus-visible { outline: 2px solid var(--builder-primary, #2e5827); outline-offset: 1px; }
+.logo-status-chips .lsc-assumption {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    margin-top: 10px;
+    padding: 9px 12px;
+    border: 1px dashed var(--qb-state-warn, #f59e0b);
+    border-radius: var(--qb-radius-md, 8px);
+    background: var(--qb-state-warn-bg, #fef3c7);
+    color: var(--pnw-bark-shadow, #374151);
+    font-size: 12.5px;
+    line-height: 1.5;
+}
+.logo-status-chips .lsc-assumption .fa-triangle-exclamation { color: var(--qb-state-warn, #f59e0b); margin-top: 2px; }
+.logo-status-chips .lsc-refresh {
+    flex-shrink: 0;
+    align-self: center;
+    border: 1px solid var(--qb-state-warn, #f59e0b);
+    background: var(--pnw-paper, #fff);
+    color: var(--pnw-bark-shadow, #374151);
+    border-radius: 5px;
+    padding: 3px 9px;
+    font-size: 11.5px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.logo-status-chips .lsc-refresh:hover { background: var(--qb-state-warn, #f59e0b); color: #fff; }
+
+/* Non-blocking TBD warning row in the push checklist */
+.pr-item.pr-warn {
+    color: var(--pnw-bark-shadow, #374151);
+    background: var(--qb-state-warn-bg, #fef3c7);
+    border-radius: 5px;
+    padding: 4px 8px;
+    margin-top: 4px;
+    font-weight: 600;
+}
+.pr-item.pr-warn .fa-triangle-exclamation { color: var(--qb-state-warn, #f59e0b); }

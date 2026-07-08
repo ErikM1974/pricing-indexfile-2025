@@ -233,6 +233,22 @@ class DTFQuoteBuilder {
         this.setupSearchListeners();
         this.setupGlobalListeners();
 
+        // Logo status chips — On file / New / TBD (Erik 2026-07-07). DTF's TBD
+        // assumption is the TRANSFER SIZE, already implied by the location picks.
+        if (typeof initLogoStatusChips === 'function') {
+            initLogoStatusChips({
+                mountSel: '.location-config-section.reference-artwork-section',
+                artworkMountSel: '#dtf-artwork-mount',
+                designFocusId: 'design-number',
+                notesSel: '#dtf-notes',
+                assumption: () => {
+                    const loc = document.getElementById('location-display')?.textContent?.trim();
+                    const locText = (loc && loc !== 'None selected') ? loc : 'the selected print locations';
+                    return `Pricing assumes transfers at: ${locText}. Final transfer sizes are confirmed after artwork review.`;
+                }
+            });
+        }
+
         // Mid-call method-switch menu (expert audit 2026-07-07) — serializes
         // IDENTITY only (customer + style/color/sizes); target reprices natively.
         if (typeof initMethodSwitchMenu === 'function') {

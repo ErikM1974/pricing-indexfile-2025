@@ -1125,7 +1125,13 @@ function renderPushChecklist(el, blockers) {
              title="Click to jump to this field"
              style="background:none;border:none;font:inherit;color:inherit;cursor:pointer;width:100%;text-align:left;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:2px;">
              <i class="fas fa-circle"></i>${b.label}</button>`;
-    el.innerHTML = '<div class="pr-title">Before you push</div>' + blockers.map(item).join('');
+    // Logo TBD = NON-blocking warning (2026-07-07): quoting on an assumption is
+    // fine, but nobody should start a production order on art we've never seen
+    // without a deliberate look at this line first.
+    const tbdWarn = (typeof window !== 'undefined' && window._logoStatus === 'tbd')
+        ? '<div class="pr-item pr-warn"><i class="fas fa-triangle-exclamation"></i> Artwork TBD — confirm the logo before pushing to production</div>'
+        : '';
+    el.innerHTML = '<div class="pr-title">Before you push</div>' + blockers.map(item).join('') + tbdWarn;
     if (!el.dataset.prFocusWired) {
         el.dataset.prFocusWired = '1';
         el.addEventListener('click', (e) => {
@@ -2112,6 +2118,139 @@ function saveQuotePdf() {
     }
 }
 if (typeof window !== 'undefined') window.saveQuotePdf = saveQuotePdf;
+
+// ============================================================
+// Logo status — On file / New / TBD (Erik 2026-07-07)
+// ============================================================
+// Three real-world logo states a quote starts from: (1) design on file →
+// design-# lookup; (2) new logo → upload + (EMB) auto new-logo setup; (3) TBD —
+// the customer wants a number before we've seen the art. The expert rule for
+// TBD: you can quote without art, but NEVER without a stated assumption. The
+// assumption is written as an "ARTWORK TBD:" line into the builder's notes
+// field, which already saves, prints on the PDF, rides the email, and restores
+// on edit-load — zero schema changes. The push checklist adds a NON-blocking
+// warning while TBD is active. Chips start neutral (no behavior change until a
+// rep opts in); clicking the active chip again returns to neutral.
+
+const LOGO_TBD_MARKER = 'ARTWORK TBD:';
+
+function initLogoStatusChips(cfg) {
+    const mountHost = document.querySelector(cfg.mountSel);
+    if (!mountHost || document.getElementById('logo-status-chips')) return;
+
+    const wrap = document.createElement('div');
+    wrap.id = 'logo-status-chips';
+    wrap.className = 'logo-status-chips';
+    wrap.innerHTML =
+        '<div class="lsc-row">' +
+        '  <span class="lsc-label"><i class="fas fa-shapes" aria-hidden="true"></i> Logo</span>' +
+        '  <div class="lsc-group" role="group" aria-label="Logo status">' +
+        '    <button type="button" class="lsc-chip" data-status="onfile" title="We already have this design — link it by design #"><i class="fas fa-folder-open"></i> On file</button>' +
+        '    <button type="button" class="lsc-chip" data-status="new" title="New logo — attach the customer&#39;s art file"><i class="fas fa-upload"></i> New — upload</button>' +
+        '    <button type="button" class="lsc-chip" data-status="tbd" title="Haven&#39;t seen the logo yet — quote on a stated assumption"><i class="fas fa-circle-question"></i> TBD — quote first</button>' +
+        '  </div>' +
+        '</div>' +
+        '<div class="lsc-assumption" id="logo-assumption-panel" style="display:none;"></div>';
+    mountHost.insertAdjacentElement('afterbegin', wrap);
+
+    const notesEl = () => document.querySelector(cfg.notesSel);
+    const artworkMount = () => (cfg.artworkMountSel ? document.querySelector(cfg.artworkMountSel) : null);
+    const designGroup = () => {
+        if (!cfg.designFocusId) return null;
+        const d = document.getElementById(cfg.designFocusId);
+        return d ? (d.closest('.design-number-input-group') || null) : null;
+    };
+
+    function writeNotesLine(text) {
+        const n = notesEl();
+        if (!n) return;
+        stripNotesLine();
+        const line = LOGO_TBD_MARKER + ' ' + text;
+        n.value = n.value.trim() ? (n.value.replace(/\s+$/, '') + '\n' + line) : line;
+        n.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    function stripNotesLine() {
+        const n = notesEl();
+        if (!n || !n.value.includes(LOGO_TBD_MARKER)) return;
+        n.value = n.value.split(/\r?\n/).filter(l => !l.trim().startsWith(LOGO_TBD_MARKER)).join('\n').replace(/\s+$/, '');
+        n.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+    function savedNotesLineText() {
+        const n = notesEl();
+        const line = n && n.value.split(/\r?\n/).find(l => l.trim().startsWith(LOGO_TBD_MARKER));
+        return line ? line.trim().slice(LOGO_TBD_MARKER.length).trim() : null;
+    }
+
+    function renderPanel(text) {
+        const panel = document.getElementById('logo-assumption-panel');
+        panel.innerHTML =
+            '<i class="fas fa-triangle-exclamation" aria-hidden="true"></i> ' +
+            '<span><strong>Quoting before artwork.</strong> <span class="lsc-a-text"></span> ' +
+            'This line prints on the quote and rides the email.</span> ' +
+            '<button type="button" class="lsc-refresh" title="Rebuild the assumption from the selections currently on screen">Update from current selections</button>';
+        panel.querySelector('.lsc-a-text').textContent = text;
+        panel.querySelector('.lsc-refresh').onclick = () => {
+            const fresh = cfg.assumption();
+            writeNotesLine(fresh);
+            panel.querySelector('.lsc-a-text').textContent = fresh;
+            if (typeof showToast === 'function') showToast('Assumption updated on the quote notes.', 'success', 2500);
+        };
+        panel.style.display = '';
+    }
+
+    function setStatus(status, opts) {
+        opts = opts || {};
+        window._logoStatus = status;
+        wrap.querySelectorAll('.lsc-chip').forEach(b => b.classList.toggle('active', b.dataset.status === status));
+        const art = artworkMount();
+        const dg = designGroup();
+        const panel = document.getElementById('logo-assumption-panel');
+
+        if (status === null) {
+            if (art) art.style.display = '';
+            if (dg) dg.style.display = '';
+            panel.style.display = 'none';
+            stripNotesLine();
+            return;
+        }
+        // Artwork upload matters on "new"; the design # group is irrelevant on "tbd".
+        if (art) art.style.display = (status === 'tbd') ? 'none' : '';
+        if (dg) dg.style.display = (status === 'tbd') ? 'none' : '';
+
+        if (status === 'tbd') {
+            const text = (opts.restore && savedNotesLineText()) || cfg.assumption();
+            if (!opts.restore) writeNotesLine(text);
+            renderPanel(text);
+        } else {
+            panel.style.display = 'none';
+            stripNotesLine();
+        }
+        if (status === 'onfile' && !opts.restore && cfg.designFocusId) {
+            const d = document.getElementById(cfg.designFocusId);
+            if (d) {
+                try { d.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (_) { }
+                d.focus();
+            }
+        }
+        if (status === 'new' && !opts.restore && typeof cfg.onNew === 'function') {
+            try { cfg.onNew(); } catch (e) { console.warn('[LogoStatus] onNew hook failed', e); }
+        }
+        if (!opts.restore && typeof markAsUnsaved === 'function') markAsUnsaved();
+    }
+
+    wrap.querySelector('.lsc-group').addEventListener('click', (e) => {
+        const chip = e.target.closest('.lsc-chip');
+        if (!chip) return;
+        setStatus(window._logoStatus === chip.dataset.status ? null : chip.dataset.status);
+    });
+
+    // Edit-load restore: a saved "ARTWORK TBD:" line re-arms the chip. Delayed
+    // twice because edit-load populates the notes field asynchronously.
+    [1200, 3500].forEach(ms => setTimeout(() => {
+        if (!window._logoStatus && savedNotesLineText() !== null) setStatus('tbd', { restore: true });
+    }, ms));
+}
+if (typeof window !== 'undefined') window.initLogoStatusChips = initLogoStatusChips;
 
 // ============================================================
 // "Recent orders" panel after customer selection (item #13, 2026-07-05)
