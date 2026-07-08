@@ -4203,3 +4203,26 @@ body.guided-on .product-table thead th { top: 64px; }
     background: #f8fafc;
 }
 .qb-empty-state-emoji { font-size: 32px; margin-bottom: 12px; }
+
+/* 1.8 stage 2: skip link — visually hidden until keyboard-focused */
+.qb-skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 8px;
+    z-index: 10001;
+    background: var(--pnw-forest, #1f4922);
+    color: #fff;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-weight: 600;
+    text-decoration: none;
+}
+.qb-skip-link:focus {
+    left: 8px;
+}
+/* h1 wears the existing title class — neutralize UA heading styles */
+h1.power-header-title {
+    /* only neutralize UA heading margin — the .power-header-title class
+       rule keeps styling size/weight exactly as the old div */
+    margin: 0;
+}

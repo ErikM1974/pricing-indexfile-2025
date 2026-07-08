@@ -15,7 +15,7 @@
  */
 // @ts-nocheck — MOVED legacy DOM code: pre-existing checkJs frictions; typing
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
-/* global escapeHtml, showToast, showLoading,
+/* global openAccessibleModal, closeAccessibleModal, escapeHtml, showToast, showLoading,
    getLtmControlState, parseRatePercent, markAsSaved, updateEditModeUI,
    QuoteShareModal, renderPushChecklist, getPushBlockers, hasUnsavedChanges */
 import { getServicePrice } from './pricing.js';
@@ -673,6 +673,7 @@ export async function openPushPreview() {
     confirmBtn.dataset.force = 'false';
     confirmBtn.innerHTML = '<i class="fas fa-upload"></i> Push to ShopWorks';
     modal.classList.add('active');
+    if (typeof openAccessibleModal === 'function') openAccessibleModal(modal, { label: 'Push to ShopWorks preview', onEsc: closePushPreview }); // 1.8: focus trap + Esc
 
     // P2-16 (audit 2026-06-06): focus management for the load-bearing push-confirm modal — remember the
     // opener, move focus into the modal, trap Tab inside it, and close on Escape (a11y; stops focus leaking
@@ -943,6 +944,7 @@ export async function verifyShopWorksImport(extOrderId) {
 export function closePushPreview() {
     const modal = document.getElementById('emb-sw-push-modal');
     if (modal) modal.classList.remove('active');
+    if (typeof closeAccessibleModal === 'function') closeAccessibleModal(modal); // 1.8: restore focus
     // P2-16: restore focus to whatever opened the modal (a11y — focus must not vanish to <body>).
     try { if (window._pushModalOpener && window._pushModalOpener.focus) window._pushModalOpener.focus(); } catch (_) {}
 }

@@ -411,6 +411,34 @@ if (process.env.ENABLE_MONITORING === 'true') {
 }
 
 // =============================================================================
+// OBSERVABILITY: structured JSON request logs + correlation ids (roadmap 1.12)
+// =============================================================================
+// Every request gets a UUID (or honors an inbound X-Request-Id), logged as one
+// JSON line and echoed back as X-Request-Id — given a failure time, one id
+// greps the path across this app AND the proxy (which honors the same header).
+// Static/asset traffic is not auto-logged (Heroku log-volume sanity); handlers
+// can use req.log.info/error for structured route-level logging. Legacy
+// console.log lines still interleave — they migrate opportunistically.
+const pinoHttp = require('pino-http');
+app.use(
+  pinoHttp({
+    genReqId: (req, res) => {
+      const id = req.headers['x-request-id'] || crypto.randomUUID();
+      res.setHeader('X-Request-Id', id);
+      return id;
+    },
+    customProps: () => ({ tenant: process.env.TENANT_ID || 'nwca', release: process.env.HEROKU_SLUG_COMMIT ? process.env.HEROKU_SLUG_COMMIT.slice(0, 7) : 'dev' }),
+    autoLogging: {
+      ignore: (req) =>
+        req.url.startsWith('/dist/') ||
+        req.url.startsWith('/shared_components/') ||
+        /\.(css|js|png|jpg|svg|woff2?|ttf|ico|map)(\?|$)/.test(req.url),
+    },
+    redact: ['req.headers.authorization', 'req.headers.cookie'],
+  })
+);
+
+// =============================================================================
 // SECURITY: HTTP security headers (helmet — roadmap 1.1)
 // =============================================================================
 // Mounted at the very top of the middleware stack so every response (static

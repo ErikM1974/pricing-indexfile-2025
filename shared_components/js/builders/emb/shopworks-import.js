@@ -18,7 +18,7 @@
  */
 // @ts-nocheck — MOVED legacy DOM code: pre-existing checkJs frictions; typing
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
-/* global reorderRowByProductType, escapeHtml, showToast,
+/* global openAccessibleModal, closeAccessibleModal, reorderRowByProductType, escapeHtml, showToast,
    createOrUpdateExtendedChildRow, ShopWorksImportParser, updateArtworkCharges,
    Event, APP_CONFIG, setLtmControlState, markAsUnsaved */
 import { showServicePricingReview, getSprEmbConfigOptions } from './spr-modal.js';
@@ -66,6 +66,7 @@ function hideImportProgress() {
 export function openShopWorksImportModal() {
     const modal = document.getElementById('shopworks-import-modal');
     modal.classList.add('active');
+    if (typeof openAccessibleModal === 'function') openAccessibleModal(modal, { label: 'Paste from ShopWorks', onEsc: closeShopWorksImportModal }); // 1.8
 
     // Reset state
     document.getElementById('shopworks-paste-area').value = '';
@@ -86,6 +87,7 @@ export function openShopWorksImportModal() {
 export function closeShopWorksImportModal() {
     const modal = document.getElementById('shopworks-import-modal');
     modal.classList.remove('active');
+    if (typeof closeAccessibleModal === 'function') closeAccessibleModal(modal); // 1.8
     embState.pendingShopWorksImport = null;
 }
 

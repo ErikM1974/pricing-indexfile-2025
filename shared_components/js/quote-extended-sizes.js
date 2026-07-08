@@ -54,6 +54,7 @@
         // Show popup with loading state
         popup.classList.remove('hidden');
         backdrop.classList.remove('hidden');
+        if (typeof openAccessibleModal === 'function') openAccessibleModal(popup, { label: 'Extended sizes', onEsc: window.closeExtendedSizePopup }); // 1.8
         applyBtn.disabled = true;
 
         // Check if this is a pants or shorts product (use stored sizes directly)
@@ -206,6 +207,7 @@
 
         popup.classList.add('hidden');
         backdrop.classList.add('hidden');
+        if (typeof closeAccessibleModal === 'function') closeAccessibleModal(popup); // 1.8
         popup.dataset.rowId = '';
     };
 

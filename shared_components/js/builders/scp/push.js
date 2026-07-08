@@ -5,7 +5,7 @@
  * Push state (_scpPushQuoteId/_scpPushInFlight) lives on scpState since S2.
  */
 // @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions; typing lands with the render/state split).
-/* global saveAndGetLink, escapeHtml, showToast,
+/* global openAccessibleModal, closeAccessibleModal, saveAndGetLink, escapeHtml, showToast,
    renderBuilderPushReadiness, collectProductsFromTable, confirm */
 import { scpState } from './state.js';
 
@@ -89,6 +89,7 @@ export async function openScpPushPreview() {
     confirmBtn.style.opacity = '0.6';
     confirmBtn.innerHTML = '<i class="fas fa-upload"></i> Push to ShopWorks';
     modal.classList.add('show');
+    if (typeof openAccessibleModal === 'function') openAccessibleModal(modal, { label: 'Push to ShopWorks preview', onEsc: closeScpPushPreview }); // 1.8
 
     try {
         const apiBase = window.APP_CONFIG.API.BASE_URL;
@@ -214,6 +215,7 @@ export async function confirmScpPush(directFallback) {
 export function closeScpPushPreview() {
     const modal = document.getElementById('scp-push-modal');
     if (modal) modal.classList.remove('show');
+    if (typeof closeAccessibleModal === 'function') closeAccessibleModal(modal); // 1.8
 }
 
 // NOTE: scpPushToShopWorks (async, auto-save → preview) is declared above near the

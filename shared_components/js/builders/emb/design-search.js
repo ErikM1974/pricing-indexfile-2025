@@ -23,7 +23,7 @@
 // checkJs frictions (.value/.dataset/expandos on HTMLElement). Typing lands
 // when this cluster's render/state split happens (see emb-decomposition-plan.md
 // follow-ups); new builders/** modules stay strictly checked.
-/* global
+/* global openAccessibleModal, closeAccessibleModal,
    updatePushButtonState, escapeHtml, showToast, DesignThumbnailService, renderOrderRecap */
 // (addExtraColorSurchargeRow is also a seam, but only inside generated onclick markup —
 import { lookupTaxRate } from './pricing-sync.js';
@@ -671,7 +671,7 @@ export function openDesignSearchModal(type) {
             searchInput._galleryMode = true;
         }
         // Show modal then load gallery
-        if (modal) { modal.classList.add('active'); modal.style.display = 'flex'; }
+        if (modal) { modal.classList.add('active'); modal.style.display = 'flex'; if (typeof openAccessibleModal === 'function') openAccessibleModal(modal, { label: 'Design search', onEsc: closeDesignSearchModal }); }
         setTimeout(() => { if (searchInput) searchInput.focus(); }, 100);
         loadCustomerDesignGallery(customerId);
     } else {
@@ -684,7 +684,7 @@ export function openDesignSearchModal(type) {
             searchInput.placeholder = 'Search by company name or design number...';
             searchInput._galleryMode = false;
         }
-        if (modal) { modal.classList.add('active'); modal.style.display = 'flex'; }
+        if (modal) { modal.classList.add('active'); modal.style.display = 'flex'; if (typeof openAccessibleModal === 'function') openAccessibleModal(modal, { label: 'Design search', onEsc: closeDesignSearchModal }); }
         setTimeout(() => { if (searchInput) searchInput.focus(); }, 100);
     }
 }
@@ -695,6 +695,7 @@ export function openDesignSearchModal(type) {
 export function closeDesignSearchModal() {
     const modal = document.getElementById('design-search-modal');
     if (modal) {
+        if (typeof closeAccessibleModal === 'function') closeAccessibleModal(modal); // 1.8
         modal.classList.remove('active');
         modal.classList.remove('gallery-mode');
         modal.style.display = 'none';

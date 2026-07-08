@@ -2063,7 +2063,12 @@ function setRepricingIndicator(on) {
         }, 300);
     } else {
         if (window._repriceShowTimer) { clearTimeout(window._repriceShowTimer); window._repriceShowTimer = null; }
-        document.getElementById('repricing-indicator')?.remove();
+        const _pill = document.getElementById('repricing-indicator');
+        if (_pill) {
+            _pill.remove();
+            // pill only appears for >300ms reprices — announce completion (1.8)
+            if (typeof announce === 'function') announce('Prices updated');
+        }
     }
 }
 
@@ -2088,6 +2093,87 @@ function wrapWithRepricingIndicator(fn) {
 if (typeof window !== 'undefined') {
     window.setRepricingIndicator = setRepricingIndicator;
     window.wrapWithRepricingIndicator = wrapWithRepricingIndicator;
+}
+
+// ============================================
+// A11Y: LIVE REGION + ACCESSIBLE MODALS (roadmap 1.8 stage 2)
+// ============================================
+// One polite live region per page; announce() routes dynamic updates
+// (reprices, saves, copies) to screen readers without stealing focus.
+function ensureLiveRegion() {
+    let el = document.getElementById('qb-live');
+    if (!el) {
+        el = document.createElement('div');
+        el.id = 'qb-live';
+        el.className = 'sr-only';
+        el.setAttribute('role', 'status');
+        el.setAttribute('aria-live', 'polite');
+        el.setAttribute('aria-atomic', 'true');
+        document.body.appendChild(el);
+    }
+    return el;
+}
+function announce(message) {
+    try {
+        const el = ensureLiveRegion();
+        el.textContent = '';
+        setTimeout(() => { el.textContent = String(message); }, 30);
+    } catch (_) { /* never load-bearing */ }
+}
+
+/**
+ * openAccessibleModal(el, {label, onEsc}) — the ONE dialog behavior for all
+ * builder modals: role/aria-modal, focus moves in (first focusable or
+ * [data-autofocus]), Tab/Shift+Tab trapped, Esc calls onEsc (default: the
+ * paired close), and closeAccessibleModal() restores focus to the opener.
+ * Purely additive on top of each modal's existing show/hide code.
+ */
+function openAccessibleModal(el, opts) {
+    if (!el || el._qbModalOpen) return;
+    opts = opts || {};
+    el._qbModalOpen = true;
+    el._qbPrevFocus = document.activeElement;
+    if (!el.getAttribute('role')) el.setAttribute('role', 'dialog');
+    el.setAttribute('aria-modal', 'true');
+    if (opts.label && !el.getAttribute('aria-label') && !el.getAttribute('aria-labelledby')) {
+        el.setAttribute('aria-label', opts.label);
+    }
+    const focusables = () => el.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    );
+    el._qbKeydown = (e) => {
+        if (e.key === 'Escape') {
+            e.stopPropagation();
+            if (typeof opts.onEsc === 'function') opts.onEsc();
+            else closeAccessibleModal(el);
+            return;
+        }
+        if (e.key !== 'Tab') return;
+        const f = Array.prototype.filter.call(focusables(), (x) => x.offsetParent !== null || x === document.activeElement);
+        if (!f.length) return;
+        const first = f[0], last = f[f.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    };
+    el.addEventListener('keydown', el._qbKeydown);
+    const target = el.querySelector('[data-autofocus]') || focusables()[0] || el;
+    if (target === el && !el.hasAttribute('tabindex')) el.setAttribute('tabindex', '-1');
+    setTimeout(() => { try { target.focus(); } catch (_) {} }, 0);
+}
+function closeAccessibleModal(el) {
+    if (!el || !el._qbModalOpen) return;
+    el._qbModalOpen = false;
+    if (el._qbKeydown) el.removeEventListener('keydown', el._qbKeydown);
+    const prev = el._qbPrevFocus;
+    el._qbPrevFocus = null;
+    if (prev && typeof prev.focus === 'function' && document.contains(prev)) {
+        setTimeout(() => { try { prev.focus(); } catch (_) {} }, 0);
+    }
+}
+if (typeof window !== 'undefined') {
+    window.announce = announce;
+    window.openAccessibleModal = openAccessibleModal;
+    window.closeAccessibleModal = closeAccessibleModal;
 }
 
 /**

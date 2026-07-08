@@ -203,6 +203,17 @@ A 62-finding expert audit is live in production. **Do not re-suggest or re-touch
 ---
 
 # PHASE 2 — PRODUCT
+
+> **⏸ DEFERRED BY DECISION (Erik, 2026-07-08) — not blocked.** After Phase 1
+> completed, Erik chose to keep this a single-shop app for NWCA and hold the
+> multi-tenant / resale work. Nothing below is invalidated: Phase 0's config
+> spine and Phase 1's hardening were built tenant-ready, so this phase can
+> start whenever the business case returns. Do not begin Phase 2 tasks
+> without an explicit new go-ahead. (Two NWCA-only carve-outs — the
+> hardcoded-hosts tail sweep and quote price-snapshotting — may be pulled
+> forward individually if Erik opts in; they don't constitute starting
+> Phase 2.)
+
 *Make it genuinely multi-tenant, white-label, and sellable. This phase ends at "a second real shop runs on an isolated tenant with their own branding + prices." The config spine (0.3) is the prerequisite for everything here.*
 
 ### 2.1 — Per-tenant authorization boundary on the proxy — close the IDOR  `[P0 · XL · serves: Security, Productization] — THE GATING ITEM`
