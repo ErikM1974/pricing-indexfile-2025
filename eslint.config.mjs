@@ -91,6 +91,7 @@ export default [
                 childRowMap: 'writable',
                 _pushQuoteId: 'writable',
                 _pushAlreadyDone: 'writable',
+                _pushInFlight: 'writable',
                 pendingShopWorksImport: 'writable',
                 lastImportMetadata: 'writable',
                 quoteService: 'writable',
@@ -110,6 +111,7 @@ export default [
             'shared_components/js/builders/emb/shopworks-import.js',
             'shared_components/js/builders/emb/persistence.js',
             'shared_components/js/builders/emb/output.js',
+            'shared_components/js/builders/emb/save-push.js',
         ],
         rules: {
             'no-unsanitized/property': 'off',

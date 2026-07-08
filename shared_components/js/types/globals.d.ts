@@ -99,6 +99,18 @@ interface Window {
     generateEmbQuoteText?: () => string;
     printQuote?: () => Promise<void> | void;
     embEmailQuote?: () => Promise<void>;
+    /* save-push bridges (builders/emb/save-push.js, extraction #6) */
+    saveAndGetLink?: (opts?: any) => Promise<any>;
+    saveQuote?: () => Promise<void>;
+    updatePushButtonState?: () => void;
+    getPushReadiness?: () => any;
+    renderPushReadiness?: () => void;
+    showPushButton?: () => void;
+    pushToShopWorks?: () => Promise<void>;
+    openPushPreview?: () => Promise<void>;
+    confirmPushToShopWorks?: () => Promise<void>;
+    verifyShopWorksImport?: () => Promise<void>;
+    closePushPreview?: () => void;
 }
 
 /*
