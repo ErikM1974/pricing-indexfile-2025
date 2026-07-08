@@ -1,0 +1,21 @@
+{
+  "embroidery-quote-builder.html": {
+    "empty-table-header": 2,
+    "label": 1,
+    "region": 19,
+    "select-name": 1
+  },
+  "screenprint-quote-builder.html": {
+    "empty-table-header": 2,
+    "label-title-only": 1,
+    "region": 31
+  },
+  "dtf-quote-builder.html": {
+    "empty-table-header": 2,
+    "label-title-only": 1,
+    "label": 2,
+    "region": 29,
+    "select-name": 2
+  },
+  "dtg-quote-builder.html": {}
+}

@@ -4150,3 +4150,52 @@ body.guided-on .product-table thead th { top: 64px; }
     font-size: 0.85rem;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
 }
+
+/* ============================================================
+   1.7 utility classes — inline style="" migration (roadmap 1.7).
+   Exact-value replacements for the recurring inline patterns in the
+   builder HTMLs (pixel-identical on desktop). display:none attrs are
+   deliberately NOT migrated — JS shows those via style.display='' and a
+   class would pin them hidden (they move with the delegated-listener
+   rework). Tail + gallery: roadmap 3.7.
+   ============================================================ */
+/* The guided skin (2026-07 UX work) already gives builder inputs the
+   touch-friendly treatment (min-height 44px, 10-12px padding, 15-16px font
+   via input[type="text"]:not(...) rules) — the migrated inline styles were
+   legacy overrides FIGHTING it. The utilities stay thin: only what the
+   skin does not set. Three names kept so the HTML reads which legacy
+   pattern each field came from (p5 / gray variants). */
+.qb-field, .qb-field--p5, .qb-field--gray {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.qb-label {
+    font-size: 11px;
+    color: #64748b;
+    display: block;
+}
+.qb-label--mb3 {
+    font-size: 11px;
+    color: #64748b;
+    display: block;
+    margin-bottom: 3px;
+}
+.qb-compact { font-size: 12px; padding: 6px 8px; }
+.qb-fs11 { font-size: 11px; }
+.qb-fs11-mr4 { font-size: 11px; margin-right: 4px; }
+.qb-fs10-w400 { font-size: 10px; font-weight: 400; }
+.qb-m0 { margin: 0; }
+.qb-mb8 { margin-bottom: 8px; }
+.qb-w80 { width: 80px; }
+.qb-flex1 { flex: 1; }
+.qb-flex1-minw130 { flex: 1; min-width: 130px; }
+.qb-span-all { grid-column: 1 / -1; }
+.qb-lh11 { line-height: 1.1; }
+.qb-empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #64748b;
+    background: #f8fafc;
+}
+.qb-empty-state-emoji { font-size: 32px; margin-bottom: 12px; }

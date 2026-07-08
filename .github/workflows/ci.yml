@@ -24,8 +24,28 @@ jobs:
         run: npm run build
       - name: Unit suite (includes web-quote-cart-parity, quick-quote-parity, no-hardcoded-hosts)
         run: npm run test:unit
+      - name: DOM suite (roadmap 1.14 — adapter contracts, nudge-tier sync, DTF child rows)
+        run: npm run test:dom
+      - name: A11y ratchet (roadmap 1.9 — axe violations only drop vs tests/a11y/baseline.json)
+        run: npm run test:a11y
       - name: npm audit (advisory — 15 pre-existing vulns as of 2026-07-07; tighten to a hard gate once cleared)
         run: npm audit --audit-level=high || echo "::warning::npm audit found high+ vulnerabilities — see log"
+
+  e2e:
+    name: Playwright E2E (money path + rendered axe ratchet)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18.x
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      # Boots server.js on :3400 (stripe/emailjs init lazily — no secrets needed);
+      # pricing READS hit the live proxy, all WRITES are route-mocked in the specs.
+      - run: npm run test:e2e
 
   lint:
     name: ESLint (new-code scope)
