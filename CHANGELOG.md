@@ -1,3 +1,8 @@
+## v2026.07.07.8 (2026.07.07)
+
+- feat(quote-builders): batch 2 — auto-merge, retry pricing, reprice pill, rush chips
+- Deploy v2026.07.07.8: 4 files (dtf-quote-builder.html,dtg-quote-builder.html,embroidery-quote-builder.html...)
+
 ## v2026.07.07.7 (2026.07.07)
 
 - docs(memory): lesson — recovery cron silently dead after gating (fixed fc56a3d, 11/21 healed)
