@@ -3271,7 +3271,8 @@ const loadBuilderHtml = createHtmlLoader();
 const REWRITTEN_BUILDER_PAGES = new Set([
   'embroidery-quote-builder.html',
   'screenprint-quote-builder.html',
-  'dtf-quote-builder.html'
+  'dtf-quote-builder.html',
+  'dtg-quote-builder.html'
 ]);
 app.get('/quote-builders/:page', (req, res, next) => {
   if (!REWRITTEN_BUILDER_PAGES.has(req.params.page)) return next();
