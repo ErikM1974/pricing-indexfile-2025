@@ -108,8 +108,8 @@
 /* EMB-scoped indigo (review C33/C34 2026-06-05) — keep the embroidery Quote Summary icon + tier badge
    indigo to match the EMB-only step-number pills, WITHOUT recoloring DTF/SCP/DTG (which share
    .tier-badge / .pricing-title and have no .emb-builder body class). */
-.emb-builder .pricing-title i { color: #6366f1; }
-.emb-builder .tier-badge { background: #6366f1; }
+.emb-builder .pricing-title i { color: var(--pnw-forest, #2e5827); }
+.emb-builder .tier-badge { background: var(--pnw-forest, #2e5827); }
 
 /* Sticky TOTAL - Always visible at bottom */
 .pricing-total-sticky {
@@ -321,8 +321,8 @@
 .logo-form-field select:focus,
 .logo-form-field input[type="number"]:focus {
     outline: none;
-    border-color: var(--nwca-blue);
-    box-shadow: 0 0 0 3px rgba(0, 63, 127, 0.1);
+    border-color: var(--pnw-forest, #2e5827);
+    box-shadow: var(--pnw-glow-focus, 0 0 0 3px rgba(46, 88, 39, 0.2));   /* was a navy glow on a forest border — read as a rendering bug (expert audit 2026-07-07) */
 }
 
 .logo-form-field select {
@@ -1023,18 +1023,20 @@
 }
 
 .al-btn.has-al {
-    background: #eff6ff;
-    border-color: #3b82f6;
-    color: #2563eb;
+    /* shared info-state tokens so "configured" reads the SAME in EMB and SCP
+       (they rendered blue vs green — state color lost its meaning; expert audit 2026-07-07) */
+    background: var(--qb-state-info-bg, #eff6ff);
+    border-color: var(--qb-state-info, #3b82f6);
+    color: var(--qb-state-info, #3b82f6);
 }
 
 .al-btn.has-al:hover {
-    background: #3b82f6;
+    background: var(--qb-state-info, #3b82f6);
     color: white;
 }
 
 .al-btn .al-badge {
-    background: #3b82f6;
+    background: var(--qb-state-info, #3b82f6);
     color: white;
     border-radius: 10px;
     padding: 0 6px;
@@ -1566,7 +1568,7 @@ td.size-disabled input {
 }
 
 .design-number-input:focus {
-    border-color: #0ea5e9;
+    border-color: var(--pnw-forest, #2e5827);
     box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.15);
     outline: none;
 }
@@ -1727,7 +1729,7 @@ td.size-disabled input {
 }
 
 .design-order-info {
-    color: #6366f1;
+    color: var(--pnw-forest, #2e5827);
     font-weight: 500;
 }
 
@@ -1755,7 +1757,7 @@ td.size-disabled input {
 /* DST filename display */
 .design-dst-files {
     font-size: 10px;
-    color: #6366f1;
+    color: var(--pnw-forest, #2e5827);
     margin-top: 2px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1808,7 +1810,7 @@ td.size-disabled input {
 }
 
 .design-search-field:focus {
-    border-color: #0ea5e9;
+    border-color: var(--pnw-forest, #2e5827);
     box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
     outline: none;
 }
@@ -2094,9 +2096,9 @@ td.size-disabled input {
 }
 
 .design-search-company-chip.active {
-    background: #6366f1;
+    background: var(--pnw-forest, #2e5827);
     color: #fff;
-    border-color: #6366f1;
+    border-color: var(--pnw-forest, #2e5827);
 }
 
 .design-search-company-chip .chip-count {
@@ -2309,7 +2311,7 @@ td.size-disabled input {
 
 .section-header-compact i {
     font-size: 14px;
-    color: #6366f1;
+    color: var(--pnw-forest, #2e5827);
 }
 
 .customer-info-body {
@@ -2336,7 +2338,7 @@ td.size-disabled input {
 
 .customer-info-body input:focus,
 .customer-info-body select:focus {
-    border-color: #6366f1;
+    border-color: var(--pnw-forest, #2e5827);
     box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.1);
     outline: none;
 }
@@ -2405,7 +2407,7 @@ td.size-disabled input {
 
 .design-row-label i {
     font-size: 12px;
-    color: #6366f1;
+    color: var(--pnw-forest, #2e5827);
     width: 16px;
     text-align: center;
 }
@@ -2654,7 +2656,7 @@ td.size-disabled input {
     width: 75px; padding: 5px 6px; border: 1px solid #cbd5e1;
     border-radius: 4px; font-size: 13px; text-align: right;
 }
-.spr-stitch-input:focus { border-color: #0ea5e9; outline: none; box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2); }
+.spr-stitch-input:focus { border-color: var(--pnw-forest, #2e5827); outline: none; box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2); }
 .spr-radio-cell { text-align: center; white-space: nowrap; }
 .spr-radio-cell label { display: flex; align-items: center; gap: 4px; cursor: pointer; justify-content: center; }
 .spr-radio-cell input[type="radio"] { margin: 0; cursor: pointer; }
@@ -2666,7 +2668,7 @@ td.size-disabled input {
 }
 .spr-custom-input:disabled { background: #f1f5f9; color: #94a3b8; }
 .spr-custom-input.spr-muted { background: #f1f5f9; color: #94a3b8; opacity: 0.6; }
-.spr-custom-input:focus { border-color: #0ea5e9; outline: none; box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2); }
+.spr-custom-input:focus { border-color: var(--pnw-forest, #2e5827); outline: none; box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2); }
 .spr-unavailable { font-size: 11px; color: #94a3b8; font-style: italic; }
 .spr-section-label {
     font-size: 11px; font-weight: 700; text-transform: uppercase;

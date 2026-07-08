@@ -10,27 +10,28 @@
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><!-- PNW shell typography (expert audit 2026-07-07): DTG loaded Inter, the trio never did -->
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Quote Builder Common Styles (loads FIRST — base styles) -->
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=2026.07.07.2">
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-common.css?v=2026.07.07.7">
 
     <!-- Quote Builder Shell (Phase 2a — PNW palette + tokens; overrides common's legacy --builder-* tokens) -->
     <link rel="stylesheet" href="/shared_components/css/quote-builder-shell.css?v=2026.06.05.5">
 
     <!-- Guided Quote shell (Phase B, 2026-07-07) -->
-    <link rel="stylesheet" href="/shared_components/css/quote-builder-guided.css?v=2026.07.07.3">
+    <link rel="stylesheet" href="/shared_components/css/quote-builder-guided.css?v=2026.07.07.7">
 
     <!-- Embroidery Quote Builder Styles (overrides common + shell) -->
-    <link rel="stylesheet" href="/shared_components/css/embroidery-quote-builder-extracted.css?v=2026.06.14.1">
+    <link rel="stylesheet" href="/shared_components/css/embroidery-quote-builder-extracted.css?v=2026.07.07.7">
 
     <!-- Shared Color Picker Component -->
-    <link rel="stylesheet" href="/shared_components/css/color-picker-shared.css?v=20260106">
+    <link rel="stylesheet" href="/shared_components/css/color-picker-shared.css?v=2026.07.07.7">
 
     <!-- Shared Quote Share Modal (2026 consolidation) -->
-    <link rel="stylesheet" href="/shared_components/css/quote-share-modal.css?v=20260113">
+    <link rel="stylesheet" href="/shared_components/css/quote-share-modal.css?v=2026.07.07.7">
 
     <!-- Customer Lookup Autocomplete -->
     <link rel="stylesheet" href="/shared_components/css/customer-lookup.css?v=2026.05.26.1">
@@ -55,7 +56,7 @@
     <script src="/shared_components/js/quote-extended-sizes.js?v=20260321"></script>
 
 </head>
-<body class="emb-builder"><!-- scoping hook: EMB-only re-skin overrides (indigo) target .emb-builder so they don't leak into DTF/SCP/DTG via shared CSS (review C33/C34) -->
+<body class="emb-builder qb-shell-body"><!-- qb-shell-body: 2026 PNW shell (Inter + tabular numerals + birch ground) — built 2026-06, had ZERO adopters until 2026-07-07 (expert audit) --><!-- scoping hook: EMB-only re-skin overrides (indigo) target .emb-builder so they don't leak into DTF/SCP/DTG via shared CSS (review C33/C34) -->
     <!-- Loading Overlay -->
     <div id="loading-overlay" class="loading-overlay" role="status" aria-live="polite">
         <div class="loading-spinner"></div>
@@ -1457,12 +1458,12 @@ Company:Absher Construction Company
     <!-- Core Dependencies -->
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/product-category-filter.js"></script>
-    <script src="/shared_components/js/quote-builder-utils.js?v=2026.07.07.2"></script>
+    <script src="/shared_components/js/quote-builder-utils.js?v=2026.07.07.7"></script>
     <script src="/shared_components/js/quote-services-bar.js?v=2026.06.07.1"></script>
     <script src="/shared_components/js/exact-match-search.js?v=20260106"></script>
-    <script src="/shared_components/js/quote-share-modal.js?v=20260113"></script>
+    <script src="/shared_components/js/quote-share-modal.js?v=2026.07.07.7"></script>
     <script src="/shared_components/js/embroidery-pricing-service.js?v=2026.06.11.10"></script>
-    <script src="/shared_components/js/embroidery-quote-pricing.js?v=2026.06.11.10"></script>
+    <script src="/shared_components/js/embroidery-quote-pricing.js?v=2026.07.07.7"></script>
     <script src="/shared_components/js/embroidery-quote-service.js?v=2026.06.10.1"></script>
     <script src="/shared_components/js/sku-validation-service.js?v=20260220-xxl-fix"></script>
 
@@ -1492,7 +1493,7 @@ Company:Absher Construction Company
 
     <!-- Power Quote Controller (extracted to external JS) -->
     <script src="/shared_components/js/quote-pricing-data.js?v=2026.06.27.1"></script>
-    <script src="/shared_components/js/embroidery-quote-invoice.js?v=2026.06.27.1"></script>
+    <script src="/shared_components/js/embroidery-quote-invoice.js?v=2026.07.07.7"></script>
     <!-- Phase 9 → Phase 11.3 artwork upload (rich mode: design name + per-file placement) -->
     <script src="/shared_components/js/artwork-upload.js?v=2026.06.05.5"></script>
     <!-- Phase 10.1: SanMar inventory check + per-row stock badges -->
@@ -1501,12 +1502,12 @@ Company:Absher Construction Company
     <!-- [2026-06-08] Shared order-summary band (Order Recap + Ship-To card) — Phase 0 of DTF/SCP parity.
          MUST load before embroidery-quote-builder.js (which calls QuoteOrderSummary.configure() at eval time). -->
     <script src="/shared_components/js/quote-order-summary.js?v=2026.06.08.12"></script>
-    <script src="/shared_components/js/embroidery-quote-builder.js?v=2026.07.07.1"></script>
+    <script src="/shared_components/js/embroidery-quote-builder.js?v=2026.07.07.7"></script>
 
     <!-- Guided Quote shell (Phase B, 2026-07-07) — 4-step flow over the existing
          sections, sidebar stays the price rail; "Show everything" restores the
          workbench. Loads LAST so it recomposes after the builder's own init. -->
-    <script src="/shared_components/js/quote-builder-guided.js?v=2026.07.07.3"></script>
+    <script src="/shared_components/js/quote-builder-guided.js?v=2026.07.07.7"></script>
 
     <!-- ========== EMB Chat (2026-05-24, Phase EMB Chat C) ==========
          Research assistant for embroidery quotes. Streams from

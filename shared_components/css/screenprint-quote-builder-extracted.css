@@ -381,18 +381,18 @@
 }
 
 .al-btn.has-al {
-    background: var(--pnw-mist, #eff6ff);
-    border-color: var(--pnw-moss, #3b82f6);
+    background: var(--qb-state-info-bg, #eff6ff);
+    border-color: var(--qb-state-info, #3b82f6);
     color: var(--pnw-forest, #2563eb);
 }
 
 .al-btn.has-al:hover {
-    background: var(--pnw-moss, #3b82f6);
+    background: var(--qb-state-info, #3b82f6);
     color: white;
 }
 
 .al-btn .al-badge {
-    background: var(--pnw-moss, #3b82f6);
+    background: var(--qb-state-info, #3b82f6);
     color: white;
     border-radius: 10px;
     padding: 0 6px;
@@ -773,7 +773,7 @@ td.size-disabled input {
     display: block;
     transition: transform 0.15s ease;
 }
-.safety-stripes-example:focus-visible { outline: 2px solid #2e6f40; outline-offset: 2px; }
+.safety-stripes-example:focus-visible { outline: 2px solid var(--pnw-forest, #2e5827); outline-offset: 2px; }
 @media (hover: hover) and (pointer: fine) {
     .safety-stripes-example:hover img { transform: scale(1.15); }
 }

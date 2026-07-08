@@ -124,7 +124,7 @@
         margin: 0 0 8pt 0 !important;        /* Phase 11.4: 14pt → 8pt */
         background: none !important;
         border: none !important;
-        border-bottom: 2pt solid #4cb354 !important;
+        border-bottom: 2pt solid #2e5827 !important;
         border-radius: 0 !important;
         color: #1a202c !important;
     }
@@ -238,7 +238,7 @@
         font-weight: 700 !important;
         letter-spacing: 0.08em !important;
         text-transform: uppercase !important;
-        color: #4cb354 !important;
+        color: #2e5827 !important;
         margin: 0 0 5pt 0 !important;
         padding: 0 !important;
         border: none !important;
@@ -285,7 +285,7 @@
         font-weight: 700 !important;
         letter-spacing: 0.08em !important;
         text-transform: uppercase !important;
-        color: #4cb354 !important;
+        color: #2e5827 !important;
         margin: 0 0 3pt 0 !important;
     }
 
@@ -476,7 +476,7 @@
     }
 
     .product-table thead th {
-        background: #4cb354 !important;
+        background: #2e5827 !important;
         color: #fff !important;
         font-size: 8pt !important;
         font-weight: 700 !important;
@@ -633,12 +633,12 @@
     .totals-card .total-row.grand-total {
         margin-top: 4pt !important;
         padding-top: 6pt !important;
-        border-top: 1pt solid #4cb354 !important;
+        border-top: 1pt solid #2e5827 !important;
     }
 
     .totals-card .total-row.grand-total .label,
     .totals-card .total-row.grand-total .value {
-        color: #4cb354 !important;
+        color: #2e5827 !important;
         font-weight: 700 !important;
         font-size: 12pt !important;
     }
@@ -711,7 +711,7 @@
         font-weight: 700 !important;
         text-transform: uppercase !important;
         letter-spacing: 0.06em !important;
-        color: #4cb354 !important;
+        color: #2e5827 !important;
         margin: 0 0 2pt 0 !important;    /* Phase 11.3: 3pt → 2pt */
         padding: 0 !important;
     }
@@ -742,7 +742,7 @@
         content: '•';
         position: absolute;
         left: 0;
-        color: #4cb354;
+        color: #2e5827;
         font-weight: 700;
     }
 
@@ -791,15 +791,22 @@
        PAGE-BREAK PROTECTION
        ============================================================ */
 
+    /* Protect small cards + ROWS — never whole tables: a 12+ item quote
+       cannot fit one page, so the old table-level avoid shoved the entire
+       table to page 2 (half-empty page 1) or was ignored inconsistently.
+       (expert audit 2026-07-07) */
     .quote-meta,
-    .quote-items,
-    .items-container,
-    .product-table,
     .embroidery-info,
     .special-notes-card,
     .quote-totals,
     .totals-card,
     .quote-footer {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    .product-table tr,
+    .quote-items tr {
         page-break-inside: avoid !important;
         break-inside: avoid !important;
     }

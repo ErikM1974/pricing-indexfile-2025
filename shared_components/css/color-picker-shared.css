@@ -92,7 +92,7 @@
     max-height: 280px;
     overflow-y: auto;
     background: white;
-    border: 2px solid var(--primary-color, #0d6efd);
+    border: 2px solid var(--builder-primary, #2e5827);   /* --primary-color only existed where an unrelated sheet defined it — EMB rendered lime, SCP bootstrap-blue (expert audit 2026-07-07) */
     border-radius: 6px;
     box-shadow: 0 6px 20px rgba(0,0,0,0.2);
     z-index: 1000;
@@ -119,17 +119,17 @@
 }
 
 .color-picker-option:hover {
-    background: #e8f4fd;
+    background: var(--pnw-fog, #f4f6f3);
 }
 
 .color-picker-option.focused {
-    background: #d0e8fa;
-    outline: 2px solid var(--primary-color, #0d6efd);
+    background: var(--pnw-mist, #e8eee7);
+    outline: 2px solid var(--builder-primary, #2e5827);
     outline-offset: -2px;
 }
 
 .color-picker-option.selected {
-    background: #e8f5e9;
+    background: var(--pnw-mist, #e8eee7);
     font-weight: 600;
 }
 
@@ -148,37 +148,7 @@
     color: #333;
 }
 
-/* =============================================
-   THEME OVERRIDES (per builder)
-   ============================================= */
-
-/* Embroidery (blue theme) */
-.embroidery-builder .color-picker-dropdown {
-    border-color: var(--nwca-blue, #0d6efd);
-}
-
-.embroidery-builder .color-picker-option.focused {
-    outline-color: var(--nwca-blue, #0d6efd);
-}
-
-/* DTF (green theme) */
-.dtf-quote-builder .color-picker-dropdown {
-    border-color: var(--dtf-primary, #10b981);
-}
-
-.dtf-quote-builder .color-picker-option.focused {
-    outline-color: var(--dtf-primary, #10b981);
-}
-
-.dtf-quote-builder .color-picker-option.selected {
-    background: var(--dtf-primary-50, #ecfdf5);
-}
-
-/* Screen Print (blue theme) */
-.screen-print-builder .color-picker-dropdown {
-    border-color: var(--nwca-blue, #0d6efd);
-}
-
-.screen-print-builder .color-picker-option.focused {
-    outline-color: var(--nwca-blue, #0d6efd);
-}
+/* THEME OVERRIDES DELETED 2026-07-07 (expert audit): the .embroidery-builder /
+   .screen-print-builder selectors targeted STALE body classes (real ones are
+   .emb-builder/.scp-builder) so only DTF's emerald ever applied — the most-used
+   control in the app rendered three different brands. One forest chrome now. */

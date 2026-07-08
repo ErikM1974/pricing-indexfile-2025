@@ -12,7 +12,7 @@
    ============================================= */
 :root {
     /* DTF-specific aliases pointing to standardized variables */
-    --dtf-primary: var(--builder-primary, #4cb354);
+    --dtf-primary: var(--builder-primary, #2e5827);   /* fallback was the retired lime (expert audit 2026-07-07) */
     --dtf-primary-dark: var(--builder-primary-dark, #3d9244);
     --dtf-primary-light: var(--builder-primary-light, #6fcf7b);
     --dtf-primary-50: #e8f5e9;
@@ -157,7 +157,7 @@
 }
 
 .location-summary strong {
-    color: #1e40af;
+    color: var(--builder-primary, #2e5827);
 }
 
 #location-display {
@@ -187,7 +187,7 @@
 
 .size-badge.size-small {
     background: #dbeafe;
-    color: #1e40af;
+    color: var(--builder-primary, #2e5827);
 }
 
 .size-badge.size-medium {
@@ -423,7 +423,7 @@
 .qty-cell {
     text-align: center;
     font-weight: 600;
-    color: #1e40af;
+    color: var(--builder-primary, #2e5827);
     background: #eff6ff;
     padding: 8px;
 }
@@ -547,7 +547,7 @@
 
 .sidebar-location-size.small {
     background: #dbeafe;
-    color: #1e40af;
+    color: var(--builder-primary, #2e5827);
 }
 
 .sidebar-location-size.medium {
@@ -656,7 +656,7 @@
 .btn-copy-quote {
     width: 100%;
     padding: 12px 20px;
-    background: #1e40af;
+    background: var(--builder-primary, #2e5827);
     color: white;
     border: none;
     border-radius: 8px;
@@ -671,7 +671,7 @@
 }
 
 .btn-copy-quote:hover {
-    background: #1e3a8a;
+    background: var(--builder-primary-dark, #1f4922);
 }
 
 .btn-copy-quote.success {
@@ -688,7 +688,7 @@
    EXTENDED SIZES PICKER (XXXL Other Column)
    ============================================= */
 .extended-col {
-    background: #374151 !important;
+    background: var(--pnw-forest-deep, #1f4922) !important;
     font-size: 11px;
 }
 
@@ -1553,7 +1553,7 @@
 .btn-view-quote {
     flex: 1;
     padding: 12px 20px;
-    background: #1e40af;
+    background: var(--builder-primary, #2e5827);
     color: white;
     border: none;
     border-radius: 8px;
@@ -1568,7 +1568,7 @@
 }
 
 .btn-view-quote:hover {
-    background: #1e3a8a;
+    background: var(--builder-primary-dark, #1f4922);
 }
 
 .btn-close-modal {
@@ -1610,20 +1610,20 @@
 /* Column header accent colors — PNW palette (forest / moss / cedar trio)
    keeps zone differentiation but on-brand */
 .location-column:nth-child(1) .column-header {
-    color: var(--pnw-forest-deep, #166534);
-    border-bottom: 2px solid var(--pnw-forest, #4cb354);
+    color: var(--pnw-forest-deep, #1f4922);
+    border-bottom: 2px solid var(--pnw-forest, #2e5827);
     padding-bottom: 8px;
 }
 
 .location-column:nth-child(2) .column-header {
-    color: var(--pnw-moss, #1e40af);
-    border-bottom: 2px solid var(--pnw-moss, #3b82f6);
+    color: var(--pnw-forest-deep, #1f4922);   /* moss text measured ~3.1:1 — the zone cue stays in the underline (expert audit 2026-07-07) */
+    border-bottom: 2px solid var(--pnw-moss, #6b8e60);
     padding-bottom: 8px;
 }
 
 .location-column:nth-child(3) .column-header {
-    color: var(--pnw-cedar, #9a3412);
-    border-bottom: 2px solid var(--pnw-cedar, #f59e0b);
+    color: var(--pnw-bark-shadow, #374151);
+    border-bottom: 2px solid var(--pnw-cedar, #9a3412);
     padding-bottom: 8px;
 }
 
@@ -1631,26 +1631,26 @@
 .size-input:focus {
     background: var(--dtf-primary-50);
     outline: none;
-    box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.15);
+    box-shadow: 0 0 0 3px rgba(46, 88, 39, 0.15);
     border-bottom: 2px solid var(--dtf-primary);
 }
 
 .desc-input:focus,
 .style-input:focus {
     outline: none;
-    background: #f0f9ff;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    background: var(--pnw-fog, #f4f6f3);
+    box-shadow: var(--pnw-glow-focus, 0 0 0 3px rgba(46, 88, 39, 0.2));
 }
 
 .quote-input:focus {
     outline: none;
     border-color: var(--dtf-primary);
-    box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.12);
+    box-shadow: 0 0 0 3px rgba(46, 88, 39, 0.12);
 }
 
 .search-input:focus {
     border-color: var(--dtf-primary);
-    box-shadow: 0 0 0 3px rgba(76, 179, 84, 0.15);
+    box-shadow: 0 0 0 3px rgba(46, 88, 39, 0.15);
 }
 
 /* --- Sidebar Panel Elevation --- */
@@ -1775,19 +1775,14 @@
 }
 
 /* --- Fee Row Styling --- */
-.fee-row {
-    background: #fafbfc;
-    border-top: 1px dashed #e5e7eb;
-}
-
+/* bg/label colors DELETED 2026-07-07 (expert audit): common.css's amber fee-row
+   won the background (!important) while these slate labels won the text — DTF
+   rendered two-tone slate-on-amber, unlike EMB/SCP. Padding/layout kept. */
 .fee-row .fee-label {
-    font-size: 13px;
-    color: #475569;
     padding: 8px 12px;
 }
 
 .fee-row .fee-label i {
-    color: #64748b;
     margin-right: 6px;
     width: 14px;
     text-align: center;
