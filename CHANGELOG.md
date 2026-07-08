@@ -1,3 +1,8 @@
+## v2026.07.07.9 (2026.07.07)
+
+- fix(quote-builders): Caspio 400 on blank dates (SCP save outage) + Save-as-PDF button
+- Deploy v2026.07.07.9: 4 files (dtf-quote-builder.html,dtg-quote-builder.html,embroidery-quote-builder.html...)
+
 ## v2026.07.07.8 (2026.07.07)
 
 - feat(quote-builders): batch 2 — auto-merge, retry pricing, reprice pill, rush chips
