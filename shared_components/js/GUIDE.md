@@ -211,6 +211,7 @@
 | `sample-pricing.js` | Dual-load blank-sample pricing math — browser buttons + server /api/samples/create-checkout-session reprice share it (jest-locked, 2026-07-06) |
 | `sample-cart-service.js` | Sample-program engine (eligibility/pricing via sample-pricing.js, sessionStorage cart, `window.sampleCart`) — extracted 2026-07-06 from the retired top-sellers-showcase page; used by /catalog Top Sellers view + product.html |
 | `samples-order-payload.js` | Pure ManageOrders push payload for PAID sample orders (Stripe payments block → lands in ShopWorks PAID); consumed by server.js webhook 'samples-order' branch (jest-locked, 2026-07-06) |
+| `observability.js` | **1.10 (2026-07-08)** Browser Sentry init (4 builders): early-error buffer + /api/version config (no DSN → OFF) + release/tenant/method tags + inline PII scrub (twin of lib/sentry-scrub.js). Loads right after vendor/sentry/bundle.min.js in `<head>`; never load-bearing |
 | `sample-inventory-service.js` | Sample inventory tracking |
 | `sample-order-service.js` | Sample order management |
 | `edp-generator-service.js` | EDP (Electronic Data Processing) service |

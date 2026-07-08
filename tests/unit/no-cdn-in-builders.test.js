@@ -53,6 +53,7 @@ test('vendored assets exist on disk (a missing file would 404 in prod)', () => {
         'vendor/fontawesome/webfonts/fa-brands-400.woff2',
         'vendor/emailjs/email.min.js',
         'vendor/dompurify/purify.min.js',
+        'vendor/sentry/bundle.min.js',
     ];
     for (const rel of VENDORED) {
         const p = path.join(__dirname, '../../shared_components', rel);

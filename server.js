@@ -50,6 +50,27 @@ const staffSaml = require('./lib/staff-saml.js');
 dotenv.config();
 
 // =============================================================================
+// OBSERVABILITY: Sentry error tracking (roadmap 1.10) — env-gated no-op
+// =============================================================================
+// Init IMMEDIATELY after env load so every later require/route is instrumented.
+// No SENTRY_DSN → tracking off, zero behavior change (dev/test default).
+// Release = the 7-char slug SHA (same identity /api/version reports), so a
+// dashboard error maps to an exact deploy. PII scrubbed in beforeSend — an
+// error event must never leak a customer email/phone (lib/sentry-scrub.js).
+const Sentry = require('@sentry/node');
+const { scrubPII } = require('./lib/sentry-scrub');
+if (process.env.SENTRY_DSN) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    environment: process.env.TENANT_ID || 'nwca',
+    release: process.env.HEROKU_SLUG_COMMIT ? process.env.HEROKU_SLUG_COMMIT.slice(0, 7) : 'dev',
+    tracesSampleRate: 0, // errors only — no performance events (volume/cost control)
+    beforeSend: (event) => scrubPII(event),
+  });
+  console.log('[Sentry] server error tracking ON (release ' + (process.env.HEROKU_SLUG_COMMIT || 'dev').slice(0, 7) + ')');
+}
+
+// =============================================================================
 // ROUTE TABLE OF CONTENTS (~2,900 lines)
 // =============================================================================
 //
@@ -445,6 +466,8 @@ const CSP_DIRECTIVES = {
     "'self'",
     CASPIO_PROXY_BASE,
     'https://api.emailjs.com',
+    // Sentry browser SDK error ingest (roadmap 1.10)
+    'https://o4511700559527936.ingest.us.sentry.io',
     'https://c3eku948.caspio.com',
     'https://c2aby672.caspio.com',
     'https://nwcustom.caspio.com',
@@ -556,9 +579,10 @@ app.get('/readyz', async (req, res) => {
 });
 
 // Exact release identification — the deploy skill's live-verify (step 14a)
-// prefers this over scraping ?v= from HTML.
+// prefers this over scraping ?v= from HTML. Also carries the Sentry DSN for
+// the browser SDK (observability.js) — DSNs are ingest-only public keys.
 app.get('/api/version', (req, res) => {
-  res.json({ sha: RELEASE_SHA, fullSha: RELEASE_SHA_FULL, release: RELEASE_VERSION });
+  res.json({ sha: RELEASE_SHA, fullSha: RELEASE_SHA_FULL, release: RELEASE_VERSION, sentryDsn: process.env.SENTRY_DSN || null });
 });
 
 // CSP violation intake (roadmap 1.1 — report-only phase). Own tiny limiter so
@@ -12504,6 +12528,12 @@ app.post('/api/box-shipments/:shipmentId/add-box', async (req, res) => {
 });
 
 // Start the server
+// Sentry express error handler — AFTER all routes, so route throws/rejections
+// are captured (then passed on; user-facing behavior unchanged). No-op without DSN.
+if (process.env.SENTRY_DSN) {
+  Sentry.setupExpressErrorHandler(app);
+}
+
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   console.log('Using existing Caspio API for quote functionality:');
