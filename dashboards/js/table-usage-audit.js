@@ -27,7 +27,36 @@
     function saveReview() { try { localStorage.setItem(LS_KEY, JSON.stringify(review)); } catch (e) {} }
     function rv(name) { return review[name] || {}; }
 
-    var liveNames = null; // Set of table names currently in Caspio (after "Check live")
+    // Live-refresh state. code/task are baked (repo-side, not browser-refreshable); a
+    // Refresh re-pulls view/rel/webhook wiring + fieldCount + which tables still exist.
+    var refreshed = false, refreshedAt = null;
+    DATA.forEach(function (r) { r._code = r.u.indexOf('code') > -1; r._task = r.u.indexOf('task') > -1; });
+
+    function applyLive(payload) {
+        var info = {}, liveSet = {};
+        (payload.tables || []).forEach(function (t) { info[t.n || t.name] = t; liveSet[t.n || t.name] = 1; });
+        DATA.forEach(function (r) {
+            var L = info[r.n];
+            if (L) {
+                r._exists = true; r._fieldNow = L.fieldCount;
+                var u = [];
+                if (r._code) u.push('code');
+                if (L.view) u.push('view');
+                if (L.rel) u.push('rel');
+                if (r._task) u.push('task');
+                if (L.webhook) u.push('webhook');
+                r.u = u;
+            } else { r._exists = false; }
+        });
+        Object.keys(liveSet).forEach(function (name) {
+            if (!DATA.some(function (r) { return r.n === name; })) {
+                var L = info[name], u = [];
+                if (L.view) u.push('view'); if (L.rel) u.push('rel'); if (L.webhook) u.push('webhook');
+                DATA.push({ n: name, f: L.fieldCount, c: '(new)', p: 0, fe: 0, i: 0, u: u, dup: false, amb: false, _new: true, _exists: true, _fieldNow: L.fieldCount, _code: false, _task: false });
+            }
+        });
+        refreshed = true; refreshedAt = payload.generatedAt;
+    }
 
     function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
     function tierOf(r) { return r.u.length > 0 ? 'used' : (r.dup ? 'tierA' : 'tierB'); }
@@ -74,8 +103,13 @@
         return '<span class="tua-tier tua-tier--used" title="In use">✓</span>';
     }
     function liveCell(r) {
-        if (!liveNames) return '';
-        return liveNames.has(r.n) ? '<span class="tua-live-exists">exists</span>' : '<span class="tua-live-gone">✓ gone</span>';
+        if (!refreshed) return '';
+        if (r._new) return '<span class="tua-live-new">NEW</span>';
+        return r._exists ? '<span class="tua-live-exists">exists</span>' : '<span class="tua-live-gone">✓ gone</span>';
+    }
+    function fieldCell(r) {
+        var fc = (r._fieldNow != null ? r._fieldNow : r.f);
+        return fc + (r._fieldNow != null && r._fieldNow !== r.f ? ' <span class="tua-fchg" title="was ' + r.f + '">✎</span>' : '');
     }
     var DECISIONS = ['', 'keep', 'archive', 'deleted'];
     function decideCell(r) {
@@ -97,22 +131,22 @@
             '<th class="no-sort">flags</th>' +
             '<th class="no-sort">decision</th>' +
             '<th class="no-sort">notes</th>' +
-            (liveNames ? '<th class="no-sort">live</th>' : '') +
+            (refreshed ? '<th class="no-sort">live</th>' : '') +
             '</tr></thead>';
         var body = rows.map(function (r) {
             var st = rv(r.n);
             return '<tr class="' + (st.rev ? 'is-reviewed' : '') + '" data-n="' + esc(r.n) + '">' +
                 '<td><input type="checkbox" class="tua-rev" data-n="' + esc(r.n) + '"' + (st.rev ? ' checked' : '') + '></td>' +
                 '<td>' + tierBadge(r) + '</td>' +
-                '<td class="tua-name">' + esc(r.n) + '</td>' +
-                '<td>' + r.f + '</td>' +
+                '<td class="tua-name">' + esc(r.n) + (r._new ? ' <span class="tua-flag flex">new</span>' : '') + '</td>' +
+                '<td>' + fieldCell(r) + '</td>' +
                 '<td>' + esc(r.c) + '</td>' +
                 '<td class="tua-code">' + r.p + '/' + r.fe + '/' + r.i + '</td>' +
                 '<td>' + sigChips(r) + '</td>' +
                 '<td>' + flagChips(r) + '</td>' +
                 '<td>' + decideCell(r) + '</td>' +
                 '<td><input type="text" class="tua-note" data-n="' + esc(r.n) + '" value="' + esc(st.note || '') + '" placeholder="…"></td>' +
-                (liveNames ? '<td>' + liveCell(r) + '</td>' : '') +
+                (refreshed ? '<td>' + liveCell(r) + '</td>' : '') +
                 '</tr>';
         }).join('');
         els.table.innerHTML = head + '<tbody>' + (rows.length ? body : '<tr><td colspan="11" class="tua-empty">No tables match.</td></tr>') + '</tbody>';
@@ -154,19 +188,25 @@
     });
     els.search.addEventListener('input', function () { state.q = els.search.value.trim().toLowerCase(); render(); });
 
-    // ---- live existence check (proxy schema endpoint) ----
+    // ---- live refresh (proxy /usage: view/rel/webhook wiring + fieldCount + new/gone) ----
+    var liveInfoEl = document.getElementById('tuaLiveInfo');
     document.getElementById('tuaLive').addEventListener('click', function () {
-        var btn = this; btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking…';
-        DashPage.fetchJson('/api/caspio-schema/tables')
+        var btn = this; btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing…';
+        DashPage.fetchJson('/api/caspio-schema/usage')
             .then(function (j) {
-                liveNames = new Set((j.tables || []).map(function (t) { return t.name; }));
-                render();
-                btn.innerHTML = '<i class="fas fa-check"></i> ' + liveNames.size + ' live';
+                applyLive(j);
+                refreshStats(); render();
+                var gone = DATA.filter(function (r) { return r._exists === false; }).length;
+                var isnew = DATA.filter(function (r) { return r._new; }).length;
+                btn.disabled = false; btn.innerHTML = '<i class="fas fa-rotate"></i> Refresh (live)';
+                if (liveInfoEl) liveInfoEl.textContent = 'live: ' + (j.count || 0) + ' tables'
+                    + (isnew ? ' · ' + isnew + ' new' : '') + (gone ? ' · ' + gone + ' gone' : '')
+                    + ' · ' + new Date(j.generatedAt).toLocaleTimeString();
             })
             .catch(function (err) {
-                console.error('live check failed:', err);
-                DashPage.showError('Could not reach the live table list (proxy /api/caspio-schema/tables). Try again.');
-                btn.disabled = false; btn.innerHTML = '<i class="fas fa-satellite-dish"></i> Check live';
+                console.error('refresh failed:', err);
+                DashPage.showError('Could not reach the live schema (proxy /api/caspio-schema/usage). Try again.');
+                btn.disabled = false; btn.innerHTML = '<i class="fas fa-rotate"></i> Refresh (live)';
             });
     });
 
