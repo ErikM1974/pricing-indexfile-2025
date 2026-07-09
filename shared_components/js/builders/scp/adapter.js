@@ -85,6 +85,35 @@ export class ScpAdapter {
     }
 
     // ── Lifecycle hook 1: UI wiring that must work even if pricing is down ─
+    // D3 split (2026-07-09): the Service_Codes load + live-label sync, moved
+    // VERBATIM out of setupPage (fire-and-forget; fallbacks until it resolves).
+    _loadScpServiceCodes() {
+        // Load Caspio Service_Codes (SPSU screen-setup, GRT-75 design) so fees come
+        // from the API, not hardcoded literals (Erik's Pricing=API rule). Fire-and-
+        // forget — getServicePrice() returns the documented fallback until it resolves,
+        // and recalculatePricing() re-reads live values on the next interaction. (2026-06-09)
+        if (typeof loadServiceCodePrices === 'function') { loadServiceCodePrices().then(() => {
+            // updatePrintConfig() re-derives printConfig.setupFee from the now-live SPSU rate
+            // and ends in recalculateAllPrices(); the old bare recalculatePricing() left the
+            // stale fallback $30/screen CHARGED while the fee-row label showed the live rate
+            // until the rep happened to click a print-config control. (expert audit 2026-07-07)
+            try { updatePrintConfig(); } catch (_) { try { recalculatePricing(); } catch (__) {} }
+            // Sync the static "$75/hr", "$10 ea", "$15 ea" labels with the live Service_Codes
+            // rates (mirror DTF's #design-rate-label pattern). The math was already API-driven,
+            // but a Caspio price change left the on-screen labels contradicting the charged
+            // totals. Format money labels to 2 decimals; the /hr rate matches DTF (integer). (2026-07-04)
+            try {
+                const _designRateEl = document.getElementById('scp-design-rate-label');
+                if (_designRateEl) _designRateEl.textContent = String(getServicePrice('GRT-75', 75));
+                const _fmt = (v) => Number.isInteger(v) ? String(v) : v.toFixed(2);
+                const _vellumRateEl = document.getElementById('scp-vellum-rate-label');
+                if (_vellumRateEl) _vellumRateEl.textContent = _fmt(getServicePrice('Vellum', 10));
+                const _colorChangeRateEl = document.getElementById('scp-color-change-rate-label');
+                if (_colorChangeRateEl) _colorChangeRateEl.textContent = _fmt(getServicePrice('Color Chg', 15));
+            } catch (_) {}
+        }); }
+    }
+
     async setupPage() {
 
         // Logo status chips — On file / New / TBD (Erik 2026-07-07). SCP's TBD
@@ -120,30 +149,7 @@ export class ScpAdapter {
             });
         }
 
-        // Load Caspio Service_Codes (SPSU screen-setup, GRT-75 design) so fees come
-        // from the API, not hardcoded literals (Erik's Pricing=API rule). Fire-and-
-        // forget — getServicePrice() returns the documented fallback until it resolves,
-        // and recalculatePricing() re-reads live values on the next interaction. (2026-06-09)
-        if (typeof loadServiceCodePrices === 'function') { loadServiceCodePrices().then(() => {
-            // updatePrintConfig() re-derives printConfig.setupFee from the now-live SPSU rate
-            // and ends in recalculateAllPrices(); the old bare recalculatePricing() left the
-            // stale fallback $30/screen CHARGED while the fee-row label showed the live rate
-            // until the rep happened to click a print-config control. (expert audit 2026-07-07)
-            try { updatePrintConfig(); } catch (_) { try { recalculatePricing(); } catch (__) {} }
-            // Sync the static "$75/hr", "$10 ea", "$15 ea" labels with the live Service_Codes
-            // rates (mirror DTF's #design-rate-label pattern). The math was already API-driven,
-            // but a Caspio price change left the on-screen labels contradicting the charged
-            // totals. Format money labels to 2 decimals; the /hr rate matches DTF (integer). (2026-07-04)
-            try {
-                const _designRateEl = document.getElementById('scp-design-rate-label');
-                if (_designRateEl) _designRateEl.textContent = String(getServicePrice('GRT-75', 75));
-                const _fmt = (v) => Number.isInteger(v) ? String(v) : v.toFixed(2);
-                const _vellumRateEl = document.getElementById('scp-vellum-rate-label');
-                if (_vellumRateEl) _vellumRateEl.textContent = _fmt(getServicePrice('Vellum', 10));
-                const _colorChangeRateEl = document.getElementById('scp-color-change-rate-label');
-                if (_colorChangeRateEl) _colorChangeRateEl.textContent = _fmt(getServicePrice('Color Chg', 15));
-            } catch (_) {}
-        }); }
+        this._loadScpServiceCodes();
 
         // Recommended safety apparel — curated hi-vis top sellers that pair with safety
         // stripes (2026-06-28). Always shown in the SCP view; emphasized when the rep
@@ -243,6 +249,46 @@ export class ScpAdapter {
     }
 
     // ── Lifecycle hook 2: pricing service init + entry routing ────────────
+    // D3 split (2026-07-09): the ?edit/?duplicate/quick-quote/method-switch/draft
+    // entry routing, moved VERBATIM out of initPricingAndRoute's try block.
+    async _routeEntryMode() {
+        // Check for edit mode (loading existing quote for revision)
+        const editQuoteId = checkForEditMode();
+        // Duplicate mode (?duplicate=SPC-...): load a copy as a NEW quote (EMB/DTF parity 2026-07-05)
+        const duplicateQuoteId = new URLSearchParams(window.location.search).get('duplicate');
+        // Quick Quote handoff (?from=quickquote) — prefill wins over draft recovery
+        // for this visit, same as ?edit=/?duplicate=. (item #6, 2026-07-05)
+        const qqPrefill = (typeof getQuickQuotePrefill === 'function') ? getQuickQuotePrefill() : null;
+        if (duplicateQuoteId) {
+            await duplicateQuote(duplicateQuoteId);
+        } else if (editQuoteId) {
+            // Skip draft recovery and load the existing quote instead
+            await loadQuoteForEditing(editQuoteId);
+        } else if (qqPrefill) {
+            initScreenPrintPersistence();
+            await applyQuickQuotePrefillScp(qqPrefill);
+        } else if (typeof takeMethodSwitchPrefill === 'function' && (window._msPrefillScp = takeMethodSwitchPrefill())) {
+            // Mid-call method switch (expert audit 2026-07-07): customer + rows from another builder
+            initScreenPrintPersistence();
+            await applyMethodSwitchPrefillScp(window._msPrefillScp);
+        } else {
+            // Initialize auto-save & draft recovery (2026 consolidation)
+            initScreenPrintPersistence();
+
+            // Check for draft recovery
+            if (scpState.spSession && scpState.spSession.shouldShowRecovery()) {
+                scpState.spSession.showRecoveryDialog(
+                    (draft) => restoreScreenPrintDraft(draft),
+                    () => {
+                        if (scpState.spPersistence) scpState.spPersistence.clearDraft();
+                        // No auto-row - user starts with empty state
+                    }
+                );
+            }
+            // No auto-row - empty state message guides user to search
+        }
+    }
+
     async initPricingAndRoute() {
         try {
             // Initialize Screen Print pricing service
@@ -251,41 +297,7 @@ export class ScpAdapter {
             // Initialize quote service for save/load
             scpState.quoteService = new ScreenPrintQuoteService();
 
-            // Check for edit mode (loading existing quote for revision)
-            const editQuoteId = checkForEditMode();
-            // Duplicate mode (?duplicate=SPC-...): load a copy as a NEW quote (EMB/DTF parity 2026-07-05)
-            const duplicateQuoteId = new URLSearchParams(window.location.search).get('duplicate');
-            // Quick Quote handoff (?from=quickquote) — prefill wins over draft recovery
-            // for this visit, same as ?edit=/?duplicate=. (item #6, 2026-07-05)
-            const qqPrefill = (typeof getQuickQuotePrefill === 'function') ? getQuickQuotePrefill() : null;
-            if (duplicateQuoteId) {
-                await duplicateQuote(duplicateQuoteId);
-            } else if (editQuoteId) {
-                // Skip draft recovery and load the existing quote instead
-                await loadQuoteForEditing(editQuoteId);
-            } else if (qqPrefill) {
-                initScreenPrintPersistence();
-                await applyQuickQuotePrefillScp(qqPrefill);
-            } else if (typeof takeMethodSwitchPrefill === 'function' && (window._msPrefillScp = takeMethodSwitchPrefill())) {
-                // Mid-call method switch (expert audit 2026-07-07): customer + rows from another builder
-                initScreenPrintPersistence();
-                await applyMethodSwitchPrefillScp(window._msPrefillScp);
-            } else {
-                // Initialize auto-save & draft recovery (2026 consolidation)
-                initScreenPrintPersistence();
-
-                // Check for draft recovery
-                if (scpState.spSession && scpState.spSession.shouldShowRecovery()) {
-                    scpState.spSession.showRecoveryDialog(
-                        (draft) => restoreScreenPrintDraft(draft),
-                        () => {
-                            if (scpState.spPersistence) scpState.spPersistence.clearDraft();
-                            // No auto-row - user starts with empty state
-                        }
-                    );
-                }
-                // No auto-row - empty state message guides user to search
-            }
+            await this._routeEntryMode();
 
             // Setup event listeners (needed for both modes)
             setupSearchAutocomplete();

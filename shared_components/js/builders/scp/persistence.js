@@ -669,6 +669,66 @@ export async function duplicateQuote(sourceQuoteId) {
 
 // confirmNewQuote() → moved to quote-builder-utils.js
 
+// D3 split (2026-07-09): the DOM form-field resets moved VERBATIM out of
+// resetQuote (state/edit/draft cleanup stays in the orchestrator).
+function _resetScpFormFields() {
+    // Reset customer form fields
+    document.getElementById('customer-name').value = '';
+    document.getElementById('customer-email').value = '';
+    document.getElementById('company-name').value = '';
+    const _cnReset = document.getElementById('customer-number');
+    if (_cnReset) _cnReset.value = '';
+    document.getElementById('customer-lookup').value = '';
+    // Clear design # + uploaded-artwork widget so the prior quote's design link +
+    // hosted logo/new-design name don't bleed into the next push. (2026-06-01)
+    const _dnReset = document.getElementById('design-number');
+    if (_dnReset) _dnReset.value = '';
+    try { if (window._scpArtwork && typeof window._scpArtwork.clear === 'function') window._scpArtwork.clear(); } catch (_) {}
+    try { if (window._scpDesignCombobox && typeof window._scpDesignCombobox.refresh === 'function') window._scpDesignCombobox.refresh(); } catch (_) {}
+
+    // Reset order & shipping fields
+    setOrderShippingData('spc-order-fields', {});
+    // [2026-06-08] setOrderShippingData({}) is a NO-OP for BLANKING (the shared util's setter guards `if (el && val)`),
+    // so explicitly clear the scoped .os-ship-* fields here — else the always-visible Ship-To card (Phase 3 band) would
+    // re-render the PRIOR quote's address on a new quote. SCP-local; does NOT touch the shared util. (adversarial-review gap)
+    ['.os-ship-address', '.os-ship-city', '.os-ship-zip', '.os-ship-method'].forEach(function (s) {
+        var el = document.querySelector('#spc-order-fields ' + s);
+        if (el) el.value = '';
+    });
+    var _shipStateReset = document.querySelector('#spc-order-fields .os-ship-state');
+    if (_shipStateReset) _shipStateReset.value = 'WA';
+    var _shipFeeReset = document.querySelector('#spc-order-fields .os-shipping-fee');
+    if (_shipFeeReset) _shipFeeReset.value = '0';
+    const taxRateReset = document.getElementById('tax-rate-input');
+    if (taxRateReset) taxRateReset.value = '10.2';
+
+    // Reset additional charges
+    const rushFee = document.getElementById('rush-fee');
+    const discountAmount = document.getElementById('discount-amount');
+    const discountReason = document.getElementById('discount-reason');
+    if (rushFee) rushFee.value = '';
+    if (discountAmount) discountAmount.value = '';
+    if (discountReason) discountReason.value = '';
+    // Reset screen-print setup parts (Erik's official list, 2026-06-27)
+    const vellumQtyReset = document.getElementById('vellum-qty');
+    const colorChangeQtyReset = document.getElementById('color-change-qty');
+    if (vellumQtyReset) vellumQtyReset.value = '';
+    if (colorChangeQtyReset) colorChangeQtyReset.value = '';
+
+    // Reset artwork services
+    const artChargeToggle = document.getElementById('art-charge-toggle');
+    const artCharge = document.getElementById('art-charge');
+    const artChargeWrapper = document.getElementById('art-charge-wrapper');
+    const graphicDesignHours = document.getElementById('graphic-design-hours');
+    if (artChargeToggle) artChargeToggle.checked = false;
+    if (artCharge) {
+        artCharge.value = '0';
+        artCharge.disabled = true;
+    }
+    if (artChargeWrapper) artChargeWrapper.style.opacity = '0.4';
+    if (graphicDesignHours) graphicDesignHours.value = '';
+}
+
 export function resetQuote() {
     // Clear the "already pushed" lock + reset the Push button so the fresh quote is pushable. (review fix 2026-06-14)
     scpState._scpPushQuoteId = null;
@@ -739,61 +799,7 @@ export function resetQuote() {
     if (darkGarmentToggle) darkGarmentToggle.checked = false;
     if (safetyToggle) safetyToggle.checked = false;
 
-    // Reset customer form fields
-    document.getElementById('customer-name').value = '';
-    document.getElementById('customer-email').value = '';
-    document.getElementById('company-name').value = '';
-    const _cnReset = document.getElementById('customer-number');
-    if (_cnReset) _cnReset.value = '';
-    document.getElementById('customer-lookup').value = '';
-    // Clear design # + uploaded-artwork widget so the prior quote's design link +
-    // hosted logo/new-design name don't bleed into the next push. (2026-06-01)
-    const _dnReset = document.getElementById('design-number');
-    if (_dnReset) _dnReset.value = '';
-    try { if (window._scpArtwork && typeof window._scpArtwork.clear === 'function') window._scpArtwork.clear(); } catch (_) {}
-    try { if (window._scpDesignCombobox && typeof window._scpDesignCombobox.refresh === 'function') window._scpDesignCombobox.refresh(); } catch (_) {}
-
-    // Reset order & shipping fields
-    setOrderShippingData('spc-order-fields', {});
-    // [2026-06-08] setOrderShippingData({}) is a NO-OP for BLANKING (the shared util's setter guards `if (el && val)`),
-    // so explicitly clear the scoped .os-ship-* fields here — else the always-visible Ship-To card (Phase 3 band) would
-    // re-render the PRIOR quote's address on a new quote. SCP-local; does NOT touch the shared util. (adversarial-review gap)
-    ['.os-ship-address', '.os-ship-city', '.os-ship-zip', '.os-ship-method'].forEach(function (s) {
-        var el = document.querySelector('#spc-order-fields ' + s);
-        if (el) el.value = '';
-    });
-    var _shipStateReset = document.querySelector('#spc-order-fields .os-ship-state');
-    if (_shipStateReset) _shipStateReset.value = 'WA';
-    var _shipFeeReset = document.querySelector('#spc-order-fields .os-shipping-fee');
-    if (_shipFeeReset) _shipFeeReset.value = '0';
-    const taxRateReset = document.getElementById('tax-rate-input');
-    if (taxRateReset) taxRateReset.value = '10.2';
-
-    // Reset additional charges
-    const rushFee = document.getElementById('rush-fee');
-    const discountAmount = document.getElementById('discount-amount');
-    const discountReason = document.getElementById('discount-reason');
-    if (rushFee) rushFee.value = '';
-    if (discountAmount) discountAmount.value = '';
-    if (discountReason) discountReason.value = '';
-    // Reset screen-print setup parts (Erik's official list, 2026-06-27)
-    const vellumQtyReset = document.getElementById('vellum-qty');
-    const colorChangeQtyReset = document.getElementById('color-change-qty');
-    if (vellumQtyReset) vellumQtyReset.value = '';
-    if (colorChangeQtyReset) colorChangeQtyReset.value = '';
-
-    // Reset artwork services
-    const artChargeToggle = document.getElementById('art-charge-toggle');
-    const artCharge = document.getElementById('art-charge');
-    const artChargeWrapper = document.getElementById('art-charge-wrapper');
-    const graphicDesignHours = document.getElementById('graphic-design-hours');
-    if (artChargeToggle) artChargeToggle.checked = false;
-    if (artCharge) {
-        artCharge.value = '0';
-        artCharge.disabled = true;
-    }
-    if (artChargeWrapper) artChargeWrapper.style.opacity = '0.4';
-    if (graphicDesignHours) graphicDesignHours.value = '';
+    _resetScpFormFields();
 
     // Clear edit mode
     scpState.editingQuoteId = null;

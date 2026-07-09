@@ -140,35 +140,9 @@ export function clearCustomerContextBanners() {
     window._taxExempt = false;
 }
 
-export function resetQuote() {
-    clearCustomerContextBanners();  // P2-8: don't bleed the prior customer's CRM banners into a new quote
-    // Hide + zero the sidebar TOTAL bar (re-shown on first recalc)
-    const _stb = document.getElementById('sidebar-total-bar');
-    if (_stb) _stb.hidden = true;
-    const _stg = document.getElementById('sidebar-grand-total');
-    if (_stg) _stg.textContent = '$0.00';
-    // Clear all product rows and re-add empty state
-    const tbody = document.getElementById('product-tbody');
-    tbody.innerHTML = `
-        <tr id="empty-state-row">
-            <td colspan="14" class="qb-empty-state">
-                <div class="qb-empty-state-emoji">&#128085;</div>
-                <div class="qb-empty-state-title">Enter a style number to get started</div>
-                <div class="qb-note-13">Type a style # in the search bar above (e.g., PC54, G500, C112)</div>
-            </td>
-        </tr>
-    `;
-
-    // Reset row counter + the child-row map (module-level) — else a previous quote's 2XL/3XL child-row
-    // references leak into the next quote and can mis-map size overrides on save. (audit #13c 2026-06-05)
-    embState.rowCounter = 0;
-    embState.childRowMap = {};
-    // [2026-06-07] Clear the wholesale flag + checkbox so it doesn't leak into the next quote.
-     
-    window._isWholesale = false;
-    const _wholesaleReset = document.getElementById('wholesale-checkbox');
-    if (_wholesaleReset) _wholesaleReset.checked = false;
-
+// D4 split (2026-07-09): resetQuote's logo/design/AL resets + DOM form-field
+// resets moved VERBATIM (edit/push/draft cleanup stays in the orchestrator).
+function _resetEmbLogoState() {
     // Reset logo cards visibility
     const garmentCard = document.getElementById('garment-logo-card');
     const capCard = document.getElementById('cap-logo-card');
@@ -258,7 +232,9 @@ export function resetQuote() {
     if (capALConfig) capALConfig.classList.remove('visible');
     document.getElementById('garment-al-toggle').checked = false;
     document.getElementById('cap-al-toggle').checked = false;
+}
 
+function _resetEmbFormFields() {
     // Reset customer form fields
     document.getElementById('customer-name').value = '';
     document.getElementById('customer-email').value = '';
@@ -340,6 +316,40 @@ export function resetQuote() {
         artworkBadge.classList.add('hidden');
         artworkBadge.style.display = 'none';
     }
+}
+
+export function resetQuote() {
+    clearCustomerContextBanners();  // P2-8: don't bleed the prior customer's CRM banners into a new quote
+    // Hide + zero the sidebar TOTAL bar (re-shown on first recalc)
+    const _stb = document.getElementById('sidebar-total-bar');
+    if (_stb) _stb.hidden = true;
+    const _stg = document.getElementById('sidebar-grand-total');
+    if (_stg) _stg.textContent = '$0.00';
+    // Clear all product rows and re-add empty state
+    const tbody = document.getElementById('product-tbody');
+    tbody.innerHTML = `
+        <tr id="empty-state-row">
+            <td colspan="14" class="qb-empty-state">
+                <div class="qb-empty-state-emoji">&#128085;</div>
+                <div class="qb-empty-state-title">Enter a style number to get started</div>
+                <div class="qb-note-13">Type a style # in the search bar above (e.g., PC54, G500, C112)</div>
+            </td>
+        </tr>
+    `;
+
+    // Reset row counter + the child-row map (module-level) — else a previous quote's 2XL/3XL child-row
+    // references leak into the next quote and can mis-map size overrides on save. (audit #13c 2026-06-05)
+    embState.rowCounter = 0;
+    embState.childRowMap = {};
+    // [2026-06-07] Clear the wholesale flag + checkbox so it doesn't leak into the next quote.
+     
+    window._isWholesale = false;
+    const _wholesaleReset = document.getElementById('wholesale-checkbox');
+    if (_wholesaleReset) _wholesaleReset.checked = false;
+
+    _resetEmbLogoState();
+
+    _resetEmbFormFields();
 
     // Clear edit mode and import metadata
     embState.editingQuoteId = null;

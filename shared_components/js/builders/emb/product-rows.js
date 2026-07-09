@@ -1773,6 +1773,73 @@ function analyzeSizeCategory(availableSizes) {
  * @param {HTMLElement} row - The product row element
  * @param {Object} sizeInfo - Result from analyzeSizeCategory()
  */
+// D4 split (2026-07-09): pants/shorts picker-row configs moved VERBATIM out of
+// updateRowForSizeCategory (SCP-twin cut; each early-returned).
+function _configurePantsRow(row, sizeInfo, sizeInputs, xxxlCell) {
+// Handle PANTS (waist/inseam sizes) - use size picker popup
+if (sizeInfo.category === 'pants') {
+    // Disable all size columns (parent row doesn't take quantities)
+    sizeInputs.forEach(input => {
+        input.disabled = true;
+        input.value = '';
+        input.placeholder = '-';
+        input.closest('td').classList.add('size-disabled');
+    });
+
+    // Enable XXXL cell as "Select Sizes" picker button
+    if (xxxlCell && sizeInfo.pantsSizes && sizeInfo.pantsSizes.length > 0) {
+        row.dataset.pantsSizes = JSON.stringify(sizeInfo.pantsSizes);
+        row.dataset.extendedSizes = JSON.stringify(sizeInfo.pantsSizes); // For compatibility
+        xxxlCell.classList.add('pants-picker-btn');
+        xxxlCell.disabled = false;
+        xxxlCell.placeholder = '+';
+        xxxlCell.closest('td').classList.remove('size-disabled');
+    } else if (xxxlCell) {
+        xxxlCell.disabled = true;
+        xxxlCell.placeholder = '-';
+        xxxlCell.closest('td').classList.add('size-disabled');
+    }
+
+    row.classList.add('pants-row');
+    row.classList.add('non-standard-sizes');
+    showToast('Pants product - click + to select waist/inseam sizes', 'info', 4000);
+    return;
+}
+}
+
+function _configureShortsRow(row, sizeInfo, sizeInputs, xxxlCell) {
+// Handle SHORTS (waist-only sizes like W30, W32) - use size picker popup
+if (sizeInfo.category === 'shorts') {
+    // Disable all size columns (parent row doesn't take quantities)
+    sizeInputs.forEach(input => {
+        input.disabled = true;
+        input.value = '';
+        input.placeholder = '-';
+        input.closest('td').classList.add('size-disabled');
+    });
+
+    // Enable XXXL cell as "Select Sizes" picker button
+    if (xxxlCell && sizeInfo.shortsSizes && sizeInfo.shortsSizes.length > 0) {
+        row.dataset.shortsSizes = JSON.stringify(sizeInfo.shortsSizes);
+        row.dataset.extendedSizes = JSON.stringify(sizeInfo.shortsSizes); // For compatibility
+        row.dataset.sizeCategory = 'shorts'; // Ensure category is set
+        xxxlCell.classList.add('shorts-picker-btn');
+        xxxlCell.disabled = false;
+        xxxlCell.placeholder = '+';
+        xxxlCell.closest('td').classList.remove('size-disabled');
+    } else if (xxxlCell) {
+        xxxlCell.disabled = true;
+        xxxlCell.placeholder = '-';
+        xxxlCell.closest('td').classList.add('size-disabled');
+    }
+
+    row.classList.add('shorts-row');
+    row.classList.add('non-standard-sizes');
+    showToast('Shorts product - click + to select waist sizes', 'info', 4000);
+    return;
+}
+}
+
 function updateRowForSizeCategory(row, sizeInfo) {
     const rowId = row.dataset.rowId;
     const sizeInputs = row.querySelectorAll('.size-input:not(.xxxl-picker-btn)');
@@ -1782,66 +1849,8 @@ function updateRowForSizeCategory(row, sizeInfo) {
     row.dataset.sizeCategory = sizeInfo.category;
     row.dataset.baseSize = sizeInfo.baseSize || '';
 
-    // Handle PANTS (waist/inseam sizes) - use size picker popup
-    if (sizeInfo.category === 'pants') {
-        // Disable all size columns (parent row doesn't take quantities)
-        sizeInputs.forEach(input => {
-            input.disabled = true;
-            input.value = '';
-            input.placeholder = '-';
-            input.closest('td').classList.add('size-disabled');
-        });
-
-        // Enable XXXL cell as "Select Sizes" picker button
-        if (xxxlCell && sizeInfo.pantsSizes && sizeInfo.pantsSizes.length > 0) {
-            row.dataset.pantsSizes = JSON.stringify(sizeInfo.pantsSizes);
-            row.dataset.extendedSizes = JSON.stringify(sizeInfo.pantsSizes); // For compatibility
-            xxxlCell.classList.add('pants-picker-btn');
-            xxxlCell.disabled = false;
-            xxxlCell.placeholder = '+';
-            xxxlCell.closest('td').classList.remove('size-disabled');
-        } else if (xxxlCell) {
-            xxxlCell.disabled = true;
-            xxxlCell.placeholder = '-';
-            xxxlCell.closest('td').classList.add('size-disabled');
-        }
-
-        row.classList.add('pants-row');
-        row.classList.add('non-standard-sizes');
-        showToast('Pants product - click + to select waist/inseam sizes', 'info', 4000);
-        return;
-    }
-
-    // Handle SHORTS (waist-only sizes like W30, W32) - use size picker popup
-    if (sizeInfo.category === 'shorts') {
-        // Disable all size columns (parent row doesn't take quantities)
-        sizeInputs.forEach(input => {
-            input.disabled = true;
-            input.value = '';
-            input.placeholder = '-';
-            input.closest('td').classList.add('size-disabled');
-        });
-
-        // Enable XXXL cell as "Select Sizes" picker button
-        if (xxxlCell && sizeInfo.shortsSizes && sizeInfo.shortsSizes.length > 0) {
-            row.dataset.shortsSizes = JSON.stringify(sizeInfo.shortsSizes);
-            row.dataset.extendedSizes = JSON.stringify(sizeInfo.shortsSizes); // For compatibility
-            row.dataset.sizeCategory = 'shorts'; // Ensure category is set
-            xxxlCell.classList.add('shorts-picker-btn');
-            xxxlCell.disabled = false;
-            xxxlCell.placeholder = '+';
-            xxxlCell.closest('td').classList.remove('size-disabled');
-        } else if (xxxlCell) {
-            xxxlCell.disabled = true;
-            xxxlCell.placeholder = '-';
-            xxxlCell.closest('td').classList.add('size-disabled');
-        }
-
-        row.classList.add('shorts-row');
-        row.classList.add('non-standard-sizes');
-        showToast('Shorts product - click + to select waist sizes', 'info', 4000);
-        return;
-    }
+    if (sizeInfo.category === 'pants') { _configurePantsRow(row, sizeInfo, sizeInputs, xxxlCell); return; }
+    if (sizeInfo.category === 'shorts') { _configureShortsRow(row, sizeInfo, sizeInputs, xxxlCell); return; }
 
     if (sizeInfo.useQtyOnly) {
         // OSFA-only: Hide all size columns, convert to single qty input

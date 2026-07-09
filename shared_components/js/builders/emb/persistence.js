@@ -25,7 +25,7 @@ import { collectProductsFromTable, onShipMethodChange, recalculatePricing, updat
 import { updateAdditionalCharges, updateDiscountType } from './quote-lifecycle.js';
 import { _syncALArrays, handleCapEmbellishmentChange, mapStitchCountToTierValue, updateNotesBadge } from './logo-config.js';
 import { addManualServiceRow, addNewRow, createChildRow, createServiceProductRow, dateFromInputValue, dateToInputValue, onSizeChange, onStyleChange, selectColor, updateCapLogoSectionVisibility, updateGarmentLogoSectionVisibility, updateLogoCardHeader } from './product-rows.js';
-import { embState, EMB_DEFAULTS, SIZE06_EXTENDED_SIZES, API_BASE } from './state.js';
+import { embState, EMB_DEFAULTS, SIZE06_EXTENDED_SIZES, API_BASE } from './state.js';
 
 // Module state — was window._* flags (Batch 3.4, 2026-07-09); nothing outside this file reads them.
 let _pendingLtmState = null;    // LTM panel state parked until the panel exists during restore
@@ -105,43 +105,9 @@ export function getEmbroideryQuoteData() {
     };
 }
 
-export function restoreEmbroideryDraft(draft) {
-    if (!draft) return;
-
-    // Restore customer info
-    if (draft.customerName) {
-        const nameEl = document.getElementById('customer-name');
-        if (nameEl) nameEl.value = draft.customerName;
-    }
-    if (draft.customerEmail) {
-        const emailEl = document.getElementById('customer-email');
-        if (emailEl) emailEl.value = draft.customerEmail;
-    }
-    if (draft.companyName) {
-        const companyEl = document.getElementById('company-name');
-        if (companyEl) companyEl.value = draft.companyName;
-    }
-    if (draft.salesRep) {
-        const salesRepEl = document.getElementById('sales-rep');
-        if (salesRepEl) salesRepEl.value = draft.salesRep;
-    }
-    if (draft.notes) {
-        const notesEl = document.getElementById('notes');
-        if (notesEl) {
-            notesEl.value = draft.notes;
-            // Show the notes section
-            const section = document.getElementById('notes-section');
-            if (section && section.classList.contains('collapsed')) {
-                section.classList.remove('collapsed');
-                const body = section.querySelector('.notes-body');
-                const icon = section.querySelector('.notes-toggle-icon');
-                if (body) body.style.display = 'block';
-                if (icon) icon.style.transform = 'rotate(180deg)';
-            }
-            updateNotesBadge();
-        }
-    }
-
+// D4 split (2026-07-09): the primary + cap-primary logo restore moved VERBATIM
+// out of restoreEmbroideryDraft.
+function _restoreDraftLogos(draft) {
     // Restore primary logo configuration
     if (draft.primaryLogo) {
         embState.primaryLogo = { ...embState.primaryLogo, ...draft.primaryLogo };
@@ -210,6 +176,46 @@ export function restoreEmbroideryDraft(draft) {
             }
         }
     }
+}
+
+export function restoreEmbroideryDraft(draft) {
+    if (!draft) return;
+
+    // Restore customer info
+    if (draft.customerName) {
+        const nameEl = document.getElementById('customer-name');
+        if (nameEl) nameEl.value = draft.customerName;
+    }
+    if (draft.customerEmail) {
+        const emailEl = document.getElementById('customer-email');
+        if (emailEl) emailEl.value = draft.customerEmail;
+    }
+    if (draft.companyName) {
+        const companyEl = document.getElementById('company-name');
+        if (companyEl) companyEl.value = draft.companyName;
+    }
+    if (draft.salesRep) {
+        const salesRepEl = document.getElementById('sales-rep');
+        if (salesRepEl) salesRepEl.value = draft.salesRep;
+    }
+    if (draft.notes) {
+        const notesEl = document.getElementById('notes');
+        if (notesEl) {
+            notesEl.value = draft.notes;
+            // Show the notes section
+            const section = document.getElementById('notes-section');
+            if (section && section.classList.contains('collapsed')) {
+                section.classList.remove('collapsed');
+                const body = section.querySelector('.notes-body');
+                const icon = section.querySelector('.notes-toggle-icon');
+                if (body) body.style.display = 'block';
+                if (icon) icon.style.transform = 'rotate(180deg)';
+            }
+            updateNotesBadge();
+        }
+    }
+
+    _restoreDraftLogos(draft);
 
     // Restore LTM override state
     if (draft.ltmEnabled === false || draft.ltmDisplayMode) {

@@ -322,7 +322,144 @@ export async function diagnoseQuote() {
  * Handles garment/cap splits, stitch count tiers, digitizing fees,
  * AL fees, service codes (DECG/DECC), and LTM display mode.
  */
-export function buildEmbroideryPricingData(allItems) {
+export // D4 split (2026-07-09): ONE product's PDF line items (returns entry or null)
+// + the service/stitch-surcharge appends, moved VERBATIM out of
+// buildEmbroideryPricingData (SCP-twin cuts).
+function _buildEmbInvoiceProduct(product) {
+    const lineItems = [];
+
+    // Find the parent row for this product to read its displayed price
+    const parentRow = document.querySelector(
+        `tr[data-style="${product.style}"][data-catalog-color="${product.catalogColor}"]:not(.child-row)`
+    );
+    const rowId = parentRow?.dataset?.rowId;
+
+    // Read base price from parent row's price cell
+    const basePriceCell = document.getElementById(`row-price-${rowId}`);
+    const basePriceText = basePriceCell?.textContent || '$0.00';
+    const baseUnitPrice = parseFloat(basePriceText.replace(/[^0-9.]/g, '')) || 0;
+
+    // Base sizes (S, M, L, XL)
+    const baseSizes = ['S', 'M', 'L', 'LG', 'XL'];
+    const baseSizeQtys = {};
+    let baseQty = 0;
+
+    Object.entries(product.sizeBreakdown || {}).forEach(([size, qty]) => {
+        if (size === 'SVC') return; // Skip service pseudo-size
+        const displaySize = size === 'L' ? 'LG' : size;
+        if (baseSizes.includes(size) && qty > 0) {
+            baseSizeQtys[displaySize] = qty;
+            baseQty += qty;
+        }
+    });
+
+    // Handle OSFA (beanies, caps without sized variants)
+    const osfaQty = product.sizeBreakdown['OSFA'] || 0;
+    if (osfaQty > 0 && baseQty === 0) {
+        // OSFA-only product — use parent price as base
+        lineItems.push({
+            description: `OSFA(${osfaQty})`,
+            quantity: osfaQty,
+            unitPrice: baseUnitPrice,
+            total: osfaQty * baseUnitPrice
+        });
+    } else {
+        if (baseQty > 0) {
+            const desc = Object.entries(baseSizeQtys)
+                .map(([size, qty]) => `${size}(${qty})`)
+                .join(' ');
+            lineItems.push({
+                description: desc,
+                quantity: baseQty,
+                unitPrice: baseUnitPrice,
+                total: baseQty * baseUnitPrice
+            });
+        }
+
+        // Extended / non-standard sizes — read from child row price cells. Iterate ALL
+        // sizeBreakdown keys (NOT a hardcoded list) so tall (LT/XLT…), fitted-cap combos
+        // (S/M, M/L, L/XL), youth (YS/YM/YL), toddler (2T–6T), big (LB/XLB…) and 7XL+ are
+        // NOT dropped from the PDF — they were silently vanishing from the table while their
+        // $ stayed in the total, so the products table under-footed. (2026-06-04 audit B3)
+        Object.entries(product.sizeBreakdown || {}).forEach(([size, qty]) => {
+            if (!(qty > 0)) return;
+            if (size === 'SVC') return;                       // service pseudo-size
+            if (baseSizes.includes(size)) return;             // already in the grouped base line
+            if (size === 'OSFA' && baseQty === 0) return;     // OSFA-only handled above
+            const childRowId = embState.childRowMap[rowId]?.[size];
+            const childPriceCell = document.getElementById(`row-price-${childRowId}`);
+            const childPriceText = childPriceCell?.textContent || '';
+            let unitPrice = parseFloat(childPriceText.replace(/[^0-9.]/g, '')) || 0;
+            if (!(unitPrice > 0)) unitPrice = baseUnitPrice;  // no child row found → base price
+            lineItems.push({
+                description: `${size}(${qty})`,
+                quantity: qty,
+                unitPrice: unitPrice,
+                total: qty * unitPrice,
+                hasUpcharge: true
+            });
+        });
+    }
+
+    if (lineItems.length === 0) return null;
+    return {
+            product: {
+                style: product.style,
+                title: product.productName || product.style,
+                color: product.color,
+                isCap: product.isCap || false
+            },
+            lineItems: lineItems
+    };
+}
+
+function _appendEmbServiceInvoiceItems(invoiceProducts, serviceItems) {
+// Add service items (DECG, DECC, AL, Monogram) as invoice products
+serviceItems.forEach(si => {
+    invoiceProducts.push({
+        product: {
+            style: si.style,
+            title: si.productName || si.title || si.style,
+            color: '',
+            isService: true,
+            isCap: si.isCap || false,
+            position: si.position || '',
+            totalQuantity: si.totalQuantity
+        },
+        isService: true,
+        lineItems: [{
+            description: si.productName || si.title || si.style,
+            quantity: si.totalQuantity,
+            unitPrice: si.unitPrice,
+            total: si.unitPrice * si.totalQuantity
+        }]
+    });
+});
+
+// Stitch surcharge (AS-Garm / AS-CAP) — a flat per-piece charge for a primary logo over 8K
+// stitches. It's in the on-screen fee table AND the grand total, but was NEVER emitted as a
+// PDF line item, so the products table under-footed (e.g. $3341.50 table vs $3473.50 subtotal
+// on EMB-2026-276 — a $132 gap with nothing explaining it). Read the live fee-row values and
+// add a real line so the PDF foots. (2026-06-04 audit B2)
+[
+    { rowId: 'garment-stitch-fee-row', totalId: 'garment-stitch-fee-total', unitId: 'garment-stitch-fee-unit', qtyId: 'garment-stitch-fee-qty', style: 'AS-Garm', label: 'Additional Stitches (Garment)', isCap: false },
+    { rowId: 'cap-stitch-fee-row', totalId: 'cap-stitch-fee-total', unitId: 'cap-stitch-fee-unit', qtyId: 'cap-stitch-fee-qty', style: 'AS-CAP', label: 'Additional Stitches (Cap)', isCap: true }
+].forEach(s => {
+    const row = document.getElementById(s.rowId);
+    if (!row || row.style.display === 'none') return;   // surcharge not active
+    const total = parseFloat((document.getElementById(s.totalId)?.textContent || '').replace(/[$,]/g, '')) || 0;
+    if (!(total > 0)) return;
+    const qty = parseInt(document.getElementById(s.qtyId)?.textContent) || 0;
+    const unit = parseFloat((document.getElementById(s.unitId)?.textContent || '').replace(/[$,]/g, '')) || 0;
+    invoiceProducts.push({
+        product: { style: s.style, title: s.label, color: '', isService: true, isCap: s.isCap },
+        isService: true,
+        lineItems: [{ description: s.label, quantity: qty || 1, unitPrice: unit, total: total }]
+    });
+});
+}
+
+function buildEmbroideryPricingData(allItems) {
     const productList = allItems.filter(p => !p.isService);
     const serviceItems = allItems.filter(p => p.isService);
     // Use the REAL saved quote ID — edit mode = editingQuoteId; after a save = _pushQuoteId.
@@ -338,137 +475,11 @@ export function buildEmbroideryPricingData(allItems) {
     const invoiceProducts = [];
 
     productList.forEach(product => {
-        const lineItems = [];
-
-        // Find the parent row for this product to read its displayed price
-        const parentRow = document.querySelector(
-            `tr[data-style="${product.style}"][data-catalog-color="${product.catalogColor}"]:not(.child-row)`
-        );
-        const rowId = parentRow?.dataset?.rowId;
-
-        // Read base price from parent row's price cell
-        const basePriceCell = document.getElementById(`row-price-${rowId}`);
-        const basePriceText = basePriceCell?.textContent || '$0.00';
-        const baseUnitPrice = parseFloat(basePriceText.replace(/[^0-9.]/g, '')) || 0;
-
-        // Base sizes (S, M, L, XL)
-        const baseSizes = ['S', 'M', 'L', 'LG', 'XL'];
-        const baseSizeQtys = {};
-        let baseQty = 0;
-
-        Object.entries(product.sizeBreakdown || {}).forEach(([size, qty]) => {
-            if (size === 'SVC') return; // Skip service pseudo-size
-            const displaySize = size === 'L' ? 'LG' : size;
-            if (baseSizes.includes(size) && qty > 0) {
-                baseSizeQtys[displaySize] = qty;
-                baseQty += qty;
-            }
-        });
-
-        // Handle OSFA (beanies, caps without sized variants)
-        const osfaQty = product.sizeBreakdown['OSFA'] || 0;
-        if (osfaQty > 0 && baseQty === 0) {
-            // OSFA-only product — use parent price as base
-            lineItems.push({
-                description: `OSFA(${osfaQty})`,
-                quantity: osfaQty,
-                unitPrice: baseUnitPrice,
-                total: osfaQty * baseUnitPrice
-            });
-        } else {
-            if (baseQty > 0) {
-                const desc = Object.entries(baseSizeQtys)
-                    .map(([size, qty]) => `${size}(${qty})`)
-                    .join(' ');
-                lineItems.push({
-                    description: desc,
-                    quantity: baseQty,
-                    unitPrice: baseUnitPrice,
-                    total: baseQty * baseUnitPrice
-                });
-            }
-
-            // Extended / non-standard sizes — read from child row price cells. Iterate ALL
-            // sizeBreakdown keys (NOT a hardcoded list) so tall (LT/XLT…), fitted-cap combos
-            // (S/M, M/L, L/XL), youth (YS/YM/YL), toddler (2T–6T), big (LB/XLB…) and 7XL+ are
-            // NOT dropped from the PDF — they were silently vanishing from the table while their
-            // $ stayed in the total, so the products table under-footed. (2026-06-04 audit B3)
-            Object.entries(product.sizeBreakdown || {}).forEach(([size, qty]) => {
-                if (!(qty > 0)) return;
-                if (size === 'SVC') return;                       // service pseudo-size
-                if (baseSizes.includes(size)) return;             // already in the grouped base line
-                if (size === 'OSFA' && baseQty === 0) return;     // OSFA-only handled above
-                const childRowId = embState.childRowMap[rowId]?.[size];
-                const childPriceCell = document.getElementById(`row-price-${childRowId}`);
-                const childPriceText = childPriceCell?.textContent || '';
-                let unitPrice = parseFloat(childPriceText.replace(/[^0-9.]/g, '')) || 0;
-                if (!(unitPrice > 0)) unitPrice = baseUnitPrice;  // no child row found → base price
-                lineItems.push({
-                    description: `${size}(${qty})`,
-                    quantity: qty,
-                    unitPrice: unitPrice,
-                    total: qty * unitPrice,
-                    hasUpcharge: true
-                });
-            });
-        }
-
-        if (lineItems.length > 0) {
-            invoiceProducts.push({
-                product: {
-                    style: product.style,
-                    title: product.productName || product.style,
-                    color: product.color,
-                    isCap: product.isCap || false
-                },
-                lineItems: lineItems
-            });
-        }
+        const e = _buildEmbInvoiceProduct(product);
+        if (e) invoiceProducts.push(e);
     });
 
-    // Add service items (DECG, DECC, AL, Monogram) as invoice products
-    serviceItems.forEach(si => {
-        invoiceProducts.push({
-            product: {
-                style: si.style,
-                title: si.productName || si.title || si.style,
-                color: '',
-                isService: true,
-                isCap: si.isCap || false,
-                position: si.position || '',
-                totalQuantity: si.totalQuantity
-            },
-            isService: true,
-            lineItems: [{
-                description: si.productName || si.title || si.style,
-                quantity: si.totalQuantity,
-                unitPrice: si.unitPrice,
-                total: si.unitPrice * si.totalQuantity
-            }]
-        });
-    });
-
-    // Stitch surcharge (AS-Garm / AS-CAP) — a flat per-piece charge for a primary logo over 8K
-    // stitches. It's in the on-screen fee table AND the grand total, but was NEVER emitted as a
-    // PDF line item, so the products table under-footed (e.g. $3341.50 table vs $3473.50 subtotal
-    // on EMB-2026-276 — a $132 gap with nothing explaining it). Read the live fee-row values and
-    // add a real line so the PDF foots. (2026-06-04 audit B2)
-    [
-        { rowId: 'garment-stitch-fee-row', totalId: 'garment-stitch-fee-total', unitId: 'garment-stitch-fee-unit', qtyId: 'garment-stitch-fee-qty', style: 'AS-Garm', label: 'Additional Stitches (Garment)', isCap: false },
-        { rowId: 'cap-stitch-fee-row', totalId: 'cap-stitch-fee-total', unitId: 'cap-stitch-fee-unit', qtyId: 'cap-stitch-fee-qty', style: 'AS-CAP', label: 'Additional Stitches (Cap)', isCap: true }
-    ].forEach(s => {
-        const row = document.getElementById(s.rowId);
-        if (!row || row.style.display === 'none') return;   // surcharge not active
-        const total = parseFloat((document.getElementById(s.totalId)?.textContent || '').replace(/[$,]/g, '')) || 0;
-        if (!(total > 0)) return;
-        const qty = parseInt(document.getElementById(s.qtyId)?.textContent) || 0;
-        const unit = parseFloat((document.getElementById(s.unitId)?.textContent || '').replace(/[$,]/g, '')) || 0;
-        invoiceProducts.push({
-            product: { style: s.style, title: s.label, color: '', isService: true, isCap: s.isCap },
-            isService: true,
-            lineItems: [{ description: s.label, quantity: qty || 1, unitPrice: unit, total: total }]
-        });
-    });
+    _appendEmbServiceInvoiceItems(invoiceProducts, serviceItems);
 
     // Calculate subtotal from line items
     let subtotal = 0;

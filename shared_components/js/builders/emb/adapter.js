@@ -76,8 +76,9 @@ export class EmbAdapter {
     }
 
     // ── Lifecycle hook 1: UI wiring that must work even if pricing is down ─
-    async setupPage() {
-
+    // D4 split (2026-07-09): setupPage's cohesive wiring blocks moved VERBATIM
+    // into the _setup* siblings below — call order unchanged.
+    _setupEmbArtwork() {
         // Phase 9 (2026-05-23) → Phase 11.3 (2026-05-24) — rich-mode artwork upload.
         // Adds design name input + per-file placement dropdown so the push payload
         // can carry Designs[{name, Locations[{Location, ImageURL}]}] for new-design
@@ -114,107 +115,9 @@ export class EmbAdapter {
                 console.error('[EMB] Artwork widget mount failed:', e);
             }
         }
+    }
 
-
-        // ALWAYS set up search first - independent of pricing calculator
-        // This ensures search works even if pricing API fails
-        setupSearchAutocomplete();
-        setupKeyboardShortcuts();
-        setupPrimaryLogoHandlers();
-        setupCapPrimaryLogoHandlers();  // Cap logo handlers
-
-        // Services bar (2026-06-03): a persistent, catalog-driven "Add to order" strip.
-        // Click a chip → addManualServiceRow(code) inserts an editable LINE ITEM. Same
-        // shared bar (quote-services-bar.js) will drive SCP/DTG/DTF with their own catalogs.
-        if (window.QuoteServicesBar) {
-            // Part numbers + descriptions match the real ShopWorks line items (Erik's
-            // test order 142021). Codes are registered in the proxy KNOWN_FEE_PNS so
-            // they push as LinesOE line items. Not here (auto from the top config): AL,
-            // AL-CAP, DECG-FB (Full Back), 3D-EMB, Laser Patch, LTM, DD (Digitizing).
-            // Prices pulled from Caspio Service_Codes via /api/service-codes (single source
-            // of truth). Non-blocking: render once prices load (or fall back to defaults +
-            // a visible warning if the API is unreachable). Change a price in Caspio → the
-            // bar reflects it on next load, no deploy needed.
-            loadServiceCodePrices().finally(() => {
-                // Digitizing labels + new-logo nudge react to live Service_Codes and to
-                // design-number typing (recalc doesn't fire on keystrokes). (2026-07-07)
-                try {
-                    syncDigitizingPriceLabels();
-                    updateDigitizingNudges();
-                    ['garment-design-number', 'cap-design-number'].forEach(id => {
-                        document.getElementById(id)?.addEventListener('input', updateDigitizingNudges);
-                    });
-                } catch (_) {}
-                const sp = (code, fb) => getServicePrice(code, fb);
-                const EMB_SERVICE_CATALOG = [
-                    { group: 'Artwork', icon: 'fa-palette', items: [
-                        { code: 'GRT-50', label: 'Logo Mockup & Review', price: sp('GRT-50', 50),  unit: 'flat', icon: 'fa-palette' },
-                        { code: 'GRT-75', label: 'Graphic Design',       price: sp('GRT-75', 75),  unit: 'hr',   icon: 'fa-pencil-ruler' },
-                        { code: 'DD',     label: 'Digitizing',           price: sp('DD', 100),     unit: 'flat', icon: 'fa-cog' },
-                        // Additional Logo — live-priced per-piece from the API (calculateALPrice,
-                        // tier-aware + per-1K stitch upcharge). Pick Garment/Cap + size, then enter qty.
-                        { code: 'AL', label: 'Additional Logo', icon: 'fa-clone', addLabel: 'Add Logo', fields: [
-                            // Placement drives BOTH where it prints AND the pricing path
-                            // (Full Back → full-back rate, Cap* → cap rate, else garment rate).
-                            { name: 'placement', label: 'Where', options: [
-                                { group: 'Garment', options: [
-                                    { value: 'Left Chest',   label: 'Left Chest' },
-                                    { value: 'Right Chest',  label: 'Right Chest' },
-                                    { value: 'Left Sleeve',  label: 'Left Sleeve' },
-                                    { value: 'Right Sleeve', label: 'Right Sleeve' },
-                                    { value: 'Back/Nape',    label: 'Back / Nape' },
-                                    { value: 'Full Back',    label: 'Full Back' }
-                                ]},
-                                { group: 'Cap', options: [
-                                    { value: 'Cap Front', label: 'Cap Front' },
-                                    { value: 'Cap Back',  label: 'Cap Back' },
-                                    { value: 'Cap Side',  label: 'Cap Side' }
-                                ]}
-                            ]},
-                            // Simple by default (Std/Mid/Large chips) — exact when it matters (type the count).
-                            { name: 'stitches', label: 'Stitches', type: 'stitches', default: 8000, min: 1000, step: 1000, presets: [
-                                { label: 'Std',   value: 8000 },
-                                { label: 'Mid',   value: 13000 },
-                                { label: 'Large', value: 20000 }
-                            ]}
-                        ]}
-                    ]},
-                    { group: 'Add-Ons', icon: 'fa-stamp', items: [
-                        { code: 'Monogram', label: 'Monogram', price: sp('Monogram', 12.50), unit: 'ea', icon: 'fa-font' },
-                        { code: 'RUSH',     label: 'Rush Fee', priceLabel: '25% of subtotal', icon: 'fa-bolt' }
-                    ]},
-                    // Customer-Supplied: the customer brings their OWN blanks (corporate Costco jackets,
-                    // etc.) — we charge embroidery ONLY, no garment, at higher DECG tiers (no garment
-                    // margin). Live-priced per-piece from /api/decg-pricing (Embroidery_Costs DECG-Garmt /
-                    // DECG-Cap), garment vs cap by chip. Pick stitches, then set the qty on the line.
-                    { group: 'Customer-Supplied', icon: 'fa-box-open', items: [
-                        { code: 'DECG', label: 'Customer Garment', icon: 'fa-tshirt', addLabel: 'Add', priceLabel: 'embroidery only', fields: [
-                            { name: 'stitches', label: 'Stitches', type: 'stitches', default: 8000, min: 1000, step: 1000, presets: [
-                                { label: 'Std', value: 8000 }, { label: 'Mid', value: 13000 }, { label: 'Large', value: 20000 }
-                            ]},
-                            { name: 'heavyweight', label: 'Heavyweight +$10', type: 'checkbox' }
-                        ]},
-                        { code: 'DECC', label: 'Customer Cap', icon: 'fa-hat-cowboy', addLabel: 'Add', priceLabel: 'embroidery only', fields: [
-                            { name: 'stitches', label: 'Stitches', type: 'stitches', default: 8000, min: 1000, step: 1000, presets: [
-                                { label: 'Std', value: 8000 }, { label: 'Mid', value: 13000 }, { label: 'Large', value: 20000 }
-                            ]},
-                            { name: 'heavyweight', label: 'Heavyweight +$10', type: 'checkbox' }
-                        ]}
-                    ]}
-                ];
-                window.QuoteServicesBar.render('emb-services-bar', EMB_SERVICE_CATALOG,
-                    (code, opts) => {
-                        if (code === 'AL' && opts && opts.fields) {
-                            addALLineItem(opts.fields.placement, opts.fields.stitches);
-                        } else if ((code === 'DECG' || code === 'DECC') && opts && opts.fields) {
-                            addDECGLineItem(code === 'DECC' ? 'cap' : 'garment', opts.fields.stitches, opts.fields.heavyweight);
-                        } else {
-                            addManualServiceRow(code, opts && opts.price);
-                        }
-                    });
-            });
-        }
-
+    _setupPushButtonGate() {
         // Gated "Push to ShopWorks" button: re-evaluate when the Customer # changes,
         // and set its initial (disabled) state for a fresh quote.
         const _custNumEl = document.getElementById('customer-number');
@@ -245,12 +148,9 @@ export class EmbAdapter {
         const _custEmailEl = document.getElementById('customer-email');  // P2-15 (audit 2026-06-06): re-enable Push when Email is the last field typed
         if (_custEmailEl) _custEmailEl.addEventListener('input', updatePushButtonState);
         updatePushButtonState();
+    }
 
-        // Auto-select sales rep based on logged-in staff (2026 consolidation)
-        if (typeof StaffAuthHelper !== 'undefined') {
-            StaffAuthHelper.autoSelectSalesRep('sales-rep');
-        }
-
+    _setupCustomerLookup() {
         // Initialize customer lookup autocomplete
         if (typeof CustomerLookupService !== 'undefined') {
             const customerLookup = new CustomerLookupService();
@@ -356,6 +256,119 @@ export class EmbAdapter {
                 }
             });
         }
+    }
+
+    async setupPage() {
+
+        this._setupEmbArtwork();
+
+        // ALWAYS set up search first - independent of pricing calculator
+        // This ensures search works even if pricing API fails
+        setupSearchAutocomplete();
+        setupKeyboardShortcuts();
+        setupPrimaryLogoHandlers();
+        setupCapPrimaryLogoHandlers();  // Cap logo handlers
+
+        // Services bar (2026-06-03): a persistent, catalog-driven "Add to order" strip.
+        // Click a chip → addManualServiceRow(code) inserts an editable LINE ITEM. Same
+        // shared bar (quote-services-bar.js) will drive SCP/DTG/DTF with their own catalogs.
+        if (window.QuoteServicesBar) {
+            // Part numbers + descriptions match the real ShopWorks line items (Erik's
+            // test order 142021). Codes are registered in the proxy KNOWN_FEE_PNS so
+            // they push as LinesOE line items. Not here (auto from the top config): AL,
+            // AL-CAP, DECG-FB (Full Back), 3D-EMB, Laser Patch, LTM, DD (Digitizing).
+            // Prices pulled from Caspio Service_Codes via /api/service-codes (single source
+            // of truth). Non-blocking: render once prices load (or fall back to defaults +
+            // a visible warning if the API is unreachable). Change a price in Caspio → the
+            // bar reflects it on next load, no deploy needed.
+            loadServiceCodePrices().finally(() => {
+                // Digitizing labels + new-logo nudge react to live Service_Codes and to
+                // design-number typing (recalc doesn't fire on keystrokes). (2026-07-07)
+                try {
+                    syncDigitizingPriceLabels();
+                    updateDigitizingNudges();
+                    ['garment-design-number', 'cap-design-number'].forEach(id => {
+                        document.getElementById(id)?.addEventListener('input', updateDigitizingNudges);
+                    });
+                } catch (_) {}
+                const sp = (code, fb) => getServicePrice(code, fb);
+                const EMB_SERVICE_CATALOG = [
+                    { group: 'Artwork', icon: 'fa-palette', items: [
+                        { code: 'GRT-50', label: 'Logo Mockup & Review', price: sp('GRT-50', 50),  unit: 'flat', icon: 'fa-palette' },
+                        { code: 'GRT-75', label: 'Graphic Design',       price: sp('GRT-75', 75),  unit: 'hr',   icon: 'fa-pencil-ruler' },
+                        { code: 'DD',     label: 'Digitizing',           price: sp('DD', 100),     unit: 'flat', icon: 'fa-cog' },
+                        // Additional Logo — live-priced per-piece from the API (calculateALPrice,
+                        // tier-aware + per-1K stitch upcharge). Pick Garment/Cap + size, then enter qty.
+                        { code: 'AL', label: 'Additional Logo', icon: 'fa-clone', addLabel: 'Add Logo', fields: [
+                            // Placement drives BOTH where it prints AND the pricing path
+                            // (Full Back → full-back rate, Cap* → cap rate, else garment rate).
+                            { name: 'placement', label: 'Where', options: [
+                                { group: 'Garment', options: [
+                                    { value: 'Left Chest',   label: 'Left Chest' },
+                                    { value: 'Right Chest',  label: 'Right Chest' },
+                                    { value: 'Left Sleeve',  label: 'Left Sleeve' },
+                                    { value: 'Right Sleeve', label: 'Right Sleeve' },
+                                    { value: 'Back/Nape',    label: 'Back / Nape' },
+                                    { value: 'Full Back',    label: 'Full Back' }
+                                ]},
+                                { group: 'Cap', options: [
+                                    { value: 'Cap Front', label: 'Cap Front' },
+                                    { value: 'Cap Back',  label: 'Cap Back' },
+                                    { value: 'Cap Side',  label: 'Cap Side' }
+                                ]}
+                            ]},
+                            // Simple by default (Std/Mid/Large chips) — exact when it matters (type the count).
+                            { name: 'stitches', label: 'Stitches', type: 'stitches', default: 8000, min: 1000, step: 1000, presets: [
+                                { label: 'Std',   value: 8000 },
+                                { label: 'Mid',   value: 13000 },
+                                { label: 'Large', value: 20000 }
+                            ]}
+                        ]}
+                    ]},
+                    { group: 'Add-Ons', icon: 'fa-stamp', items: [
+                        { code: 'Monogram', label: 'Monogram', price: sp('Monogram', 12.50), unit: 'ea', icon: 'fa-font' },
+                        { code: 'RUSH',     label: 'Rush Fee', priceLabel: '25% of subtotal', icon: 'fa-bolt' }
+                    ]},
+                    // Customer-Supplied: the customer brings their OWN blanks (corporate Costco jackets,
+                    // etc.) — we charge embroidery ONLY, no garment, at higher DECG tiers (no garment
+                    // margin). Live-priced per-piece from /api/decg-pricing (Embroidery_Costs DECG-Garmt /
+                    // DECG-Cap), garment vs cap by chip. Pick stitches, then set the qty on the line.
+                    { group: 'Customer-Supplied', icon: 'fa-box-open', items: [
+                        { code: 'DECG', label: 'Customer Garment', icon: 'fa-tshirt', addLabel: 'Add', priceLabel: 'embroidery only', fields: [
+                            { name: 'stitches', label: 'Stitches', type: 'stitches', default: 8000, min: 1000, step: 1000, presets: [
+                                { label: 'Std', value: 8000 }, { label: 'Mid', value: 13000 }, { label: 'Large', value: 20000 }
+                            ]},
+                            { name: 'heavyweight', label: 'Heavyweight +$10', type: 'checkbox' }
+                        ]},
+                        { code: 'DECC', label: 'Customer Cap', icon: 'fa-hat-cowboy', addLabel: 'Add', priceLabel: 'embroidery only', fields: [
+                            { name: 'stitches', label: 'Stitches', type: 'stitches', default: 8000, min: 1000, step: 1000, presets: [
+                                { label: 'Std', value: 8000 }, { label: 'Mid', value: 13000 }, { label: 'Large', value: 20000 }
+                            ]},
+                            { name: 'heavyweight', label: 'Heavyweight +$10', type: 'checkbox' }
+                        ]}
+                    ]}
+                ];
+                window.QuoteServicesBar.render('emb-services-bar', EMB_SERVICE_CATALOG,
+                    (code, opts) => {
+                        if (code === 'AL' && opts && opts.fields) {
+                            addALLineItem(opts.fields.placement, opts.fields.stitches);
+                        } else if ((code === 'DECG' || code === 'DECC') && opts && opts.fields) {
+                            addDECGLineItem(code === 'DECC' ? 'cap' : 'garment', opts.fields.stitches, opts.fields.heavyweight);
+                        } else {
+                            addManualServiceRow(code, opts && opts.price);
+                        }
+                    });
+            });
+        }
+
+        this._setupPushButtonGate();
+
+        // Auto-select sales rep based on logged-in staff (2026 consolidation)
+        if (typeof StaffAuthHelper !== 'undefined') {
+            StaffAuthHelper.autoSelectSalesRep('sales-rep');
+        }
+
+        this._setupCustomerLookup();
 
         // Notes textarea badge update on input
         const notesTextarea = document.getElementById('notes');

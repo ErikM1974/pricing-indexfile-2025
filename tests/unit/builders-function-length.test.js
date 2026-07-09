@@ -17,26 +17,13 @@ const ROOT = path.join(__dirname, '../../shared_components/js/builders');
 // dir → 'file:function' → frozen max lines (REAL-END measure, recalibrated 2026-07-09). Shrink-only.
 const ALLOWLISTS = {
   emb: {
-    'adapter.js:setupPage': 293, // was invisible to the old top-level-only measure
     'output.js:diagnoseQuote': 279,
-    'output.js:buildEmbroideryPricingData': 268,
-    'persistence.js:restoreEmbroideryDraft': 209,
     'persistence.js:loadQuoteForEditing': 285,
     'product-rows.js:onStyleChange': 179,
-    'product-rows.js:updateRowForSizeCategory': 165,
-    'quote-lifecycle.js:resetQuote': 234,
     'shopworks-import.js:renderImportPreview': 260, // one cohesive HTML template
     'spr-modal.js:renderSprEmbConfigSection': 412, // deferred-closure machine — needs jsdom coverage before splitting
   },
-  scp: {
-    'adapter.js:setupPage': 156,
-    'adapter.js:initPricingAndRoute': 165,
-    'persistence.js:resetQuote': 167,
-    'pricing-sync.js:_recalculatePricingImpl': 347,
-    'product-rows.js:updateRowForSizeCategory': 166,
-    'save-output.js:buildScreenprintPricingData': 203,
-    'save-output.js:saveAndGetLink': 232,
-  },
+  scp: {},
   dtf: {},
   dtg: {
     // measured 2026-07-09 at the Batch 5 decomposition (monolith → 10 modules)
