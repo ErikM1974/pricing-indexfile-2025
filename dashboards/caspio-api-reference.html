@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Caspio REST API v4 — Reference · Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- 2026 design tokens (must load before dash-shell.css) -->
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css">
+    <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
+    <link rel="stylesheet" href="/dashboards/css/caspio-api-reference.css?v=2026.07.09.1">
+</head>
+<body>
+    <div class="dash-shell">
+        <header class="dash-header">
+            <div class="dash-header-left">
+                <a href="/staff-dashboard.html" title="Back to Staff Dashboard">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                         alt="Northwest Custom Apparel" class="dash-header-logo">
+                </a>
+                <h1 class="dash-header-title">Caspio REST API <span class="capi-v">v4</span> <span class="capi-sub">platform reference</span></h1>
+            </div>
+            <div class="dash-header-right">
+                <span class="capi-lock" title="This page is restricted to Erik only"><i class="fas fa-lock"></i> Erik only</span>
+                <a href="/staff-dashboard.html" class="dash-back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    Dashboard
+                </a>
+            </div>
+        </header>
+
+        <main class="dash-content">
+
+            <!-- Intro / headline -->
+            <section class="dash-card capi-intro" id="overview">
+                <p class="capi-lead">A field-by-field tour of the Caspio REST <strong>v4</strong> surface, pulled from the account's live Swagger. <strong>v4 is a superset of v3, opt-in, and additive</strong> — our existing v3 integrations (the whole caspio-pricing-proxy) keep working untouched. Everything here is what is <em>new or changed</em> relative to v3.</p>
+                <div class="capi-chips">
+                    <span class="capi-chip"><b>63</b> paths</span>
+                    <span class="capi-chip"><b>107</b> operations</span>
+                    <span class="capi-chip"><b>12</b> sections</span>
+                    <span class="capi-chip"><b>106</b> schemas</span>
+                    <span class="capi-chip">OpenAPI <b>3.0.4</b></span>
+                    <span class="capi-chip">Base <b>/integrations/rest</b></span>
+                    <span class="capi-chip capi-chip--muted">Captured 2026-07-09 · account <b>c3eku948</b></span>
+                </div>
+                <div class="capi-callout capi-callout--tip">
+                    <h4><i class="fas fa-lightbulb"></i> The headline: v4 is built for SQL + AI</h4>
+                    <p>v4 adds bulk operations with safety rails, full T-SQL in query parameters, single-call schema discovery, first-class file/webhook/app endpoints, and a machine-readable "AI context" so agents can drive the API. Our proxy still runs v3 — adopt v4 per-endpoint only where a new power pays off.</p>
+                </div>
+            </section>
+
+            <!-- Jump nav -->
+            <nav class="capi-toc" aria-label="Section navigation">
+                <a href="#release73">Caspio 73.0</a>
+                <a href="#changed">What changed</a>
+                <a href="#discovery">Discovery &amp; AI</a>
+                <a href="#auth">Auth</a>
+                <a href="#query">Querying (T-SQL)</a>
+                <a href="#write">Writes</a>
+                <a href="#bulk">Bulk &amp; guardrails</a>
+                <a href="#errors">Errors</a>
+                <a href="#datamodel">Data model</a>
+                <a href="#files">Files</a>
+                <a href="#webhooks">Webhooks</a>
+                <a href="#apps">Apps &amp; tasks</a>
+                <a href="#proxy">Proxy adoption</a>
+                <a href="#catalog">Endpoint catalog</a>
+            </nav>
+
+            <!-- Caspio 73.0 release highlights -->
+            <section class="dash-card capi-section" id="release73">
+                <h2 class="capi-h"><span class="capi-n"><i class="fas fa-star"></i></span> What's new in Caspio 73.0 <span class="capi-tag">released 2026-07-02</span></h2>
+                <p>The v4 launch shipped as part of Caspio 73.0. Several 73.0 changes are platform-level and matter beyond the endpoint list — <strong>some affect our existing v2/v3 integrations</strong>. Full notes: <a href="https://howto.caspio.com/release-notes/caspio-73-0/" target="_blank" rel="noopener">howto.caspio.com/release-notes/caspio-73-0</a>.</p>
+
+                <div class="capi-callout capi-callout--danger">
+                    <h4><i class="fas fa-triangle-exclamation"></i> Granular permissions now enforced — impacts v2 AND v3, not just v4</h4>
+                    <p>REST endpoints now return <strong>403 Forbidden</strong> when the calling API profile lacks object-level permission (Data Import/Export Tasks, Bridge Apps); Tables password-field &amp; attachment reads now return <strong>404</strong> for missing objects. <strong>Action:</strong> confirm our proxy's API profile has <em>"Enable access to all objects"</em> ON (Integrations → API Profiles) so the ~397 proxy calls don't silently start 403-ing, and treat a 403 as an auth-scope error (surface it — never swallow).</p>
+                </div>
+
+                <div class="capi-callout capi-callout--tip">
+                    <h4><i class="fas fa-shield-halved"></i> HMAC-SHA256 signature on every outgoing webhook</h4>
+                    <p>Each outgoing webhook now carries an HMAC-SHA256 signature (secret = the webhook's autogenerated secret / <code>regenerateSecret</code>) so a receiver can prove it came from Caspio, unmodified. Compatibility mode for receivers that can't compute an HMAC: include the secret in the payload (<code>defaultPayloadIncludesSecret</code> / <code>[@out-hook:secret]</code>). Capture the exact signature header from the authenticated v4 Swagger when we build the receiver.</p>
+                </div>
+
+                <div class="capi-callout capi-callout--warn">
+                    <h4><i class="fas fa-network-wired"></i> New egress IPs for webhooks + import/export tasks</h4>
+                    <p>If any receiver or firewall allowlists Caspio's egress IPs, add the new ones (all <code>/32</code> IPv4, US set): <code>3.94.26.149</code>, <code>3.221.12.171</code>, <code>3.223.237.156</code>, <code>3.232.188.127</code>, <code>18.235.29.217</code>, <code>34.200.156.163</code>, <code>35.173.3.24</code>, <code>44.198.154.72</code>, <code>44.219.25.193</code>, <code>44.221.229.56</code>, <code>54.88.136.246</code>, <code>54.224.65.145</code>, <code>100.58.20.55</code>. The list may change without notice. (NWCA's 24 webhooks target Zapier today, so no NWCA-owned allowlist is affected yet.)</p>
+                </div>
+
+                <h4 class="capi-h4">Also in 73.0</h4>
+                <ul>
+                    <li><strong>Redesigned API Profile Management</strong> (Integrations → API Profiles) — granular default permissions by object type + per-object overrides, generate a bearer token from the UI and test in the built-in Swagger UI, and IPv6 + IP-range access control. This is the path to split our single-credential blast radius into scoped least-privilege profiles.</li>
+                    <li><strong>Flex</strong> — Theme Editor (per-Segment themes, live preview, reusable) + Date/Time minute-level min/max offsets and fixed daily time windows.</li>
+                    <li><strong>Vault</strong> — create app packages directly from a Flex application's menu.</li>
+                </ul>
+            </section>
+
+            <!-- What changed -->
+            <section class="dash-card capi-section" id="changed">
+                <h2 class="capi-h"><span class="capi-n">01</span> What changed from v3</h2>
+                <div class="capi-scroll">
+                <table class="capi-table">
+                    <thead><tr><th>Area</th><th>v3</th><th>v4</th></tr></thead>
+                    <tbody>
+                        <tr><td>Base path</td><td><code>/integrations/rest/v3/…</code></td><td><code>/integrations/rest/v4/…</code></td></tr>
+                        <tr><td>Query params</td><td><code>q.select</code>, <code>q.where</code> (prefixed)</td><td>Plain camelCase: <code>select</code>, <code>where</code>, <code>orderBy</code>, <code>groupBy</code> — <strong>no <code>q.</code></strong></td></tr>
+                        <tr><td>List response</td><td><code>{ "Result": [...] }</code></td><td><code>{ "data": [...], "pagination": {…} }</code> with <code>totalCount</code></td></tr>
+                        <tr><td>Pagination</td><td><code>q.pageSize</code> + <code>q.pageNumber</code> (never <code>q.limit</code>)</td><td><code>pageNumber</code> + <code>pageSize</code> (5–1000). <code>limit</code> legacy/ignored when paging; <code>offset</code> not honored</td></tr>
+                        <tr><td>Bulk writes</td><td>one record per call</td><td>bulk insert / conditional update / conditional delete, ≤1000, <code>207 Multi-Status</code> on partial</td></tr>
+                        <tr><td>Query power</td><td>basic filters</td><td>full <strong>T-SQL</strong>: aggregates, subqueries, <code>CASE</code>, cross-table joins</td></tr>
+                        <tr><td>Schema discovery</td><td>per-object calls</td><td>one call → every object + full field defs (<code>/v4/schemas/*</code>)</td></tr>
+                        <tr><td>Auth</td><td colspan="2">Same OAuth <code>client_credentials</code> Bearer model (24h access / 1yr refresh). v4 adds scoped least-privilege profiles.</td></tr>
+                        <tr><td>AI support</td><td>—</td><td><code>info.x-caspio-ai-context</code> primer, <code>GET /v4/aiManifest</code>, per-lens specs, actionable error hints</td></tr>
+                        <tr><td>App access</td><td>Bridge deploy only</td><td>read Flex &amp; Bridge apps, list/read/deploy DataPages</td></tr>
+                    </tbody>
+                </table>
+                </div>
+            </section>
+
+            <!-- Discovery & AI -->
+            <section class="dash-card capi-section" id="discovery">
+                <h2 class="capi-h"><span class="capi-n">02</span> Discovery &amp; AI endpoints <span class="capi-tag">no auth to read</span></h2>
+                <p>v4 is self-describing — a client or AI agent can bootstrap without hard-coding anything.</p>
+                <div class="capi-eplist">
+                    <div class="capi-ep"><span class="capi-m GET">GET</span><span class="capi-path">/v4</span><span class="capi-desc">Capability root: stability, rate-limit shape, resource URLs, manifest link</span></div>
+                    <div class="capi-ep"><span class="capi-m GET">GET</span><span class="capi-path">/v4/aiManifest</span><span class="capi-desc">AI domain primer + per-lens OpenAPI links, <code>unsupportedByDesign</code>, eval rubric</span></div>
+                    <div class="capi-ep"><span class="capi-m GET">GET</span><span class="capi-path">/v4/me</span><span class="capi-desc">This token's <code>wsProfileName</code>, <code>accountSubdomain</code>, <code>tokenExpiresAt</code>, <code>rateLimit</code></span></div>
+                    <div class="capi-ep"><span class="capi-m GET">GET</span><span class="capi-path">/v4/errors · /v4/errors/{code}</span><span class="capi-desc">Every error code with machine-readable hint + remediation</span></div>
+                </div>
+                <h4 class="capi-h4">Lenses — token-sized spec slices</h4>
+                <p>Request a task-scoped subset instead of the full 63-path spec (keeps agents inside token/operation limits):</p>
+                <div class="capi-scroll">
+                <table class="capi-table">
+                    <thead><tr><th>Lens</th><th>Scope</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>dataManager</code></td><td>runtime CRUD — records, directory users, import/export tasks, file library</td></tr>
+                        <tr><td><code>designer</code></td><td>structural — defining/modifying views &amp; directories on existing tables</td></tr>
+                        <tr><td><code>automation</code></td><td>event-driven — webhooks + table/directory triggered-action rules</td></tr>
+                    </tbody>
+                </table>
+                </div>
+            </section>
+
+            <!-- Auth -->
+            <section class="dash-card capi-section" id="auth">
+                <h2 class="capi-h"><span class="capi-n">03</span> Authentication <span class="capi-tag">OAuth 2.0 client credentials</span></h2>
+                <p>All data endpoints require <code>Authorization: Bearer {access_token}</code>. Auth is <strong>identical to v3</strong> — same token endpoint and lifecycle.</p>
+                <pre>POST {tokenEndpoint}          # account subdomain, same host family as the API base
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=client_credentials&amp;client_id={clientId}&amp;client_secret={clientSecret}
+
+→ { "access_token":"…", "token_type":"bearer", "expires_in":86399, "refresh_token":"…" }</pre>
+                <ul>
+                    <li>Cache &amp; reuse <code>access_token</code>; renew after <code>expires_in</code> (~24h). Refresh without re-sending creds: <code>grant_type=refresh_token&amp;refresh_token={…}</code>.</li>
+                    <li>Each API profile has an <strong>isolated permission boundary</strong> scoped to specific tables/views — an application-level allowlist enforced <strong>before any SQL runs</strong>. Out-of-grant references are rejected as <code>IncorrectQueryParameter</code>.</li>
+                    <li>Our implementation: <code>caspio-pricing-proxy/src/utils/caspio.js</code> → <code>getCaspioAccessToken()</code> (module-cached, 60s buffer). <strong>400 "IncorrectQueryParameter" = stale token</strong>, auto-retried once per page.</li>
+                </ul>
+            </section>
+
+            <!-- Querying -->
+            <section class="dash-card capi-section" id="query">
+                <h2 class="capi-h"><span class="capi-n">04</span> Querying records <span class="capi-tag">the T-SQL power feature</span></h2>
+                <p>Query parameters are plain camelCase (no <code>q.</code> prefix):</p>
+                <div class="capi-scroll">
+                <table class="capi-table">
+                    <thead><tr><th>Param</th><th>Meaning</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>select</code></td><td>Comma field names, <code>*</code>, or any valid T-SQL SELECT expr — aggregates (<code>COUNT</code>, <code>SUM</code>…), scalar subqueries, <code>CASE</code>, arithmetic.</td></tr>
+                        <tr><td><code>where</code></td><td>T-SQL WHERE (no keyword). <code>EXISTS</code>, <code>IN</code> + subqueries, compound conditions across any permitted table.</td></tr>
+                        <tr><td><code>orderBy</code></td><td>e.g. <code>LastName ASC, FirstName DESC</code>.</td></tr>
+                        <tr><td><code>groupBy</code></td><td>Fields/exprs; supports <code>HAVING</code>, e.g. <code>Status HAVING COUNT(*) &gt; 5</code>.</td></tr>
+                        <tr><td><code>limit</code></td><td>1–1000, default 100. Legacy; ignored when <code>pageNumber</code>/<code>pageSize</code> set.</td></tr>
+                        <tr><td><code>pageNumber</code> / <code>pageSize</code></td><td>Explicit paging. <code>pageSize</code> 5–1000 (default 25 when paging).</td></tr>
+                    </tbody>
+                </table>
+                </div>
+                <div class="capi-callout capi-callout--warn">
+                    <h4><i class="fas fa-triangle-exclamation"></i> Rules that bite</h4>
+                    <ul>
+                        <li>Always reference a field by its <strong>Name</strong>, never its Label.</li>
+                        <li>Strings need the Unicode prefix in <code>where</code>: <code>N'value'</code>. Escape single quotes by doubling: <code>N'O''Brien'</code>.</li>
+                        <li><code>YES/NO</code> fields: use <code>1/0</code> in <code>where</code>, but send JSON <code>true/false</code> in write payloads.</li>
+                        <li>Cross-table subqueries are permitted &amp; encouraged; the permission boundary still applies. System catalogs are blocked and DDL (<code>CREATE/ALTER/DROP</code>) is never allowed.</li>
+                    </ul>
+                </div>
+                <div class="capi-callout capi-callout--good">
+                    <h4><i class="fas fa-circle-check"></i> Why it matters for us</h4>
+                    <p>Rich SQL-driven analytics straight through REST — no stored procedures, middleware, or pre-built Caspio views. Reporting aggregation (e.g. daily-sales-by-rep) could move server-side.</p>
+                </div>
+            </section>
+
+            <!-- Writes -->
+            <section class="dash-card capi-section" id="write">
+                <h2 class="capi-h"><span class="capi-n">05</span> Write operations &amp; response envelope</h2>
+                <p>List endpoints return an envelope — read records from <code>data[]</code>, use <code>pagination.totalCount</code> to compute pages:</p>
+                <pre>{ "data": [ … ], "pagination": { "totalCount": N, "pageNumber": N, "pageSize": N } }</pre>
+                <div class="capi-scroll">
+                <table class="capi-table">
+                    <thead><tr><th>Verb</th><th>Behavior</th></tr></thead>
+                    <tbody>
+                        <tr><td><code>POST …/records</code></td><td>Insert one. Omit auto-generated (Editable-false) fields. Returns <code>201</code> + new <code>PK_ID</code> (or full record with <code>echo=true</code>).</td></tr>
+                        <tr><td><code>PATCH …/records/{pkId}</code></td><td>Partial update — only supplied fields change; pass <code>null</code> to clear a field.</td></tr>
+                        <tr><td><code>PUT …/records/{pkId}</code></td><td>Update by PK_ID (symmetric with PATCH by design).</td></tr>
+                        <tr><td><code>DELETE …/records/{pkId}</code></td><td>Delete by PK_ID.</td></tr>
+                    </tbody>
+                </table>
+                </div>
+                <p class="capi-note">Every write endpoint accepts an optional <code>echo=true</code> query parameter to return the affected record(s).</p>
+            </section>
+
+            <!-- Bulk -->
+            <section class="dash-card capi-section" id="bulk">
+                <h2 class="capi-h"><span class="capi-n">06</span> Bulk operations &amp; safety guardrails <span class="capi-tag">the big new capability</span></h2>
+                <p>Bulk insert takes a JSON array (max <strong>1000</strong>) and returns <code>201</code> when all succeed or <code>207 Multi-Status</code> on partial failure — each item carries its own <code>status</code>:</p>
+                <pre>POST /v4/tables/{tableId}/records/bulk
+[ { "FieldA": 1 }, { "FieldA": 2 } ]
+
+→ { "PK_ID": ["101","102"],
+    "data": [ { "status":201, "PK_ID":"101" }, { "status":422, "error":"…" } ] }</pre>
+                <p>Conditional bulk update &amp; delete <strong>require a <code>where</code></strong>:</p>
+                <ul>
+                    <li><code>BulkUpdateRecordsRequest</code> — <span class="capi-req">where *</span> (required) + <span class="capi-req">recordValues *</span> (required)</li>
+                    <li><code>BulkDeleteRecordsRequest</code> — <span class="capi-req">where *</span> (required)</li>
+                </ul>
+                <div class="capi-callout capi-callout--danger">
+                    <h4><i class="fas fa-shield-halved"></i> Tautology guard</h4>
+                    <p>An always-true filter (<code>1=1</code>, <code>PK_ID&gt;0</code>) would hit every row — irreversible for DELETE. When the server's tautology guard is active, such unscoped filters are <strong>rejected</strong>. Always target with something like <code>PK_ID IN (1,2,3)</code> or <code>Status=N'Inactive'</code>, and <strong>run a <code>SELECT</code> with the same <code>where</code> first</strong> to confirm the row count.</p>
+                </div>
+            </section>
+
+            <!-- Errors -->
+            <section class="dash-card capi-section" id="errors">
+                <h2 class="capi-h"><span class="capi-n">07</span> Error responses <span class="capi-tag">actionable diagnostics</span></h2>
+                <pre>{ "Code":"ERROR_CODE", "Message":"human description", "Resource":"/path",
+  "RequestId":"…", "DocumentationUrl":"…",
+  "Hint": { "Note":"…", "Remediation":"…" } }</pre>
+                <p>Every error links back to <code>/v4/errors/{code}</code> for a machine-readable hint + remediation. <strong>Structural deletes</strong> (deleting a table, folder, or Flex app) return <code>405</code> by design as schema protection — not a missing feature.</p>
+            </section>
+
+            <!-- Data model -->
+            <section class="dash-card capi-section" id="datamodel">
+                <h2 class="capi-h"><span class="capi-n">08</span> Data model — types, fields, schema, relationships</h2>
+                <h4 class="capi-h4">Data types (exact token strings)</h4>
+                <p>Fields flagged <strong>Editable=false</strong> are auto-generated and must never appear in POST/PUT/PATCH bodies.</p>
+                <div class="capi-scroll">
+                <table class="capi-table">
+                    <thead><tr><th>Editable</th><th>Type tokens</th></tr></thead>
+                    <tbody>
+                        <tr><td>Yes</td><td><code>TEXT255</code> <code>TEXT64K</code> <code>NUMBER</code> <code>INTEGER</code> <code>CURRENCY</code> <code>DATE/TIME</code> <code>YES/NO</code> <code>ATTACHMENT</code> <code>LIST-STRING</code> <code>LIST-NUMBER</code> <code>LIST-DATE/TIME</code> <code>PASSWORD</code></td></tr>
+                        <tr><td>No (auto)</td><td><code>PK_ID</code> <code>AUTONUMBER</code> <code>SEQUENCE</code> <code>RANDOM_ID</code> <code>GUID</code> <code>TIMESTAMP</code> <code>FORMULA</code></td></tr>
+                        <tr><td>Legacy</td><td><code>FILE</code> — read-only path field in v4; may appear on older tables</td></tr>
+                    </tbody>
+                </table>
+                </div>
+                <h4 class="capi-h4">Field model &amp; schema discovery</h4>
+                <ul>
+                    <li><code>POST/PATCH …/fields</code> use <code>FieldModelV4</code> (<code>name</code>*, <code>dataType</code>*, label, displayOrder, unique, isFormula, format, prefix, length, <code>listField[]</code>, <code>stampOnInsert/Update</code>+<code>stampTimeZone</code>, attachment controls). Reads return richer <code>FieldItemV4</code> (+<code>editable</code>, <code>formula</code>, <code>relationship</code>).</li>
+                    <li><strong>One call, everything:</strong> <code>GET /v4/schemas/tables</code> (also <code>/views</code>, <code>/directories</code>, <code>/outgoingWebhooks</code>) returns every accessible object <em>with</em> full field definitions, relationships, and triggered actions. Ideal when object names are unknown — kills field-list hard-coding.</li>
+                    <li><strong>Relationships</strong> are explicit (<code>TableRelationshipItem</code>: relationshipType, joinType, parent/child table+field, referentialIntegrity, cascadeUpdate/Delete, displayValue) — see joins without reverse-engineering views.</li>
+                </ul>
+            </section>
+
+            <!-- Files -->
+            <section class="dash-card capi-section" id="files">
+                <h2 class="capi-h"><span class="capi-n">09</span> Files &amp; attachments <span class="capi-tag">two distinct surfaces</span></h2>
+                <h4 class="capi-h4">File Library — account-level storage under <code>/v4/fileAssets</code></h4>
+                <ul>
+                    <li>List / search files &amp; folders, upload (<code>POST</code> new, <code>PUT</code> overwrite), download or delete by <strong>fileId (GUID)</strong> or by <strong>path</strong>.</li>
+                    <li>Metadata: <code>fileId, name, size, contentType, fullFilePath</code>. New-file upload returns <code>409 Conflict</code> if the name already exists.</li>
+                    <li>Typical <code>FILE</code>-field flow: stored path → <code>GET /v4/fileAssets/files/path/fileInfo</code> (resolve the fileId) → <code>GET …/files/{fileId}</code> (download).</li>
+                </ul>
+                <h4 class="capi-h4">Attachment fields — per-record binary on tables / views / directory users</h4>
+                <ul>
+                    <li>Download / upload-replace (<code>PUT</code>) / delete a single attachment by record + field name.</li>
+                    <li>Bulk attachment ops by condition: upload to many records, get/rename file metadata, delete matching files.</li>
+                </ul>
+            </section>
+
+            <!-- Webhooks -->
+            <section class="dash-card capi-section" id="webhooks">
+                <h2 class="capi-h"><span class="capi-n">10</span> Webhooks &amp; automation</h2>
+                <p>Full CRUD for outgoing webhooks and their events, plus <code>PATCH …/{webhookId}/regenerateSecret</code>. Events use <code>WebhookEventV4PostRequest</code>:</p>
+                <pre>WebhookEventV4PostRequest {
+  type *          string     // required
+  objectId *      string     // required — the table/directory
+  objectFields    string[]
+  eventSources    string[]
+  defaultPayloadIncludesSecret  boolean
+  defaultPayloadFields          string[]
+  customPayloadTemplate         string
+  enabled         boolean
+}</pre>
+                <p>Triggered-action rules surface (read-only) through schema discovery as <code>TriggeredActionItem</code> (<code>name, eventType, isEnabled, referencedObjects[]</code> + audit stamps).</p>
+                <div class="capi-callout capi-callout--tip">
+                    <h4><i class="fas fa-bolt"></i> NWCA note</h4>
+                    <p><strong>Caspio Outgoing Webhooks FIRE on REST writes</strong> (≠ Triggered Actions, which do NOT fire on REST). v4 gives full webhook CRUD — reinforces the roadmap to convert polling crons → authenticated push. Guard against feedback loops (scope <code>eventSources</code>/<code>objectFields</code>, idempotent dedupe).</p>
+                </div>
+            </section>
+
+            <!-- Apps & tasks -->
+            <section class="dash-card capi-section" id="apps">
+                <h2 class="capi-h"><span class="capi-n">11</span> Apps, DataPages &amp; tasks <span class="capi-tag">new in v4</span></h2>
+                <ul>
+                    <li><strong>Flex applications</strong> — list &amp; read (<code>AppItemV4</code>: appId, name, dataPageCount, icon, audit stamps).</li>
+                    <li><strong>Bridge applications</strong> — list/read apps, list their <strong>DataPages</strong>, read a DataPage, get its deployment code, and deploy/undeploy one or (in bulk) all DataPages.</li>
+                    <li><strong>Data Import/Export tasks</strong> — list, read, and <code>POST …/{taskId}/run</code>. <code>ScheduledTaskInfoV4</code> exposes status, recurrence, last-run time/result, and time zone.</li>
+                </ul>
+            </section>
+
+            <!-- Proxy adoption -->
+            <section class="dash-card capi-section" id="proxy">
+                <h2 class="capi-h"><span class="capi-n">12</span> Proxy adoption — the v3 → v4 migration path</h2>
+                <p><strong>Current state:</strong> <code>caspio-pricing-proxy</code> calls Caspio <strong>v3</strong> exclusively. The single migration chokepoint is <code>caspio-pricing-proxy/src/utils/caspio.js</code> (token cache, <code>fetchAllCaspioPages()</code>, base URL <code>https://c3eku948.caspio.com/integrations/rest/v3</code>).</p>
+                <h4 class="capi-h4">High-value v4 wins for us</h4>
+                <ol class="capi-ol">
+                    <li><strong>Bulk conditional writes</strong> instead of per-record loops (respect the tautology guard; SELECT-first).</li>
+                    <li><strong>Single-call schema discovery</strong> to stop hard-coding field lists.</li>
+                    <li><strong>T-SQL <code>where</code>/<code>select</code></strong> for analytics without pre-built Caspio views.</li>
+                    <li><strong>Outgoing-webhook CRUD</strong> to replace polling crons (webhook-fires-on-REST).</li>
+                    <li><code>/v4/aiManifest</code> + lenses for AI-driven tooling.</li>
+                </ol>
+                <div class="capi-callout capi-callout--warn">
+                    <h4><i class="fas fa-list-check"></i> Migration checklist (per endpoint — do NOT bump the whole repo)</h4>
+                    <p>Drop the <code>q.</code> prefix → read from <code>data[]</code> not <code>Result[]</code> → use <code>pageNumber</code>+<code>pageSize</code> → <code>N'…'</code> string literals + <code>1/0</code> in <code>where</code> (but <code>true/false</code> in bodies) → confirm the token's profile grants the referenced objects. v3 works today; migrate an endpoint only when a specific v4 power justifies it.</p>
+                </div>
+            </section>
+
+            <!-- Full catalog (JS-rendered) -->
+            <section class="dash-card capi-section" id="catalog">
+                <div class="capi-catalog-head">
+                    <h2 class="capi-h capi-h--flush"><span class="capi-n">13</span> Full endpoint catalog <span class="capi-tag">107 operations · 12 sections</span></h2>
+                    <input type="search" id="capiFilter" class="capi-filter" placeholder="Filter endpoints — path, method, or word…" aria-label="Filter endpoints">
+                </div>
+                <p class="capi-note" id="capiFilterCount"></p>
+                <div id="capiCatalog" class="capi-catalog">Rendering catalog…</div>
+            </section>
+
+            <p class="capi-foot">
+                Generated from the live Caspio REST API v4 Swagger definition at
+                <code>/integrations/rest/v4/swagger/documentation</code> (OpenAPI 3.0.4). Existing v3
+                integrations are unaffected — v4 is additive and adopted on our own schedule.
+                Canonical memory copy: <code>memory/CASPIO_REST_API_V4_REFERENCE.md</code>.<br>
+                Docs: <a href="https://howto.caspio.com/" target="_blank" rel="noopener">howto.caspio.com</a> (how-to) ·
+                <a href="https://c3eku948.caspio.com/integrations/rest/swagger/index.html" target="_blank" rel="noopener">authenticated Swagger UI</a> (live tables/apps + full v4 schemas).
+            </p>
+
+        </main>
+    </div>
+
+    <!-- Load order: APP_CONFIG → page controller -->
+    <script src="/config/app.config.js"></script>
+    <script src="/dashboards/js/caspio-api-reference.js?v=2026.07.09.1"></script>
+</body>
+</html>

@@ -1,0 +1,400 @@
+/* ==========================================================================
+   caspio-api-reference.css — Caspio REST API v4 reference viewer (Erik-only)
+   Page-specific styles for /dashboards/caspio-api-reference.html.
+   Relies on the 2026 design tokens in art-hub.css + the shell in dash-shell.css.
+   No new palette hex: HTTP-verb badges map to the semantic --state-* tokens.
+   ========================================================================== */
+
+/* ---------- Header extras ---------- */
+.capi-v {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.18);
+    padding: 1px 8px;
+    border-radius: var(--radius-pill);
+    font-size: 0.85em;
+}
+.capi-sub {
+    font-weight: 400;
+    font-size: 0.7em;
+    opacity: 0.85;
+    letter-spacing: 0.02em;
+}
+.capi-lock {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #fff;
+    background: rgba(0, 0, 0, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    padding: 5px 12px;
+    border-radius: var(--radius-pill);
+}
+
+/* ---------- Intro ---------- */
+.capi-lead {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--gray-700);
+    margin: 0 0 var(--space-4);
+}
+.capi-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+}
+.capi-chip {
+    background: var(--surface-inset);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    padding: 5px 11px;
+    font-size: 0.8rem;
+    color: var(--gray-600);
+}
+.capi-chip b {
+    color: var(--gray-900);
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+.capi-chip--muted {
+    background: transparent;
+    color: var(--gray-500);
+}
+
+/* ---------- Jump nav ---------- */
+.capi-toc {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-bottom: var(--space-6);
+}
+.capi-toc a {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--gray-600);
+    text-decoration: none;
+    padding: 6px 12px;
+    background: var(--surface-card);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-pill);
+    transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
+}
+.capi-toc a:hover {
+    color: var(--dash-theme-dark);
+    border-color: var(--dash-theme);
+    background: var(--dash-theme-bg);
+}
+
+/* ---------- Sections ---------- */
+.capi-section {
+    scroll-margin-top: var(--space-4);
+}
+.capi-h {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin: 0 0 var(--space-4);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--gray-200);
+    letter-spacing: -0.01em;
+}
+.capi-h--flush {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+.capi-n {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #fff;
+    background: var(--dash-theme);
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    flex: 0 0 auto;
+}
+.capi-tag {
+    font-size: 0.72rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--gray-500);
+    background: var(--surface-inset);
+    border-radius: var(--radius-pill);
+    padding: 3px 10px;
+}
+.capi-h4 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin: var(--space-5) 0 var(--space-2);
+}
+.capi-section p,
+.capi-section li {
+    color: var(--gray-700);
+    line-height: 1.6;
+}
+.capi-section ul,
+.capi-section ol {
+    margin: var(--space-2) 0;
+    padding-left: var(--space-5);
+}
+.capi-section li {
+    margin: var(--space-1) 0;
+}
+.capi-note {
+    font-size: 0.85rem;
+    color: var(--gray-500);
+}
+.capi-req {
+    color: var(--state-danger);
+    font-weight: 700;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+/* ---------- Inline code + pre ---------- */
+.capi-section code {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.82em;
+    background: var(--surface-inset);
+    color: var(--gray-800);
+    padding: 1.5px 6px;
+    border-radius: var(--radius-sm);
+    /* Long tokens (URLs, deep paths) must break rather than push the page sideways. */
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+.capi-section pre {
+    background: var(--gray-900);
+    color: var(--gray-100);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.8rem;
+    line-height: 1.55;
+    margin: var(--space-3) 0;
+}
+.capi-section pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    white-space: pre;
+}
+
+/* ---------- Tables ---------- */
+.capi-scroll {
+    overflow-x: auto;
+    margin: var(--space-3) 0;
+}
+.capi-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.86rem;
+    min-width: 520px;
+}
+.capi-table th,
+.capi-table td {
+    text-align: left;
+    padding: var(--space-2) var(--space-3);
+    border-bottom: 1px solid var(--gray-200);
+    vertical-align: top;
+    color: var(--gray-700);
+}
+.capi-table th {
+    color: var(--gray-500);
+    font-weight: 600;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    background: var(--surface-inset);
+    position: sticky;
+    top: 0;
+}
+.capi-table tr:last-child td {
+    border-bottom: 0;
+}
+
+/* ---------- Callouts ---------- */
+.capi-callout {
+    border: 1px solid var(--gray-200);
+    border-left: 3px solid var(--gray-400);
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4);
+    margin: var(--space-4) 0;
+    background: var(--surface-inset);
+}
+.capi-callout h4 {
+    margin: 0 0 var(--space-2);
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--gray-800);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+.capi-callout p,
+.capi-callout li {
+    margin: var(--space-1) 0;
+    font-size: 0.88rem;
+}
+.capi-callout--tip {
+    border-left-color: var(--state-info);
+    background: var(--state-info-bg);
+}
+.capi-callout--tip h4 { color: var(--state-info); }
+.capi-callout--good {
+    border-left-color: var(--state-success);
+    background: var(--state-success-bg);
+}
+.capi-callout--good h4 { color: var(--state-success); }
+.capi-callout--warn {
+    border-left-color: var(--state-warning);
+    background: var(--state-warning-bg);
+}
+.capi-callout--warn h4 { color: var(--state-warning); }
+.capi-callout--danger {
+    border-left-color: var(--state-danger);
+    background: var(--state-danger-bg);
+}
+.capi-callout--danger h4 { color: var(--state-danger); }
+
+/* ---------- Endpoint rows (static + catalog) ---------- */
+.capi-eplist {
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    margin: var(--space-3) 0;
+}
+.capi-ep {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-3);
+    align-items: baseline;
+    padding: var(--space-2) var(--space-3);
+    border-bottom: 1px solid var(--gray-200);
+    background: var(--surface-card);
+}
+.capi-ep:last-child { border-bottom: 0; }
+.capi-ep:hover { background: var(--surface-hover); }
+.capi-m {
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 3px 7px;
+    border-radius: var(--radius-sm);
+    min-width: 58px;
+    text-align: center;
+    color: #fff;
+    flex: 0 0 auto;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+.capi-m.GET    { background: var(--state-info); }
+.capi-m.POST   { background: var(--state-success); }
+.capi-m.PUT    { background: var(--state-warning); }
+.capi-m.PATCH  { background: var(--state-violet); }
+.capi-m.DELETE { background: var(--state-danger); }
+.capi-path {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 0.8rem;
+    color: var(--gray-900);
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+.capi-desc {
+    color: var(--gray-500);
+    font-size: 0.8rem;
+    margin-left: auto;
+    text-align: right;
+    max-width: 46%;
+}
+.capi-desc code {
+    white-space: nowrap;
+}
+
+/* ---------- Catalog ---------- */
+.capi-catalog-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-bottom: var(--space-2);
+    padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--gray-200);
+}
+.capi-filter {
+    flex: 1 1 260px;
+    max-width: 360px;
+    padding: 8px 14px;
+    font-family: inherit;
+    font-size: 0.875rem;
+    color: var(--gray-800);
+    background: var(--surface-card);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+}
+.capi-filter:focus {
+    outline: none;
+    border-color: var(--dash-theme);
+    box-shadow: 0 0 0 3px var(--dash-theme-bg);
+}
+.capi-grpbar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin: var(--space-5) 0 var(--space-2);
+}
+.capi-grpbar h3 {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--gray-800);
+}
+.capi-count {
+    font-size: 0.72rem;
+    color: var(--gray-500);
+    background: var(--surface-inset);
+    padding: 2px 9px;
+    border-radius: var(--radius-pill);
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+}
+.capi-empty {
+    padding: var(--space-6);
+    text-align: center;
+    color: var(--gray-500);
+    font-size: 0.9rem;
+}
+mark.capi-hit {
+    background: var(--state-warning-bg);
+    color: var(--state-warning);
+    border-radius: 2px;
+    padding: 0 1px;
+}
+
+/* ---------- Footer ---------- */
+.capi-foot {
+    margin-top: var(--space-6);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--gray-200);
+    color: var(--gray-500);
+    font-size: 0.8rem;
+    line-height: 1.6;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 700px) {
+    .capi-desc { display: none; }
+    .capi-h { font-size: 1.05rem; }
+}

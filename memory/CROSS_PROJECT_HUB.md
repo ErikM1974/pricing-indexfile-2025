@@ -35,7 +35,8 @@ These are the MASTER documents - update HERE, not copies elsewhere:
 |-------|-----------------|-------|
 | **ManageOrders API** | [MANAGEORDERS_COMPLETE_REFERENCE.md](./MANAGEORDERS_COMPLETE_REFERENCE.md) | Pricing Index |
 | **CRM Capabilities** | [MANAGEORDERS_CRM_CAPABILITY_REFERENCE.md](./MANAGEORDERS_CRM_CAPABILITY_REFERENCE.md) | Pricing Index |
-| **Caspio API Endpoints** | [CASPIO_API_CORE.md](./CASPIO_API_CORE.md) | Pricing Index |
+| **Caspio API Endpoints** (our proxy's API) | [CASPIO_API_CORE.md](./CASPIO_API_CORE.md) | Pricing Index |
+| **Caspio *platform* REST — what the proxy CALLS** | [CASPIO_REST_API_REFERENCE.md](./CASPIO_REST_API_REFERENCE.md) (v3) + [CASPIO_REST_API_V4_REFERENCE.md](./CASPIO_REST_API_V4_REFERENCE.md) (v4 delta) | Pricing Index |
 | **Lessons Learned** | [LESSONS_LEARNED.md](./LESSONS_LEARNED.md) | Pricing Index |
 | **3-Day Tees Flow** | [3-day-tees/ORDER_PUSH_FLOW.md](./3-day-tees/ORDER_PUSH_FLOW.md) | Pricing Index |
 | **Size Modifiers** | `Python Inksoft/transform.py` (lines 19-74) | Python Inksoft |
