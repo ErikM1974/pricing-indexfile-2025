@@ -7,15 +7,13 @@
  * - DTG Quote Builder (/quote-builders/dtg-quote-builder.html)
  * - DTG Pricing Calculator (/calculators/dtg-pricing.html)
  *
- * CRITICAL: Any changes to pricing formulas here will affect both calculators.
- * Always test BOTH calculators after making changes to ensure pricing remains synchronized.
- *
- * Key Pricing Formulas (MUST NOT CHANGE):
- * - Base garment cost: Math.min(...sizes.map(s => s.price))  [Use 'price' NOT 'maxCasePrice']
- * - Margin denominator: From API tier data (tiersR[].MarginDenominator)
- * - Rounding: Math.ceil(basePrice * 2) / 2 (round UP to half dollar)
- *
- * See CLAUDE.md "DTG Calculator Synchronization" section for testing requirements.
+ * THE PRICING MATH DOES NOT LIVE HERE (Batch 6, 2026-07-09): every formula
+ * (base garment cost, margin, half-dollar rounding, upcharges, LTM, tier
+ * resolution) delegates to window.DTGCanonicalPricing — the vendored
+ * dtg-canonical-pricing.js, byte-locked to the proxy's canonical engine.
+ * This class is fetch/cache/shape-adaptation only. Any formula change happens
+ * in the proxy file, gets re-copied, and is proven by the golden-vector +
+ * vendored-parity suites.
  *
  * @author Claude & Erik
  * @date 2025-08-18
@@ -41,6 +39,12 @@ class DTGPricingService {
             { code: 'LC_JB', name: 'Left Chest & Jumbo Back' }
         ];
         
+        // Batch 6: the canonical engine is REQUIRED (vendored dtg-canonical-pricing.js
+        // loads before this service on every page) - fail LOUDLY, never a silent wrong price.
+        if (typeof window.DTGCanonicalPricing === 'undefined') {
+            console.error('[DTGPricingService] dtg-canonical-pricing.js is missing - DTG pricing cannot compute.');
+            if (typeof window.showToast === 'function') window.showToast('DTG pricing engine failed to load - refresh the page.', 'error', 8000);
+        }
         console.log('[DTGPricingService] Service initialized - API bundle endpoint only (no fallback)');
     }
 
@@ -376,80 +380,31 @@ class DTGPricingService {
      * @private
      */
     calculateLocationPrices(locationCode, tier, costs, sizes, upcharges, allTiers) {
+        // Batch 6 (2026-07-09): ALL math delegates to the canonical engine
+        // (window.DTGCanonicalPricing - vendored byte-identical from the proxy's
+        // lib/dtg-canonical-pricing.js; equality CI-enforced). This wrapper only
+        // adapts shapes: N/A marking + the builder's {size: {tierLabel: price}}.
         const prices = {};
-
-        // Handle combined locations (e.g., 'LC_FB')
-        const locationCodes = locationCode.split('_');
-
-        // Resolve which TierLabel to look up in DTG_Costs. Default: the
-        // tier's own label. If the LTM tier (LTM_Fee>0) has no DTG_Costs
-        // rows, fall back to the lowest non-LTM tier's costs (preserves
-        // the historical "LTM uses 24-47 print cost" pattern).
-        let costsTierLabel = tier.TierLabel;
-        const isLTMTier = parseFloat(tier.LTM_Fee || 0) > 0;
-        if (isLTMTier && Array.isArray(allTiers)) {
-            const hasCostsForTier = costs.some(c => c.TierLabel === tier.TierLabel);
-            if (!hasCostsForTier) {
-                const nonLtm = allTiers
-                    .filter(t => parseFloat(t.LTM_Fee || 0) === 0)
-                    .sort((a, b) => Number(a.MinQuantity) - Number(b.MinQuantity));
-                if (nonLtm.length) costsTierLabel = nonLtm[0].TierLabel;
-            }
-        }
-
-        // Get print cost for this location and tier
-        let totalPrintCost = 0;
-        locationCodes.forEach(code => {
-            const costEntry = costs.find(c =>
-                c.PrintLocationCode === code &&
-                c.TierLabel === costsTierLabel
-            );
-            if (costEntry) {
-                totalPrintCost += parseFloat(costEntry.PrintCost);
-            }
+        const tiersForResolve = (Array.isArray(allTiers) && allTiers.length) ? allTiers : [tier];
+        const r = window.DTGCanonicalPricing.priceForLocationCombo({
+            bundle: { pricing: { tiers: tiersForResolve, costs, sizes, upcharges } },
+            locationCode,
+            tierLabel: tier.TierLabel,
         });
-        
-        // Find the base garment cost (lowest valid price, excluding zeros)
-        // CRITICAL: Use 'price' field not 'maxCasePrice' (fixed 2025-10-05)
-        const validPrices = sizes
-            .map(s => parseFloat(s.price))
-            .filter(price => !isNaN(price) && price > 0);
-        
-        if (validPrices.length === 0) {
+        if (r.error) {
             console.error('[DTGPricingService] No valid garment costs found for any size');
             return prices;
         }
-        
-        const baseGarmentCost = Math.min(...validPrices);
-        
-        if (isNaN(baseGarmentCost) || baseGarmentCost <= 0) {
-            console.error('[DTGPricingService] Invalid base garment cost:', baseGarmentCost);
-            return prices;
-        }
-        
-        // Calculate base price (same for all sizes before upcharges)
-        const markedUpGarment = baseGarmentCost / tier.MarginDenominator;
-        const basePrice = markedUpGarment + totalPrintCost;
-        const roundedBasePrice = this.roundUpToHalfDollar(basePrice);
-        
-        // Apply size-specific upcharges
         sizes.forEach(sizeInfo => {
             const size = sizeInfo.size;
-            // CRITICAL: Use 'price' field not 'maxCasePrice' (fixed 2025-10-05)
-            const sizePrice = parseFloat(sizeInfo.price);
-
-            // If this size has no valid price ($0), mark as unavailable
-            if (isNaN(sizePrice) || sizePrice <= 0) {
-                prices[size] = {};
-                prices[size][tier.TierLabel] = 'N/A';  // Mark as not available
+            prices[size] = {};
+            if (r.perSize[size] == null) {
+                prices[size][tier.TierLabel] = 'N/A';
                 console.warn(`[DTGPricingService] Size ${size} has invalid price, marking as N/A`);
             } else {
-                const upcharge = upcharges[size] || 0;
-                prices[size] = {};
-                prices[size][tier.TierLabel] = parseFloat((roundedBasePrice + upcharge).toFixed(2));
+                prices[size][tier.TierLabel] = parseFloat(r.perSize[size].toFixed(2));
             }
         });
-        
         return prices;
     }
 
@@ -471,47 +426,30 @@ class DTGPricingService {
      * @returns {Array<{ label, isLTM, ltmFee, basePrices: {size: price} }>}
      */
     calculateAllTierPricesForLocation(data, locationCode) {
+        // Batch 6: per-tier delegation to the canonical engine (incl. its LTM-tier
+        // print-cost fallback). The matrix historically prices EVERY size label -
+        // availability is the caller's concern - so unavailable sizes fall back to
+        // baseUnit + upcharge exactly as before.
         const { tiers, costs, sizes, upcharges } = data;
         const sizeLabels = sizes.map(s => s.size);
-        const baseGarmentCost = Math.min(...sizes.map(s => parseFloat(s.price)).filter(p => p > 0));
-        const locationCodes = (locationCode || 'LC').split('_');
-
-        // Sort tiers by MinQuantity so the LTM tier (1-23) comes first.
         const sortedTiers = [...tiers].sort(
             (a, b) => parseInt(a.MinQuantity, 10) - parseInt(b.MinQuantity, 10)
         );
-
-        // Lowest non-LTM tier label — used as print-cost fallback for LTM rows
-        // that DTG_Costs doesn't have entries for.
-        const lowestNonLtmTierLabel = (sortedTiers.find(t => parseFloat(t.LTM_Fee || 0) === 0) || sortedTiers[0] || {}).TierLabel;
-
         return sortedTiers.map(tier => {
-            const isLTM = parseFloat(tier.LTM_Fee || 0) > 0;
-            // Resolve which TierLabel to look up in DTG_Costs. If the LTM tier
-            // has its own print-cost rows, use them; otherwise fall back to the
-            // lowest non-LTM tier (preserves the historical pattern).
-            let lookupTier = tier.TierLabel;
-            if (isLTM) {
-                const hasCosts = costs.some(c => c.TierLabel === tier.TierLabel);
-                if (!hasCosts) lookupTier = lowestNonLtmTierLabel;
-            }
-            let totalPrintCost = 0;
-            locationCodes.forEach(code => {
-                const costEntry = costs.find(c =>
-                    c.PrintLocationCode === code && c.TierLabel === lookupTier
-                );
-                if (costEntry) totalPrintCost += parseFloat(costEntry.PrintCost);
+            const r = window.DTGCanonicalPricing.priceForLocationCombo({
+                bundle: { pricing: { tiers, costs, sizes, upcharges } },
+                locationCode: locationCode || 'LC',
+                tierLabel: tier.TierLabel,
             });
-            const roundedBase = Math.ceil(
-                (baseGarmentCost / tier.MarginDenominator + totalPrintCost) * 2
-            ) / 2;
             const basePrices = {};
             sizeLabels.forEach(size => {
-                basePrices[size] = roundedBase + parseFloat(upcharges[size] || 0);
+                basePrices[size] = r.perSize[size] != null
+                    ? r.perSize[size]
+                    : r.baseUnit + parseFloat(upcharges[size] || 0);
             });
             return {
                 label: tier.TierLabel,
-                isLTM,
+                isLTM: parseFloat(tier.LTM_Fee || 0) > 0,
                 ltmFee: parseFloat(tier.LTM_Fee || 0),
                 basePrices
             };
@@ -525,32 +463,21 @@ class DTGPricingService {
      * @private
      */
     getTierForQuantity(tiers, quantity) {
-        // Defensive null checking - prevent crash if tiers is undefined
         if (!tiers || !Array.isArray(tiers) || tiers.length === 0) {
             console.error('[DTGPricingService] ERROR: Invalid tiers parameter:', tiers);
-            // Return a safe fallback tier (no LTM)
-            return {
-                TierLabel: '24-47',
-                MinQuantity: 1,
-                MaxQuantity: 47,
-                MarginDenominator: 0.53, // last-resort fallback — Caspio Pricing_Tiers is authoritative (0.53 as of 2026-06)
-                LTM_Fee: 0,
-                Note: 'Fallback tier - tiers parameter was invalid'
-            };
         }
-
-        return tiers.find(t =>
-            quantity >= parseInt(t.MinQuantity, 10) && quantity <= parseInt(t.MaxQuantity, 10)
-        );
+        // Batch 6: canonical resolution (identical range find + the same 0.53 no-LTM
+        // fallback shape; adds a top-tier clamp above MaxQuantity - unreachable with
+        // the real open-ended 72+ row, locked equal by dtg-cross-repo-formula-parity).
+        return window.DTGCanonicalPricing.tierForCombinedQty(tiers, quantity);
     }
-
 
     /**
      * Round up to nearest half dollar
      * @private
      */
     roundUpToHalfDollar(amount) {
-        return Math.ceil(amount * 2) / 2;
+        return window.DTGCanonicalPricing.roundUpToHalfDollar(amount); // Batch 6: ONE rounding rule
     }
 
     /**
@@ -705,12 +632,10 @@ class DTGPricingService {
             throw new Error('No valid garment prices in API data');
         }
 
-        const baseGarmentCost = Math.min(...validPrices);
-        const garmentWithMargin = baseGarmentCost / tier.MarginDenominator;
-
-        // Sum print costs for all location codes (handles combos via '_' split)
+        // Strict pre-validation stays HERE (a missing cost row must THROW, never price
+        // low - canonical treats absent rows as $0); composition + rounding then
+        // delegate to the canonical engine (Batch 6).
         const locationCodes = locationCode.split('_');
-        let totalPrintCost = 0;
         locationCodes.forEach(code => {
             const costEntry = (costs || []).find(c =>
                 c.PrintLocationCode === code && c.TierLabel === tierLabel
@@ -718,10 +643,12 @@ class DTGPricingService {
             if (!costEntry || !costEntry.PrintCost) {
                 throw new Error(`Print cost data missing for ${code} at tier ${tierLabel}`);
             }
-            totalPrintCost += parseFloat(costEntry.PrintCost);
         });
-
-        return Math.ceil((garmentWithMargin + totalPrintCost) * 2) / 2;
+        return window.DTGCanonicalPricing.priceForLocationCombo({
+            bundle: { pricing: { tiers, costs, sizes, upcharges: {} } },
+            locationCode,
+            tierLabel,
+        }).baseUnit;
     }
 
     /**

@@ -1356,7 +1356,7 @@ let hasChanges = false;
         const tier = tierRow ? tierRow.TierLabel : tierLabelFromQty(cq);
         const ltmFee = Number(tierRow && tierRow.LTM_Fee) || 0;
         const isLtm = ltmFee > 0;
-        const ltmPP = isLtm ? Math.floor((ltmFee / cq) * 100) / 100 : 0;
+        const ltmPP = isLtm ? window.DTGCanonicalPricing.ltmPerUnit({ LTM_Fee: ltmFee }, cq) : 0;  // canonical floor-to-cents (Batch 6)
         const subtotal = state.rows.reduce((s, r) => s + (Number(r._lineTotal) || 0), 0);
         const tierDisplay = isLtm ? `${tier} (LTM)` : tier;
 
@@ -1467,7 +1467,7 @@ let hasChanges = false;
         } else {
             const tierLabel = _lastTier ? _lastTier.TierLabel : '?';
             const ltmFee = _lastTier ? Number(_lastTier.LTM_Fee) || 0 : 0;
-            const tierNote = ltmFee > 0 ? ` (LTM +$${(Math.floor((ltmFee / cq) * 100) / 100).toFixed(2)}/pc)` : '';
+            const tierNote = ltmFee > 0 ? ` (LTM +$${window.DTGCanonicalPricing.ltmPerUnit({ LTM_Fee: ltmFee }, cq).toFixed(2)}/pc)` : '';  // canonical (Batch 6)
             items.push({
                 state: 'ok',
                 label: 'Line items',
@@ -3650,7 +3650,7 @@ let hasChanges = false;
                 _lastTier = tier;
                 _allTiers = bundle.tiers;
                 const ltmFee = Number(tier.LTM_Fee) || 0;
-                const ltmPP = ltmFee > 0 ? Math.floor((ltmFee / cq) * 100) / 100 : 0;
+                const ltmPP = window.DTGCanonicalPricing.ltmPerUnit({ LTM_Fee: ltmFee }, cq);  // canonical floor-to-cents (Batch 6)
 
                 const allPrices = svc.calculateAllLocationPrices(bundle, cq);
                 if (!allPrices || !allPrices[code]) { row._perPiece = null; row._lineTotal = 0; continue; }
