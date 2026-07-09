@@ -455,13 +455,12 @@ export async function parseAndPreviewShopWorks() {
 /**
  * Render the import preview
  */
-function renderImportPreview(data) {
-    const preview = document.getElementById('shopworks-import-preview');
+// T3 split (2026-07-09): renderImportPreview was 4 sequential section paints
+// over `data` (grid / products / services / warnings+review) — moved VERBATIM.
+// _paintImportWarnings also stores the combined review list back on data
+// (consumed by the import step), exactly as before.
+function _paintImportGrid(data) {
     const grid = document.getElementById('preview-grid');
-    const products = document.getElementById('preview-products');
-    const services = document.getElementById('preview-services');
-    const warnings = document.getElementById('preview-warnings');
-
     // Customer & order info grid
     const pricingIcon = data.pricingSource === 'caspio' ? '✓' : '⚠';
     const pricingColor = data.pricingSource === 'caspio' ? '#28a745' : '#ffc107';
@@ -488,7 +487,10 @@ function renderImportPreview(data) {
             <div class="preview-item-value" style="color: ${pricingColor};">${pricingIcon} ${data.pricingSource === 'caspio' ? 'Live API' : 'Fallback'}</div>
         </div>
     `;
+}
 
+function _paintImportProducts(data) {
+    const products = document.getElementById('preview-products');
     // Products list
     let productsHtml = '';
     if (data.products.length > 0) {
@@ -570,7 +572,10 @@ function renderImportPreview(data) {
     }
     // eslint-disable-next-line no-unsanitized/property -- audited (1.4): every user/API string escapeHtml-wrapped at build; icons/notes internal or numeric
     products.innerHTML = productsHtml;
+}
 
+function _paintImportServices(data) {
+    const services = document.getElementById('preview-services');
     // Services badges
     let servicesHtml = '';
     if (data.services.digitizing) {
@@ -634,7 +639,10 @@ function renderImportPreview(data) {
     } else {
         services.innerHTML = '';
     }
+}
 
+function _paintImportWarnings(data) {
+    const warnings = document.getElementById('preview-warnings');
     // Warnings - highlight DECG API failures prominently (CLAUDE.md rule #4)
     if (data.warnings.length > 0 || data.notes.length > 0) {
         let warningsHtml = '<h5><i class="fas fa-exclamation-triangle"></i> Notes & Warnings</h5>';
@@ -713,7 +721,18 @@ function renderImportPreview(data) {
     // Store combined list on data object for import step
     data._allReviewItems = allReviewItems;
 
+}
+
+function renderImportPreview(data) {
+    const preview = document.getElementById('shopworks-import-preview');
+
+    _paintImportGrid(data);
+    _paintImportProducts(data);
+    _paintImportServices(data);
+    _paintImportWarnings(data);
+
     preview.classList.add('active');
+
 }
 
 /** Imported fee blocks — steps 4 (patch setup + GRT-50), 6 (art charges),

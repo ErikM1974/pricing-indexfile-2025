@@ -19,6 +19,7 @@ const BRIDGED = [
     'onSprSourceChange',
     'onSprCustomServiceFocus',
     'onSprGarmentPositionChange',
+    'renderSprEmbConfigSection', // T3: exported as the jsdom test seam (spr-emb-config.test.js)
     'onSprGarmentStitchTierChange',
     'onSprCapEmbellishmentChange',
     'onSprStitchChange',
@@ -32,6 +33,7 @@ const BRIDGED = [
 // Two-way lock: they must stay exported AND stay off the window surface.
 const DIET_UNBRIDGED = [
     'getSprEmbConfigOptions',
+    'renderSprEmbConfigSection', // T3 jsdom test seam — never window-bridged
 ];
 
 function loadModule() {

@@ -19,6 +19,7 @@ const ENTRIES = {
     'scp-adapter.cjs': 'shared_components/js/builders/scp/adapter.js',
     'dtf-adapter.cjs': 'shared_components/js/builders/dtf/adapter.js',
     'dtg-adapter.cjs': 'shared_components/js/builders/dtg/adapter.js',
+    'emb-spr-modal.cjs': 'shared_components/js/builders/emb/spr-modal.js',
     'dtf-quote-builder-class.cjs': 'shared_components/js/builders/dtf/quote-builder-class.js',
     'scp-persistence.cjs': 'shared_components/js/builders/scp/persistence.js',
     'emb-persistence.cjs': 'shared_components/js/builders/emb/persistence.js',

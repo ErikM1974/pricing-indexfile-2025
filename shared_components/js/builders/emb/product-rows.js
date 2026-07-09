@@ -941,6 +941,96 @@ export function deleteServiceRow(rowId) {
     }
 }
 
+// T3 split (2026-07-09): the stylesearch lookup + underscore-suffix retry,
+// moved VERBATIM out of onStyleChange (the retry rewrites input.value +
+// styleNumber — both returned).
+async function _lookupStyleProduct(input, row, styleNumber) {
+    // Fetch product data using stylesearch API
+    let product = embState.productCache[styleNumber];
+    if (!product) {
+        const response = await fetch(`${API_BASE}/api/stylesearch?term=${styleNumber}`);
+        if (!response.ok) throw new Error(`Style search API returned ${response.status}`);
+        const data = await response.json();
+        if (data && data.length > 0) {
+            // Find exact match or use first result
+            const exactMatch = data.find(p => p.value.toUpperCase() === styleNumber);
+            const result = exactMatch || data[0];
+            product = {
+                STYLE: result.value,
+                PRODUCT_TITLE: result.label
+            };
+            embState.productCache[styleNumber] = product;
+        }
+    }
+
+    // Generic fallback: if SanMar lookup failed and style has underscore,
+    // strip the suffix and retry (handles pants sizes, fit variants, etc.)
+    if (!product && styleNumber.includes('_')) {
+        const baseStyle = styleNumber.substring(0, styleNumber.lastIndexOf('_'));
+        if (baseStyle) {
+            const retryResponse = await fetch(`${API_BASE}/api/stylesearch?term=${baseStyle}`);
+            const retryData = await retryResponse.json();
+            if (retryData && retryData.length > 0) {
+                const exactMatch = retryData.find(p => p.value.toUpperCase() === baseStyle);
+                const result = exactMatch || retryData[0];
+                product = {
+                    STYLE: result.value,
+                    PRODUCT_TITLE: result.label
+                };
+                embState.productCache[baseStyle] = product;
+                const strippedSuffix = styleNumber.substring(styleNumber.lastIndexOf('_'));
+                row.dataset.originalPartNumber = styleNumber;
+                input.value = baseStyle;
+                styleNumber = baseStyle;
+                showToast(`${row.dataset.originalPartNumber} → imported as ${baseStyle} (suffix ${strippedSuffix} stripped)`, 'info', 5000);
+            }
+        }
+    }
+    return { product, styleNumber };
+}
+
+// T3 split (2026-07-09): the not-found branch (Non-SanMar lookup + "Add
+// Product" affordance), moved VERBATIM out of onStyleChange.
+async function _handleStyleNotFound(row, rowId, descInput, styleNumber) {
+    // SanMar product not found — check Non-SanMar Products database
+    try {
+        const nsResponse = await fetch(`${API_BASE}/api/non-sanmar-products/style/${encodeURIComponent(styleNumber)}`);
+        if (nsResponse.ok) {
+            const nsData = await nsResponse.json();
+            if (nsData.success && nsData.data) {
+                populateNonSanmarRow(row, rowId, nsData.data);
+                return;
+            }
+        }
+    } catch (nsErr) {
+        console.warn('[onStyleChange] Non-SanMar lookup failed:', nsErr.message);
+    }
+
+    // Not in SanMar or Non-SanMar database — show "Not found" with Add button
+    descInput.value = 'Not found';
+    showToast(`Style ${styleNumber} not found — click "Add" to register it`, 'warning');
+
+    // Store import data on the row for the Add modal
+    row.dataset.style = styleNumber;
+    row.dataset.notFound = 'true';
+
+    // Add "Add Product" button below the description
+    const descCell = descInput.closest('td') || descInput.parentElement;
+    if (descCell && !descCell.querySelector('.btn-add-nonsanmar')) {
+        const btnWrap = document.createElement('div');
+        btnWrap.className = 'btn-add-nonsanmar-block';
+        const addBtn = document.createElement('button');
+        addBtn.className = 'btn-add-nonsanmar pulse';
+        addBtn.title = 'Add to Non-SanMar database';
+        addBtn.innerHTML = '<i class="fas fa-plus-circle"></i> Add Product';
+        addBtn.onclick = () => showAddNonSanmarModal(rowId);
+        btnWrap.appendChild(addBtn);
+        descCell.appendChild(btnWrap);
+        // Stop pulse animation after 5s
+        setTimeout(() => addBtn.classList.remove('pulse'), 5000);
+    }
+}
+
 export async function onStyleChange(input, rowId) {
     let styleNumber = input.value.trim().toUpperCase();
     if (!styleNumber) return;
@@ -953,47 +1043,9 @@ export async function onStyleChange(input, rowId) {
     const pickerDropdown = row.querySelector('.color-picker-dropdown');
 
     try {
-        // Fetch product data using stylesearch API
-        let product = embState.productCache[styleNumber];
-        if (!product) {
-            const response = await fetch(`${API_BASE}/api/stylesearch?term=${styleNumber}`);
-            if (!response.ok) throw new Error(`Style search API returned ${response.status}`);
-            const data = await response.json();
-            if (data && data.length > 0) {
-                // Find exact match or use first result
-                const exactMatch = data.find(p => p.value.toUpperCase() === styleNumber);
-                const result = exactMatch || data[0];
-                product = {
-                    STYLE: result.value,
-                    PRODUCT_TITLE: result.label
-                };
-                embState.productCache[styleNumber] = product;
-            }
-        }
-
-        // Generic fallback: if SanMar lookup failed and style has underscore,
-        // strip the suffix and retry (handles pants sizes, fit variants, etc.)
-        if (!product && styleNumber.includes('_')) {
-            const baseStyle = styleNumber.substring(0, styleNumber.lastIndexOf('_'));
-            if (baseStyle) {
-                const retryResponse = await fetch(`${API_BASE}/api/stylesearch?term=${baseStyle}`);
-                const retryData = await retryResponse.json();
-                if (retryData && retryData.length > 0) {
-                    const exactMatch = retryData.find(p => p.value.toUpperCase() === baseStyle);
-                    const result = exactMatch || retryData[0];
-                    product = {
-                        STYLE: result.value,
-                        PRODUCT_TITLE: result.label
-                    };
-                    embState.productCache[baseStyle] = product;
-                    const strippedSuffix = styleNumber.substring(styleNumber.lastIndexOf('_'));
-                    row.dataset.originalPartNumber = styleNumber;
-                    input.value = baseStyle;
-                    styleNumber = baseStyle;
-                    showToast(`${row.dataset.originalPartNumber} → imported as ${baseStyle} (suffix ${strippedSuffix} stripped)`, 'info', 5000);
-                }
-            }
-        }
+        const _ls = await _lookupStyleProduct(input, row, styleNumber);
+        const product = _ls.product;
+        styleNumber = _ls.styleNumber;
 
         if (product) {
             // Pants products (PT20, etc.) are now supported via size picker popup
@@ -1077,43 +1129,7 @@ export async function onStyleChange(input, rowId) {
             if (dupBtn) dupBtn.disabled = false;
 
         } else {
-            // SanMar product not found — check Non-SanMar Products database
-            try {
-                const nsResponse = await fetch(`${API_BASE}/api/non-sanmar-products/style/${encodeURIComponent(styleNumber)}`);
-                if (nsResponse.ok) {
-                    const nsData = await nsResponse.json();
-                    if (nsData.success && nsData.data) {
-                        populateNonSanmarRow(row, rowId, nsData.data);
-                        return;
-                    }
-                }
-            } catch (nsErr) {
-                console.warn('[onStyleChange] Non-SanMar lookup failed:', nsErr.message);
-            }
-
-            // Not in SanMar or Non-SanMar database — show "Not found" with Add button
-            descInput.value = 'Not found';
-            showToast(`Style ${styleNumber} not found — click "Add" to register it`, 'warning');
-
-            // Store import data on the row for the Add modal
-            row.dataset.style = styleNumber;
-            row.dataset.notFound = 'true';
-
-            // Add "Add Product" button below the description
-            const descCell = descInput.closest('td') || descInput.parentElement;
-            if (descCell && !descCell.querySelector('.btn-add-nonsanmar')) {
-                const btnWrap = document.createElement('div');
-                btnWrap.className = 'btn-add-nonsanmar-block';
-                const addBtn = document.createElement('button');
-                addBtn.className = 'btn-add-nonsanmar pulse';
-                addBtn.title = 'Add to Non-SanMar database';
-                addBtn.innerHTML = '<i class="fas fa-plus-circle"></i> Add Product';
-                addBtn.onclick = () => showAddNonSanmarModal(rowId);
-                btnWrap.appendChild(addBtn);
-                descCell.appendChild(btnWrap);
-                // Stop pulse animation after 5s
-                setTimeout(() => addBtn.classList.remove('pulse'), 5000);
-            }
+            await _handleStyleNotFound(row, rowId, descInput, styleNumber);
         }
     } catch (error) {
         console.error('Error loading product:', error);
