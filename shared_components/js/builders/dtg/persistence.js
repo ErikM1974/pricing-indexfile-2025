@@ -339,6 +339,129 @@ export function resetForm() {
 // redirects to the read-only /quote/:id view — never populates the form.
 // This enforces Erik's one-way-sync rule at the load boundary.
 // ========================================================================
+// D1 split (2026-07-09): the edit-load steps moved VERBATIM out of
+// loadSavedDtgQuoteForEdit (explicit params; call order unchanged).
+function restoreEditShipTaxControls() {
+    // Sync the static ship-to + tax controls (rendered ONCE from default state in render(),
+    // BEFORE this runs) to the restored state. CRITICAL: without re-syncing the ship method +
+    // pickup toggle, a reopened SHIPPED quote shows pickup-toggle CHECKED + ship-to hidden;
+    // one rep click on the wrongly-ON toggle would flip method→pickup and recompute 10.2%,
+    // silently re-taxing an out-of-state (0%) or mis-taxing an in-WA-destination quote.
+    try {
+        const incEl = document.getElementById('include-tax');
+        if (incEl) incEl.checked = state.shipping.includeTax !== false;
+        const rateEl = document.getElementById('tax-rate-input');
+        if (rateEl) rateEl.value = state.shipping.taxRateOverride != null ? state.shipping.taxRateOverride : '';
+        const wholeEl = document.getElementById('wholesale-checkbox');
+        if (wholeEl) wholeEl.checked = state.customer.isWholesale;
+        // Ship method + address inputs + pickup toggle / ship-to block visibility.
+        const methodEl = document.getElementById('dtgShipMethod');
+        if (methodEl) methodEl.value = state.shipping.method || 'Customer Pickup';
+        const setShip = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+        setShip('dtgShipAddress1', state.shipping.address1);
+        setShip('dtgShipCity', state.shipping.city);
+        setShip('dtgShipState', state.shipping.state);
+        setShip('dtgShipZip', state.shipping.zip);
+        // [2026-06-09] Phase 2 — re-sync the billed shipping-charge input (blank when 0).
+        const feeEl = document.getElementById('dtgShipFee');
+        if (feeEl) feeEl.value = Number(state.shipping.fee) > 0 ? Number(state.shipping.fee).toFixed(2) : '';
+        if (typeof syncPickupToggleFromShipMethod === 'function') syncPickupToggleFromShipMethod();
+    } catch (_) { /* controls may be absent on older markup */ }
+}
+
+function restoreEditPrintLocation(items) {
+    // Print location — the saved items all share the same printLocation
+    // (DTG: location is global, not per-line). PrintLocation is saved as a
+    // STRUCTURED value {front, back, combined} (an object, or a JSON string),
+    // NOT a flat "FRONT_BACK" code. The old String(...).split('_') parse
+    // stuffed the whole JSON into state.front, so effectiveLocationCode()
+    // returned a code absent from the price map and EVERY row priced to $0
+    // on reopen (a saved $392 quote showed $0). Parse the structure; fall
+    // back to the legacy flat-string handling for older data. (2026-06-01)
+    const firstLoc = items.find(it => it && it.PrintLocation);
+    if (firstLoc && firstLoc.PrintLocation) {
+        let pl = firstLoc.PrintLocation;
+        if (typeof pl === 'string' && pl.trim().startsWith('{')) {
+            try { pl = JSON.parse(pl); } catch (_) { /* fall through to flat-string parse */ }
+        }
+        if (pl && typeof pl === 'object') {
+            state.front = String(pl.front || 'LC').toUpperCase();
+            state.back  = String(pl.back || '').toUpperCase();
+        } else {
+            const code = String(pl).toUpperCase();
+            if (code.includes('_')) {
+                const [front, back] = code.split('_');
+                state.front = front;
+                state.back  = back || '';
+            } else {
+                state.front = code;
+                state.back = '';
+            }
+        }
+        sanitizeLocationState(); // legacy quote may carry FF_JB/JF_FB
+    }
+}
+
+function rebuildEditRows(items) {
+    // Rebuild rows from quote_items. Each item carries Style/Color/SizeBreakdown.
+    const newRows = items
+        .filter(it => it && it.EmbellishmentType === 'dtg' && it.StyleNumber)
+        .map(it => {
+            const row = newBlankRow();
+            row.style      = String(it.StyleNumber || '').toUpperCase();
+            row.styleUpper = row.style;
+            row.color      = it.Color || '';
+            row.desc       = it.ProductName || '';
+            try {
+                row.sizes = it.SizeBreakdown ? JSON.parse(it.SizeBreakdown) : {};
+            } catch (_) {
+                row.sizes = {};
+            }
+            return row;
+        });
+
+    state.rows = newRows.length > 0 ? newRows : [newBlankRow()];
+}
+
+function applyEditIdentifiers(quoteId, session, opts) {
+    if (opts.forDuplicate) {
+        // Duplicate mode: this is a brand-NEW quote — never adopt the source's
+        // identifiers. Clear any stale editing/session ids so the next save
+        // CREATEs with a fresh sequence id from ensureQuoteID() (dtg-quote-page.js):
+        // window.open copies sessionStorage into the new tab in most browsers,
+        // so a stashed quoteID from the opener could otherwise be silently
+        // reused as this copy's QuoteID (duplicate-QuoteID collision).
+        try { delete window._dtgEditingQuoteId; } catch (_) {}
+        try { delete window._dtgEditingPK_ID; } catch (_) {}
+        try { delete window._dtgEditingRevision; } catch (_) {}
+        try { delete window.__dtgQuoteID; } catch (_) {}
+        try { sessionStorage.removeItem(QUOTEID_KEY); } catch (_) {}
+        // dtg-quote-page.js's ensureQuoteID() resume-stash uses its own
+        // hardcoded v1 key (NOT QUOTEID_KEY) — clear it too.
+        try { sessionStorage.removeItem('dtg.quoteID.v1'); } catch (_) {}
+        if (window.aiState) {
+            window.aiState.quoteID = null;
+            window.aiState.quoteIDPromise = null;
+            window.aiState.savedQuoteID = null;
+        }
+    } else {
+        // Stash editing context on window so dtg-quote-page.js's save path
+         
+        // can branch into the PUT/revision flow.
+        // eslint-disable-next-line no-restricted-syntax -- pre-existing window contract (verbatim IIFE move, Batch 5)
+        window._dtgEditingQuoteId = quoteId;
+        // eslint-disable-next-line no-restricted-syntax -- pre-existing window contract (verbatim IIFE move, Batch 5)
+        window._dtgEditingPK_ID = session.PK_ID;
+        // eslint-disable-next-line no-restricted-syntax -- pre-existing window contract (verbatim IIFE move, Batch 5)
+        window._dtgEditingRevision = Number(session.RevisionNumber) || 1;
+        // Also make the quoteID visible to the existing getQuoteID() helper.
+        setQuoteID(quoteId);
+        // Mark aiState as already saved so the email button (Phase 11.5) works
+        // out of the box without requiring a fresh "Save & share link" click.
+        if (window.aiState) window.aiState.savedQuoteID = quoteId;
+    }
+}
+
 export async function loadSavedDtgQuoteForEdit(quoteId, opts = {}) {
     let res, data;
     try {
@@ -420,118 +543,13 @@ export async function loadSavedDtgQuoteForEdit(quoteId, opts = {}) {
     if (savedShip.taxRateSource) state.shipping.taxRateSource = savedShip.taxRateSource;
     if (savedTax.taxAccount) state.shipping.taxAccount = savedTax.taxAccount;
     if (savedTax.taxAccountName) state.shipping.taxAccountName = savedTax.taxAccountName;
-    // Sync the static ship-to + tax controls (rendered ONCE from default state in render(),
-    // BEFORE this runs) to the restored state. CRITICAL: without re-syncing the ship method +
-    // pickup toggle, a reopened SHIPPED quote shows pickup-toggle CHECKED + ship-to hidden;
-    // one rep click on the wrongly-ON toggle would flip method→pickup and recompute 10.2%,
-    // silently re-taxing an out-of-state (0%) or mis-taxing an in-WA-destination quote.
-    try {
-        const incEl = document.getElementById('include-tax');
-        if (incEl) incEl.checked = state.shipping.includeTax !== false;
-        const rateEl = document.getElementById('tax-rate-input');
-        if (rateEl) rateEl.value = state.shipping.taxRateOverride != null ? state.shipping.taxRateOverride : '';
-        const wholeEl = document.getElementById('wholesale-checkbox');
-        if (wholeEl) wholeEl.checked = state.customer.isWholesale;
-        // Ship method + address inputs + pickup toggle / ship-to block visibility.
-        const methodEl = document.getElementById('dtgShipMethod');
-        if (methodEl) methodEl.value = state.shipping.method || 'Customer Pickup';
-        const setShip = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
-        setShip('dtgShipAddress1', state.shipping.address1);
-        setShip('dtgShipCity', state.shipping.city);
-        setShip('dtgShipState', state.shipping.state);
-        setShip('dtgShipZip', state.shipping.zip);
-        // [2026-06-09] Phase 2 — re-sync the billed shipping-charge input (blank when 0).
-        const feeEl = document.getElementById('dtgShipFee');
-        if (feeEl) feeEl.value = Number(state.shipping.fee) > 0 ? Number(state.shipping.fee).toFixed(2) : '';
-        if (typeof syncPickupToggleFromShipMethod === 'function') syncPickupToggleFromShipMethod();
-    } catch (_) { /* controls may be absent on older markup */ }
+    restoreEditShipTaxControls();
 
-    // Print location — the saved items all share the same printLocation
-    // (DTG: location is global, not per-line). PrintLocation is saved as a
-    // STRUCTURED value {front, back, combined} (an object, or a JSON string),
-    // NOT a flat "FRONT_BACK" code. The old String(...).split('_') parse
-    // stuffed the whole JSON into state.front, so effectiveLocationCode()
-    // returned a code absent from the price map and EVERY row priced to $0
-    // on reopen (a saved $392 quote showed $0). Parse the structure; fall
-    // back to the legacy flat-string handling for older data. (2026-06-01)
-    const firstLoc = items.find(it => it && it.PrintLocation);
-    if (firstLoc && firstLoc.PrintLocation) {
-        let pl = firstLoc.PrintLocation;
-        if (typeof pl === 'string' && pl.trim().startsWith('{')) {
-            try { pl = JSON.parse(pl); } catch (_) { /* fall through to flat-string parse */ }
-        }
-        if (pl && typeof pl === 'object') {
-            state.front = String(pl.front || 'LC').toUpperCase();
-            state.back  = String(pl.back || '').toUpperCase();
-        } else {
-            const code = String(pl).toUpperCase();
-            if (code.includes('_')) {
-                const [front, back] = code.split('_');
-                state.front = front;
-                state.back  = back || '';
-            } else {
-                state.front = code;
-                state.back = '';
-            }
-        }
-        sanitizeLocationState(); // legacy quote may carry FF_JB/JF_FB
-    }
+    restoreEditPrintLocation(items);
 
-    // Rebuild rows from quote_items. Each item carries Style/Color/SizeBreakdown.
-    const newRows = items
-        .filter(it => it && it.EmbellishmentType === 'dtg' && it.StyleNumber)
-        .map(it => {
-            const row = newBlankRow();
-            row.style      = String(it.StyleNumber || '').toUpperCase();
-            row.styleUpper = row.style;
-            row.color      = it.Color || '';
-            row.desc       = it.ProductName || '';
-            try {
-                row.sizes = it.SizeBreakdown ? JSON.parse(it.SizeBreakdown) : {};
-            } catch (_) {
-                row.sizes = {};
-            }
-            return row;
-        });
+    rebuildEditRows(items);
 
-    state.rows = newRows.length > 0 ? newRows : [newBlankRow()];
-
-    if (opts.forDuplicate) {
-        // Duplicate mode: this is a brand-NEW quote — never adopt the source's
-        // identifiers. Clear any stale editing/session ids so the next save
-        // CREATEs with a fresh sequence id from ensureQuoteID() (dtg-quote-page.js):
-        // window.open copies sessionStorage into the new tab in most browsers,
-        // so a stashed quoteID from the opener could otherwise be silently
-        // reused as this copy's QuoteID (duplicate-QuoteID collision).
-        try { delete window._dtgEditingQuoteId; } catch (_) {}
-        try { delete window._dtgEditingPK_ID; } catch (_) {}
-        try { delete window._dtgEditingRevision; } catch (_) {}
-        try { delete window.__dtgQuoteID; } catch (_) {}
-        try { sessionStorage.removeItem(QUOTEID_KEY); } catch (_) {}
-        // dtg-quote-page.js's ensureQuoteID() resume-stash uses its own
-        // hardcoded v1 key (NOT QUOTEID_KEY) — clear it too.
-        try { sessionStorage.removeItem('dtg.quoteID.v1'); } catch (_) {}
-        if (window.aiState) {
-            window.aiState.quoteID = null;
-            window.aiState.quoteIDPromise = null;
-            window.aiState.savedQuoteID = null;
-        }
-    } else {
-        // Stash editing context on window so dtg-quote-page.js's save path
-         
-        // can branch into the PUT/revision flow.
-        // eslint-disable-next-line no-restricted-syntax -- pre-existing window contract (verbatim IIFE move, Batch 5)
-        window._dtgEditingQuoteId = quoteId;
-        // eslint-disable-next-line no-restricted-syntax -- pre-existing window contract (verbatim IIFE move, Batch 5)
-        window._dtgEditingPK_ID = session.PK_ID;
-        // eslint-disable-next-line no-restricted-syntax -- pre-existing window contract (verbatim IIFE move, Batch 5)
-        window._dtgEditingRevision = Number(session.RevisionNumber) || 1;
-        // Also make the quoteID visible to the existing getQuoteID() helper.
-        setQuoteID(quoteId);
-        // Mark aiState as already saved so the email button (Phase 11.5) works
-        // out of the box without requiring a fresh "Save & share link" click.
-        if (window.aiState) window.aiState.savedQuoteID = quoteId;
-    }
+    applyEditIdentifiers(quoteId, session, opts);
 
     // Render the populated form + kick inventory hydration so size cells
     // light up.

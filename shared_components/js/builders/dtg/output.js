@@ -313,102 +313,11 @@ export async function dtgEmailQuote() {
     });
 }
 
-export async function submitToShopWorks() {
-    const statusEl = document.getElementById('dtgSubmitStatus');
-    const setStatus = (cls, msg) => {
-        if (!statusEl) return;
-        statusEl.className = `dtg-submit-status ${cls}`;
-        // eslint-disable-next-line no-unsanitized/property -- audited (Batch 5 move): every interpolation is escapeHtml()d, numeric, or static config
-        statusEl.innerHTML = msg;
-        statusEl.hidden = false;
-    };
-
-    // Build lines array
-    const code = effectiveLocationCode();
-    const cleanLines = state.rows
-        // Exclude invalid-color rows so the push matches the on-screen total /
-        // PDF / saved record (the four other consumers all skip these). Without
-        // it, a row with an unmatched catalog color could reach the server
-        // re-price + land in ShopWorks with a blank color. (2026-06-09)
-        .filter((r) => r.style && r.color && !isRowColorInvalid(r) && Object.keys(r.sizes || {}).length > 0)
-        .map((r) => ({ styleNumber: r.style, color: r.color, sizes: { ...r.sizes } }));
-    if (!code || cleanLines.length === 0) {
-        setStatus('error', 'Need a location + at least one filled row.');
-        return;
-    }
-    if (!state.customer.email) {
-        setStatus('error', 'Need customer email before pushing.');
-        return;
-    }
-
-    // A3 — Design # soft warning. Submit is no longer hard-blocked when the
-    // design # is empty. Instead we confirm with the rep, then push with
-    // designNumber: null. Rep adds the design # directly in ShopWorks
-    // after the art team assigns one.
-    //
-    // SKIP the warning when rep has uploaded new artwork (Erik 2026-05-20)
-    // — that path INTENTIONALLY pushes without an existing design # because
-    // ShopWorks will create the new design from the upload metadata.
-    const hasUploadedArt = (state.newArtwork?.files || []).length > 0;
-    if (!state.customer.designNumber && !hasUploadedArt) {
-        const proceedNoDesign = await genericConfirm({
-            icon: '🎨',
-            title: 'No design # entered',
-            body: 'The art team can assign one in ShopWorks after you push. The order will be created with no Design ID and the rep can add it manually. Push anyway?',
-            cancelLabel: 'Cancel',
-            proceedLabel: 'Push without design #',
-            proceedClass: 'dscm-btn-proceed',
-        });
-        if (!proceedNoDesign) {
-            setStatus('error', 'Push cancelled — add a design # and try again, or push without one when ready.');
-            return;
-        }
-    }
-
-    // Stock check — if any cell exceeds SanMar inventory, ask the rep
-    // to confirm before pushing.
-    const stockIssues = collectStockIssues();
-    if (stockIssues.length > 0) {
-        const proceed = await confirmStockOverflow(stockIssues);
-        if (!proceed) {
-            setStatus('error', 'Push cancelled — adjust quantities and try again.');
-            return;
-        }
-    }
-
-    // Resolve sales rep from the state.customer.salesRepCode
-    const rep = repByCode(state.customer.salesRepCode);
-    const shipMethodLabel = shipLabel(state.shipping.method);
-    const isPickup = isPickupMethod(state.shipping.method);
-
-    state.submitting = true;
-    updateSubmitEnabled();
-    setStatus('busy', '<i class="fas fa-circle-notch fa-spin"></i> Pricing + pushing…');
-
-    // 1) Authoritative price via canonical endpoint
-    let pricing;
-    try {
-        const r = await fetch(`${API_BASE}/api/dtg/quote-pricing`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ locationCode: code, lines: cleanLines }),
-        });
-        pricing = await r.json();
-        if (!r.ok || pricing.error) {
-            setStatus('error', `Pricing failed: ${escapeHtml(pricing && pricing.message ? pricing.message : 'HTTP ' + r.status)}`);
-            state.submitting = false; updateSubmitEnabled();
-            return;
-        }
-    } catch (err) {
-        setStatus('error', `Pricing failed: ${escapeHtml(err.message)}`);
-        state.submitting = false; updateSubmitEnabled();
-        return;
-    }
-
+// D1 split (2026-07-09): the payload assembly moved VERBATIM out of
+// submitToShopWorks into the three helpers below (explicit params; the
+// orchestrator keeps preflight + the authoritative-pricing fetch).
+function buildSubmitRows(items, code, pricing) {
     // 2) Build the order-form-shaped payload
-    const items = Array.isArray(pricing.lineItems) ? pricing.lineItems : [];
-    const subtotal = Number(pricing.subtotal) || items.reduce((s, it) => s + (Number(it.lineTotal) || 0), 0);
-    const ltmTotal = items.reduce((s, it) => s + (Number(it.ltmPerUnit) || 0) * (Number(it.totalQuantity) || 0), 0);
 
     const rows = items.map((it, i) => ({
         id: `dtg-row-${i + 1}`,
@@ -435,7 +344,12 @@ export async function submitToShopWorks() {
             tier: it.tier || pricing.tier,
         };
     });
+    return { rows, byRow };
+}
 
+function computeSubmitMoney(items, pricing) {
+    const subtotal = Number(pricing.subtotal) || items.reduce((s, it) => s + (Number(it.lineTotal) || 0), 0);
+    const ltmTotal = items.reduce((s, it) => s + (Number(it.ltmPerUnit) || 0) * (Number(it.totalQuantity) || 0), 0);
     // Tax — derive ONLY from state.shipping.taxRate (recomputeTaxRate is the single
     // authority: it already zeroes the rate for out-of-state / exempt / wholesale /
     // opt-out, sets the manual rate, and uses the DOR rate in-WA / 0.102 pickup).
@@ -452,7 +366,12 @@ export async function submitToShopWorks() {
     const taxBase = Math.round((subtotal + shipFee) * 100) / 100;
     const taxEstimate = Math.round(taxBase * (Number.isFinite(taxRate) ? taxRate : 0) * 100) / 100;
     const grandTotal = Math.round((taxBase + taxEstimate) * 100) / 100;
+    return { subtotal, ltmTotal, taxRate, shipFee, taxEstimate, grandTotal };
+}
 
+function buildSubmitBody(ctx) {
+    const { pricing, items, rows, byRow, rep, shipMethodLabel, isPickup,
+        subtotal, ltmTotal, taxRate, shipFee, taxEstimate, grandTotal } = ctx;
     const body = {
         info: {
             company: state.customer.company || '',
@@ -567,6 +486,107 @@ export async function submitToShopWorks() {
         designNumbers: state.customer.designNumber ? [state.customer.designNumber] : [],
         addOns: [],
     };
+    return body;
+}
+
+export async function submitToShopWorks() {
+    const statusEl = document.getElementById('dtgSubmitStatus');
+    const setStatus = (cls, msg) => {
+        if (!statusEl) return;
+        statusEl.className = `dtg-submit-status ${cls}`;
+        // eslint-disable-next-line no-unsanitized/property -- audited (Batch 5 move): every interpolation is escapeHtml()d, numeric, or static config
+        statusEl.innerHTML = msg;
+        statusEl.hidden = false;
+    };
+
+    // Build lines array
+    const code = effectiveLocationCode();
+    const cleanLines = state.rows
+        // Exclude invalid-color rows so the push matches the on-screen total /
+        // PDF / saved record (the four other consumers all skip these). Without
+        // it, a row with an unmatched catalog color could reach the server
+        // re-price + land in ShopWorks with a blank color. (2026-06-09)
+        .filter((r) => r.style && r.color && !isRowColorInvalid(r) && Object.keys(r.sizes || {}).length > 0)
+        .map((r) => ({ styleNumber: r.style, color: r.color, sizes: { ...r.sizes } }));
+    if (!code || cleanLines.length === 0) {
+        setStatus('error', 'Need a location + at least one filled row.');
+        return;
+    }
+    if (!state.customer.email) {
+        setStatus('error', 'Need customer email before pushing.');
+        return;
+    }
+
+    // A3 — Design # soft warning. Submit is no longer hard-blocked when the
+    // design # is empty. Instead we confirm with the rep, then push with
+    // designNumber: null. Rep adds the design # directly in ShopWorks
+    // after the art team assigns one.
+    //
+    // SKIP the warning when rep has uploaded new artwork (Erik 2026-05-20)
+    // — that path INTENTIONALLY pushes without an existing design # because
+    // ShopWorks will create the new design from the upload metadata.
+    const hasUploadedArt = (state.newArtwork?.files || []).length > 0;
+    if (!state.customer.designNumber && !hasUploadedArt) {
+        const proceedNoDesign = await genericConfirm({
+            icon: '🎨',
+            title: 'No design # entered',
+            body: 'The art team can assign one in ShopWorks after you push. The order will be created with no Design ID and the rep can add it manually. Push anyway?',
+            cancelLabel: 'Cancel',
+            proceedLabel: 'Push without design #',
+            proceedClass: 'dscm-btn-proceed',
+        });
+        if (!proceedNoDesign) {
+            setStatus('error', 'Push cancelled — add a design # and try again, or push without one when ready.');
+            return;
+        }
+    }
+
+    // Stock check — if any cell exceeds SanMar inventory, ask the rep
+    // to confirm before pushing.
+    const stockIssues = collectStockIssues();
+    if (stockIssues.length > 0) {
+        const proceed = await confirmStockOverflow(stockIssues);
+        if (!proceed) {
+            setStatus('error', 'Push cancelled — adjust quantities and try again.');
+            return;
+        }
+    }
+
+    // Resolve sales rep from the state.customer.salesRepCode
+    const rep = repByCode(state.customer.salesRepCode);
+    const shipMethodLabel = shipLabel(state.shipping.method);
+    const isPickup = isPickupMethod(state.shipping.method);
+
+    state.submitting = true;
+    updateSubmitEnabled();
+    setStatus('busy', '<i class="fas fa-circle-notch fa-spin"></i> Pricing + pushing…');
+
+    // 1) Authoritative price via canonical endpoint
+    let pricing;
+    try {
+        const r = await fetch(`${API_BASE}/api/dtg/quote-pricing`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ locationCode: code, lines: cleanLines }),
+        });
+        pricing = await r.json();
+        if (!r.ok || pricing.error) {
+            setStatus('error', `Pricing failed: ${escapeHtml(pricing && pricing.message ? pricing.message : 'HTTP ' + r.status)}`);
+            state.submitting = false; updateSubmitEnabled();
+            return;
+        }
+    } catch (err) {
+        setStatus('error', `Pricing failed: ${escapeHtml(err.message)}`);
+        state.submitting = false; updateSubmitEnabled();
+        return;
+    }
+
+    // 2) Payload assembly (D1 helpers above — verbatim moves).
+    const items = Array.isArray(pricing.lineItems) ? pricing.lineItems : [];
+    const { rows, byRow } = buildSubmitRows(items, code, pricing);
+    const money = computeSubmitMoney(items, pricing);
+    const body = buildSubmitBody({ pricing, items, rows, byRow, rep, shipMethodLabel, isPickup, ...money });
+    const { subtotal } = money;
 
     // B5 — cache for retry. If the push fails, the retry button reuses
     // this exact body so we don't double-fetch pricing.

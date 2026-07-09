@@ -490,6 +490,23 @@ export function deleteRow(rowId) {
  * @param {string} size - Size name (XXL, 3XL, 4XL, 5XL, 6XL, XS)
  * @param {number} qty - Quantity for this size
  */
+// D2 split (2026-07-09): the child-row color-option template, moved VERBATIM
+// out of createChildRow.
+function buildChildColorOptionsHtml(parentColors, parentColor, childRowId, parentRowId) {
+    // Build color options HTML for child row picker
+    return parentColors.map(c =>
+        `<div class="color-picker-option ${c.COLOR_NAME === parentColor ? 'selected' : ''}"
+             data-color-name="${escapeHtml(c.COLOR_NAME)}"
+             data-catalog-color="${escapeHtml(c.CATALOG_COLOR || c.COLOR_NAME)}"
+             data-swatch-url="${escapeHtml(c.COLOR_SQUARE_IMAGE || '')}"
+             data-hex="${escapeHtml(c.HEX_CODE || '#ccc')}"
+             onclick="selectChildColor(${childRowId}, ${parentRowId}, this)">
+            <span class="color-swatch" style="${getSwatchStyle(c)}"></span>
+            <span class="color-name">${escapeHtml(c.COLOR_NAME)}</span>
+        </div>`
+    ).join('');
+}
+
 export function createChildRow(parentRowId, size, qty) {
     const parentRow = document.getElementById(`row-${parentRowId}`);
     if (!parentRow) {
@@ -511,18 +528,7 @@ export function createChildRow(parentRowId, size, qty) {
     const parentColors = parentRow.dataset.colors ? JSON.parse(parentRow.dataset.colors) : [];
 
 
-    // Build color options HTML for child row picker
-    const colorOptionsHtml = parentColors.map(c =>
-        `<div class="color-picker-option ${c.COLOR_NAME === parentColor ? 'selected' : ''}"
-             data-color-name="${escapeHtml(c.COLOR_NAME)}"
-             data-catalog-color="${escapeHtml(c.CATALOG_COLOR || c.COLOR_NAME)}"
-             data-swatch-url="${escapeHtml(c.COLOR_SQUARE_IMAGE || '')}"
-             data-hex="${escapeHtml(c.HEX_CODE || '#ccc')}"
-             onclick="selectChildColor(${childRowId}, ${parentRowId}, this)">
-            <span class="color-swatch" style="${getSwatchStyle(c)}"></span>
-            <span class="color-name">${escapeHtml(c.COLOR_NAME)}</span>
-        </div>`
-    ).join('');
+    const colorOptionsHtml = buildChildColorOptionsHtml(parentColors, parentColor, childRowId, parentRowId);
 
     // Build current color display style
     const currentSwatchStyle = parentSwatchUrl
