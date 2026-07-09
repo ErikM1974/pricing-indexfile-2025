@@ -1,3 +1,7 @@
+## v2026.07.09.19 (2026.07.09)
+
+- types: T4 — lift ALL 38 @ts-nocheck in builders/ (rubric #5 closed)
+
 ## v2026.07.09.18 (2026.07.09)
 
 - refactor: burn-down tranche 3 — EMB allowlist EMPTY, ratchet endgame
