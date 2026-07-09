@@ -12,6 +12,7 @@
 /* global SafetyStripeRecs, ArtworkUpload, CustomerDesignCombobox,
    loadServiceCodePrices, getServicePrice, showToast */
 import { DTFQuoteBuilder } from './quote-builder-class.js';
+import { loadServiceCodePrices } from '../shared/service-codes.js';
 
 export class DtfAdapter {
     // ── MethodAdapter contract (typed in types/quote.d.ts) ────────────────

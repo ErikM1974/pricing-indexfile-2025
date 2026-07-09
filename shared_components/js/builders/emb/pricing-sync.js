@@ -28,7 +28,15 @@ import { renderPushReadiness } from './save-push.js';
 import { markEmbroideryDirty } from './persistence.js';
 import { getCapEmbellishmentType } from './logo-config.js';
 import { createServiceProductRow, updateRowBreakdown } from './product-rows.js';
-import { embState, EMB_DEFAULTS, SIZE06_EXTENDED_SIZES, API_BASE } from './state.js';
+import { embState, EMB_DEFAULTS, SIZE06_EXTENDED_SIZES, API_BASE } from './state.js';
+
+// Module state — was window._* flags (Batch 3.4, 2026-07-09); nothing outside this file reads them.
+let _alPricingCache = null;      // AL tier snapshot (cleared per recalc — stale = wrong price)
+let _decgPricingCache = null;    // DECG tier snapshot (same lifecycle)
+let _alPricingSvc = null;        // lazy EmbroideryPricingService instance for AL/DECG fetches
+let _decgLtmState = null;        // DECG-LTM row bookkeeping { rowId, sig, waivedSig }
+let _embRecalcSeq = 0;           // recalc race-guard sequence (newer run supersedes)
+let _ddFeeMismatchWarned = false; // once-per-page digitizing-fee mismatch warning
 
 // Debounce utility for input handlers that fire on every keystroke
 export function debounce(fn, delay) {
@@ -116,8 +124,8 @@ function renderPriceErrorRetries() {
 
 export async function retryRowPricing() {
     showToast('Retrying pricing…', 'info', 2000);
-    window._alPricingCache = null;     // force fresh fetches — a stale snapshot is
-    window._decgPricingCache = null;   // exactly what a failed row must not reuse
+    _alPricingCache = null;     // force fresh fetches — a stale snapshot is
+    _decgPricingCache = null;   // exactly what a failed row must not reuse
     try {
         await syncALRows();
         await syncDECGRows();
@@ -134,12 +142,12 @@ export async function retryRowPricing() {
 window.retryRowPricing = retryRowPricing;
 
 async function loadALPricing() {
-    if (window._alPricingCache) return window._alPricingCache;
+    if (_alPricingCache) return _alPricingCache;
     if (!window.EmbroideryPricingService) { console.error('[AL] EmbroideryPricingService unavailable'); return null; }
     try {
-        window._alPricingSvc = window._alPricingSvc || new window.EmbroideryPricingService();
-        window._alPricingCache = await window._alPricingSvc.fetchALPricing();
-        return window._alPricingCache;
+        _alPricingSvc = _alPricingSvc || new window.EmbroideryPricingService();
+        _alPricingCache = await _alPricingSvc.fetchALPricing();
+        return _alPricingCache;
     } catch (e) {
         console.error('[AL] fetchALPricing failed', e);
         showToast("Couldn't load Additional Logo pricing from the server — click Retry on the affected row (no refresh needed).", 'error');
@@ -167,7 +175,7 @@ export async function syncALRows() {
     // [A3] (audit 2026-06-06): API down → do NOT leave a stale/$0 AL price the save gate would accept. Flag
     // every AL row so saveAndGetLink's priceError gate blocks it (Erik's #1 rule). Toast already surfaced.
     if (!cache) { alRows.forEach(r => { r.dataset.priceError = 'true'; }); return; }
-    const svc = window._alPricingSvc;
+    const svc = _alPricingSvc;
     const counts = getOrderPieceCounts();
     for (const row of alRows) {
         const rid = row.dataset.rowId;
@@ -217,12 +225,12 @@ window.syncALRows = syncALRows;
  * leaves the row at $0 (Erik's #1 rule). Manually-overridden rows are left untouched. (2026-06-04)
  */
 async function loadDECGPricing() {
-    if (window._decgPricingCache) return window._decgPricingCache;
+    if (_decgPricingCache) return _decgPricingCache;
     if (!window.EmbroideryPricingService) { console.error('[DECG] EmbroideryPricingService unavailable'); return null; }
     try {
-        window._alPricingSvc = window._alPricingSvc || new window.EmbroideryPricingService();
-        window._decgPricingCache = await window._alPricingSvc.fetchDECGPricing();
-        return window._decgPricingCache;
+        _alPricingSvc = _alPricingSvc || new window.EmbroideryPricingService();
+        _decgPricingCache = await _alPricingSvc.fetchDECGPricing();
+        return _decgPricingCache;
     } catch (e) {
         console.error('[DECG] fetchDECGPricing failed', e);
         showToast("Couldn't load Customer-Supplied (DECG) pricing from the server — click Retry on the affected row (no refresh needed).", 'error');
@@ -242,7 +250,7 @@ export async function syncDECGRows() {
     // (Erik's #1 rule). But a MANUALLY-overridden DECG row (sellPrice>0) is independent of the API → don't
     // over-block it (fail-closed otherwise). Toast already surfaced.
     if (!cache) { rows.forEach(r => { if (!(parseFloat(r.dataset.sellPrice) > 0)) r.dataset.priceError = 'true'; }); return; }
-    const svc = window._alPricingSvc;
+    const svc = _alPricingSvc;
 
     // [expert audit 2026-07-07 F10] Tier at the POOLED same-category quantity: 15
     // supplied jackets + 15 supplied hoodies run as ONE 30-pc job (tier 24-47), not
@@ -314,7 +322,7 @@ window.syncDECGRows = syncDECGRows;
 export function _syncDecgLtmRow(decgLtm, pooledQty) {
     const total = (decgLtm.garment || 0) + (decgLtm.cap || 0);
     const sig = `${decgLtm.garment || 0}|${decgLtm.cap || 0}`;
-    const st = (window._decgLtmState = window._decgLtmState || { rowId: null, sig: null, waivedSig: null });
+    const st = (_decgLtmState = _decgLtmState || { rowId: null, sig: null, waivedSig: null });
 
     let row = st.rowId ? document.getElementById(`row-${st.rowId}`) : null;
     if (!row) row = document.querySelector('#product-tbody tr.service-product-row[data-service-type="ltm"]');
@@ -452,7 +460,7 @@ async function computeNudgeSavingsAsync(productList, allLogos, logoConfigs, ltmE
             sb[k] = (Number(sb[k]) || 0) + t.needed;
         }
         const sim = await embState.pricingCalculator.calculateQuote(clone, allLogos, logoConfigs, { ltmEnabled });
-        if (mySeq !== window._embRecalcSeq) return;   // a newer recalc superseded this sim
+        if (mySeq !== _embRecalcSeq) return;   // a newer recalc superseded this sim
         if (!sim || sim.success === false) return;
         const unitOf = (res) => {
             const pp = (res.products || []).find(p => !!(p.product && p.product.isCap) === isCapTarget);
@@ -489,8 +497,8 @@ export function syncDigitizingPriceLabels() {
     document.querySelectorAll('[data-dd-price]').forEach(el => {
         el.textContent = `$${Number(billed).toFixed(0)}`;
     });
-    if (bundleFee != null && Math.abs(ddFee - bundleFee) > 0.005 && !window._ddFeeMismatchWarned) {
-        window._ddFeeMismatchWarned = true;
+    if (bundleFee != null && Math.abs(ddFee - bundleFee) > 0.005 && !_ddFeeMismatchWarned) {
+        _ddFeeMismatchWarned = true;
         if (typeof showToast === 'function') {
             showToast(`Digitizing fee mismatch in Caspio: Embroidery_Costs says $${bundleFee} (logo-card checkbox) but Service_Codes DD says $${ddFee} (services bar). Align them so both paths bill the same.`, 'warning', 10000);
         }
@@ -532,7 +540,7 @@ async function _recalculatePricingImpl() {
     // calculateQuote resolving after a newer one overwrote fresher totals on
     // screen (the save path then snapshotted them). Only the latest call may
     // apply results. (audit 2026-06-10)
-    const mySeq = (window._embRecalcSeq = (window._embRecalcSeq || 0) + 1);
+    const mySeq = (_embRecalcSeq = (_embRecalcSeq || 0) + 1);
     // Keep Additional-Logo rows tallied to the order's piece count + re-priced for the current
     // tier BEFORE we read the table — so a garment add/remove/qty change flows into the AL line.
     // (syncALRows early-returns if there are no AL rows; sets the qty programmatically so it
@@ -665,7 +673,7 @@ async function _recalculatePricingImpl() {
         const pricing = await embState.pricingCalculator.calculateQuote(productList, allLogos, logoConfigs, { ltmEnabled });
 
         // A newer recalc started while we were awaiting — discard this stale result.
-        if (mySeq !== window._embRecalcSeq) return;
+        if (mySeq !== _embRecalcSeq) return;
 
         // Never render $0.00 on a hard API/config failure — calculateQuote returns {success:false} in that
         // case; surface it instead of silently showing a wrong (zero) price. (review C4 — Erik's #1 rule)

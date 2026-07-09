@@ -25,7 +25,10 @@ import { collectProductsFromTable, onShipMethodChange, recalculatePricing, updat
 import { updateAdditionalCharges, updateDiscountType } from './quote-lifecycle.js';
 import { _syncALArrays, handleCapEmbellishmentChange, mapStitchCountToTierValue, updateNotesBadge } from './logo-config.js';
 import { addManualServiceRow, addNewRow, createChildRow, createServiceProductRow, dateFromInputValue, dateToInputValue, onSizeChange, onStyleChange, selectColor, updateCapLogoSectionVisibility, updateGarmentLogoSectionVisibility, updateLogoCardHeader } from './product-rows.js';
-import { embState, EMB_DEFAULTS, SIZE06_EXTENDED_SIZES, API_BASE } from './state.js';
+import { embState, EMB_DEFAULTS, SIZE06_EXTENDED_SIZES, API_BASE } from './state.js';
+
+// Module state — was window._* flags (Batch 3.4, 2026-07-09); nothing outside this file reads them.
+let _pendingLtmState = null;    // LTM panel state parked until the panel exists during restore
 
 export function initEmbroideryPersistence() {
     if (typeof QuotePersistence !== 'undefined') {
@@ -603,7 +606,7 @@ export async function loadQuoteForEditing(quoteId, opts = {}) {
             // Ensure LTM panel is rendered before setting state
             // (recalculatePricing will render it, but we need state set first)
              
-            window._pendingLtmState = {
+            _pendingLtmState = {
                 enabled: !session.LTM_Waived,
                 displayMode: session.LTM_Display_Mode || 'builtin'
             };
@@ -613,9 +616,9 @@ export async function loadQuoteForEditing(quoteId, opts = {}) {
         recalculatePricing();
 
         // Apply pending LTM state after panel is rendered
-        if (window._pendingLtmState) {
-            setLtmControlState('emb-ltm-panel', window._pendingLtmState);
-            delete window._pendingLtmState;
+        if (_pendingLtmState) {
+            setLtmControlState('emb-ltm-panel', _pendingLtmState);
+            _pendingLtmState = null;
             // Re-run pricing with the restored state
             recalculatePricing();
         }

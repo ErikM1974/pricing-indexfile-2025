@@ -191,7 +191,7 @@
     // ------------------------------------------------------------------
     // Service-code fees — Caspio Service_Codes via GET /api/service-codes
     // (same source as quote-builder-utils.js loadServiceCodePrices/
-    // getServicePrice, :23-48). Fallback constants fire ONLY when the API is
+    // getServicePrice — builders/shared/service-codes.js since Batch 3.5). Fallback constants fire ONLY when the API is
     // unreachable and ALWAYS push a visible warning (Erik's #1 rule).
     // ------------------------------------------------------------------
     async function ensureServiceCodes(ctx) {

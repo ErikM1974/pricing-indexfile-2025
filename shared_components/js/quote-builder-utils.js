@@ -13,41 +13,11 @@
 // ============================================
 // SERVICE_CODES (Caspio) — shared fee loader
 // ============================================
-// Single source of truth for service fees = the Caspio Service_Codes table via
-// GET /api/service-codes. `getServicePrice(code, fallback)` returns the live
-// SellPrice, or the documented fallback WITH a visible warning if the API was
-// unreachable — never a silent wrong price (Erik's #1 rule). Shared by SCP/DTF
-// (EMB defines its own copy in embroidery-quote-builder.js — these guards yield
-// to it so there's no double-definition). (2026-06-09)
-if (typeof window !== 'undefined' && typeof window.loadServiceCodePrices !== 'function') {
-    window.loadServiceCodePrices = async function loadServiceCodePrices() {
-        try {
-            const base = window.APP_CONFIG.API.BASE_URL;
-            const resp = await fetch(`${base}/api/service-codes`);
-            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-            const json = await resp.json();
-            const map = {};
-            (json.data || []).forEach(sc => { if (sc.ServiceCode) map[String(sc.ServiceCode).toUpperCase()] = sc; });
-            window._serviceCodes = map;
-            return map;
-        } catch (e) {
-            console.error('[ServiceCodes] Could not load live prices from /api/service-codes:', e);
-            if (typeof showToast === 'function') showToast("Couldn't reach the pricing service — using default service prices", 'warning', 5000);
-            // Persistent badge (roadmap 1.15) — the toast vanishes in 5s; the
-            // estimate warning must outlive it. Bundle-less pages (DTG) skip.
-            if (typeof window.showFallbackPricingWarning === 'function') window.showFallbackPricingWarning('service prices');
-            return null;
-        }
-    };
-}
-if (typeof window !== 'undefined' && typeof window.getServicePrice !== 'function') {
-    window.getServicePrice = function getServicePrice(code, fallback) {
-        const sc = window._serviceCodes && window._serviceCodes[String(code).toUpperCase()];
-        if (!sc) return fallback;
-        const sell = parseFloat(sc.SellPrice);
-        return isNaN(sell) ? fallback : sell;
-    };
-}
+// Service_Codes pricing (loadServiceCodePrices/getServicePrice) lives in
+// builders/shared/service-codes.js — bundled + window-bridged by every builder
+// entry point (Batch 3.5, 2026-07-09; the typeof-guarded copies that lived here
+// had already drifted from the EMB module once). window._serviceCodes remains
+// the cache contract; warnIfServiceCodeMissing below reads it.
 
 // Shared "hardcoded fallback surfaced a warning" guard (Erik's #1 rule). A load
 // FAILURE already toasts via loadServiceCodePrices(); this covers the SILENT case

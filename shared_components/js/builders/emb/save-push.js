@@ -23,7 +23,11 @@ import { buildLogoConfiguration, collectProductsFromTable, getOrderPieceCounts, 
 import { getAdditionalCharges, collectDECGItems } from './quote-lifecycle.js';
 import { getCapEmbellishmentType } from './logo-config.js';
 import { dateFromInputValue } from './product-rows.js';
-import { embState } from './state.js';
+import { embState } from './state.js';
+
+// Module state — was window._* flags (Batch 3.4, 2026-07-09); nothing outside this file reads them.
+let _embSaveInFlight = false;   // save mutex (double-click guard)
+let _pushModalOpener = null;    // focus-restore target for the push modal
 
 /**
  * Save quote and get shareable link
@@ -33,17 +37,17 @@ export async function saveAndGetLink(opts = {}) {
     // Re-entrancy guard: the save button was only disabled deep into the flow
     // (after three awaits), so a double-click started two concurrent saves —
     // duplicate quote sessions on a new quote, racing delete/insert in edit mode.
-    if (window._embSaveInFlight) {
+    if (_embSaveInFlight) {
         showToast('Save already in progress…', 'info');
         return;
     }
      
-    window._embSaveInFlight = true;
+    _embSaveInFlight = true;
     try {
         return await _saveAndGetLinkInner(opts);
     } finally {
          
-        window._embSaveInFlight = false;
+        _embSaveInFlight = false;
     }
 }
 
@@ -679,7 +683,7 @@ export async function openPushPreview() {
     // opener, move focus into the modal, trap Tab inside it, and close on Escape (a11y; stops focus leaking
     // to the page behind the modal).
      
-    window._pushModalOpener = document.activeElement;
+    _pushModalOpener = document.activeElement;
     setTimeout(() => { try { const f = modal.querySelector('button:not([disabled])'); if (f) f.focus(); } catch (_) {} }, 0);
     if (!modal._embKeyBound) {
         modal._embKeyBound = true;
@@ -946,5 +950,5 @@ export function closePushPreview() {
     if (modal) modal.classList.remove('active');
     if (typeof closeAccessibleModal === 'function') closeAccessibleModal(modal); // 1.8: restore focus
     // P2-16: restore focus to whatever opened the modal (a11y — focus must not vanish to <body>).
-    try { if (window._pushModalOpener && window._pushModalOpener.focus) window._pushModalOpener.focus(); } catch (_) {}
+    try { if (_pushModalOpener && _pushModalOpener.focus) _pushModalOpener.focus(); } catch (_) {}
 }
