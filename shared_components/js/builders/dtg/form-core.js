@@ -695,6 +695,101 @@ export function syncDueDateFromQty() {
 // of the order with a state ('ok' / 'warn' / 'block' / 'tip'), a label,
 // a value (or remediation message), and optionally a `jumpId` — the DOM
 // id of the field the rep should click to fix the issue.
+// F3 split (2026-07-09): readiness checks 7-9 moved VERBATIM out of
+// computeReadiness (they share no locals beyond items/cq).
+function pushDesignReadiness(items) {
+    // 7. Design — either existing Design # OR new artwork upload (mutually
+    // exclusive). Erik 2026-05-20:
+    //   (a) No design # AND no files → BLOCK (rep must pick one path)
+    //   (b) Files uploaded but no design name → BLOCK
+    //   (c) Both design # AND files → BLOCK (conflict — pick one)
+    //   (d) Otherwise: ok / warn states like before
+    const hasExistingDesign = !!(state.customer.designNumber && String(state.customer.designNumber).trim());
+    const newArtworkFiles = state.newArtwork?.files || [];
+    const newArtworkName = (state.newArtwork?.designName || '').trim();
+    const hasUploadedArtwork = newArtworkFiles.length > 0;
+
+    if (hasExistingDesign && hasUploadedArtwork) {
+        // Conflict: rep has both — block until they pick one
+        items.push({
+            state: 'block',
+            label: 'Design',
+            value: `Conflict — existing design #${state.customer.designNumber} picked AND ${newArtworkFiles.length} file(s) uploaded. Pick one or the other.`,
+            jumpId: 'dtgDesignNumber',
+        });
+    } else if (!hasExistingDesign && !hasUploadedArtwork) {
+        // Neither — block
+        items.push({
+            state: 'block',
+            label: 'Design',
+            value: 'Pick an existing design # OR upload new artwork',
+            jumpId: 'dtgDesignNumber',
+        });
+    } else if (hasUploadedArtwork && !newArtworkName) {
+        // Files uploaded but no name — block
+        items.push({
+            state: 'block',
+            label: 'Design',
+            value: `${newArtworkFiles.length} file(s) uploaded — type a Design name to continue`,
+            jumpId: 'dtgNewArtworkName',
+        });
+    } else if (hasUploadedArtwork) {
+        // New artwork ready
+        items.push({
+            state: 'ok',
+            label: 'Design',
+            value: `New: "${newArtworkName}" — ${newArtworkFiles.length} file(s) will create a new ShopWorks design`,
+        });
+    } else {
+        // Existing design # — show the matched design's name when available
+        const cachedDesigns = dtgIF._designComboboxCustomerId
+            ? (_designsCacheByCustomer.get(String(dtgIF._designComboboxCustomerId)) || [])
+            : [];
+        const matched = cachedDesigns.find((d) => d.idDesign === String(state.customer.designNumber).trim());
+        if (matched) {
+            items.push({ state: 'ok', label: 'Design #', value: `${matched.idDesign} — ${matched.designName || '(no name)'}` });
+        } else if (dtgIF._designComboboxCustomerId && cachedDesigns.length > 0) {
+            items.push({ state: 'warn', label: 'Design #', value: `${state.customer.designNumber} — not on file for this customer (manual entry ok)`, jumpId: 'dtgDesignNumber' });
+        } else {
+            items.push({ state: 'ok', label: 'Design #', value: state.customer.designNumber });
+        }
+    }
+}
+
+function pushStockAndTierHints(items, cq) {
+    // 8. OOS-with-qty warnings (any size typed where SanMar shows 0 stock)
+    let oosTypedCount = 0;
+    for (const row of state.rows) {
+        const inv = row.inventory;
+        if (!inv || inv.status !== 'ok') continue;
+        for (const [sz, qty] of Object.entries(row.sizes || {})) {
+            if (Number(qty) > 0 && inv.bySize && Number(inv.bySize[sz]) === 0) oosTypedCount++;
+        }
+    }
+    if (oosTypedCount > 0) {
+        items.push({
+            state: 'warn',
+            label: 'Stock',
+            value: `${oosTypedCount} size${oosTypedCount === 1 ? '' : 's'} typed at qty > 0 are showing OOS at SanMar — verify before promising`,
+        });
+    }
+
+    // 9. Tier-break optimization (free money)
+    if (dtgIF._lastTier && dtgIF._allTiers && cq > 0) {
+        const nextTier = findNextTier(dtgIF._allTiers, dtgIF._lastTier, cq);
+        if (nextTier) {
+            const piecesNeeded = nextTier.MinQty - cq;
+            if (piecesNeeded > 0 && piecesNeeded <= 5) {
+                const currentLtmFee = Number(dtgIF._lastTier.LTM_Fee) || 0;
+                const hint = currentLtmFee > 0
+                    ? `Add ${piecesNeeded} more piece${piecesNeeded === 1 ? '' : 's'} to reach tier ${nextTier.TierLabel} and skip the $${currentLtmFee} LTM fee`
+                    : `Add ${piecesNeeded} more piece${piecesNeeded === 1 ? '' : 's'} to reach tier ${nextTier.TierLabel} — cheaper per-piece pricing`;
+                items.push({ state: 'tip', label: 'Tier tip', value: hint });
+            }
+        }
+    }
+}
+
 export function computeReadiness() {
     const items = [];
     const cq = combinedQty();
@@ -790,94 +885,9 @@ export function computeReadiness() {
         }
     }
 
-    // 7. Design — either existing Design # OR new artwork upload (mutually
-    // exclusive). Erik 2026-05-20:
-    //   (a) No design # AND no files → BLOCK (rep must pick one path)
-    //   (b) Files uploaded but no design name → BLOCK
-    //   (c) Both design # AND files → BLOCK (conflict — pick one)
-    //   (d) Otherwise: ok / warn states like before
-    const hasExistingDesign = !!(state.customer.designNumber && String(state.customer.designNumber).trim());
-    const newArtworkFiles = state.newArtwork?.files || [];
-    const newArtworkName = (state.newArtwork?.designName || '').trim();
-    const hasUploadedArtwork = newArtworkFiles.length > 0;
+    pushDesignReadiness(items);
 
-    if (hasExistingDesign && hasUploadedArtwork) {
-        // Conflict: rep has both — block until they pick one
-        items.push({
-            state: 'block',
-            label: 'Design',
-            value: `Conflict — existing design #${state.customer.designNumber} picked AND ${newArtworkFiles.length} file(s) uploaded. Pick one or the other.`,
-            jumpId: 'dtgDesignNumber',
-        });
-    } else if (!hasExistingDesign && !hasUploadedArtwork) {
-        // Neither — block
-        items.push({
-            state: 'block',
-            label: 'Design',
-            value: 'Pick an existing design # OR upload new artwork',
-            jumpId: 'dtgDesignNumber',
-        });
-    } else if (hasUploadedArtwork && !newArtworkName) {
-        // Files uploaded but no name — block
-        items.push({
-            state: 'block',
-            label: 'Design',
-            value: `${newArtworkFiles.length} file(s) uploaded — type a Design name to continue`,
-            jumpId: 'dtgNewArtworkName',
-        });
-    } else if (hasUploadedArtwork) {
-        // New artwork ready
-        items.push({
-            state: 'ok',
-            label: 'Design',
-            value: `New: "${newArtworkName}" — ${newArtworkFiles.length} file(s) will create a new ShopWorks design`,
-        });
-    } else {
-        // Existing design # — show the matched design's name when available
-        const cachedDesigns = dtgIF._designComboboxCustomerId
-            ? (_designsCacheByCustomer.get(String(dtgIF._designComboboxCustomerId)) || [])
-            : [];
-        const matched = cachedDesigns.find((d) => d.idDesign === String(state.customer.designNumber).trim());
-        if (matched) {
-            items.push({ state: 'ok', label: 'Design #', value: `${matched.idDesign} — ${matched.designName || '(no name)'}` });
-        } else if (dtgIF._designComboboxCustomerId && cachedDesigns.length > 0) {
-            items.push({ state: 'warn', label: 'Design #', value: `${state.customer.designNumber} — not on file for this customer (manual entry ok)`, jumpId: 'dtgDesignNumber' });
-        } else {
-            items.push({ state: 'ok', label: 'Design #', value: state.customer.designNumber });
-        }
-    }
-
-    // 8. OOS-with-qty warnings (any size typed where SanMar shows 0 stock)
-    let oosTypedCount = 0;
-    for (const row of state.rows) {
-        const inv = row.inventory;
-        if (!inv || inv.status !== 'ok') continue;
-        for (const [sz, qty] of Object.entries(row.sizes || {})) {
-            if (Number(qty) > 0 && inv.bySize && Number(inv.bySize[sz]) === 0) oosTypedCount++;
-        }
-    }
-    if (oosTypedCount > 0) {
-        items.push({
-            state: 'warn',
-            label: 'Stock',
-            value: `${oosTypedCount} size${oosTypedCount === 1 ? '' : 's'} typed at qty > 0 are showing OOS at SanMar — verify before promising`,
-        });
-    }
-
-    // 9. Tier-break optimization (free money)
-    if (dtgIF._lastTier && dtgIF._allTiers && cq > 0) {
-        const nextTier = findNextTier(dtgIF._allTiers, dtgIF._lastTier, cq);
-        if (nextTier) {
-            const piecesNeeded = nextTier.MinQty - cq;
-            if (piecesNeeded > 0 && piecesNeeded <= 5) {
-                const currentLtmFee = Number(dtgIF._lastTier.LTM_Fee) || 0;
-                const hint = currentLtmFee > 0
-                    ? `Add ${piecesNeeded} more piece${piecesNeeded === 1 ? '' : 's'} to reach tier ${nextTier.TierLabel} and skip the $${currentLtmFee} LTM fee`
-                    : `Add ${piecesNeeded} more piece${piecesNeeded === 1 ? '' : 's'} to reach tier ${nextTier.TierLabel} — cheaper per-piece pricing`;
-                items.push({ state: 'tip', label: 'Tier tip', value: hint });
-            }
-        }
-    }
+    pushStockAndTierHints(items, cq);
 
     // Overall readiness — any blocker means submit is gated
     const blockers = items.filter((i) => i.state === 'block').length;
@@ -1097,7 +1107,7 @@ export function wireRowHandlers() {
 }
 
 // ----- Customer combobox + manual fields --------------------------------
-export function wireGlobalHandlers() {
+function wireActionButtons() {
     // Add row
     const addBtn = document.getElementById('dtgAddRowBtn');
     if (addBtn) addBtn.addEventListener('click', () => {
@@ -1141,7 +1151,9 @@ export function wireGlobalHandlers() {
     // link" button).
     const emailBtn = document.getElementById('dtgEmailBtn');
     if (emailBtn) emailBtn.addEventListener('click', () => dtgEmailQuote());
+}
 
+function wireCustomerPickers() {
     // Customer combobox
     const wrap = document.getElementById('dtgCompanyCombo');
     const input = document.getElementById('dtgCompanyInput');
@@ -1182,7 +1194,9 @@ export function wireGlobalHandlers() {
         // restored from a previous quote), kick off the design fetch.
         refreshDesignComboboxForNewCustomer();
     }
+}
 
+function wireScheduleAndLightbox() {
     // --- Schedule section: due date + drop dead date (Erik 2026-05-20) ---
     // Initialize due date on mount if it's still blank (qty=0 case picks
     // the 5-BD branch — when first row's qty pushes past 24, recompute
@@ -1240,7 +1254,9 @@ export function wireGlobalHandlers() {
             if (lb && !lb.hidden) closeDesignLightbox();
         }
     });
+}
 
+function wireCustomerFields() {
     // Manual customer fields
     bindInputToState('dtgFirstName', 'firstName');
     bindInputToState('dtgLastName', 'lastName');
@@ -1277,6 +1293,9 @@ export function wireGlobalHandlers() {
         scheduleStateSave();
         updateSubmitEnabled();
     });
+}
+
+function wireShippingHandlers() {
     // A2 shipping method
     const shipSel = document.getElementById('dtgShipMethod');
     if (shipSel) shipSel.addEventListener('change', () => {
@@ -1349,7 +1368,9 @@ export function wireGlobalHandlers() {
             taxLookupTimer = setTimeout(recomputeTaxRate, 600);
         });
     });
+}
 
+function wireTaxControls() {
     // [2026-06-08] Phase 1 tax-control handlers. All route through recomputeTaxRate() (the SINGLE tax authority)
     // so the on-screen total, the PDF, the saved record, and the ShopWorks push never desync.
     const incTaxEl = document.getElementById('include-tax');
@@ -1384,6 +1405,17 @@ export function wireGlobalHandlers() {
         markDirty(); scheduleStateSave();
         renderSummary();
     });
+}
+
+export function wireGlobalHandlers() {
+    // F3 split (2026-07-09): the wiring blocks moved VERBATIM into the section
+    // functions above - call order unchanged.
+    wireActionButtons();
+    wireCustomerPickers();
+    wireScheduleAndLightbox();
+    wireCustomerFields();
+    wireShippingHandlers();
+    wireTaxControls();
 }
 
 export function bindInputToState(elId, stateKey) {
@@ -1714,11 +1746,10 @@ export function previewCustomer(match) {
     updateSubmitEnabled();
 }
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-} else {
-    init();
-}
+// Boot moved to the shared base (F1): builders/dtg/index.js runs
+// `QuoteBuilderBase(new DtgAdapter()).init()`, whose DOMContentLoaded start
+// calls init() via the adapter — same timing (the bundle is a sync classic
+// script, so readyState is always 'loading' at parse).
 
 // The public cross-file API (dtg-catalog.js + dtg-quote-page.js consume this
 // 13-method surface) — byte-stable through the decomposition (Batch 5).

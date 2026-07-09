@@ -9,7 +9,8 @@
  * Also THE sync lock for quantity-nudge tiers: each adapter's getNudgeTiers()
  * must match the canonical per-method map inside quote-builder-utils.js
  * (renderQuantityNudge) — the two have drifted apart before (SCP 2026-06-19
- * remap). DTG has no adapter; its row asserts against the utils map directly.
+ * remap). DTG joined via DtgAdapter (F1, 2026-07-09) — all 4 builders now
+ * boot through the base.
  */
 
 const fs = require('fs');
@@ -31,6 +32,7 @@ const ADAPTERS = [
     { key: 'emb', bundle: 'emb-adapter.cjs', className: 'EmbAdapter' },
     { key: 'scp', bundle: 'scp-adapter.cjs', className: 'ScpAdapter' },
     { key: 'dtf', bundle: 'dtf-adapter.cjs', className: 'DtfAdapter' },
+    { key: 'dtg', bundle: 'dtg-adapter.cjs', className: 'DtgAdapter' },
 ];
 
 const { QuoteBuilderBase } = require(path.join(BUNDLES, 'quote-builder-base.cjs'));

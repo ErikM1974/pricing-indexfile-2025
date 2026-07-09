@@ -2,7 +2,6 @@
  * DTG inline form — tax-shipping module (Batch 5, 2026-07-09). Moved VERBATIM from the
  * dtg-inline-form.js IIFE; lexical references became the imports below.
  */
-// @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions).
 /* global */
 import { renderSummary } from './pricing.js';
 import { API_BASE, state } from './state.js';
@@ -25,7 +24,7 @@ export function effectiveShipFee() {
 // onApplied hook + the manual input handler both call this to sync state before the
 // tax base re-renders.
 export function syncShipFeeFromDom() {
-    const el = document.getElementById('dtgShipFee');
+    const el = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgShipFee'));
     if (!el) return;
     const v = parseFloat(el.value);
     state.shipping.fee = (Number.isFinite(v) && v > 0) ? v : 0;
@@ -35,7 +34,7 @@ export function syncShipFeeFromDom() {
 // Called from the ship-method dropdown handler so dropdown-picked
 // "Customer Pickup" also flips the toggle.
 export function syncPickupToggleFromShipMethod() {
-    const tgl = document.getElementById('dtgPickupToggle');
+    const tgl = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgPickupToggle'));
     const block = document.getElementById('dtgShipToBlock');
     const isPickup = isPickupMethod(state.shipping.method);
     if (tgl) tgl.checked = isPickup;

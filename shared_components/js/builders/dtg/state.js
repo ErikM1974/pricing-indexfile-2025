@@ -6,7 +6,6 @@
  *  - dtgState.hasChanges + a window accessor (quote-builder-utils reads the
  *    bare `hasChanges` global — same shim SCP uses)
  */
-// @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions).
 
 // API base for the decomposed modules (matches emb/scp/dtf state.js — Rule 6:
 // the host comes from APP_CONFIG, never a literal; fail LOUD, not silently wrong).
