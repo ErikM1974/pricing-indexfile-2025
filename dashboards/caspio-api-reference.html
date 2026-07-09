@@ -220,12 +220,13 @@ grant_type=client_credentials&amp;client_id={clientId}&amp;client_secret={client
             <!-- Bulk -->
             <section class="dash-card capi-section" id="bulk">
                 <h2 class="capi-h"><span class="capi-n">06</span> Bulk operations &amp; safety guardrails <span class="capi-tag">the big new capability</span></h2>
-                <p>Bulk insert takes a JSON array (max <strong>1000</strong>) and returns <code>201</code> when all succeed or <code>207 Multi-Status</code> on partial failure — each item carries its own <code>status</code>:</p>
+                <p>Bulk insert takes a JSON array (max <strong>1000</strong>) and returns <code>201</code> when all succeed or <code>207 Multi-Status</code> on partial failure — the response is a <code>Result[]</code> array where each element carries a per-item <code>Status</code> (<code>201</code>=created, <code>4xx/5xx</code>=failure):</p>
                 <pre>POST /v4/tables/{tableId}/records/bulk
 [ { "FieldA": 1 }, { "FieldA": 2 } ]
 
-→ { "PK_ID": ["101","102"],
-    "data": [ { "status":201, "PK_ID":"101" }, { "status":422, "error":"…" } ] }</pre>
+→ { "Result": [ { "Status":201, "PK_ID":"101" },
+               { "Status":422, "error":"…" } ] }</pre>
+                <p class="capi-note">Note the envelopes differ: <strong>list</strong> endpoints return <code>data[]</code> + <code>pagination</code>, but <strong>bulk</strong> insert returns <code>Result[]</code> with a capital-S <code>Status</code> per item (confirmed against the live spec). Verify exact casing before writing a parser.</p>
                 <p>Conditional bulk update &amp; delete <strong>require a <code>where</code></strong>:</p>
                 <ul>
                     <li><code>BulkUpdateRecordsRequest</code> — <span class="capi-req">where *</span> (required) + <span class="capi-req">recordValues *</span> (required)</li>
