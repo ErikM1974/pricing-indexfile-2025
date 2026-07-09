@@ -144,8 +144,10 @@ export const lifecycleMethods = {
         if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();
     },
 
-    async init() {
-
+    // D2 split (2026-07-09): init's sequential page chrome (pricing load +
+    // listeners + logo chips + method-switch menu) moved VERBATIM; the
+    // orchestrator keeps the edit/duplicate/prefill ROUTING.
+    async _initPageChrome() {
         try {
             // Load pricing data
             await this.loadPricingData();
@@ -200,6 +202,11 @@ export const lifecycleMethods = {
                 }
             });
         }
+    },
+
+    async init() {
+
+        await this._initPageChrome();
 
         // Check for edit mode (loading existing quote for revision)
         const editQuoteId = this.checkForEditMode();
@@ -782,7 +789,10 @@ export const lifecycleMethods = {
      * Save quote and show shareable link modal
      * Called from "Save & Get Shareable Link" button
      */
-    async saveAndGetLink(opts = {}) {
+    // D2 split (2026-07-09): save-path steps moved VERBATIM out of
+    // saveAndGetLink into the _save*/_build*/_handle* siblings below
+    // (this.-preserving; the orchestrator keeps mint/guards + try/finally).
+    _validateSaveForm() {
         const customerName = document.getElementById('customer-name')?.value?.trim() || '';
         const customerEmail = document.getElementById('customer-email')?.value?.trim() || '';
         const companyName = document.getElementById('company-name')?.value?.trim() || '';
@@ -851,25 +861,10 @@ export const lifecycleMethods = {
             this.showError('Pricing data is not loaded — cannot save. Please refresh and try again.');
             return;
         }
+        return { customerName, customerEmail, companyName, salesRep, totalQty };
+    },
 
-        // Quote ID: keep the id when editing; otherwise mint from the Caspio-backed
-        // sequence (collision-safe across reps/tabs — the old Math.random() id was not)
-        const quoteId = this.editingQuoteId || await this.quoteService.generateQuoteID();
-        // Calculate from internal state (not DOM text) to avoid stale/drift issues
-        const stateCalc = this.calculateFromState();
-        if (!(stateCalc.subtotal > 0)) {
-            this.showError('Quote totals computed to $0 — pricing may not have loaded. Please re-enter a quantity or refresh before saving.');
-            return;
-        }
-        const subtotal = stateCalc.subtotal;
-        const ltmFee = this.currentPricingData?.totalLtmFee || 0;
-        // Fees/tax/grand total from the SAME state math the screen uses — never
-        // scraped from DOM text (the old `parseFloat(...) || subtotal` silently
-        // saved a products-only total whenever the DOM read failed, and treated a
-        // legitimate $0.00 grand total as falsy). (2026-06-11)
-        const totals = this.computeFeesAndTotals(stateCalc);
-        const grandTotal = totals.grandTotal;
-
+    _collectSaveArtwork() {
         // Build quote data
         // Phase 9 — include uploaded reference artwork file refs (if any)
         // Phase 11.3 (2026-05-24) — also pull newDesignName + per-file .placement
@@ -897,7 +892,125 @@ export const lifecycleMethods = {
 
         // Phase 11.1 — include design # if rep picked one from the combobox
         const designNumber = document.getElementById('design-number')?.value?.trim() || '';
+        return { referenceArtwork, newDesignName, designNumber };
+    },
 
+    _buildSaveProductEntry(p, stateCalc) {
+        const standardSizes = ['S', 'M', 'L', 'XL'];
+        const allQuantities = {};
+        const sizeGroups = [];
+
+        // Get parent row early - we need it for both price and color/image data
+        const parentRow = document.getElementById(`row-${p.id}`);
+        // eslint-disable-next-line no-unused-vars -- verbatim (D1): unused in monolith
+        const rowId = parentRow?.dataset?.rowId || parentRow?.dataset?.productId || p.id;
+
+        // Read color from row dataset (HTML stores here) or product object (JS stores here)
+        const color = parentRow?.dataset?.color || p.color || '';
+        const catalogColor = parentRow?.dataset?.catalogColor || p.catalogColor || '';
+        // Read image from row dataset (swatchUrl) or product object
+        const imageUrl = parentRow?.dataset?.swatchUrl || p.imageUrl || '';
+
+        // Collect standard size quantities
+        standardSizes.forEach(size => {
+            allQuantities[size] = p.quantities[size] || 0;
+        });
+
+        // Add child row quantities (extended sizes) — from JS state,
+        // not the DOM (2026-06-11 P2). One entry per actual child row.
+        const stateChildren = this.getChildRowsForParent(p.id);
+        stateChildren.forEach(child => {
+            const normalizedSize = child.size === 'XXL' ? '2XL' : (child.size === 'XXXL' ? '3XL' : child.size);
+            allQuantities[normalizedSize] = child.qty || 0;
+        });
+
+        // Build sizeGroups with calculated unit prices from displayed table
+        // Standard sizes (S-XL) as one group
+        const stdQtys = {};
+        let stdTotalQty = 0;
+        standardSizes.forEach(size => {
+            if (allQuantities[size] > 0) {
+                stdQtys[size] = allQuantities[size];
+                stdTotalQty += allQuantities[size];
+            }
+        });
+
+        if (stdTotalQty > 0) {
+            // Get unit price from calculated state (not DOM text)
+            const calcData = stateCalc.productTotals.get(p.id);
+            const unitPrice = calcData?.standardUnitPrice || 0;
+
+            sizeGroups.push({
+                sizes: stdQtys,
+                quantity: stdTotalQty,
+                unitPrice: unitPrice,
+                total: stdTotalQty * unitPrice,
+                // [2026-06-11] LTM component for quote_items metadata
+                pricing: { ltmPerUnit: this.currentPricingData?.ltmPerUnit || 0 },
+                effectiveCost: p.baseCost,
+                color: color,            // Include parent row color
+                catalogColor: catalogColor,
+                imageUrl: imageUrl
+            });
+        }
+
+        // Extended sizes — one group per ACTUAL child row, from JS state
+        // (2026-06-11 P2: qty/price never read from the DOM). The old loop
+        // iterated a hardcoded ['2XL'..'6XL'] list, so any other popup
+        // size (XS, XXS, talls, youth, 7XL+) was charged in the totals
+        // but silently dropped from quote_items — quote-view didn't foot
+        // and the ShopWorks push under-billed those pieces. (2026-06-11)
+        stateChildren.forEach(child => {
+            const qty = child.qty || 0;
+            if (qty <= 0) return;
+            // Normalize aliases the same way allQuantities does, so saved
+            // SizeBreakdown keys match the push's SIZE_TO_SUFFIX lookups
+            const size = child.size === 'XXL' ? '2XL' : (child.size === 'XXXL' ? '3XL' : child.size);
+
+            // Color may differ from parent if the rep changed it on the
+            // child row — color is display metadata that lives on the DOM
+            // row (state holds money fields only), parent fallback if gone
+            const childRow = document.getElementById(`row-${child.id}`);
+            const childColor = childRow?.dataset?.color || color;
+            const childCatalogColor = childRow?.dataset?.catalogColor || catalogColor;
+            const childImageUrl = childRow?.dataset?.swatchUrl || imageUrl;
+
+            // Get unit price from calculated state (not DOM text)
+            const childCalcData = stateCalc.childTotals.get(`row-${child.id}`);
+            const unitPrice = childCalcData?.unitPrice || 0;
+
+            sizeGroups.push({
+                sizes: { [size]: qty },
+                quantity: qty,
+                unitPrice: unitPrice,
+                total: qty * unitPrice,
+                // [2026-06-11] LTM component for quote_items metadata
+                pricing: { ltmPerUnit: this.currentPricingData?.ltmPerUnit || 0 },
+                effectiveCost: p.baseCost + (p.sizeUpcharges?.[size] || 0),
+                color: childColor,       // Use child row color (or parent fallback)
+                catalogColor: childCatalogColor,
+                imageUrl: childImageUrl
+            });
+        });
+
+        return {
+            styleNumber: p.styleNumber,
+            productName: p.description,
+            description: p.description,
+            color: color,               // Use row dataset value
+            catalogColor: catalogColor, // Use row dataset value
+            baseCost: p.baseCost,
+            sizeUpcharges: p.sizeUpcharges,
+            quantities: allQuantities,
+            sizeGroups: sizeGroups,
+            imageUrl: imageUrl          // Use row dataset value
+        };
+    },
+
+    _buildSaveQuoteData(ctx) {
+        const { quoteId, customerName, customerEmail, companyName, salesRep, totalQty,
+            subtotal, ltmFee, grandTotal, totals, stateCalc,
+            referenceArtwork, newDesignName, designNumber } = ctx;
         const quoteData = {
             quoteId: quoteId,
             customerName,
@@ -918,117 +1031,7 @@ export const lifecycleMethods = {
                 label: this.locationConfig[loc]?.label,
                 size: this.locationConfig[loc]?.size
             })),
-            products: this.products.map(p => {
-                const standardSizes = ['S', 'M', 'L', 'XL'];
-                const allQuantities = {};
-                const sizeGroups = [];
-
-                // Get parent row early - we need it for both price and color/image data
-                const parentRow = document.getElementById(`row-${p.id}`);
-                // eslint-disable-next-line no-unused-vars -- verbatim (D1): unused in monolith
-                const rowId = parentRow?.dataset?.rowId || parentRow?.dataset?.productId || p.id;
-
-                // Read color from row dataset (HTML stores here) or product object (JS stores here)
-                const color = parentRow?.dataset?.color || p.color || '';
-                const catalogColor = parentRow?.dataset?.catalogColor || p.catalogColor || '';
-                // Read image from row dataset (swatchUrl) or product object
-                const imageUrl = parentRow?.dataset?.swatchUrl || p.imageUrl || '';
-
-                // Collect standard size quantities
-                standardSizes.forEach(size => {
-                    allQuantities[size] = p.quantities[size] || 0;
-                });
-
-                // Add child row quantities (extended sizes) — from JS state,
-                // not the DOM (2026-06-11 P2). One entry per actual child row.
-                const stateChildren = this.getChildRowsForParent(p.id);
-                stateChildren.forEach(child => {
-                    const normalizedSize = child.size === 'XXL' ? '2XL' : (child.size === 'XXXL' ? '3XL' : child.size);
-                    allQuantities[normalizedSize] = child.qty || 0;
-                });
-
-                // Build sizeGroups with calculated unit prices from displayed table
-                // Standard sizes (S-XL) as one group
-                const stdQtys = {};
-                let stdTotalQty = 0;
-                standardSizes.forEach(size => {
-                    if (allQuantities[size] > 0) {
-                        stdQtys[size] = allQuantities[size];
-                        stdTotalQty += allQuantities[size];
-                    }
-                });
-
-                if (stdTotalQty > 0) {
-                    // Get unit price from calculated state (not DOM text)
-                    const calcData = stateCalc.productTotals.get(p.id);
-                    const unitPrice = calcData?.standardUnitPrice || 0;
-
-                    sizeGroups.push({
-                        sizes: stdQtys,
-                        quantity: stdTotalQty,
-                        unitPrice: unitPrice,
-                        total: stdTotalQty * unitPrice,
-                        // [2026-06-11] LTM component for quote_items metadata
-                        pricing: { ltmPerUnit: this.currentPricingData?.ltmPerUnit || 0 },
-                        effectiveCost: p.baseCost,
-                        color: color,            // Include parent row color
-                        catalogColor: catalogColor,
-                        imageUrl: imageUrl
-                    });
-                }
-
-                // Extended sizes — one group per ACTUAL child row, from JS state
-                // (2026-06-11 P2: qty/price never read from the DOM). The old loop
-                // iterated a hardcoded ['2XL'..'6XL'] list, so any other popup
-                // size (XS, XXS, talls, youth, 7XL+) was charged in the totals
-                // but silently dropped from quote_items — quote-view didn't foot
-                // and the ShopWorks push under-billed those pieces. (2026-06-11)
-                stateChildren.forEach(child => {
-                    const qty = child.qty || 0;
-                    if (qty <= 0) return;
-                    // Normalize aliases the same way allQuantities does, so saved
-                    // SizeBreakdown keys match the push's SIZE_TO_SUFFIX lookups
-                    const size = child.size === 'XXL' ? '2XL' : (child.size === 'XXXL' ? '3XL' : child.size);
-
-                    // Color may differ from parent if the rep changed it on the
-                    // child row — color is display metadata that lives on the DOM
-                    // row (state holds money fields only), parent fallback if gone
-                    const childRow = document.getElementById(`row-${child.id}`);
-                    const childColor = childRow?.dataset?.color || color;
-                    const childCatalogColor = childRow?.dataset?.catalogColor || catalogColor;
-                    const childImageUrl = childRow?.dataset?.swatchUrl || imageUrl;
-
-                    // Get unit price from calculated state (not DOM text)
-                    const childCalcData = stateCalc.childTotals.get(`row-${child.id}`);
-                    const unitPrice = childCalcData?.unitPrice || 0;
-
-                    sizeGroups.push({
-                        sizes: { [size]: qty },
-                        quantity: qty,
-                        unitPrice: unitPrice,
-                        total: qty * unitPrice,
-                        // [2026-06-11] LTM component for quote_items metadata
-                        pricing: { ltmPerUnit: this.currentPricingData?.ltmPerUnit || 0 },
-                        effectiveCost: p.baseCost + (p.sizeUpcharges?.[size] || 0),
-                        color: childColor,       // Use child row color (or parent fallback)
-                        catalogColor: childCatalogColor,
-                        imageUrl: childImageUrl
-                    });
-                });
-
-                return {
-                    styleNumber: p.styleNumber,
-                    productName: p.description,
-                    description: p.description,
-                    color: color,               // Use row dataset value
-                    catalogColor: catalogColor, // Use row dataset value
-                    baseCost: p.baseCost,
-                    sizeUpcharges: p.sizeUpcharges,
-                    quantities: allQuantities,
-                    sizeGroups: sizeGroups,
-                    imageUrl: imageUrl          // Use row dataset value
-                };
-            }),
+            products: this.products.map(p => this._buildSaveProductEntry(p, stateCalc)),
             totalQuantity: totalQty,
             subtotal: subtotal,
             ltmFee: ltmFee,
@@ -1086,6 +1089,85 @@ export const lifecycleMethods = {
             // eslint-disable-next-line no-dupe-keys -- pre-existing monolith bug: 'notes' appears twice in this literal (identical expressions; last-wins). Kept verbatim (D1).
             notes: document.getElementById('dtf-notes')?.value?.trim() || ''
         };
+        return quoteData;
+    },
+
+    _handleSaveSuccess(result, finalQuoteId, opts) {
+
+        // [2026-06-11] remember the id so Email Quote works on a fresh
+        // save (editingQuoteId is only set by the ?edit= path)
+        this.lastSavedQuoteId = finalQuoteId;
+
+        // [2026-06-11] surface partial saves — some quote_items POSTs
+        // failed but the old code showed the clean success modal anyway
+        // (an under-billing quote went out looking verified)
+        if (result.partialSave) {
+            this.showError(result.warning || 'Some line items FAILED to save — open the quote link and verify every line before sending.');
+            this.showToast('Quote saved INCOMPLETE — verify line items', 'error');
+        }
+
+        // Clear draft after successful save
+        if (this.persistence) {
+            this.persistence.clearDraft();
+        }
+        this.markAsSaved();
+
+        // Reveal the Push-to-ShopWorks button after a successful save.
+        // Clicking it opens openDtfPushPreview() — a review-before-push
+        // modal (parity with EMB/SCP) that shows the exact ShopWorks
+        // payload before the rep confirms. (Order/design type IDs live in
+        // caspio-pricing-proxy/config/manageorders-dtf-config.js: 18/8.)
+        if (typeof showDtfPushButton === 'function') {
+            showDtfPushButton(finalQuoteId);
+        }
+
+        // Show success modal with shareable link — SKIPPED on the silent auto-save before a Push
+        // (dtfPushToShopWorks passes skipShareModal:true; the push preview opens instead).
+        if (opts.skipShareModal) {
+            /* auto-saved for Push to ShopWorks — no share modal */
+        } else if (typeof QuoteShareModal !== 'undefined' && QuoteShareModal.show) {
+            QuoteShareModal.show(finalQuoteId, this.editingQuoteId ? `Updated to Rev ${this.editingRevision}` : null);
+        } else if (typeof showSaveModal === 'function') {
+            // Fallback to inline modal if shared module not loaded
+            showSaveModal(finalQuoteId);
+        } else {
+            // Last resort fallback
+            const url = `${window.location.origin}/quote/${finalQuoteId}`;
+            const message = this.editingQuoteId
+                ? `Quote updated!\n\nQuote ID: ${finalQuoteId}\nRevision: ${this.editingRevision}\n\nShareable Link:\n${url}`
+                : `Quote saved!\n\nQuote ID: ${finalQuoteId}\n\nShareable Link:\n${url}`;
+            alert(message);
+        }
+    },
+
+    async saveAndGetLink(opts = {}) {
+        const v = this._validateSaveForm();
+        if (!v) return;
+        const { customerName, customerEmail, companyName, salesRep, totalQty } = v;
+
+        // Quote ID: keep the id when editing; otherwise mint from the Caspio-backed
+        // sequence (collision-safe across reps/tabs — the old Math.random() id was not)
+        const quoteId = this.editingQuoteId || await this.quoteService.generateQuoteID();
+        // Calculate from internal state (not DOM text) to avoid stale/drift issues
+        const stateCalc = this.calculateFromState();
+        if (!(stateCalc.subtotal > 0)) {
+            this.showError('Quote totals computed to $0 — pricing may not have loaded. Please re-enter a quantity or refresh before saving.');
+            return;
+        }
+        const subtotal = stateCalc.subtotal;
+        const ltmFee = this.currentPricingData?.totalLtmFee || 0;
+        // Fees/tax/grand total from the SAME state math the screen uses — never
+        // scraped from DOM text (the old `parseFloat(...) || subtotal` silently
+        // saved a products-only total whenever the DOM read failed, and treated a
+        // legitimate $0.00 grand total as falsy). (2026-06-11)
+        const totals = this.computeFeesAndTotals(stateCalc);
+        const grandTotal = totals.grandTotal;
+
+        const { referenceArtwork, newDesignName, designNumber } = this._collectSaveArtwork();
+
+        const quoteData = this._buildSaveQuoteData({ quoteId, customerName, customerEmail, companyName,
+            salesRep, totalQty, subtotal, ltmFee, grandTotal, totals, stateCalc,
+            referenceArtwork, newDesignName, designNumber });
 
         // Show saving state on button
         const saveBtn = document.querySelector('.btn-save-quote, [onclick*="saveAndGetLink"]');
@@ -1115,51 +1197,7 @@ export const lifecycleMethods = {
             }
 
             if (result.success) {
-
-                // [2026-06-11] remember the id so Email Quote works on a fresh
-                // save (editingQuoteId is only set by the ?edit= path)
-                this.lastSavedQuoteId = finalQuoteId;
-
-                // [2026-06-11] surface partial saves — some quote_items POSTs
-                // failed but the old code showed the clean success modal anyway
-                // (an under-billing quote went out looking verified)
-                if (result.partialSave) {
-                    this.showError(result.warning || 'Some line items FAILED to save — open the quote link and verify every line before sending.');
-                    this.showToast('Quote saved INCOMPLETE — verify line items', 'error');
-                }
-
-                // Clear draft after successful save
-                if (this.persistence) {
-                    this.persistence.clearDraft();
-                }
-                this.markAsSaved();
-
-                // Reveal the Push-to-ShopWorks button after a successful save.
-                // Clicking it opens openDtfPushPreview() — a review-before-push
-                // modal (parity with EMB/SCP) that shows the exact ShopWorks
-                // payload before the rep confirms. (Order/design type IDs live in
-                // caspio-pricing-proxy/config/manageorders-dtf-config.js: 18/8.)
-                if (typeof showDtfPushButton === 'function') {
-                    showDtfPushButton(finalQuoteId);
-                }
-
-                // Show success modal with shareable link — SKIPPED on the silent auto-save before a Push
-                // (dtfPushToShopWorks passes skipShareModal:true; the push preview opens instead).
-                if (opts.skipShareModal) {
-                    /* auto-saved for Push to ShopWorks — no share modal */
-                } else if (typeof QuoteShareModal !== 'undefined' && QuoteShareModal.show) {
-                    QuoteShareModal.show(finalQuoteId, this.editingQuoteId ? `Updated to Rev ${this.editingRevision}` : null);
-                } else if (typeof showSaveModal === 'function') {
-                    // Fallback to inline modal if shared module not loaded
-                    showSaveModal(finalQuoteId);
-                } else {
-                    // Last resort fallback
-                    const url = `${window.location.origin}/quote/${finalQuoteId}`;
-                    const message = this.editingQuoteId
-                        ? `Quote updated!\n\nQuote ID: ${finalQuoteId}\nRevision: ${this.editingRevision}\n\nShareable Link:\n${url}`
-                        : `Quote saved!\n\nQuote ID: ${finalQuoteId}\n\nShareable Link:\n${url}`;
-                    alert(message);
-                }
+                this._handleSaveSuccess(result, finalQuoteId, opts);
                 // Return the freshly-saved ID so Push can confirm THIS save succeeded
                 // instead of trusting a persistent _dtfPushQuoteId (which would push a
                 // stale revision if this re-save just failed).
@@ -1263,6 +1301,68 @@ export const lifecycleMethods = {
         }
     },
 
+    // D2 split (2026-07-09): the DOM form-field resets moved VERBATIM out of
+    // resetQuote (state/push cleanup stays in the orchestrator).
+    _resetFormFields() {
+        // Reset customer form fields. customer-number + design-number were OMITTED,
+        // so a "New Quote" kept the PREVIOUS customer's ShopWorks # and design link —
+        // the next pushed order silently attached to the wrong customer/design. (2026-06-01)
+        ['customer-name', 'customer-email', 'company-name', 'customer-lookup',
+         'customer-phone', 'project-name', 'customer-number', 'design-number'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+        });
+        // Clear the uploaded-artwork widget + design autocomplete so the prior quote's
+        // hosted logo + new-design name don't ride along on the next push. (2026-06-01)
+        try { if (window._dtfArtwork && typeof window._dtfArtwork.clear === 'function') window._dtfArtwork.clear(); } catch (_) {}
+        try { if (window._dtfDesignCombobox && typeof window._dtfDesignCombobox.refresh === 'function') window._dtfDesignCombobox.refresh(); } catch (_) {}
+
+        // Reset order & shipping fields
+        ['order-number', 'po-number', 'req-ship-date', 'drop-dead-date',
+         'ship-to-name', 'ship-address', 'ship-city', 'ship-zip', 'ship-method'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+        });
+        const stateSelect = document.getElementById('ship-state');
+        if (stateSelect) stateSelect.value = 'WA';
+
+        // Reset tax rate to default
+        const taxRateInput = document.getElementById('tax-rate-input');
+        if (taxRateInput) taxRateInput.value = '10.2';
+
+        // Collapse order details panel
+        const orderContent = document.getElementById('order-details-content');
+        const orderChevron = document.getElementById('order-details-chevron');
+        if (orderContent) orderContent.classList.add('hidden');
+        if (orderChevron) orderChevron.style.transform = 'rotate(-90deg)';
+
+        // Reset additional charges
+        ['rush-fee', 'discount-amount', 'discount-reason', 'graphic-design-hours'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+        });
+
+        // Reset art charge toggle
+        const artToggle = document.getElementById('art-charge-toggle');
+        const artInput = document.getElementById('art-charge');
+        const artWrapper = document.getElementById('art-charge-wrapper');
+        if (artToggle) artToggle.checked = false;
+        if (artInput) { artInput.value = ''; artInput.disabled = true; }
+        if (artWrapper) artWrapper.style.opacity = '0.4';
+
+        // Reset graphic design total display
+        const designTotal = document.getElementById('graphic-design-total');
+        if (designTotal) designTotal.textContent = '0.00';
+
+        // Reset shipping fee + discount type — the shipping fee bled into the next
+        // quote's taxable total after "New Quote" (inflating the price); discount-type
+        // kept a prior 'percent' mode. (2026-06-01)
+        const shipFeeInput = document.getElementById('dtf-shipping-fee');
+        if (shipFeeInput) shipFeeInput.value = '0';
+        const discTypeSel = document.getElementById('discount-type');
+        if (discTypeSel) discTypeSel.value = 'fixed';
+    },
+
     resetQuote() {
         // Clear the "already pushed" lock + reset the Push button so the fresh quote is pushable. (review fix 2026-06-14)
         dtfState._dtfPushQuoteId = null;
@@ -1324,63 +1424,7 @@ export const lifecycleMethods = {
         });
         this.updateLocationSummary();
 
-        // Reset customer form fields. customer-number + design-number were OMITTED,
-        // so a "New Quote" kept the PREVIOUS customer's ShopWorks # and design link —
-        // the next pushed order silently attached to the wrong customer/design. (2026-06-01)
-        ['customer-name', 'customer-email', 'company-name', 'customer-lookup',
-         'customer-phone', 'project-name', 'customer-number', 'design-number'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.value = '';
-        });
-        // Clear the uploaded-artwork widget + design autocomplete so the prior quote's
-        // hosted logo + new-design name don't ride along on the next push. (2026-06-01)
-        try { if (window._dtfArtwork && typeof window._dtfArtwork.clear === 'function') window._dtfArtwork.clear(); } catch (_) {}
-        try { if (window._dtfDesignCombobox && typeof window._dtfDesignCombobox.refresh === 'function') window._dtfDesignCombobox.refresh(); } catch (_) {}
-
-        // Reset order & shipping fields
-        ['order-number', 'po-number', 'req-ship-date', 'drop-dead-date',
-         'ship-to-name', 'ship-address', 'ship-city', 'ship-zip', 'ship-method'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.value = '';
-        });
-        const stateSelect = document.getElementById('ship-state');
-        if (stateSelect) stateSelect.value = 'WA';
-
-        // Reset tax rate to default
-        const taxRateInput = document.getElementById('tax-rate-input');
-        if (taxRateInput) taxRateInput.value = '10.2';
-
-        // Collapse order details panel
-        const orderContent = document.getElementById('order-details-content');
-        const orderChevron = document.getElementById('order-details-chevron');
-        if (orderContent) orderContent.classList.add('hidden');
-        if (orderChevron) orderChevron.style.transform = 'rotate(-90deg)';
-
-        // Reset additional charges
-        ['rush-fee', 'discount-amount', 'discount-reason', 'graphic-design-hours'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) el.value = '';
-        });
-
-        // Reset art charge toggle
-        const artToggle = document.getElementById('art-charge-toggle');
-        const artInput = document.getElementById('art-charge');
-        const artWrapper = document.getElementById('art-charge-wrapper');
-        if (artToggle) artToggle.checked = false;
-        if (artInput) { artInput.value = ''; artInput.disabled = true; }
-        if (artWrapper) artWrapper.style.opacity = '0.4';
-
-        // Reset graphic design total display
-        const designTotal = document.getElementById('graphic-design-total');
-        if (designTotal) designTotal.textContent = '0.00';
-
-        // Reset shipping fee + discount type — the shipping fee bled into the next
-        // quote's taxable total after "New Quote" (inflating the price); discount-type
-        // kept a prior 'percent' mode. (2026-06-01)
-        const shipFeeInput = document.getElementById('dtf-shipping-fee');
-        if (shipFeeInput) shipFeeInput.value = '0';
-        const discTypeSel = document.getElementById('discount-type');
-        if (discTypeSel) discTypeSel.value = 'fixed';
+        this._resetFormFields();
 
         // [2026-06-11] New Quote cleanup that was missing: stale childRowMap entries
         // collided with the next quote's row IDs (phantom extended-size line items),

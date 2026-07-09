@@ -177,32 +177,10 @@ export const outputMethods = {
      * Build pricing data structure for EmbroideryInvoiceGenerator
      * Transforms DTF products into line items with size breakdowns
      */
-    buildPricingDataForInvoice() {
-        const totalQty = this.getTotalQuantity();
-        // SINGLE SOURCE (2026-06-11): line items, subtotal, fees, tax base ALL come
-        // from calculateFromState() + computeFeesAndTotals() — the same math the
-        // save path uses. The old code computed line items from DOM-displayed
-        // prices + a broken per-product fallback (transferBreakdown[loc] never
-        // matched the {breakdown:[],total} shape, so the fallback silently dropped
-        // ALL transfer costs and LTM) while taxing the screen's pre-tax subtotal:
-        // a real customer PDF printed $15.50/unit lines footing to $493.50 under a
-        // $1,018.98 GRAND TOTAL (true unit price $39.50, true subtotal $925.50).
-        const stateCalc = this.calculateFromState();
-        const totals = this.computeFeesAndTotals(stateCalc);
-        // Real quote # chain — lastSavedQuoteId was omitted, so a just-saved NEW
-        // quote printed a fabricated `DTF-<epoch>` that matches nothing in Quote
-        // Mgmt; null lets the shared generator print "DRAFT" when truly unsaved.
-        const quoteId = document.getElementById('quote-id')?.textContent
-            || this.editingQuoteId
-            || this.lastSavedQuoteId
-            || null;
-
-        // Build products array with line items
-        const products = [];
-
-        // Get pricing tier info
-        const tier = this.currentPricingData?.tier || this.getTierForQuantity(totalQty);
-
+    // D2 split (2026-07-09): the per-product invoice line-item build moved
+    // VERBATIM out of buildPricingDataForInvoice (mutates the passed array,
+    // same single-source stateCalc math).
+    _appendInvoiceProducts(products, stateCalc) {
         // Iterate through each product row. NO early qty-skip here: a product whose
         // only pieces are extended sizes has all-zero standard quantities, and the
         // old skip dropped it from the PDF entirely — the empty-lineItems guard at
@@ -291,6 +269,35 @@ export const outputMethods = {
                 });
             }
         });
+    },
+
+    buildPricingDataForInvoice() {
+        const totalQty = this.getTotalQuantity();
+        // SINGLE SOURCE (2026-06-11): line items, subtotal, fees, tax base ALL come
+        // from calculateFromState() + computeFeesAndTotals() — the same math the
+        // save path uses. The old code computed line items from DOM-displayed
+        // prices + a broken per-product fallback (transferBreakdown[loc] never
+        // matched the {breakdown:[],total} shape, so the fallback silently dropped
+        // ALL transfer costs and LTM) while taxing the screen's pre-tax subtotal:
+        // a real customer PDF printed $15.50/unit lines footing to $493.50 under a
+        // $1,018.98 GRAND TOTAL (true unit price $39.50, true subtotal $925.50).
+        const stateCalc = this.calculateFromState();
+        const totals = this.computeFeesAndTotals(stateCalc);
+        // Real quote # chain — lastSavedQuoteId was omitted, so a just-saved NEW
+        // quote printed a fabricated `DTF-<epoch>` that matches nothing in Quote
+        // Mgmt; null lets the shared generator print "DRAFT" when truly unsaved.
+        const quoteId = document.getElementById('quote-id')?.textContent
+            || this.editingQuoteId
+            || this.lastSavedQuoteId
+            || null;
+
+        // Build products array with line items
+        const products = [];
+
+        // Get pricing tier info
+        const tier = this.currentPricingData?.tier || this.getTierForQuantity(totalQty);
+
+        this._appendInvoiceProducts(products, stateCalc);
 
         // Subtotal/fees/discount/tax all from the shared state math (computed above).
         // Line items were built from the SAME stateCalc, so the printed product rows

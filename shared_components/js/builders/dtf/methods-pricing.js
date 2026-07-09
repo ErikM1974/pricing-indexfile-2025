@@ -45,24 +45,11 @@ export const pricingMethods = {
         });
     },
 
-    async updatePricing() {
-        const totalQty = this.getTotalQuantity();
-        const locationCount = this.selectedLocations.length;
-
-        // Heat-sensitive check on every reprice so edit-load / duplicate / search
-        // adds are all covered (warned styles only toast once).
-        this._warnHeatSensitiveProducts();
-
-        // Track if under the API-derived minimum (10 today, Caspio-changeable)
-        const minQty = this.getMinimumQuantity();
-        const isUnderMinimum = totalQty > 0 && totalQty < minQty;
-
-        // Show/hide minimum order warning
-        const minOrderWarning = document.getElementById('min-order-warning');
-        if (minOrderWarning) {
-            minOrderWarning.style.display = isUnderMinimum ? 'block' : 'none';
-        }
-
+    // D2 split (2026-07-09): updatePricing's derive/paint stages moved VERBATIM
+    // into the _reprice/_paint siblings below; the orchestrator threads px (the
+    // derived pricing inputs). One flagged reorder: the sidebar qty/tier paint
+    // now happens AFTER _deriveRepriceInputs (independent DOM nodes).
+    _paintZeroQuantityState(totalQty) {
         // Handle zero quantity case
         if (totalQty === 0) {
             document.getElementById('total-qty').textContent = '0';
@@ -83,30 +70,11 @@ export const pricingMethods = {
             });
             return;
         }
+    },
 
-        // For quantities under the minimum, price at the minimum tier — on-screen
-        // ESTIMATE only so users understand costs; saveAndGetLink() blocks actually
-        // saving/pushing a sub-minimum quote. (expert audit 2026-07-07)
-        const pricingQty = isUnderMinimum ? minQty : totalQty;
-
-        // Ensure pricing data is loaded from API
-        try {
-            await this.pricingCalculator.ensureLoaded();
-        } catch (error) {
-            console.error('[DTFQuoteBuilder] Failed to load pricing data:', error);
-            this.showError('Unable to load pricing data. Please refresh the page.');
-            return;
-        }
-
+    _deriveRepriceInputs(totalQty, pricingQty, locationCount) {
         // Get tier label from API (use pricingQty for tier lookup)
         const tier = this.pricingCalculator.getTierForQuantity(pricingQty);
-
-        // Update sidebar displays
-        document.getElementById('total-qty').textContent = totalQty;
-        // Show tier with warning if under minimum
-        const tierDisplay = isUnderMinimum ? `${totalQty} (Min ${minQty})` : tier;
-        document.getElementById('pricing-tier').textContent = tierDisplay;
-
         // Calculate costs from API using pricingQty (ensures valid tier pricing)
         const transferBreakdown = this.pricingCalculator.calculateTransferCosts(this.selectedLocations, pricingQty);
         const transferCost = transferBreakdown.total;
@@ -149,6 +117,13 @@ export const pricingMethods = {
         const ltmDisplayMode = ltmCtrlState.displayMode || 'builtin';
         const effectiveLtmPerUnit = ltmEnabled ? ltmPerUnit : 0;
         const effectiveLtmFee = ltmEnabled ? totalLtmFee : 0;
+        return { tier, transferBreakdown, transferCost, laborCostPerLoc, laborCost,
+            freightPerTransfer, freightCost, ltmPerUnit, totalLtmFee, marginDenom,
+            ltmEnabled, ltmDisplayMode, effectiveLtmPerUnit, effectiveLtmFee };
+    },
+
+    _storePricingAndPaintLtmRow(px, totalQty) {
+        const { tier, transferBreakdown, laborCostPerLoc, freightPerTransfer, marginDenom, ltmDisplayMode, effectiveLtmPerUnit, effectiveLtmFee } = px;
 
         // Store for quote save
         this.currentPricingData = {
@@ -189,10 +164,12 @@ export const pricingMethods = {
             // builtin mode or LTM waived — hide fee row
             if (ltmTableRow) ltmTableRow.style.display = 'none';
         }
+    },
 
-        // Calculate subtotal and grand total
+    _paintParentRows(px, totalQty) {
+        const { transferCost, laborCost, freightCost, marginDenom, ltmDisplayMode, effectiveLtmPerUnit } = px;
+
         let grandTotal = 0;
-
         // Process products from the products array (parent rows)
         this.products.forEach(product => {
             const row = document.querySelector(`tr[data-product-id="${product.id}"]`);
@@ -265,7 +242,13 @@ export const pricingMethods = {
 
             grandTotal += productTotal;
         });
+        return grandTotal;
+    },
 
+    _paintChildRows(px) {
+        const { transferCost, laborCost, freightCost, marginDenom, ltmDisplayMode, effectiveLtmPerUnit } = px;
+
+        let grandTotal = 0;
         // Process child rows (extended sizes) - they have different unit prices with upcharges.
         // Money fields (qty/baseCost/upcharges/size) come from this.childRows JS
         // state; the DOM row is located only to PAINT its price/total cells —
@@ -316,10 +299,11 @@ export const pricingMethods = {
                 grandTotal += roundedPrice * qty;
             }
         });
+        return grandTotal;
+    },
 
-        // Update subtotal and grand total
-        document.getElementById('subtotal').textContent = `$${grandTotal.toFixed(2)}`;
-        updatePerUnitPrice(grandTotal, totalQty);
+    _computeNextTierSavings(px, totalQty, locationCount) {
+        const { transferBreakdown, transferCost, freightCost, marginDenom } = px;
 
         // Compute per-piece savings for next tier nudge
         let nextTierSavings = null;
@@ -353,6 +337,68 @@ export const pricingMethods = {
                 if (nextTierSavings <= 0) nextTierSavings = null;
             }
         } catch (e) { /* graceful fallback */ }
+        window.currentPricingData.nextTierSavings = nextTierSavings;
+        updateQuantityNudge(totalQty, 'dtf', nextTierSavings);
+        return nextTierSavings;
+    },
+
+    async updatePricing() {
+        const totalQty = this.getTotalQuantity();
+        const locationCount = this.selectedLocations.length;
+
+        // Heat-sensitive check on every reprice so edit-load / duplicate / search
+        // adds are all covered (warned styles only toast once).
+        this._warnHeatSensitiveProducts();
+
+        // Track if under the API-derived minimum (10 today, Caspio-changeable)
+        const minQty = this.getMinimumQuantity();
+        const isUnderMinimum = totalQty > 0 && totalQty < minQty;
+
+        // Show/hide minimum order warning
+        const minOrderWarning = document.getElementById('min-order-warning');
+        if (minOrderWarning) {
+            minOrderWarning.style.display = isUnderMinimum ? 'block' : 'none';
+        }
+
+        if (totalQty === 0) { this._paintZeroQuantityState(totalQty); return; }
+
+        // For quantities under the minimum, price at the minimum tier — on-screen
+        // ESTIMATE only so users understand costs; saveAndGetLink() blocks actually
+        // saving/pushing a sub-minimum quote. (expert audit 2026-07-07)
+        const pricingQty = isUnderMinimum ? minQty : totalQty;
+
+        // Ensure pricing data is loaded from API
+        try {
+            await this.pricingCalculator.ensureLoaded();
+        } catch (error) {
+            console.error('[DTFQuoteBuilder] Failed to load pricing data:', error);
+            this.showError('Unable to load pricing data. Please refresh the page.');
+            return;
+        }
+
+        const px = this._deriveRepriceInputs(totalQty, pricingQty, locationCount);
+        const { tier } = px;
+
+        // Update sidebar displays
+        document.getElementById('total-qty').textContent = totalQty;
+        // Show tier with warning if under minimum
+        const tierDisplay = isUnderMinimum ? `${totalQty} (Min ${minQty})` : tier;
+        document.getElementById('pricing-tier').textContent = tierDisplay;
+
+        this._storePricingAndPaintLtmRow(px, totalQty);
+
+        // Calculate subtotal and grand total
+        let grandTotal = 0;
+
+        grandTotal += this._paintParentRows(px, totalQty);
+
+        grandTotal += this._paintChildRows(px);
+
+        // Update subtotal and grand total
+        document.getElementById('subtotal').textContent = `$${grandTotal.toFixed(2)}`;
+        updatePerUnitPrice(grandTotal, totalQty);
+
+        const nextTierSavings = this._computeNextTierSavings(px, totalQty, locationCount);
         window.currentPricingData.nextTierSavings = nextTierSavings;
         updateQuantityNudge(totalQty, 'dtf', nextTierSavings);
 
