@@ -1,3 +1,9 @@
+## v2026.07.09.3 (2026.07.09)
+
+- docs: Batch-1 plan status — XXL verdict corrected (Size05 column, suffix-only distinction); tax identifiers flipped v2026.07.09.2
+- feat(dashboards): Caspio REST API v4 reference — Erik-only admin viewer + v4 memory docs
+- Deploy v2026.07.09.3: cache-bust caspio-api-reference.html
+
 ## v2026.07.09.2 (2026.07.09)
 
 - fix: flip ShopWorks tax identifiers to Tax_10.2 / 2200.102 (Erik created the accounts)
