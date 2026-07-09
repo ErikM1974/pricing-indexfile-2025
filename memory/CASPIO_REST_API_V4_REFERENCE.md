@@ -95,7 +95,8 @@ Params are plain camelCase (no `q.`):
 Every write accepts `echo=true` to return the affected record(s).
 
 **Bulk** (the big new capability):
-- `POST …/records/bulk` — JSON array, max **1000**. `201` all-ok or **`207 Multi-Status`** partial; each item carries its own `status` (e.g. `{status:201,PK_ID:"101"}` / `{status:422,error:"…"}`).
+- `POST …/records/bulk` — JSON array, max **1000**. `201` all-ok or **`207 Multi-Status`** partial.
+  - **⚠ Response shape — CONFIRM before coding (live-spec read 2026-07-09):** the spec description says bulk POST returns a **`Result[]`** array, each element with a per-item **`Status`** (`201`=created, `4xx/5xx`=failure): `{ "Result": [ { "Status": 201, "PK_ID": "101" }, … ] }`. This **differs from the illustrative `{ "PK_ID":[…], "data":[{status,…}] }`** in the original HTML reference. LIST endpoints still use the `data[]`+`pagination` envelope — bulk and list use **different** envelopes. Verify exact casing (`Result`/`Status`) against a real bulk call before writing a parser.
 - `PATCH …/records/bulk` — `BulkUpdateRecordsRequest`: **`where`* required** + **`recordValues`* required**.
 - `DELETE …/records/bulk` — `BulkDeleteRecordsRequest`: **`where`* required**.
 
@@ -174,7 +175,17 @@ Source: <https://howto.caspio.com/release-notes/caspio-73-0/> + linked help page
 - **Redesigned API Profile Management** (Integrations → API Profiles): granular default permissions **by object type** + per-object overrides (least-privilege); **generate a bearer token from the UI** and test calls in the built-in Swagger UI; **expanded IP access control (IPv6 + IP ranges)**. This is the UI path to finally split our single-credential blast radius into scoped profiles (the long-standing v3-doc follow-on).
 - **⚠️ New IP addresses for Webhooks + Data Import/Export Tasks — update any allowlist.** Current published set (all `/32` IPv4; **US** shown — rest are AU/BR/CA/IE/UK; "may change without notice"): `3.94.26.149 · 3.221.12.171 · 3.223.237.156 · 3.232.188.127 · 18.235.29.217 · 34.200.156.163 · 35.173.3.24 · 44.198.154.72 · 44.219.25.193 · 44.221.229.56 · 54.88.136.246 · 54.224.65.145 · 100.58.20.55`. Full regional list / live truth: webhooks `…/webhooks/ip-addresses-for-webhooks/`, tasks `…/scheduled-import-and-export/ip-addresses-for-scheduled-tasks/`. (Today NWCA's 24 webhooks all target Zapier, so no NWCA-owned allowlist is affected yet — relevant when we stand up our own receiver.)
 - **Flex** — Theme Editor (per-Segment themes, live preview, reusable) + Date/Time min/max minute offsets & fixed daily Min/Max Time windows. **Vault** — create app packages from a Flex app's menu.
-- **Live inventory source:** the **authenticated** Swagger UI `https://c3eku948.caspio.com/integrations/rest/swagger/index.html` (Erik's login) exposes our live tables/views/apps + full v4 schemas — use it to capture the real object inventory and the exact webhook signature header when building against v4.
+- **Live inventory source:** the **authenticated** Swagger UI `https://c3eku948.caspio.com/integrations/rest/swagger/index.html` (Erik's login) exposes our live tables/views/apps + full v4 schemas. **✅ Crawled 2026-07-09** (profile `ProdDetailsAPI`, rate limit 2000/300s): **163 tables · 19 views · 1 dir (Staff) · 1 flex · 14 bridge apps · 24 webhooks (all Zapier, `eventSources:["Datasheet"]` — none fire on REST)**. Real object list + key table IDs/schemas → **[caspio-v4-live-inventory-2026-07-09.md](caspio-v4-live-inventory-2026-07-09.md)**. (The webhook **HMAC signature header** is still NOT in the config/spec — it only appears on an actual delivery.)
+
+## 10) Live public-contract read (2026-07-09) — confirmed from the real `c3eku948` spec
+
+The v4 **discovery endpoints are public** (no token to READ the contract): `GET /v4/swagger/documentation` (full OpenAPI) + `GET /v4/aiManifest` were fetched directly. Confirmations + facts NOT in the HTML reference:
+- **v4 is OAuth-only.** `aiManifest.unsupportedByDesign`: *"static API keys intentionally not supported → 401."* We already use OAuth `client_credentials`, so we're fine. (The Swagger UI's "Bearer (apiKey)" field just holds the OAuth **access token**.)
+- **Structural deletes are `405` BY DESIGN** — DELETE table, DELETE/rename folder (admin-UI-only DDL protection). Flex apps are **read-only** over REST (+ deploy toggle). `limit`+`offset` → offset **ignored** (use `pageNumber`/`pageSize`).
+- **Rate limits:** `X-RateLimit-*` headers are *informational*; `429` is infra-tier and may be off in non-prod (don't assume it in tests).
+- **`info.x-caspio-ai-context`** is a real ~450-line embedded primer (auth, lens selection, T-SQL, files, bulk safety, eval rubric) for AI/MCP consumers.
+- **T-SQL is parsed + AST-allowlisted against the profile grant BEFORE execution** — the manifest explicitly says T-SQL in `where/select` is *not* injection (only cross-grant reads or verbatim DB errors are findings).
+- **Still NOT in the spec:** the outgoing-webhook **HMAC signature header name** (webhooks appear only via schema discovery) and exact `X-RateLimit-*` names — capture these from a real authenticated call / live webhook when building the receiver. The **actual table/view/app inventory + field defs** need the token (public read gives the contract, not the data).
 
 ---
 
