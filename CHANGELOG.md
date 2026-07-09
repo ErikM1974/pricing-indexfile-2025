@@ -1,3 +1,8 @@
+## v2026.07.09.9 (2026.07.09)
+
+- refactor(dtf): Batch 4.3+4.4 — dtf-quote-page.js migrated into the bundle; quick wins
+- refactor(dtf): Batch 4 finale — class → 5 prototype mixins; builders-wide function-length ratchet
+
 ## v2026.07.09.8 (2026.07.09)
 
 - docs(caspio): document what Claude CAN/CAN'T create in Caspio (tables/fields YES via script; DataPages/apps UI-only)
