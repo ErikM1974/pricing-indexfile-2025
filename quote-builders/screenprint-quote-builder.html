@@ -249,7 +249,7 @@
                     <div class="search-input-wrapper">
                         <i class="fas fa-search search-icon"></i>
                         <input type="text"
-                               id="product-search"
+                               id="product-search" aria-label="Product style search"
                                class="search-input"
                                placeholder="Search by style # (e.g., PC54, G500) or product name"
                                autocomplete="off">
@@ -428,7 +428,7 @@
                             </label>
                             <div class="input-with-prefix" id="art-charge-wrapper" style="opacity: 0.4;">
                                 <span class="prefix">$</span>
-                                <input type="number" id="art-charge" class="quote-input"
+                                <input type="number" id="art-charge" aria-label="Art charge in dollars" class="quote-input"
                                        min="0" step="0.01" value="0" disabled
                                        onchange="updateArtworkCharges(); updateAdditionalCharges();" oninput="updateArtworkCharges(); updateAdditionalCharges();">
                             </div>
@@ -436,7 +436,7 @@
                         <div class="charge-field qb-m0">
                             <label class="quote-label">Graphic Design ($<span id="scp-design-rate-label">75</span>/hr)</label>
                             <div class="d-flex align-items-center gap-2">
-                                <input type="number" id="graphic-design-hours" class="quote-input qb-w80"
+                                <input type="number" id="graphic-design-hours" aria-label="Graphic design hours" class="quote-input qb-w80"
                                        min="0" step="0.5" placeholder="0"
                                        onchange="updateArtworkCharges(); updateAdditionalCharges();" oninput="updateArtworkCharges(); updateAdditionalCharges();">
                                 <span class="text-muted">hrs</span>
@@ -447,7 +447,7 @@
                             <label class="quote-label">Rush Fee</label>
                             <div class="input-with-prefix">
                                 <span class="prefix">$</span>
-                                <input type="number" id="rush-fee" class="quote-input"
+                                <input type="number" id="rush-fee" aria-label="Rush fee in dollars" class="quote-input"
                                        min="0" step="0.01" placeholder="0.00"
                                        onchange="updateAdditionalCharges()">
                                 <button type="button" class="btn-rush-percent" onclick="applyRushPercent()" title="Fill from the live rush rate (Caspio RUSH service code) as a % of the quote — re-click if the quote changes afterward"><i class="fas fa-bolt"></i> auto %</button>
@@ -456,7 +456,7 @@
                         <div class="charge-field qb-m0">
                             <label class="quote-label">Vellum Print ($<span id="scp-vellum-rate-label">10</span> ea)</label>
                             <div class="d-flex align-items-center gap-2">
-                                <input type="number" id="vellum-qty" class="quote-input qb-w80"
+                                <input type="number" id="vellum-qty" aria-label="Vellum count" class="quote-input qb-w80"
                                        min="0" step="1" placeholder="0"
                                        onchange="updateAdditionalCharges()" oninput="updateAdditionalCharges()">
                                 <span class="text-muted">= $<span id="vellum-charge-total">0.00</span></span>
@@ -465,7 +465,7 @@
                         <div class="charge-field qb-m0">
                             <label class="quote-label">Color Change ($<span id="scp-color-change-rate-label">15</span> ea)</label>
                             <div class="d-flex align-items-center gap-2">
-                                <input type="number" id="color-change-qty" class="quote-input qb-w80"
+                                <input type="number" id="color-change-qty" aria-label="Color change count" class="quote-input qb-w80"
                                        min="0" step="1" placeholder="0"
                                        onchange="updateAdditionalCharges()" oninput="updateAdditionalCharges()">
                                 <span class="text-muted">= $<span id="color-change-charge-total">0.00</span></span>
@@ -553,7 +553,7 @@
                          unchanged — save/load key off getElementById. -->
                     <div class="customer-field customer-lookup-container customer-lookup-hero qb-mb8">
                         <label class="quote-label"><i class="fas fa-search" style="margin-right: 4px;"></i> FIND CUSTOMER</label>
-                        <input type="text" id="customer-lookup" placeholder="Company, name, or email — fills everything below" class="quote-input customer-lookup-input">
+                        <input type="text" id="customer-lookup" aria-label="Customer lookup" placeholder="Company, name, or email — fills everything below" class="quote-input customer-lookup-input">
 
                         <!-- Customer context banners (Erik 2026-05-23) -->
                         <div id="customer-warning-banner" hidden></div>
@@ -567,23 +567,23 @@
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                         <div class="customer-field">
                             <label class="quote-label">NAME *</label>
-                            <input type="text" id="customer-name" placeholder="Customer name" class="quote-input" oninput="if(window.renderOrderRecap)renderOrderRecap(); if(window.updateScpPushButtonState)updateScpPushButtonState()">
+                            <input type="text" id="customer-name" aria-label="Customer name" placeholder="Customer name" class="quote-input" oninput="if(window.renderOrderRecap)renderOrderRecap(); if(window.updateScpPushButtonState)updateScpPushButtonState()">
                         </div>
                         <div class="customer-field">
                             <label class="quote-label">EMAIL *</label>
-                            <input type="email" id="customer-email" placeholder="email@company.com" class="quote-input" oninput="if(window.updateScpPushButtonState)updateScpPushButtonState()">
+                            <input type="email" id="customer-email" aria-label="Customer email" placeholder="email@company.com" class="quote-input" oninput="if(window.updateScpPushButtonState)updateScpPushButtonState()">
                         </div>
                         <div class="customer-field">
                             <label class="quote-label">COMPANY</label>
-                            <input type="text" id="company-name" placeholder="Company name" class="quote-input" oninput="if(window.renderOrderRecap)renderOrderRecap(); if(window.updateScpPushButtonState)updateScpPushButtonState()">
+                            <input type="text" id="company-name" aria-label="Company name" placeholder="Company name" class="quote-input" oninput="if(window.renderOrderRecap)renderOrderRecap(); if(window.updateScpPushButtonState)updateScpPushButtonState()">
                         </div>
                         <div class="customer-field">
                             <label class="quote-label">SHOPWORKS CUST #</label>
-                            <input type="text" id="customer-number" placeholder="auto-fills from lookup" class="quote-input" inputmode="numeric" oninput="if(window.renderOrderRecap)renderOrderRecap(); if(window.updateScpPushButtonState)updateScpPushButtonState()">
+                            <input type="text" id="customer-number" aria-label="ShopWorks customer ID" placeholder="auto-fills from lookup" class="quote-input" inputmode="numeric" oninput="if(window.renderOrderRecap)renderOrderRecap(); if(window.updateScpPushButtonState)updateScpPushButtonState()">
                         </div>
                         <div class="customer-field">
                             <label class="quote-label">SALES REP</label>
-                            <select id="sales-rep" class="quote-input" style="background: white;">
+                            <select id="sales-rep" aria-label="Sales rep" class="quote-input" style="background: white;">
                                 <option value="sales@nwcustomapparel.com">General Sales</option>
                                 <option value="bradley@nwcustomapparel.com">Bradley Wright</option>
                                 <option value="erik@nwcustomapparel.com">Erik Mickelson</option>
@@ -602,11 +602,11 @@
                              the single source. -->
                         <div class="customer-field">
                             <label class="quote-label">PHONE</label>
-                            <input type="tel" id="customer-phone" placeholder="(253) 555-1234" class="quote-input">
+                            <input type="tel" id="customer-phone" aria-label="Customer phone" placeholder="(253) 555-1234" class="quote-input">
                         </div>
                         <div class="customer-field qb-span-all">
                             <label class="quote-label">PROJECT NAME</label>
-                            <input type="text" id="project-name" placeholder="e.g., Spring Fundraiser Tees" class="quote-input">
+                            <input type="text" id="project-name" aria-label="Project name" placeholder="e.g., Spring Fundraiser Tees" class="quote-input">
                         </div>
                         <!-- Phase 11.1 (2026-05-24): customer-aware Design # lookup -->
                         <div class="customer-field qb-span-all">

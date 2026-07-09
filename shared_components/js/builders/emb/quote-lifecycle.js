@@ -151,10 +151,10 @@ export function resetQuote() {
     const tbody = document.getElementById('product-tbody');
     tbody.innerHTML = `
         <tr id="empty-state-row">
-            <td colspan="14" style="text-align: center; padding: 40px 20px; color: #64748b; background: #f8fafc;">
-                <div style="font-size: 32px; margin-bottom: 12px;">&#128085;</div>
-                <div style="font-size: 16px; font-weight: 500; margin-bottom: 8px;">Enter a style number to get started</div>
-                <div style="font-size: 13px; color: #94a3b8;">Type a style # in the search bar above (e.g., PC54, G500, C112)</div>
+            <td colspan="14" class="qb-empty-state">
+                <div class="qb-empty-state-emoji">&#128085;</div>
+                <div class="qb-empty-state-title">Enter a style number to get started</div>
+                <div class="qb-note-13">Type a style # in the search bar above (e.g., PC54, G500, C112)</div>
             </td>
         </tr>
     `;

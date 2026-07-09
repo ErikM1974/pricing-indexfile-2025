@@ -1,6 +1,13 @@
 /**
- * Professional Invoice Generation for Embroidery Quote Builder
- * Generates clean, professional PDF-ready invoices with complete pricing details
+ * Professional Invoice Generation — shared by ALL FOUR quote builders.
+ * Despite the historical name, EMB + SCP + DTF + DTG all print/save through this
+ * one class (Rule 8: invoice/PDF/totals/tax = ONE shared engine) — treat every
+ * change here as a 4-builder change and re-test each builder's print path.
+ * Rate LABELS are derived from the CHARGED totals wherever possible (so the
+ * printed arithmetic always foots); when derivation is impossible the label
+ * falls back to Service_Codes via window.getServicePrice (bridged by the
+ * builder bundles) and only then to a literal — with a console warning
+ * (Erik's pricing=API rule; audit Batch 7, 2026-07-09).
  */
 
 class EmbroideryInvoiceGenerator {
@@ -15,6 +22,19 @@ class EmbroideryInvoiceGenerator {
             'erik@nwcustomapparel.com': 'Erik Mickelson',
             'ruth@nwcustomapparel.com': 'Ruth Nhong'
         };
+    }
+
+    /**
+     * Digitizing rate LABEL when it can't be derived from the charged totals:
+     * Service_Codes 'DD' via the builder bundles' window.getServicePrice bridge,
+     * then the $100 literal — with a warning, never silently (pricing=API rule).
+     */
+    fallbackDigitizingRate() {
+        if (typeof window !== 'undefined' && typeof window.getServicePrice === 'function') {
+            return window.getServicePrice('DD', 100);
+        }
+        console.warn('[invoice] Service_Codes unavailable — using fallback $100 digitizing label');
+        return 100;
     }
 
     /**
@@ -722,7 +742,7 @@ class EmbroideryInvoiceGenerator {
         if (printConfig.totalScreens && pricingData.setupFees > 0) {
             specsHTML += `
                 <div style="font-size: 10px; color: #666; margin-top: 8px; padding-top: 5px; border-top: 1px solid #ffcc80;">
-                    <strong>Setup:</strong> ${printConfig.totalScreens} screen${printConfig.totalScreens > 1 ? 's' : ''} × $30 = $${pricingData.setupFees.toFixed(2)}
+                    <strong>Setup:</strong> ${printConfig.totalScreens} screen${printConfig.totalScreens > 1 ? 's' : ''} × $${(pricingData.setupFees / printConfig.totalScreens).toFixed(2).replace(/\.00$/, '')} = $${pricingData.setupFees.toFixed(2)}
                 </div>
             `;
         }
@@ -889,7 +909,7 @@ class EmbroideryInvoiceGenerator {
         // total (never a "$100" literal) so the printed arithmetic always foots.
         if (pricingData.setupFees > 0) {
             if (digitizingLogoCount > 0) {
-                const rateLabel = digitizingRate > 0 ? digitizingRate.toFixed(2).replace(/\.00$/, '') : '100';
+                const rateLabel = digitizingRate > 0 ? digitizingRate.toFixed(2).replace(/\.00$/, '') : String(this.fallbackDigitizingRate());
                 specsHTML += `
                     <div style="font-size: 10px; color: #666; margin-top: 5px;">
                         <strong>Setup Fees:</strong> ${digitizingLogoCount} logo${digitizingLogoCount > 1 ? 's' : ''} × $${rateLabel} digitizing = $${pricingData.setupFees.toFixed(2)}
@@ -926,7 +946,7 @@ class EmbroideryInvoiceGenerator {
         const alServiceItems = Array.isArray(opts.alServiceItems) ? opts.alServiceItems : [];
         const digitizingLabel = (opts.digitizingRate > 0)
             ? `$${opts.digitizingRate.toFixed(2).replace(/\.00$/, '')}`
-            : '$100';
+            : `$${this.fallbackDigitizingRate()}`;
 
         let html = '';
 

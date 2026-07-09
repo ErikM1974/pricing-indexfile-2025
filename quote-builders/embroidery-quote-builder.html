@@ -116,7 +116,7 @@
                             <div class="design-lookup-row logo-card-design-row" id="top-garment-design-row">
                                 <label class="design-row-label"><i class="fas fa-hashtag"></i> Design #</label>
                                 <div class="design-number-input-group">
-                                    <input type="text" id="garment-design-number" class="design-number-input"
+                                    <input type="text" id="garment-design-number" aria-label="Garment design number" class="design-number-input"
                                            placeholder="Design #" maxlength="10"
                                            onkeydown="if(event.key==='Enter'){lookupDesignNumber('garment');}">
                                     <button type="button" class="design-btn design-btn-lookup" onclick="lookupDesignNumber('garment')" title="Look up design number" aria-label="Look up design">
@@ -142,7 +142,7 @@
                                 <!-- Primary Logo Fields -->
                                 <div class="logo-form-field">
                                     <label>Position</label>
-                                    <select id="primary-position" onchange="onPrimaryPositionChange()">
+                                    <select id="primary-position" aria-label="Primary logo position" onchange="onPrimaryPositionChange()">
                                         <option value="Left Chest" selected>Left Chest</option>
                                         <option value="Right Chest">Right Chest</option>
                                         <option value="Center Chest">Center Chest</option>
@@ -157,7 +157,7 @@
                                 </div>
                                 <div class="logo-form-field">
                                     <label>Design Size</label>
-                                    <select id="primary-stitches" onchange="onPrimaryStitchTierChange()">
+                                    <select id="primary-stitches" aria-label="Primary logo stitch count" onchange="onPrimaryStitchTierChange()">
                                         <option value="8000" selected>Standard (≤10K)</option>
                                         <option value="12000">Mid +$4/pc (10-15K)</option>
                                         <option value="18000">Large +$10/pc (15-25K)</option>
@@ -166,7 +166,7 @@
                                 </div>
                                 <div class="logo-form-field" id="fb-stitch-count-field" style="display: none;">
                                     <label>Stitch Count</label>
-                                    <input type="number" id="fb-stitch-count" value="25000"
+                                    <input type="number" id="fb-stitch-count" aria-label="Full-back stitch count" value="25000"
                                            min="25000" max="100000" step="1000"
                                            oninput="onFullBackStitchCountChange()">
                                 </div>
@@ -175,7 +175,7 @@
                                      logo is configured — the classic new-CSR under-quote, and an imported quote's
                                      engine-set digitizing fee had no visible control to audit/uncheck. -->
                                 <div class="digitizing-checkbox" onclick="toggleDigitizingCheckbox(this, 'primary-digitizing')" tabindex="0" role="button" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
-                                    <input type="checkbox" id="primary-digitizing">
+                                    <input type="checkbox" id="primary-digitizing" aria-label="Primary logo needs digitizing">
                                     <div class="digitizing-checkbox-indicator">
                                         <i class="fas fa-check"></i>
                                     </div>
@@ -190,7 +190,7 @@
                                         <div class="toggle-switch-handle"></div>
                                     </div>
                                     <span class="al-inline-label" id="garment-al-label">AL</span>
-                                    <input type="checkbox" id="garment-al-toggle" style="display: none;">
+                                    <input type="checkbox" id="garment-al-toggle" aria-label="Additional logo toggle" style="display: none;">
                                 </div>
                                 <!-- AL Config Fields (hidden until toggle is on) -->
                                 <div class="al-inline-fields" id="garment-al-config-new">
@@ -219,7 +219,7 @@
                             <div class="design-lookup-row logo-card-design-row" id="top-cap-design-row">
                                 <label class="design-row-label"><i class="fas fa-hashtag"></i> Design #</label>
                                 <div class="design-number-input-group">
-                                    <input type="text" id="cap-design-number" class="design-number-input"
+                                    <input type="text" id="cap-design-number" aria-label="Cap design number" class="design-number-input"
                                            placeholder="Design #" maxlength="10"
                                            onkeydown="if(event.key==='Enter'){lookupDesignNumber('cap');}">
                                     <button type="button" class="design-btn design-btn-lookup" onclick="lookupDesignNumber('cap')" title="Look up design number" aria-label="Look up design">
@@ -241,7 +241,7 @@
                             <div class="logo-form-row cap-embellishment-row">
                                 <div class="logo-form-field">
                                     <label>Type</label>
-                                    <select id="cap-embellishment-type" onchange="handleCapEmbellishmentChange()">
+                                    <select id="cap-embellishment-type" aria-label="Cap embellishment type" onchange="handleCapEmbellishmentChange()">
                                         <option value="embroidery" selected>Flat Embroidery</option>
                                         <option value="3d-puff">3D Puff (+$5/cap)</option>
                                         <option value="laser-patch">Laser Patch (+$5/cap)</option>
@@ -253,20 +253,20 @@
                                 <div class="logo-form-row">
                                     <div class="logo-form-field">
                                         <label>Position</label>
-                                        <select id="cap-primary-position" disabled>
+                                        <select id="cap-primary-position" aria-label="Cap logo position" disabled>
                                             <option value="CF" selected>Cap Front</option>
                                         </select>
                                     </div>
                                     <div class="logo-form-field">
                                         <label>Design Size</label>
-                                        <select id="cap-primary-stitches" onchange="onCapStitchTierChange()">
+                                        <select id="cap-primary-stitches" aria-label="Cap logo stitch count" onchange="onCapStitchTierChange()">
                                             <option value="8000" selected>Standard (≤10K)</option>
                                             <option value="12000">Mid +$4/pc (10-15K)</option>
                                             <option value="18000">Large +$10/pc (15-25K)</option>
                                         </select>
                                     </div>
                                     <div class="digitizing-checkbox" onclick="toggleDigitizingCheckbox(this, 'cap-primary-digitizing')" tabindex="0" role="button" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
-                                        <input type="checkbox" id="cap-primary-digitizing">
+                                        <input type="checkbox" id="cap-primary-digitizing" aria-label="Cap logo needs digitizing">
                                         <div class="digitizing-checkbox-indicator">
                                             <i class="fas fa-check"></i>
                                         </div>
@@ -281,7 +281,7 @@
                                             <div class="toggle-switch-handle"></div>
                                         </div>
                                         <span class="al-inline-label" id="cap-al-label">AL</span>
-                                        <input type="checkbox" id="cap-al-toggle" style="display: none;">
+                                        <input type="checkbox" id="cap-al-toggle" aria-label="Cap additional logo toggle" style="display: none;">
                                     </div>
                                     <!-- Cap AL Config Fields (hidden until toggle is on) -->
                                     <div class="al-inline-fields" id="cap-al-config-new">
@@ -299,12 +299,12 @@
                                 <div class="logo-form-row">
                                     <div class="logo-form-field">
                                         <label>Position</label>
-                                        <select disabled style="opacity: 0.6; cursor: not-allowed;">
+                                        <select disabled aria-label="Cap logo position" style="opacity: 0.6; cursor: not-allowed;">
                                             <option value="CF" selected>Cap Front</option>
                                         </select>
                                     </div>
                                     <div class="digitizing-checkbox checked" onclick="toggleDigitizingCheckbox(this, 'cap-patch-setup')" tabindex="0" role="button" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
-                                        <input type="checkbox" id="cap-patch-setup" checked>
+                                        <input type="checkbox" id="cap-patch-setup" aria-label="Cap patch setup fee" checked>
                                         <div class="digitizing-checkbox-indicator">
                                             <i class="fas fa-check"></i>
                                         </div>
@@ -326,7 +326,7 @@
                     <div class="search-input-wrapper">
                         <i class="fas fa-search search-icon"></i>
                         <input type="text"
-                               id="product-search"
+                               id="product-search" aria-label="Product style search"
                                class="search-input"
                                placeholder="Search by style # (e.g., PC54, G500) or product name"
                                autocomplete="off">
@@ -674,7 +674,7 @@
                                 </label>
                             </div>
                             <div class="notes-body" style="display: none;">
-                                <textarea id="notes" placeholder="Add notes for this quote (employee names, special instructions, etc.)" style="width: 100%; min-height: 80px; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; font-family: inherit; resize: vertical; box-sizing: border-box; margin-top: 6px;"></textarea>
+                                <textarea id="notes" aria-label="Quote notes" placeholder="Add notes for this quote (employee names, special instructions, etc.)" style="width: 100%; min-height: 80px; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; font-family: inherit; resize: vertical; box-sizing: border-box; margin-top: 6px;"></textarea>
                             </div>
                         </div>
                     </div>
@@ -1025,7 +1025,7 @@
                     <i class="fas fa-info-circle"></i>
                     Paste the order text from ShopWorks ManageOrders below
                 </p>
-                <textarea id="shopworks-paste-area" class="shopworks-paste-area"
+                <textarea id="shopworks-paste-area" aria-label="Paste ShopWorks order text" class="shopworks-paste-area"
                     placeholder="Paste ShopWorks order text here...
 
 Example format:
@@ -1098,7 +1098,7 @@ Company:Absher Construction Company
                             <div style="display: flex; gap: 12px; flex-wrap: wrap;">
                                 <div class="qb-flex1-minw130">
                                     <label class="qb-label--mb3">Position</label>
-                                    <select id="spr-garment-position" onchange="onSprGarmentPositionChange()" class="qb-field--gray">
+                                    <select id="spr-garment-position" aria-label="Garment logo position" onchange="onSprGarmentPositionChange()" class="qb-field--gray">
                                         <option value="Left Chest">Left Chest</option>
                                         <option value="Right Chest">Right Chest</option>
                                         <option value="Center Chest">Center Chest</option>
@@ -1107,7 +1107,7 @@ Company:Absher Construction Company
                                 </div>
                                 <div class="qb-flex1-minw130">
                                     <label class="qb-label--mb3">Design Size</label>
-                                    <select id="spr-garment-stitch-tier" onchange="onSprGarmentStitchTierChange()" class="qb-field--gray">
+                                    <select id="spr-garment-stitch-tier" aria-label="Garment stitch tier" onchange="onSprGarmentStitchTierChange()" class="qb-field--gray">
                                         <option value="8000">Standard (&le;10K)</option>
                                         <option value="12000">Mid (&le;15K)</option>
                                         <option value="18000">Large (&le;25K)</option>
@@ -1128,7 +1128,7 @@ Company:Absher Construction Company
                             <div style="display: flex; gap: 12px; flex-wrap: wrap;">
                                 <div class="qb-flex1-minw130">
                                     <label class="qb-label--mb3">Type</label>
-                                    <select id="spr-cap-embellishment" onchange="onSprCapEmbellishmentChange()" class="qb-field--gray">
+                                    <select id="spr-cap-embellishment" aria-label="Cap embellishment" onchange="onSprCapEmbellishmentChange()" class="qb-field--gray">
                                         <option value="embroidery">Flat Embroidery</option>
                                         <option value="3d-puff">3D Puff</option>
                                         <option value="laser-patch">Laser Patch</option>
@@ -1136,7 +1136,7 @@ Company:Absher Construction Company
                                 </div>
                                 <div id="spr-cap-stitch-tier-wrapper" class="qb-flex1-minw130">
                                     <label class="qb-label--mb3">Design Size</label>
-                                    <select id="spr-cap-stitch-tier" class="qb-field--gray">
+                                    <select id="spr-cap-stitch-tier" aria-label="Cap stitch tier" class="qb-field--gray">
                                         <option value="8000">Standard (&le;10K)</option>
                                         <option value="12000">Mid (&le;15K)</option>
                                         <option value="18000">Large (&le;25K)</option>
@@ -1218,15 +1218,15 @@ Company:Absher Construction Company
                     </div>
                     <div class="ns-form-group">
                         <label>Brand <span class="ns-required">*</span></label>
-                        <input type="text" id="ns-brand" class="ns-input" placeholder="e.g. Under Armour" oninput="validateNsModalFields()">
+                        <input type="text" id="ns-brand" aria-label="Brand" class="ns-input" placeholder="e.g. Under Armour" oninput="validateNsModalFields()">
                     </div>
                     <div class="ns-form-group">
                         <label>Sell Price ($) <span class="ns-required">*</span></label>
-                        <input type="number" id="ns-sell-price" class="ns-input" step="0.01" min="0.01" placeholder="29.50" oninput="validateNsModalFields()">
+                        <input type="number" id="ns-sell-price" aria-label="Sell price in dollars" class="ns-input" step="0.01" min="0.01" placeholder="29.50" oninput="validateNsModalFields()">
                     </div>
                     <div class="ns-form-group ns-full-width">
                         <label>Product Name <span class="ns-required">*</span></label>
-                        <input type="text" id="ns-product-name" class="ns-input" placeholder="e.g. Performance Polo" oninput="validateNsModalFields()">
+                        <input type="text" id="ns-product-name" aria-label="Product name" class="ns-input" placeholder="e.g. Performance Polo" oninput="validateNsModalFields()">
                     </div>
                 </div>
                 <button type="button" class="ns-more-options-toggle" onclick="toggleNsMoreOptions(this)">
@@ -1249,11 +1249,11 @@ Company:Absher Construction Company
                     </div>
                     <div class="ns-form-group">
                         <label>Default Colors <small>(comma-separated)</small></label>
-                        <input type="text" id="ns-default-colors" class="ns-input" placeholder="e.g. Black, White, Navy">
+                        <input type="text" id="ns-default-colors" aria-label="Available colors" class="ns-input" placeholder="e.g. Black, White, Navy">
                     </div>
                     <div class="ns-form-group ns-full-width">
                         <label>Available Sizes <small>(comma-separated)</small></label>
-                        <input type="text" id="ns-available-sizes" class="ns-input" placeholder="e.g. S,M,L,XL,2XL or OSFA">
+                        <input type="text" id="ns-available-sizes" aria-label="Available sizes" class="ns-input" placeholder="e.g. S,M,L,XL,2XL or OSFA">
                     </div>
                 </div>
             </div>
@@ -1285,7 +1285,7 @@ Company:Absher Construction Company
             </div>
             <div class="shopworks-import-body" style="padding: 16px;">
                 <div class="design-search-input-row">
-                    <input type="text" id="design-search-input" class="design-search-field"
+                    <input type="text" id="design-search-input" aria-label="Design number search" class="design-search-field"
                            placeholder="Search by company name or design number..."
                            oninput="onDesignSearchInput()"
                            onkeydown="if(event.key==='Enter' && !this._galleryMode){runDesignSearch();}">
@@ -1366,16 +1366,16 @@ Company:Absher Construction Company
                         <option value="Sales Rep Deliver">Sales Rep Deliver</option>
                         <option value="Other">Other</option>
                     </select>
-                    <input type="text" id="ship-method-other" placeholder="Enter shipping method" style="display: none; width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box; margin-bottom: 10px;">
+                    <input type="text" id="ship-method-other" aria-label="Other shipping method" placeholder="Enter shipping method" style="display: none; width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box; margin-bottom: 10px;">
 
                     <label for="ship-address">Ship To Address</label>
                     <div id="ship-address-fields">
                         <input type="text" id="ship-address" placeholder="Street address"
                                style="width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box; margin-bottom: 6px;">
                         <div style="display: flex; gap: 6px;">
-                            <input type="text" id="ship-city" placeholder="City"
+                            <input type="text" id="ship-city" aria-label="Shipping city" placeholder="City"
                                    style="flex: 2; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
-                            <select id="ship-state" onchange="onShipStateChange()"
+                            <select id="ship-state" aria-label="Shipping state" onchange="onShipStateChange()"
                                     style="width: 64px; padding: 8px 4px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; background: white;">
                                 <option value="WA" selected>WA</option>
                                 <option value="AL">AL</option><option value="AK">AK</option><option value="AZ">AZ</option>
@@ -1396,7 +1396,7 @@ Company:Absher Construction Company
                                 <option value="VT">VT</option><option value="VA">VA</option><option value="WV">WV</option>
                                 <option value="WI">WI</option><option value="WY">WY</option>
                             </select>
-                            <input type="text" id="ship-zip" placeholder="ZIP" maxlength="10"
+                            <input type="text" id="ship-zip" aria-label="Shipping ZIP code" placeholder="ZIP" maxlength="10"
                                    onblur="onShipZipBlur()"
                                    style="width: 78px; padding: 8px 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box;">
                             <button type="button" id="lookup-tax-btn" onclick="lookupTaxRate()" title="Look up tax rate" aria-label="Look up tax rate"
@@ -1535,7 +1535,7 @@ Company:Absher Construction Company
              Print/Email Quote buttons in the form footer (Phase 11.5), so
              the chat is research-only. -->
         <form class="ai-chat-input" id="aiChatForm">
-            <textarea id="aiChatTextarea" rows="3" placeholder="Ask me anything — customer lookup, top embroidery sellers, color availability, EMB Q&A. (You build the quote manually in the form.)" autocomplete="off"></textarea>
+            <textarea id="aiChatTextarea" aria-label="Ask the quote assistant" rows="3" placeholder="Ask me anything — customer lookup, top embroidery sellers, color availability, EMB Q&A. (You build the quote manually in the form.)" autocomplete="off"></textarea>
             <button type="submit" class="ai-chat-send" id="aiChatSend" aria-label="Send">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
             </button>

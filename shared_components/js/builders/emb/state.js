@@ -36,35 +36,9 @@ export const EMB_DEFAULTS = {
     PATCH_SETUP_FEE: 50,
 };
 
-// Extended sizes that get their own line items
-// (2XL goes to Size05 — dedicated; all others go to Size06 "Other")
-export const EXTENDED_SIZES = ['XS', '2XL', '3XL', '4XL', '5XL', '6XL'];
-
-// ShopWorks size slot mapping — Size01-04 standard, Size05 = 2XL ONLY,
-// Size06 = everything else (mis-mapping silently breaks SW line items).
-export const SIZE_TO_SLOT = {
-    S: 'Size01', M: 'Size02', L: 'Size03', XL: 'Size04',
-    '2XL': 'Size05',
-    XS: 'Size06', '3XL': 'Size06', '4XL': 'Size06',
-    '5XL': 'Size06', '6XL': 'Size06', OSFA: 'Size06',
-};
-
-// All sizes that go in the Size06 "Other/Catch-All" column
-// (actual availability is fetched per product via the API)
-// NOT here by design: '2XL' and 'XXL' — both live in the DEDICATED Size05 column
-// (ShopWorks Pattern 3). XXL is the ladies 2XL with its OWN SKU suffix (_XXL, never
-// _2X), so it renders in the Size05 cell but keeps its name (Batch 2.0, 2026-07-09;
-// matches SCP's list — locked identical by size-constants-drift.test.js).
-export const SIZE06_EXTENDED_SIZES = [
-    'XS', '3XL', '4XL', '5XL', '6XL', '7XL', '8XL', '9XL', '10XL',
-    'OSFA', 'OSFM',
-    'S/M', 'M/L', 'L/XL', 'XS/S', 'X/2X', 'S/XL',
-    'LT', 'XLT', '2XLT', '3XLT', '4XLT', '5XLT', '6XLT', 'ST', 'MT', 'XST',
-    'YXS', 'YS', 'YM', 'YL', 'YXL',
-    '2T', '3T', '4T', '5T', '5/6T', '6T',
-    'LB', 'XLB', '2XLB',
-    'XXS', '2XS',
-];
+// Size↔slot constants graduated to ONE shared file (Batch 7.5) — re-exported
+// so every existing `from './state.js'` import keeps working unchanged.
+export { EXTENDED_SIZES, SIZE_TO_SLOT, SIZE06_EXTENDED_SIZES } from '../shared/size-constants.js';
 
 // API response caches (prevent 429 rate-limit errors) — mutated in place.
 export const sizeDetectionCache = new Map(); // "style-color" → size detection result

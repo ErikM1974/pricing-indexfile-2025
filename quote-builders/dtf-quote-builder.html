@@ -183,7 +183,7 @@
                     <div class="search-input-wrapper">
                         <i class="fas fa-search search-icon"></i>
                         <input type="text"
-                               id="product-search"
+                               id="product-search" aria-label="Product style search"
                                class="search-input"
                                placeholder="Search by style # (e.g., PC54, G500) or product name"
                                autocomplete="off">
@@ -328,7 +328,7 @@
                             </label>
                             <div class="input-with-prefix" id="art-charge-wrapper" style="opacity: 0.4;">
                                 <span class="prefix">$</span>
-                                <input type="number" id="art-charge" class="quote-input"
+                                <input type="number" id="art-charge" aria-label="Art charge in dollars" class="quote-input"
                                        min="0" step="0.01" value="0" disabled
                                        onchange="updateArtworkCharges(); updateAdditionalCharges();" oninput="updateArtworkCharges(); updateAdditionalCharges();">
                             </div>
@@ -336,7 +336,7 @@
                         <div class="charge-field qb-m0">
                             <label class="quote-label">Graphic Design ($<span id="design-rate-label-sidebar">75</span>/hr)</label>
                             <div class="d-flex align-items-center gap-2">
-                                <input type="number" id="graphic-design-hours" class="quote-input qb-w80"
+                                <input type="number" id="graphic-design-hours" aria-label="Graphic design hours" class="quote-input qb-w80"
                                        min="0" step="0.5" placeholder="0"
                                        onchange="updateArtworkCharges(); updateAdditionalCharges();" oninput="updateArtworkCharges(); updateAdditionalCharges();">
                                 <span class="text-muted">hrs</span>
@@ -347,7 +347,7 @@
                             <label class="quote-label">Rush Fee</label>
                             <div class="input-with-prefix">
                                 <span class="prefix">$</span>
-                                <input type="number" id="rush-fee" class="quote-input"
+                                <input type="number" id="rush-fee" aria-label="Rush fee in dollars" class="quote-input"
                                        min="0" step="0.01" placeholder="0.00"
                                        onchange="updateAdditionalCharges()">
                                 <button type="button" class="btn-rush-percent" onclick="applyRushPercent()" title="Fill from the live rush rate (Caspio RUSH service code) as a % of the quote — re-click if the quote changes afterward"><i class="fas fa-bolt"></i> auto %</button>
@@ -381,11 +381,11 @@
                                 <div class="d-flex gap-2">
                                     <div class="customer-field qb-flex1">
                                         <label class="quote-label qb-fs11">Order #</label>
-                                        <input type="text" id="order-number" placeholder="ShopWorks #" class="quote-input qb-compact">
+                                        <input type="text" id="order-number" aria-label="ShopWorks order number" placeholder="ShopWorks #" class="quote-input qb-compact">
                                     </div>
                                     <div class="customer-field qb-flex1">
                                         <label class="quote-label qb-fs11">PO #</label>
-                                        <input type="text" id="po-number" placeholder="Purchase Order" class="quote-input qb-compact">
+                                        <input type="text" id="po-number" aria-label="Purchase order number" placeholder="Purchase Order" class="quote-input qb-compact">
                                     </div>
                                 </div>
                                 <!-- Dates Row -->
@@ -402,14 +402,14 @@
                                 <!-- Shipping Address -->
                                 <div class="customer-field">
                                     <label class="quote-label qb-fs11">Ship To</label>
-                                    <input type="text" id="ship-to-name" placeholder="Recipient name" class="quote-input qb-compact">
+                                    <input type="text" id="ship-to-name" aria-label="Ship-to recipient name" placeholder="Recipient name" class="quote-input qb-compact">
                                 </div>
                                 <div class="customer-field">
-                                    <input type="text" id="ship-address" placeholder="Street address" class="quote-input qb-compact" oninput="if(window.renderOrderRecap)renderOrderRecap()">
+                                    <input type="text" id="ship-address" aria-label="Shipping street address" placeholder="Street address" class="quote-input qb-compact" oninput="if(window.renderOrderRecap)renderOrderRecap()">
                                 </div>
                                 <div class="d-flex gap-2">
                                     <div class="customer-field" style="flex: 2;">
-                                        <input type="text" id="ship-city" placeholder="City" class="quote-input qb-compact" oninput="if(window.renderOrderRecap)renderOrderRecap()">
+                                        <input type="text" id="ship-city" aria-label="Shipping city" placeholder="City" class="quote-input qb-compact" oninput="if(window.renderOrderRecap)renderOrderRecap()">
                                     </div>
                                     <div class="customer-field" style="flex: 0 0 60px;">
                                         <select id="ship-state" aria-label="Shipping state" class="quote-input" style="font-size: 12px; padding: 6px 4px;" onchange="onShipStateChange();if(window.renderOrderRecap)renderOrderRecap()">
@@ -434,7 +434,7 @@
                                         </select>
                                     </div>
                                     <div class="customer-field" style="flex: 0 0 80px;">
-                                        <input type="text" id="ship-zip" placeholder="ZIP" maxlength="10" class="quote-input qb-compact"
+                                        <input type="text" id="ship-zip" aria-label="Shipping ZIP code" placeholder="ZIP" maxlength="10" class="quote-input qb-compact"
                                                onblur="onShipZipBlur()" oninput="if(window.renderOrderRecap)renderOrderRecap()">
                                     </div>
                                     <button type="button" class="btn-tax-lookup" onclick="lookupTaxRate()" title="Look up tax rate">
@@ -459,7 +459,7 @@
                                     <label class="quote-label qb-fs11">Shipping Fee</label>
                                     <div style="position: relative;">
                                         <span style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); color: #666; font-size: 12px;">$</span>
-                                        <input type="number" id="dtf-shipping-fee" min="0" step="0.01" placeholder="0.00" value="0"
+                                        <input type="number" id="dtf-shipping-fee" aria-label="Shipping fee in dollars" min="0" step="0.01" placeholder="0.00" value="0"
                                                class="quote-input" style="font-size: 12px; padding: 6px 8px 6px 22px;"
                                                onchange="updateTaxCalculation()" oninput="updateTaxCalculation()">
                                     </div>
@@ -475,7 +475,7 @@
                                 <!-- Notes -->
                                 <div class="customer-field" style="margin-top: 4px;">
                                     <label class="quote-label qb-fs11"><i class="fas fa-sticky-note" style="color: #f9a825;"></i> Notes</label>
-                                    <textarea id="dtf-notes" placeholder="Special instructions, employee names, etc."
+                                    <textarea id="dtf-notes" aria-label="Quote notes" placeholder="Special instructions, employee names, etc."
                                               class="quote-input" style="font-size: 12px; padding: 6px 8px; min-height: 60px; resize: vertical; font-family: inherit;"></textarea>
                                 </div>
                             </div>
@@ -543,7 +543,7 @@
                          unchanged — save/load key off getElementById. -->
                     <div class="customer-field customer-lookup-container customer-lookup-hero qb-mb8">
                         <label class="quote-label"><i class="fas fa-search" style="margin-right: 4px;"></i> FIND CUSTOMER</label>
-                        <input type="text" id="customer-lookup" placeholder="Company, name, or email — fills everything below" class="quote-input customer-lookup-input">
+                        <input type="text" id="customer-lookup" aria-label="Customer lookup" placeholder="Company, name, or email — fills everything below" class="quote-input customer-lookup-input">
 
                         <!-- Customer context banners (Erik 2026-05-23) -->
                         <div id="customer-warning-banner" hidden></div>
@@ -557,19 +557,19 @@
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
                         <div class="customer-field">
                             <label class="quote-label">NAME *</label>
-                            <input type="text" id="customer-name" placeholder="Customer name" class="quote-input" oninput="if(window.renderOrderRecap)renderOrderRecap(); if(window.updateDtfPushButtonState)updateDtfPushButtonState()">
+                            <input type="text" id="customer-name" aria-label="Customer name" placeholder="Customer name" class="quote-input" oninput="if(window.renderOrderRecap)renderOrderRecap(); if(window.updateDtfPushButtonState)updateDtfPushButtonState()">
                         </div>
                         <div class="customer-field">
                             <label class="quote-label">EMAIL *</label>
-                            <input type="email" id="customer-email" placeholder="email@company.com" class="quote-input" oninput="if(window.updateDtfPushButtonState)updateDtfPushButtonState()">
+                            <input type="email" id="customer-email" aria-label="Customer email" placeholder="email@company.com" class="quote-input" oninput="if(window.updateDtfPushButtonState)updateDtfPushButtonState()">
                         </div>
                         <div class="customer-field">
                             <label class="quote-label">COMPANY</label>
-                            <input type="text" id="company-name" placeholder="Company name" class="quote-input" oninput="if(window.renderOrderRecap)renderOrderRecap()">
+                            <input type="text" id="company-name" aria-label="Company name" placeholder="Company name" class="quote-input" oninput="if(window.renderOrderRecap)renderOrderRecap()">
                         </div>
                         <div class="customer-field">
                             <label class="quote-label">SALES REP</label>
-                            <select id="sales-rep" class="quote-input" style="background: white;">
+                            <select id="sales-rep" aria-label="Sales rep" class="quote-input" style="background: white;">
                                 <option value="sales@nwcustomapparel.com">General Sales</option>
                                 <option value="bradley@nwcustomapparel.com">Bradley Wright</option>
                                 <option value="erik@nwcustomapparel.com">Erik Mickelson</option>
@@ -582,15 +582,15 @@
                         </div>
                         <div class="customer-field">
                             <label class="quote-label">CUSTOMER #</label>
-                            <input type="text" id="customer-number" placeholder="ShopWorks ID" class="quote-input" oninput="if(window.renderOrderRecap)renderOrderRecap(); if(window.updateDtfPushButtonState)updateDtfPushButtonState()">
+                            <input type="text" id="customer-number" aria-label="ShopWorks customer ID" placeholder="ShopWorks ID" class="quote-input" oninput="if(window.renderOrderRecap)renderOrderRecap(); if(window.updateDtfPushButtonState)updateDtfPushButtonState()">
                         </div>
                         <div class="customer-field">
                             <label class="quote-label">PHONE</label>
-                            <input type="tel" id="customer-phone" placeholder="(253) 555-1234" class="quote-input">
+                            <input type="tel" id="customer-phone" aria-label="Customer phone" placeholder="(253) 555-1234" class="quote-input">
                         </div>
                         <div class="customer-field qb-span-all">
                             <label class="quote-label">PROJECT NAME</label>
-                            <input type="text" id="project-name" placeholder="e.g., Spring Fundraiser Tees" class="quote-input">
+                            <input type="text" id="project-name" aria-label="Project name" placeholder="e.g., Spring Fundraiser Tees" class="quote-input">
                         </div>
                         <!-- Phase 11.1 (2026-05-24): customer-aware Design # lookup -->
                         <div class="customer-field qb-span-all">
@@ -780,7 +780,7 @@
                 <p>Quote ID: <strong id="saved-quote-id">---</strong></p>
                 <p>Share this link with your customer:</p>
                 <div class="url-copy-container">
-                    <input type="text" id="shareable-url" class="shareable-url-input" readonly>
+                    <input type="text" id="shareable-url" aria-label="Shareable quote link" class="shareable-url-input" readonly>
                     <button class="btn-copy-url" onclick="copyShareableUrl()">
                         <i class="fas fa-copy"></i> Copy
                     </button>

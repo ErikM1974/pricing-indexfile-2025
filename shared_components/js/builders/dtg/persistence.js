@@ -591,7 +591,7 @@ export function showDuplicateModeBanner(sourceQuoteId) {
             <i class="fas fa-copy"></i>
             <div>
                 <strong>Duplicated from ${escapeHtml(String(sourceQuoteId))}</strong>
-                <span style="opacity:0.85;"> — saving creates a NEW quote at today's prices.</span>
+                <span class="qb-dim"> — saving creates a NEW quote at today's prices.</span>
             </div>
         `;
         mount.appendChild(banner);
@@ -615,7 +615,7 @@ export function showEditModeBanner(quoteId, revision) {
             <i class="fas fa-pencil-alt"></i>
             <div>
                 <strong>Editing ${escapeHtml(String(quoteId))}</strong> · Rev ${escapeHtml(String(revision))}
-                <span style="opacity:0.85;"> — Saving will create Rev ${escapeHtml(String(revision + 1))} (same quote ID).</span>
+                <span class="qb-dim"> — Saving will create Rev ${escapeHtml(String(revision + 1))} (same quote ID).</span>
             </div>
         `;
         mount.appendChild(banner);

@@ -25,6 +25,7 @@
 | `builders/shared/quote-model.js` | **0.5 (2026-07-08)** — createQuoteItem + QuoteState store (line CRUD, totals, caps-vs-garments tierGroups). Zero price math |
 | `builders/shared/errors.js` | **1.15 (2026-07-08)** — structural no-silent-wrong-price: `showErrorBanner` (persistent role=alert strip), `showFallbackPricingWarning` (persistent amber badge, accumulates labels), `safeExecute` (loud-failure wrapper), `assertPriceOrThrow` (money-math guard). Bridged to window by all 3 index.js; classic scripts call behind typeof guards. CSS in quote-builder-common.css |
 | `builders/shared/service-codes.js` | **THE Service_Codes implementation (Batch 3.5, 2026-07-09)** — `loadServiceCodePrices()` (caches window._serviceCodes = cross-file contract) + `getServicePrice(code, fallback)` w/ visible-warning fallback. Bundled by EMB (via `emb/pricing.js` re-export) + SCP/DTF index bridges; the typeof-guarded utils copies are GONE |
+| `builders/shared/size-constants.js` | **THE size↔ShopWorks-slot constants (Batch 7.5, 2026-07-09)** — EXTENDED_SIZES / SIZE_TO_SLOT / SIZE06_EXTENDED_SIZES graduated from identical emb+scp state.js copies (both now re-export; `size-constants-drift.test.js` locks the re-exports + the 2XL/XXL→Size05 invariants) |
 | `dtg-canonical-pricing.js` | **THE DTG formula (Batch 6, 2026-07-09)** — UMD, vendored BYTE-IDENTICAL from `caspio-pricing-proxy/lib/dtg-canonical-pricing.js` (equality CI-enforced both repos). `window.DTGCanonicalPricing`; dtg-pricing-service.js + the DTG builder modules (builders/dtg) delegate ALL math here. NEVER edit this copy — edit the proxy file and re-copy |
 | `builders/emb/state.js` | **0.5 (2026-07-08)** — embState (all EMB mutable state; 3 window-backed contract fields for classic consumers) + constants + the quoteState instance |
 | `builders/dtg/index.js` | **DTG ESM entry point (decomposition COMPLETE 2026-07-09, Batch 5)** — shared-error-surface bridges + side-effect `import './form-core.js'` (boot). The page's ONLY builder script (dtg-inline-form.js monolith DELETED) |
@@ -125,7 +126,7 @@
 |------|---------|
 | `embroidery-pricing-service.js` | Embroidery pricing adapter (Caspio API) |
 | `embroidery-quote-adapter.js` | Embroidery data adapter for pricing engine |
-| `embroidery-quote-invoice.js` | Invoice generation (ShopWorks format) |
+| `embroidery-quote-invoice.js` | **THE shared invoice/print engine for ALL 4 builders** (EMB/SCP/DTF/DTG — Rule 8; name is historical). Rate labels derive from CHARGED totals (always foot); underivable → Service_Codes `DD` via window.getServicePrice → $100 literal + console warning (Batch 7). Any change = 4-builder change |
 | `embroidery-quote-pricing.js` | Pricing engine (tiers, LTM, stitch, FB) |
 | `embroidery-quote-service.js` | Quote save/update/email service |
 | `additional-logo-embroidery-simple.js` | AL pricing for garment embroidery calculator |

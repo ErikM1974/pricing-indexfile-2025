@@ -47,15 +47,11 @@ import {
     confirmScpPush,
     closeScpPushPreview,
     openScpPushPreview,
-    renderScpPushPreview,
 } from './push.js';
 import {
-    initScreenPrintPersistence,
     restoreScreenPrintDraft,
     markScreenPrintDirty,
     addProductFromQuote,
-    applyMethodSwitchPrefillScp,
-    applyQuickQuotePrefillScp,
     loadQuoteForEditing,
     duplicateQuote,
     resetQuote,
@@ -82,15 +78,15 @@ import { loadServiceCodePrices, getServicePrice } from '../shared/service-codes.
 
 // ---- print-config ----
 window.updatePrintConfig = updatePrintConfig;
+// LOAD-BEARING (Batch 7.5 diet audit): pricing-sync.js calls updateDarkGarmentNudge
+// as a bare /* global */ — it resolves THROUGH this bridge at runtime.
 window.updateDarkGarmentNudge = updateDarkGarmentNudge;
 
 // ---- persistence / lifecycle ----
-window.initScreenPrintPersistence = initScreenPrintPersistence;
 window.restoreScreenPrintDraft = restoreScreenPrintDraft;
+// LOAD-BEARING: pricing-sync.js + print-config.js call markScreenPrintDirty bare-global.
 window.markScreenPrintDirty = markScreenPrintDirty;
 window.addProductFromQuote = addProductFromQuote;
-window.applyMethodSwitchPrefillScp = applyMethodSwitchPrefillScp;
-window.applyQuickQuotePrefillScp = applyQuickQuotePrefillScp;
 window.loadQuoteForEditing = loadQuoteForEditing;
 window.duplicateQuote = duplicateQuote;
 window.resetQuote = resetQuote;
@@ -117,6 +113,7 @@ window.handleCellKeydown = handleCellKeydown;
 // applies the reprice-pill wrap BEFORE this import evaluates, so the bridge
 // (and every bare-global caller) gets the wrapped version.
 window.recalculatePricing = recalculatePricing;
+// LOAD-BEARING: print-config.js calls recalculateAllPrices bare-global (via this bridge).
 window.recalculateAllPrices = recalculateAllPrices;
 window.collectProductsFromTable = collectProductsFromTable;
 window.updateTaxCalculation = updateTaxCalculation;
@@ -125,6 +122,7 @@ window.toggleWholesale = toggleWholesale;
 // ---- quote lifecycle (S1b; applyRushPercent joined in S2) ----
 window.updateAdditionalCharges = updateAdditionalCharges;
 window.updateDiscountType = updateDiscountType;
+// LOAD-BEARING: pricing-sync.js + quote-lifecycle.js call getScpExtraFees bare-global.
 window.getScpExtraFees = getScpExtraFees;
 window.updateFeeTableRows = updateFeeTableRows;
 window.applyRushPercent = applyRushPercent;
@@ -142,7 +140,6 @@ window.scpPushToShopWorks = scpPushToShopWorks;
 window.confirmScpPush = confirmScpPush;
 window.closeScpPushPreview = closeScpPushPreview;
 window.openScpPushPreview = openScpPushPreview;
-window.renderScpPushPreview = renderScpPushPreview;
 
 // ---- state handles (debug + test hooks; NOT an API for page code) ----
 window.__scpState = scpState;

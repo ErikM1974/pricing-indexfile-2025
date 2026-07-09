@@ -27,18 +27,9 @@ import { QuoteState } from '../shared/quote-model.js';
 // Centralized config (config/app.config.js loads in <head>, before this bundle)
 export const API_BASE = window.APP_CONFIG.API.BASE_URL;
 
-// Extended sizes that get their own line items
-// (2XL goes to Size05 — dedicated; all others go to Size06 "Other")
-export const EXTENDED_SIZES = ['XS', '2XL', '3XL', '4XL', '5XL', '6XL'];
-
-// ShopWorks size slot mapping — Size01-04 standard, Size05 = 2XL ONLY,
-// Size06 = everything else (mis-mapping silently breaks SW line items).
-export const SIZE_TO_SLOT = {
-    'S': 'Size01', 'M': 'Size02', 'L': 'Size03', 'XL': 'Size04',
-    '2XL': 'Size05',  // 2XL has dedicated slot
-    'XS': 'Size06', '3XL': 'Size06', '4XL': 'Size06',
-    '5XL': 'Size06', '6XL': 'Size06', 'OSFA': 'Size06'
-};
+// Size↔slot constants graduated to ONE shared file (Batch 7.5) — re-exported
+// so every existing `from './state.js'` import keeps working unchanged.
+export { EXTENDED_SIZES, SIZE_TO_SLOT, SIZE06_EXTENDED_SIZES } from '../shared/size-constants.js';
 
 // Display labels matching ShopWorks column headers
 // (internally L/2XL/3XL — displayed LG/XXL/XXXL)
@@ -63,28 +54,6 @@ export const LOCATION_NAMES = {
 // Color words mirror the standalone calculator's darkColors list
 // (screenprint-pricing-v2.js:81) — see print-config.js for the nudge itself.
 export const SCP_DARK_COLOR_WORDS = ['black', 'navy', 'charcoal', 'forest', 'maroon', 'purple', 'brown', 'dark'];
-
-// All sizes that go in the Size06 "Other/Catch-All" column
-// (actual availability is fetched per product via the API; 2XL/XXL go in Size05)
-// Based on Python Inksoft/Inksoft_Size_Translation_Import.csv
-export const SIZE06_EXTENDED_SIZES = [
-    // Extended large (3XL and up only - 2XL/XXL go in Size05)
-    'XS', '3XL', '4XL', '5XL', '6XL', '7XL', '8XL', '9XL', '10XL',
-    // One-size
-    'OSFA', 'OSFM',
-    // Combos (for fitted caps)
-    'S/M', 'M/L', 'L/XL', 'XS/S', 'X/2X', 'S/XL',
-    // Tall
-    'LT', 'XLT', '2XLT', '3XLT', '4XLT', '5XLT', '6XLT', 'ST', 'MT', 'XST',
-    // Youth
-    'YXS', 'YS', 'YM', 'YL', 'YXL',
-    // Toddler
-    '2T', '3T', '4T', '5T', '5/6T', '6T',
-    // Big
-    'LB', 'XLB', '2XLB',
-    // Extra small
-    'XXS', '2XS'
-];
 
 // ── Mutable state (verbatim initial values from the shell) ──────────────────
 
