@@ -14,6 +14,9 @@
  * "rainy-week" item), this file becomes its real composition root.
  */
 
+// Batch 5: the decomposed inline form (side-effect import boots it — the
+// DOMContentLoaded init + window.DTGInlineForm surface live in form-core).
+import './form-core.js';
 import { showErrorBanner, hideErrorBanner, showFallbackPricingWarning } from '../shared/errors.js';
 
 window.showErrorBanner = showErrorBanner;
