@@ -1,3 +1,7 @@
+## v2026.07.09.15 (2026.07.09)
+
+- polish: A-grade follow-ups F1-F4 — DtgAdapter, DTG combobox ARIA, burn-down, pragma lifts
+
 ## v2026.07.09.14 (2026.07.09)
 
 - polish: Builder A-grade Batch 7 — invoice labels, size-constants, styles, a11y
