@@ -1,3 +1,7 @@
+## v2026.07.09.16 (2026.07.09)
+
+- refactor: deeper burn-down tranche 1 — real-end ratchet measure, DTG done, DTF allowlist EMPTY
+
 ## v2026.07.09.15 (2026.07.09)
 
 - polish: A-grade follow-ups F1-F4 — DtgAdapter, DTG combobox ARIA, burn-down, pragma lifts
