@@ -5,7 +5,6 @@
  * dtf-childrow-state.test.js, which locks methods from THIS file). The
  * reprice-pill prototype wrap rides at the tail (monolith-verbatim).
  */
-// @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions; typing lands with the render/state split).
 /* global dtfQuoteBuilder, DTFPricingService, DTFQuoteService, escapeHtml, showToast,
    formatPrice, Event, emailjs, QuotePersistence, QuoteSession, initLogoStatusChips,
    initMethodSwitchMenu, getQuickQuotePrefill, takeMethodSwitchPrefill, StaffAuthHelper,
@@ -52,7 +51,7 @@ export class DTFQuoteBuilder {
         // Auto-save & Draft Recovery (2026 consolidation)
         this.persistence = null;
         this.session = null;
-        this.initPersistence();
+        /** @type {any} */ (this).initPersistence();
 
         // Location configuration
         this.locationConfig = {
@@ -85,7 +84,7 @@ export class DTFQuoteBuilder {
         }
 
         // Initialize
-        this.init();
+        /** @type {any} */ (this).init();
     }
 
 }

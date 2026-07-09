@@ -2,7 +2,6 @@
  * DTG inline form — catalog-search module (Batch 5, 2026-07-09). Moved VERBATIM from the
  * dtg-inline-form.js IIFE; lexical references became the imports below.
  */
-// @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions).
 /* global */
 import { updateNewArtworkVisibility } from './artwork.js';
 import { applyContact, fetchCustomerHistory, populateContactPicker, renderCustomerContextBadges, renderCustomerHistoryPill } from './crm.js';
@@ -516,7 +515,7 @@ export async function fetchDesignsForCustomer(customerId) {
 // by any sticky parent. Body scroll lock prevents background scrolling.
 export function openDesignLightbox(src, caption) {
     const lb = document.getElementById('dtgThumbLightbox');
-    const img = document.getElementById('dtgThumbLightboxImg');
+    const img = /** @type {HTMLImageElement|null} */ (document.getElementById('dtgThumbLightboxImg'));
     const title = document.getElementById('dtgThumbLightboxTitle');
     if (!lb || !img) return;
     img.src = src;
@@ -539,8 +538,8 @@ export function closeDesignLightbox() {
 // whenever a design is picked, the design # is typed, or the customer
 // changes. Hidden when no matching design is loaded.
 export function syncDesignThumbnail() {
-    const anchor = document.getElementById('dtgDesignThumbAnchor');
-    const img = document.getElementById('dtgDesignThumbImg');
+    const anchor = /** @type {HTMLAnchorElement|null} */ (document.getElementById('dtgDesignThumbAnchor'));
+    const img = /** @type {HTMLImageElement|null} */ (document.getElementById('dtgDesignThumbImg'));
     if (!anchor || !img) return;
 
     const designNum = String(state.customer.designNumber || '').trim();
@@ -737,7 +736,7 @@ export async function refreshDesignComboboxForNewCustomer() {
     const newId = (cid != null && String(cid).trim() !== '') ? String(cid).trim() : null;
     if (newId === dtgIF._designComboboxCustomerId) return; // no change
     dtgIF._designComboboxCustomerId = newId;
-    const wrap = document.getElementById('dtgDesignCombo');
+    const wrap = /** @type {(HTMLElement & { __refreshDesigns?: () => Promise<void> })|null} */ (document.getElementById('dtgDesignCombo'));
     if (wrap && typeof wrap.__refreshDesigns === 'function') {
         await wrap.__refreshDesigns();
     }
@@ -815,7 +814,7 @@ function applyCompanyAddressPrefill(c) {
         state.shipping.city = (c.City || '').toString();
         state.shipping.state = newBillingState;
         state.shipping.zip = (c.Zip || '').toString();
-        const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+        const setVal = (id, val) => { const el = /** @type {HTMLInputElement|null} */ (document.getElementById(id)); if (el) el.value = val || ''; };
         setVal('dtgShipAddress1', state.shipping.address1);
         setVal('dtgShipCity', state.shipping.city);
         setVal('dtgShipState', state.shipping.state);
@@ -918,7 +917,7 @@ export function attachCompanyCombobox(wrap, input) {
         // Alexx Bacon; auto-pick lands on Craig, but rep can switch to Alexx).
         populateContactPicker(c.contacts || []);
         // Reflect in companyId field if it's blank
-        const cidInput = document.getElementById('dtgCompanyId');
+        const cidInput = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgCompanyId'));
         if (cidInput && !cidInput.value) cidInput.value = state.customer.companyId;
         markDirty();
         scheduleStateSave();

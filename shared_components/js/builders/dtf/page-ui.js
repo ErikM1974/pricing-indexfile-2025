@@ -7,7 +7,6 @@
  * resolved via the index.js bridges (SCP pattern).
  * (toggleSaveShare was deleted in the move — zero callers anywhere.)
  */
-// @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions; typing lands with the render/state split).
 /* global dtfQuoteBuilder, updateDtfPushButtonState, autoExpandFeesOnFirstCharge,
    emailQuote, showToast, hasUnsavedChanges, getServicePrice, event */
 import { API_BASE } from './state.js';
@@ -63,7 +62,7 @@ export function updateTaxCalculation() {
 
     // Sales Tax row stays visible for invoice transparency; label shows the rate when charged,
     // "(exempt)"/"(not charged)" when $0 (best-of-both level-up 2026-06-14).
-    const _dtfRateRaw = (document.getElementById('tax-rate-input')?.value || '').trim();
+    const _dtfRateRaw = (/** @type {HTMLInputElement|null} */ (document.getElementById('tax-rate-input'))?.value || '').trim();
     if (taxRowEl) taxRowEl.style.display = 'flex';
     if (taxLabel) taxLabel.textContent = (totals.includeTax && parseFloat(_dtfRateRaw) > 0)
         ? `Sales Tax (${_dtfRateRaw}%)`
@@ -89,8 +88,8 @@ export function updateTaxCalculation() {
 // toggleAdditionalCharges() moved to quote-builder-utils.js
 
 export function updateAdditionalCharges() {
-    const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
-    const discountAmount = parseFloat(document.getElementById('discount-amount')?.value || 0);
+    const rushFee = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('rush-fee'))?.value || /** @type {any} */ (0));
+    const discountAmount = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('discount-amount'))?.value || /** @type {any} */ (0));
     const badge = document.getElementById('charges-badge');
 
     // [2026-06-11] badge now reflects ALL charges (art + design + rush − discount,
@@ -133,19 +132,19 @@ export async function lookupTaxRate() {
     // [2026-06-08] P0 (#1 rule): a tax-exempt customer or wholesale order stays 0% — do NOT let a ZIP/state change
     // re-apply WA tax (the async DOR result would silently overwrite the 0). Mirror EMB's guard.
     if (window._taxExempt || window._isWholesale) {
-        const _ri = document.getElementById('tax-rate-input');
+        const _ri = /** @type {HTMLInputElement|null} */ (document.getElementById('tax-rate-input'));
         if (_ri) _ri.value = '0';
         if (typeof updateTaxCalculation === 'function') updateTaxCalculation();
         return false;
     }
-    const state = document.getElementById('ship-state')?.value || 'WA';
-    const zip = document.getElementById('ship-zip')?.value?.trim() || '';
-    const city = document.getElementById('ship-city')?.value?.trim() || '';
-    const address = document.getElementById('ship-address')?.value?.trim() || '';
+    const state = /** @type {HTMLInputElement|null} */ (document.getElementById('ship-state'))?.value || 'WA';
+    const zip = /** @type {HTMLInputElement|null} */ (document.getElementById('ship-zip'))?.value?.trim() || '';
+    const city = /** @type {HTMLInputElement|null} */ (document.getElementById('ship-city'))?.value?.trim() || '';
+    const address = /** @type {HTMLInputElement|null} */ (document.getElementById('ship-address'))?.value?.trim() || '';
 
     // Non-WA state → 0% tax
     if (state !== 'WA') {
-        document.getElementById('tax-rate-input').value = '0';
+        /** @type {HTMLInputElement} */ (document.getElementById('tax-rate-input')).value = '0';
         updateTaxCalculation();
         showTaxStatus('Out of State — No Tax', 'info');
         return true;
@@ -171,7 +170,7 @@ export async function lookupTaxRate() {
             return false;
         }
 
-        document.getElementById('tax-rate-input').value = data.taxRate;
+        /** @type {HTMLInputElement} */ (document.getElementById('tax-rate-input')).value = data.taxRate;
         updateTaxCalculation();
 
         if (data.outOfState) {
@@ -202,21 +201,21 @@ export function onShipStateChange() {
     // [2026-06-08] P0 (#1 rule): exempt/wholesale stays 0% — the WA + short-ZIP branch below writes rate 10.2
     // directly (bypassing lookupTaxRate's guard), which would re-tax an exempt order. Guard here too.
     if (window._taxExempt || window._isWholesale) {
-        const _ri = document.getElementById('tax-rate-input'); if (_ri) _ri.value = '0';
+        const _ri = /** @type {HTMLInputElement|null} */ (document.getElementById('tax-rate-input')); if (_ri) _ri.value = '0';
         if (typeof updateTaxCalculation === 'function') updateTaxCalculation();
         return;
     }
-    const state = document.getElementById('ship-state')?.value;
+    const state = /** @type {HTMLInputElement|null} */ (document.getElementById('ship-state'))?.value;
     if (state !== 'WA') {
-        document.getElementById('tax-rate-input').value = '0';
+        /** @type {HTMLInputElement} */ (document.getElementById('tax-rate-input')).value = '0';
         updateTaxCalculation();
         showTaxStatus('Out of State — No Tax', 'info');
     } else {
-        const zip = document.getElementById('ship-zip')?.value?.trim() || '';
+        const zip = /** @type {HTMLInputElement|null} */ (document.getElementById('ship-zip'))?.value?.trim() || '';
         if (zip.length >= 5) {
             lookupTaxRate();
         } else {
-            document.getElementById('tax-rate-input').value = '10.2';
+            /** @type {HTMLInputElement} */ (document.getElementById('tax-rate-input')).value = '10.2';
             updateTaxCalculation();
             showTaxStatus('', 'info');
         }
@@ -225,26 +224,26 @@ export function onShipStateChange() {
 
 // [2026-06-08] Wholesale / reseller toggle (mirror EMB). Per-order checkbox by the sales tax → 0 tax + push GL 2203.
 export function toggleWholesale() {
-    const cb = document.getElementById('wholesale-checkbox');
+    const cb = /** @type {HTMLInputElement|null} */ (document.getElementById('wholesale-checkbox'));
     // eslint-disable-next-line no-restricted-syntax -- cross-file contract: _isWholesale is read by computeFeesAndTotals (class) + shared utils (documented contract set, Batch 3.4)
     window._isWholesale = !!(cb && cb.checked);
-    const incTax = document.getElementById('include-tax');
-    const rateInput = document.getElementById('tax-rate-input');
+    const incTax = /** @type {HTMLInputElement|null} */ (document.getElementById('include-tax'));
+    const rateInput = /** @type {HTMLInputElement|null} */ (document.getElementById('tax-rate-input'));
     if (window._isWholesale) {
         if (incTax) incTax.checked = false;
         if (rateInput) rateInput.value = '0';
         if (typeof updateTaxCalculation === 'function') updateTaxCalculation();
     } else {
-        if (incTax) incTax.checked = true;
-        if (rateInput) rateInput.value = '10.2';
+        if (incTax) /** @type {HTMLInputElement} */ (incTax).checked = true;
+        if (rateInput) /** @type {HTMLInputElement} */ (rateInput).value = '10.2';
         if (typeof updateTaxCalculation === 'function') updateTaxCalculation();
         if (typeof lookupTaxRate === 'function') lookupTaxRate();  // re-fetch the real rate for the ship address
     }
 }
 
 export function onShipZipBlur() {
-    const state = document.getElementById('ship-state')?.value || 'WA';
-    const zip = document.getElementById('ship-zip')?.value?.trim() || '';
+    const state = /** @type {HTMLInputElement|null} */ (document.getElementById('ship-state'))?.value || 'WA';
+    const zip = /** @type {HTMLInputElement|null} */ (document.getElementById('ship-zip'))?.value?.trim() || '';
     if (state === 'WA' && zip.length >= 5) {
         lookupTaxRate();
     }
@@ -269,9 +268,9 @@ export async function dtfEmailQuote() {
     }
     await emailQuote({
         quoteId,
-        customerEmail: document.getElementById('customer-email')?.value?.trim(),
-        customerName: document.getElementById('customer-name')?.value?.trim(),
-        salesRepEmail: document.getElementById('sales-rep')?.value
+        customerEmail: /** @type {HTMLInputElement|null} */ (document.getElementById('customer-email'))?.value?.trim(),
+        customerName: /** @type {HTMLInputElement|null} */ (document.getElementById('customer-name'))?.value?.trim(),
+        salesRepEmail: /** @type {HTMLInputElement|null} */ (document.getElementById('sales-rep'))?.value
     });
 }
 
@@ -293,8 +292,8 @@ export function toggleOrderDetails() {
 export function updateFeeTableRows() {
     // Art charge row
     const artChargeRow = document.getElementById('art-charge-row');
-    const artChargeToggle = document.getElementById('art-charge-toggle');
-    const artCharge = parseFloat(document.getElementById('art-charge')?.value || 0);
+    const artChargeToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('art-charge-toggle'));
+    const artCharge = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('art-charge'))?.value || /** @type {any} */ (0));
     if (artChargeRow) {
         if (artChargeToggle?.checked && artCharge > 0) {
             artChargeRow.style.display = 'table-row';
@@ -307,12 +306,12 @@ export function updateFeeTableRows() {
 
     // Graphic design row
     const graphicDesignRow = document.getElementById('graphic-design-row');
-    const designHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
+    const designHours = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('graphic-design-hours'))?.value || /** @type {any} */ (0));
     const designTotal = designHours * (typeof getServicePrice === 'function' ? getServicePrice('GRT-75', 75) : 75);
     if (graphicDesignRow) {
         if (designHours > 0) {
             graphicDesignRow.style.display = 'table-row';
-            document.getElementById('design-hours-label').textContent = designHours;
+            document.getElementById('design-hours-label').textContent = /** @type {any} */ (designHours);
             document.getElementById('graphic-design-unit').textContent = '$' + designTotal.toFixed(2);
             document.getElementById('graphic-design-total-row').textContent = '$' + designTotal.toFixed(2);
         } else {
@@ -322,7 +321,7 @@ export function updateFeeTableRows() {
 
     // Rush fee row
     const rushFeeRow = document.getElementById('rush-fee-row');
-    const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
+    const rushFee = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('rush-fee'))?.value || /** @type {any} */ (0));
     if (rushFeeRow) {
         if (rushFee > 0) {
             rushFeeRow.style.display = 'table-row';
@@ -335,9 +334,9 @@ export function updateFeeTableRows() {
 
     // Discount row
     const discountRow = document.getElementById('discount-row');
-    const discountAmount = parseFloat(document.getElementById('discount-amount')?.value || 0);
-    const discountType = document.getElementById('discount-type')?.value || 'fixed';
-    const discountReason = document.getElementById('discount-reason')?.value || '';
+    const discountAmount = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('discount-amount'))?.value || /** @type {any} */ (0));
+    const discountType = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-type'))?.value || 'fixed';
+    const discountReason = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-reason'))?.value || '';
     if (discountRow) {
         if (discountAmount > 0) {
             discountRow.style.display = 'table-row';
@@ -353,7 +352,7 @@ export function updateFeeTableRows() {
                 if (t) {
                     actualDiscount = t.discount;
                 } else {
-                    const productsSubtotal = parseFloat(document.getElementById('subtotal')?.textContent?.replace(/[$,]/g, '') || 0) || 0;
+                    const productsSubtotal = parseFloat(document.getElementById('subtotal')?.textContent?.replace(/[$,]/g, '') || /** @type {any} */ (0)) || 0;
                     actualDiscount = productsSubtotal * (discountAmount / 100);
                 }
             }
@@ -398,7 +397,7 @@ export function confirmNewQuote() {
 export function showSaveModal(quoteId) {
     const url = `${window.location.origin}/quote/${quoteId}`;
     document.getElementById('saved-quote-id').textContent = quoteId;
-    document.getElementById('shareable-url').value = url;
+    /** @type {HTMLInputElement} */ (document.getElementById('shareable-url')).value = url;
     document.getElementById('save-success-modal').style.display = 'flex';
 }
 
@@ -408,11 +407,11 @@ export function closeSaveModal() {
 
 export function copyShareableUrl() {
     const urlInput = document.getElementById('shareable-url');
-    urlInput.select();
+    /** @type {HTMLInputElement} */ (urlInput).select();
     document.execCommand('copy');
 
     // Visual feedback
-    const btn = event.target.closest('button');
+    const btn = /** @type {HTMLElement} */ (event.target).closest('button');
     const originalHTML = btn.innerHTML;
      
     btn.innerHTML = '<i class="fas fa-check"></i> Copied!';

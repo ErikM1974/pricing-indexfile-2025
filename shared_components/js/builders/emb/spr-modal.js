@@ -12,7 +12,6 @@
  * goes through the exported getSprEmbConfigOptions() accessor (the state is
  * module-private now); it becomes a real import when cluster #10 extracts.
  */
-// @ts-nocheck — MOVED legacy DOM code: pre-existing checkJs frictions; typing
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
 /* global escapeHtml, DesignThumbnailService */
 import { mapStitchCountToTierValue } from './logo-config.js';
@@ -522,9 +521,9 @@ function _recalcSprAssignments(embConfigOptions, designEntries, st) {
     }
 
     // Update the garment/cap tier dropdowns in the modal
-    const gTierEl = document.getElementById('spr-garment-stitch-tier');
-    const gPosEl = document.getElementById('spr-garment-position');
-    const cTierEl = document.getElementById('spr-cap-stitch-tier');
+    const gTierEl = /** @type {HTMLInputElement|null} */ (document.getElementById('spr-garment-stitch-tier'));
+    const gPosEl = /** @type {HTMLInputElement|null} */ (document.getElementById('spr-garment-position'));
+    const cTierEl = /** @type {HTMLInputElement|null} */ (document.getElementById('spr-cap-stitch-tier'));
     if (gTierEl) gTierEl.value = st.autoGarmentTier;
     if (gPosEl) gPosEl.value = st.autoGarmentPosition;
     if (cTierEl) cTierEl.value = st.autoCapTier;
@@ -588,9 +587,9 @@ function _applySprConfigDefaults(embConfigOptions, st) {
     const garmentConfig = document.getElementById('spr-garment-config');
     garmentConfig.style.display = embConfigOptions.hasGarments ? '' : 'none';
     if (embConfigOptions.hasGarments) {
-        document.getElementById('spr-garment-position').value = st.autoGarmentPosition;
-        document.getElementById('spr-garment-stitch-tier').value = st.autoGarmentTier;
-        document.getElementById('spr-garment-digitizing').checked = embConfigOptions.digitizing || false;
+        /** @type {HTMLInputElement} */ (document.getElementById('spr-garment-position')).value = st.autoGarmentPosition;
+        /** @type {HTMLInputElement} */ (document.getElementById('spr-garment-stitch-tier')).value = st.autoGarmentTier;
+        /** @type {HTMLInputElement} */ (document.getElementById('spr-garment-digitizing')).checked = embConfigOptions.digitizing || false;
         // Sync Full Back UI if auto-detected
         if (st.autoGarmentPosition === 'Full Back') {
             onSprGarmentPositionChange();
@@ -601,10 +600,10 @@ function _applySprConfigDefaults(embConfigOptions, st) {
     const capConfig = document.getElementById('spr-cap-config');
     capConfig.style.display = embConfigOptions.hasCaps ? '' : 'none';
     if (embConfigOptions.hasCaps) {
-        document.getElementById('spr-cap-embellishment').value = 'embroidery';
-        document.getElementById('spr-cap-stitch-tier').value = st.autoCapTier;
+        /** @type {HTMLInputElement} */ (document.getElementById('spr-cap-embellishment')).value = 'embroidery';
+        /** @type {HTMLInputElement} */ (document.getElementById('spr-cap-stitch-tier')).value = st.autoCapTier;
         document.getElementById('spr-cap-stitch-tier-wrapper').style.display = '';
-        document.getElementById('spr-cap-digitizing').checked = embConfigOptions.digitizing || false;
+        /** @type {HTMLInputElement} */ (document.getElementById('spr-cap-digitizing')).checked = embConfigOptions.digitizing || false;
     }
 
     // LTM row (only if qty <= 7)
@@ -612,13 +611,13 @@ function _applySprConfigDefaults(embConfigOptions, st) {
     if (embConfigOptions.totalQty > 0 && embConfigOptions.totalQty <= 7) {
         ltmRow.style.display = '';
         // Smart default: uncheck if all products have ShopWorks pricing
-        const ltmCheckbox = document.getElementById('spr-ltm-enabled');
+        const ltmCheckbox = /** @type {HTMLInputElement|null} */ (document.getElementById('spr-ltm-enabled'));
         const ltmHint = document.getElementById('spr-ltm-hint');
         if (embConfigOptions.allProductsHaveSwPrice) {
             ltmCheckbox.checked = false;
             ltmHint.textContent = 'ShopWorks prices may include LTM';
         } else {
-            ltmCheckbox.checked = true;
+            /** @type {HTMLInputElement} */ (ltmCheckbox).checked = true;
             ltmHint.textContent = '';
         }
     } else {
@@ -751,9 +750,9 @@ function _groupSizesForReview(sizes, sizePrices, _swPrice) {
  */
 export function onSprProductSourceChange(pIdx) {
     const radios = document.querySelectorAll(`input[name="spr-psource-${pIdx}"]`);
-    const customInput = document.getElementById(`spr-pcustom-${pIdx}`);
+    const customInput = /** @type {HTMLInputElement|null} */ (document.getElementById(`spr-pcustom-${pIdx}`));
     let selectedValue = '';
-    radios.forEach(r => { if (r.checked) selectedValue = r.value; });
+    radios.forEach(r => { if (/** @type {HTMLInputElement} */ (r).checked) selectedValue = /** @type {HTMLInputElement} */ (r).value; });
     if (selectedValue === 'custom') {
         customInput.classList.remove('spr-muted');
         customInput.focus();
@@ -766,9 +765,9 @@ export function onSprProductSourceChange(pIdx) {
 }
 
 export function onSprCustomProductFocus(pIdx) {
-    const customRadio = document.querySelector(`input[name="spr-psource-${pIdx}"][value="custom"]`);
+    const customRadio = /** @type {HTMLInputElement|null} */ (document.querySelector(`input[name="spr-psource-${pIdx}"][value="custom"]`));
     if (customRadio && !customRadio.checked) {
-        customRadio.checked = true;
+        /** @type {HTMLInputElement} */ (customRadio).checked = true;
         onSprProductSourceChange(pIdx);
     }
 }
@@ -778,9 +777,9 @@ export function onSprCustomProductFocus(pIdx) {
  */
 export function onSprSourceChange(idx) {
     const radios = document.querySelectorAll(`input[name="spr-source-${idx}"]`);
-    const customInput = document.getElementById(`spr-custom-${idx}`);
+    const customInput = /** @type {HTMLInputElement|null} */ (document.getElementById(`spr-custom-${idx}`));
     let selectedValue = '';
-    radios.forEach(r => { if (r.checked) selectedValue = r.value; });
+    radios.forEach(r => { if (/** @type {HTMLInputElement} */ (r).checked) selectedValue = /** @type {HTMLInputElement} */ (r).value; });
     if (selectedValue === 'custom') {
         customInput.classList.remove('spr-muted');
         customInput.focus();
@@ -791,9 +790,9 @@ export function onSprSourceChange(idx) {
 }
 
 export function onSprCustomServiceFocus(idx) {
-    const customRadio = document.querySelector(`input[name="spr-source-${idx}"][value="custom"]`);
+    const customRadio = /** @type {HTMLInputElement|null} */ (document.querySelector(`input[name="spr-source-${idx}"][value="custom"]`));
     if (customRadio && !customRadio.checked) {
-        customRadio.checked = true;
+        /** @type {HTMLInputElement} */ (customRadio).checked = true;
         onSprSourceChange(idx);
     }
 }
@@ -801,34 +800,34 @@ export function onSprCustomServiceFocus(idx) {
 // === SPR Embroidery Config Handlers ===
 
 export function onSprGarmentPositionChange() {
-    const pos = document.getElementById('spr-garment-position').value;
-    const tierEl = document.getElementById('spr-garment-stitch-tier');
+    const pos = /** @type {HTMLInputElement} */ (document.getElementById('spr-garment-position')).value;
+    const tierEl = /** @type {HTMLInputElement|null} */ (document.getElementById('spr-garment-stitch-tier'));
     if (pos === 'Full Back') {
         tierEl.value = '25000';
-    } else if (tierEl.value === '25000') {
-        tierEl.value = '8000';
+    } else if (/** @type {HTMLInputElement} */ (tierEl).value === '25000') {
+        /** @type {HTMLInputElement} */ (tierEl).value = '8000';
     }
 }
 
 export function onSprGarmentStitchTierChange() {
-    const tier = document.getElementById('spr-garment-stitch-tier').value;
-    const posEl = document.getElementById('spr-garment-position');
+    const tier = /** @type {HTMLInputElement} */ (document.getElementById('spr-garment-stitch-tier')).value;
+    const posEl = /** @type {HTMLInputElement|null} */ (document.getElementById('spr-garment-position'));
     if (tier === '25000') {
         posEl.value = 'Full Back';
-    } else if (posEl.value === 'Full Back') {
-        posEl.value = 'Left Chest';
+    } else if (/** @type {HTMLInputElement} */ (posEl).value === 'Full Back') {
+        /** @type {HTMLInputElement} */ (posEl).value = 'Left Chest';
     }
 }
 
 export function onSprCapEmbellishmentChange() {
-    const type = document.getElementById('spr-cap-embellishment').value;
+    const type = /** @type {HTMLInputElement} */ (document.getElementById('spr-cap-embellishment')).value;
     const stitchWrapper = document.getElementById('spr-cap-stitch-tier-wrapper');
     stitchWrapper.style.display = (type === 'laser-patch') ? 'none' : '';
 }
 
 function _updateSprLtmDefault() {
     if (!_sprEmbConfigOptions || _sprEmbConfigOptions.totalQty > 7) return;
-    const ltmCheckbox = document.getElementById('spr-ltm-enabled');
+    const ltmCheckbox = /** @type {HTMLInputElement|null} */ (document.getElementById('spr-ltm-enabled'));
     const ltmHint = document.getElementById('spr-ltm-hint');
     if (!ltmCheckbox) return;
 
@@ -837,7 +836,7 @@ function _updateSprLtmDefault() {
     _sprProductItems.forEach((prod, pIdx) => {
         const radios = document.querySelectorAll(`input[name="spr-psource-${pIdx}"]`);
         let selected = 'api';
-        radios.forEach(r => { if (r.checked) selected = r.value; });
+        radios.forEach(r => { if (/** @type {HTMLInputElement} */ (r).checked) selected = /** @type {HTMLInputElement} */ (r).value; });
         if (selected !== 'sw') allSw = false;
     });
 
@@ -845,7 +844,7 @@ function _updateSprLtmDefault() {
         ltmCheckbox.checked = false;
         ltmHint.textContent = 'ShopWorks prices may include LTM';
     } else {
-        ltmCheckbox.checked = true;
+        /** @type {HTMLInputElement} */ (ltmCheckbox).checked = true;
         ltmHint.textContent = '';
     }
 }
@@ -857,7 +856,7 @@ export function onSprStitchChange(idx) {
     const item = _sprItems[idx];
     if (!item) return;
 
-    const input = document.getElementById(`spr-stitch-${idx}`);
+    const input = /** @type {HTMLInputElement|null} */ (document.getElementById(`spr-stitch-${idx}`));
     const newStitch = parseInt(input.value) || 8000;
     item.stitchCount = newStitch;
 
@@ -902,7 +901,7 @@ export function applyServicePricingReview() {
     _sprItems.forEach((item, idx) => {
         const radios = document.querySelectorAll(`input[name="spr-source-${idx}"]`);
         let selectedSource = 'api';
-        radios.forEach(r => { if (r.checked) selectedSource = r.value; });
+        radios.forEach(r => { if (/** @type {HTMLInputElement} */ (r).checked) selectedSource = /** @type {HTMLInputElement} */ (r).value; });
 
         let unitPrice = 0;
         if (selectedSource === 'sw') {
@@ -910,11 +909,11 @@ export function applyServicePricingReview() {
         } else if (selectedSource === 'api') {
             unitPrice = item.apiPrice || 0;
         } else if (selectedSource === 'custom') {
-            const customInput = document.getElementById(`spr-custom-${idx}`);
+            const customInput = /** @type {HTMLInputElement|null} */ (document.getElementById(`spr-custom-${idx}`));
             unitPrice = parseFloat(customInput.value) || 0;
         }
 
-        const stitchInput = document.getElementById(`spr-stitch-${idx}`);
+        const stitchInput = /** @type {HTMLInputElement|null} */ (document.getElementById(`spr-stitch-${idx}`));
         const stitchCount = stitchInput ? (parseInt(stitchInput.value) || 8000) : (item.stitchCount || 8000);
 
         serviceResults.push({
@@ -932,13 +931,13 @@ export function applyServicePricingReview() {
     _sprProductItems.forEach((prod, pIdx) => {
         const radios = document.querySelectorAll(`input[name="spr-psource-${pIdx}"]`);
         let selectedSource = 'api';
-        radios.forEach(r => { if (r.checked) selectedSource = r.value; });
+        radios.forEach(r => { if (/** @type {HTMLInputElement} */ (r).checked) selectedSource = /** @type {HTMLInputElement} */ (r).value; });
 
         let overridePrice = 0; // 0 = use API (no override)
         if (selectedSource === 'sw') {
             overridePrice = prod.unitPrice || 0;
         } else if (selectedSource === 'custom') {
-            const customInput = document.getElementById(`spr-pcustom-${pIdx}`);
+            const customInput = /** @type {HTMLInputElement|null} */ (document.getElementById(`spr-pcustom-${pIdx}`));
             overridePrice = parseFloat(customInput.value) || 0;
         }
         // 'api' → overridePrice stays 0 → no sellPriceOverride set
@@ -965,8 +964,8 @@ export function applyServicePricingReview() {
             if (assignSelects.length > 0) {
                 // Multi-design: read from dropdowns
                 assignSelects.forEach(sel => {
-                    const dNum = sel.dataset.designNum;
-                    const val = sel.value;
+                    const dNum = /** @type {HTMLElement} */ (sel).dataset.designNum;
+                    const val = /** @type {HTMLInputElement} */ (sel).value;
                     const entry = (_sprEmbConfigOptions.designNumbers || []).find(l => l.includes('#' + dNum));
                     const nameMatch = entry ? entry.match(/—\s*(.+)/) : null;
                     const dName = nameMatch ? nameMatch[1].trim() : '';
@@ -989,13 +988,13 @@ export function applyServicePricingReview() {
         }
 
         embConfig = {
-            garmentPosition: document.getElementById('spr-garment-position')?.value || 'Left Chest',
-            garmentStitchTier: parseInt(document.getElementById('spr-garment-stitch-tier')?.value) || 8000,
-            garmentDigitizing: document.getElementById('spr-garment-digitizing')?.checked || false,
-            capEmbellishment: document.getElementById('spr-cap-embellishment')?.value || 'embroidery',
-            capStitchTier: parseInt(document.getElementById('spr-cap-stitch-tier')?.value) || 8000,
-            capDigitizing: document.getElementById('spr-cap-digitizing')?.checked || false,
-            ltmEnabled: document.getElementById('spr-ltm-enabled')?.checked ?? true,
+            garmentPosition: /** @type {HTMLInputElement|null} */ (document.getElementById('spr-garment-position'))?.value || 'Left Chest',
+            garmentStitchTier: parseInt(/** @type {HTMLInputElement|null} */ (document.getElementById('spr-garment-stitch-tier'))?.value) || 8000,
+            garmentDigitizing: /** @type {HTMLInputElement|null} */ (document.getElementById('spr-garment-digitizing'))?.checked || false,
+            capEmbellishment: /** @type {HTMLInputElement|null} */ (document.getElementById('spr-cap-embellishment'))?.value || 'embroidery',
+            capStitchTier: parseInt(/** @type {HTMLInputElement|null} */ (document.getElementById('spr-cap-stitch-tier'))?.value) || 8000,
+            capDigitizing: /** @type {HTMLInputElement|null} */ (document.getElementById('spr-cap-digitizing'))?.checked || false,
+            ltmEnabled: /** @type {HTMLInputElement|null} */ (document.getElementById('spr-ltm-enabled'))?.checked ?? true,
             fbPriceTiers: _sprEmbConfigOptions?.fbPriceTiers || null,
             garmentDesignNumber: garmentDesignNumber,
             garmentDesignName: garmentDesignName,

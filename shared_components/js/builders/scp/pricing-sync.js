@@ -5,7 +5,6 @@
  * recalculatePricing pipeline (live `export let`, reprice-pill wrapped at the
  * tail), row/summary display sync, tax + wholesale. Moved verbatim.
  */
-// @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions; typing lands with the render/state split).
 /* global Event, updatePrintConfig, updateDarkGarmentNudge, updateFeeTableRows,
    getScpExtraFees, updateAdditionalCharges, markScreenPrintDirty,
    updateScpPushButtonState, escapeHtml, showToast, formatPrice,
@@ -209,7 +208,7 @@ async function _priceOneProduct(product, ctx) {
         }
 
         // Find parent row for this product
-        const parentRow = document.querySelector(`tr[data-style="${style}"][data-catalog-color="${product.catalogColor}"]:not(.child-row)`);
+        const parentRow = /** @type {HTMLElement|null} */ (document.querySelector(`tr[data-style="${style}"][data-catalog-color="${product.catalogColor}"]:not(.child-row)`));
         if (!parentRow) return null;
 
         const rowId = parentRow.dataset.rowId;
@@ -479,9 +478,9 @@ export function collectProductsFromTable() {
 
     rows.forEach(row => {
         const rowId = parseInt(row.id.replace('row-', ''));
-        const style = row.dataset.style;
-        const parentColor = row.dataset.color;
-        const parentCatalogColor = row.dataset.catalogColor || '';
+        const style = /** @type {HTMLElement} */ (row).dataset.style;
+        const parentColor = /** @type {HTMLElement} */ (row).dataset.color;
+        const parentCatalogColor = /** @type {HTMLElement} */ (row).dataset.catalogColor || '';
 
         if (!style || !parentColor) return;
 
@@ -500,10 +499,10 @@ export function collectProductsFromTable() {
         // IMPORTANT: Exclude .xxxl-picker-btn (shows TOTAL) and .osfa-qty-input (handled separately)
         // Note: For non-standard products (combo, youth, toddler, tall), data-size is remapped
         // eslint-disable-next-line no-unused-vars -- verbatim (S1b): unused in monolith
-        const sizeCategory = row.dataset.sizeCategory;
+        const sizeCategory = /** @type {HTMLElement} */ (row).dataset.sizeCategory;
         row.querySelectorAll('.size-input:not(.xxxl-picker-btn):not(.osfa-qty-input):not(:disabled)').forEach(input => {
-            const size = input.dataset.size;
-            const qty = parseInt(input.value) || 0;
+            const size = /** @type {HTMLElement} */ (input).dataset.size;
+            const qty = parseInt(/** @type {HTMLInputElement} */ (input).value) || 0;
             if (qty > 0 && size) {
                 colorGroups[parentCatalogColor].sizeBreakdown[size] = qty;
                 colorGroups[parentCatalogColor].totalQty += qty;
@@ -512,8 +511,8 @@ export function collectProductsFromTable() {
 
         // Handle OSFA-only products (beanies, caps, bags)
         // OSFA qty is stored in parent row, not child rows
-        if (row.dataset.isOsfaOnly === 'true') {
-            const osfaQty = parseInt(row.dataset.osfaQty) || 0;
+        if (/** @type {HTMLElement} */ (row).dataset.isOsfaOnly === 'true') {
+            const osfaQty = parseInt(/** @type {HTMLElement} */ (row).dataset.osfaQty) || 0;
             if (osfaQty > 0) {
                 colorGroups[parentCatalogColor].sizeBreakdown['OSFA'] = osfaQty;
                 colorGroups[parentCatalogColor].totalQty += osfaQty;
@@ -524,9 +523,9 @@ export function collectProductsFromTable() {
         // Child rows may have different colors than parent
         const childRows = document.querySelectorAll(`tr[data-parent-row-id="${rowId}"]`);
         childRows.forEach(childRow => {
-            const size = childRow.dataset.extendedSize;
-            const childColor = childRow.dataset.color;
-            const childCatalogColor = childRow.dataset.catalogColor || '';
+            const size = /** @type {HTMLElement} */ (childRow).dataset.extendedSize;
+            const childColor = /** @type {HTMLElement} */ (childRow).dataset.color;
+            const childCatalogColor = /** @type {HTMLElement} */ (childRow).dataset.catalogColor || '';
             const qtyDisplay = childRow.querySelector('.qty-display');
             const qty = parseInt(qtyDisplay?.textContent) || 0;
 
@@ -554,7 +553,7 @@ export function collectProductsFromTable() {
                     style: style,
                     color: group.color,
                     catalogColor: group.catalogColor,
-                    productName: row.dataset.productName || style,
+                    productName: /** @type {HTMLElement} */ (row).dataset.productName || style,
                     sizeBreakdown: group.sizeBreakdown,
                     totalQty: group.totalQty,
                     rowId: rowId
@@ -653,7 +652,7 @@ function updateSidebarPrintConfig() {
     }
 
     // Total screens
-    document.getElementById('sidebar-screens').textContent = scpState.printConfig.totalScreens;
+    document.getElementById('sidebar-screens').textContent = /** @type {any} */ (scpState.printConfig.totalScreens);
 
     // Dark garment
     document.getElementById('sidebar-dark-row').style.display = scpState.printConfig.isDarkGarment ? 'flex' : 'none';
@@ -677,7 +676,7 @@ function updateSidebarPrintConfig() {
 // ============================================================
 
 export function updateTaxCalculation() {
-    const includeTax = document.getElementById('include-tax')?.checked;
+    const includeTax = /** @type {HTMLInputElement|null} */ (document.getElementById('include-tax'))?.checked;
     const subtotalEl = document.getElementById('pre-tax-subtotal');
     const taxRowEl = document.getElementById('tax-row');
     const taxAmountEl = document.getElementById('tax-amount');
@@ -687,20 +686,20 @@ export function updateTaxCalculation() {
     // [2026-06-08] P1: read the STABLE base (data-base set by updatePricingDisplay), NOT the textContent this fn writes
     // back — else a 2nd direct call double-adds fees+shipping. Falls back to textContent only before the first recalc.
     let subtotal = parseFloat(subtotalEl?.dataset?.base);
-    if (!Number.isFinite(subtotal)) subtotal = parseFloat(subtotalEl?.textContent?.replace(/[$,]/g, '') || 0);
+    if (!Number.isFinite(subtotal)) subtotal = parseFloat(subtotalEl?.textContent?.replace(/[$,]/g, '') || /** @type {any} */ (0));
 
     // Add art charge if enabled
-    const artChargeToggle = document.getElementById('art-charge-toggle');
-    const artCharge = artChargeToggle?.checked ? parseFloat(document.getElementById('art-charge')?.value || 0) : 0;
+    const artChargeToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('art-charge-toggle'));
+    const artCharge = artChargeToggle?.checked ? parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('art-charge'))?.value || /** @type {any} */ (0)) : 0;
     subtotal += artCharge;
 
     // Add graphic design fee
-    const designHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
+    const designHours = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('graphic-design-hours'))?.value || /** @type {any} */ (0));
     const designFee = designHours * getServicePrice('GRT-75', 75);
     subtotal += designFee;
 
     // Add rush fee if present
-    const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
+    const rushFee = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('rush-fee'))?.value || /** @type {any} */ (0));
     subtotal += rushFee;
 
     // Add Vellum + Color Change setup fees (Erik's official parts, 2026-06-27).
@@ -709,8 +708,8 @@ export function updateTaxCalculation() {
     subtotal += _xfTax.vellumFee + _xfTax.colorChangeFee;
 
     // Subtract discount if present
-    const discountAmount = parseFloat(document.getElementById('discount-amount')?.value || 0);
-    const discountType = document.getElementById('discount-type')?.value || 'fixed';
+    const discountAmount = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('discount-amount'))?.value || /** @type {any} */ (0));
+    const discountType = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-type'))?.value || 'fixed';
     let discount = 0;
     if (discountType === 'percent') {
         discount = subtotal * (discountAmount / 100);
@@ -720,7 +719,7 @@ export function updateTaxCalculation() {
     subtotal = Math.max(0, subtotal - discount);
 
     // Add shipping fee (after discount — shipping not discountable)
-    const shippingFee = parseFloat(document.querySelector('#spc-order-fields .os-shipping-fee')?.value) || 0;
+    const shippingFee = parseFloat(/** @type {HTMLInputElement|null} */ (document.querySelector('#spc-order-fields .os-shipping-fee'))?.value) || 0;
     subtotal += shippingFee;
 
     // Update the pre-tax subtotal display to show adjusted amount
@@ -731,7 +730,7 @@ export function updateTaxCalculation() {
     // Dynamic tax rate from ZIP lookup or manual input
     // [2026-06-08] P0 (#1 rule): Number.isFinite so an exempt/out-of-state rate of 0 STAYS 0% — `parseFloat('0')||10.1`
     // is the falsy trap that re-taxed exempt orders at 10.1% on screen when include-tax was still checked.
-    const _scpRate = parseFloat(document.getElementById('tax-rate-input')?.value);
+    const _scpRate = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('tax-rate-input'))?.value);
     const taxRateInput = Number.isFinite(_scpRate) ? _scpRate : 10.2;
     const taxRate = taxRateInput / 100;
 
@@ -763,10 +762,10 @@ export function updateTaxCalculation() {
 
 // [2026-06-08] Wholesale / reseller toggle (mirror EMB). Per-order checkbox by the sales tax → 0 tax + push GL 2203.
 export function toggleWholesale() {
-    const cb = document.getElementById('wholesale-checkbox');
+    const cb = /** @type {HTMLInputElement|null} */ (document.getElementById('wholesale-checkbox'));
     window._isWholesale = !!(cb && cb.checked);
-    const incTax = document.getElementById('include-tax');
-    const rateInput = document.getElementById('tax-rate-input');
+    const incTax = /** @type {HTMLInputElement|null} */ (document.getElementById('include-tax'));
+    const rateInput = /** @type {HTMLInputElement|null} */ (document.getElementById('tax-rate-input'));
     if (window._isWholesale) {
         if (incTax) incTax.checked = false;
         if (rateInput) rateInput.value = '0';
@@ -774,17 +773,17 @@ export function toggleWholesale() {
         // [2026-06-08] un-toggle wholesale → re-derive the correct rate for the ship address (parity with DTF's
         // guarded lookupTaxRate) instead of leaving a flat 10.1: exempt stays 0; out-of-state 0; WA re-fetches the DOR rate.
         if (window._taxExempt) {
-            if (incTax) incTax.checked = false;
-            if (rateInput) rateInput.value = '0';
+            if (incTax) /** @type {HTMLInputElement} */ (incTax).checked = false;
+            if (rateInput) /** @type {HTMLInputElement} */ (rateInput).value = '0';
         } else {
-            if (incTax) incTax.checked = true;
-            const _st = (document.querySelector('#spc-order-fields .os-ship-state')?.value || 'WA').toUpperCase();
-            const _zip = document.querySelector('#spc-order-fields .os-ship-zip');
+            if (incTax) /** @type {HTMLInputElement} */ (incTax).checked = true;
+            const _st = (/** @type {HTMLInputElement|null} */ (document.querySelector('#spc-order-fields .os-ship-state'))?.value || 'WA').toUpperCase();
+            const _zip = /** @type {HTMLInputElement|null} */ (document.querySelector('#spc-order-fields .os-ship-zip'));
             if (_st === 'WA') {
-                if (rateInput) rateInput.value = '10.2';  // fallback until the async DOR lookup (ZIP blur) returns — Milton 10.2% since 2026-07-06
+                if (rateInput) /** @type {HTMLInputElement} */ (rateInput).value = '10.2';  // fallback until the async DOR lookup (ZIP blur) returns — Milton 10.2% since 2026-07-06
                 if (_zip && (_zip.value || '').trim().length >= 5) { _zip.dispatchEvent(new Event('blur')); }
             } else if (rateInput) {
-                rateInput.value = '0';  // out-of-state — no WA tax
+                /** @type {HTMLInputElement} */ (rateInput).value = '0';  // out-of-state — no WA tax
             }
         }
     }

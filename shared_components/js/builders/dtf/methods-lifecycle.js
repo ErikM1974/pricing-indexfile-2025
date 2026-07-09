@@ -3,7 +3,6 @@
  * Batch 4.2 (2026-07-09): methods moved VERBATIM from quote-builder-class.js
  * (`this.` state intact — the class assembles via Object.assign(prototype, ...)).
  */
-// @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions).
 /* global escapeHtml, showToast, Event, QuotePersistence, QuoteSession, initLogoStatusChips,
    initMethodSwitchMenu, getQuickQuotePrefill, takeMethodSwitchPrefill, StaffAuthHelper,
    CustomerLookupService, updateTaxCalculation, showRecentCustomerOrders,
@@ -73,9 +72,9 @@ export const lifecycleMethods = {
                     imageUrl: p.imageUrl
                 };
             }),
-            customerName: document.getElementById('customer-name')?.value || '',
-            customerEmail: document.getElementById('customer-email')?.value || '',
-            companyName: document.getElementById('company-name')?.value || '',
+            customerName: /** @type {HTMLInputElement|null} */ (document.getElementById('customer-name'))?.value || '',
+            customerEmail: /** @type {HTMLInputElement|null} */ (document.getElementById('customer-email'))?.value || '',
+            companyName: /** @type {HTMLInputElement|null} */ (document.getElementById('company-name'))?.value || '',
             productIndex: this.productIndex
         };
     },
@@ -87,15 +86,15 @@ export const lifecycleMethods = {
 
         // Restore customer info
         if (draft.customerName) {
-            const nameEl = document.getElementById('customer-name');
+            const nameEl = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-name'));
             if (nameEl) nameEl.value = draft.customerName;
         }
         if (draft.customerEmail) {
-            const emailEl = document.getElementById('customer-email');
+            const emailEl = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-email'));
             if (emailEl) emailEl.value = draft.customerEmail;
         }
         if (draft.companyName) {
-            const companyEl = document.getElementById('company-name');
+            const companyEl = /** @type {HTMLInputElement|null} */ (document.getElementById('company-name'));
             if (companyEl) companyEl.value = draft.companyName;
         }
 
@@ -103,7 +102,7 @@ export const lifecycleMethods = {
         if (draft.selectedLocations && draft.selectedLocations.length > 0) {
             draft.selectedLocations.forEach(loc => {
                 // Find the input (works for both radio and checkbox)
-                const input = document.querySelector(`input[value="${loc}"]`);
+                const input = /** @type {HTMLInputElement|null} */ (document.querySelector(`input[value="${loc}"]`));
                 if (input) {
                     input.checked = true;
                 }
@@ -249,15 +248,15 @@ export const lifecycleMethods = {
             const customerLookup = new CustomerLookupService();
 
             const applyContact = (contact) => {
-                document.getElementById('customer-name').value = contact.ct_NameFull || '';
-                document.getElementById('customer-email').value = contact.ContactNumbersEmail || '';
-                document.getElementById('company-name').value = contact.CustomerCompanyName || '';
+                /** @type {HTMLInputElement} */ (document.getElementById('customer-name')).value = contact.ct_NameFull || '';
+                /** @type {HTMLInputElement} */ (document.getElementById('customer-email')).value = contact.ContactNumbersEmail || '';
+                /** @type {HTMLInputElement} */ (document.getElementById('company-name')).value = contact.CustomerCompanyName || '';
 
                 // ShopWorks Customer # — the lookup already holds it, yet DTF made the
                 // rep re-type it (it gates Push, filters the design combobox, and a typo
                 // attaches the pushed order to the wrong customer; blank falls to the
                 // 3739 placeholder). EMB has auto-filled since June. (expert audit 2026-07-07)
-                const custNumEl = document.getElementById('customer-number');
+                const custNumEl = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-number'));
                 if (custNumEl) {
                     custNumEl.value = contact.id_Customer || '';
                     custNumEl.dispatchEvent(new Event('input', { bubbles: true }));  // refresh recap + push-button state
@@ -272,12 +271,12 @@ export const lifecycleMethods = {
                 var _incTax = document.getElementById('include-tax');
                 var _rateEl = document.getElementById('tax-rate-input');
                 if (window._taxExempt) {
-                    if (_incTax) _incTax.checked = false;
-                    if (_rateEl) _rateEl.value = '0';
+                    if (_incTax) /** @type {HTMLInputElement} */ (_incTax).checked = false;
+                    if (_rateEl) /** @type {HTMLInputElement} */ (_rateEl).value = '0';
                     if (typeof updateTaxCalculation === 'function') updateTaxCalculation();
                 } else if (_wasExempt) {
-                    if (_incTax) _incTax.checked = true;
-                    if (_rateEl && _rateEl.value === '0') _rateEl.value = '10.2';
+                    if (_incTax) /** @type {HTMLInputElement} */ (_incTax).checked = true;
+                    if (_rateEl && /** @type {HTMLInputElement} */ (_rateEl).value === '0') /** @type {HTMLInputElement} */ (_rateEl).value = '10.2';
                     if (typeof updateTaxCalculation === 'function') updateTaxCalculation();
                 }
 
@@ -305,10 +304,10 @@ export const lifecycleMethods = {
             customerLookup.bindToInput('customer-lookup', {
                 onSelect: applyContact,
                 onClear: () => {
-                    document.getElementById('customer-name').value = '';
-                    document.getElementById('customer-email').value = '';
-                    document.getElementById('company-name').value = '';
-                    const _custNumClear = document.getElementById('customer-number');
+                    /** @type {HTMLInputElement} */ (document.getElementById('customer-name')).value = '';
+                    /** @type {HTMLInputElement} */ (document.getElementById('customer-email')).value = '';
+                    /** @type {HTMLInputElement} */ (document.getElementById('company-name')).value = '';
+                    const _custNumClear = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-number'));
                     if (_custNumClear) {
                         _custNumClear.value = '';   // never leave the PREVIOUS customer's ShopWorks # armed for Push
                         _custNumClear.dispatchEvent(new Event('input', { bubbles: true }));
@@ -323,7 +322,7 @@ export const lifecycleMethods = {
             // Erik 2026-05-26: COMPANY field also triggers autocomplete (DTG parity).
             customerLookup.bindToInput('company-name', {
                 onSelect: (contact) => {
-                    const lookupInput = document.getElementById('customer-lookup');
+                    const lookupInput = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-lookup'));
                     if (lookupInput) lookupInput.value = contact.CustomerCompanyName || '';
                     applyContact(contact);
                 }
@@ -388,16 +387,16 @@ export const lifecycleMethods = {
         };
 
         for (const [id, value] of Object.entries(fields)) {
-            const el = document.getElementById(id);
+            const el = /** @type {HTMLInputElement|null} */ (document.getElementById(id));
             if (el && value) el.value = value;
         }
 
         // Set sales rep dropdown
-        const salesRepSelect = document.getElementById('sales-rep');
+        const salesRepSelect = /** @type {HTMLSelectElement|null} */ (document.getElementById('sales-rep'));
         if (salesRepSelect && session.SalesRepEmail) {
             for (let i = 0; i < salesRepSelect.options.length; i++) {
-                if (salesRepSelect.options[i].value === session.SalesRepEmail) {
-                    salesRepSelect.selectedIndex = i;
+                if (/** @type {HTMLSelectElement} */ (salesRepSelect).options[i].value === session.SalesRepEmail) {
+                    /** @type {HTMLSelectElement} */ (salesRepSelect).selectedIndex = i;
                     break;
                 }
             }
@@ -426,7 +425,7 @@ export const lifecycleMethods = {
 
         let hasOrderData = false;
         for (const [id, value] of Object.entries(orderFields)) {
-            const el = document.getElementById(id);
+            const el = /** @type {HTMLInputElement|null} */ (document.getElementById(id));
             if (el && value) {
                 el.value = value;
                 hasOrderData = true;
@@ -434,21 +433,21 @@ export const lifecycleMethods = {
         }
 
         // Set state dropdown
-        const stateSelect = document.getElementById('ship-state');
+        const stateSelect = /** @type {HTMLInputElement|null} */ (document.getElementById('ship-state'));
         if (stateSelect && session.ShipToState) {
             stateSelect.value = session.ShipToState;
         }
 
         // Set tax rate from saved quote
-        const taxRateInput = document.getElementById('tax-rate-input');
+        const taxRateInput = /** @type {HTMLInputElement|null} */ (document.getElementById('tax-rate-input'));
         if (taxRateInput && session.TaxRate != null && session.TaxRate !== '') {  // [2026-06-08] P2: != null so a saved numeric 0 (exempt/wholesale/out-of-state) restores, not the 10.1 HTML default
             taxRateInput.value = session.TaxRate;
         }
         // [2026-06-08] restore the per-order wholesale flag + checkbox on edit-reload (mirror EMB)
         // eslint-disable-next-line no-restricted-syntax -- pre-existing window contract (verbatim mixin move, Batch 4.2)
         window._isWholesale = (session.IsWholesale === 'Yes' || session.IsWholesale === true || session.IsWholesale === 1);
-        { const _wcb = document.getElementById('wholesale-checkbox'); if (_wcb) _wcb.checked = window._isWholesale; }
-        if (window._isWholesale) { const _it = document.getElementById('include-tax'); if (_it) _it.checked = false; }
+        { const _wcb = /** @type {HTMLInputElement|null} */ (document.getElementById('wholesale-checkbox')); if (_wcb) _wcb.checked = window._isWholesale; }
+        if (window._isWholesale) { const _it = /** @type {HTMLInputElement|null} */ (document.getElementById('include-tax')); if (_it) _it.checked = false; }
 
         // Auto-expand order details panel if data exists
         if (hasOrderData) {
@@ -461,9 +460,9 @@ export const lifecycleMethods = {
         // Restore project name + special instructions from the Notes JSON blob
         try {
             const blob = JSON.parse(session.Notes || '{}');
-            const projEl = document.getElementById('project-name');
+            const projEl = /** @type {HTMLInputElement|null} */ (document.getElementById('project-name'));
             if (projEl && blob.projectName) projEl.value = blob.projectName;
-            const notesEl = document.getElementById('dtf-notes');
+            const notesEl = /** @type {HTMLInputElement|null} */ (document.getElementById('dtf-notes'));
             if (notesEl && blob.specialNotes) notesEl.value = blob.specialNotes;
         } catch (_) { /* Notes not JSON — skip */ }
         // [2026-06-08] reflect the loaded customer + ship-to in the order-summary band on edit-reload
@@ -476,18 +475,18 @@ export const lifecycleMethods = {
      */
     populateAdditionalCharges(session) {
         // Art charge
-        const artChargeToggle = document.getElementById('art-charge-toggle');
-        const artChargeInput = document.getElementById('art-charge');
+        const artChargeToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('art-charge-toggle'));
+        const artChargeInput = /** @type {HTMLInputElement|null} */ (document.getElementById('art-charge'));
         const artChargeWrapper = document.getElementById('art-charge-wrapper');
         if (session.ArtCharge > 0 && artChargeToggle && artChargeInput) {
             artChargeToggle.checked = true;
             artChargeInput.disabled = false;
-            artChargeInput.value = session.ArtCharge;
+            /** @type {HTMLInputElement} */ (artChargeInput).value = session.ArtCharge;
             if (artChargeWrapper) artChargeWrapper.style.opacity = '1';
         }
 
         // Graphic design hours
-        const designHoursInput = document.getElementById('graphic-design-hours');
+        const designHoursInput = /** @type {HTMLInputElement|null} */ (document.getElementById('graphic-design-hours'));
         if (session.GraphicDesignHours > 0 && designHoursInput) {
             designHoursInput.value = session.GraphicDesignHours;
             // Update the calculated total display
@@ -498,7 +497,7 @@ export const lifecycleMethods = {
         }
 
         // Rush fee
-        const rushFeeInput = document.getElementById('rush-fee');
+        const rushFeeInput = /** @type {HTMLInputElement|null} */ (document.getElementById('rush-fee'));
         if (session.RushFee > 0 && rushFeeInput) {
             rushFeeInput.value = session.RushFee;
         }
@@ -518,7 +517,7 @@ export const lifecycleMethods = {
         }
 
         // Shipping fee
-        const shippingFeeInput = document.getElementById('dtf-shipping-fee');
+        const shippingFeeInput = /** @type {HTMLInputElement|null} */ (document.getElementById('dtf-shipping-fee'));
         if (shippingFeeInput && session.ShippingFee > 0) {
             shippingFeeInput.value = session.ShippingFee;
         }
@@ -541,7 +540,7 @@ export const lifecycleMethods = {
             if (notes.locations && Array.isArray(notes.locations)) {
                 notes.locations.forEach(loc => {
                     // Find the input (works for both radio and checkbox)
-                    const input = document.querySelector(`input[value="${loc}"]`);
+                    const input = /** @type {HTMLInputElement|null} */ (document.querySelector(`input[value="${loc}"]`));
                     if (input) {
                         input.checked = true;
                     }
@@ -699,11 +698,11 @@ export const lifecycleMethods = {
             let notesMeta = {};
             try { notesMeta = JSON.parse(session.Notes || '{}') || {}; } catch (e) { /* legacy free-text notes */ }
             this._loadedNotesMeta = notesMeta;
-            const designInput = document.getElementById('design-number');
+            const designInput = /** @type {HTMLInputElement|null} */ (document.getElementById('design-number'));
             if (designInput && notesMeta.designNumber) designInput.value = notesMeta.designNumber;
-            const notesInput = document.getElementById('dtf-notes');
+            const notesInput = /** @type {HTMLInputElement|null} */ (document.getElementById('dtf-notes'));
             if (notesInput && notesMeta.specialNotes) notesInput.value = notesMeta.specialNotes;
-            const includeTaxEl = document.getElementById('include-tax');
+            const includeTaxEl = /** @type {HTMLInputElement|null} */ (document.getElementById('include-tax'));
             if (includeTaxEl) {
                 includeTaxEl.checked = (typeof notesMeta.includeTax === 'boolean')
                     ? notesMeta.includeTax
@@ -770,7 +769,7 @@ export const lifecycleMethods = {
 
         // Order-specific fields must not carry over — order #/PO/dates belong to the ORIGINAL order
         ['order-number', 'po-number', 'req-ship-date', 'drop-dead-date'].forEach(id => {
-            const el = document.getElementById(id);
+            const el = /** @type {HTMLInputElement|null} */ (document.getElementById(id));
             if (el) el.value = '';
         });
 
@@ -793,10 +792,10 @@ export const lifecycleMethods = {
     // saveAndGetLink into the _save*/_build*/_handle* siblings below
     // (this.-preserving; the orchestrator keeps mint/guards + try/finally).
     _validateSaveForm() {
-        const customerName = document.getElementById('customer-name')?.value?.trim() || '';
-        const customerEmail = document.getElementById('customer-email')?.value?.trim() || '';
-        const companyName = document.getElementById('company-name')?.value?.trim() || '';
-        const salesRep = document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com';
+        const customerName = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-name'))?.value?.trim() || '';
+        const customerEmail = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-email'))?.value?.trim() || '';
+        const companyName = /** @type {HTMLInputElement|null} */ (document.getElementById('company-name'))?.value?.trim() || '';
+        const salesRep = /** @type {HTMLInputElement|null} */ (document.getElementById('sales-rep'))?.value || 'sales@nwcustomapparel.com';
 
         // Validate required fields — toast + focus like EMB/SCP; the old alert()
         // cascade stole keyboard focus mid-call and had to be dismissed one dialog
@@ -891,7 +890,7 @@ export const lifecycleMethods = {
         }
 
         // Phase 11.1 — include design # if rep picked one from the combobox
-        const designNumber = document.getElementById('design-number')?.value?.trim() || '';
+        const designNumber = /** @type {HTMLInputElement|null} */ (document.getElementById('design-number'))?.value?.trim() || '';
         return { referenceArtwork, newDesignName, designNumber };
     },
 
@@ -1018,10 +1017,10 @@ export const lifecycleMethods = {
             companyName,
             salesRep,
             // ShopWorks customer ID (#customer-number) — used as id_Customer on push
-            customerNumber: document.getElementById('customer-number')?.value?.trim() || '',
+            customerNumber: /** @type {HTMLInputElement|null} */ (document.getElementById('customer-number'))?.value?.trim() || '',
             // [2026-06-11] was hardcoded '' — the rep's special instructions never
             // persisted to Notes.specialNotes on the Save & Get Link path
-            notes: document.getElementById('dtf-notes')?.value?.trim() || '',
+            notes: /** @type {HTMLInputElement|null} */ (document.getElementById('dtf-notes'))?.value?.trim() || '',
             referenceArtwork, // → quote-service writes to quote_sessions.Notes JSON
             newDesignName,    // → Notes.newDesignName; proxy reads this for Designs[0].name
             designNumber,     // → quote-service writes to quote_sessions.Notes.designNumber
@@ -1042,8 +1041,8 @@ export const lifecycleMethods = {
             // [2026-06-11] from computeFeesAndTotals (state math), not DOM text — the old
             // `parseFloat(textContent) || subtotal` lost fees on any DOM hiccup and broke $0 quotes.
             preTaxSubtotal: totals.preTaxSubtotal,
-            includeTax: document.getElementById('include-tax') ? !!document.getElementById('include-tax').checked : true,
-            isWholesale: document.getElementById('wholesale-checkbox')?.checked || false,  // [2026-06-08] → IsWholesale; push routes to GL 2203
+            includeTax: document.getElementById('include-tax') ? !!/** @type {HTMLInputElement} */ (document.getElementById('include-tax')).checked : true,
+            isWholesale: /** @type {HTMLInputElement|null} */ (document.getElementById('wholesale-checkbox'))?.checked || false,  // [2026-06-08] → IsWholesale; push routes to GL 2203
             pricingMetadata: this.currentPricingData ? {
                 tier: this.currentPricingData.tier,
                 marginDenominator: this.currentPricingData.marginDenom,
@@ -1054,18 +1053,18 @@ export const lifecycleMethods = {
                 transferBreakdown: this.currentPricingData.transferBreakdown
             } : null,
             // Order & shipping fields (2026.03 overhaul)
-            customerPhone: document.getElementById('customer-phone')?.value?.trim() || '',
-            projectName: document.getElementById('project-name')?.value?.trim() || '',
-            orderNumber: document.getElementById('order-number')?.value?.trim() || '',
-            poNumber: document.getElementById('po-number')?.value?.trim() || '',
-            reqShipDate: document.getElementById('req-ship-date')?.value || '',
-            dropDeadDate: document.getElementById('drop-dead-date')?.value || '',
-            shipToName: document.getElementById('ship-to-name')?.value?.trim() || '',
-            shipAddress: document.getElementById('ship-address')?.value?.trim() || '',
-            shipCity: document.getElementById('ship-city')?.value?.trim() || '',
-            shipState: document.getElementById('ship-state')?.value || 'WA',
-            shipZip: document.getElementById('ship-zip')?.value?.trim() || '',
-            shipMethod: document.getElementById('ship-method')?.value || '',
+            customerPhone: /** @type {HTMLInputElement|null} */ (document.getElementById('customer-phone'))?.value?.trim() || '',
+            projectName: /** @type {HTMLInputElement|null} */ (document.getElementById('project-name'))?.value?.trim() || '',
+            orderNumber: /** @type {HTMLInputElement|null} */ (document.getElementById('order-number'))?.value?.trim() || '',
+            poNumber: /** @type {HTMLInputElement|null} */ (document.getElementById('po-number'))?.value?.trim() || '',
+            reqShipDate: /** @type {HTMLInputElement|null} */ (document.getElementById('req-ship-date'))?.value || '',
+            dropDeadDate: /** @type {HTMLInputElement|null} */ (document.getElementById('drop-dead-date'))?.value || '',
+            shipToName: /** @type {HTMLInputElement|null} */ (document.getElementById('ship-to-name'))?.value?.trim() || '',
+            shipAddress: /** @type {HTMLInputElement|null} */ (document.getElementById('ship-address'))?.value?.trim() || '',
+            shipCity: /** @type {HTMLInputElement|null} */ (document.getElementById('ship-city'))?.value?.trim() || '',
+            shipState: /** @type {HTMLInputElement|null} */ (document.getElementById('ship-state'))?.value || 'WA',
+            shipZip: /** @type {HTMLInputElement|null} */ (document.getElementById('ship-zip'))?.value?.trim() || '',
+            shipMethod: /** @type {HTMLInputElement|null} */ (document.getElementById('ship-method'))?.value || '',
             // [2026-06-11] all fee/tax fields from computeFeesAndTotals — single source with the
             // screen. The old inline discount IIFE used a products-only percent base while the
             // screen discounts products+art+design+rush, so saved Discount disagreed with the
@@ -1080,14 +1079,12 @@ export const lifecycleMethods = {
             rushFee: totals.rushFee,
             discount: totals.discount,
             discountPercent: totals.discountType === 'percent' ? totals.discountAmount : 0,
-            discountReason: document.getElementById('discount-reason')?.value || '',
+            discountReason: /** @type {HTMLInputElement|null} */ (document.getElementById('discount-reason'))?.value || '',
             // LTM display preferences (2026-03-22)
             ltmDisplayMode: getLtmControlState('dtf-ltm-panel').displayMode || 'builtin',
             ltmWaived: !getLtmControlState('dtf-ltm-panel').enabled,
             // Shipping fee + notes (2026-03-22)
-            shippingFee: parseFloat(document.getElementById('dtf-shipping-fee')?.value) || 0,
-            // eslint-disable-next-line no-dupe-keys -- pre-existing monolith bug: 'notes' appears twice in this literal (identical expressions; last-wins). Kept verbatim (D1).
-            notes: document.getElementById('dtf-notes')?.value?.trim() || ''
+            shippingFee: parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('dtf-shipping-fee'))?.value) || 0,
         };
         return quoteData;
     },
@@ -1170,7 +1167,7 @@ export const lifecycleMethods = {
             referenceArtwork, newDesignName, designNumber });
 
         // Show saving state on button
-        const saveBtn = document.querySelector('.btn-save-quote, [onclick*="saveAndGetLink"]');
+        const saveBtn = /** @type {HTMLInputElement|null} */ (document.querySelector('.btn-save-quote, [onclick*="saveAndGetLink"]'));
         const originalText = saveBtn?.innerHTML;
         if (saveBtn) {
             saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
@@ -1214,7 +1211,7 @@ export const lifecycleMethods = {
             if (saveBtn) {
                 // eslint-disable-next-line no-unsanitized/property -- self-restore of markup captured from this element
                 saveBtn.innerHTML = originalText;
-                saveBtn.disabled = false;
+                /** @type {HTMLInputElement} */ (saveBtn).disabled = false;
             }
         }
     },
@@ -1309,7 +1306,7 @@ export const lifecycleMethods = {
         // the next pushed order silently attached to the wrong customer/design. (2026-06-01)
         ['customer-name', 'customer-email', 'company-name', 'customer-lookup',
          'customer-phone', 'project-name', 'customer-number', 'design-number'].forEach(id => {
-            const el = document.getElementById(id);
+            const el = /** @type {HTMLInputElement|null} */ (document.getElementById(id));
             if (el) el.value = '';
         });
         // Clear the uploaded-artwork widget + design autocomplete so the prior quote's
@@ -1320,14 +1317,14 @@ export const lifecycleMethods = {
         // Reset order & shipping fields
         ['order-number', 'po-number', 'req-ship-date', 'drop-dead-date',
          'ship-to-name', 'ship-address', 'ship-city', 'ship-zip', 'ship-method'].forEach(id => {
-            const el = document.getElementById(id);
+            const el = /** @type {HTMLInputElement|null} */ (document.getElementById(id));
             if (el) el.value = '';
         });
-        const stateSelect = document.getElementById('ship-state');
+        const stateSelect = /** @type {HTMLInputElement|null} */ (document.getElementById('ship-state'));
         if (stateSelect) stateSelect.value = 'WA';
 
         // Reset tax rate to default
-        const taxRateInput = document.getElementById('tax-rate-input');
+        const taxRateInput = /** @type {HTMLInputElement|null} */ (document.getElementById('tax-rate-input'));
         if (taxRateInput) taxRateInput.value = '10.2';
 
         // Collapse order details panel
@@ -1338,16 +1335,16 @@ export const lifecycleMethods = {
 
         // Reset additional charges
         ['rush-fee', 'discount-amount', 'discount-reason', 'graphic-design-hours'].forEach(id => {
-            const el = document.getElementById(id);
+            const el = /** @type {HTMLInputElement|null} */ (document.getElementById(id));
             if (el) el.value = '';
         });
 
         // Reset art charge toggle
-        const artToggle = document.getElementById('art-charge-toggle');
-        const artInput = document.getElementById('art-charge');
+        const artToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('art-charge-toggle'));
+        const artInput = /** @type {HTMLInputElement|null} */ (document.getElementById('art-charge'));
         const artWrapper = document.getElementById('art-charge-wrapper');
         if (artToggle) artToggle.checked = false;
-        if (artInput) { artInput.value = ''; artInput.disabled = true; }
+        if (artInput) { artInput.value = ''; /** @type {HTMLInputElement} */ (artInput).disabled = true; }
         if (artWrapper) artWrapper.style.opacity = '0.4';
 
         // Reset graphic design total display
@@ -1357,9 +1354,9 @@ export const lifecycleMethods = {
         // Reset shipping fee + discount type — the shipping fee bled into the next
         // quote's taxable total after "New Quote" (inflating the price); discount-type
         // kept a prior 'percent' mode. (2026-06-01)
-        const shipFeeInput = document.getElementById('dtf-shipping-fee');
+        const shipFeeInput = /** @type {HTMLInputElement|null} */ (document.getElementById('dtf-shipping-fee'));
         if (shipFeeInput) shipFeeInput.value = '0';
-        const discTypeSel = document.getElementById('discount-type');
+        const discTypeSel = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-type'));
         if (discTypeSel) discTypeSel.value = 'fixed';
     },
 
@@ -1394,7 +1391,7 @@ export const lifecycleMethods = {
         const feesTbody = document.getElementById('fees-tbody');
         if (feesTbody) {
             feesTbody.querySelectorAll('.fee-row').forEach(row => {
-                row.style.display = 'none';
+                /** @type {HTMLElement} */ (row).style.display = 'none';
             });
         }
 
@@ -1414,13 +1411,13 @@ export const lifecycleMethods = {
 
         // Reset location radios to None
         document.querySelectorAll('input[name="front-location"]').forEach(r => {
-            r.checked = (r.value === '');
+            /** @type {HTMLInputElement} */ (r).checked = (/** @type {HTMLInputElement} */ (r).value === '');
         });
         document.querySelectorAll('input[name="back-location"]').forEach(r => {
-            r.checked = (r.value === '');
+            /** @type {HTMLInputElement} */ (r).checked = (/** @type {HTMLInputElement} */ (r).value === '');
         });
         document.querySelectorAll('input[name="sleeve-location"]').forEach(cb => {
-            cb.checked = false;
+            /** @type {HTMLInputElement} */ (cb).checked = false;
         });
         this.updateLocationSummary();
 
@@ -1433,7 +1430,7 @@ export const lifecycleMethods = {
         // eslint-disable-next-line no-restricted-syntax -- pre-existing window contract (verbatim mixin move, Batch 4.2)
         window.childRowMap = {};
         this._loadedNotesMeta = null;
-        const dtfNotesEl = document.getElementById('dtf-notes');
+        const dtfNotesEl = /** @type {HTMLInputElement|null} */ (document.getElementById('dtf-notes'));
         if (dtfNotesEl) dtfNotesEl.value = '';
         const pushBtnReset = document.getElementById('dtf-push-shopworks-btn');
         if (pushBtnReset) pushBtnReset.style.display = 'none';
@@ -1472,9 +1469,9 @@ export const lifecycleMethods = {
         }
 
         // eslint-disable-next-line no-restricted-syntax -- pre-existing window contract (verbatim mixin move, Batch 4.2)
-        window._taxExempt = false; window._isWholesale = false; { const _wcb = document.getElementById('wholesale-checkbox'); if (_wcb) _wcb.checked = false; const _it = document.getElementById('include-tax'); if (_it) _it.checked = true; }  // [2026-06-08] P0: clear tax-exempt/wholesale flags, uncheck box, RE-CHECK include-tax on New Quote (else next quote bills $0 tax)
+        window._taxExempt = false; window._isWholesale = false; { const _wcb = /** @type {HTMLInputElement|null} */ (document.getElementById('wholesale-checkbox')); if (_wcb) _wcb.checked = false; const _it = document.getElementById('include-tax'); if (_it) /** @type {HTMLInputElement} */ (_it).checked = true; }  // [2026-06-08] P0: clear tax-exempt/wholesale flags, uncheck box, RE-CHECK include-tax on New Quote (else next quote bills $0 tax)
         // eslint-disable-next-line no-restricted-syntax -- pre-existing window contract (verbatim mixin move, Batch 4.2)
-        { const _r = document.getElementById('ship-residential'); if (_r) _r.checked = false; const _er = document.getElementById('estimate-ship-result'); if (_er) _er.innerHTML = ''; window._lastShipEstimate = null; }  // [2026-06-08] clear estimator state on New Quote (residential flag + result text + last estimate shouldn't bleed)
+        { const _r = /** @type {HTMLInputElement|null} */ (document.getElementById('ship-residential')); if (_r) _r.checked = false; const _er = document.getElementById('estimate-ship-result'); if (_er) _er.innerHTML = ''; window._lastShipEstimate = null; }  // [2026-06-08] clear estimator state on New Quote (residential flag + result text + last estimate shouldn't bleed)
         // [2026-06-11] repaint totals — the zero-qty branch blanks subtotal/grand
         // (they previously kept the old quote's numbers until the next interaction)
         this.updatePricing();

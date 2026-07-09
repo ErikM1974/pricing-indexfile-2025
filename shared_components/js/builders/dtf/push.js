@@ -4,7 +4,6 @@
  * against THIS file), review/confirm preview, button state. Moved verbatim.
  * Push state (_dtfPushQuoteId/_dtfPushInFlight) lives on dtfState since D2.
  */
-// @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions; typing lands with the render/state split).
 /* global openAccessibleModal, closeAccessibleModal, dtfQuoteBuilder, escapeHtml, showToast, renderBuilderPushReadiness, confirm */
 import { dtfState } from './state.js';
 
@@ -61,12 +60,12 @@ function _dtfEsc(s) {
 // is created. If the modal or preview can't load, falls back to a direct
 // confirm()-push so the rep is never blocked.
 export async function openDtfPushPreview() {
-    const btn = document.getElementById('dtf-push-shopworks-btn');
+    const btn = /** @type {HTMLInputElement|null} */ (document.getElementById('dtf-push-shopworks-btn'));
     if (!btn || btn.disabled || !dtfState._dtfPushQuoteId) return;
     // Warn before pushing with no ShopWorks Customer # — the order would silently
     // attach to placeholder customer 3739 instead of the real customer. EMB gates its
     // button on this; SCP/DTF warn at push time for parity. (2026-06-01)
-    const _dtfCust = document.getElementById('customer-number')?.value?.trim();
+    const _dtfCust = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-number'))?.value?.trim();
     if (!_dtfCust && !confirm('No ShopWorks Customer # is set.\n\nThis order will attach to the placeholder customer (3739) instead of the real customer. Continue anyway?')) {
         return;
     }
@@ -74,7 +73,7 @@ export async function openDtfPushPreview() {
     const modal = document.getElementById('dtf-push-modal');
     const statusEl = document.getElementById('dtf-push-status');
     const previewEl = document.getElementById('dtf-push-preview');
-    const confirmBtn = document.getElementById('dtf-push-confirm');
+    const confirmBtn = /** @type {HTMLInputElement|null} */ (document.getElementById('dtf-push-confirm'));
     if (!modal || !previewEl || !confirmBtn) {
         return confirmDtfPush(true); // modal markup missing → legacy direct push
     }
@@ -94,14 +93,14 @@ export async function openDtfPushPreview() {
         const data = await resp.json();
         if (!resp.ok) throw new Error(data.error || data.details || `HTTP ${resp.status}`);
         renderDtfPushPreview(data.orderJson || {});
-        confirmBtn.disabled = false;
+        /** @type {HTMLInputElement} */ (confirmBtn).disabled = false;
         confirmBtn.style.opacity = '1';
     } catch (err) {
         console.error('[DTF Push] Preview error:', err);
         previewEl.innerHTML = '<div class="qb-err-16">' +
             '<i class="fas fa-exclamation-triangle"></i> Could not load preview: ' + _dtfEsc(err.message) +
             '<br><span class="qb-muted">You can still push below.</span></div>';
-        confirmBtn.disabled = false;
+        /** @type {HTMLInputElement} */ (confirmBtn).disabled = false;
         confirmBtn.style.opacity = '1';
     }
 }
@@ -155,15 +154,15 @@ export function renderDtfPushPreview(o) {
 // Perform the actual push (POST /push-quote). directFallback=true is the legacy
 // path used when the modal couldn't open.
 export async function confirmDtfPush(directFallback) {
-    const mainBtn = document.getElementById('dtf-push-shopworks-btn');
+    const mainBtn = /** @type {HTMLInputElement|null} */ (document.getElementById('dtf-push-shopworks-btn'));
     const mainLabel = document.getElementById('dtf-push-shopworks-label');
-    const confirmBtn = document.getElementById('dtf-push-confirm');
+    const confirmBtn = /** @type {HTMLInputElement|null} */ (document.getElementById('dtf-push-confirm'));
     const statusEl = document.getElementById('dtf-push-status');
     if (!dtfState._dtfPushQuoteId) return;
 
     if (directFallback) {
-        const customerName = document.getElementById('customer-name')?.value?.trim() || '';
-        const companyName = document.getElementById('company-name')?.value?.trim() || '';
+        const customerName = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-name'))?.value?.trim() || '';
+        const companyName = /** @type {HTMLInputElement|null} */ (document.getElementById('company-name'))?.value?.trim() || '';
         const displayName = companyName || customerName || 'N/A';
         if (!confirm(
             `Push to ShopWorks?\n\nQuote: ${dtfState._dtfPushQuoteId}\nCustomer: ${displayName}\n\n` +
@@ -205,7 +204,7 @@ export async function confirmDtfPush(directFallback) {
 
         // Success
         if (mainLabel) mainLabel.textContent = `Pushed ✓ (${data.extOrderId})`;
-        if (mainBtn) { mainBtn.style.background = '#28a745'; mainBtn.disabled = true; mainBtn.dataset.pushed = '1'; }
+        if (mainBtn) { mainBtn.style.background = '#28a745'; /** @type {HTMLInputElement} */ (mainBtn).disabled = true; mainBtn.dataset.pushed = '1'; }
         notifyToast(`Pushed to ShopWorks as ${data.extOrderId}`, 'success');
         console.log('[DTF Push] Success:', data);
         closeDtfPushPreview();
@@ -213,8 +212,8 @@ export async function confirmDtfPush(directFallback) {
     } catch (error) {
         console.error('[DTF Push] Push error:', error);
         if (statusEl) statusEl.innerHTML = '<div class="qb-err-8">Push failed: ' + _dtfEsc(error.message) + '</div>';
-        if (confirmBtn) { confirmBtn.disabled = false; confirmBtn.style.opacity = '1'; confirmBtn.innerHTML = '<i class="fas fa-upload"></i> Push to ShopWorks'; }
-        if (mainBtn) { mainBtn.disabled = false; mainBtn.style.opacity = '1'; }
+        if (confirmBtn) { /** @type {HTMLInputElement} */ (confirmBtn).disabled = false; confirmBtn.style.opacity = '1'; confirmBtn.innerHTML = '<i class="fas fa-upload"></i> Push to ShopWorks'; }
+        if (mainBtn) { /** @type {HTMLInputElement} */ (mainBtn).disabled = false; mainBtn.style.opacity = '1'; }
         if (mainLabel) mainLabel.textContent = 'Push to ShopWorks';
         notifyToast(`Push failed: ${error.message}`, 'error');
     }

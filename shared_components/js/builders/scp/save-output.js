@@ -4,7 +4,6 @@
  * line math against THIS file), saveAndGetLink/saveQuote, email + clipboard
  * quote text. Moved verbatim.
  */
-// @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions; typing lands with the render/state split).
 /* global collectProductsFromTable, recalculatePricing, updateTaxCalculation,
    getScpExtraFees, updateEditModeUI, markAsSaved, assertQuoteEditable,
    showScpPushButton, updateScpPushButtonState, escapeHtml, showToast,
@@ -53,11 +52,11 @@ export async function printQuote() {
         // it was only true on the other builders.
         const _osd = (typeof getOrderShippingData === 'function') ? getOrderShippingData('spc-order-fields') : {};
         const customerData = {
-            name: document.getElementById('customer-name')?.value || 'Customer',
-            company: document.getElementById('company-name')?.value || '',
-            email: document.getElementById('customer-email')?.value || '',
-            phone: document.getElementById('customer-phone')?.value?.trim() || _osd.phone || '',
-            project: document.getElementById('project-name')?.value?.trim() || '',
+            name: /** @type {HTMLInputElement|null} */ (document.getElementById('customer-name'))?.value || 'Customer',
+            company: /** @type {HTMLInputElement|null} */ (document.getElementById('company-name'))?.value || '',
+            email: /** @type {HTMLInputElement|null} */ (document.getElementById('customer-email'))?.value || '',
+            phone: /** @type {HTMLInputElement|null} */ (document.getElementById('customer-phone'))?.value?.trim() || _osd.phone || '',
+            project: /** @type {HTMLInputElement|null} */ (document.getElementById('project-name'))?.value?.trim() || '',
             poNumber: _osd.poNumber || '',
             orderNumber: _osd.orderNumber || '',
             reqShipDate: _osd.reqShipDate || '',
@@ -65,7 +64,7 @@ export async function printQuote() {
             shipping: (_osd.shipAddress || _osd.shipZip)
                 ? { address: _osd.shipAddress, city: _osd.shipCity, state: _osd.shipState, zip: _osd.shipZip, method: _osd.shipMethod }
                 : null,
-            salesRepEmail: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com'
+            salesRepEmail: /** @type {HTMLInputElement|null} */ (document.getElementById('sales-rep'))?.value || 'sales@nwcustomapparel.com'
         };
 
         const invoiceHTML = invoiceGenerator.generateInvoiceHTML(pricingData, customerData);
@@ -103,7 +102,7 @@ function _buildScpInvoiceProduct(product) {
     const parentRow = document.querySelector(
         `tr[data-style="${product.style}"][data-catalog-color="${product.catalogColor}"]:not(.child-row)`
     );
-    const rowId = parentRow?.dataset?.rowId;
+    const rowId = /** @type {HTMLElement|null} */ (parentRow)?.dataset?.rowId;
 
     // Read base price from parent row's price cell (displayed as $25.99)
     const basePriceCell = document.getElementById(`row-price-${rowId}`);
@@ -225,23 +224,23 @@ function buildScreenprintPricingData(products) {
         : 0;
 
     // Get art charge and graphic design from UI
-    const artChargeToggle = document.getElementById('art-charge-toggle');
-    const artCharge = artChargeToggle?.checked ? parseFloat(document.getElementById('art-charge')?.value || 0) : 0;
-    const graphicDesignHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
+    const artChargeToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('art-charge-toggle'));
+    const artCharge = artChargeToggle?.checked ? parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('art-charge'))?.value || /** @type {any} */ (0)) : 0;
+    const graphicDesignHours = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('graphic-design-hours'))?.value || /** @type {any} */ (0));
     const graphicDesignCharge = graphicDesignHours * getServicePrice('GRT-75', 75);
 
     // Get rush fee and discount from UI
-    const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
+    const rushFee = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('rush-fee'))?.value || /** @type {any} */ (0));
     // Vellum + Color Change setup parts (Erik's official list, 2026-06-27). Read
     // inline (like art/rush above) rather than via getScpExtraFees() so this PDF
     // function (+ _buildScpInvoiceProduct) stays self-contained for the brace-extracted unit test harness.
-    const vellumQtyPdf = Math.max(0, parseInt(document.getElementById('vellum-qty')?.value || 0, 10) || 0);
+    const vellumQtyPdf = Math.max(0, parseInt(/** @type {HTMLInputElement|null} */ (document.getElementById('vellum-qty'))?.value || /** @type {any} */ (0), 10) || /** @type {any} */ (0));
     const vellumFeePdf = vellumQtyPdf * getServicePrice('Vellum', 10);
-    const colorChangeQtyPdf = Math.max(0, parseInt(document.getElementById('color-change-qty')?.value || 0, 10) || 0);
+    const colorChangeQtyPdf = Math.max(0, parseInt(/** @type {HTMLInputElement|null} */ (document.getElementById('color-change-qty'))?.value || /** @type {any} */ (0), 10) || /** @type {any} */ (0));
     const colorChangeFeePdf = colorChangeQtyPdf * getServicePrice('Color Chg', 15);
-    const discountAmount = parseFloat(document.getElementById('discount-amount')?.value || 0);
-    const discountType = document.getElementById('discount-type')?.value || 'fixed';
-    const discountReason = document.getElementById('discount-reason')?.value || '';
+    const discountAmount = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('discount-amount'))?.value || /** @type {any} */ (0));
+    const discountType = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-type'))?.value || 'fixed';
+    const discountReason = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-reason'))?.value || '';
     let discount = discountAmount;
     if (discountType === 'percent' && discountAmount > 0) {
         discount = subtotal * (discountAmount / 100);
@@ -250,7 +249,7 @@ function buildScreenprintPricingData(products) {
     // Read tax + LTM state here (was post-overridden in printQuote pre-3.1.0).
     // '10.2' fallback preserves pre-3.1 behavior: an empty input previously fell
     // through to the generator's hardcoded WA standard rate.
-    const taxRateRaw = document.getElementById('tax-rate-input')?.value || '10.2';
+    const taxRateRaw = /** @type {HTMLInputElement|null} */ (document.getElementById('tax-rate-input'))?.value || '10.2';
     const ltmState = getLtmControlState('spc-ltm-panel');
     const ltmDistributed = (ltmState.displayMode === 'builtin');
 
@@ -268,10 +267,10 @@ function buildScreenprintPricingData(products) {
         // + shipping − discount) drives the PDF tax + GRAND TOTAL so the printed
         // total matches the on-screen #grand-total-with-tax.
         preTaxSubtotal: isNaN(preTaxVal) ? undefined : preTaxVal,
-        includeTax: document.getElementById('include-tax') ? !!document.getElementById('include-tax').checked : true,
+        includeTax: document.getElementById('include-tax') ? !!/** @type {HTMLInputElement} */ (document.getElementById('include-tax')).checked : true,
         taxRate: taxRateRaw,
         // Itemized on the PDF so the rows foot to the total (already inside preTaxSubtotal).
-        shippingFee: parseFloat(document.querySelector('#spc-order-fields .os-shipping-fee')?.value) || 0,
+        shippingFee: parseFloat(/** @type {HTMLInputElement|null} */ (document.querySelector('#spc-order-fields .os-shipping-fee'))?.value) || 0,
         setupFees: currentPricing.setupFees || scpState.printConfig.setupFee || 0,
         additionalServicesTotal: 0,
         // Empty logos means embroidery specs section will be skipped
@@ -322,18 +321,18 @@ function getLocationName(code) {
 // moved VERBATIM out of saveAndGetLink.
 function _collectScpSaveExtras(pricing) {
     // Get additional charges for saving (2026 fee refactor)
-    const artChargeToggle = document.getElementById('art-charge-toggle');
-    const artCharge = artChargeToggle?.checked ? parseFloat(document.getElementById('art-charge')?.value || 0) : 0;
-    const graphicDesignHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
+    const artChargeToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('art-charge-toggle'));
+    const artCharge = artChargeToggle?.checked ? parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('art-charge'))?.value || /** @type {any} */ (0)) : 0;
+    const graphicDesignHours = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('graphic-design-hours'))?.value || /** @type {any} */ (0));
     const graphicDesignCharge = graphicDesignHours * getServicePrice('GRT-75', 75);
-    const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
+    const rushFee = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('rush-fee'))?.value || /** @type {any} */ (0));
     // Vellum + Color Change + Reorder — Erik's official setup parts (2026-06-27).
     // Same getScpExtraFees() source the on-screen math + fee table use, so the
     // saved/pushed total matches what the rep sees (parity rule).
     const _xf = getScpExtraFees();
-    const discountAmount = parseFloat(document.getElementById('discount-amount')?.value || 0);
-    const discountType = document.getElementById('discount-type')?.value || 'fixed';
-    const discountReason = document.getElementById('discount-reason')?.value || '';
+    const discountAmount = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('discount-amount'))?.value || /** @type {any} */ (0));
+    const discountType = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-type'))?.value || 'fixed';
+    const discountReason = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-reason'))?.value || '';
     // Calculate discountable subtotal for percentage discount (products + additional services + setup fees)
     const discountableSubtotal = (pricing.subtotal || 0) + artCharge + graphicDesignCharge + rushFee + (scpState.printConfig.setupFee || 0) + (pricing.ltmFee || 0)
         + _xf.vellumFee + _xf.colorChangeFee;
@@ -352,7 +351,7 @@ function _collectScpSaveExtras(pricing) {
         : '';
 
     // Phase 11.1 — include design # if rep picked one from the combobox
-    const designNumber = document.getElementById('design-number')?.value?.trim() || '';
+    const designNumber = /** @type {HTMLInputElement|null} */ (document.getElementById('design-number'))?.value?.trim() || '';
     return { artCharge, graphicDesignHours, graphicDesignCharge, rushFee, _xf,
         discount, discountPercent, discountReason, referenceArtwork, newDesignName, designNumber };
 }
@@ -368,11 +367,11 @@ function _buildScpQuoteData(ctx) {
     const quoteData = {
         customerName: customerName,
         customerEmail: customerEmail,
-        companyName: document.getElementById('company-name')?.value?.trim() || '',
+        companyName: /** @type {HTMLInputElement|null} */ (document.getElementById('company-name'))?.value?.trim() || '',
         // ShopWorks customer # — attaches the pushed order to the real customer
         // (else the proxy falls back to the no-customer catch-all 3739).
-        customerNumber: document.getElementById('customer-number')?.value?.trim() || '',
-        salesRep: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com',
+        customerNumber: /** @type {HTMLInputElement|null} */ (document.getElementById('customer-number'))?.value?.trim() || '',
+        salesRep: /** @type {HTMLInputElement|null} */ (document.getElementById('sales-rep'))?.value || 'sales@nwcustomapparel.com',
         referenceArtwork, // → SCP quote-service writes to quote_sessions.Notes JSON
         newDesignName,    // → Notes.newDesignName; proxy reads this for Designs[0].name
         designNumber,     // → SCP quote-service writes to quote_sessions.Notes.designNumber
@@ -420,7 +419,7 @@ function _buildScpQuoteData(ctx) {
         // LTM display preferences (2026-03-22)
         ltmDisplayMode: getLtmControlState('spc-ltm-panel').displayMode || 'builtin',
         ltmWaived: !getLtmControlState('spc-ltm-panel').enabled,
-        isWholesale: document.getElementById('wholesale-checkbox')?.checked || false,  // [2026-06-08] → IsWholesale; push routes to GL 2203
+        isWholesale: /** @type {HTMLInputElement|null} */ (document.getElementById('wholesale-checkbox'))?.checked || false,  // [2026-06-08] → IsWholesale; push routes to GL 2203
         // [2026-06-08] P0 (review woaaypuz4): the SCP save quoteData NEVER passed taxRate (getOrderShippingData omits it),
         // so the service fell back to 10.1% → every out-of-state / exempt / non-10.1 SCP quote saved TaxRate=10.1 and the
         // /quote + /invoice mirror billed full WA tax. Pass it explicitly (mirror DTF). Erik's #1 rule.
@@ -428,9 +427,9 @@ function _buildScpQuoteData(ctx) {
         // on screen (updateTaxCalculation L3559) + on the PDF (buildScreenprintPricingData includeTax), but save used to
         // pass the raw rate input (still 10.1, since only wholesale/CRM-exempt zero it) → the saved/mirrored/pushed quote
         // billed full WA tax while the rep saw $0 = silent wrong price (Erik's #1 rule). Unchecked → save TaxRate 0.
-        taxRate: (document.getElementById('include-tax') && !document.getElementById('include-tax').checked)
+        taxRate: (document.getElementById('include-tax') && !/** @type {HTMLInputElement} */ (document.getElementById('include-tax')).checked)
             ? 0
-            : parseFloat(document.getElementById('tax-rate-input')?.value || '10.2'),
+            : parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('tax-rate-input'))?.value || '10.2'),
         // Order & shipping fields (2026-03-22)
         ...getOrderShippingData('spc-order-fields')
     };
@@ -445,8 +444,8 @@ export async function saveAndGetLink(opts = {}) {
     }
 
     // Validate required fields
-    const customerName = document.getElementById('customer-name')?.value?.trim();
-    const customerEmail = document.getElementById('customer-email')?.value?.trim();
+    const customerName = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-name'))?.value?.trim();
+    const customerEmail = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-email'))?.value?.trim();
 
     if (!customerName || !customerEmail) {
         showToast('Please enter customer name and email', 'error');
@@ -465,7 +464,7 @@ export async function saveAndGetLink(opts = {}) {
     }
 
     // Get save button for loading state
-    const saveBtn = document.querySelector('.btn-save-quote, [onclick*="saveAndGetLink"]');
+    const saveBtn = /** @type {HTMLInputElement|null} */ (document.querySelector('.btn-save-quote, [onclick*="saveAndGetLink"]'));
     const originalText = saveBtn?.innerHTML;
     if (saveBtn) {
         saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
@@ -565,7 +564,7 @@ export async function saveAndGetLink(opts = {}) {
         if (saveBtn) {
             // eslint-disable-next-line no-unsanitized/property -- self-restore of markup captured from this element
             saveBtn.innerHTML = originalText;
-            saveBtn.disabled = false;
+            /** @type {HTMLInputElement} */ (saveBtn).disabled = false;
         }
     }
 }
@@ -590,9 +589,9 @@ export async function spcEmailQuote() {
     }
     await emailQuote({
         quoteId,
-        customerEmail: document.getElementById('customer-email')?.value?.trim(),
-        customerName: document.getElementById('customer-name')?.value?.trim(),
-        salesRepEmail: document.getElementById('sales-rep')?.value
+        customerEmail: /** @type {HTMLInputElement|null} */ (document.getElementById('customer-email'))?.value?.trim(),
+        customerName: /** @type {HTMLInputElement|null} */ (document.getElementById('customer-name'))?.value?.trim(),
+        salesRepEmail: /** @type {HTMLInputElement|null} */ (document.getElementById('sales-rep'))?.value
     });
 }
 
@@ -629,8 +628,8 @@ function generateQuoteText(products, pricing) {
         'NORTHWEST CUSTOM APPAREL - SCREEN PRINT QUOTE',
         '================================================',
         `Date: ${new Date().toLocaleDateString()}`,
-        `Customer: ${document.getElementById('customer-name')?.value || 'N/A'}`,
-        `Company: ${document.getElementById('company-name')?.value || 'N/A'}`,
+        `Customer: ${/** @type {HTMLInputElement|null} */ (document.getElementById('customer-name'))?.value || 'N/A'}`,
+        `Company: ${/** @type {HTMLInputElement|null} */ (document.getElementById('company-name'))?.value || 'N/A'}`,
     ];
 
     // Print Configuration
@@ -687,18 +686,18 @@ function generateQuoteText(products, pricing) {
     // Itemize the SAME fee set the on-screen footer / PDF / saved total charge
     // (were all omitted here → copied TOTAL disagreed with the invoice). Read the
     // fees from the same UI inputs buildScreenprintPricingData() uses. (2026-07-04)
-    const _artCharge = document.getElementById('art-charge-toggle')?.checked
-        ? (parseFloat(document.getElementById('art-charge')?.value || 0) || 0) : 0;
+    const _artCharge = /** @type {HTMLInputElement|null} */ (document.getElementById('art-charge-toggle'))?.checked
+        ? (parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('art-charge'))?.value || /** @type {any} */ (0)) || 0) : 0;
     if (_artCharge > 0) lines.push(`Logo Mockup & Review: $${_artCharge.toFixed(2)}`);
-    const _designHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0) || 0;
+    const _designHours = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('graphic-design-hours'))?.value || /** @type {any} */ (0)) || 0;
     const _designFee = _designHours * getServicePrice('GRT-75', 75);
     if (_designFee > 0) lines.push(`Graphic Design (${_designHours} hr): $${_designFee.toFixed(2)}`);
-    const _rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0) || 0;
+    const _rushFee = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('rush-fee'))?.value || /** @type {any} */ (0)) || 0;
     if (_rushFee > 0) lines.push(`Rush Fee: $${_rushFee.toFixed(2)}`);
     const _xfCopy = getScpExtraFees();
     if (_xfCopy.vellumFee > 0) lines.push(`Vellum Print (${_xfCopy.vellumQty}): $${_xfCopy.vellumFee.toFixed(2)}`);
     if (_xfCopy.colorChangeFee > 0) lines.push(`Color Change (${_xfCopy.colorChangeQty}): $${_xfCopy.colorChangeFee.toFixed(2)}`);
-    const _shipFee = parseFloat(document.querySelector('#spc-order-fields .os-shipping-fee')?.value) || 0;
+    const _shipFee = parseFloat(/** @type {HTMLInputElement|null} */ (document.querySelector('#spc-order-fields .os-shipping-fee'))?.value) || 0;
     if (_shipFee > 0) lines.push(`Shipping: $${_shipFee.toFixed(2)}`);
     // Discount row (mirrors the on-screen #discount-total after % is resolved).
     const _discTotalText = document.getElementById('discount-total')?.textContent || '';

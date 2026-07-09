@@ -7,7 +7,6 @@
  * the common parts (services-bar shape, customer-panel wiring, the
  * ?edit/?duplicate/prefill routing skeleton) graduate into the base.
  */
-// @ts-nocheck — MOVED legacy init code (pre-existing checkJs frictions).
 /* global ArtworkUpload, StaffAuthHelper, CustomerLookupService,
    EmbroideryPricingCalculator, EmbroideryQuoteService, initLogoStatusChips,
    initMethodSwitchMenu, checkForEditMode, getQuickQuotePrefill,
@@ -120,7 +119,7 @@ export class EmbAdapter {
     _setupPushButtonGate() {
         // Gated "Push to ShopWorks" button: re-evaluate when the Customer # changes,
         // and set its initial (disabled) state for a fresh quote.
-        const _custNumEl = document.getElementById('customer-number');
+        const _custNumEl = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-number'));
         if (_custNumEl) _custNumEl.addEventListener('input', updatePushButtonState);
         // [A5] (audit 2026-06-06): on change, verify the typed Customer # against CRM and show the resolved
         // company (or warn) — catches a transposed-but-valid # before it silently pushes to a wrong account.
@@ -132,7 +131,7 @@ export class EmbAdapter {
             if (!id) { noteEl.textContent = ''; noteEl.hidden = true; return; }
             if (!window.customerLookupInstance) return;
             const contact = await window.customerLookupInstance.getByCustomerId(id);
-            if ((_custNumEl.value || '').trim() !== id) return;   // value changed mid-await — ignore stale result
+            if ((/** @type {HTMLInputElement} */ (_custNumEl).value || '').trim() !== id) return;   // value changed mid-await — ignore stale result
             if (contact && contact.CustomerCompanyName) {
                 noteEl.textContent = '✓ ' + contact.CustomerCompanyName;
                 noteEl.style.cssText = 'font-size:11px;color:#166534;font-weight:600;display:block;margin-top:2px;';
@@ -157,13 +156,13 @@ export class EmbAdapter {
             window.customerLookupInstance = customerLookup;  // Store for ShopWorks import
 
             const applyContact = (contact) => {
-                document.getElementById('customer-name').value = contact.ct_NameFull || '';
-                document.getElementById('customer-email').value = contact.ContactNumbersEmail || '';
-                document.getElementById('company-name').value = contact.CustomerCompanyName || '';
+                /** @type {HTMLInputElement} */ (document.getElementById('customer-name')).value = contact.ct_NameFull || '';
+                /** @type {HTMLInputElement} */ (document.getElementById('customer-email')).value = contact.ContactNumbersEmail || '';
+                /** @type {HTMLInputElement} */ (document.getElementById('company-name')).value = contact.CustomerCompanyName || '';
                 // Fill customer number (ShopWorks ID)
-                document.getElementById('customer-number').value = contact.id_Customer || '';
+                /** @type {HTMLInputElement} */ (document.getElementById('customer-number')).value = contact.id_Customer || '';
                 // Phone — API may not return phone, clear if empty
-                const phoneInput = document.getElementById('customer-phone');
+                const phoneInput = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-phone'));
                 if (phoneInput) phoneInput.value = contact.Phone || '';
                 // Auto-fill Ship To from contact address. STASH it always so that if
                 // the rep later flips Pickup → Ship it, setShipMode() restores it.
@@ -175,7 +174,7 @@ export class EmbAdapter {
                     state: contact.State || '',
                     zip: contact.Zip || ''
                 };
-                const _isPickup = (document.getElementById('ship-method')?.value === 'Customer Pickup');
+                const _isPickup = (/** @type {HTMLInputElement|null} */ (document.getElementById('ship-method'))?.value === 'Customer Pickup');
                 // P1-2 (audit 2026-06-06): a tax-exempt customer must NOT be charged WA sales tax — the CRM
                 // chip is cosmetic. Clear the tax here (uncheck include-tax + zero the rate) and DO NOT run the
                 // DOR lookup (its async result would overwrite the 0 — same race as the P0 pickup bug). #1 rule.
@@ -186,18 +185,18 @@ export class EmbAdapter {
                 // a later Pickup→Ship toggle re-applying WA tax to an exempt customer. #1 rule.
                 window._taxExempt = _taxExempt;
                 if (!_isPickup) {
-                    if (contact.State) { const el = document.getElementById('ship-state'); if (el) el.value = contact.State; }
-                    if (contact.City) { const el = document.getElementById('ship-city'); if (el) el.value = contact.City; }
-                    if (contact.Address) { const el = document.getElementById('ship-address'); if (el) el.value = contact.Address; }
+                    if (contact.State) { const el = /** @type {HTMLInputElement|null} */ (document.getElementById('ship-state')); if (el) el.value = contact.State; }
+                    if (contact.City) { const el = /** @type {HTMLInputElement|null} */ (document.getElementById('ship-city')); if (el) el.value = contact.City; }
+                    if (contact.Address) { const el = /** @type {HTMLInputElement|null} */ (document.getElementById('ship-address')); if (el) el.value = contact.Address; }
                     if (contact.Zip) {
-                        const zipInput = document.getElementById('ship-zip');
+                        const zipInput = /** @type {HTMLInputElement|null} */ (document.getElementById('ship-zip'));
                         if (zipInput) { zipInput.value = contact.Zip; if (!_taxExempt) lookupTaxRate(); }
                     }
                 }
                 if (_taxExempt) {
-                    const incTax = document.getElementById('include-tax');
+                    const incTax = /** @type {HTMLInputElement|null} */ (document.getElementById('include-tax'));
                     if (incTax) incTax.checked = false;
-                    const rateInput = document.getElementById('tax-rate-input');
+                    const rateInput = /** @type {HTMLInputElement|null} */ (document.getElementById('tax-rate-input'));
                     if (rateInput) rateInput.value = '0';
                     if (typeof updateTaxCalculation === 'function') updateTaxCalculation();
                 }
@@ -235,11 +234,11 @@ export class EmbAdapter {
             customerLookup.bindToInput('customer-lookup', {
                 onSelect: applyContact,
                 onClear: () => {
-                    document.getElementById('customer-name').value = '';
-                    document.getElementById('customer-email').value = '';
-                    document.getElementById('company-name').value = '';
-                    document.getElementById('customer-number').value = '';
-                    const phoneInput = document.getElementById('customer-phone');
+                    /** @type {HTMLInputElement} */ (document.getElementById('customer-name')).value = '';
+                    /** @type {HTMLInputElement} */ (document.getElementById('customer-email')).value = '';
+                    /** @type {HTMLInputElement} */ (document.getElementById('company-name')).value = '';
+                    /** @type {HTMLInputElement} */ (document.getElementById('customer-number')).value = '';
+                    const phoneInput = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-phone'));
                     if (phoneInput) phoneInput.value = '';
                     invalidateDesignGalleryCache(); // Invalidate gallery cache on customer clear
                     clearCustomerContextBanners();  // P2-8: don't bleed the prior customer's CRM banners
@@ -250,7 +249,7 @@ export class EmbAdapter {
             // Erik 2026-05-26: COMPANY field also triggers autocomplete (DTG parity).
             customerLookup.bindToInput('company-name', {
                 onSelect: (contact) => {
-                    const lookupInput = document.getElementById('customer-lookup');
+                    const lookupInput = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-lookup'));
                     if (lookupInput) lookupInput.value = contact.CustomerCompanyName || '';
                     applyContact(contact);
                 }
@@ -406,15 +405,15 @@ export class EmbAdapter {
                     designFocusId: 'garment-design-number',
                     notesSel: '#notes',
                     assumption: () => {
-                        const tierSel = document.getElementById('primary-stitches');
-                        const tierText = tierSel ? (tierSel.options[tierSel.selectedIndex]?.text || 'Standard (≤10K)') : 'Standard (≤10K)';
-                        const pos = document.getElementById('primary-position')?.value || 'Left Chest';
+                        const tierSel = /** @type {HTMLSelectElement|null} */ (document.getElementById('primary-stitches'));
+                        const tierText = tierSel ? (tierSel.options[/** @type {HTMLSelectElement} */ (tierSel).selectedIndex]?.text || 'Standard (≤10K)') : 'Standard (≤10K)';
+                        const pos = /** @type {HTMLInputElement|null} */ (document.getElementById('primary-position'))?.value || 'Left Chest';
                         return `Pricing assumes a ${tierText} embroidered logo at ${pos}. Final pricing is confirmed after artwork review; a new logo adds a one-time new-logo setup fee.`;
                     },
                     onNew: () => {
-                        const cb = document.getElementById('primary-digitizing');
+                        const cb = /** @type {HTMLInputElement|null} */ (document.getElementById('primary-digitizing'));
                         if (cb && !cb.checked) {
-                            cb.checked = true;
+                            /** @type {HTMLInputElement} */ (cb).checked = true;
                             cb.closest('.digitizing-checkbox')?.classList.add('checked');
                             if (typeof embState.primaryLogo !== 'undefined' && embState.primaryLogo) embState.primaryLogo.needsDigitizing = true;
                             showToast('New logo — added the one-time new-logo setup. Uncheck it if we\'ve stitched this logo before.', 'info', 6000);

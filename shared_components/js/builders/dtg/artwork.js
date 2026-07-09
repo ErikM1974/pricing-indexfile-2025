@@ -2,7 +2,6 @@
  * DTG inline form — artwork module (Batch 5, 2026-07-09). Moved VERBATIM from the
  * dtg-inline-form.js IIFE; lexical references became the imports below.
  */
-// @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions).
 /* global FormData, XMLHttpRequest,
    */
 import { updateSubmitEnabled } from './form-core.js';
@@ -110,7 +109,7 @@ export function renderNewArtworkList() {
     // Wire per-card handlers (event delegation would also work)
     list.querySelectorAll('.dcp-newart-remove').forEach(btn => {
         btn.addEventListener('click', () => {
-            const idx = Number(btn.dataset.fileIdx);
+            const idx = Number(/** @type {HTMLElement} */ (btn).dataset.fileIdx);
             state.newArtwork.files.splice(idx, 1);
             renderNewArtworkList();
             updateNewArtworkVisibility();
@@ -121,9 +120,9 @@ export function renderNewArtworkList() {
     });
     list.querySelectorAll('.dcp-newart-placement-select').forEach(sel => {
         sel.addEventListener('change', () => {
-            const idx = Number(sel.dataset.fileIdx);
+            const idx = Number(/** @type {HTMLElement} */ (sel).dataset.fileIdx);
             if (state.newArtwork.files[idx]) {
-                state.newArtwork.files[idx].placement = sel.value;
+                state.newArtwork.files[idx].placement = /** @type {HTMLInputElement} */ (sel).value;
                 markDirty();
                 scheduleStateSave();
             }
@@ -204,8 +203,8 @@ export function updateNewArtworkVisibility() {
 
 export function attachNewArtworkUpload() {
     const dropzone = document.getElementById('dtgNewArtworkDropzone');
-    const input = document.getElementById('dtgNewArtworkInput');
-    const nameInput = document.getElementById('dtgNewArtworkName');
+    const input = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgNewArtworkInput'));
+    const nameInput = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgNewArtworkName'));
     if (!dropzone || !input || !nameInput) return;
 
     // Design name input — bind to state
@@ -227,7 +226,7 @@ export function attachNewArtworkUpload() {
 
     // File input change
     input.addEventListener('change', (e) => {
-        handleArtworkFiles(e.target.files);
+        handleArtworkFiles(/** @type {HTMLInputElement} */ (e.target).files);
         input.value = ''; // Reset so same file can be re-uploaded after removal
     });
 

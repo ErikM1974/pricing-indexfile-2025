@@ -3,7 +3,6 @@
  * Batch 4.2 (2026-07-09): methods moved VERBATIM from quote-builder-class.js
  * (`this.` state intact — the class assembles via Object.assign(prototype, ...)).
  */
-// @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions).
 /* global escapeHtml, showToast, updateTaxCalculation, getServicePrice, setLtmControlState,
    getLtmControlState, renderLtmControlPanel, initLtmControlListeners, updatePerUnitPrice,
    updateQuantityNudge, parseRatePercent */
@@ -172,7 +171,7 @@ export const pricingMethods = {
         let grandTotal = 0;
         // Process products from the products array (parent rows)
         this.products.forEach(product => {
-            const row = document.querySelector(`tr[data-product-id="${product.id}"]`);
+            const row = /** @type {HTMLElement|null} */ (document.querySelector(`tr[data-product-id="${product.id}"]`));
             if (!row) return;
 
             // Skip child rows here - they're processed separately below
@@ -218,14 +217,14 @@ export const pricingMethods = {
 
             // Update row price (per-unit, not line total)
             // Support both class-based (.row-price) and ID-based (#row-price-{id}) selectors
-            const rowId = row.dataset.rowId || row.dataset.productId || product.id;
+            const rowId = row.dataset.rowId || /** @type {HTMLElement} */ (row).dataset.productId || product.id;
             const priceSpan = row.querySelector('.row-price') || document.getElementById(`row-price-${rowId}`);
             if (priceSpan) {
                 priceSpan.textContent = `$${baseDisplayPrice.toFixed(2)}`;
                 // Separate mode shows the LTM-stripped unit while the Total column is
                 // LTM-inclusive — annotate so unit × qty visibly reconciles instead of
                 // looking like broken math. (expert audit 2026-07-07)
-                priceSpan.title = (baseDisplayPrice !== baseUnitPrice)
+                /** @type {HTMLElement} */ (priceSpan).title = (baseDisplayPrice !== baseUnitPrice)
                     ? `+$${effectiveLtmPerUnit.toFixed(2)}/pc small-batch fee — itemized in the fee row; the Total column includes it`
                     : '';
             }
@@ -280,7 +279,7 @@ export const pricingMethods = {
                     const priceCell = childRow.querySelector('.cell-price');
                     if (priceCell) {
                         priceCell.textContent = `$${displayPrice.toFixed(2)}`;
-                        priceCell.title = (displayPrice !== roundedPrice)
+                        /** @type {HTMLElement} */ (priceCell).title = (displayPrice !== roundedPrice)
                             ? `+$${effectiveLtmPerUnit.toFixed(2)}/pc small-batch fee — itemized in the fee row; the Total column includes it`
                             : '';
                     }
@@ -416,7 +415,7 @@ export const pricingMethods = {
         }
 
         // Enable/disable continue button
-        const continueBtn = document.getElementById('continue-btn');
+        const continueBtn = /** @type {HTMLInputElement|null} */ (document.getElementById('continue-btn'));
         if (continueBtn) {
             continueBtn.disabled = totalQty < this.getMinimumQuantity() || this.selectedLocations.length === 0;
         }
@@ -565,9 +564,9 @@ export const pricingMethods = {
      */
     computeFeesAndTotals(stateCalc) {
         const subtotal = stateCalc.subtotal;
-        const artCharge = document.getElementById('art-charge-toggle')?.checked
-            ? (parseFloat(document.getElementById('art-charge')?.value) || 0) : 0;
-        const designHours = parseFloat(document.getElementById('graphic-design-hours')?.value) || 0;
+        const artCharge = /** @type {HTMLInputElement|null} */ (document.getElementById('art-charge-toggle'))?.checked
+            ? (parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('art-charge'))?.value) || 0) : 0;
+        const designHours = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('graphic-design-hours'))?.value) || 0;
         const grtRate = getServicePrice('GRT-75', 75);
         // A load FAILURE already toasts via loadServiceCodePrices(); this covers the silent case
         // where codes loaded but GRT-75 is missing, so a rep never bills the $75 default unwarned.
@@ -578,20 +577,20 @@ export const pricingMethods = {
             if (typeof this.showToast === 'function') this.showToast(m, 'warning'); else if (typeof showToast === 'function') showToast(m, 'warning');
         }
         const graphicDesignCharge = designHours * grtRate;
-        const rushFee = parseFloat(document.getElementById('rush-fee')?.value) || 0;
-        const discountAmount = parseFloat(document.getElementById('discount-amount')?.value) || 0;
-        const discountType = document.getElementById('discount-type')?.value || 'fixed';
+        const rushFee = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('rush-fee'))?.value) || 0;
+        const discountAmount = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('discount-amount'))?.value) || 0;
+        const discountType = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-type'))?.value || 'fixed';
         // Percent base = products + fees (same as updateTaxCalculation, NOT products-only)
         const discountBase = subtotal + artCharge + graphicDesignCharge + rushFee;
         const discount = discountType === 'percent' ? discountBase * (discountAmount / 100) : discountAmount;
-        const shippingFee = parseFloat(document.getElementById('dtf-shipping-fee')?.value) || 0;
+        const shippingFee = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('dtf-shipping-fee'))?.value) || 0;
         const preTaxSubtotal = Math.max(0, discountBase - discount) + shippingFee;
-        const includeTax = document.getElementById('include-tax') ? !!document.getElementById('include-tax').checked : true;
+        const includeTax = document.getElementById('include-tax') ? !!/** @type {HTMLInputElement} */ (document.getElementById('include-tax')).checked : true;
         // Shared parseRatePercent: 0 is a VALID rate; only NaN/empty falls back (2026-06-10 EMB fix, synced)
         const taxRatePct = (typeof parseRatePercent === 'function')
-            ? parseRatePercent(document.getElementById('tax-rate-input')?.value, 10.2)
-            : (Number.isFinite(parseFloat(document.getElementById('tax-rate-input')?.value))
-                ? parseFloat(document.getElementById('tax-rate-input')?.value) : 10.2);
+            ? parseRatePercent(/** @type {HTMLInputElement|null} */ (document.getElementById('tax-rate-input'))?.value, 10.2)
+            : (Number.isFinite(parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('tax-rate-input'))?.value))
+                ? parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('tax-rate-input'))?.value) : 10.2);
         const taxAmount = includeTax ? Math.round(preTaxSubtotal * (taxRatePct / 100) * 100) / 100 : 0;
         const grandTotal = preTaxSubtotal + taxAmount;
         return {
@@ -704,8 +703,8 @@ export const pricingMethods = {
 
             product = {
                 id: rowId,
-                styleNumber: styleInput ? styleInput.value : '',
-                description: descInput ? descInput.value : '',
+                styleNumber: styleInput ? /** @type {HTMLInputElement} */ (styleInput).value : '',
+                description: descInput ? /** @type {HTMLInputElement} */ (descInput).value : '',
                 baseCost: baseCost,
                 sizeUpcharges: sizeUpcharges,
                 color: row.dataset.colorName || '',
@@ -717,8 +716,8 @@ export const pricingMethods = {
 
         // Update quantities from row inputs (standard sizes)
         row.querySelectorAll('.size-input:not(.xxxl-picker-btn)').forEach(input => {
-            const size = input.dataset.size;
-            const qty = parseInt(input.value) || 0;
+            const size = /** @type {HTMLElement} */ (input).dataset.size;
+            const qty = parseInt(/** @type {HTMLInputElement} */ (input).value) || 0;
             // eslint-disable-next-line no-prototype-builtins -- verbatim (D1): monolith-original hasOwnProperty call
             if (size && product.quantities.hasOwnProperty(size)) {
                 product.quantities[size] = qty;

@@ -3,7 +3,6 @@
  * HTML-onclick wrappers (copyToClipboard/printQuote →
  * class methods) + the "auto %" rush chip. Moved verbatim.
  */
-// @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions; typing lands with the render/state split).
 /* global dtfQuoteBuilder, showToast, getSharedRushRate, Event */
 
 // Global function wrappers for HTML onclick handlers
@@ -32,7 +31,7 @@ export function applyRushPercent() {
     const t = b.computeFeesAndTotals(b.calculateFromState());
     const base = (t.subtotal || 0) + (t.artCharge || 0) + (t.graphicDesignCharge || 0);
     if (!(base > 0)) { showToast('Add products first — rush is a % of the quote.', 'info'); return; }
-    const el = document.getElementById('rush-fee');
+    const el = /** @type {HTMLInputElement|null} */ (document.getElementById('rush-fee'));
     if (!el) return;
     el.value = (base * rate).toFixed(2);
     el.dispatchEvent(new Event('change', { bubbles: true }));   // runs updateAdditionalCharges()

@@ -2,7 +2,6 @@
  * DTG inline form — utils module (Batch 5, 2026-07-09). Moved VERBATIM from the
  * dtg-inline-form.js IIFE; lexical references became the imports below.
  */
-// @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions).
 /* global markAsUnsaved, */
 import { SALES_REPS, SHIP_METHODS, SUPPORTED_COMBOS, state } from './state.js';
 
@@ -116,8 +115,9 @@ export function showToastSafe(text) {
     }
     txt.textContent = text;
     toast.classList.add('show');
-    clearTimeout(showToastSafe._t);
-    showToastSafe._t = setTimeout(() => toast.classList.remove('show'), 2800);
+    const _self = /** @type {typeof showToastSafe & { _t?: any }} */ (showToastSafe);
+    clearTimeout(_self._t);
+    _self._t = setTimeout(() => toast.classList.remove('show'), 2800);
 }
 
 /**

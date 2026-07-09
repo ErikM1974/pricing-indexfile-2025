@@ -10,7 +10,6 @@
  * (bundle parse time), the same pre-DOMContentLoaded timing it had as a
  * top-level statement in the monolith.
  */
-// @ts-nocheck — MOVED legacy init code (pre-existing checkJs frictions).
 /* global ArtworkUpload, StaffAuthHelper, CustomerLookupService,
    CustomerDesignCombobox, ScreenPrintPricingService, ScreenPrintQuoteService,
    QuoteOrderSummary, SafetyStripeRecs, initLogoStatusChips,
@@ -125,10 +124,10 @@ export class ScpAdapter {
                 designFocusId: 'design-number',
                 notesSel: '#spc-order-fields .os-notes',
                 assumption: () => {
-                    const front = document.querySelector('input[name="front-colors"]:checked')?.value || '1';
+                    const front = /** @type {HTMLInputElement|null} */ (document.querySelector('input[name="front-colors"]:checked'))?.value || '1';
                     const backOn = !!(scpState.printConfig && scpState.printConfig.backLocation);
-                    const back = backOn ? (document.querySelector('input[name="back-colors"]:checked')?.value || '1') : null;
-                    const dark = document.getElementById('dark-garment-toggle')?.checked;
+                    const back = backOn ? (/** @type {HTMLInputElement|null} */ (document.querySelector('input[name="back-colors"]:checked'))?.value || '1') : null;
+                    const dark = /** @type {HTMLInputElement|null} */ (document.getElementById('dark-garment-toggle'))?.checked;
                     return `Pricing assumes a ${front}-color front print${back ? ` + ${back}-color back` : ''}${dark ? ' with white underbase' : ''}. Color count is confirmed after artwork review — each added color adds a screen and changes the per-piece price.`;
                 }
             });
@@ -173,7 +172,7 @@ export class ScpAdapter {
             var _spStripeToggle = document.getElementById('safety-stripes-toggle');
             if (_spStripeToggle) {
                 _spStripeToggle.addEventListener('change', function () {
-                    if (_spStripeToggle.checked) {
+                    if (/** @type {HTMLInputElement} */ (_spStripeToggle).checked) {
                         SafetyStripeRecs.expand('scp-safety-recs');
                         var el = document.getElementById('scp-safety-recs');
                         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
@@ -225,7 +224,7 @@ export class ScpAdapter {
                     window._scpDesignCombobox = CustomerDesignCombobox.attach(designInput, {
                         method: 'scp',
                         getCustomerId: () => {
-                            const v = document.getElementById('customer-number')?.value?.trim();
+                            const v = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-number'))?.value?.trim();
                             const n = parseInt(v, 10);
                             return Number.isFinite(n) && n > 0 ? n : null;
                         },
@@ -318,12 +317,12 @@ export class ScpAdapter {
                 // Shared handler — both FIND CUSTOMER box and COMPANY field fill the
                 // same downstream fields + surface the same CRM context.
                 const applyContact = (contact) => {
-                    document.getElementById('customer-name').value = contact.ct_NameFull || '';
-                    document.getElementById('customer-email').value = contact.ContactNumbersEmail || '';
-                    document.getElementById('company-name').value = contact.CustomerCompanyName || '';
+                    /** @type {HTMLInputElement} */ (document.getElementById('customer-name')).value = contact.ct_NameFull || '';
+                    /** @type {HTMLInputElement} */ (document.getElementById('customer-email')).value = contact.ContactNumbersEmail || '';
+                    /** @type {HTMLInputElement} */ (document.getElementById('company-name')).value = contact.CustomerCompanyName || '';
                     // ShopWorks customer # — so the pushed order attaches to the real
                     // customer instead of the no-customer fallback (2026-06-01).
-                    const _custNumEl = document.getElementById('customer-number');
+                    const _custNumEl = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-number'));
                     if (_custNumEl && contact.id_Customer != null) _custNumEl.value = String(contact.id_Customer);
 
                     // [2026-06-08] P0 (Erik's #1 rule): honor tax-exempt customers — the CRM "TAX EXEMPT" chip was
@@ -334,12 +333,12 @@ export class ScpAdapter {
                     var _incTax = document.getElementById('include-tax');
                     var _rateEl = document.getElementById('tax-rate-input');
                     if (window._taxExempt) {
-                        if (_incTax) _incTax.checked = false;
-                        if (_rateEl) _rateEl.value = '0';
+                        if (_incTax) /** @type {HTMLInputElement} */ (_incTax).checked = false;
+                        if (_rateEl) /** @type {HTMLInputElement} */ (_rateEl).value = '0';
                         updateTaxCalculation();
                     } else if (_wasExempt) {
-                        if (_incTax) _incTax.checked = true;
-                        if (_rateEl && _rateEl.value === '0') _rateEl.value = '10.2';
+                        if (_incTax) /** @type {HTMLInputElement} */ (_incTax).checked = true;
+                        if (_rateEl && /** @type {HTMLInputElement} */ (_rateEl).value === '0') /** @type {HTMLInputElement} */ (_rateEl).value = '10.2';
                         updateTaxCalculation();
                     }
 
@@ -368,9 +367,9 @@ export class ScpAdapter {
                 customerLookup.bindToInput('customer-lookup', {
                     onSelect: applyContact,
                     onClear: () => {
-                        document.getElementById('customer-name').value = '';
-                        document.getElementById('customer-email').value = '';
-                        document.getElementById('company-name').value = '';
+                        /** @type {HTMLInputElement} */ (document.getElementById('customer-name')).value = '';
+                        /** @type {HTMLInputElement} */ (document.getElementById('customer-email')).value = '';
+                        /** @type {HTMLInputElement} */ (document.getElementById('company-name')).value = '';
                         window._taxExempt = false;  // [2026-06-08] P0: customer cleared → no longer exempt
                         if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();  // [2026-06-08] empty the recap on lookup clear
                         if (typeof removeRecentOrdersPanel === 'function') removeRecentOrdersPanel();  // item #13: no stale orders for the next customer
@@ -382,7 +381,7 @@ export class ScpAdapter {
                 // Selecting a result keeps the FIND CUSTOMER box in sync.
                 customerLookup.bindToInput('company-name', {
                     onSelect: (contact) => {
-                        const lookupInput = document.getElementById('customer-lookup');
+                        const lookupInput = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-lookup'));
                         if (lookupInput) lookupInput.value = contact.CustomerCompanyName || '';
                         applyContact(contact);
                     }
@@ -395,8 +394,8 @@ export class ScpAdapter {
                 onShippingFeeChange: () => { updateTaxCalculation(); if (window.renderOrderRecap) window.renderOrderRecap(); },  // [2026-06-08] refresh ship-to card on fee change
                 onTaxRateChange: (rate) => {
                     // [2026-06-08] P0 (#1 rule): exempt/wholesale orders stay 0% — don't let a ZIP DOR lookup re-apply WA tax.
-                    if (window._taxExempt || window._isWholesale) { const ri = document.getElementById('tax-rate-input'); if (ri) ri.value = '0'; updateTaxCalculation(); return; }
-                    const rateInput = document.getElementById('tax-rate-input');
+                    if (window._taxExempt || window._isWholesale) { const ri = /** @type {HTMLInputElement|null} */ (document.getElementById('tax-rate-input')); if (ri) ri.value = '0'; updateTaxCalculation(); return; }
+                    const rateInput = /** @type {HTMLInputElement|null} */ (document.getElementById('tax-rate-input'));
                     if (rateInput) rateInput.value = rate;
                     updateTaxCalculation();
                 }

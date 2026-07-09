@@ -2,7 +2,6 @@
  * DTG inline form — output module (Batch 5, 2026-07-09). Moved VERBATIM from the
  * dtg-inline-form.js IIFE; lexical references became the imports below.
  */
-// @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions).
 /* global alert,
    emailQuote, markAsSaved, EmbroideryInvoiceGenerator */
 import { effectiveLocationCode, effectiveLocationLabel, isRowColorInvalid, updateSubmitEnabled } from './form-core.js';
@@ -77,7 +76,7 @@ export function genericConfirm({ icon, title, body, cancelLabel, proceedLabel, p
         backdrop.querySelector('[data-action="confirm"]').addEventListener('click', () => cleanup(true));
         document.addEventListener('keydown', onKey);
         document.body.appendChild(backdrop);
-        backdrop.querySelector('[data-action="cancel"]').focus();
+        /** @type {HTMLElement} */ (backdrop.querySelector('[data-action="cancel"]')).focus();
     });
 }
 
@@ -135,7 +134,7 @@ export function confirmStockOverflow(issues) {
 
         document.body.appendChild(backdrop);
         // Focus the "Cancel" button by default — safer than auto-confirming.
-        backdrop.querySelector('[data-action="cancel"]').focus();
+        /** @type {HTMLElement} */ (backdrop.querySelector('[data-action="cancel"]')).focus();
     });
 }
 

@@ -156,7 +156,7 @@ import {
     runDesignSearch,
     selectDesignFromSearch,
     showMoreDesignSearchResults,
-    } from './design-search.js';
+    } from './design-search.js';
 import { showErrorBanner, hideErrorBanner, showFallbackPricingWarning } from '../shared/errors.js';
 
 // Strangler bridges — bare-identifier callers in the monolith resolve

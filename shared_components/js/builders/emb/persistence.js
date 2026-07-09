@@ -13,7 +13,6 @@
  * monolith globals reached through the global scope chain (they migrate with
  * their own clusters — see emb-decomposition-plan.md).
  */
-// @ts-nocheck — MOVED legacy DOM code: pre-existing checkJs frictions; typing
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
 /* global
    updatePushButtonState, escapeHtml, showToast,
@@ -73,31 +72,31 @@ export function getEmbroideryQuoteData() {
             stitches: embState.globalAL.cap.stitchCount,
             needsDigitizing: embState.globalAL.cap.needsDigitizing
         },
-        customerName: document.getElementById('customer-name')?.value || '',
-        customerEmail: document.getElementById('customer-email')?.value || '',
-        companyName: document.getElementById('company-name')?.value || '',
-        salesRep: document.getElementById('sales-rep')?.value || '',
-        notes: document.getElementById('notes')?.value || '',
+        customerName: /** @type {HTMLInputElement|null} */ (document.getElementById('customer-name'))?.value || '',
+        customerEmail: /** @type {HTMLInputElement|null} */ (document.getElementById('customer-email'))?.value || '',
+        companyName: /** @type {HTMLInputElement|null} */ (document.getElementById('company-name'))?.value || '',
+        salesRep: /** @type {HTMLInputElement|null} */ (document.getElementById('sales-rep'))?.value || '',
+        notes: /** @type {HTMLInputElement|null} */ (document.getElementById('notes'))?.value || '',
         ltmEnabled: getLtmControlState('emb-ltm-panel').enabled,
         ltmDisplayMode: getLtmControlState('emb-ltm-panel').displayMode || 'builtin',
-        taxRate: document.getElementById('tax-rate-input')?.value || '10.2',
-        includeTax: document.getElementById('include-tax')?.checked ?? true,
-        shippingFee: document.getElementById('shipping-fee')?.value || '0',
-        shipAddress: document.getElementById('ship-address')?.value || '',
-        shipCity: document.getElementById('ship-city')?.value || '',
-        shipState: document.getElementById('ship-state')?.value || 'WA',
-        shipZip: document.getElementById('ship-zip')?.value || '',
+        taxRate: /** @type {HTMLInputElement|null} */ (document.getElementById('tax-rate-input'))?.value || '10.2',
+        includeTax: /** @type {HTMLInputElement|null} */ (document.getElementById('include-tax'))?.checked ?? true,
+        shippingFee: /** @type {HTMLInputElement|null} */ (document.getElementById('shipping-fee'))?.value || '0',
+        shipAddress: /** @type {HTMLInputElement|null} */ (document.getElementById('ship-address'))?.value || '',
+        shipCity: /** @type {HTMLInputElement|null} */ (document.getElementById('ship-city'))?.value || '',
+        shipState: /** @type {HTMLInputElement|null} */ (document.getElementById('ship-state'))?.value || 'WA',
+        shipZip: /** @type {HTMLInputElement|null} */ (document.getElementById('ship-zip'))?.value || '',
         // Order details
-        customerPhone: document.getElementById('customer-phone')?.value || '',
-        poNumber: document.getElementById('po-number')?.value || '',
-        orderNumber: document.getElementById('order-number')?.value || '',
-        customerNumber: document.getElementById('customer-number')?.value || '',
-        shipMethod: document.getElementById('ship-method')?.value || '',
-        shipMethodOther: document.getElementById('ship-method-other')?.value || '',
-        dateOrderPlaced: dateFromInputValue(document.getElementById('date-order-placed')?.value),
-        reqShipDate: dateFromInputValue(document.getElementById('req-ship-date')?.value),
-        dropDeadDate: dateFromInputValue(document.getElementById('drop-dead-date')?.value),
-        paymentTerms: document.getElementById('payment-terms')?.value || '',
+        customerPhone: /** @type {HTMLInputElement|null} */ (document.getElementById('customer-phone'))?.value || '',
+        poNumber: /** @type {HTMLInputElement|null} */ (document.getElementById('po-number'))?.value || '',
+        orderNumber: /** @type {HTMLInputElement|null} */ (document.getElementById('order-number'))?.value || '',
+        customerNumber: /** @type {HTMLInputElement|null} */ (document.getElementById('customer-number'))?.value || '',
+        shipMethod: /** @type {HTMLInputElement|null} */ (document.getElementById('ship-method'))?.value || '',
+        shipMethodOther: /** @type {HTMLInputElement|null} */ (document.getElementById('ship-method-other'))?.value || '',
+        dateOrderPlaced: dateFromInputValue(/** @type {HTMLInputElement|null} */ (document.getElementById('date-order-placed'))?.value),
+        reqShipDate: dateFromInputValue(/** @type {HTMLInputElement|null} */ (document.getElementById('req-ship-date'))?.value),
+        dropDeadDate: dateFromInputValue(/** @type {HTMLInputElement|null} */ (document.getElementById('drop-dead-date'))?.value),
+        paymentTerms: /** @type {HTMLInputElement|null} */ (document.getElementById('payment-terms'))?.value || '',
         // Cached design data for instant restore (no API call needed)
         garmentDesignData: embState.primaryLogo._designData || null,
         capDesignData: (typeof embState.capPrimaryLogo !== 'undefined' && embState.capPrimaryLogo._designData) ? embState.capPrimaryLogo._designData : null,
@@ -111,28 +110,28 @@ function _restoreDraftLogos(draft) {
     // Restore primary logo configuration
     if (draft.primaryLogo) {
         embState.primaryLogo = { ...embState.primaryLogo, ...draft.primaryLogo };
-        const positionEl = document.getElementById('primary-position');
+        const positionEl = /** @type {HTMLInputElement|null} */ (document.getElementById('primary-position'));
         if (positionEl) positionEl.value = draft.primaryLogo.position || 'Left Chest';
-        const stitchesEl = document.getElementById('primary-stitches');
+        const stitchesEl = /** @type {HTMLInputElement|null} */ (document.getElementById('primary-stitches'));
         if (stitchesEl) stitchesEl.value = mapStitchCountToTierValue(
             draft.primaryLogo.stitchCount || 8000,
             draft.primaryLogo.position
         );
-        const digitizingEl = document.getElementById('primary-digitizing');
+        const digitizingEl = /** @type {HTMLInputElement|null} */ (document.getElementById('primary-digitizing'));
         if (digitizingEl) digitizingEl.checked = draft.primaryLogo.needsDigitizing || false;
         // Sync position dropdown disabled state and FB stitch input for Full Back
         if (draft.primaryLogo.position === 'Full Back') {
-            const posEl = document.getElementById('primary-position');
+            const posEl = /** @type {HTMLInputElement|null} */ (document.getElementById('primary-position'));
             if (posEl) posEl.disabled = true;
             const fbField = document.getElementById('fb-stitch-count-field');
-            const fbInput = document.getElementById('fb-stitch-count');
+            const fbInput = /** @type {HTMLInputElement|null} */ (document.getElementById('fb-stitch-count'));
             if (fbField) fbField.style.display = '';
             if (fbInput) fbInput.value = draft.primaryLogo.stitchCount || 25000;
         }
         // Restore design number label on card header + input field
         if (draft.primaryLogo.designNumber) {
             updateLogoCardHeader('garment', draft.primaryLogo.designNumber);
-            const gDesignInput = document.getElementById('garment-design-number');
+            const gDesignInput = /** @type {HTMLInputElement|null} */ (document.getElementById('garment-design-number'));
             if (gDesignInput) gDesignInput.value = draft.primaryLogo.designNumber;
             const gClearBtn = document.getElementById('garment-design-clear');
             if (gClearBtn) gClearBtn.style.display = 'inline-flex';
@@ -151,17 +150,17 @@ function _restoreDraftLogos(draft) {
     // Restore cap primary logo if present
     if (draft.capPrimaryLogo && typeof embState.capPrimaryLogo !== 'undefined') {
         embState.capPrimaryLogo = { ...embState.capPrimaryLogo, ...draft.capPrimaryLogo };
-        const capStitchesEl = document.getElementById('cap-primary-stitches');
+        const capStitchesEl = /** @type {HTMLInputElement|null} */ (document.getElementById('cap-primary-stitches'));
         if (capStitchesEl) capStitchesEl.value = mapStitchCountToTierValue(
             draft.capPrimaryLogo.stitchCount || 8000,
             'CF'
         );
-        const capDigitizingEl = document.getElementById('cap-primary-digitizing');
+        const capDigitizingEl = /** @type {HTMLInputElement|null} */ (document.getElementById('cap-primary-digitizing'));
         if (capDigitizingEl) capDigitizingEl.checked = draft.capPrimaryLogo.needsDigitizing || false;
         // Restore design number label on card header + input field
         if (draft.capPrimaryLogo.designNumber) {
             updateLogoCardHeader('cap', draft.capPrimaryLogo.designNumber);
-            const cDesignInput = document.getElementById('cap-design-number');
+            const cDesignInput = /** @type {HTMLInputElement|null} */ (document.getElementById('cap-design-number'));
             if (cDesignInput) cDesignInput.value = draft.capPrimaryLogo.designNumber;
             const cClearBtn = document.getElementById('cap-design-clear');
             if (cClearBtn) cClearBtn.style.display = 'inline-flex';
@@ -183,23 +182,23 @@ export function restoreEmbroideryDraft(draft) {
 
     // Restore customer info
     if (draft.customerName) {
-        const nameEl = document.getElementById('customer-name');
+        const nameEl = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-name'));
         if (nameEl) nameEl.value = draft.customerName;
     }
     if (draft.customerEmail) {
-        const emailEl = document.getElementById('customer-email');
+        const emailEl = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-email'));
         if (emailEl) emailEl.value = draft.customerEmail;
     }
     if (draft.companyName) {
-        const companyEl = document.getElementById('company-name');
+        const companyEl = /** @type {HTMLInputElement|null} */ (document.getElementById('company-name'));
         if (companyEl) companyEl.value = draft.companyName;
     }
     if (draft.salesRep) {
-        const salesRepEl = document.getElementById('sales-rep');
+        const salesRepEl = /** @type {HTMLInputElement|null} */ (document.getElementById('sales-rep'));
         if (salesRepEl) salesRepEl.value = draft.salesRep;
     }
     if (draft.notes) {
-        const notesEl = document.getElementById('notes');
+        const notesEl = /** @type {HTMLInputElement|null} */ (document.getElementById('notes'));
         if (notesEl) {
             notesEl.value = draft.notes;
             // Show the notes section
@@ -208,8 +207,8 @@ export function restoreEmbroideryDraft(draft) {
                 section.classList.remove('collapsed');
                 const body = section.querySelector('.notes-body');
                 const icon = section.querySelector('.notes-toggle-icon');
-                if (body) body.style.display = 'block';
-                if (icon) icon.style.transform = 'rotate(180deg)';
+                if (body) /** @type {HTMLElement} */ (body).style.display = 'block';
+                if (icon) /** @type {HTMLElement} */ (icon).style.transform = 'rotate(180deg)';
             }
             updateNotesBadge();
         }
@@ -227,38 +226,38 @@ export function restoreEmbroideryDraft(draft) {
 
     // Restore tax rate and shipping
     if (draft.taxRate) {
-        const rateInput = document.getElementById('tax-rate-input');
+        const rateInput = /** @type {HTMLInputElement|null} */ (document.getElementById('tax-rate-input'));
         if (rateInput) rateInput.value = draft.taxRate;
     }
     if (draft.includeTax === false) {
-        document.getElementById('include-tax').checked = false;
+        /** @type {HTMLInputElement} */ (document.getElementById('include-tax')).checked = false;
     }
     if (draft.shippingFee && parseFloat(draft.shippingFee) > 0) {
-        document.getElementById('shipping-fee').value = draft.shippingFee;
+        /** @type {HTMLInputElement} */ (document.getElementById('shipping-fee')).value = draft.shippingFee;
     }
 
     // Restore Ship To address
-    if (draft.shipAddress) document.getElementById('ship-address').value = draft.shipAddress;
-    if (draft.shipCity) document.getElementById('ship-city').value = draft.shipCity;
-    if (draft.shipState) document.getElementById('ship-state').value = draft.shipState;
-    if (draft.shipZip) document.getElementById('ship-zip').value = draft.shipZip;
+    if (draft.shipAddress) /** @type {HTMLInputElement} */ (document.getElementById('ship-address')).value = draft.shipAddress;
+    if (draft.shipCity) /** @type {HTMLInputElement} */ (document.getElementById('ship-city')).value = draft.shipCity;
+    if (draft.shipState) /** @type {HTMLInputElement} */ (document.getElementById('ship-state')).value = draft.shipState;
+    if (draft.shipZip) /** @type {HTMLInputElement} */ (document.getElementById('ship-zip')).value = draft.shipZip;
 
     // Restore order details
-    if (draft.customerPhone) document.getElementById('customer-phone').value = draft.customerPhone;
-    if (draft.poNumber) document.getElementById('po-number').value = draft.poNumber;
-    if (draft.orderNumber) document.getElementById('order-number').value = draft.orderNumber;
-    if (draft.customerNumber) document.getElementById('customer-number').value = draft.customerNumber;
+    if (draft.customerPhone) /** @type {HTMLInputElement} */ (document.getElementById('customer-phone')).value = draft.customerPhone;
+    if (draft.poNumber) /** @type {HTMLInputElement} */ (document.getElementById('po-number')).value = draft.poNumber;
+    if (draft.orderNumber) /** @type {HTMLInputElement} */ (document.getElementById('order-number')).value = draft.orderNumber;
+    if (draft.customerNumber) /** @type {HTMLInputElement} */ (document.getElementById('customer-number')).value = draft.customerNumber;
     if (draft.shipMethod) {
-        document.getElementById('ship-method').value = draft.shipMethod;
+        /** @type {HTMLInputElement} */ (document.getElementById('ship-method')).value = draft.shipMethod;
         if (draft.shipMethod === 'Other' && draft.shipMethodOther) {
-            document.getElementById('ship-method-other').value = draft.shipMethodOther;
+            /** @type {HTMLInputElement} */ (document.getElementById('ship-method-other')).value = draft.shipMethodOther;
         }
         onShipMethodChange();
     }
-    if (draft.dateOrderPlaced) document.getElementById('date-order-placed').value = dateToInputValue(draft.dateOrderPlaced);
-    if (draft.reqShipDate) document.getElementById('req-ship-date').value = dateToInputValue(draft.reqShipDate);
-    if (draft.dropDeadDate) document.getElementById('drop-dead-date').value = dateToInputValue(draft.dropDeadDate);
-    if (draft.paymentTerms) document.getElementById('payment-terms').value = draft.paymentTerms;
+    if (draft.dateOrderPlaced) /** @type {HTMLInputElement} */ (document.getElementById('date-order-placed')).value = dateToInputValue(draft.dateOrderPlaced);
+    if (draft.reqShipDate) /** @type {HTMLInputElement} */ (document.getElementById('req-ship-date')).value = dateToInputValue(draft.reqShipDate);
+    if (draft.dropDeadDate) /** @type {HTMLInputElement} */ (document.getElementById('drop-dead-date')).value = dateToInputValue(draft.dropDeadDate);
+    if (draft.paymentTerms) /** @type {HTMLInputElement} */ (document.getElementById('payment-terms')).value = draft.paymentTerms;
     // Auto-expand Order Details panel if any field restored
     if (draft.poNumber || draft.orderNumber || draft.shipMethod ||
         draft.dateOrderPlaced || draft.reqShipDate || draft.dropDeadDate || draft.paymentTerms) {
@@ -281,13 +280,13 @@ export function restoreEmbroideryDraft(draft) {
         const garmentALSwitch = document.getElementById('garment-al-switch');
         const garmentALLabel = document.getElementById('garment-al-label');
         const garmentALConfig = document.getElementById('garment-al-config-new');
-        const garmentALToggle = document.getElementById('garment-al-toggle');
+        const garmentALToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('garment-al-toggle'));
         if (garmentALSwitch) garmentALSwitch.classList.add('active');
         if (garmentALLabel) garmentALLabel.classList.add('active');
         if (garmentALConfig) garmentALConfig.classList.add('visible');
         if (garmentALToggle) garmentALToggle.checked = true;
 
-        const digitizingEl = document.getElementById('garment-al-digitizing-checkbox');
+        const digitizingEl = /** @type {HTMLInputElement|null} */ (document.getElementById('garment-al-digitizing-checkbox'));
         if (digitizingEl) digitizingEl.checked = embState.globalAL.garment.needsDigitizing;
     }
 
@@ -302,13 +301,13 @@ export function restoreEmbroideryDraft(draft) {
         const capALSwitch = document.getElementById('cap-al-switch');
         const capALLabel = document.getElementById('cap-al-label');
         const capALConfig = document.getElementById('cap-al-config-new');
-        const capALToggle = document.getElementById('cap-al-toggle');
+        const capALToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('cap-al-toggle'));
         if (capALSwitch) capALSwitch.classList.add('active');
         if (capALLabel) capALLabel.classList.add('active');
         if (capALConfig) capALConfig.classList.add('visible');
         if (capALToggle) capALToggle.checked = true;
 
-        const digitizingEl = document.getElementById('cap-al-digitizing-checkbox');
+        const digitizingEl = /** @type {HTMLInputElement|null} */ (document.getElementById('cap-al-digitizing-checkbox'));
         if (digitizingEl) digitizingEl.checked = embState.globalAL.cap.needsDigitizing;
     }
 
@@ -386,7 +385,7 @@ export function markEmbroideryDirty() {
 // T3 split (2026-07-09): loadQuoteForEditing was built from named IIFEs —
 // promoted VERBATIM to top-level (session/items now explicit params).
 function restoreEmbOrderShipping(session) {
-    const setVal = (id, v) => { const el = document.getElementById(id); if (el && v != null && v !== '') el.value = v; };
+    const setVal = (id, v) => { const el = /** @type {HTMLInputElement|null} */ (document.getElementById(id)); if (el && v != null && v !== '') el.value = v; };
     // [2026-06-07] EMB date inputs are now native <input type=date> (YYYY-MM-DD); the column is stored ISO.
     const isoToInput = (v) => dateToInputValue(v);
     setVal('customer-number', session.CustomerNumber);
@@ -406,16 +405,16 @@ function restoreEmbOrderShipping(session) {
     // so a stored value not in the <select> options IS an "Other" method. A bare
     // setVal would set selectedIndex=-1 (value '') -> the custom method displays
     // blank and gets WIPED on the next Save Revision. Detect + restore properly.
-    const smEl = document.getElementById('ship-method');
+    const smEl = /** @type {HTMLSelectElement|null} */ (document.getElementById('ship-method'));
     const sm = session.ShipMethod || '';
     if (smEl) {
         const known = Array.from(smEl.options).map(o => o.value);
         if (sm && known.indexOf(sm) === -1) {
-            smEl.value = 'Other';
-            const other = document.getElementById('ship-method-other');
+            /** @type {HTMLSelectElement} */ (smEl).value = 'Other';
+            const other = /** @type {HTMLInputElement|null} */ (document.getElementById('ship-method-other'));
             if (other) other.value = sm;
         } else if (sm) {
-            smEl.value = sm;
+            /** @type {HTMLSelectElement} */ (smEl).value = sm;
         }
         // A programmatic .value change doesn't fire onchange — call the handler so
         // the conditional UI (pickup notice / Other text / address visibility)
@@ -509,22 +508,22 @@ function _restoreTaxShipLtm(session, items) {
     // next Save Revision baked it in.
     const taxFeeItem = items.find(i => i.EmbellishmentType === 'fee' && i.StyleNumber === 'TAX');
     if (taxFeeItem) {
-        const rateInput = document.getElementById('tax-rate-input');
+        const rateInput = /** @type {HTMLInputElement|null} */ (document.getElementById('tax-rate-input'));
         if (rateInput) {
             const sessionRate = parseFloat(session.TaxRate);
             const itemRate = parseFloat(taxFeeItem.BaseUnitPrice);
             // EMB stores TaxRate as a decimal (0.101), but normalize a percent-shaped
             // legacy value (>1) instead of restoring "1010" into the input.
             const sessionPct = sessionRate > 1 ? sessionRate : sessionRate * 100;
-            rateInput.value = Number.isFinite(sessionRate) ? Math.round(sessionPct * 1000) / 1000
-                : (Number.isFinite(itemRate) ? itemRate : 10.2);
+            rateInput.value = /** @type {any} */ (Number.isFinite(sessionRate) ? Math.round(sessionPct * 1000) / 1000
+                : (Number.isFinite(itemRate) ? itemRate : 10.2));
         }
     }
     // Tax-exempt quotes save with NO TAX fee line + TaxRate 0; #include-tax defaults CHECKED in the
     // HTML, so without restoring it the reload re-applies WA tax to an exempt/out-of-state customer
     // and a Save Revision bakes the wrong total in. Restore the checkbox from the saved exemption
     // signal BEFORE recalculatePricing() reads it. (audit fix 2026-06-05 — Erik's #1 rule)
-    const includeTaxEl = document.getElementById('include-tax');
+    const includeTaxEl = /** @type {HTMLInputElement|null} */ (document.getElementById('include-tax'));
     if (includeTaxEl) {
         const taxExempt = !taxFeeItem && !(parseFloat(session.TaxRate) > 0);
         includeTaxEl.checked = !taxExempt;
@@ -536,11 +535,11 @@ function _restoreTaxShipLtm(session, items) {
     // [2026-06-07] Restore the wholesale flag + checkbox so a reloaded wholesale order stays 0-tax / acct 2203.
      
     window._isWholesale = (session.IsWholesale === 'Yes' || session.IsWholesale === true || session.IsWholesale === 1);
-    const _wholesaleEl = document.getElementById('wholesale-checkbox');
+    const _wholesaleEl = /** @type {HTMLInputElement|null} */ (document.getElementById('wholesale-checkbox'));
     if (_wholesaleEl) _wholesaleEl.checked = window._isWholesale;
     const shipFeeItem = items.find(i => i.EmbellishmentType === 'fee' && i.StyleNumber === 'SHIP');
     if (shipFeeItem && shipFeeItem.LineTotal > 0) {
-        document.getElementById('shipping-fee').value = shipFeeItem.LineTotal;
+        /** @type {HTMLInputElement} */ (document.getElementById('shipping-fee')).value = shipFeeItem.LineTotal;
     }
 
     // Restore LTM display preferences from saved quote
@@ -667,7 +666,7 @@ export async function loadQuoteForEditing(quoteId, opts = {}) {
                 const dates = events
                     .map(ev => new Date(ev.Timestamp || ev.CreatedAt || ev.EventDate || ev.Date_Created || 0))
                     .filter(d => !isNaN(d.getTime()) && d.getTime() > 0)
-                    .sort((a, b) => b - a);
+                    .sort((a, b) => /** @type {any} */ (b) - /** @type {any} */ (a));
                 const lastTxt = dates.length ? ` — last ${dates[0].toLocaleDateString()} ${dates[0].toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}` : '';
                 showToast(`👀 Customer viewed this quote ${events.length}×${lastTxt}`, 'info', 6000);
             } catch (_) { /* telemetry only */ }
@@ -706,7 +705,7 @@ export async function duplicateQuote(sourceQuoteId) {
     if (typeof updatePushButtonState === 'function') { try { updatePushButtonState(); } catch (_) {} }
 
     // Order-specific fields must not carry over
-    const clearVal = (id) => { const el = document.getElementById(id); if (el) el.value = ''; };
+    const clearVal = (id) => { const el = /** @type {HTMLInputElement|null} */ (document.getElementById(id)); if (el) el.value = ''; };
     clearVal('order-number');
     clearVal('po-number');
     if (typeof setQuoteDateDefaults === 'function') { try { setQuoteDateDefaults(); } catch (_) {} }
@@ -734,16 +733,16 @@ function populateCustomerInfo(session) {
     };
 
     for (const [id, value] of Object.entries(fields)) {
-        const el = document.getElementById(id);
+        const el = /** @type {HTMLInputElement|null} */ (document.getElementById(id));
         if (el && value) el.value = value;
     }
 
     // Set sales rep dropdown
-    const salesRepSelect = document.getElementById('sales-rep');
+    const salesRepSelect = /** @type {HTMLSelectElement|null} */ (document.getElementById('sales-rep'));
     if (salesRepSelect && session.SalesRepEmail) {
         for (let i = 0; i < salesRepSelect.options.length; i++) {
-            if (salesRepSelect.options[i].value === session.SalesRepEmail) {
-                salesRepSelect.selectedIndex = i;
+            if (/** @type {HTMLSelectElement} */ (salesRepSelect).options[i].value === session.SalesRepEmail) {
+                /** @type {HTMLSelectElement} */ (salesRepSelect).selectedIndex = i;
                 break;
             }
         }
@@ -760,7 +759,7 @@ function populateCustomerInfo(session) {
             if (parsed !== null && typeof parsed === 'object') notesText = '';
         } catch (e) { /* plain text — use as-is */ }
         if (notesText) {
-            const notesEl = document.getElementById('notes');
+            const notesEl = /** @type {HTMLInputElement|null} */ (document.getElementById('notes'));
             if (notesEl) {
                 notesEl.value = notesText;
                 const section = document.getElementById('notes-section');
@@ -768,8 +767,8 @@ function populateCustomerInfo(session) {
                     section.classList.remove('collapsed');
                     const body = section.querySelector('.notes-body');
                     const icon = section.querySelector('.notes-toggle-icon');
-                    if (body) body.style.display = 'block';
-                    if (icon) icon.style.transform = 'rotate(180deg)';
+                    if (body) /** @type {HTMLElement} */ (body).style.display = 'block';
+                    if (icon) /** @type {HTMLElement} */ (icon).style.transform = 'rotate(180deg)';
                 }
                 updateNotesBadge();
             }
@@ -783,26 +782,26 @@ function populateCustomerInfo(session) {
 export function populateLogoConfig(session, items) {
     // Primary logo (garment)
     if (session.PrintLocation) {
-        const posSelect = document.getElementById('primary-position');
+        const posSelect = /** @type {HTMLInputElement|null} */ (document.getElementById('primary-position'));
         if (posSelect) posSelect.value = session.PrintLocation;
         embState.primaryLogo.position = session.PrintLocation;
     }
     if (session.StitchCount) {
-        const stitchInput = document.getElementById('primary-stitches');
+        const stitchInput = /** @type {HTMLInputElement|null} */ (document.getElementById('primary-stitches'));
         if (stitchInput) stitchInput.value = mapStitchCountToTierValue(session.StitchCount, session.PrintLocation);
         embState.primaryLogo.stitchCount = session.StitchCount;
         // Sync position dropdown disabled state and FB stitch input for Full Back
         if (session.PrintLocation === 'Full Back') {
-            const posEl = document.getElementById('primary-position');
+            const posEl = /** @type {HTMLInputElement|null} */ (document.getElementById('primary-position'));
             if (posEl) posEl.disabled = true;
             const fbField = document.getElementById('fb-stitch-count-field');
-            const fbInput = document.getElementById('fb-stitch-count');
+            const fbInput = /** @type {HTMLInputElement|null} */ (document.getElementById('fb-stitch-count'));
             if (fbField) fbField.style.display = '';
             if (fbInput) fbInput.value = session.StitchCount || 25000;
         }
     }
     if (session.DigitizingFee > 0) {
-        const digitizingCb = document.getElementById('primary-digitizing');
+        const digitizingCb = /** @type {HTMLInputElement|null} */ (document.getElementById('primary-digitizing'));
         if (digitizingCb) {
             digitizingCb.checked = true;
             // Update visual indicator
@@ -831,7 +830,7 @@ export function populateLogoConfig(session, items) {
         if (alLabel) alLabel.classList.add('active');
         const alConfig = document.getElementById('garment-al-config-new');
         if (alConfig) alConfig.classList.add('visible');
-        const alToggle = document.getElementById('garment-al-toggle');
+        const alToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('garment-al-toggle'));
         if (alToggle) alToggle.checked = true;
 
         _syncALArrays();
@@ -839,17 +838,17 @@ export function populateLogoConfig(session, items) {
 
     // Cap primary logo
     if (session.CapPrintLocation) {
-        const capPosSelect = document.getElementById('cap-primary-position');
+        const capPosSelect = /** @type {HTMLInputElement|null} */ (document.getElementById('cap-primary-position'));
         if (capPosSelect) capPosSelect.value = session.CapPrintLocation;
         embState.capPrimaryLogo.position = session.CapPrintLocation;
     }
     if (session.CapStitchCount) {
-        const capStitchInput = document.getElementById('cap-primary-stitches');
+        const capStitchInput = /** @type {HTMLInputElement|null} */ (document.getElementById('cap-primary-stitches'));
         if (capStitchInput) capStitchInput.value = mapStitchCountToTierValue(session.CapStitchCount, 'CF');
         embState.capPrimaryLogo.stitchCount = session.CapStitchCount;
     }
     if (session.CapDigitizingFee > 0) {
-        const capDigitizingCb = document.getElementById('cap-primary-digitizing');
+        const capDigitizingCb = /** @type {HTMLInputElement|null} */ (document.getElementById('cap-primary-digitizing'));
         if (capDigitizingCb) {
             capDigitizingCb.checked = true;
             const container = capDigitizingCb.closest('.digitizing-checkbox');
@@ -866,7 +865,7 @@ export function populateLogoConfig(session, items) {
     // restore above, which it reads). The matching 3D-EMB / Laser Patch fee items are then
     // skipped in populateProducts so the recomputed fee isn't double-counted. (cert audit 2026-06-04)
     if (session.CapEmbellishmentType && session.CapEmbellishmentType !== 'embroidery') {
-        const capEmbSel = document.getElementById('cap-embellishment-type');
+        const capEmbSel = /** @type {HTMLInputElement|null} */ (document.getElementById('cap-embellishment-type'));
         if (capEmbSel) {
             capEmbSel.value = session.CapEmbellishmentType;
             embState.capPrimaryLogo.embellishmentType = session.CapEmbellishmentType;
@@ -880,7 +879,7 @@ export function populateLogoConfig(session, items) {
     if (session.GarmentDesignNumber) {
         embState.primaryLogo.designNumber = session.GarmentDesignNumber;
         updateLogoCardHeader('garment', session.GarmentDesignNumber);
-        const gDesignInput = document.getElementById('garment-design-number');
+        const gDesignInput = /** @type {HTMLInputElement|null} */ (document.getElementById('garment-design-number'));
         if (gDesignInput) gDesignInput.value = session.GarmentDesignNumber;
         const gClearBtn = document.getElementById('garment-design-clear');
         if (gClearBtn) gClearBtn.style.display = 'inline-flex';
@@ -889,7 +888,7 @@ export function populateLogoConfig(session, items) {
     if (session.CapDesignNumber) {
         embState.capPrimaryLogo.designNumber = session.CapDesignNumber;
         updateLogoCardHeader('cap', session.CapDesignNumber);
-        const cDesignInput = document.getElementById('cap-design-number');
+        const cDesignInput = /** @type {HTMLInputElement|null} */ (document.getElementById('cap-design-number'));
         if (cDesignInput) cDesignInput.value = session.CapDesignNumber;
         const cClearBtn = document.getElementById('cap-design-clear');
         if (cClearBtn) cClearBtn.style.display = 'inline-flex';
@@ -1053,7 +1052,7 @@ export async function addProductFromQuote(product) {
     const styleInput = row.querySelector('.style-input');
 
     // Set style number and trigger color loading
-    styleInput.value = product.styleNumber;
+    /** @type {HTMLInputElement} */ (styleInput).value = product.styleNumber;
     await onStyleChange(styleInput, parseInt(rowId));
 
     // Small delay to let colors load
@@ -1093,7 +1092,7 @@ export async function addProductFromQuote(product) {
             row.dataset.osfaQty = qty;
             row.dataset.isOsfaOnly = 'true';
             const osfaInput = row.querySelector('.osfa-qty-input');
-            if (osfaInput) osfaInput.value = qty;
+            if (osfaInput) /** @type {HTMLInputElement} */ (osfaInput).value = qty;
             const qtyDisp = document.getElementById(`row-qty-${rowIdNum}`);
             if (qtyDisp) qtyDisp.textContent = qty;
             continue;
@@ -1115,7 +1114,7 @@ export async function addProductFromQuote(product) {
             }
             const parent2x = row.querySelector(`input[data-size="2XL"]`);
             if (parent2x) {
-                parent2x.value = qty;
+                /** @type {HTMLInputElement} */ (parent2x).value = qty;
             } else if (size === '2XL') {
                 createChildRow(rowIdNum, '2XL', qty);
             }
@@ -1125,8 +1124,8 @@ export async function addProductFromQuote(product) {
         } else {
             // Standard size - find existing input
             const sizeInput = row.querySelector(`input[data-size="${size}"]`);
-            if (sizeInput && !sizeInput.disabled) {
-                sizeInput.value = qty;
+            if (sizeInput && !/** @type {HTMLInputElement} */ (sizeInput).disabled) {
+                /** @type {HTMLInputElement} */ (sizeInput).value = qty;
                 // Trigger change event to update totals
                 sizeInput.dispatchEvent(new Event('change', { bubbles: true }));
             } else {
@@ -1169,7 +1168,7 @@ function populateAdditionalCharges(session) {
     };
 
     for (const [id, value] of Object.entries(chargeFields)) {
-        const el = document.getElementById(id);
+        const el = /** @type {HTMLInputElement|null} */ (document.getElementById(id));
         if (el && value !== undefined && value !== null) {
             el.value = value;
         }
@@ -1183,11 +1182,11 @@ function populateAdditionalCharges(session) {
     }
 
     // Restore art charge toggle state
-    const artChargeToggle = document.getElementById('art-charge-toggle');
+    const artChargeToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('art-charge-toggle'));
     if (artChargeToggle && session.ArtCharge > 0) {
         artChargeToggle.checked = true;
         const wrapper = document.getElementById('art-charge-wrapper');
-        const input = document.getElementById('art-charge');
+        const input = /** @type {HTMLInputElement|null} */ (document.getElementById('art-charge'));
         if (wrapper) wrapper.style.opacity = '1';
         if (input) input.disabled = false;
     }
@@ -1201,9 +1200,9 @@ function populateAdditionalCharges(session) {
     // (fees/tax/LTM never restored, "Error loading quote"). Guard everything and
     // tell the rep when a saved discount can't be represented. (audit 2026-06-10)
     if (session.Discount > 0 || session.DiscountPercent > 0) {
-        const discountType = document.getElementById('discount-type');
-        const discountAmount = document.getElementById('discount-amount');
-        const discountPreset = document.getElementById('discount-preset');
+        const discountType = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-type'));
+        const discountAmount = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-amount'));
+        const discountPreset = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-preset'));
         if (!discountType || !discountAmount) {
             const saved = session.DiscountPercent > 0 ? `${session.DiscountPercent}%` : `$${session.Discount}`;
             showToast(`This quote has a saved ${saved} discount, but the discount panel was removed — re-apply it via a price override before saving a revision.`, 'warning', 10000);
@@ -1218,8 +1217,8 @@ function populateAdditionalCharges(session) {
                     discountPreset.value = presetValues.includes(percentStr) ? percentStr : 'custom';
                 }
             } else {
-                discountType.value = 'fixed';
-                discountAmount.value = session.Discount;
+                /** @type {HTMLInputElement} */ (discountType).value = 'fixed';
+                /** @type {HTMLInputElement} */ (discountAmount).value = session.Discount;
                 const sym = document.getElementById('discount-symbol');
                 if (sym) sym.textContent = '$';
             }
@@ -1228,7 +1227,7 @@ function populateAdditionalCharges(session) {
                 updateDiscountType();
             }
             // If custom percentage, ensure input wrapper is visible
-            if (session.DiscountPercent > 0 && discountPreset && discountPreset.value === 'custom') {
+            if (session.DiscountPercent > 0 && discountPreset && /** @type {HTMLInputElement} */ (discountPreset).value === 'custom') {
                 const inputWrapper = document.getElementById('discount-input-wrapper');
                 const symbol = document.getElementById('discount-symbol');
                 if (inputWrapper) inputWrapper.style.display = 'block';
@@ -1239,22 +1238,22 @@ function populateAdditionalCharges(session) {
 
     // Restore discount reason with preset detection
     if (session.DiscountReason) {
-        const reasonPreset = document.getElementById('discount-reason-preset');
-        const reasonEl = document.getElementById('discount-reason');
+        const reasonPreset = /** @type {HTMLSelectElement|null} */ (document.getElementById('discount-reason-preset'));
+        const reasonEl = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-reason'));
         if (reasonPreset && reasonEl) {
             const presetValues = Array.from(reasonPreset.options)
                 .map(opt => opt.value)
                 .filter(v => v !== 'custom');
             if (presetValues.includes(session.DiscountReason)) {
                 // Exact match to preset
-                reasonPreset.value = session.DiscountReason;
+                /** @type {HTMLSelectElement} */ (reasonPreset).value = session.DiscountReason;
                 reasonEl.style.display = 'none';
                 reasonEl.value = session.DiscountReason;
             } else {
                 // Custom reason
-                reasonPreset.value = 'custom';
+                /** @type {HTMLSelectElement} */ (reasonPreset).value = 'custom';
                 reasonEl.style.display = 'block';
-                reasonEl.value = session.DiscountReason;
+                /** @type {HTMLInputElement} */ (reasonEl).value = session.DiscountReason;
             }
         }
     }

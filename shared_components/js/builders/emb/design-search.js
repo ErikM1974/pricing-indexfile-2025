@@ -19,7 +19,6 @@
  * function declarations are window props): see the global comment below.
  * These migrate into builders/emb modules with their own clusters.
  */
-// @ts-nocheck — MOVED legacy DOM code (0.4 extraction #1): ~45 pre-existing
 // checkJs frictions (.value/.dataset/expandos on HTMLElement). Typing lands
 // when this cluster's render/state split happens (see emb-decomposition-plan.md
 // follow-ups); new builders/** modules stay strictly checked.
@@ -60,7 +59,7 @@ export async function applyDesignFromCache(type, designData) {
     const designNum = String(designData.designNumber);
     const inputId = type === 'garment' ? 'garment-design-number' : 'cap-design-number';
     const clearId = type === 'garment' ? 'garment-design-clear' : 'cap-design-clear';
-    const input = document.getElementById(inputId);
+    const input = /** @type {HTMLInputElement|null} */ (document.getElementById(inputId));
     const clearBtn = document.getElementById(clearId);
     if (input) input.value = designNum;
     if (clearBtn) clearBtn.style.display = 'inline-flex';
@@ -117,7 +116,7 @@ export async function applyDesignFromCache(type, designData) {
 export function filterDesignSearchByTier(tier) {
     _designSearchState.activeTier = tier;
     document.querySelectorAll('#design-search-filters .design-search-chip').forEach(c => {
-        c.classList.toggle('active', c.dataset.tier === tier);
+        c.classList.toggle('active', /** @type {HTMLElement} */ (c).dataset.tier === tier);
     });
     applyDesignSearchFilters();
 }
@@ -128,7 +127,7 @@ export function filterDesignSearchByTier(tier) {
 export function filterDesignSearchByCompany(company) {
     _designSearchState.activeCompany = company;
     document.querySelectorAll('#design-search-company-chips .design-search-company-chip').forEach(c => {
-        c.classList.toggle('active', c.dataset.company === company);
+        c.classList.toggle('active', /** @type {HTMLElement} */ (c).dataset.company === company);
     });
     applyDesignSearchFilters();
 }
@@ -150,7 +149,7 @@ function applyDesignSearchFilters() {
     }
 
     // Apply text filter if in gallery mode with active text input
-    const searchInput = document.getElementById('design-search-input');
+    const searchInput = /** @type {(HTMLInputElement & { _galleryMode?: boolean })|null} */ (document.getElementById('design-search-input'));
     if (searchInput && searchInput._galleryMode) {
         const q = searchInput.value.trim().toLowerCase();
         if (q) {
@@ -235,7 +234,7 @@ function resetDesignSearchFilters() {
     _designSearchState.activeCompany = 'all';
     _designSearchState.displayedCount = 0;
     document.querySelectorAll('#design-search-filters .design-search-chip').forEach(c => {
-        c.classList.toggle('active', c.dataset.tier === 'all');
+        c.classList.toggle('active', /** @type {HTMLElement} */ (c).dataset.tier === 'all');
     });
     const companyChips = document.getElementById('design-search-company-chips');
     if (companyChips) { companyChips.style.display = 'none'; companyChips.innerHTML = ''; }
@@ -253,7 +252,7 @@ export async function lookupDesignNumber(type) {
     const inputId = type === 'garment' ? 'garment-design-number' : 'cap-design-number';
     const infoId = type === 'garment' ? 'garment-design-info' : 'cap-design-info';
     const clearId = type === 'garment' ? 'garment-design-clear' : 'cap-design-clear';
-    const input = document.getElementById(inputId);
+    const input = /** @type {HTMLInputElement|null} */ (document.getElementById(inputId));
     const infoBadge = document.getElementById(infoId);
     const clearBtn = document.getElementById(clearId);
     if (!input) return;
@@ -374,15 +373,15 @@ async function applyDesignToCard(type, designNum, design) {
     }
 
     // Auto-fill Customer # from design database or company contacts lookup
-    const customerInput = document.getElementById('customer-number');
+    const customerInput = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-number'));
     if (customerInput && !customerInput.value.trim()) {
         if (design.customerId) {
             // Direct customer ID from design master table
-            customerInput.value = design.customerId;
+            /** @type {HTMLInputElement} */ (customerInput).value = design.customerId;
             // Also fill company name if empty
-            const companyInput = document.getElementById('company-name');
+            const companyInput = /** @type {HTMLInputElement|null} */ (document.getElementById('company-name'));
             if (companyInput && !companyInput.value.trim() && company) {
-                companyInput.value = company;
+                /** @type {HTMLInputElement} */ (companyInput).value = company;
             }
             showToast('Customer # ' + design.customerId + ' auto-set from design database', 'info');
         } else if (company) {
@@ -430,7 +429,7 @@ export function showDesignThumbnail(type, imageUrl) {
     if (!thumbDiv) return;
     if (imageUrl) {
         const img = thumbDiv.querySelector('.design-thumb-img');
-        img.src = imageUrl;
+        /** @type {HTMLImageElement} */ (img).src = imageUrl;
         thumbDiv.style.display = 'block';
     } else {
         thumbDiv.style.display = 'none';
@@ -459,7 +458,7 @@ export function openThumbnailFullSize(thumbnailDiv) {
  * Searches Company_Contacts_Merge_ODBC for matching company → fills id_Customer.
  */
 async function autoFillCustomerFromCompany(companyName) {
-    const customerInput = document.getElementById('customer-number');
+    const customerInput = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-number'));
     if (!customerInput || customerInput.value.trim()) return; // Already has value
 
     try {
@@ -490,40 +489,40 @@ async function autoFillCustomerFromCompany(companyName) {
         const bestMatch = exactMatch;
 
         if (bestMatch && bestMatch.id_Customer) {
-            if (!customerInput.value.trim()) {
-                customerInput.value = bestMatch.id_Customer;
+            if (!/** @type {HTMLInputElement} */ (customerInput).value.trim()) {
+                /** @type {HTMLInputElement} */ (customerInput).value = bestMatch.id_Customer;
                 // Also fill other customer fields if empty
-                const companyInput = document.getElementById('company-name');
+                const companyInput = /** @type {HTMLInputElement|null} */ (document.getElementById('company-name'));
                 if (companyInput && !companyInput.value.trim() && bestMatch.CustomerCompanyName) {
-                    companyInput.value = bestMatch.CustomerCompanyName;
+                    /** @type {HTMLInputElement} */ (companyInput).value = bestMatch.CustomerCompanyName;
                 }
-                const nameInput = document.getElementById('customer-name');
+                const nameInput = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-name'));
                 if (nameInput && !nameInput.value.trim() && bestMatch.ct_NameFull) {
-                    nameInput.value = bestMatch.ct_NameFull;
+                    /** @type {HTMLInputElement} */ (nameInput).value = bestMatch.ct_NameFull;
                 }
-                const emailInput = document.getElementById('customer-email');
+                const emailInput = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-email'));
                 if (emailInput && !emailInput.value.trim() && bestMatch.ContactNumbersEmail) {
-                    emailInput.value = bestMatch.ContactNumbersEmail;
+                    /** @type {HTMLInputElement} */ (emailInput).value = bestMatch.ContactNumbersEmail;
                 }
                 // Auto-fill Ship To address if available
                 if (bestMatch.State) {
-                    const stateInput = document.getElementById('ship-state');
-                    if (stateInput && !stateInput.value) stateInput.value = bestMatch.State;
+                    const stateInput = /** @type {HTMLInputElement|null} */ (document.getElementById('ship-state'));
+                    if (stateInput && !stateInput.value) /** @type {HTMLInputElement} */ (stateInput).value = bestMatch.State;
                 }
                 if (bestMatch.City) {
-                    const cityInput = document.getElementById('ship-city');
-                    if (cityInput && !cityInput.value.trim()) cityInput.value = bestMatch.City;
+                    const cityInput = /** @type {HTMLInputElement|null} */ (document.getElementById('ship-city'));
+                    if (cityInput && !cityInput.value.trim()) /** @type {HTMLInputElement} */ (cityInput).value = bestMatch.City;
                 }
                 if (bestMatch.Zip) {
-                    const zipInput = document.getElementById('ship-zip');
+                    const zipInput = /** @type {HTMLInputElement|null} */ (document.getElementById('ship-zip'));
                     if (zipInput && !zipInput.value.trim()) {
-                        zipInput.value = bestMatch.Zip;
+                        /** @type {HTMLInputElement} */ (zipInput).value = bestMatch.Zip;
                         lookupTaxRate(); // Auto-trigger tax lookup
                     }
                 }
                 if (bestMatch.Address) {
-                    const addrInput = document.getElementById('ship-address');
-                    if (addrInput && !addrInput.value.trim()) addrInput.value = bestMatch.Address;
+                    const addrInput = /** @type {HTMLInputElement|null} */ (document.getElementById('ship-address'));
+                    if (addrInput && !addrInput.value.trim()) /** @type {HTMLInputElement} */ (addrInput).value = bestMatch.Address;
                 }
                 showToast('Customer # ' + bestMatch.id_Customer + ' auto-set from ' +
                     escapeHtml(bestMatch.CustomerCompanyName || companyName), 'info');
@@ -553,7 +552,7 @@ function setDesignNumberOnLogo(type, designNum) {
  */
 function autoSetStitchTier(type, stitchCount, _tierName) {
     const dropdownId = type === 'garment' ? 'primary-stitches' : 'cap-primary-stitches';
-    const dropdown = document.getElementById(dropdownId);
+    const dropdown = /** @type {HTMLInputElement|null} */ (document.getElementById(dropdownId));
     if (!dropdown) return;
 
     // Map stitch count to tier value (reuse existing logic)
@@ -585,9 +584,9 @@ function autoSetStitchTier(type, stitchCount, _tierName) {
         if (typeof onPrimaryStitchTierChange === 'function') onPrimaryStitchTierChange();
         // Handle Full Back position auto-select
         if (stitchCount >= 25000) {
-            const posDropdown = document.getElementById('primary-position');
+            const posDropdown = /** @type {HTMLInputElement|null} */ (document.getElementById('primary-position'));
             if (posDropdown && posDropdown.value !== 'Full Back') {
-                posDropdown.value = 'Full Back';
+                /** @type {HTMLInputElement} */ (posDropdown).value = 'Full Back';
                 if (typeof onPrimaryPositionChange === 'function') onPrimaryPositionChange();
             }
         }
@@ -605,7 +604,7 @@ export function clearDesignNumber(type) {
     const infoId = type === 'garment' ? 'garment-design-info' : 'cap-design-info';
     const clearId = type === 'garment' ? 'garment-design-clear' : 'cap-design-clear';
 
-    const input = document.getElementById(inputId);
+    const input = /** @type {HTMLInputElement|null} */ (document.getElementById(inputId));
     const infoBadge = document.getElementById(infoId);
     const clearBtn = document.getElementById(clearId);
 
@@ -636,7 +635,7 @@ export function clearDesignNumber(type) {
 export function openDesignSearchModal(type) {
     _designSearchTarget = type;
     const modal = document.getElementById('design-search-modal');
-    const searchInput = document.getElementById('design-search-input');
+    const searchInput = /** @type {(HTMLInputElement & { _galleryMode?: boolean })|null} */ (document.getElementById('design-search-input'));
     const results = document.getElementById('design-search-results');
     const empty = document.getElementById('design-search-empty');
     const loading = document.getElementById('design-search-loading');
@@ -650,9 +649,9 @@ export function openDesignSearchModal(type) {
     if (searchInput) searchInput.value = '';
 
     // Check if a customer is selected → gallery mode
-    const customerId = document.getElementById('customer-number')?.value?.trim();
-    const customerName = document.getElementById('customer-name')?.value?.trim()
-        || document.getElementById('company-name')?.value?.trim() || '';
+    const customerId = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-number'))?.value?.trim();
+    const customerName = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-name'))?.value?.trim()
+        || /** @type {HTMLInputElement|null} */ (document.getElementById('company-name'))?.value?.trim() || '';
 
     if (customerId) {
         // Gallery mode: auto-load customer designs
@@ -667,7 +666,7 @@ export function openDesignSearchModal(type) {
         if (searchHint) searchHint.style.display = 'none';
         if (searchBtn) searchBtn.style.display = 'none';
         if (searchInput) {
-            searchInput.placeholder = 'Filter designs...';
+            /** @type {HTMLInputElement} */ (searchInput).placeholder = 'Filter designs...';
             searchInput._galleryMode = true;
         }
         // Show modal then load gallery
@@ -681,7 +680,7 @@ export function openDesignSearchModal(type) {
         if (searchHint) searchHint.style.display = '';
         if (searchBtn) searchBtn.style.display = '';
         if (searchInput) {
-            searchInput.placeholder = 'Search by company name or design number...';
+            /** @type {HTMLInputElement} */ (searchInput).placeholder = 'Search by company name or design number...';
             searchInput._galleryMode = false;
         }
         if (modal) { modal.classList.add('active'); modal.style.display = 'flex'; if (typeof openAccessibleModal === 'function') openAccessibleModal(modal, { label: 'Design search', onEsc: closeDesignSearchModal }); }
@@ -744,7 +743,7 @@ async function loadCustomerDesignGallery(customerId) {
         if (!data.success || !data.results || data.results.length === 0) {
             // No designs: show message and fall back to search mode
             if (countEl) countEl.textContent = '0 designs';
-            const searchInput = document.getElementById('design-search-input');
+            const searchInput = /** @type {(HTMLInputElement & { _galleryMode?: boolean })|null} */ (document.getElementById('design-search-input'));
             const searchHint = document.getElementById('design-search-hint');
             const searchBtn = document.getElementById('design-search-go');
             if (results) results.innerHTML = '<div class="design-search-empty" style="display:flex;"><i class="fas fa-folder-open"></i><p>No designs found for this customer. Use the search bar to find designs by name or number.</p></div>';

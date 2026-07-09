@@ -13,7 +13,6 @@
  * DOMContentLoaded composition root. State stays monolith-declared
  * (config-level writable globals); the 0.5 quote-model migrates it.
  */
-// @ts-nocheck — MOVED legacy DOM code: pre-existing checkJs frictions; typing
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
 /* global
    escapeHtml, showToast, renderOrderRecap, QuoteOrderSummary, markAsUnsaved,
@@ -90,7 +89,7 @@ if (typeof QuoteOrderSummary !== 'undefined') {
                 var out = [];
                 try {
                     if (typeof embState.primaryLogo !== 'undefined' && embState.primaryLogo && embState.primaryLogo.designNumber) {
-                        var pos = document.getElementById('primary-position')?.value || '';
+                        var pos = /** @type {HTMLInputElement|null} */ (document.getElementById('primary-position'))?.value || '';
                         out.push({ text: '#' + embState.primaryLogo.designNumber + (pos ? ' · ' + pos : ''), thumbUrl: embState.primaryLogo.thumbnailUrl || '', label: '#' + embState.primaryLogo.designNumber });
                     }
                     if (typeof embState.capPrimaryLogo !== 'undefined' && embState.capPrimaryLogo && embState.capPrimaryLogo.designNumber) {
@@ -130,7 +129,7 @@ export function setupPrimaryLogoHandlers() {
     const digitizingCheckbox = document.getElementById('primary-digitizing');
     if (digitizingCheckbox) {
         digitizingCheckbox.addEventListener('change', function() {
-            embState.primaryLogo.needsDigitizing = this.checked;
+            embState.primaryLogo.needsDigitizing = /** @type {HTMLInputElement} */ (this).checked;
             recalculatePricing();
         });
     }
@@ -186,7 +185,7 @@ export function setupCapPrimaryLogoHandlers() {
 
     if (digitizingCheckbox) {
         digitizingCheckbox.addEventListener('change', function() {
-            embState.capPrimaryLogo.needsDigitizing = this.checked;
+            embState.capPrimaryLogo.needsDigitizing = /** @type {HTMLInputElement} */ (this).checked;
             recalculatePricing();
         });
     }
@@ -200,7 +199,7 @@ export function setupCapPrimaryLogoHandlers() {
 let exactMatchSearcher = null;
 
 export function setupSearchAutocomplete() {
-    const searchInput = document.getElementById('product-search');
+    const searchInput = /** @type {HTMLInputElement|null} */ (document.getElementById('product-search'));
     const suggestions = document.getElementById('search-suggestions');
 
     if (!searchInput || !window.ExactMatchSearch) {
@@ -233,7 +232,7 @@ export function setupSearchAutocomplete() {
         // Keyboard navigation: select item via Enter
         onSelect: (product) => {
             // Keyboard selected product
-            searchInput.value = '';
+            /** @type {HTMLInputElement} */ (searchInput).value = '';
             selectProduct(product.value);
         },
 
@@ -245,7 +244,7 @@ export function setupSearchAutocomplete() {
 
     // Wire up search input
     searchInput.addEventListener('input', function() {
-        const query = this.value.trim();
+        const query = /** @type {HTMLInputElement} */ (this).value.trim();
 
         if (query.length < 2) {
             suggestions.classList.remove('show');
@@ -265,7 +264,7 @@ export function setupSearchAutocomplete() {
         // Handle Enter for immediate search when nothing is selected
         if (e.key === 'Enter') {
             e.preventDefault();
-            const query = searchInput.value.trim();
+            const query = /** @type {HTMLInputElement} */ (searchInput).value.trim();
             if (query.length >= 2) {
                 exactMatchSearcher.searchImmediate(query);
             }
@@ -274,7 +273,7 @@ export function setupSearchAutocomplete() {
 
     // Close suggestions when clicking outside
     document.addEventListener('click', function(e) {
-        if (!e.target.closest('.search-input-wrapper')) {
+        if (!/** @type {HTMLElement} */ (e.target).closest('.search-input-wrapper')) {
             suggestions.classList.remove('show');
             if (exactMatchSearcher) exactMatchSearcher.resetNavigation();
         }
@@ -293,7 +292,7 @@ function showSearchSuggestions(products) {
         // Not a dead-end: offer the non-SanMar add path right here. The row-level
         // style input already had this; the TOP search just said "No products
         // found" and stranded the rep. (audit ux-flow 2026-06-10)
-        const q = (document.getElementById('product-search')?.value || '').trim();
+        const q = (/** @type {HTMLInputElement|null} */ (document.getElementById('product-search'))?.value || '').trim();
         // eslint-disable-next-line no-unsanitized/property -- audited (1.4): only escapeHtml(q) interpolations (nested-ternary shape the rule cannot parse)
         suggestions.innerHTML = `
             <div class="suggestion-item"><span>No SanMar products found${q ? ` for "${escapeHtml(q)}"` : ''}</span></div>
@@ -342,7 +341,7 @@ function updateSearchSelectionHighlight(selectedIndex) {
 }
 
 export async function selectProduct(styleNumber) {
-    const searchInput = document.getElementById('product-search');
+    const searchInput = /** @type {HTMLInputElement|null} */ (document.getElementById('product-search'));
     const suggestions = document.getElementById('search-suggestions');
 
     searchInput.value = '';
@@ -370,7 +369,7 @@ export function addNewRow() {
     const row = document.createElement('tr');
     row.id = `row-${rowId}`;
     row.className = 'new-row';
-    row.dataset.rowId = rowId;
+    row.dataset.rowId = /** @type {any} */ (rowId);
 
     // eslint-disable-next-line no-unsanitized/property -- audited (1.4): interpolations escapeHtml-wrapped or numeric at build
     row.innerHTML = `
@@ -432,7 +431,7 @@ export function addNewRow() {
 
     // Focus on the style input
     setTimeout(() => {
-        row.querySelector('.style-input').focus();
+        /** @type {HTMLElement} */ (row.querySelector('.style-input')).focus();
     }, 50);
 
     // Remove the "new-row" highlight after a moment
@@ -445,7 +444,7 @@ export function addNewRow() {
 
 export async function addProductRow(styleNumber) {
     // Find or create empty row
-    let targetRow = document.querySelector('tr.new-row');
+    let targetRow = /** @type {HTMLElement|null} */ (document.querySelector('tr.new-row'));
     if (!targetRow) {
         addNewRow();
         targetRow = document.querySelector('tr.new-row');
@@ -453,7 +452,7 @@ export async function addProductRow(styleNumber) {
 
     const rowId = targetRow.dataset.rowId;
     const styleInput = targetRow.querySelector('.style-input');
-    styleInput.value = styleNumber;
+    /** @type {HTMLInputElement} */ (styleInput).value = styleNumber;
 
     await onStyleChange(styleInput, parseInt(rowId));
 }
@@ -464,11 +463,11 @@ export async function addProductRow(styleNumber) {
  * when the style is brand-new). (audit ux-flow 2026-06-10)
  */
 export async function addNonSanmarFromSearch() {
-    const searchEl = document.getElementById('product-search');
+    const searchEl = /** @type {HTMLInputElement|null} */ (document.getElementById('product-search'));
     const q = (searchEl?.value || '').trim();
     if (!q) return;
     document.getElementById('search-suggestions')?.classList.remove('show');
-    if (searchEl) searchEl.value = '';
+    if (searchEl) /** @type {HTMLInputElement} */ (searchEl).value = '';
     await addProductRow(q);
 }
 window.addNonSanmarFromSearch = addNonSanmarFromSearch;
@@ -546,7 +545,7 @@ export function createServiceProductRow(serviceType, data) {
     const row = document.createElement('tr');
     row.id = `row-${rowId}`;
     row.className = 'service-product-row';
-    row.dataset.rowId = rowId;
+    row.dataset.rowId = /** @type {any} */ (rowId);
     row.dataset.productType = 'service';
     row.dataset.serviceType = serviceType.toLowerCase();
     row.dataset.style = serviceType;
@@ -652,7 +651,7 @@ export function addManualServiceRow(serviceType, priceOverride) {
         if (serviceType === 'RUSH') {
             // Rush qty is fixed at 1; its price = 25% of subtotal (set live in syncRushRow)
             const q = row.querySelector('.service-qty');
-            if (q) { q.value = '1'; q.readOnly = true; }
+            if (q) { /** @type {HTMLInputElement} */ (q).value = '1'; /** @type {HTMLInputElement} */ (q).readOnly = true; }
             markAsUnsaved();
             recalculatePricing();
             showToast('Rush Fee added — 25% of subtotal', 'success');
@@ -668,8 +667,8 @@ export function addManualServiceRow(serviceType, priceOverride) {
             const qtyInput = row.querySelector('.service-qty');
             if (qtyInput) {
                 setTimeout(() => {
-                    qtyInput.focus();
-                    qtyInput.select();
+                    /** @type {HTMLElement} */ (qtyInput).focus();
+                    /** @type {HTMLInputElement} */ (qtyInput).select();
                 }, 50);
             }
             markAsUnsaved();
@@ -730,7 +729,7 @@ export async function addALLineItem(placement, stitches) {
 
     // Focus the qty input so the rep can set the count immediately
     const qtyInput = row.querySelector('.service-qty');
-    if (qtyInput) setTimeout(() => { qtyInput.focus(); qtyInput.select(); }, 50);
+    if (qtyInput) setTimeout(() => { /** @type {HTMLElement} */ (qtyInput).focus(); /** @type {HTMLInputElement} */ (qtyInput).select(); }, 50);
 
     markAsUnsaved();
     await syncALRows();     // pull the live per-piece price from the API (cached) for this row
@@ -772,7 +771,7 @@ export async function addDECGLineItem(itemType, stitches, heavyweight) {
     row.dataset.decgHeavyweight = heavyweight ? 'true' : 'false';   // +$10/pc Carhartt/canvas/leather
 
     const qtyInput = row.querySelector('.service-qty');
-    if (qtyInput) setTimeout(() => { qtyInput.focus(); qtyInput.select(); }, 50);
+    if (qtyInput) setTimeout(() => { /** @type {HTMLElement} */ (qtyInput).focus(); /** @type {HTMLInputElement} */ (qtyInput).select(); }, 50);
 
     markAsUnsaved();
     await syncDECGRows();    // pull the live per-piece price from the API (cached) for this row
@@ -852,7 +851,7 @@ export function openMonogramNamesDialog(row, serviceType) {
     wrap.addEventListener('click', (e) => { if (e.target === wrap) { close(); focusQty(); } });
     document.addEventListener('keydown', onKey);
     wrap.querySelector('.mnd-apply').addEventListener('click', () => {
-        const names = ta.value.split('\n').map(s => s.trim()).filter(Boolean);
+        const names = /** @type {HTMLInputElement} */ (ta).value.split('\n').map(s => s.trim()).filter(Boolean);
         close();
         if (!names.length) { focusQty(); return; }
         const q = row.querySelector('.service-qty');
@@ -860,9 +859,9 @@ export function openMonogramNamesDialog(row, serviceType) {
             q.value = String(names.length);
             q.dispatchEvent(new Event('change', { bubbles: true }));   // reprices via onServiceQtyChange
         }
-        const notesEl = document.getElementById('notes');
+        const notesEl = /** @type {HTMLInputElement|null} */ (document.getElementById('notes'));
         if (notesEl) {
-            notesEl.value = (notesEl.value ? notesEl.value + '\n' : '') +
+            notesEl.value = (/** @type {HTMLInputElement} */ (notesEl).value ? /** @type {HTMLInputElement} */ (notesEl).value + '\n' : '') +
                 '--- Names/Monograms ---\n' + names.join('\n');
             if (typeof updateNotesBadge === 'function') updateNotesBadge();
         }
@@ -872,7 +871,7 @@ export function openMonogramNamesDialog(row, serviceType) {
         recalculatePricing();
         showToast(`${names.length} name${names.length === 1 ? '' : 's'} captured — qty set to ${names.length}; list saved to Special Notes.`, 'success');
     });
-    setTimeout(() => ta.focus(), 50);
+    setTimeout(() => /** @type {HTMLElement} */ (ta).focus(), 50);
 }
 window.openMonogramNamesDialog = openMonogramNamesDialog;
 
@@ -901,7 +900,7 @@ export function onServiceQtyChange(rowId) {
     }
 
     const qtyInput = row.querySelector('.service-qty');
-    const quantity = parseFloat(qtyInput?.value) || 0;  // parseFloat → Graphic Design hours can be fractional (e.g. 0.75)
+    const quantity = parseFloat(/** @type {HTMLInputElement|null} */ (qtyInput)?.value) || 0;  // parseFloat → Graphic Design hours can be fractional (e.g. 0.75)
     // Use sell price override if set, otherwise use original unit price
     const overridePrice = parseFloat(row.dataset.sellPrice) || 0;
     const unitPrice = overridePrice > 0 ? overridePrice : (parseFloat(row.dataset.unitPrice) || 0);
@@ -1055,7 +1054,7 @@ export async function onStyleChange(input, rowId) {
             const cleanTitle = cleanProductTitle(product.PRODUCT_TITLE, styleNumber);
 
             // Update description with clean title
-            descInput.value = cleanTitle || styleNumber;
+            /** @type {HTMLInputElement} */ (descInput).value = cleanTitle || styleNumber;
 
             // Fetch colors using product-colors API (also returns CATEGORY_NAME) — cached per style
             let colorsData;
@@ -1126,7 +1125,7 @@ export async function onStyleChange(input, rowId) {
             // Enable "duplicate row" button now that style is loaded
             // (visual states live in quote-builder-common.css .btn-duplicate-row)
             const dupBtn = row.querySelector('.btn-duplicate-row');
-            if (dupBtn) dupBtn.disabled = false;
+            if (dupBtn) /** @type {HTMLInputElement} */ (dupBtn).disabled = false;
 
         } else {
             await _handleStyleNotFound(row, rowId, descInput, styleNumber);
@@ -1259,8 +1258,8 @@ export function selectNonSanmarColor(rowId, optionEl) {
     const pickerSelected = row.querySelector('.color-picker-selected');
     const swatch = pickerSelected.querySelector('.color-swatch');
     const nameSpan = pickerSelected.querySelector('.color-name');
-    swatch.style.backgroundImage = '';
-    swatch.style.backgroundColor = '#ccc';
+    /** @type {HTMLElement} */ (swatch).style.backgroundImage = '';
+    /** @type {HTMLElement} */ (swatch).style.backgroundColor = '#ccc';
     swatch.classList.remove('empty');
     nameSpan.textContent = colorName;
     nameSpan.classList.remove('placeholder');
@@ -1282,7 +1281,7 @@ export function selectNonSanmarColor(rowId, optionEl) {
     row.querySelector('.color-picker-dropdown').classList.add('hidden');
 
     // Enable size inputs (non-SanMar skips detectAndAdjustSizeUI API call)
-    row.querySelectorAll('.size-input').forEach(input => input.disabled = false);
+    row.querySelectorAll('.size-input').forEach(input => /** @type {HTMLInputElement} */ (input).disabled = false);
 
     // For caps, keep only OSFA enabled
     if (row.dataset.isCap === 'true') {
@@ -1291,7 +1290,7 @@ export function selectNonSanmarColor(rowId, optionEl) {
 
     // Focus first size input
     const firstSize = row.querySelector('.size-input:not([disabled])');
-    if (firstSize) firstSize.focus();
+    if (firstSize) /** @type {HTMLElement} */ (firstSize).focus();
 
     // Cascade to child rows
     cascadeColorToChildRows(rowId, colorName, colorName, '', '#ccc');
@@ -1994,15 +1993,15 @@ function onOSFAQtyChange(rowId) {
     if (!row) return;
 
     const osfaInput = row.querySelector('.osfa-qty-input');
-    const qty = parseInt(osfaInput?.value) || 0;
+    const qty = parseInt(/** @type {HTMLInputElement|null} */ (osfaInput)?.value) || 0;
 
     // Store OSFA qty in dataset
-    row.dataset.osfaQty = qty;
+    row.dataset.osfaQty = /** @type {any} */ (qty);
     row.dataset.isOsfaOnly = 'true';
 
     // Update qty display
     const qtyDisplay = document.getElementById(`row-qty-${rowId}`);
-    if (qtyDisplay) qtyDisplay.textContent = qty;
+    if (qtyDisplay) qtyDisplay.textContent = /** @type {any} */ (qty);
 
     // Trigger pricing recalculation
     recalculatePricing();
@@ -2187,21 +2186,21 @@ function validateSizeAvailability(row, availableSizes) {
         if (isAvailable) {
             input.classList.add('size-available');
             input.classList.remove('size-unavailable');
-            input.disabled = false;
-            input.placeholder = '0';
-            input.title = `${size} (SKU: ${sku})`;
+            /** @type {HTMLInputElement} */ (input).disabled = false;
+            /** @type {HTMLInputElement} */ (input).placeholder = '0';
+            /** @type {HTMLElement} */ (input).title = `${size} (SKU: ${sku})`;
         } else {
             input.classList.add('size-unavailable');
             input.classList.remove('size-available');
-            input.disabled = true;
-            input.value = '';
-            input.placeholder = 'N/A';
-            input.title = `${size} not available for this style/color`;
+            /** @type {HTMLInputElement} */ (input).disabled = true;
+            /** @type {HTMLInputElement} */ (input).value = '';
+            /** @type {HTMLInputElement} */ (input).placeholder = 'N/A';
+            /** @type {HTMLElement} */ (input).title = `${size} not available for this style/color`;
             input.closest('td')?.classList.add('size-disabled');
         }
 
         // Store SKU on input for reference
-        input.dataset.sku = sku;
+        /** @type {HTMLElement} */ (input).dataset.sku = sku;
     });
 
     // Update extended size picker (XXXL column) if present
@@ -2213,14 +2212,14 @@ function validateSizeAvailability(row, availableSizes) {
 
         if (hasExtended) {
             xxxlCell.classList.remove('size-unavailable');
-            xxxlCell.disabled = false;
-            xxxlCell.title = `Extended sizes: ${extendedSizes.join(', ')}`;
+            /** @type {HTMLInputElement} */ (xxxlCell).disabled = false;
+            /** @type {HTMLElement} */ (xxxlCell).title = `Extended sizes: ${extendedSizes.join(', ')}`;
             row.dataset.extendedSizes = JSON.stringify(extendedSizes);
         } else {
             xxxlCell.classList.add('size-unavailable');
-            xxxlCell.disabled = true;
-            xxxlCell.placeholder = '-';
-            xxxlCell.title = 'No extended sizes available';
+            /** @type {HTMLInputElement} */ (xxxlCell).disabled = true;
+            /** @type {HTMLInputElement} */ (xxxlCell).placeholder = '-';
+            /** @type {HTMLElement} */ (xxxlCell).title = 'No extended sizes available';
         }
     }
 
@@ -2322,7 +2321,7 @@ export function selectColor(rowId, optionEl, skipDuplicateCheck) {
             showToast(`${style} in ${colorName} already exists. Adding to existing row.`, 'info');
             row.querySelector('.color-picker-dropdown').classList.add('hidden');
             const existingFirstSize = existingRow.querySelector('.size-input:not([disabled])');
-            if (existingFirstSize) existingFirstSize.focus();
+            if (existingFirstSize) /** @type {HTMLElement} */ (existingFirstSize).focus();
             return;
         }
     }
@@ -2334,13 +2333,13 @@ export function selectColor(rowId, optionEl, skipDuplicateCheck) {
 
     // Set swatch style (image or hex fallback)
     if (swatchUrl) {
-        swatch.style.backgroundImage = `url('${swatchUrl}')`;
-        swatch.style.backgroundColor = '';
-        swatch.style.backgroundSize = 'cover';
-        swatch.style.backgroundPosition = 'center';
+        /** @type {HTMLElement} */ (swatch).style.backgroundImage = `url('${swatchUrl}')`;
+        /** @type {HTMLElement} */ (swatch).style.backgroundColor = '';
+        /** @type {HTMLElement} */ (swatch).style.backgroundSize = 'cover';
+        /** @type {HTMLElement} */ (swatch).style.backgroundPosition = 'center';
     } else {
-        swatch.style.backgroundImage = '';
-        swatch.style.backgroundColor = hex || '#ccc';
+        /** @type {HTMLElement} */ (swatch).style.backgroundImage = '';
+        /** @type {HTMLElement} */ (swatch).style.backgroundColor = hex || '#ccc';
     }
     swatch.classList.remove('empty');
 
@@ -2376,7 +2375,7 @@ export function selectColor(rowId, optionEl, skipDuplicateCheck) {
     row.querySelector('.color-picker-dropdown').classList.add('hidden');
 
     // Enable size inputs initially (may be disabled by detectAndAdjustSizeUI for special products)
-    row.querySelectorAll('.size-input').forEach(input => input.disabled = false);
+    row.querySelectorAll('.size-input').forEach(input => /** @type {HTMLInputElement} */ (input).disabled = false);
 
     // Detect size category and adjust UI (OSFA, combo, youth, toddler, tall, standard)
     // This runs async but doesn't block - will update UI when API returns
@@ -2396,7 +2395,7 @@ export function selectColor(rowId, optionEl, skipDuplicateCheck) {
 
     // Focus first size input (may be overridden by detectAndAdjustSizeUI for special products)
     const firstSize = row.querySelector('.size-input');
-    if (firstSize) firstSize.focus();
+    if (firstSize) /** @type {HTMLElement} */ (firstSize).focus();
 
     // Cascade to child rows if any
     cascadeColorToChildRows(rowId, colorName, catalogColor, swatchUrl, hex);
@@ -2423,11 +2422,11 @@ function cascadeColorToChildRows(parentRowId, colorName, catalogColor, swatchUrl
                 const childName = childPicker.querySelector('.color-name');
                 if (childSwatch && childName) {
                     if (swatchUrl) {
-                        childSwatch.style.backgroundImage = `url('${swatchUrl}')`;
-                        childSwatch.style.backgroundColor = '';
+                        /** @type {HTMLElement} */ (childSwatch).style.backgroundImage = `url('${swatchUrl}')`;
+                        /** @type {HTMLElement} */ (childSwatch).style.backgroundColor = '';
                     } else {
-                        childSwatch.style.backgroundImage = '';
-                        childSwatch.style.backgroundColor = hex || '#ccc';
+                        /** @type {HTMLElement} */ (childSwatch).style.backgroundImage = '';
+                        /** @type {HTMLElement} */ (childSwatch).style.backgroundColor = hex || '#ccc';
                     }
                     childSwatch.classList.remove('empty');
                     childName.textContent = colorName;
@@ -2495,7 +2494,7 @@ function navigateOptions(dropdown, direction) {
 
 // Click outside handler to close all dropdowns
 document.addEventListener('click', function(e) {
-    if (!e.target.closest('.color-picker-wrapper')) {
+    if (!/** @type {HTMLElement} */ (e.target).closest('.color-picker-wrapper')) {
         document.querySelectorAll('.color-picker-dropdown').forEach(d => d.classList.add('hidden'));
         document.querySelectorAll('.color-picker-selected[aria-expanded="true"]').forEach((el) => el.setAttribute('aria-expanded', 'false'));
     }
@@ -2519,13 +2518,13 @@ export function selectChildColor(childRowId, parentRowId, optionEl) {
 
     // Set swatch style (image or hex fallback)
     if (swatchUrl) {
-        swatch.style.backgroundImage = `url('${swatchUrl}')`;
-        swatch.style.backgroundColor = '';
-        swatch.style.backgroundSize = 'cover';
-        swatch.style.backgroundPosition = 'center';
+        /** @type {HTMLElement} */ (swatch).style.backgroundImage = `url('${swatchUrl}')`;
+        /** @type {HTMLElement} */ (swatch).style.backgroundColor = '';
+        /** @type {HTMLElement} */ (swatch).style.backgroundSize = 'cover';
+        /** @type {HTMLElement} */ (swatch).style.backgroundPosition = 'center';
     } else {
-        swatch.style.backgroundImage = '';
-        swatch.style.backgroundColor = hex || '#ccc';
+        /** @type {HTMLElement} */ (swatch).style.backgroundImage = '';
+        /** @type {HTMLElement} */ (swatch).style.backgroundColor = hex || '#ccc';
     }
     swatch.classList.remove('empty');
 
@@ -2592,7 +2591,7 @@ function findExistingRow(style, catalogColor, excludeRowId) {
     for (const row of rows) {
         const rowNumericId = parseInt(row.id.replace('row-', ''));
         if (rowNumericId === excludeRowId) continue;
-        if (row.dataset.style === style && row.dataset.catalogColor === catalogColor) {
+        if (/** @type {HTMLElement} */ (row).dataset.style === style && /** @type {HTMLElement} */ (row).dataset.catalogColor === catalogColor) {
             return row;
         }
     }
@@ -2626,7 +2625,7 @@ export function onSizeChange(rowId) {
     // Bug fix: 2026-01-14 - Parent row showed 16 instead of 14 for S/M/L/XL
     const xxlInput = row.querySelector('[data-size="2XL"]');
     if (xxlInput) {
-        const qty = parseInt(xxlInput.value) || 0;
+        const qty = parseInt(/** @type {HTMLInputElement} */ (xxlInput).value) || 0;
         // Check for both 2XL and XXL child rows (XXL is distinct for Ladies/Womens products)
         const existingChildId = embState.childRowMap[rowId]?.['2XL'] || embState.childRowMap[rowId]?.['XXL'];
         const existingChildSize = embState.childRowMap[rowId]?.['2XL'] ? '2XL' : (embState.childRowMap[rowId]?.['XXL'] ? 'XXL' : '2XL');
@@ -2639,19 +2638,19 @@ export function onSizeChange(rowId) {
                 createChildRow(rowId, '2XL', qty);
             }
             // Disable the 2XL input in parent BEFORE quantity calculation
-            xxlInput.disabled = true;
-            xxlInput.value = '';  // Clear to prevent visual confusion
-            xxlInput.style.background = '#f5f5f5';
-            xxlInput.style.color = '#999';
+            /** @type {HTMLInputElement} */ (xxlInput).disabled = true;
+            /** @type {HTMLInputElement} */ (xxlInput).value = '';  // Clear to prevent visual confusion
+            /** @type {HTMLElement} */ (xxlInput).style.background = '#f5f5f5';
+            /** @type {HTMLElement} */ (xxlInput).style.color = '#999';
         } else {
             // Remove child row if it exists (could be 2XL or XXL)
             if (existingChildId) {
                 removeChildRow(rowId, existingChildSize);
             }
             // Re-enable 2XL input in parent
-            xxlInput.disabled = false;
-            xxlInput.style.background = '';
-            xxlInput.style.color = '';
+            /** @type {HTMLInputElement} */ (xxlInput).disabled = false;
+            /** @type {HTMLElement} */ (xxlInput).style.background = '';
+            /** @type {HTMLElement} */ (xxlInput).style.color = '';
         }
     }
 
@@ -2680,12 +2679,12 @@ function updateParentQtyDisplay(rowId) {
 
     let standardTotal = 0;
     row.querySelectorAll('.size-input:not(.xxxl-picker-btn):not(.osfa-qty-input):not(:disabled)').forEach(input => {
-        standardTotal += parseInt(input.value) || 0;
+        standardTotal += parseInt(/** @type {HTMLInputElement} */ (input).value) || 0;
     });
 
     if (standardTotal > 0) {
         // Normal case: parent has standard sizes, show their total
-        document.getElementById(`row-qty-${rowId}`).textContent = standardTotal;
+        document.getElementById(`row-qty-${rowId}`).textContent = /** @type {any} */ (standardTotal);
     } else {
         // Variant-only: show child row total so parent doesn't display "0"
         let childTotal = 0;
@@ -2698,7 +2697,7 @@ function updateParentQtyDisplay(rowId) {
                 }
             });
         }
-        document.getElementById(`row-qty-${rowId}`).textContent = childTotal;
+        document.getElementById(`row-qty-${rowId}`).textContent = /** @type {any} */ (childTotal);
     }
 }
 
@@ -2713,21 +2712,21 @@ export function hideVariantOnlyParents() {
 
     const parentRows = tbody.querySelectorAll('tr:not(.child-row):not(.service-product-row)');
     parentRows.forEach(parentRow => {
-        const rowId = parseInt(parentRow.dataset.rowId);
+        const rowId = parseInt(/** @type {HTMLElement} */ (parentRow).dataset.rowId);
         if (!rowId || !embState.childRowMap[rowId]) return;
-        if (parentRow.dataset.isOsfaOnly === 'true') return;
+        if (/** @type {HTMLElement} */ (parentRow).dataset.isOsfaOnly === 'true') return;
 
         // Check if ALL standard size inputs are empty/zero
         let standardTotal = 0;
         parentRow.querySelectorAll('.size-input:not(.xxxl-picker-btn):not(.osfa-qty-input):not(:disabled)').forEach(input => {
-            standardTotal += parseInt(input.value) || 0;
+            standardTotal += parseInt(/** @type {HTMLInputElement} */ (input).value) || 0;
         });
 
         if (standardTotal > 0) return; // Has standard sizes — keep parent visible
 
         // This is a variant-only parent — hide it and promote children
         parentRow.classList.add('variant-only-parent');
-        parentRow.dataset.variantOnlyHidden = 'true';
+        /** @type {HTMLElement} */ (parentRow).dataset.variantOnlyHidden = 'true';
 
         // Promote each child row to standalone
         const childRows = document.querySelectorAll(`tr[data-parent-row-id="${rowId}"]`);
@@ -2812,7 +2811,7 @@ export function createChildRow(parentRowId, size, qty) {
     const childRow = document.createElement('tr');
     childRow.id = `row-${childRowId}`;
     childRow.className = 'child-row';
-    childRow.dataset.rowId = childRowId;
+    childRow.dataset.rowId = /** @type {any} */ (childRowId);
     childRow.dataset.parentRowId = parentRowId;
     childRow.dataset.extendedSize = size;
     childRow.dataset.style = partNumber;
@@ -2896,12 +2895,12 @@ export function createChildRow(parentRowId, size, qty) {
         let insertAfter = parentRow;  // Default: after parent (for XS or first size)
 
         for (const existingChild of existingChildren) {
-            const existingSize = existingChild.dataset.extendedSize;
+            const existingSize = /** @type {HTMLElement} */ (existingChild).dataset.extendedSize;
             const existingSizeIndex = EXTENDED_SIZE_ORDER.indexOf(existingSize);
 
             // If existing size comes before new size in order, insert after this child
             if (existingSizeIndex < newSizeIndex) {
-                insertAfter = existingChild;
+                insertAfter = /** @type {HTMLElement} */ (existingChild);
             } else {
                 // Found a size that should come after us, stop here
                 break;
@@ -2929,7 +2928,7 @@ function updateChildRow(childRowId, qty) {
     const size = childRow.dataset.extendedSize;
     const sizeInput = childRow.querySelector(`[data-size="${size}"]`);
     if (sizeInput) {
-        sizeInput.value = qty;
+        /** @type {HTMLInputElement} */ (sizeInput).value = qty;
     }
     document.getElementById(`row-qty-${childRowId}`).textContent = qty;
 }
@@ -2957,10 +2956,10 @@ export function onChildSizeChange(childRowId, parentRowId, size) {
     if (!childRow || !parentRow) return;
 
     const sizeInput = childRow.querySelector(`[data-size="${size}"]`);
-    const qty = parseInt(sizeInput?.value) || 0;
+    const qty = parseInt(/** @type {HTMLInputElement|null} */ (sizeInput)?.value) || 0;
 
     // Update child row quantity display
-    document.getElementById(`row-qty-${childRowId}`).textContent = qty;
+    document.getElementById(`row-qty-${childRowId}`).textContent = /** @type {any} */ (qty);
 
     // Update parent Qty display (reflects child changes for variant-only rows)
     updateParentQtyDisplay(parseInt(parentRowId));
@@ -2968,7 +2967,7 @@ export function onChildSizeChange(childRowId, parentRowId, size) {
     // Sync back to parent row's hidden input
     const parentInput = parentRow.querySelector(`[data-size="${size}"]`);
     if (parentInput) {
-        parentInput.value = qty;
+        /** @type {HTMLInputElement} */ (parentInput).value = /** @type {any} */ (qty);
     }
 
     // If qty is 0, remove the child row
@@ -2989,10 +2988,10 @@ export function clearExtendedSize(parentRowId, size) {
     // Clear parent input
     const parentInput = parentRow.querySelector(`[data-size="${size}"]`);
     if (parentInput) {
-        parentInput.value = '';
-        parentInput.disabled = false;
-        parentInput.style.background = '';
-        parentInput.style.color = '';
+        /** @type {HTMLInputElement} */ (parentInput).value = '';
+        /** @type {HTMLInputElement} */ (parentInput).disabled = false;
+        /** @type {HTMLElement} */ (parentInput).style.background = '';
+        /** @type {HTMLElement} */ (parentInput).style.color = '';
     }
 
     // Remove child row
@@ -3082,13 +3081,13 @@ export async function duplicateRowNewColor(sourceRowId) {
     // quick second duplicate used to grab the wrong (earlier) row and leave
     // the new one empty. addNewRow() appends synchronously; last row wins.
     addNewRow();
-    const newRow = document.getElementById('product-tbody').lastElementChild;
-    if (!newRow || !newRow.dataset.rowId) return;
+    const newRow = /** @type {HTMLElement|null} */ (document.getElementById('product-tbody')).lastElementChild;
+    if (!newRow || !/** @type {HTMLElement} */ (newRow).dataset.rowId) return;
 
-    const newRowId = parseInt(newRow.dataset.rowId);
+    const newRowId = parseInt(/** @type {HTMLElement} */ (newRow).dataset.rowId);
     const styleInput = newRow.querySelector('.style-input');
     if (styleInput) {
-        styleInput.value = style;
+        /** @type {HTMLInputElement} */ (styleInput).value = style;
         await onStyleChange(styleInput, newRowId);
         showToast(`Select a new color for ${style}`, 'info', 3000);
     }
@@ -3136,12 +3135,12 @@ export function enablePriceOverride(rowId) {
         step="0.01" min="0" value="${currentPrice.toFixed(2)}">`;
 
     const input = priceCell.querySelector('.price-override-input');
-    input.focus();
-    input.select();
+    /** @type {HTMLElement} */ (input).focus();
+    /** @type {HTMLInputElement} */ (input).select();
 
     // Commit on Enter or blur
     function commitOverride() {
-        const newPrice = parseFloat(input.value);
+        const newPrice = parseFloat(/** @type {HTMLInputElement} */ (input).value);
         if (isNaN(newPrice) || newPrice <= 0) {
             cancelOverride();
             return;
@@ -3162,11 +3161,11 @@ export function enablePriceOverride(rowId) {
 
     let committed = false;
     input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
+        if (/** @type {KeyboardEvent} */ (e).key === 'Enter') {
             e.preventDefault();
             committed = true;
             commitOverride();
-        } else if (e.key === 'Escape') {
+        } else if (/** @type {KeyboardEvent} */ (e).key === 'Escape') {
             e.preventDefault();
             committed = true;
             cancelOverride();
@@ -3228,9 +3227,9 @@ export function handleCellKeydown(event, input) {
             const nextRow = rows[currentRowIndex + 1];
             const nextCells = Array.from(nextRow.querySelectorAll('input:not([readonly]), select:not(:disabled)'));
             if (nextCells[currentIndex]) {
-                nextCells[currentIndex].focus();
+                /** @type {HTMLElement} */ (nextCells[currentIndex]).focus();
             } else if (nextCells[0]) {
-                nextCells[0].focus();
+                /** @type {HTMLElement} */ (nextCells[0]).focus();
             }
         }
     } else if (event.key === 'ArrowDown') {
@@ -3244,8 +3243,8 @@ export function handleCellKeydown(event, input) {
             const nextRow = rows[currentRowIndex + 1];
             const field = input.dataset.field || input.dataset.size;
             const nextInput = nextRow.querySelector(`[data-field="${field}"], [data-size="${field}"]`);
-            if (nextInput && !nextInput.disabled) {
-                nextInput.focus();
+            if (nextInput && !/** @type {HTMLInputElement} */ (nextInput).disabled) {
+                /** @type {HTMLElement} */ (nextInput).focus();
             }
         }
     } else if (event.key === 'ArrowUp') {
@@ -3259,8 +3258,8 @@ export function handleCellKeydown(event, input) {
             const prevRow = rows[currentRowIndex - 1];
             const field = input.dataset.field || input.dataset.size;
             const prevInput = prevRow.querySelector(`[data-field="${field}"], [data-size="${field}"]`);
-            if (prevInput && !prevInput.disabled) {
-                prevInput.focus();
+            if (prevInput && !/** @type {HTMLInputElement} */ (prevInput).disabled) {
+                /** @type {HTMLElement} */ (prevInput).focus();
             }
         }
     }

@@ -4,7 +4,6 @@
  * against THIS file), review/confirm preview, button state. Moved verbatim.
  * Push state (_scpPushQuoteId/_scpPushInFlight) lives on scpState since S2.
  */
-// @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions; typing lands with the render/state split).
 /* global openAccessibleModal, closeAccessibleModal, saveAndGetLink, escapeHtml, showToast,
    renderBuilderPushReadiness, collectProductsFromTable, confirm */
 import { scpState } from './state.js';
@@ -64,12 +63,12 @@ function _scpEsc(s) {
 // is created. If the modal or preview can't load, falls back to a direct
 // confirm()-push so the rep is never blocked.
 export async function openScpPushPreview() {
-    const btn = document.getElementById('scp-push-shopworks-btn');
+    const btn = /** @type {HTMLInputElement|null} */ (document.getElementById('scp-push-shopworks-btn'));
     if (!btn || btn.disabled || !scpState._scpPushQuoteId) return;
     // Warn before pushing with no ShopWorks Customer # — the order would silently
     // attach to placeholder customer 3739 instead of the real customer. EMB gates its
     // button on this; SCP/DTF warn at push time for parity. (2026-06-01)
-    const _scpCust = document.getElementById('customer-number')?.value?.trim();
+    const _scpCust = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-number'))?.value?.trim();
     if (!_scpCust && !confirm('No ShopWorks Customer # is set.\n\nThis order will attach to the placeholder customer (3739) instead of the real customer. Continue anyway?')) {
         return;
     }
@@ -77,7 +76,7 @@ export async function openScpPushPreview() {
     const modal = document.getElementById('scp-push-modal');
     const statusEl = document.getElementById('scp-push-status');
     const previewEl = document.getElementById('scp-push-preview');
-    const confirmBtn = document.getElementById('scp-push-confirm');
+    const confirmBtn = /** @type {HTMLInputElement|null} */ (document.getElementById('scp-push-confirm'));
     if (!modal || !previewEl || !confirmBtn) {
         return confirmScpPush(true); // modal markup missing → legacy direct push
     }
@@ -97,14 +96,14 @@ export async function openScpPushPreview() {
         const data = await resp.json();
         if (!resp.ok) throw new Error(data.error || data.details || `HTTP ${resp.status}`);
         renderScpPushPreview(data.orderJson || {});
-        confirmBtn.disabled = false;
+        /** @type {HTMLInputElement} */ (confirmBtn).disabled = false;
         confirmBtn.style.opacity = '1';
     } catch (err) {
         console.error('[SCP Push] Preview error:', err);
         previewEl.innerHTML = '<div class="qb-err-16">' +
             '<i class="fas fa-exclamation-triangle"></i> Could not load preview: ' + _scpEsc(err.message) +
             '<br><span class="qb-muted">You can still push below.</span></div>';
-        confirmBtn.disabled = false;
+        /** @type {HTMLInputElement} */ (confirmBtn).disabled = false;
         confirmBtn.style.opacity = '1';
     }
 }
@@ -158,9 +157,9 @@ export function renderScpPushPreview(o) {
 // Perform the actual push (POST /push-quote). directFallback=true is the legacy
 // path used when the modal couldn't open.
 export async function confirmScpPush(directFallback) {
-    const mainBtn = document.getElementById('scp-push-shopworks-btn');
+    const mainBtn = /** @type {HTMLInputElement|null} */ (document.getElementById('scp-push-shopworks-btn'));
     const mainLabel = document.getElementById('scp-push-shopworks-label');
-    const confirmBtn = document.getElementById('scp-push-confirm');
+    const confirmBtn = /** @type {HTMLInputElement|null} */ (document.getElementById('scp-push-confirm'));
     const statusEl = document.getElementById('scp-push-status');
     if (!scpState._scpPushQuoteId) return;
 
@@ -197,7 +196,7 @@ export async function confirmScpPush(directFallback) {
 
         // Success
         if (mainLabel) mainLabel.textContent = `Pushed ✓ (${data.extOrderId})`;
-        if (mainBtn) { mainBtn.style.background = '#28a745'; mainBtn.disabled = true; mainBtn.dataset.pushed = '1'; }
+        if (mainBtn) { mainBtn.style.background = '#28a745'; /** @type {HTMLInputElement} */ (mainBtn).disabled = true; mainBtn.dataset.pushed = '1'; }
         if (typeof showToast === 'function') showToast(`Pushed to ShopWorks as ${data.extOrderId}`, 'success');
         console.log('[SCP Push] Success:', data);
         closeScpPushPreview();
@@ -205,8 +204,8 @@ export async function confirmScpPush(directFallback) {
     } catch (error) {
         console.error('[SCP Push] Push error:', error);
         if (statusEl) statusEl.innerHTML = '<div class="qb-err-8">Push failed: ' + _scpEsc(error.message) + '</div>';
-        if (confirmBtn) { confirmBtn.disabled = false; confirmBtn.style.opacity = '1'; confirmBtn.innerHTML = '<i class="fas fa-upload"></i> Push to ShopWorks'; }
-        if (mainBtn) { mainBtn.disabled = false; mainBtn.style.opacity = '1'; }
+        if (confirmBtn) { /** @type {HTMLInputElement} */ (confirmBtn).disabled = false; confirmBtn.style.opacity = '1'; confirmBtn.innerHTML = '<i class="fas fa-upload"></i> Push to ShopWorks'; }
+        if (mainBtn) { /** @type {HTMLInputElement} */ (mainBtn).disabled = false; mainBtn.style.opacity = '1'; }
         if (mainLabel) mainLabel.textContent = 'Push to ShopWorks';
         if (typeof showToast === 'function') showToast(`Push failed: ${error.message}`, 'error');
     }
