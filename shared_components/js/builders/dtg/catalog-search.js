@@ -13,6 +13,40 @@ import { API_BASE, _colorsCache, _companySearchCache, _designsCacheByCustomer, _
 import { recomputeTaxRate } from './tax-shipping.js';
 import { escapeHtml, markDirty, positionPortaledMenu } from './utils.js';
 
+// ── F2 a11y (2026-07-09): full combobox/listbox wiring for the portaled menus.
+// Menus re-render per keystroke, so roles/ids are (re)stamped after each paint
+// and aria-expanded/activedescendant stay truthful through open/close/hover.
+let _cbxSeq = 0;
+function initComboboxAria(input, label) {
+    if (!input.id) input.id = `dtg-cbx-${++_cbxSeq}`;
+    input.setAttribute('role', 'combobox');
+    input.setAttribute('aria-haspopup', 'listbox');
+    input.setAttribute('aria-autocomplete', 'list');
+    input.setAttribute('aria-expanded', 'false');
+    if (label && !input.getAttribute('aria-label')) input.setAttribute('aria-label', label);
+}
+function syncComboboxAria(input, menu, activeIndex) {
+    const isOpen = !!menu && document.body.contains(menu);
+    input.setAttribute('aria-expanded', String(isOpen));
+    if (!isOpen) {
+        input.removeAttribute('aria-activedescendant');
+        input.removeAttribute('aria-controls');
+        return;
+    }
+    if (!menu.id) menu.id = `${input.id}-listbox`;
+    menu.setAttribute('role', 'listbox');
+    input.setAttribute('aria-controls', menu.id);
+    const items = menu.querySelectorAll('.dtg-combobox-item');
+    items.forEach((it, i) => {
+        it.setAttribute('role', 'option');
+        it.id = `${menu.id}-opt-${i}`;
+        it.setAttribute('aria-selected', String(i === activeIndex));
+    });
+    const act = items[activeIndex];
+    if (act) input.setAttribute('aria-activedescendant', act.id);
+    else input.removeAttribute('aria-activedescendant');
+}
+
 // Fetch SanMar inventory for a row's style+catalogColor combo via the
 // shared window.OrderFormInventory module. Idempotent; results are cached
 // 5 min in the inventory module itself, so calling on every input event
@@ -226,12 +260,14 @@ export function attachStyleCombobox(wrap, input, rid) {
     let timer = null;
     let lastMatches = [];
     let activeIndex = 0;
+    initComboboxAria(input, 'Product style search');
     const reposition = () => { if (menu) positionPortaledMenu(menu, input); };
 
     function close() {
         if (menu) {
             menu.remove();
             menu = null;
+            syncComboboxAria(input, null, -1);
             window.removeEventListener('scroll', reposition, true);
             window.removeEventListener('resize', reposition);
         }
@@ -244,6 +280,7 @@ export function attachStyleCombobox(wrap, input, rid) {
             // panel, customer pane, live pricing card, etc.
             document.body.appendChild(menu);
             positionPortaledMenu(menu, input);
+            syncComboboxAria(input, menu, activeIndex);
             window.addEventListener('scroll', reposition, true);
             window.addEventListener('resize', reposition);
         }
@@ -254,6 +291,7 @@ export function attachStyleCombobox(wrap, input, rid) {
             // eslint-disable-next-line no-unsanitized/property -- audited (Batch 5 move): every interpolation is escapeHtml()d, numeric, or static config
             menu.innerHTML = `<div class="dtg-combobox-empty">${input.value ? `No matches for "${escapeHtml(input.value)}"` : 'Type 2+ characters'}</div>`;
             positionPortaledMenu(menu, input);
+            syncComboboxAria(input, menu, activeIndex);
             return;
         }
         // eslint-disable-next-line no-unsanitized/property -- audited (Batch 5 move): every interpolation is escapeHtml()d, numeric, or static config
@@ -274,6 +312,7 @@ export function attachStyleCombobox(wrap, input, rid) {
                 menu.querySelectorAll('.dtg-combobox-item').forEach((it, i) => {
                     it.classList.toggle('active', i === activeIndex);
                 });
+                syncComboboxAria(input, menu, activeIndex);
             });
             item.addEventListener('mousedown', (e) => {
                 e.preventDefault();
@@ -281,6 +320,7 @@ export function attachStyleCombobox(wrap, input, rid) {
             });
         });
         positionPortaledMenu(menu, input);
+        syncComboboxAria(input, menu, activeIndex);
     }
     async function search(q) {
         if (q.length < 2) { lastMatches = []; paint(); return; }
@@ -346,6 +386,7 @@ export function attachColorCombobox(wrap, input, rid) {
     if (!row || !row.style) return;
     let menu = null;
     let activeIndex = 0;
+    initComboboxAria(input, 'Garment color search');
     let matches = row.colorsAvailable || [];
     const reposition = () => { if (menu) positionPortaledMenu(menu, input); };
 
@@ -353,6 +394,7 @@ export function attachColorCombobox(wrap, input, rid) {
         if (menu) {
             menu.remove();
             menu = null;
+            syncComboboxAria(input, null, -1);
             window.removeEventListener('scroll', reposition, true);
             window.removeEventListener('resize', reposition);
         }
@@ -363,6 +405,7 @@ export function attachColorCombobox(wrap, input, rid) {
             menu.className = 'dtg-combobox-menu';
             document.body.appendChild(menu);
             positionPortaledMenu(menu, input);
+            syncComboboxAria(input, menu, activeIndex);
             window.addEventListener('scroll', reposition, true);
             window.addEventListener('resize', reposition);
         }
@@ -410,10 +453,12 @@ export function attachColorCombobox(wrap, input, rid) {
                 menu.querySelectorAll('.dtg-combobox-item').forEach((it, i) => {
                     it.classList.toggle('active', i === activeIndex);
                 });
+                syncComboboxAria(input, menu, activeIndex);
             });
             item.addEventListener('mousedown', (e) => { e.preventDefault(); pick(matches[parseInt(item.getAttribute('data-idx'), 10)]); });
         });
         positionPortaledMenu(menu, input);
+        syncComboboxAria(input, menu, activeIndex);
     }
     function pick(c) {
         if (!c) return;
@@ -518,6 +563,50 @@ export function syncDesignThumbnail() {
     }
 }
 
+// F3 split (2026-07-09): the design-menu template + item wiring, moved VERBATIM
+// out of attachDesignCombobox's paint(); closure state rides `cbx` and index
+// changes flow back through cbx.onHover/onPick.
+function paintDesignMenuItems(cbx) {
+        if (cbx.filtered.length === 0) {
+            if (cbx.designs.length === 0) {
+                cbx.menu.innerHTML = `<div class="dtg-combobox-empty">No DTG cbx.designs on file for this customer — type a # manually or mark TBD</div>`;
+            } else {
+                cbx.menu.innerHTML = `<div class="dtg-combobox-empty">No cbx.designs match "${escapeHtml(cbx.q)}"</div>`;
+            }
+            return;
+        }
+        // eslint-disable-next-line no-unsanitized/property -- audited (Batch 5 move): every interpolation is escapeHtml()d, numeric, or static config
+        cbx.menu.innerHTML = cbx.filtered.slice(0, 30).map((d, i) => {
+            const thumb = d.thumbnailUrl
+                ? `<img class="dtg-design-row-thumb" src="${escapeHtml(d.thumbnailUrl)}" alt="" loading="lazy">`
+                : `<div class="dtg-design-row-thumb dtg-design-row-thumb--blank"><i class="fas fa-image"></i></div>`;
+            const meta = [];
+            if (d.locationCount > 1) meta.push(`${d.locationCount} locations`);
+            if (d.isVariation) meta.push('variation');
+            if (!d.designComplete) meta.push('in progress');
+            return `
+                <div class="dtg-combobox-item dtg-design-row${i === cbx.activeIndex ? ' active' : ''}" data-idx="${i}">
+                    ${thumb}
+                    <div class="dtg-design-row-text">
+                        <div class="ci-primary"><strong>${escapeHtml(d.idDesign)}</strong> — ${escapeHtml(d.designName || '(no name)')}</div>
+                        <div class="ci-secondary">${meta.length ? meta.join(' · ') : (d.dateCreated || '')}</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        cbx.menu.querySelectorAll('.dtg-combobox-item').forEach((item, idx) => {
+            item.addEventListener('mouseenter', () => { cbx.activeIndex = idx; cbx.onHover(idx); });
+            item.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                const i = parseInt(item.getAttribute('data-idx'), 10) || 0;
+                cbx.onPick(cbx.filtered[i]);
+            });
+        });
+        // Re-position after content change — cbx.menu height varies with row count.
+        positionPortaledMenu(cbx.menu, cbx.input);
+        syncComboboxAria(cbx.input, cbx.menu, cbx.activeIndex);
+}
+
 // Combobox machinery for the Design # field. Opens a dropdown of the
 // current customer's DTG designs (DesignType=45) on focus; clicking a
 // row fills the input + shows the thumbnail inline. Mirrors the
@@ -526,12 +615,14 @@ export function attachDesignCombobox(wrap, input) {
     let menu = null;
     let designs = [];
     let activeIndex = 0;
+    initComboboxAria(input, 'Design number search');
     const reposition = () => { if (menu) positionPortaledMenu(menu, input); };
 
     function close() {
         if (menu) {
             menu.remove();
             menu = null;
+            syncComboboxAria(input, null, -1);
             window.removeEventListener('scroll', reposition, true);
             window.removeEventListener('resize', reposition);
         }
@@ -545,6 +636,7 @@ export function attachDesignCombobox(wrap, input) {
             // Without this the menu gets clipped by the form's overflow:auto.
             document.body.appendChild(menu);
             positionPortaledMenu(menu, input);
+            syncComboboxAria(input, menu, activeIndex);
             window.addEventListener('scroll', reposition, true);
             window.addEventListener('resize', reposition);
         }
@@ -564,43 +656,9 @@ export function attachDesignCombobox(wrap, input) {
             return;
         }
         const filtered = filterByQuery(q || '');
-        if (filtered.length === 0) {
-            if (designs.length === 0) {
-                menu.innerHTML = `<div class="dtg-combobox-empty">No DTG designs on file for this customer — type a # manually or mark TBD</div>`;
-            } else {
-                menu.innerHTML = `<div class="dtg-combobox-empty">No designs match "${escapeHtml(q)}"</div>`;
-            }
-            return;
-        }
-        // eslint-disable-next-line no-unsanitized/property -- audited (Batch 5 move): every interpolation is escapeHtml()d, numeric, or static config
-        menu.innerHTML = filtered.slice(0, 30).map((d, i) => {
-            const thumb = d.thumbnailUrl
-                ? `<img class="dtg-design-row-thumb" src="${escapeHtml(d.thumbnailUrl)}" alt="" loading="lazy">`
-                : `<div class="dtg-design-row-thumb dtg-design-row-thumb--blank"><i class="fas fa-image"></i></div>`;
-            const meta = [];
-            if (d.locationCount > 1) meta.push(`${d.locationCount} locations`);
-            if (d.isVariation) meta.push('variation');
-            if (!d.designComplete) meta.push('in progress');
-            return `
-                <div class="dtg-combobox-item dtg-design-row${i === activeIndex ? ' active' : ''}" data-idx="${i}">
-                    ${thumb}
-                    <div class="dtg-design-row-text">
-                        <div class="ci-primary"><strong>${escapeHtml(d.idDesign)}</strong> — ${escapeHtml(d.designName || '(no name)')}</div>
-                        <div class="ci-secondary">${meta.length ? meta.join(' · ') : (d.dateCreated || '')}</div>
-                    </div>
-                </div>
-            `;
-        }).join('');
-        menu.querySelectorAll('.dtg-combobox-item').forEach((item, idx) => {
-            item.addEventListener('mouseenter', () => { activeIndex = idx; });
-            item.addEventListener('mousedown', (e) => {
-                e.preventDefault();
-                const i = parseInt(item.getAttribute('data-idx'), 10) || 0;
-                pick(filtered[i]);
-            });
-        });
-        // Re-position after content change — menu height varies with row count.
-        positionPortaledMenu(menu, input);
+        paintDesignMenuItems({ menu, input, q, designs, filtered, activeIndex,
+            onHover: (i) => { activeIndex = i; },
+            onPick: pick });
     }
     function pick(d) {
         if (!d) return;
@@ -686,17 +744,98 @@ export async function refreshDesignComboboxForNewCustomer() {
     syncDesignThumbnail();
 }
 
+// F3 split (2026-07-09): the company-menu template + item wiring, moved VERBATIM
+// out of attachCompanyCombobox's paint(); closure state rides `cbx` (in-place
+// hover toggle preserved — see the 2026-05-20 real-mouse-click note inside).
+function paintCompanyMenuItems(cbx) {
+        if (cbx.matches.length === 0) {
+            // eslint-disable-next-line no-unsanitized/property -- audited (Batch 5 move): every interpolation is escapeHtml()d, numeric, or static config
+            cbx.menu.innerHTML = `<div class="dtg-combobox-empty">${cbx.input.value.length >= 2 ? `No cbx.matches for "${escapeHtml(cbx.input.value)}"` : 'Type 2+ characters'}</div>`;
+            positionPortaledMenu(cbx.menu, cbx.input);
+            syncComboboxAria(cbx.input, cbx.menu, cbx.activeIndex);
+            return;
+        }
+        // "Did you mean" hint — appears when the rep typed something
+        // longer than what actually matched (e.g. typed "Archterra
+        // Landscape Company" but only "Archterra Landscape" found hits).
+        const fallbackHint = (cbx.matches._fallbackFrom && cbx.matches._fallbackTo)
+            ? `<div class="dtg-combobox-hint">
+                   Showing cbx.matches for <strong>"${escapeHtml(cbx.matches._fallbackTo)}"</strong>
+                   — your search <em>"${escapeHtml(cbx.matches._fallbackFrom)}"</em> had no exact hits
+               </div>`
+            : '';
+        // eslint-disable-next-line no-unsanitized/property -- audited (Batch 5 move): every interpolation is escapeHtml()d, numeric, or static config
+        cbx.menu.innerHTML = fallbackHint + cbx.matches.slice(0, 10).map((c, i) => {
+            const loc = [c.City, c.State].filter(Boolean).join(', ');
+            const contactCount = (c.contacts || []).length;
+            return `
+                <div class="dtg-combobox-item${i === cbx.activeIndex ? ' active' : ''}" data-idx="${i}">
+                    <div class="ci-primary">${escapeHtml(c.Company_Name || '')}</div>
+                    <div class="ci-secondary">${escapeHtml(loc || '—')}${contactCount > 0 ? ` · ${contactCount} contact${contactCount === 1 ? '' : 's'}` : ' · no email contacts'}</div>
+                </div>
+            `;
+        }).join('');
+        cbx.menu.querySelectorAll('.dtg-combobox-item').forEach((item) => {
+            // Hover: update active class IN PLACE, don't re-render the cbx.menu.
+            // (Re-rendering on every mouseenter destroys the DOM under the
+            // user's cursor and intermittently kills the click — Erik's
+            // real-mouse-click selection bug, 2026-05-20.)
+            item.addEventListener('mouseenter', () => {
+                const newIdx = parseInt(item.getAttribute('data-idx'), 10) || 0;
+                if (newIdx === cbx.activeIndex) return;
+                cbx.activeIndex = newIdx;
+                cbx.onHover(newIdx);
+                cbx.menu.querySelectorAll('.dtg-combobox-item').forEach((it, i) => {
+                    it.classList.toggle('active', i === cbx.activeIndex);
+                });
+                syncComboboxAria(cbx.input, cbx.menu, cbx.activeIndex);
+            });
+            item.addEventListener('mousedown', (e) => { e.preventDefault(); cbx.onPick(cbx.matches[parseInt(item.getAttribute('data-idx'), 10)]); });
+        });
+        // Re-position after content change — cbx.menu height can shrink/grow.
+        positionPortaledMenu(cbx.menu, cbx.input);
+        syncComboboxAria(cbx.input, cbx.menu, cbx.activeIndex);
+}
+
+// F3 split (2026-07-09): company-level address capture + ship-to pre-fill,
+// moved VERBATIM out of attachCompanyCombobox's pick(). `c` is the company
+// record from /api/company-contacts-2026/search.
+function applyCompanyAddressPrefill(c) {
+    // Capture company-level address fields BEFORE applyContact runs —
+    // the per-contact records from the search endpoint don't carry
+    // address data, only the company bucket does. These drive both
+    // billing state (info.state on push) AND the ship-to pre-fill.
+    const newBillingState = (c.State || '').toString().toUpperCase().slice(0, 2);
+    state.customer.state = newBillingState;
+    state.customer.city = (c.City || '').toString();
+    // Pre-fill ship-to from company address ONLY if rep hasn't started
+    // typing one in (don't clobber an in-progress drop-ship address).
+    if (!state.shipping.address1) {
+        state.shipping.address1 = (c.Address || '').toString();
+        state.shipping.city = (c.City || '').toString();
+        state.shipping.state = newBillingState;
+        state.shipping.zip = (c.Zip || '').toString();
+        const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+        setVal('dtgShipAddress1', state.shipping.address1);
+        setVal('dtgShipCity', state.shipping.city);
+        setVal('dtgShipState', state.shipping.state);
+        setVal('dtgShipZip', state.shipping.zip);
+    }
+}
+
 export function attachCompanyCombobox(wrap, input) {
     let menu = null;
     let timer = null;
     let matches = [];
     let activeIndex = 0;
+    initComboboxAria(input, 'Customer company search');
     const reposition = () => { if (menu) positionPortaledMenu(menu, input); };
 
     function close() {
         if (menu) {
             menu.remove();
             menu = null;
+            syncComboboxAria(input, null, -1);
             window.removeEventListener('scroll', reposition, true);
             window.removeEventListener('resize', reposition);
         }
@@ -712,55 +851,16 @@ export function attachCompanyCombobox(wrap, input) {
             // customer dropdown appeared below the form panel.
             document.body.appendChild(menu);
             positionPortaledMenu(menu, input);
+            syncComboboxAria(input, menu, activeIndex);
             window.addEventListener('scroll', reposition, true);
             window.addEventListener('resize', reposition);
         }
     }
     function paint() {
         if (!menu) return;
-        if (matches.length === 0) {
-            // eslint-disable-next-line no-unsanitized/property -- audited (Batch 5 move): every interpolation is escapeHtml()d, numeric, or static config
-            menu.innerHTML = `<div class="dtg-combobox-empty">${input.value.length >= 2 ? `No matches for "${escapeHtml(input.value)}"` : 'Type 2+ characters'}</div>`;
-            positionPortaledMenu(menu, input);
-            return;
-        }
-        // "Did you mean" hint — appears when the rep typed something
-        // longer than what actually matched (e.g. typed "Archterra
-        // Landscape Company" but only "Archterra Landscape" found hits).
-        const fallbackHint = (matches._fallbackFrom && matches._fallbackTo)
-            ? `<div class="dtg-combobox-hint">
-                   Showing matches for <strong>"${escapeHtml(matches._fallbackTo)}"</strong>
-                   — your search <em>"${escapeHtml(matches._fallbackFrom)}"</em> had no exact hits
-               </div>`
-            : '';
-        // eslint-disable-next-line no-unsanitized/property -- audited (Batch 5 move): every interpolation is escapeHtml()d, numeric, or static config
-        menu.innerHTML = fallbackHint + matches.slice(0, 10).map((c, i) => {
-            const loc = [c.City, c.State].filter(Boolean).join(', ');
-            const contactCount = (c.contacts || []).length;
-            return `
-                <div class="dtg-combobox-item${i === activeIndex ? ' active' : ''}" data-idx="${i}">
-                    <div class="ci-primary">${escapeHtml(c.Company_Name || '')}</div>
-                    <div class="ci-secondary">${escapeHtml(loc || '—')}${contactCount > 0 ? ` · ${contactCount} contact${contactCount === 1 ? '' : 's'}` : ' · no email contacts'}</div>
-                </div>
-            `;
-        }).join('');
-        menu.querySelectorAll('.dtg-combobox-item').forEach((item) => {
-            // Hover: update active class IN PLACE, don't re-render the menu.
-            // (Re-rendering on every mouseenter destroys the DOM under the
-            // user's cursor and intermittently kills the click — Erik's
-            // real-mouse-click selection bug, 2026-05-20.)
-            item.addEventListener('mouseenter', () => {
-                const newIdx = parseInt(item.getAttribute('data-idx'), 10) || 0;
-                if (newIdx === activeIndex) return;
-                activeIndex = newIdx;
-                menu.querySelectorAll('.dtg-combobox-item').forEach((it, i) => {
-                    it.classList.toggle('active', i === activeIndex);
-                });
-            });
-            item.addEventListener('mousedown', (e) => { e.preventDefault(); pick(matches[parseInt(item.getAttribute('data-idx'), 10)]); });
-        });
-        // Re-position after content change — menu height can shrink/grow.
-        positionPortaledMenu(menu, input);
+        paintCompanyMenuItems({ menu, input, matches, activeIndex,
+            onHover: (i) => { activeIndex = i; },
+            onPick: pick });
     }
     async function search(q) {
         if (q.length < 2) { matches = []; paint(); return; }
@@ -783,26 +883,7 @@ export function attachCompanyCombobox(wrap, input) {
         ).trim();
         state.customer.accountTier = String(c.Account_Tier || '').trim();
         renderCustomerContextBadges();
-        // Capture company-level address fields BEFORE applyContact runs —
-        // the per-contact records from the search endpoint don't carry
-        // address data, only the company bucket does. These drive both
-        // billing state (info.state on push) AND the ship-to pre-fill.
-        const newBillingState = (c.State || '').toString().toUpperCase().slice(0, 2);
-        state.customer.state = newBillingState;
-        state.customer.city = (c.City || '').toString();
-        // Pre-fill ship-to from company address ONLY if rep hasn't started
-        // typing one in (don't clobber an in-progress drop-ship address).
-        if (!state.shipping.address1) {
-            state.shipping.address1 = (c.Address || '').toString();
-            state.shipping.city = (c.City || '').toString();
-            state.shipping.state = newBillingState;
-            state.shipping.zip = (c.Zip || '').toString();
-            const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
-            setVal('dtgShipAddress1', state.shipping.address1);
-            setVal('dtgShipCity', state.shipping.city);
-            setVal('dtgShipState', state.shipping.state);
-            setVal('dtgShipZip', state.shipping.zip);
-        }
+        applyCompanyAddressPrefill(c);
         input.value = c.Company_Name || '';
         // Auto-pick first emailable contact (rep can switch via the picker)
         const firstContact = (c.contacts || []).find((ct) => ct.Email || ct.ContactNumbersEmail);

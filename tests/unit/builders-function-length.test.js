@@ -47,14 +47,9 @@ const ALLOWLISTS = {
   },
   dtg: {
     // measured 2026-07-09 at the Batch 5 decomposition (monolith → 10 modules)
-    'catalog-search.js:attachDesignCombobox': 152,
-    'catalog-search.js:attachCompanyCombobox': 192,
     'form-core.js:render': 384,
-    'form-core.js:computeReadiness': 195,
-    'form-core.js:wireGlobalHandlers': 289,
-    'form-core.js:previewCustomer': 164,
+    'form-core.js:previewCustomer': 164, // measurement artifact: LAST fn in file — span absorbs the trailing DTGInlineForm tail (real body ~28 lines)
     'output.js:submitToShopWorks': 267,
-    'persistence.js:fillFromQuote': 151,
     'persistence.js:loadSavedDtgQuoteForEdit': 241,
   },
   shared: {},

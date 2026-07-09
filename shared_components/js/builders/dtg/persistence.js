@@ -98,6 +98,86 @@ export function setQuoteID(qid) {
 }
 
 // ----- Public API for chat bridge ---------------------------------------
+// F3 split (2026-07-09): the PRICE_QUOTE application (location + rows +
+// parallel hydrates), moved VERBATIM out of fillFromQuote.
+function applyChatPriceQuote(priceQuote) {
+    // Set location
+    const code = priceQuote.locationCode || (priceQuote.lineItems && priceQuote.lineItems[0] && priceQuote.lineItems[0].locationCode) || 'LC';
+    if (code.includes('_')) {
+        const [front, back] = code.split('_');
+        state.front = front;
+        state.back = back || '';
+    } else {
+        state.front = code;
+        state.back = '';
+    }
+    sanitizeLocationState(); // never let an unpriceable combo in via chat fill
+
+    // Build rows from PRICE_QUOTE lineItems
+    const items = Array.isArray(priceQuote.lineItems) ? priceQuote.lineItems : [];
+    const newRows = items.map((it) => {
+        const r = newBlankRow();
+        r.style = (it.styleNumber || it.style || '').toUpperCase();
+        r.styleUpper = r.style;
+        r.color = it.color || '';
+        r.desc = it.description || '';
+        r.sizes = { ...(it.sizes || {}) };
+        return r;
+    });
+    state.rows = newRows.length > 0 ? newRows : [newBlankRow()];
+
+    // Cache the AI quoteID + persist to sessionStorage so it survives
+    // a page refresh.
+    if (priceQuote.quoteID) setQuoteID(priceQuote.quoteID);
+
+    // IMMEDIATE render so the rep sees the rows right away. Hydration
+    // (catalog colors, available sizes, swatch URLs) happens in the
+    // background in parallel — when each row's hydrate completes we
+    // re-render so the description / catalog color fill in. Without
+    // this the form looks empty until ALL hydrates finish (8+ seconds
+    // for a 4-line quote with cold caches).
+    renderLocationPills();
+    renderTable();
+
+    const hydrates = state.rows
+        .filter((row) => row.style)
+        .map(async (row) => {
+            try {
+                const [info, bundle] = await Promise.all([
+                    fetchProductColors(row.style),
+                    fetchBundle(row.style),
+                ]);
+                row.colorsAvailable = info.colors || [];
+                if (!row.desc && info.productTitle) row.desc = info.productTitle;
+                // Fuzzy match — bot often emits rep shorthand ("black") but
+                // canonical is "Jet Black". Exact-match would leave catalogColor
+                // empty → broken inventory check + bad ShopWorks push.
+                const matchColor = fuzzyMatchColor(info.colors || [], row.color);
+                if (matchColor) {
+                    row.catalogColor = matchColor.CATALOG_COLOR || matchColor.catalogColor || '';
+                    row.colorSwatch = matchColor.COLOR_SQUARE_IMAGE || '';
+                    // Promote canonical name so the row displays "Jet Black"
+                    // even if the bot sent "black".
+                    const canonical = matchColor.COLOR_NAME || matchColor.colorName || '';
+                    if (canonical) row.color = canonical;
+                }
+                if (bundle && Array.isArray(bundle.sizes)) {
+                    row.availableSizes = bundle.sizes
+                        .filter((s) => Number(s.price) > 0)
+                        .map((s) => String(s.size).toUpperCase());
+                }
+                // Once we know the catalogColor, kick off the inventory
+                // fetch. The fetch resolves async + re-renders independently.
+                kickInventoryFetch(row);
+            } catch (e) {
+                console.warn('[dtg-inline-form] hydrate failed for', row.style, e);
+            }
+        });
+    // Re-render once all parallel hydrates complete (description column
+    // and catalog colors fill in). Doesn't block fillFromQuote returning.
+    Promise.all(hydrates).then(() => { renderTable(); schedulePriceUpdate(); });
+}
+
 export async function fillFromQuote(priceQuote, customerFinal) {
     // C9 — race guard. If the rep has touched the form since the last
     // chat fill, ask before overwriting. Only triggers when there are
@@ -118,83 +198,7 @@ export async function fillFromQuote(priceQuote, customerFinal) {
         }
     }
 
-    if (priceQuote) {
-        // Set location
-        const code = priceQuote.locationCode || (priceQuote.lineItems && priceQuote.lineItems[0] && priceQuote.lineItems[0].locationCode) || 'LC';
-        if (code.includes('_')) {
-            const [front, back] = code.split('_');
-            state.front = front;
-            state.back = back || '';
-        } else {
-            state.front = code;
-            state.back = '';
-        }
-        sanitizeLocationState(); // never let an unpriceable combo in via chat fill
-
-        // Build rows from PRICE_QUOTE lineItems
-        const items = Array.isArray(priceQuote.lineItems) ? priceQuote.lineItems : [];
-        const newRows = items.map((it) => {
-            const r = newBlankRow();
-            r.style = (it.styleNumber || it.style || '').toUpperCase();
-            r.styleUpper = r.style;
-            r.color = it.color || '';
-            r.desc = it.description || '';
-            r.sizes = { ...(it.sizes || {}) };
-            return r;
-        });
-        state.rows = newRows.length > 0 ? newRows : [newBlankRow()];
-
-        // Cache the AI quoteID + persist to sessionStorage so it survives
-        // a page refresh.
-        if (priceQuote.quoteID) setQuoteID(priceQuote.quoteID);
-
-        // IMMEDIATE render so the rep sees the rows right away. Hydration
-        // (catalog colors, available sizes, swatch URLs) happens in the
-        // background in parallel — when each row's hydrate completes we
-        // re-render so the description / catalog color fill in. Without
-        // this the form looks empty until ALL hydrates finish (8+ seconds
-        // for a 4-line quote with cold caches).
-        renderLocationPills();
-        renderTable();
-
-        const hydrates = state.rows
-            .filter((row) => row.style)
-            .map(async (row) => {
-                try {
-                    const [info, bundle] = await Promise.all([
-                        fetchProductColors(row.style),
-                        fetchBundle(row.style),
-                    ]);
-                    row.colorsAvailable = info.colors || [];
-                    if (!row.desc && info.productTitle) row.desc = info.productTitle;
-                    // Fuzzy match — bot often emits rep shorthand ("black") but
-                    // canonical is "Jet Black". Exact-match would leave catalogColor
-                    // empty → broken inventory check + bad ShopWorks push.
-                    const matchColor = fuzzyMatchColor(info.colors || [], row.color);
-                    if (matchColor) {
-                        row.catalogColor = matchColor.CATALOG_COLOR || matchColor.catalogColor || '';
-                        row.colorSwatch = matchColor.COLOR_SQUARE_IMAGE || '';
-                        // Promote canonical name so the row displays "Jet Black"
-                        // even if the bot sent "black".
-                        const canonical = matchColor.COLOR_NAME || matchColor.colorName || '';
-                        if (canonical) row.color = canonical;
-                    }
-                    if (bundle && Array.isArray(bundle.sizes)) {
-                        row.availableSizes = bundle.sizes
-                            .filter((s) => Number(s.price) > 0)
-                            .map((s) => String(s.size).toUpperCase());
-                    }
-                    // Once we know the catalogColor, kick off the inventory
-                    // fetch. The fetch resolves async + re-renders independently.
-                    kickInventoryFetch(row);
-                } catch (e) {
-                    console.warn('[dtg-inline-form] hydrate failed for', row.style, e);
-                }
-            });
-        // Re-render once all parallel hydrates complete (description column
-        // and catalog colors fill in). Doesn't block fillFromQuote returning.
-        Promise.all(hydrates).then(() => { renderTable(); schedulePriceUpdate(); });
-    }
+    if (priceQuote) applyChatPriceQuote(priceQuote);
 
     if (customerFinal) {
         // Accept several shapes the bot might emit:
