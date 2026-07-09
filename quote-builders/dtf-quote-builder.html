@@ -656,7 +656,7 @@
             <!-- Running TOTAL (incl. tax) — compact always-visible strip above the action buttons so the rep
                  sees the customer-facing number at the moment of Save/Print/Email (EMB parity 2026-06-11).
                  Hidden until JS writes it: bind #sidebar-grand-total + un-hide #sidebar-total-bar inside
-                 updateTaxCalculation() (dtf-quote-page.js) where #grand-total-with-tax is set (single source —
+                 updateTaxCalculation() (builders/dtf/page-ui.js) where #grand-total-with-tax is set (single source —
                  always matches the invoice footer). Styles: quote-builder-common.css .sidebar-total-bar -->
             <div class="sidebar-total-bar" id="sidebar-total-bar" hidden>
                 <span class="stb-label">TOTAL <span class="stb-tax-note">incl. tax</span></span>
@@ -769,7 +769,7 @@
     <script src="/shared_components/js/quote-order-summary.js?v=2026.06.08.12"></script>
     <script src="/shared_components/js/safety-stripe-recs.js?v=2026.06.28.4"></script>
 
-    <!-- Save Success Modal (must be before dtf-quote-page.js which references it) -->
+    <!-- Save Success Modal (referenced by builders/dtf/page-ui.js showSaveModal) -->
     <div id="save-success-modal" class="save-modal-overlay" style="display: none;">
         <div class="save-modal-content">
             <div class="save-modal-header">
