@@ -532,95 +532,82 @@ export function updateDigitizingNudges() {
     });
 }
 
-async function _recalculatePricingImpl() {
-    // Keep the digitizing card labels honest + surface the new-logo nudge on every
-    // reprice (both are cheap, idempotent DOM updates). (expert audit 2026-07-07)
-    try { syncDigitizingPriceLabels(); updateDigitizingNudges(); } catch (_) {}
-    // Stale-response guard: rapid edits fire overlapping recalcs, and an OLDER
-    // calculateQuote resolving after a newer one overwrote fresher totals on
-    // screen (the save path then snapshotted them). Only the latest call may
-    // apply results. (audit 2026-06-10)
-    const mySeq = (_embRecalcSeq = (_embRecalcSeq || 0) + 1);
-    // Keep Additional-Logo rows tallied to the order's piece count + re-priced for the current
-    // tier BEFORE we read the table — so a garment add/remove/qty change flows into the AL line.
-    // (syncALRows early-returns if there are no AL rows; sets the qty programmatically so it
-    //  doesn't re-fire onServiceQtyChange → no loop.) (Erik 2026-06-05)
-    try { await syncALRows(); } catch (_) {}
-    renderOrderRecap();  // keep the bottom Order Recap (customer / ship / logos) current on any recalc
-    renderPushReadiness();  // keep the "At least one product" push-readiness check current (audit #8)
-    // Collect products from table (parent rows only)
-    const allItems = collectProductsFromTable();
-    const productList = allItems.filter(p => !p.isService);
-    const serviceItems = allItems.filter(p => p.isService);
-
-    if (productList.length === 0) {
-        // Sum ALL service items (DECG, DECC, Monogram, AL, etc.)
-        let serviceOnlyTotal = 0;
-        let totalQty = 0;
-        let hasGarments = false;
-        let hasCaps = false;
-
-        serviceItems.forEach(si => {
-            serviceOnlyTotal += si.unitPrice * si.totalQuantity;
-            totalQty += si.totalQuantity;
-            if (si.serviceType === 'decg' || !si.isCap) hasGarments = true;
-            if (si.serviceType === 'decc' || si.isCap) hasCaps = true;
-
-            // Update service row price/total cells (reflects overrides)
-            const siRow = document.getElementById(`row-${si.rowId}`);
-            const siPriceCell = document.getElementById(`row-price-${si.rowId}`);
-            const siTotalCell = document.getElementById(`row-total-${si.rowId}`);
-            const siHasOverride = siRow && parseFloat(siRow.dataset.sellPrice) > 0;
-            if (siPriceCell) {
-                if (siHasOverride) {
-                    siPriceCell.classList.add('price-overridden');
-                    siPriceCell.innerHTML = `<span class="price-override-wrapper">$${escapeHtml(si.unitPrice.toFixed(2))}<button class="btn-clear-override" onclick="event.stopPropagation(); clearPriceOverride(${escapeHtml(String(si.rowId))})" title="Clear override">&times;</button></span>`;
-                } else {
-                    siPriceCell.classList.remove('price-overridden');
-                    siPriceCell.textContent = `$${si.unitPrice.toFixed(2)}`;
-                }
-            }
-            if (siTotalCell) {
-                siTotalCell.textContent = `$${(si.unitPrice * si.totalQuantity).toFixed(2)}`;
-            }
-        });
-
-        // Check for laser-patch cap setup fee
-        const capEmbType = getCapEmbellishmentType();
-        const capHasStyle = document.querySelector('tr[data-style]:not(.child-row) .cap-badge') !== null || hasCaps;
-        const showPatchSetup = capEmbType === 'laser-patch' && capHasStyle && embState.capPrimaryLogo.needsSetup;
-        // Engine's patchSetupFee is the live Service_Codes GRT-50 value; EMB_DEFAULTS is fallback-only.
-        const patchSetupFee = showPatchSetup
-            ? (Number.isFinite(embState.pricingCalculator?.patchSetupFee) ? embState.pricingCalculator.patchSetupFee : EMB_DEFAULTS.PATCH_SETUP_FEE)
-            : 0;
-
-        // Determine tier based on total quantity
-        const tier = totalQty <= 7 ? '1-7' : totalQty <= 23 ? '8-23' : totalQty <= 47 ? '24-47' : totalQty <= 71 ? '48-71' : '72+';
-
-        updatePricingDisplay({
-            totalQuantity: totalQty,
-            tier: tier,
-            subtotal: serviceOnlyTotal,
-            ltmFee: 0,
-            setupFees: patchSetupFee,
-            capSetupFees: patchSetupFee,
-            garmentSetupFees: 0,
-            hasCaps: hasCaps || capHasStyle,
-            hasGarments: hasGarments || serviceOnlyTotal > 0,
-            grandTotal: serviceOnlyTotal + patchSetupFee
-        });
-
-        // Clear product price cells (not service rows)
-        document.querySelectorAll('tr[data-style]:not(.service-product-row) .cell-price').forEach(cell => {
-            cell.textContent = '-';
-            cell.classList.remove('price-overridden');
-        });
-        return;
+/** Paint one service row's price/total cells (override-aware) — was pasted
+ * verbatim in BOTH the service-only branch and the mixed-order fold (Batch 3.2). */
+function paintServiceRowCells(si) {
+    const siRow = document.getElementById(`row-${si.rowId}`);
+    const siPriceCell = document.getElementById(`row-price-${si.rowId}`);
+    const siTotalCell = document.getElementById(`row-total-${si.rowId}`);
+    const siHasOverride = siRow && parseFloat(siRow.dataset.sellPrice) > 0;
+    if (siPriceCell) {
+        if (siHasOverride) {
+            siPriceCell.classList.add('price-overridden');
+            siPriceCell.innerHTML = `<span class="price-override-wrapper">$${escapeHtml(si.unitPrice.toFixed(2))}<button class="btn-clear-override" onclick="event.stopPropagation(); clearPriceOverride(${escapeHtml(String(si.rowId))})" title="Clear override">&times;</button></span>`;
+        } else {
+            siPriceCell.classList.remove('price-overridden');
+            siPriceCell.textContent = `$${si.unitPrice.toFixed(2)}`;
+        }
     }
+    if (siTotalCell) {
+        siTotalCell.textContent = `$${(si.unitPrice * si.totalQuantity).toFixed(2)}`;
+    }
+}
 
-    // Build logo configuration from global state (shared helper)
-    const { logoConfigs, allLogos } = buildLogoConfiguration();
+/** Service-only orders (DECG/DECC/Monogram/AL rows, no garments): sum the
+ * service rows, paint their cells, resolve tier + patch-setup fee, render. */
+function renderServiceOnlyPricing(serviceItems) {
+    // Sum ALL service items (DECG, DECC, Monogram, AL, etc.)
+    let serviceOnlyTotal = 0;
+    let totalQty = 0;
+    let hasGarments = false;
+    let hasCaps = false;
 
+    serviceItems.forEach(si => {
+        serviceOnlyTotal += si.unitPrice * si.totalQuantity;
+        totalQty += si.totalQuantity;
+        if (si.serviceType === 'decg' || !si.isCap) hasGarments = true;
+        if (si.serviceType === 'decc' || si.isCap) hasCaps = true;
+
+        paintServiceRowCells(si);
+    });
+
+    // Check for laser-patch cap setup fee
+    const capEmbType = getCapEmbellishmentType();
+    const capHasStyle = document.querySelector('tr[data-style]:not(.child-row) .cap-badge') !== null || hasCaps;
+    const showPatchSetup = capEmbType === 'laser-patch' && capHasStyle && embState.capPrimaryLogo.needsSetup;
+    // Engine's patchSetupFee is the live Service_Codes GRT-50 value; EMB_DEFAULTS is fallback-only.
+    const patchSetupFee = showPatchSetup
+        ? (Number.isFinite(embState.pricingCalculator?.patchSetupFee) ? embState.pricingCalculator.patchSetupFee : EMB_DEFAULTS.PATCH_SETUP_FEE)
+        : 0;
+
+    // Determine tier based on total quantity
+    const tier = totalQty <= 7 ? '1-7' : totalQty <= 23 ? '8-23' : totalQty <= 47 ? '24-47' : totalQty <= 71 ? '48-71' : '72+';
+
+    updatePricingDisplay({
+        totalQuantity: totalQty,
+        tier: tier,
+        subtotal: serviceOnlyTotal,
+        ltmFee: 0,
+        setupFees: patchSetupFee,
+        capSetupFees: patchSetupFee,
+        garmentSetupFees: 0,
+        hasCaps: hasCaps || capHasStyle,
+        hasGarments: hasGarments || serviceOnlyTotal > 0,
+        grandTotal: serviceOnlyTotal + patchSetupFee
+    });
+
+    // Clear product price cells (not service rows)
+    document.querySelectorAll('tr[data-style]:not(.service-product-row) .cell-price').forEach(cell => {
+        cell.textContent = '-';
+        cell.classList.remove('price-overridden');
+    });
+    return;
+}
+
+/** Show/hide + sync the LTM control panel for the current garment/cap counts
+ * (EMB rule: LTM at qty <= 7, garments and caps tiered separately) and resolve
+ * the effective LTM state for pricing. */
+function resolveLtmState(productList) {
     // Show/hide LTM control panel based on quantities
     const garmentQtyForLtm = productList.filter(p => !p.isCap).reduce((s, p) => s + p.totalQuantity, 0);
     const capQtyForLtm = productList.filter(p => p.isCap).reduce((s, p) => s + p.totalQuantity, 0);
@@ -669,6 +656,220 @@ async function _recalculatePricingImpl() {
     const ltmEnabled = wouldHaveLTM ? ltmState.enabled : true;
     const ltmDisplayMode = ltmState.displayMode || 'builtin';
 
+    return { ltmEnabled, ltmDisplayMode };
+}
+
+/** Paint per-row + child-row unit prices and line totals from the engine
+ * result (override/non-SanMar aware; builtin-vs-separate LTM display; child
+ * rows matched by size AND color) + the per-row pricing breakdown. */
+function paintRowPrices(pricing, logoConfigs, ltmDisplayMode) {
+    // Update row prices - match line items to rows by style AND color
+    // With different colors per extended size, we now get separate products for each color
+    pricing.products.forEach((pp) => {
+        const style = pp.product.style;
+        const productCatalogColor = pp.product.catalogColor;
+        // Match by BOTH style AND catalogColor to handle duplicate styles with different colors
+        const parentRow = document.querySelector(`tr[data-style="${style}"][data-catalog-color="${productCatalogColor}"]:not(.child-row)`);
+
+        if (!parentRow) return;
+
+        const rowId = parentRow.dataset.rowId;
+        const isParentColor = productCatalogColor === parentRow.dataset.catalogColor;
+
+        if (pp.lineItems.length > 0) {
+            // For products matching the parent's color, update parent row price
+            if (isParentColor) {
+                // Find standard sizes line item (no upcharge)
+                const standardLineItem = pp.lineItems.find(li => !li.hasUpcharge);
+                if (standardLineItem) {
+                    const priceCell = document.getElementById(`row-price-${rowId}`);
+                    const totalCell = document.getElementById(`row-total-${rowId}`);
+                    if (priceCell) {
+                        // Display unit price — builtin mode shows LTM in price, separate mode shows base price
+                        const displayPrice = (ltmDisplayMode === 'builtin')
+                            ? (standardLineItem.unitPriceWithLTM || standardLineItem.unitPrice || 0)
+                            : (standardLineItem.unitPrice || 0);
+                        const hasOverride = parseFloat(parentRow.dataset.sellPrice) > 0;
+                        const isNsRow = parentRow.dataset.nonSanmar === 'true';
+
+                        if (isNsRow) {
+                            // Non-SanMar: pencil icon, no clear button (price override IS the price)
+                            priceCell.classList.remove('price-overridden');
+                            priceCell.classList.remove('ns-price-zero');
+                            priceCell.innerHTML = `<span class="ns-price-display" onclick="enablePriceOverride(${escapeHtml(String(rowId))})" title="Click to edit price">$${escapeHtml(displayPrice.toFixed(2))} <i class="fas fa-pencil-alt"></i></span>`;
+                        } else if (hasOverride) {
+                            priceCell.classList.add('price-overridden');
+                            priceCell.innerHTML = `<span class="price-override-wrapper">$${escapeHtml(displayPrice.toFixed(2))}<button class="btn-clear-override" onclick="event.stopPropagation(); clearPriceOverride(${escapeHtml(String(rowId))})" title="Clear override">&times;</button></span>`;
+                        } else {
+                            priceCell.classList.remove('price-overridden');
+                            priceCell.textContent = `$${displayPrice.toFixed(2)}`;
+                        }
+
+                        // Calculate and display line total
+                        if (totalCell) {
+                            // Use parent row's displayed qty (excludes child rows)
+                            // standardLineItem.quantity includes child sizes, which is wrong for parent display
+                            const parentQtyCell = document.getElementById(`row-qty-${rowId}`);
+                            const qty = parseInt(parentQtyCell?.textContent) || 0;
+                            const lineTotal = displayPrice * qty;
+                            totalCell.textContent = qty > 0 ? `$${lineTotal.toFixed(2)}` : '-';
+                        }
+                    }
+
+                    // Update pricing breakdown in description cell
+                    const logoConfig = pp.isCap ? logoConfigs.cap.primary : logoConfigs.garment.primary;
+
+                    // Find AL cost for this row from additionalServices
+                    // eslint-disable-next-line eqeqeq -- pre-existing loose compare (string/number rowId — verbatim move)
+                    const rowAL = pricing.additionalServices?.find(al => al.rowId == rowId);
+                    const lineItemWithAL = {
+                        ...standardLineItem,
+                        alCost: rowAL ? rowAL.unitPrice : 0
+                    };
+                    updateRowBreakdown(rowId, pp.product, lineItemWithAL, logoConfig);
+                }
+            }
+
+            // Update child row prices - match by BOTH size AND color
+            // A child row price only updates if its color matches this product's color
+            pp.lineItems.forEach(li => {
+                // First, try to get size from lineItem.size property (garments have this)
+                // If not available, fall back to parsing description (caps use "3XL(2)" format)
+                let sizesToCheck = [];
+                if (li.size) {
+                    sizesToCheck = [li.size];
+                } else {
+                    // Match ALL extended sizes in description (handles caps with "3XL(2)" format)
+                    const description = li.description || '';
+                    const extendedSizeRegex = new RegExp(
+                        // 2XL + XXL concat explicitly: both are Size05-column child rows,
+                        // deliberately NOT in the Size06 list (Batch 2.0).
+                        '(' + SIZE06_EXTENDED_SIZES.map(s => s.replace(/\//g, '\\/')).concat(['2XL', 'XXL', '\\d{4}']).join('|') + ')(?=\\(|\\s|$)',
+                        'g'
+                    );
+                    sizesToCheck = description.match(extendedSizeRegex) || [];
+                }
+
+                sizesToCheck.forEach(size => {
+                    const childRowId = embState.childRowMap[rowId]?.[size];
+                    if (childRowId) {
+                        const childRow = document.getElementById(`row-${childRowId}`);
+                        // Only update price if child row's color matches this product's color
+                        if (childRow && childRow.dataset.catalogColor === productCatalogColor) {
+                            const childPriceCell = document.getElementById(`row-price-${childRowId}`);
+                            const childTotalCell = document.getElementById(`row-total-${childRowId}`);
+                            if (childPriceCell) {
+                                // Display unit price — builtin mode shows LTM in price, separate mode shows base price
+                                const displayPrice = (ltmDisplayMode === 'builtin')
+                                    ? (li.unitPriceWithLTM || li.unitPrice || 0)
+                                    : (li.unitPrice || 0);
+                                // Check parent override (child-specific overrides handled in post-processing)
+                                const childHasOwnOverride = parseFloat(childRow.dataset.sellPrice) > 0;
+                                const hasParentOverride = parseFloat(parentRow.dataset.sellPrice) > 0;
+                                if (hasParentOverride && !childHasOwnOverride) {
+                                    childPriceCell.classList.add('price-overridden');
+                                } else if (!childHasOwnOverride) {
+                                    childPriceCell.classList.remove('price-overridden');
+                                }
+                                childPriceCell.textContent = `$${displayPrice.toFixed(2)}`;
+
+                                // Calculate and display line total for child row
+                                if (childTotalCell) {
+                                    // Extract quantity for THIS size from description
+                                    // Format: "M(3) L(2) XL(1) XS(1)" - parse qty in parentheses after size
+                                    const sizeQtyMatch = (li.description || '').match(new RegExp(size + '\\((\\d+)\\)'));
+                                    const qty = sizeQtyMatch ? parseInt(sizeQtyMatch[1]) : (li.quantity || 0);
+                                    const lineTotal = displayPrice * qty;
+                                    childTotalCell.textContent = qty > 0 ? `$${lineTotal.toFixed(2)}` : '-';
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+        }
+    });
+}
+
+/** Mixed orders: fold DECG/DECC/manual service totals into the engine's
+ * subtotal/grandTotal and paint their row cells. */
+function foldServiceItemTotals(serviceItems, pricing) {
+    if (serviceItems.length > 0) {
+        let serviceTotal = 0;
+        serviceItems.forEach(si => {
+            serviceTotal += si.unitPrice * si.totalQuantity;
+        paintServiceRowCells(si);
+        });
+        pricing.subtotal += serviceTotal;
+        pricing.grandTotal += serviceTotal;
+    }
+}
+
+/** Per-size price overrides on child rows: repaint the cell and return the
+ * subtotal delta vs the engine price (caller folds it into totals). */
+function applyChildOverrides() {
+    // Post-process: per-size price overrides on child rows
+    let childOverrideDelta = 0;
+    document.querySelectorAll('#product-tbody tr.child-row').forEach(childRow => {
+        const childOverride = parseFloat(childRow.dataset.sellPrice) || 0;
+        if (childOverride <= 0) return;
+
+        const childRowId = childRow.dataset.rowId;
+        const childPriceCell = document.getElementById(`row-price-${childRowId}`);
+        const childTotalCell = document.getElementById(`row-total-${childRowId}`);
+        const childQtyCell = document.getElementById(`row-qty-${childRowId}`);
+        if (!childPriceCell) return;
+
+        // Get the calculated price currently in the cell
+        const currentText = childPriceCell.textContent.replace(/[^0-9.]/g, '');
+        const calculatedPrice = parseFloat(currentText) || 0;
+        const qty = parseInt(childQtyCell?.textContent) || 0;
+
+        // Override display
+        childPriceCell.classList.add('price-overridden');
+        childPriceCell.innerHTML = `<span class="price-override-wrapper">$${escapeHtml(childOverride.toFixed(2))}<button class="btn-clear-override" onclick="event.stopPropagation(); clearPriceOverride(${escapeHtml(String(childRowId))})" title="Clear override">&times;</button></span>`;
+
+        if (childTotalCell && qty > 0) {
+            childTotalCell.textContent = `$${(childOverride * qty).toFixed(2)}`;
+        }
+
+        // Track delta for total adjustment
+        childOverrideDelta += (childOverride - calculatedPrice) * qty;
+    });
+
+    return childOverrideDelta;
+}
+
+async function _recalculatePricingImpl() {
+    // Keep the digitizing card labels honest + surface the new-logo nudge on every
+    // reprice (both are cheap, idempotent DOM updates). (expert audit 2026-07-07)
+    try { syncDigitizingPriceLabels(); updateDigitizingNudges(); } catch (_) {}
+    // Stale-response guard: rapid edits fire overlapping recalcs, and an OLDER
+    // calculateQuote resolving after a newer one overwrote fresher totals on
+    // screen (the save path then snapshotted them). Only the latest call may
+    // apply results. (audit 2026-06-10)
+    const mySeq = (_embRecalcSeq = (_embRecalcSeq || 0) + 1);
+    // Keep Additional-Logo rows tallied to the order's piece count + re-priced for the current
+    // tier BEFORE we read the table — so a garment add/remove/qty change flows into the AL line.
+    // (syncALRows early-returns if there are no AL rows; sets the qty programmatically so it
+    //  doesn't re-fire onServiceQtyChange → no loop.) (Erik 2026-06-05)
+    try { await syncALRows(); } catch (_) {}
+    renderOrderRecap();  // keep the bottom Order Recap (customer / ship / logos) current on any recalc
+    renderPushReadiness();  // keep the "At least one product" push-readiness check current (audit #8)
+    // Collect products from table (parent rows only)
+    const allItems = collectProductsFromTable();
+    const productList = allItems.filter(p => !p.isService);
+    const serviceItems = allItems.filter(p => p.isService);
+
+    if (productList.length === 0) {
+        renderServiceOnlyPricing(serviceItems);
+        return;
+    }
+
+    // Build logo configuration from global state (shared helper)
+    const { logoConfigs, allLogos } = buildLogoConfiguration();
+    const { ltmEnabled, ltmDisplayMode } = resolveLtmState(productList);
+
     try {
         const pricing = await embState.pricingCalculator.calculateQuote(productList, allLogos, logoConfigs, { ltmEnabled });
 
@@ -682,203 +883,21 @@ async function _recalculatePricingImpl() {
             return;
         }
 
-        if (pricing) {
-            // Update row prices - match line items to rows by style AND color
-            // With different colors per extended size, we now get separate products for each color
-            pricing.products.forEach((pp) => {
-                const style = pp.product.style;
-                const productCatalogColor = pp.product.catalogColor;
-                // Match by BOTH style AND catalogColor to handle duplicate styles with different colors
-                const parentRow = document.querySelector(`tr[data-style="${style}"][data-catalog-color="${productCatalogColor}"]:not(.child-row)`);
+        paintRowPrices(pricing, logoConfigs, ltmDisplayMode);
+        foldServiceItemTotals(serviceItems, pricing);
 
-                if (!parentRow) return;
-
-                const rowId = parentRow.dataset.rowId;
-                const isParentColor = productCatalogColor === parentRow.dataset.catalogColor;
-
-                if (pp.lineItems.length > 0) {
-                    // For products matching the parent's color, update parent row price
-                    if (isParentColor) {
-                        // Find standard sizes line item (no upcharge)
-                        const standardLineItem = pp.lineItems.find(li => !li.hasUpcharge);
-                        if (standardLineItem) {
-                            const priceCell = document.getElementById(`row-price-${rowId}`);
-                            const totalCell = document.getElementById(`row-total-${rowId}`);
-                            if (priceCell) {
-                                // Display unit price — builtin mode shows LTM in price, separate mode shows base price
-                                const displayPrice = (ltmDisplayMode === 'builtin')
-                                    ? (standardLineItem.unitPriceWithLTM || standardLineItem.unitPrice || 0)
-                                    : (standardLineItem.unitPrice || 0);
-                                const hasOverride = parseFloat(parentRow.dataset.sellPrice) > 0;
-                                const isNsRow = parentRow.dataset.nonSanmar === 'true';
-
-                                if (isNsRow) {
-                                    // Non-SanMar: pencil icon, no clear button (price override IS the price)
-                                    priceCell.classList.remove('price-overridden');
-                                    priceCell.classList.remove('ns-price-zero');
-                                    priceCell.innerHTML = `<span class="ns-price-display" onclick="enablePriceOverride(${escapeHtml(String(rowId))})" title="Click to edit price">$${escapeHtml(displayPrice.toFixed(2))} <i class="fas fa-pencil-alt"></i></span>`;
-                                } else if (hasOverride) {
-                                    priceCell.classList.add('price-overridden');
-                                    priceCell.innerHTML = `<span class="price-override-wrapper">$${escapeHtml(displayPrice.toFixed(2))}<button class="btn-clear-override" onclick="event.stopPropagation(); clearPriceOverride(${escapeHtml(String(rowId))})" title="Clear override">&times;</button></span>`;
-                                } else {
-                                    priceCell.classList.remove('price-overridden');
-                                    priceCell.textContent = `$${displayPrice.toFixed(2)}`;
-                                }
-
-                                // Calculate and display line total
-                                if (totalCell) {
-                                    // Use parent row's displayed qty (excludes child rows)
-                                    // standardLineItem.quantity includes child sizes, which is wrong for parent display
-                                    const parentQtyCell = document.getElementById(`row-qty-${rowId}`);
-                                    const qty = parseInt(parentQtyCell?.textContent) || 0;
-                                    const lineTotal = displayPrice * qty;
-                                    totalCell.textContent = qty > 0 ? `$${lineTotal.toFixed(2)}` : '-';
-                                }
-                            }
-
-                            // Update pricing breakdown in description cell
-                            const logoConfig = pp.isCap ? logoConfigs.cap.primary : logoConfigs.garment.primary;
-
-                            // Find AL cost for this row from additionalServices
-                            // eslint-disable-next-line eqeqeq -- pre-existing loose compare (string/number rowId — verbatim move)
-                            const rowAL = pricing.additionalServices?.find(al => al.rowId == rowId);
-                            const lineItemWithAL = {
-                                ...standardLineItem,
-                                alCost: rowAL ? rowAL.unitPrice : 0
-                            };
-                            updateRowBreakdown(rowId, pp.product, lineItemWithAL, logoConfig);
-                        }
-                    }
-
-                    // Update child row prices - match by BOTH size AND color
-                    // A child row price only updates if its color matches this product's color
-                    pp.lineItems.forEach(li => {
-                        // First, try to get size from lineItem.size property (garments have this)
-                        // If not available, fall back to parsing description (caps use "3XL(2)" format)
-                        let sizesToCheck = [];
-                        if (li.size) {
-                            sizesToCheck = [li.size];
-                        } else {
-                            // Match ALL extended sizes in description (handles caps with "3XL(2)" format)
-                            const description = li.description || '';
-                            const extendedSizeRegex = new RegExp(
-                                // 2XL + XXL concat explicitly: both are Size05-column child rows,
-                                // deliberately NOT in the Size06 list (Batch 2.0).
-                                '(' + SIZE06_EXTENDED_SIZES.map(s => s.replace(/\//g, '\\/')).concat(['2XL', 'XXL', '\\d{4}']).join('|') + ')(?=\\(|\\s|$)',
-                                'g'
-                            );
-                            sizesToCheck = description.match(extendedSizeRegex) || [];
-                        }
-
-                        sizesToCheck.forEach(size => {
-                            const childRowId = embState.childRowMap[rowId]?.[size];
-                            if (childRowId) {
-                                const childRow = document.getElementById(`row-${childRowId}`);
-                                // Only update price if child row's color matches this product's color
-                                if (childRow && childRow.dataset.catalogColor === productCatalogColor) {
-                                    const childPriceCell = document.getElementById(`row-price-${childRowId}`);
-                                    const childTotalCell = document.getElementById(`row-total-${childRowId}`);
-                                    if (childPriceCell) {
-                                        // Display unit price — builtin mode shows LTM in price, separate mode shows base price
-                                        const displayPrice = (ltmDisplayMode === 'builtin')
-                                            ? (li.unitPriceWithLTM || li.unitPrice || 0)
-                                            : (li.unitPrice || 0);
-                                        // Check parent override (child-specific overrides handled in post-processing)
-                                        const childHasOwnOverride = parseFloat(childRow.dataset.sellPrice) > 0;
-                                        const hasParentOverride = parseFloat(parentRow.dataset.sellPrice) > 0;
-                                        if (hasParentOverride && !childHasOwnOverride) {
-                                            childPriceCell.classList.add('price-overridden');
-                                        } else if (!childHasOwnOverride) {
-                                            childPriceCell.classList.remove('price-overridden');
-                                        }
-                                        childPriceCell.textContent = `$${displayPrice.toFixed(2)}`;
-
-                                        // Calculate and display line total for child row
-                                        if (childTotalCell) {
-                                            // Extract quantity for THIS size from description
-                                            // Format: "M(3) L(2) XL(1) XS(1)" - parse qty in parentheses after size
-                                            const sizeQtyMatch = (li.description || '').match(new RegExp(size + '\\((\\d+)\\)'));
-                                            const qty = sizeQtyMatch ? parseInt(sizeQtyMatch[1]) : (li.quantity || 0);
-                                            const lineTotal = displayPrice * qty;
-                                            childTotalCell.textContent = qty > 0 ? `$${lineTotal.toFixed(2)}` : '-';
-                                        }
-                                    }
-                                }
-                            }
-                        });
-                    });
-                }
-            });
-
-            // Add service item totals (DECG/DECC) to pricing for mixed orders
-            if (serviceItems.length > 0) {
-                let serviceTotal = 0;
-                serviceItems.forEach(si => {
-                    serviceTotal += si.unitPrice * si.totalQuantity;
-
-                    // Update service row price/total cells (reflects overrides)
-                    const siRow = document.getElementById(`row-${si.rowId}`);
-                    const siPriceCell = document.getElementById(`row-price-${si.rowId}`);
-                    const siTotalCell = document.getElementById(`row-total-${si.rowId}`);
-                    const siHasOverride = siRow && parseFloat(siRow.dataset.sellPrice) > 0;
-                    if (siPriceCell) {
-                        if (siHasOverride) {
-                            siPriceCell.classList.add('price-overridden');
-                            siPriceCell.innerHTML = `<span class="price-override-wrapper">$${escapeHtml(si.unitPrice.toFixed(2))}<button class="btn-clear-override" onclick="event.stopPropagation(); clearPriceOverride(${escapeHtml(String(si.rowId))})" title="Clear override">&times;</button></span>`;
-                        } else {
-                            siPriceCell.classList.remove('price-overridden');
-                            siPriceCell.textContent = `$${si.unitPrice.toFixed(2)}`;
-                        }
-                    }
-                    if (siTotalCell) {
-                        siTotalCell.textContent = `$${(si.unitPrice * si.totalQuantity).toFixed(2)}`;
-                    }
-                });
-                pricing.subtotal += serviceTotal;
-                pricing.grandTotal += serviceTotal;
-            }
-
-            // Post-process: per-size price overrides on child rows
-            let childOverrideDelta = 0;
-            document.querySelectorAll('#product-tbody tr.child-row').forEach(childRow => {
-                const childOverride = parseFloat(childRow.dataset.sellPrice) || 0;
-                if (childOverride <= 0) return;
-
-                const childRowId = childRow.dataset.rowId;
-                const childPriceCell = document.getElementById(`row-price-${childRowId}`);
-                const childTotalCell = document.getElementById(`row-total-${childRowId}`);
-                const childQtyCell = document.getElementById(`row-qty-${childRowId}`);
-                if (!childPriceCell) return;
-
-                // Get the calculated price currently in the cell
-                const currentText = childPriceCell.textContent.replace(/[^0-9.]/g, '');
-                const calculatedPrice = parseFloat(currentText) || 0;
-                const qty = parseInt(childQtyCell?.textContent) || 0;
-
-                // Override display
-                childPriceCell.classList.add('price-overridden');
-                childPriceCell.innerHTML = `<span class="price-override-wrapper">$${escapeHtml(childOverride.toFixed(2))}<button class="btn-clear-override" onclick="event.stopPropagation(); clearPriceOverride(${escapeHtml(String(childRowId))})" title="Clear override">&times;</button></span>`;
-
-                if (childTotalCell && qty > 0) {
-                    childTotalCell.textContent = `$${(childOverride * qty).toFixed(2)}`;
-                }
-
-                // Track delta for total adjustment
-                childOverrideDelta += (childOverride - calculatedPrice) * qty;
-            });
-
-            // Adjust totals if child overrides changed prices
-            if (childOverrideDelta !== 0) {
-                pricing.subtotal += childOverrideDelta;
-                pricing.grandTotal += childOverrideDelta;
-            }
-
-            updatePricingDisplay(pricing);
-
-            // Price-break ladder: fire-and-forget engine sim → fills in the real
-            // $/pc savings on the nudge when it lands (seq-guarded). (2026-06-10)
-            computeNudgeSavingsAsync(productList, allLogos, logoConfigs, ltmEnabled, pricing, mySeq);
+        // Adjust totals if child overrides changed prices
+        const childOverrideDelta = applyChildOverrides();
+        if (childOverrideDelta !== 0) {
+            pricing.subtotal += childOverrideDelta;
+            pricing.grandTotal += childOverrideDelta;
         }
+
+        updatePricingDisplay(pricing);
+
+        // Price-break ladder: fire-and-forget engine sim → fills in the real
+        // $/pc savings on the nudge when it lands (seq-guarded). (2026-06-10)
+        computeNudgeSavingsAsync(productList, allLogos, logoConfigs, ltmEnabled, pricing, mySeq);
     } catch (error) {
         console.error('Pricing calculation error:', error);
         showToast('Pricing calculation error. Please try again.', 'error');
@@ -886,6 +905,46 @@ async function _recalculatePricingImpl() {
 
     // Mark as dirty for auto-save (2026 consolidation)
     markEmbroideryDirty();
+}
+
+/** Fold a parent row's child rows into its color groups (child rows may carry
+ * different colors) and return their per-size price overrides. */
+function collectChildRowsIntoGroups(rowId, colorGroups) {
+    // Collect extended sizes from CHILD ROWS - GROUP BY COLOR
+    // Child rows may have different colors than parent
+    // Also collect per-size price overrides from child rows
+    const sizeOverrides = {};
+    const childRows = document.querySelectorAll(`tr[data-parent-row-id="${rowId}"]`);
+    childRows.forEach(childRow => {
+        const size = childRow.dataset.extendedSize;
+        const childColor = childRow.dataset.color;
+        const childCatalogColor = childRow.dataset.catalogColor || '';
+        const qtyDisplay = childRow.querySelector('.qty-display');
+        const qty = parseInt(qtyDisplay?.textContent) || 0;
+
+        if (qty > 0 && size) {
+            // Initialize color group if different from parent
+            if (!colorGroups[childCatalogColor]) {
+                colorGroups[childCatalogColor] = {
+                    color: childColor,
+                    catalogColor: childCatalogColor,
+                    sizeBreakdown: {},
+                    totalQty: 0
+                };
+            }
+
+            colorGroups[childCatalogColor].sizeBreakdown[size] = qty;
+            colorGroups[childCatalogColor].totalQty += qty;
+
+            // Collect per-size price override if set
+            const childOverride = parseFloat(childRow.dataset.sellPrice) || 0;
+            if (childOverride > 0) {
+                sizeOverrides[size] = childOverride;
+            }
+        }
+    });
+
+    return sizeOverrides;
 }
 
 export function collectProductsFromTable() {
@@ -974,39 +1033,8 @@ export function collectProductsFromTable() {
             }
         }
 
-        // Collect extended sizes from CHILD ROWS - GROUP BY COLOR
-        // Child rows may have different colors than parent
-        // Also collect per-size price overrides from child rows
-        const sizeOverrides = {};
-        const childRows = document.querySelectorAll(`tr[data-parent-row-id="${rowId}"]`);
-        childRows.forEach(childRow => {
-            const size = childRow.dataset.extendedSize;
-            const childColor = childRow.dataset.color;
-            const childCatalogColor = childRow.dataset.catalogColor || '';
-            const qtyDisplay = childRow.querySelector('.qty-display');
-            const qty = parseInt(qtyDisplay?.textContent) || 0;
-
-            if (qty > 0 && size) {
-                // Initialize color group if different from parent
-                if (!colorGroups[childCatalogColor]) {
-                    colorGroups[childCatalogColor] = {
-                        color: childColor,
-                        catalogColor: childCatalogColor,
-                        sizeBreakdown: {},
-                        totalQty: 0
-                    };
-                }
-
-                colorGroups[childCatalogColor].sizeBreakdown[size] = qty;
-                colorGroups[childCatalogColor].totalQty += qty;
-
-                // Collect per-size price override if set
-                const childOverride = parseFloat(childRow.dataset.sellPrice) || 0;
-                if (childOverride > 0) {
-                    sizeOverrides[size] = childOverride;
-                }
-            }
-        });
+        // Child rows (extended sizes, possibly different colors) — extracted Batch 3.2
+        const sizeOverrides = collectChildRowsIntoGroups(rowId, colorGroups);
 
         // Create product entry for each color group with quantities
         Object.entries(colorGroups).forEach(([_catalogColor, group]) => {
@@ -1054,7 +1082,9 @@ export function collectProductsFromTable() {
     return products;
 }
 
-export function updatePricingDisplay(pricing) {
+/** Headline totals: qty, subtotal(+LTM), per-unit, category-aware nudge, grand
+ * total, min-order (LTM per CATEGORY) warning, products label, pre-tax. */
+function paintHeadlineTotals(pricing) {
     // Failed AL/DECG rows get their Retry button here — this runs AFTER the recalc
     // body has repainted service-row cells, so the button isn't overwritten. (2026-07-07)
     try { renderPriceErrorRetries(); } catch (_) { }
@@ -1104,7 +1134,11 @@ export function updatePricingDisplay(pricing) {
     }
     // Update the pre-tax subtotal (same as grand-total before tax)
     document.getElementById('pre-tax-subtotal').textContent = `$${(pricing.grandTotal || 0).toFixed(2)}`;
+}
 
+/** Mixed-quote breakdown: garment/cap qty rows, tier display (caps + garments
+ * tier SEPARATELY), per-category subtotal rows (LTM baked in). */
+function paintQtyAndTierBreakdown(pricing) {
     // Quantity breakdown for mixed quotes
     const garmentQtyRow = document.getElementById('garment-qty-row');
     const capQtyRow = document.getElementById('cap-qty-row');
@@ -1168,7 +1202,11 @@ export function updatePricingDisplay(pricing) {
         garmentSubtotalRow.style.display = 'none';
         capSubtotalRow.style.display = 'none';
     }
+}
 
+/** Fee table rows: LTM (separate display mode only), setup/digitizing (with
+ * laser-patch label), AS-GARM / AS-CAP additional-stitch rows. */
+function paintFeeRows(pricing) {
     // LTM fee rows: show only in "separate" display mode
     const ltmState = getLtmControlState('emb-ltm-panel');
     const ltmDisplayMode = ltmState.displayMode || 'builtin';
@@ -1259,7 +1297,11 @@ export function updatePricingDisplay(pricing) {
     } else {
         if (capStitchFeeRow) capStitchFeeRow.style.display = 'none';
     }
+}
 
+/** AL fee rows + sidebar summaries, cap-embellishment upcharge row (3D puff /
+ * laser patch), and the AL digitizing display rows. */
+function paintAlAndCapEmbRows(pricing) {
     // ============================================
     // Additional Logo (AL) fee rows + sidebar display
     // Uses pricing engine's additionalServices — no duplicate calculation
@@ -1392,6 +1434,13 @@ export function updatePricingDisplay(pricing) {
     } else {
         if (capAlDigitizingRow) capAlDigitizingRow.style.display = 'none';
     }
+}
+
+export function updatePricingDisplay(pricing) {
+    paintHeadlineTotals(pricing);
+    paintQtyAndTierBreakdown(pricing);
+    paintFeeRows(pricing);
+    paintAlAndCapEmbRows(pricing);
 
     // (Additional Logo rows are re-priced from the API on add / qty-change — their
     // dataset.unitPrice is already current here, so they sum in like any service row.)
