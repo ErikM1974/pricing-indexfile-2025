@@ -602,7 +602,7 @@ export function renderTable() {
 
             return `<div class="dtg-size-cell${overflow ? ' dtg-size-cell--overflow' : ''}${isOOS ? ' dtg-size-cell--oos' : ''}">
                 <div class="dtg-size-label">${escapeHtml(sz)}</div>
-                <input type="number" min="0" step="1" value="${qty || ''}" data-row-id="${row.id}" data-size="${escapeHtml(sz)}" title="Tip: paste S:2 M:4 L:6 here to fill all sizes at once">
+                <input type="number" min="0" step="1" value="${qty || ''}" data-row-id="${row.id}" data-size="${escapeHtml(sz)}" aria-label="Quantity ${escapeHtml(sz)}" title="Tip: paste S:2 M:4 L:6 here to fill all sizes at once">
                 <div class="dtg-size-price${isOOS ? ' dtg-size-price--oos' : ''}">${oosDot}${priceLabel}</div>
                 ${oosWarn}
             </div>`;

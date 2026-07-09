@@ -514,7 +514,7 @@ function renderImportPreview(data) {
         const deccCaps = data.decgItems.filter(d => d.serviceType === 'decc');
 
         if (decgGarments.length > 0) {
-            productsHtml += '<h5 style="margin-top: 12px;">Customer-Supplied Garments (' + decgGarments.length + ')</h5><div class="preview-products-list">';
+            productsHtml += '<h5 class="qb-mt12">Customer-Supplied Garments (' + decgGarments.length + ')</h5><div class="preview-products-list">';
             for (const decg of decgGarments) {
                 const ltmNote = decg.ltmFee > 0 ? ` + $${decg.ltmFee} LTM` : '';
                 const tierNote = decg.tier ? ` (Tier ${decg.tier})` : '';
@@ -523,7 +523,7 @@ function renderImportPreview(data) {
                 productsHtml += `
                     <div class="preview-product-item">
                         <span class="preview-product-style" style="background: #fef3c7; color: #92400e;">DECG</span>
-                        <span class="preview-product-desc">${escapeHtml(decg.description || 'Customer garment')} <small style="color:#64748b;">${stitchNote}${tierNote}</small></span>
+                        <span class="preview-product-desc">${escapeHtml(decg.description || 'Customer garment')} <small class="qb-muted">${stitchNote}${tierNote}</small></span>
                         <span class="preview-product-qty">${sourceIcon} Qty: ${decg.quantity} @ $${decg.calculatedUnitPrice.toFixed(2)}${ltmNote}</span>
                     </div>
                 `;
@@ -532,7 +532,7 @@ function renderImportPreview(data) {
         }
 
         if (deccCaps.length > 0) {
-            productsHtml += '<h5 style="margin-top: 12px;">Customer-Supplied Caps (' + deccCaps.length + ')</h5><div class="preview-products-list">';
+            productsHtml += '<h5 class="qb-mt12">Customer-Supplied Caps (' + deccCaps.length + ')</h5><div class="preview-products-list">';
             for (const decc of deccCaps) {
                 const ltmNote = decc.ltmFee > 0 ? ` + $${decc.ltmFee} LTM` : '';
                 const tierNote = decc.tier ? ` (Tier ${decc.tier})` : '';
@@ -541,7 +541,7 @@ function renderImportPreview(data) {
                 productsHtml += `
                     <div class="preview-product-item">
                         <span class="preview-product-style" style="background: #dbeafe; color: #1e40af;">DECC</span>
-                        <span class="preview-product-desc">${escapeHtml(decc.description || 'Customer cap')} <small style="color:#64748b;">${stitchNote}${tierNote}</small></span>
+                        <span class="preview-product-desc">${escapeHtml(decc.description || 'Customer cap')} <small class="qb-muted">${stitchNote}${tierNote}</small></span>
                         <span class="preview-product-qty">${sourceIcon} Qty: ${decc.quantity} @ $${decc.calculatedUnitPrice.toFixed(2)}${ltmNote}</span>
                     </div>
                 `;

@@ -338,7 +338,7 @@ async function applyDesignToCard(type, designNum, design) {
     const dstArr = design.dstFilenames || [];
     if (dstArr.length > 0) {
         const dstDisplay = dstArr.length <= 2 ? dstArr.join(', ') : dstArr.slice(0, 2).join(', ') + ' +' + (dstArr.length - 2) + ' more';
-        badgeHtml += '<br><span style="font-size:11px;color:#6366f1;"><i class="fas fa-file-code" style="margin-right:2px;"></i>DST: ' + escapeHtml(dstDisplay) + '</span>';
+        badgeHtml += '<br><span class="qb-hint-indigo"><i class="fas fa-file-code" style="margin-right:2px;"></i>DST: ' + escapeHtml(dstDisplay) + '</span>';
     }
 
     // Order history
@@ -347,7 +347,7 @@ async function applyDesignToCard(type, designNum, design) {
         if (design.lastOrderDate) {
             orderText += ' (last: ' + new Date(design.lastOrderDate).toLocaleDateString('en-US', {month:'short', year:'numeric'}) + ')';
         }
-        badgeHtml += '<br><span style="font-size:11px;color:#6366f1;">📦 ' + escapeHtml(orderText) + '</span>';
+        badgeHtml += '<br><span class="qb-hint-indigo">📦 ' + escapeHtml(orderText) + '</span>';
     }
 
     // Extra color surcharge — warn AND collect (expert audit 2026-07-07 F2: this

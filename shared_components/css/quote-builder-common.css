@@ -4226,3 +4226,41 @@ h1.power-header-title {
        rule keeps styling size/weight exactly as the old div */
     margin: 0;
 }
+
+/* Batch 7.1 (2026-07-09): JS-template inline-style migration — utilities for the
+   repeated style strings in builder JS templates (push previews, spr-modal pills,
+   row/empty states). Named per declaration set, matching the 1.7 convention. */
+.qb-bg-gray { background: #f5f5f5; }
+.qb-muted { color: #64748b; }
+.qb-td--r { padding: 4px; text-align: right; }
+.qb-td { padding: 4px; }
+.qb-thumb-box { width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; }
+.qb-td--c { padding: 4px; text-align: center; }
+.qb-err-8 { padding: 8px; color: #b91c1c; }
+.qb-ink { color: #475569; }
+.qb-ok-icon { color: #34d399; }
+.qb-empty-state-title { font-size: 16px; font-weight: 500; margin-bottom: 8px; }
+.qb-loading-pad { padding: 24px; text-align: center; color: #64748b; }
+.qb-note-11 { color: #94a3b8; font-size: 11px; }
+.qb-err-16 { padding: 16px; color: #b91c1c; }
+.qb-grid-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; font-size: 13px; }
+.qb-table-13 { width: 100%; border-collapse: collapse; font-size: 13px; }
+.qb-th { text-align: left; border-bottom: 1px solid #e5e7eb; color: #64748b; }
+.qb-row-line { border-bottom: 1px solid #f1f5f9; }
+.qb-td--b { padding: 4px; font-weight: 600; }
+.qb-total-line { text-align: right; margin-top: 10px; font-size: 14px; font-weight: 700; }
+.qb-warn-box--mt { margin-top: 10px; padding: 8px 10px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; font-size: 12px; color: #92400e; }
+.qb-warn-box { padding: 8px; color: #92400e; background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; }
+.qb-dim { opacity: 0.85; }
+.qb-hint-indigo { font-size: 11px; color: #6366f1; }
+.qb-fs10-mr3 { font-size: 10px; margin-right: 3px; }
+.qb-muted-12 { color: #666; font-size: 12px; }
+.qb-note-13 { font-size: 13px; color: #94a3b8; }
+.qb-amber-dark { color: #b45309; }
+.qb-mt12 { margin-top: 12px; }
+.qb-pl18 { padding-left: 18px; }
+.qb-mr4 { margin-right: 4px; }
+.qb-blue-bold { color: #1e40af; font-weight: 600; }
+.qb-pill-red { background: #dc2626; color: #fff; padding: 1px 6px; border-radius: 3px; font-size: 11px; font-weight: 600; margin-left: 4px; }
+.qb-pill-amber { background: #f59e0b; color: #fff; padding: 1px 6px; border-radius: 3px; font-size: 11px; font-weight: 600; margin-left: 4px; }
+.qb-pill-green { background: #22c55e; color: #fff; padding: 1px 6px; border-radius: 3px; font-size: 11px; font-weight: 600; margin-left: 4px; }

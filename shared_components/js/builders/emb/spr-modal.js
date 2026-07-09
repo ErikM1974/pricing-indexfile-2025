@@ -99,8 +99,8 @@ function renderSprProductsSection(productItems) {
                     pHtml += `</td>`;
                 } else {
                     // Subsequent rows: just prices (no radios), aligned under radio+price above
-                    pHtml += `<td class="spr-radio-cell"><span class="spr-price-label" style="padding-left:18px">$${swPrice.toFixed(2)}</span></td>`;
-                    pHtml += `<td class="spr-radio-cell"><span class="spr-price-label" style="padding-left:18px">${group.apiPrice != null ? '$' + group.apiPrice.toFixed(2) : '—'}</span></td>`;
+                    pHtml += `<td class="spr-radio-cell"><span class="spr-price-label qb-pl18">$${swPrice.toFixed(2)}</span></td>`;
+                    pHtml += `<td class="spr-radio-cell"><span class="spr-price-label qb-pl18">${group.apiPrice != null ? '$' + group.apiPrice.toFixed(2) : '—'}</span></td>`;
                     pHtml += `<td>&nbsp;</td>`;
                 }
                 pHtml += `</tr>`;
@@ -281,7 +281,7 @@ function renderSprEmbConfigSection(embConfigOptions) {
             const showAssignment = designEntries.length >= 2 && (embConfigOptions.hasGarments || embConfigOptions.hasCaps);
 
             if (showAssignment) {
-                bannerHtml += `<div style="font-size:11px;font-weight:600;color:#1e40af;margin-bottom:6px;"><i class="fas fa-object-group" style="margin-right:4px;"></i>Design Logo Assignment</div>`;
+                bannerHtml += `<div style="font-size:11px;font-weight:600;color:#1e40af;margin-bottom:6px;"><i class="fas fa-object-group qb-mr4"></i>Design Logo Assignment</div>`;
             }
 
             // Smart auto-assign defaults
@@ -332,12 +332,12 @@ function renderSprEmbConfigSection(embConfigOptions) {
                     const surcharge = dbInfo.maxAsSurcharge || 0;
                     const scFormatted = sc.toLocaleString();
 
-                    bannerHtml += `<span style="color:#475569;">${escapeHtml(dbInfo.company || '')}</span>`;
-                    bannerHtml += `<span style="color:#1e40af;font-weight:600;">${scFormatted} stitches</span>`;
+                    bannerHtml += `<span class="qb-ink">${escapeHtml(dbInfo.company || '')}</span>`;
+                    bannerHtml += `<span class="qb-blue-bold">${scFormatted} stitches</span>`;
 
                     let tierBadge = '';
                     if (tier === 'Full Back') {
-                        tierBadge = '<span style="background:#dc2626;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;">Full Back</span>';
+                        tierBadge = '<span class="qb-pill-red">Full Back</span>';
                         if (!fbPriceTiersFromLookup && dbInfo.hasFBPricing) {
                             const fbVariant = dbInfo.variants.find(v => v.fbPrice1_7 > 0);
                             if (fbVariant) {
@@ -351,14 +351,14 @@ function renderSprEmbConfigSection(embConfigOptions) {
                             }
                         }
                     } else if (surcharge > 0) {
-                        tierBadge = `<span style="background:#f59e0b;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;">${escapeHtml(tier)} +$${surcharge}/pc</span>`;
+                        tierBadge = `<span class="qb-pill-amber">${escapeHtml(tier)} +$${surcharge}/pc</span>`;
                     } else {
-                        tierBadge = '<span style="background:#22c55e;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;">Standard</span>';
+                        tierBadge = '<span class="qb-pill-green">Standard</span>';
                     }
                     bannerHtml += tierBadge;
 
                     if (dbInfo.variants && dbInfo.variants.length > 1) {
-                        bannerHtml += `<span style="color:#94a3b8;font-size:11px;">(${dbInfo.variants.length} variants)</span>`;
+                        bannerHtml += `<span class="qb-note-11">(${dbInfo.variants.length} variants)</span>`;
                     }
                 } else if (fallbackInfo && fallbackInfo.hasStitchData) {
                     // Fallback WITH stitch data — treat like master hit
@@ -367,20 +367,20 @@ function renderSprEmbConfigSection(embConfigOptions) {
                     const surcharge = fallbackInfo.asSurcharge || 0;
                     const scFormatted = sc.toLocaleString();
 
-                    bannerHtml += `<span style="color:#475569;">${escapeHtml(fallbackInfo.companyName || '')}</span>`;
-                    bannerHtml += `<span style="color:#1e40af;font-weight:600;">${scFormatted} stitches</span>`;
+                    bannerHtml += `<span class="qb-ink">${escapeHtml(fallbackInfo.companyName || '')}</span>`;
+                    bannerHtml += `<span class="qb-blue-bold">${scFormatted} stitches</span>`;
 
                     let tierBadge = '';
                     if (tier === 'Full Back') {
-                        tierBadge = '<span style="background:#dc2626;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;">Full Back</span>';
+                        tierBadge = '<span class="qb-pill-red">Full Back</span>';
                     } else if (surcharge > 0) {
-                        tierBadge = `<span style="background:#f59e0b;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;">${escapeHtml(tier)} +$${surcharge}/pc</span>`;
+                        tierBadge = `<span class="qb-pill-amber">${escapeHtml(tier)} +$${surcharge}/pc</span>`;
                     } else {
-                        tierBadge = '<span style="background:#22c55e;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;">Standard</span>';
+                        tierBadge = '<span class="qb-pill-green">Standard</span>';
                     }
                     bannerHtml += tierBadge;
                     if (fallbackInfo.threadColors) {
-                        bannerHtml += `<span style="color:#94a3b8;font-size:11px;" title="${escapeHtml(fallbackInfo.threadColors)}">${fallbackInfo.colorCount} colors</span>`;
+                        bannerHtml += `<span class="qb-note-11" title="${escapeHtml(fallbackInfo.threadColors)}">${fallbackInfo.colorCount} colors</span>`;
                     }
 
                     // Promote fallback to dbInfo-like shape for auto-tier logic
@@ -396,20 +396,20 @@ function renderSprEmbConfigSection(embConfigOptions) {
                 } else if (fallbackInfo) {
                     // Fallback WITHOUT stitch data — name/company/colors only
                     if (fallbackInfo.companyName) {
-                        bannerHtml += `<span style="color:#475569;">${escapeHtml(fallbackInfo.companyName)}</span>`;
+                        bannerHtml += `<span class="qb-ink">${escapeHtml(fallbackInfo.companyName)}</span>`;
                     }
                     if (fallbackInfo.designName) {
                         bannerHtml += `<span style="color:#64748b;font-size:11px;">${escapeHtml(fallbackInfo.designName)}</span>`;
                     }
                     bannerHtml += '<span style="background:#d97706;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;">No stitch data</span>';
                     if (fallbackInfo.threadColors) {
-                        bannerHtml += `<span style="color:#94a3b8;font-size:11px;" title="${escapeHtml(fallbackInfo.threadColors)}">${fallbackInfo.colorCount} colors</span>`;
+                        bannerHtml += `<span class="qb-note-11" title="${escapeHtml(fallbackInfo.threadColors)}">${fallbackInfo.colorCount} colors</span>`;
                     }
                 } else {
                     // Not found in either table
                     const nameMatch = label.match(/—\s*(.+)/);
                     if (nameMatch) {
-                        bannerHtml += `<span style="color:#475569;">${escapeHtml(nameMatch[1].trim())}</span>`;
+                        bannerHtml += `<span class="qb-ink">${escapeHtml(nameMatch[1].trim())}</span>`;
                     }
                     bannerHtml += '<span style="background:#94a3b8;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;">Not in database</span>';
                 }
@@ -430,7 +430,7 @@ function renderSprEmbConfigSection(embConfigOptions) {
 
             designBanner.style.display = '';
             designBanner.style.background = '#eff6ff';
-            const headerText = showAssignment ? '' : '<div style="font-size:11px;font-weight:600;color:#1e40af;margin-bottom:4px;"><i class="fas fa-search" style="margin-right:4px;"></i>Design Stitch Lookup</div>';
+            const headerText = showAssignment ? '' : '<div style="font-size:11px;font-weight:600;color:#1e40af;margin-bottom:4px;"><i class="fas fa-search qb-mr4"></i>Design Stitch Lookup</div>';
             // eslint-disable-next-line no-unsanitized/property -- audited (1.4): numeric prices/indices + internal enums; typeUpper escapeHtml-wrapped
             designBanner.innerHTML = headerText + bannerHtml;
 

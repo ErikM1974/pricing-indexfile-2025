@@ -1351,7 +1351,7 @@ function paintAlAndCapEmbRows(pricing) {
         // eslint-disable-next-line no-unsanitized/property -- audited (1.4): AL sync rows — internal labels + numeric qty/fees only
         alContainer.innerHTML = `
             <div class="pricing-row al-pricing-row">
-                <span class="label"><i class="fas fa-tshirt" style="font-size: 10px; margin-right: 3px;"></i> AL:</span>
+                <span class="label"><i class="fas fa-tshirt qb-fs10-mr3"></i> AL:</span>
                 <span class="value">$${garmentALTotal.toFixed(2)}</span>
             </div>
             <div class="pricing-row sub-breakdown">
@@ -1370,7 +1370,7 @@ function paintAlAndCapEmbRows(pricing) {
         // eslint-disable-next-line no-unsanitized/property -- audited (1.4): AL sync rows — internal labels + numeric qty/fees only
         capAlContainer.innerHTML = `
             <div class="pricing-row al-pricing-row cap-al">
-                <span class="label"><i class="fas fa-hat-cowboy" style="font-size: 10px; margin-right: 3px;"></i> AL-Cap:</span>
+                <span class="label"><i class="fas fa-hat-cowboy qb-fs10-mr3"></i> AL-Cap:</span>
                 <span class="value">$${capALTotal.toFixed(2)}</span>
             </div>
             <div class="pricing-row sub-breakdown">

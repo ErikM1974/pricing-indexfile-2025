@@ -691,7 +691,7 @@ export async function duplicateQuote(sourceQuoteId) {
     // Duplicate banner (updateEditModeUI was suppressed in duplicate mode)
     const headerSubtitle = document.querySelector('.power-header .power-header-subtitle');
     if (headerSubtitle) {
-        headerSubtitle.innerHTML = `<span style="color: #34d399;">📋 Duplicated from ${escapeHtml(String(sourceQuoteId))} — saving creates a NEW quote at today's prices</span>`;
+        headerSubtitle.innerHTML = `<span class="qb-ok-icon">📋 Duplicated from ${escapeHtml(String(sourceQuoteId))} — saving creates a NEW quote at today's prices</span>`;
     }
     markAsUnsaved();
     showToast(`Duplicated ${sourceQuoteId} — prices refreshed to today's rates. Saving will create a new quote #.`, 'success', 7000);

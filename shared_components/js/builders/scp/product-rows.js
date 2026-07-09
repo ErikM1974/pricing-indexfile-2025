@@ -182,9 +182,8 @@ export function addNewRow() {
                    onkeydown="handleCellKeydown(event, this)">
         </td>
         <td class="thumbnail-col">
-            <div class="product-thumbnail no-image" id="thumb-${rowId}"
-                 title="Select a color to see product image"
-                 style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;"></div>
+            <div class="product-thumbnail no-image qb-thumb-box" id="thumb-${rowId}"
+                 title="Select a color to see product image"></div>
         </td>
         <td class="desc-cell">
             <div class="desc-row">
@@ -197,20 +196,20 @@ export function addNewRow() {
         </td>
         <td>
             <div class="color-picker-wrapper" data-row-id="${rowId}">
-                <div class="color-picker-selected disabled" onclick="toggleColorPicker(${rowId})" tabindex="0" onkeydown="handleColorPickerKeydown(event, ${rowId})">
+                <div class="color-picker-selected disabled" onclick="toggleColorPicker(${rowId})" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-label="Garment color" onkeydown="handleColorPickerKeydown(event, ${rowId})">
                     <span class="color-swatch empty"></span>
                     <span class="color-name placeholder">Select color...</span>
                     <i class="fas fa-chevron-down picker-arrow"></i>
                 </div>
-                <div class="color-picker-dropdown hidden" id="color-dropdown-${rowId}"></div>
+                <div class="color-picker-dropdown hidden" role="listbox" aria-label="Colors" id="color-dropdown-${rowId}"></div>
             </div>
         </td>
-        <td><input type="number" class="cell-input size-input" data-size="S" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
-        <td><input type="number" class="cell-input size-input" data-size="M" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
-        <td><input type="number" class="cell-input size-input" data-size="L" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
-        <td><input type="number" class="cell-input size-input" data-size="XL" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
-        <td><input type="number" class="cell-input size-input" data-size="2XL" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
-        <td><input type="text" class="cell-input size-input xxxl-picker-btn" data-size="3XL" value="" placeholder="+" readonly onclick="openExtendedSizePopup(${rowId})" onkeydown="if(event.key==='Enter'){openExtendedSizePopup(${rowId})}" disabled title="Click to add extended sizes (3XL, 4XL, 5XL, XS, etc.)"></td>
+        <td><input type="number" class="cell-input size-input" data-size="S" aria-label="Quantity S" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
+        <td><input type="number" class="cell-input size-input" data-size="M" aria-label="Quantity M" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
+        <td><input type="number" class="cell-input size-input" data-size="L" aria-label="Quantity L" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
+        <td><input type="number" class="cell-input size-input" data-size="XL" aria-label="Quantity XL" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
+        <td><input type="number" class="cell-input size-input" data-size="2XL" aria-label="Quantity 2XL" min="0" value="" placeholder="0" onchange="onSizeChange(${rowId})" onkeydown="handleCellKeydown(event, this)" disabled></td>
+        <td><input type="text" class="cell-input size-input xxxl-picker-btn" data-size="3XL" aria-label="Quantity 3XL" value="" placeholder="+" readonly onclick="openExtendedSizePopup(${rowId})" onkeydown="if(event.key==='Enter'){openExtendedSizePopup(${rowId})}" disabled title="Click to add extended sizes (3XL, 4XL, 5XL, XS, etc.)"></td>
         <td class="cell-qty" id="row-qty-${rowId}">0</td>
         <td class="cell-price" id="row-price-${rowId}">-</td>
         <td class="cell-total" id="row-total-${rowId}">-</td>
@@ -1099,6 +1098,20 @@ export function toggleColorPicker(rowId) {
     // Toggle this dropdown
     dropdown.classList.toggle('hidden');
 
+    // 7.2 a11y: listbox semantics. Options are populated dynamically, so stamp
+    // role/id/aria-selected lazily on open; keep aria-expanded truthful.
+    const nowOpen = !dropdown.classList.contains('hidden');
+    pickerSelected.setAttribute('aria-expanded', String(nowOpen));
+    if (nowOpen) {
+        dropdown.querySelectorAll('.color-picker-option').forEach((opt, oi) => {
+            opt.setAttribute('role', 'option');
+            if (!opt.id) opt.id = `${dropdown.id || 'color-dropdown'}-opt-${oi}`;
+            opt.setAttribute('aria-selected', String(opt.classList.contains('selected')));
+        });
+    } else {
+        pickerSelected.removeAttribute('aria-activedescendant');
+    }
+
     // Scroll selected option into view if open
     if (!dropdown.classList.contains('hidden')) {
         const selectedOption = dropdown.querySelector('.color-picker-option.selected');
@@ -1211,6 +1224,11 @@ export function selectColor(rowId, optionEl) {
     // Mark selected option in dropdown
     row.querySelectorAll('.color-picker-option').forEach(opt => opt.classList.remove('selected'));
     optionEl.classList.add('selected');
+    // 7.2 a11y: mirror the selection into aria-selected
+    optionEl.setAttribute('aria-selected', 'true');
+    if (optionEl.parentElement) {
+        optionEl.parentElement.querySelectorAll('.color-picker-option').forEach((o) => { if (o !== optionEl) o.setAttribute('aria-selected', 'false'); });
+    }
 
     // Store data on row
     row.dataset.color = colorName;
@@ -1336,6 +1354,9 @@ function navigateOptions(dropdown, direction) {
 
     // Add focus to new option
     options[newIndex].classList.add('focused');
+    // 7.2 a11y: point the combobox at the visually-focused option
+    const navTrigger = dropdown.closest('.color-picker-wrapper') && dropdown.closest('.color-picker-wrapper').querySelector('.color-picker-selected');
+    if (navTrigger && options[newIndex].id) navTrigger.setAttribute('aria-activedescendant', options[newIndex].id);
     options[newIndex].scrollIntoView({ block: 'nearest' });
 }
 
@@ -1343,6 +1364,7 @@ function navigateOptions(dropdown, direction) {
 document.addEventListener('click', function(e) {
     if (!e.target.closest('.color-picker-wrapper')) {
         document.querySelectorAll('.color-picker-dropdown').forEach(d => d.classList.add('hidden'));
+        document.querySelectorAll('.color-picker-selected[aria-expanded="true"]').forEach((el) => el.setAttribute('aria-expanded', 'false'));
     }
 });
 
@@ -1381,6 +1403,11 @@ export function selectChildColor(childRowId, parentRowId, optionEl) {
     // Mark selected option in dropdown
     childRow.querySelectorAll('.color-picker-option').forEach(opt => opt.classList.remove('selected'));
     optionEl.classList.add('selected');
+    // 7.2 a11y: mirror the selection into aria-selected
+    optionEl.setAttribute('aria-selected', 'true');
+    if (optionEl.parentElement) {
+        optionEl.parentElement.querySelectorAll('.color-picker-option').forEach((o) => { if (o !== optionEl) o.setAttribute('aria-selected', 'false'); });
+    }
 
     // Store data on row
     childRow.dataset.color = colorName;
@@ -1674,7 +1701,7 @@ export function createChildRow(parentRowId, size, qty) {
         </div>`
     ).join('');
 
-    // Build current color display — sanitize before interpolating into style="" (CSS/attribute
+    // Build current color display — sanitize before interpolating into (CSS/attribute
     // breakout); ports EMB's hardened block (review C32) that never synced here (1.4 audit).
     const _swUrl = String(parentSwatchUrl || '').replace(/["'()\\\s]/g, '');
     const _swHex = (parentHex && /^#[0-9a-fA-F]{3,8}$/.test(parentHex)) ? parentHex : '#ccc';
@@ -1725,25 +1752,25 @@ export function createChildRow(parentRowId, size, qty) {
         </td>
         <td class="thumbnail-col"></td>
         <td>
-            <span class="desc-display" style="color: #666; font-size: 12px;">${escapeHtml(parentRow.dataset.productName)} - <strong>${displaySize}</strong></span>
+            <span class="desc-display qb-muted-12">${escapeHtml(parentRow.dataset.productName)} - <strong>${displaySize}</strong></span>
         </td>
         <td>
             <div class="color-picker-wrapper child-color-picker" data-row-id="${childRowId}">
-                <div class="color-picker-selected" onclick="toggleColorPicker(${childRowId})" tabindex="0" onkeydown="handleColorPickerKeydown(event, ${childRowId})">
+                <div class="color-picker-selected" onclick="toggleColorPicker(${childRowId})" tabindex="0" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-label="Garment color" onkeydown="handleColorPickerKeydown(event, ${childRowId})">
                     <span class="color-swatch" style="${currentSwatchStyle}"></span>
                     <span class="color-name">${escapeHtml(parentColor)}</span>
                     <i class="fas fa-chevron-down picker-arrow"></i>
                 </div>
-                <div class="color-picker-dropdown hidden" id="color-dropdown-${childRowId}">
+                <div class="color-picker-dropdown hidden" role="listbox" aria-label="Colors" id="color-dropdown-${childRowId}">
                     ${colorOptionsHtml}
                 </div>
             </div>
         </td>
-        <td><input type="number" class="cell-input size-input" data-size="S" disabled value="" style="background: #f5f5f5;"></td>
-        <td><input type="number" class="cell-input size-input" data-size="M" disabled value="" style="background: #f5f5f5;"></td>
-        <td><input type="number" class="cell-input size-input" data-size="L" disabled value="" style="background: #f5f5f5;"></td>
-        <td><input type="number" class="cell-input size-input" data-size="XL" disabled value="" style="background: #f5f5f5;"></td>
-        <td><input type="number" class="cell-input size-input" data-size="2XL" ${isSize05 ? '' : 'disabled'} value="${isSize05 ? qty : ''}" placeholder="${isSize05 ? qty : ''}" style="${isSize05 ? '' : 'background: #f5f5f5;'}" onchange="onChildSizeChange(${childRowId}, ${parentRowId}, '${size}')" onkeydown="handleCellKeydown(event, this)"></td>
+        <td><input type="number" class="cell-input size-input qb-bg-gray" data-size="S" aria-label="Quantity S" disabled value=""></td>
+        <td><input type="number" class="cell-input size-input qb-bg-gray" data-size="M" aria-label="Quantity M" disabled value=""></td>
+        <td><input type="number" class="cell-input size-input qb-bg-gray" data-size="L" aria-label="Quantity L" disabled value=""></td>
+        <td><input type="number" class="cell-input size-input qb-bg-gray" data-size="XL" aria-label="Quantity XL" disabled value=""></td>
+        <td><input type="number" class="cell-input size-input" data-size="2XL" aria-label="Quantity 2XL" ${isSize05 ? '' : 'disabled'} value="${isSize05 ? qty : ''}" placeholder="${isSize05 ? qty : ''}" style="${isSize05 ? '' : 'background: #f5f5f5;'}" onchange="onChildSizeChange(${childRowId}, ${parentRowId}, '${size}')" onkeydown="handleCellKeydown(event, this)"></td>
         <td><input type="number" class="cell-input size-input" data-size="${size}" ${isSize06 ? '' : 'disabled'} value="${isSize06 ? qty : ''}" placeholder="${isSize06 ? qty : ''}" style="${isSize06 ? '' : 'background: #f5f5f5;'}" onchange="onChildSizeChange(${childRowId}, ${parentRowId}, '${size}')" onkeydown="handleCellKeydown(event, this)"></td>
         <td class="cell-qty qty-display" id="row-qty-${childRowId}">${qty}</td>
         <td class="cell-price unit-price-display" id="row-price-${childRowId}">-</td>

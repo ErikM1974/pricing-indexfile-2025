@@ -83,7 +83,7 @@ export async function openScpPushPreview() {
     }
 
     if (statusEl) statusEl.innerHTML = '';
-    previewEl.innerHTML = '<div style="padding:24px; text-align:center; color:#64748b;">' +
+    previewEl.innerHTML = '<div class="qb-loading-pad">' +
         '<i class="fas fa-spinner fa-spin"></i> Loading preview…</div>';
     confirmBtn.disabled = true;
     confirmBtn.style.opacity = '0.6';
@@ -101,9 +101,9 @@ export async function openScpPushPreview() {
         confirmBtn.style.opacity = '1';
     } catch (err) {
         console.error('[SCP Push] Preview error:', err);
-        previewEl.innerHTML = '<div style="padding:16px; color:#b91c1c;">' +
+        previewEl.innerHTML = '<div class="qb-err-16">' +
             '<i class="fas fa-exclamation-triangle"></i> Could not load preview: ' + _scpEsc(err.message) +
-            '<br><span style="color:#64748b;">You can still push below.</span></div>';
+            '<br><span class="qb-muted">You can still push below.</span></div>';
         confirmBtn.disabled = false;
         confirmBtn.style.opacity = '1';
     }
@@ -120,35 +120,35 @@ export function renderScpPushPreview(o) {
     const lineSum = lines.reduce((s, l) => s + (parseFloat(l.Price) || 0) * (parseFloat(l.Qty) || 0), 0);
     const preTax = lineSum + shipping - discount;
 
-    let html = '<div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px; font-size:13px;">';
-    html += '<div><span style="color:#64748b;">ShopWorks Order:</span> <strong>' + _scpEsc(o.ExtOrderID || '') + '</strong></div>';
-    html += '<div><span style="color:#64748b;">Order type:</span> <strong>' + _scpEsc(String(o.id_OrderType || '')) + '</strong> <span style="color:#64748b;">(13 = Screen Print)</span></div>';
-    html += '<div><span style="color:#64748b;">Customer #:</span> ' + _scpEsc(String(o.id_Customer || '')) + '</div>';
-    html += '<div><span style="color:#64748b;">Designs:</span> ' + designs.length + '</div>';
+    let html = '<div class="qb-grid-2col">';
+    html += '<div><span class="qb-muted">ShopWorks Order:</span> <strong>' + _scpEsc(o.ExtOrderID || '') + '</strong></div>';
+    html += '<div><span class="qb-muted">Order type:</span> <strong>' + _scpEsc(String(o.id_OrderType || '')) + '</strong> <span class="qb-muted">(13 = Screen Print)</span></div>';
+    html += '<div><span class="qb-muted">Customer #:</span> ' + _scpEsc(String(o.id_Customer || '')) + '</div>';
+    html += '<div><span class="qb-muted">Designs:</span> ' + designs.length + '</div>';
     html += '</div>';
 
-    html += '<table style="width:100%; border-collapse:collapse; font-size:13px;">';
-    html += '<thead><tr style="text-align:left; border-bottom:1px solid #e5e7eb; color:#64748b;">' +
-        '<th style="padding:4px;">Part</th><th style="padding:4px;">Description</th>' +
-        '<th style="padding:4px; text-align:center;">Size</th><th style="padding:4px; text-align:right;">Qty</th>' +
-        '<th style="padding:4px; text-align:right;">Price</th></tr></thead><tbody>';
+    html += '<table class="qb-table-13">';
+    html += '<thead><tr class="qb-th">' +
+        '<th class="qb-td">Part</th><th class="qb-td">Description</th>' +
+        '<th class="qb-td--c">Size</th><th class="qb-td--r">Qty</th>' +
+        '<th class="qb-td--r">Price</th></tr></thead><tbody>';
     if (lines.length === 0) {
-        html += '<tr><td colspan="5" style="padding:8px; color:#b91c1c;">No line items</td></tr>';
+        html += '<tr><td colspan="5" class="qb-err-8">No line items</td></tr>';
     } else {
         for (const l of lines) {
-            html += '<tr style="border-bottom:1px solid #f1f5f9;">' +
-                '<td style="padding:4px; font-weight:600;">' + _scpEsc(l.PartNumber || '') + '</td>' +
-                '<td style="padding:4px;">' + _scpEsc(l.Description || '') + '</td>' +
-                '<td style="padding:4px; text-align:center;">' + _scpEsc(l.Size || '') + '</td>' +
-                '<td style="padding:4px; text-align:right;">' + _scpEsc(String(l.Qty || '')) + '</td>' +
-                '<td style="padding:4px; text-align:right;">$' + (parseFloat(l.Price) || 0).toFixed(2) + '</td></tr>';
+            html += '<tr class="qb-row-line">' +
+                '<td class="qb-td--b">' + _scpEsc(l.PartNumber || '') + '</td>' +
+                '<td class="qb-td">' + _scpEsc(l.Description || '') + '</td>' +
+                '<td class="qb-td--c">' + _scpEsc(l.Size || '') + '</td>' +
+                '<td class="qb-td--r">' + _scpEsc(String(l.Qty || '')) + '</td>' +
+                '<td class="qb-td--r">$' + (parseFloat(l.Price) || 0).toFixed(2) + '</td></tr>';
         }
     }
     html += '</tbody></table>';
-    html += '<div style="text-align:right; margin-top:10px; font-size:14px; font-weight:700;">' +
+    html += '<div class="qb-total-line">' +
         'Order total (pre-tax): $' + preTax.toFixed(2) + '</div>';
     if (designs.length === 0) {
-        html += '<div style="margin-top:10px; padding:8px 10px; background:#fffbeb; border:1px solid #fde68a; border-radius:6px; font-size:12px; color:#92400e;">' +
+        html += '<div class="qb-warn-box--mt">' +
             '<i class="fas fa-exclamation-triangle"></i> No design linked — a rep must assign the design + screens in ShopWorks.</div>';
     }
     // eslint-disable-next-line no-unsanitized/property -- audited (1.4): preview html built above with _scpEsc on every dynamic value
@@ -185,7 +185,7 @@ export async function confirmScpPush(directFallback) {
 
         if (!response.ok) {
             if (response.status === 409) {
-                if (statusEl) statusEl.innerHTML = '<div style="padding:8px; color:#92400e; background:#fffbeb; border:1px solid #fde68a; border-radius:6px;">Already pushed to ShopWorks.</div>';
+                if (statusEl) statusEl.innerHTML = '<div class="qb-warn-box">Already pushed to ShopWorks.</div>';
                 if (mainLabel) mainLabel.textContent = 'Already Pushed';
                 if (mainBtn) mainBtn.style.background = '#28a745';
                 if (typeof showToast === 'function') showToast('Already pushed to ShopWorks', 'info');
@@ -204,7 +204,7 @@ export async function confirmScpPush(directFallback) {
 
     } catch (error) {
         console.error('[SCP Push] Push error:', error);
-        if (statusEl) statusEl.innerHTML = '<div style="padding:8px; color:#b91c1c;">Push failed: ' + _scpEsc(error.message) + '</div>';
+        if (statusEl) statusEl.innerHTML = '<div class="qb-err-8">Push failed: ' + _scpEsc(error.message) + '</div>';
         if (confirmBtn) { confirmBtn.disabled = false; confirmBtn.style.opacity = '1'; confirmBtn.innerHTML = '<i class="fas fa-upload"></i> Push to ShopWorks'; }
         if (mainBtn) { mainBtn.disabled = false; mainBtn.style.opacity = '1'; }
         if (mainLabel) mainLabel.textContent = 'Push to ShopWorks';

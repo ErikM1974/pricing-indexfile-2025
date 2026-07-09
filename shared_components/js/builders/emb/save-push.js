@@ -712,7 +712,7 @@ export async function openPushPreview() {
     if (!modal || !previewEl || !confirmBtn) return;
 
     if (statusEl) statusEl.innerHTML = '';
-    previewEl.innerHTML = '<div style="padding:24px; text-align:center; color:#64748b;">' +
+    previewEl.innerHTML = '<div class="qb-loading-pad">' +
         '<i class="fas fa-spinner fa-spin"></i> Loading preview…</div>';
     confirmBtn.disabled = true;
     confirmBtn.style.display = '';
@@ -974,7 +974,7 @@ export async function verifyShopWorksImport(extOrderId) {
             out.innerHTML = '<span style="color:#15803d; font-weight:600;"><i class="fas fa-check-circle"></i> ' +
                 'Confirmed in ShopWorks — order #' + escapeHtml(String(orderNo)) + '</span>';
         } else {
-            out.innerHTML = '<span style="color:#b45309;"><i class="fas fa-exclamation-triangle"></i> ' +
+            out.innerHTML = '<span class="qb-amber-dark"><i class="fas fa-exclamation-triangle"></i> ' +
                 '<strong>Not in ShopWorks yet.</strong> ManageOrders accepted the upload, but OnSite has not ' +
                 'imported it. OnSite pulls new orders periodically — wait a few minutes and click ' +
                 '“Verify in ShopWorks” again. If it never appears, the MO→OnSite conversion failed ' +
@@ -982,7 +982,7 @@ export async function verifyShopWorksImport(extOrderId) {
                 'conversion log for this order.</span>';
         }
     } catch (err) {
-        out.innerHTML = '<span style="color:#b45309;"><i class="fas fa-exclamation-triangle"></i> ' +
+        out.innerHTML = '<span class="qb-amber-dark"><i class="fas fa-exclamation-triangle"></i> ' +
             'Could not verify ShopWorks import: ' + escapeHtml(err.message) + '. Try again shortly.</span>';
     }
 }
