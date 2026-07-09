@@ -1,3 +1,7 @@
+## v2026.07.09.6 (2026.07.09)
+
+- refactor: Builder A-grade Batch 3 session 1 — EMB structure (3.1 + 3.4 + 3.5)
+
 ## v2026.07.09.5 (2026.07.09)
 
 - docs(caspio): v4 live-inventory snapshot + spec corrections + schema-introspection build plan (#10)
