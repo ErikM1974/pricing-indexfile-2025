@@ -25,6 +25,13 @@ const BRIDGED = [
     'scrollToProductRow',
 ];
 
+// Batch 3.3 bridge diet (2026-07-09): these are still EXPORTED (siblings import
+// them) but their window bridges were DELETED — no classic/HTML/test consumer.
+// Two-way lock: they must stay exported AND stay off the window surface.
+const DIET_UNBRIDGED = [
+    'showAddNonSanmarModal',
+];
+
 function loadModule() {
     // bundle (not transform) — the module imports spr-modal + design-search
     const result = esbuild.buildSync({
@@ -38,7 +45,7 @@ function loadModule() {
     const code = result.outputFiles[0].text;
     const doc = { getElementById: () => null, querySelectorAll: () => [], addEventListener() {} };
     const moduleObj = { exports: {} };
-    // eslint-disable-next-line no-new-func
+     
     new Function('module', 'exports', 'window', 'document', 'console', code)(
         moduleObj, moduleObj.exports, { document: doc, APP_CONFIG: { API: { BASE_URL: 'http://test' } } }, doc, { log() {}, warn() {}, error() {} }
     );
@@ -56,6 +63,7 @@ describe('builders/emb/shopworks-import.js', () => {
             path.join(__dirname, '../../../shared_components/js/builders/emb/index.js'),
             'utf8'
         );
-        for (const name of BRIDGED) expect(indexSrc).toContain(`window.${name} = ${name};`);
+        for (const name of BRIDGED.filter((n) => !DIET_UNBRIDGED.includes(n))) expect(indexSrc).toContain(`window.${name} = ${name};`);
+        for (const name of DIET_UNBRIDGED) expect(indexSrc).not.toContain(`window.${name} = ${name};`);
     });
 });

@@ -51,6 +51,390 @@ export async function saveAndGetLink(opts = {}) {
     }
 }
 
+/** Assemble the pricing object for save: DECG-only synthetic pricing or the
+ * live calculator; hard-failure + under-total guards (never save a silently
+ * wrong price — Erik's #1 rule); DECG + manual-service totals folded in.
+ * Returns null when a guard blocked the save (it has already toasted +
+ * restored the button). */
+async function buildSavePricing({ products, decgItems, manualServiceItems, allLogos, logoConfigs, ltmEnabled, saveBtn, originalText }) {
+    let pricing;
+    if (products.length === 0) {
+        // DECG-only: build minimal pricing (no pricing engine needed)
+        const decgTotal = decgItems.reduce((sum, d) => sum + d.total, 0);
+        const decgQty = decgItems.reduce((sum, d) => sum + d.quantity, 0);
+        pricing = {
+            products: [],
+            totalQuantity: decgQty,
+            subtotal: decgTotal,
+            grandTotal: decgTotal,
+            tier: decgQty <= 7 ? '1-7' : decgQty <= 23 ? '8-23' : decgQty <= 47 ? '24-47' : decgQty <= 71 ? '48-71' : '72+',
+            ltmFee: 0,
+            additionalServices: [],
+            additionalStitchTotal: 0,
+            garmentStitchTotal: 0,
+            capStitchTotal: 0,
+            garmentSetupFees: 0,
+            capSetupFees: 0,
+            garmentQuantity: 0,
+            capQuantity: 0
+        };
+    } else {
+        pricing = await embState.pricingCalculator.calculateQuote(products, allLogos, logoConfigs, { ltmEnabled });
+    }
+
+    // Don't SAVE a quote at a silently-wrong (zero) price on a hard pricing failure. `=== false`
+    // (not falsy) so the DECG-only branch above — which builds a pricing object with no `success`
+    // field — is NOT blocked. (review C4 — Erik's #1 rule)
+    if (pricing && pricing.success === false) {
+        // eslint-disable-next-line no-unsanitized/property -- self-restore of markup captured from this element
+        if (saveBtn) { saveBtn.innerHTML = originalText; saveBtn.disabled = false; }
+        try { showLoading(false); } catch (_) {}
+        showToast(pricing.message || 'Pricing unavailable — cannot save this quote. Refresh and try again.', 'error', 6000);
+        return null;
+    }
+
+    // Don't save an UNDER-total either — if any product's pricing failed it was left out of the
+    // subtotal (review C5). Block the save so a wrong (low) price never reaches Caspio/ShopWorks.
+    if (pricing && Array.isArray(pricing.failedProducts) && pricing.failedProducts.length > 0) {
+        // eslint-disable-next-line no-unsanitized/property -- self-restore of markup captured from this element
+        if (saveBtn) { saveBtn.innerHTML = originalText; saveBtn.disabled = false; }
+        try { showLoading(false); } catch (_) {}
+        showToast(`Can't save — pricing failed for ${pricing.failedProducts.length} item(s) (${pricing.failedProducts.map(f => f.style).join(', ')}). Refresh until all prices load.`, 'error', 7000);
+        return null;
+    }
+
+    // Include DECG/DECC service totals in grandTotal (same as recalculatePricing)
+    // Only for mixed orders (products + DECG). DECG-only path above already initialized correctly.
+    if (decgItems.length > 0 && products.length > 0) {
+        const decgServiceTotal = decgItems.reduce((sum, d) => sum + d.total, 0);
+        pricing.subtotal += decgServiceTotal;
+        pricing.grandTotal += decgServiceTotal;
+    }
+
+    // Include manual service items (Monogram/Name-Number/WEIGHT) in grandTotal
+    if (manualServiceItems.length > 0) {
+        const manualServiceTotal = manualServiceItems.reduce((sum, si) => sum + (si.unitPrice * si.totalQuantity), 0);
+        pricing.subtotal += manualServiceTotal;
+        pricing.grandTotal += manualServiceTotal;
+    }
+
+    return pricing;
+}
+
+/** ShopWorks price-audit JSON — import-vs-our per-line deltas with OK/REVIEW/
+ * MISMATCH flags (products + AL/Monogram/Weight/Digitizing/DECG service rows).
+ * Reloaded quotes keep the audit captured at import time verbatim. */
+function buildPriceAuditJSON(pricing) {
+    if (!embState.lastImportMetadata || !embState.lastImportMetadata.swSubtotal) return '';
+    // Reloaded quotes have no per-row _swUnitPrice (it only exists right after a
+    // paste-import), so recomputing here would write false MISMATCH flags. Keep
+    // the audit captured at import time verbatim. (audit 2026-06-10)
+    if (embState.lastImportMetadata.restoredFromSession) return embState.lastImportMetadata.priceAuditJSONSnapshot || '';
+    const swSub = embState.lastImportMetadata.swSubtotal;
+    const ourSub = pricing.grandTotal || 0;
+    const delta = ourSub - swSub;
+    const pct = swSub > 0 ? Math.abs(delta / swSub) * 100 : 0;
+    const flag = pct <= 5 ? 'OK' : pct <= 15 ? 'REVIEW' : 'MISMATCH';
+    const prods = (pricing.products || []).map(pp => {
+        const li = (pp.lineItems || [pp])[0];
+        const ourUnit = li?.unitPriceWithLTM || li?.unitPrice || 0;
+        const swUnit = pp.product?._swUnitPrice || 0;
+        const pDelta = ourUnit - swUnit;
+        const pPct = swUnit > 0 ? Math.abs(pDelta / swUnit) * 100 : 0;
+        return {
+            style: pp.product?.style || '?',
+            color: pp.product?.color || '?',
+            qty: pp.product?.totalQuantity || 0,
+            swUnit: parseFloat(swUnit.toFixed(2)),
+            ourUnit: parseFloat(ourUnit.toFixed(2)),
+            delta: parseFloat(pDelta.toFixed(2)),
+            flag: pPct <= 5 ? 'OK' : pPct <= 15 ? 'REVIEW' : 'MISMATCH'
+        };
+    });
+    // Append service items (AL, Monogram, Weight, Digitizing) to audit
+    const svc = embState.lastImportMetadata.parsedServices || {};
+    const alFeePerUnit = pricing.additionalServices?.length > 0
+        ? (pricing.additionalServices[0]?.unitPrice || 6.50)
+        : 6.50;
+    (svc.additionalLogos || []).forEach(al => {
+        const swU = parseFloat(al.unitPrice || al.price || 0);
+        const ourU = parseFloat(alFeePerUnit.toFixed(2));
+        const d = ourU - swU;
+        const p = swU > 0 ? Math.abs(d / swU) * 100 : 0;
+        prods.push({ style: 'AL', color: 'Service', qty: parseInt(al.quantity || al.qty || 0),
+            swUnit: parseFloat(swU.toFixed(2)), ourUnit: ourU,
+            delta: parseFloat(d.toFixed(2)), flag: p <= 5 ? 'OK' : p <= 15 ? 'REVIEW' : 'MISMATCH', isService: true });
+    });
+    (svc.monograms || []).forEach(m => {
+        const swU = parseFloat(m.unitPrice || m.price || 0);
+        const ourU = getServicePrice('Monogram', 12.50);  // audit flags must track Caspio, not 2026-02 literals
+        const d = ourU - swU;
+        const p = swU > 0 ? Math.abs(d / swU) * 100 : 0;
+        prods.push({ style: 'Monogram', color: 'Service', qty: parseInt(m.quantity || m.qty || 0),
+            swUnit: parseFloat(swU.toFixed(2)), ourUnit: ourU,
+            delta: parseFloat(d.toFixed(2)), flag: p <= 5 ? 'OK' : p <= 15 ? 'REVIEW' : 'MISMATCH', isService: true });
+    });
+    (svc.weights || []).forEach(w => {
+        const swU = parseFloat(w.unitPrice || w.price || 0);
+        const ourU = getServicePrice('WEIGHT', 6.25);  // audit flags must track Caspio, not 2026-02 literals
+        const d = ourU - swU;
+        const p = swU > 0 ? Math.abs(d / swU) * 100 : 0;
+        prods.push({ style: 'Weight', color: 'Service', qty: parseInt(w.quantity || w.qty || 0),
+            swUnit: parseFloat(swU.toFixed(2)), ourUnit: ourU,
+            delta: parseFloat(d.toFixed(2)), flag: p <= 5 ? 'OK' : p <= 15 ? 'REVIEW' : 'MISMATCH', isService: true });
+    });
+    (svc.digitizingFees || []).forEach(df => {
+        const swU = parseFloat(df.amount || df.unitPrice || 0);
+        const ourU = swU; // Digitizing is pass-through, same price expected
+        prods.push({ style: df.code || 'DD', color: 'Service', qty: 1,
+            swUnit: parseFloat(swU.toFixed(2)), ourUnit: parseFloat(ourU.toFixed(2)),
+            delta: 0, flag: 'OK', isService: true });
+    });
+    // DECG/DECC items
+    const parsedDecg = svc.decgItems || [];
+    parsedDecg.forEach(pd => {
+        const swU = parseFloat(pd.unitPrice || 0);
+        const ourU = parseFloat(pd.calculatedUnitPrice || 0);
+        const qty = parseInt(pd.quantity || 0);
+        const d = ourU - swU;
+        const p = swU > 0 ? Math.abs(d / swU) * 100 : 0;
+        const label = pd.serviceType === 'decc' ? 'DECC' : 'DECG';
+        prods.push({ style: label, color: 'Service', qty: qty,
+            swUnit: parseFloat(swU.toFixed(2)), ourUnit: parseFloat(ourU.toFixed(2)),
+            delta: parseFloat(d.toFixed(2)), flag: p <= 5 ? 'OK' : p <= 15 ? 'REVIEW' : 'MISMATCH', isService: true });
+    });
+    return JSON.stringify({ swTotal: embState.lastImportMetadata.swTotal, swSubtotal: swSub,
+        ourSubtotal: parseFloat(ourSub.toFixed(2)), deltaSubtotal: parseFloat(delta.toFixed(2)),
+        deltaPct: parseFloat(pct.toFixed(1)), flag, products: prods });
+}
+
+/** Build the customerData payload for the quote service — customer/order/ship
+ * fields, additional charges, frozen tax (include-tax honored; 0 is a VALID
+ * rate), artwork ride-alongs, import metadata, price audit. */
+function buildSaveCustomerData({ customerName, customerEmail, pricing }) {
+    // Get sales rep NAME from dropdown selected option text
+    const salesRepSelect = document.getElementById('sales-rep');
+    const salesRepEmail = salesRepSelect?.value || 'sales@nwcustomapparel.com';
+    const salesRepName = salesRepSelect?.options[salesRepSelect.selectedIndex]?.text || '';
+
+    // Get additional charges (artwork, rush, sample, discount)
+    const additionalCharges = getAdditionalCharges();
+
+    // Build customer data with additional charges
+    const customerData = {
+        email: customerEmail,
+        name: customerName,
+        company: document.getElementById('company-name')?.value?.trim() || '',
+        project: document.getElementById('project-name')?.value?.trim() || '',  // P2-5 (audit 2026-06-06): was captured nowhere
+        isWholesale: document.getElementById('wholesale-checkbox')?.checked || false,  // [2026-06-07] → IsWholesale; push routes to acct 2203
+        salesRepEmail: salesRepEmail,
+        salesRepName: salesRepName,
+        notes: document.getElementById('notes')?.value?.trim() || '',
+        // Additional charges (2026-01-14)
+        artCharge: additionalCharges.artCharge,
+        graphicDesignHours: additionalCharges.graphicDesignHours,
+        graphicDesignCharge: additionalCharges.graphicDesignCharge,
+        rushFee: additionalCharges.rushFee,
+        sampleFee: additionalCharges.sampleFee,
+        sampleQty: additionalCharges.sampleQty,
+        discount: additionalCharges.discount,
+        discountPercent: additionalCharges.discountPercent,
+        discountReason: additionalCharges.discountReason,
+        // Order details (2026-02-11)
+        phone: document.getElementById('customer-phone')?.value?.trim() || '',
+        orderNumber: document.getElementById('order-number')?.value?.trim() || '',
+        customerNumber: document.getElementById('customer-number')?.value?.trim() || '',
+        purchaseOrderNumber: document.getElementById('po-number')?.value?.trim() || '',
+        shipToAddress: document.getElementById('ship-address')?.value?.trim() || '',
+        shipToCity: document.getElementById('ship-city')?.value?.trim() || '',
+        shipToState: document.getElementById('ship-state')?.value || '',
+        shipToZip: document.getElementById('ship-zip')?.value?.trim() || '',
+        shipMethod: (() => {
+            const sel = document.getElementById('ship-method')?.value || '';
+            if (sel === 'Other') return document.getElementById('ship-method-other')?.value?.trim() || 'Other';
+            return sel;
+        })(),
+        dateOrderPlaced: dateFromInputValue(document.getElementById('date-order-placed')?.value),
+        reqShipDate: dateFromInputValue(document.getElementById('req-ship-date')?.value),
+        dropDeadDate: dateFromInputValue(document.getElementById('drop-dead-date')?.value),
+        paymentTerms: document.getElementById('payment-terms')?.value?.trim() || '',
+        // Frozen tax & design data for Caspio (2026-02-12)
+        designNumbers: embState.lastImportMetadata?.designNumbers || [],
+        digitizingCodes: embState.lastImportMetadata?.digitizingCodes || [],
+        digitizingFees: embState.lastImportMetadata?.parsedServices?.digitizingFees || [],
+        taxRate: (() => {
+            const includeTax = document.getElementById('include-tax')?.checked;
+            if (!includeTax) return 0;
+            // parseRatePercent: 0 is a VALID rate (out-of-state) — `|| 10.1` was
+            // silently saving WA tax on quotes the screen showed at $0 tax.
+            const rateVal = parseRatePercent(document.getElementById('tax-rate-input')?.value, 10.2);
+            return rateVal / 100;
+        })(),
+        taxAmount: (() => {
+            const includeTax = document.getElementById('include-tax')?.checked;
+            if (!includeTax) return 0;
+            const rateVal = parseRatePercent(document.getElementById('tax-rate-input')?.value, 10.2);
+            const preTaxText = document.getElementById('pre-tax-subtotal')?.textContent || '$0.00';
+            const preTaxSubtotal = parseFloat(preTaxText.replace(/[$,]/g, '')) || 0;
+            // #pre-tax-subtotal is ALREADY the full pre-tax base incl. shipping (= the on-screen
+            // adjustedSubtotal that updateTaxCalculation taxes once at L7259). Do NOT add shipping
+            // again — that double-counted shipping in the saved/pushed TaxAmount. (round-2 N1/N6 — pre-existing bug)
+            return Math.round(preTaxSubtotal * (rateVal / 100) * 100) / 100;
+        })(),
+        importNotes: embState.lastImportMetadata
+            ? [...(embState.lastImportMetadata.warnings || []), ...(embState.lastImportMetadata.unmatchedLines || []), ...(embState.lastImportMetadata.reviewItems || [])]
+            : [],
+        // Phase 11.3 (2026-05-24) — rich-mode artwork data.
+        // Persisted by quote-service.js into the ImportNotes JSON column
+        // (extended from flat-array to object shape so this data rides
+        // along without a Caspio schema change). Proxy's EMB transformer
+        // reads them to emit Designs[{name, Locations[]}] on push.
+        referenceArtwork: (window._embArtwork && typeof window._embArtwork.getFiles === 'function')
+            ? window._embArtwork.getFiles()
+            : [],
+        newDesignName: (window._embArtwork && typeof window._embArtwork.getDesignName === 'function')
+            ? (window._embArtwork.getDesignName() || '').trim()
+            : '',
+        paidToDate: embState.lastImportMetadata?.paidToDate ?? 0,
+        balanceAmount: embState.lastImportMetadata?.balanceAmount ?? 0,
+        orderNotes: embState.lastImportMetadata?.orderNotes ?? '',
+        // Package tracking (2026-02-14)
+        carrier: embState.lastImportMetadata?.carrier || '',
+        trackingNumber: embState.lastImportMetadata?.trackingNumber || '',
+        // Design assignments (2026-02-19)
+        garmentDesignNumber: embState.primaryLogo.designNumber || '',
+        capDesignNumber: (typeof embState.capPrimaryLogo !== 'undefined' ? embState.capPrimaryLogo.designNumber : '') || '',
+        // ShopWorks pricing audit (2026-02-13)
+        swTotal: embState.lastImportMetadata?.swTotal ?? 0,
+        swSubtotal: embState.lastImportMetadata?.swSubtotal ?? 0,
+        priceAuditJSON: buildPriceAuditJSON(pricing)
+    };
+
+    return customerData;
+}
+
+/** Post-persist bookkeeping: partial-save abort (incomplete DB = never share
+ * or push), draft clear, saved-state, share modal (revision vs new), and the
+ * Push button arm ([B5]: only a NEW quote clears the already-pushed lock).
+ * Returns false when the save must not be treated as a success. */
+function finishSuccessfulSave(result, skipShareModal) {
+    if (result.partialSave) {
+        showToast((result.warning || 'Some line items failed to save.') +
+            ' The quote is incomplete — do NOT share or push it. Check your connection and save again.', 'error', 12000);
+        return false;
+    }
+    const isUpdate = !!embState.editingQuoteId;
+    // Clear auto-save draft on successful save (2026 consolidation)
+    if (embState.embPersistence) {
+        embState.embPersistence.clearDraft();
+    }
+
+    // Mark as saved (no unsaved changes)
+    markAsSaved();
+
+    if (isUpdate) {
+        // Update mode: Show revision success message
+        const newRevision = result.revision || (embState.editingRevision + 1);
+        embState.editingRevision = newRevision;
+        updateEditModeUI(result.quoteID, newRevision);
+        showToast(`Revision ${newRevision} saved successfully!`, 'success');
+
+        // Show modal with link (don't pass message as baseUrl!) — skipped when auto-saving
+        // to push, where the push preview opens instead.
+        if (!skipShareModal) {
+            if (typeof QuoteShareModal !== 'undefined' && QuoteShareModal.show) {
+                QuoteShareModal.show(result.quoteID);
+            } else {
+                const url = `${window.location.origin}/quote/${result.quoteID}`;
+                navigator.clipboard.writeText(url).catch(() => {});
+                showToast(`Quote ${result.quoteID} updated (Rev ${newRevision}). Link copied!`, 'success');
+            }
+        }
+    } else {
+        // New quote: success modal with shareable link — skipped when auto-saving to push.
+        if (!skipShareModal) {
+            if (typeof QuoteShareModal !== 'undefined' && QuoteShareModal.show) {
+                QuoteShareModal.show(result.quoteID);
+            } else {
+                const url = `${window.location.origin}/quote/${result.quoteID}`;
+                navigator.clipboard.writeText(url).catch(() => {});
+                showToast(`Quote ${result.quoteID} saved. Link copied!`, 'success');
+            }
+        }
+    }
+
+    // Show Push to ShopWorks button after successful save. [B5]: only a NEW quote clears the
+    // already-pushed lock; an update preserves it so a re-save can't re-enable a duplicate push.
+    showPushButton(result.quoteID, { resetPushed: !isUpdate });
+
+    return true;
+}
+
+/** Pre-save validation gates: customer name/email (+ format), artwork design
+ * name + in-flight upload, non-SanMar $0 pricing, failed service-row pricing.
+ * Each gate toasts/focuses itself; returns null to block the save. */
+function validateSaveInputs(products) {
+    // Validate required fields
+    const customerName = document.getElementById('customer-name')?.value?.trim();
+    const customerEmail = document.getElementById('customer-email')?.value?.trim();
+
+    if (!customerName || !customerEmail) {
+        showToast('Please enter customer name and email', 'error');
+        if (!customerName) document.getElementById('customer-name')?.focus();
+        else if (!customerEmail) document.getElementById('customer-email')?.focus();
+        return null;
+    }
+    // [B11] (P3-15, audit 2026-06-06): email was presence-checked but never format-validated → a typo'd
+    // address saved + emailed silently. Reject an obviously-malformed address.
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)) {
+        showToast('Enter a valid email address (name@company.com).', 'error');
+        document.getElementById('customer-email')?.focus();
+        return null;
+    }
+
+    // Artwork uploaded but the design left UNNAMED → the ShopWorks push silently DROPS the art
+    // (the transformer gates Designs[] on a non-empty design name) and production gets "NO DESIGN
+    // LINKED" for a job that has a logo. isValidForPush() is false only in exactly that case
+    // (files present + name blank). Require the name so the uploaded logo reaches the floor.
+    // (2026-06-04 audit B6)
+    if (window._embArtwork && typeof window._embArtwork.isValidForPush === 'function' && !window._embArtwork.isValidForPush()) {
+        showToast('You uploaded artwork — give the design a name so it isn’t dropped from the ShopWorks order.', 'error', 6000);
+        const dn = document.querySelector('#emb-artwork-mount .artwork-upload-designname-input');  // widget's real input class (audit fix 2026-06-05)
+        if (dn && typeof dn.focus === 'function') dn.focus();
+        return null;
+    }
+
+    // Artwork still uploading → getFiles() below would snapshot referenceArtwork WITHOUT the in-flight
+    // file (the widget pushes to state.files only AFTER the upload resolves), so the EMB transformer would
+    // omit its Location and production silently loses the art. Block save until uploads finish. (review C11)
+    if (window._embArtwork && typeof window._embArtwork.isUploading === 'function' && window._embArtwork.isUploading()) {
+        showToast('Artwork is still uploading — wait for it to finish before saving.', 'warning', 5000);
+        return null;
+    }
+
+    // Validate non-SanMar products have pricing set
+    const zeroPriceRows = products.filter(p => {
+        const row = document.getElementById(`row-${p.rowId}`);
+        return row && row.dataset.nonSanmar === 'true' && p.sellPriceOverride <= 0;
+    });
+    if (zeroPriceRows.length > 0) {
+        const styleList = zeroPriceRows.map(p => p.style).join(', ');
+        showToast(`Non-SanMar product(s) have $0 pricing: ${styleList}. Double-click the price cell to set a price.`, 'error', 6000);
+        return null;
+    }
+
+    // P1-4 (audit 2026-06-06): block save when any Additional-Logo / Customer-Supplied row failed to price
+    // (its pricing API threw or returned $0). Never save a silent $0 line (Erik's #1 rule).
+    const priceErrRows = Array.from(document.querySelectorAll('#product-tbody tr.service-product-row'))
+        .filter(r => r.dataset.priceError === 'true');
+    if (priceErrRows.length > 0) {
+        showToast('Some Additional-Logo / Customer-Supplied rows could not be priced — refresh and re-check before saving (they will not be saved at $0).', 'error', 7000);
+        return null;
+    }
+
+    return { customerName, customerEmail };
+}
+
 async function _saveAndGetLinkInner(opts = {}) {
     const skipShareModal = !!(opts && opts.skipShareModal);   // true from pushToShopWorks: auto-save → push, no share modal
     // Settle on-screen prices before snapshotting them — AL rows + Rush are display-driven,
@@ -78,63 +462,10 @@ async function _saveAndGetLinkInner(opts = {}) {
         return;
     }
 
-    // Validate required fields
-    const customerName = document.getElementById('customer-name')?.value?.trim();
-    const customerEmail = document.getElementById('customer-email')?.value?.trim();
-
-    if (!customerName || !customerEmail) {
-        showToast('Please enter customer name and email', 'error');
-        if (!customerName) document.getElementById('customer-name')?.focus();
-        else if (!customerEmail) document.getElementById('customer-email')?.focus();
-        return;
-    }
-    // [B11] (P3-15, audit 2026-06-06): email was presence-checked but never format-validated → a typo'd
-    // address saved + emailed silently. Reject an obviously-malformed address.
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail)) {
-        showToast('Enter a valid email address (name@company.com).', 'error');
-        document.getElementById('customer-email')?.focus();
-        return;
-    }
-
-    // Artwork uploaded but the design left UNNAMED → the ShopWorks push silently DROPS the art
-    // (the transformer gates Designs[] on a non-empty design name) and production gets "NO DESIGN
-    // LINKED" for a job that has a logo. isValidForPush() is false only in exactly that case
-    // (files present + name blank). Require the name so the uploaded logo reaches the floor.
-    // (2026-06-04 audit B6)
-    if (window._embArtwork && typeof window._embArtwork.isValidForPush === 'function' && !window._embArtwork.isValidForPush()) {
-        showToast('You uploaded artwork — give the design a name so it isn’t dropped from the ShopWorks order.', 'error', 6000);
-        const dn = document.querySelector('#emb-artwork-mount .artwork-upload-designname-input');  // widget's real input class (audit fix 2026-06-05)
-        if (dn && typeof dn.focus === 'function') dn.focus();
-        return;
-    }
-
-    // Artwork still uploading → getFiles() below would snapshot referenceArtwork WITHOUT the in-flight
-    // file (the widget pushes to state.files only AFTER the upload resolves), so the EMB transformer would
-    // omit its Location and production silently loses the art. Block save until uploads finish. (review C11)
-    if (window._embArtwork && typeof window._embArtwork.isUploading === 'function' && window._embArtwork.isUploading()) {
-        showToast('Artwork is still uploading — wait for it to finish before saving.', 'warning', 5000);
-        return;
-    }
-
-    // Validate non-SanMar products have pricing set
-    const zeroPriceRows = products.filter(p => {
-        const row = document.getElementById(`row-${p.rowId}`);
-        return row && row.dataset.nonSanmar === 'true' && p.sellPriceOverride <= 0;
-    });
-    if (zeroPriceRows.length > 0) {
-        const styleList = zeroPriceRows.map(p => p.style).join(', ');
-        showToast(`Non-SanMar product(s) have $0 pricing: ${styleList}. Double-click the price cell to set a price.`, 'error', 6000);
-        return;
-    }
-
-    // P1-4 (audit 2026-06-06): block save when any Additional-Logo / Customer-Supplied row failed to price
-    // (its pricing API threw or returned $0). Never save a silent $0 line (Erik's #1 rule).
-    const priceErrRows = Array.from(document.querySelectorAll('#product-tbody tr.service-product-row'))
-        .filter(r => r.dataset.priceError === 'true');
-    if (priceErrRows.length > 0) {
-        showToast('Some Additional-Logo / Customer-Supplied rows could not be priced — refresh and re-check before saving (they will not be saved at $0).', 'error', 7000);
-        return;
-    }
+    // Validation gates (extracted Batch 3.2) — each gate toasts + focuses itself
+    const validated = validateSaveInputs(products);
+    if (!validated) return;
+    const { customerName, customerEmail } = validated;
 
     // Get save button for loading state
     const saveBtn = document.querySelector('.btn-save-quote, [onclick*="saveAndGetLink"]');
@@ -155,247 +486,10 @@ async function _saveAndGetLinkInner(opts = {}) {
         const ltmEnabled = ltmState.enabled;
         const ltmDisplayMode = ltmState.displayMode || 'builtin';
 
-        let pricing;
-        if (products.length === 0) {
-            // DECG-only: build minimal pricing (no pricing engine needed)
-            const decgTotal = decgItems.reduce((sum, d) => sum + d.total, 0);
-            const decgQty = decgItems.reduce((sum, d) => sum + d.quantity, 0);
-            pricing = {
-                products: [],
-                totalQuantity: decgQty,
-                subtotal: decgTotal,
-                grandTotal: decgTotal,
-                tier: decgQty <= 7 ? '1-7' : decgQty <= 23 ? '8-23' : decgQty <= 47 ? '24-47' : decgQty <= 71 ? '48-71' : '72+',
-                ltmFee: 0,
-                additionalServices: [],
-                additionalStitchTotal: 0,
-                garmentStitchTotal: 0,
-                capStitchTotal: 0,
-                garmentSetupFees: 0,
-                capSetupFees: 0,
-                garmentQuantity: 0,
-                capQuantity: 0
-            };
-        } else {
-            pricing = await embState.pricingCalculator.calculateQuote(products, allLogos, logoConfigs, { ltmEnabled });
-        }
+        const pricing = await buildSavePricing({ products, decgItems, manualServiceItems, allLogos, logoConfigs, ltmEnabled, saveBtn, originalText });
+        if (!pricing) return;
 
-        // Don't SAVE a quote at a silently-wrong (zero) price on a hard pricing failure. `=== false`
-        // (not falsy) so the DECG-only branch above — which builds a pricing object with no `success`
-        // field — is NOT blocked. (review C4 — Erik's #1 rule)
-        if (pricing && pricing.success === false) {
-            // eslint-disable-next-line no-unsanitized/property -- self-restore of markup captured from this element
-            if (saveBtn) { saveBtn.innerHTML = originalText; saveBtn.disabled = false; }
-            try { showLoading(false); } catch (_) {}
-            showToast(pricing.message || 'Pricing unavailable — cannot save this quote. Refresh and try again.', 'error', 6000);
-            return;
-        }
-
-        // Don't save an UNDER-total either — if any product's pricing failed it was left out of the
-        // subtotal (review C5). Block the save so a wrong (low) price never reaches Caspio/ShopWorks.
-        if (pricing && Array.isArray(pricing.failedProducts) && pricing.failedProducts.length > 0) {
-            // eslint-disable-next-line no-unsanitized/property -- self-restore of markup captured from this element
-            if (saveBtn) { saveBtn.innerHTML = originalText; saveBtn.disabled = false; }
-            try { showLoading(false); } catch (_) {}
-            showToast(`Can't save — pricing failed for ${pricing.failedProducts.length} item(s) (${pricing.failedProducts.map(f => f.style).join(', ')}). Refresh until all prices load.`, 'error', 7000);
-            return;
-        }
-
-        // Include DECG/DECC service totals in grandTotal (same as recalculatePricing)
-        // Only for mixed orders (products + DECG). DECG-only path above already initialized correctly.
-        if (decgItems.length > 0 && products.length > 0) {
-            const decgServiceTotal = decgItems.reduce((sum, d) => sum + d.total, 0);
-            pricing.subtotal += decgServiceTotal;
-            pricing.grandTotal += decgServiceTotal;
-        }
-
-        // Include manual service items (Monogram/Name-Number/WEIGHT) in grandTotal
-        if (manualServiceItems.length > 0) {
-            const manualServiceTotal = manualServiceItems.reduce((sum, si) => sum + (si.unitPrice * si.totalQuantity), 0);
-            pricing.subtotal += manualServiceTotal;
-            pricing.grandTotal += manualServiceTotal;
-        }
-
-        // Get sales rep NAME from dropdown selected option text
-        const salesRepSelect = document.getElementById('sales-rep');
-        const salesRepEmail = salesRepSelect?.value || 'sales@nwcustomapparel.com';
-        const salesRepName = salesRepSelect?.options[salesRepSelect.selectedIndex]?.text || '';
-
-        // Get additional charges (artwork, rush, sample, discount)
-        const additionalCharges = getAdditionalCharges();
-
-        // Build customer data with additional charges
-        const customerData = {
-            email: customerEmail,
-            name: customerName,
-            company: document.getElementById('company-name')?.value?.trim() || '',
-            project: document.getElementById('project-name')?.value?.trim() || '',  // P2-5 (audit 2026-06-06): was captured nowhere
-            isWholesale: document.getElementById('wholesale-checkbox')?.checked || false,  // [2026-06-07] → IsWholesale; push routes to acct 2203
-            salesRepEmail: salesRepEmail,
-            salesRepName: salesRepName,
-            notes: document.getElementById('notes')?.value?.trim() || '',
-            // Additional charges (2026-01-14)
-            artCharge: additionalCharges.artCharge,
-            graphicDesignHours: additionalCharges.graphicDesignHours,
-            graphicDesignCharge: additionalCharges.graphicDesignCharge,
-            rushFee: additionalCharges.rushFee,
-            sampleFee: additionalCharges.sampleFee,
-            sampleQty: additionalCharges.sampleQty,
-            discount: additionalCharges.discount,
-            discountPercent: additionalCharges.discountPercent,
-            discountReason: additionalCharges.discountReason,
-            // Order details (2026-02-11)
-            phone: document.getElementById('customer-phone')?.value?.trim() || '',
-            orderNumber: document.getElementById('order-number')?.value?.trim() || '',
-            customerNumber: document.getElementById('customer-number')?.value?.trim() || '',
-            purchaseOrderNumber: document.getElementById('po-number')?.value?.trim() || '',
-            shipToAddress: document.getElementById('ship-address')?.value?.trim() || '',
-            shipToCity: document.getElementById('ship-city')?.value?.trim() || '',
-            shipToState: document.getElementById('ship-state')?.value || '',
-            shipToZip: document.getElementById('ship-zip')?.value?.trim() || '',
-            shipMethod: (() => {
-                const sel = document.getElementById('ship-method')?.value || '';
-                if (sel === 'Other') return document.getElementById('ship-method-other')?.value?.trim() || 'Other';
-                return sel;
-            })(),
-            dateOrderPlaced: dateFromInputValue(document.getElementById('date-order-placed')?.value),
-            reqShipDate: dateFromInputValue(document.getElementById('req-ship-date')?.value),
-            dropDeadDate: dateFromInputValue(document.getElementById('drop-dead-date')?.value),
-            paymentTerms: document.getElementById('payment-terms')?.value?.trim() || '',
-            // Frozen tax & design data for Caspio (2026-02-12)
-            designNumbers: embState.lastImportMetadata?.designNumbers || [],
-            digitizingCodes: embState.lastImportMetadata?.digitizingCodes || [],
-            digitizingFees: embState.lastImportMetadata?.parsedServices?.digitizingFees || [],
-            taxRate: (() => {
-                const includeTax = document.getElementById('include-tax')?.checked;
-                if (!includeTax) return 0;
-                // parseRatePercent: 0 is a VALID rate (out-of-state) — `|| 10.1` was
-                // silently saving WA tax on quotes the screen showed at $0 tax.
-                const rateVal = parseRatePercent(document.getElementById('tax-rate-input')?.value, 10.2);
-                return rateVal / 100;
-            })(),
-            taxAmount: (() => {
-                const includeTax = document.getElementById('include-tax')?.checked;
-                if (!includeTax) return 0;
-                const rateVal = parseRatePercent(document.getElementById('tax-rate-input')?.value, 10.2);
-                const preTaxText = document.getElementById('pre-tax-subtotal')?.textContent || '$0.00';
-                const preTaxSubtotal = parseFloat(preTaxText.replace(/[$,]/g, '')) || 0;
-                // #pre-tax-subtotal is ALREADY the full pre-tax base incl. shipping (= the on-screen
-                // adjustedSubtotal that updateTaxCalculation taxes once at L7259). Do NOT add shipping
-                // again — that double-counted shipping in the saved/pushed TaxAmount. (round-2 N1/N6 — pre-existing bug)
-                return Math.round(preTaxSubtotal * (rateVal / 100) * 100) / 100;
-            })(),
-            importNotes: embState.lastImportMetadata
-                ? [...(embState.lastImportMetadata.warnings || []), ...(embState.lastImportMetadata.unmatchedLines || []), ...(embState.lastImportMetadata.reviewItems || [])]
-                : [],
-            // Phase 11.3 (2026-05-24) — rich-mode artwork data.
-            // Persisted by quote-service.js into the ImportNotes JSON column
-            // (extended from flat-array to object shape so this data rides
-            // along without a Caspio schema change). Proxy's EMB transformer
-            // reads them to emit Designs[{name, Locations[]}] on push.
-            referenceArtwork: (window._embArtwork && typeof window._embArtwork.getFiles === 'function')
-                ? window._embArtwork.getFiles()
-                : [],
-            newDesignName: (window._embArtwork && typeof window._embArtwork.getDesignName === 'function')
-                ? (window._embArtwork.getDesignName() || '').trim()
-                : '',
-            paidToDate: embState.lastImportMetadata?.paidToDate ?? 0,
-            balanceAmount: embState.lastImportMetadata?.balanceAmount ?? 0,
-            orderNotes: embState.lastImportMetadata?.orderNotes ?? '',
-            // Package tracking (2026-02-14)
-            carrier: embState.lastImportMetadata?.carrier || '',
-            trackingNumber: embState.lastImportMetadata?.trackingNumber || '',
-            // Design assignments (2026-02-19)
-            garmentDesignNumber: embState.primaryLogo.designNumber || '',
-            capDesignNumber: (typeof embState.capPrimaryLogo !== 'undefined' ? embState.capPrimaryLogo.designNumber : '') || '',
-            // ShopWorks pricing audit (2026-02-13)
-            swTotal: embState.lastImportMetadata?.swTotal ?? 0,
-            swSubtotal: embState.lastImportMetadata?.swSubtotal ?? 0,
-            priceAuditJSON: (() => {
-                if (!embState.lastImportMetadata || !embState.lastImportMetadata.swSubtotal) return '';
-                // Reloaded quotes have no per-row _swUnitPrice (it only exists right after a
-                // paste-import), so recomputing here would write false MISMATCH flags. Keep
-                // the audit captured at import time verbatim. (audit 2026-06-10)
-                if (embState.lastImportMetadata.restoredFromSession) return embState.lastImportMetadata.priceAuditJSONSnapshot || '';
-                const swSub = embState.lastImportMetadata.swSubtotal;
-                const ourSub = pricing.grandTotal || 0;
-                const delta = ourSub - swSub;
-                const pct = swSub > 0 ? Math.abs(delta / swSub) * 100 : 0;
-                const flag = pct <= 5 ? 'OK' : pct <= 15 ? 'REVIEW' : 'MISMATCH';
-                const prods = (pricing.products || []).map(pp => {
-                    const li = (pp.lineItems || [pp])[0];
-                    const ourUnit = li?.unitPriceWithLTM || li?.unitPrice || 0;
-                    const swUnit = pp.product?._swUnitPrice || 0;
-                    const pDelta = ourUnit - swUnit;
-                    const pPct = swUnit > 0 ? Math.abs(pDelta / swUnit) * 100 : 0;
-                    return {
-                        style: pp.product?.style || '?',
-                        color: pp.product?.color || '?',
-                        qty: pp.product?.totalQuantity || 0,
-                        swUnit: parseFloat(swUnit.toFixed(2)),
-                        ourUnit: parseFloat(ourUnit.toFixed(2)),
-                        delta: parseFloat(pDelta.toFixed(2)),
-                        flag: pPct <= 5 ? 'OK' : pPct <= 15 ? 'REVIEW' : 'MISMATCH'
-                    };
-                });
-                // Append service items (AL, Monogram, Weight, Digitizing) to audit
-                const svc = embState.lastImportMetadata.parsedServices || {};
-                const alFeePerUnit = pricing.additionalServices?.length > 0
-                    ? (pricing.additionalServices[0]?.unitPrice || 6.50)
-                    : 6.50;
-                (svc.additionalLogos || []).forEach(al => {
-                    const swU = parseFloat(al.unitPrice || al.price || 0);
-                    const ourU = parseFloat(alFeePerUnit.toFixed(2));
-                    const d = ourU - swU;
-                    const p = swU > 0 ? Math.abs(d / swU) * 100 : 0;
-                    prods.push({ style: 'AL', color: 'Service', qty: parseInt(al.quantity || al.qty || 0),
-                        swUnit: parseFloat(swU.toFixed(2)), ourUnit: ourU,
-                        delta: parseFloat(d.toFixed(2)), flag: p <= 5 ? 'OK' : p <= 15 ? 'REVIEW' : 'MISMATCH', isService: true });
-                });
-                (svc.monograms || []).forEach(m => {
-                    const swU = parseFloat(m.unitPrice || m.price || 0);
-                    const ourU = getServicePrice('Monogram', 12.50);  // audit flags must track Caspio, not 2026-02 literals
-                    const d = ourU - swU;
-                    const p = swU > 0 ? Math.abs(d / swU) * 100 : 0;
-                    prods.push({ style: 'Monogram', color: 'Service', qty: parseInt(m.quantity || m.qty || 0),
-                        swUnit: parseFloat(swU.toFixed(2)), ourUnit: ourU,
-                        delta: parseFloat(d.toFixed(2)), flag: p <= 5 ? 'OK' : p <= 15 ? 'REVIEW' : 'MISMATCH', isService: true });
-                });
-                (svc.weights || []).forEach(w => {
-                    const swU = parseFloat(w.unitPrice || w.price || 0);
-                    const ourU = getServicePrice('WEIGHT', 6.25);  // audit flags must track Caspio, not 2026-02 literals
-                    const d = ourU - swU;
-                    const p = swU > 0 ? Math.abs(d / swU) * 100 : 0;
-                    prods.push({ style: 'Weight', color: 'Service', qty: parseInt(w.quantity || w.qty || 0),
-                        swUnit: parseFloat(swU.toFixed(2)), ourUnit: ourU,
-                        delta: parseFloat(d.toFixed(2)), flag: p <= 5 ? 'OK' : p <= 15 ? 'REVIEW' : 'MISMATCH', isService: true });
-                });
-                (svc.digitizingFees || []).forEach(df => {
-                    const swU = parseFloat(df.amount || df.unitPrice || 0);
-                    const ourU = swU; // Digitizing is pass-through, same price expected
-                    prods.push({ style: df.code || 'DD', color: 'Service', qty: 1,
-                        swUnit: parseFloat(swU.toFixed(2)), ourUnit: parseFloat(ourU.toFixed(2)),
-                        delta: 0, flag: 'OK', isService: true });
-                });
-                // DECG/DECC items
-                const parsedDecg = svc.decgItems || [];
-                parsedDecg.forEach(pd => {
-                    const swU = parseFloat(pd.unitPrice || 0);
-                    const ourU = parseFloat(pd.calculatedUnitPrice || 0);
-                    const qty = parseInt(pd.quantity || 0);
-                    const d = ourU - swU;
-                    const p = swU > 0 ? Math.abs(d / swU) * 100 : 0;
-                    const label = pd.serviceType === 'decc' ? 'DECC' : 'DECG';
-                    prods.push({ style: label, color: 'Service', qty: qty,
-                        swUnit: parseFloat(swU.toFixed(2)), ourUnit: parseFloat(ourU.toFixed(2)),
-                        delta: parseFloat(d.toFixed(2)), flag: p <= 5 ? 'OK' : p <= 15 ? 'REVIEW' : 'MISMATCH', isService: true });
-                });
-                return JSON.stringify({ swTotal: embState.lastImportMetadata.swTotal, swSubtotal: swSub,
-                    ourSubtotal: parseFloat(ourSub.toFixed(2)), deltaSubtotal: parseFloat(delta.toFixed(2)),
-                    deltaPct: parseFloat(pct.toFixed(1)), flag, products: prods });
-            })()
-        };
-
+        const customerData = buildSaveCustomerData({ customerName, customerEmail, pricing });
         // DECG/DECC items already collected at function start
 
         // Build quote data
@@ -433,59 +527,7 @@ async function _saveAndGetLinkInner(opts = {}) {
         }
 
         if (result && result.quoteID) {
-            // Partial save = NOT a success: items are missing from the DB, so the
-            // share link, /quote page, and a ShopWorks push would all under-bill.
-            // Keep the local draft (rep's data is the only complete copy), skip the
-            // share modal, and leave Push disabled. (audit 2026-06-10)
-            if (result.partialSave) {
-                showToast((result.warning || 'Some line items failed to save.') +
-                    ' The quote is incomplete — do NOT share or push it. Check your connection and save again.', 'error', 12000);
-                return;
-            }
-
-            const isUpdate = !!embState.editingQuoteId;
-            // Clear auto-save draft on successful save (2026 consolidation)
-            if (embState.embPersistence) {
-                embState.embPersistence.clearDraft();
-            }
-
-            // Mark as saved (no unsaved changes)
-            markAsSaved();
-
-            if (isUpdate) {
-                // Update mode: Show revision success message
-                const newRevision = result.revision || (embState.editingRevision + 1);
-                embState.editingRevision = newRevision;
-                updateEditModeUI(result.quoteID, newRevision);
-                showToast(`Revision ${newRevision} saved successfully!`, 'success');
-
-                // Show modal with link (don't pass message as baseUrl!) — skipped when auto-saving
-                // to push, where the push preview opens instead.
-                if (!skipShareModal) {
-                    if (typeof QuoteShareModal !== 'undefined' && QuoteShareModal.show) {
-                        QuoteShareModal.show(result.quoteID);
-                    } else {
-                        const url = `${window.location.origin}/quote/${result.quoteID}`;
-                        navigator.clipboard.writeText(url).catch(() => {});
-                        showToast(`Quote ${result.quoteID} updated (Rev ${newRevision}). Link copied!`, 'success');
-                    }
-                }
-            } else {
-                // New quote: success modal with shareable link — skipped when auto-saving to push.
-                if (!skipShareModal) {
-                    if (typeof QuoteShareModal !== 'undefined' && QuoteShareModal.show) {
-                        QuoteShareModal.show(result.quoteID);
-                    } else {
-                        const url = `${window.location.origin}/quote/${result.quoteID}`;
-                        navigator.clipboard.writeText(url).catch(() => {});
-                        showToast(`Quote ${result.quoteID} saved. Link copied!`, 'success');
-                    }
-                }
-            }
-
-            // Show Push to ShopWorks button after successful save. [B5]: only a NEW quote clears the
-            // already-pushed lock; an update preserves it so a re-save can't re-enable a duplicate push.
-            showPushButton(result.quoteID, { resetPushed: !isUpdate });
+            if (!finishSuccessfulSave(result, skipShareModal)) return;
         } else {
             throw new Error(result?.error || 'Failed to save quote');
         }
