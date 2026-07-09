@@ -159,7 +159,7 @@ class DTFQuoteService {
             const _shipFee = parseFloat(quoteData.shippingFee) || 0;
             const preTaxNoShip = parseFloat((preTaxAllIn - _shipFee).toFixed(2));
             const _realRatePct = parseFloat(quoteData.taxRate);
-            const _realRate = (isNaN(_realRatePct) ? 10.1 : _realRatePct) / 100;
+            const _realRate = (isNaN(_realRatePct) ? 10.2 : _realRatePct) / 100;
             const includeTax = quoteData.includeTax !== false;
             const salesTax = includeTax ? parseFloat((preTaxAllIn * _realRate).toFixed(2)) : 0;
 
@@ -223,7 +223,7 @@ class DTFQuoteService {
                 LTM_Waived: quoteData.ltmWaived ? true : false,
                 // Sales rep + tax rate (2026-03-23)
                 SalesRepEmail: quoteData.salesRep || '',
-                TaxRate: Number.isFinite(parseFloat(quoteData.taxRate)) ? parseFloat(quoteData.taxRate) : 10.1,  // [2026-06-08] P0: NOT `|| 10.1` — an exempt/0% quote (rate 0) is falsy and was stored as 10.1, re-taxing via the /quote+/invoice mirror + push GL
+                TaxRate: Number.isFinite(parseFloat(quoteData.taxRate)) ? parseFloat(quoteData.taxRate) : 10.2,  // [2026-06-08] P0: NOT `|| 10.1` — an exempt/0% quote (rate 0) is falsy and was stored as 10.1, re-taxing via the /quote+/invoice mirror + push GL
                 TaxAmount: salesTax,
                 IsWholesale: quoteData.isWholesale ? 'Yes' : 'No',  // [2026-06-08] wholesale/reseller → 0 tax; push routes to GL 2203
                 // Shipping fee + notes (2026-03-22)
@@ -519,7 +519,7 @@ class DTFQuoteService {
             const _shipFee = parseFloat(quoteData.shippingFee) || 0;
             const preTaxNoShip = parseFloat((preTaxAllIn - _shipFee).toFixed(2));
             const _realRatePct = parseFloat(quoteData.taxRate);
-            const _realRate = (isNaN(_realRatePct) ? 10.1 : _realRatePct) / 100;
+            const _realRate = (isNaN(_realRatePct) ? 10.2 : _realRatePct) / 100;
             const includeTax = quoteData.includeTax !== false;
             const salesTax = includeTax ? parseFloat((preTaxAllIn * _realRate).toFixed(2)) : 0;
 
@@ -571,7 +571,7 @@ class DTFQuoteService {
                 LTM_Display_Mode: quoteData.ltmDisplayMode || 'builtin',
                 LTM_Waived: quoteData.ltmWaived ? true : false,
                 // Tax rate (2026-03-23)
-                TaxRate: Number.isFinite(parseFloat(quoteData.taxRate)) ? parseFloat(quoteData.taxRate) : 10.1,  // [2026-06-08] P0: NOT `|| 10.1` — an exempt/0% quote (rate 0) is falsy and was stored as 10.1, re-taxing via the /quote+/invoice mirror + push GL
+                TaxRate: Number.isFinite(parseFloat(quoteData.taxRate)) ? parseFloat(quoteData.taxRate) : 10.2,  // [2026-06-08] P0: NOT `|| 10.1` — an exempt/0% quote (rate 0) is falsy and was stored as 10.1, re-taxing via the /quote+/invoice mirror + push GL
                 TaxAmount: salesTax,
                 IsWholesale: quoteData.isWholesale ? 'Yes' : 'No',  // [2026-06-08] wholesale/reseller → 0 tax; push routes to GL 2203
                 // Shipping fee (2026-03-22)

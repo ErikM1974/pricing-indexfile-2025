@@ -157,16 +157,18 @@ export function restoreScreenPrintDraft(draft) {
             // Restore size quantities
             if (product.sizes || product.sizeBreakdown) {
                 const sizes = product.sizes || product.sizeBreakdown;
+                let restoredAny = false;
                 Object.entries(sizes).forEach(([size, qty]) => {
                     if (qty > 0) {
                         const sizeInput = row.querySelector(`input[data-size="${size}"]`);
                         if (sizeInput) {
                             sizeInput.value = qty;
-                            // eslint-disable-next-line no-undef -- pre-existing monolith bug: updateRowQuantityTotal exists NOWHERE (throws if a stored draft ever restores size qtys into live inputs). Kept verbatim (S1a); fix queued post-move.
-                            updateRowQuantityTotal(rowId);
+                            restoredAny = true;
                         }
                     }
                 });
+                // Same handler a manual size edit fires: rebuilds row qty cell + 2XL child-row cascade
+                if (restoredAny) onSizeChange(rowId);
             }
         });
 

@@ -197,8 +197,8 @@ class SampleOrderService {
                 .filter(item => item.notes && item.notes.includes('PAID SAMPLE'))
                 .reduce((sum, item) => sum + (item.quantity * item.price), 0);
 
-            // Calculate Washington State Sales Tax (10.1%)
-            const salesTaxRate = 0.101;
+            // Calculate Washington State Sales Tax (10.2%)
+            const salesTaxRate = 0.102;
             const salesTax = subtotal * salesTaxRate;
             const total = subtotal + salesTax;
 
@@ -248,7 +248,7 @@ class SampleOrderService {
                 // Tax handled via Payment block - ShopWorks auto-creates tax line item from these fields
                 // DO NOT add tax as line item in LinesOE - causes duplicate tax entries
                 taxTotal: parseFloat(salesTax.toFixed(2)),
-                taxPartNumber: 'Tax_10.1',                          // Must match ShopWorks "Tax Line Item" config
+                taxPartNumber: 'Tax_10.1',                          // Must match ShopWorks "Tax Line Item" config (stays until Erik adds Tax_10.2 in SW; rate above is 10.2)
                 taxPartDescription: 'City of Milton Sales Tax 10.1%',  // Must match ShopWorks config
 
                 customer: {

@@ -7,7 +7,7 @@
  * - Adds SPSU (Screen Print Setup) line items: $30.00 per setup
  * - Adds SPRESET (Screen Print Reset) line items: $25.00 per reset
  * - Enhances descriptions with print location details
- * - Includes 10.1% Milton, WA sales tax
+ * - Includes 10.2% Milton, WA sales tax
  */
 
 class ScreenPrintShopWorksGuideGenerator extends ShopWorksGuideGenerator {

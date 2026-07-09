@@ -103,7 +103,7 @@ window.OrderFormPricingShared = (function () {
 
   // Default WA sales-tax rate (Milton seller location). Same constant the DTG /
   // DTF quote builders use as the in-WA / pickup default.
-  const WA_TAX_RATE = 0.101;
+  const WA_TAX_RATE = 0.102;
   const DEPOSIT_RATE = 0.5;   // 50% deposit due
 
   // Resolve the EFFECTIVE sales-tax rate + GL account from the customer + ship
@@ -113,7 +113,7 @@ window.OrderFormPricingShared = (function () {
   //   tax-exempt customer  → 0%  (GL 2204)
   //   out of WA state      → 0%  (GL 2202)
   //   in WA / unknown      → ship.taxRate (DOR destination lookup, a DECIMAL set
-  //                          upstream) else WA default 0.101 (GL 2200.101 Wash:10.1%)
+  //                          upstream) else WA default 0.102 (GL account fallback 2200.101 until SW gets 2200.102)
   // NEVER a flat 10.1% for everyone (the old bug over-taxed exempt/out-of-state
   // customers on the customer-facing total/deposit).
   function resolveTaxContext(info, ship) {
@@ -133,7 +133,7 @@ window.OrderFormPricingShared = (function () {
     }
     // In WA (or unknown → assume WA, the conservative taxable default). Use a
     // destination rate resolved upstream (DOR lookup → ship.taxRate, decimal)
-    // when present, else the Milton 10.1% default. When we fall back to the
+    // when present, else the Milton 10.2% default. When we fall back to the
     // default, flag it (rateIsDefault) so the UI can warn that the rate hasn't
     // been verified against the real destination — Erik's #1 rule: never a
     // silent possibly-wrong number.

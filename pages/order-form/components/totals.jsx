@@ -175,7 +175,7 @@ function TotalsPanel({ deco, decoConfig, breakdown, customerMode }) {
           <span className="tp-note tp-note--cust">Estimated pricing — final pricing confirmed by your sales rep.</span>
         )}
         {breakdown?.taxRateIsDefault && tax > 0 && (
-          <span className="tp-note tp-note--err">⚠ Using 10.1% Milton default rate — verify destination tax rate.</span>
+          <span className="tp-note tp-note--err">⚠ Using 10.2% Milton default rate — verify destination tax rate.</span>
         )}
         {errors.length > 0 && (
           <span className="tp-note tp-note--err">⚠ {errors.length} pricing issue{errors.length === 1 ? '' : 's'}: {errors[0]?.message || 'see console'}</span>

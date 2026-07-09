@@ -63,78 +63,35 @@ function focusProductSearch() {
 // ============================================
 
 function updateTaxCalculation() {
-    const includeTax = document.getElementById('include-tax')?.checked;
+    // ONE money source (A-grade Batch 1.3): all fee/discount/tax/total math lives in
+    // DTFQuoteBuilder.calculateFromState() → computeFeesAndTotals() — the exact pair
+    // save + print already use. This function only RENDERS the result. (The page copy
+    // previously re-implemented the whole pipeline and drifted: 10.1% empty-field
+    // fallback here vs 10.2% in the class — screen vs saved/printed disagreed.)
+    const builder = window.dtfQuoteBuilder;
+    if (!builder || typeof builder.computeFeesAndTotals !== 'function') return;
+    const totals = builder.computeFeesAndTotals(builder.calculateFromState());
+
     const subtotalEl = document.getElementById('pre-tax-subtotal');
     const taxRowEl = document.getElementById('tax-row');
     const taxAmountEl = document.getElementById('tax-amount');
     const grandTotalEl = document.getElementById('grand-total-with-tax');
-
-    // Get base subtotal from pricing
-    // DTF subtotal always includes LTM (baked in by pricing engine rounding) — no mode branching needed
-    // [2026-06-08] P1: read the STABLE base (data-base set by updatePricing), NOT the textContent this fn writes back
-    // — else a 2nd direct call (tax-rate / include-tax / shipping-fee change) double-adds fees+shipping. Falls back to
-    // textContent only before the first updatePricing.
-    let subtotal = parseFloat(subtotalEl?.dataset?.base);
-    if (!Number.isFinite(subtotal)) subtotal = parseFloat(subtotalEl?.textContent?.replace(/[$,]/g, '') || 0);
-
-    // Add art charge if enabled
-    const artChargeToggle = document.getElementById('art-charge-toggle');
-    const artCharge = artChargeToggle?.checked ? parseFloat(document.getElementById('art-charge')?.value || 0) : 0;
-    subtotal += artCharge;
-
-    // Add graphic design fee
-    const designHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
-    const designFee = designHours * (typeof getServicePrice === 'function' ? getServicePrice('GRT-75', 75) : 75);
-    subtotal += designFee;
-
-    // Add rush fee if present
-    const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
-    subtotal += rushFee;
-
-    // Subtract discount if present
-    const discountAmount = parseFloat(document.getElementById('discount-amount')?.value || 0);
-    const discountType = document.getElementById('discount-type')?.value || 'fixed';
-    let discount = 0;
-    if (discountType === 'percent') {
-        discount = subtotal * (discountAmount / 100);
-    } else {
-        discount = discountAmount;
-    }
-    subtotal = Math.max(0, subtotal - discount);
-
-    // Add shipping fee (after discount — shipping not discountable, taxable in WA)
-    const shippingFee = parseFloat(document.getElementById('dtf-shipping-fee')?.value) || 0;
-    subtotal += shippingFee;
-
-    // Update the pre-tax subtotal display to show adjusted amount
-    if (subtotalEl) {
-        subtotalEl.textContent = '$' + subtotal.toFixed(2);
-    }
-
-    // Use dynamic tax rate from input (default 10.1% WA)
-    // [2026-06-11] shared parseRatePercent (EMB 2026-06-10 fix, synced): a cleared
-    // input parsed to NaN and rendered "$NaN" totals that poisoned email/clipboard;
-    // 0 stays a VALID rate (out-of-state/exempt) — never falls back to 10.1.
-    const rateInput = document.getElementById('tax-rate-input');
-    const taxRate = parseRatePercent(rateInput?.value, 10.1) / 100;
     const taxLabel = document.getElementById('tax-rate-label');
-    const pct = (taxRate * 100).toFixed(1);
+
+    // Pre-tax subtotal display = products + fees − discount + shipping (adjusted amount)
+    if (subtotalEl) {
+        subtotalEl.textContent = '$' + totals.preTaxSubtotal.toFixed(2);
+    }
 
     // Sales Tax row stays visible for invoice transparency; label shows the rate when charged,
     // "(exempt)"/"(not charged)" when $0 (best-of-both level-up 2026-06-14).
-    const _dtfRateRaw = (rateInput?.value || '').trim();
+    const _dtfRateRaw = (document.getElementById('tax-rate-input')?.value || '').trim();
     if (taxRowEl) taxRowEl.style.display = 'flex';
-    if (taxLabel) taxLabel.textContent = (includeTax && parseFloat(_dtfRateRaw) > 0)
+    if (taxLabel) taxLabel.textContent = (totals.includeTax && parseFloat(_dtfRateRaw) > 0)
         ? `Sales Tax (${_dtfRateRaw}%)`
         : ((window._isWholesale || window._taxExempt) ? 'Sales Tax (exempt)' : 'Sales Tax (not charged)');
-    if (includeTax) {
-        const tax = Math.round(subtotal * taxRate * 100) / 100;
-        taxAmountEl.textContent = '$' + tax.toFixed(2);
-        grandTotalEl.textContent = '$' + (subtotal + tax).toFixed(2);
-    } else {
-        taxAmountEl.textContent = '$0.00';
-        grandTotalEl.textContent = '$' + subtotal.toFixed(2);
-    }
+    if (taxAmountEl) taxAmountEl.textContent = '$' + totals.taxAmount.toFixed(2);
+    if (grandTotalEl) grandTotalEl.textContent = '$' + totals.grandTotal.toFixed(2);
 
     // Always-visible sidebar TOTAL bar (EMB parity 2026-06-11) — mirrors the
     // grand total so the running price never scrolls out of view while building.
@@ -264,7 +221,7 @@ function showTaxStatus(message, type) {
 }
 
 function onShipStateChange() {
-    // [2026-06-08] P0 (#1 rule): exempt/wholesale stays 0% — the WA + short-ZIP branch below writes rate 10.1
+    // [2026-06-08] P0 (#1 rule): exempt/wholesale stays 0% — the WA + short-ZIP branch below writes rate 10.2
     // directly (bypassing lookupTaxRate's guard), which would re-tax an exempt order. Guard here too.
     if (window._taxExempt || window._isWholesale) {
         const _ri = document.getElementById('tax-rate-input'); if (_ri) _ri.value = '0';
@@ -281,7 +238,7 @@ function onShipStateChange() {
         if (zip.length >= 5) {
             lookupTaxRate();
         } else {
-            document.getElementById('tax-rate-input').value = '10.1';
+            document.getElementById('tax-rate-input').value = '10.2';
             updateTaxCalculation();
             showTaxStatus('', 'info');
         }
@@ -300,7 +257,7 @@ function toggleWholesale() {
         if (typeof updateTaxCalculation === 'function') updateTaxCalculation();
     } else {
         if (incTax) incTax.checked = true;
-        if (rateInput) rateInput.value = '10.1';
+        if (rateInput) rateInput.value = '10.2';
         if (typeof updateTaxCalculation === 'function') updateTaxCalculation();
         if (typeof lookupTaxRate === 'function') lookupTaxRate();  // re-fetch the real rate for the ship address
     }

@@ -1970,11 +1970,12 @@ export class DTFQuoteBuilder {
         window.currentPricingData.nextTierSavings = nextTierSavings;
         updateQuantityNudge(totalQty, 'dtf', nextTierSavings);
 
-        // Update pre-tax subtotal for tax calculation
+        // Seed the pre-tax subtotal display; updateTaxCalculation() (below) immediately
+        // re-renders it from computeFeesAndTotals() — the ONE money pipeline (Batch 1.3;
+        // the old page-side copy read a dataset.base breadcrumb here and drifted).
         const preTaxSubtotal = document.getElementById('pre-tax-subtotal');
         if (preTaxSubtotal) {
             preTaxSubtotal.textContent = `$${grandTotal.toFixed(2)}`;
-            preTaxSubtotal.dataset.base = grandTotal;  // [2026-06-08] P1: stable base for updateTaxCalculation (must NOT re-read its own fee-inflated textContent → double-count on a 2nd direct call)
         }
 
         // Update tax calculation if the function exists
@@ -2120,12 +2121,12 @@ export class DTFQuoteBuilder {
 
     /**
      * Compute the adjusted pre-tax subtotal, tax, and grand total from state +
-     * fee inputs, mirroring updateTaxCalculation() (dtf-quote-page.js) exactly:
-     * percent discount applies to products + art + design + rush; discount is
-     * clamped at $0; shipping is added AFTER the discount (not discountable,
-     * taxable in WA); tax is rounded to cents before summing.
-     * SINGLE SOURCE for saveAndGetLink() and buildPricingDataForInvoice() so the
-     * saved quote and the printed PDF always foot to the on-screen totals.
+     * fee inputs: percent discount applies to products + art + design + rush;
+     * discount is clamped at $0; shipping is added AFTER the discount (not
+     * discountable, taxable in WA); tax is rounded to cents before summing.
+     * THE ONE fee/tax pipeline (Batch 1.3): saveAndGetLink(), buildPricingDataForInvoice(),
+     * AND the on-screen display — updateTaxCalculation() (dtf-quote-page.js) renders
+     * from this and does no math of its own, so screen/saved/printed cannot drift.
      * (2026-06-11 — the PDF previously taxed the screen's pre-tax subtotal while
      * footing line items from a divergent DOM/fallback path: $493.50 lines under
      * a $1,018.98 grand total on a real customer quote.)

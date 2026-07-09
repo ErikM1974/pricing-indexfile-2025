@@ -306,8 +306,8 @@ class ShopWorksGuideGenerator {
         // Combined subtotal
         const subtotal = quoteData.SubtotalAmount || (productSubtotal + feeSubtotal);
 
-        // Calculate 10.1% Milton, WA sales tax
-        const tax = quoteData.SalesTaxAmount || (subtotal * 0.101);
+        // Calculate 10.2% Milton, WA sales tax
+        const tax = quoteData.SalesTaxAmount || (subtotal * 0.102);
         const total = quoteData.TotalAmount || (subtotal + tax);
 
         // Generate fee rows HTML

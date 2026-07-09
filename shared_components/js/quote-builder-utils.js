@@ -288,7 +288,7 @@ function handleDiscountReasonPresetChange() {
 
 /**
  * Update tax calculation based on checkbox state
- * Standard pattern: 10.1% tax rate
+ * Standard pattern: 10.2% tax rate
  */
 function updateTaxCalculation() {
     const taxCheckbox = document.getElementById('apply-tax');
@@ -1463,7 +1463,7 @@ function initOrderShippingListeners(containerId, options = {}) {
                 if (zip && zip.length >= 5) {
                     _doTaxLookup(container, apiBase, options);
                 } else {
-                    if (options.onTaxRateChange) options.onTaxRateChange(10.1);
+                    if (options.onTaxRateChange) options.onTaxRateChange(10.2);
                     _showTaxStatus(container, '', '');
                 }
             }

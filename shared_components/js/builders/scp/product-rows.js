@@ -1890,10 +1890,6 @@ export function deleteRow(rowId) {
 
     row.remove();
     recalculatePricing();
-
-    // Update cap logo section visibility (hide if no caps remain)
-    // eslint-disable-next-line no-undef -- pre-existing monolith bug: updateCapLogoSectionVisibility is EMB-only (never loaded on the SCP page), so every SCP row delete ends in a swallowed ReferenceError. Kept verbatim (S1a); fix queued post-move.
-    updateCapLogoSectionVisibility();
 }
 
 // ============================================================

@@ -862,11 +862,11 @@ class EmbroideryQuoteService {
 
         // Sales Tax (TAX) — stores rate in BaseUnitPrice, amount in LineTotal.
         // Finite-check (not ||): an empty input was saving "Sales Tax (NaN%)" items,
-        // and 0% is a valid rate. Same 10.1 fallback as the builder's save path.
+        // and 0% is a valid rate. Same 10.2 fallback as the builder's save path.
         const includeTax = document.getElementById('include-tax')?.checked;
         const taxRateInput = document.getElementById('tax-rate-input');
         const _rawRate = taxRateInput ? parseFloat(taxRateInput.value) : NaN;
-        const taxRateVal = Number.isFinite(_rawRate) ? _rawRate : 10.1;
+        const taxRateVal = Number.isFinite(_rawRate) ? _rawRate : 10.2;
         if (includeTax) {
             // Calculate tax amount from adjusted subtotal
             const grandTotalText = document.getElementById('pre-tax-subtotal')?.textContent || '$0.00';

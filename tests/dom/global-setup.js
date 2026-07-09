@@ -19,6 +19,7 @@ const ENTRIES = {
     'scp-adapter.cjs': 'shared_components/js/builders/scp/adapter.js',
     'dtf-adapter.cjs': 'shared_components/js/builders/dtf/adapter.js',
     'dtf-quote-builder-class.cjs': 'shared_components/js/builders/dtf/quote-builder-class.js',
+    'scp-persistence.cjs': 'shared_components/js/builders/scp/persistence.js',
 };
 
 module.exports = async function globalSetup() {
