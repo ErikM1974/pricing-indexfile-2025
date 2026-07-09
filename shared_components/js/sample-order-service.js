@@ -217,8 +217,8 @@ class SampleOrderService {
             if (salesTax > 0) {
                 console.log('[SampleOrderService] ✅ Tax will be added via Payment block:', {
                     taxTotal: salesTax.toFixed(2),
-                    taxPartNumber: 'Tax_10.1',
-                    taxPartDescription: 'City of Milton Sales Tax 10.1%',
+                    taxPartNumber: 'Tax_10.2',
+                    taxPartDescription: 'City of Milton Sales Tax 10.2%',
                     rate: `${(salesTaxRate * 100).toFixed(1)}%`
                 });
             }
@@ -248,8 +248,8 @@ class SampleOrderService {
                 // Tax handled via Payment block - ShopWorks auto-creates tax line item from these fields
                 // DO NOT add tax as line item in LinesOE - causes duplicate tax entries
                 taxTotal: parseFloat(salesTax.toFixed(2)),
-                taxPartNumber: 'Tax_10.1',                          // Must match ShopWorks "Tax Line Item" config (stays until Erik adds Tax_10.2 in SW; rate above is 10.2)
-                taxPartDescription: 'City of Milton Sales Tax 10.1%',  // Must match ShopWorks config
+                taxPartNumber: 'Tax_10.2',                          // Must match ShopWorks "Tax Line Item" config (account created by Erik 2026-07-09)
+                taxPartDescription: 'City of Milton Sales Tax 10.2%',  // Must match ShopWorks config
 
                 customer: {
                     firstName: formData.firstName,
