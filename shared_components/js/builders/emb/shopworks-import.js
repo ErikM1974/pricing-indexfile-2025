@@ -1681,10 +1681,6 @@ export async function confirmShopWorksImport() {
         closeShopWorksImportModal();
 
         // Show import summary banner (non-SanMar detail)
-        // eslint-disable-next-line no-unused-vars -- pre-existing write-only local (verbatim move)
-        const sanMarProductCount = productsImported - nonSanMarBannerItems.filter(i =>
-            productResults.some(pr => pr.partNumber === i.style)
-        ).length;
         // Count SanMar vs non-SanMar among all imported product rows
         const allImportedRows = document.querySelectorAll('#product-tbody tr[data-style]:not(.child-row):not(.service-product-row):not(.fee-row)');
         const sanMarRowCount = Array.from(allImportedRows).filter(r => r.dataset.nonSanmar !== 'true').length;

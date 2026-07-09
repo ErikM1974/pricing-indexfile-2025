@@ -2171,3 +2171,32 @@ Moved from LESSONS_LEARNED.md to keep the active log under its line cap. Every r
 **Root Cause:** Two `function NAME(){}` declarations at one module scope — function-declaration hoisting makes the LAST one win the identifier, and BOTH `window.NAME = NAME` assignments then resolve to it (all bindings settle at hoist time, before any line runs). The intended async fn was dead code; the source-order of the two `window.X=X` lines is irrelevant.
 **Solution:** Deleted both back-compat aliases (left a comment where each was). The async (auto-save → preview) fn is now the SOLE declaration bound to `window.scpPushToShopWorks`/`window.dtfPushToShopWorks` + the HTML `onclick`. Locked by `tests/unit/push-button-binding.test.js` — per builder: exactly ONE declaration and it's `async`, plus the bound window fn returns a Promise (mutation-verified: re-adding the alias fails both assertions).
 **Prevention:** Never keep two `function NAME(){}` at the same scope — the later silently wins regardless of where the `window.X=X` lines sit. An "alias" must use a DIFFERENT name (or `const X2 = X`). When wiring a button to an async one-click flow, assert the bound global returns a Promise. Rule-8: a duplicate-decl bug in one builder almost always exists in its siblings — grep all 4 the same day.
+
+## Stubs condensed 2026-07-09 (bodies verbatim from LESSONS_LEARNED.md)
+
+### Two shipping-path pricing bugs the estimator exposed (2026-06-08) — ARCHIVED 2026-06-14
+Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive rules: a recalc must NEVER read its own written-back display as its base (own a stable `data-base`); if `TotalAmount` excludes a charge the mirror re-adds, persist the row the mirror reads; saved `TaxAmount` must tax `(base + shipping)` because `/invoice` trusts it verbatim.
+
+### DTG save read the AI chat quote, NOT the manual form — decoupled-source desync (2026-06-08) — ARCHIVED 2026-06-14
+Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive rules: when adding tax/fees to a save, confirm WHICH object the save serializes reflects the on-screen total (two sources → save the live one, not a stale AI blob); run an adversarial diff review before any money-path deploy; when a row "fails to price" clear ALL its derived fields; EVERY new tax/toggle flag MUST be re-seeded in the builder's reset path (missing key reads `undefined`, `!undefined===true` flips the wrong branch).
+
+### Extracting a shared band module — alias globals + test-harness load order (2026-06-08) — ARCHIVED 2026-06-14
+Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive gotchas: a shared module aliasing globals MUST load BEFORE its consumer; add new shared deps to manual jsdom `inject()` harness lists IN ORDER; per-builder content stays a `logos()` callback (closure); each reset/edit-reload/draft path needs its own `renderOrderRecap()`.
+
+### Push button stranded disabled — spinner destroyed the label; checklist/button desync (2026-06-07) — ARCHIVED 2026-06-11
+Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive gotchas: never replace a button's innerHTML when code reads a child by ID; gate the action button from the SAME function that renders its readiness checklist.
+
+### Phase 3.1 — shared `pricingData` contract locks the invoice generator's input (2026-06-02) — ARCHIVED 2026-06-11
+Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive: all 4 builders MUST wrap invoice input in `QuotePricingData.buildPricingData()` (quote-pricing-data.js) — never post-override fields after the normalizer; validator throws on dev hosts, warns in prod; contract locked by `tests/unit/invoice-totals.test.js`.
+
+### Design ExtDesignID collision: transfer order showed an embroidery design (2026-06-02) — ARCHIVED 2026-06-11
+Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive: any external dedupe key (`ExtDesignID`, ExtOrderID) must be GLOBALLY unique — derive from the FULL QuoteID, never a trailing sequence (date-packed IDs reset daily; SW silently merges designs sharing an id).
+
+### DTG edit-reopen never fired + dashboard Edit opened the wrong builder (2026-06-01) — ARCHIVED 2026-06-11
+Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive: a QuoteID prefix is its LEADING LETTERS (regex `^[A-Za-z]+`) — never `split('-')[0]` (only survives EMB's hyphenated format); lock quote edits on `PushedToShopWorks`, not just `Status` (hourly sync flips Status only after SW imports).
+
+### ShopWorks ManageOrders integrations: APISource routing (2026-06-02/04) — ARCHIVED 2026-06-15
+In [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). **THE RULE (load-bearing): the OnSite integration's APISource value and EVERY push path's APISource must be IDENTICAL — today both = `ManageOrders`.** A blank-APISource integration is the catch-all (pulls every order); a specific one only pulls exact matches. All push paths stamp `APISource:"ManageOrders"` (proxy transformers EMB/SCP/DTF, proxy `transformOrder` for order-form/3DT/DTG, server.js order-form, Inksoft `transform.py`). DIAGNOSTIC: order reaches MO (`/order-pull` finds it) but `/getorderno` stays count:0 ⇒ suspect this filter mismatch FIRST, not the payload.
+### Double size-suffix: quote-builder push transformers pre-suffixed the PN (2026-06-02) — ARCHIVED 2026-06-15
+In [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive: for any ShopWorks PUSH send the BASE part number + plain size and let the integration's Size Translation Table append the modifier — NEVER `getPartNumber()`/pre-suffix a pushed `PartNumber` (that's for FRONTEND display + SanMar inventory only). Verify on the **processed** SW order, not the MO intake JSON. Design types: EMB→2, SCP→1, DTF→8, DTG→45, sticker→4, emblem→5 (cap designs stay 2; `6 CAP` unused).
+

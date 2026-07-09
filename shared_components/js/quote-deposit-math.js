@@ -22,7 +22,7 @@
     // computeDepositTerms({ subtotal, shipping, taxRatePct, depositPct })
     //   subtotal   — quote_sessions.TotalAmount (pre-tax all-in merchandise total)
     //   shipping   — rep-confirmed shipping dollars (0 for pickup)
-    //   taxRatePct — rep-confirmed sales-tax rate as a PERCENT (e.g. 10.1; 0 = out of state)
+    //   taxRatePct — rep-confirmed sales-tax rate as a PERCENT (e.g. 10.2; 0 = out of state)
     //   depositPct — Service_Codes DEPOSIT-PCT SellPrice (e.g. 50)
     // Returns the full terms object or THROWS on invalid input (fail-closed:
     // a bad number must never silently become a $0 charge).

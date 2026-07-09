@@ -33,7 +33,11 @@ Companion to `A_PLUS_ROADMAP_FOR_FABLE.md` — that roadmap graded the *app* (se
 
 ---
 
-## Batch 1 — Correctness sweep `[P0 · ~1 session]`
+## Batch 1 — Correctness sweep `[P0 · ~1 session]` — ✅ SHIPPED v2026.07.09.1 (2026-07-09)
+
+> 1.1/1.2/1.3/1.4/1.6 done (battery: 1,664 jest incl. 15 new locks · 7/7 E2E · capture 547 fields **0 mismatches** — the DTF collapse is proven byte-identical).
+> **1.5 verdict (Erik decision needed):** `'XXL'` is a REAL SanMar size distinct from 2XL (~589 ladies styles use `_XXL`, 0 overlap — `shopworks-import-parser.js:42`), so **EMB's list (with XXL→Size06) is correct and SCP's is the drifted one**; worse, BOTH builders' *reload* paths fold XXL into the 2XL/Size05 column (EMB `persistence.js:1074`, SCP pricing-sync:288) — a ladies-XXL quote reloaded → saved/pushed as `_2X` is the latent wrong-SKU risk. Slotting changes are gated on Erik; `size-constants-drift.test.js` pins the delta to exactly `['XXL']` meanwhile.
+> ShopWorks GL identifiers (`Tax_10.1`/`2200.101`) still deliberately 10.1-flavored, allowlisted in `tax-rate-ratchet.test.js` — flip + delete allowlist when Erik creates the 10.2 accounts.
 
 Smallest possible diffs; each fix ships with a regression test. Full parity battery after (see Standing Rules).
 

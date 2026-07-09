@@ -1504,7 +1504,7 @@
                     customer,
                     emailSubject: draft.subject || '',
                     // Chunk E (edit-reload) restores these so a reopened exempt/wholesale/
-                    // out-of-state quote doesn't silently revert to 10.1% Milton pickup.
+                    // out-of-state quote doesn't silently revert to 10.2% Milton pickup.
                     shipping: priceQuote.shipping || null,
                     tax: {
                         isWholesale,

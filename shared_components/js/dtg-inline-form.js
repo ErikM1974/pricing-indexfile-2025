@@ -248,12 +248,12 @@ let hasChanges = false;
             state: '',
             zip: '',
             // Computed tax — populated by the DOR /api/tax-rates/lookup call
-            // (in-WA shipping) OR hardcoded to 0.101 (pickup) / 0 (out-of-state).
+            // (in-WA shipping) OR hardcoded to 0.102 (pickup) / 0 (out-of-state).
             // Floats 0..1 (NOT a percentage). Read by recalc + submit. Starts at
-            // 10.1% so the first preview render shows a plausible Tacoma-ish
+            // 10.2% so the first preview render shows a plausible Tacoma-ish
             // estimate even before the rep types a ship-to address; the real
             // rate replaces this as soon as recomputeTaxRate() runs.
-            taxRate: 0.101,
+            taxRate: 0.102,
             taxRateSource: 'default-pre-lookup',
             // Caspio sales_tax_accounts_2026 row matched to this rate. The DOR
             // lookup endpoint returns these so we can surface the right GL
@@ -993,7 +993,7 @@ let hasChanges = false;
 
                             <!-- Customer Pickup toggle (2026-05-20).
                                  ON  → hides ship-to fields, sets ShipMethod = Customer Pickup,
-                                       tax = 10.1% (Milton, WA flat).
+                                       tax = 10.2% (Milton, WA flat).
                                  OFF → shows ship-to fields, tax = destination lookup if WA
                                        or 0% if out-of-state.
                                  Default: ON (matches state.shipping.method = 'Customer Pickup'). -->
@@ -1003,7 +1003,7 @@ let hasChanges = false;
                                     <span class="dcp-toggle-track"><span class="dcp-toggle-thumb"></span></span>
                                     <span class="dcp-toggle-text">
                                         <strong>Customer Pickup</strong>
-                                        <span class="dcp-toggle-sub">Pickup at NWCA Milton — no shipping address, tax 10.1% flat</span>
+                                        <span class="dcp-toggle-sub">Pickup at NWCA Milton — no shipping address, tax 10.2% flat</span>
                                     </span>
                                 </label>
                             </div>
@@ -1363,7 +1363,7 @@ let hasChanges = false;
         // Tax estimate per Erik's 3 rules (2026-05-20). The taxRate on
         // state.shipping is the authoritative source — populated by
         // recomputeTaxRate() any time the rep toggles pickup OR types a
-        // ship-to address. Pickup = 0.101, out-of-state = 0, in-WA = DOR
+        // ship-to address. Pickup = 0.102, out-of-state = 0, in-WA = DOR
         // destination city rate.
         const isPickup = isPickupMethod(state.shipping.method);
         const shState = (state.shipping.state || '').toUpperCase();
@@ -1508,7 +1508,7 @@ let hasChanges = false;
         if (!state.shipping.method) {
             items.push({ state: 'block', label: 'Ship method', value: 'Pick a ship method or toggle Customer Pickup', jumpId: 'dtgPickupToggle' });
         } else if (isPickupReady) {
-            items.push({ state: 'ok', label: 'Ship method', value: 'Customer Pickup — Milton, WA (tax 10.1%)' });
+            items.push({ state: 'ok', label: 'Ship method', value: 'Customer Pickup — Milton, WA (tax 10.2%)' });
         } else {
             const shipLabel = (SHIP_METHODS.find((m) => m.code === state.shipping.method) || {}).label || state.shipping.method;
             // For non-pickup, check the ship-to address completeness
@@ -2412,7 +2412,7 @@ let hasChanges = false;
 
     // Re-derive state.shipping.taxRate per WA's destination-based sourcing law
     // (WAC 458-20-145 + 458-20-193). Three rules:
-    //   - pickup            → 10.1% (Milton flat — WAC 458-20-145, seller's location)
+    //   - pickup            → 10.2% (Milton flat — WAC 458-20-145, seller's location)
     //   - out of WA state   → 0%    (WAC 458-20-193 — no nexus on out-of-state sales)
     //   - in WA state       → /api/tax-rates/lookup destination city rate
     //                          (backend hits webgis.dor.wa.gov AddressRates API)
@@ -2475,13 +2475,13 @@ let hasChanges = false;
         }
         const isPickup = isPickupMethod(state.shipping.method);
         if (isPickup) {
-            state.shipping.taxRate = 0.101;
+            state.shipping.taxRate = 0.102;
             state.shipping.taxRateSource = 'pickup-flat';
-            // Milton pickup → Caspio account 2200.101 (Wash:10.1%). Hardcoded
+            // Milton pickup → Caspio account 2200.101 (Wash:10.1%) — account pair stays until Erik adds 2200.102 in ShopWorks (rate above is already 10.2). Hardcoded
             // since pickup destination doesn't change.
             state.shipping.taxAccount = '2200.101';
             state.shipping.taxAccountName = 'Wash:10.1%';
-            setStatus('Pickup at Milton, WA — 10.1% flat', 'success');
+            setStatus('Pickup at Milton, WA — 10.2% flat', 'success');
             renderSummary();
             return;
         }
@@ -4055,7 +4055,7 @@ let hasChanges = false;
             locationCode: locCode,
             locationLabel: locLabel,
             // Tax block consumed by the SAVE path (dtg-quote-page handleSaveQuote).
-            // taxRate is a DECIMAL (0.101) — matches EMB; quote-view/invoice normalize >1?/100,
+            // taxRate is a DECIMAL (0.102) — matches EMB; quote-view/invoice normalize >1?/100,
             // so decimal round-trips. DO NOT change to percent or /invoice's verbatim TaxAmount breaks.
             taxRate,
             taxAmount,
@@ -4235,7 +4235,7 @@ let hasChanges = false;
 
         // Tax — derive ONLY from state.shipping.taxRate (recomputeTaxRate is the single
         // authority: it already zeroes the rate for out-of-state / exempt / wholesale /
-        // opt-out, sets the manual rate, and uses the DOR rate in-WA / 0.101 pickup).
+        // opt-out, sets the manual rate, and uses the DOR rate in-WA / 0.102 pickup).
         // [2026-06-08] Phase 1 Chunk D fix — REMOVED the redundant out-of-state guard that
         // re-zeroed tax here: it desynced the push from screen/saved/PDF when a rep set a
         // MANUAL rate on an out-of-state ship-to (manual outranks out-of-state in the authority,
@@ -4638,7 +4638,7 @@ let hasChanges = false;
         state.shipping = {
             method: 'Customer Pickup',  // matches the default in state init (top of file)
             address1: '', address2: '', city: '', state: '', zip: '',
-            taxRate: 0.101, taxRateSource: 'pickup-flat',
+            taxRate: 0.102, taxRateSource: 'pickup-flat',
             taxAccount: '2200.101', taxAccountName: 'Wash:10.1%',
             // [2026-06-08] Phase 1 — CRITICAL: re-seed includeTax/taxRateOverride. Omitting
             // includeTax left it `undefined` after reset → recomputeTaxRate's `!includeTax`
@@ -4881,7 +4881,7 @@ let hasChanges = false;
 
         // [2026-06-08] Phase 1 Chunk E — restore shipping + tax + wholesale/exempt so a
         // reopened exempt/wholesale/out-of-state/manual quote does NOT silently revert to
-        // 10.1% Milton pickup (the EMB/SCP/DTF edit-reload bug class). Source: Notes.shipping
+        // 10.2% Milton pickup (the EMB/SCP/DTF edit-reload bug class). Source: Notes.shipping
         // (full block) + Notes.tax, with the session.TaxRate/IsWholesale columns as fallback
         // for older records. recomputeTaxRate() (called after render below) then RE-DERIVES
         // authoritatively from the restored state — these flags drive its early-return branches.
@@ -4907,7 +4907,7 @@ let hasChanges = false;
         if (savedTax.taxExemptNumber != null) state.customer.taxExemptNumber = savedTax.taxExemptNumber;
         // Seed the rate from the saved column (DTG stores DECIMAL; normalize >1?/100 for
         // any legacy percent rows) so the first render shows the saved rate before the
-        // async DOR re-lookup completes — not the 10.1% default.
+        // async DOR re-lookup completes — not the 10.2% default.
         const _savedRate = parseFloat(session.TaxRate);
         if (Number.isFinite(_savedRate)) {
             state.shipping.taxRate = _savedRate > 1 ? _savedRate / 100 : _savedRate;
@@ -4920,7 +4920,7 @@ let hasChanges = false;
         // Sync the static ship-to + tax controls (rendered ONCE from default state in render(),
         // BEFORE this runs) to the restored state. CRITICAL: without re-syncing the ship method +
         // pickup toggle, a reopened SHIPPED quote shows pickup-toggle CHECKED + ship-to hidden;
-        // one rep click on the wrongly-ON toggle would flip method→pickup and recompute 10.1%,
+        // one rep click on the wrongly-ON toggle would flip method→pickup and recompute 10.2%,
         // silently re-taxing an out-of-state (0%) or mis-taxing an in-WA-destination quote.
         try {
             const incEl = document.getElementById('include-tax');
@@ -5033,7 +5033,7 @@ let hasChanges = false;
         renderSummary();
         // [2026-06-08] Phase 1 Chunk E — re-derive tax from the just-restored shipping/
         // wholesale/exempt/manual state (single authority). Without this a reopened
-        // non-pickup quote would keep the default 10.1% until the rep touched a field.
+        // non-pickup quote would keep the default 10.2% until the rep touched a field.
         recomputeTaxRate();
         for (const row of state.rows) {
             if (row.style && row.color) kickInventoryFetch(row);
