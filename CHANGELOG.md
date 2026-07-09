@@ -1,3 +1,8 @@
+## v2026.07.09.2 (2026.07.09)
+
+- fix: flip ShopWorks tax identifiers to Tax_10.2 / 2200.102 (Erik created the accounts)
+- Deploy v2026.07.09.2: cache-bust bumps
+
 ## v2026.07.09.1 (2026.07.09)
 
 - docs: BUILDER_A_GRADE_PLAN.md — per-builder A-grade plan from 5-audit research
