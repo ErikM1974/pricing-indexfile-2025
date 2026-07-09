@@ -50,7 +50,13 @@ Smallest possible diffs; each fix ships with a regression test. Full parity batt
 
 Grade movement: SCP B− → B+, DTF B → B+ (drift dead), the "wrong number" class is closed.
 
-## Batch 2 — Safety net `[P0 · ~1 session]` (prerequisite for Batches 3-6)
+## Batch 2 — Safety net `[P0 · ~1 session]` (prerequisite for Batches 3-6) — ✅ SHIPPED v2026.07.09.3 (2026-07-09)
+
+> **2.0 (the Erik-gated XXL fix, folded in):** both builders' reload paths now preserve size NAMES — EMB stopped renaming XXL→2XL; SCP's edit-load stopped DROPPING every non-standard size (empty monolith else) and its QQ path stopped deleting the XXL child it created. One shared pattern (named child first → prime parent input → one onSizeChange), 'XXL' out of EMB's Size06 list, lists locked identical. True jsdom round-trip lock (harness gained `extended-sizes-config.js` — child-row restores used to throw invisibly there).
+> **2.1** E2E lanes: SCP + DTG positive money lanes + DTF positive lane (6 money tests total; DTF lesson: `window.dtfQuoteBuilder` exists BEFORE async init binds location listeners — click after pricing proves init, assert the summary).
+> **2.2** Money-math units: SCP tier suite (fallback remap + Caspio matcher + top-tier clamp), DTF tier/minimum boundaries, and an all-22-scenario invariants suite over the LOCKED baselines (a bad re-lock can't smuggle inconsistent goldens).
+> **2.4** Cross-repo DTG golden vectors: client ↔ proxy formula locked equal across the tier×location matrix + frozen goldens (Batch 6 becomes provable).
+> **2.3** was already done — the 4 "stubbed" EMB capture runners were wired in a prior session; README corrected (all 22 wired).
 
 - **2.1** E2E money lanes: SCP + DTG get the EMB-style positive lane (build → reprice → save mints id + posts REAL money); DTF's block-guard gets a positive money assertion too. (`tests/e2e/money-path.spec.js` — today: EMB 2, DTF 1 guard, SCP 0, DTG 0.)
 - **2.2** Money-math unit suites for SCP/DTF/DTG (tier lookup, LTM, margin application) — golden numbers lifted from `baselines.locked.json` so they can't drift from the capture gate. (EMB already has `tests/unit/pricing/*` — the only builder that does.)

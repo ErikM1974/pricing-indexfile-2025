@@ -1016,9 +1016,11 @@ async function populateProducts(items) {
  * Add a product row from loaded quote data
  */
 export async function addProductFromQuote(product) {
-    // Add new row
-    addNewRow();
-    const row = document.querySelector('tr.new-row');
+    // Add new row — target it by the id addNewRow() mints, never the transient
+    // `.new-row` highlight class (LESSONS 2026-07-06: multi-product loads can leave
+    // several rows highlighted; the first document-order match may be the wrong one).
+    const newRowId = addNewRow();
+    const row = document.getElementById(`row-${newRowId}`);
     if (!row) return;
 
     const rowId = row.dataset.rowId;
@@ -1072,16 +1074,23 @@ export async function addProductFromQuote(product) {
         }
 
         if (size === '2XL' || size === 'XXL') {
-            // 2XL AND legacy "XXL" both live in the parent's Size05 column (data-size="2XL"). Check this
-            // BEFORE the isExtendedSize branch: legacy "XXL" is in SIZE06_EXTENDED_SIZES, so it would
-            // route to createChildRow("XXL") — but the parent has no data-size="XXL" input, so the
-            // trailing onSizeChange reads it as qty 0 and DELETES the child → 2XL silently dropped
-            // (under-charged) on reload. Normalize the column to "2XL" + set the parent input; the
-            // onSizeChange at the end of this function creates + syncs the child. (audit fix 2026-06-05)
+            // Both share the parent's Size05 column (the data-size="2XL" input drives the
+            // child-row lifecycle), but XXL is a DISTINCT SanMar size (~589 ladies styles
+            // use _XXL, never _2X) and must KEEP ITS NAME through reload — the ShopWorks
+            // push suffixes off the size name, so renaming to "2XL" orders the wrong SKU.
+            // Mirror the ShopWorks-import order: create the named child FIRST, then prime
+            // the parent input; the trailing onSizeChange finds the existing child and
+            // updates it in place (it only mints a "2XL" child when NONE exists) and
+            // REMOVES the child when the parent input reads 0. (Batch 2.0, 2026-07-09;
+            // supersedes the 2026-06-05 fold-to-2XL fix, which fixed the drop but lost
+            // the XXL name.)
+            if (size === 'XXL') {
+                createChildRow(rowIdNum, 'XXL', qty);
+            }
             const parent2x = row.querySelector(`input[data-size="2XL"]`);
-            if (parent2x && !parent2x.disabled) {
+            if (parent2x) {
                 parent2x.value = qty;
-            } else {
+            } else if (size === '2XL') {
                 createChildRow(rowIdNum, '2XL', qty);
             }
         } else if (isExtendedSize) {

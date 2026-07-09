@@ -754,7 +754,9 @@ async function _recalculatePricingImpl() {
                             // Match ALL extended sizes in description (handles caps with "3XL(2)" format)
                             const description = li.description || '';
                             const extendedSizeRegex = new RegExp(
-                                '(' + SIZE06_EXTENDED_SIZES.map(s => s.replace(/\//g, '\\/')).concat(['2XL', '\\d{4}']).join('|') + ')(?=\\(|\\s|$)',
+                                // 2XL + XXL concat explicitly: both are Size05-column child rows,
+                                // deliberately NOT in the Size06 list (Batch 2.0).
+                                '(' + SIZE06_EXTENDED_SIZES.map(s => s.replace(/\//g, '\\/')).concat(['2XL', 'XXL', '\\d{4}']).join('|') + ')(?=\\(|\\s|$)',
                                 'g'
                             );
                             sizesToCheck = description.match(extendedSizeRegex) || [];

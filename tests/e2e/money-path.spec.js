@@ -140,7 +140,65 @@ test.describe('EMB money path', () => {
     });
 });
 
-test.describe('DTF money guard', () => {
+test.describe('SCP money path (Batch 2.1)', () => {
+    test('build → reprice → save mints SPC id and posts REAL money', async ({ page }) => {
+        const captured = await mockWrites(page, 'SPC');
+        await openBuilder(page, '/quote-builders/screenprint-quote-builder.html');
+
+        // Print config defaults are live (front LC, 1 color — checked in the HTML),
+        // so the lane exercises the same out-of-the-box flow a rep starts with.
+        await addProduct(page, 'PC54');
+        await setQty(page, 'M', 48); // 48-71 tier — clear of SCP's LTM-through-24-47 rule
+        await page.waitForTimeout(6000); // live reprice (proxy round trip + debounce)
+
+        await setHiddenInput(page, '#customer-name', 'E2E Test');
+        await setHiddenInput(page, '#customer-email', 'e2e@test.invalid');
+
+        await clickAction(page, '.btn-share-link');
+        await expect
+            .poll(() => captured.sessions.length, { timeout: 30000, message: 'quote_sessions POST never fired' })
+            .toBeGreaterThan(0);
+
+        const session = captured.sessions[0];
+        expect(session.QuoteID).toBe('SPC-2026-777');
+        expect(parseFloat(session.SubtotalAmount)).toBeGreaterThan(0);
+        expect(parseFloat(session.TotalAmount)).toBeGreaterThan(0);
+        expect(captured.items.length).toBeGreaterThan(0);
+    });
+});
+
+test.describe('DTG money path (Batch 2.1)', () => {
+    test('catalog previewStyle → size grid → live prices → save posts REAL money', async ({ page }) => {
+        const captured = await mockWrites(page, 'DTG');
+        await page.goto('/quote-builders/dtg-quote-builder.html');
+        // The inline form renders into its mount; previewStyle is the exact entry
+        // the catalog cards call (real rep path: click a top-seller card).
+        await page.waitForFunction(() => window.DTGInlineForm && typeof window.DTGInlineForm.previewStyle === 'function', null, { timeout: 30000 });
+        await page.evaluate(() => {
+            window.DTGInlineForm.previewStyle({ style: 'PC54', desc: 'Core Cotton Tee', color: 'Athletic Heather' });
+        });
+
+        // Size grid renders once the live bundle lands; type a real quantity.
+        const qtyInput = page.locator('input[type="number"][data-row-id][data-size="M"]').first();
+        await qtyInput.waitFor({ state: 'visible', timeout: 30000 });
+        await qtyInput.fill('24');
+        await qtyInput.dispatchEvent('change');
+        await page.waitForTimeout(6000); // live pricing (bundle + updateLivePrices)
+
+        // Save straight off the form (the #dtgSaveBtn/aiSaveQuoteBtn path).
+        await page.evaluate(() => window.dtgSaveQuote());
+        await expect
+            .poll(() => captured.sessions.length, { timeout: 30000, message: 'quote_sessions POST never fired' })
+            .toBeGreaterThan(0);
+
+        const session = captured.sessions[0];
+        expect(String(session.QuoteID)).toMatch(/^DTG/);
+        expect(parseFloat(session.TotalAmount)).toBeGreaterThan(0); // DTG TotalAmount is PRE-tax by contract
+        expect(captured.items.length).toBeGreaterThan(0);
+    });
+});
+
+test.describe('DTF money guard + path', () => {
     test('zero transfer locations BLOCKS save (garment-only ≈ half price must never persist)', async ({ page }) => {
         const captured = await mockWrites(page, 'DTF');
         await openBuilder(page, '/quote-builders/dtf-quote-builder.html');
@@ -157,5 +215,35 @@ test.describe('DTF money guard', () => {
         await expect(page.locator('body')).toContainText(/select at least one transfer location/i, { timeout: 15000 });
         await page.waitForTimeout(3000); // grace window — a late POST would betray a bypass
         expect(captured.sessions.length).toBe(0);
+    });
+
+    test('with a location selected, save posts REAL money (Batch 2.1 positive lane)', async ({ page }) => {
+        const captured = await mockWrites(page, 'DTF');
+        await openBuilder(page, '/quote-builders/dtf-quote-builder.html');
+
+        await addProduct(page, 'PC54');
+        await setQty(page, 'M', 24);
+        await page.waitForTimeout(6000); // row priced ⇒ async init (and its location listeners) is done
+
+        // Location listeners bind during the builder's async init — a click before that
+        // leaves the radio checked but selectedLocations EMPTY (window.dtfQuoteBuilder is
+        // assigned before init() settles, so waiting on the handle is not enough). Click
+        // after pricing proves init finished, and require the summary to acknowledge it.
+        await clickAction(page, 'input[name="front-location"][value="left-chest"]');
+        await expect(page.locator('#location-summary')).toContainText(/left chest/i, { timeout: 10000 });
+        await page.waitForTimeout(4000); // location reprice
+
+        await setHiddenInput(page, '#customer-name', 'E2E Test');
+        await setHiddenInput(page, '#customer-email', 'e2e@test.invalid');
+
+        await clickAction(page, '.btn-share-link');
+        await expect
+            .poll(() => captured.sessions.length, { timeout: 30000, message: 'quote_sessions POST never fired' })
+            .toBeGreaterThan(0);
+
+        const session = captured.sessions[0];
+        expect(String(session.QuoteID)).toMatch(/^DTF/);
+        expect(parseFloat(session.TotalAmount)).toBeGreaterThan(0);
+        expect(captured.items.length).toBeGreaterThan(0);
     });
 });

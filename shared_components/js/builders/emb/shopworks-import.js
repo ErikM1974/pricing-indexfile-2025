@@ -372,7 +372,7 @@ async function reImportNonSanmarRow(row, rowId, importData) {
 
     // Set sizes from import data — including extended sizes as child rows
     if (importData.sizes) {
-        const IMPORT_EXTENDED_SIZES = [...SIZE06_EXTENDED_SIZES, '2XL'];
+        const IMPORT_EXTENDED_SIZES = [...SIZE06_EXTENDED_SIZES, '2XL', 'XXL'];  // 2XL/XXL: Size05-column child rows, deliberately not in the Size06 list (Batch 2.0)
 
         for (const [size, qty] of Object.entries(importData.sizes)) {
             if (qty > 0) {
@@ -1954,7 +1954,7 @@ async function importProductRow(product, sellPriceOverride = 0, sellPriceOverrid
     // 5. Set sizes (inputs should now be enabled from selectColor)
     // Extended sizes (from SIZE06_EXTENDED_SIZES) need child rows, not direct input
     // Also: 2XL typically uses Size05 column, but if disabled, treat it as extended size
-    const IMPORT_EXTENDED_SIZES = [...SIZE06_EXTENDED_SIZES, '2XL'];
+    const IMPORT_EXTENDED_SIZES = [...SIZE06_EXTENDED_SIZES, '2XL', 'XXL'];  // 2XL/XXL: Size05-column child rows, deliberately not in the Size06 list (Batch 2.0)
 
     // Detect if this is a cap product for size mapping
     const isCapRow = row.dataset.isCap === 'true' ||

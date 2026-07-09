@@ -414,9 +414,11 @@ async function populateProducts(items) {
  * Add a product row from loaded quote data
  */
 export async function addProductFromQuote(product) {
-    // Add new row
-    addNewRow();
-    const row = document.querySelector('tr.new-row');
+    // Add new row — target it by the id addNewRow() mints, never the transient
+    // `.new-row` highlight class (LESSONS 2026-07-06: first document-order match
+    // can be an OLDER still-highlighted row when products load in a loop).
+    const newRowId = addNewRow();
+    const row = document.getElementById(`row-${newRowId}`);
     if (!row) return;
 
     const rowId = row.dataset.rowId;
@@ -445,24 +447,39 @@ export async function addProductFromQuote(product) {
     // Small delay for color selection to process
     await new Promise(resolve => setTimeout(resolve, 100));
 
-    // Set size quantities
+    // Set size quantities (Batch 2.0, 2026-07-09 — the monolith's empty else silently
+    // DROPPED every non-standard size here, so an edited quote re-saved without its
+    // XS/XXL/3XL+/tall pieces; only the Quick-Quote path had grown the child-row fix.)
+    const rowIdNum = parseInt(rowId);
+    let touchedSizes = false;
     for (const [size, qty] of Object.entries(product.sizeBreakdown)) {
         if (qty > 0) {
-            // XXL stays as 'XXL' — distinct from 2XL for Ladies/Womens products
-            const normalizedSize = size;
-
-            if (['S', 'M', 'L', 'XL', '2XL'].includes(normalizedSize)) {
-                const sizeInput = row.querySelector(`input[data-size="${normalizedSize}"]`) ||
-                                 row.querySelector(`input[data-size="${size}"]`);
+            if (['S', 'M', 'L', 'XL', '2XL'].includes(size)) {
+                const sizeInput = row.querySelector(`input[data-size="${size}"]`);
                 if (sizeInput) {
                     sizeInput.value = qty;
                     sizeInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    touchedSizes = true;
                 }
+            } else if (size === 'XXL') {
+                // XXL = ladies 2XL: shares the Size05 column but is a DISTINCT SanMar size
+                // (~589 ladies styles use _XXL, never _2X) — the NAME must survive reload or
+                // the push re-suffixes it _2X (wrong SKU). Create the named child FIRST, then
+                // prime the parent 2XL input: onSizeChange updates an existing 2XL/XXL child
+                // in place, but REMOVES it when the parent input reads 0.
+                createChildRow(rowIdNum, 'XXL', qty);
+                const parent2x = row.querySelector('input[data-size="2XL"]');
+                if (parent2x) parent2x.value = qty;
+                touchedSizes = true;
             } else {
-                // verbatim: empty else in the monolith (S1a)
+                // Extended sizes (XS, 3XL+, talls): child rows — mirrors the Quick-Quote
+                // fix (item #6, 2026-07-05), now shared by edit-load and method-switch too.
+                createChildRow(rowIdNum, size, qty);
+                touchedSizes = true;
             }
         }
     }
+    if (touchedSizes) onSizeChange(rowIdNum);   // refresh qty display + recalculatePricing
 }
 
 /**
@@ -503,20 +520,8 @@ export async function applyQuickQuotePrefillScp(qq) {
             color: qq.color || qq.colorName,
             sizeBreakdown: qq.sizeBreakdown
         });
-        const parents = document.querySelectorAll('#product-tbody tr[data-row-id]:not(.child-row)');
-        const row = parents[parents.length - 1];
-        const rowId = row ? parseInt(row.dataset.rowId, 10) : NaN;
-        if (Number.isFinite(rowId)) {
-            const STANDARD = ['S', 'M', 'L', 'XL', '2XL'];
-            let addedExtended = false;
-            for (const [size, qty] of Object.entries(qq.sizeBreakdown || {})) {
-                if (qty > 0 && !STANDARD.includes(size) && typeof createChildRow === 'function') {
-                    createChildRow(rowId, size, qty);
-                    addedExtended = true;
-                }
-            }
-            if (addedExtended) onSizeChange(rowId);   // refresh qty display + recalculatePricing
-        }
+        // Extended/XXL child rows now come from addProductFromQuote itself (Batch 2.0) —
+        // the loop that used to live here would double-create them.
         showToast('Loaded ' + qq.style + ' from Quick Quote — verify color, quantities & pricing', 'info', 6000);
     } catch (e) {
         console.error('[QuickQuote prefill] failed:', e);
