@@ -1,3 +1,9 @@
+## v2026.07.09.1 (2026.07.09)
+
+- docs: BUILDER_A_GRADE_PLAN.md — per-builder A-grade plan from 5-audit research
+- fix: Builder A-grade Batch 1 — correctness sweep (SCP bugs, DTF tax collapse, 10.2 sweep, SIZE06 lock)
+- Deploy v2026.07.09.1: cache-bust bumps
+
 ## v2026.07.08.14 (2026.07.08)
 
 - feat(dtg): carry-over batch — shared error surfaces + accessible catalog modal
