@@ -1,3 +1,7 @@
+## v2026.07.09.12 (2026.07.09)
+
+- feat(dtg): Batch 6 — formula collapse: ONE canonical engine, client delegates
+
 ## v2026.07.09.11 (2026.07.09)
 
 - feat(table-audit): live Refresh button — re-pull view/rel/webhook wiring + fieldCount + new/deleted tables via /api/caspio-schema/usage
