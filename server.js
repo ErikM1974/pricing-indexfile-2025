@@ -3015,6 +3015,13 @@ app.get('/dashboards/caspio-api-reference.html', requireCrmEmail(['erik@nwcustom
   res.sendFile(path.join(__dirname, 'dashboards', 'caspio-api-reference.html'));
 });
 
+// Caspio table-usage audit — ADMIN ONLY (hard role gate, like access-admin). A cleanup
+// tool: 163 tables + which are used (code/view/rel/task/webhook) so Erik can archive
+// stale ones. Registered before the /dashboards mount.
+app.get('/dashboards/table-usage-audit.html', requireCrmRole(['admin']), (req, res) => {
+  res.sendFile(path.join(__dirname, 'dashboards', 'table-usage-audit.html'));
+});
+
 // Customer Portal admin console — manage who can log into the customer portal
 // (Customer_Portal_Access invites). Open to the management team by ROLE (Erik=admin,
 // Bradley=accountant, Ruth=art, Taneisha/Nika=sales). The two rep tags are included so

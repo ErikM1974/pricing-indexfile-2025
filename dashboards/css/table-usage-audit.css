@@ -1,0 +1,103 @@
+/* ==========================================================================
+   table-usage-audit.css — Caspio table-usage audit (admin cleanup tool)
+   Page-specific styles for /dashboards/table-usage-audit.html.
+   Relies on the 2026 tokens in art-hub.css + the shell in dash-shell.css.
+   Usage-signal + tier chips map to the semantic --state-* tokens (no new hex).
+   ========================================================================== */
+
+.tua-sub { font-weight: 400; font-size: 0.7em; opacity: 0.85; }
+.tua-lock {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 0.8rem; font-weight: 600; color: #fff;
+    background: rgba(0,0,0,0.18); border: 1px solid rgba(255,255,255,0.35);
+    padding: 5px 12px; border-radius: var(--radius-pill);
+}
+
+/* ---------- Callout ---------- */
+.tua-callout {
+    border: 1px solid var(--state-warning); border-left: 4px solid var(--state-warning);
+    border-radius: var(--radius-md); padding: var(--space-3) var(--space-4);
+    margin-bottom: var(--space-4); background: var(--state-warning-bg);
+}
+.tua-callout h4 { margin: 0 0 var(--space-2); font-size: 0.95rem; font-weight: 700; color: var(--state-warning); display: flex; align-items: center; gap: var(--space-2); }
+.tua-callout ul { margin: 0; padding-left: var(--space-5); }
+.tua-callout li { margin: var(--space-1) 0; font-size: 0.88rem; color: var(--gray-700); line-height: 1.55; }
+.tua-callout code { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.85em; background: var(--surface-card); padding: 1px 5px; border-radius: var(--radius-sm); }
+
+/* ---------- Toolbar ---------- */
+.tua-toolbar { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; margin-bottom: var(--space-3); }
+.tua-filters { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.tua-chip {
+    font-size: 0.8rem; font-weight: 600; color: var(--gray-600);
+    background: var(--surface-card); border: 1px solid var(--gray-300);
+    border-radius: var(--radius-pill); padding: 5px 13px; cursor: pointer;
+    transition: all var(--dur-fast) var(--ease-out);
+}
+.tua-chip:hover { border-color: var(--gray-400); }
+.tua-chip.is-active { color: #fff; background: var(--dash-theme); border-color: var(--dash-theme); }
+.tua-chip--a.is-active { background: var(--state-danger); border-color: var(--state-danger); }
+.tua-chip--b.is-active { background: var(--state-warning); border-color: var(--state-warning); }
+.tua-chip--used.is-active { background: var(--state-success); border-color: var(--state-success); }
+.tua-search {
+    flex: 1 1 200px; max-width: 300px; padding: 8px 14px; font-family: inherit; font-size: 0.875rem;
+    color: var(--gray-800); background: var(--surface-card); border: 1px solid var(--gray-300); border-radius: var(--radius-md);
+}
+.tua-search:focus { outline: none; border-color: var(--dash-theme); box-shadow: 0 0 0 3px var(--dash-theme-bg); }
+.tua-actions { display: flex; gap: var(--space-2); margin-left: auto; }
+.tua-btn {
+    display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px;
+    font-family: inherit; font-size: 0.83rem; font-weight: 600; cursor: pointer;
+    color: var(--gray-700); background: var(--surface-card); border: 1px solid var(--gray-300); border-radius: var(--radius-md);
+}
+.tua-btn:hover { background: var(--gray-100); border-color: var(--gray-400); }
+.tua-btn:disabled { opacity: 0.55; cursor: default; }
+
+.tua-legend { font-size: 0.8rem; color: var(--gray-500); margin: 0 0 var(--space-2); display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.tua-count { font-size: 0.82rem; color: var(--gray-500); margin: 0 0 var(--space-2); font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
+/* ---------- Signal + tier chips ---------- */
+.tua-sig, .tua-tier {
+    display: inline-block; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.02em;
+    padding: 2px 7px; border-radius: var(--radius-sm); color: #fff; white-space: nowrap;
+}
+.tua-sig.code    { background: var(--state-success); }
+.tua-sig.view    { background: var(--state-info); }
+.tua-sig.rel     { background: var(--state-violet); }
+.tua-sig.task    { background: var(--state-warning); }
+.tua-sig.webhook { background: var(--state-danger); }
+.tua-tier--a   { background: var(--state-danger); }
+.tua-tier--b   { background: var(--state-warning); }
+.tua-tier--used{ background: var(--state-success); }
+
+/* ---------- Table ---------- */
+.tua-scroll { overflow-x: auto; }
+.tua-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; min-width: 900px; }
+.tua-table thead th {
+    position: sticky; top: 0; z-index: 1; background: var(--surface-inset);
+    color: var(--gray-600); font-weight: 600; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.03em;
+    text-align: left; padding: var(--space-2) var(--space-3); border-bottom: 2px solid var(--gray-300); cursor: pointer; white-space: nowrap;
+}
+.tua-table thead th.no-sort { cursor: default; }
+.tua-table tbody td { padding: 6px var(--space-3); border-bottom: 1px solid var(--gray-200); vertical-align: middle; }
+.tua-table tbody tr:hover { background: var(--surface-hover); }
+.tua-table tbody tr.is-reviewed { opacity: 0.6; }
+.tua-name { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.82rem; color: var(--gray-900); font-weight: 600; }
+.tua-code { font-family: 'JetBrains Mono', ui-monospace, monospace; color: var(--gray-500); white-space: nowrap; }
+.tua-flags { display: flex; gap: 4px; flex-wrap: wrap; }
+.tua-flag { font-size: 0.66rem; font-weight: 700; padding: 1px 6px; border-radius: var(--radius-sm); border: 1px solid; white-space: nowrap; }
+.tua-flag.dup  { color: var(--state-danger); border-color: var(--state-danger); background: var(--state-danger-bg); }
+.tua-flag.word { color: var(--state-warning); border-color: var(--state-warning); background: var(--state-warning-bg); }
+.tua-flag.flex { color: var(--state-info); border-color: var(--state-info); background: var(--state-info-bg); }
+.tua-live-gone   { color: var(--state-success); font-weight: 700; }
+.tua-live-exists { color: var(--gray-400); }
+
+.tua-decide { font-family: inherit; font-size: 0.78rem; padding: 3px 6px; border: 1px solid var(--gray-300); border-radius: var(--radius-sm); background: var(--surface-card); color: var(--gray-700); }
+.tua-decide.d-archive { border-color: var(--state-danger); color: var(--state-danger); font-weight: 600; }
+.tua-decide.d-keep    { border-color: var(--state-success); color: var(--state-success); font-weight: 600; }
+.tua-decide.d-deleted { border-color: var(--gray-400); color: var(--gray-500); text-decoration: line-through; }
+.tua-note { width: 100%; min-width: 130px; font-family: inherit; font-size: 0.78rem; padding: 3px 6px; border: 1px solid var(--gray-200); border-radius: var(--radius-sm); background: var(--surface-card); color: var(--gray-700); }
+.tua-note:focus { outline: none; border-color: var(--dash-theme); }
+.tua-rev { width: 16px; height: 16px; cursor: pointer; accent-color: var(--dash-theme); }
+.tua-empty { padding: var(--space-6); text-align: center; color: var(--gray-500); }
+
+@media (max-width: 700px) { .tua-actions { margin-left: 0; } }
