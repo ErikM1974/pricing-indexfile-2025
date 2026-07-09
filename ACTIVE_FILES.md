@@ -1145,6 +1145,9 @@ cap-embroidery-fix.css
 | `/dashboards/caspio-api-reference.html` | **NEW (2026-07-09)** Caspio REST API **v4** platform reference viewer — full 107-endpoint catalog + querying/bulk/auth/webhook guidance, live filter. **ERIK-ONLY** (email-gated route in server.js `requireCrmEmail`; admin-override does NOT apply). Static — no API calls. Mirrors `memory/CASPIO_REST_API_V4_REFERENCE.md`. | dash-shell.css, art-hub.css, caspio-api-reference.css, caspio-api-reference.js | ✅ Active |
 | `/dashboards/css/caspio-api-reference.css` | Caspio API reference page styles (2026 tokens; HTTP verbs → --state-* colors) | dash-shell.css, art-hub.css | ✅ Active |
 | `/dashboards/js/caspio-api-reference.js` | Caspio API reference controller — renders the v4 endpoint catalog from a static snapshot + live filter/highlight + smooth-scroll nav (no API calls) | APP_CONFIG | ✅ Active |
+| `/dashboards/table-usage-audit.html` | **NEW (2026-07-10)** Caspio Table Audit cleanup tool — all 163 tables + usage signals (code/view/rel/task/webhook) so admin can find + archive stale tables. **ADMIN-only** (`requireCrmRole(['admin'])` route in server.js). ⚠️ does NOT detect DataPage/Flex usage. | dash-shell.css, art-hub.css, dash-page-helpers.js, table-usage-audit.css, table-usage-audit.js | ✅ Active |
+| `/dashboards/css/table-usage-audit.css` | Table-audit page styles (2026 tokens; usage/tier chips → --state-* colors) | dash-shell.css, art-hub.css | ✅ Active |
+| `/dashboards/js/table-usage-audit.js` | Table-audit controller — static 163-table snapshot + filter/sort/search, per-table review (localStorage), live-existence check via `/api/caspio-schema/tables`, CSV export | DashPage, APP_CONFIG | ✅ Active |
 
 ### Staff Dashboards
 | File | Purpose | Dependencies | Status |
