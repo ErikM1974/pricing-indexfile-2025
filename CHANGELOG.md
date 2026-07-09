@@ -1,3 +1,9 @@
+## v2026.07.09.7 (2026.07.09)
+
+- memory: archive 6 old resolved lessons (299→274 lines) — memory-maintain
+- refactor(emb): Batch 3.3 bridge diet — 58 consumer-less window bridges deleted
+- refactor(emb): Batch 3 session 2 — _saveAndGetLinkInner split + two-way bridge locks
+
 ## v2026.07.09.6 (2026.07.09)
 
 - refactor: Builder A-grade Batch 3 session 1 — EMB structure (3.1 + 3.4 + 3.5)
