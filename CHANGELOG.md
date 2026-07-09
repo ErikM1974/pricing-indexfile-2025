@@ -1,3 +1,7 @@
+## v2026.07.09.17 (2026.07.09)
+
+- refactor: burn-down tranche 2 — SCP allowlist EMPTY, EMB 10→5
+
 ## v2026.07.09.16 (2026.07.09)
 
 - refactor: deeper burn-down tranche 1 — real-end ratchet measure, DTG done, DTF allowlist EMPTY
