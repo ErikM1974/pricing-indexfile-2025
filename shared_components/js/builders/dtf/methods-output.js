@@ -3,7 +3,6 @@
  * Batch 4.2 (2026-07-09): methods moved VERBATIM from quote-builder-class.js
  * (`this.` state intact — the class assembles via Object.assign(prototype, ...)).
  */
-// @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions).
 /* global escapeHtml, alert, EmbroideryInvoiceGenerator, confirm, requestAnimationFrame */
 
 export const outputMethods = {
@@ -137,21 +136,21 @@ export const outputMethods = {
 
             // Customer data from form (includes order fields for PDF header)
             const customerData = {
-                name: document.getElementById('customer-name')?.value || 'Customer',
-                company: document.getElementById('company-name')?.value || '',
-                email: document.getElementById('customer-email')?.value || '',
-                phone: document.getElementById('customer-phone')?.value || '',
-                salesRepEmail: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com',
+                name: /** @type {HTMLInputElement|null} */ (document.getElementById('customer-name'))?.value || 'Customer',
+                company: /** @type {HTMLInputElement|null} */ (document.getElementById('company-name'))?.value || '',
+                email: /** @type {HTMLInputElement|null} */ (document.getElementById('customer-email'))?.value || '',
+                phone: /** @type {HTMLInputElement|null} */ (document.getElementById('customer-phone'))?.value || '',
+                salesRepEmail: /** @type {HTMLInputElement|null} */ (document.getElementById('sales-rep'))?.value || 'sales@nwcustomapparel.com',
                 // The shared generator reads `.project` — the old `projectName`-only key
                 // meant DTF project names NEVER printed. Keep both. (expert audit 2026-07-07)
-                project: document.getElementById('project-name')?.value || '',
-                projectName: document.getElementById('project-name')?.value || '',
-                orderNumber: document.getElementById('order-number')?.value || '',
-                poNumber: document.getElementById('po-number')?.value || '',
-                reqShipDate: document.getElementById('req-ship-date')?.value || '',
+                project: /** @type {HTMLInputElement|null} */ (document.getElementById('project-name'))?.value || '',
+                projectName: /** @type {HTMLInputElement|null} */ (document.getElementById('project-name'))?.value || '',
+                orderNumber: /** @type {HTMLInputElement|null} */ (document.getElementById('order-number'))?.value || '',
+                poNumber: /** @type {HTMLInputElement|null} */ (document.getElementById('po-number'))?.value || '',
+                reqShipDate: /** @type {HTMLInputElement|null} */ (document.getElementById('req-ship-date'))?.value || '',
                 // SPECIAL NOTES footer on the PDF (shared generator supports it;
                 // EMB passes it — DTF never did, so rep notes silently vanished)
-                notes: document.getElementById('dtf-notes')?.value?.trim() || ''
+                notes: /** @type {HTMLInputElement|null} */ (document.getElementById('dtf-notes'))?.value?.trim() || ''
             };
 
             // Generate and open print window
@@ -302,7 +301,7 @@ export const outputMethods = {
         // Subtotal/fees/discount/tax all from the shared state math (computed above).
         // Line items were built from the SAME stateCalc, so the printed product rows
         // foot exactly to totals.subtotal and the fee rows foot to preTaxSubtotal.
-        const discountReason = document.getElementById('discount-reason')?.value || '';
+        const discountReason = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-reason'))?.value || '';
 
         return window.QuotePricingData.buildPricingData({
             method: 'DTF',
@@ -356,11 +355,11 @@ export const outputMethods = {
      * Focus the product search input (called by Add Product button)
      */
     focusProductSearch() {
-        const searchInput = document.getElementById('product-search');
+        const searchInput = /** @type {HTMLInputElement|null} */ (document.getElementById('product-search'));
         if (searchInput && !searchInput.disabled) {
             searchInput.focus();
             searchInput.select();
-        } else if (searchInput && searchInput.disabled) {
+        } else if (searchInput && /** @type {HTMLInputElement} */ (searchInput).disabled) {
             this.showToast('Select a location first', 'warning');
         }
     },

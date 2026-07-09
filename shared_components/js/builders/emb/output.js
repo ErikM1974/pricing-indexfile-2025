@@ -15,7 +15,6 @@
  * (buildEmbroideryPricingData ← collectProductsFromTable + pricing state);
  * never re-derive money from DOM text.
  */
-// @ts-nocheck — MOVED legacy DOM code: pre-existing checkJs frictions; typing
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
 /* global
    saveAndGetLink, showToast, getLtmControlState,
@@ -91,9 +90,9 @@ async function _reconstructDiagPricing(products, serviceItems, decgItems) {
     // Include child row override deltas (same as recalculatePricing)
     let childOverrideDelta = 0;
     document.querySelectorAll('#product-tbody tr.child-row').forEach(childRow => {
-        const childOverride = parseFloat(childRow.dataset.sellPrice) || 0;
+        const childOverride = parseFloat(/** @type {HTMLElement} */ (childRow).dataset.sellPrice) || 0;
         if (childOverride <= 0) return;
-        const childRowId = childRow.dataset.rowId;
+        const childRowId = /** @type {HTMLElement} */ (childRow).dataset.rowId;
         const childPriceCell = document.getElementById(`row-price-${childRowId}`);
         const childQtyCell = document.getElementById(`row-qty-${childRowId}`);
         if (!childPriceCell) return;
@@ -348,7 +347,7 @@ function _buildEmbInvoiceProduct(product) {
     const parentRow = document.querySelector(
         `tr[data-style="${product.style}"][data-catalog-color="${product.catalogColor}"]:not(.child-row)`
     );
-    const rowId = parentRow?.dataset?.rowId;
+    const rowId = /** @type {HTMLElement|null} */ (parentRow)?.dataset?.rowId;
 
     // Read base price from parent row's price cell
     const basePriceCell = document.getElementById(`row-price-${rowId}`);
@@ -571,7 +570,7 @@ function buildEmbroideryPricingData(allItems) {
     // normalizes percent → decimal at the boundary). The '10.2' fallback preserves
     // the pre-3.1 behavior: an empty input previously fell through to the
     // generator's hardcoded WA standard rate.
-    const taxRateRaw = document.getElementById('tax-rate-input')?.value || '10.2';
+    const taxRateRaw = /** @type {HTMLInputElement|null} */ (document.getElementById('tax-rate-input'))?.value || '10.2';
 
     return window.QuotePricingData.buildPricingData({
         method: 'EMB',
@@ -581,7 +580,7 @@ function buildEmbroideryPricingData(allItems) {
         subtotal: subtotal,
         grandTotal: grandTotal,
         preTaxSubtotal: isNaN(preTaxSubtotalVal) ? undefined : preTaxSubtotalVal,
-        includeTax: document.getElementById('include-tax') ? !!document.getElementById('include-tax').checked : true,
+        includeTax: document.getElementById('include-tax') ? !!/** @type {HTMLInputElement} */ (document.getElementById('include-tax')).checked : true,
         taxRate: taxRateRaw,
         totalQuantity: totalQty,
         setupFees: setupFees + capPatchSetupFee,
@@ -605,7 +604,7 @@ function buildEmbroideryPricingData(allItems) {
         graphicDesignCharge: charges.graphicDesignCharge || 0,
         rushFee: charges.rushFee || 0,
         // Itemized on the PDF so the rows foot to the total (already inside preTaxSubtotal).
-        shippingFee: parseFloat(document.getElementById('shipping-fee')?.value) || 0,
+        shippingFee: parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('shipping-fee'))?.value) || 0,
         discount: charges.discount || 0,
         discountReason: charges.discountReason || '',
         // DECG/DECC
@@ -652,8 +651,8 @@ export function generateEmbQuoteText(products, serviceItems) {
         'NORTHWEST CUSTOM APPAREL - EMBROIDERY QUOTE',
         '================================================',
         `Date: ${new Date().toLocaleDateString()}`,
-        `Customer: ${document.getElementById('customer-name')?.value || 'N/A'}`,
-        `Company: ${document.getElementById('company-name')?.value || 'N/A'}`,
+        `Customer: ${/** @type {HTMLInputElement|null} */ (document.getElementById('customer-name'))?.value || 'N/A'}`,
+        `Company: ${/** @type {HTMLInputElement|null} */ (document.getElementById('company-name'))?.value || 'N/A'}`,
         ''
     ];
 
@@ -700,8 +699,8 @@ export function generateEmbQuoteText(products, serviceItems) {
     const totalQty = document.getElementById('total-qty')?.textContent || '0';
     const tier = document.getElementById('pricing-tier')?.textContent || '1-7';
     const { baseSubtotal, additionalCharges, discount, adjustedSubtotal } = calculateDiscountableSubtotal();
-    const includeTax = document.getElementById('include-tax')?.checked;
-    const taxRatePct = includeTax ? parseRatePercent(document.getElementById('tax-rate-input')?.value, 10.2) : 0;
+    const includeTax = /** @type {HTMLInputElement|null} */ (document.getElementById('include-tax'))?.checked;
+    const taxRatePct = includeTax ? parseRatePercent(/** @type {HTMLInputElement|null} */ (document.getElementById('tax-rate-input'))?.value, 10.2) : 0;
     const taxAmount = Math.round(adjustedSubtotal * (taxRatePct / 100) * 100) / 100;
     const copyTotal = adjustedSubtotal + taxAmount;
 
@@ -764,13 +763,13 @@ export async function printQuote() {
         // address (stashed on customer select); else the ship-to fields when the
         // order actually ships; else none. Pickup ship-to is the Milton SHOP, so
         // it is never used as the billing address. SHIP TO prints only when shipping.
-        const shipMethod = document.getElementById('ship-method')?.value || '';
+        const shipMethod = /** @type {HTMLInputElement|null} */ (document.getElementById('ship-method'))?.value || '';
         const isPickup = shipMethod === 'Customer Pickup';
         const shipFields = {
-            address: document.getElementById('ship-address')?.value || '',
-            city: document.getElementById('ship-city')?.value || '',
-            state: document.getElementById('ship-state')?.value || '',
-            zip: document.getElementById('ship-zip')?.value || ''
+            address: /** @type {HTMLInputElement|null} */ (document.getElementById('ship-address'))?.value || '',
+            city: /** @type {HTMLInputElement|null} */ (document.getElementById('ship-city'))?.value || '',
+            state: /** @type {HTMLInputElement|null} */ (document.getElementById('ship-state'))?.value || '',
+            zip: /** @type {HTMLInputElement|null} */ (document.getElementById('ship-zip'))?.value || ''
         };
         const stash = window._lastCustomerShipTo;
         const stashHasAddr = stash && (stash.address || stash.zip);
@@ -778,20 +777,20 @@ export async function printQuote() {
             ? { address: stash.address, city: stash.city, state: stash.state, zip: stash.zip }
             : (!isPickup ? shipFields : {});
         const customerData = {
-            name: document.getElementById('customer-name')?.value || 'Customer',
-            company: document.getElementById('company-name')?.value || '',
-            project: document.getElementById('project-name')?.value?.trim() || '',  // P2-5 (audit 2026-06-06): show on PDF/invoice
-            isWholesale: document.getElementById('wholesale-checkbox')?.checked || false,  // [2026-06-07]
-            email: document.getElementById('customer-email')?.value || '',
-            phone: document.getElementById('customer-phone')?.value || '',
-            salesRepEmail: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com',
+            name: /** @type {HTMLInputElement|null} */ (document.getElementById('customer-name'))?.value || 'Customer',
+            company: /** @type {HTMLInputElement|null} */ (document.getElementById('company-name'))?.value || '',
+            project: /** @type {HTMLInputElement|null} */ (document.getElementById('project-name'))?.value?.trim() || '',  // P2-5 (audit 2026-06-06): show on PDF/invoice
+            isWholesale: /** @type {HTMLInputElement|null} */ (document.getElementById('wholesale-checkbox'))?.checked || false,  // [2026-06-07]
+            email: /** @type {HTMLInputElement|null} */ (document.getElementById('customer-email'))?.value || '',
+            phone: /** @type {HTMLInputElement|null} */ (document.getElementById('customer-phone'))?.value || '',
+            salesRepEmail: /** @type {HTMLInputElement|null} */ (document.getElementById('sales-rep'))?.value || 'sales@nwcustomapparel.com',
             // Special Notes footer — EMB was the only builder NOT printing its own
             // notes textarea (DTF passes it; the generator supports it). (2026-07-07)
-            notes: document.getElementById('notes')?.value?.trim() || '',
+            notes: /** @type {HTMLInputElement|null} */ (document.getElementById('notes'))?.value?.trim() || '',
             // Production/customer reference fields (2026-06-04 audit: were never on the PDF)
-            poNumber: document.getElementById('po-number')?.value?.trim() || '',
-            dateOrderPlaced: dateFromInputValue(document.getElementById('date-order-placed')?.value),
-            reqShipDate: dateFromInputValue(document.getElementById('req-ship-date')?.value),
+            poNumber: /** @type {HTMLInputElement|null} */ (document.getElementById('po-number'))?.value?.trim() || '',
+            dateOrderPlaced: dateFromInputValue(/** @type {HTMLInputElement|null} */ (document.getElementById('date-order-placed'))?.value),
+            reqShipDate: dateFromInputValue(/** @type {HTMLInputElement|null} */ (document.getElementById('req-ship-date'))?.value),
             billing,
             shipping: (!isPickup && (shipFields.address || shipFields.zip)) ? { ...shipFields, method: shipMethod } : null
         };
@@ -832,8 +831,8 @@ export async function embEmailQuote() {
     }
     await emailQuote({
         quoteId,
-        customerEmail: document.getElementById('customer-email')?.value?.trim(),
-        customerName: document.getElementById('customer-name')?.value?.trim(),
-        salesRepEmail: document.getElementById('sales-rep')?.value
+        customerEmail: /** @type {HTMLInputElement|null} */ (document.getElementById('customer-email'))?.value?.trim(),
+        customerName: /** @type {HTMLInputElement|null} */ (document.getElementById('customer-name'))?.value?.trim(),
+        salesRepEmail: /** @type {HTMLInputElement|null} */ (document.getElementById('sales-rep'))?.value
     });
 }

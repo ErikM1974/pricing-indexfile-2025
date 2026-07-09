@@ -61,6 +61,24 @@ function measureDir(dir) {
   return out;
 }
 
+// T4 (2026-07-09): builders/ typechecks with ZERO file-level suppressions —
+// the 38 @ts-nocheck pragmas were lifted (casts/typedefs/globals.d.ts only).
+// This lock keeps them out for good.
+describe('no @ts-nocheck in builders/ (T4 lift lock)', () => {
+  test('zero file-level suppressions', () => {
+    const offenders = [];
+    const walk = (dir) => {
+      for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+        const pth = path.join(dir, e.name);
+        if (e.isDirectory()) walk(pth);
+        else if (e.name.endsWith('.js') && fs.readFileSync(pth, 'utf8').includes('@ts-nocheck')) offenders.push(pth);
+      }
+    };
+    walk(ROOT);
+    expect(offenders).toEqual([]);
+  });
+});
+
 describe.each(Object.keys(ALLOWLISTS))('builders/%s function-length ratchet', (dirName) => {
   const measured = measureDir(path.join(ROOT, dirName));
   const allow = ALLOWLISTS[dirName];

@@ -4,7 +4,6 @@
  * appliers (Quick Quote + method switch), populate* builders, and resetQuote
  * (the Rule-7 reset checklist). Moved verbatim.
  */
-// @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions; typing lands with the render/state split).
 /* global QuotePersistence, QuoteSession, screenPrintPersistence, Event, history,
    addNewRow, collectProductsFromTable, createChildRow, onSizeChange, onStyleChange,
    selectColor, recalculatePricing, showScpPushButton, updateAdditionalCharges,
@@ -44,10 +43,10 @@ function getScreenPrintQuoteData() {
     return {
         products: collectProductsFromTable(),
         printConfig: { ...scpState.printConfig },
-        customerName: document.getElementById('customer-name')?.value || '',
-        customerEmail: document.getElementById('customer-email')?.value || '',
-        companyName: document.getElementById('company-name')?.value || '',
-        salesRep: document.getElementById('sales-rep')?.value || '',
+        customerName: /** @type {HTMLInputElement|null} */ (document.getElementById('customer-name'))?.value || '',
+        customerEmail: /** @type {HTMLInputElement|null} */ (document.getElementById('customer-email'))?.value || '',
+        companyName: /** @type {HTMLInputElement|null} */ (document.getElementById('company-name'))?.value || '',
+        salesRep: /** @type {HTMLInputElement|null} */ (document.getElementById('sales-rep'))?.value || '',
         timestamp: Date.now()
     };
 }
@@ -58,39 +57,39 @@ export function restoreScreenPrintDraft(draft) {
 
     // Restore customer info
     if (draft.customerName) {
-        const nameEl = document.getElementById('customer-name');
+        const nameEl = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-name'));
         if (nameEl) nameEl.value = draft.customerName;
     }
     if (draft.customerEmail) {
-        const emailEl = document.getElementById('customer-email');
+        const emailEl = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-email'));
         if (emailEl) emailEl.value = draft.customerEmail;
     }
     if (draft.companyName) {
-        const companyEl = document.getElementById('company-name');
+        const companyEl = /** @type {HTMLInputElement|null} */ (document.getElementById('company-name'));
         if (companyEl) companyEl.value = draft.companyName;
     }
     if (draft.salesRep) {
-        const salesRepEl = document.getElementById('sales-rep');
+        const salesRepEl = /** @type {HTMLInputElement|null} */ (document.getElementById('sales-rep'));
         if (salesRepEl) salesRepEl.value = draft.salesRep;
     }
 
     // Restore print configuration
     if (draft.printConfig) {
         // Restore front location
-        const frontRadio = document.querySelector(`input[name="front-location"][value="${draft.printConfig.frontLocation}"]`);
+        const frontRadio = /** @type {HTMLInputElement|null} */ (document.querySelector(`input[name="front-location"][value="${draft.printConfig.frontLocation}"]`));
         if (frontRadio) frontRadio.checked = true;
 
         // Restore front colors
-        const frontColorsRadio = document.querySelector(`input[name="front-colors"][value="${draft.printConfig.frontColors}"]`);
+        const frontColorsRadio = /** @type {HTMLInputElement|null} */ (document.querySelector(`input[name="front-colors"][value="${draft.printConfig.frontColors}"]`));
         if (frontColorsRadio) frontColorsRadio.checked = true;
 
         // Restore back location
-        const backRadio = document.querySelector(`input[name="back-location"][value="${draft.printConfig.backLocation || ''}"]`);
+        const backRadio = /** @type {HTMLInputElement|null} */ (document.querySelector(`input[name="back-location"][value="${draft.printConfig.backLocation || ''}"]`));
         if (backRadio) backRadio.checked = true;
 
         // Restore back colors
         if (draft.printConfig.backLocation) {
-            const backColorsRadio = document.querySelector(`input[name="back-colors"][value="${draft.printConfig.backColors}"]`);
+            const backColorsRadio = /** @type {HTMLInputElement|null} */ (document.querySelector(`input[name="back-colors"][value="${draft.printConfig.backColors}"]`));
             if (backColorsRadio) backColorsRadio.checked = true;
         }
 
@@ -98,25 +97,25 @@ export function restoreScreenPrintDraft(draft) {
         // this an edit-reload silently drops sleeves and re-saves a cheaper quote (Rule 4).
         const draftLeftSleeve = draft.printConfig.leftSleeveColors || 0;
         const draftRightSleeve = draft.printConfig.rightSleeveColors || 0;
-        const leftSleeveToggleEl = document.getElementById('left-sleeve-toggle');
+        const leftSleeveToggleEl = /** @type {HTMLInputElement|null} */ (document.getElementById('left-sleeve-toggle'));
         if (leftSleeveToggleEl) leftSleeveToggleEl.checked = draftLeftSleeve > 0;
         if (draftLeftSleeve > 0) {
-            const lsRadio = document.querySelector(`input[name="left-sleeve-colors"][value="${draftLeftSleeve}"]`);
+            const lsRadio = /** @type {HTMLInputElement|null} */ (document.querySelector(`input[name="left-sleeve-colors"][value="${draftLeftSleeve}"]`));
             if (lsRadio) lsRadio.checked = true;
         }
-        const rightSleeveToggleEl = document.getElementById('right-sleeve-toggle');
+        const rightSleeveToggleEl = /** @type {HTMLInputElement|null} */ (document.getElementById('right-sleeve-toggle'));
         if (rightSleeveToggleEl) rightSleeveToggleEl.checked = draftRightSleeve > 0;
         if (draftRightSleeve > 0) {
-            const rsRadio = document.querySelector(`input[name="right-sleeve-colors"][value="${draftRightSleeve}"]`);
+            const rsRadio = /** @type {HTMLInputElement|null} */ (document.querySelector(`input[name="right-sleeve-colors"][value="${draftRightSleeve}"]`));
             if (rsRadio) rsRadio.checked = true;
         }
 
         // Restore dark garment toggle
-        const darkGarmentToggle = document.getElementById('dark-garment-toggle');
+        const darkGarmentToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('dark-garment-toggle'));
         if (darkGarmentToggle) darkGarmentToggle.checked = draft.printConfig.isDarkGarment || false;
 
         // Restore safety stripes toggle
-        const safetyStripesToggle = document.getElementById('safety-stripes-toggle');
+        const safetyStripesToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('safety-stripes-toggle'));
         if (safetyStripesToggle) safetyStripesToggle.checked = draft.printConfig.isSafetyStripes || false;
 
         // Update config state
@@ -162,7 +161,7 @@ export function restoreScreenPrintDraft(draft) {
                     if (qty > 0) {
                         const sizeInput = row.querySelector(`input[data-size="${size}"]`);
                         if (sizeInput) {
-                            sizeInput.value = qty;
+                            /** @type {HTMLInputElement} */ (sizeInput).value = qty;
                             restoredAny = true;
                         }
                     }
@@ -201,18 +200,18 @@ export function markScreenPrintDirty() {
  */
 function populateAdditionalCharges(session) {
     // Art charge
-    const artChargeToggle = document.getElementById('art-charge-toggle');
-    const artChargeInput = document.getElementById('art-charge');
+    const artChargeToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('art-charge-toggle'));
+    const artChargeInput = /** @type {HTMLInputElement|null} */ (document.getElementById('art-charge'));
     const artChargeWrapper = document.getElementById('art-charge-wrapper');
     if (session.ArtCharge > 0 && artChargeToggle && artChargeInput) {
         artChargeToggle.checked = true;
         artChargeInput.disabled = false;
-        artChargeInput.value = session.ArtCharge;
+        /** @type {HTMLInputElement} */ (artChargeInput).value = session.ArtCharge;
         if (artChargeWrapper) artChargeWrapper.style.opacity = '1';
     }
 
     // Graphic design hours
-    const designHoursInput = document.getElementById('graphic-design-hours');
+    const designHoursInput = /** @type {HTMLInputElement|null} */ (document.getElementById('graphic-design-hours'));
     if (session.GraphicDesignHours > 0 && designHoursInput) {
         designHoursInput.value = session.GraphicDesignHours;
         // Update the calculated total display
@@ -223,7 +222,7 @@ function populateAdditionalCharges(session) {
     }
 
     // Rush fee
-    const rushFeeInput = document.getElementById('rush-fee');
+    const rushFeeInput = /** @type {HTMLInputElement|null} */ (document.getElementById('rush-fee'));
     if (session.RushFee > 0 && rushFeeInput) {
         rushFeeInput.value = session.RushFee;
     }
@@ -232,20 +231,20 @@ function populateAdditionalCharges(session) {
     // the Notes JSON (not session columns), so parse them out to restore the controls.
     let _scpNotes = {};
     try { _scpNotes = typeof session.Notes === 'string' ? JSON.parse(session.Notes || '{}') : (session.Notes || {}); } catch (_) { _scpNotes = {}; }
-    const vellumQtyInput = document.getElementById('vellum-qty');
+    const vellumQtyInput = /** @type {HTMLInputElement|null} */ (document.getElementById('vellum-qty'));
     if (vellumQtyInput && parseInt(_scpNotes.vellumQty, 10) > 0) {
-        vellumQtyInput.value = parseInt(_scpNotes.vellumQty, 10);
+        vellumQtyInput.value = /** @type {any} */ (parseInt(_scpNotes.vellumQty, 10));
     }
-    const colorChangeQtyInput = document.getElementById('color-change-qty');
+    const colorChangeQtyInput = /** @type {HTMLInputElement|null} */ (document.getElementById('color-change-qty'));
     if (colorChangeQtyInput && parseInt(_scpNotes.colorChangeQty, 10) > 0) {
-        colorChangeQtyInput.value = parseInt(_scpNotes.colorChangeQty, 10);
+        colorChangeQtyInput.value = /** @type {any} */ (parseInt(_scpNotes.colorChangeQty, 10));
     }
 
     // Discount
-    const discountAmountInput = document.getElementById('discount-amount');
-    const discountTypeSelect = document.getElementById('discount-type');
-    const discountReasonInput = document.getElementById('discount-reason');
-    const discountPreset = document.getElementById('discount-preset');
+    const discountAmountInput = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-amount'));
+    const discountTypeSelect = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-type'));
+    const discountReasonInput = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-reason'));
+    const discountPreset = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-preset'));
     if ((session.Discount > 0 || session.DiscountPercent > 0) && discountAmountInput) {
         if (session.DiscountPercent > 0) {
             if (discountTypeSelect) discountTypeSelect.value = 'percent';
@@ -257,30 +256,30 @@ function populateAdditionalCharges(session) {
                 if (presetValues.includes(percentStr)) {
                     discountPreset.value = percentStr;
                 } else {
-                    discountPreset.value = 'custom';
+                    /** @type {HTMLInputElement} */ (discountPreset).value = 'custom';
                 }
             }
         } else {
-            if (discountTypeSelect) discountTypeSelect.value = 'fixed';
-            discountAmountInput.value = session.Discount;
+            if (discountTypeSelect) /** @type {HTMLInputElement} */ (discountTypeSelect).value = 'fixed';
+            /** @type {HTMLInputElement} */ (discountAmountInput).value = session.Discount;
         }
         // Restore discount reason with preset detection
         if (session.DiscountReason) {
-            const reasonPreset = document.getElementById('discount-reason-preset');
+            const reasonPreset = /** @type {HTMLSelectElement|null} */ (document.getElementById('discount-reason-preset'));
             if (reasonPreset && discountReasonInput) {
                 const presetValues = Array.from(reasonPreset.options)
                     .map(opt => opt.value)
                     .filter(v => v !== 'custom');
                 if (presetValues.includes(session.DiscountReason)) {
                     // Exact match to preset
-                    reasonPreset.value = session.DiscountReason;
+                    /** @type {HTMLSelectElement} */ (reasonPreset).value = session.DiscountReason;
                     discountReasonInput.style.display = 'none';
                     discountReasonInput.value = session.DiscountReason;
                 } else {
                     // Custom reason
-                    reasonPreset.value = 'custom';
+                    /** @type {HTMLSelectElement} */ (reasonPreset).value = 'custom';
                     discountReasonInput.style.display = 'block';
-                    discountReasonInput.value = session.DiscountReason;
+                    /** @type {HTMLInputElement} */ (discountReasonInput).value = session.DiscountReason;
                 }
             }
         }
@@ -289,7 +288,7 @@ function populateAdditionalCharges(session) {
             updateDiscountType();
         }
         // If custom percentage, ensure input wrapper is visible
-        if (session.DiscountPercent > 0 && discountPreset && discountPreset.value === 'custom') {
+        if (session.DiscountPercent > 0 && discountPreset && /** @type {HTMLInputElement} */ (discountPreset).value === 'custom') {
             const inputWrapper = document.getElementById('discount-input-wrapper');
             const prefix = document.getElementById('discount-prefix');
             if (inputWrapper) inputWrapper.style.display = 'flex';
@@ -315,25 +314,25 @@ function populatePrintConfigFromSession(session) {
 
         // Set front location
         if (notes.frontLocation) {
-            const frontRadio = document.querySelector(`input[name="front-location"][value="${notes.frontLocation}"]`);
+            const frontRadio = /** @type {HTMLInputElement|null} */ (document.querySelector(`input[name="front-location"][value="${notes.frontLocation}"]`));
             if (frontRadio) frontRadio.checked = true;
         }
 
         // Set front colors
         if (notes.frontColors) {
-            const frontColorsRadio = document.querySelector(`input[name="front-colors"][value="${notes.frontColors}"]`);
+            const frontColorsRadio = /** @type {HTMLInputElement|null} */ (document.querySelector(`input[name="front-colors"][value="${notes.frontColors}"]`));
             if (frontColorsRadio) frontColorsRadio.checked = true;
         }
 
         // Set back location
         if (notes.backLocation) {
-            const backRadio = document.querySelector(`input[name="back-location"][value="${notes.backLocation}"]`);
+            const backRadio = /** @type {HTMLInputElement|null} */ (document.querySelector(`input[name="back-location"][value="${notes.backLocation}"]`));
             if (backRadio) backRadio.checked = true;
         }
 
         // Set back colors
         if (notes.backColors) {
-            const backColorsRadio = document.querySelector(`input[name="back-colors"][value="${notes.backColors}"]`);
+            const backColorsRadio = /** @type {HTMLInputElement|null} */ (document.querySelector(`input[name="back-colors"][value="${notes.backColors}"]`));
             if (backColorsRadio) backColorsRadio.checked = true;
         }
 
@@ -342,24 +341,24 @@ function populatePrintConfigFromSession(session) {
         const noteLeftSleeve = notes.leftSleeveColors || 0;
         const noteRightSleeve = notes.rightSleeveColors || 0;
         if (noteLeftSleeve > 0) {
-            const lst = document.getElementById('left-sleeve-toggle'); if (lst) lst.checked = true;
-            const lsr = document.querySelector(`input[name="left-sleeve-colors"][value="${noteLeftSleeve}"]`);
+            const lst = /** @type {HTMLInputElement|null} */ (document.getElementById('left-sleeve-toggle')); if (lst) lst.checked = true;
+            const lsr = /** @type {HTMLInputElement|null} */ (document.querySelector(`input[name="left-sleeve-colors"][value="${noteLeftSleeve}"]`));
             if (lsr) lsr.checked = true;
         }
         if (noteRightSleeve > 0) {
-            const rst = document.getElementById('right-sleeve-toggle'); if (rst) rst.checked = true;
-            const rsr = document.querySelector(`input[name="right-sleeve-colors"][value="${noteRightSleeve}"]`);
+            const rst = /** @type {HTMLInputElement|null} */ (document.getElementById('right-sleeve-toggle')); if (rst) rst.checked = true;
+            const rsr = /** @type {HTMLInputElement|null} */ (document.querySelector(`input[name="right-sleeve-colors"][value="${noteRightSleeve}"]`));
             if (rsr) rsr.checked = true;
         }
 
         // Set dark garment toggle
         if (notes.isDarkGarment) {
-            document.getElementById('dark-garment-toggle').checked = true;
+            /** @type {HTMLInputElement} */ (document.getElementById('dark-garment-toggle')).checked = true;
         }
 
         // Set safety stripes toggle
         if (notes.hasSafetyStripes) {
-            document.getElementById('safety-stripes-toggle').checked = true;
+            /** @type {HTMLInputElement} */ (document.getElementById('safety-stripes-toggle')).checked = true;
         }
 
         // Trigger update to recalculate screens and fees
@@ -425,7 +424,7 @@ export async function addProductFromQuote(product) {
     const styleInput = row.querySelector('.style-input');
 
     // Set style number and trigger product loading
-    styleInput.value = product.styleNumber;
+    /** @type {HTMLInputElement} */ (styleInput).value = product.styleNumber;
     await onStyleChange(styleInput, parseInt(rowId));
 
     // Small delay to let colors load
@@ -457,7 +456,7 @@ export async function addProductFromQuote(product) {
             if (['S', 'M', 'L', 'XL', '2XL'].includes(size)) {
                 const sizeInput = row.querySelector(`input[data-size="${size}"]`);
                 if (sizeInput) {
-                    sizeInput.value = qty;
+                    /** @type {HTMLInputElement} */ (sizeInput).value = qty;
                     sizeInput.dispatchEvent(new Event('change', { bubbles: true }));
                     touchedSizes = true;
                 }
@@ -469,7 +468,7 @@ export async function addProductFromQuote(product) {
                 // in place, but REMOVES it when the parent input reads 0.
                 createChildRow(rowIdNum, 'XXL', qty);
                 const parent2x = row.querySelector('input[data-size="2XL"]');
-                if (parent2x) parent2x.value = qty;
+                if (parent2x) /** @type {HTMLInputElement} */ (parent2x).value = qty;
                 touchedSizes = true;
             } else {
                 // Extended sizes (XS, 3XL+, talls): child rows — mirrors the Quick-Quote
@@ -580,11 +579,11 @@ export async function loadQuoteForEditing(quoteId, opts = {}) {
         // [2026-06-08] P0 (#1 rule): restore the saved tax rate — setOrderShippingData does NOT touch #tax-rate-input,
         // so a reopened exempt/out-of-state quote (saved TaxRate 0) defaulted to 10.1% and re-taxed on Save Revision.
         var _savedRate = parseFloat(session.TaxRate);
-        if (Number.isFinite(_savedRate)) { var _rateEl = document.getElementById('tax-rate-input'); if (_rateEl) _rateEl.value = _savedRate; }
+        if (Number.isFinite(_savedRate)) { var _rateEl = document.getElementById('tax-rate-input'); if (_rateEl) /** @type {HTMLInputElement} */ (_rateEl).value = /** @type {any} */ (_savedRate); }
         // [2026-06-08] restore the per-order wholesale flag + checkbox on edit-reload (mirror EMB)
         window._isWholesale = (session.IsWholesale === 'Yes' || session.IsWholesale === true || session.IsWholesale === 1);
-        { var _wcb = document.getElementById('wholesale-checkbox'); if (_wcb) _wcb.checked = window._isWholesale; }
-        if (window._isWholesale) { var _it = document.getElementById('include-tax'); if (_it) _it.checked = false; }
+        { var _wcb = document.getElementById('wholesale-checkbox'); if (_wcb) /** @type {HTMLInputElement} */ (_wcb).checked = window._isWholesale; }
+        if (window._isWholesale) { var _it = document.getElementById('include-tax'); if (_it) /** @type {HTMLInputElement} */ (_it).checked = false; }
         // setOrderShippingData reads data.notes||data.Notes into .os-notes, but the SCP
         // session has NO flat `notes` — only the structured `Notes` JSON blob
         // (locations/colors/userNotes). So the raw JSON dumped into the notes textarea
@@ -592,7 +591,7 @@ export async function loadQuoteForEditing(quoteId, opts = {}) {
         // Extract just the human note. (2026-06-01)
         try {
             const _scpNotes = JSON.parse(session.Notes || '{}');
-            const _noteEl = document.querySelector('#spc-order-fields .os-notes');
+            const _noteEl = /** @type {HTMLInputElement|null} */ (document.querySelector('#spc-order-fields .os-notes'));
             if (_noteEl) _noteEl.value = _scpNotes.userNotes || '';
         } catch (_) { /* Notes wasn't JSON — leave whatever setOrderShippingData set */ }
 
@@ -643,7 +642,7 @@ export async function duplicateQuote(sourceQuoteId) {
 
     // Order-specific fields must not carry over — order #/PO/dates belong to the ORIGINAL order
     ['.os-order-number', '.os-po-number', '.os-req-ship-date', '.os-drop-dead-date'].forEach(sel => {
-        const el = document.querySelector('#spc-order-fields ' + sel);
+        const el = /** @type {HTMLInputElement|null} */ (document.querySelector('#spc-order-fields ' + sel));
         if (el) el.value = '';
     });
 
@@ -673,15 +672,15 @@ export async function duplicateQuote(sourceQuoteId) {
 // resetQuote (state/edit/draft cleanup stays in the orchestrator).
 function _resetScpFormFields() {
     // Reset customer form fields
-    document.getElementById('customer-name').value = '';
-    document.getElementById('customer-email').value = '';
-    document.getElementById('company-name').value = '';
-    const _cnReset = document.getElementById('customer-number');
+    /** @type {HTMLInputElement} */ (document.getElementById('customer-name')).value = '';
+    /** @type {HTMLInputElement} */ (document.getElementById('customer-email')).value = '';
+    /** @type {HTMLInputElement} */ (document.getElementById('company-name')).value = '';
+    const _cnReset = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-number'));
     if (_cnReset) _cnReset.value = '';
-    document.getElementById('customer-lookup').value = '';
+    /** @type {HTMLInputElement} */ (document.getElementById('customer-lookup')).value = '';
     // Clear design # + uploaded-artwork widget so the prior quote's design link +
     // hosted logo/new-design name don't bleed into the next push. (2026-06-01)
-    const _dnReset = document.getElementById('design-number');
+    const _dnReset = /** @type {HTMLInputElement|null} */ (document.getElementById('design-number'));
     if (_dnReset) _dnReset.value = '';
     try { if (window._scpArtwork && typeof window._scpArtwork.clear === 'function') window._scpArtwork.clear(); } catch (_) {}
     try { if (window._scpDesignCombobox && typeof window._scpDesignCombobox.refresh === 'function') window._scpDesignCombobox.refresh(); } catch (_) {}
@@ -693,37 +692,37 @@ function _resetScpFormFields() {
     // re-render the PRIOR quote's address on a new quote. SCP-local; does NOT touch the shared util. (adversarial-review gap)
     ['.os-ship-address', '.os-ship-city', '.os-ship-zip', '.os-ship-method'].forEach(function (s) {
         var el = document.querySelector('#spc-order-fields ' + s);
-        if (el) el.value = '';
+        if (el) /** @type {HTMLInputElement} */ (el).value = '';
     });
     var _shipStateReset = document.querySelector('#spc-order-fields .os-ship-state');
-    if (_shipStateReset) _shipStateReset.value = 'WA';
+    if (_shipStateReset) /** @type {HTMLInputElement} */ (_shipStateReset).value = 'WA';
     var _shipFeeReset = document.querySelector('#spc-order-fields .os-shipping-fee');
-    if (_shipFeeReset) _shipFeeReset.value = '0';
-    const taxRateReset = document.getElementById('tax-rate-input');
+    if (_shipFeeReset) /** @type {HTMLInputElement} */ (_shipFeeReset).value = '0';
+    const taxRateReset = /** @type {HTMLInputElement|null} */ (document.getElementById('tax-rate-input'));
     if (taxRateReset) taxRateReset.value = '10.2';
 
     // Reset additional charges
-    const rushFee = document.getElementById('rush-fee');
-    const discountAmount = document.getElementById('discount-amount');
-    const discountReason = document.getElementById('discount-reason');
+    const rushFee = /** @type {HTMLInputElement|null} */ (document.getElementById('rush-fee'));
+    const discountAmount = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-amount'));
+    const discountReason = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-reason'));
     if (rushFee) rushFee.value = '';
     if (discountAmount) discountAmount.value = '';
     if (discountReason) discountReason.value = '';
     // Reset screen-print setup parts (Erik's official list, 2026-06-27)
-    const vellumQtyReset = document.getElementById('vellum-qty');
-    const colorChangeQtyReset = document.getElementById('color-change-qty');
+    const vellumQtyReset = /** @type {HTMLInputElement|null} */ (document.getElementById('vellum-qty'));
+    const colorChangeQtyReset = /** @type {HTMLInputElement|null} */ (document.getElementById('color-change-qty'));
     if (vellumQtyReset) vellumQtyReset.value = '';
     if (colorChangeQtyReset) colorChangeQtyReset.value = '';
 
     // Reset artwork services
-    const artChargeToggle = document.getElementById('art-charge-toggle');
-    const artCharge = document.getElementById('art-charge');
+    const artChargeToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('art-charge-toggle'));
+    const artCharge = /** @type {HTMLInputElement|null} */ (document.getElementById('art-charge'));
     const artChargeWrapper = document.getElementById('art-charge-wrapper');
-    const graphicDesignHours = document.getElementById('graphic-design-hours');
+    const graphicDesignHours = /** @type {HTMLInputElement|null} */ (document.getElementById('graphic-design-hours'));
     if (artChargeToggle) artChargeToggle.checked = false;
     if (artCharge) {
         artCharge.value = '0';
-        artCharge.disabled = true;
+        /** @type {HTMLInputElement} */ (artCharge).disabled = true;
     }
     if (artChargeWrapper) artChargeWrapper.style.opacity = '0.4';
     if (graphicDesignHours) graphicDesignHours.value = '';
@@ -784,18 +783,18 @@ export function resetQuote() {
     // TypeError that ABORTED the whole reset — leaving the prior customer, fees, and
     // tax rate in the next "New Quote" (wrong-customer/price risk). Select radios by
     // name, and use the real toggle ids (…-toggle). (2026-06-01)
-    const frontLocLC = document.querySelector('input[name="front-location"][value="LC"]');
+    const frontLocLC = /** @type {HTMLInputElement|null} */ (document.querySelector('input[name="front-location"][value="LC"]'));
     if (frontLocLC) frontLocLC.checked = true;
-    document.querySelectorAll('input[name="back-location"]').forEach(r => r.checked = false);
-    const frontColors1 = document.querySelector('input[name="front-colors"][value="1"]');
+    document.querySelectorAll('input[name="back-location"]').forEach(r => /** @type {HTMLInputElement} */ (r).checked = false);
+    const frontColors1 = /** @type {HTMLInputElement|null} */ (document.querySelector('input[name="front-colors"][value="1"]'));
     if (frontColors1) frontColors1.checked = true;
-    const backColors1 = document.querySelector('input[name="back-colors"][value="1"]');
+    const backColors1 = /** @type {HTMLInputElement|null} */ (document.querySelector('input[name="back-colors"][value="1"]'));
     if (backColors1) backColors1.checked = true;
     // Clear sleeves (toggles off + colors back to 1) so they don't bleed into the next quote
-    ['left-sleeve-toggle', 'right-sleeve-toggle'].forEach(id => { const t = document.getElementById(id); if (t) t.checked = false; });
-    ['left-sleeve-colors', 'right-sleeve-colors'].forEach(name => { const r = document.querySelector(`input[name="${name}"][value="1"]`); if (r) r.checked = true; });
-    const darkGarmentToggle = document.getElementById('dark-garment-toggle');
-    const safetyToggle = document.getElementById('safety-stripes-toggle');
+    ['left-sleeve-toggle', 'right-sleeve-toggle'].forEach(id => { const t = /** @type {HTMLInputElement|null} */ (document.getElementById(id)); if (t) t.checked = false; });
+    ['left-sleeve-colors', 'right-sleeve-colors'].forEach(name => { const r = /** @type {HTMLInputElement|null} */ (document.querySelector(`input[name="${name}"][value="1"]`)); if (r) r.checked = true; });
+    const darkGarmentToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('dark-garment-toggle'));
+    const safetyToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('safety-stripes-toggle'));
     if (darkGarmentToggle) darkGarmentToggle.checked = false;
     if (safetyToggle) safetyToggle.checked = false;
 
@@ -829,8 +828,8 @@ export function resetQuote() {
     try { const _r = recalculatePricing(); if (_r && typeof _r.catch === 'function') _r.catch(() => {}); } catch (_) {}
 
     // [2026-06-08] P0: clear tax-exempt/wholesale flags on New Quote (else they bleed into the next quote)
-    window._taxExempt = false; window._isWholesale = false; { const _wcb = document.getElementById('wholesale-checkbox'); if (_wcb) _wcb.checked = false; const _it = document.getElementById('include-tax'); if (_it) _it.checked = true; }  // [2026-06-08] P0: re-check include-tax on New Quote (else next quote after a wholesale/exempt one bills $0 tax)
-    { const _r = document.getElementById('ship-residential'); if (_r) _r.checked = false; const _er = document.getElementById('estimate-ship-result'); if (_er) _er.innerHTML = ''; window._lastShipEstimate = null; }  // [2026-06-08] clear estimator state on New Quote (residential flag + result text + last estimate shouldn't bleed)
+    window._taxExempt = false; window._isWholesale = false; { const _wcb = /** @type {HTMLInputElement|null} */ (document.getElementById('wholesale-checkbox')); if (_wcb) _wcb.checked = false; const _it = document.getElementById('include-tax'); if (_it) /** @type {HTMLInputElement} */ (_it).checked = true; }  // [2026-06-08] P0: re-check include-tax on New Quote (else next quote after a wholesale/exempt one bills $0 tax)
+    { const _r = /** @type {HTMLInputElement|null} */ (document.getElementById('ship-residential')); if (_r) _r.checked = false; const _er = document.getElementById('estimate-ship-result'); if (_er) _er.innerHTML = ''; window._lastShipEstimate = null; }  // [2026-06-08] clear estimator state on New Quote (residential flag + result text + last estimate shouldn't bleed)
     // [2026-06-08] clear the order-summary band on Reset / New Quote (recalc may short-circuit on the empty quote)
     if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();
 

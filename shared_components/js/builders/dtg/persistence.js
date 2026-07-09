@@ -2,7 +2,6 @@
  * DTG inline form — persistence module (Batch 5, 2026-07-09). Moved VERBATIM from the
  * dtg-inline-form.js IIFE; lexical references became the imports below.
  */
-// @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions).
 /* global alert, assertQuoteEditable,
    markAsUnsaved, markAsSaved, showToast,
    */
@@ -219,7 +218,7 @@ export async function fillFromQuote(priceQuote, customerFinal) {
         state.customer.terms = customerFinal.payment_terms || customerFinal.terms || state.customer.terms;
 
         // Reflect into DOM
-        const set = (id, val) => { const el = document.getElementById(id); if (el && val) el.value = val; };
+        const set = (id, val) => { const el = /** @type {HTMLInputElement|null} */ (document.getElementById(id)); if (el && val) el.value = val; };
         set('dtgCompanyInput', state.customer.company);
         set('dtgCompanyId', state.customer.companyId);
         set('dtgFirstName', state.customer.firstName);
@@ -227,7 +226,7 @@ export async function fillFromQuote(priceQuote, customerFinal) {
         set('dtgEmail', state.customer.email);
         set('dtgPhone', state.customer.phone);
         set('dtgDesignNumber', state.customer.designNumber);
-        const termsSel = document.getElementById('dtgTerms');
+        const termsSel = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgTerms'));
         if (termsSel && state.customer.terms) termsSel.value = state.customer.terms;
     }
 
@@ -279,7 +278,7 @@ export function resetForm() {
     state.front = 'LC';
     state.back = '';
     state.rows = [newBlankRow()];
-    state.customer = {
+    state.customer = /** @type {typeof state.customer} */ ({
         company: '', companyId: '', contactId: '',
         firstName: '', lastName: '', email: '', phone: '',
         state: '', city: '', po: '',
@@ -288,7 +287,7 @@ export function resetForm() {
         // [2026-06-08] Phase 1 — MUST reset the tax flags or they bleed into the next
         // quote (a prior wholesale/exempt would keep zeroing tax on a fresh order).
         isWholesale: false, isTaxExempt: false, taxExemptNumber: '',
-    };
+    });
     state.shipping = {
         method: 'Customer Pickup',  // matches the default in state init (top of file)
         address1: '', address2: '', city: '', state: '', zip: '',
@@ -348,22 +347,22 @@ function restoreEditShipTaxControls() {
     // one rep click on the wrongly-ON toggle would flip method→pickup and recompute 10.2%,
     // silently re-taxing an out-of-state (0%) or mis-taxing an in-WA-destination quote.
     try {
-        const incEl = document.getElementById('include-tax');
+        const incEl = /** @type {HTMLInputElement|null} */ (document.getElementById('include-tax'));
         if (incEl) incEl.checked = state.shipping.includeTax !== false;
-        const rateEl = document.getElementById('tax-rate-input');
+        const rateEl = /** @type {HTMLInputElement|null} */ (document.getElementById('tax-rate-input'));
         if (rateEl) rateEl.value = state.shipping.taxRateOverride != null ? state.shipping.taxRateOverride : '';
-        const wholeEl = document.getElementById('wholesale-checkbox');
+        const wholeEl = /** @type {HTMLInputElement|null} */ (document.getElementById('wholesale-checkbox'));
         if (wholeEl) wholeEl.checked = state.customer.isWholesale;
         // Ship method + address inputs + pickup toggle / ship-to block visibility.
-        const methodEl = document.getElementById('dtgShipMethod');
+        const methodEl = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgShipMethod'));
         if (methodEl) methodEl.value = state.shipping.method || 'Customer Pickup';
-        const setShip = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+        const setShip = (id, val) => { const el = /** @type {HTMLInputElement|null} */ (document.getElementById(id)); if (el) el.value = val || ''; };
         setShip('dtgShipAddress1', state.shipping.address1);
         setShip('dtgShipCity', state.shipping.city);
         setShip('dtgShipState', state.shipping.state);
         setShip('dtgShipZip', state.shipping.zip);
         // [2026-06-09] Phase 2 — re-sync the billed shipping-charge input (blank when 0).
-        const feeEl = document.getElementById('dtgShipFee');
+        const feeEl = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgShipFee'));
         if (feeEl) feeEl.value = Number(state.shipping.fee) > 0 ? Number(state.shipping.fee).toFixed(2) : '';
         if (typeof syncPickupToggleFromShipMethod === 'function') syncPickupToggleFromShipMethod();
     } catch (_) { /* controls may be absent on older markup */ }

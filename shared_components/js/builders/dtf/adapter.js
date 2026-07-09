@@ -8,7 +8,6 @@
  * lives in initPricingAndRoute and setupPage is a documented no-op — the
  * real split lands when the constructor's init is unpacked (post-0.4).
  */
-// @ts-nocheck — MOVED legacy init code (pre-existing checkJs frictions).
 /* global closeExtendedSizePopup, updateDtfPushButtonState, SafetyStripeRecs, ArtworkUpload, CustomerDesignCombobox,
    loadServiceCodePrices, getServicePrice, showToast */
 import { DTFQuoteBuilder } from './quote-builder-class.js';
@@ -141,7 +140,7 @@ export class DtfAdapter {
                     window._dtfDesignCombobox = CustomerDesignCombobox.attach(designInput, {
                         method: 'dtf',
                         getCustomerId: () => {
-                            const v = document.getElementById('customer-number')?.value?.trim();
+                            const v = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-number'))?.value?.trim();
                             const n = parseInt(v, 10);
                             return Number.isFinite(n) && n > 0 ? n : null;
                         },

@@ -3,16 +3,15 @@
  * Additional charges (art/rush/fees), discount controls + presets, and the
  * fee-table renderer. Moved verbatim.
  */
-// @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions; typing lands with the render/state split).
 /* global recalculatePricing, updateTaxCalculation, markScreenPrintDirty,
    escapeHtml, formatPrice, getServicePrice, autoExpandFeesOnFirstCharge,
    getSharedRushRate, Event, showToast */
 import { scpState, SCREEN_FEE } from './state.js';
 
 export function updateAdditionalCharges() {
-    const artChargeToggle = document.getElementById('art-charge-toggle');
-    const artCharge = artChargeToggle?.checked ? parseFloat(document.getElementById('art-charge')?.value || 0) : 0;
-    const designHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
+    const artChargeToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('art-charge-toggle'));
+    const artCharge = artChargeToggle?.checked ? parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('art-charge'))?.value || /** @type {any} */ (0)) : 0;
+    const designHours = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('graphic-design-hours'))?.value || /** @type {any} */ (0));
     const grtRate = getServicePrice('GRT-75', 75);
     // Missing-service-code visible warning — shared helper (quote-builder-utils.js),
     // synced with DTF/EMB (2026-07-04, Erik's #1 rule). Covers the silent case where
@@ -21,8 +20,8 @@ export function updateAdditionalCharges() {
         window.warnIfServiceCodeMissing('GRT-75', grtRate, 'Graphic-design');
     }
     const designFee = designHours * grtRate;
-    const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
-    const discountAmount = parseFloat(document.getElementById('discount-amount')?.value || 0);
+    const rushFee = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('rush-fee'))?.value || /** @type {any} */ (0));
+    const discountAmount = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('discount-amount'))?.value || /** @type {any} */ (0));
     const badge = document.getElementById('charges-badge');
 
     // Vellum + Color Change (Erik's official setup parts, 2026-06-27)
@@ -51,11 +50,11 @@ export function updateAdditionalCharges() {
 }
 
 export function updateDiscountType() {
-    const discountType = document.getElementById('discount-type')?.value;
+    const discountType = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-type'))?.value;
     const prefix = document.getElementById('discount-prefix');
     const inputWrapper = document.getElementById('discount-input-wrapper');
-    const presetDropdown = document.getElementById('discount-preset');
-    const amountInput = document.getElementById('discount-amount');
+    const presetDropdown = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-preset'));
+    const amountInput = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-amount'));
 
     if (discountType === 'percent') {
         // Show preset dropdown, hide number input
@@ -63,7 +62,7 @@ export function updateDiscountType() {
         if (presetDropdown) presetDropdown.style.display = 'block';
         // Set amount from preset (unless custom is selected)
         if (presetDropdown && presetDropdown.value !== 'custom') {
-            if (amountInput) amountInput.value = presetDropdown.value;
+            if (amountInput) amountInput.value = /** @type {HTMLInputElement} */ (presetDropdown).value;
         }
     } else {
         // Show number input, hide preset dropdown
@@ -77,9 +76,9 @@ export function updateDiscountType() {
 
 // eslint-disable-next-line no-unused-vars -- dead in the monolith too (zero callers repo-wide, incl. generated markup); kept verbatim (S1b).
 function handleDiscountPresetChange() {
-    const preset = document.getElementById('discount-preset')?.value;
+    const preset = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-preset'))?.value;
     const inputWrapper = document.getElementById('discount-input-wrapper');
-    const amountInput = document.getElementById('discount-amount');
+    const amountInput = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-amount'));
     const prefix = document.getElementById('discount-prefix');
 
     if (preset === 'custom') {
@@ -97,8 +96,8 @@ function handleDiscountPresetChange() {
 
 // eslint-disable-next-line no-unused-vars -- dead in the monolith too (zero callers repo-wide, incl. generated markup); kept verbatim (S1b).
 function handleDiscountReasonPresetChange() {
-    const preset = document.getElementById('discount-reason-preset')?.value;
-    const customInput = document.getElementById('discount-reason');
+    const preset = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-reason-preset'))?.value;
+    const customInput = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-reason'));
 
     if (preset === 'custom') {
         // Show custom input and focus it
@@ -111,7 +110,7 @@ function handleDiscountReasonPresetChange() {
         // Hide custom input and use preset value
         if (customInput) {
             customInput.style.display = 'none';
-            customInput.value = preset;
+            /** @type {HTMLInputElement} */ (customInput).value = preset;
         }
     }
     updateFeeTableRows();
@@ -128,9 +127,9 @@ function handleDiscountReasonPresetChange() {
 // change needs no deploy (Pricing=API rule). One source for the tax calc,
 // fee-table rows, badge, and save path so they can't disagree.
 export function getScpExtraFees() {
-    const vellumQty = Math.max(0, parseInt(document.getElementById('vellum-qty')?.value || 0, 10) || 0);
+    const vellumQty = Math.max(0, parseInt(/** @type {HTMLInputElement|null} */ (document.getElementById('vellum-qty'))?.value || /** @type {any} */ (0), 10) || /** @type {any} */ (0));
     const vellumPrice = getServicePrice('Vellum', 10);
-    const colorChangeQty = Math.max(0, parseInt(document.getElementById('color-change-qty')?.value || 0, 10) || 0);
+    const colorChangeQty = Math.max(0, parseInt(/** @type {HTMLInputElement|null} */ (document.getElementById('color-change-qty'))?.value || /** @type {any} */ (0), 10) || /** @type {any} */ (0));
     const colorChangePrice = getServicePrice('Color Chg', 15);
     return {
         vellumQty, vellumPrice, vellumFee: vellumQty * vellumPrice,
@@ -160,8 +159,8 @@ export function updateFeeTableRows() {
 
     // Art charge row
     const artChargeRow = document.getElementById('art-charge-row');
-    const artChargeToggle = document.getElementById('art-charge-toggle');
-    const artCharge = parseFloat(document.getElementById('art-charge')?.value || 0);
+    const artChargeToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('art-charge-toggle'));
+    const artCharge = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('art-charge'))?.value || /** @type {any} */ (0));
     if (artChargeRow) {
         if (artChargeToggle?.checked && artCharge > 0) {
             artChargeRow.style.display = 'table-row';
@@ -174,12 +173,12 @@ export function updateFeeTableRows() {
 
     // Graphic design row
     const graphicDesignRow = document.getElementById('graphic-design-row');
-    const designHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
+    const designHours = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('graphic-design-hours'))?.value || /** @type {any} */ (0));
     const designTotal = designHours * getServicePrice('GRT-75', 75);
     if (graphicDesignRow) {
         if (designHours > 0) {
             graphicDesignRow.style.display = 'table-row';
-            document.getElementById('design-hours-label').textContent = designHours;
+            document.getElementById('design-hours-label').textContent = /** @type {any} */ (designHours);
             document.getElementById('graphic-design-unit').textContent = '$' + designTotal.toFixed(2);
             document.getElementById('graphic-design-total-row').textContent = '$' + designTotal.toFixed(2);
         } else {
@@ -189,7 +188,7 @@ export function updateFeeTableRows() {
 
     // Rush fee row
     const rushFeeRow = document.getElementById('rush-fee-row');
-    const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
+    const rushFee = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('rush-fee'))?.value || /** @type {any} */ (0));
     if (rushFeeRow) {
         if (rushFee > 0) {
             rushFeeRow.style.display = 'table-row';
@@ -206,9 +205,9 @@ export function updateFeeTableRows() {
     if (vellumRow) {
         if (_xf.vellumQty > 0) {
             vellumRow.style.display = 'table-row';
-            const vql = document.getElementById('vellum-qty-label'); if (vql) vql.textContent = _xf.vellumQty;
+            const vql = document.getElementById('vellum-qty-label'); if (vql) vql.textContent = /** @type {any} */ (_xf.vellumQty);
             const vpl = document.getElementById('vellum-per-label'); if (vpl) vpl.textContent = '$' + (Number.isInteger(_xf.vellumPrice) ? _xf.vellumPrice : _xf.vellumPrice.toFixed(2));
-            const vqc = document.getElementById('vellum-qty-cell'); if (vqc) vqc.textContent = _xf.vellumQty;
+            const vqc = document.getElementById('vellum-qty-cell'); if (vqc) vqc.textContent = /** @type {any} */ (_xf.vellumQty);
             const vu = document.getElementById('vellum-fee-unit'); if (vu) vu.textContent = '$' + _xf.vellumPrice.toFixed(2);
             const vt = document.getElementById('vellum-fee-total'); if (vt) vt.textContent = '$' + _xf.vellumFee.toFixed(2);
         } else {
@@ -219,9 +218,9 @@ export function updateFeeTableRows() {
     if (colorChangeRow) {
         if (_xf.colorChangeQty > 0) {
             colorChangeRow.style.display = 'table-row';
-            const cql = document.getElementById('color-change-qty-label'); if (cql) cql.textContent = _xf.colorChangeQty;
+            const cql = document.getElementById('color-change-qty-label'); if (cql) cql.textContent = /** @type {any} */ (_xf.colorChangeQty);
             const cpl = document.getElementById('color-change-per-label'); if (cpl) cpl.textContent = '$' + (Number.isInteger(_xf.colorChangePrice) ? _xf.colorChangePrice : _xf.colorChangePrice.toFixed(2));
-            const cqc = document.getElementById('color-change-qty-cell'); if (cqc) cqc.textContent = _xf.colorChangeQty;
+            const cqc = document.getElementById('color-change-qty-cell'); if (cqc) cqc.textContent = /** @type {any} */ (_xf.colorChangeQty);
             const cu = document.getElementById('color-change-fee-unit'); if (cu) cu.textContent = '$' + _xf.colorChangePrice.toFixed(2);
             const ct = document.getElementById('color-change-fee-total'); if (ct) ct.textContent = '$' + _xf.colorChangeFee.toFixed(2);
         } else {
@@ -231,9 +230,9 @@ export function updateFeeTableRows() {
 
     // Discount row
     const discountRow = document.getElementById('discount-row');
-    const discountAmount = parseFloat(document.getElementById('discount-amount')?.value || 0);
-    const discountType = document.getElementById('discount-type')?.value || 'fixed';
-    const discountReason = document.getElementById('discount-reason')?.value || '';
+    const discountAmount = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('discount-amount'))?.value || /** @type {any} */ (0));
+    const discountType = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-type'))?.value || 'fixed';
+    const discountReason = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-reason'))?.value || '';
     if (discountRow) {
         if (discountAmount > 0) {
             discountRow.style.display = 'table-row';
@@ -241,12 +240,12 @@ export function updateFeeTableRows() {
             let actualDiscount = discountAmount;
             if (discountType === 'percent') {
                 // Calculate discountable subtotal (products + additional services + setup fees)
-                const productsSubtotal = parseFloat(document.getElementById('subtotal')?.textContent?.replace(/[$,]/g, '') || 0);
-                const artCharge = document.getElementById('art-charge-toggle')?.checked
-                    ? parseFloat(document.getElementById('art-charge')?.value || 0) : 0;
-                const designFee = parseFloat(document.getElementById('graphic-design-hours')?.value || 0) * getServicePrice('GRT-75', 75);
-                const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
-                const setupFee = parseFloat(document.getElementById('setup-fee-total')?.textContent?.replace(/[$,]/g, '') || 0);
+                const productsSubtotal = parseFloat(document.getElementById('subtotal')?.textContent?.replace(/[$,]/g, '') || /** @type {any} */ (0));
+                const artCharge = /** @type {HTMLInputElement|null} */ (document.getElementById('art-charge-toggle'))?.checked
+                    ? parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('art-charge'))?.value || /** @type {any} */ (0)) : 0;
+                const designFee = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('graphic-design-hours'))?.value || /** @type {any} */ (0)) * getServicePrice('GRT-75', 75);
+                const rushFee = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('rush-fee'))?.value || /** @type {any} */ (0));
+                const setupFee = parseFloat(document.getElementById('setup-fee-total')?.textContent?.replace(/[$,]/g, '') || /** @type {any} */ (0));
                 const ltmFee = window.currentPricingData?.ltmFee || 0;
 
                 const discountableSubtotal = productsSubtotal + artCharge + designFee + rushFee + setupFee + ltmFee
@@ -283,13 +282,13 @@ export function applyRushPercent() {
     const rate = (typeof getSharedRushRate === 'function') ? getSharedRushRate() : 0.25;
     const productsSubtotal = parseFloat(document.getElementById('subtotal')?.textContent?.replace(/[$,]/g, '')) || 0;
     if (!(productsSubtotal > 0)) { showToast('Add products first — rush is a % of the quote.', 'info'); return; }
-    const artCharge = document.getElementById('art-charge-toggle')?.checked
-        ? (parseFloat(document.getElementById('art-charge')?.value) || 0) : 0;
-    const designFee = (parseFloat(document.getElementById('graphic-design-hours')?.value) || 0) * getServicePrice('GRT-75', 75);
+    const artCharge = /** @type {HTMLInputElement|null} */ (document.getElementById('art-charge-toggle'))?.checked
+        ? (parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('art-charge'))?.value) || 0) : 0;
+    const designFee = (parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('graphic-design-hours'))?.value) || 0) * getServicePrice('GRT-75', 75);
     const setupFee = parseFloat(document.getElementById('setup-fee-total')?.textContent?.replace(/[$,]/g, '')) || 0;
     const xf = (typeof getScpExtraFees === 'function') ? getScpExtraFees() : { vellumFee: 0, colorChangeFee: 0 };
     const base = productsSubtotal + artCharge + designFee + setupFee + xf.vellumFee + xf.colorChangeFee;
-    const el = document.getElementById('rush-fee');
+    const el = /** @type {HTMLInputElement|null} */ (document.getElementById('rush-fee'));
     if (!el) return;
     el.value = (base * rate).toFixed(2);
     el.dispatchEvent(new Event('change', { bubbles: true }));   // runs updateAdditionalCharges()

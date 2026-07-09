@@ -10,7 +10,6 @@
  * cluster incl. STITCH_DENSITY). Externals are ONLY the shared state vars
  * (config-level writable globals); siblings real-import the helpers.
  */
-// @ts-nocheck — MOVED legacy DOM code: pre-existing checkJs frictions; typing
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
 /* global showToast, Event, escapeHtml */
 import { recalculatePricing } from './pricing-sync.js';
@@ -118,9 +117,9 @@ export function openStitchEstimator(selId, kind, anchorBtn) {
     pop.style.left = `${Math.max(8, window.scrollX + r.left - 120)}px`;
 
     const compute = () => {
-        const w = parseFloat(document.getElementById('se-width')?.value) || 0;
-        const h = parseFloat(document.getElementById('se-height')?.value) || 0;
-        const density = STITCH_DENSITY[document.getElementById('se-coverage')?.value] || STITCH_DENSITY.medium;
+        const w = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('se-width'))?.value) || 0;
+        const h = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('se-height'))?.value) || 0;
+        const density = STITCH_DENSITY[/** @type {HTMLInputElement|null} */ (document.getElementById('se-coverage'))?.value] || STITCH_DENSITY.medium;
         const raw = w * h * density;
         const est = Math.max(1000, Math.ceil(raw / 500) * 500);
         const tierVal = mapStitchCountToTierValue(est, '');
@@ -137,7 +136,7 @@ export function openStitchEstimator(selId, kind, anchorBtn) {
 
     document.getElementById('se-apply')?.addEventListener('click', () => {
         const { est, tierVal } = compute();
-        const sel = document.getElementById(selId);
+        const sel = /** @type {HTMLInputElement|null} */ (document.getElementById(selId));
         if (sel) {
             sel.value = tierVal;
             sel.dispatchEvent(new Event('change'));   // run the existing tier handlers
@@ -156,22 +155,22 @@ export function openStitchEstimator(selId, kind, anchorBtn) {
 }
 
 export function onPrimaryPositionChange() {
-    const posSelect = document.getElementById('primary-position');
-    const tierSelect = document.getElementById('primary-stitches');
+    const posSelect = /** @type {HTMLInputElement|null} */ (document.getElementById('primary-position'));
+    const tierSelect = /** @type {HTMLInputElement|null} */ (document.getElementById('primary-stitches'));
     const fbField = document.getElementById('fb-stitch-count-field');
     embState.primaryLogo.position = posSelect.value;
 
-    if (posSelect.value === 'Full Back') {
+    if (/** @type {HTMLInputElement} */ (posSelect).value === 'Full Back') {
         tierSelect.value = '25000';
         fbField.style.display = '';
-        const fbInput = document.getElementById('fb-stitch-count');
+        const fbInput = /** @type {HTMLInputElement|null} */ (document.getElementById('fb-stitch-count'));
         embState.primaryLogo.stitchCount = parseInt(fbInput.value) || 25000;
         showToast('Full Back requires minimum 25,000 stitches', 'info');
     } else {
         fbField.style.display = 'none';
-        if (parseInt(tierSelect.value) >= 25000) {
+        if (parseInt(/** @type {HTMLInputElement} */ (tierSelect).value) >= 25000) {
             // Switching away from Full Back — reset tier
-            tierSelect.value = '8000';
+            /** @type {HTMLInputElement} */ (tierSelect).value = '8000';
             embState.primaryLogo.stitchCount = 8000;
         }
     }
@@ -180,8 +179,8 @@ export function onPrimaryPositionChange() {
 
 // Handle garment stitch tier dropdown change
 export function onPrimaryStitchTierChange() {
-    const select = document.getElementById('primary-stitches');
-    const posSelect = document.getElementById('primary-position');
+    const select = /** @type {HTMLInputElement|null} */ (document.getElementById('primary-stitches'));
+    const posSelect = /** @type {HTMLInputElement|null} */ (document.getElementById('primary-position'));
     const fbField = document.getElementById('fb-stitch-count-field');
     const sc = parseInt(select.value) || 8000;
 
@@ -189,17 +188,17 @@ export function onPrimaryStitchTierChange() {
         // Full Back tier selected — sync position, show stitch input
         posSelect.value = 'Full Back';
         embState.primaryLogo.position = 'Full Back';
-        posSelect.disabled = true;
+        /** @type {HTMLInputElement} */ (posSelect).disabled = true;
         fbField.style.display = '';
-        const fbInput = document.getElementById('fb-stitch-count');
+        const fbInput = /** @type {HTMLInputElement|null} */ (document.getElementById('fb-stitch-count'));
         embState.primaryLogo.stitchCount = parseInt(fbInput.value) || 25000;
     } else {
         // Standard/Mid/Large — hide FB stitch input
         fbField.style.display = 'none';
         embState.primaryLogo.stitchCount = sc;
-        if (posSelect.disabled) {
-            posSelect.disabled = false;
-            posSelect.value = 'Left Chest';
+        if (/** @type {HTMLInputElement} */ (posSelect).disabled) {
+            /** @type {HTMLInputElement} */ (posSelect).disabled = false;
+            /** @type {HTMLInputElement} */ (posSelect).value = 'Left Chest';
             embState.primaryLogo.position = 'Left Chest';
         }
     }
@@ -208,7 +207,7 @@ export function onPrimaryStitchTierChange() {
 
 // Handle Full Back stitch count input change
 export function onFullBackStitchCountChange() {
-    const fbInput = document.getElementById('fb-stitch-count');
+    const fbInput = /** @type {HTMLInputElement|null} */ (document.getElementById('fb-stitch-count'));
     const val = parseInt(fbInput.value) || 25000;
     embState.primaryLogo.stitchCount = Math.max(val, 25000);
     recalculatePricing();
@@ -216,7 +215,7 @@ export function onFullBackStitchCountChange() {
 
 // Handle cap stitch tier dropdown change
 export function onCapStitchTierChange() {
-    const select = document.getElementById('cap-primary-stitches');
+    const select = /** @type {HTMLInputElement|null} */ (document.getElementById('cap-primary-stitches'));
     embState.capPrimaryLogo.stitchCount = parseInt(select.value) || 8000;
     recalculatePricing();
 }
@@ -232,7 +231,7 @@ export function updateStitchTierDropdownLabels() {
     ];
     for (const select of selects) {
         if (!select) continue;
-        for (const opt of select.options) {
+        for (const opt of /** @type {HTMLSelectElement} */ (select).options) {
             const val = parseInt(opt.value);
             if (val === 12000) {
                 opt.text = `Mid +$${data.midFee}/pc (10-15K)`;
@@ -247,7 +246,7 @@ export function updateStitchTierDropdownLabels() {
 // Position is fixed: 'AL' for garments, 'AL-Cap' for caps
 export function updateGlobalAL(type) {
     // Stitch count is always base (no input field — simplified)
-    const digitizingCheckbox = document.getElementById(`${type}-al-digitizing-checkbox`);
+    const digitizingCheckbox = /** @type {HTMLInputElement|null} */ (document.getElementById(`${type}-al-digitizing-checkbox`));
     if (digitizingCheckbox) embState.globalAL[type].needsDigitizing = digitizingCheckbox.checked;
 
     _syncALArrays();
@@ -259,7 +258,7 @@ export function toggleGlobalALNew(type) {
     const switchEl = document.getElementById(`${type}-al-switch`);
     const labelEl = document.getElementById(`${type}-al-label`);
     const configEl = document.getElementById(`${type}-al-config-new`);
-    const hiddenCheckbox = document.getElementById(`${type}-al-toggle`);
+    const hiddenCheckbox = /** @type {HTMLInputElement|null} */ (document.getElementById(`${type}-al-toggle`));
 
     // Toggle the state
     const isActive = switchEl.classList.toggle('active');
@@ -290,18 +289,18 @@ export function toggleNotesSection() {
     const isCollapsed = section.classList.toggle('collapsed');
     const body = section.querySelector('.notes-body');
     const icon = section.querySelector('.notes-toggle-icon');
-    if (body) body.style.display = isCollapsed ? 'none' : 'block';
-    if (icon) icon.style.transform = isCollapsed ? '' : 'rotate(180deg)';
+    if (body) /** @type {HTMLElement} */ (body).style.display = isCollapsed ? 'none' : 'block';
+    if (icon) /** @type {HTMLElement} */ (icon).style.transform = isCollapsed ? '' : 'rotate(180deg)';
 }
 
 // Update notes badge count
 export function updateNotesBadge() {
-    const notesEl = document.getElementById('notes');
+    const notesEl = /** @type {HTMLInputElement|null} */ (document.getElementById('notes'));
     const badge = document.getElementById('notes-badge');
     if (!notesEl || !badge) return;
     const lines = notesEl.value.trim().split('\n').filter(l => l.trim()).length;
     if (lines > 0) {
-        badge.textContent = lines;
+        badge.textContent = /** @type {any} */ (lines);
         badge.style.display = 'inline-block';
     } else {
         badge.style.display = 'none';
@@ -310,17 +309,17 @@ export function updateNotesBadge() {
 
 // NEW: Toggle function for modernized digitizing checkbox
 export function toggleDigitizingCheckbox(element, checkboxId) {
-    const checkbox = document.getElementById(checkboxId);
-    checkbox.checked = !checkbox.checked;
-    element.classList.toggle('checked', checkbox.checked);
+    const checkbox = /** @type {HTMLInputElement|null} */ (document.getElementById(checkboxId));
+    checkbox.checked = !/** @type {HTMLInputElement} */ (checkbox).checked;
+    element.classList.toggle('checked', /** @type {HTMLInputElement} */ (checkbox).checked);
 
     // Update the corresponding logo object based on checkbox ID
     if (checkboxId === 'primary-digitizing') {
-        embState.primaryLogo.needsDigitizing = checkbox.checked;
+        embState.primaryLogo.needsDigitizing = /** @type {HTMLInputElement} */ (checkbox).checked;
     } else if (checkboxId === 'cap-primary-digitizing') {
-        embState.capPrimaryLogo.needsDigitizing = checkbox.checked;
+        embState.capPrimaryLogo.needsDigitizing = /** @type {HTMLInputElement} */ (checkbox).checked;
     } else if (checkboxId === 'cap-patch-setup') {
-        embState.capPrimaryLogo.needsSetup = checkbox.checked;
+        embState.capPrimaryLogo.needsSetup = /** @type {HTMLInputElement} */ (checkbox).checked;
     }
 
     // Trigger pricing recalculation
@@ -332,7 +331,7 @@ export function toggleDigitizingCheckbox(element, checkboxId) {
 
 // Handle cap embellishment type change (Flat Embroidery, 3D Puff, or Patch)
 export function handleCapEmbellishmentChange() {
-    const embellishmentType = document.getElementById('cap-embellishment-type').value;
+    const embellishmentType = /** @type {HTMLInputElement} */ (document.getElementById('cap-embellishment-type')).value;
     const embroideryOptions = document.getElementById('cap-embroidery-options');
     const patchOptions = document.getElementById('cap-patch-options');
 
@@ -350,14 +349,14 @@ export function handleCapEmbellishmentChange() {
         // For patches: no stitches needed, use setup fee instead of digitizing
         embState.capPrimaryLogo.stitchCount = 0;
         embState.capPrimaryLogo.needsDigitizing = false;
-        embState.capPrimaryLogo.needsSetup = document.getElementById('cap-patch-setup')?.checked ?? true;
+        embState.capPrimaryLogo.needsSetup = /** @type {HTMLInputElement|null} */ (document.getElementById('cap-patch-setup'))?.checked ?? true;
     } else {
         // Show embroidery options (for both flat and 3D puff) — AL toggle is inline
         embroideryOptions.style.display = 'block';
         patchOptions.style.display = 'none';
         // Restore stitch count from input
-        embState.capPrimaryLogo.stitchCount = parseInt(document.getElementById('cap-primary-stitches')?.value) || 8000;
-        embState.capPrimaryLogo.needsDigitizing = document.getElementById('cap-primary-digitizing')?.checked ?? false;
+        embState.capPrimaryLogo.stitchCount = parseInt(/** @type {HTMLInputElement|null} */ (document.getElementById('cap-primary-stitches'))?.value) || 8000;
+        embState.capPrimaryLogo.needsDigitizing = /** @type {HTMLInputElement|null} */ (document.getElementById('cap-primary-digitizing'))?.checked ?? false;
         embState.capPrimaryLogo.needsSetup = false; // Not applicable for embroidery
     }
 
@@ -368,7 +367,7 @@ export function handleCapEmbellishmentChange() {
 
 // Get current cap embellishment type
 export function getCapEmbellishmentType() {
-    const dropdown = document.getElementById('cap-embellishment-type');
+    const dropdown = /** @type {HTMLInputElement|null} */ (document.getElementById('cap-embellishment-type'));
     return dropdown ? dropdown.value : 'embroidery';
 }
 

@@ -3,7 +3,6 @@
  * Batch 4.2 (2026-07-09): methods moved VERBATIM from quote-builder-class.js
  * (`this.` state intact — the class assembles via Object.assign(prototype, ...)).
  */
-// @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions).
 /* global escapeHtml, Event, addNewRow, onStyleChange, selectColor, createChildRow,
    removeChildRow, updateExtendedSizeDisplay */
 import { sizeDetectionCache } from './state.js';
@@ -30,14 +29,14 @@ export const rowsMethods = {
             return;
         }
 
-        const row = document.querySelector('tr.new-row');
+        const row = /** @type {HTMLElement|null} */ (document.querySelector('tr.new-row'));
         if (!row) return;
 
-        const rowId = row.dataset.rowId || row.dataset.productId;
+        const rowId = row.dataset.rowId || /** @type {HTMLElement} */ (row).dataset.productId;
         const styleInput = row.querySelector('.style-input');
 
         // Set style number and trigger product loading
-        styleInput.value = product.styleNumber;
+        /** @type {HTMLInputElement} */ (styleInput).value = product.styleNumber;
 
         // Trigger the style change handler from the HTML
         if (typeof onStyleChange === 'function') {
@@ -56,10 +55,10 @@ export const rowsMethods = {
         if (pickerDropdown) {
             const options = Array.from(pickerDropdown.querySelectorAll('.color-picker-option, .color-option'));
             const colorOption = options.find(opt =>
-                opt.dataset.display === product.color ||
-                opt.dataset.color === product.color ||
-                opt.dataset.colorName === product.color ||
-                opt.dataset.catalogColor === product.color
+                /** @type {HTMLElement} */ (opt).dataset.display === product.color ||
+                /** @type {HTMLElement} */ (opt).dataset.color === product.color ||
+                /** @type {HTMLElement} */ (opt).dataset.colorName === product.color ||
+                /** @type {HTMLElement} */ (opt).dataset.catalogColor === product.color
             ) || options.find(opt => opt.textContent.includes(product.color));
             if (colorOption && typeof selectColor === 'function') {
                 selectColor(parseInt(rowId), colorOption);
@@ -77,8 +76,8 @@ export const rowsMethods = {
                 if (['S', 'M', 'L', 'XL', '2XL'].includes(normalizedSize)) {
                     const sizeInput = row.querySelector(`input[data-size="${normalizedSize}"]`) ||
                                      row.querySelector(`input[data-size="${size}"]`);
-                    if (sizeInput && !sizeInput.disabled) {
-                        sizeInput.value = qty;
+                    if (sizeInput && !/** @type {HTMLInputElement} */ (sizeInput).disabled) {
+                        /** @type {HTMLInputElement} */ (sizeInput).value = qty;
                         sizeInput.dispatchEvent(new Event('change', { bubbles: true }));
                     } else if (normalizedSize === '2XL' && typeof createChildRow === 'function') {
                         // [2026-06-11] color-match failure used to leave the 2XL input
@@ -108,7 +107,7 @@ export const rowsMethods = {
     },
 
     setupSearchListeners() {
-        const searchInput = document.getElementById('product-search');
+        const searchInput = /** @type {HTMLInputElement|null} */ (document.getElementById('product-search'));
         const suggestionsContainer = document.getElementById('search-suggestions');
 
         if (!searchInput) return;
@@ -134,7 +133,7 @@ export const rowsMethods = {
                 },
                 // Called when Enter selects an item
                 onSelect: (product) => {
-                    searchInput.value = '';
+                    /** @type {HTMLInputElement} */ (searchInput).value = '';
                     this.selectProduct(product.value);
                     if (suggestionsContainer) suggestionsContainer.style.display = 'none';
                 },
@@ -147,7 +146,7 @@ export const rowsMethods = {
 
         // Wire up search input to use exact match search
         searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.trim();
+            const query = /** @type {HTMLInputElement} */ (e.target).value.trim();
 
             if (query.length < 2) {
                 if (suggestionsContainer) suggestionsContainer.style.display = 'none';
@@ -169,7 +168,7 @@ export const rowsMethods = {
             // Handle Enter for immediate search when nothing is selected
             if (e.key === 'Enter') {
                 e.preventDefault();
-                const query = searchInput.value.trim();
+                const query = /** @type {HTMLInputElement} */ (searchInput).value.trim();
                 if (query.length >= 2) {
                     this.productsManager.searchImmediate(query);
                 }
@@ -178,7 +177,7 @@ export const rowsMethods = {
 
         // Close suggestions when clicking outside
         document.addEventListener('click', (e) => {
-            if (!e.target.closest('.search-input-wrapper')) {
+            if (!/** @type {HTMLElement} */ (e.target).closest('.search-input-wrapper')) {
                 if (suggestionsContainer) suggestionsContainer.style.display = 'none';
                 // Reset navigation state when closing
                 const searcher = this.productsManager.getSearchInstance();
@@ -213,7 +212,7 @@ export const rowsMethods = {
         // Close color dropdowns when clicking outside
         document.addEventListener('click', (e) => {
             // If click is not inside a color picker, close all dropdowns
-            if (!e.target.closest('.color-picker-wrapper')) {
+            if (!/** @type {HTMLElement} */ (e.target).closest('.color-picker-wrapper')) {
                 document.querySelectorAll('.color-picker-dropdown:not(.hidden)').forEach(dropdown => {
                     dropdown.classList.add('hidden');
                 });
@@ -232,7 +231,7 @@ export const rowsMethods = {
 
     showSearchSuggestions(products) {
         const suggestionsContainer = document.getElementById('search-suggestions');
-        const searchInput = document.getElementById('product-search');
+        const searchInput = /** @type {HTMLInputElement|null} */ (document.getElementById('product-search'));
         if (!suggestionsContainer) return;
 
         if (!products || products.length === 0) {
@@ -255,7 +254,7 @@ export const rowsMethods = {
         // Add click handlers
         suggestionsContainer.querySelectorAll('.suggestion-item').forEach(item => {
             item.addEventListener('click', () => {
-                this.selectProduct(item.dataset.style);
+                this.selectProduct(/** @type {HTMLElement} */ (item).dataset.style);
                 suggestionsContainer.style.display = 'none';
                 if (searchInput) searchInput.value = '';
             });
@@ -288,7 +287,7 @@ export const rowsMethods = {
         window.addNewRow();  // Global function from HTML - creates row with proper onchange handlers
 
         // Find the new row and populate it
-        const targetRow = document.querySelector('tr.new-row');
+        const targetRow = /** @type {HTMLElement|null} */ (document.querySelector('tr.new-row'));
         if (!targetRow) {
             console.error('[DTFQuoteBuilder] Failed to create new row');
             return;
@@ -297,7 +296,7 @@ export const rowsMethods = {
         const rowId = parseInt(targetRow.dataset.rowId);
         const styleInput = targetRow.querySelector('.style-input');
         if (styleInput) {
-            styleInput.value = styleNumber;
+            /** @type {HTMLInputElement} */ (styleInput).value = styleNumber;
         }
 
         // Trigger the standard product loading flow (same as typing in style field)
@@ -305,7 +304,7 @@ export const rowsMethods = {
         await window.onStyleChange(styleInput, rowId);  // Global function from HTML
 
         // Clear search input
-        const searchInput = document.getElementById('product-search');
+        const searchInput = /** @type {HTMLInputElement|null} */ (document.getElementById('product-search'));
         if (searchInput) searchInput.value = '';
     },
 
@@ -377,11 +376,11 @@ export const rowsMethods = {
                 }
 
                 // Also update row dataset attributes for child row inheritance
-                const row = document.querySelector(`tr[data-product-id="${productId}"]`);
+                const row = /** @type {HTMLElement|null} */ (document.querySelector(`tr[data-product-id="${productId}"]`));
                 if (row) {
                     row.dataset.color = colorName;
-                    row.dataset.catalogColor = catalogColor;
-                    row.dataset.swatchUrl = imageUrl || '';
+                    /** @type {HTMLElement} */ (row).dataset.catalogColor = catalogColor;
+                    /** @type {HTMLElement} */ (row).dataset.swatchUrl = imageUrl || '';
                 }
 
                 // Close dropdown
@@ -402,13 +401,13 @@ export const rowsMethods = {
         if (!row) return;
 
         row.querySelectorAll('.size-input').forEach(input => {
-            input.disabled = false;
+            /** @type {HTMLInputElement} */ (input).disabled = false;
         });
 
         // Also enable extended picker button
         const extButton = row.querySelector('.btn-extended-picker');
         if (extButton) {
-            extButton.disabled = false;
+            /** @type {HTMLInputElement} */ (extButton).disabled = false;
         }
 
     },
@@ -531,7 +530,7 @@ export const rowsMethods = {
 
         // Focus first input
         const firstInput = body.querySelector('.ext-size-input');
-        if (firstInput) firstInput.focus();
+        if (firstInput) /** @type {HTMLElement} */ (firstInput).focus();
     },
 
     /**
@@ -559,8 +558,8 @@ export const rowsMethods = {
 
         // Process each extended size input from popup
         inputs.forEach(input => {
-            const rawSize = input.dataset.size;
-            const qty = parseInt(input.value) || 0;
+            const rawSize = /** @type {HTMLElement} */ (input).dataset.size;
+            const qty = parseInt(/** @type {HTMLInputElement} */ (input).value) || 0;
 
             // Access global childRowMap. Legacy alias guard (2026-06-11): rows
             // created before the XXXL→3XL key fix (restored drafts, open tabs)
@@ -582,12 +581,12 @@ export const rowsMethods = {
                 // UPDATE EXISTING CHILD ROW — JS state first (money source),
                 // then the display row (2026-06-11 P2 closure)
                 this.setChildRowQty(existingChildRowId, qty);
-                const childRow = document.getElementById(`row-${existingChildRowId}`);
+                const childRow = /** @type {HTMLElement|null} */ (document.getElementById(`row-${existingChildRowId}`));
                 if (childRow) {
                     const qtyInput = childRow.querySelector('.extended-size-qty');
-                    if (qtyInput) qtyInput.value = qty;
+                    if (qtyInput) /** @type {HTMLInputElement} */ (qtyInput).value = /** @type {any} */ (qty);
                     const qtyDisplay = document.getElementById(`row-qty-${existingChildRowId}`);
-                    if (qtyDisplay) qtyDisplay.textContent = qty;
+                    if (qtyDisplay) qtyDisplay.textContent = /** @type {any} */ (qty);
                 }
             } else if (qty === 0 && existingChildRowId) {
                 // REMOVE CHILD ROW using global function
@@ -607,7 +606,7 @@ export const rowsMethods = {
         let extTotal = 0;
         childRows.forEach(childRow => {
             // Count only non-XXL sizes (XXL has its own column in header)
-            const size = childRow.dataset.extendedSize;
+            const size = /** @type {HTMLElement} */ (childRow).dataset.extendedSize;
             if (size !== 'XXL' && size !== '2XL') {
                 const qtyDisplay = childRow.querySelector('.cell-qty');
                 extTotal += parseInt(qtyDisplay?.textContent) || 0;
@@ -666,8 +665,8 @@ export const rowsMethods = {
         this.childRows.set(Number(childRowId), {
             parentId: Number(data.parentId),
             size: data.size,
-            qty: parseInt(data.qty) || 0,
-            baseCost: parseFloat(data.baseCost) || 0,
+            qty: parseInt(/** @type {any} */ (data.qty)) || 0,
+            baseCost: parseFloat(/** @type {any} */ (data.baseCost)) || 0,
             sizeUpcharges: data.sizeUpcharges || {}
         });
     },

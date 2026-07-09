@@ -72,7 +72,7 @@ import {
     clearExtendedSize,
     deleteRow,
     handleCellKeydown,
-} from './product-rows.js';
+} from './product-rows.js';
 import { showErrorBanner, hideErrorBanner, showFallbackPricingWarning } from '../shared/errors.js';
 import { loadServiceCodePrices, getServicePrice } from '../shared/service-codes.js';
 

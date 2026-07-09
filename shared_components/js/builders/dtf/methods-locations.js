@@ -3,7 +3,6 @@
  * Batch 4.2 (2026-07-09): methods moved VERBATIM from quote-builder-class.js
  * (`this.` state intact — the class assembles via Object.assign(prototype, ...)).
  */
-// @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions).
 
 export const locationsMethods = {
 
@@ -28,20 +27,20 @@ export const locationsMethods = {
         this.selectedLocations = [];
 
         // Get front selection (radio)
-        const frontRadio = document.querySelector('input[name="front-location"]:checked');
+        const frontRadio = /** @type {HTMLInputElement|null} */ (document.querySelector('input[name="front-location"]:checked'));
         if (frontRadio && frontRadio.value) {
-            this.selectedLocations.push(frontRadio.value);
+            this.selectedLocations.push(/** @type {HTMLInputElement} */ (frontRadio).value);
         }
 
         // Get back selection (radio)
-        const backRadio = document.querySelector('input[name="back-location"]:checked');
+        const backRadio = /** @type {HTMLInputElement|null} */ (document.querySelector('input[name="back-location"]:checked'));
         if (backRadio && backRadio.value) {
-            this.selectedLocations.push(backRadio.value);
+            this.selectedLocations.push(/** @type {HTMLInputElement} */ (backRadio).value);
         }
 
         // Get sleeve selections (checkboxes)
         document.querySelectorAll('input[name="sleeve-location"]:checked').forEach(checkbox => {
-            this.selectedLocations.push(checkbox.value);
+            this.selectedLocations.push(/** @type {HTMLInputElement} */ (checkbox).value);
         });
 
 

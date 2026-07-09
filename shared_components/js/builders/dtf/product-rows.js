@@ -6,7 +6,6 @@
  * delete/duplicate, thumbnails. Moved verbatim; cross-module calls stay bare
  * globals resolved via the index.js bridges (SCP pattern).
  */
-// @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions; typing lands with the render/state split).
 /* global dtfQuoteBuilder, showToast, escapeHtml, getSwatchStyle, productThumbnailModal,
    cleanProductTitle */
 import { dtfState, API_BASE } from './state.js';
@@ -99,7 +98,7 @@ export function addNewRow() {
 
     // Focus on the style input
     setTimeout(() => {
-        row.querySelector('.style-input').focus();
+        /** @type {HTMLElement} */ (row.querySelector('.style-input')).focus();
     }, 50);
 
     // Remove the "new-row" highlight after a moment
@@ -149,7 +148,7 @@ export async function onStyleChange(input, rowId) {
         if (firstDetail) {
             // Clean product title
             const cleanTitle = cleanProductTitle(firstDetail.PRODUCT_TITLE, styleNumber);
-            if (descInput) descInput.value = cleanTitle || styleNumber;
+            if (descInput) /** @type {HTMLInputElement} */ (descInput).value = cleanTitle || styleNumber;
 
             // Store data on row
             row.dataset.style = styleNumber;
@@ -167,7 +166,7 @@ export async function onStyleChange(input, rowId) {
             // normally and every surface priced the garment at $0 — decoration-only.
             // Block the row visibly instead.
             if (!(resolvedBaseCost > 0)) {
-                if (descInput) descInput.value = 'No garment cost — cannot quote';
+                if (descInput) /** @type {HTMLInputElement} */ (descInput).value = 'No garment cost — cannot quote';
                 if (typeof showToast === 'function') {
                     showToast(`No garment cost available for ${styleNumber} — cannot price this style. Check the style number or re-add it after a refresh.`, 'error');
                 }
@@ -182,7 +181,7 @@ export async function onStyleChange(input, rowId) {
             // Enable "duplicate row" button — style loaded AND garment cost passed the
             // $0 guard above (covers fresh entry, edit-load, quick-quote prefill)
             const dupBtn = row.querySelector('.btn-duplicate-row');
-            if (dupBtn) dupBtn.disabled = false;
+            if (dupBtn) /** @type {HTMLInputElement} */ (dupBtn).disabled = false;
 
             // Populate color picker (now includes MAIN_IMAGE_URL from product-colors API)
             if (colors && colors.length > 0) {
@@ -204,7 +203,7 @@ export async function onStyleChange(input, rowId) {
                 row.dataset.colors = JSON.stringify(colors);
             }
         } else {
-            if (descInput) descInput.value = 'Not found';
+            if (descInput) /** @type {HTMLInputElement} */ (descInput).value = 'Not found';
             showToast(`Style ${styleNumber} not found`, 'error');
         }
     } catch (error) {
@@ -231,13 +230,13 @@ export async function duplicateRowNewColor(sourceRowId) {
 
     addNewRow();
     // addNewRow() appends to product-tbody synchronously — the new row is the last one
-    const newRow = document.getElementById('product-tbody').lastElementChild;
-    if (!newRow || !newRow.dataset.rowId) return;
+    const newRow = /** @type {HTMLElement|null} */ (document.getElementById('product-tbody')).lastElementChild;
+    if (!newRow || !/** @type {HTMLElement} */ (newRow).dataset.rowId) return;
 
     const styleInput = newRow.querySelector('.style-input');
     if (styleInput) {
-        styleInput.value = style;
-        await onStyleChange(styleInput, parseInt(newRow.dataset.rowId));
+        /** @type {HTMLInputElement} */ (styleInput).value = style;
+        await onStyleChange(styleInput, parseInt(/** @type {HTMLElement} */ (newRow).dataset.rowId));
         showToast(`Select a new color for ${style}`, 'info', 3000);
     }
 }
@@ -270,7 +269,7 @@ export function handleCellKeydown(event, input) {
             const nextRow = rows[currentRowIndex + 1];
             const nextCells = Array.from(nextRow.querySelectorAll('input:not([readonly]):not(:disabled)'));
             if (nextCells[currentIndex]) {
-                nextCells[currentIndex].focus();
+                /** @type {HTMLElement} */ (nextCells[currentIndex]).focus();
             }
         }
     }
@@ -293,8 +292,8 @@ export function onSizeChange(rowId) {
 
     // Handle 2XL - auto-create child row when quantity entered
     const xxlInput = row.querySelector('[data-size="2XL"]');
-    if (xxlInput && !xxlInput.disabled) {
-        const qty = parseInt(xxlInput.value) || 0;
+    if (xxlInput && !/** @type {HTMLInputElement} */ (xxlInput).disabled) {
+        const qty = parseInt(/** @type {HTMLInputElement} */ (xxlInput).value) || 0;
         // Check for both 2XL and XXL child rows (XXL is distinct for Ladies/Womens products)
         const existingChildId = dtfState.childRowMap[rowId]?.['2XL'] || dtfState.childRowMap[rowId]?.['XXL'];
 
@@ -302,10 +301,10 @@ export function onSizeChange(rowId) {
             // CREATE CHILD ROW for 2XL
             createChildRow(rowId, '2XL', qty);
             // Disable parent's 2XL input and CLEAR the value
-            xxlInput.disabled = true;
-            xxlInput.style.background = '#f5f5f5';
-            xxlInput.style.color = '#999';
-            xxlInput.value = '';  // Clear value so grayed input shows empty
+            /** @type {HTMLInputElement} */ (xxlInput).disabled = true;
+            /** @type {HTMLElement} */ (xxlInput).style.background = '#f5f5f5';
+            /** @type {HTMLElement} */ (xxlInput).style.color = '#999';
+            /** @type {HTMLInputElement} */ (xxlInput).value = '';  // Clear value so grayed input shows empty
         } else if (qty > 0 && existingChildId) {
             // Update existing child row — JS state first (money source), then
             // the display row (2026-06-11 P2)
@@ -313,8 +312,8 @@ export function onSizeChange(rowId) {
             const childRow = document.getElementById(`row-${existingChildId}`);
             if (childRow) {
                 const childInput = childRow.querySelector('.extended-size-qty');
-                if (childInput) childInput.value = qty;
-                document.getElementById(`row-qty-${existingChildId}`).textContent = qty;
+                if (childInput) /** @type {HTMLInputElement} */ (childInput).value = /** @type {any} */ (qty);
+                document.getElementById(`row-qty-${existingChildId}`).textContent = /** @type {any} */ (qty);
             }
         }
     }
@@ -322,10 +321,10 @@ export function onSizeChange(rowId) {
     // Calculate total quantity from standard sizes (S, M, L, XL)
     let total = 0;
     row.querySelectorAll('.size-input:not(.xxxl-picker-btn):not(:disabled)').forEach(input => {
-        const size = input.dataset.size;
+        const size = /** @type {HTMLElement} */ (input).dataset.size;
         // Skip 2XL - it's handled separately via child rows
         if (size !== '2XL') {
-            total += parseInt(input.value) || 0;
+            total += parseInt(/** @type {HTMLInputElement} */ (input).value) || 0;
         }
     });
 
@@ -335,7 +334,7 @@ export function onSizeChange(rowId) {
 
     // Update quantity display
     const qtyCell = document.getElementById(`row-qty-${rowId}`);
-    if (qtyCell) qtyCell.textContent = total;
+    if (qtyCell) qtyCell.textContent = /** @type {any} */ (total);
 
     // Trigger pricing recalculation via dtfQuoteBuilder
     if (dtfQuoteBuilder) {
@@ -361,12 +360,12 @@ export function selectColor(rowId, optionEl) {
     const nameSpan = pickerSelected.querySelector('.color-name');
 
     if (swatchUrl) {
-        swatch.style.backgroundImage = `url('${swatchUrl}')`;
-        swatch.style.backgroundColor = '';
-        swatch.style.backgroundSize = 'cover';
+        /** @type {HTMLElement} */ (swatch).style.backgroundImage = `url('${swatchUrl}')`;
+        /** @type {HTMLElement} */ (swatch).style.backgroundColor = '';
+        /** @type {HTMLElement} */ (swatch).style.backgroundSize = 'cover';
     } else {
-        swatch.style.backgroundImage = '';
-        swatch.style.backgroundColor = hex;
+        /** @type {HTMLElement} */ (swatch).style.backgroundImage = '';
+        /** @type {HTMLElement} */ (swatch).style.backgroundColor = hex;
     }
     swatch.classList.remove('empty');
     nameSpan.textContent = colorName;
@@ -389,7 +388,7 @@ export function selectColor(rowId, optionEl) {
     cascadeColorToChildRows(rowId, colorName, catalogColor, swatchUrl, hex);
 
     // Enable size inputs
-    row.querySelectorAll('.size-input').forEach(input => input.disabled = false);
+    row.querySelectorAll('.size-input').forEach(input => /** @type {HTMLInputElement} */ (input).disabled = false);
 
     // Phase 10.1 (2026-05-23) — fire SanMar inventory check + render badges
     // next to each size input. Uses shared InventoryBadges wrapper around
@@ -404,7 +403,7 @@ export function selectColor(rowId, optionEl) {
 
     // Focus first size
     const firstSize = row.querySelector('.size-input:not(.xxxl-picker-btn)');
-    if (firstSize) firstSize.focus();
+    if (firstSize) /** @type {HTMLElement} */ (firstSize).focus();
 
     // Color pick is a click — no input/change event for the tbody dirty-tracking
     // delegation to catch. Edit-load also calls this, but loadQuoteForEditing()
@@ -463,7 +462,7 @@ export function deleteRow(rowId) {
         // Also delete any child rows
         const childRows = document.querySelectorAll(`tr[data-parent-row-id="${rowId}"]`);
         childRows.forEach(childRow => {
-            const childId = parseInt(childRow.dataset.rowId);
+            const childId = parseInt(/** @type {HTMLElement} */ (childRow).dataset.rowId);
             childRow.remove();
             if (dtfQuoteBuilder) {
                 dtfQuoteBuilder.removeProduct(childId);
@@ -484,12 +483,6 @@ export function deleteRow(rowId) {
 // CHILD ROW FUNCTIONS (Extended Sizes - Like Embroidery/DTG)
 // ============================================================
 
-/**
- * Create a child row for an extended size (XXL, 3XL, 4XL, etc.)
- * @param {number} parentRowId - ID of the parent row
- * @param {string} size - Size name (XXL, 3XL, 4XL, 5XL, 6XL, XS)
- * @param {number} qty - Quantity for this size
- */
 // D2 split (2026-07-09): the child-row color-option template, moved VERBATIM
 // out of createChildRow.
 function buildChildColorOptionsHtml(parentColors, parentColor, childRowId, parentRowId) {
@@ -507,6 +500,12 @@ function buildChildColorOptionsHtml(parentColors, parentColor, childRowId, paren
     ).join('');
 }
 
+/**
+ * Create a child row for an extended size (XXL, 3XL, 4XL, etc.)
+ * @param {number} parentRowId - ID of the parent row
+ * @param {string} size - Size name (XXL, 3XL, 4XL, 5XL, 6XL, XS)
+ * @param {number} qty - Quantity for this size
+ */
 export function createChildRow(parentRowId, size, qty) {
     const parentRow = document.getElementById(`row-${parentRowId}`);
     if (!parentRow) {
@@ -540,7 +539,7 @@ export function createChildRow(parentRowId, size, qty) {
     childRow.className = 'child-row';
     childRow.dataset.rowId = childRowId;
     childRow.dataset.productId = childRowId;
-    childRow.dataset.parentRowId = parentRowId;
+    childRow.dataset.parentRowId = /** @type {any} */ (parentRowId);
     childRow.dataset.extendedSize = size;
     childRow.dataset.style = partNumber;
     childRow.dataset.baseStyle = baseStyle;
@@ -618,12 +617,12 @@ export function createChildRow(parentRowId, size, qty) {
     let insertAfter = parentRow;
 
     for (const existingChild of existingChildren) {
-        const existingSize = existingChild.dataset.extendedSize;
+        const existingSize = /** @type {HTMLElement} */ (existingChild).dataset.extendedSize;
         // Normalize existing size too for consistent comparison
         const normalizedExisting = existingSize === 'XXXL' ? '3XL' : existingSize;
         const existingSizeIndex = window.ExtendedSizesConfig.EXTENDED_SIZE_ORDER.indexOf(normalizedExisting);
         if (existingSizeIndex < newSizeIndex) {
-            insertAfter = existingChild;
+            insertAfter = /** @type {HTMLElement} */ (existingChild);
         }
     }
 
@@ -671,10 +670,10 @@ export function removeChildRow(parentRowId, size) {
             if (parentRow) {
                 const xxlInput = parentRow.querySelector('[data-size="2XL"]');
                 if (xxlInput) {
-                    xxlInput.disabled = false;
-                    xxlInput.value = '';
-                    xxlInput.style.background = '';
-                    xxlInput.style.color = '';
+                    /** @type {HTMLInputElement} */ (xxlInput).disabled = false;
+                    /** @type {HTMLInputElement} */ (xxlInput).value = '';
+                    /** @type {HTMLElement} */ (xxlInput).style.background = '';
+                    /** @type {HTMLElement} */ (xxlInput).style.color = '';
                 }
             }
         }
@@ -699,18 +698,18 @@ export function removeChildRow(parentRowId, size) {
  * Handle size change in a child row
  */
 export function onChildSizeChange(childRowId, parentRowId, size) {
-    const childRow = document.getElementById(`row-${childRowId}`);
+    const childRow = /** @type {HTMLElement|null} */ (document.getElementById(`row-${childRowId}`));
     if (!childRow) return;
 
     const input = childRow.querySelector('.extended-size-qty');
-    const qty = parseInt(input?.value) || 0;
+    const qty = parseInt(/** @type {HTMLInputElement|null} */ (input)?.value) || 0;
 
     // JS state first (money source), then the display cell (2026-06-11 P2)
     if (dtfQuoteBuilder) dtfQuoteBuilder.setChildRowQty(childRowId, qty);
 
     // Update qty display
     const qtyCell = document.getElementById(`row-qty-${childRowId}`);
-    if (qtyCell) qtyCell.textContent = qty;
+    if (qtyCell) qtyCell.textContent = /** @type {any} */ (qty);
 
     // If quantity is 0, remove the child row
     if (qty === 0) {
@@ -742,7 +741,7 @@ export function updateExtendedSizeDisplay(parentRowId) {
     let totalExtQty = 0;
     childRows.forEach(childRow => {
         // Skip XXL child rows for this count (they have their own column)
-        const size = childRow.dataset.extendedSize;
+        const size = /** @type {HTMLElement} */ (childRow).dataset.extendedSize;
         if (size !== 'XXL' && size !== '2XL') {
             const qtyDisplay = childRow.querySelector('.cell-qty');
             totalExtQty += parseInt(qtyDisplay?.textContent) || 0;
@@ -751,11 +750,11 @@ export function updateExtendedSizeDisplay(parentRowId) {
 
     // Update display
     if (totalExtQty > 0) {
-        xxxlBtn.value = totalExtQty;
-        xxxlBtn.placeholder = '';
+        /** @type {HTMLInputElement} */ (xxxlBtn).value = /** @type {any} */ (totalExtQty);
+        /** @type {HTMLInputElement} */ (xxxlBtn).placeholder = '';
     } else {
-        xxxlBtn.value = '';
-        xxxlBtn.placeholder = '+';
+        /** @type {HTMLInputElement} */ (xxxlBtn).value = '';
+        /** @type {HTMLInputElement} */ (xxxlBtn).placeholder = '+';
     }
 }
 
@@ -807,8 +806,8 @@ export function getExtendedSizeQty(parentRowId, size) {
         // 3XL+ only exist in popup/child rows, no parent input to check
 
         const sizeInput = parentRow.querySelector(`[data-size="${inputSize}"]`);
-        if (sizeInput && !sizeInput.disabled && !sizeInput.classList.contains('xxxl-picker-btn')) {
-            const val = parseInt(sizeInput.value) || 0;
+        if (sizeInput && !/** @type {HTMLInputElement} */ (sizeInput).disabled && !sizeInput.classList.contains('xxxl-picker-btn')) {
+            const val = parseInt(/** @type {HTMLInputElement} */ (sizeInput).value) || 0;
             if (val > 0) {
                 return val;
             }
@@ -829,10 +828,10 @@ export function selectChildColor(childRowId, parentRowId, optionEl) {
     const childRow = document.getElementById(`row-${childRowId}`);
     if (!childRow) return;
 
-    const colorName = optionEl.dataset.colorName;
-    const catalogColor = optionEl.dataset.catalogColor;
-    const swatchUrl = optionEl.dataset.swatchUrl;
-    const hex = optionEl.dataset.hex || '#ccc';
+    const colorName = /** @type {HTMLElement} */ (optionEl).dataset.colorName;
+    const catalogColor = /** @type {HTMLElement} */ (optionEl).dataset.catalogColor;
+    const swatchUrl = /** @type {HTMLElement} */ (optionEl).dataset.swatchUrl;
+    const hex = /** @type {HTMLElement} */ (optionEl).dataset.hex || '#ccc';
 
     // Update child row data attributes
     childRow.dataset.color = colorName;
@@ -847,13 +846,13 @@ export function selectChildColor(childRowId, parentRowId, optionEl) {
 
     if (swatch) {
         if (swatchUrl) {
-            swatch.style.backgroundImage = `url('${swatchUrl}')`;
-            swatch.style.backgroundColor = '';
-            swatch.style.backgroundSize = 'cover';
-            swatch.style.backgroundPosition = 'center';
+            /** @type {HTMLElement} */ (swatch).style.backgroundImage = `url('${swatchUrl}')`;
+            /** @type {HTMLElement} */ (swatch).style.backgroundColor = '';
+            /** @type {HTMLElement} */ (swatch).style.backgroundSize = 'cover';
+            /** @type {HTMLElement} */ (swatch).style.backgroundPosition = 'center';
         } else {
-            swatch.style.backgroundImage = '';
-            swatch.style.backgroundColor = hex;
+            /** @type {HTMLElement} */ (swatch).style.backgroundImage = '';
+            /** @type {HTMLElement} */ (swatch).style.backgroundColor = hex;
         }
     }
     if (nameSpan) nameSpan.textContent = colorName;
@@ -902,13 +901,13 @@ export function cascadeColorToChildRows(parentRowId, colorName, catalogColor, sw
 
         if (swatch) {
             if (swatchUrl) {
-                swatch.style.backgroundImage = `url('${swatchUrl}')`;
-                swatch.style.backgroundColor = '';
-                swatch.style.backgroundSize = 'cover';
-                swatch.style.backgroundPosition = 'center';
+                /** @type {HTMLElement} */ (swatch).style.backgroundImage = `url('${swatchUrl}')`;
+                /** @type {HTMLElement} */ (swatch).style.backgroundColor = '';
+                /** @type {HTMLElement} */ (swatch).style.backgroundSize = 'cover';
+                /** @type {HTMLElement} */ (swatch).style.backgroundPosition = 'center';
             } else {
-                swatch.style.backgroundImage = '';
-                swatch.style.backgroundColor = hex || '#ccc';
+                /** @type {HTMLElement} */ (swatch).style.backgroundImage = '';
+                /** @type {HTMLElement} */ (swatch).style.backgroundColor = hex || '#ccc';
             }
         }
         if (nameSpan) nameSpan.textContent = colorName;

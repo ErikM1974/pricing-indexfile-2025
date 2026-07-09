@@ -10,7 +10,6 @@
  * initPricingAndRoute verbatim and setupPage is a documented no-op — the
  * real split lands if init is ever unpacked.
  */
-// @ts-nocheck — wraps MOVED legacy init (pre-existing checkJs frictions).
 import { init } from './form-core.js';
 import { dtgIF, state } from './state.js';
 

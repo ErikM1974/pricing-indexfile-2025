@@ -16,7 +16,6 @@
  * MONOLITH (26 outside readers of lastImportMetadata — clusters 6/11);
  * this module reads/writes them through the global scope chain.
  */
-// @ts-nocheck — MOVED legacy DOM code: pre-existing checkJs frictions; typing
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
 /* global openAccessibleModal, closeAccessibleModal, reorderRowByProductType, escapeHtml, showToast,
    createOrUpdateExtendedChildRow, ShopWorksImportParser, updateArtworkCharges,
@@ -69,7 +68,7 @@ export function openShopWorksImportModal() {
     if (typeof openAccessibleModal === 'function') openAccessibleModal(modal, { label: 'Paste from ShopWorks', onEsc: closeShopWorksImportModal }); // 1.8
 
     // Reset state
-    document.getElementById('shopworks-paste-area').value = '';
+    /** @type {HTMLInputElement} */ (document.getElementById('shopworks-paste-area')).value = '';
     document.getElementById('shopworks-import-preview').classList.remove('active');
     document.getElementById('btn-parse-import').style.display = '';
     document.getElementById('btn-confirm-import').style.display = 'none';
@@ -98,7 +97,7 @@ export function showAddNonSanmarModal(rowId) {
     const row = document.getElementById(`row-${rowId}`);
     if (!row) return;
 
-    const styleNumber = row.dataset.style || row.querySelector('.style-input')?.value?.trim().toUpperCase() || '';
+    const styleNumber = row.dataset.style || /** @type {HTMLInputElement|null} */ (row.querySelector('.style-input'))?.value?.trim().toUpperCase() || '';
     const importData = row.dataset.importData ? JSON.parse(row.dataset.importData) : {};
 
     // Pre-parse description from import data
@@ -106,19 +105,19 @@ export function showAddNonSanmarModal(rowId) {
     const parsed = parseShopWorksDescription(description, styleNumber);
 
     // Fill modal fields
-    document.getElementById('ns-modal-row-id').value = rowId;
-    document.getElementById('ns-style-number').value = styleNumber;
-    document.getElementById('ns-brand').value = parsed.brand || importData.brand || '';
-    document.getElementById('ns-product-name').value = parsed.name || '';
-    document.getElementById('ns-category').value = parsed.category || '';
-    document.getElementById('ns-sell-price').value = importData.unitPrice || '';
-    document.getElementById('ns-default-colors').value = parsed.color || importData.color || '';
+    /** @type {HTMLInputElement} */ (document.getElementById('ns-modal-row-id')).value = rowId;
+    /** @type {HTMLInputElement} */ (document.getElementById('ns-style-number')).value = styleNumber;
+    /** @type {HTMLInputElement} */ (document.getElementById('ns-brand')).value = parsed.brand || importData.brand || '';
+    /** @type {HTMLInputElement} */ (document.getElementById('ns-product-name')).value = parsed.name || '';
+    /** @type {HTMLInputElement} */ (document.getElementById('ns-category')).value = parsed.category || '';
+    /** @type {HTMLInputElement} */ (document.getElementById('ns-sell-price')).value = importData.unitPrice || '';
+    /** @type {HTMLInputElement} */ (document.getElementById('ns-default-colors')).value = parsed.color || importData.color || '';
 
     // Auto-fill available sizes based on detected category
     if (parsed.category === 'Caps') {
-        document.getElementById('ns-available-sizes').value = 'OSFA';
+        /** @type {HTMLInputElement} */ (document.getElementById('ns-available-sizes')).value = 'OSFA';
     } else {
-        document.getElementById('ns-available-sizes').value = 'S,M,L,XL,2XL,3XL';
+        /** @type {HTMLInputElement} */ (document.getElementById('ns-available-sizes')).value = 'S,M,L,XL,2XL,3XL';
     }
 
     // Collapse "More Options" by default
@@ -160,10 +159,10 @@ export function toggleNsMoreOptions(btn) {
  * Enables/disables the Save button.
  */
 export function validateNsModalFields() {
-    const brand = document.getElementById('ns-brand').value.trim();
-    const name = document.getElementById('ns-product-name').value.trim();
-    const price = parseFloat(document.getElementById('ns-sell-price').value);
-    const saveBtn = document.getElementById('btn-save-nonsanmar');
+    const brand = /** @type {HTMLInputElement} */ (document.getElementById('ns-brand')).value.trim();
+    const name = /** @type {HTMLInputElement} */ (document.getElementById('ns-product-name')).value.trim();
+    const price = parseFloat(/** @type {HTMLInputElement} */ (document.getElementById('ns-sell-price')).value);
+    const saveBtn = /** @type {HTMLInputElement|null} */ (document.getElementById('btn-save-nonsanmar'));
     const isValid = brand && name && price > 0;
     saveBtn.disabled = !isValid;
     saveBtn.title = isValid ? '' : 'Fill Brand, Product Name, and Sell Price';
@@ -256,14 +255,14 @@ export function scrollToProductRow(rowId) {
  * Save non-SanMar product to database and re-populate the row
  */
 export async function saveNonSanmarProduct() {
-    const rowId = parseInt(document.getElementById('ns-modal-row-id').value);
-    const styleNumber = document.getElementById('ns-style-number').value.trim();
-    const brand = document.getElementById('ns-brand').value.trim();
-    const productName = document.getElementById('ns-product-name').value.trim();
-    const category = document.getElementById('ns-category').value;
-    const sellPrice = parseFloat(document.getElementById('ns-sell-price').value) || 0;
-    const defaultColors = document.getElementById('ns-default-colors').value.trim();
-    const availableSizes = document.getElementById('ns-available-sizes').value.trim();
+    const rowId = parseInt(/** @type {HTMLInputElement} */ (document.getElementById('ns-modal-row-id')).value);
+    const styleNumber = /** @type {HTMLInputElement} */ (document.getElementById('ns-style-number')).value.trim();
+    const brand = /** @type {HTMLInputElement} */ (document.getElementById('ns-brand')).value.trim();
+    const productName = /** @type {HTMLInputElement} */ (document.getElementById('ns-product-name')).value.trim();
+    const category = /** @type {HTMLInputElement} */ (document.getElementById('ns-category')).value;
+    const sellPrice = parseFloat(/** @type {HTMLInputElement} */ (document.getElementById('ns-sell-price')).value) || 0;
+    const defaultColors = /** @type {HTMLInputElement} */ (document.getElementById('ns-default-colors')).value.trim();
+    const availableSizes = /** @type {HTMLInputElement} */ (document.getElementById('ns-available-sizes')).value.trim();
 
     // Validate required fields
     if (!brand) {
@@ -282,7 +281,7 @@ export async function saveNonSanmarProduct() {
         return;
     }
 
-    const saveBtn = document.getElementById('btn-save-nonsanmar');
+    const saveBtn = /** @type {HTMLInputElement|null} */ (document.getElementById('btn-save-nonsanmar'));
     saveBtn.disabled = true;
     saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
 
@@ -335,7 +334,7 @@ export async function saveNonSanmarProduct() {
         console.error('[saveNonSanmarProduct] Error:', error);
         showToast('Failed to save: ' + error.message, 'error');
     } finally {
-        saveBtn.disabled = false;
+        /** @type {HTMLInputElement} */ (saveBtn).disabled = false;
         saveBtn.innerHTML = '<i class="fas fa-save"></i> Save & Apply';
     }
 }
@@ -388,7 +387,7 @@ async function reImportNonSanmarRow(row, rowId, importData) {
 
                     // Set per-size sell price override on child row if available
                     if (importData.sellPriceOverrides && importData.sellPriceOverrides[size]) {
-                        const childRow = document.querySelector(`tr.child-row[data-parent-row="${rowId}"][data-size="${internalSize}"]`);
+                        const childRow = /** @type {HTMLElement|null} */ (document.querySelector(`tr.child-row[data-parent-row="${rowId}"][data-size="${internalSize}"]`));
                         if (childRow) {
                             childRow.dataset.sellPrice = importData.sellPriceOverrides[size].toString();
                         }
@@ -414,7 +413,7 @@ async function reImportNonSanmarRow(row, rowId, importData) {
  * Parse pasted text and show preview
  */
 export async function parseAndPreviewShopWorks() {
-    const text = document.getElementById('shopworks-paste-area').value.trim();
+    const text = /** @type {HTMLInputElement} */ (document.getElementById('shopworks-paste-area')).value.trim();
 
     if (!text) {
         showToast('Please paste ShopWorks order text first', 'warning');
@@ -740,7 +739,7 @@ function renderImportPreview(data) {
 function applyImportedFees(data) {
     // 4. Handle patch setup + GRT-50 art charge fee
     if (data.services.patchSetup) {
-        const patchSetupCheckbox = document.getElementById('cap-patch-setup');
+        const patchSetupCheckbox = /** @type {HTMLInputElement|null} */ (document.getElementById('cap-patch-setup'));
         if (patchSetupCheckbox) {
             patchSetupCheckbox.checked = true;
             const wrapper = patchSetupCheckbox.closest('.digitizing-checkbox');
@@ -749,12 +748,12 @@ function applyImportedFees(data) {
         // Also set art charge input so GRT-50 fee is persisted on save
         // (_saveFeeLineItems saves GRT-50 only when ArtCharge > 0)
         const grt50Amount = data.services.grt50Amount || 150;
-        const artToggle = document.getElementById('art-charge-toggle');
-        const artInput = document.getElementById('art-charge');
+        const artToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('art-charge-toggle'));
+        const artInput = /** @type {HTMLInputElement|null} */ (document.getElementById('art-charge'));
         if (artToggle && artInput) {
             artToggle.checked = true;
             artInput.disabled = false;
-            artInput.value = grt50Amount.toFixed(2);
+            /** @type {HTMLInputElement} */ (artInput).value = grt50Amount.toFixed(2);
             const artWrapper = document.getElementById('art-charge-wrapper');
             if (artWrapper) artWrapper.style.opacity = '1';
             updateArtworkCharges();
@@ -763,19 +762,19 @@ function applyImportedFees(data) {
 
     // 6. Handle art charges
     if (data.services.artCharges) {
-        const artToggle = document.getElementById('art-charge-toggle');
-        const artInput = document.getElementById('art-charge');
+        const artToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('art-charge-toggle'));
+        const artInput = /** @type {HTMLInputElement|null} */ (document.getElementById('art-charge'));
         if (artToggle && artInput) {
             artToggle.checked = true;
             artInput.disabled = false;
-            artInput.value = data.services.artCharges.amount.toFixed(2);
+            /** @type {HTMLInputElement} */ (artInput).value = data.services.artCharges.amount.toFixed(2);
             updateArtworkCharges();
         }
     }
 
     // 6b. Rush fee → fee table input
     if (data.services.rush) {
-        const rushInput = document.getElementById('rush-fee');
+        const rushInput = /** @type {HTMLInputElement|null} */ (document.getElementById('rush-fee'));
         if (rushInput) {
             rushInput.value = data.services.rush.amount.toFixed(2);
             rushInput.dispatchEvent(new Event('input'));
@@ -784,7 +783,7 @@ function applyImportedFees(data) {
 
     // 6c. Shipping fee
     if (data.services.shipping) {
-        const shippingInput = document.getElementById('shipping-fee');
+        const shippingInput = /** @type {HTMLInputElement|null} */ (document.getElementById('shipping-fee'));
         if (shippingInput) {
             shippingInput.value = data.services.shipping.amount.toFixed(2);
             shippingInput.dispatchEvent(new Event('input', { bubbles: true }));
@@ -797,7 +796,7 @@ function applyImportedFees(data) {
  * the order to the wrong customer). Parser-imported values always win. */
 async function supplementCustomerFromCrm(data) {
     // Also populate customer lookup search field for easy CRM lookup
-    const customerLookupInput = document.getElementById('customer-lookup');
+    const customerLookupInput = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-lookup'));
     if (customerLookupInput && data.customer.email) {
         customerLookupInput.value = data.customer.email;
 
@@ -817,40 +816,40 @@ async function supplementCustomerFromCrm(data) {
                     if (!_exact) showToast('No exact CRM email match for the imported customer — using imported values (verify the Customer # before pushing).', 'info');
                     // Parser already populated these during import; CRM supplements, doesn't replace.
                     const contact = _exact || {};
-                    const nameEl = document.getElementById('customer-name');
-                    const emailEl = document.getElementById('customer-email');
-                    const companyEl = document.getElementById('company-name');
-                    const custNumEl = document.getElementById('customer-number');
-                    const phoneEl = document.getElementById('customer-phone');
-                    if (!nameEl.value.trim()) nameEl.value = contact.ct_NameFull || data.customer.contactName || '';
-                    if (!emailEl.value.trim()) emailEl.value = contact.ContactNumbersEmail || data.customer.email || '';
-                    if (!companyEl.value.trim()) companyEl.value = contact.CustomerCompanyName || data.customer.company || '';
+                    const nameEl = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-name'));
+                    const emailEl = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-email'));
+                    const companyEl = /** @type {HTMLInputElement|null} */ (document.getElementById('company-name'));
+                    const custNumEl = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-number'));
+                    const phoneEl = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-phone'));
+                    if (!nameEl.value.trim()) /** @type {HTMLInputElement} */ (nameEl).value = contact.ct_NameFull || data.customer.contactName || '';
+                    if (!emailEl.value.trim()) /** @type {HTMLInputElement} */ (emailEl).value = contact.ContactNumbersEmail || data.customer.email || '';
+                    if (!companyEl.value.trim()) /** @type {HTMLInputElement} */ (companyEl).value = contact.CustomerCompanyName || data.customer.company || '';
                     // Fill customer # (ShopWorks ID) from CRM if empty
                     if (custNumEl && !custNumEl.value.trim() && contact.id_Customer) {
-                        custNumEl.value = contact.id_Customer;
+                        /** @type {HTMLInputElement} */ (custNumEl).value = contact.id_Customer;
                     }
                     if (phoneEl && !phoneEl.value.trim() && contact.Phone) {
-                        phoneEl.value = contact.Phone;
+                        /** @type {HTMLInputElement} */ (phoneEl).value = contact.Phone;
                     }
                     // Auto-fill Ship To from CRM contact address
                     if (contact.State) {
-                        const stateInput = document.getElementById('ship-state');
-                        if (stateInput && !stateInput.value) stateInput.value = contact.State;
+                        const stateInput = /** @type {HTMLInputElement|null} */ (document.getElementById('ship-state'));
+                        if (stateInput && !stateInput.value) /** @type {HTMLInputElement} */ (stateInput).value = contact.State;
                     }
                     if (contact.City) {
-                        const cityInput = document.getElementById('ship-city');
-                        if (cityInput && !cityInput.value.trim()) cityInput.value = contact.City;
+                        const cityInput = /** @type {HTMLInputElement|null} */ (document.getElementById('ship-city'));
+                        if (cityInput && !cityInput.value.trim()) /** @type {HTMLInputElement} */ (cityInput).value = contact.City;
                     }
                     if (contact.Zip) {
-                        const zipInput = document.getElementById('ship-zip');
+                        const zipInput = /** @type {HTMLInputElement|null} */ (document.getElementById('ship-zip'));
                         if (zipInput && !zipInput.value.trim()) {
-                            zipInput.value = contact.Zip;
+                            /** @type {HTMLInputElement} */ (zipInput).value = contact.Zip;
                             lookupTaxRate(); // Auto-trigger tax lookup
                         }
                     }
                     if (contact.Address) {
-                        const addrInput = document.getElementById('ship-address');
-                        if (addrInput && !addrInput.value.trim()) addrInput.value = contact.Address;
+                        const addrInput = /** @type {HTMLInputElement|null} */ (document.getElementById('ship-address'));
+                        if (addrInput && !addrInput.value.trim()) /** @type {HTMLInputElement} */ (addrInput).value = contact.Address;
                     }
                     showToast('Customer info loaded from CRM', 'success');
                 } else {
@@ -873,13 +872,13 @@ async function supplementCustomerFromCrm(data) {
 async function applyCustomerAndOrderMeta(data) {
     // 1. Populate customer info
     if (data.customer.contactName) {
-        document.getElementById('customer-name').value = data.customer.contactName;
+        /** @type {HTMLInputElement} */ (document.getElementById('customer-name')).value = data.customer.contactName;
     }
     if (data.customer.email) {
-        document.getElementById('customer-email').value = data.customer.email;
+        /** @type {HTMLInputElement} */ (document.getElementById('customer-email')).value = data.customer.email;
     }
     if (data.customer.company) {
-        document.getElementById('company-name').value = data.customer.company;
+        /** @type {HTMLInputElement} */ (document.getElementById('company-name')).value = data.customer.company;
     }
 
     // CRM supplement (exact-email match only) — extracted Batch 3.1
@@ -903,30 +902,30 @@ async function applyCustomerAndOrderMeta(data) {
     applyImportedFees(data);
 
     // 6d. Populate Order Details fields
-    if (data.purchaseOrderNumber) document.getElementById('po-number').value = data.purchaseOrderNumber;
-    if (data.orderId) document.getElementById('order-number').value = data.orderId;
-    if (data.customer.customerId) document.getElementById('customer-number').value = data.customer.customerId;
+    if (data.purchaseOrderNumber) /** @type {HTMLInputElement} */ (document.getElementById('po-number')).value = data.purchaseOrderNumber;
+    if (data.orderId) /** @type {HTMLInputElement} */ (document.getElementById('order-number')).value = data.orderId;
+    if (data.customer.customerId) /** @type {HTMLInputElement} */ (document.getElementById('customer-number')).value = data.customer.customerId;
     if (data.shipping?.method) {
-        const shipMethodEl = document.getElementById('ship-method');
+        const shipMethodEl = /** @type {HTMLSelectElement|null} */ (document.getElementById('ship-method'));
         const importedMethod = data.shipping.method;
         // Check if imported value matches a predefined dropdown option
         const matchingOption = Array.from(shipMethodEl.options).find(
             opt => opt.value.toLowerCase() === importedMethod.toLowerCase()
         );
         if (matchingOption) {
-            shipMethodEl.value = matchingOption.value;
+            /** @type {HTMLSelectElement} */ (shipMethodEl).value = matchingOption.value;
         } else {
             // Non-standard method — use "Other" with text input
-            shipMethodEl.value = 'Other';
-            document.getElementById('ship-method-other').value = importedMethod;
+            /** @type {HTMLSelectElement} */ (shipMethodEl).value = 'Other';
+            /** @type {HTMLInputElement} */ (document.getElementById('ship-method-other')).value = importedMethod;
         }
         onShipMethodChange();
     }
-    if (data.customer.phone) document.getElementById('customer-phone').value = data.customer.phone;
-    if (data.dateOrderPlaced) document.getElementById('date-order-placed').value = dateToInputValue(data.dateOrderPlaced);
-    if (data.reqShipDate) document.getElementById('req-ship-date').value = dateToInputValue(data.reqShipDate);
-    if (data.dropDeadDate) document.getElementById('drop-dead-date').value = dateToInputValue(data.dropDeadDate);
-    if (data.paymentTerms) document.getElementById('payment-terms').value = data.paymentTerms;
+    if (data.customer.phone) /** @type {HTMLInputElement} */ (document.getElementById('customer-phone')).value = data.customer.phone;
+    if (data.dateOrderPlaced) /** @type {HTMLInputElement} */ (document.getElementById('date-order-placed')).value = dateToInputValue(data.dateOrderPlaced);
+    if (data.reqShipDate) /** @type {HTMLInputElement} */ (document.getElementById('req-ship-date')).value = dateToInputValue(data.reqShipDate);
+    if (data.dropDeadDate) /** @type {HTMLInputElement} */ (document.getElementById('drop-dead-date')).value = dateToInputValue(data.dropDeadDate);
+    if (data.paymentTerms) /** @type {HTMLInputElement} */ (document.getElementById('payment-terms')).value = data.paymentTerms;
 
     // Auto-expand Order Details panel if any field populated
     const hasOrderDetails = data.purchaseOrderNumber || data.orderId || data.customer.customerId ||
@@ -943,33 +942,33 @@ async function applyCustomerAndOrderMeta(data) {
 
     // 6e. Populate Ship To address and auto-lookup tax rate
     if (data.shipping) {
-        if (data.shipping.street) document.getElementById('ship-address').value = data.shipping.street;
-        if (data.shipping.city) document.getElementById('ship-city').value = data.shipping.city;
-        if (data.shipping.state) document.getElementById('ship-state').value = data.shipping.state;
-        if (data.shipping.zip) document.getElementById('ship-zip').value = data.shipping.zip;
+        if (data.shipping.street) /** @type {HTMLInputElement} */ (document.getElementById('ship-address')).value = data.shipping.street;
+        if (data.shipping.city) /** @type {HTMLInputElement} */ (document.getElementById('ship-city')).value = data.shipping.city;
+        if (data.shipping.state) /** @type {HTMLInputElement} */ (document.getElementById('ship-state')).value = data.shipping.state;
+        if (data.shipping.zip) /** @type {HTMLInputElement} */ (document.getElementById('ship-zip')).value = data.shipping.zip;
 
         // Customer Pickup = local pickup at Milton, WA — auto-set for tax lookup
         if (data.shipping.method && data.shipping.method.toLowerCase().includes('pickup') && !data.shipping.zip) {
-            document.getElementById('ship-state').value = 'WA';
-            document.getElementById('ship-zip').value = '98354';
-            document.getElementById('ship-city').value = 'Milton';
+            /** @type {HTMLInputElement} */ (document.getElementById('ship-state')).value = 'WA';
+            /** @type {HTMLInputElement} */ (document.getElementById('ship-zip')).value = '98354';
+            /** @type {HTMLInputElement} */ (document.getElementById('ship-city')).value = 'Milton';
         }
 
         // Use DOR API to get precise tax rate from address
         const lookupOk = await lookupTaxRate();
         // If lookup failed and we have a back-calculated rate, use it as fallback
         if (!lookupOk && data.orderSummary && data.orderSummary.taxRate) {
-            document.getElementById('tax-rate-input').value = data.orderSummary.taxRate.toFixed(1);
-            document.getElementById('include-tax').checked = true;
+            /** @type {HTMLInputElement} */ (document.getElementById('tax-rate-input')).value = data.orderSummary.taxRate.toFixed(1);
+            /** @type {HTMLInputElement} */ (document.getElementById('include-tax')).checked = true;
             updateTaxCalculation();
         }
     } else if (data.orderSummary && data.orderSummary.taxRate) {
         // Fallback: use back-calculated tax rate from Order Summary
-        const taxInput = document.getElementById('tax-rate-input');
+        const taxInput = /** @type {HTMLInputElement|null} */ (document.getElementById('tax-rate-input'));
         if (taxInput) {
             taxInput.value = data.orderSummary.taxRate.toFixed(1);
         }
-        const taxCheckbox = document.getElementById('include-tax');
+        const taxCheckbox = /** @type {HTMLInputElement|null} */ (document.getElementById('include-tax'));
         if (taxCheckbox) {
             taxCheckbox.checked = true;
         }
@@ -978,7 +977,7 @@ async function applyCustomerAndOrderMeta(data) {
 
     // 7. Handle graphic design hours
     if (data.services.graphicDesign) {
-        const designHoursInput = document.getElementById('graphic-design-hours');
+        const designHoursInput = /** @type {HTMLInputElement|null} */ (document.getElementById('graphic-design-hours'));
         if (designHoursInput) {
             designHoursInput.value = data.services.graphicDesign.hours;
             updateArtworkCharges();
@@ -1207,9 +1206,9 @@ function applyEmbConfig(embConfig) {
     embState.primaryLogo.position = embConfig.garmentPosition;
     embState.primaryLogo.stitchCount = embConfig.garmentStitchTier;
     embState.primaryLogo.needsDigitizing = embConfig.garmentDigitizing;
-    document.getElementById('primary-position').value = embConfig.garmentPosition;
-    document.getElementById('primary-stitches').value = embConfig.garmentStitchTier;
-    const digitizingEl = document.getElementById('primary-digitizing');
+    /** @type {HTMLInputElement} */ (document.getElementById('primary-position')).value = embConfig.garmentPosition;
+    /** @type {HTMLInputElement} */ (document.getElementById('primary-stitches')).value = embConfig.garmentStitchTier;
+    const digitizingEl = /** @type {HTMLInputElement|null} */ (document.getElementById('primary-digitizing'));
     if (digitizingEl) {
         digitizingEl.checked = embConfig.garmentDigitizing;
         const wrapper = digitizingEl.closest('.digitizing-checkbox');
@@ -1217,9 +1216,9 @@ function applyEmbConfig(embConfig) {
     }
     // Handle Full Back position sync
     if (embConfig.garmentPosition === 'Full Back') {
-        document.getElementById('primary-position').disabled = true;
+        /** @type {HTMLInputElement} */ (document.getElementById('primary-position')).disabled = true;
         const fbField = document.getElementById('fb-stitch-count-field');
-        const fbInput = document.getElementById('fb-stitch-count');
+        const fbInput = /** @type {HTMLInputElement|null} */ (document.getElementById('fb-stitch-count'));
         if (fbField) fbField.style.display = '';
         if (fbInput) fbInput.value = embConfig.garmentStitchTier;
         // Attach design-specific FB tier pricing for pricing engine
@@ -1230,17 +1229,17 @@ function applyEmbConfig(embConfig) {
 
     // Cap config
     if (embConfig.capEmbellishment) {
-        const capEmbEl = document.getElementById('cap-embellishment-type');
+        const capEmbEl = /** @type {HTMLInputElement|null} */ (document.getElementById('cap-embellishment-type'));
         if (capEmbEl) {
             capEmbEl.value = embConfig.capEmbellishment;
             handleCapEmbellishmentChange();
         }
         if (typeof embState.capPrimaryLogo !== 'undefined') {
             embState.capPrimaryLogo.stitchCount = embConfig.capStitchTier;
-            const capStitchEl = document.getElementById('cap-primary-stitches');
+            const capStitchEl = /** @type {HTMLInputElement|null} */ (document.getElementById('cap-primary-stitches'));
             if (capStitchEl) capStitchEl.value = embConfig.capStitchTier;
         }
-        const capDigitizingEl = document.getElementById('cap-primary-digitizing');
+        const capDigitizingEl = /** @type {HTMLInputElement|null} */ (document.getElementById('cap-primary-digitizing'));
         if (capDigitizingEl) {
             capDigitizingEl.checked = embConfig.capDigitizing;
             const wrapper = capDigitizingEl.closest('.digitizing-checkbox');
@@ -1258,7 +1257,7 @@ function applyEmbConfig(embConfig) {
         embState.primaryLogo.designNumber = embConfig.garmentDesignNumber;
         embState.primaryLogo.designName = embConfig.garmentDesignName || '';
         updateLogoCardHeader('garment', embConfig.garmentDesignNumber);
-        const gdi = document.getElementById('garment-design-number');
+        const gdi = /** @type {HTMLInputElement|null} */ (document.getElementById('garment-design-number'));
         if (gdi) gdi.value = embConfig.garmentDesignNumber;
         const gcb = document.getElementById('garment-design-clear');
         if (gcb) gcb.style.display = 'inline-flex';
@@ -1274,7 +1273,7 @@ function applyEmbConfig(embConfig) {
         embState.capPrimaryLogo.designNumber = embConfig.capDesignNumber;
         embState.capPrimaryLogo.designName = embConfig.capDesignName || '';
         updateLogoCardHeader('cap', embConfig.capDesignNumber);
-        const cdi = document.getElementById('cap-design-number');
+        const cdi = /** @type {HTMLInputElement|null} */ (document.getElementById('cap-design-number'));
         if (cdi) cdi.value = embConfig.capDesignNumber;
         const ccb = document.getElementById('cap-design-clear');
         if (ccb) ccb.style.display = 'inline-flex';
@@ -1382,7 +1381,7 @@ function applyServiceResults(serviceResults, data, progress) {
                         embState.globalAL.garment.needsDigitizing = true;
                     }
 
-                    const alToggle = document.getElementById('garment-al-toggle');
+                    const alToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('garment-al-toggle'));
                     const alSwitch = document.getElementById('garment-al-switch');
                     const alLabel = document.getElementById('garment-al-label');
                     const alConfig = document.getElementById('garment-al-config-new');
@@ -1391,7 +1390,7 @@ function applyServiceResults(serviceResults, data, progress) {
                     if (alLabel) alLabel.classList.add('active');
                     if (alConfig) alConfig.classList.add('visible');
 
-                    const digitizingEl = document.getElementById('garment-al-digitizing-checkbox');
+                    const digitizingEl = /** @type {HTMLInputElement|null} */ (document.getElementById('garment-al-digitizing-checkbox'));
                     if (digitizingEl) digitizingEl.checked = embState.globalAL.garment.needsDigitizing;
 
                     if (result.originalData && result.originalData.additionalLogos && result.originalData.additionalLogos.length > 1) {
@@ -1496,7 +1495,7 @@ function createAuxiliaryServiceRows(data) {
     // 16e. Auto-set cap embellishment type if detected (3D-EMB or Laser Patch)
     if (data.services.capEmbellishments && data.services.capEmbellishments.length > 0) {
         const ce = data.services.capEmbellishments[0]; // Use first detected type
-        const capEmbEl = document.getElementById('cap-embellishment-type');
+        const capEmbEl = /** @type {HTMLInputElement|null} */ (document.getElementById('cap-embellishment-type'));
         if (capEmbEl && ce.type) {
             capEmbEl.value = ce.type;
             handleCapEmbellishmentChange();
@@ -1518,7 +1517,7 @@ function writeImportNotes(data) {
     if (data._allReviewItems && data._allReviewItems.length > 0) {
         const checkedItems = [];
         document.querySelectorAll('.review-item-check:checked').forEach(cb => {
-            const idx = parseInt(cb.dataset.index);
+            const idx = parseInt(/** @type {HTMLElement} */ (cb).dataset.index);
             if (data._allReviewItems[idx]) checkedItems.push(data._allReviewItems[idx]);
         });
         if (checkedItems.length > 0) {
@@ -1572,15 +1571,15 @@ function writeImportNotes(data) {
     }
 
     // Auto-show notes section if any notes were written (import notes, AL positions, monogram names, DECG stitch counts, sewing)
-    const finalNotesEl = document.getElementById('notes');
+    const finalNotesEl = /** @type {HTMLInputElement|null} */ (document.getElementById('notes'));
     if (finalNotesEl && finalNotesEl.value.trim()) {
         const section = document.getElementById('notes-section');
         if (section && section.classList.contains('collapsed')) {
             section.classList.remove('collapsed');
             const body = section.querySelector('.notes-body');
             const icon = section.querySelector('.notes-toggle-icon');
-            if (body) body.style.display = 'block';
-            if (icon) icon.style.transform = 'rotate(180deg)';
+            if (body) /** @type {HTMLElement} */ (body).style.display = 'block';
+            if (icon) /** @type {HTMLElement} */ (icon).style.transform = 'rotate(180deg)';
         }
         updateNotesBadge();
     }
@@ -1621,7 +1620,7 @@ function finalizeImport({ data, productsImported, customProductsImported, produc
     const expectedProducts = (productsImported || 0) + (customProductsImported || 0);
     const productRows = document.querySelectorAll('#product-tbody tr[data-style]:not(.child-row)');
     const validProducts = Array.from(productRows).filter(r =>
-        r.dataset.color || r.dataset.nonSanmar === 'true'
+        /** @type {HTMLElement} */ (r).dataset.color || /** @type {HTMLElement} */ (r).dataset.nonSanmar === 'true'
     ).length;
     if (validProducts < expectedProducts) {
         const dropped = expectedProducts - validProducts;
@@ -1632,10 +1631,10 @@ function finalizeImport({ data, productsImported, customProductsImported, produc
     // Flag non-SanMar products with $0 pricing + collect for summary banner
     const nonSanMarBannerItems = [];
     document.querySelectorAll('#product-tbody tr[data-non-sanmar="true"]').forEach(nsRow => {
-        const nsRowId = parseInt(nsRow.dataset.rowId);
-        const sellPrice = parseFloat(nsRow.dataset.sellPrice) || 0;
-        const nsStyle = nsRow.dataset.style || '';
-        const nsDesc = nsRow.dataset.productName || nsRow.querySelector('[data-field="description"]')?.value || '';
+        const nsRowId = parseInt(/** @type {HTMLElement} */ (nsRow).dataset.rowId);
+        const sellPrice = parseFloat(/** @type {HTMLElement} */ (nsRow).dataset.sellPrice) || 0;
+        const nsStyle = /** @type {HTMLElement} */ (nsRow).dataset.style || '';
+        const nsDesc = /** @type {HTMLElement} */ (nsRow).dataset.productName || /** @type {HTMLInputElement|null} */ (nsRow.querySelector('[data-field="description"]'))?.value || '';
 
         nonSanMarBannerItems.push({
             rowId: nsRowId,
@@ -1658,7 +1657,7 @@ function finalizeImport({ data, productsImported, customProductsImported, produc
     // Show import summary banner (non-SanMar detail)
     // Count SanMar vs non-SanMar among all imported product rows
     const allImportedRows = document.querySelectorAll('#product-tbody tr[data-style]:not(.child-row):not(.service-product-row):not(.fee-row)');
-    const sanMarRowCount = Array.from(allImportedRows).filter(r => r.dataset.nonSanmar !== 'true').length;
+    const sanMarRowCount = Array.from(allImportedRows).filter(r => /** @type {HTMLElement} */ (r).dataset.nonSanmar !== 'true').length;
     if (nonSanMarBannerItems.length > 0) {
         showImportSummaryBanner(sanMarRowCount, nonSanMarBannerItems);
     }
@@ -1699,12 +1698,12 @@ export async function confirmShopWorksImport() {
     }
 
     const data = embState.pendingShopWorksImport;
-    const btn = document.getElementById('btn-confirm-import');
+    const btn = /** @type {HTMLInputElement|null} */ (document.getElementById('btn-confirm-import'));
 
     // Filter products by exclude checkboxes
     const excludedIndices = new Set();
     document.querySelectorAll('.product-include-check:not(:checked)').forEach(cb => {
-        excludedIndices.add(parseInt(cb.dataset.productIndex));
+        excludedIndices.add(parseInt(/** @type {HTMLElement} */ (cb).dataset.productIndex));
     });
     if (excludedIndices.size > 0) {
         data.products = data.products.filter((_, idx) => !excludedIndices.has(idx));
@@ -1756,7 +1755,7 @@ export async function confirmShopWorksImport() {
         showToast('Import failed: ' + error.message, 'error');
     } finally {
         hideImportProgress();
-        btn.disabled = false;
+        /** @type {HTMLInputElement} */ (btn).disabled = false;
         btn.innerHTML = '<i class="fas fa-check"></i> Import Items';
     }
 }
@@ -1766,13 +1765,13 @@ export async function confirmShopWorksImport() {
  * Select sales rep by email address
  */
 function selectSalesRepByEmail(email) {
-    const select = document.getElementById('sales-rep');
+    const select = /** @type {HTMLSelectElement|null} */ (document.getElementById('sales-rep'));
     if (!select || !email) return;
 
     const lowerEmail = email.toLowerCase();
     for (const option of select.options) {
         if (option.value.toLowerCase() === lowerEmail) {
-            select.value = option.value;
+            /** @type {HTMLSelectElement} */ (select).value = option.value;
             return;
         }
     }
@@ -1797,9 +1796,9 @@ function normalizeImportedSize(size) {
 /** Append one block to the quote Notes textarea (newline-separated). */
 function appendImportNote(text) {
     if (!text) return;
-    const notesEl = document.getElementById('notes');
+    const notesEl = /** @type {HTMLInputElement|null} */ (document.getElementById('notes'));
     if (!notesEl) return;
-    notesEl.value = (notesEl.value ? notesEl.value + '\n' : '') + text;
+    notesEl.value = (/** @type {HTMLInputElement} */ (notesEl).value ? /** @type {HTMLInputElement} */ (notesEl).value + '\n' : '') + text;
 }
 
 
@@ -1839,7 +1838,7 @@ async function importProductRow(product, sellPriceOverride = 0, sellPriceOverrid
 
     // 1. Set the style number and trigger load
     if (product.partNumber) {
-        styleInput.value = product.partNumber;
+        /** @type {HTMLInputElement} */ (styleInput).value = product.partNumber;
         await onStyleChange(styleInput, rowId);
 
         // Re-apply — onStyleChange may overwrite sellPrice for non-SanMar products
@@ -1853,8 +1852,8 @@ async function importProductRow(product, sellPriceOverride = 0, sellPriceOverrid
         row.dataset.style = product.description || 'Custom Item';
         const descInput = row.querySelector('[data-field="description"]');
         if (descInput) {
-            descInput.value = product.description || 'Custom Item';
-            descInput.readOnly = false;
+            /** @type {HTMLInputElement} */ (descInput).value = product.description || 'Custom Item';
+            /** @type {HTMLInputElement} */ (descInput).readOnly = false;
         }
         row.dataset.productName = product.description || 'Custom Item';
     }
@@ -2107,13 +2106,13 @@ function applyImportedSizes(row, rowId, product, sellPriceOverride, sellPriceOve
                 // Set per-size sell price override on child row if available
                 // recalculatePricing() already reads childRow.dataset.sellPrice (lines 6683-6710)
                 if (sellPriceOverrides && sellPriceOverrides[size]) {
-                    const childRow = document.querySelector(`tr.child-row[data-parent-row="${rowId}"][data-size="${internalSize}"]`);
+                    const childRow = /** @type {HTMLElement|null} */ (document.querySelector(`tr.child-row[data-parent-row="${rowId}"][data-size="${internalSize}"]`));
                     if (childRow) {
                         childRow.dataset.sellPrice = sellPriceOverrides[size].toString();
                     }
                 } else if (sellPriceOverride > 0) {
                     // Fallback: use the flat override for all child rows
-                    const childRow = document.querySelector(`tr.child-row[data-parent-row="${rowId}"][data-size="${internalSize}"]`);
+                    const childRow = /** @type {HTMLElement|null} */ (document.querySelector(`tr.child-row[data-parent-row="${rowId}"][data-size="${internalSize}"]`));
                     if (childRow) {
                         childRow.dataset.sellPrice = sellPriceOverride.toString();
                     }

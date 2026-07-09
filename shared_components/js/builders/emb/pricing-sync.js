@@ -15,7 +15,6 @@
  * module-internal callers, live-binding importers, and the window bridge
  * all invoke the wrapped version — identical to pre-move semantics.
  */
-// @ts-nocheck — MOVED legacy DOM code: pre-existing checkJs frictions; typing
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
 /* global showToast, escapeHtml,
    wrapWithRepricingIndicator, parseRatePercent, getLtmControlState,
@@ -28,7 +27,7 @@ import { renderPushReadiness } from './save-push.js';
 import { markEmbroideryDirty } from './persistence.js';
 import { getCapEmbellishmentType } from './logo-config.js';
 import { createServiceProductRow, updateRowBreakdown } from './product-rows.js';
-import { embState, EMB_DEFAULTS, SIZE06_EXTENDED_SIZES, API_BASE } from './state.js';
+import { embState, EMB_DEFAULTS, SIZE06_EXTENDED_SIZES, API_BASE } from './state.js';
 
 // Module state — was window._* flags (Batch 3.4, 2026-07-09); nothing outside this file reads them.
 let _alPricingCache = null;      // AL tier snapshot (cleared per recalc — stale = wrong price)
@@ -115,7 +114,7 @@ export const debouncedRecalculatePricing = debounce(() => recalculatePricing(), 
  */
 function renderPriceErrorRetries() {
     document.querySelectorAll('#product-tbody tr.service-product-row[data-price-error="true"]').forEach(row => {
-        const rid = row.dataset.rowId;
+        const rid = /** @type {HTMLElement} */ (row).dataset.rowId;
         const cell = document.getElementById(`row-price-${rid}`);
         if (!cell || cell.querySelector('.btn-retry-pricing')) return;
         cell.innerHTML = '<button type="button" class="btn-retry-pricing" onclick="retryRowPricing()" title="Pricing failed to load — retry without refreshing the page"><i class="fas fa-rotate-right"></i> Retry</button>';
@@ -174,39 +173,39 @@ export async function syncALRows() {
     const cache = await loadALPricing();
     // [A3] (audit 2026-06-06): API down → do NOT leave a stale/$0 AL price the save gate would accept. Flag
     // every AL row so saveAndGetLink's priceError gate blocks it (Erik's #1 rule). Toast already surfaced.
-    if (!cache) { alRows.forEach(r => { r.dataset.priceError = 'true'; }); return; }
+    if (!cache) { alRows.forEach(r => { /** @type {HTMLElement} */ (r).dataset.priceError = 'true'; }); return; }
     const svc = _alPricingSvc;
     const counts = getOrderPieceCounts();
     for (const row of alRows) {
-        const rid = row.dataset.rowId;
-        const itemType = row.dataset.alItemType || 'garment';
+        const rid = /** @type {HTMLElement} */ (row).dataset.rowId;
+        const itemType = /** @type {HTMLElement} */ (row).dataset.alItemType || 'garment';
         // Auto-tally: a 2nd logo goes on every piece — keep the qty synced to the order's
         // garment/cap count UNLESS the rep overrode it (al-qty-auto === "false"). (Erik 2026-06-05)
-        if (row.dataset.alQtyAuto !== 'false') {
+        if (/** @type {HTMLElement} */ (row).dataset.alQtyAuto !== 'false') {
             const want = (itemType === 'cap') ? counts.cap : counts.garment;
             const qInput = row.querySelector('.service-qty');
             // Set the qty to the order count even when it's 0 (rep removed all garments) — otherwise a
             // stale auto-tallied AL keeps its old qty and bills against zero pieces. Manual rows
             // (alQtyAuto === 'false') are excluded by the guard above, so a hand-set qty is never zeroed. (audit fix 2026-06-05)
-            if (qInput && String(want) !== qInput.value) qInput.value = String(want);
+            if (qInput && String(want) !== /** @type {HTMLInputElement} */ (qInput).value) /** @type {HTMLInputElement} */ (qInput).value = String(want);
         }
-        const qty = parseFloat(row.querySelector('.service-qty')?.value) || 0;
-        const stitch = parseInt(row.dataset.stitchCount, 10) || 8000;
+        const qty = parseFloat(/** @type {HTMLInputElement|null} */ (row.querySelector('.service-qty'))?.value) || 0;
+        const stitch = parseInt(/** @type {HTMLElement} */ (row).dataset.stitchCount, 10) || 8000;
         let unit = 0;
         try {
             const res = await svc.calculateALPrice(qty || 1, stitch, itemType, cache);
             unit = res.unitPrice || 0;
-            delete row.dataset.priceError;
+            delete /** @type {HTMLElement} */ (row).dataset.priceError;
         } catch (e) {
             // P1-4 (audit 2026-06-06): a pricing throw must NOT silently bill $0 (Erik's #1 rule). Flag the
             // row so the save/push gate blocks it, and tell the rep.
             console.error('[AL] calculateALPrice failed', e);
-            row.dataset.priceError = 'true';
+            /** @type {HTMLElement} */ (row).dataset.priceError = 'true';
             showToast('Could not price the Additional Logo row — refresh; it will not be saved at $0.', 'error');
         }
-        if (!(unit > 0)) row.dataset.priceError = 'true';   // an AL is never legitimately $0
+        if (!(unit > 0)) /** @type {HTMLElement} */ (row).dataset.priceError = 'true';   // an AL is never legitimately $0
         // Store the live price on the row; the next recalc sums it like any service row.
-        row.dataset.unitPrice = String(unit);
+        /** @type {HTMLElement} */ (row).dataset.unitPrice = String(unit);
         const priceCell = document.getElementById(`row-price-${rid}`);
         const totalCell = document.getElementById(`row-total-${rid}`);
         if (priceCell) priceCell.textContent = '$' + unit.toFixed(2);
@@ -249,7 +248,7 @@ export async function syncDECGRows() {
     // [A3 + A3-DECG fix] (audit 2026-06-06): API down → flag rows so saveAndGetLink's priceError gate blocks
     // (Erik's #1 rule). But a MANUALLY-overridden DECG row (sellPrice>0) is independent of the API → don't
     // over-block it (fail-closed otherwise). Toast already surfaced.
-    if (!cache) { rows.forEach(r => { if (!(parseFloat(r.dataset.sellPrice) > 0)) r.dataset.priceError = 'true'; }); return; }
+    if (!cache) { rows.forEach(r => { if (!(parseFloat(/** @type {HTMLElement} */ (r).dataset.sellPrice) > 0)) /** @type {HTMLElement} */ (r).dataset.priceError = 'true'; }); return; }
     const svc = _alPricingSvc;
 
     // [expert audit 2026-07-07 F10] Tier at the POOLED same-category quantity: 15
@@ -259,19 +258,19 @@ export async function syncDECGRows() {
     // their qty counts toward the tier/fee even though their price isn't touched.
     const pooledQty = { garment: 0, cap: 0 };
     rows.forEach(r => {
-        const t = r.dataset.decgItemType === 'cap' ? 'cap' : 'garment';
-        pooledQty[t] += parseFloat(r.querySelector('.service-qty')?.value) || 0;
+        const t = /** @type {HTMLElement} */ (r).dataset.decgItemType === 'cap' ? 'cap' : 'garment';
+        pooledQty[t] += parseFloat(/** @type {HTMLInputElement|null} */ (r.querySelector('.service-qty'))?.value) || 0;
     });
     const decgLtm = { garment: 0, cap: 0 };
 
     for (const row of rows) {
-        const rid = row.dataset.rowId;
-        const qty = parseFloat(row.querySelector('.service-qty')?.value) || 0;
-        const stitch = parseInt(row.dataset.stitchCount, 10) || 8000;
-        const itemType = row.dataset.decgItemType === 'cap' ? 'cap' : 'garment';
-        const heavyweight = row.dataset.decgHeavyweight === 'true';
+        const rid = /** @type {HTMLElement} */ (row).dataset.rowId;
+        const qty = parseFloat(/** @type {HTMLInputElement|null} */ (row.querySelector('.service-qty'))?.value) || 0;
+        const stitch = parseInt(/** @type {HTMLElement} */ (row).dataset.stitchCount, 10) || 8000;
+        const itemType = /** @type {HTMLElement} */ (row).dataset.decgItemType === 'cap' ? 'cap' : 'garment';
+        const heavyweight = /** @type {HTMLElement} */ (row).dataset.decgHeavyweight === 'true';
         const tierQty = Math.max(pooledQty[itemType], qty || 1, 1);
-        if (parseFloat(row.dataset.sellPrice) > 0) {
+        if (parseFloat(/** @type {HTMLElement} */ (row).dataset.sellPrice) > 0) {
             // manual override — recalc handles the display; still capture the
             // category's small-batch fee so the fee row stays correct.
             try {
@@ -289,16 +288,16 @@ export async function syncDECGRows() {
             // bring-your-own order under the threshold left $50 on the table (the
             // public DECG calculator and the ShopWorks import path both charge it).
             if (res.ltmFee > 0) decgLtm[itemType] = res.ltmFee;
-            delete row.dataset.priceError;
+            delete /** @type {HTMLElement} */ (row).dataset.priceError;
         } catch (e) {
             // P1-4 (audit 2026-06-06): never silently bill a customer-supplied row at $0 (Erik's #1 rule).
             console.error('[DECG] calculateDECGPrice failed', e);
-            row.dataset.priceError = 'true';
+            /** @type {HTMLElement} */ (row).dataset.priceError = 'true';
             showToast('Could not price the Customer-Supplied row — refresh; it will not be saved at $0.', 'error');
         }
-        if (!(unit > 0)) row.dataset.priceError = 'true';   // a customer-supplied row is never $0
+        if (!(unit > 0)) /** @type {HTMLElement} */ (row).dataset.priceError = 'true';   // a customer-supplied row is never $0
         // Store the live price on the row; the next recalc sums it like any service row.
-        row.dataset.unitPrice = String(unit);
+        /** @type {HTMLElement} */ (row).dataset.unitPrice = String(unit);
         const priceCell = document.getElementById(`row-price-${rid}`);
         const totalCell = document.getElementById(`row-total-${rid}`);
         if (priceCell) priceCell.textContent = '$' + unit.toFixed(2);
@@ -345,7 +344,7 @@ export function _syncDecgLtmRow(decgLtm, pooledQty) {
         if (!row) return;
         row.dataset.decgLtm = 'true';
         const qtyIn = row.querySelector('.service-qty');
-        if (qtyIn) { qtyIn.value = 1; qtyIn.readOnly = true; qtyIn.title = 'Small-batch fee — one per order (delete the row to waive)'; }
+        if (qtyIn) { /** @type {HTMLInputElement} */ (qtyIn).value = /** @type {any} */ (1); /** @type {HTMLInputElement} */ (qtyIn).readOnly = true; /** @type {HTMLElement} */ (qtyIn).title = 'Small-batch fee — one per order (delete the row to waive)'; }
         st.rowId = row.dataset.rowId; st.sig = sig; st.waivedSig = null;
         const parts = [];
         if (decgLtm.garment > 0) parts.push(`${pooledQty.garment} supplied garment pc`);
@@ -391,13 +390,13 @@ export function syncRushRow() {
     const grandEl = document.getElementById('grand-total');
     let grand = parseFloat((grandEl?.textContent || '$0').replace(/[$,]/g, '')) || 0;
     rushRows.forEach((row) => {
-        const rid = row.dataset.rowId;
+        const rid = /** @type {HTMLElement} */ (row).dataset.rowId;
         const totalCell = document.getElementById(`row-total-${rid}`);
         const priceCell = document.getElementById(`row-price-${rid}`);
         const oldTotal = parseFloat((totalCell?.textContent || '$0').replace(/[$,]/g, '')) || 0;
         const base = grand - oldTotal;                 // everything except this rush row
         const rush = +(base * getRushRate()).toFixed(2);
-        row.dataset.unitPrice = String(rush);
+        /** @type {HTMLElement} */ (row).dataset.unitPrice = String(rush);
         if (priceCell) priceCell.textContent = '$' + rush.toFixed(2);
         if (totalCell) totalCell.textContent = '$' + rush.toFixed(2);
         grand = base + rush;                           // adjust running grand total
@@ -515,12 +514,12 @@ export function updateDigitizingNudges() {
         { designId: 'garment-design-number', checkboxId: 'primary-digitizing', nudgeId: 'garment-digitizing-nudge' },
         { designId: 'cap-design-number', checkboxId: 'cap-primary-digitizing', nudgeId: 'cap-digitizing-nudge' }
     ].forEach(({ designId, checkboxId, nudgeId }) => {
-        const designEl = document.getElementById(designId);
-        const cb = document.getElementById(checkboxId);
+        const designEl = /** @type {HTMLInputElement|null} */ (document.getElementById(designId));
+        const cb = /** @type {HTMLInputElement|null} */ (document.getElementById(checkboxId));
         const host = cb ? cb.closest('.digitizing-checkbox') : null;
         if (!designEl || !cb || !host) return;
         let nudge = document.getElementById(nudgeId);
-        const cardVisible = host.offsetParent !== null;   // hidden card (e.g. no caps in quote) → no nudge
+        const cardVisible = /** @type {HTMLElement} */ (host).offsetParent !== null;   // hidden card (e.g. no caps in quote) → no nudge
         const show = cardVisible && !designEl.value.trim() && !cb.checked;
         if (!show) { if (nudge) nudge.remove(); return; }
         if (nudge) return;   // already showing
@@ -669,12 +668,12 @@ function paintRowPrices(pricing, logoConfigs, ltmDisplayMode) {
         const style = pp.product.style;
         const productCatalogColor = pp.product.catalogColor;
         // Match by BOTH style AND catalogColor to handle duplicate styles with different colors
-        const parentRow = document.querySelector(`tr[data-style="${style}"][data-catalog-color="${productCatalogColor}"]:not(.child-row)`);
+        const parentRow = /** @type {HTMLElement|null} */ (document.querySelector(`tr[data-style="${style}"][data-catalog-color="${productCatalogColor}"]:not(.child-row)`));
 
         if (!parentRow) return;
 
         const rowId = parentRow.dataset.rowId;
-        const isParentColor = productCatalogColor === parentRow.dataset.catalogColor;
+        const isParentColor = productCatalogColor === /** @type {HTMLElement} */ (parentRow).dataset.catalogColor;
 
         if (pp.lineItems.length > 0) {
             // For products matching the parent's color, update parent row price
@@ -689,8 +688,8 @@ function paintRowPrices(pricing, logoConfigs, ltmDisplayMode) {
                         const displayPrice = (ltmDisplayMode === 'builtin')
                             ? (standardLineItem.unitPriceWithLTM || standardLineItem.unitPrice || 0)
                             : (standardLineItem.unitPrice || 0);
-                        const hasOverride = parseFloat(parentRow.dataset.sellPrice) > 0;
-                        const isNsRow = parentRow.dataset.nonSanmar === 'true';
+                        const hasOverride = parseFloat(/** @type {HTMLElement} */ (parentRow).dataset.sellPrice) > 0;
+                        const isNsRow = /** @type {HTMLElement} */ (parentRow).dataset.nonSanmar === 'true';
 
                         if (isNsRow) {
                             // Non-SanMar: pencil icon, no clear button (price override IS the price)
@@ -726,7 +725,7 @@ function paintRowPrices(pricing, logoConfigs, ltmDisplayMode) {
                         ...standardLineItem,
                         alCost: rowAL ? rowAL.unitPrice : 0
                     };
-                    updateRowBreakdown(rowId, pp.product, lineItemWithAL, logoConfig);
+                    updateRowBreakdown(/** @type {any} */ (rowId), pp.product, /** @type {any} */ (lineItemWithAL), logoConfig);
                 }
             }
 
@@ -753,7 +752,7 @@ function paintRowPrices(pricing, logoConfigs, ltmDisplayMode) {
                 sizesToCheck.forEach(size => {
                     const childRowId = embState.childRowMap[rowId]?.[size];
                     if (childRowId) {
-                        const childRow = document.getElementById(`row-${childRowId}`);
+                        const childRow = /** @type {HTMLElement|null} */ (document.getElementById(`row-${childRowId}`));
                         // Only update price if child row's color matches this product's color
                         if (childRow && childRow.dataset.catalogColor === productCatalogColor) {
                             const childPriceCell = document.getElementById(`row-price-${childRowId}`);
@@ -765,7 +764,7 @@ function paintRowPrices(pricing, logoConfigs, ltmDisplayMode) {
                                     : (li.unitPrice || 0);
                                 // Check parent override (child-specific overrides handled in post-processing)
                                 const childHasOwnOverride = parseFloat(childRow.dataset.sellPrice) > 0;
-                                const hasParentOverride = parseFloat(parentRow.dataset.sellPrice) > 0;
+                                const hasParentOverride = parseFloat(/** @type {HTMLElement} */ (parentRow).dataset.sellPrice) > 0;
                                 if (hasParentOverride && !childHasOwnOverride) {
                                     childPriceCell.classList.add('price-overridden');
                                 } else if (!childHasOwnOverride) {
@@ -811,10 +810,10 @@ function applyChildOverrides() {
     // Post-process: per-size price overrides on child rows
     let childOverrideDelta = 0;
     document.querySelectorAll('#product-tbody tr.child-row').forEach(childRow => {
-        const childOverride = parseFloat(childRow.dataset.sellPrice) || 0;
+        const childOverride = parseFloat(/** @type {HTMLElement} */ (childRow).dataset.sellPrice) || 0;
         if (childOverride <= 0) return;
 
-        const childRowId = childRow.dataset.rowId;
+        const childRowId = /** @type {HTMLElement} */ (childRow).dataset.rowId;
         const childPriceCell = document.getElementById(`row-price-${childRowId}`);
         const childTotalCell = document.getElementById(`row-total-${childRowId}`);
         const childQtyCell = document.getElementById(`row-qty-${childRowId}`);
@@ -916,9 +915,9 @@ function collectChildRowsIntoGroups(rowId, colorGroups) {
     const sizeOverrides = {};
     const childRows = document.querySelectorAll(`tr[data-parent-row-id="${rowId}"]`);
     childRows.forEach(childRow => {
-        const size = childRow.dataset.extendedSize;
-        const childColor = childRow.dataset.color;
-        const childCatalogColor = childRow.dataset.catalogColor || '';
+        const size = /** @type {HTMLElement} */ (childRow).dataset.extendedSize;
+        const childColor = /** @type {HTMLElement} */ (childRow).dataset.color;
+        const childCatalogColor = /** @type {HTMLElement} */ (childRow).dataset.catalogColor || '';
         const qtyDisplay = childRow.querySelector('.qty-display');
         const qty = parseInt(qtyDisplay?.textContent) || 0;
 
@@ -937,7 +936,7 @@ function collectChildRowsIntoGroups(rowId, colorGroups) {
             colorGroups[childCatalogColor].totalQty += qty;
 
             // Collect per-size price override if set
-            const childOverride = parseFloat(childRow.dataset.sellPrice) || 0;
+            const childOverride = parseFloat(/** @type {HTMLElement} */ (childRow).dataset.sellPrice) || 0;
             if (childOverride > 0) {
                 sizeOverrides[size] = childOverride;
             }
@@ -954,21 +953,21 @@ export function collectProductsFromTable() {
 
     rows.forEach(row => {
         const rowId = parseInt(row.id.replace('row-', ''));
-        const style = row.dataset.style;
+        const style = /** @type {HTMLElement} */ (row).dataset.style;
 
         // Handle SERVICE product rows (DECG, DECC, AL, MONOGRAM, etc.)
-        if (row.dataset.productType === 'service') {
+        if (/** @type {HTMLElement} */ (row).dataset.productType === 'service') {
             const qtyInput = row.querySelector('.service-qty');
-            const quantity = parseFloat(qtyInput?.value) || 0;  // parseFloat → fractional service qty (GRT-75 hours)
+            const quantity = parseFloat(/** @type {HTMLInputElement|null} */ (qtyInput)?.value) || 0;  // parseFloat → fractional service qty (GRT-75 hours)
 
             if (quantity > 0) {
-                const serviceType = row.dataset.serviceType;
-                const isCap = row.dataset.isCap === 'true';
-                const stitchCount = parseInt(row.dataset.stitchCount) || 8000;
-                const position = row.dataset.position || '';
+                const serviceType = /** @type {HTMLElement} */ (row).dataset.serviceType;
+                const isCap = /** @type {HTMLElement} */ (row).dataset.isCap === 'true';
+                const stitchCount = parseInt(/** @type {HTMLElement} */ (row).dataset.stitchCount) || 8000;
+                const position = /** @type {HTMLElement} */ (row).dataset.position || '';
                 // Use sell price override if set (DECG/DECC), otherwise original unit price
-                const overridePrice = parseFloat(row.dataset.sellPrice) || 0;
-                const unitPrice = overridePrice > 0 ? overridePrice : (parseFloat(row.dataset.unitPrice) || 0);
+                const overridePrice = parseFloat(/** @type {HTMLElement} */ (row).dataset.sellPrice) || 0;
+                const unitPrice = overridePrice > 0 ? overridePrice : (parseFloat(/** @type {HTMLElement} */ (row).dataset.unitPrice) || 0);
 
                 products.push({
                     style: style,
@@ -990,11 +989,11 @@ export function collectProductsFromTable() {
             return; // Skip normal product processing for service rows
         }
 
-        const parentColor = row.dataset.color;
-        const parentCatalogColor = row.dataset.catalogColor || '';
+        const parentColor = /** @type {HTMLElement} */ (row).dataset.color;
+        const parentCatalogColor = /** @type {HTMLElement} */ (row).dataset.catalogColor || '';
 
         if (!style || !parentColor) {
-            console.warn(`[collectProducts] Skipping row ${rowId}: style="${style || ''}", color="${parentColor || ''}"`, row.dataset.importData || '');
+            console.warn(`[collectProducts] Skipping row ${rowId}: style="${style || ''}", color="${parentColor || ''}"`, /** @type {HTMLElement} */ (row).dataset.importData || '');
             return;
         }
 
@@ -1013,10 +1012,10 @@ export function collectProductsFromTable() {
         // IMPORTANT: Exclude .xxxl-picker-btn (shows TOTAL) and .osfa-qty-input (handled separately)
         // Note: For non-standard products (combo, youth, toddler, tall), data-size is remapped
         // eslint-disable-next-line no-unused-vars -- pre-existing write-only local (verbatim move)
-        const sizeCategory = row.dataset.sizeCategory;
+        const sizeCategory = /** @type {HTMLElement} */ (row).dataset.sizeCategory;
         row.querySelectorAll('.size-input:not(.xxxl-picker-btn):not(.osfa-qty-input):not(:disabled)').forEach(input => {
-            const size = input.dataset.size;
-            const qty = parseInt(input.value) || 0;
+            const size = /** @type {HTMLElement} */ (input).dataset.size;
+            const qty = parseInt(/** @type {HTMLInputElement} */ (input).value) || 0;
             if (qty > 0 && size) {
                 colorGroups[parentCatalogColor].sizeBreakdown[size] = qty;
                 colorGroups[parentCatalogColor].totalQty += qty;
@@ -1025,8 +1024,8 @@ export function collectProductsFromTable() {
 
         // Handle OSFA-only products (beanies, caps, bags)
         // OSFA qty is stored in parent row, not child rows
-        if (row.dataset.isOsfaOnly === 'true') {
-            const osfaQty = parseInt(row.dataset.osfaQty) || 0;
+        if (/** @type {HTMLElement} */ (row).dataset.isOsfaOnly === 'true') {
+            const osfaQty = parseInt(/** @type {HTMLElement} */ (row).dataset.osfaQty) || 0;
             if (osfaQty > 0) {
                 colorGroups[parentCatalogColor].sizeBreakdown['OSFA'] = osfaQty;
                 colorGroups[parentCatalogColor].totalQty += osfaQty;
@@ -1039,7 +1038,7 @@ export function collectProductsFromTable() {
         // Create product entry for each color group with quantities
         Object.entries(colorGroups).forEach(([_catalogColor, group]) => {
             if (group.totalQty > 0) {
-                const isCap = row.dataset.isCap === 'true';
+                const isCap = /** @type {HTMLElement} */ (row).dataset.isCap === 'true';
 
                 // Get global AL config for this product type
                 const alConfig = isCap ? embState.globalAL.cap : embState.globalAL.garment;
@@ -1054,16 +1053,16 @@ export function collectProductsFromTable() {
                     style: style,
                     color: group.color,
                     catalogColor: group.catalogColor,
-                    productName: row.dataset.productName || style,
-                    title: row.dataset.productName || style,  // For invoice PDF description column
+                    productName: /** @type {HTMLElement} */ (row).dataset.productName || style,
+                    title: /** @type {HTMLElement} */ (row).dataset.productName || style,  // For invoice PDF description column
                     sizeBreakdown: group.sizeBreakdown,
                     totalQuantity: group.totalQty,
                     isCap: isCap,  // Cap detection for pricing routing
                     rowId: rowId,  // Track row for AL price updates
-                    imageUrl: row.dataset.imageUrl || '',  // Image URL for quote view display
-                    sellPriceOverride: parseFloat(row.dataset.sellPrice) || 0,  // Non-SanMar fixed sell price
+                    imageUrl: /** @type {HTMLElement} */ (row).dataset.imageUrl || '',  // Image URL for quote view display
+                    sellPriceOverride: parseFloat(/** @type {HTMLElement} */ (row).dataset.sellPrice) || 0,  // Non-SanMar fixed sell price
                     sizeOverrides: sizeOverrides,  // Per-size price overrides from child rows (e.g., { '2XL': 27, '3XL': 29 })
-                    _swUnitPrice: parseFloat(row.dataset.swUnitPrice) || 0,  // ShopWorks charged price for audit
+                    _swUnitPrice: parseFloat(/** @type {HTMLElement} */ (row).dataset.swUnitPrice) || 0,  // ShopWorks charged price for audit
                     logoAssignments: {
                         primary: { logoId: 'primary', quantity: group.totalQty },
                         additional: additionalLogos
@@ -1460,20 +1459,20 @@ export function calculateDiscountableSubtotal() {
     const baseSubtotalText = document.getElementById('grand-total')?.textContent || '$0.00';
     const baseSubtotal = parseFloat(baseSubtotalText.replace(/[$,]/g, '')) || 0;
 
-    const artChargeToggle = document.getElementById('art-charge-toggle');
+    const artChargeToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('art-charge-toggle'));
     const artCharge = artChargeToggle?.checked
-        ? (parseFloat(document.getElementById('art-charge')?.value) || 0) : 0;
-    const designFee = (parseFloat(document.getElementById('graphic-design-hours')?.value) || 0) * getServicePrice('GRT-75', 75);  // GRT-75 rate from Service_Codes API, not hardcoded (review C8)
-    const rushFee = parseFloat(document.getElementById('rush-fee')?.value) || 0;
-    const sampleFee = parseFloat(document.getElementById('sample-fee')?.value) || 0;
-    const sampleQty = parseInt(document.getElementById('sample-qty')?.value) || 1;
-    const shippingFee = parseFloat(document.getElementById('shipping-fee')?.value) || 0;
+        ? (parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('art-charge'))?.value) || 0) : 0;
+    const designFee = (parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('graphic-design-hours'))?.value) || 0) * getServicePrice('GRT-75', 75);  // GRT-75 rate from Service_Codes API, not hardcoded (review C8)
+    const rushFee = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('rush-fee'))?.value) || 0;
+    const sampleFee = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('sample-fee'))?.value) || 0;
+    const sampleQty = parseInt(/** @type {HTMLInputElement|null} */ (document.getElementById('sample-qty'))?.value) || 1;
+    const shippingFee = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('shipping-fee'))?.value) || 0;
 
     const additionalCharges = artCharge + designFee + rushFee + (sampleFee * sampleQty) + shippingFee;
     const discountableSubtotal = baseSubtotal + additionalCharges;
 
-    const discountAmount = parseFloat(document.getElementById('discount-amount')?.value) || 0;
-    const discountType = document.getElementById('discount-type')?.value || 'fixed';
+    const discountAmount = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('discount-amount'))?.value) || 0;
+    const discountType = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-type'))?.value || 'fixed';
 
     let discount = 0;
     if (discountType === 'percent') {
@@ -1536,17 +1535,17 @@ function showTaxStatus(message, type) {
 // re-enable tax + re-look-up the destination rate. The flag is the ONLY trigger for wholesale — never inferred
 // from a $0 rate (a failed lookup must not silently become wholesale → no tax). Erik's #1 rule.
 export function toggleWholesale() {
-    const cb = document.getElementById('wholesale-checkbox');
+    const cb = /** @type {HTMLInputElement|null} */ (document.getElementById('wholesale-checkbox'));
     window._isWholesale = !!(cb && cb.checked);
-    const incTax = document.getElementById('include-tax');
-    const rateInput = document.getElementById('tax-rate-input');
+    const incTax = /** @type {HTMLInputElement|null} */ (document.getElementById('include-tax'));
+    const rateInput = /** @type {HTMLInputElement|null} */ (document.getElementById('tax-rate-input'));
     if (window._isWholesale) {
         if (incTax) incTax.checked = false;
         if (rateInput) rateInput.value = '0';
         if (typeof updateTaxCalculation === 'function') updateTaxCalculation();
         if (typeof showTaxStatus === 'function') showTaxStatus('Wholesale / reseller — no tax', 'info');
     } else {
-        if (incTax) incTax.checked = true;
+        if (incTax) /** @type {HTMLInputElement} */ (incTax).checked = true;
         if (typeof updateTaxCalculation === 'function') updateTaxCalculation();
         if (typeof lookupTaxRate === 'function') lookupTaxRate(); // re-fetch the real rate for the ship address
     }
@@ -1565,22 +1564,22 @@ export async function lookupTaxRate() {
     // [B8] (audit 2026-06-06): a tax-exempt customer — OR a wholesale/reseller order ([2026-06-07]) — must
     // stay 0% even after a Pickup→Ship toggle re-runs this lookup, else WA tax is silently re-applied. #1 rule.
     if (window._taxExempt || window._isWholesale) {
-        const rateInput = document.getElementById('tax-rate-input');
+        const rateInput = /** @type {HTMLInputElement|null} */ (document.getElementById('tax-rate-input'));
         if (rateInput) rateInput.value = '0';
-        const incTax = document.getElementById('include-tax');
+        const incTax = /** @type {HTMLInputElement|null} */ (document.getElementById('include-tax'));
         if (incTax) incTax.checked = false;
         updateTaxCalculation();
         showTaxStatus(window._isWholesale ? 'Wholesale / reseller — no tax' : 'Tax Exempt customer — no tax', 'info');
         return false;
     }
-    const state = document.getElementById('ship-state').value;
-    const zip = document.getElementById('ship-zip').value.trim();
-    const city = document.getElementById('ship-city').value.trim();
-    const address = document.getElementById('ship-address').value.trim();
+    const state = /** @type {HTMLInputElement} */ (document.getElementById('ship-state')).value;
+    const zip = /** @type {HTMLInputElement} */ (document.getElementById('ship-zip')).value.trim();
+    const city = /** @type {HTMLInputElement} */ (document.getElementById('ship-city')).value.trim();
+    const address = /** @type {HTMLInputElement} */ (document.getElementById('ship-address')).value.trim();
 
     // Non-WA state → 0% tax
     if (state !== 'WA') {
-        document.getElementById('tax-rate-input').value = '0';
+        /** @type {HTMLInputElement} */ (document.getElementById('tax-rate-input')).value = '0';
         updateTaxCalculation();
         showTaxStatus('Out of State — No Tax', 'info');
         return true;
@@ -1609,7 +1608,7 @@ export async function lookupTaxRate() {
             return false;
         }
 
-        document.getElementById('tax-rate-input').value = data.taxRate;
+        /** @type {HTMLInputElement} */ (document.getElementById('tax-rate-input')).value = data.taxRate;
         updateTaxCalculation();
 
         if (data.outOfState) {
@@ -1633,18 +1632,18 @@ export async function lookupTaxRate() {
  * If non-WA, set tax to 0%. If WA with ZIP, trigger lookup.
  */
 export function onShipStateChange() {
-    const state = document.getElementById('ship-state').value;
+    const state = /** @type {HTMLInputElement} */ (document.getElementById('ship-state')).value;
     if (state !== 'WA') {
-        document.getElementById('tax-rate-input').value = '0';
+        /** @type {HTMLInputElement} */ (document.getElementById('tax-rate-input')).value = '0';
         updateTaxCalculation();
         showTaxStatus('Out of State — No Tax', 'info');
     } else {
-        const zip = document.getElementById('ship-zip').value.trim();
+        const zip = /** @type {HTMLInputElement} */ (document.getElementById('ship-zip')).value.trim();
         if (zip && zip.length >= 5) {
             lookupTaxRate();
         } else {
             // Reset to WA default
-            document.getElementById('tax-rate-input').value = '10.2';
+            /** @type {HTMLInputElement} */ (document.getElementById('tax-rate-input')).value = '10.2';
             updateTaxCalculation();
             showTaxStatus('', 'info');
         }
@@ -1655,8 +1654,8 @@ export function onShipStateChange() {
  * Handle ZIP code blur — trigger lookup if WA + valid ZIP
  */
 export function onShipZipBlur() {
-    const state = document.getElementById('ship-state').value;
-    const zip = document.getElementById('ship-zip').value.trim();
+    const state = /** @type {HTMLInputElement} */ (document.getElementById('ship-state')).value;
+    const zip = /** @type {HTMLInputElement} */ (document.getElementById('ship-zip')).value.trim();
     if (state === 'WA' && zip.length >= 5) {
         lookupTaxRate();
     }
@@ -1668,7 +1667,7 @@ export function onShipZipBlur() {
  * When "Other" selected, show custom text input.
  */
 export function onShipMethodChange() {
-    const method = document.getElementById('ship-method').value;
+    const method = /** @type {HTMLInputElement} */ (document.getElementById('ship-method')).value;
     const isPickup = method === 'Customer Pickup';
     const carrierWrap = document.getElementById('ship-carrier-wrap');
     const pickupNotice = document.getElementById('pickup-notice');
@@ -1690,15 +1689,15 @@ export function onShipMethodChange() {
         // address) that restoreEmbOrderShipping just restored; clobbering it to Milton here would wipe it
         // and a Save Revision would persist Milton. Skip the clobber + freight-clear while restoring.
         if (!window._restoringQuote) {
-            document.getElementById('ship-address').value = '';
-            document.getElementById('ship-city').value = 'Milton';
-            document.getElementById('ship-state').value = 'WA';
-            document.getElementById('ship-zip').value = '98354';
+            /** @type {HTMLInputElement} */ (document.getElementById('ship-address')).value = '';
+            /** @type {HTMLInputElement} */ (document.getElementById('ship-city')).value = 'Milton';
+            /** @type {HTMLInputElement} */ (document.getElementById('ship-state')).value = 'WA';
+            /** @type {HTMLInputElement} */ (document.getElementById('ship-zip')).value = '98354';
             // P1-1 (audit 2026-06-06): clear any previously-estimated freight when switching back to Pickup —
             // otherwise phantom freight is billed + taxed + saved as a SHIP line + pushed to cur_Shipping.
-            const _pickupShipFee = document.getElementById('shipping-fee');
+            const _pickupShipFee = /** @type {HTMLInputElement|null} */ (document.getElementById('shipping-fee'));
             if (_pickupShipFee && parseFloat(_pickupShipFee.value) > 0) {
-                _pickupShipFee.value = '0';
+                /** @type {HTMLInputElement} */ (_pickupShipFee).value = '0';
                 if (typeof updateAdditionalCharges === 'function') updateAdditionalCharges();
             }
         }
@@ -1721,38 +1720,38 @@ export function onShipMethodChange() {
  * customer ship-to (stashed in applyContact) so the rep doesn't retype it.
  */
 export function setShipMode(mode) {
-    const select = document.getElementById('ship-method');
+    const select = /** @type {HTMLInputElement|null} */ (document.getElementById('ship-method'));
     if (!select) return;
     if (mode === 'pickup') {
         select.value = 'Customer Pickup';
     } else {
         // Leaving pickup → default to UPS Ground (most common carrier)
-        const wasPickup = select.value === 'Customer Pickup';
-        if (wasPickup) select.value = 'UPS Ground';
+        const wasPickup = /** @type {HTMLInputElement} */ (select).value === 'Customer Pickup';
+        if (wasPickup) /** @type {HTMLInputElement} */ (select).value = 'UPS Ground';
         // [2026-06-07] Clear the Milton pickup defaults (onShipMethodChange stamps city=Milton/state=WA/zip=98354
         // for the pickup tax) so they don't masquerade as the ship-to DESTINATION — bug: Pickup→Ship left "Milton"
         // in the city. The rep types the real address, or it's restored from the last customer just below. Guard
         // on _restoringQuote so an edit-reload of a real saved ship-to isn't wiped.
         if (wasPickup && !window._restoringQuote) {
             ['ship-address', 'ship-city', 'ship-state', 'ship-zip'].forEach((id) => {
-                const el = document.getElementById(id); if (el) el.value = '';
+                const el = /** @type {HTMLInputElement|null} */ (document.getElementById(id)); if (el) el.value = '';
             });
         }
         // Pre-fill the address from the last selected customer, if we have it
         const stash = window._lastCustomerShipTo;
-        const zipEl = document.getElementById('ship-zip');
+        const zipEl = /** @type {HTMLInputElement|null} */ (document.getElementById('ship-zip'));
         if (stash && zipEl && !zipEl.value.trim()) {
-            const set = (id, v) => { const el = document.getElementById(id); if (el && v) el.value = v; };
+            const set = (id, v) => { const el = /** @type {HTMLInputElement|null} */ (document.getElementById(id)); if (el && v) el.value = v; };
             set('ship-address', stash.address);
             set('ship-city', stash.city);
-            if (stash.state) { const st = document.getElementById('ship-state'); if (st) st.value = stash.state; }
+            if (stash.state) { const st = /** @type {HTMLInputElement|null} */ (document.getElementById('ship-state')); if (st) st.value = stash.state; }
             set('ship-zip', stash.zip);
         }
     }
     onShipMethodChange();
     // In ship mode, refresh the tax rate for the shown address (if any)
     if (mode === 'ship') {
-        const zip = document.getElementById('ship-zip')?.value?.trim();
+        const zip = /** @type {HTMLInputElement|null} */ (document.getElementById('ship-zip'))?.value?.trim();
         if (zip && zip.length >= 5) lookupTaxRate();
     }
 }
@@ -1766,19 +1765,19 @@ window.setShipMode = setShipMode;
 export function updateShippingSummary() {
     const el = document.getElementById('shipping-summary');
     if (!el) return;
-    const method = document.getElementById('ship-method')?.value || '';
+    const method = /** @type {HTMLInputElement|null} */ (document.getElementById('ship-method'))?.value || '';
     const isPickup = method === 'Customer Pickup';
-    const rate = (document.getElementById('tax-rate-input')?.value || '').trim();
+    const rate = (/** @type {HTMLInputElement|null} */ (document.getElementById('tax-rate-input'))?.value || '').trim();
     const ratePart = rate ? ` · ${rate}% tax` : '';
     if (isPickup) {
         el.textContent = `Customer Pickup — Milton, WA${ratePart}`;
     } else {
-        const city = (document.getElementById('ship-city')?.value || '').trim();
-        const state = document.getElementById('ship-state')?.value || '';
-        const zip = (document.getElementById('ship-zip')?.value || '').trim();
+        const city = (/** @type {HTMLInputElement|null} */ (document.getElementById('ship-city'))?.value || '').trim();
+        const state = /** @type {HTMLInputElement|null} */ (document.getElementById('ship-state'))?.value || '';
+        const zip = (/** @type {HTMLInputElement|null} */ (document.getElementById('ship-zip'))?.value || '').trim();
         const loc = [[city, state].filter(Boolean).join(', '), zip].filter(Boolean).join(' ');
         const m = (method === 'Other')
-            ? ((document.getElementById('ship-method-other')?.value || '').trim() || 'Other')
+            ? ((/** @type {HTMLInputElement|null} */ (document.getElementById('ship-method-other'))?.value || '').trim() || 'Other')
             : method;
         el.textContent = `${m}${loc ? ' — ' + loc : ' — (enter address)'}${ratePart}`;
     }
@@ -1807,10 +1806,10 @@ window.closeShippingModal = closeShippingModal;
  * Called after pricing updates and when any charge input changes
  */
 export function updateTaxCalculation() {
-    const includeTax = document.getElementById('include-tax')?.checked ?? true;
+    const includeTax = /** @type {HTMLInputElement|null} */ (document.getElementById('include-tax'))?.checked ?? true;
     const { adjustedSubtotal } = calculateDiscountableSubtotal();
 
-    const rateInput = document.getElementById('tax-rate-input');
+    const rateInput = /** @type {HTMLInputElement|null} */ (document.getElementById('tax-rate-input'));
     // parseRatePercent: an empty/cleared input rendered "$NaN" and saved a
     // "Sales Tax (NaN%)" item; 0 stays a valid rate. Same fallback as the save path.
     const taxRate = parseRatePercent(rateInput?.value, 10.2) / 100;
@@ -1831,8 +1830,8 @@ export function updateTaxCalculation() {
 
     // Shipping line under the invoice: "Customer Pickup" when picking up,
     // otherwise the shipping charge. (2026-06-02 — totals moved under line items)
-    const shippingFee = parseFloat(document.getElementById('shipping-fee')?.value) || 0;
-    const isPickup = (document.getElementById('ship-method')?.value === 'Customer Pickup');
+    const shippingFee = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('shipping-fee'))?.value) || 0;
+    const isPickup = (/** @type {HTMLInputElement|null} */ (document.getElementById('ship-method'))?.value === 'Customer Pickup');
     const shipAmtEl = document.getElementById('it-shipping-amt');
     if (shipAmtEl) {
         if (isPickup) {
@@ -1844,9 +1843,9 @@ export function updateTaxCalculation() {
                 shipAmtEl.textContent = '$' + shippingFee.toFixed(2);
             } else {
                 // No charge entered yet — show the carrier so it doesn't read as "$0.00"
-                const m = document.getElementById('ship-method')?.value || '';
+                const m = /** @type {HTMLInputElement|null} */ (document.getElementById('ship-method'))?.value || '';
                 shipAmtEl.textContent = (m === 'Other')
-                    ? ((document.getElementById('ship-method-other')?.value || '').trim() || 'Other')
+                    ? ((/** @type {HTMLInputElement|null} */ (document.getElementById('ship-method-other'))?.value || '').trim() || 'Other')
                     : (m || 'Ship');
             }
         }
@@ -1860,7 +1859,7 @@ export function updateTaxCalculation() {
     // Sales Tax label shows the effective rate when charged; "(exempt)"/"(not charged)" when $0,
     // and the row stays visible for invoice transparency (best-of-both level-up 2026-06-14).
     const taxLabel = document.getElementById('tax-label');
-    const _embRateRaw = (document.getElementById('tax-rate-input')?.value || '').trim();
+    const _embRateRaw = (/** @type {HTMLInputElement|null} */ (document.getElementById('tax-rate-input'))?.value || '').trim();
     if (taxLabel) taxLabel.textContent = (includeTax && parseFloat(_embRateRaw) > 0)
         ? `Sales Tax (${_embRateRaw}%)`
         : ((window._isWholesale || window._taxExempt) ? 'Sales Tax (exempt)' : 'Sales Tax (not charged)');

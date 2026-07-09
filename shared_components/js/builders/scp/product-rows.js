@@ -4,7 +4,6 @@
  * color picker + child rows (incl. the SCP duplicate-row auto-merge),
  * keyboard nav, and the page-level click-away listener. Moved verbatim.
  */
-// @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions; typing lands with the render/state split).
 /* global SIZE_TO_SUFFIX, EXTENDED_SIZE_ORDER, getAvailableExtendedSizes,
    markScreenPrintDirty, recalculatePricing, escapeHtml, showToast,
    SKUValidationService, ProductCategoryFilter, cleanProductTitle,
@@ -12,7 +11,7 @@
 import { scpState, API_BASE, SIZE06_EXTENDED_SIZES } from './state.js';
 
 export function setupSearchAutocomplete() {
-    const searchInput = document.getElementById('product-search');
+    const searchInput = /** @type {HTMLInputElement|null} */ (document.getElementById('product-search'));
     const suggestions = document.getElementById('search-suggestions');
 
     if (!searchInput || !window.ExactMatchSearch) {
@@ -44,7 +43,7 @@ export function setupSearchAutocomplete() {
 
         // Keyboard navigation: select item via Enter
         onSelect: (product) => {
-            searchInput.value = '';
+            /** @type {HTMLInputElement} */ (searchInput).value = '';
             selectProduct(product.value);
         },
 
@@ -56,7 +55,7 @@ export function setupSearchAutocomplete() {
 
     // Wire up search input
     searchInput.addEventListener('input', function() {
-        const query = this.value.trim();
+        const query = /** @type {HTMLInputElement} */ (this).value.trim();
 
         if (query.length < 2) {
             suggestions.classList.remove('show');
@@ -76,7 +75,7 @@ export function setupSearchAutocomplete() {
         // Handle Enter for immediate search when nothing is selected
         if (e.key === 'Enter') {
             e.preventDefault();
-            const query = searchInput.value.trim();
+            const query = /** @type {HTMLInputElement} */ (searchInput).value.trim();
             if (query.length >= 2) {
                 scpState.exactMatchSearcher.searchImmediate(query);
             }
@@ -85,7 +84,7 @@ export function setupSearchAutocomplete() {
 
     // Close suggestions when clicking outside
     document.addEventListener('click', function(e) {
-        if (!e.target.closest('.search-input-wrapper')) {
+        if (!/** @type {HTMLElement} */ (e.target).closest('.search-input-wrapper')) {
             suggestions.classList.remove('show');
             if (scpState.exactMatchSearcher) scpState.exactMatchSearcher.resetNavigation();
         }
@@ -145,7 +144,7 @@ function updateSearchSelectionHighlight(selectedIndex) {
 }
 
 export async function selectProduct(styleNumber) {
-    const searchInput = document.getElementById('product-search');
+    const searchInput = /** @type {HTMLInputElement|null} */ (document.getElementById('product-search'));
     const suggestions = document.getElementById('search-suggestions');
 
     searchInput.value = '';
@@ -170,7 +169,7 @@ export function addNewRow() {
     const row = document.createElement('tr');
     row.id = `row-${rowId}`;
     row.className = 'new-row';
-    row.dataset.rowId = rowId;
+    row.dataset.rowId = /** @type {any} */ (rowId);
 
     // eslint-disable-next-line no-unsanitized/property -- audited (1.4): interpolations escapeHtml-wrapped or numeric at build
     row.innerHTML = `
@@ -227,7 +226,7 @@ export function addNewRow() {
 
     // Focus on the style input
     setTimeout(() => {
-        row.querySelector('.style-input').focus();
+        /** @type {HTMLElement} */ (row.querySelector('.style-input')).focus();
     }, 50);
 
     // Remove the "new-row" highlight after a moment
@@ -238,7 +237,7 @@ export function addNewRow() {
 
 async function addProductRow(styleNumber) {
     // Find or create empty row
-    let targetRow = document.querySelector('tr.new-row');
+    let targetRow = /** @type {HTMLElement|null} */ (document.querySelector('tr.new-row'));
     if (!targetRow) {
         addNewRow();
         targetRow = document.querySelector('tr.new-row');
@@ -246,7 +245,7 @@ async function addProductRow(styleNumber) {
 
     const rowId = targetRow.dataset.rowId;
     const styleInput = targetRow.querySelector('.style-input');
-    styleInput.value = styleNumber;
+    /** @type {HTMLInputElement} */ (styleInput).value = styleNumber;
 
     await onStyleChange(styleInput, parseInt(rowId));
 }
@@ -288,7 +287,7 @@ export async function onStyleChange(input, rowId) {
             const cleanTitle = cleanProductTitle(product.PRODUCT_TITLE, styleNumber);
 
             // Update description with clean title
-            descInput.value = cleanTitle || styleNumber;
+            /** @type {HTMLInputElement} */ (descInput).value = cleanTitle || styleNumber;
 
             // Fetch colors using product-colors API (also returns CATEGORY_NAME)
             const colorsResponse = await fetch(`${API_BASE}/api/product-colors?styleNumber=${styleNumber}`);
@@ -333,10 +332,10 @@ export async function onStyleChange(input, rowId) {
             // Enable "duplicate row" button now that style is loaded (covers fresh
             // entry, edit-load, quick-quote prefill — every path runs onStyleChange)
             const dupBtn = row.querySelector('.btn-duplicate-row');
-            if (dupBtn) dupBtn.disabled = false;
+            if (dupBtn) /** @type {HTMLInputElement} */ (dupBtn).disabled = false;
 
         } else {
-            descInput.value = 'Not found';
+            /** @type {HTMLInputElement} */ (descInput).value = 'Not found';
             showToast(`Style ${styleNumber} not found`, 'error');
         }
     } catch (error) {
@@ -362,13 +361,13 @@ export async function duplicateRowNewColor(sourceRowId) {
 
     addNewRow();
     // addNewRow() appends to product-tbody synchronously — the new row is the last one
-    const newRow = document.getElementById('product-tbody').lastElementChild;
-    if (!newRow || !newRow.dataset.rowId) return;
+    const newRow = /** @type {HTMLElement|null} */ (document.getElementById('product-tbody')).lastElementChild;
+    if (!newRow || !/** @type {HTMLElement} */ (newRow).dataset.rowId) return;
 
     const styleInput = newRow.querySelector('.style-input');
     if (styleInput) {
-        styleInput.value = style;
-        await onStyleChange(styleInput, parseInt(newRow.dataset.rowId));
+        /** @type {HTMLInputElement} */ (styleInput).value = style;
+        await onStyleChange(styleInput, parseInt(/** @type {HTMLElement} */ (newRow).dataset.rowId));
         showToast(`Select a new color for ${style}`, 'info', 3000);
     }
 }
@@ -858,15 +857,15 @@ function onOSFAQtyChange(rowId) {
     if (!row) return;
 
     const osfaInput = row.querySelector('.osfa-qty-input');
-    const qty = parseInt(osfaInput?.value) || 0;
+    const qty = parseInt(/** @type {HTMLInputElement|null} */ (osfaInput)?.value) || 0;
 
     // Store OSFA qty in dataset
-    row.dataset.osfaQty = qty;
+    row.dataset.osfaQty = /** @type {any} */ (qty);
     row.dataset.isOsfaOnly = 'true';
 
     // Update qty display
     const qtyDisplay = document.getElementById(`row-qty-${rowId}`);
-    if (qtyDisplay) qtyDisplay.textContent = qty;
+    if (qtyDisplay) qtyDisplay.textContent = /** @type {any} */ (qty);
 
     // Trigger pricing recalculation
     recalculatePricing();
@@ -1014,21 +1013,21 @@ function validateSizeAvailability(row, availableSizes) {
         if (isAvailable) {
             input.classList.add('size-available');
             input.classList.remove('size-unavailable');
-            input.disabled = false;
-            input.placeholder = '0';
-            input.title = `${size} (SKU: ${sku})`;
+            /** @type {HTMLInputElement} */ (input).disabled = false;
+            /** @type {HTMLInputElement} */ (input).placeholder = '0';
+            /** @type {HTMLElement} */ (input).title = `${size} (SKU: ${sku})`;
         } else {
             input.classList.add('size-unavailable');
             input.classList.remove('size-available');
-            input.disabled = true;
-            input.value = '';
-            input.placeholder = 'N/A';
-            input.title = `${size} not available for this style/color`;
+            /** @type {HTMLInputElement} */ (input).disabled = true;
+            /** @type {HTMLInputElement} */ (input).value = '';
+            /** @type {HTMLInputElement} */ (input).placeholder = 'N/A';
+            /** @type {HTMLElement} */ (input).title = `${size} not available for this style/color`;
             input.closest('td')?.classList.add('size-disabled');
         }
 
         // Store SKU on input for reference
-        input.dataset.sku = sku;
+        /** @type {HTMLElement} */ (input).dataset.sku = sku;
     });
 
     // Update extended size picker (XXXL column) if present
@@ -1040,14 +1039,14 @@ function validateSizeAvailability(row, availableSizes) {
 
         if (hasExtended) {
             xxxlCell.classList.remove('size-unavailable');
-            xxxlCell.disabled = false;
-            xxxlCell.title = `Extended sizes: ${extendedSizes.join(', ')}`;
+            /** @type {HTMLInputElement} */ (xxxlCell).disabled = false;
+            /** @type {HTMLElement} */ (xxxlCell).title = `Extended sizes: ${extendedSizes.join(', ')}`;
             row.dataset.extendedSizes = JSON.stringify(extendedSizes);
         } else {
             xxxlCell.classList.add('size-unavailable');
-            xxxlCell.disabled = true;
-            xxxlCell.placeholder = '-';
-            xxxlCell.title = 'No extended sizes available';
+            /** @type {HTMLInputElement} */ (xxxlCell).disabled = true;
+            /** @type {HTMLInputElement} */ (xxxlCell).placeholder = '-';
+            /** @type {HTMLElement} */ (xxxlCell).title = 'No extended sizes available';
         }
     }
 
@@ -1165,12 +1164,12 @@ async function detectProductTypeAndAdjustUI(rowId) {
             standardSizeLabels.forEach(size => {
                 const input = row.querySelector(`input[data-size="${size}"]`);
                 if (input) {
-                    input.disabled = true;
-                    input.value = '';
-                    input.placeholder = 'N/A';
-                    input.style.backgroundColor = '#f0f0f0';
-                    input.style.color = '#999';
-                    input.title = 'Size not available for this product';
+                    /** @type {HTMLInputElement} */ (input).disabled = true;
+                    /** @type {HTMLInputElement} */ (input).value = '';
+                    /** @type {HTMLInputElement} */ (input).placeholder = 'N/A';
+                    /** @type {HTMLElement} */ (input).style.backgroundColor = '#f0f0f0';
+                    /** @type {HTMLElement} */ (input).style.color = '#999';
+                    /** @type {HTMLElement} */ (input).title = 'Size not available for this product';
                 }
             });
 
@@ -1180,7 +1179,7 @@ async function detectProductTypeAndAdjustUI(rowId) {
 
             // Focus on the extended size picker instead
             const xxxlInput = row.querySelector('input[data-size="3XL"]');
-            if (xxxlInput) xxxlInput.focus();
+            if (xxxlInput) /** @type {HTMLElement} */ (xxxlInput).focus();
         }
     } catch (error) {
         console.warn('Could not detect product type for UI adjustment:', error);
@@ -1216,13 +1215,13 @@ export function selectColor(rowId, optionEl) {
 
     // Set swatch style (image or hex fallback)
     if (swatchUrl) {
-        swatch.style.backgroundImage = `url('${swatchUrl}')`;
-        swatch.style.backgroundColor = '';
-        swatch.style.backgroundSize = 'cover';
-        swatch.style.backgroundPosition = 'center';
+        /** @type {HTMLElement} */ (swatch).style.backgroundImage = `url('${swatchUrl}')`;
+        /** @type {HTMLElement} */ (swatch).style.backgroundColor = '';
+        /** @type {HTMLElement} */ (swatch).style.backgroundSize = 'cover';
+        /** @type {HTMLElement} */ (swatch).style.backgroundPosition = 'center';
     } else {
-        swatch.style.backgroundImage = '';
-        swatch.style.backgroundColor = hex || '#ccc';
+        /** @type {HTMLElement} */ (swatch).style.backgroundImage = '';
+        /** @type {HTMLElement} */ (swatch).style.backgroundColor = hex || '#ccc';
     }
     swatch.classList.remove('empty');
 
@@ -1253,7 +1252,7 @@ export function selectColor(rowId, optionEl) {
     row.querySelector('.color-picker-dropdown').classList.add('hidden');
 
     // Enable size inputs initially (may be disabled by detectAndAdjustSizeUI for special products)
-    row.querySelectorAll('.size-input').forEach(input => input.disabled = false);
+    row.querySelectorAll('.size-input').forEach(input => /** @type {HTMLInputElement} */ (input).disabled = false);
 
     // Detect size category and adjust UI (OSFA, combo, youth, toddler, tall, standard)
     // This runs async but doesn't block - will update UI when API returns
@@ -1272,7 +1271,7 @@ export function selectColor(rowId, optionEl) {
 
     // Focus first size input (may be overridden by detectAndAdjustSizeUI for special products)
     const firstSize = row.querySelector('.size-input');
-    if (firstSize) firstSize.focus();
+    if (firstSize) /** @type {HTMLElement} */ (firstSize).focus();
 
     // Cascade to child rows if any
     cascadeColorToChildRows(rowId, colorName, catalogColor, swatchUrl, hex);
@@ -1299,11 +1298,11 @@ function cascadeColorToChildRows(parentRowId, colorName, catalogColor, swatchUrl
                 const childName = childPicker.querySelector('.color-name');
                 if (childSwatch && childName) {
                     if (swatchUrl) {
-                        childSwatch.style.backgroundImage = `url('${swatchUrl}')`;
-                        childSwatch.style.backgroundColor = '';
+                        /** @type {HTMLElement} */ (childSwatch).style.backgroundImage = `url('${swatchUrl}')`;
+                        /** @type {HTMLElement} */ (childSwatch).style.backgroundColor = '';
                     } else {
-                        childSwatch.style.backgroundImage = '';
-                        childSwatch.style.backgroundColor = hex || '#ccc';
+                        /** @type {HTMLElement} */ (childSwatch).style.backgroundImage = '';
+                        /** @type {HTMLElement} */ (childSwatch).style.backgroundColor = hex || '#ccc';
                     }
                     childSwatch.classList.remove('empty');
                     childName.textContent = colorName;
@@ -1371,7 +1370,7 @@ function navigateOptions(dropdown, direction) {
 
 // Click outside handler to close all dropdowns
 document.addEventListener('click', function(e) {
-    if (!e.target.closest('.color-picker-wrapper')) {
+    if (!/** @type {HTMLElement} */ (e.target).closest('.color-picker-wrapper')) {
         document.querySelectorAll('.color-picker-dropdown').forEach(d => d.classList.add('hidden'));
         document.querySelectorAll('.color-picker-selected[aria-expanded="true"]').forEach((el) => el.setAttribute('aria-expanded', 'false'));
     }
@@ -1395,13 +1394,13 @@ export function selectChildColor(childRowId, parentRowId, optionEl) {
 
     // Set swatch style (image or hex fallback)
     if (swatchUrl) {
-        swatch.style.backgroundImage = `url('${swatchUrl}')`;
-        swatch.style.backgroundColor = '';
-        swatch.style.backgroundSize = 'cover';
-        swatch.style.backgroundPosition = 'center';
+        /** @type {HTMLElement} */ (swatch).style.backgroundImage = `url('${swatchUrl}')`;
+        /** @type {HTMLElement} */ (swatch).style.backgroundColor = '';
+        /** @type {HTMLElement} */ (swatch).style.backgroundSize = 'cover';
+        /** @type {HTMLElement} */ (swatch).style.backgroundPosition = 'center';
     } else {
-        swatch.style.backgroundImage = '';
-        swatch.style.backgroundColor = hex || '#ccc';
+        /** @type {HTMLElement} */ (swatch).style.backgroundImage = '';
+        /** @type {HTMLElement} */ (swatch).style.backgroundColor = hex || '#ccc';
     }
     swatch.classList.remove('empty');
 
@@ -1459,7 +1458,7 @@ async function onColorChange(select, rowId) {
 
     // Enable size inputs
     row.querySelectorAll('.size-input').forEach(input => {
-        input.disabled = false;
+        /** @type {HTMLInputElement} */ (input).disabled = false;
     });
 
     // Cascade color change to child rows that haven't been manually edited
@@ -1475,7 +1474,7 @@ async function onColorChange(select, rowId) {
                 // Update child row's color dropdown selection
                 const childColorSelect = childRow.querySelector('.child-color-select');
                 if (childColorSelect) {
-                    childColorSelect.value = color;
+                    /** @type {HTMLInputElement} */ (childColorSelect).value = color;
                 }
 
             }
@@ -1485,7 +1484,7 @@ async function onColorChange(select, rowId) {
 
     // Focus first size input
     const firstSize = row.querySelector('.size-input');
-    if (firstSize) firstSize.focus();
+    if (firstSize) /** @type {HTMLElement} */ (firstSize).focus();
 }
 
 /**
@@ -1556,9 +1555,9 @@ function mergeDuplicateRowInto(existingRow, dupRowId) {
     if (!dupRow || !existingRow) return 0;
     let moved = 0;
     dupRow.querySelectorAll('.size-input:not(.xxxl-picker-btn)').forEach(inp => {
-        const qty = parseInt(inp.value, 10) || 0;
+        const qty = parseInt(/** @type {HTMLInputElement} */ (inp).value, 10) || 0;
         if (qty <= 0) return;
-        const size = inp.dataset.size;
+        const size = /** @type {HTMLElement} */ (inp).dataset.size;
         const target = existingRow.querySelector(`.size-input[data-size="${size}"]:not(.xxxl-picker-btn)`);
         if (target && !target.disabled) {
             target.value = String((parseInt(target.value, 10) || 0) + qty);
@@ -1577,7 +1576,7 @@ function findExistingRow(style, catalogColor, excludeRowId) {
     for (const row of rows) {
         const rowNumericId = parseInt(row.id.replace('row-', ''));
         if (rowNumericId === excludeRowId) continue;
-        if (row.dataset.style === style && row.dataset.catalogColor === catalogColor) {
+        if (/** @type {HTMLElement} */ (row).dataset.style === style && /** @type {HTMLElement} */ (row).dataset.catalogColor === catalogColor) {
             return row;
         }
     }
@@ -1606,11 +1605,11 @@ export function onSizeChange(rowId) {
     // Child row quantities display separately — don't double-count in parent
     let standardTotal = 0;
     row.querySelectorAll('.size-input:not(.xxxl-picker-btn):not(.osfa-qty-input):not(:disabled)').forEach(input => {
-        standardTotal += parseInt(input.value) || 0;
+        standardTotal += parseInt(/** @type {HTMLInputElement} */ (input).value) || 0;
     });
 
     if (standardTotal > 0) {
-        document.getElementById(`row-qty-${rowId}`).textContent = standardTotal;
+        document.getElementById(`row-qty-${rowId}`).textContent = /** @type {any} */ (standardTotal);
     } else {
         // Variant-only: show child row total so parent doesn't display "0"
         let childTotal = 0;
@@ -1619,14 +1618,14 @@ export function onSizeChange(rowId) {
             const qtyDisplay = childRow.querySelector('.qty-display');
             childTotal += parseInt(qtyDisplay?.textContent) || 0;
         });
-        document.getElementById(`row-qty-${rowId}`).textContent = childTotal;
+        document.getElementById(`row-qty-${rowId}`).textContent = /** @type {any} */ (childTotal);
     }
 
     // Handle 2XL/XXL size (has direct input) - create/update/remove child rows
     // Note: Size06 sizes (XS, 3XL, 4XL, 5XL, 6XL) are handled by the Extended Size Picker popup
     const xxlInput = row.querySelector('[data-size="2XL"]');
     if (xxlInput) {
-        const qty = parseInt(xxlInput.value) || 0;
+        const qty = parseInt(/** @type {HTMLInputElement} */ (xxlInput).value) || 0;
         // Check for both 2XL and XXL child rows (XXL is distinct for Ladies/Womens products)
         const existingChildId = scpState.childRowMap[rowId]?.['2XL'] || scpState.childRowMap[rowId]?.['XXL'];
         const existingChildSize = scpState.childRowMap[rowId]?.['2XL'] ? '2XL' : (scpState.childRowMap[rowId]?.['XXL'] ? 'XXL' : '2XL');
@@ -1639,26 +1638,26 @@ export function onSizeChange(rowId) {
                 createChildRow(rowId, '2XL', qty);
             }
             // Disable the 2XL input in parent and clear value
-            xxlInput.disabled = true;
-            xxlInput.value = '';  // Clear to prevent visual confusion
-            xxlInput.style.background = '#f5f5f5';
-            xxlInput.style.color = '#999';
+            /** @type {HTMLInputElement} */ (xxlInput).disabled = true;
+            /** @type {HTMLInputElement} */ (xxlInput).value = '';  // Clear to prevent visual confusion
+            /** @type {HTMLElement} */ (xxlInput).style.background = '#f5f5f5';
+            /** @type {HTMLElement} */ (xxlInput).style.color = '#999';
 
             // Recalculate parent row qty display (standard sizes only — child rows display separately)
             let newTotal = 0;
             row.querySelectorAll('.size-input:not(.xxxl-picker-btn):not(.osfa-qty-input):not(:disabled)').forEach(input => {
-                newTotal += parseInt(input.value) || 0;
+                newTotal += parseInt(/** @type {HTMLInputElement} */ (input).value) || 0;
             });
-            document.getElementById(`row-qty-${rowId}`).textContent = newTotal;
+            document.getElementById(`row-qty-${rowId}`).textContent = /** @type {any} */ (newTotal);
         } else {
             // Remove child row if it exists (could be 2XL or XXL)
             if (existingChildId) {
                 removeChildRow(rowId, existingChildSize);
             }
             // Re-enable 2XL input in parent
-            xxlInput.disabled = false;
-            xxlInput.style.background = '';
-            xxlInput.style.color = '';
+            /** @type {HTMLInputElement} */ (xxlInput).disabled = false;
+            /** @type {HTMLElement} */ (xxlInput).style.background = '';
+            /** @type {HTMLElement} */ (xxlInput).style.color = '';
         }
     }
 
@@ -1721,7 +1720,7 @@ export function createChildRow(parentRowId, size, qty) {
     const childRow = document.createElement('tr');
     childRow.id = `row-${childRowId}`;
     childRow.className = 'child-row';
-    childRow.dataset.rowId = childRowId;
+    childRow.dataset.rowId = /** @type {any} */ (childRowId);
     childRow.dataset.parentRowId = parentRowId;
     childRow.dataset.extendedSize = size;
     childRow.dataset.style = partNumber;
@@ -1803,12 +1802,12 @@ export function createChildRow(parentRowId, size, qty) {
         let insertAfter = parentRow;  // Default: after parent (for XS or first size)
 
         for (const existingChild of existingChildren) {
-            const existingSize = existingChild.dataset.extendedSize;
+            const existingSize = /** @type {HTMLElement} */ (existingChild).dataset.extendedSize;
             const existingSizeIndex = EXTENDED_SIZE_ORDER.indexOf(existingSize);
 
             // If existing size comes before new size in order, insert after this child
             if (existingSizeIndex < newSizeIndex) {
-                insertAfter = existingChild;
+                insertAfter = /** @type {HTMLElement} */ (existingChild);
             } else {
                 // Found a size that should come after us, stop here
                 break;
@@ -1836,7 +1835,7 @@ function updateChildRow(childRowId, qty) {
     const size = childRow.dataset.extendedSize;
     const sizeInput = childRow.querySelector(`[data-size="${size}"]`);
     if (sizeInput) {
-        sizeInput.value = qty;
+        /** @type {HTMLInputElement} */ (sizeInput).value = qty;
     }
     document.getElementById(`row-qty-${childRowId}`).textContent = qty;
 }
@@ -1864,15 +1863,15 @@ export function onChildSizeChange(childRowId, parentRowId, size) {
     if (!childRow || !parentRow) return;
 
     const sizeInput = childRow.querySelector(`[data-size="${size}"]`);
-    const qty = parseInt(sizeInput?.value) || 0;
+    const qty = parseInt(/** @type {HTMLInputElement|null} */ (sizeInput)?.value) || 0;
 
     // Update child row quantity display
-    document.getElementById(`row-qty-${childRowId}`).textContent = qty;
+    document.getElementById(`row-qty-${childRowId}`).textContent = /** @type {any} */ (qty);
 
     // Sync back to parent row's hidden input
     const parentInput = parentRow.querySelector(`[data-size="${size}"]`);
     if (parentInput) {
-        parentInput.value = qty;
+        /** @type {HTMLInputElement} */ (parentInput).value = /** @type {any} */ (qty);
     }
 
     // If qty is 0, remove the child row
@@ -1893,10 +1892,10 @@ export function clearExtendedSize(parentRowId, size) {
     // Clear parent input
     const parentInput = parentRow.querySelector(`[data-size="${size}"]`);
     if (parentInput) {
-        parentInput.value = '';
-        parentInput.disabled = false;
-        parentInput.style.background = '';
-        parentInput.style.color = '';
+        /** @type {HTMLInputElement} */ (parentInput).value = '';
+        /** @type {HTMLInputElement} */ (parentInput).disabled = false;
+        /** @type {HTMLElement} */ (parentInput).style.background = '';
+        /** @type {HTMLElement} */ (parentInput).style.color = '';
     }
 
     // Remove child row
@@ -1962,9 +1961,9 @@ export function handleCellKeydown(event, input) {
             const nextRow = rows[currentRowIndex + 1];
             const nextCells = Array.from(nextRow.querySelectorAll('input:not([readonly]), select:not(:disabled)'));
             if (nextCells[currentIndex]) {
-                nextCells[currentIndex].focus();
+                /** @type {HTMLElement} */ (nextCells[currentIndex]).focus();
             } else if (nextCells[0]) {
-                nextCells[0].focus();
+                /** @type {HTMLElement} */ (nextCells[0]).focus();
             }
         }
     } else if (event.key === 'ArrowDown') {
@@ -1978,8 +1977,8 @@ export function handleCellKeydown(event, input) {
             const nextRow = rows[currentRowIndex + 1];
             const field = input.dataset.field || input.dataset.size;
             const nextInput = nextRow.querySelector(`[data-field="${field}"], [data-size="${field}"]`);
-            if (nextInput && !nextInput.disabled) {
-                nextInput.focus();
+            if (nextInput && !/** @type {HTMLInputElement} */ (nextInput).disabled) {
+                /** @type {HTMLElement} */ (nextInput).focus();
             }
         }
     } else if (event.key === 'ArrowUp') {
@@ -1993,8 +1992,8 @@ export function handleCellKeydown(event, input) {
             const prevRow = rows[currentRowIndex - 1];
             const field = input.dataset.field || input.dataset.size;
             const prevInput = prevRow.querySelector(`[data-field="${field}"], [data-size="${field}"]`);
-            if (prevInput && !prevInput.disabled) {
-                prevInput.focus();
+            if (prevInput && !/** @type {HTMLInputElement} */ (prevInput).disabled) {
+                /** @type {HTMLElement} */ (prevInput).focus();
             }
         }
     }

@@ -2,7 +2,6 @@
  * DTG inline form — form-core module (Batch 5, 2026-07-09). Moved VERBATIM from the
  * dtg-inline-form.js IIFE; lexical references became the imports below.
  */
-// @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions).
 /* global Node, QuoteOrderSummary, alert, clearQuickQuoteParams, getQuickQuotePrefill,
    markAsUnsaved, setupBeforeUnloadGuard, showToast,
    */
@@ -678,7 +677,7 @@ export function syncDueDateFromQty() {
     const newDate = computeAutoDueDate(cq);
     if (newDate !== state.scheduling.dueDate) {
         state.scheduling.dueDate = newDate;
-        const f = document.getElementById('dtgDueDate');
+        const f = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgDueDate'));
         if (f) f.value = newDate;
         scheduleStateSave();
     }
@@ -901,7 +900,7 @@ export function computeReadiness() {
 // Replaced the old single-line validation banner on 2026-05-19 with this
 // richer always-visible checklist.
 export function updateSubmitEnabled() {
-    const btn = document.getElementById('dtgSubmitBtn');
+    const btn = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgSubmitBtn'));
     const panel = document.getElementById('dtgPreflightPanel');
     if (!btn) return;
 
@@ -911,7 +910,7 @@ export function updateSubmitEnabled() {
     // [2026-06-08] Phase 1 Chunk C — enable Save once any row is fully priced
     // (looser than Submit, which also needs email/design). Lets a rep save a
     // draft quote + share link before the full push-readiness gate passes.
-    const saveBtn = document.getElementById('dtgSaveBtn');
+    const saveBtn = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgSaveBtn'));
     if (saveBtn) {
         const anyPriced = state.rows.some(r =>
             r.style && r.color && Object.keys(r.sizes || {}).length > 0 && Number(r._lineTotal) > 0);
@@ -969,7 +968,7 @@ export function updateSubmitEnabled() {
                     setTimeout(() => target.focus(), 300);
                 } else {
                     // For container ids, find first input inside
-                    const firstInput = target.querySelector('input, select, textarea, button');
+                    const firstInput = /** @type {HTMLElement|null} */ (target.querySelector('input, select, textarea, button'));
                     if (firstInput) setTimeout(() => firstInput.focus(), 300);
                 }
             });
@@ -997,7 +996,7 @@ export function wireRowHandlers() {
             const sz = input.getAttribute('data-size');
             const row = state.rows.find((r) => r.id === rid);
             if (!row) return;
-            const q = Math.max(0, parseInt(input.value || '0', 10) || 0);
+            const q = Math.max(0, parseInt(/** @type {HTMLInputElement} */ (input).value || '0', 10) || 0);
             if (!row.sizes) row.sizes = {};
             if (q > 0) row.sizes[sz] = q;
             else delete row.sizes[sz];
@@ -1023,7 +1022,7 @@ export function wireRowHandlers() {
         //   "S:2 M:4 L:6 2XL:1"   "S/4, M/6, L/6"   "S-2 M-4 L-6"
         // Distribute parsed values across this row's size cells.
         input.addEventListener('paste', (e) => {
-            const text = (e.clipboardData || window.clipboardData)?.getData('text');
+            const text = (/** @type {ClipboardEvent} */ (e).clipboardData || window.clipboardData)?.getData('text');
             if (!text) return; // fall through to default paste
             const parsed = parseBulkSizes(text);
             const sizesParsed = Object.keys(parsed);
@@ -1172,7 +1171,7 @@ function wireCustomerPickers() {
     // When the rep selects a different contact, re-apply that contact's
     // first/last/email/phone to the form. State.customer.contacts must
     // already be populated by attachCompanyCombobox.pick() or previewCustomer().
-    const contactPicker = document.getElementById('dtgContactPicker');
+    const contactPicker = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgContactPicker'));
     if (contactPicker) contactPicker.addEventListener('change', () => {
         const id = contactPicker.value;
         if (!id) return;
@@ -1203,10 +1202,10 @@ function wireScheduleAndLightbox() {
     // fires via syncDueDateFromQty()).
     if (!state.scheduling.dueDate && state.scheduling.autoDueDate) {
         state.scheduling.dueDate = computeAutoDueDate(combinedQty());
-        const f = document.getElementById('dtgDueDate');
+        const f = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgDueDate'));
         if (f) f.value = state.scheduling.dueDate;
     }
-    const dueDateEl = document.getElementById('dtgDueDate');
+    const dueDateEl = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgDueDate'));
     if (dueDateEl) {
         dueDateEl.addEventListener('input', () => {
             state.scheduling.dueDate = dueDateEl.value;
@@ -1217,7 +1216,7 @@ function wireScheduleAndLightbox() {
             scheduleStateSave();
         });
     }
-    const dropDeadEl = document.getElementById('dtgDropDeadDate');
+    const dropDeadEl = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgDropDeadDate'));
     if (dropDeadEl) {
         dropDeadEl.addEventListener('input', () => {
             state.scheduling.dropDeadDate = dropDeadEl.value;
@@ -1233,7 +1232,7 @@ function wireScheduleAndLightbox() {
     if (thumbAnchor) {
         thumbAnchor.addEventListener('click', (e) => {
             e.preventDefault();
-            const img = document.getElementById('dtgDesignThumbImg');
+            const img = /** @type {HTMLImageElement|null} */ (document.getElementById('dtgDesignThumbImg'));
             if (!img || !img.src) return;
             openDesignLightbox(img.src, img.alt || '');
         });
@@ -1243,7 +1242,7 @@ function wireScheduleAndLightbox() {
     const lightbox = document.getElementById('dtgThumbLightbox');
     if (lightbox) {
         lightbox.addEventListener('click', (e) => {
-            if (e.target.dataset?.action === 'close') closeDesignLightbox();
+            if (/** @type {HTMLElement} */ (e.target).dataset?.action === 'close') closeDesignLightbox();
         });
     }
     // Escape key — global listener (rebound on each render is harmless,
@@ -1276,7 +1275,7 @@ function wireCustomerFields() {
     }
     // dtgDesignNumber is bound to state separately so the combobox's own
     // input handler doesn't conflict. Skip bindInputToState here.
-    const termsSel = document.getElementById('dtgTerms');
+    const termsSel = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgTerms'));
     if (termsSel) termsSel.addEventListener('change', () => {
         state.customer.terms = termsSel.value;
         markDirty();
@@ -1285,7 +1284,7 @@ function wireCustomerFields() {
     });
     // A1 sales rep — remember last pick in localStorage so the next quote
     // starts on the same rep.
-    const repSel = document.getElementById('dtgSalesRep');
+    const repSel = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgSalesRep'));
     if (repSel) repSel.addEventListener('change', () => {
         state.customer.salesRepCode = repSel.value;
         try { localStorage.setItem('dtg.lastSalesRep', repSel.value); } catch {}
@@ -1297,7 +1296,7 @@ function wireCustomerFields() {
 
 function wireShippingHandlers() {
     // A2 shipping method
-    const shipSel = document.getElementById('dtgShipMethod');
+    const shipSel = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgShipMethod'));
     if (shipSel) shipSel.addEventListener('change', () => {
         state.shipping.method = shipSel.value;
         // Keep the pickup toggle in sync with the dropdown (a rep picking
@@ -1315,7 +1314,7 @@ function wireShippingHandlers() {
     // to 'pickup' (canonical, accepted by the OF push endpoint at server.js
     // line ~1838 + ~2627) and hide the ship-to block. When OFF we restore
     // the previous non-pickup method (default 'ups') and show the block.
-    const pickupTgl = document.getElementById('dtgPickupToggle');
+    const pickupTgl = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgPickupToggle'));
     if (pickupTgl) pickupTgl.addEventListener('change', () => {
         if (pickupTgl.checked) {
             // Remember the prior non-pickup method so toggling OFF can restore it.
@@ -1328,7 +1327,7 @@ function wireShippingHandlers() {
             delete state.shipping._prePickupMethod;
         }
         // Sync the dropdown + show/hide ship-to block.
-        const sel = document.getElementById('dtgShipMethod');
+        const sel = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgShipMethod'));
         if (sel) sel.value = state.shipping.method;
         const block = document.getElementById('dtgShipToBlock');
         if (block) block.hidden = isPickupMethod(state.shipping.method);
@@ -1351,7 +1350,7 @@ function wireShippingHandlers() {
     ];
     let taxLookupTimer = null;
     SHIP_FIELDS.forEach(([elId, key]) => {
-        const el = document.getElementById(elId);
+        const el = /** @type {HTMLInputElement|null} */ (document.getElementById(elId));
         if (!el) return;
         el.addEventListener('input', () => {
             state.shipping[key] = el.value.trim();
@@ -1373,23 +1372,23 @@ function wireShippingHandlers() {
 function wireTaxControls() {
     // [2026-06-08] Phase 1 tax-control handlers. All route through recomputeTaxRate() (the SINGLE tax authority)
     // so the on-screen total, the PDF, the saved record, and the ShopWorks push never desync.
-    const incTaxEl = document.getElementById('include-tax');
+    const incTaxEl = /** @type {HTMLInputElement|null} */ (document.getElementById('include-tax'));
     if (incTaxEl) incTaxEl.addEventListener('change', () => {
         state.shipping.includeTax = incTaxEl.checked;
         markDirty(); scheduleStateSave(); recomputeTaxRate();
     });
-    const rateEl = document.getElementById('tax-rate-input');
+    const rateEl = /** @type {HTMLInputElement|null} */ (document.getElementById('tax-rate-input'));
     if (rateEl) rateEl.addEventListener('input', () => {
         const v = rateEl.value.trim();
         state.shipping.taxRateOverride = (v === '' ? null : Number(v));
         markDirty(); scheduleStateSave(); recomputeTaxRate();
     });
-    const wholeEl = document.getElementById('wholesale-checkbox');
+    const wholeEl = /** @type {HTMLInputElement|null} */ (document.getElementById('wholesale-checkbox'));
     if (wholeEl) wholeEl.addEventListener('change', () => {
         state.customer.isWholesale = wholeEl.checked;
         // UI parity with the trio: wholesale ON → uncheck include-tax; OFF → re-check it. recomputeTaxRate
         // re-derives the rate (wholesale branch zeros it; exempt/out-of-state still win when applicable).
-        const it = document.getElementById('include-tax');
+        const it = /** @type {HTMLInputElement|null} */ (document.getElementById('include-tax'));
         state.shipping.includeTax = !wholeEl.checked;
         if (it) it.checked = !wholeEl.checked;
         markDirty(); scheduleStateSave(); recomputeTaxRate();
@@ -1419,7 +1418,7 @@ export function wireGlobalHandlers() {
 }
 
 export function bindInputToState(elId, stateKey) {
-    const el = document.getElementById(elId);
+    const el = /** @type {HTMLInputElement|null} */ (document.getElementById(elId));
     if (!el) return;
     el.addEventListener('input', () => {
         state.customer[stateKey] = el.value.trim();
@@ -1729,7 +1728,7 @@ export function previewCustomer(match) {
     state.customer.email = match.email || state.customer.email;
     state.customer.phone = match.phone || state.customer.phone;
     // Reflect into DOM
-    const set = (id, val) => { const el = document.getElementById(id); if (el && val && !el.value) el.value = val; };
+    const set = (id, val) => { const el = /** @type {HTMLInputElement|null} */ (document.getElementById(id)); if (el && val && !el.value) el.value = val; };
     set('dtgCompanyInput', state.customer.company);
     set('dtgCompanyId', state.customer.companyId);
     set('dtgFirstName', state.customer.firstName);

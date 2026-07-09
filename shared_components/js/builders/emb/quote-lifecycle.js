@@ -10,7 +10,6 @@
  * Moved verbatim from embroidery-quote-builder.js (~640-line contiguous
  * cluster). Consumed via REAL imports by persistence/output/save-push.
  */
-// @ts-nocheck — MOVED legacy DOM code: pre-existing checkJs frictions; typing
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
 /* global showToast, markAsUnsaved,
    DesignThumbnailService, setLtmControlState, setQuoteDateDefaults,
@@ -163,7 +162,7 @@ function _resetEmbLogoState() {
     embState.primaryLogo.thumbnailUrl = null;
     updateLogoCardHeader('garment', null);
     // Clear design number inputs
-    const gDesignInput = document.getElementById('garment-design-number');
+    const gDesignInput = /** @type {HTMLInputElement|null} */ (document.getElementById('garment-design-number'));
     if (gDesignInput) gDesignInput.value = '';
     const gDesignInfo = document.getElementById('garment-design-info');
     if (gDesignInfo) { gDesignInfo.style.display = 'none'; gDesignInfo.innerHTML = ''; }
@@ -175,10 +174,10 @@ function _resetEmbLogoState() {
         embState.capPrimaryLogo.designName = null;
         embState.capPrimaryLogo.thumbnailUrl = null;
         embState.capPrimaryLogo.embellishmentType = 'embroidery';  // else a prior quote's 3D-puff / laser-patch bleeds into the next (audit #13c 2026-06-05)
-        const cEmbSel = document.getElementById('cap-embellishment-type');
+        const cEmbSel = /** @type {HTMLInputElement|null} */ (document.getElementById('cap-embellishment-type'));
         if (cEmbSel) { cEmbSel.value = 'embroidery'; if (typeof handleCapEmbellishmentChange === 'function') handleCapEmbellishmentChange(); }
         updateLogoCardHeader('cap', null);
-        const cDesignInput = document.getElementById('cap-design-number');
+        const cDesignInput = /** @type {HTMLInputElement|null} */ (document.getElementById('cap-design-number'));
         if (cDesignInput) cDesignInput.value = '';
         const cDesignInfo = document.getElementById('cap-design-info');
         if (cDesignInfo) { cDesignInfo.style.display = 'none'; cDesignInfo.innerHTML = ''; }
@@ -192,25 +191,25 @@ function _resetEmbLogoState() {
     // Clear cached design data from logo objects
     embState.primaryLogo._designData = null;
     if (typeof embState.capPrimaryLogo !== 'undefined') embState.capPrimaryLogo._designData = null;
-    document.getElementById('primary-position').value = 'Left Chest';
-    document.getElementById('primary-stitches').value = EMB_DEFAULTS.GARMENT_STITCH_COUNT;
-    document.getElementById('primary-digitizing').checked = false;
+    /** @type {HTMLInputElement} */ (document.getElementById('primary-position')).value = 'Left Chest';
+    /** @type {HTMLInputElement} */ (document.getElementById('primary-stitches')).value = /** @type {any} */ (EMB_DEFAULTS.GARMENT_STITCH_COUNT);
+    /** @type {HTMLInputElement} */ (document.getElementById('primary-digitizing')).checked = false;
     // Reset patch setup checkbox
-    const patchSetupCheckbox = document.getElementById('cap-patch-setup');
+    const patchSetupCheckbox = /** @type {HTMLInputElement|null} */ (document.getElementById('cap-patch-setup'));
     if (patchSetupCheckbox) {
         patchSetupCheckbox.checked = false;
         const wrapper = patchSetupCheckbox.closest('.digitizing-checkbox');
         if (wrapper) wrapper.classList.remove('checked');
     }
     // Re-enable position dropdown in case it was disabled by Full Back
-    document.getElementById('primary-position').disabled = false;
+    /** @type {HTMLInputElement} */ (document.getElementById('primary-position')).disabled = false;
     // Hide and reset Full Back stitch count input
     const fbField = document.getElementById('fb-stitch-count-field');
     if (fbField) fbField.style.display = 'none';
-    const fbInput = document.getElementById('fb-stitch-count');
-    if (fbInput) fbInput.value = 25000;
+    const fbInput = /** @type {HTMLInputElement|null} */ (document.getElementById('fb-stitch-count'));
+    if (fbInput) fbInput.value = /** @type {any} */ (25000);
     // Reset cap tier dropdown
-    const capTierEl = document.getElementById('cap-primary-stitches');
+    const capTierEl = /** @type {HTMLInputElement|null} */ (document.getElementById('cap-primary-stitches'));
     if (capTierEl) capTierEl.value = '8000';
 
     // Reset additional logo toggles and globalAL state
@@ -230,29 +229,29 @@ function _resetEmbLogoState() {
     if (capALSwitch) capALSwitch.classList.remove('active');
     if (capALLabel) capALLabel.classList.remove('active');
     if (capALConfig) capALConfig.classList.remove('visible');
-    document.getElementById('garment-al-toggle').checked = false;
-    document.getElementById('cap-al-toggle').checked = false;
+    /** @type {HTMLInputElement} */ (document.getElementById('garment-al-toggle')).checked = false;
+    /** @type {HTMLInputElement} */ (document.getElementById('cap-al-toggle')).checked = false;
 }
 
 function _resetEmbFormFields() {
     // Reset customer form fields
-    document.getElementById('customer-name').value = '';
-    document.getElementById('customer-email').value = '';
-    document.getElementById('company-name').value = '';
-    document.getElementById('customer-phone').value = '';
-    document.getElementById('customer-lookup').value = '';
-    { const pn = document.getElementById('project-name'); if (pn) pn.value = ''; }  // P2-5 (audit 2026-06-06)
+    /** @type {HTMLInputElement} */ (document.getElementById('customer-name')).value = '';
+    /** @type {HTMLInputElement} */ (document.getElementById('customer-email')).value = '';
+    /** @type {HTMLInputElement} */ (document.getElementById('company-name')).value = '';
+    /** @type {HTMLInputElement} */ (document.getElementById('customer-phone')).value = '';
+    /** @type {HTMLInputElement} */ (document.getElementById('customer-lookup')).value = '';
+    { const pn = /** @type {HTMLInputElement|null} */ (document.getElementById('project-name')); if (pn) pn.value = ''; }  // P2-5 (audit 2026-06-06)
 
     // Reset notes
-    const notesEl = document.getElementById('notes');
+    const notesEl = /** @type {HTMLInputElement|null} */ (document.getElementById('notes'));
     if (notesEl) notesEl.value = '';
     const notesSection = document.getElementById('notes-section');
     if (notesSection) {
         notesSection.classList.add('collapsed');
         const notesBody = notesSection.querySelector('.notes-body');
         const notesIcon = notesSection.querySelector('.notes-toggle-icon');
-        if (notesBody) notesBody.style.display = 'none';
-        if (notesIcon) notesIcon.style.transform = '';
+        if (notesBody) /** @type {HTMLElement} */ (notesBody).style.display = 'none';
+        if (notesIcon) /** @type {HTMLElement} */ (notesIcon).style.transform = '';
     }
     updateNotesBadge();
 
@@ -261,33 +260,33 @@ function _resetEmbFormFields() {
     document.getElementById('emb-ltm-wrapper').style.display = 'none';
 
     // Reset additional charges
-    document.getElementById('shipping-fee').value = '0';
-    const taxRateInput = document.getElementById('tax-rate-input');
+    /** @type {HTMLInputElement} */ (document.getElementById('shipping-fee')).value = '0';
+    const taxRateInput = /** @type {HTMLInputElement|null} */ (document.getElementById('tax-rate-input'));
     if (taxRateInput) taxRateInput.value = '10.2';
-    document.getElementById('include-tax').checked = true;
-    document.getElementById('rush-fee').value = '';
+    /** @type {HTMLInputElement} */ (document.getElementById('include-tax')).checked = true;
+    /** @type {HTMLInputElement} */ (document.getElementById('rush-fee')).value = '';
 
     // Reset Ship To fields
-    document.getElementById('ship-address').value = '';
-    document.getElementById('ship-city').value = '';
-    document.getElementById('ship-state').value = 'WA';
-    document.getElementById('ship-zip').value = '';
+    /** @type {HTMLInputElement} */ (document.getElementById('ship-address')).value = '';
+    /** @type {HTMLInputElement} */ (document.getElementById('ship-city')).value = '';
+    /** @type {HTMLInputElement} */ (document.getElementById('ship-state')).value = 'WA';
+    /** @type {HTMLInputElement} */ (document.getElementById('ship-zip')).value = '';
     const taxStatus = document.getElementById('tax-lookup-status');
     if (taxStatus) taxStatus.innerHTML = '';
 
     // Reset Order Details fields
-    document.getElementById('po-number').value = '';
-    document.getElementById('order-number').value = '';
-    document.getElementById('customer-number').value = '';
-    document.getElementById('ship-method').value = 'Customer Pickup';
-    document.getElementById('ship-method-other').value = '';
+    /** @type {HTMLInputElement} */ (document.getElementById('po-number')).value = '';
+    /** @type {HTMLInputElement} */ (document.getElementById('order-number')).value = '';
+    /** @type {HTMLInputElement} */ (document.getElementById('customer-number')).value = '';
+    /** @type {HTMLInputElement} */ (document.getElementById('ship-method')).value = 'Customer Pickup';
+    /** @type {HTMLInputElement} */ (document.getElementById('ship-method-other')).value = '';
      
     window._lastCustomerShipTo = null;
     onShipMethodChange();
-    document.getElementById('date-order-placed').value = '';
-    document.getElementById('req-ship-date').value = '';
-    document.getElementById('drop-dead-date').value = '';
-    document.getElementById('payment-terms').value = '';
+    /** @type {HTMLInputElement} */ (document.getElementById('date-order-placed')).value = '';
+    /** @type {HTMLInputElement} */ (document.getElementById('req-ship-date')).value = '';
+    /** @type {HTMLInputElement} */ (document.getElementById('drop-dead-date')).value = '';
+    /** @type {HTMLInputElement} */ (document.getElementById('payment-terms')).value = '';
     // New-quote date defaults (today / +2 weeks) — refills the just-cleared blanks
     if (typeof setQuoteDateDefaults === 'function') setQuoteDateDefaults();
     const odContent = document.getElementById('order-details-content');
@@ -300,16 +299,16 @@ function _resetEmbFormFields() {
     // discount + artwork-services panels were replaced. Bare getElementById().value
     // here threw and ABORTED resetQuote → the builder stayed in edit mode and the next
     // save silently overwrote the previous quote. Guard every access. (2026-06-04)
-    const discAmt = document.getElementById('discount-amount'); if (discAmt) discAmt.value = '';
-    const reasonPreset = document.getElementById('discount-reason-preset');
+    const discAmt = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-amount')); if (discAmt) discAmt.value = '';
+    const reasonPreset = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-reason-preset'));
     if (reasonPreset) reasonPreset.value = '';
-    const reasonInput = document.getElementById('discount-reason');
+    const reasonInput = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-reason'));
     if (reasonInput) { reasonInput.value = ''; reasonInput.style.display = 'none'; }
-    const artCharge = document.getElementById('art-charge'); if (artCharge) { artCharge.value = 0; artCharge.disabled = true; }
-    const artToggle = document.getElementById('art-charge-toggle'); if (artToggle) artToggle.checked = false;
+    const artCharge = /** @type {HTMLInputElement|null} */ (document.getElementById('art-charge')); if (artCharge) { artCharge.value = /** @type {any} */ (0); artCharge.disabled = true; }
+    const artToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('art-charge-toggle')); if (artToggle) artToggle.checked = false;
     const artChargeWrapper = document.getElementById('art-charge-wrapper');
     if (artChargeWrapper) artChargeWrapper.style.opacity = '0.4';
-    const gdh = document.getElementById('graphic-design-hours'); if (gdh) gdh.value = '';
+    const gdh = /** @type {HTMLInputElement|null} */ (document.getElementById('graphic-design-hours')); if (gdh) gdh.value = '';
     // Reset artwork badge
     const artworkBadge = document.getElementById('artwork-badge');
     if (artworkBadge) {
@@ -344,7 +343,7 @@ export function resetQuote() {
     // [2026-06-07] Clear the wholesale flag + checkbox so it doesn't leak into the next quote.
      
     window._isWholesale = false;
-    const _wholesaleReset = document.getElementById('wholesale-checkbox');
+    const _wholesaleReset = /** @type {HTMLInputElement|null} */ (document.getElementById('wholesale-checkbox'));
     if (_wholesaleReset) _wholesaleReset.checked = false;
 
     _resetEmbLogoState();
@@ -389,11 +388,11 @@ export function resetQuote() {
  * Update discount symbol when type changes ($ vs %)
  */
 export function updateDiscountType() {
-    const discountType = document.getElementById('discount-type')?.value;
+    const discountType = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-type'))?.value;
     const symbol = document.getElementById('discount-symbol');
     const inputWrapper = document.getElementById('discount-input-wrapper');
-    const presetDropdown = document.getElementById('discount-preset');
-    const amountInput = document.getElementById('discount-amount');
+    const presetDropdown = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-preset'));
+    const amountInput = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-amount'));
 
     if (discountType === 'percent') {
         // Show preset dropdown, hide number input
@@ -401,7 +400,7 @@ export function updateDiscountType() {
         if (presetDropdown) presetDropdown.style.display = 'block';
         // Set amount from preset (unless custom is selected)
         if (presetDropdown && presetDropdown.value !== 'custom') {
-            if (amountInput) amountInput.value = presetDropdown.value;
+            if (amountInput) amountInput.value = /** @type {HTMLInputElement} */ (presetDropdown).value;
         }
     } else {
         // Show number input, hide preset dropdown
@@ -414,9 +413,9 @@ export function updateDiscountType() {
 }
 
 export function handleDiscountPresetChange() {
-    const preset = document.getElementById('discount-preset')?.value;
+    const preset = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-preset'))?.value;
     const inputWrapper = document.getElementById('discount-input-wrapper');
-    const amountInput = document.getElementById('discount-amount');
+    const amountInput = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-amount'));
     const symbol = document.getElementById('discount-symbol');
 
     if (preset === 'custom') {
@@ -433,8 +432,8 @@ export function handleDiscountPresetChange() {
 }
 
 export function handleDiscountReasonPresetChange() {
-    const preset = document.getElementById('discount-reason-preset')?.value;
-    const customInput = document.getElementById('discount-reason');
+    const preset = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-reason-preset'))?.value;
+    const customInput = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-reason'));
 
     if (preset === 'custom') {
         // Show custom input and focus it
@@ -447,7 +446,7 @@ export function handleDiscountReasonPresetChange() {
         // Hide custom input and use preset value
         if (customInput) {
             customInput.style.display = 'none';
-            customInput.value = preset;
+            /** @type {HTMLInputElement} */ (customInput).value = preset;
         }
     }
     updateFeeTableRows();
@@ -463,8 +462,8 @@ export function onLtmOverrideChange() {
 }
 
 export function updateAdditionalCharges() {
-    const artCharge = parseFloat(document.getElementById('art-charge')?.value) || 0;
-    const graphicDesignHours = parseFloat(document.getElementById('graphic-design-hours')?.value) || 0;
+    const artCharge = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('art-charge'))?.value) || 0;
+    const graphicDesignHours = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('graphic-design-hours'))?.value) || 0;
     const grtRate = getServicePrice('GRT-75', 75); // GRT-75 rate from Service_Codes API (review C8)
     // Missing-service-code visible warning — shared helper (quote-builder-utils.js),
     // synced with DTF/SCP (2026-07-04, Erik's #1 rule). Covers the silent case where
@@ -473,10 +472,10 @@ export function updateAdditionalCharges() {
         window.warnIfServiceCodeMissing('GRT-75', grtRate, 'Graphic-design');
     }
     const graphicDesignCharge = graphicDesignHours * grtRate;
-    const rushFee = parseFloat(document.getElementById('rush-fee')?.value) || 0;
-    const sampleFee = parseFloat(document.getElementById('sample-fee')?.value) || 0;
-    const discountAmount = parseFloat(document.getElementById('discount-amount')?.value) || 0;
-    const discountType = document.getElementById('discount-type')?.value || 'fixed';
+    const rushFee = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('rush-fee'))?.value) || 0;
+    const sampleFee = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('sample-fee'))?.value) || 0;
+    const discountAmount = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('discount-amount'))?.value) || 0;
+    const discountType = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-type'))?.value || 'fixed';
 
     // Update graphic design total display
     const graphicDesignTotalEl = document.getElementById('graphic-design-total');
@@ -484,7 +483,7 @@ export function updateAdditionalCharges() {
         graphicDesignTotalEl.textContent = graphicDesignCharge.toFixed(2);
     }
 
-    const shippingFeeVal = parseFloat(document.getElementById('shipping-fee')?.value) || 0;
+    const shippingFeeVal = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('shipping-fee'))?.value) || 0;
 
     // Calculate total additional charges (before discount)
     const totalCharges = artCharge + graphicDesignCharge + rushFee + sampleFee + shippingFeeVal;
@@ -526,8 +525,8 @@ export function updateAdditionalCharges() {
 export function updateFeeTableRows() {
     // Art charge row
     const artChargeRow = document.getElementById('art-charge-row');
-    const artChargeToggle = document.getElementById('art-charge-toggle');
-    const artCharge = parseFloat(document.getElementById('art-charge')?.value || 0);
+    const artChargeToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('art-charge-toggle'));
+    const artCharge = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('art-charge'))?.value || /** @type {any} */ (0));
     if (artChargeRow) {
         if (artChargeToggle?.checked && artCharge > 0) {
             artChargeRow.style.display = 'table-row';
@@ -540,12 +539,12 @@ export function updateFeeTableRows() {
 
     // Graphic design row
     const graphicDesignRow = document.getElementById('graphic-design-row');
-    const designHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
+    const designHours = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('graphic-design-hours'))?.value || /** @type {any} */ (0));
     const designTotal = designHours * getServicePrice('GRT-75', 75);  // GRT-75 rate from Service_Codes API (review C8)
     if (graphicDesignRow) {
         if (designHours > 0) {
             graphicDesignRow.style.display = 'table-row';
-            document.getElementById('design-hours-label').textContent = designHours;
+            document.getElementById('design-hours-label').textContent = /** @type {any} */ (designHours);
             document.getElementById('graphic-design-unit').textContent = '$' + designTotal.toFixed(2);
             document.getElementById('graphic-design-total-row').textContent = '$' + designTotal.toFixed(2);
         } else {
@@ -555,7 +554,7 @@ export function updateFeeTableRows() {
 
     // Rush fee row
     const rushFeeRow = document.getElementById('rush-fee-row');
-    const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
+    const rushFee = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('rush-fee'))?.value || /** @type {any} */ (0));
     if (rushFeeRow) {
         if (rushFee > 0) {
             rushFeeRow.style.display = 'table-row';
@@ -568,9 +567,9 @@ export function updateFeeTableRows() {
 
     // Discount row
     const discountRow = document.getElementById('discount-row');
-    const discountAmount = parseFloat(document.getElementById('discount-amount')?.value || 0);
-    const discountType = document.getElementById('discount-type')?.value || 'fixed';
-    const discountReason = document.getElementById('discount-reason')?.value || '';
+    const discountAmount = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('discount-amount'))?.value || /** @type {any} */ (0));
+    const discountType = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-type'))?.value || 'fixed';
+    const discountReason = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-reason'))?.value || '';
     if (discountRow) {
         if (discountAmount > 0) {
             discountRow.style.display = 'table-row';
@@ -603,15 +602,15 @@ export function updateFeeTableRows() {
  * @returns {Object} Additional charges object
  */
 export function getAdditionalCharges() {
-    const discountAmount = parseFloat(document.getElementById('discount-amount')?.value) || 0;
-    const discountType = document.getElementById('discount-type')?.value || 'fixed';
+    const discountAmount = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('discount-amount'))?.value) || 0;
+    const discountType = /** @type {HTMLInputElement|null} */ (document.getElementById('discount-type'))?.value || 'fixed';
 
     // Use shared helper for consistent discount calculation
     const { discount: discountValue } = calculateDiscountableSubtotal();
     const discountPercent = discountType === 'percent' ? discountAmount : 0;
 
     // Graphic Design Services (GRT-75) @ $75/hr
-    const graphicDesignHours = parseFloat(document.getElementById('graphic-design-hours')?.value) || 0;
+    const graphicDesignHours = parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('graphic-design-hours'))?.value) || 0;
     const graphicDesignCharge = graphicDesignHours * getServicePrice('GRT-75', 75);  // GRT-75 rate from Service_Codes API (review C8)
 
     // DECG/DECC data now collected from service product rows (not fee rows)
@@ -621,15 +620,15 @@ export function getAdditionalCharges() {
     const deccItem = decgItems.find(i => i.type === 'DECC');
 
     return {
-        artCharge: parseFloat(document.getElementById('art-charge')?.value) || 0,
+        artCharge: parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('art-charge'))?.value) || 0,
         graphicDesignHours: graphicDesignHours,
         graphicDesignCharge: graphicDesignCharge,
-        rushFee: parseFloat(document.getElementById('rush-fee')?.value) || 0,
-        sampleFee: parseFloat(document.getElementById('sample-fee')?.value) || 0,
-        sampleQty: parseInt(document.getElementById('sample-qty')?.value) || 1,
+        rushFee: parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('rush-fee'))?.value) || 0,
+        sampleFee: parseFloat(/** @type {HTMLInputElement|null} */ (document.getElementById('sample-fee'))?.value) || 0,
+        sampleQty: parseInt(/** @type {HTMLInputElement|null} */ (document.getElementById('sample-qty'))?.value) || 1,
         discount: discountValue,
         discountPercent: discountPercent,
-        discountReason: document.getElementById('discount-reason')?.value?.trim() || '',
+        discountReason: /** @type {HTMLInputElement|null} */ (document.getElementById('discount-reason'))?.value?.trim() || '',
         // DECG/DECC (Customer-Supplied items) for PDF and shareable URLs - from service product rows
         decgQty: decgItem?.quantity || 0,
         decgUnit: decgItem?.unitPrice || 0,
@@ -652,15 +651,15 @@ export function collectDECGItems() {
     // Find service product rows for DECG and DECC
     const serviceRows = document.querySelectorAll('#product-tbody tr.service-product-row');
     serviceRows.forEach(row => {
-        const serviceType = row.dataset.serviceType?.toUpperCase();
+        const serviceType = /** @type {HTMLElement} */ (row).dataset.serviceType?.toUpperCase();
         if (serviceType === 'DECG' || serviceType === 'DECC') {
             const qtyInput = row.querySelector('.service-qty');
-            const qty = parseInt(qtyInput?.value) || 0;
+            const qty = parseInt(/** @type {HTMLInputElement|null} */ (qtyInput)?.value) || 0;
             // Use sell price override if set, otherwise original unit price
-            const overridePrice = parseFloat(row.dataset.sellPrice) || 0;
-            const unitPrice = overridePrice > 0 ? overridePrice : (parseFloat(row.dataset.unitPrice) || 0);
-            const stitchCount = parseInt(row.dataset.stitchCount) || 8000;
-            const heavyweight = row.dataset.decgHeavyweight === 'true';
+            const overridePrice = parseFloat(/** @type {HTMLElement} */ (row).dataset.sellPrice) || 0;
+            const unitPrice = overridePrice > 0 ? overridePrice : (parseFloat(/** @type {HTMLElement} */ (row).dataset.unitPrice) || 0);
+            const stitchCount = parseInt(/** @type {HTMLElement} */ (row).dataset.stitchCount) || 8000;
+            const heavyweight = /** @type {HTMLElement} */ (row).dataset.decgHeavyweight === 'true';
 
             if (qty > 0) {
                 items.push({
@@ -670,7 +669,7 @@ export function collectDECGItems() {
                     total: qty * unitPrice,
                     stitchCount: stitchCount,
                     heavyweight: heavyweight,
-                    rowId: row.dataset.rowId,
+                    rowId: /** @type {HTMLElement} */ (row).dataset.rowId,
                     hasPriceOverride: overridePrice > 0
                 });
             }

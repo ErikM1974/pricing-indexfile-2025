@@ -2,7 +2,6 @@
  * DTG inline form — crm module (Batch 5, 2026-07-09). Moved VERBATIM from the
  * dtg-inline-form.js IIFE; lexical references became the imports below.
  */
-// @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions).
 /* global */
 import { syncDesignThumbnail } from './catalog-search.js';
 import { updateSubmitEnabled } from './form-core.js';
@@ -161,27 +160,27 @@ export function wireHistoryPillHandlers() {
         toggle.querySelector('i').className = isHidden ? 'fas fa-chevron-up' : 'fas fa-chevron-down';
     };
     head.addEventListener('click', (e) => {
-        if (e.target.closest('button.dhp-apply')) return; // don't toggle when clicking apply buttons
+        if (/** @type {HTMLElement} */ (e.target).closest('button.dhp-apply')) return; // don't toggle when clicking apply buttons
         toggleBody();
     });
 
     // "Use this" buttons inside the expanded body — event delegation
     body.addEventListener('click', (e) => {
-        const btn = e.target.closest('button.dhp-apply');
+        const btn = /** @type {HTMLElement} */ (e.target).closest('button.dhp-apply');
         if (!btn) return;
-        const action = btn.dataset.apply;
+        const action = /** @type {HTMLElement} */ (btn).dataset.apply;
         if (action === 'phone') {
-            const newPhone = btn.dataset.phone;
+            const newPhone = /** @type {HTMLElement} */ (btn).dataset.phone;
             state.customer.phone = newPhone;
-            const f = document.getElementById('dtgPhone');
+            const f = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgPhone'));
             if (f) f.value = newPhone;
             btn.replaceWith(Object.assign(document.createElement('span'), { className: 'dhp-applied', textContent: '✓ applied' }));
             markDirty();
             scheduleStateSave();
         } else if (action === 'design') {
-            const newDesign = btn.dataset.design;
+            const newDesign = /** @type {HTMLElement} */ (btn).dataset.design;
             state.customer.designNumber = newDesign;
-            const f = document.getElementById('dtgDesignNumber');
+            const f = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgDesignNumber'));
             if (f) f.value = newDesign;
             if (typeof syncDesignThumbnail === 'function') syncDesignThumbnail();
             btn.replaceWith(Object.assign(document.createElement('span'), { className: 'dhp-applied', textContent: '✓ applied' }));
@@ -189,11 +188,11 @@ export function wireHistoryPillHandlers() {
             scheduleStateSave();
             updateSubmitEnabled();
         } else if (action === 'shipto') {
-            state.shipping.address1 = btn.dataset.address1 || '';
-            state.shipping.city = btn.dataset.city || '';
-            state.shipping.state = btn.dataset.state || '';
-            state.shipping.zip = btn.dataset.zip || '';
-            const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+            state.shipping.address1 = /** @type {HTMLElement} */ (btn).dataset.address1 || '';
+            state.shipping.city = /** @type {HTMLElement} */ (btn).dataset.city || '';
+            state.shipping.state = /** @type {HTMLElement} */ (btn).dataset.state || '';
+            state.shipping.zip = /** @type {HTMLElement} */ (btn).dataset.zip || '';
+            const setVal = (id, val) => { const el = /** @type {HTMLInputElement|null} */ (document.getElementById(id)); if (el) el.value = val || ''; };
             setVal('dtgShipAddress1', state.shipping.address1);
             setVal('dtgShipCity', state.shipping.city);
             setVal('dtgShipState', state.shipping.state);
@@ -220,12 +219,12 @@ export function applyContact(ct) {
     // captured in pick() at company-pick time. The per-contact records
     // returned by /api/company-contacts-2026/search don't carry address
     // fields, so applyContact only handles per-contact data.
-    const fn = document.getElementById('dtgFirstName'); if (fn) fn.value = state.customer.firstName;
-    const ln = document.getElementById('dtgLastName'); if (ln) ln.value = state.customer.lastName;
-    const em = document.getElementById('dtgEmail'); if (em) em.value = state.customer.email;
-    const ph = document.getElementById('dtgPhone'); if (ph) ph.value = state.customer.phone;
+    const fn = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgFirstName')); if (fn) fn.value = state.customer.firstName;
+    const ln = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgLastName')); if (ln) ln.value = state.customer.lastName;
+    const em = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgEmail')); if (em) em.value = state.customer.email;
+    const ph = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgPhone')); if (ph) ph.value = state.customer.phone;
     // Keep the contact picker in sync (highlights which contact is active)
-    const picker = document.getElementById('dtgContactPicker');
+    const picker = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgContactPicker'));
     if (picker && state.customer.contactId) picker.value = state.customer.contactId;
     updateSubmitEnabled();
 }
@@ -266,7 +265,7 @@ export function renderCustomerContextBadges() {
     });
     // The shared helper sets the dropdown value; mirror it to state.customer.terms
     // so downstream save logic picks up the same value.
-    const termsSelect = document.getElementById('dtgTerms');
+    const termsSelect = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgTerms'));
     if (termsSelect && termsSelect.value) {
         state.customer.terms = termsSelect.value;
     }

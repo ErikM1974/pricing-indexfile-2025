@@ -2,7 +2,6 @@
  * DTG inline form — pricing module (Batch 5, 2026-07-09). Moved VERBATIM from the
  * dtg-inline-form.js IIFE; lexical references became the imports below.
  */
-// @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions).
 /* global */
 import { effectiveLocationCode, effectiveLocationLabel, isRowColorInvalid, renderBand, renderTable, syncDueDateFromQty, updateSubmitEnabled } from './form-core.js';
 import { _bundleCache, dtgIF, state } from './state.js';

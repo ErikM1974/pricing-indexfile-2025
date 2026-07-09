@@ -4,30 +4,29 @@
  * (updatePrintConfig) and the dark-garment nudge banner. Moved verbatim
  * from screenprint-quote-builder.js.
  */
-// @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions; typing lands with the render/state split).
 /* global markScreenPrintDirty, recalculateAllPrices, getServicePrice */
 import { scpState, SCREEN_FEE, SCP_DARK_COLOR_WORDS } from './state.js';
 
 // Update print configuration from UI selections
 export function updatePrintConfig() {
     // Get location selections
-    const frontRadio = document.querySelector('input[name="front-location"]:checked');
-    const backRadio = document.querySelector('input[name="back-location"]:checked');
-    const frontColorsRadio = document.querySelector('input[name="front-colors"]:checked');
-    const backColorsRadio = document.querySelector('input[name="back-colors"]:checked');
+    const frontRadio = /** @type {HTMLInputElement|null} */ (document.querySelector('input[name="front-location"]:checked'));
+    const backRadio = /** @type {HTMLInputElement|null} */ (document.querySelector('input[name="back-location"]:checked'));
+    const frontColorsRadio = /** @type {HTMLInputElement|null} */ (document.querySelector('input[name="front-colors"]:checked'));
+    const backColorsRadio = /** @type {HTMLInputElement|null} */ (document.querySelector('input[name="back-colors"]:checked'));
 
     scpState.printConfig.frontLocation = frontRadio ? frontRadio.value : 'LC';
     scpState.printConfig.backLocation = backRadio ? backRadio.value : '';
     scpState.printConfig.frontColors = frontColorsRadio ? parseInt(frontColorsRadio.value) : 1;
     scpState.printConfig.backColors = backColorsRadio ? parseInt(backColorsRadio.value) : 1;
-    scpState.printConfig.isDarkGarment = document.getElementById('dark-garment-toggle').checked;
-    scpState.printConfig.isSafetyStripes = document.getElementById('safety-stripes-toggle').checked;
+    scpState.printConfig.isDarkGarment = /** @type {HTMLInputElement} */ (document.getElementById('dark-garment-toggle')).checked;
+    scpState.printConfig.isSafetyStripes = /** @type {HTMLInputElement} */ (document.getElementById('safety-stripes-toggle')).checked;
 
     // Sleeves — each checked sleeve is its OWN additional print location at its own ink-color count
-    const leftSleeveOn = document.getElementById('left-sleeve-toggle')?.checked;
-    const rightSleeveOn = document.getElementById('right-sleeve-toggle')?.checked;
-    const leftSleeveColorsRadio = document.querySelector('input[name="left-sleeve-colors"]:checked');
-    const rightSleeveColorsRadio = document.querySelector('input[name="right-sleeve-colors"]:checked');
+    const leftSleeveOn = /** @type {HTMLInputElement|null} */ (document.getElementById('left-sleeve-toggle'))?.checked;
+    const rightSleeveOn = /** @type {HTMLInputElement|null} */ (document.getElementById('right-sleeve-toggle'))?.checked;
+    const leftSleeveColorsRadio = /** @type {HTMLInputElement|null} */ (document.querySelector('input[name="left-sleeve-colors"]:checked'));
+    const rightSleeveColorsRadio = /** @type {HTMLInputElement|null} */ (document.querySelector('input[name="right-sleeve-colors"]:checked'));
     scpState.printConfig.leftSleeveColors = leftSleeveOn ? (leftSleeveColorsRadio ? parseInt(leftSleeveColorsRadio.value) : 1) : 0;
     scpState.printConfig.rightSleeveColors = rightSleeveOn ? (rightSleeveColorsRadio ? parseInt(rightSleeveColorsRadio.value) : 1) : 0;
     // engine-canonical list: one entry per checked sleeve (left, right). Pricing is order-independent.
@@ -134,7 +133,7 @@ export function updatePrintConfig() {
 }
 
 export function updateDarkGarmentNudge(productList) {
-    const toggle = document.getElementById('dark-garment-toggle');
+    const toggle = /** @type {HTMLInputElement|null} */ (document.getElementById('dark-garment-toggle'));
     if (!toggle) return;
     const host = toggle.closest('label');
     if (!host || !host.parentElement) return;
@@ -159,7 +158,7 @@ export function updateDarkGarmentNudge(productList) {
         ' <button type="button" class="dark-garment-nudge-apply">Enable</button>' +
         ' <button type="button" class="dark-garment-nudge-dismiss" aria-label="Dismiss underbase reminder" title="Dismiss">&times;</button>';
     chip.querySelector('.dark-garment-nudge-apply').addEventListener('click', () => {
-        toggle.checked = true;
+        /** @type {HTMLInputElement} */ (toggle).checked = true;
         chip.remove();
         updatePrintConfig();   // re-derives screens + setup fee, ends in recalculateAllPrices()
         if (typeof markScreenPrintDirty === 'function') markScreenPrintDirty();

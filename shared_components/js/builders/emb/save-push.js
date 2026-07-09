@@ -13,7 +13,6 @@
  * were HOISTED BACK into the monolith — persistence.js and output.js read
  * them through the global scope chain (config-level writable globals).
  */
-// @ts-nocheck — MOVED legacy DOM code: pre-existing checkJs frictions; typing
 // lands with this cluster's render/state split (see emb-decomposition-plan.md).
 /* global openAccessibleModal, closeAccessibleModal, escapeHtml, showToast, showLoading,
    getLtmControlState, parseRatePercent, markAsSaved, updateEditModeUI,
@@ -23,7 +22,7 @@ import { buildLogoConfiguration, collectProductsFromTable, getOrderPieceCounts, 
 import { getAdditionalCharges, collectDECGItems } from './quote-lifecycle.js';
 import { getCapEmbellishmentType } from './logo-config.js';
 import { dateFromInputValue } from './product-rows.js';
-import { embState } from './state.js';
+import { embState } from './state.js';
 
 // Module state — was window._* flags (Batch 3.4, 2026-07-09); nothing outside this file reads them.
 let _embSaveInFlight = false;   // save mutex (double-click guard)
@@ -213,7 +212,7 @@ function buildPriceAuditJSON(pricing) {
  * rate), artwork ride-alongs, import metadata, price audit. */
 function buildSaveCustomerData({ customerName, customerEmail, pricing }) {
     // Get sales rep NAME from dropdown selected option text
-    const salesRepSelect = document.getElementById('sales-rep');
+    const salesRepSelect = /** @type {HTMLSelectElement|null} */ (document.getElementById('sales-rep'));
     const salesRepEmail = salesRepSelect?.value || 'sales@nwcustomapparel.com';
     const salesRepName = salesRepSelect?.options[salesRepSelect.selectedIndex]?.text || '';
 
@@ -224,12 +223,12 @@ function buildSaveCustomerData({ customerName, customerEmail, pricing }) {
     const customerData = {
         email: customerEmail,
         name: customerName,
-        company: document.getElementById('company-name')?.value?.trim() || '',
-        project: document.getElementById('project-name')?.value?.trim() || '',  // P2-5 (audit 2026-06-06): was captured nowhere
-        isWholesale: document.getElementById('wholesale-checkbox')?.checked || false,  // [2026-06-07] → IsWholesale; push routes to acct 2203
+        company: /** @type {HTMLInputElement|null} */ (document.getElementById('company-name'))?.value?.trim() || '',
+        project: /** @type {HTMLInputElement|null} */ (document.getElementById('project-name'))?.value?.trim() || '',  // P2-5 (audit 2026-06-06): was captured nowhere
+        isWholesale: /** @type {HTMLInputElement|null} */ (document.getElementById('wholesale-checkbox'))?.checked || false,  // [2026-06-07] → IsWholesale; push routes to acct 2203
         salesRepEmail: salesRepEmail,
         salesRepName: salesRepName,
-        notes: document.getElementById('notes')?.value?.trim() || '',
+        notes: /** @type {HTMLInputElement|null} */ (document.getElementById('notes'))?.value?.trim() || '',
         // Additional charges (2026-01-14)
         artCharge: additionalCharges.artCharge,
         graphicDesignHours: additionalCharges.graphicDesignHours,
@@ -241,39 +240,39 @@ function buildSaveCustomerData({ customerName, customerEmail, pricing }) {
         discountPercent: additionalCharges.discountPercent,
         discountReason: additionalCharges.discountReason,
         // Order details (2026-02-11)
-        phone: document.getElementById('customer-phone')?.value?.trim() || '',
-        orderNumber: document.getElementById('order-number')?.value?.trim() || '',
-        customerNumber: document.getElementById('customer-number')?.value?.trim() || '',
-        purchaseOrderNumber: document.getElementById('po-number')?.value?.trim() || '',
-        shipToAddress: document.getElementById('ship-address')?.value?.trim() || '',
-        shipToCity: document.getElementById('ship-city')?.value?.trim() || '',
-        shipToState: document.getElementById('ship-state')?.value || '',
-        shipToZip: document.getElementById('ship-zip')?.value?.trim() || '',
+        phone: /** @type {HTMLInputElement|null} */ (document.getElementById('customer-phone'))?.value?.trim() || '',
+        orderNumber: /** @type {HTMLInputElement|null} */ (document.getElementById('order-number'))?.value?.trim() || '',
+        customerNumber: /** @type {HTMLInputElement|null} */ (document.getElementById('customer-number'))?.value?.trim() || '',
+        purchaseOrderNumber: /** @type {HTMLInputElement|null} */ (document.getElementById('po-number'))?.value?.trim() || '',
+        shipToAddress: /** @type {HTMLInputElement|null} */ (document.getElementById('ship-address'))?.value?.trim() || '',
+        shipToCity: /** @type {HTMLInputElement|null} */ (document.getElementById('ship-city'))?.value?.trim() || '',
+        shipToState: /** @type {HTMLInputElement|null} */ (document.getElementById('ship-state'))?.value || '',
+        shipToZip: /** @type {HTMLInputElement|null} */ (document.getElementById('ship-zip'))?.value?.trim() || '',
         shipMethod: (() => {
-            const sel = document.getElementById('ship-method')?.value || '';
-            if (sel === 'Other') return document.getElementById('ship-method-other')?.value?.trim() || 'Other';
+            const sel = /** @type {HTMLInputElement|null} */ (document.getElementById('ship-method'))?.value || '';
+            if (sel === 'Other') return /** @type {HTMLInputElement|null} */ (document.getElementById('ship-method-other'))?.value?.trim() || 'Other';
             return sel;
         })(),
-        dateOrderPlaced: dateFromInputValue(document.getElementById('date-order-placed')?.value),
-        reqShipDate: dateFromInputValue(document.getElementById('req-ship-date')?.value),
-        dropDeadDate: dateFromInputValue(document.getElementById('drop-dead-date')?.value),
-        paymentTerms: document.getElementById('payment-terms')?.value?.trim() || '',
+        dateOrderPlaced: dateFromInputValue(/** @type {HTMLInputElement|null} */ (document.getElementById('date-order-placed'))?.value),
+        reqShipDate: dateFromInputValue(/** @type {HTMLInputElement|null} */ (document.getElementById('req-ship-date'))?.value),
+        dropDeadDate: dateFromInputValue(/** @type {HTMLInputElement|null} */ (document.getElementById('drop-dead-date'))?.value),
+        paymentTerms: /** @type {HTMLInputElement|null} */ (document.getElementById('payment-terms'))?.value?.trim() || '',
         // Frozen tax & design data for Caspio (2026-02-12)
         designNumbers: embState.lastImportMetadata?.designNumbers || [],
         digitizingCodes: embState.lastImportMetadata?.digitizingCodes || [],
         digitizingFees: embState.lastImportMetadata?.parsedServices?.digitizingFees || [],
         taxRate: (() => {
-            const includeTax = document.getElementById('include-tax')?.checked;
+            const includeTax = /** @type {HTMLInputElement|null} */ (document.getElementById('include-tax'))?.checked;
             if (!includeTax) return 0;
             // parseRatePercent: 0 is a VALID rate (out-of-state) — `|| 10.1` was
             // silently saving WA tax on quotes the screen showed at $0 tax.
-            const rateVal = parseRatePercent(document.getElementById('tax-rate-input')?.value, 10.2);
+            const rateVal = parseRatePercent(/** @type {HTMLInputElement|null} */ (document.getElementById('tax-rate-input'))?.value, 10.2);
             return rateVal / 100;
         })(),
         taxAmount: (() => {
-            const includeTax = document.getElementById('include-tax')?.checked;
+            const includeTax = /** @type {HTMLInputElement|null} */ (document.getElementById('include-tax'))?.checked;
             if (!includeTax) return 0;
-            const rateVal = parseRatePercent(document.getElementById('tax-rate-input')?.value, 10.2);
+            const rateVal = parseRatePercent(/** @type {HTMLInputElement|null} */ (document.getElementById('tax-rate-input'))?.value, 10.2);
             const preTaxText = document.getElementById('pre-tax-subtotal')?.textContent || '$0.00';
             const preTaxSubtotal = parseFloat(preTaxText.replace(/[$,]/g, '')) || 0;
             // #pre-tax-subtotal is ALREADY the full pre-tax base incl. shipping (= the on-screen
@@ -375,8 +374,8 @@ function finishSuccessfulSave(result, skipShareModal) {
  * Each gate toasts/focuses itself; returns null to block the save. */
 function validateSaveInputs(products) {
     // Validate required fields
-    const customerName = document.getElementById('customer-name')?.value?.trim();
-    const customerEmail = document.getElementById('customer-email')?.value?.trim();
+    const customerName = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-name'))?.value?.trim();
+    const customerEmail = /** @type {HTMLInputElement|null} */ (document.getElementById('customer-email'))?.value?.trim();
 
     if (!customerName || !customerEmail) {
         showToast('Please enter customer name and email', 'error');
@@ -399,8 +398,8 @@ function validateSaveInputs(products) {
     // (2026-06-04 audit B6)
     if (window._embArtwork && typeof window._embArtwork.isValidForPush === 'function' && !window._embArtwork.isValidForPush()) {
         showToast('You uploaded artwork — give the design a name so it isn’t dropped from the ShopWorks order.', 'error', 6000);
-        const dn = document.querySelector('#emb-artwork-mount .artwork-upload-designname-input');  // widget's real input class (audit fix 2026-06-05)
-        if (dn && typeof dn.focus === 'function') dn.focus();
+        const dn = /** @type {HTMLElement|null} */ (document.querySelector('#emb-artwork-mount .artwork-upload-designname-input'));  // widget's real input class (audit fix 2026-06-05)
+        if (dn && typeof dn.focus === 'function') /** @type {HTMLElement} */ (dn).focus();
         return null;
     }
 
@@ -426,7 +425,7 @@ function validateSaveInputs(products) {
     // P1-4 (audit 2026-06-06): block save when any Additional-Logo / Customer-Supplied row failed to price
     // (its pricing API threw or returned $0). Never save a silent $0 line (Erik's #1 rule).
     const priceErrRows = Array.from(document.querySelectorAll('#product-tbody tr.service-product-row'))
-        .filter(r => r.dataset.priceError === 'true');
+        .filter(r => /** @type {HTMLElement} */ (r).dataset.priceError === 'true');
     if (priceErrRows.length > 0) {
         showToast('Some Additional-Logo / Customer-Supplied rows could not be priced — refresh and re-check before saving (they will not be saved at $0).', 'error', 7000);
         return null;
@@ -468,7 +467,7 @@ async function _saveAndGetLinkInner(opts = {}) {
     const { customerName, customerEmail } = validated;
 
     // Get save button for loading state
-    const saveBtn = document.querySelector('.btn-save-quote, [onclick*="saveAndGetLink"]');
+    const saveBtn = /** @type {HTMLInputElement|null} */ (document.querySelector('.btn-save-quote, [onclick*="saveAndGetLink"]'));
     const originalText = saveBtn?.innerHTML;
     if (saveBtn) {
         saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
@@ -540,7 +539,7 @@ async function _saveAndGetLinkInner(opts = {}) {
         if (saveBtn) {
             // eslint-disable-next-line no-unsanitized/property -- self-restore of markup captured from this element
             saveBtn.innerHTML = originalText;
-            saveBtn.disabled = false;
+            /** @type {HTMLInputElement} */ (saveBtn).disabled = false;
         }
     }
 }
@@ -559,7 +558,7 @@ export async function saveQuote() {
 // Gated: enabled only when the quote is saved AND a ShopWorks Customer # is set
 // (a blank Customer # would silently route the order to the catch-all customer).
 export function updatePushButtonState() {
-    const btn = document.getElementById('emb-push-shopworks-btn');
+    const btn = /** @type {HTMLInputElement|null} */ (document.getElementById('emb-push-shopworks-btn'));
     const label = document.getElementById('emb-push-shopworks-label');
     if (!btn) return;  // [2026-06-07] do NOT bail when the label is transiently missing → still enable/disable the button
     renderPushReadiness();
@@ -588,7 +587,7 @@ export function updatePushButtonState() {
     // :disabled rule — clearing any inline background left by the "Sent ✓" state.
     btn.style.background = '';
     btn.disabled = !enabled;
-    btn.style.opacity = '';
+    /** @type {HTMLInputElement} */ (btn).style.opacity = '';
     btn.style.cursor = '';
     btn.title = enabled
         ? 'Save + create this quote as an order in ShopWorks OnSite (saves automatically)'
@@ -612,10 +611,10 @@ export function getPushReadiness() {
         hasProducts = pieces > 0;
     } catch (_) {}
     return {
-        hasCustomer: !!(document.getElementById('customer-number')?.value?.trim()),
+        hasCustomer: !!(/** @type {HTMLInputElement|null} */ (document.getElementById('customer-number'))?.value?.trim()),
         hasProducts: hasProducts,
-        hasName: !!(document.getElementById('customer-name')?.value?.trim()),
-        hasEmail: !!(document.getElementById('customer-email')?.value?.trim()),
+        hasName: !!(/** @type {HTMLInputElement|null} */ (document.getElementById('customer-name'))?.value?.trim()),
+        hasEmail: !!(/** @type {HTMLInputElement|null} */ (document.getElementById('customer-email'))?.value?.trim()),
     };
 }
 
@@ -646,7 +645,7 @@ export function renderPushReadiness() {
     // [2026-06-07] Keep the Push button in LOCK-STEP with this checklist so they can NEVER desync. Direct
     // renderPushReadiness() callers (e.g. a product change at ~line 6341) updated the checklist green but
     // never re-gated the button → it stayed stale-disabled even with all checks green (the bug Erik hit).
-    const _pbtn = document.getElementById('emb-push-shopworks-btn');
+    const _pbtn = /** @type {HTMLInputElement|null} */ (document.getElementById('emb-push-shopworks-btn'));
     if (_pbtn && !embState._pushAlreadyDone) {
         const enabled = r.hasCustomer && r.hasProducts && r.hasName && r.hasEmail;
         _pbtn.disabled = !enabled;
@@ -666,7 +665,7 @@ export function showPushButton(quoteId, opts = {}) {
 }
 
 export async function pushToShopWorks() {
-    const hasCustomer = !!(document.getElementById('customer-number')?.value?.trim());
+    const hasCustomer = !!(/** @type {HTMLInputElement|null} */ (document.getElementById('customer-number'))?.value?.trim());
     if (!hasCustomer) {
         showToast('Enter the ShopWorks Customer # (top of the form) before pushing.', 'warning');
         document.getElementById('customer-number')?.focus();
@@ -674,7 +673,7 @@ export async function pushToShopWorks() {
     }
     if (embState._pushInFlight) return;             // already saving/pushing — ignore the double-click
     embState._pushInFlight = true;
-    const pushBtn = document.getElementById('emb-push-shopworks-btn');
+    const pushBtn = /** @type {HTMLInputElement|null} */ (document.getElementById('emb-push-shopworks-btn'));
     if (pushBtn) {
         pushBtn.disabled = true;  // disable synchronously, BEFORE the first await
         // [2026-06-07] The silent save before the preview modal takes ~2-3s — show a spinner so the rep knows
@@ -702,13 +701,13 @@ export async function pushToShopWorks() {
 // backend would send (read-only /preview endpoint) so the rep reviews line
 // items, designs and notes before the order is created.
 export async function openPushPreview() {
-    const btn = document.getElementById('emb-push-shopworks-btn');
+    const btn = /** @type {HTMLInputElement|null} */ (document.getElementById('emb-push-shopworks-btn'));
     if (!btn || btn.disabled || !embState._pushQuoteId) return;
 
     const modal = document.getElementById('emb-sw-push-modal');
     const statusEl = document.getElementById('emb-sw-push-status');
     const previewEl = document.getElementById('emb-sw-push-preview');
-    const confirmBtn = document.getElementById('emb-sw-push-confirm');
+    const confirmBtn = /** @type {HTMLInputElement|null} */ (document.getElementById('emb-sw-push-confirm'));
     if (!modal || !previewEl || !confirmBtn) return;
 
     if (statusEl) statusEl.innerHTML = '';
@@ -726,17 +725,17 @@ export async function openPushPreview() {
     // to the page behind the modal).
      
     _pushModalOpener = document.activeElement;
-    setTimeout(() => { try { const f = modal.querySelector('button:not([disabled])'); if (f) f.focus(); } catch (_) {} }, 0);
-    if (!modal._embKeyBound) {
-        modal._embKeyBound = true;
+    setTimeout(() => { try { const f = modal.querySelector('button:not([disabled])'); if (f) /** @type {HTMLElement} */ (f).focus(); } catch (_) {} }, 0);
+    if (!(/** @type {any} */ (modal)._embKeyBound)) {
+        /** @type {any} */ (modal)._embKeyBound = true;
         modal.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') { e.preventDefault(); closePushPreview(); return; }
             if (e.key !== 'Tab') return;
-            const f = Array.from(modal.querySelectorAll('button:not([disabled]), [href], input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])')).filter((el) => el.offsetParent !== null);
+            const f = Array.from(modal.querySelectorAll('button:not([disabled]), [href], input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])')).filter((el) => /** @type {HTMLElement} */ (el).offsetParent !== null);
             if (!f.length) return;
             const first = f[0], last = f[f.length - 1];
-            if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-            else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+            if (e.shiftKey && document.activeElement === first) { e.preventDefault(); /** @type {HTMLElement} */ (last).focus(); }
+            else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); /** @type {HTMLElement} */ (first).focus(); }
         });
     }
 
@@ -864,7 +863,7 @@ function renderPushPreview(data) {
 // Perform the actual push (POST /push-quote). force=true re-pushes an
 // already-pushed quote (creates a duplicate) — only set after the rep confirms.
 export async function confirmPushToShopWorks() {
-    const confirmBtn = document.getElementById('emb-sw-push-confirm');
+    const confirmBtn = /** @type {HTMLInputElement|null} */ (document.getElementById('emb-sw-push-confirm'));
     const statusEl = document.getElementById('emb-sw-push-status');
     if (!embState._pushQuoteId || !confirmBtn) return;
     const force = confirmBtn.dataset.force === 'true';
