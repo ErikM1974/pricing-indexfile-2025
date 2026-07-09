@@ -145,6 +145,22 @@ Every error links to `/v4/errors/{code}`. **Structural deletes** (deleting a tab
 
 ---
 
+## ⭐ Creating Caspio objects — what Claude CAN / CAN'T create (read before answering "can you build X in Caspio")
+
+**✅ CAN create — via a Node script using the proxy's standing OAuth cred (`getCaspioAccessToken`), NO token from Erik:**
+- **Tables + fields + records.** `axios.post(`${base}/tables`, {Name, Fields:[…]})` then `POST .../tables/{t}/records`. **Precedent: 7 scripts** in `caspio-pricing-proxy/scripts/create-*-table.js` (`Staff_App_Roles`, `Staff_Page_Access`, `Order_Payments`, `Customer_Reward_Ledger`, `Customer_Portal_Access`, portal-phase-4, safety-stripe). **Recipe:** field `Type` = `STRING` (Text 255) / `TEXT` (Text 64K) / `NUMBER` / `INTEGER` / `CURRENCY` / `DATE/TIME` / `YES/NO`; **PK is auto-added — do NOT declare an AUTONUMBER**; per-field `Unique:true`. Scripts are **dry-run by default → `--apply` to write** (a safety preview, NOT a block — Claude can run `--apply`).
+- **Records / data** on any writable table or view (POST/PUT/PATCH/DELETE), via the same creds.
+
+**⚠️ Guardrailed — Erik runs the `--apply`:**
+- **Directory (the SAML auth SOURCE) user writes + the `Role` authfield.** An access-control guardrail blocks Claude here; the Role field is auth-typed (free-text PUT → 400) and Caspio Groups aren't REST-exposed. **This is WHY app-RBAC lives in plain TABLES (`Staff_App_Roles`/`Staff_Page_Access`), not a directory Role field.**
+
+**❌ CANNOT create via REST at all — Caspio Designer UI only (platform ceiling; no token or endpoint changes this):**
+- **DataPages · Flex apps · Bridge apps** — REST is read + deploy-toggle only (`aiManifest.unsupportedByDesign`: app write = read-only `200`).
+- **A new Directory** — no `POST /v4/directories` (you can add users/fields to an *existing* one, not create it).
+- **DELETE a table / folder / Flex app → `405` by design** (DDL protection).
+
+**⚠ Don't** auto-create or REST-migrate schema on the 155K-row masters (`Sanmar_Bulk_*`, `Design_Lookup_*`) — deliberately out of scope.
+
 ## 8) Proxy adoption — the v3→v4 migration chokepoint
 
 **Current state:** `caspio-pricing-proxy` calls Caspio **v3** exclusively. The single migration point is **`caspio-pricing-proxy/src/utils/caspio.js`** — it holds `getCaspioAccessToken()` (module-cached, 60s buffer), `fetchAllCaspioPages()` (pagination), and the base URL `https://c3eku948.caspio.com/integrations/rest/v3`. (A separate legacy file-store base `https://c1abd578.caspio.com/rest/v3/files` appears in `FILE_UPLOAD_API_REQUIREMENTS.md` — different subdomain/base; reconcile if migrating file uploads.)
