@@ -9,7 +9,7 @@
  * real split lands when the constructor's init is unpacked (post-0.4).
  */
 // @ts-nocheck — MOVED legacy init code (pre-existing checkJs frictions).
-/* global SafetyStripeRecs, ArtworkUpload, CustomerDesignCombobox,
+/* global closeExtendedSizePopup, updateDtfPushButtonState, SafetyStripeRecs, ArtworkUpload, CustomerDesignCombobox,
    loadServiceCodePrices, getServicePrice, showToast */
 import { DTFQuoteBuilder } from './quote-builder-class.js';
 import { loadServiceCodePrices } from '../shared/service-codes.js';
@@ -162,5 +162,29 @@ export class DtfAdapter {
                 console.error('[DTF] Design combobox mount failed:', e);
             }
         }
+
+        // ── Migrated from dtf-quote-page.js DOMContentLoaded (Batch 4.3) ──
+        // Runs AFTER construction + wiring (deterministic — the old deferred
+        // setTimeout raced the async init). Keyboard shortcuts + the always-
+        // visible Push button/readiness render.
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                const sizePopup = document.getElementById('extended-size-popup');
+                if (sizePopup && !sizePopup.classList.contains('hidden')) {
+                    e.preventDefault();
+                    if (typeof closeExtendedSizePopup === 'function') closeExtendedSizePopup();
+                    return;
+                }
+            }
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                if (window.dtfQuoteBuilder) window.dtfQuoteBuilder.saveAndGetLink();
+            }
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                if (window.dtfQuoteBuilder) window.dtfQuoteBuilder.printQuote();
+            }
+        });
+        if (typeof updateDtfPushButtonState === 'function') updateDtfPushButtonState();
     }
 }

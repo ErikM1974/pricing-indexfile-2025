@@ -10,10 +10,21 @@
 const fs = require('fs');
 const path = require('path');
 
+// Batch 4.3: dtf-quote-page.js migrated into the bundle — the render-only
+// updateTaxCalculation now lives in builders/dtf/page-ui.js (ES module).
+const esbuild = require('esbuild');
 const PAGE_SRC = fs.readFileSync(
-  path.join(__dirname, '../../shared_components/js/dtf-quote-page.js'),
+  path.join(__dirname, '../../shared_components/js/builders/dtf/page-ui.js'),
   'utf8'
 );
+const BUNDLED = esbuild.buildSync({
+  entryPoints: [path.join(__dirname, '../../shared_components/js/builders/dtf/page-ui.js')],
+  bundle: true,
+  format: 'cjs',
+  target: 'es2020',
+  write: false,
+  logLevel: 'silent',
+}).outputFiles[0].text;
 
 function el(props) {
   return Object.assign(
@@ -43,13 +54,10 @@ function loadPage(win) {
     body: el(),
   };
   const quiet = { log() {}, warn() {}, error() {}, info() {} };
-  const factory = new Function(
-    'window',
-    'document',
-    'console',
-    PAGE_SRC + '\nreturn { updateTaxCalculation };'
-  );
-  return factory(win, doc, quiet);
+  const moduleObj = { exports: {} };
+  const factory = new Function('module', 'exports', 'window', 'document', 'console', BUNDLED);
+  factory(moduleObj, moduleObj.exports, win, doc, quiet);
+  return moduleObj.exports;
 }
 
 function makeWindow(els) {

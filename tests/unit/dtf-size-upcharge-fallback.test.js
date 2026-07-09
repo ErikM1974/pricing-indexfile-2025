@@ -18,19 +18,23 @@ const fs = require('fs');
 const path = require('path');
 
 function loadBuilderClass() {
-  // D1 (2026-07-08): the class moved to builders/dtf/quote-builder-class.js — strip the
-  // `export ` prefix so the classic new Function() harness can evaluate it.
-  const code = fs.readFileSync(path.join(__dirname, '../../shared_components/js/builders/dtf/quote-builder-class.js'), 'utf8')
-      .replace(/^export (class|function|let|const)/gm, '$1')
-      // D2: the module imports { dtfState, sizeDetectionCache } from state.js —
-      // strip the import and inject equivalent stubs for the classic harness.
-      .replace(/^import .*$/gm, '')
-      .replace(/^/, 'const dtfState = { _dtfPushQuoteId: null, _dtfPushInFlight: false, hasChanges: false };\nconst sizeDetectionCache = new Map();\n');
+  // Batch 4.2: the class assembles from 5 prototype-mixin modules — bundle the
+  // real graph (esbuild) instead of stripping imports from a single file.
+  const esbuild = require('esbuild');
+  const code = esbuild.buildSync({
+    entryPoints: [path.join(__dirname, '../../shared_components/js/builders/dtf/quote-builder-class.js')],
+    bundle: true,
+    format: 'cjs',
+    target: 'es2020',
+    write: false,
+    logLevel: 'silent',
+  }).outputFiles[0].text;
   const doc = { addEventListener: () => {}, getElementById: () => null, querySelector: () => null, querySelectorAll: () => [] };
   const quietConsole = { log() {}, warn() {}, error() {}, info() {} };
-  // eslint-disable-next-line no-new-func
-  const factory = new Function('window', 'document', 'console', code + '\nreturn DTFQuoteBuilder;');
-  return factory({}, doc, quietConsole);
+  const moduleObj = { exports: {} };
+  const factory = new Function('module', 'exports', 'window', 'document', 'console', code);
+  factory(moduleObj, moduleObj.exports, {}, doc, quietConsole);
+  return moduleObj.exports.DTFQuoteBuilder;
 }
 
 /** Bare instance with a 10-23 LTM-tier fixture (mirrors dtf-childrow-state). */

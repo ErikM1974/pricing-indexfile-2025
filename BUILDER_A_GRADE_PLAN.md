@@ -86,6 +86,10 @@ Grade movement: EMB → A.
 
 ## Batch 4 — DTF structure `[P1 · ~1 session]`
 
+> **✅ SHIPPED v2026.07.09.9 (2026-07-09).** 4.3 DONE — dtf-quote-page.js (1,473-line classic) is GONE: rows → `product-rows.js`, shims/tax/fees/save-modal → `page-ui.js`, DOMContentLoaded → adapter tail (deterministic), childRowMap → dtfState + window accessor, 32 verified bridges, dead toggleSaveShare deleted. 4.2 DONE via **prototype mixins** (deviation from the planned 4.1 state-promotion — unnecessary: verbatim method bodies keep `this.` and the childRows contract byte-identical): 69 methods → 5 cluster files; class file = 145 lines (constructor + assembly + reprice wrap). 4.4 DONE (dead exports/alias/class handleCellKeydown copy; API_BASE config-only). Ratchet now BUILDERS-WIDE (`builders-function-length.test.js`: emb 10 · scp 7 · dtf 5 frozen, shrink-only; dtf createChildRow already dropped ≤150 in the move — entry deleted).
+> **Deferred to Batch 7:** 4.5 size-alias sweep (~16 sites → one helper); the frozen big-method splits (saveAndGetLink 399, updatePricing 331, init 202) under the ratchet.
+
+
 - **4.1** Promote the 3 cross-cluster fields (`currentPricingData`, `childRows`, `selectedLocations`) from the class onto the already-present-but-inert `quoteState` (builders/dtf/state.js) — the audit-confirmed blocker to any split.
 - **4.2** Split `quote-builder-class.js` (3,713) along the 5 mapped clusters: A pricing / B rows-search-color / C locations / D save-lifecycle / E output. Big functions get the >150 treatment: `saveAndGetLink` (:2514, 399), `updatePricing` (:1663, 329), `init` (:226, 196), `buildPricingDataForInvoice` (:3009, 185), `resetQuote` (:3496, ~170).
 - **4.3** Migrate `dtf-quote-page.js` (1,473, classic) → `builders/dtf/product-rows.js` + friends, mirroring SCP's shape. Gotchas from audit: page functions must exist before class instantiation (runtime-only circularity — ESM handles it); `window.childRowMap` becomes a module export; the DOMContentLoaded shortcuts fold into `DtfAdapter.setupPage` (currently a no-op). After migration `updateDtfPushButtonState` + `showDtfPushButton` become imports.

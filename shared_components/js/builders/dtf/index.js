@@ -19,25 +19,24 @@ import { QuoteBuilderBase } from '../shared/quote-builder-base.js';
 import { DtfAdapter } from './adapter.js';
 import { dtfState, quoteState } from './state.js';
 import { DTFQuoteBuilder } from './quote-builder-class.js';
-import { copyToClipboard, copyQuoteToClipboard, printQuote, applyRushPercent } from './output.js';
+import { copyToClipboard, printQuote, applyRushPercent } from './output.js';
 import {
     showDtfPushButton,
     updateDtfPushButtonState,
     dtfPushToShopWorks,
     confirmDtfPush,
     closeDtfPushPreview,
-    openDtfPushPreview,
-    renderDtfPushPreview,
 } from './push.js';
 import { showErrorBanner, hideErrorBanner, showFallbackPricingWarning } from '../shared/errors.js';
 import { loadServiceCodePrices, getServicePrice } from '../shared/service-codes.js';
+import { openExtendedSizePopup, closeExtendedSizePopup, applyExtendedSizes, focusProductSearch, updateTaxCalculation, updateAdditionalCharges, lookupTaxRate, onShipStateChange, toggleWholesale, onShipZipBlur, dtfEmailQuote, toggleOrderDetails, updateFeeTableRows, confirmNewQuote, showSaveModal, closeSaveModal, copyShareableUrl } from './page-ui.js';
+import { addNewRow, onStyleChange, duplicateRowNewColor, handleCellKeydown, onSizeChange, selectColor, toggleColorPicker, handleColorPickerKeydown, deleteRow, createChildRow, removeChildRow, onChildSizeChange, updateExtendedSizeDisplay, getExtendedSizeQty, selectChildColor } from './product-rows.js';
 
 // ---- the builder class (the shell's init listener instantiates it) ----
 window.DTFQuoteBuilder = DTFQuoteBuilder;
 
 // ---- output / HTML-onclick wrappers ----
 window.copyToClipboard = copyToClipboard;
-window.copyQuoteToClipboard = copyQuoteToClipboard;
 window.printQuote = printQuote;
 window.applyRushPercent = applyRushPercent;
 
@@ -47,8 +46,6 @@ window.updateDtfPushButtonState = updateDtfPushButtonState;
 window.dtfPushToShopWorks = dtfPushToShopWorks;
 window.confirmDtfPush = confirmDtfPush;
 window.closeDtfPushPreview = closeDtfPushPreview;
-window.openDtfPushPreview = openDtfPushPreview;
-window.renderDtfPushPreview = renderDtfPushPreview;
 
 // ---- state handles (debug + test hooks; NOT an API for page code) ----
 window.__dtfState = dtfState;
@@ -65,6 +62,41 @@ window.showFallbackPricingWarning = showFallbackPricingWarning;
 // Service_Codes (ONE shared impl — Batch 3.5); classic callers: dtf-quote-page GRT-75
 window.loadServiceCodePrices = loadServiceCodePrices;
 window.getServicePrice = getServicePrice;
+// Migrated dtf-quote-page.js surface (Batch 4.3): HTML onclick + generated-markup
+// + class bare-global consumers — verified set (same classifier as the 3.3 diet).
+window.openExtendedSizePopup = openExtendedSizePopup;
+window.closeExtendedSizePopup = closeExtendedSizePopup;
+window.applyExtendedSizes = applyExtendedSizes;
+window.focusProductSearch = focusProductSearch;
+window.updateTaxCalculation = updateTaxCalculation;
+window.updateAdditionalCharges = updateAdditionalCharges;
+window.lookupTaxRate = lookupTaxRate;
+window.onShipStateChange = onShipStateChange;
+window.toggleWholesale = toggleWholesale;
+window.onShipZipBlur = onShipZipBlur;
+window.dtfEmailQuote = dtfEmailQuote;
+window.toggleOrderDetails = toggleOrderDetails;
+window.updateFeeTableRows = updateFeeTableRows;
+window.confirmNewQuote = confirmNewQuote;
+window.showSaveModal = showSaveModal;
+window.closeSaveModal = closeSaveModal;
+window.copyShareableUrl = copyShareableUrl;
+window.addNewRow = addNewRow;
+window.onStyleChange = onStyleChange;
+window.duplicateRowNewColor = duplicateRowNewColor;
+window.handleCellKeydown = handleCellKeydown;
+window.onSizeChange = onSizeChange;
+window.selectColor = selectColor;
+window.toggleColorPicker = toggleColorPicker;
+window.handleColorPickerKeydown = handleColorPickerKeydown;
+window.deleteRow = deleteRow;
+window.createChildRow = createChildRow;
+window.removeChildRow = removeChildRow;
+window.onChildSizeChange = onChildSizeChange;
+window.updateExtendedSizeDisplay = updateExtendedSizeDisplay;
+window.getExtendedSizeQty = getExtendedSizeQty;
+window.selectChildColor = selectChildColor;
+
 
 window.__QB_BUILD = window.__QB_BUILD || {};
 window.__QB_BUILD.dtf = { entry: 'builders/dtf/index.js', stage: 'D2-complete' };
