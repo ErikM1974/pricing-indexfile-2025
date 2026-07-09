@@ -41,6 +41,7 @@
 | `builders/dtf/state.js` | **DTF D2 (2026-07-08)** — dtfState (push flags; window-backed hasChanges) + sizeDetectionCache + quoteState instance (real state = `this.` on the class) |
 | `builders/dtf/adapter.js` | **DtfAdapter (2026-07-08)** — contract + the DTF init verbatim (instantiate-then-wire → whole body in initPricingAndRoute) |
 | `builders/dtf/quote-builder-class.js` | **DTF D1 (2026-07-08)** — the WHOLE DTFQuoteBuilder class verbatim (childRows Map = single money source; locked by dtf-childrow-state/dtf-size-upcharge-fallback) + reprice-pill prototype wrap |
+| `builders/dtf/methods-{pricing,rows,locations,lifecycle,output}.js` | **Batch 4.2 (2026-07-09)** — the 69 class methods as 5 prototype mixins (verbatim bodies, `this.` intact; class assembles via Object.assign; childRows money contract untouched — dtf-childrow-state locks the prototype). quote-builder-class.js = constructor + assembly + reprice wrap (145 lines) |
 | `builders/dtf/output.js` | **DTF D1 (2026-07-08)** — copy/print onclick wrappers + auto-% rush chip |
 | `builders/dtf/push.js` | **DTF D1 (2026-07-08)** — one-click push + preview/confirm (push-button-binding locks HERE); push state on dtfState since D2 |
 | `builders/dtf/product-rows.js` | **Batch 4.3 (2026-07-09)** — the classic dtf-quote-page.js row machinery migrated in: search/style change, color pickers, size inputs, extended-size child rows (childRowMap → dtfState + window accessor), delete/duplicate, thumbnails |

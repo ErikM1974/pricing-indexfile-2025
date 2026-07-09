@@ -270,6 +270,19 @@ interface Window {
     showErrorBanner?: (message: string, opts?: { id?: string }) => any;
     hideErrorBanner?: (id?: string) => void;
     showFallbackPricingWarning?: (label: string) => any;
+    productThumbnailModal?: { open: Function };
+    /* DTF page surface migrated into the bundle (Batch 4.3, 2026-07-09) */
+    openExtendedSizePopup?: (...args: any[]) => any;
+    closeExtendedSizePopup?: (...args: any[]) => any;
+    applyExtendedSizes?: (...args: any[]) => any;
+    focusProductSearch?: (...args: any[]) => any;
+    dtfEmailQuote?: (...args: any[]) => any;
+    confirmNewQuote?: (...args: any[]) => any;
+    showSaveModal?: (...args: any[]) => any;
+    closeSaveModal?: (...args: any[]) => any;
+    copyShareableUrl?: (...args: any[]) => any;
+    updateExtendedSizeDisplay?: (...args: any[]) => any;
+    getExtendedSizeQty?: (...args: any[]) => any;
 }
 
 /*

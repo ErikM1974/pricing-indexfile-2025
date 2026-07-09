@@ -7,6 +7,7 @@
  * resolved via the index.js bridges (SCP pattern).
  * (toggleSaveShare was deleted in the move — zero callers anywhere.)
  */
+// @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions; typing lands with the render/state split).
 /* global dtfQuoteBuilder, updateDtfPushButtonState, autoExpandFeesOnFirstCharge,
    emailQuote, showToast, hasUnsavedChanges, getServicePrice, event */
 import { API_BASE } from './state.js';

@@ -6,6 +6,7 @@
  * delete/duplicate, thumbnails. Moved verbatim; cross-module calls stay bare
  * globals resolved via the index.js bridges (SCP pattern).
  */
+// @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions; typing lands with the render/state split).
 /* global dtfQuoteBuilder, showToast, escapeHtml, getSwatchStyle, productThumbnailModal,
    cleanProductTitle */
 import { dtfState, API_BASE } from './state.js';
