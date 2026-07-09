@@ -41,12 +41,10 @@ import {
     onSprStitchChange,
     cancelServicePricingReview,
     applyServicePricingReview,
-    getSprEmbConfigOptions,
-} from './spr-modal.js';
+    } from './spr-modal.js';
 import {
     openShopWorksImportModal,
     closeShopWorksImportModal,
-    showAddNonSanmarModal,
     closeAddNonSanmarModal,
     toggleNsMoreOptions,
     validateNsModalFields,
@@ -57,20 +55,11 @@ import {
     scrollToProductRow,
 } from './shopworks-import.js';
 import {
-    initEmbroideryPersistence,
-    getEmbroideryQuoteData,
-    restoreEmbroideryDraft,
-    markEmbroideryDirty,
     loadQuoteForEditing,
     duplicateQuote,
-    addProductFromQuote,
-    populateLogoConfig,
-} from './persistence.js';
+    } from './persistence.js';
 import {
-    diagnoseQuote,
-    buildEmbroideryPricingData,
     copyToClipboard,
-    generateEmbQuoteText,
     printQuote,
     embEmailQuote,
 } from './output.js';
@@ -80,45 +69,29 @@ import {
     updatePushButtonState,
     getPushReadiness,
     renderPushReadiness,
-    showPushButton,
     pushToShopWorks,
-    openPushPreview,
     confirmPushToShopWorks,
-    verifyShopWorksImport,
     closePushPreview,
 } from './save-push.js';
 import {
     toggleAdditionalCharges,
     toggleOrderDetails,
-    setupUnsavedChangesTracking,
-    clearCustomerContextBanners,
     resetQuote,
     updateDiscountType,
     handleDiscountPresetChange,
     handleDiscountReasonPresetChange,
-    onLtmOverrideChange,
     updateAdditionalCharges,
     updateFeeTableRows,
-    getAdditionalCharges,
-    collectDECGItems,
-} from './quote-lifecycle.js';
+    } from './quote-lifecycle.js';
 import {
     recalculatePricing,
-    debouncedRecalculatePricing,
     debounce,
-    collectProductsFromTable,
     updatePricingDisplay,
-    calculateDiscountableSubtotal,
-    buildLogoConfiguration,
-    getOrderPieceCounts,
     syncALRows,
     syncDECGRows,
-    _syncDecgLtmRow,
     syncRushRow,
     getRushRate,
     estimateShipping,
-    syncDigitizingPriceLabels,
-    updateDigitizingNudges,
     retryRowPricing,
     toggleWholesale,
     lookupTaxRate,
@@ -132,60 +105,35 @@ import {
     closeShippingModal,
 } from './pricing-sync.js';
 import {
-    _syncALArrays,
-    mapStitchCountToTierValue,
-    initStitchEstimators,
-    openStitchEstimator,
     onPrimaryPositionChange,
     onPrimaryStitchTierChange,
     onFullBackStitchCountChange,
     onCapStitchTierChange,
-    updateStitchTierDropdownLabels,
     updateGlobalAL,
     toggleGlobalALNew,
     toggleLogoCard,
     toggleNotesSection,
-    updateNotesBadge,
     toggleDigitizingCheckbox,
     handleCapEmbellishmentChange,
-    getCapEmbellishmentType,
-    updateEmbellishmentDropdownLabels,
-} from './logo-config.js';
+    } from './logo-config.js';
 import {
-    updateLogoCardHeader,
-    dateToInputValue,
-    dateFromInputValue,
-    setupPrimaryLogoHandlers,
-    setupCapPrimaryLogoHandlers,
-    updateCapLogoSectionVisibility,
-    updateGarmentLogoSectionVisibility,
-    updateArtworkServicesVisibility,
-    setupSearchAutocomplete,
     selectProduct,
     addNewRow,
     addProductRow,
     addNonSanmarFromSearch,
-    createServiceProductRow,
     addManualServiceRow,
-    addALLineItem,
     addDECGLineItem,
     addExtraColorSurchargeRow,
     openMonogramNamesDialog,
     onServiceQtyChange,
     deleteServiceRow,
     onStyleChange,
-    populateNonSanmarRow,
-    updateNonSanmarPriceCell,
     selectNonSanmarColor,
-    parseShopWorksDescription,
-    isCapProduct,
-    detectAndAdjustSizeUI,
     toggleColorPicker,
     selectColor,
     handleColorPickerKeydown,
     selectChildColor,
     onSizeChange,
-    hideVariantOnlyParents,
     createChildRow,
     removeChildRow,
     onChildSizeChange,
@@ -195,15 +143,11 @@ import {
     enablePriceOverride,
     clearPriceOverride,
     handleCellKeydown,
-    updateRowBreakdown,
-    buildPricingBreakdown,
-} from './product-rows.js';
+    } from './product-rows.js';
 import {
-    applyDesignFromCache,
     filterDesignSearchByTier,
     filterDesignSearchByCompany,
     lookupDesignNumber,
-    showDesignThumbnail,
     openThumbnailFullSize,
     clearDesignNumber,
     openDesignSearchModal,
@@ -212,9 +156,7 @@ import {
     runDesignSearch,
     selectDesignFromSearch,
     showMoreDesignSearchResults,
-    invalidateDesignGalleryCache,
-    resetDesignSearchState,
-} from './design-search.js';
+    } from './design-search.js';
 import { showErrorBanner, hideErrorBanner, showFallbackPricingWarning } from '../shared/errors.js';
 
 // Strangler bridges — bare-identifier callers in the monolith resolve
@@ -226,11 +168,9 @@ window.getServicePrice = getServicePrice;
 
 // design-search (callers: monolith draft-restore/import + static HTML
 // handlers + onclick= handlers the module renders into the grid/chips)
-window.applyDesignFromCache = applyDesignFromCache;
 window.filterDesignSearchByTier = filterDesignSearchByTier;
 window.filterDesignSearchByCompany = filterDesignSearchByCompany;
 window.lookupDesignNumber = lookupDesignNumber;
-window.showDesignThumbnail = showDesignThumbnail;
 window.openThumbnailFullSize = openThumbnailFullSize;
 window.clearDesignNumber = clearDesignNumber;
 window.openDesignSearchModal = openDesignSearchModal;
@@ -239,8 +179,6 @@ window.onDesignSearchInput = onDesignSearchInput;
 window.runDesignSearch = runDesignSearch;
 window.selectDesignFromSearch = selectDesignFromSearch;
 window.showMoreDesignSearchResults = showMoreDesignSearchResults;
-window.invalidateDesignGalleryCache = invalidateDesignGalleryCache;
-window.resetDesignSearchState = resetDesignSearchState;
 
 // spr-modal (callers: the monolith import flow awaits showServicePricingReview;
 // static HTML handlers + onchange/onfocus/oninput handlers the modal renders
@@ -256,13 +194,11 @@ window.onSprCapEmbellishmentChange = onSprCapEmbellishmentChange;
 window.onSprStitchChange = onSprStitchChange;
 window.cancelServicePricingReview = cancelServicePricingReview;
 window.applyServicePricingReview = applyServicePricingReview;
-window.getSprEmbConfigOptions = getSprEmbConfigOptions;
 
 // shopworks-import (callers: static HTML modal handlers, generated banner
 // markup, and the search cluster's add-non-SanMar entry point)
 window.openShopWorksImportModal = openShopWorksImportModal;
 window.closeShopWorksImportModal = closeShopWorksImportModal;
-window.showAddNonSanmarModal = showAddNonSanmarModal;
 window.closeAddNonSanmarModal = closeAddNonSanmarModal;
 window.toggleNsMoreOptions = toggleNsMoreOptions;
 window.validateNsModalFields = validateNsModalFields;
@@ -275,21 +211,12 @@ window.scrollToProductRow = scrollToProductRow;
 // persistence (callers: the DOMContentLoaded init in the monolith — autosave
 // wiring, draft restore, ?edit=/?duplicate= flows — plus dirty-marking from
 // change tracking and QQ-handoff/import product adds)
-window.initEmbroideryPersistence = initEmbroideryPersistence;
-window.getEmbroideryQuoteData = getEmbroideryQuoteData;
-window.restoreEmbroideryDraft = restoreEmbroideryDraft;
-window.markEmbroideryDirty = markEmbroideryDirty;
 window.loadQuoteForEditing = loadQuoteForEditing;
 window.duplicateQuote = duplicateQuote;
-window.addProductFromQuote = addProductFromQuote;
-window.populateLogoConfig = populateLogoConfig; // consumer: emb-edit-reload-roundtrip harness
 
 // output (callers: static HTML print/email/copy buttons; diagnoseQuote from
 // the import flow's diagnostics hook; the rest internal)
-window.diagnoseQuote = diagnoseQuote;
-window.buildEmbroideryPricingData = buildEmbroideryPricingData;
 window.copyToClipboard = copyToClipboard;
-window.generateEmbQuoteText = generateEmbQuoteText;
 window.printQuote = printQuote;
 window.embEmailQuote = embEmailQuote;
 
@@ -300,11 +227,8 @@ window.saveQuote = saveQuote;
 window.updatePushButtonState = updatePushButtonState;
 window.getPushReadiness = getPushReadiness;
 window.renderPushReadiness = renderPushReadiness;
-window.showPushButton = showPushButton;
 window.pushToShopWorks = pushToShopWorks;
-window.openPushPreview = openPushPreview;
 window.confirmPushToShopWorks = confirmPushToShopWorks;
-window.verifyShopWorksImport = verifyShopWorksImport;
 window.closePushPreview = closePushPreview;
 
 // quote-lifecycle (callers: static HTML fee/discount/panel handlers, utils'
@@ -312,38 +236,25 @@ window.closePushPreview = closePushPreview;
 // monolith init → tracking setup)
 window.toggleAdditionalCharges = toggleAdditionalCharges;
 window.toggleOrderDetails = toggleOrderDetails;
-window.setupUnsavedChangesTracking = setupUnsavedChangesTracking;
-window.clearCustomerContextBanners = clearCustomerContextBanners;
 window.resetQuote = resetQuote;
 window.updateDiscountType = updateDiscountType;
 window.handleDiscountPresetChange = handleDiscountPresetChange;
 window.handleDiscountReasonPresetChange = handleDiscountReasonPresetChange;
-window.onLtmOverrideChange = onLtmOverrideChange;
 window.updateAdditionalCharges = updateAdditionalCharges;
 window.updateFeeTableRows = updateFeeTableRows;
-window.getAdditionalCharges = getAdditionalCharges;
-window.collectDECGItems = collectDECGItems;
 
 // pricing-sync (callers: the monolith's row/size/logo handlers funnel into
 // recalculatePricing — 40 call sites — plus static HTML tax/ship handlers
 // and generated retry markup). recalculatePricing arrives pre-wrapped with
 // the reprice pill (live export let; module tail rewraps before this runs).
 window.recalculatePricing = recalculatePricing;
-window.debouncedRecalculatePricing = debouncedRecalculatePricing;
 window.debounce = debounce;
-window.collectProductsFromTable = collectProductsFromTable;
 window.updatePricingDisplay = updatePricingDisplay;
-window.calculateDiscountableSubtotal = calculateDiscountableSubtotal;
-window.buildLogoConfiguration = buildLogoConfiguration;
-window.getOrderPieceCounts = getOrderPieceCounts;
 window.syncALRows = syncALRows;
 window.syncDECGRows = syncDECGRows;
-window._syncDecgLtmRow = _syncDecgLtmRow;
 window.syncRushRow = syncRushRow;
 window.getRushRate = getRushRate;
 window.estimateShipping = estimateShipping;
-window.syncDigitizingPriceLabels = syncDigitizingPriceLabels;
-window.updateDigitizingNudges = updateDigitizingNudges;
 window.retryRowPricing = retryRowPricing;
 window.toggleWholesale = toggleWholesale;
 window.lookupTaxRate = lookupTaxRate;
@@ -358,62 +269,37 @@ window.closeShippingModal = closeShippingModal;
 
 // logo-config (callers: static HTML logo-card/stitch/AL/embellishment
 // handlers + monolith init wiring + notes badge updates)
-window._syncALArrays = _syncALArrays;
-window.mapStitchCountToTierValue = mapStitchCountToTierValue;
-window.initStitchEstimators = initStitchEstimators;
-window.openStitchEstimator = openStitchEstimator;
 window.onPrimaryPositionChange = onPrimaryPositionChange;
 window.onPrimaryStitchTierChange = onPrimaryStitchTierChange;
 window.onFullBackStitchCountChange = onFullBackStitchCountChange;
 window.onCapStitchTierChange = onCapStitchTierChange;
-window.updateStitchTierDropdownLabels = updateStitchTierDropdownLabels;
 window.updateGlobalAL = updateGlobalAL;
 window.toggleGlobalALNew = toggleGlobalALNew;
 window.toggleLogoCard = toggleLogoCard;
 window.toggleNotesSection = toggleNotesSection;
-window.updateNotesBadge = updateNotesBadge;
 window.toggleDigitizingCheckbox = toggleDigitizingCheckbox;
 window.handleCapEmbellishmentChange = handleCapEmbellishmentChange;
-window.getCapEmbellishmentType = getCapEmbellishmentType;
-window.updateEmbellishmentDropdownLabels = updateEmbellishmentDropdownLabels;
 
 // product-rows (callers: static HTML search/row/color handlers, the size
 // grid + color picker + child-row GENERATED markup, and the monolith's
 // composition root wiring)
-window.updateLogoCardHeader = updateLogoCardHeader;
-window.dateToInputValue = dateToInputValue;
-window.dateFromInputValue = dateFromInputValue;
-window.setupPrimaryLogoHandlers = setupPrimaryLogoHandlers;
-window.setupCapPrimaryLogoHandlers = setupCapPrimaryLogoHandlers;
-window.updateCapLogoSectionVisibility = updateCapLogoSectionVisibility;
-window.updateGarmentLogoSectionVisibility = updateGarmentLogoSectionVisibility;
-window.updateArtworkServicesVisibility = updateArtworkServicesVisibility;
-window.setupSearchAutocomplete = setupSearchAutocomplete;
 window.selectProduct = selectProduct;
 window.addNewRow = addNewRow;
 window.addProductRow = addProductRow;
 window.addNonSanmarFromSearch = addNonSanmarFromSearch;
-window.createServiceProductRow = createServiceProductRow;
 window.addManualServiceRow = addManualServiceRow;
-window.addALLineItem = addALLineItem;
 window.addDECGLineItem = addDECGLineItem;
 window.addExtraColorSurchargeRow = addExtraColorSurchargeRow;
 window.openMonogramNamesDialog = openMonogramNamesDialog;
 window.onServiceQtyChange = onServiceQtyChange;
 window.deleteServiceRow = deleteServiceRow;
 window.onStyleChange = onStyleChange;
-window.populateNonSanmarRow = populateNonSanmarRow;
-window.updateNonSanmarPriceCell = updateNonSanmarPriceCell;
 window.selectNonSanmarColor = selectNonSanmarColor;
-window.parseShopWorksDescription = parseShopWorksDescription;
-window.isCapProduct = isCapProduct;
-window.detectAndAdjustSizeUI = detectAndAdjustSizeUI;
 window.toggleColorPicker = toggleColorPicker;
 window.selectColor = selectColor;
 window.handleColorPickerKeydown = handleColorPickerKeydown;
 window.selectChildColor = selectChildColor;
 window.onSizeChange = onSizeChange;
-window.hideVariantOnlyParents = hideVariantOnlyParents;
 window.createChildRow = createChildRow;
 window.removeChildRow = removeChildRow;
 window.onChildSizeChange = onChildSizeChange;
@@ -423,8 +309,6 @@ window.duplicateRowNewColor = duplicateRowNewColor;
 window.enablePriceOverride = enablePriceOverride;
 window.clearPriceOverride = clearPriceOverride;
 window.handleCellKeydown = handleCellKeydown;
-window.updateRowBreakdown = updateRowBreakdown;
-window.buildPricingBreakdown = buildPricingBreakdown;
 
 // ── Boot: the base drives the page lifecycle through the EMB adapter ──────
 // (registers the DOMContentLoaded listener now, at bundle parse time —
