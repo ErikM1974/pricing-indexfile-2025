@@ -48,7 +48,7 @@
 //        stockBanner             bool — emit '*** STOCK NOT VERIFIED ***' when
 //                                orderSettings.stockChecked === false
 //        rushOrderFlag(orderSettings) → ManageOrders rushOrder boolean
-//        taxPartNumber(pct)      → tax directive part ('Tax_10.1' / 'Tax_0')
+//        taxPartNumber(pct)      → tax directive part ('Tax_10.2' / 'Tax_0')
 //      }
 //      emails: {               EmailJS template wiring
 //        confirmationCustomerTemplate / confirmationSalesTemplate

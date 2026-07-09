@@ -113,7 +113,7 @@ window.OrderFormPricingShared = (function () {
   //   tax-exempt customer  → 0%  (GL 2204)
   //   out of WA state      → 0%  (GL 2202)
   //   in WA / unknown      → ship.taxRate (DOR destination lookup, a DECIMAL set
-  //                          upstream) else WA default 0.102 (GL account fallback 2200.101 until SW gets 2200.102)
+  //                          upstream) else WA default 0.102 (GL account fallback 2200.102)
   // NEVER a flat 10.1% for everyone (the old bug over-taxed exempt/out-of-state
   // customers on the customer-facing total/deposit).
   function resolveTaxContext(info, ship) {
@@ -145,7 +145,7 @@ window.OrderFormPricingShared = (function () {
       exempt: false,
       rateIsDefault: !haveLookedUpRate,
       label: `WA Sales Tax (${fmtPct(rate)}%)`,
-      account: ship.taxAccount || '2200.101',
+      account: ship.taxAccount || '2200.102',
       accountName: ship.taxAccountName || `Wash:${fmtPct(rate)}%`,
     };
   }

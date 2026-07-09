@@ -6,10 +6,10 @@
  * the NEXT rate change a one-day job: any 10.1/0.101 tax literal reappearing in
  * live code fails CI.
  *
- * Allowlisted (deliberately still 10.1 — ShopWorks-side identifiers that flip
- * only after Erik creates the Tax_10.2 / 2200.102 accounts in ShopWorks):
- *   Tax_10.1 · 2200.101 · Wash:10.1% · City of Milton Sales Tax 10.1%
- * When Erik confirms the SW accounts, flip those sites and DELETE the allowlist.
+ * 2026-07-09: Erik created the Tax_10.2 / 2200.102 ShopWorks accounts, the
+ * identifier sites flipped, and the allowlist was deleted — the gate is now
+ * absolute. (Old saved quotes still carry 2200.101 in their Notes — that's
+ * data, not code, and stays historically accurate.)
  */
 const fs = require('fs');
 const path = require('path');
@@ -23,8 +23,6 @@ const SCAN_DIRS = [
   { dir: 'calculators', exts: ['.html', '.js'], skip: [/archive[\\/]/] },
   { dir: 'config', exts: ['.js'], skip: [] },
 ];
-
-const SHOPWORKS_IDENTIFIER_ALLOWLIST = /Tax_10\.1|2200\.101|Wash:10\.1%|City of Milton Sales Tax 10\.1%/;
 
 // 10.1 as a standalone number (not 10.15, not 210.1) or decimal 0.101
 const STALE_RATE = /(?<![\d.])0\.101(?![\d])|(?<![\d.])10\.1(?![\d])/;
@@ -56,7 +54,6 @@ test('no live-code 10.1 / 0.101 tax literals outside the ShopWorks-identifier al
       const lines = stripComments(fs.readFileSync(file, 'utf8')).split('\n');
       lines.forEach((line, i) => {
         if (!STALE_RATE.test(line)) return;
-        if (SHOPWORKS_IDENTIFIER_ALLOWLIST.test(line)) return;
         if (/\?v=|version|calibration/i.test(line)) return; // cache-bust / unrelated numerics
         offenders.push(`${path.relative(ROOT, file)}:${i + 1}  ${line.trim().slice(0, 120)}`);
       });

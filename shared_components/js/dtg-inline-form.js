@@ -259,8 +259,8 @@ let hasChanges = false;
             // lookup endpoint returns these so we can surface the right GL
             // account in the ShopWorks Notes On Order block (Erik applies tax
             // manually post-import — see memory/wa-sales-tax-rules.md).
-            taxAccount: '2200.101',
-            taxAccountName: 'Wash:10.1%',
+            taxAccount: '2200.102',
+            taxAccountName: 'Wash:10.2%',
             // [2026-06-08] Phase 1 tax-control flags. includeTax: rep can opt the whole quote out of tax.
             // taxRateOverride: null = auto (DOR/pickup/exempt/etc.); a number (percent) = the manual rate the rep typed.
             includeTax: true,
@@ -2477,10 +2477,10 @@ let hasChanges = false;
         if (isPickup) {
             state.shipping.taxRate = 0.102;
             state.shipping.taxRateSource = 'pickup-flat';
-            // Milton pickup → Caspio account 2200.101 (Wash:10.1%) — account pair stays until Erik adds 2200.102 in ShopWorks (rate above is already 10.2). Hardcoded
+            // Milton pickup → ShopWorks account 2200.102 (Wash:10.2%), created by Erik 2026-07-09. Hardcoded
             // since pickup destination doesn't change.
-            state.shipping.taxAccount = '2200.101';
-            state.shipping.taxAccountName = 'Wash:10.1%';
+            state.shipping.taxAccount = '2200.102';
+            state.shipping.taxAccountName = 'Wash:10.2%';
             setStatus('Pickup at Milton, WA — 10.2% flat', 'success');
             renderSummary();
             return;
@@ -4639,7 +4639,7 @@ let hasChanges = false;
             method: 'Customer Pickup',  // matches the default in state init (top of file)
             address1: '', address2: '', city: '', state: '', zip: '',
             taxRate: 0.102, taxRateSource: 'pickup-flat',
-            taxAccount: '2200.101', taxAccountName: 'Wash:10.1%',
+            taxAccount: '2200.102', taxAccountName: 'Wash:10.2%',
             // [2026-06-08] Phase 1 — CRITICAL: re-seed includeTax/taxRateOverride. Omitting
             // includeTax left it `undefined` after reset → recomputeTaxRate's `!includeTax`
             // opt-out branch fired → every post-reset quote silently dropped to 0% tax while
