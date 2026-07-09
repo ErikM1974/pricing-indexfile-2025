@@ -20,7 +20,7 @@ function loadModule() {
         logLevel: 'silent',
     });
     const moduleObj = { exports: {} };
-    // eslint-disable-next-line no-new-func
+     
     new Function('module', 'exports', 'console', result.outputFiles[0].text)(
         moduleObj, moduleObj.exports, { log() {}, warn() {}, error() {} }
     );

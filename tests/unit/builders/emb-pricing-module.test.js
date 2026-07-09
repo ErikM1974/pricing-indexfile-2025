@@ -31,7 +31,7 @@ function loadModule(win) {
     });
     const code = result.outputFiles[0].text;
     const moduleObj = { exports: {} };
-    // eslint-disable-next-line no-new-func
+     
     new Function('module', 'exports', 'window', 'fetch', 'console', code)(
         moduleObj, moduleObj.exports, win, win.fetch, win.console || console
     );
