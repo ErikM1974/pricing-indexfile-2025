@@ -6,6 +6,12 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 
 ---
 
+### Regex member-access mangle in extraction rewrites (2026-07-09, tranche 2)
+- **Problem**: SCP reprice threw `undefined.totalQty` — every product dropped, $0 quotes; jsdom suites all green, only the E2E money lane caught it.
+- **Root Cause**: split-script rewrote closure vars with `totalQty → ctx.totalQty`; `` also matches AFTER a dot, so `product.totalQty` became `product.ctx.totalQty`.
+- **Solution**: exclude member positions — rewrite with `(?<!\.)name` (or restore by hand); fixed 2 sites.
+- **Prevention**: line-surgery protocol addition: never regex-rename a bare identifier into `ctx.X` without a negative-lookbehind for `.`; E2E money lanes are the ONLY net for live-DOM loop breaks — run them before calling a money-path split done.
+
 ## Security & Auth
 
 ### A "sealed" staff dashboard had 3 anonymous backdoors AROUND the gate (2026-06-30, detail → [STAFF_DASHBOARD_SEAL_AUDIT_2026-06.md](./STAFF_DASHBOARD_SEAL_AUDIT_2026-06.md))

@@ -91,6 +91,102 @@ export async function printQuote() {
  * Build pricing data structure for EmbroideryInvoiceGenerator from Screen Print products
  * FIXED: Read unit prices from DOM cells where they're already displayed
  */
+// D3 split (2026-07-09): ONE product's PDF line items, moved VERBATIM out of
+// buildScreenprintPricingData's loop. Returns the invoice entry or null.
+// NOTE: extracted ALONGSIDE the main fn by scp-save-parity's brace harness —
+// keep both self-contained (injected: document, scpState, getServicePrice...).
+function _buildScpInvoiceProduct(product) {
+    // Build line items from size breakdown
+    const lineItems = [];
+
+    // Find the parent row for this product to read its displayed price
+    const parentRow = document.querySelector(
+        `tr[data-style="${product.style}"][data-catalog-color="${product.catalogColor}"]:not(.child-row)`
+    );
+    const rowId = parentRow?.dataset?.rowId;
+
+    // Read base price from parent row's price cell (displayed as $25.99)
+    const basePriceCell = document.getElementById(`row-price-${rowId}`);
+    const basePriceText = basePriceCell?.textContent || '$0.00';
+    const baseUnitPrice = parseFloat(basePriceText.replace('$', '').replace(',', '')) || 0;
+
+    // Base sizes (S, M, L, XL) - Note: L is internal, LG is display.
+    // XXL/2XL are NOT base — they live in child rows whose price cell carries
+    // any upcharge, so they price via the child-row loop below.
+    const baseSizes = ['S', 'M', 'L', 'LG', 'XL'];
+    const baseSizeQtys = {};
+    let baseQty = 0;
+
+    Object.entries(product.sizeBreakdown || {}).forEach(([size, qty]) => {
+        // Normalize L to LG for display
+        const displaySize = size === 'L' ? 'LG' : size;
+        if (baseSizes.includes(size) && qty > 0) {
+            baseSizeQtys[displaySize] = qty;
+            baseQty += qty;
+        }
+    });
+
+    // OSFA-only products (beanies, bags) store qty on the PARENT row — no child
+    // row exists, so the parent price cell is the right price source. The old
+    // childRowMap lookup found nothing and printed the OSFA line at $0.00.
+    const osfaQty = product.sizeBreakdown?.['OSFA'] || 0;
+    if (osfaQty > 0 && baseQty === 0) {
+        lineItems.push({
+            description: `OSFA(${osfaQty})`,
+            quantity: osfaQty,
+            unitPrice: baseUnitPrice,
+            total: osfaQty * baseUnitPrice
+        });
+    } else if (baseQty > 0) {
+        // Build description like "S(2) M(3) LG(2)"
+        const desc = Object.entries(baseSizeQtys)
+            .map(([size, qty]) => `${size}(${qty})`)
+            .join(' ');
+
+        lineItems.push({
+            description: desc,
+            quantity: baseQty,
+            unitPrice: baseUnitPrice,
+            total: baseQty * baseUnitPrice
+        });
+    }
+
+    // Extended / non-standard sizes — iterate ALL sizeBreakdown keys (NOT a
+    // hardcoded list) so tall (LT/XLT…), youth (YS/YM…), toddler, fitted-cap
+    // combos (S/M, L/XL), XS/XXS, 7XL+, pants (3032) and shorts (W30) are not
+    // dropped from the PDF while their $ stays in the grand total — the same
+    // under-footing the 2026-06-11 DTF audit caught (EMB got this fix 2026-06-04).
+    Object.entries(product.sizeBreakdown || {}).forEach(([size, qty]) => {
+        if (!(qty > 0)) return;
+        if (baseSizes.includes(size)) return;             // already in the grouped base line
+        if (size === 'OSFA' && baseQty === 0) return;     // OSFA-only handled above
+        // Read the child row's price cell (carries any size upcharge)
+        const childRowId = scpState.childRowMap[rowId]?.[size];
+        const childPriceCell = document.getElementById(`row-price-${childRowId}`);
+        const childPriceText = childPriceCell?.textContent || '';
+        let unitPrice = parseFloat(childPriceText.replace(/[^0-9.]/g, '')) || 0;
+        if (!(unitPrice > 0)) unitPrice = baseUnitPrice;  // no child row (remapped parent size) → parent price
+
+        lineItems.push({
+            description: `${size}(${qty})`,
+            quantity: qty,
+            unitPrice: unitPrice,
+            total: qty * unitPrice,
+            hasUpcharge: true
+        });
+    });
+
+    if (lineItems.length === 0) return null;
+    return {
+            product: {
+                style: product.style,
+                title: product.productName || product.style,
+                color: product.color
+            },
+            lineItems: lineItems
+    };
+}
+
 function buildScreenprintPricingData(products) {
     const currentPricing = window.currentPricingData || {};
     // No #quote-id element exists in this page — the old DOM read made EVERY printed
@@ -102,96 +198,8 @@ function buildScreenprintPricingData(products) {
     const invoiceProducts = [];
 
     products.forEach(product => {
-        // Build line items from size breakdown
-        const lineItems = [];
-
-        // Find the parent row for this product to read its displayed price
-        const parentRow = document.querySelector(
-            `tr[data-style="${product.style}"][data-catalog-color="${product.catalogColor}"]:not(.child-row)`
-        );
-        const rowId = parentRow?.dataset?.rowId;
-
-        // Read base price from parent row's price cell (displayed as $25.99)
-        const basePriceCell = document.getElementById(`row-price-${rowId}`);
-        const basePriceText = basePriceCell?.textContent || '$0.00';
-        const baseUnitPrice = parseFloat(basePriceText.replace('$', '').replace(',', '')) || 0;
-
-        // Base sizes (S, M, L, XL) - Note: L is internal, LG is display.
-        // XXL/2XL are NOT base — they live in child rows whose price cell carries
-        // any upcharge, so they price via the child-row loop below.
-        const baseSizes = ['S', 'M', 'L', 'LG', 'XL'];
-        const baseSizeQtys = {};
-        let baseQty = 0;
-
-        Object.entries(product.sizeBreakdown || {}).forEach(([size, qty]) => {
-            // Normalize L to LG for display
-            const displaySize = size === 'L' ? 'LG' : size;
-            if (baseSizes.includes(size) && qty > 0) {
-                baseSizeQtys[displaySize] = qty;
-                baseQty += qty;
-            }
-        });
-
-        // OSFA-only products (beanies, bags) store qty on the PARENT row — no child
-        // row exists, so the parent price cell is the right price source. The old
-        // childRowMap lookup found nothing and printed the OSFA line at $0.00.
-        const osfaQty = product.sizeBreakdown?.['OSFA'] || 0;
-        if (osfaQty > 0 && baseQty === 0) {
-            lineItems.push({
-                description: `OSFA(${osfaQty})`,
-                quantity: osfaQty,
-                unitPrice: baseUnitPrice,
-                total: osfaQty * baseUnitPrice
-            });
-        } else if (baseQty > 0) {
-            // Build description like "S(2) M(3) LG(2)"
-            const desc = Object.entries(baseSizeQtys)
-                .map(([size, qty]) => `${size}(${qty})`)
-                .join(' ');
-
-            lineItems.push({
-                description: desc,
-                quantity: baseQty,
-                unitPrice: baseUnitPrice,
-                total: baseQty * baseUnitPrice
-            });
-        }
-
-        // Extended / non-standard sizes — iterate ALL sizeBreakdown keys (NOT a
-        // hardcoded list) so tall (LT/XLT…), youth (YS/YM…), toddler, fitted-cap
-        // combos (S/M, L/XL), XS/XXS, 7XL+, pants (3032) and shorts (W30) are not
-        // dropped from the PDF while their $ stays in the grand total — the same
-        // under-footing the 2026-06-11 DTF audit caught (EMB got this fix 2026-06-04).
-        Object.entries(product.sizeBreakdown || {}).forEach(([size, qty]) => {
-            if (!(qty > 0)) return;
-            if (baseSizes.includes(size)) return;             // already in the grouped base line
-            if (size === 'OSFA' && baseQty === 0) return;     // OSFA-only handled above
-            // Read the child row's price cell (carries any size upcharge)
-            const childRowId = scpState.childRowMap[rowId]?.[size];
-            const childPriceCell = document.getElementById(`row-price-${childRowId}`);
-            const childPriceText = childPriceCell?.textContent || '';
-            let unitPrice = parseFloat(childPriceText.replace(/[^0-9.]/g, '')) || 0;
-            if (!(unitPrice > 0)) unitPrice = baseUnitPrice;  // no child row (remapped parent size) → parent price
-
-            lineItems.push({
-                description: `${size}(${qty})`,
-                quantity: qty,
-                unitPrice: unitPrice,
-                total: qty * unitPrice,
-                hasUpcharge: true
-            });
-        });
-
-        if (lineItems.length > 0) {
-            invoiceProducts.push({
-                product: {
-                    style: product.style,
-                    title: product.productName || product.style,
-                    color: product.color
-                },
-                lineItems: lineItems
-            });
-        }
+        const e = _buildScpInvoiceProduct(product);
+        if (e) invoiceProducts.push(e);
     });
 
     // Calculate totals from line items
@@ -226,7 +234,7 @@ function buildScreenprintPricingData(products) {
     const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
     // Vellum + Color Change setup parts (Erik's official list, 2026-06-27). Read
     // inline (like art/rush above) rather than via getScpExtraFees() so this PDF
-    // function stays self-contained for the brace-extracted unit test harness.
+    // function (+ _buildScpInvoiceProduct) stays self-contained for the brace-extracted unit test harness.
     const vellumQtyPdf = Math.max(0, parseInt(document.getElementById('vellum-qty')?.value || 0, 10) || 0);
     const vellumFeePdf = vellumQtyPdf * getServicePrice('Vellum', 10);
     const colorChangeQtyPdf = Math.max(0, parseInt(document.getElementById('color-change-qty')?.value || 0, 10) || 0);
@@ -310,6 +318,125 @@ function getLocationName(code) {
  * Save quote and get shareable link
  * Uses ScreenPrintQuoteService and QuoteShareModal
  */
+// D3 split (2026-07-09): the save-path extras (charges/discount/artwork/design)
+// moved VERBATIM out of saveAndGetLink.
+function _collectScpSaveExtras(pricing) {
+    // Get additional charges for saving (2026 fee refactor)
+    const artChargeToggle = document.getElementById('art-charge-toggle');
+    const artCharge = artChargeToggle?.checked ? parseFloat(document.getElementById('art-charge')?.value || 0) : 0;
+    const graphicDesignHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
+    const graphicDesignCharge = graphicDesignHours * getServicePrice('GRT-75', 75);
+    const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
+    // Vellum + Color Change + Reorder — Erik's official setup parts (2026-06-27).
+    // Same getScpExtraFees() source the on-screen math + fee table use, so the
+    // saved/pushed total matches what the rep sees (parity rule).
+    const _xf = getScpExtraFees();
+    const discountAmount = parseFloat(document.getElementById('discount-amount')?.value || 0);
+    const discountType = document.getElementById('discount-type')?.value || 'fixed';
+    const discountReason = document.getElementById('discount-reason')?.value || '';
+    // Calculate discountable subtotal for percentage discount (products + additional services + setup fees)
+    const discountableSubtotal = (pricing.subtotal || 0) + artCharge + graphicDesignCharge + rushFee + (scpState.printConfig.setupFee || 0) + (pricing.ltmFee || 0)
+        + _xf.vellumFee + _xf.colorChangeFee;
+    const discount = discountType === 'percent' ? (discountableSubtotal * discountAmount / 100) : discountAmount;
+    const discountPercent = discountType === 'percent' ? discountAmount : 0;
+
+    // Phase 9 — include uploaded reference artwork file refs (if any)
+    // Phase 11.3 (2026-05-24) — also pull newDesignName + per-file .placement
+    // from the rich-mode widget, so the proxy can emit Designs[{name, Locations[]}]
+    // for new-artwork pushes (creates a fresh design record in ShopWorks).
+    const referenceArtwork = (window._scpArtwork && typeof window._scpArtwork.getFiles === 'function')
+        ? window._scpArtwork.getFiles()
+        : [];
+    const newDesignName = (window._scpArtwork && typeof window._scpArtwork.getDesignName === 'function')
+        ? (window._scpArtwork.getDesignName() || '').trim()
+        : '';
+
+    // Phase 11.1 — include design # if rep picked one from the combobox
+    const designNumber = document.getElementById('design-number')?.value?.trim() || '';
+    return { artCharge, graphicDesignHours, graphicDesignCharge, rushFee, _xf,
+        discount, discountPercent, discountReason, referenceArtwork, newDesignName, designNumber };
+}
+
+// D3 split (2026-07-09): the quoteData literal moved VERBATIM out of
+// saveAndGetLink (ctx carries the collected fields).
+function _buildScpQuoteData(ctx) {
+    const { customerName, customerEmail, items, pricing, artCharge, graphicDesignHours,
+        graphicDesignCharge, rushFee, _xf, discount, discountPercent, discountReason,
+        referenceArtwork, newDesignName, designNumber } = ctx;
+    void pricing;
+    // Collect quote data
+    const quoteData = {
+        customerName: customerName,
+        customerEmail: customerEmail,
+        companyName: document.getElementById('company-name')?.value?.trim() || '',
+        // ShopWorks customer # — attaches the pushed order to the real customer
+        // (else the proxy falls back to the no-customer catch-all 3739).
+        customerNumber: document.getElementById('customer-number')?.value?.trim() || '',
+        salesRep: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com',
+        referenceArtwork, // → SCP quote-service writes to quote_sessions.Notes JSON
+        newDesignName,    // → Notes.newDesignName; proxy reads this for Designs[0].name
+        designNumber,     // → SCP quote-service writes to quote_sessions.Notes.designNumber
+        items: items,
+        totalQuantity: pricing.totalQuantity || items.reduce((sum, p) => sum + p.quantity, 0),
+        subtotal: pricing.subtotal || 0,
+        ltmFee: pricing.ltmFee || 0,
+        setupFees: scpState.printConfig.setupFee || 0,
+        grandTotal: pricing.grandTotal || 0,
+        frontLocation: scpState.printConfig.frontLocation,
+        frontColors: scpState.printConfig.frontColors,
+        backLocation: scpState.printConfig.backLocation,
+        backColors: scpState.printConfig.backColors,
+        leftSleeveColors: scpState.printConfig.leftSleeveColors,
+        rightSleeveColors: scpState.printConfig.rightSleeveColors,
+        sleeveColorsList: scpState.printConfig.sleeveColorsList,
+        totalScreens: scpState.printConfig.totalScreens,
+        isDarkGarment: scpState.printConfig.isDarkGarment,
+        hasSafetyStripes: scpState.printConfig.isSafetyStripes,
+        printSetup: {
+            frontLocation: scpState.printConfig.frontLocation,
+            frontColors: scpState.printConfig.frontColors,
+            backLocation: scpState.printConfig.backLocation,
+            backColors: scpState.printConfig.backColors,
+            leftSleeveColors: scpState.printConfig.leftSleeveColors,
+            rightSleeveColors: scpState.printConfig.rightSleeveColors,
+            sleeveColorsList: scpState.printConfig.sleeveColorsList,
+            totalScreens: scpState.printConfig.totalScreens,
+            isDarkGarment: scpState.printConfig.isDarkGarment,
+            isSafetyStripes: scpState.printConfig.isSafetyStripes
+        },
+        // Additional charges (2026 fee refactor)
+        artCharge: artCharge,
+        graphicDesignHours: graphicDesignHours,
+        graphicDesignCharge: graphicDesignCharge,
+        rushFee: rushFee,
+        // Screen-print setup parts (Erik's official list, 2026-06-27)
+        vellumQty: _xf.vellumQty,
+        vellumFee: _xf.vellumFee,
+        colorChangeQty: _xf.colorChangeQty,
+        colorChangeFee: _xf.colorChangeFee,
+        discount: discount,
+        discountPercent: discountPercent,
+        discountReason: discountReason,
+        // LTM display preferences (2026-03-22)
+        ltmDisplayMode: getLtmControlState('spc-ltm-panel').displayMode || 'builtin',
+        ltmWaived: !getLtmControlState('spc-ltm-panel').enabled,
+        isWholesale: document.getElementById('wholesale-checkbox')?.checked || false,  // [2026-06-08] → IsWholesale; push routes to GL 2203
+        // [2026-06-08] P0 (review woaaypuz4): the SCP save quoteData NEVER passed taxRate (getOrderShippingData omits it),
+        // so the service fell back to 10.1% → every out-of-state / exempt / non-10.1 SCP quote saved TaxRate=10.1 and the
+        // /quote + /invoice mirror billed full WA tax. Pass it explicitly (mirror DTF). Erik's #1 rule.
+        // [2026-06-14] Gate on the Include Tax checkbox (parity with DTF L1965 / EMB save). Unchecking it shows $0 tax
+        // on screen (updateTaxCalculation L3559) + on the PDF (buildScreenprintPricingData includeTax), but save used to
+        // pass the raw rate input (still 10.1, since only wholesale/CRM-exempt zero it) → the saved/mirrored/pushed quote
+        // billed full WA tax while the rep saw $0 = silent wrong price (Erik's #1 rule). Unchecked → save TaxRate 0.
+        taxRate: (document.getElementById('include-tax') && !document.getElementById('include-tax').checked)
+            ? 0
+            : parseFloat(document.getElementById('tax-rate-input')?.value || '10.2'),
+        // Order & shipping fields (2026-03-22)
+        ...getOrderShippingData('spc-order-fields')
+    };
+    return quoteData;
+}
+
 export async function saveAndGetLink(opts = {}) {
     const products = collectProductsFromTable();
     if (products.length === 0) {
@@ -374,109 +501,9 @@ export async function saveAndGetLink(opts = {}) {
             imageUrl: row.imageUrl || ''
         }));
 
-        // Get additional charges for saving (2026 fee refactor)
-        const artChargeToggle = document.getElementById('art-charge-toggle');
-        const artCharge = artChargeToggle?.checked ? parseFloat(document.getElementById('art-charge')?.value || 0) : 0;
-        const graphicDesignHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
-        const graphicDesignCharge = graphicDesignHours * getServicePrice('GRT-75', 75);
-        const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
-        // Vellum + Color Change + Reorder — Erik's official setup parts (2026-06-27).
-        // Same getScpExtraFees() source the on-screen math + fee table use, so the
-        // saved/pushed total matches what the rep sees (parity rule).
-        const _xf = getScpExtraFees();
-        const discountAmount = parseFloat(document.getElementById('discount-amount')?.value || 0);
-        const discountType = document.getElementById('discount-type')?.value || 'fixed';
-        const discountReason = document.getElementById('discount-reason')?.value || '';
-        // Calculate discountable subtotal for percentage discount (products + additional services + setup fees)
-        const discountableSubtotal = (pricing.subtotal || 0) + artCharge + graphicDesignCharge + rushFee + (scpState.printConfig.setupFee || 0) + (pricing.ltmFee || 0)
-            + _xf.vellumFee + _xf.colorChangeFee;
-        const discount = discountType === 'percent' ? (discountableSubtotal * discountAmount / 100) : discountAmount;
-        const discountPercent = discountType === 'percent' ? discountAmount : 0;
+        const extras = _collectScpSaveExtras(pricing);
 
-        // Phase 9 — include uploaded reference artwork file refs (if any)
-        // Phase 11.3 (2026-05-24) — also pull newDesignName + per-file .placement
-        // from the rich-mode widget, so the proxy can emit Designs[{name, Locations[]}]
-        // for new-artwork pushes (creates a fresh design record in ShopWorks).
-        const referenceArtwork = (window._scpArtwork && typeof window._scpArtwork.getFiles === 'function')
-            ? window._scpArtwork.getFiles()
-            : [];
-        const newDesignName = (window._scpArtwork && typeof window._scpArtwork.getDesignName === 'function')
-            ? (window._scpArtwork.getDesignName() || '').trim()
-            : '';
-
-        // Phase 11.1 — include design # if rep picked one from the combobox
-        const designNumber = document.getElementById('design-number')?.value?.trim() || '';
-
-        // Collect quote data
-        const quoteData = {
-            customerName: customerName,
-            customerEmail: customerEmail,
-            companyName: document.getElementById('company-name')?.value?.trim() || '',
-            // ShopWorks customer # — attaches the pushed order to the real customer
-            // (else the proxy falls back to the no-customer catch-all 3739).
-            customerNumber: document.getElementById('customer-number')?.value?.trim() || '',
-            salesRep: document.getElementById('sales-rep')?.value || 'sales@nwcustomapparel.com',
-            referenceArtwork, // → SCP quote-service writes to quote_sessions.Notes JSON
-            newDesignName,    // → Notes.newDesignName; proxy reads this for Designs[0].name
-            designNumber,     // → SCP quote-service writes to quote_sessions.Notes.designNumber
-            items: items,
-            totalQuantity: pricing.totalQuantity || items.reduce((sum, p) => sum + p.quantity, 0),
-            subtotal: pricing.subtotal || 0,
-            ltmFee: pricing.ltmFee || 0,
-            setupFees: scpState.printConfig.setupFee || 0,
-            grandTotal: pricing.grandTotal || 0,
-            frontLocation: scpState.printConfig.frontLocation,
-            frontColors: scpState.printConfig.frontColors,
-            backLocation: scpState.printConfig.backLocation,
-            backColors: scpState.printConfig.backColors,
-            leftSleeveColors: scpState.printConfig.leftSleeveColors,
-            rightSleeveColors: scpState.printConfig.rightSleeveColors,
-            sleeveColorsList: scpState.printConfig.sleeveColorsList,
-            totalScreens: scpState.printConfig.totalScreens,
-            isDarkGarment: scpState.printConfig.isDarkGarment,
-            hasSafetyStripes: scpState.printConfig.isSafetyStripes,
-            printSetup: {
-                frontLocation: scpState.printConfig.frontLocation,
-                frontColors: scpState.printConfig.frontColors,
-                backLocation: scpState.printConfig.backLocation,
-                backColors: scpState.printConfig.backColors,
-                leftSleeveColors: scpState.printConfig.leftSleeveColors,
-                rightSleeveColors: scpState.printConfig.rightSleeveColors,
-                sleeveColorsList: scpState.printConfig.sleeveColorsList,
-                totalScreens: scpState.printConfig.totalScreens,
-                isDarkGarment: scpState.printConfig.isDarkGarment,
-                isSafetyStripes: scpState.printConfig.isSafetyStripes
-            },
-            // Additional charges (2026 fee refactor)
-            artCharge: artCharge,
-            graphicDesignHours: graphicDesignHours,
-            graphicDesignCharge: graphicDesignCharge,
-            rushFee: rushFee,
-            // Screen-print setup parts (Erik's official list, 2026-06-27)
-            vellumQty: _xf.vellumQty,
-            vellumFee: _xf.vellumFee,
-            colorChangeQty: _xf.colorChangeQty,
-            colorChangeFee: _xf.colorChangeFee,
-            discount: discount,
-            discountPercent: discountPercent,
-            discountReason: discountReason,
-            // LTM display preferences (2026-03-22)
-            ltmDisplayMode: getLtmControlState('spc-ltm-panel').displayMode || 'builtin',
-            ltmWaived: !getLtmControlState('spc-ltm-panel').enabled,
-            isWholesale: document.getElementById('wholesale-checkbox')?.checked || false,  // [2026-06-08] → IsWholesale; push routes to GL 2203
-            // [2026-06-08] P0 (review woaaypuz4): the SCP save quoteData NEVER passed taxRate (getOrderShippingData omits it),
-            // so the service fell back to 10.1% → every out-of-state / exempt / non-10.1 SCP quote saved TaxRate=10.1 and the
-            // /quote + /invoice mirror billed full WA tax. Pass it explicitly (mirror DTF). Erik's #1 rule.
-            // [2026-06-14] Gate on the Include Tax checkbox (parity with DTF L1965 / EMB save). Unchecking it shows $0 tax
-            // on screen (updateTaxCalculation L3559) + on the PDF (buildScreenprintPricingData includeTax), but save used to
-            // pass the raw rate input (still 10.1, since only wholesale/CRM-exempt zero it) → the saved/mirrored/pushed quote
-            // billed full WA tax while the rep saw $0 = silent wrong price (Erik's #1 rule). Unchecked → save TaxRate 0.
-            taxRate: (document.getElementById('include-tax') && !document.getElementById('include-tax').checked)
-                ? 0
-                : parseFloat(document.getElementById('tax-rate-input')?.value || '10.2'),
-            // Order & shipping fields (2026-03-22)
-            ...getOrderShippingData('spc-order-fields')
-        };
+        const quoteData = _buildScpQuoteData({ customerName, customerEmail, items, pricing, ...extras });
 
         let result;
         if (scpState.editingQuoteId) {

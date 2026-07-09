@@ -36,7 +36,7 @@ function loadService(captured) {
   const doc = { getElementById: () => null, querySelector: () => null, querySelectorAll: () => [] };
   const quietConsole = { log() {}, warn() {}, error() {}, info() {} };
   const mkStorage = () => { const m = {}; return { getItem: (k) => (k in m ? m[k] : null), setItem: (k, v) => { m[k] = String(v); }, removeItem: (k) => { delete m[k]; }, clear: () => { Object.keys(m).forEach((k) => delete m[k]); }, length: 0, key: () => null }; };
-  // eslint-disable-next-line no-new-func
+   
   const factory = new Function('window', 'document', 'fetch', 'console', 'sessionStorage', 'localStorage', code + '\nreturn window.ScreenPrintQuoteService;');
   return factory(win, doc, fetchMock, quietConsole, mkStorage(), mkStorage());
 }
@@ -108,7 +108,10 @@ function extractFunction(src, name) {
 }
 
 const BUILDER_SRC = fs.readFileSync(path.join(ROOT, 'shared_components/js/builders/scp/save-output.js'), 'utf8');
-const PDF_FN_SRC = extractFunction(BUILDER_SRC, 'buildScreenprintPricingData');
+// D3 (2026-07-09): the per-product build was split out — extract the helper
+// alongside so the evaluated source stays complete.
+const PDF_FN_SRC = extractFunction(BUILDER_SRC, '_buildScpInvoiceProduct') + '\n'
+    + extractFunction(BUILDER_SRC, 'buildScreenprintPricingData');
 
 function loadPdfBuilder({ cells, parentRows, childRowMap, currentPricingData }) {
   // sanity: brace counting captured the whole function
@@ -133,7 +136,7 @@ function loadPdfBuilder({ cells, parentRows, childRowMap, currentPricingData }) 
   const getLocationName = (c) => String(c);
   const getServicePrice = (code, fallback) => fallback;
   const getLtmControlState = () => ({ enabled: true, displayMode: 'builtin' });
-  // eslint-disable-next-line no-new-func
+   
   const factory = new Function(
     'window', 'document', 'scpState', 'getLocationName', 'getServicePrice', 'getLtmControlState',
     PDF_FN_SRC + '\nreturn buildScreenprintPricingData;'

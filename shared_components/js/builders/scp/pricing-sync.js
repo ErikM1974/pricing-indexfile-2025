@@ -55,46 +55,9 @@ function findPricingTier(tiers, qty) {
     return sorted[0];
 }
 
-async function _recalculatePricingImpl() {
-    // Collect products from table (parent rows only)
-    const productList = collectProductsFromTable();
-
-    // Dark-garment reminder — evaluated on every reprice so a navy hoodie added
-    // mid-quote still nudges while the underbase toggle is off.
-    try { updateDarkGarmentNudge(productList); } catch (_) {}
-
-    if (productList.length === 0) {
-        updatePricingDisplay({
-            totalQuantity: 0,
-            tier: '24-47',
-            subtotal: 0,
-            ltmFee: 0,
-            setupFees: scpState.printConfig.setupFee,
-            grandTotal: scpState.printConfig.setupFee
-        });
-        // Clear all price and total cells
-        document.querySelectorAll('.cell-price').forEach(cell => {
-            cell.textContent = '-';
-        });
-        document.querySelectorAll('.cell-total').forEach(cell => {
-            cell.textContent = '-';
-        });
-        return;
-    }
-
-    // Calculate total quantity across all products
-    let totalQty = 0;
-    productList.forEach(p => {
-        totalQty += p.totalQty || 0;
-    });
-
-    // Determine tier based on total quantity. NOTE: getScreenPrintTier's labels are a
-    // STATIC fallback only — the real displayed/saved tier label is derived below from the
-    // matched Caspio bundle tier. SCREENPRINT_TIERS drifted from Caspio's boundaries after the
-    // 2026-06-19 remap (it labels qty 48 "37-72" while Caspio prices the "48-71" tier).
-    const tier = getScreenPrintTier(totalQty);
-    let caspioTierLabel = null;
-
+// D3 split (2026-07-09): LTM fee resolve (API-first + warned fallback + control
+// panel wiring), moved VERBATIM out of _recalculatePricingImpl.
+async function _resolveLtmState(productList, totalQty) {
     // LTM fee — from Caspio Pricing_Tiers.LTM_Fee (the matched qty tier), NOT
     // hardcoded $75/$50 bands. The SCP service exposes `ltmFee` on each
     // primaryLocationPricing tier row (the fee is the same across color counts).
@@ -152,6 +115,247 @@ async function _recalculatePricingImpl() {
     const ltmDisplayMode = ltmState.displayMode || 'builtin';
     const ltmFee = (wouldHaveLTM && ltmEnabled) ? baseLtmFee : 0;
     const perUnitLTM = ltmFee > 0 ? Math.floor(ltmFee / totalQty * 100) / 100 : 0;
+    return { ltmEnabled, ltmDisplayMode, ltmFee, perUnitLTM };
+}
+
+// D3 split (2026-07-09): ONE product's pricing + row paint, moved VERBATIM from
+// the _recalculatePricingImpl loop. Returns { entry, productSubtotal } or null
+// (dropped — reason already pushed onto ctx.droppedProducts). ctx.first captures
+// the first-priced product's pricing/tier for the nudge + Caspio tier label.
+async function _priceOneProduct(product, ctx) {
+        const style = product.style;
+
+        // Fetch Screen Print pricing data for this style
+        const pricingData = await scpState.screenPrintPricingService.fetchPricingData(style);
+
+        if (!pricingData) {
+            console.warn(`No pricing data for ${style}`);
+            ctx.droppedProducts.push({ style, reason: 'no pricing data returned' });
+            return null;
+        }
+
+        // Get primary location pricing (garment + print)
+        const frontColors = scpState.printConfig.frontColors.toString();
+        const primaryPricing = pricingData.primaryLocationPricing?.[frontColors];
+
+        if (!primaryPricing || !primaryPricing.tiers) {
+            console.warn(`No primary pricing for ${frontColors} colors`);
+            ctx.droppedProducts.push({ style, reason: `no pricing for ${frontColors}-color front` });
+            return null;
+        }
+
+        // Find the tier data for this quantity
+        const tierData = findPricingTier(primaryPricing.tiers, ctx.totalQty);
+        if (!tierData) { ctx.droppedProducts.push({ style, reason: `no price tier for qty ${ctx.totalQty}` }); return null; }
+
+        // Capture first product's pricing for nudge savings calculation
+        if (!ctx.first.pricing) {
+            ctx.first.pricing = primaryPricing;
+            ctx.first.tierData = tierData;
+            // Caspio-accurate tier label from the MATCHED bundle tier (not the static
+            // SCREENPRINT_TIERS map) — mirrors the engine (quote-cart-engine.js:624-632).
+            const _hasMax = tierData.maxQty != null && isFinite(Number(tierData.maxQty));
+            ctx.first.caspioTierLabel = _hasMax ? (tierData.minQty + '-' + tierData.maxQty) : (tierData.minQty + '+');
+        }
+
+        // Get additional location pricing if back location enabled
+        let additionalPricePerPiece = 0;
+        if (scpState.printConfig.backLocation) {
+            const backColors = scpState.printConfig.backColors.toString();
+            const additionalPricing = pricingData.additionalLocationPricing?.[backColors];
+            const additionalTier = (additionalPricing && additionalPricing.tiers)
+                ? findPricingTier(additionalPricing.tiers, ctx.totalQty)
+                : null;
+            if (!additionalTier || typeof additionalTier.pricePerPiece !== 'number') {
+                // Never silently price the back print at $0 (Rule 4) — same guard the
+                // sleeve loop below already has; the engine hard-throws this case.
+                ctx.droppedProducts.push({ style, reason: `no add-location pricing for a ${backColors}-color back print` });
+                return null;
+            }
+            additionalPricePerPiece = additionalTier.pricePerPiece;
+        }
+
+        // Sleeves — each checked sleeve is its OWN additional print location at its own color count,
+        // priced like the back (additionalLocationPricing[colors] at the POOLED qty), SUMMED, never
+        // re-rounded (pricePerPiece is already HalfDollarCeil'd in the service). Mirrors engine
+        // quote-cart-engine.js priceScpGroup so the builder matches the engine/Quick Quote to the cent.
+        let sleeveAddlPerPiece = 0;
+        let sleeveDropped = false;
+        for (const c of (scpState.printConfig.sleeveColorsList || [])) {
+            const sleevePricing = pricingData.additionalLocationPricing?.[String(c)];
+            if (!sleevePricing || !sleevePricing.tiers) {
+                ctx.droppedProducts.push({ style, reason: `no add-location pricing for a ${c}-color sleeve` });
+                sleeveDropped = true;
+                break;
+            }
+            const sleeveTier = findPricingTier(sleevePricing.tiers, ctx.totalQty);
+            if (!sleeveTier || typeof sleeveTier.pricePerPiece !== 'number') {
+                ctx.droppedProducts.push({ style, reason: `no add-location price tier (qty ${ctx.totalQty}) for a ${c}-color sleeve` });
+                sleeveDropped = true;
+                break;
+            }
+            sleeveAddlPerPiece += sleeveTier.pricePerPiece;
+        }
+        if (sleeveDropped) return null; // never silently price a sleeve at $0 (Rule 4)
+
+        // No silent M/L substitution for an unpriced size — the engine refuses the
+        // same case (quote-cart-engine.js:726-731) and substituting drops the
+        // extended-size upcharge, so builder and engine would disagree per SKU.
+        const unpricedSize = Object.entries(product.sizeBreakdown || {})
+            .find(([sz, q]) => q > 0 && typeof tierData.prices?.[sz] !== 'number');
+        if (unpricedSize) {
+            ctx.droppedProducts.push({ style, reason: `no price for size ${unpricedSize[0]} at tier ${ctx.first.caspioTierLabel || (tierData.minQty + '+')}` });
+            return null;
+        }
+
+        // Find parent row for this product
+        const parentRow = document.querySelector(`tr[data-style="${style}"][data-catalog-color="${product.catalogColor}"]:not(.child-row)`);
+        if (!parentRow) return null;
+
+        const rowId = parentRow.dataset.rowId;
+        const { productSubtotal, parentOnlySubtotal } = _paintProductSizes(product, tierData, additionalPricePerPiece, sleeveAddlPerPiece, rowId, ctx);
+
+        // Update parent row total (standard sizes only — child rows show their own totals)
+        const parentTotalCell = document.getElementById(`row-total-${rowId}`);
+        if (parentTotalCell) {
+            const displayTotal = parentOnlySubtotal > 0 ? parentOnlySubtotal : productSubtotal;
+            parentTotalCell.textContent = product.totalQty > 0 ? `$${displayTotal.toFixed(2)}` : '-';
+        }
+
+        // Update pricing breakdown for the row
+        updateRowBreakdownScreenPrint(rowId, product, tierData);
+
+
+        // Persist a fully-priced, save-ready snapshot. saveAndGetLink() reads
+        // these instead of re-scraping the DOM. (The old save map read
+        // product.qty/.sizes/.unitPrice — fields collectProductsFromTable never
+        // returns — so saved quote_items had empty sizes and $0 unit prices,
+        // which the ShopWorks push then under-billed.) unitPrice is the per-
+        // product BLENDED price (productSubtotal / qty) so the saved LineTotal and
+        // the pushed order total exactly equal the quoted subtotal, even when
+        // extended-size upcharges make per-size prices differ within a product.
+        const _pqty = product.totalQty || 0;
+        const entry = {
+            product,
+            prices: tierData.prices,
+            tier: ctx.first.caspioTierLabel || ctx.tier.label,
+            // save-ready fields (consumed by saveAndGetLink → ScreenPrintQuoteService)
+            style: product.style,
+            productName: product.productName || product.style,
+            color: product.color,
+            catalogColor: product.catalogColor,
+            sizeBreakdown: product.sizeBreakdown,
+            totalQty: _pqty,
+            unitPrice: _pqty > 0 ? Math.round((productSubtotal / _pqty) * 100) / 100 : 0,
+            lineTotal: Math.round(productSubtotal * 100) / 100,
+            ltmPerUnit: ctx.perUnitLTM,
+            imageUrl: product.imageUrl || ''
+        };
+        return { entry, productSubtotal };
+}
+
+// D3 split (2026-07-09): the per-size price paint, moved VERBATIM out of the
+// product loop (accumulates and returns the two subtotals).
+function _paintProductSizes(product, tierData, additionalPricePerPiece, sleeveAddlPerPiece, rowId, ctx) {
+    const { safetyStripesPerPiece, ltmDisplayMode, perUnitLTM } = ctx;
+    let productSubtotal = 0;      // ALL sizes (for sidebar subtotal)
+    let parentOnlySubtotal = 0;   // Standard sizes only (for parent row Total cell)
+
+    // Calculate and display price for each size
+    Object.entries(product.sizeBreakdown || {}).forEach(([size, qty]) => {
+        if (qty <= 0) return;
+
+        // Base price for this size from primary location — guaranteed present by
+        // the unpricedSize guard above (no M/L fallback: that silently dropped
+        // extended-size upcharges and broke builder↔engine parity).
+        let sizePrice = tierData.prices[size];
+
+        // Add additional location price (back)
+        sizePrice += additionalPricePerPiece;
+
+        // Add sleeve additional-location price(s) — left + right, each at its own color count
+        sizePrice += sleeveAddlPerPiece;
+
+        // Add safety stripes (front/back only — sleeves get no hi-vis stripe)
+        sizePrice += safetyStripesPerPiece;
+
+        // Display price: builtin mode adds LTM per-unit, separate mode shows base price
+        const displayPrice = (ltmDisplayMode === 'builtin' && perUnitLTM > 0) ? sizePrice + perUnitLTM : sizePrice;
+        // Use displayPrice for subtotal so row totals match displayed unit prices
+        productSubtotal += displayPrice * qty;
+
+        // Update row price cell (for standard sizes, update parent row)
+        // Note: 2XL/XXL are child rows but NOT in SIZE06_EXTENDED_SIZES (they go in Size05 column)
+        const isExtendedSize = SIZE06_EXTENDED_SIZES.includes(size) || size === '2XL' || size === 'XXL';
+        if (!isExtendedSize) {
+            parentOnlySubtotal += displayPrice * qty;
+        }
+        if (!isExtendedSize) {
+            const priceCell = document.getElementById(`row-price-${rowId}`);
+            if (priceCell) {
+                priceCell.textContent = `$${displayPrice.toFixed(2)}`;
+            }
+        } else {
+            // Extended size - find child row
+            const childRowId = scpState.childRowMap[rowId]?.[size];
+            if (childRowId) {
+                const childPriceCell = document.getElementById(`row-price-${childRowId}`);
+                if (childPriceCell) {
+                    childPriceCell.textContent = `$${displayPrice.toFixed(2)}`;
+                }
+                // Update child row total (qty × price)
+                const childTotalCell = document.getElementById(`row-total-${childRowId}`);
+                if (childTotalCell) {
+                    const childTotal = displayPrice * qty;
+                    childTotalCell.textContent = qty > 0 ? `$${childTotal.toFixed(2)}` : '-';
+                }
+            }
+        }
+    });
+    return { productSubtotal, parentOnlySubtotal };
+}
+
+async function _recalculatePricingImpl() {
+    // Collect products from table (parent rows only)
+    const productList = collectProductsFromTable();
+
+    // Dark-garment reminder — evaluated on every reprice so a navy hoodie added
+    // mid-quote still nudges while the underbase toggle is off.
+    try { updateDarkGarmentNudge(productList); } catch (_) {}
+
+    if (productList.length === 0) {
+        updatePricingDisplay({
+            totalQuantity: 0,
+            tier: '24-47',
+            subtotal: 0,
+            ltmFee: 0,
+            setupFees: scpState.printConfig.setupFee,
+            grandTotal: scpState.printConfig.setupFee
+        });
+        // Clear all price and total cells
+        document.querySelectorAll('.cell-price').forEach(cell => {
+            cell.textContent = '-';
+        });
+        document.querySelectorAll('.cell-total').forEach(cell => {
+            cell.textContent = '-';
+        });
+        return;
+    }
+
+    // Calculate total quantity across all products
+    let totalQty = 0;
+    productList.forEach(p => {
+        totalQty += p.totalQty || 0;
+    });
+
+    // Determine tier based on total quantity. NOTE: getScreenPrintTier's labels are a
+    // STATIC fallback only — the real displayed/saved tier label is derived below from the
+    // matched Caspio bundle tier. SCREENPRINT_TIERS drifted from Caspio's boundaries after the
+    // 2026-06-19 remap (it labels qty 48 "37-72" while Caspio prices the "48-71" tier).
+    const tier = getScreenPrintTier(totalQty);
+
+    const { ltmEnabled, ltmDisplayMode, ltmFee, perUnitLTM } = await _resolveLtmState(productList, totalQty);
+    void ltmEnabled;
 
     // Safety stripes: per-piece-per-location surcharge from Caspio Service_Codes
     // 'SP-STRIPE' (fallback $2). (Pricing=API)
@@ -161,194 +365,20 @@ async function _recalculatePricingImpl() {
     let subtotal = 0;
     const pricedProducts = [];
     const droppedProducts = []; // products that couldn't be priced (surfaced after the loop)
-    let firstPricing = null;  // Capture first product's pricing for nudge savings calc
-    let firstTierData = null;
 
     try {
         // Process each product
+        const ctx = { totalQty, tier, safetyStripesPerPiece, ltmDisplayMode, perUnitLTM, droppedProducts,
+            first: { pricing: null, tierData: null, caspioTierLabel: null } };
         for (const product of productList) {
-            const style = product.style;
-
-            // Fetch Screen Print pricing data for this style
-            const pricingData = await scpState.screenPrintPricingService.fetchPricingData(style);
-
-            if (!pricingData) {
-                console.warn(`No pricing data for ${style}`);
-                droppedProducts.push({ style, reason: 'no pricing data returned' });
-                continue;
-            }
-
-            // Get primary location pricing (garment + print)
-            const frontColors = scpState.printConfig.frontColors.toString();
-            const primaryPricing = pricingData.primaryLocationPricing?.[frontColors];
-
-            if (!primaryPricing || !primaryPricing.tiers) {
-                console.warn(`No primary pricing for ${frontColors} colors`);
-                droppedProducts.push({ style, reason: `no pricing for ${frontColors}-color front` });
-                continue;
-            }
-
-            // Find the tier data for this quantity
-            const tierData = findPricingTier(primaryPricing.tiers, totalQty);
-            if (!tierData) { droppedProducts.push({ style, reason: `no price tier for qty ${totalQty}` }); continue; }
-
-            // Capture first product's pricing for nudge savings calculation
-            if (!firstPricing) {
-                firstPricing = primaryPricing;
-                firstTierData = tierData;
-                // Caspio-accurate tier label from the MATCHED bundle tier (not the static
-                // SCREENPRINT_TIERS map) — mirrors the engine (quote-cart-engine.js:624-632).
-                const _hasMax = tierData.maxQty != null && isFinite(Number(tierData.maxQty));
-                caspioTierLabel = _hasMax ? (tierData.minQty + '-' + tierData.maxQty) : (tierData.minQty + '+');
-            }
-
-            // Get additional location pricing if back location enabled
-            let additionalPricePerPiece = 0;
-            if (scpState.printConfig.backLocation) {
-                const backColors = scpState.printConfig.backColors.toString();
-                const additionalPricing = pricingData.additionalLocationPricing?.[backColors];
-                const additionalTier = (additionalPricing && additionalPricing.tiers)
-                    ? findPricingTier(additionalPricing.tiers, totalQty)
-                    : null;
-                if (!additionalTier || typeof additionalTier.pricePerPiece !== 'number') {
-                    // Never silently price the back print at $0 (Rule 4) — same guard the
-                    // sleeve loop below already has; the engine hard-throws this case.
-                    droppedProducts.push({ style, reason: `no add-location pricing for a ${backColors}-color back print` });
-                    continue;
-                }
-                additionalPricePerPiece = additionalTier.pricePerPiece;
-            }
-
-            // Sleeves — each checked sleeve is its OWN additional print location at its own color count,
-            // priced like the back (additionalLocationPricing[colors] at the POOLED qty), SUMMED, never
-            // re-rounded (pricePerPiece is already HalfDollarCeil'd in the service). Mirrors engine
-            // quote-cart-engine.js priceScpGroup so the builder matches the engine/Quick Quote to the cent.
-            let sleeveAddlPerPiece = 0;
-            let sleeveDropped = false;
-            for (const c of (scpState.printConfig.sleeveColorsList || [])) {
-                const sleevePricing = pricingData.additionalLocationPricing?.[String(c)];
-                if (!sleevePricing || !sleevePricing.tiers) {
-                    droppedProducts.push({ style, reason: `no add-location pricing for a ${c}-color sleeve` });
-                    sleeveDropped = true;
-                    break;
-                }
-                const sleeveTier = findPricingTier(sleevePricing.tiers, totalQty);
-                if (!sleeveTier || typeof sleeveTier.pricePerPiece !== 'number') {
-                    droppedProducts.push({ style, reason: `no add-location price tier (qty ${totalQty}) for a ${c}-color sleeve` });
-                    sleeveDropped = true;
-                    break;
-                }
-                sleeveAddlPerPiece += sleeveTier.pricePerPiece;
-            }
-            if (sleeveDropped) continue; // never silently price a sleeve at $0 (Rule 4)
-
-            // No silent M/L substitution for an unpriced size — the engine refuses the
-            // same case (quote-cart-engine.js:726-731) and substituting drops the
-            // extended-size upcharge, so builder and engine would disagree per SKU.
-            const unpricedSize = Object.entries(product.sizeBreakdown || {})
-                .find(([sz, q]) => q > 0 && typeof tierData.prices?.[sz] !== 'number');
-            if (unpricedSize) {
-                droppedProducts.push({ style, reason: `no price for size ${unpricedSize[0]} at tier ${caspioTierLabel || (tierData.minQty + '+')}` });
-                continue;
-            }
-
-            // Find parent row for this product
-            const parentRow = document.querySelector(`tr[data-style="${style}"][data-catalog-color="${product.catalogColor}"]:not(.child-row)`);
-            if (!parentRow) continue;
-
-            const rowId = parentRow.dataset.rowId;
-            let productSubtotal = 0;      // ALL sizes (for sidebar subtotal)
-            let parentOnlySubtotal = 0;   // Standard sizes only (for parent row Total cell)
-
-            // Calculate and display price for each size
-            Object.entries(product.sizeBreakdown || {}).forEach(([size, qty]) => {
-                if (qty <= 0) return;
-
-                // Base price for this size from primary location — guaranteed present by
-                // the unpricedSize guard above (no M/L fallback: that silently dropped
-                // extended-size upcharges and broke builder↔engine parity).
-                let sizePrice = tierData.prices[size];
-
-                // Add additional location price (back)
-                sizePrice += additionalPricePerPiece;
-
-                // Add sleeve additional-location price(s) — left + right, each at its own color count
-                sizePrice += sleeveAddlPerPiece;
-
-                // Add safety stripes (front/back only — sleeves get no hi-vis stripe)
-                sizePrice += safetyStripesPerPiece;
-
-                // Display price: builtin mode adds LTM per-unit, separate mode shows base price
-                const displayPrice = (ltmDisplayMode === 'builtin' && perUnitLTM > 0) ? sizePrice + perUnitLTM : sizePrice;
-                // Use displayPrice for subtotal so row totals match displayed unit prices
-                productSubtotal += displayPrice * qty;
-
-                // Update row price cell (for standard sizes, update parent row)
-                // Note: 2XL/XXL are child rows but NOT in SIZE06_EXTENDED_SIZES (they go in Size05 column)
-                const isExtendedSize = SIZE06_EXTENDED_SIZES.includes(size) || size === '2XL' || size === 'XXL';
-                if (!isExtendedSize) {
-                    parentOnlySubtotal += displayPrice * qty;
-                }
-                if (!isExtendedSize) {
-                    const priceCell = document.getElementById(`row-price-${rowId}`);
-                    if (priceCell) {
-                        priceCell.textContent = `$${displayPrice.toFixed(2)}`;
-                    }
-                } else {
-                    // Extended size - find child row
-                    const childRowId = scpState.childRowMap[rowId]?.[size];
-                    if (childRowId) {
-                        const childPriceCell = document.getElementById(`row-price-${childRowId}`);
-                        if (childPriceCell) {
-                            childPriceCell.textContent = `$${displayPrice.toFixed(2)}`;
-                        }
-                        // Update child row total (qty × price)
-                        const childTotalCell = document.getElementById(`row-total-${childRowId}`);
-                        if (childTotalCell) {
-                            const childTotal = displayPrice * qty;
-                            childTotalCell.textContent = qty > 0 ? `$${childTotal.toFixed(2)}` : '-';
-                        }
-                    }
-                }
-            });
-
-            // Update parent row total (standard sizes only — child rows show their own totals)
-            const parentTotalCell = document.getElementById(`row-total-${rowId}`);
-            if (parentTotalCell) {
-                const displayTotal = parentOnlySubtotal > 0 ? parentOnlySubtotal : productSubtotal;
-                parentTotalCell.textContent = product.totalQty > 0 ? `$${displayTotal.toFixed(2)}` : '-';
-            }
-
-            // Update pricing breakdown for the row
-            updateRowBreakdownScreenPrint(rowId, product, tierData);
-
-            subtotal += productSubtotal;
-            // Persist a fully-priced, save-ready snapshot. saveAndGetLink() reads
-            // these instead of re-scraping the DOM. (The old save map read
-            // product.qty/.sizes/.unitPrice — fields collectProductsFromTable never
-            // returns — so saved quote_items had empty sizes and $0 unit prices,
-            // which the ShopWorks push then under-billed.) unitPrice is the per-
-            // product BLENDED price (productSubtotal / qty) so the saved LineTotal and
-            // the pushed order total exactly equal the quoted subtotal, even when
-            // extended-size upcharges make per-size prices differ within a product.
-            const _pqty = product.totalQty || 0;
-            pricedProducts.push({
-                product,
-                prices: tierData.prices,
-                tier: caspioTierLabel || tier.label,
-                // save-ready fields (consumed by saveAndGetLink → ScreenPrintQuoteService)
-                style: product.style,
-                productName: product.productName || product.style,
-                color: product.color,
-                catalogColor: product.catalogColor,
-                sizeBreakdown: product.sizeBreakdown,
-                totalQty: _pqty,
-                unitPrice: _pqty > 0 ? Math.round((productSubtotal / _pqty) * 100) / 100 : 0,
-                lineTotal: Math.round(productSubtotal * 100) / 100,
-                ltmPerUnit: perUnitLTM,
-                imageUrl: product.imageUrl || ''
-            });
+            const r = await _priceOneProduct(product, ctx);
+            if (!r) continue;
+            subtotal += r.productSubtotal;
+            pricedProducts.push(r.entry);
         }
+        const { caspioTierLabel } = ctx.first;
+        const firstPricing = ctx.first.pricing;
+        const firstTierData = ctx.first.tierData;
 
         // Surface any product that couldn't be priced. It was EXCLUDED from the
         // subtotal/saved/pushed quote with only a console.warn before, so a rep could
