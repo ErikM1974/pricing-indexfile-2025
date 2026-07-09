@@ -30,6 +30,9 @@ const PROXY = path.join(__dirname, '..', '..', '..', 'caspio-pricing-proxy', 'li
 function loadClientService() {
   const src = fs.readFileSync(CLIENT, 'utf8');
   const win = {};
+  // Batch 6: the service DELEGATES all math to the canonical engine — inject the
+  // vendored copy, so these vectors now prove client==server THROUGH the delegation.
+  win.DTGCanonicalPricing = require(path.join(__dirname, '../../shared_components/js/dtg-canonical-pricing.js'));
   const quiet = { log() {}, warn() {}, error() {}, info() {} };
   const factory = new Function('window', 'console', 'fetch', src + '\nreturn window.DTGPricingService;');
   const DTGPricingService = factory(win, quiet, () => Promise.reject(new Error('no network in tests')));
