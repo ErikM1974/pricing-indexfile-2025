@@ -33,6 +33,209 @@ import { embState, EMB_DEFAULTS } from './state.js';
 // Captures current quote state, runs validation checks,
 // and copies compact JSON to clipboard for analysis
 // ============================================================
+// T3 split (2026-07-09): diagnoseQuote in three moves — the pricing
+// reconstruction (same folds as recalculatePricing), the 8 checks, and the
+// orchestrator keeps the report/clipboard. All VERBATIM.
+async function _reconstructDiagPricing(products, serviceItems, decgItems) {
+    // Re-run pricing engine (same as recalculatePricing)
+    const garmentALForDiag = embState.globalAL.garment.enabled ? [{
+        id: 'global-al-garment', position: 'AL',
+        stitchCount: embState.globalAL.garment.stitchCount,
+        needsDigitizing: embState.globalAL.garment.needsDigitizing
+    }] : [];
+    const capALForDiag = embState.globalAL.cap.enabled ? [{
+        id: 'global-al-cap', position: 'AL-Cap',
+        stitchCount: embState.globalAL.cap.stitchCount,
+        needsDigitizing: embState.globalAL.cap.needsDigitizing
+    }] : [];
+
+    const logoConfigs = {
+        garment: { primary: { ...embState.primaryLogo, id: 'primary' }, additional: garmentALForDiag },
+        cap: { primary: { ...embState.capPrimaryLogo, id: 'cap-primary' }, additional: capALForDiag }
+    };
+    const allLogos = [{ ...embState.primaryLogo, id: 'primary' }, ...garmentALForDiag];
+
+    let pricing;
+    if (products.length === 0) {
+        const decgTotal = decgItems.reduce((sum, d) => sum + d.total, 0);
+        const decgQty = decgItems.reduce((sum, d) => sum + d.quantity, 0);
+        pricing = {
+            products: [], totalQuantity: decgQty, subtotal: decgTotal,
+            grandTotal: decgTotal,
+            tier: decgQty <= 7 ? '1-7' : decgQty <= 23 ? '8-23' : decgQty <= 47 ? '24-47' : decgQty <= 71 ? '48-71' : '72+',
+            ltmFee: 0, additionalServices: [], additionalStitchTotal: 0,
+            garmentStitchTotal: 0, capStitchTotal: 0,
+            garmentSetupFees: 0, capSetupFees: 0,
+            garmentQuantity: 0, capQuantity: 0
+        };
+    } else {
+        const ltmEnabledDiag = getLtmControlState('emb-ltm-panel').enabled;
+        pricing = await embState.pricingCalculator.calculateQuote(products, allLogos, logoConfigs, { ltmEnabled: ltmEnabledDiag });
+    }
+
+    // Include service item totals (same as recalculatePricing)
+    let serviceTotal = 0;
+    serviceItems.forEach(si => { serviceTotal += si.unitPrice * si.totalQuantity; });
+    if (serviceTotal > 0) {
+        pricing.subtotal += serviceTotal;
+        pricing.grandTotal += serviceTotal;
+    }
+
+    // Include DECG/DECC totals (same as recalculatePricing)
+    if (decgItems.length > 0) {
+        const decgServiceTotal = decgItems.reduce((sum, d) => sum + d.total, 0);
+        pricing.subtotal += decgServiceTotal;
+        pricing.grandTotal += decgServiceTotal;
+    }
+
+    // Include child row override deltas (same as recalculatePricing)
+    let childOverrideDelta = 0;
+    document.querySelectorAll('#product-tbody tr.child-row').forEach(childRow => {
+        const childOverride = parseFloat(childRow.dataset.sellPrice) || 0;
+        if (childOverride <= 0) return;
+        const childRowId = childRow.dataset.rowId;
+        const childPriceCell = document.getElementById(`row-price-${childRowId}`);
+        const childQtyCell = document.getElementById(`row-qty-${childRowId}`);
+        if (!childPriceCell) return;
+        const currentText = childPriceCell.textContent.replace(/[^0-9.]/g, '');
+        const calculatedPrice = parseFloat(currentText) || 0;
+        const qty = parseInt(childQtyCell?.textContent) || 0;
+        childOverrideDelta += (childOverride - calculatedPrice) * qty;
+    });
+    if (childOverrideDelta !== 0) {
+        pricing.subtotal += childOverrideDelta;
+        pricing.grandTotal += childOverrideDelta;
+    }
+
+    const additionalCharges = getAdditionalCharges();
+    // eslint-disable-next-line no-unused-vars -- pre-existing: only adjustedSubtotal is consumed here (verbatim move)
+    const { baseSubtotal, discount, adjustedSubtotal } = calculateDiscountableSubtotal();
+    return { pricing, serviceTotal, childOverrideDelta, additionalCharges, adjustedSubtotal };
+}
+
+function _runDiagChecks(addCheck, dc, products, decgItems) {
+    const { pricing, serviceTotal, childOverrideDelta, additionalCharges, adjustedSubtotal } = dc;
+    // ---- CHECK 1: Line items sum to subtotal ----
+    let productLineTotal = 0;
+    if (pricing.products) {
+        pricing.products.forEach(pp => {
+            pp.lineItems.forEach(li => {
+                const price = li.unitPriceWithLTM || li.unitPrice;
+                productLineTotal += price * li.quantity;
+            });
+        });
+    }
+    productLineTotal += serviceTotal;
+    if (decgItems.length > 0) {
+        productLineTotal += decgItems.reduce((sum, d) => sum + d.total, 0);
+    }
+    productLineTotal += childOverrideDelta;
+    const subtotalDiff = Math.abs(productLineTotal - pricing.subtotal);
+    if (subtotalDiff < 0.02) {
+        addCheck('Line items sum to subtotal', 'PASS', `$${productLineTotal.toFixed(2)} == $${pricing.subtotal.toFixed(2)}`);
+    } else {
+        addCheck('Line items sum to subtotal', 'FAIL', `Product lines: $${productLineTotal.toFixed(2)}, Subtotal: $${pricing.subtotal.toFixed(2)}, diff: $${subtotalDiff.toFixed(2)}`);
+    }
+
+    // ---- CHECK 2: Grand total formula ----
+    const expectedGrand = pricing.subtotal + (pricing.setupFees || ((pricing.garmentSetupFees || 0) + (pricing.capSetupFees || 0)));
+    const actualGrand = pricing.grandTotal;
+    const grandDiff = Math.abs(expectedGrand - actualGrand);
+    if (grandDiff < 0.02) {
+        addCheck('Grand total formula', 'PASS', `subtotal($${pricing.subtotal.toFixed(2)}) + setup($${((pricing.garmentSetupFees || 0) + (pricing.capSetupFees || 0)).toFixed(2)}) = $${actualGrand.toFixed(2)}`);
+    } else {
+        addCheck('Grand total formula', 'WARN', `Expected: $${expectedGrand.toFixed(2)}, Got: $${actualGrand.toFixed(2)}, diff: $${grandDiff.toFixed(2)}`);
+    }
+
+    // ---- CHECK 3: DECG included in output paths ----
+    if (decgItems.length > 0) {
+        const decgTotal = decgItems.reduce((sum, d) => sum + d.total, 0);
+        const grandIncludesDECG = pricing.grandTotal >= decgTotal - 0.01;
+        if (grandIncludesDECG) {
+            addCheck('DECG in grandTotal', 'PASS', `$${decgTotal.toFixed(2)} included in grandTotal $${pricing.grandTotal.toFixed(2)}`);
+        } else {
+            addCheck('DECG in grandTotal', 'FAIL', `DECG total $${decgTotal.toFixed(2)} NOT reflected in grandTotal $${pricing.grandTotal.toFixed(2)}`);
+        }
+    } else {
+        addCheck('DECG in grandTotal', 'PASS', 'No DECG items (N/A)');
+    }
+
+    // ---- CHECK 4: UI displayed total matches computed total ----
+    const displayedGrandText = document.getElementById('grand-total')?.textContent || '$0.00';
+    const displayedGrand = parseFloat(displayedGrandText.replace(/[$,]/g, '')) || 0;
+    const uiDiff = Math.abs(displayedGrand - pricing.grandTotal);
+    if (uiDiff < 0.02) {
+        addCheck('UI total matches computed', 'PASS', `Displayed: $${displayedGrand.toFixed(2)}, Computed: $${pricing.grandTotal.toFixed(2)}`);
+    } else {
+        addCheck('UI total matches computed', 'FAIL', `Displayed: $${displayedGrand.toFixed(2)}, Computed: $${pricing.grandTotal.toFixed(2)}, diff: $${uiDiff.toFixed(2)}`);
+    }
+
+    // ---- CHECK 5: AL module arrays in sync with globalAL ----
+    const garmentALEnabled = embState.globalAL.garment.enabled;
+    const capALEnabled = embState.globalAL.cap.enabled;
+    const garmentALInPricing = (pricing.additionalServices || []).filter(s => s.type === 'additional_logo' && !s.isCap);
+    const capALInPricing = (pricing.additionalServices || []).filter(s => s.type === 'additional_logo' && s.isCap);
+
+    let alSyncOk = true;
+    let alDetail = [];
+    if (garmentALEnabled && garmentALInPricing.length === 0 && (pricing.garmentQuantity || 0) > 0) {
+        alSyncOk = false;
+        alDetail.push('Garment AL enabled but no AL in pricing results');
+    }
+    if (!garmentALEnabled && garmentALInPricing.length > 0) {
+        alSyncOk = false;
+        alDetail.push('Garment AL disabled but pricing has AL entries');
+    }
+    if (capALEnabled && capALInPricing.length === 0 && (pricing.capQuantity || 0) > 0) {
+        alSyncOk = false;
+        alDetail.push('Cap AL enabled but no AL in pricing results');
+    }
+    if (!capALEnabled && capALInPricing.length > 0) {
+        alSyncOk = false;
+        alDetail.push('Cap AL disabled but pricing has AL entries');
+    }
+    addCheck('AL sync with globalAL', alSyncOk ? 'PASS' : 'FAIL',
+        alSyncOk ? `Garment AL: ${garmentALEnabled ? 'ON' : 'OFF'}, Cap AL: ${capALEnabled ? 'ON' : 'OFF'}` : alDetail.join('; '));
+
+    // ---- CHECK 6: Expected ShopWorks fee part numbers ----
+    const expectedFees = [];
+    if ((pricing.garmentSetupFees || 0) > 0) expectedFees.push('DD (garment digitizing)');
+    if ((pricing.capSetupFees || 0) > 0) expectedFees.push('DD (cap digitizing)');
+    if ((pricing.garmentStitchTotal || 0) > 0) expectedFees.push('AS-Garm');
+    if ((pricing.capStitchTotal || 0) > 0) expectedFees.push('AS-CAP');
+    if (garmentALEnabled && garmentALInPricing.length > 0) expectedFees.push('AL');
+    if (capALEnabled && capALInPricing.length > 0) expectedFees.push('AL-Cap');
+    if (additionalCharges.artCharge > 0) expectedFees.push('GRT-50');
+    if (additionalCharges.graphicDesignCharge > 0) expectedFees.push('GRT-75');
+    if (additionalCharges.rushFee > 0) expectedFees.push('RUSH');
+    if (additionalCharges.discount > 0) expectedFees.push('DISCOUNT');
+    addCheck('ShopWorks fee part numbers', 'PASS', expectedFees.length > 0 ? expectedFees.join(', ') : 'No fees');
+
+    // ---- CHECK 7: Product count matches pricing product count ----
+    const tableProductCount = products.length;
+    const pricingProductCount = pricing.products ? pricing.products.length : 0;
+    if (tableProductCount === pricingProductCount) {
+        addCheck('Product count match', 'PASS', `${tableProductCount} products in table, ${pricingProductCount} in pricing engine`);
+    } else {
+        addCheck('Product count match', 'WARN', `Table: ${tableProductCount}, Pricing: ${pricingProductCount} (difference may be from color grouping)`);
+    }
+
+    // ---- CHECK 8: TotalAmount = grandTotal + fees - discount ----
+    const totalFees = (additionalCharges.artCharge || 0) +
+        (additionalCharges.graphicDesignCharge || 0) +
+        (additionalCharges.rushFee || 0) +
+        (additionalCharges.sampleFee || 0);
+    const expectedTotal = pricing.grandTotal + totalFees - (additionalCharges.discount || 0);
+    const displayedTotal = adjustedSubtotal;
+    const totalDiff = Math.abs(expectedTotal - displayedTotal);
+    if (totalDiff < 0.02) {
+        addCheck('TotalAmount formula', 'PASS', `grandTotal($${pricing.grandTotal.toFixed(2)}) + fees($${totalFees.toFixed(2)}) - discount($${(additionalCharges.discount || 0).toFixed(2)}) = $${displayedTotal.toFixed(2)}`);
+    } else {
+        addCheck('TotalAmount formula', 'FAIL', `Expected: $${expectedTotal.toFixed(2)}, Displayed: $${displayedTotal.toFixed(2)}, diff: $${totalDiff.toFixed(2)}`);
+    }
+    return { garmentALEnabled, capALEnabled, garmentALInPricing, capALInPricing };
+}
+
 export async function diagnoseQuote() {
     const allItems = collectProductsFromTable();
     const products = allItems.filter(p => !p.isService);
@@ -57,198 +260,11 @@ export async function diagnoseQuote() {
     }
 
     try {
-        // Re-run pricing engine (same as recalculatePricing)
-        const garmentALForDiag = embState.globalAL.garment.enabled ? [{
-            id: 'global-al-garment', position: 'AL',
-            stitchCount: embState.globalAL.garment.stitchCount,
-            needsDigitizing: embState.globalAL.garment.needsDigitizing
-        }] : [];
-        const capALForDiag = embState.globalAL.cap.enabled ? [{
-            id: 'global-al-cap', position: 'AL-Cap',
-            stitchCount: embState.globalAL.cap.stitchCount,
-            needsDigitizing: embState.globalAL.cap.needsDigitizing
-        }] : [];
+        const dc = await _reconstructDiagPricing(products, serviceItems, decgItems);
+        const { pricing, additionalCharges, adjustedSubtotal } = dc;
 
-        const logoConfigs = {
-            garment: { primary: { ...embState.primaryLogo, id: 'primary' }, additional: garmentALForDiag },
-            cap: { primary: { ...embState.capPrimaryLogo, id: 'cap-primary' }, additional: capALForDiag }
-        };
-        const allLogos = [{ ...embState.primaryLogo, id: 'primary' }, ...garmentALForDiag];
-
-        let pricing;
-        if (products.length === 0) {
-            const decgTotal = decgItems.reduce((sum, d) => sum + d.total, 0);
-            const decgQty = decgItems.reduce((sum, d) => sum + d.quantity, 0);
-            pricing = {
-                products: [], totalQuantity: decgQty, subtotal: decgTotal,
-                grandTotal: decgTotal,
-                tier: decgQty <= 7 ? '1-7' : decgQty <= 23 ? '8-23' : decgQty <= 47 ? '24-47' : decgQty <= 71 ? '48-71' : '72+',
-                ltmFee: 0, additionalServices: [], additionalStitchTotal: 0,
-                garmentStitchTotal: 0, capStitchTotal: 0,
-                garmentSetupFees: 0, capSetupFees: 0,
-                garmentQuantity: 0, capQuantity: 0
-            };
-        } else {
-            const ltmEnabledDiag = getLtmControlState('emb-ltm-panel').enabled;
-            pricing = await embState.pricingCalculator.calculateQuote(products, allLogos, logoConfigs, { ltmEnabled: ltmEnabledDiag });
-        }
-
-        // Include service item totals (same as recalculatePricing)
-        let serviceTotal = 0;
-        serviceItems.forEach(si => { serviceTotal += si.unitPrice * si.totalQuantity; });
-        if (serviceTotal > 0) {
-            pricing.subtotal += serviceTotal;
-            pricing.grandTotal += serviceTotal;
-        }
-
-        // Include DECG/DECC totals (same as recalculatePricing)
-        if (decgItems.length > 0) {
-            const decgServiceTotal = decgItems.reduce((sum, d) => sum + d.total, 0);
-            pricing.subtotal += decgServiceTotal;
-            pricing.grandTotal += decgServiceTotal;
-        }
-
-        // Include child row override deltas (same as recalculatePricing)
-        let childOverrideDelta = 0;
-        document.querySelectorAll('#product-tbody tr.child-row').forEach(childRow => {
-            const childOverride = parseFloat(childRow.dataset.sellPrice) || 0;
-            if (childOverride <= 0) return;
-            const childRowId = childRow.dataset.rowId;
-            const childPriceCell = document.getElementById(`row-price-${childRowId}`);
-            const childQtyCell = document.getElementById(`row-qty-${childRowId}`);
-            if (!childPriceCell) return;
-            const currentText = childPriceCell.textContent.replace(/[^0-9.]/g, '');
-            const calculatedPrice = parseFloat(currentText) || 0;
-            const qty = parseInt(childQtyCell?.textContent) || 0;
-            childOverrideDelta += (childOverride - calculatedPrice) * qty;
-        });
-        if (childOverrideDelta !== 0) {
-            pricing.subtotal += childOverrideDelta;
-            pricing.grandTotal += childOverrideDelta;
-        }
-
-        const additionalCharges = getAdditionalCharges();
-        // eslint-disable-next-line no-unused-vars -- pre-existing: only adjustedSubtotal is consumed here (verbatim move)
-        const { baseSubtotal, discount, adjustedSubtotal } = calculateDiscountableSubtotal();
-
-        // ---- CHECK 1: Line items sum to subtotal ----
-        let productLineTotal = 0;
-        if (pricing.products) {
-            pricing.products.forEach(pp => {
-                pp.lineItems.forEach(li => {
-                    const price = li.unitPriceWithLTM || li.unitPrice;
-                    productLineTotal += price * li.quantity;
-                });
-            });
-        }
-        productLineTotal += serviceTotal;
-        if (decgItems.length > 0) {
-            productLineTotal += decgItems.reduce((sum, d) => sum + d.total, 0);
-        }
-        productLineTotal += childOverrideDelta;
-        const subtotalDiff = Math.abs(productLineTotal - pricing.subtotal);
-        if (subtotalDiff < 0.02) {
-            addCheck('Line items sum to subtotal', 'PASS', `$${productLineTotal.toFixed(2)} == $${pricing.subtotal.toFixed(2)}`);
-        } else {
-            addCheck('Line items sum to subtotal', 'FAIL', `Product lines: $${productLineTotal.toFixed(2)}, Subtotal: $${pricing.subtotal.toFixed(2)}, diff: $${subtotalDiff.toFixed(2)}`);
-        }
-
-        // ---- CHECK 2: Grand total formula ----
-        const expectedGrand = pricing.subtotal + (pricing.setupFees || ((pricing.garmentSetupFees || 0) + (pricing.capSetupFees || 0)));
-        const actualGrand = pricing.grandTotal;
-        const grandDiff = Math.abs(expectedGrand - actualGrand);
-        if (grandDiff < 0.02) {
-            addCheck('Grand total formula', 'PASS', `subtotal($${pricing.subtotal.toFixed(2)}) + setup($${((pricing.garmentSetupFees || 0) + (pricing.capSetupFees || 0)).toFixed(2)}) = $${actualGrand.toFixed(2)}`);
-        } else {
-            addCheck('Grand total formula', 'WARN', `Expected: $${expectedGrand.toFixed(2)}, Got: $${actualGrand.toFixed(2)}, diff: $${grandDiff.toFixed(2)}`);
-        }
-
-        // ---- CHECK 3: DECG included in output paths ----
-        if (decgItems.length > 0) {
-            const decgTotal = decgItems.reduce((sum, d) => sum + d.total, 0);
-            const grandIncludesDECG = pricing.grandTotal >= decgTotal - 0.01;
-            if (grandIncludesDECG) {
-                addCheck('DECG in grandTotal', 'PASS', `$${decgTotal.toFixed(2)} included in grandTotal $${pricing.grandTotal.toFixed(2)}`);
-            } else {
-                addCheck('DECG in grandTotal', 'FAIL', `DECG total $${decgTotal.toFixed(2)} NOT reflected in grandTotal $${pricing.grandTotal.toFixed(2)}`);
-            }
-        } else {
-            addCheck('DECG in grandTotal', 'PASS', 'No DECG items (N/A)');
-        }
-
-        // ---- CHECK 4: UI displayed total matches computed total ----
-        const displayedGrandText = document.getElementById('grand-total')?.textContent || '$0.00';
-        const displayedGrand = parseFloat(displayedGrandText.replace(/[$,]/g, '')) || 0;
-        const uiDiff = Math.abs(displayedGrand - pricing.grandTotal);
-        if (uiDiff < 0.02) {
-            addCheck('UI total matches computed', 'PASS', `Displayed: $${displayedGrand.toFixed(2)}, Computed: $${pricing.grandTotal.toFixed(2)}`);
-        } else {
-            addCheck('UI total matches computed', 'FAIL', `Displayed: $${displayedGrand.toFixed(2)}, Computed: $${pricing.grandTotal.toFixed(2)}, diff: $${uiDiff.toFixed(2)}`);
-        }
-
-        // ---- CHECK 5: AL module arrays in sync with globalAL ----
-        const garmentALEnabled = embState.globalAL.garment.enabled;
-        const capALEnabled = embState.globalAL.cap.enabled;
-        const garmentALInPricing = (pricing.additionalServices || []).filter(s => s.type === 'additional_logo' && !s.isCap);
-        const capALInPricing = (pricing.additionalServices || []).filter(s => s.type === 'additional_logo' && s.isCap);
-
-        let alSyncOk = true;
-        let alDetail = [];
-        if (garmentALEnabled && garmentALInPricing.length === 0 && (pricing.garmentQuantity || 0) > 0) {
-            alSyncOk = false;
-            alDetail.push('Garment AL enabled but no AL in pricing results');
-        }
-        if (!garmentALEnabled && garmentALInPricing.length > 0) {
-            alSyncOk = false;
-            alDetail.push('Garment AL disabled but pricing has AL entries');
-        }
-        if (capALEnabled && capALInPricing.length === 0 && (pricing.capQuantity || 0) > 0) {
-            alSyncOk = false;
-            alDetail.push('Cap AL enabled but no AL in pricing results');
-        }
-        if (!capALEnabled && capALInPricing.length > 0) {
-            alSyncOk = false;
-            alDetail.push('Cap AL disabled but pricing has AL entries');
-        }
-        addCheck('AL sync with globalAL', alSyncOk ? 'PASS' : 'FAIL',
-            alSyncOk ? `Garment AL: ${garmentALEnabled ? 'ON' : 'OFF'}, Cap AL: ${capALEnabled ? 'ON' : 'OFF'}` : alDetail.join('; '));
-
-        // ---- CHECK 6: Expected ShopWorks fee part numbers ----
-        const expectedFees = [];
-        if ((pricing.garmentSetupFees || 0) > 0) expectedFees.push('DD (garment digitizing)');
-        if ((pricing.capSetupFees || 0) > 0) expectedFees.push('DD (cap digitizing)');
-        if ((pricing.garmentStitchTotal || 0) > 0) expectedFees.push('AS-Garm');
-        if ((pricing.capStitchTotal || 0) > 0) expectedFees.push('AS-CAP');
-        if (garmentALEnabled && garmentALInPricing.length > 0) expectedFees.push('AL');
-        if (capALEnabled && capALInPricing.length > 0) expectedFees.push('AL-Cap');
-        if (additionalCharges.artCharge > 0) expectedFees.push('GRT-50');
-        if (additionalCharges.graphicDesignCharge > 0) expectedFees.push('GRT-75');
-        if (additionalCharges.rushFee > 0) expectedFees.push('RUSH');
-        if (additionalCharges.discount > 0) expectedFees.push('DISCOUNT');
-        addCheck('ShopWorks fee part numbers', 'PASS', expectedFees.length > 0 ? expectedFees.join(', ') : 'No fees');
-
-        // ---- CHECK 7: Product count matches pricing product count ----
-        const tableProductCount = products.length;
-        const pricingProductCount = pricing.products ? pricing.products.length : 0;
-        if (tableProductCount === pricingProductCount) {
-            addCheck('Product count match', 'PASS', `${tableProductCount} products in table, ${pricingProductCount} in pricing engine`);
-        } else {
-            addCheck('Product count match', 'WARN', `Table: ${tableProductCount}, Pricing: ${pricingProductCount} (difference may be from color grouping)`);
-        }
-
-        // ---- CHECK 8: TotalAmount = grandTotal + fees - discount ----
-        const totalFees = (additionalCharges.artCharge || 0) +
-            (additionalCharges.graphicDesignCharge || 0) +
-            (additionalCharges.rushFee || 0) +
-            (additionalCharges.sampleFee || 0);
-        const expectedTotal = pricing.grandTotal + totalFees - (additionalCharges.discount || 0);
-        const displayedTotal = adjustedSubtotal;
-        const totalDiff = Math.abs(expectedTotal - displayedTotal);
-        if (totalDiff < 0.02) {
-            addCheck('TotalAmount formula', 'PASS', `grandTotal($${pricing.grandTotal.toFixed(2)}) + fees($${totalFees.toFixed(2)}) - discount($${(additionalCharges.discount || 0).toFixed(2)}) = $${displayedTotal.toFixed(2)}`);
-        } else {
-            addCheck('TotalAmount formula', 'FAIL', `Expected: $${expectedTotal.toFixed(2)}, Displayed: $${displayedTotal.toFixed(2)}, diff: $${totalDiff.toFixed(2)}`);
-        }
+        const { garmentALEnabled, capALEnabled, garmentALInPricing, capALInPricing } =
+            _runDiagChecks(addCheck, dc, products, decgItems);
 
         // Build diagnostic output
         const diagnostic = {

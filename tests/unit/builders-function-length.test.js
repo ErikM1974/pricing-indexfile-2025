@@ -16,13 +16,7 @@ const ROOT = path.join(__dirname, '../../shared_components/js/builders');
 
 // dir → 'file:function' → frozen max lines (REAL-END measure, recalibrated 2026-07-09). Shrink-only.
 const ALLOWLISTS = {
-  emb: {
-    'output.js:diagnoseQuote': 279,
-    'persistence.js:loadQuoteForEditing': 285,
-    'product-rows.js:onStyleChange': 179,
-    'shopworks-import.js:renderImportPreview': 260, // one cohesive HTML template
-    'spr-modal.js:renderSprEmbConfigSection': 412, // deferred-closure machine — needs jsdom coverage before splitting
-  },
+  emb: {},
   scp: {},
   dtf: {},
   dtg: {

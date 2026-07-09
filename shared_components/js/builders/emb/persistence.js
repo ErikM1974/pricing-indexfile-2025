@@ -383,6 +383,178 @@ export function markEmbroideryDirty() {
  * Load existing quote for editing
  * Populates all form fields with quote data
  */
+// T3 split (2026-07-09): loadQuoteForEditing was built from named IIFEs —
+// promoted VERBATIM to top-level (session/items now explicit params).
+function restoreEmbOrderShipping(session) {
+    const setVal = (id, v) => { const el = document.getElementById(id); if (el && v != null && v !== '') el.value = v; };
+    // [2026-06-07] EMB date inputs are now native <input type=date> (YYYY-MM-DD); the column is stored ISO.
+    const isoToInput = (v) => dateToInputValue(v);
+    setVal('customer-number', session.CustomerNumber);
+    setVal('project-name', session.ProjectName);   // P2-5 (audit 2026-06-06): restore Project Name on edit-reload
+    setVal('customer-phone', session.Phone);
+    setVal('order-number', session.OrderNumber);
+    setVal('po-number', session.PurchaseOrderNumber);
+    setVal('ship-address', session.ShipToAddress);
+    setVal('ship-city', session.ShipToCity);
+    setVal('ship-state', session.ShipToState);
+    setVal('ship-zip', session.ShipToZip);
+    setVal('payment-terms', session.PaymentTerms);
+    setVal('date-order-placed', isoToInput(session.DateOrderPlaced));
+    setVal('req-ship-date', isoToInput(session.ReqShipDate));
+    setVal('drop-dead-date', isoToInput(session.DropDeadDate));
+    // Ship method: the SAVE collapses an "Other" selection into the custom text,
+    // so a stored value not in the <select> options IS an "Other" method. A bare
+    // setVal would set selectedIndex=-1 (value '') -> the custom method displays
+    // blank and gets WIPED on the next Save Revision. Detect + restore properly.
+    const smEl = document.getElementById('ship-method');
+    const sm = session.ShipMethod || '';
+    if (smEl) {
+        const known = Array.from(smEl.options).map(o => o.value);
+        if (sm && known.indexOf(sm) === -1) {
+            smEl.value = 'Other';
+            const other = document.getElementById('ship-method-other');
+            if (other) other.value = sm;
+        } else if (sm) {
+            smEl.value = sm;
+        }
+        // A programmatic .value change doesn't fire onchange — call the handler so
+        // the conditional UI (pickup notice / Other text / address visibility)
+        // matches the restored method.
+        if (typeof onShipMethodChange === 'function') { try { onShipMethodChange(); } catch (_) {} }
+    }
+    // Expand the (default-collapsed) Order Details panel so the restored data is
+    // visible — a collapsed header reads as "no data" and risks re-entry/blanking.
+    if (session.CustomerNumber || session.PurchaseOrderNumber || session.OrderNumber || sm || session.ShipToAddress || session.ReqShipDate) {
+        const c = document.getElementById('order-details-content');
+        if (c) c.style.display = 'block';
+        const ch = document.getElementById('order-details-chevron');
+        if (ch) ch.style.transform = 'rotate(180deg)';
+    }
+    if (typeof updatePushButtonState === 'function') { try { updatePushButtonState(); } catch (_) {} }
+}
+
+function restoreEmbArtwork(session) {
+    if (!window._embArtwork || !session.ImportNotes) return;
+    try {
+        const parsed = JSON.parse(session.ImportNotes);
+        const art = Array.isArray(parsed.referenceArtwork) ? parsed.referenceArtwork : [];
+        if (art.length && typeof window._embArtwork.setFiles === 'function') window._embArtwork.setFiles(art);
+        if (parsed.newDesignName && typeof window._embArtwork.setDesignName === 'function') window._embArtwork.setDesignName(parsed.newDesignName);
+    } catch (_) { /* legacy flat-array ImportNotes → no artwork object to restore */ }
+}
+
+function restoreImportMetadata(session, items) {
+    let designNumbers = [];
+    try { designNumbers = JSON.parse(session.DesignNumbers || '[]'); } catch (_) { /* legacy */ }
+    const digitizingCodes = (session.DigitizingCodes || '').split(',').map(s => s.trim()).filter(Boolean);
+    // Non-DD digitizing fee items only exist in the DB — recover them from the loaded items
+    const DGT_CODES = /^(DGT-\d+|DDE|DDT)$/i;
+    const digitizingFees = (items || [])
+        .filter(it => it.EmbellishmentType === 'fee' && DGT_CODES.test(it.StyleNumber || ''))
+        .map(it => ({ code: it.StyleNumber, description: it.ProductName, amount: parseFloat(it.BaseUnitPrice) || 0 }));
+    // Saved ImportNotes round-trip back into warnings[] so the next save re-persists them.
+    let savedNotes = [];
+    try {
+        const parsedIN = JSON.parse(session.ImportNotes || '[]');
+        savedNotes = Array.isArray(parsedIN) ? parsedIN : (Array.isArray(parsedIN.importNotes) ? parsedIN.importNotes : []);
+    } catch (_) { /* not JSON */ }
+    const hasImportData = designNumbers.length || digitizingCodes.length || digitizingFees.length
+        || parseFloat(session.PaidToDate) > 0 || session.OrderNotes || session.Carrier
+        || session.TrackingNumber || parseFloat(session.SWTotal) > 0 || savedNotes.length;
+    if (!hasImportData) return;   // nothing imported — keep null (save writes defaults)
+    embState.lastImportMetadata = {
+        designNumbers,
+        digitizingCodes,
+        parsedServices: { digitizingFees },
+        warnings: savedNotes,
+        unmatchedLines: [],
+        reviewItems: [],
+        paidToDate: parseFloat(session.PaidToDate) || 0,
+        balanceAmount: parseFloat(session.BalanceAmount) || 0,
+        orderNotes: session.OrderNotes || '',
+        carrier: session.Carrier || '',
+        trackingNumber: session.TrackingNumber || '',
+        swTotal: parseFloat(session.SWTotal) || 0,
+        swSubtotal: parseFloat(session.SWSubtotal) || 0,
+        priceAuditJSONSnapshot: session.PriceAuditJSON || '',
+        restoredFromSession: true   // marks reconstruction (not a fresh paste-import)
+    };
+}
+
+function restoreBarFees(session, items) {
+    if (typeof addManualServiceRow !== 'function') return;
+    const sidebarField = {
+        'GRT-50': parseFloat(session.ArtCharge) || 0,
+        'GRT-75': parseFloat(session.GraphicDesignHours) || 0,
+        'DD': (parseFloat(session.DigitizingFee) || 0) + (parseFloat(session.CapDigitizingFee) || 0),
+        'RUSH': parseFloat(session.RushFee) || 0
+    };
+    (items || []).forEach(it => {
+        if (it.EmbellishmentType !== 'fee') return;
+        const sn = it.StyleNumber;
+        if (!(sn in sidebarField)) return;        // not a bar-fee code
+        if (sidebarField[sn] > 0) return;         // sidebar origin → recomputed elsewhere
+        addManualServiceRow(sn, sn === 'RUSH' ? undefined : (it.BaseUnitPrice || it.FinalUnitPrice || 0));
+    });
+}
+
+// T3 split (2026-07-09): tax/exempt/wholesale/shipping/LTM restore, moved
+// VERBATIM out of loadQuoteForEditing (sets the module _pendingLtmState +
+// the window._taxExempt/_isWholesale contracts exactly as before).
+function _restoreTaxShipLtm(session, items) {
+    // Restore tax rate and shipping from fee items.
+    // session.TaxRate (decimal, the frozen rate-of-record) wins; the TAX item's
+    // BaseUnitPrice (percent) is the legacy source. 0 is a VALID rate — the old
+    // `|| 10.1` restored WA tax onto out-of-state quotes saved at 0%, and the
+    // next Save Revision baked it in.
+    const taxFeeItem = items.find(i => i.EmbellishmentType === 'fee' && i.StyleNumber === 'TAX');
+    if (taxFeeItem) {
+        const rateInput = document.getElementById('tax-rate-input');
+        if (rateInput) {
+            const sessionRate = parseFloat(session.TaxRate);
+            const itemRate = parseFloat(taxFeeItem.BaseUnitPrice);
+            // EMB stores TaxRate as a decimal (0.101), but normalize a percent-shaped
+            // legacy value (>1) instead of restoring "1010" into the input.
+            const sessionPct = sessionRate > 1 ? sessionRate : sessionRate * 100;
+            rateInput.value = Number.isFinite(sessionRate) ? Math.round(sessionPct * 1000) / 1000
+                : (Number.isFinite(itemRate) ? itemRate : 10.2);
+        }
+    }
+    // Tax-exempt quotes save with NO TAX fee line + TaxRate 0; #include-tax defaults CHECKED in the
+    // HTML, so without restoring it the reload re-applies WA tax to an exempt/out-of-state customer
+    // and a Save Revision bakes the wrong total in. Restore the checkbox from the saved exemption
+    // signal BEFORE recalculatePricing() reads it. (audit fix 2026-06-05 — Erik's #1 rule)
+    const includeTaxEl = document.getElementById('include-tax');
+    if (includeTaxEl) {
+        const taxExempt = !taxFeeItem && !(parseFloat(session.TaxRate) > 0);
+        includeTaxEl.checked = !taxExempt;
+        // [B8-R2] (audit 2026-06-06): also persist the exemption so a later Pickup→Ship toggle on a
+        // reloaded exempt quote doesn't re-apply WA tax (lookupTaxRate reads window._taxExempt). #1 rule.
+         
+        window._taxExempt = taxExempt;
+    }
+    // [2026-06-07] Restore the wholesale flag + checkbox so a reloaded wholesale order stays 0-tax / acct 2203.
+     
+    window._isWholesale = (session.IsWholesale === 'Yes' || session.IsWholesale === true || session.IsWholesale === 1);
+    const _wholesaleEl = document.getElementById('wholesale-checkbox');
+    if (_wholesaleEl) _wholesaleEl.checked = window._isWholesale;
+    const shipFeeItem = items.find(i => i.EmbellishmentType === 'fee' && i.StyleNumber === 'SHIP');
+    if (shipFeeItem && shipFeeItem.LineTotal > 0) {
+        document.getElementById('shipping-fee').value = shipFeeItem.LineTotal;
+    }
+
+    // Restore LTM display preferences from saved quote
+    if (session.LTM_Display_Mode || session.LTM_Waived) {
+        // Ensure LTM panel is rendered before setting state
+        // (recalculatePricing will render it, but we need state set first)
+         
+        _pendingLtmState = {
+            enabled: !session.LTM_Waived,
+            displayMode: session.LTM_Display_Mode || 'builtin'
+        };
+    }
+}
+
 export async function loadQuoteForEditing(quoteId, opts = {}) {
     showToast('Loading quote...', 'info');
     // P0 guard (audit 2026-06-06): a pickup quote's restore re-fires the live Milton tax lookup async;
@@ -424,53 +596,7 @@ export async function loadQuoteForEditing(quoteId, opts = {}) {
         // BLANK and were then WIPED on Save Revision (updateQuote writes '' for them),
         // and a subsequent Push to ShopWorks attached the order to fallback customer
         // 3739 with no ship-to address. Restore them from the saved session. (2026-06-01)
-        (function restoreEmbOrderShipping() {
-            const setVal = (id, v) => { const el = document.getElementById(id); if (el && v != null && v !== '') el.value = v; };
-            // [2026-06-07] EMB date inputs are now native <input type=date> (YYYY-MM-DD); the column is stored ISO.
-            const isoToInput = (v) => dateToInputValue(v);
-            setVal('customer-number', session.CustomerNumber);
-            setVal('project-name', session.ProjectName);   // P2-5 (audit 2026-06-06): restore Project Name on edit-reload
-            setVal('customer-phone', session.Phone);
-            setVal('order-number', session.OrderNumber);
-            setVal('po-number', session.PurchaseOrderNumber);
-            setVal('ship-address', session.ShipToAddress);
-            setVal('ship-city', session.ShipToCity);
-            setVal('ship-state', session.ShipToState);
-            setVal('ship-zip', session.ShipToZip);
-            setVal('payment-terms', session.PaymentTerms);
-            setVal('date-order-placed', isoToInput(session.DateOrderPlaced));
-            setVal('req-ship-date', isoToInput(session.ReqShipDate));
-            setVal('drop-dead-date', isoToInput(session.DropDeadDate));
-            // Ship method: the SAVE collapses an "Other" selection into the custom text,
-            // so a stored value not in the <select> options IS an "Other" method. A bare
-            // setVal would set selectedIndex=-1 (value '') -> the custom method displays
-            // blank and gets WIPED on the next Save Revision. Detect + restore properly.
-            const smEl = document.getElementById('ship-method');
-            const sm = session.ShipMethod || '';
-            if (smEl) {
-                const known = Array.from(smEl.options).map(o => o.value);
-                if (sm && known.indexOf(sm) === -1) {
-                    smEl.value = 'Other';
-                    const other = document.getElementById('ship-method-other');
-                    if (other) other.value = sm;
-                } else if (sm) {
-                    smEl.value = sm;
-                }
-                // A programmatic .value change doesn't fire onchange — call the handler so
-                // the conditional UI (pickup notice / Other text / address visibility)
-                // matches the restored method.
-                if (typeof onShipMethodChange === 'function') { try { onShipMethodChange(); } catch (_) {} }
-            }
-            // Expand the (default-collapsed) Order Details panel so the restored data is
-            // visible — a collapsed header reads as "no data" and risks re-entry/blanking.
-            if (session.CustomerNumber || session.PurchaseOrderNumber || session.OrderNumber || sm || session.ShipToAddress || session.ReqShipDate) {
-                const c = document.getElementById('order-details-content');
-                if (c) c.style.display = 'block';
-                const ch = document.getElementById('order-details-chevron');
-                if (ch) ch.style.transform = 'rotate(180deg)';
-            }
-            if (typeof updatePushButtonState === 'function') { try { updatePushButtonState(); } catch (_) {} }
-        })();
+        restoreEmbOrderShipping(session);
 
         // Populate logo configuration
         populateLogoConfig(session, items);
@@ -480,15 +606,7 @@ export async function loadQuoteForEditing(quoteId, opts = {}) {
         // ImportNotes with empty referenceArtwork/newDesignName → the uploaded art + design name
         // are PERMANENTLY wiped and a later push emits "NO DESIGN LINKED" for a job that had art.
         // (2026-06-04 audit B5)
-        (function restoreEmbArtwork() {
-            if (!window._embArtwork || !session.ImportNotes) return;
-            try {
-                const parsed = JSON.parse(session.ImportNotes);
-                const art = Array.isArray(parsed.referenceArtwork) ? parsed.referenceArtwork : [];
-                if (art.length && typeof window._embArtwork.setFiles === 'function') window._embArtwork.setFiles(art);
-                if (parsed.newDesignName && typeof window._embArtwork.setDesignName === 'function') window._embArtwork.setDesignName(parsed.newDesignName);
-            } catch (_) { /* legacy flat-array ImportNotes → no artwork object to restore */ }
-        })();
+        restoreEmbArtwork(session);
 
         // Reconstruct lastImportMetadata from the saved session. The save path reads
         // designNumbers/digitizingFees/paidToDate/orderNotes/carrier/tracking/SW-audit
@@ -497,43 +615,7 @@ export async function loadQuoteForEditing(quoteId, opts = {}) {
         // Carrier/TrackingNumber, OrderNotes, the SW price audit, and DELETED the
         // DGT/DDE/DDT digitizing fee items (they're only written from
         // parsedServices.digitizingFees). Rebuild it from what was persisted. (audit 2026-06-10)
-        (function restoreImportMetadata() {
-            let designNumbers = [];
-            try { designNumbers = JSON.parse(session.DesignNumbers || '[]'); } catch (_) { /* legacy */ }
-            const digitizingCodes = (session.DigitizingCodes || '').split(',').map(s => s.trim()).filter(Boolean);
-            // Non-DD digitizing fee items only exist in the DB — recover them from the loaded items
-            const DGT_CODES = /^(DGT-\d+|DDE|DDT)$/i;
-            const digitizingFees = (items || [])
-                .filter(it => it.EmbellishmentType === 'fee' && DGT_CODES.test(it.StyleNumber || ''))
-                .map(it => ({ code: it.StyleNumber, description: it.ProductName, amount: parseFloat(it.BaseUnitPrice) || 0 }));
-            // Saved ImportNotes round-trip back into warnings[] so the next save re-persists them.
-            let savedNotes = [];
-            try {
-                const parsedIN = JSON.parse(session.ImportNotes || '[]');
-                savedNotes = Array.isArray(parsedIN) ? parsedIN : (Array.isArray(parsedIN.importNotes) ? parsedIN.importNotes : []);
-            } catch (_) { /* not JSON */ }
-            const hasImportData = designNumbers.length || digitizingCodes.length || digitizingFees.length
-                || parseFloat(session.PaidToDate) > 0 || session.OrderNotes || session.Carrier
-                || session.TrackingNumber || parseFloat(session.SWTotal) > 0 || savedNotes.length;
-            if (!hasImportData) return;   // nothing imported — keep null (save writes defaults)
-            embState.lastImportMetadata = {
-                designNumbers,
-                digitizingCodes,
-                parsedServices: { digitizingFees },
-                warnings: savedNotes,
-                unmatchedLines: [],
-                reviewItems: [],
-                paidToDate: parseFloat(session.PaidToDate) || 0,
-                balanceAmount: parseFloat(session.BalanceAmount) || 0,
-                orderNotes: session.OrderNotes || '',
-                carrier: session.Carrier || '',
-                trackingNumber: session.TrackingNumber || '',
-                swTotal: parseFloat(session.SWTotal) || 0,
-                swSubtotal: parseFloat(session.SWSubtotal) || 0,
-                priceAuditJSONSnapshot: session.PriceAuditJSON || '',
-                restoredFromSession: true   // marks reconstruction (not a fresh paste-import)
-            };
-        })();
+        restoreImportMetadata(session, items);
 
         // Populate products from line items
         await populateProducts(items);
@@ -549,74 +631,9 @@ export async function loadQuoteForEditing(quoteId, opts = {}) {
         // recompute from their saved SESSION field, so a non-zero session field means
         // "sidebar origin — already handled, don't add a duplicate row". RUSH self-prices (25% of
         // subtotal in syncRushRow); the others take their saved unit price. (cert audit 2026-06-04)
-        (function restoreBarFees() {
-            if (typeof addManualServiceRow !== 'function') return;
-            const sidebarField = {
-                'GRT-50': parseFloat(session.ArtCharge) || 0,
-                'GRT-75': parseFloat(session.GraphicDesignHours) || 0,
-                'DD': (parseFloat(session.DigitizingFee) || 0) + (parseFloat(session.CapDigitizingFee) || 0),
-                'RUSH': parseFloat(session.RushFee) || 0
-            };
-            (items || []).forEach(it => {
-                if (it.EmbellishmentType !== 'fee') return;
-                const sn = it.StyleNumber;
-                if (!(sn in sidebarField)) return;        // not a bar-fee code
-                if (sidebarField[sn] > 0) return;         // sidebar origin → recomputed elsewhere
-                addManualServiceRow(sn, sn === 'RUSH' ? undefined : (it.BaseUnitPrice || it.FinalUnitPrice || 0));
-            });
-        })();
+        restoreBarFees(session, items);
 
-        // Restore tax rate and shipping from fee items.
-        // session.TaxRate (decimal, the frozen rate-of-record) wins; the TAX item's
-        // BaseUnitPrice (percent) is the legacy source. 0 is a VALID rate — the old
-        // `|| 10.1` restored WA tax onto out-of-state quotes saved at 0%, and the
-        // next Save Revision baked it in.
-        const taxFeeItem = items.find(i => i.EmbellishmentType === 'fee' && i.StyleNumber === 'TAX');
-        if (taxFeeItem) {
-            const rateInput = document.getElementById('tax-rate-input');
-            if (rateInput) {
-                const sessionRate = parseFloat(session.TaxRate);
-                const itemRate = parseFloat(taxFeeItem.BaseUnitPrice);
-                // EMB stores TaxRate as a decimal (0.101), but normalize a percent-shaped
-                // legacy value (>1) instead of restoring "1010" into the input.
-                const sessionPct = sessionRate > 1 ? sessionRate : sessionRate * 100;
-                rateInput.value = Number.isFinite(sessionRate) ? Math.round(sessionPct * 1000) / 1000
-                    : (Number.isFinite(itemRate) ? itemRate : 10.2);
-            }
-        }
-        // Tax-exempt quotes save with NO TAX fee line + TaxRate 0; #include-tax defaults CHECKED in the
-        // HTML, so without restoring it the reload re-applies WA tax to an exempt/out-of-state customer
-        // and a Save Revision bakes the wrong total in. Restore the checkbox from the saved exemption
-        // signal BEFORE recalculatePricing() reads it. (audit fix 2026-06-05 — Erik's #1 rule)
-        const includeTaxEl = document.getElementById('include-tax');
-        if (includeTaxEl) {
-            const taxExempt = !taxFeeItem && !(parseFloat(session.TaxRate) > 0);
-            includeTaxEl.checked = !taxExempt;
-            // [B8-R2] (audit 2026-06-06): also persist the exemption so a later Pickup→Ship toggle on a
-            // reloaded exempt quote doesn't re-apply WA tax (lookupTaxRate reads window._taxExempt). #1 rule.
-             
-            window._taxExempt = taxExempt;
-        }
-        // [2026-06-07] Restore the wholesale flag + checkbox so a reloaded wholesale order stays 0-tax / acct 2203.
-         
-        window._isWholesale = (session.IsWholesale === 'Yes' || session.IsWholesale === true || session.IsWholesale === 1);
-        const _wholesaleEl = document.getElementById('wholesale-checkbox');
-        if (_wholesaleEl) _wholesaleEl.checked = window._isWholesale;
-        const shipFeeItem = items.find(i => i.EmbellishmentType === 'fee' && i.StyleNumber === 'SHIP');
-        if (shipFeeItem && shipFeeItem.LineTotal > 0) {
-            document.getElementById('shipping-fee').value = shipFeeItem.LineTotal;
-        }
-
-        // Restore LTM display preferences from saved quote
-        if (session.LTM_Display_Mode || session.LTM_Waived) {
-            // Ensure LTM panel is rendered before setting state
-            // (recalculatePricing will render it, but we need state set first)
-             
-            _pendingLtmState = {
-                enabled: !session.LTM_Waived,
-                displayMode: session.LTM_Display_Mode || 'builtin'
-            };
-        }
+        _restoreTaxShipLtm(session, items);
 
         // Recalculate pricing to update totals
         recalculatePricing();

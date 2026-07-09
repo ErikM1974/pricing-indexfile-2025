@@ -236,417 +236,443 @@ function renderSprServicesSection(serviceItems) {
  * NOTE >150-line ALLOWLIST (emb-function-length.test.js): one cohesive closure
  * machine — the deferred _recalcDesignAssignments closure reads/writes the
  * tier state across its whole span; splitting it needs jsdom coverage first. */
-function renderSprEmbConfigSection(embConfigOptions) {
-    // === EMBROIDERY CONFIG SECTION ===
-    const embConfigSection = document.getElementById('spr-embconfig-section');
-    if (embConfigOptions) {
-        embConfigSection.style.display = '';
+// T3 split (2026-07-09): the 412-line deferred-closure machine, staged into
+// the 5 functions below behind tests/dom/spr-emb-config.test.js (written FIRST
+// — the B3 precondition). Closure state rides `st`; entry promotion +
+// embConfigOptions._garment/_capDesignNum contracts unchanged.
+function _buildSprDesignEntries(embConfigOptions, st) {
+    // Build unified design list from parser + DB st.lookup + fallback
+    const rawDesignNums = embConfigOptions.designNumbersRaw || [];
+    const rawDesignLabels = embConfigOptions.designNumbers || [];
+    const fallbackDesigns = st.lookup?.fallbackDesigns || {};
+    const designEntries = []; // { num, label, dbInfo (or null), inDb, fallbackInfo (or null) }
 
-        // Design info banner — enhanced with stitch count lookup + per-design assignment
-        const designBanner = document.getElementById('spr-design-info-banner');
-        const lookup = embConfigOptions.designLookup;
-        let autoGarmentTier = '8000';
-        let autoGarmentPosition = 'Left Chest';
-        let autoGarmentStitchCount = 8000;
-        let autoCapTier = '8000';
-        let hasFullBack = false;
-
-        // Build unified design list from parser + DB lookup + fallback
-        const rawDesignNums = embConfigOptions.designNumbersRaw || [];
-        const rawDesignLabels = embConfigOptions.designNumbers || [];
-        const fallbackDesigns = lookup?.fallbackDesigns || {};
-        const designEntries = []; // { num, label, dbInfo (or null), inDb, fallbackInfo (or null) }
-
-        for (let di = 0; di < rawDesignNums.length; di++) {
-            const num = rawDesignNums[di];
-            const label = rawDesignLabels[di] || `Design #${num}`;
-            const dbInfo = lookup?.designs?.[num] || null;
-            const fallbackInfo = !dbInfo ? (fallbackDesigns[num] || null) : null;
-            designEntries.push({ num, label, dbInfo, inDb: !!dbInfo, fallbackInfo });
-        }
-        // Also include DB-found designs not in parser list (rare edge case)
-        if (lookup?.designs) {
-            for (const [num, info] of Object.entries(lookup.designs)) {
-                if (!designEntries.find(d => d.num === num)) {
-                    designEntries.push({ num, label: `Design #${num}`, dbInfo: info, inDb: true, fallbackInfo: null });
-                }
+    for (let di = 0; di < rawDesignNums.length; di++) {
+        const num = rawDesignNums[di];
+        const label = rawDesignLabels[di] || `Design #${num}`;
+        const dbInfo = st.lookup?.designs?.[num] || null;
+        const fallbackInfo = !dbInfo ? (fallbackDesigns[num] || null) : null;
+        designEntries.push({ num, label, dbInfo, inDb: !!dbInfo, fallbackInfo });
+    }
+    // Also include DB-found designs not in parser list (rare edge case)
+    if (st.lookup?.designs) {
+        for (const [num, info] of Object.entries(st.lookup.designs)) {
+            if (!designEntries.find(d => d.num === num)) {
+                designEntries.push({ num, label: `Design #${num}`, dbInfo: info, inDb: true, fallbackInfo: null });
             }
         }
+    }
+    return designEntries;
+}
 
-        // Extract FB price tiers from first Full Back design found
-        let fbPriceTiersFromLookup = null;
+function _buildSprDesignRow(entry, defaultAssignments, embConfigOptions, st) {
+    let rowHtml = '';
+        const { num, label, dbInfo, inDb, fallbackInfo } = entry;
 
-        if (designEntries.length > 0) {
-            let bannerHtml = '';
-            const showAssignment = designEntries.length >= 2 && (embConfigOptions.hasGarments || embConfigOptions.hasCaps);
+        // Design entry row with optional thumbnail
+        const thumbUrl = inDb ? (dbInfo.mockupUrl || dbInfo.dstPreviewUrl || dbInfo.thumbnailUrl || dbInfo.artworkUrl || '') : '';
+        const designNameText = inDb ? (dbInfo.designName || '') : (fallbackInfo?.designName || '');
 
-            if (showAssignment) {
-                bannerHtml += `<div style="font-size:11px;font-weight:600;color:#1e40af;margin-bottom:6px;"><i class="fas fa-object-group qb-mr4"></i>Design Logo Assignment</div>`;
+        rowHtml += `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;flex-wrap:wrap;">`;
+        if (thumbUrl) {
+            rowHtml += `<img src="${escapeHtml(thumbUrl)}" alt="Design #${escapeHtml(num)}" style="width:40px;height:40px;border-radius:4px;object-fit:cover;border:1px solid #ddd;flex-shrink:0;" onerror="this.style.display='none'">`;
+        }
+        rowHtml += `<span id="spr-thumb-${escapeHtml(num)}" style="display:none;"></span>`;
+        rowHtml += `<strong>#${escapeHtml(num)}</strong>`;
+        if (designNameText) {
+            rowHtml += `<span style="color:#64748b;font-size:11px;font-style:italic;">${escapeHtml(designNameText.length > 30 ? designNameText.substring(0, 28) + '...' : designNameText)}</span>`;
+        }
+
+        if (inDb) {
+            const sc = dbInfo.maxStitchCount;
+            const tier = dbInfo.maxStitchTier || 'Standard';
+            const surcharge = dbInfo.maxAsSurcharge || 0;
+            const scFormatted = sc.toLocaleString();
+
+            rowHtml += `<span class="qb-ink">${escapeHtml(dbInfo.company || '')}</span>`;
+            rowHtml += `<span class="qb-blue-bold">${scFormatted} stitches</span>`;
+
+            let tierBadge = '';
+            if (tier === 'Full Back') {
+                tierBadge = '<span class="qb-pill-red">Full Back</span>';
+                if (!st.fbPriceTiersFromLookup && dbInfo.hasFBPricing) {
+                    const fbVariant = dbInfo.variants.find(v => v.fbPrice1_7 > 0);
+                    if (fbVariant) {
+                        st.fbPriceTiersFromLookup = {
+                            fbPrice1_7: fbVariant.fbPrice1_7,
+                            fbPrice8_23: fbVariant.fbPrice8_23,
+                            fbPrice24_47: fbVariant.fbPrice24_47,
+                            fbPrice48_71: fbVariant.fbPrice48_71,
+                            fbPrice72plus: fbVariant.fbPrice72plus
+                        };
+                    }
+                }
+            } else if (surcharge > 0) {
+                tierBadge = `<span class="qb-pill-amber">${escapeHtml(tier)} +$${surcharge}/pc</span>`;
+            } else {
+                tierBadge = '<span class="qb-pill-green">Standard</span>';
+            }
+            rowHtml += tierBadge;
+
+            if (dbInfo.variants && dbInfo.variants.length > 1) {
+                rowHtml += `<span class="qb-note-11">(${dbInfo.variants.length} variants)</span>`;
+            }
+        } else if (fallbackInfo && fallbackInfo.hasStitchData) {
+            // Fallback WITH stitch data — treat like master hit
+            const sc = fallbackInfo.stitchCount;
+            const tier = fallbackInfo.stitchTier || 'Standard';
+            const surcharge = fallbackInfo.asSurcharge || 0;
+            const scFormatted = sc.toLocaleString();
+
+            rowHtml += `<span class="qb-ink">${escapeHtml(fallbackInfo.companyName || '')}</span>`;
+            rowHtml += `<span class="qb-blue-bold">${scFormatted} stitches</span>`;
+
+            let tierBadge = '';
+            if (tier === 'Full Back') {
+                tierBadge = '<span class="qb-pill-red">Full Back</span>';
+            } else if (surcharge > 0) {
+                tierBadge = `<span class="qb-pill-amber">${escapeHtml(tier)} +$${surcharge}/pc</span>`;
+            } else {
+                tierBadge = '<span class="qb-pill-green">Standard</span>';
+            }
+            rowHtml += tierBadge;
+            if (fallbackInfo.threadColors) {
+                rowHtml += `<span class="qb-note-11" title="${escapeHtml(fallbackInfo.threadColors)}">${fallbackInfo.colorCount} colors</span>`;
             }
 
-            // Smart auto-assign defaults
-            // Sort by stitch count descending for DB-found designs
-            const sortedEntries = [...designEntries];
-            if (sortedEntries.every(e => e.inDb)) {
-                sortedEntries.sort((a, b) => (b.dbInfo?.maxStitchCount || 0) - (a.dbInfo?.maxStitchCount || 0));
+            // Promote fallback to dbInfo-like shape for auto-tier logic
+            entry.inDb = true;
+            entry.dbInfo = {
+                maxStitchCount: sc,
+                maxStitchTier: tier,
+                maxAsSurcharge: surcharge,
+                company: fallbackInfo.companyName,
+                hasFBPricing: false,
+                variants: [{ stitchCount: sc, stitchTier: tier, asSurcharge: surcharge }]
+            };
+        } else if (fallbackInfo) {
+            // Fallback WITHOUT stitch data — name/company/colors only
+            if (fallbackInfo.companyName) {
+                rowHtml += `<span class="qb-ink">${escapeHtml(fallbackInfo.companyName)}</span>`;
             }
-            const defaultAssignments = {};
-            if (showAssignment) {
-                if (embConfigOptions.hasGarments && embConfigOptions.hasCaps) {
-                    // First/highest → garment, second/lowest → cap
-                    defaultAssignments[sortedEntries[0].num] = 'garment';
-                    if (sortedEntries.length >= 2) defaultAssignments[sortedEntries[1].num] = 'cap';
-                    for (let i = 2; i < sortedEntries.length; i++) defaultAssignments[sortedEntries[i].num] = 'none';
-                } else if (embConfigOptions.hasGarments) {
-                    sortedEntries.forEach(e => { defaultAssignments[e.num] = 'garment'; });
-                } else {
-                    sortedEntries.forEach(e => { defaultAssignments[e.num] = 'cap'; });
+            if (fallbackInfo.designName) {
+                rowHtml += `<span style="color:#64748b;font-size:11px;">${escapeHtml(fallbackInfo.designName)}</span>`;
+            }
+            rowHtml += '<span style="background:#d97706;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;">No stitch data</span>';
+            if (fallbackInfo.threadColors) {
+                rowHtml += `<span class="qb-note-11" title="${escapeHtml(fallbackInfo.threadColors)}">${fallbackInfo.colorCount} colors</span>`;
+            }
+        } else {
+            // Not found in either table
+            const nameMatch = label.match(/—\s*(.+)/);
+            if (nameMatch) {
+                rowHtml += `<span class="qb-ink">${escapeHtml(nameMatch[1].trim())}</span>`;
+            }
+            rowHtml += '<span style="background:#94a3b8;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;">Not in database</span>';
+        }
+
+        // Assignment dropdown (only for 2+ designs)
+        if (st.showAssignment) {
+            const defaultVal = defaultAssignments[num] || 'garment';
+            rowHtml += `<select id="spr-design-assign-${escapeHtml(num)}" data-design-num="${escapeHtml(num)}" class="spr-design-assign" style="margin-left:auto;padding:2px 6px;font-size:11px;border:1px solid #cbd5e1;border-radius:4px;background:#fff;">`;
+            if (embConfigOptions.hasGarments) rowHtml += `<option value="garment"${defaultVal === 'garment' ? ' selected' : ''}>Garment Logo</option>`;
+            if (embConfigOptions.hasCaps) rowHtml += `<option value="cap"${defaultVal === 'cap' ? ' selected' : ''}>Cap Logo</option>`;
+            rowHtml += `<option value="both"${defaultVal === 'both' ? ' selected' : ''}>Both</option>`;
+            rowHtml += `<option value="none"${defaultVal === 'none' ? ' selected' : ''}>None (skip)</option>`;
+            rowHtml += `</select>`;
+        }
+
+        rowHtml += `</div>`;
+    return rowHtml;
+}
+
+function _renderSprDesignBanner(embConfigOptions, designEntries, st) {
+    let bannerHtml = '';
+    st.showAssignment = designEntries.length >= 2 && (embConfigOptions.hasGarments || embConfigOptions.hasCaps);
+
+    if (st.showAssignment) {
+        bannerHtml += `<div style="font-size:11px;font-weight:600;color:#1e40af;margin-bottom:6px;"><i class="fas fa-object-group qb-mr4"></i>Design Logo Assignment</div>`;
+    }
+
+    // Smart auto-assign defaults
+    // Sort by stitch count descending for DB-found designs
+    const sortedEntries = [...designEntries];
+    if (sortedEntries.every(e => e.inDb)) {
+        sortedEntries.sort((a, b) => (b.dbInfo?.maxStitchCount || 0) - (a.dbInfo?.maxStitchCount || 0));
+    }
+    const defaultAssignments = {};
+    if (st.showAssignment) {
+        if (embConfigOptions.hasGarments && embConfigOptions.hasCaps) {
+            // First/highest → garment, second/lowest → cap
+            defaultAssignments[sortedEntries[0].num] = 'garment';
+            if (sortedEntries.length >= 2) defaultAssignments[sortedEntries[1].num] = 'cap';
+            for (let i = 2; i < sortedEntries.length; i++) defaultAssignments[sortedEntries[i].num] = 'none';
+        } else if (embConfigOptions.hasGarments) {
+            sortedEntries.forEach(e => { defaultAssignments[e.num] = 'garment'; });
+        } else {
+            sortedEntries.forEach(e => { defaultAssignments[e.num] = 'cap'; });
+        }
+    }
+
+
+    for (const entry of designEntries) {
+        bannerHtml += _buildSprDesignRow(entry, defaultAssignments, embConfigOptions, st);
+    }
+
+    st.designBanner.style.display = '';
+    st.designBanner.style.background = '#eff6ff';
+    const headerText = st.showAssignment ? '' : '<div style="font-size:11px;font-weight:600;color:#1e40af;margin-bottom:4px;"><i class="fas fa-search qb-mr4"></i>Design Stitch Lookup</div>';
+    // eslint-disable-next-line no-unsanitized/property -- audited (1.4): numeric prices/indices + internal enums; typeUpper escapeHtml-wrapped
+    st.designBanner.innerHTML = headerText + bannerHtml;
+
+    // Fetch design thumbnails for the banner (non-blocking)
+    if (typeof DesignThumbnailService !== 'undefined' && designEntries.length > 0) {
+        const sprDesignNums = designEntries.map(e => e.num);
+        DesignThumbnailService.fetchThumbnailsBatch(sprDesignNums).then(thumbMap => {
+            for (const [dn, url] of Object.entries(thumbMap)) {
+                if (url) {
+                    const slot = document.getElementById('spr-thumb-' + dn);
+                    if (slot) {
+                        slot.innerHTML = '<img src="' + escapeHtml(url) + '" class="spr-design-thumb" alt="Design #' + escapeHtml(dn) + '" onerror="this.parentElement.style.display=\'none\'">';
+                        slot.style.display = 'inline-block';
+                    }
                 }
             }
+        });
+    }
+}
 
-            // Track max stitch for garment auto-tier and FB detection
-            let maxStitchCount = 0;
-            let maxStitchTier = 'Standard';
-            let maxAsSurcharge = 0;
+function _recalcSprAssignments(embConfigOptions, designEntries, st) {
 
-            for (const entry of designEntries) {
-                const { num, label, dbInfo, inDb, fallbackInfo } = entry;
+    let garmentDesignNum = null;
+    let capDesignNum = null;
 
-                // Design entry row with optional thumbnail
-                const thumbUrl = inDb ? (dbInfo.mockupUrl || dbInfo.dstPreviewUrl || dbInfo.thumbnailUrl || dbInfo.artworkUrl || '') : '';
-                const designNameText = inDb ? (dbInfo.designName || '') : (fallbackInfo?.designName || '');
-
-                bannerHtml += `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;flex-wrap:wrap;">`;
-                if (thumbUrl) {
-                    bannerHtml += `<img src="${escapeHtml(thumbUrl)}" alt="Design #${escapeHtml(num)}" style="width:40px;height:40px;border-radius:4px;object-fit:cover;border:1px solid #ddd;flex-shrink:0;" onerror="this.style.display='none'">`;
-                }
-                bannerHtml += `<span id="spr-thumb-${escapeHtml(num)}" style="display:none;"></span>`;
-                bannerHtml += `<strong>#${escapeHtml(num)}</strong>`;
-                if (designNameText) {
-                    bannerHtml += `<span style="color:#64748b;font-size:11px;font-style:italic;">${escapeHtml(designNameText.length > 30 ? designNameText.substring(0, 28) + '...' : designNameText)}</span>`;
-                }
-
-                if (inDb) {
-                    const sc = dbInfo.maxStitchCount;
-                    const tier = dbInfo.maxStitchTier || 'Standard';
-                    const surcharge = dbInfo.maxAsSurcharge || 0;
-                    const scFormatted = sc.toLocaleString();
-
-                    bannerHtml += `<span class="qb-ink">${escapeHtml(dbInfo.company || '')}</span>`;
-                    bannerHtml += `<span class="qb-blue-bold">${scFormatted} stitches</span>`;
-
-                    let tierBadge = '';
-                    if (tier === 'Full Back') {
-                        tierBadge = '<span class="qb-pill-red">Full Back</span>';
-                        if (!fbPriceTiersFromLookup && dbInfo.hasFBPricing) {
-                            const fbVariant = dbInfo.variants.find(v => v.fbPrice1_7 > 0);
-                            if (fbVariant) {
-                                fbPriceTiersFromLookup = {
-                                    fbPrice1_7: fbVariant.fbPrice1_7,
-                                    fbPrice8_23: fbVariant.fbPrice8_23,
-                                    fbPrice24_47: fbVariant.fbPrice24_47,
-                                    fbPrice48_71: fbVariant.fbPrice48_71,
-                                    fbPrice72plus: fbVariant.fbPrice72plus
-                                };
-                            }
-                        }
-                    } else if (surcharge > 0) {
-                        tierBadge = `<span class="qb-pill-amber">${escapeHtml(tier)} +$${surcharge}/pc</span>`;
-                    } else {
-                        tierBadge = '<span class="qb-pill-green">Standard</span>';
-                    }
-                    bannerHtml += tierBadge;
-
-                    if (dbInfo.variants && dbInfo.variants.length > 1) {
-                        bannerHtml += `<span class="qb-note-11">(${dbInfo.variants.length} variants)</span>`;
-                    }
-                } else if (fallbackInfo && fallbackInfo.hasStitchData) {
-                    // Fallback WITH stitch data — treat like master hit
-                    const sc = fallbackInfo.stitchCount;
-                    const tier = fallbackInfo.stitchTier || 'Standard';
-                    const surcharge = fallbackInfo.asSurcharge || 0;
-                    const scFormatted = sc.toLocaleString();
-
-                    bannerHtml += `<span class="qb-ink">${escapeHtml(fallbackInfo.companyName || '')}</span>`;
-                    bannerHtml += `<span class="qb-blue-bold">${scFormatted} stitches</span>`;
-
-                    let tierBadge = '';
-                    if (tier === 'Full Back') {
-                        tierBadge = '<span class="qb-pill-red">Full Back</span>';
-                    } else if (surcharge > 0) {
-                        tierBadge = `<span class="qb-pill-amber">${escapeHtml(tier)} +$${surcharge}/pc</span>`;
-                    } else {
-                        tierBadge = '<span class="qb-pill-green">Standard</span>';
-                    }
-                    bannerHtml += tierBadge;
-                    if (fallbackInfo.threadColors) {
-                        bannerHtml += `<span class="qb-note-11" title="${escapeHtml(fallbackInfo.threadColors)}">${fallbackInfo.colorCount} colors</span>`;
-                    }
-
-                    // Promote fallback to dbInfo-like shape for auto-tier logic
-                    entry.inDb = true;
-                    entry.dbInfo = {
-                        maxStitchCount: sc,
-                        maxStitchTier: tier,
-                        maxAsSurcharge: surcharge,
-                        company: fallbackInfo.companyName,
-                        hasFBPricing: false,
-                        variants: [{ stitchCount: sc, stitchTier: tier, asSurcharge: surcharge }]
-                    };
-                } else if (fallbackInfo) {
-                    // Fallback WITHOUT stitch data — name/company/colors only
-                    if (fallbackInfo.companyName) {
-                        bannerHtml += `<span class="qb-ink">${escapeHtml(fallbackInfo.companyName)}</span>`;
-                    }
-                    if (fallbackInfo.designName) {
-                        bannerHtml += `<span style="color:#64748b;font-size:11px;">${escapeHtml(fallbackInfo.designName)}</span>`;
-                    }
-                    bannerHtml += '<span style="background:#d97706;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;">No stitch data</span>';
-                    if (fallbackInfo.threadColors) {
-                        bannerHtml += `<span class="qb-note-11" title="${escapeHtml(fallbackInfo.threadColors)}">${fallbackInfo.colorCount} colors</span>`;
-                    }
-                } else {
-                    // Not found in either table
-                    const nameMatch = label.match(/—\s*(.+)/);
-                    if (nameMatch) {
-                        bannerHtml += `<span class="qb-ink">${escapeHtml(nameMatch[1].trim())}</span>`;
-                    }
-                    bannerHtml += '<span style="background:#94a3b8;color:#fff;padding:1px 6px;border-radius:3px;font-size:11px;font-weight:600;margin-left:4px;">Not in database</span>';
-                }
-
-                // Assignment dropdown (only for 2+ designs)
-                if (showAssignment) {
-                    const defaultVal = defaultAssignments[num] || 'garment';
-                    bannerHtml += `<select id="spr-design-assign-${escapeHtml(num)}" data-design-num="${escapeHtml(num)}" class="spr-design-assign" style="margin-left:auto;padding:2px 6px;font-size:11px;border:1px solid #cbd5e1;border-radius:4px;background:#fff;">`;
-                    if (embConfigOptions.hasGarments) bannerHtml += `<option value="garment"${defaultVal === 'garment' ? ' selected' : ''}>Garment Logo</option>`;
-                    if (embConfigOptions.hasCaps) bannerHtml += `<option value="cap"${defaultVal === 'cap' ? ' selected' : ''}>Cap Logo</option>`;
-                    bannerHtml += `<option value="both"${defaultVal === 'both' ? ' selected' : ''}>Both</option>`;
-                    bannerHtml += `<option value="none"${defaultVal === 'none' ? ' selected' : ''}>None (skip)</option>`;
-                    bannerHtml += `</select>`;
-                }
-
-                bannerHtml += `</div>`;
+    if (st.showAssignment) {
+        const selects = st.designBanner.querySelectorAll('.spr-design-assign');
+        selects.forEach(sel => {
+            const dNum = sel.dataset.designNum;
+            const val = sel.value;
+            if (val === 'garment' || val === 'both') {
+                if (!garmentDesignNum) garmentDesignNum = dNum;
             }
-
-            designBanner.style.display = '';
-            designBanner.style.background = '#eff6ff';
-            const headerText = showAssignment ? '' : '<div style="font-size:11px;font-weight:600;color:#1e40af;margin-bottom:4px;"><i class="fas fa-search qb-mr4"></i>Design Stitch Lookup</div>';
-            // eslint-disable-next-line no-unsanitized/property -- audited (1.4): numeric prices/indices + internal enums; typeUpper escapeHtml-wrapped
-            designBanner.innerHTML = headerText + bannerHtml;
-
-            // Fetch design thumbnails for the banner (non-blocking)
-            if (typeof DesignThumbnailService !== 'undefined' && designEntries.length > 0) {
-                const sprDesignNums = designEntries.map(e => e.num);
-                DesignThumbnailService.fetchThumbnailsBatch(sprDesignNums).then(thumbMap => {
-                    for (const [dn, url] of Object.entries(thumbMap)) {
-                        if (url) {
-                            const slot = document.getElementById('spr-thumb-' + dn);
-                            if (slot) {
-                                slot.innerHTML = '<img src="' + escapeHtml(url) + '" class="spr-design-thumb" alt="Design #' + escapeHtml(dn) + '" onerror="this.parentElement.style.display=\'none\'">';
-                                slot.style.display = 'inline-block';
-                            }
-                        }
-                    }
-                });
+            if (val === 'cap' || val === 'both') {
+                if (!capDesignNum) capDesignNum = dNum;
             }
+        });
+    } else if (designEntries.length === 1) {
+        // Single design — assign to whatever types exist
+        garmentDesignNum = designEntries[0].num;
+        capDesignNum = designEntries[0].num;
+    }
 
-            // Function to recalculate auto-tiers from assignment dropdowns
-            function _recalcDesignAssignments() {
-                let garmentDesignNum = null;
-                let capDesignNum = null;
+    // Store assignment on embConfigOptions for later retrieval
+    embConfigOptions._garmentDesignNum = garmentDesignNum;
+    embConfigOptions._capDesignNum = capDesignNum;
 
-                if (showAssignment) {
-                    const selects = designBanner.querySelectorAll('.spr-design-assign');
-                    selects.forEach(sel => {
-                        const dNum = sel.dataset.designNum;
-                        const val = sel.value;
-                        if (val === 'garment' || val === 'both') {
-                            if (!garmentDesignNum) garmentDesignNum = dNum;
-                        }
-                        if (val === 'cap' || val === 'both') {
-                            if (!capDesignNum) capDesignNum = dNum;
-                        }
-                    });
-                } else if (designEntries.length === 1) {
-                    // Single design — assign to whatever types exist
-                    garmentDesignNum = designEntries[0].num;
-                    capDesignNum = designEntries[0].num;
-                }
+    // Auto-set garment tier from assigned design
+    st.autoGarmentTier = '8000';
+    st.autoGarmentPosition = 'Left Chest';
+    st.autoGarmentStitchCount = 8000;
+    st.hasFullBack = false;
+    embConfigOptions.fbPriceTiers = null;
 
-                // Store assignment on embConfigOptions for later retrieval
-                embConfigOptions._garmentDesignNum = garmentDesignNum;
-                embConfigOptions._capDesignNum = capDesignNum;
-
-                // Auto-set garment tier from assigned design
-                autoGarmentTier = '8000';
-                autoGarmentPosition = 'Left Chest';
-                autoGarmentStitchCount = 8000;
-                hasFullBack = false;
-                embConfigOptions.fbPriceTiers = null;
-
-                if (garmentDesignNum) {
-                    const gInfo = lookup?.designs?.[garmentDesignNum] || designEntries.find(e => e.num === garmentDesignNum)?.dbInfo;
-                    if (gInfo) {
-                        const sc = gInfo.maxStitchCount;
-                        const tier = gInfo.maxStitchTier || 'Standard';
-                        autoGarmentStitchCount = sc;
-                        if (tier === 'Full Back' || sc >= 25000) {
-                            autoGarmentTier = '25000';
-                            autoGarmentPosition = 'Full Back';
-                            hasFullBack = true;
-                            // Set FB price tiers from this specific design
-                            if (gInfo.hasFBPricing) {
-                                const fbVariant = gInfo.variants.find(v => v.fbPrice1_7 > 0);
-                                if (fbVariant) {
-                                    embConfigOptions.fbPriceTiers = {
-                                        fbPrice1_7: fbVariant.fbPrice1_7,
-                                        fbPrice8_23: fbVariant.fbPrice8_23,
-                                        fbPrice24_47: fbVariant.fbPrice24_47,
-                                        fbPrice48_71: fbVariant.fbPrice48_71,
-                                        fbPrice72plus: fbVariant.fbPrice72plus
-                                    };
-                                }
-                            }
-                        } else {
-                            autoGarmentTier = mapStitchCountToTierValue(sc, '');
-                        }
+    if (garmentDesignNum) {
+        const gInfo = st.lookup?.designs?.[garmentDesignNum] || designEntries.find(e => e.num === garmentDesignNum)?.dbInfo;
+        if (gInfo) {
+            const sc = gInfo.maxStitchCount;
+            const tier = gInfo.maxStitchTier || 'Standard';
+            st.autoGarmentStitchCount = sc;
+            if (tier === 'Full Back' || sc >= 25000) {
+                st.autoGarmentTier = '25000';
+                st.autoGarmentPosition = 'Full Back';
+                st.hasFullBack = true;
+                // Set FB price tiers from this specific design
+                if (gInfo.hasFBPricing) {
+                    const fbVariant = gInfo.variants.find(v => v.fbPrice1_7 > 0);
+                    if (fbVariant) {
+                        embConfigOptions.fbPriceTiers = {
+                            fbPrice1_7: fbVariant.fbPrice1_7,
+                            fbPrice8_23: fbVariant.fbPrice8_23,
+                            fbPrice24_47: fbVariant.fbPrice24_47,
+                            fbPrice48_71: fbVariant.fbPrice48_71,
+                            fbPrice72plus: fbVariant.fbPrice72plus
+                        };
                     }
                 }
-
-                // Auto-set cap tier from assigned design
-                autoCapTier = '8000';
-                if (capDesignNum) {
-                    const cInfo = lookup?.designs?.[capDesignNum] || designEntries.find(e => e.num === capDesignNum)?.dbInfo;
-                    if (cInfo) {
-                        // For caps, use smallest variant stitch count
-                        let minCapStitch = Infinity;
-                        for (const v of cInfo.variants) {
-                            if (v.stitchCount < minCapStitch) minCapStitch = v.stitchCount;
-                        }
-                        if (minCapStitch < Infinity) {
-                            autoCapTier = mapStitchCountToTierValue(minCapStitch, '');
-                        }
-                    }
-                }
-
-                // Update the garment/cap tier dropdowns in the modal
-                const gTierEl = document.getElementById('spr-garment-stitch-tier');
-                const gPosEl = document.getElementById('spr-garment-position');
-                const cTierEl = document.getElementById('spr-cap-stitch-tier');
-                if (gTierEl) gTierEl.value = autoGarmentTier;
-                if (gPosEl) gPosEl.value = autoGarmentPosition;
-                if (cTierEl) cTierEl.value = autoCapTier;
+            } else {
+                st.autoGarmentTier = mapStitchCountToTierValue(sc, '');
             }
+        }
+    }
 
-            // Wire up onchange for assignment dropdowns
-            if (showAssignment) {
-                setTimeout(() => {
-                    const selects = designBanner.querySelectorAll('.spr-design-assign');
-                    selects.forEach(sel => {
-                        sel.addEventListener('change', _recalcDesignAssignments);
-                    });
-                }, 0);
+    // Auto-set cap tier from assigned design
+    st.autoCapTier = '8000';
+    if (capDesignNum) {
+        const cInfo = st.lookup?.designs?.[capDesignNum] || designEntries.find(e => e.num === capDesignNum)?.dbInfo;
+        if (cInfo) {
+            // For caps, use smallest variant stitch count
+            let minCapStitch = Infinity;
+            for (const v of cInfo.variants) {
+                if (v.stitchCount < minCapStitch) minCapStitch = v.stitchCount;
             }
+            if (minCapStitch < Infinity) {
+                st.autoCapTier = mapStitchCountToTierValue(minCapStitch, '');
+            }
+        }
+    }
 
-            // Run initial assignment calculation
-            // (for single-design or initial defaults — sets autoGarmentTier/autoCapTier)
-            // Defer to after DOM update if using assignment dropdowns
-            if (!showAssignment) {
-                // Legacy single-design or no-assignment path
-                for (const entry of designEntries) {
-                    if (entry.inDb) {
-                        const sc = entry.dbInfo.maxStitchCount;
-                        const tier = entry.dbInfo.maxStitchTier || 'Standard';
-                        if (sc > maxStitchCount) {
-                            maxStitchCount = sc;
-                            maxStitchTier = tier;
-                            // eslint-disable-next-line no-unused-vars -- pre-existing write-only local (verbatim move)
-                            maxAsSurcharge = entry.dbInfo.maxAsSurcharge || 0;
-                        }
-                    }
-                }
-                // eslint-disable-next-line no-unused-vars -- pre-existing write-only local (verbatim move)
-                autoGarmentStitchCount = maxStitchCount || 8000;
-                if (maxStitchTier === 'Full Back' || maxStitchCount >= 25000) {
-                    autoGarmentTier = '25000';
-                    autoGarmentPosition = 'Full Back';
+    // Update the garment/cap tier dropdowns in the modal
+    const gTierEl = document.getElementById('spr-garment-stitch-tier');
+    const gPosEl = document.getElementById('spr-garment-position');
+    const cTierEl = document.getElementById('spr-cap-stitch-tier');
+    if (gTierEl) gTierEl.value = st.autoGarmentTier;
+    if (gPosEl) gPosEl.value = st.autoGarmentPosition;
+    if (cTierEl) cTierEl.value = st.autoCapTier;
+}
+
+function _applySprInitialAssignments(embConfigOptions, designEntries, st) {
+    let maxStitchCount = 0;
+    let maxStitchTier = 'Standard';
+    let maxAsSurcharge = 0;
+    // Run initial assignment calculation
+    // (for single-design or initial defaults — sets st.autoGarmentTier/st.autoCapTier)
+    // Defer to after DOM update if using assignment dropdowns
+    if (!st.showAssignment) {
+        // Legacy single-design or no-assignment path
+        for (const entry of designEntries) {
+            if (entry.inDb) {
+                const sc = entry.dbInfo.maxStitchCount;
+                const tier = entry.dbInfo.maxStitchTier || 'Standard';
+                if (sc > maxStitchCount) {
+                    maxStitchCount = sc;
+                    maxStitchTier = tier;
                     // eslint-disable-next-line no-unused-vars -- pre-existing write-only local (verbatim move)
-                    hasFullBack = true;
-                    embConfigOptions.fbPriceTiers = fbPriceTiersFromLookup;
-                } else if (maxStitchCount > 0) {
-                    autoGarmentTier = mapStitchCountToTierValue(maxStitchCount, '');
+                    maxAsSurcharge = entry.dbInfo.maxAsSurcharge || 0;
                 }
-                // Cap tier: use smallest variant
-                let minCapStitch = Infinity;
-                for (const entry of designEntries) {
-                    if (entry.inDb) {
-                        for (const v of entry.dbInfo.variants) {
-                            if (v.stitchCount < minCapStitch) minCapStitch = v.stitchCount;
-                        }
-                    }
-                }
-                if (minCapStitch < Infinity && minCapStitch !== maxStitchCount) {
-                    autoCapTier = mapStitchCountToTierValue(minCapStitch, '');
-                }
-                // Store single design assignment
-                embConfigOptions._garmentDesignNum = designEntries[0]?.num || null;
-                embConfigOptions._capDesignNum = designEntries[0]?.num || null;
-            } else {
-                // Use default assignments to set initial tiers
-                setTimeout(_recalcDesignAssignments, 0);
             }
+        }
+         
+        st.autoGarmentStitchCount = maxStitchCount || 8000;
+        if (maxStitchTier === 'Full Back' || maxStitchCount >= 25000) {
+            st.autoGarmentTier = '25000';
+            st.autoGarmentPosition = 'Full Back';
+             
+            st.hasFullBack = true;
+            embConfigOptions.fbPriceTiers = st.fbPriceTiersFromLookup;
+        } else if (maxStitchCount > 0) {
+            st.autoGarmentTier = mapStitchCountToTierValue(maxStitchCount, '');
+        }
+        // Cap tier: use smallest variant
+        let minCapStitch = Infinity;
+        for (const entry of designEntries) {
+            if (entry.inDb) {
+                for (const v of entry.dbInfo.variants) {
+                    if (v.stitchCount < minCapStitch) minCapStitch = v.stitchCount;
+                }
+            }
+        }
+        if (minCapStitch < Infinity && minCapStitch !== maxStitchCount) {
+            st.autoCapTier = mapStitchCountToTierValue(minCapStitch, '');
+        }
+        // Store single design assignment
+        embConfigOptions._garmentDesignNum = designEntries[0]?.num || null;
+        embConfigOptions._capDesignNum = designEntries[0]?.num || null;
+    } else {
+        // Use default assignments to set initial tiers
+        setTimeout(() => _recalcSprAssignments(embConfigOptions, designEntries, st), 0);
+    }
+}
 
-        } else if (embConfigOptions.designInfo) {
-            // Fallback: show simple design text if lookup had no results and no raw design numbers
-            designBanner.style.display = '';
-            designBanner.innerHTML = `<i class="fas fa-palette" style="margin-right:6px;"></i><span>${escapeHtml(embConfigOptions.designInfo)}</span>`;
+function _applySprConfigDefaults(embConfigOptions, st) {
+    // Garment config — auto-set from design st.lookup
+    const garmentConfig = document.getElementById('spr-garment-config');
+    garmentConfig.style.display = embConfigOptions.hasGarments ? '' : 'none';
+    if (embConfigOptions.hasGarments) {
+        document.getElementById('spr-garment-position').value = st.autoGarmentPosition;
+        document.getElementById('spr-garment-stitch-tier').value = st.autoGarmentTier;
+        document.getElementById('spr-garment-digitizing').checked = embConfigOptions.digitizing || false;
+        // Sync Full Back UI if auto-detected
+        if (st.autoGarmentPosition === 'Full Back') {
+            onSprGarmentPositionChange();
+        }
+    }
+
+    // Cap config — auto-set from design st.lookup
+    const capConfig = document.getElementById('spr-cap-config');
+    capConfig.style.display = embConfigOptions.hasCaps ? '' : 'none';
+    if (embConfigOptions.hasCaps) {
+        document.getElementById('spr-cap-embellishment').value = 'embroidery';
+        document.getElementById('spr-cap-stitch-tier').value = st.autoCapTier;
+        document.getElementById('spr-cap-stitch-tier-wrapper').style.display = '';
+        document.getElementById('spr-cap-digitizing').checked = embConfigOptions.digitizing || false;
+    }
+
+    // LTM row (only if qty <= 7)
+    const ltmRow = document.getElementById('spr-ltm-row');
+    if (embConfigOptions.totalQty > 0 && embConfigOptions.totalQty <= 7) {
+        ltmRow.style.display = '';
+        // Smart default: uncheck if all products have ShopWorks pricing
+        const ltmCheckbox = document.getElementById('spr-ltm-enabled');
+        const ltmHint = document.getElementById('spr-ltm-hint');
+        if (embConfigOptions.allProductsHaveSwPrice) {
+            ltmCheckbox.checked = false;
+            ltmHint.textContent = 'ShopWorks prices may include LTM';
         } else {
-            designBanner.style.display = 'none';
-        }
-
-        // Garment config — auto-set from design lookup
-        const garmentConfig = document.getElementById('spr-garment-config');
-        garmentConfig.style.display = embConfigOptions.hasGarments ? '' : 'none';
-        if (embConfigOptions.hasGarments) {
-            document.getElementById('spr-garment-position').value = autoGarmentPosition;
-            document.getElementById('spr-garment-stitch-tier').value = autoGarmentTier;
-            document.getElementById('spr-garment-digitizing').checked = embConfigOptions.digitizing || false;
-            // Sync Full Back UI if auto-detected
-            if (autoGarmentPosition === 'Full Back') {
-                onSprGarmentPositionChange();
-            }
-        }
-
-        // Cap config — auto-set from design lookup
-        const capConfig = document.getElementById('spr-cap-config');
-        capConfig.style.display = embConfigOptions.hasCaps ? '' : 'none';
-        if (embConfigOptions.hasCaps) {
-            document.getElementById('spr-cap-embellishment').value = 'embroidery';
-            document.getElementById('spr-cap-stitch-tier').value = autoCapTier;
-            document.getElementById('spr-cap-stitch-tier-wrapper').style.display = '';
-            document.getElementById('spr-cap-digitizing').checked = embConfigOptions.digitizing || false;
-        }
-
-        // LTM row (only if qty <= 7)
-        const ltmRow = document.getElementById('spr-ltm-row');
-        if (embConfigOptions.totalQty > 0 && embConfigOptions.totalQty <= 7) {
-            ltmRow.style.display = '';
-            // Smart default: uncheck if all products have ShopWorks pricing
-            const ltmCheckbox = document.getElementById('spr-ltm-enabled');
-            const ltmHint = document.getElementById('spr-ltm-hint');
-            if (embConfigOptions.allProductsHaveSwPrice) {
-                ltmCheckbox.checked = false;
-                ltmHint.textContent = 'ShopWorks prices may include LTM';
-            } else {
-                ltmCheckbox.checked = true;
-                ltmHint.textContent = '';
-            }
-        } else {
-            ltmRow.style.display = 'none';
+            ltmCheckbox.checked = true;
+            ltmHint.textContent = '';
         }
     } else {
-        embConfigSection.style.display = 'none';
+        ltmRow.style.display = 'none';
     }
+}
+
+export function renderSprEmbConfigSection(embConfigOptions) {
+    // === EMBROIDERY CONFIG SECTION ===
+    const embConfigSection = document.getElementById('spr-embconfig-section');
+    if (!embConfigOptions) {
+        embConfigSection.style.display = 'none';
+        return;
+    }
+    embConfigSection.style.display = '';
+
+    // Deferred-closure state threaded through the stage fns above (T3 split).
+    const st = {
+        designBanner: document.getElementById('spr-design-info-banner'),
+        lookup: embConfigOptions.designLookup,
+        autoGarmentTier: '8000',
+        autoGarmentPosition: 'Left Chest',
+        autoGarmentStitchCount: 8000,
+        autoCapTier: '8000',
+        hasFullBack: false,
+        fbPriceTiersFromLookup: null,
+        showAssignment: false,
+    };
+
+    const designEntries = _buildSprDesignEntries(embConfigOptions, st);
+
+    if (designEntries.length > 0) {
+        _renderSprDesignBanner(embConfigOptions, designEntries, st);
+
+        // Wire up onchange for assignment dropdowns (deferred — options land after innerHTML)
+        if (st.showAssignment) {
+            setTimeout(() => {
+                const selects = st.designBanner.querySelectorAll('.spr-design-assign');
+                selects.forEach(sel => {
+                    sel.addEventListener('change', () => _recalcSprAssignments(embConfigOptions, designEntries, st));
+                });
+            }, 0);
+        }
+
+        _applySprInitialAssignments(embConfigOptions, designEntries, st);
+    } else if (embConfigOptions.designInfo) {
+        // Fallback: show simple design text if lookup had no results and no raw design numbers
+        st.designBanner.style.display = '';
+        st.designBanner.innerHTML = `<i class="fas fa-palette" style="margin-right:6px;"></i><span>${escapeHtml(embConfigOptions.designInfo)}</span>`;
+    } else {
+        st.designBanner.style.display = 'none';
+    }
+
+    _applySprConfigDefaults(embConfigOptions, st);
 }
 
 export function showServicePricingReview(serviceItems, productItems, embConfigOptions) {
