@@ -14,7 +14,7 @@
 
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/table-usage-audit.css?v=2026.07.10.1">
+    <link rel="stylesheet" href="/dashboards/css/table-usage-audit.css?v=2026.07.10.2">
 </head>
 <body>
     <div class="dash-shell">
@@ -69,7 +69,7 @@
                     </div>
                     <input type="search" id="tuaSearch" class="tua-search" placeholder="Search table name…" aria-label="Search">
                     <div class="tua-actions">
-                        <button class="tua-btn" id="tuaLive"><i class="fas fa-satellite-dish"></i> Check live</button>
+                        <button class="tua-btn" id="tuaLive"><i class="fas fa-rotate"></i> Refresh (live)</button>
                         <button class="tua-btn" id="tuaExport"><i class="fas fa-file-csv"></i> Export my review</button>
                     </div>
                 </div>
@@ -77,8 +77,9 @@
                     <b>usedBy:</b>
                     <span class="tua-sig code">code</span><span class="tua-sig view">view</span><span class="tua-sig rel">relationship</span><span class="tua-sig task">task</span><span class="tua-sig webhook">webhook</span>
                     &nbsp;·&nbsp; <b>code p/f/i</b> = files in proxy / frontend / inksoft &nbsp;·&nbsp; set a <b>decision</b> + <b>notes</b> as you work (saved in this browser).
+                    &nbsp;·&nbsp; <b>Refresh (live)</b> re-pulls view/rel/webhook wiring + field counts + <b>new / deleted</b> tables from Caspio; the <b>code</b> signal stays as of the 2026-07-10 snapshot (needs a repo re-scan).
                 </p>
-                <p class="tua-count" id="tuaCount"></p>
+                <p class="tua-count"><span id="tuaCount"></span> &nbsp; <span class="tua-liveinfo" id="tuaLiveInfo"></span></p>
                 <div class="tua-scroll"><table class="tua-table" id="tuaTable"></table></div>
             </div>
         </main>
@@ -87,6 +88,6 @@
     <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/dash-page-helpers.js"></script>
-    <script src="/dashboards/js/table-usage-audit.js?v=2026.07.10.1"></script>
+    <script src="/dashboards/js/table-usage-audit.js?v=2026.07.10.2"></script>
 </body>
 </html>
