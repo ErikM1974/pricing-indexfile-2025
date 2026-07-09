@@ -95,20 +95,18 @@ existing `npm start` is running in CI).
 
 ---
 
-## Phase 0b vs Phase 0b.1
+## Scenario coverage — ALL 22 WIRED (Phase 0b.1 complete; README caught up 2026-07-09)
 
-**Phase 0b (this is)** — 18/22 scenarios fully wired:
 - ✅ DTG: all 5 (single-location simple)
-- ✅ EMB: 3 of 7 (EMB-01, EMB-02, EMB-07 — standard garment 8K paths)
-- ⏳ EMB: 4 stubbed (EMB-03/04/05/06 — need DECG + AL + cap-specific runners)
+- ✅ EMB: all 7 — incl. the once-stubbed EMB-03 (primary + AL), EMB-04 (Full Back DECG),
+  EMB-05 (cap C112), EMB-06 (beanie/flat-headwear); runners live in
+  `scripts/capture-pricing-baselines.js` (per-scenario blocks ~L293-380)
 - ✅ DTF: all 5 (decoration-only, garmentCost=0)
 - ✅ SCP: all 5 (primary + additional location, screen setup, two LTM tiers)
 
-**Phase 0b.1 (next)** — wire the 4 EMB stubs:
-- EMB-03: primary 8K LC + AL 5K right sleeve → uses `service.calculateALPrice()`
-- EMB-04: Full Back 15K → uses `service.calculateDECGPrice(stitchCount)`
-- EMB-05: Cap C112 8K front → uses cap-specific data path (Embroidery_Cap_Costs)
-- EMB-06: Beanie CP90 5K → uses `ProductCategoryFilter.isFlatHeadwear()` detection
+`tests/unit/pricing-baseline-invariants.test.js` (Batch 2.2) additionally proves the
+LOCKED goldens are internally coherent (sizeTotal = perPiece×qty; Σsizes = line;
+grand = line + LTM + screen setup) — a bad re-lock can't smuggle in inconsistent numbers.
 
 ---
 

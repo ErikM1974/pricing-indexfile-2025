@@ -51,6 +51,10 @@ export const SIZE_TO_SLOT = {
 
 // All sizes that go in the Size06 "Other/Catch-All" column
 // (actual availability is fetched per product via the API)
+// NOT here by design: '2XL' and 'XXL' — both live in the DEDICATED Size05 column
+// (ShopWorks Pattern 3). XXL is the ladies 2XL with its OWN SKU suffix (_XXL, never
+// _2X), so it renders in the Size05 cell but keeps its name (Batch 2.0, 2026-07-09;
+// matches SCP's list — locked identical by size-constants-drift.test.js).
 export const SIZE06_EXTENDED_SIZES = [
     'XS', '3XL', '4XL', '5XL', '6XL', '7XL', '8XL', '9XL', '10XL',
     'OSFA', 'OSFM',
@@ -59,7 +63,7 @@ export const SIZE06_EXTENDED_SIZES = [
     'YXS', 'YS', 'YM', 'YL', 'YXL',
     '2T', '3T', '4T', '5T', '5/6T', '6T',
     'LB', 'XLB', '2XLB',
-    'XXS', '2XS', 'XXL',
+    'XXS', '2XS',
 ];
 
 // API response caches (prevent 429 rate-limit errors) — mutated in place.

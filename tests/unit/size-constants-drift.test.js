@@ -5,14 +5,12 @@
  * SIZE_TO_SLOT, SIZE06_EXTENDED_SIZES). Copies drift; drift here mis-slots
  * ShopWorks line items (the PC54 Size05/Size06 lesson).
  *
- * KNOWN, DELIBERATE delta pending Erik's verdict (2026-07-09): EMB's
- * SIZE06_EXTENDED_SIZES includes 'XXL', SCP's does not. XXL is a REAL SanMar
- * size distinct from 2XL (~589 ladies styles use _XXL, 0 overlap with _2XL —
- * shopworks-import-parser.js:42), so EMB's list is believed correct; SCP
- * routes XXL into the Size05/2XL column instead. Changing either side changes
- * push output for ladies XXL products → Erik decides before unification.
- * This test pins the delta to EXACTLY ['XXL'] and everything else identical,
- * so no NEW drift can sneak in while that decision is pending.
+ * RESOLVED 2026-07-09 (Erik + SHOPWORKS_SIZE_MAPPING.md): XXL shares the
+ * Size05 column with 2XL (ShopWorks Pattern 3) — its distinctness is the SKU
+ * suffix only (~589 ladies styles use _XXL, never _2X). Neither '2XL' nor
+ * 'XXL' belongs in the Size06 list; both render as Size05-column child rows
+ * that KEEP their names (reload paths fixed in Batch 2.0). The lists are now
+ * IDENTICAL and this test keeps them that way.
  */
 const fs = require('fs');
 const path = require('path');
@@ -45,15 +43,14 @@ describe('EMB/SCP size-constant drift lock (Batch 1.5)', () => {
     expect(emb.SIZE_TO_SLOT['2XL']).toBe('Size05');
   });
 
-  test("SIZE06 delta is EXACTLY ['XXL'] (EMB-only, pending Erik verdict) — nothing else may drift", () => {
-    const embOnly = emb.SIZE06.filter((s) => !scp.SIZE06.includes(s));
-    const scpOnly = scp.SIZE06.filter((s) => !emb.SIZE06.includes(s));
-    expect(embOnly).toEqual(['XXL']);
-    expect(scpOnly).toEqual([]);
+  test('SIZE06 lists identical (XXL delta resolved 2026-07-09)', () => {
+    expect(emb.SIZE06).toEqual(scp.SIZE06);
   });
 
-  test("neither list contains '2XL' (Size05-dedicated — LESSONS archive rule)", () => {
-    expect(emb.SIZE06).not.toContain('2XL');
-    expect(scp.SIZE06).not.toContain('2XL');
+  test("neither list contains '2XL' or 'XXL' (both Size05-dedicated)", () => {
+    for (const s of ['2XL', 'XXL']) {
+      expect(emb.SIZE06).not.toContain(s);
+      expect(scp.SIZE06).not.toContain(s);
+    }
   });
 });

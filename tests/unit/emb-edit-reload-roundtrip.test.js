@@ -47,6 +47,9 @@ const read = (rel) => fs.readFileSync(path.join(ROOT, rel), 'utf8');
 // Read once — the builder is large; re-reading per test is wasteful.
 const HTML = read('quote-builders/embroidery-quote-builder.html');
 const UTILS_SRC = read('shared_components/js/quote-builder-utils.js');
+// Classic size-config script the real page loads — createChildRow reads its bare
+// globals (SIZE_TO_SUFFIX, EXTENDED_SIZE_ORDER); without it any child-row restore throws.
+const ESC_SRC = read('shared_components/js/extended-sizes-config.js');
 const PCF_SRC = read('shared_components/js/product-category-filter.js');
 const SERVICE_SRC = read('shared_components/js/embroidery-quote-service.js');
 const SUMMARY_SRC = read('shared_components/js/quote-order-summary.js');
@@ -142,6 +145,7 @@ async function buildBuilder(routes) {
     window.document.head.appendChild(s);
   };
   inject(UTILS_SRC);
+  inject(ESC_SRC);
   inject(PCF_SRC);
   inject(SERVICE_SRC + '\n;window.EmbroideryQuoteService = EmbroideryQuoteService;');
   inject(SUMMARY_SRC);  // shared order-summary band — must load before the builder (matches production) so the builder's QuoteOrderSummary.configure() wires #order-recap / #ship-to-card
@@ -359,5 +363,51 @@ describe('P1 — OSFA-only cap reload keeps its quantity', () => {
     expect(osfaIdx).toBeGreaterThan(-1);
     expect(twoXlIdx).toBeGreaterThan(-1);
     expect(osfaIdx).toBeLessThan(twoXlIdx); // OSFA check comes first
+  });
+});
+
+// ============================================================================
+// Batch 2.0 — reloaded ladies XXL keeps its NAME (Size05 column, _XXL SKU)
+// ============================================================================
+describe('Batch 2.0 — reloaded ladies XXL stays XXL (never renamed to 2XL)', () => {
+  // ~589 ladies styles use the _XXL suffix (never _2X). The 2026-06-05 fix folded
+  // XXL into the parent 2XL input on reload, so the trailing onSizeChange minted a
+  // "2XL" child → re-save/push ordered the wrong SKU. Batch 2.0 creates the NAMED
+  // child first and primes the parent input; onSizeChange updates it in place.
+  const xxlSession = {
+    QuoteID: 'EMB-XXL-1', Status: 'Open', RevisionNumber: 1,
+    CustomerName: 'Ladies Co', CustomerEmail: 'l@co.com',
+  };
+  const xxlItem = [{
+    EmbellishmentType: 'embroidery', StyleNumber: 'LPC54', Color: 'Black', ProductName: 'Ladies Core Tee',
+    SizeBreakdown: '{"M":5,"XXL":4}', Quantity: 9, BaseUnitPrice: 12,
+  }];
+  const xxlRoutes = [
+    ['/api/quote_sessions', [xxlSession]],
+    ['/api/quote_items', xxlItem],
+    ['/api/stylesearch', [{ value: 'LPC54', label: 'Ladies Core Tee' }]],
+    ['/api/product-colors', { colors: [{ COLOR_NAME: 'Black', CATALOG_COLOR: 'Black', HEX_CODE: '#000' }], CATEGORY_NAME: 'Ladies' }],
+    ['/api/sizes-by-style-color', { data: ['S', 'M', 'L', 'XL', 'XXL'] }],
+    ['/api/service-codes', []],
+  ];
+
+  test('XXL survives reload as an XXL child row — no "2XL" child minted', async () => {
+    const { window } = await buildBuilder(xxlRoutes);
+    await window.loadQuoteForEditing('EMB-XXL-1');
+    await flush();
+
+    const children = [...window.document.querySelectorAll('tr.child-row')];
+    const xxlChild = children.find((r) => r.dataset.extendedSize === 'XXL');
+    const renamed = children.find((r) => r.dataset.extendedSize === '2XL');
+    expect(xxlChild).toBeTruthy();
+    expect(renamed).toBeUndefined();
+    // Quantity survived on the child (the display cell is what collectProductsFromTable reads).
+    expect(xxlChild.querySelector('.qty-display').textContent).toBe('4');
+  });
+
+  test("source guard: the XXL branch creates the NAMED child before priming the parent input", () => {
+    const m = SRC.match(/if \(size === '2XL' \|\| size === 'XXL'\)[\s\S]{0,1400}?\n        \} else if \(isExtendedSize\)/);
+    expect(m).not.toBeNull();
+    expect(m[0]).toMatch(/createChildRow\(rowIdNum, 'XXL', qty\)/);
   });
 });

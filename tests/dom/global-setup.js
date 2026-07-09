@@ -20,6 +20,7 @@ const ENTRIES = {
     'dtf-adapter.cjs': 'shared_components/js/builders/dtf/adapter.js',
     'dtf-quote-builder-class.cjs': 'shared_components/js/builders/dtf/quote-builder-class.js',
     'scp-persistence.cjs': 'shared_components/js/builders/scp/persistence.js',
+    'emb-persistence.cjs': 'shared_components/js/builders/emb/persistence.js',
 };
 
 module.exports = async function globalSetup() {
