@@ -1,3 +1,9 @@
+## v2026.07.09.5 (2026.07.09)
+
+- docs(caspio): v4 live-inventory snapshot + spec corrections + schema-introspection build plan (#10)
+- docs(caspio): mark integration TODO #10 DONE & LIVE (proxy v890) — no-token schema-introspection endpoints
+- docs(caspio-ref): correct bulk-insert response shape to Result[]/Status (live-spec)
+
 ## v2026.07.09.4 (2026.07.09)
 
 - fix+test: Builder A-grade Batch 2 — safety net + XXL name preservation
