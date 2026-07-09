@@ -1,3 +1,8 @@
+## v2026.07.09.8 (2026.07.09)
+
+- docs(caspio): document what Claude CAN/CAN'T create in Caspio (tables/fields YES via script; DataPages/apps UI-only)
+- refactor(emb): Batch 3 session 3 — money-engine + review-modal splits; function-length ratchet — BATCH 3 CLOSED
+
 ## v2026.07.09.7 (2026.07.09)
 
 - memory: archive 6 old resolved lessons (299→274 lines) — memory-maintain
