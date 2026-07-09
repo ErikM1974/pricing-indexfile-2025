@@ -67,6 +67,10 @@ Grade movement: every builder's money is now triple-locked (unit + E2E + capture
 
 ## Batch 3 — EMB structure `[P1 · 1-2 sessions]`
 
+> **SESSION 1 SHIPPED v2026.07.09.5 (2026-07-09):** 3.1 DONE — `confirmShopWorksImport` (~1,000 lines) → thin orchestrator + 13 step functions (exact execution order preserved; progress ledger threaded); `importProductRow` (313) → orchestrator + 3 helpers; only `renderImportPreview` (264, one HTML template) remains >150 in the file. 3.5 DONE — ONE `builders/shared/service-codes.js` for all 4 builders (utils guarded copies deleted, emb/pricing.js = re-export, SCP/DTF adapters real-import + index bridges); `normalizeImportedSize()` (was pasted 2×); `appendImportNote()` (idiom ×5); DECG/DECC twins → one loop; steps 16-16d → table-driven. 3.4 DONE — all 9 intra-module `window._*` flags → module state (save-push 2, persistence 1, pricing-sync 6); the 7 cross-file contracts stay, documented.
+> **SESSION 2 (next):** 3.3 bridge diet (~80 deletions, grep protocol) · 3.2 splits (`showServicePricingReview` ~622, `_saveAndGetLinkInner` ~453, `_recalculatePricingImpl` ~354, `updatePricingDisplay` ~353, `renderImportPreview` 264) · 3.6 remaining suppressions.
+
+
 EMB is 14,372 lines / 14 modules; 4 files hold 58%. Verbatim-move discipline throughout; capture parity after every extraction.
 
 - **3.1** Split `confirmShopWorksImport` (shopworks-import.js:729, ~1,000 lines) along its own numbered steps into 8 functions + thin orchestrator: `applyCustomerSalesRepAndOrderMeta` (759-988) · `buildReviewPayload` (990-1199) · `applyEmbConfig` (1218-1303) · `mergeExtendedSizeProducts` (1305-1346, pure) · `importAllProducts` (1348-1366, 1461-1470) · `applyServiceResults` (1368-1456, 1484-1542) · `writeImportNotes` (+`appendImportNote()` helper — same idiom pasted 5×) · `finalizeImport` (1617-1714). Then same treatment for `importProductRow` (:1745, ~310).

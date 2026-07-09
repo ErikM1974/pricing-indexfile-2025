@@ -30,6 +30,7 @@ import {
     renderDtfPushPreview,
 } from './push.js';
 import { showErrorBanner, hideErrorBanner, showFallbackPricingWarning } from '../shared/errors.js';
+import { loadServiceCodePrices, getServicePrice } from '../shared/service-codes.js';
 
 // ---- the builder class (the shell's init listener instantiates it) ----
 window.DTFQuoteBuilder = DTFQuoteBuilder;
@@ -61,6 +62,9 @@ new QuoteBuilderBase(new DtfAdapter()).init();
 window.showErrorBanner = showErrorBanner;
 window.hideErrorBanner = hideErrorBanner;
 window.showFallbackPricingWarning = showFallbackPricingWarning;
+// Service_Codes (ONE shared impl — Batch 3.5); classic callers: dtf-quote-page GRT-75
+window.loadServiceCodePrices = loadServiceCodePrices;
+window.getServicePrice = getServicePrice;
 
 window.__QB_BUILD = window.__QB_BUILD || {};
 window.__QB_BUILD.dtf = { entry: 'builders/dtf/index.js', stage: 'D2-complete' };

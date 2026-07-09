@@ -20,6 +20,7 @@
    renderOrderShippingFields, initOrderShippingListeners,
    setupKeyboardShortcuts, showToast */
 import { updatePrintConfig } from './print-config.js';
+import { loadServiceCodePrices } from '../shared/service-codes.js';
 import { setupSearchAutocomplete } from './product-rows.js';
 import { recalculatePricing, collectProductsFromTable, updateTaxCalculation } from './pricing-sync.js';
 import {

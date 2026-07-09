@@ -376,14 +376,7 @@ async function reImportNonSanmarRow(row, rowId, importData) {
 
         for (const [size, qty] of Object.entries(importData.sizes)) {
             if (qty > 0) {
-                let internalSize = size;
-                if (size === 'LG') internalSize = 'L';
-                if (size === '2X') internalSize = '2XL';
-                if (size === 'XXXL' || size === '3X') internalSize = '3XL';
-                if (size === 'XXXXL' || size === '4X') internalSize = '4XL';
-                if (size === '5X') internalSize = '5XL';
-                if (size === '6X') internalSize = '6XL';
-                // XXL stays as 'XXL' — distinct from 2XL for Ladies/Womens products
+                const internalSize = normalizeImportedSize(size);  // shared normalizer (Batch 3.5)
 
                 const sizeInput = row.querySelector(`[data-size="${internalSize}"]`);
                 const needsChildRow = IMPORT_EXTENDED_SIZES.includes(internalSize) ||
@@ -723,8 +716,962 @@ function renderImportPreview(data) {
     preview.classList.add('active');
 }
 
+/** Imported fee blocks — steps 4 (patch setup + GRT-50), 6 (art charges),
+ * 6b (rush fee), 6c (shipping fee). DOM population only. */
+function applyImportedFees(data) {
+    // 4. Handle patch setup + GRT-50 art charge fee
+    if (data.services.patchSetup) {
+        const patchSetupCheckbox = document.getElementById('cap-patch-setup');
+        if (patchSetupCheckbox) {
+            patchSetupCheckbox.checked = true;
+            const wrapper = patchSetupCheckbox.closest('.digitizing-checkbox');
+            if (wrapper) wrapper.classList.add('checked');
+        }
+        // Also set art charge input so GRT-50 fee is persisted on save
+        // (_saveFeeLineItems saves GRT-50 only when ArtCharge > 0)
+        const grt50Amount = data.services.grt50Amount || 150;
+        const artToggle = document.getElementById('art-charge-toggle');
+        const artInput = document.getElementById('art-charge');
+        if (artToggle && artInput) {
+            artToggle.checked = true;
+            artInput.disabled = false;
+            artInput.value = grt50Amount.toFixed(2);
+            const artWrapper = document.getElementById('art-charge-wrapper');
+            if (artWrapper) artWrapper.style.opacity = '1';
+            updateArtworkCharges();
+        }
+    }
+
+    // 6. Handle art charges
+    if (data.services.artCharges) {
+        const artToggle = document.getElementById('art-charge-toggle');
+        const artInput = document.getElementById('art-charge');
+        if (artToggle && artInput) {
+            artToggle.checked = true;
+            artInput.disabled = false;
+            artInput.value = data.services.artCharges.amount.toFixed(2);
+            updateArtworkCharges();
+        }
+    }
+
+    // 6b. Rush fee → fee table input
+    if (data.services.rush) {
+        const rushInput = document.getElementById('rush-fee');
+        if (rushInput) {
+            rushInput.value = data.services.rush.amount.toFixed(2);
+            rushInput.dispatchEvent(new Event('input'));
+        }
+    }
+
+    // 6c. Shipping fee
+    if (data.services.shipping) {
+        const shippingInput = document.getElementById('shipping-fee');
+        if (shippingInput) {
+            shippingInput.value = data.services.shipping.amount.toFixed(2);
+            shippingInput.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+    }
+}
+
+/** Supplement customer fields + Ship-To from CRM by EXACT email match (fuzzy
+ * results rejected — [A6] audit 2026-06-06: a wrong account would silently push
+ * the order to the wrong customer). Parser-imported values always win. */
+async function supplementCustomerFromCrm(data) {
+    // Also populate customer lookup search field for easy CRM lookup
+    const customerLookupInput = document.getElementById('customer-lookup');
+    if (customerLookupInput && data.customer.email) {
+        customerLookupInput.value = data.customer.email;
+
+        // Direct API call to find customer by email (bypass debounced dropdown)
+        // This avoids timing issues with modal close/blur events
+        if (window.customerLookupInstance) {
+            try {
+                const results = await window.customerLookupInstance.search(data.customer.email);
+
+                if (results.length > 0) {
+                    // [A6] (audit 2026-06-06): search() is FUZZY, so results[0] can be a DIFFERENT customer.
+                    // Only trust a match whose email EXACTLY equals the imported one — otherwise fall back to
+                    // an empty object so the import data is used and id_Customer / company / address are NOT
+                    // filled from a wrong account (which would silently push the order to the wrong customer).
+                    const _wantEmail = (data.customer.email || '').toLowerCase().trim();
+                    const _exact = results.find(c => (c.ContactNumbersEmail || '').toLowerCase().trim() === _wantEmail);
+                    if (!_exact) showToast('No exact CRM email match for the imported customer — using imported values (verify the Customer # before pushing).', 'info');
+                    // Parser already populated these during import; CRM supplements, doesn't replace.
+                    const contact = _exact || {};
+                    const nameEl = document.getElementById('customer-name');
+                    const emailEl = document.getElementById('customer-email');
+                    const companyEl = document.getElementById('company-name');
+                    const custNumEl = document.getElementById('customer-number');
+                    const phoneEl = document.getElementById('customer-phone');
+                    if (!nameEl.value.trim()) nameEl.value = contact.ct_NameFull || data.customer.contactName || '';
+                    if (!emailEl.value.trim()) emailEl.value = contact.ContactNumbersEmail || data.customer.email || '';
+                    if (!companyEl.value.trim()) companyEl.value = contact.CustomerCompanyName || data.customer.company || '';
+                    // Fill customer # (ShopWorks ID) from CRM if empty
+                    if (custNumEl && !custNumEl.value.trim() && contact.id_Customer) {
+                        custNumEl.value = contact.id_Customer;
+                    }
+                    if (phoneEl && !phoneEl.value.trim() && contact.Phone) {
+                        phoneEl.value = contact.Phone;
+                    }
+                    // Auto-fill Ship To from CRM contact address
+                    if (contact.State) {
+                        const stateInput = document.getElementById('ship-state');
+                        if (stateInput && !stateInput.value) stateInput.value = contact.State;
+                    }
+                    if (contact.City) {
+                        const cityInput = document.getElementById('ship-city');
+                        if (cityInput && !cityInput.value.trim()) cityInput.value = contact.City;
+                    }
+                    if (contact.Zip) {
+                        const zipInput = document.getElementById('ship-zip');
+                        if (zipInput && !zipInput.value.trim()) {
+                            zipInput.value = contact.Zip;
+                            lookupTaxRate(); // Auto-trigger tax lookup
+                        }
+                    }
+                    if (contact.Address) {
+                        const addrInput = document.getElementById('ship-address');
+                        if (addrInput && !addrInput.value.trim()) addrInput.value = contact.Address;
+                    }
+                    showToast('Customer info loaded from CRM', 'success');
+                } else {
+                    // Show that lookup ran but found nothing - not an error
+                    showToast('Customer not found in CRM - using imported values', 'info');
+                }
+            } catch (err) {
+                console.warn('[ShopWorks Import] CRM lookup failed:', err);
+                showToast('CRM lookup failed - using imported values', 'warning');
+            }
+        }
+
+        // Customer section is now always visible at top of sidebar — no need to expand
+    }
+}
+
+/** Import steps 1-7 — customer info + CRM supplement, sales rep, patch/GRT-50,
+ * art/rush/shipping fees, order details, ship-to + tax lookup, design hours.
+ * Returns the collected additional-logo list (step 5) for the review payload. */
+async function applyCustomerAndOrderMeta(data) {
+    // 1. Populate customer info
+    if (data.customer.contactName) {
+        document.getElementById('customer-name').value = data.customer.contactName;
+    }
+    if (data.customer.email) {
+        document.getElementById('customer-email').value = data.customer.email;
+    }
+    if (data.customer.company) {
+        document.getElementById('company-name').value = data.customer.company;
+    }
+
+    // CRM supplement (exact-email match only) — extracted Batch 3.1
+    await supplementCustomerFromCrm(data);
+
+    // 2. Select sales rep by email
+    if (data.salesRep.email) {
+        selectSalesRepByEmail(data.salesRep.email);
+    }
+
+    // 3. Digitizing is now configured in the Review Import Pricing modal (embroidery config section)
+
+    // 5. Collect additional logos for service pricing review
+    const additionalLogos = data.services.additionalLogos || [];
+    // Add legacy single additionalLogo if exists and not already in array
+    if (data.services.additionalLogo && !additionalLogos.some(al => al.position === data.services.additionalLogo.position)) {
+        additionalLogos.push(data.services.additionalLogo);
+    }
+
+    // Steps 4 + 6/6b/6c — imported fees (patch/GRT-50, art, rush, shipping): extracted Batch 3.1
+    applyImportedFees(data);
+
+    // 6d. Populate Order Details fields
+    if (data.purchaseOrderNumber) document.getElementById('po-number').value = data.purchaseOrderNumber;
+    if (data.orderId) document.getElementById('order-number').value = data.orderId;
+    if (data.customer.customerId) document.getElementById('customer-number').value = data.customer.customerId;
+    if (data.shipping?.method) {
+        const shipMethodEl = document.getElementById('ship-method');
+        const importedMethod = data.shipping.method;
+        // Check if imported value matches a predefined dropdown option
+        const matchingOption = Array.from(shipMethodEl.options).find(
+            opt => opt.value.toLowerCase() === importedMethod.toLowerCase()
+        );
+        if (matchingOption) {
+            shipMethodEl.value = matchingOption.value;
+        } else {
+            // Non-standard method — use "Other" with text input
+            shipMethodEl.value = 'Other';
+            document.getElementById('ship-method-other').value = importedMethod;
+        }
+        onShipMethodChange();
+    }
+    if (data.customer.phone) document.getElementById('customer-phone').value = data.customer.phone;
+    if (data.dateOrderPlaced) document.getElementById('date-order-placed').value = dateToInputValue(data.dateOrderPlaced);
+    if (data.reqShipDate) document.getElementById('req-ship-date').value = dateToInputValue(data.reqShipDate);
+    if (data.dropDeadDate) document.getElementById('drop-dead-date').value = dateToInputValue(data.dropDeadDate);
+    if (data.paymentTerms) document.getElementById('payment-terms').value = data.paymentTerms;
+
+    // Auto-expand Order Details panel if any field populated
+    const hasOrderDetails = data.purchaseOrderNumber || data.orderId || data.customer.customerId ||
+        data.shipping?.method || data.dateOrderPlaced || data.reqShipDate ||
+        data.dropDeadDate || data.paymentTerms;
+    if (hasOrderDetails) {
+        const odContent = document.getElementById('order-details-content');
+        const odChevron = document.getElementById('order-details-chevron');
+        const odBadge = document.getElementById('order-details-badge');
+        if (odContent) odContent.style.display = 'block';
+        if (odChevron) odChevron.style.transform = 'rotate(180deg)';
+        if (odBadge) odBadge.style.display = 'inline';
+    }
+
+    // 6e. Populate Ship To address and auto-lookup tax rate
+    if (data.shipping) {
+        if (data.shipping.street) document.getElementById('ship-address').value = data.shipping.street;
+        if (data.shipping.city) document.getElementById('ship-city').value = data.shipping.city;
+        if (data.shipping.state) document.getElementById('ship-state').value = data.shipping.state;
+        if (data.shipping.zip) document.getElementById('ship-zip').value = data.shipping.zip;
+
+        // Customer Pickup = local pickup at Milton, WA — auto-set for tax lookup
+        if (data.shipping.method && data.shipping.method.toLowerCase().includes('pickup') && !data.shipping.zip) {
+            document.getElementById('ship-state').value = 'WA';
+            document.getElementById('ship-zip').value = '98354';
+            document.getElementById('ship-city').value = 'Milton';
+        }
+
+        // Use DOR API to get precise tax rate from address
+        const lookupOk = await lookupTaxRate();
+        // If lookup failed and we have a back-calculated rate, use it as fallback
+        if (!lookupOk && data.orderSummary && data.orderSummary.taxRate) {
+            document.getElementById('tax-rate-input').value = data.orderSummary.taxRate.toFixed(1);
+            document.getElementById('include-tax').checked = true;
+            updateTaxCalculation();
+        }
+    } else if (data.orderSummary && data.orderSummary.taxRate) {
+        // Fallback: use back-calculated tax rate from Order Summary
+        const taxInput = document.getElementById('tax-rate-input');
+        if (taxInput) {
+            taxInput.value = data.orderSummary.taxRate.toFixed(1);
+        }
+        const taxCheckbox = document.getElementById('include-tax');
+        if (taxCheckbox) {
+            taxCheckbox.checked = true;
+        }
+        updateTaxCalculation();
+    }
+
+    // 7. Handle graphic design hours
+    if (data.services.graphicDesign) {
+        const designHoursInput = document.getElementById('graphic-design-hours');
+        if (designHoursInput) {
+            designHoursInput.value = data.services.graphicDesign.hours;
+            updateArtworkCharges();
+        }
+    }
+
+    return additionalLogos;
+}
+
+/** Look up design stitch counts (Digitized Designs, then the ShopWorks_Designs
+ * fallback for not-found numbers). Best-effort with timeouts — returns null and
+ * the modal falls back to manual selection. */
+async function lookupImportDesigns(data, progress) {
+    // Look up design stitch counts from Digitized Designs database
+    let designLookup = null;
+    if (data.designNumbersRaw && data.designNumbersRaw.length > 0) {
+        progress.step++;
+        updateImportProgress(progress.step, progress.total, 'Looking up design stitch counts...', data.designNumbersRaw.join(', '));
+        try {
+            const lookupUrl = `${APP_CONFIG.API.BASE_URL}/api/digitized-designs/lookup?designs=${encodeURIComponent(data.designNumbersRaw.join(','))}`;
+            const lookupResp = await Promise.race([
+                fetch(lookupUrl),
+                new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 8000))
+            ]);
+            if (lookupResp.ok) {
+                const lookupData = await lookupResp.json();
+                if (lookupData.success) {
+                    designLookup = lookupData;
+                }
+            }
+        } catch (err) {
+            console.warn('[ShopWorks Import] Design stitch lookup failed (will use manual selection):', err.message);
+        }
+
+        // Fallback: look up not-found designs in ShopWorks_Designs table
+        if (designLookup?.notFound?.length > 0) {
+            try {
+                const fallbackUrl = `${APP_CONFIG.API.BASE_URL}/api/digitized-designs/fallback?designs=${encodeURIComponent(designLookup.notFound.join(','))}`;
+                const fbResp = await Promise.race([
+                    fetch(fallbackUrl),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
+                ]);
+                if (fbResp.ok) {
+                    const fbData = await fbResp.json();
+                    if (fbData.success && fbData.count > 0) {
+                        designLookup.fallbackDesigns = fbData.designs;
+                        designLookup.notFound = fbData.notFound; // update to truly-not-found
+                    }
+                }
+            } catch (err) {
+                console.warn('[ShopWorks Import] Fallback design lookup failed (non-critical):', err.message);
+            }
+        }
+    }
+
+    return designLookup;
+}
+
+/** Review-payload 9a — fold the parsed additional logos into ONE AL review row
+ * (summed qty, first logo drives stitch count / digitizing / SW price). */
+function collectAlReviewItem(additionalLogos, serviceReviewItems) {
+    // 9a. Collect AL items
+    if (additionalLogos.length > 0) {
+        const alQty = additionalLogos.reduce((sum, al) => sum + al.quantity, 0);
+        const firstAL = additionalLogos[0];
+        const alStitchCount = firstAL.stitchCount || 8000;
+        const swPrice = firstAL.unitPrice || 0;
+        const apiPrice = embState.pricingCalculator
+            ? embState.pricingCalculator.getServiceUnitPrice('al', alStitchCount, alQty, false)
+            : null;
+
+        serviceReviewItems.push({
+            type: 'AL',
+            quantity: alQty,
+            stitchCount: alStitchCount,
+            isCap: false,
+            shopWorksPrice: swPrice,
+            apiPrice: apiPrice,
+            label: 'Additional Logo',
+            originalData: { additionalLogos, needsDigitizing: firstAL.needsDigitizing }
+        });
+    }
+}
+
+/** Import steps 8-10 — collect product + service review items (AL / DECG / DECC /
+ * Monogram) and build the embroidery-config options, incl. the digitized-design
+ * stitch lookup (+ ShopWorks_Designs fallback). Pure collection: no DOM writes. */
+async function buildReviewPayload(data, additionalLogos, progress) {
+    // 8. Collect product items for pricing review (deferred import)
+    const productReviewItems = [];
+    const totalProductQty = data.products.reduce((sum, p) => {
+        return sum + Object.values(p.sizes || {}).reduce((s, q) => s + q, 0);
+    }, 0);
+
+    for (const product of data.products) {
+        const isCap = isCapProduct(product.partNumber, product.description || '');
+        let sizePrices = null;
+        if (embState.pricingCalculator) {
+            try {
+                sizePrices = await embState.pricingCalculator.getProductSizePrices(
+                    product.partNumber, totalProductQty, isCap
+                );
+            } catch (e) {
+                console.warn(`[ShopWorks Import] Could not get API prices for ${product.partNumber}:`, e);
+            }
+        }
+
+        productReviewItems.push({
+            partNumber: product.partNumber,
+            color: product.color || '',
+            description: product.description || '',
+            sizes: product.sizes,
+            unitPrice: product.unitPrice || 0,
+            isCap: isCap,
+            sizePrices: sizePrices,
+            totalQty: Object.values(product.sizes || {}).reduce((s, q) => s + q, 0),
+            brand: product.brand || '',
+            // Pass through full product for importProductRow()
+            _importData: product
+        });
+    }
+
+    // 9. Collect all service items for pricing review modal
+    const serviceReviewItems = [];
+
+    // 9a. Collect AL items — extracted Batch 3.1
+    collectAlReviewItem(additionalLogos, serviceReviewItems);
+
+    // 9b. Collect DECG/DECC items (ONE loop — the two blocks were pasted twins, Batch 3.5)
+    if (data.decgItems && data.decgItems.length > 0) {
+        const flavors = [
+            { type: 'DECG', items: data.decgItems.filter(d => d.serviceType !== 'decc'), isCap: false, label: 'Customer-Supplied Garments' },
+            { type: 'DECC', items: data.decgItems.filter(d => d.serviceType === 'decc'), isCap: true, label: 'Customer-Supplied Caps' },
+        ];
+        for (const { type, items, isCap, label } of flavors) {
+            if (items.length === 0) continue;
+            let totalQty = 0, avgStitchCount = 0;
+            items.forEach(d => {
+                totalQty += d.quantity;
+                avgStitchCount += (d.stitchCount || 8000) * d.quantity;
+            });
+            avgStitchCount = totalQty > 0 ? Math.round(avgStitchCount / totalQty) : 8000;
+
+            const swTotal = items.reduce((sum, d) => sum + (d.unitPrice || 0) * d.quantity, 0);
+            const swAvg = totalQty > 0 ? swTotal / totalQty : 0;
+
+            const apiTotal = items.reduce((sum, d) => sum + (d.calculatedUnitPrice || 0) * d.quantity, 0);
+            const apiAvg = totalQty > 0 ? apiTotal / totalQty : 0;
+
+            serviceReviewItems.push({
+                type,
+                quantity: totalQty,
+                stitchCount: avgStitchCount,
+                isCap,
+                shopWorksPrice: swAvg,
+                apiPrice: apiAvg > 0 ? apiAvg : null,
+                label,
+                originalData: { items },
+            });
+        }
+    }
+
+    // 9c. Collect Monogram items
+    if (data.services.monograms && data.services.monograms.length > 0) {
+        const totalNames = data.services.monograms.reduce((sum, m) => sum + m.quantity, 0);
+        const monogramApiPrice = embState.pricingCalculator
+            ? embState.pricingCalculator.getServiceUnitPrice('monogram', 0, totalNames, false)
+            : 12.50;
+
+        serviceReviewItems.push({
+            type: 'Monogram',
+            quantity: totalNames,
+            stitchCount: 0,
+            isCap: false,
+            shopWorksPrice: 12.50,
+            apiPrice: monogramApiPrice,
+            label: 'Monogram/Name',
+            originalData: { monograms: data.services.monograms }
+        });
+    }
+
+    // 10. Build embroidery configuration options for the modal
+    const totalProductQtyForConfig = productReviewItems.reduce((sum, p) => {
+        return sum + Object.values(p.sizes || {}).reduce((s, q) => s + q, 0);
+    }, 0) + (data.decgItems ? data.decgItems.reduce((s, d) => s + d.quantity, 0) : 0);
+
+    const hasGarmentProducts = productReviewItems.some(p => !p.isCap) ||
+        (data.decgItems && data.decgItems.some(d => d.serviceType === 'decg'));
+    const hasCapProducts = productReviewItems.some(p => p.isCap) ||
+        (data.decgItems && data.decgItems.some(d => d.serviceType === 'decc'));
+    const allProductsHaveSwPrice = productReviewItems.length > 0 &&
+        productReviewItems.every(p => (p.unitPrice || 0) > 0);
+
+    // Extract design info from notes
+    let designInfo = null;
+    if (data.notes && data.notes.length > 0) {
+        const designMatch = data.notes.join(' ').match(/Design\s*#?\s*:?\s*(\d+)\s*[-–—]\s*(.+)/i);
+        if (designMatch) {
+            designInfo = `Design #${designMatch[1]} — ${designMatch[2].trim()}`;
+        }
+    }
+
+    // Design stitch-count lookup (Digitized Designs + ShopWorks_Designs fallback) — extracted Batch 3.1
+    const designLookup = await lookupImportDesigns(data, progress);
+
+    const embConfigOptions = {
+        hasGarments: hasGarmentProducts,
+        hasCaps: hasCapProducts,
+        totalQty: totalProductQtyForConfig,
+        digitizing: data.services.digitizing || false,
+        designInfo: designInfo,
+        allProductsHaveSwPrice: allProductsHaveSwPrice,
+        designLookup: designLookup,
+        designNumbers: data.designNumbers || [],
+        designNumbersRaw: data.designNumbersRaw || []
+    };
+
+    return { productReviewItems, serviceReviewItems, embConfigOptions, designLookup };
+}
+
+/** Import step 10b — apply the embroidery configuration chosen in the review modal
+ * (garment/cap logo config, Full Back sync, LTM override, design-number assignment). */
+function applyEmbConfig(embConfig) {
+    if (!embConfig) return;
+    // Garment logo config
+    embState.primaryLogo.position = embConfig.garmentPosition;
+    embState.primaryLogo.stitchCount = embConfig.garmentStitchTier;
+    embState.primaryLogo.needsDigitizing = embConfig.garmentDigitizing;
+    document.getElementById('primary-position').value = embConfig.garmentPosition;
+    document.getElementById('primary-stitches').value = embConfig.garmentStitchTier;
+    const digitizingEl = document.getElementById('primary-digitizing');
+    if (digitizingEl) {
+        digitizingEl.checked = embConfig.garmentDigitizing;
+        const wrapper = digitizingEl.closest('.digitizing-checkbox');
+        if (wrapper) wrapper.classList.toggle('checked', embConfig.garmentDigitizing);
+    }
+    // Handle Full Back position sync
+    if (embConfig.garmentPosition === 'Full Back') {
+        document.getElementById('primary-position').disabled = true;
+        const fbField = document.getElementById('fb-stitch-count-field');
+        const fbInput = document.getElementById('fb-stitch-count');
+        if (fbField) fbField.style.display = '';
+        if (fbInput) fbInput.value = embConfig.garmentStitchTier;
+        // Attach design-specific FB tier pricing for pricing engine
+        embState.primaryLogo.fbPriceTiers = embConfig.fbPriceTiers || null;
+    } else {
+        embState.primaryLogo.fbPriceTiers = null;
+    }
+
+    // Cap config
+    if (embConfig.capEmbellishment) {
+        const capEmbEl = document.getElementById('cap-embellishment-type');
+        if (capEmbEl) {
+            capEmbEl.value = embConfig.capEmbellishment;
+            handleCapEmbellishmentChange();
+        }
+        if (typeof embState.capPrimaryLogo !== 'undefined') {
+            embState.capPrimaryLogo.stitchCount = embConfig.capStitchTier;
+            const capStitchEl = document.getElementById('cap-primary-stitches');
+            if (capStitchEl) capStitchEl.value = embConfig.capStitchTier;
+        }
+        const capDigitizingEl = document.getElementById('cap-primary-digitizing');
+        if (capDigitizingEl) {
+            capDigitizingEl.checked = embConfig.capDigitizing;
+            const wrapper = capDigitizingEl.closest('.digitizing-checkbox');
+            if (wrapper) wrapper.classList.toggle('checked', embConfig.capDigitizing);
+        }
+    }
+
+    // LTM override
+    setLtmControlState('emb-ltm-panel', { enabled: embConfig.ltmEnabled });
+
+    // Store design number assignments on logo objects + update card headers + input fields
+    // Use cached design lookup data to avoid redundant API calls
+    const _importDesignLookup = getSprEmbConfigOptions()?.designLookup;
+    if (embConfig.garmentDesignNumber) {
+        embState.primaryLogo.designNumber = embConfig.garmentDesignNumber;
+        embState.primaryLogo.designName = embConfig.garmentDesignName || '';
+        updateLogoCardHeader('garment', embConfig.garmentDesignNumber);
+        const gdi = document.getElementById('garment-design-number');
+        if (gdi) gdi.value = embConfig.garmentDesignNumber;
+        const gcb = document.getElementById('garment-design-clear');
+        if (gcb) gcb.style.display = 'inline-flex';
+        // Use cached data if available (no API call), fallback to lookup
+        const gDesignData = _importDesignLookup?.designs?.[embConfig.garmentDesignNumber];
+        if (gDesignData) {
+            applyDesignFromCache('garment', gDesignData);
+        } else {
+            lookupDesignNumber('garment');
+        }
+    }
+    if (embConfig.capDesignNumber) {
+        embState.capPrimaryLogo.designNumber = embConfig.capDesignNumber;
+        embState.capPrimaryLogo.designName = embConfig.capDesignName || '';
+        updateLogoCardHeader('cap', embConfig.capDesignNumber);
+        const cdi = document.getElementById('cap-design-number');
+        if (cdi) cdi.value = embConfig.capDesignNumber;
+        const ccb = document.getElementById('cap-design-clear');
+        if (ccb) ccb.style.display = 'inline-flex';
+        const cDesignData = _importDesignLookup?.designs?.[embConfig.capDesignNumber];
+        if (cDesignData) {
+            applyDesignFromCache('cap', cDesignData);
+        } else {
+            lookupDesignNumber('cap');
+        }
+    }
+}
+
+/** Import step 11 — pure merge: the parser returns LST700 and LST700_3XL as separate
+ * products; fold extended-size variants into ONE entry (sizes summed, per-size sell
+ * overrides preserved) so importProductRow creates one parent with child rows. */
+function mergeExtendedSizeProducts(productResults) {
+    // 11. Pre-merge extended-size products before import
+    // Parser returns LST700 and LST700_3XL as separate products — merge their sizes
+    // so importProductRow creates ONE parent row with proper child rows
+    const mergedProductResults = [];
+    const baseMap = new Map(); // "PARTNUM|COLOR" → index in mergedProductResults
+
+    for (const prodResult of productResults) {
+        const product = prodResult._importData;
+        const key = `${(product.partNumber || '').toUpperCase()}|${(product.color || '').toUpperCase()}`;
+
+        if (baseMap.has(key)) {
+            // Merge sizes into existing entry
+            const mergedEntry = mergedProductResults[baseMap.get(key)];
+            const baseProduct = mergedEntry._importData;
+            for (const [size, qty] of Object.entries(product.sizes || {})) {
+                baseProduct.sizes[size] = (baseProduct.sizes[size] || 0) + qty;
+            }
+            // Preserve per-size sell price overrides from extended-size variants
+            // e.g., CC8C_2X has a different sell price than CC8C base
+            if (prodResult.overridePrice > 0) {
+                if (!mergedEntry.sellPriceOverrides) mergedEntry.sellPriceOverrides = {};
+                for (const size of Object.keys(product.sizes || {})) {
+                    mergedEntry.sellPriceOverrides[size] = prodResult.overridePrice;
+                }
+            }
+        } else {
+            baseMap.set(key, mergedProductResults.length);
+            // Deep copy to avoid mutating original
+            const entry = {
+                ...prodResult,
+                _importData: { ...product, sizes: { ...(product.sizes || {}) } }
+            };
+            // Store base product's override price for its sizes too
+            if (prodResult.overridePrice > 0) {
+                entry.sellPriceOverrides = {};
+                for (const size of Object.keys(product.sizes || {})) {
+                    entry.sellPriceOverrides[size] = prodResult.overridePrice;
+                }
+            }
+            mergedProductResults.push(entry);
+        }
+    }
+
+    return mergedProductResults;
+}
+
+/** Import step 12 — import SanMar product rows (throttled; per-row failures logged,
+ * not fatal). Returns how many imported. */
+async function importSanmarProducts(mergedProductResults, progress) {
+    // 12. Import products (deferred from step 8)
+    progress.step++;
+    updateImportProgress(progress.step, progress.total, 'Importing products...', `0 of ${mergedProductResults.length}`);
+    let productsImported = 0;
+    for (let i = 0; i < mergedProductResults.length; i++) {
+        const prodResult = mergedProductResults[i];
+        try {
+            await importProductRow(prodResult._importData, prodResult.overridePrice || 0, prodResult.sellPriceOverrides || null);
+            productsImported++;
+        } catch (err) {
+            console.warn(`Failed to import product ${prodResult.partNumber}:`, err);
+        }
+        progress.step++;
+        updateImportProgress(progress.step, progress.total, 'Importing products...', `${i + 1} of ${mergedProductResults.length}: ${prodResult.partNumber || 'product'}`);
+        // Small delay between imports to reduce API rate limiting
+        if (i < mergedProductResults.length - 1) {
+            await new Promise(resolve => setTimeout(resolve, 150));
+        }
+    }
+
+    return productsImported;
+}
+
+/** Import services from the review modal — AL (global toggle or service row when no
+ * products), DECG/DECC, Monogram (+ names into notes). */
+function applyServiceResults(serviceResults, data, progress) {
+    // 12. Process service results
+    progress.step++;
+    updateImportProgress(progress.step, progress.total, 'Processing services...', '');
+    if (serviceResults && serviceResults.length > 0) {
+        for (const result of serviceResults) {
+            const typeUpper = result.type.toUpperCase();
+
+            if (typeUpper === 'AL') {
+                if (data.products.length > 0 || (data.customProducts && data.customProducts.length > 0)) {
+                    embState.globalAL.garment.enabled = true;
+                    embState.globalAL.garment.position = 'AL';
+                    embState.globalAL.garment.stitchCount = result.stitchCount;
+                    if (result.originalData && result.originalData.needsDigitizing) {
+                        embState.globalAL.garment.needsDigitizing = true;
+                    }
+
+                    const alToggle = document.getElementById('garment-al-toggle');
+                    const alSwitch = document.getElementById('garment-al-switch');
+                    const alLabel = document.getElementById('garment-al-label');
+                    const alConfig = document.getElementById('garment-al-config-new');
+                    if (alToggle) alToggle.checked = true;
+                    if (alSwitch) alSwitch.classList.add('active');
+                    if (alLabel) alLabel.classList.add('active');
+                    if (alConfig) alConfig.classList.add('visible');
+
+                    const digitizingEl = document.getElementById('garment-al-digitizing-checkbox');
+                    if (digitizingEl) digitizingEl.checked = embState.globalAL.garment.needsDigitizing;
+
+                    if (result.originalData && result.originalData.additionalLogos && result.originalData.additionalLogos.length > 1) {
+                        const positions = result.originalData.additionalLogos.map(al => al.position || 'Additional Location');
+                        appendImportNote(`Additional logo positions: ${positions.join(', ')}`);
+                    }
+
+                    _syncALArrays();
+                }
+
+                if (data.products.length === 0 && (!data.customProducts || data.customProducts.length === 0)) {
+                    createServiceProductRow('AL', {
+                        quantity: result.quantity,
+                        unitPrice: result.unitPrice,
+                        total: result.quantity * result.unitPrice,
+                        isCap: false,
+                        position: 'Additional Location'
+                    });
+                }
+            } else if (typeUpper === 'DECG') {
+                createServiceProductRow('DECG', {
+                    quantity: result.quantity,
+                    stitchCount: result.stitchCount,
+                    unitPrice: result.unitPrice,
+                    total: result.quantity * result.unitPrice,
+                    isCap: false
+                });
+            } else if (typeUpper === 'DECC') {
+                createServiceProductRow('DECC', {
+                    quantity: result.quantity,
+                    stitchCount: result.stitchCount,
+                    unitPrice: result.unitPrice,
+                    total: result.quantity * result.unitPrice,
+                    isCap: true
+                });
+            } else if (typeUpper === 'MONOGRAM') {
+                createServiceProductRow('Monogram', {
+                    quantity: result.quantity,
+                    unitPrice: result.unitPrice,
+                    total: result.quantity * result.unitPrice,
+                    isCap: false
+                });
+
+                if (result.originalData && result.originalData.monograms) {
+                    const nameDetails = result.originalData.monograms
+                        .filter(m => m.description)
+                        .map(m => m.description)
+                        .join('\n');
+                    if (nameDetails) {
+                        appendImportNote('--- Names/Monograms ---\n' + nameDetails);
+                    }
+                }
+            }
+        }
+    }
+}
+
+/** Import step 14 — non-SanMar products as real rows; then hide variant-only parents
+ * (runs regardless — SanMar imports can produce them too). Returns count. */
+async function importCustomProducts(data) {
+    let customProductsImported = 0;
+    // 14. Handle non-SanMar products — import as real rows (uses Non_SanMar_Products DB or "Add" button)
+    if (data.customProducts && data.customProducts.length > 0) {
+        for (const product of data.customProducts) {
+            await importProductRow(product, product.unitPrice || 0);
+            customProductsImported++;
+        }
+
+        showToast(`${customProductsImported} non-SanMar product(s) imported — verify pricing`, 'info', 5000);
+    }
+
+    // Hide variant-only parents (products with no standard sizes, only extended children)
+    hideVariantOnlyParents();
+
+    return customProductsImported;
+}
+
+/** Import steps 16-16e — auxiliary service rows (sewing SEG/SECC, weights, design
+ * transfer, contract) + auto-set cap embellishment type when detected. */
+function createAuxiliaryServiceRows(data) {
+    // 16-16d. Auxiliary service rows — table-driven (four pasted near-twin blocks,
+    // Batch 3.5). `||` defaults preserved verbatim (incl. price 0 → default).
+    const AUX_SERVICE_ROWS = [
+        { key: 'sewing', pn: (s) => s.partNumber || (s.isCap ? 'SECC' : 'SEG'), qty: (s) => s.quantity || 0, price: (s) => s.unitPrice || 10.00, isCap: (s) => s.isCap || false },
+        { key: 'weights', pn: () => 'WEIGHT', qty: (w) => w.quantity || 0, price: (w) => w.unitPrice || 6.25, isCap: () => false },
+        { key: 'designTransfer', pn: () => 'DT', qty: (d) => d.quantity || 1, price: (d) => d.unitPrice || 50.00, isCap: () => false },
+        { key: 'contract', pn: (c) => (c.isCap ? 'CTR-CAP' : 'CTR-GARMT'), qty: (c) => c.quantity || 1, price: (c) => c.unitPrice || 0, isCap: (c) => c.isCap || false },
+    ];
+    for (const cfg of AUX_SERVICE_ROWS) {
+        const rows = data.services[cfg.key];
+        if (!rows || rows.length === 0) continue;
+        for (const item of rows) {
+            createServiceProductRow(cfg.pn(item), {
+                quantity: cfg.qty(item),
+                unitPrice: cfg.price(item),
+                total: cfg.qty(item) * cfg.price(item),
+                isCap: cfg.isCap(item),
+            });
+        }
+    }
+
+    // 16e. Auto-set cap embellishment type if detected (3D-EMB or Laser Patch)
+    if (data.services.capEmbellishments && data.services.capEmbellishments.length > 0) {
+        const ce = data.services.capEmbellishments[0]; // Use first detected type
+        const capEmbEl = document.getElementById('cap-embellishment-type');
+        if (capEmbEl && ce.type) {
+            capEmbEl.value = ce.type;
+            handleCapEmbellishmentChange();
+        }
+    }
+}
+
+/** Import steps 15 + 17 + 18 — write import notes (parser notes, checked review
+ * items, unrecognized-services catch-all) and auto-expand the notes section.
+ * (Step 16 runs between 15 and 17 in the orchestrator; it writes rows, not notes,
+ * so the note ORDER in the textarea is unchanged.) */
+function writeImportNotes(data) {
+    // 15. Populate notes from import (employee names, warnings, etc.)
+    if (data.notes && data.notes.length > 0) {
+        appendImportNote('--- ShopWorks Import Notes ---\n' + data.notes.join('\n'));
+    }
+
+    // 17. Import checked review items as notes (invalid items, AS-GARM/CAP, LTM)
+    if (data._allReviewItems && data._allReviewItems.length > 0) {
+        const checkedItems = [];
+        document.querySelectorAll('.review-item-check:checked').forEach(cb => {
+            const idx = parseInt(cb.dataset.index);
+            if (data._allReviewItems[idx]) checkedItems.push(data._allReviewItems[idx]);
+        });
+        if (checkedItems.length > 0) {
+            const notesEl = document.getElementById('notes');
+            if (notesEl) {
+                const reviewNotes = checkedItems.map(item => {
+                    const priceStr = item.unitPrice > 0
+                        ? ` — $${item.unitPrice.toFixed(2)}/ea × ${item.quantity || 1}`
+                        : '';
+                    return `${item.partNumber || '(no PN)'}: ${item.description || ''}${priceStr}`;
+                }).join('\n');
+                appendImportNote('--- Imported Review Items ---\n' + reviewNotes);
+            }
+        }
+    }
+
+    // 18. Catch-all: dump any unprocessed service data into notes
+    const handledServiceKeys = [
+        'digitizing', 'digitizingCodes', 'digitizingCount', 'digitizingFees',
+        'patchSetup', 'additionalLogo', 'additionalLogos',
+        'artCharges', 'graphicDesign', 'monograms',
+        'rush', 'ltmFee', 'sewing', 'additionalStitches',
+        'shipping', 'weights',
+        'designTransfer', 'contract',
+        'capEmbellishments'
+    ];
+    const unhandled = Object.entries(data.services || {})
+        .filter(([key, val]) => !handledServiceKeys.includes(key) && val != null)
+        .filter(([_key, val]) => {
+            if (Array.isArray(val) && val.length === 0) return false;
+            if (val === false) return false;
+            if (typeof val === 'number' && val === 0) return false;
+            return true;
+        });
+    if (unhandled.length > 0) {
+        const notesEl = document.getElementById('notes');
+        if (notesEl) {
+            const lines = unhandled.map(([key, val]) => {
+                if (Array.isArray(val)) {
+                    return val.map(item =>
+                        `${key.toUpperCase()}: ${item.description || item.partNumber || ''} — Qty: ${item.quantity || ''}, $${(item.unitPrice || 0).toFixed(2)}/ea`
+                    ).join('\n');
+                }
+                if (typeof val === 'object' && val.amount !== undefined) {
+                    return `${key.toUpperCase()}: $${val.amount.toFixed(2)}${val.description ? ' — ' + val.description : ''}`;
+                }
+                return `${key.toUpperCase()}: ${JSON.stringify(val)}`;
+            }).join('\n');
+            appendImportNote('--- Unrecognized Services ---\n' + lines);
+        }
+    }
+
+    // Auto-show notes section if any notes were written (import notes, AL positions, monogram names, DECG stitch counts, sewing)
+    const finalNotesEl = document.getElementById('notes');
+    if (finalNotesEl && finalNotesEl.value.trim()) {
+        const section = document.getElementById('notes-section');
+        if (section && section.classList.contains('collapsed')) {
+            section.classList.remove('collapsed');
+            const body = section.querySelector('.notes-body');
+            const icon = section.querySelector('.notes-toggle-icon');
+            if (body) body.style.display = 'block';
+            if (icon) icon.style.transform = 'rotate(180deg)';
+        }
+        updateNotesBadge();
+    }
+}
+
+/** Import finale — reprice, mark dirty, stash lastImportMetadata for the Caspio save,
+ * post-import validation (dropped-row + non-SanMar $0 banners), close modal, summary. */
+function finalizeImport({ data, productsImported, customProductsImported, productResults, serviceResults, designLookup, progress }) {
+    // Recalculate pricing
+    recalculatePricing();
+    markAsUnsaved();
+
+    // Store import metadata for Caspio save (design numbers, warnings, unmatched lines)
+    embState.lastImportMetadata = {
+        designNumbers: data.designNumbers || [],
+        digitizingCodes: data.services?.digitizingCodes || [],
+        warnings: data.warnings || [],
+        reviewItems: (data.reviewItems || []).map(r => `${r.partNumber || '(no PN)'}: ${r.description || ''}`),
+        unmatchedLines: (data.unmatchedLines || []).map(u => `[${u.section}] ${u.line}`),
+        paidToDate: data.orderSummary?.paidToDate || 0,
+        balanceAmount: data.orderSummary?.balance || 0,
+        orderNotes: data.orderNotes || '',
+        swTotal: data.orderSummary?.total || 0,
+        swSubtotal: data.orderSummary?.subtotal || 0,
+        carrier: Array.isArray(data.packageTracking) ? data.packageTracking.map(t => t.carrier).filter(Boolean).join(', ') : '',
+        trackingNumber: Array.isArray(data.packageTracking) ? data.packageTracking.map(t => t.trackingNumber).filter(Boolean).join(', ') : '',
+        parsedServices: {
+            additionalLogos: data.services?.additionalLogos || [],
+            monograms: data.services?.monograms || [],
+            weights: data.services?.weights || [],
+            digitizingFees: data.services?.digitizingFees || [],
+            decgItems: data.decgItems || []
+        },
+        designLookup: designLookup || null
+    };
+
+    // Post-import validation: detect silently dropped rows
+    const expectedProducts = (productsImported || 0) + (customProductsImported || 0);
+    const productRows = document.querySelectorAll('#product-tbody tr[data-style]:not(.child-row)');
+    const validProducts = Array.from(productRows).filter(r =>
+        r.dataset.color || r.dataset.nonSanmar === 'true'
+    ).length;
+    if (validProducts < expectedProducts) {
+        const dropped = expectedProducts - validProducts;
+        console.warn(`[ShopWorks Import] ${dropped} of ${expectedProducts} product rows may be incomplete (missing color). Check rows for issues.`);
+        showToast(`Warning: ${dropped} product(s) may not have imported correctly. Review rows for missing colors.`, 'warning', 8000);
+    }
+
+    // Flag non-SanMar products with $0 pricing + collect for summary banner
+    const nonSanMarBannerItems = [];
+    document.querySelectorAll('#product-tbody tr[data-non-sanmar="true"]').forEach(nsRow => {
+        const nsRowId = parseInt(nsRow.dataset.rowId);
+        const sellPrice = parseFloat(nsRow.dataset.sellPrice) || 0;
+        const nsStyle = nsRow.dataset.style || '';
+        const nsDesc = nsRow.dataset.productName || nsRow.querySelector('[data-field="description"]')?.value || '';
+
+        nonSanMarBannerItems.push({
+            rowId: nsRowId,
+            style: nsStyle,
+            description: nsDesc,
+            price: sellPrice
+        });
+
+        // Update price cell with pencil icon affordance
+        updateNonSanmarPriceCell(nsRow, nsRowId);
+    });
+
+    // Finalize progress
+    updateImportProgress(progress.total, progress.total, 'Import complete!', '');
+
+    // Close modal and show success
+    hideImportProgress();
+    closeShopWorksImportModal();
+
+    // Show import summary banner (non-SanMar detail)
+    // Count SanMar vs non-SanMar among all imported product rows
+    const allImportedRows = document.querySelectorAll('#product-tbody tr[data-style]:not(.child-row):not(.service-product-row):not(.fee-row)');
+    const sanMarRowCount = Array.from(allImportedRows).filter(r => r.dataset.nonSanmar !== 'true').length;
+    if (nonSanMarBannerItems.length > 0) {
+        showImportSummaryBanner(sanMarRowCount, nonSanMarBannerItems);
+    }
+
+    const summary = [];
+    if (productsImported > 0) {
+        const overrideCount = productResults.filter(p => p.overridePrice > 0).length;
+        summary.push(`${productsImported} products` + (overrideCount > 0 ? ` (${overrideCount} price override)` : ''));
+    }
+    if (customProductsImported > 0) summary.push(`${customProductsImported} non-SanMar`);
+    if (data.services.digitizing) summary.push('digitizing');
+    if (serviceResults && serviceResults.length > 0) {
+        const serviceTypes = serviceResults.map(r => r.type);
+        if (serviceTypes.includes('AL')) summary.push('additional logo(s)');
+        if (serviceTypes.includes('DECG') || serviceTypes.includes('DECC')) summary.push('customer-supplied items');
+        if (serviceTypes.includes('Monogram') || serviceTypes.includes('MONOGRAM')) summary.push('monogram/names');
+    }
+
+    showToast(`Imported: ${summary.join(', ')}`, 'success', 5000);
+
+    // Persistent warning if DECG prices used fallback values (API was down during parse)
+    if (data.decgApiFailed) {
+        showToast('DECG prices may be outdated — API was unavailable during import. Verify prices before sending.', 'warning');
+    }
+}
+
 /**
- * Confirm and execute the import
+ * Confirm and execute the import — thin orchestrator (Batch 3.1, 2026-07-09).
+ * Each numbered import step lives in its own function above/below; this keeps
+ * the exact monolith EXECUTION ORDER: customer/meta → review payload → pricing
+ * review modal (cancel aborts) → emb config → merge → SanMar products →
+ * services → non-SanMar products → aux service rows → notes → finalize.
  */
 export async function confirmShopWorksImport() {
     if (!embState.pendingShopWorksImport) {
@@ -749,454 +1696,15 @@ export async function confirmShopWorksImport() {
     btn.innerHTML = '<span class="spinner"></span> Importing...';
 
     try {
-        // Calculate total steps for progress
+        // Progress ledger threaded through the step functions (+5 = customer,
+        // services, CRM, validation, cleanup — the monolith's accounting).
         const totalProducts = (data.products?.length || 0) + (data.customProducts?.length || 0);
-        const totalSteps = totalProducts + 5; // +5 for customer, services, CRM, validation, cleanup
-        let currentStep = 0;
+        const progress = { step: 0, total: totalProducts + 5 };
+        updateImportProgress(progress.step, progress.total, 'Setting up customer info...', '');
 
-        updateImportProgress(currentStep, totalSteps, 'Setting up customer info...', '');
-
-        // 1. Populate customer info
-        if (data.customer.contactName) {
-            document.getElementById('customer-name').value = data.customer.contactName;
-        }
-        if (data.customer.email) {
-            document.getElementById('customer-email').value = data.customer.email;
-        }
-        if (data.customer.company) {
-            document.getElementById('company-name').value = data.customer.company;
-        }
-
-        // Also populate customer lookup search field for easy CRM lookup
-        const customerLookupInput = document.getElementById('customer-lookup');
-        if (customerLookupInput && data.customer.email) {
-            customerLookupInput.value = data.customer.email;
-
-            // Direct API call to find customer by email (bypass debounced dropdown)
-            // This avoids timing issues with modal close/blur events
-            if (window.customerLookupInstance) {
-                try {
-                    const results = await window.customerLookupInstance.search(data.customer.email);
-
-                    if (results.length > 0) {
-                        // [A6] (audit 2026-06-06): search() is FUZZY, so results[0] can be a DIFFERENT customer.
-                        // Only trust a match whose email EXACTLY equals the imported one — otherwise fall back to
-                        // an empty object so the import data is used and id_Customer / company / address are NOT
-                        // filled from a wrong account (which would silently push the order to the wrong customer).
-                        const _wantEmail = (data.customer.email || '').toLowerCase().trim();
-                        const _exact = results.find(c => (c.ContactNumbersEmail || '').toLowerCase().trim() === _wantEmail);
-                        if (!_exact) showToast('No exact CRM email match for the imported customer — using imported values (verify the Customer # before pushing).', 'info');
-                        // Parser already populated these during import; CRM supplements, doesn't replace.
-                        const contact = _exact || {};
-                        const nameEl = document.getElementById('customer-name');
-                        const emailEl = document.getElementById('customer-email');
-                        const companyEl = document.getElementById('company-name');
-                        const custNumEl = document.getElementById('customer-number');
-                        const phoneEl = document.getElementById('customer-phone');
-                        if (!nameEl.value.trim()) nameEl.value = contact.ct_NameFull || data.customer.contactName || '';
-                        if (!emailEl.value.trim()) emailEl.value = contact.ContactNumbersEmail || data.customer.email || '';
-                        if (!companyEl.value.trim()) companyEl.value = contact.CustomerCompanyName || data.customer.company || '';
-                        // Fill customer # (ShopWorks ID) from CRM if empty
-                        if (custNumEl && !custNumEl.value.trim() && contact.id_Customer) {
-                            custNumEl.value = contact.id_Customer;
-                        }
-                        if (phoneEl && !phoneEl.value.trim() && contact.Phone) {
-                            phoneEl.value = contact.Phone;
-                        }
-                        // Auto-fill Ship To from CRM contact address
-                        if (contact.State) {
-                            const stateInput = document.getElementById('ship-state');
-                            if (stateInput && !stateInput.value) stateInput.value = contact.State;
-                        }
-                        if (contact.City) {
-                            const cityInput = document.getElementById('ship-city');
-                            if (cityInput && !cityInput.value.trim()) cityInput.value = contact.City;
-                        }
-                        if (contact.Zip) {
-                            const zipInput = document.getElementById('ship-zip');
-                            if (zipInput && !zipInput.value.trim()) {
-                                zipInput.value = contact.Zip;
-                                lookupTaxRate(); // Auto-trigger tax lookup
-                            }
-                        }
-                        if (contact.Address) {
-                            const addrInput = document.getElementById('ship-address');
-                            if (addrInput && !addrInput.value.trim()) addrInput.value = contact.Address;
-                        }
-                        showToast('Customer info loaded from CRM', 'success');
-                    } else {
-                        // Show that lookup ran but found nothing - not an error
-                        showToast('Customer not found in CRM - using imported values', 'info');
-                    }
-                } catch (err) {
-                    console.warn('[ShopWorks Import] CRM lookup failed:', err);
-                    showToast('CRM lookup failed - using imported values', 'warning');
-                }
-            }
-
-            // Customer section is now always visible at top of sidebar — no need to expand
-        }
-
-        // 2. Select sales rep by email
-        if (data.salesRep.email) {
-            selectSalesRepByEmail(data.salesRep.email);
-        }
-
-        // 3. Digitizing is now configured in the Review Import Pricing modal (embroidery config section)
-
-        // 4. Handle patch setup + GRT-50 art charge fee
-        if (data.services.patchSetup) {
-            const patchSetupCheckbox = document.getElementById('cap-patch-setup');
-            if (patchSetupCheckbox) {
-                patchSetupCheckbox.checked = true;
-                const wrapper = patchSetupCheckbox.closest('.digitizing-checkbox');
-                if (wrapper) wrapper.classList.add('checked');
-            }
-            // Also set art charge input so GRT-50 fee is persisted on save
-            // (_saveFeeLineItems saves GRT-50 only when ArtCharge > 0)
-            const grt50Amount = data.services.grt50Amount || 150;
-            const artToggle = document.getElementById('art-charge-toggle');
-            const artInput = document.getElementById('art-charge');
-            if (artToggle && artInput) {
-                artToggle.checked = true;
-                artInput.disabled = false;
-                artInput.value = grt50Amount.toFixed(2);
-                const artWrapper = document.getElementById('art-charge-wrapper');
-                if (artWrapper) artWrapper.style.opacity = '1';
-                updateArtworkCharges();
-            }
-        }
-
-        // 5. Collect additional logos for service pricing review
-        const additionalLogos = data.services.additionalLogos || [];
-        // Add legacy single additionalLogo if exists and not already in array
-        if (data.services.additionalLogo && !additionalLogos.some(al => al.position === data.services.additionalLogo.position)) {
-            additionalLogos.push(data.services.additionalLogo);
-        }
-
-        // 6. Handle art charges
-        if (data.services.artCharges) {
-            const artToggle = document.getElementById('art-charge-toggle');
-            const artInput = document.getElementById('art-charge');
-            if (artToggle && artInput) {
-                artToggle.checked = true;
-                artInput.disabled = false;
-                artInput.value = data.services.artCharges.amount.toFixed(2);
-                updateArtworkCharges();
-            }
-        }
-
-        // 6b. Rush fee → fee table input
-        if (data.services.rush) {
-            const rushInput = document.getElementById('rush-fee');
-            if (rushInput) {
-                rushInput.value = data.services.rush.amount.toFixed(2);
-                rushInput.dispatchEvent(new Event('input'));
-            }
-        }
-
-        // 6c. Shipping fee
-        if (data.services.shipping) {
-            const shippingInput = document.getElementById('shipping-fee');
-            if (shippingInput) {
-                shippingInput.value = data.services.shipping.amount.toFixed(2);
-                shippingInput.dispatchEvent(new Event('input', { bubbles: true }));
-            }
-        }
-
-        // 6d. Populate Order Details fields
-        if (data.purchaseOrderNumber) document.getElementById('po-number').value = data.purchaseOrderNumber;
-        if (data.orderId) document.getElementById('order-number').value = data.orderId;
-        if (data.customer.customerId) document.getElementById('customer-number').value = data.customer.customerId;
-        if (data.shipping?.method) {
-            const shipMethodEl = document.getElementById('ship-method');
-            const importedMethod = data.shipping.method;
-            // Check if imported value matches a predefined dropdown option
-            const matchingOption = Array.from(shipMethodEl.options).find(
-                opt => opt.value.toLowerCase() === importedMethod.toLowerCase()
-            );
-            if (matchingOption) {
-                shipMethodEl.value = matchingOption.value;
-            } else {
-                // Non-standard method — use "Other" with text input
-                shipMethodEl.value = 'Other';
-                document.getElementById('ship-method-other').value = importedMethod;
-            }
-            onShipMethodChange();
-        }
-        if (data.customer.phone) document.getElementById('customer-phone').value = data.customer.phone;
-        if (data.dateOrderPlaced) document.getElementById('date-order-placed').value = dateToInputValue(data.dateOrderPlaced);
-        if (data.reqShipDate) document.getElementById('req-ship-date').value = dateToInputValue(data.reqShipDate);
-        if (data.dropDeadDate) document.getElementById('drop-dead-date').value = dateToInputValue(data.dropDeadDate);
-        if (data.paymentTerms) document.getElementById('payment-terms').value = data.paymentTerms;
-
-        // Auto-expand Order Details panel if any field populated
-        const hasOrderDetails = data.purchaseOrderNumber || data.orderId || data.customer.customerId ||
-            data.shipping?.method || data.dateOrderPlaced || data.reqShipDate ||
-            data.dropDeadDate || data.paymentTerms;
-        if (hasOrderDetails) {
-            const odContent = document.getElementById('order-details-content');
-            const odChevron = document.getElementById('order-details-chevron');
-            const odBadge = document.getElementById('order-details-badge');
-            if (odContent) odContent.style.display = 'block';
-            if (odChevron) odChevron.style.transform = 'rotate(180deg)';
-            if (odBadge) odBadge.style.display = 'inline';
-        }
-
-        // 6e. Populate Ship To address and auto-lookup tax rate
-        if (data.shipping) {
-            if (data.shipping.street) document.getElementById('ship-address').value = data.shipping.street;
-            if (data.shipping.city) document.getElementById('ship-city').value = data.shipping.city;
-            if (data.shipping.state) document.getElementById('ship-state').value = data.shipping.state;
-            if (data.shipping.zip) document.getElementById('ship-zip').value = data.shipping.zip;
-
-            // Customer Pickup = local pickup at Milton, WA — auto-set for tax lookup
-            if (data.shipping.method && data.shipping.method.toLowerCase().includes('pickup') && !data.shipping.zip) {
-                document.getElementById('ship-state').value = 'WA';
-                document.getElementById('ship-zip').value = '98354';
-                document.getElementById('ship-city').value = 'Milton';
-            }
-
-            // Use DOR API to get precise tax rate from address
-            const lookupOk = await lookupTaxRate();
-            // If lookup failed and we have a back-calculated rate, use it as fallback
-            if (!lookupOk && data.orderSummary && data.orderSummary.taxRate) {
-                document.getElementById('tax-rate-input').value = data.orderSummary.taxRate.toFixed(1);
-                document.getElementById('include-tax').checked = true;
-                updateTaxCalculation();
-            }
-        } else if (data.orderSummary && data.orderSummary.taxRate) {
-            // Fallback: use back-calculated tax rate from Order Summary
-            const taxInput = document.getElementById('tax-rate-input');
-            if (taxInput) {
-                taxInput.value = data.orderSummary.taxRate.toFixed(1);
-            }
-            const taxCheckbox = document.getElementById('include-tax');
-            if (taxCheckbox) {
-                taxCheckbox.checked = true;
-            }
-            updateTaxCalculation();
-        }
-
-        // 7. Handle graphic design hours
-        if (data.services.graphicDesign) {
-            const designHoursInput = document.getElementById('graphic-design-hours');
-            if (designHoursInput) {
-                designHoursInput.value = data.services.graphicDesign.hours;
-                updateArtworkCharges();
-            }
-        }
-
-        // 8. Collect product items for pricing review (deferred import)
-        const productReviewItems = [];
-        const totalProductQty = data.products.reduce((sum, p) => {
-            return sum + Object.values(p.sizes || {}).reduce((s, q) => s + q, 0);
-        }, 0);
-
-        for (const product of data.products) {
-            const isCap = isCapProduct(product.partNumber, product.description || '');
-            let sizePrices = null;
-            if (embState.pricingCalculator) {
-                try {
-                    sizePrices = await embState.pricingCalculator.getProductSizePrices(
-                        product.partNumber, totalProductQty, isCap
-                    );
-                } catch (e) {
-                    console.warn(`[ShopWorks Import] Could not get API prices for ${product.partNumber}:`, e);
-                }
-            }
-
-            productReviewItems.push({
-                partNumber: product.partNumber,
-                color: product.color || '',
-                description: product.description || '',
-                sizes: product.sizes,
-                unitPrice: product.unitPrice || 0,
-                isCap: isCap,
-                sizePrices: sizePrices,
-                totalQty: Object.values(product.sizes || {}).reduce((s, q) => s + q, 0),
-                brand: product.brand || '',
-                // Pass through full product for importProductRow()
-                _importData: product
-            });
-        }
-
-        // 9. Collect all service items for pricing review modal
-        const serviceReviewItems = [];
-
-        // 9a. Collect AL items
-        if (additionalLogos.length > 0) {
-            const alQty = additionalLogos.reduce((sum, al) => sum + al.quantity, 0);
-            const firstAL = additionalLogos[0];
-            const alStitchCount = firstAL.stitchCount || 8000;
-            const swPrice = firstAL.unitPrice || 0;
-            const apiPrice = embState.pricingCalculator
-                ? embState.pricingCalculator.getServiceUnitPrice('al', alStitchCount, alQty, false)
-                : null;
-
-            serviceReviewItems.push({
-                type: 'AL',
-                quantity: alQty,
-                stitchCount: alStitchCount,
-                isCap: false,
-                shopWorksPrice: swPrice,
-                apiPrice: apiPrice,
-                label: 'Additional Logo',
-                originalData: { additionalLogos, needsDigitizing: firstAL.needsDigitizing }
-            });
-        }
-
-        // 9b. Collect DECG/DECC items
-        if (data.decgItems && data.decgItems.length > 0) {
-            const decgGarments = data.decgItems.filter(d => d.serviceType !== 'decc');
-            const deccCaps = data.decgItems.filter(d => d.serviceType === 'decc');
-
-            if (decgGarments.length > 0) {
-                let totalQty = 0, avgStitchCount = 0;
-                decgGarments.forEach(d => {
-                    totalQty += d.quantity;
-                    avgStitchCount += (d.stitchCount || 8000) * d.quantity;
-                });
-                avgStitchCount = totalQty > 0 ? Math.round(avgStitchCount / totalQty) : 8000;
-
-                const swTotal = decgGarments.reduce((sum, d) => sum + (d.unitPrice || 0) * d.quantity, 0);
-                const swAvg = totalQty > 0 ? swTotal / totalQty : 0;
-
-                const apiTotal = decgGarments.reduce((sum, d) => sum + (d.calculatedUnitPrice || 0) * d.quantity, 0);
-                const apiAvg = totalQty > 0 ? apiTotal / totalQty : 0;
-
-                serviceReviewItems.push({
-                    type: 'DECG',
-                    quantity: totalQty,
-                    stitchCount: avgStitchCount,
-                    isCap: false,
-                    shopWorksPrice: swAvg,
-                    apiPrice: apiAvg > 0 ? apiAvg : null,
-                    label: 'Customer-Supplied Garments',
-                    originalData: { items: decgGarments }
-                });
-            }
-
-            if (deccCaps.length > 0) {
-                let totalQty = 0, avgStitchCount = 0;
-                deccCaps.forEach(d => {
-                    totalQty += d.quantity;
-                    avgStitchCount += (d.stitchCount || 8000) * d.quantity;
-                });
-                avgStitchCount = totalQty > 0 ? Math.round(avgStitchCount / totalQty) : 8000;
-
-                const swTotal = deccCaps.reduce((sum, d) => sum + (d.unitPrice || 0) * d.quantity, 0);
-                const swAvg = totalQty > 0 ? swTotal / totalQty : 0;
-
-                const apiTotal = deccCaps.reduce((sum, d) => sum + (d.calculatedUnitPrice || 0) * d.quantity, 0);
-                const apiAvg = totalQty > 0 ? apiTotal / totalQty : 0;
-
-                serviceReviewItems.push({
-                    type: 'DECC',
-                    quantity: totalQty,
-                    stitchCount: avgStitchCount,
-                    isCap: true,
-                    shopWorksPrice: swAvg,
-                    apiPrice: apiAvg > 0 ? apiAvg : null,
-                    label: 'Customer-Supplied Caps',
-                    originalData: { items: deccCaps }
-                });
-            }
-        }
-
-        // 9c. Collect Monogram items
-        if (data.services.monograms && data.services.monograms.length > 0) {
-            const totalNames = data.services.monograms.reduce((sum, m) => sum + m.quantity, 0);
-            const monogramApiPrice = embState.pricingCalculator
-                ? embState.pricingCalculator.getServiceUnitPrice('monogram', 0, totalNames, false)
-                : 12.50;
-
-            serviceReviewItems.push({
-                type: 'Monogram',
-                quantity: totalNames,
-                stitchCount: 0,
-                isCap: false,
-                shopWorksPrice: 12.50,
-                apiPrice: monogramApiPrice,
-                label: 'Monogram/Name',
-                originalData: { monograms: data.services.monograms }
-            });
-        }
-
-        // 10. Build embroidery configuration options for the modal
-        const totalProductQtyForConfig = productReviewItems.reduce((sum, p) => {
-            return sum + Object.values(p.sizes || {}).reduce((s, q) => s + q, 0);
-        }, 0) + (data.decgItems ? data.decgItems.reduce((s, d) => s + d.quantity, 0) : 0);
-
-        const hasGarmentProducts = productReviewItems.some(p => !p.isCap) ||
-            (data.decgItems && data.decgItems.some(d => d.serviceType === 'decg'));
-        const hasCapProducts = productReviewItems.some(p => p.isCap) ||
-            (data.decgItems && data.decgItems.some(d => d.serviceType === 'decc'));
-        const allProductsHaveSwPrice = productReviewItems.length > 0 &&
-            productReviewItems.every(p => (p.unitPrice || 0) > 0);
-
-        // Extract design info from notes
-        let designInfo = null;
-        if (data.notes && data.notes.length > 0) {
-            const designMatch = data.notes.join(' ').match(/Design\s*#?\s*:?\s*(\d+)\s*[-–—]\s*(.+)/i);
-            if (designMatch) {
-                designInfo = `Design #${designMatch[1]} — ${designMatch[2].trim()}`;
-            }
-        }
-
-        // Look up design stitch counts from Digitized Designs database
-        let designLookup = null;
-        if (data.designNumbersRaw && data.designNumbersRaw.length > 0) {
-            currentStep++;
-            updateImportProgress(currentStep, totalSteps, 'Looking up design stitch counts...', data.designNumbersRaw.join(', '));
-            try {
-                const lookupUrl = `${APP_CONFIG.API.BASE_URL}/api/digitized-designs/lookup?designs=${encodeURIComponent(data.designNumbersRaw.join(','))}`;
-                const lookupResp = await Promise.race([
-                    fetch(lookupUrl),
-                    new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 8000))
-                ]);
-                if (lookupResp.ok) {
-                    const lookupData = await lookupResp.json();
-                    if (lookupData.success) {
-                        designLookup = lookupData;
-                    }
-                }
-            } catch (err) {
-                console.warn('[ShopWorks Import] Design stitch lookup failed (will use manual selection):', err.message);
-            }
-
-            // Fallback: look up not-found designs in ShopWorks_Designs table
-            if (designLookup?.notFound?.length > 0) {
-                try {
-                    const fallbackUrl = `${APP_CONFIG.API.BASE_URL}/api/digitized-designs/fallback?designs=${encodeURIComponent(designLookup.notFound.join(','))}`;
-                    const fbResp = await Promise.race([
-                        fetch(fallbackUrl),
-                        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
-                    ]);
-                    if (fbResp.ok) {
-                        const fbData = await fbResp.json();
-                        if (fbData.success && fbData.count > 0) {
-                            designLookup.fallbackDesigns = fbData.designs;
-                            designLookup.notFound = fbData.notFound; // update to truly-not-found
-                        }
-                    }
-                } catch (err) {
-                    console.warn('[ShopWorks Import] Fallback design lookup failed (non-critical):', err.message);
-                }
-            }
-        }
-
-        const embConfigOptions = {
-            hasGarments: hasGarmentProducts,
-            hasCaps: hasCapProducts,
-            totalQty: totalProductQtyForConfig,
-            digitizing: data.services.digitizing || false,
-            designInfo: designInfo,
-            allProductsHaveSwPrice: allProductsHaveSwPrice,
-            designLookup: designLookup,
-            designNumbers: data.designNumbers || [],
-            designNumbersRaw: data.designNumbersRaw || []
-        };
+        const additionalLogos = await applyCustomerAndOrderMeta(data);
+        const { productReviewItems, serviceReviewItems, embConfigOptions, designLookup } =
+            await buildReviewPayload(data, additionalLogos, progress);
 
         // Show pricing review modal with embroidery config
         hideImportProgress();  // overlay (z-index 10001) blocks modal (z-index 10000)
@@ -1215,499 +1723,14 @@ export async function confirmShopWorksImport() {
         const serviceResults = reviewResults ? reviewResults.services : [];
         const productResults = reviewResults ? reviewResults.products : [];
 
-        // 10b. Apply embroidery configuration from modal
-        const embConfig = reviewResults ? reviewResults.embConfig : null;
-        if (embConfig) {
-            // Garment logo config
-            embState.primaryLogo.position = embConfig.garmentPosition;
-            embState.primaryLogo.stitchCount = embConfig.garmentStitchTier;
-            embState.primaryLogo.needsDigitizing = embConfig.garmentDigitizing;
-            document.getElementById('primary-position').value = embConfig.garmentPosition;
-            document.getElementById('primary-stitches').value = embConfig.garmentStitchTier;
-            const digitizingEl = document.getElementById('primary-digitizing');
-            if (digitizingEl) {
-                digitizingEl.checked = embConfig.garmentDigitizing;
-                const wrapper = digitizingEl.closest('.digitizing-checkbox');
-                if (wrapper) wrapper.classList.toggle('checked', embConfig.garmentDigitizing);
-            }
-            // Handle Full Back position sync
-            if (embConfig.garmentPosition === 'Full Back') {
-                document.getElementById('primary-position').disabled = true;
-                const fbField = document.getElementById('fb-stitch-count-field');
-                const fbInput = document.getElementById('fb-stitch-count');
-                if (fbField) fbField.style.display = '';
-                if (fbInput) fbInput.value = embConfig.garmentStitchTier;
-                // Attach design-specific FB tier pricing for pricing engine
-                embState.primaryLogo.fbPriceTiers = embConfig.fbPriceTiers || null;
-            } else {
-                embState.primaryLogo.fbPriceTiers = null;
-            }
-
-            // Cap config
-            if (embConfig.capEmbellishment) {
-                const capEmbEl = document.getElementById('cap-embellishment-type');
-                if (capEmbEl) {
-                    capEmbEl.value = embConfig.capEmbellishment;
-                    handleCapEmbellishmentChange();
-                }
-                if (typeof embState.capPrimaryLogo !== 'undefined') {
-                    embState.capPrimaryLogo.stitchCount = embConfig.capStitchTier;
-                    const capStitchEl = document.getElementById('cap-primary-stitches');
-                    if (capStitchEl) capStitchEl.value = embConfig.capStitchTier;
-                }
-                const capDigitizingEl = document.getElementById('cap-primary-digitizing');
-                if (capDigitizingEl) {
-                    capDigitizingEl.checked = embConfig.capDigitizing;
-                    const wrapper = capDigitizingEl.closest('.digitizing-checkbox');
-                    if (wrapper) wrapper.classList.toggle('checked', embConfig.capDigitizing);
-                }
-            }
-
-            // LTM override
-            setLtmControlState('emb-ltm-panel', { enabled: embConfig.ltmEnabled });
-
-            // Store design number assignments on logo objects + update card headers + input fields
-            // Use cached design lookup data to avoid redundant API calls
-            const _importDesignLookup = getSprEmbConfigOptions()?.designLookup;
-            if (embConfig.garmentDesignNumber) {
-                embState.primaryLogo.designNumber = embConfig.garmentDesignNumber;
-                embState.primaryLogo.designName = embConfig.garmentDesignName || '';
-                updateLogoCardHeader('garment', embConfig.garmentDesignNumber);
-                const gdi = document.getElementById('garment-design-number');
-                if (gdi) gdi.value = embConfig.garmentDesignNumber;
-                const gcb = document.getElementById('garment-design-clear');
-                if (gcb) gcb.style.display = 'inline-flex';
-                // Use cached data if available (no API call), fallback to lookup
-                const gDesignData = _importDesignLookup?.designs?.[embConfig.garmentDesignNumber];
-                if (gDesignData) {
-                    applyDesignFromCache('garment', gDesignData);
-                } else {
-                    lookupDesignNumber('garment');
-                }
-            }
-            if (embConfig.capDesignNumber) {
-                embState.capPrimaryLogo.designNumber = embConfig.capDesignNumber;
-                embState.capPrimaryLogo.designName = embConfig.capDesignName || '';
-                updateLogoCardHeader('cap', embConfig.capDesignNumber);
-                const cdi = document.getElementById('cap-design-number');
-                if (cdi) cdi.value = embConfig.capDesignNumber;
-                const ccb = document.getElementById('cap-design-clear');
-                if (ccb) ccb.style.display = 'inline-flex';
-                const cDesignData = _importDesignLookup?.designs?.[embConfig.capDesignNumber];
-                if (cDesignData) {
-                    applyDesignFromCache('cap', cDesignData);
-                } else {
-                    lookupDesignNumber('cap');
-                }
-            }
-        }
-
-        // 11. Pre-merge extended-size products before import
-        // Parser returns LST700 and LST700_3XL as separate products — merge their sizes
-        // so importProductRow creates ONE parent row with proper child rows
-        const mergedProductResults = [];
-        const baseMap = new Map(); // "PARTNUM|COLOR" → index in mergedProductResults
-
-        for (const prodResult of productResults) {
-            const product = prodResult._importData;
-            const key = `${(product.partNumber || '').toUpperCase()}|${(product.color || '').toUpperCase()}`;
-
-            if (baseMap.has(key)) {
-                // Merge sizes into existing entry
-                const mergedEntry = mergedProductResults[baseMap.get(key)];
-                const baseProduct = mergedEntry._importData;
-                for (const [size, qty] of Object.entries(product.sizes || {})) {
-                    baseProduct.sizes[size] = (baseProduct.sizes[size] || 0) + qty;
-                }
-                // Preserve per-size sell price overrides from extended-size variants
-                // e.g., CC8C_2X has a different sell price than CC8C base
-                if (prodResult.overridePrice > 0) {
-                    if (!mergedEntry.sellPriceOverrides) mergedEntry.sellPriceOverrides = {};
-                    for (const size of Object.keys(product.sizes || {})) {
-                        mergedEntry.sellPriceOverrides[size] = prodResult.overridePrice;
-                    }
-                }
-            } else {
-                baseMap.set(key, mergedProductResults.length);
-                // Deep copy to avoid mutating original
-                const entry = {
-                    ...prodResult,
-                    _importData: { ...product, sizes: { ...(product.sizes || {}) } }
-                };
-                // Store base product's override price for its sizes too
-                if (prodResult.overridePrice > 0) {
-                    entry.sellPriceOverrides = {};
-                    for (const size of Object.keys(product.sizes || {})) {
-                        entry.sellPriceOverrides[size] = prodResult.overridePrice;
-                    }
-                }
-                mergedProductResults.push(entry);
-            }
-        }
-
-        // 12. Import products (deferred from step 8)
-        currentStep++;
-        updateImportProgress(currentStep, totalSteps, 'Importing products...', `0 of ${mergedProductResults.length}`);
-        let productsImported = 0;
-        for (let i = 0; i < mergedProductResults.length; i++) {
-            const prodResult = mergedProductResults[i];
-            try {
-                await importProductRow(prodResult._importData, prodResult.overridePrice || 0, prodResult.sellPriceOverrides || null);
-                productsImported++;
-            } catch (err) {
-                console.warn(`Failed to import product ${prodResult.partNumber}:`, err);
-            }
-            currentStep++;
-            updateImportProgress(currentStep, totalSteps, 'Importing products...', `${i + 1} of ${mergedProductResults.length}: ${prodResult.partNumber || 'product'}`);
-            // Small delay between imports to reduce API rate limiting
-            if (i < mergedProductResults.length - 1) {
-                await new Promise(resolve => setTimeout(resolve, 150));
-            }
-        }
-
-        // 12. Process service results
-        currentStep++;
-        updateImportProgress(currentStep, totalSteps, 'Processing services...', '');
-        if (serviceResults && serviceResults.length > 0) {
-            for (const result of serviceResults) {
-                const typeUpper = result.type.toUpperCase();
-
-                if (typeUpper === 'AL') {
-                    if (data.products.length > 0 || (data.customProducts && data.customProducts.length > 0)) {
-                        embState.globalAL.garment.enabled = true;
-                        embState.globalAL.garment.position = 'AL';
-                        embState.globalAL.garment.stitchCount = result.stitchCount;
-                        if (result.originalData && result.originalData.needsDigitizing) {
-                            embState.globalAL.garment.needsDigitizing = true;
-                        }
-
-                        const alToggle = document.getElementById('garment-al-toggle');
-                        const alSwitch = document.getElementById('garment-al-switch');
-                        const alLabel = document.getElementById('garment-al-label');
-                        const alConfig = document.getElementById('garment-al-config-new');
-                        if (alToggle) alToggle.checked = true;
-                        if (alSwitch) alSwitch.classList.add('active');
-                        if (alLabel) alLabel.classList.add('active');
-                        if (alConfig) alConfig.classList.add('visible');
-
-                        const digitizingEl = document.getElementById('garment-al-digitizing-checkbox');
-                        if (digitizingEl) digitizingEl.checked = embState.globalAL.garment.needsDigitizing;
-
-                        if (result.originalData && result.originalData.additionalLogos && result.originalData.additionalLogos.length > 1) {
-                            const positions = result.originalData.additionalLogos.map(al => al.position || 'Additional Location');
-                            const notesEl = document.getElementById('notes');
-                            if (notesEl) {
-                                const alNote = `Additional logo positions: ${positions.join(', ')}`;
-                                notesEl.value = (notesEl.value ? notesEl.value + '\n' : '') + alNote;
-                            }
-                        }
-
-                        _syncALArrays();
-                    }
-
-                    if (data.products.length === 0 && (!data.customProducts || data.customProducts.length === 0)) {
-                        createServiceProductRow('AL', {
-                            quantity: result.quantity,
-                            unitPrice: result.unitPrice,
-                            total: result.quantity * result.unitPrice,
-                            isCap: false,
-                            position: 'Additional Location'
-                        });
-                    }
-                } else if (typeUpper === 'DECG') {
-                    createServiceProductRow('DECG', {
-                        quantity: result.quantity,
-                        stitchCount: result.stitchCount,
-                        unitPrice: result.unitPrice,
-                        total: result.quantity * result.unitPrice,
-                        isCap: false
-                    });
-                } else if (typeUpper === 'DECC') {
-                    createServiceProductRow('DECC', {
-                        quantity: result.quantity,
-                        stitchCount: result.stitchCount,
-                        unitPrice: result.unitPrice,
-                        total: result.quantity * result.unitPrice,
-                        isCap: true
-                    });
-                } else if (typeUpper === 'MONOGRAM') {
-                    createServiceProductRow('Monogram', {
-                        quantity: result.quantity,
-                        unitPrice: result.unitPrice,
-                        total: result.quantity * result.unitPrice,
-                        isCap: false
-                    });
-
-                    if (result.originalData && result.originalData.monograms) {
-                        const nameDetails = result.originalData.monograms
-                            .filter(m => m.description)
-                            .map(m => m.description)
-                            .join('\n');
-                        if (nameDetails) {
-                            const notesEl = document.getElementById('notes');
-                            if (notesEl) {
-                                notesEl.value = (notesEl.value ? notesEl.value + '\n' : '') +
-                                                '--- Names/Monograms ---\n' + nameDetails;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // 13. LTM fee handled via review items (preview checkboxes → notes)
-        // Previously targeted non-existent #additional-charges element
-
-        // 14. Handle non-SanMar products — import as real rows (uses Non_SanMar_Products DB or "Add" button)
-        let customProductsImported = 0;
-        if (data.customProducts && data.customProducts.length > 0) {
-            for (const product of data.customProducts) {
-                await importProductRow(product, product.unitPrice || 0);
-                customProductsImported++;
-            }
-
-            showToast(`${customProductsImported} non-SanMar product(s) imported — verify pricing`, 'info', 5000);
-        }
-
-        // Hide variant-only parents (products with no standard sizes, only extended children)
-        hideVariantOnlyParents();
-
-        // 15. Populate notes from import (employee names, warnings, etc.)
-        if (data.notes && data.notes.length > 0) {
-            const notesEl = document.getElementById('notes');
-            if (notesEl) {
-                const importNotes = '--- ShopWorks Import Notes ---\n' + data.notes.join('\n');
-                notesEl.value = (notesEl.value ? notesEl.value + '\n' : '') + importNotes;
-            }
-        }
-
-        // 16. Create service rows for sewing items (SEG/SECC)
-        if (data.services.sewing && data.services.sewing.length > 0) {
-            for (const s of data.services.sewing) {
-                const sewPartNumber = s.partNumber || (s.isCap ? 'SECC' : 'SEG');
-                createServiceProductRow(sewPartNumber, {
-                    quantity: s.quantity || 0,
-                    unitPrice: s.unitPrice || 10.00,
-                    total: (s.quantity || 0) * (s.unitPrice || 10.00),
-                    isCap: s.isCap || false
-                });
-            }
-        }
-
-        // 16b. Create service rows for weight items
-        if (data.services.weights && data.services.weights.length > 0) {
-            for (const w of data.services.weights) {
-                createServiceProductRow('WEIGHT', {
-                    quantity: w.quantity || 0,
-                    unitPrice: w.unitPrice || 6.25,
-                    total: (w.quantity || 0) * (w.unitPrice || 6.25),
-                    isCap: false
-                });
-            }
-        }
-
-        // 16c. Create service rows for design transfer items
-        if (data.services.designTransfer && data.services.designTransfer.length > 0) {
-            for (const dt of data.services.designTransfer) {
-                createServiceProductRow('DT', {
-                    quantity: dt.quantity || 1,
-                    unitPrice: dt.unitPrice || 50.00,
-                    total: (dt.quantity || 1) * (dt.unitPrice || 50.00),
-                    isCap: false
-                });
-            }
-        }
-
-        // 16d. Create service rows for contract items
-        if (data.services.contract && data.services.contract.length > 0) {
-            for (const ctr of data.services.contract) {
-                const ctrPN = ctr.isCap ? 'CTR-CAP' : 'CTR-GARMT';
-                createServiceProductRow(ctrPN, {
-                    quantity: ctr.quantity || 1,
-                    unitPrice: ctr.unitPrice || 0,
-                    total: (ctr.quantity || 1) * (ctr.unitPrice || 0),
-                    isCap: ctr.isCap || false
-                });
-            }
-        }
-
-        // 16e. Auto-set cap embellishment type if detected (3D-EMB or Laser Patch)
-        if (data.services.capEmbellishments && data.services.capEmbellishments.length > 0) {
-            const ce = data.services.capEmbellishments[0]; // Use first detected type
-            const capEmbEl = document.getElementById('cap-embellishment-type');
-            if (capEmbEl && ce.type) {
-                capEmbEl.value = ce.type;
-                handleCapEmbellishmentChange();
-            }
-        }
-
-        // 17. Import checked review items as notes (invalid items, AS-GARM/CAP, LTM)
-        if (data._allReviewItems && data._allReviewItems.length > 0) {
-            const checkedItems = [];
-            document.querySelectorAll('.review-item-check:checked').forEach(cb => {
-                const idx = parseInt(cb.dataset.index);
-                if (data._allReviewItems[idx]) checkedItems.push(data._allReviewItems[idx]);
-            });
-            if (checkedItems.length > 0) {
-                const notesEl = document.getElementById('notes');
-                if (notesEl) {
-                    const reviewNotes = checkedItems.map(item => {
-                        const priceStr = item.unitPrice > 0
-                            ? ` — $${item.unitPrice.toFixed(2)}/ea × ${item.quantity || 1}`
-                            : '';
-                        return `${item.partNumber || '(no PN)'}: ${item.description || ''}${priceStr}`;
-                    }).join('\n');
-                    notesEl.value = (notesEl.value ? notesEl.value + '\n' : '') +
-                        '--- Imported Review Items ---\n' + reviewNotes;
-                }
-            }
-        }
-
-        // 18. Catch-all: dump any unprocessed service data into notes
-        const handledServiceKeys = [
-            'digitizing', 'digitizingCodes', 'digitizingCount', 'digitizingFees',
-            'patchSetup', 'additionalLogo', 'additionalLogos',
-            'artCharges', 'graphicDesign', 'monograms',
-            'rush', 'ltmFee', 'sewing', 'additionalStitches',
-            'shipping', 'weights',
-            'designTransfer', 'contract',
-            'capEmbellishments'
-        ];
-        const unhandled = Object.entries(data.services || {})
-            .filter(([key, val]) => !handledServiceKeys.includes(key) && val != null)
-            .filter(([_key, val]) => {
-                if (Array.isArray(val) && val.length === 0) return false;
-                if (val === false) return false;
-                if (typeof val === 'number' && val === 0) return false;
-                return true;
-            });
-        if (unhandled.length > 0) {
-            const notesEl = document.getElementById('notes');
-            if (notesEl) {
-                const lines = unhandled.map(([key, val]) => {
-                    if (Array.isArray(val)) {
-                        return val.map(item =>
-                            `${key.toUpperCase()}: ${item.description || item.partNumber || ''} — Qty: ${item.quantity || ''}, $${(item.unitPrice || 0).toFixed(2)}/ea`
-                        ).join('\n');
-                    }
-                    if (typeof val === 'object' && val.amount !== undefined) {
-                        return `${key.toUpperCase()}: $${val.amount.toFixed(2)}${val.description ? ' — ' + val.description : ''}`;
-                    }
-                    return `${key.toUpperCase()}: ${JSON.stringify(val)}`;
-                }).join('\n');
-                notesEl.value = (notesEl.value ? notesEl.value + '\n' : '') +
-                    '--- Unrecognized Services ---\n' + lines;
-            }
-        }
-
-        // Auto-show notes section if any notes were written (import notes, AL positions, monogram names, DECG stitch counts, sewing)
-        const finalNotesEl = document.getElementById('notes');
-        if (finalNotesEl && finalNotesEl.value.trim()) {
-            const section = document.getElementById('notes-section');
-            if (section && section.classList.contains('collapsed')) {
-                section.classList.remove('collapsed');
-                const body = section.querySelector('.notes-body');
-                const icon = section.querySelector('.notes-toggle-icon');
-                if (body) body.style.display = 'block';
-                if (icon) icon.style.transform = 'rotate(180deg)';
-            }
-            updateNotesBadge();
-        }
-
-        // Recalculate pricing
-        recalculatePricing();
-        markAsUnsaved();
-
-        // Store import metadata for Caspio save (design numbers, warnings, unmatched lines)
-        embState.lastImportMetadata = {
-            designNumbers: data.designNumbers || [],
-            digitizingCodes: data.services?.digitizingCodes || [],
-            warnings: data.warnings || [],
-            reviewItems: (data.reviewItems || []).map(r => `${r.partNumber || '(no PN)'}: ${r.description || ''}`),
-            unmatchedLines: (data.unmatchedLines || []).map(u => `[${u.section}] ${u.line}`),
-            paidToDate: data.orderSummary?.paidToDate || 0,
-            balanceAmount: data.orderSummary?.balance || 0,
-            orderNotes: data.orderNotes || '',
-            swTotal: data.orderSummary?.total || 0,
-            swSubtotal: data.orderSummary?.subtotal || 0,
-            carrier: Array.isArray(data.packageTracking) ? data.packageTracking.map(t => t.carrier).filter(Boolean).join(', ') : '',
-            trackingNumber: Array.isArray(data.packageTracking) ? data.packageTracking.map(t => t.trackingNumber).filter(Boolean).join(', ') : '',
-            parsedServices: {
-                additionalLogos: data.services?.additionalLogos || [],
-                monograms: data.services?.monograms || [],
-                weights: data.services?.weights || [],
-                digitizingFees: data.services?.digitizingFees || [],
-                decgItems: data.decgItems || []
-            },
-            designLookup: designLookup || null
-        };
-
-        // Post-import validation: detect silently dropped rows
-        const expectedProducts = (productsImported || 0) + (customProductsImported || 0);
-        const productRows = document.querySelectorAll('#product-tbody tr[data-style]:not(.child-row)');
-        const validProducts = Array.from(productRows).filter(r =>
-            r.dataset.color || r.dataset.nonSanmar === 'true'
-        ).length;
-        if (validProducts < expectedProducts) {
-            const dropped = expectedProducts - validProducts;
-            console.warn(`[ShopWorks Import] ${dropped} of ${expectedProducts} product rows may be incomplete (missing color). Check rows for issues.`);
-            showToast(`Warning: ${dropped} product(s) may not have imported correctly. Review rows for missing colors.`, 'warning', 8000);
-        }
-
-        // Flag non-SanMar products with $0 pricing + collect for summary banner
-        const nonSanMarBannerItems = [];
-        document.querySelectorAll('#product-tbody tr[data-non-sanmar="true"]').forEach(nsRow => {
-            const nsRowId = parseInt(nsRow.dataset.rowId);
-            const sellPrice = parseFloat(nsRow.dataset.sellPrice) || 0;
-            const nsStyle = nsRow.dataset.style || '';
-            const nsDesc = nsRow.dataset.productName || nsRow.querySelector('[data-field="description"]')?.value || '';
-
-            nonSanMarBannerItems.push({
-                rowId: nsRowId,
-                style: nsStyle,
-                description: nsDesc,
-                price: sellPrice
-            });
-
-            // Update price cell with pencil icon affordance
-            updateNonSanmarPriceCell(nsRow, nsRowId);
-        });
-
-        // Finalize progress
-        updateImportProgress(totalSteps, totalSteps, 'Import complete!', '');
-
-        // Close modal and show success
-        hideImportProgress();
-        closeShopWorksImportModal();
-
-        // Show import summary banner (non-SanMar detail)
-        // Count SanMar vs non-SanMar among all imported product rows
-        const allImportedRows = document.querySelectorAll('#product-tbody tr[data-style]:not(.child-row):not(.service-product-row):not(.fee-row)');
-        const sanMarRowCount = Array.from(allImportedRows).filter(r => r.dataset.nonSanmar !== 'true').length;
-        if (nonSanMarBannerItems.length > 0) {
-            showImportSummaryBanner(sanMarRowCount, nonSanMarBannerItems);
-        }
-
-        const summary = [];
-        if (productsImported > 0) {
-            const overrideCount = productResults.filter(p => p.overridePrice > 0).length;
-            summary.push(`${productsImported} products` + (overrideCount > 0 ? ` (${overrideCount} price override)` : ''));
-        }
-        if (customProductsImported > 0) summary.push(`${customProductsImported} non-SanMar`);
-        if (data.services.digitizing) summary.push('digitizing');
-        if (serviceResults && serviceResults.length > 0) {
-            const serviceTypes = serviceResults.map(r => r.type);
-            if (serviceTypes.includes('AL')) summary.push('additional logo(s)');
-            if (serviceTypes.includes('DECG') || serviceTypes.includes('DECC')) summary.push('customer-supplied items');
-            if (serviceTypes.includes('Monogram') || serviceTypes.includes('MONOGRAM')) summary.push('monogram/names');
-        }
-
-        showToast(`Imported: ${summary.join(', ')}`, 'success', 5000);
-
-        // Persistent warning if DECG prices used fallback values (API was down during parse)
-        if (data.decgApiFailed) {
-            showToast('DECG prices may be outdated — API was unavailable during import. Verify prices before sending.', 'warning');
-        }
+        applyEmbConfig(reviewResults ? reviewResults.embConfig : null);
+        const mergedProductResults = mergeExtendedSizeProducts(productResults);
+        const productsImported = await importSanmarProducts(mergedProductResults, progress);
+        applyServiceResults(serviceResults, data, progress);
+        const customProductsImported = await importCustomProducts(data);
+        createAuxiliaryServiceRows(data);
+        writeImportNotes(data);
+        finalizeImport({ data, productsImported, customProductsImported, productResults, serviceResults, designLookup, progress });
 
     } catch (error) {
         console.error('Import failed:', error);
@@ -1718,6 +1741,7 @@ export async function confirmShopWorksImport() {
         btn.innerHTML = '<i class="fas fa-check"></i> Import Items';
     }
 }
+
 
 /**
  * Select sales rep by email address
@@ -1736,15 +1760,40 @@ function selectSalesRepByEmail(email) {
 }
 
 /**
- * Import a single product row from ShopWorks data
+ * Normalize a ShopWorks-imported size label to the builder's internal format.
+ * ONE copy (Batch 3.5) — used by the import row path AND the non-SanMar
+ * re-import path, which had drifted apart once already.
+ * XXL stays 'XXL' — distinct ladies size (~589 styles use _XXL, never _2X).
+ */
+function normalizeImportedSize(size) {
+    if (size === 'LG') return 'L';
+    if (size === '2X') return '2XL';
+    if (size === 'XXXL' || size === '3X') return '3XL';
+    if (size === 'XXXXL' || size === '4X') return '4XL';
+    if (size === '5X') return '5XL';
+    if (size === '6X') return '6XL';
+    return size;
+}
+
+/** Append one block to the quote Notes textarea (newline-separated). */
+function appendImportNote(text) {
+    if (!text) return;
+    const notesEl = document.getElementById('notes');
+    if (!notesEl) return;
+    notesEl.value = (notesEl.value ? notesEl.value + '\n' : '') + text;
+}
+
+
+/**
+ * Import a single product row from ShopWorks data — thin orchestrator
+ * (Batch 3.1): create + stash → style load → non-SanMar / not-found branches →
+ * color select → sizes → reprice trigger.
  */
 async function importProductRow(product, sellPriceOverride = 0, sellPriceOverrides = null) {
-    // eslint-disable-next-line no-unused-vars -- pre-existing write-only local (verbatim move)
-    const totalQty = Object.values(product.sizes).reduce((sum, q) => sum + q, 0);
-
-    // Add a new row
-    addNewRow();
-    const row = document.querySelector('tr.new-row');
+    // Add a new row — target it by the id addNewRow() mints (LESSONS 2026-07-06);
+    // still strip the highlight class so bulk imports don't strobe.
+    const newRowId = addNewRow();
+    const row = document.getElementById(`row-${newRowId}`);
     if (!row) throw new Error('Failed to create row');
     row.classList.remove('new-row');  // Remove immediately to prevent collision with next import
 
@@ -1809,106 +1858,129 @@ async function importProductRow(product, sellPriceOverride = 0, sellPriceOverrid
 
     // Row is still "Not found" — force-import as non-SanMar so sizes work
     if (row.dataset.notFound === 'true') {
-        // Auto-create non-SanMar product in Caspio for future imports
-        if (product.partNumber) {
-            try {
-                const parsed = parseShopWorksDescription(product.description || '', product.partNumber);
-                const createPayload = {
-                    StyleNumber: product.partNumber,
-                    Brand: parsed.brand || product.brand || 'Unknown',
-                    ProductName: parsed.name || product.description || product.partNumber,
-                    Category: parsed.category || '',
-                    DefaultSellPrice: sellPriceOverride || product.unitPrice || 0,
-                    DefaultColors: product.color || '',
-                    AvailableSizes: Object.keys(product.sizes || {}).join(','),
-                    PricingMethod: 'FIXED',
-                    Notes: 'Auto-created from ShopWorks import'
-                };
-                const resp = await fetch(`${APP_CONFIG.API.BASE_URL}/api/non-sanmar-products`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(createPayload)
-                });
-                if (resp.ok) {
-                    showToast(`Auto-added ${product.partNumber} to product database`, 'success', 3000);
-                }
-                // If POST fails (duplicate, etc.), continue silently — force-import still works
-            } catch (e) {
-                console.warn(`[Import] Auto-create non-SanMar failed for ${product.partNumber}:`, e.message);
-            }
-        }
-
-        // Convert from "Not Found" to non-SanMar so size inputs get enabled
-        row.dataset.nonSanmar = 'true';
-        delete row.dataset.notFound;
-
-        // Remove the "Add" button (no longer needed since we're force-importing)
-        const addBtn = row.querySelector('.btn-add-nonsanmar');
-        if (addBtn) addBtn.remove();
-
-        // Set sell price from pricing review modal
-        if (sellPriceOverride > 0) {
-            row.dataset.sellPrice = sellPriceOverride.toString();
-        }
-
-        // Preserve ShopWorks description as ProductName for all output paths
-        const importData = JSON.parse(row.dataset.importData || '{}');
-        if (importData.description) {
-            const descInput = row.querySelector('[data-field="description"]');
-            if (descInput) descInput.value = importData.description;
-            row.dataset.productName = importData.description;
-        }
-
-        // Detect cap vs garment and enable appropriate size inputs
-        const isCap = isCapProduct(product.partNumber, product.description || '');
-        if (isCap) {
-            row.dataset.isCap = 'true';
-            const capBadge = document.getElementById(`cap-badge-${rowId}`);
-            if (capBadge) capBadge.style.display = 'inline-flex';
-        } else {
-            row.dataset.isCap = 'false';
-        }
-
-        // OSFA detection — works for caps, beanies, bags (independent of isCap)
-        const hasOSFA = product.sizes && product.sizes['OSFA'];
-        const sizeKeys = product.sizes ? Object.keys(product.sizes) : [];
-        const isOsfaOnly = hasOSFA && sizeKeys.length === 1;
-        if (isOsfaOnly) {
-            row.dataset.sizeCategory = 'osfa-only';
-            row.dataset.isOsfaOnly = 'true';
-            row.dataset.osfaQty = product.sizes['OSFA'];
-            row.dataset.availableSizes = JSON.stringify(['OSFA']);
-            if (isCap) row.dataset.capSizes = JSON.stringify(['OSFA']);
-            const qtyDisplay = document.getElementById(`row-qty-${rowId}`);
-            if (qtyDisplay) qtyDisplay.textContent = product.sizes['OSFA'];
-        } else {
-            // Standard sizes (S, M, L, etc.) — enable all size inputs
-            row.querySelectorAll('.size-input').forEach(input => input.disabled = false);
-        }
-
-        // Reorder row into correct section (caps vs garments)
-        reorderRowByProductType(row);
-        updateCapLogoSectionVisibility();
-
-        // Now apply color and sizes — inputs are enabled so quantities will set
-        // For OSFA caps, sizes are already set above; reImportNonSanmarRow
-        // handles color and any non-OSFA sizes
-        const importColor = product.color || 'N/A';
-        row.dataset.color = importColor;
-        row.dataset.catalogColor = importColor;
-
-        await reImportNonSanmarRow(row, rowId, {
-            color: importColor,
-            sizes: product.sizes,
-            sellPriceOverrides: sellPriceOverrides
-        });
-
-        // Trigger size change to update qty display and pricing
-        onSizeChange(rowId);
-        return row;
+        return forceImportAsNonSanmar(row, rowId, product, sellPriceOverride, sellPriceOverrides);
     }
 
-    // 4. SELECT COLOR for SanMar products (this enables size inputs!)
+    await selectImportedColor(row, rowId, product, sellPriceOverride);
+    applyImportedSizes(row, rowId, product, sellPriceOverride, sellPriceOverrides);
+
+    // 6. Trigger size change to recalculate
+    onSizeChange(rowId);
+    return row;
+}
+
+/**
+ * Force-import a "Not found" part number as a non-SanMar row: auto-create it in
+ * the Non_SanMar_Products DB (best-effort), convert the row, detect cap/OSFA,
+ * reorder into the right section, then apply color + sizes via the non-SanMar
+ * re-import path. Returns the row.
+ */
+async function forceImportAsNonSanmar(row, rowId, product, sellPriceOverride, sellPriceOverrides) {
+    // Auto-create non-SanMar product in Caspio for future imports
+    if (product.partNumber) {
+        try {
+            const parsed = parseShopWorksDescription(product.description || '', product.partNumber);
+            const createPayload = {
+                StyleNumber: product.partNumber,
+                Brand: parsed.brand || product.brand || 'Unknown',
+                ProductName: parsed.name || product.description || product.partNumber,
+                Category: parsed.category || '',
+                DefaultSellPrice: sellPriceOverride || product.unitPrice || 0,
+                DefaultColors: product.color || '',
+                AvailableSizes: Object.keys(product.sizes || {}).join(','),
+                PricingMethod: 'FIXED',
+                Notes: 'Auto-created from ShopWorks import'
+            };
+            const resp = await fetch(`${APP_CONFIG.API.BASE_URL}/api/non-sanmar-products`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(createPayload)
+            });
+            if (resp.ok) {
+                showToast(`Auto-added ${product.partNumber} to product database`, 'success', 3000);
+            }
+            // If POST fails (duplicate, etc.), continue silently — force-import still works
+        } catch (e) {
+            console.warn(`[Import] Auto-create non-SanMar failed for ${product.partNumber}:`, e.message);
+        }
+    }
+
+    // Convert from "Not Found" to non-SanMar so size inputs get enabled
+    row.dataset.nonSanmar = 'true';
+    delete row.dataset.notFound;
+
+    // Remove the "Add" button (no longer needed since we're force-importing)
+    const addBtn = row.querySelector('.btn-add-nonsanmar');
+    if (addBtn) addBtn.remove();
+
+    // Set sell price from pricing review modal
+    if (sellPriceOverride > 0) {
+        row.dataset.sellPrice = sellPriceOverride.toString();
+    }
+
+    // Preserve ShopWorks description as ProductName for all output paths
+    const importData = JSON.parse(row.dataset.importData || '{}');
+    if (importData.description) {
+        const descInput = row.querySelector('[data-field="description"]');
+        if (descInput) descInput.value = importData.description;
+        row.dataset.productName = importData.description;
+    }
+
+    // Detect cap vs garment and enable appropriate size inputs
+    const isCap = isCapProduct(product.partNumber, product.description || '');
+    if (isCap) {
+        row.dataset.isCap = 'true';
+        const capBadge = document.getElementById(`cap-badge-${rowId}`);
+        if (capBadge) capBadge.style.display = 'inline-flex';
+    } else {
+        row.dataset.isCap = 'false';
+    }
+
+    // OSFA detection — works for caps, beanies, bags (independent of isCap)
+    const hasOSFA = product.sizes && product.sizes['OSFA'];
+    const sizeKeys = product.sizes ? Object.keys(product.sizes) : [];
+    const isOsfaOnly = hasOSFA && sizeKeys.length === 1;
+    if (isOsfaOnly) {
+        row.dataset.sizeCategory = 'osfa-only';
+        row.dataset.isOsfaOnly = 'true';
+        row.dataset.osfaQty = product.sizes['OSFA'];
+        row.dataset.availableSizes = JSON.stringify(['OSFA']);
+        if (isCap) row.dataset.capSizes = JSON.stringify(['OSFA']);
+        const qtyDisplay = document.getElementById(`row-qty-${rowId}`);
+        if (qtyDisplay) qtyDisplay.textContent = product.sizes['OSFA'];
+    } else {
+        // Standard sizes (S, M, L, etc.) — enable all size inputs
+        row.querySelectorAll('.size-input').forEach(input => input.disabled = false);
+    }
+
+    // Reorder row into correct section (caps vs garments)
+    reorderRowByProductType(row);
+    updateCapLogoSectionVisibility();
+
+    // Now apply color and sizes — inputs are enabled so quantities will set
+    // For OSFA caps, sizes are already set above; reImportNonSanmarRow
+    // handles color and any non-OSFA sizes
+    const importColor = product.color || 'N/A';
+    row.dataset.color = importColor;
+    row.dataset.catalogColor = importColor;
+
+    await reImportNonSanmarRow(row, rowId, {
+        color: importColor,
+        sizes: product.sizes,
+        sellPriceOverrides: sellPriceOverrides
+    });
+
+    // Trigger size change to update qty display and pricing
+    onSizeChange(rowId);
+    return row;
+}
+
+/**
+ * Select the imported color on a SanMar row (exact match on COLOR_NAME /
+ * CATALOG_COLOR, then fuzzy fallback for abbreviations like "Athletic Hthr").
+ * Re-applies the sell-price override selectColor clears.
+ */
+async function selectImportedColor(row, rowId, product, sellPriceOverride) {
     if (product.color) {
         const pickerDropdown = row.querySelector('.color-picker-dropdown');
         if (pickerDropdown) {
@@ -1950,7 +2022,14 @@ async function importProductRow(product, sellPriceOverride = 0, sellPriceOverrid
             }
         }
     }
+}
 
+/**
+ * Apply imported size quantities: cap-size mapping, OSFA-only parents, child
+ * rows for extended/2XL/XXL sizes (with per-size sell overrides), standard
+ * sizes straight into parent inputs.
+ */
+function applyImportedSizes(row, rowId, product, sellPriceOverride, sellPriceOverrides) {
     // 5. Set sizes (inputs should now be enabled from selectColor)
     // Extended sizes (from SIZE06_EXTENDED_SIZES) need child rows, not direct input
     // Also: 2XL typically uses Size05 column, but if disabled, treat it as extended size
@@ -1977,15 +2056,8 @@ async function importProductRow(product, sellPriceOverride = 0, sellPriceOverrid
 
     for (const [size, qty] of Object.entries(product.sizes)) {
         if (qty > 0) {
-            // Map imported size to our internal format
-            let internalSize = size;
-            if (size === 'LG') internalSize = 'L';
-            if (size === '2X') internalSize = '2XL';
-            // XXL stays as 'XXL' — distinct size for Ladies/Womens products (589 products use _XXL, not _2XL)
-            if (size === 'XXXL' || size === '3X') internalSize = '3XL';
-            if (size === 'XXXXL' || size === '4X') internalSize = '4XL';
-            if (size === '5X') internalSize = '5XL';
-            if (size === '6X') internalSize = '6XL';
+            // Map imported size to our internal format (shared normalizer — Batch 3.5)
+            let internalSize = normalizeImportedSize(size);
 
             // Apply cap size mapping if this is a cap
             if (isCapRow && CAP_SIZE_MAP[internalSize.toUpperCase()]) {
@@ -2044,8 +2116,4 @@ async function importProductRow(product, sellPriceOverride = 0, sellPriceOverrid
             }
         }
     }
-
-    // 6. Trigger size change to recalculate
-    onSizeChange(rowId);
-    return row;
 }

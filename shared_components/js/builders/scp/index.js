@@ -78,6 +78,7 @@ import {
     handleCellKeydown,
 } from './product-rows.js';
 import { showErrorBanner, hideErrorBanner, showFallbackPricingWarning } from '../shared/errors.js';
+import { loadServiceCodePrices, getServicePrice } from '../shared/service-codes.js';
 
 // ---- print-config ----
 window.updatePrintConfig = updatePrintConfig;
@@ -155,6 +156,9 @@ new QuoteBuilderBase(new ScpAdapter()).init();
 window.showErrorBanner = showErrorBanner;
 window.hideErrorBanner = hideErrorBanner;
 window.showFallbackPricingWarning = showFallbackPricingWarning;
+// Service_Codes (ONE shared impl — Batch 3.5); classic callers: screenprint-quote-service SPSU
+window.loadServiceCodePrices = loadServiceCodePrices;
+window.getServicePrice = getServicePrice;
 
 window.__QB_BUILD = window.__QB_BUILD || {};
 window.__QB_BUILD.scp = { entry: 'builders/scp/index.js', stage: 'S2-complete' };
