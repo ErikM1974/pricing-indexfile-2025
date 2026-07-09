@@ -1,3 +1,8 @@
+## v2026.07.09.10 (2026.07.09)
+
+- docs(dtf): update 2 stale HTML comments referencing the deleted dtf-quote-page.js
+- feat(dashboards): Caspio Table Audit cleanup tool (admin-only) — 163 tables + usage signals
+
 ## v2026.07.09.9 (2026.07.09)
 
 - refactor(dtf): Batch 4.3+4.4 — dtf-quote-page.js migrated into the bundle; quick wins
