@@ -1,3 +1,7 @@
+## v2026.07.09.4 (2026.07.09)
+
+- fix+test: Builder A-grade Batch 2 — safety net + XXL name preservation
+
 ## v2026.07.09.3 (2026.07.09)
 
 - docs: Batch-1 plan status — XXL verdict corrected (Size05 column, suffix-only distinction); tax identifiers flipped v2026.07.09.2
