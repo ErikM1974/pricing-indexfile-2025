@@ -25,6 +25,108 @@
 | 7 | Gate customer-portal WRITE actions (approve/revise/rush/upload) | ⏳ pending |
 | 8 | Durable sessions — **cookie-session** (NOT Redis; free, no add-on); fixes logout-on-deploy | ✅ **DONE & LIVE** (FE `dd2fb1e5`) |
 | 9 | Gate the public proxy staff-data endpoints (side-door) — **AUDITED 2026-06-29: 98 HIGH/CRITICAL open endpoints, ~5 CRITICAL anonymous money/data holes** | 🔴 plan ready → [PROXY_SIDE_DOOR_AUDIT_2026-06.md](PROXY_SIDE_DOOR_AUDIT_2026-06.md) |
+| 10 | **Read-only Caspio SCHEMA introspection endpoint** (OPEN/no-token — lets tooling + Claude enumerate all tables/views/apps/webhooks + any table's fields via the proxy's standing creds, so no per-session bearer handoff) | ✅ **DONE & LIVE 2026-07-10 (proxy v890, commit `e5e13a4`)** — 6 endpoints under `/api/caspio-schema/*`, verified in prod → §#10 below |
+
+### #10 — Caspio SCHEMA introspection endpoint (no-token standing access) — NEW 2026-07-09
+> ✅ **DONE & LIVE 2026-07-10** — proxy release **v890**, commit `e5e13a4` (`src/routes/caspio-schema.js` + `server.js` mount, pathspec-committed clear of concurrent art/box-upload WIP). Verified in prod (public, no token): `/tables`=163, `/tables/Quote_Sessions/fields`=100, `/views`=19, `/webhooks`=24, `/apps`=14 bridge+1 flex, `/full`=163, unknown table → 404. Base = `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/caspio-schema/*`. Confirmed integration points: `getCaspioAccessToken()`→token string; proxy uses **axios** (not fetch); v4 base derived from `config.caspio.apiBaseUrl` (v3→v4); the v3 OAuth token works on v4. Postman auto-synced by the proxy's pre-commit hook. **Next session: no token needed — just curl the proxy.**
+
+**Why:** Erik doesn't want to hand Claude a bearer token every session, but wants Claude to be able to "look at Swagger / all tables + assets." Claude can't safely hold the account's master OAuth credential; the secure equivalent is to **go through the proxy** (which already holds `CASPIO_CLIENT_ID/SECRET` server-side + auto-refreshes). Claude already reads Caspio *data* via existing public proxy routes; the only gap is a **general schema-introspection** route so Claude can enumerate ANY table's fields on demand. **Decision (Erik 2026-07-09): OPEN — no auth gate.** Kept SCHEMA-ONLY (structure/field names + types), never bulk row data, so open exposure stays low.
+
+**Uses Caspio REST v4** `/v4/schemas/*` + `/v4/tables/*` (the proxy's existing OAuth token works on `/v4` — same account OAuth; verified by the 2026-07-09 authenticated crawl). Endpoints:
+```
+GET /api/caspio-schema/tables               → [{name, tableId, fieldCount, description}]  (163 today)
+GET /api/caspio-schema/tables/:name/fields  → [{name, dataType, editable, unique, isFormula}]
+GET /api/caspio-schema/views                → [name]
+GET /api/caspio-schema/webhooks             → [{name, status, events:[{object,type,sources}]}]
+GET /api/caspio-schema/apps                 → {bridge:[name], flex:[name]}
+GET /api/caspio-schema/full                 → whole data-dictionary in ONE call (/v4/schemas/tables: fields+relationships per table)
+```
+
+**READY-TO-DROP FILE — `caspio-pricing-proxy/src/routes/caspio-schema.js`:**
+```js
+// Read-only Caspio SCHEMA introspection — enumerate tables/views/apps/webhooks + any
+// table's fields WITHOUT a per-session bearer token, using the proxy's standing OAuth
+// credential. OPEN by design (Erik 2026-07-09): schema structure only, never row data.
+// Caspio REST v4 (/v4/schemas/*, /v4/tables/*). Mount BEFORE the catch-all in server.js:
+//   app.use('/api/caspio-schema', require('./src/routes/caspio-schema'));  // adjust path to match repo
+const express = require('express');
+const router = express.Router();
+
+// ⚠ INTEGRATION POINT 1 — confirm the export in src/utils/caspio.js. Assumed:
+//   getCaspioAccessToken() -> Promise<string bearerToken>  (module-cached, 60s buffer).
+const { getCaspioAccessToken } = require('../utils/caspio');
+
+const V4 = 'https://c3eku948.caspio.com/integrations/rest/v4';
+
+// ⚠ INTEGRATION POINT 2 — uses global fetch (Node 18+). If the proxy is on <18 or uses
+// axios/node-fetch, swap this one function for the repo's http client.
+async function v4Get(path) {
+  const token = await getCaspioAccessToken();
+  const r = await fetch(`${V4}${path}`, { headers: { Authorization: `Bearer ${token}` } });
+  if (!r.ok) {                                   // surface errors — never silent-fallback (Erik rule #1)
+    const body = await r.text().catch(() => '');
+    const e = new Error(`Caspio v4 ${r.status} on ${path}: ${body.slice(0, 300)}`);
+    e.status = r.status; throw e;
+  }
+  return r.json();
+}
+
+const cache = new Map(); const TTL = 15 * 60 * 1000;   // schema rarely changes; stays well under rate limit
+async function cached(key, loader) {
+  const h = cache.get(key);
+  if (h && Date.now() - h.at < TTL) return h.val;
+  const val = await loader(); cache.set(key, { at: Date.now(), val }); return val;
+}
+const wrap = (h) => async (req, res) => {
+  try { res.json(await h(req)); }
+  catch (e) { res.status(e.status >= 400 && e.status < 600 ? e.status : 502).json({ success: false, error: e.message }); }
+};
+
+router.get('/tables', wrap(async () => {
+  const j = await cached('tables', () => v4Get('/tables?pageSize=1000'));
+  return { success: true, count: j.pagination?.totalCount ?? (j.data || []).length,
+    tables: (j.data || []).map(t => ({ name: t.name, tableId: t.tableId, fieldCount: t.fieldCount, description: t.description })) };
+}));
+router.get('/tables/:name/fields', wrap(async (req) => {
+  const list = await cached('tables', () => v4Get('/tables?pageSize=1000'));
+  const t = (list.data || []).find(x => String(x.name).toLowerCase() === String(req.params.name).toLowerCase());
+  if (!t) { const e = new Error(`Table not found: ${req.params.name}`); e.status = 404; throw e; }
+  const j = await cached(`f:${t.tableId}`, () => v4Get(`/tables/${t.tableId}/fields`));
+  return { success: true, table: t.name, tableId: t.tableId,
+    fields: (j.data || j || []).map(f => ({ name: f.name, dataType: f.dataType, editable: f.editable, unique: f.unique, isFormula: f.isFormula })) };
+}));
+router.get('/views', wrap(async () => {
+  const j = await cached('views', () => v4Get('/views?pageSize=1000'));
+  return { success: true, count: j.pagination?.totalCount ?? (j.data || []).length, views: (j.data || []).map(v => v.name) };
+}));
+router.get('/webhooks', wrap(async () => {
+  const j = await cached('webhooks', () => v4Get('/schemas/outgoingWebhooks?pageSize=1000'));
+  return { success: true, count: j.pagination?.totalCount ?? (j.data || []).length,
+    webhooks: (j.data || []).map(w => ({ name: w.name, status: w.status,
+      events: (w.events || []).map(e => ({ object: e.objectName, type: e.type, sources: e.eventSources })) })) };
+}));
+router.get('/apps', wrap(async () => {
+  const [b, f] = await Promise.all([cached('bridge', () => v4Get('/bridgeApplications')), cached('flex', () => v4Get('/flexApplications'))]);
+  return { success: true, bridge: (b.data || []).map(a => a.name), flex: (f.data || []).map(a => a.name) };
+}));
+router.get('/full', wrap(async () => {                 // one-call data dictionary
+  const j = await cached('full', () => v4Get('/schemas/tables?pageSize=1000'));
+  return { success: true, count: (j.data || []).length,
+    tables: (j.data || []).map(t => ({ name: t.name, tableId: t.tableId,
+      fields: (t.fields || []).map(f => ({ name: f.name, dataType: f.dataType, editable: f.editable })) })) };
+}));
+
+module.exports = router;
+```
+
+**Build steps when the proxy repo is reachable (currently DEHYDRATED on Erik's OneDrive — only the root folder exists, no `src/`/`server.js`):**
+1. Sync the OneDrive `caspio-pricing-proxy` folder (right-click → "Always keep on this device") OR point Claude at the real working clone.
+2. Drop the file above at `src/routes/caspio-schema.js`; verify INTEGRATION POINT 1 (token helper export name/return) + POINT 2 (global fetch vs axios/node-fetch) against `src/utils/caspio.js`.
+3. Mount in `server.js` (`app.use('/api/caspio-schema', require('./src/routes/caspio-schema'))`) + add to the route-TOC comment block per the proxy's convention.
+4. Register in the proxy's docs/`ACTIVE_FILES` + memory. Smoke-test: `curl <proxy>/api/caspio-schema/tables` → 163 tables; `.../tables/Quote_Sessions/fields` → columns.
+5. Deploy the proxy (its own deploy flow). Then Claude can enumerate any table any session with **zero token handoff**.
+
+**Note:** a general schema endpoint is mild DB-recon info (table/field names). It's schema-only (no row data) and Erik chose OPEN; if that ever feels too exposed, gate it behind the existing `X-CRM-API-Secret` (server-to-server) — but that reintroduces a secret to call it.
 
 ### #1 — Portal (DECIDED: ship data-minimization now; real gate = Phase-2 magic-link, #6)
 Design → [CASPIO_PORTAL_DESIGN.md](CASPIO_PORTAL_DESIGN.md). Decision: token gate / strict link-breaking would need #2 staff-auth to sign rep links (else open-oracle), so we ship data-minimization now and defer real confidentiality to Phase-2 login. Bare `/portal/:id` links keep working.
