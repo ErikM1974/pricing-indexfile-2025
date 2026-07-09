@@ -1,3 +1,7 @@
+## v2026.07.09.18 (2026.07.09)
+
+- refactor: burn-down tranche 3 — EMB allowlist EMPTY, ratchet endgame
+
 ## v2026.07.09.17 (2026.07.09)
 
 - refactor: burn-down tranche 2 — SCP allowlist EMPTY, EMB 10→5
