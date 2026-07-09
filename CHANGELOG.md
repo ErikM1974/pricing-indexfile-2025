@@ -1,3 +1,7 @@
+## v2026.07.09.13 (2026.07.09)
+
+- refactor: Builder A-grade Batch 5 — DTG decomposition (5.1+5.2)
+
 ## v2026.07.09.12 (2026.07.09)
 
 - feat(dtg): Batch 6 — formula collapse: ONE canonical engine, client delegates
