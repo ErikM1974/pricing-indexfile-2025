@@ -18,6 +18,7 @@ import { QuoteState } from '../shared/quote-model.js';
 export const sizeDetectionCache = new Map(); // key: "style-color" → extended sizes array
 
 export const dtfState = {
+    childRowMap: {},   // { parentRowId: { '2XL': childRowId, ... } } — class + rows module share it (Batch 4.3)
     // push
     _dtfPushQuoteId: null,
     _dtfPushInFlight: false,
@@ -41,3 +42,14 @@ Object.defineProperties(dtfState, {
 
 // ── Canonical line-item store (roadmap 0.5) ─────────────────────────────────
 export const quoteState = new QuoteState();
+
+// API base for the migrated page modules (matches emb/scp state.js).
+export const API_BASE = window.APP_CONFIG?.API?.BASE_URL || (console.error('[DTF] APP_CONFIG missing — API calls will fail'), '');
+
+// window-backed contract: the class reads/reset-assigns window.childRowMap
+// (quote-builder-class.js) — route both through dtfState (Batch 4.3).
+Object.defineProperty(window, 'childRowMap', {
+    get() { return dtfState.childRowMap; },
+    set(v) { dtfState.childRowMap = v; },
+    configurable: true,
+});

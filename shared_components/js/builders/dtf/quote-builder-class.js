@@ -1350,62 +1350,6 @@ export class DTFQuoteBuilder {
 
     }
 
-    /**
-     * Handle keyboard navigation in size input cells (Tab, Enter, Arrow keys)
-     * Matches Embroidery/Screen Print/DTG keyboard navigation pattern
-     */
-    handleCellKeydown(event, input) {
-        const row = input.closest('tr');
-        const tbody = document.getElementById('product-tbody');
-        const rows = Array.from(tbody.querySelectorAll('tr'));
-        const currentRowIndex = rows.indexOf(row);
-
-        if (event.key === 'Enter' || event.key === 'ArrowDown') {
-            event.preventDefault();
-            // Move to same column in next row
-            if (currentRowIndex < rows.length - 1) {
-                const nextRow = rows[currentRowIndex + 1];
-                const size = input.dataset.size;
-                const nextInput = nextRow.querySelector(`[data-size="${size}"]:not([disabled])`);
-                if (nextInput) {
-                    nextInput.focus();
-                    nextInput.select();
-                }
-            }
-        } else if (event.key === 'ArrowUp') {
-            event.preventDefault();
-            // Move to same column in previous row
-            if (currentRowIndex > 0) {
-                const prevRow = rows[currentRowIndex - 1];
-                const size = input.dataset.size;
-                const prevInput = prevRow.querySelector(`[data-size="${size}"]:not([disabled])`);
-                if (prevInput) {
-                    prevInput.focus();
-                    prevInput.select();
-                }
-            }
-        } else if (event.key === 'ArrowRight' && input.selectionStart === input.value.length) {
-            // Move to next size column in same row
-            const cells = Array.from(row.querySelectorAll('.size-input:not([disabled])'));
-            const currentIndex = cells.indexOf(input);
-            if (currentIndex < cells.length - 1) {
-                event.preventDefault();
-                cells[currentIndex + 1].focus();
-                cells[currentIndex + 1].select();
-            }
-        } else if (event.key === 'ArrowLeft' && input.selectionStart === 0) {
-            // Move to previous size column in same row
-            const cells = Array.from(row.querySelectorAll('.size-input:not([disabled])'));
-            const currentIndex = cells.indexOf(input);
-            if (currentIndex > 0) {
-                event.preventDefault();
-                cells[currentIndex - 1].focus();
-                cells[currentIndex - 1].select();
-            }
-        }
-    }
-
-    // ==================== EXTENDED SIZE POPUP ====================
 
     /**
      * Open extended size popup for a product

@@ -1,6 +1,6 @@
 /**
  * DTF output module — DTF decomposition D1 (2026-07-08).
- * HTML-onclick wrappers (copyToClipboard/copyQuoteToClipboard/printQuote →
+ * HTML-onclick wrappers (copyToClipboard/printQuote →
  * class methods) + the "auto %" rush chip. Moved verbatim.
  */
 // @ts-nocheck — MOVED legacy DOM code (pre-existing checkJs frictions; typing lands with the render/state split).
@@ -13,7 +13,6 @@ export function copyToClipboard() {
     }
 }
 // Legacy alias
-export function copyQuoteToClipboard() { copyToClipboard(); }
 
 export function printQuote() {
     if (dtfQuoteBuilder) {

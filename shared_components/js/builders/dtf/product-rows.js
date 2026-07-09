@@ -1,446 +1,17 @@
-// Global functions for onclick handlers (dtfQuoteBuilder is declared in external JS)
-document.addEventListener('DOMContentLoaded', function() {
-
-    // Setup keyboard shortcuts
-    document.addEventListener('keydown', function(e) {
-        // Escape = Close popups
-        if (e.key === 'Escape') {
-            const sizePopup = document.getElementById('extended-size-popup');
-            if (sizePopup && !sizePopup.classList.contains('hidden')) {
-                e.preventDefault();
-                closeExtendedSizePopup();
-                return;
-            }
-        }
-
-        // Ctrl+S = Save
-        if (e.ctrlKey && e.key === 's') {
-            e.preventDefault();
-            // [2026-06-11] was the dead legacy saveQuote() — it reads elements this
-            // page doesn't have (#quote-notes) and threw, so Ctrl+S silently no-oped
-            if (dtfQuoteBuilder) dtfQuoteBuilder.saveAndGetLink();
-        }
-
-        // Ctrl+P = Print
-        if (e.ctrlKey && e.key === 'p') {
-            e.preventDefault();
-            if (dtfQuoteBuilder) dtfQuoteBuilder.printQuote();
-        }
-    });
-
-    // Render the always-visible Push button + "Before you push" checklist on load (EMB parity 2026-06-14).
-    // Deferred so dtfQuoteBuilder + #push-readiness exist; thereafter it refreshes on every recalc/customer change.
-    setTimeout(function () { if (typeof updateDtfPushButtonState === 'function') updateDtfPushButtonState(); }, 0);
-});
-
-// Extended size popup functions
-function openExtendedSizePopup(productId) {
-    if (dtfQuoteBuilder) {
-        dtfQuoteBuilder.openExtendedSizePopup(productId);
-    }
-}
-
-function closeExtendedSizePopup() {
-    if (dtfQuoteBuilder) {
-        dtfQuoteBuilder.closeExtendedSizePopup();
-    }
-}
-
-function applyExtendedSizes() {
-    if (dtfQuoteBuilder) {
-        dtfQuoteBuilder.applyExtendedSizes();
-    }
-}
-
-function focusProductSearch() {
-    if (dtfQuoteBuilder) {
-        dtfQuoteBuilder.focusProductSearch();
-    }
-}
-
-// ============================================
-// TAX CALCULATION & ADDITIONAL CHARGES
-// ============================================
-
-function updateTaxCalculation() {
-    // ONE money source (A-grade Batch 1.3): all fee/discount/tax/total math lives in
-    // DTFQuoteBuilder.calculateFromState() → computeFeesAndTotals() — the exact pair
-    // save + print already use. This function only RENDERS the result. (The page copy
-    // previously re-implemented the whole pipeline and drifted: 10.1% empty-field
-    // fallback here vs 10.2% in the class — screen vs saved/printed disagreed.)
-    const builder = window.dtfQuoteBuilder;
-    if (!builder || typeof builder.computeFeesAndTotals !== 'function') return;
-    const totals = builder.computeFeesAndTotals(builder.calculateFromState());
-
-    const subtotalEl = document.getElementById('pre-tax-subtotal');
-    const taxRowEl = document.getElementById('tax-row');
-    const taxAmountEl = document.getElementById('tax-amount');
-    const grandTotalEl = document.getElementById('grand-total-with-tax');
-    const taxLabel = document.getElementById('tax-rate-label');
-
-    // Pre-tax subtotal display = products + fees − discount + shipping (adjusted amount)
-    if (subtotalEl) {
-        subtotalEl.textContent = '$' + totals.preTaxSubtotal.toFixed(2);
-    }
-
-    // Sales Tax row stays visible for invoice transparency; label shows the rate when charged,
-    // "(exempt)"/"(not charged)" when $0 (best-of-both level-up 2026-06-14).
-    const _dtfRateRaw = (document.getElementById('tax-rate-input')?.value || '').trim();
-    if (taxRowEl) taxRowEl.style.display = 'flex';
-    if (taxLabel) taxLabel.textContent = (totals.includeTax && parseFloat(_dtfRateRaw) > 0)
-        ? `Sales Tax (${_dtfRateRaw}%)`
-        : ((window._isWholesale || window._taxExempt) ? 'Sales Tax (exempt)' : 'Sales Tax (not charged)');
-    if (taxAmountEl) taxAmountEl.textContent = '$' + totals.taxAmount.toFixed(2);
-    if (grandTotalEl) grandTotalEl.textContent = '$' + totals.grandTotal.toFixed(2);
-
-    // Always-visible sidebar TOTAL bar (EMB parity 2026-06-11) — mirrors the
-    // grand total so the running price never scrolls out of view while building.
-    const sidebarBar = document.getElementById('sidebar-total-bar');
-    const sidebarTotal = document.getElementById('sidebar-grand-total');
-    if (sidebarBar && sidebarTotal) {
-        sidebarTotal.textContent = grandTotalEl.textContent;
-        sidebarBar.hidden = false;
-    }
-
-    // [2026-06-08] keep the order-summary band (recap + ship-to card) current on every recalc / tax / fee change
-    if (typeof window.renderOrderRecap === 'function') window.renderOrderRecap();
-    // Keep the always-visible Push button + readiness checklist in lock-step with product/fee changes.
-    try { if (typeof updateDtfPushButtonState === 'function') updateDtfPushButtonState(); } catch (_) {}
-}
-
-// toggleAdditionalCharges() moved to quote-builder-utils.js
-
-function updateAdditionalCharges() {
-    const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
-    const discountAmount = parseFloat(document.getElementById('discount-amount')?.value || 0);
-    const badge = document.getElementById('charges-badge');
-
-    // [2026-06-11] badge now reflects ALL charges (art + design + rush − discount,
-    // with a percent discount converted to dollars) — it used to ignore art/design
-    // and subtract a percent value as if it were dollars
-    const b = window.dtfQuoteBuilder;
-    const t = (b && typeof b.computeFeesAndTotals === 'function' && b.currentPricingData)
-        ? b.computeFeesAndTotals(b.calculateFromState()) : null;
-    const netCharges = t
-        ? (t.artCharge + t.graphicDesignCharge + t.rushFee - t.discount)
-        : (rushFee - discountAmount);
-    if (netCharges !== 0) {
-        badge.textContent = (netCharges >= 0 ? '+' : '') + '$' + netCharges.toFixed(2);
-        badge.classList.remove('hidden');
-        // Phase A: panel is collapsed by default — the first non-zero charge
-        // (edit-load, draft restore) pops it open ONCE so fees never load hidden.
-        if (typeof autoExpandFeesOnFirstCharge === 'function') autoExpandFeesOnFirstCharge();
-    } else {
-        badge.classList.add('hidden');
-    }
-
-    // Update fee table rows
-    updateFeeTableRows();
-
-    // Recalculate tax with new charges
-    updateTaxCalculation();
-}
-
-// updateDiscountType()/handleDiscountPresetChange()/handleDiscountReasonPresetChange()
-// DELETED 2026-07-07 (expert audit): the DTF discount UI was removed 2026-03-23, so
-// these page-local copies had zero references in dtf-quote-builder.html and only
-// shadowed the shared quote-builder-utils.js versions that EMB/SCP still use.
-
-// ============================================
-// TAX LOOKUP & SHIPPING FUNCTIONS
-// (Uses API_BASE defined below in ROW-BASED INPUT section)
-// ============================================
-
-async function lookupTaxRate() {
-    // [2026-06-08] P0 (#1 rule): a tax-exempt customer or wholesale order stays 0% — do NOT let a ZIP/state change
-    // re-apply WA tax (the async DOR result would silently overwrite the 0). Mirror EMB's guard.
-    if (window._taxExempt || window._isWholesale) {
-        const _ri = document.getElementById('tax-rate-input');
-        if (_ri) _ri.value = '0';
-        if (typeof updateTaxCalculation === 'function') updateTaxCalculation();
-        return false;
-    }
-    const state = document.getElementById('ship-state')?.value || 'WA';
-    const zip = document.getElementById('ship-zip')?.value?.trim() || '';
-    const city = document.getElementById('ship-city')?.value?.trim() || '';
-    const address = document.getElementById('ship-address')?.value?.trim() || '';
-
-    // Non-WA state → 0% tax
-    if (state !== 'WA') {
-        document.getElementById('tax-rate-input').value = '0';
-        updateTaxCalculation();
-        showTaxStatus('Out of State — No Tax', 'info');
-        return true;
-    }
-
-    if (!zip || zip.length < 5) {
-        showTaxStatus('Enter ZIP code to look up rate', 'info');
-        return false;
-    }
-
-    try {
-        showTaxStatus('Looking up tax rate...', 'loading');
-        const resp = await fetch(`${API_BASE}/api/tax-rates/lookup`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ address, city, state, zip })
-        });
-        if (!resp.ok) throw new Error(`API returned ${resp.status}`);
-        const data = await resp.json();
-
-        if (!data.success) {
-            showTaxStatus(data.error || 'Lookup failed', 'error');
-            return false;
-        }
-
-        document.getElementById('tax-rate-input').value = data.taxRate;
-        updateTaxCalculation();
-
-        if (data.outOfState) {
-            showTaxStatus('Out of State — No Tax', 'info');
-        } else if (data.fallback) {
-            showTaxStatus(`Default rate ${data.taxRate}% (DOR unavailable)`, 'warning');
-        } else {
-            const locationLabel = city || data.locationCode || 'WA';
-            showTaxStatus(`${locationLabel} — ${data.taxRate}%`, 'success');
-        }
-        return true;
-    } catch (err) {
-        console.error('[Tax Lookup] Error:', err);
-        showTaxStatus('Lookup failed — using current rate', 'error');
-        return false;
-    }
-}
-
-function showTaxStatus(message, type) {
-    const el = document.getElementById('tax-lookup-status');
-    if (!el) return;
-    const colors = { success: '#059669', error: '#dc2626', warning: '#d97706', info: '#64748b', loading: '#2563eb' };
-    el.textContent = message;
-    el.style.color = colors[type] || '#64748b';
-}
-
-function onShipStateChange() {
-    // [2026-06-08] P0 (#1 rule): exempt/wholesale stays 0% — the WA + short-ZIP branch below writes rate 10.2
-    // directly (bypassing lookupTaxRate's guard), which would re-tax an exempt order. Guard here too.
-    if (window._taxExempt || window._isWholesale) {
-        const _ri = document.getElementById('tax-rate-input'); if (_ri) _ri.value = '0';
-        if (typeof updateTaxCalculation === 'function') updateTaxCalculation();
-        return;
-    }
-    const state = document.getElementById('ship-state')?.value;
-    if (state !== 'WA') {
-        document.getElementById('tax-rate-input').value = '0';
-        updateTaxCalculation();
-        showTaxStatus('Out of State — No Tax', 'info');
-    } else {
-        const zip = document.getElementById('ship-zip')?.value?.trim() || '';
-        if (zip.length >= 5) {
-            lookupTaxRate();
-        } else {
-            document.getElementById('tax-rate-input').value = '10.2';
-            updateTaxCalculation();
-            showTaxStatus('', 'info');
-        }
-    }
-}
-
-// [2026-06-08] Wholesale / reseller toggle (mirror EMB). Per-order checkbox by the sales tax → 0 tax + push GL 2203.
-function toggleWholesale() {
-    const cb = document.getElementById('wholesale-checkbox');
-    window._isWholesale = !!(cb && cb.checked);
-    const incTax = document.getElementById('include-tax');
-    const rateInput = document.getElementById('tax-rate-input');
-    if (window._isWholesale) {
-        if (incTax) incTax.checked = false;
-        if (rateInput) rateInput.value = '0';
-        if (typeof updateTaxCalculation === 'function') updateTaxCalculation();
-    } else {
-        if (incTax) incTax.checked = true;
-        if (rateInput) rateInput.value = '10.2';
-        if (typeof updateTaxCalculation === 'function') updateTaxCalculation();
-        if (typeof lookupTaxRate === 'function') lookupTaxRate();  // re-fetch the real rate for the ship address
-    }
-}
-window.toggleWholesale = toggleWholesale;
-
-function onShipZipBlur() {
-    const state = document.getElementById('ship-state')?.value || 'WA';
-    const zip = document.getElementById('ship-zip')?.value?.trim() || '';
-    if (state === 'WA' && zip.length >= 5) {
-        lookupTaxRate();
-    }
-}
-
-async function dtfEmailQuote() {
-    // [2026-06-11] also accept lastSavedQuoteId — a fresh save never set
-    // editingQuoteId, so Email Quote was a dead end for never-edited quotes.
-    // [2026-07-07 expert audit] save-if-dirty first, like EMB: the /quote link
-    // renders the SAVED row, so emailing after an un-saved edit silently sent
-    // the customer the OLD prices while the rep read the new ones aloud.
-    let quoteId = window.dtfQuoteBuilder?.editingQuoteId || window.dtfQuoteBuilder?.lastSavedQuoteId;
-    const dirty = (typeof hasUnsavedChanges === 'function') ? hasUnsavedChanges() : false;
-    if ((!quoteId || dirty) && window.dtfQuoteBuilder?.saveAndGetLink) {
-        showToast('Saving quote before emailing…', 'info', 2500);
-        await window.dtfQuoteBuilder.saveAndGetLink({ skipShareModal: true });
-        quoteId = window.dtfQuoteBuilder?.editingQuoteId || window.dtfQuoteBuilder?.lastSavedQuoteId;
-    }
-    if (!quoteId) {
-        showToast('Please save the quote first before emailing', 'error');
-        return;
-    }
-    await emailQuote({
-        quoteId,
-        customerEmail: document.getElementById('customer-email')?.value?.trim(),
-        customerName: document.getElementById('customer-name')?.value?.trim(),
-        salesRepEmail: document.getElementById('sales-rep')?.value
-    });
-}
-
-function toggleOrderDetails() {
-    const content = document.getElementById('order-details-content');
-    const chevron = document.getElementById('order-details-chevron');
-    if (content && chevron) {
-        content.classList.toggle('hidden');
-        chevron.style.transform = content.classList.contains('hidden') ? 'rotate(-90deg)' : 'rotate(0)';
-    }
-}
-
-// ============================================
-// ARTWORK SERVICES FUNCTIONS
-// toggleArtworkServices(), toggleArtCharge(), updateArtworkCharges()
-// moved to quote-builder-utils.js
-// ============================================
-
-function updateFeeTableRows() {
-    // Art charge row
-    const artChargeRow = document.getElementById('art-charge-row');
-    const artChargeToggle = document.getElementById('art-charge-toggle');
-    const artCharge = parseFloat(document.getElementById('art-charge')?.value || 0);
-    if (artChargeRow) {
-        if (artChargeToggle?.checked && artCharge > 0) {
-            artChargeRow.style.display = 'table-row';
-            document.getElementById('art-charge-unit').textContent = '$' + artCharge.toFixed(2);
-            document.getElementById('art-charge-total').textContent = '$' + artCharge.toFixed(2);
-        } else {
-            artChargeRow.style.display = 'none';
-        }
-    }
-
-    // Graphic design row
-    const graphicDesignRow = document.getElementById('graphic-design-row');
-    const designHours = parseFloat(document.getElementById('graphic-design-hours')?.value || 0);
-    const designTotal = designHours * (typeof getServicePrice === 'function' ? getServicePrice('GRT-75', 75) : 75);
-    if (graphicDesignRow) {
-        if (designHours > 0) {
-            graphicDesignRow.style.display = 'table-row';
-            document.getElementById('design-hours-label').textContent = designHours;
-            document.getElementById('graphic-design-unit').textContent = '$' + designTotal.toFixed(2);
-            document.getElementById('graphic-design-total-row').textContent = '$' + designTotal.toFixed(2);
-        } else {
-            graphicDesignRow.style.display = 'none';
-        }
-    }
-
-    // Rush fee row
-    const rushFeeRow = document.getElementById('rush-fee-row');
-    const rushFee = parseFloat(document.getElementById('rush-fee')?.value || 0);
-    if (rushFeeRow) {
-        if (rushFee > 0) {
-            rushFeeRow.style.display = 'table-row';
-            document.getElementById('rush-fee-unit').textContent = '$' + rushFee.toFixed(2);
-            document.getElementById('rush-fee-total').textContent = '$' + rushFee.toFixed(2);
-        } else {
-            rushFeeRow.style.display = 'none';
-        }
-    }
-
-    // Discount row
-    const discountRow = document.getElementById('discount-row');
-    const discountAmount = parseFloat(document.getElementById('discount-amount')?.value || 0);
-    const discountType = document.getElementById('discount-type')?.value || 'fixed';
-    const discountReason = document.getElementById('discount-reason')?.value || '';
-    if (discountRow) {
-        if (discountAmount > 0) {
-            discountRow.style.display = 'table-row';
-            let actualDiscount = discountAmount;
-            if (discountType === 'percent') {
-                // [2026-06-11] same source as the charged totals. The old inline
-                // math parsed #ltm-row-total — which shows '(included)' in separate
-                // LTM mode → NaN → the row printed '-$NaN' — and double-counted the
-                // baked LTM into the discount base vs updateTaxCalculation.
-                const b = window.dtfQuoteBuilder;
-                const t = (b && typeof b.computeFeesAndTotals === 'function' && b.currentPricingData)
-                    ? b.computeFeesAndTotals(b.calculateFromState()) : null;
-                if (t) {
-                    actualDiscount = t.discount;
-                } else {
-                    const productsSubtotal = parseFloat(document.getElementById('subtotal')?.textContent?.replace(/[$,]/g, '') || 0) || 0;
-                    actualDiscount = productsSubtotal * (discountAmount / 100);
-                }
-            }
-            const reasonLabel = document.getElementById('discount-reason-label');
-            if (reasonLabel) {
-                let labelParts = [];
-                if (discountType === 'percent') {
-                    labelParts.push(`${discountAmount}%`);
-                }
-                if (discountReason) {
-                    labelParts.push(discountReason);
-                }
-                reasonLabel.textContent = labelParts.length > 0 ? `(${labelParts.join(' - ')})` : '';
-            }
-            document.getElementById('discount-unit').textContent = '-$' + actualDiscount.toFixed(2);
-            document.getElementById('discount-total').textContent = '-$' + actualDiscount.toFixed(2);
-        } else {
-            discountRow.style.display = 'none';
-        }
-    }
-}
-
-function toggleSaveShare() {
-    const content = document.getElementById('save-share-content');
-    const chevron = document.getElementById('save-share-chevron');
-
-    if (content.classList.contains('hidden')) {
-        content.classList.remove('hidden');
-        chevron.style.transform = 'rotate(180deg)';
-    } else {
-        content.classList.add('hidden');
-        chevron.style.transform = 'rotate(0deg)';
-    }
-}
-
-// ============================================
-// New Quote Functionality (UX Improvement)
-// ============================================
-
 /**
- * Wrapper function for header button - calls class method
+ * DTF product-rows module — Batch 4.3 (2026-07-09): the classic
+ * dtf-quote-page.js row machinery migrated into the bundle — search/style
+ * change, color pickers, size inputs, extended-size child rows (childRowMap
+ * now lives on dtfState with a window-backed accessor for the class), row
+ * delete/duplicate, thumbnails. Moved verbatim; cross-module calls stay bare
+ * globals resolved via the index.js bridges (SCP pattern).
  */
-function confirmNewQuote() {
-    if (dtfQuoteBuilder) {
-        dtfQuoteBuilder.confirmNewQuote();
-    }
-}
+/* global dtfQuoteBuilder, showToast, escapeHtml, getSwatchStyle, productThumbnailModal,
+   cleanProductTitle */
+import { dtfState, API_BASE } from './state.js';
 
-// ============================================================
-// ROW-BASED INPUT FUNCTIONS (Match other quote builders)
-// ============================================================
-
-// Use centralized config (fallback to hardcoded URL for backwards compatibility)
-const API_BASE = window.APP_CONFIG?.API?.BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
-// REMOVED: let rowCounter = 0; - now using dtfQuoteBuilder.getNextRowId() for all rows
-// This prevents ID collisions between parent and child rows
-const productCache = {};
-
-// Child row tracking (like DTG/Embroidery pattern)
-// Using var so it's accessible globally for dtf-quote-builder.js class
-var childRowMap = {};  // { parentRowId: { '2XL': childRowId, '3XL': childRowId } }
-window.childRowMap = childRowMap;  // Expose to JS class
-
-// Use shared ExtendedSizesConfig module (2026 consolidation)
-// REQUIRED - no fallback. Shows error if module not loaded.
+// Shared ExtendedSizesConfig module is REQUIRED — no fallback (classic script
+// loads before the bundle; hard-fail loudly if the include went missing).
 if (!window.ExtendedSizesConfig) {
     console.error('❌ ExtendedSizesConfig module not loaded! Check script includes.');
     document.body.innerHTML = `
@@ -452,15 +23,12 @@ if (!window.ExtendedSizesConfig) {
     `;
     throw new Error('ExtendedSizesConfig module required but not loaded');
 }
-// SIZE_TO_SUFFIX and EXTENDED_SIZE_ORDER are now accessed via
-// window.ExtendedSizesConfig.* to avoid duplicate const declarations
-// (extended-sizes-config.js declares them at global scope)
 
 /**
  * Add a new empty row for user to type style number
  * Matches pattern from DTG/Embroidery/Screen Print quote builders
  */
-function addNewRow() {
+export function addNewRow() {
     const tbody = document.getElementById('product-tbody');
     // Use shared counter from JS class to prevent ID collisions with child rows
     const rowId = dtfQuoteBuilder.getNextRowId();
@@ -475,6 +43,7 @@ function addNewRow() {
     row.dataset.rowId = rowId;
     row.dataset.productId = rowId;  // Match what updatePricing() expects
 
+    // eslint-disable-next-line no-unsanitized/property -- audited (Batch 4.3): rowId numeric via getNextRowId; template is static markup
     row.innerHTML = `
         <td>
             <input type="text" class="cell-input style-input"
@@ -539,12 +108,11 @@ function addNewRow() {
     }, 1000);
 }
 // Expose to window for JS class access
-window.addNewRow = addNewRow;
 
 /**
  * Handle style number change - fetch product data
  */
-async function onStyleChange(input, rowId) {
+export async function onStyleChange(input, rowId) {
     const styleNumber = input.value.trim().toUpperCase();
     if (!styleNumber) return;
 
@@ -618,6 +186,7 @@ async function onStyleChange(input, rowId) {
 
             // Populate color picker (now includes MAIN_IMAGE_URL from product-colors API)
             if (colors && colors.length > 0) {
+                // eslint-disable-next-line no-unsanitized/property -- audited (Batch 4.3): every color field escapeHtml-wrapped; swatch via hardened getSwatchStyle
                 pickerDropdown.innerHTML = colors.map(c => `
                     <div class="color-picker-option"
                          data-color-name="${escapeHtml(c.COLOR_NAME)}"
@@ -644,14 +213,13 @@ async function onStyleChange(input, rowId) {
     }
 }
 // Expose to window for JS class access
-window.onStyleChange = onStyleChange;
 
 /**
  * Duplicate a product row for a different color of the same style (Rule 8:
  * mirrors EMB's duplicateRowNewColor). Pre-fills the style number and runs
  * onStyleChange() so the color picker loads — the rep just picks the new color.
  */
-async function duplicateRowNewColor(sourceRowId) {
+export async function duplicateRowNewColor(sourceRowId) {
     const sourceRow = document.getElementById(`row-${sourceRowId}`);
     if (!sourceRow) return;
 
@@ -673,12 +241,11 @@ async function duplicateRowNewColor(sourceRowId) {
         showToast(`Select a new color for ${style}`, 'info', 3000);
     }
 }
-window.duplicateRowNewColor = duplicateRowNewColor;
 
 /**
  * Handle keyboard navigation in cells
  */
-function handleCellKeydown(event, input) {
+export function handleCellKeydown(event, input) {
     const row = input.closest('tr');
     const cells = Array.from(row.querySelectorAll('input:not([readonly]):not(:disabled)'));
     const currentIndex = cells.indexOf(input);
@@ -712,7 +279,7 @@ function handleCellKeydown(event, input) {
 /**
  * Handle size input changes
  */
-function onSizeChange(rowId) {
+export function onSizeChange(rowId) {
     const row = document.getElementById(`row-${rowId}`);
     if (!row) {
         return;
@@ -729,7 +296,7 @@ function onSizeChange(rowId) {
     if (xxlInput && !xxlInput.disabled) {
         const qty = parseInt(xxlInput.value) || 0;
         // Check for both 2XL and XXL child rows (XXL is distinct for Ladies/Womens products)
-        const existingChildId = childRowMap[rowId]?.['2XL'] || childRowMap[rowId]?.['XXL'];
+        const existingChildId = dtfState.childRowMap[rowId]?.['2XL'] || dtfState.childRowMap[rowId]?.['XXL'];
 
         if (qty > 0 && !existingChildId) {
             // CREATE CHILD ROW for 2XL
@@ -779,7 +346,7 @@ function onSizeChange(rowId) {
 /**
  * Select a color from the picker (parent row)
  */
-function selectColor(rowId, optionEl) {
+export function selectColor(rowId, optionEl) {
     const row = document.getElementById(`row-${rowId}`);
     const colorName = optionEl.dataset.colorName;
     const catalogColor = optionEl.dataset.catalogColor;
@@ -848,7 +415,7 @@ function selectColor(rowId, optionEl) {
 /**
  * Toggle color picker dropdown
  */
-function toggleColorPicker(rowId) {
+export function toggleColorPicker(rowId) {
     const row = document.getElementById(`row-${rowId}`);
     const dropdown = row.querySelector('.color-picker-dropdown');
     const selected = row.querySelector('.color-picker-selected');
@@ -866,7 +433,7 @@ function toggleColorPicker(rowId) {
 /**
  * Handle keyboard events on color picker
  */
-function handleColorPickerKeydown(event, rowId) {
+export function handleColorPickerKeydown(event, rowId) {
     if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault();
         toggleColorPicker(rowId);
@@ -879,7 +446,7 @@ function handleColorPickerKeydown(event, rowId) {
 /**
  * Delete a row
  */
-function deleteRow(rowId) {
+export function deleteRow(rowId) {
     const row = document.getElementById(`row-${rowId}`);
     if (row) {
         // Also delete any child rows
@@ -892,7 +459,7 @@ function deleteRow(rowId) {
             }
         });
         // Clear child row tracking
-        delete childRowMap[rowId];
+        delete dtfState.childRowMap[rowId];
 
         row.remove();
         if (dtfQuoteBuilder) {
@@ -912,7 +479,7 @@ function deleteRow(rowId) {
  * @param {string} size - Size name (XXL, 3XL, 4XL, 5XL, 6XL, XS)
  * @param {number} qty - Quantity for this size
  */
-function createChildRow(parentRowId, size, qty) {
+export function createChildRow(parentRowId, size, qty) {
     const parentRow = document.getElementById(`row-${parentRowId}`);
     if (!parentRow) {
         console.error('[DTF] Cannot create child row: parent not found', parentRowId);
@@ -978,6 +545,7 @@ function createChildRow(parentRowId, size, qty) {
     const isSize05 = SIZE05_SIZES.includes(size);
     const isSize06 = !isSize05;
 
+    // eslint-disable-next-line no-unsanitized/property -- audited (Batch 4.3, mirrors emb/product-rows C32): childRowId numeric (getNextRowId), partNumber/size internal codes, colors escapeHtml-wrapped, swatch via hardened getSwatchStyle
     childRow.innerHTML = `
         <td>
             <span class="style-display">${escapeHtml(partNumber)}</span>
@@ -1045,9 +613,9 @@ function createChildRow(parentRowId, size, qty) {
 
     insertAfter.after(childRow);
 
-    // Track in childRowMap
-    if (!childRowMap[parentRowId]) childRowMap[parentRowId] = {};
-    childRowMap[parentRowId][size] = childRowId;
+    // Track in dtfState.childRowMap
+    if (!dtfState.childRowMap[parentRowId]) dtfState.childRowMap[parentRowId] = {};
+    dtfState.childRowMap[parentRowId][size] = childRowId;
 
     // Mirror into JS state — calculateFromState()/getTotalQuantity()/save/print
     // read THIS, never the DOM row, which is display-only (2026-06-11 P2)
@@ -1074,12 +642,12 @@ function createChildRow(parentRowId, size, qty) {
  * @param {number} parentRowId - ID of the parent row
  * @param {string} size - Size to remove (XXL, 3XL, etc.)
  */
-function removeChildRow(parentRowId, size) {
-    const childRowId = childRowMap[parentRowId]?.[size];
+export function removeChildRow(parentRowId, size) {
+    const childRowId = dtfState.childRowMap[parentRowId]?.[size];
     if (childRowId) {
         const childRow = document.getElementById(`row-${childRowId}`);
         if (childRow) childRow.remove();
-        delete childRowMap[parentRowId][size];
+        delete dtfState.childRowMap[parentRowId][size];
 
         // If removing XXL, re-enable parent's XXL input
         if (size === 'XXL' || size === '2XL') {
@@ -1114,7 +682,7 @@ function removeChildRow(parentRowId, size) {
 /**
  * Handle size change in a child row
  */
-function onChildSizeChange(childRowId, parentRowId, size) {
+export function onChildSizeChange(childRowId, parentRowId, size) {
     const childRow = document.getElementById(`row-${childRowId}`);
     if (!childRow) return;
 
@@ -1146,7 +714,7 @@ function onChildSizeChange(childRowId, parentRowId, size) {
 /**
  * Update the parent row's XXXL button display to show count of extended sizes
  */
-function updateExtendedSizeDisplay(parentRowId) {
+export function updateExtendedSizeDisplay(parentRowId) {
     const parentRow = document.getElementById(`row-${parentRowId}`);
     if (!parentRow) return;
 
@@ -1182,7 +750,7 @@ function updateExtendedSizeDisplay(parentRowId) {
  * @param {number} parentRowId - ID of the parent row
  * @param {string} size - Size name (XS, XXL, 3XL, 4XL, 5XL, 6XL)
  */
-function getExtendedSizeQty(parentRowId, size) {
+export function getExtendedSizeQty(parentRowId, size) {
     // Normalize size aliases
     const normalizedSize = size === 'XXXL' ? '3XL' : size;
 
@@ -1190,7 +758,7 @@ function getExtendedSizeQty(parentRowId, size) {
     // rows created before the XXXL→3XL key fix are stored under 'XXXL' — the old
     // single-key lookup missed them, the popup prefilled 3XL as blank, and Apply
     // then deleted the existing row (qty 0 + existing ⇒ remove).
-    const ids = childRowMap[parentRowId];
+    const ids = dtfState.childRowMap[parentRowId];
     const childKey = ids && (ids[normalizedSize] != null ? normalizedSize
         : (ids[size] != null ? size
         : (normalizedSize === '3XL' && ids['XXXL'] != null ? 'XXXL'
@@ -1234,7 +802,6 @@ function getExtendedSizeQty(parentRowId, size) {
     return 0;
 }
 // Expose to global scope for JS class to use
-window.getExtendedSizeQty = getExtendedSizeQty;
 
 /**
  * Select a color for a child row (called from child row color picker)
@@ -1242,7 +809,7 @@ window.getExtendedSizeQty = getExtendedSizeQty;
  * @param {number} parentRowId - ID of the parent row
  * @param {Element} optionEl - The clicked option element
  */
-function selectChildColor(childRowId, parentRowId, optionEl) {
+export function selectChildColor(childRowId, parentRowId, optionEl) {
     const childRow = document.getElementById(`row-${childRowId}`);
     if (!childRow) return;
 
@@ -1297,10 +864,10 @@ function selectChildColor(childRowId, parentRowId, optionEl) {
  * @param {string} swatchUrl - URL to color swatch image
  * @param {string} hex - Hex color code
  */
-function cascadeColorToChildRows(parentRowId, colorName, catalogColor, swatchUrl, hex) {
-    if (!childRowMap[parentRowId]) return;
+export function cascadeColorToChildRows(parentRowId, colorName, catalogColor, swatchUrl, hex) {
+    if (!dtfState.childRowMap[parentRowId]) return;
 
-    Object.values(childRowMap[parentRowId]).forEach(childRowId => {
+    Object.values(dtfState.childRowMap[parentRowId]).forEach(childRowId => {
         const childRow = document.getElementById(`row-${childRowId}`);
         if (!childRow) return;
 
@@ -1339,13 +906,13 @@ function cascadeColorToChildRows(parentRowId, colorName, catalogColor, swatchUrl
  * Update visual styling for child rows based on color match with parent
  * @param {number} parentRowId - ID of the parent row
  */
-function updateChildRowColorIndicators(parentRowId) {
+export function updateChildRowColorIndicators(parentRowId) {
     const parentRow = document.getElementById(`row-${parentRowId}`);
-    if (!parentRow || !childRowMap[parentRowId]) return;
+    if (!parentRow || !dtfState.childRowMap[parentRowId]) return;
 
     const parentCatalogColor = parentRow.dataset.catalogColor;
 
-    Object.values(childRowMap[parentRowId]).forEach(childRowId => {
+    Object.values(dtfState.childRowMap[parentRowId]).forEach(childRowId => {
         const childRow = document.getElementById(`row-${childRowId}`);
         if (!childRow) return;
 
@@ -1364,7 +931,7 @@ function updateChildRowColorIndicators(parentRowId) {
 
 // escapeHtml() is now provided by quote-builder-utils.js
 
-function updateProductThumbnail(rowId, imageUrl, productName, styleNumber, colorName) {
+export function updateProductThumbnail(rowId, imageUrl, productName, styleNumber, colorName) {
     const thumbContainer = document.getElementById(`thumb-${rowId}`);
     if (!thumbContainer) return;
 
@@ -1397,34 +964,3 @@ function updateProductThumbnail(rowId, imageUrl, productName, styleNumber, color
 
 // Save modal functions (from second inline block)
 // Save modal functions
-function showSaveModal(quoteId) {
-    const url = `${window.location.origin}/quote/${quoteId}`;
-    document.getElementById('saved-quote-id').textContent = quoteId;
-    document.getElementById('shareable-url').value = url;
-    document.getElementById('save-success-modal').style.display = 'flex';
-}
-
-function closeSaveModal() {
-    document.getElementById('save-success-modal').style.display = 'none';
-}
-
-function copyShareableUrl() {
-    const urlInput = document.getElementById('shareable-url');
-    urlInput.select();
-    document.execCommand('copy');
-
-    // Visual feedback
-    const btn = event.target.closest('button');
-    const originalHTML = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-    btn.style.background = '#28a745';
-    setTimeout(() => {
-        btn.innerHTML = originalHTML;
-        btn.style.background = '';
-    }, 2000);
-}
-
-// Close modal on backdrop click
-document.getElementById('save-success-modal').addEventListener('click', function(e) {
-    if (e.target === this) closeSaveModal();
-});
