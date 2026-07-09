@@ -1,3 +1,7 @@
+## v2026.07.09.11 (2026.07.09)
+
+- feat(table-audit): live Refresh button — re-pull view/rel/webhook wiring + fieldCount + new/deleted tables via /api/caspio-schema/usage
+
 ## v2026.07.09.10 (2026.07.09)
 
 - docs(dtf): update 2 stale HTML comments referencing the deleted dtf-quote-page.js
