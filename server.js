@@ -820,6 +820,33 @@ function requireCrmRole(allowedRoles) {
   };
 }
 
+// Email-locked page gate — like requireCrmRole but keyed to specific email addresses
+// instead of roles. Use for pages that must stay private to named individuals even if
+// someone else later gains the 'admin' role: the Staff_Page_Access admin-override
+// (userMayAccessPage) does NOT apply to an explicit route like this. Register it BEFORE
+// the /dashboards static mount, exactly like the access-admin.html gate.
+// accessRestrictedPage() is a hoisted function declaration (defined further below).
+function requireCrmEmail(allowedEmails) {
+  const allow = allowedEmails.map(e => String(e).toLowerCase());
+  return (req, res, next) => {
+    const isApiRequest = req.originalUrl.startsWith('/api/');
+    if (!req.session?.crmUser) {
+      if (isApiRequest) {
+        return res.status(401).json({ error: 'Unauthorized', message: 'Session expired. Please log in again.' });
+      }
+      return res.redirect('/dashboards/staff-login.html?redirect=' + encodeURIComponent(req.originalUrl));
+    }
+    const email = String(req.session.crmUser.email || '').toLowerCase();
+    if (!allow.includes(email)) {
+      if (isApiRequest) {
+        return res.status(403).json({ error: 'Forbidden', message: 'You do not have permission to access this resource.' });
+      }
+      return res.status(403).type('html').send(accessRestrictedPage(req.session.crmUser.firstName));
+    }
+    return next();
+  };
+}
+
 // requireStaff (#2 flip 2026-06-29) — gate a page/route behind ANY verified
 // staff session (established only by the SAML ACS). Unauthenticated visitors are
 // BOUNCED to SSO login (never hard-locked-out); API calls get 401 + a loginUrl.
@@ -2978,6 +3005,14 @@ app.get('/dashboards/house-accounts.html', requireCrmRole(['house']), (req, res)
 // this page edits the RBAC tables themselves). Registered before the /dashboards mount.
 app.get('/dashboards/access-admin.html', requireCrmRole(['admin']), (req, res) => {
   res.sendFile(path.join(__dirname, 'dashboards', 'access-admin.html'));
+});
+
+// Caspio REST API v4 reference viewer — ERIK ONLY (hard email gate). Locked to Erik's
+// email so it stays private even if someone else is later granted the 'admin' role; the
+// Staff_Page_Access admin-override does NOT apply to this explicit route. Registered
+// before the /dashboards mount so it intercepts ahead of gateStaffHtml + static.
+app.get('/dashboards/caspio-api-reference.html', requireCrmEmail(['erik@nwcustomapparel.com']), (req, res) => {
+  res.sendFile(path.join(__dirname, 'dashboards', 'caspio-api-reference.html'));
 });
 
 // Customer Portal admin console — manage who can log into the customer portal

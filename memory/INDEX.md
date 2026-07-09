@@ -98,6 +98,7 @@ _Read API + PO (write) side._
 ## 🗄️ Caspio / Backend / Auth / API
 
 - [CASPIO_REST_API_REFERENCE.md](CASPIO_REST_API_REFERENCE.md) — ⭐ Caspio **platform** REST v3 (Swagger) capability map: tables/views/files/webhooks/directories/tasks/bridge-apps, what NWCA uses vs untapped, auth, plan-gating, webhook-fires-on-REST (+ `caspio-swagger-snapshot-2026-06-29.json`)
+- [CASPIO_REST_API_V4_REFERENCE.md](CASPIO_REST_API_V4_REFERENCE.md) — ⭐ Caspio **platform** REST **v4** delta vs v3 (base path, ops, query semantics): bulk ops (≤1000, `207`), full T-SQL `where/select`, single-call schema discovery, fileAssets/webhook CRUD, AI manifest+lenses; opt-in/additive, proxy still runs v3. Staff-viewable at `/dashboards/caspio-api-reference.html` (Erik-only)
 - [CASPIO_INTEGRATION_TODO.md](CASPIO_INTEGRATION_TODO.md) — ⭐ **9-item build list + session resume** (Swagger-driven security/integration roadmap; #1 portal-data-min & #2 staff SAML auth ✅ LIVE)
 - [STAFF_AUTH_DESIGN.md](STAFF_AUTH_DESIGN.md) — staff-dashboard auth via Caspio "Staff" App Connection SAML SSO (app=SP, Caspio=IdP); killed forgeable `/api/crm-session` (#2, LIVE v1477)
 - [CASPIO_PORTAL_DESIGN.md](CASPIO_PORTAL_DESIGN.md) — customer portal: data-minimization + magic-link auth + admin console + Phase 5 reward-dollars ledger (LIVE 2026-06-30)

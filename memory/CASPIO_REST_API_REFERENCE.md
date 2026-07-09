@@ -4,6 +4,8 @@
 >
 > **Not the same as [CASPIO_API_CORE.md](CASPIO_API_CORE.md)** — that documents *our proxy's* API (the Heroku `caspio-pricing-proxy/api` endpoints the front-end consumes). THIS file documents the *Caspio platform* API that the proxy itself calls.
 >
+> **Newer API version:** [CASPIO_REST_API_V4_REFERENCE.md](CASPIO_REST_API_V4_REFERENCE.md) — the v4 delta (bulk ops, T-SQL queries, schema discovery, AI manifest) lives there. This file stays canonical for v3 + the shared OAuth/token lifecycle. v4 is opt-in/additive; the proxy still runs v3.
+>
 > **Source of truth = the live spec, not this file.** Re-fetch any time (public, no auth needed to READ the contract):
 > ```bash
 > curl -s "https://c3eku948.caspio.com/integrations/rest/v3/swagger/documentation" -o caspio-swagger.json
@@ -132,4 +134,4 @@ Clone `caspio-pricing-proxy/src/routes/box-webhooks.js` (battle-tested HMAC rece
 
 ---
 
-**Cross-refs:** [CASPIO_API_CORE.md](CASPIO_API_CORE.md) (our proxy API) · [CASPIO_STAFF_AUTH.md](CASPIO_STAFF_AUTH.md) · [LESSONS_LEARNED.md](LESSONS_LEARNED.md) (Triggered-Actions-don't-fire-on-REST) · Zapier zaps (the 24 outgoing webhooks ARE the Zaps — see MEMORY "Zapier rules") · CLAUDE.md "Documentation Entry Points".
+**Cross-refs:** [CASPIO_REST_API_V4_REFERENCE.md](CASPIO_REST_API_V4_REFERENCE.md) (v4 sibling — bulk/T-SQL/schema-discovery delta) · [CASPIO_API_CORE.md](CASPIO_API_CORE.md) (our proxy API) · [CASPIO_STAFF_AUTH.md](CASPIO_STAFF_AUTH.md) · [LESSONS_LEARNED.md](LESSONS_LEARNED.md) (Triggered-Actions-don't-fire-on-REST) · Zapier zaps (the 24 outgoing webhooks ARE the Zaps — see MEMORY "Zapier rules") · CLAUDE.md "Documentation Entry Points".
