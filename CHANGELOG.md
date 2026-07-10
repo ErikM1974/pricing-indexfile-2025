@@ -1,3 +1,8 @@
+## v2026.07.10.8 (2026.07.10)
+
+- feat(handbook): booklet-perfect PDF — logo cover, punch margins, zero ghost pages (28pp)
+- docs: repair handbook-pdf ACTIVE_FILES rows (shell-substitution ate backtick paths)
+
 ## v2026.07.10.7 (2026.07.10)
 
 - docs(memory)+data: wave 5 — handbook compliance additions published (7/7 verified)
