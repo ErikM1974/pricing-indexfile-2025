@@ -1,3 +1,9 @@
+## v2026.07.10.7 (2026.07.10)
+
+- docs(memory)+data: wave 5 — handbook compliance additions published (7/7 verified)
+- data(policy-migration): wave-3 snapshot — RETIRE? cleared, HR compliance-gap queue added
+- feat(policies): reading-first typography + print stylesheet for ALL hub policies; booklet-quality handbook PDF
+
 ## v2026.07.10.6 (2026.07.10)
 
 - docs(memory): v2026.07.10.5 live (r1618) + tracker admin-gated via Staff_Page_Access
