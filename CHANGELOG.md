@@ -1,3 +1,8 @@
+## v2026.07.10.9 (2026.07.10)
+
+- docs(memory): wave 7 — booklet-perfect handbook PDF live r1621
+- feat(dashboard): View Org Chart (2026) link in the Team widget dropdown
+
 ## v2026.07.10.8 (2026.07.10)
 
 - feat(handbook): booklet-perfect PDF — logo cover, punch margins, zero ghost pages (28pp)
