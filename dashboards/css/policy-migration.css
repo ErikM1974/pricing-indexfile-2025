@@ -1,0 +1,149 @@
+/* ==========================================================================
+   policy-migration.css — page-specific styles for dashboards/policy-migration.html
+
+   Shell classes (.dash-header, .dash-back-link, .dash-stat-card, etc.) come
+   from shared_components/css/dash-shell.css. Design tokens (--surface-*,
+   --gray-*, --shadow-*, --radius-*, --state-*) come from
+   shared_components/css/art-hub.css.
+
+   Only page-specific styles here. NEVER redefine tokens. NEVER hardcode
+   colors/shadows/radii — use var(--token-name).
+   ========================================================================== */
+
+.pm-questions-list {
+    margin: 0;
+    padding: 0 0 0 1.2rem;
+    display: grid;
+    gap: 0.45rem;
+}
+
+.pm-questions-list li {
+    line-height: 1.45;
+}
+
+.pm-hint {
+    margin: 0.9rem 0 0;
+    color: var(--gray-500);
+    font-size: 0.85rem;
+}
+
+.pm-wave-log {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.55rem;
+}
+
+.pm-wave-log li {
+    display: flex;
+    gap: 0.6rem;
+    align-items: baseline;
+    line-height: 1.4;
+}
+
+.pm-wave-when {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--gray-500);
+    white-space: nowrap;
+}
+
+.pm-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    align-items: center;
+}
+
+.pm-controls input[type="search"] {
+    padding: 0.45rem 0.75rem;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    font: inherit;
+    min-width: 220px;
+}
+
+.pm-chiprow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+
+.pm-chip {
+    border: 1px solid var(--gray-200);
+    background: var(--gray-50);
+    border-radius: 999px;
+    padding: 0.25rem 0.7rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.pm-chip.on {
+    background: var(--gray-800);
+    color: var(--gray-50);
+    border-color: var(--gray-800);
+}
+
+.pm-table-wrap {
+    overflow-x: auto;
+}
+
+.pm-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.86rem;
+}
+
+.pm-table th {
+    text-align: left;
+    padding: 0.5rem 0.6rem;
+    color: var(--gray-500);
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--gray-200);
+    position: sticky;
+    top: 0;
+    background: var(--surface-card, #fff);
+}
+
+.pm-table td {
+    padding: 0.5rem 0.6rem;
+    border-bottom: 1px solid var(--gray-100);
+    vertical-align: top;
+}
+
+.pm-badge {
+    display: inline-block;
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    white-space: nowrap;
+    background: var(--gray-100);
+    color: var(--gray-700);
+}
+
+.pm-badge--done    { background: var(--state-success-bg, #d1e7dd); color: var(--state-success-text, #0f5132); }
+.pm-badge--core    { background: var(--state-warning-bg, #fff3cd); color: var(--state-warning-text, #664d03); }
+.pm-badge--erik    { background: var(--state-danger-bg, #f8d7da);  color: var(--state-danger-text, #842029); }
+.pm-badge--auto    { background: var(--gray-100); color: var(--gray-600); }
+
+.pm-note {
+    color: var(--gray-500);
+    font-size: 0.8rem;
+}
+
+.pm-footnote {
+    color: var(--gray-500);
+    font-size: 0.8rem;
+    margin: 1rem 0 0;
+}
+
+.pm-count {
+    color: var(--gray-500);
+    font-size: 0.8rem;
+    margin-left: auto;
+}

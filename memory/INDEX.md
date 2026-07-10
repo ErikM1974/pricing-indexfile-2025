@@ -172,6 +172,7 @@ _Forward-looking; verify status before trusting._
 - [CALCULATOR_PRICING_AUDIT_2026-07.md](CALCULATOR_PRICING_AUDIT_2026-07.md) — 30-agent sweep of all 14 live calculators for hardcoded/drifted pricing + submit-flow bugs; ranked findings + fix order (2026-07-01)
 - [QUOTE_BUILDER_UX_AUDIT_2026-07.md](QUOTE_BUILDER_UX_AUDIT_2026-07.md) — order-entry UX audit of all 4 quote builders: click scorecard, verified price-display risks (10.1 residuals, silent SCP fallbacks), P1–P3 rec list, skin verdict (2026-07-06)
 - [QUOTE_BUILDER_EXPERT_AUDIT_2026-07-07.md](QUOTE_BUILDER_EXPERT_AUDIT_2026-07-07.md) — 5-expert audit (EMB/DTF/SCP domain + workflow + CSS): 62 verified findings, NONE fixed — money leaks (DTF zero-location, EMB DECG LTM, SCP $0 back), SCP email dead end, PNW shell never switched on; week-1 punch list + Erik policy decisions (2026-07-07)
+- [HR_DASHBOARD_TRAINING_REORG_2026-07.md](HR_DASHBOARD_TRAINING_REORG_2026-07.md) — staff-dashboard 2-category reorg (Policies & Procedures + Training): all 436 SweetProcess docs classified vs live hub/training, worksheet in OneDrive HR folder, nav redesign pending Erik (2026-07-10)
 
 ## 🔎 Audit / findings detail — historical, still pointed-to (NOT current state)
 

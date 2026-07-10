@@ -48,6 +48,7 @@ The `/training` directory contains all training materials, interactive games, ad
 | Embroidery Order Types | `shopworks-embroidery-order-type.html` | Order type selection | Active |
 | Sales Tax Training | `shopworks-sales-tax-training.html` | Tax code application | Active |
 | Notes System | `shopworks-notes.html` | Order notes best practices | Active |
+| SanMar Purchasing | `sanmar-purchasing-guide.html` (+ `.css`/`.js`, screenshots in `images/sanmar-purchasing/`) | Purchasing blanks from SanMar via the ShopWorks API integration — cost line items, build/send PO, note the order. Based on Bradley's guide; embeds official ShopWorks Wistia videos | Active |
 
 ### Specialized Training Tools
 
@@ -244,6 +245,7 @@ class TrainingModule {
 
 ## Recent Updates
 
+- **2026-07-10**: Added SanMar Purchasing Guide (`sanmar-purchasing-guide.html`) from Bradley's training deck — 3-phase workflow, size-annotation cheat sheet, ShopWorks screenshots (SanMar account # redacted — /training is a public static mount), official ShopWorks Wistia videos (`fast.wistia.net` added to CSP frameSrc in server.js). Linked in staff-dashboard Training nav.
 - **2025-08-15**: Added ShopWorks Embroidery Order Type training module
 - **2025-08**: Enhanced Adriyella's dashboard suite with v2 daily tasks
 - **2025-08**: Added NWCA Language Reference Card to Training Games Hub
