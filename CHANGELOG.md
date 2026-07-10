@@ -1,3 +1,10 @@
+## v2026.07.10.3 (2026-07-10)
+
+- fix(builders): color-picker dropdown escapes table-card clipping (EMB/SCP/DTF)
+- docs(memory): LESSONS â€” SW >2MB silent image drop + dropdown clipping; archive duplicate-row entry
+- docs(memory): MO reference Â§13 â€” sw.jpg transcode implementation note
+- docs(memory): MO reference â€” Designs populate matrix per method + full id_DesignType taxonomy
+
 ## v2026.07.10.2 (2026.07.10)
 
 - feat(manageorders-ref): add PULL API models (Orders/LineItems/Tracking/Payments/InventoryLevels) — now 18 models/266 fields, both Swaggers
