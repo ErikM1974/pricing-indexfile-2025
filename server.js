@@ -502,7 +502,8 @@ const CSP_DIRECTIVES = {
   ],
   frameSrc: [
     "'self'",
-    // Embedded Caspio DataPages, Box previews, Jotform, YouTube how-tos
+    // Embedded Caspio DataPages, Box previews, Jotform, YouTube how-tos,
+    // Wistia (official ShopWorks training videos on /training pages)
     'https://c3eku948.caspio.com',
     'https://c2aby672.caspio.com',
     'https://nwcustom.caspio.com',
@@ -511,6 +512,7 @@ const CSP_DIRECTIVES = {
     'https://www.jotform.com',
     'https://form.jotform.com',
     'https://www.youtube.com',
+    'https://fast.wistia.net',
   ],
   frameAncestors: ["'self'"],
   objectSrc: ["'none'"],
@@ -3026,6 +3028,12 @@ app.get('/dashboards/table-usage-audit.html', requireCrmRole(['admin']), (req, r
 // push/pull fields (from the public Swagger + our tested reference). Before the mount.
 app.get('/dashboards/manageorders-api-reference.html', requireCrmRole(['admin']), (req, res) => {
   res.sendFile(path.join(__dirname, 'dashboards', 'manageorders-api-reference.html'));
+});
+
+// SanMar Web Services (SOAP) cheat sheet — ADMIN ONLY. Static reference from the
+// Integration Guide v24.5 + memory/SANMAR_API_REFERENCE.md. Before the mount.
+app.get('/dashboards/sanmar-api-reference.html', requireCrmRole(['admin']), (req, res) => {
+  res.sendFile(path.join(__dirname, 'dashboards', 'sanmar-api-reference.html'));
 });
 
 // Customer Portal admin console — manage who can log into the customer portal

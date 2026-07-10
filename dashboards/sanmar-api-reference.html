@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>SanMar Web Services — API Cheat Sheet · Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css">
+    <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
+    <link rel="stylesheet" href="/dashboards/css/sanmar-api-reference.css?v=2026.07.10.1">
+</head>
+<body>
+    <div class="dash-shell">
+        <header class="dash-header">
+            <div class="dash-header-left">
+                <a href="/staff-dashboard.html" title="Back to Staff Dashboard">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                         alt="Northwest Custom Apparel" class="dash-header-logo">
+                </a>
+                <h1 class="dash-header-title">SanMar Web Services <span class="sm-subhead">SOAP API cheat sheet · guide v24.5</span></h1>
+            </div>
+            <div class="dash-header-right">
+                <span class="sm-lock" title="Admin only"><i class="fas fa-user-shield"></i> Admin</span>
+                <a href="/staff-dashboard.html" class="dash-back-link"><i class="fas fa-arrow-left"></i> Dashboard</a>
+            </div>
+        </header>
+
+        <main class="dash-content">
+
+            <section class="dash-card sm-intro">
+                <p class="sm-lead">Field + method reference for the <strong>SanMar Web Services API</strong> — the XML/SOAP services we use for product data, live inventory, pricing, order status/shipments, invoices, and packing slips (Box Labels). From the <strong>Integration Guide v24.5 (July 2026)</strong>, annotated with our production gotchas.</p>
+                <div class="sm-chips">
+                    <span class="sm-chip">Prod <b>ws.sanmar.com:8080</b></span>
+                    <span class="sm-chip">Test <b>test-ws.sanmar.com:8080</b></span>
+                    <span class="sm-chip">Protocol <b>SOAP/XML · TLS 1.2</b></span>
+                    <span class="sm-chip"><b>12</b> services</span>
+                    <span class="sm-chip sm-chip--muted">Canonical: <b>memory/SANMAR_API_REFERENCE.md</b> + <b>sanmar-api-guide-24.5-jul2026.pdf</b></span>
+                </div>
+                <div class="sm-callout sm-callout--danger">
+                    <h4><i class="fas fa-triangle-exclamation"></i> The gotchas that actually break integrations</h4>
+                    <ul>
+                        <li><b>Color = <code>catalogColor</code> / mainframe code</b> ("BrillOrng"), never the display <code>COLOR_NAME</code> — for every SanMar API, inventory, and order call. (One exception: our proxy's <code>/api/inventory</code> product feed keys on COLOR_NAME.)</li>
+                        <li><b>Inventory caps at 3000/warehouse</b> — a returned "3000" means <em>≥3000</em>, not an exact count (both inventory services).</li>
+                        <li><b><code>sizeIndex</code> is a small ordinal</b> (1=XS, 2=S, 3=M, 4=L, 5=XL, 6+=2XL…). <b><code>uniqueKey</code> = <code>inventoryKey</code>+<code>sizeIndex</code></b> = PromoStandards <code>partId</code> — the CSV merge key.</li>
+                        <li><b>Use PRODUCTION WSDLs even for read testing</b> — the Test env's products/pricing/inventory are stale. Test credentials are separate.</li>
+                        <li><b>Order tracking:</b> error <b>301</b> = order not shipped+invoiced yet (persisting &gt;48h → flag + pause); <b>303</b> = date older than 7 days; <b>allOpen excludes Complete</b> — a fast order can vanish between polls (pair with invoice-based catch-up).</li>
+                        <li><b>Standard getPricing = cost tiers, not MSRP</b>, and <b>price varies by color</b>. MSRP/MAP = PromoStandards <code>priceType=List</code> or the <code>mapPrice</code> field (new Jun 2026).</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section class="dash-card">
+                <h2 class="sm-h">Services &amp; WSDLs <span class="sm-tag">prefix with https://&lt;host&gt;:8080</span></h2>
+                <div class="sm-eplist" id="smEndpoints"></div>
+                <p class="sm-note">Product Data V2 also answers at <code>…/ProductDataServiceV2.xml?wsdl</code> — prefer the Binding form (what our proxy uses). Order Status <b>V1 was removed Aug 2024</b> — never re-add it. API IP <code>63.251.12.134</code>; a WSDL timeout in a browser = port-8080 firewall block.</p>
+            </section>
+
+            <section class="dash-card">
+                <div class="sm-fieldhead">
+                    <h2 class="sm-h sm-h--flush">Methods &amp; fields <span class="sm-tag">every service, annotated</span></h2>
+                    <input type="search" id="smFilter" class="sm-filter" placeholder="Search — getPricing, partIdArray, casePrice, 301…" aria-label="Search">
+                </div>
+                <p class="sm-count" id="smCount"></p>
+                <div id="smModels"></div>
+            </section>
+
+            <section class="dash-card">
+                <h2 class="sm-h">Data-usage cadence <span class="sm-tag">best practices, guide pp.13-17</span></h2>
+                <div class="sm-scroll"><table class="sm-table">
+                    <thead><tr><th>Need</th><th>Best option</th><th>Cadence / rule</th></tr></thead>
+                    <tbody>
+                        <tr><td>Invoices</td><td><b>Daily Invoice File</b> (FTP, 6am PT)</td><td>Invoiced daily after 9pm PT — pull the NEXT day. PromoStandards GetInvoices only after 3pm PT. 1-2 calls/day by reference#.</td></tr>
+                        <tr><td>Inventory — bulk</td><td><b>sanmar_dip.txt</b> (FTP, hourly)</td><td>Service pull at style level ≈ 3000 API calls/occurrence — use the file.</td></tr>
+                        <tr><td>Inventory — live</td><td>PromoStandards Inventory V2</td><td>At time of ordering only (partIdArray batches a cart ≤200).</td></tr>
+                        <tr><td>Pricing — sale</td><td>sanmar_dip.txt, <b>Mon &amp; Wed</b></td><td>Sale pricing changes every Mon/Wed.</td></tr>
+                        <tr><td>Pricing — case/MSRP/program</td><td>SanMar_EPDD.csv / Incentive file, monthly</td><td>Base pricing changes only 1-2×/year.</td></tr>
+                        <tr><td>Order status</td><td>Order Status V2, ≤3×/day</td><td>Wait 2h after PO. STOP polling on Complete/Canceled. Backorder → pause until in-hands date.</td></tr>
+                        <tr><td>Shipments</td><td><b>Daily Status File</b> (FTP, nightly)</td><td>Alt: OSN V1 ≤3×/day (7-day window).</td></tr>
+                        <tr><td>Full catalog</td><td>sanmar_dip.txt / EPDD / SDL, monthly</td><td>One-time getProductBulkInfo; deltas via getProductDeltaInfo (FTP SanMarPI, merge on unique_key).</td></tr>
+                    </tbody>
+                </table></div>
+            </section>
+
+            <section class="dash-card">
+                <h2 class="sm-h">Warehouses <span class="sm-tag">whseID · also the pricing fobId values</span></h2>
+                <div class="sm-scroll"><table class="sm-table sm-table--tight">
+                    <thead><tr><th>ID</th><th>Location</th><th>ID</th><th>Location</th><th>ID</th><th>Location</th></tr></thead>
+                    <tbody>
+                        <tr><td><b>1</b></td><td>Seattle, WA</td><td><b>4</b></td><td>Reno, NV</td><td><b>7</b></td><td>Minneapolis, MN</td></tr>
+                        <tr><td><b>2</b></td><td>Cincinnati, OH</td><td><b>5</b></td><td>Robbinsville, NJ</td><td><b>12</b></td><td>Phoenix, AZ</td></tr>
+                        <tr><td><b>3</b></td><td>Dallas, TX</td><td><b>6</b></td><td>Jacksonville, FL</td><td><b>31</b></td><td>Richmond, VA</td></tr>
+                    </tbody>
+                </table></div>
+            </section>
+
+            <section class="dash-card">
+                <h2 class="sm-h">Errors</h2>
+                <p><b>Standard:</b> <code>Invalid Style + Color + Size specified</code> (use SanMar_SDL_N.csv for valid combos) · <code>User authentication failed</code> · <code>Invalid warehouse specified</code>.</p>
+                <p><b>PromoStandards codes:</b> 100 ID not found · 104 unauthorized · 105 auth failed · 110 auth required · 115 wsVersion · 120 required fields · 125 not supported · 130 productId · 135 product color · 140 partId · 145 part color · 150 part size · 155 date format · 160 no results · 200 product data not found · 300 queryType · <b>301 PO/invoice not found (must be shipped + invoiced)</b> · 302 bad timestamp · <b>303 date &gt;7 days old</b> · 999 general.</p>
+            </section>
+
+            <section class="dash-card">
+                <h2 class="sm-h">Brand restrictions &amp; MAP <span class="sm-tag">v24.5 — RESTRUCTURED Jul 2026</span></h2>
+                <p><b>Prohibited on Amazon/eBay/Etsy/Craigslist/any third-party or D2C site (14):</b> Brooks Brothers · Carhartt · Cotopaxi · Eddie Bauer · <b>MiiR Apparel (new)</b> · New Era · Nike · OGIO · Outdoor Research · Stanley/Stella · tentree · The North Face · Tommy Bahama · Travis Mathew.</p>
+                <div class="sm-scroll"><table class="sm-table">
+                    <thead><tr><th>MAP tier</th><th>Brands</th></tr></thead>
+                    <tbody>
+                        <tr><td><b>10% off MSRP</b></td><td>Alternative Apparel, Brooks Brothers, Bulwark, Champion, Cotopaxi, Eddie Bauer, <b>MiiR Apparel</b>, New Era, Nike, OGIO, Outdoor Research, Red Kap, Richardson Apparel, Russell Outdoors, Spacecraft, Stanley/Stella, tentree, The North Face, Travis Mathew, Wink</td></tr>
+                        <tr><td><b>20% off MSRP</b></td><td>AllMade, CornerStone (excl. $9.75 caps), District, Mercer+Mettle, Port &amp; Co, Port Authority, Sport-Tek, Volunteer Knitwear</td></tr>
+                        <tr><td><b>25% off MSRP</b></td><td><b>Flexfit, Richardson Caps</b> (excl. $9.75 styles) — <i>changed in v24.5</i></td></tr>
+                        <tr><td><b>MAP = $9.75</b></td><td>Richardson caps 115 / 112 / 112FP / 112PFC / 112PFR</td></tr>
+                        <tr><td><b>MAP = MSRP</b></td><td>Carhartt, Nike Bags, Tommy Bahama (no advertised discount; none ever on OGIO bags)</td></tr>
+                        <tr><td><b>No MAP</b></td><td>A4, Anvil, Bella+Canvas, Comfort Colors, Fruit of the Loom, Gildan, Jerzees, Next Level, Rabbit Skins — <i>moved from 25% in v24.5 (unrestricted)</i></td></tr>
+                    </tbody>
+                </table></div>
+                <p class="sm-note">Hemmed pants: NOT in integrated data or PO submittal — order via SanMar.com/phone/email (unhemmed = supported). GTINs for most brands: SanMar_SDL_N.csv / SanMar_EPDD.csv.</p>
+            </section>
+
+            <p class="sm-foot">
+                Compiled from the SanMar Web Services Integration Guide <b>v24.5 (July 2026)</b> — PDF: <code>memory/sanmar-api-guide-24.5-jul2026.pdf</code> — plus tested behavior in
+                <code>memory/SANMAR_API_REFERENCE.md</code> (the single source of truth — update THERE, not here).
+                PO <b>submission</b> (outbound blank ordering) is separate → <code>memory/sanmar-po/README.md</code>. Onboarding/access: <code>sanmarintegrations@sanmar.com</code>.
+            </p>
+        </main>
+    </div>
+
+    <script src="/dashboards/js/sanmar-api-reference.js?v=2026.07.10.1"></script>
+</body>
+</html>
