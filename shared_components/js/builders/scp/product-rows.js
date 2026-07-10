@@ -9,6 +9,7 @@
    SKUValidationService, ProductCategoryFilter, cleanProductTitle,
    getSwatchStyle, productThumbnailModal, Event */
 import { scpState, API_BASE, SIZE06_EXTENDED_SIZES } from './state.js';
+import { positionColorDropdown } from '../shared/color-dropdown-position.js';
 
 export function setupSearchAutocomplete() {
     const searchInput = /** @type {HTMLInputElement|null} */ (document.getElementById('product-search'));
@@ -1110,6 +1111,8 @@ export function toggleColorPicker(rowId) {
     // role/id/aria-selected lazily on open; keep aria-expanded truthful.
     const nowOpen = !dropdown.classList.contains('hidden');
     pickerSelected.setAttribute('aria-expanded', String(nowOpen));
+    // P1 (2026-07-10): pin to viewport so table-card overflow can't clip the list
+    if (nowOpen) positionColorDropdown(pickerSelected, dropdown);
     if (nowOpen) {
         dropdown.querySelectorAll('.color-picker-option').forEach((opt, oi) => {
             opt.setAttribute('role', 'option');

@@ -9,6 +9,7 @@
 /* global dtfQuoteBuilder, showToast, escapeHtml, getSwatchStyle, productThumbnailModal,
    cleanProductTitle */
 import { dtfState, API_BASE } from './state.js';
+import { positionColorDropdown } from '../shared/color-dropdown-position.js';
 
 // Shared ExtendedSizesConfig module is REQUIRED — no fallback (classic script
 // loads before the bundle; hard-fail loudly if the include went missing).
@@ -431,6 +432,8 @@ export function toggleColorPicker(rowId) {
     // role/id/aria-selected lazily on open; keep aria-expanded truthful.
     const nowOpen = !dropdown.classList.contains('hidden');
     selected.setAttribute('aria-expanded', String(nowOpen));
+    // P1 (2026-07-10): pin to viewport so table-card overflow can't clip the list
+    if (nowOpen) positionColorDropdown(selected, dropdown);
     if (nowOpen) {
         dropdown.querySelectorAll('.color-picker-option').forEach((opt, oi) => {
             opt.setAttribute('role', 'option');

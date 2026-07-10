@@ -696,7 +696,7 @@ Artwork/design information.
 | `DesignName` | string | Design name |
 | `ExtDesignID` | string | External design ID |
 | `id_Design` | number | OnSite design ID — **OMIT entirely when unknown; do NOT send `0`** (see ⚠️ rule below) |
-| `id_DesignType` | number | Design type (3=standard, 45=DTG) |
+| `id_DesignType` | number | Design type — NWCA taxonomy: 1=Screen Print · 2=Embroidery · 4=Sticker · 5=Emblem · 8=DTF · 45=DTG (3=standard/legacy; single source = `DESIGN_TYPE_ID` in Pricing Index `server.js` ~2798) |
 | `id_Artist` | number | Artist assignment ID |
 | `ForProductColor` | string | Applicable colors — **use CATALOG_COLOR codes**, comma-separated; should list ALL colors the design covers (see ⚠️ rule below) |
 | `VendorDesignID` | string | Vendor's design ID |
@@ -744,6 +744,24 @@ Same rule as `LinesOE.Color` — abbreviated mainframe codes (`Bk/Bk/LtGy`, `Hot
 | `ParameterValue` | string | Parameter value |
 | `Text` | string | Text content |
 | `CustomField01-05` | string | Custom fields |
+
+#### What the quote-builder transformers populate (2026-07-10 Swagger field audit)
+
+New-design pushes (Branch 2 — uploaded artwork) now fill, per method:
+
+| Field | EMB | SCP | DTF |
+|-------|-----|-----|-----|
+| `ForProductColor` | ✅ all distinct CATALOG_COLOR codes, comma-sep (contract above) | ✅ same | ✅ same |
+| `Locations[].TotalStitches` | ✅ `StitchCount`/`CapStitchCount` per placement | — | — |
+| `Locations[].TotalColors` | — | ✅ per-location: placement matches `/back/i` → `backColors`, else `frontColors` (falls back to front+back sum on 0 — the pre-2026-07-10 behavior stamped the SUM on every location) | — |
+| `Locations[].TotalFlashes` | — | ✅ `'1'` when `Notes.isDarkGarment` (white underbase flash) | — |
+| `Locations[].Notes` | filename | filename + `· Underbase (dark garment)` when dark | filename + `· <sizeName> transfer` when the placement matches a `Notes.transferBreakdown` entry |
+| `Locations[].ImageURL` | ✅ `/sw.jpg` variant (§13) | ✅ | ✅ |
+| `Locations[].DesignCode` | `EMB-n` | `SCP-n` | `DTF-n` |
+
+Still unpopulated (no honest data at quote-push time): `id_Artist`, `VendorDesignID`, `LocationDetails[]` (thread colors exist only after Ruth digitizes — `EMB_Design_Files.Thread_Sequence_JSON` is keyed to mockups, not quotes), Custom fields. Existing-design pushes (Branch 1) stay `{ id_Design }`-only — OnSite already owns that design record.
+
+⚠️ **Conversion-survival caveat:** like the order-level tax fields (§ "OnSite DROPS the pushed order-level tax field"), a schema-accepted field is not proven until it's seen on a converted OnSite order. `TotalStitches`/`ImageURL`/`DesignName` are production-proven; `TotalColors`/`TotalFlashes`/`ForProductColor`/location `Notes` shipped 2026-07-10 — verify on the next test push and update this row.
 
 ---
 
@@ -1167,6 +1185,8 @@ Holidays skipped:
 - Images exceeding 2MB will fail silently or be rejected
 
 **Solution:** Compress images before attaching. Convert to .jpg for photos.
+
+**NWCA implementation (2026-07-10):** proxy `GET /api/files/:key/sw.jpg` (files-simple.js) serves any stored upload as a ≤1.9MB JPEG with a real extension (sharp: EXIF-rotate, white-flatten, ≤1400px q80, retry 1000px q70). `lib/sw-image-url.js swImageUrl()` rewrites our own `/api/files/<key>` URLs to that variant in ALL push transformers (emb/scp/dtf `ImageURL`, push-client `mediaUrl`/`caspioUrl`); external URLs pass through unchanged. EMB also fills order-level `Attachments` from every uploaded file (`artworkAttachments()`) so artwork is visible in the Attachments tab even when an existing design # suppressed the Designs[] hostedFiles path. Never hand OnSite a raw upload URL.
 
 ---
 
