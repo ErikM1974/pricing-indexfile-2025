@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Purchasing from SanMar — ShopWorks Training Guide | Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Page styles -->
+    <link rel="stylesheet" href="/training/sanmar-purchasing-guide.css">
+</head>
+<body>
+    <main class="main-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-container">
+                <div class="header-left">
+                    <img class="header-logo" src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel">
+                    <nav class="breadcrumb">
+                        <a href="/staff-dashboard.html">Staff Dashboard</a>
+                        <span>/</span>
+                        <a href="/staff-dashboard.html#training">Training</a>
+                        <span>/</span>
+                        <span>SanMar Purchasing</span>
+                    </nav>
+                </div>
+                <div class="header-right">
+                    <button class="btn-print" type="button" data-action="print">
+                        <i class="fas fa-print" aria-hidden="true"></i> Print
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Page Title -->
+        <h1 class="page-title">
+            <i class="fas fa-cart-shopping" aria-hidden="true"></i> Purchasing from SanMar — ShopWorks Training Guide
+        </h1>
+        <p class="page-subtitle">
+            A step-by-step guide to ordering blanks from SanMar through the ShopWorks API integration —
+            from costing line items to a submitted purchase order. Based on Bradley's purchasing guide, and
+            written so anyone on the team can cover purchasing when he's out. Bradley owns this process;
+            Nika &amp; Taneisha are the trained backups.
+        </p>
+
+        <!-- Quick Nav -->
+        <nav class="quicknav" aria-label="On this page">
+            <h2>On this page</h2>
+            <ul>
+                <li><a href="#overview"><span class="num">1</span> The Workflow in One View</a></li>
+                <li><a href="#phase1"><span class="num">2</span> Phase 1 · Cost the Line Items</a></li>
+                <li><a href="#sizes"><span class="num">3</span> Size Annotation Cheat Sheet</a></li>
+                <li><a href="#phase2"><span class="num">4</span> Phase 2 · Build &amp; Send the PO</a></li>
+                <li><a href="#phase3"><span class="num">5</span> Phase 3 · Note the Order</a></li>
+                <li><a href="#vendors"><span class="num">6</span> Other Vendors &amp; Who to Ask</a></li>
+                <li><a href="#checklist"><span class="num">7</span> Final Checklist</a></li>
+                <li><a href="#videos"><span class="num">8</span> Official ShopWorks Videos</a></li>
+            </ul>
+        </nav>
+
+        <!-- ═══════════════════════════════════════════════════════════════
+             1 · THE WORKFLOW IN ONE VIEW
+             ═══════════════════════════════════════════════════════════════ -->
+        <h2 class="section-divider overview-theme" id="overview">
+            <i class="fas fa-eye" aria-hidden="true"></i> 1 · The Workflow in One View
+        </h2>
+
+        <div class="pillars">
+            <div class="pillar">
+                <span class="pillar-step">1</span>
+                <h3>Match &amp; cost line items</h3>
+                <p>Pull the live SanMar cost into every line item with <strong>Get Cost from Vendor</strong> —
+                correct color, one line per size.</p>
+                <p class="pillar-where"><i class="fas fa-location-dot" aria-hidden="true"></i> Order → Line Items</p>
+            </div>
+            <div class="pillar">
+                <span class="pillar-step">2</span>
+                <h3>Build &amp; send the PO</h3>
+                <p>Create the purchase order, fill in contact, ship-to and shipping method, then press
+                <strong>Send PO</strong> and confirm.</p>
+                <p class="pillar-where"><i class="fas fa-location-dot" aria-hidden="true"></i> Purchasing tab</p>
+            </div>
+            <div class="pillar">
+                <span class="pillar-step">3</span>
+                <h3>Document it</h3>
+                <p>Type <strong>“PO submitted”</strong> at the front of the order notes and flag any
+                out-of-stock items with restock dates.</p>
+                <p class="pillar-where"><i class="fas fa-location-dot" aria-hidden="true"></i> Notes On Order</p>
+            </div>
+        </div>
+
+        <div class="callout callout-key">
+            <i class="fas fa-compass" aria-hidden="true"></i> <strong>Rule of thumb:</strong> an order isn't purchased until all
+            three phases are done — <strong>costed, PO sent, and noted on the order</strong>. If you remember nothing else:
+            cost it, send it, note it.
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-plug" aria-hidden="true"></i> Why the API integration matters</h3>
+            </div>
+            <div class="ref-card-body">
+                <p>ShopWorks talks directly to SanMar. <strong>Get Cost from Vendor</strong> pulls live cost and availability
+                straight from SanMar — no manual price lookups — and <strong>Send PO</strong> transmits the purchase order
+                electronically the moment you confirm it. No phone call, no email, no re-keying into sanmar.com.</p>
+                <div class="callout callout-info">
+                    <i class="fas fa-circle-info" aria-hidden="true"></i> <strong>Where this happens:</strong> everything in this guide
+                    is done inside <strong>ShopWorks OnSite</strong>, on the order you're purchasing for. Keep this page (or
+                    Bradley's guide) open next to ShopWorks on your first few orders.
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════
+             2 · PHASE 1 — COST THE LINE ITEMS
+             ═══════════════════════════════════════════════════════════════ -->
+        <h2 class="section-divider cost-theme" id="phase1">
+            <i class="fas fa-tags" aria-hidden="true"></i> 2 · Phase 1 — Cost the Line Items
+        </h2>
+
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-hand-pointer" aria-hidden="true"></i> Step 1A — Open the line item and pull cost</h3>
+            </div>
+            <div class="ref-card-body">
+                <ol class="steps">
+                    <li><strong>Open the line item.</strong> From the order, open the item in the <strong>Line Items</strong>
+                        window and stay on the <strong>Behavior</strong> tab.</li>
+                    <li><strong>Check Product Source.</strong> Vendor should read <code>1002 · SANMAR</code> with
+                        <strong>“Allow purchase”</strong> selected.</li>
+                    <li><strong>Click “Get Cost from Vendor.”</strong> The blue button next to the vendor field opens the
+                        SanMar cost window.</li>
+                </ol>
+                <figure class="screenshot">
+                    <a href="/training/images/sanmar-purchasing/line-items-get-cost.png" target="_blank" rel="noopener">
+                        <img src="/training/images/sanmar-purchasing/line-items-get-cost.png" loading="lazy"
+                             alt="ShopWorks Line Items window on the Behavior tab for a PC55 tee — Product Source shows vendor 1002 SANMAR with Allow purchase selected, and the blue Get Cost from Vendor button is circled in red">
+                    </a>
+                    <figcaption><i class="fas fa-magnifying-glass-plus" aria-hidden="true"></i> The Line Items window for a
+                    Port &amp; Company tee (PC55) — vendor <strong>1002 · SANMAR</strong>, with <strong>Get Cost from Vendor</strong>
+                    circled. Click to enlarge.</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-palette" aria-hidden="true"></i> Step 1B — Get Cost from SANMAR: color → cost → apply</h3>
+            </div>
+            <div class="ref-card-body">
+                <p>The <strong>Get Cost from SANMAR</strong> window walks you through it, numbered 1–4:</p>
+                <ol class="steps">
+                    <li><strong>Select the color from the list.</strong> It must be a valid SanMar color for this exact product —
+                        e.g. <code>Dark Hthr Grey</code>. If your color isn't in the list, double-check the product number.</li>
+                    <li><strong>Select the vendor.</strong> <code>1002 · SanMar</code>.</li>
+                    <li><strong>Press “Get Cost.”</strong> The live SanMar price comes back in the box.</li>
+                    <li><strong>Press “Apply Cost.”</strong> Writes that cost onto the line item.</li>
+                </ol>
+                <div class="callout callout-warn">
+                    <i class="fas fa-triangle-exclamation" aria-hidden="true"></i> <strong>Watch out:</strong> the price isn't saved
+                    until you press <strong>Apply Cost</strong> — don't stop at Get Cost.
+                </div>
+                <figure class="screenshot">
+                    <a href="/training/images/sanmar-purchasing/get-cost-window.png" target="_blank" rel="noopener">
+                        <img src="/training/images/sanmar-purchasing/get-cost-window.png" loading="lazy"
+                             alt="Get Cost from SANMAR window with numbered steps — 1 select color from a dropdown showing Dark Hthr Grey, 2 select vendor 1002, 3 Get Cost button, 4 Apply Cost button">
+                    </a>
+                    <figcaption><i class="fas fa-magnifying-glass-plus" aria-hidden="true"></i> The window numbers the steps for you:
+                    color → vendor → <strong>Get Cost</strong> → <strong>Apply Cost</strong>. Click to enlarge.</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-layer-group" aria-hidden="true"></i> Step 1C — Every line item: one line per size, right column</h3>
+            </div>
+            <div class="ref-card-body">
+                <ol class="steps">
+                    <li><strong>Repeat 1A–1B for all line items.</strong> Every line on the order gets costed the same way.</li>
+                    <li><strong>Each size gets its own line item.</strong> e.g. <code>K540</code>, <code>K540_2X</code>,
+                        <code>TLK540_XLT</code>, <code>TLK540_2XLT</code> — never combined on one line.</li>
+                    <li><strong>Special sizes carry an annotation.</strong> The suffix on the part number
+                        (<code>_2X</code>, <code>_XLT</code>…) — full cheat sheet in
+                        <a href="#sizes">the next section</a>.</li>
+                    <li><strong>Quantities go in the 3X column.</strong> All special sizes use the <strong>3X column</strong> —
+                        except <strong>2X Mens</strong> garments, which use the <strong>2X column</strong>.</li>
+                </ol>
+                <div class="callout callout-warn">
+                    <i class="fas fa-triangle-exclamation" aria-hidden="true"></i> <strong>Double-check here:</strong> wrong column =
+                    wrong size ordered. This is where mistakes usually happen — verify before building the PO.
+                </div>
+                <figure class="screenshot">
+                    <a href="/training/images/sanmar-purchasing/one-line-per-size.png" target="_blank" rel="noopener">
+                        <img src="/training/images/sanmar-purchasing/one-line-per-size.png" loading="lazy"
+                             alt="Order line items showing sizes split into separate lines — K540 for standard sizes plus K540_2X, TLK540_XLT and TLK540_2XLT lines in Black and Navy, with special-size quantities keyed in the XXL and XXXL columns">
+                    </a>
+                    <figcaption><i class="fas fa-magnifying-glass-plus" aria-hidden="true"></i> A real example: <code>K540</code> holds
+                    the standard sizes; <code>K540_2X</code>, <code>TLK540_XLT</code> and <code>TLK540_2XLT</code> each get their own
+                    line, with quantities in the special-size columns. Click to enlarge.</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════
+             3 · SIZE ANNOTATION CHEAT SHEET
+             ═══════════════════════════════════════════════════════════════ -->
+        <h2 class="section-divider sizes-theme" id="sizes">
+            <i class="fas fa-ruler" aria-hidden="true"></i> 3 · Size Annotation Cheat Sheet
+        </h2>
+
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-table-list" aria-hidden="true"></i> Annotation + column, by size</h3>
+                <span class="btn-link badge-static"><i class="fas fa-print" aria-hidden="true"></i> Print-friendly — keep it handy</span>
+            </div>
+            <div class="ref-card-body">
+                <p>Add the annotation to the part number (e.g. <code>K540_2X</code>) and key the quantity into the column shown.</p>
+                <div class="cheat-tables">
+                    <table class="ref-table">
+                        <thead><tr><th>Size</th><th>Style</th><th>Column</th><th>Annotation</th></tr></thead>
+                        <tbody>
+                            <tr class="exception-row"><td><strong>2X</strong></td><td>Mens</td><td><strong>2X</strong></td><td><code>_2X</code></td></tr>
+                            <tr><td><strong>2X</strong></td><td>Womens</td><td>3X</td><td><code>_XXL</code></td></tr>
+                            <tr><td><strong>3X</strong></td><td>Both</td><td>3X</td><td><code>_3X</code></td></tr>
+                            <tr><td><strong>XS</strong></td><td>Both</td><td>3X</td><td><code>_XS</code></td></tr>
+                            <tr><td><strong>4X</strong></td><td>Both</td><td>3X</td><td><code>_4X</code></td></tr>
+                            <tr><td><strong>LT</strong></td><td>Both</td><td>3X</td><td><code>_LT</code></td></tr>
+                            <tr><td><strong>XLT</strong></td><td>Both</td><td>3X</td><td><code>_XLT</code></td></tr>
+                        </tbody>
+                    </table>
+                    <table class="ref-table">
+                        <thead><tr><th>Size</th><th>Style</th><th>Column</th><th>Annotation</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>2XLT</strong></td><td>Both</td><td>3X</td><td><code>_2XLT</code></td></tr>
+                            <tr><td><strong>3XLT</strong></td><td>Both</td><td>3X</td><td><code>_3XLT</code></td></tr>
+                            <tr><td><strong>OSFM</strong></td><td>Caps</td><td>3X</td><td><code>_OSFM</code></td></tr>
+                            <tr><td><strong>S/M</strong></td><td>Caps</td><td>3X</td><td><code>_S/M</code></td></tr>
+                            <tr><td><strong>L/XL</strong></td><td>Caps</td><td>3X</td><td><code>_L/XL</code></td></tr>
+                            <tr><td><strong>06M</strong></td><td>Toddlers</td><td>3X</td><td><code>_06M</code></td></tr>
+                            <tr><td><strong>12M</strong></td><td>Toddlers</td><td>3X</td><td><code>_12M</code></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="callout callout-warn">
+                    <i class="fas fa-star" aria-hidden="true"></i> <strong>The only exception:</strong> 2X Mens goes in the
+                    <strong>2X column</strong>. Everything else — women's 2X (<code>_XXL</code>), talls, caps, toddlers,
+                    XS through 4X — lands in the <strong>3X column</strong> with its suffix.
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════
+             4 · PHASE 2 — BUILD & SEND THE PO
+             ═══════════════════════════════════════════════════════════════ -->
+        <h2 class="section-divider po-theme" id="phase2">
+            <i class="fas fa-file-invoice" aria-hidden="true"></i> 4 · Phase 2 — Build &amp; Send the PO
+        </h2>
+
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-plus" aria-hidden="true"></i> Step 2A — Create the PO on the Purchasing tab</h3>
+            </div>
+            <div class="ref-card-body">
+                <ol class="steps">
+                    <li><strong>Open the Purchasing tab.</strong> Because you costed everything in Phase 1, your items appear
+                        under <strong>“Products to Purchase.”</strong></li>
+                    <li><strong>Check every line.</strong> Unit cost, vendor <code>1002 · Sanm</code>, and quantities per size.</li>
+                    <li><strong>Click “+ Add”</strong> under <strong>“Product POs for This Order”</strong> — this creates the
+                        SanMar PO and assigns it a PO number.</li>
+                    <li><strong>Open the PO.</strong> Click the <strong>✓ button</strong> at the far right of the new PO row
+                        to open it for editing.</li>
+                </ol>
+                <figure class="screenshot">
+                    <a href="/training/images/sanmar-purchasing/purchasing-tab-add.png" target="_blank" rel="noopener">
+                        <img src="/training/images/sanmar-purchasing/purchasing-tab-add.png" loading="lazy"
+                             alt="ShopWorks Purchasing tab — Products to Purchase lists PC55, PC55_2X and PC55_3X with unit cost and vendor 1002, and the Add button under Product POs for This Order is circled in red">
+                    </a>
+                    <figcaption><i class="fas fa-magnifying-glass-plus" aria-hidden="true"></i> The costed products are ready to buy —
+                    hit <strong>+ Add</strong> to spin up the PO. Click to enlarge.</figcaption>
+                </figure>
+                <figure class="screenshot">
+                    <a href="/training/images/sanmar-purchasing/po-row-open.png" target="_blank" rel="noopener">
+                        <img src="/training/images/sanmar-purchasing/po-row-open.png" loading="lazy"
+                             alt="New PO row for vendor 1002 SANMAR showing PO number 86738 and date issued, with the green checkmark button at the far right circled in red">
+                    </a>
+                    <figcaption><i class="fas fa-magnifying-glass-plus" aria-hidden="true"></i> The new PO row appears with its PO number
+                    (86738 here) — open it with the <strong>✓</strong> button on the right. Click to enlarge.</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-address-card" aria-hidden="true"></i> Step 2B — Fill contact, ship-to and shipping method</h3>
+            </div>
+            <div class="ref-card-body">
+                <ol class="steps">
+                    <li><strong>Vendor Contact.</strong> Use the <strong>◄ Pick</strong> button to choose the SanMar contact
+                        (e.g. Dave Brown).</li>
+                    <li><strong>Ship To.</strong> Use the green fill-in button to drop in the shop address —
+                        Northwest Embroidery, Milton WA.</li>
+                    <li><strong>Ship Method.</strong> Set how it ships (e.g. <code>PSST</code> — SanMar's “Pack Separately,
+                        Ship Together” program that arrives via UPS). Account # and Net 30 terms fill in automatically.</li>
+                </ol>
+                <div class="callout callout-tip">
+                    <i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i> <strong>Use the buttons, not the keyboard:</strong>
+                    each red circle in the screenshot marks a fill-in button — pick, don't type, so addresses and contacts
+                    come in exactly as SanMar expects.
+                </div>
+                <figure class="screenshot">
+                    <a href="/training/images/sanmar-purchasing/po-fill-buttons.png" target="_blank" rel="noopener">
+                        <img src="/training/images/sanmar-purchasing/po-fill-buttons.png" loading="lazy"
+                             alt="Purchase order details form with red circles marking the Pick button for Vendor Contact, the green fill button for Ship To, and the Ship Method dropdown — phone, fax and Net 30 terms are already filled in automatically">
+                    </a>
+                    <figcaption><i class="fas fa-magnifying-glass-plus" aria-hidden="true"></i> Three fill-ins before sending: contact
+                    (<strong>Pick</strong>), ship-to (green button), ship method (dropdown). Click to enlarge.</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-paper-plane" aria-hidden="true"></i> Step 2C — Press “Send PO” and confirm</h3>
+            </div>
+            <div class="ref-card-body">
+                <ol class="steps">
+                    <li><strong>Press “Send PO.”</strong> The button sits on the right-hand panel of the PO window.</li>
+                    <li><strong>Confirm submission.</strong> A confirmation window appears — the PO isn't transmitted
+                        until you confirm it.</li>
+                    <li><strong>Grab the PO number.</strong> Top-right of the window (e.g. <code>86738</code>) — you'll want
+                        it for the order notes in Phase 3.</li>
+                </ol>
+                <div class="callout callout-info">
+                    <i class="fas fa-bolt" aria-hidden="true"></i> <strong>Done means sent:</strong> the PO goes to SanMar through
+                    the integration the moment you confirm — no separate email needed.
+                </div>
+                <figure class="screenshot">
+                    <a href="/training/images/sanmar-purchasing/send-po.png" target="_blank" rel="noopener">
+                        <img src="/training/images/sanmar-purchasing/send-po.png" loading="lazy"
+                             alt="Completed purchase order for vendor 1002 SANMAR — contact Dave Brown, ship-to Northwest Embroidery Inc in Milton WA, ship method PSST, PO number 86738 — with the Send PO button on the right panel circled in red">
+                    </a>
+                    <figcaption><i class="fas fa-magnifying-glass-plus" aria-hidden="true"></i> Everything filled in — contact, ship-to,
+                    <code>PSST</code> — and <strong>Send PO</strong> circled on the right edge. Click to enlarge.</figcaption>
+                </figure>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════
+             5 · PHASE 3 — NOTE THE ORDER
+             ═══════════════════════════════════════════════════════════════ -->
+        <h2 class="section-divider notes-theme" id="phase3">
+            <i class="fas fa-pen-to-square" aria-hidden="true"></i> 5 · Phase 3 — Close the Loop in the Order Notes
+        </h2>
+
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-note-sticky" aria-hidden="true"></i> Thirty seconds that save everyone else</h3>
+            </div>
+            <div class="ref-card-body">
+                <ol class="steps">
+                    <li><strong>Open “Notes On Order”</strong> — back on the order itself.</li>
+                    <li><strong>Type at the front of the notes:</strong> your initials + date + <strong>“PO submitted”</strong> —
+                        the first thing anyone sees on the order.</li>
+                    <li><strong>Flag out-of-stock items.</strong> Note any style on backorder and its estimated restock date.</li>
+                </ol>
+                <p class="note-label">Bradley's real example:</p>
+                <div class="note-example" aria-label="Example order note">
+                    <span class="seg seg-who">BW 5/17/21</span> <span class="seg seg-status">PO submitted,</span>
+                    <span class="seg seg-bo">ST650 on BO with est. restock of next week</span>
+                </div>
+                <div class="note-decode">
+                    <span><span class="dot dot-who" aria-hidden="true"></span> initials + date</span>
+                    <span><span class="dot dot-status" aria-hidden="true"></span> status</span>
+                    <span><span class="dot dot-bo" aria-hidden="true"></span> backorder + restock estimate</span>
+                </div>
+                <figure class="screenshot">
+                    <a href="/training/images/sanmar-purchasing/notes-example.png" target="_blank" rel="noopener">
+                        <img src="/training/images/sanmar-purchasing/notes-example.png" loading="lazy"
+                             alt="Notes On Order panel in ShopWorks showing the first line: BW 5/17/21 PO submitted, ST650 on BO with est. restock of next week">
+                    </a>
+                    <figcaption><i class="fas fa-magnifying-glass-plus" aria-hidden="true"></i> How it looks in ShopWorks — the first
+                    line of <strong>Notes On Order</strong>. Click to enlarge.</figcaption>
+                </figure>
+                <div class="callout callout-info">
+                    <i class="fas fa-arrow-up-1-9" aria-hidden="true"></i> <strong>Why the front?</strong> Production and customer
+                    service read notes top-down — stock issues need to be the first thing they see.
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════
+             6 · OTHER VENDORS & WHO TO ASK
+             ═══════════════════════════════════════════════════════════════ -->
+        <h2 class="section-divider vendors-theme" id="vendors">
+            <i class="fas fa-store" aria-hidden="true"></i> 6 · Beyond SanMar — Other Vendors &amp; Who to Ask
+        </h2>
+
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-signs-post" aria-hidden="true"></i> Where to go for each vendor</h3>
+            </div>
+            <div class="ref-card-body">
+                <table class="ref-table">
+                    <thead><tr><th>Vendor</th><th>How to purchase</th></tr></thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>SanMar</strong></td>
+                            <td><strong>This guide.</strong> The API integration handles costing and PO submission end-to-end —
+                                follow the three phases above.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>All other vendors</strong></td>
+                            <td>Open the vendor's record in ShopWorks and follow the <strong>purchasing notes saved there</strong>
+                                for that vendor.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Supacolor transfers</strong></td>
+                            <td><strong>Nika takes point</strong> — she has purchased Supacolor transfers before.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="callout callout-tip">
+                    <i class="fas fa-hourglass-half" aria-hidden="true"></i> <strong>Not urgent, not sure?</strong> It can wait —
+                    Bradley will take care of it when he's back. <strong>Urgent + unsure → grab Erik.</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="ref-card">
+            <div class="ref-card-body">
+                <div class="contacts">
+                    <div class="contact-card"><div class="who">Bradley Wright</div><div class="role">Purchasing — owns this process</div><div class="for">All purchasing questions; non-urgent items wait for him</div></div>
+                    <div class="contact-card"><div class="who">Nika &amp; Taneisha</div><div class="role">Trained backups (this guide)</div><div class="for">SanMar purchasing coverage; Nika also handles Supacolor</div></div>
+                    <div class="contact-card"><div class="who">Erik Mickelson</div><div class="role">Operations Manager</div><div class="for">Escalation — anything urgent you're unsure about</div></div>
+                    <div class="contact-card"><div class="who">Dave Brown @ SanMar</div><div class="role">SanMar contact on POs</div><div class="for">The vendor contact you Pick in Step 2B</div></div>
+                </div>
+                <div class="callout callout-info">
+                    <i class="fas fa-truck-ramp-box" aria-hidden="true"></i> <strong>What happens after you send it?</strong> The blanks
+                    arrive at the dock and get received against your PO — that side of the story is the
+                    <a href="/training/shipping-receiving-guide.html">Shipping &amp; Receiving Guide</a>.
+                </div>
+            </div>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════
+             7 · FINAL CHECKLIST
+             ═══════════════════════════════════════════════════════════════ -->
+        <h2 class="section-divider check-theme" id="checklist">
+            <i class="fas fa-list-check" aria-hidden="true"></i> 7 · Before You Call an Order “Purchased”
+        </h2>
+
+        <div class="ref-card checklist-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-clipboard-check" aria-hidden="true"></i> Run this on your first few orders</h3>
+                <span class="btn-link badge-static"><i class="fas fa-floppy-disk" aria-hidden="true"></i> Saves in your browser</span>
+            </div>
+            <div class="ref-card-body">
+                <p class="checklist-phase-label">Phase 1 — Costing</p>
+                <div class="checklist-grid" data-checklist="sanmar-po-phase1">
+                    <label class="checklist-item"><input type="checkbox"><span>Every line item costed via <strong>Get Cost from Vendor</strong></span></label>
+                    <label class="checklist-item"><input type="checkbox"><span>Valid SanMar color selected before getting cost</span></label>
+                    <label class="checklist-item"><input type="checkbox"><span><strong>Apply Cost</strong> pressed — not just Get Cost</span></label>
+                    <label class="checklist-item"><input type="checkbox"><span>One line item per size, annotation on the part number</span></label>
+                    <label class="checklist-item"><input type="checkbox"><span>Special-size quantities in the <strong>3X column</strong> (2X Mens → 2X column)</span></label>
+                </div>
+                <p class="checklist-phase-label">Phase 2 &amp; 3 — PO + Notes</p>
+                <div class="checklist-grid" data-checklist="sanmar-po-phase23">
+                    <label class="checklist-item"><input type="checkbox"><span>PO created under the Purchasing tab with all items</span></label>
+                    <label class="checklist-item"><input type="checkbox"><span>Contact, Ship To and Ship Method filled via the pick buttons</span></label>
+                    <label class="checklist-item"><input type="checkbox"><span><strong>Send PO</strong> pressed — and confirmed in the pop-up</span></label>
+                    <label class="checklist-item"><input type="checkbox"><span><strong>“PO submitted”</strong> + initials + date at the front of the notes</span></label>
+                    <label class="checklist-item"><input type="checkbox"><span>Backorders noted with estimated restock dates</span></label>
+                </div>
+                <button class="checklist-reset" type="button" data-reset="sanmar-po-phase1 sanmar-po-phase23">Reset checklist</button>
+            </div>
+        </div>
+
+        <div class="callout callout-do">
+            <i class="fas fa-graduation-cap" aria-hidden="true"></i> <strong>After two or three orders it's muscle memory.</strong>
+            Questions along the way? Grab Erik, check the vendor notes in ShopWorks, and keep this page open on your
+            first few orders.
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════════════
+             8 · OFFICIAL SHOPWORKS VIDEOS
+             ═══════════════════════════════════════════════════════════════ -->
+        <h2 class="section-divider videos-theme" id="videos">
+            <i class="fas fa-circle-play" aria-hidden="true"></i> 8 · Official ShopWorks Training Videos
+        </h2>
+
+        <div class="ref-card">
+            <div class="ref-card-header">
+                <h3><i class="fas fa-video" aria-hidden="true"></i> Core Training — Session 5: Purchasing &amp; Inventory</h3>
+            </div>
+            <div class="ref-card-body">
+                <p>ShopWorks publishes its own purchasing &amp; inventory training. These videos cover the <em>general</em>
+                OnSite purchasing system (broader than just SanMar) — great background on why the screens work the way
+                they do. <strong>The SanMar-specific steps above are how we do it at NWCA.</strong></p>
+                <div class="video-grid">
+                    <div class="video-card">
+                        <div class="video-frame">
+                            <iframe src="https://fast.wistia.net/embed/iframe/53fo8q4vtm" title="ShopWorks Core Training — Session 5: Purchasing and Inventory (OnSite Ver. 13)" allow="fullscreen" loading="lazy" allowfullscreen></iframe>
+                        </div>
+                        <p class="video-caption">Purchasing &amp; Inventory — OnSite <strong>Ver. 13</strong></p>
+                    </div>
+                    <div class="video-card">
+                        <div class="video-frame">
+                            <iframe src="https://fast.wistia.net/embed/iframe/o2mkh2dpbx" title="ShopWorks Core Training — Session 5: Purchasing and Inventory (OnSite Ver. 14)" allow="fullscreen" loading="lazy" allowfullscreen></iframe>
+                        </div>
+                        <p class="video-caption">Purchasing &amp; Inventory — OnSite <strong>Ver. 14</strong></p>
+                    </div>
+                </div>
+                <ul class="bullets">
+                    <li>Source page: <a href="https://shopworkshelp.com/index.php?action=faq&amp;cat=93&amp;id=369&amp;artlang=en" target="_blank" rel="noopener">ShopWorks Help — Session 5: Purchasing and Inventory</a></li>
+                    <li>Next session there: <a href="https://shopworkshelp.com/index.php?action=faq&amp;cat=93&amp;id=370&amp;artlang=en" target="_blank" rel="noopener">Session 6 — Receiving &amp; Shipping</a> (pairs with our <a href="/training/shipping-receiving-guide.html">Shipping &amp; Receiving Guide</a>)</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Sources -->
+        <div class="sources-note">
+            <i class="fas fa-book" aria-hidden="true"></i> <strong>Sources.</strong> Compiled from Bradley Wright's
+            “Purchasing from SanMar” guide and his July 2026 team-training deck (screenshots from ShopWorks OnSite,
+            SanMar account details redacted). Official Session 5 training videos © ShopWorks
+            (<a href="https://shopworkshelp.com/" target="_blank" rel="noopener">shopworkshelp.com</a>).
+        </div>
+
+        <!-- Footer -->
+        <div class="page-footer">
+            <p>
+                <a href="/staff-dashboard.html#training"><i class="fas fa-graduation-cap" aria-hidden="true"></i> Training Hub</a>
+                &nbsp;&middot;&nbsp;
+                <a href="/staff-dashboard.html"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to Staff Dashboard</a>
+            </p>
+            <p>Northwest Custom Apparel · SanMar Purchasing Training Guide</p>
+        </div>
+    </main>
+
+    <button class="back-to-top" type="button" data-action="top" aria-label="Back to top"><i class="fas fa-arrow-up" aria-hidden="true"></i></button>
+
+    <!-- Scripts -->
+    <script src="/training/sanmar-purchasing-guide.js"></script>
+</body>
+</html>
