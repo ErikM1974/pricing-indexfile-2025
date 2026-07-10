@@ -34,6 +34,19 @@ May triage verdicts + per-doc **content-overlap** vs the LIVE Policies Hub bodie
 
 RETIRE? → HR-CONFIDENTIAL → HUB → TRAINING → PARTIAL-HUB (by dept) → COVERED spot-checks → RETIRE/ARCHIVE confirm. Erik marks decisions in the worksheet; then: new hub policies via admin API (⚠️ CLAUDE.md two-way **Employee Handbook sync check** before publishing each), training imports as `/training/` pages, retire/archive moves files into `_Archived-Duplicates`-style folders.
 
+## TRUST MODE (2026-07-10) — Erik delegated curation
+
+Erik: *"pick the ones that count … then the rest of the left over junk you can look at … I trust you Fable to do this."* Operating model now: **CORE 42** (HR 9 · Money 6 · Ops 15 · Training 12 — Fable updates each to 2026 standards and publishes; Erik spot-checks) · **ERIK 18** (dead-tool/credential facts only he knows) · **AUTO 376** (Fable processes; optional glance). Tier chips baked into the worksheet.
+
+**Hub write path (working, verified):** proxy `PUT https://caspio-pricing-proxy…/api/policies/:policyId` with header `X-CRM-API-Secret` (value = `CRM_API_SECRET` in this repo's `.env`) + `If-Match: <Updated_At>`; send `Body_HTML` (Body_Plain auto-derived) + `Updated_By`. List endpoint omits Body_HTML — GET the detail endpoint first.
+
+**LIVE hub fixes shipped 2026-07-10 (~19:35):**
+1. `sales-tax-shopworks` — Milton 10.1%→**10.2%** (6.5+3.7), added **Tax_10.2 / 2200.102** (old 10.1/2200.101 marked retired), summary updated.
+2. `eft-and-vendor-payments` — full **Kitsap Bank → Bank of America** rewrite (bill pay + check deposits; Payoneer section unchanged; Kitsap-specific "Deposit Connect" steps removed, Accounting owns current deposit method).
+3. `credit-card-sop` — Translink funds settle → **Bank of America** general account.
+
+**Business facts learned:** NWCA banks at **Bank of America** (July 2026; previously Kitsap Bank) — check `our-credit-references` doc + any vendor-credit references before reuse. **Translink IS current** (card-transaction view). Hub stale-scan (130 policies): pending-Erik markers = Jive ×2 (`phone-procedures`, `emergency-vendor-contacts`) · Stamps.com ×4 (`shipping-receiving-handbook`, `office-assistant-role`, `shipping-procedures`, `inksoft-and-shopify-workflows`) · Bigin in `hb-17-tech-data-security` · Qdigitizing ×7. 'sweetprocess' hits are cosmetic provenance text — **0 sweetprocess-hosted links in hub bodies** (nothing breaks at subscription end; only corpus-file attachments need rescue). `ltm-fee-policy` "10.1" = false positive ($10.17 example price).
+
 ## Status
 
 - [x] 2026-07-10 — classification + worksheet delivered; nav design proposed; questions list sent to Erik.
