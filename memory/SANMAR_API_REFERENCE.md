@@ -1,10 +1,12 @@
 # SanMar Web Services API Reference
 
-**Source:** SanMar Web Services Integration Guide **v24.4 (June 2026, 127 pages)**
-**Created:** 2026-02-22 (from v22.8) · **Updated:** 2026-06-23 (to v24.4)
+**Source:** SanMar Web Services Integration Guide **v24.5 (July 2026, 128 pages)** — PDF beside this file: `sanmar-api-guide-24.5-jul2026.pdf`
+**Created:** 2026-02-22 (from v22.8) · **Updated:** 2026-07-10 (to v24.5)
 **Purpose:** Documents how ShopWorks/NWCA communicates with SanMar for product info, inventory, pricing, order status/shipment, invoicing, and packing slips.
+**Staff cheat sheet (admin-only):** `/dashboards/sanmar-api-reference.html` — endpoints + methods + gotchas with a live filter. Renders from an embedded snapshot; **this file stays the single source of truth (update HERE, not the page's JS).**
 
-> **What changed v22.8 → v24.4** (SanMar change log): Feb 2025 added brands A4 + Stanley/Stella · Mar 2025 renamed **Edev → Test** environment · Jul 2025 PromoStandards GetProduct V2 params + getProductInfoByCategory categories + GetPackingSlip LPN info · Sep 2025 + Feb 2026 Brand Restrictions · Feb 2026 per-warehouse qty in GetInventory + "Port & Co" name · Jun 2026 SoapUI URL + getProduct getBrand/getCategory process + **getProduct MAP pricing field**.
+> **What changed v24.4 → v24.5 (July 2026):** "Updated Brand Restrictions page" — in practice a real restructure: **MiiR Apparel ADDED** to the prohibited-marketplace brands (now 14) and to MAP 10%; **Red House dropped** from the MAP 10% list; **MAP table rebuilt** — the basics/blanks brands (A4, Anvil, Bella+Canvas, Comfort Colors, Fruit of the Loom, Gildan, Jerzees, Next Level, Rabbit Skins) moved from "25% off" to a real **No MAP** column, and the **25% tier is now Flexfit + Richardson Caps**; policy text now reads "…10% off MSRP … or **20% for our private label brands**".
+> **v22.8 → v24.4** (prior): Feb 2025 added brands A4 + Stanley/Stella · Mar 2025 renamed **Edev → Test** environment · Jul 2025 PromoStandards GetProduct V2 params + getProductInfoByCategory categories + GetPackingSlip LPN info · Sep 2025 + Feb 2026 Brand Restrictions · Feb 2026 per-warehouse qty in GetInventory + "Port & Co" name · Jun 2026 SoapUI URL + getProduct getBrand/getCategory process + **getProduct MAP pricing field**.
 
 ---
 
@@ -279,32 +281,30 @@ Functions: **`getOrderStatus`**, **`getServiceMethods`** (capability probe); **`
 
 ---
 
-## Brand Restrictions (updated v24.4)
+## Brand Restrictions (updated v24.5)
 
-Prohibited from sale on **Amazon, eBay, Etsy, Craigslist, or any other third-party or direct-to-consumer website** (without embellishment) — **13 brands**:
+Prohibited from sale on **Amazon, eBay, Etsy, Craigslist, or any other third-party or direct-to-consumer website** — **14 brands**:
 
-> Brooks Brothers · Carhartt · Cotopaxi · Eddie Bauer · New Era · Nike · OGIO · **Outdoor Research** · **Stanley/Stella** · **tentree** · The North Face · Tommy Bahama · Travis Mathew
+> Brooks Brothers · Carhartt · Cotopaxi · Eddie Bauer · **MiiR Apparel** (NEW v24.5) · New Era · Nike · OGIO · Outdoor Research · Stanley/Stella · tentree · The North Face · Tommy Bahama · Travis Mathew
 
-(Bold = added since our prior doc.)
+## MAP Pricing (rebuilt v24.5 — structure CHANGED from v24.4)
 
-## MAP Pricing (rebuilt v24.4)
-
-Customers may not advertise discounts greater than the brand's MAP tier. **No discount may be advertised on OGIO bags.**
+Customers may not advertise discounts greater than **10% off MSRP** (retail brands) or **20% (SanMar private-label brands)**. **No discount may be advertised on OGIO bags.**
 
 | MAP tier | Brands |
 |---|---|
-| **10% off MSRP** | Alternative Apparel, Brooks Brothers, Bulwark, Champion, Cotopaxi, Eddie Bauer, New Era, Nike, OGIO, Outdoor Research, Red House, Red Kap, Richardson Apparel, Russell Outdoors, Spacecraft, Stanley/Stella, tentree, The North Face, Travis Mathew, Wink |
-| **20% off MSRP** | AllMade, CornerStone (excl. Richardson caps below), District, Mercer+Mettle, Port & Company, Port Authority, Sport-Tek, Volunteer Knitwear |
-| **25% off MSRP** | A4, Anvil, Bella+Canvas, Comfort Colors, Fruit of the Loom, Gildan, Jerzees, Next Level, Rabbit Skins |
-| **MAP = $9.75** | Richardson caps: styles **115, 112 / 112FP, 112PFC / 112PFR** (carved out of CornerStone's 20%) |
+| **10% off MSRP** | Alternative Apparel, Brooks Brothers, Bulwark, Champion, Cotopaxi, Eddie Bauer, **MiiR Apparel**, New Era, Nike, OGIO, Outdoor Research, Red Kap, Richardson Apparel, Russell Outdoors, Spacecraft, Stanley/Stella, tentree, The North Face, Travis Mathew, Wink *(Red House dropped in v24.5)* |
+| **20% off MSRP** | AllMade, CornerStone (excl. Richardson caps below), District, Mercer+Mettle, Port & Co, Port Authority, Sport-Tek, Volunteer Knitwear |
+| **25% off MSRP** | **Flexfit, Richardson Caps** (excl. the $9.75 styles below) — *was the basics tier in v24.4* |
+| **MAP = $9.75** | Richardson caps: styles **115, 112 / 112FP, 112PFC / 112PFR** |
 | **MAP = MSRP** (no discount) | Carhartt, Nike Bags, Tommy Bahama |
-| **No MAP** | *(empty in v24.4 — no brands listed)* |
+| **No MAP** | A4, Anvil, Bella+Canvas, Comfort Colors, Fruit of the Loom, Gildan, Jerzees, Next Level, Rabbit Skins — *moved here from "25% off" in v24.5 (unrestricted)* |
 
-> The "No MAP" column is empty: the basics/blanks brands are capped at **25% off**, not unrestricted. MSRP for these calculations = PromoStandards `getConfigurationAndPricing` with `priceType=List`, or the per-SKU `mapPrice` field from getProduct.
+> ⚠️ v24.4 had the basics brands capped at 25% and an empty No-MAP column; **v24.5 frees the basics entirely** and re-uses the 25% tier for Flexfit + Richardson Caps. MSRP for MAP calculations = PromoStandards `getConfigurationAndPricing` with `priceType=List`, or the per-SKU `mapPrice` field from getProduct (bulk CSV col `MAP_PRICE`).
 
 ## GTIN (NEW)
 
-GTINs (Global Trade Item Numbers) for these brands are in `SanMar_SDL_N.csv` and `SanMar_EPDD.csv` on the FTP server: A4, Allmade, Alternative, Anvil, Bella+Canvas, Brooks Brothers, Bulwark, Carhartt, Champion, Comfort Colors, CornerStone, Cotopaxi, District, Eddie Bauer, Fruit of the Loom, Gildan, Jerzees, Mercer+Mettle, Next Level, Nike, OGIO, Outdoor Research, Port & Co, Port Authority, Precious Cargo, Rabbit Skins, Red House, Red Kap, Russell Outdoors, Spacecraft, Sport-Tek, Stanley/Stella, tentree, The North Face, Tommy Bahama, TravisMathew, Volunteer Knitwear, Wink.
+GTINs (Global Trade Item Numbers) for these brands are in `SanMar_SDL_N.csv` and `SanMar_EPDD.csv` on the FTP server: A4, Allmade, Alternative, Anvil, Bella+Canvas, Brooks Brothers, Bulwark, Carhartt, Champion, Comfort Colors, CornerStone, Cotopaxi, District, Eddie Bauer, **Flexfit** (v24.5), Fruit of the Loom, Gildan, Jerzees, Mercer+Mettle, **MiiR Apparel** (v24.5), Next Level, Nike, OGIO, Outdoor Research, Port & Co, Port Authority, Precious Cargo, Rabbit Skins, Red House, Red Kap, Russell Outdoors, Spacecraft, Sport-Tek, Stanley/Stella, tentree, The North Face, Tommy Bahama, TravisMathew, Volunteer Knitwear, Wink.
 
 ## Hemmed Pants (NEW)
 

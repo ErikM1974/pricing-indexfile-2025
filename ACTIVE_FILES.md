@@ -1158,6 +1158,9 @@ cap-embroidery-fix.css
 | `/dashboards/manageorders-api-reference.html` | **NEW (2026-07-10)** ManageOrders / OnSite External API field cheat sheet — all push/pull endpoints + every ExternalOrderJson field (from public Swagger + tested gotchas), live filter. **ADMIN-only** (`requireCrmRole(['admin'])`). Canonical deep doc = `memory/MANAGEORDERS_COMPLETE_REFERENCE.md`. | dash-shell.css, art-hub.css, manageorders-api-reference.css, manageorders-api-reference.js | ✅ Active |
 | `/dashboards/css/manageorders-api-reference.css` | ManageOrders cheat-sheet styles (2026 tokens; HTTP verbs → --state-*) | dash-shell.css, art-hub.css | ✅ Active |
 | `/dashboards/js/manageorders-api-reference.js` | ManageOrders cheat-sheet controller — renders endpoints + 12 field models from an embedded snapshot + live filter/highlight (no API calls) | — | ✅ Active |
+| `/dashboards/sanmar-api-reference.html` | **NEW (2026-07-10)** SanMar Web Services (SOAP) cheat sheet — 12 services/WSDLs, methods + fields + gotchas (catalogColor, 3000 cap, sizeIndex, 301/303), cadence, warehouses, v24.5 MAP/brand restrictions, live filter. **ADMIN-only** (`requireCrmRole(['admin'])`). Canonical = `memory/SANMAR_API_REFERENCE.md`. | dash-shell.css, art-hub.css, sanmar-api-reference.css, sanmar-api-reference.js | ✅ Active |
+| `/dashboards/css/sanmar-api-reference.css` | SanMar cheat-sheet styles (2026 tokens) | dash-shell.css, art-hub.css | ✅ Active |
+| `/dashboards/js/sanmar-api-reference.js` | SanMar cheat-sheet controller — 14 sections (services/methods/fields/bridge rules) from an embedded snapshot + live filter/highlight (no API calls) | — | ✅ Active |
 
 ### Staff Dashboards
 | File | Purpose | Dependencies | Status |
@@ -1351,7 +1354,7 @@ Polish + code-quality pass. Plan: `~/.claude/plans/this-is-a-big-parsed-unicorn.
   - `pages/` (incl. js/, css/, order-form/, services/, utils/): 76 files
   - `shared_components/css/`: 61 files
   - `dashboards/` (incl. js/, css/, reports/): 39 files
-  - `training/`: 41 files
+  - `training/`: 44 files (+ `images/sanmar-purchasing/`, 8 screenshots)
   - Root (HTML/JS/CSS only): 34 files
   - `product/` (incl. components/, services/, styles/, js/): 20 files
   - `scripts/` (incl. safety-tools/): 20 files
@@ -1388,7 +1391,7 @@ Polish + code-quality pass. Plan: `~/.claude/plans/this-is-a-big-parsed-unicorn.
 
 ## 📁 Additional Directories
 
-### Training Materials (`/training/` — 41 files)
+### Training Materials (`/training/` — 44 files)
 
 Operational guides, training modules, and Adriyella's daily-task tooling. Most are standalone HTML pages with embedded JS/CSS.
 
@@ -1412,6 +1415,10 @@ Operational guides, training modules, and Adriyella's daily-task tooling. Most a
 | `/training/sales-coordinator-manual.html` | Sales coordinator manual | ✅ Active |
 | `/training/sales-coordinator-training-schedule.html` | Sales coordinator training schedule | ✅ Active |
 | `/training/sales-tax-code-trainer.html` | Sales tax code trainer | ✅ Active |
+| `/training/sanmar-purchasing-guide.html` | **NEW (2026-07-10)** SanMar purchasing via ShopWorks API training guide — 3 phases (cost line items / build+send PO / note order), size-annotation cheat sheet, ShopWorks screenshots from Bradley's deck, official ShopWorks Wistia videos. Linked from staff-dashboard Training nav | ✅ Active |
+| `/training/sanmar-purchasing-guide.css` | Styles for the SanMar purchasing training guide (print-friendly) | ✅ Active |
+| `/training/sanmar-purchasing-guide.js` | SanMar purchasing guide behaviour: print, persistent checklists, back-to-top | ✅ Active |
+| `/training/images/sanmar-purchasing/` | 8 ShopWorks screenshots for the SanMar purchasing guide (from Bradley's PPTX; account # redacted) | ✅ Active |
 | `/training/shipping-receiving-guide.html` | Shipping & Receiving Clerk training guide (receiving/shipping/pickups/close-day/hand-off) | ✅ Active |
 | `/training/shipping-receiving-guide.css` | Styles for the Shipping & Receiving training guide (print-friendly) | ✅ Active |
 | `/training/shipping-receiving-guide.js` | Shipping & Receiving guide behaviour: print, persistent checklists, back-to-top | ✅ Active |
