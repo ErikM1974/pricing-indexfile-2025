@@ -1395,12 +1395,15 @@ Polish + code-quality pass. Plan: `~/.claude/plans/this-is-a-big-parsed-unicorn.
 
 ## 📁 Additional Directories
 
-### Training Materials (`/training/` — 44 files)
+### Training Materials (`/training/` — 47 files)
 
 Operational guides, training modules, and Adriyella's daily-task tooling. Most are standalone HTML pages with embedded JS/CSS.
 
 | File | Purpose | Status |
 |------|---------|--------|
+| `/training/index.html` | **NEW (2026-07-10)** Training Center — role-track directory of ALL training (static guides + live Policies Hub Training category via public API); dashboard Training nav lands here | ✅ Active |
+| `/training/training-center.js` | Training Center controller — curated role tracks + live hub Training-category list | ✅ Active |
+| `/training/training-center.css` | Training Center styles (2026 tokens, dash-shell) | ✅ Active |
 | `/training/garment-art-request-guide.md` | **NEW (2026-06-17)** AE field guide for the rebuilt Garment art-request form — each field, what's required, what "approved" means, repeat/revision how-tos, short-notes rule | ✅ Active |
 | `/training/api-test-runner.html` | API test runner harness | ✅ Active |
 | `/training/art-approval-guide.html` | Art approval workflow guide | ✅ Active |
