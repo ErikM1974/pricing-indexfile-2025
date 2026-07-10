@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Policy Migration - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- 2026 design tokens (must load before dash-shell.css) -->
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css">
+    <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
+    <link rel="stylesheet" href="/dashboards/css/policy-migration.css">
+</head>
+<body>
+    <div class="dash-shell">
+        <header class="dash-header">
+            <div class="dash-header-left">
+                <a href="/staff-dashboard.html" title="Back to Staff Dashboard">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                         alt="Northwest Custom Apparel" class="dash-header-logo">
+                </a>
+                <h1 class="dash-header-title">Policy Migration — SweetProcess → Policies Hub</h1>
+            </div>
+            <div class="dash-header-right">
+                <a href="/pages/policies-hub.html" class="dash-back-link">
+                    <i class="fas fa-book-open"></i>
+                    Policies Hub
+                </a>
+                <a href="/staff-dashboard.html" class="dash-back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    Dashboard
+                </a>
+            </div>
+        </header>
+
+        <main class="dash-content">
+            <div class="dash-error-banner" role="alert">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span class="dash-error-banner-message"></span>
+                <button class="dash-error-banner-close" aria-label="Dismiss">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="dash-stat-grid">
+                <div class="dash-stat-card dash-stat-card--accent">
+                    <div class="dash-stat-value" id="stat-live">—</div>
+                    <div class="dash-stat-label">Live hub policies</div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value" id="stat-done">—</div>
+                    <div class="dash-stat-label">Docs resolved</div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value" id="stat-core">—</div>
+                    <div class="dash-stat-label">CORE queue left</div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value" id="stat-erik">—</div>
+                    <div class="dash-stat-label">Waiting on Erik</div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value" id="stat-junk">—</div>
+                    <div class="dash-stat-label">Retire / archive pile</div>
+                </div>
+            </div>
+
+            <div class="dash-card pm-questions" id="questions-card">
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title"><i class="fas fa-circle-question"></i> Questions only Erik can answer</h2>
+                </div>
+                <ul id="questions-list" class="pm-questions-list"></ul>
+                <p class="pm-hint">Answer any of these in a Claude session ("no more Jive", "MBF is dead") — each answer clears documents and fixes live policies automatically.</p>
+            </div>
+
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title"><i class="fas fa-rocket"></i> Shipped</h2>
+                </div>
+                <ul id="wave-log" class="pm-wave-log"></ul>
+            </div>
+
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title"><i class="fas fa-list-check"></i> Document tracker</h2>
+                    <div class="pm-controls">
+                        <input type="search" id="pm-search" placeholder="Search documents…" aria-label="Search documents">
+                        <div class="pm-chiprow" id="tier-chips"></div>
+                    </div>
+                </div>
+                <div id="content-root" class="dash-loading">Loading…</div>
+            </div>
+
+            <p class="pm-footnote">
+                Working files: OneDrive → 2026 → Human Resources 2026 → "NWCA Policy and Procedure list from Sweetprocess 2017 to 2026"
+                (<code>_Dashboard_Migration_Worksheet.html</code> / <code>.xlsx</code>). Confidential HR items are tracked there only — never on this page.
+            </p>
+        </main>
+    </div>
+
+    <!-- Load order matters: APP_CONFIG → fetch-timeout → DashPage → page controller -->
+    <script src="/config/app.config.js"></script>
+    <script src="/shared_components/js/fetch-timeout.js"></script>
+    <script src="/shared_components/js/dash-page-helpers.js"></script>
+    <script src="/dashboards/js/policy-migration.js"></script>
+</body>
+</html>
