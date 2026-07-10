@@ -14,7 +14,7 @@
 
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/manageorders-api-reference.css?v=2026.07.10.1">
+    <link rel="stylesheet" href="/dashboards/css/manageorders-api-reference.css?v=2026.07.10.2">
 </head>
 <body>
     <div class="dash-shell">
@@ -37,12 +37,11 @@
             <section class="dash-card mo-intro">
                 <p class="mo-lead">Field reference for the <strong>ShopWorks OnSite External API</strong> ("ManageOrders") — the API we push orders to and pull order/tracking data from. Every field of the order-push structure, annotated with the gotchas we've learned in production.</p>
                 <div class="mo-chips">
-                    <span class="mo-chip">Host <b>manageordersapi.com/onsite</b></span>
+                    <span class="mo-chip">Host <b>manageordersapi.com</b></span>
+                    <span class="mo-chip">Push <b>/onsite</b> · Pull <b>/v1</b></span>
                     <span class="mo-chip">Auth <b>Cognito (Bearer id_token)</b></span>
-                    <span class="mo-chip"><b>11</b> endpoints</span>
-                    <span class="mo-chip"><b>11</b> models · <b>149</b> fields</span>
-                    <span class="mo-chip">Swagger <b>1.0.0</b></span>
-                    <span class="mo-chip mo-chip--muted">Source: <a href="https://app.swaggerhub.com/apis-docs/ShopWorks/OnSiteExternalAPI/1.0.0" target="_blank" rel="noopener">SwaggerHub</a> + our reference</span>
+                    <span class="mo-chip"><b>18</b> models · <b>266</b> fields</span>
+                    <span class="mo-chip mo-chip--muted">Swagger: <a href="https://app.swaggerhub.com/apis-docs/ShopWorks/OnSiteExternalAPI/1.0.0" target="_blank" rel="noopener">Push</a> · <a href="https://app.swaggerhub.com/apis-docs/ShopWorks/ManageOrdersAPI/1.0.0" target="_blank" rel="noopener">Pull</a> + our reference</span>
                 </div>
                 <div class="mo-callout mo-callout--danger">
                     <h4><i class="fas fa-triangle-exclamation"></i> Swagger vs reality — read before you build a push</h4>
@@ -72,13 +71,13 @@
             </section>
 
             <p class="mo-foot">
-                Compiled from the public Swagger (<code>app.swaggerhub.com/apis/ShopWorks/OnSiteExternalAPI/1.0.0</code>) + tested behavior in
+                Compiled from the two public Swaggers — push <code>ShopWorks/OnSiteExternalAPI/1.0.0</code> (host <code>/onsite</code>) + pull <code>ShopWorks/ManageOrdersAPI/1.0.0</code> (host <code>/v1</code>) — plus tested behavior in
                 <code>memory/MANAGEORDERS_COMPLETE_REFERENCE.md</code> (the single source of truth — update THERE, not here).
                 Push chokepoint: <code>caspio-pricing-proxy/lib/manageorders-push-client.js</code>.
             </p>
         </main>
     </div>
 
-    <script src="/dashboards/js/manageorders-api-reference.js?v=2026.07.10.1"></script>
+    <script src="/dashboards/js/manageorders-api-reference.js?v=2026.07.10.2"></script>
 </body>
 </html>

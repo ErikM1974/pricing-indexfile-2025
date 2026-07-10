@@ -164,6 +164,62 @@
             ['Weight', 'number', false, ''],
             ['CustomField01', 'string', false, ''], ['CustomField02', 'string', false, ''], ['CustomField03', 'string', false, ''], ['CustomField04', 'string', false, ''], ['CustomField05', 'string', false, ''],
         ]},
+
+        // ===== PULL API (GET /v1/manageorders/*) — response models =====
+        { name: 'Orders (pull)', desc: 'GET /orders + /orders/{order_no} response. Completed = sts_Shipped && sts_Invoiced && sts_Paid.', fields: [
+            ['id_Order', 'integer', false, '= WO# (ShopWorks work-order number).'],
+            ['id_OrderType', 'number', false, ''],
+            ['id_Customer', 'integer', false, ''],
+            ['id_CustomerInternal', 'integer', false, ''],
+            ['CustomerName', 'string', false, ''],
+            ['CustomerServiceRep', 'string', false, 'Sales rep. NOTE: correct spelling HERE (pull); the PUSH field is the "CustomerSeviceRep" typo.'],
+            ['CustomerPurchaseOrder', 'string', false, 'PO# — storefront orders link WO by PO==QuoteID.'],
+            ['ContactFirstName', 'string', false, ''], ['ContactLastName', 'string', false, ''], ['ContactEmail', 'string', false, ''], ['ContactPhone', 'string', false, ''], ['ContactFax', 'string', false, ''], ['ContactTitle', 'string', false, ''], ['ContactDepartment', 'string', false, ''],
+            ['date_Ordered', 'string', false, ''], ['date_Invoiced', 'string', false, ''], ['date_RequestedToShip', 'string', false, ''], ['date_Produced', 'string', false, ''],
+            ['date_Shippied', 'string', false, '⚠ misspelled "date_Shippied" (double-i) in the API — read it exactly.'],
+            ['sts_Invoiced', 'string', false, '⚠ multi-state code: 0=No · 1=Yes · .5=Partial · 8/222=N/A. NOT a boolean.'],
+            ['sts_Paid', 'string', false, '0/1/.5/8/222 (see sts_Invoiced).'],
+            ['sts_Produced', 'string', false, '0/1/.5/8/222.'],
+            ['sts_Purchased', 'string', false, '0/1/.5/8/222.'],
+            ['sts_Received', 'string', false, '0/1/.5/8/222.'],
+            ['sts_Shipped', 'integer', false, '0/1/.5/8/222.'],
+            ['sts_ArtDone', 'integer', false, ''], ['sts_ReceivedSub', 'integer', false, ''], ['sts_PurchasedSub', 'integer', false, ''], ['sts_SizingType', 'integer', false, ''],
+            ['TotalProductQuantity', 'integer', false, ''],
+            ['cur_TotalInvoice', 'number', false, ''], ['cur_SubTotal', 'number', false, ''], ['cur_SalesTaxTotal', 'number', false, ''], ['cur_Shipping', 'number', false, ''], ['cur_Payments', 'number', false, ''], ['cur_Balance', 'number', false, ''], ['cur_Adjustment', 'number', false, ''],
+            ['TermsName', 'string', false, ''], ['TermsDays', 'integer', false, ''],
+            ['DesignName', 'string', false, 'LIVE design name (operator edits show here; pushed.* stays frozen).'],
+            ['id_Design', 'number', false, ''], ['id_URL', 'string', false, ''],
+        ]},
+        { name: 'LineItems (pull)', desc: 'GET /lineitems/{order_no}. Size01–06 are POSITIONAL.', fields: [
+            ['id_Order', 'integer', false, ''],
+            ['PartNumber', 'string', false, ''], ['PartColor', 'string', false, ''], ['PartDescription', 'string', false, ''],
+            ['LineQuantity', 'integer', false, ''], ['LineUnitPrice', 'number', false, ''],
+            ['Name', 'string', false, 'Personalization.'], ['SortOrder', 'integer', false, ''], ['InvoiceNotes', 'string', false, ''],
+            ['Size01', 'string', false, '⚠ POSITIONAL: Size01=S · Size02=M · Size03=L · Size04=XL · Size05=2XL · Size06=catch-all. Extended SKUs (_2X/_3X) land in the SAME column — SUM across all lines per style to rebuild the true distribution.'],
+            ['Size02', 'string', false, 'M'], ['Size03', 'string', false, 'L'], ['Size04', 'string', false, 'XL'], ['Size05', 'string', false, '2XL'], ['Size06', 'string', false, 'catch-all (extended sizes)'],
+            ['Custom01', 'string', false, ''], ['Custom02', 'string', false, ''], ['Custom03', 'string', false, ''], ['Custom04', 'string', false, ''], ['Custom05', 'string', false, ''],
+        ]},
+        { name: 'GetOrderNo (pull)', desc: 'GET /getorderno/{ext_order_id} → resolves ExtOrderID → WO#. NOT source-scoped; empty for builder ExtSources.', fields: [
+            ['id_Order', 'number', false, 'The resolved WO#.'],
+        ]},
+        { name: 'Tracking (pull)', desc: 'GET /tracking + /tracking/{order_no}.', fields: [
+            ['id_Order', 'integer', false, ''], ['TrackingNumber', 'string', false, ''], ['Type', 'string', false, 'carrier/service.'],
+            ['AddressCompany', 'string', false, ''], ['Address1', 'string', false, ''], ['Address2', 'string', false, ''], ['AddressCity', 'string', false, ''], ['AddressState', 'string', false, ''], ['AddressZip', 'string', false, ''], ['AddressCountry', 'string', false, ''],
+            ['Weight', 'string', false, ''], ['Cost', 'string', false, ''], ['date_Creation', 'string', false, ''], ['date_Imported', 'string', false, ''],
+        ]},
+        { name: 'OnSitePayments (pull)', desc: 'GET /payments — payments entered in OnSite.', fields: [
+            ['id_Order', 'integer', false, ''], ['Amount', 'number', false, ''], ['PaymentType', 'string', false, ''], ['date_PaymentApplied', 'string', false, ''], ['PaymentNumber', 'string', false, ''], ['id_SubPayment', 'integer', false, ''],
+        ]},
+        { name: 'WebPayments (pull)', desc: 'GET /payments — web (Stripe/portal) payments, with billing address.', fields: [
+            ['id_Order', 'integer', false, ''], ['Amount', 'number', false, ''], ['sts_Approved', 'integer', false, ''], ['PaymentNumber', 'string', false, ''], ['id_SubPayment', 'integer', false, ''], ['date_PaymentApplied', 'string', false, ''],
+            ['FirstName', 'string', false, ''], ['LastName', 'string', false, ''],
+            ['BillingCompnay', 'string', false, '⚠ misspelled "BillingCompnay" in the API.'], ['BillingAddress', 'string', false, ''], ['BillingCity', 'string', false, ''], ['BillingState', 'string', false, ''], ['BillingZip', 'string', false, ''], ['BillingCountry', 'string', false, ''],
+        ]},
+        { name: 'InventoryLevels (pull)', desc: 'GET /inventorylevels — per part+color, quantity per size.', fields: [
+            ['id_InventoryLevel', 'integer', false, ''], ['PartNumber', 'string', false, ''], ['Color', 'string', false, ''], ['ColorRange', 'string', false, ''], ['PartDescription', 'string', false, ''],
+            ['Size01', 'number', false, 'qty in S'], ['Size02', 'number', false, 'M'], ['Size03', 'number', false, 'L'], ['Size04', 'number', false, 'XL'], ['Size05', 'number', false, '2XL'], ['Size06', 'number', false, 'extended'],
+            ['UnitCost', 'number', false, ''], ['TotalCost', 'number', false, ''], ['GLAccount', 'string', false, ''], ['SKU', 'string', false, ''], ['PreprintGroup', 'string', false, ''], ['ProductType', 'string', false, ''], ['FindCode', 'string', false, ''], ['id_Vendor', 'number', false, ''], ['VendorName', 'string', false, ''],
+        ]},
     ];
 
     function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
