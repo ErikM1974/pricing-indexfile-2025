@@ -1,3 +1,10 @@
+## v2026.07.10.6 (2026.07.10)
+
+- docs(memory): v2026.07.10.5 live (r1618) + tracker admin-gated via Staff_Page_Access
+- data(policy-migration): wave-2 snapshot — Erik Q&A cascade applied (RETIRE? 15→5, hub 138)
+- docs(memory): HR reorg wave 2 — Erik Q&A cascade shipped (hub 138, creds scrubbed)
+- feat(training): Training Center role-track directory + 2-category nav (Office Assistant folded in)
+
 ## v2026.07.10.5 (2026.07.10)
 
 - docs(memory): Caspio platform findings from image-uploads build + training claude.md entry
