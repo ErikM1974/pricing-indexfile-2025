@@ -1168,6 +1168,8 @@ Holidays skipped:
 
 **Solution:** Compress images before attaching. Convert to .jpg for photos.
 
+**NWCA implementation (2026-07-10):** proxy `GET /api/files/:key/sw.jpg` (files-simple.js) serves any stored upload as a ≤1.9MB JPEG with a real extension (sharp: EXIF-rotate, white-flatten, ≤1400px q80, retry 1000px q70). `lib/sw-image-url.js swImageUrl()` rewrites our own `/api/files/<key>` URLs to that variant in ALL push transformers (emb/scp/dtf `ImageURL`, push-client `mediaUrl`/`caspioUrl`); external URLs pass through unchanged. EMB also fills order-level `Attachments` from every uploaded file (`artworkAttachments()`) so artwork is visible in the Attachments tab even when an existing design # suppressed the Designs[] hostedFiles path. Never hand OnSite a raw upload URL.
+
 ---
 
 ## 14. Customer Matching Priority (ExtCustomerID)
