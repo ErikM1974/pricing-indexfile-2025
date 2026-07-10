@@ -34,6 +34,14 @@ May triage verdicts + per-doc **content-overlap** vs the LIVE Policies Hub bodie
 
 RETIRE? → HR-CONFIDENTIAL → HUB → TRAINING → PARTIAL-HUB (by dept) → COVERED spot-checks → RETIRE/ARCHIVE confirm. Erik marks decisions in the worksheet; then: new hub policies via admin API (⚠️ CLAUDE.md two-way **Employee Handbook sync check** before publishing each), training imports as `/training/` pages, retire/archive moves files into `_Archived-Duplicates`-style folders.
 
+## Wave 1 SHIPPED (2026-07-10 ~19:58) — 14/14 published, hub now 137 policies
+
+- **7 PUT inserts:** pricing-negotiation (Special Pricing approval) · maintenance-equipment-care (Texwipe ordering) · dtg-daily-ops (3-2-1 + no-zinger) · emblem-orders-yung-ming (in-house printed emblems) · customer-complaint-handling (Fix-It Team) · jd-purchasing-clerk (performance expectations) · hb-13 (sick-overflow rule).
+- **7 POST new:** `overtime-policy-2026` (⚠️ LEGALLY CORRECTED — unapproved OT is still PAID per WA/FLSA, discipline instead; old "not compensated" clause dropped) · `meetings-attendance-policy` · `screen-printing-outsourced-sop` (5 docs consolidated) · `production-manager-weekly-ops` · Training: `csr-90-day-onboarding` · `ae-sales-foundations` (SanMar U password REDACTED — rotate!) · `embroidery-quality-basics` (rewritten, not reprinted — © Stitches Mag).
+- 10 more CORE sources VERIFIED already-covered → archive. CORE left = 8 (payment-terms merge, cc-auth fold, S&R training ×2, + 4 parked on Erik). PM-KPI eval rubric reclassified HR-CONFIDENTIAL.
+- **Publish mechanics gotcha:** batched bash curl loop against the proxy stalls with empty responses — use sequential python urllib (publish_wave1.py pattern), 45s timeout, If-Match per PUT.
+- **`/dashboards/policy-migration.html` tracker BUILT + verified** (dash-page pattern; data snapshot `policy-migration-data.json`, confidential rows excluded; nav: Administration → Policy Migration Tracker). Deploy **v2026.07.10.5 staged: main+tag on GitHub; `git push heroku main` BLOCKED by permission classifier — Erik must explicitly name the production deploy.** Also: add a `Staff_Page_Access` row to make the page admin-only (defaults any-staff).
+
 ## TRUST MODE (2026-07-10) — Erik delegated curation
 
 Erik: *"pick the ones that count … then the rest of the left over junk you can look at … I trust you Fable to do this."* Operating model now: **CORE 42** (HR 9 · Money 6 · Ops 15 · Training 12 — Fable updates each to 2026 standards and publishes; Erik spot-checks) · **ERIK 18** (dead-tool/credential facts only he knows) · **AUTO 376** (Fable processes; optional glance). Tier chips baked into the worksheet.
