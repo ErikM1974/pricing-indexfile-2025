@@ -1255,6 +1255,11 @@
 .team-dropdown__view-all:hover {
     background: color-mix(in oklch, var(--accent) 18%, var(--surface-card));
 }
+/* Anchor variant (View Org Chart, 2026-07-10) — kill underline, gap stacked items */
+a.team-dropdown__view-all {
+    text-decoration: none;
+    margin-top: var(--space-2);
+}
 
 /* =====================================================
    STAFF DIRECTORY MODAL (uses <dashboard-modal>)
