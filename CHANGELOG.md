@@ -1,3 +1,8 @@
+## v2026.07.10.4 (2026.07.10)
+
+- feat(dashboards): SanMar Web Services cheat sheet (admin-only) + reference bump to guide v24.5
+- chore(training): include SanMar Purchasing Guide page assets (other session's finished work, committed verbatim)
+
 ## v2026.07.10.3 (2026-07-10)
 
 - fix(builders): color-picker dropdown escapes table-card clipping (EMB/SCP/DTF)
