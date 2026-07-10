@@ -1,3 +1,7 @@
+## v2026.07.10.2 (2026.07.10)
+
+- feat(manageorders-ref): add PULL API models (Orders/LineItems/Tracking/Payments/InventoryLevels) — now 18 models/266 fields, both Swaggers
+
 ## v2026.07.10.1 (2026.07.10)
 
 - feat(dashboards): ManageOrders/OnSite API field cheat sheet (admin-only) + Swagger snapshot
