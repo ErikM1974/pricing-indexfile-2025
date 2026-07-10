@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>ManageOrders / OnSite API — Field Cheat Sheet · Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css">
+    <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
+    <link rel="stylesheet" href="/dashboards/css/manageorders-api-reference.css?v=2026.07.10.1">
+</head>
+<body>
+    <div class="dash-shell">
+        <header class="dash-header">
+            <div class="dash-header-left">
+                <a href="/staff-dashboard.html" title="Back to Staff Dashboard">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                         alt="Northwest Custom Apparel" class="dash-header-logo">
+                </a>
+                <h1 class="dash-header-title">ManageOrders / OnSite API <span class="mo-subhead">push + pull field cheat sheet</span></h1>
+            </div>
+            <div class="dash-header-right">
+                <span class="mo-lock" title="Admin only"><i class="fas fa-user-shield"></i> Admin</span>
+                <a href="/staff-dashboard.html" class="dash-back-link"><i class="fas fa-arrow-left"></i> Dashboard</a>
+            </div>
+        </header>
+
+        <main class="dash-content">
+
+            <section class="dash-card mo-intro">
+                <p class="mo-lead">Field reference for the <strong>ShopWorks OnSite External API</strong> ("ManageOrders") — the API we push orders to and pull order/tracking data from. Every field of the order-push structure, annotated with the gotchas we've learned in production.</p>
+                <div class="mo-chips">
+                    <span class="mo-chip">Host <b>manageordersapi.com/onsite</b></span>
+                    <span class="mo-chip">Auth <b>Cognito (Bearer id_token)</b></span>
+                    <span class="mo-chip"><b>11</b> endpoints</span>
+                    <span class="mo-chip"><b>11</b> models · <b>149</b> fields</span>
+                    <span class="mo-chip">Swagger <b>1.0.0</b></span>
+                    <span class="mo-chip mo-chip--muted">Source: <a href="https://app.swaggerhub.com/apis-docs/ShopWorks/OnSiteExternalAPI/1.0.0" target="_blank" rel="noopener">SwaggerHub</a> + our reference</span>
+                </div>
+                <div class="mo-callout mo-callout--danger">
+                    <h4><i class="fas fa-triangle-exclamation"></i> Swagger vs reality — read before you build a push</h4>
+                    <ul>
+                        <li><b>Dates are <code>MM/DD/YYYY</code></b> on push (the Swagger says ISO — OnSite rejects ISO).</li>
+                        <li><b><code>TaxTotal: 0</code></b> — OnSite drops the order-level tax on import. Put tax in a <code>Notes</code> block; the rep applies it via the ShopWorks dropdown. Tax flags <code>sts_EnableTax01–04</code> (undocumented in Swagger) drive tax calc if used.</li>
+                        <li><b><code>Color</code> = CATALOG_COLOR</b> (mainframe code), never COLOR_NAME. <b><code>id_Design</code>: omit</b> (don't send 0) when unknown. <b>Size:</b> push the BASE part# + plain size — OnSite appends <code>_2X</code>/<code>_3X</code>.</li>
+                        <li><b>Only 4 valid <code>Notes[].Type</code> values</b> — one bad Type aborts the WHOLE push. <code>ExtOrderID</code>/<code>ExtDesignID</code> must be GLOBALLY unique (full date+seq+year).</li>
+                        <li><code>GET /order-pull</code> returns fields at the TOP level (Swagger shows them wrapped in <code>order_json</code> — it's wrong). Retention ≈ 2 years, not 60 days.</li>
+                    </ul>
+                    <p class="mo-note">Full detail (165+ fields, per-endpoint examples, tested behavior) → the canonical <code>memory/MANAGEORDERS_COMPLETE_REFERENCE.md</code>. This page is the quick lookup.</p>
+                </div>
+            </section>
+
+            <section class="dash-card">
+                <h2 class="mo-h">Endpoints <span class="mo-tag">push · pull · tracking</span></h2>
+                <div class="mo-eplist" id="moEndpoints"></div>
+            </section>
+
+            <section class="dash-card">
+                <div class="mo-fieldhead">
+                    <h2 class="mo-h mo-h--flush">Field reference <span class="mo-tag">every model + field</span></h2>
+                    <input type="search" id="moFilter" class="mo-filter" placeholder="Search any field — TaxTotal, Color, ExtOrderID…" aria-label="Search fields">
+                </div>
+                <p class="mo-count" id="moCount"></p>
+                <div id="moModels"></div>
+            </section>
+
+            <p class="mo-foot">
+                Compiled from the public Swagger (<code>app.swaggerhub.com/apis/ShopWorks/OnSiteExternalAPI/1.0.0</code>) + tested behavior in
+                <code>memory/MANAGEORDERS_COMPLETE_REFERENCE.md</code> (the single source of truth — update THERE, not here).
+                Push chokepoint: <code>caspio-pricing-proxy/lib/manageorders-push-client.js</code>.
+            </p>
+        </main>
+    </div>
+
+    <script src="/dashboards/js/manageorders-api-reference.js?v=2026.07.10.1"></script>
+</body>
+</html>
