@@ -37,6 +37,7 @@ RETIRE? → HR-CONFIDENTIAL → HUB → TRAINING → PARTIAL-HUB (by dept) → C
 ## Status
 
 - [x] 2026-07-10 — classification + worksheet delivered; nav design proposed; questions list sent to Erik.
+- [x] 2026-07-10 — **Batch 1 reviewed** (Erik's first 15 marks: Accounting + Art + 2 CSR): 9 DISCUSS resolved via hub-body verification (5→COVERED-HUB archive, 2 merge-into-hub, CSR-90-day→TRAINING, sales-tax→fix-hub-first); his 4 RETIRE + 2 ARCHIVE safety-verified (hub artwork-intake names its consolidated sources verbatim; eft-and-vendor-payments contains full RDC procedure). Decisions read from Chrome Profile 2 leveldb (no CSV export needed) and now BAKED into worksheet data. **⚠️ LIVE HUB BUG found: `sales-tax-shopworks` still says Milton 10.1% — must update to 10.2%/Tax_10.2/2200.102 (Erik to paste corrected text or approve me doing it).** Gotcha: `credit-card-sop-2025` doc contains the FULL corporate card number in plaintext — redact before archiving.
 - [ ] Erik reviews worksheet batches; answers dead-tool + nav questions.
 - [ ] Implement nav (2 categories) + Training Center page after approval.
 - [ ] Promote HUB-gap docs to hub (handbook sync check each) · import TRAINING docs · execute retire/archive.
