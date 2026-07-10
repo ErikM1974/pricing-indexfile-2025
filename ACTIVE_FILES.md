@@ -1134,13 +1134,13 @@ cap-embroidery-fix.css
 
 ## 📂 Dashboard & Admin
 
-### Handbook PDF Generator ( — NEW 2026-07-10)
+### Handbook PDF Generator (`/scripts/handbook-pdf/` — NEW 2026-07-10)
 
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-|  | Rebuilds the printable Employee Handbook booklet (forms/Employee-Handbook-Latest.pdf) from LIVE hub chapters — cover w/ logo, TOC w/ page numbers, punch margins, per-chapter ghost-page compaction | npm docx + node-html-parser, Word COM for PDF export | ✅ Active |
-|  | Run instructions + ghost-page check recipe | — | ✅ Active |
-|  | NWCA logo for the cover (from Caspio CDN) | — | ✅ Active |
+| `/scripts/handbook-pdf/build_handbook_docx.js` | Rebuilds the printable Employee Handbook booklet (forms/Employee-Handbook-Latest.pdf) from LIVE hub chapters — cover w/ logo, TOC w/ page numbers, punch margins, per-chapter ghost-page compaction | npm docx + node-html-parser, Word COM for PDF export | ✅ Active |
+| `/scripts/handbook-pdf/README.md` | Run instructions + ghost-page check recipe | — | ✅ Active |
+| `/scripts/handbook-pdf/logo.png` | NWCA logo for the cover (from Caspio CDN) | — | ✅ Active |
 
 ### New Dashboard Pages (NEW 2026-04)
 | File | Purpose | Dependencies | Status |
