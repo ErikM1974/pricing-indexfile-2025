@@ -1,3 +1,7 @@
+## v2026.07.10.1 (2026.07.10)
+
+- feat(dashboards): ManageOrders/OnSite API field cheat sheet (admin-only) + Swagger snapshot
+
 ## v2026.07.09.19 (2026.07.09)
 
 - types: T4 — lift ALL 38 @ts-nocheck in builders/ (rubric #5 closed)
