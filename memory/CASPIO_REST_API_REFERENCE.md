@@ -36,6 +36,7 @@
 - `GET/POST/PUT/DELETE /v3/tables/{t}/records` — the workhorse
 - `GET /v3/tables/{t}/passwordFields` · `PUT/DELETE /v3/tables/{t}/passwordFields/{pf}` — **set/reset** a password field value server-side (PUT writes a hash; DELETE clears). ⚠️ This is a WRITE, NOT a credential-verify endpoint — Caspio REST has **no** "check these credentials" operation (confirmed by the 2026-06-29 portal-design research). Don't treat it as a login verifier.
 - `GET/PUT/DELETE /v3/tables/{t}/attachments/{field}[/{recordPkId}|/fileInfo]` — files stored ON a record
+- **File fields via plain record INSERT (verified live 2026-07-10, image-uploads build):** v3 `POST /records` accepts a File field as a **files-storage path string** (`"Image_Database": "/Artwork/name.png"` — file must already exist via `POST /v3/files`). No attachments round-trip needed. Same probe: **List-String fields accept JSON arrays on INSERT/PUT** (`"Vendor": ["Sanmar"]`, matched case-insensitively) — the "can't PUT plain strings" 500 applies to bare strings only; **Timestamp fields auto-stamp on insert** (writing them is unnecessary).
 - **Record query params:** `q.select` (projection — cuts payload), `q.where` (filter; **always sanitize**), `q.orderby`, `q.groupBy` (server-side aggregation), `q.pageSize` + `q.pageNumber` (**use `q.pageSize`, NOT `q.limit`, on v3** — `q.limit`+`q.pageNumber` overlaps pages). Pagination centralized in `fetchAllCaspioPages()`.
 
 ### Views (13) — read + write through predefined joins/filters
@@ -46,6 +47,7 @@
 ### Files (11) — Caspio-hosted file store + folders
 - `GET/POST/PUT /v3/files` · `GET/DELETE /v3/files/{externalKey}` · `GET /v3/files/{externalKey}/fileInfo`
 - `GET /v3/files/folders[/{externalKey}]` · `GET/DELETE /v3/files/path` · `GET /v3/files/path/fileInfo`
+- ⚠️ **cdn.caspio.com is NOT a general file CDN** (verified 2026-07-10): API-uploaded files in the Artwork folder 403 on `https://cdn.caspio.com/A0E15000/Artwork/<name>` — only specially-exposed folders (e.g. `Safety Stripes`) serve publicly. To give an API-uploaded file a public URL, use the proxy streamer `GET /api/files/{externalKey}` (what image-uploads + ManageOrders push both do).
 
 ### Outgoing Webhooks (10) — **event push** ⭐
 - `GET/POST /v3/outgoingWebhooks` · `GET/PUT/DELETE /v3/outgoingWebhooks/{id}`
