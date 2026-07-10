@@ -4,6 +4,10 @@ The definitive guide to ShopWorks ManageOrders API usage across all NWCA project
 
 > **Official API docs**: `/memory/manageorders-api-guide-2024.pdf` (37 pages, v05.22.24)
 > Key sections: PULL API (p5-16), PUSH API (p17-37), Authentication (p2-4), Errors (p11)
+>
+> **Official Swagger (push)**: <https://app.swaggerhub.com/apis-docs/ShopWorks/OnSiteExternalAPI/1.0.0> — "ManageOrders Push API" v1.0.0 (Swagger 2.0). Dated raw snapshot beside this file: `manageorders-push-swagger-2026-07-10.json` (12 models / every ExternalOrderJson field; NO field descriptions — the gotchas here are the value-add). Re-fetch: `curl -s -H "Accept: application/json" https://api.swaggerhub.com/apis/ShopWorks/OnSiteExternalAPI/1.0.0`. **See §"Official Swagger vs Reality" — the spec omits tax flags, uses ISO dates (reality = MM/DD/YYYY), and marks everything optional.**
+>
+> **Staff cheat sheet (Erik-buildable, admin-only)**: `/dashboards/manageorders-api-reference.html` — every endpoint + field with the gotchas, live filter. Renders from an embedded snapshot; **this file stays the single source of truth (update HERE, not the page's JS).**
 
 **Last Updated:** 2026-02-22
 **Applies To:** Pricing Index File 2025, caspio-pricing-proxy, Python Inksoft

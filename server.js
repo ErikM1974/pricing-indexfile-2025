@@ -3022,6 +3022,12 @@ app.get('/dashboards/table-usage-audit.html', requireCrmRole(['admin']), (req, r
   res.sendFile(path.join(__dirname, 'dashboards', 'table-usage-audit.html'));
 });
 
+// ManageOrders / OnSite API field cheat sheet — ADMIN ONLY. Static reference of the
+// push/pull fields (from the public Swagger + our tested reference). Before the mount.
+app.get('/dashboards/manageorders-api-reference.html', requireCrmRole(['admin']), (req, res) => {
+  res.sendFile(path.join(__dirname, 'dashboards', 'manageorders-api-reference.html'));
+});
+
 // Customer Portal admin console — manage who can log into the customer portal
 // (Customer_Portal_Access invites). Open to the management team by ROLE (Erik=admin,
 // Bradley=accountant, Ruth=art, Taneisha/Nika=sales). The two rep tags are included so
