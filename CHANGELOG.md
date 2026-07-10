@@ -1,3 +1,11 @@
+## v2026.07.10.5 (2026.07.10)
+
+- docs(memory): Caspio platform findings from image-uploads build + training claude.md entry
+- docs(memory): HR/staff-dashboard 2-category reorg — SweetProcess classification project (2026-07-10)
+- docs(memory): HR reorg batch 1 reviewed — 9 discuss resolved, live hub sales-tax 10.1% bug found
+- docs(memory): HR reorg trust mode — 3 live hub fixes (tax 10.2, BofA), tier system CORE/ERIK/AUTO
+- feat(dashboards): Policy Migration tracker — SweetProcess→hub project status page (admin nav)
+
 ## v2026.07.10.4 (2026.07.10)
 
 - feat(dashboards): SanMar Web Services cheat sheet (admin-only) + reference bump to guide v24.5
