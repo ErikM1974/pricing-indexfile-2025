@@ -1,0 +1,121 @@
+/* ==========================================================================
+   training-center.css — styles for training/index.html (Training Center)
+
+   Shell classes come from shared_components/css/dash-shell.css; design tokens
+   (--gray-*, --shadow-*, --radius-*) from shared_components/css/art-hub.css.
+   Page-specific styles only. NEVER redefine tokens or hardcode palette values.
+   ========================================================================== */
+
+.tc-intro {
+    max-width: 900px;
+    margin: 0 0 1.25rem;
+    color: var(--gray-600);
+    line-height: 1.55;
+}
+
+.tc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.tc-track {
+    background: var(--surface-card, #fff);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: 1.1rem 1.2rem;
+}
+
+.tc-track h2 {
+    margin: 0 0 0.2rem;
+    font-size: 1.02rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tc-track .tc-desc {
+    margin: 0 0 0.7rem;
+    color: var(--gray-500);
+    font-size: 0.82rem;
+    line-height: 1.4;
+}
+
+.tc-track ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 0.3rem;
+}
+
+.tc-track li a {
+    display: flex;
+    align-items: baseline;
+    gap: 0.45rem;
+    text-decoration: none;
+    color: var(--gray-800);
+    font-size: 0.9rem;
+    padding: 0.28rem 0.4rem;
+    border-radius: var(--radius-sm);
+    line-height: 1.35;
+}
+
+.tc-track li a:hover {
+    background: var(--gray-50);
+}
+
+.tc-chip {
+    display: inline-block;
+    padding: 0.05rem 0.42rem;
+    border-radius: 999px;
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    background: var(--gray-100);
+    color: var(--gray-600);
+    white-space: nowrap;
+    flex: none;
+}
+
+.tc-chip--hub {
+    background: var(--state-success-bg, #d1e7dd);
+    color: var(--state-success-text, #0f5132);
+}
+
+.tc-hub-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 0.35rem;
+}
+
+.tc-hub-list li a {
+    display: block;
+    text-decoration: none;
+    color: var(--gray-800);
+    font-size: 0.9rem;
+    padding: 0.35rem 0.5rem;
+    border-radius: var(--radius-sm);
+}
+
+.tc-hub-list li a:hover {
+    background: var(--gray-50);
+}
+
+.tc-hub-list li .tc-sub {
+    color: var(--gray-500);
+    font-size: 0.78rem;
+    display: block;
+    margin-top: 0.1rem;
+}
+
+.tc-note {
+    margin: 0 0 0.7rem;
+    color: var(--gray-500);
+    font-size: 0.82rem;
+}
