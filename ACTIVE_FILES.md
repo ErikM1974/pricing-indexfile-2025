@@ -96,6 +96,9 @@
 ### Secondary Pages (/pages/ directory)
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
+| `/pages/forms/garment-drop-off-form.html` | **NEW (2026-07-10)** Fillable on-screen twin of the Customer Garment Drop-Off PDF — type in browser, Print / Save as PDF outputs the filled one-page letter form. Nothing is saved server-side. Linked from Forms Library ("Fill Out Online"). | garment-drop-off-form.css, garment-drop-off-form.js | ✅ Active |
+| `/pages/forms/garment-drop-off-form.css` | Drop-off form styles — screen fill-in layout + @media print letter layout matching the official PDF (green #256a42 sampled from PDF) | — | ✅ Active |
+| `/pages/forms/garment-drop-off-form.js` | Drop-off form controller — seeds 5 garment rows, Add Row, per-row auto-total (manual override wins), Clear, print button, dirty beforeunload guard | — | ✅ Active |
 | `/pages/policies-hub.html` | **CANONICAL** Caspio-backed Policies Hub (tree sidebar, search, category chips, admin-gated CRUD) — renamed 2026-05-14 from policies-hub-v2.html as the production cutover | policies-admin-gate.js, policies-api.js, policies-hub.js, policies-hub-v2.css | ✅ Active |
 | `/pages/policies-hub-legacy.html` | Pre-Caspio hardcoded hub (9 cards, no editing) — archived 2026-05-14 for safety; safe to delete after ~30 days if no fallback events | dashboard-styles.css, policies-hub.css | 🗄️ Legacy |
 | `/pages/policy-detail.html` | **NEW** Individual policy read/edit page (TipTap rich-text editor, breadcrumb, outline, sub-procedures) | policies-admin-gate.js, policies-api.js, policy-editor-tiptap.js, policy-detail.js, policies-hub-v2.css, policy-detail.css | ✅ Active |
@@ -1145,6 +1148,11 @@ cap-embroidery-fix.css
 ### New Dashboard Pages (NEW 2026-04)
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
+| `/dashboards/forms-library.html` | **NEW (2026-07-10)** Forms Library — central staff page for printable/fillable company forms, grouped by category. Driven by Caspio `Forms_Library` table via proxy `GET /api/forms-library` (Erik adds a row → form appears, no deploy). Each form: Download/Print PDF + optional Fill Out Online link. Sidebar-linked from staff dashboard ("📄 Forms Library"). | dash-shell.css, dash-page-helpers.js, forms-library.css, forms-library.js | ✅ Active |
+| `/dashboards/js/forms-library.js` | Forms Library controller — fetch /api/forms-library, group by Category, render Download/Fill actions; escapes API text, refuses non-http(s)/relative URLs | DashPage, APP_CONFIG | ✅ Active |
+| `/dashboards/css/forms-library.css` | Forms Library page styles (2026 tokens) | dash-shell.css, art-hub.css | ✅ Active |
+| `/forms/customer-garment-drop-off-form.pdf` | **NEW (2026-07-10)** Customer Garment Drop-Off Form (blank printable) — customer-supplied garment intake: contact info, decoration checklist, size grid, liability waiver | listed in Caspio Forms_Library; fillable twin = /pages/forms/garment-drop-off-form.html | ✅ Active |
+| `/forms/Customer-Supplied-Garments-Acknowledgment.pdf` | Customer-supplied garments liability acknowledgment (signed waiver PDF) | listed in Caspio Forms_Library | ✅ Active |
 | `/dashboards/policy-migration.html` | **NEW (2026-07-10)** Policy Migration tracker — SweetProcess→Policies Hub project status: hub-live count, Erik question queue, wave log, per-document tier/status table with hub deep-links. Read-only snapshot; confidential HR rows excluded from data. | dash-shell.css, dash-page-helpers.js, policy-migration.css, policy-migration.js, policy-migration-data.json | ✅ Active |
 | `/dashboards/js/policy-migration.js` | Policy Migration controller — stats, questions, wave log, tier-filtered document table | DashPage, fetch-timeout, policy-migration-data.json | ✅ Active |
 | `/dashboards/css/policy-migration.css` | Policy Migration page styles (2026 tokens) | dash-shell.css, art-hub.css | ✅ Active |
