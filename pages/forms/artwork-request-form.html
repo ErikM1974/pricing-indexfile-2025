@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Custom Artwork Request Form - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/pages/forms/nwca-form-shared.css">
+    <link rel="stylesheet" href="/pages/forms/artwork-request-form.css">
+</head>
+<body>
+    <!-- Screen-only toolbar: never prints -->
+    <div class="form-toolbar no-print">
+        <a href="/dashboards/forms-library.html" class="toolbar-link">
+            <i class="fas fa-arrow-left"></i> Forms Library
+        </a>
+        <div class="toolbar-actions">
+            <button type="button" id="clearFormBtn" class="toolbar-btn toolbar-btn--ghost">
+                <i class="fas fa-eraser"></i> Clear
+            </button>
+            <a href="/forms/custom-artwork-request-form.pdf" target="_blank" rel="noopener" class="toolbar-btn toolbar-btn--ghost">
+                <i class="fas fa-file-pdf"></i> Blank PDF
+            </a>
+            <button type="button" id="printFormBtn" class="toolbar-btn toolbar-btn--primary">
+                <i class="fas fa-print"></i> Print / Save as PDF
+            </button>
+        </div>
+    </div>
+
+    <div class="form-sheet">
+        <header class="form-header">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                 alt="Northwest Custom Apparel" class="form-logo">
+            <h1 class="form-title">Custom Artwork Request Form</h1>
+            <p class="form-subtitle">For customer-requested custom graphic design and decoration projects</p>
+            <p class="form-contact">2025 Freeman Rd. E., Milton, WA 98354 &nbsp;&bull;&nbsp; 253-922-5793 &nbsp;&bull;&nbsp; www.nwcustomapparel.com</p>
+        </header>
+
+        <section class="form-section">
+            <div class="section-bar">1. Customer / Order Information</div>
+            <div class="info-grid">
+                <div class="info-field">
+                    <label for="fldCompany">Company</label>
+                    <input type="text" id="fldCompany" autocomplete="organization">
+                </div>
+                <div class="info-field">
+                    <label for="fldDateRequested">Date Requested</label>
+                    <input type="text" id="fldDateRequested">
+                </div>
+                <div class="info-field">
+                    <label for="fldContact">Contact Name</label>
+                    <input type="text" id="fldContact" autocomplete="name">
+                </div>
+                <div class="info-field">
+                    <label for="fldDueDate">Due Date</label>
+                    <input type="text" id="fldDueDate">
+                </div>
+                <div class="info-field">
+                    <label for="fldPhone">Phone</label>
+                    <input type="tel" id="fldPhone" autocomplete="tel">
+                </div>
+                <div class="info-field">
+                    <label for="fldPo">PO #</label>
+                    <input type="text" id="fldPo">
+                </div>
+                <div class="info-field">
+                    <label for="fldEmail">Email</label>
+                    <input type="email" id="fldEmail" autocomplete="email">
+                </div>
+                <div class="info-field">
+                    <label for="fldCustomerNum">Customer #</label>
+                    <input type="text" id="fldCustomerNum">
+                </div>
+                <div class="info-field">
+                    <label for="fldSalesRep">Sales Rep</label>
+                    <input type="text" id="fldSalesRep">
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">2. Artwork Type / Project Type</div>
+            <div class="decoration-row">
+                <label class="deco-check"><input type="checkbox" id="typeDtg"> T-Shirt / DTG</label>
+                <label class="deco-check"><input type="checkbox" id="typeEmbroidery"> Embroidery</label>
+                <label class="deco-check"><input type="checkbox" id="typeTransfers"> Transfers</label>
+                <label class="deco-check"><input type="checkbox" id="typeStickers"> Stickers</label>
+                <label class="deco-check"><input type="checkbox" id="typeBanner"> Banner</label>
+                <label class="deco-check"><input type="checkbox" id="typeLaser"> Laser Engraving</label>
+                <label class="deco-check"><input type="checkbox" id="typePatch"> Patch</label>
+                <label class="deco-check deco-check--other">
+                    <input type="checkbox" id="typeOther"> Other
+                    <input type="text" id="typeOtherText" class="deco-other-text" aria-label="Other artwork type description">
+                </label>
+            </div>
+        </section>
+
+        <div class="artwork-two-col">
+            <section class="form-section">
+                <div class="section-bar">3. Project Details</div>
+                <div class="info-grid info-grid--stack">
+                    <div class="info-field">
+                        <label for="fldProjectName">Project Name / Event</label>
+                        <input type="text" id="fldProjectName">
+                    </div>
+                    <div class="info-field">
+                        <label for="fldGarmentType">Item or Garment Type</label>
+                        <input type="text" id="fldGarmentType">
+                    </div>
+                    <div class="info-field">
+                        <label for="fldQuantity">Quantity</label>
+                        <input type="text" id="fldQuantity">
+                    </div>
+                    <div class="info-field">
+                        <label for="fldDecoLocation">Decoration Location</label>
+                        <input type="text" id="fldDecoLocation">
+                    </div>
+                    <div class="info-field">
+                        <label for="fldArtSize">Size of Artwork</label>
+                        <input type="text" id="fldArtSize">
+                    </div>
+                    <div class="info-field">
+                        <label for="fldAudience">Intended Audience / Use</label>
+                        <input type="text" id="fldAudience">
+                    </div>
+                </div>
+            </section>
+
+            <section class="form-section">
+                <div class="section-bar">4. Art Direction</div>
+                <div class="info-grid info-grid--stack">
+                    <div class="info-field">
+                        <label for="fldExactText">Exact Text to Include</label>
+                        <input type="text" id="fldExactText">
+                    </div>
+                    <div class="info-field">
+                        <label for="fldColors">Preferred Colors</label>
+                        <input type="text" id="fldColors">
+                    </div>
+                    <div class="info-field">
+                        <label for="fldFonts">Font / Style Preferences</label>
+                        <input type="text" id="fldFonts">
+                    </div>
+                    <div class="info-field">
+                        <label for="fldGraphics">Graphic Elements / Icons / Images to Include</label>
+                        <input type="text" id="fldGraphics">
+                    </div>
+                    <div class="info-field">
+                        <label for="fldAvoid">Must Avoid / Do Not Include</label>
+                        <input type="text" id="fldAvoid">
+                    </div>
+                    <div class="info-field info-field--checks">
+                        <label>Reference Art Provided?</label>
+                        <label class="deco-check"><input type="checkbox" id="refArtYes"> Yes</label>
+                        <label class="deco-check"><input type="checkbox" id="refArtNo"> No</label>
+                    </div>
+                    <div class="info-field info-field--checks">
+                        <label>Existing Logo Provided?</label>
+                        <label class="deco-check"><input type="checkbox" id="logoYes"> Yes</label>
+                        <label class="deco-check"><input type="checkbox" id="logoNo"> No</label>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <section class="form-section">
+            <div class="section-bar">5. Sketch / Layout Area</div>
+            <textarea id="fldSketch" class="notes-area sketch-area" rows="8"
+                      aria-label="Sketch or layout notes"
+                      placeholder="Please provide placement notes or describe layout ideas (or sketch on the printed copy)."></textarea>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">6. Additional Notes / Special Instructions</div>
+            <textarea id="fldNotes" class="notes-area" rows="3" aria-label="Additional notes"></textarea>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">7. Art Budget &amp; Approval</div>
+            <div class="budget-approval">
+                <div class="info-field budget-field">
+                    <label for="fldBudget">Art Budget&nbsp;&nbsp;$</label>
+                    <input type="text" id="fldBudget">
+                </div>
+                <div class="signature-row signature-row--approval">
+                    <div class="signature-field">
+                        <div class="signature-line"></div>
+                        <label>Customer Signature</label>
+                    </div>
+                    <div class="signature-field">
+                        <input type="text" id="fldPrintedName" aria-label="Printed name">
+                        <label>Printed Name</label>
+                    </div>
+                    <div class="signature-field">
+                        <input type="text" id="fldSignDate" aria-label="Date">
+                        <label>Date</label>
+                    </div>
+                    <div class="signature-field">
+                        <input type="text" id="fldReceivedBy" aria-label="NWCA received by">
+                        <label>NWCA Received By</label>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="form-footer">
+            &bull;&nbsp; Please attach any reference images, logos, or examples that will help our artist create the perfect design. &nbsp;&bull;<br>
+            <span class="form-footer--fine">Revisions are not included unless quoted separately.</span>
+        </footer>
+    </div>
+
+    <script src="/pages/forms/nwca-form-shared.js"></script>
+    <script src="/pages/forms/artwork-request-form.js"></script>
+</body>
+</html>

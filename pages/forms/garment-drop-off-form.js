@@ -6,14 +6,14 @@
  * produces the filled copy (window.print → browser "Save as PDF").
  *
  * Behaviors: seed 5 garment rows (+ Add Row), auto-total each row from the
- * size counts (manual edit of Total wins), warn before leaving a dirty form.
+ * size counts (manual edit of Total wins). Print / clear / dirty-guard come
+ * from nwca-form-shared.js (NWCAForm).
  */
 (function () {
     'use strict';
 
     var SIZE_COUNT = 6; // S M L XL 2XL 3XL
     var DEFAULT_ROWS = 5;
-    var dirty = false;
 
     document.addEventListener('DOMContentLoaded', function () {
         var tbody = document.getElementById('garmentRows');
@@ -23,26 +23,7 @@
             addRow(tbody);
         });
 
-        document.getElementById('printFormBtn').addEventListener('click', function () {
-            window.print();
-        });
-
-        document.getElementById('clearFormBtn').addEventListener('click', function () {
-            if (!window.confirm('Clear everything typed into this form?')) return;
-            document.querySelectorAll('input[type="text"], input[type="tel"], input[type="email"], input[type="number"], textarea')
-                .forEach(function (el) { el.value = ''; delete el.dataset.manual; });
-            document.querySelectorAll('input[type="checkbox"]').forEach(function (el) { el.checked = false; });
-            dirty = false;
-        });
-
-        // Dirty tracking → beforeunload guard (same UX rule as the quote builders)
-        document.addEventListener('input', function () { dirty = true; });
-        window.addEventListener('beforeunload', function (e) {
-            if (!dirty) return;
-            e.preventDefault();
-            e.returnValue = '';
-        });
-        window.addEventListener('afterprint', function () { dirty = false; });
+        NWCAForm.init({});
     });
 
     function addRow(tbody) {

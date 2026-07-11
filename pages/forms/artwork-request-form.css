@@ -1,0 +1,53 @@
+/* ==========================================================================
+   artwork-request-form.css — pages/forms/artwork-request-form.html
+   Page-specific layout on top of nwca-form-shared.css. Portrait print.
+   ========================================================================== */
+
+@media print {
+    @page { size: letter portrait; margin: 0.4in; }
+}
+
+/* Sections 3 + 4 sit side-by-side like the PDF (stack on narrow screens/print stays 2-col) */
+.artwork-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 20px;
+    align-items: start;
+}
+
+/* Inside the two-col panels the fields stack in ONE column */
+.info-grid--stack { grid-template-columns: 1fr; }
+
+/* Long labels (art direction) stack above their line instead of squeezing it */
+.artwork-two-col .info-field {
+    flex-wrap: wrap;
+}
+
+.artwork-two-col .info-field label {
+    min-width: 0;
+}
+
+/* yes/no check pairs */
+.info-field--checks { gap: 14px; }
+.info-field--checks .deco-check { font-weight: 600; }
+
+.sketch-area { min-height: 170px; }
+
+.budget-approval {
+    border: 1.5px solid var(--form-green);
+    border-radius: 0 4px 4px 4px;
+    padding: 12px 14px;
+}
+
+.budget-field { max-width: 240px; }
+
+.signature-row--approval { margin-top: 18px; }
+
+@media (max-width: 700px) {
+    .artwork-two-col { grid-template-columns: 1fr; }
+}
+
+@media print {
+    .sketch-area { min-height: 2.1in; }
+    .artwork-two-col { grid-template-columns: 1fr 1fr; }
+}
