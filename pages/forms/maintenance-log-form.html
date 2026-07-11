@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Equipment Maintenance Log - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/pages/forms/nwca-form-shared.css">
+    <link rel="stylesheet" href="/pages/forms/maintenance-log-form.css">
+</head>
+<body>
+    <!-- Screen-only toolbar: never prints -->
+    <div class="form-toolbar no-print">
+        <a href="/dashboards/forms-library.html" class="toolbar-link">
+            <i class="fas fa-arrow-left"></i> Forms Library
+        </a>
+        <div class="toolbar-actions">
+            <button type="button" id="clearFormBtn" class="toolbar-btn toolbar-btn--ghost">
+                <i class="fas fa-eraser"></i> Clear
+            </button>
+            <a href="#" id="blankPdfLink" target="_blank" rel="noopener" class="toolbar-btn toolbar-btn--ghost">
+                <i class="fas fa-file-pdf"></i> Fillable PDF
+            </a>
+            <button type="button" id="printFormBtn" class="toolbar-btn toolbar-btn--primary">
+                <i class="fas fa-print"></i> Print / Save as PDF
+            </button>
+        </div>
+    </div>
+
+    <div class="form-sheet">
+        <header class="form-header">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                 alt="Northwest Custom Apparel" class="form-logo">
+            <h1 class="form-title" id="formTitle">Equipment Maintenance Log</h1>
+            <p class="form-subtitle" id="formSubtitle">Cleaning, inspection, adjustments, repairs and scheduled maintenance</p>
+            <p class="form-contact">2025 Freeman Rd. E., Milton, WA 98354 &nbsp;&bull;&nbsp; 253-922-5793 &nbsp;&bull;&nbsp; www.nwcustomapparel.com</p>
+        </header>
+
+        <div class="type-switch no-print" id="typeSwitch">
+            <!-- equipment-type chips injected by maintenance-log-form.js -->
+        </div>
+
+        <section class="form-section">
+            <div class="section-bar">1. Equipment &amp; Record</div>
+            <div class="info-grid" id="identityGrid">
+                <!-- identity fields injected per equipment type -->
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">2. Maintenance Type</div>
+            <div class="decoration-row">
+                <label class="deco-check"><input type="checkbox" id="mtDaily"> Daily</label>
+                <label class="deco-check"><input type="checkbox" id="mtWeekly"> Weekly</label>
+                <label class="deco-check"><input type="checkbox" id="mtMonthly"> Monthly</label>
+                <label class="deco-check"><input type="checkbox" id="mtQuarterly"> Quarterly</label>
+                <label class="deco-check"><input type="checkbox" id="mtPreventive"> Preventive</label>
+                <label class="deco-check"><input type="checkbox" id="mtCorrective"> Corrective</label>
+                <label class="deco-check"><input type="checkbox" id="mtEmergency"> Emergency / Breakdown</label>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">3. Maintenance Tasks</div>
+            <table class="form-table task-table">
+                <thead>
+                    <tr>
+                        <th class="col-task">Task</th>
+                        <th class="col-check">Done</th>
+                        <th class="col-check">N/A</th>
+                    </tr>
+                </thead>
+                <tbody id="taskRows">
+                    <!-- 14 task rows injected per equipment type -->
+                </tbody>
+            </table>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">4. Readings &amp; Test Results</div>
+            <div class="info-grid" id="readingsGrid">
+                <!-- readings fields injected per equipment type -->
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">5. Issues Found</div>
+            <textarea id="fldIssues" class="notes-area" rows="2" aria-label="Issues found"></textarea>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">6. Action Taken &amp; Parts Used</div>
+            <textarea id="fldAction" class="notes-area" rows="2" aria-label="Action taken and parts used"></textarea>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">7. Machine Status &amp; Sign-Off</div>
+            <div class="decoration-row">
+                <label class="deco-check"><input type="checkbox" id="stReady"> Ready for Use</label>
+                <label class="deco-check"><input type="checkbox" id="stLimited"> Limited Use</label>
+                <label class="deco-check"><input type="checkbox" id="stOut"> Out of Service</label>
+                <label class="deco-check"><input type="checkbox" id="stFollowUp"> Follow-Up Required</label>
+            </div>
+            <div class="info-grid signoff-grid">
+                <div class="info-field">
+                    <label for="fldNextService">Next Service Due</label>
+                    <input type="text" id="fldNextService">
+                </div>
+                <div class="info-field">
+                    <label for="fldDowntime">Downtime</label>
+                    <input type="text" id="fldDowntime">
+                </div>
+                <div class="info-field">
+                    <label for="fldSupervisor">Supervisor Initials</label>
+                    <input type="text" id="fldSupervisor">
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="/config/app.config.js"></script>
+    <script src="/pages/forms/nwca-form-shared.js"></script>
+    <script src="/pages/forms/nwca-form-save.js"></script>
+    <script src="/pages/forms/maintenance-log-form.js"></script>
+</body>
+</html>

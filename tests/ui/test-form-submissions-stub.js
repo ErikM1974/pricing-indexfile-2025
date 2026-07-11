@@ -69,6 +69,27 @@
         },
     ];
 
+    submissions.push({
+        Submission_ID: 'AEO0711-5005', Form_ID: 'ae-order-intake', Company: 'Drain Pro Inc.',
+        Contact_Name: 'Mike Rowe', Phone: '253-555-0142', Email: 'mike@drainpro.com',
+        Customer_Number: '7740', Sales_Rep: 'Taneisha', Due_Date: iso(10), Status: 'New',
+        Summary: '10 pcs · $733.93 · Embroidery', Submitted_At: new Date(Date.now() - 3600000).toISOString(),
+        Updated_At: '', Updated_By: '', Art_Request_ID: '', Pushed_To_ShopWorks: '', ShopWorks_Order_ID: '',
+        Payload_JSON: JSON.stringify({
+            fields: [['Company', 'Drain Pro Inc.'], ['Subtotal', '666.00'], ['Tax', '67.93'], ['Order Total', '733.93'], ['Ship Method', 'UPS Ground']],
+            checks: ['Embroidery', 'Ship', 'Proof required'],
+            tables: [{
+                title: 'Order Lines',
+                columns: ['Style', 'Color', 'Catalog Color', 'Description', 'S', 'M', 'L', 'XL', '2XL', '3XL', 'Other', 'Qty', 'Unit Price', 'Line Total'],
+                rows: [
+                    ['PC54', 'Navy', 'Navy', 'Core Tee', '2', '4', '', '', '1', '', '', '7', '18.50', '129.50'],
+                    ['K87', 'heather-ish', '', 'Pocket Tee', '', '3', '', '', '', '', '', '3', '25.00', '75.00'],
+                ],
+            }],
+            notes: [['Production Notes', 'Rush if possible.']],
+        }),
+    });
+
     var items = [
         { PK_ID: 11, Submission_ID: 'SMP0709-3003', Line_Number: '1', Source: 'Showroom', Brand: 'Carhartt', Style: 'K87', Description: 'Pocket Tee', Color: 'Black', Size: 'L', Qty: '1', Retail_Value: '29.99', Charge_Value: '22.49', Item_Status: 'Out', Date_Returned: '', Condition: '', Checked_In_By: '' },
         { PK_ID: 12, Submission_ID: 'SMP0709-3003', Line_Number: '2', Source: 'Vendor', Brand: 'CornerStone', Style: 'CS410', Description: 'Polo', Color: 'Navy', Size: 'XL', Qty: '1', Retail_Value: '39.99', Charge_Value: '29.99', Item_Status: 'Out', Date_Returned: '', Condition: '', Checked_In_By: '' },
@@ -111,6 +132,16 @@
                 var sub = submissions.filter(function (s) { return s.Submission_ID === id; })[0];
                 if (!sub) return json({ error: 'not found' }, 404);
                 return json({ submission: sub, items: items.filter(function (i) { return i.Submission_ID === id; }) });
+            }
+            if (method === 'POST' && /\/push-to-shopworks$/.test(tail)) {
+                var pushId = decodeURIComponent(tail.replace(/^\//, '').replace(/\/push-to-shopworks$/, ''));
+                var target2 = submissions.filter(function (s) { return s.Submission_ID === pushId; })[0];
+                if (!target2) return json({ error: 'not found' }, 404);
+                if (target2.Pushed_To_ShopWorks === 'Yes') return json({ error: 'Already pushed — refusing duplicate' }, 409);
+                target2.Pushed_To_ShopWorks = 'Yes';
+                target2.ShopWorks_Order_ID = 'NWCA-' + pushId + '-2026';
+                target2.Status = 'Entered in ShopWorks';
+                return json({ pushed: true, extOrderId: target2.ShopWorks_Order_ID, lineCount: 3, verifiedLines: [{}], skippedRows: [{}], warnings: [] });
             }
             if (method === 'PUT') {
                 var pid = decodeURIComponent(tail.replace(/^\//, ''));

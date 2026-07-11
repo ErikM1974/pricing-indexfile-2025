@@ -1,0 +1,55 @@
+/* ==========================================================================
+   qc-checklist-form.css — pages/forms/qc-checklist-form.html
+   Final QC checklist twin. Portrait print.
+   ========================================================================== */
+
+@media print {
+    @page { size: letter portrait; margin: 0.35in; }
+}
+
+/* inspection checklist */
+.col-item { width: 70%; text-align: left; }
+.col-mark { width: 10%; }
+
+.qc-table .cell-item {
+    font-size: 0.85rem;
+    padding: 6px 10px;
+}
+
+.qc-table .cell-mark { text-align: center; padding: 3px; }
+
+.qc-table input[type="checkbox"] {
+    width: 17px;
+    height: 17px;
+    accent-color: var(--form-green);
+}
+
+.qc-table .cell-mark--fail input[type="checkbox"] { accent-color: #b91c1c; }
+
+/* quantity verification */
+.col-style { width: 20%; }
+.col-color { width: 13%; }
+.col-num { width: 9%; }
+.col-notes { width: 31%; }
+
+.qty-table td input { padding: 6px 4px; font-size: 0.82rem; }
+
+/* disposition */
+.disposition-row {
+    border: none;
+    justify-content: center;
+    gap: 18px;
+    padding: 6px 0 2px;
+}
+
+.disposition-row .deco-check { font-weight: 800; }
+
+.signature-row--two { grid-template-columns: 2fr 1fr; margin-top: 14px; }
+
+@media print {
+    .form-logo { height: 44px; }
+    .form-title { font-size: 1.3rem; }
+    .form-section { margin-top: 9px; }
+    .qc-table .cell-item { padding: 4px 8px; font-size: 0.78rem; }
+    .notes-area { min-height: 0.5in; }
+}

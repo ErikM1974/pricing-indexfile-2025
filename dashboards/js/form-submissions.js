@@ -21,6 +21,9 @@
         'name-personalization': { label: 'Name List', icon: 'fa-signature', cls: 'badge--nam' },
         'sample-checkout': { label: 'Samples', icon: 'fa-shirt', cls: 'badge--smp' },
         'ae-order-intake': { label: 'Order Intake', icon: 'fa-cart-flatbed', cls: 'badge--aeo' },
+        'final-qc-checklist': { label: 'Final QC', icon: 'fa-clipboard-check', cls: 'badge--qcc' },
+        'spoilage-report': { label: 'Spoilage', icon: 'fa-triangle-exclamation', cls: 'badge--spl' },
+        'maintenance-log': { label: 'Maintenance', icon: 'fa-screwdriver-wrench', cls: 'badge--mnt' },
     };
 
     var STATUS_CLS = {
@@ -33,6 +36,15 @@
         'Returned': 'status--done',
         'Charged': 'status--overdue',
         'Archived': 'status--muted',
+        'Logged': 'status--muted',
+        'Follow-Up Required': 'status--partial',
+        'Under Review': 'status--progress',
+        'Replacement Ordered': 'status--progress',
+        'Released': 'status--done',
+        'On Hold': 'status--overdue',
+        'Rework': 'status--partial',
+        'Resolved': 'status--done',
+        'Entered in ShopWorks': 'status--done',
     };
 
     var STATUS_CHOICES = {
@@ -41,6 +53,9 @@
         'name-personalization': ['New', 'In Progress', 'Completed', 'Archived'],
         'sample-checkout': ['Checked Out', 'Partially Returned', 'Returned', 'Charged', 'Archived'],
         'ae-order-intake': ['New', 'In Progress', 'Entered in ShopWorks', 'Completed', 'Archived'],
+        'final-qc-checklist': ['New', 'Released', 'On Hold', 'Rework', 'Resolved', 'Archived'],
+        'spoilage-report': ['New', 'Under Review', 'Replacement Ordered', 'Resolved', 'Archived'],
+        'maintenance-log': ['Logged', 'Follow-Up Required', 'Resolved', 'Archived'],
     };
 
     var state = {
@@ -294,6 +309,11 @@
                 ? '<span class="inbox-status status--art"><i class="fas fa-palette"></i> Art Request #' + esc(sub.Art_Request_ID) + '</span>'
                 : '<button type="button" class="dash-btn" id="artPushBtn"><i class="fas fa-palette"></i> Create Art Request</button>';
         }
+        if (sub.Form_ID === 'ae-order-intake') {
+            html += sub.Pushed_To_ShopWorks === 'Yes'
+                ? '<span class="inbox-status status--done"><i class="fas fa-industry"></i> ShopWorks: ' + esc(sub.ShopWorks_Order_ID || 'pushed') + '</span>'
+                : '<button type="button" class="dash-btn" id="swPushBtn"><i class="fas fa-industry"></i> Push to ShopWorks…</button>';
+        }
         html += '<span class="inbox-muted" id="detailActionMsg"></span></div>';
 
         // header fields
@@ -355,6 +375,8 @@
         });
         var artBtn = document.getElementById('artPushBtn');
         if (artBtn) artBtn.addEventListener('click', function () { pushToArtHub(sub, payload, artBtn); });
+        var swBtn = document.getElementById('swPushBtn');
+        if (swBtn) swBtn.addEventListener('click', function () { showShopWorksPreview(sub, payload); });
         body.querySelectorAll('[data-return-pk]').forEach(function (btn) {
             btn.addEventListener('click', function () { checkInItem(btn.dataset.returnPk, 'Returned'); });
         });
@@ -496,6 +518,86 @@
             console.error('[forms-inbox] art push failed:', err);
             btn.disabled = false;
             detailMsg('Art request NOT created: ' + err.message, true);
+        });
+    }
+
+    // ---------- shopworks push (AE Order Intake) ----------
+
+    // Mirrors the server transformer's verification rule so the preview shows
+    // EXACTLY what will and won't push. The server re-validates — this is UX.
+    function classifyOrderRows(payload) {
+        var table = (payload.tables || []).filter(function (t) { return t.title === 'Order Lines'; })[0] || { rows: [] };
+        var verified = [];
+        var skipped = [];
+        (table.rows || []).forEach(function (row, idx) {
+            var style = String(row[0] || '').trim();
+            var catalogColor = String(row[2] || '').trim();
+            var sizes = row.slice(4, 10).map(function (v) { return parseInt(v, 10) || 0; });
+            var sizedQty = sizes.reduce(function (a, b) { return a + b; }, 0);
+            var price = parseFloat(String(row[12] || '').replace(/[$,\s]/g, ''));
+            var reasons = [];
+            if (!style) reasons.push('no style');
+            if (!catalogColor) reasons.push('color not SanMar-verified');
+            if (sizedQty <= 0) reasons.push('no S–3XL sizes');
+            if (isNaN(price)) reasons.push('no unit price');
+            (reasons.length ? skipped : verified).push({
+                n: idx + 1, style: style || '?', color: String(row[1] || ''), catalogColor: catalogColor,
+                qty: sizedQty || row[11] || '?', price: row[12] || '?', reasons: reasons,
+            });
+        });
+        return { verified: verified, skipped: skipped };
+    }
+
+    function showShopWorksPreview(sub, payload) {
+        var body = document.getElementById('detailBody');
+        var existing = document.getElementById('swPreview');
+        if (existing) existing.remove();
+
+        var c = classifyOrderRows(payload);
+        var html = '<div class="detail-actionbar sw-preview" id="swPreview"><div style="width:100%">' +
+            '<strong><i class="fas fa-industry"></i> Push preview — creates a REAL ShopWorks order</strong><br>' +
+            'Customer: <strong>' + esc(sub.Company) + '</strong>' +
+            (sub.Customer_Number ? ' (#' + esc(sub.Customer_Number) + ')' : ' — <span class="inbox-late">no customer #: lands on the catch-all, re-assign in SW</span>') +
+            '<br>';
+
+        if (c.verified.length) {
+            html += '<span class="inbox-status status--done">' + c.verified.length + ' row' + (c.verified.length === 1 ? '' : 's') + ' push as line items</span> ' +
+                c.verified.map(function (r) { return esc(r.style + ' ' + r.catalogColor + ' ×' + r.qty + ' @$' + r.price); }).join(' · ') + '<br>';
+        }
+        if (c.skipped.length) {
+            html += '<span class="inbox-status status--overdue">' + c.skipped.length + ' row' + (c.skipped.length === 1 ? '' : 's') + ' ride in order NOTES only</span> ' +
+                c.skipped.map(function (r) { return esc('row ' + r.n + ' (' + r.reasons.join(', ') + ')'); }).join(' · ') + '<br>';
+        }
+        html += '<span class="inbox-muted">Tax is NOT pushed (apply the SW tax dropdown). Money summary, decoration and fulfillment ride in Notes On Order. No design is linked.</span><br>';
+
+        if (c.verified.length) {
+            html += '<button type="button" class="dash-btn dash-btn--primary" id="swConfirmBtn"><i class="fas fa-check"></i> Confirm push</button> ';
+        } else {
+            html += '<span class="inbox-late">Nothing pushable — every row is unverified. Fix rows or enter by hand.</span> ';
+        }
+        html += '<button type="button" class="dash-btn" id="swCancelBtn">Cancel</button></div></div>';
+
+        body.insertAdjacentHTML('afterbegin', html);
+        document.getElementById('swCancelBtn').addEventListener('click', function () {
+            document.getElementById('swPreview').remove();
+        });
+        var confirmBtn = document.getElementById('swConfirmBtn');
+        if (confirmBtn) confirmBtn.addEventListener('click', function () {
+            confirmBtn.disabled = true;
+            confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Pushing…';
+            inboxFetch('/' + encodeURIComponent(sub.Submission_ID) + '/push-to-shopworks', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ staffEmail: state.staffEmail }),
+            }).then(function (resp) {
+                detailMsg('Pushed to ShopWorks as ' + resp.extOrderId + ' (' + resp.lineCount + ' line items). Import shows in MO within ~15–30 min.');
+                return refreshKeepingDetail(sub.Submission_ID);
+            }).catch(function (err) {
+                console.error('[forms-inbox] SW push failed:', err);
+                confirmBtn.disabled = false;
+                confirmBtn.innerHTML = '<i class="fas fa-check"></i> Confirm push';
+                detailMsg('ShopWorks push FAILED: ' + err.message, true);
+            });
         });
     }
 

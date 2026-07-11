@@ -1,0 +1,69 @@
+/* ==========================================================================
+   maintenance-log-form.css — pages/forms/maintenance-log-form.html
+   Shared page for all six equipment maintenance logs. Portrait print.
+   ========================================================================== */
+
+@media print {
+    @page { size: letter portrait; margin: 0.35in; }
+}
+
+/* Equipment-type switcher (screen only) */
+.type-switch {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin: 14px 0 2px;
+    justify-content: center;
+}
+
+.type-chip {
+    border: 1.5px solid var(--form-green);
+    background: transparent;
+    color: var(--form-green-dark);
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+}
+
+.type-chip.is-active {
+    background: var(--form-green);
+    color: #fff;
+}
+
+/* Task checklist */
+.col-task { width: 84%; text-align: left; }
+.col-check { width: 8%; }
+
+.task-table .cell-task {
+    font-size: 0.85rem;
+    padding: 7px 10px;
+    text-align: left;
+}
+
+.task-table .cell-check {
+    text-align: center;
+    padding: 4px;
+}
+
+.task-table input[type="checkbox"] {
+    width: 17px;
+    height: 17px;
+    accent-color: var(--form-green);
+}
+
+.signoff-grid { margin-top: 12px; grid-template-columns: repeat(3, 1fr); }
+
+@media (max-width: 700px) {
+    .signoff-grid { grid-template-columns: 1fr; }
+}
+
+@media print {
+    .form-logo { height: 44px; }
+    .form-title { font-size: 1.3rem; }
+    .form-section { margin-top: 9px; }
+    .task-table .cell-task { padding: 4px 8px; font-size: 0.78rem; }
+    .notes-area { min-height: 0.55in; }
+}
