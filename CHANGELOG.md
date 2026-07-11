@@ -1,3 +1,7 @@
+## v2026.07.11.2 (2026.07.11)
+
+- feat(forms): 3 more fillable twins (artwork request, name personalization, sample checkout) + shared form framework
+
 ## v2026.07.11.1 (2026.07.11)
 
 - docs(memory): wave 8 — official 2026 org chart embedded + Team-widget link live r1622
