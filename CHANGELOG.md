@@ -1,3 +1,9 @@
+## v2026.07.11.6 (2026.07.11)
+
+- feat(forms): refinement batch — dynamic sizes+upcharges, contacts v2, swatches, dates, design lookup, QQ deep-link, autofill+autosave
+- refactor: retire legacy Order Form — remove button, app, and dead routes
+- Deploy v2026.07.11.6: 10 files (compare-pricing.html,dtg-pricing.html,manual-pricing.html...)
+
 ## v2026.07.11.5 (2026.07.11)
 
 - feat(forms): ops batch — 8 fillable PDFs + QC/Spoilage/Maintenance twins + AEO ShopWorks push UI
