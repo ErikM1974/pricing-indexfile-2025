@@ -556,6 +556,10 @@ body {
     padding: 6px;
 }
 
+/* explicit display beats the UA [hidden] rule — restore it (same bug class as
+   the Inbox modal overlay, 2026-07-11) */
+.swatch-grid[hidden] { display: none; }
+
 .swatch-cell {
     display: flex;
     align-items: center;
