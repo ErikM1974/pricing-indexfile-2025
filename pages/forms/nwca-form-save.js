@@ -130,6 +130,7 @@
                 })
                 .then(function (body) {
                     NWCAForm.markClean();
+                    document.dispatchEvent(new CustomEvent('nwca-form:saved')); // clears the autosave draft
                     banner('ok', '<i class="fas fa-circle-check"></i> Saved to NWCA as <strong>' + escapeHtml(body.submissionId) +
                         '</strong> — it\'s in the Forms Inbox. You can still print.');
                 })

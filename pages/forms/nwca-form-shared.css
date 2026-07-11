@@ -395,6 +395,71 @@ body {
     color: var(--ink);
 }
 
+/* ---------- Hybrid date picker (nwca-form-dates.js) ---------- */
+
+.date-anchor { position: relative; }
+
+.date-pick-btn {
+    position: absolute;
+    right: 0;
+    bottom: 2px;
+    border: none;
+    background: transparent;
+    color: var(--form-green);
+    cursor: pointer;
+    font-size: 0.95rem;
+    padding: 2px 4px;
+}
+
+.date-pick-btn:hover { color: var(--form-green-dark); }
+
+.date-pick-native {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.date-anchor input[type="text"] { padding-right: 26px; }
+
+/* draft-restore banner buttons */
+.draft-restore-btn, .draft-discard-btn {
+    border: none;
+    background: none;
+    font: inherit;
+    font-weight: 700;
+    color: var(--form-green-dark);
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0;
+}
+
+/* ---------- Customer intelligence banners (nwca-form-contacts.js) ---------- */
+
+.customer-intel {
+    max-width: 8.5in;
+    margin: 12px auto -8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.customer-intel--wide { max-width: 11in; }
+
+.intel-banner {
+    padding: 9px 14px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: 1.5px solid;
+}
+
+.intel-banner--warning { background: #fef3c7; border-color: #b45309; color: #7c2d12; }
+.intel-banner--info { background: #e0f2fe; border-color: #0369a1; color: #0c4a6e; }
+
 /* ---------- Customer-lookup dropdown (nwca-form-contacts.js) ---------- */
 
 .contacts-anchor { position: relative; }
@@ -438,6 +503,122 @@ body {
 @media print {
     .contacts-dropdown { display: none !important; }
 }
+
+/* ---------- Swatch color picker (nwca-form-styles.js) ---------- */
+
+.swatch-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    border: none;
+    background: transparent;
+    font: inherit;
+    font-size: 0.78rem;
+    padding: 5px 4px;
+    cursor: pointer;
+    text-align: left;
+}
+
+.swatch-chip {
+    flex: 0 0 auto;
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    border: 1px solid var(--line);
+    background-color: #f3f4f6;
+    background-size: cover;
+    background-position: center;
+}
+
+.swatch-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.swatch-grid {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 25;
+    min-width: 250px;
+    max-width: 330px;
+    max-height: 280px;
+    overflow-y: auto;
+    background: #fff;
+    border: 1.5px solid var(--form-green);
+    border-radius: 6px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+    padding: 6px;
+}
+
+.swatch-cell {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border: none;
+    background: transparent;
+    font: inherit;
+    font-size: 0.72rem;
+    padding: 5px 6px;
+    cursor: pointer;
+    border-radius: 4px;
+    text-align: left;
+}
+
+.swatch-cell:hover { background: #e9f3ec; }
+
+.swatch-cell .swatch-chip { width: 20px; height: 20px; }
+
+.swatch-cell-name {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.swatch-cell--manual {
+    grid-column: 1 / -1;
+    justify-content: center;
+    color: var(--ink-soft);
+    border-top: 1px solid #eef1ef;
+}
+
+@media print {
+    .swatch-grid { display: none !important; }
+    .swatch-btn { padding: 5px 2px; }
+    .swatch-btn .swatch-chip { display: none; }
+}
+
+/* ---------- Dynamic size chips (AE order lines) ---------- */
+
+.size-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px 6px;
+    padding: 3px 4px;
+}
+
+.size-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+.size-chip input {
+    width: 34px !important;
+    border: 1px solid var(--line) !important;
+    border-radius: 3px;
+    text-align: center;
+    padding: 3px 2px !important;
+}
+
+.size-chip--upcharge label { color: #b45309; }
 
 /* ---------- Footer ---------- */
 

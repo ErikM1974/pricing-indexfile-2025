@@ -1773,8 +1773,17 @@
         // ?mode=quick — the dashboard's New Quote launcher deep-links straight to
         // Quick Price ("not sure which method — compare them") (2026-07-07).
         try {
-            var qMode = new URLSearchParams(window.location.search).get('mode');
-            if (qMode === 'quick') setMode('quick');
+            var qParams = new URLSearchParams(window.location.search);
+            if (qParams.get('mode') === 'quick') setMode('quick');
+            // ?style=PC61&qty=24 — deep-link prefill (AE Order Intake's 💰 button,
+            // 2026-07-11). Prefills INPUTS only; pricing runs the normal engine path.
+            var qStyle = (qParams.get('style') || '').trim();
+            var qQty = parseInt(qParams.get('qty'), 10);
+            if (qQty > 0) { $('qqQty').value = qQty; state.qty = qQty; }
+            if (qStyle) {
+                $('qqStyle').value = qStyle.toUpperCase();
+                lookupStyle(qStyle.toUpperCase());
+            }
         } catch (_) { }
         renderMode();
         renderLineMethods();

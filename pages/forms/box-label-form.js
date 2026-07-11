@@ -28,6 +28,8 @@
                 document.getElementById('fldCustomer').value = company.Company_Name || '';
             }
         });
+        NWCAFormDates.attach('fldDueDate', 'fldDropDead');
+        NWCAForm.autosave({ key: 'box-label', tables: [{ tbody: tbody, addRow: function () { addRow(tbody); } }] });
     });
 
     function addRow(tbody) {

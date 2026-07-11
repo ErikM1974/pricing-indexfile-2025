@@ -73,6 +73,9 @@
                 <div class="info-field">
                     <label for="fldPoCustomer">PO # / Customer #</label>
                     <input type="text" id="fldPoCustomer">
+                    <!-- ShopWorks customer id captured by the company picker (drives
+                         the SW push's idCustomer + design search scoping) -->
+                    <input type="hidden" id="fldCustomerNum">
                 </div>
             </div>
         </section>
@@ -80,22 +83,17 @@
         <section class="form-section">
             <div class="section-bar">2. Garment / Product Details</div>
             <p class="assist-hint no-print"><i class="fas fa-wand-magic-sparkles"></i>
-                Type a style # (PC54, K87…) and pick from the SanMar list — description fills itself and Color becomes that style's real color list. Everything stays typable by hand.</p>
+                Type a style # and pick from the SanMar list — description fills itself, Color becomes a swatch picker, and the size boxes become that style's REAL size run (4XL/5XL/talls included, extended-size upcharges applied automatically). 💰 opens Quick Quote for the engine price. Everything stays typable by hand.</p>
             <table class="form-table order-table" id="orderTable">
                 <thead>
                     <tr>
                         <th class="col-style">Style #</th>
                         <th class="col-color">Color</th>
                         <th class="col-desc">Product Description</th>
-                        <th class="col-size">S</th>
-                        <th class="col-size">M</th>
-                        <th class="col-size">L</th>
-                        <th class="col-size">XL</th>
-                        <th class="col-size">2XL</th>
-                        <th class="col-size">3XL</th>
+                        <th class="col-sizes">Sizes &amp; Quantities</th>
                         <th class="col-other">Other</th>
                         <th class="col-qty">Qty</th>
-                        <th class="col-price">Unit Price</th>
+                        <th class="col-price">Base Price</th>
                         <th class="col-total">Line Total</th>
                     </tr>
                 </thead>
@@ -245,6 +243,8 @@
     <script src="/pages/forms/nwca-form-shared.js"></script>
     <script src="/pages/forms/nwca-form-contacts.js"></script>
     <script src="/pages/forms/nwca-form-styles.js"></script>
+    <script src="/pages/forms/nwca-form-designs.js"></script>
+    <script src="/pages/forms/nwca-form-dates.js"></script>
     <script src="/pages/forms/nwca-form-save.js"></script>
     <script src="/pages/forms/ae-order-intake-form.js"></script>
 </body>

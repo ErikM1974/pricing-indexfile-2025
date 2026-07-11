@@ -177,55 +177,84 @@
             });
     }
 
+    // Swatch picker (Erik 2026-07-11: "like the quote builder"). A button shows
+    // the picked swatch+name; clicking opens a swatch grid. Built ONCE per
+    // colors load and toggled — never regenerated on hover (archived combobox
+    // lesson: regenerating DOM mid-hover eats the click).
     function buildColorSelect(colorCell, colors) {
         var textInput = colorCell.querySelector('input');
-        var old = colorCell.querySelector('select');
-        if (old) old.remove();
+        var oldBtn = colorCell.querySelector('.swatch-btn');
+        if (oldBtn) oldBtn.remove();
+        var oldGrid = colorCell.querySelector('.swatch-grid');
+        if (oldGrid) oldGrid.remove();
 
-        var select = document.createElement('select');
-        select.className = 'color-select';
-        select.setAttribute('aria-label', 'Color');
-        var opt0 = document.createElement('option');
-        opt0.value = '';
-        opt0.textContent = '— pick color —';
-        select.appendChild(opt0);
-        colors.forEach(function (c) {
-            var opt = document.createElement('option');
-            opt.value = c.COLOR_NAME || '';
-            opt.dataset.catalogColor = c.CATALOG_COLOR || '';
-            opt.textContent = c.COLOR_NAME || '';
-            select.appendChild(opt);
-        });
-        var optManual = document.createElement('option');
-        optManual.value = '__manual__';
-        optManual.textContent = '— type color manually —';
-        select.appendChild(optManual);
+        colorCell.classList.add('contacts-anchor');
 
-        select.addEventListener('change', function () {
-            if (select.value === '__manual__') {
-                select.remove();
-                textInput.hidden = false;
-                delete textInput.dataset.catalogColor; // manual = unverified
-                textInput.focus();
-                return;
-            }
-            var picked = select.options[select.selectedIndex];
-            textInput.value = select.value;
-            textInput.dataset.catalogColor = (picked && picked.dataset.catalogColor) || '';
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'swatch-btn';
+        btn.setAttribute('aria-label', 'Pick color');
+        btn.innerHTML = '<span class="swatch-chip"></span><span class="swatch-name">— pick color —</span>';
+
+        var grid = document.createElement('div');
+        grid.className = 'swatch-grid';
+        grid.hidden = true;
+
+        function choose(colorName, catalogColor, img) {
+            textInput.value = colorName;
+            textInput.dataset.catalogColor = catalogColor || '';
+            btn.querySelector('.swatch-name').textContent = colorName || '— pick color —';
+            var chip = btn.querySelector('.swatch-chip');
+            chip.style.backgroundImage = img ? 'url("' + img + '")' : 'none';
+            grid.hidden = true;
             textInput.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+
+        colors.forEach(function (c) {
+            var cell = document.createElement('button');
+            cell.type = 'button';
+            cell.className = 'swatch-cell';
+            cell.title = c.COLOR_NAME || '';
+            var img = c.COLOR_SQUARE_IMAGE || '';
+            cell.innerHTML = '<span class="swatch-chip"' + (img ? ' style="background-image:url(&quot;' + img + '&quot;)"' : '') + '></span>' +
+                '<span class="swatch-cell-name">' + escapeHtml(c.COLOR_NAME || '') + '</span>';
+            cell.addEventListener('click', function (e) {
+                e.preventDefault();
+                choose(c.COLOR_NAME || '', c.CATALOG_COLOR || '', img);
+            });
+            grid.appendChild(cell);
+        });
+
+        var manual = document.createElement('button');
+        manual.type = 'button';
+        manual.className = 'swatch-cell swatch-cell--manual';
+        manual.textContent = '⌨ type color manually';
+        manual.addEventListener('click', function (e) {
+            e.preventDefault();
+            btn.remove();
+            grid.remove();
+            textInput.hidden = false;
+            delete textInput.dataset.catalogColor; // manual = unverified
+            textInput.focus();
+        });
+        grid.appendChild(manual);
+
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            grid.hidden = !grid.hidden;
+        });
+        document.addEventListener('click', function (e) {
+            if (!colorCell.contains(e.target)) grid.hidden = true;
         });
 
         textInput.hidden = true;
-        colorCell.appendChild(select);
+        colorCell.appendChild(btn);
+        colorCell.appendChild(grid);
+
         // preselect if the text input already holds one of the colors
         if (textInput.value) {
-            for (var i = 0; i < select.options.length; i++) {
-                if (select.options[i].value.toLowerCase() === textInput.value.toLowerCase()) {
-                    select.selectedIndex = i;
-                    textInput.dataset.catalogColor = select.options[i].dataset.catalogColor || '';
-                    break;
-                }
-            }
+            var match = colors.filter(function (c) { return (c.COLOR_NAME || '').toLowerCase() === textInput.value.toLowerCase(); })[0];
+            if (match) choose(match.COLOR_NAME, match.CATALOG_COLOR, match.COLOR_SQUARE_IMAGE || '');
         }
     }
 
@@ -238,5 +267,40 @@
             .replace(/'/g, '&#39;');
     }
 
-    global.NWCAFormStyles = { attachRow: attachRow };
+    // ── Size list + extended-size upcharges (for dynamic size cells) ───────
+    // sizes: /api/sizes-by-style-color (CATALOG color) → ordered real sizes.
+    // upcharges: /api/max-prices-by-style → sellingPriceDisplayAddOns map
+    // {SIZE: dollars} straight from Caspio Standard_Size_Upcharges (the same
+    // source the pricing engine reads — Rule 9: never hardcoded).
+    var sizesCache = {};
+    var upchargeCache = {};
+
+    function loadSizes(styleNumber, catalogColor) {
+        var base = apiBase();
+        var key = styleNumber + '|' + catalogColor;
+        if (sizesCache[key]) return Promise.resolve(sizesCache[key]);
+        if (!base) return Promise.reject(new Error('config missing'));
+        return fetch(base + '/api/sizes-by-style-color?styleNumber=' + encodeURIComponent(styleNumber) + '&color=' + encodeURIComponent(catalogColor))
+            .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+            .then(function (data) {
+                var sizes = (data && data.sizes) || [];
+                sizesCache[key] = sizes;
+                return sizes;
+            });
+    }
+
+    function loadUpcharges(styleNumber) {
+        var base = apiBase();
+        if (upchargeCache[styleNumber]) return Promise.resolve(upchargeCache[styleNumber]);
+        if (!base) return Promise.reject(new Error('config missing'));
+        return fetch(base + '/api/max-prices-by-style?styleNumber=' + encodeURIComponent(styleNumber))
+            .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+            .then(function (data) {
+                var map = (data && data.sellingPriceDisplayAddOns) || {};
+                upchargeCache[styleNumber] = map;
+                return map;
+            });
+    }
+
+    global.NWCAFormStyles = { attachRow: attachRow, loadSizes: loadSizes, loadUpcharges: loadUpcharges };
 })(window);

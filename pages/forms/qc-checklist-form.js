@@ -64,6 +64,16 @@
         NWCAForm.init({});
         NWCAFormContacts.attach({ input: document.getElementById('fldCompany') });
         NWCAFormSave.init({ formId: 'final-qc-checklist', build: buildSubmission });
+        NWCAFormDates.attach('fldInspectionDate', 'fldSigDate');
+        if (!document.getElementById('fldInspectionDate').value) document.getElementById('fldInspectionDate').value = NWCAFormDates.today();
+        NWCAForm.staffFill(['fldInspector']);
+        NWCAForm.autosave({
+            key: 'final-qc-checklist',
+            tables: [
+                { tbody: qcBody, addRow: null },
+                { tbody: qtyBody, addRow: function () { addQtyRow(qtyBody); } },
+            ],
+        });
     });
 
     function addQtyRow(tbody) {
