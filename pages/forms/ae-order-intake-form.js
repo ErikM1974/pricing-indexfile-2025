@@ -210,9 +210,9 @@
         }
         link.addEventListener('click', function () {
             var qty = tr.querySelector('.row-qty').value || '';
-            link.href = '/calculators/quick-quote.html?style=' + encodeURIComponent(style) + (qty ? '&qty=' + encodeURIComponent(qty) : '');
+            link.href = '/calculators/quick-quote/index.html?style=' + encodeURIComponent(style) + (qty ? '&qty=' + encodeURIComponent(qty) : '');
         });
-        link.href = '/calculators/quick-quote.html?style=' + encodeURIComponent(style);
+        link.href = '/calculators/quick-quote/index.html?style=' + encodeURIComponent(style);
     }
 
     function textCell(className, ariaLabel) {

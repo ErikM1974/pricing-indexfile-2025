@@ -1781,6 +1781,7 @@
             var qQty = parseInt(qParams.get('qty'), 10);
             if (qQty > 0) { $('qqQty').value = qQty; state.qty = qQty; }
             if (qStyle) {
+                setMode('quick'); // a style deep-link means "price THIS style" — Quick Price panel
                 $('qqStyle').value = qStyle.toUpperCase();
                 lookupStyle(qStyle.toUpperCase());
             }

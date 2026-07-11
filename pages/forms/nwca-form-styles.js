@@ -210,6 +210,8 @@
             textInput.dispatchEvent(new Event('input', { bubbles: true }));
         }
 
+        // mousedown (not click) throughout — matches every other dropdown in the
+        // form suite; trusted-click synthesis was double-toggling the grid.
         colors.forEach(function (c) {
             var cell = document.createElement('button');
             cell.type = 'button';
@@ -218,8 +220,9 @@
             var img = c.COLOR_SQUARE_IMAGE || '';
             cell.innerHTML = '<span class="swatch-chip"' + (img ? ' style="background-image:url(&quot;' + img + '&quot;)"' : '') + '></span>' +
                 '<span class="swatch-cell-name">' + escapeHtml(c.COLOR_NAME || '') + '</span>';
-            cell.addEventListener('click', function (e) {
+            cell.addEventListener('mousedown', function (e) {
                 e.preventDefault();
+                e.stopPropagation();
                 choose(c.COLOR_NAME || '', c.CATALOG_COLOR || '', img);
             });
             grid.appendChild(cell);
@@ -229,8 +232,9 @@
         manual.type = 'button';
         manual.className = 'swatch-cell swatch-cell--manual';
         manual.textContent = '⌨ type color manually';
-        manual.addEventListener('click', function (e) {
+        manual.addEventListener('mousedown', function (e) {
             e.preventDefault();
+            e.stopPropagation();
             btn.remove();
             grid.remove();
             textInput.hidden = false;
@@ -239,11 +243,12 @@
         });
         grid.appendChild(manual);
 
-        btn.addEventListener('click', function (e) {
+        btn.addEventListener('mousedown', function (e) {
             e.preventDefault();
+            e.stopPropagation();
             grid.hidden = !grid.hidden;
         });
-        document.addEventListener('click', function (e) {
+        document.addEventListener('mousedown', function (e) {
             if (!colorCell.contains(e.target)) grid.hidden = true;
         });
 
