@@ -20,6 +20,7 @@
         'artwork-request': { label: 'Artwork', icon: 'fa-palette', cls: 'badge--art' },
         'name-personalization': { label: 'Name List', icon: 'fa-signature', cls: 'badge--nam' },
         'sample-checkout': { label: 'Samples', icon: 'fa-shirt', cls: 'badge--smp' },
+        'ae-order-intake': { label: 'Order Intake', icon: 'fa-cart-flatbed', cls: 'badge--aeo' },
     };
 
     var STATUS_CLS = {
@@ -39,6 +40,7 @@
         'artwork-request': ['New', 'Sent to Art', 'In Progress', 'Completed', 'Archived'],
         'name-personalization': ['New', 'In Progress', 'Completed', 'Archived'],
         'sample-checkout': ['Checked Out', 'Partially Returned', 'Returned', 'Charged', 'Archived'],
+        'ae-order-intake': ['New', 'In Progress', 'Entered in ShopWorks', 'Completed', 'Archived'],
     };
 
     var state = {

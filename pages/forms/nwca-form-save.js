@@ -154,5 +154,5 @@
             .replace(/'/g, '&#39;');
     }
 
-    global.NWCAFormSave = { init: init, toIsoDay: toIsoDay, val: val, checked: checked };
+    global.NWCAFormSave = { init: init, toIsoDay: toIsoDay, val: val, checked: checked, apiBase: apiBase };
 })(window);

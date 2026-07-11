@@ -1,0 +1,145 @@
+/* ==========================================================================
+   ae-order-intake-form.css — pages/forms/ae-order-intake-form.html
+   Page-specific layout on top of nwca-form-shared.css. Portrait print.
+   13-column order table needs the tightest type of any twin.
+   ========================================================================== */
+
+@media print {
+    @page { size: letter portrait; margin: 0.35in; }
+}
+
+.assist-hint {
+    margin: 6px 0 8px;
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+}
+
+.assist-hint .fa-wand-magic-sparkles { color: var(--form-green); }
+
+/* Order table column widths (13 cols) */
+.col-style { width: 8.5%; }
+.col-color { width: 10%; }
+.col-desc  { width: 17%; }
+.col-size  { width: 4.4%; }
+.col-other { width: 6%; }
+.col-qty   { width: 5.5%; }
+.col-price { width: 8%; }
+.col-total { width: 9%; }
+
+.order-table td input { padding: 6px 3px; font-size: 0.8rem; }
+.order-table th { font-size: 0.66rem; padding: 5px 2px; }
+
+/* per-row color select swaps in over the text input */
+.order-table .color-select {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font: inherit;
+    font-size: 0.78rem;
+    padding: 6px 2px;
+}
+
+.order-table .color-select:focus { outline: none; background: #f0f7f2; }
+
+.order-table td { position: relative; }
+
+/* rows with a verified SanMar color get a subtle tick */
+.order-table td.cell-color.is-verified::after {
+    content: '✓';
+    position: absolute;
+    right: 2px;
+    top: 2px;
+    font-size: 0.6rem;
+    color: var(--form-green);
+}
+
+/* ---------- Fulfillment + money stack ---------- */
+
+.fulfillment-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 12px 24px;
+    border: 1.5px solid var(--form-green);
+    border-radius: 0 4px 4px 4px;
+    padding: 12px 14px;
+}
+
+.fulfillment-left { display: flex; flex-direction: column; gap: 10px; }
+
+.money-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-left: 1px solid var(--line);
+    padding-left: 18px;
+}
+
+.money-row {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.money-row label {
+    flex: 0 0 90px;
+    font-weight: 600;
+    font-size: 0.875rem;
+}
+
+.money-row input {
+    flex: 1;
+    border: none;
+    border-bottom: 1px solid var(--ink);
+    font: inherit;
+    font-size: 0.95rem;
+    padding: 2px 4px;
+    background: transparent;
+    text-align: right;
+    min-width: 0;
+}
+
+.money-row input:focus { outline: none; background: #f0f7f2; }
+
+.money-strong { font-weight: 700; }
+
+.tax-lookup {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.tax-lookup input {
+    width: 64px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    font: inherit;
+    font-size: 0.8rem;
+    padding: 3px 6px;
+}
+
+.tax-btn {
+    border-color: var(--form-green);
+    color: var(--form-green);
+    padding: 4px 10px;
+    font-size: 0.78rem;
+}
+
+.tax-btn:hover { background: #e9f3ec; }
+
+.tax-hint { font-size: 0.75rem; color: var(--ink-soft); }
+.tax-hint.is-ok { color: var(--form-green-dark); font-weight: 600; }
+.tax-hint.is-warn { color: #b45309; font-weight: 600; }
+
+@media (max-width: 700px) {
+    .fulfillment-grid { grid-template-columns: 1fr; }
+    .money-stack { border-left: none; padding-left: 0; }
+}
+
+@media print {
+    .form-logo { height: 46px; }
+    .form-title { font-size: 1.35rem; }
+    .form-section { margin-top: 10px; }
+    .order-table td input { padding: 4px 2px; font-size: 0.74rem; }
+    .waiver-text { font-size: 0.8rem; }
+}
