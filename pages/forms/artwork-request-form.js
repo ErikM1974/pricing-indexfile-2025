@@ -13,6 +13,10 @@
         NWCAForm.init({});
         NWCAFormContacts.attach({ input: document.getElementById('fldCompany') });
         NWCAFormSave.init({ formId: 'artwork-request', build: buildSubmission });
+        NWCAFormDates.attach('fldDateRequested', 'fldDueDate', 'fldSignDate');
+        if (!document.getElementById('fldDateRequested').value) document.getElementById('fldDateRequested').value = NWCAFormDates.today();
+        NWCAForm.staffFill(['fldSalesRep', 'fldReceivedBy']);
+        NWCAForm.autosave({ key: 'artwork-request' });
     });
 
     function buildSubmission() {

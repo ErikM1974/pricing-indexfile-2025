@@ -26,6 +26,10 @@
         NWCAForm.init({});
         NWCAFormContacts.attach({ input: document.getElementById('fldCompany') });
         NWCAFormSave.init({ formId: 'garment-drop-off', build: buildSubmission });
+        NWCAFormDates.attach('fldDateIn', 'fldDateNeeded', 'fldSignDate');
+        if (!document.getElementById('fldDateIn').value) document.getElementById('fldDateIn').value = NWCAFormDates.today();
+        NWCAForm.staffFill(['fldReceivedBy']);
+        NWCAForm.autosave({ key: 'garment-drop-off', tables: [{ tbody: tbody, addRow: function () { addRow(tbody); } }] });
     });
 
     function buildSubmission() {

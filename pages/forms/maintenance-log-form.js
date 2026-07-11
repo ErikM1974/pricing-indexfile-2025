@@ -163,6 +163,13 @@
 
         NWCAForm.init({});
         NWCAFormSave.init({ formId: 'maintenance-log', build: buildSubmission });
+        NWCAFormDates.attach('fldNextService');
+        // identity grid: ident4 = Maintenance Date / Time, ident5 = Performed By
+        // (all six equipment types share the 4-identity layout)
+        var dateEl = document.getElementById('ident4');
+        if (dateEl && !dateEl.value) dateEl.value = NWCAFormDates.today();
+        NWCAForm.staffFill(['ident5']);
+        NWCAForm.autosave({ key: 'maintenance-log-' + currentType, tables: [{ tbody: document.getElementById('taskRows'), addRow: null }] });
     });
 
     function buildTypeSwitch() {

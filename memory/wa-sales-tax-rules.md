@@ -74,7 +74,7 @@ Single source of truth for "what RATE" is `recomputeTaxRate()` in `shared_compon
 
 ## ShopWorks push: TaxTotal = 0, tax applied manually (Erik's workflow, 2026-05-20)
 
-**Order Form submit path (`/api/submit-order-form`) sends `taxTotal: 0` to ManageOrders.** This is intentional, not a bug.
+**The `/api/submit-order-form` push path sends `taxTotal: 0` to ManageOrders.** This is intentional, not a bug. (The Order Form UI was retired 2026-07-11 — the route lives on for the DTG builder push, same TaxTotal=0 workflow.)
 
 ⚠️ **STALE AS OF 2026-07-06 — Milton is now 10.2% (DOR-verified). ERIK ACTION: update the ShopWorks integration defaults to `Tax_10.2` / `2200.102` (create the part/account in ShopWorks if missing).** The reason: the ShopWorks ManageOrders integration is configured with hardcoded `Tax Line Item = "Tax_10.1"` and `Tax Account = "2200.101"`. Those defaults are stamped on EVERY order pulled by the integration — there's no per-order override mechanism. If we pushed `TaxTotal: $X` for a Seattle 10.35% order, ShopWorks would auto-create a line labeled `Tax_10.1 — City of Milton Sales Tax 10.1%` with the correct dollar amount but the wrong GL account and wrong description.
 

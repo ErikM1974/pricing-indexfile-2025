@@ -26,6 +26,9 @@
         });
         NWCAFormContacts.attach({ input: document.getElementById('fldCompany') });
         NWCAFormSave.init({ formId: 'name-personalization', build: buildSubmission });
+        NWCAFormDates.attach('fldDueDate', 'fldSignDate');
+        NWCAForm.staffFill(['fldSalesRep', 'fldReceivedBy']);
+        NWCAForm.autosave({ key: 'name-personalization', tables: [{ tbody: tbody, addRow: function () { addRow(tbody); } }] });
     });
 
     function buildSubmission() {

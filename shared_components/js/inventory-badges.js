@@ -1,8 +1,8 @@
 /**
  * Inventory Badges — shared helper for table-based quote builders
  *
- * Wraps the existing OrderFormInventory module (pages/order-form/inventory/
- * inventory-check.js) and renders small stock badges next to each size input
+ * Wraps the existing OrderFormInventory module (shared_components/js/
+ * sanmar-inventory-check.js) and renders small stock badges next to each size input
  * cell in a product row.
  *
  * DTG uses OrderFormInventory directly via React-style re-render. This module

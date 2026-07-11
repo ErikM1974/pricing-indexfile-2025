@@ -16,15 +16,33 @@
 
 .assist-hint .fa-wand-magic-sparkles { color: var(--form-green); }
 
-/* Order table column widths (13 cols) */
-.col-style { width: 8.5%; }
-.col-color { width: 10%; }
+/* Order table column widths (8 cols — sizes live in one chip cell) */
+.col-style { width: 9%; }
+.col-color { width: 11%; }
 .col-desc  { width: 17%; }
-.col-size  { width: 4.4%; }
-.col-other { width: 6%; }
+.col-sizes { width: 33%; }
+.col-other { width: 7%; }
 .col-qty   { width: 5.5%; }
 .col-price { width: 8%; }
-.col-total { width: 9%; }
+.col-total { width: 9.5%; }
+
+.cell-sizes { vertical-align: middle; }
+
+.qq-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin: 3px 4px 2px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--form-green-dark);
+    text-decoration: none;
+    border: 1px solid var(--form-green);
+    border-radius: 999px;
+    padding: 1px 8px;
+}
+
+.qq-link:hover { background: #e9f3ec; }
 
 .order-table td input { padding: 6px 3px; font-size: 0.8rem; }
 .order-table th { font-size: 0.66rem; padding: 5px 2px; }

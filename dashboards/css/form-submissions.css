@@ -221,6 +221,18 @@
 
 .inbox-modal-head h2 { margin: 0; font-size: 1.05rem; }
 
+.copy-id {
+    border: none;
+    background: none;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    color: var(--gray-800);
+    padding: 0 2px;
+}
+
+.copy-id:hover { color: var(--gray-500); }
+
 .inbox-modal-actions { display: flex; gap: 8px; }
 
 .inbox-modal-body { padding: 16px 18px 24px; overflow-y: auto; }

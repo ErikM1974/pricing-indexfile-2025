@@ -30,6 +30,14 @@
         return null; // config missing — lookup disabled, manual typing unaffected
     }
 
+    // "(253) 555-0142" from whatever digits arrive; non-10-digit strings pass through
+    function formatPhone(value) {
+        var digits = String(value || '').replace(/\D/g, '');
+        if (digits.length === 11 && digits[0] === '1') digits = digits.slice(1);
+        if (digits.length !== 10) return String(value || '');
+        return '(' + digits.slice(0, 3) + ') ' + digits.slice(3, 6) + '-' + digits.slice(6);
+    }
+
     function fillStandard(company, contact) {
         var set = function (id, value) {
             var el = document.getElementById(id);
@@ -42,10 +50,86 @@
         if (contact) {
             set('fldContact', contact.ct_NameFull || ((contact.NameFirst || '') + ' ' + (contact.NameLast || '')).trim());
             set('fldEmail', contact.Email);
-            set('fldPhone', contact.Phone_Best || contact.Company_Phone || company.Phone_Best || company.Company_Phone);
+            set('fldPhone', formatPhone(contact.Phone_Best || contact.Company_Phone || company.Phone_Best || company.Company_Phone));
         } else {
-            set('fldPhone', company.Phone_Best || company.Company_Phone);
+            set('fldPhone', formatPhone(company.Phone_Best || company.Company_Phone));
         }
+        renderIntel(company);
+        attachContactPicker(company);
+    }
+
+    // ── Customer intelligence banners (same data the Order Form uses) ──────
+    function renderIntel(company) {
+        var wrap = document.querySelector('.customer-intel');
+        if (!wrap) {
+            wrap = document.createElement('div');
+            wrap.className = 'customer-intel no-print';
+            var sheet = document.querySelector('.form-sheet');
+            if (!sheet) return;
+            if (sheet.classList.contains('form-sheet--landscape')) wrap.classList.add('customer-intel--wide');
+            sheet.parentNode.insertBefore(wrap, sheet);
+        }
+        wrap.innerHTML = '';
+        if (company.Customer_Warning) {
+            var warn = document.createElement('div');
+            warn.className = 'intel-banner intel-banner--warning';
+            warn.innerHTML = '<i class="fas fa-triangle-exclamation"></i> Customer warning: ' + escapeHtml(company.Customer_Warning);
+            wrap.appendChild(warn);
+        }
+        var infoBits = [];
+        if (company.Is_Tax_Exempt) infoBits.push('TAX EXEMPT' + (company.Tax_Exempt_Number ? ' (#' + company.Tax_Exempt_Number + ')' : '') + ' — no sales tax');
+        var terms = company.Payment_Terms || company.CustTerms || company.Preferred_Terms_FromOrders;
+        if (terms) infoBits.push('Terms: ' + terms);
+        if (company.Account_Tier) infoBits.push('Tier: ' + company.Account_Tier);
+        if (infoBits.length) {
+            var info = document.createElement('div');
+            info.className = 'intel-banner intel-banner--info';
+            info.innerHTML = '<i class="fas fa-circle-info"></i> ' + escapeHtml(infoBits.join(' · '));
+            wrap.appendChild(info);
+        }
+        // tax-exempt hint next to a Tax field if the form has one
+        if (company.Is_Tax_Exempt) {
+            var taxHint = document.getElementById('taxHint');
+            if (taxHint) { taxHint.textContent = 'Customer is TAX EXEMPT'; taxHint.className = 'tax-hint is-warn'; }
+        }
+        document.dispatchEvent(new CustomEvent('nwca-contacts:company', { detail: company }));
+    }
+
+    // ── Contact sub-picker: after a company pick, the Contact field offers
+    //    that company's people on focus (typing manually still fine) ────────
+    function attachContactPicker(company) {
+        var input = document.getElementById('fldContact');
+        var contacts = (company.contacts || []);
+        if (!input || contacts.length < 2 || input.dataset.contactPickerFor === String(company.id_Customer)) return;
+        input.dataset.contactPickerFor = String(company.id_Customer);
+
+        var parent = input.parentNode;
+        parent.classList.add('contacts-anchor');
+        var old = parent.querySelector('.contacts-dropdown--people');
+        if (old) old.remove();
+
+        var box = document.createElement('div');
+        box.className = 'contacts-dropdown contacts-dropdown--people';
+        box.hidden = true;
+        contacts.forEach(function (ct) {
+            var el = document.createElement('div');
+            el.className = 'contacts-row';
+            var name = ct.ct_NameFull || ((ct.NameFirst || '') + ' ' + (ct.NameLast || '')).trim();
+            el.innerHTML = escapeHtml(name) + (ct.Email ? ' <span class="contacts-muted">' + escapeHtml(ct.Email) + '</span>' : '');
+            el.addEventListener('mousedown', function (e) {
+                e.preventDefault();
+                fillStandard(company, ct);
+                box.hidden = true;
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+            });
+            box.appendChild(el);
+        });
+        parent.appendChild(box);
+
+        input.addEventListener('focus', function () { box.hidden = false; });
+        document.addEventListener('click', function (e) {
+            if (e.target !== input && !box.contains(e.target)) box.hidden = true;
+        });
     }
 
     function attach(opts) {
@@ -207,5 +291,5 @@
             .replace(/'/g, '&#39;');
     }
 
-    global.NWCAFormContacts = { attach: attach, fillStandard: fillStandard };
+    global.NWCAFormContacts = { attach: attach, fillStandard: fillStandard, formatPhone: formatPhone };
 })(window);

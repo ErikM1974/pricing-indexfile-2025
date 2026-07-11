@@ -290,7 +290,15 @@
         var meta = FORM_META[sub.Form_ID] || { label: sub.Form_ID, icon: 'fa-file', cls: '' };
         document.getElementById('detailTitle').innerHTML =
             '<span class="inbox-badge ' + meta.cls + '"><i class="fas ' + meta.icon + '"></i> ' + esc(meta.label) + '</span> ' +
-            esc(sub.Submission_ID) + ' <span class="inbox-muted">saved ' + esc(fmtStamp(sub.Submitted_At)) + '</span>';
+            '<button type="button" class="copy-id" title="Copy id" data-copy="' + esc(sub.Submission_ID) + '">' + esc(sub.Submission_ID) + ' <i class="far fa-copy"></i></button>' +
+            ' <span class="inbox-muted">saved ' + esc(fmtStamp(sub.Submitted_At)) + '</span>';
+        var copyBtn = document.querySelector('#detailTitle .copy-id');
+        copyBtn.addEventListener('click', function () {
+            navigator.clipboard.writeText(copyBtn.dataset.copy).then(function () {
+                copyBtn.querySelector('i').className = 'fas fa-check';
+                setTimeout(function () { copyBtn.querySelector('i').className = 'far fa-copy'; }, 1200);
+            }).catch(function () { /* clipboard blocked — no-op */ });
+        });
 
         var payload = {};
         try { payload = JSON.parse(sub.Payload_JSON || '{}'); } catch (e) { /* renders empty */ }
@@ -526,9 +534,30 @@
     // Mirrors the server transformer's verification rule so the preview shows
     // EXACTLY what will and won't push. The server re-validates — this is UX.
     function classifyOrderRows(payload) {
-        var table = (payload.tables || []).filter(function (t) { return t.title === 'Order Lines'; })[0] || { rows: [] };
         var verified = [];
         var skipped = [];
+
+        if (Array.isArray(payload.lines) && payload.lines.length) {
+            // v2 machine block (dynamic sizes + upcharges)
+            payload.lines.forEach(function (line, idx) {
+                var sizes = (line.sizes || []).filter(function (s) { return parseInt(s.qty, 10) > 0; });
+                var qty = sizes.reduce(function (a, s) { return a + parseInt(s.qty, 10); }, 0);
+                var price = parseFloat(String(line.basePrice || '').replace(/[$,\s]/g, ''));
+                var reasons = [];
+                if (!String(line.style || '').trim()) reasons.push('no style');
+                if (!String(line.catalogColor || '').trim()) reasons.push('color not SanMar-verified');
+                if (!sizes.length) reasons.push('no sizes');
+                if (isNaN(price)) reasons.push('no base price');
+                (reasons.length ? skipped : verified).push({
+                    n: idx + 1, style: line.style || '?', color: line.colorName || '', catalogColor: line.catalogColor || '',
+                    qty: qty || line.qty || '?', price: line.basePrice || '?', reasons: reasons,
+                });
+            });
+            return { verified: verified, skipped: skipped };
+        }
+
+        // legacy v1 table rows (fixed S–3XL columns)
+        var table = (payload.tables || []).filter(function (t) { return t.title === 'Order Lines'; })[0] || { rows: [] };
         (table.rows || []).forEach(function (row, idx) {
             var style = String(row[0] || '').trim();
             var catalogColor = String(row[2] || '').trim();

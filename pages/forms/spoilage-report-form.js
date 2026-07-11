@@ -38,6 +38,10 @@
         NWCAForm.init({ onAfterClear: function () { recalcTotalLoss(); } });
         NWCAFormContacts.attach({ input: document.getElementById('fldCompany') });
         NWCAFormSave.init({ formId: 'spoilage-report', build: buildSubmission });
+        NWCAFormDates.attach('fldDateTime', 'fldClosedDate');
+        if (!document.getElementById('fldDateTime').value) document.getElementById('fldDateTime').value = NWCAFormDates.today();
+        NWCAForm.staffFill(['fldReportedBy']);
+        NWCAForm.autosave({ key: 'spoilage-report', tables: [{ tbody: tbody, addRow: function () { addRow(tbody); } }] });
     });
 
     function money(n) { return (Math.round(n * 100) / 100).toFixed(2); }

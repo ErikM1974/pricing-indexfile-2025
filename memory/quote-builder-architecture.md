@@ -151,9 +151,9 @@ estimateShipping()` vs EMB/DTF bare `estimateShipping()` → align; SCP/DTF indi
 | **EMB** | "quote-builder" | `embroidery-quote-builder.js`, `embroidery-pricing-service.js`, `embroidery-quote-service.js`, `embroidery-quote-pricing.js` |
 | **SCP** | "quote-builder" | `screenprint-quote-builder.js`, `screenprint-pricing-service.js`, `screenprint-quote-service.js` |
 | **DTF** | "quote-builder" | `dtf-quote-builder.js`, `dtf-pricing-service.js`, `dtf-quote-service.js`, `dtf-quote-pricing.js`, `dtf-quote-page.js`, `dtf-quote-products.js` |
-| **Order Form** (WIP, multi-method) | single-page order entry | `pages/order-form.html` + `order-form-*.js`; pushes via `server.js /api/submit-order-form` → `NWCA-OrderForm` |
+| **Order Form** (**RETIRED 2026-07-11** — code deleted) | single-page order entry | was `pages/order-form.html`; its push route `server.js /api/submit-order-form` is RETAINED for the DTG builder |
 
-### Order Form — the 5th surface (added 2026-06-02)
+### Order Form — the 5th surface (added 2026-06-02 · **RETIRED 2026-07-11**: UI + drafts/approve/share routes deleted; `/api/submit-order-form` kept for the DTG push; OF rows read-only in Quote Mgmt)
 One staff-facing page that handles **all 6 methods at once** (EMB/SCP/DTG/DTF/Stickers/Emblems) via a drag-services panel + a single size matrix. It is **already partly unified**:
 - **SHARES (today):** all 7 method pricing services (`{embroidery,cap-embroidery,screenprint,dtg,dtf,emblem,sticker}-pricing-service.js`), `manageorders-inventory-service.js`, `product-category-filter.js`. → *Proof the pricing engines are UI-agnostic; this is the model for the whole unification.*
 - **Push:** `/api/submit-order-form` (server.js) → ManageOrders `NWCA-OrderForm` (apiSource now blank like the rest). The 2026-06-02 push fixes (base PN size-suffix, tax block 2200.101/2202, Notes To Production, per-size breakout) already apply here.

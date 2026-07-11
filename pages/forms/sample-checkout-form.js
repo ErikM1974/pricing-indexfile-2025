@@ -25,6 +25,27 @@
         NWCAForm.init({});
         NWCAFormContacts.attach({ input: document.getElementById('fldCompany') });
         NWCAFormSave.init({ formId: 'sample-checkout', build: buildSubmission });
+        NWCAFormDates.attach('fldCheckoutDate', 'fldReturnDue', 'fldGraceDeadline', 'fldVendorReturnBy', 'fldSignDate');
+        NWCAForm.staffFill(['fldAe', 'fldIssuedBy']);
+        NWCAForm.autosave({ key: 'sample-checkout', tables: [{ tbody: tbody, addRow: function () { addRow(tbody); } }] });
+
+        // the form's own printed rule: samples due back in 14 days, grace +3
+        var checkout = document.getElementById('fldCheckoutDate');
+        if (!checkout.value) {
+            checkout.value = NWCAFormDates.today();
+        }
+        function autoDueDates() {
+            var due = document.getElementById('fldReturnDue');
+            var grace = document.getElementById('fldGraceDeadline');
+            if (!due.value.trim()) due.value = NWCAFormDates.plusDays(checkout.value, 14);
+            if (!grace.value.trim()) grace.value = NWCAFormDates.plusDays(checkout.value, 17);
+        }
+        autoDueDates();
+        checkout.addEventListener('input', function () {
+            // re-derive only fields the user hasn't hand-edited away from the rule
+            document.getElementById('fldReturnDue').value = NWCAFormDates.plusDays(checkout.value, 14);
+            document.getElementById('fldGraceDeadline').value = NWCAFormDates.plusDays(checkout.value, 17);
+        });
     });
 
     // ⚠️ Card section (status/type/last4/exp/cardholder) is DELIBERATELY absent
