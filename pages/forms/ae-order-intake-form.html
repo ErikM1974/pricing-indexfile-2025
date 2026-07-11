@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>AE Customer Order Intake Form - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/pages/forms/nwca-form-shared.css">
+    <link rel="stylesheet" href="/pages/forms/ae-order-intake-form.css">
+</head>
+<body>
+    <!-- Screen-only toolbar: never prints -->
+    <div class="form-toolbar no-print">
+        <a href="/dashboards/forms-library.html" class="toolbar-link">
+            <i class="fas fa-arrow-left"></i> Forms Library
+        </a>
+        <div class="toolbar-actions">
+            <button type="button" id="clearFormBtn" class="toolbar-btn toolbar-btn--ghost">
+                <i class="fas fa-eraser"></i> Clear
+            </button>
+            <a href="/forms/ae-customer-order-intake-form.pdf" target="_blank" rel="noopener" class="toolbar-btn toolbar-btn--ghost">
+                <i class="fas fa-file-pdf"></i> Fillable PDF
+            </a>
+            <button type="button" id="printFormBtn" class="toolbar-btn toolbar-btn--primary">
+                <i class="fas fa-print"></i> Print / Save as PDF
+            </button>
+        </div>
+    </div>
+
+    <div class="form-sheet">
+        <header class="form-header">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                 alt="Northwest Custom Apparel" class="form-logo">
+            <h1 class="form-title">AE Customer Order Intake Form</h1>
+            <p class="form-subtitle">Complete before entering the order into ShopWorks</p>
+            <p class="form-contact">2025 Freeman Rd. E., Milton, WA 98354 &nbsp;&bull;&nbsp; 253-922-5793 &nbsp;&bull;&nbsp; www.nwcustomapparel.com</p>
+        </header>
+
+        <section class="form-section">
+            <div class="section-bar">1. Customer / Order Information</div>
+            <div class="info-grid">
+                <div class="info-field">
+                    <label for="fldCompany">Company</label>
+                    <input type="text" id="fldCompany" autocomplete="organization">
+                </div>
+                <div class="info-field">
+                    <label for="fldSalesRep">Sales Rep</label>
+                    <input type="text" id="fldSalesRep">
+                </div>
+                <div class="info-field">
+                    <label for="fldContact">Contact Name</label>
+                    <input type="text" id="fldContact" autocomplete="name">
+                </div>
+                <div class="info-field">
+                    <label for="fldOrderDate">Order Date</label>
+                    <input type="text" id="fldOrderDate">
+                </div>
+                <div class="info-field">
+                    <label for="fldPhone">Phone</label>
+                    <input type="tel" id="fldPhone" autocomplete="tel">
+                </div>
+                <div class="info-field">
+                    <label for="fldInHands">In-Hands Date</label>
+                    <input type="text" id="fldInHands">
+                </div>
+                <div class="info-field">
+                    <label for="fldEmail">Email</label>
+                    <input type="email" id="fldEmail" autocomplete="email">
+                </div>
+                <div class="info-field">
+                    <label for="fldPoCustomer">PO # / Customer #</label>
+                    <input type="text" id="fldPoCustomer">
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">2. Garment / Product Details</div>
+            <p class="assist-hint no-print"><i class="fas fa-wand-magic-sparkles"></i>
+                Type a style # (PC54, K87…) and pick from the SanMar list — description fills itself and Color becomes that style's real color list. Everything stays typable by hand.</p>
+            <table class="form-table order-table" id="orderTable">
+                <thead>
+                    <tr>
+                        <th class="col-style">Style #</th>
+                        <th class="col-color">Color</th>
+                        <th class="col-desc">Product Description</th>
+                        <th class="col-size">S</th>
+                        <th class="col-size">M</th>
+                        <th class="col-size">L</th>
+                        <th class="col-size">XL</th>
+                        <th class="col-size">2XL</th>
+                        <th class="col-size">3XL</th>
+                        <th class="col-other">Other</th>
+                        <th class="col-qty">Qty</th>
+                        <th class="col-price">Unit Price</th>
+                        <th class="col-total">Line Total</th>
+                    </tr>
+                </thead>
+                <tbody id="orderRows">
+                    <!-- rows injected by ae-order-intake-form.js -->
+                </tbody>
+            </table>
+            <button type="button" id="addRowBtn" class="toolbar-btn toolbar-btn--ghost add-row-btn no-print">
+                <i class="fas fa-plus"></i> Add Row
+            </button>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">3. Decoration Method</div>
+            <div class="decoration-row">
+                <label class="deco-check"><input type="checkbox" id="mEmbroidery"> Embroidery</label>
+                <label class="deco-check"><input type="checkbox" id="mDtg"> DTG</label>
+                <label class="deco-check"><input type="checkbox" id="mTransfers"> Transfers</label>
+                <label class="deco-check"><input type="checkbox" id="mScreen"> Screen Printing</label>
+                <label class="deco-check"><input type="checkbox" id="mLaser"> Laser Engraving</label>
+                <label class="deco-check"><input type="checkbox" id="mPatches"> Patches</label>
+                <label class="deco-check"><input type="checkbox" id="mStickers"> Stickers</label>
+                <label class="deco-check"><input type="checkbox" id="mBanners"> Banners</label>
+                <label class="deco-check deco-check--other">
+                    <input type="checkbox" id="mOther"> Other &mdash; Specify:
+                    <input type="text" id="mOtherText" class="deco-other-text" aria-label="Other decoration method">
+                </label>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">4. Decoration / Artwork Details</div>
+            <div class="info-grid">
+                <div class="info-field">
+                    <label for="fldDecoLocation">Decoration Location</label>
+                    <input type="text" id="fldDecoLocation">
+                </div>
+                <div class="info-field">
+                    <label for="fldLogoName">Logo / Artwork Name</label>
+                    <input type="text" id="fldLogoName">
+                </div>
+                <div class="info-field">
+                    <label for="fldThreadColors">Thread / Print Colors</label>
+                    <input type="text" id="fldThreadColors">
+                </div>
+                <div class="info-field">
+                    <label for="fldArtInstructions">Artwork Instructions</label>
+                    <input type="text" id="fldArtInstructions">
+                </div>
+                <div class="info-field info-field--checks">
+                    <label>Proof Required?</label>
+                    <label class="deco-check"><input type="checkbox" id="proofYes"> Yes</label>
+                    <label class="deco-check"><input type="checkbox" id="proofNo"> No</label>
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">5. Fulfillment, Pricing &amp; Payment</div>
+            <div class="fulfillment-grid">
+                <div class="fulfillment-left">
+                    <div class="info-field info-field--checks">
+                        <label>Fulfillment</label>
+                        <label class="deco-check"><input type="checkbox" id="fulPickup"> Customer Pickup</label>
+                        <label class="deco-check"><input type="checkbox" id="fulShip"> Ship</label>
+                    </div>
+                    <div class="info-field">
+                        <label for="fldShipMethod">Ship Method</label>
+                        <input type="text" id="fldShipMethod">
+                    </div>
+                    <div class="info-field">
+                        <label for="fldShipTo">Ship-To / Delivery Instructions</label>
+                        <input type="text" id="fldShipTo">
+                    </div>
+                    <div class="info-field">
+                        <label for="fldShipDate">Pickup / Ship Date</label>
+                        <input type="text" id="fldShipDate">
+                    </div>
+                    <div class="info-field">
+                        <label for="fldPaymentNotes">Deposit / Payment Notes</label>
+                        <input type="text" id="fldPaymentNotes">
+                    </div>
+                </div>
+                <div class="money-stack">
+                    <div class="money-row">
+                        <label for="fldSubtotal">Subtotal</label>
+                        <input type="text" id="fldSubtotal" inputmode="decimal">
+                    </div>
+                    <div class="money-row">
+                        <label for="fldTax">Tax</label>
+                        <input type="text" id="fldTax" inputmode="decimal">
+                    </div>
+                    <div class="tax-lookup no-print">
+                        <input type="text" id="fldTaxZip" maxlength="5" inputmode="numeric" placeholder="ZIP" aria-label="Tax lookup ZIP">
+                        <button type="button" id="taxLookupBtn" class="toolbar-btn toolbar-btn--ghost tax-btn"><i class="fas fa-percent"></i> Look up rate</button>
+                        <span id="taxHint" class="tax-hint"></span>
+                    </div>
+                    <div class="money-row">
+                        <label for="fldOrderTotal">Order Total</label>
+                        <input type="text" id="fldOrderTotal" inputmode="decimal" class="money-strong">
+                    </div>
+                    <div class="money-row">
+                        <label for="fldDeposit">Deposit</label>
+                        <input type="text" id="fldDeposit" inputmode="decimal">
+                    </div>
+                    <div class="money-row">
+                        <label for="fldBalanceDue">Balance Due</label>
+                        <input type="text" id="fldBalanceDue" inputmode="decimal" class="money-strong">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">6. Production Notes / Special Instructions</div>
+            <textarea id="fldNotes" class="notes-area" rows="3" aria-label="Production notes"></textarea>
+        </section>
+
+        <section class="waiver-box">
+            <h2 class="waiver-title">7. Customer Approval &amp; AE Sign-Off</h2>
+            <p class="waiver-text">
+                Customer confirms the product details, quantities, decoration instructions, pricing and
+                fulfillment information above are correct.
+            </p>
+            <div class="signature-row">
+                <div class="signature-field">
+                    <div class="signature-line"></div>
+                    <label>Customer Signature</label>
+                </div>
+                <div class="signature-field">
+                    <input type="text" id="fldPrintedName" aria-label="Printed name">
+                    <label>Printed Name</label>
+                </div>
+                <div class="signature-field">
+                    <input type="text" id="fldSignDate" aria-label="Date">
+                    <label>Date</label>
+                </div>
+                <div class="signature-field">
+                    <div class="signature-line"></div>
+                    <label>AE Signature</label>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="/config/app.config.js"></script>
+    <script src="/pages/forms/nwca-form-shared.js"></script>
+    <script src="/pages/forms/nwca-form-contacts.js"></script>
+    <script src="/pages/forms/nwca-form-styles.js"></script>
+    <script src="/pages/forms/nwca-form-save.js"></script>
+    <script src="/pages/forms/ae-order-intake-form.js"></script>
+</body>
+</html>
