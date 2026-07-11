@@ -40,7 +40,7 @@ Commit: `feat(sanmar): draft SanMar PO Integration backend (getPreSubmitInfo + s
 1. **Availability badge (Option A)** — a "Check SanMar stock" action on an order/PO row → `POST /pre-submit-check` → show per-line ✅/❌ + warehouse. Read-only, safe.
 2. **PO preview + confirm modal (Option B)** — render the `po-payload.schema.json` payload for staff review (lines, ship-to, method) → on **explicit confirm** → `POST /submit` with `confirm:true`. NEVER auto-submit. Show the returned `message` + per-line result; surface any error visibly (Erik's #1 rule).
 
-Reuse: `pages/order-form/inventory/inventory-check.js`, the color/size pickers, `order-form-size-suffix.js`. Call via `APP_CONFIG.API.BASE_URL` (never hardcode the proxy URL).
+Reuse: `shared_components/js/sanmar-inventory-check.js` (moved 2026-07-11, ex `pages/order-form/inventory/inventory-check.js`), the color/size pickers, `order-form-size-suffix.js`. Call via `APP_CONFIG.API.BASE_URL` (never hardcode the proxy URL).
 
 ### API contract (so wiring is unambiguous later)
 

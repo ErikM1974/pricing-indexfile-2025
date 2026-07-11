@@ -138,10 +138,9 @@ dotenv.config();
 //   (NO /custom-caps page route yet — add the clean-URL sendFile WITH the page
 //    wave; registering it now would be a zombie route, P0 lesson 2026-06-11)
 //
-// ONLINE ORDER FORM
-//   L1654 POST /api/order-form-drafts    — save draft to quote_sessions w/ OF- prefix
-//   L1710 POST /api/submit-order-form    — push to ShopWorks (ExtSource: NWCA-OrderForm)
-//   L1840 GET  /order-form/:draftId      — short share link → redirects to /pages/order-form.html?draftId=…
+// ONLINE ORDER FORM (UI retired 2026-07-11 — /pages/order-form deleted; drafts/approve/share-link routes removed)
+//   L1710 POST /api/submit-order-form    — push to ShopWorks (ExtSource: NWCA-OrderForm). RETAINED:
+//                                          the DTG builder's submitToShopWorks() pushes through this route.
 //
 // CRM & AUTH
 //   L508  POST /api/crm-session
@@ -6696,8 +6695,8 @@ function buildOrderNote({ info, breakdown, draftId, ship, orderNotes, extOrderId
   // 0. Customer Warning (Erik 2026-05-23): if the customer record in
   // CompanyContactsMerge2026 has a Customer_Warning flag (e.g. "DO NOT
   // EXTEND CREDIT", "REQUIRES PREPAY"), surface it as the FIRST line so
-  // AR sees it before doing anything else. Frontend pulls this via the
-  // /api/order-form-drafts/companies/:id picker and passes through info.
+  // AR sees it before doing anything else. The client passes it through
+  // info.customerWarning (originally via the Order Form company picker).
   const cw = String(info?.customerWarning || '').trim();
   if (cw) {
     lines.push(`CUSTOMER WARNING: ${cw}`);
@@ -6924,140 +6923,13 @@ async function generateOrderFormDraftId() {
   }
 }
 
-// POST /api/order-form-drafts — Save a draft to Caspio quote_sessions so staff can share the link with a customer.
-// Reuses the existing quote_sessions table with QuoteID prefix "OF-".
-app.post('/api/order-form-drafts', async (req, res) => {
-  try {
-    const { info = {}, rows = [], ship = {}, orderNotes = '', files = [] } = req.body || {};
+// (The /api/order-form-drafts save + customer-approve routes were removed 2026-07-11
+//  along with the Order Form UI — see git history. /api/submit-order-form below is
+//  RETAINED because the DTG quote builder pushes through it.)
 
-    const draftId = await generateOrderFormDraftId();
-    const expiresAtDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-    const formattedExpiresAt = expiresAtDate.toISOString().replace(/\.\d{3}Z$/, '');
-
-    // staffFilled = which fields the staff already filled — customer view should leave these alone.
-    const staffFilled = Object.keys(info).filter(k => info[k] !== '' && info[k] != null);
-
-    const sessionData = {
-      QuoteID: draftId,
-      SessionID: `orderform_${Date.now()}`,
-      Status: 'Draft',
-      CustomerName: [info.buyerFirst, info.buyerLast].filter(Boolean).join(' '),
-      CompanyName: info.company || '',
-      CustomerEmail: info.email || '',
-      Phone: info.phone || '',
-      TotalQuantity: 0,
-      SubtotalAmount: 0,
-      LTMFeeTotal: 0,
-      TotalAmount: 0,
-      ExpiresAt: formattedExpiresAt,
-      Notes: JSON.stringify({ info, rows, ship, orderNotes, files, staffFilled })
-    };
-
-    const apiUrl = `${CASPIO_PROXY_BASE}/api/quote_sessions`;
-    const r = await fetch(apiUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(sessionData)
-    });
-
-    if (!r.ok) {
-      const txt = await r.text();
-      console.error('[Order Form Draft] Caspio save failed:', txt);
-      return res.status(502).json({ success: false, error: 'Failed to save draft', detail: txt });
-    }
-
-    console.log('[Order Form Draft] ✓ Saved:', draftId);
-    res.json({ success: true, draftId });
-  } catch (err) {
-    console.error('[Order Form Draft] Error:', err);
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
-// POST /api/order-form-drafts/:draftId/approve
-// Phase D.3 (2026-05-04) — Customer-facing Approve action. Looks up the
-// quote_session by QuoteID (e.g. OF-0035), then PUTs Status='Approved'
-// via Caspio. Returns rich data the frontend can use to fire an EmailJS
-// notification to the sales rep + erik@ (D.3.1).
-app.post('/api/order-form-drafts/:draftId/approve', async (req, res) => {
-  try {
-    const draftId = String(req.params.draftId || '').trim();
-    if (!/^OF-\d+$/.test(draftId)) {
-      return res.status(400).json({ success: false, error: 'Invalid draft ID format' });
-    }
-    const PROXY = CASPIO_PROXY_BASE;
-
-    // 1. Look up the session by QuoteID to get its PK_ID + Notes payload
-    const lookupUrl = `${PROXY}/api/quote_sessions?quoteID=${encodeURIComponent(draftId)}`;
-    const lookupRes = await fetch(lookupUrl);
-    if (!lookupRes.ok) {
-      const txt = await lookupRes.text();
-      console.error(`[Order Form Approve] Lookup failed for ${draftId}:`, txt);
-      return res.status(502).json({ success: false, error: 'Lookup failed', detail: txt });
-    }
-    const sessions = await lookupRes.json();
-    const session = Array.isArray(sessions) ? sessions[0] : sessions;
-    if (!session || !session.PK_ID) {
-      return res.status(404).json({ success: false, error: 'Draft not found' });
-    }
-
-    // Pull info + rows out of the embedded JSON Notes blob so we can return
-    // rep email + customer details + total to the client for EmailJS.
-    let parsed = {};
-    try { parsed = JSON.parse(session.Notes || '{}'); } catch (_) { parsed = {}; }
-    const info = parsed.info || {};
-    const repSlug = String(info.salesRep || '').toLowerCase();
-    const repEmail = SALES_REP_EMAILS[repSlug] || 'erik@nwcustomapparel.com';
-    const repName = SALES_REP_FULL_NAMES[repSlug] || info.salesRep || 'Sales Team';
-
-    if (session.Status === 'Approved') {
-      return res.json({
-        success: true,
-        draftId,
-        status: 'Approved',
-        alreadyApproved: true,
-        rep_email: repEmail,
-        rep_name: repName,
-      });
-    }
-
-    // 2. PUT Status='Approved' via the proxy's quote_sessions update route
-    const putUrl = `${PROXY}/api/quote_sessions/${session.PK_ID}`;
-    const putRes = await fetch(putUrl, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ Status: 'Approved' })
-    });
-    if (!putRes.ok) {
-      const txt = await putRes.text();
-      console.error(`[Order Form Approve] Update failed for ${draftId}:`, txt);
-      return res.status(502).json({ success: false, error: 'Update failed', detail: txt });
-    }
-
-    console.log(`[Order Form Approve] ✓ ${draftId} approved → notifying ${repEmail}`);
-    res.json({
-      success: true,
-      draftId,
-      status: 'Approved',
-      approvedAt: new Date().toISOString(),
-      // Fields the frontend feeds into EmailJS template_order_approved.
-      // Frontend fires the email — server-side we just return the data.
-      rep_email: repEmail,
-      rep_name: repName,
-      customer_name: [info.buyerFirst, info.buyerLast].filter(Boolean).join(' ') || session.CustomerName || '',
-      customer_company: info.company || session.CompanyName || '',
-      customer_email: info.email || session.CustomerEmail || '',
-      customer_phone: info.phone || session.Phone || '',
-    });
-  } catch (err) {
-    console.error('[Order Form Approve] Error:', err);
-    res.status(500).json({ success: false, error: err.message });
-  }
-});
-
-// Sales-rep slug → full name. The form's <select> in paper-form.jsx:1562
-// stores a lowercase login slug ("taneisha") as the value because that's
-// the legacy convention. ShopWorks's CustomerServiceRep field displays
+// Sales-rep slug → full name. Clients of /api/submit-order-form (today the
+// DTG builder; originally the retired Order Form) send a lowercase login
+// slug ("taneisha") as the value because that's the legacy convention. ShopWorks's CustomerServiceRep field displays
 // whatever string we send verbatim, so without translation the rep shows
 // up as "taneisha" instead of "Taneisha Clark". Mapping is kept here
 // (server-side) instead of changing the dropdown value because saved
@@ -7073,18 +6945,6 @@ const SALES_REP_FULL_NAMES = {
   erik: 'Erik Mickelson',
   ruth: 'Ruthie Nhoung',
   jim: 'Jim Mickelson',
-};
-
-// Sales-rep slug → email. Used by the /approve route (D.3.1) to
-// identify the recipient when EmailJS notifies the rep that the
-// customer has approved the order. erik@ catches anything that's not
-// in the table so notifications never silently drop.
-const SALES_REP_EMAILS = {
-  nika: 'nika@nwcustomapparel.com',
-  taneisha: 'taneisha@nwcustomapparel.com',
-  erik: 'erik@nwcustomapparel.com',
-  ruth: 'ruth@nwcustomapparel.com',
-  jim: 'jim@nwcustomapparel.com',
 };
 
 // Sales-rep slug → ShopWorks Employee ID for id_EmpCreatedBy on the
@@ -8078,18 +7938,6 @@ app.post('/api/submit-order-form', async (req, res) => {
     console.error('[Order Form Submit] Error:', err);
     res.status(500).json({ success: false, error: err.message });
   }
-});
-
-// GET /order-form/:draftId — Short share link. Redirects to the page with ?draftId=...
-// so the order-form HTML's relative asset paths (order-form/styles.css, etc.) resolve correctly.
-// ID format: OF-NNNN (globally sequential, allocated via /api/quote-sequence/OF) or
-// OF-<timestamp> when the counter falls back. Both match ^OF-\d+$.
-app.get('/order-form/:draftId', (req, res) => {
-  const draftId = req.params.draftId;
-  if (!draftId || !/^OF-\d+$/.test(draftId)) {
-    return res.status(400).send('Invalid order-form draft ID format');
-  }
-  res.redirect(302, `/pages/order-form.html?draftId=${encodeURIComponent(draftId)}`);
 });
 
 // Monitoring API endpoints (if enabled)

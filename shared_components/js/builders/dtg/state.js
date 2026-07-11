@@ -18,9 +18,10 @@ export const SUBMIT_URL = '/api/submit-order-form'; // relative — same-origin 
 export const STANDARD_SIZES = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', '6XL'];
 
 
-// Sales reps — mirrors pages/order-form/components/paper-form.jsx:2128-2132.
-// Tech debt: if a 6th rep joins, edit this list AND the order form's list.
-// No /api/sales-reps endpoint today.
+// Sales reps — mirrors server.js SALES_REP_FULL_NAMES / SALES_REP_EMP_IDS
+// (defined above the /api/submit-order-form route; the Order Form UI this
+// originally mirrored was retired 2026-07-11). Tech debt: if a 6th rep
+// joins, edit this list AND server.js. No /api/sales-reps endpoint today.
 export const SALES_REPS = [
     { code: 'nika',     name: 'Nika Lao',       email: 'nika@nwcustomapparel.com' },
     { code: 'erik',     name: 'Erik Mickelson', email: 'erik@nwcustomapparel.com' },

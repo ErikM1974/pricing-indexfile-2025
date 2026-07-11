@@ -124,9 +124,9 @@ CHANGED_ASSETS=$( (git diff --name-only origin/develop HEAD -- '*.js' '*.jsx' '*
                    git status --porcelain | awk '/\.(jsx?|css)$/ {print $2}') | sort -u )
 ```
 
-**`.jsx` MUST be included** (`*.jsx` pathspec + `jsx?` in the regex). The order form
-(`pages/order-form/`) is built from in-browser-Babel `.jsx` files referenced with `?v=`
-in `order-form.html`. A `(js|css)` filter silently skips them, so the deploy ships new
+**`.jsx` MUST be included** (`*.jsx` pathspec + `jsx?` in the regex). In-browser-Babel
+`.jsx` pages (today `dashboards/production-shifts/app.jsx`; originally the order form,
+retired 2026-07-11) are referenced with `?v=` in their HTML. A `(js|css)` filter silently skips them, so the deploy ships new
 `.jsx` that reps' browsers never load (stale cache) — a silent "deployed but nothing
 changed" failure (caught 2026-06-09).
 

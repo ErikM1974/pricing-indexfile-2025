@@ -1250,12 +1250,10 @@ function editQuote(quoteId) {
         viewQuote(quoteId);
         return;
     } else if (prefix === 'OF') {
-        // Order Form drafts (OF-NNNN) are NOT quote-builder quotes — they
-        // reopen in the React Order Form via ?draftId= (different app AND
-        // different param than the builders' ?edit=). Routing them to the
-        // EMB builder (the old default) opened an order-form-shaped quote
-        // in the wrong app → broken load. (2026-06-09)
-        window.open(`/pages/order-form.html?draftId=${encodeURIComponent(quoteId)}`, '_blank');
+        // Retired Order Form drafts (OF-NNNN) — the React Order Form app was
+        // removed 2026-07-11, so there is no app to reopen these in. Open the
+        // read-only view instead (same treatment as CAP rows).
+        viewQuote(quoteId);
         return;
     }
     // EMB / EMBC / CEMB and anything else → embroidery builder (default)

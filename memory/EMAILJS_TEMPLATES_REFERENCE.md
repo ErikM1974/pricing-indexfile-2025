@@ -69,7 +69,7 @@ Pulled every template's HTML/subject/settings (from the dashboard React `dataSou
 ### Order Form / Portal / Screenprint request
 | Template ID | Display | Trigger | Service | Params |
 |---|---|---|---|---|
-| `template_order_approved` | Order Approved Form | `pages/order-form/components/customer-approval-view.jsx:402` | jgrave3 | to_email, rep_name, draft_id, order_number, approved_at, customer_*, total_amount, total_qty, summary_html, company_name, company_phone, share_url, reply_to |
+| `template_order_approved` | Order Approved Form | **NO LIVE TRIGGER** — Order Form retired 2026-07-11 (was customer-approval-view.jsx); template dormant in EmailJS, safe to delete there | jgrave3 | to_email, rep_name, draft_id, order_number, approved_at, customer_*, total_amount, total_qty, summary_html, company_name, company_phone, share_url, reply_to |
 | `template_utvx9iw` | Magic Link | **server** `server.js:3072` & `:4186` (portal login) | 1c4k67j | to_email, company_name, magic_link, expiry_minutes |
 
 ### Proxy digests & alerts (server-side crons)

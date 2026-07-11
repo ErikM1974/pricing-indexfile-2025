@@ -38,7 +38,7 @@ You cannot write to SanMar prod until onboarding + a passing multi-line test PO.
   - `tests/jest/sanmar-submit-po.test.js`: 8 tests, GREEN — parser locked vs the guide's success/error responses; consolidation + builder + XML-escaping verified.
 - **REMAINING:**
   - Live-fire against **Test** after onboarding (uses the same `SANMAR_TEST_*` creds as Option A). Submit the multi-line `templates/po-sample.json`, confirm "PO Submission successful" + the Holding file.
-  - Frontend: a builder/preview modal in the Production group (`staff-dashboard-v3/index.html:515-537`) [blocked for now — `quote-management.html` is owned by a parallel session]. Reuse `pages/order-form/inventory/inventory-check.js`, color/size pickers, `order-form-size-suffix.js`.
+  - Frontend: a builder/preview modal in the Production group (`staff-dashboard-v3/index.html:515-537`) [blocked for now — `quote-management.html` is owned by a parallel session]. Reuse `shared_components/js/sanmar-inventory-check.js` (moved 2026-07-11), color/size pickers, `order-form-size-suffix.js`.
   - Confirm `SanMar_Orders` column names for the tracking write (`SanMar_PO`, `ShopWorks_PO`, `Matched_By`, `Last_Sync_Date` — mirrors the existing `/link` route).
   - Chosen ship mode (consolidation vs will-call); extended-size validation on real styles.
 - **Effort:** backend done; UI + live-fire remain. **Risk:** Medium — first supplier write. **Mitigated by the 6 guardrails + a required human-confirmed preview. Keep a human in the loop.**

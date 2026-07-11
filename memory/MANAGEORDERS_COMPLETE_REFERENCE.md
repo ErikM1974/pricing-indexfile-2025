@@ -1730,6 +1730,8 @@ const customers = await response.json();
 
 **Added:** 2026-04-21 · **Updated:** 2026-04-22 (switched to `OF-NNNN` global-sequential format)
 
+> **⚠️ RETIRED 2026-07-11** — the Order Form UI (`/pages/order-form.html` + `pages/order-form/`), the drafts/approve routes, and the `/order-form/:draftId` share link were **deleted** (git history has everything). **`POST /api/submit-order-form` REMAINS LIVE — the DTG quote builder pushes through it**, so the payload/OrderType/DesignType tables below still describe a live route. OF-NNNN rows in `quote_sessions` are read-only history in Quote Management.
+
 New browser form at `/pages/order-form.html`. Staff-facing by default; supports a **shareable customer link** (`/order-form/OF-NNNN`) where staff pre-fill what they know and the customer fills the rest.
 
 **Routing:**
@@ -2001,8 +2003,7 @@ Universal services (RUSH, Freight, Discount, Pallet, Art, GRT-50, GRT-75, DT) ap
 | Project | File | Purpose |
 |---------|------|---------|
 | Pricing Index | `/server.js:1046-1337` | 3-Day Tees order creation |
-| Pricing Index | `/server.js:~1654-1840` | Online Order Form submit + draft + share route |
-| Pricing Index | `/pages/order-form/shopworks.js` | Order Form browser client (routes to `/api/submit-order-form`) |
+| Pricing Index | `/server.js` `/api/submit-order-form` | Ex-Order Form push route — RETAINED for the DTG builder push (Order Form UI + drafts/share routes deleted 2026-07-11) |
 | Pricing Index | `/shared_components/js/manageorders-*.js` | PULL API services |
 | caspio-proxy | `/src/routes/manageorders.js` | PULL API routes |
 | caspio-proxy | `/lib/manageorders-push-client.js` | PUSH API client |

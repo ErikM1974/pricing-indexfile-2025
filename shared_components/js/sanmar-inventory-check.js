@@ -1,4 +1,10 @@
-// Order Form — SanMar nationwide inventory check.
+// SanMar nationwide inventory check (window.OrderFormInventory).
+//
+// Shared by all 4 quote builders' per-size stock badges (EMB/SCP/DTF via
+// inventory-badges.js, DTG via catalog-search.js/form-core.js). Originally
+// built for the Order Form (app retired 2026-07-11, file moved here from
+// pages/order-form/inventory/) — the legacy global name is kept because
+// every consumer references window.OrderFormInventory.
 //
 // Replaces the older multi-SKU fan-out against /api/manageorders/inventorylevels
 // (NWCA local warehouse, color filter silently ignored, hardcoded Size01-06

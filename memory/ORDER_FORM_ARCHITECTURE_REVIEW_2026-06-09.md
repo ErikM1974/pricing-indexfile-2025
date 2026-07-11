@@ -1,5 +1,7 @@
 # Order Form — Architecture Review (2026-06-09)
 
+> **RETIRED 2026-07-11** — the `pages/order-form/` app this review analyzed was DELETED (dashboard buttons + code + drafts/approve/share routes; git history has it all). `/api/submit-order-form` survives for the DTG builder push. Historical reference only.
+
 > Multi-agent review (8 deep-readers + 6 expert lenses + synthesis, ~1.8M tokens) of the
 > `pages/order-form/` React app. Workflow run `wf_0aaf97bb-508`. This is the durable plan;
 > execute from the phased plan below. Verdict grade: **C** across every lens.

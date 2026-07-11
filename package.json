@@ -35,10 +35,7 @@
     "capture:pricing": "node scripts/capture-pricing-baselines.js",
     "capture:pricing:headed": "node scripts/capture-pricing-baselines.js --headed",
     "capture:pricing:ci": "node scripts/capture-pricing-baselines.js --start-server",
-    "test:pricing-baselines": "jest tests/integration/pricing-baselines.test.js --verbose",
-    "capture:order-form-parity": "node scripts/capture-order-form-baselines.js",
-    "capture:order-form-parity:ci": "node scripts/capture-order-form-baselines.js --start-server",
-    "test:order-form-parity": "jest tests/integration/order-form-parity.test.js --verbose"
+    "test:pricing-baselines": "jest tests/integration/pricing-baselines.test.js --verbose"
   },
   "engines": {
     "node": "18.x"
