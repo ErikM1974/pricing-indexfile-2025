@@ -1,3 +1,7 @@
+## v2026.07.11.5 (2026.07.11)
+
+- feat(forms): ops batch — 8 fillable PDFs + QC/Spoilage/Maintenance twins + AEO ShopWorks push UI
+
 ## v2026.07.11.4 (2026.07.11)
 
 - feat(forms): AE Order Intake fill-online twin — customer + SanMar assists, auto-math, AEO saves
