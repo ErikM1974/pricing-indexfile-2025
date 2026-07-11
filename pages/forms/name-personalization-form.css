@@ -1,0 +1,78 @@
+/* ==========================================================================
+   name-personalization-form.css — pages/forms/name-personalization-form.html
+   Page-specific layout on top of nwca-form-shared.css. LANDSCAPE print.
+   ========================================================================== */
+
+@media print {
+    @page { size: letter landscape; margin: 0.35in; }
+}
+
+/* Spec row: label/field pairs flow inline like the PDF */
+.spec-label {
+    font-weight: 700;
+    font-size: 0.875rem;
+    white-space: nowrap;
+}
+
+.spec-field {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    min-width: 150px;
+    flex: 1;
+}
+
+.spec-field label {
+    font-weight: 600;
+    font-size: 0.875rem;
+    white-space: nowrap;
+}
+
+.spec-field input {
+    flex: 1;
+    border: none;
+    border-bottom: 1px solid var(--ink);
+    font: inherit;
+    font-size: 0.9rem;
+    padding: 2px 4px;
+    background: transparent;
+    min-width: 60px;
+}
+
+.spec-field input:focus { outline: none; background: #f0f7f2; }
+
+.spec-field--wide { min-width: 220px; }
+
+/* Name list column widths */
+.col-num { width: 3.5%; }
+.col-name { width: 24%; }
+.col-garment { width: 18%; }
+.col-color { width: 11%; }
+.col-size { width: 6.5%; }
+.col-qty { width: 5.5%; }
+.col-notes { width: 31.5%; }
+
+/* Tighter rows so 20 fit on one landscape sheet */
+.name-table td input { padding: 5px 5px; font-size: 0.82rem; }
+.name-table td.cell-num { padding: 5px 2px; }
+
+/* Verification row: Total Names + 4 signature fields */
+.signature-row--five {
+    grid-template-columns: 0.6fr 1.2fr 1.2fr 0.8fr 1fr;
+    margin-top: 16px;
+}
+
+.total-names { font-weight: 700; }
+
+@media (max-width: 700px) {
+    .signature-row--five { grid-template-columns: 1fr 1fr; }
+}
+
+@media print {
+    /* keep the whole sheet compact enough for one landscape page */
+    .form-logo { height: 44px; }
+    .form-title { font-size: 1.3rem; }
+    .form-section { margin-top: 8px; }
+    .name-table td input { padding: 3px 4px; font-size: 0.78rem; }
+    .waiver-box { margin-top: 10px; }
+}

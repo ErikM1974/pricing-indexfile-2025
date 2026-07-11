@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Sample Checkout & Return Agreement - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/pages/forms/nwca-form-shared.css">
+    <link rel="stylesheet" href="/pages/forms/sample-checkout-form.css">
+</head>
+<body>
+    <!-- Screen-only toolbar: never prints -->
+    <div class="form-toolbar no-print">
+        <a href="/dashboards/forms-library.html" class="toolbar-link">
+            <i class="fas fa-arrow-left"></i> Forms Library
+        </a>
+        <div class="toolbar-actions">
+            <button type="button" id="clearFormBtn" class="toolbar-btn toolbar-btn--ghost">
+                <i class="fas fa-eraser"></i> Clear
+            </button>
+            <a href="/forms/sample-checkout-return-agreement.pdf" target="_blank" rel="noopener" class="toolbar-btn toolbar-btn--ghost">
+                <i class="fas fa-file-pdf"></i> Blank PDF
+            </a>
+            <button type="button" id="printFormBtn" class="toolbar-btn toolbar-btn--primary">
+                <i class="fas fa-print"></i> Print / Save as PDF
+            </button>
+        </div>
+    </div>
+
+    <div class="form-sheet form-sheet--landscape">
+        <header class="form-header">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                 alt="Northwest Custom Apparel" class="form-logo">
+            <h1 class="form-title">Sample Checkout &amp; Return Agreement</h1>
+            <p class="form-subtitle">Customer samples are due back within 14 calendar days</p>
+            <p class="form-contact">2025 Freeman Rd. E., Milton, WA 98354 &nbsp;&bull;&nbsp; 253-922-5793 &nbsp;&bull;&nbsp; www.nwcustomapparel.com</p>
+        </header>
+
+        <section class="form-section">
+            <div class="section-bar">1. Customer / Checkout Information</div>
+            <div class="info-grid info-grid--cols4">
+                <div class="info-field">
+                    <label for="fldCompany">Company</label>
+                    <input type="text" id="fldCompany" autocomplete="organization">
+                </div>
+                <div class="info-field">
+                    <label for="fldContact">Contact Name</label>
+                    <input type="text" id="fldContact" autocomplete="name">
+                </div>
+                <div class="info-field">
+                    <label for="fldPhone">Phone</label>
+                    <input type="tel" id="fldPhone" autocomplete="tel">
+                </div>
+                <div class="info-field">
+                    <label for="fldEmail">Email</label>
+                    <input type="email" id="fldEmail" autocomplete="email">
+                </div>
+                <div class="info-field">
+                    <label for="fldAe">AE</label>
+                    <input type="text" id="fldAe">
+                </div>
+                <div class="info-field">
+                    <label for="fldCustomerNum">Customer #</label>
+                    <input type="text" id="fldCustomerNum">
+                </div>
+                <div class="info-field">
+                    <label for="fldCheckoutDate">Checkout Date</label>
+                    <input type="text" id="fldCheckoutDate">
+                </div>
+                <div class="info-field">
+                    <label for="fldReturnDue">Return Due Date</label>
+                    <input type="text" id="fldReturnDue">
+                </div>
+                <div class="info-field">
+                    <label for="fldGraceDeadline">Grace Deadline</label>
+                    <input type="text" id="fldGraceDeadline">
+                </div>
+                <div class="info-field info-field--checks">
+                    <label>Source</label>
+                    <label class="deco-check"><input type="checkbox" id="srcShowroom"> Showroom</label>
+                    <label class="deco-check"><input type="checkbox" id="srcVendor"> Vendor Ordered</label>
+                </div>
+                <div class="info-field">
+                    <label for="fldVendorOrder">Vendor / Order #</label>
+                    <input type="text" id="fldVendorOrder">
+                </div>
+                <div class="info-field">
+                    <label for="fldVendorReturnBy">Vendor Return By</label>
+                    <input type="text" id="fldVendorReturnBy">
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">2. Sample Items &mdash; Charge Value is 75% of Stated Retail Value</div>
+            <table class="form-table sample-table" id="sampleTable">
+                <thead>
+                    <tr>
+                        <th class="col-num">#</th>
+                        <th class="col-source">Source</th>
+                        <th class="col-brand">Brand</th>
+                        <th class="col-style">Style #</th>
+                        <th class="col-desc">Description</th>
+                        <th class="col-color">Color</th>
+                        <th class="col-size">Size</th>
+                        <th class="col-qty">Qty</th>
+                        <th class="col-retail">Retail Value</th>
+                        <th class="col-charge">Charge Value (75%)</th>
+                        <th class="col-returned">Date Returned</th>
+                        <th class="col-condition">Condition / Initials</th>
+                    </tr>
+                </thead>
+                <tbody id="sampleRows">
+                    <!-- rows injected by sample-checkout-form.js -->
+                </tbody>
+            </table>
+            <button type="button" id="addRowBtn" class="toolbar-btn toolbar-btn--ghost add-row-btn no-print">
+                <i class="fas fa-plus"></i> Add Row
+            </button>
+        </section>
+
+        <div class="checkout-two-col">
+            <section class="form-section">
+                <div class="section-bar">3. Return Condition Requirements</div>
+                <div class="decoration-row condition-box">
+                    <span class="condition-intro">Samples must be returned in vendor-returnable condition:</span>
+                    <label class="deco-check"><input type="checkbox" id="condUnworn"> Unworn</label>
+                    <label class="deco-check"><input type="checkbox" id="condUnwashed"> Unwashed</label>
+                    <label class="deco-check"><input type="checkbox" id="condUnaltered"> Unaltered</label>
+                    <label class="deco-check"><input type="checkbox" id="condUndamaged"> Undamaged</label>
+                    <label class="deco-check"><input type="checkbox" id="condTags"> Original tags attached</label>
+                    <label class="deco-check"><input type="checkbox" id="condPackaging"> Original packaging included</label>
+                </div>
+            </section>
+
+            <section class="form-section">
+                <div class="section-bar">4. Secure Card on File</div>
+                <div class="decoration-row condition-box card-box">
+                    <span class="condition-intro">Card status:</span>
+                    <label class="deco-check"><input type="checkbox" id="cardOnFile"> Already on file</label>
+                    <label class="deco-check"><input type="checkbox" id="cardAddedToday"> Added today securely</label>
+                    <span class="condition-intro">Card Type</span>
+                    <label class="deco-check"><input type="checkbox" id="cardVisa"> Visa</label>
+                    <label class="deco-check"><input type="checkbox" id="cardMc"> MC</label>
+                    <label class="deco-check"><input type="checkbox" id="cardAmex"> Amex</label>
+                    <label class="deco-check"><input type="checkbox" id="cardDiscover"> Discover</label>
+                    <span class="spec-field spec-field--last4"><label for="fldLast4">Last 4</label><input type="text" id="fldLast4" maxlength="4" inputmode="numeric"></span>
+                    <span class="spec-field"><label for="fldExp">Exp.</label><input type="text" id="fldExp" maxlength="7"></span>
+                    <span class="spec-field spec-field--wide"><label for="fldCardholder">Cardholder</label><input type="text" id="fldCardholder"></span>
+                </div>
+            </section>
+        </div>
+
+        <section class="waiver-box">
+            <h2 class="waiver-title">5. Customer Authorization &amp; Approval</h2>
+            <p class="waiver-text">
+                I understand that all samples remain the property of Northwest Custom Apparel until purchased.
+                I agree to return all samples within 14 calendar days of checkout, unworn, unwashed, unaltered,
+                undamaged, and with original tags and packaging. A 2&ndash;3 calendar day grace period may be provided.
+                I authorize Northwest Custom Apparel to charge the card securely held on file for 75% of the stated
+                retail value (retail value less 25%) of any sample not returned by the grace deadline, or returned
+                damaged, worn, washed, altered, or otherwise unsuitable for vendor return.
+            </p>
+            <div class="signature-row">
+                <div class="signature-field">
+                    <div class="signature-line"></div>
+                    <label>Customer Signature</label>
+                </div>
+                <div class="signature-field">
+                    <input type="text" id="fldPrintedName" aria-label="Printed name">
+                    <label>Printed Name</label>
+                </div>
+                <div class="signature-field">
+                    <input type="text" id="fldSignDate" aria-label="Date">
+                    <label>Date</label>
+                </div>
+                <div class="signature-field">
+                    <input type="text" id="fldIssuedBy" aria-label="AE / issued by">
+                    <label>AE / Issued By</label>
+                </div>
+            </div>
+        </section>
+
+        <footer class="form-footer form-footer--fine">
+            Do not write the full card number or CVV on this form. Store payment information only in the approved secure payment system.
+        </footer>
+    </div>
+
+    <script src="/pages/forms/nwca-form-shared.js"></script>
+    <script src="/pages/forms/sample-checkout-form.js"></script>
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Customer Name Personalization Form - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/pages/forms/nwca-form-shared.css">
+    <link rel="stylesheet" href="/pages/forms/name-personalization-form.css">
+</head>
+<body>
+    <!-- Screen-only toolbar: never prints -->
+    <div class="form-toolbar no-print">
+        <a href="/dashboards/forms-library.html" class="toolbar-link">
+            <i class="fas fa-arrow-left"></i> Forms Library
+        </a>
+        <div class="toolbar-actions">
+            <button type="button" id="clearFormBtn" class="toolbar-btn toolbar-btn--ghost">
+                <i class="fas fa-eraser"></i> Clear
+            </button>
+            <a href="/forms/customer-name-personalization-form.pdf" target="_blank" rel="noopener" class="toolbar-btn toolbar-btn--ghost">
+                <i class="fas fa-file-pdf"></i> Blank PDF
+            </a>
+            <button type="button" id="printFormBtn" class="toolbar-btn toolbar-btn--primary">
+                <i class="fas fa-print"></i> Print / Save as PDF
+            </button>
+        </div>
+    </div>
+
+    <div class="form-sheet form-sheet--landscape">
+        <header class="form-header">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                 alt="Northwest Custom Apparel" class="form-logo">
+            <h1 class="form-title">Customer Name Personalization Form</h1>
+            <p class="form-subtitle">Names will be produced exactly as approved below</p>
+            <p class="form-contact">2025 Freeman Rd. E., Milton, WA 98354 &nbsp;&bull;&nbsp; 253-922-5793 &nbsp;&bull;&nbsp; www.nwcustomapparel.com</p>
+        </header>
+
+        <section class="form-section">
+            <div class="section-bar">1. Customer / Order Information</div>
+            <div class="info-grid info-grid--cols4">
+                <div class="info-field">
+                    <label for="fldCompany">Company</label>
+                    <input type="text" id="fldCompany" autocomplete="organization">
+                </div>
+                <div class="info-field">
+                    <label for="fldContact">Contact Name</label>
+                    <input type="text" id="fldContact" autocomplete="name">
+                </div>
+                <div class="info-field">
+                    <label for="fldPhone">Phone</label>
+                    <input type="tel" id="fldPhone" autocomplete="tel">
+                </div>
+                <div class="info-field">
+                    <label for="fldEmail">Email</label>
+                    <input type="email" id="fldEmail" autocomplete="email">
+                </div>
+                <div class="info-field">
+                    <label for="fldSalesRep">Sales Rep</label>
+                    <input type="text" id="fldSalesRep">
+                </div>
+                <div class="info-field">
+                    <label for="fldOrderPo">Order / PO #</label>
+                    <input type="text" id="fldOrderPo">
+                </div>
+                <div class="info-field">
+                    <label for="fldDueDate">Due Date</label>
+                    <input type="text" id="fldDueDate">
+                </div>
+                <div class="info-field">
+                    <label for="fldCustomerNum">Customer #</label>
+                    <input type="text" id="fldCustomerNum">
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">2. Personalization Specifications</div>
+            <div class="decoration-row spec-row">
+                <span class="spec-label">Decoration Method</span>
+                <label class="deco-check"><input type="checkbox" id="methodEmbroidery"> Embroidery</label>
+                <label class="deco-check"><input type="checkbox" id="methodTransfer"> Transfer</label>
+                <label class="deco-check"><input type="checkbox" id="methodDtg"> DTG</label>
+                <label class="deco-check deco-check--other">
+                    <input type="checkbox" id="methodOther"> Other
+                    <input type="text" id="methodOtherText" class="deco-other-text" aria-label="Other decoration method">
+                </label>
+                <span class="spec-field"><label for="fldNameLocation">Name Location</label><input type="text" id="fldNameLocation"></span>
+                <span class="spec-field"><label for="fldFont">Font</label><input type="text" id="fldFont"></span>
+                <span class="spec-field"><label for="fldLetterHeight">Letter Height</label><input type="text" id="fldLetterHeight"></span>
+                <span class="spec-field spec-field--wide"><label for="fldThreadColor">Thread / Print Color</label><input type="text" id="fldThreadColor"></span>
+                <span class="spec-label">Capitalization</span>
+                <label class="deco-check"><input type="checkbox" id="capAll"> ALL CAPS</label>
+                <label class="deco-check"><input type="checkbox" id="capUpperLower"> Upper/lower</label>
+                <label class="deco-check"><input type="checkbox" id="capAsWritten"> As written</label>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">3. Name List &mdash; Please Print or Type Names Exactly as They Should Appear</div>
+            <table class="form-table name-table" id="nameTable">
+                <thead>
+                    <tr>
+                        <th class="col-num">#</th>
+                        <th class="col-name">Name Exactly as Printed</th>
+                        <th class="col-garment">Garment / Style</th>
+                        <th class="col-color">Color</th>
+                        <th class="col-size">Size</th>
+                        <th class="col-qty">Qty</th>
+                        <th class="col-notes">Special Notes / Garment Assignment</th>
+                    </tr>
+                </thead>
+                <tbody id="nameRows">
+                    <!-- rows injected by name-personalization-form.js -->
+                </tbody>
+            </table>
+            <button type="button" id="addRowBtn" class="toolbar-btn toolbar-btn--ghost add-row-btn no-print">
+                <i class="fas fa-plus"></i> Add Row
+            </button>
+        </section>
+
+        <section class="waiver-box">
+            <h2 class="waiver-title">4. Customer Verification &amp; Approval</h2>
+            <p class="waiver-text">
+                Names will be produced exactly as written. The customer is responsible for verifying spelling,
+                capitalization, garment assignments, sizes, colors, and quantities before signing.
+            </p>
+            <div class="signature-row signature-row--five">
+                <div class="signature-field">
+                    <input type="text" id="fldTotalNames" class="total-names" aria-label="Total names">
+                    <label>Total Names</label>
+                </div>
+                <div class="signature-field">
+                    <div class="signature-line"></div>
+                    <label>Customer Signature</label>
+                </div>
+                <div class="signature-field">
+                    <input type="text" id="fldPrintedName" aria-label="Printed name">
+                    <label>Printed Name</label>
+                </div>
+                <div class="signature-field">
+                    <input type="text" id="fldSignDate" aria-label="Date">
+                    <label>Date</label>
+                </div>
+                <div class="signature-field">
+                    <input type="text" id="fldReceivedBy" aria-label="NWCA received by">
+                    <label>NWCA Received By</label>
+                </div>
+            </div>
+        </section>
+
+        <footer class="form-footer form-footer--fine">
+            Please attach the approved artwork or order reference. Do not abbreviate names unless the customer requests it.
+        </footer>
+    </div>
+
+    <script src="/pages/forms/nwca-form-shared.js"></script>
+    <script src="/pages/forms/name-personalization-form.js"></script>
+</body>
+</html>
