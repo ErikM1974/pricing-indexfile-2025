@@ -1,3 +1,7 @@
+## v2026.07.11.7 (2026.07.11)
+
+- fix(forms): AE form hotfix — swatch grid [hidden] override, QQ deep-link path + quick mode
+
 ## v2026.07.11.6 (2026.07.11)
 
 - feat(forms): refinement batch — dynamic sizes+upcharges, contacts v2, swatches, dates, design lookup, QQ deep-link, autofill+autosave
