@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Customer Garment Drop-Off Form - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/pages/forms/garment-drop-off-form.css">
+</head>
+<body>
+    <!-- Screen-only toolbar: never prints -->
+    <div class="form-toolbar no-print">
+        <a href="/dashboards/forms-library.html" class="toolbar-link">
+            <i class="fas fa-arrow-left"></i> Forms Library
+        </a>
+        <div class="toolbar-actions">
+            <button type="button" id="clearFormBtn" class="toolbar-btn toolbar-btn--ghost">
+                <i class="fas fa-eraser"></i> Clear
+            </button>
+            <a href="/forms/customer-garment-drop-off-form.pdf" target="_blank" rel="noopener" class="toolbar-btn toolbar-btn--ghost">
+                <i class="fas fa-file-pdf"></i> Blank PDF
+            </a>
+            <button type="button" id="printFormBtn" class="toolbar-btn toolbar-btn--primary">
+                <i class="fas fa-print"></i> Print / Save as PDF
+            </button>
+        </div>
+    </div>
+
+    <div class="form-sheet">
+        <header class="form-header">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                 alt="Northwest Custom Apparel" class="form-logo">
+            <h1 class="form-title">Customer Garment Drop-Off Form</h1>
+            <p class="form-subtitle">For customer-supplied blank garments to be decorated by Northwest Custom Apparel</p>
+            <p class="form-contact">2025 Freeman Rd. E., Milton, WA 98354 &nbsp;&bull;&nbsp; 253-922-5793 &nbsp;&bull;&nbsp; www.nwcustomapparel.com</p>
+        </header>
+
+        <section class="form-section">
+            <div class="section-bar">Customer Information</div>
+            <div class="info-grid">
+                <div class="info-field">
+                    <label for="fldCompany">Company</label>
+                    <input type="text" id="fldCompany" autocomplete="organization">
+                </div>
+                <div class="info-field">
+                    <label for="fldDateNeeded">Date Needed</label>
+                    <input type="text" id="fldDateNeeded">
+                </div>
+                <div class="info-field">
+                    <label for="fldContact">Contact Name</label>
+                    <input type="text" id="fldContact" autocomplete="name">
+                </div>
+                <div class="info-field">
+                    <label for="fldPo">PO #</label>
+                    <input type="text" id="fldPo">
+                </div>
+                <div class="info-field">
+                    <label for="fldPhone">Phone</label>
+                    <input type="tel" id="fldPhone" autocomplete="tel">
+                </div>
+                <div class="info-field">
+                    <label for="fldCustomerNum">Customer #</label>
+                    <input type="text" id="fldCustomerNum">
+                </div>
+                <div class="info-field">
+                    <label for="fldEmail">Email</label>
+                    <input type="email" id="fldEmail" autocomplete="email">
+                </div>
+                <div class="info-field">
+                    <label for="fldReceivedBy">Received By</label>
+                    <input type="text" id="fldReceivedBy">
+                </div>
+                <div class="info-field">
+                    <label for="fldDateIn">Date In</label>
+                    <input type="text" id="fldDateIn">
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">Decoration Requested</div>
+            <div class="decoration-row">
+                <label class="deco-check"><input type="checkbox" id="decoEmbroidery"> Embroidery</label>
+                <label class="deco-check"><input type="checkbox" id="decoDtg"> DTG Printing</label>
+                <label class="deco-check"><input type="checkbox" id="decoScreen"> Screen Printing</label>
+                <label class="deco-check"><input type="checkbox" id="decoTransfers"> Transfers</label>
+                <label class="deco-check deco-check--other">
+                    <input type="checkbox" id="decoOther"> Other
+                    <input type="text" id="decoOtherText" class="deco-other-text" aria-label="Other decoration description">
+                </label>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">Garment Details</div>
+            <table class="garment-table" id="garmentTable">
+                <thead>
+                    <tr>
+                        <th class="col-style">Brand / Style #</th>
+                        <th class="col-color">Color</th>
+                        <th class="col-desc">Product Description</th>
+                        <th class="col-size">S</th>
+                        <th class="col-size">M</th>
+                        <th class="col-size">L</th>
+                        <th class="col-size">XL</th>
+                        <th class="col-size">2XL</th>
+                        <th class="col-size">3XL</th>
+                        <th class="col-other">Other</th>
+                        <th class="col-total">Total Garments</th>
+                    </tr>
+                </thead>
+                <tbody id="garmentRows">
+                    <!-- rows injected by garment-drop-off-form.js -->
+                </tbody>
+            </table>
+            <button type="button" id="addRowBtn" class="toolbar-btn toolbar-btn--ghost add-row-btn no-print">
+                <i class="fas fa-plus"></i> Add Row
+            </button>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">Order Notes</div>
+            <textarea id="fldNotes" class="notes-area" rows="4" aria-label="Order notes"></textarea>
+        </section>
+
+        <section class="waiver-box">
+            <h2 class="waiver-title">Customer-Supplied Garment Waiver</h2>
+            <p class="waiver-text">
+                I understand that Northwest Custom Apparel is decorating garments supplied by the customer.
+                Because these items were not purchased through Northwest Custom Apparel, the company is not
+                responsible for uncontrollable manufacturing mishaps, including broken needles, machinery
+                malfunctions, dye migration, scorching, or other production-related issues. Northwest Custom
+                Apparel is not liable for replacement of customer-supplied items.
+            </p>
+        </section>
+
+        <section class="signature-row">
+            <div class="signature-field">
+                <div class="signature-line"></div>
+                <label>Customer Signature</label>
+            </div>
+            <div class="signature-field">
+                <input type="text" id="fldPrintedName" aria-label="Printed name">
+                <label>Printed Name</label>
+            </div>
+            <div class="signature-field">
+                <input type="text" id="fldSignDate" aria-label="Signature date">
+                <label>Date</label>
+            </div>
+            <div class="signature-field">
+                <input type="text" id="fldNwcaReceivedBy" aria-label="NWCA received by">
+                <label>NWCA Received By</label>
+            </div>
+        </section>
+
+        <footer class="form-footer">
+            &bull;&nbsp; Please count garments carefully before leaving them with Northwest Custom Apparel. &nbsp;&bull;
+        </footer>
+    </div>
+
+    <script src="/pages/forms/garment-drop-off-form.js"></script>
+</body>
+</html>
