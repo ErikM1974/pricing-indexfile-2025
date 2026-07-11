@@ -1,0 +1,304 @@
+/* ==========================================================================
+   form-submissions.css — page-specific styles for dashboards/form-submissions.html
+   ("Forms Inbox"). Shell classes come from dash-shell.css; tokens from
+   art-hub.css. Never redefine tokens; never hardcode palette hex.
+   ========================================================================== */
+
+.inbox-muted { color: var(--gray-500); font-size: 0.85em; font-weight: 400; display: inline-block; margin-left: 6px; }
+
+/* ---------- tabs ---------- */
+
+.inbox-tabs { display: flex; gap: 8px; margin: 16px 0; }
+
+.inbox-tab {
+    border: 1px solid var(--gray-200);
+    background: var(--gray-50);
+    color: var(--gray-600);
+    font: inherit;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+}
+
+.inbox-tab.is-active {
+    background: var(--gray-800);
+    border-color: var(--gray-800);
+    color: #fff;
+}
+
+/* ---------- filter bar ---------- */
+
+.inbox-filterbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.inbox-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.inbox-chip {
+    border: 1px solid var(--gray-200);
+    background: transparent;
+    color: var(--gray-600);
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 999px;
+    cursor: pointer;
+}
+
+.inbox-chip.is-active { background: var(--gray-800); border-color: var(--gray-800); color: #fff; }
+
+.inbox-select, .inbox-search {
+    font: inherit;
+    font-size: 0.875rem;
+    padding: 6px 10px;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    background: #fff;
+    color: var(--gray-800);
+}
+
+.inbox-search { flex: 1; min-width: 180px; }
+
+/* ---------- table ---------- */
+
+.inbox-tablewrap { overflow-x: auto; }
+
+.inbox-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+
+.inbox-table th {
+    text-align: left;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--gray-500);
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--gray-200);
+    white-space: nowrap;
+}
+
+.inbox-table td {
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--gray-100);
+    vertical-align: top;
+}
+
+.inbox-table tbody tr:hover { background: var(--gray-50); }
+
+.row--overdue td { background: #fef2f2; }
+
+.col-company strong { display: block; color: var(--gray-800); }
+.col-company .inbox-muted { margin-left: 0; }
+.col-date, .col-due { white-space: nowrap; }
+.col-summary { color: var(--gray-600); max-width: 320px; }
+
+.inbox-empty {
+    padding: 28px;
+    text-align: center;
+    color: var(--gray-500);
+}
+
+/* ---------- badges & statuses ---------- */
+
+.inbox-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: var(--gray-100);
+    color: var(--gray-600);
+    white-space: nowrap;
+}
+
+.badge--drp { background: #e0f2fe; color: #075985; }
+.badge--art { background: #fce7f3; color: #9d174d; }
+.badge--nam { background: #ede9fe; color: #5b21b6; }
+.badge--smp { background: #fef3c7; color: #92400e; }
+.badge--ok  { background: #ecfdf5; color: #047857; }
+.badge--check { background: #ecfdf5; color: #047857; }
+
+.inbox-status {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 999px;
+    background: var(--gray-100);
+    color: var(--gray-600);
+    white-space: nowrap;
+}
+
+.status--new      { background: #e0f2fe; color: #075985; }
+.status--progress { background: #fef3c7; color: #92400e; }
+.status--art      { background: #fce7f3; color: #9d174d; }
+.status--done     { background: #ecfdf5; color: #047857; }
+.status--out      { background: #fef3c7; color: #92400e; }
+.status--partial  { background: #ffedd5; color: #9a3412; }
+.status--overdue  { background: #fee2e2; color: #b91c1c; }
+.status--muted    { background: var(--gray-100); color: var(--gray-500); }
+
+.inbox-late {
+    color: #b91c1c;
+    font-weight: 800;
+    font-size: 0.75rem;
+    letter-spacing: 0.03em;
+}
+
+.inbox-stat--overdue.is-hot .dash-stat-value { color: #b91c1c; }
+
+/* small + danger button variants on top of .dash-btn */
+.dash-btn--sm { padding: 4px 10px; font-size: 0.78rem; }
+.dash-btn--danger { border-color: #fecaca; color: #b91c1c; }
+.dash-btn--danger:hover { background: #fef2f2; }
+
+/* ---------- samples tracker ---------- */
+
+.sample-group { margin-bottom: 20px; }
+
+.sample-group-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 10px 12px;
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+
+.sample-group-head.is-overdue {
+    background: #fef2f2;
+    border-color: #fecaca;
+}
+
+/* ---------- detail modal ---------- */
+
+.inbox-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(17, 24, 39, 0.55);
+    z-index: 60;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 4vh 16px;
+}
+
+/* explicit display beats the UA [hidden] rule — restore it */
+.inbox-modal-overlay[hidden] { display: none; }
+
+.inbox-modal {
+    background: #fff;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    width: min(980px, 100%);
+    max-height: 92vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.inbox-modal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.inbox-modal-head h2 { margin: 0; font-size: 1.05rem; }
+
+.inbox-modal-actions { display: flex; gap: 8px; }
+
+.inbox-modal-body { padding: 16px 18px 24px; overflow-y: auto; }
+
+.detail-actionbar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 10px 12px;
+    background: var(--gray-50);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    margin-bottom: 14px;
+    font-size: 0.875rem;
+}
+
+.detail-actionbar label { font-weight: 600; color: var(--gray-600); }
+
+.detail-actionbar select {
+    font: inherit;
+    padding: 5px 8px;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+    margin-left: 6px;
+}
+
+.detail-fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 8px 18px;
+    margin-bottom: 12px;
+}
+
+.detail-field span {
+    display: block;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--gray-500);
+}
+
+.detail-field strong { color: var(--gray-800); font-size: 0.9rem; }
+
+.detail-checks { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+
+.detail-subhead {
+    margin: 18px 0 8px;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--gray-600);
+}
+
+.detail-note {
+    margin: 0 0 10px;
+    padding: 10px 12px;
+    background: var(--gray-50);
+    border: 1px solid var(--gray-100);
+    border-radius: var(--radius-sm);
+    font-size: 0.9rem;
+    white-space: pre-wrap;
+}
+
+/* ---------- print: the open detail modal becomes the page ---------- */
+
+@media print {
+    .no-print, .dash-header, .dash-stat-grid, .inbox-tabs,
+    #viewSubmissions, #viewSamples, .dash-error-banner { display: none !important; }
+
+    body.inbox-modal-open .inbox-modal-overlay {
+        position: static;
+        padding: 0;
+        background: none;
+        display: block;
+    }
+
+    body.inbox-modal-open .inbox-modal {
+        box-shadow: none;
+        max-height: none;
+        width: 100%;
+    }
+
+    .inbox-modal-body { overflow: visible; }
+}

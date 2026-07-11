@@ -82,6 +82,41 @@ body {
 
 .toolbar-btn--primary:hover { background: #e9f3ec; }
 
+.toolbar-btn--save {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: #fff;
+}
+
+.toolbar-btn--save:hover { background: rgba(255, 255, 255, 0.3); }
+
+.toolbar-btn:disabled { opacity: 0.6; cursor: default; }
+
+/* ---------- Save-to-NWCA result banner ---------- */
+
+.form-save-banner {
+    max-width: 8.5in;
+    margin: 16px auto -8px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: 1.5px solid;
+}
+
+.form-save-banner--wide { max-width: 11in; }
+
+.form-save-banner--ok {
+    background: #e9f3ec;
+    border-color: var(--form-green);
+    color: var(--form-green-dark);
+}
+
+.form-save-banner--error {
+    background: #fdecea;
+    border-color: #b91c1c;
+    color: #7f1d1d;
+}
+
 /* ---------- The sheet ---------- */
 
 .form-sheet {
@@ -358,6 +393,50 @@ body {
     font-size: 0.78rem;
     font-weight: 600;
     color: var(--ink);
+}
+
+/* ---------- Customer-lookup dropdown (nwca-form-contacts.js) ---------- */
+
+.contacts-anchor { position: relative; }
+
+.contacts-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 20;
+    background: #fff;
+    border: 1.5px solid var(--form-green);
+    border-radius: 0 0 6px 6px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+    max-height: 280px;
+    overflow-y: auto;
+}
+
+.contacts-row {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    border-top: 1px solid #eef1ef;
+}
+
+.contacts-row--company { background: #f7faf8; }
+
+.contacts-row--contact { padding-left: 28px; }
+
+.contacts-row.is-active,
+.contacts-row:hover { background: #e9f3ec; }
+
+.contacts-row--empty {
+    color: var(--ink-soft);
+    font-style: italic;
+    cursor: default;
+}
+
+.contacts-muted { color: var(--ink-soft); font-weight: 400; font-size: 0.82em; }
+
+@media print {
+    .contacts-dropdown { display: none !important; }
 }
 
 /* ---------- Footer ---------- */

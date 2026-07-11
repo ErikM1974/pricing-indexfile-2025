@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Box Label - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/pages/forms/nwca-form-shared.css">
+    <link rel="stylesheet" href="/pages/forms/box-label-form.css">
+</head>
+<body>
+    <!-- Screen-only toolbar: never prints -->
+    <div class="form-toolbar no-print">
+        <a href="/dashboards/forms-library.html" class="toolbar-link">
+            <i class="fas fa-arrow-left"></i> Forms Library
+        </a>
+        <div class="toolbar-actions">
+            <button type="button" id="clearFormBtn" class="toolbar-btn toolbar-btn--ghost">
+                <i class="fas fa-eraser"></i> Clear
+            </button>
+            <a href="/forms/box-label.pdf" target="_blank" rel="noopener" class="toolbar-btn toolbar-btn--ghost">
+                <i class="fas fa-file-pdf"></i> Blank PDF
+            </a>
+            <button type="button" id="printFormBtn" class="toolbar-btn toolbar-btn--primary">
+                <i class="fas fa-print"></i> Print / Save as PDF
+            </button>
+        </div>
+    </div>
+
+    <div class="form-sheet label-sheet">
+        <div class="label-row">
+            <div class="label-field">
+                <label for="fldOrderType">Order Type</label>
+                <input type="text" id="fldOrderType">
+            </div>
+            <div class="label-field">
+                <label for="fldWorkOrder">Work Order</label>
+                <input type="text" id="fldWorkOrder">
+            </div>
+        </div>
+
+        <div class="label-row">
+            <div class="label-field">
+                <label for="fldDueDate">Due Date</label>
+                <input type="text" id="fldDueDate">
+            </div>
+            <div class="label-field label-field--dropdead">
+                <label for="fldDropDead">Drop-Dead Date</label>
+                <input type="text" id="fldDropDead">
+            </div>
+        </div>
+
+        <hr class="label-divider">
+
+        <div class="label-field label-field--customer">
+            <label for="fldCustomer">Customer</label>
+            <input type="text" id="fldCustomer" autocomplete="off">
+        </div>
+
+        <div class="label-row label-row--design">
+            <div class="label-field label-field--designnum">
+                <label for="fldDesignNumber">Design Number</label>
+                <input type="text" id="fldDesignNumber">
+            </div>
+            <div class="label-field">
+                <label for="fldDesignName">Design Name</label>
+                <input type="text" id="fldDesignName">
+            </div>
+        </div>
+
+        <table class="form-table label-table" id="labelTable">
+            <thead>
+                <tr>
+                    <th class="col-style">Style</th>
+                    <th class="col-desc">Description</th>
+                    <th class="col-color">Color</th>
+                    <th class="col-size">S</th>
+                    <th class="col-size">M</th>
+                    <th class="col-size">L</th>
+                    <th class="col-size">XL</th>
+                    <th class="col-size">2XL</th>
+                    <th class="col-size">3XL</th>
+                    <th class="col-other">Other</th>
+                    <th class="col-total">Total</th>
+                </tr>
+            </thead>
+            <tbody id="labelRows">
+                <!-- rows injected by box-label-form.js -->
+            </tbody>
+        </table>
+
+        <footer class="label-logo">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                 alt="Northwest Custom Apparel">
+        </footer>
+    </div>
+
+    <script src="/config/app.config.js"></script>
+    <script src="/pages/forms/nwca-form-shared.js"></script>
+    <script src="/pages/forms/nwca-form-contacts.js"></script>
+    <script src="/pages/forms/box-label-form.js"></script>
+</body>
+</html>

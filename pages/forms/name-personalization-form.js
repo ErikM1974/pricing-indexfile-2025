@@ -24,7 +24,55 @@
         NWCAForm.init({
             onAfterClear: function () { recalcTotal(); }
         });
+        NWCAFormContacts.attach({ input: document.getElementById('fldCompany') });
+        NWCAFormSave.init({ formId: 'name-personalization', build: buildSubmission });
     });
+
+    function buildSubmission() {
+        var V = NWCAFormSave.val;
+        var specs = [];
+        [['methodEmbroidery', 'Embroidery'], ['methodTransfer', 'Transfer'], ['methodDtg', 'DTG']]
+            .forEach(function (pair) { if (NWCAFormSave.checked(pair[0])) specs.push(pair[1]); });
+        if (NWCAFormSave.checked('methodOther')) specs.push('Other: ' + (V('methodOtherText') || '?'));
+        [['capAll', 'ALL CAPS'], ['capUpperLower', 'Upper/lower'], ['capAsWritten', 'As written']]
+            .forEach(function (pair) { if (NWCAFormSave.checked(pair[0])) specs.push(pair[1]); });
+
+        var rows = [];
+        document.querySelectorAll('#nameRows tr').forEach(function (tr) {
+            var num = tr.querySelector('.cell-num').textContent;
+            var cells = Array.prototype.map.call(tr.querySelectorAll('input'), function (el) { return el.value.trim(); });
+            if (cells.some(function (c) { return c; })) rows.push([num].concat(cells));
+        });
+        var nameCount = rows.filter(function (r) { return r[1]; }).length;
+
+        return {
+            company: V('fldCompany'),
+            contactName: V('fldContact'),
+            phone: V('fldPhone'),
+            email: V('fldEmail'),
+            customerNumber: V('fldCustomerNum'),
+            salesRep: V('fldSalesRep'),
+            dueDateText: V('fldDueDate'),
+            summary: (V('fldTotalNames') || nameCount) + ' names · ' + (specs[0] || 'method not marked'),
+            payload: {
+                fields: [
+                    ['Company', V('fldCompany')], ['Contact Name', V('fldContact')], ['Phone', V('fldPhone')],
+                    ['Email', V('fldEmail')], ['Sales Rep', V('fldSalesRep')], ['Order / PO #', V('fldOrderPo')],
+                    ['Due Date', V('fldDueDate')], ['Customer #', V('fldCustomerNum')],
+                    ['Name Location', V('fldNameLocation')], ['Font', V('fldFont')],
+                    ['Letter Height', V('fldLetterHeight')], ['Thread / Print Color', V('fldThreadColor')],
+                    ['Total Names', V('fldTotalNames') || String(nameCount)],
+                ],
+                checks: specs,
+                tables: [{
+                    title: 'Name List',
+                    columns: ['#', 'Name Exactly as Printed', 'Garment / Style', 'Color', 'Size', 'Qty', 'Special Notes'],
+                    rows: rows,
+                }],
+                notes: [['Printed Name', V('fldPrintedName')], ['Signature Date', V('fldSignDate')], ['NWCA Received By', V('fldReceivedBy')]],
+            },
+        };
+    }
 
     function seedRows(tbody) {
         for (var i = 0; i < DEFAULT_ROWS; i++) addRow(tbody);

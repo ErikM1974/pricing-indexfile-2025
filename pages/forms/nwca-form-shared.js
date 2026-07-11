@@ -44,5 +44,8 @@
         window.addEventListener('afterprint', function () { dirty = false; });
     }
 
-    global.NWCAForm = { init: init };
+    // Successful Save-to-NWCA clears the leave-warning (nwca-form-save.js)
+    function markClean() { dirty = false; }
+
+    global.NWCAForm = { init: init, markClean: markClean };
 })(window);

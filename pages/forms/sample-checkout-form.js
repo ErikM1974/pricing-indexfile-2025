@@ -23,7 +23,59 @@
         });
 
         NWCAForm.init({});
+        NWCAFormContacts.attach({ input: document.getElementById('fldCompany') });
+        NWCAFormSave.init({ formId: 'sample-checkout', build: buildSubmission });
     });
+
+    // ⚠️ Card section (status/type/last4/exp/cardholder) is DELIBERATELY absent
+    // from the saved data — print-only per Erik 2026-07-11. The proxy re-strips
+    // card-ish keys server-side as defense in depth (jest-locked).
+    function buildSubmission() {
+        var V = NWCAFormSave.val;
+        var checksList = [];
+        if (NWCAFormSave.checked('srcShowroom')) checksList.push('Source: Showroom');
+        if (NWCAFormSave.checked('srcVendor')) checksList.push('Source: Vendor Ordered');
+        [['condUnworn', 'Unworn'], ['condUnwashed', 'Unwashed'], ['condUnaltered', 'Unaltered'],
+         ['condUndamaged', 'Undamaged'], ['condTags', 'Original tags attached'], ['condPackaging', 'Original packaging included']]
+            .forEach(function (pair) { if (NWCAFormSave.checked(pair[0])) checksList.push(pair[1]); });
+
+        var items = [];
+        document.querySelectorAll('#sampleRows tr').forEach(function (tr) {
+            var inputs = tr.querySelectorAll('input');
+            // order: source, brand, style, description, color, size, qty, retail, charge, dateReturned, condition
+            var v = Array.prototype.map.call(inputs, function (el) { return el.value.trim(); });
+            if (v.slice(0, 9).some(function (c) { return c; })) {
+                items.push({
+                    source: v[0], brand: v[1], style: v[2], description: v[3], color: v[4],
+                    size: v[5], qty: v[6], retailValue: v[7], chargeValue: v[8],
+                });
+            }
+        });
+
+        return {
+            company: V('fldCompany'),
+            contactName: V('fldContact'),
+            phone: V('fldPhone'),
+            email: V('fldEmail'),
+            customerNumber: V('fldCustomerNum'),
+            salesRep: V('fldAe'),
+            dueDateText: V('fldReturnDue'),
+            summary: items.length + ' item' + (items.length === 1 ? '' : 's') + ' out · due ' + (V('fldReturnDue') || '?'),
+            items: items,
+            payload: {
+                fields: [
+                    ['Company', V('fldCompany')], ['Contact Name', V('fldContact')], ['Phone', V('fldPhone')],
+                    ['Email', V('fldEmail')], ['AE', V('fldAe')], ['Customer #', V('fldCustomerNum')],
+                    ['Checkout Date', V('fldCheckoutDate')], ['Return Due Date', V('fldReturnDue')],
+                    ['Grace Deadline', V('fldGraceDeadline')], ['Vendor / Order #', V('fldVendorOrder')],
+                    ['Vendor Return By', V('fldVendorReturnBy')],
+                ],
+                checks: checksList,
+                tables: [],
+                notes: [['Printed Name', V('fldPrintedName')], ['Signature Date', V('fldSignDate')], ['AE / Issued By', V('fldIssuedBy')]],
+            },
+        };
+    }
 
     function addRow(tbody) {
         var tr = document.createElement('tr');
