@@ -1,3 +1,7 @@
+## v2026.07.11.3 (2026.07.11)
+
+- feat(forms): Forms Inbox + Caspio-saved submissions + samples tracker + box label + customer lookup
+
 ## v2026.07.11.2 (2026.07.11)
 
 - feat(forms): 3 more fillable twins (artwork request, name personalization, sample checkout) + shared form framework
