@@ -24,7 +24,52 @@
         });
 
         NWCAForm.init({});
+        NWCAFormContacts.attach({ input: document.getElementById('fldCompany') });
+        NWCAFormSave.init({ formId: 'garment-drop-off', build: buildSubmission });
     });
+
+    function buildSubmission() {
+        var V = NWCAFormSave.val;
+        var decoration = [];
+        [['decoEmbroidery', 'Embroidery'], ['decoDtg', 'DTG Printing'], ['decoScreen', 'Screen Printing'], ['decoTransfers', 'Transfers']]
+            .forEach(function (pair) { if (NWCAFormSave.checked(pair[0])) decoration.push(pair[1]); });
+        if (NWCAFormSave.checked('decoOther')) decoration.push('Other: ' + (V('decoOtherText') || '?'));
+
+        var rows = [];
+        var totalPieces = 0;
+        document.querySelectorAll('#garmentRows tr').forEach(function (tr) {
+            var cells = Array.prototype.map.call(tr.querySelectorAll('input'), function (el) { return el.value.trim(); });
+            if (cells.some(function (c) { return c; })) {
+                rows.push(cells);
+                totalPieces += parseInt(cells[cells.length - 1], 10) || 0;
+            }
+        });
+
+        return {
+            company: V('fldCompany'),
+            contactName: V('fldContact'),
+            phone: V('fldPhone'),
+            email: V('fldEmail'),
+            customerNumber: V('fldCustomerNum'),
+            salesRep: V('fldReceivedBy'),
+            dueDateText: V('fldDateNeeded'),
+            summary: totalPieces + ' pcs · ' + (decoration.join(', ') || 'no method marked'),
+            payload: {
+                fields: [
+                    ['Company', V('fldCompany')], ['Contact Name', V('fldContact')], ['Phone', V('fldPhone')],
+                    ['Email', V('fldEmail')], ['Date In', V('fldDateIn')], ['Date Needed', V('fldDateNeeded')],
+                    ['PO #', V('fldPo')], ['Customer #', V('fldCustomerNum')], ['Received By', V('fldReceivedBy')],
+                ],
+                checks: decoration,
+                tables: [{
+                    title: 'Garment Details',
+                    columns: ['Brand / Style #', 'Color', 'Description', 'S', 'M', 'L', 'XL', '2XL', '3XL', 'Other', 'Total'],
+                    rows: rows,
+                }],
+                notes: [['Order Notes', V('fldNotes')], ['Printed Name', V('fldPrintedName')], ['Signature Date', V('fldSignDate')]],
+            },
+        };
+    }
 
     function addRow(tbody) {
         var tr = document.createElement('tr');

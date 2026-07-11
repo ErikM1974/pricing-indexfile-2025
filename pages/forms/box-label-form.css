@@ -1,0 +1,109 @@
+/* ==========================================================================
+   box-label-form.css — pages/forms/box-label-form.html
+
+   8.5×11 BOX LABEL taped to the front of a shirt box — factory staff read it
+   from across the shop floor, so everything is BIG: boxed fields (not lines),
+   heavy labels, orange drop-dead date like the official PDF. Portrait print.
+   ========================================================================== */
+
+@media print {
+    @page { size: letter portrait; margin: 0.35in; }
+}
+
+.label-sheet {
+    border: 3px solid var(--form-green);
+    border-radius: 14px;
+}
+
+.label-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+
+.label-row--design { grid-template-columns: 0.6fr 1.4fr; }
+
+.label-field { margin-top: 14px; }
+
+.label-field label {
+    display: block;
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: #4a4a4a;
+    margin-bottom: 6px;
+}
+
+.label-field input {
+    width: 100%;
+    border: 2px solid var(--ink);
+    border-radius: 4px;
+    background: #eef1fb;
+    font: inherit;
+    font-size: 1.9rem;
+    font-weight: 700;
+    padding: 10px 12px;
+    height: 68px;
+}
+
+.label-field input:focus { outline: 3px solid #bcd8c6; background: #f0f7f2; }
+
+/* Drop-dead date pops in orange like the PDF */
+.label-field--dropdead label { color: #b45309; }
+.label-field--dropdead input { border-color: #b45309; }
+
+/* Customer is the biggest read-from-across-the-room field */
+.label-field--customer input {
+    font-size: 2.6rem;
+    font-weight: 800;
+    height: 88px;
+}
+
+.label-divider {
+    border: none;
+    border-top: 3px solid var(--form-green);
+    margin: 20px 0 4px;
+}
+
+/* Style grid — bigger than the intake forms' tables */
+.label-table { margin-top: 22px; }
+
+.label-table th {
+    background: #e7f0e9;
+    color: var(--form-green-dark);
+    font-size: 0.9rem;
+    padding: 8px 4px;
+}
+
+.label-table td input {
+    font-size: 1.15rem;
+    font-weight: 600;
+    padding: 12px 6px;
+}
+
+.col-style { width: 10%; }
+.col-desc  { width: 26%; }
+.col-color { width: 12%; }
+.col-size  { width: 5.8%; }
+.col-other { width: 8.5%; }
+.col-total { width: 8.7%; }
+
+.label-logo {
+    margin-top: 26px;
+    text-align: center;
+}
+
+.label-logo img { height: 58px; }
+
+@media (max-width: 700px) {
+    .label-row, .label-row--design { grid-template-columns: 1fr; }
+    .label-field input { font-size: 1.3rem; height: 54px; }
+    .label-field--customer input { font-size: 1.6rem; height: 64px; }
+}
+
+@media print {
+    .label-sheet { border-width: 4px; }
+    .label-field input { background: #fff; }
+    .label-table th { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+}

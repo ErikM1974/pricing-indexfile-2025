@@ -106,6 +106,7 @@ dotenv.config();
 // STAFF DASHBOARD FORWARDERS (SAML-gated same-origin reads of secret-gated proxy data)
 //   GET /api/mo/orders[...]              — ManageOrders reads (PII airtight path, 2026-07-05)
 //   GET /api/staff/payments/recent       — Order_Payments ledger for the Money Collected widget (2026-07-06)
+//   ALL /api/crm-proxy/form-submissions* — Forms Inbox reads/updates (any staff; ~L3230, 2026-07-11)
 //
 // SAMPLE PROGRAM ('samples' channel, 2026-07-06 — SAM{MMDD}-{rand4} QuoteIDs; handleSamplesOrderPaid ~L1400)
 //   POST /api/samples/create-checkout-session — PAID blank samples: dedicated multi-style route (shared
@@ -3222,6 +3223,12 @@ app.all('/api/crm-proxy/portal-reorder*', ...createCrmProxy('portal-reorder', PO
 // Reward dollars (Phase 5) — the console reads a customer's ledger/balance here. WRITES go
 // through the dedicated /api/portal-admin/rewards/entry (which stamps the staff email).
 app.all('/api/crm-proxy/customer-rewards*', ...createCrmProxy('customer-rewards', PORTAL_ADMIN_ROLES));
+
+// Form Submissions (Forms Inbox) — saved fillable-form twins. ANY logged-in staff
+// (like unlisted dashboard pages), so we reuse the factory's forwarder but swap the
+// role gate for requireStaff. Proxy side is secret-only (holds customer contact info).
+const [, formSubmissionsForwarder] = createCrmProxy('form-submissions', []);
+app.all('/api/crm-proxy/form-submissions*', requireStaff, formSubmissionsForwarder);
 
 // =============================================================================
 // POLICIES HUB AI ASSIST — streaming proxy to caspio-pricing-proxy.

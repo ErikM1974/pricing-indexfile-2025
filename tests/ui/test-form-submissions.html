@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>TEST — Forms Inbox (stubbed fetch)</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css">
+    <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
+    <link rel="stylesheet" href="/dashboards/css/form-submissions.css">
+</head>
+<body>
+    <!-- Same DOM as dashboards/form-submissions.html, driven by the REAL controller
+         with fetch stubbed to fixtures (test-form-submissions-stub.js) so the
+         SAML-gated crm-proxy isn't needed. UI/regression harness only. -->
+    <div class="dash-shell">
+        <header class="dash-header">
+            <div class="dash-header-left">
+                <h1 class="dash-header-title">Forms Inbox — TEST HARNESS (fixture data)</h1>
+            </div>
+        </header>
+
+        <main class="dash-content">
+            <div class="dash-error-banner" role="alert">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span class="dash-error-banner-message"></span>
+                <button class="dash-error-banner-close" aria-label="Dismiss"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div class="dash-stat-grid">
+                <div class="dash-stat-card"><div class="dash-stat-value" id="statNew">—</div><div class="dash-stat-label">New this week</div></div>
+                <div class="dash-stat-card"><div class="dash-stat-value" id="statOut">—</div><div class="dash-stat-label">Sample items out</div></div>
+                <div class="dash-stat-card inbox-stat--overdue"><div class="dash-stat-value" id="statOverdue">—</div><div class="dash-stat-label">Overdue samples</div></div>
+                <div class="dash-stat-card dash-stat-card--accent"><div class="dash-stat-value" id="statDueSoon">—</div><div class="dash-stat-label">Due in 7 days</div></div>
+            </div>
+
+            <div class="inbox-tabs no-print">
+                <button type="button" class="inbox-tab is-active" data-view="submissions"><i class="fas fa-inbox"></i> All Submissions</button>
+                <button type="button" class="inbox-tab" data-view="samples"><i class="fas fa-shirt"></i> Samples Tracker</button>
+            </div>
+
+            <section id="viewSubmissions" class="dash-card">
+                <div class="inbox-filterbar no-print">
+                    <div class="inbox-chips" id="formChips">
+                        <button type="button" class="inbox-chip is-active" data-form="">All</button>
+                        <button type="button" class="inbox-chip" data-form="garment-drop-off">Drop-Offs</button>
+                        <button type="button" class="inbox-chip" data-form="artwork-request">Artwork</button>
+                        <button type="button" class="inbox-chip" data-form="name-personalization">Name Lists</button>
+                        <button type="button" class="inbox-chip" data-form="sample-checkout">Samples</button>
+                    </div>
+                    <select id="statusFilter" class="inbox-select" aria-label="Filter by status">
+                        <option value="">Any status</option>
+                        <option>New</option><option>In Progress</option><option>Sent to Art</option><option>Completed</option>
+                        <option>Checked Out</option><option>Partially Returned</option><option>Returned</option><option>Archived</option>
+                    </select>
+                    <input type="search" id="searchBox" class="inbox-search" placeholder="Search company / contact / ID…" aria-label="Search submissions">
+                </div>
+                <div id="submissionsRoot" class="dash-loading">Loading submissions…</div>
+            </section>
+
+            <section id="viewSamples" class="dash-card" hidden>
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title"><i class="fas fa-rotate-left"></i> Checked-Out Samples</h2>
+                    <span class="inbox-muted">75% of retail is charged for items not returned by the grace deadline.</span>
+                </div>
+                <div id="samplesRoot" class="dash-loading">Loading open samples…</div>
+            </section>
+        </main>
+    </div>
+
+    <div class="inbox-modal-overlay" id="detailOverlay" hidden>
+        <div class="inbox-modal" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+            <div class="inbox-modal-head no-print">
+                <h2 id="detailTitle">Submission</h2>
+                <div class="inbox-modal-actions">
+                    <button type="button" id="printDetailBtn" class="dash-btn"><i class="fas fa-print"></i> Print</button>
+                    <button type="button" id="closeDetailBtn" class="dash-btn" aria-label="Close"><i class="fas fa-times"></i></button>
+                </div>
+            </div>
+            <div id="detailBody" class="inbox-modal-body"></div>
+        </div>
+    </div>
+
+    <script src="/config/app.config.js"></script>
+    <script src="/shared_components/js/dash-page-helpers.js"></script>
+    <!-- fetch stub MUST load before the controller -->
+    <script src="/tests/ui/test-form-submissions-stub.js"></script>
+    <script src="/dashboards/js/form-submissions.js"></script>
+</body>
+</html>

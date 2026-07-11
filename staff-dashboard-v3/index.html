@@ -91,16 +91,23 @@
                         </a>
                     </div>
 
-                    <!-- Forms Library (2026-07-10) — printable/fillable PDFs from the
-                         Caspio Forms_Library table (drop-off, waivers, ink orders…) -->
-                    <div class="nav-section" data-section="forms">
-                        <a href="/dashboards/forms-library.html" class="nav-section-header-link">
+                    <!-- Forms (2026-07-10, Inbox added 2026-07-11) — Library = printable/
+                         fillable forms (Caspio Forms_Library registry); Inbox = saved
+                         submissions + checked-out-samples tracker (Form_Submissions). -->
+                    <div class="nav-section collapsed" data-section="forms">
+                        <button type="button" class="nav-section-header" data-action="sidebar:toggle-section" aria-expanded="false" aria-controls="nav-forms">
                             <div class="nav-section-title">
                                 <span aria-hidden="true">📄</span>
-                                <span>Forms Library</span>
+                                <span>Forms</span>
                             </div>
-                            <span aria-hidden="true">→</span>
-                        </a>
+                            <span class="chevron" aria-hidden="true">▼</span>
+                        </button>
+                        <div class="nav-section-content" id="nav-forms">
+                            <div>
+                                <a href="/dashboards/forms-library.html" class="nav-link">🗂️ Forms Library — print &amp; fill</a>
+                                <a href="/dashboards/form-submissions.html" class="nav-link">📥 Forms Inbox — saved &amp; samples out</a>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Training -->
