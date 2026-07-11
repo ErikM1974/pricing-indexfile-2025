@@ -1,3 +1,7 @@
+## v2026.07.11.4 (2026.07.11)
+
+- feat(forms): AE Order Intake fill-online twin — customer + SanMar assists, auto-math, AEO saves
+
 ## v2026.07.11.3 (2026.07.11)
 
 - feat(forms): Forms Inbox + Caspio-saved submissions + samples tracker + box label + customer lookup
