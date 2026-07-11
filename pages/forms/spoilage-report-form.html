@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Spoilage, Damage & Reprint Report - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/pages/forms/nwca-form-shared.css">
+    <link rel="stylesheet" href="/pages/forms/spoilage-report-form.css">
+</head>
+<body>
+    <!-- Screen-only toolbar: never prints -->
+    <div class="form-toolbar no-print">
+        <a href="/dashboards/forms-library.html" class="toolbar-link">
+            <i class="fas fa-arrow-left"></i> Forms Library
+        </a>
+        <div class="toolbar-actions">
+            <button type="button" id="clearFormBtn" class="toolbar-btn toolbar-btn--ghost">
+                <i class="fas fa-eraser"></i> Clear
+            </button>
+            <a href="/forms/spoilage-damage-reprint-report.pdf" target="_blank" rel="noopener" class="toolbar-btn toolbar-btn--ghost">
+                <i class="fas fa-file-pdf"></i> Fillable PDF
+            </a>
+            <button type="button" id="printFormBtn" class="toolbar-btn toolbar-btn--primary">
+                <i class="fas fa-print"></i> Print / Save as PDF
+            </button>
+        </div>
+    </div>
+
+    <div class="form-sheet">
+        <header class="form-header">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                 alt="Northwest Custom Apparel" class="form-logo">
+            <h1 class="form-title">Spoilage, Damage &amp; Reprint Report</h1>
+            <p class="form-subtitle">Document damaged or incorrectly produced product, the cost, the cause, and the fix</p>
+            <p class="form-contact">2025 Freeman Rd. E., Milton, WA 98354 &nbsp;&bull;&nbsp; 253-922-5793 &nbsp;&bull;&nbsp; www.nwcustomapparel.com</p>
+        </header>
+
+        <section class="form-section">
+            <div class="section-bar">1. Order / Location</div>
+            <div class="info-grid">
+                <div class="info-field">
+                    <label for="fldWorkOrder">Work Order</label>
+                    <input type="text" id="fldWorkOrder">
+                </div>
+                <div class="info-field">
+                    <label for="fldCompany">Customer</label>
+                    <input type="text" id="fldCompany" autocomplete="off">
+                </div>
+                <div class="info-field">
+                    <label for="fldDepartment">Department</label>
+                    <input type="text" id="fldDepartment">
+                </div>
+                <div class="info-field">
+                    <label for="fldMachine">Machine / Station</label>
+                    <input type="text" id="fldMachine">
+                </div>
+                <div class="info-field">
+                    <label for="fldDateTime">Date / Time</label>
+                    <input type="text" id="fldDateTime">
+                </div>
+                <div class="info-field">
+                    <label for="fldReportedBy">Reported By</label>
+                    <input type="text" id="fldReportedBy">
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">2. Where Was It Found?</div>
+            <div class="decoration-row">
+                <label class="deco-check"><input type="checkbox" id="whReceiving"> Receiving</label>
+                <label class="deco-check"><input type="checkbox" id="whSetup"> Setup / First Piece</label>
+                <label class="deco-check"><input type="checkbox" id="whProduction"> During Production</label>
+                <label class="deco-check"><input type="checkbox" id="whFinalQc"> Final QC</label>
+                <label class="deco-check"><input type="checkbox" id="whPacking"> Packing</label>
+                <label class="deco-check"><input type="checkbox" id="whComplaint"> Customer Complaint</label>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">3. Type of Error / Damage</div>
+            <div class="decoration-row">
+                <label class="deco-check"><input type="checkbox" id="cVendor"> Vendor Defect</label>
+                <label class="deco-check"><input type="checkbox" id="cWrongGarment"> Wrong Garment / Size</label>
+                <label class="deco-check"><input type="checkbox" id="cWrongArt"> Wrong Artwork / Version</label>
+                <label class="deco-check"><input type="checkbox" id="cWrongColor"> Wrong Color</label>
+                <label class="deco-check"><input type="checkbox" id="cPlacement"> Placement / Alignment</label>
+                <label class="deco-check"><input type="checkbox" id="cMachine"> Machine / Equipment</label>
+                <label class="deco-check"><input type="checkbox" id="cOperator"> Operator / Setup</label>
+                <label class="deco-check"><input type="checkbox" id="cDye"> Dye Migration / Scorching</label>
+                <label class="deco-check"><input type="checkbox" id="cNeedle"> Needle / Hoop Damage</label>
+                <label class="deco-check"><input type="checkbox" id="cHeatPress"> Heat Press Issue</label>
+                <label class="deco-check"><input type="checkbox" id="cContamination"> Contamination / Stain</label>
+                <label class="deco-check deco-check--other">
+                    <input type="checkbox" id="cOther"> Other
+                    <input type="text" id="cOtherText" class="deco-other-text" aria-label="Other cause">
+                </label>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">4. Damaged / Spoiled Items</div>
+            <p class="assist-hint no-print"><i class="fas fa-wand-magic-sparkles"></i>
+                Style # lookup fills the description; Loss Total auto-computes Qty × (Garment + Decoration cost).</p>
+            <table class="form-table spoil-table" id="spoilTable">
+                <thead>
+                    <tr>
+                        <th class="col-style">Style</th>
+                        <th class="col-desc">Description</th>
+                        <th class="col-color">Color</th>
+                        <th class="col-size">Size</th>
+                        <th class="col-qty">Qty</th>
+                        <th class="col-cost">Garment Cost</th>
+                        <th class="col-cost">Decoration Cost</th>
+                        <th class="col-loss">Loss Total</th>
+                        <th class="col-disp">Disposition</th>
+                    </tr>
+                </thead>
+                <tbody id="spoilRows">
+                    <!-- rows injected by spoilage-report-form.js -->
+                </tbody>
+            </table>
+            <button type="button" id="addRowBtn" class="toolbar-btn toolbar-btn--ghost add-row-btn no-print">
+                <i class="fas fa-plus"></i> Add Row
+            </button>
+            <div class="loss-total-row">
+                <label for="fldTotalLoss">Estimated Total Loss&nbsp;&nbsp;$</label>
+                <input type="text" id="fldTotalLoss" inputmode="decimal">
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">5. Root Cause</div>
+            <textarea id="fldRootCause" class="notes-area" rows="2" aria-label="Root cause"></textarea>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">6. Corrective Action / Prevention</div>
+            <textarea id="fldCorrective" class="notes-area" rows="2" aria-label="Corrective action"></textarea>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">7. Replacement &amp; Resolution</div>
+            <div class="info-grid">
+                <div class="info-field">
+                    <label for="fldReplacementPo">Replacement PO / WO</label>
+                    <input type="text" id="fldReplacementPo">
+                </div>
+                <div class="info-field">
+                    <label for="fldStatus">Status</label>
+                    <input type="text" id="fldStatus" placeholder="Open / Replacement ordered / Closed">
+                </div>
+                <div class="info-field">
+                    <label for="fldSupervisor">Supervisor Approval</label>
+                    <input type="text" id="fldSupervisor">
+                </div>
+                <div class="info-field">
+                    <label for="fldClosedDate">Closed Date</label>
+                    <input type="text" id="fldClosedDate">
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="/config/app.config.js"></script>
+    <script src="/pages/forms/nwca-form-shared.js"></script>
+    <script src="/pages/forms/nwca-form-contacts.js"></script>
+    <script src="/pages/forms/nwca-form-styles.js"></script>
+    <script src="/pages/forms/nwca-form-save.js"></script>
+    <script src="/pages/forms/spoilage-report-form.js"></script>
+</body>
+</html>

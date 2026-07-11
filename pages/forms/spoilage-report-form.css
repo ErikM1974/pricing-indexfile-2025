@@ -1,0 +1,71 @@
+/* ==========================================================================
+   spoilage-report-form.css — pages/forms/spoilage-report-form.html
+   Spoilage / damage / reprint report twin. Portrait print.
+   ========================================================================== */
+
+@media print {
+    @page { size: letter portrait; margin: 0.35in; }
+}
+
+.assist-hint {
+    margin: 6px 0 8px;
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+}
+
+.assist-hint .fa-wand-magic-sparkles { color: var(--form-green); }
+
+/* items table */
+.col-style { width: 9%; }
+.col-desc  { width: 20%; }
+.col-color { width: 10%; }
+.col-size  { width: 6%; }
+.col-qty   { width: 5.5%; }
+.col-cost  { width: 10%; }
+.col-loss  { width: 10%; }
+.col-disp  { width: 13%; }
+
+.spoil-table td input { padding: 6px 3px; font-size: 0.8rem; }
+
+.spoil-table .color-select {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font: inherit;
+    font-size: 0.78rem;
+    padding: 6px 2px;
+}
+
+.spoil-table .color-select:focus { outline: none; background: #f0f7f2; }
+
+.loss-total-row {
+    display: flex;
+    justify-content: flex-end;
+    align-items: baseline;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.loss-total-row label { font-weight: 800; font-size: 0.95rem; }
+
+.loss-total-row input {
+    width: 140px;
+    border: none;
+    border-bottom: 2px solid var(--ink);
+    font: inherit;
+    font-size: 1.05rem;
+    font-weight: 700;
+    text-align: right;
+    padding: 2px 4px;
+    background: transparent;
+}
+
+.loss-total-row input:focus { outline: none; background: #f0f7f2; }
+
+@media print {
+    .form-logo { height: 44px; }
+    .form-title { font-size: 1.3rem; }
+    .form-section { margin-top: 9px; }
+    .spoil-table td input { padding: 4px 2px; font-size: 0.74rem; }
+    .notes-area { min-height: 0.5in; }
+}

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Final QC Checklist - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/pages/forms/nwca-form-shared.css">
+    <link rel="stylesheet" href="/pages/forms/qc-checklist-form.css">
+</head>
+<body>
+    <!-- Screen-only toolbar: never prints -->
+    <div class="form-toolbar no-print">
+        <a href="/dashboards/forms-library.html" class="toolbar-link">
+            <i class="fas fa-arrow-left"></i> Forms Library
+        </a>
+        <div class="toolbar-actions">
+            <button type="button" id="clearFormBtn" class="toolbar-btn toolbar-btn--ghost">
+                <i class="fas fa-eraser"></i> Clear
+            </button>
+            <a href="/forms/final-qc-checklist.pdf" target="_blank" rel="noopener" class="toolbar-btn toolbar-btn--ghost">
+                <i class="fas fa-file-pdf"></i> Fillable PDF
+            </a>
+            <button type="button" id="printFormBtn" class="toolbar-btn toolbar-btn--primary">
+                <i class="fas fa-print"></i> Print / Save as PDF
+            </button>
+        </div>
+    </div>
+
+    <div class="form-sheet">
+        <header class="form-header">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                 alt="Northwest Custom Apparel" class="form-logo">
+            <h1 class="form-title">Final QC Checklist</h1>
+            <p class="form-subtitle">Inspect the completed order before it is packed, shipped, or released</p>
+            <p class="form-contact">2025 Freeman Rd. E., Milton, WA 98354 &nbsp;&bull;&nbsp; 253-922-5793 &nbsp;&bull;&nbsp; www.nwcustomapparel.com</p>
+        </header>
+
+        <section class="form-section">
+            <div class="section-bar">1. Order Information</div>
+            <div class="info-grid">
+                <div class="info-field">
+                    <label for="fldWorkOrder">Work Order</label>
+                    <input type="text" id="fldWorkOrder">
+                </div>
+                <div class="info-field">
+                    <label for="fldCompany">Customer</label>
+                    <input type="text" id="fldCompany" autocomplete="off">
+                </div>
+                <div class="info-field">
+                    <label for="fldDepartment">Department</label>
+                    <input type="text" id="fldDepartment">
+                </div>
+                <div class="info-field">
+                    <label for="fldInspector">QC Inspector</label>
+                    <input type="text" id="fldInspector">
+                </div>
+                <div class="info-field">
+                    <label for="fldInspectionDate">Inspection Date / Time</label>
+                    <input type="text" id="fldInspectionDate">
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">2. Decoration Type</div>
+            <div class="decoration-row">
+                <label class="deco-check"><input type="checkbox" id="dEmbroidery"> Embroidery</label>
+                <label class="deco-check"><input type="checkbox" id="dDtg"> DTG</label>
+                <label class="deco-check"><input type="checkbox" id="dDtf"> DTF / Transfer</label>
+                <label class="deco-check"><input type="checkbox" id="dScreen"> Screen Print</label>
+                <label class="deco-check"><input type="checkbox" id="dLaser"> Laser</label>
+                <label class="deco-check"><input type="checkbox" id="dStickers"> Stickers / Banners</label>
+                <label class="deco-check"><input type="checkbox" id="dPatches"> Patches</label>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">3. Inspection Checklist</div>
+            <table class="form-table qc-table">
+                <thead>
+                    <tr>
+                        <th class="col-item">Check</th>
+                        <th class="col-mark">OK</th>
+                        <th class="col-mark">FAIL</th>
+                        <th class="col-mark">N/A</th>
+                    </tr>
+                </thead>
+                <tbody id="qcRows">
+                    <!-- 14 QC items injected by qc-checklist-form.js -->
+                </tbody>
+            </table>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">4. Quantity Verification</div>
+            <table class="form-table qty-table" id="qtyTable">
+                <thead>
+                    <tr>
+                        <th class="col-style">Style / Item</th>
+                        <th class="col-color">Color</th>
+                        <th class="col-num">Ordered</th>
+                        <th class="col-num">Completed</th>
+                        <th class="col-num">Passed</th>
+                        <th class="col-num">Rejected</th>
+                        <th class="col-notes">Notes</th>
+                    </tr>
+                </thead>
+                <tbody id="qtyRows">
+                    <!-- rows injected -->
+                </tbody>
+            </table>
+            <button type="button" id="addRowBtn" class="toolbar-btn toolbar-btn--ghost add-row-btn no-print">
+                <i class="fas fa-plus"></i> Add Row
+            </button>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">5. QC Exceptions / Notes</div>
+            <textarea id="fldExceptions" class="notes-area" rows="2" aria-label="QC exceptions"></textarea>
+        </section>
+
+        <section class="waiver-box">
+            <h2 class="waiver-title">6. Final Disposition</h2>
+            <div class="decoration-row disposition-row">
+                <label class="deco-check"><input type="checkbox" id="dispRelease"> RELEASE</label>
+                <label class="deco-check"><input type="checkbox" id="dispHold"> HOLD</label>
+                <label class="deco-check"><input type="checkbox" id="dispRework"> REWORK</label>
+                <label class="deco-check"><input type="checkbox" id="dispPartial"> PARTIAL</label>
+                <label class="deco-check"><input type="checkbox" id="dispReject"> REJECT</label>
+            </div>
+            <div class="signature-row signature-row--two">
+                <div class="signature-field">
+                    <input type="text" id="fldInspectorSig" aria-label="Inspector signature or initials">
+                    <label>Inspector Signature / Initials</label>
+                </div>
+                <div class="signature-field">
+                    <input type="text" id="fldSigDate" aria-label="Date">
+                    <label>Date</label>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="/config/app.config.js"></script>
+    <script src="/pages/forms/nwca-form-shared.js"></script>
+    <script src="/pages/forms/nwca-form-contacts.js"></script>
+    <script src="/pages/forms/nwca-form-save.js"></script>
+    <script src="/pages/forms/qc-checklist-form.js"></script>
+</body>
+</html>
