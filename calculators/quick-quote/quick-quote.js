@@ -262,6 +262,10 @@
         seq: 0,
         prevPP: {},           // id -> last REAL per-piece price (survives the loading flicker)
         flashUntil: {},       // id -> timestamp; the tasteful "price changed" flash window
+        handback: null,       // {token} when opened from the AE Order Intake (?from=aeo&hb=) —
+                              // cards grow a "Use on order form" button that hands the price
+                              // back to the intake tab via localStorage (storage event)
+        pinOnce: null,        // ?method= deep-link — pins that method on the first product load
         // ----- LINE SHEET MODE (method-first multi-style mini-catalog -> PDF) -----
         mode: 'linesheet',    // DEFAULT (AEs prefer line-item) | 'quick' (one style, every method)
         lineMethod: null,     // locked imprint method id for the sheet: emb|capemb|dtg|scp|dtf
@@ -509,6 +513,13 @@
         state.results = {}; // drop the previous product's cards while the new ones load
         state.selectedMethod = null;
         state.methodPinned = false;
+        // one-shot ?method= deep-link (AE round-trip): pin that method on the
+        // FIRST product load only — later style switches auto-follow best value
+        if (state.pinOnce && state.methods.some(function (m) { return m.id === state.pinOnce; })) {
+            state.selectedMethod = state.pinOnce;
+            state.methodPinned = true;
+        }
+        state.pinOnce = null;
         state.embAddl = [];
         state.capEmb = 'embroidery';
         var mb = $('qqMatrix'); if (mb) mb.innerHTML = '';
@@ -1297,6 +1308,9 @@
             + oneTimeHtml
             + (meta.length ? '<div class="qq-card-meta">' + meta.join('') + '</div>' : '')
             + nudgeHtml
+            + (state.handback ? '<button type="button" class="qq-use-price" data-id="' + esc(id)
+                + '" title="Send this price back to the AE Order Intake form">'
+                + '<i class="fas fa-reply" aria-hidden="true"></i> Use on order form — ' + fmt(s.perPiece) + '/' + unitWord + '</button>' : '')
             + openBuilderHtml(id)
             + (sel ? '<div class="qq-card-selhint">price breaks below ↓</div>' : '')
             + '</div>';
@@ -1604,6 +1618,49 @@
     function printLineSheet() { window.print(); }
 
     // ============================================================
+    // ORDER-FORM HANDBACK (?from=aeo) — send a priced method back to the
+    // AE Order Intake tab. localStorage 'storage' events fire in OTHER
+    // same-origin tabs, so this works regardless of how the tab was opened
+    // (the 💰 link is rel=noopener — window.opener is unavailable by design).
+    // ============================================================
+    function sendHandback(id, btn) {
+        var r = state.results[id];
+        if (!state.handback || !state.product || !r || r.status !== 'ok') return;
+        var def = METHODS[id];
+        var s = r.summary;
+        var unitWord = state.product.isCap ? 'cap' : 'pc';
+        var cfg = configText(id);
+        var provenance = 'Quick Quote: ' + def.label + (cfg ? ' — ' + cfg : '')
+            + ' · ' + totalQty() + ' ' + (state.product.isCap ? 'caps' : 'pcs')
+            + (s.tierLabel ? ' (' + s.tierLabel + ' tier)' : '')
+            + ' → ' + fmt(s.perPiece) + '/' + unitWord
+            + (s.ltm && s.ltm.fee > 0 ? ' incl. small-batch fee' : '');
+        var msg = {
+            token: state.handback.token || '',
+            style: state.product.style,
+            color: state.color ? state.color.name : '',
+            method: id,
+            methodLabel: def.label,
+            config: cfg,
+            qty: totalQty(),
+            perPiece: s.perPiece,
+            total: s.total,
+            tierLabel: s.tierLabel || '',
+            provenance: provenance,
+            ts: Date.now()
+        };
+        try {
+            localStorage.setItem('nwca-qq-handback', JSON.stringify(msg));
+        } catch (err) {
+            console.error('[quick-quote] handback failed:', err);
+            btn.textContent = '✗ Could not send — copy the price by hand';
+            return;
+        }
+        btn.classList.add('is-sent');
+        btn.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Sent to the order form — switch back to that tab';
+    }
+
+    // ============================================================
     // WIRING
     // ============================================================
     function wire() {
@@ -1615,6 +1672,8 @@
         $('qqResults').addEventListener('click', function (e) {
             if (e.target.closest('.qq-open-builder')) return; // builder handoff link — let the browser navigate
             if (e.target.closest('.qq-retry')) return; // retry has its own handler
+            var use = e.target.closest('.qq-use-price');
+            if (use) { sendHandback(use.getAttribute('data-id'), use); return; }
             var nudge = e.target.closest('.qq-card-nudge[data-addqty]');
             if (nudge) { // one-click "add N more" → bump qty to the next price break
                 if (state.useSizes) return;
@@ -1780,6 +1839,16 @@
             var qStyle = (qParams.get('style') || '').trim();
             var qQty = parseInt(qParams.get('qty'), 10);
             if (qQty > 0) { $('qqQty').value = qQty; state.qty = qQty; }
+            // ?from=aeo&hb=<token>&method=<emb|dtg|scp|dtf> — round-trip mode for the
+            // AE Order Intake (2026-07-11): every priced card gets a "Use on order
+            // form" button that hands {price, config} back to the intake tab via
+            // localStorage; hb echoes back so the form knows which row asked.
+            if (qParams.get('from') === 'aeo') {
+                state.handback = { token: qParams.get('hb') || '' };
+                var qMethod = qParams.get('method');
+                if (qMethod && METHODS[qMethod]) state.pinOnce = qMethod; // consumed by applyProduct
+                $('qqHandbackBar').hidden = false;
+            }
             if (qStyle) {
                 setMode('quick'); // a style deep-link means "price THIS style" — Quick Price panel
                 $('qqStyle').value = qStyle.toUpperCase();
