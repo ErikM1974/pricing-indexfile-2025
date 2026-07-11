@@ -1,3 +1,10 @@
+## v2026.07.11.1 (2026.07.11)
+
+- docs(memory): wave 8 — official 2026 org chart embedded + Team-widget link live r1622
+- docs(memory): wave 8b — org chart coded (maintainable HTML replaces image as canonical)
+- feat(forms): Forms Library page + fillable garment drop-off twin + 5 form PDFs
+- chore(git): mark *.pdf binary in .gitattributes — prevent EOL normalization corrupting form PDFs
+
 ## v2026.07.10.9 (2026.07.10)
 
 - docs(memory): wave 7 — booklet-perfect handbook PDF live r1621
