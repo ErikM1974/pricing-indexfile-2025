@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Webstore / Company Store Request - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/pages/forms/nwca-form-shared.css">
+    <link rel="stylesheet" href="/pages/forms/webstore-request-form.css">
+</head>
+<body>
+    <div class="form-toolbar no-print">
+        <a href="/dashboards/forms-library.html" class="toolbar-link">
+            <i class="fas fa-arrow-left"></i> Forms Library
+        </a>
+        <div class="toolbar-actions">
+            <button type="button" id="clearFormBtn" class="toolbar-btn toolbar-btn--ghost">
+                <i class="fas fa-eraser"></i> Clear
+            </button>
+            <button type="button" id="printFormBtn" class="toolbar-btn toolbar-btn--primary">
+                <i class="fas fa-print"></i> Print / Save as PDF
+            </button>
+        </div>
+    </div>
+
+    <div class="form-sheet">
+        <header class="form-header">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                 alt="Northwest Custom Apparel" class="form-logo">
+            <h1 class="form-title">Webstore / Company Store Request</h1>
+            <p class="form-subtitle">Everything we need to build your online company store &mdash; one sheet instead of ten emails</p>
+            <p class="form-contact">2025 Freeman Rd. E., Milton, WA 98354 &nbsp;&bull;&nbsp; 253-922-5793 &nbsp;&bull;&nbsp; www.nwcustomapparel.com</p>
+        </header>
+
+        <section class="form-section">
+            <div class="section-bar">1. Company &amp; Contact</div>
+            <div class="info-grid">
+                <div class="info-field">
+                    <label for="fldCompany">Company</label>
+                    <input type="text" id="fldCompany" autocomplete="off">
+                </div>
+                <div class="info-field">
+                    <label for="fldContact">Store contact</label>
+                    <input type="text" id="fldContact">
+                </div>
+                <div class="info-field">
+                    <label for="fldPhone">Phone</label>
+                    <input type="text" id="fldPhone">
+                </div>
+                <div class="info-field">
+                    <label for="fldEmail">Email</label>
+                    <input type="text" id="fldEmail">
+                </div>
+                <div class="info-field">
+                    <label for="fldSalesRep">Sales Rep</label>
+                    <input type="text" id="fldSalesRep">
+                </div>
+                <div class="info-field">
+                    <label for="fldLaunchDate">Target launch date</label>
+                    <input type="text" id="fldLaunchDate">
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">2. Store Type &amp; Window</div>
+            <div class="decoration-row">
+                <label class="deco-check"><input type="checkbox" id="stWindow"> Order window (opens &amp; closes)</label>
+                <label class="deco-check"><input type="checkbox" id="stAlwaysOn"> Always-on store</label>
+            </div>
+            <div class="info-grid">
+                <div class="info-field">
+                    <label for="fldOpenDate">Window opens</label>
+                    <input type="text" id="fldOpenDate">
+                </div>
+                <div class="info-field">
+                    <label for="fldCloseDate">Window closes</label>
+                    <input type="text" id="fldCloseDate">
+                </div>
+                <div class="info-field">
+                    <label for="fldHeadcount">Approx. buyers / employees</label>
+                    <input type="text" id="fldHeadcount">
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">3. Who Pays &amp; How It Ships</div>
+            <div class="decoration-row">
+                <label class="deco-check"><input type="checkbox" id="payCompany"> Company pays all</label>
+                <label class="deco-check"><input type="checkbox" id="payEmployee"> Employees pay (card at checkout)</label>
+                <label class="deco-check"><input type="checkbox" id="paySplit"> Split — company allowance</label>
+            </div>
+            <div class="info-grid">
+                <div class="info-field">
+                    <label for="fldAllowance">Allowance per employee ($, if split)</label>
+                    <input type="text" id="fldAllowance">
+                </div>
+            </div>
+            <div class="decoration-row">
+                <label class="deco-check"><input type="checkbox" id="shipBulk"> Bulk ship everything to the company</label>
+                <label class="deco-check"><input type="checkbox" id="shipIndividual"> Ship to each buyer</label>
+                <label class="deco-check"><input type="checkbox" id="shipPickup"> Pickup at NWCA</label>
+            </div>
+            <div class="info-grid">
+                <div class="info-field info-field--wide">
+                    <label for="fldShipTo">Bulk ship-to address (if applicable)</label>
+                    <input type="text" id="fldShipTo">
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">4. Products Wanted</div>
+            <p class="assist-hint no-print"><i class="fas fa-wand-magic-sparkles"></i>
+                Style # lookup fills the description and turns Color into a swatch picker. Rough list is fine — we'll confirm final lineup with mockups.</p>
+            <table class="form-table store-table" id="storeTable">
+                <thead>
+                    <tr>
+                        <th class="col-style">Style #</th>
+                        <th class="col-color">Color</th>
+                        <th class="col-desc">Description</th>
+                        <th class="col-deco">Decoration</th>
+                        <th class="col-place">Logo placement</th>
+                    </tr>
+                </thead>
+                <tbody id="storeRows">
+                    <!-- rows injected by webstore-request-form.js -->
+                </tbody>
+            </table>
+            <button type="button" id="addRowBtn" class="toolbar-btn toolbar-btn--ghost add-row-btn no-print">
+                <i class="fas fa-plus"></i> Add Row
+            </button>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">5. Logos &amp; Approval</div>
+            <div class="info-grid">
+                <div class="info-field info-field--wide">
+                    <label for="fldLogos">Logo(s) — names, link or where the files are, existing design #s</label>
+                    <input type="text" id="fldLogos">
+                </div>
+                <div class="info-field">
+                    <label for="fldApprover">Who approves mockups?</label>
+                    <input type="text" id="fldApprover">
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">6. Notes (minimums, sizes to stock, deadline context)</div>
+            <textarea id="fldNotes" class="notes-area" rows="2" aria-label="Notes"></textarea>
+        </section>
+    </div>
+
+    <script src="/config/app.config.js"></script>
+    <script src="/pages/forms/nwca-form-shared.js"></script>
+    <script src="/pages/forms/nwca-form-dates.js"></script>
+    <script src="/pages/forms/nwca-form-contacts.js"></script>
+    <script src="/pages/forms/nwca-form-styles.js"></script>
+    <script src="/pages/forms/nwca-form-save.js"></script>
+    <script src="/pages/forms/webstore-request-form.js"></script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Team Roster - Names &amp; Numbers - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/pages/forms/nwca-form-shared.css">
+    <link rel="stylesheet" href="/pages/forms/team-roster-form.css">
+</head>
+<body>
+    <div class="form-toolbar no-print">
+        <a href="/dashboards/forms-library.html" class="toolbar-link">
+            <i class="fas fa-arrow-left"></i> Forms Library
+        </a>
+        <div class="toolbar-actions">
+            <button type="button" id="clearFormBtn" class="toolbar-btn toolbar-btn--ghost">
+                <i class="fas fa-eraser"></i> Clear
+            </button>
+            <button type="button" id="printFormBtn" class="toolbar-btn toolbar-btn--primary">
+                <i class="fas fa-print"></i> Print / Save as PDF
+            </button>
+        </div>
+    </div>
+
+    <div class="form-sheet">
+        <header class="form-header">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                 alt="Northwest Custom Apparel" class="form-logo">
+            <h1 class="form-title">Team Roster — Names &amp; Numbers</h1>
+            <p class="form-subtitle">One garment per roster &mdash; names and numbers are produced EXACTLY as written below</p>
+            <p class="form-contact">2025 Freeman Rd. E., Milton, WA 98354 &nbsp;&bull;&nbsp; 253-922-5793 &nbsp;&bull;&nbsp; www.nwcustomapparel.com</p>
+        </header>
+
+        <section class="form-section">
+            <div class="section-bar">1. Order Information</div>
+            <div class="info-grid">
+                <div class="info-field">
+                    <label for="fldCompany">Company / Team</label>
+                    <input type="text" id="fldCompany" autocomplete="off">
+                </div>
+                <div class="info-field">
+                    <label for="fldContact">Contact</label>
+                    <input type="text" id="fldContact">
+                </div>
+                <div class="info-field">
+                    <label for="fldPhone">Phone</label>
+                    <input type="text" id="fldPhone">
+                </div>
+                <div class="info-field">
+                    <label for="fldEmail">Email</label>
+                    <input type="text" id="fldEmail">
+                </div>
+                <div class="info-field">
+                    <label for="fldSalesRep">Sales Rep</label>
+                    <input type="text" id="fldSalesRep">
+                </div>
+                <div class="info-field">
+                    <label for="fldDueDate">Needed By</label>
+                    <input type="text" id="fldDueDate">
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">2. Garment &amp; Personalization Spec</div>
+            <p class="assist-hint no-print"><i class="fas fa-wand-magic-sparkles"></i>
+                Style # lookup fills the description and turns Color into a swatch picker. Different garment for some players? Use a second roster sheet.</p>
+            <div class="info-grid">
+                <div class="info-field">
+                    <label for="fldStyle">Style #</label>
+                    <span id="styleCell"><input type="text" id="fldStyle" autocomplete="off"></span>
+                </div>
+                <div class="info-field" id="colorCell">
+                    <label for="fldColor">Color</label>
+                    <input type="text" id="fldColor">
+                </div>
+                <div class="info-field info-field--wide">
+                    <label for="fldDescription">Product description</label>
+                    <input type="text" id="fldDescription">
+                </div>
+                <div class="info-field">
+                    <label for="fldNamePlacement">Name placement</label>
+                    <input type="text" id="fldNamePlacement" placeholder="e.g. Upper back">
+                </div>
+                <div class="info-field">
+                    <label for="fldNumberPlacement">Number placement</label>
+                    <input type="text" id="fldNumberPlacement" placeholder="e.g. Center back 8&quot;">
+                </div>
+                <div class="info-field">
+                    <label for="fldFont">Font / Style</label>
+                    <input type="text" id="fldFont">
+                </div>
+                <div class="info-field">
+                    <label for="fldThreadColor">Thread / Print color</label>
+                    <input type="text" id="fldThreadColor">
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">3. Roster</div>
+            <table class="form-table roster-table" id="rosterTable">
+                <thead>
+                    <tr>
+                        <th class="col-n">#</th>
+                        <th class="col-name">Player / Name (exactly as produced)</th>
+                        <th class="col-number">Number</th>
+                        <th class="col-size">Size</th>
+                        <th class="col-notes">Notes</th>
+                    </tr>
+                </thead>
+                <tbody id="rosterRows">
+                    <!-- rows injected by team-roster-form.js -->
+                </tbody>
+            </table>
+            <button type="button" id="addRowBtn" class="toolbar-btn toolbar-btn--ghost add-row-btn no-print">
+                <i class="fas fa-plus"></i> Add Row
+            </button>
+            <div class="roster-tally" id="rosterTally"></div>
+        </section>
+
+        <section class="form-section">
+            <div class="waiver-box">
+                <div class="waiver-title">Spelling Verification</div>
+                <p class="waiver-text">
+                    Names and numbers will be produced <strong>exactly as written above</strong>, including capitalization.
+                    Northwest Custom Apparel is not responsible for spelling or number errors on this list once signed.
+                    Replacements for listed errors are billed at the regular garment + decoration price.
+                </p>
+            </div>
+            <div class="signature-row">
+                <div class="signature-field">
+                    <div class="signature-line"></div>
+                    <label>Customer signature</label>
+                </div>
+                <div class="signature-field">
+                    <div class="signature-line"></div>
+                    <label>Print name</label>
+                </div>
+                <div class="signature-field signature-field--date">
+                    <div class="signature-line"></div>
+                    <label>Date</label>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="/config/app.config.js"></script>
+    <script src="/pages/forms/nwca-form-shared.js"></script>
+    <script src="/pages/forms/nwca-form-dates.js"></script>
+    <script src="/pages/forms/nwca-form-contacts.js"></script>
+    <script src="/pages/forms/nwca-form-styles.js"></script>
+    <script src="/pages/forms/nwca-form-save.js"></script>
+    <script src="/pages/forms/team-roster-form.js"></script>
+</body>
+</html>

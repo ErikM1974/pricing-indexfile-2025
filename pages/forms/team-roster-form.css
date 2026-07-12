@@ -1,0 +1,33 @@
+/* team-roster-form.css — Team Roster (Names & Numbers) twin (portrait) */
+
+.info-field--wide { grid-column: span 2; }
+
+.assist-hint {
+    font-size: 0.82rem;
+    color: #555;
+    margin: 6px 0 8px;
+}
+.assist-hint .fa-wand-magic-sparkles { color: #2e6f40; margin-right: 4px; }
+
+.roster-table .col-n { width: 5%; }
+.roster-table .col-name { width: 40%; }
+.roster-table .col-number { width: 12%; }
+.roster-table .col-size { width: 13%; }
+.roster-table .col-notes { width: 30%; }
+.roster-table .cell-n {
+    text-align: center;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.roster-tally {
+    margin-top: 8px;
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: #1f4d2c;
+}
+
+@media print {
+    .roster-table td input { padding: 4px 3px; font-size: 0.78rem; }
+    .roster-tally { font-size: 0.85rem; }
+}

@@ -1,0 +1,21 @@
+/* injury-report-form.css — Employee Injury / Incident Report twin (portrait) */
+
+.waiver-box--urgent {
+    border-color: #b3261e;
+    background: #fdf1f0;
+    margin-bottom: 12px;
+}
+.waiver-box--urgent .waiver-text { color: #7a1c16; }
+.waiver-box--urgent .fa-truck-medical { margin-right: 5px; }
+
+.equip-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    align-self: center;
+    margin-right: 4px;
+}
+
+@media print {
+    .form-section { margin-top: 10px; }
+    .waiver-box--urgent { margin-bottom: 8px; }
+}

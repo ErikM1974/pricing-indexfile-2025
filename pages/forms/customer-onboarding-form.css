@@ -1,0 +1,17 @@
+/* customer-onboarding-form.css — New Customer Onboarding twin (portrait) */
+
+.info-field--wide { grid-column: span 2; }
+
+.assist-hint {
+    font-size: 0.82rem;
+    color: #555;
+    margin: 6px 0 8px;
+}
+.assist-hint .fa-wand-magic-sparkles,
+.assist-hint .fa-circle-info,
+.assist-hint .fa-list-check { color: #2e6f40; margin-right: 4px; }
+
+@media print {
+    .form-section { margin-top: 10px; }
+    .assist-hint { font-size: 0.72rem; }
+}

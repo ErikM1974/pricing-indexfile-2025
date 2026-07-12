@@ -68,6 +68,17 @@
             var notes = document.getElementById('fldPaymentNotes');
             if (terms && notes && !notes.value.trim()) notes.value = 'Terms: ' + terms;
         });
+
+        // Quick Quote round-trip: the QQ tab (opened via a row's 💰 link with
+        // ?from=aeo&hb=<row token>) writes its picked price to localStorage —
+        // the 'storage' event fires HERE, in this tab. Match the row by token
+        // (fallback: same style with a blank price) and fill it.
+        window.addEventListener('storage', function (e) {
+            if (e.key !== 'nwca-qq-handback' || !e.newValue) return;
+            var msg;
+            try { msg = JSON.parse(e.newValue); } catch (_) { return; }
+            if (msg && msg.perPiece != null) applyQqHandback(msg);
+        });
     });
 
     // ---------- rows ----------
@@ -104,7 +115,12 @@
         price.inputMode = 'decimal';
         price.className = 'row-price';
         price.setAttribute('aria-label', 'Base unit price');
-        price.addEventListener('input', function () { recalcLine(tr); });
+        price.addEventListener('input', function (e) {
+            // hand-editing the price voids the Quick Quote provenance — the
+            // chip must never claim a config that no longer matches the number
+            if (e.isTrusted && tr.dataset.pricedVia) setPriceProvenance(tr, '');
+            recalcLine(tr);
+        });
         priceTd.appendChild(price);
         tr.appendChild(priceTd);
 
@@ -196,7 +212,30 @@
         });
     }
 
-    // 💰 Quick Quote — read the REAL decorated price from the engine tool
+    // 💰 Quick Quote — read the REAL decorated price from the engine tool.
+    // Opens in round-trip mode (?from=aeo&hb=<row token>): QQ grows a "Use on
+    // order form" button that sends {price, config} back to THIS tab via
+    // localStorage (see the 'storage' listener in init) — no retyping.
+    var QQ_METHOD_FROM_CHECKBOX = [['mEmbroidery', 'emb'], ['mScreen', 'scp'], ['mDtg', 'dtg'], ['mTransfers', 'dtf']];
+
+    function qqHref(tr) {
+        var style = tr.querySelector('.cell-style input').value.trim().toUpperCase();
+        var qty = tr.querySelector('.row-qty').value.trim();
+        if (!tr.dataset.hbToken) {
+            tr.dataset.hbToken = 'hb' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+        }
+        var method = '';
+        QQ_METHOD_FROM_CHECKBOX.some(function (pair) {
+            var box = document.getElementById(pair[0]);
+            if (box && box.checked) { method = pair[1]; return true; }
+            return false;
+        });
+        return '/calculators/quick-quote/index.html?style=' + encodeURIComponent(style)
+            + (qty ? '&qty=' + encodeURIComponent(qty) : '')
+            + '&from=aeo&hb=' + encodeURIComponent(tr.dataset.hbToken)
+            + (method ? '&method=' + method : '');
+    }
+
     function ensureQqLink(tr, style) {
         var chips = tr.querySelector('.cell-sizes');
         var link = chips.querySelector('.qq-link');
@@ -207,12 +246,54 @@
             link.rel = 'noopener';
             link.innerHTML = '<i class="fas fa-sack-dollar"></i> Quick Quote';
             chips.appendChild(link);
+            // refresh at click time — qty/method may have changed since render
+            link.addEventListener('click', function () { link.href = qqHref(tr); });
         }
-        link.addEventListener('click', function () {
-            var qty = tr.querySelector('.row-qty').value || '';
-            link.href = '/calculators/quick-quote/index.html?style=' + encodeURIComponent(style) + (qty ? '&qty=' + encodeURIComponent(qty) : '');
+        link.href = qqHref(tr);
+    }
+
+    // Quick Quote sent a price back (storage event from the QQ tab). Find the
+    // row: token match first, else same style with a still-blank price.
+    function applyQqHandback(msg) {
+        var rows = Array.prototype.slice.call(document.querySelectorAll('#orderRows tr'));
+        var tr = null;
+        rows.some(function (r) {
+            if (msg.token && r.dataset.hbToken === msg.token) { tr = r; return true; }
+            return false;
         });
-        link.href = '/calculators/quick-quote/index.html?style=' + encodeURIComponent(style);
+        if (!tr) {
+            var wantStyle = String(msg.style || '').trim().toUpperCase();
+            rows.some(function (r) {
+                var s = r.querySelector('.cell-style input').value.trim().toUpperCase();
+                if (wantStyle && s === wantStyle && !r.querySelector('.row-price').value.trim()) { tr = r; return true; }
+                return false;
+            });
+        }
+        if (!tr) return;
+        var price = tr.querySelector('.row-price');
+        price.value = (Math.round(Number(msg.perPiece) * 100) / 100).toFixed(2);
+        price.dispatchEvent(new Event('input', { bubbles: true })); // money chain runs
+        setPriceProvenance(tr, msg.provenance || '');
+        tr.classList.remove('qq-row-flash');
+        void tr.offsetWidth; // restart the animation if it fired before
+        tr.classList.add('qq-row-flash');
+    }
+
+    // Gray provenance chip under the description — records WHICH Quick Quote
+    // config produced this price. Saved as payload.lines[].pricedVia and pushed
+    // into the ShopWorks order notes; screen-only (kept off the printed form).
+    function setPriceProvenance(tr, text) {
+        tr.dataset.pricedVia = text || '';
+        var cell = tr.querySelector('.cell-desc');
+        var chip = cell.querySelector('.price-prov');
+        if (!text) { if (chip) chip.remove(); return; }
+        if (!chip) {
+            chip = document.createElement('div');
+            chip.className = 'price-prov no-print';
+            cell.appendChild(chip);
+        }
+        chip.textContent = text;
+        chip.title = text;
     }
 
     function textCell(className, ariaLabel) {
@@ -286,7 +367,39 @@
                 }
             }
         }
+        updateSizePriceNote(tr);
         recalcSubtotal();
+    }
+
+    // Per-size price line — DOES print (unlike the .price-prov chip): the sheet
+    // must show the real per-size unit prices (base + Caspio upcharge) so the
+    // line-total math is auditable on paper and a rep keying the order into
+    // ShopWorks by hand types each size's actual price, not just the base.
+    // e.g. "Per pc: std $83.00 · 2XL $85.00 ×5 · 3XL $86.00 ×1 · 4XL $87.00 ×1"
+    function updateSizePriceNote(tr) {
+        var td = tr.querySelector('.cell-sizes');
+        var note = td.querySelector('.size-price-note');
+        var base = num(tr.querySelector('.row-price').value);
+        var parts = [];
+        if (base !== null && base > 0) {
+            var hasStd = false;
+            tr.querySelectorAll('.size-qty').forEach(function (el) {
+                var q = parseInt(el.value, 10);
+                if (isNaN(q) || q <= 0) return;
+                var up = parseFloat(el.dataset.upcharge) || 0;
+                if (up > 0) parts.push(el.dataset.size + ' $' + money(base + up) + ' ×' + q);
+                else hasStd = true;
+            });
+            // only worth printing when an upcharged size is in play
+            if (parts.length && hasStd) parts.unshift('std $' + money(base));
+        }
+        if (!parts.length) { if (note) note.remove(); return; }
+        if (!note) {
+            note = document.createElement('div');
+            note.className = 'size-price-note';
+            td.insertBefore(note, td.querySelector('.qq-link'));
+        }
+        note.textContent = 'Per pc: ' + parts.join(' · ');
     }
 
     function recalcSubtotal() {
@@ -426,6 +539,7 @@
             lines.push({
                 style: style, colorName: colorName, catalogColor: catalogColor, description: description,
                 basePrice: basePrice, sizes: sizes, otherSizes: otherSizes, qty: qty, lineTotal: lineTotal,
+                pricedVia: tr.dataset.pricedVia || '',
             });
         });
 

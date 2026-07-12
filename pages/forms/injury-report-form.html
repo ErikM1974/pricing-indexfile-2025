@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Employee Injury / Incident Report - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/pages/forms/nwca-form-shared.css">
+    <link rel="stylesheet" href="/pages/forms/injury-report-form.css">
+</head>
+<body>
+    <div class="form-toolbar no-print">
+        <a href="/dashboards/forms-library.html" class="toolbar-link">
+            <i class="fas fa-arrow-left"></i> Forms Library
+        </a>
+        <div class="toolbar-actions">
+            <button type="button" id="clearFormBtn" class="toolbar-btn toolbar-btn--ghost">
+                <i class="fas fa-eraser"></i> Clear
+            </button>
+            <button type="button" id="printFormBtn" class="toolbar-btn toolbar-btn--primary">
+                <i class="fas fa-print"></i> Print / Save as PDF
+            </button>
+        </div>
+    </div>
+
+    <div class="form-sheet">
+        <header class="form-header">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                 alt="Northwest Custom Apparel" class="form-logo">
+            <h1 class="form-title">Employee Injury / Incident Report</h1>
+            <p class="form-subtitle">Complete the SAME DAY as the incident &mdash; include near-misses; documentation protects everyone</p>
+            <p class="form-contact">2025 Freeman Rd. E., Milton, WA 98354 &nbsp;&bull;&nbsp; 253-922-5793</p>
+        </header>
+
+        <div class="waiver-box waiver-box--urgent">
+            <p class="waiver-text"><i class="fas fa-truck-medical"></i>
+                <strong>Emergency first, paperwork second.</strong> If an employee is hospitalized, DOSH must be notified
+                within <strong>8 hours</strong> (fatality: immediately) — call <strong>1-800-423-7233</strong>.
+                Work-related medical treatment: start a claim at Lni.wa.gov or the treating provider files it.</p>
+        </div>
+
+        <section class="form-section">
+            <div class="section-bar">1. Who &amp; When</div>
+            <div class="info-grid">
+                <div class="info-field">
+                    <label for="fldCompany">Employee name</label>
+                    <input type="text" id="fldCompany">
+                </div>
+                <div class="info-field">
+                    <label for="fldTitle">Job title</label>
+                    <input type="text" id="fldTitle">
+                </div>
+                <div class="info-field">
+                    <label for="fldDate">Date of incident</label>
+                    <input type="text" id="fldDate">
+                </div>
+                <div class="info-field">
+                    <label for="fldTime">Time</label>
+                    <input type="text" id="fldTime">
+                </div>
+                <div class="info-field">
+                    <label for="fldLocation">Where on the premises</label>
+                    <input type="text" id="fldLocation">
+                </div>
+                <div class="info-field">
+                    <label for="fldSupervisor">Supervisor notified / when</label>
+                    <input type="text" id="fldSupervisor">
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">2. What Kind of Incident</div>
+            <div class="decoration-row">
+                <label class="deco-check"><input type="checkbox" id="knInjury"> Injury</label>
+                <label class="deco-check"><input type="checkbox" id="knNearMiss"> Near-miss (no injury)</label>
+                <label class="deco-check"><input type="checkbox" id="knProperty"> Property / equipment damage</label>
+            </div>
+            <div class="decoration-row">
+                <span class="equip-label">Equipment involved:</span>
+                <label class="deco-check"><input type="checkbox" id="eqEmb"> Embroidery machine</label>
+                <label class="deco-check"><input type="checkbox" id="eqKornit"> Kornit DTG</label>
+                <label class="deco-check"><input type="checkbox" id="eqHeatPress"> Heat press</label>
+                <label class="deco-check"><input type="checkbox" id="eqLaser"> Laser</label>
+                <label class="deco-check"><input type="checkbox" id="eqRoland"> Roland printer</label>
+                <label class="deco-check"><input type="checkbox" id="eqCompressor"> Air compressor</label>
+                <label class="deco-check deco-check--other">
+                    <input type="checkbox" id="eqOther"> Other
+                    <input type="text" id="eqOtherText" class="deco-other-text" aria-label="Other equipment">
+                </label>
+            </div>
+            <div class="info-grid">
+                <div class="info-field">
+                    <label for="fldBodyPart">Body part(s) affected</label>
+                    <input type="text" id="fldBodyPart">
+                </div>
+                <div class="info-field">
+                    <label for="fldWitnesses">Witnesses</label>
+                    <input type="text" id="fldWitnesses">
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">3. What Happened (be specific — what, how, why)</div>
+            <textarea id="fldWhatHappened" class="notes-area" rows="3" aria-label="What happened"></textarea>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">4. Response &amp; Treatment</div>
+            <div class="decoration-row">
+                <label class="deco-check"><input type="checkbox" id="rsFirstAid"> First aid given on site</label>
+                <label class="deco-check"><input type="checkbox" id="rsMedical"> Medical treatment sought</label>
+                <label class="deco-check"><input type="checkbox" id="rsDeclined"> Treatment offered &amp; declined</label>
+                <label class="deco-check"><input type="checkbox" id="rsWorkMissed"> Time / work missed</label>
+            </div>
+            <div class="info-grid">
+                <div class="info-field">
+                    <label for="fldFirstAidBy">First aid by</label>
+                    <input type="text" id="fldFirstAidBy">
+                </div>
+                <div class="info-field">
+                    <label for="fldTreatedAt">Treated at (clinic / hospital)</label>
+                    <input type="text" id="fldTreatedAt">
+                </div>
+                <div class="info-field">
+                    <label for="fldClaim">L&amp;I claim # (if filed)</label>
+                    <input type="text" id="fldClaim">
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">5. Corrective Action (what prevents this happening again?)</div>
+            <textarea id="fldCorrective" class="notes-area" rows="2" aria-label="Corrective action"></textarea>
+        </section>
+
+        <section class="form-section">
+            <div class="signature-row">
+                <div class="signature-field">
+                    <div class="signature-line"></div>
+                    <label>Employee signature</label>
+                </div>
+                <div class="signature-field">
+                    <div class="signature-line"></div>
+                    <label>Supervisor signature</label>
+                </div>
+                <div class="signature-field signature-field--date">
+                    <div class="signature-line"></div>
+                    <label>Date</label>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="/config/app.config.js"></script>
+    <script src="/pages/forms/nwca-form-shared.js"></script>
+    <script src="/pages/forms/nwca-form-dates.js"></script>
+    <script src="/pages/forms/nwca-form-save.js"></script>
+    <script src="/pages/forms/injury-report-form.js"></script>
+</body>
+</html>

@@ -498,3 +498,12 @@ button.qq-card-nudge:focus-visible { outline: 2px solid var(--qq-green); outline
     color: #fff;
     text-decoration: none;
 }
+
+/* ===== Order-form handback mode (?from=aeo — AE Order Intake round-trip, 2026-07-11) ===== */
+/* [hidden] pairing is REQUIRED: display:flex on the class would beat the UA hidden rule */
+.qq-handback-bar { display: flex; align-items: flex-start; gap: 8px; font-size: 12.5px; color: var(--qq-green-dark); background: var(--qq-green-tint); border: 1px solid var(--qq-green); border-radius: var(--qq-radius-sm); padding: 8px 12px; margin-bottom: 12px; line-height: 1.45; }
+.qq-handback-bar[hidden] { display: none; }
+.qq-handback-bar i { margin-top: 2px; }
+.qq-use-price { display: block; width: 100%; margin-top: 8px; border: none; border-radius: 7px; padding: 7px 10px; font-family: inherit; font-size: 12.5px; font-weight: 600; text-align: center; cursor: pointer; color: #fff; background: var(--qq-green); }
+.qq-use-price:hover { background: var(--qq-green-dark); }
+.qq-use-price.is-sent { background: var(--qq-green-tint); color: var(--qq-green-dark); border: 1px solid var(--qq-green); cursor: default; }
