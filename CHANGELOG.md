@@ -1,3 +1,7 @@
+## v2026.07.12.9 (2026.07.12)
+
+- feat(seo): Organization schema w/ sameAs → nwcustomapparel.net (entity stitching)
+
 ## v2026.07.12.8 (2026.07.12)
 
 - feat(seo): product pages visible to search — hybrid-SSR heads + Product schema + /sitemap-products.xml (569 styles)
