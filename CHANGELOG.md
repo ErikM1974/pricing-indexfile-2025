@@ -1,3 +1,7 @@
+## v2026.07.12.2 (2026.07.12)
+
+- fix(cc-auth): print fits ONE Letter page — compact print layer
+
 ## v2026.07.12.1 (2026.07.12)
 
 - feat(forms): Credit Card Authorization 2026 — PCI-safe twin replaces the 2015 PDF
