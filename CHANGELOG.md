@@ -1,3 +1,8 @@
+## v2026.07.12.3 (2026.07.12)
+
+- feat(public): customer lead forms — Request a Quote + Company Store Inquiry + roster in footer
+- Deploy v2026.07.12.3: cache-bust public-form + inbox assets
+
 ## v2026.07.12.2 (2026.07.12)
 
 - fix(cc-auth): print fits ONE Letter page — compact print layer
