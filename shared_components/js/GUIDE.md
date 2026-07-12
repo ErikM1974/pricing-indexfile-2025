@@ -272,3 +272,6 @@
 - `features-bundle.js` — unreferenced Phase 2 feature experiment (never loaded)
 - `hero-quantity-calculator.js` — unreferenced cap embroidery quantity UX (never loaded)
 - `pricing-matrix-capture-fix.js` — unreferenced DTG matrix capture workaround (superseded)
+
+## blog-teaser.js (2026-07-12)
+Homepage "From the blog" section (index.html). Fetches the 3 newest Published posts from the proxy's public `/api/blog-posts` and renders blog.css cards into `#blogTeaserGrid`; the `#blogTeaser` section stays `[hidden]` unless posts actually render (failed/empty fetch = untouched homepage). Needs `/config/app.config.js` loaded first. The SSR `/blog` pages carry the SEO — this is décor only.

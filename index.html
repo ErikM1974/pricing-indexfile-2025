@@ -30,6 +30,7 @@
     <link rel="stylesheet" href="catalog-search.css?v=4">
     <link rel="stylesheet" href="/shared_components/css/nwca-2026-core.css?v=2026.07.01.1">
     <link rel="stylesheet" href="/shared_components/css/nwca-2026.css?v=2026.06.12.5">
+    <link rel="stylesheet" href="/shared_components/css/blog.css?v=2026.07.12.4">
 </head>
 <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -102,6 +103,9 @@
                 </li>
                 <li class="nav-item">
                     <a href="/pages/webstore-info.html" class="nav-link">Webstores</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/blog" class="nav-link">Blog</a>
                 </li>
                 <li class="nav-item">
                     <a href="/pages/request-a-quote.html" class="nav-link">Get a Quote</a>
@@ -505,6 +509,18 @@
         </div>
     </main>
 
+    <!-- From the Blog — client-fetched teaser (the SSR /blog pages carry the SEO);
+         stays hidden until posts load so an empty/failed fetch shows nothing -->
+    <section class="blog-teaser" id="blogTeaser" hidden>
+        <div class="blog-teaser-inner">
+            <div class="blog-teaser-head">
+                <h2>From the blog</h2>
+                <a href="/blog" class="blog-teaser-all">All posts →</a>
+            </div>
+            <div class="blog-grid" id="blogTeaserGrid"></div>
+        </div>
+    </section>
+
     <footer class="site-footer">
         <div class="footer-inner">
             <div class="footer-brand">
@@ -530,6 +546,7 @@
                     <li><a href="/pages/webstore-info.html">Custom Webstores</a></li>
                     <li><a href="/pages/webstore-inquiry.html">Start a Company Store</a></li>
                     <li><a href="/pages/forms/team-roster-form.html">Team Roster — Names &amp; Numbers</a></li>
+                    <li><a href="/blog">Blog</a></li>
                     <li><a href="/calculators/laser-tumbler-polarcamel.html">Laser-Engraved Tumblers</a></li>
                 </ul>
             </div>
@@ -564,5 +581,7 @@
     <script src="home-2026.js?v=2026.06.11.4" defer></script>
     <!-- Quote-cart badge auto-wires from the stored cart (self-init on [data-quote-badge]). -->
     <script src="/shared_components/js/quote-cart-store.js?v=2026.07.04.2" defer></script>
+    <script src="/config/app.config.js" defer></script>
+    <script src="/shared_components/js/blog-teaser.js?v=2026.07.12.4" defer></script>
 </body>
 </html>

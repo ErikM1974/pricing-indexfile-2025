@@ -147,6 +147,12 @@ dotenv.config();
 //   L543  GET  /crm-logout
 //   L553  GET  /dashboards/{taneisha,nika,house}-*.html (role-gated)
 //
+// BLOG (server-rendered for SEO; posts = Caspio Blog_Posts via proxy) (2026-07-12)
+//   L~3300 GET  /blog · /blog/:slug — SSR pages (5-min cache, marked+xss)
+//          GET  /blog/feed.xml · /sitemap-blog.xml
+//          POST /api/blog-preview (requireStaff — Blog Editor live preview)
+//          ALL  /api/crm-proxy/blog-posts* — editor writes/drafts (any staff; ~L3236)
+//
 // STATIC FILE SERVING
 //   /robots.txt — staff/internal dirs + credential share-links disallowed (2026-06-11)
 //   GET /api/tenants/:id/config — runtime tenant config for config/tenant.js
@@ -512,6 +518,8 @@ const CSP_DIRECTIVES = {
     'https://www.jotform.com',
     'https://form.jotform.com',
     'https://www.youtube.com',
+    'https://www.youtube-nocookie.com', // blog post video embeds (lib/blog.js builds these)
+    'https://player.vimeo.com',         // blog post video embeds
     'https://fast.wistia.net',
   ],
   frameAncestors: ["'self'"],
@@ -3229,6 +3237,12 @@ app.all('/api/crm-proxy/customer-rewards*', ...createCrmProxy('customer-rewards'
 const [, formSubmissionsForwarder] = createCrmProxy('form-submissions', []);
 app.all('/api/crm-proxy/form-submissions*', requireStaff, formSubmissionsForwarder);
 
+// Blog Editor (dashboards/blog-editor.html) — staff write posts through this
+// forwarder (adds the CRM secret the proxy's gateWritesOnly demands; also lets
+// the editor list/read Drafts, which the public blog-posts endpoint hides).
+const [, blogPostsForwarder] = createCrmProxy('blog-posts', []);
+app.all('/api/crm-proxy/blog-posts*', requireStaff, blogPostsForwarder);
+
 // =============================================================================
 // POLICIES HUB AI ASSIST — streaming proxy to caspio-pricing-proxy.
 // The actual Claude API call lives on the proxy (where ANTHROPIC_API_KEY is
@@ -3286,6 +3300,63 @@ console.log('✓ CRM API proxy routes loaded (session-protected)');
 // robots.txt — staff/internal paths + credential-bearing share links disallowed (2026-06-11)
 app.get('/robots.txt', (req, res) => {
   res.sendFile(path.join(__dirname, 'robots.txt'));
+});
+
+// =============================================================================
+// BLOG — server-rendered for SEO (2026-07-12). Posts live in Caspio Blog_Posts
+// (Erik publishes via /dashboards/blog-editor.html — no deploy); lib/blog.js
+// fetches through the proxy with a 5-min cache and renders markdown → safe
+// HTML (marked + xss allowlist; YouTube/Vimeo embeds built server-side).
+// Routes: GET /blog · GET /blog/feed.xml · GET /sitemap-blog.xml ·
+//         GET /blog/:slug · POST /api/blog-preview (staff — editor live preview)
+// =============================================================================
+const blog = require('./lib/blog');
+const blogTemplates = require('./lib/blog-templates');
+
+app.get('/blog', async (req, res) => {
+  try {
+    const posts = await blog.listPublished();
+    const category = String(req.query.category || '').slice(0, 60);
+    res.type('html').send(blogTemplates.renderIndex(posts, { category }));
+  } catch (e) {
+    console.error('[blog] index failed:', e.message);
+    res.status(503).type('html').send('<h1>Blog temporarily unavailable</h1><p>Please try again in a minute.</p>');
+  }
+});
+
+app.get('/blog/feed.xml', async (req, res) => {
+  try {
+    res.type('application/rss+xml').send(blogTemplates.renderFeed(await blog.listPublished()));
+  } catch (e) { res.status(503).send('feed unavailable'); }
+});
+
+app.get('/sitemap-blog.xml', async (req, res) => {
+  try {
+    res.type('application/xml').send(blogTemplates.renderSitemap(await blog.listPublished()));
+  } catch (e) { res.status(503).send('sitemap unavailable'); }
+});
+
+app.get('/blog/:slug', async (req, res) => {
+  try {
+    const post = await blog.getPublished(String(req.params.slug || ''));
+    if (!post) {
+      return res.status(404).type('html').send(
+        '<h1>Post not found</h1><p><a href="/blog">Back to the blog</a></p>');
+    }
+    const all = await blog.listPublished();
+    const related = all.filter((p) => p.slug !== post.slug &&
+      (!post.category || p.category === post.category)).slice(0, 3);
+    res.type('html').send(blogTemplates.renderPost(post, blog.renderMarkdown(post.bodyMarkdown), related));
+  } catch (e) {
+    console.error('[blog] post failed:', e.message);
+    res.status(503).type('html').send('<h1>Blog temporarily unavailable</h1><p>Please try again in a minute.</p>');
+  }
+});
+
+// Editor live preview — SAME renderer as the live pages so preview never lies.
+// Staff-only (it renders arbitrary markdown; keep it off the public surface).
+app.post('/api/blog-preview', requireStaff, express.json({ limit: '256kb' }), (req, res) => {
+  res.json({ html: blog.renderMarkdown(String((req.body || {}).markdown || '')) });
 });
 
 // ── Tenant config (roadmap 0.3) ─────────────────────────────────────────────
