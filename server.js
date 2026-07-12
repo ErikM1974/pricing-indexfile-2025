@@ -3302,6 +3302,12 @@ app.get('/robots.txt', (req, res) => {
   res.sendFile(path.join(__dirname, 'robots.txt'));
 });
 
+// Google Search Console ownership proof (2026-07-12) — NEVER remove: GSC
+// re-checks periodically and the property un-verifies if this 404s.
+app.get('/google9a8dd44e58634cb7.html', (req, res) => {
+  res.type('text/html').send('google-site-verification: google9a8dd44e58634cb7.html');
+});
+
 // =============================================================================
 // BLOG — server-rendered for SEO (2026-07-12). Posts live in Caspio Blog_Posts
 // (Erik publishes via /dashboards/blog-editor.html — no deploy); lib/blog.js
