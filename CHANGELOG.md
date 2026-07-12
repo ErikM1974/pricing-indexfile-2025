@@ -1,3 +1,7 @@
+## v2026.07.12.6 (2026.07.12)
+
+- feat(dashboard): Blog Editor link in Administration section
+
 ## v2026.07.12.5 (2026.07.12)
 
 - feat(seo): Google Search Console ownership proof route
