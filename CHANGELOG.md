@@ -1,3 +1,7 @@
+## v2026.07.12.4 (2026.07.12)
+
+- feat(blog): server-rendered blog + staff editor — SEO-first, posts in Caspio, publish without deploys
+
 ## v2026.07.12.3 (2026.07.12)
 
 - feat(public): customer lead forms — Request a Quote + Company Store Inquiry + roster in footer
