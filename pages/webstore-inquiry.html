@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Store Inquiry - Northwest Custom Apparel</title>
+    <meta name="description" content="Tell us about the online company store you want — window or always-on, who pays, what products. We'll design it with you.">
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/pages/forms/nwca-form-shared.css">
+    <link rel="stylesheet" href="/pages/request-a-quote.css">
+</head>
+<body>
+    <div class="public-topbar">
+        <a href="/pages/webstore-info.html" class="public-home"><i class="fas fa-arrow-left"></i> About company stores</a>
+        <span class="public-phone"><i class="fas fa-phone"></i> 253-922-5793</span>
+    </div>
+
+    <div class="form-sheet">
+        <header class="form-header">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                 alt="Northwest Custom Apparel" class="form-logo">
+            <h1 class="form-title">Company Store Inquiry</h1>
+            <p class="form-subtitle">Tell us about the store you have in mind &mdash; we'll come back with a plan and examples</p>
+            <p class="form-contact">Family owned since 1977 &nbsp;&bull;&nbsp; Milton, WA &nbsp;&bull;&nbsp; 253-922-5793 &nbsp;&bull;&nbsp; sales@nwcustomapparel.com</p>
+        </header>
+
+        <div class="hp-wrap" aria-hidden="true"><label for="hpWebsite">Website</label><input type="text" id="hpWebsite" tabindex="-1" autocomplete="off"></div>
+
+        <section class="form-section">
+            <div class="section-bar">1. How do we reach you?</div>
+            <div class="info-grid">
+                <div class="info-field">
+                    <label for="fldName">Your name <span class="req">*</span></label>
+                    <input type="text" id="fldName" autocomplete="name">
+                </div>
+                <div class="info-field">
+                    <label for="fldCompany">Company / Organization <span class="req">*</span></label>
+                    <input type="text" id="fldCompany" autocomplete="organization">
+                </div>
+                <div class="info-field">
+                    <label for="fldEmail">Email <span class="req">*</span></label>
+                    <input type="text" id="fldEmail" inputmode="email" autocomplete="email">
+                </div>
+                <div class="info-field">
+                    <label for="fldPhone">Phone</label>
+                    <input type="text" id="fldPhone" inputmode="tel" autocomplete="tel">
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">2. The store you're picturing</div>
+            <div class="decoration-row">
+                <span class="type-label">Type:</span>
+                <label class="deco-check"><input type="checkbox" id="stWindow"> Order window (opens, then closes)</label>
+                <label class="deco-check"><input type="checkbox" id="stAlwaysOn"> Always-open store</label>
+                <label class="deco-check"><input type="checkbox" id="stNotSure"> Not sure yet</label>
+            </div>
+            <div class="decoration-row">
+                <span class="type-label">Who pays:</span>
+                <label class="deco-check"><input type="checkbox" id="payCompany"> Company pays</label>
+                <label class="deco-check"><input type="checkbox" id="payEmployee"> Employees pay at checkout</label>
+                <label class="deco-check"><input type="checkbox" id="paySplit"> Mix (company allowance)</label>
+            </div>
+            <div class="info-grid">
+                <div class="info-field">
+                    <label for="fldHeadcount">Roughly how many people would order?</label>
+                    <input type="text" id="fldHeadcount" inputmode="numeric" placeholder="e.g. 45">
+                </div>
+                <div class="info-field">
+                    <label for="fldLaunch">When would you like it live?</label>
+                    <input type="text" id="fldLaunch" placeholder="date or 'flexible'">
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">3. Products &amp; logos</div>
+            <div class="info-field info-field--full">
+                <label for="fldProducts">What would you like in the store? <span class="hint">(rough list is perfect — polos, hoodies, caps…)</span></label>
+                <textarea id="fldProducts" class="notes-area" rows="2" placeholder="e.g. polos and quarter-zips with the company logo, maybe beanies for winter"></textarea>
+            </div>
+            <div class="info-field info-field--full">
+                <label for="fldNotes">Anything else we should know? <span class="hint">(logos you have, sizes to stock, questions)</span></label>
+                <textarea id="fldNotes" class="notes-area" rows="2"></textarea>
+            </div>
+        </section>
+
+        <div class="public-submit-row">
+            <button type="button" id="submitStoreBtn" class="public-submit"><i class="fas fa-paper-plane"></i> Send my store inquiry</button>
+            <p class="public-privacy">We only use this to reply about your store — no mailing lists, no spam.</p>
+        </div>
+
+        <div class="public-success" hidden>
+            <i class="fas fa-circle-check success-icon"></i>
+            <h2>Got it — thank you!</h2>
+            <p>Your inquiry is in (reference <strong class="public-success-ref"></strong>) and we'll get back to you
+               within one business day with a plan. Sooner? Call <a href="tel:253-922-5793">253-922-5793</a>.</p>
+            <p><a href="/">&larr; Back to nwcustomapparel.com</a></p>
+        </div>
+    </div>
+
+    <script src="/config/app.config.js"></script>
+    <script src="/pages/forms/nwca-form-dates.js"></script>
+    <script src="/pages/forms/nwca-public-form.js"></script>
+    <script src="/pages/webstore-inquiry.js"></script>
+</body>
+</html>

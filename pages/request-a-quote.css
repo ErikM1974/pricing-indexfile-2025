@@ -1,0 +1,76 @@
+/* request-a-quote.css — public customer lead form (shares nwca-form-shared.css) */
+
+.public-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #2e6f40;
+    color: #fff;
+    padding: 10px 18px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+.public-topbar a { color: #fff; text-decoration: none; }
+.public-topbar a:hover { text-decoration: underline; }
+
+.req { color: #b3261e; }
+.hint { font-weight: 400; font-size: 0.72rem; color: #777; }
+.type-label { font-size: 0.85rem; font-weight: 600; align-self: center; margin-right: 4px; }
+.info-field--full { margin-top: 4px; }
+
+/* honeypot — visually gone, still in the DOM for bots */
+.hp-wrap { position: absolute; left: -9999px; top: -9999px; height: 1px; overflow: hidden; }
+
+.upload-row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.upload-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: #fff;
+    border: 1.5px solid #2e6f40;
+    color: #1f4d2c;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+.upload-btn:hover { background: #eef6f0; }
+.upload-status { font-size: 0.8rem; color: #555; flex: 1; min-width: 220px; }
+.upload-status .ok { color: #2e6f40; }
+
+.public-submit-row { text-align: center; margin-top: 22px; }
+.public-submit {
+    background: #2e6f40;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 14px 34px;
+    font: inherit;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+.public-submit:hover { background: #1f4d2c; }
+.public-submit:disabled { opacity: 0.6; cursor: default; }
+.public-privacy { font-size: 0.75rem; color: #777; margin-top: 8px; }
+
+.public-form-banner {
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.92rem;
+    font-weight: 500;
+    margin-bottom: 14px;
+}
+.public-form-banner.is-error { border: 2px solid #b3261e; background: #fdf1f0; color: #7a1c16; }
+.public-form-banner.is-ok { border: 2px solid #2e6f40; background: #eef6f0; color: #1f4d2c; }
+
+.public-success { text-align: center; padding: 30px 10px 20px; }
+.public-success .success-icon { font-size: 3rem; color: #2e6f40; }
+.public-success h2 { margin: 12px 0 6px; }
+.public-success p { color: #444; max-width: 520px; margin: 6px auto; }
+.public-success a { color: #1f4d2c; font-weight: 600; }
+
+@media (max-width: 700px) {
+    .public-submit { width: 100%; }
+}
