@@ -1,3 +1,8 @@
+## v2026.07.12.1 (2026.07.12)
+
+- feat(forms): Credit Card Authorization 2026 — PCI-safe twin replaces the 2015 PDF
+- Deploy v2026.07.12.1: cache-bust forms-inbox assets
+
 ## v2026.07.11.8 (2026.07.11)
 
 - feat(forms): Quick Quote ↔ AE intake round-trip — send engine price back to the row with provenance
