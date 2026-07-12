@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Blog Editor - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- 2026 design tokens (must load before dash-shell.css) -->
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css">
+    <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
+    <link rel="stylesheet" href="/shared_components/css/blog.css">
+    <link rel="stylesheet" href="/dashboards/css/blog-editor.css">
+</head>
+<body>
+    <div class="dash-shell">
+        <header class="dash-header">
+            <div class="dash-header-left">
+                <a href="/staff-dashboard.html" title="Back to Staff Dashboard">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                         alt="Northwest Custom Apparel" class="dash-header-logo">
+                </a>
+                <h1 class="dash-header-title">Blog Editor</h1>
+            </div>
+            <div class="dash-header-right">
+                <a href="/blog" target="_blank" rel="noopener" class="dash-back-link">
+                    <i class="fas fa-up-right-from-square"></i>
+                    View live blog
+                </a>
+                <a href="/staff-dashboard.html" class="dash-back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    Dashboard
+                </a>
+            </div>
+        </header>
+
+        <main class="dash-content">
+            <div class="dash-error-banner" role="alert">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span class="dash-error-text"></span>
+            </div>
+
+            <!-- ===== Post list ===== -->
+            <section id="listView">
+                <div class="be-list-head">
+                    <h2>Posts</h2>
+                    <button type="button" id="newPostBtn" class="be-btn be-btn--primary">
+                        <i class="fas fa-plus"></i> New post
+                    </button>
+                </div>
+                <div id="postList" class="be-list dash-loading">Loading posts…</div>
+            </section>
+
+            <!-- ===== Editor ===== -->
+            <section id="editorView" hidden>
+                <div class="be-editor-head">
+                    <button type="button" id="backToListBtn" class="be-btn be-btn--ghost">
+                        <i class="fas fa-arrow-left"></i> All posts
+                    </button>
+                    <div class="be-editor-actions">
+                        <span id="saveState" class="be-save-state"></span>
+                        <button type="button" id="saveDraftBtn" class="be-btn">Save draft</button>
+                        <button type="button" id="publishBtn" class="be-btn be-btn--primary">
+                            <i class="fas fa-bullhorn"></i> Publish
+                        </button>
+                        <button type="button" id="unpublishBtn" class="be-btn be-btn--warn" hidden>Unpublish</button>
+                        <a id="viewLiveLink" class="be-btn be-btn--ghost" target="_blank" rel="noopener" hidden>
+                            <i class="fas fa-up-right-from-square"></i> View live
+                        </a>
+                    </div>
+                </div>
+
+                <div class="be-grid">
+                    <div class="be-fields">
+                        <label class="be-label" for="fldTitle">Title</label>
+                        <input type="text" id="fldTitle" class="be-input" placeholder="e.g. Embroidery vs. Screen Printing: Which Is Right for Your Team?">
+
+                        <label class="be-label" for="fldSlug">URL slug <span class="be-hint" id="slugHint">/blog/…</span></label>
+                        <input type="text" id="fldSlug" class="be-input be-input--mono" placeholder="auto-generates from the title">
+                        <p class="be-note" id="slugLockNote" hidden><i class="fas fa-lock"></i> Slug is permanent once published (search engines index the URL).</p>
+
+                        <label class="be-label" for="fldMeta">Meta description <span class="be-hint"><span id="metaCount">0</span>/155 — this is the Google snippet</span></label>
+                        <textarea id="fldMeta" class="be-input" rows="2" maxlength="255" placeholder="One or two sentences that make someone click."></textarea>
+
+                        <div class="be-row">
+                            <div>
+                                <label class="be-label" for="fldCategory">Category</label>
+                                <input type="text" id="fldCategory" class="be-input" list="beCategories" placeholder="Guides / News / Behind the Scenes">
+                                <datalist id="beCategories"></datalist>
+                            </div>
+                            <div>
+                                <label class="be-label" for="fldAuthor">Author</label>
+                                <input type="text" id="fldAuthor" class="be-input" placeholder="Northwest Custom Apparel">
+                            </div>
+                        </div>
+
+                        <label class="be-label">Hero image</label>
+                        <div class="be-hero-row">
+                            <img id="heroPreview" class="be-hero-preview" alt="" hidden>
+                            <div class="be-hero-controls">
+                                <label class="be-btn" for="fldHeroFile"><i class="fas fa-image"></i> Upload image</label>
+                                <input type="file" id="fldHeroFile" accept="image/*" hidden>
+                                <input type="text" id="fldHeroUrl" class="be-input be-input--mono" placeholder="…or paste an image URL">
+                            </div>
+                        </div>
+
+                        <label class="be-label" for="fldBody">Post body <span class="be-hint">Markdown — use the toolbar; paste a YouTube/Vimeo link on its own line to embed it</span></label>
+                        <div class="be-toolbar" role="toolbar" aria-label="Formatting">
+                            <button type="button" data-md="bold" title="Bold"><i class="fas fa-bold"></i></button>
+                            <button type="button" data-md="italic" title="Italic"><i class="fas fa-italic"></i></button>
+                            <button type="button" data-md="h2" title="Section heading">H2</button>
+                            <button type="button" data-md="h3" title="Sub-heading">H3</button>
+                            <button type="button" data-md="ul" title="Bullet list"><i class="fas fa-list-ul"></i></button>
+                            <button type="button" data-md="link" title="Link"><i class="fas fa-link"></i></button>
+                            <button type="button" data-md="quote" title="Quote"><i class="fas fa-quote-left"></i></button>
+                            <label class="be-toolbar-upload" for="fldBodyImage" title="Insert image"><i class="fas fa-image"></i></label>
+                            <input type="file" id="fldBodyImage" accept="image/*" hidden>
+                        </div>
+                        <textarea id="fldBody" class="be-input be-body" rows="18" placeholder="Write like you're explaining it to a customer at the counter…"></textarea>
+                    </div>
+
+                    <div class="be-preview-col">
+                        <div class="be-preview-head">Live preview <span class="be-hint">(exactly what the published page renders)</span></div>
+                        <div class="be-google">
+                            <div class="be-google-title" id="gTitle">Post title | Northwest Custom Apparel</div>
+                            <div class="be-google-url" id="gUrl">www.teamnwca.com/blog/…</div>
+                            <div class="be-google-desc" id="gDesc">Meta description preview…</div>
+                        </div>
+                        <div id="previewPane" class="blog-prose be-preview"></div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="/config/app.config.js"></script>
+    <script src="/shared_components/js/fetch-timeout.js"></script>
+    <script src="/shared_components/js/dash-page-helpers.js"></script>
+    <script src="/dashboards/js/blog-editor.js"></script>
+</body>
+</html>
