@@ -367,7 +367,39 @@
                 }
             }
         }
+        updateSizePriceNote(tr);
         recalcSubtotal();
+    }
+
+    // Per-size price line — DOES print (unlike the .price-prov chip): the sheet
+    // must show the real per-size unit prices (base + Caspio upcharge) so the
+    // line-total math is auditable on paper and a rep keying the order into
+    // ShopWorks by hand types each size's actual price, not just the base.
+    // e.g. "Per pc: std $83.00 · 2XL $85.00 ×5 · 3XL $86.00 ×1 · 4XL $87.00 ×1"
+    function updateSizePriceNote(tr) {
+        var td = tr.querySelector('.cell-sizes');
+        var note = td.querySelector('.size-price-note');
+        var base = num(tr.querySelector('.row-price').value);
+        var parts = [];
+        if (base !== null && base > 0) {
+            var hasStd = false;
+            tr.querySelectorAll('.size-qty').forEach(function (el) {
+                var q = parseInt(el.value, 10);
+                if (isNaN(q) || q <= 0) return;
+                var up = parseFloat(el.dataset.upcharge) || 0;
+                if (up > 0) parts.push(el.dataset.size + ' $' + money(base + up) + ' ×' + q);
+                else hasStd = true;
+            });
+            // only worth printing when an upcharged size is in play
+            if (parts.length && hasStd) parts.unshift('std $' + money(base));
+        }
+        if (!parts.length) { if (note) note.remove(); return; }
+        if (!note) {
+            note = document.createElement('div');
+            note.className = 'size-price-note';
+            td.insertBefore(note, td.querySelector('.qq-link'));
+        }
+        note.textContent = 'Per pc: ' + parts.join(' · ');
     }
 
     function recalcSubtotal() {
