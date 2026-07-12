@@ -147,6 +147,10 @@ dotenv.config();
 //   L543  GET  /crm-logout
 //   L553  GET  /dashboards/{taneisha,nika,house}-*.html (role-gated)
 //
+// PRODUCT SEO (2026-07-12): /product[.html]?style= = hybrid-SSR head injection
+//   (per-product title/meta/canonical/OG/JSON-LD, fail-open) ~L2882;
+//   GET /sitemap-products.xml — one URL per unique style (proxy /api/all-styles)
+//
 // BLOG (server-rendered for SEO; posts = Caspio Blog_Posts via proxy) (2026-07-12)
 //   L~3300 GET  /blog · /blog/:slug — SSR pages (5-min cache, marked+xss)
 //          GET  /blog/feed.xml · /sitemap-blog.xml
@@ -2878,16 +2882,44 @@ async function rebuildTdtQuote(colorConfigs, orderSettings, customerData) {
   return { quote, tax, config, shipping: shipResolved };
 }
 
-// Serve product.html routes BEFORE static middleware to avoid conflicts
-app.get('/product', (req, res) => {
-  console.log('Serving product.html page');
-  res.sendFile(path.join(__dirname, 'product.html'));
-});
+// Serve product.html routes BEFORE static middleware to avoid conflicts.
+// SEO hybrid-SSR (2026-07-12): when ?style= is present, the static file goes
+// out with a per-product <title>/meta/canonical/OG + Product JSON-LD injected
+// (lib/product-seo.js, 10-min cache) — same pattern as /blog. The client JS
+// runs unchanged. ANY failure serves the untouched static file (fail-open).
+const productSeo = require('./lib/product-seo');
+const productHtmlPath = path.join(__dirname, 'product.html');
 
-// Also serve product.html when accessed with .html extension
-app.get('/product.html', (req, res) => {
-  console.log('Serving product.html page (with .html extension)');
-  res.sendFile(path.join(__dirname, 'product.html'));
+async function serveProductPage(req, res) {
+  const style = String(req.query.style || req.query.StyleNumber || '').trim();
+  if (style) {
+    try {
+      const head = await productSeo.headForStyle(style);
+      if (head) {
+        const html = await fs.promises.readFile(productHtmlPath, 'utf8');
+        res.set('Cache-Control', 'public, max-age=300');
+        return res.type('html').send(productSeo.injectHead(html, head));
+      }
+    } catch (e) {
+      console.error('[product-seo] injection failed (serving static):', e.message);
+    }
+  }
+  res.sendFile(productHtmlPath);
+}
+
+app.get('/product', serveProductPage);
+app.get('/product.html', serveProductPage);
+
+// Product sitemap — one URL per unique style (proxy /api/all-styles, cached).
+// Referenced from robots.txt; submitted in Google Search Console.
+app.get('/sitemap-products.xml', async (req, res) => {
+  try {
+    const styles = await productSeo.listStyles();
+    res.type('application/xml').send(productSeo.renderProductSitemap(styles));
+  } catch (e) {
+    console.error('[product-seo] sitemap failed:', e.message);
+    res.status(503).send('sitemap unavailable');
+  }
 });
 
 // Removed duplicate routes - these pages are now served from /pages/ directory (see lines 342-347)
