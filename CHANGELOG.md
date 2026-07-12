@@ -1,3 +1,10 @@
+## v2026.07.11.8 (2026.07.11)
+
+- feat(forms): Quick Quote ↔ AE intake round-trip — send engine price back to the row with provenance
+- feat(ae-intake): printable per-size price line — 'Per pc: std $83.00 · 2XL $85.00 ×5 …' under the size chips
+- feat(forms): batch 2 — 7 fill-online forms: onboarding, team roster, webstore request, credit app, tax-exempt cert, PTO, injury report
+- Deploy v2026.07.11.8: cache-bust ?v= (quick-quote, ae-order-intake, forms-inbox)
+
 ## v2026.07.11.7 (2026.07.11)
 
 - fix(forms): AE form hotfix — swatch grid [hidden] override, QQ deep-link path + quick mode
