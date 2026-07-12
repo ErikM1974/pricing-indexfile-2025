@@ -31,6 +31,7 @@
         'tax-exempt-cert': { label: 'Tax Cert', icon: 'fa-receipt', cls: 'badge--tax' },
         'pto-request': { label: 'PTO', icon: 'fa-umbrella-beach', cls: 'badge--pto' },
         'injury-report': { label: 'Incident', icon: 'fa-kit-medical', cls: 'badge--inj' },
+        'credit-card-auth': { label: 'Card Auth', icon: 'fa-credit-card', cls: 'badge--cca' },
     };
 
     var STATUS_CLS = {
@@ -63,6 +64,7 @@
         'Open': 'status--new',
         'L&I Filed': 'status--art',
         'Closed': 'status--done',
+        'Card on File': 'status--done',
     };
 
     var STATUS_CHOICES = {
@@ -81,6 +83,7 @@
         'tax-exempt-cert': ['New', 'Verified', 'Expired', 'Archived'],
         'pto-request': ['Pending', 'Approved', 'Denied', 'Archived'],
         'injury-report': ['Open', 'Under Review', 'L&I Filed', 'Closed', 'Archived'],
+        'credit-card-auth': ['New', 'Card on File', 'Expired', 'Archived'],
     };
 
     var state = {
