@@ -1,3 +1,7 @@
+## v2026.07.12.8 (2026.07.12)
+
+- feat(seo): product pages visible to search — hybrid-SSR heads + Product schema + /sitemap-products.xml (569 styles)
+
 ## v2026.07.12.7 (2026.07.12)
 
 - perf(pdp): fetchpriority=high on gallery hero (pairs with proxy gzip + cache deploy)
