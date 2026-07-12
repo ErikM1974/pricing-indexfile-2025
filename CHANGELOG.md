@@ -1,3 +1,7 @@
+## v2026.07.12.5 (2026.07.12)
+
+- feat(seo): Google Search Console ownership proof route
+
 ## v2026.07.12.4 (2026.07.12)
 
 - feat(blog): server-rendered blog + staff editor — SEO-first, posts in Caspio, publish without deploys
