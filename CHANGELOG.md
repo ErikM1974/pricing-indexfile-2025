@@ -1,3 +1,7 @@
+## v2026.07.12.7 (2026.07.12)
+
+- perf(pdp): fetchpriority=high on gallery hero (pairs with proxy gzip + cache deploy)
+
 ## v2026.07.12.6 (2026.07.12)
 
 - feat(dashboard): Blog Editor link in Administration section
