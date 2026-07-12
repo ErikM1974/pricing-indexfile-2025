@@ -24,6 +24,13 @@
         'final-qc-checklist': { label: 'Final QC', icon: 'fa-clipboard-check', cls: 'badge--qcc' },
         'spoilage-report': { label: 'Spoilage', icon: 'fa-triangle-exclamation', cls: 'badge--spl' },
         'maintenance-log': { label: 'Maintenance', icon: 'fa-screwdriver-wrench', cls: 'badge--mnt' },
+        'customer-onboarding': { label: 'New Account', icon: 'fa-user-plus', cls: 'badge--onb' },
+        'team-roster': { label: 'Roster', icon: 'fa-people-group', cls: 'badge--rst' },
+        'webstore-request': { label: 'Webstore', icon: 'fa-store', cls: 'badge--wsr' },
+        'credit-application': { label: 'Credit App', icon: 'fa-file-signature', cls: 'badge--crd' },
+        'tax-exempt-cert': { label: 'Tax Cert', icon: 'fa-receipt', cls: 'badge--tax' },
+        'pto-request': { label: 'PTO', icon: 'fa-umbrella-beach', cls: 'badge--pto' },
+        'injury-report': { label: 'Incident', icon: 'fa-kit-medical', cls: 'badge--inj' },
     };
 
     var STATUS_CLS = {
@@ -45,6 +52,17 @@
         'Rework': 'status--partial',
         'Resolved': 'status--done',
         'Entered in ShopWorks': 'status--done',
+        'Account Created': 'status--done',
+        'Store Built': 'status--progress',
+        'Launched': 'status--done',
+        'Approved': 'status--done',
+        'Denied': 'status--overdue',
+        'Pending': 'status--partial',
+        'Verified': 'status--done',
+        'Expired': 'status--overdue',
+        'Open': 'status--new',
+        'L&I Filed': 'status--art',
+        'Closed': 'status--done',
     };
 
     var STATUS_CHOICES = {
@@ -56,6 +74,13 @@
         'final-qc-checklist': ['New', 'Released', 'On Hold', 'Rework', 'Resolved', 'Archived'],
         'spoilage-report': ['New', 'Under Review', 'Replacement Ordered', 'Resolved', 'Archived'],
         'maintenance-log': ['Logged', 'Follow-Up Required', 'Resolved', 'Archived'],
+        'customer-onboarding': ['New', 'In Progress', 'Account Created', 'Archived'],
+        'team-roster': ['New', 'In Progress', 'Entered in ShopWorks', 'Completed', 'Archived'],
+        'webstore-request': ['New', 'In Progress', 'Store Built', 'Launched', 'Archived'],
+        'credit-application': ['Under Review', 'Approved', 'Denied', 'Archived'],
+        'tax-exempt-cert': ['New', 'Verified', 'Expired', 'Archived'],
+        'pto-request': ['Pending', 'Approved', 'Denied', 'Archived'],
+        'injury-report': ['Open', 'Under Review', 'L&I Filed', 'Closed', 'Archived'],
     };
 
     var state = {

@@ -1,0 +1,20 @@
+/* webstore-request-form.css — Webstore / Company Store Request twin (portrait) */
+
+.info-field--wide { grid-column: span 2; }
+
+.assist-hint {
+    font-size: 0.82rem;
+    color: #555;
+    margin: 6px 0 8px;
+}
+.assist-hint .fa-wand-magic-sparkles { color: #2e6f40; margin-right: 4px; }
+
+.store-table .col-style { width: 14%; }
+.store-table .col-color { width: 18%; }
+.store-table .col-desc { width: 32%; }
+.store-table .col-deco { width: 16%; }
+.store-table .col-place { width: 20%; }
+
+@media print {
+    .store-table td input { padding: 4px 3px; font-size: 0.76rem; }
+}

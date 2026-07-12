@@ -1,0 +1,21 @@
+/* tax-exempt-cert-form.css — Tax-Exempt / Resale Certificate twin (portrait) */
+
+.info-field--wide { grid-column: span 2; }
+
+.exp-hint {
+    font-weight: 400;
+    font-size: 0.72rem;
+    color: #8a6d1a;
+}
+
+.assist-hint {
+    font-size: 0.82rem;
+    color: #555;
+    margin: 6px 0 8px;
+}
+.assist-hint .fa-circle-info,
+.assist-hint .fa-list-check { color: #2e6f40; margin-right: 4px; }
+
+@media print {
+    .exp-hint { display: none; }
+}

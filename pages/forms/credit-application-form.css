@@ -1,0 +1,21 @@
+/* credit-application-form.css — Net-Terms Credit Application twin (portrait) */
+
+.info-field--wide { grid-column: span 2; }
+
+.waiver-box--nocard {
+    border-color: #b3261e;
+    background: #fdf1f0;
+    margin-bottom: 12px;
+}
+.waiver-box--nocard .waiver-text { color: #7a1c16; }
+.waiver-box--nocard .fa-shield-halved { margin-right: 5px; }
+
+.ref-table .col-refco { width: 30%; }
+.ref-table .col-refname { width: 24%; }
+.ref-table .col-refphone { width: 20%; }
+.ref-table .col-refemail { width: 26%; }
+
+@media print {
+    .form-section { margin-top: 10px; }
+    .ref-table td input { padding: 5px 3px; }
+}

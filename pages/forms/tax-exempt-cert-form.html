@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Tax-Exempt / Resale Certificate - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/pages/forms/nwca-form-shared.css">
+    <link rel="stylesheet" href="/pages/forms/tax-exempt-cert-form.css">
+</head>
+<body>
+    <div class="form-toolbar no-print">
+        <a href="/dashboards/forms-library.html" class="toolbar-link">
+            <i class="fas fa-arrow-left"></i> Forms Library
+        </a>
+        <div class="toolbar-actions">
+            <button type="button" id="clearFormBtn" class="toolbar-btn toolbar-btn--ghost">
+                <i class="fas fa-eraser"></i> Clear
+            </button>
+            <button type="button" id="printFormBtn" class="toolbar-btn toolbar-btn--primary">
+                <i class="fas fa-print"></i> Print / Save as PDF
+            </button>
+        </div>
+    </div>
+
+    <div class="form-sheet">
+        <header class="form-header">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                 alt="Northwest Custom Apparel" class="form-logo">
+            <h1 class="form-title">Tax-Exempt / Resale Certificate on File</h1>
+            <p class="form-subtitle">Documents WHY we don't charge this customer sales tax &mdash; the certificate itself must be attached</p>
+            <p class="form-contact">2025 Freeman Rd. E., Milton, WA 98354 &nbsp;&bull;&nbsp; 253-922-5793 &nbsp;&bull;&nbsp; www.nwcustomapparel.com</p>
+        </header>
+
+        <section class="form-section">
+            <div class="section-bar">1. Customer</div>
+            <div class="info-grid">
+                <div class="info-field">
+                    <label for="fldCompany">Company</label>
+                    <input type="text" id="fldCompany" autocomplete="off">
+                </div>
+                <div class="info-field">
+                    <label for="fldContact">Contact</label>
+                    <input type="text" id="fldContact">
+                </div>
+                <div class="info-field">
+                    <label for="fldPhone">Phone</label>
+                    <input type="text" id="fldPhone">
+                </div>
+                <div class="info-field">
+                    <label for="fldEmail">Email</label>
+                    <input type="text" id="fldEmail">
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">2. Exemption Type</div>
+            <div class="decoration-row">
+                <label class="deco-check"><input type="checkbox" id="exResale"> WA resale (reseller permit)</label>
+                <label class="deco-check"><input type="checkbox" id="exNonprofit"> Nonprofit exemption</label>
+                <label class="deco-check"><input type="checkbox" id="exGov"> Government</label>
+                <label class="deco-check"><input type="checkbox" id="exTribal"> Tribal</label>
+                <label class="deco-check"><input type="checkbox" id="exOutOfState"> Out-of-state (no WA nexus)</label>
+                <label class="deco-check deco-check--other">
+                    <input type="checkbox" id="exOther"> Other
+                    <input type="text" id="exOtherText" class="deco-other-text" aria-label="Other exemption type">
+                </label>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">3. Permit / Certificate</div>
+            <div class="info-grid">
+                <div class="info-field">
+                    <label for="fldPermit">Permit / certificate #</label>
+                    <input type="text" id="fldPermit">
+                </div>
+                <div class="info-field">
+                    <label for="fldIssued">Issued</label>
+                    <input type="text" id="fldIssued">
+                </div>
+                <div class="info-field">
+                    <label for="fldExpires">Expires <span class="exp-hint">(flags "due" in the Forms Inbox 7 days out)</span></label>
+                    <input type="text" id="fldExpires">
+                </div>
+                <div class="info-field info-field--wide">
+                    <label for="fldResells">What do they resell / why exempt?</label>
+                    <input type="text" id="fldResells">
+                </div>
+                <div class="info-field info-field--wide">
+                    <label for="fldCertFile">Certificate copy — link, or note where it was emailed/filed</label>
+                    <input type="text" id="fldCertFile">
+                </div>
+            </div>
+            <p class="assist-hint"><i class="fas fa-circle-info"></i>
+                A WA reseller permit is verifiable at dor.wa.gov &rarr; "Look up a business". Verify before marking the account exempt.</p>
+        </section>
+
+        <section class="form-section">
+            <div class="waiver-box">
+                <div class="waiver-title">Customer Certification</div>
+                <p class="waiver-text">
+                    The buyer certifies the exemption claimed above is valid, that purchases from Northwest Custom Apparel
+                    are for the stated exempt purpose, and that the buyer will notify NWCA if the permit is revoked or expires.
+                    The buyer remains liable for any tax, penalties, and interest found due if the exemption is invalid.
+                </p>
+            </div>
+            <div class="signature-row">
+                <div class="signature-field">
+                    <div class="signature-line"></div>
+                    <label>Customer signature</label>
+                </div>
+                <div class="signature-field">
+                    <div class="signature-line"></div>
+                    <label>Print name &amp; title</label>
+                </div>
+                <div class="signature-field signature-field--date">
+                    <div class="signature-line"></div>
+                    <label>Date</label>
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section no-print">
+            <div class="section-bar">Office Use — After Saving</div>
+            <p class="assist-hint"><i class="fas fa-list-check"></i>
+                1) Verify the permit at DOR, 2) mark the customer tax-exempt in ShopWorks + Caspio, 3) set the Inbox
+                status to <strong>Verified</strong>. The Inbox will flag this submission as "due" when the certificate
+                is 7 days from expiring — collect the renewal before it lapses.</p>
+        </section>
+    </div>
+
+    <script src="/config/app.config.js"></script>
+    <script src="/pages/forms/nwca-form-shared.js"></script>
+    <script src="/pages/forms/nwca-form-dates.js"></script>
+    <script src="/pages/forms/nwca-form-contacts.js"></script>
+    <script src="/pages/forms/nwca-form-save.js"></script>
+    <script src="/pages/forms/tax-exempt-cert-form.js"></script>
+</body>
+</html>

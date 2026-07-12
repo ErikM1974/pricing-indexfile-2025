@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>New Customer Onboarding - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/pages/forms/nwca-form-shared.css">
+    <link rel="stylesheet" href="/pages/forms/customer-onboarding-form.css">
+</head>
+<body>
+    <div class="form-toolbar no-print">
+        <a href="/dashboards/forms-library.html" class="toolbar-link">
+            <i class="fas fa-arrow-left"></i> Forms Library
+        </a>
+        <div class="toolbar-actions">
+            <button type="button" id="clearFormBtn" class="toolbar-btn toolbar-btn--ghost">
+                <i class="fas fa-eraser"></i> Clear
+            </button>
+            <button type="button" id="printFormBtn" class="toolbar-btn toolbar-btn--primary">
+                <i class="fas fa-print"></i> Print / Save as PDF
+            </button>
+        </div>
+    </div>
+
+    <div class="form-sheet">
+        <header class="form-header">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                 alt="Northwest Custom Apparel" class="form-logo">
+            <h1 class="form-title">New Customer Onboarding</h1>
+            <p class="form-subtitle">One sheet sets up the account — ShopWorks customer, CRM contact, tax status, and terms</p>
+            <p class="form-contact">2025 Freeman Rd. E., Milton, WA 98354 &nbsp;&bull;&nbsp; 253-922-5793 &nbsp;&bull;&nbsp; www.nwcustomapparel.com</p>
+        </header>
+
+        <section class="form-section">
+            <div class="section-bar">1. Company</div>
+            <p class="assist-hint no-print"><i class="fas fa-wand-magic-sparkles"></i>
+                Type the company name — if it matches an EXISTING customer you'll see a banner (don't create a duplicate account).</p>
+            <div class="info-grid">
+                <div class="info-field">
+                    <label for="fldCompany">Company (legal name)</label>
+                    <input type="text" id="fldCompany" autocomplete="off">
+                </div>
+                <div class="info-field">
+                    <label for="fldDba">DBA / Brand name</label>
+                    <input type="text" id="fldDba">
+                </div>
+                <div class="info-field">
+                    <label for="fldWebsite">Website</label>
+                    <input type="text" id="fldWebsite">
+                </div>
+                <div class="info-field">
+                    <label for="fldIndustry">Industry / What they do</label>
+                    <input type="text" id="fldIndustry">
+                </div>
+                <div class="info-field">
+                    <label for="fldHeardVia">How did they hear about us?</label>
+                    <input type="text" id="fldHeardVia">
+                </div>
+                <div class="info-field">
+                    <label for="fldSalesRep">Assigned Sales Rep</label>
+                    <input type="text" id="fldSalesRep">
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">2. Contacts</div>
+            <div class="info-grid">
+                <div class="info-field">
+                    <label for="fldContact">Primary contact</label>
+                    <input type="text" id="fldContact">
+                </div>
+                <div class="info-field">
+                    <label for="fldContactTitle">Title / Role</label>
+                    <input type="text" id="fldContactTitle">
+                </div>
+                <div class="info-field">
+                    <label for="fldPhone">Phone</label>
+                    <input type="text" id="fldPhone">
+                </div>
+                <div class="info-field">
+                    <label for="fldEmail">Email</label>
+                    <input type="text" id="fldEmail">
+                </div>
+                <div class="info-field">
+                    <label for="fldApContact">Accounts Payable contact</label>
+                    <input type="text" id="fldApContact">
+                </div>
+                <div class="info-field">
+                    <label for="fldApEmail">AP email / phone</label>
+                    <input type="text" id="fldApEmail">
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">3. Addresses</div>
+            <div class="info-grid info-grid--cols">
+                <div class="info-field info-field--wide">
+                    <label for="fldBilling">Billing address (street, city, state, zip)</label>
+                    <input type="text" id="fldBilling">
+                </div>
+                <div class="info-field info-field--wide">
+                    <label for="fldShipping">Shipping address</label>
+                    <input type="text" id="fldShipping">
+                </div>
+            </div>
+            <label class="deco-check"><input type="checkbox" id="chkSameAddr"> Shipping same as billing</label>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">4. Tax Status &amp; Terms</div>
+            <div class="decoration-row">
+                <label class="deco-check"><input type="checkbox" id="taxTaxable"> Taxable (WA sales tax applies)</label>
+                <label class="deco-check"><input type="checkbox" id="taxResale"> Tax-exempt — resale</label>
+                <label class="deco-check"><input type="checkbox" id="taxOther"> Tax-exempt — nonprofit / government</label>
+            </div>
+            <div class="info-grid">
+                <div class="info-field">
+                    <label for="fldPermit">Reseller permit # (if exempt)</label>
+                    <input type="text" id="fldPermit">
+                </div>
+                <div class="info-field">
+                    <label for="fldPermitExp">Permit expiration</label>
+                    <input type="text" id="fldPermitExp">
+                </div>
+            </div>
+            <p class="assist-hint"><i class="fas fa-circle-info"></i>
+                Exempt customers: also complete the <strong>Tax-Exempt / Resale Certificate</strong> form so the certificate is on file.</p>
+            <div class="decoration-row">
+                <label class="deco-check"><input type="checkbox" id="termsCard"> Card on file</label>
+                <label class="deco-check"><input type="checkbox" id="termsPrepay"> Prepay / 50% deposit</label>
+                <label class="deco-check"><input type="checkbox" id="termsNet15"> Net 15</label>
+                <label class="deco-check"><input type="checkbox" id="termsNet30"> Net 30 (credit application required)</label>
+                <label class="deco-check"><input type="checkbox" id="chkPoRequired"> PO required on their orders</label>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">5. Decoration Profile</div>
+            <div class="decoration-row">
+                <label class="deco-check"><input type="checkbox" id="mEmbroidery"> Embroidery</label>
+                <label class="deco-check"><input type="checkbox" id="mDtg"> DTG</label>
+                <label class="deco-check"><input type="checkbox" id="mScreen"> Screen Printing</label>
+                <label class="deco-check"><input type="checkbox" id="mTransfers"> DTF Transfers</label>
+                <label class="deco-check"><input type="checkbox" id="mLaser"> Laser Engraving</label>
+                <label class="deco-check"><input type="checkbox" id="mPatches"> Patches</label>
+            </div>
+            <div class="info-grid">
+                <div class="info-field info-field--wide">
+                    <label for="fldLogoFiles">Logo files — where are they? (link, email, "bringing files", existing design #)</label>
+                    <input type="text" id="fldLogoFiles">
+                </div>
+                <div class="info-field">
+                    <label for="fldFirstOrder">First order in mind?</label>
+                    <input type="text" id="fldFirstOrder">
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">6. Notes</div>
+            <textarea id="fldNotes" class="notes-area" rows="2" aria-label="Notes"></textarea>
+        </section>
+
+        <section class="form-section no-print">
+            <div class="section-bar">After Saving — Account Setup Checklist (office use)</div>
+            <p class="assist-hint"><i class="fas fa-list-check"></i>
+                From the Forms Inbox: 1) create the ShopWorks customer, 2) Sync All CRM, 3) send the customer portal invite,
+                4) route the credit application / tax certificate if marked above. Mark the submission
+                <strong>Account Created</strong> when done.</p>
+        </section>
+    </div>
+
+    <script src="/config/app.config.js"></script>
+    <script src="/pages/forms/nwca-form-shared.js"></script>
+    <script src="/pages/forms/nwca-form-dates.js"></script>
+    <script src="/pages/forms/nwca-form-contacts.js"></script>
+    <script src="/pages/forms/nwca-form-save.js"></script>
+    <script src="/pages/forms/customer-onboarding-form.js"></script>
+</body>
+</html>

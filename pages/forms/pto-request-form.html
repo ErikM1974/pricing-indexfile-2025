@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>PTO / Time-Off Request - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/pages/forms/nwca-form-shared.css">
+    <link rel="stylesheet" href="/pages/forms/pto-request-form.css">
+</head>
+<body>
+    <div class="form-toolbar no-print">
+        <a href="/dashboards/forms-library.html" class="toolbar-link">
+            <i class="fas fa-arrow-left"></i> Forms Library
+        </a>
+        <div class="toolbar-actions">
+            <button type="button" id="clearFormBtn" class="toolbar-btn toolbar-btn--ghost">
+                <i class="fas fa-eraser"></i> Clear
+            </button>
+            <button type="button" id="printFormBtn" class="toolbar-btn toolbar-btn--primary">
+                <i class="fas fa-print"></i> Print / Save as PDF
+            </button>
+        </div>
+    </div>
+
+    <div class="form-sheet">
+        <header class="form-header">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                 alt="Northwest Custom Apparel" class="form-logo">
+            <h1 class="form-title">PTO / Time-Off Request</h1>
+            <p class="form-subtitle">Submit before scheduling &mdash; approval flows through the Forms Inbox (types per the Employee Handbook)</p>
+            <p class="form-contact">2025 Freeman Rd. E., Milton, WA 98354 &nbsp;&bull;&nbsp; 253-922-5793</p>
+        </header>
+
+        <section class="form-section">
+            <div class="section-bar">1. Employee</div>
+            <div class="info-grid">
+                <div class="info-field">
+                    <label for="fldCompany">Employee name</label>
+                    <input type="text" id="fldCompany">
+                </div>
+                <div class="info-field">
+                    <label for="fldDept">Department / Role</label>
+                    <input type="text" id="fldDept">
+                </div>
+                <div class="info-field">
+                    <label for="fldSubmitted">Date submitted</label>
+                    <input type="text" id="fldSubmitted">
+                </div>
+                <div class="info-field">
+                    <label for="fldManager">Manager / Supervisor</label>
+                    <input type="text" id="fldManager">
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">2. Type of Leave (per the Employee Handbook)</div>
+            <div class="decoration-row">
+                <label class="deco-check"><input type="checkbox" id="tpVacation"> Vacation / PTO</label>
+                <label class="deco-check"><input type="checkbox" id="tpSick"> Sick / Safe leave</label>
+                <label class="deco-check"><input type="checkbox" id="tpPersonal"> Personal</label>
+                <label class="deco-check"><input type="checkbox" id="tpUnpaid"> Unpaid</label>
+                <label class="deco-check"><input type="checkbox" id="tpBereavement"> Bereavement</label>
+                <label class="deco-check"><input type="checkbox" id="tpJury"> Jury duty</label>
+                <label class="deco-check deco-check--other">
+                    <input type="checkbox" id="tpOther"> Other
+                    <input type="text" id="tpOtherText" class="deco-other-text" aria-label="Other leave type">
+                </label>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">3. Dates Requested</div>
+            <div class="info-grid">
+                <div class="info-field">
+                    <label for="fldFirstDay">First day off</label>
+                    <input type="text" id="fldFirstDay">
+                </div>
+                <div class="info-field">
+                    <label for="fldLastDay">Last day off</label>
+                    <input type="text" id="fldLastDay">
+                </div>
+                <div class="info-field">
+                    <label for="fldReturnDay">Returning to work</label>
+                    <input type="text" id="fldReturnDay">
+                </div>
+                <div class="info-field">
+                    <label for="fldHours">Total hours / days</label>
+                    <input type="text" id="fldHours">
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">4. Coverage &amp; Notes</div>
+            <div class="info-grid">
+                <div class="info-field info-field--wide">
+                    <label for="fldCoverage">Coverage arranged with / open jobs handed to</label>
+                    <input type="text" id="fldCoverage">
+                </div>
+            </div>
+            <textarea id="fldNotes" class="notes-area" rows="2" aria-label="Notes"></textarea>
+        </section>
+
+        <section class="form-section">
+            <div class="signature-row">
+                <div class="signature-field">
+                    <div class="signature-line"></div>
+                    <label>Employee signature</label>
+                </div>
+                <div class="signature-field signature-field--date">
+                    <div class="signature-line"></div>
+                    <label>Date</label>
+                </div>
+            </div>
+            <div class="approval-strip">
+                <span class="approval-title">Manager use:</span>
+                <label class="deco-check"><input type="checkbox" id="apApproved"> Approved</label>
+                <label class="deco-check"><input type="checkbox" id="apDenied"> Denied</label>
+                <span class="approval-sig">
+                    <span class="signature-line signature-line--inline"></span>
+                    <label>Manager signature / date</label>
+                </span>
+            </div>
+            <p class="assist-hint no-print"><i class="fas fa-circle-info"></i>
+                Saved requests land in the Forms Inbox as <strong>Pending</strong> — the manager flips them to
+                Approved or Denied there (paper checkboxes are for printed copies).</p>
+        </section>
+    </div>
+
+    <script src="/config/app.config.js"></script>
+    <script src="/pages/forms/nwca-form-shared.js"></script>
+    <script src="/pages/forms/nwca-form-dates.js"></script>
+    <script src="/pages/forms/nwca-form-save.js"></script>
+    <script src="/pages/forms/pto-request-form.js"></script>
+</body>
+</html>
