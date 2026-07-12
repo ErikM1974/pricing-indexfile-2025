@@ -64,8 +64,48 @@
 }
 .pan-block-banner .fa-shield-halved { margin-right: 5px; }
 
+/* ---------- Print: everything fits ONE Letter page (Erik 2026-07-12) ---------- */
+@page { size: letter portrait; margin: 0.3in; }
+
 @media print {
-    .form-section { margin-top: 10px; }
-    .waiver-box--pci { margin-bottom: 8px; }
     .exp-hint { display: none; }
+
+    /* header: half-height */
+    .form-header { margin-bottom: 4px; }
+    .form-logo { height: 28px; }
+    .form-title { font-size: 1rem; margin: 2px 0 0; }
+    .form-subtitle { font-size: 0.64rem; margin: 1px 0 0; }
+    .form-contact { font-size: 0.64rem; margin: 1px 0 0; }
+
+    /* secure-channels box: compact but still the first thing a customer reads */
+    .waiver-box--pci { margin-bottom: 4px; padding: 4px 8px; }
+    .waiver-box--pci .waiver-title { font-size: 0.72rem; margin-bottom: 1px; }
+    .waiver-box--pci .waiver-text { font-size: 0.62rem; line-height: 1.3; margin: 1px 0; }
+    .pci-ways { margin: 1px 0 1px 14px; font-size: 0.62rem; line-height: 1.3; }
+    .pci-ways li { margin-bottom: 0; }
+
+    /* sections + fields: tight grid */
+    .form-section { margin-top: 4px; }
+    .section-bar { font-size: 0.66rem; padding: 1px 8px; }
+    .info-grid { gap: 2px 12px; }
+    .info-field { margin-bottom: 1px; }
+    .info-field label { font-size: 0.58rem; margin-bottom: 0; }
+    .info-field input { font-size: 0.72rem; padding: 0 2px; }
+    .decoration-row { gap: 2px 12px; margin: 2px 0; }
+    .deco-check { font-size: 0.66rem; }
+    .type-label { font-size: 0.66rem; }
+
+    .ship-grid { gap: 10px; }
+    .ship-title { font-size: 0.7rem; margin-bottom: 1px; }
+    .ship-block .info-field { margin-bottom: 1px; }
+
+    /* agreement + signatures */
+    .waiver-box { padding: 4px 8px; }
+    .waiver-title { font-size: 0.72rem; margin-bottom: 1px; }
+    .waiver-text { font-size: 0.6rem; line-height: 1.3; margin: 1px 0; }
+    .signature-row { margin-top: 5px; gap: 14px; }
+    .signature-line { height: 15px; }
+    .signature-field label { font-size: 0.58rem; }
+
+    #fldEnding { letter-spacing: 2px; }
 }
