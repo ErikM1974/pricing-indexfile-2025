@@ -32,6 +32,7 @@
         'pto-request': { label: 'PTO', icon: 'fa-umbrella-beach', cls: 'badge--pto' },
         'injury-report': { label: 'Incident', icon: 'fa-kit-medical', cls: 'badge--inj' },
         'credit-card-auth': { label: 'Card Auth', icon: 'fa-credit-card', cls: 'badge--cca' },
+        'quote-request': { label: 'Quote Lead', icon: 'fa-bullhorn', cls: 'badge--qrq' },
     };
 
     var STATUS_CLS = {
@@ -65,6 +66,10 @@
         'L&I Filed': 'status--art',
         'Closed': 'status--done',
         'Card on File': 'status--done',
+        'Contacted': 'status--progress',
+        'Quoted': 'status--art',
+        'Won': 'status--done',
+        'Lost': 'status--muted',
     };
 
     var STATUS_CHOICES = {
@@ -84,6 +89,7 @@
         'pto-request': ['Pending', 'Approved', 'Denied', 'Archived'],
         'injury-report': ['Open', 'Under Review', 'L&I Filed', 'Closed', 'Archived'],
         'credit-card-auth': ['New', 'Card on File', 'Expired', 'Archived'],
+        'quote-request': ['New', 'Contacted', 'Quoted', 'Won', 'Lost', 'Archived'],
     };
 
     var state = {

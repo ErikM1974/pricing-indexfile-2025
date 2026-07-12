@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request a Quote - Northwest Custom Apparel</title>
+    <meta name="description" content="Tell us what you need — custom embroidery, screen printing, DTG, and DTF transfers in Milton, WA. A real person replies within one business day.">
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/pages/forms/nwca-form-shared.css">
+    <link rel="stylesheet" href="/pages/request-a-quote.css?v=2026.07.12.3">
+</head>
+<body>
+    <div class="public-topbar">
+        <a href="/" class="public-home"><i class="fas fa-arrow-left"></i> nwcustomapparel.com</a>
+        <span class="public-phone"><i class="fas fa-phone"></i> 253-922-5793</span>
+    </div>
+
+    <div class="form-sheet">
+        <header class="form-header">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                 alt="Northwest Custom Apparel" class="form-logo">
+            <h1 class="form-title">Request a Quote</h1>
+            <p class="form-subtitle">Tell us what you're making &mdash; a real person replies within one business day (usually much faster)</p>
+            <p class="form-contact">Family owned since 1977 &nbsp;&bull;&nbsp; Milton, WA &nbsp;&bull;&nbsp; 253-922-5793 &nbsp;&bull;&nbsp; sales@nwcustomapparel.com</p>
+        </header>
+
+        <!-- honeypot: humans never see it; bots fill it and get a fake success -->
+        <div class="hp-wrap" aria-hidden="true"><label for="hpWebsite">Website</label><input type="text" id="hpWebsite" tabindex="-1" autocomplete="off"></div>
+
+        <section class="form-section">
+            <div class="section-bar">1. How do we reach you?</div>
+            <div class="info-grid">
+                <div class="info-field">
+                    <label for="fldName">Your name <span class="req">*</span></label>
+                    <input type="text" id="fldName" autocomplete="name">
+                </div>
+                <div class="info-field">
+                    <label for="fldCompany">Company / Team (if any)</label>
+                    <input type="text" id="fldCompany" autocomplete="organization">
+                </div>
+                <div class="info-field">
+                    <label for="fldEmail">Email <span class="req">*</span></label>
+                    <input type="text" id="fldEmail" inputmode="email" autocomplete="email">
+                </div>
+                <div class="info-field">
+                    <label for="fldPhone">Phone <span class="req">*</span></label>
+                    <input type="text" id="fldPhone" inputmode="tel" autocomplete="tel">
+                </div>
+            </div>
+            <div class="decoration-row">
+                <span class="type-label">Best way to reply:</span>
+                <label class="deco-check"><input type="checkbox" id="rpEmail"> Email</label>
+                <label class="deco-check"><input type="checkbox" id="rpCall"> Call</label>
+                <label class="deco-check"><input type="checkbox" id="rpText"> Text</label>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">2. What do you need?</div>
+            <div class="info-field info-field--full">
+                <label for="fldWhat">Tell us about the project <span class="req">*</span> &nbsp;<span class="hint">(what it's for, roughly what you have in mind)</span></label>
+                <textarea id="fldWhat" class="notes-area" rows="3" placeholder="e.g. 30 hoodies for our landscaping crew — logo on the front, name on the sleeve"></textarea>
+            </div>
+            <div class="decoration-row">
+                <span class="type-label">Decoration:</span>
+                <label class="deco-check"><input type="checkbox" id="mEmbroidery"> Embroidery</label>
+                <label class="deco-check"><input type="checkbox" id="mScreen"> Screen Printing</label>
+                <label class="deco-check"><input type="checkbox" id="mDtg"> DTG Print</label>
+                <label class="deco-check"><input type="checkbox" id="mDtf"> DTF Transfers</label>
+                <label class="deco-check"><input type="checkbox" id="mLaser"> Laser Engraving</label>
+                <label class="deco-check"><input type="checkbox" id="mPatches"> Patches</label>
+                <label class="deco-check"><input type="checkbox" id="mNotSure"> Not sure — help me choose</label>
+            </div>
+            <div class="info-grid">
+                <div class="info-field">
+                    <label for="fldQty">About how many pieces?</label>
+                    <input type="text" id="fldQty" inputmode="numeric" placeholder="e.g. 48">
+                </div>
+                <div class="info-field">
+                    <label for="fldNeedBy">When do you need them?</label>
+                    <input type="text" id="fldNeedBy" placeholder="date or 'flexible'">
+                </div>
+                <div class="info-field">
+                    <label for="fldStyle">Style # (only if you know it) <span class="hint">— start typing, we'll look it up</span></label>
+                    <input type="text" id="fldStyle" autocomplete="off">
+                </div>
+                <div class="info-field">
+                    <label for="fldProduct">Product</label>
+                    <input type="text" id="fldProduct" placeholder="fills itself from the style #, or describe it">
+                </div>
+            </div>
+        </section>
+
+        <section class="form-section">
+            <div class="section-bar">3. Your logo / artwork (optional)</div>
+            <div class="upload-row">
+                <label class="upload-btn" for="fldLogoFile"><i class="fas fa-image"></i> Attach a logo image</label>
+                <input type="file" id="fldLogoFile" accept="image/*" hidden>
+                <span class="upload-status" id="uploadStatus">PNG or JPG is perfect — even a photo or screenshot. We'll ask for production files later if we need them.</span>
+            </div>
+        </section>
+
+        <div class="public-submit-row">
+            <button type="button" id="submitQuoteBtn" class="public-submit"><i class="fas fa-paper-plane"></i> Send my quote request</button>
+            <p class="public-privacy">We only use this to reply about your project — no mailing lists, no spam.</p>
+        </div>
+
+        <div class="public-success" hidden>
+            <i class="fas fa-circle-check success-icon"></i>
+            <h2>Got it — thank you!</h2>
+            <p>Your request is in (reference <strong class="public-success-ref"></strong>) and a real person will get back to you
+               within one business day. Need us sooner? Call <a href="tel:253-922-5793">253-922-5793</a>.</p>
+            <p><a href="/">&larr; Back to nwcustomapparel.com</a></p>
+        </div>
+    </div>
+
+    <script src="/config/app.config.js"></script>
+    <script src="/pages/forms/nwca-form-dates.js"></script>
+    <script src="/pages/forms/nwca-form-styles.js"></script>
+    <script src="/pages/forms/nwca-public-form.js?v=2026.07.12.3"></script>
+    <script src="/pages/request-a-quote.js?v=2026.07.12.3"></script>
+</body>
+</html>
