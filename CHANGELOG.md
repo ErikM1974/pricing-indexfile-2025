@@ -1,3 +1,10 @@
+## v2026.07.13.8 (2026.07.13)
+
+- fix(a11y): expose aria-expanded on brand landing mobile menu button (WCAG 4.1.2)
+- Merge develop into a11y fix branch (bring in new brand pages)
+- fix(a11y): add aria-expanded baseline to custom-sport-tek + custom-new-era
+- chore(cache-bust): bump custom-carhartt.js ?v= to 2026.07.13.8 on 7 brand pages
+
 ## v2026.07.13.7 (2026.07.13)
 
 - fix(seo): align FAQPage JSON-LD with visible FAQ copy on 4 brand pages
