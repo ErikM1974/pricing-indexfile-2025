@@ -22,5 +22,6 @@ Disallow: /invoice/
 Disallow: /portal/
 Disallow: /order-status
 
+Sitemap: https://www.teamnwca.com/sitemap-pages.xml
 Sitemap: https://www.teamnwca.com/sitemap-blog.xml
 Sitemap: https://www.teamnwca.com/sitemap-products.xml
