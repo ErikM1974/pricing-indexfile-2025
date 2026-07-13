@@ -3340,6 +3340,16 @@ app.get('/google9a8dd44e58634cb7.html', (req, res) => {
   res.type('text/html').send('google-site-verification: google9a8dd44e58634cb7.html');
 });
 
+// Favicon — SELF-HOSTED (2026-07-12): the old cdn.caspio.com favicon URL is
+// robots-blocked (cdn robots.txt = Disallow: /), so Googlebot-Image could
+// never fetch it and search results showed a generic globe instead of our
+// icon. No root express.static exists, hence explicit routes. favicon.ico is
+// a PNG-in-ICO wrapper of the same 48x48 mark (Google's minimum favicon size).
+app.get(['/favicon.ico', '/favicon.png'], (req, res) => {
+  res.set('Cache-Control', 'public, max-age=86400');
+  res.sendFile(path.join(__dirname, req.path === '/favicon.ico' ? 'favicon.ico' : 'favicon.png'));
+});
+
 // =============================================================================
 // BLOG — server-rendered for SEO (2026-07-12). Posts live in Caspio Blog_Posts
 // (Erik publishes via /dashboards/blog-editor.html — no deploy); lib/blog.js
