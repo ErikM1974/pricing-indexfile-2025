@@ -594,6 +594,21 @@
 }
 .pdp-details-list li { break-inside: avoid; }
 
+/* ── This style on our blog (related-posts.js) ─────────────── */
+.pdp-blog-links {
+    margin: 0;
+    padding-left: 20px;
+    font-size: 15px;
+    line-height: 2;
+    color: var(--ink-soft);
+}
+.pdp-blog-links a {
+    color: var(--pnw-forest, #2d5f3f);
+    font-weight: 600;
+    text-decoration: none;
+}
+.pdp-blog-links a:hover { text-decoration: underline; }
+
 /* ── Related products ──────────────────────────────────────── */
 .pdp-related-grid {
     display: grid;

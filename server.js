@@ -154,6 +154,7 @@ dotenv.config();
 // BLOG (server-rendered for SEO; posts = Caspio Blog_Posts via proxy) (2026-07-12)
 //   L~3300 GET  /blog · /blog/:slug — SSR pages (5-min cache, marked+xss)
 //          GET  /blog/feed.xml · /sitemap-blog.xml
+//          GET  /api/blog-product-map — style→posts map for PDP "From our blog" (2026-07-12)
 //          POST /api/blog-preview (requireStaff — Blog Editor live preview)
 //          ALL  /api/crm-proxy/blog-posts* — editor writes/drafts (any staff; ~L3236)
 //
@@ -3382,6 +3383,17 @@ app.get('/sitemap-blog.xml', async (req, res) => {
   try {
     res.type('application/xml').send(blogTemplates.renderSitemap(await blog.listPublished()));
   } catch (e) { res.status(503).send('sitemap unavailable'); }
+});
+
+// Style → published-posts map for the product page's "From our blog" block
+// (lib/blog.js productMap — live-derived from post bodies, so new posts wire
+// themselves in with no deploy). Failure = 503; the PDP module silently skips
+// the block (progressive enhancement, not customer data).
+app.get('/api/blog-product-map', async (req, res) => {
+  try {
+    res.set('Cache-Control', 'public, max-age=600');
+    res.json(await blog.productMap());
+  } catch (e) { res.status(503).json({ error: 'map unavailable' }); }
 });
 
 app.get('/blog/:slug', async (req, res) => {
