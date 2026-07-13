@@ -3903,11 +3903,41 @@ app.get(['/custom-port-and-company', '/custom-port-and-company.html'], (req, res
   res.sendFile(path.join(__dirname, 'pages', 'custom-port-and-company.html'));
 });
 
+// Custom CornerStone — static SEO brand landing page (2026-07-13): ANSI hi-vis
+// safety apparel, snag-proof tactical polos, Class 3 outerwear.
+app.get(['/custom-cornerstone', '/custom-cornerstone.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'custom-cornerstone.html'));
+});
+
+// Custom The North Face — static SEO brand landing page (2026-07-13): premium
+// DryVent jackets, Skyline fleece, insulated vests — the gift people keep.
+app.get(['/custom-north-face', '/custom-north-face.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'custom-north-face.html'));
+});
+
+// Custom Gildan — static SEO brand landing page (2026-07-13): value screen-print
+// blanks — Ultra Cotton tees & Heavy Blend hoodies for big runs.
+app.get(['/custom-gildan', '/custom-gildan.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'custom-gildan.html'));
+});
+
+// Custom Eddie Bauer — static SEO brand landing page (2026-07-13): premium
+// outerwear — soft shell, rain & quilted jackets, executive-gift tier.
+app.get(['/custom-eddie-bauer', '/custom-eddie-bauer.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'custom-eddie-bauer.html'));
+});
+
+// Custom TravisMathew — static SEO brand landing page (2026-07-13): premium golf
+// polos, 1/4-zips, and signature caps for tournaments & outings.
+app.get(['/custom-travismathew', '/custom-travismathew.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'custom-travismathew.html'));
+});
+
 // Core-pages sitemap (2026-07-12) — the handful of hand-built landing/tool
 // pages that aren't in the blog or product sitemaps. Listed in robots.txt.
 app.get('/sitemap-pages.xml', (req, res) => {
   const pages = [
-    '/', '/custom-carhartt', '/custom-richardson', '/custom-nike', '/custom-new-era', '/custom-sport-tek', '/custom-ogio', '/custom-district', '/custom-port-authority', '/custom-port-and-company', '/custom-tees', '/custom-caps', '/blog',
+    '/', '/custom-carhartt', '/custom-richardson', '/custom-nike', '/custom-new-era', '/custom-sport-tek', '/custom-ogio', '/custom-district', '/custom-port-authority', '/custom-port-and-company', '/custom-cornerstone', '/custom-north-face', '/custom-gildan', '/custom-eddie-bauer', '/custom-travismathew', '/custom-tees', '/custom-caps', '/blog',
     '/brands.html', '/catalog?topSellers=1',
     '/pages/request-a-quote.html', '/pages/webstore-inquiry.html', '/pages/webstore-info.html',
   ];
