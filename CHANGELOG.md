@@ -1,3 +1,7 @@
+## v2026.07.13.1 (2026.07.13)
+
+- feat(seo): Custom Carhartt brand landing page (/custom-carhartt) — static indexable 18-style grid with real order stats, FAQ + CollectionPage/ItemList/FAQPage schema, .net educational cross-link; + /sitemap-pages.xml (core pages) in robots, drawer/footer links
+
 ## v2026.07.12.12 (2026.07.12)
 
 - fix(masthead): homepage search box crushed by 8-item menu — Corporate site moves to util-strip, search gets 190px floor, p1/p2 tiered demotion + quote-badge :has relief (verified 1680/1200/1050/mobile, zero overflow)
