@@ -138,6 +138,7 @@ _Per-feature topic files the index links to._
 - [LASER_PATCH_IMPLEMENTATION.md](LASER_PATCH_IMPLEMENTATION.md)
 - [MONOGRAM_FORM_SYSTEM.md](MONOGRAM_FORM_SYSTEM.md)
 - [EXACT_MATCH_SEARCH_IMPLEMENTATION_SUMMARY.md](EXACT_MATCH_SEARCH_IMPLEMENTATION_SUMMARY.md)
+- [blog-content-differentiation.md](blog-content-differentiation.md) — SEO lane split (teamnwca product/style vs .net education); .net topic map + `reference/nwcustomapparel-net-blogs/` (316-post export)
 
 ## 📊 Dashboards / Staff / Ops
 
