@@ -3933,11 +3933,24 @@ app.get(['/custom-travismathew', '/custom-travismathew.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'custom-travismathew.html'));
 });
 
+// Custom Bella+Canvas — static SEO brand landing page (2026-07-13): premium
+// soft jersey tees, tri-blends, and sponge fleece for merch & fashion drops.
+app.get(['/custom-bella-canvas', '/custom-bella-canvas.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'custom-bella-canvas.html'));
+});
+
+// Use-case landing pages (2026-07-13) — intent/occasion pages that cut across
+// brands. Clean URLs so they're indexable; the file itself keeps its name.
+// Golf tournament apparel page was built 2026-07-12 but had no clean URL/sitemap.
+app.get(['/golf-tournament-apparel', '/golf-tournaments'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'golf-tournaments-2026.html'));
+});
+
 // Core-pages sitemap (2026-07-12) — the handful of hand-built landing/tool
 // pages that aren't in the blog or product sitemaps. Listed in robots.txt.
 app.get('/sitemap-pages.xml', (req, res) => {
   const pages = [
-    '/', '/custom-carhartt', '/custom-richardson', '/custom-nike', '/custom-new-era', '/custom-sport-tek', '/custom-ogio', '/custom-district', '/custom-port-authority', '/custom-port-and-company', '/custom-cornerstone', '/custom-north-face', '/custom-gildan', '/custom-eddie-bauer', '/custom-travismathew', '/custom-tees', '/custom-caps', '/blog',
+    '/', '/custom-carhartt', '/custom-richardson', '/custom-nike', '/custom-new-era', '/custom-sport-tek', '/custom-ogio', '/custom-district', '/custom-port-authority', '/custom-port-and-company', '/custom-cornerstone', '/custom-north-face', '/custom-gildan', '/custom-eddie-bauer', '/custom-travismathew', '/custom-bella-canvas', '/golf-tournament-apparel', '/custom-tees', '/custom-caps', '/blog',
     '/brands.html', '/catalog?topSellers=1',
     '/pages/request-a-quote.html', '/pages/webstore-inquiry.html', '/pages/webstore-info.html',
   ];
