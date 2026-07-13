@@ -379,8 +379,14 @@ class BrandsFlyout {
             iconHtml = `<span class="brand-link-icon">🏷️</span>`;
         }
 
+        // Brands with a dedicated landing page route there instead of the
+        // catalog filter (SEO brand-program pages, 2026-07-13). Extend this
+        // map as more /custom-<brand> pages ship.
+        const BRAND_LANDING_PAGES = { 'Carhartt': '/custom-carhartt' };
+        const landingPage = BRAND_LANDING_PAGES[brandName];
+
         return `
-            <a href="/?brand=${encodedBrand}" class="brand-link">
+            <a href="${landingPage || `/?brand=${encodedBrand}`}" class="brand-link">
                 ${iconHtml}
                 <span class="brand-link-name">${this.escapeHtml(brandName)}</span>
             </a>
