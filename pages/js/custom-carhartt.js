@@ -20,7 +20,10 @@
             sidebar.classList.toggle('show', open);
             overlay.classList.toggle('show', open);
             document.body.classList.toggle('drawer-open', open);
+            // WCAG 4.1.2 — expose open/closed state of the hamburger to assistive tech.
+            if (openBtn) openBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
         }
+        if (openBtn) openBtn.setAttribute('aria-expanded', 'false'); // baseline in case HTML omits it
         if (openBtn) openBtn.addEventListener('click', function () { setDrawer(true); });
         if (closeBtn) closeBtn.addEventListener('click', function () { setDrawer(false); });
         if (overlay) overlay.addEventListener('click', function () { setDrawer(false); });
