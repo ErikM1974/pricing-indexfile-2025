@@ -18,6 +18,7 @@
 | `autocomplete-new.js` | Search autocomplete | index.html | Move to shared_components |
 | `brands.js` | Brands listing page logic | brands.html | Move to shared_components |
 | `brands-flyout.js` | Brands flyout/dropdown menu (header nav) | index.html, multiple | Move to shared_components |
+| `shared_components/js/nav-dropdown.js` | CLICK-to-open disclosure for the Products/Brands mega dropdowns — toggles `.nav-open`, closes on outside-click/Escape/other-trigger, one open at a time, `aria-expanded`. Replaced hover-open (finicky on desktop, absent on touch); CSS has NO `:hover` open rule | index.html, pages/catalog.html; CSS `.nav-item.nav-open` in nwca-2026-core.css | ✅ Active (NEW 2026-07-13) |
 | `c112-bogo-promo.js` | BOGO promotion logic | Specific promo | Move to calculators |
 | `cart.js` | Cart functionality | NONE (cart.html retired 2026-06-11) | 🚩 Dead — flagged for deletion |
 | `cart-ui.js` | Cart UI components | NONE (cart.html retired 2026-06-11) | 🚩 Dead — flagged for deletion |
