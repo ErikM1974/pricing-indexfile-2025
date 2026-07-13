@@ -1,3 +1,8 @@
+## v2026.07.13.9 (2026.07.13)
+
+- feat(seo): Custom Port Authority + Port & Company brand landing pages
+- feat(seo): 5 brand landing pages — CornerStone, North Face, Gildan, Eddie Bauer, TravisMathew
+
 ## v2026.07.13.8 (2026.07.13)
 
 - fix(a11y): expose aria-expanded on brand landing mobile menu button (WCAG 4.1.2)
