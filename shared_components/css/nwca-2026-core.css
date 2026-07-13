@@ -227,6 +227,27 @@ img { max-width: 100%; }
 }
 .nav-search-btn:hover { background: var(--green-700); }
 
+/* Search must stay typeable: the menu is flex:none, so without a floor the
+   input crushes to just its button when a masthead carries many items
+   (homepage grew to 8 — caught 2026-07-12). ~190px ≈ 130px of visible text.
+   NOTE the bar itself is width-capped by --wrap (~1240px content), so item
+   budget is about the MENU count, not the monitor — long menus must demote. */
+.nav-search { min-width: 190px; }
+
+/* Tiered menu demotion for long mastheads (only pages that mark items with
+   .nav-item--p1/p2 — currently index.html). Lower-priority links drop out as
+   the bar narrows instead of strangling the search box; everything demoted
+   stays reachable in the drawer and footer. */
+@media (max-width: 1240px) { .nav-item--p2 { display: none; } }
+@media (max-width: 1080px) { .nav-item--p1 { display: none; } }
+/* Mid-quote the quote badge (~110px) joins the bar — give up the p2 links
+   rather than the search width (badge + Get a Quote overlap in purpose);
+   below the wrap cap the p1 links go too. */
+.nav-bar-inner:has(.quote-badge:not([hidden])) .nav-item--p2 { display: none; }
+@media (max-width: 1240px) {
+    .nav-bar-inner:has(.quote-badge:not([hidden])) .nav-item--p1 { display: none; }
+}
+
 /* Quote-cart badge — masthead pill, count wired by quote-cart-store.js
    ([data-quote-badge] auto-init; hidden at 0 items). Visible on mobile
    (lives outside .nav-menu, which collapses ≤960px). */
@@ -777,6 +798,7 @@ img { max-width: 100%; }
     .brand-logo { height: 38px; }
     .util-inner { justify-content: center; }
     .util-contact .util-mail { display: none; }
+    .util-contact .util-corp { display: none; } /* in the drawer on mobile */
 
     .footer-inner { grid-template-columns: 1fr 1fr; gap: 26px; }
 }
