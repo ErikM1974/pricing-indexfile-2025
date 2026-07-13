@@ -1,3 +1,7 @@
+## v2026.07.13.5 (2026.07.13)
+
+- feat(seo): Custom Nike brand landing page (/custom-nike) — Dri-FIT polo families + fleece/caps/tees grid w/ real order stats (NKDC1963 = 1,700+ embroidered), swoosh/premium-gift angle, FAQ + CollectionPage/ItemList/FAQPage schema; Brands dropdown routes Nike → landing; sitemap + drawer/footer links
+
 ## v2026.07.13.4 (2026.07.13)
 
 - feat(seo): Custom Richardson brand landing page (/custom-richardson) — 112-family + trucker/rope cap grid w/ real order stats (112 = 7,800+ decorated), leather/laser-patch decoration section, real customer showcase, FAQ + CollectionPage/ItemList/FAQPage schema; Brands dropdown routes Richardson → landing page; sitemap + drawer/footer links; reuses Carhartt landing CSS/JS
