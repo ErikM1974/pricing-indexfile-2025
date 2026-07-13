@@ -3343,14 +3343,18 @@ app.get('/google9a8dd44e58634cb7.html', (req, res) => {
   res.type('text/html').send('google-site-verification: google9a8dd44e58634cb7.html');
 });
 
-// Favicon — SELF-HOSTED (2026-07-12): the old cdn.caspio.com favicon URL is
-// robots-blocked (cdn robots.txt = Disallow: /), so Googlebot-Image could
-// never fetch it and search results showed a generic globe instead of our
-// icon. No root express.static exists, hence explicit routes. favicon.ico is
-// a PNG-in-ICO wrapper of the same 48x48 mark (Google's minimum favicon size).
-app.get(['/favicon.ico', '/favicon.png'], (req, res) => {
+// Favicon — SELF-HOSTED (2026-07-12; icon refreshed 2026-07-13 to the NWCA
+// circle/tee mark): the old cdn.caspio.com favicon URL is robots-blocked (cdn
+// robots.txt = Disallow: /), so Googlebot-Image could never fetch it and search
+// results showed a generic globe. No root express.static exists, hence explicit
+// routes. favicon.ico is a multi-size (16/32/48) PNG-in-ICO; apple-touch-icon
+// (180) is auto-requested by iOS at the site root for "Add to Home Screen".
+app.get(['/favicon.ico', '/favicon.png', '/apple-touch-icon.png', '/apple-touch-icon-precomposed.png'], (req, res) => {
   res.set('Cache-Control', 'public, max-age=86400');
-  res.sendFile(path.join(__dirname, req.path === '/favicon.ico' ? 'favicon.ico' : 'favicon.png'));
+  const file = req.path === '/favicon.ico' ? 'favicon.ico'
+             : req.path === '/favicon.png' ? 'favicon.png'
+             : 'apple-touch-icon.png';
+  res.sendFile(path.join(__dirname, file));
 });
 
 // =============================================================================
