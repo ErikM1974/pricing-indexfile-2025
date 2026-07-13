@@ -60,6 +60,24 @@ class BrandsFlyout {
 
         // Set up on-demand loading (only fetch when dropdown opens)
         this.setupLazyLoading();
+
+        // Warm the dropdown during browser IDLE time so it opens instantly —
+        // the brand list + logos are fetched before the user ever hovers/clicks
+        // (the API is cached proxy-side, so this is cheap). Runs only when the
+        // browser is idle, well after critical page load, so it never competes
+        // with it — unlike the old eager-on-load approach that stalled the page.
+        this.prefetchWhenIdle();
+    }
+
+    prefetchWhenIdle() {
+        const warm = () => {
+            if (!this.brandsLoaded && !this.isLoading) this.loadBrands();
+        };
+        if (typeof window.requestIdleCallback === 'function') {
+            window.requestIdleCallback(warm, { timeout: 4000 });
+        } else {
+            setTimeout(warm, 2500);
+        }
     }
 
     /**

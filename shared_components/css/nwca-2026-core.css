@@ -204,7 +204,7 @@ img { max-width: 100%; }
 }
 .nav-link:hover { color: var(--green-900); background: var(--green-50); }
 .nav-arrow { width: 11px; height: 11px; color: var(--ink-faint); transition: transform 0.18s ease; flex: none; }
-.nav-item:hover .nav-arrow, .nav-item:focus-within .nav-arrow { transform: rotate(180deg); color: var(--green-700); }
+.nav-item.nav-open .nav-arrow { transform: rotate(180deg); color: var(--green-700); }
 .nav-link .flag-new { margin-left: 2px; }
 
 /* Search */
@@ -292,8 +292,12 @@ img { max-width: 100%; }
     pointer-events: none;
     transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
 }
-.nav-item:hover > .nav-dropdown,
-.nav-item:focus-within > .nav-dropdown {
+/* CLICK-to-open: nav-dropdown.js toggles .nav-open. Deliberately NOT :hover —
+   hover mega menus are finicky on desktop (a dead strip of bare nav bar sits
+   between the small trigger and the full-width panel, so a diagonal toward a
+   far brand snapped the menu shut) and don't exist on touch. Click is robust
+   everywhere and never opens by accident (2026-07-13). */
+.nav-item.nav-open > .nav-dropdown {
     opacity: 1; visibility: visible; transform: translateY(0); pointer-events: auto;
 }
 .dropdown-content { padding: 22px 26px 24px; }
