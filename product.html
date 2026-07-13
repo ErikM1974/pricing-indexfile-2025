@@ -300,6 +300,15 @@
                 </div>
             </section>
 
+            <!-- This style on our blog — posts featuring this style (related-posts.js;
+                 stays hidden unless /api/blog-product-map has entries for it) -->
+            <section class="pdp-section" id="blogPostsSection" aria-labelledby="blogPostsHeading" hidden>
+                <div class="wrap">
+                    <h2 id="blogPostsHeading">This style on our blog</h2>
+                    <ul class="pdp-blog-links" id="blogPostsList"></ul>
+                </div>
+            </section>
+
             <!-- Related products -->
             <section class="pdp-section" id="relatedSection" aria-labelledby="relatedHeading" hidden>
                 <div class="wrap">
@@ -391,5 +400,6 @@
     <script src="/shared_components/js/sample-cart-service.js?v=2026.07.08.8" defer></script>
     <script src="/shared_components/js/cart-drawer.js?v=2026.07.06.7" defer></script>
     <script src="/product/js/product-2026.js?v=2026.07.06.7" defer></script>
+    <script src="/product/js/related-posts.js?v=2026.07.12.1" defer></script>
 </body>
 </html>

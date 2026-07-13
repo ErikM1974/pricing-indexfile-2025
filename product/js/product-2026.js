@@ -227,22 +227,32 @@
         }
         $('crumbStyle').textContent = state.style;
 
-        // SEO
+        // SEO — the server (lib/product-seo.js) injects a per-product head with
+        // decoration-METHOD-aware titles, NWCA copy in the meta, and Product
+        // JSON-LD. When that ran (title is no longer the static placeholder),
+        // do NOT overwrite it: the client rewrite was silently undoing the SSR
+        // title in the rendered DOM Google indexes (caught 2026-07-12 — SERPs
+        // showed this generic title, not the SSR one), and injectJsonLd would
+        // add a DUPLICATE Product schema beside the server's. Client values
+        // remain the fallback for any path that serves the raw static file.
         const canonical = window.location.origin + '/product.html?style=' + encodeURIComponent(state.style);
-        document.title = state.style + ' ' + displayName + ' — Custom ' + (state.isCap ? 'Caps' : 'Apparel')
-            + ' | Northwest Custom Apparel';
+        const ssrHead = !/^Product Details \|/.test(document.title);
         const desc = (bullets.lead || displayName) + ' Live inventory and decoration pricing — embroidery'
             + (state.isCap ? '' : ', screen print, DTG, and DTF') + ' from Northwest Custom Apparel, Milton WA.';
-        setMeta('name', 'description', desc.slice(0, 300));
-        setMeta('property', 'og:title', document.title);
-        setMeta('property', 'og:description', desc.slice(0, 300));
+        if (!ssrHead) {
+            document.title = state.style + ' ' + displayName + ' — Custom ' + (state.isCap ? 'Caps' : 'Apparel')
+                + ' | Northwest Custom Apparel';
+            setMeta('name', 'description', desc.slice(0, 300));
+            setMeta('property', 'og:title', document.title);
+            setMeta('property', 'og:description', desc.slice(0, 300));
+        }
         const img = state.selected && (state.selected.images.front_model || state.selected.images.front_flat);
         if (img) setMeta('property', 'og:image', img);
         setMeta('property', 'og:url', canonical);
         const link = $('canonicalLink');
         if (link) link.href = canonical;
 
-        injectJsonLd(canonical, displayName, desc, img);
+        if (!ssrHead) injectJsonLd(canonical, displayName, desc, img);
     }
 
     function setMeta(attr, key, value) {
