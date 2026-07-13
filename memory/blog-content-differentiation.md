@@ -72,9 +72,15 @@ Batch 1 (2026-07-13): `richardson-112-custom-trucker-cap-guide`, `best-carhartt-
 `custom-ogio-bags-polos-corporate-gifts`, `best-affordable-custom-tees-gildan-district-port-and-company`,
 `premium-branded-jackets-eddie-bauer-north-face-corporate-gifts`, `bella-canvas-3001-soft-retail-tee-merch-brands`,
 `travismathew-premium-polos-quarter-zips-golf-client-facing-teams`.
-All 15 brand landing pages are now covered. Next angles (not yet written): single-style deep-dives on the very
-top-GP styles, seasonal/"2026 best sellers" roundups, decoration-on-a-style ("embroidery vs DTG on X"),
-industry use-case product picks (breweries, schools, restaurants) — keep all COMMERCIAL, link to product/quote.
+Batch 3 (2026-07-13, `product-style-batch3.json`, "Industry Guides"): `best-custom-apparel-for-breweries-taprooms`,
+`best-custom-apparel-for-restaurants-and-cafes`, `best-custom-apparel-real-estate-professional-services`,
+`best-custom-apparel-nonprofits-events-volunteers`, `best-custom-apparel-landscaping-lawn-care-crews`,
+`best-custom-apparel-auto-shops-mechanics-dealerships`.
+**17 drafts total across 3 batches.** DROPPED industries (.net owns them): schools (uniform polos + fundraising),
+gyms (gym-printing handbook) — check `reference/.../INDEX.md` before adding any industry/topic. Brewery/restaurant
+were angled to apparel+MERCH, NOT aprons (.net owns custom aprons — link out, don't duplicate).
+Next un-written angles: single-style deep-dives (top-GP styles), seasonal/"2026 best sellers", decoration-on-a-style,
+more industries with NO .net overlap (auto detailing, food trucks, marinas/boating, churches, trades sub-niches).
 
 ## Related
 - Blog system (Caspio `Blog_Posts` → SSR `/blog` + editor + Monday autopilot): [[BLOG_SYSTEM_2026-07]]
