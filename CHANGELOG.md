@@ -1,3 +1,8 @@
+## v2026.07.13.3 (2026.07.13)
+
+- fix(nav): click-to-open mega dropdowns (Products/Brands) — replaces hover. Kills 'diagonal death' entirely, works on touch/tablet, never opens by accident; nav-dropdown.js disclosure (toggle, outside-click/Escape close, one-at-a-time, aria-expanded), CSS drops :hover open. Verified: click open/close, hover no-op, panel hit-testable, aria syncs, 0 console errors
+- perf(nav): eliminate mega-menu open delay — idle-prefetch brand list on requestIdleCallback so the Brands dropdown is warm before first open (was ~3s API fetch on fresh page); pairs with proxy /api/all-brands cache
+
 ## v2026.07.13.2 (2026.07.13)
 
 - feat(nav): Carhartt discoverable from homepage — Brands dropdown routes Carhartt to /custom-carhartt (BRAND_LANDING_PAGES map, extensible), footer Shop column link; flyout cache-busted
