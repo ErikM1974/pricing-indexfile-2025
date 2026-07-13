@@ -3861,11 +3861,17 @@ app.get(['/custom-richardson', '/custom-richardson.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'custom-richardson.html'));
 });
 
+// Custom Nike — static SEO brand landing page (2026-07-13): Dri-FIT polos,
+// Club Fleece, and caps embroidered in-house (the swoosh premium/gift play).
+app.get(['/custom-nike', '/custom-nike.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'custom-nike.html'));
+});
+
 // Core-pages sitemap (2026-07-12) — the handful of hand-built landing/tool
 // pages that aren't in the blog or product sitemaps. Listed in robots.txt.
 app.get('/sitemap-pages.xml', (req, res) => {
   const pages = [
-    '/', '/custom-carhartt', '/custom-richardson', '/custom-tees', '/custom-caps', '/blog',
+    '/', '/custom-carhartt', '/custom-richardson', '/custom-nike', '/custom-tees', '/custom-caps', '/blog',
     '/brands.html', '/catalog?topSellers=1',
     '/pages/request-a-quote.html', '/pages/webstore-inquiry.html', '/pages/webstore-info.html',
   ];
