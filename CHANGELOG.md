@@ -1,3 +1,8 @@
+## v2026.07.13.11 (2026.07.13)
+
+- feat(seo): rebuild /custom-safety-apparel around screen-printed safety-stripes program
+- feat(seo): expand safety-stripe design menu (14 layouts) + visible not-ANSI disclaimer
+
 ## v2026.07.13.10 (2026.07.13)
 
 - feat(seo): Custom Bella+Canvas landing page + clean URL for golf tournament page
