@@ -1,3 +1,8 @@
+## v2026.07.13.10 (2026.07.13)
+
+- feat(seo): Custom Bella+Canvas landing page + clean URL for golf tournament page
+- feat(seo): golf tournament page — canonical, JSON-LD, cross-links + clean-URL inbound links
+
 ## v2026.07.13.9 (2026.07.13)
 
 - feat(seo): Custom Port Authority + Port & Company brand landing pages
