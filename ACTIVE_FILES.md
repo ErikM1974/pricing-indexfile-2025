@@ -12,6 +12,7 @@
 
 | File | Purpose | Used By | Future Action |
 |------|---------|---------|---------------|
+| `favicon.png` / `favicon.ico` | Self-hosted 48×48 site icon (SERP favicon — old cdn.caspio.com URL is robots-blocked so Google showed a globe); served by explicit server.js routes | every page + Google Search | ✅ Active (NEW 2026-07-12) |
 | `app-modern.js` | Main application logic | index.html | Move to shared_components |
 | `app-new.js` | New app version | Unknown | Verify if needed |
 | `autocomplete-new.js` | Search autocomplete | index.html | Move to shared_components |
