@@ -155,6 +155,8 @@ dotenv.config();
 //   L~3300 GET  /blog · /blog/:slug — SSR pages (5-min cache, marked+xss)
 //          GET  /blog/feed.xml · /sitemap-blog.xml
 //          GET  /api/blog-product-map — style→posts map for PDP "From our blog" (2026-07-12)
+//   GET /custom-carhartt[.html] — static SEO brand landing page (pages/custom-carhartt.html, 2026-07-12)
+//   GET /sitemap-pages.xml — core landing/tool pages sitemap (2026-07-12)
 //          POST /api/blog-preview (requireStaff — Blog Editor live preview)
 //          ALL  /api/crm-proxy/blog-posts* — editor writes/drafts (any staff; ~L3236)
 //
@@ -3843,6 +3845,27 @@ app.get(['/catalog', '/catalog.html'], (req, res) => {
 // Clean URL + .html alias; success page resolves via the static /pages mount.
 app.get(['/custom-caps', '/custom-caps.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'custom-caps.html'));
+});
+
+// Custom Carhartt — static SEO brand landing page (2026-07-12): curated
+// top-sellers grid + FAQ + ItemList/FAQPage schema. Targets "custom carhartt
+// embroidered" buying-intent queries; content is fully static on purpose.
+app.get(['/custom-carhartt', '/custom-carhartt.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'custom-carhartt.html'));
+});
+
+// Core-pages sitemap (2026-07-12) — the handful of hand-built landing/tool
+// pages that aren't in the blog or product sitemaps. Listed in robots.txt.
+app.get('/sitemap-pages.xml', (req, res) => {
+  const pages = [
+    '/', '/custom-carhartt', '/custom-tees', '/custom-caps', '/blog',
+    '/brands.html', '/catalog?topSellers=1',
+    '/pages/request-a-quote.html', '/pages/webstore-inquiry.html', '/pages/webstore-info.html',
+  ];
+  const urls = pages.map((p) =>
+    `  <url><loc>https://www.teamnwca.com${p.replace(/&/g, '&amp;')}</loc><changefreq>weekly</changefreq></url>`);
+  res.type('application/xml').send(
+    `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>`);
 });
 
 // Customer quote cart — sessionStorage quote builder (quote-cart Phase 2,
