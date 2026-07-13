@@ -1,3 +1,8 @@
+## v2026.07.12.11 (2026.07.12)
+
+- feat(seo): PDP 'This style on our blog' block — /api/blog-product-map (live-derived from post bodies, self-maintaining) + related-posts.js; fix client SEO rewrite clobbering SSR method-aware titles + duplicate Product schema (client now defers when SSR head present)
+- Deploy v2026.07.12.11: cache-bust product-2026.{js,css} + related-posts.js
+
 ## v2026.07.12.10 (2026.07.12)
 
 - docs(memory): Caspio q.distinct-ignored + unordered-groupBy-pagination gotcha; archive resolved staff-backdoors entry
