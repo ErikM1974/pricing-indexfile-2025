@@ -400,7 +400,7 @@ class BrandsFlyout {
         // Brands with a dedicated landing page route there instead of the
         // catalog filter (SEO brand-program pages, 2026-07-13). Extend this
         // map as more /custom-<brand> pages ship.
-        const BRAND_LANDING_PAGES = { 'Carhartt': '/custom-carhartt', 'Richardson': '/custom-richardson', 'Nike': '/custom-nike', 'New Era': '/custom-new-era', 'Sport-Tek': '/custom-sport-tek', 'OGIO': '/custom-ogio', 'District': '/custom-district', 'Port Authority': '/custom-port-authority', 'Port & Co': '/custom-port-and-company', 'Port & Company': '/custom-port-and-company', 'CornerStone': '/custom-cornerstone', 'The North Face': '/custom-north-face', 'Gildan': '/custom-gildan', 'Eddie Bauer': '/custom-eddie-bauer', 'TravisMathew': '/custom-travismathew' };
+        const BRAND_LANDING_PAGES = { 'Carhartt': '/custom-carhartt', 'Richardson': '/custom-richardson', 'Nike': '/custom-nike', 'New Era': '/custom-new-era', 'Sport-Tek': '/custom-sport-tek', 'OGIO': '/custom-ogio', 'District': '/custom-district', 'Port Authority': '/custom-port-authority', 'Port & Co': '/custom-port-and-company', 'Port & Company': '/custom-port-and-company', 'CornerStone': '/custom-cornerstone', 'The North Face': '/custom-north-face', 'Gildan': '/custom-gildan', 'Eddie Bauer': '/custom-eddie-bauer', 'TravisMathew': '/custom-travismathew', 'Bella + Canvas': '/custom-bella-canvas' };
         const landingPage = BRAND_LANDING_PAGES[brandName];
 
         return `
