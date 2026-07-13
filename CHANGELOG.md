@@ -1,3 +1,10 @@
+## v2026.07.13.12 (2026.07.13)
+
+- feat(home): surface Custom Safety Stripe Apparel on the homepage
+- seo(safety): keyword-optimize meta description + keywords for hi-vis search
+- feat(brand): refresh favicon to NWCA circle/tee logo + add apple-touch-icon
+- Deploy v2026.07.13.12: cache-bust nwca-2026.css (.duo-safety band + 5-col svc-grid)
+
 ## v2026.07.13.11 (2026.07.13)
 
 - feat(seo): rebuild /custom-safety-apparel around screen-printed safety-stripes program
