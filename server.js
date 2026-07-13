@@ -3854,11 +3854,18 @@ app.get(['/custom-carhartt', '/custom-carhartt.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'custom-carhartt.html'));
 });
 
+// Custom Richardson — static SEO brand landing page (2026-07-13): the 112
+// trucker + full Richardson cap lineup, leather/laser patches (NWCA specialty).
+// Same static pattern as /custom-carhartt (shares its landing CSS/JS).
+app.get(['/custom-richardson', '/custom-richardson.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'custom-richardson.html'));
+});
+
 // Core-pages sitemap (2026-07-12) — the handful of hand-built landing/tool
 // pages that aren't in the blog or product sitemaps. Listed in robots.txt.
 app.get('/sitemap-pages.xml', (req, res) => {
   const pages = [
-    '/', '/custom-carhartt', '/custom-tees', '/custom-caps', '/blog',
+    '/', '/custom-carhartt', '/custom-richardson', '/custom-tees', '/custom-caps', '/blog',
     '/brands.html', '/catalog?topSellers=1',
     '/pages/request-a-quote.html', '/pages/webstore-inquiry.html', '/pages/webstore-info.html',
   ];
