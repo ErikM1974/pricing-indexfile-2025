@@ -29,7 +29,7 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="catalog-search.css?v=4">
-    <link rel="stylesheet" href="/shared_components/css/nwca-2026-core.css?v=2026.07.01.1">
+    <link rel="stylesheet" href="/shared_components/css/nwca-2026-core.css?v=2026.07.12.12">
     <link rel="stylesheet" href="/shared_components/css/nwca-2026.css?v=2026.06.12.5">
     <link rel="stylesheet" href="/shared_components/css/blog.css?v=2026.07.12.4">
 
@@ -49,6 +49,7 @@
                 <span class="util-hours">Mon–Fri 8:30–5:00 PT</span>
                 <a href="tel:253-922-5793">253-922-5793</a>
                 <a class="util-mail" href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a>
+                <a class="util-corp" href="https://nwcustomapparel.net/" target="_blank" rel="noopener">Corporate site ↗</a>
                 <a href="/staff-dashboard.html" title="Staff Portal">Staff</a>
             </div>
         </div>
@@ -101,24 +102,26 @@
                         </div>
                     </div>
                 </li>
-                <li class="nav-item">
+                <!-- --p1/--p2/--p3 = demotion tiers (nwca-2026-core.css): lowest-priority
+                     links leave the bar first as the viewport narrows so the search box
+                     keeps a typeable width. Everything demoted stays in the drawer. -->
+                <li class="nav-item nav-item--p1">
                     <a href="/catalog?topSellers=1" class="nav-link">Top Sellers</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item nav-item--p1">
                     <a href="/#express-order" class="nav-link">Express Order <span class="flag-new">New</span></a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item nav-item--p2">
                     <a href="/pages/webstore-info.html" class="nav-link">Webstores</a>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item nav-item--p2">
                     <a href="/blog" class="nav-link">Blog</a>
                 </li>
                 <li class="nav-item">
                     <a href="/pages/request-a-quote.html" class="nav-link">Get a Quote</a>
                 </li>
-                <li class="nav-item">
-                    <a href="https://nwcustomapparel.net/" class="nav-link" target="_blank" rel="noopener">Corporate site ↗</a>
-                </li>
+                <!-- Corporate site link lives in the util-strip (meta-nav) — the main
+                     bar is width-capped at --wrap and 8 items crushed the search box. -->
             </ul>
 
             <div class="nav-search" role="search">
@@ -174,6 +177,9 @@
             <a href="/catalog?topSellers=1">Top Sellers &amp; Free Samples</a>
             <a href="/brands.html">Brands</a>
             <a href="/pages/webstore-info.html">Custom Webstores</a>
+            <a href="/blog">Blog</a>
+            <a href="/pages/request-a-quote.html">Get a Quote</a>
+            <a href="https://nwcustomapparel.net/" target="_blank" rel="noopener">Corporate site ↗</a>
         </nav>
         <h3 class="drawer-subhead">Shop by category</h3>
         <ul class="category-list" id="categoryList">
