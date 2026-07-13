@@ -3891,11 +3891,23 @@ app.get(['/custom-district', '/custom-district.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'custom-district.html'));
 });
 
+// Custom Port Authority — static SEO brand landing page (2026-07-13): the
+// corporate-apparel workhorse — caps, performance polos, soft-shell jackets.
+app.get(['/custom-port-authority', '/custom-port-authority.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'custom-port-authority.html'));
+});
+
+// Custom Port & Company — static SEO brand landing page (2026-07-13): value
+// tees & Core Fleece for big orders, fundraisers, and events.
+app.get(['/custom-port-and-company', '/custom-port-and-company.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'custom-port-and-company.html'));
+});
+
 // Core-pages sitemap (2026-07-12) — the handful of hand-built landing/tool
 // pages that aren't in the blog or product sitemaps. Listed in robots.txt.
 app.get('/sitemap-pages.xml', (req, res) => {
   const pages = [
-    '/', '/custom-carhartt', '/custom-richardson', '/custom-nike', '/custom-new-era', '/custom-sport-tek', '/custom-ogio', '/custom-district', '/custom-tees', '/custom-caps', '/blog',
+    '/', '/custom-carhartt', '/custom-richardson', '/custom-nike', '/custom-new-era', '/custom-sport-tek', '/custom-ogio', '/custom-district', '/custom-port-authority', '/custom-port-and-company', '/custom-tees', '/custom-caps', '/blog',
     '/brands.html', '/catalog?topSellers=1',
     '/pages/request-a-quote.html', '/pages/webstore-inquiry.html', '/pages/webstore-info.html',
   ];
