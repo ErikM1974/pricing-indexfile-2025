@@ -1,3 +1,12 @@
+## v2026.07.12.10 (2026.07.12)
+
+- docs(memory): Caspio q.distinct-ignored + unordered-groupBy-pagination gotcha; archive resolved staff-backdoors entry
+- docs(memory): lesson — Caspio v3 unordered pagination drops rows; proxy-wide q.orderBy sweep (36 sites/10 routes, proxy 3ef35ee)
+- feat(product-seo): decoration-method-aware titles — tees get 'Screen Printed & DTG', polos/outerwear 'Embroidered', caps 'Embroidery & Patches', performance 'Screen Printed & DTF' (matches style+method search queries)
+- fix(seo): self-host favicon — cdn.caspio.com is robots-blocked so Google SERPs showed a generic globe; 48x48 PNG + PNG-in-ICO at root routes, 153 pages repointed
+- Merge remote-tracking branch 'origin/develop' into claude/adoring-feistel-7404e2
+- docs(memory): dedupe the two pagination lessons into one entry (both sessions wrote one; 296 lines, under the 300 cap)
+
 ## v2026.07.12.9 (2026.07.12)
 
 - feat(seo): Organization schema w/ sameAs → nwcustomapparel.net (entity stitching)
