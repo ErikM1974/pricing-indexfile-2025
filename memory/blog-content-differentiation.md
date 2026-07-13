@@ -62,6 +62,20 @@ drafts, 1 private, 18 trash; see its `INDEX.md`). Topic clusters (posts multi-co
 5. **Before publishing a topic, scan `reference/nwcustomapparel-net-blogs/INDEX.md`** for an existing .net
    post on the same subject. If one exists → change the angle to product/commercial, or link to theirs.
 
+## Product-style drafts already written (don't duplicate — extend the angle instead)
+
+Created as **Drafts** in Caspio `Blog_Posts` via `caspio-pricing-proxy/scripts/seed-blog-posts.js`
+(content JSON in `caspio-pricing-proxy/scripts/blog-posts/product-style-batch{1,2}.json`).
+Batch 1 (2026-07-13): `richardson-112-custom-trucker-cap-guide`, `best-carhartt-styles-custom-company-workwear`,
+`cornerstone-hi-vis-ansi-safety-styles-custom-workwear`, `best-custom-polos-company-uniforms-sport-tek-port-authority-nike`,
+`best-custom-hoodies-winter-crews`. Batch 2 (2026-07-13): `new-era-custom-caps-pro-sports-style`,
+`custom-ogio-bags-polos-corporate-gifts`, `best-affordable-custom-tees-gildan-district-port-and-company`,
+`premium-branded-jackets-eddie-bauer-north-face-corporate-gifts`, `bella-canvas-3001-soft-retail-tee-merch-brands`,
+`travismathew-premium-polos-quarter-zips-golf-client-facing-teams`.
+All 15 brand landing pages are now covered. Next angles (not yet written): single-style deep-dives on the very
+top-GP styles, seasonal/"2026 best sellers" roundups, decoration-on-a-style ("embroidery vs DTG on X"),
+industry use-case product picks (breweries, schools, restaurants) — keep all COMMERCIAL, link to product/quote.
+
 ## Related
 - Blog system (Caspio `Blog_Posts` → SSR `/blog` + editor + Monday autopilot): [[BLOG_SYSTEM_2026-07]]
 - Product copy program (per-style descriptions feeding style content): Product_Copy seeding, proxy v906
