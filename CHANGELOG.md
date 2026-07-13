@@ -1,3 +1,8 @@
+## v2026.07.13.7 (2026.07.13)
+
+- fix(seo): align FAQPage JSON-LD with visible FAQ copy on 4 brand pages
+- feat(seo): Custom OGIO + District brand landing pages
+
 ## v2026.07.13.6 (2026.07.13)
 
 - feat(seo): Custom New Era brand landing page (/custom-new-era)
