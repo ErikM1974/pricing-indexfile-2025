@@ -1,3 +1,7 @@
+## v2026.07.13.2 (2026.07.13)
+
+- feat(nav): Carhartt discoverable from homepage — Brands dropdown routes Carhartt to /custom-carhartt (BRAND_LANDING_PAGES map, extensible), footer Shop column link; flyout cache-busted
+
 ## v2026.07.13.1 (2026.07.13)
 
 - feat(seo): Custom Carhartt brand landing page (/custom-carhartt) — static indexable 18-style grid with real order stats, FAQ + CollectionPage/ItemList/FAQPage schema, .net educational cross-link; + /sitemap-pages.xml (core pages) in robots, drawer/footer links
