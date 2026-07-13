@@ -1,3 +1,13 @@
+## v2026.07.13.7 (2026.07.13)
+
+- fix(seo): align FAQPage JSON-LD with visible FAQ copy on 4 brand pages
+- feat(seo): Custom OGIO + District brand landing pages
+
+## v2026.07.13.6 (2026.07.13)
+
+- feat(seo): Custom New Era brand landing page (/custom-new-era)
+- feat(seo): Custom Sport-Tek brand landing page (/custom-sport-tek)
+
 ## v2026.07.13.5 (2026.07.13)
 
 - feat(seo): Custom Nike brand landing page (/custom-nike) — Dri-FIT polo families + fleece/caps/tees grid w/ real order stats (NKDC1963 = 1,700+ embroidered), swoosh/premium-gift angle, FAQ + CollectionPage/ItemList/FAQPage schema; Brands dropdown routes Nike → landing; sitemap + drawer/footer links
