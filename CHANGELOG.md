@@ -1,3 +1,7 @@
+## v2026.07.12.12 (2026.07.12)
+
+- fix(masthead): homepage search box crushed by 8-item menu — Corporate site moves to util-strip, search gets 190px floor, p1/p2 tiered demotion + quote-badge :has relief (verified 1680/1200/1050/mobile, zero overflow)
+
 ## v2026.07.12.11 (2026.07.12)
 
 - feat(seo): PDP 'This style on our blog' block — /api/blog-product-map (live-derived from post bodies, self-maintaining) + related-posts.js; fix client SEO rewrite clobbering SSR method-aware titles + duplicate Product schema (client now defers when SSR head present)
