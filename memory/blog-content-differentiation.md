@@ -76,11 +76,18 @@ Batch 3 (2026-07-13, `product-style-batch3.json`, "Industry Guides"): `best-cust
 `best-custom-apparel-for-restaurants-and-cafes`, `best-custom-apparel-real-estate-professional-services`,
 `best-custom-apparel-nonprofits-events-volunteers`, `best-custom-apparel-landscaping-lawn-care-crews`,
 `best-custom-apparel-auto-shops-mechanics-dealerships`.
-**17 drafts total across 3 batches.** DROPPED industries (.net owns them): schools (uniform polos + fundraising),
-gyms (gym-printing handbook) — check `reference/.../INDEX.md` before adding any industry/topic. Brewery/restaurant
-were angled to apparel+MERCH, NOT aprons (.net owns custom aprons — link out, don't duplicate).
-Next un-written angles: single-style deep-dives (top-GP styles), seasonal/"2026 best sellers", decoration-on-a-style,
-more industries with NO .net overlap (auto detailing, food trucks, marinas/boating, churches, trades sub-niches).
+Batch 4 (2026-07-13, `product-style-batch4.json`): `custom-apparel-food-trucks-mobile-food-vendors`,
+`custom-apparel-marinas-boating-watersports`, `best-custom-apparel-for-churches-and-ministries`,
+`best-custom-apparel-for-golf-courses-country-clubs`, `custom-apparel-pet-businesses-groomers-vets-dog-daycare`,
+`2026-best-selling-custom-apparel-styles-pnw-businesses` (a 31-link internal hub post).
+**23 drafts total across 4 batches.** DROPPED (.net owns them): schools (uniform polos + fundraising), gyms
+(gym-printing handbook), HVAC/trades (4 HVAC posts) — always check `reference/.../INDEX.md` before a new industry/topic.
+Brewery/restaurant/food-truck angled to apparel+MERCH, NOT aprons (.net owns aprons — link out).
+**Internal links AUDITED (2026-07-13):** all 22 routes HTTP-checked + 26 styles catalog-checked; fixed bare
+`/quote-builders/` (→ specific dtg/embroidery/screenprint builder) and `style=3001` (→ `BC3001`).
+`seed-blog-posts.js --update` refreshes an existing draft's content without touching Status/Published_At.
+Next un-written angles: single-style deep-dives, seasonal roundups, more no-overlap industries (auto detailing,
+salons/spas, coffee roasters as retail brands, self-storage, gyms are OUT).
 
 ## Related
 - Blog system (Caspio `Blog_Posts` → SSR `/blog` + editor + Monday autopilot): [[BLOG_SYSTEM_2026-07]]
