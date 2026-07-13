@@ -3873,11 +3873,17 @@ app.get(['/custom-new-era', '/custom-new-era.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'custom-new-era.html'));
 });
 
+// Custom Sport-Tek — static SEO brand landing page (2026-07-13): performance
+// polos, Competitor tees, and Sport-Wick 1/4-zips for teams & spirit wear.
+app.get(['/custom-sport-tek', '/custom-sport-tek.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'custom-sport-tek.html'));
+});
+
 // Core-pages sitemap (2026-07-12) — the handful of hand-built landing/tool
 // pages that aren't in the blog or product sitemaps. Listed in robots.txt.
 app.get('/sitemap-pages.xml', (req, res) => {
   const pages = [
-    '/', '/custom-carhartt', '/custom-richardson', '/custom-nike', '/custom-new-era', '/custom-tees', '/custom-caps', '/blog',
+    '/', '/custom-carhartt', '/custom-richardson', '/custom-nike', '/custom-new-era', '/custom-sport-tek', '/custom-tees', '/custom-caps', '/blog',
     '/brands.html', '/catalog?topSellers=1',
     '/pages/request-a-quote.html', '/pages/webstore-inquiry.html', '/pages/webstore-info.html',
   ];
