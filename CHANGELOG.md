@@ -1,3 +1,7 @@
+## v2026.07.14.4 (2026.07.14)
+
+- feat(policies): interactive 2026 org chart — full-width layout, 5-across directs, masonry production grid
+
 ## v2026.07.14.3 (2026.07.14)
 
 - docs(training): note Training Center in claude.md recent updates
