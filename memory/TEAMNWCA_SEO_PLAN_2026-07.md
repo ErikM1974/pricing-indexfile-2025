@@ -102,8 +102,16 @@ include (feed these into the email/brief for Mehar):
    two domains never publish contradictory turnaround/minimum claims (same class of problem
    as prices outside the engine, softer stakes).
 
+## Coordination with Mehar (.net SEO writer)
+- **Mehar's email: umehar56@gmail.com** — Claude does NOT email him directly; questions
+  about .net SEO go through Erik ("Erik, please ask Mehar…"). Gray-area topics (could go
+  either site) → flag to Erik BEFORE writing (collision protocol §7 of the guide).
+- **✅ Packet SENT to Mehar 2026-07-14** (roadmap + playbook + template + coordination
+  guide) — the 3 roadmap amendments and 4 template additions are relayed; Mehar is building
+  .net's local/service lane per the guide. Every future teamnwca blog/page must honor Lane
+  Split v2 (never local/"near me"/city, never educational-craft, never anything .net covers
+  with the same intent — cross-link instead).
+
 ## Open asks
-- **Erik → Mehar**: relay the 3 roadmap amendments (calculators/pricing → teamnwca; coordinate
-  the vs-comparison angle; retire /dtg-calculator/ + /order-form/). 
 - **Erik**: green-light brand-page wave 2 order (safety vests first is my recommendation —
   it pairs with the queued CSV405 post and the hi-vis Product_Copy already seeded).
