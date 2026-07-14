@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  NORTHWEST CUSTOM APPAREL — LOCAL LANDING PAGE TEMPLATE
+  ============================================================================
+  This is a WORKING EXAMPLE filled in for "Tacoma". To create a page for a new
+  city, duplicate this file and find-replace the tokens below. See the PLAYBOOK
+  for the full token map, schema notes, and the pre-publish checklist.
+
+  FIND-REPLACE TOKENS (this example uses Tacoma / Pierce County):
+    {{CITY}}         -> Tacoma
+    {{COUNTY}}       -> Pierce County
+    {{CITY_SLUG}}    -> tacoma           (used in the URL)
+    {{NEIGHBORS}}    -> Fife, Puyallup, University Place, Lakewood, Federal Way
+    {{DRIVE_TIME}}   -> about 15 minutes
+    {{LOCAL_INDUSTRIES}} -> construction, healthcare, maritime, and hospitality
+
+  CONFIRM-BEFORE-PUBLISH (verify these are accurate for the business):
+    [PHONE] 253-922-5793   [STREET] , Milton, WA 98354   [MINIMUM]   [TURNAROUND]
+    [REVIEW_COUNT] [RATING]  — replace with real Google review data
+  Remove the yellow "TEMPLATE NOTES" banner before publishing.
+  ============================================================================
+-->
+<html lang="en-US">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ===== SEO METADATA (swap {{CITY}} / {{COUNTY}}) ===== -->
+<title>Custom Embroidery &amp; Screen Printing in Tacoma, WA | NW Custom Apparel</title>
+<meta name="description" content="Custom embroidery, screen printing &amp; DTG in Tacoma, WA. Serving Pierce County businesses since 1977 — fast turnaround, no-hassle ordering. Get a free quote today.">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://nwcustomapparel.net/custom-embroidery-tacoma-wa/">
+
+<!-- ===== OPEN GRAPH ===== -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Custom Embroidery &amp; Screen Printing in Tacoma, WA | NW Custom Apparel">
+<meta property="og:description" content="Serving Tacoma &amp; Pierce County businesses since 1977. Custom embroidery, screen printing, DTG &amp; promotional products with fast local turnaround.">
+<meta property="og:url" content="https://nwcustomapparel.net/custom-embroidery-tacoma-wa/">
+<meta property="og:image" content="https://nwcustomapparel.net/wp-content/uploads/nwca-embroidery-tacoma.jpg">
+
+<!-- ===== STRUCTURED DATA: LocalBusiness + Service (swap city/geo/area) ===== -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "LocalBusiness",
+      "@id": "https://nwcustomapparel.net/#business",
+      "name": "Northwest Custom Apparel",
+      "image": "https://nwcustomapparel.net/wp-content/uploads/nwca-storefront.jpg",
+      "url": "https://nwcustomapparel.net/",
+      "telephone": "+1-253-922-5793",
+      "priceRange": "$$",
+      "foundingDate": "1977",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "[STREET ADDRESS — use the exact address from Google Business Profile]",
+        "addressLocality": "Milton",
+        "addressRegion": "WA",
+        "postalCode": "98354",
+        "addressCountry": "US"
+      },
+      "geo": { "@type": "GeoCoordinates", "latitude": "[LATITUDE]", "longitude": "[LONGITUDE]" },
+      "openingHoursSpecification": [{
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"],
+        "opens": "08:30", "closes": "17:00"
+      }],
+      "areaServed": { "@type": "City", "name": "Tacoma, WA" },
+      "sameAs": ["https://www.facebook.com/nwcustomapparel"]
+    },
+    {
+      "@type": "Service",
+      "serviceType": "Custom Embroidery and Screen Printing",
+      "provider": { "@id": "https://nwcustomapparel.net/#business" },
+      "areaServed": { "@type": "City", "name": "Tacoma, WA" },
+      "description": "Custom embroidery, screen printing, DTG and DTF apparel decoration for businesses, teams and organizations in Tacoma and Pierce County, WA."
+    }
+  ]
+}
+</script>
+
+<!-- ===== STRUCTURED DATA: FAQPage (must match the visible FAQ below) ===== -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "Do you serve businesses in Tacoma?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our production facility is in Milton, about 15 minutes from downtown Tacoma, and we serve businesses, teams and organizations throughout Tacoma and Pierce County with custom embroidery, screen printing and DTG." } },
+    { "@type": "Question", "name": "Is there a minimum order for custom apparel?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Minimums vary by decoration method. Embroidery and screen printing have low minimums for Tacoma businesses, and DTG printing is available with no minimum. Contact us for details on your project." } },
+    { "@type": "Question", "name": "How fast is turnaround for Tacoma orders?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Standard turnaround is typically 7–10 business days after art approval, with rush and same-day DTG options available. Local Tacoma pickup and delivery keep timelines tight." } },
+    { "@type": "Question", "name": "What brands and garments can you decorate?",
+      "acceptedAnswer": { "@type": "Answer", "text": "We decorate premium brands including Carhartt, Nike, The North Face, Richardson, Cutter & Buck and more, plus a full catalog of shirts, polos, hats, jackets and workwear through SanMar." } }
+  ]
+}
+</script>
+
+<style>
+  :root{--navy:#16324f;--teal:#2c7a7b;--ink:#233;--muted:#5b6b7f;--bg:#fff;--soft:#f4f7fa;--line:#e3e8ef;--gold:#c8892b}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:#22303c;line-height:1.6}
+  .container{max-width:1080px;margin:0 auto;padding:0 22px}
+  a{color:var(--teal)}
+  h1,h2,h3{color:var(--navy);line-height:1.2}
+  .btn{display:inline-block;background:var(--gold);color:#fff;font-weight:700;padding:13px 26px;border-radius:8px;text-decoration:none;font-size:16px}
+  .btn.alt{background:var(--navy)}
+  .btn:hover{opacity:.92}
+  /* template banner - REMOVE before publishing */
+  .tmpl{background:#fff8e1;border-bottom:2px dashed #c8892b;color:#7a5b12;font-size:13px;padding:9px 22px;text-align:center}
+  .tmpl b{color:#7a5b12}
+  /* top bar */
+  .topbar{background:var(--navy);color:#fff;font-size:14px}
+  .topbar .container{display:flex;justify-content:space-between;align-items:center;padding:9px 22px;flex-wrap:wrap;gap:8px}
+  .topbar a{color:#fff;text-decoration:none;font-weight:700}
+  /* hero */
+  .hero{background:linear-gradient(135deg,#16324f,#22475f 60%,#2c7a7b);color:#fff;padding:56px 0 50px}
+  .hero h1{color:#fff;font-size:34px;margin:0 0 14px;max-width:760px}
+  .hero p{font-size:18px;max-width:620px;opacity:.95;margin:0 0 24px}
+  .hero .cta-row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  .hero .ph{color:#fff;font-weight:700;font-size:17px;text-decoration:none;align-self:center}
+  /* trust bar */
+  .trust{background:var(--soft);border-bottom:1px solid var(--line)}
+  .trust .container{display:flex;justify-content:space-around;gap:14px;flex-wrap:wrap;padding:20px 22px;text-align:center}
+  .trust .n{font-size:24px;font-weight:800;color:var(--teal)}
+  .trust .l{font-size:13px;color:var(--muted)}
+  section{padding:44px 0}
+  section h2{font-size:25px;margin:0 0 6px}
+  .lead{color:var(--muted);max-width:760px;margin:0 0 22px}
+  .grid{display:grid;gap:18px}
+  .g3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+  .g2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px 22px}
+  .card h3{margin:0 0 6px;font-size:18px}
+  .card p{margin:0;color:var(--muted);font-size:15px}
+  .soft{background:var(--soft)}
+  .steps{counter-reset:s;display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+  .step{position:relative;background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px 18px 18px}
+  .step::before{counter-increment:s;content:counter(s);position:absolute;top:-14px;left:18px;background:var(--gold);color:#fff;font-weight:800;width:30px;height:30px;border-radius:50%;display:grid;place-items:center}
+  .rev{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  .rev blockquote{margin:0;background:#fff;border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:10px;padding:18px 20px;font-size:15px}
+  .rev cite{display:block;margin-top:10px;font-style:normal;font-weight:700;color:var(--navy);font-size:14px}
+  .stars{color:var(--gold);letter-spacing:2px}
+  .faq details{background:#fff;border:1px solid var(--line);border-radius:10px;padding:4px 18px;margin:10px 0}
+  .faq summary{font-weight:700;color:var(--navy);cursor:pointer;padding:12px 0;font-size:16px}
+  .faq p{color:var(--muted);margin:0 0 14px}
+  .areaband{background:var(--navy);color:#fff}
+  .areaband h2{color:#fff}
+  .areaband .container{display:grid;gap:24px;grid-template-columns:1.2fr 1fr;align-items:center}
+  .areaband p{opacity:.92}
+  .nap{font-size:15px;line-height:1.8}
+  .map-ph{background:#12283f;border:1px dashed #3f5f78;border-radius:12px;min-height:220px;display:grid;place-items:center;color:#9fb6c9;font-size:14px;text-align:center;padding:20px}
+  .final{background:linear-gradient(135deg,#2c7a7b,#16324f);color:#fff;text-align:center}
+  .final h2{color:#fff;font-size:27px}
+  .final p{opacity:.95;max-width:600px;margin:8px auto 22px}
+  footer{background:#0f2438;color:#c7d4e0;font-size:14px;padding:26px 0}
+  footer a{color:#c7d4e0}
+  @media(max-width:720px){.hero h1{font-size:27px}.areaband .container{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- ▼▼ TEMPLATE NOTES — DELETE THIS BANNER BEFORE PUBLISHING ▼▼ -->
+<div class="tmpl">
+  <b>TEMPLATE — swap the tokens (see the source comment &amp; the playbook), fill the [CONFIRM] values with real data, then delete this banner.</b>
+  Example city: <b>Tacoma / Pierce County</b> · URL: <b>/custom-embroidery-tacoma-wa/</b>
+</div>
+
+<div class="topbar"><div class="container">
+  <span>Northwest Custom Apparel — Serving Tacoma &amp; the South Sound since 1977</span>
+  <a href="tel:+12539225793">📞 253-922-5793</a>
+</div></div>
+
+<!-- ===== HERO ===== -->
+<div class="hero"><div class="container">
+  <h1>Custom Embroidery &amp; Screen Printing in Tacoma, Washington</h1>
+  <p>Local, in-house apparel decoration for Tacoma businesses, teams and organizations — embroidery, screen printing, DTG and promotional products, done right since 1977.</p>
+  <div class="cta-row">
+    <a class="btn" href="#quote">Get a Free Quote</a>
+    <a class="ph" href="tel:+12539225793">or call 253-922-5793</a>
+  </div>
+</div></div>
+
+<!-- ===== TRUST BAR ===== -->
+<div class="trust"><div class="container">
+  <div><div class="n">48+ yrs</div><div class="l">Decorating apparel since 1977</div></div>
+  <div><div class="n">5,000+</div><div class="l">Businesses served</div></div>
+  <div><div class="n">95%</div><div class="l">Customer reorder rate</div></div>
+  <div><div class="n">~15 min</div><div class="l">From downtown Tacoma</div></div>
+</div></div>
+
+<!-- ===== LOCAL INTRO ===== -->
+<section><div class="container">
+  <h2>Your local custom apparel shop for Tacoma</h2>
+  <p class="lead">Northwest Custom Apparel has decorated shirts, hats, jackets and workwear for Pacific Northwest businesses for nearly five decades. Our production facility in Milton sits just about 15 minutes from downtown Tacoma, so Pierce County companies get big-shop capabilities with local, hands-on service — real people who answer the phone, review your artwork, and stand behind every stitch and print.</p>
+  <p class="lead">Whether you run a Tacoma construction crew that needs hi-vis embroidered workwear, a restaurant outfitting its staff, or a school ordering spirit wear, we handle it start to finish — sourcing, decoration, and delivery — right here in the South Sound.</p>
+</div></section>
+
+<!-- ===== SERVICES ===== -->
+<section class="soft"><div class="container">
+  <h2>Custom decoration services for Tacoma businesses</h2>
+  <p class="lead">One local partner for every way you brand apparel.</p>
+  <div class="grid g3">
+    <div class="card"><h3>Custom Embroidery</h3><p>Durable, professional stitched logos on polos, jackets, caps and workwear. <a href="/services/custom-embroidery/">Learn more →</a></p></div>
+    <div class="card"><h3>Screen Printing</h3><p>Vibrant, cost-effective prints for bulk t-shirt and apparel runs. <a href="/services/custom-t-shirt-printing/">Learn more →</a></p></div>
+    <div class="card"><h3>DTG Printing</h3><p>Full-color, no-minimum direct-to-garment printing for detailed designs. <a href="/direct-to-garment/">Learn more →</a></p></div>
+    <div class="card"><h3>DTF Transfers</h3><p>Bright, stretchy transfers that work on nearly any fabric. <a href="/services/direct-to-film-printing/">Learn more →</a></p></div>
+    <div class="card"><h3>Caps &amp; Headwear</h3><p>Embroidered and patch caps — Richardson, New Era and more. <a href="/personalized-embroidered-baseball-hats/">Learn more →</a></p></div>
+    <div class="card"><h3>Promotional Products</h3><p>Branded drinkware, bags and giveaways to round out your order. <a href="/marketing/">Learn more →</a></p></div>
+  </div>
+</div></section>
+
+<!-- ===== WHY US ===== -->
+<section><div class="container">
+  <h2>Why Tacoma companies choose Northwest Custom Apparel</h2>
+  <div class="grid g2">
+    <div class="card"><h3>The Northwest's original embroidery shop</h3><p>Family-run since 1977 — the oldest commercial embroidery operation in the region, with the experience to get complex jobs right the first time.</p></div>
+    <div class="card"><h3>Premium brands, decorated in-house</h3><p>We decorate Carhartt, Nike, The North Face, Brooks Brothers, Cutter &amp; Buck, Richardson and more — nothing is outsourced.</p></div>
+    <div class="card"><h3>Built for businesses</h3><p>5,000+ companies trust us, and 95% reorder. Company stores, uniform programs and reorders are our specialty.</p></div>
+    <div class="card"><h3>Local &amp; accountable</h3><p>A real Tacoma-area team, fast proofs, and delivery across Pierce County — not an anonymous online upload form.</p></div>
+  </div>
+</div></section>
+
+<!-- ===== INDUSTRIES ===== -->
+<section class="soft"><div class="container">
+  <h2>Industries we outfit across Tacoma &amp; Pierce County</h2>
+  <p class="lead">From jobsite to storefront, we help local teams look sharp: construction &amp; trades, HVAC, healthcare, restaurants &amp; hospitality, real estate, schools &amp; sports, landscaping, and maritime.</p>
+</div></section>
+
+<!-- ===== PROCESS ===== -->
+<section><div class="container">
+  <h2>How ordering works</h2>
+  <p class="lead">Simple, guided, and local from first call to final delivery.</p>
+  <div class="steps">
+    <div class="step"><h3>Request a quote</h3><p>Tell us what you need — garments, quantities, and your logo.</p></div>
+    <div class="step"><h3>Approve your proof</h3><p>We digitize your art and send a proof for sign-off.</p></div>
+    <div class="step"><h3>We decorate in-house</h3><p>Embroidery or printing done at our Milton facility.</p></div>
+    <div class="step"><h3>Pickup or delivery</h3><p>Collect locally or have it delivered across Tacoma.</p></div>
+  </div>
+</div></section>
+
+<!-- ===== REVIEWS ===== -->
+<section class="soft"><div class="container">
+  <h2>What local customers say</h2>
+  <p class="lead"><span class="stars">★★★★★</span> Rated [RATING] from [REVIEW_COUNT]+ Google reviews — <em>[replace with real review data]</em></p>
+  <div class="rev">
+    <blockquote>“[Real Google review text for a Tacoma / Pierce County customer goes here.]”<cite>— [Customer Name], [Tacoma company]</cite></blockquote>
+    <blockquote>“[Second real review — keep these authentic; do not fabricate testimonials.]”<cite>— [Customer Name], [Tacoma company]</cite></blockquote>
+    <blockquote>“[Third real review highlighting local service or reorder experience.]”<cite>— [Customer Name], [Tacoma company]</cite></blockquote>
+  </div>
+</div></section>
+
+<!-- ===== SERVICE AREA + NAP ===== -->
+<div class="areaband"><section><div class="container">
+  <div>
+    <h2>Proudly serving Tacoma &amp; the South Sound</h2>
+    <p>We work with businesses throughout Tacoma and nearby communities — including Fife, Puyallup, University Place, Lakewood and Federal Way. Our Milton facility is about 15 minutes from downtown Tacoma for easy pickup and delivery.</p>
+    <p class="nap">
+      <strong>Northwest Custom Apparel</strong><br>
+      [Street Address], Milton, WA 98354<br>
+      Phone: <a href="tel:+12539225793" style="color:#fff">253-922-5793</a><br>
+      Mon–Fri, 8:30am–5:00pm
+    </p>
+  </div>
+  <div class="map-ph">[ Embed Google Map of the Milton location here ]</div>
+</div></section></div>
+
+<!-- ===== FAQ (must match FAQPage schema in <head>) ===== -->
+<section class="faq"><div class="container">
+  <h2>Tacoma custom apparel — frequently asked questions</h2>
+  <details open><summary>Do you serve businesses in Tacoma?</summary><p>Yes. Our production facility is in Milton, about 15 minutes from downtown Tacoma, and we serve businesses, teams and organizations throughout Tacoma and Pierce County with custom embroidery, screen printing and DTG.</p></details>
+  <details><summary>Is there a minimum order for custom apparel?</summary><p>Minimums vary by decoration method. Embroidery and screen printing have low minimums for Tacoma businesses, and DTG printing is available with no minimum. Contact us for details on your project.</p></details>
+  <details><summary>How fast is turnaround for Tacoma orders?</summary><p>Standard turnaround is typically 7–10 business days after art approval, with rush and same-day DTG options available. Local Tacoma pickup and delivery keep timelines tight.</p></details>
+  <details><summary>What brands and garments can you decorate?</summary><p>We decorate premium brands including Carhartt, Nike, The North Face, Richardson and Cutter &amp; Buck, plus a full catalog of shirts, polos, hats, jackets and workwear through SanMar.</p></details>
+</div></section>
+
+<!-- ===== FINAL CTA ===== -->
+<div class="final" id="quote"><section><div class="container">
+  <h2>Ready to brand your Tacoma team?</h2>
+  <p>Get a free, no-pressure quote from the Northwest's original custom apparel shop. Tell us what you need and we'll take it from there.</p>
+  <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+    <a class="btn" href="/contact-us/">Get My Free Quote</a>
+    <a class="btn alt" href="tel:+12539225793">Call 253-922-5793</a>
+  </div>
+</div></section></div>
+
+<footer><div class="container">
+  <strong>Northwest Custom Apparel</strong> · [Street Address], Milton, WA 98354 · <a href="tel:+12539225793">253-922-5793</a><br>
+  Custom embroidery &amp; screen printing for Tacoma, Pierce County and the greater Puget Sound since 1977.
+</div></footer>
+
+</body>
+</html>

@@ -1,7 +1,8 @@
 # teamnwca.com SEO Plan v2 — coordinated with the .net recovery roadmap
-*2026-07-14. Companion to `reference/net-seo-recovery-roadmap-2026-07.html` (Mehar's .net plan)
-and `memory/blog-content-differentiation.md` (Lane Split v2). The two plans are designed to
-run in parallel WITHOUT competing — one business, two query classes.*
+*2026-07-14. Companion to `reference/net-seo-recovery-roadmap-2026-07.html` (Mehar's .net plan),
+`reference/net-local-page-playbook-2026-07.html` + `reference/net-local-landing-page-template-2026-07.html`
+(the local-page build kit for Mehar), and `memory/blog-content-differentiation.md` (Lane Split v2).
+The two plans are designed to run in parallel WITHOUT competing — one business, two query classes.*
 
 ## The one-paragraph strategy
 
@@ -78,6 +79,29 @@ and quote requests, measured monthly, October 2026 checkpoint.
   URLs; slugs never change after publish.
 - Burst-publishing stays off — steady 1/wk beats dumps (Google treats sudden volume on a
   young blog as a spam signal).
+
+## Local-page kit → teamnwca touchpoints (from the playbook + template, 2026-07-14)
+
+The Tacoma template is solid for .net's lane. Four coordination items it doesn't yet
+include (feed these into the email/brief for Mehar):
+1. **Catalog cross-link block on every city page** — the template's service grid links only
+   .net service pages. Add one block per page: "Browse 3,000+ styles with live pricing →
+   teamnwca.com" (catalog + quote builders). Local visitor lands on .net, transacts on
+   teamnwca. Keep .net's own quote CTA primary — this is the *catalog* path, not a
+   replacement lead form.
+2. **Brand mentions → teamnwca brand pages** — the template's "Why us"/FAQ name Carhartt,
+   Nike, North Face, Richardson. Link "Carhartt" to `teamnwca.com/custom-carhartt` (live);
+   as wave-2 brand pages ship (safety vests, polos, New Era), same treatment.
+3. **NAP consistency is now CROSS-DOMAIN** — the playbook requires NAP byte-identical to
+   Google Business Profile. teamnwca's Organization JSON-LD (index.html) says
+   `2025 Freeman Rd E, Milton, WA 98354 · 253-922-5793` — ⏳ Erik verify this matches GBP
+   exactly; whatever GBP says wins on BOTH domains (the entity stitching makes Google read
+   them as one business, so a NAP mismatch on either side weakens the local signals Mehar
+   is building).
+4. **Template FAQ claims to confirm against real policy** — "same-day DTG", "7–10 business
+   days", "no minimum DTG": confirm these match what teamnwca's tools/pages state, so the
+   two domains never publish contradictory turnaround/minimum claims (same class of problem
+   as prices outside the engine, softer stakes).
 
 ## Open asks
 - **Erik → Mehar**: relay the 3 roadmap amendments (calculators/pricing → teamnwca; coordinate
