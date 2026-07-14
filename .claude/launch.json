@@ -23,6 +23,13 @@
       "port": 3010,
       "autoPort": true,
       "cwd": "."
+    },
+    {
+      "name": "static-qa",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8099"],
+      "port": 8099,
+      "cwd": "."
     }
   ]
 }
