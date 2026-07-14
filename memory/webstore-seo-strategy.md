@@ -56,7 +56,16 @@ margin, no handling). So the formula is a go-forward **price increase / margin r
 refresh if garment costs move; ideal long-term = wire the pricing API). Example totals @ $6: CT100617 $117.50, CTK121 $91.50,
 NKDC1963 $69.50, 112 $37, W668 $60, ST469 $48.50.
 
-## Spoke build (2026-07-14)
+## Spoke build (2026-07-14) — ALL 6 B2B SPOKES BUILT
+
+Live: `/construction-webstores` (deployed v2026.07.14.5). On develop (awaiting deploy): `/restaurant-webstores`,
+`/property-management-webstores`, `/industrial-webstores`, `/retail-webstores`, `/government-webstores`. Spokes 3–6
+generated from a template (scratchpad `gen-spokes.js` + `/tmp/spoke_products.json` data pull). All EMBROIDERY-ONLY
+pricing (emb + $6; Erik: no screen-print/run split on the pages). Each: hero + real-product grid + how + FAQ + CTA,
+links to the /company-webstores hub. Open enhancement: hub 10 store-type cards don't yet link to the 6 spokes
+(add a "popular niches" row on the hub for hub→spoke internal linking).
+
+## Spoke build detail
 
 Flat keyword URLs, hub-template (golf-showcase + company-webstores.css), ABSOLUTE asset paths, each with a real
 "what this niche puts in their store" product grid + cross-links + CTA → /pages/webstore-inquiry.html. Don't name
