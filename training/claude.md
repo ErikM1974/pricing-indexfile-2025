@@ -245,6 +245,7 @@ class TrainingModule {
 
 ## Recent Updates
 
+- **2026-07-10**: Added **Training Center** (`index.html` + `training-center.{js,css}`) — role-track directory of ALL training: static guides plus the Policies Hub **Training category fetched live** from the public proxy API (new hub modules appear with no deploy). Dashboard Training nav lands here; the old Office Assistant nav section folded in as a track (its Bonus Policy link now points at the hub `bonus-and-incentives` policy). dash-shell/art-hub tokens, external JS/CSS only. NOTE: /training is a PUBLIC mount — the Center lists only links, titles, and published-hub summaries.
 - **2026-07-10**: Added SanMar Purchasing Guide (`sanmar-purchasing-guide.html`) from Bradley's training deck — 3-phase workflow, size-annotation cheat sheet, ShopWorks screenshots (SanMar account # redacted — /training is a public static mount), official ShopWorks Wistia videos (`fast.wistia.net` added to CSP frameSrc in server.js). Linked in staff-dashboard Training nav.
 - **2025-08-15**: Added ShopWorks Embroidery Order Type training module
 - **2025-08**: Enhanced Adriyella's dashboard suite with v2 daily tasks

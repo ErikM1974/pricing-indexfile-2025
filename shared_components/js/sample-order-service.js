@@ -132,6 +132,75 @@ class SampleOrderService {
     }
 
     /**
+     * Destination-based WA sales tax rate for the ship-to address.
+     * WAC 458-20-145: in-WA shipments tax at the DESTINATION rate (7.0%–10.6%),
+     * not a flat Milton rate; WAC 458-20-193: out-of-state shipments collect no
+     * WA tax. Rate comes from POST /api/tax-rates/lookup (DOR API → Caspio →
+     * state default) — see memory/wa-sales-tax-rules.md. The endpoint returns
+     * the rate as a PERCENTAGE (e.g. 10.2), so divide by 100.
+     *
+     * @param {Object} formData - Checkout form data (shipping_* fields)
+     * @returns {Promise<Object>} { rate (decimal), source, account, accountName, fallback }
+     */
+    async lookupSalesTax(formData) {
+        const shipState = (formData.shipping_state || '').trim().toUpperCase();
+
+        if (shipState && shipState !== 'WA') {
+            return { rate: 0, source: 'out-of-state', account: '2202', accountName: 'Out of State Sales', fallback: false };
+        }
+
+        try {
+            const resp = await fetch(`${this.apiBase}/api/tax-rates/lookup`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    address: formData.shipping_address1 || '',
+                    city: formData.shipping_city || '',
+                    state: shipState || 'WA',
+                    zip: formData.shipping_zip || ''
+                })
+            });
+            const j = await resp.json();
+            const pct = Number(j.taxRate ?? j.rate);   // percent, e.g. 10.2
+            if (!resp.ok || j.success === false || !Number.isFinite(pct)) {
+                throw new Error(j.error || `Tax lookup failed (HTTP ${resp.status})`);
+            }
+            return {
+                rate: pct / 100,
+                source: j.fallback ? 'dor-default' : 'dor-lookup',
+                account: j.account || '2200',
+                accountName: j.accountName || 'WA Sales Tax',
+                fallback: !!j.fallback
+            };
+        } catch (error) {
+            // Never a silent wrong price: the order still submits (pushed tax is
+            // advisory — ShopWorks recomputes at invoicing) but the estimate is
+            // flagged here AND via a "TAX — VERIFY" note on the pushed order.
+            console.warn('[SampleOrderService] ⚠️ Tax lookup failed — using Milton 10.2% ESTIMATE. Rep must verify at invoicing.', error);
+            return { rate: 0.102, source: 'lookup-failed-milton-default', account: '2200.102', accountName: 'Wash:10.2%', fallback: true };
+        }
+    }
+
+    /**
+     * Derive the ShopWorks tax directive fields from a decimal rate.
+     * Same convention as the storefront push (server.js buildManageOrdersPayload):
+     * "Tax_<pct>" (e.g. "Tax_10.2") or "Tax_0" when no tax applies — matches the
+     * ShopWorks tax-line config Erik maintains per rate.
+     *
+     * @param {number} rateDecimal - e.g. 0.102
+     * @param {Object} taxInfo - result of lookupSalesTax()
+     * @returns {Object} { taxPartNumber, taxPartDescription, taxPct }
+     */
+    deriveTaxPartFields(rateDecimal, taxInfo) {
+        const taxPct = rateDecimal > 0 ? String(Math.round(rateDecimal * 10000) / 100) : null;
+        const taxPartNumber = taxPct ? `Tax_${taxPct}` : 'Tax_0';
+        const taxPartDescription = taxPct
+            ? `${taxInfo.accountName || 'WA Sales Tax'} ${taxPct}%${taxInfo.account ? ` (acct ${taxInfo.account})` : ''}`
+            : (taxInfo.source === 'out-of-state' ? 'No sales tax (out of state)' : 'No sales tax');
+        return { taxPartNumber, taxPartDescription, taxPct };
+    }
+
+    /**
      * Submit sample order to ShopWorks via ManageOrders PUSH API
      *
      * @param {Object} formData - Customer and shipping information
@@ -197,17 +266,24 @@ class SampleOrderService {
                 .filter(item => item.notes && item.notes.includes('PAID SAMPLE'))
                 .reduce((sum, item) => sum + (item.quantity * item.price), 0);
 
-            // Calculate Washington State Sales Tax (10.2%)
-            const salesTaxRate = 0.102;
-            const salesTax = subtotal * salesTaxRate;
+            // Washington sales tax — destination-based DOR lookup, never hardcoded
+            // (Milton rose 10.1% → 10.2% on 2026-07-06; rates change quarterly).
+            // Free-only orders have nothing taxable, so skip the lookup.
+            const taxInfo = subtotal > 0
+                ? await this.lookupSalesTax(formData)
+                : { rate: 0, source: 'no-taxable-items', fallback: false };
+            const salesTaxRate = taxInfo.rate;
+            const salesTax = Math.round(subtotal * salesTaxRate * 100) / 100;
             const total = subtotal + salesTax;
+            const { taxPartNumber, taxPartDescription, taxPct } = this.deriveTaxPartFields(salesTaxRate, taxInfo);
 
             console.log('[SampleOrderService] Order breakdown:', {
                 freeItems: freeItems.length,
                 paidItems: paidItems.length,
                 subtotal: subtotal.toFixed(2),
                 salesTax: salesTax.toFixed(2),
-                total: total.toFixed(2)
+                total: total.toFixed(2),
+                taxSource: taxInfo.source
             });
 
             // Sales tax handled via Payment block TaxTotal field only
@@ -217,9 +293,10 @@ class SampleOrderService {
             if (salesTax > 0) {
                 console.log('[SampleOrderService] ✅ Tax will be added via Payment block:', {
                     taxTotal: salesTax.toFixed(2),
-                    taxPartNumber: 'Tax_10.2',
-                    taxPartDescription: 'City of Milton Sales Tax 10.2%',
-                    rate: `${(salesTaxRate * 100).toFixed(1)}%`
+                    taxPartNumber: taxPartNumber,
+                    taxPartDescription: taxPartDescription,
+                    rate: `${taxPct}%`,
+                    source: taxInfo.source
                 });
             }
 
@@ -248,8 +325,8 @@ class SampleOrderService {
                 // Tax handled via Payment block - ShopWorks auto-creates tax line item from these fields
                 // DO NOT add tax as line item in LinesOE - causes duplicate tax entries
                 taxTotal: parseFloat(salesTax.toFixed(2)),
-                taxPartNumber: 'Tax_10.2',                          // Must match ShopWorks "Tax Line Item" config (account created by Erik 2026-07-09)
-                taxPartDescription: 'City of Milton Sales Tax 10.2%',  // Must match ShopWorks config
+                taxPartNumber: taxPartNumber,           // "Tax_<pct>" — must match ShopWorks tax-line config (Tax_10.2 for Milton as of 2026-07-06)
+                taxPartDescription: taxPartDescription,
 
                 customer: {
                     firstName: formData.firstName,
@@ -301,7 +378,17 @@ class SampleOrderService {
                         text: subtotal > 0
                             ? `MIXED ORDER - ${paidItems.length} PAID ($${subtotal.toFixed(2)} + $${salesTax.toFixed(2)} tax = $${total.toFixed(2)}) + ${freeItems.length} FREE - ${formData.company || formData.lastName}`
                             : `FREE SAMPLE - Top Sellers Showcase - ${formData.company || formData.lastName}`
-                    }
+                    },
+                    // Guardrail: if the DOR lookup failed or returned its state
+                    // default, the pushed tax is an ESTIMATE — flag it for the rep
+                    // (never a silent wrong price).
+                    ...(taxInfo.fallback && salesTax > 0
+                        ? [{
+                            type: 'Notes On Order',
+                            text: `TAX — VERIFY AT INVOICING: DOR rate lookup unavailable (${taxInfo.source}); pushed ${taxPct}% as an estimate. Confirm the destination rate before invoicing.`
+                        }]
+                        : []
+                    )
                 ]
             };
 
