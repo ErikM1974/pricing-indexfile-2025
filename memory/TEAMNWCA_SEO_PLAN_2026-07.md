@@ -92,12 +92,11 @@ include (feed these into the email/brief for Mehar):
 2. **Brand mentions → teamnwca brand pages** — the template's "Why us"/FAQ name Carhartt,
    Nike, North Face, Richardson. Link "Carhartt" to `teamnwca.com/custom-carhartt` (live);
    as wave-2 brand pages ship (safety vests, polos, New Era), same treatment.
-3. **NAP consistency is now CROSS-DOMAIN** — the playbook requires NAP byte-identical to
-   Google Business Profile. teamnwca's Organization JSON-LD (index.html) says
-   `2025 Freeman Rd E, Milton, WA 98354 · 253-922-5793` — ⏳ Erik verify this matches GBP
-   exactly; whatever GBP says wins on BOTH domains (the entity stitching makes Google read
-   them as one business, so a NAP mismatch on either side weakens the local signals Mehar
-   is building).
+3. **NAP consistency is now CROSS-DOMAIN — ✅ VERIFIED 2026-07-14 against GBP screenshot**:
+   `2025 Freeman Rd E, Milton, WA 98354 · (253) 922-5793` — teamnwca's Organization JSON-LD
+   (index.html) matches. This exact NAP is the only one either site ever prints (entity
+   stitching = one business; a mismatch on either side weakens Mehar's local signals).
+   GBP also shows **4.9★ / 187 reviews** (2026-07-14) — the template's [RATING]/[REVIEW_COUNT].
 4. **Template FAQ claims to confirm against real policy** — "same-day DTG", "7–10 business
    days", "no minimum DTG": confirm these match what teamnwca's tools/pages state, so the
    two domains never publish contradictory turnaround/minimum claims (same class of problem
