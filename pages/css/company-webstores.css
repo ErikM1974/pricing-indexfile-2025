@@ -51,6 +51,23 @@ a.ws-card--link:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba
 .ws-card__go i { transition: transform .15s ease; }
 a.ws-card--link:hover .ws-card__go i { transform: translateX(3px); }
 
+/* breadcrumb bar on the spoke pages — visible path back up to the hub (mirrors JSON-LD) */
+.ws-breadcrumb { background: #fff; border-bottom: 1px solid #eef1ef; }
+.ws-breadcrumb__inner {
+  max-width: 1120px; margin: 0 auto; padding: 10px 1.5rem;
+  font-size: 0.85rem; color: #6b7280;
+  display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+}
+.ws-breadcrumb__inner a { color: #1b6b3a; text-decoration: none; font-weight: 600; }
+.ws-breadcrumb__inner a:hover { text-decoration: underline; }
+.ws-breadcrumb__sep { color: #c3ccc7; }
+.ws-breadcrumb__current { color: #6b7280; }
+
+/* photo variant of the niche card — full-bleed image on top, text body below */
+.ws-card--photo { padding: 0; overflow: hidden; }
+.ws-card__photo { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; display: block; background: #eef2f0; }
+.ws-card--photo .ws-card__body { padding: 18px 20px 20px; display: flex; flex-direction: column; flex: 1 1 auto; }
+
 /* product cards with an image + suggested price (spoke pages) */
 .ws-card__img { width: 100%; aspect-ratio: 4 / 3; object-fit: contain; background: #f4f6f5; border-radius: 10px; margin-bottom: 12px; display: block; }
 .ws-card__price { font-size: 0.9rem; font-weight: 800; color: #1b6b3a; margin: 2px 0 8px; }
