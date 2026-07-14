@@ -1,3 +1,14 @@
+## v2026.07.14.6 (2026.07.14)
+
+- feat(webstores): Restaurant & hospitality spoke (/restaurant-webstores)
+- fix(webstores): restaurant spoke shows embroidery-only pricing (per Erik)
+- feat(webstores): 4 remaining B2B spokes — property mgmt, industrial, retail, government
+- docs(webstores): all 6 B2B spokes built
+- feat(webstores): 5 more spokes — team, school spirit, fundraising, college, event
+- feat(webstores): construction hero -> Carhartt branded header image (per Erik)
+- fix(webstores): dark hero scrim + text-shadow so headline stays readable over bright images (Carhartt)
+- Deploy v2026.07.14.6: cache-bust company-webstores.css ?v -> 2026.07.14.6 (hero scrim)
+
 ## v2026.07.14.5 (2026.07.14)
 
 - docs(active-files): register org-chart-2026 css + js (Rule 5)
