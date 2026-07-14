@@ -1,3 +1,14 @@
+## v2026.07.14.5 (2026.07.14)
+
+- docs(active-files): register org-chart-2026 css + js (Rule 5)
+- feat(seo): Company & Team Webstores hub (/company-webstores) — B2B hub-and-spoke
+- feat(webstores): add College/Greek/Clubs + Retail brand-merch store types to hub (InkSoft-validated niches)
+- docs(webstores): InkSoft webstore niche data finding + data-driven spoke priority
+- feat(webstores): Construction spoke (/construction-webstores) w/ real order-data product grid
+- feat(webstores): construction spoke product cards get real photos + suggested embroidered prices
+- feat(webstores): construction cards show formula price (left-chest embroidery + $6 handling = total)
+- Deploy v2026.07.14.5: cache-bust company-webstores.css
+
 ## v2026.07.14.4 (2026.07.14)
 
 - feat(policies): interactive 2026 org chart — full-width layout, 5-across directs, masonry production grid
