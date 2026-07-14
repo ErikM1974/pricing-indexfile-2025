@@ -1,3 +1,16 @@
+## v2026.07.14.1 (2026.07.14)
+
+- docs(seo): file nwcustomapparel.net blog export as reference + blog lane-split strategy
+- docs(blog): record product-style batches 1-2 (11 drafts) in differentiation strategy
+- docs(blog): record product-style batch 3 (industry guides) — 17 drafts total
+- docs(blog): record batch 4 (23 drafts total) + internal-link audit results
+- docs(seo): file .net recovery roadmap + lane split v2 + teamnwca SEO plan v2
+- docs(seo): file .net local-page playbook + template; add cross-domain touchpoints to teamnwca plan
+- docs(seo): two-site coordination guide (deliverable for Mehar, canonical copy)
+- docs(seo): NAP verified vs GBP (2025 Freeman Rd E / (253) 922-5793) + 4.9-star/187-review template data
+- docs(seo): packet sent to Mehar; record contact + question-routing protocol
+- feat(dashboards): SEO Strategy page — admin-only living reference for two-site search strategy
+
 ## v2026.07.13.12 (2026.07.13)
 
 - feat(home): surface Custom Safety Stripe Apparel on the homepage
