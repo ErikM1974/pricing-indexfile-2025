@@ -3972,12 +3972,16 @@ app.get(['/company-webstores', '/company-webstores.html'], (req, res) => {
 app.get(['/construction-webstores', '/construction-webstores.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'construction-webstores.html'));
 });
+// Restaurant & hospitality spoke — mixed screen-print (staff tees) + embroidery (polos/caps).
+app.get(['/restaurant-webstores', '/restaurant-webstores.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'restaurant-webstores.html'));
+});
 
 // Core-pages sitemap (2026-07-12) — the handful of hand-built landing/tool
 // pages that aren't in the blog or product sitemaps. Listed in robots.txt.
 app.get('/sitemap-pages.xml', (req, res) => {
   const pages = [
-    '/', '/custom-carhartt', '/custom-richardson', '/custom-nike', '/custom-new-era', '/custom-sport-tek', '/custom-ogio', '/custom-district', '/custom-port-authority', '/custom-port-and-company', '/custom-cornerstone', '/custom-north-face', '/custom-gildan', '/custom-eddie-bauer', '/custom-travismathew', '/custom-bella-canvas', '/golf-tournament-apparel', '/custom-safety-apparel', '/company-webstores', '/construction-webstores', '/custom-tees', '/custom-caps', '/blog',
+    '/', '/custom-carhartt', '/custom-richardson', '/custom-nike', '/custom-new-era', '/custom-sport-tek', '/custom-ogio', '/custom-district', '/custom-port-authority', '/custom-port-and-company', '/custom-cornerstone', '/custom-north-face', '/custom-gildan', '/custom-eddie-bauer', '/custom-travismathew', '/custom-bella-canvas', '/golf-tournament-apparel', '/custom-safety-apparel', '/company-webstores', '/construction-webstores', '/restaurant-webstores', '/custom-tees', '/custom-caps', '/blog',
     '/brands.html', '/catalog?topSellers=1',
     '/pages/request-a-quote.html', '/pages/webstore-inquiry.html',
   ];
