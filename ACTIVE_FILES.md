@@ -1,6 +1,6 @@
 # Active Files Registry
-**Last Updated:** 2026-06-11
-**Total Active Files:** 575 (HTML+JS+CSS, excludes `node_modules/`, `.git/`, `tests/`, `.claude/`, `archive-working-files/`)
+**Last Updated:** 2026-07-14
+**Total Active Files:** 577 (HTML+JS+CSS, excludes `node_modules/`, `.git/`, `tests/`, `.claude/`, `archive-working-files/`)
 **Purpose:** Track all active files to prevent orphaned code accumulation
 **Audit cadence:** Quarterly. Bump the timestamp on every file create/delete/move (CLAUDE.md Top 8 Rule #5).
 
@@ -176,10 +176,12 @@
 | `/pages/policy-detail.html` | **NEW** Individual policy read/edit page (TipTap rich-text editor, breadcrumb, outline, sub-procedures) | policies-admin-gate.js, policies-api.js, policy-editor-tiptap.js, policy-detail.js, policies-hub-v2.css, policy-detail.css | ✅ Active |
 | `/pages/css/policies-hub-v2.css` | **NEW** Stylesheet for policies hub v2 (tree sidebar, cards, category chips, NW-green theme) | — | ✅ Active |
 | `/pages/css/policy-detail.css` | **NEW** Stylesheet for policy-detail.html (prose body, TipTap chrome, outline sidebar, edit form) | — | ✅ Active |
+| `/pages/css/org-chart-2026.css` | **NEW (2026-07-14)** Scoped 2026 visual system for the Organizational Chart policy — responsive hierarchy cards, production grid, search states, print and reduced-motion support | org-chart-2026.js | ✅ Active |
 | `/shared_components/js/policies/policies-api.js` | **NEW** Policies Hub fetch wrapper (public reads + admin CRUD, 401 redirect, 409 concurrency) | /api/policies-public/*, /api/crm-proxy/policies/* | ✅ Active |
 | `/shared_components/js/policies/policies-admin-gate.js` | **NEW** Resolves `window.IS_POLICIES_ADMIN` from `/api/crm-session/me` permissions; emits `policies:admin-resolved` event | /api/crm-session/me | ✅ Active |
 | `/shared_components/js/policies/policies-hub.js` | **NEW** Hub page controller (tree render, search debounce, category filter, grid/list toggle, recently-updated) | PoliciesAPI, PoliciesAdminGate | ✅ Active |
 | `/shared_components/js/policies/policy-detail.js` | **NEW** Detail page controller (read/edit/new modes, save flow, autosave drafts, sub-procedure listing) | PoliciesAPI, PoliciesAdminGate, PolicyEditor, DOMPurify (CDN) | ✅ Active |
+| `/shared_components/js/policies/org-chart-2026.js` | **NEW (2026-07-14)** Progressive enhancement for `org-chart-2026`: converts Caspio inline markup to semantic classes, member search, production collapse, and keyboard-operable department toggles; no effect on other policies | policy-detail.html, org-chart-2026.css | ✅ Active |
 | `/shared_components/js/policies/policy-editor-tiptap.js` | **NEW** TipTap 2.10.4 rich-text editor wrapper loaded from esm.sh — StarterKit + Image + Link + Table + Placeholder + Typography + custom videoEmbed node (YouTube/Loom/Vimeo). Image upload via drag-drop, paste, or button → `/api/files/upload`. AI Assist toolbar button. | esm.sh @tiptap/* @2.10.4, /api/files/upload, PolicyAIAssist | ✅ Active |
 | `/shared_components/js/policies/policy-ai-assist.js` | **NEW** AI Assist modal for the TipTap editor — action picker (Generate / Polish / Expand / Summarize / FAQ / Translate / Explain-like-I'm-new), SSE stream consumer with live token rendering, Insert or Replace into editor | `/api/policies/ai-assist`, DOMPurify | ✅ Active |
 | `/shared_components/js/policies/policy-ai-search.js` | **NEW** AI semantic search modal for the hub — natural-language query → Claude ranks the policy index → shows confidence-tagged results with "why this matches" explanations | `https://caspio-pricing-proxy/api/policies-ai-search` (public, rate-limited) | ✅ Active |
