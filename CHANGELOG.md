@@ -1,3 +1,10 @@
+## v2026.07.14.3 (2026.07.14)
+
+- docs(training): note Training Center in claude.md recent updates
+- fix(samples): sample checkout tax = destination DOR lookup, was hardcoded Milton 10.1%
+- fix(quote-view): remove dead hardcoded size-upcharge map + legacy renderer (Rule 9 audit)
+- Deploy v2026.07.14.3: 1 files (sample-cart.html,...)
+
 ## v2026.07.14.2 (2026.07.14)
 
 - Remove staff-only screen-print quote builder link from custom-safety-apparel page
