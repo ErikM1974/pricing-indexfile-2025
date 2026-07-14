@@ -6,7 +6,52 @@ same keywords they **cannibalize** each other — Google splits authority and ma
 neither well. So the two blogs run in **different lanes by search intent.** This is Erik's
 SEO strategy (2026-07-13) and it's sound.
 
-## The lane split
+## ⭐ LANE SPLIT v2 (2026-07-14) — updated for the .net recovery roadmap
+
+The SEMrush/Claude recovery roadmap for .net (filed at
+`reference/net-seo-recovery-roadmap-2026-07.html`, delivered to Mehar 2026-07-14) pivots
+.net **into commercial intent** — local landing pages, "custom embroidery near me" (8.1K/mo),
+service pages, Google Business Profile. That makes the old "teaches vs sells" split too
+coarse. The split is now by **QUERY CLASS**, both sites commercial where it counts:
+
+| Query class | Owner | Examples |
+|---|---|---|
+| **Local / service** — "near me", "[service] [city]", GBP/local pack | **.net** | "custom embroidery near me", "screen printing Tacoma", "/custom-embroidery-seattle/" |
+| **Product / style / catalog** — style numbers, brand catalogs, comparisons, use-case picks | **teamnwca** | "pc54 vs pc61", "custom carhartt", "richardson 112 colors", brand landing pages |
+| **Tools / pricing / calculators** | **teamnwca ONLY** (Rule 9: one pricing engine) | quote builders, cost calculators, "bulk polo pricing" |
+| **Educational / how-it-works / craft** | **.net** (retained authority + 497 AI citations) | "how does DTG work", fabric guides, break-in guides |
+
+**Consequences for teamnwca content:**
+- teamnwca must **NEVER chase "near me"/city/service queries** — those are now .net's
+  recovery targets; competing there would sabotage the plan Erik just commissioned.
+- The Monday autopilot collision check now runs BOTH directions: skip topics .net covers
+  *educationally* AND skip local/service commercial queries .net is rebuilding.
+
+**⚠ Amendments Erik should relay to Mehar before Phase 3 executes** (the roadmap was
+written for .net in isolation and three items step into teamnwca's lane):
+1. **"Custom embroidery cost calculator" (Phase 3) → do NOT build on .net.** Calculators/
+   pricing are teamnwca's engine (CLAUDE.md Rule 9 — one pricing path). Instead .net links
+   to teamnwca's quote tools. Same for "bulk polo pricing" content — .net can cover the
+   *process* angle, prices live on teamnwca.
+2. **"Screen printing vs embroidery for uniforms" (Phase 3)** — method-education angle is
+   fine for .net, but *product-anchored* comparison ("which garment/style") is teamnwca's.
+   Coordinate the angle before writing.
+3. **Existing Rule-9 hazards on .net**: `/dtg-calculator/` publishes DTG prices outside the
+   engine; `/order-form/` duplicates the retired Order Form. Add retire/301 to the punch list.
+
+**What teamnwca GAINS from the .net plan (exploit these):**
+- Phase 1 "funnel informational traffic to commercial pages": for **brand/product** intent
+  the funnel target should be teamnwca — Carhartt break-in post (161 visits/mo) → 
+  `/custom-carhartt` (✅ done 2026-07-13); Eddie Bauer quality post (118/mo) → teamnwca
+  premium-jackets content/brand page (draft `premium-branded-jackets-...` exists — publish,
+  then ask Mehar to link it); cotton-vs-poly (48/mo) → already cross-linked from pc54-vs-pc61.
+- .net's local pages should each link teamnwca's catalog/quote tools as the "browse styles
+  & get pricing" step — local visitor lands on .net, transacts on teamnwca.
+- .net's 497 AI citations prove the AI-search channel: teamnwca posts should keep
+  direct-answer headings + FAQ schema (brand pages have it; blog posts should open with a
+  "The short answer" block — the pc90h post pattern).
+
+## The lane split (v1, 2026-07-13 — still valid for educational-vs-product)
 
 | | **nwcustomapparel.net** (WordPress "Corporate site") | **teamnwca.com** (this app — commerce) |
 |---|---|---|
