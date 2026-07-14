@@ -30,6 +30,17 @@
 .ws-card__desc { font-size: 0.9rem; color: #4b5563; margin: 0 0 10px; line-height: 1.55; flex: 1 1 auto; }
 .ws-card__eg { font-size: 0.8rem; color: #6b7280; font-style: italic; margin: 0; }
 
+/* product cards with an image + suggested price (spoke pages) */
+.ws-card__img { width: 100%; aspect-ratio: 4 / 3; object-fit: contain; background: #f4f6f5; border-radius: 10px; margin-bottom: 12px; display: block; }
+.ws-card__price { font-size: 0.9rem; font-weight: 800; color: #1b6b3a; margin: 2px 0 8px; }
+.ws-card__price span { font-weight: 500; color: #6b7280; font-size: 0.8rem; }
+.ws-pricenote {
+  max-width: 1120px; margin: 20px auto 0; padding: 13px 20px;
+  background: #eef5f0; border: 1px solid #d7e6dd; border-radius: 12px;
+  font-size: 0.9rem; color: #2f4a3c; text-align: center; line-height: 1.5;
+}
+.ws-pricenote strong { color: #14312a; }
+
 /* the "how it works" numbered steps as a clean row */
 .ws-steps {
   display: grid;
