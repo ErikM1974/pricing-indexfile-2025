@@ -3972,12 +3972,45 @@ app.get(['/company-webstores', '/company-webstores.html'], (req, res) => {
 app.get(['/construction-webstores', '/construction-webstores.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'construction-webstores.html'));
 });
+// Restaurant & hospitality spoke.
+app.get(['/restaurant-webstores', '/restaurant-webstores.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'restaurant-webstores.html'));
+});
+// Remaining B2B webstore spokes (2026-07-14) — property mgmt, industrial, retail, government.
+app.get(['/property-management-webstores', '/property-management-webstores.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'property-management-webstores.html'));
+});
+app.get(['/industrial-webstores', '/industrial-webstores.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'industrial-webstores.html'));
+});
+app.get(['/retail-webstores', '/retail-webstores.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'retail-webstores.html'));
+});
+app.get(['/government-webstores', '/government-webstores.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'government-webstores.html'));
+});
+// Webstore spokes wave 2 (2026-07-14) — team, school spirit, fundraising, college, event.
+app.get(['/team-webstores', '/team-webstores.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'team-webstores.html'));
+});
+app.get(['/school-spirit-webstores', '/school-spirit-webstores.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'school-spirit-webstores.html'));
+});
+app.get(['/fundraising-webstores', '/fundraising-webstores.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'fundraising-webstores.html'));
+});
+app.get(['/college-webstores', '/college-webstores.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'college-webstores.html'));
+});
+app.get(['/event-webstores', '/event-webstores.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'event-webstores.html'));
+});
 
 // Core-pages sitemap (2026-07-12) — the handful of hand-built landing/tool
 // pages that aren't in the blog or product sitemaps. Listed in robots.txt.
 app.get('/sitemap-pages.xml', (req, res) => {
   const pages = [
-    '/', '/custom-carhartt', '/custom-richardson', '/custom-nike', '/custom-new-era', '/custom-sport-tek', '/custom-ogio', '/custom-district', '/custom-port-authority', '/custom-port-and-company', '/custom-cornerstone', '/custom-north-face', '/custom-gildan', '/custom-eddie-bauer', '/custom-travismathew', '/custom-bella-canvas', '/golf-tournament-apparel', '/custom-safety-apparel', '/company-webstores', '/construction-webstores', '/custom-tees', '/custom-caps', '/blog',
+    '/', '/custom-carhartt', '/custom-richardson', '/custom-nike', '/custom-new-era', '/custom-sport-tek', '/custom-ogio', '/custom-district', '/custom-port-authority', '/custom-port-and-company', '/custom-cornerstone', '/custom-north-face', '/custom-gildan', '/custom-eddie-bauer', '/custom-travismathew', '/custom-bella-canvas', '/golf-tournament-apparel', '/custom-safety-apparel', '/company-webstores', '/construction-webstores', '/restaurant-webstores', '/property-management-webstores', '/industrial-webstores', '/retail-webstores', '/government-webstores', '/team-webstores', '/school-spirit-webstores', '/fundraising-webstores', '/college-webstores', '/event-webstores', '/custom-tees', '/custom-caps', '/blog',
     '/brands.html', '/catalog?topSellers=1',
     '/pages/request-a-quote.html', '/pages/webstore-inquiry.html',
   ];

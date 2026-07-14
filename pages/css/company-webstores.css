@@ -2,6 +2,20 @@
    Shell/typography come from golf-tournament-showcase.css (same as the safety page);
    this file only adds the icon-driven "types" + "benefits" card grids (no images). */
 
+/* Hero scrim — the webstore heroes use a bare <img class="hero__image"> with no
+   .hero__overlay element, so add a dark gradient here (loads after golf CSS) so the
+   white headline stays readable over any image, including bright ones like the Carhartt
+   banner. Left-weighted: darkest where the centered text sits, lighter on the right. */
+.hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(90deg, rgba(8, 18, 12, 0.86) 0%, rgba(8, 18, 12, 0.68) 52%, rgba(8, 18, 12, 0.42) 100%);
+}
+.hero__headline, .hero__sub { text-shadow: 0 2px 14px rgba(0, 0, 0, 0.55); }
+
 .ws-section { padding: 40px 0 8px; }
 .ws-grid {
   display: grid;
