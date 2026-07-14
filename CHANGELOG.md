@@ -1,3 +1,8 @@
+## v2026.07.14.7 (2026.07.14)
+
+- feat(webstores): hub 'Browse by industry' section — 11 linked cards to spoke pages
+- Deploy v2026.07.14.7: hub Browse-by-industry links + cache-bust company-webstores.css ?v -> 2026.07.14.7
+
 ## v2026.07.14.6 (2026.07.14)
 
 - feat(webstores): Restaurant & hospitality spoke (/restaurant-webstores)
