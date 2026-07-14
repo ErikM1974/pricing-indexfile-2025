@@ -33,6 +33,24 @@ Greek** despite those being InkSoft's marketed niches.
 Tier 3 (InkSoft-popular but NOT current NWCA business — speculative expansion, lower priority): school spirit, team,
 fundraising, college/Greek, nonprofit.
 
+## What each niche actually orders (from `ManageOrders_LineItems` on the InkSoft orders — use for spoke product grids)
+
+Real top styles per niche (units, Jan–Jul 2026) — link `/product.html?style=X` for the real SanMar styles:
+- **Construction (663 orders):** Nike Dri-FIT polo NKDC1963 (supers/PMs), Carhartt Rain Defender hoodie CT100617 + Midweight CTK121, Volunteer VL100 tee, Richardson 112 patch cap, Port Authority W668 plaid flannel, Sport-Tek F281 hoodie + ST469 1/4-zip. Cross-link hi-vis → /custom-safety-apparel.
+- **Industrial (Stella-Jones):** PC90H fleece hoodie, Callaway CGM211 polo, Carhartt CT100617, PC61 tee, Eddie Bauer EB544 + Carhartt CT102199 soft shells, TravisMathew TM1MW452 1/4-zip. (More premium — soft shells + Callaway/TM.)
+- **Retail (Arrow Lumber, Mud Bay):** Jerzees 363M tee, Port & Co PC68H fleece, District DT8102 hoodie, Bella+Canvas BC3005 V-neck, Comfort Colors 1580 1/4-zip.
+- **Government (Pierce County, police):** Next Level NL3600 tee, Nike NKBV6042/NKDC1963 polos, Carhartt CT100617/CTK121, PC90H fleece, CornerStone CS410 tactical polo (police).
+- **Hospitality (Hops N Drops — huge volume):** Sport-Tek performance LST700/ST350/ST700 (servers), branded caps (CP96), PC61 tee, Port Authority K810/LK810 polos, kitchen skull caps (HT01).
+- **Property mgmt (AMC + communities):** Bella+Canvas BC3001 tee, New Era NEA100 tee + NE200 cap (resident events/leasing), Port & Co PC78/PC78H crew+hoodie, CornerStone CS430 workwear pocket tee (maintenance crews), Nike NKDC1963 polo (office). Split: office staff (polos) vs maintenance (workwear).
+
+## Spoke build (2026-07-14)
+
+Flat keyword URLs, hub-template (golf-showcase + company-webstores.css), ABSOLUTE asset paths, each with a real
+"what this niche puts in their store" product grid + cross-links + CTA → /pages/webstore-inquiry.html. Don't name
+specific customers publicly (say "Pacific NW construction crews"). URLs: `/construction-webstores`,
+`/property-management-webstores`, `/restaurant-webstores`, `/industrial-webstores`, `/retail-brand-webstores`,
+`/government-webstores`. Each added to sitemap-pages.xml + linked from the hub's type cards.
+
 **InkSoft's own advice matched the data:** target specialized/underserved groups + mine your order history; they flag
 nonprofits/schools as *their* most profitable, but NWCA's actual money is B2B company stores. Build spokes for the proven
 winners first. Each spoke: hero + why-this-niche + recommended products + how-it-works + FAQ + CTA to /pages/webstore-inquiry.html,
