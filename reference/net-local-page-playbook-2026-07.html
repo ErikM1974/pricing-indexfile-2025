@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Local Landing Page Playbook — Northwest Custom Apparel</title>
+<style>
+  :root{--navy:#16324f;--teal:#2c7a7b;--muted:#5b6b7f;--line:#e3e8ef;--red:#c0392b;--redbg:#fbeae8;--green:#1f9d55;--greenbg:#e8f6ee;--amber:#b7791f;--amberbg:#fbf3e3}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:#22303c;line-height:1.62;font-size:15.5px;background:#f6f8fb}
+  .wrap{max-width:900px;margin:0 auto;padding:0 24px 80px}
+  header{background:linear-gradient(135deg,#16324f,#2c7a7b);color:#fff;padding:38px 0 30px}
+  header .wrap{padding-bottom:0}
+  .kicker{text-transform:uppercase;letter-spacing:.14em;font-size:12px;opacity:.85;margin:0 0 8px}
+  h1{margin:0 0 8px;font-size:26px}
+  .sub{opacity:.92;font-size:14.5px;margin:0}
+  h2{font-size:20px;margin:34px 0 10px;padding-bottom:7px;border-bottom:2px solid var(--line);color:var(--navy)}
+  h3{font-size:16px;margin:18px 0 6px;color:var(--navy)}
+  p{margin:10px 0}
+  code{background:#eef2f7;padding:1px 6px;border-radius:4px;font-size:13.5px;color:#22364c}
+  pre{background:#0f2438;color:#e6edf3;padding:16px 18px;border-radius:10px;overflow-x:auto;font-size:13px;line-height:1.5}
+  pre code{background:none;color:inherit;padding:0}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;background:#fff}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:#f0f4f9;color:var(--navy);font-size:12px;text-transform:uppercase;letter-spacing:.03em}
+  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px 22px;margin:14px 0}
+  .danger{background:var(--redbg);border-left:5px solid var(--red);padding:14px 18px;border-radius:0 10px 10px 0;margin:16px 0}
+  .danger h3{color:var(--red);margin-top:0}
+  .ok{background:var(--greenbg);border-left:5px solid var(--green);padding:12px 16px;border-radius:0 10px 10px 0;margin:14px 0;font-size:14px}
+  .warn{background:var(--amberbg);border-left:5px solid var(--amber);padding:12px 16px;border-radius:0 10px 10px 0;margin:14px 0;font-size:14px}
+  ul{margin:8px 0;padding-left:22px}li{margin:6px 0}
+  .check{list-style:none;padding-left:0}
+  .check li{padding-left:28px;position:relative}
+  .check li::before{content:"☐";position:absolute;left:0;color:var(--teal);font-size:17px;top:-1px}
+  strong{color:var(--navy)}
+  .tok{font-family:ui-monospace,Menlo,Consolas,monospace;color:#0b6}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <p class="kicker">Build Playbook · Companion to the landing-page template</p>
+  <h1>Local Landing Page Playbook</h1>
+  <p class="sub">Northwest Custom Apparel — how to spin up a high-ranking local page per city, the right way. For Mehar.</p>
+</div></header>
+<div class="wrap">
+
+<h2>What this is &amp; how to use it</h2>
+<p>The companion file <code>nwca-local-landing-page-template.html</code> is a complete, SEO-optimized example page for <strong>Tacoma</strong>. This playbook tells you how to turn it into a page for any service-area city — with the metadata, schema, and copy already structured — and, just as important, how to do it <em>without</em> creating thin duplicate pages that Google will ignore or penalize. The template is a reference build; recreate it in Elementor (or use it as an HTML base) — the structure, headings, schema, and internal links are what matter, not the exact styling.</p>
+
+<div class="danger">
+  <h3>⚠ Read this first — the #1 way local pages fail</h3>
+  <p><strong>Do not create pages that are identical except for the city name.</strong> Google treats find-and-replace "doorway pages" as spam and will either not rank them or suppress the whole set. The Bonney Lake page ranks because it's genuinely useful; scale that, not a mail-merge.</p>
+  <p><strong>Every city page needs real, unique local content:</strong> different intro copy, the actual neighborhoods/towns nearby, real industries in that city, genuine testimonials from customers in that area, and specifics (drive time, local delivery notes, a local project example). Aim for at least ~40–50% unique body content per page. If you can't write something true and specific about serving that city, don't publish the page yet.</p>
+</div>
+
+<h2>1. URL pattern &amp; the cannibalization fix</h2>
+<p>Pick <strong>one</strong> URL pattern and use it for every city. Right now the site mixes <code>/custom-embroidery-seattle/</code>, <code>/seattle-custom-t-shirts/</code>, <code>/spokane-dtg-and-embroidery/</code> and <code>/embroidery-screenprinting-bonneylake-wa/</code>. Standardize on:</p>
+<pre><code>/custom-embroidery-{{city-slug}}-wa/</code></pre>
+<p>301-redirect the old inconsistent URLs to the standardized ones. <strong>Critical:</strong> only <em>one</em> page should target "custom embroidery near me / [city]" per city — today the Seattle and Bonney Lake pages both chase "custom embroidery near me," which splits ranking strength and holds both on page 2. One city = one primary local page.</p>
+
+<h2>2. Token map (find &amp; replace per city)</h2>
+<p>The template uses Tacoma as the worked example. To build a new city, replace these values with true, specific information for that location:</p>
+<table>
+  <tr><th>Token</th><th>Tacoma example</th><th>Notes</th></tr>
+  <tr><td class="tok">{{CITY}}</td><td>Tacoma</td><td>Primary city name, used in title/H1/body/schema.</td></tr>
+  <tr><td class="tok">{{COUNTY}}</td><td>Pierce County</td><td>County for area-served context.</td></tr>
+  <tr><td class="tok">{{CITY_SLUG}}</td><td>tacoma</td><td>Lowercase, hyphenated, for the URL.</td></tr>
+  <tr><td class="tok">{{NEIGHBORS}}</td><td>Fife, Puyallup, University Place, Lakewood, Federal Way</td><td>Real nearby towns — makes each page unique &amp; captures nearby searches.</td></tr>
+  <tr><td class="tok">{{DRIVE_TIME}}</td><td>about 15 minutes</td><td>Honest drive time from the Milton facility.</td></tr>
+  <tr><td class="tok">{{LOCAL_INDUSTRIES}}</td><td>construction, healthcare, maritime, hospitality</td><td>Industries that actually matter in that city.</td></tr>
+  <tr><td>[STREET ADDRESS] / [LAT] / [LONG]</td><td>—</td><td><strong>Use the exact NAP from Google Business Profile.</strong> Must be identical on every page and match GBP letter-for-letter.</td></tr>
+  <tr><td>[RATING] / [REVIEW_COUNT] / reviews</td><td>—</td><td>Real Google review data &amp; real testimonials only — never fabricate.</td></tr>
+  <tr><td>[MINIMUM] / [TURNAROUND]</td><td>—</td><td>Confirm the business's actual policies before stating them.</td></tr>
+</table>
+
+<h2>3. Metadata templates</h2>
+<p>Keep titles ≤ ~60 characters and descriptions ≤ ~155. Lead with the primary keyword, not the brand.</p>
+<h3>Title tag</h3>
+<pre><code>Custom Embroidery &amp; Screen Printing in {{CITY}}, WA | NW Custom Apparel</code></pre>
+<h3>Meta description</h3>
+<pre><code>Custom embroidery, screen printing &amp; DTG in {{CITY}}, WA. Serving {{COUNTY}}
+businesses since 1977 — fast turnaround, no-hassle ordering. Get a free quote.</code></pre>
+<h3>H1 (only one per page)</h3>
+<pre><code>Custom Embroidery &amp; Screen Printing in {{CITY}}, Washington</code></pre>
+<h3>Canonical &amp; image alt</h3>
+<pre><code>&lt;link rel="canonical" href="https://nwcustomapparel.net/custom-embroidery-{{city-slug}}-wa/"&gt;
+Hero image alt: "Custom embroidered apparel for {{CITY}}, WA businesses by Northwest Custom Apparel"</code></pre>
+
+<h2>4. Structured data (schema)</h2>
+<p>Two JSON-LD blocks live in the template's <code>&lt;head&gt;</code>: a <strong>LocalBusiness + Service</strong> graph and a <strong>FAQPage</strong>. Rules:</p>
+<ul>
+  <li>Swap <code>areaServed</code> city, and the FAQ questions/answers, to match each page.</li>
+  <li>The FAQPage schema <strong>must match the visible FAQ text exactly</strong> — mismatched schema is a manual-action risk.</li>
+  <li>NAP in the schema must be byte-for-byte identical to Google Business Profile and the visible footer.</li>
+  <li>Validate every page in Google's <strong>Rich Results Test</strong> before publishing.</li>
+</ul>
+<div class="warn">Use one canonical <code>LocalBusiness</code> <code>@id</code> (the main business) across all pages and vary only <code>areaServed</code> / <code>Service</code>. Don't invent a separate "business" per city — you have one business serving many areas.</div>
+
+<h2>5. Page blueprint — section by section</h2>
+<table>
+  <tr><th>Section</th><th>Purpose</th><th>SEO / conversion note</th></tr>
+  <tr><td>Hero (H1 + subhead + CTA + phone)</td><td>Confirm relevance instantly</td><td>Primary keyword in H1; CTA + click-to-call above the fold.</td></tr>
+  <tr><td>Trust bar</td><td>Credibility</td><td>Since 1977, 5,000+ businesses, 95% reorder, drive time to that city.</td></tr>
+  <tr><td>Local intro (2 paragraphs)</td><td><strong>Unique local content</strong></td><td>This is where each page earns its uniqueness — write real specifics about serving that city.</td></tr>
+  <tr><td>Services grid</td><td>Coverage + internal links</td><td>Link each service to its main service page (passes authority, aids navigation).</td></tr>
+  <tr><td>Why us</td><td>Differentiation</td><td>Brands decorated (Carhartt, Nike, North Face), in-house, local.</td></tr>
+  <tr><td>Industries in [city]</td><td>Local relevance + long-tail</td><td>Name industries real to that city; link to any industry pages (HVAC, construction).</td></tr>
+  <tr><td>Process steps</td><td>Reduce friction</td><td>Reassures first-time buyers; can be shared copy across pages.</td></tr>
+  <tr><td>Reviews</td><td>Social proof</td><td>Use real, ideally local, Google reviews. Never fabricate.</td></tr>
+  <tr><td>Service area + NAP + map</td><td>Local signals</td><td>Neighbors list, exact NAP, embedded Google Map of the Milton location.</td></tr>
+  <tr><td>FAQ (+ schema)</td><td>Long-tail + rich results</td><td>Answer real local questions; mirror in FAQPage schema.</td></tr>
+  <tr><td>Final CTA</td><td>Convert</td><td>Quote form + phone; this is the goal of the page.</td></tr>
+</table>
+
+<h2>6. Internal linking rules</h2>
+<ul>
+  <li>Link every city page <strong>from</strong> a "Service Areas" section in the footer or main nav (so they're discoverable and get authority).</li>
+  <li>Each city page links <strong>out</strong> to the core service pages and 2–3 relevant blog posts.</li>
+  <li>Link nearby city pages to each other ("We also serve <em>{{NEIGHBORS}}</em>") — but only where genuinely relevant.</li>
+  <li>Add these pages to the XML sitemap and request indexing in Search Console after publishing.</li>
+</ul>
+
+<h2>7. Priority cities to build</h2>
+<p>Rebuild the existing under-performing local pages to this standard first (they already have keyword footprints), then expand:</p>
+<ul>
+  <li><strong>Rebuild:</strong> Seattle, Spokane, Portland, Kent — currently earning ~0 traffic despite ranking for dozens of keywords.</li>
+  <li><strong>Add (core service area):</strong> Tacoma, Milton (home city), Puyallup, Federal Way, Auburn, Lakewood, Fife, Kent, Renton.</li>
+  <li>Prioritize by local search volume for "custom embroidery [city]" / "screen printing [city]" and by where your real customers already are.</li>
+</ul>
+
+<h2>8. Pre-publish checklist (per page)</h2>
+<ul class="check">
+  <li>Unique intro + local specifics written (not just city-name swapped)</li>
+  <li>Title ≤ 60 chars, description ≤ 155, single H1, keyword-first</li>
+  <li>URL follows <code>/custom-embroidery-{{city-slug}}-wa/</code>; old variants 301'd</li>
+  <li>Only one page targets "custom embroidery near me / [city]" for this city</li>
+  <li>LocalBusiness + FAQPage schema updated; passes Rich Results Test</li>
+  <li>NAP matches Google Business Profile exactly (schema, body, footer)</li>
+  <li>Real reviews &amp; testimonials only; ratings accurate</li>
+  <li>Internal links in (from Service Areas) and out (to service + blog pages)</li>
+  <li>Hero CTA + click-to-call above the fold; final quote CTA present</li>
+  <li>Image alt text includes city + service; images compressed</li>
+  <li>Mobile check; template notes banner removed</li>
+  <li>Added to XML sitemap; URL submitted in Search Console</li>
+</ul>
+
+<div class="ok"><strong>Bottom line for Mehar:</strong> the Bonney Lake page already proves this model works. The job is to (1) standardize the URL pattern and kill the "near me" cannibalization, (2) rebuild the 0-traffic city pages to this template with genuinely unique local content, and (3) expand to the core Puget Sound service area — each page unique, schema-complete, and internally linked.</div>
+
+<p style="color:#5b6b7f;font-size:12.5px;margin-top:26px;border-top:1px solid var(--line);padding-top:14px">
+Note: the template includes placeholder values ([STREET ADDRESS], [LAT]/[LONG], [RATING], [REVIEW_COUNT], [MINIMUM], [TURNAROUND], and the phone number) that must be confirmed against the business's real Google Business Profile and policies before publishing. Phone shown (253-922-5793) was taken from the site's public listing — verify it's current.
+</p>
+
+</div>
+</body>
+</html>

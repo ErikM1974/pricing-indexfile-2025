@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Two-Site SEO Coordination Guide — nwcustomapparel.net + teamnwca.com</title>
+<style>
+  :root{--navy:#16324f;--teal:#2c7a7b;--muted:#5b6b7f;--line:#e3e8ef;--red:#c0392b;--redbg:#fbeae8;--green:#1f9d55;--greenbg:#e8f6ee;--amber:#b7791f;--amberbg:#fbf3e3;--blue:#2b6cb0;--bluebg:#e8f0fa}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:#22303c;line-height:1.62;font-size:15.5px;background:#f6f8fb}
+  .wrap{max-width:920px;margin:0 auto;padding:0 24px 80px}
+  header{background:linear-gradient(135deg,#16324f,#2c7a7b);color:#fff;padding:38px 0 30px}
+  header .wrap{padding-bottom:0}
+  .kicker{text-transform:uppercase;letter-spacing:.14em;font-size:12px;opacity:.85;margin:0 0 8px}
+  h1{margin:0 0 8px;font-size:26px}
+  .sub{opacity:.92;font-size:14.5px;margin:0}
+  .meta-line{margin-top:14px;font-size:13px;opacity:.85;border-top:1px solid rgba(255,255,255,.2);padding-top:11px}
+  h2{font-size:20px;margin:34px 0 10px;padding-bottom:7px;border-bottom:2px solid var(--line);color:var(--navy)}
+  h3{font-size:16px;margin:18px 0 6px;color:var(--navy)}
+  p{margin:10px 0}
+  code{background:#eef2f7;padding:1px 6px;border-radius:4px;font-size:13.5px;color:#22364c}
+  pre{background:#0f2438;color:#e6edf3;padding:16px 18px;border-radius:10px;overflow-x:auto;font-size:13px;line-height:1.5}
+  pre code{background:none;color:inherit;padding:0}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:14px;background:#fff}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:#f0f4f9;color:var(--navy);font-size:12px;text-transform:uppercase;letter-spacing:.03em}
+  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px 22px;margin:14px 0}
+  .danger{background:var(--redbg);border-left:5px solid var(--red);padding:14px 18px;border-radius:0 10px 10px 0;margin:16px 0}
+  .danger h3{color:var(--red);margin-top:0}
+  .ok{background:var(--greenbg);border-left:5px solid var(--green);padding:12px 16px;border-radius:0 10px 10px 0;margin:14px 0;font-size:14px}
+  .warn{background:var(--amberbg);border-left:5px solid var(--amber);padding:12px 16px;border-radius:0 10px 10px 0;margin:14px 0;font-size:14px}
+  .note{background:var(--bluebg);border-left:5px solid var(--blue);padding:12px 16px;border-radius:0 10px 10px 0;margin:14px 0;font-size:14px}
+  ul{margin:8px 0;padding-left:22px}li{margin:6px 0}
+  .check{list-style:none;padding-left:0}
+  .check li{padding-left:28px;position:relative}
+  .check li::before{content:"☐";position:absolute;left:0;color:var(--teal);font-size:17px;top:-1px}
+  strong{color:var(--navy)}
+  .lane-net{background:#e8f0fa;color:#2b6cb0;font-weight:700;padding:2px 9px;border-radius:5px;font-size:12px;white-space:nowrap}
+  .lane-team{background:#e8f6ee;color:#1f9d55;font-weight:700;padding:2px 9px;border-radius:5px;font-size:12px;white-space:nowrap}
+  .lane-both{background:#fbf3e3;color:#b7791f;font-weight:700;padding:2px 9px;border-radius:5px;font-size:12px;white-space:nowrap}
+  .flow{background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px 24px;margin:14px 0;font-size:14.5px}
+  .flow .q{font-weight:700;color:var(--navy)}
+  .flow .a{margin:4px 0 14px 18px;color:#22303c}
+  td.num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+  .done{color:var(--green);font-weight:700}
+  .todo{color:var(--amber);font-weight:700}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <p class="kicker">Two-Site Strategy · Read alongside the Recovery Roadmap &amp; Local Page Playbook</p>
+  <h1>How nwcustomapparel.net and teamnwca.com work together</h1>
+  <p class="sub">One business, two websites, zero overlap — who writes what, who links where, and why it makes both sites rank better. For Mehar.</p>
+  <div class="meta-line">Prepared for: <strong>Mehar (web/SEO)</strong> · Commissioned by: Erik Mickelson · July 14, 2026 · Companion files: <em>SEO Audit &amp; Traffic Recovery Roadmap</em>, <em>Local Landing Page Playbook</em>, <em>Local Landing Page Template</em></div>
+</div></header>
+<div class="wrap">
+
+<h2>Why this document exists</h2>
+<p>Northwest Custom Apparel runs two websites, and Google knows they're the same business — both sites carry <code>sameAs</code> schema pointing at each other, and they share the same name, address, and phone. That's deliberate and good: it stitches both domains to one entity in Google's knowledge graph.</p>
+<p>But it has one consequence that shapes everything in this document: <strong>if both sites publish pages chasing the same search query, Google splits the ranking strength between them and often ranks neither on page 1.</strong> We saw exactly this with "custom embroidery near me" split across two .net pages (both stuck on page 2) — the same thing happens across the two domains, only worse. The fix is not to compete less aggressively; it's to <strong>never compete at all</strong>. Each query class has exactly one owner, and the other site links to it.</p>
+<div class="ok"><strong>The one-sentence version:</strong> .net wins the customer's <em>trust and location</em> ("who does embroidery near me?"), teamnwca wins the customer's <em>product decision and order</em> ("which garment, what price?") — and every page on each site hands the visitor to the other site at exactly the moment their question changes.</div>
+
+<h2>1. The lane map — who owns which searches</h2>
+<table>
+  <tr><th>Query class</th><th>Owner</th><th>Examples</th></tr>
+  <tr><td><strong>Local &amp; service intent</strong> — "near me", "[service] in [city]", Google Business Profile / map pack</td><td><span class="lane-net">.net</span></td><td>"custom embroidery near me" · "screen printing Tacoma" · "embroidery services near me" · all city landing pages</td></tr>
+  <tr><td><strong>Educational / how-it-works / craft</strong></td><td><span class="lane-net">.net</span></td><td>"how does DTG work" · fabric guides · "how to break in a Carhartt jacket" · digitizing, thread, stitch education</td></tr>
+  <tr><td><strong>Product &amp; style</strong> — style numbers, brand catalogs, product comparisons, use-case picks</td><td><span class="lane-team">teamnwca</span></td><td>"pc54 vs pc61" · "custom carhartt" · "richardson 112 colors" · "best polos for office teams" · brand landing pages</td></tr>
+  <tr><td><strong>Tools, pricing &amp; calculators</strong></td><td><span class="lane-team">teamnwca</span> <em>(exclusively — see §3)</em></td><td>quote builders · pricing pages · cost calculators · roster/size collection · online stores</td></tr>
+  <tr><td><strong>Company story / history / culture</strong></td><td><span class="lane-net">.net</span></td><td>"since 1977" story · case studies · team &amp; culture</td></tr>
+  <tr><td><strong>Industry angles</strong></td><td><span class="lane-both">split</span></td><td>.net keeps its existing industry wins (HVAC, construction education, kitchens/aprons, gyms, schools). teamnwca takes <em>product-pick</em> posts for industries .net hasn't covered (breweries, landscaping, auto shops, marinas…). When in doubt → ask Erik before writing.</td></tr>
+</table>
+<div class="warn"><strong>Hi-vis / safety, said once and clearly:</strong> .net owns the <em>educational</em> hi-vis angle (ANSI class explainers, "why hi-vis matters", the Washington-requirements post — that one is excellent). teamnwca owns the <em>commercial</em> hi-vis terms (product picks, "hi-vis shirts with company logo", the safety-stripes program). The ~50 near-duplicate hi-vis drafts in the .net backup should be merged into the existing educational winners per the Roadmap — please don't publish them as standalone posts, and don't add hi-vis <em>product-recommendation</em> posts on .net.</div>
+
+<h2>2. "Which site does this content belong on?" — the 30-second test</h2>
+<div class="flow">
+  <p class="q">1. Is the searcher asking WHERE to get something done, or WHO to trust locally? ("near me", a city name, "embroidery shop")</p>
+  <p class="a">→ <span class="lane-net">.net</span> — city page or service page. This is the Recovery Roadmap's core mission.</p>
+  <p class="q">2. Is the searcher asking HOW something works, or learning? ("how does…", "what is…", "difference between fabrics")</p>
+  <p class="a">→ <span class="lane-net">.net</span> — educational post. Your authority + 497 AI citations live here.</p>
+  <p class="q">3. Is the searcher deciding WHICH product/style/brand to buy, or asking about PRICE? (a style number, a brand name + "custom", "best X for Y", "cost", "pricing")</p>
+  <p class="a">→ <span class="lane-team">teamnwca</span> — product post, brand page, or tool. Don't write it on .net; link to it instead.</p>
+  <p class="q">4. Could it honestly go either way?</p>
+  <p class="a">→ Flag it to Erik <em>before</em> writing. A 2-minute check beats two pages cannibalizing each other for six months.</p>
+</div>
+
+<h2>3. Three amendments to the Recovery Roadmap</h2>
+<p>The Roadmap is the plan of record for .net — everything in it stands except three Phase-3 content ideas that would cross into teamnwca's lane. Here's what to do instead:</p>
+<table>
+  <tr><th>Roadmap item</th><th>Change</th><th>Why</th></tr>
+  <tr><td>"Custom embroidery <strong>cost calculator</strong>"</td><td><strong>Don't build on .net.</strong> Link to teamnwca's quote tools instead. Same for "bulk polo pricing"-type content: .net can cover the <em>process</em> ("how quoting works, what affects price"), but never publish actual prices or calculators.</td><td>All NWCA pricing comes from ONE live pricing engine on teamnwca. A second price surface anywhere — even on our own .net — will eventually show customers a wrong price. This is a hard company rule.</td></tr>
+  <tr><td>"Screen printing <strong>vs</strong> embroidery for uniforms"</td><td><strong>Coordinate the angle first.</strong> The method-education version ("how each process works, pros/cons") is yours. The product-anchored version ("which garments/styles, get a price") is teamnwca's — it's being built there. Ideal outcome: you write the education piece, it links to teamnwca's product piece, and vice-versa.</td><td>Two sites on one query = both lose. Two sites on two <em>intents</em> of the query, cross-linked = we own the whole SERP journey.</td></tr>
+  <tr><td>(addition) <code>/dtg-calculator/</code> and <code>/order-form/</code></td><td><strong>Retire &amp; 301</strong> — <code>/dtg-calculator/</code> → the DTG service page (or teamnwca's quote builder), <code>/order-form/</code> → the contact/quote page.</td><td>The calculator publishes DTG prices outside the pricing engine (see above), and the order form duplicates a system that was retired on the main app. Both are stale-data liabilities.</td></tr>
+</table>
+
+<h2>4. Additions to the Local Page Template</h2>
+<p>The Tacoma template is approved as-is for structure, schema, and copy. Please add these four things as you build each city page:</p>
+
+<h3>4a. A catalog block on every city page</h3>
+<p>The template's services grid links your service pages — good. Add <strong>one more block</strong> (after Services or Why-Us) that hands product/browsing intent to teamnwca. Copy-paste base (restyle freely to match the page):</p>
+<pre><code>&lt;section class="catalog-band"&gt;
+  &lt;h2&gt;Browse the full catalog — with live pricing&lt;/h2&gt;
+  &lt;p&gt;Explore 3,000+ shirts, polos, caps, jackets and workwear styles and see
+     decorated pricing instantly on our ordering site.&lt;/p&gt;
+  &lt;a class="btn" href="https://www.teamnwca.com/"&gt;Browse Styles &amp;amp; Pricing
+     at teamnwca.com →&lt;/a&gt;
+&lt;/section&gt;</code></pre>
+<p><strong>Keep your own quote CTA as the primary conversion</strong> on city pages — this block is the <em>browsing</em> path, not a replacement lead form. The visitor who wants to talk fills your form; the visitor who wants to shop clicks through to teamnwca. Both end up as NWCA orders.</p>
+
+<h3>4b. Brand names become links</h3>
+<p>Where the template names brands ("We decorate Carhartt, Nike, The North Face, Richardson…"), link the brand names to teamnwca's brand pages as they exist:</p>
+<table>
+  <tr><th>Brand mention</th><th>Link to</th><th>Status</th></tr>
+  <tr><td>Carhartt</td><td><code>https://www.teamnwca.com/custom-carhartt</code></td><td class="done">Live now</td></tr>
+  <tr><td>Caps / Richardson / New Era</td><td><code>https://www.teamnwca.com/custom-caps</code></td><td class="done">Live now</td></tr>
+  <tr><td>Hi-vis / safety apparel</td><td><code>https://www.teamnwca.com/custom-safety-apparel</code></td><td class="done">Live now</td></tr>
+  <tr><td>Polos, New Era brand page, safety vests</td><td>(coming — Erik will send URLs as each goes live)</td><td class="todo">In build</td></tr>
+</table>
+
+<h3>4c. NAP is now a two-site contract</h3>
+<p>Your playbook's rule — NAP byte-identical to Google Business Profile — applies to <strong>both domains</strong>, because Google reads them as one business. <strong>Verified against GBP July 14, 2026:</strong> <code>2025 Freeman Rd E, Milton, WA 98354 · (253) 922-5793</code>. That is the only address/phone either site ever prints (schema, footers, city pages) — teamnwca's schema already matches. If you spot a mismatch anywhere on either site, flag it.</p>
+<p><strong>Template placeholder data, also from GBP (July 14, 2026):</strong> <code>[RATING]</code> = <strong>4.9</strong>, <code>[REVIEW_COUNT]</code> = <strong>187</strong> Google reviews. Re-check the live numbers when you build each page (they only go up), and pull the actual review texts from the GBP listing — real reviews only, per your playbook.</p>
+
+<h3>4d. Factual claims must match across sites</h3>
+<p>The template's FAQ placeholders — turnaround ("7–10 business days"), minimums ("no minimum DTG"), same-day options — must say the same thing both sites say. Before publishing the first city page, confirm the real numbers with Erik once, then reuse them verbatim everywhere. One business can't tell Google two different turnaround stories.</p>
+
+<h2>5. The funnel map — your posts → teamnwca targets</h2>
+<p>Roadmap Phase 1 calls for CTAs from your top informational posts to commercial pages. For <strong>brand/product</strong> intent, the right commercial page is usually on teamnwca (for <strong>local/service</strong> intent it stays on .net). Here's the current map:</p>
+<table>
+  <tr><th>.net post</th><th class="num">Visits/mo</th><th>Add CTA/link to</th><th>Status</th></tr>
+  <tr><td><code>/how-to-break-in-carhartt-jacket/</code></td><td class="num">161</td><td><code>teamnwca.com/custom-carhartt</code></td><td class="done">✅ Done (July 13)</td></tr>
+  <tr><td><code>/is-eddie-bauer-a-quality-brand/</code></td><td class="num">118</td><td>teamnwca premium-jackets guide (Eddie Bauer / North Face corporate gifts) — Erik sends the URL when it publishes</td><td class="todo">Queued</td></tr>
+  <tr><td><code>/cotton-vs-polyester-guide/</code></td><td class="num">48</td><td><code>teamnwca.com/blog/pc54-vs-pc61</code> (it already links back to you)</td><td class="todo">Add link</td></tr>
+  <tr><td><code>/dtg-printed-hoodies-heavy-equipment-companies/</code></td><td class="num">—</td><td><code>teamnwca.com/blog/pc90h-vs-gildan-18500</code> (already links back to you)</td><td class="todo">Add link</td></tr>
+  <tr><td><code>/why-is-carhartt-so-popular/</code> + <code>/carhartt-alternatives-bulk-workwear/</code></td><td class="num">31 + …</td><td><code>teamnwca.com/custom-carhartt</code> (when you refresh them per Roadmap Phase 1)</td><td class="todo">With refresh</td></tr>
+</table>
+<div class="note"><strong>This works both ways.</strong> teamnwca's posts already send readers to your explainers (the hoodie comparison links your print-method guide; the tee comparison links your cotton-vs-polyester guide), and every new teamnwca post will keep doing that. Your educational authority is the reason we don't have to re-explain anything — we just link you.</div>
+
+<h2>6. What teamnwca is doing (so nothing surprises you)</h2>
+<ul>
+  <li><strong>One product-focused blog post per week</strong> — style comparisons, brand roundups, "best X for [industry]" picks. All anchored on style numbers and catalog pages; none will touch local, service, or educational queries.</li>
+  <li><strong>Brand landing pages</strong> — Carhartt and Caps are live; safety vests, polos, and New Era are next. Each is a product catalog page, not a service page — your service/city pages stay the only pages targeting service intent.</li>
+  <li><strong>Product page SEO</strong> — 3,197 product pages with server-rendered titles and custom descriptions. These target style-number searches ("pc54", "richardson 112") that .net has never targeted.</li>
+  <li><strong>Every teamnwca post cross-links a relevant .net explainer</strong> where one exists — that's a standing rule on our side.</li>
+</ul>
+
+<h2>7. Collision protocol — before either site writes anything new</h2>
+<ul class="check">
+  <li><strong>Mehar, before a new .net post/page:</strong> search <code>teamnwca.com/blog</code> and the brand pages for the topic. If teamnwca already targets the query with buying intent → keep your angle educational/local and cross-link, or skip it. Style numbers, brand-catalog terms, "best/vs" product picks, and anything with a price → teamnwca's.</li>
+  <li><strong>teamnwca (automated), before every post:</strong> we search .net's live content for the target query. If you cover it, we either change our angle to product/commercial and cross-link you, or we don't write it. This check runs automatically before every publish.</li>
+  <li><strong>Ties or gray areas → Erik decides.</strong> One Slack message beats months of split rankings.</li>
+</ul>
+
+<h2>8. Shared scoreboard (monthly)</h2>
+<p>Alongside the Roadmap's metrics, we'll watch the combined picture monthly:</p>
+<ul>
+  <li><strong>Non-brand organic clicks, both properties</strong> (Search Console) — the number that matters.</li>
+  <li><strong>Quote requests / form fills from organic</strong>, whichever site they land on — it's one pipeline.</li>
+  <li><strong>Cross-domain click-throughs</strong> (.net → teamnwca catalog clicks, teamnwca → .net explainer clicks).</li>
+  <li><strong>Zero-cannibalization check:</strong> no query where both domains sit on page 1–3 with the same intent. If we find one, we pick an owner and 301/de-optimize the other.</li>
+  <li><strong>October 2026 checkpoint</strong> — three months of curves on both sites, review together.</li>
+</ul>
+
+<div class="ok"><strong>Bottom line:</strong> the Roadmap gives .net its mission (win local + service). teamnwca's mission is product + pricing. This guide is the treaty line between them: one owner per query, links across the border in both directions, one shared scoreboard. Follow the lane map and every page we publish makes <em>both</em> sites stronger.</div>
+
+<p style="color:#5b6b7f;font-size:12.5px;margin-top:26px;border-top:1px solid var(--line);padding-top:14px">
+Questions or gray-area topics: erik@nwcustomapparel.com. This guide supersedes the earlier two-site content playbook (July 12) — the lane definitions here are current.
+</p>
+
+</div>
+</body>
+</html>

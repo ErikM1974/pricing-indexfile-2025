@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>SEO Strategy - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- 2026 design tokens (must load before dash-shell.css) -->
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css">
+    <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
+    <link rel="stylesheet" href="/dashboards/css/seo-strategy.css">
+</head>
+<body>
+    <div class="dash-shell">
+        <header class="dash-header">
+            <div class="dash-header-left">
+                <a href="/staff-dashboard.html" title="Back to Staff Dashboard">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                         alt="Northwest Custom Apparel" class="dash-header-logo">
+                </a>
+                <h1 class="dash-header-title">SEO Strategy</h1>
+            </div>
+            <div class="dash-header-right">
+                <a href="/staff-dashboard.html" class="dash-back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    Dashboard
+                </a>
+            </div>
+        </header>
+
+        <main class="dash-content">
+            <div class="dash-error-banner" role="alert">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span class="dash-error-banner-message"></span>
+                <button class="dash-error-banner-close" aria-label="Dismiss">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="seo-doc-banner">
+                <div class="seo-doc-banner-main">
+                    <i class="fas fa-compass"></i>
+                    <div>
+                        <strong>Living document — the plan of record for NWCA search strategy.</strong>
+                        Covers teamnwca.com (this app) and nwcustomapparel.net (Mehar's WordPress site) and how they
+                        work together without competing. To change it, tell Claude:
+                        <em>&ldquo;update the SEO Strategy page&rdquo;</em> — and log the change in <a href="#changelog">§9</a>.
+                    </div>
+                </div>
+                <div class="seo-doc-banner-meta">
+                    Admin-only · Last updated <strong id="lastUpdated">July 14, 2026</strong>
+                </div>
+            </div>
+
+            <!-- At-a-glance stats -->
+            <div class="dash-stat-grid seo-stats">
+                <div class="dash-stat-card dash-stat-card--accent">
+                    <div class="dash-stat-value">5</div>
+                    <div class="dash-stat-label">Blog posts published</div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value">25</div>
+                    <div class="dash-stat-label">Drafts banked (~6 mo)</div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value">3,197</div>
+                    <div class="dash-stat-label">Product pages w/ SEO heads</div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value">546</div>
+                    <div class="dash-stat-label">Custom style descriptions</div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value">42</div>
+                    <div class="dash-stat-label">SEMrush keywords (baseline)</div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value">4.9★</div>
+                    <div class="dash-stat-label">GBP · 187 reviews</div>
+                </div>
+            </div>
+            <p class="seo-stats-note">Snapshot July 14, 2026 — update these when the monthly review runs.</p>
+
+            <div class="seo-layout">
+                <!-- Sticky table of contents -->
+                <aside class="seo-toc" aria-label="Sections">
+                    <div class="seo-toc-title">On this page</div>
+                    <nav>
+                        <a href="#mission" class="seo-toc-link">1 · Mission &amp; the two-site model</a>
+                        <a href="#lanes" class="seo-toc-link">2 · The lane map</a>
+                        <a href="#teamnwca" class="seo-toc-link">3 · teamnwca.com plan</a>
+                        <a href="#dotnet" class="seo-toc-link">4 · nwcustomapparel.net plan</a>
+                        <a href="#coordination" class="seo-toc-link">5 · Working with Mehar</a>
+                        <a href="#facts" class="seo-toc-link">6 · Shared facts (NAP &amp; claims)</a>
+                        <a href="#scoreboard" class="seo-toc-link">7 · Scoreboard &amp; checkpoints</a>
+                        <a href="#reference" class="seo-toc-link">8 · Reference shelf</a>
+                        <a href="#changelog" class="seo-toc-link">9 · Change log</a>
+                    </nav>
+                </aside>
+
+                <div class="seo-sections">
+
+                    <!-- ============ 1. MISSION ============ -->
+                    <section class="dash-card seo-section" id="mission">
+                        <div class="dash-card-header">
+                            <h2 class="dash-card-title"><span class="seo-secnum">1</span> Mission &amp; the two-site model</h2>
+                        </div>
+                        <div class="seo-section-body">
+                            <p>NWCA runs two websites, and Google knows they are the <strong>same business</strong> — both carry
+                            <code>sameAs</code> schema pointing at each other and share the same name, address, and phone
+                            (entity stitching, live on both sides since July 12, 2026). That is deliberate: it pools brand
+                            authority into one knowledge-graph entity.</p>
+                            <p>The one consequence that shapes everything: <strong>if both sites publish pages chasing the same
+                            search query, Google splits ranking strength between them and often ranks neither on page&nbsp;1.</strong>
+                            We watched this happen on .net itself — &ldquo;custom embroidery near me&rdquo; split across two of its own
+                            pages held both on page&nbsp;2. Across two domains it is worse. So the rule is not &ldquo;compete gently&rdquo;;
+                            it is <strong>never compete at all</strong>: every query class has exactly one owner, and the other site links to it.</p>
+                            <div class="seo-callout seo-callout--success">
+                                <strong>The strategy in one sentence:</strong> .net wins the customer&rsquo;s <em>trust and location</em>
+                                (&ldquo;who does embroidery near me?&rdquo;) — teamnwca wins the customer&rsquo;s <em>product decision and order</em>
+                                (&ldquo;which garment, what price?&rdquo;) — and each site hands the visitor to the other at exactly the moment
+                                their question changes.
+                            </div>
+                            <p>Division of labor: <strong>Mehar</strong> (umehar56@gmail.com) runs .net per the Recovery Roadmap.
+                            <strong>Claude</strong> runs teamnwca per this page (weekly blog autopilot + product/brand SEO).
+                            <strong>Erik</strong> owns gray-area calls and relays questions between the two.
+                            The full doctrine was decided July 13–14, 2026 (&ldquo;Lane Split v2&rdquo;) and sent to Mehar as a 4-document packet on July&nbsp;14.</p>
+                        </div>
+                    </section>
+
+                    <!-- ============ 2. LANE MAP ============ -->
+                    <section class="dash-card seo-section" id="lanes">
+                        <div class="dash-card-header">
+                            <h2 class="dash-card-title"><span class="seo-secnum">2</span> The lane map — who owns which searches</h2>
+                        </div>
+                        <div class="seo-section-body">
+                            <table class="seo-table">
+                                <thead>
+                                    <tr><th>Query class</th><th>Owner</th><th>Examples</th></tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Local &amp; service intent</strong><br>&ldquo;near me&rdquo;, &ldquo;[service] in [city]&rdquo;, map pack / GBP</td>
+                                        <td><span class="seo-lane seo-lane--net">.net</span></td>
+                                        <td>&ldquo;custom embroidery near me&rdquo; (8,100/mo) · &ldquo;screen printing Tacoma&rdquo; · all city landing pages</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Educational / how-it-works / craft</strong></td>
+                                        <td><span class="seo-lane seo-lane--net">.net</span></td>
+                                        <td>&ldquo;how does DTG work&rdquo; · fabric guides · digitizing &amp; thread education · brand care guides</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Product &amp; style</strong><br>style numbers, brand catalogs, comparisons, use-case picks</td>
+                                        <td><span class="seo-lane seo-lane--team">teamnwca</span></td>
+                                        <td>&ldquo;pc54 vs pc61&rdquo; · &ldquo;custom carhartt&rdquo; · &ldquo;richardson 112 colors&rdquo; · &ldquo;best polos for office teams&rdquo;</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Tools, pricing &amp; calculators</strong></td>
+                                        <td><span class="seo-lane seo-lane--team">teamnwca</span> <em>exclusively</em></td>
+                                        <td>quote builders · pricing content · cost calculators · roster/size tools · webstores</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Company story / history / culture</strong></td>
+                                        <td><span class="seo-lane seo-lane--net">.net</span></td>
+                                        <td>&ldquo;since 1977&rdquo; story · case studies · team &amp; culture</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Industry angles</strong></td>
+                                        <td><span class="seo-lane seo-lane--both">split</span></td>
+                                        <td>.net keeps its wins (HVAC, construction education, aprons/kitchens, gyms, schools).
+                                            teamnwca takes <em>product-pick</em> posts for uncovered industries (breweries, landscaping, auto shops, marinas&hellip;).
+                                            Unsure → ask Erik first.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <h3>The 30-second test for any new content idea</h3>
+                            <ol class="seo-flow">
+                                <li><strong>Is the searcher asking WHERE to get it done, or WHO to trust locally?</strong> → <span class="seo-lane seo-lane--net">.net</span> city/service page.</li>
+                                <li><strong>Is the searcher asking HOW something works?</strong> → <span class="seo-lane seo-lane--net">.net</span> educational post.</li>
+                                <li><strong>Is the searcher deciding WHICH product/brand to buy, or asking about PRICE?</strong> → <span class="seo-lane seo-lane--team">teamnwca</span> post, brand page, or tool.</li>
+                                <li><strong>Could it honestly go either way?</strong> → flag to Erik <em>before</em> writing. Two minutes now beats six months of split rankings.</li>
+                            </ol>
+
+                            <div class="seo-callout seo-callout--warning">
+                                <strong>Hi-vis / safety, said once:</strong> .net owns the <em>educational</em> angle (ANSI class explainers,
+                                &ldquo;WA hi-vis requirements&rdquo; — excellent post, link it). teamnwca owns the <em>commercial</em> terms
+                                (product picks, &ldquo;hi-vis shirts with company logo&rdquo;, the safety-stripes program, <code>/custom-safety-apparel</code>).
+                                The ~50 near-duplicate hi-vis drafts in .net&rsquo;s backup get merged into its educational winners — never published standalone.
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- ============ 3. TEAMNWCA PLAN ============ -->
+                    <section class="dash-card seo-section" id="teamnwca">
+                        <div class="dash-card-header">
+                            <h2 class="dash-card-title"><span class="seo-secnum">3</span> teamnwca.com — the plan</h2>
+                        </div>
+                        <div class="seo-section-body">
+                            <h3>Live assets (protect these — don&rsquo;t churn what works)</h3>
+                            <table class="seo-table">
+                                <thead><tr><th>Asset</th><th>State</th><th>Standing rule</th></tr></thead>
+                                <tbody>
+                                    <tr><td>Server-rendered <code>/blog</code> + sitemap + Google Search Console</td><td><span class="seo-chip seo-chip--live">Live</span></td><td>Monday autopilot publishes 1 post/week — never burst-publish</td></tr>
+                                    <tr><td>Product SEO heads — 3,197 styles, method-aware titles (92% specific)</td><td><span class="seo-chip seo-chip--live">Live</span></td><td>Never per-method URLs (doorway-page trap); one page per style, ever</td></tr>
+                                    <tr><td>Product_Copy overlay — custom descriptions beat SanMar boilerplate</td><td><span class="seo-chip seo-chip--live">546 styles</span></td><td>Insert-only batches; Erik&rsquo;s Caspio edits always win; ~2,650 tail remaining</td></tr>
+                                    <tr><td>Brand landing pages — <code>/custom-carhartt</code>, <code>/custom-caps</code>, <code>/custom-safety-apparel</code></td><td><span class="seo-chip seo-chip--live">Live</span></td><td>Curated grid + real order stats + FAQ schema; <strong>no prices in schema</strong> (Rule 9)</td></tr>
+                                    <tr><td>Blog ↔ product-page internal links (<code>/api/blog-product-map</code>)</td><td><span class="seo-chip seo-chip--live">Live</span></td><td>Self-wiring — new posts appear on product pages automatically, no deploy</td></tr>
+                                    <tr><td>Entity stitching (<code>sameAs</code> both domains) + GSC verification route</td><td><span class="seo-chip seo-chip--live">Live</span></td><td>NEVER remove the <code>google9a8d…html</code> route or the schema blocks</td></tr>
+                                    <tr><td>Monday blog autopilot with two-way collision gate</td><td><span class="seo-chip seo-chip--live">Live</span></td><td>Refuses same-intent .net collisions AND any local/&ldquo;near me&rdquo; query drafts</td></tr>
+                                </tbody>
+                            </table>
+
+                            <h3>Phased plan (mirrors Mehar&rsquo;s phases so both sites compound)</h3>
+                            <div class="seo-phase">
+                                <div class="seo-phase-head"><span class="seo-phase-when">Phase 1 · now → week 3</span> Cadence &amp; funnel wiring</div>
+                                <ul>
+                                    <li>Weekly blog cadence continues (25 drafts banked ≈ 6 months of runway).</li>
+                                    <li>Publish the <strong>Eddie Bauer / North Face premium-jackets post early</strong> — it becomes the funnel target for .net&rsquo;s Eddie Bauer post (118 visits/mo); send Mehar the URL when live.</li>
+                                    <li>Funnel-target list delivered to Mehar <span class="seo-chip seo-chip--done">Done Jul 14</span></li>
+                                </ul>
+                            </div>
+                            <div class="seo-phase">
+                                <div class="seo-phase-head"><span class="seo-phase-when">Phase 2 · weeks 3–8</span> Brand pages wave 2 (while Mehar builds city pages)</div>
+                                <ul>
+                                    <li>Replicate the <code>/custom-carhartt</code> pattern: <strong>/custom-safety-vests</strong> (pairs with the CSV405 post + hi-vis copy already seeded), then <strong>/custom-polos</strong>, then <strong>/custom-new-era</strong> (106 styles already have custom copy). One page ≈ every 2 weeks; each added to <code>sitemap-pages.xml</code>. <span class="seo-chip seo-chip--open">Awaiting Erik go</span></li>
+                                    <li>Supply Mehar the copy-paste <strong>catalog block</strong> for every city page he builds (&ldquo;Browse 3,000+ styles with live pricing → teamnwca.com&rdquo;).</li>
+                                    <li>Product_Copy tail batches continue (PA / P&amp;C / District / OGIO / Nike rests).</li>
+                                </ul>
+                            </div>
+                            <div class="seo-phase">
+                                <div class="seo-phase-head"><span class="seo-phase-when">Phase 3 · weeks 6–14</span> Claim the tool &amp; comparison ground</div>
+                                <ul>
+                                    <li>Publish product-anchored versions of the topics .net&rsquo;s roadmap floated — &ldquo;screen printing vs embroidery for uniforms&rdquo; (which garments/styles, link both builders) and &ldquo;how quoting works&rdquo; — so Mehar&rsquo;s Phase 3 links to existing pages instead of building competing ones.</li>
+                                    <li>AI-search structure on every post: open with a <strong>&ldquo;The short answer&rdquo;</strong> block, direct-answer H2s, FAQ schema on roundups (.net&rsquo;s 497 AI citations prove the channel).</li>
+                                    <li>Industry product-pick drafts publish through fall (breweries, landscaping, auto shops, churches, golf, pet businesses&hellip; — all banked, all .net-collision-checked).</li>
+                                </ul>
+                            </div>
+                            <div class="seo-phase">
+                                <div class="seo-phase-head"><span class="seo-phase-when">Phase 4 · ongoing</span> Authority &amp; measurement</div>
+                                <ul>
+                                    <li>Backlinks: supplier/brand directories (SanMar, Carhartt authorized decorator) list <strong>both</strong> domains; &ldquo;since 1977&rdquo; PR anchored on the catalog/tools angle for teamnwca.</li>
+                                    <li>.net&rsquo;s 615 referring domains link teamnwca sitewide (footer — live) — passes authority to the newer domain (AS 7 vs 26).</li>
+                                    <li>Monthly review with Mehar&rsquo;s report — see <a href="#scoreboard">§7</a>.</li>
+                                </ul>
+                            </div>
+
+                            <h3>Hard rules (never break)</h3>
+                            <ul class="seo-rules">
+                                <li><strong>Rule 9 — one pricing engine.</strong> No price appears outside it, on either domain. No prices/offers in any JSON-LD schema.</li>
+                                <li><strong>Never chase &ldquo;near me&rdquo; or city queries</strong> — that lane is .net&rsquo;s recovery plan.</li>
+                                <li><strong>Never write educational/craft content</strong> — link .net&rsquo;s explainer instead.</li>
+                                <li><strong>Never copy .net text</strong> (literal duplicate content tanks both). Check <code>reference/nwcustomapparel-net-blogs/INDEX.md</code> before writing.</li>
+                                <li><strong>Slugs never change after publish.</strong> One post/week — steady cadence beats dumps.</li>
+                                <li><strong>Every post:</strong> 3+ product links, one tool CTA, one .net cross-link where a related explainer exists, meta ≤155 chars written for the click.</li>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <!-- ============ 4. .NET PLAN ============ -->
+                    <section class="dash-card seo-section" id="dotnet">
+                        <div class="dash-card-header">
+                            <h2 class="dash-card-title"><span class="seo-secnum">4</span> nwcustomapparel.net — Mehar&rsquo;s recovery plan</h2>
+                        </div>
+                        <div class="seo-section-body">
+                            <p class="seo-muted">Summary of the SEMrush/Claude roadmap delivered July 14, 2026 (full doc in the <a href="#reference">reference shelf</a>). Mehar executes; this is here so anyone can see what the other half of the strategy is doing.</p>
+
+                            <h3>The diagnosis</h3>
+                            <ul>
+                                <li>Ranking keywords peaked ~15–18K in early 2025, now ~4–5K; ~1,000 visits/mo and falling ~12–16%.</li>
+                                <li>~47% of traffic is the homepage on brand searches; ~35% is informational posts about <em>other brands</em> (Carhartt, Eddie Bauer) — traffic that Google&rsquo;s helpful-content updates + AI Overviews are structurally eroding and that rarely converts.</li>
+                                <li>The commercial/local &ldquo;money pages&rdquo; already exist but sit on pages 2–5 — e.g. <code>/custom-embroidery-seattle/</code> holds 206 keywords yet earns 5 visits/mo.</li>
+                                <li><strong>Proof the fix works:</strong> the new Bonney Lake local page already pulls 32 visits/mo at ~#10 for &ldquo;custom embroidery near me&rdquo; (8,100 searches/mo).</li>
+                            </ul>
+
+                            <h3>His four phases</h3>
+                            <table class="seo-table">
+                                <thead><tr><th>Phase</th><th>Focus</th></tr></thead>
+                                <tbody>
+                                    <tr><td><strong>1 · Weeks 1–3</strong></td><td>Fix &ldquo;near me&rdquo; cannibalization (one page per city per term) · on-page overhaul of the money pages · add CTAs from top informational posts to commercial pages · refresh the biggest decliners.</td></tr>
+                                    <tr><td><strong>2 · Weeks 3–8</strong></td><td>Local landing-page system to the Bonney Lake standard — rebuild Seattle/Spokane/Portland/Kent, add Tacoma, Milton, Puyallup, Federal Way, Auburn&hellip; URL pattern <code>/custom-embroidery-{city}-wa/</code>, 301 old variants · optimize Google Business Profile + citations + reviews.</td></tr>
+                                    <tr><td><strong>3 · Weeks 6–14</strong></td><td>Content triage of ~300 posts (keep/merge/retire; hi-vis drafts merged, not published) · pivot new content to commercial/local/industry topics · keep AI-citation-friendly structure (497 citations today).</td></tr>
+                                    <tr><td><strong>4 · Ongoing</strong></td><td>Grow referring domains (615 → competitor benchmark ~1,300) · close keyword gaps vs brokenarrowwear / thefoundryclothing.</td></tr>
+                                </tbody>
+                            </table>
+
+                            <div class="seo-callout seo-callout--info">
+                                <strong>Anti-doorway rule (his playbook, worth repeating):</strong> city pages are NOT find-and-replace clones —
+                                each needs ~40–50% genuinely unique local content (real neighborhoods, industries, drive times, local reviews)
+                                or Google suppresses the whole set. The Bonney Lake page ranks because it&rsquo;s genuinely useful.
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- ============ 5. COORDINATION ============ -->
+                    <section class="dash-card seo-section" id="coordination">
+                        <div class="dash-card-header">
+                            <h2 class="dash-card-title"><span class="seo-secnum">5</span> Working with Mehar — the treaty terms</h2>
+                        </div>
+                        <div class="seo-section-body">
+                            <h3>Contact &amp; routing</h3>
+                            <p><strong>Mehar:</strong> umehar56@gmail.com. Claude never emails him directly — questions route through Erik
+                            (&ldquo;Erik, please ask Mehar&hellip;&rdquo;), and Mehar&rsquo;s asks for teamnwca (URLs, cross-link targets, confirmed policy numbers) come back the same way.
+                            Gray-area topics stop for Erik&rsquo;s call <em>before</em> anyone writes.</p>
+
+                            <h3>Three amendments to his roadmap (relayed Jul 14)</h3>
+                            <table class="seo-table">
+                                <thead><tr><th>Roadmap item</th><th>Amendment</th></tr></thead>
+                                <tbody>
+                                    <tr><td>&ldquo;Custom embroidery cost calculator&rdquo; / &ldquo;bulk polo pricing&rdquo;</td><td><strong>Not on .net.</strong> All pricing lives in teamnwca&rsquo;s one engine (Rule 9). .net covers the <em>process</em> angle and links our quote tools.</td></tr>
+                                    <tr><td>&ldquo;Screen printing vs embroidery for uniforms&rdquo;</td><td><strong>Coordinate the angle.</strong> Method education = his; product-anchored comparison = ours (being built in Phase 3). Cross-link both.</td></tr>
+                                    <tr><td><code>/dtg-calculator/</code> + <code>/order-form/</code></td><td><strong>Retire &amp; 301.</strong> The calculator publishes DTG prices outside the engine; the order form duplicates a retired system.</td></tr>
+                                </tbody>
+                            </table>
+
+                            <h3>Four additions to his city-page template</h3>
+                            <ol>
+                                <li><strong>Catalog block on every city page</strong> — &ldquo;Browse 3,000+ styles with live pricing → teamnwca.com&rdquo;. His quote CTA stays primary; this is the browsing path. Local visitor lands on .net, transacts on teamnwca.</li>
+                                <li><strong>Brand mentions become links</strong> — Carhartt → <code>/custom-carhartt</code>, caps → <code>/custom-caps</code>, hi-vis → <code>/custom-safety-apparel</code>; more as wave 2 ships.</li>
+                                <li><strong>NAP is a two-site contract</strong> — see <a href="#facts">§6</a>.</li>
+                                <li><strong>Claims must match across sites</strong> — turnaround, minimums, same-day options say the same thing everywhere.</li>
+                            </ol>
+
+                            <h3>The funnel map — his posts → our pages</h3>
+                            <table class="seo-table">
+                                <thead><tr><th>.net post</th><th>Visits/mo</th><th>Links to</th><th>Status</th></tr></thead>
+                                <tbody>
+                                    <tr><td><code>/how-to-break-in-carhartt-jacket/</code></td><td>161</td><td><code>/custom-carhartt</code></td><td><span class="seo-chip seo-chip--done">Done Jul 13</span></td></tr>
+                                    <tr><td><code>/is-eddie-bauer-a-quality-brand/</code></td><td>118</td><td>Premium-jackets post (publishing early)</td><td><span class="seo-chip seo-chip--open">Queued</span></td></tr>
+                                    <tr><td><code>/cotton-vs-polyester-guide/</code></td><td>48</td><td><code>/blog/pc54-vs-pc61</code> (links back already)</td><td><span class="seo-chip seo-chip--open">Mehar to add</span></td></tr>
+                                    <tr><td><code>/dtg-printed-hoodies-heavy-equipment…/</code></td><td>—</td><td><code>/blog/pc90h-vs-gildan-18500</code> (links back already)</td><td><span class="seo-chip seo-chip--open">Mehar to add</span></td></tr>
+                                    <tr><td><code>/why-is-carhartt-so-popular/</code> + <code>/carhartt-alternatives…/</code></td><td>31+</td><td><code>/custom-carhartt</code> (with his Phase-1 refresh)</td><td><span class="seo-chip seo-chip--open">With refresh</span></td></tr>
+                                </tbody>
+                            </table>
+                            <p class="seo-muted">Works both ways: every teamnwca post cross-links a relevant .net explainer (standing rule, enforced by the autopilot checklist).</p>
+
+                            <h3>Collision protocol</h3>
+                            <ul>
+                                <li><strong>Mehar, before writing:</strong> check <code>teamnwca.com/blog</code> + brand pages. Buying-intent product topic → keep his angle educational/local + cross-link, or skip.</li>
+                                <li><strong>teamnwca (automated), before every publish:</strong> the Monday autopilot searches .net&rsquo;s live content for the target query AND refuses drafts targeting local/service queries. Same intent found → don&rsquo;t publish, report instead.</li>
+                                <li><strong>Ties → Erik decides.</strong> One Slack message beats months of split rankings.</li>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <!-- ============ 6. SHARED FACTS ============ -->
+                    <section class="dash-card seo-section" id="facts">
+                        <div class="dash-card-header">
+                            <h2 class="dash-card-title"><span class="seo-secnum">6</span> Shared facts — NAP &amp; claims (both sites, verbatim)</h2>
+                        </div>
+                        <div class="seo-section-body">
+                            <p>Google reads both domains as one business, so these values must be <strong>byte-identical everywhere</strong>
+                            (schema, footers, city pages, GBP). Verified against Google Business Profile <strong>July 14, 2026</strong>:</p>
+                            <table class="seo-table seo-table--facts">
+                                <tbody>
+                                    <tr><th>Address</th><td><code>2025 Freeman Rd E, Milton, WA 98354</code></td></tr>
+                                    <tr><th>Phone</th><td><code>(253) 922-5793</code></td></tr>
+                                    <tr><th>Google rating</th><td>4.9★ · 187 reviews (as of Jul 14, 2026 — recheck when quoted; real review texts only)</td></tr>
+                                    <tr><th>Hours</th><td>Mon–Fri 8:30am–5:00pm (GBP shows &ldquo;Opens 9 AM&rdquo; — <span class="seo-chip seo-chip--open">Erik: confirm which is right, then align GBP + both sites</span>)</td></tr>
+                                    <tr><th>Founded</th><td>1977 — &ldquo;the Northwest&rsquo;s original embroidery shop&rdquo;</td></tr>
+                                </tbody>
+                            </table>
+                            <div class="seo-callout seo-callout--warning">
+                                <strong>Claims contract:</strong> turnaround times, minimums, and same-day options must read the same on
+                                .net city pages, .net FAQs, and teamnwca tools/pages. Before Mehar publishes his first city page, confirm
+                                the real numbers once and reuse verbatim. One business can&rsquo;t tell Google two different stories.
+                                Anyone spotting a mismatch on either site flags it to Erik.
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- ============ 7. SCOREBOARD ============ -->
+                    <section class="dash-card seo-section" id="scoreboard">
+                        <div class="dash-card-header">
+                            <h2 class="dash-card-title"><span class="seo-secnum">7</span> Scoreboard &amp; checkpoints</h2>
+                        </div>
+                        <div class="seo-section-body">
+                            <h3>Review monthly (with Mehar&rsquo;s report)</h3>
+                            <ul>
+                                <li><strong>Non-brand organic clicks, both properties</strong> (Search Console) — the real growth number; brand searches don&rsquo;t count.</li>
+                                <li><strong>Quote requests / form fills from organic</strong>, whichever site they land on — it&rsquo;s one pipeline (watch Forms Inbox referrers).</li>
+                                <li><strong>SEMrush keyword counts both domains</strong> — teamnwca baseline <strong>42</strong> (Jul 12, 2026); .net decline vs its −9%/mo baseline.</li>
+                                <li><strong>Cross-domain click-through</strong> — .net → teamnwca catalog clicks and the reverse.</li>
+                                <li><strong>Zero-cannibalization check</strong> — no query where both domains sit on pages 1–3 with the same intent; if found, pick one owner and de-optimize/301 the other.</li>
+                            </ul>
+                            <h3>October 2026 checkpoint</h3>
+                            <p>Three months of curves on both sites, reviewed together. Success looks like:</p>
+                            <ul>
+                                <li>teamnwca: 12+ posts live and indexed; style-number queries ranking (those move fastest); keyword count climbing steadily from 42.</li>
+                                <li>.net: money pages moving page 2 → page 1 on the target commercial terms; local pack visibility for &ldquo;near me&rdquo; searches; informational bleed slowed.</li>
+                                <li>Business: quote requests arriving with blog/product referrers.</li>
+                                <li>Then: revisit the long-term one-domain-vs-two question <em>with data</em> (deliberately deferred — no merge for now, Erik&rsquo;s call July 12).</li>
+                            </ul>
+                        </div>
+                    </section>
+
+                    <!-- ============ 8. REFERENCE SHELF ============ -->
+                    <section class="dash-card seo-section" id="reference">
+                        <div class="dash-card-header">
+                            <h2 class="dash-card-title"><span class="seo-secnum">8</span> Reference shelf — the source documents</h2>
+                        </div>
+                        <div class="seo-section-body">
+                            <p class="seo-muted">Canonical copies live in the Pricing Index repo; the same four HTML docs were emailed to Mehar July 14, 2026.</p>
+                            <table class="seo-table">
+                                <thead><tr><th>Document</th><th>What it is</th><th>Repo path</th></tr></thead>
+                                <tbody>
+                                    <tr><td>SEO Audit &amp; Traffic Recovery Roadmap</td><td>.net diagnosis + 90-day plan (SEMrush data)</td><td><code>reference/net-seo-recovery-roadmap-2026-07.html</code></td></tr>
+                                    <tr><td>Local Landing Page Playbook</td><td>How Mehar builds city pages without doorway-page risk</td><td><code>reference/net-local-page-playbook-2026-07.html</code></td></tr>
+                                    <tr><td>Local Landing Page Template</td><td>Complete worked example (Tacoma) with schema</td><td><code>reference/net-local-landing-page-template-2026-07.html</code></td></tr>
+                                    <tr><td>Two-Site Coordination Guide</td><td>The treaty — lane map, amendments, funnel map, protocol</td><td><code>reference/two-site-seo-coordination-guide-2026-07.html</code></td></tr>
+                                    <tr><td>Lane Split v2 (working rules)</td><td>Claude&rsquo;s canonical lane rules + .net topic inventory</td><td><code>memory/blog-content-differentiation.md</code></td></tr>
+                                    <tr><td>teamnwca SEO Plan v2 (working file)</td><td>The phased plan behind §3, kept current</td><td><code>memory/TEAMNWCA_SEO_PLAN_2026-07.md</code></td></tr>
+                                    <tr><td>.net full content export</td><td>316 posts/pages — the collision-check corpus</td><td><code>reference/nwcustomapparel-net-blogs/</code></td></tr>
+                                    <tr><td>Blog roadmap &amp; content bank</td><td>16 briefs / 4 pillars; drafts queue in Caspio <code>Blog_Posts</code></td><td><code>Downloads/teamnwca-blog-roadmap-2026.md</code> + Blog Editor</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <!-- ============ 9. CHANGE LOG ============ -->
+                    <section class="dash-card seo-section" id="changelog">
+                        <div class="dash-card-header">
+                            <h2 class="dash-card-title"><span class="seo-secnum">9</span> Change log</h2>
+                        </div>
+                        <div class="seo-section-body">
+                            <p class="seo-muted">Newest first. Every strategy change gets a row — tell Claude &ldquo;update the SEO Strategy page&rdquo; and describe the change.</p>
+                            <table class="seo-table seo-table--log">
+                                <thead><tr><th>Date</th><th>Change</th></tr></thead>
+                                <tbody>
+                                    <tr><td>2026-07-14</td><td>This page created (admin-only). NAP verified against GBP. 4-doc packet emailed to Mehar. Lane Split v2 adopted (.net = local/service + education; teamnwca = product/style/tools). Autopilot collision gate extended to refuse local-query drafts.</td></tr>
+                                    <tr><td>2026-07-14</td><td>.net Recovery Roadmap + Local Page Playbook + Template received (SEMrush + Claude) and filed to <code>reference/</code>. Three roadmap amendments defined (no calculators/prices on .net; coordinate vs-comparisons; retire <code>/dtg-calculator/</code> + <code>/order-form/</code>).</td></tr>
+                                    <tr><td>2026-07-13</td><td>Lane Split v1 (&ldquo;.net teaches, teamnwca sells&rdquo;). <code>/custom-carhartt</code> brand page live; .net Carhartt post cross-linked to it (slug typo fixed + 301). 23 product-style drafts banked (batches 1–4). Weekly autopilot published <code>pc90h-vs-gildan-18500</code>.</td></tr>
+                                    <tr><td>2026-07-12</td><td>Blog system live (SSR + GSC verified). Product SEO heads for 3,197 styles; method-aware titles; Product_Copy overlay (546 styles). Entity stitching live on both domains. Two-site strategy decided: no merge for now; blog roadmap delivered; first post <code>pc54-vs-pc61</code> published.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                </div><!-- /seo-sections -->
+            </div><!-- /seo-layout -->
+        </main>
+    </div>
+
+    <!-- Load order matters: APP_CONFIG → fetch-timeout → DashPage → page controller -->
+    <script src="/config/app.config.js"></script>
+    <script src="/shared_components/js/fetch-timeout.js"></script>
+    <script src="/shared_components/js/dash-page-helpers.js"></script>
+    <script src="/dashboards/js/seo-strategy.js"></script>
+</body>
+</html>

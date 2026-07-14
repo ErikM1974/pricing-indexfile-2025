@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SEO Audit &amp; Traffic Recovery Roadmap — nwcustomapparel.net</title>
+<style>
+  :root{
+    --ink:#1a2332;--muted:#5b6b7f;--line:#e3e8ef;--bg:#f6f8fb;
+    --green:#1f9d55;--greenbg:#e8f6ee;--blue:#2b6cb0;--bluebg:#e8f0fa;
+    --amber:#b7791f;--amberbg:#fbf3e3;--red:#c0392b;--redbg:#fbeae8;
+    --brand:#16324f;--brand2:#2c7a7b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+    color:#1a2332;background:#f6f8fb;line-height:1.62;font-size:15.5px}
+  .wrap{max-width:940px;margin:0 auto;padding:0 24px 80px}
+  header{background:linear-gradient(135deg,#16324f,#2c7a7b);color:#fff;padding:40px 0 34px}
+  header .wrap{padding-bottom:0}
+  .kicker{text-transform:uppercase;letter-spacing:.14em;font-size:12px;opacity:.85;margin:0 0 8px}
+  h1{margin:0 0 8px;font-size:28px;line-height:1.18}
+  .sub{opacity:.92;font-size:14.5px;margin:2px 0}
+  .meta-line{margin-top:16px;font-size:13.5px;opacity:.85;border-top:1px solid rgba(255,255,255,.2);padding-top:12px}
+  h2{font-size:21px;margin:38px 0 12px;padding-bottom:8px;border-bottom:2px solid #e3e8ef;color:#16324f}
+  h3{font-size:16.5px;margin:22px 0 6px;color:#16324f}
+  h4{font-size:15px;margin:16px 0 4px;color:#22364c}
+  p{margin:10px 0}
+  .lede{font-size:17px;color:#26364a}
+  .card{background:#fff;border:1px solid #e3e8ef;border-radius:12px;padding:20px 24px;margin:16px 0;
+    box-shadow:0 1px 3px rgba(20,40,60,.05)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin:14px 0}
+  .kpi{background:#fff;border:1px solid #e3e8ef;border-radius:10px;padding:14px 16px}
+  .kpi .n{font-size:24px;font-weight:800;color:#16324f;line-height:1.1}
+  .kpi .l{font-size:12.5px;color:#5b6b7f;margin-top:3px}
+  .kpi .d{font-size:12px;font-weight:700;margin-top:4px}
+  .dn{color:#c0392b}.up{color:#1f9d55}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:14px}
+  th,td{text-align:left;padding:9px 11px;border-bottom:1px solid #eef2f7;vertical-align:top}
+  th{background:#f0f4f9;color:#16324f;font-size:12px;text-transform:uppercase;letter-spacing:.03em}
+  td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+  code{background:#eef2f7;padding:1px 5px;border-radius:4px;font-size:13px;color:#22364c}
+  ul{margin:8px 0;padding-left:22px}li{margin:6px 0}
+  .tag{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:5px;margin-right:6px;vertical-align:middle}
+  .p1{background:var(--redbg);color:var(--red)}
+  .p2{background:var(--amberbg);color:var(--amber)}
+  .p3{background:var(--bluebg);color:var(--blue)}
+  .win{background:var(--greenbg);color:var(--green)}
+  .phase{background:#fff;border:1px solid #e3e8ef;border-left:5px solid #2c7a7b;border-radius:10px;padding:18px 22px;margin:16px 0}
+  .phase h3{margin-top:0;display:flex;align-items:baseline;gap:10px}
+  .phase .when{font-size:12.5px;font-weight:700;color:#2c7a7b;text-transform:uppercase;letter-spacing:.04em}
+  .note{background:#e8f0fa;border-left:4px solid #2b6cb0;padding:12px 16px;border-radius:0 8px 8px 0;font-size:14px;margin:14px 0}
+  .warn{background:#fbf3e3;border-left:4px solid #b7791f;padding:12px 16px;border-radius:0 8px 8px 0;font-size:14px;margin:14px 0}
+  .win-box{background:#e8f6ee;border-left:4px solid #1f9d55;padding:12px 16px;border-radius:0 8px 8px 0;font-size:14px;margin:14px 0}
+  .foot{color:#5b6b7f;font-size:12.5px;margin-top:30px;border-top:1px solid #e3e8ef;padding-top:14px}
+  .check{list-style:none;padding-left:0}
+  .check li{padding-left:28px;position:relative;margin:9px 0}
+  .check li::before{content:"☐";position:absolute;left:0;top:-1px;font-size:17px;color:#2c7a7b}
+  .toc{columns:2;font-size:14px}
+  @media(max-width:640px){.toc{columns:1}}
+  strong{color:#16324f}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <p class="kicker">SEO Audit &amp; Traffic Recovery Roadmap</p>
+    <h1>nwcustomapparel.net</h1>
+    <p class="sub">A data-driven plan to reverse the traffic decline and rebuild qualified organic growth.</p>
+    <div class="meta-line">
+      Prepared for: <strong>Mehar (web/SEO)</strong> &nbsp;·&nbsp; Commissioned by: Erik Mickelson &nbsp;·&nbsp; July 14, 2026<br>
+      Data sources: SEMrush (live, US database, Jul 2026) · site database backup (Jul 12, 2026) · live crawl of nwcustomapparel.net
+    </div>
+  </div>
+</header>
+<div class="wrap">
+
+<h2>How to read this document</h2>
+<p>This isn't a teardown — the site is genuinely well-built, and the fundamentals (clean technical setup, deep content, solid on-page optimization) are done right. The problem is <strong>strategic, not technical</strong>: the site's traffic was built on informational articles that Google and AI have been devaluing since early 2025, while the pages that actually win customers — local, commercial "custom embroidery / printing" pages — are built but not ranking. This plan redirects the existing engine toward the traffic that converts. Sections in order: where we stand, what happened and why, the core opportunity, and a phased 90-day+ roadmap with specific pages and keywords.</p>
+
+<h2>1. Executive summary</h2>
+<p class="lede">Organic visibility peaked in early–mid 2025 and has since fallen by roughly two-thirds. The decline is concentrated in informational blog content; the commercial pages that should drive revenue are underperforming. The fix is a deliberate shift from "traffic for traffic's sake" to <strong>local + commercial intent</strong>.</p>
+<ul>
+  <li><strong>The trend:</strong> ranking keywords peaked near 15,000–18,000 in early 2025 and are now ~4,000–5,000 — a sustained multi-quarter decline, not a blip. Monthly organic traffic is ~1,000 visits (US), down ~12–16% recently.</li>
+  <li><strong>The cause:</strong> ~35% of traffic comes from informational articles about <em>other brands</em> (Carhartt, Eddie Bauer) and generic topics — exactly what Google's 2024–2025 "helpful content" / core updates and AI Overviews have hit hardest. Another ~47% is the homepage on your own brand name.</li>
+  <li><strong>The missed opportunity:</strong> your commercial and local pages already target the right keywords but rank on page 2–5. Example: <code>/custom-embroidery-seattle/</code> holds 206 keywords yet earns just 5 visits/month. The high-value term <strong>"custom embroidery near me" (8,100 searches/mo)</strong> sits at position ~10–35.</li>
+  <li><strong>Proof the fix works:</strong> a new local page, <code>/embroidery-screenprinting-bonneylake-wa/</code>, is already pulling 32 visits/month for "custom embroidery near me" — the model to replicate.</li>
+  <li><strong>Realistic goal (6–9 months):</strong> rebuild <em>qualified</em> traffic — local, commercial, lead-generating — even if raw informational traffic keeps sliding. Chasing back the informational peak is neither likely nor valuable.</li>
+</ul>
+
+<h2>2. Where we stand today</h2>
+<div class="grid">
+  <div class="kpi"><div class="n">26</div><div class="l">Authority Score</div><div class="d">"Good" (SEMrush)</div></div>
+  <div class="kpi"><div class="n">~1.0K</div><div class="l">Organic traffic / mo (US)</div><div class="d dn">▼ ~12–16%</div></div>
+  <div class="kpi"><div class="n">4.1K</div><div class="l">Organic keywords (US)</div><div class="d dn">▼ 9.2%</div></div>
+  <div class="kpi"><div class="n">615</div><div class="l">Referring domains</div><div class="d">16K backlinks</div></div>
+  <div class="kpi"><div class="n">208</div><div class="l">Pages earning traffic</div><div class="d">of ~300 published</div></div>
+  <div class="kpi"><div class="n">497</div><div class="l">AI citations</div><div class="d up">ChatGPT / AI Overviews / Gemini</div></div>
+</div>
+<p><strong>The trajectory tells the story.</strong> From near-zero in 2022, the site climbed steeply to a peak of ~15–18K ranking keywords in early-to-mid 2025 (with heavy featured-snippet/SERP-feature presence), then entered a steady decline back down to today's ~4–5K. The growth phase was real, skilled work; the decline since is the problem this plan addresses.</p>
+<div class="note"><strong>One bright spot worth protecting:</strong> the site has genuine AI-search visibility — cited 497 times across ChatGPT, Google AI Overviews, and Gemini, with the homepage itself cited 6 times. As AI search grows, this is an asset to build on, not ignore.</div>
+
+<h2>3. Diagnosis — what happened and why</h2>
+
+<h3>3a. Traffic is dangerously concentrated and mostly non-commercial</h3>
+<p>Of ~1,000 monthly organic visits, here's where they actually land:</p>
+<table>
+  <tr><th>Page</th><th>Type</th><th class="num">Visits/mo</th><th class="num">Share</th><th class="num">Trend</th></tr>
+  <tr><td><code>/</code> (homepage)</td><td>Brand</td><td class="num">473</td><td class="num">46.9%</td><td class="num dn">−148</td></tr>
+  <tr><td><code>/how-to-break-in-carhartt-jacket/</code></td><td>Informational</td><td class="num">161</td><td class="num">16.0%</td><td class="num up">+71</td></tr>
+  <tr><td><code>/is-eddie-bauer-a-quality-brand/</code></td><td>Informational</td><td class="num">118</td><td class="num">11.7%</td><td class="num dn">−34</td></tr>
+  <tr><td><code>/cotton-vs-polyester-guide/</code></td><td>Informational</td><td class="num">48</td><td class="num">4.8%</td><td class="num up">+7</td></tr>
+  <tr><td><code>/embroidery-screenprinting-bonneylake-wa/</code></td><td class="win">Local commercial</td><td class="num">32</td><td class="num">3.2%</td><td class="num up">NEW</td></tr>
+  <tr><td><code>/why-is-carhartt-so-popular/</code></td><td>Informational</td><td class="num">31</td><td class="num">3.1%</td><td class="num dn">−153</td></tr>
+</table>
+<p>Two problems jump out: <strong>~47% of all traffic is a single page (the homepage) on your own brand name</strong> — people who already know you, not new discovery. And the top non-brand pages are informational articles about Carhartt and Eddie Bauer. A person searching "how to break in a Carhartt jacket" is not about to order 200 embroidered polos. <strong>This traffic looks healthy but rarely converts.</strong></p>
+
+<h3>3b. The decline is concentrated in that informational content</h3>
+<p>The biggest month-over-month losses are all informational pages — the exact content Google's recent updates and AI Overviews target:</p>
+<table>
+  <tr><th>Page</th><th class="num">Visits lost</th></tr>
+  <tr><td><code>/why-is-carhartt-so-popular/</code></td><td class="num dn">−153</td></tr>
+  <tr><td><code>/</code> (homepage, brand seasonality)</td><td class="num dn">−148</td></tr>
+  <tr><td><code>/cut-up-shirt-ideas/</code></td><td class="num dn">−48</td></tr>
+  <tr><td><code>/is-eddie-bauer-a-quality-brand/</code></td><td class="num dn">−34</td></tr>
+  <tr><td><code>/carhartt-alternatives-bulk-workwear/</code></td><td class="num dn">−32</td></tr>
+</table>
+<p><strong>Root causes (in order of impact):</strong></p>
+<ul>
+  <li><strong>Google's 2024–2025 Helpful Content &amp; core updates.</strong> These systematically demoted broad informational content from sites without deep topical authority on that subject — e.g., an apparel decorator ranking for "who invented the hoodie." Much of this is industry-wide, not a mistake anyone made.</li>
+  <li><strong>AI Overviews are eating informational clicks.</strong> Questions like "how to soften a Carhartt jacket" increasingly get answered directly in Google/AI, so even a #1 ranking now earns fewer clicks. Your visibility here is fine; the clicks are structurally shrinking.</li>
+  <li><strong>Over-reliance on tangential topics.</strong> The content engine chased what was easy to rank for (low-difficulty informational terms about other brands) rather than what's hard but valuable (competitive local commercial terms).</li>
+</ul>
+
+<h3>3c. The money pages exist — they just aren't ranking</h3>
+<p>This is the most important — and most fixable — finding. The site already has commercial and local pages targeting the right keywords. They hold large keyword footprints but sit too low to earn traffic:</p>
+<table>
+  <tr><th>Commercial / local page</th><th class="num">Keywords</th><th class="num">Visits/mo</th><th>Primary target</th></tr>
+  <tr><td><code>/custom-embroidery-seattle/</code></td><td class="num">206</td><td class="num dn">5</td><td>"embroidery services near me"</td></tr>
+  <tr><td><code>/custom-printed-t-shirts-.../</code></td><td class="num">187</td><td class="num dn">0</td><td>"same day t shirt print"</td></tr>
+  <tr><td><code>/how-to-design-a-custom-t-shirt/</code></td><td class="num">119</td><td class="num dn">0</td><td>custom t-shirt design</td></tr>
+  <tr><td><code>/direct-to-garment/</code></td><td class="num">112</td><td class="num dn">2</td><td>"dtg printing service"</td></tr>
+  <tr><td><code>/seattle-custom-t-shirts/</code></td><td class="num">78</td><td class="num dn">0</td><td>"24 hour custom shirts"</td></tr>
+  <tr><td><code>/spokane-dtg-and-embroidery/</code></td><td class="num">35</td><td class="num dn">0</td><td>Spokane embroidery/DTG</td></tr>
+  <tr><td><code>/direct-to-garment-printing-services-in-portland/</code></td><td class="num">34</td><td class="num dn">0</td><td>Portland DTG</td></tr>
+  <tr><td><code>/embroidered-clothing-near-me/</code></td><td class="num">22</td><td class="num dn">0</td><td>"embroidered clothing near me"</td></tr>
+</table>
+<p>And the target keywords are high-value and high-volume:</p>
+<ul>
+  <li><strong>"custom embroidery near me"</strong> — 8,100 searches/mo — currently ranking <strong>#10</strong> (Bonney Lake page) <em>and</em> <strong>#35</strong> (Seattle page). Two pages splitting the same term = cannibalization.</li>
+  <li><strong>"embroidery services near me"</strong> — 2,400/mo — ranking #18 (page 2).</li>
+  <li><strong>"custom embroidery near me"</strong> also targeted by the Seattle page at #35 — same problem.</li>
+</ul>
+<div class="win-box"><strong>The proof it works:</strong> <code>/embroidery-screenprinting-bonneylake-wa/</code> is a <em>new</em> local page and already earns 32 visits/mo at position ~10 for "custom embroidery near me." Local landing pages built and optimized properly <em>do</em> rank here. This is the template to scale.</div>
+
+<h2>4. The recovery roadmap</h2>
+<p>Sequenced so the fastest, highest-certainty wins come first. Each item names the page(s), the action, and why it matters. Rough timeline assumes one focused person; adjust to Mehar's bandwidth.</p>
+
+<div class="phase">
+  <h3><span class="when">Phase 1 · Weeks 1–3</span> Quick wins &amp; stop the bleeding</h3>
+  <ul>
+    <li><span class="tag p1">Critical</span><strong>Fix the "near me" cannibalization.</strong> Decide one primary page per city for "custom embroidery near me" / "embroidery services near me." Point the others' internal links and any duplicate targeting at the primary; differentiate the secondary pages' focus (e.g., Seattle page → "custom embroidery Seattle," Bonney Lake → "near me"). Splitting the 8,100/mo term across two page-2 URLs is costing you page-1 potential on both.</li>
+    <li><span class="tag p1">Critical</span><strong>On-page overhaul of the top money pages</strong> (<code>/custom-embroidery-seattle/</code>, <code>/seattle-custom-t-shirts/</code>, <code>/direct-to-garment/</code>, <code>/custom-printed-t-shirts.../</code>): tighten title + H1 to the exact commercial target, add location + intent modifiers, strengthen the intro, add pricing/process/CTA blocks, and internal-link them from the homepage and top nav. They already have keyword coverage; they need on-page focus and internal authority.</li>
+    <li><span class="tag p2">High</span><strong>Funnel your informational traffic to commercial pages.</strong> The Carhartt/Eddie Bauer/cotton-polyester posts pull ~35% of traffic — add prominent, relevant internal links and CTAs from them to the matching service pages (e.g., Carhartt jacket post → custom embroidered Carhartt jackets service). Capture the visitors you already have.</li>
+    <li><span class="tag p2">High</span><strong>Refresh the biggest losers</strong> that are still on-topic and commercial-adjacent (<code>/carhartt-alternatives-bulk-workwear/</code>, <code>/why-is-carhartt-so-popular/</code>): update for 2026, add a clear commercial angle/CTA. For purely informational decliners with no commercial tie, don't over-invest.</li>
+    <li><span class="tag p3">Verify</span><strong>Confirm LocalBusiness schema &amp; the www→non-www 301</strong> (flagged in the technical audit) are correctly in place — quick items that support everything local.</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <h3><span class="when">Phase 2 · Weeks 3–8</span> Win local &amp; commercial intent</h3>
+  <ul>
+    <li><span class="tag p1">Critical</span><strong>Build out a proper local landing-page system,</strong> modeled on the winning Bonney Lake page, for every service area you serve: Tacoma, Milton, Seattle, Kent, Puyallup, Federal Way, Auburn, etc. Each page: unique local copy, embedded map/NAP, local reviews, service list, and internal links. (You already have Seattle/Spokane/Portland/Kent stubs ranking at 0 — rebuild these to the Bonney Lake standard rather than starting over.)</li>
+    <li><span class="tag p1">Critical</span><strong>Optimize Google Business Profile + local citations.</strong> Local pack rankings drive the "near me" searches as much as the website. Ensure consistent NAP across the web, categories, photos, services, and a steady flow of reviews (you have a reviews plugin already).</li>
+    <li><span class="tag p2">High</span><strong>Rescue the service/category pages</strong> (<code>/services/</code>, <code>/services/custom-t-shirt-printing/</code>, <code>/services/custom-patch/</code>, <code>/direct-to-garment/</code>): these are the commercial backbone and currently earn ~0. Expand content depth, add proof (case studies, brands you decorate — Carhartt, Nike, North Face), and link them prominently.</li>
+    <li><span class="tag p2">High</span><strong>Target the high-volume commercial terms deliberately:</strong> "custom embroidery near me" (8.1K), "embroidery services near me" (2.4K), "custom t-shirt printing [city]," "screen printing near me," "DTF printing services near me." Build/assign one strong page each and track weekly.</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <h3><span class="when">Phase 3 · Weeks 6–14</span> Pivot the content strategy</h3>
+  <ul>
+    <li><span class="tag p2">High</span><strong>Triage all ~300 posts into keep / merge / repurpose / retire.</strong> Keep &amp; monetize the informational winners (add CTAs/links). Merge thin near-duplicates (the backup shows ~50 near-identical "high-vis" and "baseball cap" drafts — do <em>not</em> publish these as-is; they're thin duplicate content risk). Retire or noindex dead weight that earns nothing and has no commercial purpose.</li>
+    <li><span class="tag p2">High</span><strong>Shift new content toward bottom-of-funnel &amp; commercial comparison topics</strong> that fit your business and convert: "custom embroidery cost calculator," "screen printing vs embroidery for uniforms," "bulk polo pricing," industry-specific pages (HVAC, construction, restaurants — the HVAC page is already showing signs of life). Less "who invented the hoodie," more "custom embroidered work shirts for [industry] in Washington."</li>
+    <li><span class="tag p3">Medium</span><strong>Lean into AI search.</strong> You're already cited 497×. Keep content well-structured (clear headings, direct answers, FAQ schema, factual specifics) so you keep earning AI Overview / ChatGPT citations as that channel grows.</li>
+  </ul>
+</div>
+
+<div class="phase">
+  <h3><span class="when">Phase 4 · Ongoing</span> Authority &amp; competitive ground</h3>
+  <ul>
+    <li><span class="tag p3">Medium</span><strong>Grow referring domains.</strong> You have 615; the market leader below has ~1,300. Pursue local partnerships, supplier/brand pages (SanMar, Carhartt authorized decorator), chamber/industry directories, PR on the "since 1977 / oldest in the Northwest" story, and customer/case-study links.</li>
+    <li><span class="tag p3">Medium</span><strong>Study the winners' commercial pages</strong> (see competitor table) and close the keyword gap on terms they rank for and you don't.</li>
+  </ul>
+</div>
+
+<h2>5. Competitor watch</h2>
+<p>Your tracked competitors show where the ceiling is — and that the commercial-intent players are winning:</p>
+<table>
+  <tr><th>Domain</th><th class="num">Organic traffic</th><th class="num">Keywords</th><th class="num">Auth. Score</th><th class="num">Ref. domains</th></tr>
+  <tr><td><strong>brokenarrowwear.com</strong></td><td class="num">57K</td><td class="num">25.1K</td><td class="num">36</td><td class="num">1.3K</td></tr>
+  <tr><td>thefoundryclothing</td><td class="num">20.8K <span class="up">▲56%</span></td><td class="num">3.5K</td><td class="num">27</td><td class="num">335</td></tr>
+  <tr><td>iminstitches.com</td><td class="num">1.7K <span class="up">▲105%</span></td><td class="num">2.2K</td><td class="num">11</td><td class="num">527</td></tr>
+  <tr><td><strong>nwcustomapparel.net</strong></td><td class="num dn">~1.0K ▼</td><td class="num">4.1K</td><td class="num">26</td><td class="num">615</td></tr>
+</table>
+<p>Notable: <strong>thefoundryclothing pulls 20.8K visits from only 3.5K keywords</strong> — fewer keywords than you, but far more traffic, because they rank well for high-volume commercial terms. That's the whole thesis of this plan: it's not about <em>more</em> keywords, it's about ranking well for the <em>right</em> ones.</p>
+
+<h2>6. How to measure recovery</h2>
+<p>Track outcomes, not vanity. Review monthly:</p>
+<ul>
+  <li><strong>Non-brand organic traffic</strong> (exclude "nw custom apparel" etc.) — the real growth metric. Total traffic will be noisy while informational content keeps sliding; non-brand commercial traffic is what matters.</li>
+  <li><strong>Rankings for the target commercial terms</strong> — set up SEMrush Position Tracking for "custom embroidery near me," "embroidery services near me," "custom t-shirt printing [city]," etc. Watch page-2→page-1 movement.</li>
+  <li><strong>Traffic to service &amp; local pages specifically</strong> — the money pages in section 3c should climb from ~0.</li>
+  <li><strong>Leads / form fills / quote requests from organic</strong> — connect Search Console + analytics to actual inquiries. This is the number the business cares about.</li>
+  <li><strong>Local pack / Google Business Profile visibility</strong> for "near me" searches.</li>
+</ul>
+<div class="warn"><strong>Set expectations:</strong> SEO recovery runs on a 3–6 month clock, and local/commercial rankings take time to earn. Expect early movement on the quick wins (cannibalization fix, on-page, internal linking) within 4–8 weeks, and the local build-out to compound over a quarter or two. The goal is <em>qualified</em> traffic that converts — don't judge success by chasing the 2025 informational peak back.</div>
+
+<h2>7. The punch list (start here)</h2>
+<ul class="check">
+  <li><strong>Consolidate "custom embroidery near me"</strong> to one primary page; fix the Seattle/Bonney Lake cannibalization.</li>
+  <li><strong>Rewrite titles/H1 + strengthen</strong> <code>/custom-embroidery-seattle/</code>, <code>/seattle-custom-t-shirts/</code>, <code>/direct-to-garment/</code>, <code>/custom-printed-t-shirts.../</code> for their commercial targets.</li>
+  <li><strong>Add CTAs + internal links</strong> from top informational posts (Carhartt, Eddie Bauer, cotton-vs-polyester) to matching service pages.</li>
+  <li><strong>Confirm</strong> LocalBusiness schema + www→non-www 301 redirect.</li>
+  <li><strong>Rebuild local pages</strong> (Seattle, Spokane, Portland, Kent + new: Tacoma, Milton, Puyallup, Federal Way, Auburn) to the Bonney Lake standard.</li>
+  <li><strong>Optimize Google Business Profile</strong> + citations + review flow.</li>
+  <li><strong>Expand the service/category pages</strong> with depth, proof, and prominent linking.</li>
+  <li><strong>Content triage:</strong> keep/monetize winners, merge the ~50 near-duplicate drafts, retire dead weight.</li>
+  <li><strong>Shift new content</strong> to commercial/local/industry topics; keep AI-friendly structure.</li>
+  <li><strong>Set up Position Tracking</strong> for the target commercial keywords; report monthly on non-brand + lead metrics.</li>
+</ul>
+
+<p class="foot">
+Methodology &amp; confidence: Metrics and rankings pulled live from SEMrush (US database, data dated Jul 12, 2026); page-level and metadata findings from the site's database backup (Jul 12, 2026) and a live crawl. SEMrush traffic figures are estimates and vary by database/date window (hence small differences between the Domain Overview and Top Pages numbers). Attribution of the decline to Google updates and AI Overviews is the most probable explanation based on the pattern and timing; Google Search Console data (impressions/clicks by query and page) would confirm it precisely and is recommended as the next diagnostic input. This document assesses the website's SEO to guide the work ahead; it is not a judgment of any individual's overall performance.
+</p>
+
+</div>
+</body>
+</html>
