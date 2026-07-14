@@ -43,6 +43,19 @@ Real top styles per niche (units, Jan–Jul 2026) — link `/product.html?style=
 - **Hospitality (Hops N Drops — huge volume):** Sport-Tek performance LST700/ST350/ST700 (servers), branded caps (CP96), PC61 tee, Port Authority K810/LK810 polos, kitchen skull caps (HT01).
 - **Property mgmt (AMC + communities):** Bella+Canvas BC3001 tee, New Era NEA100 tee + NE200 cap (resident events/leasing), Port & Co PC78/PC78H crew+hoodie, CornerStone CS430 workwear pocket tee (maintenance crews), Nike NKDC1963 polo (office). Split: office staff (polos) vs maintenance (workwear).
 
+## Webstore item pricing model (decided 2026-07-14) — for the product cards on spokes
+
+**Formula = garment ÷ 0.53 (MarginDenominator) + $18 left-chest embroidery (8000-stitch) + a flat $6 handling fee**,
+HalfDollarCeil on the decorated part. KEY: the **1-7 and 8-23 embroidery tiers are identical** (same 0.53 margin, same
+$18 emb) — the ONLY difference is the 1-7 tier's **$50 LTM fee**; the webstore model replaces that $50 LTM with the $6
+handling. Source: proxy `GET /api/pricing-bundle?method=EMB&styleNumber=X` (tiersR + sizes + allEmbroideryCostsR).
+**Finding:** this formula is **~30–60% ABOVE** what the InkSoft stores currently charge (stores run ~garment÷0.65 ≈ 35%
+margin, no handling). So the formula is a go-forward **price increase / margin recapture** — for existing repeat accounts
+(Absher 423 orders) phase it in; for new stores start at the formula. Construction card prices show
+`total ($emb + $6 handling)`. Erik chose $6 (not $10; not $50). Prices are hardcoded illustrative examples (Rule 9 caveat —
+refresh if garment costs move; ideal long-term = wire the pricing API). Example totals @ $6: CT100617 $117.50, CTK121 $91.50,
+NKDC1963 $69.50, 112 $37, W668 $60, ST469 $48.50.
+
 ## Spoke build (2026-07-14)
 
 Flat keyword URLs, hub-template (golf-showcase + company-webstores.css), ABSOLUTE asset paths, each with a real
