@@ -3792,8 +3792,10 @@ app.get('/sale.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'sale.html'));
 });
 
+// Legacy webstore info page → consolidated into the SEO hub /company-webstores
+// (2026-07-14) so the two don't cannibalize. 301 keeps its link equity.
 app.get('/webstore-info.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'pages', 'webstore-info.html'));
+  res.redirect(301, '/company-webstores');
 });
 
 // Top Sellers consolidation (2026-07-06): the standalone showcase + per-style
@@ -3957,13 +3959,20 @@ app.get(['/custom-safety-apparel', '/custom-safety-apparel.html'], (req, res) =>
   res.sendFile(path.join(__dirname, 'pages', 'custom-safety-apparel.html'));
 });
 
+// Company & Team Webstores — SEO hub (2026-07-14): the B2B "company store / team
+// store / employee uniform store" cluster; hub-and-spoke (8 store-type cards) in
+// golf-page showcase style. Supersedes the legacy /webstore-info.html (301'd below).
+app.get(['/company-webstores', '/company-webstores.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'company-webstores.html'));
+});
+
 // Core-pages sitemap (2026-07-12) — the handful of hand-built landing/tool
 // pages that aren't in the blog or product sitemaps. Listed in robots.txt.
 app.get('/sitemap-pages.xml', (req, res) => {
   const pages = [
-    '/', '/custom-carhartt', '/custom-richardson', '/custom-nike', '/custom-new-era', '/custom-sport-tek', '/custom-ogio', '/custom-district', '/custom-port-authority', '/custom-port-and-company', '/custom-cornerstone', '/custom-north-face', '/custom-gildan', '/custom-eddie-bauer', '/custom-travismathew', '/custom-bella-canvas', '/golf-tournament-apparel', '/custom-safety-apparel', '/custom-tees', '/custom-caps', '/blog',
+    '/', '/custom-carhartt', '/custom-richardson', '/custom-nike', '/custom-new-era', '/custom-sport-tek', '/custom-ogio', '/custom-district', '/custom-port-authority', '/custom-port-and-company', '/custom-cornerstone', '/custom-north-face', '/custom-gildan', '/custom-eddie-bauer', '/custom-travismathew', '/custom-bella-canvas', '/golf-tournament-apparel', '/custom-safety-apparel', '/company-webstores', '/custom-tees', '/custom-caps', '/blog',
     '/brands.html', '/catalog?topSellers=1',
-    '/pages/request-a-quote.html', '/pages/webstore-inquiry.html', '/pages/webstore-info.html',
+    '/pages/request-a-quote.html', '/pages/webstore-inquiry.html',
   ];
   const urls = pages.map((p) =>
     `  <url><loc>https://www.teamnwca.com${p.replace(/&/g, '&amp;')}</loc><changefreq>weekly</changefreq></url>`);
