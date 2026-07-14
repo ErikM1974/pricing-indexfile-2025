@@ -1,0 +1,78 @@
+/* Interactive Organizational Chart — scoped to the enhanced policy only. */
+.policy-body.org-chart-view { max-width: none; }
+/* The org chart has no headings, so the outline sidebar is hidden — but its
+   240px grid track still reserves space. Reclaim it so the chart runs full-width. */
+.detail-layout:has(.policy-body.org-chart-view) { grid-template-columns: 1fr; }
+.org-chart { --forest:#164e2d; --leaf:#2f7d4c; --mint:#edf7f0; --line:#b8d0c0;
+  position:relative; padding:clamp(1rem,3vw,2rem); border:1px solid var(--line);
+  border-radius:20px; background:linear-gradient(145deg,#fff 0%,#f3f8f4 100%);
+  box-shadow:0 16px 45px rgba(22,78,45,.09); overflow:hidden; }
+.org-chart::before { content:""; position:absolute; inset:0 0 auto; height:5px;
+  background:linear-gradient(90deg,var(--forest),#56a56f,#d4a72c); }
+.org-chart-toolbar { display:flex; flex-wrap:wrap; align-items:center; gap:.6rem;
+  margin-bottom:1.25rem; padding-bottom:1rem; border-bottom:1px solid #dce8df; }
+.org-chart-date { margin-right:auto; padding:.4rem .8rem; border-radius:999px;
+  background:var(--forest); color:#fff; font-size:.72rem; font-weight:800; letter-spacing:.08em; }
+.org-chart-search { min-width:190px; padding:.55rem .75rem; border:1px solid var(--line);
+  border-radius:9px; background:#fff; color:#183125; font:inherit; }
+.org-chart-toggle { border:1px solid var(--line); border-radius:9px; padding:.55rem .75rem;
+  background:#fff; color:var(--forest); font:600 .78rem Inter,sans-serif; cursor:pointer; }
+.org-chart-toggle:hover,.org-chart-toggle:focus-visible { border-color:var(--leaf); background:var(--mint); outline:2px solid transparent; }
+.org-chart-level { display:flex; justify-content:center; }
+.org-chart-connector { width:2px; height:28px; margin:auto; background:var(--line); position:relative; }
+.org-chart-connector::after { content:""; position:absolute; bottom:-1px; left:-4px;
+  border:5px solid transparent; border-top-color:var(--leaf); }
+.org-card { position:relative; min-width:0; padding:1rem; border:1px solid var(--line);
+  border-radius:13px; background:#fff; text-align:center; box-shadow:0 5px 14px rgba(20,62,38,.07);
+  transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease,opacity .18s; }
+.org-card:hover,.org-card--department:focus-visible { transform:translateY(-3px); border-color:var(--leaf);
+  box-shadow:0 10px 24px rgba(20,62,38,.14); outline:none; }
+.org-card--leader { width:min(100%,320px); border-top:4px solid var(--forest); }
+.org-card--direct { flex:1 1 160px; max-width:230px; }
+.org-card-name { color:var(--forest); font-weight:800; font-size:.95rem; }
+.org-card-role { margin-top:.2rem; color:#24382d; font-size:.78rem; font-weight:700; }
+.org-card-detail { margin-top:.4rem; color:#607066; font-size:.74rem; line-height:1.4; }
+.org-chart-directs { display:flex; flex-wrap:wrap; justify-content:center; gap:.7rem; }
+.org-production { margin-top:1.5rem; padding:1rem; border:1px solid var(--line);
+  border-radius:16px; background:rgba(255,255,255,.65); }
+.org-production-heading { display:flex; align-items:center; gap:.5rem; margin-bottom:1rem;
+  color:var(--forest); font-size:.78rem; font-weight:800; letter-spacing:.06em; text-transform:uppercase; }
+.org-production-heading::before { content:""; width:8px; height:8px; border-radius:50%; background:#d4a72c; }
+/* Desktop: one row of 4 department columns. Exactly 4 departments in 4 grid
+   columns = a single row, so uneven team sizes just make columns of different
+   heights (expected) — there is no second row to drop into a ragged gap.
+   align-items:start keeps each supervisor pinned to the top so the supervisor
+   row stays flush. Below 850px the columns wrap, so we switch to masonry. */
+.org-production-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.75rem; align-items:start; }
+.org-department { display:grid; gap:.5rem; }
+.org-department .org-card { height:auto; }
+.org-card--department[role="button"] { cursor:pointer; }
+.org-card--department[role="button"]::after { content:"Hide team"; display:block; margin-top:.55rem;
+  color:var(--leaf); font-size:.65rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; }
+.org-department.is-collapsed .org-card--department::after { content:"Show team"; }
+.org-operator-list { display:grid; gap:.4rem; }
+.org-department.is-collapsed .org-operator-list { display:none; }
+.org-operator { padding:.55rem .65rem; border:1px solid #d5e2d8; border-radius:9px;
+  background:#f6faf7; text-align:center; }
+.org-operator-name { display:block; color:var(--forest); font-size:.76rem; font-weight:700; }
+.org-operator-role { display:block; color:#6a786e; font-size:.67rem; }
+.org-coverage { margin-top:1rem; padding:1rem 1.2rem; border-radius:14px;
+  background:linear-gradient(135deg,#123d25,var(--forest)); color:#fff; }
+.org-coverage-title { margin-bottom:.5rem; font-size:.78rem; font-weight:800; letter-spacing:.06em; }
+.org-coverage ul { margin:0; padding-left:1.2rem; font-size:.78rem; line-height:1.7; }
+.org-chart.is-production-collapsed .org-production-grid { display:none; }
+.org-chart.is-production-collapsed .org-production-heading { margin-bottom:0; }
+.org-search-dim { opacity:.2; }
+.org-search-hit { border-color:#d4a72c; box-shadow:0 0 0 3px rgba(212,167,44,.2); }
+/* Tablet: 4 columns no longer fit — masonry-pack departments so unequal team
+   heights never leave a ragged gap under a shorter column. */
+@media (max-width:850px) { .org-production-grid { display:block; columns:2; column-gap:.75rem; }
+  .org-department { break-inside:avoid; margin-bottom:.75rem; } }
+@media (max-width:560px) { .org-chart { padding:1rem .75rem; border-radius:14px; }
+  .org-chart-search { order:3; width:100%; } .org-card--direct { max-width:none; flex-basis:100%; }
+  .org-production-grid { columns:1; } }
+@media (prefers-reduced-motion:reduce) { .org-card { transition:none; } }
+@media print { .org-chart-toolbar .org-chart-search,.org-chart-toggle { display:none; }
+  .org-chart { box-shadow:none; }
+  /* force the production block open even if collapsed on screen */
+  .org-chart.is-production-collapsed .org-production-grid { columns:3!important; display:block!important; } }
