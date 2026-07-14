@@ -1,3 +1,11 @@
+## v2026.07.14.8 (2026.07.14)
+
+- feat(webstores): illustrated industry tiles + drop redundant store-types grid
+- feat(webstores): breadcrumb + 'All Webstores' nav on all 11 spokes (back to hub)
+- feat(webstores): FAQ real pricing + calculator on-demand $10->$6
+- webstores calculator: explain item pricing = 1-7 left-chest embroidery price + $6/item
+- Deploy v2026.07.14.8: cache-bust company-webstores.css ?v -> 2026.07.14.8 (illustrated tiles, breadcrumbs)
+
 ## v2026.07.14.7 (2026.07.14)
 
 - feat(webstores): hub 'Browse by industry' section — 11 linked cards to spoke pages
