@@ -1,3 +1,7 @@
+## v2026.07.14.2 (2026.07.14)
+
+- Remove staff-only screen-print quote builder link from custom-safety-apparel page
+
 ## v2026.07.14.1 (2026.07.14)
 
 - docs(seo): file nwcustomapparel.net blog export as reference + blog lane-split strategy
