@@ -56,7 +56,8 @@
       "Bash(node -e \"process.exit\\(require\\('./package.json'\\).scripts['test:parser']?0:1\\)\")",
       "Bash(npm run *)",
       "Bash(git reset *)",
-      "Bash(git stash *)"
+      "Bash(git stash *)",
+      "Bash(git commit -m ' *)"
     ]
   },
   "hooks": {
