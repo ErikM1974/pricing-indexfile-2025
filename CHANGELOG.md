@@ -1,3 +1,10 @@
+## v2026.07.15.1 (2026.07.15)
+
+- fix(digitizing): remove dead dashboard AE-email block (backend now notifies)
+- docs(memory): note org-chart-2026 UI refresh in HR reorg doc
+- feat(inbound): section SanMar Daily Inbound Report by sales rep
+- Deploy v2026.07.15.1: 1 files (settings.json,...)
+
 ## v2026.07.14.8 (2026.07.14)
 
 - feat(webstores): illustrated industry tiles + drop redundant store-types grid
