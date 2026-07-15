@@ -216,44 +216,92 @@
       <p class="sit-note">${esc(data.note || '')}</p>`;
   }
 
-  // ── Printable report (branded, print-only) ──
+  // ── One PO's print block. Extracted from buildPrintSheet so the report can be
+  //    grouped by sales rep while reusing the EXACT per-PO markup (no drift). ──
+  function poBlockHtml(o) {
+    const body = (o.boxDetailAvailable && o.boxDetail && o.boxDetail.length)
+      ? o.boxDetail.map(b => `
+        <div class="sit-ps-box">Box ${fmtNum(b.boxNumber)} · ${esc(b.carrier)} ${esc(b.trackingNumber)} · ${fmtNum(b.pieces)} pcs${b.cost ? ' · ' + fmtMoney(b.cost) : ''}</div>
+        <table class="sit-ps-tbl">
+          <thead><tr><th>Style</th><th>Description</th><th>Color</th><th>Size</th><th style="text-align:right">Qty</th><th style="text-align:right">Cost</th></tr></thead>
+          <tbody>${(b.items || []).map(it => `<tr><td>${esc(it.style)}</td><td>${esc(it.title || '')}</td><td>${esc(it.color || '—')}</td><td>${esc(it.size)}</td><td style="text-align:right">${fmtNum(it.qty)}</td><td style="text-align:right">${it.lineCost ? fmtMoney(it.lineCost) : '—'}</td></tr>`).join('')}</tbody>
+        </table>`).join('')
+      : `<table class="sit-ps-tbl">
+          <thead><tr><th>Style</th><th>Description</th><th>Color</th><th>Size</th><th style="text-align:right">Ord</th><th style="text-align:right">Ship</th><th>Status</th><th style="text-align:right">Cost</th></tr></thead>
+          <tbody>${(o.lines || []).map(l => `<tr><td>${esc(l.style)}</td><td>${esc(l.title || '')}</td><td>${esc(l.color || '—')}</td><td>${esc(l.size)}</td><td style="text-align:right">${fmtNum(l.qtyOrdered)}</td><td style="text-align:right">${fmtNum(l.qtyShipped)}</td><td>${esc(l.status)}</td><td style="text-align:right">${l.lineCost ? fmtMoney(l.lineCost) : '—'}</td></tr>`).join('')}</tbody>
+        </table>`;
+    const psLogo = o.logoUrl ? `<img class="sit-ps-logo" src="${esc(o.logoUrl)}" alt="" onerror="this.style.display='none'">` : '';
+    const psFields = [
+      fmtShortDate(o.dueDate) ? 'Due ' + fmtShortDate(o.dueDate) : '',
+      o.designNumber ? 'Design ' + o.designNumber + (o.designName ? ' ' + o.designName : '') : '',
+      o.contactName ? 'Contact ' + o.contactName : '',
+      o.salesRep ? 'Rep ' + initials(o.salesRep) : '',
+      o.customerPO ? 'Cust PO ' + o.customerPO : '',
+      o.terms ? 'Terms ' + o.terms : '',
+      o.dateOrdered ? 'Ordered ' + fmtShortDate(o.dateOrdered) : '',
+    ].filter(Boolean).map(esc).join(' · ');
+    return `<div class="sit-ps-po">
+      <div class="sit-ps-po-head">
+        ${psLogo}
+        <div class="sit-ps-po-htxt">
+          <div><b>${esc(o.company || 'Unmatched')}</b> &nbsp; SanMar PO #${esc(o.sanmarPO)}${o.workOrder ? ' · WO #' + esc(o.workOrder) : ''} · ${esc(o.method)}
+            <span class="sit-ps-r">${fmtNum(o.boxes)} box(es) · ${fmtNum(o.piecesShipped)} pcs${o.cost ? ' · <b>' + fmtMoney(o.cost) + '</b>' : ''}${o.upsDelivery && o.upsDelivery.date ? ' · UPS ' + fmtShortDate(o.upsDelivery.date) + (o.upsDelivery.type === 'rescheduled' ? ' (resched)' : o.upsDelivery.type === 'delivered' ? ' (delivered)' : '') : ''}</span></div>
+          ${psFields ? `<div class="sit-ps-fields">${psFields}</div>` : ''}
+        </div>
+      </div>
+      ${body}
+    </div>`;
+  }
+
+  // ── Group report POs by sales rep. Empty/blank rep → one "Unassigned /
+  //    Unmatched" bucket that always sorts LAST (so unmatched POs — e.g. a
+  //    still-unlinked SanMar PO — still print, never silently dropped). Named
+  //    reps A→Z. Each group carries its own subtotal. ──
+  function groupOrdersByRep(orders) {
+    const UNASSIGNED = 'Unassigned / Unmatched';
+    const map = new Map();
+    (orders || []).forEach(o => {
+      const rep = String(o.salesRep || '').trim() || UNASSIGNED;
+      if (!map.has(rep)) map.set(rep, []);
+      map.get(rep).push(o);
+    });
+    const groups = [...map.entries()].map(([repName, repOrders]) => ({
+      repName,
+      repInitials: repName === UNASSIGNED ? '' : initials(repName),
+      orders: repOrders,
+      sub: repOrders.reduce((a, o) => ({
+        pos: a.pos + 1,
+        boxes: a.boxes + (Number(o.boxes) || 0),
+        pieces: a.pieces + (Number(o.piecesShipped) || 0),
+        cost: a.cost + (Number(o.cost) || 0),
+      }), { pos: 0, boxes: 0, pieces: 0, cost: 0 }),
+    }));
+    groups.sort((a, b) => {
+      if (a.repName === UNASSIGNED) return 1;    // Unassigned always last
+      if (b.repName === UNASSIGNED) return -1;
+      return a.repName.localeCompare(b.repName); // reps A→Z
+    });
+    return groups;
+  }
+
+  // ── Printable report (branded, print-only) — SECTIONED BY SALES REP, one rep
+  //    per page (CSS page-break) so the day's printout can be split and dropped
+  //    in each AE's bin. Per-PO markup unchanged (poBlockHtml). ──
   function buildPrintSheet(data) {
     const old = document.getElementById('sit-print-sheet');
     if (old) old.remove();
     const t = data.totals || {};
-    const poBlocks = (data.orders || []).map(o => {
-      const body = (o.boxDetailAvailable && o.boxDetail && o.boxDetail.length)
-        ? o.boxDetail.map(b => `
-          <div class="sit-ps-box">Box ${fmtNum(b.boxNumber)} · ${esc(b.carrier)} ${esc(b.trackingNumber)} · ${fmtNum(b.pieces)} pcs${b.cost ? ' · ' + fmtMoney(b.cost) : ''}</div>
-          <table class="sit-ps-tbl">
-            <thead><tr><th>Style</th><th>Description</th><th>Color</th><th>Size</th><th style="text-align:right">Qty</th><th style="text-align:right">Cost</th></tr></thead>
-            <tbody>${(b.items || []).map(it => `<tr><td>${esc(it.style)}</td><td>${esc(it.title || '')}</td><td>${esc(it.color || '—')}</td><td>${esc(it.size)}</td><td style="text-align:right">${fmtNum(it.qty)}</td><td style="text-align:right">${it.lineCost ? fmtMoney(it.lineCost) : '—'}</td></tr>`).join('')}</tbody>
-          </table>`).join('')
-        : `<table class="sit-ps-tbl">
-            <thead><tr><th>Style</th><th>Description</th><th>Color</th><th>Size</th><th style="text-align:right">Ord</th><th style="text-align:right">Ship</th><th>Status</th><th style="text-align:right">Cost</th></tr></thead>
-            <tbody>${(o.lines || []).map(l => `<tr><td>${esc(l.style)}</td><td>${esc(l.title || '')}</td><td>${esc(l.color || '—')}</td><td>${esc(l.size)}</td><td style="text-align:right">${fmtNum(l.qtyOrdered)}</td><td style="text-align:right">${fmtNum(l.qtyShipped)}</td><td>${esc(l.status)}</td><td style="text-align:right">${l.lineCost ? fmtMoney(l.lineCost) : '—'}</td></tr>`).join('')}</tbody>
-          </table>`;
-      const psLogo = o.logoUrl ? `<img class="sit-ps-logo" src="${esc(o.logoUrl)}" alt="" onerror="this.style.display='none'">` : '';
-      const psFields = [
-        fmtShortDate(o.dueDate) ? 'Due ' + fmtShortDate(o.dueDate) : '',
-        o.designNumber ? 'Design ' + o.designNumber + (o.designName ? ' ' + o.designName : '') : '',
-        o.contactName ? 'Contact ' + o.contactName : '',
-        o.salesRep ? 'Rep ' + initials(o.salesRep) : '',
-        o.customerPO ? 'Cust PO ' + o.customerPO : '',
-        o.terms ? 'Terms ' + o.terms : '',
-        o.dateOrdered ? 'Ordered ' + fmtShortDate(o.dateOrdered) : '',
-      ].filter(Boolean).map(esc).join(' · ');
-      return `<div class="sit-ps-po">
-        <div class="sit-ps-po-head">
-          ${psLogo}
-          <div class="sit-ps-po-htxt">
-            <div><b>${esc(o.company || 'Unmatched')}</b> &nbsp; SanMar PO #${esc(o.sanmarPO)}${o.workOrder ? ' · WO #' + esc(o.workOrder) : ''} · ${esc(o.method)}
-              <span class="sit-ps-r">${fmtNum(o.boxes)} box(es) · ${fmtNum(o.piecesShipped)} pcs${o.cost ? ' · <b>' + fmtMoney(o.cost) + '</b>' : ''}${o.upsDelivery && o.upsDelivery.date ? ' · UPS ' + fmtShortDate(o.upsDelivery.date) + (o.upsDelivery.type === 'rescheduled' ? ' (resched)' : o.upsDelivery.type === 'delivered' ? ' (delivered)' : '') : ''}</span></div>
-            ${psFields ? `<div class="sit-ps-fields">${psFields}</div>` : ''}
-          </div>
+    const repSections = groupOrdersByRep(data.orders).map(g => {
+      const heading = g.repInitials
+        ? `${esc(g.repName)} <span class="sit-ps-rep-ini">(${esc(g.repInitials)})</span>`
+        : esc(g.repName);
+      return `<section class="sit-ps-rep">
+        <div class="sit-ps-rep-head">
+          <span class="sit-ps-rep-name">${heading}</span>
+          <span class="sit-ps-rep-sub">${fmtNum(g.sub.pos)} PO${g.sub.pos === 1 ? '' : 's'} · ${fmtNum(g.sub.boxes)} boxes · ${fmtNum(g.sub.pieces)} pcs · ${fmtMoney0(g.sub.cost)} blanks</span>
         </div>
-        ${body}
-      </div>`;
+        ${g.orders.map(poBlockHtml).join('')}
+      </section>`;
     }).join('');
 
     const sheet = document.createElement('div');
@@ -263,9 +311,9 @@
         <div class="sit-ps-brand">Northwest Custom Apparel</div>
         <div class="sit-ps-title">Daily Inbound Report — SanMar Blanks</div>
         <div class="sit-ps-sub">Arriving ${esc(fmtDate(data.date))} &nbsp;·&nbsp; ${fmtNum(t.pos)} POs · ${fmtNum(t.workOrders)} work orders · ${fmtNum(t.boxes)} boxes · ${fmtNum(t.piecesShipped)} pieces · <b>${fmtMoney0(t.cost)} blanks cost</b></div>
-        <div class="sit-ps-note">Arrival = SanMar ship date + ground-transit estimate to Milton, WA (no carrier ETA from SanMar). Blank cost = SanMar wholesale (CASE_PRICE × qty).</div>
+        <div class="sit-ps-note">Arrival = SanMar ship date + ground-transit estimate to Milton, WA (no carrier ETA from SanMar). Blank cost = SanMar wholesale (CASE_PRICE × qty). Grouped by sales rep — one rep per page.</div>
       </div>
-      ${poBlocks || '<p>No shipments arriving this day.</p>'}`;
+      ${repSections || '<p>No shipments arriving this day.</p>'}`;
     document.body.appendChild(sheet);
     return sheet;
   }
