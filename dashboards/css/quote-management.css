@@ -1124,6 +1124,14 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 .sit-ps-tbl th, .sit-ps-tbl td { border: 1px solid #e0e0e0; padding: 3px 6px; text-align: left; }
 .sit-ps-tbl th { background: #fafafa; font-weight: 600; }
 .sit-ps-box { font-size: 10px; font-weight: 700; color: #2e6f40; margin: 4px 0 2px; }
+/* ── Rep sections in the Daily Inbound Report — each rep starts on a fresh page
+   so the day's printout can be physically split into each AE's bin ── */
+.sit-ps-rep { page-break-before: always; }
+.sit-ps-rep:first-of-type { page-break-before: avoid; } /* first rep rides on the header page */
+.sit-ps-rep-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; border-bottom: 2px solid #2e6f40; margin: 0 0 8px; padding-bottom: 4px; page-break-after: avoid; }
+.sit-ps-rep-name { font-size: 13px; font-weight: 800; color: #2e6f40; }
+.sit-ps-rep-ini { font-weight: 600; color: #555; }
+.sit-ps-rep-sub { font-size: 10px; color: #555; white-space: nowrap; }
 
 /* ── Per-box receiving LABEL (8.5×11 portrait, one page per box; sit-label-printing mode) ── */
 #sit-label-sheet { display: none; }
