@@ -94,6 +94,7 @@ _Read API + PO (write) side._
 
 - [SANMAR_API_REFERENCE.md](SANMAR_API_REFERENCE.md) — ⭐ SanMar read-side API (**v24.5 Jul 2026** — MiiR restricted; MAP restructured: basics → No-MAP, 25% = Flexfit/Richardson caps). Admin cheat-sheet `/dashboards/sanmar-api-reference.html`
 - [sanmar-api-guide-24.5-jul2026.pdf](sanmar-api-guide-24.5-jul2026.pdf) — current official guide (supersedes `sanmar-api-2025-doc.pdf`)
+- [SANMAR_INBOUND_2026-07.md](SANMAR_INBOUND_2026-07.md) — SanMar Inbound dashboard: PO→WO match via `PurchaseOrders.ID_PO`, UPS-real arrival day, shipment received dates, report-by-rep (proxy v913–v917)
 
 ## 🗄️ Caspio / Backend / Auth / API
 

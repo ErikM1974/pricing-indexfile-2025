@@ -472,6 +472,34 @@ serviceItems.forEach(si => {
         lineItems: [{ description: s.label, quantity: qty || 1, unitPrice: unit, total: total }]
     });
 });
+
+// Cap embellishment upcharge (3D Puff / Laser Patch) — a flat per-cap add-on shown in the
+// on-screen fee table (#cap-embellishment-fee-row) AND folded into #grand-total, but — exactly
+// like the AS-CAP stitch surcharge above — it was NEVER emitted as a PDF line item. The products
+// table then under-footed by the upcharge total: laser-patch EMB-2026-313 printed a $360 table
+// against a $420 subtotal (a $60 gap with nothing explaining it). The per-cap price EXCLUDES this
+// upcharge — the engine tracks it separately (embroidery-quote-pricing.js:658 keeps decorationCost
+// at embCost; patch/puff totals are added once at :1848/:1851) — so adding the line makes the table
+// foot WITHOUT double-counting. Label carries "CODE : Description" (e.g. "Laser Patch : Patch
+// Upcharge" / "3D-EMB : 3D Puff Upcharge"); split it so the Style cell shows the ShopWorks code
+// and the description reads cleanly. (2026-07-15)
+const capEmbRow = document.getElementById('cap-embellishment-fee-row');
+if (capEmbRow && capEmbRow.style.display !== 'none') {
+    const total = parseFloat((document.getElementById('cap-embellishment-fee-total')?.textContent || '').replace(/[$,]/g, '')) || 0;
+    if (total > 0) {
+        const qty = parseInt(document.getElementById('cap-embellishment-fee-qty')?.textContent) || 0;
+        const unit = parseFloat((document.getElementById('cap-embellishment-fee-unit')?.textContent || '').replace(/[$,]/g, '')) || 0;
+        const rawLabel = (document.getElementById('cap-embellishment-fee-label')?.textContent || '').trim();
+        const parts = rawLabel.split(':');
+        const style = parts.length > 1 ? parts[0].trim() : 'Laser Patch';
+        const title = parts.length > 1 ? parts.slice(1).join(':').trim() : (rawLabel || 'Cap Embellishment Upcharge');
+        invoiceProducts.push({
+            product: { style: style, title: title, color: '', isService: true, isCap: true },
+            isService: true,
+            lineItems: [{ description: title, quantity: qty || 1, unitPrice: unit, total: total }]
+        });
+    }
+}
 }
 
 function buildEmbroideryPricingData(allItems) {
