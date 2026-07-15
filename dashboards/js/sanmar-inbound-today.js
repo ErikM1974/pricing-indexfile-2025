@@ -145,7 +145,13 @@
   // business-day estimate). Rescheduled stands out in amber so a slipped arrival is obvious.
   function upsChip(o) {
     const u = o.upsDelivery;
-    if (!u || !u.date) return '';
+    if (!u || !u.date) {
+      // No UPS scan yet → this day is our ship+transit ESTIMATE, not a confirmed UPS date. Mark it
+      // clearly so receiving knows it may shift (the truthful arrival comes from UPS once scanned).
+      return o.arrival
+        ? `<span class="sit-ups sit-ups--est" title="Estimated from SanMar ship date + ground transit — UPS hasn't scanned these boxes yet, so the day may still shift">~ est. ${esc(fmtShortDate(o.arrival))}</span>`
+        : '';
+    }
     const cfg = {
       delivered: ['✅', 'UPS delivered', 'sit-ups--ok'],
       scheduled: ['🚚', 'UPS arriving', 'sit-ups--ok'],
