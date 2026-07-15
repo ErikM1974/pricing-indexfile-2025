@@ -1,3 +1,8 @@
+## v2026.07.15.2 (2026.07.15)
+
+- feat(sanmar-inbound): label estimated vs UPS-confirmed arrival on inbound cards
+- Deploy v2026.07.15.2: cache-bust quote-management.html (UPS arrival labels)
+
 ## v2026.07.15.1 (2026.07.15)
 
 - fix(digitizing): remove dead dashboard AE-email block (backend now notifies)
