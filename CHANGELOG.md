@@ -1,3 +1,8 @@
+## v2026.07.15.3 (2026.07.15)
+
+- Memory: add SANMAR_INBOUND_2026-07 topic file, dedupe LESSONS, index it
+- fix(emb-print): emit cap-embellishment upcharge (laser patch / 3D puff) as a PDF line item
+
 ## v2026.07.15.2 (2026.07.15)
 
 - feat(sanmar-inbound): label estimated vs UPS-confirmed arrival on inbound cards
