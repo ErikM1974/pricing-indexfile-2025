@@ -597,27 +597,13 @@
 
             showToast(`Mockup updated to "${newStatus}"`, 'success');
 
-            // Notify AE when Ruth starts working
-            if (action === 'start' && typeof emailjs !== 'undefined') {
-                const mockup = allMockups.find(m => String(m.Mockup_ID) === String(mockupId));
-                if (mockup && mockup.Submitted_By) {
-                    try {
-                        emailjs.init('4qSbDO-SQs19TbP80');
-                        emailjs.send('service_jgrave3', 'template_art_note_added', {
-                            to_email: mockup.Submitted_By,
-                            to_name: mockup.Sales_Rep || 'Sales Rep',
-                            design_id: mockup.Design_Number || 'NEW',
-                            company_name: mockup.Company_Name || 'Unknown',
-                            note_text: 'Ruth has started working on your mockup request for ' + (mockup.Company_Name || 'Unknown'),
-                            note_type: 'In Progress',
-                            header_emoji: '⏳',
-                            header_title: 'In Progress',
-                            detail_link: 'https://www.teamnwca.com/mockup/' + mockupId + '?view=ae',
-                            from_name: 'Ruth (Digitizing)'
-                        }).catch(function () {});
-                    } catch (e) { /* silent */ }
-                }
-            }
+            // AE notification is handled SERVER-SIDE by the status chokepoint
+            // (caspio-pricing-proxy PUT /api/mockups/:id/status), which emails
+            // the submitting AE on In Progress / Awaiting Approval / Completed /
+            // Revision Requested regardless of which screen Ruth used. The old
+            // client-side emailjs block here never fired (it looked up records
+            // by Mockup_ID, but /api/mockups rows key on ID) and swallowed
+            // errors — removed 2026-07-15 in favor of the reliable backend path.
 
             // Refresh data
             await fetchMockups();
