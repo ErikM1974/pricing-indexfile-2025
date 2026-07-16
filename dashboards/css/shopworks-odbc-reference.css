@@ -1,0 +1,100 @@
+/* ==========================================================================
+   shopworks-odbc-reference.css — ShopWorks OnSite ODBC reference.
+   Page-specific styles for /dashboards/shopworks-odbc-reference.html.
+   Uses the 2026 tokens (art-hub.css) + dash-shell.css. Sibling pattern:
+   manageorders-api-reference.css. Never redefine tokens; never hardcode
+   colors/shadows/radii — var(--token) only.
+   ========================================================================== */
+
+.swo-subhead { font-weight: 400; font-size: 0.7em; opacity: 0.85; }
+.swo-lock {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 600; color: #fff;
+    background: rgba(0,0,0,0.18); border: 1px solid rgba(255,255,255,0.35); padding: 5px 12px; border-radius: var(--radius-pill);
+}
+
+.swo-lead { font-size: 1rem; line-height: 1.6; color: var(--gray-700); margin: 0 0 var(--space-4); }
+.swo-body { font-size: 0.9rem; line-height: 1.6; color: var(--gray-700); margin: var(--space-3) 0; }
+.swo-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-4); }
+.swo-chip { background: var(--surface-inset); border: 1px solid var(--gray-200); border-radius: var(--radius-md); padding: 5px 11px; font-size: 0.8rem; color: var(--gray-600); }
+.swo-chip b { color: var(--gray-900); font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
+/* ---------- Headings ---------- */
+.swo-h {
+    display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-3); font-size: 1.15rem; font-weight: 700;
+    color: var(--gray-900); margin: 0 0 var(--space-4); padding-bottom: var(--space-3); border-bottom: 1px solid var(--gray-200); letter-spacing: -0.01em;
+}
+.swo-h--flush { margin-bottom: 0; padding-bottom: 0; border-bottom: 0; }
+.swo-tag { font-size: 0.72rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gray-500); background: var(--surface-inset); border-radius: var(--radius-pill); padding: 3px 10px; }
+
+/* ---------- Callout ---------- */
+.swo-callout { border: 1px solid var(--gray-200); border-left: 4px solid var(--gray-400); border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); margin: var(--space-4) 0 0; background: var(--surface-inset); }
+.swo-callout h4 { margin: 0 0 var(--space-2); font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; gap: var(--space-2); }
+.swo-callout ul { margin: 0; padding-left: var(--space-5); }
+.swo-callout li { margin: var(--space-1) 0; font-size: 0.88rem; color: var(--gray-700); line-height: 1.55; }
+.swo-callout--danger { border-left-color: var(--state-danger); background: var(--state-danger-bg); }
+.swo-callout--danger h4 { color: var(--state-danger); }
+.swo-note { font-size: 0.82rem; color: var(--gray-500); margin: var(--space-2) 0 0; }
+
+.swo-callout code, .swo-lead code, .swo-body code, .swo-note code, .swo-rules code, .swo-foot code, .swo-fnote code, .swo-gaps code {
+    font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.82em; background: var(--surface-card); color: var(--gray-800);
+    padding: 1px 5px; border-radius: var(--radius-sm); overflow-wrap: anywhere;
+}
+
+/* ---------- Architecture strip + code block ---------- */
+.swo-arch { font-size: 0.86rem; color: var(--gray-700); background: var(--surface-inset); border: 1px solid var(--gray-200); border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); line-height: 1.7; }
+.swo-arch b { color: var(--gray-900); }
+.swo-arrow { color: var(--state-info); font-weight: 700; white-space: nowrap; }
+.swo-code {
+    font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.78rem; line-height: 1.55; color: var(--gray-800);
+    background: var(--surface-inset); border: 1px solid var(--gray-200); border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4); overflow-x: auto; margin: var(--space-3) 0 0;
+}
+
+/* ---------- Rules columns ---------- */
+.swo-cols { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+.swo-rules { margin: 0; padding-left: var(--space-5); }
+.swo-rules li { margin: var(--space-2) 0; font-size: 0.86rem; color: var(--gray-700); line-height: 1.55; }
+@media (max-width: 900px) { .swo-cols { grid-template-columns: 1fr; } }
+
+/* ---------- Field explorer ---------- */
+.swo-fieldhead { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: var(--space-3); margin-bottom: var(--space-2); padding-bottom: var(--space-3); border-bottom: 1px solid var(--gray-200); }
+.swo-filter { flex: 1 1 260px; max-width: 420px; padding: 8px 14px; font-family: inherit; font-size: 0.875rem; color: var(--gray-800); background: var(--surface-card); border: 1px solid var(--gray-300); border-radius: var(--radius-md); }
+.swo-filter:focus { outline: none; border-color: var(--dash-theme); box-shadow: 0 0 0 3px var(--dash-theme-bg); }
+.swo-toggle { display: inline-flex; align-items: center; gap: 6px; font-size: 0.82rem; color: var(--gray-600); cursor: pointer; white-space: nowrap; }
+.swo-toggle-hint { color: var(--gray-400); font-size: 0.74rem; }
+.swo-count { font-size: 0.82rem; color: var(--gray-500); margin: 0 0 var(--space-3); font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
+.swo-tbl { margin-bottom: var(--space-5); }
+.swo-tbl-head { display: flex; align-items: baseline; gap: var(--space-3); cursor: pointer; user-select: none; }
+.swo-tbl-head h3 { margin: 0; font-size: 1rem; font-weight: 700; color: var(--dash-theme-dark); font-family: 'JetBrains Mono', ui-monospace, monospace; }
+.swo-tbl-count { font-size: 0.72rem; color: var(--gray-500); background: var(--surface-inset); padding: 2px 9px; border-radius: var(--radius-pill); }
+.swo-tbl-desc { font-size: 0.84rem; color: var(--gray-500); margin: 4px 0 var(--space-2); }
+.swo-tbl-chevron { margin-left: auto; color: var(--gray-400); font-size: 0.8rem; transition: transform 0.15s ease; }
+.swo-tbl.collapsed .swo-tbl-chevron { transform: rotate(-90deg); }
+.swo-tbl.collapsed .swo-scroll, .swo-tbl.collapsed .swo-tbl-desc { display: none; }
+
+.swo-scroll { overflow-x: auto; }
+.swo-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; min-width: 560px; }
+.swo-table thead th { text-align: left; padding: 6px var(--space-3); border-bottom: 2px solid var(--gray-300); color: var(--gray-500); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; background: var(--surface-inset); }
+.swo-table td { padding: 6px var(--space-3); border-bottom: 1px solid var(--gray-200); vertical-align: top; }
+.swo-table tr:last-child td { border-bottom: 0; }
+.swo-fname { font-family: 'JetBrains Mono', ui-monospace, monospace; font-weight: 600; color: var(--gray-900); white-space: nowrap; }
+.swo-ftype { font-family: 'JetBrains Mono', ui-monospace, monospace; color: var(--gray-500); white-space: nowrap; }
+.swo-fnote { color: var(--gray-600); line-height: 1.5; }
+
+/* field-kind badges */
+.swo-kind { display: inline-block; font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; border-radius: var(--radius-sm); padding: 1px 6px; margin-left: 6px; vertical-align: middle; }
+.swo-kind--calc { color: var(--state-warning); background: var(--state-warning-bg); }
+.swo-kind--global { color: var(--gray-500); background: var(--surface-inset); }
+.swo-kind--summary { color: var(--state-danger); background: var(--state-danger-bg); }
+tr.swo-row--star td { background: var(--state-success-bg); }
+.swo-star { color: var(--state-success); margin-right: 4px; }
+
+.swo-empty { padding: var(--space-6); text-align: center; color: var(--gray-500); }
+mark.swo-hit { background: var(--state-warning-bg); color: var(--state-warning); border-radius: 2px; padding: 0 1px; }
+
+/* ---------- Gap table + footer ---------- */
+.swo-gaps td:first-child { font-weight: 600; color: var(--gray-800); white-space: nowrap; }
+.swo-foot { margin-top: var(--space-6); padding-top: var(--space-4); border-top: 1px solid var(--gray-200); color: var(--gray-500); font-size: 0.8rem; line-height: 1.6; }
+
+@media (max-width: 700px) { .swo-gaps td:first-child { white-space: normal; } }

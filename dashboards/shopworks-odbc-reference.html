@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>ShopWorks ODBC Reference · Northwest Custom Apparel</title>
+    <link rel="icon" href="/favicon.png" type="image/png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css">
+    <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
+    <link rel="stylesheet" href="/dashboards/css/shopworks-odbc-reference.css?v=2026.07.16.1">
+</head>
+<body>
+    <div class="dash-shell">
+        <header class="dash-header">
+            <div class="dash-header-left">
+                <a href="/staff-dashboard.html" title="Back to Staff Dashboard">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                         alt="Northwest Custom Apparel" class="dash-header-logo">
+                </a>
+                <h1 class="dash-header-title">ShopWorks ODBC <span class="swo-subhead">direct FileMaker table access — connection, rules &amp; field catalog</span></h1>
+            </div>
+            <div class="dash-header-right">
+                <span class="swo-lock" title="Admin only"><i class="fas fa-user-shield"></i> Admin</span>
+                <a href="/staff-dashboard.html" class="dash-back-link"><i class="fas fa-arrow-left"></i> Dashboard</a>
+            </div>
+        </header>
+
+        <main class="dash-content">
+
+            <!-- ── Intro + connection card ─────────────────────────────── -->
+            <section class="dash-card">
+                <p class="swo-lead">Read-only SQL access to the <strong>OnSite FileMaker database</strong> via the FileMaker ODBC (xDBC) driver — the data layer <em>underneath</em> the ManageOrders API. 17 tables, 2,630 fields, including due dates, customer credit/terms, job costing, commissions, and the production-floor log that ManageOrders can't return. Verified live 2026-07-16.</p>
+                <div class="swo-chips">
+                    <span class="swo-chip">Server <b>192.168.10.6</b> (LAN)</span>
+                    <span class="swo-chip">Port <b>2399</b> (fixed xDBC)</span>
+                    <span class="swo-chip">File <b>Data_ODBCMapping</b> (only valid target)</span>
+                    <span class="swo-chip">Login <b>extro / extro</b> (read-only)</span>
+                    <span class="swo-chip">Driver <b>FileMaker ODBC 15.0.6</b> (32+64-bit on bandit)</span>
+                    <span class="swo-chip"><b>16</b> tables · <b>2,630</b> fields</span>
+                </div>
+                <div class="swo-callout swo-callout--danger">
+                    <h4><i class="fas fa-triangle-exclamation"></i> Vendor rules — the OnSite server is LIVE production</h4>
+                    <ul>
+                        <li><b>Never blanket-query.</b> Always filter (<code>WHERE</code> on a stored, indexed field) + <code>FETCH FIRST n ROWS ONLY</code>. Unbounded scans can fill the server's C: drive and crash OnSite for everyone.</li>
+                        <li><b>Never poll tightly.</b> Automated queries run minutes apart, not seconds. One connection, sequential queries — the xDBC listener serializes work.</li>
+                        <li><b>DSN points at <code>Data_ODBCMapping</code> only.</b> Never other files, never modify it, never create extra DSNs.</li>
+                        <li><b>Resetting the ODBC connector</b> (FileMaker Server Admin Console) <b>disconnects ALL ODBC clients — including the shipping machines.</b> Coordinate before touching it; shipping software must be restarted after.</li>
+                        <li><b>No images/attachments</b> via ODBC (design thumbnails, PDFs). <b>No writes ever</b> — the <code>extro</code> account is read-only; order creation stays on the ManageOrders push API.</li>
+                        <li><b>Need a table/field that isn't mapped?</b> Full-screen OnSite screenshots with fields highlighted → <a href="mailto:support@shopworx.com">support@shopworx.com</a>. They annotate table/field names and extend the mapping. (Known unmapped: <code>LinesPur</code> — PO line items.)</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- ── How we connect ──────────────────────────────────────── -->
+            <section class="dash-card">
+                <h2 class="swo-h">How we connect <span class="swo-tag">bandit bridge · dev</span></h2>
+                <div class="swo-arch">laptop (chat / scripts) <span class="swo-arrow">→ WinRM →</span> <b>BANDIT</b> (192.168.10.219 · drivers + 3 System DSNs: SW32, SWAddress, SWODBC) <span class="swo-arrow">→ ODBC :2399 →</span> <b>OnSite server</b> (192.168.10.6)</div>
+                <p class="swo-body">The FileMaker driver and the querying app must live on the <em>same Windows machine</em> — bandit fills that role (always-on; already had both drivers from the shipping integration). Remote-query pattern from an authorized laptop:</p>
+                <pre class="swo-code">$cred = Import-Clixml "$env:USERPROFILE\bandit-cred.xml"
+Invoke-Command -ComputerName bandit -Credential $cred -ScriptBlock {
+  $c = New-Object System.Data.Odbc.OdbcConnection `
+    'DRIVER={FileMaker ODBC};Server=192.168.10.6;Database=Data_ODBCMapping;UID=extro;PWD=extro'
+  $c.Open()
+  # ... bounded SELECT here ...
+  $c.Close()
+}</pre>
+                <p class="swo-note">Production plan (not yet built): scheduled sync agent on bandit → proxy bulk-upsert route → Caspio tables + freshness watchdog. Heroku can never reach the DSN directly (no Linux driver; LAN-only address). Canonical doc: <code>memory/SHOPWORKS_ODBC_INTEGRATION.md</code>.</p>
+            </section>
+
+            <!-- ── Query rules ─────────────────────────────────────────── -->
+            <section class="dash-card">
+                <h2 class="swo-h">FileMaker SQL — rules &amp; traps <span class="swo-tag">read before writing queries</span></h2>
+                <div class="swo-cols">
+                    <ul class="swo-rules">
+                        <li><b>Row limits:</b> <code>FETCH FIRST 100 ROWS ONLY</code> (no <code>LIMIT</code>/<code>TOP</code>). Paging: <code>OFFSET n ROWS</code> before it — but prefer delta-sync on <code>date_Modification</code>.</li>
+                        <li><b>Dates:</b> <code>{d '2026-07-16'}</code> / <code>{ts '2026-07-16 14:00:00'}</code>. <b>Never <code>BETWEEN</code> on dates</b> — pathologically slow; use <code>&gt;= AND &lt;=</code>.</li>
+                        <li><b>Empty string = NULL.</b> <code>col = ''</code> matches nothing → use <code>IS NULL / IS NOT NULL</code>.</li>
+                        <li><b>Case-sensitive strings.</b> <code>'a' &lt;&gt; 'A'</code>. <code>LOWER()</code> works but kills index use.</li>
+                        <li><b>Booleans are 1/0</b> — no TRUE/FALSE keywords.</li>
+                        <li><b>Joins:</b> INNER + LEFT OUTER only (no RIGHT/FULL — rewrite as LEFT).</li>
+                    </ul>
+                    <ul class="swo-rules">
+                        <li><b>⚠ THE BIG ONE — calc fields:</b> prefixes <code>cn_ ct_ cd_ cm_ co_ cnCur_ cnPer_ sum_</code> are unstored calculations/summaries — evaluated per-row, unindexable. <b>Never in WHERE</b>; avoid in SELECT. One calc field can turn a sub-second query into minutes of server CPU. <code>gn_ gt_ gd_ gm_ go_</code> = globals (session values — useless to us). Plain <code>date_ cur_ sts_ ID_ id_</code> fields are stored → fast.</li>
+                        <li><b>Never <code>SELECT *</code></b> — explicit column lists only (wide tables evaluate every calc per row).</li>
+                        <li><b>Schema discovery:</b> <code>SELECT TableName, FieldName, FieldType FROM FileMaker_Fields</code> (.NET <code>GetSchemaTable()</code> overflows on wide tables — FM15 driver bug).</li>
+                        <li><b>Repeating fields</b> (<code>decimal[14]</code>, <code>varchar[10]</code>) need special handling — plain SELECT returns repetition 1.</li>
+                        <li><b>Expect dropped connections.</b> The <code>fmxdbc_listener</code> process can wedge; set timeouts, retry once, then alert.</li>
+                        <li><b>Multi-state status codes:</b> <code>sts_*</code> = 0 No · 1 Yes · .5 Partial · 8/222 N/A (same as ManageOrders).</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- ── What this unlocks ───────────────────────────────────── -->
+            <section class="dash-card">
+                <h2 class="swo-h">What ODBC gives us that ManageOrders can't <span class="swo-tag">gap fills</span></h2>
+                <div class="swo-scroll"><table class="swo-table swo-gaps">
+                    <thead><tr><th>Need</th><th>Where it lives</th></tr></thead>
+                    <tbody>
+                        <tr><td>Real due date (MO has none)</td><td><code>Orders.date_OrderDropDead</code> + <code>date_ProductionScheduled/Done</code>, <code>date_DesignScheduled/Done</code></td></tr>
+                        <tr><td>Full customer master w/ credit &amp; terms</td><td><code>Cust.cur_CreditLimit / cur_CreditUsed / Terms / sts_CreditAutoHold / TaxExemptNumber</code></td></tr>
+                        <tr><td>Customer sales history (10 yrs + monthly)</td><td><code>Cust.cur_TotalYearSales1-10</code>, <code>cur_TotalMonthSales1-12</code>, <code>date_LastOrdered</code>, <code>avg_DaysLate</code></td></tr>
+                        <tr><td>Ship method for receiving labels</td><td><code>Addr.ShipMethod</code> (+ <code>sts_ShipStation</code>, <code>timestamp_ShipstationLastUpdate</code>)</td></tr>
+                        <tr><td>Per-order P&amp;L / job costing</td><td><code>Orders.cur_JobCost_*</code>, <code>cur_JobCost_ProfitLoss_01/02</code></td></tr>
+                        <tr><td>Commissions at the source</td><td><code>Orders.cur_CommishDue_* / cur_CommishPay_* / sts_CommishPaid</code></td></tr>
+                        <tr><td>Receivables aging per order</td><td><code>Orders.cnCur_Balance_Over1/30/60/90</code>, <code>cd_date_PaymentDue</code>, <code>sts_Paid</code></td></tr>
+                        <tr><td>Web order → WO join (SQL!)</td><td><code>Orders.ExtOrderID / ExtSource / sts_APIOrder</code></td></tr>
+                        <tr><td>Requested vs actual sizes + backorders</td><td><code>LinesOE.Size01-06_Req</code> vs <code>_Act</code>, <code>Size01-06_BO</code></td></tr>
+                        <tr><td>Vendor PO + receiving + payables match</td><td><code>PO.date_Received / ConfirmationNumber / cnCur_Payables*</code> (+ <code>sts_API_Submitted</code>)</td></tr>
+                        <tr><td>Shop-floor labor / defects / misprints</td><td><code>ProductionLogDetails.Hours / Qty / Misprints / Defects / cur_LaborRate</code> per employee+machine</td></tr>
+                        <tr><td>Machine capacity data</td><td><code>Machines.StitchesPerMinute / UnitsPerHour / NumberOfHeads / cur_MachineRate</code></td></tr>
+                        <tr><td>Inventory commitments per size</td><td><code>InvLevel.SizeNN_OnOrder / _InProduction / _Committed / _ToReachMin/Max</code></td></tr>
+                        <tr><td>Status-slot decoder</td><td><code>OrdTyp.id_StatusKey_01-13</code> + <code>ct_Key_Display_*</code> label <code>Orders.sts_01–13b</code> per order type</td></tr>
+                    </tbody>
+                </table></div>
+                <p class="swo-note">ODBC does <b>not</b> do: images/attachments · writes (ManageOrders push stays the only write path) · webhooks (still pull-based).</p>
+            </section>
+
+            <!-- ── Field explorer ──────────────────────────────────────── -->
+            <section class="dash-card">
+                <div class="swo-fieldhead">
+                    <h2 class="swo-h swo-h--flush">Field catalog <span class="swo-tag">live schema · pulled 2026-07-16</span></h2>
+                    <label class="swo-toggle"><input type="checkbox" id="swoStoredOnly"> stored fields only <span class="swo-toggle-hint">(hide calc/global/summary)</span></label>
+                    <input type="search" id="swoFilter" class="swo-filter" placeholder="Filter 2,630 fields… (e.g. DropDead, Credit, ShipMethod)" autocomplete="off">
+                </div>
+                <p class="swo-count" id="swoCount">Loading schema…</p>
+                <div id="swoTables"><div class="swo-empty"><i class="fas fa-spinner fa-spin"></i> Loading field catalog…</div></div>
+            </section>
+
+            <footer class="swo-foot">
+                Canonical deep doc: <code>memory/SHOPWORKS_ODBC_INTEGRATION.md</code> (update THAT, not this page) · raw catalog: <code>memory/shopworks-odbc-schema-catalog.txt</code> · vendor guide: “ODBC Integration Guide for OnSite Projects” (ShopWorks PDF) · driver installer: <code>SW ODBC Shipping Address</code> from the ShopWorks Box link.
+            </footer>
+
+        </main>
+    </div>
+
+    <script src="/config/app.config.js"></script>
+    <script src="/shared_components/js/fetch-timeout.js"></script>
+    <script src="/shared_components/js/dash-page-helpers.js"></script>
+    <script src="/dashboards/js/shopworks-odbc-reference.js?v=2026.07.16.1"></script>
+</body>
+</html>
