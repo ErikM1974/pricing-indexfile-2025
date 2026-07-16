@@ -78,9 +78,14 @@ links to the /company-webstores hub. Hub→spoke linking DONE: all 11 hub store-
   ("DTG ink is made for cotton") — never let store copy imply DTG on polyester. **Poly/performance CAN print via DTF
   transfers** (Erik 2026-07-16): partner-printed (public phrase = **"our Los Angeles partner"**, Erik-confirmed — Supacolor
   NEVER named publicly, same rule as InkSoft/SanMar), heat-pressed in-house; extra lead time (out-of-house production) +
-  transfer store must expect to sell **10+ printed pieces** (= Supacolor 10-transfer min AND the DTF 10-23 pricing tier floor; was 12, corrected 2026-07-16). Poly product cards get `.ws-card__deco` "Poly fabric —
-  embroidery or DTF transfer only" (team ST350+ST650 done; other spokes' poly cards — Nike NKDC1963, ST469/ST700/LST700,
-  CS410, TM1MW452, EB544 — awaiting Erik's per-style confirmation). Also: every spoke pricing FAQ now ends "…shipped within about two
+  transfer store must expect to sell **10+ printed pieces** (= Supacolor 10-transfer min AND the DTF 10-23 pricing tier floor; was 12, corrected 2026-07-16). **ALL 66 cards on 11 spokes now carry a `.ws-card__deco` print-option
+  line (2026-07-16, Erik decided per-style):** DTG styles (7): PC61, BC3001, PC78H (code list) + BC3005, PC90H, PC68H,
+  PC78 (Erik-added) — shown as a menu-style .ws-card__pricing block (one .ws-card__pricerow per method: Embroidered / DTG full-front print / DTF transfer print, price right-aligned; DTG computed @12-23 FF tier + $6; per-card emb+$6 breakdown removed — pricenote carries it). Also a.ws-card anchor underline reset added (spoke product cards are bare <a class=ws-card>). DTF styles (20): everything
+  else incl. Gildan 2000/18500 + NL3600 (Erik: Gildan/NL3600 "do not print great" on DTG — NEVER move to DTG) — line =
+  "[Poly fabric — ]Print option: DTF transfer $X" where **DTF price = emb card price + $0.50 ALWAYS** (Erik: keep prices
+  distinct, never identical). Caps (112/CP96/NE200) = "Embroidery only". Sweep gotcha: JS `String.replace` with `$`-prices
+  in the replacement string mangles `$1`/`$2` as group refs — use a replacer FUNCTION. ⏳ open: `dtg-product-recommendations(-modal).js`
+  code lists DON'T include the 4 Erik-added DTG styles — ask Erik whether to sync (changes DTG builder modal UX). Also: every spoke pricing FAQ now ends "…shipped within about two
   weeks" (order turnaround answered on all 11, not just hub). **"No upfront cost" was WRONG and is scrubbed
   site-wide** — the $300 setup applies to fundraising stores too; never re-add that claim. Sweep tooling: scratchpad
   `pricing-copy-sweep.js` pattern (exact-string + expected-count, catches template drift).
@@ -92,7 +97,7 @@ links to the /company-webstores hub. Hub→spoke linking DONE: all 11 hub store-
   1920×1280; also og:image) — NWCA t-shirt fundraiser that raised **$6,800 for firefighters' families** (2015 Twisp fire;
   shirt honors the three fallen + injured survivor). Hero trust line captions it — keep caption if image ever changes;
   tone = memorial, keep dignified.
-- **Team-spoke `#names-numbers` section (2026-07-16)**: showroom-cta photo+copy block after #products — Lincoln Lynx
+- **`#names-numbers` section on team-spoke AND fundraising-spoke (2026-07-16)**: showroom-cta photo+copy block (team: after #products; fundraising: after #causes, lead adapted "walker's or player's name") — Lincoln Lynx
   football hoodie (Caspio 9457695, front logo + back name/number in one shot). Message: "Yes — we print names and numbers"
   on shirt/hoodie BACKS, but ALWAYS as an AE team order (roster collected once), NEVER online customization; webstore sells
   the logo gear alongside. Reuses hub's showroom-cta classes from golf-tournament-showcase.css.
@@ -100,6 +105,18 @@ links to the /company-webstores hub. Hub→spoke linking DONE: all 11 hub store-
   Ruthie+Kanha modeling (9457666, uses `--top` crop), CHP pink patch (9457672), Sock it to Cancer (9457678), 25%-to-Cancer-
   Research-Institute donation tee (9457681) + October "start in September" CTA. CSS: `.ws-card__photo--square/--top`
   modifiers in company-webstores.css. Scalable home for future cause shirts (Buddy Walk, memorials — add a card, not a section).
+
+## Roster-form funnel wiring (2026-07-16 — Erik decided after agent audit)
+
+- Names-and-numbers sections (team + fundraising) link **"Fill Out Your Roster Online" -> /pages/forms/team-roster-form.html**
+  (replaced the mailto ghost button; Call stays primary; callout adds "we'll confirm every name, number, and size with you
+  before production"). Rationale: structured roster > email; form captures contact info -> Forms Inbox (RST prefix).
+- **Slack wiring (DONE 2026-07-16): #form-leads channel (C0BHYGK47RA) + incoming webhook on the "NWCA Backend Alerts" app;**
+  `SLACK_FORM_LEADS_WEBHOOK_URL` set on caspio-pricing-proxy (v918, config-only restart). quote-request + webstore-request
+  pings are LIVE NOW (that code was already deployed — the env var was the missing piece for the whole lead funnel!).
+- **team-roster ping needs proxy deploy of a54114a** (adds team-roster to LEAD_NOTIFY_FORMS; committed + pushed to GitHub,
+  NOT yet deployed — Erik must confirm proxy deploys explicitly). Never link a form from a marketing page unless its
+  arrival pings — the Forms Inbox is pull-only.
 
 ## Spoke build detail
 
