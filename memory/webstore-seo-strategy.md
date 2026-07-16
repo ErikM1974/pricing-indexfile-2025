@@ -78,9 +78,14 @@ links to the /company-webstores hub. Hub→spoke linking DONE: all 11 hub store-
   ("DTG ink is made for cotton") — never let store copy imply DTG on polyester. **Poly/performance CAN print via DTF
   transfers** (Erik 2026-07-16): partner-printed (public phrase = **"our Los Angeles partner"**, Erik-confirmed — Supacolor
   NEVER named publicly, same rule as InkSoft/SanMar), heat-pressed in-house; extra lead time (out-of-house production) +
-  transfer store must expect to sell **10+ printed pieces** (= Supacolor 10-transfer min AND the DTF 10-23 pricing tier floor; was 12, corrected 2026-07-16). Poly product cards get `.ws-card__deco` "Poly fabric —
-  embroidery or DTF transfer only" (team ST350+ST650 done; other spokes' poly cards — Nike NKDC1963, ST469/ST700/LST700,
-  CS410, TM1MW452, EB544 — awaiting Erik's per-style confirmation). Also: every spoke pricing FAQ now ends "…shipped within about two
+  transfer store must expect to sell **10+ printed pieces** (= Supacolor 10-transfer min AND the DTF 10-23 pricing tier floor; was 12, corrected 2026-07-16). **ALL 66 cards on 11 spokes now carry a `.ws-card__deco` print-option
+  line (2026-07-16, Erik decided per-style):** DTG styles (7): PC61, BC3001, PC78H (code list) + BC3005, PC90H, PC68H,
+  PC78 (Erik-added) — line = "Print option: DTG full front $X" (computed @12-23 FF tier + $6). DTF styles (20): everything
+  else incl. Gildan 2000/18500 + NL3600 (Erik: Gildan/NL3600 "do not print great" on DTG — NEVER move to DTG) — line =
+  "[Poly fabric — ]Print option: DTF transfer $X" where **DTF price = emb card price + $0.50 ALWAYS** (Erik: keep prices
+  distinct, never identical). Caps (112/CP96/NE200) = "Embroidery only". Sweep gotcha: JS `String.replace` with `$`-prices
+  in the replacement string mangles `$1`/`$2` as group refs — use a replacer FUNCTION. ⏳ open: `dtg-product-recommendations(-modal).js`
+  code lists DON'T include the 4 Erik-added DTG styles — ask Erik whether to sync (changes DTG builder modal UX). Also: every spoke pricing FAQ now ends "…shipped within about two
   weeks" (order turnaround answered on all 11, not just hub). **"No upfront cost" was WRONG and is scrubbed
   site-wide** — the $300 setup applies to fundraising stores too; never re-add that claim. Sweep tooling: scratchpad
   `pricing-copy-sweep.js` pattern (exact-string + expected-count, catches template drift).
