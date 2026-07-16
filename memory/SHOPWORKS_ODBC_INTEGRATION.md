@@ -9,6 +9,7 @@
 - Server: **192.168.10.6** (OnSite host, LAN) · Port: default **2399** (leave blank in DSN)
 - Database file: `Data_ODBCMapping` · User/pass: `extro` / `extro` (**read-only** — enforces the never-write rule at the account level)
 - DSN-less connection string (works without creating a DSN): `DRIVER={FileMaker ODBC};Server=192.168.10.6;Database=Data_ODBCMapping;UID=extro;PWD=extro`
+- ✅ Verified 2026-07-16 from Erik's laptop: server pings (3-8ms) and **port 2399 OPEN — xDBC listener already live** (shipping integrations use it) → no ShopWorks ticket needed to enable server-side sharing. Laptop lacks the driver (no fmodbc64.dll) — install from Box link to query.
 
 ## Vendor rules (ShopWorks, binding)
 
