@@ -10,6 +10,7 @@
 - Database file: `Data_ODBCMapping` · User/pass: `extro` / `extro` (**read-only** — enforces the never-write rule at the account level)
 - DSN-less connection string (works without creating a DSN): `DRIVER={FileMaker ODBC};Server=192.168.10.6;Database=Data_ODBCMapping;UID=extro;PWD=extro`
 - ✅ Verified 2026-07-16 from Erik's laptop: server pings (3-8ms) and **port 2399 OPEN — xDBC listener already live** (shipping integrations use it) → no ShopWorks ticket needed to enable server-side sharing. Laptop lacks the driver (no fmodbc64.dll) — install from Box link to query.
+- Installer inspected 2026-07-16 (`SW ODBC Shipping Address.exe`, 2.9MB, ShopWorks v8.300 Advanced Installer, unsigned, Erik's copy arrived via Slack not Box): bundles **FileMaker ODBC driver 15.0.6, 32-BIT (`fmodbc32.dll`)** — contradicts card's "64-bit" claim; pre-creates DSN → Data_ODBCMapping w/ `UseLongVarchar` already ON + "ENTER YOUR SERVER IP HERE" placeholder. **If only 32-bit lands: agent = 32-bit Python/pyodbc + `SysWOW64\odbcad32.exe` DSN admin.** Verify actual DLL post-install; check Box folder for a Win64 variant.
 
 ## Vendor rules (ShopWorks, binding)
 
