@@ -1,3 +1,12 @@
+## v2026.07.16.3 (2026.07.16)
+
+- feat(webstores): print-option lines on all 66 product cards across 11 spokes
+- feat(webstores): menu-style pricing blocks on all 66 product cards
+- feat(webstores): names-and-numbers section on /fundraising-webstores too
+- fix(webstores): names-numbers section now says jerseys + sponsor logos explicitly
+- feat(webstores): "Fill Out Your Roster Online" button -> team-roster form
+- docs(memory): roster-form funnel wiring — #form-leads webhook live, proxy deploy pending
+
 ## v2026.07.16.2 (2026.07.16)
 
 - fix(webstores): accurate pricing copy on all 12 webstore pages — $300 setup, $6 handling, first-tier (1-7) emb rate
