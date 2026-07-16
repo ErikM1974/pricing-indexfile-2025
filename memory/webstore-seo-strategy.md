@@ -73,7 +73,9 @@ links to the /company-webstores hub. Hub→spoke linking DONE: all 11 hub store-
   spokes. Store *setup* remains "1–2 weeks" (a different number — don't conflate).
 - **Standard pricing copy on ALL 11 spokes + hub (Erik 2026-07-16)**: "first-tier (1–7 piece) left-chest embroidery rate
   plus a flat $6 handling fee … one-time $300 setup fee to build and brand your store" — in every spoke's pricing FAQ
-  (added one to construction, which lacked it) AND every ws-pricenote. **"No upfront cost" was WRONG and is scrubbed
+  (added one to construction, which lacked it) AND every ws-pricenote (pricenote says price "includes your left-chest
+  embroidered logo"). Second ws-pricenote on all 11 spokes: **DTG offered but ONLY on tested/approved COTTON tees+hoodies**
+  ("DTG ink is made for cotton") — poly/performance = embroidery-only; never let store copy imply DTG on polyester. **"No upfront cost" was WRONG and is scrubbed
   site-wide** — the $300 setup applies to fundraising stores too; never re-add that claim. Sweep tooling: scratchpad
   `pricing-copy-sweep.js` pattern (exact-string + expected-count, catches template drift).
 - Hub FAQ now covers fundraising give-back (links /fundraising-webstores); fundraising spoke has a "what do you recommend
