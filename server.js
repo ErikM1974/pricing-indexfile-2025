@@ -3079,6 +3079,13 @@ app.get('/dashboards/sanmar-api-reference.html', requireCrmRole(['admin']), (req
   res.sendFile(path.join(__dirname, 'dashboards', 'sanmar-api-reference.html'));
 });
 
+// ShopWorks OnSite ODBC reference — ERIK ONLY (hard email gate, like caspio-api-reference):
+// the page displays the ODBC connection card (LAN server + read-only credentials), the
+// FileMaker query rules, and the 2,630-field Data_ODBCMapping catalog. Before the mount.
+app.get('/dashboards/shopworks-odbc-reference.html', requireCrmEmail(['erik@nwcustomapparel.com']), (req, res) => {
+  res.sendFile(path.join(__dirname, 'dashboards', 'shopworks-odbc-reference.html'));
+});
+
 // Customer Portal admin console — manage who can log into the customer portal
 // (Customer_Portal_Access invites). Open to the management team by ROLE (Erik=admin,
 // Bradley=accountant, Ruth=art, Taneisha/Nika=sales). The two rep tags are included so

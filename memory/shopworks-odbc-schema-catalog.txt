@@ -1,0 +1,2630 @@
+﻿Addr|All|decimal
+Addr|date_Creation|date
+Addr|date_Modification|date
+Addr|gn_ID_Address|global decimal
+Addr|gn_ID_Unique|global decimal
+Addr|gn_ID_User|global decimal
+Addr|ID_Address|decimal
+Addr|ID_Unique|decimal
+Addr|sts_Archive|decimal
+Addr|time_Creation|time
+Addr|time_Modification|time
+Addr|timestamp_Creation|timestamp
+Addr|timestamp_Modification|timestamp
+Addr|id_Customer|decimal
+Addr|id_Vendor|decimal
+Addr|AddressCompany|varchar
+Addr|Address1|varchar
+Addr|Address2|varchar
+Addr|AddressCity|varchar
+Addr|AddressState|varchar
+Addr|AddressCountry|varchar
+Addr|AddressZip|varchar
+Addr|id_VendorMain|decimal
+Addr|id_Employee|decimal
+Addr|id_EmployeeMain|decimal
+Addr|ct_AddressFull|varchar
+Addr|sts_MainAddress|decimal
+Addr|AddressDescription|varchar
+Addr|explode_Company|varchar
+Addr|explode_Address1|varchar
+Addr|explode_Address2|varchar
+Addr|explode_City|varchar
+Addr|explode_State|varchar
+Addr|explode_Zip|varchar
+Addr|explode_Country|varchar
+Addr|id_CustomerMain|decimal
+Addr|sts_Omit|decimal
+Addr|id_CompanyLocationShipping|decimal
+Addr|id_CompanyLocationBilling|decimal
+Addr|gt_SFFilterLayout|global varchar
+Addr|gt_SFFilterTable|global varchar
+Addr|gn_id_Customer|global decimal
+Addr|gn_id_Vendor|global decimal
+Addr|cn_FoundCount|decimal
+Addr|explode_Description|varchar
+Addr|gn_PortalColumn|global decimal[10]
+Addr|id_Contact|decimal
+Addr|id_Marketing|decimal
+Addr|id_Quote|decimal
+Addr|gt_ID_Block|global varchar
+Addr|gn_id_MarketingDB_Working|global decimal
+Addr|gt_Access_Overall|global varchar
+Addr|gt_Access_Record|global varchar
+Addr|gt_CustomExport_Category|global varchar
+Addr|gt_CustomExport_Source|global varchar
+Addr|gt_CustomReport_Category|global varchar
+Addr|gt_CustomReport_Source|global varchar
+Addr|gn_All|global decimal
+Addr|sum_All|decimal
+Addr|id_MarketingImport|decimal
+Addr|ct_AddressFullPrint|varchar
+Addr|id_Order|decimal
+Addr|ShipMethod|varchar
+Addr|gn_id_Order|global decimal
+Addr|gn_id_LineOE|global decimal
+Addr|ct_CityStateZipCountry|varchar
+Addr|id_EmployeeOwn|varchar
+Addr|sts_OwnershipMode|decimal
+Addr|sts_OwnershipType|decimal
+Addr|ct_ContactEmail|varchar
+Addr|ct_ContactName|varchar
+Addr|ct_id_OrderKeyImport|varchar
+Addr|id_OrderKeyAlpha|varchar
+Addr|sts_ShipStation|decimal
+Addr|timestamp_ShipstationLastUpdate|timestamp
+Buttons|All|decimal
+Buttons|date_Creation|date
+Buttons|date_Modification|date
+Buttons|gn_ID_Unique|global decimal
+Buttons|gn_ID_User|global decimal
+Buttons|ID_Unique|decimal
+Buttons|sts_Archive|decimal
+Buttons|time_Creation|time
+Buttons|time_Modification|time
+Buttons|timestamp_Creation|timestamp
+Buttons|timestamp_Modification|timestamp
+Buttons|ID_Serial|decimal
+Buttons|ID_Button|decimal
+Buttons|ButtonText|varchar
+Buttons|ButtonPrimary|binary
+Buttons|ButtonSecondary|binary
+Buttons|ButtonPrint|binary
+Buttons|PrintText|varchar
+Buttons|gn_All|global decimal
+Buttons|sum_All|decimal
+ContactNumbers|All|decimal
+ContactNumbers|date_Creation|date
+ContactNumbers|date_Modification|date
+ContactNumbers|gn_ID_Contact|global decimal
+ContactNumbers|gn_ID_Unique|global decimal
+ContactNumbers|gn_ID_User|global decimal
+ContactNumbers|ID_ContactNumber|decimal
+ContactNumbers|ID_Unique|decimal
+ContactNumbers|sts_Archive|decimal
+ContactNumbers|time_Creation|time
+ContactNumbers|time_Modification|time
+ContactNumbers|timestamp_Creation|timestamp
+ContactNumbers|timestamp_Modification|timestamp
+ContactNumbers|id_Contact|decimal
+ContactNumbers|Number|varchar
+ContactNumbers|Email|varchar
+ContactNumbers|sts_Omit|decimal
+ContactNumbers|cn_FoundCount|decimal
+ContactNumbers|sts_Phone|decimal
+ContactNumbers|sts_Fax|decimal
+ContactNumbers|sts_Email|decimal
+ContactNumbers|sts_Primary|decimal
+ContactNumbers|Label|varchar
+ContactNumbers|sts_SortOrder|decimal
+ContactNumbers|sts_EnableBulkEmail|decimal
+ContactNumbers|ct_Label_Number|varchar
+ContactNumbers|gn_All|global decimal
+ContactNumbers|sum_All|decimal
+ContactNumbers|id_MarketingImport|decimal
+ContactNumbers|ct_NameFull|varchar
+ContactNumbers|cn_sts_Email|decimal
+Contacts|All|decimal
+Contacts|date_Creation|date
+Contacts|date_Modification|date
+Contacts|gn_ID_Contact|global decimal
+Contacts|gn_ID_Unique|global decimal
+Contacts|gn_ID_User|global decimal
+Contacts|ID_Contact|decimal
+Contacts|ID_Unique|decimal
+Contacts|sts_Archive|decimal
+Contacts|time_Creation|time
+Contacts|time_Modification|time
+Contacts|timestamp_Creation|timestamp
+Contacts|timestamp_Modification|timestamp
+Contacts|id_Customer|decimal
+Contacts|id_Vendor|decimal
+Contacts|id_Marketing|decimal
+Contacts|NameFirst|varchar
+Contacts|NameLast|varchar
+Contacts|Title|varchar
+Contacts|Email_Primary|varchar
+Contacts|sts_EnableBulkEmail|decimal
+Contacts|Notes|varchar
+Contacts|sts_SortOrder|decimal
+Contacts|gn_RecordNumber|global decimal
+Contacts|ct_id_Vendor_Email|decimal
+Contacts|ct_NameFull|varchar
+Contacts|ct_id_Customer_Email|decimal
+Contacts|Department|varchar
+Contacts|explode_NameFull|varchar
+Contacts|explode_Department|varchar
+Contacts|explode_Title|varchar
+Contacts|sts_Omit|decimal
+Contacts|gt_SFFilterLayout|global varchar
+Contacts|gt_SFFilterTable|global varchar
+Contacts|cn_FoundCount|decimal
+Contacts|sts_Attachments|decimal
+Contacts|id_Quote|decimal
+Contacts|ct_ID_Special|varchar
+Contacts|gn_id_Customer|global decimal
+Contacts|gn_id_Marketing|global decimal
+Contacts|gn_id_Quote|global decimal
+Contacts|All Copy|decimal
+Contacts|sts_Activity|decimal
+Contacts|id_ContRel|decimal
+Contacts|sts_Relationship|decimal
+Contacts|gn_id_Vendor|global decimal
+Contacts|id_Activity|decimal
+Contacts|gt_ID_Block|global varchar
+Contacts|cn_ContactSource|decimal
+Contacts|gt_ID_Contact_List|global varchar
+Contacts|gt_Access_Overall|global varchar
+Contacts|gn_id_MarketingDB_Working|global decimal
+Contacts|gt_Access_Record|global varchar
+Contacts|gt_CustomReport_Source|global varchar
+Contacts|gt_CustomReport_Category|global varchar
+Contacts|gt_CustomExport_Category|global varchar
+Contacts|gt_CustomExport_Source|global varchar
+Contacts|gn_All|global decimal
+Contacts|sum_All|decimal
+Contacts|gt_BulkEmailList|global varchar
+Contacts|gt_BulkEmailSeparator|global varchar
+Contacts|gt_BulkEmail_File_From|global varchar
+Contacts|id_MarketingImport|decimal
+Contacts|id_EmployeeOwn|varchar
+Contacts|sts_OwnershipMode|decimal
+Contacts|sts_OwnershipType|decimal
+Cust|All|decimal
+Cust|date_Creation|date
+Cust|date_Modification|date
+Cust|gn_ID_Customer|global decimal
+Cust|gn_ID_Unique|global decimal
+Cust|gn_ID_User|global decimal
+Cust|ID_Customer|decimal
+Cust|ID_Unique|decimal
+Cust|sts_Archive|decimal
+Cust|time_Creation|time
+Cust|time_Modification|time
+Cust|timestamp_Creation|timestamp
+Cust|timestamp_Modification|timestamp
+Cust|coa_AccountSalesTax01|varchar
+Cust|coa_AccountSalesTax02|varchar
+Cust|id_IndexMarketing|decimal
+Cust|id_CompanyLocation|decimal
+Cust|n_EmployeeCount|decimal
+Cust|id_ReceivableStatus_01|decimal
+Cust|sts_Activity|decimal
+Cust|sts_EmailTo1|decimal
+Cust|sts_EmailTo2|decimal
+Cust|sts_EmailTo3|decimal
+Cust|sts_EmailTo4|decimal
+Cust|sts_EnableFinanceCharges|decimal
+Cust|sts_FinanceChargeLineitemSetting|decimal
+Cust|sts_FinanceChargeAddDatesDescription|decimal
+Cust|sts_Notify1|decimal
+Cust|sts_Notify2|decimal
+Cust|sts_Notify3|decimal
+Cust|sts_Notify4|decimal
+Cust|sts_Notify5|decimal
+Cust|sts_ApplySalesTax_01|decimal
+Cust|pref_PrintPackingList|decimal
+Cust|sts_PrintBulkStatement|decimal
+Cust|sts_OrdersLinkAccess|decimal
+Cust|sts_FinanceChargeSettings|decimal
+Cust|CompanyName|varchar
+Cust|cur_CreditLimit|decimal
+Cust|cur_CreditUsed|decimal
+Cust|cnCur_CreditLeft|decimal
+Cust|CustomField01|varchar
+Cust|CustomField02|varchar
+Cust|CustomField03|varchar
+Cust|NotesCustomerReminder|varchar
+Cust|CustomerWarning|varchar
+Cust|date_TaxExemptExpiration|date
+Cust|Email1|varchar
+Cust|Email2|varchar
+Cust|Email3|varchar
+Cust|Email4|varchar
+Cust|Email5|varchar
+Cust|EmailCC1|varchar
+Cust|EmailCC2|varchar
+Cust|EmailCC3|varchar
+Cust|EmailCC4|varchar
+Cust|EmailCC5|varchar
+Cust|EmailHeader1|varchar
+Cust|EmailHeader2|varchar
+Cust|EmailHeader3|varchar
+Cust|EmailHeader4|varchar
+Cust|EmailHeader5|varchar
+Cust|EmailInvoice|varchar
+Cust|EmailInvoiceBCC|varchar
+Cust|EmailInvoiceCC|varchar
+Cust|EmailReceivables|varchar
+Cust|EmailReceivablesBCC|varchar
+Cust|EmailReceivablesCC|varchar
+Cust|EmailResponse5|varchar
+Cust|ExtCustomerID|varchar
+Cust|FinanceChargeProductDescription|varchar
+Cust|FinanceChargeProductID|varchar
+Cust|NotesCustomerInternal|varchar
+Cust|NotesCustomerInvoice|varchar
+Cust|id_DiscountLevel|decimal
+Cust|ReceivableContactNameFirst|varchar
+Cust|ReceivableContactNameLast|varchar
+Cust|ReferenceFrom|varchar
+Cust|id_SalesGroup|decimal
+Cust|SICCOde|varchar
+Cust|SICDescription|varchar
+Cust|TaxExemptNumber|varchar
+Cust|WebsiteURL|varchar
+Cust|OrdersLinkPassword|varchar
+Cust|OrdersLinkUsername|varchar
+Cust|cur_Statement_Over1|decimal
+Cust|cur_Statement_Over30|decimal
+Cust|cur_Statement_Over60|decimal
+Cust|cur_Statement_Over90|decimal
+Cust|cur_Statement_TotalBalance|decimal
+Cust|cur_Statement_Current|decimal
+Cust|cur_Statement_TotalInvoice|decimal
+Cust|id_AddressBilling|decimal
+Cust|sts_Active|decimal
+Cust|CustomerType|varchar
+Cust|CustomerSource|varchar
+Cust|Terms|varchar
+Cust|id_EmployeeOwn|varchar
+Cust|ct_NotesCustomerInternal|varchar
+Cust|gt_AddressCompany|global varchar
+Cust|gt_Address1|global varchar
+Cust|gt_AddressCity|global varchar
+Cust|gt_AddressState|global varchar
+Cust|gt_AddressZip|global varchar
+Cust|gt_AddressCountry|global varchar
+Cust|gt_Address2|global varchar
+Cust|filter_AddressCompany|varchar
+Cust|filter_Address1|varchar
+Cust|filter_Address2|varchar
+Cust|filter_AddressCity|varchar
+Cust|filter_AddressState|varchar
+Cust|filter_AddressZip|varchar
+Cust|filter_AddressCountry|varchar
+Cust|gn_PortalRecordCountAddresses|global decimal
+Cust|gn_RecordCountAddresses|global decimal
+Cust|InvoiceContactNameFirst|varchar
+Cust|InvoiceContactNameLast|varchar
+Cust|gt_ContactNameFull|global varchar
+Cust|gt_ContactDepartment|global varchar
+Cust|filter_ContactNameFull|varchar
+Cust|filter_ContactDepartment|varchar
+Cust|gn_PortalRecordCountContacts|global decimal
+Cust|gn_RecordCountContacts|global decimal
+Cust|gn_id_Contact|global decimal
+Cust|gt_ContactTitle|global varchar
+Cust|filter_ContactTitle|varchar
+Cust|sts_Omit|decimal
+Cust|date_FinanceChargesAssessed|date
+Cust|sts_FinanceChargeOnCharge|decimal
+Cust|cur_FinanceChargeMinimum|decimal
+Cust|per_FinanceChargePercentage|decimal
+Cust|gt_OrdersLinkValidityCheck|global varchar
+Cust|gt_OrdersLinkUsername|global varchar
+Cust|sts_OrdersLinkError|decimal
+Cust|sts_OrdersLinkReady|decimal
+Cust|gt_HeaderTextModify|global varchar
+Cust|gt_SFFilterLayout_Customer|global varchar
+Cust|gt_SFFilterTable|global varchar
+Cust|LogField|varchar
+Cust|cn_FoundCount|decimal
+Cust|EmailMain|varchar
+Cust|filter_AddressDescription|varchar
+Cust|gt_AddressDescription|global varchar
+Cust|CustomField04|varchar
+Cust|CustomField05|varchar
+Cust|CustomField06|varchar
+Cust|CustomField07|date
+Cust|CustomField08|date
+Cust|CustomField09|date
+Cust|CustomField10|date
+Cust|sts_Attachments|decimal
+Cust|gn_id_Employee|global decimal
+Cust|sts_OwnershipType|decimal
+Cust|sts_DiscrepancyLogs|decimal
+Cust|gt_EmployeeNameFull|global varchar
+Cust|filter_EmployeeNameFull|varchar
+Cust|ct_id_EmployeeOwn|varchar
+Cust|sts_OwnershipMode|decimal
+Cust|gt_DepartmentCode|global varchar
+Cust|filter_DepartmentCode|varchar
+Cust|gt_id_EmployeeOwn_Add|global varchar
+Cust|gt_id_EmployeeOwn_Replace|global varchar
+Cust|gt_id_EmployeeOwn_Delete|global varchar
+Cust|CustomerServiceRep|varchar
+Cust|gt_PortalActivity|global varchar
+Cust|PortalReceivablesActivity|varchar
+Cust|id_DefaultCalculator1|decimal
+Cust|id_DefaultCalculator2|decimal
+Cust|sts_ForceDefaultCalculator1|decimal
+Cust|sts_ForceDefaultCalculator2|decimal
+Cust|gt_ID_Block|global varchar
+Cust|PhoneMain|varchar
+Cust|FaxMain|varchar
+Cust|gd_BulkLetterDate|global date
+Cust|explode_CompanyName|varchar
+Cust|cur_TotalYearSales1|decimal
+Cust|cur_TotalYearSales2|decimal
+Cust|cur_TotalYearSales3|decimal
+Cust|cur_TotalYearSales4|decimal
+Cust|cur_TotalYearSales5|decimal
+Cust|cur_TotalYearSales6|decimal
+Cust|cur_TotalYearSales7|decimal
+Cust|cur_TotalYearSales8|decimal
+Cust|cur_TotalYearSales9|decimal
+Cust|cur_TotalYearSales10|decimal
+Cust|cn_SumTotalYearSales|decimal
+Cust|sum_TotalYearSales1|decimal
+Cust|sum_TotalYearSales2|decimal
+Cust|sum_TotalYearSales3|decimal
+Cust|sum_TotalYearSales4|decimal
+Cust|sum_TotalYearSales5|decimal
+Cust|sum_TotalYearSales6|decimal
+Cust|sum_TotalYearSales7|decimal
+Cust|sum_TotalYearSales8|decimal
+Cust|sum_TotalYearSales9|decimal
+Cust|sum_TotalYearSales10|decimal
+Cust|sum_SumTotalYearSales|decimal
+Cust|gn_CustAnnualSales|global decimal
+Cust|gd_SalesDateStart|global date
+Cust|gd_SalesDateEnd|global date
+Cust|cur_TotalMonthSales1|decimal
+Cust|cur_TotalMonthSales2|decimal
+Cust|cur_TotalMonthSales5|decimal
+Cust|cur_TotalMonthSales6|decimal
+Cust|cur_TotalMonthSales7|decimal
+Cust|cur_TotalMonthSales8|decimal
+Cust|cur_TotalMonthSales9|decimal
+Cust|cur_TotalMonthSales10|decimal
+Cust|cur_TotalMonthSales11|decimal
+Cust|cur_TotalMonthSales12|decimal
+Cust|cur_TotalMonthSales3|decimal
+Cust|cur_TotalMonthSales4|decimal
+Cust|cn_SumTotalMonthSales|decimal
+Cust|gn_CustMonthlySales|global decimal
+Cust|sum_TotalMonthSales1|decimal
+Cust|sum_TotalMonthSales2|decimal
+Cust|sum_TotalMonthSales5|decimal
+Cust|sum_TotalMonthSales6|decimal
+Cust|sum_TotalMonthSales7|decimal
+Cust|sum_TotalMonthSales8|decimal
+Cust|sum_TotalMonthSales9|decimal
+Cust|sum_TotalMonthSales10|decimal
+Cust|sum_TotalMonthSales11|decimal
+Cust|sum_TotalMonthSales12|decimal
+Cust|sum_TotalMonthSales3|decimal
+Cust|sum_TotalMonthSales4|decimal
+Cust|sum_SumTotalMonthSales|decimal
+Cust|coa_AccountSalesTax03|varchar
+Cust|coa_AccountSalesTax04|varchar
+Cust|gt_coa_SalesTax_Change01|global varchar
+Cust|gt_coa_SalesTax_Change02|global varchar
+Cust|gt_coa_SalesTax_Change03|global varchar
+Cust|gt_coa_SalesTax_Change04|global varchar
+Cust|gn_sts_ChargeSalesTax_Change|global decimal
+Cust|gn_All|global decimal
+Cust|InvoiceType|varchar
+Cust|ct_PortalMatch|varchar
+Cust|cur_Statement_TotalPayments|decimal
+Cust|id_ReceivableStatus_02|decimal
+Cust|id_ReceivableStatus_03|decimal
+Cust|HoldMessage|varchar
+Cust|ct_HoldMessage|varchar
+Cust|id_Employee_Receivable|decimal
+Cust|sts_CreditAutoHold|decimal
+Cust|gt_SFFilterLayout_Receivables|global varchar
+Cust|sum_cur_Statement_TotalInvoice|decimal
+Cust|sum_cur_Statement_TotalPayments|decimal
+Cust|sum_cur_Statement_TotalBalance|decimal
+Cust|sum_cur_Statement_Current|decimal
+Cust|sum_cur_Statement_Over1|decimal
+Cust|sum_cur_Statement_Over30|decimal
+Cust|sum_cur_Statement_Over60|decimal
+Cust|sum_cur_Statement_Over90|decimal
+Cust|gt_IDList_Statement|global varchar
+Cust|cur_Payment_TotalPayments|decimal
+Cust|cur_Payment_TotalUnapplied|decimal
+Cust|cur_Payment_TotalDiscount|decimal
+Cust|cur_Payment_TotalTransaction|decimal
+Cust|avg_DaysLate|decimal
+Cust|gt_CustomExportCategory|global varchar
+Cust|gt_CustomExportSource|global varchar
+Cust|gt_CustomReportCategory|global varchar
+Cust|gt_CustomReportSource|global varchar
+Cust|date_LastOrdered|date
+Cust|sum_All|decimal
+Cust|cur_FinanceChargeTemporary|decimal
+Cust|sum_cur_FinanceChargeTemporary|decimal
+Cust|gn_id_OrderType|global decimal
+Cust|gn_id_CompanyLocation|global decimal
+Cust|FixedPriceColumn|varchar
+Cust|gt_MonthYear|global varchar
+Cust|gn_id_FormsViewer|global decimal
+Cust|gn_id_Order|global decimal
+Cust|gt_FieldName|global varchar
+Cust|id_Marketing|decimal
+Cust|id_Quote|decimal
+Cust|sts_ApplySalesTax_02|decimal
+Cust|sts_ApplySalesTax_03|decimal
+Cust|sts_ApplySalesTax_04|decimal
+Cust|sts_ShippingTaxable|decimal
+Cust|gn_ID_Customer_Merge|global decimal
+Cust|gt_CompanyName|global varchar
+Cust|filter_CompanyName|varchar
+Cust|SalesGroup|varchar
+Cust|gn_id_DiscountLevel|global decimal
+Cust|gn_id_DefaultCalculator1|global decimal
+Cust|gn_id_DefaultCalculator2|global decimal
+Cust|gn_ForceDefaultCalculator1|global decimal
+Cust|gn_ForceDefaultCalculator2|global decimal
+Cust|gt_id_AccountMain|global varchar
+Cust|NotesCustomerReminderInvoice|varchar
+Cust|ct_NotesCustomerReminderInvoice|varchar
+Cust|sts_TaxExempt|decimal
+Cust|ct_NotesCustomerReminder|varchar
+Des|All|decimal
+Des|date_Creation|date
+Des|date_Modification|date
+Des|gn_ID_Design|global decimal
+Des|gn_ID_Unique|global decimal
+Des|gn_ID_User|global decimal
+Des|ID_Design|decimal
+Des|ID_Unique|decimal
+Des|sts_Archive|decimal
+Des|time_Creation|time
+Des|time_Modification|time
+Des|timestamp_Creation|timestamp
+Des|timestamp_Modification|timestamp
+Des|sts_Omit|decimal
+Des|gt_SFFilterLayout|global varchar
+Des|gt_SFFilterTable|global varchar
+Des|DesignName|varchar
+Des|id_Customer|decimal
+Des|sts_Active|decimal
+Des|cn_FoundCount|decimal
+Des|ColorProduct|varchar
+Des|id_VendorDesign|varchar
+Des|SepType|varchar
+Des|SepTime|decimal
+Des|sts_DesignDone|decimal
+Des|gn_id_DesignType|global decimal
+Des|id_DesignType|decimal
+Des|gt_ErrorMessage|global varchar
+Des|CustomField01|varchar
+Des|CustomField02|varchar
+Des|CustomField03|varchar
+Des|CustomField04|varchar
+Des|CustomField05|varchar
+Des|sts_Attachments|decimal
+Des|sts_Thumbnails|decimal
+Des|date_Designed|date
+Des|cn_LocationCount|decimal
+Des|gt_ID_Design_BlockForSelection|global varchar
+Des|id_Serial_Status|decimal
+Des|id_Key_TaskListOrder|varchar
+Des|sts_StatusType|decimal
+Des|sts_AllowUpdate|decimal
+Des|id_Employee_Artist|decimal
+Des|cn_TotalLogHours|decimal
+Des|gn_id_Variation|global decimal
+Des|gt_CustomExportCategory|global varchar
+Des|gt_CustomExportSource|global varchar
+Des|gt_CustomReportCategory|global varchar
+Des|gt_CustomReportSource|global varchar
+Des|sum_TotalDesigns|decimal
+Des|gn_All|global decimal
+Des|ct_DesignName|varchar
+Des|sum_All|decimal
+Des|id_Key_Status_Design|varchar
+Des|id_Key_Status_Design_Done|varchar
+Des|gt_ID_Block|global varchar
+Des|ExtDesignID|varchar
+Des|NotesToProduction|varchar
+Des|ct_NotesToProduction|varchar
+Des|gn_sts_Clone_IncludeVariations|global decimal
+Des|id_EmployeeOwn|varchar
+Des|sts_OwnershipMode|decimal
+Des|sts_OwnershipType|decimal
+Des|gn_PS_ID_CustomerInternal|global decimal
+Des|gt_PS_ProofFilter|global varchar
+Des|id_PS_ProofTable|decimal
+Des|ID_DesignSerial|decimal
+Des|sts_Variation|decimal
+Des|id_Variation|decimal
+Des|id_DesignParent|decimal
+Des|ct_CustomField01|varchar
+Des|ct_CustomField05|varchar
+Des|ct_CustomField02|varchar
+Des|ct_CustomField03|varchar
+Des|ct_CustomField04|varchar
+Des|cn_id_Family|decimal
+Event|All|decimal
+Event|date_Creation|date
+Event|date_Modification|date
+Event|gn_ID_Event|global decimal
+Event|gn_ID_Unique|global decimal
+Event|gn_ID_User|global decimal
+Event|ID_Event|decimal
+Event|ID_Unique|decimal
+Event|sts_Archive|decimal
+Event|time_Creation|time
+Event|time_Modification|time
+Event|timestamp_Creation|timestamp
+Event|timestamp_Modification|timestamp
+Event|sts_Omit|decimal
+Event|gt_SFFilterLayout|global varchar
+Event|gt_SFFilterTable|global varchar
+Event|gn_All|global decimal
+Event|sum_All|decimal
+Event|id_ProductionEvent|decimal
+Event|id_Order|decimal
+Event|id_OrderDesign|decimal
+Event|id_Design|decimal
+Event|id_OrderDesLoc|decimal
+Event|id_Machine|decimal
+Event|sts_Master|decimal
+Event|cn_DesignsByFormat|decimal
+Event|cn_LocationsByFormat|decimal
+Event|cn_Qty|decimal
+Event|cn_sts_HasVariations|decimal
+Event|Qty|decimal
+Event|date_Scheduled|date
+Event|ct_ColorBlock|varchar
+Event|ct_StitchesBlock|decimal
+Event|gn_Colors|global decimal
+Event|gn_Stitches|global decimal
+Event|gn_id_Machine|global decimal
+Event|TimeSetup|decimal
+Event|TimeRun|decimal
+Event|ct_TextBlock|decimal
+Event|ct_Location|varchar
+Event|cn_Highlight|decimal
+Event|id_DesignFormat|decimal
+Event|sts_LocationType|decimal
+Event|sts_SortOrder|decimal
+Event|DayAbbr|varchar
+Event|sts_Produced|decimal
+Event|cm_TimeSetupDisplay|time
+Event|cm_TimeRunDisplay|time
+Event|cn_TimeJob|decimal
+Event|cm_TimeJobDisplay|time
+Event|ct_QtyBlock|varchar
+Event|gn_ID_EventSelected|global decimal
+Event|cn_id_Design|decimal
+Event|ct_DesignTitle|varchar
+Event|cn_ColorsTotal|decimal
+Event|cn_StitchesTotal|decimal
+Event|ct_DesignIDs|varchar
+Event|cn_Locations|varchar
+Event|cn_sts_DesignEvent|decimal
+Event|cn_sts_NonDesignEvent|decimal
+Event|cn_FoundCount|decimal
+Event|gn_Qty|global decimal
+Event|gm_TimeJob|global time
+Event|sum_TimeSetup|time
+Event|sum_TimeRun|time
+Event|sum_TimeJob|time
+Event|sum_Qty|decimal
+Event|gt_ID_Block|global varchar
+Event|Notes|varchar
+Event|ct_Notes|varchar
+Event|cd_DateForCalendar|date
+Event|ct_id_EventForCalendar|varchar
+Event|ct_id_MachineForCalendar|varchar
+Event|sts_Priority|decimal
+Event|gdr_ganttDate|global date[28]
+Event|cor_MachineIcon|binary[28]
+Event|DateBlockRange|varchar
+Event|DateBlockExact|varchar
+Event|ct_id_OrderForCalendar|varchar
+Event|gn_id_Order|global decimal
+Event|cnr_MasterExtend|decimal[28]
+Event|cd_DateMaster|date
+Event|cn_MainCalendarrSort|decimal
+Event|cn_id_Order_Master|decimal
+Event|ct_Company_Master|varchar
+Event|ct_sts_DesignDone_Master|varchar
+Event|ct_sts_Received_Master|varchar
+Event|cd_DateReqShip_Master|date
+Event|cd_DateDropDead_Master|date
+Event|id_ProductionEventBlock|varchar
+Event|id_MachineBlock|varchar
+Event|gn_ID_User Copy|global decimal
+Event|go_SortUpGraphic|global binary
+Event|go_SortDownGraphic|global binary
+Event|co_SortUp|binary
+Event|co_SortDown|binary
+Event|cn_NonMaster|decimal
+Event|sts_NotScheduled|decimal
+Event|gt_CustomExportCategory|global varchar
+Event|gt_CustomExportSource|global varchar
+Event|gt_CustomReportCategory|global varchar
+Event|gt_CustomReportSource|global varchar
+Event|cm_TimeJob01|time
+Event|cm_TimeJob02|time
+Event|cm_TimeJob03|time
+Event|cm_TimeJob04|time
+Event|cm_TimeJob05|time
+Event|cm_TimeJob06|time
+Event|cm_TimeJob07|time
+Event|cm_TimeJob08|time
+Event|cm_TimeJob09|time
+Event|cm_TimeJob10|time
+Event|cm_TimeJob11|time
+Event|cm_TimeJob12|time
+Event|cm_TimeJob13|time
+Event|cm_TimeJob14|time
+Event|cm_TimeJob15|time
+Event|cm_TimeJob16|time
+Event|cm_TimeJob17|time
+Event|cm_TimeJob18|time
+Event|cm_TimeJob19|time
+Event|cm_TimeJob20|time
+Event|cm_TimeJob21|time
+Event|cm_TimeJob22|time
+Event|cm_TimeJob23|time
+Event|cm_TimeJob24|time
+Event|cm_TimeJob25|time
+Event|cm_TimeJob26|time
+Event|cm_TimeJob27|time
+Event|cm_TimeJob28|time
+Event|id_EmployeeOwn|varchar
+Event|sts_OwnershipMode|decimal
+Event|sts_OwnershipType|decimal
+Event|ct_ProductionEventName|varchar
+Event|ct_MachineName|varchar
+Event|ct_CompanyName|varchar
+Event|co_OrderTypeGraphic|binary
+Event|co_MachineIcon|binary
+Event|co_HasVariation|binary
+Event|co_HoldOrderGraphic|binary
+Event|co_ArtDone|binary
+Event|co_Purchased|binary
+Event|co_Received|binary
+Event|cd_DesignScheduled|date
+Event|cd_OrderPlaced|date
+Event|cd_OrderRequestedToShip|date
+Event|cd_OrderDropDead|date
+Event|ct_DateForGanttCalendar|varchar
+Event|date_To|date
+Event|z_sc_TimestampEndCalc|timestamp
+Event|z_sc_TimestampStartCalc|timestamp
+Event|time_FromSeed|time
+Event|time_ToSeed|time
+Event|ct_day_From|varchar
+Event|ct_day_To|varchar
+Event|ct_CalendarDisplay|varchar
+Event|cm_TimeScheduled|time
+Event|date_EventDone|date
+InvLevel|All|decimal
+InvLevel|date_Creation|date
+InvLevel|date_Modification|date
+InvLevel|gn_ID_InvLevel|global decimal
+InvLevel|gn_ID_Unique|global decimal
+InvLevel|gn_ID_User|global decimal
+InvLevel|ID_InvLevel|decimal
+InvLevel|ID_Unique|decimal
+InvLevel|sts_Archive|decimal
+InvLevel|time_Creation|time
+InvLevel|time_Modification|time
+InvLevel|timestamp_Creation|timestamp
+InvLevel|timestamp_Modification|timestamp
+InvLevel|sts_Omit|decimal
+InvLevel|gt_SFFilterLayout_Blank|global varchar
+InvLevel|gt_SFFilterTable|global varchar
+InvLevel|PartNumber|varchar
+InvLevel|PartColorRange|varchar
+InvLevel|PartColor|varchar
+InvLevel|PartDescription|varchar
+InvLevel|Size01|decimal
+InvLevel|Size02|decimal
+InvLevel|Size03|decimal
+InvLevel|Size04|decimal
+InvLevel|Size05|decimal
+InvLevel|Size06|decimal
+InvLevel|AE_Trigger|decimal
+InvLevel|gn_id_Order|global decimal
+InvLevel|gt_ID_Block|global varchar
+InvLevel|cn_LineQuantity|decimal
+InvLevel|SortOrder|decimal
+InvLevel|ct_PartRange|varchar
+InvLevel|gn_id_PO|global decimal
+InvLevel|gn_id_LineOE|global decimal
+InvLevel|gn_All|global decimal
+InvLevel|gn_id_LinePur|global decimal
+InvLevel|ct_PartColor|varchar
+InvLevel|sum_All|decimal
+InvLevel|cn_FoundCount|decimal
+InvLevel|cur_UnitCost|decimal
+InvLevel|id_InvLevelType|decimal
+InvLevel|sum_cn_LineQuantity|decimal
+InvLevel|sum_cnCur_LineCost|decimal
+InvLevel|sum_Size01|decimal
+InvLevel|sum_Size02|decimal
+InvLevel|sum_Size03|decimal
+InvLevel|sum_Size04|decimal
+InvLevel|sum_Size05|decimal
+InvLevel|sum_Size06|decimal
+InvLevel|cnCur_LineCost|decimal
+InvLevel|gt_Filter_StorageLoc01|global varchar
+InvLevel|gt_Filter_StorageLoc02|global varchar
+InvLevel|gt_Filter_StorageLoc03|global varchar
+InvLevel|cn_Size01_Filtered|decimal
+InvLevel|cn_Size01_NotStored|decimal
+InvLevel|cn_Size02_NotStored|decimal
+InvLevel|cn_Size03_NotStored|decimal
+InvLevel|cn_Size04_NotStored|decimal
+InvLevel|cn_Size05_NotStored|decimal
+InvLevel|cn_Size06_NotStored|decimal
+InvLevel|cn_LineQuantity_NotStored|decimal
+InvLevel|cn_Size02_Filtered|decimal
+InvLevel|cn_Size03_Filtered|decimal
+InvLevel|cn_Size04_Filtered|decimal
+InvLevel|cn_Size05_Filtered|decimal
+InvLevel|cn_Size06_Filtered|decimal
+InvLevel|gt_StorageMatch|global varchar
+InvLevel|gt_CustomExportCategory|global varchar
+InvLevel|gt_CustomExportSource|global varchar
+InvLevel|gt_CustomReportCategory|global varchar
+InvLevel|gt_CustomReportSource|global varchar
+InvLevel|SKU|varchar
+InvLevel|coa_Inventory|varchar
+InvLevel|id_EmployeeOwn|varchar
+InvLevel|sts_OwnershipMode|decimal
+InvLevel|sts_OwnershipType|decimal
+InvLevel|Size01_OnOrder|decimal
+InvLevel|Size01_InProduction|decimal
+InvLevel|Size01_Committed|decimal
+InvLevel|Size01_Reconciled|decimal
+InvLevel|Size02_Committed|decimal
+InvLevel|Size02_InProduction|decimal
+InvLevel|Size02_OnOrder|decimal
+InvLevel|Size02_Reconciled|decimal
+InvLevel|Size03_Committed|decimal
+InvLevel|Size03_InProduction|decimal
+InvLevel|Size03_OnOrder|decimal
+InvLevel|Size03_Reconciled|decimal
+InvLevel|Size04_Committed|decimal
+InvLevel|Size04_InProduction|decimal
+InvLevel|Size04_OnOrder|decimal
+InvLevel|Size04_Reconciled|decimal
+InvLevel|Size05_Committed|decimal
+InvLevel|Size05_InProduction|decimal
+InvLevel|Size05_OnOrder|decimal
+InvLevel|Size05_Reconciled|decimal
+InvLevel|Size06_Committed|decimal
+InvLevel|Size06_InProduction|decimal
+InvLevel|Size06_OnOrder|decimal
+InvLevel|Size06_Reconciled|decimal
+InvLevel|timestamp_InvManagementLastCalculated|timestamp
+InvLevel|sts_OrderWizard|decimal
+InvLevel|per_OrderWizardCushion|decimal
+InvLevel|sts_ReconciledNegative|decimal
+InvLevel|Size01_ToReachMin|decimal
+InvLevel|Size02_ToReachMin|decimal
+InvLevel|Size03_ToReachMin|decimal
+InvLevel|Size04_ToReachMin|decimal
+InvLevel|Size05_ToReachMin|decimal
+InvLevel|Size06_ToReachMin|decimal
+InvLevel|Size01_ToReachMax|decimal
+InvLevel|Size02_ToReachMax|decimal
+InvLevel|Size03_ToReachMax|decimal
+InvLevel|Size04_ToReachMax|decimal
+InvLevel|Size05_ToReachMax|decimal
+InvLevel|Size06_ToReachMax|decimal
+InvLevel|sts_ToReachMinNegative|decimal
+InvLevel|sts_ToReachMaxNegative|decimal
+InvLevel|gt_id_AccountMain|global varchar
+InvLevel|gn_id_CycleCount|global decimal
+InvLevel|cur_TotalMonthSales1|decimal
+InvLevel|cur_TotalYearSales1|decimal
+InvLevel|cur_TotalMonthSales2|decimal
+InvLevel|cur_TotalMonthSales3|decimal
+InvLevel|cur_TotalMonthSales4|decimal
+InvLevel|cur_TotalMonthSales5|decimal
+InvLevel|cur_TotalMonthSales6|decimal
+InvLevel|cur_TotalMonthSales7|decimal
+InvLevel|cur_TotalMonthSales8|decimal
+InvLevel|cur_TotalMonthSales9|decimal
+InvLevel|cur_TotalMonthSales10|decimal
+InvLevel|cur_TotalMonthSales11|decimal
+InvLevel|cur_TotalMonthSales12|decimal
+InvLevel|cur_TotalYearSales2|decimal
+InvLevel|cur_TotalYearSales3|decimal
+InvLevel|cur_TotalYearSales4|decimal
+InvLevel|cur_TotalYearSales5|decimal
+InvLevel|cur_TotalYearSales6|decimal
+InvLevel|cur_TotalYearSales7|decimal
+InvLevel|cur_TotalYearSales8|decimal
+InvLevel|cur_TotalYearSales9|decimal
+InvLevel|cur_TotalYearSales10|decimal
+InvLevel|cur_TotalYearSales11|decimal
+InvLevel|cur_TotalYearSales12|decimal
+InvLevel|ct_PartColorDisplay|varchar
+LinesOE|All|decimal
+LinesOE|date_Creation|date
+LinesOE|date_Modification|date
+LinesOE|gn_ID_LineOE|global decimal
+LinesOE|gn_ID_Unique|global decimal
+LinesOE|gn_ID_User|global decimal
+LinesOE|ID_LineOE|decimal
+LinesOE|ID_Unique|decimal
+LinesOE|sts_Archive|decimal
+LinesOE|time_Creation|time
+LinesOE|time_Modification|time
+LinesOE|timestamp_Creation|timestamp
+LinesOE|timestamp_Modification|timestamp
+LinesOE|sts_Omit|decimal
+LinesOE|gt_SFFilterLayout|global varchar
+LinesOE|gt_SFFilterTable|global varchar
+LinesOE|PartNumber|varchar
+LinesOE|PartColorRange|varchar
+LinesOE|PartColor|varchar
+LinesOE|PartDescription|varchar
+LinesOE|Size01_Req|decimal
+LinesOE|Size02_Req|decimal
+LinesOE|Size03_Req|decimal
+LinesOE|Size04_Req|decimal
+LinesOE|Size05_Req|decimal
+LinesOE|Size06_Req|decimal
+LinesOE|id_Order|decimal
+LinesOE|cn_LineQuantity_Req|decimal
+LinesOE|sts_UseCalcPrice|decimal
+LinesOE|cnCur_UnitPriceCalculated|decimal
+LinesOE|cur_UnitPriceUserEntered|decimal
+LinesOE|cnCur_UnitPriceUsed|decimal
+LinesOE|cnCur_LinePrice_Req|decimal
+LinesOE|gn_id_Order|global decimal
+LinesOE|sts_Purchased|decimal
+LinesOE|AE_Trigger|decimal
+LinesOE|cn_Size01_Purchased|decimal
+LinesOE|cn_Size02_Purchased|decimal
+LinesOE|cn_Size03_Purchased|decimal
+LinesOE|cn_Size04_Purchased|decimal
+LinesOE|cn_Size05_Purchased|decimal
+LinesOE|cn_Size06_Purchased|decimal
+LinesOE|cn_Size01_ToPurchase|decimal
+LinesOE|cn_Size02_ToPurchase|decimal
+LinesOE|cn_Size03_ToPurchase|decimal
+LinesOE|cn_Size04_ToPurchase|decimal
+LinesOE|cn_Size05_ToPurchase|decimal
+LinesOE|cn_Size06_ToPurchase|decimal
+LinesOE|sts_Received|decimal
+LinesOE|cn_Size01_PurchasedSub|decimal
+LinesOE|cn_Size02_PurchasedSub|decimal
+LinesOE|cn_Size03_PurchasedSub|decimal
+LinesOE|cn_Size04_PurchasedSub|decimal
+LinesOE|cn_Size05_PurchasedSub|decimal
+LinesOE|cn_Size06_PurchasedSub|decimal
+LinesOE|cn_Size01_ToPurchaseSub|decimal
+LinesOE|cn_Size02_ToPurchaseSub|decimal
+LinesOE|cn_Size03_ToPurchaseSub|decimal
+LinesOE|cn_Size04_ToPurchaseSub|decimal
+LinesOE|cn_Size05_ToPurchaseSub|decimal
+LinesOE|cn_Size06_ToPurchaseSub|decimal
+LinesOE|sts_PurchasedSub|decimal
+LinesOE|sts_ReceivedSub|decimal
+LinesOE|sts_ProductSource_Purchase|decimal
+LinesOE|sts_Production_Subcontract|decimal
+LinesOE|sts_EnableCommission|decimal
+LinesOE|sts_Storage_Ship|decimal
+LinesOE|sts_EnableTax01|decimal
+LinesOE|sts_EnableTax02|decimal
+LinesOE|sts_EnableTax03|decimal
+LinesOE|sts_EnableTax04|decimal
+LinesOE|Size01_Act|decimal
+LinesOE|Size02_Act|decimal
+LinesOE|Size03_Act|decimal
+LinesOE|Size04_Act|decimal
+LinesOE|Size05_Act|decimal
+LinesOE|Size06_Act|decimal
+LinesOE|cn_LineQuantity_Act|decimal
+LinesOE|id_OrderType|decimal
+LinesOE|cnCur_LinePrice_Act|decimal
+LinesOE|cnCur_LineTaxable01_Req|decimal
+LinesOE|cnCur_LineTaxable03_Req|decimal
+LinesOE|cnCur_LineTaxable04_Req|decimal
+LinesOE|cnCur_LineTaxable02_Req|decimal
+LinesOE|cnCur_LineTaxable01_Act|decimal
+LinesOE|cnCur_LineTaxable02_Act|decimal
+LinesOE|cnCur_LineTaxable03_Act|decimal
+LinesOE|cnCur_LineTaxable04_Act|decimal
+LinesOE|PartNumberDisplay|varchar
+LinesOE|PartDescriptionDisplay|varchar
+LinesOE|sts_Storage_Inventory|decimal
+LinesOE|sts_InvenAction|decimal
+LinesOE|sts_InvenActionDone|decimal
+LinesOE|sts_ComponentLine|decimal
+LinesOE|PartNumberAssb|varchar
+LinesOE|PartNumberCmpnt|varchar
+LinesOE|PartColorRangeAssb|varchar
+LinesOE|PartColorRangeCmpnt|varchar
+LinesOE|PartColorAssb|varchar
+LinesOE|PartColorCmpnt|varchar
+LinesOE|PartDescriptionAssb|varchar
+LinesOE|PartDescriptionCmpnt|varchar
+LinesOE|SortOrder|decimal
+LinesOE|SortMaster|decimal
+LinesOE|id_LineOE_AssbParent|decimal
+LinesOE|cn_sts_AssbLine|decimal
+LinesOE|cn_Size01_ToShipSpec|decimal
+LinesOE|cn_Size02_ToShipSpec|decimal
+LinesOE|cn_Size03_ToShipSpec|decimal
+LinesOE|cn_Size04_ToShipSpec|decimal
+LinesOE|cn_Size05_ToShipSpec|decimal
+LinesOE|cn_Size06_ToShipSpec|decimal
+LinesOE|sts_Shipped|decimal
+LinesOE|sts_ToAssignShipping|decimal
+LinesOE|gn_id_ProductSerial|global decimal
+LinesOE|ct_PartRangeVendor|varchar
+LinesOE|id_Vendor|decimal
+LinesOE|ct_PartRange|varchar
+LinesOE|id_PriceCalculationType|decimal
+LinesOE|id_ProductColorsBlock|varchar
+LinesOE|cur_UnitPrice155|decimal
+LinesOE|cur_UnitPrice160|decimal
+LinesOE|cur_UnitPrice165|decimal
+LinesOE|cur_UnitPrice170|decimal
+LinesOE|cur_UnitPrice175|decimal
+LinesOE|cur_UnitPrice180|decimal
+LinesOE|sts_PriceCalcQty|decimal
+LinesOE|cn_QtyForPricing|decimal
+LinesOE|cur_CalcSeedUserEntered|decimal
+LinesOE|id_PriceCalcPrint|varchar
+LinesOE|id_PriceCalcEmb|varchar
+LinesOE|gt_ID_LineOE_Block|global varchar
+LinesOE|PriceCalculatorValues|varchar
+LinesOE|gt_ID_Block|global varchar
+LinesOE|gn_id_Component|global decimal
+LinesOE|id_Component|decimal
+LinesOE|cn_sts_HasCmpnt|decimal
+LinesOE|Units_Qty|decimal
+LinesOE|Units_Type|varchar
+LinesOE|sts_UseSecondaryUnits|decimal
+LinesOE|PartDescriptionUnits|varchar
+LinesOE|sts_UnitsPricing|decimal
+LinesOE|sts_UnitsPurchasing|decimal
+LinesOE|ct_ColorRangeMatch|varchar
+LinesOE|Units_Area1|decimal
+LinesOE|Units_Area2|decimal
+LinesOE|cn_sts_UnitsUsingArea|decimal
+LinesOE|cn_LineQuantity_ToPrice|decimal
+LinesOE|cn_Size01_Current|decimal
+LinesOE|cn_Size02_Current|decimal
+LinesOE|cn_Size03_Current|decimal
+LinesOE|cn_Size04_Current|decimal
+LinesOE|cn_Size05_Current|decimal
+LinesOE|cn_Size06_Current|decimal
+LinesOE|cn_LineQuantity_Current|decimal
+LinesOE|sum_Size01_Current|decimal
+LinesOE|sum_Size02_Current|decimal
+LinesOE|cn_NumberOfDefects|decimal
+LinesOE|cnCur_LineCost_Purchased|decimal
+LinesOE|cnCur_LineCost_PurchasedSub|decimal
+LinesOE|cnCur_LineCost_ToPurchase|decimal
+LinesOE|ct_PartRangeColor|varchar
+LinesOE|coa_Revenue|varchar
+LinesOE|cur_Revenue|decimal
+LinesOE|coa_CostOfGoods|varchar
+LinesOE|cur_CostOfGoods|decimal
+LinesOE|id_VendorForPurchasing|decimal
+LinesOE|cur_UnitCost|decimal
+LinesOE|cnCur_UnitCostProduct|decimal
+LinesOE|cn_sts_UseAltQtys|decimal
+LinesOE|Size01_PurAlt|decimal
+LinesOE|Size02_PurAlt|decimal
+LinesOE|Size03_PurAlt|decimal
+LinesOE|Size04_PurAlt|decimal
+LinesOE|Size05_PurAlt|decimal
+LinesOE|Size06_PurAlt|decimal
+LinesOE|cn_HighlightAltQty|decimal
+LinesOE|cn_HighlightMainQty|decimal
+LinesOE|gn_id_PO|global decimal
+LinesOE|gn_All|global decimal
+LinesOE|sts_InProdLineQueue|decimal
+LinesOE|cur_UnitCostSubcontract|decimal
+LinesOE|sts_InSubLineQueue|decimal
+LinesOE|Size01_SubAlt|decimal
+LinesOE|Size02_SubAlt|decimal
+LinesOE|Size03_SubAlt|decimal
+LinesOE|Size04_SubAlt|decimal
+LinesOE|Size05_SubAlt|decimal
+LinesOE|Size06_SubAlt|decimal
+LinesOE|cn_sts_UseAltSub|decimal
+LinesOE|cn_HighlightAltQtySub|decimal
+LinesOE|cn_HighlightMainQtySub|decimal
+LinesOE|sts_UnitsPurchasingExtraPercent|decimal
+LinesOE|sts_UnitsPurchasingExtraRound|decimal
+LinesOE|gt_SFFilterLayout_Purchase|global varchar
+LinesOE|gt_SFFilterLayout_PurchaseSub|global varchar
+LinesOE|cn_FoundCount|decimal
+LinesOE|gn_id_POToIssue|global decimal
+LinesOE|gn_id_LinePur|global decimal
+LinesOE|gn_id_LineRec|global decimal
+LinesOE|gn_id_LineShip|global decimal
+LinesOE|gn_id_LineComp|global decimal
+LinesOE|id_VendorForSub|decimal
+LinesOE|cnCur_LineCost_Royalty|decimal
+LinesOE|sum_All|decimal
+LinesOE|cnCur_Line_Commissionable|decimal
+LinesOE|cnCur_LineCost_Product|decimal
+LinesOE|cnCur_LineCost_ShippingDistribution|decimal
+LinesOE|per_UnitCostOther|decimal
+LinesOE|cnCur_LineCost_Other|decimal
+LinesOE|cur_UnitCostOther|decimal
+LinesOE|cnCur_LineCost_LaborDistribution|decimal
+LinesOE|cnCur_Line_GrossProfit|decimal
+LinesOE|cnPer_Line_GrossProfitPercentage|decimal
+LinesOE|cnCur_LinePrice_Current|decimal
+LinesOE|gn_id_InvTransType|global decimal
+LinesOE|cn_sts_ToPurInStock_01|decimal
+LinesOE|ct_PartColor|varchar
+LinesOE|cn_sts_ToPurInStock_02|decimal
+LinesOE|cn_sts_ToPurInStock_03|decimal
+LinesOE|cn_sts_ToPurInStock_04|decimal
+LinesOE|cn_sts_ToPurInStock_05|decimal
+LinesOE|cn_sts_ToPurInStock_06|decimal
+LinesOE|cn_sts_PurAltInStock_01|decimal
+LinesOE|cn_sts_PurAltInStock_02|decimal
+LinesOE|cn_sts_PurAltInStock_03|decimal
+LinesOE|cn_sts_PurAltInStock_04|decimal
+LinesOE|cn_sts_PurAltInStock_05|decimal
+LinesOE|cn_sts_PurAltInStock_06|decimal
+LinesOE|cn_sts_HasPurAltInStock|decimal
+LinesOE|cn_sts_HasToPurInStock|decimal
+LinesOE|gt_CustomReportSource|global varchar
+LinesOE|gt_CustomReportCategory|global varchar
+LinesOE|gt_CustomExportCategory|global varchar
+LinesOE|gt_CustomExportSource|global varchar
+LinesOE|cn_sts_PurBoolean|decimal
+LinesOE|cn_sts_RecBoolean|decimal
+LinesOE|cn_sts_PurSubBoolean|decimal
+LinesOE|cn_sts_RecSubBoolean|decimal
+LinesOE|PartNumberPrint|varchar
+LinesOE|PartDescriptionPrint|varchar
+LinesOE|cnCur_LineCost_ToPurchaseCmpnts|decimal
+LinesOE|cnCur_LineCost_PurchasedCmpnts|decimal
+LinesOE|cnCur_LineCost_PurchasedSubCmpnts|decimal
+LinesOE|cnCur_LineCost_ProductCmpnts|decimal
+LinesOE|cnCur_LineCost_ProductTotal|decimal
+LinesOE|gn_Test|global decimal
+LinesOE|cnCur_UnitCostPurchasedAvg|decimal
+LinesOE|cnCur_CalcSeedFromProduct|decimal
+LinesOE|sts_ProductSource_Supplied|decimal
+LinesOE|sum_Size01_Req|decimal
+LinesOE|sum_Size01_Act|decimal
+LinesOE|sum_Size02_Act|decimal
+LinesOE|sum_Size02_Req|decimal
+LinesOE|sum_Size03_Act|decimal
+LinesOE|sum_Size03_Req|decimal
+LinesOE|sum_Size04_Act|decimal
+LinesOE|sum_Size04_Req|decimal
+LinesOE|sum_Size05_Act|decimal
+LinesOE|sum_Size05_Req|decimal
+LinesOE|sum_Size06_Act|decimal
+LinesOE|sum_Size06_Req|decimal
+LinesOE|OrderInstructions|varchar
+LinesOE|sum_cnCur_LinePrice_Req|decimal
+LinesOE|sum_cnCur_LinePrice_Act|decimal
+LinesOE|sum_cnCur_LineCost_Product|decimal
+LinesOE|sum_cn_LineQuantity_Act|decimal
+LinesOE|sum_cn_LineQuantity_Req|decimal
+LinesOE|sum_cn_NumberOfDefects|decimal
+LinesOE|OrderInvoiceNotes|varchar
+LinesOE|sum_cnCur_Line_GrossProfit|decimal
+LinesOE|gn_Show01|global decimal
+LinesOE|gn_Show02|global decimal
+LinesOE|gn_Show03|global decimal
+LinesOE|gn_Show04|global decimal
+LinesOE|gn_Show05|global decimal
+LinesOE|sum_cn_LineQuantity_Current|decimal
+LinesOE|sum_cnCur_LinePrice_Current|decimal
+LinesOE|PartColorPrice|varchar
+LinesOE|sum_Size03_Current|decimal
+LinesOE|sum_Size04_Current|decimal
+LinesOE|sum_Size05_Current|decimal
+LinesOE|sum_Size06_Current|decimal
+LinesOE|cnPer_DefectPercentage|decimal
+LinesOE|cnCur_EstimatedDefectCost|decimal
+LinesOE|sum_cnCur_EstimatedDefectCost|decimal
+LinesOE|cnCur_UnitPriceDiscount|decimal
+LinesOE|per_Discount|decimal
+LinesOE|sts_ApplyDiscount|decimal
+LinesOE|cnCur_LinePriceDiscount_Current|decimal
+LinesOE|cnCur_UnitPriceNoDiscount|decimal
+LinesOE|cur_UnitDiscountFlat|decimal
+LinesOE|sts_ProductSource_Inventory|decimal
+LinesOE|sts_Production_Designs|decimal
+LinesOE|sts_Production_Components|decimal
+LinesOE|sts_Invoicing_Invoice|decimal
+LinesOE|cn_sts_Behavior_Invoicing|decimal
+LinesOE|cn_sts_Behavior_Production|decimal
+LinesOE|cn_sts_Behavior_SecondaryUnits|decimal
+LinesOE|cn_sts_Behavior_ProductSource|decimal
+LinesOE|cn_sts_Behavior_Storage|decimal
+LinesOE|id_ProductClass|decimal
+LinesOE|gn_id_OrderDesLoc|global decimal
+LinesOE|gn_id_DesLoc|global decimal
+LinesOE|cn_sts_ToPurchase|decimal
+LinesOE|Quote_Qty_01|decimal
+LinesOE|Quote_Qty_02|decimal
+LinesOE|Quote_Qty_03|decimal
+LinesOE|Quote_Qty_04|decimal
+LinesOE|Quote_cur_Price_UserEntered_01|decimal
+LinesOE|Quote_cur_Price_UserEntered_02|decimal
+LinesOE|Quote_cur_Price_UserEntered_03|decimal
+LinesOE|Quote_cur_Price_UserEntered_04|decimal
+LinesOE|Quote_cur_Price_Calculated_01|decimal
+LinesOE|Quote_cur_Price_Calculated_02|decimal
+LinesOE|Quote_cur_Price_Calculated_03|decimal
+LinesOE|Quote_cur_Price_Calculated_04|decimal
+LinesOE|id_Quote|decimal
+LinesOE|cn_sts_Order|decimal
+LinesOE|Quote_cnCur_Price_Used_01|decimal
+LinesOE|Quote_cnCur_Price_Used_02|decimal
+LinesOE|Quote_cnCur_Price_Used_03|decimal
+LinesOE|Quote_cnCur_Price_Used_04|decimal
+LinesOE|Quote_cnCur_UnitPriceDiscount_01|decimal
+LinesOE|Quote_cnCur_UnitPriceDiscount_02|decimal
+LinesOE|Quote_cnCur_UnitPriceDiscount_03|decimal
+LinesOE|Quote_cnCur_UnitPriceDiscount_04|decimal
+LinesOE|Quote_cur_UnitCost_01|decimal
+LinesOE|Quote_cur_UnitCost_02|decimal
+LinesOE|Quote_cur_UnitCost_03|decimal
+LinesOE|Quote_cur_UnitCost_04|decimal
+LinesOE|Quote_sts_ShowSetup|decimal
+LinesOE|cn_sts_HasInstructions|decimal
+LinesOE|gn_cur_UnitCost|global decimal
+LinesOE|Quote_ct_EmbellishmentDetails|varchar
+LinesOE|Quote_cn_sts_CalculatorBased|decimal
+LinesOE|cn_sts_ActInStock_01|decimal
+LinesOE|cn_sts_ActInStock_02|decimal
+LinesOE|cn_sts_ActInStock_03|decimal
+LinesOE|cn_sts_ActInStock_04|decimal
+LinesOE|cn_sts_ActInStock_05|decimal
+LinesOE|cn_sts_ActInStock_06|decimal
+LinesOE|sts_IncludeGL_ProductMods|decimal
+LinesOE|sts_IncludeGL_Subcontract|decimal
+LinesOE|Quote_cn_EmbellishmentLocations|decimal
+LinesOE|Quote_cnCur_GrossPerLocation_01|decimal
+LinesOE|Quote_cnCur_GrossPerLocation_02|decimal
+LinesOE|Quote_cnCur_GrossPerLocation_03|decimal
+LinesOE|Quote_cnCur_GrossPerLocation_04|decimal
+LinesOE|Quote_cnCur_GrossMargin_01|decimal
+LinesOE|Quote_cnCur_GrossMargin_02|decimal
+LinesOE|Quote_cnCur_GrossMargin_03|decimal
+LinesOE|Quote_cnCur_GrossMargin_04|decimal
+LinesOE|sts_BulkDelete|decimal
+LinesOE|Quote_sts_ConvertToOrder|decimal
+LinesOE|cn_Size01_ToShip|decimal
+LinesOE|cn_Size02_ToShip|decimal
+LinesOE|cn_Size03_ToShip|decimal
+LinesOE|cn_Size04_ToShip|decimal
+LinesOE|cn_Size05_ToShip|decimal
+LinesOE|cn_Size06_ToShip|decimal
+LinesOE|Size01_ShipAlt|decimal
+LinesOE|Size02_ShipAlt|decimal
+LinesOE|Size03_ShipAlt|decimal
+LinesOE|Size04_ShipAlt|decimal
+LinesOE|Size05_ShipAlt|decimal
+LinesOE|Size06_ShipAlt|decimal
+LinesOE|cn_sts_UseAltShip|decimal
+LinesOE|cn_HighlightMainQtyShip|decimal
+LinesOE|cn_HighlightAltQtyShip|decimal
+LinesOE|gn_id_Address|global decimal
+LinesOE|cn_HighlightAltQtyShipSpec|decimal
+LinesOE|cn_HighlightMainQtyShipSpec|decimal
+LinesOE|cn_sts_UseAltShipSpec|decimal
+LinesOE|Size01_ShipSpecAlt|decimal
+LinesOE|Size02_ShipSpecAlt|decimal
+LinesOE|Size03_ShipSpecAlt|decimal
+LinesOE|Size04_ShipSpecAlt|decimal
+LinesOE|Size05_ShipSpecAlt|decimal
+LinesOE|Size06_ShipSpecAlt|decimal
+LinesOE|gt_id_LinesOEToShipHighlight|global varchar
+LinesOE|cn_HighlightToShipLink|decimal
+LinesOE|Quote_ct_QuoteTitle|decimal
+LinesOE|Quote_ct_QuoteHeader|decimal
+LinesOE|cnCur_LineCost_Pulled|decimal
+LinesOE|cnCur_LineCost_Bought|decimal
+LinesOE|Finish_PartNumber|varchar
+LinesOE|Finish_PartDescription|varchar
+LinesOE|Finish_PartColor|varchar
+LinesOE|Finish_PartRange|varchar
+LinesOE|Finish_PartIDSerial|decimal
+LinesOE|cn_sts_ToFillActProd|decimal
+LinesOE|cn_LineQuantity_ToProduce|decimal
+LinesOE|cnCur_Line_UnitPerImprint|decimal
+LinesOE|sum_cnCur_LineCost_Purchased|decimal
+LinesOE|cn_sts_ToInvenInv|decimal
+LinesOE|cnCur_LineCost_BoughtAllExtra|decimal
+LinesOE|sum_cnCur_LineCost_PurchasedSub|decimal
+LinesOE|sum_cnCur_LineCost_Other|decimal
+LinesOE|sum_cnCur_LineCost_Royalty|decimal
+LinesOE|sum_cnCur_LineCost_ShippingDistribution|decimal
+LinesOE|sum_cnCur_LineCost_LaborDistribution|decimal
+LinesOE|id_OrderBOParent|decimal
+LinesOE|cn_id_OrderBOMatch|decimal
+LinesOE|ct_PartColorCommitted|varchar
+LinesOE|ct_PartColorInProduction|varchar
+LinesOE|gt_id_AccountMain|global varchar
+LinesOE|cnCur_LineCost_ToPurchaseSub|decimal
+LinesOE|cnCur_LineCost_ToPurchaseSubCmpnts|decimal
+LinesOE|id_Order_ReturnParent|decimal
+LinesOE|id_LineOE_ReturnParent|decimal
+LinesOE|RoyaltyCategory|varchar
+LinesOE|id_RoyaltyCategory|decimal
+LinesOE|cur_RoyaltyFlat|decimal
+LinesOE|per_Royalty|decimal
+LinesOE|sts_DisableRoyalty_Line|decimal
+LinesOE|sts_DisableRoyalty_Product|decimal
+LinesOE|sts_DisableRoyalty_Design|decimal
+LinesOE|gt_PartColorPrice|global varchar
+LinesOE|ct_NameFull|varchar
+LinesOE|id_Contact|decimal
+LinesOE|NameFirst|varchar
+LinesOE|NameLast|varchar
+LinesOE|Custom01|varchar
+LinesOE|Custom02|varchar
+LinesOE|Custom03|varchar
+LinesOE|Custom04|varchar
+LinesOE|Custom05|varchar
+LinesOE|gt_TextGeneric_01|global varchar
+LinesOE|gt_TextGeneric_02|global varchar
+LinesOE|gt_TextGeneric_03|global varchar
+LinesOE|gt_TextGeneric_04|global varchar
+LinesOE|gt_TextGeneric_05|global varchar
+LinesOE|gn_NumberGeneric_01|global decimal
+LinesOE|gn_NumberGeneric_02|global decimal
+LinesOE|gn_NumberGeneric_03|global decimal
+LinesOE|gn_NumberGeneric_04|global decimal
+LinesOE|gn_NumberGeneric_05|global decimal
+LinesOE|ct_CustomFieldNotes|varchar
+LinesOE|gn_id_DiscountLevel|global decimal
+LinesOE|gn_id_Customer|global decimal
+LinesOE|gt_id_DesignBlock|global varchar
+LinesOE|gt_PartColor|global varchar
+LinesOE|sts_POS_Return|decimal
+LinesOE|cn_LineWeight|decimal
+LinesOE|sts_BackOrderInclude|decimal
+LinesOE|Size01_BO|decimal
+LinesOE|Size02_BO|decimal
+LinesOE|Size03_BO|decimal
+LinesOE|Size04_BO|decimal
+LinesOE|Size05_BO|decimal
+LinesOE|Size06_BO|decimal
+LinesOE|id_SAGEVendor|decimal
+LinesOE|RoyaltyLicenseCode|varchar
+LinesOE|RoyaltyInstitutionCode01|varchar
+LinesOE|RoyaltyInstitutionCode02|varchar
+LinesOE|RoyaltyProductCode|varchar
+LinesOE|AvalaraTaxCode|varchar
+LinesOE|ct_PartRangeVendorToPurchase|varchar
+LinesOE|Qty_PriceCalculation_Other|decimal
+LinesOE|gt_Error_PriceCalculation|global varchar
+LinesOE|gt_Filter_PriceCalc_id_PriceCalculationType|global varchar
+LinesOE|cn_Size01_Shipped|decimal
+LinesOE|cn_Size02_Shipped|decimal
+LinesOE|cn_Size03_Shipped|decimal
+LinesOE|cn_Size04_Shipped|decimal
+LinesOE|cn_Size05_Shipped|decimal
+LinesOE|cn_Size06_Shipped|decimal
+LinesOE|cn_sts_ShipDiff_Size01|decimal
+LinesOE|cn_sts_ShipDiff_Size02|decimal
+LinesOE|cn_sts_ShipDiff_Size03|decimal
+LinesOE|cn_sts_ShipDiff_Size04|decimal
+LinesOE|cn_sts_ShipDiff_Size05|decimal
+LinesOE|cn_sts_ShipDiff_Size06|decimal
+LinesOE|sum_cn_sts_ShipDiff_Size01|decimal
+LinesOE|sum_cn_sts_ShipDiff_Size02|decimal
+LinesOE|sum_cn_sts_ShipDiff_Size03|decimal
+LinesOE|sum_cn_sts_ShipDiff_Size04|decimal
+LinesOE|sum_cn_sts_ShipDiff_Size05|decimal
+LinesOE|sum_cn_sts_ShipDiff_Size06|decimal
+LinesOE|id_Design|decimal
+LinesOE|DesignTitle|varchar
+LinesOE|cur_LineCost_Internal|decimal
+LinesOE|ct_OrderInvoiceNotes|varchar
+LinesOE|ct_OrderInstructions|varchar
+LinesOE|ct_PartColorDisplay|varchar
+LinesOE|ct_PartNumber|varchar
+LinesOE|cn_id_Integration|decimal
+LinesOE|cn_Size01_ShippedSpec|decimal
+LinesOE|cn_Size02_ShippedSpec|decimal
+LinesOE|cn_Size03_ShippedSpec|decimal
+LinesOE|cn_Size04_ShippedSpec|decimal
+LinesOE|cn_Size05_ShippedSpec|decimal
+LinesOE|cn_Size06_ShippedSpec|decimal
+Machines|All|decimal
+Machines|date_Creation|date
+Machines|date_Modification|date
+Machines|gn_ID_Unique|global decimal
+Machines|gn_ID_User|global decimal
+Machines|ID_Unique|decimal
+Machines|sts_Archive|decimal
+Machines|time_Creation|time
+Machines|time_Modification|time
+Machines|timestamp_Creation|timestamp
+Machines|timestamp_Modification|timestamp
+Machines|MachineName|varchar
+Machines|ID_Machine|varchar
+Machines|gt_ID_Machine|global varchar
+Machines|ID_MachineSerial|decimal
+Machines|gn_ID_MachineSerial|global decimal
+Machines|sts_ShowOnCalendar|decimal
+Machines|id_MachineType|decimal
+Machines|MaxNumberOfColors|decimal
+Machines|cur_MachineRate|decimal
+Machines|Icon|binary
+Machines|IconText|varchar
+Machines|sts_OmitFromLegend|varchar
+Machines|NumberOfHeads|decimal
+Machines|StitchesPerMinute|decimal
+Machines|TimeSetup|decimal
+Machines|TimeBetweenRuns|decimal
+Machines|gt_MachineName|global varchar
+Machines|gn_id_MachineType|global decimal
+Machines|gt_ErrorMessage|global varchar
+Machines|sts_Omit|decimal
+Machines|gt_SFFilterLayout|global varchar
+Machines|gt_SFFilterTable|global varchar
+Machines|MachineType|varchar
+Machines|gt_ID_MachineChange|global varchar
+Machines|gt_MachineType|global varchar
+Machines|ActivityTypes|varchar
+Machines|gn_All|global decimal
+Machines|sum_All|decimal
+Machines|id_ProductionEventBlock|varchar
+Machines|ct_id_ProductionEventBlock|varchar
+Machines|UnitsPerHour|decimal
+Machines|ct_id_ProductionEventCalendarBlock|varchar
+Machines|id_Color|decimal
+Machines|Folder_From|varchar
+Machines|Folder_To|varchar
+Machines|Folder_FileTypeList|varchar
+Machines|Folder_sts_Move|decimal
+Orders|All|decimal
+Orders|date_Creation|date
+Orders|date_Modification|date
+Orders|gn_ID_Order|global decimal
+Orders|gn_ID_Unique|global decimal
+Orders|gn_ID_User|global decimal
+Orders|ID_Order|decimal
+Orders|ID_Unique|decimal
+Orders|sts_Archive|decimal
+Orders|time_Creation|time
+Orders|time_Modification|time
+Orders|timestamp_Creation|timestamp
+Orders|timestamp_Modification|timestamp
+Orders|sts_Omit|decimal
+Orders|gt_SFFilterLayout_Orders|global varchar
+Orders|gt_SFFilterTable|global varchar
+Orders|id_Customer|decimal
+Orders|date_OrderPlaced|date
+Orders|date_OrderRequestedToShip|date
+Orders|date_OrderDropDead|date
+Orders|gn_id_LineOE|global decimal
+Orders|AE_Trigger|decimal
+Orders|id_OrderTypeSerial|decimal
+Orders|id_OrderType|decimal
+Orders|filter_ContactDepartment|varchar
+Orders|filter_ContactNameFull|varchar
+Orders|filter_ContactTitle|varchar
+Orders|gt_ContactDepartment|global varchar
+Orders|gt_ContactNameFull|global varchar
+Orders|gt_ContactTitle|global varchar
+Orders|gn_PortalRecordCountContacts|global decimal
+Orders|gn_RecordCountContacts|global decimal
+Orders|ContactFirst|varchar
+Orders|ContactLast|varchar
+Orders|ContactPhone|varchar
+Orders|ContactFax|varchar
+Orders|ContactEmail|varchar
+Orders|NotesOnOrder|varchar
+Orders|ContactTitle|varchar
+Orders|ContactDepartment|varchar
+Orders|CustomerPurchaseOrder|varchar
+Orders|TermsName|varchar
+Orders|id_EmpSalesperson|decimal
+Orders|id_EmpCreatedBy|decimal
+Orders|CustomerType|varchar
+Orders|id_CompanyLocation|decimal
+Orders|gt_AddressCompany|global varchar
+Orders|gt_Address1|global varchar
+Orders|gt_AddressCity|global varchar
+Orders|gt_AddressState|global varchar
+Orders|gt_AddressZip|global varchar
+Orders|gt_AddressCountry|global varchar
+Orders|gt_Address2|global varchar
+Orders|filter_AddressCompany|varchar
+Orders|filter_Address1|varchar
+Orders|filter_Address2|varchar
+Orders|filter_AddressCity|varchar
+Orders|filter_AddressState|varchar
+Orders|filter_AddressZip|varchar
+Orders|filter_AddressCountry|varchar
+Orders|filter_AddressDescription|varchar
+Orders|gt_AddressDescription|global varchar
+Orders|gn_PortalRecordCountAddresses|global decimal
+Orders|gn_RecordCountAddresses|global decimal
+Orders|gn_id_Design|global decimal
+Orders|gn_id_OrderDesLoc|global decimal
+Orders|id_EmployeeOwn|varchar
+Orders|sts_GroupSalesMain|decimal
+Orders|sts_Invoiced|decimal
+Orders|cn_sts_HoldOrderGraphic|decimal
+Orders|sts_ArtDone|decimal
+Orders|sts_Purchased|decimal
+Orders|sts_PurchasedSub|decimal
+Orders|sts_Received|decimal
+Orders|sts_ReceivedSub|decimal
+Orders|sts_Produced|decimal
+Orders|sts_Shipped|decimal
+Orders|HoldOrderText|varchar
+Orders|cur_Subtotal|decimal
+Orders|cur_Taxable01|decimal
+Orders|cur_Shipping|decimal
+Orders|cnCur_TotalInvoice|decimal
+Orders|cnCur_Balance|decimal
+Orders|coa_AccountSalesTax01|varchar
+Orders|coa_AccountSalesTax02|varchar
+Orders|coa_AccountSalesTax03|varchar
+Orders|coa_AccountSalesTax04|varchar
+Orders|per_SalesTaxRate01|decimal
+Orders|per_SalesTaxRate02|decimal
+Orders|per_SalesTaxRate03|decimal
+Orders|per_SalesTaxRate04|decimal
+Orders|sts_ApplySalesTax01|decimal
+Orders|sts_ApplySalesTax02|decimal
+Orders|sts_ApplySalesTax03|decimal
+Orders|sts_ApplySalesTax04|decimal
+Orders|cur_Taxable02|decimal
+Orders|cur_Taxable03|decimal
+Orders|cur_Taxable04|decimal
+Orders|cnCur_SalesTaxTotal|decimal
+Orders|sts_ShippingTaxable|decimal
+Orders|cnCur_SalesTax01|decimal
+Orders|cnCur_SalesTax02|decimal
+Orders|cnCur_SalesTax03|decimal
+Orders|cnCur_SalesTax04|decimal
+Orders|sts_SizingType|decimal
+Orders|sts_LineStatusShow|varchar
+Orders|filter_EmployeeNameFull|varchar
+Orders|gt_EmployeeNameFull|global varchar
+Orders|sts_OwnershipMode|decimal
+Orders|sts_OwnershipType|decimal
+Orders|gt_DepartmentCode|global varchar
+Orders|filter_DepartmentCode|varchar
+Orders|ct_id_EmployeeOwn|varchar
+Orders|sts_Attachment|decimal
+Orders|ct_LayoutName|varchar
+Orders|cn_sts_HoldOrder|decimal
+Orders|cn_sts_Rush|decimal
+Orders|sts_RushOverride|decimal
+Orders|sts_Activity|decimal
+Orders|CustomerServiceRep|varchar
+Orders|cn_sts_ShippingSpecType|decimal
+Orders|NotesOnHold|varchar
+Orders|NotesToArt|varchar
+Orders|NotesToPurchasing|varchar
+Orders|NotesToReceiving|varchar
+Orders|NotesToProduction|varchar
+Orders|NotesToFinishing|varchar
+Orders|NotesFormsOrderApproval|varchar
+Orders|NotesToAccounting|varchar
+Orders|NotesFormsInvoice|varchar
+Orders|NotesFormsPackingList|varchar
+Orders|NotesToWebCustomer|varchar
+Orders|NotesToWebSalesperson|varchar
+Orders|NotesToShipping|varchar
+Orders|ct_NotesToArt|varchar
+Orders|ct_NotesToPurchasing|varchar
+Orders|ct_NotesToReceiving|varchar
+Orders|ct_NotesToProduction|varchar
+Orders|ct_NotesToFinishing|varchar
+Orders|ct_NotesToAccounting|varchar
+Orders|ct_NotesToShipping|varchar
+Orders|gn_id_LineShip|global decimal
+Orders|gn_id_LinePur|global decimal
+Orders|gn_id_LinePurSub|global decimal
+Orders|gn_id_LineComp|global decimal
+Orders|gn_id_LineRec|global decimal
+Orders|gn_id_LineRecSub|global decimal
+Orders|sts_01|decimal
+Orders|sts_02|decimal
+Orders|sts_03|decimal
+Orders|sts_04|decimal
+Orders|sts_05|decimal
+Orders|sts_06|decimal
+Orders|sts_07|decimal
+Orders|sts_08|decimal
+Orders|sts_09|decimal
+Orders|sts_10|decimal
+Orders|sts_11|decimal
+Orders|sts_12|decimal
+Orders|slot_01|decimal
+Orders|slot_02|decimal
+Orders|slot_03|decimal
+Orders|slot_04|decimal
+Orders|slot_05|decimal
+Orders|slot_06|decimal
+Orders|slot_07|decimal
+Orders|slot_08|decimal
+Orders|slot_09|decimal
+Orders|slot_10|decimal
+Orders|slot_11|decimal
+Orders|slot_12|decimal
+Orders|cn_Display_Status_01|decimal
+Orders|cn_Display_Status_02|decimal
+Orders|cn_Display_Status_03|decimal
+Orders|cn_Display_Status_04|decimal
+Orders|cn_Display_Status_05|decimal
+Orders|cn_Display_Status_06|decimal
+Orders|cn_Display_Status_07|decimal
+Orders|cn_Display_Status_08|decimal
+Orders|cn_Display_Status_09|decimal
+Orders|cn_Display_Status_10|decimal
+Orders|cn_Display_Status_11|decimal
+Orders|cn_Display_Status_12|decimal
+Orders|sts_02b|decimal
+Orders|sts_13|decimal
+Orders|sts_10b|decimal
+Orders|sts_11b|decimal
+Orders|sts_12b|decimal
+Orders|sts_13b|decimal
+Orders|slot_13|decimal
+Orders|slot_02b|decimal
+Orders|slot_10b|decimal
+Orders|slot_11b|decimal
+Orders|slot_12b|decimal
+Orders|slot_13b|decimal
+Orders|cn_Display_Status_13|decimal
+Orders|cn_Display_Status_Secondary_01|decimal
+Orders|cn_Display_Status_Secondary_02|decimal
+Orders|cn_Display_Status_Secondary_03|decimal
+Orders|cn_Display_Status_Secondary_04|decimal
+Orders|cn_Display_Status_Secondary_05|decimal
+Orders|cn_Display_Status_Secondary_06|decimal
+Orders|cn_Display_Status_Secondary_07|decimal
+Orders|cn_Display_Status_Secondary_08|decimal
+Orders|cn_Display_Status_Secondary_09|decimal
+Orders|cn_Display_Status_Secondary_10|decimal
+Orders|cn_Display_Status_Secondary_11|decimal
+Orders|cn_Display_Status_Secondary_12|decimal
+Orders|cn_Display_Status_Secondary_13|decimal
+Orders|cn_TotalProductQty_Req|decimal
+Orders|gt_id_Order_Key|global varchar
+Orders|id_SalesStatus|decimal
+Orders|CompanyName|varchar
+Orders|DesignTitleBlock|varchar
+Orders|id_DesignBlock|varchar
+Orders|gt_ID_Block|global varchar
+Orders|gn_id_DesLoc|global decimal
+Orders|gn_id_PreCmpntBlank|global decimal
+Orders|ct_ContactNameFull|varchar
+Orders|cn_sts_Assembly|decimal
+Orders|cn_TotalProductQty_Pricing|decimal
+Orders|date_OrderInvoiced|date
+Orders|cn_FoundCount|decimal
+Orders|sts_RoyaltyLocked|decimal
+Orders|cn_sts_RoyaltyLocked|decimal
+Orders|sts_RoyaltyToLock|decimal
+Orders|cnCur_Total_Royalty_Calculated|decimal
+Orders|date_Royalty_LastCalculated|date
+Orders|cnCur_Total_Royalty_Reported|decimal
+Orders|cnCur_Total_Royalty_Difference|decimal
+Orders|gt_SFFilterLayout_Invoice|global varchar
+Orders|Invoice_Field01|varchar
+Orders|Invoice_Field02|varchar
+Orders|cnCur_DebitTotal|decimal
+Orders|cnCur_CreditTotal|decimal
+Orders|gn_id_Vendor|global decimal
+Orders|gn_id_PO|global decimal
+Orders|NotesOnPurchasing|varchar
+Orders|ct_NotesOnPurchasing|varchar
+Orders|EmployeeNamePurchasing|varchar
+Orders|filter_VendorName|varchar
+Orders|gn_PortalRecordCountVendors|global decimal
+Orders|gn_RecordCountVendors|global decimal
+Orders|gt_VendorName|global varchar
+Orders|date_Stamp_Invoiced|date
+Orders|id_Employee_Stamp_Invoiced|decimal
+Orders|gn_All|global decimal
+Orders|ct_NotesToPurchasingSub|varchar
+Orders|NotesToPurchasingSub|varchar
+Orders|ct_NotesOnPurchasingSub|varchar
+Orders|NotesOnPurchasingSub|varchar
+Orders|gt_SFFilterLayout_Purchase|global varchar
+Orders|gt_SFFilterLayout_PurchaseSub|global varchar
+Orders|cur_Adjust|decimal
+Orders|cur_Payments|decimal
+Orders|ct_PortalMatch|varchar
+Orders|TermsDays|decimal
+Orders|cd_date_PaymentDue|date
+Orders|date_Today|date
+Orders|cn_DaysOverdue|decimal
+Orders|cnCur_Balance_Current|decimal
+Orders|cnCur_Balance_Over1|decimal
+Orders|cnCur_Balance_Over30|decimal
+Orders|cnCur_Balance_Over60|decimal
+Orders|cnCur_Balance_Over90|decimal
+Orders|cn_sts_Receivable|decimal
+Orders|NotesOnArt|varchar
+Orders|NotesOnReceiving|varchar
+Orders|NotesOnProduction|varchar
+Orders|NotesOnShipping|varchar
+Orders|NotesOnAccounting|varchar
+Orders|cn_TotalProductQty_Act|decimal
+Orders|cn_TotalProductQty_Current|decimal
+Orders|cn_TotalProductQty_Imprints|decimal
+Orders|sum_All|decimal
+Orders|cur_CommishDue_Total|decimal
+Orders|cur_CommishPay_Total|decimal
+Orders|dateTime_Commissions_LastCalculated|timestamp
+Orders|sts_CommishToPay_Order|decimal
+Orders|cur_CommishDue_Order|decimal
+Orders|cur_CommishPay_Order|decimal
+Orders|gt_Temp|global varchar
+Orders|cur_CommishDue_CashCurrent|decimal
+Orders|cur_CommishPay_Cash|decimal
+Orders|sts_CommishPaid|decimal
+Orders|sts_CommishAllow|decimal
+Orders|cur_CommishNet_CashCurrent|decimal
+Orders|cur_CommishNet_Order|decimal
+Orders|gn_id_Order_QuickFind_Invoicing|global decimal
+Orders|id_Key_Status_10b|varchar
+Orders|id_Key_Status_10b_Done|varchar
+Orders|id_Key_Status_11b_Done|varchar
+Orders|id_Key_Status_12b_Done|varchar
+Orders|id_Key_Status_13b_Done|varchar
+Orders|id_Key_Status_11b|varchar
+Orders|id_Key_Status_12b|varchar
+Orders|id_Key_Status_13b|varchar
+Orders|gt_id_Order_QuickFind_OrderStatus|global varchar
+Orders|sts_StatusType_10b|decimal
+Orders|sts_StatusType_11b|decimal
+Orders|sts_StatusType_12b|decimal
+Orders|sts_StatusType_13b|decimal
+Orders|cn_sts_EnableShipping|decimal
+Orders|id_Contact|decimal
+Orders|gn_id_OrderDes|global decimal
+Orders|gn_id_Variation|global decimal
+Orders|gn_id_FormsViewer|global decimal
+Orders|ProductionSequence|varchar[10]
+Orders|ct_TotalShipToLocations|varchar
+Orders|cn_sts_ShowRushOverride|decimal
+Orders|ct_MonthYear|varchar
+Orders|cur_CommishDue_Cash|decimal
+Orders|cur_CommishDue_TotalCurrent|decimal
+Orders|cur_CommishNet_Cash|decimal
+Orders|cur_CommishNet_Total|decimal
+Orders|cur_CommishNet_TotalCurrent|decimal
+Orders|cur_CommishDue_OrderCurrent|decimal
+Orders|cur_CommishNet_OrderCurrent|decimal
+Orders|sts_CommishLock|decimal
+Orders|gn_id_Employee|global decimal
+Orders|gt_id_LinesOE_ToDelete|global varchar
+Orders|cur_ToApply|decimal
+Orders|sum_cur_ToApply|decimal
+Orders|gn_ToApply_Start|global decimal
+Orders|cnCur_ToApply_Left|decimal
+Orders|gt_MonthYear|global varchar
+Orders|gd_DateApply|global date
+Orders|sum_cur_CommishNet_CashCurrent|decimal
+Orders|sum_cur_CommishNet_OrderCurrent|decimal
+Orders|sum_cur_CommishNet_Order|decimal
+Orders|sts_CommishLockReason|decimal
+Orders|sts_CommishToPay_Cash|decimal
+Orders|sts_Paid|decimal
+Orders|sts_JobCost_Include_Commissions01|decimal
+Orders|sts_JobCost_Include_Commissions02|decimal
+Orders|sts_JobCost_Include_Labor01|decimal
+Orders|sts_JobCost_Include_Labor02|decimal
+Orders|sts_JobCost_Include_Misc01|decimal
+Orders|sts_JobCost_Include_Misc02|decimal
+Orders|sts_JobCost_Include_ShippingIn01|decimal
+Orders|sts_JobCost_Include_ShippingIn02|decimal
+Orders|sts_JobCost_Include_ProductToPurchase01|decimal
+Orders|sts_JobCost_Include_ProductToPurchase02|decimal
+Orders|sts_JobCost_Include_ProductOther01|decimal
+Orders|sts_JobCost_Include_ProductOther02|decimal
+Orders|sts_JobCost_Include_Royalties01|decimal
+Orders|sts_JobCost_Include_Royalties02|decimal
+Orders|sts_JobCost_Include_ShippingRevenue01|decimal
+Orders|sts_JobCost_Include_ShippingRevenue02|decimal
+Orders|sts_JobCost_Include_SubContract01|decimal
+Orders|sts_JobCost_Include_SubContract02|decimal
+Orders|cur_JobCost_Product_ToPurchase|decimal
+Orders|cur_JobCost_Product_Other|decimal
+Orders|cur_JobCost_Subcontract|decimal
+Orders|cur_JobCost_Labor|decimal
+Orders|cur_JobCost_FreightIn|decimal
+Orders|cur_JobCost_Misc|decimal
+Orders|cnCur_JobCost_TotalRevenue_01|decimal
+Orders|cnCur_JobCost_TotalRevenue_02|decimal
+Orders|cur_JobCost_ProfitLoss_01|decimal
+Orders|cur_JobCost_ProfitLoss_02|decimal
+Orders|per_JobCost_ProfitLoss_01|decimal
+Orders|per_JobCost_ProfitLoss_02|decimal
+Orders|cnCur_JobCost_TotalCosts_01|decimal
+Orders|cnCur_JobCost_TotalCosts_02|decimal
+Orders|cur_JobCost_FreightOut|decimal
+Orders|sts_JobCost_Include_ShippingOut01|decimal
+Orders|sts_JobCost_Include_ShippingOut02|decimal
+Orders|gt_SFFilterLayout_Receiving|global varchar
+Orders|cn_RecordNumber|decimal
+Orders|cn_PercentDone|decimal
+Orders|id_ReceivingStatus|decimal
+Orders|gt_FormName|global varchar
+Orders|gt_FormListAsName|global varchar
+Orders|pref_Print_BackOrderMessage|decimal
+Orders|pref_Print_SalesTaxDetail|decimal
+Orders|Invoice_AddressBlock_Shipping|varchar
+Orders|pref_PrintAddress_Shipping|decimal
+Orders|Invoice_AddressBlock_Billing|varchar
+Orders|pref_Print_DesignDetail|decimal
+Orders|sts_BackOrder|decimal
+Orders|id_Order_BOParent|decimal
+Orders|gt_SFFilterLayout_Shipping|global varchar
+Orders|id_DiscountLevel|decimal
+Orders|per_Discount|decimal
+Orders|DiscountNote|varchar
+Orders|cur_DiscountFlat|decimal
+Orders|date_External|date
+Orders|ExtSource|varchar
+Orders|ExtOrderID|varchar
+Orders|gt_SFFilterLayout_Receivables|global varchar
+Orders|sum_cnCur_Balance|decimal
+Orders|sum_cnCur_Balance_Current|decimal
+Orders|sum_cnCur_Balance_Over1|decimal
+Orders|sum_cnCur_Balance_Over30|decimal
+Orders|sum_cnCur_Balance_Over60|decimal
+Orders|sum_cnCur_Balance_Over90|decimal
+Orders|gt_CustomExportCategory|global varchar
+Orders|gt_CustomExportSource|global varchar
+Orders|gt_CustomReportCategory|global varchar
+Orders|gt_CustomReportSource|global varchar
+Orders|sum_cnCur_TotalInvoice|decimal
+Orders|sts_EDP_Hold|decimal
+Orders|TextOrder|varchar
+Orders|ct_TextOrder|varchar
+Orders|gd_DateAgingAsOf|global date
+Orders|gn_id_ARLog|global decimal
+Orders|date_ForAging|date
+Orders|id_Quote|decimal
+Orders|id_ShippingStatus|decimal
+Orders|sum_cnCur_SalesTaxTotal|decimal
+Orders|cur_JobCost_Product_Purchased|decimal
+Orders|sts_JobCost_Include_ProductPurchased01|decimal
+Orders|sts_JobCost_Include_ProductPurchased02|decimal
+Orders|cnCur_CreditTotal_Section01|decimal
+Orders|cnCur_DebitTotal_Section01|decimal
+Orders|cnCur_CreditTotal_Section02|decimal
+Orders|cnCur_CreditTotal_Section03|decimal
+Orders|cnCur_DebitTotal_Section02|decimal
+Orders|cnCur_DebitTotal_Section03|decimal
+Orders|cnCur_PO_Total|decimal
+Orders|cnCur_AP_Total|decimal
+Orders|cnCur_AP_PO_Difference|decimal
+Orders|gt_SFFilterLayout_Production|global varchar
+Orders|cn_TotalProductQty_ToProduce|decimal
+Orders|date_ProductionScheduled|date
+Orders|cd_date_Shipped_Max|date
+Orders|gn_id_Event|global decimal
+Orders|gn_EventLocFilter|global decimal
+Orders|gt_FormFilter|global varchar
+Orders|sum_cur_Shipping|decimal
+Orders|sum_cur_Subtotal|decimal
+Orders|cn_EventTimeSetup|decimal
+Orders|cn_EventTimeRun|decimal
+Orders|cn_EventTimeJob|decimal
+Orders|cm_EventTimeJobDisplay|time
+Orders|cm_EventTimeRunDisplay|time
+Orders|cm_EventTimeSetupDisplay|time
+Orders|cn_MachinesUsed|decimal
+Orders|cn_EventDesignCount|decimal
+Orders|cn_DesignCount|decimal
+Orders|cn_LocationCount|decimal
+Orders|cn_EventLocationCount|decimal
+Orders|cn_EventUsingDesignCount|decimal
+Orders|cn_EventNotUsingDesignCount|decimal
+Orders|cn_EventUsingDesignQty|decimal
+Orders|cn_EventNotUsingDesignQty|decimal
+Orders|cn_zero|decimal
+Orders|cn_pointfive|decimal
+Orders|gt_SFFilterLayout_Analysis|global varchar
+Orders|sum_cnCur_JobCost_TotalRevenue_01|decimal
+Orders|sum_cnCur_JobCost_TotalRevenue_02|decimal
+Orders|sum_cnCur_JobCost_TotalCosts_01|decimal
+Orders|sum_cnCur_JobCost_TotalCosts_02|decimal
+Orders|sum_cur_JobCost_ProfitLoss_01|decimal
+Orders|sum_cur_JobCost_ProfitLoss_02|decimal
+Orders|sum_per_JobCost_ProfitLoss_01|decimal
+Orders|sum_per_JobCost_ProfitLoss_02|decimal
+Orders|cn_DaysToComplete|decimal
+Orders|cn_DaysLate|decimal
+Orders|date_OrderShipped|date
+Orders|date_DesignScheduled|date
+Orders|cn_StitchCount|decimal
+Orders|cn_ColorsCount|decimal
+Orders|sum_cn_ColorsCount|decimal
+Orders|sum_cn_EventTimeJob|decimal
+Orders|sum_cn_LocationCount|decimal
+Orders|sum_cn_StitchCount|decimal
+Orders|sum_cn_TotalProductQty_Imprints|decimal
+Orders|sum_cn_TotalProductQty_ToProduce|decimal
+Orders|cn_DesignTimeEst|decimal
+Orders|cm_DesignTimeEstDisplay|time
+Orders|sum_cnCur_SalesTax01|decimal
+Orders|sum_cnCur_SalesTax02|decimal
+Orders|sum_cnCur_SalesTax03|decimal
+Orders|sum_cnCur_SalesTax04|decimal
+Orders|sum_cn_TotalProductQty_Current|decimal
+Orders|sum_cur_JobCost_Product_ToPurchase|decimal
+Orders|sum_cur_JobCost_Product_Purchased|decimal
+Orders|sum_cur_JobCost_Product_Other|decimal
+Orders|SalesGroup|varchar
+Orders|sum_cn_DesignCount|decimal
+Orders|sum_cm_EventTimeRunDisplay|time
+Orders|sum_cm_EventTimeSetupDisplay|time
+Orders|sum_cm_EventTimejobDisplay|time
+Orders|gn_id_Address|global decimal
+Orders|date_ProductionDone|date
+Orders|date_DesignDone|date
+Orders|cn_id_OrderBOMatch|decimal
+Orders|gt_id_AccountMain|global varchar
+Orders|sts_UpdateOrderDesigns|decimal
+Orders|sts_OnSite61|decimal
+Orders|sts_ShippingTaxable02|decimal
+Orders|sts_ShippingTaxable03|decimal
+Orders|sts_ShippingTaxable04|decimal
+Orders|CustomField01|varchar
+Orders|CustomField02|varchar
+Orders|CustomField03|varchar
+Orders|CustomField04|varchar
+Orders|CustomField05|varchar
+Orders|CustomField06|varchar
+Orders|CustomField07|date
+Orders|CustomField08|date
+Orders|CustomField09|date
+Orders|CustomField10|date
+Orders|gn_PS_ID_CustomerInternal|global decimal
+Orders|gt_PS_ProofFilter|global varchar
+Orders|id_PS_ProofTable|decimal
+Orders|sts_Avalara|decimal
+Orders|cur_AvalaraTax|decimal
+Orders|cn_AvalaraTaxLogCount|decimal
+Orders|AvalaraInvoiceTransCode|varchar
+Orders|gn_id_MachineCalendarView|global decimal
+Orders|gd_DateCalendarView|global date
+Orders|gn_id_ProductionEventCalendarView|global decimal
+Orders|cn_Calendar_TotalTime|time
+Orders|cn_Calendar_TotalQty|decimal
+Orders|TaxExemptNumber|varchar
+Orders|sts_TaxExempt|decimal
+Orders|cn_ProdLog_Qty|decimal
+Orders|cm_ProdLog_SetupTime|time
+Orders|cm_ProdLog_ProductionTime|time
+Orders|cm_ProdLog_TotalTime|time
+Orders|ct_NotesOnHold|varchar
+Orders|ct_NotesOnProduction|varchar
+Orders|ct_NotesOnArt|varchar
+Orders|ct_NotesOnReceiving|varchar
+Orders|ct_NotesOnShipping|varchar
+Orders|ct_NotesFormsPackingList|varchar
+Orders|ct_NotesToWebCustomer|varchar
+Orders|ct_NotesToWebSalesperson|varchar
+Orders|ct_NotesOnOrder|varchar
+Orders|ct_NotesOnAccounting|varchar
+Orders|id_Integration|decimal
+Orders|gt_PartNumber|global varchar
+Orders|sts_APIOrder|decimal
+Orders|pref_ProdSpecV2Enable|decimal
+Orders|Barcode|binary
+Orders|AddressCount|decimal
+OrdTyp|All|decimal
+OrdTyp|date_Creation|date
+OrdTyp|date_Modification|date
+OrdTyp|gn_ID_OrderType|global decimal
+OrdTyp|gn_ID_Unique|global decimal
+OrdTyp|gn_ID_User|global decimal
+OrdTyp|ID_OrderType|decimal
+OrdTyp|ID_Unique|decimal
+OrdTyp|sts_Archive|decimal
+OrdTyp|time_Creation|time
+OrdTyp|time_Modification|time
+OrdTyp|timestamp_Creation|timestamp
+OrdTyp|timestamp_Modification|timestamp
+OrdTyp|OrderTypeNotes|varchar
+OrdTyp|OrderTypeGraphic|binary
+OrdTyp|OrderType|varchar
+OrdTyp|ID_OrderTypeSerial|decimal
+OrdTyp|gn_ID_OrderTypeSerial|global decimal
+OrdTyp|sts_DisableCustomer|decimal
+OrdTyp|sts_PartType|decimal
+OrdTyp|sts_DisableDesigns|decimal
+OrdTyp|id_DesignTypeDefault|decimal
+OrdTyp|sts_Enabled|decimal
+OrdTyp|sts_Locked|decimal
+OrdTyp|coa_Revenue|varchar
+OrdTyp|coa_CostOfGoods|varchar
+OrdTyp|sts_CommissionOrder|decimal
+OrdTyp|sts_CommissionType|decimal
+OrdTyp|sts_CommissionSetting|decimal
+OrdTyp|pref_HoldOnOrder|decimal
+OrdTyp|pref_ArtProofRequired|decimal
+OrdTyp|pref_AutoEnterActivity|decimal
+OrdTyp|pref_SizingType|decimal
+OrdTyp|pref_2or3Decimal|decimal
+OrdTyp|pref_Print_LogoPackingList|decimal
+OrdTyp|pref_Print_BackOrderMessage|decimal
+OrdTyp|head_HeaderInternalForm1|varchar
+OrdTyp|head_HeaderInternalForm2|varchar
+OrdTyp|head_HeaderArtSpec|varchar
+OrdTyp|head_HeaderPackingList|varchar
+OrdTyp|head_HeaderInvoiceField1|varchar
+OrdTyp|head_HeaderInvoiceField2|varchar
+OrdTyp|pref_DefaultDaysProduction|decimal
+OrdTyp|pref_DefaultDaysArt|decimal
+OrdTyp|pref_AutoScheduleSaturday|decimal
+OrdTyp|pref_AutoScheduleSunday|decimal
+OrdTyp|pref_RushDays|decimal
+OrdTyp|pref_RushMessage|varchar
+OrdTyp|note_NoteToAppearOnArtApprovals|varchar
+OrdTyp|ord_PriceCalculatorUsePartValue|decimal
+OrdTyp|ord_PriceCalculatorQuantity|decimal
+OrdTyp|pur_ForcePurchasing|decimal
+OrdTyp|id_EmployeeLocked|decimal
+OrdTyp|id_ButtonLocked|decimal
+OrdTyp|WordsShipping|varchar
+OrdTyp|WordsSalesTax|varchar
+OrdTyp|sts_Print_SalesTaxBreakdown|decimal
+OrdTyp|sts_PriceCalcUsePartValue|decimal
+OrdTyp|sts_PriceCalcQuantity|decimal
+OrdTyp|sts_ForcePurchasing|decimal
+OrdTyp|NotesFormsOrderApproval|varchar
+OrdTyp|NotesFormsInvoice|varchar
+OrdTyp|NotesFormsPackingList|varchar
+OrdTyp|sts_Omit|decimal
+OrdTyp|gt_SFFilterLayout|global varchar
+OrdTyp|gt_SFFilterTable|global varchar
+OrdTyp|cn_sts_GroupSpecial|decimal
+OrdTyp|cn_sts_GroupSalesMain|decimal
+OrdTyp|sts_DisableDesignChanges|decimal
+OrdTyp|gt_OrderTypeName|global varchar
+OrdTyp|pref_ShippingSpecType|decimal
+OrdTyp|pref_ShippingMethod|varchar
+OrdTyp|id_StatusKey_09|varchar
+OrdTyp|id_StatusKey_10|varchar
+OrdTyp|id_StatusKey_11|varchar
+OrdTyp|id_StatusKey_12|varchar
+OrdTyp|gt_sts_Lookup|global varchar
+OrdTyp|id_StatusKey_01|varchar
+OrdTyp|id_StatusKey_02|varchar
+OrdTyp|id_StatusKey_03|varchar
+OrdTyp|id_StatusKey_04|varchar
+OrdTyp|id_StatusKey_05|varchar
+OrdTyp|id_StatusKey_06|varchar
+OrdTyp|id_StatusKey_07|varchar
+OrdTyp|id_StatusKey_08|varchar
+OrdTyp|id_StatusKey_13|varchar
+OrdTyp|ct_Key_Display_01|varchar
+OrdTyp|ct_Key_Display_02|varchar
+OrdTyp|ct_Key_Display_03|varchar
+OrdTyp|ct_Key_Display_04|varchar
+OrdTyp|ct_Key_Display_05|varchar
+OrdTyp|ct_Key_Display_06|varchar
+OrdTyp|ct_Key_Display_07|varchar
+OrdTyp|ct_Key_Display_08|varchar
+OrdTyp|ct_Key_Display_09|varchar
+OrdTyp|ct_Key_Display_10|varchar
+OrdTyp|ct_Key_Display_11|varchar
+OrdTyp|ct_Key_Display_12|varchar
+OrdTyp|ct_Key_Display_13|varchar
+OrdTyp|id_StatusKey_02b|varchar
+OrdTyp|id_StatusKey_10b|varchar
+OrdTyp|id_StatusKey_11b|varchar
+OrdTyp|id_StatusKey_12b|varchar
+OrdTyp|id_StatusKey_13b|varchar
+OrdTyp|filter_DepartmentCode|varchar
+OrdTyp|filter_EmployeeNameFull|varchar
+OrdTyp|gt_DepartmentCode|global varchar
+OrdTyp|gt_EmployeeNameFull|global varchar
+OrdTyp|gt_sts_10|global varchar
+OrdTyp|gt_sts_11|global varchar
+OrdTyp|gt_sts_12|global varchar
+OrdTyp|gt_sts_13|global varchar
+OrdTyp|pref_InvoiceHeader01|varchar
+OrdTyp|pref_InvoiceHeader02|varchar
+OrdTyp|sts_Allow_Lineitem_Revenue|decimal
+OrdTyp|sts_Allow_Lineitem_CostOfGoods|decimal
+OrdTyp|gn_All|global decimal
+OrdTyp|sum_All|decimal
+OrdTyp|sts_SpecialFinanceCharge|decimal
+OrdTyp|sts_SpecialInitialBalance|decimal
+OrdTyp|id_FormsEnabled|varchar
+OrdTyp|gt_id_FormsViewer|global varchar
+OrdTyp|id_FormGroups|varchar
+OrdTyp|pref_CommissionLocking|decimal
+OrdTyp|pref_CommissionLocking_Manual|decimal
+OrdTyp|sts_ContractReceiving|decimal
+OrdTyp|sts_InventoryPurchase|decimal
+OrdTyp|sts_InvoiceOnly|decimal
+OrdTyp|sts_JobCost_Include_ShippingRevenue01|decimal
+OrdTyp|sts_JobCost_Include_ShippingRevenue02|decimal
+OrdTyp|sts_JobCost_Include_ProductToPurchase01|decimal
+OrdTyp|sts_JobCost_Include_ProductToPurchase02|decimal
+OrdTyp|sts_JobCost_Include_ProductOther01|decimal
+OrdTyp|sts_JobCost_Include_ProductOther02|decimal
+OrdTyp|sts_JobCost_Include_SubContract01|decimal
+OrdTyp|sts_JobCost_Include_SubContract02|decimal
+OrdTyp|sts_JobCost_Include_Royalties01|decimal
+OrdTyp|sts_JobCost_Include_Royalties02|decimal
+OrdTyp|sts_JobCost_Include_Labor01|decimal
+OrdTyp|sts_JobCost_Include_Labor02|decimal
+OrdTyp|sts_JobCost_Include_Commissions01|decimal
+OrdTyp|sts_JobCost_Include_Commissions02|decimal
+OrdTyp|sts_JobCost_Include_ShippingIn01|decimal
+OrdTyp|sts_JobCost_Include_ShippingIn02|decimal
+OrdTyp|sts_JobCost_Include_Misc01|decimal
+OrdTyp|sts_JobCost_Include_Misc02|decimal
+OrdTyp|sts_JobCost_Include_ShippingOut02|decimal
+OrdTyp|sts_JobCost_Include_ShippingOut01|decimal
+OrdTyp|gt_FormFilter|global varchar
+OrdTyp|sts_AllowSelect|decimal
+OrdTyp|pref_Print_SalesTaxDetail|decimal
+OrdTyp|pref_Print_DesignDetail|decimal
+OrdTyp|gn_id_LOTPCView|global decimal
+OrdTyp|gn_id_ProductClassAdd|global decimal
+OrdTyp|gt_ProductClassView|global varchar
+OrdTyp|pref_Text_Header|varchar
+OrdTyp|pref_Text_Seperator|varchar
+OrdTyp|pref_Text_ShowSalesperson|decimal
+OrdTyp|pref_Text_ShowShipping|decimal
+OrdTyp|pref_Text_ShowDesigns|decimal
+OrdTyp|pref_Text_ShowProductInvoiceNotes|decimal
+OrdTyp|pref_Text_BoldHeader|decimal
+OrdTyp|pref_Text_BoldProduct|decimal
+OrdTyp|sts_JobCost_Include_ProductPurchased01|decimal
+OrdTyp|sts_JobCost_Include_ProductPurchased02|decimal
+OrdTyp|sts_ForceInvoicing_Purchase|decimal
+OrdTyp|sts_ForceInvoicing_PurchaseSub|decimal
+OrdTyp|sts_ForceInvoicing_Ship|decimal
+OrdTyp|sts_ForceInvoicing_Receive|decimal
+OrdTyp|sts_ForceInvoicing_Production|decimal
+OrdTyp|gt_id_AccountMain|global varchar
+OrdTyp|id_TemplateDefault|decimal
+OrdTyp|pref_DefaultDaysOrderDue|decimal
+OrdTyp|sts_AutoOrderDue|decimal
+OrdTyp|pref_AutoScheduleSaturdayOrderDueDate|decimal
+OrdTyp|pref_AutoScheduleSundayOrderDueDate|decimal
+OrdTyp|sts_ProhibitSizingTypeChange|decimal
+OrdTyp|id_CompanyLocation|decimal
+OrdTyp|cn_FoundCount|decimal
+OrdTyp|pref_ProdSpecV2Enable|decimal
+PO|All|decimal
+PO|date_Creation|date
+PO|date_Modification|date
+PO|gn_ID_PO|global decimal
+PO|gn_ID_Unique|global decimal
+PO|gn_ID_User|global decimal
+PO|ID_PO|decimal
+PO|ID_Unique|decimal
+PO|sts_Archive|decimal
+PO|time_Creation|time
+PO|time_Modification|time
+PO|timestamp_Creation|timestamp
+PO|timestamp_Modification|timestamp
+PO|sts_Omit|decimal
+PO|gt_SFFilterLayout|global varchar
+PO|gt_SFFilterTable|global varchar
+PO|id_Order|decimal
+PO|id_POType|decimal
+PO|id_Vendor|decimal
+PO|sts_Issued|decimal
+PO|VendorContact|varchar
+PO|id_EmployeeCreated|decimal
+PO|date_POIssued|date
+PO|ConfirmationNumber|varchar
+PO|CustomText01|varchar
+PO|CustomText02|varchar
+PO|CustomText03|varchar
+PO|CustomText04|varchar
+PO|CustomText05|varchar
+PO|CustomNum01|decimal
+PO|CustomNum02|decimal
+PO|CustomNum03|decimal
+PO|CustomNum04|decimal
+PO|CustomNum05|decimal
+PO|CustomDate01|date
+PO|CustomDate02|date
+PO|CustomDate03|date
+PO|CustomDate04|date
+PO|CustomDate05|date
+PO|PurchasingAgent|varchar
+PO|date_PORequestedToShip|date
+PO|date_PODropDead|date
+PO|ShipAddress1|varchar
+PO|ShipAddress2|varchar
+PO|ShipAddressCity|varchar
+PO|ShipAddressCompany|varchar
+PO|ShipAddressCountry|varchar
+PO|ShipAddressState|varchar
+PO|ShipAddressZip|varchar
+PO|ShipMethod|varchar
+PO|filter_ContactDepartment|varchar
+PO|filter_ContactNameFull|varchar
+PO|filter_ContactTitle|varchar
+PO|gt_ContactDepartment|global varchar
+PO|gt_ContactNameFull|global varchar
+PO|gt_ContactTitle|global varchar
+PO|gn_PortalRecordCountContacts|global decimal
+PO|gn_RecordCountContacts|global decimal
+PO|PODefinition|varchar
+PO|sts_HasActivity|decimal
+PO|ShipFromDescription|varchar
+PO|gn_id_LineShip|global decimal
+PO|gn_id_Order|global decimal
+PO|gn_id_Vendor|global decimal
+PO|gn_id_LineOE|global decimal
+PO|gn_id_LinePur|global decimal
+PO|gn_id_Address|global decimal
+PO|id_OrderBlock|varchar
+PO|sts_RelatedToOrder|decimal
+PO|gn_id_ProductPOSerial|global decimal
+PO|gn_id_ProductSerial|global decimal
+PO|acct_SalesTax01|varchar
+PO|acct_SalesTax02|varchar
+PO|acct_SalesTax03|varchar
+PO|acct_SalesTax04|varchar
+PO|cnCur_SalesTax01|decimal
+PO|cnCur_SalesTax02|decimal
+PO|cnCur_SalesTax03|decimal
+PO|cnCur_SalesTax04|decimal
+PO|cnCur_SalesTaxTotal|decimal
+PO|cur_Shipping|decimal
+PO|cur_Subtotal|decimal
+PO|cur_Taxable01|decimal
+PO|cur_Taxable02|decimal
+PO|cur_Taxable03|decimal
+PO|cur_Taxable04|decimal
+PO|per_SalesTaxRate01|decimal
+PO|per_SalesTaxRate02|decimal
+PO|per_SalesTaxRate03|decimal
+PO|per_SalesTaxRate04|decimal
+PO|sts_ApplySalesTax01|decimal
+PO|sts_ApplySalesTax02|decimal
+PO|sts_ApplySalesTax03|decimal
+PO|sts_ApplySalesTax04|decimal
+PO|sts_ShippingTaxable|decimal
+PO|AE_Trigger|decimal
+PO|cnCur_TotalInvoice|decimal
+PO|cn_TotalProductQty|decimal
+PO|NotesToReceiving|varchar
+PO|NotesToPO|varchar
+PO|NotesToPayables|varchar
+PO|NotesToPOInternal|varchar
+PO|gt_id_OrderBlock|global varchar
+PO|gn_PortalRecordCountVendors|global decimal
+PO|gn_RecordCountVendors|global decimal
+PO|gt_VendorName|global varchar
+PO|filter_VendorName|varchar
+PO|cnCur_PayablesTotal|decimal
+PO|cnCur_PayablesOutstanding|decimal
+PO|sts_Attachments|decimal
+PO|ct_NotesToPayables|varchar
+PO|ct_NotesToPO|varchar
+PO|ct_NotesToPOInternal|varchar
+PO|ct_NotesToReceiving|varchar
+PO|sts_Received|decimal
+PO|gn_ID_PO_QuickFind|global decimal
+PO|gn_id_Order_QuickFind|global decimal
+PO|sts_SizingType|decimal
+PO|cn_FoundCount|decimal
+PO|date_Received|date
+PO|cnCur_PayablesDifference|decimal
+PO|sts_OverridePayableMatch|decimal
+PO|cn_sts_PayableExists|decimal
+PO|cn_sts_PayableMatch|decimal
+PO|sum_cnCur_PayablesDifference|decimal
+PO|sum_cnCur_PayablesTotal|decimal
+PO|sum_cnCur_SalesTaxTotal|decimal
+PO|sum_cnCur_TotalInvoice|decimal
+PO|sum_cur_Shipping|decimal
+PO|sum_cur_Subtotal|decimal
+PO|gn_All|global decimal
+PO|cn_sts_ProductPO|decimal
+PO|cn_sts_SubPO|decimal
+PO|sum_All|decimal
+PO|gt_CustomExportCategory|global varchar
+PO|gt_CustomExportSource|global varchar
+PO|gt_CustomReportCategory|global varchar
+PO|gt_CustomReportSource|global varchar
+PO|ct_ShipAddressFull|varchar
+PO|id_CompanyLocation|decimal
+PO|NotesOnReceiving|varchar
+PO|ct_NotesOnReceiving|varchar
+PO|gn_id_LineRec|global decimal
+PO|cn_sts_WarnDate|decimal
+PO|ct_AddressPOMatch|varchar
+PO|cn_sts_WarnAddress|decimal
+PO|cn_sts_WarnMethod|decimal
+PO|id_ReceivingStatus|decimal
+PO|gt_ID_Block|global varchar
+PO|EDP_NotesToArt|varchar
+PO|EDP_NotesToProduction|varchar
+PO|EDP_NotesToReceiving|varchar
+PO|EDP_NotesToPurchasing|varchar
+PO|EDP_NotesToShipping|varchar
+PO|EDP_NotesToAccounting|varchar
+PO|ct_EDP_NotesToArt|varchar
+PO|ct_EDP_NotesToPurchasing|varchar
+PO|ct_EDP_NotesToReceiving|varchar
+PO|ct_EDP_NotesToProduction|varchar
+PO|ct_EDP_NotesToShipping|varchar
+PO|ct_EDP_NotesToAccounting|varchar
+PO|TextPurchaseOrder|varchar
+PO|ct_TextPurchaseOrder|varchar
+PO|gt_EDP_FieldName|global varchar
+PO|gt_EDP_id_EDPTable|global varchar
+PO|id_DesignBlock|varchar
+PO|ct_VendorName|varchar
+PO|co_POTypeGraphic|binary
+PO|cd_DateForCalendar|date
+PO|ct_id_POTypeForCalendar|varchar
+PO|id_EmployeeOwn|varchar
+PO|sts_OwnershipMode|decimal
+PO|sts_OwnershipType|decimal
+PO|gn_id_FormsViewer|global decimal
+PO|gt_PortalActivity|global varchar
+PO|sts_ShippingTaxable02|decimal
+PO|sts_ShippingTaxable03|decimal
+PO|sts_ShippingTaxable04|decimal
+PO|id_PriceCalcEmb|varchar
+PO|id_PriceCalcPrint|varchar
+PO|ct_EmbellishmentDetails|varchar
+PO|id_Design|decimal
+PO|id_OrderDesign|decimal
+PO|sts_API_Submitted|decimal
+PO|API_Display|varchar
+PO|API_Text|varchar
+PO|ct_API_Display|varchar
+PO|ct_API_Text|varchar
+PO|sts_Locked|decimal
+PO|id_EmployeeLockedBy|decimal
+PO|date_API_Submitted|date
+PO|timestamp_API_Submitted|timestamp
+Prod|All|decimal
+Prod|date_Creation|date
+Prod|date_Modification|date
+Prod|gn_ID_Unique|global decimal
+Prod|gn_ID_User|global decimal
+Prod|ID_Unique|decimal
+Prod|sts_Archive|decimal
+Prod|time_Creation|time
+Prod|time_Modification|time
+Prod|timestamp_Creation|timestamp
+Prod|timestamp_Modification|timestamp
+Prod|ID_ProductSerial|decimal
+Prod|gn_ID_Serial|global decimal
+Prod|PartNumber|varchar
+Prod|id_ProductClass|decimal
+Prod|id_Vendor|decimal
+Prod|cur_Cost1|decimal
+Prod|cur_Cost2|decimal
+Prod|cur_Cost3|decimal
+Prod|cur_CostInventory|decimal
+Prod|cur_FixedPrice|decimal[14]
+Prod|RoundTo|decimal
+Prod|sts_AffectJobCosting1|decimal
+Prod|sts_AffectJobCosting2|decimal
+Prod|sts_AffectJobCosting3|decimal
+Prod|sts_AffectPricing1|decimal
+Prod|sts_AffectPricing2|decimal
+Prod|sts_AffectPricing3|decimal
+Prod|sts_AllowUpdate|decimal
+Prod|sts_Commissionable|decimal
+Prod|sts_EndQuantityPricing|decimal
+Prod|sts_LimitSize01|decimal
+Prod|sts_LimitSize02|decimal
+Prod|sts_LimitSize03|decimal
+Prod|sts_LimitSize04|decimal
+Prod|sts_LimitSize05|decimal
+Prod|sts_LimitSize06|decimal
+Prod|id_PriceCalculationType|decimal
+Prod|sts_Product_AllowPurchase|decimal
+Prod|sts_Taxable|decimal
+Prod|sts_Updated|decimal
+Prod|ColorRange|varchar
+Prod|Description|varchar
+Prod|FindCode|varchar
+Prod|ProductType|varchar
+Prod|MtxCost01|decimal
+Prod|MtxCost02|decimal
+Prod|MtxCost03|decimal
+Prod|MtxCost04|decimal
+Prod|MtxCost05|decimal
+Prod|MtxCost06|decimal
+Prod|MtxCostCode|varchar
+Prod|MtxPrice01|decimal
+Prod|MtxPrice02|decimal
+Prod|MtxPrice03|decimal
+Prod|MtxPrice04|decimal
+Prod|MtxPrice05|decimal
+Prod|MtxPrice06|decimal
+Prod|MtxQty01|decimal
+Prod|MtxQty02|decimal
+Prod|MtxQty03|decimal
+Prod|MtxQty04|decimal
+Prod|MtxQty05|decimal
+Prod|MtxQty06|decimal
+Prod|PageNumber|decimal
+Prod|POItem|varchar
+Prod|POSize|varchar
+Prod|id_Design|decimal
+Prod|per_ProductionCushion|decimal
+Prod|sts_IncludeWizard|decimal
+Prod|sts_SetAsThreshhold|decimal
+Prod|BinLocation|varchar
+Prod|RoyaltyFlat|decimal
+Prod|RoyaltyPercent|decimal
+Prod|sts_Omit|decimal
+Prod|gt_SFFilterLayout|global varchar
+Prod|gt_SFFilterTable|global varchar
+Prod|cn_FoundCount|decimal
+Prod|cnCur_UnitCostCalculator|decimal
+Prod|cnCur_UnitCostAdd|decimal
+Prod|id_DefaultCalculator1|decimal
+Prod|id_DefaultCalculator2|decimal
+Prod|FactorWeighting|decimal
+Prod|FactorRounding|decimal
+Prod|MtxQty07|decimal
+Prod|MtxQty08|decimal
+Prod|MtxQty09|decimal
+Prod|MtxQty10|decimal
+Prod|MtxPrice07|decimal
+Prod|MtxPrice08|decimal
+Prod|MtxPrice09|decimal
+Prod|MtxPrice10|decimal
+Prod|MtxCost07|decimal
+Prod|MtxCost08|decimal
+Prod|MtxCost09|decimal
+Prod|MtxCost10|decimal
+Prod|cn_MtxMargin01|decimal
+Prod|sts_Attachments|decimal
+Prod|ProductColor|varchar
+Prod|sts_ProductColor|decimal
+Prod|id_ProductColorBlock|varchar
+Prod|gt_ProductColor|global varchar
+Prod|Filter_ProductColor|decimal
+Prod|sts_Active|decimal
+Prod|sts_Sized|decimal
+Prod|gt_ID_Product_BlockForSelection|global varchar
+Prod|date_LastUpdated|date
+Prod|gn_ID_ProductSerial|global decimal
+Prod|ct_PartRangeVendor|varchar
+Prod|cn_sts_LimitSize01|decimal
+Prod|cn_sts_LimitSize02|decimal
+Prod|cn_sts_LimitSize03|decimal
+Prod|cn_sts_LimitSize04|decimal
+Prod|cn_sts_LimitSize05|decimal
+Prod|cn_sts_LimitSize06|decimal
+Prod|ct_PartRange|varchar
+Prod|gn_id_DefaultCalculator1|global decimal
+Prod|gn_id_DefaultCalculator2|global decimal
+Prod|gt_ID_Block|global varchar
+Prod|gn_id_Component|global decimal
+Prod|cn_sts_HasCmpnt|decimal
+Prod|sts_UseSecondaryUnits|decimal
+Prod|Units_Type|varchar
+Prod|sts_UnitsPricing|decimal
+Prod|PartNumberDisplay|varchar
+Prod|PartDescriptionDisplay|varchar
+Prod|cn_MtxMargin02|decimal
+Prod|cn_MtxMargin03|decimal
+Prod|cn_MtxMargin04|decimal
+Prod|cn_MtxMargin05|decimal
+Prod|cn_MtxMargin06|decimal
+Prod|cn_MtxMargin07|decimal
+Prod|cn_MtxMargin08|decimal
+Prod|cn_MtxMargin09|decimal
+Prod|cn_MtxMargin10|decimal
+Prod|MtxCost11|decimal
+Prod|MtxCost12|decimal
+Prod|MtxCost13|decimal
+Prod|MtxCost14|decimal
+Prod|MtxPrice11|decimal
+Prod|MtxPrice12|decimal
+Prod|MtxPrice13|decimal
+Prod|MtxPrice14|decimal
+Prod|MtxQty11|decimal
+Prod|MtxQty12|decimal
+Prod|MtxQty13|decimal
+Prod|MtxQty14|decimal
+Prod|cn_MtxMargin11|decimal
+Prod|cn_MtxMargin12|decimal
+Prod|cn_MtxMargin13|decimal
+Prod|cn_MtxMargin14|decimal
+Prod|gt_MtxCode|global varchar
+Prod|sts_UnitsPurchasing|decimal
+Prod|ct_UnitsLabel_Cost|varchar
+Prod|cn_sts_LimitSize01Button|decimal
+Prod|cn_sts_LimitSize02Button|decimal
+Prod|cn_sts_LimitSize03Button|decimal
+Prod|cn_sts_LimitSize04Button|decimal
+Prod|cn_sts_LimitSize05Button|decimal
+Prod|cn_sts_LimitSize06Button|decimal
+Prod|gt_ProductColorRange|global varchar
+Prod|Filter_ProductColorRange|decimal
+Prod|cn_JobCost_Flat|decimal
+Prod|cn_JobCost_Percentage|decimal
+Prod|coa_CostOfGoods|varchar
+Prod|coa_Inventory|varchar
+Prod|coa_Revenue|varchar
+Prod|gn_All|global decimal
+Prod|sts_UnitsPurchasingExtraPercent|decimal
+Prod|sts_UnitsPurchasingExtraRound|decimal
+Prod|sum_All|decimal
+Prod|gt_CustomExportCategory|global varchar
+Prod|gt_CustomExportSource|global varchar
+Prod|gt_CustomReportCategory|global varchar
+Prod|gt_CustomReportSource|global varchar
+Prod|gn_PriceCalcMargin|global decimal[14]
+Prod|gn_PriceCalcMarkup|global decimal[14]
+Prod|gn_PriceCalcLocCost|global decimal[14]
+Prod|cn_PriceCalcPrice|decimal[14]
+Prod|gn_QtyRange|global decimal[14]
+Prod|gn_PriceCalcDiscount|global decimal
+Prod|PreprintGroup|varchar
+Prod|SKU|varchar
+Prod|CustomField01|varchar
+Prod|CustomField02|varchar
+Prod|sts_Thumbnail|decimal
+Prod|gn_id_DesLoc|global decimal
+Prod|gn_id_ProdLinesComp|global decimal
+Prod|gn_id_ProductClass|global decimal
+Prod|cn_Inventory_Flat|decimal
+Prod|cn_Inventory_Percentage|decimal
+Prod|sts_Components|decimal
+Prod|sts_Designs|decimal
+Prod|sts_ProductionSpec|decimal
+Prod|sts_Royalties|decimal
+Prod|id_EmployeeOwn|varchar
+Prod|sts_OwnershipMode|decimal
+Prod|sts_OwnershipType|decimal
+Prod|gt_id_AccountMain|global varchar
+Prod|gn_id_Barcode|global decimal
+Prod|ct_ColorRangeMatch|varchar
+Prod|gn_id_PriceMtx|global decimal
+Prod|ProductWeight|decimal
+Prod|PricingFormula|varchar
+Prod|gt_FormulaResults|global varchar
+Prod|Notes|varchar
+Prod|gn_id_OrderType|global decimal
+Prod|gt_id_LineOE_BlockCurrent|global varchar
+Prod|ProductCode|varchar
+Prod|import_Template|varchar
+Prod|import_Attribute01|varchar
+Prod|import_Attribute02|varchar
+Prod|import_Setting01|varchar
+Prod|import_DisplayType|varchar
+Prod|import_Matrix|varchar
+Prod|import_Colors|varchar
+Prod|import_Image01|varchar
+Prod|import_Image02|varchar
+Prod|import_Image03|varchar
+Prod|import_Sizes|varchar
+Prod|import_PriceMin|varchar
+Prod|import_PriceMax|varchar
+Prod|import_id_ProductSerial|varchar
+Prod|import_id_ProductClass|varchar
+Prod|import_sts_ProductColor|varchar
+Prod|import_sts_Taxable|varchar
+Prod|import_sts_Commissionable|varchar
+Prod|import_PartNumber|varchar
+Prod|import_PartDescription|varchar
+Prod|import_PreprintGroup|varchar
+Prod|import_TimestampLastImport|timestamp
+Prod|import_Notes|varchar
+Prod|import_Attribute03|varchar
+Prod|AvalaraTaxCode|varchar
+Prod|ct_Description|varchar
+Prod|sts_AllowJobCosting|decimal
+Prod|ct_UnitsLabel_Price|varchar
+Prod|id_ProdOnline|decimal
+Prod|id_ProdVarOnline|decimal
+Prod|BrandName|varchar
+ProductionLogDetails|All|decimal
+ProductionLogDetails|date_Creation|date
+ProductionLogDetails|date_Modification|date
+ProductionLogDetails|gn_ID_Unique|global decimal
+ProductionLogDetails|gn_ID_User|global decimal
+ProductionLogDetails|ID_ProdLogDetails|decimal
+ProductionLogDetails|ID_Unique|decimal
+ProductionLogDetails|sts_Archive|decimal
+ProductionLogDetails|time_Creation|time
+ProductionLogDetails|time_Modification|time
+ProductionLogDetails|timestamp_Creation|timestamp
+ProductionLogDetails|timestamp_Modification|timestamp
+ProductionLogDetails|sts_Omit|decimal
+ProductionLogDetails|gt_SFFilterLayout|global varchar
+ProductionLogDetails|gt_SFFilterTable|global varchar
+ProductionLogDetails|id_Order|decimal
+ProductionLogDetails|Notes|varchar
+ProductionLogDetails|ct_Notes|decimal
+ProductionLogDetails|id_Design|decimal
+ProductionLogDetails|id_Employee|decimal
+ProductionLogDetails|Time_Start|time
+ProductionLogDetails|Time_Finish|time
+ProductionLogDetails|Hours|decimal
+ProductionLogDetails|cn_sts_LogArt|decimal
+ProductionLogDetails|cn_sts_LogProd|decimal
+ProductionLogDetails|LogItem|varchar
+ProductionLogDetails|date_Log|date
+ProductionLogDetails|cn_Hours_Calculated|decimal
+ProductionLogDetails|id_ProdLog|decimal
+ProductionLogDetails|id_Machine|decimal
+ProductionLogDetails|cn_ID_LogLink|varchar
+ProductionLogDetails|id_EmployeeCreated|decimal
+ProductionLogDetails|Misprints|decimal
+ProductionLogDetails|Defects|decimal
+ProductionLogDetails|Qty|decimal
+ProductionLogDetails|cn_FoundCount|decimal
+ProductionLogDetails|id_Team|decimal
+ProductionLogDetails|cn_sts_Employee|decimal
+ProductionLogDetails|cn_sts_Team|decimal
+ProductionLogDetails|cn_Display_ID|decimal
+ProductionLogDetails|ct_Display_Name|varchar
+ProductionLogDetails|cur_LaborRate|decimal
+ProductionLogDetails|sum_cn_Hours_Calculated|decimal
+ProductionLogDetails|id_LogType|decimal
+ProductionLogDetails|cn_id_LogType_Display|decimal
+ProductionLogDetails|gn_All|global decimal
+ProductionLogDetails|sts_Production|decimal
+ProductionLogDetails|sts_Setup|decimal
+ProductionLogDetails|cnCur_TotalLabor|decimal
+ProductionLogDetails|cn_ProductionRate|decimal
+ProductionLogDetails|cnCur_LaborPerPiece|decimal
+ProductionLogDetails|cnCur_TotalRevenue|decimal
+ProductionLogDetails|cnCur_RevenuePerPiece|decimal
+ProductionLogDetails|cnCur_RevenuePerHour|decimal
+ProductionLogDetails|sum_All|decimal
+ProductionLogDetails|gt_CustomExportCategory|global varchar
+ProductionLogDetails|gt_CustomExportSource|global varchar
+ProductionLogDetails|gt_CustomReportCategory|global varchar
+ProductionLogDetails|gt_CustomReportSource|global varchar
+ProductionLogDetails|sum_Defects|decimal
+ProductionLogDetails|sum_Misprints|decimal
+ProductionLogDetails|sum_Qty|decimal
+ProductionLogDetails|gt_ID_Block|global varchar
+ProductionLogDetails|sum_cnCur_TotalLabor|decimal
+ProductionLogDetails|ct_Display_SetupOrProduction|varchar
+Version|All|decimal
+Version|Version|varchar
+Version|DateRelease|date
+Version|Notes|varchar
+Version|ID_Version|decimal
+Version|ID_Unique|decimal
+Version|gt_Result|global varchar

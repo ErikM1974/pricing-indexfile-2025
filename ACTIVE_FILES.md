@@ -1259,6 +1259,10 @@ cap-embroidery-fix.css
 | `/dashboards/sanmar-api-reference.html` | **NEW (2026-07-10)** SanMar Web Services (SOAP) cheat sheet — 12 services/WSDLs, methods + fields + gotchas (catalogColor, 3000 cap, sizeIndex, 301/303), cadence, warehouses, v24.5 MAP/brand restrictions, live filter. **ADMIN-only** (`requireCrmRole(['admin'])`). Canonical = `memory/SANMAR_API_REFERENCE.md`. | dash-shell.css, art-hub.css, sanmar-api-reference.css, sanmar-api-reference.js | ✅ Active |
 | `/dashboards/css/sanmar-api-reference.css` | SanMar cheat-sheet styles (2026 tokens) | dash-shell.css, art-hub.css | ✅ Active |
 | `/dashboards/js/sanmar-api-reference.js` | SanMar cheat-sheet controller — 14 sections (services/methods/fields/bridge rules) from an embedded snapshot + live filter/highlight (no API calls) | — | ✅ Active |
+| `/dashboards/shopworks-odbc-reference.html` | **NEW (2026-07-16)** ShopWorks OnSite ODBC reference — connection card (bandit bridge → 192.168.10.6 Data_ODBCMapping), vendor rules, FileMaker SQL gotchas, gap-fill table, searchable 2,630-field catalog. **ERIK-only** (`requireCrmEmail` route in server.js — page shows credentials). Canonical deep doc = `memory/SHOPWORKS_ODBC_INTEGRATION.md`. | dash-shell.css, art-hub.css, shopworks-odbc-reference.css, shopworks-odbc-reference.js, data/shopworks-odbc-schema.json | ✅ Active |
+| `/dashboards/css/shopworks-odbc-reference.css` | ShopWorks ODBC reference styles (2026 tokens; calc/global/summary field badges → --state-*) | dash-shell.css, art-hub.css | ✅ Active |
+| `/dashboards/js/shopworks-odbc-reference.js` | ShopWorks ODBC reference controller — fetches the schema JSON, renders 16 collapsible tables + live filter/highlight, stored-only toggle, curated gotcha notes, auto kind-badges for calc/global/summary prefixes | fetch (static JSON), DashPage (errors) | ✅ Active |
+| `/dashboards/data/shopworks-odbc-schema.json` | Static schema snapshot — 2,630 fields/16 tables pulled live from FileMaker_Fields 2026-07-16. Regenerate from `memory/shopworks-odbc-schema-catalog.txt` if ShopWorks extends Data_ODBCMapping. | — | ✅ Active |
 
 ### Staff Dashboards
 | File | Purpose | Dependencies | Status |
