@@ -67,6 +67,12 @@ Heroku CANNOT reach the LAN DSN (no Linux Claris driver + port 2399 unreachable 
 date_Due (MO has none — labels fall back to date_RequestedToShip) · ship method at receiving time ("cannot be put on a receiving label") · full customer master w/ terms/credit (MO "customers" = dedupe of last-60-day orders only) · employee/rep records (MO: dirty free text) · design records beyond id_Design/DesignName · vendor PO & receiving detail (MO: only coarse sts_Purchased/Received) · per-line/per-operation production status (MO: header-level codes only) · unlimited history + server-side SQL aggregation (kills the daily-sales-archive workaround class) · post-push edit visibility (snapshot-staleness bug class).
 ODBC does NOT do: images/attachments (Box/mockup flows unaffected), writes (keep MO push), real-time webhooks (it's still pull).
 
+## EXISTING CSV pipeline to replace (discovered 2026-07-16)
+
+- **Bandit already exports ODBC data on a schedule**: scheduled task → CSV (e.g. `ORDER_ODBC_*.csv`, 46 cols × 25K rows FULL dump) → OneDrive → Caspio DataHub import. **Three Caspio tables ride this chain: `ORDER_ODBC`, `Designs_ODBC_2025`, `Company_Contacts_Merge_ODBC`** (sources: Orders, Des, Contacts — all in Data_ODBCMapping).
+- **`ORDER_ODBC` schema (via `/api/caspio-schema/tables/ORDER_ODBC/fields`)**: 47 fields; **`ID_Order` UNIQUE = upsert key**; 33 cols map 1:1 to ODBC Orders field names; **13 are Caspio-side enrichment the sync must NEVER overwrite**: `Codereadr_*` (scanner), `Comment`, `Cust_Rating`, `SalesRep2026`, `Rep_Email`, `Sales_Rep_Email`, `UserID_Bigin`, `ORDER_TYPE_1`, `LATE_STATUS_MESSAGE`; `ORDER_TYPE` = Caspio FORMULA (read-only, never write).
+- Replacement = the decided push-agent architecture (above) with delta-sync on `Orders.date_Modification`; cutover plan: run parallel with CSV chain ~1 week, then retire CSV task; repeat for Designs/Contacts tables.
+
 ## Next steps (in order)
 
 1. Erik: screenshot OnSite screens w/ wanted fields highlighted → `support@shopworx.com` (ask for ODBC access + field mapping). Start small: order header due-date/status fields + customer master.
