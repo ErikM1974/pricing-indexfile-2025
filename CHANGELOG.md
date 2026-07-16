@@ -1,3 +1,10 @@
+## v2026.07.16.4 (2026.07.16)
+
+- docs(memory): ShopWorks OnSite ODBC integration research — vendor rules, FM SQL gotchas, push-agent architecture
+- docs(memory): ODBC connection card — 64-bit driver, OnSite host 192.168.10.6, read-only creds
+- docs(memory): MO mirror 12-day freeze — v878 gate starved own sync cron (fixed proxy v920)
+- docs(memory): ODBC — verified xDBC listener live on 192.168.10.6:2399, no server-side enablement needed
+
 ## v2026.07.16.3 (2026.07.16)
 
 - feat(webstores): print-option lines on all 66 product cards across 11 spokes
