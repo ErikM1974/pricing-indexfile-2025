@@ -1,3 +1,8 @@
+## v2026.07.16.1 (2026.07.16)
+
+- feat(webstores): FAQ additions for customer questions — personalization AE-only, ~2wk turnaround, fundraising give-back
+- feat(webstores): fundraising-spoke hero = Heroes of Twisp benefit shirt (real $6,800 fundraiser)
+
 ## v2026.07.15.3 (2026.07.15)
 
 - Memory: add SANMAR_INBOUND_2026-07 topic file, dedupe LESSONS, index it
