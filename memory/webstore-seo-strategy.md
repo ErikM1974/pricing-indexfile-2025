@@ -75,6 +75,10 @@ links to the /company-webstores hub. Hub→spoke linking DONE: all 11 hub store-
   for a company organizing shirts for a community event?" answer (limited-run store + AE companion order for personalized items).
 - **Gotcha: visible FAQ and FAQPage JSON-LD must stay 1:1 on every webstore page** — hub schema had been missing the visible
   cost Q (fixed 2026-07-16). Validator: parse each ld+json block + compare mainEntity count vs `<details>` count.
+- **Fundraising-spoke hero = real story (2026-07-16)**: "Heroes of Twisp" memorial benefit shirt (Caspio file 9457614,
+  1920×1280; also og:image) — NWCA t-shirt fundraiser that raised **$6,800 for firefighters' families** (2015 Twisp fire;
+  shirt honors the three fallen + injured survivor). Hero trust line captions it — keep caption if image ever changes;
+  tone = memorial, keep dignified.
 
 ## Spoke build detail
 
