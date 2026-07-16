@@ -24,6 +24,7 @@
     color: var(--gray-900); margin: 0 0 var(--space-4); padding-bottom: var(--space-3); border-bottom: 1px solid var(--gray-200); letter-spacing: -0.01em;
 }
 .swo-h--flush { margin-bottom: 0; padding-bottom: 0; border-bottom: 0; }
+.swo-h--section { margin-top: var(--space-5); }
 .swo-tag { font-size: 0.72rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gray-500); background: var(--surface-inset); border-radius: var(--radius-pill); padding: 3px 10px; }
 
 /* ---------- Callout ---------- */
@@ -49,6 +50,12 @@
     background: var(--surface-inset); border: 1px solid var(--gray-200); border-radius: var(--radius-md);
     padding: var(--space-3) var(--space-4); overflow-x: auto; margin: var(--space-3) 0 0;
 }
+
+/* ---------- Setup steps ---------- */
+.swo-steps { margin: 0; padding-left: var(--space-5); counter-reset: none; }
+.swo-steps li { margin: var(--space-3) 0; font-size: 0.88rem; color: var(--gray-700); line-height: 1.6; }
+.swo-steps li b:first-child { color: var(--gray-900); }
+.swo-steps .swo-code { margin: var(--space-2) 0; }
 
 /* ---------- Rules columns ---------- */
 .swo-cols { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }

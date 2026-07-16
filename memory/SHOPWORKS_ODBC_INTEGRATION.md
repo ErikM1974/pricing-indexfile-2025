@@ -5,7 +5,7 @@
 ## ⚡ Working access path (verified live 2026-07-16)
 
 - **Bandit** (`bandit.NWEINC.local` = 192.168.10.219, Win10 Pro, domain-joined, 57-day uptime — always-on) already had BOTH FileMaker drivers (32+64-bit) AND 3 System DSNs → 192.168.10.6/Data_ODBCMapping (`SW32`, `SWAddress` 32-bit; `SWODBC` 64-bit) — shipping-integration legacy. **No installer needed anywhere.**
-- Erik's laptop (ERIKLAPTOP, WORKGROUP, non-domain) reaches bandit via **PowerShell Remoting**: WinRM service started + `TrustedHosts='bandit,bandit.NWEINC.local,192.168.10.219'` (client-side, admin, done 2026-07-16); credential = DPAPI-encrypted `%USERPROFILE%\bandit-cred.xml` (`NWEINC\Erik`, laptop+user-bound, Claude never sees password).
+- Erik's laptop (ERIKLAPTOP, WORKGROUP, non-domain) reaches bandit via **PowerShell Remoting**: WinRM service started + `TrustedHosts='bandit,bandit.NWEINC.local,192.168.10.219'` (client-side, admin, done 2026-07-16); credential = DPAPI-encrypted `%USERPROFILE%\bandit-cred.xml` (`NWEINC\Erik`, laptop+user-bound, Claude never sees password). ⚠ **Re-create the cred file after any bandit/domain password change** (goes stale → auth failures). Full setup recipe + troubleshooting = the "Laptop → bandit setup" section on `/dashboards/shopworks-odbc-reference.html`.
 - Query pattern from any session on the laptop (shop LAN only):
   `$cred = Import-Clixml "$env:USERPROFILE\bandit-cred.xml"; Invoke-Command -ComputerName bandit -Credential $cred { ...OdbcConnection 'DRIVER={FileMaker ODBC};Server=192.168.10.6;Database=Data_ODBCMapping;UID=extro;PWD=extro'... }`
 - Verified end-to-end: pulled same-day orders (142464-68) w/ due dates. Bandit = intended production sync-agent host (Task Scheduler) when built.

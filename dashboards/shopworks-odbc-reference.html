@@ -14,7 +14,7 @@
 
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/shopworks-odbc-reference.css?v=2026.07.16.1">
+    <link rel="stylesheet" href="/dashboards/css/shopworks-odbc-reference.css?v=2026.07.16.2">
 </head>
 <body>
     <div class="dash-shell">
@@ -72,6 +72,33 @@ Invoke-Command -ComputerName bandit -Credential $cred -ScriptBlock {
   $c.Close()
 }</pre>
                 <p class="swo-note">Production plan (not yet built): scheduled sync agent on bandit → proxy bulk-upsert route → Caspio tables + freshness watchdog. Heroku can never reach the DSN directly (no Linux driver; LAN-only address). Canonical doc: <code>memory/SHOPWORKS_ODBC_INTEGRATION.md</code>.</p>
+
+                <h2 class="swo-h swo-h--section">Laptop → bandit setup <span class="swo-tag">one-time per laptop · done on ERIKLAPTOP 2026-07-16</span></h2>
+                <p class="swo-body">The laptop is a <b>workgroup</b> machine and bandit is on the <b>NWEINC domain</b>, so PowerShell Remoting needs two one-time steps (no Kerberos between them). Repeat these on any new/replacement laptop:</p>
+                <ol class="swo-steps">
+                    <li><b>Trust bandit</b> — in an <b>Administrator</b> PowerShell (Start → type <code>powershell</code> → "Run as Administrator"):
+                        <pre class="swo-code">Set-Service WinRM -StartupType Manual
+Start-Service WinRM
+Set-Item WSMan:\localhost\Client\TrustedHosts -Value 'bandit,bandit.NWEINC.local,192.168.10.219' -Force
+Get-Item  WSMan:\localhost\Client\TrustedHosts   # verify the 3 entries</pre>
+                        Trusts <em>bandit specifically</em> (no wildcard). If <code>Set-Item</code> says "cannot connect to the destination", the local WinRM service isn't running — the first two lines fix that. "Access is denied" = window isn't elevated.</li>
+                    <li><b>Store the bandit login</b> — in a <b>normal</b> (non-admin) PowerShell, so the file is encrypted under your everyday account:
+                        <pre class="swo-code">Get-Credential NWEINC\Erik | Export-Clixml "$env:USERPROFILE\bandit-cred.xml"</pre>
+                        Enter the password you use to log into bandit. The file is DPAPI-encrypted — readable <em>only</em> by this Windows user on this machine; the password never appears in scripts or chat. <b>⚠ Re-run this step after any bandit/domain password change</b> — the stored credential goes stale and remoting starts failing with auth errors.</li>
+                    <li><b>Use it</b> — any PowerShell session (or Claude in chat) can now run queries ON bandit:
+                        <pre class="swo-code">$cred = Import-Clixml "$env:USERPROFILE\bandit-cred.xml"
+Invoke-Command -ComputerName bandit -Credential $cred -ScriptBlock { hostname }   # smoke test → BANDIT</pre></li>
+                </ol>
+                <div class="swo-callout">
+                    <h4><i class="fas fa-wrench"></i> Troubleshooting the bridge</h4>
+                    <ul>
+                        <li><b>"WinRM cannot process the request / TrustedHosts"</b> → step 1 wasn't done (or a new laptop). Re-run it.</li>
+                        <li><b>Auth/logon failure on Invoke-Command</b> → stale credential file after a password change → re-run step 2.</li>
+                        <li><b>Times out / host unreachable</b> → laptop is off the shop LAN (192.168.10.x) — this only works on-site (or via VPN), or bandit is off/asleep (ping <code>192.168.10.219</code>, RDP is also open as a fallback).</li>
+                        <li><b>ODBC errors <code>IM002/IM014</code> on bandit</b> → app/driver bitness mismatch — bandit has BOTH drivers; 64-bit PowerShell/Python uses the 64-bit driver + the <code>SWODBC</code> System DSN, 32-bit apps use <code>SW32</code>/<code>SWAddress</code>.</li>
+                        <li><b>Connection opens but queries hang</b> → the <code>fmxdbc_listener</code> on the OnSite server may be wedged — resetting it in FMS Admin Console <b>kicks off the shipping machines too</b>; coordinate first.</li>
+                    </ul>
+                </div>
             </section>
 
             <!-- ── Query rules ─────────────────────────────────────────── -->
