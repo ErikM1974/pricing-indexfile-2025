@@ -97,7 +97,7 @@ links to the /company-webstores hub. Hub→spoke linking DONE: all 11 hub store-
   1920×1280; also og:image) — NWCA t-shirt fundraiser that raised **$6,800 for firefighters' families** (2015 Twisp fire;
   shirt honors the three fallen + injured survivor). Hero trust line captions it — keep caption if image ever changes;
   tone = memorial, keep dignified.
-- **Team-spoke `#names-numbers` section (2026-07-16)**: showroom-cta photo+copy block after #products — Lincoln Lynx
+- **`#names-numbers` section on team-spoke AND fundraising-spoke (2026-07-16)**: showroom-cta photo+copy block (team: after #products; fundraising: after #causes, lead adapted "walker's or player's name") — Lincoln Lynx
   football hoodie (Caspio 9457695, front logo + back name/number in one shot). Message: "Yes — we print names and numbers"
   on shirt/hoodie BACKS, but ALWAYS as an AE team order (roster collected once), NEVER online customization; webstore sells
   the logo gear alongside. Reuses hub's showroom-cta classes from golf-tournament-showcase.css.
