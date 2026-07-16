@@ -1,3 +1,12 @@
+## v2026.07.16.5 (2026.07.16)
+
+- docs(memory): ODBC installer inspected — bundles 32-bit FileMaker 15.0.6 driver, DSN preset w/ UseLongVarchar
+- docs(memory): ODBC LIVE — bandit bridge verified, 17-table/2630-field schema cataloged, gap fields confirmed
+- docs(memory): ODBC full-catalog read-through — job costing, commissions, aging, ship-method, labor log discovered
+- feat(dashboards): ShopWorks ODBC reference page — connection card, vendor rules, searchable 2,630-field catalog
+- docs(odbc-reference): laptop -> bandit bridge setup recipe + troubleshooting on the admin page
+- Deploy v2026.07.16.5: 1 files (shopworks-odbc-reference.html...)
+
 ## v2026.07.16.4 (2026.07.16)
 
 - docs(memory): ShopWorks OnSite ODBC integration research — vendor rules, FM SQL gotchas, push-agent architecture
