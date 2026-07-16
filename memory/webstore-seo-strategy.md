@@ -71,6 +71,11 @@ links to the /company-webstores hub. Hub→spoke linking DONE: all 11 hub store-
   ("Can we get jerseys with our team name, player numbers, and a sponsor logo?"). Matches Erik's email to Nika 2026-07-15.
 - **Published order turnaround: ~2 weeks** ("embroidered in-house and shipped within about two weeks") — hub FAQ only, not
   spokes. Store *setup* remains "1–2 weeks" (a different number — don't conflate).
+- **Standard pricing copy on ALL 11 spokes + hub (Erik 2026-07-16)**: "first-tier (1–7 piece) left-chest embroidery rate
+  plus a flat $6 handling fee … one-time $300 setup fee to build and brand your store" — in every spoke's pricing FAQ
+  (added one to construction, which lacked it) AND every ws-pricenote. **"No upfront cost" was WRONG and is scrubbed
+  site-wide** — the $300 setup applies to fundraising stores too; never re-add that claim. Sweep tooling: scratchpad
+  `pricing-copy-sweep.js` pattern (exact-string + expected-count, catches template drift).
 - Hub FAQ now covers fundraising give-back (links /fundraising-webstores); fundraising spoke has a "what do you recommend
   for a company organizing shirts for a community event?" answer (limited-run store + AE companion order for personalized items).
 - **Gotcha: visible FAQ and FAQPage JSON-LD must stay 1:1 on every webstore page** — hub schema had been missing the visible
