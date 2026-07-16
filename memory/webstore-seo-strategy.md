@@ -106,6 +106,18 @@ links to the /company-webstores hub. Hub→spoke linking DONE: all 11 hub store-
   Research-Institute donation tee (9457681) + October "start in September" CTA. CSS: `.ws-card__photo--square/--top`
   modifiers in company-webstores.css. Scalable home for future cause shirts (Buddy Walk, memorials — add a card, not a section).
 
+## Roster-form funnel wiring (2026-07-16 — Erik decided after agent audit)
+
+- Names-and-numbers sections (team + fundraising) link **"Fill Out Your Roster Online" -> /pages/forms/team-roster-form.html**
+  (replaced the mailto ghost button; Call stays primary; callout adds "we'll confirm every name, number, and size with you
+  before production"). Rationale: structured roster > email; form captures contact info -> Forms Inbox (RST prefix).
+- **Slack wiring (DONE 2026-07-16): #form-leads channel (C0BHYGK47RA) + incoming webhook on the "NWCA Backend Alerts" app;**
+  `SLACK_FORM_LEADS_WEBHOOK_URL` set on caspio-pricing-proxy (v918, config-only restart). quote-request + webstore-request
+  pings are LIVE NOW (that code was already deployed — the env var was the missing piece for the whole lead funnel!).
+- **team-roster ping needs proxy deploy of a54114a** (adds team-roster to LEAD_NOTIFY_FORMS; committed + pushed to GitHub,
+  NOT yet deployed — Erik must confirm proxy deploys explicitly). Never link a form from a marketing page unless its
+  arrival pings — the Forms Inbox is pull-only.
+
 ## Spoke build detail
 
 Flat keyword URLs, hub-template (golf-showcase + company-webstores.css), ABSOLUTE asset paths, each with a real
