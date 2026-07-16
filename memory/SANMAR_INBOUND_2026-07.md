@@ -57,6 +57,16 @@ The Print/PDF report groups POs by sales rep (page-break per rep, per-rep subtot
 `sanmar-inbound-today.js`. On-screen modal unchanged.
 
 ## Gotchas / open
+- **Company/method come from the `ManageOrders_Orders` Caspio mirror at query time** (daily 12:00 UTC
+  `sync-manageorders.js`) — if the mirror goes stale, every post-gap PO renders "unmatched / Other" even
+  with a correct WO badge. Happened 7/4→7/16 (v878 PII gate 401'd the sync's own API calls; fixed v920 —
+  scripts now send `x-crm-api-secret`). No freshness watchdog yet — if "unmatched" clusters on RECENT WOs,
+  check `MAX(Last_Sync_Date)` in `ManageOrders_Orders` FIRST. → LESSONS 2026-07-16.
+- **`ORDER_ODBC` (Caspio daily 6 AM ODBC import from ShopWorks)**: 2021→now retention, has
+  `CompanyName`/`ORDER_TYPE`/`id_OrderType`/`CustomerServiceRep` keyed by unique `ID_Order` — a good
+  candidate 2nd company/method fallback for inbound-today. Caveat 2026-07-16: its SOURCE feed lagged
+  ~8 days (newest ID_Order 142391 placed 7/8, while MO API had 142469) — fix the feed lag before
+  trusting it for brand-new orders.
 - **Latent bug (task spawned):** `/api/sanmar-orders/lookup` reads `.Result` off a value that `makeCaspioRequest`
   GET returns as a BARE ARRAY (`utils/caspio.js`), so `/lookup` ALWAYS returns `items:[]`/`shipments:[]` and style
   search returns 0. Use `inbound-today` (reads the array correctly) to judge whether items exist, not `/lookup`.
