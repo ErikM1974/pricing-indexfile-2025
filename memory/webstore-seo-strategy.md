@@ -76,9 +76,11 @@ links to the /company-webstores hub. Hub→spoke linking DONE: all 11 hub store-
   (added one to construction, which lacked it) AND every ws-pricenote (pricenote says price "includes your left-chest
   embroidered logo"). Second ws-pricenote on all 11 spokes: **DTG offered but ONLY on tested/approved COTTON tees+hoodies**
   ("DTG ink is made for cotton") — never let store copy imply DTG on polyester. **Poly/performance CAN print via DTF
-  transfers** (Erik 2026-07-16): partner-printed ("specialty transfer partner in Los Angeles" — Supacolor, NEVER named
-  publicly, same rule as InkSoft/SanMar), heat-pressed in-house; extra lead time (out-of-house production) + transfer
-  store must expect to sell **12+ printed pieces**. Also: every spoke pricing FAQ now ends "…shipped within about two
+  transfers** (Erik 2026-07-16): partner-printed (public phrase = **"our Los Angeles partner"**, Erik-confirmed — Supacolor
+  NEVER named publicly, same rule as InkSoft/SanMar), heat-pressed in-house; extra lead time (out-of-house production) +
+  transfer store must expect to sell **12+ printed pieces**. Poly product cards get `.ws-card__deco` "Poly fabric —
+  embroidery or DTF transfer only" (team ST350+ST650 done; other spokes' poly cards — Nike NKDC1963, ST469/ST700/LST700,
+  CS410, TM1MW452, EB544 — awaiting Erik's per-style confirmation). Also: every spoke pricing FAQ now ends "…shipped within about two
   weeks" (order turnaround answered on all 11, not just hub). **"No upfront cost" was WRONG and is scrubbed
   site-wide** — the $300 setup applies to fundraising stores too; never re-add that claim. Sweep tooling: scratchpad
   `pricing-copy-sweep.js` pattern (exact-string + expected-count, catches template drift).
