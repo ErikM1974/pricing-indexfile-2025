@@ -84,6 +84,10 @@ links to the /company-webstores hub. Hub→spoke linking DONE: all 11 hub store-
   1920×1280; also og:image) — NWCA t-shirt fundraiser that raised **$6,800 for firefighters' families** (2015 Twisp fire;
   shirt honors the three fallen + injured survivor). Hero trust line captions it — keep caption if image ever changes;
   tone = memorial, keep dignified.
+- **Fundraising-spoke `#causes` gallery (2026-07-16)**: 4 real breast-cancer-awareness cards between #products and #how —
+  Ruthie+Kanha modeling (9457666, uses `--top` crop), CHP pink patch (9457672), Sock it to Cancer (9457678), 25%-to-Cancer-
+  Research-Institute donation tee (9457681) + October "start in September" CTA. CSS: `.ws-card__photo--square/--top`
+  modifiers in company-webstores.css. Scalable home for future cause shirts (Buddy Walk, memorials — add a card, not a section).
 
 ## Spoke build detail
 
