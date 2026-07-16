@@ -1,3 +1,15 @@
+## v2026.07.16.2 (2026.07.16)
+
+- fix(webstores): accurate pricing copy on all 12 webstore pages — $300 setup, $6 handling, first-tier (1-7) emb rate
+- feat(webstores): breast cancer awareness causes gallery on /fundraising-webstores
+- feat(webstores): names-and-numbers showcase on /team-webstores (Lincoln Lynx hoodie)
+- feat(webstores): highlight the AE-routing callout in the names-and-numbers section
+- feat(webstores): DTG-availability note + "includes your logo" pricing phrasing on all 11 spokes
+- fix(webstores): order turnaround (~2 weeks) now answered on every spoke, not just the hub
+- feat(webstores): poly printing via DTF transfers — transparent note on all 11 spokes
+- feat(webstores): poly card tags on team spoke + simplify DTF partner phrase
+- fix(webstores): DTF transfer-store minimum 12 -> 10 + CSS cache-bust
+
 ## v2026.07.16.1 (2026.07.16)
 
 - feat(webstores): FAQ additions for customer questions — personalization AE-only, ~2wk turnaround, fundraising give-back
