@@ -1,6 +1,21 @@
 # ShopWorks OnSite ODBC Integration (FileMaker xDBC)
 
-**Status:** 🟡 Research complete 2026-07-16 — NOT built. Source: vendor PDF `ODBC Integration Guide for OnSite Projects.pdf` (Erik's Downloads, 7 pages) + Claris docs + proxy-repo pattern audit.
+**Status:** 🟢 LIVE READ ACCESS 2026-07-16 via bandit bridge (dev). Production sync agent NOT built yet. Source: vendor PDF `ODBC Integration Guide for OnSite Projects.pdf` (Erik's Downloads, 7 pages) + Claris docs + proxy-repo pattern audit + live schema pull.
+
+## ⚡ Working access path (verified live 2026-07-16)
+
+- **Bandit** (`bandit.NWEINC.local` = 192.168.10.219, Win10 Pro, domain-joined, 57-day uptime — always-on) already had BOTH FileMaker drivers (32+64-bit) AND 3 System DSNs → 192.168.10.6/Data_ODBCMapping (`SW32`, `SWAddress` 32-bit; `SWODBC` 64-bit) — shipping-integration legacy. **No installer needed anywhere.**
+- Erik's laptop (ERIKLAPTOP, WORKGROUP, non-domain) reaches bandit via **PowerShell Remoting**: WinRM service started + `TrustedHosts='bandit,bandit.NWEINC.local,192.168.10.219'` (client-side, admin, done 2026-07-16); credential = DPAPI-encrypted `%USERPROFILE%\bandit-cred.xml` (`NWEINC\Erik`, laptop+user-bound, Claude never sees password).
+- Query pattern from any session on the laptop (shop LAN only):
+  `$cred = Import-Clixml "$env:USERPROFILE\bandit-cred.xml"; Invoke-Command -ComputerName bandit -Credential $cred { ...OdbcConnection 'DRIVER={FileMaker ODBC};Server=192.168.10.6;Database=Data_ODBCMapping;UID=extro;PWD=extro'... }`
+- Verified end-to-end: pulled same-day orders (142464-68) w/ due dates. Bandit = intended production sync-agent host (Task Scheduler) when built.
+
+## Schema (pulled live 2026-07-16 — full catalog: [shopworks-odbc-schema-catalog.txt](shopworks-odbc-schema-catalog.txt), 2,630 fields, `Table|Field|Type`)
+
+- **17 tables**: Addr(75) Buttons(20) ContactNumbers(31) Contacts(66) **Cust(294)** Des(76) Event(158) InvLevel(145) **LinesOE(494)** Machines(48) **Orders(539)** OrdTyp(180) **PO(192)** Prod(240) ProductionLogDetails(65) Version(7). `LinesPur` listed by GetSchema('Tables') but ABSENT from FileMaker_Fields + 0-col reads — unmapped placeholder; ask ShopWorks if PO lines needed.
+- **Gap-filling headline fields**: `Orders.date_OrderDropDead` (the due date MO lacks!) + `date_ProductionScheduled/Done`, `date_DesignScheduled/Done`, `date_OrderShipped`, `date_ForAging`, `id_EmpSalesperson`, **`date_Modification` = delta-sync key**. `Cust.cur_CreditLimit/cur_CreditUsed/Terms/sts_CreditAutoHold/TaxExemptNumber/date_TaxExemptExpiration/cur_Statement_TotalBalance` = entire CRM credit/terms wishlist.
+- **Field-prefix decoder (critical for query perf)**: `cn_`/`ct_`/`cd_` = unstored CALC (number/text/date), `sum_` = summary, `gn_`/`gt_` = global — ALL slow/unindexable, NEVER in WHERE, avoid in SELECT. Plain `date_`/`cur_`/`sts_`/`ID_` fields = stored → use these.
+- **Driver gotcha**: .NET `GetSchemaTable()`/`GetSchema('Columns')` fail on wide tables (arithmetic overflow / duplicate SQL_NO_NULLS — FM15-driver bug). **Schema discovery = `SELECT TableName, FieldName, FieldType FROM FileMaker_Fields`** (also FileMaker_Tables). Data reads of those same tables work fine with explicit column lists.
 **Verdict:** ODBC gives direct SQL reads of the OnSite FileMaker tables — strictly more data than ManageOrders PULL (due dates, full customer master w/ terms, employee/rep records, vendor PO/receiving detail, design records, per-line production state, unlimited history, SQL aggregation). MO push API remains the ONLY write path into ShopWorks — never write via ODBC.
 
 ## Connection card (Erik, 2026-07-16)
