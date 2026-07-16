@@ -80,6 +80,7 @@ _Order push/pull + ShopWorks setup._
 - [MANAGEORDERS_INTEGRATION.md](MANAGEORDERS_INTEGRATION.md)
 - [MANAGEORDERS_PUSH_WEBSTORE.md](MANAGEORDERS_PUSH_WEBSTORE.md)
 - [manageorders-api-guide-2024.pdf](manageorders-api-guide-2024.pdf)
+- [SHOPWORKS_ODBC_INTEGRATION.md](SHOPWORKS_ODBC_INTEGRATION.md) — 🟡 FileMaker ODBC direct-read research (2026-07-16): vendor rules, driver/DSN facts, FM SQL gotchas, push-agent→proxy→Caspio architecture
 - [SHOPWORKS_EDP_INTEGRATION.md](SHOPWORKS_EDP_INTEGRATION.md)
 - [SHOPWORKS_SIZE_MAPPING.md](SHOPWORKS_SIZE_MAPPING.md)
 - [SHOPWORKS_EXTENDED_SKU_PATTERNS.md](SHOPWORKS_EXTENDED_SKU_PATTERNS.md)
