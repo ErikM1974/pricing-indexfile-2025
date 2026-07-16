@@ -80,7 +80,7 @@ links to the /company-webstores hub. Hub→spoke linking DONE: all 11 hub store-
   NEVER named publicly, same rule as InkSoft/SanMar), heat-pressed in-house; extra lead time (out-of-house production) +
   transfer store must expect to sell **10+ printed pieces** (= Supacolor 10-transfer min AND the DTF 10-23 pricing tier floor; was 12, corrected 2026-07-16). **ALL 66 cards on 11 spokes now carry a `.ws-card__deco` print-option
   line (2026-07-16, Erik decided per-style):** DTG styles (7): PC61, BC3001, PC78H (code list) + BC3005, PC90H, PC68H,
-  PC78 (Erik-added) — line = "Print option: DTG full front $X" (computed @12-23 FF tier + $6). DTF styles (20): everything
+  PC78 (Erik-added) — shown as a menu-style .ws-card__pricing block (one .ws-card__pricerow per method: Embroidered / DTG full-front print / DTF transfer print, price right-aligned; DTG computed @12-23 FF tier + $6; per-card emb+$6 breakdown removed — pricenote carries it). Also a.ws-card anchor underline reset added (spoke product cards are bare <a class=ws-card>). DTF styles (20): everything
   else incl. Gildan 2000/18500 + NL3600 (Erik: Gildan/NL3600 "do not print great" on DTG — NEVER move to DTG) — line =
   "[Poly fabric — ]Print option: DTF transfer $X" where **DTF price = emb card price + $0.50 ALWAYS** (Erik: keep prices
   distinct, never identical). Caps (112/CP96/NE200) = "Embroidery only". Sweep gotcha: JS `String.replace` with `$`-prices
