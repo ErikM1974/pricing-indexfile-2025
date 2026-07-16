@@ -75,7 +75,11 @@ links to the /company-webstores hub. Hub→spoke linking DONE: all 11 hub store-
   plus a flat $6 handling fee … one-time $300 setup fee to build and brand your store" — in every spoke's pricing FAQ
   (added one to construction, which lacked it) AND every ws-pricenote (pricenote says price "includes your left-chest
   embroidered logo"). Second ws-pricenote on all 11 spokes: **DTG offered but ONLY on tested/approved COTTON tees+hoodies**
-  ("DTG ink is made for cotton") — poly/performance = embroidery-only; never let store copy imply DTG on polyester. **"No upfront cost" was WRONG and is scrubbed
+  ("DTG ink is made for cotton") — never let store copy imply DTG on polyester. **Poly/performance CAN print via DTF
+  transfers** (Erik 2026-07-16): partner-printed ("specialty transfer partner in Los Angeles" — Supacolor, NEVER named
+  publicly, same rule as InkSoft/SanMar), heat-pressed in-house; extra lead time (out-of-house production) + transfer
+  store must expect to sell **12+ printed pieces**. Also: every spoke pricing FAQ now ends "…shipped within about two
+  weeks" (order turnaround answered on all 11, not just hub). **"No upfront cost" was WRONG and is scrubbed
   site-wide** — the $300 setup applies to fundraising stores too; never re-add that claim. Sweep tooling: scratchpad
   `pricing-copy-sweep.js` pattern (exact-string + expected-count, catches template drift).
 - Hub FAQ now covers fundraising give-back (links /fundraising-webstores); fundraising spoke has a "what do you recommend
