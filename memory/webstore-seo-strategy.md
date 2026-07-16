@@ -62,8 +62,23 @@ Live: `/construction-webstores` (deployed v2026.07.14.5). On develop (awaiting d
 `/property-management-webstores`, `/industrial-webstores`, `/retail-webstores`, `/government-webstores`. Spokes 3–6
 generated from a template (scratchpad `gen-spokes.js` + `/tmp/spoke_products.json` data pull). All EMBROIDERY-ONLY
 pricing (emb + $6; Erik: no screen-print/run split on the pages). Each: hero + real-product grid + how + FAQ + CTA,
-links to the /company-webstores hub. Open enhancement: hub 10 store-type cards don't yet link to the 6 spokes
-(add a "popular niches" row on the hub for hub→spoke internal linking).
+links to the /company-webstores hub. Hub→spoke linking DONE: all 11 hub store-type cards link to their spokes (verified 2026-07-16).
+
+## Webstore FAQ policy (2026-07-16 — from Pro Paint Solutions / Buddy Walk inquiry; Erik decided)
+
+- **Personalization = AE-ONLY, never on a webstore**: jerseys with individual names/numbers AND sponsor logos route to an
+  account executive as a custom team order; webstores carry approved-logo gear only. Now stated on hub FAQ + team-spoke FAQ
+  ("Can we get jerseys with our team name, player numbers, and a sponsor logo?"). Matches Erik's email to Nika 2026-07-15.
+- **Published order turnaround: ~2 weeks** ("embroidered in-house and shipped within about two weeks") — hub FAQ only, not
+  spokes. Store *setup* remains "1–2 weeks" (a different number — don't conflate).
+- Hub FAQ now covers fundraising give-back (links /fundraising-webstores); fundraising spoke has a "what do you recommend
+  for a company organizing shirts for a community event?" answer (limited-run store + AE companion order for personalized items).
+- **Gotcha: visible FAQ and FAQPage JSON-LD must stay 1:1 on every webstore page** — hub schema had been missing the visible
+  cost Q (fixed 2026-07-16). Validator: parse each ld+json block + compare mainEntity count vs `<details>` count.
+- **Fundraising-spoke hero = real story (2026-07-16)**: "Heroes of Twisp" memorial benefit shirt (Caspio file 9457614,
+  1920×1280; also og:image) — NWCA t-shirt fundraiser that raised **$6,800 for firefighters' families** (2015 Twisp fire;
+  shirt honors the three fallen + injured survivor). Hero trust line captions it — keep caption if image ever changes;
+  tone = memorial, keep dignified.
 
 ## Spoke build detail
 
