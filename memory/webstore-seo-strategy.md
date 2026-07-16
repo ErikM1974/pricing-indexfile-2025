@@ -78,7 +78,7 @@ links to the /company-webstores hub. Hub→spoke linking DONE: all 11 hub store-
   ("DTG ink is made for cotton") — never let store copy imply DTG on polyester. **Poly/performance CAN print via DTF
   transfers** (Erik 2026-07-16): partner-printed (public phrase = **"our Los Angeles partner"**, Erik-confirmed — Supacolor
   NEVER named publicly, same rule as InkSoft/SanMar), heat-pressed in-house; extra lead time (out-of-house production) +
-  transfer store must expect to sell **12+ printed pieces**. Poly product cards get `.ws-card__deco` "Poly fabric —
+  transfer store must expect to sell **10+ printed pieces** (= Supacolor 10-transfer min AND the DTF 10-23 pricing tier floor; was 12, corrected 2026-07-16). Poly product cards get `.ws-card__deco` "Poly fabric —
   embroidery or DTF transfer only" (team ST350+ST650 done; other spokes' poly cards — Nike NKDC1963, ST469/ST700/LST700,
   CS410, TM1MW452, EB544 — awaiting Erik's per-style confirmation). Also: every spoke pricing FAQ now ends "…shipped within about two
   weeks" (order turnaround answered on all 11, not just hub). **"No upfront cost" was WRONG and is scrubbed
