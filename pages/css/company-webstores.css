@@ -68,9 +68,26 @@ a.ws-card--link:hover .ws-card__go i { transform: translateX(3px); }
 .ws-card__photo { width: 100%; aspect-ratio: 3 / 2; object-fit: cover; display: block; background: #eef2f0; }
 .ws-card--photo .ws-card__body { padding: 18px 20px 20px; display: flex; flex-direction: column; flex: 1 1 auto; }
 
+/* highlighted callout paragraph inside a showroom-cta (e.g. the names-and-numbers AE-routing note) */
+.showroom-cta__lead--callout {
+  background: #eef5f0;
+  border: 1px solid #d7e6dd;
+  border-left: 4px solid #1b6b3a;
+  border-radius: 10px;
+  padding: 14px 18px;
+  color: #2f4a3c;
+}
+.showroom-cta__lead--callout strong { color: #14312a; }
+
+/* cause-gallery cards (real fundraisers we've printed) — square variant of the photo card */
+.ws-card__photo--square { aspect-ratio: 1 / 1; }
+.ws-card__photo--top { object-position: center top; }
+
 /* product cards with an image + suggested price (spoke pages) */
 .ws-card__img { width: 100%; aspect-ratio: 4 / 3; object-fit: contain; background: #f4f6f5; border-radius: 10px; margin-bottom: 12px; display: block; }
 .ws-card__price { font-size: 0.9rem; font-weight: 800; color: #1b6b3a; margin: 2px 0 8px; }
+/* decoration-method note on poly product cards (poly = embroidery or DTF transfer only, no DTG) */
+.ws-card__deco { font-size: 0.78rem; color: #6b7280; margin: -2px 0 8px; }
 .ws-card__price span { font-weight: 500; color: #6b7280; font-size: 0.8rem; }
 .ws-pricenote {
   max-width: 1120px; margin: 20px auto 0; padding: 13px 20px;

@@ -71,6 +71,19 @@ links to the /company-webstores hub. Hub→spoke linking DONE: all 11 hub store-
   ("Can we get jerseys with our team name, player numbers, and a sponsor logo?"). Matches Erik's email to Nika 2026-07-15.
 - **Published order turnaround: ~2 weeks** ("embroidered in-house and shipped within about two weeks") — hub FAQ only, not
   spokes. Store *setup* remains "1–2 weeks" (a different number — don't conflate).
+- **Standard pricing copy on ALL 11 spokes + hub (Erik 2026-07-16)**: "first-tier (1–7 piece) left-chest embroidery rate
+  plus a flat $6 handling fee … one-time $300 setup fee to build and brand your store" — in every spoke's pricing FAQ
+  (added one to construction, which lacked it) AND every ws-pricenote (pricenote says price "includes your left-chest
+  embroidered logo"). Second ws-pricenote on all 11 spokes: **DTG offered but ONLY on tested/approved COTTON tees+hoodies**
+  ("DTG ink is made for cotton") — never let store copy imply DTG on polyester. **Poly/performance CAN print via DTF
+  transfers** (Erik 2026-07-16): partner-printed (public phrase = **"our Los Angeles partner"**, Erik-confirmed — Supacolor
+  NEVER named publicly, same rule as InkSoft/SanMar), heat-pressed in-house; extra lead time (out-of-house production) +
+  transfer store must expect to sell **10+ printed pieces** (= Supacolor 10-transfer min AND the DTF 10-23 pricing tier floor; was 12, corrected 2026-07-16). Poly product cards get `.ws-card__deco` "Poly fabric —
+  embroidery or DTF transfer only" (team ST350+ST650 done; other spokes' poly cards — Nike NKDC1963, ST469/ST700/LST700,
+  CS410, TM1MW452, EB544 — awaiting Erik's per-style confirmation). Also: every spoke pricing FAQ now ends "…shipped within about two
+  weeks" (order turnaround answered on all 11, not just hub). **"No upfront cost" was WRONG and is scrubbed
+  site-wide** — the $300 setup applies to fundraising stores too; never re-add that claim. Sweep tooling: scratchpad
+  `pricing-copy-sweep.js` pattern (exact-string + expected-count, catches template drift).
 - Hub FAQ now covers fundraising give-back (links /fundraising-webstores); fundraising spoke has a "what do you recommend
   for a company organizing shirts for a community event?" answer (limited-run store + AE companion order for personalized items).
 - **Gotcha: visible FAQ and FAQPage JSON-LD must stay 1:1 on every webstore page** — hub schema had been missing the visible
@@ -79,6 +92,14 @@ links to the /company-webstores hub. Hub→spoke linking DONE: all 11 hub store-
   1920×1280; also og:image) — NWCA t-shirt fundraiser that raised **$6,800 for firefighters' families** (2015 Twisp fire;
   shirt honors the three fallen + injured survivor). Hero trust line captions it — keep caption if image ever changes;
   tone = memorial, keep dignified.
+- **Team-spoke `#names-numbers` section (2026-07-16)**: showroom-cta photo+copy block after #products — Lincoln Lynx
+  football hoodie (Caspio 9457695, front logo + back name/number in one shot). Message: "Yes — we print names and numbers"
+  on shirt/hoodie BACKS, but ALWAYS as an AE team order (roster collected once), NEVER online customization; webstore sells
+  the logo gear alongside. Reuses hub's showroom-cta classes from golf-tournament-showcase.css.
+- **Fundraising-spoke `#causes` gallery (2026-07-16)**: 4 real breast-cancer-awareness cards between #products and #how —
+  Ruthie+Kanha modeling (9457666, uses `--top` crop), CHP pink patch (9457672), Sock it to Cancer (9457678), 25%-to-Cancer-
+  Research-Institute donation tee (9457681) + October "start in September" CTA. CSS: `.ws-card__photo--square/--top`
+  modifiers in company-webstores.css. Scalable home for future cause shirts (Buddy Walk, memorials — add a card, not a section).
 
 ## Spoke build detail
 
