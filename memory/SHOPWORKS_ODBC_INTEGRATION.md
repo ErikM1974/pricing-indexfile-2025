@@ -3,6 +3,13 @@
 **Status:** 🟡 Research complete 2026-07-16 — NOT built. Source: vendor PDF `ODBC Integration Guide for OnSite Projects.pdf` (Erik's Downloads, 7 pages) + Claris docs + proxy-repo pattern audit.
 **Verdict:** ODBC gives direct SQL reads of the OnSite FileMaker tables — strictly more data than ManageOrders PULL (due dates, full customer master w/ terms, employee/rep records, vendor PO/receiving detail, design records, per-line production state, unlimited history, SQL aggregation). MO push API remains the ONLY write path into ShopWorks — never write via ODBC.
 
+## Connection card (Erik, 2026-07-16)
+
+- Driver: **FileMaker ODBC 64-bit** (`fmodbc64.dll`) → 64-bit Python/Node work directly, no bitness gymnastics
+- Server: **192.168.10.6** (OnSite host, LAN) · Port: default **2399** (leave blank in DSN)
+- Database file: `Data_ODBCMapping` · User/pass: `extro` / `extro` (**read-only** — enforces the never-write rule at the account level)
+- DSN-less connection string (works without creating a DSN): `DRIVER={FileMaker ODBC};Server=192.168.10.6;Database=Data_ODBCMapping;UID=extro;PWD=extro`
+
 ## Vendor rules (ShopWorks, binding)
 
 - ONE dedicated Windows machine runs the FileMaker ODBC driver; **the querying app MUST run on that same machine** (Heroku can never connect directly).
