@@ -84,6 +84,10 @@ links to the /company-webstores hub. Hub→spoke linking DONE: all 11 hub store-
   1920×1280; also og:image) — NWCA t-shirt fundraiser that raised **$6,800 for firefighters' families** (2015 Twisp fire;
   shirt honors the three fallen + injured survivor). Hero trust line captions it — keep caption if image ever changes;
   tone = memorial, keep dignified.
+- **Team-spoke `#names-numbers` section (2026-07-16)**: showroom-cta photo+copy block after #products — Lincoln Lynx
+  football hoodie (Caspio 9457695, front logo + back name/number in one shot). Message: "Yes — we print names and numbers"
+  on shirt/hoodie BACKS, but ALWAYS as an AE team order (roster collected once), NEVER online customization; webstore sells
+  the logo gear alongside. Reuses hub's showroom-cta classes from golf-tournament-showcase.css.
 - **Fundraising-spoke `#causes` gallery (2026-07-16)**: 4 real breast-cancer-awareness cards between #products and #how —
   Ruthie+Kanha modeling (9457666, uses `--top` crop), CHP pink patch (9457672), Sock it to Cancer (9457678), 25%-to-Cancer-
   Research-Institute donation tee (9457681) + October "start in September" CTA. CSS: `.ws-card__photo--square/--top`
