@@ -1,3 +1,12 @@
+## v2026.07.17.11 (2026.07.17)
+
+- docs(memory): all-Box image push pipeline built (upload-with-stub?target=box + bandit script); sweep thru 2024+undated done, 2025/26 pending BEFORE=2027
+- docs(memory): all-Box image migration COMPLETE — sweep done thru 2026, 0 thumbnails left on Caspio (withUploads=0 every year), serving re-verified
+- docs(memory): direct-sync expanded to Contacts+SalesReps+Designs (retire OneDrive CSV chain); validated 99%+ vs live tables; CSV-import backfill plan
+- docs(memory): compact MEMORY index under target
+- feat(portal+finished-photos): 2026 portal elevation + barcode-driven capture app
+- Deploy v2026.07.17.11: 3 files (finished-photos-poster.html,finished-photos.html,customer-product.html...)
+
 ## v2026.07.17.10 (2026.07.17)
 
 - Deploy v2026.07.17.10: finished-photos — add 'Choose from album' (not just camera)
