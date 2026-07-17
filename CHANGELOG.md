@@ -1,3 +1,7 @@
+## v2026.07.17.8 (2026.07.17)
+
+- Deploy v2026.07.17.8: show Design # on portal My Logos cards
+
 ## v2026.07.17.7 (2026.07.17)
 
 - Deploy v2026.07.17.7: finished-photos search + design# tweaks
