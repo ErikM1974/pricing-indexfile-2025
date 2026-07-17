@@ -1,3 +1,8 @@
+## v2026.07.17.13 (2026.07.17)
+
+- fix(finished-photos): Order# row — compound .fp-btn.fp-btn-inline so the later .fp-btn width:100% can't flatten the input
+- Deploy v2026.07.17.13: orderrow fix cache bust
+
 ## v2026.07.17.12 (2026.07.17)
 
 - fix(branding): swap dead Box shared-static logo for the working Caspio CDN logo on capture app + portal header/favicon (white chip for legibility on green)
