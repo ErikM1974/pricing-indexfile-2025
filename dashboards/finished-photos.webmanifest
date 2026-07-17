@@ -1,0 +1,15 @@
+{
+    "name": "NWCA Finished Photos",
+    "short_name": "Finished Photos",
+    "description": "Snap the finished piece and publish it to the customer's portal",
+    "start_url": "/dashboards/finished-photos.html",
+    "scope": "/",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#f2f5f0",
+    "theme_color": "#14351c",
+    "icons": [
+        { "src": "/dashboards/images/fp-icon-192.png", "sizes": "192x192", "type": "image/png" },
+        { "src": "/dashboards/images/fp-icon-512.png", "sizes": "512x512", "type": "image/png" }
+    ]
+}
