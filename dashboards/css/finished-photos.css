@@ -115,8 +115,9 @@ body {
 }
 .fp-input:focus { outline: none; border-color: var(--fp-green); box-shadow: 0 0 0 3px rgba(46, 125, 50, .14); }
 .fp-orderrow { display: flex; gap: 8px; }
-.fp-orderrow .fp-input { flex: 1; margin-bottom: 0; }
-.fp-btn-inline { width: auto; padding: 0 22px; flex: none; }
+.fp-orderrow .fp-input { flex: 1; min-width: 0; margin-bottom: 0; }
+/* Compound selector — must outrank .fp-btn's width:100% (defined later in this sheet) */
+.fp-btn.fp-btn-inline { width: auto; padding: 0 22px; flex: none; }
 
 /* ── Scan launcher ── */
 .fp-scan-btn {
