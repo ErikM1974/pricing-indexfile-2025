@@ -1,3 +1,9 @@
+## v2026.07.17.4 (2026.07.17)
+
+- docs(memory): SanMar received-PO filter LIVE (v931 + v2026.07.17.3) + freshness fix = direct PO ODBC sync
+- docs(memory): direct PO ODBC sync LIVE (15-min) — SanMar Inbound received freshness
+- Deploy v2026.07.17.4: Finished Photos — factory capture page + portal 3rd bucket
+
 ## v2026.07.17.3 (2026.07.17)
 
 - docs(memory): SanMar Inbound received-PO filter (BUILT, pending deploy)
