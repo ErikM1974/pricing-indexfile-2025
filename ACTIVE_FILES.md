@@ -1280,7 +1280,9 @@ cap-embroidery-fix.css
 | `/dashboards/js/customer-portal-admin.js` | Customer Portals console controller (CRUD + CRM lookup + send-link + preview) | DashPage, same-origin `/api/crm-proxy/*` + `/api/portal-admin/*` | ✅ Active |
 | `/dashboards/finished-photos.html` | **NEW (2026-07-17)** Factory finished-product photo capture + manage (mobile-first, iPad/phones). Pick customer → design → snap photo → upload (hidden), then approve to show on the customer's portal (My Logos → Finished Photos). SAML-gated (any staff). | finished-photos.js/css, proxy `/api/finished-photos` (open POST) + same-origin `/api/staff/finished-photos` (GET/PATCH/DELETE forwarders), `/api/company-contacts/search`, `/api/designs/by-customer` | ✅ Active |
 | `/dashboards/js/finished-photos.js` | Finished-photos capture controller (customer search, design picker, camera upload, approve/delete manage) | APP_CONFIG, proxy `/api/finished-photos`, `/api/staff/finished-photos/*` | ✅ Active |
-| `/dashboards/css/finished-photos.css` | Finished-photos capture page styles (NWCA green, mobile-first, no inline) | - | ✅ Active |
+| `/dashboards/css/finished-photos.css` | Finished-photos capture page + wall-poster styles (NWCA green, mobile-first, print `@media`, no inline) | - | ✅ Active |
+| `/dashboards/finished-photos-poster.html` | **NEW (2026-07-17)** Printable QR wall poster → the capture page. Static inline SVG QR (no runtime lib). Print for factory wall / staff desks. Linked from the capture page header. | finished-photos.css, finished-photos-poster.js | ✅ Active |
+| `/dashboards/js/finished-photos-poster.js` | Wall-poster Print button handler (window.print) | - | ✅ Active |
 | `/dashboards/css/customer-portal-admin.css` | Customer Portals console page styles (table, modal, badges) | dash-shell.css, art-hub.css tokens | ✅ Active |
 | `/dashboards/taneisha-crm.html` | Taneisha's Account CRM dashboard | rep-crm.js, rep-crm.css | ✅ Active |
 | `/dashboards/nika-crm.html` | **NEW** Nika's Account CRM dashboard | rep-crm.js, rep-crm.css | ✅ Active |

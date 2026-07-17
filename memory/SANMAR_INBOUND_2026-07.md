@@ -93,6 +93,28 @@ were counted in but still showed, because UPS's live status was genuinely `Out f
   `date_Received=NULL` (receiving count-in never recorded in ShopWorks, despite "we received them"). The sync + filter
   are correct; a PO collapses to "✓ Received" within ~15 min of Mikalah receiving it IN ShopWorks.
 
+## 6. PO→WO MIS-LINK bug FIXED + nightly auto-heal (2026-07-17)
+
+Root-caused the "wrong company on the inbound card" (Erik's turn-1 "something's mismatched" hunch). The OLD
+style-overlap / `WO≈PO+offset` guesser mis-linked **~9% of recent POs** (120 of 1,334) to the WRONG order — often a
+different company (PO 113664 showed **Shio Sushi** but is really **Emtech** WO 142449; 113651 Chris Holstrom→South
+Sound Sitework; etc.). STICKY because `runPurchaseOrderMatch` only fills BLANK `id_Order` and `runQuickMatch` only
+revisits BLANK-`Company_Name` rows — nothing ever re-examines a row once a (wrong) company is written.
+
+- **Fix = `runPurchaseOrderReconcile` + `POST /api/sanmar-orders/po-reconcile`** (`?dryRun` / `?limit` / `?minPO`):
+  corrects any `SanMar_Orders.id_Order` that DISAGREES with the authoritative ShopWorks `PurchaseOrders.ID_PO→id_Order`
+  (re-derives Company/Rep from the corrected WO; only rewrites company when the MO mirror has the new order, else leaves
+  it — dashboard re-derives company from id_Order anyway). **ShopWorks wins** (system of record for PO→WO).
+- **ENABLER = the 15-min ODBC PO sync (§5)** — it keeps `PurchaseOrders.id_Order` fresh+authoritative, which is what
+  makes the reconcile safe. Before it, the mirror could be a day stale.
+- **APPLIED 2026-07-17**: dry-run 120 disagreements → verified 7/7 random against ShopWorks source → applied 120, 0
+  errors. Board corrected live (Emtech / South Sound Sitework / Cold Boy Stables / General Mechanical; "Shio Sushi"
+  gone — its REAL POs 113394/113408 were received back in June). Run from bandit w/ `x-api-secret=CrmApiSecret`.
+- **AUTO-HEAL**: `runPurchaseOrderReconcile({})` wired into nightly `runManageOrdersMatch` (no floor = comprehensive) →
+  self-corrects disagreements every night; surfaced as `reconciled`/`reconcileDisagreements` in the match status.
+  Steady-state ≈ 0 (only newly-mis-guessed POs). ⏳ deeper fix (optional): stop the style-overlap matcher writing
+  guesses when PurchaseOrders will have the answer within 15 min — reconcile makes it moot but it's wasteful.
+
 ## Gotchas / open
 - **Company/method come from the `ManageOrders_Orders` Caspio mirror at query time** (daily 12:00 UTC
   `sync-manageorders.js`) — if the mirror goes stale, every post-gap PO renders "unmatched / Other" even
