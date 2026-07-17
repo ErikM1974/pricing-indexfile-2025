@@ -1,3 +1,18 @@
+## v2026.07.17.1 (2026.07.17)
+
+- docs(memory): ODBC — existing CSV/OneDrive/DataHub pipeline mapped; ORDER_ODBC upsert key + enrichment columns
+- docs(memory): ODBC direct order sync LIVE — bandit agent + proxy route + heartbeat watchdog, gotchas, cutover plan
+- docs(memory): Thumbnails Report analysis — 99% id_Design coverage, image->company path proven, Thumb/DesLoc exposure needed
+- docs(memory): thumbnail image source confirmed — NCA-FS01=192.168.10.6 FileMaker container store, file-type mix, read-only, sync plan
+- docs(memory): SWF drop folder created on bandit (\\BANDIT\SWF) — always-on host for thumbnail export, replaces OneDrive
+- docs(memory): full current-state pipeline discovered — 5 FrontDesk ODBC exports + image copy; bandit consolidation target
+- docs(memory): correct architecture — FrontDesk=bandit login; 5 metadata exports+order sync already on bandit; only 3 thumbnail tasks remain on Erik desktop
+- docs(memory): Thumb.csv builder decoded (3-way join) + proposed direct-proxy simplification (metadata-sync endpoint)
+- docs(memory): thumbnail metadata sync BUILT+PAUSED — Caspio budget blocker (API 441K/500K, storage 15.83/20GB); stopping point + next-session plan
+- docs(memory): storage strategy — tier thumbnail images (recent=Caspio, archive=Box) to keep Caspio Files lean
+- docs(memory): Box archive sweep RUNNING (BEFORE=2025) + customer-logos-on-portal plan (Designs2026 bridge)
+- Deploy v2026.07.17.1: 3 files (customer-portal.html,customer-portal.js,server.js,...)
+
 ## v2026.07.16.5 (2026.07.16)
 
 - docs(memory): ODBC installer inspected — bundles 32-bit FileMaker 15.0.6 driver, DSN preset w/ UseLongVarchar
