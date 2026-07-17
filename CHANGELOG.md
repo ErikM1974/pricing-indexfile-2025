@@ -1,3 +1,7 @@
+## v2026.07.17.9 (2026.07.17)
+
+- Deploy v2026.07.17.9: show decoration method (Embroidery/DTG/…) under design # on portal cards
+
 ## v2026.07.17.8 (2026.07.17)
 
 - Deploy v2026.07.17.8: show Design # on portal My Logos cards
