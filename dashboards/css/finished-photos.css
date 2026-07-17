@@ -122,3 +122,33 @@ body {
 .fp-del { background: none; border: none; color: var(--fp-danger); font-size: 12px; cursor: pointer; padding: 2px; }
 .fp-empty { text-align: center; color: var(--fp-muted); padding: 20px; }
 [hidden] { display: none !important; }
+
+/* Header "Print wall poster" link on the capture page. */
+.fp-poster-link { display: inline-block; margin-top: 10px; color: #fff; font-size: 13px; font-weight: 600; text-decoration: underline; }
+
+/* ── Printable wall poster (finished-photos-poster.html) ── */
+.fpp-body { background: #eef1ee; padding: 24px 16px 60px; }
+.fpp-print {
+    display: block; margin: 0 auto 20px; padding: 12px 22px; font-size: 15px; font-weight: 700;
+    background: var(--fp-green); color: #fff; border: none; border-radius: 10px; cursor: pointer;
+}
+.fpp-poster {
+    max-width: 620px; margin: 0 auto; background: #fff; border: 1px solid var(--fp-border);
+    border-radius: 16px; padding: 40px 34px; text-align: center;
+}
+.fpp-badge { font-size: 12px; letter-spacing: .18em; font-weight: 700; color: var(--fp-green-dark); }
+.fpp-title { font-size: 30px; margin: 10px 0 6px; color: var(--fp-ink); }
+.fpp-sub { font-size: 16px; color: var(--fp-ink-soft); line-height: 1.45; margin: 0 auto 22px; max-width: 460px; }
+.fpp-qr { display: inline-block; padding: 14px; border: 3px solid var(--fp-green); border-radius: 14px; background: #fff; }
+.fpp-qr svg { display: block; width: 300px; height: 300px; }
+.fpp-scan { font-size: 17px; font-weight: 700; color: var(--fp-green-dark); margin: 16px 0 4px; }
+.fpp-steps { display: inline-block; text-align: left; margin: 10px auto 0; padding-left: 22px; font-size: 15px; color: var(--fp-ink); line-height: 1.7; }
+.fpp-url { margin-top: 22px; font-size: 14px; color: var(--fp-muted); word-break: break-all; }
+@media print {
+    .fpp-body { background: #fff; padding: 0; }
+    .fpp-print { display: none; }
+    .fpp-poster { border: none; border-radius: 0; max-width: 100%; padding: 24px; }
+    .fpp-qr { border-color: #000; }
+    .fpp-title, .fpp-scan { color: #000; }
+    @page { margin: 0.5in; }
+}
