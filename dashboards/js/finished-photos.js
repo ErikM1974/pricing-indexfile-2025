@@ -125,14 +125,19 @@
     });
 
     // ── Photo ──
+    // Two ways to add a photo: "Take a photo" (fp-file has capture=camera → opens the camera directly,
+    // fast on the factory floor) and "Choose from album" (fp-file-album, no capture → the phone's photo
+    // library + Files). Both feed the same handler.
     var fileInput = el('fp-file');
-    fileInput.addEventListener('change', function () {
-        var f = fileInput.files && fileInput.files[0];
+    var albumInput = el('fp-file-album');
+    function onPhotoChosen(f) {
         state.file = f || null;
         if (f) { el('fp-preview').src = URL.createObjectURL(f); el('fp-preview-wrap').hidden = false; }
         else { el('fp-preview-wrap').hidden = true; }
         refreshUploadBtn();
-    });
+    }
+    fileInput.addEventListener('change', function () { onPhotoChosen(fileInput.files && fileInput.files[0]); });
+    if (albumInput) albumInput.addEventListener('change', function () { onPhotoChosen(albumInput.files && albumInput.files[0]); });
     function refreshUploadBtn() { el('fp-upload-btn').disabled = !(state.file && state.designChosen && state.cust); }
     function setStatus(kind, msg) { var s = el('fp-status'); s.className = 'fp-status is-' + kind; s.textContent = msg; }
 
@@ -152,7 +157,7 @@
             .then(function (res) {
                 if (!res.ok || !res.j.success) throw new Error((res.j && res.j.error) || 'Upload failed');
                 setStatus('ok', '✓ Uploaded — it’s hidden until you tap “Show to customer” below.');
-                fileInput.value = ''; state.file = null; el('fp-preview-wrap').hidden = true; el('fp-caption').value = '';
+                fileInput.value = ''; if (albumInput) albumInput.value = ''; state.file = null; el('fp-preview-wrap').hidden = true; el('fp-caption').value = '';
                 refreshUploadBtn();
                 loadManage(state.cust.id);
             })

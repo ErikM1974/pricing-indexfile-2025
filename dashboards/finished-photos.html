@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>Finished Photos — Capture | NWCA Staff</title>
-    <link rel="stylesheet" href="/dashboards/css/finished-photos.css?v=2026.07.17.5">
+    <link rel="stylesheet" href="/dashboards/css/finished-photos.css?v=2026.07.17.10">
 </head>
 <body>
     <header class="fp-header">
@@ -46,10 +46,12 @@
         <section class="fp-step" id="fp-step-photo" hidden>
             <div class="fp-step-head"><span class="fp-num">3</span><h2>Photo</h2></div>
             <input type="file" id="fp-file" accept="image/*" capture="environment" hidden>
+            <input type="file" id="fp-file-album" accept="image/*" hidden>
             <label for="fp-file" class="fp-camera-btn" id="fp-camera-btn">
                 <span class="fp-camera-ico">📷</span>
-                <span>Take / choose photo</span>
+                <span>Take a photo</span>
             </label>
+            <label for="fp-file-album" class="fp-album-btn" id="fp-album-btn">🖼️ Choose from album / files</label>
             <div class="fp-preview-wrap" id="fp-preview-wrap" hidden>
                 <img id="fp-preview" alt="Selected photo preview">
             </div>
@@ -68,6 +70,6 @@
     </main>
 
     <script src="/config/app.config.js?v=2026.07.17.1"></script>
-    <script src="/dashboards/js/finished-photos.js?v=2026.07.17.7"></script>
+    <script src="/dashboards/js/finished-photos.js?v=2026.07.17.10"></script>
 </body>
 </html>
