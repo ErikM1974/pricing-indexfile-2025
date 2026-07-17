@@ -1,3 +1,8 @@
+## v2026.07.17.12 (2026.07.17)
+
+- fix(branding): swap dead Box shared-static logo for the working Caspio CDN logo on capture app + portal header/favicon (white chip for legibility on green)
+- Deploy v2026.07.17.12: logo-fix cache bust
+
 ## v2026.07.17.11 (2026.07.17)
 
 - docs(memory): all-Box image push pipeline built (upload-with-stub?target=box + bandit script); sweep thru 2024+undated done, 2025/26 pending BEFORE=2027
