@@ -89,6 +89,12 @@ body {
     cursor: pointer; margin-bottom: 12px;
 }
 .fp-camera-ico { font-size: 34px; }
+.fp-album-btn {
+    display: block; text-align: center; margin: 0 0 12px; padding: 12px;
+    border: 1px solid var(--fp-border); border-radius: 10px; background: #fff;
+    color: var(--fp-green-dark); font-weight: 600; font-size: 15px; cursor: pointer;
+}
+.fp-album-btn:active { background: var(--fp-green-bg); }
 .fp-preview-wrap { margin-bottom: 12px; text-align: center; }
 .fp-preview-wrap img { max-width: 100%; max-height: 320px; border-radius: 10px; border: 1px solid var(--fp-border); }
 
