@@ -84,12 +84,14 @@ were counted in but still showed, because UPS's live status was genuinely `Out f
   live POs showed `received:false` incl. Shio Sushi/Chris Holstrom that Ruthie said were counted in** — because
   `PurchaseOrders.date_Received` isn't fresh yet (legacy daily PO export hasn't caught up). Feature is correct; it's
   waiting on the sync → the freshness fix below is the real value-add.
-- ⏳ **FRESHNESS FIX (recommended, not yet built) = direct PO ODBC sync, NOT ManageOrders**. MO's `sts_Received` is
-  ORDER-level (one flag per WO — can't distinguish a 2-PO WO like Chris Holstrom 113651+113660) and the MO Caspio
-  mirror is daily, so MO only helps via live per-order calls (~15-min, business-hrs, risks hiding a still-inbound PO).
-  Better: clone the 15-min ORDER_ODBC bandit→proxy→Caspio agent for the ShopWorks `PO` table (per-PO authoritative
-  `date_Received`) → writes the SAME `PurchaseOrders` table this feature reads → zero dashboard change, ~15-min clear.
-  Also retires the legacy daily "Purchase Orders Export" CSV chain (already a cutover target in SHOPWORKS_ODBC doc).
+- ✅ **FRESHNESS FIX LIVE 2026-07-17 = direct PO ODBC sync (NOT ManageOrders)**. Built the 15-min bandit→proxy→Caspio
+  PO sync (Task `NWCA ShopWorks ODBC PO Sync`; `POST /api/shopworks-odbc/sync-purchase-orders`; upsert `PurchaseOrders`
+  by ID_PO w/ per-PO `date_Received`/`sts_Received`) → the SAME table this feature reads, so ~15-min clear, zero
+  dashboard change. Full detail → SHOPWORKS_ODBC_INTEGRATION.md "DIRECT PO SYNC LIVE". (MO was rejected: `sts_Received`
+  is order-level — can't split a 2-PO WO like Chris Holstrom 113651+113660 — and its mirror is daily.)
+- **WHY NOTHING DROPPED YET**: verified straight from ShopWorks — all 7 of today's SanMar POs are `sts_Received=0` /
+  `date_Received=NULL` (receiving count-in never recorded in ShopWorks, despite "we received them"). The sync + filter
+  are correct; a PO collapses to "✓ Received" within ~15 min of Mikalah receiving it IN ShopWorks.
 
 ## Gotchas / open
 - **Company/method come from the `ManageOrders_Orders` Caspio mirror at query time** (daily 12:00 UTC
