@@ -6,11 +6,11 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 
 ---
 
-### Regex member-access mangle in extraction rewrites (2026-07-09, tranche 2)
-- **Problem**: SCP reprice threw `undefined.totalQty` — every product dropped, $0 quotes; jsdom suites all green, only the E2E money lane caught it.
-- **Root Cause**: split-script rewrote closure vars with `totalQty → ctx.totalQty`; `` also matches AFTER a dot, so `product.totalQty` became `product.ctx.totalQty`.
-- **Solution**: exclude member positions — rewrite with `(?<!\.)name` (or restore by hand); fixed 2 sites.
-- **Prevention**: line-surgery protocol addition: never regex-rename a bare identifier into `ctx.X` without a negative-lookbehind for `.`; E2E money lanes are the ONLY net for live-DOM loop breaks — run them before calling a money-path split done.
+### Box shared-static image links 301 → broken logos silently hidden by onerror (2026-07-17)
+- **Problem**: Portal header logo never displayed for customers; the new finished-photos capture app showed raw alt text. Both pointed at `northwestcustomapparel.box.com/shared/static/8ngf….png`.
+- **Root Cause**: Box shared-static URLs 301-redirect instead of serving the image, so `<img>` fails; the portal's `onerror → display:none` handler hid the breakage (nobody knew a logo was even supposed to be there).
+- **Solution**: Swapped both headers + the portal favicon to the site-standard Caspio CDN logo (`cdn.caspio.com/A0E15000/Safety Stripes/web northwest custom apparel logo.png`) on a white chip for dark-green bars (v2026.07.17.12).
+- **Prevention**: Never use Box shared-static links as `<img src>` — use the Caspio CDN logo or a proxy-served asset. `onerror → hide` is a SILENT failure mode: pair it with a text-brand fallback or re-check when touching branding. Grep `box.com/shared/static` in HTML on any branding pass.
 
 ## Security & Auth
 

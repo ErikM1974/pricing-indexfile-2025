@@ -174,3 +174,13 @@ ODBC does NOT do: images/attachments (Box/mockup flows unaffected), writes (keep
 1. Erik: screenshot OnSite screens w/ wanted fields highlighted → `support@shopworx.com` (ask for ODBC access + field mapping). Start small: order header due-date/status fields + customer master.
 2. Pick the Windows box (a shipping machine may already have the driver — same installer) or a dedicated mini-PC; static LAN IP to the OnSite server; install driver + System DSN → `Data_ODBCMapping`; smoke-test from Excel/PowerShell before any code.
 3. Build agent + proxy route per architecture above; 15-60 min cadence; watchdog first, data second.
+
+## Finished-Photos capture v2 + work-order barcode lookup (LIVE 2026-07-17, app v2026.07.17.11–.13 + proxy v945)
+
+The factory capture page (`/dashboards/finished-photos.html`) now finds the order 3 ways — **Scan** (camera barcode), **Order #** (typed / keyboard-wedge scanner), **Search** (company name):
+
+- **Proxy `GET /api/finished-photos/lookup?code=`** (secret-gated by the existing non-POST mount; app forwards via SAML `GET /api/staff/finished-photos/lookup`): digits → `ORDER_ODBC` by `ID_Order` → `{idCustomer, CompanyName, datePlaced}`; `#####Loc#` (the design-sheet barcode, e.g. `40121Loc1`) → `Designs2026` by `ID_Design` → design + customer (company name from the customer's newest ORDER_ODBC row). Digits that miss as an order # retry as a design #. `parseScanCode` strips Code 39 `*` sentinels; jest `finished-photos-lookup.test.js`.
+- **One scan of the design-sheet barcode = customer + design selected → camera step.** Order-# path stamps `idOrder` onto the upload (`Finished_Photos.ID_Order`).
+- **Scanner** = vendored `dashboards/js/vendor/html5-qrcode.min.js` (v2.3.8, MIT, ZXing — works on iOS Safari; native BarcodeDetector doesn't). Formats: CODE_39/CODE_128/QR. Camera-denied → graceful "type the order #" fallback.
+- **Client-side compression**: photos re-encode ≤2000px JPEG q0.85 before upload (iPhone ~4MB → ~500KB); HEIC/undecodable falls back to the original (proxy accepts HEIC). Caption quick-chips (Front/Back/Left chest/Sleeve/Cap), retake overlay, publish list with "Live on portal" state + lightbox.
+- **ORDER_ODBC coverage caveat**: lookup only resolves orders present in the ODBC mirror (bandit 15-min sync) — fine for floor work orders (same-day); ancient order #s miss → use Search.
