@@ -75,6 +75,11 @@ ODBC does NOT do: images/attachments (Box/mockup flows unaffected), writes (keep
 - **Gotchas hit live**: ① Heroku 30s router timeout kills serial Caspio writes — agent chunks 75 + route upserts in parallel waves of 10 (~5s/chunk). ② ORDER_ODBC text cols are TEXT255 (except NotesOnOrder/NotesToAccounting 64K) — route truncates (order 139191 NotesToProduction >255 400'd). ③ Caspio v3 POST /tables silently DROPS columns with wrong Type enum (created only PK_ID) — add via POST /tables/{t}/fields with types `String`/`Integer`/`Date/Time` (NOT `Timestamp` = auto-stamp type; NOT ALL-CAPS).
 - **⏳ Cutover**: ERIK adds Heroku Scheduler entry `npm run check-shopworks-odbc-health` every 30 min (proxy app) · parallel-run ~1 week → disable bandit CSV task + Caspio DataHub import · then same pattern for `Designs_ODBC_2025` (Des) + `Company_Contacts_Merge_ODBC` (Contacts) · UPS for bandit recommended.
 
+## 💡 Storage strategy (Erik's idea 2026-07-17) — tier images to Box
+
+- **Caspio storage 15.83/20GB (79%) is almost all thumbnail IMAGES** (records are tiny, 860K/2M). Erik's idea: keep RECENT thumbnails in Caspio Files, archive OLD ones to **Box.com** (already core NWCA infra — proxy `box-upload.js`/`resolveToProxyUrl()`/box serving). Images are safe on the ShopWorks server regardless (`\\NCA-FS01\Thumbnails`, authoritative), so Box is just the serving copy for old ones. AGREED — good fit.
+- **Plan (image side, next session)**: image sync routes images older than a cutoff (decide ~2-3yr) → Box, recent → Caspio; metadata `FileUrl` points to whichever backend (proxy serves both, so website is agnostic). Bonus: with Box for archive we DON'T need an aggressive metadata date-cutoff — can keep metadata + Box image for all 28k thumbnails without touching Caspio's 20GB cap. "All-Box" (zero images in Caspio) is the leaner end-state but a bigger migration — start tiered. Free space now via existing proxy `DELETE /api/thumbnails/delete-by-year/:year`.
+
 ## ⏸️ Thumbnail METADATA sync BUILT + PAUSED 2026-07-17 (Caspio budget blocker)
 
 - **STATUS: task `NWCA ShopWorks Thumbnail Metadata Sync` DISABLED on bandit** (stopped mid-first-load at ~2,020 rows; snapshot `C:\NWCA\thumb-sync\last-snapshot.json` persists progress — resumable). Endpoint + reader are BUILT, DEPLOYED, and PROVEN (2,020 rows synced clean before the limit). Order sync untouched/healthy.
