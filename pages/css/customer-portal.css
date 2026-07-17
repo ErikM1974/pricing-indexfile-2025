@@ -858,6 +858,56 @@ body.cp-has-ribbon .cp-header { border-top: 0; }
 .cp-tab:hover { color: var(--cp-ink); }
 .cp-tab.is-active { color: var(--cp-theme-dark); border-bottom-color: var(--cp-theme); }
 
+/* Sub-tabs inside My Logos (Approved Logos / Mockups). Pill style — visually SUBORDINATE to the
+   underline top-tabs so they don't read as another nav level. Distinct .cp-subtab/data-subtab
+   class (see customer-portal.js) keeps them off the global top-tab click handler. */
+.cp-subtabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0 0 16px;
+}
+.cp-subtab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: 1px solid var(--cp-border);
+    border-radius: 999px;
+    padding: 6px 14px;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--cp-ink-soft);
+    cursor: pointer;
+    transition: color .12s ease, border-color .12s ease, background .12s ease;
+}
+.cp-subtab:hover { color: var(--cp-ink); border-color: var(--cp-theme-light); }
+.cp-subtab.is-active { color: var(--cp-theme-dark); border-color: var(--cp-theme); background: var(--cp-theme-bg); }
+.cp-subtab-count {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--cp-ink-mute);
+    background: var(--cp-theme-bg);
+    border-radius: 999px;
+    padding: 1px 8px;
+    min-width: 20px;
+    text-align: center;
+}
+.cp-subtab.is-active .cp-subtab-count { color: var(--cp-theme-dark); }
+.cp-subpanel { display: block; }
+/* Type chip inside a Mockups card body — "Graphic Art" (Steve) vs "Embroidery" (Ruth). */
+.cp-type-chip {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--cp-theme-dark);
+    background: var(--cp-theme-bg);
+    border-radius: 999px;
+    padding: 2px 9px;
+}
+
 /* Section already has its own top margin; kill the doubled gap at a panel's start. */
 .cp-tabpanel > .cp-section:first-child { margin-top: 0; }
 /* Panel gets programmatic focus on tab switch (a11y) — it's a container, not a control, so
@@ -885,6 +935,7 @@ body.cp-has-ribbon .cp-header { border-top: 0; }
     .cp-snapshot { grid-template-columns: repeat(2, 1fr); gap: 10px; }
     .cp-snap-val { font-size: 20px; }
     .cp-tab { padding: 10px 13px; }
+    .cp-subtab { padding: 5px 11px; }
 }
 
 /* ── Visible load-failure state (Erik's #1 rule: never a silent empty/$0) ── */

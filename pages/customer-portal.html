@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Your Account - Northwest Custom Apparel</title>
     <link rel="icon" type="image/png" href="https://northwestcustomapparel.box.com/shared/static/8ngf6qvtbq32bjlt97l7fkr0plmaw2o4.png">
-    <link rel="stylesheet" href="/pages/css/customer-portal.css?v=2026.07.05.2">
+    <link rel="stylesheet" href="/pages/css/customer-portal.css?v=2026.07.17.2">
     <link rel="stylesheet" href="/pages/css/portal-reorder-list.css?v=2026.07.03.1">
 </head>
 <body>
@@ -126,7 +126,26 @@
                 <span class="cp-section-count" id="cp-logos-count">0</span>
             </div>
             <p class="cp-section-sub">Your logos and design proofs we have on file — ready to run again.</p>
-            <div class="cp-card-grid" id="cp-logos-grid"></div>
+            <!-- Sub-tabs: Approved Logos (ShopWorks thumbnails) vs Mockups (Graphic Art + Embroidery proofs).
+                 Distinct .cp-subtab/data-subtab class so the scoped JS handler never hits the top-level tabs. -->
+            <div class="cp-subtabs" id="cp-logos-subtabs" role="tablist" style="display:none;">
+                <button class="cp-subtab is-active" id="cp-subtab-approved" type="button" role="tab" aria-selected="true" data-subtab="approved">Approved Logos <span class="cp-subtab-count" id="cp-approved-count">0</span></button>
+                <button class="cp-subtab" id="cp-subtab-mockups" type="button" role="tab" aria-selected="false" data-subtab="mockups">Mockups <span class="cp-subtab-count" id="cp-mockups-count">0</span></button>
+            </div>
+            <div class="cp-subpanel" data-subpanel="approved">
+                <div class="cp-card-grid" id="cp-approved-grid"></div>
+                <div class="cp-empty" id="cp-approved-empty" style="display:none;">
+                    <div class="cp-empty-icon">&#127912;</div>
+                    <div>No approved logos on file yet.</div>
+                </div>
+            </div>
+            <div class="cp-subpanel" data-subpanel="mockups" style="display:none;">
+                <div class="cp-card-grid" id="cp-mockups-grid"></div>
+                <div class="cp-empty" id="cp-mockups-empty" style="display:none;">
+                    <div class="cp-empty-icon">&#128444;</div>
+                    <div>No mockups on file yet.</div>
+                </div>
+            </div>
             <div class="cp-soon-panel" id="cp-logos-empty" style="display:none;">
                 <div class="cp-soon-icon" aria-hidden="true">&#127912;</div>
                 <div class="cp-soon-title">Your logos are on their way</div>
@@ -255,6 +274,6 @@
 
     <script src="/shared_components/js/app-config.js"></script>
     <script src="/pages/js/portal-reorder-list.js?v=2026.07.04.4"></script>
-    <script src="/pages/js/customer-portal.js?v=2026.07.17.1"></script>
+    <script src="/pages/js/customer-portal.js?v=2026.07.17.2"></script>
 </body>
 </html>

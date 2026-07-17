@@ -61,6 +61,7 @@
     //    appears inside it. Snapshot values are polled from the count spans as data lands. ──
     var _cpOpenBalance = 0, _cpOpenCount = 0, _ordersLoaded = false, _ordersFailed = false;
     setupTabs();
+    setupLogoSubtabs();
     function setupTabs() {
         var barEl = document.getElementById('cp-tabs-bar'), snapEl = document.getElementById('cp-snapshot');
         if (!barEl) return;
@@ -121,6 +122,29 @@
         }
     }
 
+    // ── My Logos sub-tabs (Approved Logos / Mockups) — a SCOPED handler + switcher. Uses a distinct
+    //    .cp-subtab / data-subtab (NOT .cp-tab) so it never triggers the global top-level tab handler
+    //    in setupTabs(); queries are scoped to #cp-section-logos so nothing outside is touched. ──
+    function setupLogoSubtabs() {
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest) return;
+            var st = e.target.closest('.cp-subtab[data-subtab]');
+            if (st) { e.preventDefault(); switchLogoSubtab(st.getAttribute('data-subtab')); }
+        });
+    }
+    function switchLogoSubtab(name) {
+        var panels = document.querySelectorAll('#cp-section-logos .cp-subpanel');
+        for (var i = 0; i < panels.length; i++) {
+            panels[i].style.display = panels[i].getAttribute('data-subpanel') === name ? 'block' : 'none';
+        }
+        var tabs = document.querySelectorAll('#cp-section-logos .cp-subtab');
+        for (var j = 0; j < tabs.length; j++) {
+            var on = tabs[j].getAttribute('data-subtab') === name;
+            tabs[j].classList.toggle('is-active', on);
+            tabs[j].setAttribute('aria-selected', on ? 'true' : 'false');
+        }
+    }
+
     function loadPortalData() {
         fetch(AGG_URL, { credentials: 'same-origin' })
             .then(function (resp) {
@@ -154,28 +178,31 @@
             });
     }
 
-    // ── My Logos: the customer's logos + design proofs (mockups + art), grouped by design ──
-    // Phase 0: pure front-end — /api/portal already returns customer-scoped, image-filtered,
-    // allowlist-projected mockups + art (2026+ per PORTAL_DATE_CUTOFF). We just merge, dedup by
-    // design #, and show one card per logo. (Phase 1 adds the not-date-gated brand-logo table.)
+    // ── My Logos: the customer's logos + proofs, split into two buckets under sub-tabs ──
+    //  • "Approved Logos" = the ShopWorks thumbnails (logoLibrary) — the master logo art, full history.
+    //  • "Mockups"        = design proofs, each card chipped "Graphic Art" (Steve/art) or "Embroidery"
+    //                       (Ruth/mockup). 2026+ per PORTAL_DATE_CUTOFF.
+    // Buckets dedup INDEPENDENTLY (a design can appear in both). The approval banner + per-card
+    // "Needs approval" badges come from the proofs (mockups+art) — the library is never awaiting.
     function renderMyLogos(mockups, artRequests, logoLibrary, custId) {
-        var grid = document.getElementById('cp-logos-grid');
         var countEl = document.getElementById('cp-logos-count');
-        var emptyEl = document.getElementById('cp-logos-empty');
+        var sectionEmptyEl = document.getElementById('cp-logos-empty');
+        var subtabsEl = document.getElementById('cp-logos-subtabs');
         document.getElementById('cp-section-logos').style.display = 'block';
 
         // Approved/Completed = the customer's FINAL artwork ("Completed" = the job actually ran).
         // Exact match — NOT a substring, or "Awaiting Approval" would wrongly count as approved.
         var isApproved = function (s) { var t = String(s || '').trim().toLowerCase(); return t === 'approved' || t === 'completed' || t === 'complete'; };
-        // "Awaiting Approval" = the ball is in the CUSTOMER's court (drives the top banner +
-        // card badge). Deliberately NOT "Revision Requested" — there the customer already
-        // acted and the art team is working, so nagging them would be wrong.
+        // "Awaiting Approval" = the ball is in the CUSTOMER's court (drives the top banner + card badge).
+        // Deliberately NOT "Revision Requested" — there the customer already acted and the art team is working.
         var isAwaiting = function (s) { return String(s || '').trim().toLowerCase().replace(/\s+/g, '-') === 'awaiting-approval'; };
-        var items = [];
+
+        // Proofs = Ruth's mockups (kind 'mockup' → Embroidery) + Steve's art (kind 'art' → Graphic Art).
+        var proofItems = [];
         (mockups || []).forEach(function (m) {
             var img = m.Box_Mockup_1 || m.Box_Mockup_2 || m.Box_Mockup_3;
             if (!img) return;
-            items.push({
+            proofItems.push({
                 design: String(m.Design_Number || ''),
                 name: m.Design_Name || (m.Design_Number ? 'Design #' + m.Design_Number : 'Design'),
                 meta: [m.Print_Location, m.Mockup_Type].filter(Boolean).join(' · '),
@@ -184,23 +211,21 @@
         });
         (artRequests || []).forEach(function (a) {
             // ONLY a real design proof (the mockup Steve/AE made). MAIN_IMAGE_URL_1 is a plain SanMar
-            // catalog stock photo of the blank garment/model — deliberately NOT used. A design with no
-            // proof on file is SKIPPED (we never show "just the model" as if it were the logo).
+            // catalog stock photo of the blank garment/model — deliberately NOT used.
             var img = a.Final_Approved_Mockup || a.Box_File_Mockup || a.Box_File_Link;
             if (!img) return;
-            items.push({
+            proofItems.push({
                 design: String(a.Design_Num_SW || ''),
                 name: a.Design_Num_SW ? 'Design #' + a.Design_Num_SW : (a.GarmentStyle || 'Design'),
                 meta: [a.GarmentStyle, a.GarmentColor].filter(Boolean).join(' · '),
                 img: img, date: a.Date_Created || '', kind: 'art', approved: isApproved(a.Status), awaiting: isAwaiting(a.Status)
             });
         });
-        // Logo library: the customer's full historical design set (all methods) with thumbnails,
-        // NOT date-gated. Lowest rank, so when a design ALSO has a recent proof (mockup/art), the
-        // proof card wins on grouping; library-only designs surface their thumbnail on their own.
+        // Approved Logos = the ShopWorks thumbnail library (the master logos), NOT date-gated.
+        var libraryItems = [];
         (logoLibrary || []).forEach(function (d) {
             if (!d.thumbnailUrl) return;
-            items.push({
+            libraryItems.push({
                 design: String(d.idDesign || ''),
                 name: d.designName || (d.idDesign ? 'Design #' + d.idDesign : 'Design'),
                 meta: '',
@@ -208,69 +233,99 @@
             });
         });
 
-        // Group by design # so a logo's proofs collapse into ONE card. Per design, prefer the
-        // APPROVED/Completed proof (the customer's final artwork) > a mockup over art > the newest.
-        // Nothing is hidden — a design with no approved proof yet still shows its latest.
-        var rank = function (it) { return (it.approved ? 100 : 0) + (it.kind === 'mockup' ? 10 : 0); };
-        var byKey = {};
-        items.forEach(function (it) {
-            var key = it.design ? ('d:' + it.design) : ('u:' + it.img);
-            var ex = byKey[key];
-            if (!ex) { byKey[key] = it; return; }
-            var better = rank(it) > rank(ex) || (rank(it) === rank(ex) && String(it.date) > String(ex.date));
-            if (better) byKey[key] = it;
-        });
-        var logos = Object.keys(byKey).map(function (k) { return byKey[k]; })
-            .sort(function (a, b) { return String(b.date).localeCompare(String(a.date)); });
-
-        // Designs with ANY proof awaiting the customer's approval → top banner + card badge.
-        // Keyed the same way as the grouping so a design whose SHOWN card is an older approved
-        // proof still gets flagged when a newer proof of that design awaits approval.
+        // Designs with ANY proof awaiting the customer's approval → top banner + per-card badge.
         var actionKeys = {};
-        items.forEach(function (it) {
+        proofItems.forEach(function (it) {
             if (it.awaiting) actionKeys[it.design ? ('d:' + it.design) : ('u:' + it.img)] = true;
         });
-        showApprovalBanner(Object.keys(actionKeys).length);
+        var awaitingCount = Object.keys(actionKeys).length;
+        showApprovalBanner(awaitingCount);
 
-        countEl.textContent = logos.length;
-        if (!logos.length) { grid.innerHTML = ''; emptyEl.style.display = 'flex'; return; }
-        emptyEl.style.display = 'none';
-        // The card opens a LIGHTBOX (not the internal staff art-request/mockup page, which errors
-        // for customers). Store the proxied image so the lightbox shows the full design.
+        // Dedup within a bucket: one card per design #, preferring APPROVED > mockup > art > newest.
+        var rank = function (it) { return (it.approved ? 100 : 0) + (it.kind === 'mockup' ? 10 : 0); };
+        var dedup = function (items) {
+            var byKey = {};
+            items.forEach(function (it) {
+                var key = it.design ? ('d:' + it.design) : ('u:' + it.img);
+                var ex = byKey[key];
+                if (!ex) { byKey[key] = it; return; }
+                var better = rank(it) > rank(ex) || (rank(it) === rank(ex) && String(it.date) > String(ex.date));
+                if (better) byKey[key] = it;
+            });
+            return Object.keys(byKey).map(function (k) { return byKey[k]; })
+                .sort(function (a, b) { return String(b.date).localeCompare(String(a.date)); });
+        };
+
+        var approvedLogos = dedup(libraryItems);
+        var mockupsList = dedup(proofItems);
+
+        // Render each bucket into its own grid; a Mockups card is chipped Graphic Art / Embroidery.
+        renderLogoBucket('cp-approved-grid', 'cp-approved-empty', approvedLogos, actionKeys, null);
+        renderLogoBucket('cp-mockups-grid', 'cp-mockups-empty', mockupsList, actionKeys, function (it) {
+            return it.kind === 'art' ? 'Graphic Art' : 'Embroidery';
+        });
+
+        var setCount = function (id, v) { var el = document.getElementById(id); if (el) el.textContent = v; };
+        setCount('cp-approved-count', approvedLogos.length);
+        setCount('cp-mockups-count', mockupsList.length);
+        var total = approvedLogos.length + mockupsList.length;
+        countEl.textContent = total; // grand total → header + mirrored to the snapshot "Logos" chip
+
+        if (!total) {
+            if (subtabsEl) subtabsEl.style.display = 'none';
+            sectionEmptyEl.style.display = 'flex';
+            return;
+        }
+        sectionEmptyEl.style.display = 'none';
+        if (subtabsEl) subtabsEl.style.display = '';
+        // Land on the tab that needs attention (awaiting proofs live in Mockups); else the first
+        // non-empty bucket (Approved Logos preferred — it's the mothership).
+        switchLogoSubtab(awaitingCount ? 'mockups' : (approvedLogos.length ? 'approved' : 'mockups'));
+    }
+
+    // Render one logo bucket into gridId; show emptyId when the bucket has no cards. typeLabelFn(item)
+    // returns the type-chip text for Mockups cards (Graphic Art / Embroidery), or null for Approved Logos.
+    function renderLogoBucket(gridId, emptyId, logos, actionKeys, typeLabelFn) {
+        var grid = document.getElementById(gridId);
+        var empty = document.getElementById(emptyId);
+        if (!grid) return;
+        if (!logos.length) { grid.innerHTML = ''; if (empty) empty.style.display = 'block'; return; }
+        if (empty) empty.style.display = 'none';
         grid.innerHTML = logos.map(function (l) {
-            // Box proof URLs are ALREADY caspio-proxy image endpoints — load them DIRECTLY (grid +
-            // lightbox). Double-proxying through /api/image-proxy stalls under page-load concurrency
-            // (~30 images at once). Direct also puts them on a separate host from the product images.
-            // Grid = 256px thumbnail; lightbox = ?size=large (1024/full). Non-proxy URLs (raw box.com /
-            // sanmar) still go through the FE image-proxy.
-            // Box mockups AND Caspio /api/files thumbnails (logo library) are already caspio-proxy
-            // image endpoints on an allowed host — load them DIRECTLY. Only ?size=large applies to
-            // Box thumbnails; /api/files serves the stored file as-is. Non-proxy URLs go via FE proxy.
-            var isBox = /\/api\/box\/thumbnail\//.test(l.img);
-            var isProxyImg = isBox || /\/api\/files\//.test(l.img);
-            var gridSrc = isProxyImg ? l.img : ('/api/image-proxy?url=' + encodeURIComponent(l.img));
-            var largeRaw = isBox ? (l.img + (l.img.indexOf('?') === -1 ? '?' : '&') + 'size=large') : l.img;
-            var largeSrc = isProxyImg ? largeRaw : ('/api/image-proxy?url=' + encodeURIComponent(largeRaw));
-            // eager (not lazy): My Logos is a small showcase below the fold — lazy left the proof
-            // images blank until the customer scrolled far enough. Few images, so eager is fine.
-            var img = '<img src="' + gridSrc + '" alt="" loading="eager" '
-                + 'onerror="this.parentElement.innerHTML=\'<div class=cp-card-placeholder>&#127912;</div>\'">';
-            var needs = !!actionKeys[l.design ? ('d:' + l.design) : ('u:' + l.img)];
-            var badge = needs
-                ? '<div class="cp-action-badge">Needs approval</div>'
-                : (l.approved ? '<div class="cp-logo-approved">&#10003; Approved</div>' : '');
-            return '<div class="cp-card cp-logo-card' + (needs ? ' cp-card--action-needed' : '') + '" role="button" tabindex="0"'
-                + ' data-img="' + escapeAttr(largeSrc) + '" data-title="' + escapeAttr(l.name) + '" data-meta="' + escapeAttr(l.meta || '') + '">'
-                + '<div class="cp-card-image">' + img + badge + '</div>'
-                + '<div class="cp-card-body">'
-                    + '<div class="cp-card-design">' + escapeHtml(l.name) + '</div>'
-                    + (l.meta ? '<div class="cp-card-name">' + escapeHtml(l.meta) + '</div>' : '')
-                    + '<div class="cp-card-footer">'
-                        + '<span class="cp-card-view">View design</span>'
-                        + '<div class="cp-card-date">' + formatDate(l.date) + '</div>'
-                    + '</div>'
-                + '</div></div>';
+            return renderLogoCard(l, actionKeys, typeLabelFn ? typeLabelFn(l) : '');
         }).join('');
+    }
+
+    // One logo/proof card. Opens a LIGHTBOX (not the internal staff page, which errors for customers).
+    // Box + Caspio /api/files URLs are already caspio-proxy image endpoints on an allowed host — load
+    // them DIRECTLY (grid 256px; lightbox ?size=large). Non-proxy URLs go via the FE image-proxy.
+    function renderLogoCard(l, actionKeys, typeLabel) {
+        var isBox = /\/api\/box\/thumbnail\//.test(l.img);
+        var isProxyImg = isBox || /\/api\/files\//.test(l.img);
+        var gridSrc = isProxyImg ? l.img : ('/api/image-proxy?url=' + encodeURIComponent(l.img));
+        var largeRaw = isBox ? (l.img + (l.img.indexOf('?') === -1 ? '?' : '&') + 'size=large') : l.img;
+        var largeSrc = isProxyImg ? largeRaw : ('/api/image-proxy?url=' + encodeURIComponent(largeRaw));
+        // eager (not lazy): My Logos is a small showcase below the fold — lazy left proofs blank
+        // until the customer scrolled far enough. Few images, so eager is fine.
+        var img = '<img src="' + gridSrc + '" alt="" loading="eager" '
+            + 'onerror="this.parentElement.innerHTML=\'<div class=cp-card-placeholder>&#127912;</div>\'">';
+        var needs = !!actionKeys[l.design ? ('d:' + l.design) : ('u:' + l.img)];
+        var badge = needs
+            ? '<div class="cp-action-badge">Needs approval</div>'
+            : (l.approved ? '<div class="cp-logo-approved">&#10003; Approved</div>' : '');
+        var chip = typeLabel ? '<div class="cp-type-chip">' + escapeHtml(typeLabel) + '</div>' : '';
+        return '<div class="cp-card cp-logo-card' + (needs ? ' cp-card--action-needed' : '') + '" role="button" tabindex="0"'
+            + ' data-img="' + escapeAttr(largeSrc) + '" data-title="' + escapeAttr(l.name) + '" data-meta="' + escapeAttr(l.meta || '') + '">'
+            + '<div class="cp-card-image">' + img + badge + '</div>'
+            + '<div class="cp-card-body">'
+                + '<div class="cp-card-design">' + escapeHtml(l.name) + '</div>'
+                + (l.meta ? '<div class="cp-card-name">' + escapeHtml(l.meta) + '</div>' : '')
+                + chip
+                + '<div class="cp-card-footer">'
+                    + '<span class="cp-card-view">View design</span>'
+                    + '<div class="cp-card-date">' + formatDate(l.date) + '</div>'
+                + '</div>'
+            + '</div></div>';
     }
 
     // ── My Logos lightbox: click a design card → view the full design image (no staff page) ──
