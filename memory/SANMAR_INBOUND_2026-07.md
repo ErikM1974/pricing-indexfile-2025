@@ -56,7 +56,7 @@ The Print/PDF report groups POs by sales rep (page-break per rep, per-rep subtot
 "Unassigned / Unmatched" section that prints last. `buildPrintSheet()` → `groupOrdersByRep()` + `poBlockHtml()` in
 `sanmar-inbound-today.js`. On-screen modal unchanged.
 
-## 5. Received-PO filter — "already counted in" drops off the arriving list (BUILT 2026-07-17, ⏳ pending deploy)
+## 5. Received-PO filter — "already counted in" drops off the arriving list (LIVE 2026-07-17: proxy v931 + pricing v2026.07.17.3)
 
 Erik's ask (2026-07-17): once receiving (Mikalah) counts a PO in, stop showing it as inbound — her physical
 count is more truthful than UPS's "out for delivery" (real case: Shio Sushi PO 113664 / Chris Holstrom 113651+113660
@@ -79,8 +79,17 @@ were counted in but still showed, because UPS's live status was genuinely `Out f
   Export** (still on the legacy CSV→OneDrive→Caspio-import chain, NOT the 15-min direct ORDER_ODBC sync). If that's
   ~daily, a PO Mikalah counts at 10 AM won't drop off until the next export — tolerable for a day-view that rolls over
   anyway; for near-real-time clearing, move that PO export to a frequent/direct-proxy sync like orders.
-- ⏳ **Deploy = BOTH repos**: proxy (`sanmar-orders.js`) + Pricing Index (`quote-management.{html,css}` + `.js`,
-  `?v=` bumped to 2026.07.17.1). Backward-compatible either order (missing `received` → treated as not-received).
+- ✅ **DEPLOYED both repos** (proxy v931 `sanmar-orders.js`; pricing v2026.07.17.3). Verified live: API returns
+  `received`/`receivedDate`/`totals.received`; deployed JS+CSS carry the received card. **BUT at deploy time all 7
+  live POs showed `received:false` incl. Shio Sushi/Chris Holstrom that Ruthie said were counted in** — because
+  `PurchaseOrders.date_Received` isn't fresh yet (legacy daily PO export hasn't caught up). Feature is correct; it's
+  waiting on the sync → the freshness fix below is the real value-add.
+- ⏳ **FRESHNESS FIX (recommended, not yet built) = direct PO ODBC sync, NOT ManageOrders**. MO's `sts_Received` is
+  ORDER-level (one flag per WO — can't distinguish a 2-PO WO like Chris Holstrom 113651+113660) and the MO Caspio
+  mirror is daily, so MO only helps via live per-order calls (~15-min, business-hrs, risks hiding a still-inbound PO).
+  Better: clone the 15-min ORDER_ODBC bandit→proxy→Caspio agent for the ShopWorks `PO` table (per-PO authoritative
+  `date_Received`) → writes the SAME `PurchaseOrders` table this feature reads → zero dashboard change, ~15-min clear.
+  Also retires the legacy daily "Purchase Orders Export" CSV chain (already a cutover target in SHOPWORKS_ODBC doc).
 
 ## Gotchas / open
 - **Company/method come from the `ManageOrders_Orders` Caspio mirror at query time** (daily 12:00 UTC
