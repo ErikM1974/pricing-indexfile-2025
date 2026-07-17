@@ -4149,6 +4149,48 @@ app.get('/api/staff/payments/recent', requireStaff, async (req, res) => {
   }
 });
 
+// ── Finished-photo staff manage endpoints. The proxy gates GET(all)/PATCH/DELETE behind the CRM
+//    secret, so forward them from here with the secret (requireStaff = SAML gate). The photo UPLOAD
+//    (POST /api/finished-photos) goes to the proxy DIRECTLY from the browser (open + rate-limited),
+//    same pattern as the mockup uploads — no multipart hop needed here. ──
+app.get('/api/staff/finished-photos', requireStaff, async (req, res) => {
+  if (!CRM_API_SECRET) return res.status(503).json({ error: 'not_configured' });
+  const id = String(req.query.idCustomer || '').replace(/\D/g, '');
+  if (!id) return res.status(400).json({ error: 'idCustomer required' });
+  try {
+    const r = await fetch(`${CRM_API_BASE}/api/finished-photos?idCustomer=${id}`, {
+      headers: { 'X-CRM-API-Secret': CRM_API_SECRET }, signal: AbortSignal.timeout(15000)
+    });
+    const body = await r.text();
+    res.status(r.status).type(r.headers.get('content-type') || 'application/json').send(body);
+  } catch (e) { console.error('[finished-photos-forward:list]', e.message); res.status(502).json({ error: 'upstream_unavailable' }); }
+});
+app.patch('/api/staff/finished-photos/:pk', requireStaff, express.json(), async (req, res) => {
+  if (!CRM_API_SECRET) return res.status(503).json({ error: 'not_configured' });
+  const pk = String(req.params.pk || '').replace(/\D/g, '');
+  if (!pk) return res.status(400).json({ error: 'bad id' });
+  try {
+    const r = await fetch(`${CRM_API_BASE}/api/finished-photos/${pk}`, {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json', 'X-CRM-API-Secret': CRM_API_SECRET },
+      body: JSON.stringify(req.body || {}), signal: AbortSignal.timeout(15000)
+    });
+    const body = await r.text();
+    res.status(r.status).type(r.headers.get('content-type') || 'application/json').send(body);
+  } catch (e) { console.error('[finished-photos-forward:patch]', e.message); res.status(502).json({ error: 'upstream_unavailable' }); }
+});
+app.delete('/api/staff/finished-photos/:pk', requireStaff, async (req, res) => {
+  if (!CRM_API_SECRET) return res.status(503).json({ error: 'not_configured' });
+  const pk = String(req.params.pk || '').replace(/\D/g, '');
+  if (!pk) return res.status(400).json({ error: 'bad id' });
+  try {
+    const r = await fetch(`${CRM_API_BASE}/api/finished-photos/${pk}`, {
+      method: 'DELETE', headers: { 'X-CRM-API-Secret': CRM_API_SECRET }, signal: AbortSignal.timeout(15000)
+    });
+    const body = await r.text();
+    res.status(r.status).type(r.headers.get('content-type') || 'application/json').send(body);
+  } catch (e) { console.error('[finished-photos-forward:delete]', e.message); res.status(502).json({ error: 'upstream_unavailable' }); }
+});
+
 // Look up an email in the Customer_Portal_Access registry (server-side, secret-gated proxy).
 async function fetchPortalAccess(email) {
   if (!CRM_API_SECRET) return null;
@@ -4470,7 +4512,26 @@ async function getPortalData(customerId) {
       }));
   } catch (e) { console.warn('[Portal] logo library fetch failed:', e.message); }
 
-  return { company: { name: companyName }, mockups, artRequests, logoLibrary };
+  // Finished photos: real photos of the decorated product the factory captured and a staffer
+  // APPROVED for the customer (portal=1 → Show_To_Customer='Yes' only). Keyed on the ShopWorks
+  // customer id; tagged with Design_Number so they group next to that design. Served from Box.
+  // Best-effort — a failure here must never break the rest of the portal.
+  let finishedPhotos = [];
+  try {
+    const fResp = await portalProxyGet(`/api/finished-photos?idCustomer=${cid}&portal=1`);
+    finishedPhotos = ((fResp && fResp.photos) || [])
+      .filter((p) => p.imageUrl)
+      .map((p) => ({
+        designNumber: p.designNumber || null,
+        designName: p.designName || null,
+        companyName: p.companyName || null,
+        caption: p.caption || null,
+        imageUrl: p.imageUrl,
+        uploadedDate: p.uploadedDate || null,
+      }));
+  } catch (e) { console.warn('[Portal] finished photos fetch failed:', e.message); }
+
+  return { company: { name: companyName }, mockups, artRequests, logoLibrary, finishedPhotos };
 }
 
 // GET /api/portal — customer-safe aggregate for the LOGGED-IN customer. SESSION-SCOPED:
