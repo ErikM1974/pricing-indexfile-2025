@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Finished Photos — Capture | NWCA Staff</title>
+    <link rel="stylesheet" href="/dashboards/css/finished-photos.css?v=2026.07.17.4">
+</head>
+<body>
+    <header class="fp-header">
+        <div class="fp-header-in">
+            <h1>📸 Finished Product Photos</h1>
+            <p>Snap a photo of the finished decorated item. Pick the customer &amp; design, take the photo, then approve it to show on the customer's portal.</p>
+        </div>
+    </header>
+
+    <main class="fp-main">
+        <!-- STEP 1 — customer -->
+        <section class="fp-step" id="fp-step-customer">
+            <div class="fp-step-head"><span class="fp-num">1</span><h2>Customer</h2></div>
+            <div id="fp-cust-picker">
+                <input type="search" id="fp-cust-search" class="fp-input" placeholder="Search company name…" autocomplete="off" autocapitalize="none">
+                <div class="fp-results" id="fp-cust-results" hidden></div>
+            </div>
+            <div class="fp-chosen" id="fp-cust-chosen" hidden>
+                <div><strong id="fp-cust-name"></strong><span class="fp-muted" id="fp-cust-id"></span></div>
+                <button type="button" class="fp-link" id="fp-cust-change">Change</button>
+            </div>
+        </section>
+
+        <!-- STEP 2 — design -->
+        <section class="fp-step" id="fp-step-design" hidden>
+            <div class="fp-step-head"><span class="fp-num">2</span><h2>Design</h2></div>
+            <p class="fp-hint">Tap the design this photo is for. This groups the photo next to that logo on the portal.</p>
+            <div class="fp-design-grid" id="fp-design-grid"></div>
+            <button type="button" class="fp-link" id="fp-design-none">No specific design — general photo</button>
+            <div class="fp-chosen" id="fp-design-chosen" hidden>
+                <div><strong id="fp-design-name"></strong><span class="fp-muted" id="fp-design-num"></span></div>
+                <button type="button" class="fp-link" id="fp-design-change">Change</button>
+            </div>
+        </section>
+
+        <!-- STEP 3 — photo -->
+        <section class="fp-step" id="fp-step-photo" hidden>
+            <div class="fp-step-head"><span class="fp-num">3</span><h2>Photo</h2></div>
+            <input type="file" id="fp-file" accept="image/*" capture="environment" hidden>
+            <label for="fp-file" class="fp-camera-btn" id="fp-camera-btn">
+                <span class="fp-camera-ico">📷</span>
+                <span>Take / choose photo</span>
+            </label>
+            <div class="fp-preview-wrap" id="fp-preview-wrap" hidden>
+                <img id="fp-preview" alt="Selected photo preview">
+            </div>
+            <input type="text" id="fp-caption" class="fp-input" placeholder="Optional caption (e.g. 'Left chest on navy polo')" maxlength="200">
+            <button type="button" class="fp-btn fp-btn-primary" id="fp-upload-btn" disabled>Upload photo</button>
+            <div class="fp-status" id="fp-status" role="status" aria-live="polite"></div>
+        </section>
+
+        <!-- Manage — this customer's photos -->
+        <section class="fp-step" id="fp-step-manage" hidden>
+            <div class="fp-step-head"><span class="fp-num">✓</span><h2>On file for this customer</h2></div>
+            <p class="fp-hint">Toggle <em>Show to customer</em> to publish a photo to their portal. Only shown ones appear to the customer.</p>
+            <div class="fp-manage-list" id="fp-manage-list"></div>
+            <div class="fp-empty" id="fp-manage-empty" hidden>No photos for this customer yet.</div>
+        </section>
+    </main>
+
+    <script src="/config/app.config.js?v=2026.07.17.1"></script>
+    <script src="/dashboards/js/finished-photos.js?v=2026.07.17.4"></script>
+</body>
+</html>

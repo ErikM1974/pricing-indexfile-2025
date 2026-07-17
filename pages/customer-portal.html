@@ -131,6 +131,7 @@
             <div class="cp-subtabs" id="cp-logos-subtabs" role="tablist" style="display:none;">
                 <button class="cp-subtab is-active" id="cp-subtab-approved" type="button" role="tab" aria-selected="true" data-subtab="approved">Approved Logos <span class="cp-subtab-count" id="cp-approved-count">0</span></button>
                 <button class="cp-subtab" id="cp-subtab-mockups" type="button" role="tab" aria-selected="false" data-subtab="mockups">Mockups <span class="cp-subtab-count" id="cp-mockups-count">0</span></button>
+                <button class="cp-subtab" id="cp-subtab-finished" type="button" role="tab" aria-selected="false" data-subtab="finished">Finished Photos <span class="cp-subtab-count" id="cp-finished-count">0</span></button>
             </div>
             <div class="cp-subpanel" data-subpanel="approved">
                 <div class="cp-card-grid" id="cp-approved-grid"></div>
@@ -144,6 +145,13 @@
                 <div class="cp-empty" id="cp-mockups-empty" style="display:none;">
                     <div class="cp-empty-icon">&#128444;</div>
                     <div>No mockups on file yet.</div>
+                </div>
+            </div>
+            <div class="cp-subpanel" data-subpanel="finished" style="display:none;">
+                <div class="cp-card-grid" id="cp-finished-grid"></div>
+                <div class="cp-empty" id="cp-finished-empty" style="display:none;">
+                    <div class="cp-empty-icon">&#128248;</div>
+                    <div>No finished-product photos yet.</div>
                 </div>
             </div>
             <div class="cp-soon-panel" id="cp-logos-empty" style="display:none;">
@@ -274,6 +282,6 @@
 
     <script src="/shared_components/js/app-config.js"></script>
     <script src="/pages/js/portal-reorder-list.js?v=2026.07.04.4"></script>
-    <script src="/pages/js/customer-portal.js?v=2026.07.17.2"></script>
+    <script src="/pages/js/customer-portal.js?v=2026.07.17.4"></script>
 </body>
 </html>

@@ -165,7 +165,7 @@
                     document.title = 'Your Account | NWCA';
                 }
 
-                renderMyLogos(data.mockups || [], data.artRequests || [], data.logoLibrary || [], custId);
+                renderMyLogos(data.mockups || [], data.artRequests || [], data.logoLibrary || [], data.finishedPhotos || [], custId);
 
                 // Show content, hide loading
                 document.getElementById('cp-loading').style.display = 'none';
@@ -184,7 +184,7 @@
     //                       (Ruth/mockup). 2026+ per PORTAL_DATE_CUTOFF.
     // Buckets dedup INDEPENDENTLY (a design can appear in both). The approval banner + per-card
     // "Needs approval" badges come from the proofs (mockups+art) — the library is never awaiting.
-    function renderMyLogos(mockups, artRequests, logoLibrary, custId) {
+    function renderMyLogos(mockups, artRequests, logoLibrary, finishedPhotos, custId) {
         var countEl = document.getElementById('cp-logos-count');
         var sectionEmptyEl = document.getElementById('cp-logos-empty');
         var subtabsEl = document.getElementById('cp-logos-subtabs');
@@ -258,17 +258,32 @@
 
         var approvedLogos = dedup(libraryItems);
         var mockupsList = dedup(proofItems);
+        // Finished photos: the factory's real product shots, approved for the customer. Show them ALL,
+        // newest first — each is a distinct product photo, so no per-design collapse (no dedup).
+        var finishedList = [];
+        (finishedPhotos || []).forEach(function (p) {
+            if (!p.imageUrl) return;
+            finishedList.push({
+                design: String(p.designNumber || ''),
+                name: p.designName || (p.designNumber ? 'Design #' + p.designNumber : 'Finished photo'),
+                meta: p.caption || '',
+                img: p.imageUrl, date: p.uploadedDate || '', kind: 'finished', approved: false, awaiting: false
+            });
+        });
+        finishedList.sort(function (a, b) { return String(b.date).localeCompare(String(a.date)); });
 
         // Render each bucket into its own grid; a Mockups card is chipped Graphic Art / Embroidery.
         renderLogoBucket('cp-approved-grid', 'cp-approved-empty', approvedLogos, actionKeys, null);
         renderLogoBucket('cp-mockups-grid', 'cp-mockups-empty', mockupsList, actionKeys, function (it) {
             return it.kind === 'art' ? 'Graphic Art' : 'Embroidery';
         });
+        renderLogoBucket('cp-finished-grid', 'cp-finished-empty', finishedList, actionKeys, null);
 
         var setCount = function (id, v) { var el = document.getElementById(id); if (el) el.textContent = v; };
         setCount('cp-approved-count', approvedLogos.length);
         setCount('cp-mockups-count', mockupsList.length);
-        var total = approvedLogos.length + mockupsList.length;
+        setCount('cp-finished-count', finishedList.length);
+        var total = approvedLogos.length + mockupsList.length + finishedList.length;
         countEl.textContent = total; // grand total → header + mirrored to the snapshot "Logos" chip
 
         if (!total) {
@@ -279,8 +294,13 @@
         sectionEmptyEl.style.display = 'none';
         if (subtabsEl) subtabsEl.style.display = '';
         // Land on the tab that needs attention (awaiting proofs live in Mockups); else the first
-        // non-empty bucket (Approved Logos preferred — it's the mothership).
-        switchLogoSubtab(awaitingCount ? 'mockups' : (approvedLogos.length ? 'approved' : 'mockups'));
+        // non-empty bucket — Approved Logos (the mothership) → Mockups → Finished Photos.
+        switchLogoSubtab(
+            awaitingCount ? 'mockups'
+                : approvedLogos.length ? 'approved'
+                : mockupsList.length ? 'mockups'
+                : 'finished'
+        );
     }
 
     // Render one logo bucket into gridId; show emptyId when the bucket has no cards. typeLabelFn(item)
