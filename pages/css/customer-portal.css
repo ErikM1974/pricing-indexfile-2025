@@ -226,6 +226,8 @@ body {
     text-overflow: ellipsis;
 }
 .cp-card-meta { font-size: 12px; color: var(--cp-ink-mute); margin-bottom: 4px; }
+/* Decoration method (Embroidery / DTG / …) shown under the design # — green so it stands out. */
+.cp-card-type { color: var(--cp-theme-dark); font-weight: 600; margin-top: -4px; }
 .cp-card-footer {
     display: flex;
     align-items: center;

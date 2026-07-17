@@ -178,6 +178,12 @@
             });
     }
 
+    // ShopWorks design-type codes → labels (same map as invoice.js / quote-view.js TYPE_NAMES). Built
+    // per render from the logo library (which carries designType), then read by renderLogoCard to show
+    // the decoration method (Embroidery / DTG / DTF / Screenprint …) under each card's design #.
+    var LOGO_TYPE_NAMES = { 1: 'Screenprint', 2: 'Embroidery', 4: 'Sticker', 5: 'Emblem', 8: 'DTF Transfer', 45: 'DTG' };
+    var _logoTypeByDesign = {};
+
     // ── My Logos: the customer's logos + proofs, split into two buckets under sub-tabs ──
     //  • "Approved Logos" = the ShopWorks thumbnails (logoLibrary) — the master logo art, full history.
     //  • "Mockups"        = design proofs, each card chipped "Graphic Art" (Steve/art) or "Embroidery"
@@ -196,6 +202,14 @@
         // "Awaiting Approval" = the ball is in the CUSTOMER's court (drives the top banner + card badge).
         // Deliberately NOT "Revision Requested" — there the customer already acted and the art team is working.
         var isAwaiting = function (s) { return String(s || '').trim().toLowerCase().replace(/\s+/g, '-') === 'awaiting-approval'; };
+
+        // Decoration method per design (Embroidery / DTG / …), from the logo library's designType code.
+        // renderLogoCard looks each card's design # up here to show the method under the design #.
+        _logoTypeByDesign = {};
+        (logoLibrary || []).forEach(function (d) {
+            var nm = LOGO_TYPE_NAMES[Number(d.designType)];
+            if (d.idDesign != null && nm) _logoTypeByDesign[String(d.idDesign)] = nm;
+        });
 
         // Proofs = Ruth's mockups (kind 'mockup' → Embroidery) + Steve's art (kind 'art' → Graphic Art).
         var proofItems = [];
@@ -337,13 +351,16 @@
         // Show the design # under the name so the customer can reference it for a reorder — but skip
         // it when the title IS already "Design #…" (no design name on file), which would just repeat.
         var designLabel = (l.design && l.name !== ('Design #' + l.design)) ? ('Design #' + l.design) : '';
-        var metaLine = [designLabel, l.meta].filter(Boolean).join(' · ');
+        var line1 = [designLabel, l.meta].filter(Boolean).join(' · '); // design # (+ caption / garment)
+        var typeName = _logoTypeByDesign[String(l.design)] || '';       // decoration method, shown under it
+        var metaAll = [line1, typeName].filter(Boolean).join(' · ');     // combined, for the lightbox caption
         return '<div class="cp-card cp-logo-card' + (needs ? ' cp-card--action-needed' : '') + '" role="button" tabindex="0"'
-            + ' data-img="' + escapeAttr(largeSrc) + '" data-title="' + escapeAttr(l.name) + '" data-meta="' + escapeAttr(metaLine) + '">'
+            + ' data-img="' + escapeAttr(largeSrc) + '" data-title="' + escapeAttr(l.name) + '" data-meta="' + escapeAttr(metaAll) + '">'
             + '<div class="cp-card-image">' + img + badge + '</div>'
             + '<div class="cp-card-body">'
                 + '<div class="cp-card-design">' + escapeHtml(l.name) + '</div>'
-                + (metaLine ? '<div class="cp-card-name">' + escapeHtml(metaLine) + '</div>' : '')
+                + (line1 ? '<div class="cp-card-name">' + escapeHtml(line1) + '</div>' : '')
+                + (typeName ? '<div class="cp-card-name cp-card-type">' + escapeHtml(typeName) + '</div>' : '')
                 + chip
                 + '<div class="cp-card-footer">'
                     + '<span class="cp-card-view">View design</span>'
