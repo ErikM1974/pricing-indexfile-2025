@@ -1,3 +1,8 @@
+## v2026.07.17.14 (2026.07.17)
+
+- docs(memory): capture-v2 barcode lookup + portal elevation shipped; Box shared-static logo lesson (archive regex-mangle entry)
+- feat(finished-photos): installable web app — manifest + apple-touch-icons so Add-to-Home-Screen launches standalone with a real NWCA icon
+
 ## v2026.07.17.13 (2026.07.17)
 
 - fix(finished-photos): Order# row — compound .fp-btn.fp-btn-inline so the later .fp-btn width:100% can't flatten the input
