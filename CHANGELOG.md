@@ -1,3 +1,8 @@
+## v2026.07.17.3 (2026.07.17)
+
+- docs(memory): SanMar Inbound received-PO filter (BUILT, pending deploy)
+- Deploy v2026.07.17.3: 3 files (quote-management.css,sanmar-inbound-today.js,quote-management.html,...)
+
 ## v2026.07.17.2 (2026.07.17)
 
 - Deploy v2026.07.17.2: My Logos → Approved Logos / Mockups sub-tabs
