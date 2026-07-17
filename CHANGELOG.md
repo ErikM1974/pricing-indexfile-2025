@@ -1,3 +1,8 @@
+## v2026.07.17.5 (2026.07.17)
+
+- docs(memory): PO->WO mis-link bug fixed (120 corrected + nightly auto-heal)
+- Deploy v2026.07.17.5: Finished Photos QR wall poster
+
 ## v2026.07.17.4 (2026.07.17)
 
 - docs(memory): SanMar received-PO filter LIVE (v931 + v2026.07.17.3) + freshness fix = direct PO ODBC sync
