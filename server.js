@@ -4452,7 +4452,25 @@ async function getPortalData(customerId) {
     .filter((a) => (a.Final_Approved_Mockup || a.Box_File_Mockup || a.BoxFileLink || a.MAIN_IMAGE_URL_1 || a.MAIN_IMAGE_URL_2 || a.MAIN_IMAGE_URL_3 || a.MAIN_IMAGE_URL_4) && portalOnOrAfterCutoff(a.Date_Created))
     .map(projectPortalArt);
 
-  return { company: { name: companyName }, mockups, artRequests };
+  // Logo library: the customer's FULL historical design set (all decoration methods) with
+  // thumbnails, via Designs2026.ID_Customer → Shopworks_Thumbnail_Report. NOT date-gated —
+  // this is their whole logo history. Thumbnails serve transparently from Caspio OR Box
+  // (archived). Best-effort: a failure here must never break the rest of the portal.
+  let logoLibrary = [];
+  try {
+    const lResp = await portalProxyGet(`/api/designs/by-customer/${cid}?method=all&limit=200`);
+    logoLibrary = ((lResp && lResp.designs) || [])
+      .filter((d) => d.thumbnailUrl)
+      .map((d) => ({
+        idDesign: d.idDesign || null,
+        designName: d.designName || null,
+        designType: d.designType || null,
+        thumbnailUrl: d.thumbnailUrl,
+        dateCreated: d.dateCreated || null,
+      }));
+  } catch (e) { console.warn('[Portal] logo library fetch failed:', e.message); }
+
+  return { company: { name: companyName }, mockups, artRequests, logoLibrary };
 }
 
 // GET /api/portal — customer-safe aggregate for the LOGGED-IN customer. SESSION-SCOPED:

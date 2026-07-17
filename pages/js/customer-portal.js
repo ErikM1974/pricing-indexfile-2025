@@ -141,7 +141,7 @@
                     document.title = 'Your Account | NWCA';
                 }
 
-                renderMyLogos(data.mockups || [], data.artRequests || [], custId);
+                renderMyLogos(data.mockups || [], data.artRequests || [], data.logoLibrary || [], custId);
 
                 // Show content, hide loading
                 document.getElementById('cp-loading').style.display = 'none';
@@ -158,7 +158,7 @@
     // Phase 0: pure front-end — /api/portal already returns customer-scoped, image-filtered,
     // allowlist-projected mockups + art (2026+ per PORTAL_DATE_CUTOFF). We just merge, dedup by
     // design #, and show one card per logo. (Phase 1 adds the not-date-gated brand-logo table.)
-    function renderMyLogos(mockups, artRequests, custId) {
+    function renderMyLogos(mockups, artRequests, logoLibrary, custId) {
         var grid = document.getElementById('cp-logos-grid');
         var countEl = document.getElementById('cp-logos-count');
         var emptyEl = document.getElementById('cp-logos-empty');
@@ -193,6 +193,18 @@
                 name: a.Design_Num_SW ? 'Design #' + a.Design_Num_SW : (a.GarmentStyle || 'Design'),
                 meta: [a.GarmentStyle, a.GarmentColor].filter(Boolean).join(' · '),
                 img: img, date: a.Date_Created || '', kind: 'art', approved: isApproved(a.Status), awaiting: isAwaiting(a.Status)
+            });
+        });
+        // Logo library: the customer's full historical design set (all methods) with thumbnails,
+        // NOT date-gated. Lowest rank, so when a design ALSO has a recent proof (mockup/art), the
+        // proof card wins on grouping; library-only designs surface their thumbnail on their own.
+        (logoLibrary || []).forEach(function (d) {
+            if (!d.thumbnailUrl) return;
+            items.push({
+                design: String(d.idDesign || ''),
+                name: d.designName || (d.idDesign ? 'Design #' + d.idDesign : 'Design'),
+                meta: '',
+                img: d.thumbnailUrl, date: d.dateCreated || '', kind: 'library', approved: false, awaiting: false
             });
         });
 
@@ -231,10 +243,14 @@
             // (~30 images at once). Direct also puts them on a separate host from the product images.
             // Grid = 256px thumbnail; lightbox = ?size=large (1024/full). Non-proxy URLs (raw box.com /
             // sanmar) still go through the FE image-proxy.
+            // Box mockups AND Caspio /api/files thumbnails (logo library) are already caspio-proxy
+            // image endpoints on an allowed host — load them DIRECTLY. Only ?size=large applies to
+            // Box thumbnails; /api/files serves the stored file as-is. Non-proxy URLs go via FE proxy.
             var isBox = /\/api\/box\/thumbnail\//.test(l.img);
-            var gridSrc = isBox ? l.img : ('/api/image-proxy?url=' + encodeURIComponent(l.img));
+            var isProxyImg = isBox || /\/api\/files\//.test(l.img);
+            var gridSrc = isProxyImg ? l.img : ('/api/image-proxy?url=' + encodeURIComponent(l.img));
             var largeRaw = isBox ? (l.img + (l.img.indexOf('?') === -1 ? '?' : '&') + 'size=large') : l.img;
-            var largeSrc = isBox ? largeRaw : ('/api/image-proxy?url=' + encodeURIComponent(largeRaw));
+            var largeSrc = isProxyImg ? largeRaw : ('/api/image-proxy?url=' + encodeURIComponent(largeRaw));
             // eager (not lazy): My Logos is a small showcase below the fold — lazy left the proof
             // images blank until the customer scrolled far enough. Few images, so eager is fine.
             var img = '<img src="' + gridSrc + '" alt="" loading="eager" '
