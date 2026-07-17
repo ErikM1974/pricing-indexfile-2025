@@ -2,30 +2,76 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
     <meta name="robots" content="noindex, nofollow">
+    <meta name="theme-color" content="#14351c">
     <title>Finished Photos — Capture | NWCA Staff</title>
-    <link rel="stylesheet" href="/dashboards/css/finished-photos.css?v=2026.07.17.10">
+    <link rel="stylesheet" href="/dashboards/css/finished-photos.css?v=2026.07.17.11">
 </head>
 <body>
-    <header class="fp-header">
-        <div class="fp-header-in">
-            <h1>📸 Finished Product Photos</h1>
-            <p>Snap a photo of the finished decorated item. Pick the customer &amp; design, take the photo, then approve it to show on the customer's portal.</p>
-            <a class="fp-poster-link" href="/dashboards/finished-photos-poster.html" target="_blank" rel="noopener">🖨️ Print the wall poster (QR code)</a>
+    <header class="fp-topbar">
+        <img src="https://northwestcustomapparel.box.com/shared/static/8ngf6qvtbq32bjlt97l7fkr0plmaw2o4.png"
+             alt="Northwest Custom Apparel" class="fp-logo" id="fp-logo">
+        <div class="fp-topbar-text">
+            <h1>Finished Photos</h1>
+            <p>Snap the finished piece &rarr; publish it to the customer&rsquo;s portal</p>
         </div>
     </header>
 
     <main class="fp-main">
-        <!-- STEP 1 — customer -->
-        <section class="fp-step" id="fp-step-customer">
-            <div class="fp-step-head"><span class="fp-num">1</span><h2>Customer</h2></div>
-            <div id="fp-cust-picker">
-                <input type="search" id="fp-cust-search" class="fp-input" placeholder="Search company name…" autocomplete="off" autocapitalize="none">
-                <div class="fp-results" id="fp-cust-results" hidden></div>
+        <!-- STEP 1 — find the order / customer -->
+        <section class="fp-step" id="fp-step-find">
+            <div class="fp-step-head"><span class="fp-num">1</span><h2>Find the order</h2></div>
+
+            <div id="fp-find-picker">
+                <div class="fp-modes" role="tablist" aria-label="How to find the order">
+                    <button type="button" class="fp-mode" id="fp-mode-scan" data-mode="scan" role="tab" aria-selected="false">
+                        <span class="fp-mode-ico" aria-hidden="true">&#9635;</span>Scan
+                    </button>
+                    <button type="button" class="fp-mode" id="fp-mode-order" data-mode="order" role="tab" aria-selected="false">
+                        <span class="fp-mode-ico" aria-hidden="true">#</span>Order&nbsp;#
+                    </button>
+                    <button type="button" class="fp-mode" id="fp-mode-search" data-mode="search" role="tab" aria-selected="false">
+                        <span class="fp-mode-ico" aria-hidden="true">&#9906;</span>Search
+                    </button>
+                </div>
+
+                <!-- Scan a work-order barcode -->
+                <div class="fp-pane" id="fp-pane-scan" hidden>
+                    <button type="button" class="fp-scan-btn" id="fp-scan-open">
+                        <span class="fp-scan-btn-ico" aria-hidden="true">&#128247;</span>
+                        <span>Scan the work-order barcode</span>
+                        <span class="fp-scan-btn-sub">Bottom of the work order &middot; or the design-sheet barcode</span>
+                    </button>
+                </div>
+
+                <!-- Type the order number -->
+                <div class="fp-pane" id="fp-pane-order" hidden>
+                    <div class="fp-orderrow">
+                        <input type="text" id="fp-order-input" class="fp-input" inputmode="numeric" autocomplete="off"
+                               enterkeyhint="search" placeholder="Order # — e.g. 142476">
+                        <button type="button" class="fp-btn fp-btn-primary fp-btn-inline" id="fp-order-find">Find</button>
+                    </div>
+                    <p class="fp-hint">Top-right of the work order. Design #s from the design sheet work too. A handheld scanner can type straight into this box.</p>
+                </div>
+
+                <!-- Search company name -->
+                <div class="fp-pane" id="fp-pane-search" hidden>
+                    <input type="search" id="fp-cust-search" class="fp-input" placeholder="Search company name&hellip;" autocomplete="off" autocapitalize="none">
+                    <div class="fp-results" id="fp-cust-results" hidden></div>
+                </div>
+
+                <div class="fp-status" id="fp-find-status" role="status" aria-live="polite"></div>
             </div>
+
             <div class="fp-chosen" id="fp-cust-chosen" hidden>
-                <div><strong id="fp-cust-name"></strong><span class="fp-muted" id="fp-cust-id"></span></div>
+                <div class="fp-chosen-body">
+                    <strong id="fp-cust-name"></strong>
+                    <div class="fp-chips">
+                        <span class="fp-chip" id="fp-cust-id"></span>
+                        <span class="fp-chip fp-chip--order" id="fp-order-chip" hidden></span>
+                    </div>
+                </div>
                 <button type="button" class="fp-link" id="fp-cust-change">Change</button>
             </div>
         </section>
@@ -33,11 +79,14 @@
         <!-- STEP 2 — design -->
         <section class="fp-step" id="fp-step-design" hidden>
             <div class="fp-step-head"><span class="fp-num">2</span><h2>Design</h2></div>
-            <p class="fp-hint">Tap the design this photo is for. This groups the photo next to that logo on the portal.</p>
+            <p class="fp-hint" id="fp-design-hint">Tap the design this photo is for &mdash; it files the photo next to that logo on the portal.</p>
             <div class="fp-design-grid" id="fp-design-grid"></div>
-            <button type="button" class="fp-link" id="fp-design-none">No specific design — general photo</button>
+            <button type="button" class="fp-link" id="fp-design-none">No specific design &mdash; general photo</button>
             <div class="fp-chosen" id="fp-design-chosen" hidden>
-                <div><strong id="fp-design-name"></strong><span class="fp-muted" id="fp-design-num"></span></div>
+                <div class="fp-chosen-body">
+                    <strong id="fp-design-name"></strong>
+                    <div class="fp-chips"><span class="fp-chip" id="fp-design-num"></span></div>
+                </div>
                 <button type="button" class="fp-link" id="fp-design-change">Change</button>
             </div>
         </section>
@@ -45,15 +94,27 @@
         <!-- STEP 3 — photo -->
         <section class="fp-step" id="fp-step-photo" hidden>
             <div class="fp-step-head"><span class="fp-num">3</span><h2>Photo</h2></div>
+            <p class="fp-hint">Clean shot = happy customer: plain background, garment flat or on a form, logo filling the frame.</p>
             <input type="file" id="fp-file" accept="image/*" capture="environment" hidden>
             <input type="file" id="fp-file-album" accept="image/*" hidden>
-            <label for="fp-file" class="fp-camera-btn" id="fp-camera-btn">
-                <span class="fp-camera-ico">📷</span>
-                <span>Take a photo</span>
-            </label>
-            <label for="fp-file-album" class="fp-album-btn" id="fp-album-btn">🖼️ Choose from album / files</label>
+            <div class="fp-photo-btns" id="fp-photo-btns">
+                <label for="fp-file" class="fp-camera-btn" id="fp-camera-btn">
+                    <span class="fp-camera-ico" aria-hidden="true">&#128247;</span>
+                    <span>Take a photo</span>
+                </label>
+                <label for="fp-file-album" class="fp-album-btn" id="fp-album-btn">&#128444;&#65039; Choose from album</label>
+            </div>
             <div class="fp-preview-wrap" id="fp-preview-wrap" hidden>
                 <img id="fp-preview" alt="Selected photo preview">
+                <button type="button" class="fp-retake" id="fp-retake">&#8634; Retake</button>
+                <span class="fp-size-note" id="fp-size-note" hidden></span>
+            </div>
+            <div class="fp-caption-chips" id="fp-caption-chips" aria-label="Quick captions">
+                <button type="button" class="fp-cchip" data-cap="Front">Front</button>
+                <button type="button" class="fp-cchip" data-cap="Back">Back</button>
+                <button type="button" class="fp-cchip" data-cap="Left chest">Left chest</button>
+                <button type="button" class="fp-cchip" data-cap="Sleeve">Sleeve</button>
+                <button type="button" class="fp-cchip" data-cap="Cap">Cap</button>
             </div>
             <input type="text" id="fp-caption" class="fp-input" placeholder="Optional caption (e.g. 'Left chest on navy polo')" maxlength="200">
             <button type="button" class="fp-btn fp-btn-primary" id="fp-upload-btn" disabled>Upload photo</button>
@@ -62,14 +123,33 @@
 
         <!-- Manage — this customer's photos -->
         <section class="fp-step" id="fp-step-manage" hidden>
-            <div class="fp-step-head"><span class="fp-num">✓</span><h2>On file for this customer</h2></div>
-            <p class="fp-hint">Toggle <em>Show to customer</em> to publish a photo to their portal. Only shown ones appear to the customer.</p>
+            <div class="fp-step-head"><span class="fp-num">&#10003;</span><h2>On file for this customer</h2></div>
+            <p class="fp-hint">New photos stay <em>hidden</em> until you publish them. Only published photos appear on the customer&rsquo;s portal.</p>
             <div class="fp-manage-list" id="fp-manage-list"></div>
             <div class="fp-empty" id="fp-manage-empty" hidden>No photos for this customer yet.</div>
         </section>
     </main>
 
+    <!-- Barcode scanner modal -->
+    <div class="fp-scan-modal" id="fp-scan-modal" hidden>
+        <div class="fp-scan-sheet">
+            <div class="fp-scan-head">
+                <strong>Scan the barcode</strong>
+                <button type="button" class="fp-scan-close" id="fp-scan-close" aria-label="Close scanner">&times;</button>
+            </div>
+            <div id="fp-scan-video"></div>
+            <div class="fp-scan-status" id="fp-scan-status" role="status" aria-live="polite">Starting camera&hellip;</div>
+        </div>
+    </div>
+
+    <!-- Photo lightbox (manage list) -->
+    <div class="fp-lightbox" id="fp-lightbox" hidden>
+        <button type="button" class="fp-lightbox-close" id="fp-lightbox-close" aria-label="Close">&times;</button>
+        <img id="fp-lightbox-img" alt="Finished photo full size">
+    </div>
+
     <script src="/config/app.config.js?v=2026.07.17.1"></script>
-    <script src="/dashboards/js/finished-photos.js?v=2026.07.17.10"></script>
+    <script src="/dashboards/js/vendor/html5-qrcode.min.js?v=2026.07.17.11" defer></script>
+    <script src="/dashboards/js/finished-photos.js?v=2026.07.17.11" defer></script>
 </body>
 </html>

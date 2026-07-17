@@ -4165,6 +4165,20 @@ app.get('/api/staff/finished-photos', requireStaff, async (req, res) => {
     res.status(r.status).type(r.headers.get('content-type') || 'application/json').send(body);
   } catch (e) { console.error('[finished-photos-forward:list]', e.message); res.status(502).json({ error: 'upstream_unavailable' }); }
 });
+// Barcode / order-number lookup: a work-order scan ("142476" footer barcode or "40121Loc1"
+// design-sheet barcode) resolves to the customer (+ design) so the crew skips the search.
+app.get('/api/staff/finished-photos/lookup', requireStaff, async (req, res) => {
+  if (!CRM_API_SECRET) return res.status(503).json({ error: 'not_configured' });
+  const code = String(req.query.code || '').trim().slice(0, 40);
+  if (!code) return res.status(400).json({ error: 'code required' });
+  try {
+    const r = await fetch(`${CRM_API_BASE}/api/finished-photos/lookup?code=${encodeURIComponent(code)}`, {
+      headers: { 'X-CRM-API-Secret': CRM_API_SECRET }, signal: AbortSignal.timeout(15000)
+    });
+    const body = await r.text();
+    res.status(r.status).type(r.headers.get('content-type') || 'application/json').send(body);
+  } catch (e) { console.error('[finished-photos-forward:lookup]', e.message); res.status(502).json({ error: 'upstream_unavailable' }); }
+});
 app.patch('/api/staff/finished-photos/:pk', requireStaff, express.json(), async (req, res) => {
   if (!CRM_API_SECRET) return res.status(503).json({ error: 'not_configured' });
   const pk = String(req.params.pk || '').replace(/\D/g, '');
@@ -5294,13 +5308,29 @@ app.post('/api/portal/reorder-batch', reorderRequestLimiter, requireCustomer, ex
 // The customer can only READ their balance and REQUEST a redemption — never change the
 // ledger. All ledger writes are staff-initiated (admin console → /api/portal-admin/rewards/entry).
 
+// Customer-safe projection of a reward-ledger feed: keep the math + story, drop the staff
+// audit trail (entries[].by = the granting staffer's email — internal, never customer-facing).
+function projectPortalRewards(raw) {
+  const entries = Array.isArray(raw && raw.entries) ? raw.entries : [];
+  return {
+    balance: Number(raw && raw.balance) || 0,
+    entries: entries.map((e) => ({
+      amount: Number(e.amount) || 0,
+      type: e.type || '',
+      reason: e.reason || '',
+      orderRef: e.orderRef || '',
+      created: e.created || '',
+    })),
+  };
+}
+
 // GET /api/portal/rewards — the logged-in customer's reward-dollar balance + recent activity.
 app.get('/api/portal/rewards', portalLimiter, requireCustomer, async (req, res) => {
   try {
     const cid = String(req.customerSession.portalCustomer.idCustomer);
     const r = await fetch(`${CRM_API_BASE}/api/customer-rewards/balance/${encodeURIComponent(cid)}`, { headers: { 'X-CRM-API-Secret': CRM_API_SECRET }, signal: AbortSignal.timeout(PORTAL_FETCH_TIMEOUT_MS) });
     if (!r.ok) throw new Error('rewards ' + r.status);
-    res.json(await r.json());
+    res.json(projectPortalRewards(await r.json()));
   } catch (err) {
     // Erik's #1 rule: never report a silent "$0" balance on failure — a customer
     // with reward $ would see their card vanish. Surface a 503 so the FE shows
@@ -5494,7 +5524,8 @@ app.get('/api/portal-admin/preview/:id/rewards', requireCrmRole(PORTAL_ADMIN_ROL
   if (!/^\d+$/.test(cid)) return res.status(400).json({ error: 'numeric customer id required' });
   try {
     const r = await fetch(`${CRM_API_BASE}/api/customer-rewards/balance/${encodeURIComponent(cid)}`, { headers: { 'X-CRM-API-Secret': CRM_API_SECRET }, signal: AbortSignal.timeout(PORTAL_FETCH_TIMEOUT_MS) });
-    res.json(r.ok ? await r.json() : { balance: 0, entries: [] });
+    // Same customer-safe projection as /api/portal/rewards — the preview mirrors what the customer sees.
+    res.json(r.ok ? projectPortalRewards(await r.json()) : { balance: 0, entries: [] });
   } catch (err) { res.json({ balance: 0, entries: [] }); }
 });
 // POST /api/portal-admin/rewards/entry — staff grant/adjust/redeem a reward entry. Stamps the

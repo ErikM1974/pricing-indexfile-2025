@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Your Account - Northwest Custom Apparel</title>
     <link rel="icon" type="image/png" href="https://northwestcustomapparel.box.com/shared/static/8ngf6qvtbq32bjlt97l7fkr0plmaw2o4.png">
-    <link rel="stylesheet" href="/pages/css/customer-portal.css?v=2026.07.17.9">
+    <link rel="stylesheet" href="/pages/css/customer-portal.css?v=2026.07.17.11">
     <link rel="stylesheet" href="/pages/css/portal-reorder-list.css?v=2026.07.03.1">
 </head>
 <body>
@@ -61,6 +61,7 @@
             <div class="cp-rewards-left">
                 <div class="cp-rewards-label"><span class="cp-rewards-star">&#9733;</span> Your Reward Dollars</div>
                 <div class="cp-rewards-balance" id="cp-rewards-balance">$0.00</div>
+                <div class="cp-rewards-sub" id="cp-rewards-sub" style="display:none;"></div>
             </div>
             <button class="cp-rewards-btn" id="cp-redeem-btn" type="button">Redeem on your next order</button>
         </div>
@@ -252,6 +253,11 @@
                     <input type="text" id="cp-redeem-amt" inputmode="decimal" placeholder="e.g. 25" autocomplete="off">
                 </label>
                 <div class="cp-req-error" id="cp-redeem-error"></div>
+                <!-- Recent reward activity (grants/redemptions) — filled by loadRewards -->
+                <div class="cp-redeem-history" id="cp-redeem-history" style="display:none;">
+                    <span class="cp-field-label">Recent activity</span>
+                    <div id="cp-redeem-history-list"></div>
+                </div>
             </div>
             <div class="cp-modal-foot">
                 <button class="cp-btn-ghost" id="cp-redeem-cancel" type="button">Cancel</button>
@@ -282,6 +288,6 @@
 
     <script src="/shared_components/js/app-config.js"></script>
     <script src="/pages/js/portal-reorder-list.js?v=2026.07.04.4"></script>
-    <script src="/pages/js/customer-portal.js?v=2026.07.17.9"></script>
+    <script src="/pages/js/customer-portal.js?v=2026.07.17.11"></script>
 </body>
 </html>
