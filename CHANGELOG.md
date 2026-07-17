@@ -1,3 +1,7 @@
+## v2026.07.17.10 (2026.07.17)
+
+- Deploy v2026.07.17.10: finished-photos — add 'Choose from album' (not just camera)
+
 ## v2026.07.17.9 (2026.07.17)
 
 - Deploy v2026.07.17.9: show decoration method (Embroidery/DTG/…) under design # on portal cards
