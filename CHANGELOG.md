@@ -1,3 +1,7 @@
+## v2026.07.17.6 (2026.07.17)
+
+- Deploy v2026.07.17.6: link Finished Photos on staff dashboard
+
 ## v2026.07.17.5 (2026.07.17)
 
 - docs(memory): PO->WO mis-link bug fixed (120 corrected + nightly auto-heal)
