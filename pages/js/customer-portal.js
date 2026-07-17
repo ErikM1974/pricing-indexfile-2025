@@ -334,12 +334,16 @@
             ? '<div class="cp-action-badge">Needs approval</div>'
             : (l.approved ? '<div class="cp-logo-approved">&#10003; Approved</div>' : '');
         var chip = typeLabel ? '<div class="cp-type-chip">' + escapeHtml(typeLabel) + '</div>' : '';
+        // Show the design # under the name so the customer can reference it for a reorder — but skip
+        // it when the title IS already "Design #…" (no design name on file), which would just repeat.
+        var designLabel = (l.design && l.name !== ('Design #' + l.design)) ? ('Design #' + l.design) : '';
+        var metaLine = [designLabel, l.meta].filter(Boolean).join(' · ');
         return '<div class="cp-card cp-logo-card' + (needs ? ' cp-card--action-needed' : '') + '" role="button" tabindex="0"'
-            + ' data-img="' + escapeAttr(largeSrc) + '" data-title="' + escapeAttr(l.name) + '" data-meta="' + escapeAttr(l.meta || '') + '">'
+            + ' data-img="' + escapeAttr(largeSrc) + '" data-title="' + escapeAttr(l.name) + '" data-meta="' + escapeAttr(metaLine) + '">'
             + '<div class="cp-card-image">' + img + badge + '</div>'
             + '<div class="cp-card-body">'
                 + '<div class="cp-card-design">' + escapeHtml(l.name) + '</div>'
-                + (l.meta ? '<div class="cp-card-name">' + escapeHtml(l.meta) + '</div>' : '')
+                + (metaLine ? '<div class="cp-card-name">' + escapeHtml(metaLine) + '</div>' : '')
                 + chip
                 + '<div class="cp-card-footer">'
                     + '<span class="cp-card-view">View design</span>'
