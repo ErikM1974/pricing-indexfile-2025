@@ -1,3 +1,7 @@
+## v2026.07.17.2 (2026.07.17)
+
+- Deploy v2026.07.17.2: My Logos → Approved Logos / Mockups sub-tabs
+
 ## v2026.07.17.1 (2026.07.17)
 
 - docs(memory): ODBC — existing CSV/OneDrive/DataHub pipeline mapped; ORDER_ODBC upsert key + enrichment columns
