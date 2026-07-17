@@ -38,11 +38,20 @@
     searchInput.addEventListener('input', debounce(function () {
         var q = searchInput.value.trim();
         if (q.length < 2) { results.hidden = true; results.innerHTML = ''; return; }
-        fetch(apiBase() + '/api/company-contacts/search?q=' + encodeURIComponent(q) + '&limit=15')
+        fetch(apiBase() + '/api/company-contacts/search?q=' + encodeURIComponent(q) + '&limit=25')
             .then(function (r) { return r.ok ? r.json() : { contacts: [] }; })
             .then(function (d) {
                 var seen = {}, rows = [];
                 ((d && d.contacts) || []).forEach(function (c) { var id = c.id_Customer; if (id && !seen[id]) { seen[id] = 1; rows.push(c); } });
+                // A staffer is picking a COMPANY, not a contact named "Adam" — float company-name
+                // matches to the top (name starts-with > contains > matched only via a contact/email).
+                // Stable within a tier so the backend's most-recent-first order is preserved.
+                var ql = q.toLowerCase();
+                rows = rows.map(function (c, i) {
+                    var n = String(c.CustomerCompanyName || '').toLowerCase();
+                    var s = n.indexOf(ql) === 0 ? 3 : (n.indexOf(ql) !== -1 ? 2 : 1);
+                    return { c: c, s: s, i: i };
+                }).sort(function (a, b) { return b.s - a.s || a.i - b.i; }).map(function (x) { return x.c; });
                 if (!rows.length) { results.innerHTML = '<div class="fp-result fp-muted">No matches</div>'; results.hidden = false; return; }
                 results.innerHTML = rows.map(function (c) {
                     return '<button type="button" class="fp-result" data-id="' + esc(c.id_Customer) + '" data-name="' + esc(c.CustomerCompanyName) + '">'
@@ -162,10 +171,16 @@
                 listEl.innerHTML = ps.map(function (p) {
                     var title = p.designName || (p.designNumber ? 'Design #' + p.designNumber : 'Finished photo');
                     var on = !!p.showToCustomer;
+                    // Sub-line: design # (when the title is a name, so it isn't repeated) · caption · date.
+                    var subParts = [];
+                    if (p.designNumber && p.designName) subParts.push('Design #' + p.designNumber);
+                    if (p.caption) subParts.push(p.caption);
+                    var dt = fmtDate(p.uploadedDate); if (dt) subParts.push(dt);
+                    var sub = subParts.map(esc).join(' · ');
                     return '<div class="fp-mrow" data-pk="' + esc(p.pkId) + '">'
                         + '<img src="' + esc(p.imageUrl) + '" alt="" loading="lazy">'
                         + '<div class="fp-mrow-body"><div class="fp-mrow-title">' + esc(title) + '</div>'
-                        + '<div class="fp-mrow-sub">' + (p.caption ? esc(p.caption) + ' · ' : '') + esc(fmtDate(p.uploadedDate)) + '</div></div>'
+                        + '<div class="fp-mrow-sub">' + sub + '</div></div>'
                         + '<div class="fp-mrow-actions">'
                         + '<button type="button" class="fp-toggle' + (on ? ' is-on' : '') + '" data-act="toggle" data-on="' + (on ? '1' : '0') + '">' + (on ? '✓ Shown' : 'Show to customer') + '</button>'
                         + '<button type="button" class="fp-del" data-act="del">Delete</button>'
