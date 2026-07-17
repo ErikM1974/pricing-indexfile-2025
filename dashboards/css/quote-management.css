@@ -1078,6 +1078,15 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 .sit-muted { color: #9097a0; }
 .sit-na { color: #b08; font-style: italic; }
 
+/* Received (counted in by receiving in ShopWorks) — collapsed + de-emphasized. Physically here,
+   so it drops off the arriving totals/labels but stays visible for reconciliation (never hidden). */
+.sit-card--received { opacity: 0.66; }
+.sit-card--received .sit-card-main { background: #f4f7f4; border-bottom: none; }
+.sit-card--received .sit-logo { width: 46px; height: 46px; font-size: 20px; }
+.sit-recv { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: #dcfce7; color: #166534; border: 1px solid #86efac; white-space: nowrap; cursor: help; }
+.sit-stat--recv { background: #f0fdf4; border-color: #bbf7d0; }
+.sit-stat--recv .sit-stat-num { color: #166534; }
+
 .sit-lines { width: 100%; border-collapse: collapse; font-size: 13px; }
 .sit-lines th, .sit-lines td { padding: 6px 14px; border-bottom: 1px solid #f0f0f0; text-align: left; }
 .sit-lines th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; color: #6b7280; background: #fff; }

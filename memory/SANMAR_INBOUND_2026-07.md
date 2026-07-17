@@ -56,6 +56,32 @@ The Print/PDF report groups POs by sales rep (page-break per rep, per-rep subtot
 "Unassigned / Unmatched" section that prints last. `buildPrintSheet()` → `groupOrdersByRep()` + `poBlockHtml()` in
 `sanmar-inbound-today.js`. On-screen modal unchanged.
 
+## 5. Received-PO filter — "already counted in" drops off the arriving list (BUILT 2026-07-17, ⏳ pending deploy)
+
+Erik's ask (2026-07-17): once receiving (Mikalah) counts a PO in, stop showing it as inbound — her physical
+count is more truthful than UPS's "out for delivery" (real case: Shio Sushi PO 113664 / Chris Holstrom 113651+113660
+were counted in but still showed, because UPS's live status was genuinely `Out for Delivery` today — verified via
+`/api/ups-tracking/:tn`, not a wrong-tracking mismatch: tracking comes from SanMar's per-PO shipment feed).
+
+- **Signal already in Caspio**: the `PurchaseOrders` mirror carries **`sts_Received`** + **`date_Received`** (set by
+  the ShopWorks→Caspio PO sync when receiving counts a PO in). Same field the `check-transfers-received` cron already
+  keys on. `inbound-today` ALREADY joins `PurchaseOrders` by `ID_PO`, so this was a small extension.
+- **Backend** (`sanmar-orders.js`): new `fetchPoReceivedMap(numericPOs)` (reads `ID_PO,sts_Received,date_Received`;
+  received = `date_Received` present OR `sts_Received==1`). Each order gets `received` + `receivedDate`. Received POs
+  are **excluded from the arriving totals** (pos/boxes/pieces/cost/workOrders), counted in `totals.received`, and
+  **sorted last**. Best-effort read (Rule #4: a failed read flags nothing → PO stays on the list, never hides a box).
+- **Frontend** (`sanmar-inbound-today.js` + `dashboards/css/quote-management.css`): received cards render **collapsed
+  + greyed** (`.sit-card--received`) with a green **✓ Received [date]** badge (`.sit-recv`), no contents table, no
+  Label button; a **"✓ N already received"** summary tile (`.sit-stat--recv`). Received POs are excluded from Box
+  Labels (`printAllLabels`) and the Print/PDF worklist (`buildPrintSheet`). Chose mark+collapse over hard-remove so a
+  receiving mis-count never makes a box silently vanish. Verified render via local harness (mock API) — clean, no errors.
+- **⚠ FRESHNESS CAVEAT (the one thing to tune)**: "received" only clears as fast as the bandit **Purchase Orders
+  Export** (still on the legacy CSV→OneDrive→Caspio-import chain, NOT the 15-min direct ORDER_ODBC sync). If that's
+  ~daily, a PO Mikalah counts at 10 AM won't drop off until the next export — tolerable for a day-view that rolls over
+  anyway; for near-real-time clearing, move that PO export to a frequent/direct-proxy sync like orders.
+- ⏳ **Deploy = BOTH repos**: proxy (`sanmar-orders.js`) + Pricing Index (`quote-management.{html,css}` + `.js`,
+  `?v=` bumped to 2026.07.17.1). Backward-compatible either order (missing `received` → treated as not-received).
+
 ## Gotchas / open
 - **Company/method come from the `ManageOrders_Orders` Caspio mirror at query time** (daily 12:00 UTC
   `sync-manageorders.js`) — if the mirror goes stale, every post-gap PO renders "unmatched / Other" even

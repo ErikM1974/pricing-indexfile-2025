@@ -168,6 +168,34 @@
       ? (o.trackingUrl ? `<a href="${esc(o.trackingUrl)}" target="_blank" rel="noopener">🚚 ${esc(o.carrier || 'Track')} ${esc(o.tracking)}</a>` : `🚚 ${esc(o.carrier)} ${esc(o.tracking)}`)
       : '';
     const f = (lbl, val) => val ? `<span class="sit-f"><span class="sit-fl">${lbl}</span> <b>${esc(val)}</b></span>` : '';
+
+    // Received (counted in by receiving in ShopWorks) → collapsed, de-emphasized card: no contents
+    // table, no label button, and excluded from the arriving totals — the blanks are physically here.
+    if (o.received) {
+      return `<div class="sit-card sit-card--received">
+        <div class="sit-card-main">
+          ${logoTile(o)}
+          <div class="sit-card-info">
+            <div class="sit-card-head">
+              <div class="sit-card-title">
+                <span class="sit-company">${company}</span>
+                ${methodChip(o.method)}
+                <span class="sit-recv" title="Counted in by receiving in ShopWorks${o.receivedDate ? ' on ' + esc(fmtShortDate(o.receivedDate)) : ''} — already here, no longer on the inbound count">✓ Received${o.receivedDate ? ' ' + esc(fmtShortDate(o.receivedDate)) : ''}</span>
+              </div>
+              <span class="sit-wo">WO ${wo}</span>
+            </div>
+            <div class="sit-card-meta">
+              <span class="sit-f"><span class="sit-fl">SanMar PO</span> <b>${esc(o.sanmarPO)}</b></span>
+              <span>📦 ${fmtNum(o.boxes)} box${o.boxes === 1 ? '' : 'es'}</span>
+              <span>🧵 ${fmtNum(o.piecesShipped)} pcs</span>
+              ${o.designNumber ? `<span class="sit-f"><span class="sit-fl">Design</span> <b>${esc(o.designNumber)}</b></span>` : ''}
+              ${f('Rep', initials(o.salesRep))}
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }
+
     return `<div class="sit-card">
       <div class="sit-card-main">
         ${logoTile(o)}
@@ -216,6 +244,7 @@
         <div class="sit-stat"><span class="sit-stat-num">${fmtNum(t.boxes)}</span><span class="sit-stat-lbl">boxes</span></div>
         <div class="sit-stat"><span class="sit-stat-num">${fmtNum(t.piecesShipped)}</span><span class="sit-stat-lbl">pieces arriving</span></div>
         <div class="sit-stat sit-stat--cost"><span class="sit-stat-num">${fmtMoney0(t.cost)}</span><span class="sit-stat-lbl">blanks cost</span></div>
+        ${t.received ? `<div class="sit-stat sit-stat--recv"><span class="sit-stat-num">✓ ${fmtNum(t.received)}</span><span class="sit-stat-lbl">already received</span></div>` : ''}
       </div>
       <div class="sit-cards">${data.orders.map(poCard).join('')}</div>
       <p class="sit-costnote">💵 Blank cost = SanMar wholesale (CASE_PRICE × qty) — what we pay SanMar. Final invoiced amounts can vary slightly and land ~1–2 weeks after arrival.</p>
@@ -297,7 +326,8 @@
     const old = document.getElementById('sit-print-sheet');
     if (old) old.remove();
     const t = data.totals || {};
-    const repSections = groupOrdersByRep(data.orders).map(g => {
+    // The printed worklist is actionable inbound only — received POs are already counted in.
+    const repSections = groupOrdersByRep((data.orders || []).filter(o => !o.received)).map(g => {
       const heading = g.repInitials
         ? `${esc(g.repName)} <span class="sit-ps-rep-ini">(${esc(g.repInitials)})</span>`
         : esc(g.repName);
@@ -444,7 +474,8 @@
   }
   function printAllLabels() {
     if (!lastData) return;
-    printLabels((lastData.orders || []).flatMap(boxesForOrder));
+    // Received POs are already counted in — no receiving label needed.
+    printLabels((lastData.orders || []).filter(o => !o.received).flatMap(boxesForOrder));
   }
 
   function setContent(html) {
