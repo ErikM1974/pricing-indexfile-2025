@@ -1,16 +1,19 @@
 /* Customer Portal — "Your Account" surface. cp- prefix.
-   ONE design language: one border/shadow/radius/ink/spacing scale keyed off the
-   NWCA green + gold tokens below. (Redesigned 2026-07-01.) */
+   ONE design language keyed off the NWCA green + gold tokens below.
+   2026-07-17 elevation pass: richer header, hero company banner, tactile snapshot
+   tiles, glassy sticky tabs, softer depth ramp, always-on rewards card (+ zero-state
+   and activity list). Every class + JS inline-display contract preserved. */
 
 :root {
     /* Brand */
     --cp-theme: #2e7d32;
     --cp-theme-dark: #1b5e20;
+    --cp-theme-deep: #143a1a;
     --cp-theme-light: #4caf50;
-    --cp-theme-bg: #f1f8e9;
-    --cp-theme-bg-hover: #e8f5e9;
+    --cp-theme-bg: #eef7ea;
+    --cp-theme-bg-hover: #e4f2e0;
 
-    /* Gold accent (warm half of the brand — Coming-Soon pill, Partial/Revision badge, rewards hairline) */
+    /* Gold accent (warm half of the brand — rewards, Coming-Soon, Partial/Revision) */
     --cp-gold: #c9a227;
     --cp-gold-dark: #b8942a;
     --cp-gold-ink: #6b5e1f;      /* AA on --cp-gold-bg */
@@ -19,69 +22,75 @@
 
     /* Surfaces + warm neutral canvas */
     --cp-surface: #ffffff;       /* every card/panel/table */
-    --cp-surface-2: #f6f8f4;     /* image wells, subtle insets */
+    --cp-surface-2: #f5f8f3;     /* image wells, subtle insets */
     --cp-cream: #fbfbf7;         /* soon-panel base */
-    --cp-page-bg: #f4f6f1;       /* faint green-tinted page */
+    --cp-page-bg: #f3f6f0;       /* faint green-tinted page */
 
     /* One border + line ramp */
-    --cp-border: #e3e7e1;        /* the single card/table hairline */
-    --cp-border-soft: #eef1ec;   /* interior row dividers */
+    --cp-border: #e2e7e0;        /* the single card/table hairline */
+    --cp-border-soft: #edf1ec;   /* interior row dividers */
     --cp-zebra: #f8faf6;         /* table even-row stripe */
     --cp-gray-100: #f0f2ee;
     --cp-gray-200: #e2e6df;
 
     /* One ink ramp */
-    --cp-ink: #1f2a22;           /* headings / primary */
-    --cp-ink-soft: #5c6b5e;      /* body / secondary */
-    --cp-ink-mute: #8a938c;      /* meta / dates / faint */
+    --cp-ink: #17231b;           /* headings / primary */
+    --cp-ink-soft: #57665a;      /* body / secondary */
+    --cp-ink-mute: #89928b;      /* meta / dates / faint */
 
-    /* One elevation scale */
-    --cp-shadow-1: 0 1px 3px rgba(27,60,27,.06), 0 1px 2px rgba(27,60,27,.04);
-    --cp-shadow-2: 0 6px 20px rgba(27,60,27,.10);
+    /* One elevation scale (green-cast so shadows feel branded, not sooty) */
+    --cp-shadow-1: 0 1px 2px rgba(23, 54, 27, .05), 0 2px 6px rgba(23, 54, 27, .06);
+    --cp-shadow-2: 0 10px 28px rgba(23, 54, 27, .13);
+    --cp-ring: 0 0 0 3px rgba(46, 125, 50, .14);
 
     /* Radius + spacing scale */
-    --cp-radius: 10px;
-    --cp-radius-sm: 8px;
-    --cp-radius-lg: 14px;        /* modals */
-    --cp-gap: 16px;             /* inside grids */
-    --cp-section-y: 32px;       /* between sections */
+    --cp-radius: 14px;
+    --cp-radius-sm: 10px;
+    --cp-radius-lg: 18px;        /* modals */
+    --cp-gap: 16px;              /* inside grids */
+    --cp-section-y: 34px;        /* between sections */
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: var(--cp-page-bg);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    background:
+        radial-gradient(120% 300px at 50% -60px, #e6efe2 0%, transparent 70%),
+        var(--cp-page-bg);
     color: var(--cp-ink);
     line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
 }
 
 /* ── Header ── */
 .cp-header {
-    background: linear-gradient(135deg, var(--cp-theme), var(--cp-theme-dark));
+    background:
+        radial-gradient(90% 160% at 8% -30%, rgba(255, 255, 255, .14) 0%, transparent 55%),
+        linear-gradient(140deg, var(--cp-theme) 0%, var(--cp-theme-dark) 55%, var(--cp-theme-deep) 100%);
     color: white;
-    padding: 16px 24px;
+    padding: 18px 26px;
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 15px;
 }
-.cp-header-logo { height: 40px; width: auto; }
-.cp-header-text h1 { font-size: 18px; font-weight: 600; letter-spacing: 0.3px; }
-.cp-header-text p { font-size: 12px; opacity: 0.85; }
+.cp-header-logo { height: 44px; width: auto; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .25)); }
+.cp-header-text h1 { font-size: 19px; font-weight: 700; letter-spacing: .012em; }
+.cp-header-text p { font-size: 12.5px; opacity: .82; letter-spacing: .02em; }
 .cp-header-actions { margin-left: auto; display: flex; gap: 8px; align-items: center; }
 .cp-header-link {
     color: #fff;
     font-size: 13px;
     font-weight: 600;
     text-decoration: none;
-    padding: 7px 14px;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.45);
+    padding: 8px 15px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.42);
     white-space: nowrap;
-    transition: background .12s;
+    transition: background .15s, border-color .15s;
 }
-.cp-header-link:hover { background: rgba(255, 255, 255, 0.16); }
-.cp-header-link--signout { border-color: rgba(255, 255, 255, 0.25); opacity: 0.92; }
+.cp-header-link:hover { background: rgba(255, 255, 255, 0.16); border-color: rgba(255, 255, 255, .7); }
+.cp-header-link--signout { border-color: rgba(255, 255, 255, 0.22); opacity: 0.92; }
 .cp-header-link:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 @media (max-width: 560px) {
     .cp-header-actions { width: 100%; margin-left: 0; margin-top: 8px; justify-content: flex-end; }
@@ -89,22 +98,31 @@ body {
 }
 
 /* ── Main content ── */
-.cp-main { max-width: 1080px; margin: 0 auto; padding: 24px 20px 72px; }
+.cp-main { max-width: 1080px; margin: 0 auto; padding: 26px 20px 76px; }
 
-/* ── Company banner ── */
+/* ── Company banner — the account hero ── */
 .cp-company-banner {
-    background: var(--cp-surface);
+    position: relative;
+    overflow: hidden;
+    background:
+        radial-gradient(130% 300% at 100% -80%, var(--cp-theme-bg) 0%, transparent 55%),
+        var(--cp-surface);
     border: 1px solid var(--cp-border);
-    border-left: 4px solid var(--cp-theme);
     border-radius: var(--cp-radius);
     box-shadow: var(--cp-shadow-1);
-    padding: 22px 26px;
+    padding: 24px 28px;
     margin-bottom: 22px;
 }
-.cp-company-name { font-size: 21px; font-weight: 700; color: var(--cp-ink); margin-bottom: 3px; }
+.cp-company-banner::before {
+    content: "";
+    position: absolute; inset: 0 auto 0 0; width: 5px;
+    background: linear-gradient(180deg, var(--cp-theme-light), var(--cp-theme-dark));
+    border-radius: 5px 0 0 5px;
+}
+.cp-company-name { font-size: 23px; font-weight: 800; letter-spacing: -.012em; color: var(--cp-ink); margin-bottom: 3px; }
 .cp-company-subtitle { font-size: 13px; color: var(--cp-ink-mute); }
 /* "Your rep: <name> · <contact>" line under the company name (filled from the orders feed) */
-.cp-company-rep { font-size: 13px; color: var(--cp-ink-soft); margin-top: 7px; }
+.cp-company-rep { font-size: 13px; color: var(--cp-ink-soft); margin-top: 8px; }
 .cp-company-rep strong { color: var(--cp-ink); font-weight: 600; }
 .cp-rep-link { color: var(--cp-theme-dark); font-weight: 600; text-decoration: none; }
 .cp-rep-link:hover { color: var(--cp-theme); text-decoration: underline; }
@@ -132,8 +150,8 @@ body {
     background: #9c1c33;
     color: #fff;
     border: none;
-    border-radius: var(--cp-radius-sm);
-    padding: 7px 14px;
+    border-radius: 999px;
+    padding: 8px 16px;
     font-size: 13px;
     font-weight: 700;
     font-family: inherit;
@@ -151,14 +169,14 @@ body {
     align-items: center;
     gap: 10px;
     margin-bottom: 14px;
-    padding-bottom: 9px;
+    padding-bottom: 10px;
     border-bottom: 1px solid var(--cp-border);
 }
-.cp-section-header h2 { font-size: 16px; font-weight: 700; letter-spacing: .01em; color: var(--cp-ink); }
+.cp-section-header h2 { font-size: 16.5px; font-weight: 800; letter-spacing: .005em; color: var(--cp-ink); }
 .cp-section-count {
     background: var(--cp-theme-bg);
     color: var(--cp-theme-dark);
-    border: 1px solid var(--cp-theme-light);
+    border: 1px solid #cbe5cd;
     font-size: 12px;
     font-weight: 700;
     padding: 1px 9px;
@@ -174,7 +192,7 @@ body {
    shadow + one radius + identical hover lift. Only min-width differs
    by content type (art/mockup cards vs the denser product/rec cards). */
 .cp-card-grid { display: grid; gap: var(--cp-gap); grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
-.cp-product-grid { display: grid; gap: var(--cp-gap); grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); }
+.cp-product-grid { display: grid; gap: var(--cp-gap); grid-template-columns: repeat(auto-fill, minmax(195px, 1fr)); }
 
 .cp-card,
 .cp-product-card {
@@ -187,14 +205,14 @@ body {
     flex-direction: column;
     text-decoration: none;
     color: inherit;
-    transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+    transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
 }
 .cp-card { cursor: pointer; }   /* .cp-card is an <a> */
 .cp-card:hover,
 .cp-product-card:hover {
-    transform: translateY(-2px);
+    transform: translateY(-3px);
     box-shadow: var(--cp-shadow-2);
-    border-color: var(--cp-theme-light);
+    border-color: #bcd9be;
 }
 .cp-card:focus-visible,
 .cp-product-card:focus-within {
@@ -206,7 +224,7 @@ body {
 .cp-card-image {
     width: 100%;
     aspect-ratio: 4/3;
-    background: var(--cp-surface-2);
+    background: linear-gradient(180deg, #fbfcfa, var(--cp-surface-2));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -216,7 +234,7 @@ body {
 .cp-card-image img { width: 100%; height: 100%; object-fit: cover; }
 .cp-card-placeholder { color: #ccd2cb; font-size: 48px; }
 .cp-card-body { padding: 14px 16px; }
-.cp-card-design { font-size: 14px; font-weight: 600; color: var(--cp-ink); margin-bottom: 2px; }
+.cp-card-design { font-size: 14px; font-weight: 700; color: var(--cp-ink); margin-bottom: 2px; }
 .cp-card-name {
     font-size: 13px;
     color: var(--cp-ink-soft);
@@ -255,13 +273,13 @@ body {
 /* Lightbox — full-size design proof */
 .cp-lightbox {
     position: fixed; inset: 0; z-index: 1200;
-    background: rgba(15,25,15,.82);
+    background: rgba(12, 22, 13, .84);
     display: flex; align-items: center; justify-content: center; padding: 4vh 4vw;
 }
 .cp-lightbox-inner {
     position: relative; max-width: 720px; width: 100%;
     background: #fff; border-radius: var(--cp-radius-lg); overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0,0,0,.4);
+    box-shadow: 0 24px 70px rgba(0, 0, 0, .45);
 }
 .cp-lightbox-inner img { display: block; width: 100%; max-height: 78vh; object-fit: contain; background: var(--cp-surface-2); }
 .cp-lightbox-cap { padding: 14px 18px; }
@@ -269,10 +287,10 @@ body {
 .cp-lightbox-meta { font-size: 13px; color: var(--cp-ink-soft); margin-top: 2px; }
 .cp-lightbox-close {
     position: absolute; top: 8px; right: 10px; z-index: 2;
-    width: 34px; height: 34px; border-radius: 50%; border: none;
-    background: rgba(0,0,0,.5); color: #fff; font-size: 22px; line-height: 1; cursor: pointer;
+    width: 36px; height: 36px; border-radius: 50%; border: none;
+    background: rgba(0, 0, 0, .5); color: #fff; font-size: 22px; line-height: 1; cursor: pointer;
 }
-.cp-lightbox-close:hover { background: rgba(0,0,0,.7); }
+.cp-lightbox-close:hover { background: rgba(0, 0, 0, .7); }
 
 /* Action-needed highlight — thin, tokenized */
 .cp-card--action-needed {
@@ -348,10 +366,10 @@ body {
 .cp-status--neutral::before { display: none; }
 
 /* ── Loading ── */
-.cp-loading { text-align: center; padding: 80px 20px; }
+.cp-loading { text-align: center; padding: 90px 20px; }
 .cp-spinner {
-    width: 40px; height: 40px;
-    border: 3px solid #e0e0e0;
+    width: 42px; height: 42px;
+    border: 3px solid #dde5db;
     border-top-color: var(--cp-theme);
     border-radius: 50%;
     animation: cp-spin 0.8s linear infinite;
@@ -369,7 +387,7 @@ body {
 /* ── Empty state (Products / Orders / Invoices — NOT the soon panel) ── */
 .cp-empty {
     text-align: center;
-    padding: 40px 24px;
+    padding: 42px 24px;
     color: var(--cp-ink-mute);
     font-size: 14px;
     background: var(--cp-surface);
@@ -382,8 +400,8 @@ body {
 /* ── Footer ── */
 .cp-footer {
     text-align: center;
-    padding: 20px;
-    font-size: 11px;
+    padding: 22px 20px;
+    font-size: 12px;
     color: var(--cp-ink-mute);
     border-top: 1px solid var(--cp-border);
     margin-top: 8px;
@@ -410,12 +428,12 @@ body {
     padding: 12px 16px;
     background: var(--cp-theme-bg);
     color: var(--cp-theme-dark);
-    font-size: 11.5px;
-    font-weight: 700;
-    letter-spacing: .04em;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .06em;
     text-transform: uppercase;
     white-space: nowrap;
-    border-bottom: 2px solid var(--cp-theme-light);
+    border-bottom: 2px solid #bcd9be;
 }
 .cp-table thead th:first-child { border-top-left-radius: var(--cp-radius); }
 .cp-table thead th:last-child  { border-top-right-radius: var(--cp-radius); }
@@ -470,11 +488,11 @@ body {
 .cp-row-reorder {
     background: var(--cp-theme-bg);
     color: var(--cp-theme-dark);
-    border: 1px solid var(--cp-theme-light);
-    border-radius: var(--cp-radius-sm);
-    padding: 5px 12px;
+    border: 1px solid #cbe5cd;
+    border-radius: 999px;
+    padding: 6px 14px;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 700;
     font-family: inherit;
     cursor: pointer;
     white-space: nowrap;
@@ -504,19 +522,20 @@ body.cp-has-ribbon .cp-header { border-top: 0; }
 /* ── Products + Recommendations ── */
 .cp-product-img {
     aspect-ratio: 1 / 1;
-    background: var(--cp-surface-2);
+    background: linear-gradient(180deg, #fbfcfa, var(--cp-surface-2));
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
 }
-.cp-product-img img { width: 100%; height: 100%; object-fit: contain; }
+.cp-product-img img { width: 100%; height: 100%; object-fit: contain; transition: transform .2s ease; }
+.cp-product-card:hover .cp-product-img img { transform: scale(1.03); }
 .cp-product-imglink { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; cursor: pointer; }
 .cp-product-titlelink { color: inherit; text-decoration: none; }
 .cp-product-titlelink:hover { color: var(--cp-theme-dark); text-decoration: underline; }
 .cp-product-img.cp-noimg::after { content: '👕'; font-size: 40px; opacity: .35; }
-.cp-product-body { padding: 11px 12px 13px; display: flex; flex-direction: column; gap: 3px; flex: 1; }
-.cp-product-title { font-weight: 600; font-size: 13.5px; color: var(--cp-ink); line-height: 1.3; }
+.cp-product-body { padding: 12px 13px 14px; display: flex; flex-direction: column; gap: 3px; flex: 1; }
+.cp-product-title { font-weight: 700; font-size: 13.5px; color: var(--cp-ink); line-height: 1.3; }
 .cp-product-sub { font-size: 12px; color: var(--cp-ink-soft); }
 .cp-product-meta { font-size: 11.5px; color: var(--cp-ink-mute); margin-bottom: 8px; }
 .cp-product-btn {
@@ -524,28 +543,29 @@ body.cp-has-ribbon .cp-header { border-top: 0; }
     display: block; text-align: center; text-decoration: none;  /* works as <button> (recs) OR <a> (Your Products → product page) */
     background: var(--cp-theme-bg);
     color: var(--cp-theme-dark);
-    border: 1px solid var(--cp-theme-light);
-    border-radius: var(--cp-radius-sm);
-    padding: 8px 10px;
+    border: 1px solid #cbe5cd;
+    border-radius: 999px;
+    padding: 9px 10px;
     font-size: 12.5px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
     font-family: inherit;
-    transition: background .15s, color .15s, border-color .15s;
+    transition: background .15s, color .15s, border-color .15s, box-shadow .15s;
 }
-.cp-product-btn:hover { background: var(--cp-theme); color: #fff; border-color: var(--cp-theme); }
+.cp-product-btn:hover { background: var(--cp-theme); color: #fff; border-color: var(--cp-theme); box-shadow: 0 3px 10px rgba(46, 125, 50, .28); }
+.cp-product-btn:focus-visible { outline: 2px solid var(--cp-theme); outline-offset: 2px; }
 
 /* Your Products discovery aids — search + sort + show-more (only shown when the list is long) */
 .cp-products-toolbar { display: flex; gap: 10px; margin: 0 0 16px; flex-wrap: wrap; }
 .cp-search {
-    flex: 1 1 220px; min-width: 170px; padding: 9px 12px; border: 1px solid var(--cp-border);
-    border-radius: var(--cp-radius-sm); font-size: 14px; font-family: inherit; background: var(--cp-surface); color: var(--cp-ink);
+    flex: 1 1 220px; min-width: 170px; padding: 10px 14px; border: 1px solid var(--cp-border);
+    border-radius: 999px; font-size: 14px; font-family: inherit; background: var(--cp-surface); color: var(--cp-ink);
 }
 .cp-sortsel {
-    padding: 9px 11px; border: 1px solid var(--cp-border); border-radius: var(--cp-radius-sm);
+    padding: 10px 13px; border: 1px solid var(--cp-border); border-radius: var(--cp-radius-sm);
     font-size: 14px; font-family: inherit; background: var(--cp-surface); color: var(--cp-ink); cursor: pointer;
 }
-.cp-search:focus, .cp-sortsel:focus { outline: none; border-color: var(--cp-theme); box-shadow: 0 0 0 3px rgba(46,125,50,.12); }
+.cp-search:focus, .cp-sortsel:focus { outline: none; border-color: var(--cp-theme); box-shadow: var(--cp-ring); }
 .cp-products-more { text-align: center; margin-top: 18px; }
 
 /* Recommendation with no artwork/mockup image yet → striped "Coming soon" placeholder in the card image well */
@@ -563,22 +583,22 @@ body.cp-has-ribbon .cp-header { border-top: 0; }
     margin: 2px 0 9px;
     font-size: 11.5px; font-weight: 700; letter-spacing: .01em; line-height: 1.3;
     color: var(--cp-gold-ink);
-    background: var(--cp-gold-bg);
+    background: linear-gradient(180deg, #fdf8e2, var(--cp-gold-bg));
     border: 1px solid var(--cp-gold-border);
-    padding: 3px 9px; border-radius: 999px;
+    padding: 3px 10px; border-radius: 999px;
 }
 .cp-rec-reward-star { color: var(--cp-gold); }
 
 /* Ordered-color swatches on a "Your Products" card (one card per style, catalog-style) */
 .cp-swatches { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; margin: 1px 0 9px; }
 .cp-swatch {
-    width: 18px; height: 18px; border-radius: 4px; object-fit: cover;
+    width: 18px; height: 18px; border-radius: 5px; object-fit: cover;
     border: 1px solid var(--cp-border); background: var(--cp-surface-2); flex: 0 0 auto;
 }
 .cp-swatch--noimg { background: var(--cp-gray-100); }
 .cp-swatch-more { font-size: 11px; font-weight: 700; color: var(--cp-ink-mute); margin-left: 2px; }
 
-/* ══ COMING-SOON PAIR — Mockups + Art & Designs (bottom of page) ══
+/* ══ COMING-SOON PAIR — Mockups + Art & Designs ══
    Does NOT touch .cp-card rendering, so real cards still show for
    customers who have them. */
 .cp-section--soon .cp-section-header h2 { color: var(--cp-ink-soft); }
@@ -637,8 +657,8 @@ body.cp-has-ribbon .cp-header { border-top: 0; }
     color: #fff;
     font-size: 13px;
     font-weight: 700;
-    padding: 9px 18px;
-    border-radius: var(--cp-radius-sm);
+    padding: 10px 20px;
+    border-radius: 999px;
     transition: background .15s, transform .15s;
 }
 .cp-soon-cta:hover { background: var(--cp-theme-dark); transform: translateY(-1px); }
@@ -648,7 +668,7 @@ body.cp-has-ribbon .cp-header { border-top: 0; }
 /* ── Request modal ── */
 .cp-modal-overlay {
     position: fixed; inset: 0;
-    background: rgba(20,30,20,.5);
+    background: rgba(16, 26, 17, .55);
     display: flex; align-items: center; justify-content: center;
     /* Above the reorder-list FAB (1000) AND its drawer (1001) so neither floats over an open
        modal; still below the image lightbox (1200). (Pre-existing FAB/modal z-tie, fixed here.) */
@@ -656,26 +676,26 @@ body.cp-has-ribbon .cp-header { border-top: 0; }
 }
 .cp-modal {
     background: #fff; border-radius: var(--cp-radius-lg); width: 100%; max-width: 440px;
-    box-shadow: 0 16px 48px rgba(0,0,0,.25);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, .3);
 }
 .cp-modal-head {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 16px 20px; border-bottom: 1px solid #eee;
+    padding: 16px 20px; border-bottom: 1px solid var(--cp-border-soft);
 }
 .cp-modal-head h3 { font-size: 17px; color: var(--cp-theme-dark); }
 .cp-modal-close { background: none; border: none; font-size: 24px; line-height: 1; color: #aaa; cursor: pointer; }
 .cp-modal-close:hover { color: #555; }
 .cp-modal-body { padding: 18px 20px; }
-.cp-modal-foot { display: flex; justify-content: flex-end; gap: 10px; padding: 14px 20px; border-top: 1px solid #eee; }
+.cp-modal-foot { display: flex; justify-content: flex-end; gap: 10px; padding: 14px 20px; border-top: 1px solid var(--cp-border-soft); }
 
-.cp-req-product { background: var(--cp-theme-bg); border-radius: 8px; padding: 11px 13px; margin-bottom: 16px; }
+.cp-req-product { background: var(--cp-theme-bg); border-radius: var(--cp-radius-sm); padding: 11px 13px; margin-bottom: 16px; }
 .cp-req-prod-title { font-weight: 600; color: #222; font-size: 14px; }
 .cp-req-prod-sub { font-size: 12.5px; color: #5c6b5e; margin-top: 2px; }
 
 /* Modal top: garment preview + product name side by side */
 .cp-req-top { display: flex; gap: 14px; align-items: center; margin-bottom: 16px; }
 .cp-req-image {
-    flex: 0 0 88px; width: 88px; height: 88px; border-radius: 10px; overflow: hidden;
+    flex: 0 0 88px; width: 88px; height: 88px; border-radius: var(--cp-radius-sm); overflow: hidden;
     background: var(--cp-surface-2); border: 1px solid var(--cp-border);
     display: flex; align-items: center; justify-content: center;
 }
@@ -688,7 +708,7 @@ body.cp-has-ribbon .cp-header { border-top: 0; }
     width: 100%; padding: 9px 11px; border: 1px solid #d4d9d0; border-radius: 8px;
     font-size: 14px; font-family: inherit; background: #fff; color: #222; cursor: pointer;
 }
-.cp-select:focus { outline: none; border-color: var(--cp-theme); box-shadow: 0 0 0 3px rgba(46,125,50,.12); }
+.cp-select:focus { outline: none; border-color: var(--cp-theme); box-shadow: var(--cp-ring); }
 
 /* ── Style-level volume on a "Your Products" card ("you order a lot of this") ── */
 .cp-product-total { font-size: 11.5px; font-weight: 700; color: var(--cp-theme-dark); margin: 0 0 8px; }
@@ -730,7 +750,7 @@ body.cp-has-ribbon .cp-header { border-top: 0; }
     width: 100%; text-align: center; padding: 8px 4px; border: 1px solid #d4d9d0; border-radius: 8px;
     font-size: 14px; font-family: inherit; -moz-appearance: textfield;
 }
-.cp-size-input:focus { outline: none; border-color: var(--cp-theme); box-shadow: 0 0 0 3px rgba(46,125,50,.12); }
+.cp-size-input:focus { outline: none; border-color: var(--cp-theme); box-shadow: var(--cp-ring); }
 .cp-size-total { margin-top: 9px; font-size: 13px; color: #444; text-align: right; }
 .cp-size-total strong { color: var(--cp-theme-dark); font-size: 15px; }
 
@@ -741,15 +761,15 @@ body.cp-has-ribbon .cp-header { border-top: 0; }
     width: 100%; padding: 9px 11px; border: 1px solid #d4d9d0; border-radius: 8px;
     font-size: 14px; font-family: inherit; resize: vertical;
 }
-.cp-field input:focus, .cp-field textarea:focus { outline: none; border-color: var(--cp-theme); box-shadow: 0 0 0 3px rgba(46,125,50,.12); }
+.cp-field input:focus, .cp-field textarea:focus { outline: none; border-color: var(--cp-theme); box-shadow: var(--cp-ring); }
 .cp-req-error { color: #b3261e; font-size: 13px; min-height: 1em; }
 
 .cp-btn-primary, .cp-btn-ghost {
-    border-radius: 8px; padding: 9px 16px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; border: 1px solid transparent;
+    border-radius: 999px; padding: 10px 18px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; border: 1px solid transparent;
 }
-.cp-btn-primary { background: var(--cp-theme); color: #fff; }
+.cp-btn-primary { background: var(--cp-theme); color: #fff; box-shadow: 0 3px 10px rgba(46, 125, 50, .25); }
 .cp-btn-primary:hover:not(:disabled) { background: var(--cp-theme-dark); }
-.cp-btn-primary:disabled { opacity: .6; cursor: default; }
+.cp-btn-primary:disabled { opacity: .6; cursor: default; box-shadow: none; }
 .cp-btn-ghost { background: #fff; color: #555; border-color: #d4d9d0; }
 .cp-btn-ghost:hover { background: #f5f5f5; }
 
@@ -757,50 +777,86 @@ body.cp-has-ribbon .cp-header { border-top: 0; }
 .cp-toast {
     position: fixed; bottom: 22px; left: 50%;
     transform: translateX(-50%) translateY(18px);
-    background: var(--cp-theme-dark); color: #fff;
-    padding: 12px 20px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,.25);
+    background: var(--cp-theme-deep); color: #fff;
+    padding: 12px 20px; border-radius: 12px; box-shadow: 0 12px 34px rgba(0, 0, 0, .3);
     font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s;
     z-index: 1100; max-width: 90vw; text-align: center;
 }
 .cp-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-/* ── Reward dollars card ── */
+/* ── Reward dollars card (always visible: balance OR earn-nudge zero state) ── */
 .cp-rewards {
+    position: relative;
+    overflow: hidden;
     display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
-    background: linear-gradient(135deg, #1b5e20, #2e7d32);
-    color: #fff; border-radius: var(--cp-radius); padding: 16px 22px; margin-bottom: var(--cp-section-y);
+    background:
+        radial-gradient(120% 240% at 100% -60%, rgba(255, 213, 79, .18) 0%, transparent 55%),
+        linear-gradient(135deg, var(--cp-theme-dark), var(--cp-theme) 90%);
+    color: #fff; border-radius: var(--cp-radius); padding: 18px 24px; margin-bottom: var(--cp-section-y);
     border: 1px solid #caa63a; box-shadow: var(--cp-shadow-1);
 }
-.cp-rewards-label { font-size: 13px; color: #d9f0dd; font-weight: 600; letter-spacing: .02em; }
+.cp-rewards-label { font-size: 12.5px; color: #d9f0dd; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; }
 .cp-rewards-star { color: #ffd54f; }
-.cp-rewards-balance { font-size: 30px; font-weight: 700; line-height: 1.1; margin-top: 2px; }
+.cp-rewards-balance { font-size: 32px; font-weight: 800; line-height: 1.1; margin-top: 3px; font-variant-numeric: tabular-nums; }
+.cp-rewards-sub { font-size: 12.5px; color: #cfe8d3; margin-top: 5px; max-width: 520px; line-height: 1.45; }
 .cp-rewards-btn {
-    background: #ffd54f; color: #1b3a1e; border: none; border-radius: 8px;
-    padding: 10px 18px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit;
-    white-space: nowrap; transition: background .15s;
+    background: #ffd54f; color: #1b3a1e; border: none; border-radius: 999px;
+    padding: 11px 20px; font-size: 14px; font-weight: 800; cursor: pointer; font-family: inherit;
+    white-space: nowrap; transition: background .15s, transform .12s;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, .2);
 }
-.cp-rewards-btn:hover { background: #ffca28; }
+.cp-rewards-btn:hover { background: #ffca28; transform: translateY(-1px); }
+.cp-rewards-btn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+/* $0 zero state — quieter card, same family (the nudge, not the trophy) */
+.cp-rewards--zero {
+    background:
+        radial-gradient(140% 220% at 100% -60%, var(--cp-gold-bg) 0%, transparent 60%),
+        var(--cp-surface);
+    border: 1px solid var(--cp-gold-border);
+    color: var(--cp-ink);
+}
+.cp-rewards--zero .cp-rewards-label { color: var(--cp-gold-ink); }
+.cp-rewards--zero .cp-rewards-balance { color: var(--cp-ink); }
+.cp-rewards--zero .cp-rewards-sub { color: var(--cp-ink-soft); }
+
+/* Recent reward activity rows (redeem modal) */
+.cp-redeem-history { margin-top: 4px; }
+.cp-rh-row {
+    display: flex; align-items: baseline; gap: 10px;
+    padding: 7px 2px;
+    border-bottom: 1px solid var(--cp-border-soft);
+    font-size: 13px;
+}
+.cp-rh-row:last-child { border-bottom: none; }
+.cp-rh-amt { font-weight: 800; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cp-rh-amt.is-pos { color: var(--cp-theme-dark); }
+.cp-rh-amt.is-neg { color: #9c1c33; }
+.cp-rh-label { flex: 1; color: var(--cp-ink-soft); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cp-rh-date { color: var(--cp-ink-mute); font-size: 12px; white-space: nowrap; }
 
 /* ── Responsive — one predictable collapse for both grids ── */
 @media (max-width: 640px) {
-    .cp-header { padding: 12px 16px; }
+    .cp-header { padding: 13px 16px; }
+    .cp-header-logo { height: 38px; }
     .cp-header-text h1 { font-size: 16px; }
     .cp-main { padding: 16px 12px 48px; }
     .cp-section { margin-bottom: 26px; }
     .cp-company-banner { padding: 18px 20px; }
-    .cp-company-name { font-size: 18px; }
+    .cp-company-name { font-size: 19px; }
     .cp-card-grid, .cp-product-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
     .cp-section-header { flex-wrap: wrap; }
     .cp-soon-pill { margin-left: 8px; }
     .cp-table thead th, .cp-table tbody td { padding: 10px 12px; }
     .cp-table { font-size: 13px; }
+    .cp-rewards { padding: 15px 18px; }
+    .cp-rewards-balance { font-size: 27px; }
 }
 @media (max-width: 420px) {
     .cp-card-grid, .cp-product-grid { grid-template-columns: 1fr 1fr; }
     .cp-size-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
-/* ── Snapshot bar + tabs (2026-07-04): tames the big-account single-scroll ── */
+/* ── Snapshot bar + tabs: tames the big-account single-scroll ── */
 .cp-snapshot {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -808,17 +864,30 @@ body.cp-has-ribbon .cp-header { border-top: 0; }
     margin: 0 0 20px;
 }
 .cp-snap {
+    position: relative;
+    overflow: hidden;
     display: block;
     background: var(--cp-surface);
     border: 1px solid var(--cp-border);
     border-radius: var(--cp-radius);
-    padding: 12px 14px;
+    padding: 13px 16px;
     text-decoration: none;
-    transition: border-color .12s ease, box-shadow .12s ease;
+    box-shadow: var(--cp-shadow-1);
+    transition: border-color .14s ease, box-shadow .14s ease, transform .14s ease;
 }
-.cp-snap:hover { border-color: var(--cp-theme-light); box-shadow: 0 1px 4px rgba(46, 125, 50, .10); }
-.cp-snap-label { display: block; font-size: 12px; color: var(--cp-ink-mute); margin-bottom: 3px; }
-.cp-snap-val { display: block; font-size: 24px; font-weight: 700; line-height: 1.1; color: var(--cp-ink); }
+.cp-snap::after {
+    content: "";
+    position: absolute; left: 16px; right: 16px; bottom: 0; height: 3px;
+    border-radius: 3px 3px 0 0;
+    background: linear-gradient(90deg, var(--cp-theme-light), var(--cp-theme));
+    opacity: 0;
+    transition: opacity .14s ease;
+}
+.cp-snap:hover { border-color: #bcd9be; box-shadow: var(--cp-shadow-2); transform: translateY(-2px); }
+.cp-snap:hover::after { opacity: 1; }
+.cp-snap:focus-visible { outline: 2px solid var(--cp-theme); outline-offset: 2px; }
+.cp-snap-label { display: block; font-size: 11.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--cp-ink-mute); margin-bottom: 4px; }
+.cp-snap-val { display: block; font-size: 26px; font-weight: 800; line-height: 1.1; color: var(--cp-ink); font-variant-numeric: tabular-nums; }
 .cp-snap-val.cp-snap-bal--due { color: #b3261e; }
 
 .cp-tabs-bar {
@@ -833,6 +902,9 @@ body.cp-has-ribbon .cp-header { border-top: 0; }
     padding: 6px 0 20px;
     margin: 0;
 }
+@supports (backdrop-filter: blur(6px)) {
+    .cp-tabs-bar { background: rgba(243, 246, 240, .86); backdrop-filter: blur(6px); }
+}
 .cp-tabs {
     display: flex;
     gap: 2px;
@@ -846,7 +918,7 @@ body.cp-has-ribbon .cp-header { border-top: 0; }
 .cp-tab {
     background: none;
     border: none;
-    border-bottom: 2px solid transparent;
+    border-bottom: 2.5px solid transparent;
     margin-bottom: -1px;
     padding: 11px 16px;
     font: inherit;
@@ -855,14 +927,16 @@ body.cp-has-ribbon .cp-header { border-top: 0; }
     color: var(--cp-ink-soft);
     white-space: nowrap;
     cursor: pointer;
-    transition: color .12s ease, border-color .12s ease;
+    border-radius: 8px 8px 0 0;
+    transition: color .12s ease, border-color .12s ease, background .12s ease;
 }
-.cp-tab:hover { color: var(--cp-ink); }
-.cp-tab.is-active { color: var(--cp-theme-dark); border-bottom-color: var(--cp-theme); }
+.cp-tab:hover { color: var(--cp-ink); background: rgba(46, 125, 50, .06); }
+.cp-tab.is-active { color: var(--cp-theme-dark); border-bottom-color: var(--cp-theme); font-weight: 700; }
+.cp-tab:focus-visible { outline: 2px solid var(--cp-theme); outline-offset: -2px; }
 
-/* Sub-tabs inside My Logos (Approved Logos / Mockups). Pill style — visually SUBORDINATE to the
-   underline top-tabs so they don't read as another nav level. Distinct .cp-subtab/data-subtab
-   class (see customer-portal.js) keeps them off the global top-tab click handler. */
+/* Sub-tabs inside My Logos (Approved Logos / Mockups / Finished Photos). Pill style — visually
+   SUBORDINATE to the underline top-tabs so they don't read as another nav level. Distinct
+   .cp-subtab/data-subtab class (see customer-portal.js) keeps them off the global tab handler. */
 .cp-subtabs {
     display: flex;
     flex-wrap: wrap;
@@ -876,7 +950,7 @@ body.cp-has-ribbon .cp-header { border-top: 0; }
     background: none;
     border: 1px solid var(--cp-border);
     border-radius: 999px;
-    padding: 6px 14px;
+    padding: 7px 15px;
     font: inherit;
     font-size: 13px;
     font-weight: 600;
@@ -886,6 +960,7 @@ body.cp-has-ribbon .cp-header { border-top: 0; }
 }
 .cp-subtab:hover { color: var(--cp-ink); border-color: var(--cp-theme-light); }
 .cp-subtab.is-active { color: var(--cp-theme-dark); border-color: var(--cp-theme); background: var(--cp-theme-bg); }
+.cp-subtab:focus-visible { outline: 2px solid var(--cp-theme); outline-offset: 2px; }
 .cp-subtab-count {
     font-size: 12px;
     font-weight: 700;
@@ -895,6 +970,7 @@ body.cp-has-ribbon .cp-header { border-top: 0; }
     padding: 1px 8px;
     min-width: 20px;
     text-align: center;
+    font-variant-numeric: tabular-nums;
 }
 .cp-subtab.is-active .cp-subtab-count { color: var(--cp-theme-dark); }
 .cp-subpanel { display: block; }
@@ -927,24 +1003,24 @@ body.cp-has-ribbon .cp-header { border-top: 0; }
     font-weight: 600;
     color: var(--cp-theme-dark);
     cursor: pointer;
-    padding: 6px 12px;
-    border-radius: var(--cp-radius-sm);
+    padding: 6px 14px;
+    border-radius: 999px;
     transition: background .12s ease;
 }
 .cp-rows-more:hover { background: var(--cp-theme-bg); }
 
 @media (max-width: 560px) {
     .cp-snapshot { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-    .cp-snap-val { font-size: 20px; }
+    .cp-snap-val { font-size: 21px; }
     .cp-tab { padding: 10px 13px; }
-    .cp-subtab { padding: 5px 11px; }
+    .cp-subtab { padding: 6px 12px; }
 }
 
 /* ── Visible load-failure state (Erik's #1 rule: never a silent empty/$0) ── */
 .cp-load-error {
     border: 1px solid #e6c9c9;
     background: #fbf1f1;
-    border-radius: 12px;
+    border-radius: var(--cp-radius);
     padding: 20px 22px;
     text-align: center;
     color: #7a2b2b;
@@ -954,14 +1030,21 @@ body.cp-has-ribbon .cp-header { border-top: 0; }
 .cp-load-error a { color: var(--cp-theme-dark); font-weight: 600; }
 .cp-load-retry {
     margin-top: 12px;
-    padding: 9px 20px;
+    padding: 10px 22px;
     border: 1px solid var(--cp-theme);
     background: var(--cp-theme);
     color: #fff;
-    font-weight: 600;
+    font-weight: 700;
     font-size: 14px;
-    border-radius: 8px;
+    border-radius: 999px;
     cursor: pointer;
 }
 .cp-load-retry:hover { background: var(--cp-theme-dark); border-color: var(--cp-theme-dark); }
 .cp-load-retry:focus-visible { outline: 2px solid var(--cp-theme-dark); outline-offset: 2px; }
+
+/* Motion counts as polish only when it's wanted */
+@media (prefers-reduced-motion: reduce) {
+    .cp-card, .cp-product-card, .cp-snap, .cp-product-img img,
+    .cp-rewards-btn, .cp-soon-cta, .cp-toast { transition: none; }
+    .cp-spinner { animation-duration: 1.6s; }
+}

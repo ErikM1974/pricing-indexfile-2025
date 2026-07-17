@@ -52,6 +52,7 @@
     "express-rate-limit": "^7.1.5",
     "express-session": "^1.19.0",
     "helmet": "^8.2.0",
+    "html5-qrcode": "^2.3.8",
     "marked": "^12.0.2",
     "node-fetch": "^2.7.0",
     "pino": "^10.3.1",

@@ -1153,7 +1153,28 @@
     })();
 
     // ── Phase 5: reward dollars (read balance + redeem-as-request) ──
+    // The card ALWAYS shows: with a balance it's the redeem CTA; at $0 it flips to a
+    // "here's how to earn" nudge that jumps to the ★-tagged Recommended picks.
     var rewardBalance = 0;
+    var rewardEntries = [];
+    function renderRewardsCard() {
+        var card = document.getElementById('cp-rewards');
+        var balEl = document.getElementById('cp-rewards-balance');
+        var subEl = document.getElementById('cp-rewards-sub');
+        var btn = document.getElementById('cp-redeem-btn');
+        if (!card || !balEl) return;
+        balEl.textContent = money(rewardBalance);
+        var zero = !(rewardBalance > 0);
+        card.classList.toggle('cp-rewards--zero', zero);
+        if (subEl) {
+            subEl.textContent = zero
+                ? 'Earn reward dollars on premium picks — look for the ★ tag under Recommended for You.'
+                : 'Apply them to your next order — your rep takes it from there.';
+            subEl.style.display = 'block';
+        }
+        if (btn) btn.textContent = zero ? 'See ways to earn ★' : 'Redeem on your next order';
+        card.style.display = 'flex';
+    }
     function loadRewards() {
         fetch(REWARDS_URL, { credentials: 'same-origin' })
             .then(function (r) {
@@ -1162,10 +1183,8 @@
             })
             .then(function (d) {
                 rewardBalance = Number(d && d.balance) || 0;
-                if (rewardBalance > 0) {
-                    document.getElementById('cp-rewards-balance').textContent = money(rewardBalance);
-                    document.getElementById('cp-rewards').style.display = 'flex';
-                }
+                rewardEntries = (d && d.entries) || [];
+                renderRewardsCard();
             })
             .catch(function (err) {
                 // A blip must not silently hide a real balance. If the card is
@@ -1179,11 +1198,41 @@
                 }
             });
     }
+    // Last few grants/redemptions inside the redeem modal — the "why do I have this" story.
+    function renderRewardHistory() {
+        var wrap = document.getElementById('cp-redeem-history');
+        var list = document.getElementById('cp-redeem-history-list');
+        if (!wrap || !list) return;
+        var rows = (rewardEntries || []).slice(0, 5);
+        if (!rows.length) { wrap.style.display = 'none'; return; }
+        list.innerHTML = rows.map(function (e) {
+            var amt = Number(e.amount) || 0;
+            var when = formatDate(e.created);
+            var label = e.reason || (e.type === 'redeem' ? 'Redeemed' : e.type === 'grant' ? 'Reward earned' : 'Adjustment');
+            return '<div class="cp-rh-row">'
+                + '<span class="cp-rh-amt ' + (amt < 0 ? 'is-neg' : 'is-pos') + '">' + (amt < 0 ? '−' : '+') + money(Math.abs(amt)) + '</span>'
+                + '<span class="cp-rh-label">' + escapeHtml(label) + '</span>'
+                + (when ? '<span class="cp-rh-date">' + escapeHtml(when) + '</span>' : '')
+                + '</div>';
+        }).join('');
+        wrap.style.display = 'block';
+    }
     function openRedeem() {
+        if (!(rewardBalance > 0)) {
+            // $0 — the button is an earn-nudge: jump to the ★-tagged Recommended picks.
+            switchTab('products', true);
+            var recs = document.getElementById('cp-section-recs');
+            if (recs && recs.style.display !== 'none') {
+                setTimeout(function () { try { recs.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { recs.scrollIntoView(); } }, 60);
+            }
+            showToast('&#9733; Premium picks with the gold tag earn reward dollars — ask your rep for details.');
+            return;
+        }
         if (PREVIEW) { showToast('Staff preview — the customer would redeem their rewards here.'); return; }
         document.getElementById('cp-redeem-avail').textContent = money(rewardBalance);
         document.getElementById('cp-redeem-amt').value = '';
         document.getElementById('cp-redeem-error').textContent = '';
+        renderRewardHistory();
         document.getElementById('cp-redeem-modal').style.display = 'flex';
     }
     function closeRedeem() { document.getElementById('cp-redeem-modal').style.display = 'none'; }
