@@ -336,9 +336,20 @@
         var urls = (payload.artworkUrls || []).map(safeHttpUrl).filter(Boolean);
         var jfUrl = safeHttpUrl((payload._source || {}).url || '');
         if (urls.length || jfUrl) {
-            artworkHtml = '<div class="ld-section"><div class="ld-section-title">Artwork & Source</div><div class="ld-links">' +
+            // JotForm upload links need a JotForm login — route them through the
+            // staff passthrough so attachments open (and preview) in-app.
+            var isJfUpload = function (u) { return /^https:\/\/((www\.)?jotform\.com\/uploads\/|files\.jotform\.com\/)/i.test(u); };
+            var viewUrl = function (u) { return isJfUpload(u) ? DashPage.apiUrl('/api/jotform/file?u=' + encodeURIComponent(u)) : u; };
+            var isImage = function (u) { return /\.(png|jpe?g|gif|webp|bmp)(\?|$)/i.test(u); };
+            var thumbs = urls.filter(isImage);
+            artworkHtml = '<div class="ld-section"><div class="ld-section-title">Artwork & Source</div>' +
+                (thumbs.length ? '<div class="ld-thumbs">' + thumbs.map(function (u) {
+                    return '<a href="' + esc(viewUrl(u)) + '" target="_blank" rel="noopener noreferrer">' +
+                        '<img class="ld-thumb" loading="lazy" alt="Artwork attachment" src="' + esc(viewUrl(u)) + '"></a>';
+                }).join('') + '</div>' : '') +
+                '<div class="ld-links">' +
                 urls.map(function (u, i) {
-                    return '<a href="' + esc(u) + '" target="_blank" rel="noopener noreferrer">' +
+                    return '<a href="' + esc(viewUrl(u)) + '" target="_blank" rel="noopener noreferrer">' +
                         '<i class="fas fa-paperclip"></i> Attachment ' + (i + 1) + '</a>';
                 }).join('') +
                 (jfUrl ? '<a href="' + esc(jfUrl) + '" target="_blank" rel="noopener noreferrer">' +
