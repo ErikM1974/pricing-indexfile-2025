@@ -170,6 +170,15 @@ When adding endpoints or rendering user data:
 
 These files are the single source of truth across all 3 NWCA projects.
 
+## Bandit Integration = LIVING DOC (keep it current)
+
+`/dashboards/bandit-integration.html` (Admin → Bandit Integration) is a **staff-facing live reference** for the bandit sync system. Whenever you change ANY of the following, you MUST update that page **and** `memory/SHOPWORKS_ODBC_INTEGRATION.md` in the same task (never let them drift):
+- a bandit scheduled task (the **`\NWCA`** Task Scheduler folder — add/remove/rename/reschedule/change run-as/enable-disable),
+- a sync agent script (`../caspio-pricing-proxy/scripts/bandit-agent/*.ps1`) or its `config.json`,
+- a sync proxy endpoint (`/api/shopworks-odbc/*`, `/api/thumbnails/*`) or the flow to Caspio/Box.
+
+Bump the page's `?v=` on any HTML/CSS edit. The page's task table + `C:\NWCA\` file-layout + task→script→log map must always match reality on bandit. Re-verify against bandit (`schtasks /query`) rather than trusting the doc.
+
 ## Documentation Entry Points
 
 - [/memory/CROSS_PROJECT_HUB.md](memory/CROSS_PROJECT_HUB.md) — start here for cross-project work

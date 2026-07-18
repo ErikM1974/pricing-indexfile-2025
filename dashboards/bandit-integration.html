@@ -36,7 +36,7 @@
 
             <!-- ── Overview + the data flow ─────────────────────────────── -->
             <section class="dash-card">
-                <p class="bi-lead"><strong>Bandit</strong> is the always-on Windows box on the shop LAN that carries ShopWorks data into Caspio. It is <em>not</em> a file-copy or a Box client — it runs small PowerShell agents on a schedule that read ShopWorks and POST to our proxy, which does every Caspio write and every Box upload. Verified live 2026-07-18.</p>
+                <p class="bi-lead"><strong>Bandit</strong> is the always-on Windows box on the shop LAN that carries ShopWorks data into Caspio. It is <em>not</em> a file-copy or a Box client — it runs small PowerShell agents on a schedule that read ShopWorks and POST to our proxy, which does every Caspio write and every Box upload. <b>Living document</b> — kept current whenever the bandit tasks or sync scripts change. Verified live 2026-07-18.</p>
                 <div class="bi-flow">
                     <span class="bi-node"><i class="fas fa-server"></i> ShopWorks<br><small>FileMaker @192.168.10.6</small></span>
                     <span class="bi-arrow"><i class="fas fa-arrow-right"></i><small>ODBC read / file share</small></span>
