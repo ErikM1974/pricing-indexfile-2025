@@ -127,8 +127,10 @@
     }
 
     function closeNewLead() {
+        var wasOpen = !document.getElementById('newlead-modal').hidden;
         document.getElementById('newlead-overlay').hidden = true;
         document.getElementById('newlead-modal').hidden = true;
+        if (wasOpen) document.getElementById('btn-new-lead').focus(); // a11y: return focus
     }
 
     function saveNewLead() {
@@ -610,6 +612,7 @@
             body: JSON.stringify(body),
         }).then(function () {
             lead[field] = value;
+            L.clearHeat(lead); // value / customer-link edits can change the 🔥 badge
             // Timeline breadcrumbs (fire-and-forget) — status + ownership only.
             if (field === 'Status' && value !== prev) {
                 L.logActivity(lead.Submission_ID, 'status', 'Status: ' + (prev || '—') + ' → ' + value, '', state.staffEmail);

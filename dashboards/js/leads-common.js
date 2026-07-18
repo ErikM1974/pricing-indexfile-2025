@@ -216,20 +216,59 @@
 
     // ---------- 🔥 hot-lead + first-response signals ----------
 
-    var HOT_TEXT_RE = /\b(asap|rush|urgent|need(ed)?\s+by|deadline|event date|due date)\b/i;
+    var HOT_TEXT_RE = /\b(asap|rush|urgent|deadline|in[\s-]?hands?|need(s|ed)?\s+(it\s+|them\s+|these\s+)?(by|before)|needs?\s+\d)/i;
     var QTY_RE = /\b(\d{2,4})\s*(pcs|pieces|shirts|tees|t-shirts|caps|hats|hoodies|jackets|polos|uniforms|jerseys|units)\b/i;
+    var DATE_VALUE_RE = /^(\d{4}-\d{2}-\d{2}|\d{1,2}\/\d{1,2}\/\d{2,4})$/;
 
-    /** Reasons this lead is hot (empty array = not hot). Cheap — data already loaded. */
+    /** Customer-typed text ONLY: Summary + payload field VALUES + checks.
+     *  Never the raw Payload_JSON — that includes field LABELS, and e.g. every
+     *  Quote Request carries a "Need By" label, which would flag ALL of them. */
+    function heatHaystack(lead) {
+        var p = payloadOf(lead);
+        var vals = (p.fields || []).map(function (pair) { return pair && pair[1] != null ? String(pair[1]) : ''; });
+        return (lead.Summary || '') + ' ' + vals.join(' ') + ' ' + (p.checks || []).join(' ');
+    }
+
+    /** A payload value that IS a date in the next 60 days = an answered
+     *  need-by field (past dates = backfill noise, excluded). */
+    function futureNeedBy(lead) {
+        var p = payloadOf(lead);
+        var fields = p.fields || [];
+        for (var i = 0; i < fields.length; i++) {
+            var v = fields[i] && fields[i][1] != null ? String(fields[i][1]).trim() : '';
+            if (!DATE_VALUE_RE.test(v)) continue;
+            // pin ISO date-only to noon — bare YYYY-MM-DD parses UTC (day-shift trap)
+            var t = Date.parse(v.indexOf('-') !== -1 ? v + 'T12:00:00' : v);
+            if (isNaN(t)) continue;
+            var days = Math.floor((t - Date.now()) / 86400000);
+            if (days >= 0 && days <= 60) return v;
+        }
+        return null;
+    }
+
+    /** Reasons this lead is hot (empty array = not hot). Cached on the lead
+     *  object (cleared by the pages after edits that can change heat). */
     function leadHeat(lead) {
+        if (lead.__heat) return lead.__heat;
         var reasons = [];
-        var hay = (lead.Summary || '') + ' ' + (lead.Payload_JSON || '');
+        var hay = heatHaystack(lead);
         if (HOT_TEXT_RE.test(hay)) reasons.push('deadline mentioned');
+        var needBy = futureNeedBy(lead);
+        if (needBy && !reasons.length) reasons.push('needs by ' + needBy);
         var qm = QTY_RE.exec(hay);
         if (qm && parseInt(qm[1], 10) >= 48) reasons.push(qm[1] + ' pieces mentioned');
         if (lead.Matched_ID_Customer) reasons.push('existing customer');
         var v = Number(lead.Lead_Value);
         if (isFinite(v) && v >= 500) reasons.push('$' + Math.round(v).toLocaleString('en-US') + ' est. value');
+        try {
+            Object.defineProperty(lead, '__heat', { value: reasons, configurable: true, enumerable: false, writable: true });
+        } catch (e) { /* frozen object — recompute next call */ }
         return reasons;
+    }
+
+    /** Call after any edit that can change heat (value, customer link, payload). */
+    function clearHeat(lead) {
+        try { delete lead.__heat; } catch (e) { /* non-configurable — harmless */ }
     }
 
     /** First-response countdown for untouched New leads (null when N/A). */
@@ -308,6 +347,7 @@
         sourceTitleOf: sourceTitleOf,
         statusCls: statusCls,
         leadHeat: leadHeat,
+        clearHeat: clearHeat,
         responseTimer: responseTimer,
         filesBase: filesBase,
         isJfUpload: isJfUpload,
