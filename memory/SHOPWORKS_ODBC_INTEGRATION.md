@@ -93,6 +93,12 @@ ODBC does NOT do: images/attachments (Box/mockup flows unaffected), writes (keep
 - **Verified 2026-07-18**: triggered all 7 → orders 44 updated, others 0-delta clean, thumbnails 0 pending, all `ok:true`. (4 odd `.png` files persistently 500 on Box upload — 0.01%, ignored.)
 - **Staff doc**: `/dashboards/bandit-integration.html` (Administration nav) — accurate data-flow, task table, mechanics, the burst-rate rule. Built 2026-07-18.
 
+## ⏳ PENDING — thumbnail metadata via ODBC (Ryan/ShopWorks, expected ~week of 2026-07-21)
+
+- **What's coming**: Ryan Gaul (ShopWorks tech, ticket **386060**) is adding **2 scalar fields to `Data_ODBCMapping`** from the thumbnail table: **`ID_Serial`** (thumbnail PK) + **`id_Design`** (the linked design — lives on the Design Location table, shown as `Thumb_DesLoc::id_Design`; the `id_DesLoc` FK is an acceptable substitute — we'd join DesLoc→id_Design). Optional: a `timestamp_Added`/modified stamp for incremental pulls. Erik confirmed the field list 2026-07-18; Ryan replies "next week."
+- **WHEN IT LANDS — build the switch (then this is the new flow)**: convert the **Thumbnail Metadata Sync** from reading Erik's manual `Thumbnails Report*.xlsx` (via `\\BANDIT\SWF`) to a **direct ODBC read** of the thumbnail table (DSN `SWODBC`, bounded query) — same pattern as the other 5 syncs. Steps: (1) new/modified bandit agent + adjust `/api/thumbnails/metadata-sync` to accept the ODBC field set (ID_Serial + id_Design; **enrich DesignName/PartNumber from the already-synced Des table via id_Design**; FileName comes from the image side, dims are cosmetic/optional); (2) put the task in the `\NWCA` folder as SYSTEM; (3) **RETIRE** the manual xlsx export + the `\\BANDIT\SWF` drop + the ImportExcel dependency; (4) verify the thumbnail→design→customer chain still resolves for the portal; (5) **update `/dashboards/bandit-integration.html` + this doc** (living-doc rule).
+- **Claude: be ready** — when Erik says "Ryan opened the ODBC mapping," pull the thumbnail table's ODBC fields first (`shopworks-odbc-schema` / a probe), confirm ID_Serial + id_Design are queryable, then build the switch above.
+
 ## ✅✅ ALL THUMBNAILS ON BOX — full backfill COMPLETE 2026-07-18 (metadata + images, $0 Integrations)
 
 - **FINAL STATE (live export `Shopworks_Thumbnail_Report`)**: 27,570 rows — **26,896 serve from Box** (97.6%), **0 from Caspio** (`/api/files/` = 0), 674 imageless (metadata-only, no thumb file on server), **0 ExternalKey / 0 malformed / 0 dup ID_Serial**. Fully migrated + consistent.
