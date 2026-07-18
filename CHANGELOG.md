@@ -1,3 +1,9 @@
+## v2026.07.18.11 (2026.07.18)
+
+- docs(memory): LEADS_CRM_2026-07 topic file (capture + CRM v2 system, endpoints, gotchas) + INDEX pointer + ACTIVE_FILES rows for the CRM v2 pages
+- fix(leads): rel=noopener (drop noreferrer) on attachment links — noreferrer stripped the Referer that the old passthrough gate required; keep sending origin referrer as belt-and-braces
+- Deploy v2026.07.18.11: cache-bust leads controllers
+
 ## v2026.07.18.10 (2026.07.18)
 
 - feat(leads-crm): quote handoff + suggestions (CRM v2 P4)
