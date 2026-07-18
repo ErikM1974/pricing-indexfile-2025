@@ -1,3 +1,8 @@
+## v2026.07.18.9 (2026.07.18)
+
+- feat(leads-crm): kanban pipeline board (CRM v2 P3)
+- Deploy v2026.07.18.9: cache-bust leads board assets
+
 ## v2026.07.18.8 (2026.07.18)
 
 - feat(leads-crm): lead workspace page (CRM v2 P2)
