@@ -314,6 +314,24 @@
             });
     }
 
+    // Known-safe attachment hosts: our proxy's Caspio-file server (QRQ logo
+    // uploads live there as "Name.ext — https://…/api/files/<key>" text) and
+    // JotForm uploads. ONLY these are surfaced as attachments — never arbitrary
+    // customer-typed URLs (lead data is untrusted).
+    function extractFileUrls(text) {
+        var filesBase = DashPage.apiUrl('/api/files/');
+        var out = [];
+        var re = /https:\/\/\S+/g;
+        var m;
+        while ((m = re.exec(String(text || '')))) {
+            var u = m[0].replace(/[),.;'"\]]+$/, '');
+            if (/^https:\/\/((www\.)?jotform\.com\/uploads\/|files\.jotform\.com\/)/i.test(u) || u.indexOf(filesBase) === 0) {
+                out.push(u);
+            }
+        }
+        return out;
+    }
+
     function openDrawer(lead) {
         state.current = lead;
         var payload = payloadOf(lead);
@@ -332,15 +350,24 @@
             ['Lead ID', '<span class="ld-id">' + esc(lead.Submission_ID) + '</span>'],
         ];
 
+        var entries = payloadEntries(payload);
+
         var artworkHtml = '';
-        var urls = (payload.artworkUrls || []).map(safeHttpUrl).filter(Boolean);
+        var fromFields = [];
+        entries.forEach(function (p) { fromFields = fromFields.concat(extractFileUrls(p[1])); });
+        var urls = (payload.artworkUrls || []).concat(fromFields)
+            .map(safeHttpUrl).filter(Boolean)
+            .filter(function (u, i, a) { return a.indexOf(u) === i; });
         var jfUrl = safeHttpUrl((payload._source || {}).url || '');
         if (urls.length || jfUrl) {
             // JotForm upload links need a JotForm login — route them through the
             // staff passthrough so attachments open (and preview) in-app.
             var isJfUpload = function (u) { return /^https:\/\/((www\.)?jotform\.com\/uploads\/|files\.jotform\.com\/)/i.test(u); };
             var viewUrl = function (u) { return isJfUpload(u) ? DashPage.apiUrl('/api/jotform/file?u=' + encodeURIComponent(u)) : u; };
-            var isImage = function (u) { return /\.(png|jpe?g|gif|webp|bmp)(\?|$)/i.test(u); };
+            // /api/files/<key> URLs are extensionless — try them as thumbnails
+            // too; non-images get hidden by the onerror wiring after render.
+            var filesBase = DashPage.apiUrl('/api/files/');
+            var isImage = function (u) { return /\.(png|jpe?g|gif|webp|bmp)(\?|$)/i.test(u) || u.indexOf(filesBase) === 0; };
             var thumbs = urls.filter(isImage);
             artworkHtml = '<div class="ld-section"><div class="ld-section-title">Artwork & Source</div>' +
                 (thumbs.length ? '<div class="ld-thumbs">' + thumbs.map(function (u) {
@@ -357,7 +384,6 @@
                 '</div></div>';
         }
 
-        var entries = payloadEntries(payload);
         var detailsHtml = entries.length
             ? '<div class="ld-section"><div class="ld-section-title">Submitted Details</div><dl class="ld-kv">' +
                 entries.map(function (p) {
@@ -388,6 +414,14 @@
             '<div class="ld-section"><div class="ld-section-title">Order History</div><div id="orders-root" class="ld-muted"></div></div>' +
             detailsHtml +
             artworkHtml;
+
+        // Hide thumbnail slots that turn out not to be images (extensionless
+        // /api/files/ keys can be PDFs) — no inline handlers, wired post-render.
+        Array.prototype.forEach.call(document.querySelectorAll('#drawer-body img.ld-thumb'), function (img) {
+            img.addEventListener('error', function () {
+                if (img.parentNode) img.parentNode.style.display = 'none';
+            });
+        });
 
         document.getElementById('drawer-status').addEventListener('change', function () {
             saveField(lead, 'Status', this.value, this);
