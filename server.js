@@ -108,6 +108,7 @@ dotenv.config();
 //   GET /api/staff/payments/recent       — Order_Payments ledger for the Money Collected widget (2026-07-06)
 //   ALL /api/crm-proxy/form-submissions* — Forms Inbox reads/updates (any staff; ~L3230, 2026-07-11)
 //   ALL /api/crm-proxy/order-odbc*       — ORDER_ODBC order history for the Leads board (any staff; 2026-07-18)
+//   ALL /api/crm-proxy/lead-activity*    — Leads CRM timeline reads/appends (any staff; 2026-07-18)
 //
 // SAMPLE PROGRAM ('samples' channel, 2026-07-06 — SAM{MMDD}-{rand4} QuoteIDs; handleSamplesOrderPaid ~L1400)
 //   POST /api/samples/create-checkout-session — PAID blank samples: dedicated multi-style route (shared
@@ -3285,6 +3286,11 @@ app.all('/api/crm-proxy/form-submissions*', requireStaff, formSubmissionsForward
 // is CRM-secret-gated on the proxy (2026-07-18), so browsers must come through here.
 const [, orderOdbcForwarder] = createCrmProxy('order-odbc', []);
 app.all('/api/crm-proxy/order-odbc*', requireStaff, orderOdbcForwarder);
+
+// Leads CRM activity timeline (notes / status history / attachments on a lead) —
+// Lead_Activity reads+appends. Any logged-in staff; secret-only upstream.
+const [, leadActivityForwarder] = createCrmProxy('lead-activity', []);
+app.all('/api/crm-proxy/lead-activity*', requireStaff, leadActivityForwarder);
 
 // Blog Editor (dashboards/blog-editor.html) — staff write posts through this
 // forwarder (adds the CRM secret the proxy's gateWritesOnly demands; also lets

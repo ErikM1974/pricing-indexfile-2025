@@ -124,6 +124,21 @@
         Last_Order_Date: '2026-06-30', Customerdate_LastOrdered: '2026-06-30',
     };
 
+    // Leads CRM v2 — in-memory activity timeline (Lead_Activity mirror)
+    var activityPk = 2;
+    var activities = [
+        {
+            PK_ID: 1, Submission_ID: 'JFL0716-1234', Activity_Type: 'system',
+            Activity_Text: 'Assigned to Nika Lao', Attachment_URL: '',
+            Created_By: 'jotform-webhook', Created_At: hoursAgo(46),
+        },
+        {
+            PK_ID: 2, Submission_ID: 'JFL0716-1234', Activity_Type: 'note',
+            Activity_Text: 'Called Mike — wants embroidered caps for the fall crew. Sending sample photos.',
+            Attachment_URL: '', Created_By: 'nika@nwcustomapparel.com', Created_At: hoursAgo(20),
+        },
+    ];
+
     var orders = [
         { ID_Order: 130221, date_OrderPlaced: '2026-06-28T00:00:00', cnCur_TotalInvoice: 1250.75, sts_Invoiced: 1, sts_Shipped: 1 },
         { ID_Order: 129804, date_OrderPlaced: '2026-05-14T00:00:00', cnCur_TotalInvoice: 682.10, sts_Invoiced: 1, sts_Shipped: 1 },
@@ -155,7 +170,7 @@
                 if (!lead) return jsonResponse(404, { error: 'not found' });
                 var body = {};
                 try { body = JSON.parse(options.body || '{}'); } catch (e) { body = {}; }
-                ['Status', 'Sales_Rep', 'Matched_ID_Customer', 'Linked_Quote_ID', 'Updated_By'].forEach(function (k) {
+                ['Status', 'Sales_Rep', 'Matched_ID_Customer', 'Linked_Quote_ID', 'Updated_By', 'Due_Date', 'Lead_Value'].forEach(function (k) {
                     if (body[k] !== undefined) lead[k] = body[k];
                 });
                 return jsonResponse(200, { updated: id, fields: body });
@@ -169,6 +184,28 @@
 
         if (u.indexOf('/api/crm-proxy/order-odbc') !== -1) {
             return jsonResponse(200, orders);
+        }
+
+        if (u.indexOf('/api/crm-proxy/lead-activity') !== -1) {
+            if (method === 'POST') {
+                var abody = {};
+                try { abody = JSON.parse(options.body || '{}'); } catch (e2) { abody = {}; }
+                var row = {
+                    PK_ID: ++activityPk,
+                    Submission_ID: abody.submissionId || '',
+                    Activity_Type: abody.activityType || 'note',
+                    Activity_Text: abody.activityText || '',
+                    Attachment_URL: abody.attachmentUrl || '',
+                    Created_By: abody.createdBy || '',
+                    Created_At: new Date().toISOString(),
+                };
+                activities.push(row);
+                return jsonResponse(201, { activity: row });
+            }
+            var aid = (new URLSearchParams(u.split('?')[1] || '')).get('submissionId');
+            var mine = activities.filter(function (a) { return a.Submission_ID === aid; })
+                .slice().sort(function (a, b) { return b.PK_ID - a.PK_ID; });
+            return jsonResponse(200, { activities: mine });
         }
 
         if (u.indexOf('/api/company-contacts/by-email/') !== -1) {

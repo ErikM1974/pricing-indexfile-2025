@@ -426,6 +426,10 @@
                     reps.map(function (r) {
                         return '<option value="' + esc(r) + '"' + (r === lead.Sales_Rep ? ' selected' : '') + '>' + esc(r) + '</option>';
                     }).join('') + '</select></div>' +
+                '<div class="ld-control"><label class="ld-control-label" for="drawer-due">Follow-up date</label>' +
+                '<input type="date" id="drawer-due" class="ld-select" value="' + esc(lead.Due_Date || '') + '"></div>' +
+                '<div class="ld-control"><label class="ld-control-label" for="drawer-value">Est. value $</label>' +
+                '<input type="number" id="drawer-value" class="ld-select" min="0" step="50" placeholder="0" value="' + esc(lead.Lead_Value || '') + '"></div>' +
             '</div></div>' +
             (lead.Summary ? '<div class="ld-section"><div class="ld-section-title">Project</div>' +
                 '<div class="ld-summary">' + esc(lead.Summary) + '</div></div>' : '') +
@@ -450,6 +454,12 @@
         });
         document.getElementById('drawer-rep').addEventListener('change', function () {
             saveField(lead, 'Sales_Rep', this.value, this);
+        });
+        document.getElementById('drawer-due').addEventListener('change', function () {
+            saveField(lead, 'Due_Date', this.value, this);
+        });
+        document.getElementById('drawer-value').addEventListener('change', function () {
+            saveField(lead, 'Lead_Value', this.value, this);
         });
 
         renderMatchSection(lead);
