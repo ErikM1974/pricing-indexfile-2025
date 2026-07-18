@@ -981,14 +981,29 @@
                 escapeHtml(err.message || '') + '</p></div>';
         }
 
-        // Poll every 60s
-        state.pollTimer = setInterval(async function () {
-            try {
-                await Promise.all([fetchJobs(), fetchStats()]);
-                applyFilters();
-            } catch (e) { /* swallow — already toasted */ }
-        }, POLL_INTERVAL_MS);
+        // Poll every 60s — paused while the tab is hidden (save API calls;
+        // bradley-transfers pattern), immediate refresh on refocus.
+        state.pollTimer = setInterval(pollOnce, POLL_INTERVAL_MS);
     }
+
+    async function pollOnce() {
+        try {
+            await Promise.all([fetchJobs(), fetchStats()]);
+            applyFilters();
+        } catch (e) { /* swallow — already toasted */ }
+    }
+
+    // Stop polling when tab hidden (save API calls)
+    document.addEventListener('visibilitychange', function () {
+        if (document.hidden) {
+            if (state.pollTimer) { clearInterval(state.pollTimer); state.pollTimer = null; }
+        } else {
+            if (!state.pollTimer) {
+                pollOnce(); // immediate refresh on refocus
+                state.pollTimer = setInterval(pollOnce, POLL_INTERVAL_MS);
+            }
+        }
+    });
 
     function debounce(fn, ms) {
         var t;

@@ -1444,8 +1444,19 @@
 
         // Always default to Grid view on page load
 
-        // Poll for notifications every 30 seconds
-        setInterval(pollNotifications, 30000);
+        // Poll for notifications every 30 seconds — paused while the tab is
+        // hidden (saves API/Caspio calls overnight; bradley-transfers pattern).
+        // On refocus: immediate catch-up poll + data refresh, then re-arm.
+        let notificationTimer = setInterval(pollNotifications, 30000);
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                if (notificationTimer) { clearInterval(notificationTimer); notificationTimer = null; }
+            } else if (!notificationTimer) {
+                pollNotifications();
+                fetchMockups();
+                notificationTimer = setInterval(pollNotifications, 30000);
+            }
+        });
     }
 
     // Expose tab function globally (used by onclick in HTML)
