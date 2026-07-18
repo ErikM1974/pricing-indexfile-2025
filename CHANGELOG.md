@@ -1,3 +1,8 @@
+## v2026.07.18.8 (2026.07.18)
+
+- feat(leads-crm): lead workspace page (CRM v2 P2)
+- Deploy v2026.07.18.8: cache-bust leads CRM assets
+
 ## v2026.07.18.7 (2026.07.18)
 
 - feat(leads-crm): P1 frontend — lead-activity staff forwarder + drawer Follow-up-date & Est-value inputs (activates the AE follow-up digest) + stub activity store
