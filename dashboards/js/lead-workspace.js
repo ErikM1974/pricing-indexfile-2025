@@ -158,10 +158,10 @@
             var label = a.Activity_Text || L.fileBasename(u) || 'Attachment';
             attach = '<div class="ld-links" style="margin-top:6px">' +
                 (L.isImageUrl(u)
-                    ? '<div class="ld-thumbs"><a href="' + esc(L.viewUrl(u)) + '" target="_blank" rel="noopener noreferrer">' +
+                    ? '<div class="ld-thumbs"><a href="' + esc(L.viewUrl(u)) + '" target="_blank" rel="noopener">' +
                       '<img class="ld-thumb" loading="lazy" alt="Attachment" src="' + esc(L.viewUrl(u)) + '"></a></div>'
                     : '') +
-                '<span class="ld-att"><a href="' + esc(L.viewUrl(u)) + '" target="_blank" rel="noopener noreferrer">' +
+                '<span class="ld-att"><a href="' + esc(L.viewUrl(u)) + '" target="_blank" rel="noopener">' +
                 '<i class="fas fa-paperclip"></i> ' + esc(label) + '</a>' +
                 '<a class="ld-dl" href="' + esc(L.downloadUrl(u)) + '" title="Download" aria-label="Download attachment">' +
                 '<i class="fas fa-download"></i></a></span></div>';
@@ -673,18 +673,18 @@
         var thumbs = atts.map(function (a) { return a.url; }).filter(L.isImageUrl);
         root.innerHTML =
             (thumbs.length ? '<div class="ld-thumbs">' + thumbs.map(function (u) {
-                return '<a href="' + esc(L.viewUrl(u)) + '" target="_blank" rel="noopener noreferrer">' +
+                return '<a href="' + esc(L.viewUrl(u)) + '" target="_blank" rel="noopener">' +
                     '<img class="ld-thumb" loading="lazy" alt="Artwork" src="' + esc(L.viewUrl(u)) + '"></a>';
             }).join('') + '</div>' : '') +
             '<div class="ld-links">' +
             atts.map(function (a, i) {
                 var label = a.name || (L.isJfUpload(a.url) ? L.fileBasename(a.url) : '') || ('Attachment ' + (i + 1));
-                return '<span class="ld-att"><a href="' + esc(L.viewUrl(a.url)) + '" target="_blank" rel="noopener noreferrer">' +
+                return '<span class="ld-att"><a href="' + esc(L.viewUrl(a.url)) + '" target="_blank" rel="noopener">' +
                     '<i class="fas fa-paperclip"></i> ' + esc(label) + '</a>' +
                     '<a class="ld-dl" href="' + esc(L.downloadUrl(a.url)) + '" title="Download ' + esc(label) + '">' +
                     '<i class="fas fa-download"></i></a></span>';
             }).join('') +
-            (jfUrl ? '<a href="' + esc(jfUrl) + '" target="_blank" rel="noopener noreferrer">' +
+            (jfUrl ? '<a href="' + esc(jfUrl) + '" target="_blank" rel="noopener">' +
                 '<i class="fas fa-arrow-up-right-from-square"></i> View in JotForm</a>' : '') +
             '</div>';
         Array.prototype.forEach.call(root.querySelectorAll('img.ld-thumb'), function (img) {
