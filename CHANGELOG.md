@@ -1,3 +1,10 @@
+## v2026.07.18.3 (2026.07.18)
+
+- docs(memory): LESSONS + side-door audit — proxy orders-router escaped mounts gated (v951)
+- feat(leads): Leads CRM board — /dashboards/leads.html + sidebar/nav wiring + order-odbc staff forwarder
+- feat(leads): open a lead from the #Submission_ID hash (AE email deep link)
+- Deploy v2026.07.18.3: 3 files (form-submissions.html,leads.html,test-leads.html...)
+
 ## v2026.07.18.2 (2026-07-18)
 
 - perf(api-quota): poller visibility-pause + quote bulk-sync backoff (Caspio 507K/500K)
