@@ -54,6 +54,7 @@
         staffEmail: '',
         current: null,          // lead open in the drawer
         matchCache: {},         // email → contact | null (per page-load)
+        hashOpened: false,      // #Submission_ID deep link handled once per load
     };
 
     // ---------- tiny utils ----------
@@ -164,6 +165,15 @@
             renderFilters();
             renderStats();
             renderTable();
+            // Deep link from the AE notification email: /dashboards/leads.html#JFL0718-1234
+            // (a #hash, not ?lead= — '=' gets mangled by quoted-printable in emails).
+            var wantId = decodeURIComponent((location.hash || '').slice(1));
+            if (wantId && !state.hashOpened) {
+                state.hashOpened = true;
+                var hit = state.leads.find(function (l) { return l.Submission_ID === wantId; });
+                if (hit) openDrawer(hit);
+                else DashPage.showError('Lead ' + wantId + ' is not in the current view — it may be Archived (turn on "Show archived").');
+            }
         }).catch(function (err) {
             console.error('[leads] load failed:', err);
             DashPage.showError('Unable to load leads (' + err.message + '). Refresh to retry.');
