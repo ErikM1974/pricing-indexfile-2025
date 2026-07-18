@@ -160,8 +160,10 @@ async function syncFromShopWorks() {
             headers: { 'Content-Type': 'application/json' },
             // olderThanMin:5 is the endpoint floor — forces a refresh of
             // anything not synced in the last 5 min. daysBack:90 covers
-            // the widest dashboard date filter.
-            body: JSON.stringify({ daysBack: 90, olderThanMin: 5 }),
+            // the widest dashboard date filter. full:true bypasses the
+            // hourly cron's age-based backoff so the manual button always
+            // syncs the whole window (and runs the purge pass).
+            body: JSON.stringify({ daysBack: 90, olderThanMin: 5, full: true }),
         });
         const result = await resp.json().catch(() => ({}));
         if (!resp.ok || !result.success) {

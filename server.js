@@ -11323,9 +11323,14 @@ app.post('/api/quote-sessions/bulk-sync-from-shopworks', async (req, res) => {
     // OR clause, EMB/SCP/DTF orders never get their ShopWorks snapshot
     // synced back, which means /invoice/EMB-XXXX shows pre-import data only
     // and Send-to-ShipStation has incomplete info.
+    // Cancelled rows are excluded at the source (2026-07-18): a cancelled
+    // EMB/SCP/DTF quote still matches `PushedToShopWorks IS NOT NULL`, and
+    // re-syncing it every hour re-stamped ShopWorks_Last_Synced — which reset
+    // its 30-day purge countdown daily (quote-management's "Purges in N days"
+    // counts from Last_Synced). The purge pass below still handles them.
     let sessions;
     try {
-      sessions = await makeApiRequest(`/quote_sessions?q.where=${encodeURIComponent("Status='Processed' OR PushedToShopWorks IS NOT NULL")}&q.pageSize=1000`);
+      sessions = await makeApiRequest(`/quote_sessions?q.where=${encodeURIComponent("(Status='Processed' OR PushedToShopWorks IS NOT NULL) AND Status<>'Cancelled_in_ShopWorks'")}&q.pageSize=1000`);
     } catch (e) {
       return res.status(500).json({ success: false, error: 'Caspio fetch failed', details: e.message });
     }
@@ -11347,7 +11352,25 @@ app.post('/api/quote-sessions/bulk-sync-from-shopworks', async (req, res) => {
     // mark fresh syncs as stale (or vice versa).
     const staleThresholdMs = olderThanMin * 60 * 1000;
     const now = Date.now();
+
+    // Age-based backoff (2026-07-18 Caspio quota reduction): quotes <7 days
+    // old sync on every hourly run — that cadence is what detects ShopWorks-
+    // side deletions and fires the ShipStation cancel-cascade for ACTIVE
+    // orders. Older quotes (7-30d) sync only on the 0/6/12/18 UTC runs
+    // (4×/day). Keyed on CreatedAt_Quote, NOT ShopWorks_Last_Synced — every
+    // sync branch re-stamps Last_Synced, so it can never age. The dashboard's
+    // manual button passes { full: true } to bypass the backoff entirely.
+    const fullSync = req.body?.full === true;
+    const BACKOFF_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+    const isBackoffHour = new Date().getUTCHours() % 6 === 0;
+
     const candidates = inWindow.filter(s => {
+      if (!fullSync && !isBackoffHour) {
+        const created = s.CreatedAt_Quote || s.CreatedAt;
+        const t = created ? Date.parse(created) : NaN;
+        // Unknown age → treat as recent (sync hourly — the safe default).
+        if (Number.isFinite(t) && (now - t) > BACKOFF_AGE_MS) return false;
+      }
       if (!s.ShopWorks_Last_Synced) return true;
       const lastSynced = parseCaspioPacificMs(s.ShopWorks_Last_Synced);
       if (!Number.isFinite(lastSynced)) return true;
@@ -11406,7 +11429,12 @@ app.post('/api/quote-sessions/bulk-sync-from-shopworks', async (req, res) => {
     // 30 days from the deletion-detection timestamp. (Erik 2026-05-21)
     const PURGE_RETENTION_DAYS = SOFT_DELETE_RETENTION_DAYS;
     const purgeStats = { purged: 0, purgeErrors: 0 };
-    if (!dryRun) {
+    // Purge pass runs once daily (the 6 UTC run) instead of hourly — deletes
+    // become due on a 30-DAY clock, so hourly checks were pure Caspio burn.
+    // Manual { full: true } runs still purge so the dashboard button behaves
+    // exactly as before.
+    const runPurgePass = fullSync || new Date().getUTCHours() === 6;
+    if (!dryRun && runPurgePass) {
       try {
         const cancelled = await makeApiRequest(`/quote_sessions?q.where=${encodeURIComponent("Status='Cancelled_in_ShopWorks'")}&q.pageSize=1000`);
         if (Array.isArray(cancelled) && cancelled.length > 0) {
