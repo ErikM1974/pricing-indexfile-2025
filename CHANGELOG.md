@@ -1,3 +1,9 @@
+## v2026.07.18.2 (2026-07-18)
+
+- perf(api-quota): poller visibility-pause + quote bulk-sync backoff (Caspio 507K/500K)
+- docs(memory): LESSONS entry — Caspio quota blown by uncached per-style endpoints + dead-table probe
+- Deploy v2026.07.18.2: 3 files (art-hub-ruth.html,quote-management.html,supacolor-orders.html...)
+
 ## v2026.07.18.1 (2026.07.18)
 
 - docs(memory): work-order footer barcode encodes Ord<order#> — lookup parser accepts the prefix (proxy cfe011a)
