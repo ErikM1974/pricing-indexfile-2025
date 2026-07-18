@@ -1,3 +1,8 @@
+## v2026.07.18.7 (2026.07.18)
+
+- feat(leads-crm): P1 frontend — lead-activity staff forwarder + drawer Follow-up-date & Est-value inputs (activates the AE follow-up digest) + stub activity store
+- Deploy v2026.07.18.7: cache-bust leads.js
+
 ## v2026.07.18.6 (2026.07.18)
 
 - feat(leads): attachment filenames as labels + download buttons (?download=1 via both file servers)
