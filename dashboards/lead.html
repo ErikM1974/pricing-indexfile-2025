@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Lead - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- 2026 design tokens (must load before dash-shell.css) -->
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css">
+    <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
+    <link rel="stylesheet" href="/dashboards/css/leads.css?v=2026.07.18.8">
+    <link rel="stylesheet" href="/dashboards/css/lead-workspace.css?v=2026.07.18.8">
+</head>
+<body>
+    <div class="dash-shell">
+        <header class="dash-header">
+            <div class="dash-header-left">
+                <a href="/staff-dashboard.html" title="Back to Staff Dashboard">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                         alt="Northwest Custom Apparel" class="dash-header-logo">
+                </a>
+                <h1 class="dash-header-title" id="lw-page-title">Lead</h1>
+            </div>
+            <div class="dash-header-right">
+                <a href="/dashboards/leads.html" class="dash-back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    Leads board
+                </a>
+            </div>
+        </header>
+
+        <main class="dash-content">
+            <div class="dash-error-banner" role="alert">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span class="dash-error-banner-message"></span>
+                <button class="dash-error-banner-close" aria-label="Dismiss">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Lead header strip: who + source + pipeline controls -->
+            <div class="dash-card lw-head" id="lw-head">
+                <div class="lw-head-main">
+                    <div class="lw-title" id="lw-title">Loading lead…</div>
+                    <div class="lw-sub" id="lw-sub"></div>
+                </div>
+                <div class="lw-head-controls" id="lw-head-controls" hidden>
+                    <div class="ld-control">
+                        <label class="ld-control-label" for="lw-status">Status</label>
+                        <select id="lw-status" class="ld-select"></select>
+                    </div>
+                    <div class="ld-control">
+                        <label class="ld-control-label" for="lw-rep">Assigned rep</label>
+                        <select id="lw-rep" class="ld-select"></select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lw-grid">
+                <!-- Center: composer + activity timeline -->
+                <section class="lw-main">
+                    <div class="dash-card lw-composer-card">
+                        <label class="ld-section-title" for="lw-note-input">Add a note</label>
+                        <textarea id="lw-note-input" class="lw-note-input" rows="3"
+                            placeholder="Call notes, next steps, what the customer said… (Ctrl+Enter to save)"></textarea>
+                        <div class="lw-composer-actions">
+                            <button type="button" id="lw-note-save" class="ld-btn ld-btn--primary">
+                                <i class="fas fa-plus"></i> Add note
+                            </button>
+                            <div class="lw-dropzone" id="lw-dropzone" role="button" tabindex="0"
+                                 aria-label="Attach a file — drag and drop, paste, or click to browse">
+                                <i class="fas fa-paperclip"></i>
+                                <span>Drop, paste, or click to attach a file</span>
+                            </div>
+                            <input type="file" id="lw-file-input" class="lw-file-input" multiple
+                                   accept=".ai,.eps,.pdf,.png,.jpg,.jpeg,.tiff,.tif,.psd,.svg,.webp" hidden>
+                        </div>
+                        <div class="lw-upload-status ld-muted" id="lw-upload-status" hidden></div>
+                    </div>
+
+                    <div class="dash-card">
+                        <div class="dash-card-header">
+                            <h2 class="dash-card-title">Activity</h2>
+                        </div>
+                        <div id="lw-timeline" class="dash-loading">Loading activity…</div>
+                    </div>
+                </section>
+
+                <!-- Right rail: panels -->
+                <aside class="lw-rail">
+                    <div class="dash-card lw-panel">
+                        <div class="ld-section-title">Contact</div>
+                        <div id="lw-panel-contact" class="ld-muted">—</div>
+                    </div>
+                    <div class="dash-card lw-panel">
+                        <div class="ld-section-title">Follow-up</div>
+                        <div id="lw-panel-followup"></div>
+                    </div>
+                    <div class="dash-card lw-panel">
+                        <div class="ld-section-title">Estimated value</div>
+                        <div id="lw-panel-value"></div>
+                    </div>
+                    <div class="dash-card lw-panel">
+                        <div class="ld-section-title">ShopWorks customer</div>
+                        <div id="match-root" class="ld-muted">Checking…</div>
+                        <div id="lw-panel-intel"></div>
+                    </div>
+                    <div class="dash-card lw-panel">
+                        <div class="ld-section-title">Quote</div>
+                        <div id="lw-panel-quote"></div>
+                    </div>
+                    <div class="dash-card lw-panel">
+                        <div class="ld-section-title">Order history</div>
+                        <div id="orders-root" class="ld-muted"></div>
+                    </div>
+                    <div class="dash-card lw-panel">
+                        <div class="ld-section-title">Submitted details</div>
+                        <div id="lw-panel-details" class="ld-muted">—</div>
+                    </div>
+                    <div class="dash-card lw-panel">
+                        <div class="ld-section-title">Original artwork</div>
+                        <div id="lw-panel-artwork" class="ld-muted">None attached.</div>
+                    </div>
+                </aside>
+            </div>
+        </main>
+    </div>
+
+    <!-- Load order matters: APP_CONFIG → fetch-timeout → DashPage → shared upload → LeadsCommon → controller -->
+    <script src="/config/app.config.js"></script>
+    <script src="/shared_components/js/fetch-timeout.js"></script>
+    <script src="/shared_components/js/dash-page-helpers.js"></script>
+    <script src="/shared_components/js/artwork-upload.js"></script>
+    <script src="/dashboards/js/leads-common.js?v=2026.07.18.8"></script>
+    <script src="/dashboards/js/lead-workspace.js?v=2026.07.18.8"></script>
+</body>
+</html>

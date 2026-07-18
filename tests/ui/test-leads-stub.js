@@ -164,6 +164,13 @@
         }
 
         if (u.indexOf('/api/crm-proxy/form-submissions') !== -1) {
+            // workspace detail read: /api/crm-proxy/form-submissions/<id>
+            if (method === 'GET' && u.indexOf('/api/crm-proxy/form-submissions/') !== -1) {
+                var did = decodeURIComponent(u.split('/api/crm-proxy/form-submissions/')[1].split('?')[0]);
+                var dlead = leads.find(function (l) { return l.Submission_ID === did; });
+                if (!dlead) return jsonResponse(404, { error: 'Submission not found' });
+                return jsonResponse(200, { submission: dlead, items: [] });
+            }
             if (method === 'PUT') {
                 var id = decodeURIComponent(u.split('/api/crm-proxy/form-submissions/')[1].split('?')[0]);
                 var lead = leads.find(function (l) { return l.Submission_ID === id; });
@@ -219,6 +226,28 @@
             return jsonResponse(200, { contacts: [drainProContact] });
         }
 
+        if (u.indexOf('/api/customer-history/') !== -1) {
+            return jsonResponse(200, {
+                hasHistory: true, orderCount: 12, lastOrderDate: '2026-06-30', lastOrderDaysAgo: 18,
+                totalRevenue: 15230.5, avgOrderSize: 1269.21,
+                topItems: [{ name: 'PC54 Tees' }, { name: 'Richardson 112 Caps' }, { name: 'Hoodies' }],
+            });
+        }
+
+        if (u.indexOf('/api/quote_sessions') !== -1) {
+            var qparams = new URLSearchParams(u.split('?')[1] || '');
+            var qid = qparams.get('quoteID');
+            var qemail = qparams.get('customerEmail');
+            var quote = {
+                QuoteID: 'EMB0718-1', SessionID: 'sess-1', Status: 'Payment Confirmed',
+                TotalAmount: 1234.56, CustomerName: 'Drain Pro Inc.', CustomerEmail: 'mike@drainpro.com',
+                CreatedAt: '2026-07-18T16:00:00',
+            };
+            if (qid) return jsonResponse(200, qid === 'EMB0718-1' ? [quote] : []);
+            if (qemail) return jsonResponse(200, qemail.toLowerCase() === 'mike@drainpro.com' ? [quote] : []);
+            return jsonResponse(200, []);
+        }
+
         if (u.indexOf('/api/company-contacts/search') !== -1) {
             return jsonResponse(200, {
                 contacts: [
@@ -230,4 +259,45 @@
 
         return jsonResponse(404, { error: 'stub has no route for ' + u });
     };
+
+    // ── XHR patch — ArtworkUpload.uploadOne posts /api/files/upload via
+    // XMLHttpRequest, which the fetch stub can't intercept. Fake the upload
+    // (progress → success → externalKey) so the workspace attach flow clicks
+    // through end-to-end with zero network.
+    var uploadN = 0;
+    function StubXHR() {
+        var self = this;
+        this.status = 0;
+        this.responseText = '';
+        this.timeout = 0;
+        this._listeners = {};
+        this.upload = { addEventListener: function (ev, cb) { if (ev === 'progress') self._onProgress = cb; } };
+    }
+    StubXHR.prototype.addEventListener = function (ev, cb) { this._listeners[ev] = cb; };
+    StubXHR.prototype.open = function (method, url) { this._url = String(url); };
+    StubXHR.prototype.send = function () {
+        var self = this;
+        if (this._url.indexOf('/api/files/upload') !== -1) {
+            console.log('[leads-stub] XHR upload →', this._url);
+            setTimeout(function () {
+                if (self._onProgress) self._onProgress({ lengthComputable: true, loaded: 60, total: 100 });
+                setTimeout(function () {
+                    uploadN += 1;
+                    self.status = 200;
+                    self.responseText = JSON.stringify({
+                        externalKey: 'stub-upload-' + uploadN,
+                        fileName: 'pasted-art-' + uploadN + '.png',
+                        originalName: 'pasted-art-' + uploadN + '.png',
+                        size: 4321, mimeType: 'image/png',
+                    });
+                    if (self._listeners.load) self._listeners.load();
+                }, 60);
+            }, 40);
+            return;
+        }
+        self.status = 404;
+        self.responseText = '{}';
+        setTimeout(function () { if (self._listeners.load) self._listeners.load(); }, 10);
+    };
+    window.XMLHttpRequest = StubXHR;
 })();

@@ -1,48 +1,25 @@
 /**
- * leads.js — controller for dashboards/leads.html (Leads CRM)
+ * leads.js — controller for dashboards/leads.html (Leads CRM board)
  *
  * One board for every lead source: the 6 JotForm website forms (ingested by
  * the proxy as Form_ID='jotform-lead') + the in-app Quote Request / Webstore
  * Inquiry / Team Roster forms — all rows in Caspio Form_Submissions.
  *
- * Data paths:
- *   · lead rows + status/rep/link writes → SAME-ORIGIN session-gated forwarder
- *     /api/crm-proxy/form-submissions* (raw proxy endpoints are secret-only —
- *     lead rows hold customer PII)
- *   · ShopWorks customer match → DashPage.fetchJson → public proxy
- *     /api/company-contacts/* (quote-builder precedent)
- *   · order history → SAME-ORIGIN /api/crm-proxy/order-odbc* (secret-gated
- *     upstream since v2026.07.18)
+ * Shared vocabulary/helpers live in dashboards/js/leads-common.js
+ * (window.LeadsCommon) — also used by the lead workspace (lead.html).
  *
- * NO POLLING — Caspio quota rule. Data loads on open + the Refresh button.
+ * Data paths: rows + status/rep/date/value writes → SAME-ORIGIN session-gated
+ * /api/crm-proxy/form-submissions*; ShopWorks match → public proxy
+ * /api/company-contacts/*; order history → /api/crm-proxy/order-odbc*;
+ * timeline appends → /api/crm-proxy/lead-activity*.
+ * NO POLLING — loads on open + the Refresh button (Caspio quota rule).
  * Every rendered value passes esc() — lead fields are attacker-controlled.
  */
 (function () {
     'use strict';
 
-    var LEAD_FORM_IDS = ['jotform-lead', 'quote-request', 'webstore-request', 'team-roster'];
-
-    var SOURCE_META = {
-        'jotform-lead': { label: 'Website', icon: 'fa-globe' },
-        'quote-request': { label: 'Quote Request', icon: 'fa-bullhorn' },
-        'webstore-request': { label: 'Webstore', icon: 'fa-store' },
-        'team-roster': { label: 'Roster', icon: 'fa-people-group' },
-    };
-
-    // Per-form pipelines — mirrors dashboards/js/form-submissions.js STATUS_CHOICES.
-    var STATUS_CHOICES = {
-        'jotform-lead': ['New', 'Contacted', 'Quoted', 'Won', 'Lost', 'Archived'],
-        'quote-request': ['New', 'Contacted', 'Quoted', 'Won', 'Lost', 'Archived'],
-        'webstore-request': ['New', 'In Progress', 'Store Built', 'Launched', 'Archived'],
-        'team-roster': ['New', 'In Progress', 'Entered in ShopWorks', 'Completed', 'Archived'],
-    };
-    var WON_STATUSES = ['Won', 'Launched', 'Completed', 'Entered in ShopWorks'];
-    var PIPELINE_STATUSES = ['Contacted', 'Quoted', 'In Progress', 'Store Built'];
-
-    // Display names match Sales_Reps_2026.CustomerServiceRep / the quote-builder
-    // dropdowns. Taneisha first — she is the default owner of unmatched leads.
-    var REPS = ['Taneisha Clark', 'Nika Lao', 'Erik Mickelson', 'Jim Mickelson',
-        'Bradley Wright', 'Steve Deland', 'Ruth Nhong', 'General Sales'];
+    var L = window.LeadsCommon;
+    var esc = L.esc, fmtWhen = L.fmtWhen, fmtMoney = L.fmtMoney;
 
     var state = {
         leads: [],
@@ -56,65 +33,6 @@
         matchCache: {},         // email → contact | null (per page-load)
         hashOpened: false,      // #Submission_ID deep link handled once per load
     };
-
-    // ---------- tiny utils ----------
-
-    function esc(v) {
-        return String(v == null ? '' : v)
-            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-    }
-
-    function fmtWhen(iso) {
-        var s = String(iso == null ? '' : iso);
-        // Date-only strings (e.g. contacts' Last_Order_Date '2026-06-30') parse as
-        // UTC midnight and would display a day early in Pacific — pin to local noon.
-        var d = new Date(/^\d{4}-\d{2}-\d{2}$/.test(s) ? s + 'T12:00:00' : s);
-        if (isNaN(d.getTime())) return esc(s);
-        return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    }
-
-    function fmtMoney(v) {
-        var n = Number(v);
-        if (!isFinite(n)) return '';
-        return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    }
-
-    function safeHttpUrl(u) {
-        return typeof u === 'string' && /^https:\/\//i.test(u) ? u : '';
-    }
-
-    function payloadOf(lead) {
-        if (!lead.__payload) {
-            try { lead.__payload = JSON.parse(lead.Payload_JSON || '{}') || {}; }
-            catch (e) { lead.__payload = {}; }
-        }
-        return lead.__payload;
-    }
-
-    function sourceTitleOf(lead) {
-        if (lead.Form_ID !== 'jotform-lead') return (SOURCE_META[lead.Form_ID] || {}).label || lead.Form_ID;
-        var src = payloadOf(lead)._source || {};
-        return src.formTitle ? 'Website — ' + src.formTitle : 'Website (JotForm)';
-    }
-
-    // Same-origin session-gated forwarder (mirrors the Forms Inbox pattern).
-    function crmFetch(path, options) {
-        return fetch('/api/crm-proxy/form-submissions' + path, options).then(function (resp) {
-            return resp.json().catch(function () { return {}; }).then(function (body) {
-                if (!resp.ok) throw new Error(body.error || ('HTTP ' + resp.status));
-                return body;
-            });
-        });
-    }
-
-    function statusCls(status) {
-        if (status === 'New') return 'ld-status--new';
-        if (WON_STATUSES.indexOf(status) !== -1) return 'ld-status--won';
-        if (status === 'Lost' || status === 'Archived') return 'ld-status--lost';
-        if (PIPELINE_STATUSES.indexOf(status) !== -1) return 'ld-status--active';
-        return '';
-    }
 
     // ---------- boot ----------
 
@@ -156,17 +74,16 @@
         tbody.innerHTML = '<tr><td colspan="7" class="ld-empty dash-loading">Loading leads…</td></tr>';
 
         var params = new URLSearchParams();
-        params.set('formIds', LEAD_FORM_IDS.join(','));
+        params.set('formIds', L.LEAD_FORM_IDS.join(','));
         params.set('limit', state.includeArchived ? '2000' : '600');
         if (!state.includeArchived) params.set('statusNot', 'Archived');
 
-        crmFetch('?' + params.toString()).then(function (body) {
+        L.crmFetch('?' + params.toString()).then(function (body) {
             state.leads = body.submissions || [];
             renderFilters();
             renderStats();
             renderTable();
-            // Deep link from the AE notification email: /dashboards/leads.html#JFL0718-1234
-            // (a #hash, not ?lead= — '=' gets mangled by quoted-printable in emails).
+            // Deep link (e.g. from the AE emails): /dashboards/leads.html#JFL0718-1234
             var wantId = decodeURIComponent((location.hash || '').slice(1));
             if (wantId && !state.hashOpened) {
                 state.hashOpened = true;
@@ -188,8 +105,8 @@
         var fresh = 0, pipeline = 0, won = 0;
         state.leads.forEach(function (l) {
             if (l.Status === 'New') fresh += 1;
-            else if (PIPELINE_STATUSES.indexOf(l.Status) !== -1) pipeline += 1;
-            if (WON_STATUSES.indexOf(l.Status) !== -1) won += 1;
+            else if (L.PIPELINE_STATUSES.indexOf(l.Status) !== -1) pipeline += 1;
+            if (L.WON_STATUSES.indexOf(l.Status) !== -1) won += 1;
         });
         document.getElementById('stat-total').textContent = total;
         document.getElementById('stat-new').textContent = fresh;
@@ -213,10 +130,9 @@
     }
 
     function renderFilters() {
-        // Source: the 3 in-app forms + one entry per JotForm form seen in the data.
         var sources = [];
         ['quote-request', 'webstore-request', 'team-roster'].forEach(function (f) {
-            sources.push({ value: f, label: SOURCE_META[f].label });
+            sources.push({ value: f, label: L.SOURCE_META[f].label });
         });
         var seenJf = {};
         state.leads.forEach(function (l) {
@@ -224,7 +140,7 @@
             var key = l.External_Source || 'jotform';
             if (!seenJf[key]) {
                 seenJf[key] = true;
-                sources.push({ value: 'jf:' + key, label: sourceTitleOf(l) });
+                sources.push({ value: 'jf:' + key, label: L.sourceTitleOf(l) });
             }
         });
         setOptions('filter-source', state.source, sources);
@@ -236,7 +152,7 @@
         }));
 
         var reps = {};
-        REPS.forEach(function (r) { reps[r] = true; });
+        L.REPS.forEach(function (r) { reps[r] = true; });
         state.leads.forEach(function (l) { if (l.Sales_Rep) reps[l.Sales_Rep] = true; });
         var repOptions = Object.keys(reps).map(function (r) { return { value: r, label: r }; });
         repOptions.push({ value: '(unassigned)', label: '(unassigned)' });
@@ -271,17 +187,17 @@
             return;
         }
         tbody.innerHTML = rows.map(function (l) {
-            var meta = SOURCE_META[l.Form_ID] || { label: l.Form_ID, icon: 'fa-file' };
+            var meta = L.SOURCE_META[l.Form_ID] || { label: l.Form_ID, icon: 'fa-file' };
             return '<tr data-id="' + esc(l.Submission_ID) + '">' +
                 '<td class="ld-when">' + fmtWhen(l.Submitted_At) + '</td>' +
                 '<td class="ld-id">' + esc(l.Submission_ID) + '</td>' +
                 '<td><div class="ld-contact-name">' + esc(l.Contact_Name || '—') + '</div>' +
                     '<div class="ld-contact-email">' + esc(l.Email || '') + '</div></td>' +
                 '<td>' + esc(l.Company || '—') + '</td>' +
-                '<td><span class="ld-badge ld-badge--' + esc(l.Form_ID) + '" title="' + esc(sourceTitleOf(l)) + '">' +
+                '<td><span class="ld-badge ld-badge--' + esc(l.Form_ID) + '" title="' + esc(L.sourceTitleOf(l)) + '">' +
                     '<i class="fas ' + esc(meta.icon) + '"></i> ' + esc(meta.label) + '</span></td>' +
                 '<td>' + esc(l.Sales_Rep || '—') + '</td>' +
-                '<td><span class="ld-status ' + statusCls(l.Status) + '">' + esc(l.Status || '—') + '</span></td>' +
+                '<td><span class="ld-status ' + L.statusCls(l.Status) + '">' + esc(l.Status || '—') + '</span></td>' +
                 '</tr>';
         }).join('');
 
@@ -302,57 +218,19 @@
         document.getElementById('drawer-overlay').hidden = true;
     }
 
-    function payloadEntries(payload) {
-        if (Array.isArray(payload.fields)) {
-            return payload.fields.filter(function (p) { return Array.isArray(p) && p.length >= 2; });
-        }
-        return Object.keys(payload)
-            .filter(function (k) { return k.charAt(0) !== '_' && k !== 'artworkUrls'; })
-            .map(function (k) {
-                var v = payload[k];
-                return [k, (v && typeof v === 'object') ? JSON.stringify(v) : String(v == null ? '' : v)];
-            });
-    }
-
-    // Known-safe attachment hosts: our proxy's Caspio-file server (QRQ logo
-    // uploads live there as "Name.ext — https://…/api/files/<key>" text) and
-    // JotForm uploads. ONLY these are surfaced as attachments — never arbitrary
-    // customer-typed URLs (lead data is untrusted).
-    function extractFileUrls(text) {
-        var filesBase = DashPage.apiUrl('/api/files/');
-        var s = String(text || '');
-        var out = [];
-        var re = /https:\/\/\S+/g;
-        var m;
-        while ((m = re.exec(s))) {
-            var u = m[0].replace(/[),.;'"\]]+$/, '');
-            var allowed = /^https:\/\/((www\.)?jotform\.com\/uploads\/|files\.jotform\.com\/)/i.test(u) || u.indexOf(filesBase) === 0;
-            if (!allowed) continue;
-            // QRQ format "NWE LOGO.webp — https://…" → keep the human filename
-            var before = s.slice(0, m.index).replace(/[\s—–-]+$/, '');
-            var nm = before.split(/[|;,\n]/).pop().trim();
-            if (!/\.[a-z0-9]{2,5}$/i.test(nm)) nm = '';
-            out.push({ url: u, name: nm });
-        }
-        return out;
-    }
-
-    function fileBasename(u) {
-        try { return decodeURIComponent(String(u).split('?')[0].split('/').pop() || ''); }
-        catch (e) { return String(u).split('/').pop() || ''; }
-    }
-
     function openDrawer(lead) {
         state.current = lead;
-        var payload = payloadOf(lead);
-        var choices = STATUS_CHOICES[lead.Form_ID] || STATUS_CHOICES['jotform-lead'];
+        var payload = L.payloadOf(lead);
+        var choices = L.STATUS_CHOICES[lead.Form_ID] || L.STATUS_CHOICES['jotform-lead'];
         if (lead.Status && choices.indexOf(lead.Status) === -1) choices = choices.concat([lead.Status]);
-        var reps = REPS.slice();
+        var reps = L.REPS.slice();
         if (lead.Sales_Rep && reps.indexOf(lead.Sales_Rep) === -1) reps.push(lead.Sales_Rep);
 
         document.getElementById('drawer-title').textContent = lead.Contact_Name || lead.Company || lead.Submission_ID;
         document.getElementById('drawer-sub').textContent =
-            (lead.Company || '') + ' · ' + sourceTitleOf(lead) + ' · ' + fmtWhen(lead.Submitted_At);
+            (lead.Company || '') + ' · ' + L.sourceTitleOf(lead) + ' · ' + fmtWhen(lead.Submitted_At);
+        var fullLink = document.getElementById('drawer-open-full');
+        if (fullLink) fullLink.href = '/dashboards/lead.html#' + encodeURIComponent(lead.Submission_ID);
 
         var contactRows = [
             ['Email', lead.Email ? '<a href="mailto:' + esc(lead.Email) + '">' + esc(lead.Email) + '</a>' : '—'],
@@ -360,45 +238,23 @@
             ['Lead ID', '<span class="ld-id">' + esc(lead.Submission_ID) + '</span>'],
         ];
 
-        var entries = payloadEntries(payload);
-
+        var atts = L.collectAttachments(payload);
+        var jfUrl = L.safeHttpUrl((payload._source || {}).url || '');
         var artworkHtml = '';
-        var atts = (payload.artworkUrls || []).map(function (u) { return { url: u, name: '' }; });
-        entries.forEach(function (p) { atts = atts.concat(extractFileUrls(p[1])); });
-        var seenUrls = {};
-        atts = atts.filter(function (a) {
-            a.url = safeHttpUrl(a.url);
-            if (!a.url || seenUrls[a.url]) return false;
-            seenUrls[a.url] = true;
-            return true;
-        });
-        var urls = atts.map(function (a) { return a.url; });
-        var jfUrl = safeHttpUrl((payload._source || {}).url || '');
-        if (urls.length || jfUrl) {
-            // JotForm upload links need a JotForm login — route them through the
-            // staff passthrough so attachments open (and preview) in-app.
-            var isJfUpload = function (u) { return /^https:\/\/((www\.)?jotform\.com\/uploads\/|files\.jotform\.com\/)/i.test(u); };
-            var viewUrl = function (u) { return isJfUpload(u) ? DashPage.apiUrl('/api/jotform/file?u=' + encodeURIComponent(u)) : u; };
-            // /api/files/<key> URLs are extensionless — try them as thumbnails
-            // too; non-images get hidden by the onerror wiring after render.
-            var filesBase = DashPage.apiUrl('/api/files/');
-            var isImage = function (u) { return /\.(png|jpe?g|gif|webp|bmp)(\?|$)/i.test(u) || u.indexOf(filesBase) === 0; };
-            var thumbs = urls.filter(isImage);
+        if (atts.length || jfUrl) {
+            var thumbs = atts.map(function (a) { return a.url; }).filter(L.isImageUrl);
             artworkHtml = '<div class="ld-section"><div class="ld-section-title">Artwork & Source</div>' +
                 (thumbs.length ? '<div class="ld-thumbs">' + thumbs.map(function (u) {
-                    return '<a href="' + esc(viewUrl(u)) + '" target="_blank" rel="noopener noreferrer">' +
-                        '<img class="ld-thumb" loading="lazy" alt="Artwork attachment" src="' + esc(viewUrl(u)) + '"></a>';
+                    return '<a href="' + esc(L.viewUrl(u)) + '" target="_blank" rel="noopener noreferrer">' +
+                        '<img class="ld-thumb" loading="lazy" alt="Artwork attachment" src="' + esc(L.viewUrl(u)) + '"></a>';
                 }).join('') + '</div>' : '') +
                 '<div class="ld-links">' +
                 atts.map(function (a, i) {
-                    var label = a.name || (isJfUpload(a.url) ? fileBasename(a.url) : '') || ('Attachment ' + (i + 1));
-                    var dl = isJfUpload(a.url)
-                        ? viewUrl(a.url) + '&download=1'
-                        : a.url + (a.url.indexOf('?') >= 0 ? '&' : '?') + 'download=1';
+                    var label = a.name || (L.isJfUpload(a.url) ? L.fileBasename(a.url) : '') || ('Attachment ' + (i + 1));
                     return '<span class="ld-att">' +
-                        '<a href="' + esc(viewUrl(a.url)) + '" target="_blank" rel="noopener noreferrer">' +
+                        '<a href="' + esc(L.viewUrl(a.url)) + '" target="_blank" rel="noopener noreferrer">' +
                         '<i class="fas fa-paperclip"></i> ' + esc(label) + '</a>' +
-                        '<a class="ld-dl" href="' + esc(dl) + '" title="Download ' + esc(label) + '" aria-label="Download ' + esc(label) + '">' +
+                        '<a class="ld-dl" href="' + esc(L.downloadUrl(a.url)) + '" title="Download ' + esc(label) + '" aria-label="Download ' + esc(label) + '">' +
                         '<i class="fas fa-download"></i></a></span>';
                 }).join('') +
                 (jfUrl ? '<a href="' + esc(jfUrl) + '" target="_blank" rel="noopener noreferrer">' +
@@ -406,6 +262,7 @@
                 '</div></div>';
         }
 
+        var entries = L.payloadEntries(payload);
         var detailsHtml = entries.length
             ? '<div class="ld-section"><div class="ld-section-title">Submitted Details</div><dl class="ld-kv">' +
                 entries.map(function (p) {
@@ -475,12 +332,18 @@
         var body = { Updated_By: state.staffEmail || 'leads-page' };
         body[field] = value;
         if (selectEl) selectEl.disabled = true;
-        crmFetch('/' + encodeURIComponent(lead.Submission_ID), {
+        L.crmFetch('/' + encodeURIComponent(lead.Submission_ID), {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body),
         }).then(function () {
             lead[field] = value;
+            // Timeline breadcrumbs (fire-and-forget) — status + ownership only.
+            if (field === 'Status' && value !== prev) {
+                L.logActivity(lead.Submission_ID, 'status', 'Status: ' + (prev || '—') + ' → ' + value, '', state.staffEmail);
+            } else if (field === 'Sales_Rep' && value !== prev) {
+                L.logActivity(lead.Submission_ID, 'system', value ? 'Assigned to ' + value : 'Unassigned', '', state.staffEmail);
+            }
             renderStats();
             renderFilters();
             renderTable();
@@ -521,7 +384,9 @@
             document.querySelectorAll('#match-root [data-link-customer]'),
             function (btn) {
                 btn.addEventListener('click', function () {
-                    saveField(lead, 'Matched_ID_Customer', btn.getAttribute('data-link-customer'), null);
+                    var custId = btn.getAttribute('data-link-customer');
+                    saveField(lead, 'Matched_ID_Customer', custId, null);
+                    L.logActivity(lead.Submission_ID, 'system', 'Linked ShopWorks customer #' + custId, '', state.staffEmail);
                     btn.disabled = true;
                     btn.innerHTML = '<i class="fas fa-check"></i> Linked';
                     renderOrdersSection(lead, true);
@@ -583,7 +448,6 @@
         }
 
         if (lead.Matched_ID_Customer) {
-            // Already linked (auto-matched at ingest or by staff) — show the linked customer.
             root.innerHTML = '<div class="ld-match ld-match--found">' +
                 '<div class="ld-match-head"><span class="ld-pill ld-pill--customer"><i class="fas fa-circle-check"></i> Existing customer</span>' +
                 '<span class="ld-muted">Customer #' + esc(lead.Matched_ID_Customer) + '</span></div>' +
