@@ -465,14 +465,99 @@
             .catch(function () { root.innerHTML = ''; });
     }
 
-    // Linked quote panel — live status/$ + manual link (suggestions land in P4).
+    // "Start a quote" targets — mirrors dashboards/js/quote-management.js
+    // DUPLICATE_BUILDERS routing (EMB*/SP* variants collapse to one builder).
+    var QUOTE_BUILDERS = [
+        { label: 'Embroidery', icon: 'fa-shirt', url: '/quote-builders/embroidery-quote-builder.html' },
+        { label: 'Screen Print', icon: 'fa-print', url: '/quote-builders/screenprint-quote-builder.html' },
+        { label: 'DTG', icon: 'fa-spray-can', url: '/quote-builders/dtg-quote-builder.html' },
+        { label: 'DTF', icon: 'fa-fire', url: '/quote-builders/dtf-quote-builder.html' },
+    ];
+
+    // Hand the lead's identity to a builder via the EXISTING method-switch
+    // prefill (quote-builder-utils.js takeMethodSwitchPrefill — zero builder
+    // edits): sessionStorage + ?from=methodswitch.
+    function startQuote(builderUrl) {
+        var lead = state.lead;
+        try {
+            sessionStorage.setItem('nwca-method-switch', JSON.stringify({
+                customer: {
+                    name: lead.Contact_Name || '',
+                    email: lead.Email || '',
+                    company: lead.Company || '',
+                    phone: lead.Phone || '',
+                    customerNumber: lead.Matched_ID_Customer || lead.Customer_Number || '',
+                },
+                products: [],
+            }));
+        } catch (e) { /* storage blocked — builder opens unprefilled */ }
+        window.open(builderUrl + '?from=methodswitch', '_blank', 'noopener');
+        L.logActivity(lead.Submission_ID, 'system', 'Started a quote (' + builderUrl.split('/').pop().replace('-quote-builder.html', '') + ')', '', state.staffEmail)
+            .then(function (r) { if (r && r.activity) prependActivity(r.activity); });
+    }
+
+    function linkQuote(lead, q) {
+        saveLeadField('Linked_Quote_ID', q.QuoteID, null).then(function (ok) {
+            if (!ok) return;
+            var total = q.TotalAmount != null && q.TotalAmount !== '' ? String(q.TotalAmount) : '';
+            if (total && String(lead.Lead_Value || '') !== total) {
+                saveLeadField('Lead_Value', total, null).then(function (ok2) { if (ok2) renderValuePanel(lead); });
+            }
+            L.logActivity(lead.Submission_ID, 'quote',
+                'Linked quote ' + q.QuoteID + (total ? ' (' + fmtMoney(total) + ')' : ''), '', state.staffEmail)
+                .then(function (r) { if (r && r.activity) prependActivity(r.activity); });
+            renderQuotePanel(lead);
+        });
+    }
+
+    function loadQuoteSuggestions(lead) {
+        var box = document.getElementById('lw-quote-suggest');
+        if (!box) return;
+        if (!lead.Email) { box.innerHTML = '<span class="ld-muted">No email on this lead — link by Quote ID below.</span>'; return; }
+        box.innerHTML = '<span class="ld-muted">Checking recent quotes…</span>';
+        DashPage.fetchJson('/api/quote_sessions?customerEmail=' + encodeURIComponent(lead.Email))
+            .then(function (body) {
+                var rows = Array.isArray(body) ? body : (body.sessions || body.result || []);
+                var seen = {};
+                var quotes = rows.filter(function (q) {
+                    if (!q || !q.QuoteID || seen[q.QuoteID]) return false;
+                    seen[q.QuoteID] = true;
+                    return true;
+                }).slice(0, 5);
+                if (!quotes.length) {
+                    box.innerHTML = '<span class="ld-muted">No quotes for ' + esc(lead.Email) + ' yet. ' +
+                        'After saving one in the builder, </span><button type="button" id="lw-suggest-refresh" class="lw-chip">check again</button>';
+                    var r1 = document.getElementById('lw-suggest-refresh');
+                    if (r1) r1.addEventListener('click', function () { loadQuoteSuggestions(lead); });
+                    return;
+                }
+                box.innerHTML = quotes.map(function (q, i) {
+                    return '<div class="ld-match-result"><span>' +
+                        '<strong class="ld-id">' + esc(q.QuoteID) + '</strong> ' +
+                        '<span class="ld-muted">' + (fmtMoney(q.TotalAmount) || '') +
+                        (q.CreatedAt ? ' · ' + fmtWhen(q.CreatedAt) : '') + '</span></span>' +
+                        '<button type="button" class="ld-btn" data-quote="' + i + '">Link</button></div>';
+                }).join('') +
+                '<button type="button" id="lw-suggest-refresh" class="lw-chip">refresh</button>';
+                Array.prototype.forEach.call(box.querySelectorAll('[data-quote]'), function (b) {
+                    b.addEventListener('click', function () { linkQuote(lead, quotes[parseInt(b.getAttribute('data-quote'), 10)]); });
+                });
+                var r2 = document.getElementById('lw-suggest-refresh');
+                if (r2) r2.addEventListener('click', function () { loadQuoteSuggestions(lead); });
+            })
+            .catch(function (err) {
+                box.innerHTML = '<span class="ld-muted">Quote lookup unavailable (' + esc(err.message) + ').</span>';
+            });
+    }
+
+    // Linked quote panel — live status/$ + start-a-quote handoff + suggestions.
     function renderQuotePanel(lead) {
         var root = document.getElementById('lw-panel-quote');
 
         function manualLinkHtml() {
             return '<div class="lw-quote-row">' +
                 '<input type="text" id="lw-quote-id" class="lw-quote-input" placeholder="Quote ID (e.g. EMB0718-1)">' +
-                '<button type="button" id="lw-quote-link" class="ld-btn"><i class="fas fa-link"></i></button>' +
+                '<button type="button" id="lw-quote-link" class="ld-btn" aria-label="Link quote"><i class="fas fa-link"></i></button>' +
                 '</div>';
         }
 
@@ -503,16 +588,24 @@
             return;
         }
 
-        root.innerHTML = '<div class="ld-muted">No quote linked yet.</div>' + manualLinkHtml();
+        root.innerHTML =
+            '<div class="lw-intel-title">Start a quote — prefilled with this lead</div>' +
+            '<div class="lw-method-grid">' + QUOTE_BUILDERS.map(function (b, i) {
+                return '<button type="button" class="ld-btn lw-method-btn" data-builder="' + i + '">' +
+                    '<i class="fas ' + b.icon + '"></i> ' + b.label + '</button>';
+            }).join('') + '</div>' +
+            '<div class="lw-intel-title">Recent quotes for this email</div>' +
+            '<div id="lw-quote-suggest"></div>' +
+            manualLinkHtml();
+
+        Array.prototype.forEach.call(root.querySelectorAll('[data-builder]'), function (b) {
+            b.addEventListener('click', function () { startQuote(QUOTE_BUILDERS[parseInt(b.getAttribute('data-builder'), 10)].url); });
+        });
+        loadQuoteSuggestions(lead);
         document.getElementById('lw-quote-link').addEventListener('click', function () {
             var id = document.getElementById('lw-quote-id').value.trim();
             if (!/^[A-Za-z0-9-]{3,40}$/.test(id)) { DashPage.showError('That does not look like a Quote ID.'); return; }
-            saveLeadField('Linked_Quote_ID', id, this).then(function (ok) {
-                if (!ok) return;
-                L.logActivity(lead.Submission_ID, 'quote', 'Linked quote ' + id, '', state.staffEmail)
-                    .then(function (r) { if (r && r.activity) prependActivity(r.activity); });
-                renderQuotePanel(lead);
-            });
+            linkQuote(lead, { QuoteID: id, TotalAmount: null }); // linked view re-syncs $ from the live quote
         });
     }
 
