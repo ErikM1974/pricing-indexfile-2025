@@ -3292,6 +3292,11 @@ app.all('/api/crm-proxy/order-odbc*', requireStaff, orderOdbcForwarder);
 const [, leadActivityForwarder] = createCrmProxy('lead-activity', []);
 app.all('/api/crm-proxy/lead-activity*', requireStaff, leadActivityForwarder);
 
+// Leads CRM one-click outreach emails (preview + send-as-the-AE, logged to the
+// timeline). Any logged-in staff; secret-only upstream.
+const [, leadOutreachForwarder] = createCrmProxy('lead-outreach', []);
+app.all('/api/crm-proxy/lead-outreach*', requireStaff, leadOutreachForwarder);
+
 // Blog Editor (dashboards/blog-editor.html) — staff write posts through this
 // forwarder (adds the CRM secret the proxy's gateWritesOnly demands; also lets
 // the editor list/read Drafts, which the public blog-posts endpoint hides).

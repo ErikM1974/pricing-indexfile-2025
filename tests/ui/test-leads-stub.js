@@ -189,8 +189,60 @@
             return jsonResponse(200, { submissions: out });
         }
 
+        // Public POST /api/form-submissions (manual phone/walk-in lead) — the
+        // crm-proxy branch above requires the '/api/crm-proxy/' prefix, so this
+        // only catches the direct-to-proxy create.
+        if (method === 'POST' && u.indexOf('/api/form-submissions') !== -1 && u.indexOf('crm-proxy') === -1) {
+            var nbody = {};
+            try { nbody = JSON.parse(options.body || '{}'); } catch (e3) { nbody = {}; }
+            var newLead = {
+                Submission_ID: 'MNL0718-' + String(1000 + leads.length),
+                Form_ID: nbody.formId || 'manual-lead',
+                Company: nbody.company || '', Contact_Name: nbody.contactName || '',
+                Phone: nbody.phone || '', Email: nbody.email || '',
+                Customer_Number: '', Sales_Rep: nbody.salesRep || '',
+                Due_Date: nbody.dueDateIso || '', Status: 'New',
+                Summary: nbody.summary || '',
+                Submitted_At: new Date().toISOString(), Updated_At: new Date().toISOString(),
+                Updated_By: '', Art_Request_ID: '', External_Source: '', External_ID: '',
+                Matched_ID_Customer: '', Linked_Quote_ID: '', Lead_Value: '',
+                Payload_JSON: JSON.stringify(nbody.payload || {}),
+            };
+            leads.unshift(newLead);
+            return jsonResponse(201, { submissionId: newLead.Submission_ID });
+        }
+
         if (u.indexOf('/api/crm-proxy/order-odbc') !== -1) {
             return jsonResponse(200, orders);
+        }
+
+        // One-click outreach — preview returns server-shape {label,subject,bodyHtml};
+        // send returns {sent,label,to} and mirrors the proxy's 'email' activity log.
+        if (u.indexOf('/api/crm-proxy/lead-outreach') !== -1 && method === 'POST') {
+            var obody = {};
+            try { obody = JSON.parse(options.body || '{}'); } catch (e4) { obody = {}; }
+            var LABELS = {
+                'intro': 'Introduction', 'quote-followup': 'Quote follow-up',
+                'checking-in': 'Checking in', 'won-thanks': 'Thanks — welcome aboard',
+            };
+            var olabel = LABELS[obody.template];
+            if (!olabel) return jsonResponse(400, { error: 'Unknown outreach template' });
+            var olead = obody.lead || {};
+            if (obody.preview) {
+                return jsonResponse(200, {
+                    preview: true, label: olabel,
+                    subject: olabel + ' — Northwest Custom Apparel',
+                    bodyHtml: '<p>Hi ' + (olead.contactName || 'there') + ',</p>' +
+                        '<p>[stub preview of the “' + olabel + '” template for ' + (olead.company || 'your team') + ']</p>' +
+                        '<p>' + (obody.aeName || 'NWCA') + '<br>Northwest Custom Apparel · Family owned &amp; operated since 1977 · Milton, WA</p>',
+                });
+            }
+            activities.push({
+                PK_ID: ++activityPk, Submission_ID: obody.submissionId || '',
+                Activity_Type: 'email', Activity_Text: 'Emailed “' + olabel + '” → ' + (olead.email || ''),
+                Attachment_URL: '', Created_By: obody.aeEmail || '', Created_At: new Date().toISOString(),
+            });
+            return jsonResponse(200, { sent: true, label: olabel, to: olead.email || '' });
         }
 
         if (u.indexOf('/api/crm-proxy/lead-activity') !== -1) {
