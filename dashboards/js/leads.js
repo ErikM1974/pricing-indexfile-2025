@@ -320,16 +320,26 @@
     // customer-typed URLs (lead data is untrusted).
     function extractFileUrls(text) {
         var filesBase = DashPage.apiUrl('/api/files/');
+        var s = String(text || '');
         var out = [];
         var re = /https:\/\/\S+/g;
         var m;
-        while ((m = re.exec(String(text || '')))) {
+        while ((m = re.exec(s))) {
             var u = m[0].replace(/[),.;'"\]]+$/, '');
-            if (/^https:\/\/((www\.)?jotform\.com\/uploads\/|files\.jotform\.com\/)/i.test(u) || u.indexOf(filesBase) === 0) {
-                out.push(u);
-            }
+            var allowed = /^https:\/\/((www\.)?jotform\.com\/uploads\/|files\.jotform\.com\/)/i.test(u) || u.indexOf(filesBase) === 0;
+            if (!allowed) continue;
+            // QRQ format "NWE LOGO.webp — https://…" → keep the human filename
+            var before = s.slice(0, m.index).replace(/[\s—–-]+$/, '');
+            var nm = before.split(/[|;,\n]/).pop().trim();
+            if (!/\.[a-z0-9]{2,5}$/i.test(nm)) nm = '';
+            out.push({ url: u, name: nm });
         }
         return out;
+    }
+
+    function fileBasename(u) {
+        try { return decodeURIComponent(String(u).split('?')[0].split('/').pop() || ''); }
+        catch (e) { return String(u).split('/').pop() || ''; }
     }
 
     function openDrawer(lead) {
@@ -353,11 +363,16 @@
         var entries = payloadEntries(payload);
 
         var artworkHtml = '';
-        var fromFields = [];
-        entries.forEach(function (p) { fromFields = fromFields.concat(extractFileUrls(p[1])); });
-        var urls = (payload.artworkUrls || []).concat(fromFields)
-            .map(safeHttpUrl).filter(Boolean)
-            .filter(function (u, i, a) { return a.indexOf(u) === i; });
+        var atts = (payload.artworkUrls || []).map(function (u) { return { url: u, name: '' }; });
+        entries.forEach(function (p) { atts = atts.concat(extractFileUrls(p[1])); });
+        var seenUrls = {};
+        atts = atts.filter(function (a) {
+            a.url = safeHttpUrl(a.url);
+            if (!a.url || seenUrls[a.url]) return false;
+            seenUrls[a.url] = true;
+            return true;
+        });
+        var urls = atts.map(function (a) { return a.url; });
         var jfUrl = safeHttpUrl((payload._source || {}).url || '');
         if (urls.length || jfUrl) {
             // JotForm upload links need a JotForm login — route them through the
@@ -375,9 +390,16 @@
                         '<img class="ld-thumb" loading="lazy" alt="Artwork attachment" src="' + esc(viewUrl(u)) + '"></a>';
                 }).join('') + '</div>' : '') +
                 '<div class="ld-links">' +
-                urls.map(function (u, i) {
-                    return '<a href="' + esc(viewUrl(u)) + '" target="_blank" rel="noopener noreferrer">' +
-                        '<i class="fas fa-paperclip"></i> Attachment ' + (i + 1) + '</a>';
+                atts.map(function (a, i) {
+                    var label = a.name || (isJfUpload(a.url) ? fileBasename(a.url) : '') || ('Attachment ' + (i + 1));
+                    var dl = isJfUpload(a.url)
+                        ? viewUrl(a.url) + '&download=1'
+                        : a.url + (a.url.indexOf('?') >= 0 ? '&' : '?') + 'download=1';
+                    return '<span class="ld-att">' +
+                        '<a href="' + esc(viewUrl(a.url)) + '" target="_blank" rel="noopener noreferrer">' +
+                        '<i class="fas fa-paperclip"></i> ' + esc(label) + '</a>' +
+                        '<a class="ld-dl" href="' + esc(dl) + '" title="Download ' + esc(label) + '" aria-label="Download ' + esc(label) + '">' +
+                        '<i class="fas fa-download"></i></a></span>';
                 }).join('') +
                 (jfUrl ? '<a href="' + esc(jfUrl) + '" target="_blank" rel="noopener noreferrer">' +
                     '<i class="fas fa-arrow-up-right-from-square"></i> View in JotForm</a>' : '') +
