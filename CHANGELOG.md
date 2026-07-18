@@ -1,3 +1,8 @@
+## v2026.07.18.5 (2026.07.18)
+
+- feat(leads): surface file links inside lead fields as attachments — QRQ logo uploads (…/api/files/<key> text lines) now render in Artwork & Source with thumbnail attempts (onerror-hidden for non-images); allow-listed hosts only (proxy files + JotForm uploads)
+- Deploy v2026.07.18.5: cache-bust leads.js
+
 ## v2026.07.18.4 (2026.07.18)
 
 - feat(leads): in-app artwork viewing — attachments route through /api/jotform/file (staff passthrough) with inline image thumbnails in the drawer
