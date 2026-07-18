@@ -62,6 +62,116 @@
 }
 .ld-refresh-btn:hover { background: var(--gray-100); }
 
+/* ── View toggle + Mine chip ── */
+.ld-view-toggle { display: inline-flex; margin-left: auto; border: 1px solid var(--gray-300); border-radius: var(--radius-sm); overflow: hidden; }
+.ld-toggle-btn {
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--gray-600);
+    background: var(--surface-card);
+    border: none;
+    padding: 6px 12px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.ld-toggle-btn + .ld-toggle-btn { border-left: 1px solid var(--gray-300); }
+.ld-toggle-btn[aria-pressed="true"] { background: var(--gray-900); color: var(--surface-card); }
+
+.ld-chip-btn {
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--gray-600);
+    background: var(--surface-card);
+    border: 1px solid var(--gray-300);
+    border-radius: 999px;
+    padding: 6px 14px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.ld-chip-btn[aria-pressed="true"] { background: var(--gray-900); color: var(--surface-card); border-color: var(--gray-900); }
+
+/* ── Kanban board ── */
+.ld-board {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(200px, 1fr));
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+}
+.ld-col {
+    background: var(--gray-50);
+    border: 1px solid var(--gray-100);
+    border-radius: var(--radius-md);
+    min-height: 180px;
+    display: flex;
+    flex-direction: column;
+}
+.ld-col.is-drop-over { border-color: var(--gray-500); background: var(--gray-100); }
+.ld-col-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 6px;
+    padding: 10px 12px 6px;
+    border-bottom: 2px solid var(--gray-200);
+}
+.ld-col--new .ld-col-head { border-bottom-color: var(--state-info-text, var(--gray-400)); }
+.ld-col--contacted .ld-col-head, .ld-col--quoted .ld-col-head { border-bottom-color: var(--state-warning-text, var(--gray-400)); }
+.ld-col--won .ld-col-head { border-bottom-color: var(--state-success-text, var(--gray-400)); }
+.ld-col--lost .ld-col-head { border-bottom-color: var(--gray-400); }
+.ld-col-title { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--gray-700); }
+.ld-col-meta { font-size: 0.74rem; font-weight: 600; color: var(--gray-500); white-space: nowrap; }
+.ld-col-body { padding: 8px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.ld-col-empty { text-align: center; color: var(--gray-400); padding: 16px 0; }
+.ld-col-older { text-align: center; font-size: 0.72rem; color: var(--gray-500); padding: 4px 0; }
+
+.ld-card {
+    background: var(--surface-card);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    padding: 10px 12px;
+    cursor: grab;
+}
+.ld-card:hover { border-color: var(--gray-400); }
+.ld-card.is-dragging { opacity: 0.5; cursor: grabbing; }
+.ld-card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 6px; }
+.ld-card-company { font-size: 0.84rem; font-weight: 600; color: var(--gray-900); word-break: break-word; }
+.ld-card-contact { font-size: 0.76rem; color: var(--gray-500); margin-top: 1px; }
+.ld-card-meta { display: flex; align-items: center; gap: 8px; margin-top: 8px; font-size: 0.74rem; color: var(--gray-500); }
+.ld-card-val { font-weight: 700; color: var(--gray-800); }
+.ld-card-age { margin-left: auto; }
+.ld-dot {
+    flex-shrink: 0;
+    width: 9px;
+    height: 9px;
+    border-radius: 999px;
+    background: var(--state-danger-text, #b42318);
+    margin-top: 4px;
+}
+.ld-rep-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    background: var(--gray-200);
+    color: var(--gray-700);
+    font-size: 0.64rem;
+    font-weight: 700;
+}
+
+@media (max-width: 900px) {
+    .ld-board { grid-template-columns: repeat(5, 220px); }
+}
+
 /* ── Table ── */
 .ld-table-scroll { overflow-x: auto; }
 
@@ -285,5 +395,7 @@
 
 @media (max-width: 720px) {
     .ld-toolbar { flex-direction: column; align-items: stretch; }
+    /* in a column flexbox the search's flex-basis would become HEIGHT */
+    .ld-search { flex: none; min-width: 0; }
     .ld-kv { grid-template-columns: 1fr; }
 }

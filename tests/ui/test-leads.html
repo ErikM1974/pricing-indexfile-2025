@@ -13,7 +13,7 @@
 
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/leads.css?v=2026.07.18.8">
+    <link rel="stylesheet" href="/dashboards/css/leads.css?v=2026.07.18.9">
     <link rel="stylesheet" href="/tests/ui/test-harness-ribbon.css">
 </head>
 <body>
@@ -72,6 +72,10 @@
                 <div class="dash-card-header ld-toolbar-header">
                     <h2 class="dash-card-title">All Leads</h2>
                     <span class="ld-count" id="leads-count"></span>
+                    <div class="ld-view-toggle" role="group" aria-label="View">
+                        <button type="button" id="view-board" class="ld-toggle-btn" aria-pressed="false"><i class="fas fa-table-columns"></i> Board</button>
+                        <button type="button" id="view-list" class="ld-toggle-btn" aria-pressed="false"><i class="fas fa-list"></i> List</button>
+                    </div>
                 </div>
 
                 <div class="ld-toolbar">
@@ -85,13 +89,18 @@
                         <option value="">All reps</option>
                     </select>
                     <input type="search" id="filter-search" class="ld-search" placeholder="Search name, company, email…" aria-label="Search leads">
+                    <button type="button" id="filter-mine" class="ld-chip-btn" aria-pressed="false" hidden>
+                        <i class="fas fa-user"></i> Mine
+                    </button>
                     <label class="ld-archived-toggle">
                         <input type="checkbox" id="filter-archived">
                         Show archived
                     </label>
                 </div>
 
-                <div class="ld-table-scroll">
+                <div class="ld-board" id="leads-board" hidden></div>
+
+                <div class="ld-table-scroll" id="leads-list-wrap">
                     <table class="ld-table" id="leads-table">
                         <thead>
                             <tr>
@@ -138,6 +147,6 @@
     <script src="/shared_components/js/dash-page-helpers.js"></script>
     <script src="/dashboards/js/leads-common.js?v=2026.07.18.8"></script>
     <script src="/tests/ui/test-leads-stub.js"></script>
-    <script src="/dashboards/js/leads.js?v=2026.07.18.8"></script>
+    <script src="/dashboards/js/leads.js?v=2026.07.18.9"></script>
 </body>
 </html>

@@ -32,6 +32,10 @@
         current: null,          // lead open in the drawer
         matchCache: {},         // email → contact | null (per page-load)
         hashOpened: false,      // #Submission_ID deep link handled once per load
+        view: (function () {    // board default on desktop, list on narrow; persisted
+            try { var v = localStorage.getItem('nwca-leads-view'); if (v) return v; } catch (e) { /* private mode */ }
+            return window.innerWidth < 768 ? 'list' : 'board';
+        })(),
     };
 
     // ---------- boot ----------
@@ -40,10 +44,36 @@
         wireChrome();
         fetch('/api/crm-session/me')
             .then(function (r) { return r.json(); })
-            .then(function (me) { state.staffEmail = me.email || ''; })
+            .then(function (me) { state.staffEmail = me.email || ''; updateMineChip(); })
             .catch(function () { /* Updated_By falls back to 'leads-page' */ });
         loadLeads();
     });
+
+    function updateMineChip() {
+        var chip = document.getElementById('filter-mine');
+        var mine = L.EMAIL_TO_REP[state.staffEmail];
+        chip.hidden = !mine;
+        chip.setAttribute('aria-pressed', mine && state.rep === mine ? 'true' : 'false');
+    }
+
+    function syncViewToggle() {
+        document.getElementById('view-board').setAttribute('aria-pressed', state.view === 'board' ? 'true' : 'false');
+        document.getElementById('view-list').setAttribute('aria-pressed', state.view === 'list' ? 'true' : 'false');
+    }
+
+    function setView(v) {
+        state.view = v;
+        try { localStorage.setItem('nwca-leads-view', v); } catch (e) { /* private mode */ }
+        renderView();
+    }
+
+    function renderView() {
+        syncViewToggle();
+        var board = document.getElementById('leads-board');
+        var listWrap = document.getElementById('leads-list-wrap');
+        if (state.view === 'board') { board.hidden = false; listWrap.hidden = true; renderBoard(); }
+        else { board.hidden = true; listWrap.hidden = false; renderTable(); }
+    }
 
     function wireChrome() {
         document.getElementById('btn-refresh').addEventListener('click', loadLeads);
@@ -54,12 +84,23 @@
         [['filter-source', 'source'], ['filter-status', 'status'], ['filter-rep', 'rep']].forEach(function (pair) {
             document.getElementById(pair[0]).addEventListener('change', function () {
                 state[pair[1]] = this.value;
-                renderTable();
+                updateMineChip();
+                renderView();
             });
         });
         document.getElementById('filter-search').addEventListener('input', function () {
             state.search = this.value.trim().toLowerCase();
-            renderTable();
+            renderView();
+        });
+        document.getElementById('view-board').addEventListener('click', function () { setView('board'); });
+        document.getElementById('view-list').addEventListener('click', function () { setView('list'); });
+        document.getElementById('filter-mine').addEventListener('click', function () {
+            var mine = L.EMAIL_TO_REP[state.staffEmail];
+            if (!mine) return;
+            state.rep = (state.rep === mine) ? '' : mine;
+            document.getElementById('filter-rep').value = state.rep;
+            updateMineChip();
+            renderView();
         });
         document.getElementById('drawer-close').addEventListener('click', closeDrawer);
         document.getElementById('drawer-overlay').addEventListener('click', closeDrawer);
@@ -82,7 +123,7 @@
             state.leads = body.submissions || [];
             renderFilters();
             renderStats();
-            renderTable();
+            renderView();
             // Deep link (e.g. from the AE emails): /dashboards/leads.html#JFL0718-1234
             var wantId = decodeURIComponent((location.hash || '').slice(1));
             if (wantId && !state.hashOpened) {
@@ -208,6 +249,129 @@
             });
         });
     }
+
+    // ---------- kanban board (P3) ----------
+
+    var COLUMNS = [
+        { key: 'new', label: 'New' },
+        { key: 'contacted', label: 'Contacted' },
+        { key: 'quoted', label: 'Quoted' },
+        { key: 'won', label: 'Won' },
+        { key: 'lost', label: 'Lost' },
+    ];
+    var TERMINAL_BOARD_DAYS = 45; // Won/Lost columns show recent only; older stay in the list
+
+    function repInitials(name) {
+        return String(name || '').split(/\s+/).map(function (w) { return w.charAt(0); }).join('').slice(0, 2).toUpperCase();
+    }
+
+    function ageDays(iso) {
+        var t = Date.parse(iso);
+        if (isNaN(t)) return '';
+        var d = Math.floor((Date.now() - t) / 86400000);
+        return d <= 0 ? 'today' : d + 'd';
+    }
+
+    function cardHtml(l) {
+        var meta = L.SOURCE_META[l.Form_ID] || { icon: 'fa-file', label: l.Form_ID };
+        var overdue = L.isOverdue(l.Due_Date);
+        var val = Number(l.Lead_Value);
+        return '<div class="ld-card" draggable="true" data-id="' + esc(l.Submission_ID) + '" title="' + esc(l.Status || '') + '">' +
+            '<div class="ld-card-top"><span class="ld-card-company">' + esc(l.Company || '(no company)') + '</span>' +
+            (overdue ? '<span class="ld-dot" title="Follow-up overdue (' + esc(l.Due_Date) + ')"></span>' : '') + '</div>' +
+            '<div class="ld-card-contact">' + esc(l.Contact_Name || '') + '</div>' +
+            '<div class="ld-card-meta">' +
+            '<span class="ld-card-src" title="' + esc(L.sourceTitleOf(l)) + '"><i class="fas ' + esc(meta.icon) + '"></i></span>' +
+            (isFinite(val) && val > 0 ? '<span class="ld-card-val">$' + Math.round(val).toLocaleString('en-US') + '</span>' : '') +
+            '<span class="ld-card-age">' + esc(ageDays(l.Submitted_At)) + '</span>' +
+            (l.Sales_Rep ? '<span class="ld-rep-chip" title="' + esc(l.Sales_Rep) + '">' + esc(repInitials(l.Sales_Rep)) + '</span>' : '') +
+            '</div></div>';
+    }
+
+    function renderBoard() {
+        var rows = state.leads.filter(matchesFilters).filter(function (l) { return l.Status !== 'Archived'; });
+        document.getElementById('leads-count').textContent = rows.length + ' of ' + state.leads.length;
+
+        var cutoff = Date.now() - TERMINAL_BOARD_DAYS * 86400000;
+        var byCol = { new: [], contacted: [], quoted: [], won: [], lost: [] };
+        var olderCount = { won: 0, lost: 0 };
+        rows.forEach(function (l) {
+            var col = L.STAGE_OF[l.Status];
+            if (!col || !byCol[col]) return;
+            if (col === 'won' || col === 'lost') {
+                var ts = Date.parse(l.Updated_At || l.Submitted_At);
+                if (!isNaN(ts) && ts < cutoff) { olderCount[col] += 1; return; }
+            }
+            byCol[col].push(l);
+        });
+
+        var board = document.getElementById('leads-board');
+        board.innerHTML = COLUMNS.map(function (c) {
+            var items = byCol[c.key];
+            var sum = items.reduce(function (acc, l) {
+                var n = Number(l.Lead_Value);
+                return acc + (isFinite(n) && n > 0 ? n : 0);
+            }, 0);
+            return '<div class="ld-col ld-col--' + c.key + '" data-col="' + c.key + '">' +
+                '<div class="ld-col-head"><span class="ld-col-title">' + c.label + '</span>' +
+                '<span class="ld-col-meta">' + items.length + (sum > 0 ? ' · $' + Math.round(sum).toLocaleString('en-US') : '') + '</span></div>' +
+                '<div class="ld-col-body">' +
+                items.map(cardHtml).join('') +
+                (olderCount[c.key] ? '<div class="ld-col-older">+' + olderCount[c.key] + ' older — see List</div>' : '') +
+                (!items.length && !olderCount[c.key] ? '<div class="ld-col-empty">—</div>' : '') +
+                '</div></div>';
+        }).join('');
+        wireBoard();
+    }
+
+    var dragId = null;
+    function wireBoard() {
+        var board = document.getElementById('leads-board');
+        Array.prototype.forEach.call(board.querySelectorAll('.ld-card'), function (card) {
+            card.addEventListener('dragstart', function (e) {
+                dragId = card.getAttribute('data-id');
+                card.classList.add('is-dragging');
+                if (e.dataTransfer) {
+                    e.dataTransfer.effectAllowed = 'move';
+                    try { e.dataTransfer.setData('text/plain', dragId); } catch (err) { /* IE-ism */ }
+                }
+            });
+            card.addEventListener('dragend', function () { card.classList.remove('is-dragging'); dragId = null; });
+            card.addEventListener('click', function () {
+                var lead = state.leads.find(function (l) { return l.Submission_ID === card.getAttribute('data-id'); });
+                if (lead) openDrawer(lead);
+            });
+        });
+        Array.prototype.forEach.call(board.querySelectorAll('.ld-col'), function (col) {
+            col.addEventListener('dragover', function (e) { e.preventDefault(); col.classList.add('is-drop-over'); });
+            col.addEventListener('dragleave', function () { col.classList.remove('is-drop-over'); });
+            col.addEventListener('drop', function (e) {
+                e.preventDefault();
+                col.classList.remove('is-drop-over');
+                var id = dragId || (e.dataTransfer && e.dataTransfer.getData('text/plain'));
+                if (id) moveCard(id, col.getAttribute('data-col'));
+            });
+        });
+    }
+
+    /**
+     * Move a lead to a board column — the drop handler AND the harness both
+     * come through here. Maps the column to the form's own status via
+     * DRAG_STATUS; blocked combos (e.g. Roster → Quoted) explain themselves.
+     */
+    function moveCard(submissionId, column) {
+        var lead = state.leads.find(function (l) { return l.Submission_ID === submissionId; });
+        if (!lead) return;
+        var mapped = (L.DRAG_STATUS[lead.Form_ID] || {})[column];
+        if (!mapped) {
+            var label = (L.SOURCE_META[lead.Form_ID] || {}).label || lead.Form_ID;
+            DashPage.showError(label + ' leads don\'t have a stage for that column — use the Status menu in the drawer instead.');
+            return;
+        }
+        if (mapped === lead.Status) return;
+        saveField(lead, 'Status', mapped, null);
+    }
+    window.moveCard = moveCard;
 
     // ---------- drawer ----------
 
@@ -346,7 +510,7 @@
             }
             renderStats();
             renderFilters();
-            renderTable();
+            renderView();
         }).catch(function (err) {
             console.error('[leads] save failed:', err);
             DashPage.showError('Could not save ' + field.replace('_', ' ') + ' (' + err.message + '). Nothing was changed.');

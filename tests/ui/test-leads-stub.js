@@ -44,8 +44,8 @@
         {
             Submission_ID: 'JFL0716-1234', Form_ID: 'jotform-lead', Company: 'Drain Pro Inc.',
             Contact_Name: 'Mike Rowe', Phone: '253-555-0142', Email: 'mike@drainpro.com',
-            Customer_Number: '', Sales_Rep: 'Nika Lao', Due_Date: '', Status: 'Contacted',
-            Summary: 'Requesting embroidery pricing for 40 caps',
+            Customer_Number: '', Sales_Rep: 'Nika Lao', Due_Date: '2026-07-15', Status: 'Contacted',
+            Lead_Value: '1200', Summary: 'Requesting embroidery pricing for 40 caps',
             Submitted_At: hoursAgo(46), Updated_At: hoursAgo(20), Updated_By: 'jotform-webhook',
             Art_Request_ID: '', External_Source: 'jotform:220514824751149',
             External_ID: '6600981122334455667', Matched_ID_Customer: '7740', Linked_Quote_ID: '',
