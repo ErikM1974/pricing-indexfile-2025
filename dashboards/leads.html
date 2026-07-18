@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Leads - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- 2026 design tokens (must load before dash-shell.css) -->
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css">
+    <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
+    <link rel="stylesheet" href="/dashboards/css/leads.css?v=20260718.1">
+</head>
+<body>
+    <div class="dash-shell">
+        <header class="dash-header">
+            <div class="dash-header-left">
+                <a href="/staff-dashboard.html" title="Back to Staff Dashboard">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                         alt="Northwest Custom Apparel" class="dash-header-logo">
+                </a>
+                <h1 class="dash-header-title">Leads</h1>
+            </div>
+            <div class="dash-header-right">
+                <button type="button" id="btn-refresh" class="ld-refresh-btn" title="Reload leads">
+                    <i class="fas fa-rotate"></i>
+                    Refresh
+                </button>
+                <a href="/staff-dashboard.html" class="dash-back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    Dashboard
+                </a>
+            </div>
+        </header>
+
+        <main class="dash-content">
+            <div class="dash-error-banner" role="alert">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span class="dash-error-banner-message"></span>
+                <button class="dash-error-banner-close" aria-label="Dismiss">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="dash-stat-grid">
+                <div class="dash-stat-card dash-stat-card--accent">
+                    <div class="dash-stat-value" id="stat-total">—</div>
+                    <div class="dash-stat-label">Leads</div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value" id="stat-new">—</div>
+                    <div class="dash-stat-label">New</div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value" id="stat-pipeline">—</div>
+                    <div class="dash-stat-label">In Pipeline</div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value" id="stat-won">—</div>
+                    <div class="dash-stat-label">Won</div>
+                </div>
+            </div>
+
+            <div class="dash-card">
+                <div class="dash-card-header ld-toolbar-header">
+                    <h2 class="dash-card-title">All Leads</h2>
+                    <span class="ld-count" id="leads-count"></span>
+                </div>
+
+                <div class="ld-toolbar">
+                    <select id="filter-source" class="ld-select" aria-label="Filter by source">
+                        <option value="">All sources</option>
+                    </select>
+                    <select id="filter-status" class="ld-select" aria-label="Filter by status">
+                        <option value="">All statuses</option>
+                    </select>
+                    <select id="filter-rep" class="ld-select" aria-label="Filter by rep">
+                        <option value="">All reps</option>
+                    </select>
+                    <input type="search" id="filter-search" class="ld-search" placeholder="Search name, company, email…" aria-label="Search leads">
+                    <label class="ld-archived-toggle">
+                        <input type="checkbox" id="filter-archived">
+                        Show archived
+                    </label>
+                </div>
+
+                <div class="ld-table-scroll">
+                    <table class="ld-table" id="leads-table">
+                        <thead>
+                            <tr>
+                                <th>Received</th>
+                                <th>Lead</th>
+                                <th>Contact</th>
+                                <th>Company</th>
+                                <th>Source</th>
+                                <th>Rep</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leads-tbody">
+                            <tr><td colspan="7" class="ld-empty dash-loading">Loading leads…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Lead detail drawer -->
+    <div class="ld-overlay" id="drawer-overlay" hidden></div>
+    <aside class="ld-drawer" id="lead-drawer" aria-hidden="true" aria-label="Lead detail">
+        <div class="ld-drawer-head">
+            <div>
+                <div class="ld-drawer-title" id="drawer-title"></div>
+                <div class="ld-drawer-sub" id="drawer-sub"></div>
+            </div>
+            <button type="button" class="ld-drawer-close" id="drawer-close" aria-label="Close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="ld-drawer-body" id="drawer-body"></div>
+    </aside>
+
+    <!-- Load order matters: APP_CONFIG → fetch-timeout → DashPage → page controller -->
+    <script src="/config/app.config.js"></script>
+    <script src="/shared_components/js/fetch-timeout.js"></script>
+    <script src="/shared_components/js/dash-page-helpers.js"></script>
+    <script src="/dashboards/js/leads.js?v=20260718.1"></script>
+</body>
+</html>

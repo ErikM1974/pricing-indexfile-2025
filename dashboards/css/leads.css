@@ -1,0 +1,268 @@
+/* ==========================================================================
+   leads.css — page-specific styles for dashboards/leads.html (Leads CRM)
+
+   Shell classes (.dash-header, .dash-back-link, .dash-stat-card, etc.) come
+   from shared_components/css/dash-shell.css. Design tokens (--surface-*,
+   --gray-*, --shadow-*, --radius-*, --state-*) come from
+   shared_components/css/art-hub.css.
+
+   Only page-specific styles here (ld- prefix). NEVER redefine tokens. NEVER
+   hardcode colors/shadows/radii — use var(--token-name).
+   ========================================================================== */
+
+/* ── Toolbar ── */
+.ld-toolbar-header { display: flex; align-items: baseline; gap: 10px; }
+.ld-count { font-size: 0.82rem; color: var(--gray-500); }
+
+.ld-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    padding: 12px 0 16px;
+}
+
+.ld-select,
+.ld-search {
+    font: inherit;
+    font-size: 0.85rem;
+    color: var(--gray-800);
+    background: var(--surface-card);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    padding: 7px 10px;
+}
+.ld-search { flex: 1 1 220px; min-width: 180px; }
+.ld-select:focus-visible,
+.ld-search:focus-visible { outline: 2px solid var(--gray-400); outline-offset: 1px; }
+
+.ld-archived-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    color: var(--gray-600);
+    cursor: pointer;
+    user-select: none;
+}
+
+.ld-refresh-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--gray-700);
+    background: var(--surface-card);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    padding: 7px 12px;
+    cursor: pointer;
+}
+.ld-refresh-btn:hover { background: var(--gray-100); }
+
+/* ── Table ── */
+.ld-table-scroll { overflow-x: auto; }
+
+.ld-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+.ld-table th {
+    text-align: left;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--gray-500);
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--gray-200);
+    white-space: nowrap;
+}
+.ld-table td {
+    padding: 10px;
+    border-bottom: 1px solid var(--gray-100);
+    vertical-align: top;
+}
+.ld-table tbody tr { cursor: pointer; }
+.ld-table tbody tr:hover { background: var(--gray-50); }
+
+.ld-empty { text-align: center; color: var(--gray-500); padding: 28px 10px; cursor: default; }
+
+.ld-id { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--gray-600); white-space: nowrap; }
+.ld-when { white-space: nowrap; color: var(--gray-600); }
+.ld-contact-name { font-weight: 600; color: var(--gray-800); }
+.ld-contact-email { font-size: 0.78rem; color: var(--gray-500); word-break: break-all; }
+
+.ld-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.74rem;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: var(--gray-100);
+    color: var(--gray-600);
+    white-space: nowrap;
+}
+.ld-badge--jotform-lead { background: var(--state-info-bg, var(--gray-100)); color: var(--state-info-text, var(--gray-700)); }
+
+.ld-status {
+    display: inline-block;
+    font-size: 0.74rem;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: var(--gray-100);
+    color: var(--gray-600);
+    white-space: nowrap;
+}
+.ld-status--new { background: var(--state-info-bg, var(--gray-100)); color: var(--state-info-text, var(--gray-700)); }
+.ld-status--active { background: var(--state-warning-bg, var(--gray-100)); color: var(--state-warning-text, var(--gray-700)); }
+.ld-status--won { background: var(--state-success-bg, var(--gray-100)); color: var(--state-success-text, var(--gray-700)); }
+.ld-status--lost { background: var(--gray-100); color: var(--gray-500); }
+
+/* ── Drawer ── */
+.ld-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(17, 24, 39, 0.45);
+    z-index: 60;
+}
+
+.ld-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(520px, 96vw);
+    background: var(--surface-card);
+    box-shadow: var(--shadow-lg);
+    transform: translateX(105%);
+    transition: transform 0.2s ease;
+    z-index: 70;
+    display: flex;
+    flex-direction: column;
+}
+.ld-drawer.open { transform: translateX(0); }
+
+.ld-drawer-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--gray-200);
+}
+.ld-drawer-title { font-size: 1.05rem; font-weight: 700; color: var(--gray-900); }
+.ld-drawer-sub { font-size: 0.82rem; color: var(--gray-500); margin-top: 2px; }
+.ld-drawer-close {
+    font-size: 1rem;
+    color: var(--gray-500);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: var(--radius-sm);
+}
+.ld-drawer-close:hover { background: var(--gray-100); color: var(--gray-800); }
+
+.ld-drawer-body { padding: 16px 18px 28px; overflow-y: auto; }
+
+.ld-section { margin-bottom: 18px; }
+.ld-section-title {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--gray-500);
+    margin-bottom: 8px;
+}
+
+.ld-controls { display: flex; gap: 8px; flex-wrap: wrap; }
+.ld-controls .ld-select { flex: 1 1 160px; }
+.ld-control-label { display: block; font-size: 0.74rem; color: var(--gray-500); margin-bottom: 3px; }
+.ld-control { flex: 1 1 160px; }
+
+.ld-kv { display: grid; grid-template-columns: minmax(110px, 38%) 1fr; gap: 4px 12px; font-size: 0.85rem; }
+.ld-kv dt { color: var(--gray-500); }
+.ld-kv dd { color: var(--gray-800); margin: 0; word-break: break-word; white-space: pre-wrap; }
+
+.ld-summary {
+    font-size: 0.88rem;
+    color: var(--gray-800);
+    background: var(--gray-50);
+    border: 1px solid var(--gray-100);
+    border-radius: var(--radius-md);
+    padding: 10px 12px;
+    white-space: pre-wrap;
+}
+
+.ld-links a { display: inline-flex; align-items: center; gap: 6px; margin: 0 10px 6px 0; font-size: 0.84rem; }
+
+/* ── Customer match card ── */
+.ld-match {
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    padding: 12px;
+    font-size: 0.85rem;
+}
+.ld-match--found { border-color: var(--state-success-text, var(--gray-300)); }
+.ld-match-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.ld-pill {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: var(--gray-100);
+    color: var(--gray-600);
+}
+.ld-pill--customer { background: var(--state-success-bg, var(--gray-100)); color: var(--state-success-text, var(--gray-700)); }
+.ld-pill--prospect { background: var(--state-info-bg, var(--gray-100)); color: var(--state-info-text, var(--gray-700)); }
+
+.ld-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--gray-700);
+    background: var(--surface-card);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    padding: 6px 10px;
+    cursor: pointer;
+}
+.ld-btn:hover { background: var(--gray-100); }
+.ld-btn[disabled] { opacity: 0.5; cursor: default; }
+
+.ld-match-search { display: flex; gap: 6px; margin-top: 10px; }
+.ld-match-search input { flex: 1; }
+.ld-match-results { margin-top: 8px; display: grid; gap: 6px; }
+.ld-match-result {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--gray-100);
+    border-radius: var(--radius-sm);
+    padding: 6px 8px;
+}
+
+/* ── Order history ── */
+.ld-orders-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; margin-top: 8px; }
+.ld-orders-table th {
+    text-align: left;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: var(--gray-500);
+    padding: 5px 8px;
+    border-bottom: 1px solid var(--gray-200);
+}
+.ld-orders-table td { padding: 6px 8px; border-bottom: 1px solid var(--gray-100); white-space: nowrap; }
+.ld-muted { color: var(--gray-500); font-size: 0.82rem; }
+
+@media (max-width: 720px) {
+    .ld-toolbar { flex-direction: column; align-items: stretch; }
+    .ld-kv { grid-template-columns: 1fr; }
+}
