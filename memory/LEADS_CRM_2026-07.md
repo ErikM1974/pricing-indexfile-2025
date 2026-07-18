@@ -33,6 +33,7 @@ One system, two layers, all live in production. Frontend releases 1689–1694 (v
 - **Date-only strings (`YYYY-MM-DD`) parse as UTC midnight** → display a day early Pacific; pin to `T12:00:00` (leads-common `fmtWhen`).
 - Harness stubs: ArtworkUpload uses **XMLHttpRequest** — fetch stub alone can't intercept; `test-leads-stub.js` patches XHR for `/api/files/upload`.
 - In a **column** flexbox, `flex-basis` becomes HEIGHT (mobile search-box balloon; fixed with `flex:none` in the media query).
+- **Origin/Referer-gated file endpoints 401 normal clicks** — `target="_blank"` + `rel="noreferrer"` (and privacy browsers) send NO Referer. `/api/jotform/file` is now ungated like `/api/files/:key` (the u= host allow-list is the real guard); links use `rel="noopener"` only.
 - GET `/api/form-submissions` supports `formIds=`/`statusNot=`/`limit=` (≤2000); PUT whitelist incl. Sales_Rep/Matched_ID_Customer/Linked_Quote_ID/Lead_Value.
 
 ## Open / optional
