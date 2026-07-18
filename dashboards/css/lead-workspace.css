@@ -147,6 +147,12 @@
 .lw-intel { margin-top: 10px; border-top: 1px dashed var(--gray-200); padding-top: 10px; }
 .lw-intel-title { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--gray-500); margin-bottom: 6px; }
 
+.lw-method-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 6px 0 14px; }
+.lw-method-btn { justify-content: center; }
+
+#lw-quote-suggest { margin-bottom: 12px; display: grid; gap: 6px; }
+#lw-quote-suggest .lw-chip { justify-self: start; }
+
 .lw-quote-linked { border: 1px solid var(--gray-200); border-radius: var(--radius-md); padding: 10px 12px; }
 .lw-quote-amount { font-size: 1.1rem; font-weight: 700; color: var(--gray-900); }
 .lw-quote-row { display: flex; gap: 6px; margin-top: 8px; }
