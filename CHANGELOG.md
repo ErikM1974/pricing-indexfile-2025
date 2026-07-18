@@ -1,3 +1,8 @@
+## v2026.07.18.4 (2026.07.18)
+
+- feat(leads): in-app artwork viewing — attachments route through /api/jotform/file (staff passthrough) with inline image thumbnails in the drawer
+- Deploy v2026.07.18.4: cache-bust leads assets
+
 ## v2026.07.18.3 (2026.07.18)
 
 - docs(memory): LESSONS + side-door audit — proxy orders-router escaped mounts gated (v951)
