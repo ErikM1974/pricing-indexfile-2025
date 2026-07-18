@@ -129,8 +129,9 @@
             body: JSON.stringify(body),
         }).then(function () {
             lead[field] = value;
+            L.clearHeat(lead);
+            renderHeadChips(lead); // status clears the timer; value/customer-link can change 🔥
             if (field === 'Status' && value !== prev) {
-                renderHeadChips(lead); // leaving "New" clears the response timer
                 L.logActivity(lead.Submission_ID, 'status', 'Status: ' + (prev || '—') + ' → ' + value, '', state.staffEmail)
                     .then(function (r) { if (r && r.activity) prependActivity(r.activity); });
             } else if (field === 'Sales_Rep' && value !== prev) {
