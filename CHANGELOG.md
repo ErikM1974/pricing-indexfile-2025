@@ -1,3 +1,10 @@
+## v2026.07.18.12 (2026.07.18)
+
+- docs(memory): LESSONS — Referer-gated file endpoints 401 top-level navigations (Leads artwork fix) + topic-file gotcha line
+- docs(memory): leads extras — in-app enrichment parity + House mapping DONE; spam-candidate CSV delivered (138/1766)
+- feat(leads-crm): manual lead entry + one-click outreach + hot badges/response timers
+- Deploy v2026.07.18.12: 4 files (lead.html,leads.html,test-lead-workspace.html...)
+
 ## v2026.07.18.11 (2026.07.18)
 
 - docs(memory): LEADS_CRM_2026-07 topic file (capture + CRM v2 system, endpoints, gotchas) + INDEX pointer + ACTIVE_FILES rows for the CRM v2 pages
