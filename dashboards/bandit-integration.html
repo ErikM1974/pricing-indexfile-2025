@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Bandit Integration · Northwest Custom Apparel</title>
+    <link rel="icon" href="/favicon.png" type="image/png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css">
+    <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
+    <link rel="stylesheet" href="/dashboards/css/bandit-integration.css?v=2026.07.18.1">
+</head>
+<body>
+    <div class="dash-shell">
+        <header class="dash-header">
+            <div class="dash-header-left">
+                <a href="/staff-dashboard.html" title="Back to Staff Dashboard">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                         alt="Northwest Custom Apparel" class="dash-header-logo">
+                </a>
+                <h1 class="dash-header-title">Bandit Integration <span class="bi-subhead">how ShopWorks data &amp; thumbnails flow to Caspio &amp; Box</span></h1>
+            </div>
+            <div class="dash-header-right">
+                <span class="bi-lock" title="Admin only"><i class="fas fa-user-shield"></i> Admin</span>
+                <a href="/staff-dashboard.html" class="dash-back-link"><i class="fas fa-arrow-left"></i> Dashboard</a>
+            </div>
+        </header>
+
+        <main class="dash-content">
+
+            <!-- ── Overview + the data flow ─────────────────────────────── -->
+            <section class="dash-card">
+                <p class="bi-lead"><strong>Bandit</strong> is the always-on Windows box on the shop LAN that carries ShopWorks data into Caspio. It is <em>not</em> a file-copy or a Box client — it runs small PowerShell agents on a schedule that read ShopWorks and POST to our proxy, which does every Caspio write and every Box upload. <b>Living document</b> — kept current whenever the bandit tasks or sync scripts change. Verified live 2026-07-18.</p>
+                <div class="bi-flow">
+                    <span class="bi-node"><i class="fas fa-server"></i> ShopWorks<br><small>FileMaker @192.168.10.6</small></span>
+                    <span class="bi-arrow"><i class="fas fa-arrow-right"></i><small>ODBC read / file share</small></span>
+                    <span class="bi-node bi-node--accent"><i class="fas fa-microchip"></i> Bandit<br><small>agents in C:\NWCA</small></span>
+                    <span class="bi-arrow"><i class="fas fa-arrow-right"></i><small>HTTPS POST + secret</small></span>
+                    <span class="bi-node"><i class="fas fa-cloud"></i> caspio-pricing-proxy<br><small>Heroku</small></span>
+                    <span class="bi-arrow"><i class="fas fa-arrow-right"></i><small>REST / Box API</small></span>
+                    <span class="bi-node"><i class="fas fa-database"></i> Caspio + Box</span>
+                </div>
+                <div class="bi-chips">
+                    <span class="bi-chip">Bandit <b>bandit.NWEINC.local</b> · 192.168.10.219</span>
+                    <span class="bi-chip">Tables via <b>FileMaker ODBC</b> (DSN SWODBC → Data_ODBCMapping @192.168.10.6)</span>
+                    <span class="bi-chip">Thumbnail images from <b>\\NCA-FS01\Thumbnails</b></span>
+                    <span class="bi-chip">Box uploads happen <b>on the proxy</b> (not bandit)</span>
+                </div>
+                <div class="bi-callout bi-callout--danger">
+                    <h4><i class="fas fa-triangle-exclamation"></i> The one rule that bit us</h4>
+                    <p><b>Never run two write-heavy Caspio syncs at full speed at the same time.</b> On 2026-07-17 the thumbnail-metadata sync and image sync ran concurrently and tripped Caspio's <b>per-second</b> rate limit (<code>api-calls-rate</code>) — even though the <em>monthly</em> Integrations meter was only 496K/500K. The monthly cap is <b>soft</b> (billed overage), not a hard block; the per-second burst limit is the real ceiling. It looked like an outage but recovered the instant the concurrency stopped.</p>
+                </div>
+            </section>
+
+            <!-- ── Scheduled tasks ──────────────────────────────────────── -->
+            <section class="dash-card">
+                <div class="dash-card-header"><h2 class="dash-card-title"><i class="fas fa-clock"></i> Scheduled tasks on bandit</h2></div>
+                <p class="bi-note">Task Scheduler → the <code>\NWCA</code> folder (all 7 grouped there, away from the OneDrive/Adobe/OS tasks). Every task runs as <b>SYSTEM</b> — independent of who's logged into bandit. Master copies of every script live in the repo at <code>caspio-pricing-proxy/scripts/bandit-agent/</code> — <b>edit there, then re-copy to bandit</b>.</p>
+                <div class="bi-table-wrap">
+                <table class="bi-table">
+                    <thead><tr><th>Task</th><th>Reads</th><th>Proxy endpoint</th><th>Every</th><th>Runs as</th><th>Status</th></tr></thead>
+                    <tbody>
+                        <tr><td>ShopWorks ODBC Order Sync</td><td>ODBC <code>Orders</code></td><td><code>/sync-orders</code></td><td>15 min</td><td>SYSTEM</td><td><span class="bi-ok">Live</span></td></tr>
+                        <tr><td>ShopWorks ODBC PO Sync</td><td>ODBC <code>PO</code></td><td><code>/sync-purchase-orders</code></td><td>15 min</td><td>SYSTEM</td><td><span class="bi-ok">Live</span></td></tr>
+                        <tr><td>ShopWorks ODBC Designs Sync</td><td>ODBC <code>Des</code></td><td><code>/sync-designs</code></td><td>4 h</td><td>SYSTEM</td><td><span class="bi-ok">Live</span></td></tr>
+                        <tr><td>ShopWorks ODBC SalesReps Sync</td><td>ODBC <code>Cust</code></td><td><code>/sync-sales-reps</code></td><td>4 h</td><td>SYSTEM</td><td><span class="bi-ok">Live</span></td></tr>
+                        <tr><td>ShopWorks ODBC Contacts Sync</td><td>ODBC (4 tables)</td><td><code>/sync-contacts</code></td><td>12 h</td><td>SYSTEM</td><td><span class="bi-ok">Live</span></td></tr>
+                        <tr><td>Thumbnail Metadata Sync</td><td><code>C:\SWF</code> xlsx (local)</td><td><code>/thumbnails/metadata-sync</code></td><td>30 min</td><td>SYSTEM</td><td><span class="bi-ok">Live</span></td></tr>
+                        <tr><td>Thumbnail Box Sync</td><td><code>\\NCA-FS01\Thumbnails</code></td><td><code>/thumbnails/upload-with-stub?target=box</code></td><td>20 min</td><td>SYSTEM</td><td><span class="bi-ok">Live</span></td></tr>
+                    </tbody>
+                </table>
+                </div>
+                <p class="bi-note">All 7 sit in the <code>\NWCA</code> Task Scheduler folder and run as SYSTEM. The metadata sync's snapshot was seeded after the bulk import, so it only posts <b>future</b> xlsx changes (not a re-backfill). SYSTEM reaches <code>\\NCA-FS01\Thumbnails</code> because the <b>BANDIT machine account has share read</b> — no interactive login needed.</p>
+                <div class="bi-callout bi-callout--info">
+                    <h4><i class="fas fa-triangle-exclamation"></i> Steady-state, not backfill — keep them from bursting together</h4>
+                    <p>These are gentle now (deltas of a few rows/images per run). The one guard: don't let the metadata + image syncs fire a <b>large</b> batch at the exact same second (that's the per-second-limit trap). Steady-state overlap is fine; a future bulk re-load should be staggered or done via CSV import.</p>
+                </div>
+            </section>
+
+            <!-- ── Reference: managing the \NWCA tasks ──────────────────── -->
+            <section class="dash-card">
+                <div class="dash-card-header"><h2 class="dash-card-title"><i class="fas fa-folder-tree"></i> Managing the tasks — reference</h2></div>
+                <p class="bi-note">On bandit: <b>Task Scheduler → Task Scheduler Library → NWCA</b>. Right-click any task for <b>Run · End · Enable/Disable · Properties · History</b>. All 7 run as SYSTEM, so nothing depends on who's logged in. Set up 2026-07-18.</p>
+
+                <h3 class="bi-h">Where everything lives on bandit</h3>
+                <div class="bi-code">C:\NWCA\
+  odbc-sync\                       # the 5 ODBC syncs + the SHARED config
+    config.json                    # { ProxyBase, CrmApiSecret, Dsn=SWODBC }  ← proxy URL + secret
+    sync-orders.ps1            last-sync.txt                 sync-orders.log
+    sync-purchase-orders.ps1   last-sync-po.txt              sync-purchase-orders.log
+    sync-contacts.ps1          last-snapshot-contacts.json   sync-contacts.log
+    sync-designs.ps1           last-snapshot-designs.json    sync-designs.log
+    sync-sales-reps.ps1        last-snapshot-reps.json       sync-sales-reps.log
+  thumb-image-sync\
+    sync-thumbnails-to-box.ps1                               sync-thumbnails-to-box.log
+  thumb-sync\
+    sync-thumbnail-metadata.ps1  last-snapshot.json          sync-thumbnail-metadata.log</div>
+                <p class="bi-note"><b>Master copies</b> of every <code>.ps1</code> live in the repo at <code>caspio-pricing-proxy/scripts/bandit-agent/</code>. Rule: <b>edit the repo copy, then re-copy it to the matching <code>C:\NWCA\…</code> path</b> — never hand-edit on bandit (it drifts and gets overwritten). Only <code>config.json</code> is bandit-only (it holds the secret). The <code>last-*.txt / *.json</code> files are each sync's delta bookmark — deleting one forces a full re-sync (don't, unless you mean to).</p>
+
+                <h3 class="bi-h">Task → script → schedule → log</h3>
+                <div class="bi-table-wrap">
+                <table class="bi-table">
+                    <thead><tr><th>Task (in \NWCA)</th><th>Script</th><th>Every</th><th>Log file</th><th>Caspio table</th></tr></thead>
+                    <tbody>
+                        <tr><td>ShopWorks ODBC Order Sync</td><td><code>sync-orders.ps1</code></td><td>15 min</td><td><code>sync-orders.log</code></td><td>ORDER_ODBC</td></tr>
+                        <tr><td>ShopWorks ODBC PO Sync</td><td><code>sync-purchase-orders.ps1</code></td><td>15 min</td><td><code>sync-purchase-orders.log</code></td><td>PurchaseOrders</td></tr>
+                        <tr><td>ShopWorks ODBC Contacts Sync</td><td><code>sync-contacts.ps1</code></td><td>12 h</td><td><code>sync-contacts.log</code></td><td>CompanyContactsMerge2026</td></tr>
+                        <tr><td>ShopWorks ODBC Designs Sync</td><td><code>sync-designs.ps1</code></td><td>4 h</td><td><code>sync-designs.log</code></td><td>Designs2026</td></tr>
+                        <tr><td>ShopWorks ODBC SalesReps Sync</td><td><code>sync-sales-reps.ps1</code></td><td>4 h</td><td><code>sync-sales-reps.log</code></td><td>Sales_Reps_2026</td></tr>
+                        <tr><td>Thumbnail Metadata Sync</td><td><code>sync-thumbnail-metadata.ps1</code></td><td>30 min</td><td><code>sync-thumbnail-metadata.log</code></td><td>Shopworks_Thumbnail_Report (rows)</td></tr>
+                        <tr><td>Thumbnail Box Sync</td><td><code>sync-thumbnails-to-box.ps1</code></td><td>20 min</td><td><code>sync-thumbnails-to-box.log</code></td><td>Shopworks_Thumbnail_Report (FileUrl)</td></tr>
+                    </tbody>
+                </table>
+                </div>
+
+                <h3 class="bi-h">Common jobs</h3>
+                <ul class="bi-list">
+                    <li><b>Is a sync healthy?</b> From any browser: <code>…/api/shopworks-odbc/health</code> (+ <code>/po-health</code>, <code>/contacts-health</code>, <code>/designs-health</code>, <code>/reps-health</code>) → returns <code>ok</code>, minutes since last success, and the last summary.</li>
+                    <li><b>Run one now:</b> right-click → <b>Run</b>, or <code>schtasks /Run /TN "\NWCA\ShopWorks ODBC Order Sync"</code>. Then read its <code>.log</code>.</li>
+                    <li><b>See what happened:</b> the <b>Last Run Result</b> column, or the task's <b>History</b> tab, or the tail of its <code>.log</code>.</li>
+                    <li><b>Change a script's behavior:</b> edit the repo master, copy to the matching <code>C:\NWCA\…</code> path — no task change needed.</li>
+                    <li><b>Keep thumbnails flowing:</b> keep exporting "Thumbnails Report" from ShopWorks into <code>\\BANDIT\SWF</code> (= <code>C:\SWF</code>); the metadata sync reads the newest one each run.</li>
+                    <li><b>Handy script flags</b> (run manually): <code>-DryRun</code> (validate, 0 writes), <code>-SeedSnapshot</code> (baseline after a bulk import), <code>-CsvOut &lt;path&gt;</code> (emit a CSV for a $0 bulk import).</li>
+                </ul>
+
+                <div class="bi-callout bi-callout--danger">
+                    <h4><i class="fas fa-triangle-exclamation"></i> Never-break rules for this folder</h4>
+                    <ul>
+                        <li><b>Only touch tasks inside <code>\NWCA</code>.</b> Leave the OneDrive / Adobe / Edge / Norton / Windows tasks alone — they're app/OS-managed, get auto-recreated, and deleting them breaks sync/updates/antivirus.</li>
+                        <li><b>New sync?</b> Create it <b>inside <code>\NWCA</code>, run as SYSTEM</b>, script in <code>C:\NWCA\…</code> with its master in the repo <code>bandit-agent/</code> folder.</li>
+                        <li><b>Never run a large metadata + image batch at the same time</b> (per-second Caspio limit). Bulk loads go through a <b>CSV import</b>, not the API.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- ── How a sync works ─────────────────────────────────────── -->
+            <section class="dash-card">
+                <div class="dash-card-header"><h2 class="dash-card-title"><i class="fas fa-gears"></i> How each sync works</h2></div>
+                <ol class="bi-steps">
+                    <li><b>Read</b> — the agent opens the FileMaker ODBC DSN (<code>SWODBC</code>, login <code>extro/extro</code>, read-only) and pulls a <b>bounded</b> query (orders/PO = rows changed since last run; contacts/designs/reps = full scan). Thumbnail images are read from the file share instead.</li>
+                    <li><b>Clean</b> — the agent applies the same normalization the old OneDrive export used (rep names, address/city/state, tiers, flags).</li>
+                    <li><b>POST</b> — cleaned rows go in chunks to the proxy endpoint above (header <code>x-crm-api-secret</code>). The <b>proxy is the only thing that writes Caspio</b>, upserting by key (ID_Order / ID_PO / ID_Contact / ID_Customer / ID_Design / ID_Serial). It also uploads images to Box.</li>
+                    <li><b>Heartbeat</b> — every run stamps <code>Sync_Heartbeats</code> so the watchdog can tell "alive but quiet" from "dead".</li>
+                </ol>
+                <p class="bi-note">Each agent supports handy flags: <code>-DryRun</code> (validate + 0 writes), <code>-SeedSnapshot</code> (adopt current state as the delta baseline), <code>-CsvOut &lt;path&gt;</code> (emit a table-shaped CSV for a bulk Caspio import — the import quota, not the API budget).</p>
+                <div class="bi-callout bi-callout--info">
+                    <h4><i class="fas fa-lightbulb"></i> Big backfills = CSV import, not the API</h4>
+                    <p>A Caspio <b>CSV import</b> runs on the <em>Data import/export runs</em> quota (~90/1000), <b>not</b> the metered Integrations API calls (500K/mo). Every agent's <code>-CsvOut</code> mode emits a CSV so a 25k-row backfill costs <b>$0 in API</b>. That's how the full thumbnail backfill was done.</p>
+                </div>
+            </section>
+
+            <!-- ── Thumbnails → Box ─────────────────────────────────────── -->
+            <section class="dash-card">
+                <div class="dash-card-header"><h2 class="dash-card-title"><i class="fas fa-image"></i> Thumbnails &amp; Box</h2></div>
+                <ul class="bi-list">
+                    <li><b>Two parts.</b> <u>Metadata</u> rows (design name, part #, dims) come from Erik's <code>Thumbnails Report*.xlsx</code> export dropped into <code>\\BANDIT\SWF</code>. <u>Images</u> come from the FileMaker container store shared as <code>\\NCA-FS01\Thumbnails</code> (read-only — never write it).</li>
+                    <li><b>All images live on Box</b> (folder <code>ShopWorks Thumbnails Archive</code>, id 400901982283). As of 2026-07-18: <b>26,896 thumbnails serve from Box, 0 from Caspio</b>. The upload happens on the proxy via <code>uploadFileToBox()</code> using Box creds in the Heroku env — there is no Box client or token on bandit.</li>
+                    <li><b>Transparent to the website.</b> Every consumer resolves the URL as <code>ExternalKey ? /api/files/{key} : FileUrl</code>, so a row that points at Box just serves from Box — no app change needed.</li>
+                </ul>
+            </section>
+
+            <!-- ── Connecting + troubleshooting ─────────────────────────── -->
+            <section class="dash-card">
+                <div class="dash-card-header"><h2 class="dash-card-title"><i class="fas fa-screwdriver-wrench"></i> Connecting &amp; troubleshooting</h2></div>
+                <ul class="bi-list">
+                    <li><b>Reach bandit</b> from Erik's laptop over PowerShell Remoting: <code>$cred = Import-Clixml "$env:USERPROFILE\bandit-cred.xml"; Invoke-Command -ComputerName bandit -Credential $cred { … }</code> (the credential is DPAPI-encrypted, laptop-bound — re-create it after any domain password change). Or plain RDP.</li>
+                    <li><b>Is a sync healthy?</b> <code>GET /api/shopworks-odbc/health</code> (and <code>/po-health</code>, <code>/contacts-health</code>, <code>/designs-health</code>, <code>/reps-health</code>) return <code>ok</code> + minutes since last success.</li>
+                    <li><b>Logs</b> live next to each script: <code>C:\NWCA\odbc-sync\*.log</code>, <code>C:\NWCA\thumb-image-sync\*.log</code>, <code>C:\NWCA\thumb-sync\*.log</code>. Config for all: <code>C:\NWCA\odbc-sync\config.json</code> (ProxyBase, CrmApiSecret, Dsn).</li>
+                    <li><b>Task inventory:</b> use <code>schtasks /query</code> — the <code>Get-ScheduledTask</code> cmdlet returns empty over PS-remoting on this box.</li>
+                </ul>
+                <div class="bi-callout bi-callout--danger">
+                    <h4><i class="fas fa-triangle-exclamation"></i> Vendor rules — OnSite is LIVE production</h4>
+                    <ul>
+                        <li><b>Never blanket-query</b> the ODBC DSN — always <code>WHERE</code> + <code>FETCH FIRST n</code>; unbounded scans can crash OnSite for everyone. <b>No writes ever</b> (order creation stays on the ManageOrders push API).</li>
+                        <li><b>Never poll tightly</b> — minutes apart, not seconds. And never two write-heavy Caspio syncs at once (see the rule at the top).</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- ── Retiring the old system ──────────────────────────────── -->
+            <section class="dash-card">
+                <div class="dash-card-header"><h2 class="dash-card-title"><i class="fas fa-box-archive"></i> What this replaced</h2></div>
+                <p class="bi-note">The old path was <b>bandit exports a CSV → OneDrive → a Caspio scheduled import</b> (overnight). It's <b>fully retired as of 2026-07-18</b>: the direct ODBC syncs above write Caspio in ~15 min, and the 5 old <code>… Export to OneDrive</code> tasks + the Caspio import tasks have been deleted/disabled. (The many <code>OneDrive Reporting/Startup</code>, Adobe, Edge, Norton tasks in Task Scheduler are Windows/app-managed — not ours, left intact.) Full history &amp; field-level detail: repo <code>memory/SHOPWORKS_ODBC_INTEGRATION.md</code>.</p>
+            </section>
+
+        </main>
+    </div>
+</body>
+</html>

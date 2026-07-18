@@ -1,0 +1,78 @@
+/* ==========================================================================
+   bandit-integration.css — page-specific styles for
+   /dashboards/bandit-integration.html. Sibling of shopworks-odbc-reference.css.
+   Uses the 2026 tokens (art-hub.css) + dash-shell.css. Never redefine tokens;
+   never hardcode colors/shadows/radii — var(--token) only.
+   ========================================================================== */
+
+.bi-subhead { font-weight: 400; font-size: 0.68em; opacity: 0.85; }
+.bi-lock {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 600; color: #fff;
+    background: rgba(0,0,0,0.18); border: 1px solid rgba(255,255,255,0.35); padding: 5px 12px; border-radius: var(--radius-pill);
+}
+
+.bi-lead { font-size: 1rem; line-height: 1.6; color: var(--gray-700); margin: 0 0 var(--space-4); }
+.bi-note { font-size: 0.84rem; color: var(--gray-500); line-height: 1.55; margin: var(--space-3) 0 0; }
+.bi-h { font-size: 1rem; font-weight: 700; color: var(--gray-900); margin: var(--space-5) 0 var(--space-2); padding-bottom: var(--space-2); border-bottom: 1px solid var(--gray-200); }
+.bi-code { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.78rem; line-height: 1.55; color: var(--gray-800); background: var(--surface-inset); border: 1px solid var(--gray-200); border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); overflow-x: auto; margin: var(--space-2) 0 0; white-space: pre; }
+
+/* ---------- data-flow strip ---------- */
+.bi-flow {
+    display: flex; align-items: stretch; flex-wrap: wrap; gap: var(--space-2);
+    background: var(--surface-inset); border: 1px solid var(--gray-200); border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4); margin-bottom: var(--space-4);
+}
+.bi-node {
+    display: flex; flex-direction: column; justify-content: center; gap: 2px; text-align: center;
+    font-size: 0.82rem; font-weight: 600; color: var(--gray-800); background: var(--surface-card);
+    border: 1px solid var(--gray-200); border-radius: var(--radius-sm); padding: var(--space-2) var(--space-3);
+}
+.bi-node small { font-weight: 400; font-size: 0.72rem; color: var(--gray-500); font-family: 'JetBrains Mono', ui-monospace, monospace; }
+.bi-node i { color: var(--gray-500); margin-bottom: 2px; }
+.bi-node--accent { border-color: var(--dash-theme); background: var(--dash-theme-bg); }
+.bi-node--accent i { color: var(--dash-theme-dark); }
+.bi-arrow { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--state-info); font-weight: 700; }
+.bi-arrow small { font-weight: 400; font-size: 0.66rem; color: var(--gray-400); white-space: nowrap; }
+
+/* ---------- chips ---------- */
+.bi-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-4); }
+.bi-chip { background: var(--surface-inset); border: 1px solid var(--gray-200); border-radius: var(--radius-md); padding: 5px 11px; font-size: 0.8rem; color: var(--gray-600); }
+.bi-chip b { color: var(--gray-900); font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
+/* ---------- callouts ---------- */
+.bi-callout { border: 1px solid var(--gray-200); border-left: 4px solid var(--gray-400); border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); margin: var(--space-4) 0 0; background: var(--surface-inset); }
+.bi-callout h4 { margin: 0 0 var(--space-2); font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; gap: var(--space-2); }
+.bi-callout p { margin: 0; font-size: 0.88rem; color: var(--gray-700); line-height: 1.6; }
+.bi-callout ul { margin: 0; padding-left: var(--space-5); }
+.bi-callout li { margin: var(--space-1) 0; font-size: 0.88rem; color: var(--gray-700); line-height: 1.55; }
+.bi-callout--danger { border-left-color: var(--state-danger); background: var(--state-danger-bg); }
+.bi-callout--danger h4 { color: var(--state-danger); }
+.bi-callout--info { border-left-color: var(--state-info); }
+.bi-callout--info h4 { color: var(--state-info); }
+
+/* ---------- lists + steps ---------- */
+.bi-list { margin: 0; padding-left: var(--space-5); }
+.bi-list li { margin: var(--space-2) 0; font-size: 0.9rem; color: var(--gray-700); line-height: 1.6; }
+.bi-steps { margin: 0; padding-left: var(--space-5); }
+.bi-steps li { margin: var(--space-3) 0; font-size: 0.9rem; color: var(--gray-700); line-height: 1.6; }
+.bi-steps li b:first-child { color: var(--gray-900); }
+
+/* ---------- inline code ---------- */
+.bi-lead code, .bi-note code, .bi-callout code, .bi-list code, .bi-steps code, .bi-table code {
+    font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.82em; background: var(--surface-card); color: var(--gray-800);
+    padding: 1px 5px; border-radius: var(--radius-sm); overflow-wrap: anywhere;
+}
+
+/* ---------- task table ---------- */
+.bi-table-wrap { overflow-x: auto; margin-top: var(--space-2); }
+.bi-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; min-width: 640px; }
+.bi-table thead th { text-align: left; padding: 7px var(--space-3); border-bottom: 2px solid var(--gray-300); color: var(--gray-500); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; background: var(--surface-inset); }
+.bi-table td { padding: 7px var(--space-3); border-bottom: 1px solid var(--gray-200); vertical-align: middle; color: var(--gray-700); }
+.bi-table tr:last-child td { border-bottom: 0; }
+.bi-table td:first-child { font-weight: 600; color: var(--gray-900); }
+
+/* ---------- status pills ---------- */
+.bi-ok, .bi-off, .bi-done { display: inline-block; font-size: 0.72rem; font-weight: 600; padding: 2px 9px; border-radius: var(--radius-pill); white-space: nowrap; }
+.bi-ok   { color: var(--dash-theme-dark); background: var(--dash-theme-bg); }
+.bi-off  { color: var(--gray-500); background: var(--surface-inset); }
+.bi-done { color: var(--state-info); background: var(--surface-inset); }
