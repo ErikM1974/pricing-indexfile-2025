@@ -1,3 +1,13 @@
+## v2026.07.18.1 (2026.07.18)
+
+- docs(memory): work-order footer barcode encodes Ord<order#> — lookup parser accepts the prefix (proxy cfe011a)
+- docs(memory): ALL thumbnails on Box COMPLETE 7/18 (26,896 Box / 0 Caspio) — full backfill via CSV import ($0 Integrations); burst-rate-limit lesson (never run 2 write-heavy Caspio syncs concurrently); Box-only ?csv=1 endpoint
+- feat(dashboard): Bandit Integration admin doc page + memory: bandit tasks hardened (all SYSTEM, \NWCA folder, obsolete deleted); fetchAllCaspioPages maxPages-cap gotcha
+- docs(bandit-integration): add task-scheduler reference section — \NWCA folder, file layout, task→script→log map, common jobs, never-break rules
+- docs: Bandit Integration = living doc — CLAUDE.md rule to keep the dashboard page + memory in sync on any bandit task/script change
+- docs(memory): PENDING — Ryan/ShopWorks adding ID_Serial+id_Design to Data_ODBCMapping (~wk of 2026-07-21); when live, switch thumbnail metadata sync from manual xlsx to direct ODBC read
+- Deploy v2026.07.18.1: 1 files (bandit-integration.html,...)
+
 ## v2026.07.17.14 (2026.07.17)
 
 - docs(memory): capture-v2 barcode lookup + portal elevation shipped; Box shared-static logo lesson (archive regex-mangle entry)
