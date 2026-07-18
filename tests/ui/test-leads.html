@@ -120,9 +120,14 @@
                 <div class="ld-drawer-title" id="drawer-title"></div>
                 <div class="ld-drawer-sub" id="drawer-sub"></div>
             </div>
-            <button type="button" class="ld-drawer-close" id="drawer-close" aria-label="Close">
-                <i class="fas fa-times"></i>
-            </button>
+            <div class="ld-drawer-head-actions">
+                <a id="drawer-open-full" class="ld-btn" href="#" title="Open the full lead workspace">
+                    <i class="fas fa-up-right-from-square"></i> Full lead
+                </a>
+                <button type="button" class="ld-drawer-close" id="drawer-close" aria-label="Close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
         </div>
         <div class="ld-drawer-body" id="drawer-body"></div>
     </aside>
@@ -131,7 +136,8 @@
     <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/dash-page-helpers.js"></script>
+    <script src="/dashboards/js/leads-common.js?v=2026.07.18.8"></script>
     <script src="/tests/ui/test-leads-stub.js"></script>
-    <script src="/dashboards/js/leads.js?v=2026.07.18.7"></script>
+    <script src="/dashboards/js/leads.js?v=2026.07.18.8"></script>
 </body>
 </html>

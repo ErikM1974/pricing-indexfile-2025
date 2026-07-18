@@ -1,0 +1,153 @@
+/* ==========================================================================
+   lead-workspace.css — page-specific styles for dashboards/lead.html
+   (Leads CRM v2 full lead workspace).
+
+   Loads AFTER leads.css — the drawer's ld-* atoms (ld-btn, ld-kv, ld-match,
+   ld-status, ld-thumbs, ld-orders-table, …) are reused verbatim here; this
+   file only adds the workspace layout + composer/timeline styles.
+   Tokens from art-hub.css; shell from dash-shell.css. No hardcoded palette.
+   ========================================================================== */
+
+/* ── Header strip ── */
+.lw-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+.lw-title { font-size: 1.25rem; font-weight: 700; color: var(--gray-900); }
+.lw-sub { font-size: 0.85rem; color: var(--gray-500); margin-top: 3px; }
+.lw-head-controls { display: flex; gap: 10px; flex-wrap: wrap; }
+.lw-head-controls .ld-control { min-width: 170px; }
+
+/* ── Two-column grid ── */
+.lw-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 16px;
+    align-items: start;
+    margin-top: 16px;
+}
+.lw-main { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.lw-rail { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.lw-panel { padding: 14px 16px; }
+
+@media (max-width: 900px) {
+    .lw-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Composer ── */
+.lw-note-input {
+    width: 100%;
+    font: inherit;
+    font-size: 0.9rem;
+    color: var(--gray-800);
+    background: var(--surface-card);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    padding: 10px 12px;
+    margin-top: 8px;
+    resize: vertical;
+}
+.lw-note-input:focus-visible { outline: 2px solid var(--gray-400); outline-offset: 1px; }
+
+.lw-composer-actions {
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+.ld-btn--primary {
+    background: var(--gray-900);
+    color: var(--surface-card);
+    border-color: var(--gray-900);
+}
+.ld-btn--primary:hover { background: var(--gray-700); color: var(--surface-card); }
+
+.lw-dropzone {
+    flex: 1 1 220px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    color: var(--gray-500);
+    border: 1.5px dashed var(--gray-300);
+    border-radius: var(--radius-md);
+    padding: 8px 12px;
+    cursor: pointer;
+    user-select: none;
+}
+.lw-dropzone:hover, .lw-dropzone.is-over { border-color: var(--gray-500); color: var(--gray-700); background: var(--gray-50); }
+.lw-dropzone:focus-visible { outline: 2px solid var(--gray-400); outline-offset: 1px; }
+
+/* ── Timeline ── */
+.lw-timeline-list { list-style: none; margin: 0; padding: 0; }
+.lw-item {
+    display: flex;
+    gap: 12px;
+    padding: 12px 2px;
+    border-bottom: 1px solid var(--gray-100);
+}
+.lw-item:last-child { border-bottom: none; }
+.lw-item-icon {
+    flex: 0 0 32px;
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: var(--gray-100);
+    color: var(--gray-600);
+    font-size: 0.85rem;
+}
+.lw-item--note .lw-item-icon { background: var(--state-info-bg, var(--gray-100)); color: var(--state-info-text, var(--gray-700)); }
+.lw-item--status .lw-item-icon { background: var(--state-warning-bg, var(--gray-100)); color: var(--state-warning-text, var(--gray-700)); }
+.lw-item--attachment .lw-item-icon { background: var(--state-success-bg, var(--gray-100)); color: var(--state-success-text, var(--gray-700)); }
+.lw-item--quote .lw-item-icon { background: var(--state-success-bg, var(--gray-100)); color: var(--state-success-text, var(--gray-700)); }
+
+.lw-item-body { min-width: 0; flex: 1; }
+.lw-item-meta { font-size: 0.74rem; color: var(--gray-500); margin-bottom: 2px; }
+.lw-item-text { font-size: 0.88rem; color: var(--gray-800); white-space: pre-wrap; word-break: break-word; }
+.lw-item--system .lw-item-text { color: var(--gray-500); font-size: 0.82rem; }
+.lw-item-origin .lw-item-text { color: var(--gray-600); }
+
+/* ── Rail panels ── */
+.lw-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.lw-chip {
+    font: inherit;
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: var(--gray-600);
+    background: var(--gray-100);
+    border: 1px solid var(--gray-200);
+    border-radius: 999px;
+    padding: 3px 10px;
+    cursor: pointer;
+}
+.lw-chip:hover { background: var(--gray-200); color: var(--gray-800); }
+
+.lw-due-overdue { color: var(--state-danger-text, #b42318); font-weight: 600; font-size: 0.8rem; margin-top: 6px; }
+
+.lw-value-input, .lw-quote-input {
+    width: 100%;
+    font: inherit;
+    font-size: 0.88rem;
+    color: var(--gray-800);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    padding: 7px 10px;
+    background: var(--surface-card);
+}
+.lw-value-big { font-size: 1.3rem; font-weight: 700; color: var(--gray-900); margin-bottom: 6px; }
+
+.lw-intel { margin-top: 10px; border-top: 1px dashed var(--gray-200); padding-top: 10px; }
+.lw-intel-title { font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--gray-500); margin-bottom: 6px; }
+
+.lw-quote-linked { border: 1px solid var(--gray-200); border-radius: var(--radius-md); padding: 10px 12px; }
+.lw-quote-amount { font-size: 1.1rem; font-weight: 700; color: var(--gray-900); }
+.lw-quote-row { display: flex; gap: 6px; margin-top: 8px; }
+.lw-quote-row .lw-quote-input { flex: 1; }
