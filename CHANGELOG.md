@@ -1,3 +1,8 @@
+## v2026.07.18.13 (2026.07.18)
+
+- fix(leads-crm): 🔥 heat scans field VALUES not raw Payload_JSON (QRQ 'Need By' label flagged every submission) + future-date need-by detection + per-lead cache w/ clearHeat invalidation; workspace chips refresh on any save; modal focus-return a11y
+- Deploy v2026.07.18.13: cache-bust leads assets
+
 ## v2026.07.18.12 (2026.07.18)
 
 - docs(memory): LESSONS — Referer-gated file endpoints 401 top-level navigations (Leads artwork fix) + topic-file gotcha line
