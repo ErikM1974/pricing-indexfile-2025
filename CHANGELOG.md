@@ -1,3 +1,8 @@
+## v2026.07.18.6 (2026.07.18)
+
+- feat(leads): attachment filenames as labels + download buttons (?download=1 via both file servers)
+- Deploy v2026.07.18.6: cache-bust leads assets
+
 ## v2026.07.18.5 (2026.07.18)
 
 - feat(leads): surface file links inside lead fields as attachments — QRQ logo uploads (…/api/files/<key> text lines) now render in Artwork & Source with thumbnail attempts (onerror-hidden for non-images); allow-listed hosts only (proxy files + JotForm uploads)
