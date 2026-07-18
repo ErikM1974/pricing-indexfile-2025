@@ -14,7 +14,7 @@
 
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/bandit-integration.css?v=2026.07.18.2">
+    <link rel="stylesheet" href="/dashboards/css/bandit-integration.css?v=2026.07.18.3">
 </head>
 <body>
     <div class="dash-shell">
@@ -80,6 +80,62 @@
                 <div class="bi-callout bi-callout--info">
                     <h4><i class="fas fa-triangle-exclamation"></i> Steady-state, not backfill — keep them from bursting together</h4>
                     <p>These are gentle now (deltas of a few rows/images per run). The one guard: don't let the metadata + image syncs fire a <b>large</b> batch at the exact same second (that's the per-second-limit trap). Steady-state overlap is fine; a future bulk re-load should be staggered or done via CSV import.</p>
+                </div>
+            </section>
+
+            <!-- ── Reference: managing the \NWCA tasks ──────────────────── -->
+            <section class="dash-card">
+                <div class="dash-card-header"><h2 class="dash-card-title"><i class="fas fa-folder-tree"></i> Managing the tasks — reference</h2></div>
+                <p class="bi-note">On bandit: <b>Task Scheduler → Task Scheduler Library → NWCA</b>. Right-click any task for <b>Run · End · Enable/Disable · Properties · History</b>. All 7 run as SYSTEM, so nothing depends on who's logged in. Set up 2026-07-18.</p>
+
+                <h3 class="bi-h">Where everything lives on bandit</h3>
+                <div class="bi-code">C:\NWCA\
+  odbc-sync\                       # the 5 ODBC syncs + the SHARED config
+    config.json                    # { ProxyBase, CrmApiSecret, Dsn=SWODBC }  ← proxy URL + secret
+    sync-orders.ps1            last-sync.txt                 sync-orders.log
+    sync-purchase-orders.ps1   last-sync-po.txt              sync-purchase-orders.log
+    sync-contacts.ps1          last-snapshot-contacts.json   sync-contacts.log
+    sync-designs.ps1           last-snapshot-designs.json    sync-designs.log
+    sync-sales-reps.ps1        last-snapshot-reps.json       sync-sales-reps.log
+  thumb-image-sync\
+    sync-thumbnails-to-box.ps1                               sync-thumbnails-to-box.log
+  thumb-sync\
+    sync-thumbnail-metadata.ps1  last-snapshot.json          sync-thumbnail-metadata.log</div>
+                <p class="bi-note"><b>Master copies</b> of every <code>.ps1</code> live in the repo at <code>caspio-pricing-proxy/scripts/bandit-agent/</code>. Rule: <b>edit the repo copy, then re-copy it to the matching <code>C:\NWCA\…</code> path</b> — never hand-edit on bandit (it drifts and gets overwritten). Only <code>config.json</code> is bandit-only (it holds the secret). The <code>last-*.txt / *.json</code> files are each sync's delta bookmark — deleting one forces a full re-sync (don't, unless you mean to).</p>
+
+                <h3 class="bi-h">Task → script → schedule → log</h3>
+                <div class="bi-table-wrap">
+                <table class="bi-table">
+                    <thead><tr><th>Task (in \NWCA)</th><th>Script</th><th>Every</th><th>Log file</th><th>Caspio table</th></tr></thead>
+                    <tbody>
+                        <tr><td>ShopWorks ODBC Order Sync</td><td><code>sync-orders.ps1</code></td><td>15 min</td><td><code>sync-orders.log</code></td><td>ORDER_ODBC</td></tr>
+                        <tr><td>ShopWorks ODBC PO Sync</td><td><code>sync-purchase-orders.ps1</code></td><td>15 min</td><td><code>sync-purchase-orders.log</code></td><td>PurchaseOrders</td></tr>
+                        <tr><td>ShopWorks ODBC Contacts Sync</td><td><code>sync-contacts.ps1</code></td><td>12 h</td><td><code>sync-contacts.log</code></td><td>CompanyContactsMerge2026</td></tr>
+                        <tr><td>ShopWorks ODBC Designs Sync</td><td><code>sync-designs.ps1</code></td><td>4 h</td><td><code>sync-designs.log</code></td><td>Designs2026</td></tr>
+                        <tr><td>ShopWorks ODBC SalesReps Sync</td><td><code>sync-sales-reps.ps1</code></td><td>4 h</td><td><code>sync-sales-reps.log</code></td><td>Sales_Reps_2026</td></tr>
+                        <tr><td>Thumbnail Metadata Sync</td><td><code>sync-thumbnail-metadata.ps1</code></td><td>30 min</td><td><code>sync-thumbnail-metadata.log</code></td><td>Shopworks_Thumbnail_Report (rows)</td></tr>
+                        <tr><td>Thumbnail Box Sync</td><td><code>sync-thumbnails-to-box.ps1</code></td><td>20 min</td><td><code>sync-thumbnails-to-box.log</code></td><td>Shopworks_Thumbnail_Report (FileUrl)</td></tr>
+                    </tbody>
+                </table>
+                </div>
+
+                <h3 class="bi-h">Common jobs</h3>
+                <ul class="bi-list">
+                    <li><b>Is a sync healthy?</b> From any browser: <code>…/api/shopworks-odbc/health</code> (+ <code>/po-health</code>, <code>/contacts-health</code>, <code>/designs-health</code>, <code>/reps-health</code>) → returns <code>ok</code>, minutes since last success, and the last summary.</li>
+                    <li><b>Run one now:</b> right-click → <b>Run</b>, or <code>schtasks /Run /TN "\NWCA\ShopWorks ODBC Order Sync"</code>. Then read its <code>.log</code>.</li>
+                    <li><b>See what happened:</b> the <b>Last Run Result</b> column, or the task's <b>History</b> tab, or the tail of its <code>.log</code>.</li>
+                    <li><b>Change a script's behavior:</b> edit the repo master, copy to the matching <code>C:\NWCA\…</code> path — no task change needed.</li>
+                    <li><b>Keep thumbnails flowing:</b> keep exporting "Thumbnails Report" from ShopWorks into <code>\\BANDIT\SWF</code> (= <code>C:\SWF</code>); the metadata sync reads the newest one each run.</li>
+                    <li><b>Handy script flags</b> (run manually): <code>-DryRun</code> (validate, 0 writes), <code>-SeedSnapshot</code> (baseline after a bulk import), <code>-CsvOut &lt;path&gt;</code> (emit a CSV for a $0 bulk import).</li>
+                </ul>
+
+                <div class="bi-callout bi-callout--danger">
+                    <h4><i class="fas fa-triangle-exclamation"></i> Never-break rules for this folder</h4>
+                    <ul>
+                        <li><b>Only touch tasks inside <code>\NWCA</code>.</b> Leave the OneDrive / Adobe / Edge / Norton / Windows tasks alone — they're app/OS-managed, get auto-recreated, and deleting them breaks sync/updates/antivirus.</li>
+                        <li><b>New sync?</b> Create it <b>inside <code>\NWCA</code>, run as SYSTEM</b>, script in <code>C:\NWCA\…</code> with its master in the repo <code>bandit-agent/</code> folder.</li>
+                        <li><b>Never run a large metadata + image batch at the same time</b> (per-second Caspio limit). Bulk loads go through a <b>CSV import</b>, not the API.</li>
+                    </ul>
                 </div>
             </section>
 
