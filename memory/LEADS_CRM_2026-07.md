@@ -39,4 +39,5 @@ One system, two layers, all live in production. Frontend releases 1689–1694 (v
 ## Open / optional
 
 - ⏳ **ERIK: EmailJS `template_lead_followup_digest`** + `heroku config:set EMAILJS_TEMPLATE_LEAD_FOLLOWUP_DIGEST=<id>` — cron activates itself once set (params: to_email/to_name/ae_name/digest_date/counts/overdue_html/due_html/new_html/board_link, triple-stache the *_html).
-- Optional: purge old spam rows from the 12-yr backfill · extend auto-assign/email to QRQ/WSR arrivals · 'House' rep name → sales@ mapping (one backfill row logs unassigned).
+- ⏳ **ERIK: spam sweep** — `Downloads\jotform-spam-candidates.csv` (138/1,766 flagged: url-in-text 61, seo-words 48, dear-sir 25, .ru/.cn-ish 15) — review + bulk-delete in the Caspio datasheet. Regenerate anytime: scratchpad spam-report heuristic (read-only).
+- ✅ DONE 7/18 late (proxy v2026.07.18.6 `4dfb885`): in-app QRQ/WSR/RST arrivals get JotForm-parity enrichment (fire-and-forget assignLead + Matched_ID_Customer stamp + rep email; roster keeps customer-chosen rep) — smoke-proven (QRQ0718-3130 → Jim + #3739, archived). 'House' rep → sales@ in rep-email-map.
