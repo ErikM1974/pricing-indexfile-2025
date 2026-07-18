@@ -22,6 +22,10 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 
 ### `app.use('/api', requireCrmApiSecret, router)` 401s EVERY /api route after it (2026-06-30, ARCHIVED 2026-07-16): the router arg does NOT scope the middleware — gate PATH-SPECIFIC mounts (`app.use('/api/x', gate)` or a path list) before the bare `/api` mount, never bare `/api`. Full entry in archive.
 
+### The INVERSE miss: a prefix gate covers ONE mount, not the router — `/api/order-odbc` + `/api/order-dashboard` + `/api/customers` stayed anonymous 3 weeks after the `/api/orders` "full-gate" (2026-07-18, proxy v951)
+The 6/29 flip `app.use('/api/orders', requireCrmApiSecret)` matched only that path segment, but `src/routes/orders.js` (mounted at bare `/api`) ALSO registers `/order-odbc` (ORDER_ODBC customer contact + invoice financials, raw `q.where` passthrough), `/order-dashboard`, and `/customers` (anonymous Customer_Info enumeration + anon POST/PUT/DELETE) — all still public. Fix: gate each sibling mount; bare create `POST /api/customers` stays public-hardened (BOGO promo browser form — PROXY_SIDE_DOOR_AUDIT decision #6 still open). Caller sweep (both repos + Python Inksoft + proxy `scripts/`) found ONE live caller — FE portal `buildProductDetail` — already sending the secret, so zero repoints.
+**Prevention:** gating a multi-route router at a mount prefix requires enumerating EVERY `router.<verb>('/path')` in the file and gating each distinct first segment — the mount prefix is all a gate sees (pair this with the over-gate lesson above). And "the router is gated" claims must be proven by curling each ROUTE, not the mount.
+
 ### Customer Supplied SCP calculator had 100% hardcoded pricing — 4th disconnected price surface (2026-07-01, ARCHIVED 2026-07-06): wired to `priceScpGroup({customerSuppliedGarment:true})` → `generateManualPricingData(0)` — reuse the manual-cost machinery for "no garment cost" pricing, never a parallel formula; verify formulas against the LIVE API, not memory comments. Full entry in archive.
 
 ### Same calculator follow-up (2026-07-01, ARCHIVED 2026-07-07): displayed quote ID != saved ID (generateQuoteID called twice — mint ONCE, thread it through) + email failure masked a successful save (track save/notify outcomes separately). Full entry in archive.
@@ -81,21 +85,11 @@ Laser-patch EMB (EMB-2026-313) printed a $360 products table against a $420 Subt
 ### quote-view.js carried a DEAD hardcoded extended-size upcharge map `{2XL:2,3XL:4,4XL:6,5XL:8,6XL:10}` (Rule-9 latent violation, 2026-07-06)
 An audit flagged `this.sizeUpcharges` (pages/js/quote-view.js) as feeding customer Unit-Price cells with no visible-warning fallback. **Verification proved it DEAD:** the whole consumer subtree (`renderProductCard`->`renderSizeMatrix`/`calculateProductTotal`->`getUnitPriceForSize`/`getBaseSellingPrice`/`getEstimatedUnitPrice`, + `groupByPrice`/`renderPriceLegend`/`getSizeLabel`/`renderSimpleItemList`) was the OLD product-card renderer -- unreferenced since the compact-table path (`renderItems`->`buildProductRows`->`renderProductRow`) replaced it, and that live path reads ONLY stored `BaseUnitPrice`/`FinalUnitPrice`/`LineTotal` off the saved `quote_items`. Removed the map + all 440 dead lines (`node --check` clean, no test referenced them). **Prevention:** (a) quote-view + `embroidery-quote-invoice.js` are FROZEN-quote DISPLAY surfaces -- render the per-line prices the engine already saved and derive any upcharge as (extended - base); NEVER re-price via API at display time (that is Rule-9's forbidden 4th path, and the product/rate may have changed since save) and NEVER via a front-end constant. Upcharge authority upstream = API `sellingPriceDisplayAddOns` (`quote-cart-engine.js` HARD-ERRORS on a missing extended size, never a `{2XL:2...}` fallback). (b) Before "fixing" a hardcoded-pricing finding, trace the call graph -- an unreachable subtree is dead code to DELETE, not a live surface to re-wire or wrap in a warning.
 
-### DTG unpriceable location combos FF_JB/JF_FB (2026-06-11, ARCHIVED 2026-06-30): any selector whose choices feed a pricing lookup MUST validate its options against the pricing layer's supported list (a combo `A_B` string-join needs an explicit whitelist); every state entry (click/restore/edit/chat) goes through one sanitizer. Full entry in archive.
-
-### Cloned checkout flows carry channel hardcodes in PUSH notes (2026-06-10, ARCHIVED 2026-06-30): forking an order channel — grep the push-payload builder for EVERY literal the old channel assumed (rush banner, turnaround, part #s) + eyeball one real payload per channel; clean URLs also break relative asset paths (use absolute `/pages/...`). Full entry in archive.
-
 ### Falsy-zero `||10.1` tax bug recurred in EMB after the DTF/SCP fix (2026-06-10): when you fix a falsy-zero MONEY bug in one builder, grep the other 3 for the same literal (`\|\| 10\.1` / `\|\| 0\.101`) THAT DAY (Rule 8) — EMB was missed because each builder hand-rolls rate parsing. All rate inputs now go through shared `parseRatePercent` (quote-builder-utils.js, 0 valid via finite-check), locked by `parse-rate-percent.test.js`. See the Falsy-Zero rule below.
 
 ### PowerShell 5.1 Get-Content/Set-Content round-trip corrupts UTF-8 repo files (2026-06-10, ARCHIVED 2026-07-06): NEVER round-trip repo source through PS 5.1 Get-Content/Set-Content (BOM-less UTF-8 read as ANSI → mojibake file-wide) — use the Edit tool or node; after ANY scripted bulk edit, grep the diff for `â€|Ã|â†`. Full entry in archive.
 
 ### Order-form push: restart node to verify + fees need one source (2026-06-09, ARCHIVED 2026-06-30): Node does NOT hot-reload — restart `node server.js` to verify ANY server-side change (a stale process serves old API); a fee folded into a total must ALSO be an itemized line (one source screen+PDF+push read) and an unresolved/$0 fee must BLOCK the push, never drop silently. Full entry in archive.
-
-### Two shipping-path pricing bugs (2026-06-08, ARCHIVED 2026-06-14): recalc must never read its own written-back display as base; if TotalAmount excludes a charge the mirror re-adds, persist the row the mirror reads; saved TaxAmount taxes (base+shipping). Full entry in archive.
-
-### DTG save read the AI chat quote, not the form (2026-06-08, ARCHIVED 2026-06-14): save must serialize the object reflecting the on-screen total (two sources → save the LIVE one); every new tax/toggle flag re-seeds in reset (missing key → `!undefined===true` flips branches). Full entry in archive.
-
-### Shared band module — alias globals + harness load order (2026-06-08, ARCHIVED 2026-06-14): a shared module aliasing globals loads BEFORE its consumer; add new shared deps to jsdom inject() lists IN ORDER; each reset/edit/draft path calls its own renderOrderRecap(). Full entry in archive.
 
 ### Duplicate `function NAME()` hoisting no-op'd the push button (SCP + DTF, 2026-06-14, ARCHIVED 2026-07-07): two `function NAME(){}` at one scope — the LAST wins at hoist time, both `window.X=X` bind to it; never alias with the same name; locked by `push-button-binding.test.js`. Full entry in archive.
 
@@ -106,8 +100,6 @@ An audit flagged `this.sizeUpcharges` (pages/js/quote-view.js) as feeding custom
 ### To-100 readiness: adversarial-verify caught money gaps in the FIXES themselves (2026-06-06/07, ARCHIVED 2026-06-25): adversarially verify your OWN fixes; persisted UI state must be set BEFORE the first async consumer on EVERY entry path. Full entry in archive.
 
 ### Edit-reload audit — pickup tax overwrite + AL/OSFA mis-bills (2026-06-06, ARCHIVED 2026-06-25): any async call (tax/pricing/inventory) fired DURING a restore races the sync field-restore — gate on `_restoringQuote`; edit-reload is the #1 silent-data-loss surface (jsdom@22 round-trip test). Full entry in archive.
-
-### Shared `pricingData` contract (2026-06-02, ARCHIVED 2026-06-11): all 4 builders wrap invoice input in `QuotePricingData.buildPricingData()` — never post-override after the normalizer; locked by `invoice-totals.test.js`. Full entry in archive.
 
 ### Deep review: systemic PDF-total bug + edit-reopen data loss, 4 builders (2026-06-01, ARCHIVED 2026-06-25): the shared invoice generator must tax the SAME on-screen pre-tax number; the 3 output paths (screen/saved/printed) must AGREE for a quote WITH fee+discount; edit-reopen must restore EVERY saved field. Full entry in archive.
 
@@ -120,10 +112,6 @@ An audit flagged `this.sizeUpcharges` (pages/js/quote-view.js) as feeding custom
 ### APISource routing (2026-06-02/04, ARCHIVED 2026-06-15): OnSite integration's APISource and EVERY push path must be IDENTICAL (`ManageOrders`); order in MO but `/getorderno` count:0 ⇒ suspect this filter FIRST. Full entry in archive.
 
 ### Double size-suffix on push (2026-06-02, ARCHIVED 2026-06-15): push BASE part number + plain size — the integration's Size Translation Table appends modifiers; verify on the PROCESSED SW order. Design types: EMB→2, SCP→1, DTF→8, DTG→45, sticker→4, emblem→5. Full entry in archive.
-
-### ExtDesignID collision (2026-06-02, ARCHIVED 2026-06-11): external dedupe keys (ExtDesignID/ExtOrderID) must be GLOBALLY unique — derive from the FULL QuoteID (date-packed sequences reset daily; SW silently merges). Full entry in archive.
-
-### QuoteID prefix parsing + edit lock (2026-06-01, ARCHIVED 2026-06-11): prefix = LEADING LETTERS (`^[A-Za-z]+`), never `split('-')[0]`; lock edits on `PushedToShopWorks`, not Status. Full entry in archive.
 
 ---
 

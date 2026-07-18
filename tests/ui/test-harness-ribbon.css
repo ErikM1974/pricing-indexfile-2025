@@ -1,0 +1,13 @@
+/* test-harness-ribbon.css — shared "this is a stubbed harness" banner for
+   tests/ui/*.html pages, so a screenshot can never be mistaken for prod. */
+.test-harness-ribbon {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: repeating-linear-gradient(45deg, #fef3c7, #fef3c7 12px, #fde68a 12px, #fde68a 24px);
+    color: #78350f;
+    font: 600 0.78rem/1.4 Inter, sans-serif;
+    text-align: center;
+    padding: 6px 12px;
+    border-bottom: 1px solid #f59e0b;
+}

@@ -122,12 +122,18 @@
         });
     }
 
+    // jotform-lead rows live on the Leads board (dashboards/leads.html) — keep
+    // the ~1,800 imported website leads out of the ops Inbox.
+    function withoutJotformLeads(submissions) {
+        return (submissions || []).filter(function (s) { return s.Form_ID !== 'jotform-lead'; });
+    }
+
     function loadAll() {
         Promise.all([
             inboxFetch(''),
             inboxFetch('/items/open'),
         ]).then(function (results) {
-            state.submissions = results[0].submissions || [];
+            state.submissions = withoutJotformLeads(results[0].submissions);
             state.openItems = results[1].items || [];
             renderStats();
             renderSubmissions();
@@ -475,7 +481,7 @@
 
     function refreshKeepingDetail(submissionId) {
         return Promise.all([inboxFetch(''), inboxFetch('/items/open')]).then(function (results) {
-            state.submissions = results[0].submissions || [];
+            state.submissions = withoutJotformLeads(results[0].submissions);
             state.openItems = results[1].items || [];
             renderStats();
             renderSubmissions();

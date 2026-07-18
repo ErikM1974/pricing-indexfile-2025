@@ -107,6 +107,7 @@ dotenv.config();
 //   GET /api/mo/orders[...]              — ManageOrders reads (PII airtight path, 2026-07-05)
 //   GET /api/staff/payments/recent       — Order_Payments ledger for the Money Collected widget (2026-07-06)
 //   ALL /api/crm-proxy/form-submissions* — Forms Inbox reads/updates (any staff; ~L3230, 2026-07-11)
+//   ALL /api/crm-proxy/order-odbc*       — ORDER_ODBC order history for the Leads board (any staff; 2026-07-18)
 //
 // SAMPLE PROGRAM ('samples' channel, 2026-07-06 — SAM{MMDD}-{rand4} QuoteIDs; handleSamplesOrderPaid ~L1400)
 //   POST /api/samples/create-checkout-session — PAID blank samples: dedicated multi-style route (shared
@@ -3278,6 +3279,12 @@ app.all('/api/crm-proxy/customer-rewards*', ...createCrmProxy('customer-rewards'
 // role gate for requireStaff. Proxy side is secret-only (holds customer contact info).
 const [, formSubmissionsForwarder] = createCrmProxy('form-submissions', []);
 app.all('/api/crm-proxy/form-submissions*', requireStaff, formSubmissionsForwarder);
+
+// Leads board (dashboards/leads.html) order history — ORDER_ODBC reads for a
+// matched ShopWorks customer. Any logged-in staff; the upstream /api/order-odbc
+// is CRM-secret-gated on the proxy (2026-07-18), so browsers must come through here.
+const [, orderOdbcForwarder] = createCrmProxy('order-odbc', []);
+app.all('/api/crm-proxy/order-odbc*', requireStaff, orderOdbcForwarder);
 
 // Blog Editor (dashboards/blog-editor.html) — staff write posts through this
 // forwarder (adds the CRM secret the proxy's gateWritesOnly demands; also lets
