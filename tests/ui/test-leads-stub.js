@@ -72,7 +72,11 @@
             Submitted_At: hoursAgo(70), Updated_At: '', Updated_By: '',
             Art_Request_ID: '', External_Source: '', External_ID: '', Matched_ID_Customer: '', Linked_Quote_ID: '',
             Payload_JSON: JSON.stringify({
-                fields: [['Company', 'Milton Little League'], ['Quantity', '60'], ['Method', 'DTG'], ['Need By', '2026-08-05']],
+                fields: [
+                    ['Company', 'Milton Little League'], ['Quantity', '60'], ['Method', 'DTG'], ['Need By', '2026-08-05'],
+                    // QRQ logo uploads arrive as "Name.ext — <proxy files url>" text (like Jordan Hibbard's real lead)
+                    ['Logo file', 'NWE LOGO.webp — https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/files/testkey-b2b2556b'],
+                ],
                 checks: ['DTG', 'Reply by email'],
             }),
         },
