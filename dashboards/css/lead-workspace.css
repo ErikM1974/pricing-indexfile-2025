@@ -108,6 +108,7 @@
 .lw-item--status .lw-item-icon { background: var(--state-warning-bg, var(--gray-100)); color: var(--state-warning-text, var(--gray-700)); }
 .lw-item--attachment .lw-item-icon { background: var(--state-success-bg, var(--gray-100)); color: var(--state-success-text, var(--gray-700)); }
 .lw-item--quote .lw-item-icon { background: var(--state-success-bg, var(--gray-100)); color: var(--state-success-text, var(--gray-700)); }
+.lw-item--email .lw-item-icon { background: var(--state-info-bg, var(--gray-100)); color: var(--state-info-text, var(--gray-700)); }
 
 .lw-item-body { min-width: 0; flex: 1; }
 .lw-item-meta { font-size: 0.74rem; color: var(--gray-500); margin-bottom: 2px; }
@@ -157,3 +158,36 @@
 .lw-quote-amount { font-size: 1.1rem; font-weight: 700; color: var(--gray-900); }
 .lw-quote-row { display: flex; gap: 6px; margin-top: 8px; }
 .lw-quote-row .lw-quote-input { flex: 1; }
+
+/* ── 🔥 header chips + one-click outreach ── */
+.lw-head-chips { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.lw-fire-chip {
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: var(--state-warning-text, var(--gray-700));
+    background: var(--state-warning-bg, var(--gray-100));
+    border-radius: 999px;
+    padding: 3px 10px;
+}
+
+.lw-outreach-btns { display: flex; flex-direction: column; gap: 6px; }
+.lw-outreach-btn { justify-content: flex-start; }
+.lw-outreach-card { margin-top: 10px; border: 1px solid var(--gray-200); border-radius: var(--radius-md); overflow: hidden; }
+.lw-outreach-subject {
+    font-weight: 700;
+    font-size: 0.84rem;
+    padding: 8px 10px;
+    background: var(--gray-50);
+    border-bottom: 1px solid var(--gray-200);
+}
+.lw-outreach-body { padding: 10px; font-size: 0.8rem; color: var(--gray-800); max-height: 260px; overflow-y: auto; }
+.lw-outreach-body p { margin: 0 0 8px; }
+.lw-outreach-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 8px 10px;
+    border-top: 1px solid var(--gray-200);
+}
+.lw-outreach-sent { margin-top: 10px; font-size: 0.8rem; font-weight: 600; color: var(--state-success-text, var(--gray-700)); }

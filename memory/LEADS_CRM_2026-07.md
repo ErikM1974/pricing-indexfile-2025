@@ -1,6 +1,6 @@
 # Leads CRM — capture + Salesforce-lite pipeline (built & shipped 2026-07-18)
 
-One system, two layers, all live in production. Frontend releases 1689–1694 (v2026.07.18.2→.10); proxy v2026.07.18.2→.5 (`d3f66dd`→`8682e39`).
+One system, two layers, all live in production. Frontend releases 1689–1696 (v2026.07.18.2→.12); proxy v2026.07.18.2→.7 (`d3f66dd`→`e6feff6`).
 
 ## Layer 1 — Unified capture (JotForm + in-app → `Form_Submissions`)
 
@@ -24,6 +24,9 @@ One system, two layers, all live in production. Frontend releases 1689–1694 (v
 - **Follow-up digest**: proxy cron weekdays **7:45 AM PT** (staggered vs 8:00 approval digest) — `src/utils/lead-followup-digest.js`; buckets: overdue (`Due_Date<today`) / due today / new-&-untouched (New, no date, >48h, ≤60d); ONE Caspio read; per-AE via `resolveAEEmailLoose` (full display names!); admin `GET /api/lead-digest/scan` + `POST /api/lead-digest/send` (x-admin-key=ADMIN_KEY_DIGEST). `rep-email-map.js` += Jim/Bradley/Steve→art@/'General'→sales@.
 - **Quote handoff**: workspace "Start a quote" buttons → sessionStorage `nwca-method-switch` {customer incl. customerNumber} + `{builder}?from=methodswitch` — rides existing `takeMethodSwitchPrefill`, **zero builder edits**; suggestions = `quote_sessions?customerEmail=` → one-click Link.
 - **Shared core**: `dashboards/js/leads-common.js` (`window.LeadsCommon`) — vocabulary, formatting, payload/attachment parsing, crm-proxy helpers, `logActivity`. Activity breadcrumbs are client-posted (status/rep/link/upload/quote); Due_Date/Lead_Value edits deliberately NOT logged.
+- **Manual capture** (`manual-lead` / MNL, v2026.07.18.7): board "+ New lead" modal → public `POST /api/form-submissions` (company falls back to "Individual — name"; `salesRep` prefilled from `EMAIL_TO_REP[staffEmail]`; est. value = follow-up PUT after the 201); Slack "📞 New PHONE/WALK-IN LEAD"; in the digest; enrichment SKIPS the rep email when the logger picked a rep (no self-notify). Creates a `system` "Logged manually (source)" activity, then reuses the hash-deep-link path to pop the drawer.
+- **One-click outreach** (workspace "Email the lead" panel): 4 server-built templates (proxy `src/utils/lead-outreach-templates.js` — intro/quote-followup/checking-in/won-thanks; ALL lead values HTML-escaped, jest-locked) → `POST /api/crm-proxy/lead-outreach` `preview:true` renders subject+body inline → Send goes EmailJS `EMAILJS_TEMPLATE_LEAD_OUTREACH` (To=lead, Reply-To=AE only if `@nwcustomapparel.com` else sales@, from_name "AE — Northwest Custom Apparel") + server logs an `email` activity (client mirrors it locally; `Activity_Type` allowlist includes `email`).
+- **🔥 hot badges + response timers** (`leads-common.js` `leadHeat`/`responseTimer`, pure client-side on already-loaded data): hot = deadline words (asap/rush/urgent/needed by/…) OR ≥48 pieces mentioned OR existing customer OR `Lead_Value≥500` — 🔥 with reasons in the title-tooltip on cards/list/workspace header; hot leads float to the top of the New column (stable sort). Timer on untouched `Status='New'`: <1h green "respond: Nm left" / 1–24h amber "Nh waiting" / >24h red "Nd untouched"; clears the moment status changes.
 
 ## Gotchas learned building it (recur-prone)
 
@@ -33,9 +36,12 @@ One system, two layers, all live in production. Frontend releases 1689–1694 (v
 - **Date-only strings (`YYYY-MM-DD`) parse as UTC midnight** → display a day early Pacific; pin to `T12:00:00` (leads-common `fmtWhen`).
 - Harness stubs: ArtworkUpload uses **XMLHttpRequest** — fetch stub alone can't intercept; `test-leads-stub.js` patches XHR for `/api/files/upload`.
 - In a **column** flexbox, `flex-basis` becomes HEIGHT (mobile search-box balloon; fixed with `flex:none` in the media query).
+- **Origin/Referer-gated file endpoints 401 normal clicks** — `target="_blank"` + `rel="noreferrer"` (and privacy browsers) send NO Referer. `/api/jotform/file` is now ungated like `/api/files/:key` (the u= host allow-list is the real guard); links use `rel="noopener"` only.
 - GET `/api/form-submissions` supports `formIds=`/`statusNot=`/`limit=` (≤2000); PUT whitelist incl. Sales_Rep/Matched_ID_Customer/Linked_Quote_ID/Lead_Value.
 
 ## Open / optional
 
 - ⏳ **ERIK: EmailJS `template_lead_followup_digest`** + `heroku config:set EMAILJS_TEMPLATE_LEAD_FOLLOWUP_DIGEST=<id>` — cron activates itself once set (params: to_email/to_name/ae_name/digest_date/counts/overdue_html/due_html/new_html/board_link, triple-stache the *_html).
-- Optional: purge old spam rows from the 12-yr backfill · extend auto-assign/email to QRQ/WSR arrivals · 'House' rep name → sales@ mapping (one backfill row logs unassigned).
+- ⏳ **ERIK: EmailJS `template_lead_outreach`** + `heroku config:set EMAILJS_TEMPLATE_LEAD_OUTREACH=<id>` — until set, Send returns a visible 503 (preview still works). Template fields: To Email `{{to_email}}`, Reply-To `{{reply_to}}`, From Name `{{from_name}}`, Subject `{{subject}}`, body = `{{{body_html}}}` (triple-stache — it's HTML).
+- ⏳ **ERIK: spam sweep** — `Downloads\jotform-spam-candidates.csv` (138/1,766 flagged: url-in-text 61, seo-words 48, dear-sir 25, .ru/.cn-ish 15) — review + bulk-delete in the Caspio datasheet. Regenerate anytime: scratchpad spam-report heuristic (read-only).
+- ✅ DONE 7/18 late (proxy v2026.07.18.6 `4dfb885`): in-app QRQ/WSR/RST arrivals get JotForm-parity enrichment (fire-and-forget assignLead + Matched_ID_Customer stamp + rep email; roster keeps customer-chosen rep) — smoke-proven (QRQ0718-3130 → Jim + #3739, archived). 'House' rep → sales@ in rep-email-map.

@@ -15,13 +15,14 @@
 (function (global) {
     'use strict';
 
-    var LEAD_FORM_IDS = ['jotform-lead', 'quote-request', 'webstore-request', 'team-roster'];
+    var LEAD_FORM_IDS = ['jotform-lead', 'quote-request', 'webstore-request', 'team-roster', 'manual-lead'];
 
     var SOURCE_META = {
         'jotform-lead': { label: 'Website', icon: 'fa-globe' },
         'quote-request': { label: 'Quote Request', icon: 'fa-bullhorn' },
         'webstore-request': { label: 'Webstore', icon: 'fa-store' },
         'team-roster': { label: 'Roster', icon: 'fa-people-group' },
+        'manual-lead': { label: 'Phone/Walk-in', icon: 'fa-phone' },
     };
 
     // Per-form pipelines — mirrors dashboards/js/form-submissions.js STATUS_CHOICES.
@@ -30,6 +31,7 @@
         'quote-request': ['New', 'Contacted', 'Quoted', 'Won', 'Lost', 'Archived'],
         'webstore-request': ['New', 'In Progress', 'Store Built', 'Launched', 'Archived'],
         'team-roster': ['New', 'In Progress', 'Entered in ShopWorks', 'Completed', 'Archived'],
+        'manual-lead': ['New', 'Contacted', 'Quoted', 'Won', 'Lost', 'Archived'],
     };
     var WON_STATUSES = ['Won', 'Launched', 'Completed', 'Entered in ShopWorks'];
     var PIPELINE_STATUSES = ['Contacted', 'Quoted', 'In Progress', 'Store Built'];
@@ -50,6 +52,7 @@
         'quote-request': { new: 'New', contacted: 'Contacted', quoted: 'Quoted', won: 'Won', lost: 'Lost' },
         'webstore-request': { new: 'New', contacted: 'In Progress', quoted: 'Store Built', won: 'Launched', lost: null },
         'team-roster': { new: 'New', contacted: 'In Progress', quoted: null, won: 'Entered in ShopWorks', lost: null },
+        'manual-lead': { new: 'New', contacted: 'Contacted', quoted: 'Quoted', won: 'Won', lost: 'Lost' },
     };
 
     // Display names match Sales_Reps_2026.CustomerServiceRep / the quote-builder
@@ -211,6 +214,35 @@
         });
     }
 
+    // ---------- 🔥 hot-lead + first-response signals ----------
+
+    var HOT_TEXT_RE = /\b(asap|rush|urgent|need(ed)?\s+by|deadline|event date|due date)\b/i;
+    var QTY_RE = /\b(\d{2,4})\s*(pcs|pieces|shirts|tees|t-shirts|caps|hats|hoodies|jackets|polos|uniforms|jerseys|units)\b/i;
+
+    /** Reasons this lead is hot (empty array = not hot). Cheap — data already loaded. */
+    function leadHeat(lead) {
+        var reasons = [];
+        var hay = (lead.Summary || '') + ' ' + (lead.Payload_JSON || '');
+        if (HOT_TEXT_RE.test(hay)) reasons.push('deadline mentioned');
+        var qm = QTY_RE.exec(hay);
+        if (qm && parseInt(qm[1], 10) >= 48) reasons.push(qm[1] + ' pieces mentioned');
+        if (lead.Matched_ID_Customer) reasons.push('existing customer');
+        var v = Number(lead.Lead_Value);
+        if (isFinite(v) && v >= 500) reasons.push('$' + Math.round(v).toLocaleString('en-US') + ' est. value');
+        return reasons;
+    }
+
+    /** First-response countdown for untouched New leads (null when N/A). */
+    function responseTimer(lead) {
+        if (lead.Status !== 'New') return null;
+        var t = Date.parse(lead.Submitted_At);
+        if (isNaN(t)) return null;
+        var mins = Math.floor((Date.now() - t) / 60000);
+        if (mins < 60) return { cls: 'ok', label: 'respond: ' + (60 - mins) + 'm left' };
+        if (mins < 1440) return { cls: 'warn', label: Math.floor(mins / 60) + 'h waiting' };
+        return { cls: 'late', label: Math.floor(mins / 1440) + 'd untouched' };
+    }
+
     // ---------- same-origin crm-proxy fetch helpers ----------
 
     function crmFetch(path, options) {
@@ -275,6 +307,8 @@
         payloadEntries: payloadEntries,
         sourceTitleOf: sourceTitleOf,
         statusCls: statusCls,
+        leadHeat: leadHeat,
+        responseTimer: responseTimer,
         filesBase: filesBase,
         isJfUpload: isJfUpload,
         viewUrl: viewUrl,

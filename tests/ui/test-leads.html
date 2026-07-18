@@ -13,7 +13,7 @@
 
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/leads.css?v=2026.07.18.9">
+    <link rel="stylesheet" href="/dashboards/css/leads.css?v=2026.07.18.12">
     <link rel="stylesheet" href="/tests/ui/test-harness-ribbon.css">
 </head>
 <body>
@@ -29,6 +29,10 @@
                 <h1 class="dash-header-title">Leads</h1>
             </div>
             <div class="dash-header-right">
+                <button type="button" id="btn-new-lead" class="ld-refresh-btn ld-newlead-btn" title="Log a phone or walk-in lead">
+                    <i class="fas fa-plus"></i>
+                    New lead
+                </button>
                 <button type="button" id="btn-refresh" class="ld-refresh-btn" title="Reload leads">
                     <i class="fas fa-rotate"></i>
                     Refresh
@@ -141,12 +145,55 @@
         <div class="ld-drawer-body" id="drawer-body"></div>
     </aside>
 
+    <!-- New-lead modal (mirror of leads.html) -->
+    <div class="ld-overlay" id="newlead-overlay" hidden></div>
+    <div class="ld-modal" id="newlead-modal" role="dialog" aria-modal="true" aria-labelledby="newlead-title" hidden>
+        <div class="ld-modal-head">
+            <h2 class="ld-modal-title" id="newlead-title"><i class="fas fa-phone"></i> New lead — phone / walk-in</h2>
+            <button type="button" class="ld-drawer-close" id="newlead-close" aria-label="Close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="ld-modal-body">
+            <div class="ld-control"><label class="ld-control-label" for="nl-name">Contact name *</label>
+                <input id="nl-name" class="ld-select" type="text" autocomplete="off"></div>
+            <div class="ld-control"><label class="ld-control-label" for="nl-company">Company</label>
+                <input id="nl-company" class="ld-select" type="text" autocomplete="off"></div>
+            <div class="ld-controls">
+                <div class="ld-control"><label class="ld-control-label" for="nl-email">Email</label>
+                    <input id="nl-email" class="ld-select" type="email" autocomplete="off"></div>
+                <div class="ld-control"><label class="ld-control-label" for="nl-phone">Phone</label>
+                    <input id="nl-phone" class="ld-select" type="tel" autocomplete="off"></div>
+            </div>
+            <div class="ld-control"><label class="ld-control-label" for="nl-summary">What they want *</label>
+                <textarea id="nl-summary" class="ld-select" rows="3" placeholder="e.g. 60 hoodies for a crew, needs them by Aug 15"></textarea></div>
+            <div class="ld-controls">
+                <div class="ld-control"><label class="ld-control-label" for="nl-source">How they reached us</label>
+                    <select id="nl-source" class="ld-select">
+                        <option>Phone call</option><option>Walk-in</option><option>Referral</option><option>Email</option><option>Other</option>
+                    </select></div>
+                <div class="ld-control"><label class="ld-control-label" for="nl-rep">Assigned rep</label>
+                    <select id="nl-rep" class="ld-select"></select></div>
+            </div>
+            <div class="ld-controls">
+                <div class="ld-control"><label class="ld-control-label" for="nl-value">Est. value $</label>
+                    <input id="nl-value" class="ld-select" type="number" min="0" step="50" placeholder="0"></div>
+                <div class="ld-control"><label class="ld-control-label" for="nl-due">Follow-up date</label>
+                    <input id="nl-due" class="ld-select" type="date"></div>
+            </div>
+            <div class="ld-modal-actions">
+                <button type="button" id="newlead-save" class="ld-btn ld-btn--primary"><i class="fas fa-plus"></i> Create lead</button>
+                <span id="newlead-status" class="ld-muted"></span>
+            </div>
+        </div>
+    </div>
+
     <!-- Same load order as the real page, with the fetch stub injected before the controller -->
     <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/dash-page-helpers.js"></script>
-    <script src="/dashboards/js/leads-common.js?v=2026.07.18.8"></script>
+    <script src="/dashboards/js/leads-common.js?v=2026.07.18.12"></script>
     <script src="/tests/ui/test-leads-stub.js"></script>
-    <script src="/dashboards/js/leads.js?v=2026.07.18.11"></script>
+    <script src="/dashboards/js/leads.js?v=2026.07.18.12"></script>
 </body>
 </html>

@@ -32,7 +32,7 @@
         uploading: 0,
     };
 
-    var ICONS = { note: 'fa-comment', status: 'fa-arrow-right-arrow-left', attachment: 'fa-paperclip', quote: 'fa-file-invoice-dollar', system: 'fa-gear' };
+    var ICONS = { note: 'fa-comment', status: 'fa-arrow-right-arrow-left', attachment: 'fa-paperclip', quote: 'fa-file-invoice-dollar', system: 'fa-gear', email: 'fa-envelope' };
 
     // ---------- boot ----------
 
@@ -102,6 +102,19 @@
         document.getElementById('lw-head-controls').hidden = false;
         statusSel.onchange = function () { saveLeadField('Status', this.value, this); };
         repSel.onchange = function () { saveLeadField('Sales_Rep', this.value, this); };
+        renderHeadChips(lead);
+    }
+
+    // 🔥 + first-response chips under the title (leads-common heuristics).
+    function renderHeadChips(lead) {
+        var el = document.getElementById('lw-head-chips');
+        if (!el) return;
+        var heat = L.leadHeat(lead);
+        var timer = L.responseTimer(lead);
+        el.innerHTML =
+            (heat.length ? '<span class="lw-fire-chip" title="Why this lead is hot">🔥 ' + esc(heat.join(' · ')) + '</span>' : '') +
+            (timer ? '<span class="ld-timer ld-timer--' + timer.cls + '">' + esc(timer.label) + '</span>' : '');
+        el.hidden = !el.innerHTML;
     }
 
     function saveLeadField(field, value, el) {
@@ -117,6 +130,7 @@
         }).then(function () {
             lead[field] = value;
             if (field === 'Status' && value !== prev) {
+                renderHeadChips(lead); // leaving "New" clears the response timer
                 L.logActivity(lead.Submission_ID, 'status', 'Status: ' + (prev || '—') + ' → ' + value, '', state.staffEmail)
                     .then(function (r) { if (r && r.activity) prependActivity(r.activity); });
             } else if (field === 'Sales_Rep' && value !== prev) {
@@ -284,6 +298,7 @@
     function renderRail() {
         var lead = state.lead;
         renderContactPanel(lead);
+        renderOutreachPanel(lead);
         renderFollowupPanel(lead);
         renderValuePanel(lead);
         renderMatchPanel(lead);
@@ -300,6 +315,105 @@
             '<dt>Email</dt><dd>' + (lead.Email ? '<a href="mailto:' + esc(lead.Email) + '">' + esc(lead.Email) + '</a>' : '—') + '</dd>' +
             '<dt>Phone</dt><dd>' + (lead.Phone ? '<a href="tel:' + esc(lead.Phone) + '">' + esc(lead.Phone) + '</a>' : '—') + '</dd>' +
             '</dl>';
+    }
+
+    // ---------- one-click outreach (4 server-built templates) ----------
+    // Keys mirror proxy src/utils/lead-outreach-templates.js TEMPLATE_KEYS.
+
+    var OUTREACH_TEMPLATES = [
+        { key: 'intro', label: 'Introduction', icon: 'fa-handshake' },
+        { key: 'quote-followup', label: 'Quote follow-up', icon: 'fa-file-invoice-dollar' },
+        { key: 'checking-in', label: 'Checking in', icon: 'fa-comment-dots' },
+        { key: 'won-thanks', label: 'Thanks — welcome aboard', icon: 'fa-circle-check' },
+    ];
+
+    function outreachFetch(payload) {
+        return fetch('/api/crm-proxy/lead-outreach', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        }).then(function (resp) {
+            return resp.json().catch(function () { return {}; }).then(function (b) {
+                if (!resp.ok) throw new Error((b && b.error) || ('HTTP ' + resp.status));
+                return b;
+            });
+        });
+    }
+
+    function outreachBody(lead, tpl, preview) {
+        return {
+            submissionId: lead.Submission_ID,
+            template: tpl.key,
+            preview: !!preview,
+            lead: { contactName: lead.Contact_Name || '', email: lead.Email || '', company: lead.Company || '' },
+            aeName: L.EMAIL_TO_REP[state.staffEmail] || lead.Sales_Rep || 'Northwest Custom Apparel',
+            aeEmail: state.staffEmail,
+        };
+    }
+
+    function renderOutreachPanel(lead) {
+        var root = document.getElementById('lw-panel-outreach');
+        if (!root) return;
+        if (!lead.Email) {
+            root.innerHTML = '<span class="ld-muted">No email on this lead — nothing to send to.</span>';
+            return;
+        }
+        root.classList.remove('ld-muted');
+        root.innerHTML =
+            '<div class="lw-outreach-btns">' + OUTREACH_TEMPLATES.map(function (t, i) {
+                return '<button type="button" class="ld-btn lw-outreach-btn" data-tpl="' + i + '">' +
+                    '<i class="fas ' + t.icon + '"></i> ' + t.label + '</button>';
+            }).join('') + '</div>' +
+            '<div id="lw-outreach-preview"></div>';
+        Array.prototype.forEach.call(root.querySelectorAll('[data-tpl]'), function (b) {
+            b.addEventListener('click', function () {
+                previewOutreach(lead, OUTREACH_TEMPLATES[parseInt(b.getAttribute('data-tpl'), 10)]);
+            });
+        });
+    }
+
+    function previewOutreach(lead, tpl) {
+        var box = document.getElementById('lw-outreach-preview');
+        box.innerHTML = '<span class="ld-muted">Building preview…</span>';
+        outreachFetch(outreachBody(lead, tpl, true)).then(function (p) {
+            box.innerHTML =
+                '<div class="lw-outreach-card">' +
+                '<div class="lw-outreach-subject">' + esc(p.subject || '') + '</div>' +
+                // bodyHtml is OUR server-side template output — every lead-supplied
+                // value is HTML-escaped in lead-outreach-templates.js (jest-locked).
+                '<div class="lw-outreach-body">' + (p.bodyHtml || '') + '</div>' +
+                '<div class="lw-outreach-actions">' +
+                '<button type="button" id="lw-outreach-send" class="ld-btn ld-btn--primary">' +
+                '<i class="fas fa-paper-plane"></i> Send to ' + esc(lead.Email) + '</button>' +
+                '<button type="button" id="lw-outreach-cancel" class="lw-chip">Cancel</button>' +
+                '<span id="lw-outreach-note" class="ld-muted"></span>' +
+                '</div></div>';
+            document.getElementById('lw-outreach-cancel').addEventListener('click', function () { box.innerHTML = ''; });
+            document.getElementById('lw-outreach-send').addEventListener('click', function () {
+                var btn = this;
+                btn.disabled = true;
+                document.getElementById('lw-outreach-note').textContent = 'Sending…';
+                outreachFetch(outreachBody(lead, tpl, false)).then(function (r) {
+                    box.innerHTML = '<div class="lw-outreach-sent"><i class="fas fa-circle-check"></i> Sent “' +
+                        esc(r.label || tpl.label) + '” to ' + esc(r.to || lead.Email) + '</div>';
+                    // The proxy logged the 'email' activity server-side; mirror it
+                    // locally so the timeline updates without a refetch.
+                    prependActivity({
+                        Activity_Type: 'email',
+                        Activity_Text: 'Emailed “' + (r.label || tpl.label) + '” → ' + (r.to || lead.Email),
+                        Created_By: state.staffEmail || 'leads-page',
+                        Created_At: new Date().toISOString(),
+                    });
+                }).catch(function (err) {
+                    btn.disabled = false;
+                    var note = document.getElementById('lw-outreach-note');
+                    if (note) note.textContent = '';
+                    DashPage.showError('Email NOT sent: ' + err.message);
+                });
+            });
+        }).catch(function (err) {
+            box.innerHTML = '<span class="ld-muted">Preview failed (' + esc(err.message) + ').</span>';
+        });
     }
 
     function renderFollowupPanel(lead) {

@@ -104,7 +104,102 @@
         });
         document.getElementById('drawer-close').addEventListener('click', closeDrawer);
         document.getElementById('drawer-overlay').addEventListener('click', closeDrawer);
-        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeDrawer(); });
+        document.getElementById('btn-new-lead').addEventListener('click', openNewLead);
+        document.getElementById('newlead-close').addEventListener('click', closeNewLead);
+        document.getElementById('newlead-overlay').addEventListener('click', closeNewLead);
+        document.getElementById('newlead-save').addEventListener('click', saveNewLead);
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') { closeDrawer(); closeNewLead(); }
+        });
+    }
+
+    // ---------- new-lead modal (manual phone / walk-in capture) ----------
+
+    function openNewLead() {
+        var repSel = document.getElementById('nl-rep');
+        repSel.innerHTML = L.REPS.map(function (r) { return '<option>' + esc(r) + '</option>'; }).join('');
+        repSel.value = L.EMAIL_TO_REP[state.staffEmail] || 'Taneisha Clark';
+        if (!repSel.value) repSel.value = L.REPS[0];
+        document.getElementById('newlead-status').textContent = '';
+        document.getElementById('newlead-overlay').hidden = false;
+        document.getElementById('newlead-modal').hidden = false;
+        document.getElementById('nl-name').focus();
+    }
+
+    function closeNewLead() {
+        document.getElementById('newlead-overlay').hidden = true;
+        document.getElementById('newlead-modal').hidden = true;
+    }
+
+    function saveNewLead() {
+        var name = document.getElementById('nl-name').value.trim();
+        var summary = document.getElementById('nl-summary').value.trim();
+        var statusEl = document.getElementById('newlead-status');
+        if (!name || !summary) {
+            statusEl.textContent = 'Contact name and “what they want” are required.';
+            return;
+        }
+        var company = document.getElementById('nl-company').value.trim();
+        var source = document.getElementById('nl-source').value;
+        var rep = document.getElementById('nl-rep').value;
+        var value = document.getElementById('nl-value').value.trim();
+        var due = document.getElementById('nl-due').value;
+        var btn = document.getElementById('newlead-save');
+        btn.disabled = true;
+        statusEl.textContent = 'Saving…';
+
+        var body = {
+            formId: 'manual-lead',
+            contactName: name,
+            company: company || ('Individual — ' + name),
+            email: document.getElementById('nl-email').value.trim(),
+            phone: document.getElementById('nl-phone').value.trim(),
+            summary: summary.slice(0, 250),
+            salesRep: rep,
+            payload: {
+                fields: [
+                    ['How they reached us', source],
+                    ['What they want', summary],
+                    ['Logged by', state.staffEmail || 'staff'],
+                ],
+            },
+        };
+        if (due) body.dueDateIso = due;
+
+        fetch(DashPage.apiUrl('/api/form-submissions'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        }).then(function (resp) {
+            return resp.json().catch(function () { return {}; }).then(function (b) {
+                if (!resp.ok) throw new Error((b && b.error) || ('HTTP ' + resp.status));
+                return b;
+            });
+        }).then(function (created) {
+            var id = created.submissionId;
+            L.logActivity(id, 'system', 'Logged manually (' + source + ') by ' + (state.staffEmail || 'staff'), '', state.staffEmail);
+            var finish = function () {
+                closeNewLead();
+                ['nl-name', 'nl-company', 'nl-email', 'nl-phone', 'nl-summary', 'nl-value', 'nl-due'].forEach(function (fid) {
+                    document.getElementById(fid).value = '';
+                });
+                // Reuse the deep-link path so the fresh lead opens in the drawer.
+                state.hashOpened = false;
+                location.hash = encodeURIComponent(id);
+                loadLeads();
+            };
+            var v = Number(value);
+            if (value && isFinite(v) && v > 0) {
+                L.crmFetch('/' + encodeURIComponent(id), {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ Lead_Value: String(v), Updated_By: state.staffEmail || 'leads-page' }),
+                }).then(finish, finish);
+            } else finish();
+        }).catch(function (err) {
+            console.error('[leads] manual lead save failed:', err);
+            statusEl.textContent = 'Could not save: ' + err.message;
+        }).finally(function () { btn.disabled = false; });
     }
 
     // ---------- data ----------
@@ -229,16 +324,20 @@
         }
         tbody.innerHTML = rows.map(function (l) {
             var meta = L.SOURCE_META[l.Form_ID] || { label: l.Form_ID, icon: 'fa-file' };
+            var heat = L.leadHeat(l);
+            var timer = L.responseTimer(l);
             return '<tr data-id="' + esc(l.Submission_ID) + '">' +
                 '<td class="ld-when">' + fmtWhen(l.Submitted_At) + '</td>' +
                 '<td class="ld-id">' + esc(l.Submission_ID) + '</td>' +
                 '<td><div class="ld-contact-name">' + esc(l.Contact_Name || '—') + '</div>' +
                     '<div class="ld-contact-email">' + esc(l.Email || '') + '</div></td>' +
-                '<td>' + esc(l.Company || '—') + '</td>' +
+                '<td>' + (heat.length ? '<span class="ld-fire" title="Hot lead: ' + esc(heat.join(' · ')) + '">🔥</span> ' : '') +
+                    esc(l.Company || '—') + '</td>' +
                 '<td><span class="ld-badge ld-badge--' + esc(l.Form_ID) + '" title="' + esc(L.sourceTitleOf(l)) + '">' +
                     '<i class="fas ' + esc(meta.icon) + '"></i> ' + esc(meta.label) + '</span></td>' +
                 '<td>' + esc(l.Sales_Rep || '—') + '</td>' +
-                '<td><span class="ld-status ' + L.statusCls(l.Status) + '">' + esc(l.Status || '—') + '</span></td>' +
+                '<td><span class="ld-status ' + L.statusCls(l.Status) + '">' + esc(l.Status || '—') + '</span>' +
+                    (timer ? ' <span class="ld-timer ld-timer--' + timer.cls + '">' + esc(timer.label) + '</span>' : '') + '</td>' +
                 '</tr>';
         }).join('');
 
@@ -276,13 +375,17 @@
         var meta = L.SOURCE_META[l.Form_ID] || { icon: 'fa-file', label: l.Form_ID };
         var overdue = L.isOverdue(l.Due_Date);
         var val = Number(l.Lead_Value);
+        var heat = L.leadHeat(l);
+        var timer = L.responseTimer(l);
         return '<div class="ld-card" draggable="true" data-id="' + esc(l.Submission_ID) + '" title="' + esc(l.Status || '') + '">' +
             '<div class="ld-card-top"><span class="ld-card-company">' + esc(l.Company || '(no company)') + '</span>' +
+            (heat.length ? '<span class="ld-fire" title="Hot lead: ' + esc(heat.join(' · ')) + '">🔥</span>' : '') +
             (overdue ? '<span class="ld-dot" title="Follow-up overdue (' + esc(l.Due_Date) + ')"></span>' : '') + '</div>' +
             '<div class="ld-card-contact">' + esc(l.Contact_Name || '') + '</div>' +
             '<div class="ld-card-meta">' +
             '<span class="ld-card-src" title="' + esc(L.sourceTitleOf(l)) + '"><i class="fas ' + esc(meta.icon) + '"></i></span>' +
             (isFinite(val) && val > 0 ? '<span class="ld-card-val">$' + Math.round(val).toLocaleString('en-US') + '</span>' : '') +
+            (timer ? '<span class="ld-timer ld-timer--' + timer.cls + '">' + esc(timer.label) + '</span>' : '') +
             '<span class="ld-card-age">' + esc(ageDays(l.Submitted_At)) + '</span>' +
             (l.Sales_Rep ? '<span class="ld-rep-chip" title="' + esc(l.Sales_Rep) + '">' + esc(repInitials(l.Sales_Rep)) + '</span>' : '') +
             '</div></div>';
@@ -304,6 +407,11 @@
             }
             byCol[col].push(l);
         });
+
+        // 🔥 leads float to the top of New (stable order within each group).
+        var hotNew = [], coldNew = [];
+        byCol.new.forEach(function (l) { (L.leadHeat(l).length ? hotNew : coldNew).push(l); });
+        byCol.new = hotNew.concat(coldNew);
 
         var board = document.getElementById('leads-board');
         board.innerHTML = COLUMNS.map(function (c) {

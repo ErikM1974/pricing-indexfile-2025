@@ -13,8 +13,8 @@
 
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/leads.css?v=2026.07.18.9">
-    <link rel="stylesheet" href="/dashboards/css/lead-workspace.css?v=2026.07.18.10">
+    <link rel="stylesheet" href="/dashboards/css/leads.css?v=2026.07.18.12">
+    <link rel="stylesheet" href="/dashboards/css/lead-workspace.css?v=2026.07.18.12">
     <link rel="stylesheet" href="/tests/ui/test-harness-ribbon.css">
 </head>
 <body>
@@ -50,6 +50,7 @@
                 <div class="lw-head-main">
                     <div class="lw-title" id="lw-title">Loading lead…</div>
                     <div class="lw-sub" id="lw-sub"></div>
+                    <div class="lw-head-chips" id="lw-head-chips" hidden></div>
                 </div>
                 <div class="lw-head-controls" id="lw-head-controls" hidden>
                     <div class="ld-control">
@@ -98,6 +99,10 @@
                         <div id="lw-panel-contact" class="ld-muted">—</div>
                     </div>
                     <div class="dash-card lw-panel">
+                        <div class="ld-section-title">Email the lead</div>
+                        <div id="lw-panel-outreach" class="ld-muted">—</div>
+                    </div>
+                    <div class="dash-card lw-panel">
                         <div class="ld-section-title">Follow-up</div>
                         <div id="lw-panel-followup"></div>
                     </div>
@@ -136,8 +141,8 @@
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/dash-page-helpers.js"></script>
     <script src="/shared_components/js/artwork-upload.js"></script>
-    <script src="/dashboards/js/leads-common.js?v=2026.07.18.8"></script>
+    <script src="/dashboards/js/leads-common.js?v=2026.07.18.12"></script>
     <script src="/tests/ui/test-leads-stub.js"></script>
-    <script src="/dashboards/js/lead-workspace.js?v=2026.07.18.11"></script>
+    <script src="/dashboards/js/lead-workspace.js?v=2026.07.18.12"></script>
 </body>
 </html>
