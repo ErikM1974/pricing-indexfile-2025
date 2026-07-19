@@ -1,3 +1,17 @@
+## v2026.07.19.1 (2026.07.19)
+
+- fix(leads): Board/List toggle dead — [hidden] guard in leads.css (.ld-board display:grid beat UA [hidden]); archive 2 resolved LESSONS entries
+- docs(memory): spam sweep done 2026-07-19 — 9 archived (2 CSV + 7 human-reviewed), digest 32→23
+- fix(leads): quote-builder prefill from a lead now works (all 4 builders)
+- fix(leads): confirmed-bug batch — filters, link-customer, a11y, security, in-flight guards
+- fix(leads): workspace bug batch — quote link/unlink, hash crash, revert, outreach, retry
+- feat(leads): Export button — download the current view as Excel-ready CSV
+- feat(leads): Edit lead (both surfaces) + admin-only Delete + fix spoofable attribution
+- docs(memory): Leads CRM hardening + AE-portal batch (2026-07-19)
+- feat(leads): Send samples — AE places a sample order prefilled from a lead
+- feat(leads-crm): rep scorecard page + auto-Won conversion forwarder
+- test+docs(leads-crm): scorecard UI test harness + ACTIVE_FILES entry
+
 ## v2026.07.18.13 (2026.07.18)
 
 - fix(leads-crm): 🔥 heat scans field VALUES not raw Payload_JSON (QRQ 'Need By' label flagged every submission) + future-date need-by detection + per-lead cache w/ clearHeat invalidation; workspace chips refresh on any save; modal focus-return a11y
