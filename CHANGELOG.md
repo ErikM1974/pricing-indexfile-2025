@@ -1,3 +1,8 @@
+## v2026.07.19.2 (2026.07.19)
+
+- feat(leads): Send to the art team — hand a lead to Steve/Ruth, prefilled + linked
+- docs(memory): art + sample handoffs shipped; marketing-kit scoped (needs Caspio tables)
+
 ## v2026.07.19.1 (2026.07.19)
 
 - fix(leads): Board/List toggle dead — [hidden] guard in leads.css (.ld-board display:grid beat UA [hidden]); archive 2 resolved LESSONS entries
