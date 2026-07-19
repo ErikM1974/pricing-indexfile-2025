@@ -28,9 +28,12 @@
         lead: null,
         activities: [],
         staffEmail: '',
+        perms: [],
         matchCache: {},
         uploading: 0,
     };
+
+    function isAdmin() { return state.perms.indexOf('admin') !== -1; }
 
     var ICONS = { note: 'fa-comment', status: 'fa-arrow-right-arrow-left', attachment: 'fa-paperclip', quote: 'fa-file-invoice-dollar', system: 'fa-gear', email: 'fa-envelope' };
 
@@ -39,7 +42,7 @@
     document.addEventListener('DOMContentLoaded', function () {
         fetch('/api/crm-session/me')
             .then(function (r) { return r.json(); })
-            .then(function (me) { state.staffEmail = me.email || ''; })
+            .then(function (me) { state.staffEmail = me.email || ''; state.perms = me.permissions || []; if (state.lead) renderHeadActions(state.lead); })
             .catch(function () { /* Created_By falls back to 'leads-page' */ });
 
         var rawHash = (location.hash || '').slice(1);
@@ -106,6 +109,28 @@
         statusSel.onchange = function () { saveLeadField('Status', this.value, this); };
         repSel.onchange = function () { saveLeadField('Sales_Rep', this.value, this); };
         renderHeadChips(lead);
+        renderHeadActions(lead);
+    }
+
+    // Edit info (all staff) + Delete (admin only, server-enforced). Re-rendered
+    // when permissions arrive (the session fetch may resolve after the lead loads).
+    function renderHeadActions(lead) {
+        var el = document.getElementById('lw-head-actions');
+        if (!el) return;
+        el.innerHTML =
+            '<button type="button" id="lw-edit" class="ld-btn"><i class="fas fa-pen"></i> Edit info</button>' +
+            (isAdmin() ? '<button type="button" id="lw-delete" class="ld-btn ld-btn--danger"><i class="fas fa-trash"></i> Delete</button>' : '');
+        el.hidden = false;
+        document.getElementById('lw-edit').addEventListener('click', function () {
+            L.openEditLeadModal(lead, { staffEmail: state.staffEmail, onSaved: function () {
+                renderHeader();      // repaint title/sub/chips with the new values
+                renderRail();        // contact + artwork panels read the edited fields
+            } });
+        });
+        var del = document.getElementById('lw-delete');
+        if (del) del.addEventListener('click', function () {
+            L.deleteLead(lead, { onDeleted: function () { window.location.href = '/dashboards/leads.html'; } });
+        });
     }
 
     // 🔥 + first-response chips under the title (leads-common heuristics).

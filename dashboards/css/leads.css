@@ -286,6 +286,11 @@
 .ld-modal-actions { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
 .ld-btn--primary { background: var(--gray-900); color: var(--surface-card); border-color: var(--gray-900); }
 .ld-btn--primary:hover { background: var(--gray-700); color: var(--surface-card); }
+.ld-btn--danger { color: var(--state-danger, #b42318); border-color: var(--state-danger, #f0c2bd); }
+.ld-btn--danger:hover { background: var(--state-danger-bg, #fde8e8); color: var(--state-danger, #b42318); }
+
+/* Edit / Delete action row at the top of the drawer body */
+.ld-drawer-actions { display: flex; gap: 8px; }
 
 /* ── 🔥 heat + first-response timer ── */
 .ld-fire { flex-shrink: 0; font-size: 0.85rem; cursor: help; }

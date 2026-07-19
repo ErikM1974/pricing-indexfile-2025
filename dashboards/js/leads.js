@@ -34,6 +34,7 @@
         hashOpened: false,      // #Submission_ID deep link handled once per load
         loadSeq: 0,             // in-flight guard: only the newest loadLeads wins
         drawerReturnFocus: null,// element to restore focus to when the drawer closes
+        perms: [],              // staff permissions (from /api/crm-session/me) — gates Delete
         view: (function () {    // board default on desktop, list on narrow; persisted
             try { var v = localStorage.getItem('nwca-leads-view'); if (v) return v; } catch (e) { /* private mode */ }
             return window.innerWidth < 768 ? 'list' : 'board';
@@ -46,10 +47,12 @@
         wireChrome();
         fetch('/api/crm-session/me')
             .then(function (r) { return r.json(); })
-            .then(function (me) { state.staffEmail = me.email || ''; updateMineChip(); })
+            .then(function (me) { state.staffEmail = me.email || ''; state.perms = me.permissions || []; updateMineChip(); })
             .catch(function () { /* Updated_By falls back to 'leads-page' */ });
         loadLeads();
     });
+
+    function isAdmin() { return state.perms.indexOf('admin') !== -1; }
 
     function updateMineChip() {
         var chip = document.getElementById('filter-mine');
@@ -664,6 +667,10 @@
             : '';
 
         document.getElementById('drawer-body').innerHTML =
+            '<div class="ld-section ld-drawer-actions">' +
+                '<button type="button" id="drawer-edit" class="ld-btn"><i class="fas fa-pen"></i> Edit info</button>' +
+                (isAdmin() ? '<button type="button" id="drawer-delete" class="ld-btn ld-btn--danger"><i class="fas fa-trash"></i> Delete</button>' : '') +
+            '</div>' +
             '<div class="ld-section"><div class="ld-controls">' +
                 '<div class="ld-control"><label class="ld-control-label" for="drawer-status">Status</label>' +
                 '<select id="drawer-status" class="ld-select">' +
@@ -699,6 +706,20 @@
             });
         });
 
+        document.getElementById('drawer-edit').addEventListener('click', function () {
+            L.openEditLeadModal(lead, { staffEmail: state.staffEmail, onSaved: function () {
+                renderStats(); renderFilters(); renderView();
+                if (state.current === lead) openDrawer(lead); // repaint the drawer with the new values
+            } });
+        });
+        var delBtn = document.getElementById('drawer-delete');
+        if (delBtn) delBtn.addEventListener('click', function () {
+            L.deleteLead(lead, { onDeleted: function () {
+                state.leads = state.leads.filter(function (l) { return l.Submission_ID !== lead.Submission_ID; });
+                closeDrawer();
+                renderStats(); renderFilters(); renderView();
+            } });
+        });
         document.getElementById('drawer-status').addEventListener('change', function () {
             saveField(lead, 'Status', this.value, this);
         });

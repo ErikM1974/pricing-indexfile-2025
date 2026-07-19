@@ -3275,11 +3275,51 @@ app.all('/api/crm-proxy/portal-reorder*', ...createCrmProxy('portal-reorder', PO
 // through the dedicated /api/portal-admin/rewards/entry (which stamps the staff email).
 app.all('/api/crm-proxy/customer-rewards*', ...createCrmProxy('customer-rewards', PORTAL_ADMIN_ROLES));
 
+// The verified session email is the ONLY source of truth for audit-attribution
+// fields — the client body used to supply Updated_By/Created_By, so any staffer
+// could attribute an edit / timeline note to a colleague. Overwrite it server-side.
+function stampSessionIdentity(field) {
+  return (req, res, next) => {
+    if (req.body && ['POST', 'PUT', 'PATCH'].includes(req.method)) {
+      const email = (req.session && req.session.crmUser && req.session.crmUser.email) || '';
+      if (email) req.body[field] = email;
+    }
+    next();
+  };
+}
+
+// Hard-delete a lead — ADMIN ONLY, enforced HERE (identity from the session, never
+// the request). Registered BEFORE the generic mount so it wins the route match; the
+// deletedBy is appended server-side from the verified session. Mirrors the
+// quote_sessions delete precedent. The proxy DELETE cascades the lead's timeline.
+app.delete('/api/crm-proxy/form-submissions/:submissionId', requireCrmRole(['admin']), async (req, res) => {
+  try {
+    const caller = req.session && req.session.crmUser;
+    if (!caller) return res.status(401).json({ error: 'Unauthorized' });
+    const email = String(caller.email || '').toLowerCase();
+    const id = encodeURIComponent(req.params.submissionId);
+    const url = `${CRM_API_BASE}/api/form-submissions/${id}?deletedBy=${encodeURIComponent(email)}`;
+    const response = await fetch(url, { method: 'DELETE', headers: { 'X-CRM-API-Secret': CRM_API_SECRET } });
+    const data = await response.json().catch(() => ({}));
+    if (response.ok) console.log(`[lead-delete] ${email} deleted ${req.params.submissionId}`);
+    else console.warn(`[lead-delete] BLOCKED/failed ${req.params.submissionId} for ${email} → ${response.status}`);
+    res.status(response.status).json(data);
+  } catch (err) {
+    console.error('[lead-delete] error:', err.message);
+    res.status(500).json({ error: 'Delete failed', message: err.message });
+  }
+});
+
 // Form Submissions (Forms Inbox) — saved fillable-form twins. ANY logged-in staff
 // (like unlisted dashboard pages), so we reuse the factory's forwarder but swap the
 // role gate for requireStaff. Proxy side is secret-only (holds customer contact info).
+// DELETE is 405'd here so no future proxy delete surface is any-staff-reachable —
+// hard delete goes through the admin-only route above. Updated_By is session-stamped.
 const [, formSubmissionsForwarder] = createCrmProxy('form-submissions', []);
-app.all('/api/crm-proxy/form-submissions*', requireStaff, formSubmissionsForwarder);
+app.all('/api/crm-proxy/form-submissions*', requireStaff, (req, res, next) => {
+  if (req.method === 'DELETE') return res.status(405).json({ error: 'Deleting a lead requires the admin delete route.' });
+  next();
+}, stampSessionIdentity('Updated_By'), formSubmissionsForwarder);
 
 // Leads board (dashboards/leads.html) order history — ORDER_ODBC reads for a
 // matched ShopWorks customer. Any logged-in staff; the upstream /api/order-odbc
@@ -3290,7 +3330,7 @@ app.all('/api/crm-proxy/order-odbc*', requireStaff, orderOdbcForwarder);
 // Leads CRM activity timeline (notes / status history / attachments on a lead) —
 // Lead_Activity reads+appends. Any logged-in staff; secret-only upstream.
 const [, leadActivityForwarder] = createCrmProxy('lead-activity', []);
-app.all('/api/crm-proxy/lead-activity*', requireStaff, leadActivityForwarder);
+app.all('/api/crm-proxy/lead-activity*', requireStaff, stampSessionIdentity('createdBy'), leadActivityForwarder);
 
 // Leads CRM one-click outreach emails (preview + send-as-the-AE, logged to the
 // timeline). Any logged-in staff; secret-only upstream.
