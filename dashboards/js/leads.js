@@ -259,7 +259,12 @@
         var tbody = document.getElementById('leads-tbody');
         tbody.innerHTML = '<tr><td colspan="7" class="ld-empty dash-loading">Loading leads…</td></tr>';
 
-        var limit = state.includeArchived ? 2000 : 600;
+        // Fetch the full set (proxy hard-caps at 2000). ~1,066 non-archived +
+        // ~700 archived both fit, so the board shows every lead and the count
+        // tiles + column totals are accurate. Loads once on open/refresh — no
+        // polling (Caspio quota). If leads ever exceed 2000, the cap-warning
+        // below fires honestly and we trim old terminal leads server-side.
+        var limit = 2000;
         var params = new URLSearchParams();
         params.set('formIds', L.LEAD_FORM_IDS.join(','));
         params.set('limit', String(limit));
