@@ -1,3 +1,8 @@
+## v2026.07.19.3 (2026.07.19)
+
+- feat(leads): Send a marketing kit — AE picks box contents, Mikalah works the queue
+- chore(leads): cache-bust lead-workspace .3→.4 (kit modal changes)
+
 ## v2026.07.19.2 (2026.07.19)
 
 - feat(leads): Send to the art team — hand a lead to Steve/Ruth, prefilled + linked
