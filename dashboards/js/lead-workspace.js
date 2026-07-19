@@ -590,12 +590,19 @@
     ];
 
     // Hand the lead's identity to a builder via the EXISTING method-switch
-    // prefill (quote-builder-utils.js takeMethodSwitchPrefill — zero builder
-    // edits): sessionStorage + ?from=methodswitch.
+    // prefill (quote-builder-utils.js takeMethodSwitchPrefill drains this on the
+    // builder side — zero per-builder edits for the trio; DTG has its own reader).
+    // The builder opens in a NEW tab with `noopener`, whose sessionStorage does
+    // NOT inherit ours — so we stash in localStorage under the shared
+    // 'nwca-method-switch' key (ts-stamped; the reader TTL-checks + drains it).
     function startQuote(builderUrl) {
         var lead = state.lead;
+        var stashed = false;
         try {
-            sessionStorage.setItem('nwca-method-switch', JSON.stringify({
+            localStorage.setItem('nwca-method-switch', JSON.stringify({
+                ts: Date.now(),
+                from: 'lead',
+                fromLabel: 'Leads CRM',
                 customer: {
                     name: lead.Contact_Name || '',
                     email: lead.Email || '',
@@ -605,7 +612,13 @@
                 },
                 products: [],
             }));
-        } catch (e) { /* storage blocked — builder opens unprefilled */ }
+            stashed = true;
+        } catch (e) {
+            console.error('[leads] method-switch stash failed', e);
+        }
+        if (!stashed) {
+            DashPage.showError('Could not carry the customer into the quote builder (browser storage blocked). Open the builder and enter the customer info manually.');
+        }
         window.open(builderUrl + '?from=methodswitch', '_blank', 'noopener');
         L.logActivity(lead.Submission_ID, 'system', 'Started a quote (' + builderUrl.split('/').pop().replace('-quote-builder.html', '') + ')', '', state.staffEmail)
             .then(function (r) { if (r && r.activity) prependActivity(r.activity); });
