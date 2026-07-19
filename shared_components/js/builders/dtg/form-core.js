@@ -3,7 +3,7 @@
  * dtg-inline-form.js IIFE; lexical references became the imports below.
  */
 /* global Node, QuoteOrderSummary, alert, clearQuickQuoteParams, getQuickQuotePrefill,
-   markAsUnsaved, setupBeforeUnloadGuard, showToast,
+   history, markAsUnsaved, setupBeforeUnloadGuard, showToast, takeMethodSwitchPrefill,
    */
 import { attachNewArtworkUpload } from './artwork.js';
 import { attachColorCombobox, attachCompanyCombobox, attachDesignCombobox, attachStyleCombobox, closeDesignLightbox, fuzzyMatchColor, kickInventoryFetch, openDesignLightbox, refreshDesignComboboxForNewCustomer } from './catalog-search.js';
@@ -1532,6 +1532,34 @@ export function init() {
         }, null);
         if (typeof showToast === 'function') showToast('Loaded ' + qqPrefill.style + ' from Quick Quote — verify details', 'info', 6000);
         if (typeof clearQuickQuoteParams === 'function') clearQuickQuoteParams();
+        return;
+    }
+
+    // Method-switch / Leads handoff (?from=methodswitch): carry the CUSTOMER
+    // identity only (the trio applies it via applyMethodSwitchCustomer; DTG's
+    // form is its own architecture so we map the shared payload onto the DTG
+    // customer fields through fillFromQuote — the same setter the AI/Quick-Quote
+    // paths use, so no pricing is carried). Lead fields are attacker-controlled;
+    // fillFromQuote sets input .value only (never innerHTML). Wins over
+    // session-restore for this visit, same priority as ?edit=/?from=quickquote.
+    const msPrefill = (typeof takeMethodSwitchPrefill === 'function') ? takeMethodSwitchPrefill() : null;
+    if (msPrefill && msPrefill.customer && (msPrefill.customer.name || msPrefill.customer.company || msPrefill.customer.email)) {
+        const c = msPrefill.customer;
+        if (state.rows.length === 0) state.rows.push(newBlankRow());
+        render();
+        fillFromQuote(null, {
+            name: c.name || '',
+            company: c.company || '',
+            customer_number: c.customerNumber || '',
+            email: c.email || '',
+            phone: c.phone || '',
+        });
+        if (typeof showToast === 'function') {
+            showToast('Customer carried over from ' + (msPrefill.fromLabel || 'the lead') + ' — add products to price', 'info', 6000);
+        }
+        if (typeof markAsUnsaved === 'function') markAsUnsaved();
+        // Strip the param so a refresh doesn't re-run the (now-drained) handoff.
+        try { history.replaceState(null, '', window.location.pathname); } catch (_) { /* ignore */ }
         return;
     }
 

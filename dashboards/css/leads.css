@@ -10,6 +10,10 @@
    hardcode colors/shadows/radii — use var(--token-name).
    ========================================================================== */
 
+/* Author display rules (.ld-board { display: grid }) beat the UA's
+   [hidden] { display: none }, so JS view toggling silently fails without this. */
+[hidden] { display: none !important; }
+
 /* ── Toolbar ── */
 .ld-toolbar-header { display: flex; align-items: baseline; gap: 10px; }
 .ld-count { font-size: 0.82rem; color: var(--gray-500); }
@@ -95,6 +99,27 @@
     gap: 6px;
 }
 .ld-chip-btn[aria-pressed="true"] { background: var(--gray-900); color: var(--surface-card); border-color: var(--gray-900); }
+
+/* The drawer (position:fixed, z-index 70) + modals (z-index 80) cover the
+   in-flow dash error banner — on a phone the 96vw drawer hides it entirely and
+   the overlay eats its dismiss click. Pin it above everything when shown so a
+   save-failure message from inside the drawer is always visible + dismissable. */
+.dash-error-banner.show {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    z-index: 95;
+    margin: 0;
+    box-shadow: var(--shadow-lg);
+}
+
+/* Keyboard focus for the mouse-openable cards/rows (they're role=button now). */
+.ld-card:focus-visible,
+.ld-table tr[data-id]:focus-visible {
+    outline: 2px solid var(--gray-900);
+    outline-offset: -2px;
+}
 
 /* ── Kanban board ── */
 .ld-board {
@@ -261,6 +286,11 @@
 .ld-modal-actions { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
 .ld-btn--primary { background: var(--gray-900); color: var(--surface-card); border-color: var(--gray-900); }
 .ld-btn--primary:hover { background: var(--gray-700); color: var(--surface-card); }
+.ld-btn--danger { color: var(--state-danger, #b42318); border-color: var(--state-danger, #f0c2bd); }
+.ld-btn--danger:hover { background: var(--state-danger-bg, #fde8e8); color: var(--state-danger, #b42318); }
+
+/* Edit / Delete action row at the top of the drawer body */
+.ld-drawer-actions { display: flex; gap: 8px; }
 
 /* ── 🔥 heat + first-response timer ── */
 .ld-fire { flex-shrink: 0; font-size: 0.85rem; cursor: help; }

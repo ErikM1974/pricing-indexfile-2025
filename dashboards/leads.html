@@ -16,7 +16,7 @@
     <!-- 2026 design tokens (must load before dash-shell.css) -->
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/leads.css?v=2026.07.18.12">
+    <link rel="stylesheet" href="/dashboards/css/leads.css?v=2026.07.19.3">
 </head>
 <body>
     <div class="dash-shell">
@@ -33,10 +33,18 @@
                     <i class="fas fa-plus"></i>
                     New lead
                 </button>
+                <button type="button" id="btn-export" class="ld-refresh-btn" title="Download the current view as a CSV (opens in Excel)">
+                    <i class="fas fa-file-arrow-down"></i>
+                    Export
+                </button>
                 <button type="button" id="btn-refresh" class="ld-refresh-btn" title="Reload leads">
                     <i class="fas fa-rotate"></i>
                     Refresh
                 </button>
+                <a href="/dashboards/lead-scorecard.html" class="ld-refresh-btn" title="Rep close rates + order value">
+                    <i class="fas fa-trophy"></i>
+                    Scorecard
+                </a>
                 <a href="/staff-dashboard.html" class="dash-back-link">
                     <i class="fas fa-arrow-left"></i>
                     Dashboard
@@ -193,7 +201,7 @@
     <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/dash-page-helpers.js"></script>
-    <script src="/dashboards/js/leads-common.js?v=2026.07.18.13"></script>
-    <script src="/dashboards/js/leads.js?v=2026.07.18.13"></script>
+    <script src="/dashboards/js/leads-common.js?v=2026.07.19.2"></script>
+    <script src="/dashboards/js/leads.js?v=2026.07.19.2"></script>
 </body>
 </html>

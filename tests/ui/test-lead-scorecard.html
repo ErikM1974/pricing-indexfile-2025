@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>TEST — Lead Scorecard harness</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css">
+    <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
+    <link rel="stylesheet" href="/dashboards/css/lead-scorecard.css?v=2026.07.19.1">
+    <link rel="stylesheet" href="/tests/ui/test-harness-ribbon.css">
+</head>
+<body>
+    <div class="test-harness-ribbon" role="note">HARNESS — stubbed scorecard fixtures, no SAML/Caspio. Real controller (dashboards/js/lead-scorecard.js) + real CSS.</div>
+
+    <div class="dash-shell">
+        <header class="dash-header">
+            <div class="dash-header-left">
+                <a href="/staff-dashboard.html" title="Back to Staff Dashboard">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                         alt="Northwest Custom Apparel" class="dash-header-logo">
+                </a>
+                <h1 class="dash-header-title">Lead Scorecard</h1>
+            </div>
+            <div class="dash-header-right">
+                <a href="/tests/ui/test-leads.html" class="dash-back-link"><i class="fas fa-arrow-left"></i> Leads board</a>
+            </div>
+        </header>
+
+        <main class="dash-content">
+            <div class="dash-error-banner" role="alert">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span class="dash-error-banner-message"></span>
+                <button class="dash-error-banner-close" aria-label="Dismiss"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div class="dash-card sc-controls-card">
+                <div class="sc-presets" role="group" aria-label="Date range presets">
+                    <button type="button" class="sc-preset" data-preset="taneisha-oct">Since Oct 2025</button>
+                    <button type="button" class="sc-preset" data-preset="ytd">This year</button>
+                    <button type="button" class="sc-preset" data-preset="90d">Last 90 days</button>
+                    <button type="button" class="sc-preset" data-preset="all">All time</button>
+                </div>
+                <div class="sc-range">
+                    <label class="sc-field"><span>From</span><input type="date" id="sc-since" class="sc-input"></label>
+                    <label class="sc-field"><span>To</span><input type="date" id="sc-until" class="sc-input"></label>
+                    <button type="button" id="sc-apply" class="sc-btn sc-btn--primary"><i class="fas fa-magnifying-glass"></i> Apply</button>
+                </div>
+            </div>
+
+            <div class="dash-stat-grid">
+                <div class="dash-stat-card dash-stat-card--accent"><div class="dash-stat-value" id="stat-closed">—</div><div class="dash-stat-label">Leads closed</div></div>
+                <div class="dash-stat-card"><div class="dash-stat-value" id="stat-sales">—</div><div class="dash-stat-label">Order value (from those leads)</div></div>
+                <div class="dash-stat-card"><div class="dash-stat-value" id="stat-reps">—</div><div class="dash-stat-label">Reps with closes</div></div>
+                <div class="dash-stat-card"><div class="dash-stat-value" id="stat-range">—</div><div class="dash-stat-label">Range</div></div>
+            </div>
+
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title">By rep</h2>
+                    <span class="sc-hint">“Order value” = orders placed <em>after</em> the inquiry (what the lead drove). Lifetime = customer's total with us.</span>
+                </div>
+                <div class="sc-table-scroll">
+                    <table class="sc-table" id="rep-table">
+                        <thead><tr><th>Rep</th><th class="sc-num">Leads closed</th><th class="sc-num">Order value</th><th class="sc-num">Lifetime value</th></tr></thead>
+                        <tbody id="rep-tbody"><tr><td colspan="4" class="sc-empty dash-loading">Loading…</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title">Closed leads</h2>
+                    <span class="sc-count" id="leads-count"></span>
+                    <select id="sc-rep-filter" class="sc-input sc-rep-filter" aria-label="Filter by rep"><option value="">All reps</option></select>
+                </div>
+                <div class="sc-table-scroll">
+                    <table class="sc-table" id="leads-table">
+                        <thead><tr><th>Company</th><th>Rep</th><th>Inquiry</th><th>Converted</th><th class="sc-num">Order value</th><th class="sc-num">Lifetime</th></tr></thead>
+                        <tbody id="leads-tbody"><tr><td colspan="6" class="sc-empty">—</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/config/app.config.js"></script>
+    <script src="/shared_components/js/fetch-timeout.js"></script>
+    <script src="/shared_components/js/dash-page-helpers.js"></script>
+    <script src="/tests/ui/test-lead-scorecard-stub.js"></script>
+    <script src="/dashboards/js/lead-scorecard.js?v=2026.07.19.1"></script>
+</body>
+</html>

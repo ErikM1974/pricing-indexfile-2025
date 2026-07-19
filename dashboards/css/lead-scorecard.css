@@ -1,0 +1,105 @@
+/* ==========================================================================
+   lead-scorecard.css — page-specific styles for dashboards/lead-scorecard.html
+
+   Shell classes (.dash-header, .dash-stat-card, .dash-card, .dash-back-link)
+   come from dash-shell.css; tokens (--gray-*, --surface-*, --radius-*,
+   --state-*) from art-hub.css. No hardcoded palette, no inline styles.
+   ========================================================================== */
+
+.sc-controls-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+.sc-presets { display: flex; gap: 6px; flex-wrap: wrap; }
+.sc-preset {
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--gray-600);
+    background: var(--gray-100);
+    border: 1px solid var(--gray-200);
+    border-radius: 999px;
+    padding: 6px 14px;
+    cursor: pointer;
+}
+.sc-preset:hover { background: var(--gray-200); color: var(--gray-800); }
+.sc-preset.is-active { background: var(--gray-900); color: var(--surface-card); border-color: var(--gray-900); }
+
+.sc-range { display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap; }
+.sc-field { display: flex; flex-direction: column; gap: 3px; font-size: 0.72rem; font-weight: 600; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.03em; }
+.sc-input {
+    font: inherit;
+    font-size: 0.88rem;
+    color: var(--gray-800);
+    background: var(--surface-card);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    padding: 7px 10px;
+}
+.sc-input:focus-visible { outline: 2px solid var(--gray-400); outline-offset: 1px; }
+
+.sc-btn {
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--gray-700);
+    background: var(--surface-card);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    padding: 8px 16px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.sc-btn--primary { background: var(--gray-900); color: var(--surface-card); border-color: var(--gray-900); }
+.sc-btn--primary:hover { background: var(--gray-700); }
+
+.sc-hint { font-size: 0.76rem; color: var(--gray-500); }
+.sc-hint em { font-style: italic; color: var(--gray-600); }
+.sc-count { font-size: 0.82rem; color: var(--gray-500); }
+.sc-rep-filter { margin-left: auto; }
+
+.sc-table-scroll { overflow-x: auto; }
+.sc-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.sc-table th, .sc-table td {
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--gray-100);
+    white-space: nowrap;
+}
+.sc-table th {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--gray-500);
+    background: var(--gray-50);
+}
+.sc-table tbody tr:hover { background: var(--gray-50); }
+.sc-num { text-align: right; font-variant-numeric: tabular-nums; font-family: 'JetBrains Mono', monospace; }
+.sc-strong { font-weight: 700; color: var(--gray-900); }
+.sc-muted { color: var(--gray-500); }
+.sc-empty { text-align: center; color: var(--gray-500); padding: 22px; }
+
+/* rep row: a subtle value bar behind the name */
+.sc-table td:first-child { position: relative; }
+.sc-bar {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    background: var(--state-success-bg, var(--gray-100));
+    opacity: 0.5;
+    z-index: 0;
+}
+.sc-rep-name { position: relative; z-index: 1; font-weight: 600; color: var(--gray-800); }
+.sc-cust { color: var(--gray-400); font-size: 0.78rem; font-family: 'JetBrains Mono', monospace; }
+.sc-table a { color: var(--state-info-text, #2563eb); text-decoration: none; }
+.sc-table a:hover { text-decoration: underline; }
+
+@media (max-width: 640px) {
+    .sc-controls-card { align-items: stretch; }
+    .sc-range { justify-content: space-between; }
+}

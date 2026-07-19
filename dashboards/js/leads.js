@@ -32,6 +32,9 @@
         current: null,          // lead open in the drawer
         matchCache: {},         // email → contact | null (per page-load)
         hashOpened: false,      // #Submission_ID deep link handled once per load
+        loadSeq: 0,             // in-flight guard: only the newest loadLeads wins
+        drawerReturnFocus: null,// element to restore focus to when the drawer closes
+        perms: [],              // staff permissions (from /api/crm-session/me) — gates Delete
         view: (function () {    // board default on desktop, list on narrow; persisted
             try { var v = localStorage.getItem('nwca-leads-view'); if (v) return v; } catch (e) { /* private mode */ }
             return window.innerWidth < 768 ? 'list' : 'board';
@@ -44,10 +47,12 @@
         wireChrome();
         fetch('/api/crm-session/me')
             .then(function (r) { return r.json(); })
-            .then(function (me) { state.staffEmail = me.email || ''; updateMineChip(); })
+            .then(function (me) { state.staffEmail = me.email || ''; state.perms = me.permissions || []; updateMineChip(); })
             .catch(function () { /* Updated_By falls back to 'leads-page' */ });
         loadLeads();
     });
+
+    function isAdmin() { return state.perms.indexOf('admin') !== -1; }
 
     function updateMineChip() {
         var chip = document.getElementById('filter-mine');
@@ -75,8 +80,42 @@
         else { board.hidden = true; listWrap.hidden = false; renderTable(); }
     }
 
+    // ---------- focus management (a11y) ----------
+
+    function getFocusable(container) {
+        return Array.prototype.slice.call(container.querySelectorAll(
+            'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        )).filter(function (el) { return el.offsetParent !== null; });
+    }
+
+    // Keep Tab inside an open overlay (drawer / modal) — without this, Tab walks
+    // out into the dimmed background page (which is not inert), letting a keyboard
+    // user operate hidden controls (e.g. Refresh) mid-task.
+    function bindFocusTrap(container, isOpen) {
+        container.addEventListener('keydown', function (e) {
+            if (e.key !== 'Tab' || !isOpen()) return;
+            var f = getFocusable(container);
+            if (!f.length) return;
+            var first = f[0], last = f[f.length - 1];
+            if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+            else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        });
+    }
+
+    // Open a lead from a keyboard-activated card/row (Enter or Space).
+    function activateOnKey(handler) {
+        return function (e) {
+            if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') { e.preventDefault(); handler(); }
+        };
+    }
+
     function wireChrome() {
+        var drawer = document.getElementById('lead-drawer');
+        drawer.setAttribute('inert', '');           // closed drawer must not be tabbable (it's only off-screen via transform)
+        bindFocusTrap(drawer, function () { return drawer.classList.contains('open'); });
+        bindFocusTrap(document.getElementById('newlead-modal'), function () { return !document.getElementById('newlead-modal').hidden; });
         document.getElementById('btn-refresh').addEventListener('click', loadLeads);
+        document.getElementById('btn-export').addEventListener('click', exportCurrentView);
         document.getElementById('filter-archived').addEventListener('change', function () {
             state.includeArchived = this.checked;
             loadLeads();
@@ -196,7 +235,13 @@
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ Lead_Value: String(v), Updated_By: state.staffEmail || 'leads-page' }),
-                }).then(finish, finish);
+                }).then(finish, function (err) {
+                    // The lead itself was created; only the value write failed.
+                    // Don't swallow it (the modal would close as if all saved).
+                    console.error('[leads] new-lead value save failed:', err);
+                    finish();
+                    DashPage.showError('Lead created, but its estimated value ($' + v + ') did not save (' + err.message + '). Open the lead to add it.');
+                });
             } else finish();
         }).catch(function (err) {
             console.error('[leads] manual lead save failed:', err);
@@ -208,28 +253,48 @@
 
     function loadLeads() {
         DashPage.hideError();
+        // Reloading replaces every lead object, so a drawer left open would hold a
+        // stale, orphaned row (saves would render pre-edit values). Close it first.
+        closeDrawer();
         var tbody = document.getElementById('leads-tbody');
         tbody.innerHTML = '<tr><td colspan="7" class="ld-empty dash-loading">Loading leads…</td></tr>';
 
+        var limit = state.includeArchived ? 2000 : 600;
         var params = new URLSearchParams();
         params.set('formIds', L.LEAD_FORM_IDS.join(','));
-        params.set('limit', state.includeArchived ? '2000' : '600');
+        params.set('limit', String(limit));
         if (!state.includeArchived) params.set('statusNot', 'Archived');
 
+        // In-flight guard: toggling Show-archived / hammering Refresh fires
+        // overlapping GETs of different sizes; only the newest may win.
+        var seq = ++state.loadSeq;
         L.crmFetch('?' + params.toString()).then(function (body) {
+            if (seq !== state.loadSeq) return; // superseded by a newer load
             state.leads = body.submissions || [];
             renderFilters();
             renderStats();
             renderView();
+            // The server hard-caps the result set; at the cap, older leads are
+            // silently omitted — say so rather than pretend this is everything.
+            if (state.leads.length >= limit) {
+                DashPage.showError('Showing the ' + state.leads.length + ' most recent leads — older ones are not loaded. Narrow with filters/search, or export for the full set.');
+            }
             // Deep link (e.g. from the AE emails): /dashboards/leads.html#JFL0718-1234
-            var wantId = decodeURIComponent((location.hash || '').slice(1));
+            var wantId = '';
+            try { wantId = decodeURIComponent((location.hash || '').slice(1)); }
+            catch (_) { wantId = (location.hash || '').slice(1); } // malformed % — use raw
             if (wantId && !state.hashOpened) {
-                state.hashOpened = true;
                 var hit = state.leads.find(function (l) { return l.Submission_ID === wantId; });
-                if (hit) openDrawer(hit);
-                else DashPage.showError('Lead ' + wantId + ' is not in the current view — it may be Archived (turn on "Show archived").');
+                if (hit) { state.hashOpened = true; openDrawer(hit); }       // latch only once opened
+                else if (!state.includeArchived) {
+                    DashPage.showError('Lead ' + wantId + ' isn\'t in the active list — turn on "Show archived" to look for it.');
+                } else {
+                    state.hashOpened = true; // archived included and still missing — don't nag every reload
+                    DashPage.showError('Lead ' + wantId + ' was not found (it may have been deleted).');
+                }
             }
         }).catch(function (err) {
+            if (seq !== state.loadSeq) return;
             console.error('[leads] load failed:', err);
             DashPage.showError('Unable to load leads (' + err.message + '). Refresh to retry.');
             tbody.innerHTML = '<tr><td colspan="7" class="ld-empty"><i class="fas fa-triangle-exclamation"></i> Leads unavailable.</td></tr>';
@@ -252,6 +317,10 @@
         document.getElementById('stat-won').textContent = won;
     }
 
+    // Rebuilds a filter <select> and returns the value it actually holds after —
+    // '' when the prior selection no longer exists in the new option set. The
+    // caller MUST write that back to state (else the view keeps filtering by a
+    // value the dropdown no longer shows → phantom "0 leads" the user can't clear).
     function setOptions(selectId, current, options) {
         var sel = document.getElementById(selectId);
         var first = sel.options[0];
@@ -265,11 +334,12 @@
         });
         sel.value = current;
         if (sel.value !== current) { sel.value = ''; }
+        return sel.value;
     }
 
     function renderFilters() {
         var sources = [];
-        ['quote-request', 'webstore-request', 'team-roster'].forEach(function (f) {
+        ['quote-request', 'webstore-request', 'team-roster', 'manual-lead'].forEach(function (f) {
             sources.push({ value: f, label: L.SOURCE_META[f].label });
         });
         var seenJf = {};
@@ -281,11 +351,11 @@
                 sources.push({ value: 'jf:' + key, label: L.sourceTitleOf(l) });
             }
         });
-        setOptions('filter-source', state.source, sources);
+        state.source = setOptions('filter-source', state.source, sources);
 
         var statuses = {};
         state.leads.forEach(function (l) { if (l.Status) statuses[l.Status] = true; });
-        setOptions('filter-status', state.status, Object.keys(statuses).sort().map(function (s) {
+        state.status = setOptions('filter-status', state.status, Object.keys(statuses).sort().map(function (s) {
             return { value: s, label: s };
         }));
 
@@ -294,7 +364,7 @@
         state.leads.forEach(function (l) { if (l.Sales_Rep) reps[l.Sales_Rep] = true; });
         var repOptions = Object.keys(reps).map(function (r) { return { value: r, label: r }; });
         repOptions.push({ value: '(unassigned)', label: '(unassigned)' });
-        setOptions('filter-rep', state.rep, repOptions);
+        state.rep = setOptions('filter-rep', state.rep, repOptions);
     }
 
     function matchesFilters(l) {
@@ -314,6 +384,45 @@
         return true;
     }
 
+    // ---------- CSV export (current view) ----------
+
+    function exportCurrentView() {
+        var rows = state.leads.filter(matchesFilters);
+        if (!rows.length) { DashPage.showError('Nothing to export — no leads match the current filters.'); return; }
+        var cols = [
+            ['Lead ID', function (l) { return l.Submission_ID; }],
+            ['Received', function (l) { return l.Submitted_At; }],      // raw naive-Pacific string — never append Z
+            ['Contact', function (l) { return l.Contact_Name; }],
+            ['Company', function (l) { return l.Company; }],
+            ['Email', function (l) { return l.Email; }],
+            ['Phone', function (l) { return l.Phone; }],
+            ['Source', function (l) { return L.sourceTitleOf(l); }],
+            ['Rep', function (l) { return l.Sales_Rep; }],
+            ['Status', function (l) { return l.Status; }],
+            ['Est. Value', function (l) { return l.Lead_Value; }],      // raw number so Excel can sum it
+            ['Follow-up', function (l) { return l.Due_Date; }],
+            ['Last Updated', function (l) { return l.Updated_At; }],    // proxy for last activity (avoids N+1 Caspio reads)
+            ['Hot', function (l) { return L.leadHeat(l).join('; '); }],
+            ['ShopWorks #', function (l) { return l.Matched_ID_Customer; }],
+            ['Linked Quote', function (l) { return l.Linked_Quote_ID; }],
+            ['Summary', function (l) { return l.Summary; }],
+        ];
+        var lines = [cols.map(function (c) { return L.csvCell(c[0]); }).join(',')];
+        rows.forEach(function (l) {
+            lines.push(cols.map(function (c) { return L.csvCell(c[1](l)); }).join(','));
+        });
+        // UTF-8 BOM so Excel decodes accented company/contact names correctly.
+        var blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'leads-' + (state.includeArchived ? 'all' : 'active') + '-' + L.todayIso() + '.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    }
+
     function renderTable() {
         var rows = state.leads.filter(matchesFilters);
         document.getElementById('leads-count').textContent =
@@ -328,7 +437,7 @@
             var meta = L.SOURCE_META[l.Form_ID] || { label: l.Form_ID, icon: 'fa-file' };
             var heat = L.leadHeat(l);
             var timer = L.responseTimer(l);
-            return '<tr data-id="' + esc(l.Submission_ID) + '">' +
+            return '<tr data-id="' + esc(l.Submission_ID) + '" tabindex="0" role="button" aria-label="Open lead ' + esc(l.Contact_Name || l.Company || l.Submission_ID) + '">' +
                 '<td class="ld-when">' + fmtWhen(l.Submitted_At) + '</td>' +
                 '<td class="ld-id">' + esc(l.Submission_ID) + '</td>' +
                 '<td><div class="ld-contact-name">' + esc(l.Contact_Name || '—') + '</div>' +
@@ -344,10 +453,12 @@
         }).join('');
 
         Array.prototype.forEach.call(tbody.querySelectorAll('tr[data-id]'), function (tr) {
-            tr.addEventListener('click', function () {
+            var open = function () {
                 var lead = state.leads.find(function (l) { return l.Submission_ID === tr.getAttribute('data-id'); });
                 if (lead) openDrawer(lead);
-            });
+            };
+            tr.addEventListener('click', open);
+            tr.addEventListener('keydown', activateOnKey(open));
         });
     }
 
@@ -379,7 +490,7 @@
         var val = Number(l.Lead_Value);
         var heat = L.leadHeat(l);
         var timer = L.responseTimer(l);
-        return '<div class="ld-card" draggable="true" data-id="' + esc(l.Submission_ID) + '" title="' + esc(l.Status || '') + '">' +
+        return '<div class="ld-card" draggable="true" data-id="' + esc(l.Submission_ID) + '" tabindex="0" role="button" aria-label="Open lead ' + esc(l.Company || l.Contact_Name || l.Submission_ID) + '" title="' + esc(l.Status || '') + '">' +
             '<div class="ld-card-top"><span class="ld-card-company">' + esc(l.Company || '(no company)') + '</span>' +
             (heat.length ? '<span class="ld-fire" title="Hot lead: ' + esc(heat.join(' · ')) + '">🔥</span>' : '') +
             (overdue ? '<span class="ld-dot" title="Follow-up overdue (' + esc(l.Due_Date) + ')"></span>' : '') + '</div>' +
@@ -447,10 +558,12 @@
                 }
             });
             card.addEventListener('dragend', function () { card.classList.remove('is-dragging'); dragId = null; });
-            card.addEventListener('click', function () {
+            var open = function () {
                 var lead = state.leads.find(function (l) { return l.Submission_ID === card.getAttribute('data-id'); });
                 if (lead) openDrawer(lead);
-            });
+            };
+            card.addEventListener('click', open);
+            card.addEventListener('keydown', activateOnKey(open));
         });
         Array.prototype.forEach.call(board.querySelectorAll('.ld-col'), function (col) {
             col.addEventListener('dragover', function (e) { e.preventDefault(); col.classList.add('is-drop-over'); });
@@ -486,13 +599,22 @@
     // ---------- drawer ----------
 
     function closeDrawer() {
+        var drawer = document.getElementById('lead-drawer');
+        var wasOpen = drawer.classList.contains('open');
         state.current = null;
-        document.getElementById('lead-drawer').classList.remove('open');
-        document.getElementById('lead-drawer').setAttribute('aria-hidden', 'true');
+        drawer.classList.remove('open');
+        drawer.setAttribute('aria-hidden', 'true');
+        drawer.setAttribute('inert', '');           // remove off-screen content from the tab order
         document.getElementById('drawer-overlay').hidden = true;
+        // Return focus to whatever opened the drawer (a11y: focus must never vanish).
+        if (wasOpen && state.drawerReturnFocus && document.body.contains(state.drawerReturnFocus)) {
+            try { state.drawerReturnFocus.focus(); } catch (_) { /* element gone */ }
+        }
+        state.drawerReturnFocus = null;
     }
 
     function openDrawer(lead) {
+        state.drawerReturnFocus = document.activeElement; // restore on close
         state.current = lead;
         var payload = L.payloadOf(lead);
         var choices = L.STATUS_CHOICES[lead.Form_ID] || L.STATUS_CHOICES['jotform-lead'];
@@ -513,7 +635,7 @@
         ];
 
         var atts = L.collectAttachments(payload);
-        var jfUrl = L.safeHttpUrl((payload._source || {}).url || '');
+        var jfUrl = L.safeSourceUrl((payload._source || {}).url || '');
         var artworkHtml = '';
         if (atts.length || jfUrl) {
             var thumbs = atts.map(function (a) { return a.url; }).filter(L.isImageUrl);
@@ -545,6 +667,10 @@
             : '';
 
         document.getElementById('drawer-body').innerHTML =
+            '<div class="ld-section ld-drawer-actions">' +
+                '<button type="button" id="drawer-edit" class="ld-btn"><i class="fas fa-pen"></i> Edit info</button>' +
+                (isAdmin() ? '<button type="button" id="drawer-delete" class="ld-btn ld-btn--danger"><i class="fas fa-trash"></i> Delete</button>' : '') +
+            '</div>' +
             '<div class="ld-section"><div class="ld-controls">' +
                 '<div class="ld-control"><label class="ld-control-label" for="drawer-status">Status</label>' +
                 '<select id="drawer-status" class="ld-select">' +
@@ -580,6 +706,20 @@
             });
         });
 
+        document.getElementById('drawer-edit').addEventListener('click', function () {
+            L.openEditLeadModal(lead, { staffEmail: state.staffEmail, onSaved: function () {
+                renderStats(); renderFilters(); renderView();
+                if (state.current === lead) openDrawer(lead); // repaint the drawer with the new values
+            } });
+        });
+        var delBtn = document.getElementById('drawer-delete');
+        if (delBtn) delBtn.addEventListener('click', function () {
+            L.deleteLead(lead, { onDeleted: function () {
+                state.leads = state.leads.filter(function (l) { return l.Submission_ID !== lead.Submission_ID; });
+                closeDrawer();
+                renderStats(); renderFilters(); renderView();
+            } });
+        });
         document.getElementById('drawer-status').addEventListener('change', function () {
             saveField(lead, 'Status', this.value, this);
         });
@@ -596,17 +736,25 @@
         renderMatchSection(lead);
         renderOrdersSection(lead);
 
-        document.getElementById('lead-drawer').classList.add('open');
-        document.getElementById('lead-drawer').setAttribute('aria-hidden', 'false');
+        var drawer = document.getElementById('lead-drawer');
+        drawer.classList.add('open');
+        drawer.setAttribute('aria-hidden', 'false');
+        drawer.removeAttribute('inert');
         document.getElementById('drawer-overlay').hidden = false;
+        var closeBtn = document.getElementById('drawer-close');   // move focus into the drawer
+        if (closeBtn) closeBtn.focus();
     }
 
+    // Returns a promise resolving true on a confirmed save, false on failure —
+    // callers that log activity / flip UI must gate on that (never announce a
+    // save before the PUT lands). `selectEl`, when passed, is disabled during the
+    // request and reverted to `prev` on failure.
     function saveField(lead, field, value, selectEl) {
         var prev = lead[field];
         var body = { Updated_By: state.staffEmail || 'leads-page' };
         body[field] = value;
         if (selectEl) selectEl.disabled = true;
-        L.crmFetch('/' + encodeURIComponent(lead.Submission_ID), {
+        return L.crmFetch('/' + encodeURIComponent(lead.Submission_ID), {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(body),
@@ -622,10 +770,12 @@
             renderStats();
             renderFilters();
             renderView();
+            return true;
         }).catch(function (err) {
             console.error('[leads] save failed:', err);
-            DashPage.showError('Could not save ' + field.replace('_', ' ') + ' (' + err.message + '). Nothing was changed.');
+            DashPage.showError('Could not save ' + field.replace(/_/g, ' ') + ' (' + err.message + '). Nothing was changed.');
             if (selectEl) selectEl.value = prev || '';
+            return false;
         }).finally(function () {
             if (selectEl) selectEl.disabled = false;
         });
@@ -660,11 +810,19 @@
             function (btn) {
                 btn.addEventListener('click', function () {
                     var custId = btn.getAttribute('data-link-customer');
-                    saveField(lead, 'Matched_ID_Customer', custId, null);
-                    L.logActivity(lead.Submission_ID, 'system', 'Linked ShopWorks customer #' + custId, '', state.staffEmail);
+                    var restore = btn.innerHTML;
                     btn.disabled = true;
-                    btn.innerHTML = '<i class="fas fa-check"></i> Linked';
-                    renderOrdersSection(lead, true);
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Linking…';
+                    // Only log the link + flip the button + autoload orders AFTER the
+                    // save is confirmed — otherwise a failed PUT leaves a false
+                    // "Linked" timeline row and a green checkmark on an unlinked lead,
+                    // and the autoload runs before lead.Matched_ID_Customer is set.
+                    saveField(lead, 'Matched_ID_Customer', custId, null).then(function (ok) {
+                        if (!ok) { btn.disabled = false; btn.innerHTML = restore; return; }
+                        L.logActivity(lead.Submission_ID, 'system', 'Linked ShopWorks customer #' + custId, '', state.staffEmail);
+                        btn.innerHTML = '<i class="fas fa-check"></i> Linked';
+                        renderOrdersSection(lead, true); // lead.Matched_ID_Customer now set → autoload fires
+                    });
                 });
             }
         );
@@ -817,7 +975,10 @@
                     }).join('') + '</tbody></table></div>';
             }).catch(function (err) {
                 console.error('[leads] order history failed:', err);
-                root.innerHTML = '<span class="ld-muted">Order history unavailable (' + esc(err.message) + ').</span>';
+                root.innerHTML = '<span class="ld-muted">Order history unavailable (' + esc(err.message) + '). </span>' +
+                    '<button type="button" id="btn-orders-retry" class="ld-btn">Retry</button>';
+                var retry = document.getElementById('btn-orders-retry');
+                if (retry) retry.addEventListener('click', function () { renderOrdersSection(lead, true); });
             });
         };
         btn.addEventListener('click', load);

@@ -116,6 +116,37 @@
         return typeof u === 'string' && /^https:\/\//i.test(u) ? u : '';
     }
 
+    // Lead fields (incl. payload.artworkUrls and _source.url) come from the PUBLIC
+    // POST /api/form-submissions — an attacker can inject any https:// URL. A
+    // scheme check (safeHttpUrl) is NOT enough: an arbitrary host renders as a
+    // tracking-beacon <img> or a phishing link inside staff dashboards. Attachments
+    // are restricted to OUR proxy files + JotForm uploads; the "View in JotForm"
+    // source link is restricted to jotform.com. Both parse the URL (not a prefix
+    // match) so `https://evil.com/api/files/` and `https://evil.com/jotform.com`
+    // can't sneak through.
+    function isAllowedAttachmentUrl(u) {
+        return typeof u === 'string' && (isJfUpload(u) || u.indexOf(filesBase()) === 0);
+    }
+
+    function safeSourceUrl(u) {
+        if (typeof u !== 'string' || !/^https:\/\//i.test(u)) return '';
+        try {
+            var h = new URL(u).hostname.toLowerCase();
+            return (h === 'jotform.com' || h.endsWith('.jotform.com')) ? u : '';
+        } catch (e) { return ''; }
+    }
+
+    // One RFC-4180 CSV cell, hardened against Excel formula injection. Lead values
+    // are attacker-supplied (public POST), so a cell starting with = + - @ (or a
+    // control char Excel treats as a formula lead-in) is prefixed with an apostrophe
+    // so Excel shows it as text instead of executing it.
+    function csvCell(v) {
+        var s = String(v == null ? '' : v);
+        if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
+        if (/[",\r\n]/.test(s)) s = '"' + s.replace(/"/g, '""') + '"';
+        return s;
+    }
+
     // ---------- payload / source ----------
 
     function payloadOf(lead) {
@@ -182,15 +213,13 @@
 
     // Known-safe attachment hosts only — never arbitrary customer-typed URLs.
     function extractFileUrls(text) {
-        var base = filesBase();
         var s = String(text || '');
         var out = [];
         var re = /https:\/\/\S+/g;
         var m;
         while ((m = re.exec(s))) {
             var u = m[0].replace(/[),.;'"\]]+$/, '');
-            var allowed = isJfUpload(u) || u.indexOf(base) === 0;
-            if (!allowed) continue;
+            if (!isAllowedAttachmentUrl(u)) continue;
             // QRQ format "NWE LOGO.webp — https://…" → keep the human filename
             var before = s.slice(0, m.index).replace(/[\s—–-]+$/, '');
             var nm = before.split(/[|;,\n]/).pop().trim();
@@ -203,12 +232,15 @@
     // All of a lead's ORIGINAL attachments: payload.artworkUrls + file links
     // found inside submitted field values. Deduped; {url, name}.
     function collectAttachments(payload) {
-        var atts = (payload.artworkUrls || []).map(function (u) { return { url: u, name: '' }; });
+        // artworkUrls is attacker-controlled (public POST) — allowlist the host,
+        // don't just check the scheme (that let any https:// image/link through).
+        var atts = (payload.artworkUrls || [])
+            .filter(isAllowedAttachmentUrl)
+            .map(function (u) { return { url: u, name: '' }; });
         payloadEntries(payload).forEach(function (p) { atts = atts.concat(extractFileUrls(p[1])); });
         var seen = {};
         return atts.filter(function (a) {
-            a.url = safeHttpUrl(a.url);
-            if (!a.url || seen[a.url]) return false;
+            if (!isAllowedAttachmentUrl(a.url) || seen[a.url]) return false; // defense-in-depth
             seen[a.url] = true;
             return true;
         });
@@ -324,6 +356,165 @@
         });
     }
 
+    // ---------- shared Edit Lead modal (board drawer + workspace) ----------
+
+    // Editable identity fields (Payload_JSON stays immutable — it's the customer's
+    // original submission). Prefills use element.value assignment ONLY — lead
+    // values are attacker-controlled (public POST), never innerHTML-interpolated.
+    var EDIT_FIELDS = [
+        { key: 'Contact_Name', label: 'Contact name', type: 'text' },
+        { key: 'Company', label: 'Company *', type: 'text' },
+        { key: 'Email', label: 'Email', type: 'email' },
+        { key: 'Phone', label: 'Phone', type: 'tel', max: 60 },
+        { key: 'Customer_Number', label: 'ShopWorks customer #', type: 'text', max: 40 },
+        { key: 'Summary', label: 'What they want', type: 'textarea', max: 250 },
+    ];
+
+    function openEditLeadModal(lead, opts) {
+        opts = opts || {};
+        var old = document.getElementById('edit-lead-overlay');
+        if (old && old.parentNode) old.parentNode.removeChild(old);
+
+        var overlay = document.createElement('div');
+        overlay.className = 'ld-overlay';
+        overlay.id = 'edit-lead-overlay';
+        var modal = document.createElement('div');
+        modal.className = 'ld-modal';
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-modal', 'true');
+        modal.setAttribute('aria-label', 'Edit lead');
+
+        var head = document.createElement('div');
+        head.className = 'ld-modal-head';
+        var title = document.createElement('h2');
+        title.className = 'ld-modal-title';
+        title.innerHTML = '<i class="fas fa-pen"></i> Edit lead';
+        var closeBtn = document.createElement('button');
+        closeBtn.type = 'button';
+        closeBtn.className = 'ld-drawer-close';
+        closeBtn.setAttribute('aria-label', 'Close');
+        closeBtn.innerHTML = '<i class="fas fa-times"></i>';
+        head.appendChild(title);
+        head.appendChild(closeBtn);
+
+        var bodyEl = document.createElement('div');
+        bodyEl.className = 'ld-modal-body';
+        var inputs = {};
+        EDIT_FIELDS.forEach(function (f) {
+            var ctrl = document.createElement('div');
+            ctrl.className = 'ld-control';
+            var lab = document.createElement('label');
+            lab.className = 'ld-control-label';
+            lab.textContent = f.label;
+            var input = f.type === 'textarea' ? document.createElement('textarea') : document.createElement('input');
+            if (f.type !== 'textarea') input.type = f.type;
+            else input.rows = 3;
+            input.className = 'ld-select';
+            if (f.max) input.maxLength = f.max;
+            input.value = lead[f.key] == null ? '' : String(lead[f.key]); // attacker-safe: value, not innerHTML
+            inputs[f.key] = input;
+            ctrl.appendChild(lab);
+            ctrl.appendChild(input);
+            bodyEl.appendChild(ctrl);
+        });
+        var hint = document.createElement('div');
+        hint.className = 'ld-muted';
+        hint.style.fontSize = '0.78rem';
+        hint.textContent = 'The “Submitted Details” panel keeps showing the customer’s original submission.';
+        bodyEl.appendChild(hint);
+
+        var actions = document.createElement('div');
+        actions.className = 'ld-modal-actions';
+        var saveBtn = document.createElement('button');
+        saveBtn.type = 'button';
+        saveBtn.className = 'ld-btn ld-btn--primary';
+        saveBtn.innerHTML = '<i class="fas fa-check"></i> Save changes';
+        var statusEl = document.createElement('span');
+        statusEl.className = 'ld-muted';
+        actions.appendChild(saveBtn);
+        actions.appendChild(statusEl);
+        bodyEl.appendChild(actions);
+
+        modal.appendChild(head);
+        modal.appendChild(bodyEl);
+        overlay.appendChild(modal);
+        document.body.appendChild(overlay);
+
+        var prevFocus = document.activeElement;
+        function close() {
+            document.removeEventListener('keydown', onKey);
+            if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+            if (prevFocus && document.body.contains(prevFocus)) { try { prevFocus.focus(); } catch (e) { /* gone */ } }
+        }
+        function onKey(e) {
+            if (e.key === 'Escape') { close(); return; }
+            if (e.key === 'Tab') { // trap Tab inside the modal
+                var f = modal.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled])');
+                if (!f.length) return;
+                var first = f[0], last = f[f.length - 1];
+                if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+                else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+            }
+        }
+        closeBtn.addEventListener('click', close);
+        overlay.addEventListener('click', function (e) { if (e.target === overlay) close(); });
+        document.addEventListener('keydown', onKey);
+        inputs.Contact_Name.focus();
+
+        saveBtn.addEventListener('click', function () {
+            var company = inputs.Company.value.trim();
+            if (!company) { statusEl.textContent = 'Company is required.'; inputs.Company.focus(); return; }
+            var email = inputs.Email.value.trim();
+            if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { statusEl.textContent = 'That email doesn’t look valid.'; inputs.Email.focus(); return; }
+
+            var updates = {};
+            var changed = [];
+            EDIT_FIELDS.forEach(function (f) {
+                var val = inputs[f.key].value.trim();
+                var cur = lead[f.key] == null ? '' : String(lead[f.key]).trim();
+                if (val !== cur) { updates[f.key] = val; changed.push(f.label.replace(' *', '')); }
+            });
+            if (!changed.length) { close(); return; }
+
+            saveBtn.disabled = true;
+            statusEl.textContent = 'Saving…';
+            crmFetch('/' + encodeURIComponent(lead.Submission_ID), {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updates),
+            }).then(function () {
+                Object.keys(updates).forEach(function (k) { lead[k] = updates[k]; });
+                clearHeat(lead);
+                logActivity(lead.Submission_ID, 'system', 'Edited lead info (' + changed.join(', ') + ')', '', opts.staffEmail || '');
+                if (typeof opts.onSaved === 'function') opts.onSaved(updates);
+                close();
+            }).catch(function (err) {
+                saveBtn.disabled = false;
+                statusEl.textContent = 'Could not save: ' + err.message;
+            });
+        });
+    }
+
+    // Admin-only hard delete (server-enforced). Confirms first; Archive is the
+    // reversible any-staff alternative. onDeleted() runs after a 200.
+    function deleteLead(lead, opts) {
+        opts = opts || {};
+        var name = lead.Company || lead.Contact_Name || lead.Submission_ID;
+        if (!window.confirm('Permanently delete “' + name + '” and its entire timeline?\n\nThis cannot be undone. To just hide it instead, set the status to Archived.')) return;
+        fetch('/api/crm-proxy/form-submissions/' + encodeURIComponent(lead.Submission_ID), { method: 'DELETE' })
+            .then(function (resp) {
+                return resp.json().catch(function () { return {}; }).then(function (body) {
+                    if (!resp.ok) throw new Error(body.error || ('HTTP ' + resp.status));
+                    return body;
+                });
+            })
+            .then(function () { if (typeof opts.onDeleted === 'function') opts.onDeleted(); })
+            .catch(function (err) {
+                if (typeof DashPage !== 'undefined') DashPage.showError('Could not delete this lead (' + err.message + ').');
+                else window.alert('Could not delete this lead: ' + err.message);
+            });
+    }
+
     global.LeadsCommon = {
         LEAD_FORM_IDS: LEAD_FORM_IDS,
         SOURCE_META: SOURCE_META,
@@ -342,6 +533,11 @@
         todayIso: todayIso,
         isOverdue: isOverdue,
         safeHttpUrl: safeHttpUrl,
+        safeSourceUrl: safeSourceUrl,
+        isAllowedAttachmentUrl: isAllowedAttachmentUrl,
+        csvCell: csvCell,
+        openEditLeadModal: openEditLeadModal,
+        deleteLead: deleteLead,
         payloadOf: payloadOf,
         payloadEntries: payloadEntries,
         sourceTitleOf: sourceTitleOf,

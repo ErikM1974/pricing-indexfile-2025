@@ -28,9 +28,12 @@
         lead: null,
         activities: [],
         staffEmail: '',
+        perms: [],
         matchCache: {},
         uploading: 0,
     };
+
+    function isAdmin() { return state.perms.indexOf('admin') !== -1; }
 
     var ICONS = { note: 'fa-comment', status: 'fa-arrow-right-arrow-left', attachment: 'fa-paperclip', quote: 'fa-file-invoice-dollar', system: 'fa-gear', email: 'fa-envelope' };
 
@@ -39,11 +42,14 @@
     document.addEventListener('DOMContentLoaded', function () {
         fetch('/api/crm-session/me')
             .then(function (r) { return r.json(); })
-            .then(function (me) { state.staffEmail = me.email || ''; })
+            .then(function (me) { state.staffEmail = me.email || ''; state.perms = me.permissions || []; if (state.lead) renderHeadActions(state.lead); })
             .catch(function () { /* Created_By falls back to 'leads-page' */ });
 
-        var id = decodeURIComponent((location.hash || '').slice(1)) ||
-            new URLSearchParams(location.search).get('id') || '';
+        var rawHash = (location.hash || '').slice(1);
+        var id = '';
+        try { id = decodeURIComponent(rawHash); }
+        catch (_) { id = rawHash; } // malformed % in an emailed link — use it raw rather than crash boot
+        if (!id) id = new URLSearchParams(location.search).get('id') || '';
         if (!id) {
             renderFatal('No lead id — open a lead from the <a href="/dashboards/leads.html">Leads board</a>.');
             return;
@@ -103,6 +109,59 @@
         statusSel.onchange = function () { saveLeadField('Status', this.value, this); };
         repSel.onchange = function () { saveLeadField('Sales_Rep', this.value, this); };
         renderHeadChips(lead);
+        renderHeadActions(lead);
+    }
+
+    // Edit info (all staff) + Delete (admin only, server-enforced). Re-rendered
+    // when permissions arrive (the session fetch may resolve after the lead loads).
+    function renderHeadActions(lead) {
+        var el = document.getElementById('lw-head-actions');
+        if (!el) return;
+        el.innerHTML =
+            '<button type="button" id="lw-edit" class="ld-btn"><i class="fas fa-pen"></i> Edit info</button>' +
+            '<button type="button" id="lw-samples" class="ld-btn"><i class="fas fa-box-open"></i> Send samples</button>' +
+            (isAdmin() ? '<button type="button" id="lw-delete" class="ld-btn ld-btn--danger"><i class="fas fa-trash"></i> Delete</button>' : '');
+        el.hidden = false;
+        document.getElementById('lw-edit').addEventListener('click', function () {
+            L.openEditLeadModal(lead, { staffEmail: state.staffEmail, onSaved: function () {
+                renderHeader();      // repaint title/sub/chips with the new values
+                renderRail();        // contact + artwork panels read the edited fields
+            } });
+        });
+        document.getElementById('lw-samples').addEventListener('click', function () { startSampleOrder(lead); });
+        var del = document.getElementById('lw-delete');
+        if (del) del.addEventListener('click', function () {
+            L.deleteLead(lead, { onDeleted: function () { window.location.href = '/dashboards/leads.html'; } });
+        });
+    }
+
+    // Open the sample catalog with the lead's contact info stashed for the cart to
+    // prefill. localStorage (not sessionStorage) because the builder/catalog opens
+    // in a noopener tab that can't inherit sessionStorage — same cross-tab rule as
+    // the quote handoff. The cart consumes + clears it (pages/js/sample-cart-page.js).
+    function startSampleOrder(lead) {
+        var name = (lead.Contact_Name || '').trim();
+        var sp = name.indexOf(' ');
+        try {
+            localStorage.setItem('nwca-sample-prefill', JSON.stringify({
+                v: 1,
+                ts: Date.now(),
+                submissionId: lead.Submission_ID,
+                firstName: sp > 0 ? name.slice(0, sp) : name,
+                lastName: sp > 0 ? name.slice(sp + 1) : '',
+                email: lead.Email || '',
+                phone: lead.Phone || '',
+                company: lead.Company || '',
+                salesRep: lead.Sales_Rep || L.EMAIL_TO_REP[state.staffEmail] || 'House',
+                staffEmail: state.staffEmail || '',
+            }));
+        } catch (e) {
+            console.error('[lead-ws] sample stash failed', e);
+            DashPage.showError('Could not carry the contact info into the sample cart (browser storage blocked). Open /catalog and enter it manually.');
+        }
+        window.open('/catalog?topSellers=1&from=leadsample', '_blank', 'noopener');
+        L.logActivity(lead.Submission_ID, 'system', 'Started a sample order', '', state.staffEmail)
+            .then(function (r) { if (r && r.activity) prependActivity(r.activity); });
     }
 
     // 🔥 + first-response chips under the title (leads-common heuristics).
@@ -142,7 +201,10 @@
         }).catch(function (err) {
             console.error('[lead-ws] save failed:', err);
             DashPage.showError('Could not save ' + field.replace(/_/g, ' ') + ' (' + err.message + '). Nothing was changed.');
-            if (el && el.tagName === 'SELECT') el.value = prev || '';
+            // Revert the control to the last-saved value — was SELECT-only, so a
+            // failed date/number edit kept showing the unsaved value (the AE would
+            // trust a due date / est. value that never persisted).
+            if (el && (el.tagName === 'SELECT' || el.tagName === 'INPUT')) el.value = prev == null ? '' : prev;
             return false;
         }).finally(function () {
             if (el) el.disabled = false;
@@ -409,7 +471,14 @@
                     btn.disabled = false;
                     var note = document.getElementById('lw-outreach-note');
                     if (note) note.textContent = '';
-                    DashPage.showError('Email NOT sent: ' + err.message);
+                    // A 15s client timeout does NOT cancel the server's send — the
+                    // email may have gone out. Saying "NOT sent" invites a duplicate.
+                    var timedOut = err.name === 'AbortError' || /abort|timed?\s*out|timeout/i.test(err.message || '');
+                    if (timedOut) {
+                        DashPage.showError('The send timed out before the server confirmed — the email MAY have gone out. Reload the page to check the timeline before resending, so ' + lead.Email + ' isn\'t emailed twice.');
+                    } else {
+                        DashPage.showError('Email NOT sent: ' + err.message);
+                    }
                 });
             });
         }).catch(function (err) {
@@ -590,12 +659,19 @@
     ];
 
     // Hand the lead's identity to a builder via the EXISTING method-switch
-    // prefill (quote-builder-utils.js takeMethodSwitchPrefill — zero builder
-    // edits): sessionStorage + ?from=methodswitch.
+    // prefill (quote-builder-utils.js takeMethodSwitchPrefill drains this on the
+    // builder side — zero per-builder edits for the trio; DTG has its own reader).
+    // The builder opens in a NEW tab with `noopener`, whose sessionStorage does
+    // NOT inherit ours — so we stash in localStorage under the shared
+    // 'nwca-method-switch' key (ts-stamped; the reader TTL-checks + drains it).
     function startQuote(builderUrl) {
         var lead = state.lead;
+        var stashed = false;
         try {
-            sessionStorage.setItem('nwca-method-switch', JSON.stringify({
+            localStorage.setItem('nwca-method-switch', JSON.stringify({
+                ts: Date.now(),
+                from: 'lead',
+                fromLabel: 'Leads CRM',
                 customer: {
                     name: lead.Contact_Name || '',
                     email: lead.Email || '',
@@ -605,7 +681,13 @@
                 },
                 products: [],
             }));
-        } catch (e) { /* storage blocked — builder opens unprefilled */ }
+            stashed = true;
+        } catch (e) {
+            console.error('[leads] method-switch stash failed', e);
+        }
+        if (!stashed) {
+            DashPage.showError('Could not carry the customer into the quote builder (browser storage blocked). Open the builder and enter the customer info manually.');
+        }
         window.open(builderUrl + '?from=methodswitch', '_blank', 'noopener');
         L.logActivity(lead.Submission_ID, 'system', 'Started a quote (' + builderUrl.split('/').pop().replace('-quote-builder.html', '') + ')', '', state.staffEmail)
             .then(function (r) { if (r && r.activity) prependActivity(r.activity); });
@@ -622,6 +704,16 @@
                 'Linked quote ' + q.QuoteID + (total ? ' (' + fmtMoney(total) + ')' : ''), '', state.staffEmail)
                 .then(function (r) { if (r && r.activity) prependActivity(r.activity); });
             renderQuotePanel(lead);
+        });
+    }
+
+    function unlinkQuote(lead) {
+        var wasId = lead.Linked_Quote_ID;
+        saveLeadField('Linked_Quote_ID', '', null).then(function (ok) {
+            if (!ok) return;
+            L.logActivity(lead.Submission_ID, 'quote', 'Unlinked quote ' + (wasId || ''), '', state.staffEmail)
+                .then(function (r) { if (r && r.activity) prependActivity(r.activity); });
+            renderQuotePanel(lead); // back to the builder buttons + suggestions + manual link
         });
     }
 
@@ -679,15 +771,25 @@
         if (lead.Linked_Quote_ID) {
             root.innerHTML = '<div class="lw-quote-linked">' +
                 '<div class="ld-match-head"><span class="ld-id">' + esc(lead.Linked_Quote_ID) + '</span>' +
-                '<a class="ld-btn" href="/quote/' + encodeURIComponent(lead.Linked_Quote_ID) + '" target="_blank" rel="noopener">Open</a></div>' +
+                '<span class="lw-quote-linked-actions">' +
+                '<a class="ld-btn" href="/quote/' + encodeURIComponent(lead.Linked_Quote_ID) + '" target="_blank" rel="noopener">Open</a>' +
+                '<button type="button" id="lw-quote-unlink" class="lw-chip" title="Unlink this quote from the lead">Unlink</button>' +
+                '</span></div>' +
                 '<div id="lw-quote-live" class="ld-muted">Loading quote…</div></div>';
+            document.getElementById('lw-quote-unlink').addEventListener('click', function () { unlinkQuote(lead); });
             DashPage.fetchJson('/api/quote_sessions?quoteID=' + encodeURIComponent(lead.Linked_Quote_ID))
                 .then(function (body) {
                     var rows = Array.isArray(body) ? body : (body.sessions || body.result || []);
                     var q = rows[0];
                     var el = document.getElementById('lw-quote-live');
                     if (!el) return;
-                    if (!q) { el.textContent = 'Quote not found.'; return; }
+                    if (!q) {
+                        // Linked to an ID that doesn't exist (e.g. a typo to a valid-
+                        // format but missing quote). Say so AND keep the Unlink button
+                        // visible above so it's recoverable — never re-sync $ from it.
+                        el.innerHTML = '<span class="lw-quote-missing">Quote ' + esc(lead.Linked_Quote_ID) + ' not found — use Unlink to correct it.</span>';
+                        return;
+                    }
                     el.outerHTML = '<div class="lw-quote-amount">' + (fmtMoney(q.TotalAmount) || '—') + '</div>' +
                         '<div class="ld-muted">' + esc(q.Status || '') + (q.CustomerName ? ' · ' + esc(q.CustomerName) : '') + '</div>';
                     // Snapshot re-sync: the quote's real total drives pipeline $.
@@ -720,7 +822,22 @@
         document.getElementById('lw-quote-link').addEventListener('click', function () {
             var id = document.getElementById('lw-quote-id').value.trim();
             if (!/^[A-Za-z0-9-]{3,40}$/.test(id)) { DashPage.showError('That does not look like a Quote ID.'); return; }
-            linkQuote(lead, { QuoteID: id, TotalAmount: null }); // linked view re-syncs $ from the live quote
+            // Verify the quote EXISTS before linking — a typo to a valid-format ID
+            // used to save silently and lock the panel to "Quote not found" with no
+            // way out (and could clobber Lead_Value from the wrong quote).
+            var linkBtn = document.getElementById('lw-quote-link');
+            linkBtn.disabled = true;
+            DashPage.fetchJson('/api/quote_sessions?quoteID=' + encodeURIComponent(id))
+                .then(function (body) {
+                    var rows = Array.isArray(body) ? body : (body.sessions || body.result || []);
+                    var q = rows[0];
+                    if (!q) { DashPage.showError('Quote ' + id + ' was not found — check the ID and try again.'); linkBtn.disabled = false; return; }
+                    linkQuote(lead, { QuoteID: q.QuoteID || id, TotalAmount: q.TotalAmount != null ? q.TotalAmount : null });
+                })
+                .catch(function (err) {
+                    DashPage.showError('Could not verify quote ' + id + ' (' + err.message + ').');
+                    linkBtn.disabled = false;
+                });
         });
     }
 
@@ -763,7 +880,12 @@
                             '<td>' + esc(st) + '</td></tr>';
                     }).join('') + '</tbody></table></div>';
             }).catch(function (err) {
-                root.innerHTML = '<span class="ld-muted">Order history unavailable (' + esc(err.message) + ').</span>';
+                // Leave a Retry control — the workspace has no refresh button, so
+                // without this a transient blip forces a full page reload.
+                root.innerHTML = '<span class="ld-muted">Order history unavailable (' + esc(err.message) + '). </span>' +
+                    '<button type="button" id="lw-orders-retry" class="lw-chip">Retry</button>';
+                var retry = document.getElementById('lw-orders-retry');
+                if (retry) retry.addEventListener('click', function () { renderOrdersPanel(lead, true); });
             });
         };
         btn.addEventListener('click', load);
@@ -782,7 +904,7 @@
     function renderArtworkPanel(lead) {
         var payload = L.payloadOf(lead);
         var atts = L.collectAttachments(payload);
-        var jfUrl = L.safeHttpUrl((payload._source || {}).url || '');
+        var jfUrl = L.safeSourceUrl((payload._source || {}).url || '');
         var root = document.getElementById('lw-panel-artwork');
         if (!atts.length && !jfUrl) { root.innerHTML = '<span class="ld-muted">None attached.</span>'; return; }
         var thumbs = atts.map(function (a) { return a.url; }).filter(L.isImageUrl);

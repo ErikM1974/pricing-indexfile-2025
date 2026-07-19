@@ -634,6 +634,10 @@ document.getElementById('sampleRequestForm').addEventListener('submit', async fu
         // Clear cart
         sessionStorage.removeItem('sampleCart');
 
+        // If an AE started this order from a lead, log it to that lead's timeline
+        // and clear the handoff stash (no-op for real customers).
+        finishSampleLeadHandoff(shopWorksOrderNumber);
+
         // Show success message
         document.getElementById('cartContainer').style.display = 'none';
         document.getElementById('confirmationId').textContent = shopWorksOrderNumber || 'SR-' + Date.now().toString().slice(-6);
@@ -652,6 +656,65 @@ document.getElementById('sampleRequestForm').addEventListener('submit', async fu
 if (new URLSearchParams(window.location.search).get('success') !== '1') {
     loadCart();
 }
+
+// --- Leads CRM handoff: an AE clicked "Order samples" on a lead, which stashed
+// the lead's contact info in localStorage (cross-tab: a noopener tab can't inherit
+// sessionStorage). Prefill the contact form once, from that stash. Real customers
+// never have the stash, so this is a no-op for them.
+var SAMPLE_LEAD_KEY = 'nwca-sample-prefill';
+var SAMPLE_LEAD_TTL_MS = 2 * 60 * 60 * 1000; // 2h — an abandoned stash self-expires
+
+function readSampleLeadStash() {
+    try {
+        var raw = localStorage.getItem(SAMPLE_LEAD_KEY);
+        if (!raw) return null;
+        var s = JSON.parse(raw);
+        if (!s || (typeof s.ts === 'number' && Date.now() - s.ts > SAMPLE_LEAD_TTL_MS)) {
+            localStorage.removeItem(SAMPLE_LEAD_KEY);
+            return null;
+        }
+        return s;
+    } catch (e) { return null; }
+}
+
+function applySampleLeadPrefill() {
+    var s = readSampleLeadStash();
+    if (!s) return;
+    // element.value only — lead fields are attacker-controlled (public forms).
+    var set = function (id, val) { var el = document.getElementById(id); if (el && val) el.value = val; };
+    set('fldFirstName', s.firstName);
+    set('fldLastName', s.lastName);
+    set('fldEmail', s.email);
+    set('fldPhone', s.phone);
+    set('fldCompany', s.company);
+    var rep = document.getElementById('salesRep');
+    if (rep && s.salesRep) {
+        var ok = Array.prototype.some.call(rep.options, function (o) { return o.value === s.salesRep; });
+        if (ok) rep.value = s.salesRep;
+    }
+}
+
+// Fire-and-forget lead breadcrumb + clear the stash after an order is placed.
+function finishSampleLeadHandoff(orderNumber) {
+    var s = readSampleLeadStash();
+    if (!s || !s.submissionId) return;
+    try {
+        fetch('/api/crm-proxy/lead-activity', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                submissionId: s.submissionId,
+                activityType: 'system',
+                activityText: 'Sample order ' + (orderNumber || '') + ' placed for this lead',
+                createdBy: s.staffEmail || 'sample-cart',
+            }),
+        }).catch(function () { /* staff-only endpoint; a customer tab just 401s — ignore */ });
+    } catch (e) { /* ignore */ }
+    try { localStorage.removeItem(SAMPLE_LEAD_KEY); } catch (e) { /* ignore */ }
+}
+window.finishSampleLeadHandoff = finishSampleLeadHandoff; // sample-checkout.js calls it on the Stripe return
+
+applySampleLeadPrefill();
 
 // ── 2026 chrome: drawer + masthead search ─────────────────────────────
 (function wireChrome() {

@@ -1965,18 +1965,51 @@ function initMethodSwitchMenu(cfg) {
     });
 }
 
+// Cross-tab handoffs (e.g. the Leads workspace opening a builder in a NEW tab
+// with `noopener`) CANNOT use sessionStorage — a noopener tab starts a fresh
+// browsing context with an EMPTY sessionStorage, so the same-tab "Switch method"
+// menu's stash never arrives (this is exactly why the lead → builder prefill
+// silently did nothing). Cross-tab callers stash into localStorage (shared
+// across tabs) via stashMethodSwitchPrefill(); the reader drains sessionStorage
+// first (same-tab switch) then localStorage (cross-tab), clearing both.
+const METHOD_SWITCH_TTL_MS = 5 * 60 * 1000; // localStorage stash self-expires
+
+/**
+ * Stash a switch/prefill payload for a builder opened in ANOTHER tab. Stamps a
+ * `ts` so a stash abandoned before the builder loads can't prefill a later,
+ * unrelated open (the reader TTL-checks it).
+ * @returns {boolean} true if the stash was written
+ */
+function stashMethodSwitchPrefill(payload) {
+    try {
+        localStorage.setItem(METHOD_SWITCH_KEY, JSON.stringify(
+            Object.assign({ ts: Date.now() }, payload)));
+        return true;
+    } catch (err) {
+        console.error('[MethodSwitch] localStorage stash failed', err);
+        return false;
+    }
+}
+
 /**
  * One-shot reader for the switch payload — only fires on ?from=methodswitch,
- * and always clears the stash so a refresh can't double-add products.
+ * and always clears BOTH stores so a refresh can't double-add products and a
+ * cross-tab stash can't linger.
  * @returns {null | {from, fromLabel, customer, products:[]}}
  */
 function takeMethodSwitchPrefill() {
     try {
         if (!window.location.search.includes('from=methodswitch')) return null;
-        const raw = sessionStorage.getItem(METHOD_SWITCH_KEY);
+        let raw = sessionStorage.getItem(METHOD_SWITCH_KEY);
         sessionStorage.removeItem(METHOD_SWITCH_KEY);
+        let fromLocal = false;
+        if (!raw) { raw = localStorage.getItem(METHOD_SWITCH_KEY); fromLocal = true; }
+        try { localStorage.removeItem(METHOD_SWITCH_KEY); } catch (_) { /* ignore */ }
         const p = JSON.parse(raw || 'null');
-        return (p && Array.isArray(p.products)) ? p : null;
+        if (!p || !Array.isArray(p.products)) return null;
+        // A cross-tab (localStorage) stash older than the TTL is stale — ignore it.
+        if (fromLocal && typeof p.ts === 'number' && Date.now() - p.ts > METHOD_SWITCH_TTL_MS) return null;
+        return p;
     } catch (_) { return null; }
 }
 
@@ -2004,6 +2037,7 @@ function applyMethodSwitchCustomer(cust) {
 
 if (typeof window !== 'undefined') {
     window.initMethodSwitchMenu = initMethodSwitchMenu;
+    window.stashMethodSwitchPrefill = stashMethodSwitchPrefill;
     window.takeMethodSwitchPrefill = takeMethodSwitchPrefill;
     window.applyMethodSwitchCustomer = applyMethodSwitchCustomer;
 }
@@ -2541,7 +2575,7 @@ if (typeof window !== 'undefined') {
 
 // Node.js export (testing) — pure functions only
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { escapeHtml, formatPrice, cleanProductTitle, getSwatchStyle, parseRatePercent, parseBulkSizes, distributeProportionally };
+    module.exports = { escapeHtml, formatPrice, cleanProductTitle, getSwatchStyle, parseRatePercent, parseBulkSizes, distributeProportionally, stashMethodSwitchPrefill, takeMethodSwitchPrefill };
 }
 
 // QuoteBuilderUtils v3.1.0 loaded
