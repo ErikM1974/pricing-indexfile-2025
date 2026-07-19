@@ -3337,6 +3337,12 @@ app.all('/api/crm-proxy/lead-activity*', requireStaff, stampSessionIdentity('cre
 const [, leadOutreachForwarder] = createCrmProxy('lead-outreach', []);
 app.all('/api/crm-proxy/lead-outreach*', requireStaff, leadOutreachForwarder);
 
+// Leads CRM conversion tracking + rep scorecard (dashboards/lead-scorecard.html):
+// GET /lead-scorecard (per-rep closes + order value) — any logged-in staff;
+// secret-only upstream. The auto-Won run/scan stay admin-key server-side.
+const [, leadScorecardForwarder] = createCrmProxy('lead-scorecard', []);
+app.all('/api/crm-proxy/lead-scorecard*', requireStaff, leadScorecardForwarder);
+
 // Blog Editor (dashboards/blog-editor.html) — staff write posts through this
 // forwarder (adds the CRM secret the proxy's gateWritesOnly demands; also lets
 // the editor list/read Drafts, which the public blog-posts endpoint hides).
