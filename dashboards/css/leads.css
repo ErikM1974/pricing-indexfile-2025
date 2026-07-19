@@ -10,6 +10,10 @@
    hardcode colors/shadows/radii — use var(--token-name).
    ========================================================================== */
 
+/* Author display rules (.ld-board { display: grid }) beat the UA's
+   [hidden] { display: none }, so JS view toggling silently fails without this. */
+[hidden] { display: none !important; }
+
 /* ── Toolbar ── */
 .ld-toolbar-header { display: flex; align-items: baseline; gap: 10px; }
 .ld-count { font-size: 0.82rem; color: var(--gray-500); }
