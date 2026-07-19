@@ -1,3 +1,9 @@
+## v2026.07.19.4 (2026.07.19)
+
+- docs(memory): marketing kit built + deployed (Caspio tables created via API)
+- feat(leads-crm): Unqualified & Spam review page + board nav link
+- Deploy v2026.07.19.4: cache-bust leads assets
+
 ## v2026.07.19.3 (2026.07.19)
 
 - feat(leads): Send a marketing kit — AE picks box contents, Mikalah works the queue
