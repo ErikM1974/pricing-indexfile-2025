@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Unqualified &amp; Spam Leads - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- 2026 design tokens (must load before dash-shell.css) -->
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css">
+    <link rel="stylesheet" href="/shared_components/css/dash-shell.css"><link rel="stylesheet" href="/tests/ui/test-harness-ribbon.css">
+    <link rel="stylesheet" href="/dashboards/css/unqualified-leads.css">
+</head>
+<body>
+    <div class="dash-shell">
+        <header class="dash-header">
+            <div class="dash-header-left">
+                <a href="/staff-dashboard.html" title="Back to Staff Dashboard">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                         alt="Northwest Custom Apparel" class="dash-header-logo">
+                </a>
+                <h1 class="dash-header-title">Unqualified &amp; Spam Leads</h1>
+            </div>
+            <div class="dash-header-right">
+                <button type="button" id="btn-refresh" class="uq-btn" title="Reload"><i class="fas fa-rotate"></i> Refresh</button>
+                <a href="/dashboards/leads.html" class="dash-back-link"><i class="fas fa-arrow-left"></i> Leads board</a>
+            </div>
+        </header>
+
+        <main class="dash-content">
+            <div class="dash-error-banner" role="alert">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span class="dash-error-banner-message"></span>
+                <button class="dash-error-banner-close" aria-label="Dismiss"><i class="fas fa-times"></i></button>
+            </div>
+
+            <p class="uq-intro">
+                These leads were auto-categorized by Claude and kept out of your main board and win-rate.
+                <strong>Spam</strong> = someone selling to us or a scam. <strong>Unqualified</strong> = a real
+                person but a personal one-off (a single item, one name, a hobby order). Nothing here counts as a lost deal.
+            </p>
+
+            <div class="uq-tabs" role="tablist">
+                <button type="button" class="uq-tab is-active" data-cat="spam" role="tab">
+                    <i class="fas fa-ban"></i> Spam <span class="uq-badge" id="badge-spam">—</span>
+                </button>
+                <button type="button" class="uq-tab" data-cat="unqualified" role="tab">
+                    <i class="fas fa-user-slash"></i> Unqualified <span class="uq-badge" id="badge-unqualified">—</span>
+                </button>
+            </div>
+
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title" id="section-title">Spam</h2>
+                    <span class="uq-count" id="list-count"></span>
+                    <input type="search" id="uq-search" class="uq-input" placeholder="Search company, contact, email…" aria-label="Search">
+                </div>
+                <div class="uq-note" id="spam-note">
+                    <i class="fas fa-circle-info"></i>
+                    To permanently delete these, open <code>Downloads/leads-SPAM-to-delete.csv</code> (has Claude's reason per row),
+                    then bulk-delete the matching rows in the Caspio <em>Form_Submissions</em> datasheet. They stay hidden here until you do.
+                </div>
+                <div class="uq-table-scroll">
+                    <table class="uq-table" id="uq-table">
+                        <thead>
+                            <tr><th>Received</th><th>Company</th><th>Contact</th><th>Email</th><th>What they said</th></tr>
+                        </thead>
+                        <tbody id="uq-tbody">
+                            <tr><td colspan="5" class="uq-empty dash-loading">Loading…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Load order matters: APP_CONFIG → fetch-timeout → DashPage → page controller -->
+    <div class="test-harness-ribbon" role="note">HARNESS — stubbed spam/unqualified fixtures, no SAML/Caspio. Real controller + CSS.</div><script src="/config/app.config.js"></script>
+    <script src="/shared_components/js/fetch-timeout.js"></script>
+    <script src="/shared_components/js/dash-page-helpers.js"></script><script src="/tests/ui/test-unqualified-leads-stub.js"></script>
+    <script src="/dashboards/js/unqualified-leads.js?v=2026.07.19.4"></script>
+</body>
+</html>
