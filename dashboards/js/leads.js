@@ -472,6 +472,8 @@
         { key: 'lost', label: 'Lost' },
     ];
     var TERMINAL_BOARD_DAYS = 45; // Won/Lost columns show recent only; older stay in the list
+    var COL_CAP = 20;             // cards shown per column before the "Show N more" toggle
+    var expandedCols = {};        // column key → showing all (else capped at COL_CAP)
 
     function repInitials(name) {
         return String(name || '').split(/\s+/).map(function (w) { return w.charAt(0); }).join('').slice(0, 2).toUpperCase();
@@ -533,11 +535,23 @@
                 var n = Number(l.Lead_Value);
                 return acc + (isFinite(n) && n > 0 ? n : 0);
             }, 0);
+            // Cap each column so tall columns (Won/Lost) don't force endless
+            // scrolling — show the first COL_CAP, reveal the rest on demand.
+            var expanded = !!expandedCols[c.key];
+            var shown = expanded ? items : items.slice(0, COL_CAP);
+            var hiddenN = items.length - shown.length;
+            var moreBtn = '';
+            if (items.length > COL_CAP) {
+                moreBtn = '<button type="button" class="ld-col-more" data-col="' + esc(c.key) + '">' +
+                    (expanded ? '<i class="fas fa-chevron-up"></i> Show fewer'
+                              : '<i class="fas fa-chevron-down"></i> Show ' + hiddenN + ' more') + '</button>';
+            }
             return '<div class="ld-col ld-col--' + c.key + '" data-col="' + c.key + '">' +
                 '<div class="ld-col-head"><span class="ld-col-title">' + c.label + '</span>' +
                 '<span class="ld-col-meta">' + items.length + (sum > 0 ? ' · $' + Math.round(sum).toLocaleString('en-US') : '') + '</span></div>' +
                 '<div class="ld-col-body">' +
-                items.map(cardHtml).join('') +
+                shown.map(cardHtml).join('') +
+                moreBtn +
                 (olderCount[c.key] ? '<div class="ld-col-older">+' + olderCount[c.key] + ' older — see List</div>' : '') +
                 (!items.length && !olderCount[c.key] ? '<div class="ld-col-empty">—</div>' : '') +
                 '</div></div>';
@@ -564,6 +578,14 @@
             };
             card.addEventListener('click', open);
             card.addEventListener('keydown', activateOnKey(open));
+        });
+        Array.prototype.forEach.call(board.querySelectorAll('.ld-col-more'), function (b) {
+            b.addEventListener('click', function (e) {
+                e.stopPropagation();
+                var k = b.getAttribute('data-col');
+                expandedCols[k] = !expandedCols[k];
+                renderBoard();
+            });
         });
         Array.prototype.forEach.call(board.querySelectorAll('.ld-col'), function (col) {
             col.addEventListener('dragover', function (e) { e.preventDefault(); col.classList.add('is-drop-over'); });
