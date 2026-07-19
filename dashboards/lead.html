@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
     <link rel="stylesheet" href="/dashboards/css/leads.css?v=2026.07.19.3">
-    <link rel="stylesheet" href="/dashboards/css/lead-workspace.css?v=2026.07.19.2">
+    <link rel="stylesheet" href="/dashboards/css/lead-workspace.css?v=2026.07.19.3">
 </head>
 <body>
     <div class="dash-shell">
@@ -135,9 +135,24 @@
                         <div class="ld-section-title">Original artwork</div>
                         <div id="lw-panel-artwork" class="ld-muted">None attached.</div>
                     </div>
+                    <div class="dash-card lw-panel">
+                        <div class="ld-section-title">Send to the art team</div>
+                        <div id="lw-panel-art"></div>
+                    </div>
                 </aside>
             </div>
         </main>
+    </div>
+
+    <!-- Send to the art team modal — mounts the shared garment art form
+         (GarmentSubmitForm) prefilled from this lead. Deps lazy-load on first open.
+         Cloned from quote-view's Send-to-Steve modal. -->
+    <div id="lw-art-modal" class="lw-art-modal" style="display:none;">
+        <div class="lw-art-modal-backdrop" id="lw-art-modal-backdrop"></div>
+        <div class="lw-art-modal-dialog" role="dialog" aria-modal="true" aria-label="Send artwork to the art team">
+            <button type="button" class="lw-art-modal-close" id="lw-art-modal-close" title="Close">&times;</button>
+            <div id="lw-art-form-mount"></div>
+        </div>
     </div>
 
     <!-- Load order matters: APP_CONFIG → fetch-timeout → DashPage → shared upload → LeadsCommon → controller -->
@@ -146,6 +161,6 @@
     <script src="/shared_components/js/dash-page-helpers.js"></script>
     <script src="/shared_components/js/artwork-upload.js"></script>
     <script src="/dashboards/js/leads-common.js?v=2026.07.19.2"></script>
-    <script src="/dashboards/js/lead-workspace.js?v=2026.07.19.2"></script>
+    <script src="/dashboards/js/lead-workspace.js?v=2026.07.19.3"></script>
 </body>
 </html>

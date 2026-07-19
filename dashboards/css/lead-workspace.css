@@ -157,9 +157,17 @@
 .lw-quote-linked { border: 1px solid var(--gray-200); border-radius: var(--radius-md); padding: 10px 12px; }
 .lw-quote-amount { font-size: 1.1rem; font-weight: 700; color: var(--gray-900); }
 .lw-quote-linked-actions { display: inline-flex; gap: 6px; align-items: center; }
-.lw-head-actions { display: flex; gap: 8px; margin-top: 10px; }
+.lw-head-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
 .ld-btn--danger { color: var(--state-danger, #b42318); border-color: var(--state-danger, #f0c2bd); }
 .ld-btn--danger:hover { background: var(--state-danger-bg, #fde8e8); color: var(--state-danger, #b42318); }
+
+/* Send-to-the-art-team modal (mounts the shared GarmentSubmitForm) — cloned from
+   quote-view's sts-modal so the lazy-loaded form renders the same way. */
+.lw-art-modal { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: flex-start; justify-content: center; padding: 24px 16px; overflow-y: auto; }
+.lw-art-modal-backdrop { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55); }
+.lw-art-modal-dialog { position: relative; z-index: 1; width: 100%; max-width: 880px; margin: auto; background: #ffffff; border-radius: 12px; box-shadow: 0 24px 60px rgba(15, 23, 42, 0.35); padding: 20px 20px 28px; }
+.lw-art-modal-close { position: absolute; top: 10px; right: 12px; width: 34px; height: 34px; border: none; border-radius: 50%; background: #f1f5f9; color: #475569; font-size: 22px; line-height: 1; cursor: pointer; z-index: 2; }
+.lw-art-modal-close:hover { background: #e2e8f0; color: #0f172a; }
 .lw-quote-missing { color: var(--state-danger, #b42318); }
 .lw-quote-row { display: flex; gap: 6px; margin-top: 8px; }
 .lw-quote-row .lw-quote-input { flex: 1; }
