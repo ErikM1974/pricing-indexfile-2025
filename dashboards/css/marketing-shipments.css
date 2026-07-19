@@ -1,0 +1,25 @@
+/* ==========================================================================
+   marketing-shipments.css — Mikalah's kit-fulfillment queue
+   (dashboards/marketing-shipments.html). Reuses the leads.css ld-* atoms
+   (ld-table, ld-btn, ld-toggle-btn, ld-when, ld-id, ld-muted). Tokens from
+   art-hub.css; shell from dash-shell.css. Only queue-specific styles here.
+   ========================================================================== */
+
+[hidden] { display: none !important; }
+
+.ms-tab { cursor: pointer; }
+
+.ms-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+
+.ms-ship-form { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.ms-ship-form .ld-select { font-size: 0.82rem; padding: 5px 7px; }
+.ms-ship-form .ms-tracking { min-width: 150px; }
+
+.ms-track {
+    font-size: 0.8rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--gray-700);
+    background: var(--gray-100);
+    border-radius: var(--radius-sm);
+    padding: 2px 8px;
+}

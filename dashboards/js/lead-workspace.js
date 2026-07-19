@@ -120,6 +120,7 @@
         el.innerHTML =
             '<button type="button" id="lw-edit" class="ld-btn"><i class="fas fa-pen"></i> Edit info</button>' +
             '<button type="button" id="lw-samples" class="ld-btn"><i class="fas fa-box-open"></i> Send samples</button>' +
+            '<button type="button" id="lw-kit" class="ld-btn"><i class="fas fa-gift"></i> Send kit</button>' +
             (isAdmin() ? '<button type="button" id="lw-delete" class="ld-btn ld-btn--danger"><i class="fas fa-trash"></i> Delete</button>' : '');
         el.hidden = false;
         document.getElementById('lw-edit').addEventListener('click', function () {
@@ -129,6 +130,7 @@
             } });
         });
         document.getElementById('lw-samples').addEventListener('click', function () { startSampleOrder(lead); });
+        document.getElementById('lw-kit').addEventListener('click', function () { openKitModal(lead); });
         var del = document.getElementById('lw-delete');
         if (del) del.addEventListener('click', function () {
             L.deleteLead(lead, { onDeleted: function () { window.location.href = '/dashboards/leads.html'; } });
@@ -162,6 +164,138 @@
         window.open('/catalog?topSellers=1&from=leadsample', '_blank', 'noopener');
         L.logActivity(lead.Submission_ID, 'system', 'Started a sample order', '', state.staffEmail)
             .then(function (r) { if (r && r.activity) prependActivity(r.activity); });
+    }
+
+    // ---------- Send a marketing kit (catalog / stickers / samples → Mikalah) ----------
+    // AE picks box contents + ship-to (prefilled from the lead), we POST a
+    // Marketing_Shipments row; Mikalah works the queue at
+    // /dashboards/marketing-shipments.html. All values through esc() (lead data +
+    // the Erik-editable kit catalog are attacker/text-controlled).
+    function kitFetch(path, options) {
+        return fetch('/api/crm-proxy/marketing-shipments' + (path || ''), options).then(function (resp) {
+            return resp.json().catch(function () { return {}; }).then(function (body) {
+                if (!resp.ok) throw new Error(body.error || ('HTTP ' + resp.status));
+                return body;
+            });
+        });
+    }
+
+    function openKitModal(lead) {
+        var old = document.getElementById('lw-kit-overlay');
+        if (old && old.parentNode) old.parentNode.removeChild(old);
+        var overlay = document.createElement('div');
+        overlay.className = 'ld-overlay';
+        overlay.id = 'lw-kit-overlay';
+        var modal = document.createElement('div');
+        modal.className = 'ld-modal lw-kit-modal';
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-modal', 'true');
+        modal.setAttribute('aria-label', 'Send a marketing kit');
+        modal.innerHTML =
+            '<div class="ld-modal-head"><h2 class="ld-modal-title"><i class="fas fa-gift"></i> Send a marketing kit</h2>' +
+            '<button type="button" class="ld-drawer-close" id="lw-kit-close" aria-label="Close"><i class="fas fa-times"></i></button></div>' +
+            '<div class="ld-modal-body">' +
+            '<div class="ld-control-label">What to send</div>' +
+            '<div id="lw-kit-items" class="lw-kit-items"><span class="ld-muted">Loading kit items…</span></div>' +
+            '<div class="ld-controls">' +
+            '<div class="ld-control"><label class="ld-control-label" for="lw-kit-recipient">Recipient</label><input id="lw-kit-recipient" class="ld-select" type="text"></div>' +
+            '<div class="ld-control"><label class="ld-control-label" for="lw-kit-company">Company</label><input id="lw-kit-company" class="ld-select" type="text"></div>' +
+            '</div>' +
+            '<div class="ld-control"><label class="ld-control-label" for="lw-kit-addr1">Street address *</label><input id="lw-kit-addr1" class="ld-select" type="text" autocomplete="off"></div>' +
+            '<div class="ld-control"><label class="ld-control-label" for="lw-kit-addr2">Suite / unit</label><input id="lw-kit-addr2" class="ld-select" type="text" autocomplete="off"></div>' +
+            '<div class="ld-controls">' +
+            '<div class="ld-control"><label class="ld-control-label" for="lw-kit-city">City *</label><input id="lw-kit-city" class="ld-select" type="text"></div>' +
+            '<div class="ld-control"><label class="ld-control-label" for="lw-kit-state">State *</label><input id="lw-kit-state" class="ld-select" type="text" maxlength="20"></div>' +
+            '<div class="ld-control"><label class="ld-control-label" for="lw-kit-zip">ZIP *</label><input id="lw-kit-zip" class="ld-select" type="text" maxlength="20"></div>' +
+            '</div>' +
+            '<div class="ld-controls">' +
+            '<div class="ld-control"><label class="ld-control-label" for="lw-kit-phone">Phone</label><input id="lw-kit-phone" class="ld-select" type="tel"></div>' +
+            '<div class="ld-control"><label class="ld-control-label" for="lw-kit-email">Email</label><input id="lw-kit-email" class="ld-select" type="email"></div>' +
+            '</div>' +
+            '<div class="ld-control"><label class="ld-control-label" for="lw-kit-notes">Notes for shipping</label><textarea id="lw-kit-notes" class="ld-select" rows="2"></textarea></div>' +
+            '<div class="ld-modal-actions"><button type="button" id="lw-kit-send" class="ld-btn ld-btn--primary"><i class="fas fa-paper-plane"></i> Send to shipping</button><span id="lw-kit-status" class="ld-muted"></span></div>' +
+            '</div>';
+        overlay.appendChild(modal);
+        document.body.appendChild(overlay);
+
+        // Prefill ship-to from the lead (values only — attacker-safe).
+        var setV = function (id, v) { var el = document.getElementById(id); if (el) el.value = v || ''; };
+        setV('lw-kit-recipient', lead.Contact_Name);
+        setV('lw-kit-company', lead.Company);
+        setV('lw-kit-phone', lead.Phone);
+        setV('lw-kit-email', lead.Email);
+
+        var prevFocus = document.activeElement;
+        function close() {
+            document.removeEventListener('keydown', onKey);
+            if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+            if (prevFocus && document.body.contains(prevFocus)) { try { prevFocus.focus(); } catch (e) { /* gone */ } }
+        }
+        function onKey(e) { if (e.key === 'Escape') close(); }
+        document.getElementById('lw-kit-close').addEventListener('click', close);
+        overlay.addEventListener('click', function (e) { if (e.target === overlay) close(); });
+        document.addEventListener('keydown', onKey);
+
+        // Load the Erik-editable kit catalog → checkbox + qty per item.
+        kitFetch('/items').then(function (body) {
+            var items = body.items || [];
+            var box = document.getElementById('lw-kit-items');
+            if (!items.length) { box.innerHTML = '<span class="ld-muted">No kit items configured. Add rows to Marketing_Kit_Items in Caspio.</span>'; return; }
+            box.innerHTML = items.map(function (it) {
+                return '<label class="lw-kit-item">' +
+                    '<input type="checkbox" class="lw-kit-cb" data-code="' + esc(it.Item_Code) + '" data-label="' + esc(it.Label) + '">' +
+                    '<span class="lw-kit-item-label">' + esc(it.Label) + '</span>' +
+                    '<input type="number" class="lw-kit-qty" min="1" value="1" aria-label="Quantity">' +
+                    '</label>';
+            }).join('');
+        }).catch(function (err) {
+            document.getElementById('lw-kit-items').innerHTML = '<span class="ld-muted">Could not load kit items (' + esc(err.message) + ').</span>';
+        });
+
+        document.getElementById('lw-kit-send').addEventListener('click', function () {
+            var statusEl = document.getElementById('lw-kit-status');
+            var picked = Array.prototype.slice.call(modal.querySelectorAll('.lw-kit-cb:checked')).map(function (cb) {
+                var row = cb.closest('.lw-kit-item');
+                var qtyEl = row ? row.querySelector('.lw-kit-qty') : null;
+                return { code: cb.getAttribute('data-code'), label: cb.getAttribute('data-label'), qty: qtyEl ? Number(qtyEl.value) || 1 : 1 };
+            });
+            if (!picked.length) { statusEl.textContent = 'Pick at least one item.'; return; }
+            var addr1 = document.getElementById('lw-kit-addr1').value.trim();
+            var city = document.getElementById('lw-kit-city').value.trim();
+            var stateV = document.getElementById('lw-kit-state').value.trim();
+            var zip = document.getElementById('lw-kit-zip').value.trim();
+            if (!addr1 || !city || !stateV || !zip) { statusEl.textContent = 'Street, city, state, and ZIP are required.'; return; }
+
+            var sendBtn = document.getElementById('lw-kit-send');
+            sendBtn.disabled = true;
+            statusEl.textContent = 'Sending…';
+            kitFetch('', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    submissionId: lead.Submission_ID,
+                    requestedBy: state.staffEmail,
+                    salesRep: lead.Sales_Rep || '',
+                    recipientName: document.getElementById('lw-kit-recipient').value.trim(),
+                    company: document.getElementById('lw-kit-company').value.trim(),
+                    address1: addr1, address2: document.getElementById('lw-kit-addr2').value.trim(),
+                    city: city, state: stateV, zip: zip,
+                    phone: document.getElementById('lw-kit-phone').value.trim(),
+                    email: document.getElementById('lw-kit-email').value.trim(),
+                    notes: document.getElementById('lw-kit-notes').value.trim(),
+                    items: picked,
+                }),
+            }).then(function (r) {
+                var label = picked.map(function (p) { return p.qty > 1 ? (p.qty + '× ' + p.label) : p.label; }).join(', ');
+                L.logActivity(lead.Submission_ID, 'system', 'Requested a marketing kit (' + r.shipmentId + '): ' + label, '', state.staffEmail)
+                    .then(function (a) { if (a && a.activity) prependActivity(a.activity); });
+                close();
+                DashPage.hideError();
+            }).catch(function (err) {
+                sendBtn.disabled = false;
+                statusEl.textContent = 'Could not send: ' + err.message;
+            });
+        });
     }
 
     // 🔥 + first-response chips under the title (leads-common heuristics).
