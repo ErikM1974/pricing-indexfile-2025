@@ -1,3 +1,8 @@
+## v2026.07.19.5 (2026.07.19)
+
+- feat(leads-crm): Rescan-with-Claude button (unqualified page) + scorecard Refresh
+- Deploy v2026.07.19.5: cache-bust leads assets
+
 ## v2026.07.19.4 (2026.07.19)
 
 - docs(memory): marketing kit built + deployed (Caspio tables created via API)
