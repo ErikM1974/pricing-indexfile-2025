@@ -3337,6 +3337,22 @@ app.all('/api/crm-proxy/lead-activity*', requireStaff, stampSessionIdentity('cre
 const [, leadOutreachForwarder] = createCrmProxy('lead-outreach', []);
 app.all('/api/crm-proxy/lead-outreach*', requireStaff, leadOutreachForwarder);
 
+// Leads CRM "Send a marketing kit" — AEs request catalog/sample/sticker kits for a
+// lead; Mikalah (shipping) works the queue (dashboards/marketing-shipments.html).
+// Any logged-in staff; the upstream router holds recipient PII (secret-only).
+const [, marketingShipmentsForwarder] = createCrmProxy('marketing-shipments', []);
+app.all('/api/crm-proxy/marketing-shipments*', requireStaff, (req, res, next) => {
+  // Stamp the requester/updater from the verified session (attribution, not trust).
+  if (req.body && ['POST', 'PUT', 'PATCH'].includes(req.method)) {
+    const email = (req.session && req.session.crmUser && req.session.crmUser.email) || '';
+    if (email) {
+      if (req.body.requestedBy !== undefined || req.method === 'POST') req.body.requestedBy = email;
+      if (req.body.Updated_By !== undefined || req.method === 'PUT') req.body.Updated_By = email;
+    }
+  }
+  next();
+}, marketingShipmentsForwarder);
+
 // Leads CRM conversion tracking + rep scorecard (dashboards/lead-scorecard.html):
 // GET /lead-scorecard (per-rep closes + order value) — any logged-in staff;
 // secret-only upstream. The auto-Won run/scan stay admin-key server-side.
