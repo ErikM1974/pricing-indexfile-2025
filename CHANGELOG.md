@@ -1,3 +1,8 @@
+## v2026.07.19.6 (2026.07.19)
+
+- feat(leads-board): cap each kanban column at 20 cards + Show N more / Show fewer toggle (Won/Lost columns ran hundreds deep after backfill)
+- Deploy v2026.07.19.6: cache-bust leads assets
+
 ## v2026.07.19.5 (2026.07.19)
 
 - feat(leads-crm): Rescan-with-Claude button (unqualified page) + scorecard Refresh
