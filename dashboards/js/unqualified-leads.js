@@ -27,6 +27,7 @@
         document.getElementById('btn-refresh').addEventListener('click', function () {
             state.cache = {}; load(state.cat);
         });
+        document.getElementById('btn-rescan').addEventListener('click', rescan);
         document.getElementById('uq-search').addEventListener('input', function () {
             state.search = this.value.trim().toLowerCase(); render();
         });
@@ -51,6 +52,40 @@
     }
 
     function setBadge(cat, n) { document.getElementById('badge-' + cat).textContent = n; }
+
+    // "Rescan with Claude" — POST to the classifier; it categorizes any new,
+    // uncategorized leads (spam/unqualified auto-archive here, qualified stay on
+    // the board). Then reload so freshly-caught spam/unqualified appear.
+    function rescan() {
+        var btn = document.getElementById('btn-rescan');
+        var orig = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Scanning…';
+        DashPage.hideError();
+        fetch('/api/crm-proxy/lead-classify/run', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' })
+            .then(function (resp) {
+                return resp.json().catch(function () { return {}; }).then(function (b) {
+                    if (!resp.ok) throw new Error((b && b.error) || ('HTTP ' + resp.status));
+                    return b;
+                });
+            })
+            .then(function (r) {
+                state.cache = {};
+                load('spam'); prefetchCount('unqualified');
+                var added = (r.spam || 0) + (r.unqualified || 0);
+                DashPage.showError((r.classified || 0) === 0
+                    ? 'No new leads to categorize — everything is already sorted.'
+                    : 'Claude categorized ' + r.classified + ' new lead' + (r.classified === 1 ? '' : 's') + ': ' +
+                        (r.spam || 0) + ' spam, ' + (r.unqualified || 0) + ' unqualified, ' + (r.qualified || 0) + ' qualified' +
+                        (added ? ' (' + added + ' moved off the board).' : '.'),
+                    'info');
+            })
+            .catch(function (err) {
+                DashPage.showError('Rescan failed: ' + err.message +
+                    (/503/.test(err.message) ? ' — the ANTHROPIC_API_KEY may not be set on the proxy.' : ''));
+            })
+            .finally(function () { btn.disabled = false; btn.innerHTML = orig; });
+    }
 
     function fetchCat(cat) {
         return fetch('/api/crm-proxy/form-submissions?category=' + encodeURIComponent(cat) + '&limit=2000')

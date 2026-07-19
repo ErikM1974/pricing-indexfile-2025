@@ -13,8 +13,13 @@
         { Submission_ID: 'JFL0607-3441', Company: 'None', Contact_Name: 'Dan Rahme', Email: 'bigzib79@yahoo.com', Summary: 'Looking for 1 die cut sticker to put on my camper', Submitted_At: '2026-06-07T10:00:00' },
         { Submission_ID: 'JFL0529-1037b', Company: 'Self', Contact_Name: 'Troy Vigil', Email: 'troy@example.com', Summary: 'PGA professional, need my golf bag embroidered with my name', Submitted_At: '2026-05-29T10:00:00' },
     ];
-    window.fetch = function (url) {
+    window.fetch = function (url, options) {
         var u = String(url);
+        if (u.indexOf('/api/crm-proxy/lead-classify/run') !== -1) {
+            return Promise.resolve({ ok: true, status: 200, json: function () {
+                return Promise.resolve({ success: true, classified: 2, spam: 1, unqualified: 1, qualified: 0, archived: 2, model: 'claude-opus-4-8' });
+            } });
+        }
         if (u.indexOf('/api/crm-proxy/form-submissions') === -1) {
             return Promise.resolve({ ok: false, status: 404, json: function () { return Promise.resolve({ error: 'stub: ' + u }); } });
         }

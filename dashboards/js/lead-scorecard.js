@@ -46,6 +46,8 @@
     });
 
     function wire() {
+        var rf = document.getElementById('sc-refresh');
+        if (rf) rf.addEventListener('click', load);
         document.getElementById('sc-apply').addEventListener('click', function () {
             state.since = document.getElementById('sc-since').value;
             state.until = document.getElementById('sc-until').value;

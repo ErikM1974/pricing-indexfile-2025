@@ -3359,6 +3359,11 @@ app.all('/api/crm-proxy/marketing-shipments*', requireStaff, (req, res, next) =>
 const [, leadScorecardForwarder] = createCrmProxy('lead-scorecard', []);
 app.all('/api/crm-proxy/lead-scorecard*', requireStaff, leadScorecardForwarder);
 
+// Leads CRM "Rescan with Claude" — classify newly-arrived leads (spam/
+// unqualified/qualified) on demand. Any logged-in staff; secret-only upstream.
+const [, leadClassifyForwarder] = createCrmProxy('lead-classify', []);
+app.all('/api/crm-proxy/lead-classify*', requireStaff, leadClassifyForwarder);
+
 // Blog Editor (dashboards/blog-editor.html) — staff write posts through this
 // forwarder (adds the CRM secret the proxy's gateWritesOnly demands; also lets
 // the editor list/read Drafts, which the public blog-posts endpoint hides).
