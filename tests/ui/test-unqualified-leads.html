@@ -16,7 +16,7 @@
     <!-- 2026 design tokens (must load before dash-shell.css) -->
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css"><link rel="stylesheet" href="/tests/ui/test-harness-ribbon.css">
-    <link rel="stylesheet" href="/dashboards/css/unqualified-leads.css">
+    <link rel="stylesheet" href="/dashboards/css/unqualified-leads.css?v=2026.07.19.4">
 </head>
 <body>
     <div class="dash-shell">
@@ -29,6 +29,9 @@
                 <h1 class="dash-header-title">Unqualified &amp; Spam Leads</h1>
             </div>
             <div class="dash-header-right">
+                <button type="button" id="btn-rescan" class="uq-btn uq-btn--primary" title="Have Claude categorize any new, uncategorized leads">
+                    <i class="fas fa-wand-magic-sparkles"></i> Rescan with Claude
+                </button>
                 <button type="button" id="btn-refresh" class="uq-btn" title="Reload"><i class="fas fa-rotate"></i> Refresh</button>
                 <a href="/dashboards/leads.html" class="dash-back-link"><i class="fas fa-arrow-left"></i> Leads board</a>
             </div>
@@ -82,7 +85,7 @@
     </div>
 
     <!-- Load order matters: APP_CONFIG → fetch-timeout → DashPage → page controller -->
-    <div class="test-harness-ribbon" role="note">HARNESS — stubbed spam/unqualified fixtures, no SAML/Caspio. Real controller + CSS.</div><script src="/config/app.config.js"></script>
+    <div class="test-harness-ribbon" role="note">HARNESS — stubbed spam/unqualified fixtures + faked rescan, no SAML/Caspio.</div><script src="/config/app.config.js"></script>
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/dash-page-helpers.js"></script><script src="/tests/ui/test-unqualified-leads-stub.js"></script>
     <script src="/dashboards/js/unqualified-leads.js?v=2026.07.19.4"></script>
