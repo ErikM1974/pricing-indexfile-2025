@@ -155,6 +155,14 @@
 .ld-col-body { padding: 8px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
 .ld-col-empty { text-align: center; color: var(--gray-400); padding: 16px 0; }
 .ld-col-older { text-align: center; font-size: 0.72rem; color: var(--gray-500); padding: 4px 0; }
+.ld-col-more {
+    font: inherit; font-size: 0.75rem; font-weight: 600;
+    color: var(--gray-600); background: var(--gray-100);
+    border: 1px solid var(--gray-200); border-radius: var(--radius-sm);
+    padding: 6px 10px; cursor: pointer; display: inline-flex; align-items: center;
+    justify-content: center; gap: 6px; width: 100%;
+}
+.ld-col-more:hover { background: var(--gray-200); color: var(--gray-800); }
 
 .ld-card {
     background: var(--surface-card);
