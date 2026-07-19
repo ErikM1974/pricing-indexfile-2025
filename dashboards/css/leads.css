@@ -100,6 +100,27 @@
 }
 .ld-chip-btn[aria-pressed="true"] { background: var(--gray-900); color: var(--surface-card); border-color: var(--gray-900); }
 
+/* The drawer (position:fixed, z-index 70) + modals (z-index 80) cover the
+   in-flow dash error banner — on a phone the 96vw drawer hides it entirely and
+   the overlay eats its dismiss click. Pin it above everything when shown so a
+   save-failure message from inside the drawer is always visible + dismissable. */
+.dash-error-banner.show {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    z-index: 95;
+    margin: 0;
+    box-shadow: var(--shadow-lg);
+}
+
+/* Keyboard focus for the mouse-openable cards/rows (they're role=button now). */
+.ld-card:focus-visible,
+.ld-table tr[data-id]:focus-visible {
+    outline: 2px solid var(--gray-900);
+    outline-offset: -2px;
+}
+
 /* ── Kanban board ── */
 .ld-board {
     display: grid;

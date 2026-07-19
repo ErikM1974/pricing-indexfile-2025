@@ -795,7 +795,7 @@
     function renderArtworkPanel(lead) {
         var payload = L.payloadOf(lead);
         var atts = L.collectAttachments(payload);
-        var jfUrl = L.safeHttpUrl((payload._source || {}).url || '');
+        var jfUrl = L.safeSourceUrl((payload._source || {}).url || '');
         var root = document.getElementById('lw-panel-artwork');
         if (!atts.length && !jfUrl) { root.innerHTML = '<span class="ld-muted">None attached.</span>'; return; }
         var thumbs = atts.map(function (a) { return a.url; }).filter(L.isImageUrl);

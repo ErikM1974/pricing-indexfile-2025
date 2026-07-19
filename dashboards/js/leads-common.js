@@ -116,6 +116,26 @@
         return typeof u === 'string' && /^https:\/\//i.test(u) ? u : '';
     }
 
+    // Lead fields (incl. payload.artworkUrls and _source.url) come from the PUBLIC
+    // POST /api/form-submissions — an attacker can inject any https:// URL. A
+    // scheme check (safeHttpUrl) is NOT enough: an arbitrary host renders as a
+    // tracking-beacon <img> or a phishing link inside staff dashboards. Attachments
+    // are restricted to OUR proxy files + JotForm uploads; the "View in JotForm"
+    // source link is restricted to jotform.com. Both parse the URL (not a prefix
+    // match) so `https://evil.com/api/files/` and `https://evil.com/jotform.com`
+    // can't sneak through.
+    function isAllowedAttachmentUrl(u) {
+        return typeof u === 'string' && (isJfUpload(u) || u.indexOf(filesBase()) === 0);
+    }
+
+    function safeSourceUrl(u) {
+        if (typeof u !== 'string' || !/^https:\/\//i.test(u)) return '';
+        try {
+            var h = new URL(u).hostname.toLowerCase();
+            return (h === 'jotform.com' || h.endsWith('.jotform.com')) ? u : '';
+        } catch (e) { return ''; }
+    }
+
     // ---------- payload / source ----------
 
     function payloadOf(lead) {
@@ -182,15 +202,13 @@
 
     // Known-safe attachment hosts only — never arbitrary customer-typed URLs.
     function extractFileUrls(text) {
-        var base = filesBase();
         var s = String(text || '');
         var out = [];
         var re = /https:\/\/\S+/g;
         var m;
         while ((m = re.exec(s))) {
             var u = m[0].replace(/[),.;'"\]]+$/, '');
-            var allowed = isJfUpload(u) || u.indexOf(base) === 0;
-            if (!allowed) continue;
+            if (!isAllowedAttachmentUrl(u)) continue;
             // QRQ format "NWE LOGO.webp — https://…" → keep the human filename
             var before = s.slice(0, m.index).replace(/[\s—–-]+$/, '');
             var nm = before.split(/[|;,\n]/).pop().trim();
@@ -203,12 +221,15 @@
     // All of a lead's ORIGINAL attachments: payload.artworkUrls + file links
     // found inside submitted field values. Deduped; {url, name}.
     function collectAttachments(payload) {
-        var atts = (payload.artworkUrls || []).map(function (u) { return { url: u, name: '' }; });
+        // artworkUrls is attacker-controlled (public POST) — allowlist the host,
+        // don't just check the scheme (that let any https:// image/link through).
+        var atts = (payload.artworkUrls || [])
+            .filter(isAllowedAttachmentUrl)
+            .map(function (u) { return { url: u, name: '' }; });
         payloadEntries(payload).forEach(function (p) { atts = atts.concat(extractFileUrls(p[1])); });
         var seen = {};
         return atts.filter(function (a) {
-            a.url = safeHttpUrl(a.url);
-            if (!a.url || seen[a.url]) return false;
+            if (!isAllowedAttachmentUrl(a.url) || seen[a.url]) return false; // defense-in-depth
             seen[a.url] = true;
             return true;
         });
@@ -342,6 +363,8 @@
         todayIso: todayIso,
         isOverdue: isOverdue,
         safeHttpUrl: safeHttpUrl,
+        safeSourceUrl: safeSourceUrl,
+        isAllowedAttachmentUrl: isAllowedAttachmentUrl,
         payloadOf: payloadOf,
         payloadEntries: payloadEntries,
         sourceTitleOf: sourceTitleOf,
