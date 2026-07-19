@@ -128,6 +128,9 @@
         if (params.get('success') === '1') {
             var quoteId = params.get('quote_id') || '';
             sessionStorage.removeItem('sampleCart');
+            // If an AE started this from a lead, log it to the lead's timeline + clear
+            // the handoff stash (no-op for real customers). Defined in sample-cart-page.js.
+            if (typeof window.finishSampleLeadHandoff === 'function') window.finishSampleLeadHandoff(quoteId);
             var cartContainer = document.getElementById('cartContainer');
             var success = document.getElementById('successMessage');
             if (cartContainer) cartContainer.style.display = 'none';

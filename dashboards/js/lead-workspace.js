@@ -119,6 +119,7 @@
         if (!el) return;
         el.innerHTML =
             '<button type="button" id="lw-edit" class="ld-btn"><i class="fas fa-pen"></i> Edit info</button>' +
+            '<button type="button" id="lw-samples" class="ld-btn"><i class="fas fa-box-open"></i> Send samples</button>' +
             (isAdmin() ? '<button type="button" id="lw-delete" class="ld-btn ld-btn--danger"><i class="fas fa-trash"></i> Delete</button>' : '');
         el.hidden = false;
         document.getElementById('lw-edit').addEventListener('click', function () {
@@ -127,10 +128,40 @@
                 renderRail();        // contact + artwork panels read the edited fields
             } });
         });
+        document.getElementById('lw-samples').addEventListener('click', function () { startSampleOrder(lead); });
         var del = document.getElementById('lw-delete');
         if (del) del.addEventListener('click', function () {
             L.deleteLead(lead, { onDeleted: function () { window.location.href = '/dashboards/leads.html'; } });
         });
+    }
+
+    // Open the sample catalog with the lead's contact info stashed for the cart to
+    // prefill. localStorage (not sessionStorage) because the builder/catalog opens
+    // in a noopener tab that can't inherit sessionStorage — same cross-tab rule as
+    // the quote handoff. The cart consumes + clears it (pages/js/sample-cart-page.js).
+    function startSampleOrder(lead) {
+        var name = (lead.Contact_Name || '').trim();
+        var sp = name.indexOf(' ');
+        try {
+            localStorage.setItem('nwca-sample-prefill', JSON.stringify({
+                v: 1,
+                ts: Date.now(),
+                submissionId: lead.Submission_ID,
+                firstName: sp > 0 ? name.slice(0, sp) : name,
+                lastName: sp > 0 ? name.slice(sp + 1) : '',
+                email: lead.Email || '',
+                phone: lead.Phone || '',
+                company: lead.Company || '',
+                salesRep: lead.Sales_Rep || L.EMAIL_TO_REP[state.staffEmail] || 'House',
+                staffEmail: state.staffEmail || '',
+            }));
+        } catch (e) {
+            console.error('[lead-ws] sample stash failed', e);
+            DashPage.showError('Could not carry the contact info into the sample cart (browser storage blocked). Open /catalog and enter it manually.');
+        }
+        window.open('/catalog?topSellers=1&from=leadsample', '_blank', 'noopener');
+        L.logActivity(lead.Submission_ID, 'system', 'Started a sample order', '', state.staffEmail)
+            .then(function (r) { if (r && r.activity) prependActivity(r.activity); });
     }
 
     // 🔥 + first-response chips under the title (leads-common heuristics).
