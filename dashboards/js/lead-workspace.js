@@ -42,8 +42,11 @@
             .then(function (me) { state.staffEmail = me.email || ''; })
             .catch(function () { /* Created_By falls back to 'leads-page' */ });
 
-        var id = decodeURIComponent((location.hash || '').slice(1)) ||
-            new URLSearchParams(location.search).get('id') || '';
+        var rawHash = (location.hash || '').slice(1);
+        var id = '';
+        try { id = decodeURIComponent(rawHash); }
+        catch (_) { id = rawHash; } // malformed % in an emailed link — use it raw rather than crash boot
+        if (!id) id = new URLSearchParams(location.search).get('id') || '';
         if (!id) {
             renderFatal('No lead id — open a lead from the <a href="/dashboards/leads.html">Leads board</a>.');
             return;
@@ -142,7 +145,10 @@
         }).catch(function (err) {
             console.error('[lead-ws] save failed:', err);
             DashPage.showError('Could not save ' + field.replace(/_/g, ' ') + ' (' + err.message + '). Nothing was changed.');
-            if (el && el.tagName === 'SELECT') el.value = prev || '';
+            // Revert the control to the last-saved value — was SELECT-only, so a
+            // failed date/number edit kept showing the unsaved value (the AE would
+            // trust a due date / est. value that never persisted).
+            if (el && (el.tagName === 'SELECT' || el.tagName === 'INPUT')) el.value = prev == null ? '' : prev;
             return false;
         }).finally(function () {
             if (el) el.disabled = false;
@@ -409,7 +415,14 @@
                     btn.disabled = false;
                     var note = document.getElementById('lw-outreach-note');
                     if (note) note.textContent = '';
-                    DashPage.showError('Email NOT sent: ' + err.message);
+                    // A 15s client timeout does NOT cancel the server's send — the
+                    // email may have gone out. Saying "NOT sent" invites a duplicate.
+                    var timedOut = err.name === 'AbortError' || /abort|timed?\s*out|timeout/i.test(err.message || '');
+                    if (timedOut) {
+                        DashPage.showError('The send timed out before the server confirmed — the email MAY have gone out. Reload the page to check the timeline before resending, so ' + lead.Email + ' isn\'t emailed twice.');
+                    } else {
+                        DashPage.showError('Email NOT sent: ' + err.message);
+                    }
                 });
             });
         }).catch(function (err) {
@@ -638,6 +651,16 @@
         });
     }
 
+    function unlinkQuote(lead) {
+        var wasId = lead.Linked_Quote_ID;
+        saveLeadField('Linked_Quote_ID', '', null).then(function (ok) {
+            if (!ok) return;
+            L.logActivity(lead.Submission_ID, 'quote', 'Unlinked quote ' + (wasId || ''), '', state.staffEmail)
+                .then(function (r) { if (r && r.activity) prependActivity(r.activity); });
+            renderQuotePanel(lead); // back to the builder buttons + suggestions + manual link
+        });
+    }
+
     function loadQuoteSuggestions(lead) {
         var box = document.getElementById('lw-quote-suggest');
         if (!box) return;
@@ -692,15 +715,25 @@
         if (lead.Linked_Quote_ID) {
             root.innerHTML = '<div class="lw-quote-linked">' +
                 '<div class="ld-match-head"><span class="ld-id">' + esc(lead.Linked_Quote_ID) + '</span>' +
-                '<a class="ld-btn" href="/quote/' + encodeURIComponent(lead.Linked_Quote_ID) + '" target="_blank" rel="noopener">Open</a></div>' +
+                '<span class="lw-quote-linked-actions">' +
+                '<a class="ld-btn" href="/quote/' + encodeURIComponent(lead.Linked_Quote_ID) + '" target="_blank" rel="noopener">Open</a>' +
+                '<button type="button" id="lw-quote-unlink" class="lw-chip" title="Unlink this quote from the lead">Unlink</button>' +
+                '</span></div>' +
                 '<div id="lw-quote-live" class="ld-muted">Loading quote…</div></div>';
+            document.getElementById('lw-quote-unlink').addEventListener('click', function () { unlinkQuote(lead); });
             DashPage.fetchJson('/api/quote_sessions?quoteID=' + encodeURIComponent(lead.Linked_Quote_ID))
                 .then(function (body) {
                     var rows = Array.isArray(body) ? body : (body.sessions || body.result || []);
                     var q = rows[0];
                     var el = document.getElementById('lw-quote-live');
                     if (!el) return;
-                    if (!q) { el.textContent = 'Quote not found.'; return; }
+                    if (!q) {
+                        // Linked to an ID that doesn't exist (e.g. a typo to a valid-
+                        // format but missing quote). Say so AND keep the Unlink button
+                        // visible above so it's recoverable — never re-sync $ from it.
+                        el.innerHTML = '<span class="lw-quote-missing">Quote ' + esc(lead.Linked_Quote_ID) + ' not found — use Unlink to correct it.</span>';
+                        return;
+                    }
                     el.outerHTML = '<div class="lw-quote-amount">' + (fmtMoney(q.TotalAmount) || '—') + '</div>' +
                         '<div class="ld-muted">' + esc(q.Status || '') + (q.CustomerName ? ' · ' + esc(q.CustomerName) : '') + '</div>';
                     // Snapshot re-sync: the quote's real total drives pipeline $.
@@ -733,7 +766,22 @@
         document.getElementById('lw-quote-link').addEventListener('click', function () {
             var id = document.getElementById('lw-quote-id').value.trim();
             if (!/^[A-Za-z0-9-]{3,40}$/.test(id)) { DashPage.showError('That does not look like a Quote ID.'); return; }
-            linkQuote(lead, { QuoteID: id, TotalAmount: null }); // linked view re-syncs $ from the live quote
+            // Verify the quote EXISTS before linking — a typo to a valid-format ID
+            // used to save silently and lock the panel to "Quote not found" with no
+            // way out (and could clobber Lead_Value from the wrong quote).
+            var linkBtn = document.getElementById('lw-quote-link');
+            linkBtn.disabled = true;
+            DashPage.fetchJson('/api/quote_sessions?quoteID=' + encodeURIComponent(id))
+                .then(function (body) {
+                    var rows = Array.isArray(body) ? body : (body.sessions || body.result || []);
+                    var q = rows[0];
+                    if (!q) { DashPage.showError('Quote ' + id + ' was not found — check the ID and try again.'); linkBtn.disabled = false; return; }
+                    linkQuote(lead, { QuoteID: q.QuoteID || id, TotalAmount: q.TotalAmount != null ? q.TotalAmount : null });
+                })
+                .catch(function (err) {
+                    DashPage.showError('Could not verify quote ' + id + ' (' + err.message + ').');
+                    linkBtn.disabled = false;
+                });
         });
     }
 
@@ -776,7 +824,12 @@
                             '<td>' + esc(st) + '</td></tr>';
                     }).join('') + '</tbody></table></div>';
             }).catch(function (err) {
-                root.innerHTML = '<span class="ld-muted">Order history unavailable (' + esc(err.message) + ').</span>';
+                // Leave a Retry control — the workspace has no refresh button, so
+                // without this a transient blip forces a full page reload.
+                root.innerHTML = '<span class="ld-muted">Order history unavailable (' + esc(err.message) + '). </span>' +
+                    '<button type="button" id="lw-orders-retry" class="lw-chip">Retry</button>';
+                var retry = document.getElementById('lw-orders-retry');
+                if (retry) retry.addEventListener('click', function () { renderOrdersPanel(lead, true); });
             });
         };
         btn.addEventListener('click', load);

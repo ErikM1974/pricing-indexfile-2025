@@ -914,7 +914,10 @@
                     }).join('') + '</tbody></table></div>';
             }).catch(function (err) {
                 console.error('[leads] order history failed:', err);
-                root.innerHTML = '<span class="ld-muted">Order history unavailable (' + esc(err.message) + ').</span>';
+                root.innerHTML = '<span class="ld-muted">Order history unavailable (' + esc(err.message) + '). </span>' +
+                    '<button type="button" id="btn-orders-retry" class="ld-btn">Retry</button>';
+                var retry = document.getElementById('btn-orders-retry');
+                if (retry) retry.addEventListener('click', function () { renderOrdersSection(lead, true); });
             });
         };
         btn.addEventListener('click', load);
