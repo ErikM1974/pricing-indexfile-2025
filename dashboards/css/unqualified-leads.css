@@ -1,0 +1,70 @@
+/* ==========================================================================
+   unqualified-leads.css — page styles for dashboards/unqualified-leads.html
+
+   Shell classes from dash-shell.css; tokens (--gray-*, --surface-*, --radius-*,
+   --state-*) from art-hub.css. No hardcoded palette, no inline styles.
+   ========================================================================== */
+
+.uq-intro { font-size: 0.9rem; color: var(--gray-600); max-width: 900px; margin: 0 0 16px; line-height: 1.5; }
+.uq-intro strong { color: var(--gray-800); }
+
+.uq-btn {
+    font: inherit; font-size: 0.85rem; font-weight: 600;
+    color: var(--gray-700); background: var(--surface-card);
+    border: 1px solid var(--gray-300); border-radius: var(--radius-sm);
+    padding: 8px 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+}
+.uq-btn:hover { background: var(--gray-100); }
+
+.uq-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+.uq-tab {
+    font: inherit; font-size: 0.9rem; font-weight: 600;
+    color: var(--gray-600); background: var(--gray-100);
+    border: 1px solid var(--gray-200); border-radius: var(--radius-md);
+    padding: 9px 16px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+}
+.uq-tab:hover { background: var(--gray-200); }
+.uq-tab.is-active { background: var(--gray-900); color: var(--surface-card); border-color: var(--gray-900); }
+.uq-badge {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; font-weight: 700;
+    background: var(--surface-card); color: var(--gray-700);
+    border-radius: 999px; padding: 1px 8px; min-width: 18px; text-align: center;
+}
+.uq-tab.is-active .uq-badge { background: var(--gray-700); color: var(--surface-card); }
+
+.uq-count { font-size: 0.82rem; color: var(--gray-500); }
+.uq-input {
+    margin-left: auto; font: inherit; font-size: 0.88rem; color: var(--gray-800);
+    background: var(--surface-card); border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm); padding: 7px 10px; min-width: 240px;
+}
+.uq-input:focus-visible { outline: 2px solid var(--gray-400); outline-offset: 1px; }
+
+.uq-note {
+    font-size: 0.82rem; color: var(--gray-600); line-height: 1.5;
+    background: var(--state-warning-bg, var(--gray-50));
+    border: 1px solid var(--gray-200); border-radius: var(--radius-md);
+    padding: 10px 14px; margin: 0 0 14px;
+}
+.uq-note code { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; background: var(--gray-100); padding: 1px 5px; border-radius: 4px; }
+.uq-note em { font-style: italic; }
+
+.uq-table-scroll { overflow-x: auto; }
+.uq-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+.uq-table th, .uq-table td {
+    text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--gray-100); vertical-align: top;
+}
+.uq-table th {
+    font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
+    color: var(--gray-500); background: var(--gray-50); white-space: nowrap; position: sticky; top: 0;
+}
+.uq-table tbody tr:hover { background: var(--gray-50); }
+.uq-when { white-space: nowrap; color: var(--gray-500); }
+.uq-email { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--gray-600); }
+.uq-summary { color: var(--gray-700); max-width: 420px; }
+.uq-empty { text-align: center; color: var(--gray-500); padding: 22px; }
+
+@media (max-width: 640px) {
+    .uq-input { min-width: 0; width: 100%; margin: 8px 0 0; }
+    .dash-card-header { flex-wrap: wrap; }
+}
