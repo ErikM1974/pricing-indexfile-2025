@@ -1,3 +1,8 @@
+## v2026.07.19.7 (2026.07.19)
+
+- feat(leads-board): fetch full lead set (2000) so the board covers all ~1,066 leads — no more '600 most recent' cutoff
+- Deploy v2026.07.19.7: cache-bust leads assets
+
 ## v2026.07.19.6 (2026.07.19)
 
 - feat(leads-board): cap each kanban column at 20 cards + Show N more / Show fewer toggle (Won/Lost columns ran hundreds deep after backfill)
