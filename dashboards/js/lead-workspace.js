@@ -369,6 +369,7 @@
         renderOrdersPanel(lead);
         renderDetailsPanel(lead);
         renderArtworkPanel(lead);
+        renderArtPanel(lead);
     }
 
     function renderContactPanel(lead) {
@@ -930,4 +931,149 @@
             });
         });
     }
+
+    // ---------- Send to the art team (Steve/Ruth) ----------
+    //
+    // Reuses the production-proven quote-view "Send to Steve" flow: lazy-load the
+    // shared GarmentSubmitForm bundle, open it in a modal PREFILLED from the lead,
+    // and on submit link the new art request back onto the lead (Art_Request_ID
+    // was pre-built for exactly this) + log the timeline. Zero backend changes —
+    // POST /api/artrequests is the same pass-through the AE dashboard uses.
+
+    var _artFormLoading = null;
+    function ensureArtFormLoaded() {
+        if (_artFormLoading) return _artFormLoading;
+        if (typeof GarmentSubmitForm !== 'undefined') { _artFormLoading = Promise.resolve(); return _artFormLoading; }
+        var V = '2026.06.26.1';
+        var loadScript = function (src) {
+            return new Promise(function (resolve, reject) {
+                var base = src.split('?')[0];
+                if (document.querySelector('script[data-src="' + base + '"]')) return resolve();
+                var s = document.createElement('script');
+                s.src = src; s.setAttribute('data-src', base);
+                s.onload = function () { resolve(); };
+                s.onerror = function () { reject(new Error('Failed to load ' + base)); };
+                document.head.appendChild(s);
+            });
+        };
+        var loadCss = function (href) {
+            var base = href.split('?')[0];
+            if (document.querySelector('link[data-href="' + base + '"]')) return;
+            var l = document.createElement('link');
+            l.rel = 'stylesheet'; l.href = href; l.setAttribute('data-href', base);
+            document.head.appendChild(l);
+        };
+        loadCss('/shared_components/css/garment-submit-form.css?v=' + V);
+        // app-config first (form API base + pickers), then tolerant enhancers, then the form JS.
+        _artFormLoading = loadScript('/shared_components/js/app-config.js').catch(function () {})
+            .then(function () {
+                return Promise.allSettled([
+                    loadScript('https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js'),
+                    loadScript('/shared_components/js/nwca-date-utils.js'),
+                    loadScript('/shared_components/js/customer-lookup-service.js'),
+                    loadScript('/shared_components/js/design-name-picker.js'),
+                    loadScript('/shared_components/js/work-order-picker.js'),
+                ]);
+            })
+            .then(function () { return loadScript('/shared_components/js/garment-submit-form.js?v=' + V); });
+        return _artFormLoading;
+    }
+
+    function buildArtPrefill(lead) {
+        var payload = L.payloadOf(lead);
+        // Only OUR proxy-hosted files import server-side (JotForm hosts aren't on
+        // the import-from-url allowlist) — carry those as reference files; JotForm
+        // attachment links ride in the notes instead.
+        var atts = L.collectAttachments(payload);
+        var artworkUrls = atts
+            .filter(function (a) { return a.url.indexOf(L.filesBase()) === 0; })
+            .map(function (a) { return { url: a.url, fileName: a.name || 'lead-artwork', displayName: a.name || 'Lead artwork' }; });
+        var jfLinks = atts
+            .filter(function (a) { return L.isJfUpload(a.url); })
+            .map(function (a) { return a.name || L.fileBasename(a.url); });
+
+        var notes = 'From lead ' + lead.Submission_ID + ': ' + (lead.Summary || '(no summary)') +
+            '\nLead: ' + SITE_ORIGIN() + '/dashboards/lead.html#' + lead.Submission_ID +
+            (lead.Phone ? ('\nPhone: ' + lead.Phone) : '') +
+            (jfLinks.length ? ('\nJotForm attachments: ' + jfLinks.join(', ')) : '');
+
+        return {
+            company: lead.Company || '',
+            contactName: lead.Contact_Name || '',
+            contactEmail: lead.Email || '',
+            salesRep: lead.Sales_Rep || '',
+            custNum: lead.Matched_ID_Customer || '',
+            customerId: lead.Matched_ID_Customer || '',
+            dueDate: /^\d{4}-\d{2}-\d{2}$/.test(lead.Due_Date || '') ? lead.Due_Date : '',
+            notes: notes,
+            artworkUrls: artworkUrls,
+        };
+    }
+
+    // Same-origin absolute base for the lead back-link (art-request-detail reads NOTES).
+    function SITE_ORIGIN() {
+        return (window.location && window.location.origin) || 'https://teamnwca.com';
+    }
+
+    function renderArtPanel(lead) {
+        var root = document.getElementById('lw-panel-art');
+        if (!root) return;
+        if (lead.Art_Request_ID) {
+            root.innerHTML =
+                '<div class="ld-match-head"><span class="ld-pill ld-pill--customer"><i class="fas fa-palette"></i> Art request #' + esc(lead.Art_Request_ID) + '</span>' +
+                '<a class="ld-btn" href="/art-request/' + encodeURIComponent(lead.Art_Request_ID) + '?view=ae" target="_blank" rel="noopener">Open</a></div>' +
+                '<button type="button" id="lw-art-again" class="lw-chip" style="margin-top:8px">Start another</button>';
+            document.getElementById('lw-art-again').addEventListener('click', function () { openArtModal(lead); });
+            return;
+        }
+        root.innerHTML =
+            '<span class="ld-muted">Hand this lead to Steve/Ruth with the contact info + artwork prefilled.</span>' +
+            '<button type="button" id="lw-art-send" class="ld-btn ld-btn--primary" style="margin-top:8px"><i class="fas fa-palette"></i> Send to the art team</button>';
+        document.getElementById('lw-art-send').addEventListener('click', function () { openArtModal(lead); });
+    }
+
+    function openArtModal(lead) {
+        var btn = document.getElementById('lw-art-send') || document.getElementById('lw-art-again');
+        var orig = btn ? btn.innerHTML : '';
+        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading…'; }
+        ensureArtFormLoaded().then(function () {
+            if (typeof GarmentSubmitForm === 'undefined') throw new Error('art form bundle failed to load');
+            var modal = document.getElementById('lw-art-modal');
+            GarmentSubmitForm.init('lw-art-form-mount', {
+                prefill: buildArtPrefill(lead),
+                onSubmitted: function (designId) {
+                    if (modal) modal.style.display = 'none';
+                    if (designId) {
+                        saveLeadField('Art_Request_ID', String(designId), null).then(function (ok) {
+                            if (!ok) return;
+                            L.logActivity(lead.Submission_ID, 'system', 'Started art request #' + designId, '', state.staffEmail)
+                                .then(function (r) { if (r && r.activity) prependActivity(r.activity); });
+                            renderArtPanel(lead);
+                        });
+                    }
+                },
+            });
+            if (modal) modal.style.display = 'flex';
+        }).catch(function (err) {
+            console.error('[lead-ws] Send to art failed:', err);
+            DashPage.showError('Could not open the art form (' + (err && err.message ? err.message : 'unknown error') + ').');
+        }).finally(function () {
+            if (btn) { btn.disabled = false; btn.innerHTML = orig; }
+        });
+    }
+
+    // Wire the art-modal close controls once (the modal markup is static in lead.html).
+    (function wireArtModal() {
+        var closeIt = function () { var m = document.getElementById('lw-art-modal'); if (m) m.style.display = 'none'; };
+        document.addEventListener('DOMContentLoaded', function () {
+            var c = document.getElementById('lw-art-modal-close');
+            var b = document.getElementById('lw-art-modal-backdrop');
+            if (c) c.addEventListener('click', closeIt);
+            if (b) b.addEventListener('click', closeIt);
+            document.addEventListener('keydown', function (e) {
+                var m = document.getElementById('lw-art-modal');
+                if (e.key === 'Escape' && m && m.style.display !== 'none') closeIt();
+            });
+        });
+    })();
 })();
