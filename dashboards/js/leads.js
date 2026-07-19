@@ -112,6 +112,7 @@
         bindFocusTrap(drawer, function () { return drawer.classList.contains('open'); });
         bindFocusTrap(document.getElementById('newlead-modal'), function () { return !document.getElementById('newlead-modal').hidden; });
         document.getElementById('btn-refresh').addEventListener('click', loadLeads);
+        document.getElementById('btn-export').addEventListener('click', exportCurrentView);
         document.getElementById('filter-archived').addEventListener('change', function () {
             state.includeArchived = this.checked;
             loadLeads();
@@ -378,6 +379,45 @@
             if (hay.indexOf(state.search) === -1) return false;
         }
         return true;
+    }
+
+    // ---------- CSV export (current view) ----------
+
+    function exportCurrentView() {
+        var rows = state.leads.filter(matchesFilters);
+        if (!rows.length) { DashPage.showError('Nothing to export — no leads match the current filters.'); return; }
+        var cols = [
+            ['Lead ID', function (l) { return l.Submission_ID; }],
+            ['Received', function (l) { return l.Submitted_At; }],      // raw naive-Pacific string — never append Z
+            ['Contact', function (l) { return l.Contact_Name; }],
+            ['Company', function (l) { return l.Company; }],
+            ['Email', function (l) { return l.Email; }],
+            ['Phone', function (l) { return l.Phone; }],
+            ['Source', function (l) { return L.sourceTitleOf(l); }],
+            ['Rep', function (l) { return l.Sales_Rep; }],
+            ['Status', function (l) { return l.Status; }],
+            ['Est. Value', function (l) { return l.Lead_Value; }],      // raw number so Excel can sum it
+            ['Follow-up', function (l) { return l.Due_Date; }],
+            ['Last Updated', function (l) { return l.Updated_At; }],    // proxy for last activity (avoids N+1 Caspio reads)
+            ['Hot', function (l) { return L.leadHeat(l).join('; '); }],
+            ['ShopWorks #', function (l) { return l.Matched_ID_Customer; }],
+            ['Linked Quote', function (l) { return l.Linked_Quote_ID; }],
+            ['Summary', function (l) { return l.Summary; }],
+        ];
+        var lines = [cols.map(function (c) { return L.csvCell(c[0]); }).join(',')];
+        rows.forEach(function (l) {
+            lines.push(cols.map(function (c) { return L.csvCell(c[1](l)); }).join(','));
+        });
+        // UTF-8 BOM so Excel decodes accented company/contact names correctly.
+        var blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'leads-' + (state.includeArchived ? 'all' : 'active') + '-' + L.todayIso() + '.csv';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
     }
 
     function renderTable() {

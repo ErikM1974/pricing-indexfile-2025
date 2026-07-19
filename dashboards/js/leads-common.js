@@ -136,6 +136,17 @@
         } catch (e) { return ''; }
     }
 
+    // One RFC-4180 CSV cell, hardened against Excel formula injection. Lead values
+    // are attacker-supplied (public POST), so a cell starting with = + - @ (or a
+    // control char Excel treats as a formula lead-in) is prefixed with an apostrophe
+    // so Excel shows it as text instead of executing it.
+    function csvCell(v) {
+        var s = String(v == null ? '' : v);
+        if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
+        if (/[",\r\n]/.test(s)) s = '"' + s.replace(/"/g, '""') + '"';
+        return s;
+    }
+
     // ---------- payload / source ----------
 
     function payloadOf(lead) {
@@ -365,6 +376,7 @@
         safeHttpUrl: safeHttpUrl,
         safeSourceUrl: safeSourceUrl,
         isAllowedAttachmentUrl: isAllowedAttachmentUrl,
+        csvCell: csvCell,
         payloadOf: payloadOf,
         payloadEntries: payloadEntries,
         sourceTitleOf: sourceTitleOf,

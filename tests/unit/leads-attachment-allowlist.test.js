@@ -53,6 +53,30 @@ describe('safeSourceUrl — jotform.com only', () => {
     });
 });
 
+describe('csvCell — RFC-4180 quoting + Excel formula-injection hardening', () => {
+    test('plain values pass through unquoted', () => {
+        expect(L.csvCell('Acme Co')).toBe('Acme Co');
+        expect(L.csvCell(2500)).toBe('2500');
+        expect(L.csvCell(null)).toBe('');
+    });
+    test('quotes/commas/newlines are RFC-4180 quoted', () => {
+        expect(L.csvCell('a,b')).toBe('"a,b"');
+        expect(L.csvCell('she said "hi"')).toBe('"she said ""hi"""');
+        expect(L.csvCell('line1\nline2')).toBe('"line1\nline2"');
+    });
+    test('formula-lead-in cells are apostrophe-prefixed (=+-@)', () => {
+        expect(L.csvCell('=1+1')).toBe("'=1+1");
+        expect(L.csvCell('+1-800-EVIL')).toBe("'+1-800-EVIL");
+        expect(L.csvCell('-2+3')).toBe("'-2+3");
+        expect(L.csvCell('@SUM(A1)')).toBe("'@SUM(A1)");
+    });
+    test('a formula cell that ALSO contains quotes/commas gets both (prefix then RFC-4180 quote)', () => {
+        expect(L.csvCell('=cmd,arg')).toBe('"\'=cmd,arg"');
+        // A malicious HYPERLINK: apostrophe-prefixed, then quotes force quoting + doubling.
+        expect(L.csvCell('=HYPERLINK("http://evil")')).toBe('"\'=HYPERLINK(""http://evil"")"');
+    });
+});
+
 describe('collectAttachments — filters injected artworkUrls', () => {
     test('keeps only allowlisted hosts, drops the injected beacon', () => {
         const atts = L.collectAttachments({
