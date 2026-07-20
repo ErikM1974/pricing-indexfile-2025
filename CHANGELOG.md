@@ -1,3 +1,7 @@
+## v2026.07.20.5 (2026.07.20)
+
+- fix(finished-photos): lightbox overlay was always shown (broken image over dimmed page)
+
 ## v2026.07.20.4 (2026.07.20)
 
 - feat(staff-dashboard): Phase 1 'alive + personal' layer — Win Bell, Pride Wall, My Stuff
