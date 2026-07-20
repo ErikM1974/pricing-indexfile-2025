@@ -1,3 +1,8 @@
+## v2026.07.20.1 (2026.07.20)
+
+- docs(memory): shared SanMar invoice viewer notes (by-po fix, stale mirror warning)
+- feat(vendor-portal): permanent bookmarkable access link — no email round-trip
+
 ## v2026.07.19.17 (2026.07.19)
 
 - feat(finished-photos): Finished Photos Library page — browse all photos by account + sales rep
