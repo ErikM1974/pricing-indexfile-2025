@@ -1,3 +1,9 @@
+## v2026.07.20.4 (2026.07.20)
+
+- feat(staff-dashboard): Phase 1 'alive + personal' layer — Win Bell, Pride Wall, My Stuff
+- feat(staff-dashboard): Phase 2 Ctrl+K Everything Bar + Phase 1 feedback tweaks
+- Deploy v2026.07.20.4: 1 files (index.html...)
+
 ## v2026.07.20.3 (2026.07.20)
 
 - feat(mission-control): show-5 accordion on Missing Info + collapsible secondary cards
