@@ -34,6 +34,7 @@
         mk('162394919', daysAgo(3), '113683', 40.96, 'Net30'),           // not in SW → NOT IMPORTED
         mk('162391874', daysAgo(3), '113682', 1991.77, 'Net30', 'Korsmo Construction <script>alert(1)</script>'),
         mk('5670868', daysAgo(2), '113612', -81.51, 'Net30'),            // credit, not in SW
+        mk('5615563', daysAgo(6), '113372', -36.50, 'Net30'),            // credit, in SW zero-padded (CR-005615563) → must match
         mk('162009107', daysAgo(5), '113552 BW', 249.60, 'Net30'),       // not in SW
         mk('161990010', daysAgo(4), '113610', 164.87, 'MRKFUND'),        // marketing → EXCLUDED from tab
         mk('157400001', daysAgo(200), '111853', 875.07, 'Net30'),        // older than 90d → olderCount
@@ -52,7 +53,8 @@
     window.__SMP_TEST_SW__ =
         'id_PO,VendorName,cur_Payable,date_Paid,ID_Payable,id_Vendor,InvoiceNumber,cnCur_PayableOutstanding\r\n' +
         '113686,SANMAR,122.05 ,,148300,1002,INV-162398367,122.05\r\n' +
-        '113693,SANMAR,"1,170.40 ",07/18/2026,148301,1002,INV-162395846,\r\n';
+        '113693,SANMAR,"1,170.40 ",07/18/2026,148301,1002,INV-162395846,\r\n' +
+        '113372,SANMAR,-36.50 ,,148302,1002,CR-005615563,\r\n';
 
     function byDate(start, end) {
         return byDateFixture.filter(function (i) { return i.invoiceDate >= start && i.invoiceDate <= end; })
