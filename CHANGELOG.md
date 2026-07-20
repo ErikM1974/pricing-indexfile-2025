@@ -1,3 +1,10 @@
+## v2026.07.20.3 (2026.07.20)
+
+- feat(mission-control): show-5 accordion on Missing Info + collapsible secondary cards
+- docs(memory): data-quality open/non-webstore filter + accordion/collapse UI
+- docs(shopworks-odbc): ship-method (Addr.ShipMethod) joined into ORDER_ODBC for DQ radar
+- Deploy v2026.07.20.3: 2 files (ae-mission-control.html,test-ae-mission-control.html,...)
+
 ## v2026.07.20.2 (2026.07.20)
 
 - Deploy v2026.07.20.2: restore /api/staff/finished-photos/library forwarder (lost in 7/19 server.js hotfix revert)
