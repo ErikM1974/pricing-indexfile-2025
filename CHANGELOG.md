@@ -1,3 +1,10 @@
+## v2026.07.19.8 (2026.07.19)
+
+- feat(mission-control): AE Mission Control — per-AE cockpit for Taneisha & Nika
+- feat(mission-control): add Quick Quote to the quick-actions rail (Erik request)
+- docs(memory): AE Mission Control topic file + INDEX row; LESSONS rep-name entry reflects SALES_REP_MAP Jones→Clark fix
+- Deploy v2026.07.19.8: 2 files (ae-mission-control.html,test-ae-mission-control.html...)
+
 ## v2026.07.19.7 (2026.07.19)
 
 - feat(leads-board): fetch full lead set (2000) so the board covers all ~1,066 leads — no more '600 most recent' cutoff
