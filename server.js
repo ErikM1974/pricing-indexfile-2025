@@ -3407,6 +3407,9 @@ function aeDashboardForwarder(upstreamPath) {
 app.get('/api/crm-proxy/ae-dashboard/summary', requireCrmRole(['taneisha', 'nika', 'admin']), aeDashboardForwarder('/api/ae-dashboard/summary'));
 // Growth radar ("Money on the Table") — same identity rules as the summary.
 app.get('/api/crm-proxy/ae-dashboard/growth', requireCrmRole(['taneisha', 'nika', 'admin']), aeDashboardForwarder('/api/ae-dashboard/growth'));
+// Purchasing tracker — JotForm "Purchasing" form (requests to Bradley) joined
+// to the ShopWorks PurchaseOrders mirror (ordered/received) per work order.
+app.get('/api/crm-proxy/ae-dashboard/purchasing', requireCrmRole(['taneisha', 'nika', 'admin']), aeDashboardForwarder('/api/ae-dashboard/purchasing'));
 
 // Leads CRM conversion tracking + rep scorecard (dashboards/lead-scorecard.html):
 // GET /lead-scorecard (per-rep closes + order value) — any logged-in staff;

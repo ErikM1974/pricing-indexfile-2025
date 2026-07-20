@@ -16,7 +16,7 @@
     <!-- 2026 design tokens (must load before dash-shell.css) -->
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/ae-mission-control.css?v=2026.07.19.11">
+    <link rel="stylesheet" href="/dashboards/css/ae-mission-control.css?v=2026.07.19.13">
 </head>
 <body>
     <div class="dash-shell">
@@ -130,6 +130,16 @@
                 <p class="aemc-bonus-foot" id="aemc-bonus-foot"></p>
             </div>
 
+            <!-- Purchasing tracker: JotForm requests to Bradley × ShopWorks PO mirror -->
+            <div class="dash-card aemc-purch-card">
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title"><i class="fas fa-cart-flatbed"></i> My Purchasing <span class="aemc-sub" id="aemc-purch-sub"></span></h2>
+                    <a class="aemc-viewall" href="https://www.jotform.com/inbox/241646601815152" target="_blank" rel="noopener">Purchasing form inbox</a>
+                </div>
+                <p class="aemc-hint">Every purchase request you've sent Bradley (last 60 days) and where it stands: <span class="aemc-purch-chip aemc-purch--sent">Sent</span> → <span class="aemc-purch-chip aemc-purch--ordered">Ordered</span> → <span class="aemc-purch-chip aemc-purch--received">Received</span> → <span class="aemc-purch-chip aemc-purch--shipped">Shipped</span></p>
+                <div id="aemc-purch"><div class="dash-loading">Checking your purchase requests…</div></div>
+            </div>
+
             <!-- Growth radar: revenue statistically missing vs each account's own history -->
             <div class="dash-card aemc-growth-card">
                 <div class="dash-card-header">
@@ -236,6 +246,6 @@
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/dash-page-helpers.js"></script>
     <script src="/dashboards/js/sanmar-inbound-today.js?v=2026.07.19.1"></script>
-    <script src="/dashboards/js/ae-mission-control.js?v=2026.07.19.11"></script>
+    <script src="/dashboards/js/ae-mission-control.js?v=2026.07.19.13"></script>
 </body>
 </html>

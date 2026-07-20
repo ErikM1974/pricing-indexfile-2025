@@ -226,6 +226,23 @@ a.aemc-row-main:hover { text-decoration: underline; }
     color: var(--gray-500);
 }
 
+/* ---------- purchasing tracker card ---------- */
+.aemc-purch-card { margin-bottom: var(--space-4); }
+.aemc-purch-chip {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+.aemc-purch--sent { background: var(--surface-inset); color: var(--gray-600); border: 1px solid var(--gray-300); }
+.aemc-purch--ordered { background: #f3f7ff; color: #0a4fb5; border: 1px solid #c4d7f7; }
+.aemc-purch--partial { background: #fff8f0; color: #b85a00; border: 1px solid #f5d3ad; }
+.aemc-purch--received { background: #eaf7ef; color: #0f5132; border: 1px solid #b7e0c5; }
+.aemc-purch--invoiced { background: #eaf7ef; color: #0f5132; border: 1px solid #b7e0c5; }
+.aemc-purch--shipped { background: #4cb354; color: #fff; border: 1px solid #4cb354; }
+
 /* ---------- growth radar card ---------- */
 .aemc-growth-card { margin-bottom: var(--space-4); }
 .aemc-growth-hint { margin-bottom: var(--space-2); }

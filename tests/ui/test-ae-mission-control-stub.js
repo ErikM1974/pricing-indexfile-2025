@@ -164,6 +164,23 @@
                 ],
             });
         }
+        if (u.indexOf('/api/crm-proxy/ae-dashboard/purchasing') !== -1) {
+            return json({
+                rep: REP, generatedAt: new Date().toISOString(), windowDays: 60,
+                submissionCount: 4, truncated: 0, cacheHit: false,
+                counts: { sent: 1, ordered: 1, received: 1, shipped: 1 },
+                items: [
+                    { submissionId: '1', submittedAt: daysAgoDay(1) + ' 09:12:00', orderType: 'Regular Order', bradleyPo: '3702', orders: [
+                        { orderNumber: 142501, company: 'Harbor Electric', status: 'sent', poCount: 0, vendors: [], orderedDate: '', receivedDate: '' }] },
+                    { submissionId: '2', submittedAt: daysAgoDay(3) + ' 14:40:00', orderType: 'Rush', bradleyPo: '3691', orders: [
+                        { orderNumber: 142449, company: 'Korsmo Construction', status: 'ordered', poCount: 1, vendors: ['SanMar'], orderedDate: daysAgoDay(2), receivedDate: '' }] },
+                    { submissionId: '3', submittedAt: daysAgoDay(7) + ' 10:05:00', orderType: 'Regular Order', bradleyPo: '3668', orders: [
+                        { orderNumber: 142398, company: 'CITC of Washington', status: 'received', poCount: 2, vendors: ['SanMar', 'S&S Activewear'], orderedDate: daysAgoDay(6), receivedDate: daysAgoDay(2) }] },
+                    { submissionId: '4', submittedAt: daysAgoDay(12) + ' 16:22:00', orderType: 'Regular Order', bradleyPo: '', orders: [
+                        { orderNumber: 142301, company: 'Boeing Employees Club', status: 'shipped', poCount: 1, vendors: ['SanMar'], orderedDate: daysAgoDay(11), receivedDate: daysAgoDay(6) }] },
+                ],
+            });
+        }
         if (u.indexOf('/api/crm-proxy/marketing-shipments/items') !== -1) {
             return json({ items: kitItems });
         }
