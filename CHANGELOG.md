@@ -1,3 +1,8 @@
+## v2026.07.19.15 (2026.07.19)
+
+- docs(memory): Purchasing Portal notes
+- Deploy v2026.07.19.15: SanMar invoice viewer on the Purchasing Portal (on-screen + Print/Save PDF)
+
 ## v2026.07.19.14 (2026.07.19)
 
 - docs(memory): My Purchasing tracker (JotForm x PurchaseOrders) notes
