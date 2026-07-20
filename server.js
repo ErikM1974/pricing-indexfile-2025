@@ -153,6 +153,13 @@ dotenv.config();
 //   L543  GET  /crm-logout
 //   L553  GET  /dashboards/{taneisha,nika,house}-*.html (role-gated)
 //
+// VENDOR PORTAL (subcontractor magic-link — L&P Screen Printing / Ed Lacey, 2026-07-19)
+//   ~L4470 GET  /vendor/login · POST /auth/vendor/request-link · GET /auth/vendor/verify · GET /auth/vendor/logout
+//          GET  /vendor                    — portal page (requireVendor; nwca_vendor cookie via lib/vendor-magic-link)
+//          GET  /api/vendor/jobs[/:id]     — session-scoped Screen Print transfer orders (allowlist projection)
+//          POST /api/vendor/jobs/:id/notes — vendor comment onto the job timeline
+//          Invite registry: proxy Vendor_Portal_Access (secret-gated /api/vendor-portal-access)
+//
 // PRODUCT SEO (2026-07-12): /product[.html]?style= = hybrid-SSR head injection
 //   (per-product title/meta/canonical/OG/JSON-LD, fail-open) ~L2882;
 //   GET /sitemap-products.xml — one URL per unique style (proxy /api/all-styles)
@@ -766,6 +773,22 @@ app.use(function loadCustomerSession(req, res, next) {
   if (raw) {
     const sess = customerMagicLink.verifySession(raw);
     if (sess) req.customerSession = { portalCustomer: sess };
+  }
+  next();
+});
+
+// ── Vendor portal session (subcontractor magic-link — L&P Screen Printing) ──
+// Third principal type, third PHYSICALLY SEPARATE cookie (nwca_vendor) with its own
+// token type tags ('vsess' vs 'sess'), so staff/customer/vendor credentials can never
+// be confused or replayed across portals. loadVendorSession sets req.vendorSession on
+// every request; null for anyone without a valid vendor cookie.
+const vendorMagicLink = require('./lib/vendor-magic-link');
+app.use(function loadVendorSession(req, res, next) {
+  req.vendorSession = null;
+  const raw = parseCookieHeader(req)['nwca_vendor'];
+  if (raw) {
+    const sess = vendorMagicLink.verifySession(raw);
+    if (sess) req.vendorSession = { portalVendor: sess };
   }
   next();
 });
@@ -4441,6 +4464,314 @@ app.get('/auth/customer/verify', async (req, res) => {
 app.get('/auth/customer/logout', (req, res) => {
   res.clearCookie('nwca_customer');
   return res.redirect('/customer/login');
+});
+
+// =============================================================================
+// Vendor Portal — subcontractor magic-link login + screen-print job feed
+// =============================================================================
+// First (and so far only) vendor: Ed Lacey at L&P Screen Printing. Replaces the
+// email-everything-to-Ed process: Ed logs in passwordless (invite-only via the
+// Vendor_Portal_Access Caspio table, Erik-editable) and sees every Screen Print
+// transfer order (Transfer_Orders.Method='Screen Print') whose SP_Vendor matches
+// his invite's Vendor_Name — job details, work-order lines, artwork/working-file
+// downloads (Box shared links), and the activity timeline (he can post notes back).
+// Mirrors the customer-portal stack 1:1: separate nwca_vendor cookie, live
+// Enabled re-check (revoke in Caspio → dead within ~60s), session-scoped data
+// endpoints with ALLOWLIST projections (staff emails / Supacolor internals never
+// reach the vendor's browser).
+const VENDOR_MAGIC_LINK_TEMPLATE = process.env.EMAILJS_TEMPLATE_VENDOR_LOGIN || CUSTOMER_MAGIC_LINK_TEMPLATE;
+
+const vendorLoginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  message: { error: 'Too many sign-in requests, please try again shortly' },
+});
+const vendorApiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 120,
+  message: { error: 'Too many requests, please try again shortly' },
+});
+
+// Look up an email in the Vendor_Portal_Access registry (server-side, secret-gated proxy).
+async function fetchVendorAccess(email) {
+  if (!CRM_API_SECRET) return null;
+  try {
+    const r = await fetch(`${CRM_API_BASE}/api/vendor-portal-access/by-email/${encodeURIComponent(email)}`, {
+      headers: { 'X-CRM-API-Secret': CRM_API_SECRET },
+    });
+    if (!r.ok) return null;
+    const j = await r.json();
+    return j && j.found ? j.access : null;
+  } catch (e) { console.error('[vendor-login] access lookup error:', e.message); return null; }
+}
+
+// Live revocation re-check (60s cache) — same rationale as isPortalAccessEnabled:
+// the cookie is a 30-day HMAC; without this a disabled vendor's cookie would keep
+// working until expiry. Fail-OPEN on transient proxy errors, fail-CLOSED on a
+// definitive disabled/not-found answer.
+const _vendorEnabledCache = new Map(); // email → { enabled, t }
+async function isVendorAccessEnabled(email) {
+  const key = String(email || '').toLowerCase();
+  const hit = _vendorEnabledCache.get(key);
+  if (hit && Date.now() - hit.t < 60 * 1000) return hit.enabled;
+  try {
+    const access = await fetchVendorAccess(key);
+    const enabled = Boolean(access && access.enabled);
+    _vendorEnabledCache.set(key, { enabled, t: Date.now() });
+    return enabled;
+  } catch (e) {
+    console.error('[vendor-portal] enabled re-check failed:', e.message);
+    return true; // fail open — a proxy blip never locks the vendor out
+  }
+}
+
+// Gate: require a verified vendor session. API → 401 + loginUrl; page → redirect to login.
+async function requireVendor(req, res, next) {
+  const pv = req.vendorSession && req.vendorSession.portalVendor;
+  if (!pv) {
+    if (req.path.startsWith('/api/')) {
+      return res.status(401).json({ error: 'Sign in required', loginUrl: '/vendor/login' });
+    }
+    return res.redirect('/vendor/login?next=' + encodeURIComponent(req.originalUrl));
+  }
+  try {
+    if (!(await isVendorAccessEnabled(pv.email))) {
+      res.clearCookie('nwca_vendor');
+      if (req.path.startsWith('/api/')) {
+        return res.status(401).json({ error: 'Access revoked', loginUrl: '/vendor/login' });
+      }
+      return res.redirect('/vendor/login');
+    }
+  } catch (e) { console.error('[vendor-portal] requireVendor recheck error:', e.message); /* fail open */ }
+  return next();
+}
+
+// Login page (email entry). Public.
+app.get('/vendor/login', (req, res) => {
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.sendFile(path.join(__dirname, 'pages', 'vendor-login.html'));
+});
+
+// Request a magic link. ALWAYS returns { ok:true } (constant shape) → no account enumeration.
+app.post('/auth/vendor/request-link', vendorLoginLimiter, express.json(), async (req, res) => {
+  const ok = () => res.json({ ok: true });
+  try {
+    if (!vendorMagicLink.isConfigured()) { console.warn('[vendor-login] MAGIC_LINK_SECRET not configured'); return ok(); }
+    const email = String((req.body && req.body.email) || '').toLowerCase().trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return ok();
+    const access = await fetchVendorAccess(email);
+    if (!access || !access.enabled || !access.vendor_name) {
+      console.log(`[vendor-login] no enabled access for ${email}`);
+      return ok();
+    }
+    const token = vendorMagicLink.mintToken({ email, vendorName: access.vendor_name });
+    const link = `${PUBLIC_SITE_ORIGIN}/auth/vendor/verify?token=${encodeURIComponent(token)}`;
+    await sendEmailJSTemplate(VENDOR_MAGIC_LINK_TEMPLATE, {
+      to_email: email,
+      company_name: access.vendor_name,
+      magic_link: link,
+      expiry_minutes: String(vendorMagicLink.LINK_TTL_MIN),
+    }).catch((e) => console.error('[vendor-login] email send failed:', e.message));
+    console.log(`[vendor-login] link sent to ${email} (${access.vendor_name})`);
+    return ok();
+  } catch (e) {
+    console.error('[vendor-login] request-link error:', e.message);
+    return ok();
+  }
+});
+
+// Verify a magic link → live re-check Enabled → set the vendor session cookie → /vendor.
+app.get('/auth/vendor/verify', async (req, res) => {
+  const fail = () => res.redirect('/vendor/login?error=expired');
+  try {
+    if (!vendorMagicLink.isConfigured()) return res.status(503).send('Vendor login is temporarily unavailable.');
+    let claim;
+    try { claim = vendorMagicLink.verifyToken(req.query.token); } catch (_) { return fail(); }
+    // Re-check the LIVE invite: revoking Enabled kills outstanding links immediately, and
+    // re-binds the token's claimed vendor to the table's truth (anti-tamper).
+    const access = await fetchVendorAccess(claim.email);
+    if (!access || !access.enabled || String(access.vendor_name) !== String(claim.vendorName)) return fail();
+    const sessionToken = vendorMagicLink.mintSession({
+      email: claim.email, vendorName: access.vendor_name, contactName: access.contact_name || '',
+    });
+    res.cookie('nwca_vendor', sessionToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    });
+    // Best-effort LastLogin stamp — never blocks the login.
+    if (CRM_API_SECRET) {
+      fetch(`${CRM_API_BASE}/api/vendor-portal-access/touch-login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CRM-API-Secret': CRM_API_SECRET },
+        body: JSON.stringify({ email: claim.email }),
+      }).catch((e) => console.warn('[vendor-login] touch-login failed:', e.message));
+    }
+    const next = (typeof req.query.next === 'string' && req.query.next.startsWith('/vendor')) ? req.query.next : '/vendor';
+    return res.redirect(next);
+  } catch (e) {
+    console.error('[vendor-login] verify error:', e.message);
+    return fail();
+  }
+});
+
+// Logout — clear the vendor cookie.
+app.get('/auth/vendor/logout', (req, res) => {
+  res.clearCookie('nwca_vendor');
+  return res.redirect('/vendor/login');
+});
+
+// The portal page itself — gated by the vendor LOGIN session.
+app.get('/vendor', requireVendor, (req, res) => {
+  res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.sendFile(path.join(__dirname, 'pages', 'vendor-portal.html'));
+});
+
+// ── Vendor-safe data endpoints (session-scoped, allowlist projections) ──────
+// Raw Transfer_Orders rows never reach the vendor's browser: staff emails,
+// Supacolor linkage, and internal ids are projected away. Scope = Method='Screen
+// Print' AND SP_Vendor matches the session's vendor (rows predating SP_Vendor
+// default to 'L&P Printing', matching the proxy's create-time default).
+function vendorOwnsRow(row, vendorName) {
+  if (!row || row.Method !== 'Screen Print') return false;
+  const rowVendor = String(row.SP_Vendor || 'L&P Printing').trim().toLowerCase();
+  return rowVendor === String(vendorName || '').trim().toLowerCase();
+}
+function projectVendorJob(r) {
+  return {
+    id: r.ID_Transfer,
+    status: r.Status || null,
+    isRush: r.Is_Rush === true || r.Is_Rush === 'true' || r.Is_Rush === 1,
+    companyName: r.Company_Name || null,
+    customerName: r.Customer_Name || null,
+    designNumber: r.Design_Number || null,
+    transferType: r.Transfer_Type || null,
+    fabricTarget: r.Fabric_Target || null,
+    colorCount: r.Color_Count != null ? r.Color_Count : null,
+    primaryColor: r.Primary_Color || null,
+    additionalColors: r.Additional_Colors || null,
+    fileNotes: r.File_Notes || null,
+    specialInstructions: r.Special_Instructions || null,
+    neededBy: r.Needed_By_Date || null,
+    requestedAt: r.Requested_At || null,
+    estimatedShipDate: r.Estimated_Ship_Date || null,
+    shopworksPO: r.ShopWorks_PO_Number || null,
+    salesRepName: r.Sales_Rep_Name || null,
+    lineCount: r.line_count != null ? r.line_count : null,
+    fileCount: r.file_count != null ? r.file_count : null,
+    mockupThumbnailUrl: r.mockup_thumbnail_url || null,
+  };
+}
+function projectVendorLine(l) {
+  return {
+    quantity: l.Quantity != null ? l.Quantity : null,
+    transferSize: l.Transfer_Size || null,
+    pressCount: l.Press_Count != null ? l.Press_Count : null,
+    widthIn: l.Transfer_Width_In != null ? l.Transfer_Width_In : null,
+    heightIn: l.Transfer_Height_In != null ? l.Transfer_Height_In : null,
+    notes: l.File_Notes || null,
+  };
+}
+function projectVendorFile(f) {
+  return {
+    fileType: f.File_Type || null,
+    fileName: f.File_Name || null,
+    fileUrl: f.File_URL || null,
+    thumbnailUrl: f.Thumbnail_URL || null,
+    mime: f.File_MIME || null,
+    widthPx: f.Width_Px != null ? f.Width_Px : null,
+    heightPx: f.Height_Px != null ? f.Height_Px : null,
+    widthIn: f.Width_In != null ? f.Width_In : null,
+    heightIn: f.Height_In != null ? f.Height_In : null,
+    notes: f.File_Notes || null,
+  };
+}
+function projectVendorNote(n) {
+  return {
+    type: n.Note_Type || 'comment',
+    text: n.Note_Text || '',
+    authorName: n.Author_Name || 'NWCA',
+    createdAt: n.Created_At || null,
+  };
+}
+const VENDOR_JOB_ID_RE = /^[A-Za-z0-9][A-Za-z0-9-]{0,39}$/; // ST-YYMMDD-#### and legacy shapes
+const VENDOR_STATUS_SET = new Set(['Requested', 'Ordered', 'PO_Created', 'Shipped', 'Received', 'Cancelled', 'On_Hold']);
+
+// GET /api/vendor/jobs?status=CSV — every Screen Print job for the logged-in vendor.
+app.get('/api/vendor/jobs', vendorApiLimiter, requireVendor, async (req, res) => {
+  try {
+    const pv = req.vendorSession.portalVendor;
+    let qs = '/api/transfer-orders?method=' + encodeURIComponent('Screen Print') + '&includeLineCount=true&pageSize=500';
+    if (req.query.status) {
+      const statuses = String(req.query.status).split(',').map((s) => s.trim()).filter((s) => VENDOR_STATUS_SET.has(s));
+      if (statuses.length) qs += '&status=' + encodeURIComponent(statuses.join(','));
+    }
+    const data = await portalProxyGet(qs);
+    const rows = (data && data.records) || [];
+    const jobs = rows.filter((r) => vendorOwnsRow(r, pv.vendorName)).map(projectVendorJob);
+    res.json({ vendor: { name: pv.vendorName, contactName: pv.contactName, email: pv.email }, jobs });
+  } catch (e) {
+    console.error('[vendor-portal] jobs list error:', e.message);
+    res.status(503).json({ error: 'Unable to load jobs right now. Please refresh.' });
+  }
+});
+
+// GET /api/vendor/jobs/:id — one job + lines + files + notes (ownership-checked).
+app.get('/api/vendor/jobs/:id', vendorApiLimiter, requireVendor, async (req, res) => {
+  try {
+    const id = String(req.params.id || '');
+    if (!VENDOR_JOB_ID_RE.test(id)) return res.status(404).json({ error: 'Not found' });
+    const pv = req.vendorSession.portalVendor;
+    const data = await portalProxyGet('/api/transfer-orders/' + encodeURIComponent(id));
+    const record = data && data.record;
+    if (!record || !vendorOwnsRow(record, pv.vendorName)) return res.status(404).json({ error: 'Not found' });
+    res.json({
+      job: projectVendorJob(record),
+      lines: ((data && data.lines) || []).map(projectVendorLine),
+      files: ((data && data.files) || []).map(projectVendorFile),
+      notes: ((data && data.notes) || []).map(projectVendorNote),
+    });
+  } catch (e) {
+    console.error('[vendor-portal] job detail error:', e.message);
+    res.status(503).json({ error: 'Unable to load this job right now. Please refresh.' });
+  }
+});
+
+// POST /api/vendor/jobs/:id/notes { note } — vendor posts a comment onto the job's
+// activity timeline (visible to Bradley/Steve on the staff transfer-detail page).
+app.post('/api/vendor/jobs/:id/notes', vendorApiLimiter, requireVendor, express.json(), async (req, res) => {
+  try {
+    const id = String(req.params.id || '');
+    if (!VENDOR_JOB_ID_RE.test(id)) return res.status(404).json({ error: 'Not found' });
+    const note = String((req.body && req.body.note) || '').trim().slice(0, 2000);
+    if (!note) return res.status(400).json({ error: 'Note text required' });
+    const pv = req.vendorSession.portalVendor;
+    // Ownership check BEFORE writing — a vendor can only comment on their own jobs.
+    const data = await portalProxyGet('/api/transfer-orders/' + encodeURIComponent(id));
+    const record = data && data.record;
+    if (!record || !vendorOwnsRow(record, pv.vendorName)) return res.status(404).json({ error: 'Not found' });
+    const authorName = `${pv.contactName || pv.email} (${pv.vendorName})`;
+    const headers = { 'Content-Type': 'application/json' };
+    if (CRM_API_SECRET) headers['X-CRM-API-Secret'] = CRM_API_SECRET;
+    const r = await fetch(`${CRM_API_BASE}/api/transfer-order-notes`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        Transfer_ID: id,
+        Note_Type: 'comment',
+        Note_Text: note,
+        Author_Email: pv.email,
+        Author_Name: authorName,
+      }),
+      signal: AbortSignal.timeout(PORTAL_FETCH_TIMEOUT_MS),
+    });
+    if (!r.ok) throw new Error(`proxy ${r.status}`);
+    res.json({ ok: true });
+  } catch (e) {
+    console.error('[vendor-portal] add note error:', e.message);
+    res.status(503).json({ error: 'Unable to post your note right now. Please try again.' });
+  }
 });
 
 // Dedicated limiter for the status API: customers re-check this page over

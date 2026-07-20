@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Vendor Sign In — Northwest Custom Apparel</title>
+  <link rel="icon" href="/favicon.png">
+  <link rel="stylesheet" href="/pages/css/customer-login.css">
+</head>
+<body>
+  <div class="cl-wrap">
+    <div class="cl-card">
+      <div class="cl-accent"></div>
+      <img class="cl-logo" src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png" alt="Northwest Custom Apparel">
+
+      <div id="cl-form-view">
+        <h1>Vendor portal sign in</h1>
+        <p class="cl-sub">Enter your email and we'll send you a secure one-click sign-in link.</p>
+        <form id="cl-form" novalidate>
+          <input type="email" id="cl-email" name="email" placeholder="you@yourshop.com" autocomplete="email" required>
+          <button type="submit" id="cl-submit">Email me a sign-in link</button>
+        </form>
+        <p class="cl-error" id="cl-error" hidden>That link has expired or is no longer valid. Enter your email to get a new one.</p>
+      </div>
+
+      <div id="cl-sent-view" hidden>
+        <div class="cl-check">&check;</div>
+        <h1>Check your email</h1>
+        <p class="cl-sub">If your email is on file, a sign-in link is on its way. It expires in 15 minutes.</p>
+        <p class="cl-hint">Didn't get it? Check your spam folder, or <a href="/vendor/login">try again</a>.</p>
+      </div>
+
+      <p class="cl-foot">Need access? Contact Northwest Custom Apparel &middot; (253) 922-5793</p>
+    </div>
+  </div>
+  <script src="/pages/js/vendor-login.js"></script>
+</body>
+</html>
