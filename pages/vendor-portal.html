@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Job Portal — Northwest Custom Apparel</title>
+  <link rel="icon" href="/favicon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <link rel="stylesheet" href="/pages/css/vendor-portal.css?v=2026.07.19.15">
+</head>
+<body>
+  <header class="vp-header">
+    <div class="vp-header-inner">
+      <img class="vp-logo" src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png" alt="Northwest Custom Apparel">
+      <div class="vp-header-title">
+        <h1 id="vp-vendor-name">Job Portal</h1>
+        <span class="vp-header-sub">Screen-print jobs from Northwest Custom Apparel</span>
+      </div>
+      <div class="vp-header-user">
+        <span id="vp-user-chip" class="vp-user-chip"><i class="fas fa-user"></i> <span id="vp-user-email"></span></span>
+        <a class="vp-btn vp-btn--ghost" href="/auth/vendor/logout"><i class="fas fa-sign-out-alt"></i> Sign out</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="vp-container">
+    <!-- Error banner (API failures are always VISIBLE — never silent) -->
+    <div id="vp-error" class="vp-error" hidden>
+      <i class="fas fa-exclamation-triangle"></i>
+      <span id="vp-error-text">Unable to load jobs. Please refresh.</span>
+    </div>
+
+    <!-- ── LIST VIEW ─────────────────────────────────────────── -->
+    <section id="vp-list-view">
+      <div class="vp-toolbar">
+        <div class="vp-filters" id="vp-filters">
+          <button class="vp-chip vp-chip--active" data-filter="active">Active</button>
+          <button class="vp-chip" data-filter="completed">Completed</button>
+          <button class="vp-chip" data-filter="all">All</button>
+        </div>
+        <div class="vp-search">
+          <i class="fas fa-search"></i>
+          <input type="search" id="vp-search" placeholder="Search company, design #, job #">
+        </div>
+      </div>
+
+      <div id="vp-loading" class="vp-loading"><i class="fas fa-spinner fa-spin"></i> Loading jobs…</div>
+      <div id="vp-empty" class="vp-empty" hidden>
+        <i class="fas fa-inbox"></i>
+        <p>No jobs here right now.</p>
+      </div>
+      <div id="vp-job-grid" class="vp-job-grid"></div>
+    </section>
+
+    <!-- ── DETAIL VIEW ───────────────────────────────────────── -->
+    <section id="vp-detail-view" hidden>
+      <button class="vp-btn vp-btn--ghost vp-back" id="vp-back-btn"><i class="fas fa-arrow-left"></i> All jobs</button>
+
+      <div id="vp-detail-loading" class="vp-loading"><i class="fas fa-spinner fa-spin"></i> Loading job…</div>
+
+      <div id="vp-detail-main" hidden>
+        <div class="vp-detail-header">
+          <div>
+            <div class="vp-detail-id" id="vp-d-id"></div>
+            <h2 class="vp-detail-company" id="vp-d-company"></h2>
+            <div class="vp-detail-sub" id="vp-d-sub"></div>
+          </div>
+          <div class="vp-detail-badges" id="vp-d-badges"></div>
+        </div>
+
+        <div class="vp-grid">
+          <div class="vp-col">
+            <div class="vp-card">
+              <div class="vp-card-header"><h3><i class="fas fa-clipboard-list"></i> Work Order</h3></div>
+              <div class="vp-card-body">
+                <dl class="vp-meta" id="vp-d-meta"></dl>
+                <div class="vp-instructions" id="vp-d-instructions" hidden></div>
+              </div>
+            </div>
+
+            <div class="vp-card">
+              <div class="vp-card-header"><h3><i class="fas fa-layer-group"></i> Print Lines</h3></div>
+              <div class="vp-card-body">
+                <div class="vp-table-scroll">
+                  <table class="vp-table" id="vp-d-lines-table">
+                    <thead>
+                      <tr><th>Qty</th><th>Size</th><th>W×H (in)</th><th>Presses</th><th>Notes</th></tr>
+                    </thead>
+                    <tbody id="vp-d-lines"></tbody>
+                  </table>
+                </div>
+                <div class="vp-empty-panel" id="vp-d-lines-empty" hidden>No print lines on this job.</div>
+              </div>
+            </div>
+
+            <div class="vp-card">
+              <div class="vp-card-header"><h3><i class="fas fa-download"></i> Artwork &amp; Working Files</h3></div>
+              <div class="vp-card-body">
+                <div id="vp-d-files" class="vp-files"></div>
+                <div class="vp-empty-panel" id="vp-d-files-empty" hidden>No files attached yet.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="vp-col">
+            <div class="vp-card">
+              <div class="vp-card-header"><h3><i class="fas fa-image"></i> Mockup</h3></div>
+              <div class="vp-card-body" id="vp-d-mockup">
+                <div class="vp-empty-panel">No mockup attached.</div>
+              </div>
+            </div>
+
+            <div class="vp-card">
+              <div class="vp-card-header"><h3><i class="fas fa-comments"></i> Activity &amp; Messages</h3></div>
+              <div class="vp-card-body">
+                <div class="vp-comment-form">
+                  <textarea id="vp-comment-input" rows="2" maxlength="2000" placeholder="Question or update for NWCA? Post it here…"></textarea>
+                  <button class="vp-btn vp-btn--primary" id="vp-comment-btn"><i class="fas fa-paper-plane"></i> Post</button>
+                </div>
+                <div class="vp-timeline" id="vp-d-notes"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="vp-footer">
+    Northwest Custom Apparel &middot; Milton, WA &middot; (253) 922-5793
+  </footer>
+
+  <script src="/shared_components/js/caspio-date-utils.js?v=1"></script>
+  <script src="/pages/js/vendor-portal.js?v=2026.07.19.15"></script>
+</body>
+</html>

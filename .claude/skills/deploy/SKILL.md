@@ -198,6 +198,44 @@ if [ -n "$ORPHAN" ]; then
 fi
 ```
 
+### Step 3.6 — Guard: foreign hunks + server boot probe
+
+Two gates added after the 2026-07-19 outage (v2026.07.19.15): `git add -u` in a
+SHARED checkout swept in ANOTHER session's in-progress `server.js` routes whose
+`lib/` dependency was still untracked → the slug crashed on boot (`Cannot find
+module`) → prod served H10 503s until a Heroku rollback.
+
+**(a) Foreign-hunk check.** Before committing, list what Step 3 staged and
+compare against the files THIS session actually changed. If `server.js` (or any
+staged file you didn't knowingly edit) is in the diff, inspect it:
+
+```bash
+git diff --cached --name-only
+# For any staged file you didn't change yourself:
+git diff --cached server.js | head -80    # foreign routes/require()s = another session's work
+```
+
+If foreign hunks are found: `git restore --staged <file> && git checkout -- <file>`
+is WRONG (it destroys the other session's working tree) — instead `git restore
+--staged <file>` only, so their edits stay in the working tree uncommitted, and
+proceed without them. Never deploy code you can't identify.
+
+**(b) Boot probe.** A slug that doesn't boot 503s EVERY page including customer
+storefronts. `node --check` misses missing modules — actually load the server:
+
+```bash
+node --check server.js || { echo "✗ ABORT — server.js syntax error"; git reset -q; exit 1; }
+PORT=3113 timeout 15 node server.js > /tmp/bootprobe.log 2>&1
+if ! grep -qE "listening|running|started|Server" /tmp/bootprobe.log; then
+  echo "✗ DEPLOY ABORTED — server.js did not boot:"; tail -5 /tmp/bootprobe.log
+  git reset -q; exit 1
+fi
+```
+
+(`timeout` kills the probe server after it proves it can start; the grep matches
+the startup banner. A `Cannot find module` lands in the log and aborts here
+instead of in production.)
+
 ### Step 4 — Commit
 
 ```bash

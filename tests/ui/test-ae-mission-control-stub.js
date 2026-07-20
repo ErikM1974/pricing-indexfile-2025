@@ -216,13 +216,23 @@
                     { submissionId: '1', submittedAt: daysAgoDay(1) + ' 09:12:00', orderType: 'Regular Order', bradleyPo: '3702', orders: [
                         { orderNumber: 142501, company: 'Harbor Electric', status: 'sent', poCount: 0, vendors: [], orderedDate: '', receivedDate: '' }] },
                     { submissionId: '2', submittedAt: daysAgoDay(3) + ' 14:40:00', orderType: 'Rush', bradleyPo: '3691', orders: [
-                        { orderNumber: 142449, company: 'Korsmo Construction', status: 'ordered', poCount: 1, vendors: ['SanMar'], orderedDate: daysAgoDay(2), receivedDate: '' }] },
+                        { orderNumber: 142449, company: 'Korsmo Construction', status: 'ordered', poCount: 1, vendors: ['SanMar'], sanmarPos: [113777], orderedDate: daysAgoDay(2), receivedDate: '' }] },
                     { submissionId: '3', submittedAt: daysAgoDay(7) + ' 10:05:00', orderType: 'Regular Order', bradleyPo: '3668', orders: [
-                        { orderNumber: 142398, company: 'CITC of Washington', status: 'received', poCount: 2, vendors: ['SanMar', 'S&S Activewear'], orderedDate: daysAgoDay(6), receivedDate: daysAgoDay(2) }] },
+                        { orderNumber: 142398, company: 'CITC of Washington', status: 'received', poCount: 2, vendors: ['SanMar', 'S&S Activewear'], sanmarPos: [113606], orderedDate: daysAgoDay(6), receivedDate: daysAgoDay(2) }] },
                     { submissionId: '4', submittedAt: daysAgoDay(12) + ' 16:22:00', orderType: 'Regular Order', bradleyPo: '', orders: [
                         { orderNumber: 142301, company: 'Boeing Employees Club', status: 'shipped', poCount: 1, vendors: ['SanMar'], orderedDate: daysAgoDay(11), receivedDate: daysAgoDay(6) }] },
                 ],
             });
+        }
+        if (u.indexOf('/api/sanmar-invoices/by-po/') !== -1) {
+            var po = u.split('/by-po/')[1].split('?')[0];
+            return json({ purchaseOrder: po, invoices: [{
+                invoiceNumber: 'INV-88' + po.slice(-3), invoiceDate: daysAgoDay(2), dueDate: daysAgoDay(-28),
+                purchaseOrderNo: po, orderDate: daysAgoDay(4), invoiceStatus: 'Unpaid', shipVia: 'UPS GROUND', terms: 'NET 30',
+                subtotal: 164.16, salesTax: 0, shippingCharges: 12.1, freightSavings: 0, totalAmount: 176.26,
+                shipTo: { name: 'Northwest Custom Apparel', city: 'Milton', state: 'WA' },
+                lineItems: [{ styleNo: 'PC54', color: 'Navy', description: 'Port & Company Core Cotton Tee', size: 'L', quantity: 48, unitPrice: 3.42, lineTotal: 164.16 }]
+            }], fetchedAt: new Date().toISOString() });
         }
         if (u.indexOf('/api/crm-proxy/marketing-shipments/items') !== -1) {
             return json({ items: kitItems });
