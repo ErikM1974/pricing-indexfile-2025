@@ -37,7 +37,9 @@
                 year: 2026, currentQuarter: 'Q3', previousQuarter: 'Q2',
                 previous: {
                     rows: [
-                        { type: 'Online Store', quarter: 'Q2', amount: isT ? 131.7 : 2.97, base: isT ? 2634 : 99, rate: isT ? 0.05 : 0.03, status: 'Calculated', paycheckDate: '', payrollNumber: '' },
+                        // Realistic stored shape: base = TOTAL quarter revenue, rate = nominal 1%,
+                        // amount = composite math → caption must be SUPPRESSED (base×rate ≠ amount).
+                        { type: 'Online Store', quarter: 'Q2', amount: isT ? 131.7 : 2.97, base: isT ? 34639.68 : 25340.84, rate: 0.01, status: 'Calculated', paycheckDate: '', payrollNumber: '' },
                         { type: 'Garment Spiff', quarter: 'Q2', amount: isT ? 53.75 : 128.25, base: 0, rate: 0, status: 'Calculated', paycheckDate: '' },
                         { type: 'Win-Back Bounty', quarter: 'Q2', amount: isT ? 350.15 : 0, base: isT ? 7003 : 0, rate: 0.05, status: 'Calculated', paycheckDate: '' },
                     ],
