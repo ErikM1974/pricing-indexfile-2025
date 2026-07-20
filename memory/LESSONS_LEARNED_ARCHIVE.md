@@ -2308,3 +2308,9 @@ An audit flagged `this.sizeUpcharges` (pages/js/quote-view.js) as feeding custom
 - **Root Cause**: Box shared-static URLs 301-redirect instead of serving the image, so `<img>` fails; the portal's `onerror → display:none` handler hid the breakage (nobody knew a logo was even supposed to be there).
 - **Solution**: Swapped both headers + the portal favicon to the site-standard Caspio CDN logo (`cdn.caspio.com/A0E15000/Safety Stripes/web northwest custom apparel logo.png`) on a white chip for dark-green bars (v2026.07.17.12).
 - **Prevention**: Never use Box shared-static links as `<img src>` — use the Caspio CDN logo or a proxy-served asset. `onerror → hide` is a SILENT failure mode: pair it with a text-brand fallback or re-check when touching branding. Grep `box.com/shared/static` in HTML on any branding pass.
+
+### Referer-gated file endpoint 401'd normal staff clicks (Leads artwork, 2026-07-18, archived 2026-07-19)
+- **Problem**: Clicking a lead's artwork link/download opened `{"error":"Unauthorized"}` — yet the same image rendered fine as a thumbnail on the page.
+- **Root Cause**: `/api/jotform/file` used `requireCrmSecretOrBrowserOrigin`, which needs an allow-listed Origin/Referer. `<img>` requests send Referer (thumbnail worked), but the anchor had `rel="noreferrer"` — target=_blank navigation arrived with NO Referer → 401. Privacy browsers strip Referer too.
+- **Solution**: Ungated the endpoint (proxy `4fe2681`) to match the `/api/files/:externalKey` precedent — the `u=` allow-list (JotForm upload hosts only) is the real open-proxy guard; links now use `rel="noopener"` only (FE v2026.07.18.11).
+- **Prevention**: Never gate a browser-navigated file/download endpoint on Origin/Referer presence — those headers are unreliable for top-level navigations. Gate with sessions/secrets (via forwarders) or make the resource-path unguessable + allow-listed.
