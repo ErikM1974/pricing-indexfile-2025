@@ -53,3 +53,20 @@ Full detail → SHOPWORKS_ODBC_INTEGRATION.md "SanMar Payables — ODBC paid/imp
   table is SELECT-able or must be exposed in OnSite "Manage ODBC". Then build `sync-payables.ps1` + Caspio
   `ShopWorks_Payables` + reconciliation view (stale SanMar-open, missing bills, amount mismatches).
 - Erik greenlit expanding ODBC fields + Caspio columns.
+
+## Invoices tab = OPEN-PAYABLES WORKLIST (Erik reframe, 2026-07-20 v2)
+Erik: the Invoices tab is NOT "all invoices in a range" — it's "invoices + credits from SanMar we haven't paid
+AND haven't imported into ShopWorks." Rebuilt accordingly:
+- **Base = SanMar `GetUnpaidInvoices`** (`/api/staff/sanmar-invoices/unpaid` forwarder) = what we still owe. Vendor
+  1002 only — **MRKFUND excluded entirely** (they live on the Marketing tab now, not badged-in-place). Default
+  window = **last 90 days** (older unpaid = a hint to widen; the 2020–2022 stale pile stays out of the worklist).
+  Real-data shape: 392 Net30 unpaid, 170 in last 90d, ~$31.8K owed.
+- **ShopWorks cross-ref = the source of Imported?/Paid?** Erik chose **upload now + ODBC later**. The page ingests
+  the ShopWorks payables export (the `Sanmar payables inside shopworks currently 2026.csv` he already pulls) via an
+  inline RFC-4180 parser; `normInv()` matches SanMar raw ↔ ShopWorks `INV-`/`CR-`/`FTC-`. **Imported = payable row
+  exists; Paid = `date_Paid` set.** Verified on real files: of 170 recent open, **72 not imported** (to import+pay)
+  / **98 imported-unpaid** (to pay) / 0 paid. Status filter: not-imported+unpaid (default) · imported-awaiting-pay ·
+  all-owed · everything. SanMar's own "paid" = off-the-unpaid-list; ShopWorks `date_Paid` = our books.
+- When Path B (ODBC `ShopWorks_Payables` sync) lands, the same cross-ref reads Caspio instead of the upload — no
+  UI change. `PayableExists`/`PayableMatch` PO-level fields (staged) are the coarse fallback if invoice-level stays
+  ODBC-blocked.

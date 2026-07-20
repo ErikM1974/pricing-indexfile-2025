@@ -4365,6 +4365,23 @@ app.get('/api/staff/sanmar-invoices/by-date', requireStaff, async (req, res) => 
   }
 });
 
+// SanMar OPEN payables — GetUnpaidInvoices (what we still owe SanMar). Drives the
+// SanMar Payables page's Invoices tab (the unpaid worklist). No params; the proxy
+// caches it. Same staff gate + secret as the by-date forwarder.
+app.get('/api/staff/sanmar-invoices/unpaid', requireStaff, async (req, res) => {
+  if (!CRM_API_SECRET) return res.status(503).json({ error: 'not_configured' });
+  try {
+    const r = await fetch(`${CRM_API_BASE}/api/sanmar-invoices/unpaid`, {
+      headers: { 'X-CRM-API-Secret': CRM_API_SECRET }, signal: AbortSignal.timeout(60000)
+    });
+    const body = await r.text();
+    res.status(r.status).type(r.headers.get('content-type') || 'application/json').send(body);
+  } catch (e) {
+    console.error('[sanmar-unpaid-forward]', e.message);
+    res.status(502).json({ error: 'upstream_unavailable' });
+  }
+});
+
 // ── Finished-photo staff manage endpoints. The proxy gates GET(all)/PATCH/DELETE behind the CRM
 //    secret, so forward them from here with the secret (requireStaff = SAML gate). The photo UPLOAD
 //    (POST /api/finished-photos) goes to the proxy DIRECTLY from the browser (open + rate-limited),

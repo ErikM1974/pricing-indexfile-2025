@@ -1,23 +1,24 @@
 /**
- * test-sanmar-payables-stub.js — fetch stub for tests/ui/test-sanmar-payables.html
- * Replaces window.fetch so the SanMar Payables page renders BOTH tabs without a
- * SAML session or live SanMar. Returns invoices filtered to the requested
- * [start,end] window (so the marketing tab's quarterly pulls partition cleanly),
- * with a realistic mix: Net30 invoices + a credit + a $0 + MRKFUND marketing
- * charges spread across the year (+ an XSS probe in a ship-to name).
+ * test-sanmar-payables-stub.js — fetch stub + fixtures for the SanMar Payables harness.
+ * Renders both tabs without SAML / live SanMar:
+ *   • /api/staff/sanmar-invoices/unpaid  → open-payables fixture (Net30 + credits +
+ *     an excluded MRKFUND + older-than-90d items to exercise the "older" hint).
+ *   • /api/staff/sanmar-invoices/by-date → MRKFUND spread across the year (Marketing tab).
+ *   • /api/sanmar-invoices/by-po/:po     → viewer payload.
+ * Also pre-loads a ShopWorks payables CSV via window.__SMP_TEST_SW__ (the controller's
+ * test seam) so Imported/Paid status + the status filter render without a file dialog.
  */
 (function () {
     'use strict';
 
     function iso(d) { return d.toISOString().slice(0, 10); }
     function daysAgo(n) { return iso(new Date(Date.now() - n * 86400000)); }
-    function addDays(isoStr, n) { var d = new Date(isoStr + 'T12:00:00'); d.setDate(d.getDate() + n); return iso(d); }
-    var YEAR = new Date().getFullYear();
-    var THIS_MONTH = new Date().getMonth();
+    function addDays(s, n) { var d = new Date(s + 'T12:00:00'); d.setDate(d.getDate() + n); return iso(d); }
+    var YEAR = new Date().getFullYear(), THIS_MONTH = new Date().getMonth();
 
-    function mk(invNo, dateStr, po, amt, terms, ship) {
+    function mk(inv, dateStr, po, amt, terms, ship) {
         return {
-            invoiceNumber: invNo, invoiceDate: dateStr,
+            invoiceNumber: inv, invoiceDate: dateStr,
             dueDate: terms === 'MRKFUND' ? dateStr : addDays(dateStr, 30),
             purchaseOrderNo: po, orderDate: addDays(dateStr, -3), invoiceStatus: 'Unpaid',
             terms: terms, subtotal: amt, salesTax: 0, shippingCharges: 0, freightSavings: 0, totalAmount: amt,
@@ -26,42 +27,51 @@
         };
     }
 
-    // Standard Net30 payables (recent, so the Invoices tab's last-30-days default shows them).
-    var fixture = [
-        mk('161990001', daysAgo(1), '113600', 245.60, 'Net30'),
-        mk('161990002', daysAgo(3), '113601 BW', 1222.47, 'Net30', 'Korsmo Construction <script>alert(1)</script>'),
-        mk('161990003', daysAgo(5), '113602', 26.06, 'Net30'),
-        mk('5590001', daysAgo(6), '113603', -40.99, 'Net30'),          // credit (CR-)
-        mk('161990004', daysAgo(7), 'LEGEND0611', 0, 'Net30'),          // $0 (unchecked by default)
-        mk('161990010', daysAgo(4), '113610', 164.87, 'MRKFUND')        // recent marketing charge
+    // Open payables (GetUnpaidInvoices) fixture.
+    var unpaid = [
+        mk('162398367', daysAgo(2), '113686', 122.05, 'Net30'),          // in SW, unpaid → IMPORTED·UNPAID
+        mk('162395846', daysAgo(2), '113693', 170.40, 'Net30'),          // in SW, date_Paid → PAID
+        mk('162394919', daysAgo(3), '113683', 40.96, 'Net30'),           // not in SW → NOT IMPORTED
+        mk('162391874', daysAgo(3), '113682', 1991.77, 'Net30', 'Korsmo Construction <script>alert(1)</script>'),
+        mk('5670868', daysAgo(2), '113612', -81.51, 'Net30'),            // credit, not in SW
+        mk('162009107', daysAgo(5), '113552 BW', 249.60, 'Net30'),       // not in SW
+        mk('161990010', daysAgo(4), '113610', 164.87, 'MRKFUND'),        // marketing → EXCLUDED from tab
+        mk('157400001', daysAgo(200), '111853', 875.07, 'Net30'),        // older than 90d → olderCount
+        mk('157400002', daysAgo(210), '111854', 100.00, 'Net30')         // older than 90d
     ];
-    // Marketing-fund charges across the year (populate the month bars + fund math).
+
+    // Marketing charges across the year (Marketing tab).
     var MKT = [520, 1180, 875, 640, 1490, 980, 730, 1210, 560, 890, 400, 300];
+    var byDateFixture = [];
     for (var m = 0; m <= THIS_MONTH; m++) {
-        var dateStr = iso(new Date(YEAR, m, 15));
-        fixture.push(mk('1574' + (10000 + m * 137), dateStr, '11' + (1800 + m), MKT[m] || 500, 'MRKFUND'));
+        byDateFixture.push(mk('1574' + (10000 + m * 137), iso(new Date(YEAR, m, 15)), '11' + (1800 + m), MKT[m] || 500, 'MRKFUND'));
     }
-    fixture.push(mk('5591002', iso(new Date(YEAR, Math.max(0, THIS_MONTH - 1), 20)), '112900', -200.88, 'MRKFUND')); // marketing credit
+
+    // ShopWorks payables export fixture — matches two of the unpaid rows. Includes a
+    // quoted comma amount + a paid + an unpaid row to exercise the parser + status.
+    window.__SMP_TEST_SW__ =
+        'id_PO,VendorName,cur_Payable,date_Paid,ID_Payable,id_Vendor,InvoiceNumber,cnCur_PayableOutstanding\r\n' +
+        '113686,SANMAR,122.05 ,,148300,1002,INV-162398367,122.05\r\n' +
+        '113693,SANMAR,"1,170.40 ",07/18/2026,148301,1002,INV-162395846,\r\n';
 
     function byDate(start, end) {
-        return fixture.filter(function (i) { return i.invoiceDate >= start && i.invoiceDate <= end; })
+        return byDateFixture.filter(function (i) { return i.invoiceDate >= start && i.invoiceDate <= end; })
             .sort(function (a, b) { return b.invoiceDate.localeCompare(a.invoiceDate); });
     }
 
     var realFetch = window.fetch;
     window.fetch = function (url) {
         var u = String(url);
+        if (u.indexOf('/api/staff/sanmar-invoices/unpaid') !== -1) {
+            return Promise.resolve(new Response(JSON.stringify({ invoices: unpaid }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+        }
         if (u.indexOf('/api/staff/sanmar-invoices/by-date') !== -1) {
-            var q = u.split('?')[1] || '';
-            var p = new URLSearchParams(q);
-            var start = p.get('start'), end = p.get('end');
-            return Promise.resolve(new Response(JSON.stringify({ dateRange: { start: start, end: end }, invoices: byDate(start, end) }),
-                { status: 200, headers: { 'Content-Type': 'application/json' } }));
+            var p = new URLSearchParams((u.split('?')[1] || ''));
+            return Promise.resolve(new Response(JSON.stringify({ dateRange: {}, invoices: byDate(p.get('start'), p.get('end')) }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
         }
         if (u.indexOf('/api/sanmar-invoices/by-po/') !== -1) {
             var po = u.split('/by-po/')[1].split('?')[0];
-            return Promise.resolve(new Response(JSON.stringify({ purchaseOrder: po, invoices: [mk('16199' + po.slice(-4), daysAgo(2), po, 245.60, 'Net30')] }),
-                { status: 200, headers: { 'Content-Type': 'application/json' } }));
+            return Promise.resolve(new Response(JSON.stringify({ purchaseOrder: po, invoices: [mk('16199' + po.slice(-4), daysAgo(2), po, 245.60, 'Net30')] }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
         }
         return realFetch.apply(window, arguments);
     };

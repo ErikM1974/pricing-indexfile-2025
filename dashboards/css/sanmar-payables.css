@@ -85,6 +85,38 @@
 .smp-badge--mkt { background: #fff3e0; color: #b45309; border: 1px solid #f5d3ad; }
 .smp-badge--credit { background: #fdecec; color: #c0392b; border: 1px solid #f3c4c4; }
 .smp-badge--zero { background: var(--surface-inset, #eee); color: var(--gray-500); border: 1px solid var(--gray-300); }
+.smp-badge--todo { background: #eef4ff; color: #0a4fb5; border: 1px solid #c4d7f7; }
+.smp-badge--imported { background: #fff8f0; color: #b45309; border: 1px solid #f5d3ad; }
+.smp-badge--paid { background: #eaf7ef; color: #0f5132; border: 1px solid #b7e0c5; }
+.smp-paiddate { font-size: 0.72rem; color: var(--gray-500); margin-left: 4px; }
+
+/* ShopWorks upload bar */
+.smp-swbar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+    padding: 10px 12px;
+    margin-bottom: var(--space-3);
+    background: var(--surface-inset, #f7f7f8);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-sm);
+}
+.smp-upload-btn { cursor: pointer; }
+.smp-sw-status { font-size: 0.8rem; color: var(--gray-600); }
+.smp-linkbtn {
+    border: none; background: none; color: var(--art-theme, #009900);
+    font: inherit; font-size: 0.8rem; cursor: pointer; text-decoration: underline; padding: 0;
+}
+.smp-older-hint {
+    font-size: 0.8rem;
+    color: #b45309;
+    background: #fff8f0;
+    border: 1px solid #f5d3ad;
+    border-radius: var(--radius-sm);
+    padding: 6px 10px;
+    margin: 0 0 var(--space-2);
+}
 
 .smp-note {
     flex: 1;
