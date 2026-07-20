@@ -1,3 +1,7 @@
+## v2026.07.20.8 (2026.07.20)
+
+- Deploy v2026.07.20.8: 10 files (ACTIVE_FILES.md,sanmar-payables.css,sanmar-payables.js,...)
+
 ## v2026.07.20.7 (2026.07.20)
 
 - docs(lessons): [hidden] guard recurrence #5 (finished-photos-library lightbox)
