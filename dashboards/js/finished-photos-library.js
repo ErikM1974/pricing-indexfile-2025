@@ -183,9 +183,7 @@
         var btn = e.target.closest('[data-act]');
         if (!btn) return;
         if (btn.getAttribute('data-act') === 'view') {
-            el('fpl-lightbox-img').src = btn.getAttribute('data-src') || '';
-            el('fpl-lightbox-cap').textContent = btn.getAttribute('data-cap') || '';
-            el('fpl-lightbox').hidden = false;
+            openLightbox(btn.getAttribute('data-src') || '', btn.getAttribute('data-cap') || '');
             return;
         }
         // publish / hide
@@ -250,8 +248,56 @@
         });
     }
 
+    // ── lightbox ──
+    // The grid shows a small 256px thumbnail; the lightbox wants a crisp full view. The
+    // ?size=large path streams the ORIGINAL file, so it loads even when Box hasn't generated
+    // the small rendition yet (a cold/just-uploaded photo — that's what showed a broken image
+    // before). Strategy: paint the cached thumbnail instantly, then swap in the full-size when
+    // it arrives; never show the browser's broken-image glyph — fall back to a text status.
+    function largeUrl(src) {
+        return src + (src.indexOf('?') === -1 ? '?' : '&') + 'size=large';
+    }
+
+    function openLightbox(thumbUrl, cap) {
+        var box = el('fpl-lightbox');
+        var img = el('fpl-lightbox-img');
+        var status = el('fpl-lightbox-status');
+        el('fpl-lightbox-cap').textContent = cap || '';
+        box.hidden = false;
+        status.hidden = true;
+        status.textContent = '';
+
+        function showStatus(msg) { img.hidden = true; status.hidden = false; status.textContent = msg; }
+
+        if (!thumbUrl) { showStatus('No image available for this photo.'); return; }
+
+        // Instant preview from the (usually cached) grid thumbnail — but if that exact
+        // thumbnail is a cold/broken one, drop to a Loading state, not a broken glyph.
+        img.onload = function () { img.hidden = false; status.hidden = true; };
+        img.onerror = function () { showStatus('Loading…'); };
+        img.hidden = false;
+        img.src = thumbUrl;
+
+        // Upgrade to the full-size original in the background.
+        var hi = new Image();
+        hi.onload = function () {
+            if (box.hidden) return;                 // closed before it finished
+            img.onerror = function () { showStatus('This photo could not be loaded.'); };
+            img.src = hi.src; img.hidden = false; status.hidden = true;
+        };
+        hi.onerror = function () {
+            if (box.hidden) return;
+            if (img.hidden) showStatus('This photo could not be loaded.'); // neither size loaded
+        };
+        hi.src = largeUrl(thumbUrl);
+    }
+
     function closeLightbox() {
         el('fpl-lightbox').hidden = true;
-        el('fpl-lightbox-img').src = '';
+        var img = el('fpl-lightbox-img');
+        img.onload = img.onerror = null;
+        img.removeAttribute('src');
+        img.hidden = true;
+        el('fpl-lightbox-status').hidden = true;
     }
 })();
