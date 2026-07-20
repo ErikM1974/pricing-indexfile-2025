@@ -28,12 +28,31 @@
                 salesAsOf: daysAgoDay(2),
                 openQuoteCount: isT ? 4 : 2,
                 openQuoteValue: isT ? 6890.5 : 3120,
-                commissionQtd: isT ? 1284.22 : 2210.4,
+                commissionQtd: isT ? 60.75 : 0,
                 commissionQuarter: 'Q3 2026',
                 leadWinRate: isT ? 38 : 52,
                 leadsWon90: isT ? 6 : 11,
             },
-            commission: { quarter: 'Q3', year: 2026, totalCommission: isT ? 1284.22 : 2210.4, baselineMet: true, baselineProgress: 112.4 },
+            bonus: {
+                year: 2026, currentQuarter: 'Q3', previousQuarter: 'Q2',
+                previous: {
+                    rows: [
+                        { type: 'Online Store', quarter: 'Q2', amount: isT ? 131.7 : 2.97, base: isT ? 2634 : 99, rate: isT ? 0.05 : 0.03, status: 'Calculated', paycheckDate: '', payrollNumber: '' },
+                        { type: 'Garment Spiff', quarter: 'Q2', amount: isT ? 53.75 : 128.25, base: 0, rate: 0, status: 'Calculated', paycheckDate: '' },
+                        { type: 'Win-Back Bounty', quarter: 'Q2', amount: isT ? 350.15 : 0, base: isT ? 7003 : 0, rate: 0.05, status: 'Calculated', paycheckDate: '' },
+                    ],
+                    total: isT ? 535.6 : 131.22, allPaid: false,
+                },
+                current: {
+                    rows: [
+                        { type: 'Online Store', quarter: 'Q3', amount: 0, base: 0, rate: 0.01, status: 'Calculated' },
+                        { type: 'Garment Spiff', quarter: 'Q3', amount: 0, base: 0, rate: 0, status: 'Calculated' },
+                        { type: 'Win-Back Bounty', quarter: 'Q3', amount: isT ? 60.75 : 0, base: isT ? 1215 : 0, rate: 0.05, status: 'Calculated' },
+                    ],
+                    total: isT ? 60.75 : 0,
+                },
+                paidYtd: isT ? 1241.14 : 1314.38,
+            },
             actionQueue: {
                 overdueLeads: [{
                     submissionId: 'JFL0714-1001', formId: 'jotform-lead', company: 'Rainier Roofing <script>alert(1)</script>',

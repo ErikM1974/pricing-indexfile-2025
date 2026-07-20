@@ -16,7 +16,7 @@
     <!-- 2026 design tokens (must load before dash-shell.css) -->
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/ae-mission-control.css?v=2026.07.19.8">
+    <link rel="stylesheet" href="/dashboards/css/ae-mission-control.css?v=2026.07.19.9">
 </head>
 <body>
     <div class="dash-shell">
@@ -109,6 +109,25 @@
                 <div id="aemc-queue" class="aemc-queue">
                     <div class="dash-loading">Loading your action queue…</div>
                 </div>
+            </div>
+
+            <!-- Bonus & commission (Commission_Payouts = payroll system of record) -->
+            <div class="dash-card aemc-bonus-card">
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title"><i class="fas fa-sack-dollar"></i> Bonus &amp; Commission</h2>
+                    <a class="aemc-viewall" id="aemc-bonus-link" href="https://inksoft-transform-8a3dc4e38097.herokuapp.com/commissions" target="_blank" rel="noopener">Full bonus dashboard</a>
+                </div>
+                <div class="aemc-bonus-grid">
+                    <div>
+                        <h3 class="aemc-queue-section-title" id="aemc-bonus-prev-title">Last quarter payout</h3>
+                        <div id="aemc-bonus-prev"><div class="dash-loading">Loading…</div></div>
+                    </div>
+                    <div>
+                        <h3 class="aemc-queue-section-title" id="aemc-bonus-cur-title">This quarter so far</h3>
+                        <div id="aemc-bonus-cur"><div class="dash-loading">Loading…</div></div>
+                    </div>
+                </div>
+                <p class="aemc-bonus-foot" id="aemc-bonus-foot"></p>
             </div>
 
             <!-- ZONE 3: work panels -->
@@ -207,6 +226,6 @@
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/dash-page-helpers.js"></script>
     <script src="/dashboards/js/sanmar-inbound-today.js?v=2026.07.19.1"></script>
-    <script src="/dashboards/js/ae-mission-control.js?v=2026.07.19.8"></script>
+    <script src="/dashboards/js/ae-mission-control.js?v=2026.07.19.9"></script>
 </body>
 </html>
