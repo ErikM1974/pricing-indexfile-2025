@@ -1,3 +1,8 @@
+## v2026.07.19.14 (2026.07.19)
+
+- docs(memory): My Purchasing tracker (JotForm x PurchaseOrders) notes
+- Deploy v2026.07.19.14: Purchasing Portal — company-wide Bradley purchase-request status page
+
 ## v2026.07.19.13 (2026.07.19)
 
 - docs(memory): ShopWorks write-back not possible (never propose) + To-Do tracker design
