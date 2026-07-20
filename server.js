@@ -109,6 +109,10 @@ dotenv.config();
 //   ALL /api/crm-proxy/form-submissions* — Forms Inbox reads/updates (any staff; ~L3230, 2026-07-11)
 //   ALL /api/crm-proxy/order-odbc*       — ORDER_ODBC order history for the Leads board (any staff; 2026-07-18)
 //   ALL /api/crm-proxy/lead-activity*    — Leads CRM timeline reads/appends (any staff; 2026-07-18)
+//   GET /api/crm-proxy/ae-dashboard/summary — AE Mission Control aggregate (taneisha/nika/admin;
+//     rep email derived from session, admin-only ?viewAs=; ~L3390, 2026-07-19)
+//   GET /dashboards/ae-mission-control.html — per-AE cockpit page (role-gated taneisha/nika; ~L3059)
+//     + AE post-login landing redirect in the SAML ACS (default relay → mission control; ~L3033)
 //
 // SAMPLE PROGRAM ('samples' channel, 2026-07-06 — SAM{MMDD}-{rand4} QuoteIDs; handleSamplesOrderPaid ~L1400)
 //   POST /api/samples/create-checkout-session — PAID blank samples: dedicated multi-style route (shared
@@ -3023,7 +3027,15 @@ app.post('/auth/saml/acs', express.urlencoded({ extended: false, limit: '1mb' })
       },
     };
     // Same-origin only — reject protocol-relative '//host' / '/\host' open-redirects.
-    const relay = (typeof req.body.RelayState === 'string' && /^\/(?![/\\])/.test(req.body.RelayState)) ? req.body.RelayState : '/staff-dashboard.html';
+    let relay = (typeof req.body.RelayState === 'string' && /^\/(?![/\\])/.test(req.body.RelayState)) ? req.body.RelayState : '/staff-dashboard.html';
+    // AE landing (2026-07-19): when an AE logs in WITHOUT a specific destination
+    // (relay is still the generic default), land them on their Mission Control
+    // instead of the staff dashboard. Explicit ?next= deep links are untouched,
+    // and admins (who also hold the rep permissions) keep the staff dashboard.
+    if (relay === '/staff-dashboard.html' && !permissions.includes('admin')
+        && (permissions.includes('taneisha') || permissions.includes('nika'))) {
+      relay = '/dashboards/ae-mission-control.html';
+    }
     res.redirect(relay); // cookie-session writes the Set-Cookie automatically
   } catch (e) {
     console.error('[SAML] ACS verify failed:', e.message);
@@ -3044,6 +3056,12 @@ app.get('/dashboards/taneisha-crm.html', requireCrmRole(['taneisha']), (req, res
 });
 app.get('/dashboards/nika-crm.html', requireCrmRole(['nika']), (req, res) => {
   res.sendFile(path.join(__dirname, 'dashboards', 'nika-crm.html'));
+});
+// AE Mission Control — the per-AE cockpit. Hard code gate (like the rep CRM pages)
+// because the page surfaces the rep's commission dollars; admin passes automatically
+// (admin permissions include 'taneisha' + 'nika' via permissionsFromRole).
+app.get('/dashboards/ae-mission-control.html', requireCrmRole(['taneisha', 'nika']), (req, res) => {
+  res.sendFile(path.join(__dirname, 'dashboards', 'ae-mission-control.html'));
 });
 app.get('/dashboards/house-accounts.html', requireCrmRole(['house']), (req, res) => {
   res.sendFile(path.join(__dirname, 'dashboards', 'house-accounts.html'));
@@ -3352,6 +3370,31 @@ app.all('/api/crm-proxy/marketing-shipments*', requireStaff, (req, res, next) =>
   }
   next();
 }, marketingShipmentsForwarder);
+
+// AE Mission Control aggregate feed — the ONE data call behind
+// /dashboards/ae-mission-control.html. Identity comes from the verified SAML
+// session, never the browser: we derive `email` server-side and only honor a
+// ?viewAs= override for admins (Erik's view-as-rep switcher). Role-gated to
+// the AEs + admin because the payload includes the rep's commission dollars.
+app.get('/api/crm-proxy/ae-dashboard/summary', requireCrmRole(['taneisha', 'nika', 'admin']), async (req, res) => {
+  try {
+    const caller = req.session.crmUser;
+    const perms = caller.permissions || [];
+    let email = String(caller.email || '').toLowerCase();
+    const viewAs = String(req.query.viewAs || '').toLowerCase().trim();
+    if (viewAs && perms.includes('admin')) email = viewAs; // admin-only override
+    const params = new URLSearchParams({ email });
+    if (req.query.refresh) params.set('refresh', String(req.query.refresh));
+    const response = await fetch(`${CRM_API_BASE}/api/ae-dashboard/summary?${params}`, {
+      headers: { 'X-CRM-API-Secret': CRM_API_SECRET }
+    });
+    const data = await response.json().catch(() => ({ error: 'Bad upstream response' }));
+    res.status(response.status).json(data);
+  } catch (error) {
+    console.error('[CRM Proxy] ae-dashboard summary error:', error.message);
+    res.status(500).json({ error: 'Proxy error', message: error.message });
+  }
+});
 
 // Leads CRM conversion tracking + rep scorecard (dashboards/lead-scorecard.html):
 // GET /lead-scorecard (per-rep closes + order value) — any logged-in staff;

@@ -11,10 +11,7 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 - **Root Cause**: (a) every PDP view cost ~13 Caspio calls — the 8 per-style siblings of pricing-bundle (size-pricing, max-prices, inventory, colors, swatches, details…) had zero server cache while the data changes only nightly; (b) `/api/sizes-by-style-color` probed the dead `/tables/Inventory` (404 since 2026-06-18) on EVERY call; (c) `Standard_Size_Upcharges`/`Size_Display_Order` re-fetched in full per request; (d) dashboard pollers ran 24/7 in hidden tabs (~2,880 calls/day/tab); (e) hourly quote bulk-sync re-synced every 30-day quote every hour — and re-syncing cancelled quotes re-stamped `ShopWorks_Last_Synced`, resetting their 30-day purge countdown daily.
 - **Solution**: proxy v2026.07.18.1 shared `ttl-cache.js` (never serves expired — Rule 4; degraded payloads never cached) + 1h static-table cache + probe removal + `GET /api/product-cache/clear`; pollers pause on `visibilitychange`; bulk-sync excludes cancelled + age-backoff on `CreatedAt_Quote` (NOT Last_Synced — every sync branch re-stamps it, so it can never age; and `Imported` is NOT terminal — hourly re-sync of Imported is what detects SW deletions → ShipStation cancel-cascade).
 - **Prevention**: new hot read endpoint → cache it at birth (copy ttl-cache pattern; key = ALL response-shaping params incl. `includeDiscontinued`); never leave a known-dead upstream probe "for when it comes back" — one 404 × every request is real quota; every `setInterval` fetch ships with the visibility-pause guard; verify quota impact in `GET /api/admin/metrics` `callsByTable`, not vibes; `sanitize(x) || x` = no sanitization at all — fail closed.
-- **Problem**: Portal header logo never displayed for customers; the new finished-photos capture app showed raw alt text. Both pointed at `northwestcustomapparel.box.com/shared/static/8ngf….png`.
-- **Root Cause**: Box shared-static URLs 301-redirect instead of serving the image, so `<img>` fails; the portal's `onerror → display:none` handler hid the breakage (nobody knew a logo was even supposed to be there).
-- **Solution**: Swapped both headers + the portal favicon to the site-standard Caspio CDN logo (`cdn.caspio.com/A0E15000/Safety Stripes/web northwest custom apparel logo.png`) on a white chip for dark-green bars (v2026.07.17.12).
-- **Prevention**: Never use Box shared-static links as `<img src>` — use the Caspio CDN logo or a proxy-served asset. `onerror → hide` is a SILENT failure mode: pair it with a text-brand fallback or re-check when touching branding. Grep `box.com/shared/static` in HTML on any branding pass.
+### Box shared-static `<img>` links 301 = dead (2026-07-17, ARCHIVED 2026-07-19): never use `box.com/shared/static` as an img src — Caspio CDN logo or proxy-served asset; `onerror → hide` is a silent failure. Full entry in archive.
 
 ## Security & Auth
 
@@ -249,6 +246,9 @@ Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive 
 ---
 
 ## Data Integrity
+
+### One rep, FOUR name shapes across tables — and one is a trap (2026-07-19, AE Mission Control build)
+Per-rep filters hit different shapes: `Form_Submissions.Sales_Rep`/`ORDER_ODBC.CustomerServiceRep`/`NW_Daily_Sales_By_Rep.RepName` = full name ("Taneisha Clark"); `Quote_Sessions` = `SalesRepEmail/Name`; **ArtRequests.Sales_Rep is free-text and CHANGED shape** — recent rows full names, older bare first names (`rep-email-map.js` comment stale) → first-name-only filter silently returned 0 rows. And `SALES_REP_MAP` (manageorders-emb-config) said taneisha@ → **"Taneisha Jones"** — a real BUG (Erik-confirmed Clark; every EMB/SCP/DTF push stamped a CSR name no report joins on) — FIXED to "Taneisha Clark" same day. **Fix/Prevention:** proxy `ae-dashboard.js AE_REGISTRY` = the one email→{fullName,firstName} map (sync w/ FE `leads-common.js EMAIL_TO_REP`); ArtRequests filter ORs both forms; verify a rep column's live shape with one query before filtering — never trust map comments; any rep-name map entry that matches nothing in Sales_Reps_2026 is a bug, not a variant.
 
 ### Quote Sequence Race — duplicate IDs (ARCHIVED 2026-06-12): Caspio has no atomic increment — any read-modify-write needs an app-level lock (mutex per prefix). Full entry in archive.
 
