@@ -12,6 +12,12 @@
    2026 design system.
    ========================================================================== */
 
+/* File-wide [hidden] guard — REQUIRED on every dashboard stylesheet. An author `display`
+   rule (grid/flex/block) silently beats the UA `[hidden]{display:none}`, so any element JS
+   toggles via `.hidden` that also has a display rule never actually hides. (This page's
+   .fpl-lightbox learned it the hard way — LESSONS 2026-07-19, recurrence #5.) */
+[hidden] { display: none !important; }
+
 .fpl-sub {
     font-size: 0.8rem;
     font-weight: 500;
@@ -194,10 +200,8 @@
 }
 
 /* ── lightbox ── */
-/* [hidden] alone loses to `display:flex` below — an author rule beats the UA-stylesheet
-   [hidden]{display:none}, so without this override the overlay is shown from page load,
-   dimming the whole page over an empty <img>. Same bug class as .dtg-catalog-modal[hidden]. */
-.fpl-lightbox[hidden] { display: none !important; }
+/* Overlay is display:flex, so it depends on the file-wide [hidden] guard at the top of this
+   file to stay hidden until opened (without it the overlay renders from page load). */
 .fpl-lightbox {
     position: fixed;
     inset: 0;
