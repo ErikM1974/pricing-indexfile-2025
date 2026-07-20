@@ -194,6 +194,10 @@
 }
 
 /* ── lightbox ── */
+/* [hidden] alone loses to `display:flex` below — an author rule beats the UA-stylesheet
+   [hidden]{display:none}, so without this override the overlay is shown from page load,
+   dimming the whole page over an empty <img>. Same bug class as .dtg-catalog-modal[hidden]. */
+.fpl-lightbox[hidden] { display: none !important; }
 .fpl-lightbox {
     position: fixed;
     inset: 0;
@@ -203,6 +207,12 @@
     align-items: center;
     justify-content: center;
     padding: 2rem;
+}
+.fpl-lightbox-status {
+    color: var(--gray-200);
+    font-size: 0.9rem;
+    text-align: center;
+    padding: 2.5rem 1rem;
 }
 .fpl-lightbox-fig {
     margin: 0;

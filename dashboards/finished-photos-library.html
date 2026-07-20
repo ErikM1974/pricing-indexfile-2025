@@ -16,7 +16,7 @@
     <!-- 2026 design tokens (must load before dash-shell.css) -->
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/finished-photos-library.css">
+    <link rel="stylesheet" href="/dashboards/css/finished-photos-library.css?v=2026.07.20.5">
 </head>
 <body>
     <div class="dash-shell">
@@ -98,7 +98,8 @@
             <i class="fas fa-times"></i>
         </button>
         <figure class="fpl-lightbox-fig">
-            <img id="fpl-lightbox-img" src="" alt="Finished product photo, full size">
+            <img id="fpl-lightbox-img" alt="Finished product photo, full size" hidden>
+            <div class="fpl-lightbox-status" id="fpl-lightbox-status" hidden></div>
             <figcaption id="fpl-lightbox-cap"></figcaption>
         </figure>
     </div>
@@ -107,6 +108,6 @@
     <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/dash-page-helpers.js"></script>
-    <script src="/dashboards/js/finished-photos-library.js"></script>
+    <script src="/dashboards/js/finished-photos-library.js?v=2026.07.20.5"></script>
 </body>
 </html>
