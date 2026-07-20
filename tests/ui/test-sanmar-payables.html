@@ -14,8 +14,8 @@
 
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/shared_components/css/sanmar-invoice-viewer.css?v=2026.07.20.2">
-    <link rel="stylesheet" href="/dashboards/css/sanmar-payables.css?v=2026.07.20.8">
+    <link rel="stylesheet" href="/shared_components/css/sanmar-invoice-viewer.css?v=2026.07.20.8">
+    <link rel="stylesheet" href="/dashboards/css/sanmar-payables.css?v=2026.07.20.9">
 </head>
 <body>
     <div class="dash-shell">
@@ -57,15 +57,15 @@
                 <div class="dash-stat-grid">
                     <div class="dash-stat-card dash-stat-card--accent">
                         <div class="dash-stat-value" id="smp-stat-count">—</div>
-                        <div class="dash-stat-label">Invoices in range</div>
+                        <div class="dash-stat-label">Open payables</div>
                     </div>
                     <div class="dash-stat-card">
                         <div class="dash-stat-value" id="smp-stat-net">—</div>
-                        <div class="dash-stat-label">Net amount</div>
+                        <div class="dash-stat-label">Amount owed</div>
                     </div>
                     <div class="dash-stat-card">
-                        <div class="dash-stat-value" id="smp-stat-credits">—</div>
-                        <div class="dash-stat-label">Credits</div>
+                        <div class="dash-stat-value" id="smp-stat-notimported">—</div>
+                        <div class="dash-stat-label">Not imported yet</div>
                     </div>
                     <div class="dash-stat-card">
                         <div class="dash-stat-value" id="smp-stat-selected">—</div>
@@ -75,18 +75,34 @@
 
                 <div class="dash-card">
                     <div class="dash-card-header smp-toolbar">
-                        <h2 class="dash-card-title"><i class="fas fa-file-invoice-dollar"></i> SanMar Invoices → ShopWorks Payables</h2>
+                        <h2 class="dash-card-title"><i class="fas fa-file-invoice-dollar"></i> Open SanMar Payables</h2>
                         <span class="smp-updated" id="smp-updated"></span>
+                    </div>
+
+                    <div class="smp-swbar">
+                        <label class="dash-btn smp-upload-btn" for="smp-sw-file"><i class="fas fa-upload"></i> Upload ShopWorks payables</label>
+                        <input type="file" id="smp-sw-file" accept=".csv,text/csv" hidden>
+                        <button type="button" id="smp-sw-clear" class="smp-linkbtn" hidden>clear</button>
+                        <span class="smp-sw-status" id="smp-sw-status">No ShopWorks export loaded — showing all open payables. Upload it to see Imported / Paid status.</span>
                     </div>
 
                     <div class="smp-filters">
                         <div class="smp-field">
-                            <label class="smp-field-label" for="smp-start">Start date</label>
+                            <label class="smp-field-label" for="smp-start">From date</label>
                             <input type="date" id="smp-start" class="smp-input">
                         </div>
                         <div class="smp-field">
-                            <label class="smp-field-label" for="smp-end">End date</label>
+                            <label class="smp-field-label" for="smp-end">To date</label>
                             <input type="date" id="smp-end" class="smp-input">
+                        </div>
+                        <div class="smp-field">
+                            <label class="smp-field-label" for="smp-status-filter">Show</label>
+                            <select id="smp-status-filter" class="smp-input" disabled>
+                                <option value="needimport">Not imported &amp; unpaid</option>
+                                <option value="topay">Imported, awaiting payment</option>
+                                <option value="open">All still owed</option>
+                                <option value="all">Everything (incl. paid)</option>
+                            </select>
                         </div>
                         <div class="smp-field">
                             <label class="smp-field-label" for="smp-search-po">PO #</label>
@@ -98,6 +114,8 @@
                         </div>
                     </div>
 
+                    <p class="smp-older-hint" id="smp-older-hint" hidden></p>
+
                     <div class="smp-table-scroll">
                         <table class="smp-table">
                             <thead>
@@ -108,12 +126,12 @@
                                     <th>PO #</th>
                                     <th>Ship To</th>
                                     <th>Amount</th>
-                                    <th>Due Date</th>
+                                    <th>ShopWorks status</th>
                                     <th>Invoice</th>
                                 </tr>
                             </thead>
                             <tbody id="smp-tbody">
-                                <tr><td colspan="7" class="smp-empty dash-loading">Loading SanMar invoices…</td></tr>
+                                <tr><td colspan="8" class="smp-empty dash-loading">Loading open SanMar payables…</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -121,8 +139,7 @@
                     <div class="smp-footer">
                         <p class="smp-note">
                             <i class="fas fa-circle-info"></i>
-                            Exports the standard SanMar payables (vendor <strong>1002</strong>, Net30 incl. credits).
-                            <span class="smp-badge smp-badge--mkt">MARKETING</span> charges bill to a separate account (vendor 2425) and live on the <strong>Marketing Fund</strong> tab.
+                            Open invoices &amp; credits you still owe SanMar (vendor <strong>1002</strong>). Upload your ShopWorks payables export to see what's already imported / paid. Marketing-fund charges live on the <strong>Marketing Fund</strong> tab.
                         </p>
                         <button type="button" id="smp-download" class="dash-btn dash-btn--primary smp-download">
                             <i class="fas fa-file-csv"></i>
@@ -212,8 +229,8 @@
     <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/dash-page-helpers.js"></script>
-    <script src="/shared_components/js/sanmar-invoice-viewer.js?v=2026.07.20.2"></script>
+    <script src="/shared_components/js/sanmar-invoice-viewer.js?v=2026.07.20.8"></script>
     <script src="/tests/ui/test-sanmar-payables-stub.js"></script>
-    <script src="/dashboards/js/sanmar-payables.js?v=2026.07.20.8"></script>
+    <script src="/dashboards/js/sanmar-payables.js?v=2026.07.20.9"></script>
 </body>
 </html>
