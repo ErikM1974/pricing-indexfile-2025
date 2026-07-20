@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>TEST HARNESS — Finished Photos Library</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- 2026 design tokens (must load before dash-shell.css) -->
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css">
+    <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
+    <link rel="stylesheet" href="/dashboards/css/finished-photos-library.css">
+</head>
+<body>
+    <div class="dash-shell">
+        <header class="dash-header">
+            <div class="dash-header-left">
+                <a href="/staff-dashboard.html" title="Back to Staff Dashboard">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                         alt="Northwest Custom Apparel" class="dash-header-logo">
+                </a>
+                <h1 class="dash-header-title">Finished Photos Library</h1>
+            </div>
+            <div class="dash-header-right">
+                <a href="/dashboards/finished-photos.html" class="dash-btn" title="Snap a new finished-product photo">
+                    <i class="fas fa-camera"></i>
+                    Add a photo
+                </a>
+                <button type="button" id="fpl-refresh" class="dash-btn" title="Refresh photos">
+                    <i class="fas fa-rotate"></i>
+                    Refresh
+                </button>
+                <a href="/staff-dashboard.html" class="dash-back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    Dashboard
+                </a>
+            </div>
+        </header>
+
+        <main class="dash-content">
+            <div class="dash-error-banner" role="alert">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span class="dash-error-banner-message"></span>
+                <button class="dash-error-banner-close" aria-label="Dismiss">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="dash-stat-grid">
+                <div class="dash-stat-card dash-stat-card--accent">
+                    <div class="dash-stat-value" id="fpl-stat-total">—</div>
+                    <div class="dash-stat-label">Photos</div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value" id="fpl-stat-live">—</div>
+                    <div class="dash-stat-label">Live on portals</div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value" id="fpl-stat-hidden">—</div>
+                    <div class="dash-stat-label">Not published yet</div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value" id="fpl-stat-accounts">—</div>
+                    <div class="dash-stat-label">Accounts with photos</div>
+                </div>
+            </div>
+
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title"><i class="fas fa-images"></i> Browse <span class="fpl-sub" id="fpl-sub"></span></h2>
+                </div>
+                <div class="fpl-toolbar">
+                    <div class="fpl-chips" id="fpl-rep-chips" role="group" aria-label="Filter by sales rep"></div>
+                    <div class="fpl-toolbar-right">
+                        <input type="search" id="fpl-search" class="fpl-search" placeholder="Search company or design…" autocomplete="off">
+                        <select id="fpl-visibility" class="fpl-select" aria-label="Filter by portal visibility">
+                            <option value="all">All photos</option>
+                            <option value="live">Published only</option>
+                            <option value="hidden">Hidden only</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="fpl-body"><div class="dash-loading">Loading the photo library…</div></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Full-size viewer -->
+    <div class="fpl-lightbox" id="fpl-lightbox" hidden>
+        <button type="button" class="fpl-lightbox-close" id="fpl-lightbox-close" aria-label="Close">
+            <i class="fas fa-times"></i>
+        </button>
+        <figure class="fpl-lightbox-fig">
+            <img id="fpl-lightbox-img" src="" alt="Finished product photo, full size">
+            <figcaption id="fpl-lightbox-cap"></figcaption>
+        </figure>
+    </div>
+
+    <!-- Load order matters: APP_CONFIG → fetch-timeout → DashPage → STUB → page controller -->
+    <script src="/config/app.config.js"></script>
+    <script src="/shared_components/js/fetch-timeout.js"></script>
+    <script src="/shared_components/js/dash-page-helpers.js"></script>
+    <script src="/tests/ui/test-finished-photos-library-stub.js"></script>
+    <script src="/dashboards/js/finished-photos-library.js"></script>
+</body>
+</html>

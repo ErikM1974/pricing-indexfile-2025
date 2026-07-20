@@ -1,0 +1,242 @@
+/* ==========================================================================
+   finished-photos-library.css — page-specific styles for
+   dashboards/finished-photos-library.html
+
+   Shell classes (.dash-header, .dash-back-link, .dash-stat-card, etc.) come
+   from shared_components/css/dash-shell.css. Design tokens (--surface-*,
+   --gray-*, --shadow-*, --radius-*, --state-*) come from
+   shared_components/css/art-hub.css.
+
+   Only add page-specific styles here. NEVER redefine tokens. NEVER hardcode
+   colors/shadows/radii — use var(--token-name) so the page inherits the
+   2026 design system.
+   ========================================================================== */
+
+.fpl-sub {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--gray-500);
+    margin-left: 0.4rem;
+}
+
+/* ── toolbar: rep chips + search + visibility ── */
+.fpl-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+}
+.fpl-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+}
+.fpl-chip {
+    border: 1px solid var(--gray-300);
+    background: var(--surface-card, #fff);
+    color: var(--gray-700);
+    border-radius: 999px;
+    padding: 0.3rem 0.8rem;
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+.fpl-chip:hover { border-color: var(--gray-400); }
+.fpl-chip.is-active {
+    background: var(--primary, var(--gray-800));
+    border-color: var(--primary, var(--gray-800));
+    color: #fff;
+}
+.fpl-chip-count {
+    font-weight: 500;
+    opacity: 0.75;
+    margin-left: 0.25rem;
+}
+.fpl-toolbar-right {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.fpl-search,
+.fpl-select {
+    font: inherit;
+    font-size: 0.85rem;
+    color: var(--gray-800);
+    background: var(--surface-card, #fff);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    padding: 0.4rem 0.7rem;
+}
+.fpl-search { min-width: 220px; }
+.fpl-search:focus,
+.fpl-select:focus { outline: 2px solid var(--primary, var(--gray-500)); outline-offset: 1px; }
+
+/* ── account sections ── */
+.fpl-account { margin-bottom: 1.4rem; }
+.fpl-account-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem;
+    padding-bottom: 0.35rem;
+    margin-bottom: 0.6rem;
+    border-bottom: 1px solid var(--gray-200);
+}
+.fpl-account-name {
+    font-size: 0.98rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin: 0;
+}
+.fpl-account-meta {
+    font-size: 0.78rem;
+    color: var(--gray-500);
+}
+.fpl-rep-badge {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--gray-600);
+    background: var(--gray-100);
+    border: 1px solid var(--gray-200);
+    border-radius: 999px;
+    padding: 0.1rem 0.55rem;
+}
+
+/* ── photo grid ── */
+.fpl-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.8rem;
+}
+.fpl-card {
+    background: var(--surface-card, #fff);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    display: flex;
+    flex-direction: column;
+}
+.fpl-card-imgbtn {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: var(--gray-100);
+    cursor: zoom-in;
+    aspect-ratio: 4 / 3;
+}
+.fpl-card-imgbtn img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.fpl-card-body {
+    padding: 0.5rem 0.6rem 0.6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    font-size: 0.78rem;
+    color: var(--gray-600);
+}
+.fpl-card-title {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--gray-800);
+}
+.fpl-card-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.4rem;
+    margin-top: 0.15rem;
+}
+.fpl-live {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--state-success);
+}
+.fpl-live i { font-size: 0.65rem; }
+.fpl-hidden-note {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--gray-400);
+}
+.fpl-pub-btn {
+    font: inherit;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    border: 1px solid var(--gray-300);
+    background: var(--surface-card, #fff);
+    color: var(--gray-700);
+    cursor: pointer;
+}
+.fpl-pub-btn:hover { border-color: var(--gray-400); }
+.fpl-pub-btn:disabled { opacity: 0.5; cursor: default; }
+
+.fpl-empty {
+    padding: 1.6rem 0.5rem;
+    text-align: center;
+    color: var(--gray-500);
+    font-size: 0.9rem;
+}
+.fpl-more {
+    font-size: 0.8rem;
+    color: var(--gray-500);
+    margin: 0.6rem 0 0;
+}
+
+/* ── lightbox ── */
+.fpl-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: rgba(15, 23, 42, 0.88);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+.fpl-lightbox-fig {
+    margin: 0;
+    max-width: min(92vw, 1100px);
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.fpl-lightbox-fig img {
+    max-width: 100%;
+    max-height: 80vh;
+    object-fit: contain;
+    border-radius: var(--radius-md);
+    background: var(--gray-900);
+}
+.fpl-lightbox-fig figcaption {
+    color: var(--gray-200);
+    font-size: 0.85rem;
+    text-align: center;
+}
+.fpl-lightbox-close {
+    position: absolute;
+    top: 1rem;
+    right: 1.2rem;
+    font-size: 1.4rem;
+    color: #fff;
+    background: none;
+    border: 0;
+    cursor: pointer;
+    padding: 0.4rem;
+}
+
+@media (max-width: 640px) {
+    .fpl-toolbar-right { width: 100%; }
+    .fpl-search { flex: 1; min-width: 0; }
+}
