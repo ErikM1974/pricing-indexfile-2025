@@ -1,3 +1,7 @@
+## v2026.07.20.11 (2026.07.20)
+
+- Deploy v2026.07.20.11: 6 files (sanmar-payables.js,sanmar-payables.html,SHOPWORKS_ODBC_INTEGRATION.md,...) — auto ShopWorks payables feed (ODBC) on SanMar Payables page
+
 ## v2026.07.20.10 (2026.07.20)
 
 - Deploy v2026.07.20.10: 4 files (sanmar-payables.js,sanmar-payables.html,test-sanmar-payables-stub.js,...) — normInv leading-zero fix for zero-padded ShopWorks credits
