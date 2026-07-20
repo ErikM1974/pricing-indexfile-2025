@@ -1,3 +1,11 @@
+## v2026.07.19.17 (2026.07.19)
+
+- feat(finished-photos): Finished Photos Library page — browse all photos by account + sales rep
+- docs: outage lesson (git add -u in shared checkout) + deploy-skill Step 3.6 foreign-hunk guard + boot probe
+- docs: condense outage lesson to fit 300-line limit
+- feat(vendor-portal): L&P Screen Printing subcontractor portal — magic-link login + screen-print job feed
+- Deploy v2026.07.19.17: shared SanMar invoice viewer — Mission Control purchasing cards + portal (one component); includes concurrent session's vendor-portal server routes (libs now committed, boot-probed) + Missing-Info card forwarder restored
+
 ## v2026.07.19.16 (2026.07.19)
 
 
