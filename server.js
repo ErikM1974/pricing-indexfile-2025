@@ -3410,6 +3410,20 @@ app.get('/api/crm-proxy/ae-dashboard/growth', requireCrmRole(['taneisha', 'nika'
 // Purchasing tracker — JotForm "Purchasing" form (requests to Bradley) joined
 // to the ShopWorks PurchaseOrders mirror (ordered/received) per work order.
 app.get('/api/crm-proxy/ae-dashboard/purchasing', requireCrmRole(['taneisha', 'nika', 'admin']), aeDashboardForwarder('/api/ae-dashboard/purchasing'));
+// Purchasing Portal — company-wide view of the same feed (every request to
+// Bradley + requester + status). ANY logged-in staff; no identity injection.
+app.get('/api/crm-proxy/purchasing-portal', requireStaff, async (req, res) => {
+  try {
+    const response = await fetch(`${CRM_API_BASE}/api/ae-dashboard/purchasing-all`, {
+      headers: { 'X-CRM-API-Secret': CRM_API_SECRET }
+    });
+    const data = await response.json().catch(() => ({ error: 'Bad upstream response' }));
+    res.status(response.status).json(data);
+  } catch (error) {
+    console.error('[CRM Proxy] purchasing-portal error:', error.message);
+    res.status(500).json({ error: 'Proxy error', message: error.message });
+  }
+});
 
 // Leads CRM conversion tracking + rep scorecard (dashboards/lead-scorecard.html):
 // GET /lead-scorecard (per-rep closes + order value) — any logged-in staff;

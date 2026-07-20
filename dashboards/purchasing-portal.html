@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Purchasing Portal - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- 2026 design tokens (must load before dash-shell.css) -->
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css">
+    <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
+    <link rel="stylesheet" href="/dashboards/css/purchasing-portal.css?v=2026.07.19.14">
+</head>
+<body>
+    <div class="dash-shell">
+        <header class="dash-header">
+            <div class="dash-header-left">
+                <a href="/staff-dashboard.html" title="Back to Staff Dashboard">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                         alt="Northwest Custom Apparel" class="dash-header-logo">
+                </a>
+                <h1 class="dash-header-title">Purchasing Portal</h1>
+            </div>
+            <div class="dash-header-right">
+                <a href="https://www.jotform.com/inbox/241646601815152" target="_blank" rel="noopener" class="dash-btn" title="The JotForm inbox Bradley works from">
+                    <i class="fas fa-inbox"></i>
+                    Form inbox
+                </a>
+                <button type="button" id="pp-refresh" class="dash-btn" title="Reload the feed">
+                    <i class="fas fa-rotate"></i>
+                    Refresh
+                </button>
+                <a href="/staff-dashboard.html" class="dash-back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    Dashboard
+                </a>
+            </div>
+        </header>
+
+        <main class="dash-content">
+            <div class="dash-error-banner" role="alert">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span class="dash-error-banner-message"></span>
+                <button class="dash-error-banner-close" aria-label="Dismiss">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="dash-stat-grid">
+                <div class="dash-stat-card dash-stat-card--accent">
+                    <div class="dash-stat-value" id="pp-stat-total">—</div>
+                    <div class="dash-stat-label">Requests (60d)</div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value" id="pp-stat-sent">—</div>
+                    <div class="dash-stat-label">Awaiting Purchase</div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value" id="pp-stat-ordered">—</div>
+                    <div class="dash-stat-label">Ordered</div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value" id="pp-stat-received">—</div>
+                    <div class="dash-stat-label">Received</div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value" id="pp-stat-done">—</div>
+                    <div class="dash-stat-label">Invoiced / Shipped</div>
+                </div>
+            </div>
+
+            <div class="dash-card">
+                <div class="dash-card-header pp-toolbar">
+                    <h2 class="dash-card-title"><i class="fas fa-cart-flatbed"></i> Purchase Requests to Bradley</h2>
+                    <span class="pp-updated" id="pp-updated"></span>
+                </div>
+                <div class="pp-filters">
+                    <input type="search" id="pp-search" class="pp-input" placeholder="Search WO #, company, PO #…" aria-label="Search">
+                    <select id="pp-filter-rep" class="pp-input" aria-label="Filter by requester">
+                        <option value="">All requesters</option>
+                    </select>
+                    <select id="pp-filter-status" class="pp-input" aria-label="Filter by status">
+                        <option value="">All statuses</option>
+                        <option value="sent">Sent to Bradley</option>
+                        <option value="ordered">Ordered</option>
+                        <option value="partial">Partially received</option>
+                        <option value="received">Received</option>
+                        <option value="invoiced">Invoiced</option>
+                        <option value="shipped">Shipped</option>
+                    </select>
+                </div>
+                <div class="pp-table-scroll">
+                    <table class="pp-table">
+                        <thead>
+                            <tr>
+                                <th>WO #</th>
+                                <th>Company</th>
+                                <th>Requested by</th>
+                                <th>Sent</th>
+                                <th>Type</th>
+                                <th>PO #</th>
+                                <th>Vendors</th>
+                                <th>Ordered</th>
+                                <th>Received</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pp-tbody">
+                            <tr><td colspan="10" class="pp-empty dash-loading">Loading purchase requests…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Load order matters: APP_CONFIG → fetch-timeout → DashPage → page controller -->
+    <script src="/config/app.config.js"></script>
+    <script src="/shared_components/js/fetch-timeout.js"></script>
+    <script src="/shared_components/js/dash-page-helpers.js"></script>
+    <script src="/dashboards/js/purchasing-portal.js?v=2026.07.19.14"></script>
+</body>
+</html>
