@@ -106,6 +106,7 @@ dotenv.config();
 // STAFF DASHBOARD FORWARDERS (SAML-gated same-origin reads of secret-gated proxy data)
 //   GET /api/mo/orders[...]              — ManageOrders reads (PII airtight path, 2026-07-05)
 //   GET /api/staff/payments/recent       — Order_Payments ledger for the Money Collected widget (2026-07-06)
+//   GET /api/staff/finished-photos/library — company-wide finished-photo library w/ rep names (any staff; ~L4356, 2026-07-19)
 //   ALL /api/crm-proxy/form-submissions* — Forms Inbox reads/updates (any staff; ~L3230, 2026-07-11)
 //   ALL /api/crm-proxy/order-odbc*       — ORDER_ODBC order history for the Leads board (any staff; 2026-07-18)
 //   ALL /api/crm-proxy/lead-activity*    — Leads CRM timeline reads/appends (any staff; 2026-07-18)
@@ -4350,6 +4351,28 @@ app.get('/api/staff/finished-photos', requireStaff, async (req, res) => {
     const body = await r.text();
     res.status(r.status).type(r.headers.get('content-type') || 'application/json').send(body);
   } catch (e) { console.error('[finished-photos-forward:list]', e.message); res.status(502).json({ error: 'upstream_unavailable' }); }
+});
+// Company-wide photo library (photos joined with each account's rep) — feeds the Finished
+// Photos Library page and Mission Control's "My Finished Photos" view. Query passthrough is
+// whitelisted: rep / idCustomer / limit / refresh.
+app.get('/api/staff/finished-photos/library', requireStaff, async (req, res) => {
+  if (!CRM_API_SECRET) return res.status(503).json({ error: 'not_configured' });
+  const params = new URLSearchParams();
+  const rep = String(req.query.rep || '').trim().slice(0, 80);
+  if (rep) params.set('rep', rep);
+  const id = String(req.query.idCustomer || '').replace(/\D/g, '');
+  if (id) params.set('idCustomer', id);
+  const limit = String(req.query.limit || '').replace(/\D/g, '');
+  if (limit) params.set('limit', limit);
+  if (String(req.query.refresh || '') === '1') params.set('refresh', '1');
+  try {
+    const qs = params.toString();
+    const r = await fetch(`${CRM_API_BASE}/api/finished-photos/library${qs ? '?' + qs : ''}`, {
+      headers: { 'X-CRM-API-Secret': CRM_API_SECRET }, signal: AbortSignal.timeout(20000)
+    });
+    const body = await r.text();
+    res.status(r.status).type(r.headers.get('content-type') || 'application/json').send(body);
+  } catch (e) { console.error('[finished-photos-forward:library]', e.message); res.status(502).json({ error: 'upstream_unavailable' }); }
 });
 // Barcode / order-number lookup: a work-order scan ("142476" footer barcode or "40121Loc1"
 // design-sheet barcode) resolves to the customer (+ design) so the crew skips the search.
