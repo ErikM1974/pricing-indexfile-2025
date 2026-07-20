@@ -164,6 +164,49 @@
                 ],
             });
         }
+        if (u.indexOf('/api/crm-proxy/ae-dashboard/data-quality') !== -1) {
+            return json({
+                rep: REP, generatedAt: new Date().toISOString(), windowDays: 30,
+                ordersScanned: 41, customersScanned: 28, cacheHit: false,
+                counts: { ordersFlagged: 3, customersFlagged: 2, orderErrors: 6 },
+                orders: [
+                    { idOrder: 142510, idCustomer: 3310, company: 'Harbor Electric <script>alert(1)</script>', placedDate: daysAgoDay(1), requestedShipDate: '', invoiced: false, shipped: false, errCount: 3, issues: [
+                        { field: 'phone', severity: 'err', text: 'no contact phone' },
+                        { field: 'terms', severity: 'err', text: 'no payment terms' },
+                        { field: 'due-date', severity: 'err', text: 'no requested-ship date' }] },
+                    { idOrder: 142488, idCustomer: 5120, company: 'Korsmo Construction', placedDate: daysAgoDay(3), requestedShipDate: daysAgoDay(-10), invoiced: false, shipped: false, errCount: 2, issues: [
+                        { field: 'ship-address', severity: 'err', text: 'shipping charged but NO ship-to address' },
+                        { field: 'email', severity: 'err', text: 'no contact email' }] },
+                    { idOrder: 142371, idCustomer: 7881, company: 'Cintas', placedDate: daysAgoDay(9), requestedShipDate: daysAgoDay(-2), invoiced: true, shipped: true, errCount: 1, issues: [
+                        { field: 'tax', severity: 'err', text: 'taxable order but $0 sales tax (customer is not tax-exempt)' }] },
+                ],
+                customers: [
+                    { idCustomer: 3310, company: 'Harbor Electric', errCount: 2, issues: [
+                        { field: 'customer-type', severity: 'err', text: 'customer type not set' },
+                        { field: 'phone', severity: 'err', text: 'no phone on the customer record' }] },
+                    { idCustomer: 5120, company: 'Korsmo Construction', errCount: 0, issues: [
+                        { field: 'terms', severity: 'warn', text: 'no default payment terms' },
+                        { field: 'address', severity: 'warn', text: 'address incomplete' }] },
+                ],
+                ordersTruncated: 0, customersTruncated: 0,
+            });
+        }
+        if (u.indexOf('/api/crm-proxy/ae-dashboard/due-dates') !== -1) {
+            return json({
+                rep: REP, generatedAt: new Date().toISOString(), today: daysAgoDay(0),
+                dueSoonDays: 7, lookbackDays: 60, ordersScanned: 41, cacheHit: false,
+                counts: { late: 2, atRisk: 2, dueSoonOnTrack: 3 },
+                late: [
+                    { idOrder: 142280, idCustomer: 3310, company: 'Harbor Electric <b>xss</b>', orderType: 'Embroidery', placedDate: daysAgoDay(14), dueDate: daysAgoDay(5), daysUntilDue: -5, subtotal: 2140.75, invoiced: false, blanks: 'ordered', poCount: 1, vendors: ['SanMar'], flag: 'late', reason: '5d past due · blanks ordered, not received' },
+                    { idOrder: 142315, idCustomer: 5120, company: 'Korsmo Construction', orderType: 'DTG', placedDate: daysAgoDay(10), dueDate: daysAgoDay(1), daysUntilDue: -1, subtotal: 890, invoiced: true, blanks: 'received', poCount: 2, vendors: ['SanMar', 'S&S Activewear'], flag: 'late', reason: '1d past due' },
+                ],
+                atRisk: [
+                    { idOrder: 142501, idCustomer: 7881, company: 'Cintas', orderType: 'Screen Print', placedDate: daysAgoDay(3), dueDate: daysAgoDay(0), daysUntilDue: 0, subtotal: 1450.25, invoiced: false, blanks: 'none', poCount: 0, vendors: [], flag: 'risk', reason: 'due TODAY · blanks not purchased (no PO on this WO)' },
+                    { idOrder: 142449, idCustomer: 1102, company: 'Puget Powerwash', orderType: 'Embroidery', placedDate: daysAgoDay(6), dueDate: daysAgoDay(-4), daysUntilDue: 4, subtotal: 812, invoiced: false, blanks: 'partial', poCount: 2, vendors: ['SanMar'], flag: 'risk', reason: 'due in 4d · blanks only partially received' },
+                ],
+                lateTruncated: 0, atRiskTruncated: 0,
+            });
+        }
         if (u.indexOf('/api/crm-proxy/ae-dashboard/purchasing') !== -1) {
             return json({
                 rep: REP, generatedAt: new Date().toISOString(), windowDays: 60,

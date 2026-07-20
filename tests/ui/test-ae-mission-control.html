@@ -16,7 +16,7 @@
     <!-- 2026 design tokens (must load before dash-shell.css) -->
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/ae-mission-control.css?v=2026.07.19.13">
+    <link rel="stylesheet" href="/dashboards/css/ae-mission-control.css?v=2026.07.19.16">
 </head>
 <body>
     <div class="dash-shell">
@@ -96,6 +96,7 @@
                 <button type="button" class="dash-btn" id="aemc-kit-btn"><i class="fas fa-gift"></i> Request Sample Kit</button>
                 <a class="dash-btn" href="/dashboards/leads.html"><i class="fas fa-table-columns"></i> Leads Board</a>
                 <a class="dash-btn" id="aemc-accounts-link" href="/dashboards/taneisha-crm.html" hidden><i class="fas fa-address-book"></i> My Accounts</a>
+                <a class="dash-btn" id="aemc-photos-link" href="/dashboards/finished-photos-library.html" title="Finished-product photos for your accounts"><i class="fas fa-images"></i> My Finished Photos</a>
                 <a class="dash-btn" href="/dashboards/lead-scorecard.html"><i class="fas fa-trophy"></i> Scorecard</a>
                 <a class="dash-btn" href="/dashboards/commission-structure.html"><i class="fas fa-percent"></i> Commission Plan</a>
             </div>
@@ -140,6 +141,16 @@
                 <div id="aemc-purch"><div class="dash-loading">Checking your purchase requests…</div></div>
             </div>
 
+            <!-- Order Due Dates: unshipped ShopWorks orders vs requested-ship date × blanks PO status -->
+            <div class="dash-card aemc-due-card">
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title"><i class="fas fa-calendar-days"></i> Order Due Dates <span class="aemc-sub" id="aemc-due-sub"></span></h2>
+                    <a class="aemc-viewall" href="/dashboards/purchasing-portal.html">Full purchasing portal</a>
+                </div>
+                <p class="aemc-hint">Your unshipped orders measured against their requested-ship date. <span class="aemc-due-flag aemc-due-flag--late">Late</span> = the date already passed. <span class="aemc-due-flag aemc-due-flag--risk">At risk</span> = due within 7 days and the blanks aren't purchased or received yet — chase Bradley or the vendor now.</p>
+                <div id="aemc-due"><div class="dash-loading">Checking your order due dates…</div></div>
+            </div>
+
             <!-- Growth radar: revenue statistically missing vs each account's own history -->
             <div class="dash-card aemc-growth-card">
                 <div class="dash-card-header">
@@ -148,6 +159,15 @@
                 </div>
                 <p class="aemc-hint aemc-growth-hint">Accounts that are late against <em>their own</em> ordering rhythm, or spent real money in the next 45 days last year and haven't ordered yet. Call these first.</p>
                 <div id="aemc-growth"><div class="dash-loading">Scanning 24 months of your order history…</div></div>
+            </div>
+
+            <!-- Data-quality radar: ShopWorks orders/customers entered with essential fields missing -->
+            <div class="dash-card aemc-dq-card">
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title"><i class="fas fa-list-check"></i> Missing Info — Fix in ShopWorks <span class="aemc-sub" id="aemc-dq-sub"></span></h2>
+                </div>
+                <p class="aemc-hint">Orders you entered in the last 30 days that are missing essentials — contact name, phone, email, ship-to address, payment terms, ship date, or sales tax — plus the customer records behind them that need setup fixes. Open each one in ShopWorks and fill the gaps before production or accounting hits them.</p>
+                <div id="aemc-dq"><div class="dash-loading">Checking your recent ShopWorks entries…</div></div>
             </div>
 
             <!-- ZONE 3: work panels -->
@@ -247,6 +267,6 @@
     <script src="/shared_components/js/dash-page-helpers.js"></script>
     <script src="/dashboards/js/sanmar-inbound-today.js?v=2026.07.19.1"></script>
     <script src="/tests/ui/test-ae-mission-control-stub.js"></script>
-    <script src="/dashboards/js/ae-mission-control.js?v=2026.07.19.13"></script>
+    <script src="/dashboards/js/ae-mission-control.js?v=2026.07.19.15"></script>
 </body>
 </html>

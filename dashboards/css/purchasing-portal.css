@@ -66,3 +66,128 @@
 .pp-chip--received { background: #eaf7ef; color: #0f5132; border: 1px solid #b7e0c5; }
 .pp-chip--invoiced { background: #eaf7ef; color: #0f5132; border: 1px solid #b7e0c5; }
 .pp-chip--shipped { background: #4cb354; color: #fff; border: 1px solid #4cb354; }
+
+/* =====================================================
+   SANMAR INVOICE MODAL + PRINT SHEET
+   ===================================================== */
+.pp-invoice-btn {
+    border: 1px solid var(--gray-300);
+    background: var(--surface-card);
+    color: var(--gray-600);
+    font: inherit;
+    font-size: 0.75rem;
+    padding: 3px 10px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    white-space: nowrap;
+}
+.pp-invoice-btn:hover { background: var(--surface-hover); color: var(--gray-900); }
+
+.pp-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    z-index: 90;
+}
+.pp-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(820px, calc(100vw - 32px));
+    max-height: min(88vh, 900px);
+    overflow: auto;
+    background: var(--surface-card);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    z-index: 100;
+}
+.pp-modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--gray-200);
+    position: sticky;
+    top: 0;
+    background: var(--surface-card);
+}
+.pp-modal-title { font-size: 1rem; font-weight: 700; color: var(--gray-900); margin: 0; }
+.pp-modal-actions-head { display: flex; align-items: center; gap: var(--space-2); }
+.pp-modal-close {
+    border: none;
+    background: transparent;
+    color: var(--gray-500);
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 6px;
+}
+.pp-modal-close:hover { color: var(--gray-900); }
+.pp-modal-body { padding: var(--space-4); }
+
+/* The invoice "document" — styled to read like a paper invoice on screen and print */
+.pp-inv {
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    margin-bottom: var(--space-4);
+    background: #fff;
+    color: #1a1a1a;
+}
+.pp-inv-top {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    border-bottom: 2px solid #1a1a1a;
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+}
+.pp-inv-brand { font-size: 1.05rem; font-weight: 700; }
+.pp-inv-brand small { display: block; font-weight: 400; color: #555; font-size: 0.75rem; }
+.pp-inv-no { text-align: right; font-family: 'JetBrains Mono', monospace; }
+.pp-inv-no strong { font-size: 1.05rem; }
+.pp-inv-meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 6px 16px;
+    font-size: 0.8rem;
+    margin-bottom: 12px;
+}
+.pp-inv-meta dt { color: #666; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.pp-inv-meta dd { margin: 0; font-weight: 600; }
+.pp-inv table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+.pp-inv th {
+    text-align: left;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #666;
+    border-bottom: 1px solid #1a1a1a;
+    padding: 5px 8px;
+}
+.pp-inv td { padding: 5px 8px; border-bottom: 1px solid #e5e5e5; }
+.pp-inv .pp-inv-num { text-align: right; font-family: 'JetBrains Mono', monospace; white-space: nowrap; }
+.pp-inv-totals { margin-top: 10px; margin-left: auto; width: 260px; font-size: 0.82rem; }
+.pp-inv-totals div { display: flex; justify-content: space-between; padding: 3px 8px; }
+.pp-inv-totals .pp-inv-grand { border-top: 2px solid #1a1a1a; font-weight: 700; font-size: 0.95rem; }
+.pp-inv-badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: #eaf7ef;
+    color: #0f5132;
+    border: 1px solid #b7e0c5;
+}
+
+/* Print: show ONLY the print sheet (same pattern as sanmar-inbound-today) */
+#pp-print-sheet { display: none; }
+@media print {
+    body.pp-printing > * { display: none !important; }
+    body.pp-printing #pp-print-sheet { display: block !important; }
+    body.pp-printing #pp-print-sheet .pp-inv { border: none; margin: 0 0 24px; page-break-after: always; }
+    body.pp-printing #pp-print-sheet .pp-inv:last-child { page-break-after: auto; }
+}
