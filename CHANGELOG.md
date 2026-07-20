@@ -1,3 +1,7 @@
+## v2026.07.20.2 (2026.07.20)
+
+- Deploy v2026.07.20.2: restore /api/staff/finished-photos/library forwarder (lost in 7/19 server.js hotfix revert)
+
 ## v2026.07.20.1 (2026.07.20)
 
 - docs(memory): shared SanMar invoice viewer notes (by-po fix, stale mirror warning)
