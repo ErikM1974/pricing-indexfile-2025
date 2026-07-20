@@ -3376,25 +3376,30 @@ app.all('/api/crm-proxy/marketing-shipments*', requireStaff, (req, res, next) =>
 // session, never the browser: we derive `email` server-side and only honor a
 // ?viewAs= override for admins (Erik's view-as-rep switcher). Role-gated to
 // the AEs + admin because the payload includes the rep's commission dollars.
-app.get('/api/crm-proxy/ae-dashboard/summary', requireCrmRole(['taneisha', 'nika', 'admin']), async (req, res) => {
-  try {
-    const caller = req.session.crmUser;
-    const perms = caller.permissions || [];
-    let email = String(caller.email || '').toLowerCase();
-    const viewAs = String(req.query.viewAs || '').toLowerCase().trim();
-    if (viewAs && perms.includes('admin')) email = viewAs; // admin-only override
-    const params = new URLSearchParams({ email });
-    if (req.query.refresh) params.set('refresh', String(req.query.refresh));
-    const response = await fetch(`${CRM_API_BASE}/api/ae-dashboard/summary?${params}`, {
-      headers: { 'X-CRM-API-Secret': CRM_API_SECRET }
-    });
-    const data = await response.json().catch(() => ({ error: 'Bad upstream response' }));
-    res.status(response.status).json(data);
-  } catch (error) {
-    console.error('[CRM Proxy] ae-dashboard summary error:', error.message);
-    res.status(500).json({ error: 'Proxy error', message: error.message });
-  }
-});
+function aeDashboardForwarder(upstreamPath) {
+  return async (req, res) => {
+    try {
+      const caller = req.session.crmUser;
+      const perms = caller.permissions || [];
+      let email = String(caller.email || '').toLowerCase();
+      const viewAs = String(req.query.viewAs || '').toLowerCase().trim();
+      if (viewAs && perms.includes('admin')) email = viewAs; // admin-only override
+      const params = new URLSearchParams({ email });
+      if (req.query.refresh) params.set('refresh', String(req.query.refresh));
+      const response = await fetch(`${CRM_API_BASE}${upstreamPath}?${params}`, {
+        headers: { 'X-CRM-API-Secret': CRM_API_SECRET }
+      });
+      const data = await response.json().catch(() => ({ error: 'Bad upstream response' }));
+      res.status(response.status).json(data);
+    } catch (error) {
+      console.error(`[CRM Proxy] ae-dashboard ${upstreamPath} error:`, error.message);
+      res.status(500).json({ error: 'Proxy error', message: error.message });
+    }
+  };
+}
+app.get('/api/crm-proxy/ae-dashboard/summary', requireCrmRole(['taneisha', 'nika', 'admin']), aeDashboardForwarder('/api/ae-dashboard/summary'));
+// Growth radar ("Money on the Table") — same identity rules as the summary.
+app.get('/api/crm-proxy/ae-dashboard/growth', requireCrmRole(['taneisha', 'nika', 'admin']), aeDashboardForwarder('/api/ae-dashboard/growth'));
 
 // Leads CRM conversion tracking + rep scorecard (dashboards/lead-scorecard.html):
 // GET /lead-scorecard (per-rep closes + order value) — any logged-in staff;

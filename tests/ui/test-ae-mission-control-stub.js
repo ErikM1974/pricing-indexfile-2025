@@ -153,6 +153,17 @@
             var email = m ? decodeURIComponent(m[1]) : REP.email;
             return json(summaryFor(email === NIKA.email ? NIKA : REP));
         }
+        if (u.indexOf('/api/crm-proxy/ae-dashboard/growth') !== -1) {
+            return json({
+                rep: REP, generatedAt: new Date().toISOString(), windowMonths: 24,
+                accountsScanned: 214, flaggedCount: 9, potentialTotal: 18420.5, truncated: 0, cacheHit: false,
+                items: [
+                    { idCustomer: '7881', company: 'Cintas', orderCount24mo: 14, medianGapDays: 42, daysSinceLastOrder: 93, lastOrderDate: daysAgoDay(93), avgOrderValue: 1450.25, lyUpcoming45d: 0, estValue: 1450.25, reasons: [{ type: 'rhythm', text: 'usually orders every ~42 days — quiet for 93' }] },
+                    { idCustomer: '5120', company: 'Korsmo Construction', orderCount24mo: 9, medianGapDays: 61, daysSinceLastOrder: 44, lastOrderDate: daysAgoDay(44), avgOrderValue: 890, lyUpcoming45d: 4200, estValue: 4200, reasons: [{ type: 'season', text: 'spent $4,200 in the next 45 days LAST year' }] },
+                    { idCustomer: '3310', company: 'Harbor Electric', orderCount24mo: 11, medianGapDays: 38, daysSinceLastOrder: 71, lastOrderDate: daysAgoDay(71), avgOrderValue: 2140, lyUpcoming45d: 980, estValue: 2140, reasons: [{ type: 'rhythm', text: 'usually orders every ~38 days — quiet for 71' }, { type: 'season', text: 'spent $980 in the next 45 days LAST year' }] },
+                ],
+            });
+        }
         if (u.indexOf('/api/crm-proxy/marketing-shipments/items') !== -1) {
             return json({ items: kitItems });
         }

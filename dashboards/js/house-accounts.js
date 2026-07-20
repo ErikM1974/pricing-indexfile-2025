@@ -168,6 +168,22 @@ class HouseAccountsService {
             throw new Error(`Failed to remove account from House table: ${deleteResponse.status}`);
         }
 
+        // 3. ALSO update Sales_Reps_2026 (ownership source of truth). Without
+        // this, the next sync-ownership run reads the OLD owner from
+        // Sales_Reps_2026 and silently reverts the assignment — the Caspio
+        // rep-table row alone doesn't survive (caught 2026-07-19). Same
+        // contract the reconcile-modal "Assign to…" dropdown uses. Note the
+        // durable home is still ShopWorks Cust.CustomerServiceRep — the ODBC
+        // agent re-mirrors it if that customer's ShopWorks row changes.
+        const fullName = repName === 'Taneisha' ? 'Taneisha Clark' : 'Nika Lao';
+        const swOk = await this.updateShopWorksRep(
+            account.ID_Customer, fullName, `Win Back '26 ${repName.toUpperCase()}`
+        );
+        if (!swOk) {
+            // Visible, not silent: the CRM move happened but ownership didn't stick.
+            throw new Error(`Account moved to ${repName}'s CRM, but the Sales_Reps_2026 ownership update FAILED — the next sync will revert it. Also set ${fullName} as CustomerServiceRep in ShopWorks.`);
+        }
+
         return { success: true, repName };
     }
 
