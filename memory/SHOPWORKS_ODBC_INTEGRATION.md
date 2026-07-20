@@ -235,11 +235,19 @@ match. Two paths (the DSN schema decides which):
   ⚠ COARSE for split-invoice POs (one PO can have >1 SanMar invoice — e.g. PO 113437 had 2) — it's a
   per-PO, not per-invoice, signal. ⏳ ACTIVATE: deploy proxy + recopy `sync-purchase-orders.ps1` to bandit
   `C:\NWCA\odbc-sync\` (fields flow next 15-min run).
-- **Path B — invoice-level (the real reconciliation; needs the AP table exposed):** ShopWorks' invoice-level
-  Payables data (`ID_Payable, date_Paid, InvoiceNumber, cur_Payable, cnCur_PayableOutstanding, sts_ToPay`) is
-  **NOT in the current DSN** (mapped tables = Addr/Contacts/Cust/Des/Event/InvLevel/LinesOE/Machines/OrdTyp/
-  Orders/PO/Prod/…; no bill/payable table). Run **`bandit-agent/probe-payables.ps1`** on bandit to confirm
-  whether an AP table is `SELECT`-able (maybe the catalog is stale) or must be exposed in ShopWorks OnSite
-  "Manage ODBC" (or requested from support@shopworx.com). Once a table+columns are confirmed → build
-  `sync-payables.ps1` (clone `sync-purchase-orders.ps1`) + `POST /api/shopworks-odbc/sync-payables` upsert +
-  Caspio `ShopWorks_Payables` table → exact per-invoice `date_Paid` for the reconciliation view.
+- **Path B — invoice-level (the real one) — BUILT + DEPLOYED 2026-07-20, ⏳ pending the bandit probe:** the whole
+  pipeline is live except the bandit-side data pull. ✅ Caspio **`ShopWorks_Payables`** table created (14 cols:
+  ID_Payable key, InvoiceNumber, id_PO/id_Order/id_Vendor, date_Payable/PayableDue/Creation/**Paid**, cur_Payable,
+  cnCur_PayableOutstanding, sts_ToPay, date_Modification; `scripts/create-shopworks-payables-table.js`). ✅ proxy
+  (deployed 39956f3): `POST /api/shopworks-odbc/sync-payables` (upsert by ID_Payable, secret-gated), `GET
+  /api/shopworks-odbc/payables?sinceDays=` (read feed, secret-gated — verified returns the empty table),
+  `payables-health` watchdog. ✅ app forwarder `GET /api/staff/sanmar-invoices`… + `GET /api/staff/shopworks-payables`;
+  the SanMar Payables page **auto-loads the feed on open** (`loadShopworksFeed()`) → skips the manual upload when
+  the table has rows, falls back to upload when empty. ✅ agent `bandit-agent/sync-payables.ps1` written.
+  ⏳ **THE ONE REMAINING STEP (needs bandit):** the ShopWorks AP table is **NOT in the current DSN** (mapped tables
+  = Addr/Contacts/Cust/Des/Event/InvLevel/LinesOE/Machines/OrdTyp/Orders/PO/Prod/…). Run
+  **`bandit-agent/probe-payables.ps1`** → it prints whether an AP table (Payables/Pay/Bills/LinesPur/…) is
+  `SELECT`-able or must be exposed in ShopWorks OnSite "Manage ODBC" (or via support@shopworx.com). Then set
+  `PayablesTable`/`PayablesDeltaField` in bandit `config.json`, `sync-payables.ps1 -DryRun`, and schedule the
+  15-min task + a Heroku Scheduler `payables-health/alert`. Data then flows → the page is fully automatic (import
+  into ShopWorks → clears within ~15 min, no upload).

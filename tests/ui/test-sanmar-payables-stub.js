@@ -67,6 +67,10 @@
         if (u.indexOf('/api/staff/sanmar-invoices/unpaid') !== -1) {
             return Promise.resolve(new Response(JSON.stringify({ invoices: unpaid }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
         }
+        if (u.indexOf('/api/staff/shopworks-payables') !== -1) {
+            // Empty auto-feed in the harness → the __SMP_TEST_SW__ seam drives the cross-ref.
+            return Promise.resolve(new Response(JSON.stringify({ success: true, count: 0, rows: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+        }
         if (u.indexOf('/api/staff/sanmar-invoices/by-date') !== -1) {
             var p = new URLSearchParams((u.split('?')[1] || ''));
             return Promise.resolve(new Response(JSON.stringify({ dateRange: {}, invoices: byDate(p.get('start'), p.get('end')) }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
