@@ -3265,6 +3265,13 @@ app.all('/api/crm-proxy/house-accounts*', ...createCrmProxy('house-accounts', ['
 // Sales Reps 2026 proxy - requires 'house' role (admin can view/edit all reps)
 app.all('/api/crm-proxy/sales-reps-2026*', ...createCrmProxy('sales-reps-2026', ['house']));
 
+// Assignment history + ShopWorks To-Do — audit trail of rep assignments and the
+// "still needs keying into ShopWorks" checklist (no write-back exists; Erik keys
+// CustomerServiceRep by hand and the ODBC mirror confirms it). NOTE: the house
+// page has POSTed here since the reconcile audit-trail shipped, but this
+// forwarder never existed — every log call 404'd silently (caught 2026-07-19).
+app.all('/api/crm-proxy/assignment-history*', ...createCrmProxy('assignment-history', ['house']));
+
 // Policies Hub admin proxy - requires 'policies-admin' role (currently Erik only).
 // Public reads do NOT go through here — frontend hits /api/policies-public on the
 // caspio-pricing-proxy directly (unprotected, Published+Active only).

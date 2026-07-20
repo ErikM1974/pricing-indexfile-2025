@@ -514,6 +514,12 @@ class HouseAccountsController {
 
             // Gap Report Modal
             gapReportBtn: document.getElementById('gap-report-btn'),
+            swTodoBtn: document.getElementById('sw-todo-btn'),
+            swTodoCount: document.getElementById('sw-todo-count'),
+            swTodoOverlay: document.getElementById('sw-todo-modal-overlay'),
+            swTodoBody: document.getElementById('sw-todo-body'),
+            swTodoClose: document.getElementById('sw-todo-close'),
+            swTodoCopy: document.getElementById('sw-todo-copy'),
             gapReportModalOverlay: document.getElementById('gap-report-modal-overlay'),
             gapReportModalClose: document.getElementById('gap-report-modal-close'),
             gapReportRefreshBtn: document.getElementById('gap-report-refresh-btn'),
@@ -591,6 +597,19 @@ class HouseAccountsController {
         // Gap Report button and modal
         if (this.elements.gapReportBtn) {
             this.elements.gapReportBtn.addEventListener('click', () => this.openGapReportModal());
+        }
+
+        // ShopWorks To-Do button and modal
+        if (this.elements.swTodoBtn) {
+            this.elements.swTodoBtn.addEventListener('click', () => this.openShopWorksTodoModal());
+            if (this.elements.swTodoClose) this.elements.swTodoClose.addEventListener('click', () => { this.elements.swTodoOverlay.classList.remove('active'); });
+            if (this.elements.swTodoCopy) this.elements.swTodoCopy.addEventListener('click', () => this.copyShopWorksTodo());
+            if (this.elements.swTodoOverlay) {
+                this.elements.swTodoOverlay.addEventListener('click', (e) => {
+                    if (e.target === this.elements.swTodoOverlay) this.elements.swTodoOverlay.classList.remove('active');
+                });
+            }
+            this.refreshShopWorksTodoCount();
         }
         if (this.elements.gapReportModalClose) {
             this.elements.gapReportModalClose.addEventListener('click', () => this.closeGapReportModal());
@@ -953,9 +972,19 @@ class HouseAccountsController {
         try {
             await this.service.assignToRep(account, repName);
 
+            // Audit trail + ShopWorks To-Do entry (there's no write-back — Erik
+            // must key this into ShopWorks; the to-do tracks it until the ODBC
+            // mirror confirms). CRM_MANUAL = card-assign, vs RECONCILE modal.
+            await this.logAssignmentHistory({
+                ID_Customer: account.ID_Customer,
+                companyName: account.CompanyName,
+                shopWorksRep: account.Assigned_To || 'House',
+            }, repName === 'Taneisha' ? 'Taneisha Clark' : 'Nika Lao', 'CRM_MANUAL');
+
             // Success
             this.closeConfirmModal();
-            this.showToast(`${account.CompanyName} assigned to ${repName}!`);
+            this.showToast(`${account.CompanyName} assigned to ${repName}! Added to the ShopWorks To-Do — key it into ShopWorks when you can.`);
+            this.refreshShopWorksTodoCount();
 
             // Reload data
             await this.loadData();
@@ -1514,6 +1543,120 @@ class HouseAccountsController {
     }
 
     // ============================================================
+    // SHOPWORKS TO-DO (no write-back — manual keying checklist)
+    // ============================================================
+
+    escHtml(v) {
+        return String(v == null ? '' : v)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    async fetchShopWorksTodo() {
+        const resp = await fetch('/api/crm-proxy/assignment-history/shopworks-todo', { credentials: 'same-origin' });
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        return resp.json();
+    }
+
+    /** Badge on the button — quiet best-effort (modal open is the loud path). */
+    async refreshShopWorksTodoCount() {
+        try {
+            const todo = await this.fetchShopWorksTodo();
+            const n = (todo.pending || []).length + (todo.reverted || []).length;
+            this._swTodoCache = todo;
+            if (this.elements.swTodoCount) {
+                this.elements.swTodoCount.hidden = n === 0;
+                this.elements.swTodoCount.textContent = n;
+            }
+        } catch (e) {
+            console.warn('ShopWorks to-do count failed:', e.message);
+        }
+    }
+
+    async openShopWorksTodoModal() {
+        if (this.elements.swTodoOverlay) this.elements.swTodoOverlay.classList.add('active');
+        this.elements.swTodoBody.innerHTML = '<div class="loading-spinner"></div>';
+        try {
+            const todo = await this.fetchShopWorksTodo();
+            this._swTodoCache = todo;
+            this.renderShopWorksTodo(todo);
+            this.refreshShopWorksTodoCount();
+        } catch (e) {
+            this.elements.swTodoBody.innerHTML =
+                `<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><h3>Could not load the to-do list</h3><p>${this.escHtml(e.message)} — close and retry.</p></div>`;
+        }
+    }
+
+    renderShopWorksTodo(todo) {
+        const pending = todo.pending || [];
+        const reverted = todo.reverted || [];
+        if (!pending.length && !reverted.length) {
+            this.elements.swTodoBody.innerHTML =
+                '<div class="empty-state"><i class="fas fa-circle-check"></i><h3>All caught up</h3><p>Every dashboard assignment has been confirmed in ShopWorks.</p></div>';
+            return;
+        }
+        const esc = (v) => this.escHtml(v);
+        const fmtDay = (d) => { const x = new Date(d); return isNaN(x) ? '' : x.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); };
+        let html = '';
+        if (reverted.length) {
+            html += '<h3 class="sw-todo-section sw-todo-section--warn"><i class="fas fa-triangle-exclamation"></i> ShopWorks disagreed — re-key or accept</h3>' +
+                '<table class="sw-todo-table"><thead><tr><th>Cust #</th><th>Company</th><th>What happened</th><th></th></tr></thead><tbody>' +
+                reverted.map((r) => `<tr><td>${esc(r.customerId)}</td><td>${esc(r.customerName)}</td><td>${esc(r.notes)}</td>` +
+                    `<td><button class="sync-btn sw-todo-dismiss" data-cid="${esc(r.customerId)}" data-cname="${esc(r.customerName)}" data-rep="${esc(r.newRep)}">Accept</button></td></tr>`).join('') +
+                '</tbody></table>';
+        }
+        if (pending.length) {
+            html += '<h3 class="sw-todo-section"><i class="fas fa-keyboard"></i> Key these into ShopWorks (Cust → Customer Service Rep)</h3>' +
+                '<table class="sw-todo-table"><thead><tr><th>Cust #</th><th>Company</th><th>Set rep to</th><th>Assigned</th><th></th></tr></thead><tbody>' +
+                pending.map((p) => `<tr><td>${esc(p.customerId)}</td><td>${esc(p.customerName)}</td><td><strong>${esc(p.newRep)}</strong></td><td>${fmtDay(p.actionDate)}</td>` +
+                    `<td><button class="sync-btn sw-todo-dismiss" data-cid="${esc(p.customerId)}" data-cname="${esc(p.customerName)}" data-rep="${esc(p.newRep)}">Mark done</button></td></tr>`).join('') +
+                '</tbody></table>' +
+                '<p class="modal-subtitle">Rows also clear automatically ~15 min after you key them in (the ODBC mirror confirms the match).</p>';
+        }
+        this.elements.swTodoBody.innerHTML = html;
+        this.elements.swTodoBody.querySelectorAll('.sw-todo-dismiss').forEach((btn) => {
+            btn.addEventListener('click', () => this.dismissShopWorksTodoItem(btn));
+        });
+    }
+
+    /** "Mark done"/"Accept" — logs a SYNC row so the item clears immediately. */
+    async dismissShopWorksTodoItem(btn) {
+        btn.disabled = true;
+        try {
+            const resp = await fetch('/api/crm-proxy/assignment-history', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'same-origin',
+                body: JSON.stringify({
+                    customerId: btn.dataset.cid,
+                    customerName: btn.dataset.cname,
+                    previousRep: btn.dataset.rep,
+                    newRep: btn.dataset.rep,
+                    actionType: 'REASSIGNED',
+                    changedBy: 'Erik',
+                    changeSource: 'SYNC',
+                    notes: 'Manually marked done on the house page',
+                }),
+            });
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            btn.closest('tr').remove();
+            this.refreshShopWorksTodoCount();
+        } catch (e) {
+            btn.disabled = false;
+            this.showError(`Could not mark done: ${e.message}`);
+        }
+    }
+
+    copyShopWorksTodo() {
+        const pending = (this._swTodoCache && this._swTodoCache.pending) || [];
+        if (!pending.length) { this.showToast('Nothing pending to copy.'); return; }
+        const lines = pending.map((p) => `Cust #${p.customerId}  ${p.customerName}  →  ${p.newRep}`);
+        navigator.clipboard.writeText('ShopWorks rep updates needed:\n' + lines.join('\n'))
+            .then(() => this.showToast(`Copied ${pending.length} item${pending.length === 1 ? '' : 's'}.`))
+            .catch(() => this.showError('Copy failed — select the table text manually.'));
+    }
+
+    // ============================================================
     // GAP REPORT MODAL METHODS
     // ============================================================
 
@@ -1981,7 +2124,7 @@ class HouseAccountsController {
      * @param {Object} customer - The customer data
      * @param {string} newRep - The rep being assigned to
      */
-    async logAssignmentHistory(customer, newRep) {
+    async logAssignmentHistory(customer, newRep, changeSource = 'RECONCILE') {
         try {
             const previousRep = customer.shopWorksRep || 'Unassigned';
             const orderNumbers = (customer.orders || [])
@@ -1989,7 +2132,7 @@ class HouseAccountsController {
                 .filter(n => n && n !== 'N/A')
                 .join(', ');
 
-            await fetch('/api/crm-proxy/assignment-history', {
+            const resp = await fetch('/api/crm-proxy/assignment-history', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'same-origin',
@@ -2000,13 +2143,16 @@ class HouseAccountsController {
                     newRep: newRep,
                     actionType: previousRep === 'Unassigned' ? 'ASSIGNED' : 'REASSIGNED',
                     changedBy: 'Erik',
-                    changeSource: 'RECONCILE',
+                    changeSource: changeSource,
                     relatedOrders: orderNumbers
                 })
             });
+            // This row IS the ShopWorks To-Do entry — a failed log means the
+            // assignment silently disappears from the checklist. Say so.
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
         } catch (error) {
-            // Log error but don't block the assignment
             console.warn('Failed to log assignment history:', error);
+            this.showError(`Assignment saved, but it could NOT be added to the ShopWorks To-Do list (${error.message}). Write it down: ${customer.companyName || customer.ID_Customer} → ${newRep}.`);
         }
     }
 
