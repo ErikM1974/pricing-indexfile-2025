@@ -1,3 +1,8 @@
+## v2026.07.19.12 (2026.07.19)
+
+- docs(memory): growth radar + CRM sync review findings/fixes
+- Deploy v2026.07.19.12: ShopWorks To-Do checklist on house page + assignment-history forwarder (was silently 404ing)
+
 ## v2026.07.19.11 (2026.07.19)
 
 - Deploy v2026.07.19.11: growth radar card + rep-CRM quarter-true win-back + house assign persistence
