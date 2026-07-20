@@ -19,5 +19,11 @@ Per-AE cockpit for Taneisha Clark & Nika Lao (admin view-as). One page, identity
 - Shapes: Form_Submissions/ORDER_ODBC/NW_Daily_Sales = full name; Quote_Sessions = `SalesRepEmail/Name` (builders default `sales@` when rep unpicked → panel = *attributed* quotes only); ArtRequests = full OR first name (filter ORs both); `SALES_REP_MAP` "Taneisha Jones" was a push BUG → fixed to Clark 7/19.
 - New proxy filters shipped with this: form-submissions `?salesRep=`, quote_sessions `?salesRepEmail=`/`?salesRepName=`.
 
+## Bonus & Commission card (added 2026-07-19, same day)
+- MC card + KPI read **`Commission_Payouts`** (payroll system of record; daily 3PM-UTC `sync-commissions.js` refreshes current quarter; Approved/Paid rows locked). ONE Caspio read replaces the in-process InkSoft recompute. Aggregate response: `bonus{previousQuarter rows/total/allPaid, current, paidYtd}`; KPI = full current-quarter bonus (Online Store + Garment Spiff + Win-Back).
+- Card links to the Flask Bonus Dashboard (`inksoft-transform…/commissions/{nika|taneisha}`); annual retention/growth/new-business tiers stay December-only.
+- **Win-Back Bounty fix (commission-payouts.js)**: was YTD-cumulative every quarter (Q2 would re-pay Q1 — caught pre-payroll 7/19). Now current quarter = live YTD − prior quarters' `Revenue_Base`; a CLOSED quarter reports its frozen row (`source:'stored-row'`) because account tables only hold live YTD. `/api/commissions/win-back` endpoint stays cumulative by design.
+- Bonus plan sources: `config/online-store-commission-config.js` (1%/5%/3%, baselines N $45,814 / T $51,582 per qtr, setup bonuses $250/$100 at $2,500) + `config/garment-tracker-config.js` (per-quarter spiffs) + tiers hardcoded in commission-payouts.js + rep PDFs in Python Inksoft static/. ⚠ setup bonuses only computed in `/online-store-commissions/detail` — NOT in the payout path (flagged to Erik 7/19 with Q2 corrections).
+
 ## Phase 3 backlog (not built)
 Next-best-action ranking · since-last-visit highlights (localStorage diff) · morning Slack/email deep link (evolve the 7:45 digest) · absorb taneisha-/nika-crm as "My Accounts" tab · move rep access from email-keyed perms to `sales` role + Sales_Reps_2026 registry.
