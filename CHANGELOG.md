@@ -1,3 +1,10 @@
+## v2026.07.19.10 (2026.07.19)
+
+- docs(memory): Bonus & Commission card + win-back quarter-fix notes in AE Mission Control topic file
+- docs(memory): final corrected Q2 payout figures (both setup bonuses recorded)
+- docs(memory): Q2 rows finalized (Pay 15, 7/24) + Bonus Dashboard edit-button/paycheckDate fixes
+- Deploy v2026.07.19.10: bonus-row caption only when base×rate=amount (Online Store composite rows confused reps)
+
 ## v2026.07.19.9 (2026.07.19)
 
 - Deploy v2026.07.19.9: 5 files (ae-mission-control.html,ae-mission-control.css,ae-mission-control.js...)
