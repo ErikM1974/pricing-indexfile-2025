@@ -1,76 +1,53 @@
 /* =====================================================
-   STAFF DASHBOARD v3 — COMMAND PALETTE (Ctrl+K, 2026-07-20)
-   Namespaced .cp-*. Loaded unlayered after the theme file;
-   all values from tokens.css.
+   STAFF DASHBOARD v3 — HERO SEARCH + COMMAND PALETTE
+   (Ctrl+K "Everything Bar", 2026-07-20; re-anchored 2026-07-20)
+
+   The search input is a PERSISTENT hero bar near the top of the
+   dashboard (where the sales-goal banner used to be). Its results
+   panel is absolutely positioned and drops DOWNWARD from the bar,
+   so it can never cover the header or the goal chip above it.
+
+   Namespaced .hero-search__* (the bar) and .cp-* (the panel).
+   Loaded unlayered after the theme file; all values from tokens.css.
    ===================================================== */
 
-/* header trigger */
-.cp-trigger {
-    display: inline-flex;
+/* ── HERO SEARCH BAR ────────────────────────────────── */
+
+.hero-search-wrap {
+    position: relative;   /* anchor for the absolutely-positioned .cp-panel */
+    margin-top: 14px;
+    z-index: 30;
+}
+
+.hero-search {
+    display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
+    height: 52px;
+    padding: 0 16px;
     background: var(--surface-card);
     border: 1px solid var(--border-base);
-    border-radius: var(--radius-md);
-    color: var(--text-muted);
-    font-size: var(--font-size-sm);
-    padding: 7px 12px;
-    cursor: pointer;
-    transition: color 0.15s ease, border-color 0.15s ease;
-}
-
-.cp-trigger:hover { color: var(--text); border-color: var(--accent); }
-
-.cp-trigger kbd {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    color: var(--text-faint);
-    border: 1px solid var(--border-base);
-    border-radius: var(--radius-sm);
-    padding: 1px 5px;
-}
-
-/* backdrop + dialog */
-.cp-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(6, 10, 8, 0.62);
-    backdrop-filter: blur(2px);
-    z-index: 1200;
-}
-
-.cp-dialog {
-    position: fixed;
-    top: 14vh;
-    left: 50%;
-    transform: translateX(-50%);
-    width: min(620px, calc(100vw - 32px));
-    background: var(--surface-elev, var(--surface-card));
-    border: 1px solid var(--border-base);
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-3);
-    z-index: 1201;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.cp-inputrow {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 14px 16px;
-    border-bottom: 1px solid var(--border-base);
+.hero-search:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-bg, rgba(74, 222, 128, 0.12));
 }
 
-.cp-inputrow .cp-caret {
-    color: var(--accent);
-    font-family: var(--font-mono);
-    font-size: 16px;
+.hero-search__icon {
+    font-size: 17px;
+    color: var(--text-muted);
+    flex-shrink: 0;
 }
 
-#cpInput {
+.hero-search:focus-within .hero-search__icon { color: var(--accent); }
+
+.hero-search__input {
     flex: 1;
+    min-width: 0;
+    height: 100%;
     background: transparent;
     border: 0;
     outline: 0;
@@ -79,22 +56,44 @@
     font-family: var(--font-sans);
 }
 
-#cpInput::placeholder { color: var(--text-faint); }
+.hero-search__input::placeholder { color: var(--text-faint); }
 
-.cp-esc {
+.hero-search__kbd {
+    flex-shrink: 0;
     font-family: var(--font-mono);
     font-size: 10px;
     color: var(--text-faint);
     border: 1px solid var(--border-base);
     border-radius: var(--radius-sm);
     padding: 2px 6px;
-    background: transparent;
-    cursor: pointer;
 }
 
-/* results */
+/* ── RESULTS PANEL (drops down, anchored to the bar) ──── */
+
+.cp-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(6, 10, 8, 0.45);
+    z-index: 1200;
+}
+
+.cp-panel {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    z-index: 1201;
+    background: var(--surface-elev, var(--surface-card));
+    border: 1px solid var(--border-base);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-3);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
 .cp-results {
-    max-height: 46vh;
+    max-height: 52vh;
     overflow-y: auto;
     padding-bottom: 6px;
 }
@@ -120,8 +119,8 @@
 
 .cp-icon {
     width: 22px;
-    text-align: center;
     flex-shrink: 0;
+    text-align: center;
     color: var(--accent);
     font-size: 14px;
 }
@@ -150,42 +149,53 @@
 }
 
 .cp-hint {
+    flex-shrink: 0;
     font-family: var(--font-mono);
     font-size: 10px;
     color: var(--text-faint);
     white-space: nowrap;
-    flex-shrink: 0;
 }
 
 .cp-item--sel .cp-hint { color: var(--accent); }
 
-/* status + toast footer */
 .cp-status {
+    min-height: 34px;
+    padding: 10px 16px;
     font-size: var(--font-size-xs);
     color: var(--text-faint);
-    padding: 10px 16px;
     border-top: 1px solid var(--border-base);
-    min-height: 34px;
 }
 
+/* ── COPY TOAST (fixed, bottom-center — never fights the panel) ── */
+
 .cp-toast {
-    position: absolute;
-    right: 14px;
-    bottom: 10px;
-    background: var(--accent-bg, rgba(74, 222, 128, 0.12));
+    position: fixed;
+    left: 50%;
+    bottom: 28px;
+    transform: translateX(-50%) translateY(8px);
+    z-index: 1300;
+    background: var(--accent-bg, rgba(74, 222, 128, 0.14));
     color: var(--accent);
     font-size: var(--font-size-xs);
     border: 1px solid var(--accent);
     border-radius: var(--radius-pill);
-    padding: 4px 12px;
+    padding: 6px 16px;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.2s ease;
+    transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
-.cp-toast--show { opacity: 1; }
+.cp-toast--show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
 
 @media (max-width: 640px) {
-    .cp-trigger span.cp-trigger-label, .cp-trigger kbd { display: none; }
-    .cp-dialog { top: 8vh; }
+    .hero-search__kbd { display: none; }
+    .cp-results { max-height: 60vh; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-search,
+    .cp-toast { transition: none; }
 }

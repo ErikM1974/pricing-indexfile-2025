@@ -29,3 +29,29 @@ body {
     gap: 10px;
     flex-wrap: wrap;
 }
+
+.t-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.t-brand { font-size: 16px; font-weight: 600; }
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.t-fakebtn {
+    height: 34px;
+    padding: 0 14px;
+    background: var(--surface-card, #131a15);
+    border: 1px solid var(--border-base, #243028);
+    border-radius: var(--radius-pill, 999px);
+    color: var(--text-muted, #90a297);
+    font-size: 13px;
+    cursor: pointer;
+}
