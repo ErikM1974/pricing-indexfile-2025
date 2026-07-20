@@ -21,9 +21,9 @@
 
     // ── canned data ──
     var sessions = [
-        { QuoteID: 'CAP0720-9', Status: 'Payment Confirmed', CompanyName: 'Pacific Fire Dept', TotalAmount: '3890.00', TaxAmount: '396.78', CreatedAt: new Date().toISOString() },
-        { QuoteID: 'EMB0718-2', Status: 'Accepted', CompanyName: 'Gig Harbor Yacht Club', TotalAmount: '1720.00', TaxAmount: '140.00', CreatedAt: new Date().toISOString() },
-        { QuoteID: 'DTG0715-5', Status: 'Open', CompanyName: 'Ignored Co', TotalAmount: '100', TaxAmount: '0', CreatedAt: new Date().toISOString() },
+        { QuoteID: 'CAP0720-9', Status: 'Payment Confirmed', CompanyName: 'Pacific Fire Dept', SubtotalAmount: '3890.00', TotalAmount: '4286.78', TaxAmount: '396.78', SalesRepName: 'Nika Lao', CreatedAt: new Date().toISOString() },
+        { QuoteID: 'EMB0718-2', Status: 'Accepted', CompanyName: 'Gig Harbor Yacht Club', SubtotalAmount: '1720.00', TotalAmount: '1860.00', TaxAmount: '140.00', SalesRepName: 'Taneisha Clark', CreatedAt: new Date().toISOString() },
+        { QuoteID: 'DTG0715-5', Status: 'Open', CompanyName: 'Ignored Co', SubtotalAmount: '100', TotalAmount: '100', TaxAmount: '0', CreatedAt: new Date().toISOString() },
     ];
 
     function svgPhoto(label, bg) {
@@ -51,6 +51,16 @@
         }
         if (u.indexOf('/api/staff/finished-photos/library') === 0) {
             return Promise.resolve(new Response(JSON.stringify({ success: true, photos: photos, reps: [] }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+        }
+        if (u.indexOf('/api/staff/command-search') === 0) {
+            var body = {
+                success: true, q: 'mock', errors: {},
+                customers: [{ idCustomer: 10428, company: 'Tacoma Longshoremen Credit Union', rep: 'Nika Lao', lastOrder: '2026-07-16', city: 'Tacoma', state: 'WA' }],
+                orders: [{ idOrder: 142470, company: 'Tacoma Longshoremen Credit Union', rep: 'Nika Lao', idCustomer: 10428, placed: '2026-07-16', subtotal: 1240.5, orderType: '77 Account', shipped: false, invoiced: false }],
+                quotes: [{ quoteID: 'EMB-2026-314', company: 'Cold Boy Stables', status: 'Open', subtotal: 420, rep: 'Erik Mickelson', created: '2026-07-15' }],
+                designs: [{ designNumber: '40477', name: 'D SQUARE left chest', company: 'Schneider Electric', stitchCount: 9400, image: '', lastOrder: '2026-07-01' }],
+            };
+            return Promise.resolve(new Response(JSON.stringify(body), { status: 200, headers: { 'Content-Type': 'application/json' } }));
         }
         return realFetch(url, opts);
     };

@@ -86,6 +86,29 @@ a.wb-event:hover .wb-event-text {
     font-variant-numeric: tabular-nums;
 }
 
+/* order-type prefix chip (CAP / DTG / EMB…) */
+.wb-pfx {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+    border: 1px solid var(--border-base);
+    border-radius: var(--radius-sm);
+    padding: 1px 5px;
+    align-self: center;
+}
+
+/* sales rep first name */
+.wb-rep {
+    font-size: var(--font-size-xs);
+    color: var(--text-soft);
+}
+
+.wb-rep::before {
+    content: "· ";
+    color: var(--text-faint);
+}
+
 .wb-when {
     font-size: var(--font-size-xs);
     color: var(--text-faint);

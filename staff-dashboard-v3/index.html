@@ -37,7 +37,9 @@
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=2026.06.24.8">
     <!-- Phase 1 "alive + personal" widgets (2026-07-20): Win Bell ticker,
          Pride Wall photo strip, My Stuff pinned/recent tools row. -->
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/phase1-widgets.css?v=2026.07.20.3">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/phase1-widgets.css?v=2026.07.20.4">
+    <!-- Phase 2 (2026-07-20): Ctrl+K command palette — the Everything Bar. -->
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/command-palette.css?v=2026.07.20.4">
 
     <!-- Caspio CSS isolation (must load BEFORE the Caspio embed script in body).
          Sets up a MutationObserver that disables any stylesheets Caspio's embed
@@ -252,6 +254,13 @@
                 </div>
                 <div class="header-right">
 
+                    <!-- Ctrl+K Everything Bar trigger (Phase 2, 2026-07-20) -->
+                    <button type="button" class="cp-trigger" data-action="palette:open" aria-haspopup="dialog" aria-controls="command-palette" title="Search anything — customers, orders, quotes, designs, tools">
+                        <i class="fas fa-magnifying-glass" aria-hidden="true"></i>
+                        <span class="cp-trigger-label">Search anything</span>
+                        <kbd>Ctrl K</kbd>
+                    </button>
+
                     <!-- Phase 4.5: Combined Team widget (replaces 3-pill cluster) -->
                     <div class="team-widget">
                         <button type="button" id="teamBtn" class="team-btn" data-action="team:toggle-dropdown" aria-haspopup="true" aria-expanded="false" aria-controls="teamDropdown">
@@ -268,6 +277,9 @@
                             <h4><i class="fas fa-trophy" aria-hidden="true"></i> Upcoming Anniversaries</h4>
                             <ul id="teamAnniversaryList"></ul>
 
+                            <a href="/dashboards/production-shifts.html" class="team-dropdown__view-all">
+                                <i class="fas fa-user-clock" aria-hidden="true"></i> Production Shifts
+                            </a>
                             <button type="button" class="team-dropdown__view-all" data-action="staff-directory:show" data-filter="all">
                                 <i class="fas fa-table" aria-hidden="true"></i> Open Staff Directory
                             </button>
@@ -360,7 +372,8 @@
                         <div class="pinned-row__label">⭐ Frequently Used</div>
                         <div class="pinned-row__list" id="pinnedToolsList">
                             <a href="/dashboards/ae-mission-control.html" class="tool-btn" title="AE Mission Control — Taneisha & Nika's cockpit: action queue, KPIs, quotes, art, kits, commission"><i class="fas fa-rocket" aria-hidden="true"></i> AE Mission Control</a>
-                            <a href="/dashboards/production-shifts.html" class="tool-btn"><i class="fas fa-user-clock" aria-hidden="true"></i> Production Shifts</a>
+                            <!-- Production Shifts moved to the header Team dropdown 2026-07-20
+                                 (Erik: it's a people thing) — still listed in the Production category below. -->
                             <a href="/dashboards/finished-photos.html" class="tool-btn"><i class="fas fa-camera" aria-hidden="true"></i> Finished Photos</a>
                             <a href="/dashboards/finished-photos-library.html" class="tool-btn" title="Browse every finished-product photo by account and sales rep"><i class="fas fa-images" aria-hidden="true"></i> Photo Library</a>
                             <!-- Workflow Strip: Bradley's Queue → Supacolor API Orders -->
@@ -885,6 +898,24 @@
         </div>
     </div>
     <script src="/staff-dashboard-v3/quote-launcher.js?v=2026.07.07.4" defer></script>
+
+    <!-- ============ Ctrl+K Command Palette (Phase 2, 2026-07-20) ============
+         One box that finds anything: tools (harvested from this page's DOM),
+         customers, ShopWorks orders, quotes, designs (backend fan-out search).
+         Behavior: command-palette-controller.js (imported by dashboard-app). -->
+    <div class="cp-backdrop" id="cp-backdrop" hidden></div>
+    <div class="cp-dialog" id="command-palette" role="dialog" aria-modal="true" aria-label="Search anything" hidden>
+        <div class="cp-inputrow">
+            <span class="cp-caret" aria-hidden="true">›</span>
+            <input type="text" id="cpInput" placeholder="Customer, order #, quote, design #, or any tool…"
+                   autocomplete="off" spellcheck="false" aria-label="Search anything" role="combobox"
+                   aria-expanded="true" aria-controls="cpResults">
+            <button type="button" class="cp-esc" data-action="palette:close">esc</button>
+        </div>
+        <div class="cp-results" id="cpResults" role="listbox" aria-label="Search results"></div>
+        <div class="cp-status" id="cpStatus"></div>
+        <div class="cp-toast" id="cpToast" role="status"></div>
+    </div>
 
     <!-- Legacy production-schedule modules (no API calls, just static stats + predictor.
          Ported as plain script tags before the v3 module so production-controller.js

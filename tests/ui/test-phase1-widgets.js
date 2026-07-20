@@ -3,7 +3,9 @@
 import { initWinBell } from '/shared_components/js/staff-dashboard/controllers/win-bell-controller.js';
 import { initPrideWall } from '/shared_components/js/staff-dashboard/controllers/pride-wall-controller.js';
 import { initMyStuff } from '/shared_components/js/staff-dashboard/controllers/my-stuff-controller.js';
+import { initCommandPalette } from '/shared_components/js/staff-dashboard/controllers/command-palette-controller.js';
 
 initMyStuff();
 initWinBell();
 initPrideWall();
+initCommandPalette();

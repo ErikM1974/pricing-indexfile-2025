@@ -24,6 +24,8 @@ import { initGarmentTracker }  from '../controllers/garment-tracker-controller.j
 import { initWinBell }         from '../controllers/win-bell-controller.js';
 import { initPrideWall }       from '../controllers/pride-wall-controller.js';
 import { initMyStuff }         from '../controllers/my-stuff-controller.js';
+// Phase 2 "effortless" layer (2026-07-20): Ctrl+K Everything Bar
+import { initCommandPalette }  from '../controllers/command-palette-controller.js';
 
 // Load custom elements (registers themselves on import)
 import '../widgets/dashboard-modal.js';
@@ -46,6 +48,7 @@ async function bootstrap() {
     initCelebrations();
     initProduction();        // renders from static stats — no network
     initMyStuff();           // localStorage only — no network
+    initCommandPalette();    // Ctrl+K — registry harvested from DOM; backend on demand
 
     // Async controllers — fetches from caspio-pricing-proxy
     initOrdersInbox();       // quote_sessions last 7 days (paid web orders / accepted / push failures)

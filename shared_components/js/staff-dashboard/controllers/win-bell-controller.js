@@ -61,12 +61,16 @@ function eventsFromSessions(sessions) {
     for (const s of sessions) {
         const status = String(s.Status || '');
         const pfx = prefixOf(s.QuoteID);
-        const total = (parseFloat(s.TotalAmount) || 0) + (parseFloat(s.TaxAmount) || 0);
+        // Erik 2026-07-20: show the pre-tax SUBTOTAL (falls back to TotalAmount
+        // for old rows), plus the sales rep and the order-type prefix chip.
+        const subtotal = parseFloat(s.SubtotalAmount) || parseFloat(s.TotalAmount) || 0;
+        const rep = String(s.SalesRepName || '').split(' ')[0]; // first name keeps the line short
         const who = s.CompanyName || s.CustomerName || s.QuoteID;
+        const base = { pfx, rep, amt: subtotal, href: `/quote/${encodeURIComponent(s.QuoteID)}` };
         if ((status === 'Processed' || status === 'Payment Confirmed') && STOREFRONT_PREFIXES.includes(pfx)) {
-            found.push({ id: `${s.QuoteID}|paid`, icon: '📦', text: `Paid web order — ${who}`, amt: total, href: `/quote/${encodeURIComponent(s.QuoteID)}` });
+            found.push({ ...base, id: `${s.QuoteID}|paid`, icon: '📦', text: `Paid web order — ${who}` });
         } else if (status === 'Accepted') {
-            found.push({ id: `${s.QuoteID}|accepted`, icon: '✅', text: `Quote accepted — ${who}`, amt: total, href: `/quote/${encodeURIComponent(s.QuoteID)}` });
+            found.push({ ...base, id: `${s.QuoteID}|accepted`, icon: '✅', text: `Quote accepted — ${who}` });
         }
     }
     return found;
@@ -138,8 +142,10 @@ function render(feed, { celebrate = false } = {}) {
         <${ev.href ? `a href="${escapeHtml(ev.href)}" target="_blank" rel="noopener"` : 'span'}
             class="wb-event${i === 0 && celebrate ? ' wb-event--new' : ''}">
             <span aria-hidden="true">${escapeHtml(ev.icon)}</span>
+            ${ev.pfx ? `<span class="wb-pfx">${escapeHtml(ev.pfx)}</span>` : ''}
             <span class="wb-event-text">${escapeHtml(ev.text)}</span>
             ${ev.amt ? `<span class="wb-amt">${formatMoney(ev.amt)}</span>` : ''}
+            ${ev.rep ? `<span class="wb-rep">${escapeHtml(ev.rep)}</span>` : ''}
             <span class="wb-when">${escapeHtml(formatRelativeTime(new Date(ev.ts)))}</span>
         </${ev.href ? 'a' : 'span'}>`).join('');
 

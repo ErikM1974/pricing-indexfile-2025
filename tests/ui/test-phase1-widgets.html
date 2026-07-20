@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/tokens.css">
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css">
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/phase1-widgets.css">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/command-palette.css">
     <link rel="stylesheet" href="/tests/ui/test-phase1-widgets.css">
     <!-- Mock APP_CONFIG + fetch BEFORE any dashboard module loads -->
     <script src="/tests/ui/test-phase1-widgets-mocks.js"></script>
@@ -41,8 +42,23 @@
         <p class="t-note">goal: <span id="goalPercent">47</span>% · dummy tools:
             <a href="/calculators/quick-quote/" class="tool-btn"><i class="fas fa-bolt" aria-hidden="true"></i> Quick Quote</a>
             <a href="/dashboards/production-shifts.html" class="tool-btn"><i class="fas fa-user-clock" aria-hidden="true"></i> Production Shifts</a>
+            <button type="button" class="cp-trigger" data-action="palette:open"><i class="fas fa-magnifying-glass" aria-hidden="true"></i> <span class="cp-trigger-label">Search anything</span> <kbd>Ctrl K</kbd></button>
         </p>
     </main>
+
+    <!-- Command palette (Phase 2) -->
+    <div class="cp-backdrop" id="cp-backdrop" hidden></div>
+    <div class="cp-dialog" id="command-palette" role="dialog" aria-modal="true" aria-label="Search anything" hidden>
+        <div class="cp-inputrow">
+            <span class="cp-caret" aria-hidden="true">›</span>
+            <input type="text" id="cpInput" placeholder="Customer, order #, quote, design #, or any tool…"
+                   autocomplete="off" spellcheck="false" aria-label="Search anything">
+            <button type="button" class="cp-esc" data-action="palette:close">esc</button>
+        </div>
+        <div class="cp-results" id="cpResults" role="listbox" aria-label="Search results"></div>
+        <div class="cp-status" id="cpStatus"></div>
+        <div class="cp-toast" id="cpToast" role="status"></div>
+    </div>
     <script type="module" src="/tests/ui/test-phase1-widgets.js"></script>
 </body>
 </html>
