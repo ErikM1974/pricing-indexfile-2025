@@ -14,7 +14,7 @@
 
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/bandit-integration.css?v=2026.07.18.1">
+    <link rel="stylesheet" href="/dashboards/css/bandit-integration.css?v=2026.07.20.1">
 </head>
 <body>
     <div class="dash-shell">
@@ -144,6 +144,7 @@
                 <div class="dash-card-header"><h2 class="dash-card-title"><i class="fas fa-gears"></i> How each sync works</h2></div>
                 <ol class="bi-steps">
                     <li><b>Read</b> — the agent opens the FileMaker ODBC DSN (<code>SWODBC</code>, login <code>extro/extro</code>, read-only) and pulls a <b>bounded</b> query (orders/PO = rows changed since last run; contacts/designs/reps = full scan). Thumbnail images are read from the file share instead.</li>
+                    <li><b>Join what isn't on the main table</b> — the <b>Order Sync</b> runs a second bounded query for the <b>ship method</b>, which ShopWorks keeps on the address row (<code>Addr.ShipMethod</code>), not on <code>Orders</code>. It fetches the method for just the orders in the delta (chunked <code>id_Order IN (…)</code>) and attaches it as an extra <code>ShipMethod</code> column on <code>ORDER_ODBC</code> — which is what lets the AE data-quality radar flag "a ship method was chosen but no ship-to address was entered".</li>
                     <li><b>Clean</b> — the agent applies the same normalization the old OneDrive export used (rep names, address/city/state, tiers, flags).</li>
                     <li><b>POST</b> — cleaned rows go in chunks to the proxy endpoint above (header <code>x-crm-api-secret</code>). The <b>proxy is the only thing that writes Caspio</b>, upserting by key (ID_Order / ID_PO / ID_Contact / ID_Customer / ID_Design / ID_Serial). It also uploads images to Box.</li>
                     <li><b>Heartbeat</b> — every run stamps <code>Sync_Heartbeats</code> so the watchdog can tell "alive but quiet" from "dead".</li>
