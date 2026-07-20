@@ -1,3 +1,8 @@
+## v2026.07.19.13 (2026.07.19)
+
+- docs(memory): ShopWorks write-back not possible (never propose) + To-Do tracker design
+- Deploy v2026.07.19.13: My Purchasing card — Bradley request status (sent/ordered/received/shipped) on Mission Control
+
 ## v2026.07.19.12 (2026.07.19)
 
 - docs(memory): growth radar + CRM sync review findings/fixes
