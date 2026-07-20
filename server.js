@@ -3433,6 +3433,10 @@ app.get('/api/crm-proxy/ae-dashboard/growth', requireCrmRole(['taneisha', 'nika'
 // Purchasing tracker — JotForm "Purchasing" form (requests to Bradley) joined
 // to the ShopWorks PurchaseOrders mirror (ordered/received) per work order.
 app.get('/api/crm-proxy/ae-dashboard/purchasing', requireCrmRole(['taneisha', 'nika', 'admin']), aeDashboardForwarder('/api/ae-dashboard/purchasing'));
+// Data-quality radar ("Missing Info — Fix in ShopWorks") — restores the
+// forwarder for the concurrent session's MC card after the 2026-07-19 server.js
+// hotfix revert (its proxy endpoint /api/ae-dashboard/data-quality is live).
+app.get('/api/crm-proxy/ae-dashboard/data-quality', requireCrmRole(['taneisha', 'nika', 'admin']), aeDashboardForwarder('/api/ae-dashboard/data-quality'));
 // Purchasing Portal — company-wide view of the same feed (every request to
 // Bradley + requester + status). ANY logged-in staff; no identity injection.
 app.get('/api/crm-proxy/purchasing-portal', requireStaff, async (req, res) => {

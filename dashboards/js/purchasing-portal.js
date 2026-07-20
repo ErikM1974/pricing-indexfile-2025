@@ -36,10 +36,6 @@
         el('pp-search').addEventListener('input', renderTable);
         el('pp-filter-rep').addEventListener('change', renderTable);
         el('pp-filter-status').addEventListener('change', renderTable);
-        el('pp-invoice-close').addEventListener('click', closeInvoiceModal);
-        el('pp-invoice-overlay').addEventListener('click', closeInvoiceModal);
-        el('pp-invoice-print').addEventListener('click', printInvoice);
-        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeInvoiceModal(); });
         load();
     });
 
@@ -140,108 +136,15 @@
         });
     }
 
-    // ---------- SanMar invoice modal (on-screen + Print / Save PDF) ----------
-    // SanMar's GetInvoiceByPurchaseOrderNo is keyed by our PO number (the
-    // ShopWorks ID_PO on SanMar orders — same match the inbound dashboard
-    // uses). Fetched browser-direct from the proxy (rate-limited GET).
-
-    function money2(v) {
-        return '$' + (Math.round((Number(v) || 0) * 100) / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    }
-
-    function invoiceHtml(inv, wo, company) {
-        var lines = (inv.lineItems || []).map(function (li) {
-            return '<tr>' +
-                '<td>' + esc(li.styleNo) + '</td>' +
-                '<td>' + esc(li.description || '') + '</td>' +
-                '<td>' + esc(li.color || '') + '</td>' +
-                '<td>' + esc(li.size || '') + '</td>' +
-                '<td class="pp-inv-num">' + (li.quantity || 0) + '</td>' +
-                '<td class="pp-inv-num">' + money2(li.unitPrice) + '</td>' +
-                '<td class="pp-inv-num">' + money2(li.lineTotal) + '</td>' +
-                '</tr>';
-        }).join('');
-        var ship = inv.shipTo || {};
-        return '<div class="pp-inv">' +
-            '<div class="pp-inv-top">' +
-            '<div class="pp-inv-brand">SanMar Corporation<small>Invoice — Northwest Custom Apparel' + (wo ? ' · WO #' + esc(wo) : '') + (company ? ' · ' + esc(company) : '') + '</small></div>' +
-            '<div class="pp-inv-no"><strong>Invoice ' + esc(inv.invoiceNumber || '—') + '</strong><br>' + esc(inv.invoiceDate || '') +
-            (inv.invoiceStatus ? '<br><span class="pp-inv-badge">' + esc(inv.invoiceStatus) + '</span>' : '') + '</div>' +
-            '</div>' +
-            '<dl class="pp-inv-meta">' +
-            '<div><dt>PO #</dt><dd>' + esc(inv.purchaseOrderNo || '—') + '</dd></div>' +
-            '<div><dt>Order date</dt><dd>' + esc(inv.orderDate || '—') + '</dd></div>' +
-            '<div><dt>Terms</dt><dd>' + esc(inv.terms || '—') + '</dd></div>' +
-            '<div><dt>Due date</dt><dd>' + esc(inv.dueDate || '—') + '</dd></div>' +
-            '<div><dt>Ship via</dt><dd>' + esc(inv.shipVia || '—') + '</dd></div>' +
-            '<div><dt>Ship to</dt><dd>' + esc([ship.name, ship.city, ship.state].filter(Boolean).join(', ') || '—') + '</dd></div>' +
-            '</dl>' +
-            '<table><thead><tr><th>Style</th><th>Description</th><th>Color</th><th>Size</th><th>Qty</th><th>Unit</th><th>Ext</th></tr></thead>' +
-            '<tbody>' + (lines || '<tr><td colspan="7">No line items returned.</td></tr>') + '</tbody></table>' +
-            '<div class="pp-inv-totals">' +
-            '<div><span>Subtotal</span><span class="pp-inv-num">' + money2(inv.subtotal) + '</span></div>' +
-            '<div><span>Shipping &amp; handling</span><span class="pp-inv-num">' + money2(inv.shippingCharges) + '</span></div>' +
-            (inv.freightSavings ? '<div><span>Freight savings</span><span class="pp-inv-num">-' + money2(inv.freightSavings) + '</span></div>' : '') +
-            '<div><span>Sales tax</span><span class="pp-inv-num">' + money2(inv.salesTax) + '</span></div>' +
-            '<div class="pp-inv-grand"><span>Total</span><span class="pp-inv-num">' + money2(inv.totalAmount) + '</span></div>' +
-            '</div></div>';
-    }
-
+    // ---------- SanMar invoice (shared viewer) ----------
+    // Delegates to window.SanMarInvoiceViewer (shared_components/js/
+    // sanmar-invoice-viewer.js) — the SAME modal + Print/Save PDF the AE
+    // Mission Control purchasing card uses, so the document never drifts.
     function openInvoiceModal(wo, company, pos, orderedDate) {
-        el('pp-invoice-overlay').hidden = false;
-        el('pp-invoice-modal').hidden = false;
-        el('pp-invoice-title').innerHTML = '<i class="fas fa-file-invoice-dollar"></i> SanMar Invoice — WO #' + esc(wo);
-        el('pp-invoice-print').disabled = true;
-        var body = el('pp-invoice-body');
-        body.innerHTML = '<div class="dash-loading">Fetching the invoice from SanMar…</div>';
-
-        // orderedDate narrows the server's SanMar invoice-date search window.
-        var dateParam = /^\d{4}-\d{2}-\d{2}$/.test(orderedDate || '') ? '?orderedDate=' + orderedDate : '';
-        Promise.all(pos.map(function (po) {
-            return DashPage.fetchJson('/api/sanmar-invoices/by-po/' + encodeURIComponent(po) + dateParam)
-                .then(function (r) { return { po: po, invoices: r.invoices || [] }; })
-                .catch(function (err) { return { po: po, error: err.message }; });
-        })).then(function (results) {
-            var html = '';
-            results.forEach(function (r) {
-                if (r.error) {
-                    html += '<div class="pp-empty">PO ' + esc(r.po) + ': invoice lookup failed (' + esc(r.error) + ').</div>';
-                } else if (!r.invoices.length) {
-                    html += '<div class="pp-empty">PO ' + esc(r.po) + ': SanMar has not invoiced this PO yet — it may still be open or very recent.</div>';
-                } else {
-                    r.invoices.forEach(function (inv) { html += invoiceHtml(inv, wo, company); });
-                }
-            });
-            body.innerHTML = html || '<div class="pp-empty">No invoices found.</div>';
-            el('pp-invoice-print').disabled = !body.querySelector('.pp-inv');
-        });
-    }
-
-    function closeInvoiceModal() {
-        el('pp-invoice-overlay').hidden = true;
-        el('pp-invoice-modal').hidden = true;
-    }
-
-    /** Print just the invoice(s): clone into a print sheet, body class hides
-     *  everything else (same pattern as the SanMar inbound print report). */
-    function printInvoice() {
-        var invoices = el('pp-invoice-body').querySelectorAll('.pp-inv');
-        if (!invoices.length) return;
-        var old = document.getElementById('pp-print-sheet');
-        if (old) old.remove();
-        var sheet = document.createElement('div');
-        sheet.id = 'pp-print-sheet';
-        Array.prototype.forEach.call(invoices, function (inv) { sheet.appendChild(inv.cloneNode(true)); });
-        document.body.appendChild(sheet);
-        document.body.classList.add('pp-printing');
-        var cleanup = function () {
-            document.body.classList.remove('pp-printing');
-            var s = document.getElementById('pp-print-sheet');
-            if (s) s.remove();
-            window.removeEventListener('afterprint', cleanup);
-        };
-        window.addEventListener('afterprint', cleanup);
-        window.print();
-        setTimeout(function () { if (document.body.classList.contains('pp-printing')) cleanup(); }, 1500);
+        if (!window.SanMarInvoiceViewer) {
+            DashPage.showError('Invoice viewer failed to load — refresh the page.');
+            return;
+        }
+        window.SanMarInvoiceViewer.open({ wo: wo, company: company, pos: pos, orderedDate: orderedDate });
     }
 })();

@@ -203,6 +203,7 @@
 | `production-schedule-stats.js` | Precomputed turnaround stats |
 | `production-schedule-predictor.js` | Turnaround prediction engine |
 | `monogram-dashboard.js` | Monogram dashboard controller |
+| `sanmar-invoice-viewer.js` | Shared SanMar invoice modal (`SanMarInvoiceViewer.open`) — on-screen invoice + Print/Save PDF; used by Purchasing Portal + AE Mission Control |
 
 ## Art Hub Dashboard
 

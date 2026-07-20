@@ -1,0 +1,128 @@
+/* sanmar-invoice-viewer.css — shared SanMar invoice modal + print sheet.
+ * Pairs with shared_components/js/sanmar-invoice-viewer.js (window.SanMarInvoiceViewer).
+ * Loaded by the Purchasing Portal AND AE Mission Control so the invoice
+ * document renders identically everywhere. Uses art-hub.css tokens. */
+
+.smiv-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    z-index: 190;
+}
+.smiv-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(820px, calc(100vw - 32px));
+    max-height: min(88vh, 900px);
+    overflow: auto;
+    background: var(--surface-card, #fff);
+    border-radius: var(--radius-lg, 12px);
+    box-shadow: var(--shadow-lg, 0 10px 40px rgba(0,0,0,.25));
+    z-index: 200;
+}
+.smiv-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--gray-200, #e5e7eb);
+    position: sticky;
+    top: 0;
+    background: var(--surface-card, #fff);
+    z-index: 1;
+}
+.smiv-title { font-size: 1rem; font-weight: 700; color: var(--gray-900, #111827); margin: 0; }
+.smiv-head-actions { display: flex; align-items: center; gap: 8px; }
+.smiv-btn {
+    font: inherit;
+    font-size: 0.85rem;
+    padding: 7px 14px;
+    border: 1px solid var(--gray-300, #d1d5db);
+    border-radius: var(--radius-sm, 6px);
+    background: var(--surface-card, #fff);
+    color: var(--gray-700, #374151);
+    cursor: pointer;
+}
+.smiv-btn--primary { background: var(--art-theme, #4cb354); border-color: var(--art-theme, #4cb354); color: #fff; }
+.smiv-btn:disabled { opacity: 0.5; cursor: default; }
+.smiv-close {
+    border: none;
+    background: transparent;
+    color: var(--gray-500, #6b7280);
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 6px;
+}
+.smiv-close:hover { color: var(--gray-900, #111827); }
+.smiv-body { padding: 16px; }
+.smiv-loading { padding: 24px; text-align: center; color: var(--gray-500, #6b7280); }
+.smiv-note { padding: 12px; color: var(--gray-500, #6b7280); font-size: 0.85rem; }
+
+/* The invoice "document" — reads like paper on screen and in print */
+.smiv-inv {
+    border: 1px solid var(--gray-200, #e5e7eb);
+    border-radius: var(--radius-md, 8px);
+    padding: 16px;
+    margin-bottom: 16px;
+    background: #fff;
+    color: #1a1a1a;
+}
+.smiv-inv-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    border-bottom: 2px solid #1a1a1a;
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+}
+.smiv-inv-brand { font-size: 1.05rem; font-weight: 700; }
+.smiv-inv-brand small { display: block; font-weight: 400; color: #555; font-size: 0.75rem; }
+.smiv-inv-no { text-align: right; font-family: 'JetBrains Mono', monospace; }
+.smiv-inv-no strong { font-size: 1.05rem; }
+.smiv-meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 6px 16px;
+    font-size: 0.8rem;
+    margin: 0 0 12px;
+}
+.smiv-meta dt { color: #666; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.smiv-meta dd { margin: 0; font-weight: 600; }
+.smiv-inv table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+.smiv-inv th {
+    text-align: left;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #666;
+    border-bottom: 1px solid #1a1a1a;
+    padding: 5px 8px;
+}
+.smiv-inv td { padding: 5px 8px; border-bottom: 1px solid #e5e5e5; }
+.smiv-num { text-align: right; font-family: 'JetBrains Mono', monospace; white-space: nowrap; }
+.smiv-totals { margin-top: 10px; margin-left: auto; width: 260px; font-size: 0.82rem; }
+.smiv-totals div { display: flex; justify-content: space-between; padding: 3px 8px; }
+.smiv-totals .smiv-grand { border-top: 2px solid #1a1a1a; font-weight: 700; font-size: 0.95rem; }
+.smiv-badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: #eaf7ef;
+    color: #0f5132;
+    border: 1px solid #b7e0c5;
+}
+
+/* Print: show ONLY the print sheet (sanmar-inbound-today pattern) */
+#smiv-print-sheet { display: none; }
+@media print {
+    body.smiv-printing > * { display: none !important; }
+    body.smiv-printing #smiv-print-sheet { display: block !important; }
+    body.smiv-printing #smiv-print-sheet .smiv-inv { border: none; margin: 0 0 24px; page-break-after: always; }
+    body.smiv-printing #smiv-print-sheet .smiv-inv:last-child { page-break-after: auto; }
+}

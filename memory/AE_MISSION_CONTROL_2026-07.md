@@ -44,5 +44,10 @@ Per-AE cockpit for Taneisha Clark & Nika Lao (admin view-as). One page, identity
 - 🔑 **An order is LISTED only with ≥1 err-severity issue** — blank ship-to alone is a warn (pickup orders are normal; without the filter 80/125 of Nika's orders flagged = noise). Warns ride along as context chips. Live first run: Nika 53/125 orders (phone+terms), Taneisha 35/74 (terms) + 17 customers.
 - ⚠ Ship METHOD is NOT in the 33-column ORDER_ODBC sync — "UPS Ground but no address" is approximated by `cur_Shipping`>0 + blank address (= err). Literal check needs ShipMethod added to sync-orders.ps1 + Caspio table.
 
+## Order Due Dates card (2026-07-19 late)
+- Proxy `GET /api/ae-dashboard/due-dates?email=` (secret, 10-min cache) + FE forwarder `/api/crm-proxy/ae-dashboard/due-dates` (same taneisha/nika/admin gates + viewAs) + MC card between My Purchasing and Money on the Table.
+- Logic: rep's UNSHIPPED ORDER_ODBC orders (dedupe by ID_Order) vs `date_OrderRequestedToShip` (60d lookback, nulls excluded — data-quality radar owns missing dates). **Late** = due date passed, not shipped. **At risk** = due ≤7d AND blanks not fully received per `PurchaseOrders` join (`sts_Received`/`date_Received`; blanks ladder none→ordered→partial→received). Due-soon orders with blanks received = on-track count only. Rows reuse `aemc-purch--*` chips for blanks + new `aemc-due-flag--late/risk` chips.
+- Per-rep separation is inherent: rep derived from SAML session, admin `?viewAs=` toggles Taneisha/Nika — same identity path as summary.
+
 ## Phase 3 backlog (not built)
 Next-best-action ranking · since-last-visit highlights (localStorage diff) · morning Slack/email deep link (evolve the 7:45 digest) · absorb taneisha-/nika-crm as "My Accounts" tab · move rep access from email-keyed perms to `sales` role + Sales_Reps_2026 registry.

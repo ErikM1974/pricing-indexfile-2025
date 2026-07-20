@@ -457,14 +457,28 @@
                     if (o.receivedDate) meta.push('received ' + fmtWhen(o.receivedDate));
                     if (!o.orderedDate && m.submittedAt) meta.push('sent ' + fmtWhen(m.submittedAt));
                     if (m.bradleyPo) meta.push('PO# ' + m.bradleyPo);
+                    // SanMar invoice button — same shared viewer as the Purchasing Portal.
+                    var invBtn = (o.sanmarPos && o.sanmarPos.length)
+                        ? '<button type="button" class="aemc-mini-btn aemc-inv-btn" data-wo="' + esc(o.orderNumber) + '" data-company="' + esc(o.company || '') + '" data-pos="' + esc(o.sanmarPos.join(',')) + '" data-ordered="' + esc(o.orderedDate || '') + '"><i class="fas fa-file-invoice-dollar"></i> Invoice</button>'
+                        : '';
                     return '<li class="aemc-row">' +
                         '<span class="aemc-row-main">WO #' + esc(o.orderNumber) + (o.company ? ' — ' + esc(o.company) : '') + '</span>' +
                         '<span class="aemc-purch-chip aemc-purch--' + esc(o.status) + '">' + esc(PURCH_LABEL[o.status] || o.status) + '</span>' +
+                        invBtn +
                         '<span class="aemc-row-right"><span class="aemc-row-meta">' + esc(meta.join(' · ')) + '</span></span>' +
                         '</li>';
                 }).join('');
             }).join('') + '</ul>' +
                 (p.truncated ? '<p class="aemc-hint">…and ' + p.truncated + ' older request' + (p.truncated === 1 ? '' : 's') + ' in the form inbox.</p>' : '');
+            Array.prototype.forEach.call(el('aemc-purch').querySelectorAll('.aemc-inv-btn'), function (btn) {
+                btn.addEventListener('click', function () {
+                    if (!window.SanMarInvoiceViewer) { DashPage.showError('Invoice viewer failed to load — refresh the page.'); return; }
+                    window.SanMarInvoiceViewer.open({
+                        wo: btn.dataset.wo, company: btn.dataset.company,
+                        pos: btn.dataset.pos.split(',').filter(Boolean), orderedDate: btn.dataset.ordered,
+                    });
+                });
+            });
         }).catch(function (err) {
             el('aemc-purch').innerHTML = '<div class="aemc-panel-error">Purchasing tracker failed to load (' + esc(err.message) + '). Refresh to retry.</div>';
         });
