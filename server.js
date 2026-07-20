@@ -4382,6 +4382,25 @@ app.get('/api/staff/sanmar-invoices/unpaid', requireStaff, async (req, res) => {
   }
 });
 
+// ShopWorks payables feed for the SanMar Payables page's automatic Imported?/Paid?
+// cross-check (the bandit ODBC → Caspio ShopWorks_Payables sync). When this returns
+// rows, the page skips the manual ShopWorks-CSV upload. Empty (sync not live yet) →
+// the page falls back to upload. Staff-gated; adds the CRM secret upstream.
+app.get('/api/staff/shopworks-payables', requireStaff, async (req, res) => {
+  if (!CRM_API_SECRET) return res.status(503).json({ error: 'not_configured' });
+  const sinceDays = Math.min(Math.max(parseInt(req.query.sinceDays, 10) || 365, 1), 3650);
+  try {
+    const r = await fetch(`${CRM_API_BASE}/api/shopworks-odbc/payables?sinceDays=${sinceDays}`, {
+      headers: { 'X-CRM-API-Secret': CRM_API_SECRET }, signal: AbortSignal.timeout(30000)
+    });
+    const body = await r.text();
+    res.status(r.status).type(r.headers.get('content-type') || 'application/json').send(body);
+  } catch (e) {
+    console.error('[shopworks-payables-forward]', e.message);
+    res.status(502).json({ error: 'upstream_unavailable' });
+  }
+});
+
 // ── Finished-photo staff manage endpoints. The proxy gates GET(all)/PATCH/DELETE behind the CRM
 //    secret, so forward them from here with the secret (requireStaff = SAML gate). The photo UPLOAD
 //    (POST /api/finished-photos) goes to the proxy DIRECTLY from the browser (open + rate-limited),

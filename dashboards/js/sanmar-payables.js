@@ -140,6 +140,7 @@
         el('smp-mkt-download').addEventListener('click', downloadMarketingCsv);
 
         loadInvoices();
+        loadShopworksFeed();   // auto ShopWorks cross-ref when the ODBC sync is live; else upload fallback
     });
 
     function switchTab(tab) {
@@ -330,6 +331,18 @@
         ev.target.value = '';
     }
 
+    // Apply a ShopWorks payables map (from the auto ODBC feed OR a manual upload) →
+    // enables the status filter, defaults to the worklist, re-renders.
+    function applySw(map, statusText, allowClear) {
+        state.sw = { map: map, count: map.size, at: new Date() };
+        el('smp-status-filter').disabled = false;
+        if (el('smp-status-filter').value === 'all') el('smp-status-filter').value = 'needimport';
+        el('smp-sw-status').textContent = statusText;
+        el('smp-sw-clear').hidden = !allowClear;
+        renderInvoiceStats();
+        renderInvoiceTable();
+    }
+
     function ingestShopworks(text) {
         var rows = parseCsv(text);
         if (!rows.length) throw new Error('empty file');
@@ -346,13 +359,22 @@
             if (!key) continue;
             map.set(key, { datePaid: iPaid >= 0 ? String(cells[iPaid] || '').trim() : '', outstanding: iOut >= 0 ? cells[iOut] : '' });
         }
-        state.sw = { map: map, count: map.size, at: new Date() };
-        el('smp-status-filter').disabled = false;
-        el('smp-status-filter').value = 'needimport';
-        el('smp-sw-status').textContent = 'ShopWorks export loaded — ' + map.size + ' payable rows matched by invoice #.';
-        el('smp-sw-clear').hidden = false;
-        renderInvoiceStats();
-        renderInvoiceTable();
+        applySw(map, 'ShopWorks export loaded — ' + map.size + ' payable rows matched by invoice #.', true);
+    }
+
+    // Auto ODBC feed (bandit → Caspio ShopWorks_Payables). When it has rows, the page
+    // skips the manual upload; when it's empty (sync not live yet) it silently leaves
+    // the upload fallback in place. Optional — never surfaces an error banner.
+    function loadShopworksFeed() {
+        fetchJson('/api/staff/shopworks-payables?sinceDays=365').then(function (d) {
+            if (!d || !d.count) return;              // sync not populated yet → keep upload fallback
+            var map = new Map();
+            (d.rows || []).forEach(function (row) {
+                var key = normInv(row.InvoiceNumber);
+                if (key && key !== '0') map.set(key, { datePaid: String(row.date_Paid || '').trim(), outstanding: row.cnCur_PayableOutstanding });
+            });
+            applySw(map, 'Auto-synced from ShopWorks · ' + map.size + ' payables (refreshes ~every 15 min).', false);
+        }).catch(function () { /* optional feed — keep the upload fallback */ });
     }
 
     function clearShopworks() {
