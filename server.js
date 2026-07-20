@@ -4337,6 +4337,34 @@ app.get('/api/staff/payments/recent', requireStaff, async (req, res) => {
   }
 });
 
+// SanMar Payables page (2026-07-20) — pulls SanMar invoices live from the SOAP
+// Invoicing service for a date range. The proxy /api/sanmar-invoices/by-date is
+// only rate-limited (not PII-gated), but this is finance data, so the browser
+// goes through this staff-session-gated same-origin forwarder. Sending the CRM
+// secret also skips the proxy's per-IP SanMar rate limit. Validates the dates and
+// enforces SanMar's ≤3-month window before forwarding.
+app.get('/api/staff/sanmar-invoices/by-date', requireStaff, async (req, res) => {
+  if (!CRM_API_SECRET) return res.status(503).json({ error: 'not_configured' });
+  const start = String(req.query.start || '').trim();
+  const end = String(req.query.end || '').trim();
+  const iso = /^\d{4}-\d{2}-\d{2}$/;
+  if (!iso.test(start) || !iso.test(end)) return res.status(400).json({ error: 'start and end must be YYYY-MM-DD' });
+  if (start > end) return res.status(400).json({ error: 'start must be on or before end' });
+  const days = Math.round((Date.parse(end) - Date.parse(start)) / 86400000);
+  if (days > 100) return res.status(400).json({ error: 'range too large — SanMar allows at most a 3-month window' });
+  try {
+    const url = `${CRM_API_BASE}/api/sanmar-invoices/by-date?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`;
+    const r = await fetch(url, {
+      headers: { 'X-CRM-API-Secret': CRM_API_SECRET }, signal: AbortSignal.timeout(30000)
+    });
+    const body = await r.text();
+    res.status(r.status).type(r.headers.get('content-type') || 'application/json').send(body);
+  } catch (e) {
+    console.error('[sanmar-invoices-forward]', e.message);
+    res.status(502).json({ error: 'upstream_unavailable' });
+  }
+});
+
 // ── Finished-photo staff manage endpoints. The proxy gates GET(all)/PATCH/DELETE behind the CRM
 //    secret, so forward them from here with the secret (requireStaff = SAML gate). The photo UPLOAD
 //    (POST /api/finished-photos) goes to the proxy DIRECTLY from the browser (open + rate-limited),

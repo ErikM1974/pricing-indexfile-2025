@@ -221,3 +221,25 @@ The factory capture page (`/dashboards/finished-photos.html`) now finds the orde
 - **Scanner** = vendored `dashboards/js/vendor/html5-qrcode.min.js` (v2.3.8, MIT, ZXing — works on iOS Safari; native BarcodeDetector doesn't). Formats: CODE_39/CODE_128/QR. Camera-denied → graceful "type the order #" fallback.
 - **Client-side compression**: photos re-encode ≤2000px JPEG q0.85 before upload (iPhone ~4MB → ~500KB); HEIC/undecodable falls back to the original (proxy accepts HEIC). Caption quick-chips (Front/Back/Left chest/Sleeve/Cap), retake overlay, publish list with "Live on portal" state + lightbox.
 - **ORDER_ODBC coverage caveat**: lookup only resolves orders present in the ODBC mirror (bandit 15-min sync) — fine for floor work orders (same-day); ancient order #s miss → use Search.
+
+## SanMar Payables — ODBC paid/imported signal (STAGED 2026-07-20, ⏳ deploy + bandit copy)
+
+Powers the SanMar Payables page (`/dashboards/sanmar-payables.html`) Phase-2 "is this invoice imported/paid?"
+match. Two paths (the DSN schema decides which):
+- **Path A — PO-level (works with the CURRENT DSN; STAGED, needs deploy):** the ShopWorks `PO` table already
+  exposes `cn_sts_PayableExists` + `cn_sts_PayableMatch` (0|1) alongside the already-synced
+  `cnCur_PayablesOutstanding`. Added them to the PO sync: **2 new Caspio `PurchaseOrders` cols
+  `PayableExists`/`PayableMatch` (created 7/20)**, added to `PO_INT_FIELDS` in `shopworks-odbc-sync.js`, and to the
+  `SELECT` in `bandit-agent/sync-purchase-orders.ps1`. Match a SanMar invoice → `PurchaseOrders.ID_PO` (via
+  `purchaseOrderNo`) → **Imported? = `PayableExists==1`; Paid? = `PayableExists==1 && PayablesOutstanding==0`**.
+  ⚠ COARSE for split-invoice POs (one PO can have >1 SanMar invoice — e.g. PO 113437 had 2) — it's a
+  per-PO, not per-invoice, signal. ⏳ ACTIVATE: deploy proxy + recopy `sync-purchase-orders.ps1` to bandit
+  `C:\NWCA\odbc-sync\` (fields flow next 15-min run).
+- **Path B — invoice-level (the real reconciliation; needs the AP table exposed):** ShopWorks' invoice-level
+  Payables data (`ID_Payable, date_Paid, InvoiceNumber, cur_Payable, cnCur_PayableOutstanding, sts_ToPay`) is
+  **NOT in the current DSN** (mapped tables = Addr/Contacts/Cust/Des/Event/InvLevel/LinesOE/Machines/OrdTyp/
+  Orders/PO/Prod/…; no bill/payable table). Run **`bandit-agent/probe-payables.ps1`** on bandit to confirm
+  whether an AP table is `SELECT`-able (maybe the catalog is stale) or must be exposed in ShopWorks OnSite
+  "Manage ODBC" (or requested from support@shopworx.com). Once a table+columns are confirmed → build
+  `sync-payables.ps1` (clone `sync-purchase-orders.ps1`) + `POST /api/shopworks-odbc/sync-payables` upsert +
+  Caspio `ShopWorks_Payables` table → exact per-invoice `date_Paid` for the reconciliation view.
