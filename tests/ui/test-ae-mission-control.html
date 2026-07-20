@@ -16,7 +16,7 @@
     <!-- 2026 design tokens (must load before dash-shell.css) -->
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/ae-mission-control.css?v=2026.07.19.9">
+    <link rel="stylesheet" href="/dashboards/css/ae-mission-control.css?v=2026.07.19.11">
 </head>
 <body>
     <div class="dash-shell">
@@ -130,6 +130,16 @@
                 <p class="aemc-bonus-foot" id="aemc-bonus-foot"></p>
             </div>
 
+            <!-- Growth radar: revenue statistically missing vs each account's own history -->
+            <div class="dash-card aemc-growth-card">
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title"><i class="fas fa-satellite-dish"></i> Money on the Table <span class="aemc-sub" id="aemc-growth-sub"></span></h2>
+                    <a class="aemc-viewall" id="aemc-growth-accounts-link" href="/dashboards/taneisha-crm.html" hidden>My Accounts</a>
+                </div>
+                <p class="aemc-hint aemc-growth-hint">Accounts that are late against <em>their own</em> ordering rhythm, or spent real money in the next 45 days last year and haven't ordered yet. Call these first.</p>
+                <div id="aemc-growth"><div class="dash-loading">Scanning 24 months of your order history…</div></div>
+            </div>
+
             <!-- ZONE 3: work panels -->
             <div class="aemc-panels">
                 <div class="dash-card">
@@ -227,6 +237,6 @@
     <script src="/shared_components/js/dash-page-helpers.js"></script>
     <script src="/dashboards/js/sanmar-inbound-today.js?v=2026.07.19.1"></script>
     <script src="/tests/ui/test-ae-mission-control-stub.js"></script>
-    <script src="/dashboards/js/ae-mission-control.js?v=2026.07.19.10"></script>
+    <script src="/dashboards/js/ae-mission-control.js?v=2026.07.19.11"></script>
 </body>
 </html>

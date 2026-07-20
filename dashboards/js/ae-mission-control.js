@@ -142,6 +142,7 @@
             state.summary = data;
             state.rep = data.rep;
             render(data);
+            loadGrowth();
         }).catch(function (err) {
             DashPage.showError('Could not load your dashboard: ' + err.message + ' — refresh to retry.');
             el('aemc-greeting').textContent = 'Your data could not be loaded.';
@@ -418,6 +419,36 @@
                     '</li>';
             }, 'No orders invoiced to your customers in the last 30 days.');
         }
+    }
+
+    // ---------- growth radar ("Money on the Table") ----------
+    function loadGrowth() {
+        var params = (state.isAdmin && state.viewAs) ? '?viewAs=' + encodeURIComponent(state.viewAs) : '';
+        var acct = el('aemc-growth-accounts-link');
+        if (state.rep && ACCOUNTS_PAGE[state.rep.email]) { acct.href = ACCOUNTS_PAGE[state.rep.email]; acct.hidden = false; }
+        sameOriginJson('/api/crm-proxy/ae-dashboard/growth' + params).then(function (g) {
+            el('aemc-growth-sub').textContent = g.flaggedCount
+                ? '(' + g.flaggedCount + ' account' + (g.flaggedCount === 1 ? '' : 's') + ' · ~' + money0(g.potentialTotal) + ' in reach)'
+                : '';
+            if (!g.items || !g.items.length) {
+                el('aemc-growth').innerHTML = '<div class="aemc-empty">Nothing overdue against its own rhythm right now — every active account is on schedule. Check back tomorrow.</div>';
+                return;
+            }
+            el('aemc-growth').innerHTML = '<ul class="aemc-rows">' + g.items.map(function (it) {
+                var chips = (it.reasons || []).map(function (r) {
+                    return '<span class="aemc-growth-reason aemc-growth-reason--' + esc(r.type) + '">' + esc(r.text) + '</span>';
+                }).join(' ');
+                return '<li class="aemc-row">' +
+                    '<span class="aemc-row-main">' + esc(it.company) + '</span>' +
+                    chips +
+                    '<span class="aemc-row-right"><span class="aemc-money aemc-growth-total">~' + money0(it.estValue) + '</span><br>' +
+                    '<span class="aemc-row-meta">last order ' + fmtWhen(it.lastOrderDate) + ' · avg ' + money0(it.avgOrderValue) + '</span></span>' +
+                    '</li>';
+            }).join('') + '</ul>' +
+                (g.truncated ? '<p class="aemc-hint">…and ' + g.truncated + ' more flagged — work these first, then refresh tomorrow.</p>' : '');
+        }).catch(function (err) {
+            el('aemc-growth').innerHTML = '<div class="aemc-panel-error">Growth radar failed to load (' + esc(err.message) + '). Refresh to retry.</div>';
+        });
     }
 
     // ---------- SanMar inbound (company-wide fetch, rep rows highlighted) ----------

@@ -226,6 +226,20 @@ a.aemc-row-main:hover { text-decoration: underline; }
     color: var(--gray-500);
 }
 
+/* ---------- growth radar card ---------- */
+.aemc-growth-card { margin-bottom: var(--space-4); }
+.aemc-growth-hint { margin-bottom: var(--space-2); }
+.aemc-growth-reason {
+    display: inline-block;
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+}
+.aemc-growth-reason--rhythm { background: #fff8f0; color: #b85a00; border: 1px solid #f5d3ad; }
+.aemc-growth-reason--season { background: #f3f7ff; color: #0a4fb5; border: 1px solid #c4d7f7; }
+.aemc-growth-total { font-weight: 700; color: var(--gray-900); }
+
 /* ---------- inbound card ---------- */
 .aemc-inbound-card { margin-bottom: var(--space-4); }
 .aemc-inbound { font-size: 0.9rem; color: var(--gray-600); }

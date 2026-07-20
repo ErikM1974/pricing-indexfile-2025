@@ -913,7 +913,13 @@ class RepCRMController {
             this.elements.winbackCount.textContent = `${stats.winBack} account${stats.winBack !== 1 ? 's' : ''}`;
         }
         if (this.elements.winbackBonus) {
-            this.elements.winbackBonus.textContent = this.formatCurrency(stats.winBackBonus);
+            // Placeholder while the payroll-true number loads. The old value here
+            // (5% × full-YTD win-back revenue) over-stated a QUARTERLY payout —
+            // it re-counted revenue already paid in earlier quarters (same bug
+            // fixed in the Q2-2026 payroll). The quarterly-report endpoint is
+            // the single engine payroll uses; show ITS number.
+            this.elements.winbackBonus.textContent = '…';
+            this._renderQuarterWinBack();
         }
         const quarterInfo = this.service.getQuarterInfo();
         if (this.elements.quarterLabel) {
@@ -925,6 +931,37 @@ class RepCRMController {
         if (this.elements.unclassifiedRevenue) {
             this.elements.unclassifiedRevenue.textContent = this.formatCurrency(stats.unclassifiedRevenue);
             this.elements.unclassifiedCount.textContent = `${stats.unclassified} account${stats.unclassified !== 1 ? 's' : ''}`;
+        }
+    }
+
+    /**
+     * Fill the win-back "5% Bonus" tile with the QUARTER-AWARE number from the
+     * commissions engine (the same one payroll pays), replacing the old client
+     * math of 5% × full-YTD. Failure shows "—" with a tooltip — never a wrong
+     * dollar figure (Erik's #1 rule).
+     */
+    async _renderQuarterWinBack() {
+        const tile = this.elements.winbackBonus;
+        if (!tile) return;
+        try {
+            const apiBase = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+            const resp = await fetch(`${apiBase}/api/commissions/quarterly-report`);
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            const report = await resp.json();
+            // REP_CONFIG.repName is the FIRST name ("Taneisha"); the report keys
+            // by FULL name ("Taneisha Clark") — match by prefix.
+            const repFirst = (window.REP_CONFIG && window.REP_CONFIG.repName) || '';
+            const repKey = Object.keys(report.reps || {}).find(k => k.startsWith(repFirst));
+            const repData = repKey && report.reps[repKey];
+            const wb = repData && repData.winBack;
+            if (!wb) throw new Error('rep not in report');
+            tile.textContent = this.formatCurrency(wb.bountyAmount || 0);
+            tile.title = `${report.quarter} ${report.year}: 5% of ${this.formatCurrency(wb.totalRevenue || 0)} win-back revenue this quarter`
+                + (wb.cumulativeRevenue ? ` (YTD across win-back accounts: ${this.formatCurrency(wb.cumulativeRevenue)})` : '');
+        } catch (err) {
+            console.error('[RepCRM] quarter win-back fetch failed:', err.message);
+            tile.textContent = '—';
+            tile.title = 'Could not load the quarterly win-back number — refresh to retry.';
         }
     }
 
