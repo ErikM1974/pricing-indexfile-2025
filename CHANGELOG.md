@@ -1,3 +1,9 @@
+## v2026.07.20.7 (2026.07.20)
+
+- docs(lessons): [hidden] guard recurrence #5 (finished-photos-library lightbox)
+- feat(staff-dashboard): compact goal chip + persistent hero search bar (Erik layout redesign)
+- Deploy v2026.07.20.7: 1 files (index.html...)
+
 ## v2026.07.20.6 (2026.07.20)
 
 - refactor(finished-photos): file-wide [hidden] guard in library CSS (convention)
