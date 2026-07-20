@@ -1,3 +1,7 @@
+## v2026.07.20.10 (2026.07.20)
+
+- Deploy v2026.07.20.10: 4 files (sanmar-payables.js,sanmar-payables.html,test-sanmar-payables-stub.js,...) — normInv leading-zero fix for zero-padded ShopWorks credits
+
 ## v2026.07.20.9 (2026.07.20)
 
 - Deploy v2026.07.20.9: 8 files (ACTIVE_FILES.md,sanmar-payables.css,sanmar-payables.js,...)
