@@ -69,8 +69,11 @@
     // Normalized invoice key for matching SanMar (raw "162398367") ↔ ShopWorks
     // ("INV-162398367" / "CR-5670868" / "FTC-001031473"): strip the prefix + any
     // non-alphanumerics, uppercase. Sign is tracked separately (never in the key).
+    // NB: also strip leading zeros — ShopWorks zero-pads credit/freight numbers
+    // (CR-005615563, FTC-001124876) while SanMar returns them bare (5615563), so
+    // without this every padded credit would falsely read "not imported".
     function normInv(s) {
-        return String(s == null ? '' : s).trim().toUpperCase().replace(/^(INV|CR|FTC)-?/, '').replace(/[^A-Z0-9]/g, '');
+        return String(s == null ? '' : s).trim().toUpperCase().replace(/^(INV|CR|FTC)-?/, '').replace(/[^A-Z0-9]/g, '').replace(/^0+/, '') || '0';
     }
 
     function csvCell(v) {
