@@ -107,6 +107,7 @@ dotenv.config();
 //   GET /api/mo/orders[...]              — ManageOrders reads (PII airtight path, 2026-07-05)
 //   GET /api/staff/payments/recent       — Order_Payments ledger for the Money Collected widget (2026-07-06)
 //   GET /api/staff/finished-photos/library — company-wide finished-photo library w/ rep names (any staff; ~L4356, 2026-07-19)
+//   GET /api/staff/command-search        — Ctrl+K Everything Bar: proxy fan-out search across customers/orders/quotes/designs (any staff; 2026-07-20)
 //   ALL /api/crm-proxy/form-submissions* — Forms Inbox reads/updates (any staff; ~L3230, 2026-07-11)
 //   ALL /api/crm-proxy/order-odbc*       — ORDER_ODBC order history for the Leads board (any staff; 2026-07-18)
 //   ALL /api/crm-proxy/lead-activity*    — Leads CRM timeline reads/appends (any staff; 2026-07-18)
@@ -4373,6 +4374,21 @@ app.get('/api/staff/finished-photos/library', requireStaff, async (req, res) => 
     const body = await r.text();
     res.status(r.status).type(r.headers.get('content-type') || 'application/json').send(body);
   } catch (e) { console.error('[finished-photos-forward:library]', e.message); res.status(502).json({ error: 'upstream_unavailable' }); }
+});
+// Ctrl+K Everything Bar (2026-07-20 Phase 2) — forwards the dashboard command
+// palette's query to the proxy's CRM-gated fan-out search (customers / orders /
+// quotes / designs). Same airtight pattern as the other /api/staff forwarders.
+app.get('/api/staff/command-search', requireStaff, async (req, res) => {
+  if (!CRM_API_SECRET) return res.status(503).json({ error: 'not_configured' });
+  const q = String(req.query.q || '').trim().slice(0, 60);
+  if (q.length < 2) return res.status(400).json({ error: 'q must be 2-60 characters' });
+  try {
+    const r = await fetch(`${CRM_API_BASE}/api/command-search?q=${encodeURIComponent(q)}`, {
+      headers: { 'X-CRM-API-Secret': CRM_API_SECRET }, signal: AbortSignal.timeout(15000)
+    });
+    const body = await r.text();
+    res.status(r.status).type(r.headers.get('content-type') || 'application/json').send(body);
+  } catch (e) { console.error('[command-search-forward]', e.message); res.status(502).json({ error: 'upstream_unavailable' }); }
 });
 // Barcode / order-number lookup: a work-order scan ("142476" footer barcode or "40121Loc1"
 // design-sheet barcode) resolves to the customer (+ design) so the crew skips the search.
