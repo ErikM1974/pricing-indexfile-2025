@@ -80,6 +80,19 @@
             <nav class="sidebar-nav">
                 <div class="sidebar-content">
 
+                    <!-- AE Mission Control (2026-07-19) — per-AE cockpit for Taneisha & Nika:
+                         action queue (leads/quotes/art/kits), KPIs, commission, SanMar
+                         inbound. Role-gated server-side (taneisha/nika/admin only). -->
+                    <div class="nav-section" data-section="mission-control">
+                        <a href="/dashboards/ae-mission-control.html" class="nav-section-header-link">
+                            <div class="nav-section-title">
+                                <span aria-hidden="true">🚀</span>
+                                <span>AE Mission Control</span>
+                            </div>
+                            <span aria-hidden="true">→</span>
+                        </a>
+                    </div>
+
                     <!-- Leads (2026-07-18) — unified lead board: JotForm website leads +
                          Quote Request / Webstore / Roster rows (Form_Submissions), rep
                          assignment + ShopWorks customer match. -->
@@ -318,6 +331,7 @@
                     <div class="pinned-row pinned-row--frequent">
                         <div class="pinned-row__label">⭐ Frequently Used</div>
                         <div class="pinned-row__list" id="pinnedToolsList">
+                            <a href="/dashboards/ae-mission-control.html" class="tool-btn" title="AE Mission Control — Taneisha & Nika's cockpit: action queue, KPIs, quotes, art, kits, commission"><i class="fas fa-rocket" aria-hidden="true"></i> AE Mission Control</a>
                             <a href="/dashboards/production-shifts.html" class="tool-btn"><i class="fas fa-user-clock" aria-hidden="true"></i> Production Shifts</a>
                             <a href="/dashboards/finished-photos.html" class="tool-btn"><i class="fas fa-camera" aria-hidden="true"></i> Finished Photos</a>
                             <!-- Workflow Strip: Bradley's Queue → Supacolor API Orders -->

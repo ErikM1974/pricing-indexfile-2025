@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>TEST HARNESS — AE Mission Control</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- 2026 design tokens (must load before dash-shell.css) -->
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css">
+    <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
+    <link rel="stylesheet" href="/dashboards/css/ae-mission-control.css?v=2026.07.19.1">
+</head>
+<body>
+    <div class="dash-shell">
+        <header class="dash-header">
+            <div class="dash-header-left">
+                <a href="/staff-dashboard.html" title="Back to Staff Dashboard">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                         alt="Northwest Custom Apparel" class="dash-header-logo">
+                </a>
+                <h1 class="dash-header-title" id="aemc-title">Mission Control</h1>
+            </div>
+            <div class="dash-header-right">
+                <div class="aemc-viewas" id="aemc-viewas" hidden role="group" aria-label="View as rep">
+                    <span class="aemc-viewas-label"><i class="fas fa-user-secret"></i> View as</span>
+                    <button type="button" class="aemc-viewas-btn" data-rep="taneisha@nwcustomapparel.com">Taneisha</button>
+                    <button type="button" class="aemc-viewas-btn" data-rep="nika@nwcustomapparel.com">Nika</button>
+                </div>
+                <button type="button" id="aemc-refresh" class="dash-btn" title="Refresh all data">
+                    <i class="fas fa-rotate"></i>
+                    Refresh
+                </button>
+                <a href="/staff-dashboard.html" class="dash-back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    Dashboard
+                </a>
+            </div>
+        </header>
+
+        <main class="dash-content">
+            <div class="dash-error-banner" role="alert">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span class="dash-error-banner-message"></span>
+                <button class="dash-error-banner-close" aria-label="Dismiss">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="aemc-greeting-row">
+                <div class="aemc-greeting" id="aemc-greeting">Loading your day…</div>
+                <div class="aemc-updated" id="aemc-updated"></div>
+            </div>
+
+            <!-- ZONE 2: KPI strip -->
+            <div class="dash-stat-grid aemc-kpis">
+                <div class="dash-stat-card dash-stat-card--accent">
+                    <div class="dash-stat-value" id="kpi-ytd">—</div>
+                    <div class="dash-stat-label">YTD Sales</div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value" id="kpi-mtd">—</div>
+                    <div class="dash-stat-label">This Month</div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value" id="kpi-quotes">—</div>
+                    <div class="dash-stat-label" id="kpi-quotes-label">Open Quotes</div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value" id="kpi-commission">—</div>
+                    <div class="dash-stat-label" id="kpi-commission-label">Store Commission</div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value" id="kpi-winrate">—</div>
+                    <div class="dash-stat-label">Lead Win Rate (90d)</div>
+                </div>
+            </div>
+
+            <!-- ZONE 4: quick actions -->
+            <div class="aemc-actions" id="aemc-actions" role="toolbar" aria-label="Quick actions">
+                <span class="aemc-actions-label">New quote:</span>
+                <a class="dash-btn" href="/quote-builders/embroidery-quote-builder.html">EMB</a>
+                <a class="dash-btn" href="/quote-builders/screenprint-quote-builder.html">SCP</a>
+                <a class="dash-btn" href="/quote-builders/dtf-quote-builder.html">DTF</a>
+                <a class="dash-btn" href="/quote-builders/dtg-quote-builder.html">DTG</a>
+                <span class="aemc-actions-sep"></span>
+                <a class="dash-btn" href="/dashboards/ae-dashboard.html"><i class="fas fa-palette"></i> Send Artwork <span class="aemc-badge" id="aemc-art-badge" hidden></span></a>
+                <button type="button" class="dash-btn" id="aemc-kit-btn"><i class="fas fa-gift"></i> Request Sample Kit</button>
+                <a class="dash-btn" href="/dashboards/leads.html"><i class="fas fa-table-columns"></i> Leads Board</a>
+                <a class="dash-btn" id="aemc-accounts-link" href="/dashboards/taneisha-crm.html" hidden><i class="fas fa-address-book"></i> My Accounts</a>
+                <a class="dash-btn" href="/dashboards/lead-scorecard.html"><i class="fas fa-trophy"></i> Scorecard</a>
+                <a class="dash-btn" href="/dashboards/commission-structure.html"><i class="fas fa-percent"></i> Commission Plan</a>
+            </div>
+
+            <!-- ZONE 1: Today / action queue -->
+            <div class="dash-card aemc-queue-card">
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title"><i class="fas fa-bolt"></i> Needs You Today</h2>
+                    <span class="aemc-queue-count" id="aemc-queue-count"></span>
+                </div>
+                <div id="aemc-queue" class="aemc-queue">
+                    <div class="dash-loading">Loading your action queue…</div>
+                </div>
+            </div>
+
+            <!-- ZONE 3: work panels -->
+            <div class="aemc-panels">
+                <div class="dash-card">
+                    <div class="dash-card-header">
+                        <h2 class="dash-card-title"><i class="fas fa-user-plus"></i> My Leads</h2>
+                        <a class="aemc-viewall" href="/dashboards/leads.html">View all</a>
+                    </div>
+                    <div id="panel-leads"><div class="dash-loading">Loading…</div></div>
+                </div>
+                <div class="dash-card">
+                    <div class="dash-card-header">
+                        <h2 class="dash-card-title"><i class="fas fa-file-invoice-dollar"></i> My Quotes</h2>
+                        <a class="aemc-viewall" href="/dashboards/quote-management.html">View all</a>
+                    </div>
+                    <div id="panel-quotes"><div class="dash-loading">Loading…</div></div>
+                </div>
+                <div class="dash-card">
+                    <div class="dash-card-header">
+                        <h2 class="dash-card-title"><i class="fas fa-palette"></i> My Art Requests</h2>
+                        <a class="aemc-viewall" href="/dashboards/ae-dashboard.html">View all</a>
+                    </div>
+                    <div id="panel-art"><div class="dash-loading">Loading…</div></div>
+                </div>
+                <div class="dash-card">
+                    <div class="dash-card-header">
+                        <h2 class="dash-card-title"><i class="fas fa-box"></i> My Recent Orders <span class="aemc-sub" id="panel-orders-sub"></span></h2>
+                        <a class="aemc-viewall" id="aemc-orders-viewall" href="/dashboards/quote-management.html">View all</a>
+                    </div>
+                    <div id="panel-orders"><div class="dash-loading">Loading…</div></div>
+                </div>
+            </div>
+
+            <!-- ZONE 5: SanMar inbound -->
+            <div class="dash-card aemc-inbound-card">
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title"><i class="fas fa-truck-fast"></i> SanMar Arriving Today <span class="aemc-sub" id="aemc-inbound-sub"></span></h2>
+                    <button type="button" class="dash-btn" id="aemc-inbound-open"><i class="fas fa-up-right-from-square"></i> Full view</button>
+                </div>
+                <div id="aemc-inbound" class="aemc-inbound"><div class="dash-loading">Checking today's inbound…</div></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Sample-kit request modal (standalone — any recipient, optionally no lead) -->
+    <div class="aemc-overlay" id="aemc-kit-overlay" hidden></div>
+    <div class="aemc-modal" id="aemc-kit-modal" role="dialog" aria-modal="true" aria-labelledby="aemc-kit-title" hidden>
+        <div class="aemc-modal-head">
+            <h2 class="aemc-modal-title" id="aemc-kit-title"><i class="fas fa-gift"></i> Request a sample / marketing kit</h2>
+            <button type="button" class="aemc-modal-close" id="aemc-kit-close" aria-label="Close"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="aemc-modal-body">
+            <p class="aemc-hint">Goes straight to Mikalah's shipping queue. Pick the contents, tell us where it goes.</p>
+            <div class="aemc-field-label">What to send</div>
+            <div id="aemc-kit-items" class="aemc-kit-items"><span class="aemc-muted">Loading kit items…</span></div>
+            <div class="aemc-grid2">
+                <div class="aemc-field"><label class="aemc-field-label" for="aemc-kit-recipient">Recipient</label><input id="aemc-kit-recipient" type="text" autocomplete="off"></div>
+                <div class="aemc-field"><label class="aemc-field-label" for="aemc-kit-company">Company</label><input id="aemc-kit-company" type="text" autocomplete="off"></div>
+            </div>
+            <div class="aemc-field"><label class="aemc-field-label" for="aemc-kit-addr1">Street address *</label><input id="aemc-kit-addr1" type="text" autocomplete="off"></div>
+            <div class="aemc-field"><label class="aemc-field-label" for="aemc-kit-addr2">Suite / unit</label><input id="aemc-kit-addr2" type="text" autocomplete="off"></div>
+            <div class="aemc-grid3">
+                <div class="aemc-field"><label class="aemc-field-label" for="aemc-kit-city">City *</label><input id="aemc-kit-city" type="text"></div>
+                <div class="aemc-field"><label class="aemc-field-label" for="aemc-kit-state">State *</label><input id="aemc-kit-state" type="text" maxlength="20"></div>
+                <div class="aemc-field"><label class="aemc-field-label" for="aemc-kit-zip">ZIP *</label><input id="aemc-kit-zip" type="text" maxlength="20"></div>
+            </div>
+            <div class="aemc-grid2">
+                <div class="aemc-field"><label class="aemc-field-label" for="aemc-kit-phone">Phone</label><input id="aemc-kit-phone" type="tel"></div>
+                <div class="aemc-field"><label class="aemc-field-label" for="aemc-kit-email">Email</label><input id="aemc-kit-email" type="email"></div>
+            </div>
+            <div class="aemc-field"><label class="aemc-field-label" for="aemc-kit-notes">Notes for shipping</label><textarea id="aemc-kit-notes" rows="2"></textarea></div>
+            <div class="aemc-modal-actions">
+                <button type="button" id="aemc-kit-send" class="dash-btn dash-btn--primary"><i class="fas fa-paper-plane"></i> Send to shipping</button>
+                <span id="aemc-kit-status" class="aemc-muted"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- One-click outreach modal (server-built templates, per lead) -->
+    <div class="aemc-overlay" id="aemc-outreach-overlay" hidden></div>
+    <div class="aemc-modal" id="aemc-outreach-modal" role="dialog" aria-modal="true" aria-labelledby="aemc-outreach-title" hidden>
+        <div class="aemc-modal-head">
+            <h2 class="aemc-modal-title" id="aemc-outreach-title"><i class="fas fa-envelope"></i> Email this lead</h2>
+            <button type="button" class="aemc-modal-close" id="aemc-outreach-close" aria-label="Close"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="aemc-modal-body">
+            <div class="aemc-outreach-lead" id="aemc-outreach-lead"></div>
+            <div class="aemc-outreach-btns" id="aemc-outreach-btns"></div>
+            <div id="aemc-outreach-preview"></div>
+        </div>
+    </div>
+
+    <!-- Load order matters: APP_CONFIG → fetch-timeout → DashPage → inbound modal → page controller -->
+    <script src="/config/app.config.js"></script>
+    <script src="/shared_components/js/fetch-timeout.js"></script>
+    <script src="/shared_components/js/dash-page-helpers.js"></script>
+    <script src="/dashboards/js/sanmar-inbound-today.js?v=2026.07.19.1"></script>
+    <script src="/tests/ui/test-ae-mission-control-stub.js"></script>
+    <script src="/dashboards/js/ae-mission-control.js?v=2026.07.19.1"></script>
+</body>
+</html>
