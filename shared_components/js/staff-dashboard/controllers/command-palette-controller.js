@@ -243,19 +243,25 @@ function openPalette() {
     state.open = true;
     state.registry = null; // re-harvest — My Stuff pins may have changed
     document.getElementById('cp-backdrop').hidden = false;
-    document.getElementById('command-palette').hidden = false;
+    document.getElementById('cpPanel').hidden = false;
     const input = document.getElementById('cpInput');
-    input.value = '';
-    state.q = ''; state.backend = null; state.sel = 0;
+    input.setAttribute('aria-expanded', 'true');
+    state.sel = 0;
     render();
-    input.focus();
+    // Persistent hero bar: focus it unless the focus event is what opened us.
+    if (document.activeElement !== input) input.focus();
 }
 
 function closePalette() {
     if (!state.open) return;
     state.open = false;
     document.getElementById('cp-backdrop').hidden = true;
-    document.getElementById('command-palette').hidden = true;
+    document.getElementById('cpPanel').hidden = true;
+    const input = document.getElementById('cpInput');
+    input.setAttribute('aria-expanded', 'false');
+    input.value = '';
+    state.q = ''; state.backend = null; state.sel = 0;
+    input.blur();
 }
 
 function activate(i) {
@@ -280,6 +286,10 @@ export function initCommandPalette() {
     events.register('palette:pick', (el) => activate(parseInt(el.dataset.idx, 10)));
 
     document.getElementById('cp-backdrop')?.addEventListener('click', closePalette);
+
+    // Persistent hero bar: focusing it opens the results panel. (No blur→close
+    // handler on purpose — that would fire before a result click registers.)
+    input.addEventListener('focus', () => openPalette());
 
     input.addEventListener('input', () => {
         state.q = input.value.trim();

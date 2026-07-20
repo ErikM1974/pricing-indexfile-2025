@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>TEST — Phase 1 Widgets (Win Bell · Pride Wall · My Stuff)</title>
+    <title>TEST — Phase 1+2 Widgets (Win Bell · Pride Wall · My Stuff · Hero Search · Goal Chip)</title>
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/tokens.css">
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css">
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/phase1-widgets.css">
@@ -15,7 +15,39 @@
 </head>
 <body>
     <main class="t-wrap">
-        <h1 class="t-title">Phase 1 widget harness — mocked data, real controllers</h1>
+        <h1 class="t-title">Phase 1+2 widget harness — mocked data, real controllers</h1>
+
+        <!-- Mini header so the goal chip renders in a .header-right context -->
+        <header class="top-header t-header">
+            <div class="header-left"><span class="t-brand">Staff Dashboard</span></div>
+            <div class="header-right">
+                <a href="#" class="goal-chip sales-goal-banner" title="2026 sales goal" aria-label="2026 sales goal">
+                    <i class="fas fa-bullseye goal-chip__icon" aria-hidden="true"></i>
+                    <span class="goal-chip__pct"><span id="goalPercent">47</span>%</span>
+                    <span class="goal-chip__track"><span class="goal-chip__fill" id="goalProgress" style="width: 47%"></span></span>
+                    <span class="goal-chip__amt"><span id="goalCurrent">$1,410,311</span> <span class="goal-chip__of">/ $3M</span></span>
+                </a>
+                <button type="button" class="t-fakebtn">Team</button>
+            </div>
+        </header>
+
+        <!-- Hero Search (Phase 2 re-anchored) -->
+        <div class="cp-backdrop" id="cp-backdrop" hidden></div>
+        <section class="hero-search-wrap" aria-label="Search anything">
+            <div class="hero-search" id="heroSearch">
+                <i class="fas fa-magnifying-glass hero-search__icon" aria-hidden="true"></i>
+                <input type="text" id="cpInput" class="hero-search__input"
+                       placeholder="Search a customer, order #, quote, design #, or any tool…"
+                       autocomplete="off" spellcheck="false" aria-label="Search anything"
+                       role="combobox" aria-expanded="false" aria-controls="cpResults">
+                <kbd class="hero-search__kbd">Ctrl K</kbd>
+            </div>
+            <div class="cp-panel" id="cpPanel" hidden>
+                <div class="cp-results" id="cpResults" role="listbox" aria-label="Search results"></div>
+                <div class="cp-status" id="cpStatus"></div>
+            </div>
+            <div class="cp-toast" id="cpToast" role="status"></div>
+        </section>
 
         <!-- Win Bell -->
         <section class="wb-strip" id="winBellStrip" aria-label="Live wins ticker" hidden>
@@ -38,27 +70,11 @@
             <div class="pinned-row__list" id="myStuffList"></div>
         </div>
 
-        <!-- sales-goal stand-in so the milestone check has a DOM target -->
-        <p class="t-note">goal: <span id="goalPercent">47</span>% · dummy tools:
+        <p class="t-note">dummy tools for local search:
             <a href="/calculators/quick-quote/" class="tool-btn"><i class="fas fa-bolt" aria-hidden="true"></i> Quick Quote</a>
             <a href="/dashboards/production-shifts.html" class="tool-btn"><i class="fas fa-user-clock" aria-hidden="true"></i> Production Shifts</a>
-            <button type="button" class="cp-trigger" data-action="palette:open"><i class="fas fa-magnifying-glass" aria-hidden="true"></i> <span class="cp-trigger-label">Search anything</span> <kbd>Ctrl K</kbd></button>
         </p>
     </main>
-
-    <!-- Command palette (Phase 2) -->
-    <div class="cp-backdrop" id="cp-backdrop" hidden></div>
-    <div class="cp-dialog" id="command-palette" role="dialog" aria-modal="true" aria-label="Search anything" hidden>
-        <div class="cp-inputrow">
-            <span class="cp-caret" aria-hidden="true">›</span>
-            <input type="text" id="cpInput" placeholder="Customer, order #, quote, design #, or any tool…"
-                   autocomplete="off" spellcheck="false" aria-label="Search anything">
-            <button type="button" class="cp-esc" data-action="palette:close">esc</button>
-        </div>
-        <div class="cp-results" id="cpResults" role="listbox" aria-label="Search results"></div>
-        <div class="cp-status" id="cpStatus"></div>
-        <div class="cp-toast" id="cpToast" role="status"></div>
-    </div>
     <script type="module" src="/tests/ui/test-phase1-widgets.js"></script>
 </body>
 </html>

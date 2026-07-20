@@ -230,6 +230,79 @@ a.wb-event:hover .wb-event-text {
     .pw-tile img { transition: none; }
 }
 
+/* ── 2026 GOAL CHIP (header, replaces the big banner 2026-07-20) ──
+   The chip keeps the .sales-goal-banner class + #goal* IDs so
+   sales-goal-controller drives it unchanged. These selectors are
+   scoped to .header-right so they out-specify the big-banner rules
+   in components/theme/patch-2 (which match bare .sales-goal-banner). */
+
+.header-right .goal-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 34px;
+    padding: 0 12px;
+    margin: 0;
+    background: var(--surface-card);
+    border: 1px solid var(--border-base);
+    border-radius: var(--radius-pill);
+    color: var(--text-soft);
+    font-size: var(--font-size-sm);
+    text-decoration: none;
+    white-space: nowrap;
+    box-shadow: none;
+    overflow: visible;
+    min-height: 0;
+    transition: border-color 0.15s ease;
+}
+
+.header-right .goal-chip:hover { border-color: var(--accent); }
+
+/* kill the big banner's glow pseudo-element */
+.header-right .goal-chip::before { content: none; }
+
+.goal-chip__icon { color: var(--accent); font-size: 13px; }
+
+.goal-chip__pct {
+    font-family: var(--font-mono);
+    font-weight: var(--font-weight-semibold);
+    color: var(--good);
+    font-variant-numeric: tabular-nums;
+}
+
+.goal-chip__track {
+    width: 46px;
+    height: 5px;
+    flex-shrink: 0;
+    background: var(--border-base);
+    border-radius: 99px;
+    overflow: hidden;
+}
+
+.goal-chip__fill {
+    display: block;
+    height: 100%;
+    background: var(--good);
+    border-radius: 99px;
+    transition: width 0.6s ease;
+}
+
+.goal-chip__amt {
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.goal-chip__of { color: var(--text-faint); }
+
+/* while YTD is loading (controller drops .is-loading when it lands) */
+.header-right .goal-chip.is-loading .goal-chip__pct,
+.header-right .goal-chip.is-loading .goal-chip__track { display: none; }
+.header-right .goal-chip.is-loading .goal-chip__amt { font-style: italic; color: var(--text-faint); }
+
+@media (max-width: 980px) {
+    .goal-chip__amt { display: none; }
+}
+
 /* ── MY STUFF ───────────────────────────────────────── */
 
 .ms-hint {

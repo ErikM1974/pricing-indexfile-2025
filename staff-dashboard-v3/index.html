@@ -37,9 +37,9 @@
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=2026.06.24.8">
     <!-- Phase 1 "alive + personal" widgets (2026-07-20): Win Bell ticker,
          Pride Wall photo strip, My Stuff pinned/recent tools row. -->
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/phase1-widgets.css?v=2026.07.20.4">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/phase1-widgets.css?v=2026.07.20.7">
     <!-- Phase 2 (2026-07-20): Ctrl+K command palette — the Everything Bar. -->
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/command-palette.css?v=2026.07.20.4">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/command-palette.css?v=2026.07.20.7">
 
     <!-- Caspio CSS isolation (must load BEFORE the Caspio embed script in body).
          Sets up a MutationObserver that disables any stylesheets Caspio's embed
@@ -254,12 +254,18 @@
                 </div>
                 <div class="header-right">
 
-                    <!-- Ctrl+K Everything Bar trigger (Phase 2, 2026-07-20) -->
-                    <button type="button" class="cp-trigger" data-action="palette:open" aria-haspopup="dialog" aria-controls="command-palette" title="Search anything — customers, orders, quotes, designs, tools">
-                        <i class="fas fa-magnifying-glass" aria-hidden="true"></i>
-                        <span class="cp-trigger-label">Search anything</span>
-                        <kbd>Ctrl K</kbd>
-                    </button>
+                    <!-- Compact 2026 goal chip (2026-07-20 — moved out of the big banner
+                         so it's always visible and never covered by search results).
+                         Keeps .sales-goal-banner + is-loading + the #goal* IDs so
+                         sales-goal-controller drives it UNCHANGED; only restyled. -->
+                    <a href="/staff-dashboard.html" class="goal-chip sales-goal-banner is-loading" title="2026 sales goal — click to refresh" aria-label="2026 sales goal">
+                        <i class="fas fa-bullseye goal-chip__icon" aria-hidden="true"></i>
+                        <span class="goal-chip__pct"><span id="goalPercent">0</span>%</span>
+                        <span class="goal-chip__track" role="progressbar" aria-label="Progress to annual goal" aria-valuemin="0" aria-valuemax="100">
+                            <span class="goal-chip__fill" id="goalProgress" style="width: 0%"></span>
+                        </span>
+                        <span class="goal-chip__amt"><span id="goalCurrent">Loading…</span> <span class="goal-chip__of">/ $3M</span></span>
+                    </a>
 
                     <!-- Phase 4.5: Combined Team widget (replaces 3-pill cluster) -->
                     <div class="team-widget">
@@ -300,29 +306,28 @@
             <div id="partialDataWarning" class="partial-data-warning is-hidden"></div>
 
             <!-- ===================================================
-                 SALES GOAL BANNER (simplified 2026-05-13 per Erik's request)
-                 Just the headline: 2026 Goal · $3.0M · progress · YTD · (%).
-                 Pace/days-left/projected-EOY spans removed — too much info
-                 for a single glance. Numbers still computed by the controller;
-                 just not rendered. JS keeps null-safe access so nothing breaks.
+                 HERO SEARCH — the "Everything Bar" (2026-07-20)
+                 Replaces the big sales-goal banner as the top moment. Search is
+                 the front door; the goal moved to a compact header chip above.
+                 The results panel is ANCHORED here and drops DOWNWARD, so it can
+                 never cover the goal or header again. #cpInput is the same input
+                 the command-palette controller drives; Ctrl+K focuses it.
                  =================================================== -->
-            <!-- Banner ships with .is-loading so it never flashes the "—" + "(—%)"
-                 broken-looking state. Controller removes the class when YTD lands. -->
-            <section class="sales-goal-banner is-loading" aria-label="2026 sales goal">
-                <div class="sales-goal-row">
-                    <span class="sales-goal-icon" aria-hidden="true"><i class="fas fa-bullseye"></i></span>
-                    <span class="sales-goal-label">2026 Goal</span>
-                    <span class="sales-goal-amount">$3.0M</span>
-
-                    <div class="sales-goal-progress" role="progressbar" aria-label="Progress to annual goal" aria-valuemin="0" aria-valuemax="100">
-                        <div class="progress-fill" id="goalProgress" style="width: 0%"></div>
-                    </div>
-
-                    <!-- Initial copy matches the .is-loading state so there's no
-                         flash of "$0" before the controller renders "Loading YTD…". -->
-                    <span class="sales-goal-current" id="goalCurrent">Loading YTD…</span>
-                    <span class="sales-goal-percent">(<span id="goalPercent">0</span>%)</span>
+            <div class="cp-backdrop" id="cp-backdrop" hidden></div>
+            <section class="hero-search-wrap" aria-label="Search anything">
+                <div class="hero-search" id="heroSearch">
+                    <i class="fas fa-magnifying-glass hero-search__icon" aria-hidden="true"></i>
+                    <input type="text" id="cpInput" class="hero-search__input"
+                           placeholder="Search a customer, order #, quote, design #, or any tool…"
+                           autocomplete="off" spellcheck="false" aria-label="Search anything"
+                           role="combobox" aria-expanded="false" aria-controls="cpResults">
+                    <kbd class="hero-search__kbd">Ctrl K</kbd>
                 </div>
+                <div class="cp-panel" id="cpPanel" hidden>
+                    <div class="cp-results" id="cpResults" role="listbox" aria-label="Search results"></div>
+                    <div class="cp-status" id="cpStatus"></div>
+                </div>
+                <div class="cp-toast" id="cpToast" role="status"></div>
             </section>
 
             <!-- Win Bell (2026-07-20 Phase 1) — live ticker: new paid web
@@ -899,23 +904,9 @@
     </div>
     <script src="/staff-dashboard-v3/quote-launcher.js?v=2026.07.07.4" defer></script>
 
-    <!-- ============ Ctrl+K Command Palette (Phase 2, 2026-07-20) ============
-         One box that finds anything: tools (harvested from this page's DOM),
-         customers, ShopWorks orders, quotes, designs (backend fan-out search).
-         Behavior: command-palette-controller.js (imported by dashboard-app). -->
-    <div class="cp-backdrop" id="cp-backdrop" hidden></div>
-    <div class="cp-dialog" id="command-palette" role="dialog" aria-modal="true" aria-label="Search anything" hidden>
-        <div class="cp-inputrow">
-            <span class="cp-caret" aria-hidden="true">›</span>
-            <input type="text" id="cpInput" placeholder="Customer, order #, quote, design #, or any tool…"
-                   autocomplete="off" spellcheck="false" aria-label="Search anything" role="combobox"
-                   aria-expanded="true" aria-controls="cpResults">
-            <button type="button" class="cp-esc" data-action="palette:close">esc</button>
-        </div>
-        <div class="cp-results" id="cpResults" role="listbox" aria-label="Search results"></div>
-        <div class="cp-status" id="cpStatus"></div>
-        <div class="cp-toast" id="cpToast" role="status"></div>
-    </div>
+    <!-- Command palette markup moved UP into the hero search bar (2026-07-20).
+         #cpInput / #cpPanel / #cpResults / #cpStatus / #cpToast + #cp-backdrop
+         now live in the .hero-search-wrap section near the top of <main>. -->
 
     <!-- Legacy production-schedule modules (no API calls, just static stats + predictor.
          Ported as plain script tags before the v3 module so production-controller.js
