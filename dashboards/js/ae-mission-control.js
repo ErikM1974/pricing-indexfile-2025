@@ -89,6 +89,75 @@
         return (m && PREFIX_BUILDER[m[1]]) || null;
     }
 
+    // ---------- progressive disclosure (keeps long cards short) ----------
+    // Render every item, but collapse rows past `visible` behind a "Show N
+    // more" toggle. renderItem(item, isHidden) must add the aemc-row--collapsed
+    // class to its <li> when isHidden is true. One delegated handler (wired in
+    // init) expands/collapses the list that precedes the clicked button.
+    function expandableRows(items, renderItem, opts) {
+        opts = opts || {};
+        var visible = opts.visible || 5;
+        var noun = opts.noun || 'row';
+        var lis = items.map(function (it, i) { return renderItem(it, i >= visible); }).join('');
+        var html = '<ul class="aemc-rows">' + lis + '</ul>';
+        if (items.length > visible) {
+            var more = items.length - visible;
+            html += '<button type="button" class="aemc-more-toggle" aria-expanded="false" data-more="' + more +
+                '" data-noun="' + esc(noun) + '"><i class="fas fa-chevron-down"></i> Show ' + more + ' more ' +
+                esc(noun) + (more === 1 ? '' : 's') + '</button>';
+        }
+        return html;
+    }
+
+    function wireExpandToggles() {
+        document.addEventListener('click', function (e) {
+            var btn = e.target.closest('.aemc-more-toggle');
+            if (!btn) return;
+            var ul = btn.previousElementSibling;
+            while (ul && !(ul.classList && ul.classList.contains('aemc-rows'))) ul = ul.previousElementSibling;
+            if (!ul) return;
+            var expanded = ul.classList.toggle('is-expanded');
+            btn.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+            if (expanded) {
+                btn.innerHTML = '<i class="fas fa-chevron-up"></i> Show less';
+            } else {
+                var n = btn.getAttribute('data-more'), noun = btn.getAttribute('data-noun') || 'row';
+                btn.innerHTML = '<i class="fas fa-chevron-down"></i> Show ' + n + ' more ' + noun + (n === '1' ? '' : 's');
+            }
+        });
+    }
+
+    // ---------- whole-card collapse (declutter the page) ----------
+    // Secondary cards marked .aemc-collapsible collapse to just their header
+    // (title + summary count) on header click. State persists per-card in
+    // localStorage so each rep keeps the layout they like. The action queue and
+    // KPI zones are never collapsible.
+    function wireCardCollapse() {
+        var KEY = 'aemcCollapsed';
+        var state_ = {};
+        try { state_ = JSON.parse(localStorage.getItem(KEY) || '{}') || {}; } catch (e) { state_ = {}; }
+        Array.prototype.forEach.call(document.querySelectorAll('.dash-card.aemc-collapsible'), function (card) {
+            var header = card.querySelector(':scope > .dash-card-header');
+            if (header && !header.querySelector('.aemc-collapse-caret')) {
+                var caret = document.createElement('i');
+                caret.className = 'fas fa-chevron-up aemc-collapse-caret';
+                caret.setAttribute('aria-hidden', 'true');
+                header.appendChild(caret);
+            }
+            var key = card.getAttribute('data-collapse-key');
+            if (key && state_[key]) card.classList.add('is-collapsed');
+        });
+        document.addEventListener('click', function (e) {
+            if (e.target.closest('a, button, input, select, textarea')) return; // let controls act
+            var header = e.target.closest('.dash-card.aemc-collapsible > .dash-card-header');
+            if (!header) return;
+            var card = header.parentElement;
+            var collapsed = card.classList.toggle('is-collapsed');
+            var key = card.getAttribute('data-collapse-key');
+            if (key) { state_[key] = collapsed; try { localStorage.setItem(KEY, JSON.stringify(state_)); } catch (e2) { /* private mode */ } }
+        });
+    }
+
     // ---------- boot ----------
     document.addEventListener('DOMContentLoaded', init);
 
@@ -108,6 +177,8 @@
             }
             wireHeader();
             wireKitModal();
+            wireExpandToggles();
+            wireCardCollapse();
             loadSummary(false);
             loadInbound();
             pollArtNotifications();
@@ -450,25 +521,28 @@
                 el('aemc-purch').innerHTML = '<div class="aemc-empty">No purchase requests sent to Bradley in the last ' + p.windowDays + ' days.</div>';
                 return;
             }
-            el('aemc-purch').innerHTML = '<ul class="aemc-rows">' + p.items.map(function (m) {
-                return (m.orders || []).map(function (o) {
-                    var meta = [];
-                    if (o.orderedDate) meta.push('ordered ' + fmtWhen(o.orderedDate) + (o.vendors && o.vendors.length ? ' (' + o.vendors.join(', ') + ')' : ''));
-                    if (o.receivedDate) meta.push('received ' + fmtWhen(o.receivedDate));
-                    if (!o.orderedDate && m.submittedAt) meta.push('sent ' + fmtWhen(m.submittedAt));
-                    if (m.bradleyPo) meta.push('PO# ' + m.bradleyPo);
-                    // SanMar invoice button — same shared viewer as the Purchasing Portal.
-                    var invBtn = (o.sanmarPos && o.sanmarPos.length)
-                        ? '<button type="button" class="aemc-mini-btn aemc-inv-btn" data-wo="' + esc(o.orderNumber) + '" data-company="' + esc(o.company || '') + '" data-pos="' + esc(o.sanmarPos.join(',')) + '" data-ordered="' + esc(o.orderedDate || '') + '"><i class="fas fa-file-invoice-dollar"></i> Invoice</button>'
-                        : '';
-                    return '<li class="aemc-row">' +
-                        '<span class="aemc-row-main">WO #' + esc(o.orderNumber) + (o.company ? ' — ' + esc(o.company) : '') + '</span>' +
-                        '<span class="aemc-purch-chip aemc-purch--' + esc(o.status) + '">' + esc(PURCH_LABEL[o.status] || o.status) + '</span>' +
-                        invBtn +
-                        '<span class="aemc-row-right"><span class="aemc-row-meta">' + esc(meta.join(' · ')) + '</span></span>' +
-                        '</li>';
-                }).join('');
-            }).join('') + '</ul>' +
+            var purchRows = [];
+            (p.items || []).forEach(function (m) {
+                (m.orders || []).forEach(function (o) { purchRows.push({ m: m, o: o }); });
+            });
+            el('aemc-purch').innerHTML = expandableRows(purchRows, function (r, hidden) {
+                var m = r.m, o = r.o;
+                var meta = [];
+                if (o.orderedDate) meta.push('ordered ' + fmtWhen(o.orderedDate) + (o.vendors && o.vendors.length ? ' (' + o.vendors.join(', ') + ')' : ''));
+                if (o.receivedDate) meta.push('received ' + fmtWhen(o.receivedDate));
+                if (!o.orderedDate && m.submittedAt) meta.push('sent ' + fmtWhen(m.submittedAt));
+                if (m.bradleyPo) meta.push('PO# ' + m.bradleyPo);
+                // SanMar invoice button — same shared viewer as the Purchasing Portal.
+                var invBtn = (o.sanmarPos && o.sanmarPos.length)
+                    ? '<button type="button" class="aemc-mini-btn aemc-inv-btn" data-wo="' + esc(o.orderNumber) + '" data-company="' + esc(o.company || '') + '" data-pos="' + esc(o.sanmarPos.join(',')) + '" data-ordered="' + esc(o.orderedDate || '') + '"><i class="fas fa-file-invoice-dollar"></i> Invoice</button>'
+                    : '';
+                return '<li class="aemc-row' + (hidden ? ' aemc-row--collapsed' : '') + '">' +
+                    '<span class="aemc-row-main">WO #' + esc(o.orderNumber) + (o.company ? ' — ' + esc(o.company) : '') + '</span>' +
+                    '<span class="aemc-purch-chip aemc-purch--' + esc(o.status) + '">' + esc(PURCH_LABEL[o.status] || o.status) + '</span>' +
+                    invBtn +
+                    '<span class="aemc-row-right"><span class="aemc-row-meta">' + esc(meta.join(' · ')) + '</span></span>' +
+                    '</li>';
+            }, { noun: 'request' }) +
                 (p.truncated ? '<p class="aemc-hint">…and ' + p.truncated + ' older request' + (p.truncated === 1 ? '' : 's') + ' in the form inbox.</p>' : '');
             Array.prototype.forEach.call(el('aemc-purch').querySelectorAll('.aemc-inv-btn'), function (btn) {
                 btn.addEventListener('click', function () {
@@ -492,7 +566,7 @@
     // blanks status → the purchasing chip class that carries the same meaning
     var DUE_BLANKS_CHIP = { none: 'sent', ordered: 'ordered', partial: 'partial', received: 'received' };
 
-    function dueRow(o) {
+    function dueRow(o, hidden) {
         var flagText = o.flag === 'late'
             ? 'Late ' + Math.abs(o.daysUntilDue) + 'd'
             : (o.daysUntilDue === 0 ? 'Due TODAY' : 'Due in ' + o.daysUntilDue + 'd');
@@ -500,7 +574,7 @@
         if (o.vendors && o.vendors.length) meta.push(o.vendors.join(', '));
         if (o.subtotal) meta.push(money0(o.subtotal));
         if (o.invoiced) meta.push('invoiced');
-        return '<li class="aemc-row">' +
+        return '<li class="aemc-row' + (hidden ? ' aemc-row--collapsed' : '') + '">' +
             '<span class="aemc-row-main">WO #' + esc(o.idOrder) + (o.company ? ' — ' + esc(o.company) : '') + '</span>' +
             '<span class="aemc-due-flag aemc-due-flag--' + (o.flag === 'late' ? 'late' : 'risk') + '">' + esc(flagText) + '</span>' +
             '<span class="aemc-purch-chip aemc-purch--' + esc(DUE_BLANKS_CHIP[o.blanks] || 'sent') + '">' + esc(DUE_BLANKS_LABEL[o.blanks] || o.blanks) + '</span>' +
@@ -524,13 +598,13 @@
             }
             var html = '';
             if ((d.late || []).length) {
-                html += '<h3 class="aemc-queue-section-title">🔴 Past due — not shipped</h3><ul class="aemc-rows">' +
-                    d.late.map(dueRow).join('') + '</ul>' +
+                html += '<h3 class="aemc-queue-section-title">🔴 Past due — not shipped</h3>' +
+                    expandableRows(d.late, dueRow, { noun: 'order' }) +
                     (d.lateTruncated ? '<p class="aemc-hint">…and ' + d.lateTruncated + ' more past-due order' + (d.lateTruncated === 1 ? '' : 's') + '.</p>' : '');
             }
             if ((d.atRisk || []).length) {
-                html += '<h3 class="aemc-queue-section-title">🟠 Due soon — blanks not in house</h3><ul class="aemc-rows">' +
-                    d.atRisk.map(dueRow).join('') + '</ul>' +
+                html += '<h3 class="aemc-queue-section-title">🟠 Due soon — blanks not in house</h3>' +
+                    expandableRows(d.atRisk, dueRow, { noun: 'order' }) +
                     (d.atRiskTruncated ? '<p class="aemc-hint">…and ' + d.atRiskTruncated + ' more at-risk order' + (d.atRiskTruncated === 1 ? '' : 's') + '.</p>' : '');
             }
             if (c.dueSoonOnTrack) {
@@ -556,17 +630,17 @@
                 el('aemc-growth').innerHTML = '<div class="aemc-empty">Nothing overdue against its own rhythm right now — every active account is on schedule. Check back tomorrow.</div>';
                 return;
             }
-            el('aemc-growth').innerHTML = '<ul class="aemc-rows">' + g.items.map(function (it) {
+            el('aemc-growth').innerHTML = expandableRows(g.items, function (it, hidden) {
                 var chips = (it.reasons || []).map(function (r) {
                     return '<span class="aemc-growth-reason aemc-growth-reason--' + esc(r.type) + '">' + esc(r.text) + '</span>';
                 }).join(' ');
-                return '<li class="aemc-row">' +
+                return '<li class="aemc-row' + (hidden ? ' aemc-row--collapsed' : '') + '">' +
                     '<span class="aemc-row-main">' + esc(it.company) + '</span>' +
                     chips +
                     '<span class="aemc-row-right"><span class="aemc-money aemc-growth-total">~' + money0(it.estValue) + '</span><br>' +
                     '<span class="aemc-row-meta">last order ' + fmtWhen(it.lastOrderDate) + ' · avg ' + money0(it.avgOrderValue) + '</span></span>' +
                     '</li>';
-            }).join('') + '</ul>' +
+            }, { noun: 'account' }) +
                 (g.truncated ? '<p class="aemc-hint">…and ' + g.truncated + ' more flagged — work these first, then refresh tomorrow.</p>' : '');
         }).catch(function (err) {
             el('aemc-growth').innerHTML = '<div class="aemc-panel-error">Growth radar failed to load (' + esc(err.message) + '). Refresh to retry.</div>';
@@ -589,33 +663,30 @@
                   (c.customersFlagged || 0) + ' customer' + (c.customersFlagged === 1 ? '' : 's') + ' need attention)'
                 : '';
             if (!(d.orders || []).length && !(d.customers || []).length) {
-                el('aemc-dq').innerHTML = '<div class="aemc-empty">Clean sweep — every order you entered in the last ' +
+                el('aemc-dq').innerHTML = '<div class="aemc-empty">Clean sweep — every open order you entered in the last ' +
                     (d.windowDays || 30) + ' days has contact, ship-to, terms, ship date, and tax filled in. Nice work.</div>';
                 return;
             }
             var html = '';
             if ((d.orders || []).length) {
-                html += '<h3 class="aemc-queue-section-title">Orders missing fields</h3><ul class="aemc-rows">' +
-                    d.orders.map(function (o) {
-                        var stage = o.shipped ? 'Shipped' : (o.invoiced ? 'Invoiced' : 'Open');
-                        return '<li class="aemc-row">' +
+                html += '<h3 class="aemc-queue-section-title">Orders missing fields</h3>' +
+                    expandableRows(d.orders, function (o, hidden) {
+                        return '<li class="aemc-row' + (hidden ? ' aemc-row--collapsed' : '') + '">' +
                             '<span class="aemc-row-main">WO #' + esc(o.idOrder) + (o.company ? ' — ' + esc(o.company) : '') + '</span>' +
                             dqChips(o.issues) +
-                            '<span class="aemc-row-right"><span class="aemc-row-meta">entered ' + fmtWhen(o.placedDate) + ' · ' + esc(stage) + '</span></span>' +
+                            '<span class="aemc-row-right"><span class="aemc-row-meta">entered ' + fmtWhen(o.placedDate) + '</span></span>' +
                             '</li>';
-                    }).join('') + '</ul>' +
-                    (d.ordersTruncated ? '<p class="aemc-hint">…and ' + d.ordersTruncated + ' more flagged order' + (d.ordersTruncated === 1 ? '' : 's') + '.</p>' : '');
+                    }, { noun: 'order' });
             }
             if ((d.customers || []).length) {
-                html += '<h3 class="aemc-queue-section-title">Customer records needing updates</h3><ul class="aemc-rows">' +
-                    d.customers.map(function (cu) {
-                        return '<li class="aemc-row">' +
+                html += '<h3 class="aemc-queue-section-title">Customer records needing updates</h3>' +
+                    expandableRows(d.customers, function (cu, hidden) {
+                        return '<li class="aemc-row' + (hidden ? ' aemc-row--collapsed' : '') + '">' +
                             '<span class="aemc-row-main">' + esc(cu.company) + '</span>' +
                             dqChips(cu.issues) +
                             '<span class="aemc-row-right"><span class="aemc-row-meta">Cust #' + esc(cu.idCustomer) + '</span></span>' +
                             '</li>';
-                    }).join('') + '</ul>' +
-                    (d.customersTruncated ? '<p class="aemc-hint">…and ' + d.customersTruncated + ' more customer' + (d.customersTruncated === 1 ? '' : 's') + '.</p>' : '');
+                    }, { noun: 'customer' });
             }
             el('aemc-dq').innerHTML = html;
         }).catch(function (err) {

@@ -285,6 +285,49 @@ a.aemc-row-main:hover { text-decoration: underline; }
 .aemc-dq-chip--err { background: #fdf0f0; color: #a12622; border: 1px solid #f0c4c2; }
 .aemc-dq-chip--warn { background: #fff8f0; color: #b85a00; border: 1px solid #f5d3ad; }
 
+/* ---------- progressive disclosure ("show N more") ---------- */
+.aemc-row--collapsed { display: none; }
+.aemc-rows.is-expanded .aemc-row--collapsed { display: flex; }
+.aemc-more-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: var(--space-2);
+    padding: 5px 12px;
+    border: 1px solid var(--gray-200);
+    border-radius: 999px;
+    background: var(--surface-inset);
+    color: var(--art-theme);
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+.aemc-more-toggle:hover { background: var(--surface-hover); border-color: var(--gray-300); }
+.aemc-more-toggle i { font-size: 0.7rem; }
+
+/* ---------- whole-card collapse (declutter) ---------- */
+.aemc-collapsible > .dash-card-header {
+    cursor: pointer;
+    user-select: none;
+    justify-content: flex-start;
+}
+.aemc-collapsible > .dash-card-header > .dash-card-title { margin-right: auto; }
+.aemc-collapse-caret {
+    color: var(--gray-400);
+    font-size: 0.8rem;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+}
+.aemc-collapsible > .dash-card-header:hover .aemc-collapse-caret { color: var(--gray-600); }
+.dash-card.is-collapsed .aemc-collapse-caret { transform: rotate(180deg); }
+.dash-card.is-collapsed > *:not(.dash-card-header) { display: none; }
+.dash-card.is-collapsed > .dash-card-header {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
 /* ---------- inbound card ---------- */
 .aemc-inbound-card { margin-bottom: var(--space-4); }
 .aemc-inbound { font-size: 0.9rem; color: var(--gray-600); }

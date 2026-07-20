@@ -165,28 +165,35 @@
             });
         }
         if (u.indexOf('/api/crm-proxy/ae-dashboard/data-quality') !== -1) {
+            // 7 orders + 6 customers so the "show 5 + expand" accordion triggers
+            // in both sections. All orders are OPEN/in-process (invoiced &
+            // webstore rows are filtered out server-side now — no stage field).
+            var o = function (id, cust, company, placedAgo, issues) {
+                return { idOrder: id, idCustomer: cust, company: company, placedDate: daysAgoDay(placedAgo),
+                    errCount: issues.filter(function (i) { return i.severity === 'err'; }).length, issues: issues };
+            };
+            var e = function (field, text) { return { field: field, severity: 'err', text: text }; };
+            var w = function (field, text) { return { field: field, severity: 'warn', text: text }; };
             return json({
                 rep: REP, generatedAt: new Date().toISOString(), windowDays: 30,
-                ordersScanned: 41, customersScanned: 28, cacheHit: false,
-                counts: { ordersFlagged: 3, customersFlagged: 2, orderErrors: 6 },
+                ordersScanned: 47, ordersExcluded: 78, customersScanned: 28, cacheHit: false,
+                counts: { ordersFlagged: 7, customersFlagged: 6, orderErrors: 12 },
                 orders: [
-                    { idOrder: 142510, idCustomer: 3310, company: 'Harbor Electric <script>alert(1)</script>', placedDate: daysAgoDay(1), requestedShipDate: '', invoiced: false, shipped: false, errCount: 3, issues: [
-                        { field: 'phone', severity: 'err', text: 'no contact phone' },
-                        { field: 'terms', severity: 'err', text: 'no payment terms' },
-                        { field: 'due-date', severity: 'err', text: 'no requested-ship date' }] },
-                    { idOrder: 142488, idCustomer: 5120, company: 'Korsmo Construction', placedDate: daysAgoDay(3), requestedShipDate: daysAgoDay(-10), invoiced: false, shipped: false, errCount: 2, issues: [
-                        { field: 'ship-address', severity: 'err', text: 'shipping charged but NO ship-to address' },
-                        { field: 'email', severity: 'err', text: 'no contact email' }] },
-                    { idOrder: 142371, idCustomer: 7881, company: 'Cintas', placedDate: daysAgoDay(9), requestedShipDate: daysAgoDay(-2), invoiced: true, shipped: true, errCount: 1, issues: [
-                        { field: 'tax', severity: 'err', text: 'taxable order but $0 sales tax (customer is not tax-exempt)' }] },
+                    o(142510, 3310, 'Harbor Electric <script>alert(1)</script>', 1, [e('phone', 'no contact phone'), e('terms', 'no payment terms'), e('due-date', 'no requested-ship date')]),
+                    o(142488, 5120, 'Korsmo Construction', 3, [e('ship-address', 'ship method "UPS Ground" chosen but NO ship-to address'), e('email', 'no contact email')]),
+                    o(142371, 7881, 'Cintas', 4, [e('tax', 'taxable order but $0 sales tax (customer is not tax-exempt)')]),
+                    o(142365, 6002, 'Puget Powerwash', 5, [e('last-name', 'no contact last name'), w('ship-address', 'no ship-to address (OK only if pickup)')]),
+                    o(142340, 6110, 'Sound Transit Crew', 6, [e('terms', 'no payment terms')]),
+                    o(142322, 6220, 'Tacoma Tug & Barge', 8, [e('phone', 'no contact phone')]),
+                    o(142301, 6330, 'CITC of Washington', 11, [e('terms', 'no payment terms'), e('phone', 'no contact phone')]),
                 ],
                 customers: [
-                    { idCustomer: 3310, company: 'Harbor Electric', errCount: 2, issues: [
-                        { field: 'customer-type', severity: 'err', text: 'customer type not set' },
-                        { field: 'phone', severity: 'err', text: 'no phone on the customer record' }] },
-                    { idCustomer: 5120, company: 'Korsmo Construction', errCount: 0, issues: [
-                        { field: 'terms', severity: 'warn', text: 'no default payment terms' },
-                        { field: 'address', severity: 'warn', text: 'address incomplete' }] },
+                    { idCustomer: 3310, company: 'Harbor Electric', errCount: 2, issues: [e('customer-type', 'customer type not set'), e('phone', 'no phone on the customer record')] },
+                    { idCustomer: 5120, company: 'Korsmo Construction', errCount: 0, issues: [w('terms', 'no default payment terms'), w('address', 'address incomplete')] },
+                    { idCustomer: 6002, company: 'Puget Powerwash', errCount: 1, issues: [e('customer-type', 'customer type not set')] },
+                    { idCustomer: 6110, company: 'Sound Transit Crew', errCount: 1, issues: [e('tax', 'marked tax-exempt but no exemption # on file')] },
+                    { idCustomer: 6220, company: 'Tacoma Tug & Barge', errCount: 0, issues: [w('address', 'address incomplete')] },
+                    { idCustomer: 6330, company: 'CITC of Washington', errCount: 1, issues: [e('phone', 'no phone on the customer record')] },
                 ],
                 ordersTruncated: 0, customersTruncated: 0,
             });
