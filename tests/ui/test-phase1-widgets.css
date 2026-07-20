@@ -1,0 +1,31 @@
+/* TEST HARNESS STYLES — test-phase1-widgets.html only. */
+body {
+    background: var(--surface-base, #10141a);
+    color: var(--text, #e8ede9);
+    font-family: var(--font-sans, system-ui, sans-serif);
+    margin: 0;
+}
+
+.t-wrap {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 28px 20px 60px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.t-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-muted, #90a297);
+}
+
+.t-note {
+    font-size: 13px;
+    color: var(--text-faint, #5c6d63);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}

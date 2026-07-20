@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-accent="green" data-density="comfy">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>TEST — Phase 1 Widgets (Win Bell · Pride Wall · My Stuff)</title>
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/tokens.css">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/phase1-widgets.css">
+    <link rel="stylesheet" href="/tests/ui/test-phase1-widgets.css">
+    <!-- Mock APP_CONFIG + fetch BEFORE any dashboard module loads -->
+    <script src="/tests/ui/test-phase1-widgets-mocks.js"></script>
+</head>
+<body>
+    <main class="t-wrap">
+        <h1 class="t-title">Phase 1 widget harness — mocked data, real controllers</h1>
+
+        <!-- Win Bell -->
+        <section class="wb-strip" id="winBellStrip" aria-label="Live wins ticker" hidden>
+            <span class="wb-bell" id="wbBell" aria-hidden="true">🔔</span>
+            <div class="wb-events" id="wbEvents" aria-live="polite"></div>
+        </section>
+
+        <!-- Pride Wall -->
+        <section class="pw-strip" id="prideWall" aria-label="Pride Wall — recent finished work" hidden>
+            <div class="pw-head">
+                <span class="pw-title">🖼️ Pride Wall — made by us, lately</span>
+                <a class="pw-link" href="/dashboards/finished-photos-library.html">Open the Photo Library →</a>
+            </div>
+            <div class="pw-track" id="pwTrack"></div>
+        </section>
+
+        <!-- My Stuff -->
+        <div class="pinned-row pinned-row--mystuff" id="myStuffRow">
+            <div class="pinned-row__label">📌 My Stuff</div>
+            <div class="pinned-row__list" id="myStuffList"></div>
+        </div>
+
+        <!-- sales-goal stand-in so the milestone check has a DOM target -->
+        <p class="t-note">goal: <span id="goalPercent">47</span>% · dummy tools:
+            <a href="/calculators/quick-quote/" class="tool-btn"><i class="fas fa-bolt" aria-hidden="true"></i> Quick Quote</a>
+            <a href="/dashboards/production-shifts.html" class="tool-btn"><i class="fas fa-user-clock" aria-hidden="true"></i> Production Shifts</a>
+        </p>
+    </main>
+    <script type="module" src="/tests/ui/test-phase1-widgets.js"></script>
+</body>
+</html>

@@ -20,6 +20,10 @@ import { initMetrics }         from '../controllers/metrics-controller.js';
 import { initTeamPerformance } from '../controllers/team-performance-controller.js';
 import { initProduction }      from '../controllers/production-controller.js';
 import { initGarmentTracker }  from '../controllers/garment-tracker-controller.js';
+// Phase 1 "alive + personal" widgets (2026-07-20)
+import { initWinBell }         from '../controllers/win-bell-controller.js';
+import { initPrideWall }       from '../controllers/pride-wall-controller.js';
+import { initMyStuff }         from '../controllers/my-stuff-controller.js';
 
 // Load custom elements (registers themselves on import)
 import '../widgets/dashboard-modal.js';
@@ -41,6 +45,7 @@ async function bootstrap() {
     initSalesGoal();
     initCelebrations();
     initProduction();        // renders from static stats — no network
+    initMyStuff();           // localStorage only — no network
 
     // Async controllers — fetches from caspio-pricing-proxy
     initOrdersInbox();       // quote_sessions last 7 days (paid web orders / accepted / push failures)
@@ -49,6 +54,8 @@ async function bootstrap() {
     initMetrics();           // ManageOrders revenue + sparkline + YoY
     initTeamPerformance();   // Caspio archive YTD per-rep
     initGarmentTracker();    // Caspio garment-tracker table (bridged to legacy service)
+    initWinBell();           // quote_sessions diff → live wins ticker + confetti
+    initPrideWall();         // finished-photos library → ambient photo strip
 
     await authPromise;
 

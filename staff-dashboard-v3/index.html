@@ -35,6 +35,9 @@
          [class*="..."] selectors were over-matching and damaging styles that
          components.css already had correct (garment-bonus, celebration pills, etc). -->
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=2026.06.24.8">
+    <!-- Phase 1 "alive + personal" widgets (2026-07-20): Win Bell ticker,
+         Pride Wall photo strip, My Stuff pinned/recent tools row. -->
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/phase1-widgets.css?v=2026.07.20.3">
 
     <!-- Caspio CSS isolation (must load BEFORE the Caspio embed script in body).
          Sets up a MutationObserver that disables any stylesheets Caspio's embed
@@ -310,6 +313,24 @@
                 </div>
             </section>
 
+            <!-- Win Bell (2026-07-20 Phase 1) — live ticker: new paid web
+                 orders, accepted quotes, goal milestones. Hidden until the
+                 controller has at least one event to show. -->
+            <section class="wb-strip" id="winBellStrip" aria-label="Live wins ticker" hidden>
+                <span class="wb-bell" id="wbBell" aria-hidden="true">🔔</span>
+                <div class="wb-events" id="wbEvents" aria-live="polite"></div>
+            </section>
+
+            <!-- Pride Wall (2026-07-20 Phase 1) — ambient rotation of recent
+                 finished-product photos from the company photo library. -->
+            <section class="pw-strip" id="prideWall" aria-label="Pride Wall — recent finished work" hidden>
+                <div class="pw-head">
+                    <span class="pw-title">🖼️ Pride Wall — made by us, lately</span>
+                    <a class="pw-link" href="/dashboards/finished-photos-library.html">Open the Photo Library →</a>
+                </div>
+                <div class="pw-track" id="pwTrack"></div>
+            </section>
+
             <!-- Dashboard zones -->
             <div class="dashboard-zones">
 
@@ -324,9 +345,16 @@
                         </h2>
                     </header>
 
+                    <!-- My Stuff (2026-07-20 Phase 1) — per-user pinned + recent
+                         tools, learned from clicks, stored in localStorage.
+                         Purely additive: the full grid below never changes. -->
+                    <div class="pinned-row pinned-row--mystuff" id="myStuffRow">
+                        <div class="pinned-row__label">📌 My Stuff</div>
+                        <div class="pinned-row__list" id="myStuffList"></div>
+                    </div>
+
                     <!-- Frequently Used Tools (ported from v2 staff-dashboard, 2026-05-13).
-                         Curated global list for now; per-user pinning is a Phase 2
-                         enhancement. The Transfer Workflow strip visually teaches the
+                         The Transfer Workflow strip visually teaches the
                          Bradley → Supa sequence to new staff. -->
                     <div class="pinned-row pinned-row--frequent">
                         <div class="pinned-row__label">⭐ Frequently Used</div>
@@ -882,6 +910,6 @@
     <!-- ===================================================
          APP ENTRY (ES module)
          =================================================== -->
-    <script type="module" src="/shared_components/js/staff-dashboard/core/dashboard-app.js?v=2026.07.06.11"></script>
+    <script type="module" src="/shared_components/js/staff-dashboard/core/dashboard-app.js?v=2026.07.20.3"></script>
 </body>
 </html>
