@@ -144,6 +144,8 @@
             render(data);
             loadGrowth();
             loadPurchasing();
+            loadDueDates();
+            loadDataQuality();
         }).catch(function (err) {
             DashPage.showError('Could not load your dashboard: ' + err.message + ' — refresh to retry.');
             el('aemc-greeting').textContent = 'Your data could not be loaded.';
@@ -172,6 +174,14 @@
         var acctLink = el('aemc-accounts-link');
         if (ACCOUNTS_PAGE[rep.email]) { acctLink.href = ACCOUNTS_PAGE[rep.email]; acctLink.hidden = false; }
         else acctLink.hidden = true;
+
+        // "My Finished Photos" → library pre-filtered to this rep's accounts.
+        // #hash, never ?x= (house rule); fullName matches Sales_Reps_2026.CustomerServiceRep.
+        var photosLink = el('aemc-photos-link');
+        if (photosLink) {
+            photosLink.href = '/dashboards/finished-photos-library.html' +
+                (rep.fullName ? '#rep=' + encodeURIComponent(rep.fullName) : '');
+        }
 
         renderKpis(data);
         renderQueue(data);
@@ -460,6 +470,65 @@
         });
     }
 
+    // ---------- order due dates (unshipped orders vs requested-ship date × blanks POs) ----------
+    var DUE_BLANKS_LABEL = {
+        none: 'Blanks not purchased', ordered: 'Blanks ordered',
+        partial: 'Partially received', received: 'Blanks received',
+    };
+    // blanks status → the purchasing chip class that carries the same meaning
+    var DUE_BLANKS_CHIP = { none: 'sent', ordered: 'ordered', partial: 'partial', received: 'received' };
+
+    function dueRow(o) {
+        var flagText = o.flag === 'late'
+            ? 'Late ' + Math.abs(o.daysUntilDue) + 'd'
+            : (o.daysUntilDue === 0 ? 'Due TODAY' : 'Due in ' + o.daysUntilDue + 'd');
+        var meta = ['due ' + fmtWhen(o.dueDate)];
+        if (o.vendors && o.vendors.length) meta.push(o.vendors.join(', '));
+        if (o.subtotal) meta.push(money0(o.subtotal));
+        if (o.invoiced) meta.push('invoiced');
+        return '<li class="aemc-row">' +
+            '<span class="aemc-row-main">WO #' + esc(o.idOrder) + (o.company ? ' — ' + esc(o.company) : '') + '</span>' +
+            '<span class="aemc-due-flag aemc-due-flag--' + (o.flag === 'late' ? 'late' : 'risk') + '">' + esc(flagText) + '</span>' +
+            '<span class="aemc-purch-chip aemc-purch--' + esc(DUE_BLANKS_CHIP[o.blanks] || 'sent') + '">' + esc(DUE_BLANKS_LABEL[o.blanks] || o.blanks) + '</span>' +
+            '<span class="aemc-row-right"><span class="aemc-row-meta">' + esc(meta.join(' · ')) + '</span></span>' +
+            '</li>';
+    }
+
+    function loadDueDates() {
+        var params = (state.isAdmin && state.viewAs) ? '?viewAs=' + encodeURIComponent(state.viewAs) : '';
+        sameOriginJson('/api/crm-proxy/ae-dashboard/due-dates' + params).then(function (d) {
+            var c = d.counts || {};
+            var bits = [];
+            if (c.late) bits.push(c.late + ' late');
+            if (c.atRisk) bits.push(c.atRisk + ' at risk');
+            el('aemc-due-sub').textContent = bits.length ? '(' + bits.join(' · ') + ')' : '';
+            if (!(d.late || []).length && !(d.atRisk || []).length) {
+                el('aemc-due').innerHTML = '<div class="aemc-empty">Nothing is late and nothing due in the next ' +
+                    (d.dueSoonDays || 7) + ' days is waiting on blanks' +
+                    (c.dueSoonOnTrack ? ' — ' + c.dueSoonOnTrack + ' order' + (c.dueSoonOnTrack === 1 ? '' : 's') + ' due soon already have goods in house' : '') + '.</div>';
+                return;
+            }
+            var html = '';
+            if ((d.late || []).length) {
+                html += '<h3 class="aemc-queue-section-title">🔴 Past due — not shipped</h3><ul class="aemc-rows">' +
+                    d.late.map(dueRow).join('') + '</ul>' +
+                    (d.lateTruncated ? '<p class="aemc-hint">…and ' + d.lateTruncated + ' more past-due order' + (d.lateTruncated === 1 ? '' : 's') + '.</p>' : '');
+            }
+            if ((d.atRisk || []).length) {
+                html += '<h3 class="aemc-queue-section-title">🟠 Due soon — blanks not in house</h3><ul class="aemc-rows">' +
+                    d.atRisk.map(dueRow).join('') + '</ul>' +
+                    (d.atRiskTruncated ? '<p class="aemc-hint">…and ' + d.atRiskTruncated + ' more at-risk order' + (d.atRiskTruncated === 1 ? '' : 's') + '.</p>' : '');
+            }
+            if (c.dueSoonOnTrack) {
+                html += '<p class="aemc-hint">' + c.dueSoonOnTrack + ' other order' + (c.dueSoonOnTrack === 1 ? '' : 's') + ' due in the next ' +
+                    (d.dueSoonDays || 7) + ' days already have blanks in house — on track.</p>';
+            }
+            el('aemc-due').innerHTML = html;
+        }).catch(function (err) {
+            el('aemc-due').innerHTML = '<div class="aemc-panel-error">Order due dates failed to load (' + esc(err.message) + '). Refresh to retry.</div>';
+        });
+    }
+
     // ---------- growth radar ("Money on the Table") ----------
     function loadGrowth() {
         var params = (state.isAdmin && state.viewAs) ? '?viewAs=' + encodeURIComponent(state.viewAs) : '';
@@ -487,6 +556,56 @@
                 (g.truncated ? '<p class="aemc-hint">…and ' + g.truncated + ' more flagged — work these first, then refresh tomorrow.</p>' : '');
         }).catch(function (err) {
             el('aemc-growth').innerHTML = '<div class="aemc-panel-error">Growth radar failed to load (' + esc(err.message) + '). Refresh to retry.</div>';
+        });
+    }
+
+    // ---------- data-quality radar (ShopWorks entries missing essentials) ----------
+    function dqChips(issues) {
+        return (issues || []).map(function (i) {
+            return '<span class="aemc-dq-chip aemc-dq-chip--' + (i.severity === 'err' ? 'err' : 'warn') + '">' + esc(i.text) + '</span>';
+        }).join(' ');
+    }
+
+    function loadDataQuality() {
+        var params = (state.isAdmin && state.viewAs) ? '?viewAs=' + encodeURIComponent(state.viewAs) : '';
+        sameOriginJson('/api/crm-proxy/ae-dashboard/data-quality' + params).then(function (d) {
+            var c = d.counts || {};
+            el('aemc-dq-sub').textContent = (c.ordersFlagged || c.customersFlagged)
+                ? '(' + (c.ordersFlagged || 0) + ' order' + (c.ordersFlagged === 1 ? '' : 's') + ' · ' +
+                  (c.customersFlagged || 0) + ' customer' + (c.customersFlagged === 1 ? '' : 's') + ' need attention)'
+                : '';
+            if (!(d.orders || []).length && !(d.customers || []).length) {
+                el('aemc-dq').innerHTML = '<div class="aemc-empty">Clean sweep — every order you entered in the last ' +
+                    (d.windowDays || 30) + ' days has contact, ship-to, terms, ship date, and tax filled in. Nice work.</div>';
+                return;
+            }
+            var html = '';
+            if ((d.orders || []).length) {
+                html += '<h3 class="aemc-queue-section-title">Orders missing fields</h3><ul class="aemc-rows">' +
+                    d.orders.map(function (o) {
+                        var stage = o.shipped ? 'Shipped' : (o.invoiced ? 'Invoiced' : 'Open');
+                        return '<li class="aemc-row">' +
+                            '<span class="aemc-row-main">WO #' + esc(o.idOrder) + (o.company ? ' — ' + esc(o.company) : '') + '</span>' +
+                            dqChips(o.issues) +
+                            '<span class="aemc-row-right"><span class="aemc-row-meta">entered ' + fmtWhen(o.placedDate) + ' · ' + esc(stage) + '</span></span>' +
+                            '</li>';
+                    }).join('') + '</ul>' +
+                    (d.ordersTruncated ? '<p class="aemc-hint">…and ' + d.ordersTruncated + ' more flagged order' + (d.ordersTruncated === 1 ? '' : 's') + '.</p>' : '');
+            }
+            if ((d.customers || []).length) {
+                html += '<h3 class="aemc-queue-section-title">Customer records needing updates</h3><ul class="aemc-rows">' +
+                    d.customers.map(function (cu) {
+                        return '<li class="aemc-row">' +
+                            '<span class="aemc-row-main">' + esc(cu.company) + '</span>' +
+                            dqChips(cu.issues) +
+                            '<span class="aemc-row-right"><span class="aemc-row-meta">Cust #' + esc(cu.idCustomer) + '</span></span>' +
+                            '</li>';
+                    }).join('') + '</ul>' +
+                    (d.customersTruncated ? '<p class="aemc-hint">…and ' + d.customersTruncated + ' more customer' + (d.customersTruncated === 1 ? '' : 's') + '.</p>' : '');
+            }
+            el('aemc-dq').innerHTML = html;
+        }).catch(function (err) {
+            el('aemc-dq').innerHTML = '<div class="aemc-panel-error">Missing-info check failed to load (' + esc(err.message) + '). Refresh to retry.</div>';
         });
     }
 

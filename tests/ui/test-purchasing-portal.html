@@ -16,7 +16,7 @@
     <!-- 2026 design tokens (must load before dash-shell.css) -->
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/purchasing-portal.css?v=2026.07.19.14">
+    <link rel="stylesheet" href="/dashboards/css/purchasing-portal.css?v=2026.07.19.15">
 </head>
 <body>
     <div class="dash-shell">
@@ -110,10 +110,11 @@
                                 <th>Ordered</th>
                                 <th>Received</th>
                                 <th>Status</th>
+                                <th>Invoice</th>
                             </tr>
                         </thead>
                         <tbody id="pp-tbody">
-                            <tr><td colspan="10" class="pp-empty dash-loading">Loading purchase requests…</td></tr>
+                            <tr><td colspan="11" class="pp-empty dash-loading">Loading purchase requests…</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -121,11 +122,26 @@
         </main>
     </div>
 
+    <!-- SanMar invoice modal (on-screen view + Print / Save PDF) -->
+    <div class="pp-overlay" id="pp-invoice-overlay" hidden></div>
+    <div class="pp-modal" id="pp-invoice-modal" role="dialog" aria-modal="true" aria-labelledby="pp-invoice-title" hidden>
+        <div class="pp-modal-head">
+            <h2 class="pp-modal-title" id="pp-invoice-title"><i class="fas fa-file-invoice-dollar"></i> SanMar Invoice</h2>
+            <div class="pp-modal-actions-head">
+                <button type="button" id="pp-invoice-print" class="dash-btn dash-btn--primary"><i class="fas fa-print"></i> Print / Save PDF</button>
+                <button type="button" class="pp-modal-close" id="pp-invoice-close" aria-label="Close"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+        <div class="pp-modal-body" id="pp-invoice-body">
+            <div class="dash-loading">Fetching the invoice from SanMar…</div>
+        </div>
+    </div>
+
     <!-- Load order matters: APP_CONFIG → fetch-timeout → DashPage → page controller -->
     <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/dash-page-helpers.js"></script>
     <script src="/tests/ui/test-purchasing-portal-stub.js"></script>
-    <script src="/dashboards/js/purchasing-portal.js?v=2026.07.19.14"></script>
+    <script src="/dashboards/js/purchasing-portal.js?v=2026.07.19.15"></script>
 </body>
 </html>

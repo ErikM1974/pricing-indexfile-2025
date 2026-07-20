@@ -419,6 +419,16 @@
 | `/pages/js/portal-reorder-list.js` | Shared multi-item "Re-order List" (2026-07-04) — floating FAB + drawer; sessionStorage-persisted across portal pages; "Send all" POSTs `/api/portal/reorder-batch` (grouped Batch_Num, no price). Loaded on product page + portal home | server.js POST /api/portal/reorder-batch | ✅ Active |
 | `/pages/css/portal-reorder-list.css` | Re-order List floating button + drawer styling (portal --cp-* tokens w/ fallbacks) | — | ✅ Active |
 
+### Vendor Portal — L&P Screen Printing subcontractor (NEW 2026-07-19)
+| File | Purpose | Dependencies | Status |
+|------|---------|--------------|--------|
+| `/pages/vendor-portal.html` | Subcontractor job portal at `/vendor` (session-gated) — Ed Lacey / L&P sees every `Method='Screen Print'` transfer order: work-order details, print lines, artwork + working-file downloads (Box links), activity timeline + post-a-note. Replaces the email-everything-to-Ed process | vendor-portal.js/.css, caspio-date-utils.js, server.js /api/vendor/* | ✅ Active |
+| `/pages/js/vendor-portal.js` | Portal controller — list/filter/search cards, `#job=` deep links, detail render (meta/lines/files/mockup/notes), note posting; same-origin `/api/vendor/*` only (never hits the proxy directly) | server.js GET /api/vendor/jobs[,/:id], POST /api/vendor/jobs/:id/notes | ✅ Active |
+| `/pages/css/vendor-portal.css` | Vendor portal styling (self-contained; NWCA green brand, status badges, cards/files/timeline) | — | ✅ Active |
+| `/pages/vendor-login.html` | Vendor magic-link login page at `/vendor/login` (passwordless, invite-only via proxy `Vendor_Portal_Access`) | vendor-login.js, customer-login.css (shared) | ✅ Active |
+| `/pages/js/vendor-login.js` | Vendor login logic — POSTs `/auth/vendor/request-link`; constant "check your email" state (no account enumeration) | server.js POST /auth/vendor/request-link | ✅ Active |
+| `/lib/vendor-magic-link.js` | Vendor magic-link + session token crypto (HMAC; distinct `vlink`/`vsess` type tags so customer/staff tokens can never be replayed as vendor sessions; nwca_vendor cookie) | server.js (loadVendorSession, /auth/vendor/*, requireVendor) | ✅ Active |
+
 ### Mockup Detail Page (NEW 2026-04)
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
@@ -1224,6 +1234,8 @@ cap-embroidery-fix.css
 | `/tests/ui/test-ae-mission-control-stub.js` | Fetch stub for the Mission Control harness — crm-session (admin), ae-dashboard summary (per-rep fixtures incl. XSS probe), bonus/growth/purchasing fixtures, marketing-shipments items+POST, lead-outreach preview/send, inbound-today, art-notifications | — | ✅ Active |
 | `/tests/ui/test-purchasing-portal.html` | Purchasing Portal UI harness — real controller + CSS over stubbed fetch (no SAML/JotForm/Caspio); exercises stats, table, search + requester/status filters, XSS escaping | purchasing-portal.css/js, test-purchasing-portal-stub.js | ✅ Active |
 | `/tests/ui/test-purchasing-portal-stub.js` | Fetch stub for the Purchasing Portal harness — one purchasing-portal payload with all 6 statuses, 3 requesters, and an XSS-probe company name | — | ✅ Active |
+| `/tests/ui/test-finished-photos-library.html` | Finished Photos Library UI harness — real controller + CSS over stubbed fetch (no SAML/Caspio/Box); exercises stats, rep chips, account grouping, search/visibility filters, publish toggle, lightbox, XSS escaping | finished-photos-library.css/js, test-finished-photos-library-stub.js | ✅ Active |
+| `/tests/ui/test-finished-photos-library-stub.js` | Fetch stub for the library harness — 5 photos across 3 accounts (2 reps + house bucket, XSS-probe company), inline-SVG images, stateful PATCH publish/hide | — | ✅ Active |
 | `/dashboards/lead.html` | **NEW (2026-07-18)** Lead workspace (CRM v2 P2) — full-width "work a lead" record opened from the board/drawer/emails via `#Submission_ID` hash: activity timeline + note composer + drag/paste/click file attach (ArtworkUpload → `/api/files/upload` → timeline `attachment` rows), header status/rep controls, rail panels (contact, follow-up date + quick chips, est. value, ShopWorks match + customer-history intelligence, linked quote w/ live $ + Lead_Value snapshot re-sync, click-gated order history, submitted details, original artwork). No pollers. | leads.css, lead-workspace.css, leads-common.js, lead-workspace.js, artwork-upload.js | ✅ Active |
 | `/dashboards/js/lead-workspace.js` | Lead workspace controller — crm-proxy form-submissions detail read + PUTs, lead-activity timeline reads/appends, public customer-history/quote_sessions/company-contacts reads; escapeHTML everywhere | LeadsCommon, DashPage, ArtworkUpload, crm-proxy forwarders | ✅ Active |
 | `/dashboards/css/lead-workspace.css` | Lead workspace styles (2-column grid, composer, dropzone, timeline items, rail panels; reuses leads.css ld-* atoms; 2026 tokens) | leads.css, dash-shell.css, art-hub.css | ✅ Active |
@@ -1320,6 +1332,9 @@ cap-embroidery-fix.css
 | `/dashboards/css/finished-photos.css` | Finished-photos capture page + wall-poster styles (NWCA green, mobile-first, segmented modes, scanner sheet, safe-area, print `@media`, no inline) | - | ✅ Active |
 | `/dashboards/finished-photos-poster.html` | Printable QR wall poster → the capture page. Static inline SVG QR (no runtime lib). Print for factory wall / staff desks. (No longer linked from the capture page header — 2026-07-17.) | finished-photos.css, finished-photos-poster.js | ✅ Active |
 | `/dashboards/js/finished-photos-poster.js` | Wall-poster Print button handler (window.print) | - | ✅ Active |
+| `/dashboards/finished-photos-library.html` | **NEW (2026-07-19)** Finished Photos Library — company-wide browse of every finished-product photo, grouped by account with the account's sales rep badge; rep filter chips + search + published/hidden filter + inline Publish/Hide + lightbox. Deep link `#rep=<full name>` (Mission Control "My Finished Photos"). SAML-gated (any staff). | dash-shell.css, dash-page-helpers.js, finished-photos-library.css/js, same-origin `/api/staff/finished-photos/library` + PATCH forwarder | ✅ Active |
+| `/dashboards/js/finished-photos-library.js` | Finished Photos Library controller (one library fetch, client-side rep/search/visibility filters, account grouping, publish toggle, hash deep-link) | DashPage, `/api/staff/finished-photos/library`, `/api/staff/finished-photos/:pk` PATCH | ✅ Active |
+| `/dashboards/css/finished-photos-library.css` | Finished Photos Library page styles (rep chips, account sections, photo grid, lightbox — tokens only) | dash-shell.css, art-hub.css | ✅ Active |
 | `/dashboards/css/customer-portal-admin.css` | Customer Portals console page styles (table, modal, badges) | dash-shell.css, art-hub.css tokens | ✅ Active |
 | `/dashboards/taneisha-crm.html` | Taneisha's Account CRM dashboard | rep-crm.js, rep-crm.css | ✅ Active |
 | `/dashboards/nika-crm.html` | **NEW** Nika's Account CRM dashboard | rep-crm.js, rep-crm.css | ✅ Active |
