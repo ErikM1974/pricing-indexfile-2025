@@ -294,9 +294,15 @@
         if (!rows.length) return '<div class="aemc-empty">No bonus rows recorded yet this quarter.</div>';
         return '<ul class="aemc-rows">' + rows.map(function (r) {
             var chipCls = r.status === 'Paid' ? ' aemc-status--paid' : ' aemc-status--pending';
+            // Show the "on $base @ rate%" caption ONLY when it IS the math
+            // (base × rate = amount, e.g. Win-Back). Online Store rows store
+            // total revenue + a nominal 1% while the amount comes from composite
+            // baseline/new-store math — captioning those invites reps to
+            // multiply in their head and think they were shorted.
+            var captionIsExact = r.base > 0 && r.rate > 0 && Math.abs(r.base * r.rate - r.amount) <= 0.02;
             return '<li class="aemc-row">' +
                 '<span class="aemc-row-main">' + esc(r.type) + '</span>' +
-                (r.base ? '<span class="aemc-row-meta">on ' + money0(r.base) + (r.rate ? ' @ ' + Math.round(r.rate * 1000) / 10 + '%' : '') + '</span>' : '') +
+                (captionIsExact ? '<span class="aemc-row-meta">on ' + money0(r.base) + ' @ ' + Math.round(r.rate * 1000) / 10 + '%</span>' : '') +
                 '<span class="aemc-status' + chipCls + '">' + esc(r.status || '') + '</span>' +
                 '<span class="aemc-row-right"><span class="aemc-money">' + money2(r.amount) + '</span></span>' +
                 '</li>';
