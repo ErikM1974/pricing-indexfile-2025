@@ -1,3 +1,7 @@
+## v2026.07.19.9 (2026.07.19)
+
+- Deploy v2026.07.19.9: 5 files (ae-mission-control.html,ae-mission-control.css,ae-mission-control.js...)
+
 ## v2026.07.19.8 (2026.07.19)
 
 - feat(mission-control): AE Mission Control — per-AE cockpit for Taneisha & Nika
