@@ -143,6 +143,7 @@
             state.rep = data.rep;
             render(data);
             loadGrowth();
+            loadPurchasing();
         }).catch(function (err) {
             DashPage.showError('Could not load your dashboard: ' + err.message + ' — refresh to retry.');
             el('aemc-greeting').textContent = 'Your data could not be loaded.';
@@ -419,6 +420,44 @@
                     '</li>';
             }, 'No orders invoiced to your customers in the last 30 days.');
         }
+    }
+
+    // ---------- purchasing tracker (requests to Bradley × ShopWorks POs) ----------
+    var PURCH_LABEL = {
+        sent: 'Sent to Bradley', ordered: 'Ordered', partial: 'Partially received',
+        received: 'Received', invoiced: 'Invoiced', shipped: 'Shipped',
+    };
+
+    function loadPurchasing() {
+        var params = (state.isAdmin && state.viewAs) ? '?viewAs=' + encodeURIComponent(state.viewAs) : '';
+        sameOriginJson('/api/crm-proxy/ae-dashboard/purchasing' + params).then(function (p) {
+            var c = p.counts || {};
+            var waiting = (c.sent || 0);
+            el('aemc-purch-sub').textContent = p.submissionCount
+                ? '(' + p.submissionCount + ' request' + (p.submissionCount === 1 ? '' : 's') + ' in ' + p.windowDays + 'd' + (waiting ? ' · ' + waiting + ' not yet ordered' : '') + ')'
+                : '';
+            if (!p.items || !p.items.length) {
+                el('aemc-purch').innerHTML = '<div class="aemc-empty">No purchase requests sent to Bradley in the last ' + p.windowDays + ' days.</div>';
+                return;
+            }
+            el('aemc-purch').innerHTML = '<ul class="aemc-rows">' + p.items.map(function (m) {
+                return (m.orders || []).map(function (o) {
+                    var meta = [];
+                    if (o.orderedDate) meta.push('ordered ' + fmtWhen(o.orderedDate) + (o.vendors && o.vendors.length ? ' (' + o.vendors.join(', ') + ')' : ''));
+                    if (o.receivedDate) meta.push('received ' + fmtWhen(o.receivedDate));
+                    if (!o.orderedDate && m.submittedAt) meta.push('sent ' + fmtWhen(m.submittedAt));
+                    if (m.bradleyPo) meta.push('PO# ' + m.bradleyPo);
+                    return '<li class="aemc-row">' +
+                        '<span class="aemc-row-main">WO #' + esc(o.orderNumber) + (o.company ? ' — ' + esc(o.company) : '') + '</span>' +
+                        '<span class="aemc-purch-chip aemc-purch--' + esc(o.status) + '">' + esc(PURCH_LABEL[o.status] || o.status) + '</span>' +
+                        '<span class="aemc-row-right"><span class="aemc-row-meta">' + esc(meta.join(' · ')) + '</span></span>' +
+                        '</li>';
+                }).join('');
+            }).join('') + '</ul>' +
+                (p.truncated ? '<p class="aemc-hint">…and ' + p.truncated + ' older request' + (p.truncated === 1 ? '' : 's') + ' in the form inbox.</p>' : '');
+        }).catch(function (err) {
+            el('aemc-purch').innerHTML = '<div class="aemc-panel-error">Purchasing tracker failed to load (' + esc(err.message) + '). Refresh to retry.</div>';
+        });
     }
 
     // ---------- growth radar ("Money on the Table") ----------
