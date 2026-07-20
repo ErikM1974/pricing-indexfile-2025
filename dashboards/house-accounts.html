@@ -12,7 +12,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
     <!-- Dashboard Styles -->
-    <link href="/dashboards/css/house-accounts.css" rel="stylesheet">
+    <link href="/dashboards/css/house-accounts.css?v=2026.07.19.12" rel="stylesheet">
 </head>
 <body>
     <div class="house-page">
@@ -111,6 +111,9 @@
                         <button class="reconcile-btn" id="reconcile-btn" title="Find customers with orders not in any account list">
                             <i class="fas fa-user-plus"></i> Find Unassigned
                         </button>
+                        <button class="gap-report-btn" id="sw-todo-btn" title="Dashboard rep assignments you still need to key into ShopWorks by hand (ShopWorks has no write-back — the ODBC mirror auto-confirms once you do)">
+                            <i class="fas fa-clipboard-check"></i> ShopWorks To-Do <span class="sw-todo-count" id="sw-todo-count" hidden></span>
+                        </button>
                         <div class="sync-controls">
                             <button class="sync-btn primary" id="sync-all-btn" title="Sync ownership and sales for all CRM dashboards (Nika, Taneisha, House)">
                                 <i class="fas fa-sync"></i> Sync All CRM
@@ -143,6 +146,29 @@
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- ShopWorks To-Do Modal -->
+    <div class="modal-overlay" id="sw-todo-modal-overlay">
+        <div class="gap-report-modal">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <h2><i class="fas fa-clipboard-check"></i> ShopWorks To-Do</h2>
+                    <p class="modal-subtitle">Assignments made in the dashboards that you still need to key into ShopWorks (Cust → Customer Service Rep). The 15-min ODBC mirror auto-clears each row once ShopWorks matches.</p>
+                </div>
+                <div class="modal-header-actions">
+                    <button class="sync-btn" id="sw-todo-copy" title="Copy the list to paste into notes / print for ShopWorks entry">
+                        <i class="fas fa-copy"></i> Copy list
+                    </button>
+                    <button class="modal-close" id="sw-todo-close">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="gap-report-modal-body" id="sw-todo-body">
+                <div class="loading-spinner"></div>
+            </div>
+        </div>
     </div>
 
     <!-- Reconcile Modal -->
@@ -266,6 +292,6 @@
 
     <!-- Dashboard JavaScript -->
     <script src="/shared_components/js/caspio-date-utils.js?v=1"></script>
-    <script src="/dashboards/js/house-accounts.js?v=2026.07.19.11"></script>
+    <script src="/dashboards/js/house-accounts.js?v=2026.07.19.12"></script>
 </body>
 </html>
