@@ -97,6 +97,7 @@ _Read API + PO (write) side._
 - [sanmar-api-guide-24.5-jul2026.pdf](sanmar-api-guide-24.5-jul2026.pdf) — current official guide (supersedes `sanmar-api-2025-doc.pdf`)
 - [SANMAR_INBOUND_2026-07.md](SANMAR_INBOUND_2026-07.md) — SanMar Inbound dashboard: PO→WO match via `PurchaseOrders.ID_PO`, UPS-real arrival day, shipment received dates, report-by-rep (proxy v913–v917)
 - [LEADS_CRM_2026-07.md](LEADS_CRM_2026-07.md) — Leads CRM (2026-07-18): JotForm 6-form REST-first ingest + backfill into `Form_Submissions`, AE auto-assign rule, kanban board + lead workspace + `Lead_Activity` timeline + follow-up digest + quote handoff; endpoints, gotchas (hash links / lazy-require caspio / npm flags), open items
+- [AE_MISSION_CONTROL_2026-07.md](AE_MISSION_CONTROL_2026-07.md) — AE Mission Control (2026-07-19): per-AE cockpit page + proxy `/api/ae-dashboard/summary` aggregate (cache, per-panel errors), session-derived identity + admin view-as, post-SAML landing, rep-name shapes (AE_REGISTRY), in-page kit/outreach actions, Phase 3 backlog
 
 ## 🗄️ Caspio / Backend / Auth / API
 
