@@ -158,6 +158,8 @@ dotenv.config();
 //          GET  /vendor                    — portal page (requireVendor; nwca_vendor cookie via lib/vendor-magic-link)
 //          GET  /api/vendor/jobs[/:id]     — session-scoped Screen Print transfer orders (allowlist projection)
 //          POST /api/vendor/jobs/:id/notes — vendor comment onto the job timeline
+//          GET  /vendor/access/:token      — PERMANENT bookmarkable access link (no email round-trip; live Enabled re-check)
+//          GET  /api/vendor-admin/access-link?email= — staff-only (portal-admin roles): mint a vendor's permanent link
 //          Invite registry: proxy Vendor_Portal_Access (secret-gated /api/vendor-portal-access)
 //
 // PRODUCT SEO (2026-07-12): /product[.html]?style= = hybrid-SSR head injection
@@ -4624,6 +4626,65 @@ app.get('/auth/vendor/verify', async (req, res) => {
 app.get('/auth/vendor/logout', (req, res) => {
   res.clearCookie('nwca_vendor');
   return res.redirect('/vendor/login');
+});
+
+// Permanent access link (Erik: "we don't need a magic link", 2026-07-20).
+// One bookmarkable URL per vendor: verify the long-lived signed token, re-check
+// the LIVE Enabled flag (revoke in Caspio → link dead within ~60s), set the
+// normal 30-day session cookie, land on /vendor. The emailed magic-link flow
+// above still works but is no longer the primary path.
+app.get('/vendor/access/:token', async (req, res) => {
+  const fail = () => res.redirect('/vendor/login?error=expired');
+  try {
+    if (!vendorMagicLink.isConfigured()) return res.status(503).send('Vendor portal is temporarily unavailable.');
+    let claim;
+    try { claim = vendorMagicLink.verifyAccessToken(req.params.token); } catch (_) { return fail(); }
+    const access = await fetchVendorAccess(claim.email);
+    if (!access || !access.enabled || String(access.vendor_name) !== String(claim.vendorName)) return fail();
+    const sessionToken = vendorMagicLink.mintSession({
+      email: claim.email, vendorName: access.vendor_name, contactName: access.contact_name || '',
+    });
+    res.cookie('nwca_vendor', sessionToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    });
+    if (CRM_API_SECRET) {
+      fetch(`${CRM_API_BASE}/api/vendor-portal-access/touch-login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CRM-API-Secret': CRM_API_SECRET },
+        body: JSON.stringify({ email: claim.email }),
+      }).catch((e) => console.warn('[vendor-access] touch-login failed:', e.message));
+    }
+    return res.redirect('/vendor');
+  } catch (e) {
+    console.error('[vendor-access] error:', e.message);
+    return fail();
+  }
+});
+
+// Staff-only: fetch a vendor's permanent access link (to text/email to the vendor).
+// GET /api/vendor-admin/access-link?email=… → { link }. Portal-admin roles only —
+// this URL IS the vendor's credential, so it never appears in any vendor-reachable
+// or public response.
+app.get('/api/vendor-admin/access-link', requireCrmRole(PORTAL_ADMIN_ROLES), async (req, res) => {
+  try {
+    if (!vendorMagicLink.isConfigured()) return res.status(503).json({ error: 'not configured' });
+    const email = String(req.query.email || '').toLowerCase().trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: 'valid email required' });
+    const access = await fetchVendorAccess(email);
+    if (!access || !access.enabled) return res.status(404).json({ error: 'No enabled vendor access for that email' });
+    const token = vendorMagicLink.mintAccessToken({ email, vendorName: access.vendor_name });
+    res.json({
+      vendor: access.vendor_name,
+      contact: access.contact_name || null,
+      link: `${PUBLIC_SITE_ORIGIN}/vendor/access/${token}`,
+    });
+  } catch (e) {
+    console.error('[vendor-admin] access-link error:', e.message);
+    res.status(503).json({ error: 'Unable to build the access link right now.' });
+  }
 });
 
 // The portal page itself — gated by the vendor LOGIN session.
