@@ -202,6 +202,30 @@ a.aemc-row-main:hover { text-decoration: underline; }
     font-size: 0.85rem;
 }
 
+/* ---------- bonus card ---------- */
+.aemc-bonus-card { margin-bottom: var(--space-4); }
+.aemc-bonus-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+}
+@media (max-width: 700px) { .aemc-bonus-grid { grid-template-columns: 1fr; } }
+.aemc-bonus-total {
+    font-size: 1.25rem;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--gray-900);
+    margin: 4px 0 6px;
+}
+.aemc-bonus-when { font-size: 0.8rem; color: var(--gray-500); margin-bottom: var(--space-2); }
+.aemc-status--paid { background: #eaf7ef; color: #0f5132; border-color: #b7e0c5; }
+.aemc-status--pending { background: #fff8f0; color: #b85a00; border-color: #f5d3ad; }
+.aemc-bonus-foot {
+    margin: var(--space-3) 0 0;
+    font-size: 0.78rem;
+    color: var(--gray-500);
+}
+
 /* ---------- inbound card ---------- */
 .aemc-inbound-card { margin-bottom: var(--space-4); }
 .aemc-inbound { font-size: 0.9rem; color: var(--gray-600); }

@@ -173,6 +173,7 @@
 
         renderKpis(data);
         renderQueue(data);
+        renderBonus(data);
         renderPanels(data);
 
         if (data.errors) {
@@ -189,7 +190,7 @@
             : k.openQuoteCount + ' · ' + money0(k.openQuoteValue);
         el('kpi-quotes-label').textContent = 'Open Quotes (90d)';
         el('kpi-commission').textContent = money0(k.commissionQtd);
-        el('kpi-commission-label').textContent = 'Store Commission' + (k.commissionQuarter ? ' (' + k.commissionQuarter + ')' : '');
+        el('kpi-commission-label').textContent = 'Bonus Earned' + (k.commissionQuarter ? ' (' + k.commissionQuarter + ')' : '');
         el('kpi-winrate').textContent = (k.leadWinRate == null) ? '—' : k.leadWinRate + '%';
 
         var badge = el('aemc-art-badge');
@@ -280,6 +281,71 @@
                 catch (e) { DashPage.showError('Could not open the email panel for this lead.'); }
             });
         });
+    }
+
+    // ---------- bonus & commission (Commission_Payouts = payroll of record) ----------
+    var BONUS_DASHBOARD_BASE = 'https://inksoft-transform-8a3dc4e38097.herokuapp.com/commissions';
+    var BONUS_DASHBOARD_PATH = {
+        'taneisha@nwcustomapparel.com': '/taneisha',
+        'nika@nwcustomapparel.com': '/nika',
+    };
+
+    function bonusRowsHtml(rows) {
+        if (!rows.length) return '<div class="aemc-empty">No bonus rows recorded yet this quarter.</div>';
+        return '<ul class="aemc-rows">' + rows.map(function (r) {
+            var chipCls = r.status === 'Paid' ? ' aemc-status--paid' : ' aemc-status--pending';
+            return '<li class="aemc-row">' +
+                '<span class="aemc-row-main">' + esc(r.type) + '</span>' +
+                (r.base ? '<span class="aemc-row-meta">on ' + money0(r.base) + (r.rate ? ' @ ' + Math.round(r.rate * 1000) / 10 + '%' : '') + '</span>' : '') +
+                '<span class="aemc-status' + chipCls + '">' + esc(r.status || '') + '</span>' +
+                '<span class="aemc-row-right"><span class="aemc-money">' + money2(r.amount) + '</span></span>' +
+                '</li>';
+        }).join('') + '</ul>';
+    }
+
+    function renderBonus(data) {
+        var b = data.bonus;
+        var prevBox = el('aemc-bonus-prev'), curBox = el('aemc-bonus-cur');
+        if (data.errors && data.errors.payouts) {
+            prevBox.innerHTML = curBox.innerHTML =
+                '<div class="aemc-panel-error">Bonus data failed to load (' + esc(data.errors.payouts) + '). Refresh to retry.</div>';
+            return;
+        }
+        if (!b) { prevBox.innerHTML = curBox.innerHTML = '<div class="aemc-empty">No bonus data.</div>'; return; }
+
+        // rep-specific link to the full Flask bonus dashboard
+        var link = el('aemc-bonus-link');
+        var rep = data.rep || {};
+        link.href = BONUS_DASHBOARD_BASE + (BONUS_DASHBOARD_PATH[rep.email] || '');
+
+        if (b.previousQuarter) {
+            el('aemc-bonus-prev-title').textContent = b.previousQuarter + ' ' + b.year + ' payout';
+            var when;
+            if (b.previous.allPaid) {
+                var pc = b.previous.rows[0] && (b.previous.rows[0].paycheckDate || b.previous.rows[0].paidDate);
+                when = 'Paid' + (pc ? ' — paycheck ' + fmtWhen(pc) : '');
+            } else if (b.previous.rows.length) {
+                when = 'Pending payroll — lands on your next paycheck';
+            } else {
+                when = '';
+            }
+            prevBox.innerHTML =
+                '<div class="aemc-bonus-total">' + money2(b.previous.total) + '</div>' +
+                (when ? '<div class="aemc-bonus-when">' + esc(when) + '</div>' : '') +
+                bonusRowsHtml(b.previous.rows);
+        } else {
+            el('aemc-bonus-prev-title').textContent = 'Last quarter payout';
+            prevBox.innerHTML = '<div class="aemc-empty">First quarter of the year — no prior payout.</div>';
+        }
+
+        el('aemc-bonus-cur-title').textContent = b.currentQuarter + ' ' + b.year + ' earned so far';
+        curBox.innerHTML =
+            '<div class="aemc-bonus-total">' + money2(b.current.total) + '</div>' +
+            '<div class="aemc-bonus-when">Accrues as orders invoice — refreshed daily</div>' +
+            bonusRowsHtml(b.current.rows);
+
+        el('aemc-bonus-foot').textContent = 'Paid so far in ' + b.year + ': ' +
+            money2(b.paidYtd) + ' · Components: Online Store commission, Garment Spiffs, Win-Back Bounty (5%). Annual retention/growth/new-business bonuses are calculated in December.';
     }
 
     // ---------- work panels ----------
