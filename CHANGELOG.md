@@ -1,3 +1,11 @@
+## v2026.07.21.1 (2026.07.21)
+
+- AE Mission Control: name Setup Bonus in bonus footnote + tag manual rows
+- memory: record bonus-surface reconciliation + 7/21 Setup Bonus fix
+- Memory maintenance: LESSONS 302→248, archive 17 entries, refresh INDEX
+- memory: commit pre-existing SanMar Payables date-stamp-log note
+- Deploy v2026.07.21.1: 1 files (test-ae-mission-control.html,...)
+
 ## v2026.07.20.12 (2026.07.20)
 
 - Deploy v2026.07.20.12: 7 files (sanmar-payables.css,sanmar-payables.js,sanmar-payables.html,...) — payable import-stamp log + Mark imported button
