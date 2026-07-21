@@ -14,7 +14,7 @@
 
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/bandit-integration.css?v=2026.07.20.1">
+    <link rel="stylesheet" href="/dashboards/css/bandit-integration.css?v=2026.07.21.1">
 </head>
 <body>
     <div class="dash-shell">
@@ -36,7 +36,7 @@
 
             <!-- ── Overview + the data flow ─────────────────────────────── -->
             <section class="dash-card">
-                <p class="bi-lead"><strong>Bandit</strong> is the always-on Windows box on the shop LAN that carries ShopWorks data into Caspio. It is <em>not</em> a file-copy or a Box client — it runs small PowerShell agents on a schedule that read ShopWorks and POST to our proxy, which does every Caspio write and every Box upload. <b>Living document</b> — kept current whenever the bandit tasks or sync scripts change. Verified live 2026-07-18.</p>
+                <p class="bi-lead"><strong>Bandit</strong> is the always-on Windows box on the shop LAN that carries ShopWorks data into Caspio. It is <em>not</em> a file-copy or a Box client — it runs small PowerShell agents on a schedule that read ShopWorks and POST to our proxy, which does every Caspio write and every Box upload. <b>Living document</b> — kept current whenever the bandit tasks or sync scripts change. Verified live 2026-07-21.</p>
                 <div class="bi-flow">
                     <span class="bi-node"><i class="fas fa-server"></i> ShopWorks<br><small>FileMaker @192.168.10.6</small></span>
                     <span class="bi-arrow"><i class="fas fa-arrow-right"></i><small>ODBC read / file share</small></span>
@@ -71,12 +71,12 @@
                         <tr><td>ShopWorks ODBC Designs Sync</td><td>ODBC <code>Des</code></td><td><code>/sync-designs</code></td><td>4 h</td><td>SYSTEM</td><td><span class="bi-ok">Live</span></td></tr>
                         <tr><td>ShopWorks ODBC SalesReps Sync</td><td>ODBC <code>Cust</code></td><td><code>/sync-sales-reps</code></td><td>4 h</td><td>SYSTEM</td><td><span class="bi-ok">Live</span></td></tr>
                         <tr><td>ShopWorks ODBC Contacts Sync</td><td>ODBC (4 tables)</td><td><code>/sync-contacts</code></td><td>12 h</td><td>SYSTEM</td><td><span class="bi-ok">Live</span></td></tr>
-                        <tr><td>Thumbnail Metadata Sync</td><td><code>C:\SWF</code> xlsx (local)</td><td><code>/thumbnails/metadata-sync</code></td><td>30 min</td><td>SYSTEM</td><td><span class="bi-ok">Live</span></td></tr>
+                        <tr><td>Thumbnail Metadata Sync</td><td>ODBC <code>Thumbnails</code> (+ DesignLocations, Des)</td><td><code>/thumbnails/metadata-sync</code></td><td>30 min</td><td>SYSTEM</td><td><span class="bi-ok">Live</span></td></tr>
                         <tr><td>Thumbnail Box Sync</td><td><code>\\NCA-FS01\Thumbnails</code></td><td><code>/thumbnails/upload-with-stub?target=box</code></td><td>20 min</td><td>SYSTEM</td><td><span class="bi-ok">Live</span></td></tr>
                     </tbody>
                 </table>
                 </div>
-                <p class="bi-note">All 7 sit in the <code>\NWCA</code> Task Scheduler folder and run as SYSTEM. The metadata sync's snapshot was seeded after the bulk import, so it only posts <b>future</b> xlsx changes (not a re-backfill). SYSTEM reaches <code>\\NCA-FS01\Thumbnails</code> because the <b>BANDIT machine account has share read</b> — no interactive login needed.</p>
+                <p class="bi-note">All 7 sit in the <code>\NWCA</code> Task Scheduler folder and run as SYSTEM. The metadata sync now reads the ODBC <code>Thumbnails</code> table directly (delta on <code>timestamp_Modification</code>) — the old manual "Thumbnails Report" xlsx export is <b>retired as of 2026-07-21</b>. SYSTEM reaches <code>\\NCA-FS01\Thumbnails</code> because the <b>BANDIT machine account has share read</b> — no interactive login needed.</p>
                 <div class="bi-callout bi-callout--info">
                     <h4><i class="fas fa-triangle-exclamation"></i> Steady-state, not backfill — keep them from bursting together</h4>
                     <p>These are gentle now (deltas of a few rows/images per run). The one guard: don't let the metadata + image syncs fire a <b>large</b> batch at the exact same second (that's the per-second-limit trap). Steady-state overlap is fine; a future bulk re-load should be staggered or done via CSV import.</p>
@@ -100,7 +100,7 @@
   thumb-image-sync\
     sync-thumbnails-to-box.ps1                               sync-thumbnails-to-box.log
   thumb-sync\
-    sync-thumbnail-metadata.ps1  last-snapshot.json          sync-thumbnail-metadata.log</div>
+    sync-thumbnail-metadata.ps1  last-sync-thumb-meta.txt     sync-thumbnail-metadata.log</div>
                 <p class="bi-note"><b>Master copies</b> of every <code>.ps1</code> live in the repo at <code>caspio-pricing-proxy/scripts/bandit-agent/</code>. Rule: <b>edit the repo copy, then re-copy it to the matching <code>C:\NWCA\…</code> path</b> — never hand-edit on bandit (it drifts and gets overwritten). Only <code>config.json</code> is bandit-only (it holds the secret). The <code>last-*.txt / *.json</code> files are each sync's delta bookmark — deleting one forces a full re-sync (don't, unless you mean to).</p>
 
                 <h3 class="bi-h">Task → script → schedule → log</h3>
@@ -125,7 +125,7 @@
                     <li><b>Run one now:</b> right-click → <b>Run</b>, or <code>schtasks /Run /TN "\NWCA\ShopWorks ODBC Order Sync"</code>. Then read its <code>.log</code>.</li>
                     <li><b>See what happened:</b> the <b>Last Run Result</b> column, or the task's <b>History</b> tab, or the tail of its <code>.log</code>.</li>
                     <li><b>Change a script's behavior:</b> edit the repo master, copy to the matching <code>C:\NWCA\…</code> path — no task change needed.</li>
-                    <li><b>Keep thumbnails flowing:</b> keep exporting "Thumbnails Report" from ShopWorks into <code>\\BANDIT\SWF</code> (= <code>C:\SWF</code>); the metadata sync reads the newest one each run.</li>
+                    <li><b>Thumbnail metadata is automatic:</b> the metadata sync reads the ODBC <code>Thumbnails</code> table directly (joined to <code>DesignLocations</code> for the design id and <code>Des</code> for the design name) — <b>no manual "Thumbnails Report" export needed</b> (retired 2026-07-21).</li>
                     <li><b>Handy script flags</b> (run manually): <code>-DryRun</code> (validate, 0 writes), <code>-SeedSnapshot</code> (baseline after a bulk import), <code>-CsvOut &lt;path&gt;</code> (emit a CSV for a $0 bulk import).</li>
                 </ul>
 
@@ -143,8 +143,8 @@
             <section class="dash-card">
                 <div class="dash-card-header"><h2 class="dash-card-title"><i class="fas fa-gears"></i> How each sync works</h2></div>
                 <ol class="bi-steps">
-                    <li><b>Read</b> — the agent opens the FileMaker ODBC DSN (<code>SWODBC</code>, login <code>extro/extro</code>, read-only) and pulls a <b>bounded</b> query (orders/PO = rows changed since last run; contacts/designs/reps = full scan). Thumbnail images are read from the file share instead.</li>
-                    <li><b>Join what isn't on the main table</b> — the <b>Order Sync</b> runs a second bounded query for the <b>ship method</b>, which ShopWorks keeps on the address row (<code>Addr.ShipMethod</code>), not on <code>Orders</code>. It fetches the method for just the orders in the delta (chunked <code>id_Order IN (…)</code>) and attaches it as an extra <code>ShipMethod</code> column on <code>ORDER_ODBC</code> — which is what lets the AE data-quality radar flag "a ship method was chosen but no ship-to address was entered".</li>
+                    <li><b>Read</b> — the agent opens the FileMaker ODBC DSN (<code>SWODBC</code>, login <code>extro/extro</code>, read-only) and pulls a <b>bounded</b> query (orders/PO/thumbnail-metadata = rows changed since last run; contacts/designs/reps = full scan). Only the thumbnail <b>images</b> come from the file share instead of ODBC.</li>
+                    <li><b>Join what isn't on the main table</b> — the <b>Order Sync</b> runs a second bounded query for the <b>ship method</b>, which ShopWorks keeps on the address row (<code>Addr.ShipMethod</code>), not on <code>Orders</code>. It fetches the method for just the orders in the delta (chunked <code>id_Order IN (…)</code>) and attaches it as an extra <code>ShipMethod</code> column on <code>ORDER_ODBC</code> — which is what lets the AE data-quality radar flag "a ship method was chosen but no ship-to address was entered". The <b>Thumbnail Metadata Sync</b> works the same way: it resolves each thumbnail's <b>design id</b> and <b>design name</b> by joining <code>Thumbnails → DesignLocations → Des</code> in one bounded query (that design id is the link from a thumbnail to its customer for the portal logo library).</li>
                     <li><b>Clean</b> — the agent applies the same normalization the old OneDrive export used (rep names, address/city/state, tiers, flags).</li>
                     <li><b>POST</b> — cleaned rows go in chunks to the proxy endpoint above (header <code>x-crm-api-secret</code>). The <b>proxy is the only thing that writes Caspio</b>, upserting by key (ID_Order / ID_PO / ID_Contact / ID_Customer / ID_Design / ID_Serial). It also uploads images to Box.</li>
                     <li><b>Heartbeat</b> — every run stamps <code>Sync_Heartbeats</code> so the watchdog can tell "alive but quiet" from "dead".</li>
@@ -160,7 +160,7 @@
             <section class="dash-card">
                 <div class="dash-card-header"><h2 class="dash-card-title"><i class="fas fa-image"></i> Thumbnails &amp; Box</h2></div>
                 <ul class="bi-list">
-                    <li><b>Two parts.</b> <u>Metadata</u> rows (design name, part #, dims) come from Erik's <code>Thumbnails Report*.xlsx</code> export dropped into <code>\\BANDIT\SWF</code>. <u>Images</u> come from the FileMaker container store shared as <code>\\NCA-FS01\Thumbnails</code> (read-only — never write it).</li>
+                    <li><b>Two parts.</b> <u>Metadata</u> rows (design id, design name, part #, dims) come from a <b>direct ODBC read</b> of the ShopWorks <code>Thumbnails</code> table — scoped to rows that have an image file (<code>FileName IS NOT NULL</code>), joined to <code>DesignLocations</code> for the design id and <code>Des</code> for the design name (ShopWorks ticket 386060 exposed these tables 2026-07-21; the old manual <code>Thumbnails Report*.xlsx</code> export is retired). <u>Images</u> come from the FileMaker container store shared as <code>\\NCA-FS01\Thumbnails</code> (read-only — never write it).</li>
                     <li><b>All images live on Box</b> (folder <code>ShopWorks Thumbnails Archive</code>, id 400901982283). As of 2026-07-18: <b>26,896 thumbnails serve from Box, 0 from Caspio</b>. The upload happens on the proxy via <code>uploadFileToBox()</code> using Box creds in the Heroku env — there is no Box client or token on bandit.</li>
                     <li><b>Transparent to the website.</b> Every consumer resolves the URL as <code>ExternalKey ? /api/files/{key} : FileUrl</code>, so a row that points at Box just serves from Box — no app change needed.</li>
                 </ul>
@@ -187,7 +187,7 @@
             <!-- ── Retiring the old system ──────────────────────────────── -->
             <section class="dash-card">
                 <div class="dash-card-header"><h2 class="dash-card-title"><i class="fas fa-box-archive"></i> What this replaced</h2></div>
-                <p class="bi-note">The old path was <b>bandit exports a CSV → OneDrive → a Caspio scheduled import</b> (overnight). It's <b>fully retired as of 2026-07-18</b>: the direct ODBC syncs above write Caspio in ~15 min, and the 5 old <code>… Export to OneDrive</code> tasks + the Caspio import tasks have been deleted/disabled. (The many <code>OneDrive Reporting/Startup</code>, Adobe, Edge, Norton tasks in Task Scheduler are Windows/app-managed — not ours, left intact.) Full history &amp; field-level detail: repo <code>memory/SHOPWORKS_ODBC_INTEGRATION.md</code>.</p>
+                <p class="bi-note">The old path was <b>bandit exports a CSV → OneDrive → a Caspio scheduled import</b> (overnight). It's <b>fully retired as of 2026-07-18</b>: the direct ODBC syncs above write Caspio in ~15 min, and the 5 old <code>… Export to OneDrive</code> tasks + the Caspio import tasks have been deleted/disabled. The manual <b>Thumbnails Report</b> xlsx export — the last hand-step left in the whole pipeline — was replaced by a direct ODBC read of the <code>Thumbnails</code> table on <b>2026-07-21</b> (ShopWorks ticket 386060 exposed the <code>Thumbnails</code> + <code>DesignLocations</code> tables). (The many <code>OneDrive Reporting/Startup</code>, Adobe, Edge, Norton tasks in Task Scheduler are Windows/app-managed — not ours, left intact.) Full history &amp; field-level detail: repo <code>memory/SHOPWORKS_ODBC_INTEGRATION.md</code>.</p>
             </section>
 
         </main>
