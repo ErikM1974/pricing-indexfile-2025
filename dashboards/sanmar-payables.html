@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
     <link rel="stylesheet" href="/shared_components/css/sanmar-invoice-viewer.css?v=2026.07.20.2">
-    <link rel="stylesheet" href="/dashboards/css/sanmar-payables.css?v=2026.07.20.9">
+    <link rel="stylesheet" href="/dashboards/css/sanmar-payables.css?v=2026.07.20.12">
 </head>
 <body>
     <div class="dash-shell">
@@ -86,7 +86,7 @@
                         <label class="dash-btn smp-upload-btn" for="smp-sw-file"><i class="fas fa-upload"></i> Upload ShopWorks payables</label>
                         <input type="file" id="smp-sw-file" accept=".csv,text/csv" hidden>
                         <button type="button" id="smp-sw-clear" class="smp-linkbtn" hidden>clear</button>
-                        <span class="smp-sw-status" id="smp-sw-status">No ShopWorks export loaded — showing all open payables. Upload it to see Imported / Paid status.</span>
+                        <span class="smp-sw-status" id="smp-sw-status">Loading imported status…</span>
                     </div>
 
                     <div class="smp-filters">
@@ -142,11 +142,15 @@
                     <div class="smp-footer">
                         <p class="smp-note">
                             <i class="fas fa-circle-info"></i>
-                            Open invoices &amp; credits you still owe SanMar (vendor <strong>1002</strong>). Upload your ShopWorks payables export to see what's already imported / paid. Marketing-fund charges live on the <strong>Marketing Fund</strong> tab.
+                            Workflow: select the not-imported rows → <strong>Download ShopWorks CSV</strong> → import into ShopWorks → <strong>Mark imported</strong> (stamps them so they drop off this list). Marketing-fund charges live on the <strong>Marketing Fund</strong> tab.
                         </p>
                         <button type="button" id="smp-download" class="dash-btn dash-btn--primary smp-download">
                             <i class="fas fa-file-csv"></i>
                             Download ShopWorks CSV (<span class="smp-download-count">0</span>)
+                        </button>
+                        <button type="button" id="smp-markimported" class="dash-btn smp-markbtn">
+                            <i class="fas fa-check"></i>
+                            Mark imported (<span class="smp-mark-count">0</span>)
                         </button>
                     </div>
                 </div>
@@ -235,6 +239,6 @@
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/dash-page-helpers.js"></script>
     <script src="/shared_components/js/sanmar-invoice-viewer.js?v=2026.07.20.2"></script>
-    <script src="/dashboards/js/sanmar-payables.js?v=2026.07.20.11"></script>
+    <script src="/dashboards/js/sanmar-payables.js?v=2026.07.20.12"></script>
 </body>
 </html>

@@ -4401,6 +4401,49 @@ app.get('/api/staff/shopworks-payables', requireStaff, async (req, res) => {
   }
 });
 
+// SanMar payable IMPORT LOG — self-managed "imported to ShopWorks" date-stamps
+// (Caspio SanMar_Payable_Imports). The page reads the log to compute Imported? and
+// filter the worklist; Erik stamps invoices when he imports them. No ShopWorks
+// ODBC/upload dependency. Reads are staff-gated; writes add the CRM secret + the
+// signed-in user's email so the stamp records who imported it.
+app.get('/api/staff/sanmar-invoices/imports', requireStaff, async (req, res) => {
+  if (!CRM_API_SECRET) return res.status(503).json({ error: 'not_configured' });
+  const since = String(req.query.since || '').trim();
+  const qs = /^\d{4}-\d{2}-\d{2}$/.test(since) ? `?since=${since}` : '';
+  try {
+    const r = await fetch(`${CRM_API_BASE}/api/sanmar-invoices/imports${qs}`, {
+      headers: { 'X-CRM-API-Secret': CRM_API_SECRET }, signal: AbortSignal.timeout(30000)
+    });
+    const body = await r.text();
+    res.status(r.status).type(r.headers.get('content-type') || 'application/json').send(body);
+  } catch (e) { console.error('[sanmar-imports-forward]', e.message); res.status(502).json({ error: 'upstream_unavailable' }); }
+});
+
+app.post('/api/staff/sanmar-invoices/mark-imported', requireStaff, express.json(), async (req, res) => {
+  if (!CRM_API_SECRET) return res.status(503).json({ error: 'not_configured' });
+  const body = Object.assign({}, req.body || {}, { importedBy: (req.session.crmUser && req.session.crmUser.email) || 'staff' });
+  try {
+    const r = await fetch(`${CRM_API_BASE}/api/sanmar-invoices/mark-imported`, {
+      method: 'POST', headers: { 'x-api-secret': CRM_API_SECRET, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body), signal: AbortSignal.timeout(30000)
+    });
+    const txt = await r.text();
+    res.status(r.status).type(r.headers.get('content-type') || 'application/json').send(txt);
+  } catch (e) { console.error('[sanmar-mark-imported-forward]', e.message); res.status(502).json({ error: 'upstream_unavailable' }); }
+});
+
+app.post('/api/staff/sanmar-invoices/unmark-imported', requireStaff, express.json(), async (req, res) => {
+  if (!CRM_API_SECRET) return res.status(503).json({ error: 'not_configured' });
+  try {
+    const r = await fetch(`${CRM_API_BASE}/api/sanmar-invoices/unmark-imported`, {
+      method: 'POST', headers: { 'x-api-secret': CRM_API_SECRET, 'Content-Type': 'application/json' },
+      body: JSON.stringify(req.body || {}), signal: AbortSignal.timeout(30000)
+    });
+    const txt = await r.text();
+    res.status(r.status).type(r.headers.get('content-type') || 'application/json').send(txt);
+  } catch (e) { console.error('[sanmar-unmark-imported-forward]', e.message); res.status(502).json({ error: 'upstream_unavailable' }); }
+});
+
 // ── Finished-photo staff manage endpoints. The proxy gates GET(all)/PATCH/DELETE behind the CRM
 //    secret, so forward them from here with the secret (requireStaff = SAML gate). The photo UPLOAD
 //    (POST /api/finished-photos) goes to the proxy DIRECTLY from the browser (open + rate-limited),

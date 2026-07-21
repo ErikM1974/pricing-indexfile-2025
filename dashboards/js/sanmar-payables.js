@@ -31,7 +31,8 @@
     var state = {
         activeTab: 'invoices',
         unpaid: [], range: { start: '', end: '' },
-        sw: null,       // { map: Map(normInv → {datePaid, outstanding}), count, at } from the ShopWorks payables upload
+        imports: null, importsLoaded: false, // Map(normInv → {date}) — self-managed "imported to ShopWorks" stamps (primary)
+        sw: null,       // { map: Map(normInv → {datePaid, outstanding}) } — optional ShopWorks feed/upload (adds Paid)
         mkt: null
     };
 
@@ -129,6 +130,7 @@
         el('smp-sw-file').addEventListener('change', onShopworksFile);
         el('smp-sw-clear').addEventListener('click', clearShopworks);
         el('smp-download').addEventListener('click', downloadStandardCsv);
+        el('smp-markimported').addEventListener('click', markSelectedImported);
         el('smp-select-all').addEventListener('change', function () {
             var on = el('smp-select-all').checked;
             Array.prototype.forEach.call(el('smp-tbody').querySelectorAll('.smp-row-check:not([disabled])'), function (cb) { cb.checked = on; });
@@ -140,7 +142,8 @@
         el('smp-mkt-download').addEventListener('click', downloadMarketingCsv);
 
         loadInvoices();
-        loadShopworksFeed();   // auto ShopWorks cross-ref when the ODBC sync is live; else upload fallback
+        loadImports();         // PRIMARY imported cross-ref = your own stamp log (no ShopWorks needed)
+        loadShopworksFeed();   // OPTIONAL: adds Paid status when the ODBC sync is live / you upload
     });
 
     function switchTab(tab) {
@@ -188,18 +191,24 @@
         });
     }
 
-    // ShopWorks status for one invoice. known=false until a ShopWorks export is loaded.
+    // Combined imported/paid status for one invoice, from BOTH the import-stamp log
+    // (Erik marks it on import — the PRIMARY signal, no ShopWorks needed) and the
+    // optional ShopWorks feed/upload (adds the paid date). known=false until at least
+    // one source has loaded.
     function swStatus(inv) {
-        if (!state.sw) return { known: false, imported: false, paid: false, datePaid: '' };
-        var m = state.sw.map.get(normInv(inv.invoiceNumber));
-        if (!m) return { known: true, imported: false, paid: false, datePaid: '' };
-        var paid = !!(m.datePaid && m.datePaid.trim());
-        return { known: true, imported: true, paid: paid, datePaid: m.datePaid };
+        var known = state.importsLoaded || !!state.sw;
+        if (!known) return { known: false, imported: false, paid: false, datePaid: '', importedDate: '' };
+        var norm = normInv(inv.invoiceNumber);
+        var stamp = state.imports ? state.imports.get(norm) : null;
+        var m = state.sw ? state.sw.map.get(norm) : null;
+        var paid = !!(m && m.datePaid && m.datePaid.trim());
+        return { known: true, imported: !!(stamp || m), paid: paid, datePaid: m ? m.datePaid : '', importedDate: stamp ? stamp.date : '' };
     }
 
     function matchesStatus(inv) {
-        if (!state.sw) return true;                 // no cross-ref → show all open
-        var f = el('smp-status-filter').value, st = swStatus(inv);
+        var st = swStatus(inv);
+        if (!st.known) return true;                 // nothing loaded yet → show all open
+        var f = el('smp-status-filter').value;
         if (f === 'all') return true;
         if (f === 'open') return !st.paid;          // everything we still owe (our books)
         if (f === 'topay') return st.imported && !st.paid;
@@ -221,8 +230,9 @@
         var owed = state.unpaid.reduce(function (s, i) { return s + (Number(i.totalAmount) || 0); }, 0);
         el('smp-stat-count').textContent = state.unpaid.length;
         el('smp-stat-net').textContent = money(owed);
-        var notImp = state.sw ? state.unpaid.filter(function (i) { return !swStatus(i).imported && !swStatus(i).paid; }).length : null;
-        el('smp-stat-notimported').textContent = state.sw ? notImp : '—';
+        var known = state.importsLoaded || !!state.sw;
+        var notImp = known ? state.unpaid.filter(function (i) { var s = swStatus(i); return !s.imported && !s.paid; }).length : null;
+        el('smp-stat-notimported').textContent = known ? notImp : '—';
         // older-unpaid hint
         var hint = el('smp-older-hint');
         if (state.olderCount) { hint.textContent = '⚠ ' + state.olderCount + ' older unpaid item' + (state.olderCount === 1 ? '' : 's') + ' before ' + toMDY(state.range.start) + ' — widen the start date to review.'; hint.hidden = false; }
@@ -232,9 +242,9 @@
 
     function statusBadge(inv) {
         var st = swStatus(inv);
-        if (!st.known) return '<span class="smp-badge smp-badge--zero" title="Upload a ShopWorks payables export to see status">—</span>';
+        if (!st.known) return '<span class="smp-badge smp-badge--zero">—</span>';
         if (st.paid) return '<span class="smp-badge smp-badge--paid">PAID</span>';
-        if (st.imported) return '<span class="smp-badge smp-badge--imported">IMPORTED · UNPAID</span>';
+        if (st.imported) return '<span class="smp-badge smp-badge--imported">IMPORTED' + (st.importedDate ? ' ' + esc(st.importedDate) : '') + '</span>';
         return '<span class="smp-badge smp-badge--todo">NOT IMPORTED</span>';
     }
 
@@ -249,8 +259,9 @@
             var neg = (Number(i.totalAmount) || 0) < 0;
             var ship = (i.shipTo && i.shipTo.name) ? i.shipTo.name : '';
             var st = swStatus(i);
-            var box = '<input type="checkbox" class="smp-row-check" data-idx="' + idx + '"' + (st.paid ? '' : ' checked') + '>';
-            return '<tr class="' + (neg ? 'smp-tr--credit' : '') + (st.paid ? ' smp-tr--excluded' : '') + '">' +
+            var done = st.imported || st.paid;
+            var box = '<input type="checkbox" class="smp-row-check" data-idx="' + idx + '"' + (done ? '' : ' checked') + '>';
+            return '<tr class="' + (neg ? 'smp-tr--credit' : '') + (done ? ' smp-tr--excluded' : '') + '">' +
                 '<td class="smp-check-cell">' + box + '</td>' +
                 '<td>' + fmtWhen(i.invoiceDate) + '</td>' +
                 '<td class="smp-inv">' + (neg ? 'CR-' : 'INV-') + esc(i.invoiceNumber) + '</td>' +
@@ -280,9 +291,11 @@
     function updateSelectionCount() {
         var n = el('smp-tbody').querySelectorAll('.smp-row-check:checked').length;
         el('smp-stat-selected').textContent = n;
-        var btn = el('smp-download');
-        btn.disabled = n === 0;
-        btn.querySelector('.smp-download-count').textContent = n;
+        var dl = el('smp-download');
+        dl.disabled = n === 0;
+        dl.querySelector('.smp-download-count').textContent = n;
+        var mk = el('smp-markimported');
+        if (mk) { mk.disabled = n === 0; var c = mk.querySelector('.smp-mark-count'); if (c) c.textContent = n; }
     }
 
     function downloadStandardCsv() {
@@ -291,6 +304,66 @@
         DashPage.hideError();
         downloadCsvFile(picks.map(function (i) { return csvRow(i, '1002'); }),
             'Sanmar_Payables_1002_' + state.range.start + '_to_' + state.range.end + '.csv');
+    }
+
+    // ---------- Import-stamp log (the self-managed "imported to ShopWorks" record) ----------
+
+    // Normalize a Caspio Date/Time to M/D/YYYY for display.
+    function fmtStamp(v) {
+        var s = String(v || ''), m = /(\d{4})-(\d{2})-(\d{2})/.exec(s);
+        if (m) return Number(m[2]) + '/' + Number(m[3]) + '/' + m[1];
+        m = /(\d{1,2})\/(\d{1,2})\/(\d{4})/.exec(s);
+        return m ? Number(m[1]) + '/' + Number(m[2]) + '/' + m[3] : s.slice(0, 10);
+    }
+    function enableStatusFilter() {
+        el('smp-status-filter').disabled = false;
+        if (el('smp-status-filter').value === 'all') el('smp-status-filter').value = 'needimport';
+    }
+    function statusLine() {
+        var parts = [];
+        if (state.importsLoaded && state.imports) parts.push(state.imports.size + ' marked imported (your log)');
+        if (state.sw) parts.push('ShopWorks paid status loaded');
+        return parts.length ? parts.join(' · ') : 'Loading imported status…';
+    }
+
+    // Load the import-stamp log → the PRIMARY imported cross-reference (no ShopWorks needed).
+    function loadImports() {
+        fetchJson('/api/staff/sanmar-invoices/imports').then(function (d) {
+            var map = new Map();
+            (d.imports || []).forEach(function (row) {
+                var key = normInv(row.InvoiceNumber);
+                if (key && key !== '0') map.set(key, { date: fmtStamp(row.Date_Imported) });
+            });
+            state.imports = map; state.importsLoaded = true;
+            enableStatusFilter();
+            el('smp-sw-status').textContent = statusLine();
+            renderInvoiceStats(); renderInvoiceTable();
+        }).catch(function () { state.importsLoaded = true; renderInvoiceStats(); renderInvoiceTable(); });
+    }
+
+    // Stamp the selected (not-yet-imported) invoices → they drop off the worklist.
+    function markSelectedImported() {
+        var picks = selectedInvoices().filter(function (i) { return !swStatus(i).imported; });
+        if (!picks.length) { DashPage.showError('Select invoices that are not already imported.'); return; }
+        if (!window.confirm('Mark ' + picks.length + ' invoice' + (picks.length === 1 ? '' : 's') + ' as imported into ShopWorks? They will drop off the "not imported" list.')) return;
+        DashPage.hideError();
+        var payload = { invoices: picks.map(function (i) {
+            var neg = (Number(i.totalAmount) || 0) < 0;
+            return { invoiceNumber: (neg ? 'CR-' : 'INV-') + String(i.invoiceNumber), payableDate: toMDY(i.invoiceDate), amount: Number(i.totalAmount) || 0, poNumber: String(i.purchaseOrderNo || ''), vendor: '1002' };
+        }) };
+        var btn = el('smp-markimported'); btn.disabled = true;
+        fetch('/api/staff/sanmar-invoices/mark-imported', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+            .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+            .then(function (res) {
+                var when = fmtStamp(res.date || todayIso());
+                if (!state.imports) state.imports = new Map();
+                picks.forEach(function (i) { state.imports.set(normInv(i.invoiceNumber), { date: when }); });
+                state.importsLoaded = true;
+                renderInvoiceStats(); renderInvoiceTable();
+                el('smp-sw-status').textContent = '✓ Marked ' + (res.stamped != null ? res.stamped : picks.length) + ' imported · ' + statusLine();
+            })
+            .catch(function (err) { DashPage.showError('Could not mark imported: ' + err.message); })
+            .then(function () { btn.disabled = false; });
     }
 
     // ---------- ShopWorks payables cross-reference (upload now; ODBC later) ----------
@@ -335,9 +408,8 @@
     // enables the status filter, defaults to the worklist, re-renders.
     function applySw(map, statusText, allowClear) {
         state.sw = { map: map, count: map.size, at: new Date() };
-        el('smp-status-filter').disabled = false;
-        if (el('smp-status-filter').value === 'all') el('smp-status-filter').value = 'needimport';
-        el('smp-sw-status').textContent = statusText;
+        enableStatusFilter();
+        el('smp-sw-status').textContent = statusLine();
         el('smp-sw-clear').hidden = !allowClear;
         renderInvoiceStats();
         renderInvoiceTable();
@@ -379,10 +451,9 @@
 
     function clearShopworks() {
         state.sw = null;
-        el('smp-status-filter').disabled = true;
-        el('smp-status-filter').value = 'all';
-        el('smp-sw-status').textContent = 'No ShopWorks export loaded — showing all open payables.';
+        if (!(state.importsLoaded && state.imports)) { el('smp-status-filter').disabled = true; el('smp-status-filter').value = 'all'; }
         el('smp-sw-clear').hidden = true;
+        el('smp-sw-status').textContent = statusLine();
         renderInvoiceStats();
         renderInvoiceTable();
     }

@@ -62,10 +62,20 @@
     }
 
     var realFetch = window.fetch;
-    window.fetch = function (url) {
+    window.fetch = function (url, options) {
         var u = String(url);
         if (u.indexOf('/api/staff/sanmar-invoices/unpaid') !== -1) {
             return Promise.resolve(new Response(JSON.stringify({ invoices: unpaid }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+        }
+        if (u.indexOf('/api/staff/sanmar-invoices/mark-imported') !== -1) {
+            var n = 0; try { n = (JSON.parse((options && options.body) || '{}').invoices || []).length; } catch (e) {}
+            return Promise.resolve(new Response(JSON.stringify({ success: true, stamped: n, errored: 0, date: iso(new Date()) }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
+        }
+        if (u.indexOf('/api/staff/sanmar-invoices/imports') !== -1) {
+            // one pre-stamped invoice → verifies the import-log cross-ref (162009107 → IMPORTED 7/19)
+            return Promise.resolve(new Response(JSON.stringify({ success: true, count: 1, imports: [
+                { InvoiceNumber: 'INV-162009107', Date_Imported: '2026-07-19T00:00:00', Imported_By: 'erik@nwcustomapparel.com', Vendor: '1002' }
+            ] }), { status: 200, headers: { 'Content-Type': 'application/json' } }));
         }
         if (u.indexOf('/api/staff/shopworks-payables') !== -1) {
             // Empty auto-feed in the harness → the __SMP_TEST_SW__ seam drives the cross-ref.

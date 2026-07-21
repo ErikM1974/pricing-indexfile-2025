@@ -244,10 +244,17 @@ match. Two paths (the DSN schema decides which):
   `payables-health` watchdog. ✅ app forwarder `GET /api/staff/sanmar-invoices`… + `GET /api/staff/shopworks-payables`;
   the SanMar Payables page **auto-loads the feed on open** (`loadShopworksFeed()`) → skips the manual upload when
   the table has rows, falls back to upload when empty. ✅ agent `bandit-agent/sync-payables.ps1` written.
-  ⏳ **THE ONE REMAINING STEP (needs bandit):** the ShopWorks AP table is **NOT in the current DSN** (mapped tables
-  = Addr/Contacts/Cust/Des/Event/InvLevel/LinesOE/Machines/OrdTyp/Orders/PO/Prod/…). Run
-  **`bandit-agent/probe-payables.ps1`** → it prints whether an AP table (Payables/Pay/Bills/LinesPur/…) is
-  `SELECT`-able or must be exposed in ShopWorks OnSite "Manage ODBC" (or via support@shopworx.com). Then set
-  `PayablesTable`/`PayablesDeltaField` in bandit `config.json`, `sync-payables.ps1 -DryRun`, and schedule the
-  15-min task + a Heroku Scheduler `payables-health/alert`. Data then flows → the page is fully automatic (import
-  into ShopWorks → clears within ~15 min, no upload).
+  ⏳ **BLOCKED ON SHOPWORKS EXPOSING THE AP TABLE — probe RAN on bandit 2026-07-20 (via `bandit-cred.xml` +
+  Invoke-Command):** the DSN now exposes **19 tables** (Addr, Buttons, ContactNumbers, Contacts, Cust, Des,
+  **DesignLocations**, Event, InvLevel, LinesOE, LinesPur, Machines, Orders, OrdTyp, PO, Prod, ProductionLogDetails,
+  **Thumbnails**, Version — DesignLocations+Thumbnails new since 7/16). **NO payables/bill table** — every candidate
+  (Payables/Pay/Bills/VendorInvoice/APBills/PayHeader/…) → `FQL0002 "table does not exist"`; `LinesPur` → `<File
+  Missing>` (still an unmapped placeholder). And the exposed **PO table has NO `InvoiceNumber` and NO `date_Paid`**
+  (only PO-level `cn_sts_PayableExists`/`cnCur_PayablesOutstanding`/`cnCur_TotalInvoice`). So invoice-level date_Paid
+  is NOT derivable from ODBC as mapped. **→ ShopWorks must add the AP/vendor-bill table occurrence (ID_Payable,
+  InvoiceNumber, id_PO, id_Order, id_Vendor, date_Payable/PayableDue/Creation/Paid, cur_Payable,
+  cnCur_PayableOutstanding, sts_ToPay + a modification timestamp) to the hosted `Data_ODBCMapping` file** (email
+  support@shopworx.com — same pattern as the LinesPur request). Once exposed: set `PayablesTable`/`PayablesDeltaField`
+  in bandit `config.json`, `sync-payables.ps1 -DryRun`, schedule the 15-min task → page fully automatic. **Until then:
+  the manual upload stays the accurate invoice-level source.** (Bandit is now remotely reachable from the laptop for
+  the activation — `bandit-cred.xml` + Invoke-Command work.)
