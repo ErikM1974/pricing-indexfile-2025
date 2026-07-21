@@ -1,3 +1,7 @@
+## v2026.07.20.12 (2026.07.20)
+
+- Deploy v2026.07.20.12: 7 files (sanmar-payables.css,sanmar-payables.js,sanmar-payables.html,...) — payable import-stamp log + Mark imported button
+
 ## v2026.07.20.11 (2026.07.20)
 
 - Deploy v2026.07.20.11: 6 files (sanmar-payables.js,sanmar-payables.html,SHOPWORKS_ODBC_INTEGRATION.md,...) — auto ShopWorks payables feed (ODBC) on SanMar Payables page
