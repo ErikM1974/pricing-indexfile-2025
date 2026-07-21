@@ -1,3 +1,7 @@
+## v2026.07.21.3 (2026.07.21)
+
+- Pride Wall: freeze newest 6, newest-first order, richer captions
+
 ## v2026.07.21.2 (2026.07.21)
 
 - Thumbnail metadata sync: cut over from manual xlsx to direct ODBC
