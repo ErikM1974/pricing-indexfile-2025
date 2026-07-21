@@ -33,11 +33,30 @@
         return 'data:image/svg+xml;base64,' + btoa(svg);
     }
     var hues = ['#3a7c52', '#2c5a7c', '#7c3a5a', '#7c6a2c', '#4a3a7c', '#2c7c6e', '#7c4a2c', '#52527c'];
+    // uploadedDate deliberately out of array order so the harness proves the
+    // Pride Wall's newest-first sort (not merely "no longer shuffled"). After
+    // sorting, the frozen newest-6 left→right are: Ostrom Farms(7/21) ·
+    // NW Paving(7/20) · Pacific Fire(7/19) · Drain-Pro(7/18) · WCTTR(7/15) ·
+    // Streich Bros(7/11); Tacoma Plumbing(7/06) + Gig Harbor(6/28) fall off.
+    // dsn: design number (WCTTR left blank on purpose — proves a tile drops the
+    // # gracefully when the photo has none).
+    var pmeta = [
+        { co: 'Pacific Fire Dept', rep: 'Taneisha', date: '2026-07-19 10:12:00', dsn: '40477' },
+        { co: 'Streich Bros', rep: 'Nika', date: '2026-07-11 09:03:00', dsn: '39812' },
+        { co: 'Tacoma Plumbing', rep: 'Taneisha', date: '2026-07-06 14:20:00', dsn: '39104' },
+        { co: 'WCTTR', rep: 'Nika', date: '2026-07-15 16:45:00', dsn: '' },
+        { co: 'Drain-Pro', rep: 'Taneisha', date: '2026-07-18 08:30:00', dsn: '40655' },
+        { co: 'Ostrom Farms', rep: 'Nika', date: '2026-07-21 07:55:00', dsn: '40901' },
+        { co: 'Gig Harbor YC', rep: 'Taneisha', date: '2026-06-28 11:00:00', dsn: '38520' },
+        { co: 'NW Paving', rep: 'Nika', date: '2026-07-20 13:15:00', dsn: '40888' },
+    ];
     var photos = hues.map(function (h, i) {
         return {
             imageUrl: svgPhoto('Job #' + (128400 + i), h),
-            companyName: ['Pacific Fire Dept', 'Streich Bros', 'Tacoma Plumbing', 'WCTTR', 'Drain-Pro', 'Ostrom Farms', 'Gig Harbor YC', 'NW Paving'][i],
-            repName: i % 2 ? 'Nika' : 'Taneisha',
+            companyName: pmeta[i].co,
+            repName: pmeta[i].rep,
+            uploadedDate: pmeta[i].date,
+            designNumber: pmeta[i].dsn,
             showToCustomer: true,
         };
     });

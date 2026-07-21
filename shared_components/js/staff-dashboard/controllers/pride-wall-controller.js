@@ -1,17 +1,24 @@
 /* =====================================================
    STAFF DASHBOARD v3 — PRIDE WALL (Phase 1 "alive" layer, 2026-07-20)
 
-   Ambient strip of recent finished-product photos — the work we
-   actually made, drifting by under the goal banner all day.
+   A static strip of the six most recent finished-product photos —
+   the work we actually made — sitting under the goal banner all day.
 
    Data: GET /api/staff/finished-photos/library (same-origin SAML
    forwarder that finished-photos-library.html uses; 60s server
-   cache). Published photos only (showToCustomer) — those are the
-   quality-vetted ones; falls back to all photos if nothing is
-   published yet so the wall isn't empty in week 1.
+   cache). Published photos only (showToCustomer) — the quality-vetted
+   ones; falls back to all photos if nothing is published yet so the
+   wall isn't empty in week 1.
 
-   Rotation: one random tile crossfades to the next photo every
-   ~7s. prefers-reduced-motion ⇒ static 6 photos, no rotation.
+   Order: newest work first, left → right (defensive uploadedDate sort).
+
+   Frozen: the newest 6, static — no rotation/crossfade (Erik, 2026-07-21).
+   Re-fetched hourly so genuinely new photos off the shop floor take
+   their place at the front.
+
+   Caption: each tile labels the account + design # (when set) on top,
+   sales rep · date below — always visible, not hover-only.
+
    Failure state is VISIBLE but calm (muted one-liner, Rule #4 —
    this is decor, not pricing, so no alarm banner).
    ===================================================== */
@@ -19,68 +26,63 @@
 import { escapeHtml } from '../core/dashboard-ui-utils.js';
 
 const TILE_COUNT = 6;
-const ROTATE_MS = 7000;
 const FETCH_LIMIT = 200;
 
-const state = {
-    photos: [],     // shuffled pool
-    cursor: 0,      // next photo to show
-    onTiles: [],    // photo per tile index
-    timer: null,
-};
-
-function shuffle(arr) {
-    for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-    return arr;
+// Newest first — the wall leads with the most recent work, left → right.
+// The library API already returns rows newest-first; we sort defensively by
+// uploadedDate so the wall stays correct even if that upstream order changes.
+// Array.sort is stable, so ties / undated rows keep the API's original order
+// (never worse than what the endpoint hands us). Parsing the naive Pacific
+// timestamp as browser-local is fine here — every row gets the same treatment,
+// so relative order is preserved (we only need ordering, not absolute time).
+function uploadedAt(p) {
+    const t = p && p.uploadedDate ? Date.parse(p.uploadedDate) : NaN;
+    return isNaN(t) ? 0 : t;
+}
+function newestFirst(arr) {
+    return arr.slice().sort((a, b) => uploadedAt(b) - uploadedAt(a));
 }
 
-function nextPhoto() {
-    const p = state.photos[state.cursor % state.photos.length];
-    state.cursor++;
-    return p;
+// "Jul 21" — short + local. Same parse the library page uses; year omitted
+// because the wall only ever shows the newest handful (all but certainly this year).
+function fmtDate(s) {
+    if (!s) return '';
+    const d = new Date(s);
+    if (isNaN(d.getTime())) return '';
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
 function tileHtml(p) {
-    const cap = [p.companyName, p.repName].filter(Boolean).join(' · ');
+    const co = p.companyName || '';
+    const dsn = p.designNumber ? `#${p.designNumber}` : '';
+    const meta = [p.repName, fmtDate(p.uploadedDate)].filter(Boolean).join(' · ');
+    const title = [co, dsn, meta].filter(Boolean).join(' · ') || 'Open the Photo Library';
+    // Line 1 = company (truncates) with the design # pinned to the right so it is
+    // never clipped; line 2 = rep · date. Each piece is dropped when it's absent.
+    const line1 = (co || dsn)
+        ? `<span class="pw-cap-co">
+                ${co ? `<span class="pw-cap-name">${escapeHtml(co)}</span>` : ''}
+                ${dsn ? `<span class="pw-cap-dsn">${escapeHtml(dsn)}</span>` : ''}
+           </span>`
+        : '';
     return `
-        <a class="pw-tilelink" href="/dashboards/finished-photos-library.html" title="${escapeHtml(cap || 'Open the Photo Library')}">
-            <img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(cap || 'Finished product photo')}" loading="lazy"
+        <a class="pw-tilelink" href="/dashboards/finished-photos-library.html" title="${escapeHtml(title)}">
+            <img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(co || 'Finished product photo')}" loading="lazy"
                  onerror="this.closest('.pw-tile').classList.add('pw-tile--dead')">
-            <span class="pw-cap">${escapeHtml(cap)}</span>
+            <span class="pw-cap">
+                ${line1}
+                ${meta ? `<span class="pw-cap-meta">${escapeHtml(meta)}</span>` : ''}
+            </span>
         </a>`;
 }
 
-function renderStatic() {
+function renderTiles(photos) {
     const track = document.getElementById('pwTrack');
     if (!track) return;
-    state.onTiles = Array.from({ length: Math.min(TILE_COUNT, state.photos.length) }, () => nextPhoto());
-    track.innerHTML = state.onTiles
+    track.innerHTML = photos
+        .slice(0, TILE_COUNT)
         .map((p) => `<div class="pw-tile">${tileHtml(p)}</div>`)
         .join('');
-}
-
-function rotateOneTile() {
-    const track = document.getElementById('pwTrack');
-    if (!track || state.photos.length <= TILE_COUNT) return;
-    const tiles = track.querySelectorAll('.pw-tile');
-    if (!tiles.length) return;
-
-    const i = Math.floor(Math.random() * tiles.length);
-    const tile = tiles[i];
-    // Skip photos already on screen so the wall never shows duplicates.
-    const showing = new Set(state.onTiles.map((p) => p && p.imageUrl));
-    let fresh = nextPhoto();
-    let guard = 0;
-    while (showing.has(fresh.imageUrl) && guard++ < state.photos.length) fresh = nextPhoto();
-    state.onTiles[i] = fresh;
-    tile.classList.add('pw-tile--fading');
-    setTimeout(() => {
-        tile.innerHTML = tileHtml(fresh);
-        tile.classList.remove('pw-tile--fading');
-    }, 600); // matches the CSS opacity transition
 }
 
 async function load() {
@@ -105,19 +107,12 @@ async function load() {
     const pool = published.length >= TILE_COUNT ? published : all;
     if (!pool.length) { strip.hidden = true; return; } // nothing to show yet — no empty chrome
 
-    state.photos = shuffle(pool.slice());
-    state.cursor = 0;
     strip.hidden = false;
-    renderStatic();
-
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!reduced && !state.timer && state.photos.length > TILE_COUNT) {
-        state.timer = setInterval(rotateOneTile, ROTATE_MS);
-    }
+    renderTiles(newestFirst(pool));
 }
 
 export function initPrideWall() {
     load();
-    // Refresh the pool hourly — new photos from the shop floor join the wall.
+    // Refresh hourly — new photos from the shop floor take their place at the front.
     setInterval(load, 60 * 60 * 1000);
 }

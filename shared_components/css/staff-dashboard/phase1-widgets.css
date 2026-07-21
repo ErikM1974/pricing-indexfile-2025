@@ -191,23 +191,53 @@ a.wb-event:hover .wb-event-text {
 
 .pw-tile--dead { display: none; }
 
+/* Always-visible caption — company (bold) over rep · date. Two short lines,
+   each truncated so a long account name never wraps or overflows the tile. */
 .pw-cap {
     position: absolute;
     inset-inline: 0;
     bottom: 0;
-    padding: 14px 8px 6px;
-    font-size: var(--font-size-xs);
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: 18px 8px 6px;
     color: #fff;
-    background: linear-gradient(transparent, rgba(0, 0, 0, 0.78));
-    opacity: 0;
-    transition: opacity 0.25s ease;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.82));
+    pointer-events: none;
+}
+
+.pw-cap-name,
+.pw-cap-meta {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.pw-tilelink:hover .pw-cap,
-.pw-tilelink:focus-visible .pw-cap { opacity: 1; }
+/* Line 1: company name (flexes + truncates) with the design # pinned right. */
+.pw-cap-co {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+}
+
+.pw-cap-name {
+    flex: 1 1 auto;
+    min-width: 0; /* allow the name to ellipsize instead of shoving the # off-tile */
+}
+
+.pw-cap-dsn {
+    flex: 0 0 auto; /* design # stays fully visible — never clipped */
+    font-weight: var(--font-weight-normal);
+    color: rgba(255, 255, 255, 0.72);
+    font-variant-numeric: tabular-nums;
+}
+
+.pw-cap-meta {
+    font-size: var(--font-size-xs);
+    color: rgba(255, 255, 255, 0.82);
+}
 
 .pw-unavailable {
     grid-column: 1 / -1;
