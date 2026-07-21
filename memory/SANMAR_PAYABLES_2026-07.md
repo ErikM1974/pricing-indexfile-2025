@@ -70,3 +70,17 @@ AND haven't imported into ShopWorks." Rebuilt accordingly:
 - When Path B (ODBC `ShopWorks_Payables` sync) lands, the same cross-ref reads Caspio instead of the upload — no
   UI change. `PayableExists`/`PayableMatch` PO-level fields (staged) are the coarse fallback if invoice-level stays
   ODBC-blocked.
+
+## Imported? = SELF-MANAGED DATE-STAMP LOG (Erik's 5-year method — PRIMARY signal, LIVE 2026-07-20)
+The ShopWorks ODBC path is BLOCKED (probe on bandit 7/20: the AP/bill table with `InvoiceNumber`+`date_Paid` is
+NOT published to the `Data_ODBCMapping` ODBC file, and the exposed PO table has neither field → needs a ShopWorks
+support request to add it). So the page's PRIMARY imported signal is a self-managed stamp log — exactly how the old
+Caspio payables table's `Date_Imported_SW` worked for 5 years:
+- Caspio **`SanMar_Payable_Imports`** (key InvoiceNumber; Date_Imported, Imported_By, PayableDate, Amount, PONumber, Vendor).
+- Proxy `sanmar-invoices.js`: `GET /imports` (feed), `POST /mark-imported` (upsert, secret-gated, stores who+date),
+  `POST /unmark-imported` (corrections). App forwarders `GET/POST /api/staff/sanmar-invoices/{imports,mark-imported,unmark-imported}`.
+- Page: **auto-loads the stamp log on open** (`loadImports()` — no upload/ODBC needed) → per-row `IMPORTED <date>` /
+  `NOT IMPORTED`; **"Mark imported" button** stamps the selected rows w/ today (+ signed-in user) → they drop off
+  the "Not imported" worklist. Workflow: select → Download CSV → import into ShopWorks → Mark imported. `swStatus()`
+  now COMBINES the stamp log (imported) + the optional ShopWorks feed/upload (adds Paid). Verified via harness
+  (stamp cross-ref + mark flow) + real-data. LIVE app v2026.07.20.12 / proxy 97e50b3.

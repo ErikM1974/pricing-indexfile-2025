@@ -1,6 +1,6 @@
 # NWCA Documentation Index
 
-**Last Updated:** 2026-07-04 (regenerated from `git ls-files memory` by `/memory-maintain`)
+**Last Updated:** 2026-07-21 (regenerated from `git ls-files memory` by `/memory-maintain`)
 **Purpose:** Master navigation for `/memory`. How memory itself works → [MEMORY_SYSTEM.md](MEMORY_SYSTEM.md).
 **Regenerate:** run `/memory-maintain` (do not hand-edit file-by-file — it drifts).
 
@@ -96,6 +96,7 @@ _Read API + PO (write) side._
 - [SANMAR_API_REFERENCE.md](SANMAR_API_REFERENCE.md) — ⭐ SanMar read-side API (**v24.5 Jul 2026** — MiiR restricted; MAP restructured: basics → No-MAP, 25% = Flexfit/Richardson caps). Admin cheat-sheet `/dashboards/sanmar-api-reference.html`
 - [sanmar-api-guide-24.5-jul2026.pdf](sanmar-api-guide-24.5-jul2026.pdf) — current official guide (supersedes `sanmar-api-2025-doc.pdf`)
 - [SANMAR_INBOUND_2026-07.md](SANMAR_INBOUND_2026-07.md) — SanMar Inbound dashboard: PO→WO match via `PurchaseOrders.ID_PO`, UPS-real arrival day, shipment received dates, report-by-rep (proxy v913–v917)
+- [SANMAR_PAYABLES_2026-07.md](SANMAR_PAYABLES_2026-07.md) — SanMar Payables page (2026-07-20): `/dashboards/sanmar-payables.html` open-payables worklist (SanMar GetUnpaidInvoices × ShopWorks cross-ref → Imported?/Paid? flags), Marketing Fund tab; vendor split Net30→1002 / MRKFUND→2425; `ShopWorks_Payables` table + sync/read routes (⏳ probe on bandit). Commission/bonus reconciliation of the AE dashboards lives in AE_MISSION_CONTROL_2026-07.md
 - [LEADS_CRM_2026-07.md](LEADS_CRM_2026-07.md) — Leads CRM (2026-07-18): JotForm 6-form REST-first ingest + backfill into `Form_Submissions`, AE auto-assign rule, kanban board + lead workspace + `Lead_Activity` timeline + follow-up digest + quote handoff; endpoints, gotchas (hash links / lazy-require caspio / npm flags), open items
 - [AE_MISSION_CONTROL_2026-07.md](AE_MISSION_CONTROL_2026-07.md) — AE Mission Control (2026-07-19): per-AE cockpit page + proxy `/api/ae-dashboard/summary` aggregate (cache, per-panel errors), session-derived identity + admin view-as, post-SAML landing, rep-name shapes (AE_REGISTRY), in-page kit/outreach actions, Phase 3 backlog
 
@@ -106,6 +107,8 @@ _Read API + PO (write) side._
 - [caspio-v4-live-inventory-2026-07-09.md](caspio-v4-live-inventory-2026-07-09.md) — real `c3eku948` inventory snapshot from an authenticated v4 read: 163 tables/19 views/14 bridge apps/24 Zapier webhooks (all Datasheet-only, none fire on REST), key table IDs + schemas, profile `ProdDetailsAPI` sees all objects
 - [CASPIO_INTEGRATION_TODO.md](CASPIO_INTEGRATION_TODO.md) — ⭐ **9-item build list + session resume** (Swagger-driven security/integration roadmap; #1 portal-data-min & #2 staff SAML auth ✅ LIVE)
 - [STAFF_AUTH_DESIGN.md](STAFF_AUTH_DESIGN.md) — staff-dashboard auth via Caspio "Staff" App Connection SAML SSO (app=SP, Caspio=IdP); killed forgeable `/api/crm-session` (#2, LIVE v1477)
+- [AIRTIGHT_PII_PROXY_PLAN_2026-07.md](AIRTIGHT_PII_PROXY_PLAN_2026-07.md) — plan/record for secret-only gating of ManageOrders PII reads on the proxy; caller-repoint waves + the "sweep `scripts/` before flipping a gate" discipline (see LESSONS "PII gate flips break callers in waves")
+- [EMAILJS_TEMPLATES_REFERENCE.md](EMAILJS_TEMPLATES_REFERENCE.md) — EmailJS service + template ID reference and the flow each template serves (quote share/accept, art, digitizing, leads outreach)
 - [CASPIO_PORTAL_DESIGN.md](CASPIO_PORTAL_DESIGN.md) — customer portal: data-minimization + magic-link auth + admin console + Phase 5 reward-dollars ledger (LIVE 2026-06-30)
 - [STAFF_DASHBOARD_SEAL_AUDIT_2026-06.md](STAFF_DASHBOARD_SEAL_AUDIT_2026-06.md) — 58-agent adversarial audit that found + closed 3 anon staff-page backdoors around the gate (`gateStaffHtml`, gift-certs secret, creditcard-atmos)
 - [SIDE_DOOR_REMEDIATION_PLAN_2026-06.md](SIDE_DOOR_REMEDIATION_PLAN_2026-06.md) — public-proxy "side-door" gating plan (waves 1–4; Inksoft Flask routing + FE-dashboard SAML)
