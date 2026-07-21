@@ -1,3 +1,7 @@
+## v2026.07.21.2 (2026.07.21)
+
+- Thumbnail metadata sync: cut over from manual xlsx to direct ODBC
+
 ## v2026.07.21.1 (2026.07.21)
 
 - AE Mission Control: name Setup Bonus in bonus footnote + tag manual rows
