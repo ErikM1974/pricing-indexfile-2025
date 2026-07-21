@@ -372,6 +372,10 @@
         'taneisha@nwcustomapparel.com': '/taneisha',
         'nika@nwcustomapparel.com': '/nika',
     };
+    // The three types the daily sync cron computes and materializes automatically.
+    // Anything else in the payout ledger (e.g. a hand-keyed Setup Bonus) is a manual
+    // adjustment — flag it so the row is self-explanatory and the total is trusted.
+    var COMPUTED_BONUS_TYPES = { 'Online Store': 1, 'Garment Spiff': 1, 'Win-Back Bounty': 1 };
 
     function bonusRowsHtml(rows) {
         if (!rows.length) return '<div class="aemc-empty">No bonus rows recorded yet this quarter.</div>';
@@ -383,9 +387,13 @@
             // baseline/new-store math — captioning those invites reps to
             // multiply in their head and think they were shorted.
             var captionIsExact = r.base > 0 && r.rate > 0 && Math.abs(r.base * r.rate - r.amount) <= 0.02;
+            var isManual = !COMPUTED_BONUS_TYPES[r.type];
+            var metaHtml = captionIsExact
+                ? '<span class="aemc-row-meta">on ' + money0(r.base) + ' @ ' + (Math.round(r.rate * 1000) / 10) + '%</span>'
+                : (isManual ? '<span class="aemc-row-meta">manual adjustment</span>' : '');
             return '<li class="aemc-row">' +
                 '<span class="aemc-row-main">' + esc(r.type) + '</span>' +
-                (captionIsExact ? '<span class="aemc-row-meta">on ' + money0(r.base) + ' @ ' + Math.round(r.rate * 1000) / 10 + '%</span>' : '') +
+                metaHtml +
                 '<span class="aemc-status' + chipCls + '">' + esc(r.status || '') + '</span>' +
                 '<span class="aemc-row-right"><span class="aemc-money">' + money2(r.amount) + '</span></span>' +
                 '</li>';
@@ -433,8 +441,18 @@
             '<div class="aemc-bonus-when">Accrues as orders invoice — refreshed daily</div>' +
             bonusRowsHtml(b.current.rows);
 
+        // Name the components ACTUALLY present in the payout so the footnote can
+        // never undercount the total again (a hand-keyed Setup Bonus row is folded
+        // into b.current.total but was previously unnamed here). Falls back to the
+        // standard three before any rows load.
+        var typeSet = {};
+        (b.current.rows || []).concat(b.previous.rows || []).forEach(function (r) {
+            if (r && r.type) typeSet[r.type] = 1;
+        });
+        var comps = Object.keys(typeSet);
+        var compStr = comps.length ? comps.join(', ') : 'Online Store, Garment Spiff, Win-Back Bounty';
         el('aemc-bonus-foot').textContent = 'Paid so far in ' + b.year + ': ' +
-            money2(b.paidYtd) + ' · Components: Online Store commission, Garment Spiffs, Win-Back Bounty (5%). Annual retention/growth/new-business bonuses are calculated in December.';
+            money2(b.paidYtd) + ' · Components: ' + compStr + '. Annual retention/growth/new-business bonuses are calculated in December.';
     }
 
     // ---------- work panels ----------
