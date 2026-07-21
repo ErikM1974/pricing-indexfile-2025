@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
     <link rel="stylesheet" href="/shared_components/css/sanmar-invoice-viewer.css?v=2026.07.20.8">
-    <link rel="stylesheet" href="/dashboards/css/sanmar-payables.css?v=2026.07.20.9">
+    <link rel="stylesheet" href="/dashboards/css/sanmar-payables.css?v=2026.07.20.12">
 </head>
 <body>
     <div class="dash-shell">
@@ -83,7 +83,7 @@
                         <label class="dash-btn smp-upload-btn" for="smp-sw-file"><i class="fas fa-upload"></i> Upload ShopWorks payables</label>
                         <input type="file" id="smp-sw-file" accept=".csv,text/csv" hidden>
                         <button type="button" id="smp-sw-clear" class="smp-linkbtn" hidden>clear</button>
-                        <span class="smp-sw-status" id="smp-sw-status">No ShopWorks export loaded — showing all open payables. Upload it to see Imported / Paid status.</span>
+                        <span class="smp-sw-status" id="smp-sw-status">Loading imported status…</span>
                     </div>
 
                     <div class="smp-filters">
@@ -144,6 +144,10 @@
                         <button type="button" id="smp-download" class="dash-btn dash-btn--primary smp-download">
                             <i class="fas fa-file-csv"></i>
                             Download ShopWorks CSV (<span class="smp-download-count">0</span>)
+                        </button>
+                        <button type="button" id="smp-markimported" class="dash-btn smp-markbtn">
+                            <i class="fas fa-check"></i>
+                            Mark imported (<span class="smp-mark-count">0</span>)
                         </button>
                     </div>
                 </div>
@@ -231,6 +235,6 @@
     <script src="/shared_components/js/dash-page-helpers.js"></script>
     <script src="/shared_components/js/sanmar-invoice-viewer.js?v=2026.07.20.8"></script>
     <script src="/tests/ui/test-sanmar-payables-stub.js"></script>
-    <script src="/dashboards/js/sanmar-payables.js?v=2026.07.20.11"></script>
+    <script src="/dashboards/js/sanmar-payables.js?v=2026.07.20.12"></script>
 </body>
 </html>

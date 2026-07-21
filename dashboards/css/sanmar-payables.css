@@ -232,3 +232,10 @@
     border-top: 1px solid var(--gray-200);
 }
 .smp-download:disabled { opacity: 0.5; cursor: not-allowed; }
+.smp-markbtn {
+    background: #eaf7ef;
+    color: #0f5132;
+    border: 1px solid #b7e0c5;
+}
+.smp-markbtn:hover:not(:disabled) { background: #d8f0e2; }
+.smp-markbtn:disabled { opacity: 0.5; cursor: not-allowed; }
