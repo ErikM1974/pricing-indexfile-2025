@@ -30,6 +30,7 @@
         renderLimit: RENDER_STEP,
         editingId: null,   // PK_ID being edited, or null when adding
         aiImage: null,     // downscaled screenshot data URI staged for extraction
+        engagement: {},    // email(lc) → { inMailchimp, opened, rating } from the last check
     };
     try { var _v = localStorage.getItem('nwca-jml-view'); if (_v === 'all' || _v === 'mine') state.view = _v; } catch (e) {}
 
@@ -80,7 +81,9 @@
         el('jml-export').addEventListener('click', exportMailchimp);
         el('jml-labels').addEventListener('click', printLabels);
         el('jml-mc-test').addEventListener('click', mcTest);
+        el('jml-mc-check').addEventListener('click', mcCheckEngagement);
         el('jml-mc-sync').addEventListener('click', mcSync);
+        el('jml-mc-sync-engaged').addEventListener('click', mcSyncEngaged);
         el('jml-mc-refresh').addEventListener('click', mcRefresh);
         el('jml-view-mine').addEventListener('click', function () { setView('mine'); });
         el('jml-view-all').addEventListener('click', function () { setView('all'); });
@@ -235,20 +238,54 @@
             else setMcStatus('Not connected: ' + (d.error || 'unknown') + (d.audiences ? ' — audiences found: ' + d.audiences.join(', ') : ''), 'err');
         }).catch(function (err) { b.disabled = false; setMcStatus('Could not reach the server: ' + err.message, 'err'); });
     }
-    function mcSync() {
-        if (!window.confirm('Sync your prospects to Mailchimp?\n\nEveryone with an email is added to the audience as NON-subscribed — they will NOT be emailed until you subscribe them in Mailchimp.')) return;
-        var b = el('jml-mc-sync'); b.disabled = true;
-        setMcStatus('Syncing to Mailchimp… this can take up to a minute — please wait.', 'ok');
-        jsonFetch(API + '/mailchimp/sync', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }).then(function (d) {
-            b.disabled = false;
-            if (d.error) { setMcStatus('Sync failed: ' + d.error, 'err'); return; }
-            var msg = '✓ Synced ' + d.attempted + ' companies (' + d.created + ' new, ' + d.updated + ' updated) to “' + d.audience + '”.';
-            if (d.errors) msg += ' ' + d.errors + ' had a problem.';
-            if (d.skippedDoNotMail) msg += ' ' + d.skippedDoNotMail + ' skipped (Do not mail).';
-            if (d.message) msg = d.message;
-            setMcStatus(msg, d.errors ? 'warn' : 'ok');
-        }).catch(function (err) { b.disabled = false; setMcStatus('Sync failed: ' + err.message, 'err'); });
+    function memberFromRow(r) {
+        var nm = splitName(r);
+        return { email: r.Email, first: nm.first, last: nm.last, company: r.Company, address: r.Address, city: r.City, state: r.State, zip: r.Zip, phone: r.Phone, tag: (r.Category || '').trim() };
     }
+    function rowIsEngaged(r) {
+        var e = state.engagement[String(r.Email || '').toLowerCase()];
+        return !!(e && e.opened);
+    }
+
+    // Check the current group against Mailchimp — how many are known, how many opened.
+    function mcCheckEngagement() {
+        var rows = currentRows().filter(hasEmail);
+        if (!rows.length) { setMcStatus('No companies with an email in ' + syncScopeLabel() + ' to check.', 'warn'); return; }
+        var emails = rows.map(function (r) { return r.Email; });
+        var b = el('jml-mc-check'); b.disabled = true;
+        setMcStatus('Checking Mailchimp for ' + emails.length + ' emails… (the first check can take a minute)', 'ok');
+        jsonFetch(API + '/mailchimp/engagement', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ emails: emails }) }).then(function (d) {
+            b.disabled = false;
+            if (d.error) { setMcStatus(d.error, 'err'); return; }
+            state.engagement = {};
+            Object.keys(d.byEmail || {}).forEach(function (k) { state.engagement[k.toLowerCase()] = d.byEmail[k]; });
+            el('jml-mc-sync-engaged').hidden = false;
+            el('jml-mc-sync-engaged').textContent = '';
+            el('jml-mc-sync-engaged').appendChild(document.createTextNode(' Sync engaged only (' + d.opened + ')'));
+            var i = document.createElement('i'); i.className = 'fas fa-star'; i.setAttribute('aria-hidden', 'true');
+            el('jml-mc-sync-engaged').insertBefore(i, el('jml-mc-sync-engaged').firstChild);
+            setMcStatus('Of ' + d.checked + ' with an email in ' + syncScopeLabel() + ': ' + d.inMailchimp + ' are in Mailchimp, and ' + d.opened + ' have opened your emails. Use “Sync engaged only” to add just the ' + d.opened + ' openers.', d.opened ? 'ok' : 'warn');
+        }).catch(function (err) { b.disabled = false; setMcStatus('Engagement check failed: ' + err.message, 'err'); });
+    }
+
+    // Sync a set of rows (with an email) to Mailchimp, tagged by segment.
+    function doSync(rows, whatLabel) {
+        if (!rows.length) { setMcStatus('No ' + whatLabel + ' to sync in ' + syncScopeLabel() + '.', 'warn'); return; }
+        if (!window.confirm('Add ' + rows.length + ' ' + whatLabel + ' from ' + syncScopeLabel() + ' to your Mailchimp audience, tagged by group?\n\n⚠ This adds ' + rows.length + ' to your Mailchimp contact count. They go in NON-subscribed — not emailed until you subscribe them.')) return;
+        var members = rows.map(memberFromRow);
+        var b1 = el('jml-mc-sync'), b2 = el('jml-mc-sync-engaged');
+        b1.disabled = true; if (b2) b2.disabled = true;
+        setMcStatus('Syncing ' + members.length + ' to Mailchimp…', 'ok');
+        jsonFetch(API + '/mailchimp/sync', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ members: members }) }).then(function (d) {
+            b1.disabled = false; if (b2) b2.disabled = false;
+            if (d.error) { setMcStatus('Sync failed: ' + d.error, 'err'); return; }
+            var msg = '✓ Synced ' + d.attempted + ' to “' + d.audience + '” (' + d.created + ' new, ' + d.updated + ' updated).';
+            if (d.errors) msg += ' ' + d.errors + ' had a problem.';
+            setMcStatus(msg, d.errors ? 'warn' : 'ok');
+        }).catch(function (err) { b1.disabled = false; if (b2) b2.disabled = false; setMcStatus('Sync failed: ' + err.message, 'err'); });
+    }
+    function mcSync() { doSync(currentRows().filter(hasEmail), 'companies (with an email)'); }
+    function mcSyncEngaged() { doSync(currentRows().filter(hasEmail).filter(rowIsEngaged), 'engaged companies (have opened your emails)'); }
     function mcRefresh() {
         var b = el('jml-mc-refresh'); b.disabled = true;
         setMcStatus('Checking Mailchimp for who has been emailed…', 'ok');
@@ -555,6 +592,13 @@
         }
         return sortRows(rows.filter(matchesCategory));
     }
+    function hasEmail(r) { return /\S+@\S+\.\S+/.test(String(r.Email || '')); }
+    function syncScopeLabel() {
+        if (state.view === 'mine') return 'your companies';
+        if (state.category) return '“' + state.category + '”';
+        if (state.search) return 'your search results';
+        return 'ALL companies';
+    }
 
     function render() {
         var total = state.entries.length;
@@ -575,6 +619,12 @@
         el('jml-count').textContent = filtering ? '(showing ' + rows.length + ')' : '';
 
         if (isAll) renderChips();
+
+        var mcScope = el('jml-mc-scope');
+        if (mcScope) {
+            var syncN = rows.filter(hasEmail).length;
+            mcScope.textContent = 'Sync will add ' + syncN + ' compan' + (syncN === 1 ? 'y' : 'ies') + ' (with an email) from ' + syncScopeLabel() + '.';
+        }
 
         if (!rows.length) {
             if (!isAll) {

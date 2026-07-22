@@ -41,7 +41,22 @@
             return json(200, { ok: true, configured: true, dc: 'us7', audience: { name: "Jim's Prospects", members: 0 } });
         }
         if (/\/jim-mailing-list\/mailchimp\/sync\b/.test(u) && method === 'POST') {
-            return json(200, { ok: true, audience: "Jim's Prospects", attempted: 2, created: 2, updated: 0, errors: 0, skippedNoEmail: 1, skippedDoNotMail: 0 });
+            var syncBody = {}; try { syncBody = options.body ? JSON.parse(options.body) : {}; } catch (e) {}
+            var n = (syncBody.members || []).length;
+            return json(200, { ok: true, audience: "Jim's Prospects", attempted: n, created: n, updated: 0, errors: 0 });
+        }
+        if (/\/jim-mailing-list\/mailchimp\/engagement\b/.test(u) && method === 'POST') {
+            var engBody = {}; try { engBody = options.body ? JSON.parse(options.body) : {}; } catch (e) {}
+            var emails = engBody.emails || [];
+            var byEmail = {}, inMc = 0, opened = 0;
+            emails.forEach(function (em, idx) {
+                em = String(em).toLowerCase();
+                var isIn = idx % 2 === 0, didOpen = isIn && idx % 4 === 0;
+                if (isIn) inMc++;
+                if (didOpen) opened++;
+                byEmail[em] = { inMailchimp: isIn, opened: didOpen, rating: didOpen ? 4 : (isIn ? 2 : 0) };
+            });
+            return json(200, { ok: true, checked: emails.length, inMailchimp: inMc, opened: opened, byEmail: byEmail });
         }
         if (/\/jim-mailing-list\/mailchimp\/record-sends\b/.test(u) && method === 'POST') {
             return json(200, { ok: true, campaigns: 1, recipients: 1, updated: 1 });
