@@ -6,6 +6,12 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 
 ---
 
+### New staff-dashboard sidebar section = solid green square (missing SVG mask) (2026-07-22)
+- **Problem**: AE Mission Control, Leads, Jim's Mailing List, and Forms rendered as solid NW-green squares in the sidebar (their `→` also a faint gray nub) while the older sections showed clean icons.
+- **Root Cause**: the sidebar does NOT display the emoji in `<span aria-hidden>`. `dashboard-v3-theme.css` sets that span to `font-size:0` + `background-color:var(--nw-green)` and cuts it out with a per-section `mask-image` (inline SVG). Each of the 4 sections was added AFTER the masking system and never got its `[data-section="X"] … :first-child { mask-image }` rule — no mask = green floods the whole 18×18 box. Same for the trailing-arrow `:last-child` (base `background-color:var(--ink-dim)` → gray nub).
+- **Solution**: added the 4 first-child icon masks (rocket/magnet/mailbox/clipboard-list) + a chevron-right `:last-child` mask for the 3 link-style sections; bumped `?v=` on the theme `<link>`.
+- **Prevention**: adding a `.nav-section[data-section="…"]` to `staff-dashboard-v3/index.html` is a TWO-file change — you MUST also add its `:first-child` `mask-image` (and `:last-child` for header-link sections) in `dashboard-v3-theme.css`, else it's a green square. The emoji in the HTML is a placeholder the mask replaces, not the rendered icon. Validate hand-authored mask SVGs as XML before shipping (malformed = silent blank mask). Icons are 24×24 Feather/Lucide line, `stroke='white'` `stroke-width='1.8'`.
+
 ### Caspio quota blown by uncached per-style endpoints + a dead-table probe (2026-07-18)
 - **Problem**: 507K/500K Integrations at day 22. Recurring baseline (~18K/day ≈ 545K/mo) exceeded the cap by itself — only ~100K was July's one-off backfills.
 - **Root Cause**: (a) every PDP view cost ~13 Caspio calls — the 8 per-style siblings of pricing-bundle (size-pricing, max-prices, inventory, colors, swatches, details…) had zero server cache while the data changes only nightly; (b) `/api/sizes-by-style-color` probed the dead `/tables/Inventory` (404 since 2026-06-18) on EVERY call; (c) `Standard_Size_Upcharges`/`Size_Display_Order` re-fetched in full per request; (d) dashboard pollers ran 24/7 in hidden tabs (~2,880 calls/day/tab); (e) hourly quote bulk-sync re-synced every 30-day quote every hour — and re-syncing cancelled quotes re-stamped `ShopWorks_Last_Synced`, resetting their 30-day purge countdown daily.
