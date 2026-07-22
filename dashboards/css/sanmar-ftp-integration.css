@@ -1,0 +1,95 @@
+/* ==========================================================================
+   sanmar-ftp-integration.css — page styles for
+   /dashboards/sanmar-ftp-integration.html (SanMar FTP Downloads, admin).
+   Uses the 2026 tokens (art-hub.css) + dash-shell.css. Never redefine tokens;
+   never hardcode colors/shadows/radii — var(--token) only.
+   ========================================================================== */
+
+.sf-subhead { font-weight: 400; font-size: 0.68em; opacity: 0.85; }
+.sf-lock {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 600; color: #fff;
+    background: rgba(0,0,0,0.18); border: 1px solid rgba(255,255,255,0.35); padding: 5px 12px; border-radius: var(--radius-pill);
+}
+
+.sf-lead { font-size: 1rem; line-height: 1.6; color: var(--gray-700); margin: 0 0 var(--space-4); }
+.sf-note { font-size: 0.82rem; color: var(--gray-500); line-height: 1.55; margin: var(--space-3) 0 0; }
+
+.dash-card-header { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+
+/* ---------- buttons ---------- */
+.sf-btn {
+    display: inline-flex; align-items: center; gap: 7px; font-size: 0.84rem; font-weight: 600;
+    padding: 7px 14px; border-radius: var(--radius-md); border: 1px solid transparent;
+    cursor: pointer; text-decoration: none; white-space: nowrap; line-height: 1;
+    background: var(--dash-theme); color: #fff; transition: filter .12s ease, background .12s ease;
+}
+.sf-btn:hover { filter: brightness(1.05); }
+.sf-btn:active { filter: brightness(0.95); }
+.sf-btn--ghost { background: var(--surface-inset); color: var(--gray-700); border-color: var(--gray-300); }
+.sf-btn--ghost:hover { background: var(--surface-card); filter: none; }
+.sf-btn[disabled], .sf-btn.is-busy { opacity: 0.6; pointer-events: none; }
+
+/* ---------- status / messages ---------- */
+.sf-status { font-size: 0.9rem; color: var(--gray-600); margin: 0 0 var(--space-3); }
+.sf-status.is-error { color: var(--state-danger); }
+.sf-msg { border: 1px solid var(--gray-200); border-left: 4px solid var(--gray-400); border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4); background: var(--surface-inset); font-size: 0.9rem; color: var(--gray-700); line-height: 1.55; }
+.sf-msg--error { border-left-color: var(--state-danger); background: var(--state-danger-bg); color: var(--state-danger); }
+.sf-spin { animation: sf-spin 0.8s linear infinite; display: inline-block; }
+@keyframes sf-spin { to { transform: rotate(360deg); } }
+
+/* ---------- file table ---------- */
+.sf-table-wrap { overflow-x: auto; }
+.sf-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; min-width: 620px; }
+.sf-table thead th { text-align: left; padding: 8px var(--space-3); border-bottom: 2px solid var(--gray-300);
+    color: var(--gray-500); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; background: var(--surface-inset); }
+.sf-table td { padding: 9px var(--space-3); border-bottom: 1px solid var(--gray-200); vertical-align: middle; color: var(--gray-700); }
+.sf-table tr:last-child td { border-bottom: 0; }
+.sf-file-name { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.82rem; color: var(--gray-900); font-weight: 600; }
+.sf-file-kind { font-size: 0.82rem; color: var(--gray-600); }
+.sf-file-meta { font-size: 0.8rem; color: var(--gray-500); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.sf-row--master td { background: var(--dash-theme-bg); }
+.sf-tag { display: inline-block; font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em;
+    padding: 2px 8px; border-radius: var(--radius-pill); color: var(--dash-theme-dark); background: var(--dash-theme-bg);
+    border: 1px solid var(--dash-theme); margin-left: 6px; vertical-align: middle; }
+
+/* ---------- flow strip ---------- */
+.sf-flow { display: flex; align-items: stretch; flex-wrap: wrap; gap: var(--space-2);
+    background: var(--surface-inset); border: 1px solid var(--gray-200); border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4); margin-bottom: var(--space-4); }
+.sf-node { display: flex; flex-direction: column; justify-content: center; gap: 2px; text-align: center;
+    font-size: 0.82rem; font-weight: 600; color: var(--gray-800); background: var(--surface-card);
+    border: 1px solid var(--gray-200); border-radius: var(--radius-sm); padding: var(--space-2) var(--space-3); }
+.sf-node small { font-weight: 400; font-size: 0.72rem; color: var(--gray-500); font-family: 'JetBrains Mono', ui-monospace, monospace; }
+.sf-node i { color: var(--gray-500); margin-bottom: 2px; }
+.sf-node--accent { border-color: var(--dash-theme); background: var(--dash-theme-bg); }
+.sf-node--accent i { color: var(--dash-theme-dark); }
+.sf-arrow { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; color: var(--state-info); font-weight: 700; }
+.sf-arrow small { font-weight: 400; font-size: 0.66rem; color: var(--gray-400); white-space: nowrap; }
+
+/* ---------- chips ---------- */
+.sf-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-4); }
+.sf-chip { background: var(--surface-inset); border: 1px solid var(--gray-200); border-radius: var(--radius-md); padding: 5px 11px; font-size: 0.8rem; color: var(--gray-600); }
+.sf-chip b { color: var(--gray-900); font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
+/* ---------- callouts ---------- */
+.sf-callout { border: 1px solid var(--gray-200); border-left: 4px solid var(--gray-400); border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4); margin: var(--space-4) 0 0; background: var(--surface-inset); }
+.sf-callout h4 { margin: 0 0 var(--space-2); font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; gap: var(--space-2); }
+.sf-callout p { margin: 0; font-size: 0.88rem; color: var(--gray-700); line-height: 1.6; }
+.sf-callout--danger { border-left-color: var(--state-danger); background: var(--state-danger-bg); }
+.sf-callout--danger h4 { color: var(--state-danger); }
+.sf-callout--info { border-left-color: var(--state-info); }
+.sf-callout--info h4 { color: var(--state-info); }
+.sf-callout--warn { border-left-color: var(--state-warning, #b45309); }
+.sf-callout--warn h4 { color: var(--state-warning, #b45309); }
+
+/* ---------- steps ---------- */
+.sf-steps { margin: 0; padding-left: var(--space-5); }
+.sf-steps li { margin: var(--space-3) 0; font-size: 0.9rem; color: var(--gray-700); line-height: 1.6; }
+
+/* ---------- inline code ---------- */
+.sf-lead code, .sf-note code, .sf-callout code, .sf-steps code, .sf-table code, .sf-chip code {
+    font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.82em; background: var(--surface-card); color: var(--gray-800);
+    padding: 1px 5px; border-radius: var(--radius-sm); overflow-wrap: anywhere;
+}

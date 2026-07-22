@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEST · SanMar Downloads page</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css">
+    <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
+    <link rel="stylesheet" href="/dashboards/css/sanmar-ftp-integration.css?v=2026.07.22.8">
+</head>
+<body>
+    <div class="dash-shell">
+        <header class="dash-header">
+            <div class="dash-header-left">
+                <a href="#" title="Back"><img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="NWCA" class="dash-header-logo"></a>
+                <h1 class="dash-header-title">SanMar Downloads <span class="sf-subhead">pull SanMar's pricing &amp; data files, then import into Caspio</span></h1>
+            </div>
+            <div class="dash-header-right">
+                <span class="sf-lock" title="Admin only"><i class="fas fa-user-shield"></i> Admin</span>
+                <a href="#" class="dash-back-link"><i class="fas fa-arrow-left"></i> Dashboard</a>
+            </div>
+        </header>
+        <main class="dash-content">
+            <section class="dash-card">
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title"><i class="fas fa-cloud-arrow-down"></i> Download SanMar files</h2>
+                    <button type="button" id="sf-refresh" class="sf-btn sf-btn--ghost"><i class="fas fa-rotate"></i> Refresh</button>
+                </div>
+                <p class="sf-lead">These are the data files SanMar publishes on their FTP server. Click <b>Download</b> to save one to your computer — no FileZilla needed — then import it into Caspio. The product &amp; pricing master is <code>SanMarPI-Bulk</code>; it feeds garment <b>CASE_PRICE</b> into every quote builder.</p>
+                <div id="sf-status" class="sf-status" aria-live="polite"></div>
+                <div id="sf-files"></div>
+                <p class="sf-note" id="sf-checked"></p>
+            </section>
+            <section class="dash-card">
+                <div class="dash-card-header"><h2 class="dash-card-title"><i class="fas fa-database"></i> After you download — import into Caspio</h2></div>
+                <ol class="sf-steps">
+                    <li>Caspio app <b>Sanmar Pricing 2026</b> → table <code>Sanmar_Bulk_251816_Feb2024</code> → <b>Import</b> the CSV you just downloaded.</li>
+                    <li>Import mode: <b>Update &amp; add records</b>, match on <code>UNIQUE_KEY</code>.</li>
+                    <li><b>Leave unmapped</b> so your own values are kept: <code>IsTopSeller</code>, <code>IsNew</code>, <code>Display_Image_URL</code> (formula).</li>
+                    <li>Done — this one table feeds every quote builder, so all pricing surfaces refresh within ~15 min.</li>
+                </ol>
+                <div class="sf-callout sf-callout--danger">
+                    <h4><i class="fas fa-triangle-exclamation"></i> This is the table that runs pricing</h4>
+                    <p><code>Sanmar_Bulk_251816_Feb2024</code> is the single garment-cost source for all quote builders. After a big import, spot-check a couple of styles and confirm a changed price shows the same in the Catalog, Quick Quote, and a Quote Builder.</p>
+                </div>
+            </section>
+            <section class="dash-card">
+                <div class="dash-card-header"><h2 class="dash-card-title"><i class="fas fa-diagram-project"></i> How this works</h2></div>
+                <div class="sf-flow">
+                    <span class="sf-node"><i class="fas fa-server"></i> SanMar FTP<br><small>ftp.sanmar.com</small></span>
+                    <span class="sf-arrow"><i class="fas fa-arrow-right"></i><small>this page</small></span>
+                    <span class="sf-node sf-node--accent"><i class="fas fa-cloud-arrow-down"></i> Download<br><small>to your PC</small></span>
+                    <span class="sf-arrow"><i class="fas fa-arrow-right"></i><small>Caspio import</small></span>
+                    <span class="sf-node"><i class="fas fa-database"></i> Sanmar_Bulk<br><small>product master</small></span>
+                    <span class="sf-arrow"><i class="fas fa-arrow-right"></i><small>CASE_PRICE</small></span>
+                    <span class="sf-node"><i class="fas fa-tags"></i> All quote builders</span>
+                </div>
+                <div class="sf-chips">
+                    <span class="sf-chip">Host <b>ftp.sanmar.com</b> · user <b>6920</b> · plain FTP</span>
+                    <span class="sf-chip">Pricing master in <b>/SanMarPDD/SanMarPI/</b> (<code>SanMarPI-Bulk-*.csv</code>)</span>
+                </div>
+                <div class="sf-callout sf-callout--info">
+                    <h4><i class="fas fa-laptop"></i> Prefer a one-click desktop tool?</h4>
+                    <p>There's also <code>Download-SanMar-Pricing.bat</code> in the <code>sanmar-ftp-box</code> folder — double-click it to pull the newest pricing file straight to your Downloads folder.</p>
+                </div>
+                <div class="sf-callout sf-callout--warn" id="sf-config-note" hidden>
+                    <h4><i class="fas fa-gear"></i> One-time setup</h4>
+                    <p>Needs <code>SANMAR_FTP_PASSWORD</code> as an app config var.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="/tests/ui/test-sanmar-ftp-stub.js"></script>
+    <script src="/dashboards/js/sanmar-ftp-integration.js?v=2026.07.22.8"></script>
+</body>
+</html>

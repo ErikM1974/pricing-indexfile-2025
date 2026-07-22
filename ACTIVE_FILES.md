@@ -1,6 +1,6 @@
 # Active Files Registry
-**Last Updated:** 2026-07-14
-**Total Active Files:** 577 (HTML+JS+CSS, excludes `node_modules/`, `.git/`, `tests/`, `.claude/`, `archive-working-files/`)
+**Last Updated:** 2026-07-22
+**Total Active Files:** 580 (HTML+JS+CSS, excludes `node_modules/`, `.git/`, `tests/`, `.claude/`, `archive-working-files/`)
 **Purpose:** Track all active files to prevent orphaned code accumulation
 **Audit cadence:** Quarterly. Bump the timestamp on every file create/delete/move (CLAUDE.md Top 8 Rule #5).
 
@@ -1325,6 +1325,9 @@ cap-embroidery-fix.css
 | `/dashboards/css/shopworks-odbc-reference.css` | ShopWorks ODBC reference styles (2026 tokens; calc/global/summary field badges → --state-*) | dash-shell.css, art-hub.css | ✅ Active |
 | `/dashboards/bandit-integration.html` | **NEW (2026-07-18)** Bandit integration reference — data-flow (bandit→proxy→Caspio/Box), live scheduled-task table, sync mechanics (ODBC read→clean→POST), thumbnails→Box, connect/troubleshoot, the per-second-rate-limit rule. Admin doc; static (no JS). Deep detail = `memory/SHOPWORKS_ODBC_INTEGRATION.md` | dash-shell.css, art-hub.css, bandit-integration.css | ✅ Active |
 | `/dashboards/css/bandit-integration.css` | Bandit integration page styles (2026 tokens; flow strip, task table, status pills) | dash-shell.css, art-hub.css | ✅ Active |
+| `/dashboards/sanmar-ftp-integration.html` | **NEW (2026-07-22)** SanMar Downloads — admin page that lists SanMar's FTP data files and streams the chosen one to the browser (replaces manual FileZilla). Primary = `SanMarPI-Bulk-*.csv` → import into `Sanmar_Bulk_251816_Feb2024` (the master every quote builder prices from). Backed by `/api/staff/sanmar-ftp/{list,download}` in server.js (basic-ftp, admin-gated). Needs `SANMAR_FTP_PASSWORD` config var. Deep detail = `memory/SANMAR_FTP_INTEGRATION.md` | dash-shell.css, art-hub.css, sanmar-ftp-integration.css, sanmar-ftp-integration.js | ✅ Active |
+| `/dashboards/css/sanmar-ftp-integration.css` | SanMar Downloads page styles (2026 tokens; file table, flow strip, callouts, download buttons) | dash-shell.css, art-hub.css | ✅ Active |
+| `/dashboards/js/sanmar-ftp-integration.js` | SanMar Downloads controller — fetches `/api/staff/sanmar-ftp/list`, renders the file table (pins the pricing master, human size/date/kind), builds per-file Download links to `/api/staff/sanmar-ftp/download`; handles not-configured/ftp-error/401 states | fetch (same-origin admin API) | ✅ Active |
 | `/dashboards/js/shopworks-odbc-reference.js` | ShopWorks ODBC reference controller — fetches the schema JSON, renders 16 collapsible tables + live filter/highlight, stored-only toggle, curated gotcha notes, auto kind-badges for calc/global/summary prefixes | fetch (static JSON), DashPage (errors) | ✅ Active |
 | `/dashboards/data/shopworks-odbc-schema.json` | Static schema snapshot — 2,630 fields/16 tables pulled live from FileMaker_Fields 2026-07-16. Regenerate from `memory/shopworks-odbc-schema-catalog.txt` if ShopWorks extends Data_ODBCMapping. | — | ✅ Active |
 
