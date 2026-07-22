@@ -324,6 +324,17 @@
 .jml-entry.is-customer { border-left: 5px solid var(--state-success); }
 .jml-entry.is-donotmail { border-left: 5px solid var(--gray-400); }
 
+/* ---- Mailchimp card ---- */
+.jml-mc-title { font-size: 22px; font-weight: 700; color: var(--gray-900); margin: 0 0 var(--space-3); display: flex; align-items: center; gap: var(--space-3); }
+.jml-mc-title i { color: var(--art-theme); }
+.jml-mc-help { font-size: 16px; line-height: 1.5; color: var(--gray-600); margin: 0 0 var(--space-4); }
+.jml-mc-help strong { color: var(--gray-900); }
+.jml-mc-actions { display: flex; gap: var(--space-3); flex-wrap: wrap; }
+.jml-mc-status { margin: var(--space-4) 0 0; font-size: 16px; font-weight: 600; padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); }
+.jml-mc-status.is-ok { color: var(--state-success); background: var(--state-success-bg); }
+.jml-mc-status.is-warn { color: var(--state-warning); background: var(--state-warning-bg); }
+.jml-mc-status.is-err { color: var(--state-danger); background: var(--state-danger-bg); }
+
 /* ---- entries ---- */
 .jml-list { display: flex; flex-direction: column; gap: var(--space-4); }
 

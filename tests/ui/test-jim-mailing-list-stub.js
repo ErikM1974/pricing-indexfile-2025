@@ -33,6 +33,17 @@
             return realFetch ? realFetch(url, options) : json(404, { error: 'not stubbed' });
         }
 
+        // Mailchimp (Phase 2)
+        if (/\/jim-mailing-list\/mailchimp\/status\b/.test(u) && method === 'GET') {
+            return json(200, { ok: true, configured: true, dc: 'us7', audience: { name: "Jim's Prospects", members: 0 } });
+        }
+        if (/\/jim-mailing-list\/mailchimp\/sync\b/.test(u) && method === 'POST') {
+            return json(200, { ok: true, audience: "Jim's Prospects", attempted: 2, created: 2, updated: 0, errors: 0, skippedNoEmail: 1, skippedDoNotMail: 0 });
+        }
+        if (/\/jim-mailing-list\/mailchimp\/record-sends\b/.test(u) && method === 'POST') {
+            return json(200, { ok: true, campaigns: 1, recipients: 1, updated: 1 });
+        }
+
         // AI capture — return the Copy Wrights directory-listing example.
         if (/\/jim-mailing-list\/extract\b/.test(u) && method === 'POST') {
             return json(200, {
