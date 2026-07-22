@@ -1,3 +1,7 @@
+## v2026.07.22.6 (2026.07.22)
+
+- Jim's Mailing List: Mailchimp — sync current group + Check engagement / Sync engaged only
+
 ## v2026.07.22.5 (2026.07.22)
 
 - Jim's Mailing List: Jim-first redesign — 'Your companies' default view + collapsed Mailchimp
