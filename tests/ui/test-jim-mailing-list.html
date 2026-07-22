@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/jim-mailing-list.css?v=2026.07.21.2">
+    <link rel="stylesheet" href="/dashboards/css/jim-mailing-list.css?v=2026.07.21.3">
 </head>
 <body>
     <div class="dash-shell">
@@ -33,6 +33,29 @@
                 Type in a company below and press <strong>Save</strong>. It gets added to your list.
                 You can change or remove any company anytime.
             </p>
+
+            <section class="jml-card jml-ai-card">
+                <h2 class="jml-ai-title"><i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i> Let Claude fill it in for you</h2>
+                <p class="jml-ai-help">
+                    Found a company online? <strong>Copy the text</strong> and paste it below — or <strong>paste a screenshot</strong>.
+                    Claude reads it and fills in the form. Then check it and press <strong>Save</strong>.
+                </p>
+                <label for="jml-ai-text" class="jml-ai-label">Paste what you copied here</label>
+                <textarea id="jml-ai-text" rows="4" placeholder="Paste the company name, address, phone, email…"></textarea>
+                <div class="jml-ai-image-row">
+                    <label class="jml-ai-imgbtn"><i class="fas fa-image" aria-hidden="true"></i> Choose a screenshot
+                        <input type="file" id="jml-ai-file" accept="image/*" hidden></label>
+                    <span class="jml-ai-orpaste">…or press <kbd>Ctrl</kbd> + <kbd>V</kbd> to paste a screenshot</span>
+                </div>
+                <div id="jml-ai-thumb-wrap" class="jml-ai-thumb-wrap" hidden>
+                    <img id="jml-ai-thumb" alt="Your screenshot" class="jml-ai-thumb">
+                    <button type="button" id="jml-ai-thumb-clear" class="jml-ai-thumb-clear" aria-label="Remove screenshot"><i class="fas fa-times" aria-hidden="true"></i> Remove</button>
+                </div>
+                <button type="button" class="jml-btn jml-btn-ai" id="jml-ai-go">
+                    <i class="fas fa-wand-magic-sparkles" aria-hidden="true"></i> <span id="jml-ai-go-text">Read it &amp; fill in the form</span>
+                </button>
+                <p class="jml-ai-status" id="jml-ai-status" role="status" aria-live="polite" hidden></p>
+            </section>
 
             <section class="jml-card jml-form-card">
                 <h2 class="jml-form-title" id="jml-form-title">
@@ -120,6 +143,6 @@
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/dash-page-helpers.js"></script>
     <script src="/tests/ui/test-jim-mailing-list-stub.js"></script>
-    <script src="/dashboards/js/jim-mailing-list.js?v=2026.07.21.2"></script>
+    <script src="/dashboards/js/jim-mailing-list.js?v=2026.07.21.3"></script>
 </body>
 </html>

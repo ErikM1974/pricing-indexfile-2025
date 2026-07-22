@@ -19,6 +19,7 @@
         entries: [],      // rows from the API
         search: '',
         editingId: null,  // PK_ID being edited, or null when adding
+        aiImage: null,    // downscaled screenshot data URI staged for extraction
     };
 
     // form field id → Caspio column
@@ -53,8 +54,132 @@
         });
         // Delegated — the list is rebuilt on every render(), so listen on the container.
         el('jml-list').addEventListener('click', onListClick);
+        wireAi();
         load();
     });
+
+    // ── AI capture (paste text / screenshot → Claude fills the form) ───────
+    function wireAi() {
+        el('jml-ai-go').addEventListener('click', runAiExtract);
+        el('jml-ai-file').addEventListener('change', function () {
+            var f = el('jml-ai-file').files && el('jml-ai-file').files[0];
+            if (f) stageImage(f);
+        });
+        el('jml-ai-thumb-clear').addEventListener('click', clearAiImage);
+        // Paste a screenshot anywhere on the AI card.
+        document.querySelector('.jml-ai-card').addEventListener('paste', function (e) {
+            var items = (e.clipboardData && e.clipboardData.items) || [];
+            for (var i = 0; i < items.length; i++) {
+                if (items[i].type && items[i].type.indexOf('image') === 0) {
+                    var blob = items[i].getAsFile();
+                    if (blob) { e.preventDefault(); stageImage(blob); return; }
+                }
+            }
+        });
+    }
+
+    // Downscale to keep the upload small (fewer tokens, lower cost, under limits),
+    // flattening onto white so JPEG doesn't blacken transparent PNG regions.
+    function fileToDownscaledDataUrl(file, maxDim, quality) {
+        return new Promise(function (resolve, reject) {
+            var url = URL.createObjectURL(file);
+            var img = new Image();
+            img.onload = function () {
+                URL.revokeObjectURL(url);
+                var w = img.naturalWidth || 1, h = img.naturalHeight || 1;
+                var scale = Math.min(1, maxDim / Math.max(w, h));
+                var cw = Math.max(1, Math.round(w * scale)), ch = Math.max(1, Math.round(h * scale));
+                var canvas = document.createElement('canvas');
+                canvas.width = cw; canvas.height = ch;
+                var ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, cw, ch);
+                ctx.drawImage(img, 0, 0, cw, ch);
+                try { resolve(canvas.toDataURL('image/jpeg', quality)); }
+                catch (err) { reject(err); }
+            };
+            img.onerror = function () { URL.revokeObjectURL(url); reject(new Error('Could not read that image')); };
+            img.src = url;
+        });
+    }
+
+    function stageImage(file) {
+        setAiStatus('Getting the screenshot ready…', false);
+        fileToDownscaledDataUrl(file, 1400, 0.85)
+            .then(function (dataUrl) {
+                state.aiImage = dataUrl;
+                el('jml-ai-thumb').src = dataUrl;
+                el('jml-ai-thumb-wrap').hidden = false;
+                setAiStatus('Screenshot ready. Press the button below to read it.', false);
+            })
+            .catch(function (err) {
+                clearAiImage();
+                DashPage.showError('That screenshot could not be read: ' + err.message);
+            });
+    }
+
+    function clearAiImage() {
+        state.aiImage = null;
+        el('jml-ai-file').value = '';
+        el('jml-ai-thumb').removeAttribute('src');
+        el('jml-ai-thumb-wrap').hidden = true;
+    }
+
+    function setAiStatus(msg, isWarn) {
+        var s = el('jml-ai-status');
+        if (!msg) { s.hidden = true; s.textContent = ''; return; }
+        s.textContent = msg;
+        s.classList.toggle('is-warn', !!isWarn);
+        s.hidden = false;
+    }
+
+    function runAiExtract() {
+        DashPage.hideError();
+        var text = el('jml-ai-text').value.trim();
+        if (!text && !state.aiImage) { setAiStatus('Paste some text or a screenshot first.', true); return; }
+
+        var btn = el('jml-ai-go');
+        btn.disabled = true;
+        setAiStatus('Reading… this takes a few seconds.', false);
+
+        jsonFetch(API + '/extract', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: text || undefined, image: state.aiImage || undefined }),
+        }).then(function (data) {
+            btn.disabled = false;
+            var f = data.fields || {};
+            if (!f.company && !f.phone && !f.email && !f.address) {
+                setAiStatus('Claude did not find a company in that — you can type it in below instead.', true);
+                return;
+            }
+            fillFormFromAi(f);
+            el('jml-ai-text').value = '';
+            clearAiImage();
+            setAiStatus('✓ Filled in below — please check it, fix anything, then press Save.', false);
+            var card = document.querySelector('.jml-form-card');
+            window.scrollTo({ top: (card.getBoundingClientRect().top + window.pageYOffset) - 20, behavior: 'smooth' });
+        }).catch(function (err) {
+            btn.disabled = false;
+            setAiStatus('', false);
+            DashPage.showError('Could not read that: ' + err.message + ' — please try again.');
+        });
+    }
+
+    function fillFormFromAi(f) {
+        resetForm();
+        el('jml-company').value = f.company || '';
+        el('jml-contact').value = f.contact_name || '';
+        el('jml-address').value = f.address || '';
+        el('jml-city').value = f.city || '';
+        el('jml-state').value = f.state || '';
+        el('jml-zip').value = f.zip || '';
+        el('jml-phone').value = f.phone || '';
+        el('jml-email').value = f.email || '';
+        el('jml-website').value = f.website || '';
+        el('jml-source').value = 'Found online';
+        el('jml-category').value = f.category || '';
+        el('jml-notes').value = f.notes || '';
+    }
 
     // ── data ──────────────────────────────────────────────────────────────
     function jsonFetch(url, options) {

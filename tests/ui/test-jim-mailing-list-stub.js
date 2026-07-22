@@ -33,6 +33,19 @@
             return realFetch ? realFetch(url, options) : json(404, { error: 'not stubbed' });
         }
 
+        // AI capture — return the Copy Wrights directory-listing example.
+        if (/\/jim-mailing-list\/extract\b/.test(u) && method === 'POST') {
+            return json(200, {
+                fields: {
+                    company: 'Copy Wrights', contact_name: 'Justin Kasarda (General Manager)',
+                    address: '2106 Tacoma Ave S', city: 'Tacoma', state: 'WA', zip: '98402',
+                    phone: '(253) 922-5156', email: '', website: '',
+                    category: 'Printing Services, Signs/Banners',
+                    notes: 'Fax (855) 594-3238; cell (253) 670-8702. 30+ years.',
+                },
+            });
+        }
+
         // pull an id off the end if present
         var m = /\/jim-mailing-list\/(\d+)/.exec(u);
         var id = m ? parseInt(m[1], 10) : null;

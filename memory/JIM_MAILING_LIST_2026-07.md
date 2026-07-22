@@ -40,7 +40,25 @@ Bigin CRM prospects (non-customers). **Not deployed yet — safe stopping point.
   CSS over in-memory fetch stub). **VERIFIED via static-qa (port 8099): load, add, edit, delete,
   search, count-wording, website link, category tag — all pass, zero console errors.**
 
-**Import file (READY):**
+**AI capture (paste text / screenshot → Claude fills the form) — DONE 7/22:**
+- Proxy `POST /api/jim-mailing-list/extract` in the same route file — Anthropic SDK (lazy client,
+  `claude-haiku-4-5-20251001`, same pattern as `src/routes/vision.js`); accepts `{text?, image? dataURI}`,
+  returns `{fields}` (company/contact_name/address/city/state/zip/phone/email/website/category/notes).
+  Writes NOTHING — the page pre-fills the form so Jim reviews then Saves normally.
+- App forwarder bumped to `express.json({limit:'12mb'})` for the pasted screenshot (proxy global cap = 10mb).
+- Page: "Let Claude fill it in for you" card above the form — textarea + Ctrl+V/file screenshot (client
+  downscales to 1400px JPEG q0.85 before upload), "Read it & fill in the form" → prefills + scrolls to form.
+- Verified in harness (text path → Copy Wrights fields → Save adds it). ⚠ needs `ANTHROPIC_API_KEY` on the
+  proxy (already set — vision.js uses it). Model = Haiku to keep per-use cost tiny; bump if quality is weak.
+
+**Erik Q&A 7/22:**
+- **Unique field?** Leave PK_ID as the only unique key (autonumber). Do NOT set Company unique (blocks legit
+  multi-location + errors on Jim) or Bigin_Id unique (blank on manual/AI adds → Caspio dup-blank reject). Dedup
+  softly in-app / at import, not via a DB constraint.
+- **Multiple contacts per company?** One row per company (it's a mailing list). Import took the primary contact
+  (email-preferred); extras weren't imported. Offer to fold extra contacts into Notes on a re-import if wanted.
+
+**Import file (IMPORTED 7/22 — Erik ran the Caspio CSV import; 2,905 rows live in Prospect_Mailing_List):**
 - `C:\Users\erik\Downloads\Jim-Prospect-Import.csv` — **2,905 rows**, headers EXACTLY match the table
   (Company, Contact_Name, Address, City, State, Zip, Phone, Email, Source, Notes, Website, Category,
   Bigin_Id, Added_By, Created_At, Updated_At, Updated_By — NO PK_ID). Contact-joined from contacts CSV

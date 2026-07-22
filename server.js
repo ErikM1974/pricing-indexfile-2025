@@ -3411,7 +3411,8 @@ app.all('/api/crm-proxy/marketing-shipments*', requireStaff, (req, res, next) =>
 // contact info). Added_By (on create) + Updated_By (on writes) are stamped from
 // the verified session so the browser can't attribute an edit to someone else.
 const [, jimMailingListForwarder] = createCrmProxy('jim-mailing-list', []);
-app.all('/api/crm-proxy/jim-mailing-list*', requireStaff, express.json(), (req, res, next) => {
+// 12mb body limit: the /extract sub-route accepts a pasted screenshot (base64).
+app.all('/api/crm-proxy/jim-mailing-list*', requireStaff, express.json({ limit: '12mb' }), (req, res, next) => {
   if (req.body && ['POST', 'PUT', 'PATCH'].includes(req.method)) {
     const email = (req.session && req.session.crmUser && req.session.crmUser.email) || '';
     if (email) {
