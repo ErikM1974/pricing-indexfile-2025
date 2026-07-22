@@ -48,6 +48,11 @@
 .jml-mc-summary i { color: var(--art-theme); }
 .jml-mc-summary:hover { color: var(--gray-800); }
 .jml-mc-body { padding: 0 var(--space-5) var(--space-5); }
+.jml-mc-scope { font-size: 15px; color: var(--gray-600); font-weight: 600; margin: 0 0 var(--space-3); }
+.jml-mc-scope:empty { display: none; }
+.jml-mc-engaged-btn { border-color: var(--art-theme); color: var(--art-theme); }
+.jml-mc-engaged-btn i { color: var(--state-warning); }
+.jml-mc-engaged-btn:hover { background: var(--art-theme-light, #eaf7ea); }
 
 /* ---- intro line ---- */
 .jml-intro {
