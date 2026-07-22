@@ -76,6 +76,9 @@
         el('jml-list').addEventListener('change', onListChange);
         el('jml-export').addEventListener('click', exportMailchimp);
         el('jml-labels').addEventListener('click', printLabels);
+        el('jml-mc-test').addEventListener('click', mcTest);
+        el('jml-mc-sync').addEventListener('click', mcSync);
+        el('jml-mc-refresh').addEventListener('click', mcRefresh);
         wireAi();
         load();
     });
@@ -178,6 +181,48 @@
         if (!w) { DashPage.showError('Please allow pop-ups so the labels can open in a new tab to print.'); return; }
         w.document.write(html); w.document.close();
         showOk('Opened ' + rows.length + ' labels in a new tab to print.');
+    }
+
+    // ── Mailchimp (test / sync / record sends) ────────────────────────────
+    function setMcStatus(msg, kind) {
+        var s = el('jml-mc-status');
+        if (!msg) { s.hidden = true; s.textContent = ''; return; }
+        s.className = 'jml-mc-status ' + (kind === 'err' ? 'is-err' : kind === 'warn' ? 'is-warn' : 'is-ok');
+        s.textContent = msg;
+        s.hidden = false;
+    }
+    function mcTest() {
+        var b = el('jml-mc-test'); b.disabled = true;
+        setMcStatus('Checking the connection…', 'ok');
+        jsonFetch(API + '/mailchimp/status').then(function (d) {
+            b.disabled = false;
+            if (d.ok) setMcStatus('✓ Connected. Audience “' + (d.audience && d.audience.name) + '” has ' + (d.audience && d.audience.members) + ' contact(s) in Mailchimp.', 'ok');
+            else setMcStatus('Not connected: ' + (d.error || 'unknown') + (d.audiences ? ' — audiences found: ' + d.audiences.join(', ') : ''), 'err');
+        }).catch(function (err) { b.disabled = false; setMcStatus('Could not reach the server: ' + err.message, 'err'); });
+    }
+    function mcSync() {
+        if (!window.confirm('Sync your prospects to Mailchimp?\n\nEveryone with an email is added to the audience as NON-subscribed — they will NOT be emailed until you subscribe them in Mailchimp.')) return;
+        var b = el('jml-mc-sync'); b.disabled = true;
+        setMcStatus('Syncing to Mailchimp… this can take up to a minute — please wait.', 'ok');
+        jsonFetch(API + '/mailchimp/sync', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }).then(function (d) {
+            b.disabled = false;
+            if (d.error) { setMcStatus('Sync failed: ' + d.error, 'err'); return; }
+            var msg = '✓ Synced ' + d.attempted + ' companies (' + d.created + ' new, ' + d.updated + ' updated) to “' + d.audience + '”.';
+            if (d.errors) msg += ' ' + d.errors + ' had a problem.';
+            if (d.skippedDoNotMail) msg += ' ' + d.skippedDoNotMail + ' skipped (Do not mail).';
+            if (d.message) msg = d.message;
+            setMcStatus(msg, d.errors ? 'warn' : 'ok');
+        }).catch(function (err) { b.disabled = false; setMcStatus('Sync failed: ' + err.message, 'err'); });
+    }
+    function mcRefresh() {
+        var b = el('jml-mc-refresh'); b.disabled = true;
+        setMcStatus('Checking Mailchimp for who has been emailed…', 'ok');
+        jsonFetch(API + '/mailchimp/record-sends', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }).then(function (d) {
+            b.disabled = false;
+            if (d.error) { setMcStatus(d.error, 'err'); return; }
+            setMcStatus('✓ ' + (d.message || ('Updated ' + d.updated + ' prospect(s) from ' + d.campaigns + ' campaign(s).')), 'ok');
+            if (d.updated) load();
+        }).catch(function (err) { b.disabled = false; setMcStatus(err.message, 'err'); });
     }
 
     // ── AI capture (paste text / screenshot → Claude fills the form) ───────
