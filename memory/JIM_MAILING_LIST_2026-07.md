@@ -1,88 +1,93 @@
-# Jim's Mailing List — build status & handoff (2026-07-21)
+# Jim's Mailing List — build status & handoff (2026-07-22)
 
-Owner "Jim" (83, non-technical) wants a dead-simple prospect/mailing list he can add/edit/delete.
-Standalone Caspio table + senior-friendly dashboard page, PLUS a one-time bulk import of ~2,905
-Bigin CRM prospects (non-customers). **✅ LIVE 2026-07-22 — proxy v988, app v1731 (tag v2026.07.22.1).**
+Owner "Jim" (83, non-technical) wanted a dead-simple prospect/mailing list he can add/edit/delete.
+Standalone Caspio table + senior-friendly dashboard page, a one-time bulk import of ~2,905 Bigin CRM
+prospects (non-customers), AI capture (paste/screenshot → Claude fills the form), a Jim-first two-view
+redesign, and a controlled/engagement-gated Mailchimp sync for Erik.
+**✅ Phase 1+2 + redesign + engagement all LIVE 2026-07-22 — proxy `55fe4ce`, app `v2026.07.22.7`.**
 
-## Decisions (Erik-confirmed this session)
-- **New dedicated table `Prospect_Mailing_List`** — NOT `Form_Submissions`/Leads CRM (that fires AE
-  routing / Slack / 7:45 digest; a passive list must not touch it).
-- **Access:** any logged-in staff (no `Staff_Page_Access` row). Sidebar link after Leads.
-- **Fields:** full mailing info + added **Website**, **Category** (Bigin Tag / segment, e.g. "Fire Dept
-  Prospect"), **Bigin_Id** (read-only import provenance).
-- **Bigin classification:** exclude customers (`id_Customer` linked, or Tag/Type = Customer) AND leads
-  (Tag `Jotform`/`Lead`) → **2,905 prospects**. Erik said "only bring in non customers and import";
-  I kept the stricter 2,905 (leads excluded too, per his original "not a customer or a lead"). The
-  **472 leads are a one-word add-back** if he wants them.
-- **Import method:** Caspio **CSV import (free)** — Erik runs the UI import of the generated file.
+## The page
+`/dashboards/jim-mailing-list.html` (+ `css/`, `js/` — bump `?v=` on shared edits; currently `2026.07.22.7`).
+Sidebar link "✉️ Jim's Mailing List" after Leads (`staff-dashboard-v3/index.html`). Any logged-in staff
+(no `Staff_Page_Access` row). Same-origin API base `/api/crm-proxy/jim-mailing-list`.
 
-## DONE
-**Proxy repo (`../caspio-pricing-proxy`):**
-- `scripts/create-prospect-mailing-list-table.js` — created AND **ran `--apply`; the table EXISTS in
-  Caspio** (17 fields + auto PK_ID). Script `process.exit()`s cleanly (api-tracker timer otherwise hangs it).
-- `src/routes/jim-mailing-list.js` — full CRUD (list/get/post/put/delete). `putWithRecordsAffected` +
-  `RecordsAffected`→404 on PUT/DELETE; numeric `PK_ID` addressing; `S`/`nowIso` from
-  form-submission-helpers. `FIELDS`/`EDITABLE`/`CAPS` include Website/Category (Bigin_Id read-only).
-- `server.js` ~L1254 — `app.use('/api/jim-mailing-list', requireCrmApiSecret, jimMailingListRoutes)`
-  (after marketing-shipments; PII → whole-mount secret).
+## Data
+- **Caspio table `Prospect_Mailing_List`** — dedicated (NOT `Form_Submissions`/Leads CRM; a passive list
+  must not fire AE routing / Slack / 7:45 digest). Fields: Company, Contact_Name, **First_Name, Last_Name**,
+  Address, City, State, Zip, Phone, Email, Source, Website, Category, Notes, Bigin_Id, **Status,
+  Last_Mailed_At, Mailchimp_Status, Mailchimp_Last_Sent, Mailchimp_Sent_Count**, Added_By, Created_At,
+  Updated_At, Updated_By + auto PK_ID.
+- **Unique key = PK_ID only** (autonumber). Company NOT unique (multi-location + would error on Jim);
+  Bigin_Id NOT unique (blank on manual/AI adds → Caspio dup-blank reject). Dedup softly in-app, not via DB.
+- **One row per company** (it's a mailing list). Import took the primary (email-preferred) contact.
+- **First/Last** split is **derive-on-read** (`splitName` off Contact_Name) — no backfill; the add/edit
+  form has real First/Last inputs going forward.
+- **Bigin import (done):** 5,874 companies − customers (`id_Customer` linked / Tag=Customer) − leads
+  (Tag `Jotform`/`Lead`) = **2,905 prospects**, Erik CSV-imported into Caspio 7/22. The **472 leads are a
+  one-word add-back** (re-run generator without the lead exclusion) if he wants them.
 
-**App repo (Pricing Index File 2025):**
-- `dashboards/jim-mailing-list.html` + `css/jim-mailing-list.css` + `js/jim-mailing-list.js`
-  (`?v=2026.07.21.2`) — senior-friendly: 19px+ inputs, ≥52px buttons, one form reused for add+edit,
-  client-side search, native confirm on delete, green "saved" toast, Website link + Category tag,
-  errors via `DashPage.showError`. Calls same-origin `/api/crm-proxy/jim-mailing-list`.
-- `server.js` ~L3408 — forwarder `app.all('/api/crm-proxy/jim-mailing-list*', requireStaff,
-  express.json(), <stamp Added_By on POST + Updated_By on writes>, jimMailingListForwarder)`.
-- `staff-dashboard-v3/index.html` — sidebar `<div class="nav-section" data-section="jim-mailing-list">`
-  "✉️ Jim's Mailing List" after the Leads section.
-- `ACTIVE_FILES.md` — 5 rows added (page/js/css + 2 test-harness files).
-- `tests/ui/test-jim-mailing-list.html` + `test-jim-mailing-list-stub.js` — harness (real controller +
-  CSS over in-memory fetch stub). **VERIFIED via static-qa (port 8099): load, add, edit, delete,
-  search, count-wording, website link, category tag — all pass, zero console errors.**
+## Redesign (Jim-first, Erik-confirmed)
+- **Portrait welcome** — on login, `jml-welcome` shows Jim's photo (Caspio file URL
+  `https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9463872`) + greeting so he knows he's
+  on his page. ⚠ do NOT `loading="lazy"` that img — above-fold + browser-pane not compositing = it never
+  fires (naturalWidth 0). Currently shows for all staff; Jim-only gating is an option not taken.
+- **Two views** (toggle `jml-view-mine`/`jml-view-all`, persisted `localStorage nwca-jml-view`): **"Yours"**
+  = rows where `Added_By === me.email`, sorted newest-first (Created_At desc) so Jim sees what he just typed,
+  not 2,905 old imports. **"Browse all"** = full list with filter chips + sort. `me` from `/api/crm-session/me`.
+- Segment filter chips + sort + capped render (RENDER_STEP=100, "show more").
 
-**AI capture (paste text / screenshot → Claude fills the form) — DONE 7/22:**
-- Proxy `POST /api/jim-mailing-list/extract` in the same route file — Anthropic SDK (lazy client,
-  `claude-haiku-4-5-20251001`, same pattern as `src/routes/vision.js`); accepts `{text?, image? dataURI}`,
-  returns `{fields}` (company/contact_name/address/city/state/zip/phone/email/website/category/notes).
-  Writes NOTHING — the page pre-fills the form so Jim reviews then Saves normally.
-- App forwarder bumped to `express.json({limit:'12mb'})` for the pasted screenshot (proxy global cap = 10mb).
-- Page: "Let Claude fill it in for you" card above the form — textarea + Ctrl+V/file screenshot (client
-  downscales to 1400px JPEG q0.85 before upload), "Read it & fill in the form" → prefills + scrolls to form.
-- Verified in harness (text path → Copy Wrights fields → Save adds it). ⚠ needs `ANTHROPIC_API_KEY` on the
-  proxy (already set — vision.js uses it). Model = Haiku to keep per-use cost tiny; bump if quality is weak.
+## AI capture
+- Proxy `POST …/extract` — Anthropic SDK (lazy client, **`claude-haiku-4-5-20251001`**, same pattern as
+  `src/routes/vision.js`); `{text?, image? dataURI}` → `{fields}`. Writes NOTHING; the page pre-fills the
+  form for Jim to review + Save. App forwarder = `express.json({limit:'12mb'})` (proxy global cap 10mb;
+  client downscales screenshot to 1400px JPEG q0.85 first). Needs `ANTHROPIC_API_KEY` on proxy (already set).
 
-**Erik Q&A 7/22:**
-- **Unique field?** Leave PK_ID as the only unique key (autonumber). Do NOT set Company unique (blocks legit
-  multi-location + errors on Jim) or Bigin_Id unique (blank on manual/AI adds → Caspio dup-blank reject). Dedup
-  softly in-app / at import, not via a DB constraint.
-- **Multiple contacts per company?** One row per company (it's a mailing list). Import took the primary contact
-  (email-preferred); extras weren't imported. Offer to fold extra contacts into Notes on a re-import if wanted.
+## Mailchimp (Phase 2 — Erik-only, collapsed `<details>` strip at page bottom)
+`src/utils/mailchimp-client.js` (Basic auth, key's `-usX` = data center, NEVER logged). Audience by NAME
+**"Jim's Prospects"** (`MAILCHIMP_AUDIENCE` env override) so no hardcoded List ID. Needs `MAILCHIMP_API_KEY`
+on proxy (Erik added, us7). Buttons: Test-connection, **Check engagement**, Sync, **Sync engaged only**,
+Refresh-activity, + scope selector.
+- **Controlled sync (never all-at-once — Mailchimp bills per contact):** client sends the CURRENT scope's
+  rows to `…/mailchimp/sync`; server requires an **email**, caps 2000/call, upserts as **`transactional`**
+  (NOT marketing-subscribed → nobody is emailed until Erik subscribes them), tags by segment, ensures merge
+  fields (FNAME/LNAME/COMPANY/ADDRESS/CITY/STATE/ZIP/PHONE).
+- **Engagement-gated sync (Erik's ask: "only push the emails that have been opening our emails"):**
+  "Check engagement" → `…/mailchimp/engagement` reads **every** Mailchimp audience's members and marks
+  `opened = avg_open_rate > 0`. That read takes ~50s (past Heroku's 30s H12 cap) so it runs in the
+  **BACKGROUND**: `getEngagementMap()` returns null + kicks off `buildEngagementMap()`, endpoint returns
+  `{building:true}` instantly ("…click again in about a minute"), 2nd click reads the 10-min cache. Then
+  **"Sync engaged only"** pushes just the openers. **LIVE-VERIFIED 7/22**: of 1,461 prospects with an email,
+  575 are in Mailchimp, **326 have opened** → "Sync engaged only (326)".
+- `…/mailchimp/record-sends` (manual button) stamps Mailchimp_Last_Sent/Sent_Count from recent campaigns'
+  `/reports/{id}/sent-to`. Auto webhook-on-send is a future option.
 
-**Import file (IMPORTED 7/22 — Erik ran the Caspio CSV import; 2,905 rows live in Prospect_Mailing_List):**
-- `C:\Users\erik\Downloads\Jim-Prospect-Import.csv` — **2,905 rows**, headers EXACTLY match the table
-  (Company, Contact_Name, Address, City, State, Zip, Phone, Email, Source, Notes, Website, Category,
-  Bigin_Id, Added_By, Created_At, Updated_At, Updated_By — NO PK_ID). Contact-joined from contacts CSV
-  (1,677 contact / 1,461 email / 1,977 phone / 2,275 street / 1,319 website). Source='Bigin import',
-  Category=Bigin Tag, Bigin_Id=Bigin Company Id, timestamps='2026-07-21T00:00:00', Added_By='bigin-import'.
-- Generator: `<scratchpad>/build-jim-import.ps1` (PowerShell Import-Csv, robust). Source files:
-  `C:\Users\erik\Downloads\Bigin Companies.csv` (5,874 companies) + `bigin contacs.csv` (9,628 contacts).
-
-## DONE 7/22
-- ✅ Proxy deployed (Heroku **v988**) — `/api/jim-mailing-list` + `/extract` live, 401-gated.
-- ✅ Caspio CSV import run by Erik — 2,905 rows live in `Prospect_Mailing_List`.
-- ✅ App deployed (`/deploy`, Heroku **v1731**, tag **v2026.07.22.1**); `/api/version` SHA `53c797a` matches.
-
-## REMAINING
-1. **Erik live smoke-test:** open `/dashboards/jim-mailing-list.html` as staff → confirm 2,905 load,
-   search works, add/edit/delete round-trip, and the "Let Claude fill it in" box (text + screenshot).
-2. Optional: add the 472 leads back if Erik wants them (re-run generator without the lead exclusion).
-3. MEMORY.md compaction is due (~21KB) — run `/memory-maintain` sometime.
+## Deploy state (all live 7/22)
+- Proxy `../caspio-pricing-proxy` `main` → Heroku, latest **`55fe4ce`** (`/api/jim-mailing-list` + `/extract`
+  + `/mailchimp/*`, 401-gated whole-mount `requireCrmApiSecret`).
+- App `develop`→`main`→Heroku, **`v2026.07.22.7`** (main `0dc69b07`). Forwarder ~server.js L3408
+  `app.all('/api/crm-proxy/jim-mailing-list*', requireStaff, express.json({limit:'12mb'}), <stamp
+  Added_By/Updated_By from session>, jimMailingListForwarder)`.
+- Harness `tests/ui/test-jim-mailing-list.html` + `-stub.js` (real controller over in-memory fetch stub).
 
 ## Gotchas learned
-- Caspio IS reachable + writable from the local sandbox (proxy `.env` present). Any Caspio script MUST
-  `process.exit()` or the api-tracker interval keeps the process alive (looks like a hang).
-- `Customer Type` in the Bigin export is an INDUSTRY label (Construction/Fire-Police/…), NOT a
-  customer flag. The real customer signal is `id_Customer` populated (or Tag "Customer").
-- Bigin CSVs have embedded newlines in Description → `wc -l` overcounts; use a real CSV parser
-  (PowerShell Import-Csv) — true counts: 5,874 companies / 9,628 contacts.
-- Git: DEPLOYED 7/22 — proxy `main`→Heroku (v988); app `develop`→`main`→Heroku (v1731, tag v2026.07.22.1).
+- **Live-test the engagement build is BACKGROUND, not sync** — the browser JS tool (CDP) caps a single
+  `javascript_exec` at ~45s, and Heroku H12 kills a request at 30s, but the map build is ~50s. First click
+  MUST return `{building:true}` fast; verify the 2nd click (after ~1 min) reads cache. `heroku run` won't
+  stream from the Claude sandbox (ETIMEDOUT rendezvous) — verify via deployed endpoints + `heroku logs`.
+- **NEVER handle the Mailchimp/Anthropic API key in chat** — Erik adds it to Heroku config himself.
+- **Shared git checkout races:** other Claude sessions push to develop/main + leave dirty server.js/
+  package.json mid-deploy. Stage ONLY your explicit files (never `git add -u`); deploy `origin/main:main`;
+  a concurrent hotfix `checkout` can erase uncommitted wiring hunks (the .20.2 forwarder was swept once).
+- Date off-by-one: parse `YYYY-MM-DD` as LOCAL (not UTC `toISOString`) or "Mailed today" shows yesterday.
+- Caspio script MUST `process.exit()` (api-tracker interval otherwise keeps it alive = looks hung).
+- Caspio IS reachable/writable from the local sandbox (proxy `.env` present).
+- Bigin `Customer Type` = INDUSTRY label, NOT a customer flag; real signal is `id_Customer` populated.
+  Bigin CSVs have embedded newlines → use a real parser (PowerShell Import-Csv): 5,874 co / 9,628 contacts.
+
+## Remaining / optional (offered, not built)
+1. Add the 472 leads back if wanted.
+2. Accidental-delete safety net for Jim (undo / soft-delete).
+3. "Send hot prospect to Leads board" one-click bridge.
+4. In-app duplicate guard on add.
+5. Automatic Mailchimp send-recording via webhook (vs the manual Refresh-activity button).
+6. Portrait Jim-only gating.
