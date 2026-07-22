@@ -2,30 +2,39 @@
  * jim-mailing-list.js — controller for dashboards/jim-mailing-list.html
  *
  * The owner's ("Jim's") manual prospect / mailing list. Add / edit / delete
- * companies. One same-origin call to the SAML-session forwarder
- * /api/crm-proxy/jim-mailing-list* (which adds the CRM secret + stamps identity
- * before hitting the proxy's secret-only Prospect_Mailing_List route).
+ * companies. Same-origin calls to the SAML-session forwarder
+ * /api/crm-proxy/jim-mailing-list* (adds the CRM secret + stamps identity before
+ * the proxy's secret-only Prospect_Mailing_List route).
  *
  * Built for an 83-year-old, non-technical user: one form (reused for add AND
- * edit), plain confirmations, and every failure shown loudly via
+ * edit), plain confirmations, big targets. Errors always shown via
  * DashPage.showError — never a silently empty or wrong list.
+ *
+ * List UX: the whole list loads once, then filters (segment chips), sort, and
+ * search run client-side. Rendering is capped (RENDER_STEP) with a "Show more"
+ * button so 3,000+ rows don't build 3,000 DOM cards at once.
  */
 (function () {
     'use strict';
 
     var API = '/api/crm-proxy/jim-mailing-list';
+    var RENDER_STEP = 100;
 
     var state = {
-        entries: [],      // rows from the API
+        entries: [],       // rows from the API
         search: '',
-        editingId: null,  // PK_ID being edited, or null when adding
-        aiImage: null,    // downscaled screenshot data URI staged for extraction
+        category: '',      // '' = all segments, else an exact Category value
+        sort: 'company',   // company | city | last | recent
+        renderLimit: RENDER_STEP,
+        editingId: null,   // PK_ID being edited, or null when adding
+        aiImage: null,     // downscaled screenshot data URI staged for extraction
     };
 
-    // form field id → Caspio column
+    // form field id → Caspio column (Contact_Name is composed from First/Last on save)
     var FIELD_MAP = {
         'jml-company': 'Company',
-        'jml-contact': 'Contact_Name',
+        'jml-first': 'First_Name',
+        'jml-last': 'Last_Name',
         'jml-address': 'Address',
         'jml-city': 'City',
         'jml-state': 'State',
@@ -44,14 +53,24 @@
             return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
         });
     }
+    function displayName(r) {
+        return ((r.First_Name || '') + ' ' + (r.Last_Name || '')).trim() || (r.Contact_Name || '');
+    }
 
     document.addEventListener('DOMContentLoaded', function () {
         el('jml-form').addEventListener('submit', onSubmit);
         el('jml-cancel').addEventListener('click', cancelEdit);
         el('jml-search').addEventListener('input', function () {
             state.search = el('jml-search').value.trim().toLowerCase();
+            state.renderLimit = RENDER_STEP;
             render();
         });
+        el('jml-sort').addEventListener('change', function () {
+            state.sort = el('jml-sort').value;
+            state.renderLimit = RENDER_STEP;
+            render();
+        });
+        el('jml-chips').addEventListener('click', onChipClick);
         // Delegated — the list is rebuilt on every render(), so listen on the container.
         el('jml-list').addEventListener('click', onListClick);
         wireAi();
@@ -66,7 +85,6 @@
             if (f) stageImage(f);
         });
         el('jml-ai-thumb-clear').addEventListener('click', clearAiImage);
-        // Paste a screenshot anywhere on the AI card.
         document.querySelector('.jml-ai-card').addEventListener('paste', function (e) {
             var items = (e.clipboardData && e.clipboardData.items) || [];
             for (var i = 0; i < items.length; i++) {
@@ -168,7 +186,8 @@
     function fillFormFromAi(f) {
         resetForm();
         el('jml-company').value = f.company || '';
-        el('jml-contact').value = f.contact_name || '';
+        el('jml-first').value = f.first_name || '';
+        el('jml-last').value = f.last_name || '';
         el('jml-address').value = f.address || '';
         el('jml-city').value = f.city || '';
         el('jml-state').value = f.state || '';
@@ -214,6 +233,9 @@
 
         var body = {};
         Object.keys(FIELD_MAP).forEach(function (fid) { body[FIELD_MAP[fid]] = el(fid).value.trim(); });
+        // Keep the legacy combined Contact_Name in sync when a name is present.
+        var full = ((body.First_Name || '') + ' ' + (body.Last_Name || '')).trim();
+        if (full) body.Contact_Name = full;
 
         if (!body.Company) {
             DashPage.showError('Please type a company name before saving.');
@@ -249,6 +271,13 @@
         if (!row) return;
         state.editingId = row.PK_ID;
         Object.keys(FIELD_MAP).forEach(function (fid) { el(fid).value = row[FIELD_MAP[fid]] || ''; });
+        // If this row predates the name split, seed First/Last from the combined name.
+        if (!row.First_Name && !row.Last_Name && row.Contact_Name) {
+            var nm = row.Contact_Name.replace(/\s*\(.*\)\s*$/, '').trim();
+            var parts = nm.split(/\s+/);
+            el('jml-first').value = parts.shift() || '';
+            el('jml-last').value = parts.join(' ');
+        }
 
         el('jml-form-title').innerHTML = '<i class="fas fa-pen" aria-hidden="true"></i> Editing ' + esc(row.Company);
         el('jml-save-text').textContent = 'Save changes';
@@ -290,26 +319,60 @@
     function onListClick(e) {
         var btn = e.target.closest('[data-act]');
         if (!btn) return;
+        var act = btn.getAttribute('data-act');
+        if (act === 'more') { state.renderLimit += RENDER_STEP; render(); return; }
+        if (act === 'showall') {
+            state.category = ''; state.search = ''; el('jml-search').value = '';
+            state.renderLimit = RENDER_STEP; render(); return;
+        }
         var id = btn.getAttribute('data-id');
-        if (btn.getAttribute('data-act') === 'edit') startEdit(id);
-        else if (btn.getAttribute('data-act') === 'delete') remove(id);
+        if (act === 'edit') startEdit(id);
+        else if (act === 'delete') remove(id);
+    }
+
+    function onChipClick(e) {
+        var chip = e.target.closest('[data-cat]');
+        if (!chip) return;
+        state.category = chip.getAttribute('data-cat') || '';
+        state.renderLimit = RENDER_STEP;
+        render();
+    }
+
+    // ── filtering + sorting ────────────────────────────────────────────────
+    function matchesSearch(row) {
+        if (!state.search) return true;
+        var hay = [row.Company, row.First_Name, row.Last_Name, row.Contact_Name, row.Address, row.City,
+            row.State, row.Zip, row.Phone, row.Email, row.Website, row.Source, row.Category, row.Notes]
+            .join(' ').toLowerCase();
+        return hay.indexOf(state.search) !== -1;
+    }
+    function matchesCategory(row) {
+        return !state.category || (row.Category || '') === state.category;
+    }
+    function sortRows(rows) {
+        var s = state.sort;
+        return rows.sort(function (a, b) {
+            if (s === 'city') return String(a.City || '').localeCompare(String(b.City || '')) || String(a.Company || '').localeCompare(String(b.Company || ''));
+            if (s === 'last') return String(a.Last_Name || 'zzz').localeCompare(String(b.Last_Name || 'zzz')) || String(a.Company || '').localeCompare(String(b.Company || ''));
+            if (s === 'recent') return String(b.Created_At || '').localeCompare(String(a.Created_At || '')) || (Number(b.PK_ID) - Number(a.PK_ID));
+            return String(a.Company || '').localeCompare(String(b.Company || '')); // company A–Z
+        });
+    }
+    function filtered() {
+        return sortRows(state.entries.filter(function (r) { return matchesSearch(r) && matchesCategory(r); }));
     }
 
     // ── render ────────────────────────────────────────────────────────────
-    function matches(row) {
-        if (!state.search) return true;
-        var hay = [row.Company, row.Contact_Name, row.Address, row.City, row.State,
-            row.Zip, row.Phone, row.Email, row.Website, row.Source, row.Category, row.Notes].join(' ').toLowerCase();
-        return hay.indexOf(state.search) !== -1;
-    }
-
     function render() {
-        var rows = state.entries.filter(matches);
         var total = state.entries.length;
+        var rows = filtered();
+        var filtering = state.search || state.category;
 
-        if (!total) el('jml-count').textContent = '';
-        else if (state.search) el('jml-count').textContent = '(showing ' + rows.length + ' of ' + total + ')';
-        else el('jml-count').textContent = '(' + total + ' ' + (total === 1 ? 'company' : 'companies') + ')';
+        el('jml-count').textContent = !total ? ''
+            : (filtering ? '(showing ' + rows.length + ' of ' + total + ')'
+                : '(' + total + ' ' + (total === 1 ? 'company' : 'companies') + ')');
+
+        renderChips();
 
         if (!total) {
             el('jml-list').innerHTML = '<div class="jml-empty"><i class="fas fa-inbox" aria-hidden="true"></i>' +
@@ -317,18 +380,43 @@
             return;
         }
         if (!rows.length) {
-            el('jml-list').innerHTML = '<div class="jml-empty">No companies match “' + esc(state.search) + '”.</div>';
+            el('jml-list').innerHTML = '<div class="jml-empty">No companies match your search or filter. ' +
+                '<button type="button" class="jml-linkbtn" data-act="showall">Show all</button></div>';
             return;
         }
-        el('jml-list').innerHTML = rows.map(entryHtml).join('');
+
+        var shown = rows.slice(0, state.renderLimit);
+        var html = shown.map(entryHtml).join('');
+        if (rows.length > state.renderLimit) {
+            html += '<button type="button" class="jml-showmore" data-act="more">' +
+                'Show more (' + (rows.length - state.renderLimit) + ' more)</button>';
+        }
+        el('jml-list').innerHTML = html;
+    }
+
+    // Segment (Category) filter chips, most common first, each with a count.
+    function renderChips() {
+        var counts = {};
+        state.entries.forEach(function (r) {
+            var c = (r.Category || '').trim();
+            if (c) counts[c] = (counts[c] || 0) + 1;
+        });
+        var cats = Object.keys(counts).sort(function (a, b) { return counts[b] - counts[a] || a.localeCompare(b); });
+        var chips = [{ cat: '', label: 'All', n: state.entries.length }];
+        cats.forEach(function (c) { chips.push({ cat: c, label: c, n: counts[c] }); });
+
+        el('jml-chips').innerHTML = chips.map(function (c) {
+            var active = (state.category || '') === c.cat;
+            return '<button type="button" class="jml-chip' + (active ? ' is-active' : '') + '" data-cat="' + esc(c.cat) + '">' +
+                esc(c.label) + '<span class="jml-chip-n">' + c.n + '</span></button>';
+        }).join('');
     }
 
     function entryHtml(r) {
         var lines = [];
+        var nm = displayName(r);
+        if (nm) lines.push(line('fa-user', esc(nm)));
 
-        if (r.Contact_Name) lines.push(line('fa-user', esc(r.Contact_Name)));
-
-        // Street on its own line, then "City, State ZIP"
         var cityLine = [r.City && r.State ? r.City + ', ' + r.State : (r.City || r.State || ''), r.Zip].filter(Boolean).join(' ');
         if (r.Address) lines.push(line('fa-location-dot', esc(r.Address)));
         if (cityLine) lines.push(line(r.Address ? '' : 'fa-location-dot', esc(cityLine)));
