@@ -1,3 +1,7 @@
+## v2026.07.22.7 (2026.07.22)
+
+- Jim's Mailing List: handle Mailchimp engagement 'building' response (background build)
+
 ## v2026.07.22.6 (2026.07.22)
 
 - Jim's Mailing List: Mailchimp — sync current group + Check engagement / Sync engaged only
