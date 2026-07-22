@@ -3405,6 +3405,23 @@ app.all('/api/crm-proxy/marketing-shipments*', requireStaff, (req, res, next) =>
   next();
 }, marketingShipmentsForwarder);
 
+// Jim's Mailing List (dashboards/jim-mailing-list.html) — the owner's manual
+// prospect list. Any logged-in staff (it's an internal list, not the sales
+// pipeline); the upstream Prospect_Mailing_List router is secret-only (holds
+// contact info). Added_By (on create) + Updated_By (on writes) are stamped from
+// the verified session so the browser can't attribute an edit to someone else.
+const [, jimMailingListForwarder] = createCrmProxy('jim-mailing-list', []);
+app.all('/api/crm-proxy/jim-mailing-list*', requireStaff, express.json(), (req, res, next) => {
+  if (req.body && ['POST', 'PUT', 'PATCH'].includes(req.method)) {
+    const email = (req.session && req.session.crmUser && req.session.crmUser.email) || '';
+    if (email) {
+      if (req.method === 'POST') req.body.Added_By = email;
+      req.body.Updated_By = email;
+    }
+  }
+  next();
+}, jimMailingListForwarder);
+
 // AE Mission Control aggregate feed — the ONE data call behind
 // /dashboards/ae-mission-control.html. Identity comes from the verified SAML
 // session, never the browser: we derive `email` server-side and only honor a

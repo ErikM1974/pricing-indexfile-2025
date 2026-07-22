@@ -1,0 +1,252 @@
+/* jim-mailing-list.css — the owner's ("Jim's") manual prospect list.
+   Deliberately oversized & high-contrast: the primary user is 83 and slow on the
+   computer. Big type, big targets (>=52px), one column, plain language. All colors
+   come from art-hub.css tokens; --art-theme is the single per-page knob (NWCA green). */
+
+:root { --art-theme: #009900; }
+
+/* Comfortable reading width, centered. */
+.jml-intro,
+.jml-form-card,
+.jml-list-section { max-width: 880px; margin-left: auto; margin-right: auto; }
+
+/* ---- intro line ---- */
+.jml-intro {
+    font-size: 20px;
+    line-height: 1.55;
+    color: var(--gray-700);
+    background: var(--art-theme-light, #eaf7ea);
+    border: 1px solid color-mix(in srgb, var(--art-theme) 25%, transparent);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5) var(--space-6);
+    margin-bottom: var(--space-6);
+}
+.jml-intro strong { color: var(--gray-900); }
+
+/* ---- green "saved!" confirmation ---- */
+.jml-ok {
+    max-width: 880px;
+    margin: 0 auto var(--space-5);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: 19px;
+    font-weight: 600;
+    color: var(--state-success);
+    background: var(--state-success-bg);
+    border: 1px solid color-mix(in srgb, var(--state-success) 35%, transparent);
+    border-radius: var(--radius-md);
+    padding: var(--space-4) var(--space-5);
+}
+.jml-ok i { font-size: 22px; }
+
+/* ---- cards ---- */
+.jml-card,
+.jml-list-section {
+    background: var(--surface-card);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: var(--space-8);
+    margin-bottom: var(--space-8);
+}
+
+.jml-form-title,
+.jml-list-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin: 0 0 var(--space-6);
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+.jml-form-title i { color: var(--art-theme); }
+
+/* ---- form fields ---- */
+.jml-field { margin-bottom: var(--space-5); display: flex; flex-direction: column; }
+.jml-field label {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--gray-800);
+    margin-bottom: var(--space-2);
+}
+.jml-opt { font-weight: 400; color: var(--gray-500); font-size: 16px; }
+.jml-hint { font-size: 15px; color: var(--gray-500); margin-top: var(--space-2); }
+
+.jml-field input,
+.jml-field textarea {
+    font-family: inherit;
+    font-size: 19px;
+    color: var(--gray-900);
+    background: var(--surface-card);
+    border: 2px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    min-height: 54px;
+    width: 100%;
+    box-sizing: border-box;
+    transition: border-color var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
+}
+.jml-field textarea { min-height: 90px; resize: vertical; line-height: 1.5; }
+
+.jml-field input:focus,
+.jml-field textarea:focus,
+.jml-search-wrap input:focus {
+    outline: none;
+    border-color: var(--art-theme);
+    box-shadow: var(--shadow-glow-theme);
+}
+
+/* address + phone/email side-by-side on wide screens, stacked on phones */
+.jml-row { display: flex; gap: var(--space-4); }
+.jml-row .jml-field { flex: 1 1 0; }
+.jml-grow { flex: 1 1 0; }
+.jml-state { flex: 0 0 110px; }
+.jml-zip { flex: 0 0 130px; }
+
+/* ---- buttons ---- */
+.jml-btn {
+    font-family: inherit;
+    font-size: 19px;
+    font-weight: 600;
+    min-height: 56px;
+    padding: 0 var(--space-6);
+    border-radius: var(--radius-md);
+    border: 2px solid transparent;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    transition: background var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+}
+.jml-btn:active { transform: translateY(1px); }
+
+.jml-form-actions { display: flex; gap: var(--space-4); margin-top: var(--space-6); flex-wrap: wrap; }
+
+.jml-btn-save {
+    background: var(--art-theme);
+    color: #fff;
+    flex: 1 1 auto;
+    min-width: 220px;
+}
+.jml-btn-save:hover { background: var(--art-theme-hover, #007a00); }
+
+.jml-btn-cancel {
+    background: var(--surface-card);
+    color: var(--gray-700);
+    border-color: var(--gray-300);
+}
+.jml-btn-cancel:hover { background: var(--surface-inset); }
+
+/* ---- list header + search ---- */
+.jml-list-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    margin-bottom: var(--space-6);
+}
+.jml-list-title { margin: 0; }
+.jml-count { font-size: 18px; font-weight: 500; color: var(--gray-500); }
+
+.jml-search-wrap { position: relative; flex: 0 0 300px; max-width: 100%; }
+.jml-search-wrap i {
+    position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+    color: var(--gray-400); font-size: 17px; pointer-events: none;
+}
+.jml-search-wrap input {
+    font-family: inherit;
+    font-size: 18px;
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 52px;
+    padding: 12px 16px 12px 44px;
+    border: 2px solid var(--gray-300);
+    border-radius: var(--radius-pill);
+    background: var(--surface-card);
+    color: var(--gray-900);
+}
+
+/* ---- entries ---- */
+.jml-list { display: flex; flex-direction: column; gap: var(--space-4); }
+
+.jml-entry {
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5) var(--space-6);
+    background: var(--surface-elevated);
+    display: flex;
+    gap: var(--space-4);
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+.jml-entry-main { flex: 1 1 320px; min-width: 0; }
+.jml-entry-name { font-size: 22px; font-weight: 700; color: var(--gray-900); margin: 0 0 var(--space-2); }
+.jml-entry-line { font-size: 17px; color: var(--gray-700); line-height: 1.5; }
+.jml-entry-line i { color: var(--gray-400); width: 22px; text-align: center; margin-right: var(--space-1); }
+.jml-entry-line a { color: var(--state-info); text-decoration: none; }
+.jml-entry-line a:hover { text-decoration: underline; }
+.jml-entry-notes { margin-top: var(--space-2); font-size: 16px; color: var(--gray-600); font-style: italic; }
+.jml-entry-source { display: inline-block; margin-top: var(--space-2); font-size: 15px; color: var(--gray-500); }
+.jml-entry-cat {
+    display: inline-block;
+    margin-top: var(--space-2);
+    margin-right: var(--space-3);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--art-theme);
+    background: var(--art-theme-light, #eaf7ea);
+    border: 1px solid color-mix(in srgb, var(--art-theme) 30%, transparent);
+    border-radius: var(--radius-pill);
+    padding: 3px 12px;
+}
+.jml-entry-cat i { margin-right: 4px; }
+
+.jml-entry-actions { display: flex; gap: var(--space-3); flex: 0 0 auto; }
+.jml-mini-btn {
+    font-family: inherit;
+    font-size: 17px;
+    font-weight: 600;
+    min-height: 48px;
+    padding: 0 var(--space-5);
+    border-radius: var(--radius-md);
+    border: 2px solid var(--gray-300);
+    background: var(--surface-card);
+    color: var(--gray-700);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    transition: background var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+}
+.jml-mini-btn:hover { background: var(--surface-inset); }
+.jml-edit:hover { border-color: var(--art-theme); color: var(--art-theme); }
+.jml-delete { color: var(--state-danger); border-color: color-mix(in srgb, var(--state-danger) 35%, var(--gray-300)); }
+.jml-delete:hover { background: var(--state-danger-bg); border-color: var(--state-danger); }
+
+/* ---- empty / loading states ---- */
+.jml-empty, .jml-loading {
+    text-align: center;
+    padding: var(--space-8) var(--space-6);
+    font-size: 19px;
+    color: var(--gray-500);
+}
+.jml-empty i { font-size: 40px; color: var(--gray-300); display: block; margin-bottom: var(--space-4); }
+
+/* ---- highlight the form while editing ---- */
+.jml-form-card.is-editing { border-color: var(--art-theme); box-shadow: var(--shadow-glow-theme), var(--shadow-md); }
+
+/* ---- phones ---- */
+@media (max-width: 640px) {
+    .jml-card, .jml-list-section { padding: var(--space-5); }
+    .jml-row { flex-direction: column; gap: 0; }
+    .jml-state, .jml-zip { flex: 1 1 auto; }
+    .jml-search-wrap { flex: 1 1 100%; }
+    .jml-btn-save { min-width: 0; width: 100%; }
+    .jml-entry-actions { width: 100%; }
+    .jml-mini-btn { flex: 1 1 0; justify-content: center; }
+}

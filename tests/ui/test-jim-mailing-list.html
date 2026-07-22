@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEST — Jim's Mailing List</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css">
+    <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
+    <link rel="stylesheet" href="/dashboards/css/jim-mailing-list.css?v=2026.07.21.2">
+</head>
+<body>
+    <div class="dash-shell">
+        <header class="dash-header">
+            <div class="dash-header-left">
+                <h1 class="dash-header-title">Jim's Mailing List — TEST HARNESS (stubbed data)</h1>
+            </div>
+        </header>
+
+        <main class="dash-content">
+            <div class="dash-error-banner" role="alert">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span class="dash-error-banner-message"></span>
+                <button class="dash-error-banner-close" aria-label="Dismiss"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div class="jml-ok" id="jml-ok" role="status" aria-live="polite" hidden>
+                <i class="fas fa-check-circle"></i> <span id="jml-ok-text">Saved!</span>
+            </div>
+
+            <p class="jml-intro">
+                Type in a company below and press <strong>Save</strong>. It gets added to your list.
+                You can change or remove any company anytime.
+            </p>
+
+            <section class="jml-card jml-form-card">
+                <h2 class="jml-form-title" id="jml-form-title">
+                    <i class="fas fa-plus-circle" aria-hidden="true"></i> Add a company
+                </h2>
+                <form id="jml-form" novalidate>
+                    <div class="jml-field">
+                        <label for="jml-company">Company name</label>
+                        <input type="text" id="jml-company" autocomplete="off" required>
+                        <span class="jml-hint">This is the only box you have to fill in.</span>
+                    </div>
+                    <div class="jml-field">
+                        <label for="jml-contact">Contact person <span class="jml-opt">(optional)</span></label>
+                        <input type="text" id="jml-contact" autocomplete="off">
+                    </div>
+                    <div class="jml-field">
+                        <label for="jml-address">Street address <span class="jml-opt">(optional)</span></label>
+                        <input type="text" id="jml-address" autocomplete="off">
+                    </div>
+                    <div class="jml-row">
+                        <div class="jml-field jml-grow">
+                            <label for="jml-city">City <span class="jml-opt">(optional)</span></label>
+                            <input type="text" id="jml-city" autocomplete="off">
+                        </div>
+                        <div class="jml-field jml-state">
+                            <label for="jml-state">State</label>
+                            <input type="text" id="jml-state" autocomplete="off">
+                        </div>
+                        <div class="jml-field jml-zip">
+                            <label for="jml-zip">ZIP</label>
+                            <input type="text" id="jml-zip" autocomplete="off" inputmode="numeric">
+                        </div>
+                    </div>
+                    <div class="jml-row">
+                        <div class="jml-field jml-grow">
+                            <label for="jml-phone">Phone <span class="jml-opt">(optional)</span></label>
+                            <input type="tel" id="jml-phone" autocomplete="off">
+                        </div>
+                        <div class="jml-field jml-grow">
+                            <label for="jml-email">Email <span class="jml-opt">(optional)</span></label>
+                            <input type="email" id="jml-email" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="jml-field">
+                        <label for="jml-website">Website <span class="jml-opt">(optional)</span></label>
+                        <input type="text" id="jml-website" autocomplete="off" inputmode="url">
+                    </div>
+                    <div class="jml-row">
+                        <div class="jml-field jml-grow">
+                            <label for="jml-source">Where did you find them? <span class="jml-opt">(optional)</span></label>
+                            <input type="text" id="jml-source" autocomplete="off" placeholder="e.g. Milton Times magazine">
+                        </div>
+                        <div class="jml-field jml-grow">
+                            <label for="jml-category">List / group <span class="jml-opt">(optional)</span></label>
+                            <input type="text" id="jml-category" autocomplete="off" placeholder="e.g. Fire Dept Prospect">
+                        </div>
+                    </div>
+                    <div class="jml-field">
+                        <label for="jml-notes">Notes <span class="jml-opt">(optional)</span></label>
+                        <textarea id="jml-notes" rows="3"></textarea>
+                    </div>
+                    <div class="jml-form-actions">
+                        <button type="submit" class="jml-btn jml-btn-save" id="jml-save">
+                            <i class="fas fa-check" aria-hidden="true"></i> <span id="jml-save-text">Save company</span>
+                        </button>
+                        <button type="button" class="jml-btn jml-btn-cancel" id="jml-cancel" hidden>Cancel</button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="jml-list-section">
+                <div class="jml-list-head">
+                    <h2 class="jml-list-title">Your list <span class="jml-count" id="jml-count"></span></h2>
+                    <div class="jml-search-wrap">
+                        <i class="fas fa-search" aria-hidden="true"></i>
+                        <input type="search" id="jml-search" placeholder="Search your list" aria-label="Search your list">
+                    </div>
+                </div>
+                <div id="jml-list" class="jml-list"></div>
+            </section>
+        </main>
+    </div>
+
+    <script src="/config/app.config.js"></script>
+    <script src="/shared_components/js/fetch-timeout.js"></script>
+    <script src="/shared_components/js/dash-page-helpers.js"></script>
+    <script src="/tests/ui/test-jim-mailing-list-stub.js"></script>
+    <script src="/dashboards/js/jim-mailing-list.js?v=2026.07.21.2"></script>
+</body>
+</html>
