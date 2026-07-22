@@ -1,3 +1,8 @@
+## v2026.07.22.5 (2026.07.22)
+
+- Jim's Mailing List: Jim-first redesign — 'Your companies' default view + collapsed Mailchimp
+- Jim's Mailing List: Jim's portrait in the welcome header
+
 ## v2026.07.22.4 (2026.07.22)
 
 - SanMar Inbound: 'Print for...' recipient-tailored daily reports
