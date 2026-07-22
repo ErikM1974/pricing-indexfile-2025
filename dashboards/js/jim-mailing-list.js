@@ -22,6 +22,8 @@
 
     var state = {
         entries: [],       // rows from the API
+        me: { email: '', firstName: '' }, // the logged-in user (for "your companies")
+        view: 'mine',      // 'mine' = only what I added (default) · 'all' = full list
         search: '',
         category: '',      // '' = all segments, else an exact Category value
         sort: 'company',   // company | city | last | recent
@@ -29,6 +31,7 @@
         editingId: null,   // PK_ID being edited, or null when adding
         aiImage: null,     // downscaled screenshot data URI staged for extraction
     };
+    try { var _v = localStorage.getItem('nwca-jml-view'); if (_v === 'all' || _v === 'mine') state.view = _v; } catch (e) {}
 
     // form field id → Caspio column (Contact_Name is composed from First/Last on save)
     var FIELD_MAP = {
@@ -79,9 +82,37 @@
         el('jml-mc-test').addEventListener('click', mcTest);
         el('jml-mc-sync').addEventListener('click', mcSync);
         el('jml-mc-refresh').addEventListener('click', mcRefresh);
+        el('jml-view-mine').addEventListener('click', function () { setView('mine'); });
+        el('jml-view-all').addEventListener('click', function () { setView('all'); });
         wireAi();
+        loadMe();
         load();
     });
+
+    // Who's logged in — drives "your companies" (Added_By match) + the greeting.
+    function loadMe() {
+        fetch('/api/crm-session/me', { credentials: 'same-origin' })
+            .then(function (r) { return r.ok ? r.json() : {}; })
+            .then(function (m) {
+                state.me = { email: String(m.email || '').toLowerCase(), firstName: m.firstName || '' };
+                var g = el('jml-greeting');
+                if (g) g.textContent = state.me.firstName ? ('Welcome, ' + state.me.firstName + ' 👋') : '';
+                // If this user hasn't added anything, start them on the full list instead.
+                if (state.view === 'mine' && state.entries.length && !state.entries.some(isMine)) state.view = 'all';
+                render();
+            })
+            .catch(function () { render(); });
+    }
+
+    function setView(v) {
+        state.view = v;
+        try { localStorage.setItem('nwca-jml-view', v); } catch (e) {}
+        state.renderLimit = RENDER_STEP;
+        render();
+    }
+    function isMine(r) {
+        return !!state.me.email && String(r.Added_By || '').toLowerCase() === state.me.email;
+    }
 
     var STATUSES = ['Not contacted', 'Mailed', 'Responded', 'Customer', 'Do not mail'];
 
@@ -146,7 +177,7 @@
         setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
     }
     function exportMailchimp() {
-        var rows = filtered();
+        var rows = currentRows();
         if (!rows.length) { DashPage.showError('Nothing to export in this view — clear your search or filter first.'); return; }
         var headers = ['Email Address', 'First Name', 'Last Name', 'Company', 'Address', 'City', 'State', 'Zip', 'Phone', 'Tags'];
         var lines = [headers.join(',')];
@@ -162,7 +193,7 @@
 
     // ── printable mailing labels (Avery 5160, current filtered view) ──────
     function printLabels() {
-        var rows = filtered().filter(function (r) { return r.Address || r.City; });
+        var rows = currentRows().filter(function (r) { return r.Address || r.City; });
         if (!rows.length) { DashPage.showError('No mailing addresses to print in this view.'); return; }
         var cells = rows.map(function (r) {
             var nm = splitName(r), who = (nm.first + ' ' + nm.last).trim();
@@ -473,6 +504,7 @@
             state.category = ''; state.search = ''; el('jml-search').value = '';
             state.renderLimit = RENDER_STEP; render(); return;
         }
+        if (act === 'viewall') { setView('all'); return; }
         var id = btn.getAttribute('data-id');
         if (act === 'edit') startEdit(id);
         else if (act === 'delete') remove(id);
@@ -506,30 +538,50 @@
             return String(a.Company || '').localeCompare(String(b.Company || '')); // company A–Z
         });
     }
-    function filtered() {
-        return sortRows(state.entries.filter(function (r) { return matchesSearch(r) && matchesCategory(r); }));
-    }
 
     // ── render ────────────────────────────────────────────────────────────
+    // Rows for the current view: "mine" = what I added, newest first; "all" = full
+    // list with segment filter + chosen sort. Search applies in both.
+    function currentRows() {
+        var rows = state.entries.filter(matchesSearch);
+        if (state.view === 'mine') {
+            return rows.filter(isMine).sort(function (a, b) {
+                return String(b.Created_At || '').localeCompare(String(a.Created_At || '')) || (Number(b.PK_ID) - Number(a.PK_ID));
+            });
+        }
+        return sortRows(rows.filter(matchesCategory));
+    }
+
     function render() {
         var total = state.entries.length;
-        var rows = filtered();
-        var filtering = state.search || state.category;
+        var mineCount = state.entries.filter(isMine).length;
+        var isAll = state.view === 'all';
+        var rows = currentRows();
 
-        el('jml-count').textContent = !total ? ''
-            : (filtering ? '(showing ' + rows.length + ' of ' + total + ')'
-                : '(' + total + ' ' + (total === 1 ? 'company' : 'companies') + ')');
+        // view toggle
+        el('jml-mine-count').textContent = '(' + mineCount + ')';
+        el('jml-all-count').textContent = '(' + total + ')';
+        el('jml-view-mine').classList.toggle('is-active', !isAll);
+        el('jml-view-all').classList.toggle('is-active', isAll);
+        el('jml-list-title-text').textContent = isAll ? 'All companies' : 'Your companies';
+        el('jml-list-actions').hidden = !isAll;   // export / labels — full list only
+        el('jml-filterbar').hidden = !isAll;       // segment chips + sort — full list only
 
-        renderChips();
+        var filtering = state.search || (isAll && state.category);
+        el('jml-count').textContent = filtering ? '(showing ' + rows.length + ')' : '';
 
-        if (!total) {
-            el('jml-list').innerHTML = '<div class="jml-empty"><i class="fas fa-inbox" aria-hidden="true"></i>' +
-                'Your list is empty. Add your first company using the form above.</div>';
-            return;
-        }
+        if (isAll) renderChips();
+
         if (!rows.length) {
-            el('jml-list').innerHTML = '<div class="jml-empty">No companies match your search or filter. ' +
-                '<button type="button" class="jml-linkbtn" data-act="showall">Show all</button></div>';
+            if (!isAll) {
+                el('jml-list').innerHTML = '<div class="jml-empty"><i class="fas fa-user-plus" aria-hidden="true"></i>' +
+                    (state.search ? 'None of your companies match “' + esc(state.search) + '”.'
+                        : 'You haven’t added any companies yet. Use the form above to add your first one — it shows up here.') +
+                    ' <button type="button" class="jml-linkbtn" data-act="viewall">See all ' + total + ' companies</button></div>';
+            } else {
+                el('jml-list').innerHTML = '<div class="jml-empty">No companies match your search or filter. ' +
+                    '<button type="button" class="jml-linkbtn" data-act="showall">Show all</button></div>';
+            }
             return;
         }
 
