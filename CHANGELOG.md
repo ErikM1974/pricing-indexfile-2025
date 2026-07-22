@@ -1,3 +1,9 @@
+## v2026.07.22.1 (2026.07.22)
+
+- Jim's Mailing List: senior-friendly dashboard page + forwarder + nav
+- Jim's Mailing List: AI capture UI (paste text/screenshot -> Claude fills form)
+- Deploy v2026.07.22.1: 2 files (jim-mailing-list.html,test-jim-mailing-list.html,...)
+
 ## v2026.07.21.3 (2026.07.21)
 
 - Pride Wall: freeze newest 6, newest-first order, richer captions
