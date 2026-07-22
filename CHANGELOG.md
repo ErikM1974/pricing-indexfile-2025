@@ -1,3 +1,10 @@
+## v2026.07.22.2 (2026.07.22)
+
+- Jim's Mailing List: mark shipped (proxy v988 + app v1731)
+- Jim's Mailing List: First/Last names + segment filter chips + sort + capped list render
+- Jim's Mailing List: outreach status + Mailchimp CSV export + printable labels
+- Deploy v2026.07.22.2: Jim's Mailing List Phase 1 (2 files)
+
 ## v2026.07.22.1 (2026.07.22)
 
 - Jim's Mailing List: senior-friendly dashboard page + forwarder + nav
