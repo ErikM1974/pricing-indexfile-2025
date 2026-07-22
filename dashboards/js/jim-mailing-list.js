@@ -84,6 +84,8 @@
         el('jml-mc-refresh').addEventListener('click', mcRefresh);
         el('jml-view-mine').addEventListener('click', function () { setView('mine'); });
         el('jml-view-all').addEventListener('click', function () { setView('all'); });
+        var portrait = el('jml-portrait');
+        if (portrait) portrait.addEventListener('error', function () { portrait.style.display = 'none'; });
         wireAi();
         loadMe();
         load();
@@ -97,6 +99,8 @@
                 state.me = { email: String(m.email || '').toLowerCase(), firstName: m.firstName || '' };
                 var g = el('jml-greeting');
                 if (g) g.textContent = state.me.firstName ? ('Welcome, ' + state.me.firstName + ' 👋') : '';
+                var w = el('jml-welcome');
+                if (w) w.hidden = !state.me.firstName;   // portrait + greeting appear once we know who's here
                 // If this user hasn't added anything, start them on the full list instead.
                 if (state.view === 'mine' && state.entries.length && !state.entries.some(isMine)) state.view = 'all';
                 render();
