@@ -1,3 +1,7 @@
+## v2026.07.22.4 (2026.07.22)
+
+- SanMar Inbound: 'Print for...' recipient-tailored daily reports
+
 ## v2026.07.22.3 (2026.07.22)
 
 - Staff dashboard: fix 4 sidebar sections rendering as green squares
