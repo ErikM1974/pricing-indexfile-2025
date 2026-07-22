@@ -73,9 +73,112 @@
         el('jml-chips').addEventListener('click', onChipClick);
         // Delegated — the list is rebuilt on every render(), so listen on the container.
         el('jml-list').addEventListener('click', onListClick);
+        el('jml-list').addEventListener('change', onListChange);
+        el('jml-export').addEventListener('click', exportMailchimp);
+        el('jml-labels').addEventListener('click', printLabels);
         wireAi();
         load();
     });
+
+    var STATUSES = ['Not contacted', 'Mailed', 'Responded', 'Customer', 'Do not mail'];
+
+    // First/Last, deriving from the combined Contact_Name when the split is empty
+    // (imported rows). Used by the card, the CSV export, and the Mailchimp sync.
+    function splitName(r) {
+        var first = (r.First_Name || '').trim(), last = (r.Last_Name || '').trim();
+        if (!first && !last && r.Contact_Name) {
+            var nm = r.Contact_Name.replace(/\s*\(.*\)\s*$/, '').trim();
+            var parts = nm.split(/\s+/);
+            first = parts.shift() || '';
+            last = parts.join(' ');
+        }
+        return { first: first, last: last };
+    }
+    function fmtDate(s) {
+        if (!s) return '';
+        // Parse a plain YYYY-MM-DD as a LOCAL date (new Date('2026-07-22') is UTC
+        // midnight → shows the day before in Pacific). Full datetimes pass through.
+        var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(s).trim());
+        var d = m ? new Date(+m[1], +m[2] - 1, +m[3]) : new Date(s);
+        return isNaN(d.getTime()) ? String(s).slice(0, 10) : d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+    function todayLocal() {
+        var d = new Date();
+        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+
+    // ── outreach status (per-card dropdown → PUT) ─────────────────────────
+    function onListChange(e) {
+        var sel = e.target.closest('select.jml-status');
+        if (!sel) return;
+        var id = sel.getAttribute('data-statusfor');
+        var row = state.entries.filter(function (r) { return String(r.PK_ID) === String(id); })[0];
+        if (!row) return;
+        var val = sel.value;
+        var body = { Status: val === 'Not contacted' ? '' : val };
+        if (val === 'Mailed' && !row.Last_Mailed_At) body.Last_Mailed_At = todayLocal();
+        sel.disabled = true;
+        jsonFetch(API + '/' + encodeURIComponent(id), { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+            .then(function () {
+                row.Status = body.Status;
+                if (body.Last_Mailed_At) row.Last_Mailed_At = body.Last_Mailed_At;
+                sel.disabled = false;
+                showOk('Marked ' + row.Company + ': ' + val + '.');
+                render();
+            })
+            .catch(function (err) {
+                sel.disabled = false;
+                sel.value = row.Status || 'Not contacted';
+                DashPage.showError('Could not update status: ' + err.message);
+            });
+    }
+
+    // ── CSV export (Mailchimp-mapped, current filtered view) ──────────────
+    function csvCell(v) { v = String(v == null ? '' : v); return /[",\n\r]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }
+    function downloadBlob(blob, name) {
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url; a.download = name;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    }
+    function exportMailchimp() {
+        var rows = filtered();
+        if (!rows.length) { DashPage.showError('Nothing to export in this view — clear your search or filter first.'); return; }
+        var headers = ['Email Address', 'First Name', 'Last Name', 'Company', 'Address', 'City', 'State', 'Zip', 'Phone', 'Tags'];
+        var lines = [headers.join(',')];
+        rows.forEach(function (r) {
+            var nm = splitName(r);
+            lines.push([r.Email, nm.first, nm.last, r.Company, r.Address, r.City, r.State, r.Zip, r.Phone, r.Category].map(csvCell).join(','));
+        });
+        var tag = state.category ? state.category.replace(/[^a-z0-9]+/gi, '-').toLowerCase() : 'all';
+        // BOM so Excel/Mailchimp read UTF-8 correctly.
+        downloadBlob(new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8;' }), 'jim-list-' + tag + '.csv');
+        showOk('Downloaded ' + rows.length + ' companies as a Mailchimp CSV.');
+    }
+
+    // ── printable mailing labels (Avery 5160, current filtered view) ──────
+    function printLabels() {
+        var rows = filtered().filter(function (r) { return r.Address || r.City; });
+        if (!rows.length) { DashPage.showError('No mailing addresses to print in this view.'); return; }
+        var cells = rows.map(function (r) {
+            var nm = splitName(r), who = (nm.first + ' ' + nm.last).trim();
+            var cityz = [[r.City, r.State].filter(Boolean).join(', '), r.Zip].filter(Boolean).join(' ');
+            var l = [who, r.Company, r.Address, cityz].filter(Boolean).map(esc);
+            return '<div class="lbl">' + l.join('<br>') + '</div>';
+        }).join('');
+        var html = '<!doctype html><html><head><meta charset="utf-8"><title>Mailing labels</title><style>' +
+            '@page{size:letter;margin:0.5in 0.1875in;}body{margin:0;font-family:Arial,Helvetica,sans-serif;}' +
+            '.sheet{display:grid;grid-template-columns:repeat(3,2.625in);grid-auto-rows:1in;column-gap:0.125in;}' +
+            '.lbl{padding:0.12in 0.2in;font-size:11pt;line-height:1.25;overflow:hidden;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;}' +
+            '@media screen{.lbl{outline:1px dashed #ccc;}}</style></head><body>' +
+            '<div class="sheet">' + cells + '</div>' +
+            '<scr' + 'ipt>window.onload=function(){setTimeout(function(){window.print();},250);};</scr' + 'ipt></body></html>';
+        var w = window.open('', '_blank');
+        if (!w) { DashPage.showError('Please allow pop-ups so the labels can open in a new tab to print.'); return; }
+        w.document.write(html); w.document.close();
+        showOk('Opened ' + rows.length + ' labels in a new tab to print.');
+    }
 
     // ── AI capture (paste text / screenshot → Claude fills the form) ───────
     function wireAi() {
@@ -430,10 +533,16 @@
         if (r.Notes) extra += '<div class="jml-entry-notes">' + esc(r.Notes) + '</div>';
         if (r.Source) extra += '<span class="jml-entry-source"><i class="fas fa-book-open" aria-hidden="true"></i> Found in: ' + esc(r.Source) + '</span>';
 
-        return '<div class="jml-entry">' +
+        var cur = r.Status || 'Not contacted';
+        var statusSel = '<select class="jml-status" data-statusfor="' + esc(r.PK_ID) + '" aria-label="Outreach status for ' + esc(r.Company) + '">' +
+            STATUSES.map(function (s) { return '<option' + (s === cur ? ' selected' : '') + '>' + esc(s) + '</option>'; }).join('') + '</select>';
+        var mailed = r.Last_Mailed_At ? '<span class="jml-lastmailed">Last contacted ' + esc(fmtDate(r.Last_Mailed_At)) + '</span>' : '';
+        var footer = '<div class="jml-entry-status"><span class="jml-status-label">Status:</span> ' + statusSel + mailed + '</div>';
+
+        return '<div class="jml-entry' + (cur !== 'Not contacted' ? ' is-' + cur.toLowerCase().replace(/[^a-z]/g, '') : '') + '">' +
             '<div class="jml-entry-main">' +
                 '<h3 class="jml-entry-name">' + esc(r.Company) + '</h3>' +
-                lines.join('') + extra +
+                lines.join('') + extra + footer +
             '</div>' +
             '<div class="jml-entry-actions">' +
                 '<button type="button" class="jml-mini-btn jml-edit" data-act="edit" data-id="' + esc(r.PK_ID) + '">' +

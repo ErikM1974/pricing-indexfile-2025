@@ -294,6 +294,36 @@
     background: none; border: none; color: var(--art-theme); cursor: pointer; text-decoration: underline; padding: 0;
 }
 
+/* ---- list actions (export / print labels) ---- */
+.jml-list-actions { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; margin-bottom: var(--space-4); }
+.jml-tool-btn {
+    font-family: inherit; font-size: 16px; font-weight: 600;
+    min-height: 46px; padding: 0 var(--space-5);
+    border: 2px solid var(--gray-300); border-radius: var(--radius-md);
+    background: var(--surface-card); color: var(--gray-700);
+    cursor: pointer; display: inline-flex; align-items: center; gap: var(--space-2);
+}
+.jml-tool-btn:hover { border-color: var(--art-theme); color: var(--art-theme); }
+.jml-tool-hint { font-size: 14px; color: var(--gray-500); }
+
+/* ---- per-card outreach status ---- */
+.jml-entry-status { margin-top: var(--space-3); display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
+.jml-status-label { font-size: 15px; color: var(--gray-500); font-weight: 600; }
+.jml-status {
+    font-family: inherit; font-size: 15px; font-weight: 600; min-height: 40px;
+    padding: 0 var(--space-3); border: 2px solid var(--gray-300); border-radius: var(--radius-md);
+    background: var(--surface-card); color: var(--gray-800); cursor: pointer;
+}
+.jml-status:focus { outline: none; border-color: var(--art-theme); box-shadow: var(--shadow-glow-theme); }
+.jml-status:disabled { opacity: .6; }
+.jml-lastmailed { font-size: 14px; color: var(--gray-500); }
+
+/* status tints on the card's left edge */
+.jml-entry.is-mailed { border-left: 5px solid var(--state-info); }
+.jml-entry.is-responded { border-left: 5px solid var(--state-warning); }
+.jml-entry.is-customer { border-left: 5px solid var(--state-success); }
+.jml-entry.is-donotmail { border-left: 5px solid var(--gray-400); }
+
 /* ---- entries ---- */
 .jml-list { display: flex; flex-direction: column; gap: var(--space-4); }
 
