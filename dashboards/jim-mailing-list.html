@@ -15,7 +15,7 @@
     <!-- 2026 design tokens (must load before dash-shell.css) -->
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/jim-mailing-list.css?v=2026.07.22.3">
+    <link rel="stylesheet" href="/dashboards/css/jim-mailing-list.css?v=2026.07.22.5">
 </head>
 <body>
     <div class="dash-shell">
@@ -47,6 +47,10 @@
                 <i class="fas fa-check-circle"></i> <span id="jml-ok-text">Saved!</span>
             </div>
 
+            <div class="jml-welcome" id="jml-welcome" hidden>
+                <img class="jml-portrait" id="jml-portrait" src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9463872" alt="Jim">
+                <span class="jml-greeting" id="jml-greeting"></span>
+            </div>
             <p class="jml-intro">
                 Type in a company below and press <strong>Save</strong>. It gets added to your list.
                 You can change or remove any company anytime.
@@ -174,36 +178,25 @@
                 </form>
             </section>
 
-            <!-- MAILCHIMP -->
-            <section class="jml-card jml-mc-card">
-                <h2 class="jml-mc-title"><i class="fas fa-paper-plane" aria-hidden="true"></i> Mailchimp</h2>
-                <p class="jml-mc-help">
-                    Send this list to Mailchimp and track who's been emailed. Prospects sync as
-                    <strong>non-subscribed</strong> — nobody gets a campaign until you subscribe them in Mailchimp.
-                </p>
-                <div class="jml-mc-actions">
-                    <button type="button" class="jml-tool-btn" id="jml-mc-test"><i class="fas fa-plug" aria-hidden="true"></i> Test connection</button>
-                    <button type="button" class="jml-tool-btn" id="jml-mc-sync"><i class="fas fa-cloud-arrow-up" aria-hidden="true"></i> Sync to Mailchimp</button>
-                    <button type="button" class="jml-tool-btn" id="jml-mc-refresh"><i class="fas fa-rotate" aria-hidden="true"></i> Refresh email activity</button>
-                </div>
-                <p class="jml-mc-status" id="jml-mc-status" role="status" aria-live="polite" hidden></p>
-            </section>
-
             <!-- THE LIST -->
             <section class="jml-list-section">
+                <div class="jml-viewtoggle" role="group" aria-label="Which companies to show">
+                    <button type="button" class="jml-viewbtn" id="jml-view-mine" data-view="mine">Your companies <span class="jml-view-n" id="jml-mine-count"></span></button>
+                    <button type="button" class="jml-viewbtn" id="jml-view-all" data-view="all">All companies <span class="jml-view-n" id="jml-all-count"></span></button>
+                </div>
                 <div class="jml-list-head">
-                    <h2 class="jml-list-title">Your list <span class="jml-count" id="jml-count"></span></h2>
+                    <h2 class="jml-list-title"><span id="jml-list-title-text">Your companies</span> <span class="jml-count" id="jml-count"></span></h2>
                     <div class="jml-search-wrap">
                         <i class="fas fa-search" aria-hidden="true"></i>
-                        <input type="search" id="jml-search" placeholder="Search your list" aria-label="Search your list">
+                        <input type="search" id="jml-search" placeholder="Search" aria-label="Search the list">
                     </div>
                 </div>
-                <div class="jml-list-actions">
+                <div class="jml-list-actions" id="jml-list-actions" hidden>
                     <button type="button" class="jml-tool-btn" id="jml-export"><i class="fas fa-file-csv" aria-hidden="true"></i> Download for Mailchimp</button>
                     <button type="button" class="jml-tool-btn" id="jml-labels"><i class="fas fa-print" aria-hidden="true"></i> Print mailing labels</button>
                     <span class="jml-tool-hint">exports whatever you're filtered to</span>
                 </div>
-                <div class="jml-filterbar">
+                <div class="jml-filterbar" id="jml-filterbar" hidden>
                     <div id="jml-chips" class="jml-chips" role="group" aria-label="Filter by group"></div>
                     <label class="jml-sort">Sort:
                         <select id="jml-sort">
@@ -216,12 +209,29 @@
                 </div>
                 <div id="jml-list" class="jml-list"></div>
             </section>
+
+            <!-- MAILCHIMP (staff — Erik). Collapsed by default so Jim never sees it. -->
+            <details class="jml-mc-details">
+                <summary class="jml-mc-summary"><i class="fas fa-paper-plane" aria-hidden="true"></i> Mailchimp — staff only (sync &amp; email tracking)</summary>
+                <div class="jml-mc-body">
+                    <p class="jml-mc-help">
+                        Send this list to Mailchimp and track who's been emailed. Prospects sync as
+                        <strong>non-subscribed</strong> — nobody gets a campaign until you subscribe them in Mailchimp.
+                    </p>
+                    <div class="jml-mc-actions">
+                        <button type="button" class="jml-tool-btn" id="jml-mc-test"><i class="fas fa-plug" aria-hidden="true"></i> Test connection</button>
+                        <button type="button" class="jml-tool-btn" id="jml-mc-sync"><i class="fas fa-cloud-arrow-up" aria-hidden="true"></i> Sync to Mailchimp</button>
+                        <button type="button" class="jml-tool-btn" id="jml-mc-refresh"><i class="fas fa-rotate" aria-hidden="true"></i> Refresh email activity</button>
+                    </div>
+                    <p class="jml-mc-status" id="jml-mc-status" role="status" aria-live="polite" hidden></p>
+                </div>
+            </details>
         </main>
     </div>
 
     <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/dash-page-helpers.js"></script>
-    <script src="/dashboards/js/jim-mailing-list.js?v=2026.07.22.3"></script>
+    <script src="/dashboards/js/jim-mailing-list.js?v=2026.07.22.5"></script>
 </body>
 </html>

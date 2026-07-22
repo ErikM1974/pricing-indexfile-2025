@@ -9,9 +9,9 @@
 
     var seq = 3;
     var rows = [
-        { PK_ID: 1, Company: 'Milton Hardware & Supply', First_Name: 'Carl', Last_Name: 'Jensen', Contact_Name: 'Carl Jensen', Address: '1420 Meridian Ave E', City: 'Milton', State: 'WA', Zip: '98354', Phone: '253-555-0142', Email: 'carl@miltonhardware.example', Website: 'www.miltonhardware.example', Source: 'Milton Times', Category: 'Construction Prospect', Notes: 'Wants embroidered work shirts.', Created_At: '2026-07-20T00:00:00' },
-        { PK_ID: 2, Company: 'Fife Family Diner', First_Name: 'Rosa', Last_Name: 'Alvarez', Contact_Name: 'Rosa Alvarez', Address: '', City: 'Fife', State: 'WA', Zip: '98424', Phone: '253-555-0199', Email: '', Website: '', Source: 'Pierce County Business Journal', Category: 'Landscaper', Notes: '', Created_At: '2026-07-21T00:00:00' },
-        { PK_ID: 3, Company: 'Edgewood Little League', First_Name: '', Last_Name: '', Contact_Name: '', Address: '2607 Jovita Blvd', City: 'Edgewood', State: 'WA', Zip: '98372', Phone: '', Email: 'info@edgewoodll.example', Website: 'http://edgewoodll.example/', Source: 'Bigin import', Category: 'Fire Dept Prospect', Notes: 'Spring team jerseys — follow up in Feb.', Created_At: '2026-07-19T00:00:00' },
+        { PK_ID: 1, Company: 'Milton Hardware & Supply', First_Name: 'Carl', Last_Name: 'Jensen', Contact_Name: 'Carl Jensen', Address: '1420 Meridian Ave E', City: 'Milton', State: 'WA', Zip: '98354', Phone: '253-555-0142', Email: 'carl@miltonhardware.example', Website: 'www.miltonhardware.example', Source: 'Milton Times', Category: 'Construction Prospect', Notes: 'Wants embroidered work shirts.', Added_By: 'jim@nwcustomapparel.com', Created_At: '2026-07-20T00:00:00' },
+        { PK_ID: 2, Company: 'Fife Family Diner', First_Name: 'Rosa', Last_Name: 'Alvarez', Contact_Name: 'Rosa Alvarez', Address: '', City: 'Fife', State: 'WA', Zip: '98424', Phone: '253-555-0199', Email: '', Website: '', Source: 'Pierce County Business Journal', Category: 'Landscaper', Notes: '', Added_By: 'jim@nwcustomapparel.com', Created_At: '2026-07-21T00:00:00' },
+        { PK_ID: 3, Company: 'Edgewood Little League', First_Name: '', Last_Name: '', Contact_Name: '', Address: '2607 Jovita Blvd', City: 'Edgewood', State: 'WA', Zip: '98372', Phone: '', Email: 'info@edgewoodll.example', Website: 'http://edgewoodll.example/', Source: 'Bigin import', Category: 'Fire Dept Prospect', Notes: 'Spring team jerseys — follow up in Feb.', Added_By: 'bigin-import', Created_At: '2026-07-19T00:00:00' },
     ];
 
     function json(status, body) {
@@ -29,6 +29,9 @@
         options = options || {};
         var method = (options.method || 'GET').toUpperCase();
 
+        if (/\/api\/crm-session\/me\b/.test(u)) {
+            return json(200, { authenticated: true, firstName: 'Jim', email: 'jim@nwcustomapparel.com', permissions: ['staff'] });
+        }
         if (u.indexOf('/api/crm-proxy/jim-mailing-list') !== 0) {
             return realFetch ? realFetch(url, options) : json(404, { error: 'not stubbed' });
         }
@@ -69,7 +72,8 @@
         }
         if (method === 'POST') {
             if (!body.Company) return json(400, { error: 'Company name is required' });
-            var rec = Object.assign({ PK_ID: ++seq }, body);
+            // Mirror the real server: forwarder stamps Added_By, route sets Created_At.
+            var rec = Object.assign({ PK_ID: ++seq, Added_By: 'jim@nwcustomapparel.com', Created_At: new Date().toISOString() }, body);
             rows.push(rec);
             return json(201, { created: rec });
         }

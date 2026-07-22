@@ -6,9 +6,48 @@
 :root { --art-theme: #009900; }
 
 /* Comfortable reading width, centered. */
+.jml-welcome,
 .jml-intro,
 .jml-form-card,
 .jml-list-section { max-width: 880px; margin-left: auto; margin-right: auto; }
+
+/* ---- welcome header (portrait + greeting) ---- */
+.jml-welcome { display: flex; align-items: center; gap: var(--space-4); margin-bottom: var(--space-4); }
+.jml-portrait {
+    width: 64px; height: 64px; border-radius: 50%; object-fit: cover;
+    border: 3px solid var(--art-theme); box-shadow: var(--shadow-sm); flex: 0 0 auto;
+}
+.jml-greeting { font-size: 24px; font-weight: 700; color: var(--gray-900); margin: 0; }
+
+/* ---- view toggle (Your companies / All companies) ---- */
+.jml-viewtoggle { display: flex; gap: var(--space-2); margin-bottom: var(--space-5); flex-wrap: wrap; }
+.jml-viewbtn {
+    font-family: inherit; font-size: 18px; font-weight: 600;
+    min-height: 52px; padding: 0 var(--space-6);
+    border: 2px solid var(--gray-300); border-radius: var(--radius-pill);
+    background: var(--surface-card); color: var(--gray-700);
+    cursor: pointer; display: inline-flex; align-items: center; gap: var(--space-2);
+}
+.jml-viewbtn:hover { border-color: var(--art-theme); color: var(--art-theme); }
+.jml-viewbtn.is-active { background: var(--art-theme); border-color: var(--art-theme); color: #fff; }
+.jml-view-n { font-size: 15px; font-weight: 600; opacity: .9; }
+
+/* ---- Mailchimp: collapsed staff strip at the bottom ---- */
+.jml-mc-details {
+    max-width: 880px; margin: var(--space-6) auto 0;
+    border: 1px solid var(--gray-200); border-radius: var(--radius-lg); background: var(--surface-card);
+}
+.jml-mc-summary {
+    list-style: none; cursor: pointer; padding: var(--space-4) var(--space-5);
+    font-size: 16px; font-weight: 600; color: var(--gray-600);
+    display: flex; align-items: center; gap: var(--space-2);
+}
+.jml-mc-summary::-webkit-details-marker { display: none; }
+.jml-mc-summary::after { content: '▾'; margin-left: auto; color: var(--gray-400); font-size: 18px; }
+.jml-mc-details[open] .jml-mc-summary::after { content: '▴'; }
+.jml-mc-summary i { color: var(--art-theme); }
+.jml-mc-summary:hover { color: var(--gray-800); }
+.jml-mc-body { padding: 0 var(--space-5) var(--space-5); }
 
 /* ---- intro line ---- */
 .jml-intro {
