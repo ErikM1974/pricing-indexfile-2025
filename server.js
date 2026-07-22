@@ -3126,6 +3126,15 @@ app.get('/dashboards/sanmar-api-reference.html', requireCrmRole(['admin']), (req
   res.sendFile(path.join(__dirname, 'dashboards', 'sanmar-api-reference.html'));
 });
 
+// SanMar FTP Downloads — ADMIN ONLY. Lists the data files SanMar publishes on their FTP
+// (ftp.sanmar.com, user 6920) and streams the chosen one to the browser — the web version
+// of the FileZilla step. The primary file, SanMarPI-Bulk-*.csv, is imported into the Caspio
+// product master Sanmar_Bulk_251816_Feb2024 (the table every quote builder prices from).
+// Backed by /api/staff/sanmar-ftp/{list,download}. Before the /dashboards static mount.
+app.get('/dashboards/sanmar-ftp-integration.html', requireCrmRole(['admin']), (req, res) => {
+  res.sendFile(path.join(__dirname, 'dashboards', 'sanmar-ftp-integration.html'));
+});
+
 // ShopWorks OnSite ODBC reference — ERIK ONLY (hard email gate, like caspio-api-reference):
 // the page displays the ODBC connection card (LAN server + read-only credentials), the
 // FileMaker query rules, and the 2,630-field Data_ODBCMapping catalog. Before the mount.
@@ -4397,6 +4406,108 @@ app.get('/api/staff/sanmar-invoices/unpaid', requireStaff, async (req, res) => {
   } catch (e) {
     console.error('[sanmar-unpaid-forward]', e.message);
     res.status(502).json({ error: 'upstream_unavailable' });
+  }
+});
+
+// ─── SanMar FTP file downloads (ADMIN) ───────────────────────────────────────
+// Drives /dashboards/sanmar-ftp-integration.html. Lists the data files SanMar
+// publishes on their FTP (ftp.sanmar.com, user 6920) and streams the chosen one
+// straight to the admin's browser — the web equivalent of the manual FileZilla
+// step. The primary file, SanMarPI-Bulk-*.csv, is imported into the Caspio product
+// master Sanmar_Bulk_251816_Feb2024 (the table every quote builder prices from).
+// Requires SANMAR_FTP_PASSWORD as an app config var (never hardcoded). Only the
+// allow-listed directories may be listed/downloaded — no arbitrary FTP paths.
+const { Client: SanmarFtpClient } = require('basic-ftp');
+const SANMAR_FTP_CFG = {
+  host: process.env.SANMAR_FTP_HOST || 'ftp.sanmar.com',
+  user: process.env.SANMAR_FTP_USER || '6920',
+  password: process.env.SANMAR_FTP_PASSWORD || '',
+  dirs: ['/SanMarPDD/SanMarPI/', '/SanMarPDD/']
+};
+const SANMAR_FTP_FILE_RE = /^[A-Za-z0-9._-]+\.(csv|txt|zip)$/i;
+let _sanmarFtpListCache = { at: 0, data: null };
+
+function sanmarFtpConnect() {
+  const c = new SanmarFtpClient(60000); // 60s command timeout
+  return c.access({
+    host: SANMAR_FTP_CFG.host,
+    user: SANMAR_FTP_CFG.user,
+    password: SANMAR_FTP_CFG.password,
+    secure: false
+  }).then(() => c);
+}
+
+// List the allow-listed SanMar FTP folders (5-min cache; ?fresh=1 to bypass).
+// Flags the newest SanMarPI-Bulk-*.csv as the pricing master.
+app.get('/api/staff/sanmar-ftp/list', requireCrmRole(['admin']), async (req, res) => {
+  if (!SANMAR_FTP_CFG.password) {
+    return res.status(503).json({ error: 'not_configured',
+      message: 'SanMar FTP password not set. Add SANMAR_FTP_PASSWORD to the app config vars.' });
+  }
+  if (!req.query.fresh && _sanmarFtpListCache.data && (Date.now() - _sanmarFtpListCache.at) < 5 * 60 * 1000) {
+    return res.json(_sanmarFtpListCache.data);
+  }
+  let client;
+  try {
+    client = await sanmarFtpConnect();
+    const files = [];
+    for (const dir of SANMAR_FTP_CFG.dirs) {
+      let entries;
+      try { entries = await client.list(dir); }
+      catch (e) { continue; } // a missing/denied dir shouldn't fail the whole list
+      for (const f of entries) {
+        if (f.isDirectory) continue;
+        if (!SANMAR_FTP_FILE_RE.test(f.name)) continue;
+        const mod = (f.modifiedAt instanceof Date) ? f.modifiedAt.toISOString() : (f.rawModifiedAt || null);
+        files.push({ dir, name: f.name, size: f.size || 0, modifiedAt: mod });
+      }
+    }
+    let masterKey = null, newest = -1;
+    for (const f of files) {
+      if (/^SanMarPI-Bulk-.*\.csv$/i.test(f.name)) {
+        const t = f.modifiedAt ? (Date.parse(f.modifiedAt) || 0) : 0;
+        if (t >= newest) { masterKey = f.dir + f.name; newest = t; }
+      }
+    }
+    files.sort((a, b) => String(b.modifiedAt || '').localeCompare(String(a.modifiedAt || '')));
+    const payload = { files, masterKey, checkedAt: new Date().toISOString() };
+    _sanmarFtpListCache = { at: Date.now(), data: payload };
+    res.json(payload);
+  } catch (e) {
+    console.error('[sanmar-ftp-list]', e.message);
+    res.status(502).json({ error: 'ftp_error', message: e.message });
+  } finally {
+    if (client) client.close();
+  }
+});
+
+// Stream one allow-listed SanMar FTP file to the browser as a download.
+app.get('/api/staff/sanmar-ftp/download', requireCrmRole(['admin']), async (req, res) => {
+  if (!SANMAR_FTP_CFG.password) {
+    return res.status(503).json({ error: 'not_configured',
+      message: 'SanMar FTP password not set. Add SANMAR_FTP_PASSWORD to the app config vars.' });
+  }
+  const dir = String(req.query.dir || '');
+  const name = String(req.query.name || '');
+  if (!SANMAR_FTP_CFG.dirs.includes(dir)) return res.status(400).json({ error: 'dir_not_allowed' });
+  if (!SANMAR_FTP_FILE_RE.test(name)) return res.status(400).json({ error: 'bad_filename' });
+  const remote = dir + name;
+  let client;
+  try {
+    client = await sanmarFtpConnect();
+    let size = 0;
+    try { size = await client.size(remote); } catch (e) { /* size optional */ }
+    res.setHeader('Content-Type', 'application/octet-stream'); // octet-stream → skip gzip, keep Content-Length
+    res.setHeader('Content-Disposition', `attachment; filename="${name}"`);
+    if (size > 0) res.setHeader('Content-Length', String(size));
+    await client.downloadTo(res, remote);
+    res.end();
+  } catch (e) {
+    console.error('[sanmar-ftp-download]', name, e.message);
+    if (!res.headersSent) res.status(502).json({ error: 'ftp_error', message: e.message });
+    else { try { res.end(); } catch (_) {} }
+  } finally {
+    if (client) client.close();
   }
 });
 

@@ -43,6 +43,7 @@
   "dependencies": {
     "@node-saml/node-saml": "^5.1.0",
     "@sentry/node": "^8.55.2",
+    "basic-ftp": "^6.0.1",
     "body-parser": "^1.20.2",
     "compression": "^1.8.0",
     "cookie-session": "^2.1.1",
