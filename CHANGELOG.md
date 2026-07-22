@@ -1,3 +1,9 @@
+## v2026.07.22.8 (2026.07.22)
+
+- Jim's Mailing List: doc current — Phase 2 + engagement-gated Mailchimp sync
+- SanMar Downloads: admin page + FTP download endpoints to refresh Sanmar_Bulk master
+- Deploy v2026.07.22.8: 2 files (sanmar-ftp-integration.html,test-sanmar-ftp-page.html,...)
+
 ## v2026.07.22.7 (2026.07.22)
 
 - Jim's Mailing List: handle Mailchimp engagement 'building' response (background build)
