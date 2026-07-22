@@ -1,3 +1,8 @@
+## v2026.07.22.3 (2026.07.22)
+
+- Staff dashboard: fix 4 sidebar sections rendering as green squares
+- Jim's Mailing List Phase 2: Mailchimp panel (test / sync / refresh activity)
+
 ## v2026.07.22.2 (2026.07.22)
 
 - Jim's Mailing List: mark shipped (proxy v988 + app v1731)
