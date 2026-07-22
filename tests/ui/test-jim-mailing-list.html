@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/jim-mailing-list.css?v=2026.07.22.1">
+    <link rel="stylesheet" href="/dashboards/css/jim-mailing-list.css?v=2026.07.22.2">
 </head>
 <body>
     <div class="dash-shell">
@@ -67,9 +67,15 @@
                         <input type="text" id="jml-company" autocomplete="off" required>
                         <span class="jml-hint">This is the only box you have to fill in.</span>
                     </div>
-                    <div class="jml-field">
-                        <label for="jml-contact">Contact person <span class="jml-opt">(optional)</span></label>
-                        <input type="text" id="jml-contact" autocomplete="off">
+                    <div class="jml-row">
+                        <div class="jml-field jml-grow">
+                            <label for="jml-first">First name <span class="jml-opt">(optional)</span></label>
+                            <input type="text" id="jml-first" autocomplete="off">
+                        </div>
+                        <div class="jml-field jml-grow">
+                            <label for="jml-last">Last name <span class="jml-opt">(optional)</span></label>
+                            <input type="text" id="jml-last" autocomplete="off">
+                        </div>
                     </div>
                     <div class="jml-field">
                         <label for="jml-address">Street address <span class="jml-opt">(optional)</span></label>
@@ -134,6 +140,22 @@
                         <input type="search" id="jml-search" placeholder="Search your list" aria-label="Search your list">
                     </div>
                 </div>
+                <div class="jml-list-actions">
+                    <button type="button" class="jml-tool-btn" id="jml-export"><i class="fas fa-file-csv" aria-hidden="true"></i> Download for Mailchimp</button>
+                    <button type="button" class="jml-tool-btn" id="jml-labels"><i class="fas fa-print" aria-hidden="true"></i> Print mailing labels</button>
+                    <span class="jml-tool-hint">exports whatever you're filtered to</span>
+                </div>
+                <div class="jml-filterbar">
+                    <div id="jml-chips" class="jml-chips" role="group" aria-label="Filter by group"></div>
+                    <label class="jml-sort">Sort:
+                        <select id="jml-sort">
+                            <option value="company">Company A–Z</option>
+                            <option value="city">City</option>
+                            <option value="last">Last name</option>
+                            <option value="recent">Recently added</option>
+                        </select>
+                    </label>
+                </div>
                 <div id="jml-list" class="jml-list"></div>
             </section>
         </main>
@@ -143,6 +165,6 @@
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/dash-page-helpers.js"></script>
     <script src="/tests/ui/test-jim-mailing-list-stub.js"></script>
-    <script src="/dashboards/js/jim-mailing-list.js?v=2026.07.22.1"></script>
+    <script src="/dashboards/js/jim-mailing-list.js?v=2026.07.22.2"></script>
 </body>
 </html>

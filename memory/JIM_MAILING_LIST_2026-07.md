@@ -2,7 +2,7 @@
 
 Owner "Jim" (83, non-technical) wants a dead-simple prospect/mailing list he can add/edit/delete.
 Standalone Caspio table + senior-friendly dashboard page, PLUS a one-time bulk import of ~2,905
-Bigin CRM prospects (non-customers). **Not deployed yet — safe stopping point.**
+Bigin CRM prospects (non-customers). **✅ LIVE 2026-07-22 — proxy v988, app v1731 (tag v2026.07.22.1).**
 
 ## Decisions (Erik-confirmed this session)
 - **New dedicated table `Prospect_Mailing_List`** — NOT `Form_Submissions`/Leads CRM (that fires AE
@@ -67,16 +67,16 @@ Bigin CRM prospects (non-customers). **Not deployed yet — safe stopping point.
 - Generator: `<scratchpad>/build-jim-import.ps1` (PowerShell Import-Csv, robust). Source files:
   `C:\Users\erik\Downloads\Bigin Companies.csv` (5,874 companies) + `bigin contacs.csv` (9,628 contacts).
 
-## REMAINING (do next session)
-1. **Deploy — PROXY FIRST, then app** (forwarder depends on the proxy route):
-   - Proxy: deploy `caspio-pricing-proxy` to Heroku; confirm boot log `✓ Jim mailing list routes loaded [CRM-gated]`.
-   - App: run `/deploy` skill (bumps `?v=`, changelog, verify).
-2. **Erik runs the Caspio CSV import** of `Jim-Prospect-Import.csv` INTO `Prospect_Mailing_List`
-   (Caspio → table → Import → map by matching header names; leave PK_ID auto). Give him the quick steps.
-3. **Verify live:** open `/dashboards/jim-mailing-list.html` as staff → 2,905 rows load, search works,
-   add/edit/delete round-trips against real Caspio.
-4. Optional: add the 472 leads back if Erik wants them (re-run generator without the lead exclusion).
-5. Docs after deploy: MEMORY.md "shipped" one-liner; LESSONS_LEARNED only if a real gotcha surfaced.
+## DONE 7/22
+- ✅ Proxy deployed (Heroku **v988**) — `/api/jim-mailing-list` + `/extract` live, 401-gated.
+- ✅ Caspio CSV import run by Erik — 2,905 rows live in `Prospect_Mailing_List`.
+- ✅ App deployed (`/deploy`, Heroku **v1731**, tag **v2026.07.22.1**); `/api/version` SHA `53c797a` matches.
+
+## REMAINING
+1. **Erik live smoke-test:** open `/dashboards/jim-mailing-list.html` as staff → confirm 2,905 load,
+   search works, add/edit/delete round-trip, and the "Let Claude fill it in" box (text + screenshot).
+2. Optional: add the 472 leads back if Erik wants them (re-run generator without the lead exclusion).
+3. MEMORY.md compaction is due (~21KB) — run `/memory-maintain` sometime.
 
 ## Gotchas learned
 - Caspio IS reachable + writable from the local sandbox (proxy `.env` present). Any Caspio script MUST
@@ -85,4 +85,4 @@ Bigin CRM prospects (non-customers). **Not deployed yet — safe stopping point.
   customer flag. The real customer signal is `id_Customer` populated (or Tag "Customer").
 - Bigin CSVs have embedded newlines in Description → `wc -l` overcounts; use a real CSV parser
   (PowerShell Import-Csv) — true counts: 5,874 companies / 9,628 contacts.
-- Git: committed at handoff on `develop` (both repos), NOT pushed/deployed.
+- Git: DEPLOYED 7/22 — proxy `main`→Heroku (v988); app `develop`→`main`→Heroku (v1731, tag v2026.07.22.1).

@@ -9,9 +9,9 @@
 
     var seq = 3;
     var rows = [
-        { PK_ID: 1, Company: 'Milton Hardware & Supply', Contact_Name: 'Carl Jensen', Address: '1420 Meridian Ave E', City: 'Milton', State: 'WA', Zip: '98354', Phone: '253-555-0142', Email: 'carl@miltonhardware.example', Website: 'www.miltonhardware.example', Source: 'Milton Times', Category: 'Construction Prospect', Notes: 'Wants embroidered work shirts for the crew.' },
-        { PK_ID: 2, Company: 'Fife Family Diner', Contact_Name: 'Rosa Alvarez', Address: '', City: 'Fife', State: 'WA', Zip: '98424', Phone: '253-555-0199', Email: '', Website: '', Source: 'Saw in Pierce County Business Journal', Category: '', Notes: '' },
-        { PK_ID: 3, Company: 'Edgewood Little League', Contact_Name: '', Address: '2607 Jovita Blvd', City: 'Edgewood', State: 'WA', Zip: '98372', Phone: '', Email: 'info@edgewoodll.example', Website: 'http://edgewoodll.example/', Source: 'Bigin import', Category: 'Fire Dept Prospect', Notes: 'Spring team jerseys — follow up in Feb.' },
+        { PK_ID: 1, Company: 'Milton Hardware & Supply', First_Name: 'Carl', Last_Name: 'Jensen', Contact_Name: 'Carl Jensen', Address: '1420 Meridian Ave E', City: 'Milton', State: 'WA', Zip: '98354', Phone: '253-555-0142', Email: 'carl@miltonhardware.example', Website: 'www.miltonhardware.example', Source: 'Milton Times', Category: 'Construction Prospect', Notes: 'Wants embroidered work shirts.', Created_At: '2026-07-20T00:00:00' },
+        { PK_ID: 2, Company: 'Fife Family Diner', First_Name: 'Rosa', Last_Name: 'Alvarez', Contact_Name: 'Rosa Alvarez', Address: '', City: 'Fife', State: 'WA', Zip: '98424', Phone: '253-555-0199', Email: '', Website: '', Source: 'Pierce County Business Journal', Category: 'Landscaper', Notes: '', Created_At: '2026-07-21T00:00:00' },
+        { PK_ID: 3, Company: 'Edgewood Little League', First_Name: '', Last_Name: '', Contact_Name: '', Address: '2607 Jovita Blvd', City: 'Edgewood', State: 'WA', Zip: '98372', Phone: '', Email: 'info@edgewoodll.example', Website: 'http://edgewoodll.example/', Source: 'Bigin import', Category: 'Fire Dept Prospect', Notes: 'Spring team jerseys — follow up in Feb.', Created_At: '2026-07-19T00:00:00' },
     ];
 
     function json(status, body) {
@@ -37,11 +37,11 @@
         if (/\/jim-mailing-list\/extract\b/.test(u) && method === 'POST') {
             return json(200, {
                 fields: {
-                    company: 'Copy Wrights', contact_name: 'Justin Kasarda (General Manager)',
+                    company: 'Copy Wrights', first_name: 'Justin', last_name: 'Kasarda',
                     address: '2106 Tacoma Ave S', city: 'Tacoma', state: 'WA', zip: '98402',
                     phone: '(253) 922-5156', email: '', website: '',
                     category: 'Printing Services, Signs/Banners',
-                    notes: 'Fax (855) 594-3238; cell (253) 670-8702. 30+ years.',
+                    notes: 'General Manager. Fax (855) 594-3238; cell (253) 670-8702.',
                 },
             });
         }

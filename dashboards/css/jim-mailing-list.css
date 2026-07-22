@@ -258,6 +258,72 @@
     color: var(--gray-900);
 }
 
+/* ---- filter bar (segment chips + sort) ---- */
+.jml-filterbar { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); flex-wrap: wrap; margin-bottom: var(--space-5); }
+.jml-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); flex: 1 1 auto; }
+.jml-chip {
+    font-family: inherit; font-size: 15px; font-weight: 600;
+    min-height: 40px; padding: 0 var(--space-4);
+    border: 2px solid var(--gray-300); border-radius: var(--radius-pill);
+    background: var(--surface-card); color: var(--gray-700);
+    cursor: pointer; display: inline-flex; align-items: center; gap: var(--space-2);
+}
+.jml-chip:hover { border-color: var(--art-theme); color: var(--art-theme); }
+.jml-chip.is-active { background: var(--art-theme); border-color: var(--art-theme); color: #fff; }
+.jml-chip-n { font-size: 13px; font-weight: 600; background: color-mix(in srgb, currentColor 16%, transparent); border-radius: var(--radius-pill); padding: 1px 8px; }
+.jml-chip.is-active .jml-chip-n { background: rgba(255,255,255,.28); }
+
+.jml-sort { font-size: 16px; color: var(--gray-600); display: inline-flex; align-items: center; gap: var(--space-2); flex: 0 0 auto; }
+.jml-sort select {
+    font-family: inherit; font-size: 16px; min-height: 44px; padding: 0 var(--space-3);
+    border: 2px solid var(--gray-300); border-radius: var(--radius-md);
+    background: var(--surface-card); color: var(--gray-900); cursor: pointer;
+}
+.jml-sort select:focus { outline: none; border-color: var(--art-theme); box-shadow: var(--shadow-glow-theme); }
+
+/* ---- show more / inline link button ---- */
+.jml-showmore {
+    font-family: inherit; font-size: 18px; font-weight: 600;
+    width: 100%; min-height: 54px; margin-top: var(--space-2);
+    border: 2px dashed var(--gray-300); border-radius: var(--radius-lg);
+    background: var(--surface-inset); color: var(--gray-700); cursor: pointer;
+}
+.jml-showmore:hover { border-color: var(--art-theme); color: var(--art-theme); }
+.jml-linkbtn {
+    font-family: inherit; font-size: inherit; font-weight: 600;
+    background: none; border: none; color: var(--art-theme); cursor: pointer; text-decoration: underline; padding: 0;
+}
+
+/* ---- list actions (export / print labels) ---- */
+.jml-list-actions { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; margin-bottom: var(--space-4); }
+.jml-tool-btn {
+    font-family: inherit; font-size: 16px; font-weight: 600;
+    min-height: 46px; padding: 0 var(--space-5);
+    border: 2px solid var(--gray-300); border-radius: var(--radius-md);
+    background: var(--surface-card); color: var(--gray-700);
+    cursor: pointer; display: inline-flex; align-items: center; gap: var(--space-2);
+}
+.jml-tool-btn:hover { border-color: var(--art-theme); color: var(--art-theme); }
+.jml-tool-hint { font-size: 14px; color: var(--gray-500); }
+
+/* ---- per-card outreach status ---- */
+.jml-entry-status { margin-top: var(--space-3); display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
+.jml-status-label { font-size: 15px; color: var(--gray-500); font-weight: 600; }
+.jml-status {
+    font-family: inherit; font-size: 15px; font-weight: 600; min-height: 40px;
+    padding: 0 var(--space-3); border: 2px solid var(--gray-300); border-radius: var(--radius-md);
+    background: var(--surface-card); color: var(--gray-800); cursor: pointer;
+}
+.jml-status:focus { outline: none; border-color: var(--art-theme); box-shadow: var(--shadow-glow-theme); }
+.jml-status:disabled { opacity: .6; }
+.jml-lastmailed { font-size: 14px; color: var(--gray-500); }
+
+/* status tints on the card's left edge */
+.jml-entry.is-mailed { border-left: 5px solid var(--state-info); }
+.jml-entry.is-responded { border-left: 5px solid var(--state-warning); }
+.jml-entry.is-customer { border-left: 5px solid var(--state-success); }
+.jml-entry.is-donotmail { border-left: 5px solid var(--gray-400); }
+
 /* ---- entries ---- */
 .jml-list { display: flex; flex-direction: column; gap: var(--space-4); }
 
