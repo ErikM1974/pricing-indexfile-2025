@@ -251,19 +251,50 @@
       <p class="sit-note">${esc(data.note || '')}</p>`;
   }
 
-  // ── One PO's print block. Extracted from buildPrintSheet so the report can be
-  //    grouped by sales rep while reusing the EXACT per-PO markup (no drift). ──
-  function poBlockHtml(o) {
+  // ── Print helpers shared by every recipient profile ──
+  // The printed worklist is ACTIONABLE inbound only — a received PO is physically
+  // counted in already, so it drops off every printout (same rule the on-screen
+  // "✓ Received" collapse uses). Never-Break Rule #4: a failed received-read leaves
+  // the PO on the list, so this only ever hides blanks that are truly here.
+  function activeOrders(data) { return (data && data.orders ? data.orders : []).filter(o => !o.received); }
+  function sumOrders(orders) {
+    return (orders || []).reduce((a, o) => ({
+      pos: a.pos + 1,
+      boxes: a.boxes + (Number(o.boxes) || 0),
+      pieces: a.pieces + (Number(o.piecesShipped) || 0),
+      cost: a.cost + (Number(o.cost) || 0),
+    }), { pos: 0, boxes: 0, pieces: 0, cost: 0 });
+  }
+  function repKey(o) { return String((o && o.salesRep) || '').trim() || 'Unassigned / Unmatched'; }
+  function byCompany(a, b) { return String(a.company || '~~~').localeCompare(String(b.company || '~~~')); }
+  function dueKey(o) { return String((o && o.dueDate) || '').slice(0, 10) || '9999-99-99'; } // blank due sorts last
+  function byDue(a, b) { return dueKey(a).localeCompare(dueKey(b)); }
+  function byPO(a, b) { return (Number(a.sanmarPO) || 0) - (Number(b.sanmarPO) || 0) || String(a.sanmarPO || '').localeCompare(String(b.sanmarPO || '')); }
+  // Production sequences by decoration method; unknown methods sort after the known ones, A→Z.
+  const METHOD_SEQ = ['Embroidery', 'Screen Print', 'DTG', 'DTF', 'Sticker', 'Emblem', 'Online Store', 'Inksoft', 'Other'];
+  function byMethodOrder(a, b) { const ia = METHOD_SEQ.indexOf(a), ib = METHOD_SEQ.indexOf(b); return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib) || String(a).localeCompare(String(b)); }
+  // "Due soon" = due within a week of the report day (or already past) → highlighted for production.
+  function isDueSoon(dueIso, refIso) {
+    const d = String(dueIso || '').slice(0, 10), r = String(refIso || '').slice(0, 10);
+    if (!d || !r) return false;
+    return (new Date(d + 'T00:00:00') - new Date(r + 'T00:00:00')) / 86400000 <= 7;
+  }
+
+  // ── One PO's print block (detailed card, used by the Full + AE sheets). Extracted
+  //    so reports reuse the EXACT per-PO markup (no drift). opts.showCost=false strips
+  //    every cost column + Terms so AEs can hand the sheet to a customer. ──
+  function poBlockHtml(o, opts) {
+    const showCost = !opts || opts.showCost !== false;
     const body = (o.boxDetailAvailable && o.boxDetail && o.boxDetail.length)
       ? o.boxDetail.map(b => `
-        <div class="sit-ps-box">Box ${fmtNum(b.boxNumber)} · ${esc(b.carrier)} ${esc(b.trackingNumber)} · ${fmtNum(b.pieces)} pcs${b.cost ? ' · ' + fmtMoney(b.cost) : ''}</div>
+        <div class="sit-ps-box">Box ${fmtNum(b.boxNumber)} · ${esc(b.carrier)} ${esc(b.trackingNumber)} · ${fmtNum(b.pieces)} pcs${showCost && b.cost ? ' · ' + fmtMoney(b.cost) : ''}</div>
         <table class="sit-ps-tbl">
-          <thead><tr><th>Style</th><th>Description</th><th>Color</th><th>Size</th><th style="text-align:right">Qty</th><th style="text-align:right">Cost</th></tr></thead>
-          <tbody>${(b.items || []).map(it => `<tr><td>${esc(it.style)}</td><td>${esc(it.title || '')}</td><td>${esc(it.color || '—')}</td><td>${esc(it.size)}</td><td style="text-align:right">${fmtNum(it.qty)}</td><td style="text-align:right">${it.lineCost ? fmtMoney(it.lineCost) : '—'}</td></tr>`).join('')}</tbody>
+          <thead><tr><th>Style</th><th>Description</th><th>Color</th><th>Size</th><th style="text-align:right">Qty</th>${showCost ? '<th style="text-align:right">Cost</th>' : ''}</tr></thead>
+          <tbody>${(b.items || []).map(it => `<tr><td>${esc(it.style)}</td><td>${esc(it.title || '')}</td><td>${esc(it.color || '—')}</td><td>${esc(it.size)}</td><td style="text-align:right">${fmtNum(it.qty)}</td>${showCost ? `<td style="text-align:right">${it.lineCost ? fmtMoney(it.lineCost) : '—'}</td>` : ''}</tr>`).join('')}</tbody>
         </table>`).join('')
       : `<table class="sit-ps-tbl">
-          <thead><tr><th>Style</th><th>Description</th><th>Color</th><th>Size</th><th style="text-align:right">Ord</th><th style="text-align:right">Ship</th><th>Status</th><th style="text-align:right">Cost</th></tr></thead>
-          <tbody>${(o.lines || []).map(l => `<tr><td>${esc(l.style)}</td><td>${esc(l.title || '')}</td><td>${esc(l.color || '—')}</td><td>${esc(l.size)}</td><td style="text-align:right">${fmtNum(l.qtyOrdered)}</td><td style="text-align:right">${fmtNum(l.qtyShipped)}</td><td>${esc(l.status)}</td><td style="text-align:right">${l.lineCost ? fmtMoney(l.lineCost) : '—'}</td></tr>`).join('')}</tbody>
+          <thead><tr><th>Style</th><th>Description</th><th>Color</th><th>Size</th><th style="text-align:right">Ord</th><th style="text-align:right">Ship</th><th>Status</th>${showCost ? '<th style="text-align:right">Cost</th>' : ''}</tr></thead>
+          <tbody>${(o.lines || []).map(l => `<tr><td>${esc(l.style)}</td><td>${esc(l.title || '')}</td><td>${esc(l.color || '—')}</td><td>${esc(l.size)}</td><td style="text-align:right">${fmtNum(l.qtyOrdered)}</td><td style="text-align:right">${fmtNum(l.qtyShipped)}</td><td>${esc(l.status)}</td>${showCost ? `<td style="text-align:right">${l.lineCost ? fmtMoney(l.lineCost) : '—'}</td>` : ''}</tr>`).join('')}</tbody>
         </table>`;
     const psLogo = o.logoUrl ? `<img class="sit-ps-logo" src="${esc(o.logoUrl)}" alt="" onerror="this.style.display='none'">` : '';
     const psFields = [
@@ -272,7 +303,7 @@
       o.contactName ? 'Contact ' + o.contactName : '',
       o.salesRep ? 'Rep ' + initials(o.salesRep) : '',
       o.customerPO ? 'Cust PO ' + o.customerPO : '',
-      o.terms ? 'Terms ' + o.terms : '',
+      showCost && o.terms ? 'Terms ' + o.terms : '',
       o.dateOrdered ? 'Ordered ' + fmtShortDate(o.dateOrdered) : '',
     ].filter(Boolean).map(esc).join(' · ');
     return `<div class="sit-ps-po">
@@ -280,7 +311,7 @@
         ${psLogo}
         <div class="sit-ps-po-htxt">
           <div><b>${esc(o.company || 'Unmatched')}</b> &nbsp; SanMar PO #${esc(o.sanmarPO)}${o.workOrder ? ' · WO #' + esc(o.workOrder) : ''} · ${esc(o.method)}
-            <span class="sit-ps-r">${fmtNum(o.boxes)} box(es) · ${fmtNum(o.piecesShipped)} pcs${o.cost ? ' · <b>' + fmtMoney(o.cost) + '</b>' : ''}${o.upsDelivery && o.upsDelivery.date ? ' · UPS ' + fmtShortDate(o.upsDelivery.date) + (o.upsDelivery.type === 'rescheduled' ? ' (resched)' : o.upsDelivery.type === 'delivered' ? ' (delivered)' : '') : ''}</span></div>
+            <span class="sit-ps-r">${fmtNum(o.boxes)} box(es) · ${fmtNum(o.piecesShipped)} pcs${showCost && o.cost ? ' · <b>' + fmtMoney(o.cost) + '</b>' : ''}${o.upsDelivery && o.upsDelivery.date ? ' · UPS ' + fmtShortDate(o.upsDelivery.date) + (o.upsDelivery.type === 'rescheduled' ? ' (resched)' : o.upsDelivery.type === 'delivered' ? ' (delivered)' : '') : ''}</span></div>
           ${psFields ? `<div class="sit-ps-fields">${psFields}</div>` : ''}
         </div>
       </div>
@@ -319,44 +350,174 @@
     return groups;
   }
 
-  // ── Printable report (branded, print-only) — SECTIONED BY SALES REP, one rep
-  //    per page (CSS page-break) so the day's printout can be split and dropped
-  //    in each AE's bin. Per-PO markup unchanged (poBlockHtml). ──
-  function buildPrintSheet(data) {
-    const old = document.getElementById('sit-print-sheet');
-    if (old) old.remove();
-    const t = data.totals || {};
-    // The printed worklist is actionable inbound only — received POs are already counted in.
-    const repSections = groupOrdersByRep((data.orders || []).filter(o => !o.received)).map(g => {
-      const heading = g.repInitials
-        ? `${esc(g.repName)} <span class="sit-ps-rep-ini">(${esc(g.repInitials)})</span>`
-        : esc(g.repName);
-      return `<section class="sit-ps-rep">
-        <div class="sit-ps-rep-head">
-          <span class="sit-ps-rep-name">${heading}</span>
-          <span class="sit-ps-rep-sub">${fmtNum(g.sub.pos)} PO${g.sub.pos === 1 ? '' : 's'} · ${fmtNum(g.sub.boxes)} boxes · ${fmtNum(g.sub.pieces)} pcs · ${fmtMoney0(g.sub.cost)} blanks</span>
-        </div>
-        ${g.orders.map(poBlockHtml).join('')}
-      </section>`;
-    }).join('');
+  // ── Branded print header shared by every recipient profile.
+  //    opts: {title, recipient, subLine (HTML ok), note}. ──
+  function psHeader(data, opts) {
+    opts = opts || {};
+    return `<div class="sit-ps-head">
+      <div class="sit-ps-brand">Northwest Custom Apparel</div>
+      <div class="sit-ps-title">${esc(opts.title || 'Daily Inbound Report — SanMar Blanks')}</div>
+      ${opts.recipient ? `<div class="sit-ps-recipient">${esc(opts.recipient)}</div>` : ''}
+      <div class="sit-ps-sub">Arriving ${esc(fmtDate(data.date))} &nbsp;·&nbsp; ${opts.subLine || ''}</div>
+      ${opts.note ? `<div class="sit-ps-note">${esc(opts.note)}</div>` : ''}
+    </div>`;
+  }
 
+  // ── Profile 1 · FULL report — everyone's master copy (the "entire report" Bradley,
+  //    Mikalah and Ruthie all get). Continuous + company-sorted, all columns incl. cost.
+  //    Per-AE splitting now lives in the AE sheets, so this stays one compact run. ──
+  function buildFullInner(data) {
+    const t = data.totals || {};
+    const orders = activeOrders(data).slice().sort(byCompany);
+    return psHeader(data, {
+      title: 'Daily Inbound Report — SanMar Blanks',
+      subLine: `${fmtNum(t.pos)} POs · ${fmtNum(t.workOrders)} work orders · ${fmtNum(t.boxes)} boxes · ${fmtNum(t.piecesShipped)} pieces · <b>${fmtMoney0(t.cost)} blanks cost</b>`,
+      note: 'Full day, all reps. Arrival = SanMar ship date + ground-transit estimate to Milton, WA. Blank cost = SanMar wholesale (CASE_PRICE × qty).',
+    }) + (orders.length ? orders.map(o => poBlockHtml(o, { showCost: true })).join('') : '<p>No shipments arriving this day.</p>');
+  }
+
+  // ── Profile 2 · one AE's personal sheet — their POs only, cost + terms stripped so it's
+  //    safe to hand a customer. Header carries THEIR subtotal, not the whole day's. ──
+  function aeSheetSection(data, repName, orders, asSection) {
+    const s = sumOrders(orders);
+    const head = `<div class="sit-ps-head">
+      <div class="sit-ps-brand">Northwest Custom Apparel</div>
+      <div class="sit-ps-title">Your inbound — SanMar blanks</div>
+      <div class="sit-ps-recipient">${esc(repName)}${initials(repName) ? ' (' + esc(initials(repName)) + ')' : ''}</div>
+      <div class="sit-ps-sub">Arriving ${esc(fmtDate(data.date))} &nbsp;·&nbsp; ${fmtNum(s.pos)} of your PO${s.pos === 1 ? '' : 's'} · ${fmtNum(s.boxes)} boxes · ${fmtNum(s.pieces)} pieces</div>
+      <div class="sit-ps-note">Your customers' blanks landing today — a good moment to let them know their order is moving.</div>
+    </div>`;
+    const body = orders.length
+      ? orders.slice().sort(byDue).map(o => poBlockHtml(o, { showCost: false })).join('')
+      : '<p>No inbound assigned to you this day.</p>';
+    return asSection ? `<section class="sit-ps-rep">${head}${body}</section>` : head + body;
+  }
+  function buildAeInner(data, repName) {
+    return aeSheetSection(data, repName, activeOrders(data).filter(o => repKey(o) === repName), false);
+  }
+
+  // ── Profile 3 · ALL AE sheets in one job — every rep, one per page (page-break),
+  //    each the same cost-stripped layout. Unassigned rides last so nothing drops. ──
+  function buildAllAeInner(data) {
+    const sections = groupOrdersByRep(activeOrders(data))
+      .map(g => aeSheetSection(data, g.repName, g.orders, true)).join('');
+    return sections || '<p>No shipments arriving this day.</p>';
+  }
+
+  // ── Profile 4 · RECEIVING checklist (Mikalah) — one row per BOX, company-sorted, with a
+  //    tick box. The size matrix stays on each box's printed label; this is the manifest. ──
+  function buildReceivingInner(data) {
+    const orders = activeOrders(data).slice().sort(byCompany);
+    const s = sumOrders(orders);
+    const rows = orders.flatMap(o => boxesForOrder(o).map(p => {
+      const b = p.box;
+      const track = b.trackingNumber ? `${esc(b.carrier || '')} ${esc(b.trackingNumber)}` : '<span class="sit-rt-muted">no tracking</span>';
+      // Per-box "x of N" when SanMar's box detail is available; when it isn't, a multi-box PO
+      // collapses to ONE row — say "N boxes" there so the physical count still reconciles.
+      const boxCell = p.boxTotal > 1
+        ? `${fmtNum(p.boxNo)} of ${fmtNum(p.boxTotal)}`
+        : ((Number(o.boxes) || 1) > 1 ? `${fmtNum(o.boxes)} boxes` : '1 of 1');
+      return `<tr>
+        <td class="sit-rt-check"></td>
+        <td>${esc(o.company || 'Unmatched')}</td>
+        <td>${o.workOrder ? '#' + esc(o.workOrder) : '<span class="sit-rt-muted">no WO</span>'}</td>
+        <td>${esc(o.sanmarPO)}</td>
+        <td class="sit-rt-c">${boxCell}</td>
+        <td>${track}</td>
+        <td class="sit-rt-c">${fmtNum(b.pieces || o.piecesShipped)}</td>
+        <td>${esc(o.method || '')}</td>
+      </tr>`;
+    })).join('');
+    return psHeader(data, {
+      title: 'Receiving checklist — SanMar inbound',
+      recipient: 'Receiving · Mikalah',
+      subLine: `${fmtNum(s.pos)} orders · ${fmtNum(s.boxes)} boxes · ${fmtNum(s.pieces)} pieces to check in`,
+      note: 'Tick each box as it is scanned in. The full size breakdown prints on each box’s receiving label.',
+    }) + `<table class="sit-rt-tbl sit-rt-recv">
+      <thead><tr><th class="sit-rt-check">✓</th><th>Company</th><th>WO</th><th>SanMar PO</th><th class="sit-rt-c">Box</th><th>Carrier / tracking</th><th class="sit-rt-c">Pcs</th><th>Type</th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="8">No boxes arriving this day.</td></tr>'}</tbody></table>`;
+  }
+
+  // ── Profile 5 · PRODUCTION plan (Ruthie) — grouped by decoration method, soonest-due
+  //    first within each. No cost/tracking; rows due within a week are bolded. ──
+  function buildProductionInner(data) {
+    const orders = activeOrders(data);
+    const byMethod = new Map();
+    orders.forEach(o => { const m = o.method || 'Other'; if (!byMethod.has(m)) byMethod.set(m, []); byMethod.get(m).push(o); });
+    const sections = [...byMethod.keys()].sort(byMethodOrder).map(m => {
+      const list = byMethod.get(m).slice().sort(byDue);
+      const pcs = list.reduce((a, o) => a + (Number(o.piecesShipped) || 0), 0);
+      const rows = list.map(o => `<tr>
+        <td class="${isDueSoon(o.dueDate, data.date) ? 'sit-rt-due-soon' : ''}">${esc(fmtShortDate(o.dueDate)) || '—'}</td>
+        <td>${esc(o.company || 'Unmatched')}</td>
+        <td>${o.workOrder ? '#' + esc(o.workOrder) : '<span class="sit-rt-muted">no WO</span>'}</td>
+        <td>${esc(o.designNumber || '—')}${o.designName ? ' · ' + esc(o.designName) : ''}</td>
+        <td class="sit-rt-c">${fmtNum(o.piecesShipped)}</td>
+        <td>${esc(initials(o.salesRep))}</td>
+      </tr>`).join('');
+      return `<div class="sit-rt-method" style="border-left-color:${METHOD_DARK[m] || '#444'}">${esc(m)} <span class="sit-rt-method-sub">${list.length} order${list.length === 1 ? '' : 's'} · ${fmtNum(pcs)} pcs</span></div>
+        <table class="sit-rt-tbl"><thead><tr><th>Due</th><th>Company</th><th>WO</th><th>Design</th><th class="sit-rt-c">Pcs</th><th>Rep</th></tr></thead><tbody>${rows}</tbody></table>`;
+    }).join('');
+    const s = sumOrders(orders);
+    return psHeader(data, {
+      title: 'Production plan — SanMar inbound',
+      recipient: 'Production · Ruthie',
+      subLine: `${fmtNum(s.pos)} orders · ${fmtNum(s.pieces)} pieces · grouped by method, soonest due first`,
+      note: 'Blanks arriving today, ready to schedule. Bold due dates land within a week.',
+    }) + (sections || '<p>No shipments arriving this day.</p>');
+  }
+
+  // ── Profile 6 · PURCHASING / PO reconcile (Bradley) — PO-sorted table with cost, terms,
+  //    ordered-vs-shipped and backorder/hold flags; grand-total cost row. ──
+  function buildPurchasingInner(data) {
+    const orders = activeOrders(data).slice().sort(byPO);
+    const rows = orders.map(o => {
+      const flag = (o.issue && (o.issue.backorder || o.issue.hold)) ? `<span class="sit-rt-flag">${o.issue.backorder ? 'BACKORDER' : 'HOLD'}</span>` : '';
+      const short = (Number(o.piecesShipped) || 0) !== (Number(o.piecesOrdered) || 0);
+      return `<tr>
+        <td>${esc(o.sanmarPO)}</td>
+        <td>${o.workOrder ? '#' + esc(o.workOrder) : '<span class="sit-rt-muted">no WO</span>'}</td>
+        <td>${esc(o.company || 'Unmatched')} ${flag}</td>
+        <td>${esc(initials(o.salesRep))}</td>
+        <td class="sit-rt-c">${fmtNum(o.piecesOrdered)}</td>
+        <td class="sit-rt-c${short ? ' sit-rt-short' : ''}">${fmtNum(o.piecesShipped)}${short ? ' ✗' : ''}</td>
+        <td>${esc(o.terms || '—')}</td>
+        <td class="sit-rt-c sit-rt-cost">${o.cost ? fmtMoney(o.cost) : '—'}</td>
+      </tr>`;
+    }).join('');
+    const s = sumOrders(orders);
+    return psHeader(data, {
+      title: 'Purchasing — SanMar PO reconcile',
+      recipient: 'Purchasing · Bradley',
+      subLine: `${fmtNum(s.pos)} POs · ${fmtNum(s.boxes)} boxes · ${fmtNum(s.pieces)} pieces · <b>${fmtMoney0(s.cost)} blanks cost</b>`,
+      note: 'Ordered vs shipped — ✗ marks a short ship (backorder/hold flagged in red). Cost = SanMar wholesale (CASE_PRICE × qty).',
+    }) + `<table class="sit-rt-tbl sit-rt-purch">
+      <thead><tr><th>SanMar PO</th><th>WO</th><th>Company</th><th>Rep</th><th class="sit-rt-c">Ord</th><th class="sit-rt-c">Ship</th><th>Terms</th><th class="sit-rt-c">Cost</th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="8">No POs arriving this day.</td></tr>'}
+        <tr class="sit-rt-tot"><td colspan="7">TOTAL · ${fmtNum(s.pos)} PO${s.pos === 1 ? '' : 's'}</td><td class="sit-rt-c">${fmtMoney(s.cost)}</td></tr></tbody></table>`;
+  }
+
+  // ── Shared print plumbing: render a profile's inner HTML into #sit-print-sheet, then print. ──
+  const PRINT_BUILDERS = {
+    full: (d) => buildFullInner(d),
+    ae: (d, rep) => buildAeInner(d, rep),
+    allAe: (d) => buildAllAeInner(d),
+    receiving: (d) => buildReceivingInner(d),
+    production: (d) => buildProductionInner(d),
+    purchasing: (d) => buildPurchasingInner(d),
+  };
+  function renderPrintSheet(innerHtml) {
+    const old = document.getElementById('sit-print-sheet'); if (old) old.remove();
     const sheet = document.createElement('div');
     sheet.id = 'sit-print-sheet';
-    sheet.innerHTML = `
-      <div class="sit-ps-head">
-        <div class="sit-ps-brand">Northwest Custom Apparel</div>
-        <div class="sit-ps-title">Daily Inbound Report — SanMar Blanks</div>
-        <div class="sit-ps-sub">Arriving ${esc(fmtDate(data.date))} &nbsp;·&nbsp; ${fmtNum(t.pos)} POs · ${fmtNum(t.workOrders)} work orders · ${fmtNum(t.boxes)} boxes · ${fmtNum(t.piecesShipped)} pieces · <b>${fmtMoney0(t.cost)} blanks cost</b></div>
-        <div class="sit-ps-note">Arrival = SanMar ship date + ground-transit estimate to Milton, WA (no carrier ETA from SanMar). Blank cost = SanMar wholesale (CASE_PRICE × qty). Grouped by sales rep — one rep per page.</div>
-      </div>
-      ${repSections || '<p>No shipments arriving this day.</p>'}`;
+    sheet.innerHTML = innerHtml;
     document.body.appendChild(sheet);
     return sheet;
   }
-
-  function printReport() {
+  function printProfile(kind, arg) {
     if (!lastData) return;
-    buildPrintSheet(lastData);
+    const builder = PRINT_BUILDERS[kind] || PRINT_BUILDERS.full;
+    renderPrintSheet(builder(lastData, arg));
     document.body.classList.add('sit-printing');
     const cleanup = () => {
       document.body.classList.remove('sit-printing');
@@ -639,6 +800,43 @@
     }
   }
 
+  // ── "Print for…" dropdown: one menu item per recipient. AE rows are derived from the
+  //    day's assigned reps (Unassigned/Unmatched never gets its own personal sheet). ──
+  function buildPrintMenuHtml() {
+    if (!lastData || !activeOrders(lastData).length) {
+      return '<div class="sit-pm-empty">Nothing to print for this day.</div>';
+    }
+    const aeItems = groupOrdersByRep(activeOrders(lastData)).filter(g => g.repInitials).map(g =>
+      `<button class="sit-pm-item" role="menuitem" data-print="ae" data-rep="${esc(g.repName)}">
+        <span class="sit-pm-ini">${esc(g.repInitials)}</span>
+        <span class="sit-pm-txt">${esc(g.repName)} <span class="sit-pm-count">· ${fmtNum(g.sub.pos)} PO${g.sub.pos === 1 ? '' : 's'}</span></span>
+      </button>`).join('');
+    return `
+      <div class="sit-pm-group">Everyone · full day</div>
+      <button class="sit-pm-item" role="menuitem" data-print="full"><i class="fas fa-users"></i> <span class="sit-pm-txt">Full report <span class="sit-pm-hint">— all reps</span></span></button>
+      <div class="sit-pm-group">AE personal sheets · their orders only</div>
+      ${aeItems || '<div class="sit-pm-empty">No AE-assigned POs today.</div>'}
+      <button class="sit-pm-item sit-pm-strong" role="menuitem" data-print="allAe"><i class="fas fa-layer-group"></i> <span class="sit-pm-txt">All AE sheets <span class="sit-pm-hint">— one per page</span></span></button>
+      <div class="sit-pm-group">Role sheets · full day, tailored</div>
+      <button class="sit-pm-item" role="menuitem" data-print="receiving"><i class="fas fa-box"></i> <span class="sit-pm-txt">Receiving checklist <span class="sit-pm-hint">· Mikalah</span></span></button>
+      <button class="sit-pm-item" role="menuitem" data-print="production"><i class="fas fa-industry"></i> <span class="sit-pm-txt">Production plan <span class="sit-pm-hint">· Ruthie · by due date</span></span></button>
+      <button class="sit-pm-item" role="menuitem" data-print="purchasing"><i class="fas fa-file-invoice-dollar"></i> <span class="sit-pm-txt">Purchasing / PO reconcile <span class="sit-pm-hint">· Bradley</span></span></button>`;
+  }
+  function togglePrintMenu(show) {
+    const menu = modalEl && modalEl.querySelector('#sit-printmenu');
+    const btn = modalEl && modalEl.querySelector('#sit-print');
+    if (!menu || !btn) return;
+    const willShow = (show != null) ? show : menu.hidden;
+    if (willShow) {
+      menu.innerHTML = buildPrintMenuHtml();
+      menu.hidden = false;
+      btn.setAttribute('aria-expanded', 'true');
+    } else {
+      menu.hidden = true;
+      btn.setAttribute('aria-expanded', 'false');
+    }
+  }
+
   function build() {
     modalEl = document.createElement('div');
     modalEl.className = 'modal sit-modal';
@@ -657,7 +855,10 @@
           </div>
           <div class="sit-header-actions">
             <button class="btn-cancel" id="sit-labels" title="Print a receiving label for every box today (8.5×11, one per page)"><i class="fas fa-tags"></i> Box Labels</button>
-            <button class="btn-cancel" id="sit-print" title="Print or save a PDF of the whole day’s incoming items"><i class="fas fa-print"></i> Print / PDF</button>
+            <div class="sit-printmenu-wrap">
+              <button class="btn-cancel" id="sit-print" aria-haspopup="true" aria-expanded="false" title="Print a report tailored to each person — AEs get only their orders, support staff get the full day"><i class="fas fa-print"></i> Print for… <i class="fas fa-caret-down sit-print-caret"></i></button>
+              <div class="sit-printmenu" id="sit-printmenu" role="menu" hidden></div>
+            </div>
             <button class="btn-cancel" id="sit-refresh" title="Re-pull from SanMar synced data"><i class="fas fa-rotate"></i> Refresh</button>
             <button class="sit-close" id="sit-close" aria-label="Close">&times;</button>
           </div>
@@ -669,7 +870,18 @@
     modalEl.addEventListener('click', (e) => { if (e.target === modalEl) close(); });
     modalEl.querySelector('#sit-close').onclick = close;
     modalEl.querySelector('#sit-refresh').onclick = () => load(true, viewDate);
-    modalEl.querySelector('#sit-print').onclick = printReport;
+    // "Print for…" dropdown — toggle on the button, act on menu clicks, close on outside click.
+    const printBtn = modalEl.querySelector('#sit-print');
+    const printMenu = modalEl.querySelector('#sit-printmenu');
+    printBtn.onclick = (e) => { e.stopPropagation(); if (printBtn.disabled) return; togglePrintMenu(); };
+    printMenu.addEventListener('click', (e) => {
+      const item = e.target.closest('[data-print]');
+      if (!item) return;
+      togglePrintMenu(false);
+      printProfile(item.getAttribute('data-print'), item.getAttribute('data-rep') || undefined);
+    });
+    modalEl.querySelector('.sit-printmenu-wrap').addEventListener('click', (e) => e.stopPropagation());
+    modalEl.addEventListener('click', () => togglePrintMenu(false));
     modalEl.querySelector('#sit-labels').onclick = printAllLabels;
     modalEl.querySelector('#sit-datebtn').onclick = toggleCalendar;
     modalEl.querySelector('#sit-prevday').onclick = () => load(false, addDaysISO(viewDate, -1));
@@ -692,11 +904,14 @@
       printLabels(pick.length ? pick : all.slice(0, 1));
     });
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && modalEl && modalEl.style.display !== 'none') close();
+      if (e.key !== 'Escape' || !modalEl || modalEl.style.display === 'none') return;
+      const menu = modalEl.querySelector('#sit-printmenu');
+      if (menu && !menu.hidden) { togglePrintMenu(false); return; } // Esc closes the print menu first
+      close();
     });
   }
 
-  function close() { if (modalEl) modalEl.style.display = 'none'; }
+  function close() { togglePrintMenu(false); if (modalEl) modalEl.style.display = 'none'; }
 
   window.openInboundTodayModal = function () {
     if (!modalEl) build();

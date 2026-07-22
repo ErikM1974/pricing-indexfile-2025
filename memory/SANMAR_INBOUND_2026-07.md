@@ -50,11 +50,24 @@ The formerly-empty `SanMar_Shipments` fields `Delivery_Status` + `Estimated_Deli
   + `GET /sync-delivery-dates-status`. Skips already-`Delivered` rows so repeat runs are cheap. Backfilled 473 rows
   (465 delivered) on 2026-07-15. **Wired into the nightly `sync-sanmar.js`** (after `matchManageOrders`).
 
-## 4. Daily Inbound Report — sectioned by sales rep (pricing v2026.07.15.1)
+## 4. Daily Inbound Report — "Print for…" recipient profiles (pricing v2026.07.22.4, built 2026-07-22; SUPERSEDES the old rep-section report)
 
-The Print/PDF report groups POs by sales rep (page-break per rep, per-rep subtotal); unmatched POs collect in an
-"Unassigned / Unmatched" section that prints last. `buildPrintSheet()` → `groupOrdersByRep()` + `poBlockHtml()` in
-`sanmar-inbound-today.js`. On-screen modal unchanged.
+Erik prints the day's inbound each morning and hands a copy to Bradley (purchasing), Nika + Taneisha (AEs, who
+should see ONLY their own orders and NOT the wholesale cost), Mikalah (receiving) and Ruthie (production) — each
+needs a different cut. The single "Print / PDF" button is now a **"Print for…" dropdown** (`#sit-printmenu`,
+on-screen `.sit-printmenu` styles in `quote-management.css`), one item per recipient. ALL six reports render from
+the SAME already-loaded `lastData` (no extra fetch, no drift) via `printProfile(kind, arg)` → `renderPrintSheet()`
++ per-profile `build*Inner()` builders in `sanmar-inbound-today.js`. Every profile prints only NON-received POs
+(`activeOrders()` — received = physically counted in, drops off, same rule as the on-screen collapse).
+
+- **`full`** — everyone's master copy; continuous, company-sorted, all columns incl. cost (`data.totals`, header $ via `fmtMoney0` = whole dollar).
+- **`ae` (per rep)** + **`allAe`** — `poBlockHtml(o, {showCost:false})` strips every cost column, PO-level cost, AND Terms so it's customer-safe; header shows THAT rep's subtotal ("2 of your POs"), sorted by due date. `allAe` = one `.sit-ps-rep` page-break section per rep (Unassigned last).
+- **`receiving`** (Mikalah) — one row per BOX (via `boxesForOrder`), company-sorted, `.sit-rt-check` tick box; when box detail is missing a multi-box PO collapses to one row labelled "N boxes" so the physical count still reconciles with the header. Size matrix stays on the box LABELS.
+- **`production`** (Ruthie) — grouped by decoration method (`METHOD_SEQ` order), soonest-due first; due-within-7-days bold (`.sit-rt-due-soon`). No cost/tracking.
+- **`purchasing`** (Bradley) — PO-sorted table, cost + terms + ordered-vs-shipped (✗ short-ship) + backorder/hold flag (`.sit-rt-flag`), grand-total cost row.
+- Role tables share `.sit-rt-*` print CSS. `poBlockHtml` gained a `{showCost}` opt (default true). `groupOrdersByRep()` retained (feeds the AE menu + `allAe`).
+- Verified via `tests/ui/test-inbound-print.html` (mock data): AE sheets carry no `$`/Terms, received PO excluded from all 6, flags/short-ship/due-soon/box-reconcile all render.
+- ⚠ Same-day box-count edge: when SanMar box detail is absent, receiving shows one summary line ("N boxes") not N tickable lines — acceptable since real POs usually carry box detail.
 
 ## 5. Received-PO filter — "already counted in" drops off the arriving list (LIVE 2026-07-17: proxy v931 + pricing v2026.07.17.3)
 

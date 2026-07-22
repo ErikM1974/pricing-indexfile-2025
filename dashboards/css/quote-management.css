@@ -1000,6 +1000,35 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 .sit-header-actions { display: flex; align-items: center; gap: 8px; flex: none; }
 .sit-header-actions .btn-cancel:disabled { opacity: 0.5; cursor: not-allowed; }
 
+/* "Print for…" recipient dropdown (screen) — one item per person, tailored report each */
+.sit-printmenu-wrap { position: relative; display: inline-flex; }
+.sit-print-caret { font-size: 11px; margin-left: 2px; color: #6b8a72; }
+.sit-printmenu {
+    position: absolute; top: calc(100% + 6px); right: 0; z-index: 40;
+    min-width: 292px; max-height: 62vh; overflow-y: auto;
+    background: #fff; border: 1px solid #d6e0d6; border-radius: 10px;
+    box-shadow: 0 12px 34px rgba(20, 45, 25, 0.18); padding: 6px;
+}
+.sit-printmenu[hidden] { display: none; }
+.sit-pm-group { font-size: 11px; font-weight: 700; color: #6b8a72; text-transform: uppercase; letter-spacing: .03em; padding: 8px 10px 3px; }
+.sit-pm-item {
+    display: flex; align-items: center; gap: 9px; width: 100%; text-align: left;
+    background: none; border: none; border-radius: 7px; padding: 8px 10px;
+    font-size: 13.5px; color: #24402c; cursor: pointer;
+}
+.sit-pm-item:hover { background: #eef4ee; }
+.sit-pm-item > i { width: 16px; text-align: center; color: #4a7a58; flex: none; }
+.sit-pm-txt { flex: 1; min-width: 0; }
+.sit-pm-strong { font-weight: 600; }
+.sit-pm-hint { color: #8aa392; font-weight: 400; }
+.sit-pm-count { color: #8aa392; }
+.sit-pm-ini {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px; flex: none; border-radius: 50%;
+    background: #e3efe6; color: #2e6f40; font-size: 11px; font-weight: 700;
+}
+.sit-pm-empty { padding: 8px 10px; font-size: 12.5px; color: #8aa392; }
+
 /* Date navigation (prev / pick-a-day / next / today) */
 .sit-datenav { display: flex; align-items: center; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
 .sit-datenav .sit-date-line { margin-top: 0; color: #245; }
@@ -1124,6 +1153,25 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 .sit-ps-title { font-size: 14px; font-weight: 700; margin-top: 2px; }
 .sit-ps-sub { font-size: 11px; color: #333; margin-top: 4px; }
 .sit-ps-note { font-size: 9.5px; color: #777; margin-top: 3px; }
+.sit-ps-recipient { font-size: 14px; font-weight: 800; color: #24402c; margin-top: 3px; }
+
+/* ── Role-tailored sheets: receiving checklist / production plan / purchasing reconcile ── */
+.sit-rt-tbl { width: 100%; border-collapse: collapse; font-size: 10.5px; margin-bottom: 10px; }
+.sit-rt-tbl th { text-align: left; background: #eef4ee; border: 1px solid #d5ddd5; padding: 4px 6px; font-size: 9.5px; text-transform: uppercase; letter-spacing: .02em; color: #35503b; }
+.sit-rt-tbl td { border: 1px solid #e2e8e2; padding: 4px 6px; vertical-align: top; }
+.sit-rt-tbl tbody tr { page-break-inside: avoid; }
+.sit-rt-c { text-align: center; white-space: nowrap; }
+.sit-rt-muted { color: #999; }
+.sit-rt-check { width: 26px; text-align: center; }
+.sit-rt-recv tbody .sit-rt-check::before { content: ""; display: inline-block; width: 13px; height: 13px; border: 1.5px solid #7a8a7a; border-radius: 2px; }
+.sit-rt-method { font-size: 12px; font-weight: 800; color: #2e6f40; margin: 12px 0 4px; padding: 2px 0 2px 8px; border-left: 4px solid #444; page-break-after: avoid; }
+.sit-rt-method:first-of-type { margin-top: 2px; }
+.sit-rt-method-sub { font-size: 10px; font-weight: 600; color: #667; }
+.sit-rt-due-soon { font-weight: 800; color: #a3300f; }
+.sit-rt-flag { display: inline-block; font-size: 8.5px; font-weight: 800; color: #a32d2d; border: 1px solid #e0a3a3; border-radius: 3px; padding: 0 4px; margin-left: 4px; vertical-align: 1px; }
+.sit-rt-short { color: #a32d2d; font-weight: 800; }
+.sit-rt-cost { font-variant-numeric: tabular-nums; }
+.sit-rt-tot td { border-top: 2px solid #2e6f40; font-weight: 800; background: #f4f8f4; }
 .sit-ps-po { margin-bottom: 12px; page-break-inside: avoid; }
 .sit-ps-po-head { display: flex; gap: 8px; align-items: flex-start; background: #f1f5f1; padding: 5px 8px; font-size: 11px; border: 1px solid #dde5dd; }
 .sit-ps-po-head .sit-ps-r { float: right; color: #555; }
