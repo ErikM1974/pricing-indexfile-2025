@@ -256,6 +256,7 @@
         setMcStatus('Checking Mailchimp for ' + emails.length + ' emails… (the first check can take a minute)', 'ok');
         jsonFetch(API + '/mailchimp/engagement', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ emails: emails }) }).then(function (d) {
             b.disabled = false;
+            if (d.building) { setMcStatus(d.message || 'Reading your Mailchimp history (first time only) — click “Check engagement” again in about a minute.', 'warn'); return; }
             if (d.error) { setMcStatus(d.error, 'err'); return; }
             state.engagement = {};
             Object.keys(d.byEmail || {}).forEach(function (k) { state.engagement[k.toLowerCase()] = d.byEmail[k]; });
