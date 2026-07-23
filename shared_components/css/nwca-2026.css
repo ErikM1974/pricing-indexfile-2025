@@ -110,6 +110,43 @@
 .duo-safety:hover .duo-safety-cta { text-decoration: underline; }
 .duo-safety:hover .duo-safety-img { opacity: 0.7; }
 
+/* Fall Catalog '26 — seasonal new-arrivals band (copy + SanMar product-thumbnail strip) */
+.fall26-band {
+    position: relative; display: grid; grid-template-columns: 1.05fr 1fr; align-items: center; gap: 30px;
+    border-radius: var(--radius); overflow: hidden; text-decoration: none; color: #fff;
+    padding: 30px 32px;
+    background:
+        radial-gradient(760px 320px at 92% -25%, rgba(126, 208, 140, 0.22), transparent 60%),
+        linear-gradient(180deg, var(--green-900), var(--green-950));
+    box-shadow: var(--shadow-card);
+    transition: box-shadow 0.16s ease, transform 0.16s ease;
+}
+.fall26-band:hover { box-shadow: var(--shadow-pop); transform: translateY(-2px); }
+.fall26-band-body { position: relative; z-index: 1; }
+.fall26-band .duo-badge { background: var(--rush); border: none; color: #fff; }
+.fall26-band h3 {
+    font-family: var(--font-display); font-weight: 800; line-height: 1.03;
+    font-size: clamp(24px, 3vw, 34px); margin-bottom: 8px;
+}
+.fall26-band h3 .yr { color: #7ed08c; }
+.fall26-band p { font-size: 14px; opacity: 0.9; max-width: 48ch; margin-bottom: 16px; }
+.fall26-band-cta {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: var(--font-display); font-weight: 800; font-size: 15px; color: #fff;
+}
+.fall26-band-cta svg { transition: transform 0.15s ease; }
+.fall26-band:hover .fall26-band-cta svg { transform: translateX(3px); }
+.fall26-band-strip { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+.fall26-thumb { aspect-ratio: 1 / 1; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 14px -6px rgba(0, 0, 0, 0.5); }
+.fall26-thumb img { width: 100%; height: 100%; object-fit: contain; padding: 7px; }
+@media (max-width: 860px) {
+    .fall26-band { grid-template-columns: 1fr; gap: 20px; padding: 26px 24px; }
+}
+@media (max-width: 520px) {
+    .fall26-band-strip { grid-template-columns: repeat(4, 1fr); }
+    .fall26-thumb:nth-child(5) { display: none; }
+}
+
 /* Express Order — homepage hero pair (Custom T-Shirts + Custom Hats).
    Photo-card pattern modeled on .shelf-card; replaces the old .duo-hats teaser. */
 .express-section { max-width: var(--wrap); margin: 0 auto; padding: 4px 20px 40px; }
