@@ -1,3 +1,8 @@
+## v2026.07.23.3 (2026.07.23)
+
+- Staff dashboard: remove Win Bell ticker under the hero search
+- Deploy v2026.07.23.3: 1 files (index.html,)
+
 ## v2026.07.23.2 (2026.07.23)
 
 - Converter: uppercase the size shown in descriptions (Size SS -, not ss)
