@@ -26,6 +26,8 @@ BrandName`. Download = `Shopworks_Import_Converted.csv`. Import into ShopWorks P
   variants (`_2XLT/_2XLR/_2XLL/_2XLS/_2XLP`) keep their suffix.
 - **Descriptions get the size** on extended-size rows: `Size 2XL - …`, `Size 3XL - …`,
   `Size OSFA - …`, `Size XXL - …` (ladies). Tidy: collapse whitespace, strip trailing period.
+  The size shown in the description is **UPPERCASED** (`Size SS -`, `Size XXXL -`) to match
+  existing parts, even though the part-number suffix keeps ShopWorks's case (`_ss`, `_xxxl`).
 - **sts_LimitSize** (blocked=1, allowed=blank): base S/M/L/XL = `----11`; **2XL & XXL = `1111-1`
   (Size05)**; everything else = `11111-` (Size06).
 - Full path: `ID_Product` = **`sanmarToShopWorksSKU(style,size)`** (reuses
