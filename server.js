@@ -3135,6 +3135,13 @@ app.get('/dashboards/sanmar-ftp-integration.html', requireCrmRole(['admin']), (r
   res.sendFile(path.join(__dirname, 'dashboards', 'sanmar-ftp-integration.html'));
 });
 
+// SanMar → ShopWorks Parts converter — ADMIN ONLY. Client-side tool: upload a SanMar
+// price list (ShopWorks integration list OR raw feed), it converts to a ShopWorks Parts
+// import CSV (adds sizes to descriptions, _2XL→_2X, size flags). Before the /dashboards mount.
+app.get('/dashboards/sanmar-shopworks-converter.html', requireCrmRole(['admin']), (req, res) => {
+  res.sendFile(path.join(__dirname, 'dashboards', 'sanmar-shopworks-converter.html'));
+});
+
 // ShopWorks OnSite ODBC reference — ERIK ONLY (hard email gate, like caspio-api-reference):
 // the page displays the ODBC connection card (LAN server + read-only credentials), the
 // FileMaker query rules, and the 2,630-field Data_ODBCMapping catalog. Before the mount.

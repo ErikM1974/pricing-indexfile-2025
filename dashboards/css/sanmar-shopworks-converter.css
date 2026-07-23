@@ -1,0 +1,76 @@
+/* ==========================================================================
+   sanmar-shopworks-converter.css — SanMar → ShopWorks Parts converter (admin).
+   2026 tokens (art-hub.css) + dash-shell.css. var(--token) only; no hardcoded
+   colors/shadows/radii.
+   ========================================================================== */
+
+.sw-subhead { font-weight: 400; font-size: 0.68em; opacity: 0.85; }
+.sw-lock {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 600; color: #fff;
+    background: rgba(0,0,0,0.18); border: 1px solid rgba(255,255,255,0.35); padding: 5px 12px; border-radius: var(--radius-pill);
+}
+.sw-lead { font-size: 1rem; line-height: 1.6; color: var(--gray-700); margin: 0 0 var(--space-4); }
+.sw-note { font-size: 0.82rem; color: var(--gray-500); line-height: 1.5; margin: var(--space-3) 0 0; }
+
+/* ---------- buttons ---------- */
+.sw-btn {
+    display: inline-flex; align-items: center; gap: 7px; font-size: 0.86rem; font-weight: 600;
+    padding: 8px 15px; border-radius: var(--radius-md); border: 1px solid transparent; cursor: pointer;
+    text-decoration: none; white-space: nowrap; line-height: 1; background: var(--dash-theme); color: #fff;
+    transition: filter .12s ease;
+}
+.sw-btn:hover { filter: brightness(1.05); }
+.sw-btn[disabled] { opacity: 0.5; pointer-events: none; }
+.sw-btn--ghost { background: var(--surface-inset); color: var(--gray-700); border-color: var(--gray-300); }
+.sw-btn--ghost:hover { background: var(--surface-card); filter: none; }
+.sw-btn--go { background: var(--state-success, #16a34a); }
+
+/* ---------- file picker row ---------- */
+.sw-drop {
+    display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-2);
+    background: var(--surface-inset); border: 1px dashed var(--gray-300); border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4); margin-bottom: var(--space-3);
+}
+.sw-file-input { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+.sw-file-name { font-size: 0.85rem; color: var(--gray-600); flex: 1; min-width: 160px; font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
+/* ---------- status / messages ---------- */
+.sw-status { font-size: 0.9rem; color: var(--gray-600); margin: var(--space-2) 0; }
+.sw-spin { animation: sw-spin 0.8s linear infinite; display: inline-block; }
+@keyframes sw-spin { to { transform: rotate(360deg); } }
+.sw-msg { border: 1px solid var(--gray-200); border-left: 4px solid var(--gray-400); border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4); background: var(--surface-inset); font-size: 0.9rem; color: var(--gray-700); line-height: 1.55; }
+.sw-msg--error { border-left-color: var(--state-danger); background: var(--state-danger-bg); color: var(--state-danger); }
+
+/* ---------- stats + download ---------- */
+.sw-stats { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-3); margin: var(--space-3) 0; }
+.sw-stat { font-size: 0.9rem; color: var(--gray-600); }
+.sw-stat b { color: var(--gray-900); font-size: 1.05rem; }
+.sw-stat--mode { background: var(--dash-theme-bg); color: var(--dash-theme-dark); border-radius: var(--radius-pill); padding: 3px 12px; font-weight: 600; font-size: 0.8rem; }
+.sw-stats .sw-btn--go { margin-left: auto; }
+
+/* ---------- preview table ---------- */
+.sw-table-wrap { overflow-x: auto; border: 1px solid var(--gray-200); border-radius: var(--radius-md); }
+.sw-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; min-width: 620px; }
+.sw-table thead th { text-align: left; padding: 8px var(--space-3); border-bottom: 2px solid var(--gray-300);
+    color: var(--gray-500); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; background: var(--surface-inset); }
+.sw-table td { padding: 7px var(--space-3); border-bottom: 1px solid var(--gray-200); vertical-align: middle; color: var(--gray-700); }
+.sw-table tr:last-child td { border-bottom: 0; }
+.sw-mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+.sw-table .sw-mono:first-child { font-weight: 600; color: var(--gray-900); }
+.sw-num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sw-dim { color: var(--gray-400); letter-spacing: 2px; }
+
+/* ---------- lists / steps / callouts ---------- */
+.sw-list, .sw-steps { margin: 0; padding-left: var(--space-5); }
+.sw-list li, .sw-steps li { margin: var(--space-2) 0; font-size: 0.9rem; color: var(--gray-700); line-height: 1.6; }
+.sw-callout { border: 1px solid var(--gray-200); border-left: 4px solid var(--state-info); border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4); margin: var(--space-4) 0 0; background: var(--surface-inset); }
+.sw-callout h4 { margin: 0 0 var(--space-2); font-size: 0.95rem; font-weight: 700; display: flex; align-items: center; gap: var(--space-2); color: var(--state-info); }
+.sw-callout p { margin: 0; font-size: 0.88rem; color: var(--gray-700); line-height: 1.6; }
+
+/* ---------- inline code ---------- */
+.sw-lead code, .sw-list code, .sw-steps code, .sw-callout code, .sw-note code {
+    font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.82em; background: var(--surface-card); color: var(--gray-800);
+    padding: 1px 5px; border-radius: var(--radius-sm); overflow-wrap: anywhere;
+}
