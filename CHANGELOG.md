@@ -1,3 +1,8 @@
+## v2026.07.23.1 (2026.07.23)
+
+- Vendor PapaParse + SheetJS for SanMar->ShopWorks parts converter (WIP)
+- SanMar -> ShopWorks Parts converter (admin dashboard tool)
+
 ## v2026.07.22.8 (2026.07.22)
 
 - Jim's Mailing List: doc current — Phase 2 + engagement-gated Mailchimp sync
