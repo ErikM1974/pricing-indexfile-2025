@@ -20,8 +20,8 @@ import { initMetrics }         from '../controllers/metrics-controller.js';
 import { initTeamPerformance } from '../controllers/team-performance-controller.js';
 import { initProduction }      from '../controllers/production-controller.js';
 import { initGarmentTracker }  from '../controllers/garment-tracker-controller.js';
-// Phase 1 "alive + personal" widgets (2026-07-20)
-import { initWinBell }         from '../controllers/win-bell-controller.js';
+// Phase 1 "alive + personal" widgets (2026-07-20). Win Bell removed 2026-07-23
+// (Erik: its first-run placeholder cluttered the top of the page).
 import { initPrideWall }       from '../controllers/pride-wall-controller.js';
 import { initMyStuff }         from '../controllers/my-stuff-controller.js';
 // Phase 2 "effortless" layer (2026-07-20): Ctrl+K Everything Bar
@@ -57,7 +57,6 @@ async function bootstrap() {
     initMetrics();           // ManageOrders revenue + sparkline + YoY
     initTeamPerformance();   // Caspio archive YTD per-rep
     initGarmentTracker();    // Caspio garment-tracker table (bridged to legacy service)
-    initWinBell();           // quote_sessions diff → live wins ticker + confetti
     initPrideWall();         // finished-photos library → ambient photo strip
 
     await authPromise;
