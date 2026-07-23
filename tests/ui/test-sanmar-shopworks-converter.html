@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEST · SanMar → ShopWorks Parts converter</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css">
+    <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
+    <link rel="stylesheet" href="/dashboards/css/sanmar-shopworks-converter.css?v=2026.07.23.1">
+</head>
+<body>
+    <div class="dash-shell">
+        <header class="dash-header">
+            <div class="dash-header-left">
+                <a href="#"><img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="NWCA" class="dash-header-logo"></a>
+                <h1 class="dash-header-title">SanMar → ShopWorks Parts <span class="sw-subhead">convert a SanMar price list into a ShopWorks parts import</span></h1>
+            </div>
+            <div class="dash-header-right"><span class="sw-lock"><i class="fas fa-user-shield"></i> Admin</span></div>
+        </header>
+        <main class="dash-content">
+            <section class="dash-card">
+                <div class="dash-card-header"><h2 class="dash-card-title"><i class="fas fa-wand-magic-sparkles"></i> Convert a price list</h2></div>
+                <p class="sw-note" id="sw-libcheck">checking libraries…</p>
+                <div class="sw-drop">
+                    <input type="file" id="sw-file" class="sw-file-input">
+                    <label for="sw-file" class="sw-btn sw-btn--ghost"><i class="fas fa-folder-open"></i> Choose file</label>
+                    <span id="sw-file-name" class="sw-file-name">No file selected</span>
+                    <button type="button" id="sw-convert" class="sw-btn"><i class="fas fa-wand-magic-sparkles"></i> Convert</button>
+                    <button type="button" id="sw-reset" class="sw-btn sw-btn--ghost"><i class="fas fa-rotate-left"></i> Reset</button>
+                </div>
+                <div id="sw-results" style="display:none">
+                    <div class="sw-stats">
+                        <span class="sw-stat"><b id="sw-stat-in">0</b> rows in</span>
+                        <span class="sw-stat"><b id="sw-stat-out">0</b> parts out</span>
+                        <span class="sw-stat sw-stat--mode" id="sw-stat-fmt"></span>
+                        <button type="button" id="sw-download" class="sw-btn sw-btn--go"><i class="fas fa-download"></i> Download CSV</button>
+                    </div>
+                    <div class="sw-table-wrap">
+                        <table class="sw-table">
+                            <thead><tr><th>ID_Product</th><th>Description</th><th>Piece</th><th>Case</th><th>Sizes</th></tr></thead>
+                            <tbody id="sw-preview-body"></tbody>
+                        </table>
+                    </div>
+                    <p class="sw-note">Preview shows the first 12 rows. The download contains all of them.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="/dashboards/js/vendor/papaparse.min.js"></script>
+    <script src="/dashboards/js/vendor/xlsx.full.min.js"></script>
+    <script src="/shared_components/js/sku-validation-service.js"></script>
+    <script src="/dashboards/js/sanmar-shopworks-parts.js?v=2026.07.23.1"></script>
+    <script src="/tests/ui/test-sanmar-shopworks-stub.js"></script>
+</body>
+</html>
