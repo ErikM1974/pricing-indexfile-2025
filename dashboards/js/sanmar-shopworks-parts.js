@@ -107,7 +107,9 @@
     else if (suf === 'XXL') { newSuf = 'XXL'; disp = 'XXL'; }
     else { newSuf = suf; disp = suf; }
     out.ID_Product = style + '_' + newSuf;
-    out.Description = 'Size ' + disp + ' - ' + base;
+    // Display size is UPPERCASED (existing parts read "Size SS -", "Size XXXL -")
+    // even though the part-number suffix keeps ShopWorks's case (_ss, _xxxl).
+    out.Description = 'Size ' + disp.toUpperCase() + ' - ' + base;
     return out;
   }
   function fixupRows(rows, inputCols) {
@@ -125,7 +127,7 @@
     }
     s = cleanDesc(s);
     var sz = String(size || '').trim();
-    if (sz && !isStd(sz)) s = 'Size ' + sz + ' - ' + s;
+    if (sz && !isStd(sz)) s = 'Size ' + sz.toUpperCase() + ' - ' + s;
     return s;
   }
 

@@ -64,6 +64,12 @@ describe('FIXUP path (integration list) — matches existing parts', () => {
     expect(r.sts_LimitSize05).toBe('');
   });
 
+  test('lowercase part-suffix (_ss) keeps its case in the part# but UPPERCASES the size in the description', () => {
+    const r = SW.fixupRow({ ID_Product: 'WW3150S_ss', Description: 'Wink Unisex Short WorkFlex Cargo Pant.' });
+    expect(r.ID_Product).toBe('WW3150S_ss');
+    expect(r.Description).toBe('Size SS - Wink Unisex Short WorkFlex Cargo Pant');
+  });
+
   test('fixupRows over a batch leaves zero _2XL exact endings', () => {
     const rows = [{ ID_Product: 'A_2XL', Description: 'X.' }, { ID_Product: 'B_2XLT', Description: 'Y.' }, { ID_Product: 'C_XXL', Description: 'Z.' }];
     const out = SW.fixupRows(rows).rows;
@@ -111,6 +117,12 @@ describe('FULL conversion path (raw SanMar feed)', () => {
     expect(rows).toHaveLength(1);
     expect(rows[0].Price_Unit_Piece).toBe('4.98');
   });
+  test('lowercase raw size ("ss") -> lowercase part suffix but UPPERCASE size in description', () => {
+    const { rows } = SW.fullConvertRows([{ STYLE: 'WW3150S', SIZE: 'ss', PIECE_PRICE: '14.27', CASE_PRICE: '12.27', PRODUCT_TITLE: 'Wink Unisex Short WorkFlex Cargo Pant WW3150S' }]);
+    expect(rows[0].ID_Product).toBe('WW3150S_ss');
+    expect(rows[0].Description).toBe('Size SS - Wink Unisex Short WorkFlex Cargo Pant');
+  });
+
   test('accepts STYLE# as well as STYLE; drops zero-price rows', () => {
     const { rows } = SW.fullConvertRows([
       { 'STYLE#': 'PC54', SIZE: 'L', PIECE_PRICE: '3.50', CASE_PRICE: '3.00', PRODUCT_TITLE: 'Port & Company Core Cotton Tee PC54' },
