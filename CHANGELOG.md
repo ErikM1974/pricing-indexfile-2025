@@ -1,3 +1,8 @@
+## v2026.07.23.2 (2026.07.23)
+
+- Converter: uppercase the size shown in descriptions (Size SS -, not ss)
+- Deploy v2026.07.23.2: 2 files (sanmar-shopworks-converter.html,test-sanmar-shopworks-converter.html,...)
+
 ## v2026.07.23.1 (2026.07.23)
 
 - Vendor PapaParse + SheetJS for SanMar->ShopWorks parts converter (WIP)
