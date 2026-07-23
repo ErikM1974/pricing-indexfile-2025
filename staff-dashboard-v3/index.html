@@ -35,9 +35,9 @@
          [class*="..."] selectors were over-matching and damaging styles that
          components.css already had correct (garment-bonus, celebration pills, etc). -->
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=2026.06.24.8">
-    <!-- Phase 1 "alive + personal" widgets (2026-07-20): Win Bell ticker,
-         Pride Wall photo strip, My Stuff pinned/recent tools row. -->
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/phase1-widgets.css?v=2026.07.21.3">
+    <!-- Phase 1 "alive + personal" widgets (2026-07-20): Pride Wall photo
+         strip, My Stuff pinned/recent tools row. (Win Bell removed 2026-07-23.) -->
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/phase1-widgets.css?v=2026.07.23.3">
     <!-- Phase 2 (2026-07-20): Ctrl+K command palette — the Everything Bar. -->
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/command-palette.css?v=2026.07.20.7">
 
@@ -346,13 +346,10 @@
                 <div class="cp-toast" id="cpToast" role="status"></div>
             </section>
 
-            <!-- Win Bell (2026-07-20 Phase 1) — live ticker: new paid web
-                 orders, accepted quotes, goal milestones. Hidden until the
-                 controller has at least one event to show. -->
-            <section class="wb-strip" id="winBellStrip" aria-label="Live wins ticker" hidden>
-                <span class="wb-bell" id="wbBell" aria-hidden="true">🔔</span>
-                <div class="wb-events" id="wbEvents" aria-live="polite"></div>
-            </section>
+            <!-- Win Bell strip REMOVED 2026-07-23 (Erik: it sat between the search
+                 and the Pride Wall showing only its first-run "Win Bell is live"
+                 seed line — a permanent placeholder that cluttered the top of the
+                 page). Controller (win-bell-controller.js) + its .wb-* CSS deleted. -->
 
             <!-- Pride Wall (2026-07-20 Phase 1) — ambient rotation of recent
                  finished-product photos from the company photo library. -->
@@ -948,6 +945,6 @@
     <!-- ===================================================
          APP ENTRY (ES module)
          =================================================== -->
-    <script type="module" src="/shared_components/js/staff-dashboard/core/dashboard-app.js?v=2026.07.20.4"></script>
+    <script type="module" src="/shared_components/js/staff-dashboard/core/dashboard-app.js?v=2026.07.23.3"></script>
 </body>
 </html>
