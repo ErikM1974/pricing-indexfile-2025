@@ -369,3 +369,42 @@
 
 /* Header Samples badge (shares .quote-badge base styles) */
 .sample-badge { margin-left: 8px; }
+
+/* ── Fall Catalog '26 promo strip (links to /pages/fall-catalog-2026.html) ── */
+.fall26-promo {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 18px auto 0;
+    padding: 15px 20px;
+    border-radius: var(--radius);
+    background:
+        radial-gradient(600px 200px at 88% -40%, rgba(126, 208, 140, 0.22), transparent 60%),
+        linear-gradient(180deg, var(--green-900), var(--green-950));
+    color: #fff;
+    text-decoration: none;
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--green-950);
+    transition: transform 0.16s ease, box-shadow 0.16s ease;
+}
+.fall26-promo:hover { transform: translateY(-2px); box-shadow: var(--shadow-pop); }
+.fall26-promo-badge {
+    flex: 0 0 auto;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+    background: var(--rush); color: #fff; border-radius: 999px; padding: 4px 11px;
+}
+.fall26-promo-copy { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.fall26-promo-copy strong { font-family: var(--font-display); font-weight: 800; font-size: 16.5px; }
+.fall26-promo-copy span { font-size: 13px; color: rgba(255, 255, 255, 0.82); }
+.fall26-promo-cta {
+    flex: 0 0 auto; margin-left: auto;
+    display: inline-flex; align-items: center; gap: 5px;
+    font-weight: 700; font-size: 14px; color: #fff; white-space: nowrap;
+}
+.fall26-promo-cta svg { transition: transform 0.15s ease; }
+.fall26-promo:hover .fall26-promo-cta svg { transform: translateX(3px); }
+@media (max-width: 640px) {
+    .fall26-promo { flex-wrap: wrap; gap: 10px; }
+    .fall26-promo-copy span { font-size: 12px; }
+    .fall26-promo-cta { margin-left: 0; width: 100%; }
+}

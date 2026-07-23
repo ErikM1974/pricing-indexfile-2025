@@ -28,6 +28,7 @@
             descInput: document.getElementById('fldProduct'),
         });
         document.getElementById('fldLogoFile').addEventListener('change', uploadLogo);
+        prefillFromUrl();
 
         NWCAPublicForm.init({
             formId: 'quote-request',
@@ -41,6 +42,28 @@
             build: buildSubmission,
         });
     });
+
+    // Deep-link prefill: /request-a-quote.html?style=&product=&source= (used by
+    // the Fall Catalog '26 landing page cards). Purely additive — a visitor with
+    // no params sees the blank form exactly as before.
+    function prefillFromUrl() {
+        var p;
+        try { p = new URLSearchParams(window.location.search); } catch (e) { return; }
+        var style = (p.get('style') || '').trim();
+        var product = (p.get('product') || '').trim();
+        var source = (p.get('source') || '').trim();
+        var styleEl = document.getElementById('fldStyle');
+        var prodEl = document.getElementById('fldProduct');
+        var whatEl = document.getElementById('fldWhat');
+        if (style && styleEl && !styleEl.value) styleEl.value = style.toUpperCase();
+        if (product && prodEl && !prodEl.value) prodEl.value = product;
+        if (whatEl && !whatEl.value && (product || style)) {
+            whatEl.value = "I'm interested in " + (product || style) +
+                (style && product ? ' (' + style.toUpperCase() + ')' : '') +
+                (source ? ' — from ' + source : '') +
+                '. Please send decorated pricing.';
+        }
+    }
 
     function uploadLogo() {
         var input = document.getElementById('fldLogoFile');
