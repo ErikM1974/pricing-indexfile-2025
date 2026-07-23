@@ -1,3 +1,8 @@
+## v2026.07.23.4 (2026.07.23)
+
+- Deploy v2026.07.23.4: 10 files (ACTIVE_FILES.md,index.html,catalog.html,...)
+- Fall Catalog '26 landing page (/pages/fall-catalog-2026.html) — 179 new SanMar Fall-2026 styles; homepage band + catalog nav/banner + quote deep-link prefill
+
 ## v2026.07.23.3 (2026.07.23)
 
 - Staff dashboard: remove Win Bell ticker under the hero search
