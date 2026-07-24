@@ -200,9 +200,26 @@ class QuoteViewPage {
         return null;
     }
 
+    /**
+     * Share-link token suffix for API calls (2026-07-24).
+     *
+     * Quotes saved from now on carry an unguessable token; their share links
+     * look like /quote/STK-2026-001?k=<token>. Quotes saved BEFORE this have no
+     * stored token and the server serves them without one, so an old link with
+     * no `?k=` keeps working — this returns '' in that case and nothing breaks.
+     * Staff sessions bypass the check server-side.
+     */
+    shareTokenParam(joiner) {
+        try {
+            const k = new URLSearchParams(window.location.search).get('k');
+            if (!k) return '';
+            return (joiner || '?') + 'k=' + encodeURIComponent(k);
+        } catch (e) { return ''; }
+    }
+
     async loadQuote() {
         try {
-            const response = await fetch(`/api/public/quote/${this.quoteId}`);
+            const response = await fetch(`/api/public/quote/${this.quoteId}${this.shareTokenParam()}`);
 
             if (!response.ok) {
                 if (response.status === 404) {
@@ -828,6 +845,22 @@ class QuoteViewPage {
         // Build embroidery info section
         let html = this.renderEmbroideryInfo();
 
+        // Garment size columns are meaningless on quotes for products that have
+        // no apparel sizes — stickers, banners and emblem patches. Rendering them
+        // gave a sticker line six empty cells and made the quote look broken
+        // (2026-07-24). Suppress the whole size block for those prefixes and let
+        // Item/Color/Qty/Unit/Total carry the row.
+        const sizelessPrefix = ['STK', 'PATCH'].includes(this.quoteId?.split(/[\d-]/)[0] || '');
+        this.hideSizeColumns = sizelessPrefix;
+
+        const sizeHeaders = sizelessPrefix ? '' : `
+                            <th class="size-col">S</th>
+                            <th class="size-col">M</th>
+                            <th class="size-col">L</th>
+                            <th class="size-col">XL</th>
+                            <th class="size-col">2XL</th>
+                            <th class="size-col">3XL</th>`;
+
         // Build compact table HTML (no Description column)
         html += `
             <div class="product-table-wrapper">
@@ -835,13 +868,7 @@ class QuoteViewPage {
                     <thead>
                         <tr>
                             <th class="style-col">Item / Description</th>
-                            <th class="color-col">Color</th>
-                            <th class="size-col">S</th>
-                            <th class="size-col">M</th>
-                            <th class="size-col">L</th>
-                            <th class="size-col">XL</th>
-                            <th class="size-col">2XL</th>
-                            <th class="size-col">3XL</th>
+                            <th class="color-col">Color</th>${sizeHeaders}
                             <th class="qty-col">Qty</th>
                             <th class="price-col">Unit $</th>
                             <th class="total-col">Total</th>
@@ -864,7 +891,9 @@ class QuoteViewPage {
                 if (m !== lastMethodSubhead) {
                     const label = this.methodLabels[m] || (m ? m.toUpperCase() : 'Other');
                     const locSuffix = group.printLocation ? ` — ${group.printLocation}` : '';
-                    html += `<tr class="method-subhead"><td colspan="11">${this.escapeHtml(label + locSuffix)}</td></tr>`;
+                    // colspan must track the header — 11 columns normally, 5 when
+                    // the six garment size columns are suppressed (STK/PATCH).
+                    html += `<tr class="method-subhead"><td colspan="${this.hideSizeColumns ? 5 : 11}">${this.escapeHtml(label + locSuffix)}</td></tr>`;
                     lastMethodSubhead = m;
                 }
             }
@@ -949,6 +978,13 @@ class QuoteViewPage {
             const types = new Set((this.productItems || []).map(i => String(i.EmbellishmentType || '').toLowerCase()));
             if (types.size > 1) return '';
         }
+        // Stickers / banners / emblem patches have no decoration LOCATION at all —
+        // they are the product, not something applied to a garment. Without this
+        // the block fell through to the `location || 'Left Chest'` default at the
+        // bottom and told sticker customers their stickers go on the left chest
+        // (2026-07-24).
+        if (['STK', 'PATCH'].includes(prefix)) return '';
+
         // CEMB (Contract Embroidery, AI-drafted) added 2026-05-14 (Phase 5)
         // so the Location + Stitches detail row renders on CEMB quote views.
         const isEmbroideryQuote = ['EMB', 'EMBC', 'CEMB', 'RICH', 'CAP'].includes(prefix);
@@ -1149,9 +1185,9 @@ class QuoteViewPage {
                         <div style="font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: 10px; font-weight: 500; color: ${subInk}; opacity: 0.75; margin-top: 2px; letter-spacing: 0.03em;">${this.escapeHtml(displaySku)}</div>
                     </td>
                     <td class="color-col" style="font-size: 11px;">${this.escapeHtml(description)}</td>
-                    <td class="size-col" colspan="6" style="text-align: center; color: #94a3b8; font-size: 10px; font-style: italic;">
+                    ${this.hideSizeColumns ? '' : `<td class="size-col" colspan="6" style="text-align: center; color: #94a3b8; font-size: 10px; font-style: italic;">
                         ${this.escapeHtml(sizeColPlaceholder)}
-                    </td>
+                    </td>`}
                     <td class="qty-col">${qty}</td>
                     <td class="price-col">${this.formatCurrency(unitPrice)}</td>
                     <td class="total-col">${this.formatCurrency(lineTotal)}</td>
@@ -1377,12 +1413,12 @@ class QuoteViewPage {
             <tr class="${rowClass}">
                 <td class="style-col fee-part">${this.escapeHtml(partNum)}</td>
                 <td class="color-col fee-desc">${this.escapeHtml(description)}</td>
+                ${this.hideSizeColumns ? '' : `<td class="size-col"></td>
                 <td class="size-col"></td>
                 <td class="size-col"></td>
                 <td class="size-col"></td>
                 <td class="size-col"></td>
-                <td class="size-col"></td>
-                <td class="size-col"></td>
+                <td class="size-col"></td>`}
                 <td class="qty-col">${qty}</td>
                 <td class="price-col">${this.formatCurrency(unitPrice)}</td>
                 <td class="total-col">${this.formatCurrency(total)}</td>
@@ -1451,6 +1487,34 @@ class QuoteViewPage {
                 }
             });
         });
+
+        // SIZELESS PRODUCTS (2026-07-24). Every row below is derived from
+        // SizeBreakdown, so a product with no garment sizes — stickers, banners,
+        // emblem patches — produced ZERO rows and vanished from the quote
+        // entirely, while its money still counted toward the total. A customer
+        // saw a $346 total with only the $50 setup fee itemised.
+        //
+        // Keyed on "the breakdown yielded nothing", not on a prefix, so it also
+        // catches any future sizeless product. Apparel always has a breakdown,
+        // so this can never fire for a garment.
+        if (Object.keys(allSizes).length === 0) {
+            const totalQty = productGroup.items.reduce((s, i) => s + (Number(i.Quantity) || 0), 0);
+            const totalAmt = productGroup.items.reduce((s, i) => s + (Number(i.LineTotal) || 0), 0);
+            if (totalQty > 0 || totalAmt > 0) {
+                rows.push({
+                    style: productGroup.styleNumber,
+                    description: productGroup.productName,
+                    color: productGroup.color,
+                    sizes: {},
+                    qty: totalQty,
+                    unitPrice: totalQty > 0 ? totalAmt / totalQty : 0,
+                    lineTotal: totalAmt,
+                    isFirstRow: true,
+                    groupIndex: groupIndex
+                });
+            }
+            return rows;
+        }
 
         // Standard sizes (S, M, L, XL) - one row
         const standardSizes = ['S', 'M', 'L', 'XL'];
@@ -1567,12 +1631,12 @@ class QuoteViewPage {
             <tr class="${isFirstRow ? 'first-row' : 'extended-row'}">
                 ${styleCell}
                 <td class="color-col">${this.escapeHtml(row.color)}</td>
-                <td class="size-col">${sCol}</td>
+                ${this.hideSizeColumns ? '' : `<td class="size-col">${sCol}</td>
                 <td class="size-col">${mCol}</td>
                 <td class="size-col">${lgCol}</td>
                 <td class="size-col">${xlCol}</td>
                 <td class="size-col">${xxlCol}</td>
-                <td class="size-col">${xxxlCol}</td>
+                <td class="size-col">${xxxlCol}</td>`}
                 <td class="qty-col">${row.qty}</td>
                 <td class="price-col">${this.formatCurrency(row.unitPrice)}</td>
                 <td class="total-col">${this.formatCurrency(row.lineTotal)}</td>
@@ -1825,7 +1889,7 @@ class QuoteViewPage {
         // ShopWorks_Snapshot. Used for the sync pill + (Phase 4b+) all
         // the ShopWorks-mirrored sections.
         try {
-            const r = await fetch(`/api/quote-sessions/${this.quoteId}/full`);
+            const r = await fetch(`/api/quote-sessions/${this.quoteId}/full${this.shareTokenParam()}`);
             if (!r.ok) {
                 // 404 or 500 — the page already rendered from /api/public/quote
                 // so this is non-fatal. Hide the strip and move on.
@@ -2631,7 +2695,7 @@ class QuoteViewPage {
                 throw new Error(result.error || `HTTP ${resp.status}`);
             }
             // Refresh /full so the new ShipStation_Order_ID + status are reflected
-            const r = await fetch(`/api/quote-sessions/${encodeURIComponent(this.quoteId)}/full`);
+            const r = await fetch(`/api/quote-sessions/${encodeURIComponent(this.quoteId)}/full${this.shareTokenParam()}`);
             if (r.ok) this.fullData = await r.json();
             this._updateShipStationButton(
                 this.fullData?.shopWorks?.snapshot?.order,
