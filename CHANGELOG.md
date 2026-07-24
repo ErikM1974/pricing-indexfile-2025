@@ -1,3 +1,10 @@
+## v2026.07.24.2 (2026.07.24)
+
+- Sticker page: derived per-sticker price, backup-card warning, fee row fix
+- Security: staff-gate the sticker page + route its AI chat through the app
+- Phase 1: public /custom-stickers — zero clicks to a price
+- Deploy v2026.07.24.2: 3 files (index.html,sticker-manual-pricing.html,custom-stickers.html,...)
+
 ## v2026.07.24.1 (2026.07.24)
 
 - LESSONS: % max-height in auto grid tracks (PDP photo crop, 2026-07-23)
