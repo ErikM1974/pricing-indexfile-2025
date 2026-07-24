@@ -1,3 +1,7 @@
+## v2026.07.24.6 (2026.07.24)
+
+- Outdoor durability is 3 years, not 5 (Erik 2026-07-24)
+
 ## v2026.07.24.5 (2026.07.24)
 
 - Phase 3: public /custom-banners — a SIZE ladder, because there is no volume break
