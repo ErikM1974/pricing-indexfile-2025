@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Custom die-cut vinyl stickers printed in Milton, WA. See every price for every size and quantity — 50 to 10,000, 2x2 to 6x6. UL 969 listed ORAJET 3651 vinyl, proof before we print, free local pickup.">
+    <meta name="robots" content="index, follow">
+    <title>Custom Die-Cut Stickers — Every Price, No Login | Northwest Custom Apparel</title>
+
+    <link rel="canonical" href="https://www.teamnwca.com/custom-stickers">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Custom Die-Cut Stickers — every price, no login">
+    <meta property="og:description" content="Pick a size and a quantity and the price is already on screen. 2x2 to 6x6, 50 to 10,000 pieces. UL 969 listed vinyl, printed in Milton, WA since 1977.">
+    <meta property="og:image" content="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png">
+    <meta property="og:url" content="https://www.teamnwca.com/custom-stickers">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <link rel="preconnect" href="https://cdn.caspio.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="icon" href="/favicon.png" type="image/png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/shared_components/css/nwca-2026-core.css?v=2026.07.13.4">
+    <link rel="stylesheet" href="/pages/css/custom-stickers.css?v=2026.07.24.1">
+    <!-- 🔴 Do NOT add sticker-pricing-page.css or nwca-form-shared.css here.
+         Both declare :root tokens that collide with core and would repaint the
+         masthead and footer. See the header note in custom-stickers.css. -->
+</head>
+<body>
+    <a class="skip-link" href="#configurator">Skip to pricing</a>
+
+    <!-- Utility strip -->
+    <div class="util-strip">
+        <div class="util-inner">
+            <p class="util-fam"><strong>Northwest Custom Apparel</strong> — family-owned in Milton, WA since 1977</p>
+            <div class="util-contact">
+                <span class="util-hours">Mon–Fri 8:30–5:00 PT</span>
+                <a href="tel:253-922-5793">253-922-5793</a>
+                <a class="util-mail" href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a>
+                <a href="/staff-dashboard.html" title="Staff Portal">Staff</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Masthead -->
+    <header class="nav-bar">
+        <div class="nav-bar-inner">
+            <button class="mobile-menu-btn" id="mobileMenuBtn" type="button" aria-label="Open menu" aria-controls="sidebar">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+
+            <a href="/" class="brand" title="Northwest Custom Apparel — Home">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                     alt="Northwest Custom Apparel" class="brand-logo" width="160" height="46">
+            </a>
+
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/catalog" class="nav-link nav-products" aria-haspopup="true" aria-expanded="false">
+                        Products
+                        <svg class="nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </a>
+                    <div class="nav-dropdown mega-dropdown">
+                        <div class="dropdown-content">
+                            <div id="navDropdownSearch"></div>
+                            <div class="dropdown-categories" id="navCategories"></div>
+                        </div>
+                    </div>
+                </li>
+                <li class="nav-item brands-nav-item" data-dropdown="brands">
+                    <a href="/brands.html" class="nav-link nav-brands" aria-haspopup="true" aria-expanded="false">
+                        Brands
+                        <svg class="nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </a>
+                    <div class="nav-dropdown brands-dropdown mega-dropdown">
+                        <div class="dropdown-content">
+                            <div class="brands-grid" id="navBrandsGrid">
+                                <div class="brands-loading">Loading brands…</div>
+                            </div>
+                            <div class="brands-footer">
+                                <a href="/brands.html" class="view-all-brands-link">View all brands →</a>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <!-- Plain .nav-item, deliberately NOT --p1/--p2: core hides those
+                     at every viewport once the quote badge appears, which would
+                     make this link vanish for exactly the returning customers
+                     most likely to add stickers to an apparel order. -->
+                <li class="nav-item">
+                    <a href="/custom-stickers" class="nav-link" aria-current="page">Stickers <span class="flag-new">New</span></a>
+                </li>
+                <li class="nav-item">
+                    <a href="/catalog?topSellers=1" class="nav-link">Top Sellers</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/pages/request-a-quote.html" class="nav-link">Get a Quote</a>
+                </li>
+            </ul>
+
+            <div class="nav-search" role="search">
+                <input type="text" id="navSearchInput" class="nav-search-input"
+                       placeholder="Search styles — PC61, hoodies, caps…" autocomplete="off"
+                       role="combobox" aria-expanded="false" aria-autocomplete="list"
+                       aria-controls="navAutocompleteList" aria-label="Search products">
+                <div id="navAutocompleteList" class="nav-autocomplete-list" role="listbox" aria-label="Product suggestions"></div>
+                <button id="navSearchBtn" class="nav-search-btn" type="button" aria-label="Search">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <a class="quote-badge" href="/quote-cart" data-quote-badge hidden>
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"></path>
+                    <rect x="9" y="3" width="6" height="4" rx="1"></rect>
+                    <path d="M9 12h6"></path><path d="M9 16h6"></path>
+                </svg>
+                <span class="quote-badge-label">Quote</span>
+                <span class="quote-badge-count" data-quote-badge-count>0</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Drawer -->
+    <aside class="sidebar" id="sidebar" aria-label="Browse menu">
+        <div class="drawer-head">
+            <span class="drawer-head-title">Browse NWCA</span>
+            <button class="drawer-close" id="drawerClose" type="button" aria-label="Close menu">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <nav class="drawer-links" aria-label="Quick links">
+            <a href="/">Home</a>
+            <a href="/catalog">Catalog</a>
+            <a href="/custom-stickers">Custom Stickers <span class="flag-new">New</span></a>
+            <a href="/pages/fall-catalog-2026.html">Fall Catalog '26</a>
+            <a href="/catalog?topSellers=1">Top Sellers &amp; Free Samples</a>
+            <a href="/brands.html">Brands</a>
+            <a href="/pages/webstore-info.html">Custom Webstores</a>
+        </nav>
+        <h3 class="drawer-subhead">Shop by category</h3>
+        <ul class="category-list" id="categoryList"></ul>
+        <div class="drawer-contact">
+            Questions? A human answers.<br>
+            <a href="tel:253-922-5793">253-922-5793</a><br>
+            <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a><br>
+            2025 Freeman Rd E, Milton, WA 98354
+        </div>
+    </aside>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <main id="main">
+        <div class="wrap">
+
+            <!-- Hard failure: pricing unavailable. The card is hidden and NO
+                 price of any kind renders (Erik's #1 rule). -->
+            <div class="stk-alert stk-alert-error" id="stkAlert" role="alert" hidden>
+                <strong>We can't load live pricing right now.</strong>
+                We'd rather show you nothing than a price we're not sure about.
+                Refresh, or call <a href="tel:253-922-5793">(253) 922-5793</a> — we'll price it on the phone in about a minute.
+            </div>
+
+            <!-- Soft failure: the API answered, but from its backup rate card. -->
+            <div class="stk-alert stk-alert-warn" id="stkWarn" role="alert" hidden>
+                <strong>These are our last published prices.</strong>
+                Live pricing didn't load just now, so please confirm your total with us before you order — <a href="tel:253-922-5793">(253) 922-5793</a>.
+            </div>
+
+            <section class="stk-hero">
+                <div class="stk-hero-copy">
+                    <h1>Custom die-cut stickers</h1>
+                    <p class="stk-deck">Printed in Milton, Washington since 1977. Pick a size and a quantity — the price is already on the screen.</p>
+                    <ul class="stk-trust-line">
+                        <li>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>
+                            You approve a proof before we print or charge
+                        </li>
+                        <li>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                            UL 969 listed vinyl, up to 5 years outdoors
+                        </li>
+                        <li>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            Free pickup in Milton, or we ship
+                        </li>
+                    </ul>
+
+                </div>
+
+                <!-- Size diagram: true relative scale beside a credit card. More
+                     use to a sticker buyer than a lifestyle photo, and inline
+                     SVG is not an inline <script>/<style>.
+                     A SIBLING of the copy, not a child: on mobile it has to drop
+                     BELOW the configurator, and it can only be reordered
+                     independently if it is its own grid item. -->
+                <figure class="stk-figure">
+                    <svg id="stkFigure" viewBox="0 0 420 200" role="img" aria-labelledby="stkFigureTitle">
+                        <title id="stkFigureTitle">Sticker sizes shown at true relative scale next to a credit card</title>
+                    </svg>
+                    <figcaption class="stk-figure-note" id="stkFigureNote">Sizes shown at true relative scale.</figcaption>
+                </figure>
+
+                <!-- ── The configurator ──────────────────────────────── -->
+                <div class="stk-card" id="configurator">
+                    <fieldset>
+                        <div class="stk-legend-row">
+                            <legend>Choose a size</legend>
+                            <button type="button" class="stk-textbtn" id="stkSizeHelp">Size help</button>
+                        </div>
+                        <ul class="stk-sizes" id="stkSizes"></ul>
+                        <div class="stk-custom-dims" id="stkCustomDims">
+                            <input type="number" id="stkW" inputmode="decimal" step="0.25" min="0.75" placeholder="Width" aria-label="Width in inches">
+                            <span aria-hidden="true">×</span>
+                            <input type="number" id="stkH" inputmode="decimal" step="0.25" min="0.75" placeholder="Height" aria-label="Height in inches">
+                            <span>in</span>
+                        </div>
+                        <p class="stk-inline-note" id="stkSizeNote" hidden></p>
+                    </fieldset>
+
+                    <!-- Swapped in when either dimension exceeds 6in. The sticker
+                         ladder and the square-foot ladder are NEVER on screen at
+                         the same time — they invert across the 6in boundary. -->
+                    <div class="stk-oversize" id="stkOversize" hidden>
+                        <h3>Larger than 6 inches — that's a large-format decal</h3>
+                        <p>Priced by the square foot, any size up to 52 inches wide, with volume breaks. Same ORAJET vinyl, same printer.</p>
+                        <button type="button" class="stk-cta" id="stkOversizeCta">Get a large-format quote →</button>
+                    </div>
+
+                    <div id="stkQtyBlock">
+                        <fieldset>
+                            <div class="stk-legend-row">
+                                <legend>Choose a quantity</legend>
+                                <button type="button" class="stk-textbtn" id="stkCopyList" aria-label="Copy this price list">Copy price list</button>
+                            </div>
+
+                            <div class="stk-ladder-wrap">
+                                <table class="stk-ladder" id="stkLadder">
+                                    <caption>Price by quantity for the selected size</caption>
+                                    <tbody></tbody>
+                                </table>
+                                <div class="stk-custom-qty" id="stkCustomQtyWrap">
+                                    <input type="number" id="stkCustomQty" inputmode="numeric" min="1" placeholder="Quantity" aria-label="A different quantity">
+                                </div>
+                            </div>
+
+                            <!-- Mobile: the 11-row table won't fit, so price and
+                                 savings ride in the option labels instead. -->
+                            <div class="stk-qty-select">
+                                <select id="stkQtySelect" aria-label="Quantity"></select>
+                            </div>
+                        </fieldset>
+                        <p class="stk-inline-note" id="stkQtyNote" hidden></p>
+
+                        <div class="stk-price">
+                            <output class="stk-price-total" id="stkTotal" aria-live="polite" aria-atomic="true">—</output>
+                            <span class="stk-price-unit" id="stkUnit"></span>
+                        </div>
+                        <!-- Nothing sits between the price and the button. The
+                             rounding caveat and the >6in escape hatch both moved
+                             below it: each was ~20px of distance between the
+                             number and the thing you click, and that distance is
+                             what decides whether the CTA clears the fold. -->
+                        <button type="button" class="stk-cta" id="stkCta">Get this in writing →</button>
+                        <p class="stk-cta-sub">Next: send your artwork. You approve a proof before we print or charge anything.</p>
+
+                        <div class="stk-below">
+                            <p class="stk-price-rounding">Totals are exact. Per-sticker figures are rounded.</p>
+                            <p class="stk-overflow-link">Bigger than 6 inches? <a href="#stk-oversize-info" id="stkBigLink">Large-format decals →</a></p>
+                            <p class="stk-setup-q">Art setup — have we printed this design for you before?</p>
+                            <div class="stk-setup-opts">
+                                <label><input type="radio" name="stkSetup" value="reorder"> Yes — no setup fee</label>
+                                <label><input type="radio" name="stkSetup" value="new"> No, it's new</label>
+                            </div>
+                            <p id="stkSetupLine">A one-time art setup fee applies to new designs. Pay it once — every reorder of that design is $0 setup, forever.</p>
+                            <p id="stkDelivery">Ready 10–12 business days from artwork approval. Free pickup in Milton, WA.</p>
+                            <p class="stk-nudge" id="stkNudge" hidden></p>
+
+                            <div class="stk-keep">
+                                <span class="stk-keep-label">Keep this price:</span>
+                                <button type="button" id="stkCopyLink">Copy link</button>
+                                <button type="button" id="stkEmailMe">Email it to me</button>
+                                <button type="button" id="stkPrint">Print</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lead panel. Uses core .field primitives — NOT
+                         nwca-form-shared.css, which would repaint the page. -->
+                    <div class="stk-lead" id="stkLead">
+                        <h3 id="stkLeadTitle">Where should we send it?</h3>
+                        <p class="stk-lead-sub" id="stkLeadSub">We'll email you this exact quote — usually within the hour.</p>
+                        <div class="stk-lead-grid">
+                            <div><label for="stkName">Your name</label><input type="text" id="stkName" autocomplete="name"></div>
+                            <div><label for="stkEmail">Email</label><input type="email" id="stkEmail" autocomplete="email"></div>
+                            <div><label for="stkPhone">Phone</label><input type="tel" id="stkPhone" autocomplete="tel"></div>
+                            <div><label for="stkCompany">Company <span style="font-weight:400">(optional)</span></label><input type="text" id="stkCompany" autocomplete="organization"></div>
+                            <div><label for="stkMessage">Anything else? <span style="font-weight:400">(optional)</span></label><textarea id="stkMessage" rows="2"></textarea></div>
+                            <div class="stk-hp"><label for="hpWebsite">Website</label><input type="text" id="hpWebsite" tabindex="-1" autocomplete="off"></div>
+                        </div>
+                        <p class="stk-inline-note is-error" id="stkLeadError" hidden></p>
+                        <button type="button" class="stk-cta" id="stkLeadSubmit">Send my quote request</button>
+                        <p class="stk-cta-sub">Artwork comes next — you can email it later if it's not handy.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ── Trust band ────────────────────────────────────────── -->
+            <section class="stk-band">
+                <div class="stk-trust-grid">
+                    <div>
+                        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="m9 15 2 2 4-4"></path></svg>
+                        <h3>Approve a proof first</h3>
+                        <p>Nothing prints and nothing bills until you sign off on a digital proof. A real person sends it.</p>
+                    </div>
+                    <div>
+                        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        <h3>UL 969 listed vinyl</h3>
+                        <p>ORAJET 3651 by ORAFOL — 2.75 mil calendered PVC, permanent solvent adhesive, rated up to 5 years outdoors.</p>
+                    </div>
+                    <div>
+                        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 21h18"></path><path d="M5 21V7l7-4 7 4v14"></path><path d="M9 21v-6h6v6"></path></svg>
+                        <h3>Printed here, not brokered</h3>
+                        <p>Milton, Washington since 1977. Family-owned, one building. You can pick your order up.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ── How it works ──────────────────────────────────────── -->
+            <section class="stk-band">
+                <h2>How it works</h2>
+                <ol class="stk-steps">
+                    <li><strong>Pick size and quantity</strong>The price is on screen. No form, no account.</li>
+                    <li><strong>Send your artwork</strong>Vector is ideal (AI, EPS, PDF with bleed). A JPG or PNG works too — we'll tell you if it needs work.</li>
+                    <li><strong>Approve your proof</strong>A digital proof with the exact die line. Nothing prints or bills until you say go.</li>
+                    <li><strong>Pick up or we ship</strong>10–12 business days from approval. Pickup in Milton is free.</li>
+                </ol>
+            </section>
+
+            <!-- ── The whole sheet ───────────────────────────────────── -->
+            <section class="stk-band" id="stk-rate-card">
+                <h2>Every price, all 50 combinations</h2>
+                <p class="stk-band-sub">No login, no "request a quote", no games. This is the whole sheet.</p>
+                <div class="stk-rates" id="stkRates"></div>
+                <p class="stk-rate-foot">
+                    Prices exclude Washington sales tax and shipping. Pickup in Milton is free. Minimum order 50.
+                    Over 10,000 pieces or over 6 inches, we quote individually.
+                </p>
+            </section>
+
+            <!-- ── Cross-sell ────────────────────────────────────────── -->
+            <section class="stk-band">
+                <div class="stk-cross" id="stk-oversize-info">
+                    <h2>Bigger than a sticker?</h2>
+                    <p class="stk-band-sub">
+                        We also print <strong>vinyl banners</strong> — 13 oz Ultraflex Ultima Pro, sewn hems and #2 brass
+                        grommets included, no size limit — and <strong>large-format decals</strong> priced by the square foot,
+                        up to 52 inches wide. And we decorate apparel, so it can all be one order and one invoice.
+                    </p>
+                    <a class="btn btn-primary" href="/pages/request-a-quote.html?source=custom-stickers&amp;product=Banners%20%26%20large-format%20decals">Ask about banners &amp; decals →</a>
+                </div>
+            </section>
+
+            <!-- ── Specs + FAQ ───────────────────────────────────────── -->
+            <section class="stk-band stk-faq">
+                <h2>Questions</h2>
+                <details>
+                    <summary>What's the minimum order?</summary>
+                    <p>50 stickers — $87 for a 2 × 2 or $98 for a 3 × 3. Need fewer? Call (253) 922-5793 and we'll tell you straight away whether we can do it.</p>
+                </details>
+                <details>
+                    <summary>Why do you price by square sizes?</summary>
+                    <p>We price to the next standard square. A 2 × 3 design prices at our 3 × 3 tier — and we still cut it at your exact 2 × 3 shape. Since you're already on that tier, you can go up to a full 3 × 3 at no extra cost.</p>
+                </details>
+                <details>
+                    <summary>What's the art setup fee?</summary>
+                    <p>It covers your mockup, a print-readiness check on the die line, and up to 2 rounds of revisions. It applies once per new design — including when you send print-ready vector art. Every reorder of that same design is $0 setup, forever.</p>
+                </details>
+                <details>
+                    <summary>How long does it take?</summary>
+                    <p>10–12 business days from artwork approval. The clock starts when you approve your proof, not when you order — and your rep usually turns a proof around the same day. Need it faster? Rush production is available — ask your rep.</p>
+                </details>
+                <details>
+                    <summary>What are they made of?</summary>
+                    <p>ORAJET 3651 by ORAFOL — 2.75 mil calendered PVC, white film, permanent solvent adhesive, rated up to 5 years outdoors, UL 969 / CSA C22.2 No. 015 listed. Printed on a Roland TrueVIS LG-540 with 7-colour ECO-UV ink at 1440 dpi and machine contour cut.</p>
+                </details>
+                <details>
+                    <summary>What about stickers bigger than 6 inches?</summary>
+                    <p>Over 6 inches we print large-format decals, priced by the square foot, up to 52 inches wide. Same vinyl, same printer.</p>
+                </details>
+                <details>
+                    <summary>Do you print banners?</summary>
+                    <p>Yes — 13 oz Ultraflex Ultima Pro FL front-lit matte, sewn hems and #2 brass grommets every 24 inches included, $10 per square foot, $40 minimum. Any size.</p>
+                </details>
+                <details>
+                    <summary>Is sales tax included?</summary>
+                    <p>No. Washington sales tax is added on your invoice.</p>
+                </details>
+            </section>
+        </div>
+    </main>
+
+    <!-- Size-help dialog — the device that makes the quote explicitly
+         provisional, which is what licenses a two-input configurator on a
+         product whose final size depends on the artwork. -->
+    <dialog class="stk-dialog" id="stkSizeDialog">
+        <div class="stk-dialog-body">
+            <h2>How we size stickers</h2>
+            <p><strong>You don't have to be exact.</strong> We print five standard squares — 2 × 2, 3 × 3, 4 × 4, 5 × 5 and 6 × 6 inches — and we price to the next square your design fits inside.</p>
+            <p>So a <strong>2 × 3 inch</strong> design prices at our <strong>3 × 3</strong> tier. We still cut it at your exact 2 × 3 shape. You're not paying for a bigger sticker — you're paying our 3 × 3 rate, because that's the tier your artwork falls into.</p>
+            <p><strong>And since you're already on that tier</strong>, you can go up to a full 3 × 3 at no extra cost. Plenty of people do.</p>
+            <p><strong>Odd shapes price by the bounding box</strong> — the smallest rectangle the art fits inside. A 10″ circle is a 10 × 10.</p>
+            <p><strong>Your rep confirms the exact size and the final price on your proof — before anything is printed or charged.</strong> If the artwork you send changes which tier you're on, you'll see it on the proof and you can say no.</p>
+            <p><strong>Quantities work the same way.</strong> We price at the next break — enter 250 and you'll be quoted our 300 tier.</p>
+            <button type="button" class="btn btn-primary stk-dialog-close" id="stkSizeDialogClose">Got it</button>
+        </div>
+    </dialog>
+
+    <!-- Always-on action bar. Not media-gated: a card taller than the viewport
+         cannot rely on position:sticky to keep its CTA reachable. -->
+    <div class="stk-bar" id="stkBar" hidden>
+        <div class="stk-bar-summary">
+            <strong id="stkBarTotal">—</strong>
+            <span id="stkBarDetail"></span>
+        </div>
+        <button type="button" class="stk-bar-cta" id="stkBarCta">Get this in writing →</button>
+    </div>
+
+    <div class="stk-toast" id="stkToast" role="status" aria-live="polite"></div>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20White%20Text.png?ver=1" alt="Northwest Custom Apparel" width="180" height="52" loading="lazy">
+                <p>Family-owned custom apparel decorator in Milton, Washington. Embroidery, screen printing, DTG, and DTF — done in-house since 1977.</p>
+                <span class="footer-est">Est. 1977 · Milton, WA</span>
+            </div>
+            <div class="footer-col">
+                <h3>Shop</h3>
+                <ul>
+                    <li><a href="/catalog">Product Catalog</a></li>
+                    <li><a href="/custom-stickers">Custom Stickers</a></li>
+                    <li><a href="/pages/fall-catalog-2026.html">Fall Catalog '26</a></li>
+                    <li><a href="/catalog?topSellers=1">Top Sellers</a></li>
+                    <li><a href="/brands.html">Brands</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Services</h3>
+                <ul>
+                    <li><a href="/custom-stickers">Die-Cut Stickers</a></li>
+                    <li><a href="/golf-tournament-apparel?utm_source=catalog&amp;utm_campaign=golf-2026-q2&amp;utm_medium=footer">Tournament Packages</a></li>
+                    <li><a href="/pages/webstore-info.html">Custom Webstores</a></li>
+                    <li><a href="/calculators/laser-tumbler-polarcamel.html">Laser-Engraved Tumblers</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Contact</h3>
+                <address>
+                    2025 Freeman Rd E<br>
+                    Milton, WA 98354<br>
+                    <a href="tel:253-922-5793">253-922-5793</a><br>
+                    <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a><br>
+                    Mon–Fri 8:30–5:00 PT
+                </address>
+                <ul><li><a href="/staff-dashboard.html">Staff Portal</a></li></ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="footer-bottom-inner">
+                <span>© 2026 Northwest Custom Apparel</span>
+                <span>Family-owned &amp; operated since 1977</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JSON-LD. Product WITHOUT offers, and no AggregateOffer: lib/product-seo.js
+         states the no-price-outside-the-engine rule and this would be the first
+         priced schema on the domain. Erik's call, currently no. -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.teamnwca.com/" },
+            { "@type": "ListItem", "position": 2, "name": "Custom Die-Cut Stickers", "item": "https://www.teamnwca.com/custom-stickers" }
+          ]
+        },
+        {
+          "@type": "Product",
+          "name": "Custom Die-Cut Vinyl Stickers",
+          "description": "Custom die-cut vinyl stickers on ORAJET 3651, UL 969 listed, rated up to 5 years outdoors. Sizes 2x2 to 6x6 inches, 50 to 10,000 pieces. Printed in Milton, Washington.",
+          "brand": { "@type": "Brand", "name": "Northwest Custom Apparel" },
+          "material": "ORAJET 3651 calendered PVC vinyl",
+          "manufacturer": {
+            "@type": "Organization",
+            "name": "Northwest Custom Apparel",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "2025 Freeman Rd E",
+              "addressLocality": "Milton",
+              "addressRegion": "WA",
+              "postalCode": "98354",
+              "addressCountry": "US"
+            },
+            "telephone": "+1-253-922-5793"
+          }
+        }
+      ]
+    }
+    </script>
+
+    <script src="/config/app.config.js"></script>
+    <script src="/product-search-service.js?v=2026.06.11.11"></script>
+    <script src="/shared_components/js/decoration-methods.js?v=2026.06.11.5"></script>
+    <script src="/brands-flyout.js?v=2026.07.13.13"></script>
+    <script src="/shared_components/js/nav-dropdown.js?v=2026.07.13.4" defer></script>
+    <script src="/app-modern.js?v=4" defer></script>
+    <script src="/shared_components/js/quote-cart-store.js?v=2026.07.04.2" defer></script>
+    <script src="/pages/js/custom-stickers-ladder.js?v=2026.07.24.1" defer></script>
+    <script src="/pages/js/custom-stickers.js?v=2026.07.24.1" defer></script>
+</body>
+</html>

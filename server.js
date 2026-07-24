@@ -128,6 +128,14 @@ dotenv.config();
 // QUOTE CART (customer quote-cart Phase 2, 2026-06-11)
 //   GET /quote-cart[.html]                  — Add-to-Quote cart page (pages/quote-cart.html; sessionStorage store, engine-priced)
 //
+// CUSTOM STICKERS (public storefront, 2026-07-24)
+//   GET /custom-stickers[.html] · /stickers  — zero-click sticker configurator (pages/custom-stickers.html)
+//                                              One GET /api/sticker-pricing on boot; the ladder re-prices from
+//                                              memory, so a size change costs ZERO further calls. Ends in a
+//                                              quote-request lead (POST /api/form-submissions, formId
+//                                              'quote-request'). Calls NO AI endpoint.
+//   (the STAFF sticker tool with the AI drawer is /pricing/stickers — requireStaff, see "STAFF-GATED CALCULATOR PAGES")
+//
 // CUSTOM T-SHIRTS (multi-style DTG storefront, 2026-06-10 — helpers ~L900: getCtsPricingConfig/getCtsCatalog/resolveCtsShipping/rebuildCtsQuote + stock gate getCtsStock/ctsStockConflicts ~L1135)
 //   GET  /custom-tees[.html]                — storefront page (gallery of 20 DTG top sellers + designer + Stripe)
 //   POST /api/create-checkout-session       — SHARED with 3DT; orderSettings.channel='custom-tees' selects per-style reprice + DTG-prefix QuoteIDs
@@ -4172,6 +4180,17 @@ app.get(['/custom-caps', '/custom-caps.html'], (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'custom-caps.html'));
 });
 
+// Custom die-cut stickers — public, indexed storefront page (2026-07-24).
+// Zero clicks to a price: the whole 50-SKU grid arrives in one boot call and the
+// ladder re-prices from memory. Registered in the SAME commit as the page and
+// the sitemap entry (see the zombie-route note at the top of this file).
+//
+// Distinct from /pricing/stickers, which is the STAFF tool (AI quote drawer,
+// requireStaff-gated). This page calls no AI endpoint at all.
+app.get(['/custom-stickers', '/custom-stickers.html', '/stickers'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'custom-stickers.html'));
+});
+
 // Custom Carhartt — static SEO brand landing page (2026-07-12): curated
 // top-sellers grid + FAQ + ItemList/FAQPage schema. Targets "custom carhartt
 // embroidered" buying-intent queries; content is fully static on purpose.
@@ -4329,7 +4348,7 @@ app.get(['/event-webstores', '/event-webstores.html'], (req, res) => {
 // pages that aren't in the blog or product sitemaps. Listed in robots.txt.
 app.get('/sitemap-pages.xml', (req, res) => {
   const pages = [
-    '/', '/custom-carhartt', '/custom-richardson', '/custom-nike', '/custom-new-era', '/custom-sport-tek', '/custom-ogio', '/custom-district', '/custom-port-authority', '/custom-port-and-company', '/custom-cornerstone', '/custom-north-face', '/custom-gildan', '/custom-eddie-bauer', '/custom-travismathew', '/custom-bella-canvas', '/golf-tournament-apparel', '/custom-safety-apparel', '/company-webstores', '/construction-webstores', '/restaurant-webstores', '/property-management-webstores', '/industrial-webstores', '/retail-webstores', '/government-webstores', '/team-webstores', '/school-spirit-webstores', '/fundraising-webstores', '/college-webstores', '/event-webstores', '/custom-tees', '/custom-caps', '/blog',
+    '/', '/custom-carhartt', '/custom-richardson', '/custom-nike', '/custom-new-era', '/custom-sport-tek', '/custom-ogio', '/custom-district', '/custom-port-authority', '/custom-port-and-company', '/custom-cornerstone', '/custom-north-face', '/custom-gildan', '/custom-eddie-bauer', '/custom-travismathew', '/custom-bella-canvas', '/golf-tournament-apparel', '/custom-safety-apparel', '/company-webstores', '/construction-webstores', '/restaurant-webstores', '/property-management-webstores', '/industrial-webstores', '/retail-webstores', '/government-webstores', '/team-webstores', '/school-spirit-webstores', '/fundraising-webstores', '/college-webstores', '/event-webstores', '/custom-tees', '/custom-caps', '/custom-stickers', '/blog',
     '/brands.html', '/catalog?topSellers=1',
     '/pages/request-a-quote.html', '/pages/webstore-inquiry.html',
   ];
