@@ -23,10 +23,10 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/shared_components/css/nwca-2026-core.css?v=2026.07.13.4">
-    <link rel="stylesheet" href="/pages/css/custom-stickers.css?v=2026.07.24.2">
+    <link rel="stylesheet" href="/pages/css/instant-quote.css?v=2026.07.24.5">
     <!-- 🔴 Do NOT add sticker-pricing-page.css or nwca-form-shared.css here.
          Both declare :root tokens that collide with core and would repaint the
-         masthead and footer. See the header note in custom-stickers.css. -->
+         masthead and footer. See the header note in instant-quote.css. -->
 </head>
 <body>
     <a class="skip-link" href="#configurator">Skip to pricing</a>
@@ -97,6 +97,9 @@
                     <a href="/custom-stickers" class="nav-link" aria-current="page">Stickers <span class="flag-new">New</span></a>
                 </li>
                 <li class="nav-item">
+                    <a href="/custom-banners" class="nav-link">Banners <span class="flag-new">New</span></a>
+                </li>
+                <li class="nav-item">
                     <a href="/catalog?topSellers=1" class="nav-link">Top Sellers</a>
                 </li>
                 <li class="nav-item">
@@ -143,6 +146,7 @@
             <a href="/">Home</a>
             <a href="/catalog">Catalog</a>
             <a href="/custom-stickers">Custom Stickers <span class="flag-new">New</span></a>
+            <a href="/custom-banners">Vinyl Banners <span class="flag-new">New</span></a>
             <a href="/pages/fall-catalog-2026.html">Fall Catalog '26</a>
             <a href="/catalog?topSellers=1">Top Sellers &amp; Free Samples</a>
             <a href="/brands.html">Brands</a>
@@ -204,10 +208,19 @@
                      BELOW the configurator, and it can only be reordered
                      independently if it is its own grid item. -->
                 <figure class="stk-figure">
+                    <!-- Real work, not stock. Every sticker shown is one we printed.
+                         NOT lazy: this sits in the initial viewport on desktop, and
+                         lazy-loading an above-the-fold image just delays it. fetchpriority="low"
+                         keeps it behind the CSS/JS that render the price instead.
+                         width/height reserve the box so nothing shifts as it lands. -->
+                    <img class="stk-figure-photo"
+                         src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/sticker%20hero%20image_1.jpg?ver=1"
+                         alt="Die-cut stickers printed by Northwest Custom Apparel — stacks of finished customer stickers on the left, and a laptop lid covered in applied stickers on the right showing real-world size"
+                         width="1600" height="1067" fetchpriority="low" decoding="async">
                     <svg id="stkFigure" viewBox="0 0 420 200" role="img" aria-labelledby="stkFigureTitle">
                         <title id="stkFigureTitle">Sticker sizes shown at true relative scale next to a credit card</title>
                     </svg>
-                    <figcaption class="stk-figure-note" id="stkFigureNote">Sizes shown at true relative scale.</figcaption>
+                    <figcaption class="stk-figure-note" id="stkFigureNote">Our own work. Sizes below shown at true relative scale.</figcaption>
                 </figure>
 
                 <!-- ── The configurator ──────────────────────────────── -->
@@ -449,6 +462,7 @@
                 <ul>
                     <li><a href="/catalog">Product Catalog</a></li>
                     <li><a href="/custom-stickers">Custom Stickers</a></li>
+                    <li><a href="/custom-banners">Vinyl Banners</a></li>
                     <li><a href="/pages/fall-catalog-2026.html">Fall Catalog '26</a></li>
                     <li><a href="/catalog?topSellers=1">Top Sellers</a></li>
                     <li><a href="/brands.html">Brands</a></li>
@@ -458,6 +472,7 @@
                 <h3>Services</h3>
                 <ul>
                     <li><a href="/custom-stickers">Die-Cut Stickers</a></li>
+                    <li><a href="/custom-banners">Vinyl Banners</a></li>
                     <li><a href="/golf-tournament-apparel?utm_source=catalog&amp;utm_campaign=golf-2026-q2&amp;utm_medium=footer">Tournament Packages</a></li>
                     <li><a href="/pages/webstore-info.html">Custom Webstores</a></li>
                     <li><a href="/calculators/laser-tumbler-polarcamel.html">Laser-Engraved Tumblers</a></li>

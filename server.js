@@ -4309,6 +4309,15 @@ app.get(['/custom-stickers', '/custom-stickers.html', '/stickers'], (req, res) =
   res.sendFile(path.join(__dirname, 'pages', 'custom-stickers.html'));
 });
 
+// Custom vinyl banners — public, indexed storefront page (Phase 3, 2026-07-24).
+// Sibling of /custom-stickers and the lane Sticker Mule does not compete in at
+// all. The ladder here is SIZES, not quantities: BAN-SQFT is a flat $10/sqft
+// with no volume break, so a quantity ladder would imply a discount that does
+// not exist. Boot payload: GET /api/public/banner-presets.
+app.get(['/custom-banners', '/custom-banners.html', '/banners'], (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'custom-banners.html'));
+});
+
 // Custom Carhartt — static SEO brand landing page (2026-07-12): curated
 // top-sellers grid + FAQ + ItemList/FAQPage schema. Targets "custom carhartt
 // embroidered" buying-intent queries; content is fully static on purpose.
@@ -4466,7 +4475,7 @@ app.get(['/event-webstores', '/event-webstores.html'], (req, res) => {
 // pages that aren't in the blog or product sitemaps. Listed in robots.txt.
 app.get('/sitemap-pages.xml', (req, res) => {
   const pages = [
-    '/', '/custom-carhartt', '/custom-richardson', '/custom-nike', '/custom-new-era', '/custom-sport-tek', '/custom-ogio', '/custom-district', '/custom-port-authority', '/custom-port-and-company', '/custom-cornerstone', '/custom-north-face', '/custom-gildan', '/custom-eddie-bauer', '/custom-travismathew', '/custom-bella-canvas', '/golf-tournament-apparel', '/custom-safety-apparel', '/company-webstores', '/construction-webstores', '/restaurant-webstores', '/property-management-webstores', '/industrial-webstores', '/retail-webstores', '/government-webstores', '/team-webstores', '/school-spirit-webstores', '/fundraising-webstores', '/college-webstores', '/event-webstores', '/custom-tees', '/custom-caps', '/custom-stickers', '/blog',
+    '/', '/custom-carhartt', '/custom-richardson', '/custom-nike', '/custom-new-era', '/custom-sport-tek', '/custom-ogio', '/custom-district', '/custom-port-authority', '/custom-port-and-company', '/custom-cornerstone', '/custom-north-face', '/custom-gildan', '/custom-eddie-bauer', '/custom-travismathew', '/custom-bella-canvas', '/golf-tournament-apparel', '/custom-safety-apparel', '/company-webstores', '/construction-webstores', '/restaurant-webstores', '/property-management-webstores', '/industrial-webstores', '/retail-webstores', '/government-webstores', '/team-webstores', '/school-spirit-webstores', '/fundraising-webstores', '/college-webstores', '/event-webstores', '/custom-tees', '/custom-caps', '/custom-stickers', '/custom-banners', '/blog',
     '/brands.html', '/catalog?topSellers=1',
     '/pages/request-a-quote.html', '/pages/webstore-inquiry.html',
   ];
@@ -10820,6 +10829,78 @@ app.get('/invoice/:quoteId', (req, res) => {
     return res.status(400).send('Invalid quote ID format');
   }
   res.sendFile(path.join(__dirname, 'pages', 'invoice.html'));
+});
+
+// =============================================================================
+// PUBLIC BANNER PRESETS — /custom-banners boot payload (Phase 3, 2026-07-24)
+//
+// The banner rate card has NO volume break ($10/sqft flat), so the sticker
+// page's quantity ladder has nothing to attach to. What varies on a banner is
+// SIZE — so the ladder is a size ladder, and this prices every preset in ONE
+// round trip instead of the browser firing seven /quote calls on load.
+//
+// Every price still comes from computeBannerQuote via the proxy; this only
+// fans out and collects, so there is no second banner pricing implementation.
+// The proxy's 15-min TTL cache means the fan-out is one Caspio read, not seven.
+// =============================================================================
+const BANNER_PRESET_SIZES = [
+  { w: 2, h: 4,  label: '2 × 4 ft',  note: 'Table banner' },
+  { w: 2, h: 6,  label: '2 × 6 ft',  note: 'Table / rail' },
+  { w: 3, h: 5,  label: '3 × 5 ft',  note: 'Fence banner' },
+  { w: 3, h: 6,  label: '3 × 6 ft',  note: 'Most popular' },
+  { w: 3, h: 8,  label: '3 × 8 ft',  note: 'Wide fence' },
+  { w: 4, h: 8,  label: '4 × 8 ft',  note: 'Field / building' },
+  { w: 4, h: 10, label: '4 × 10 ft', note: 'Large format' },
+];
+
+app.get('/api/public/banner-presets', async (req, res) => {
+  res.set('Cache-Control', 'no-cache');
+  try {
+    const cardRes = await fetch(`${CASPIO_PROXY_BASE}/api/banner-pricing`);
+    if (!cardRes.ok) throw new Error('rate card HTTP ' + cardRes.status);
+    const card = await cardRes.json();
+
+    const priced = await Promise.all(BANNER_PRESET_SIZES.map(async (p) => {
+      const w = Math.round(p.w * 12), h = Math.round(p.h * 12);
+      const r = await fetch(`${CASPIO_PROXY_BASE}/api/banner-pricing/quote?width=${w}&height=${h}&qty=1`);
+      if (!r.ok) throw new Error(`preset ${p.label} HTTP ${r.status}`);
+      const q = await r.json();
+      return {
+        key: `${p.w}x${p.h}`,
+        label: p.label,
+        note: p.note,
+        widthFt: p.w, heightFt: p.h, widthIn: w, heightIn: h,
+        sqft: q.dimensions ? q.dimensions.sqft : null,
+        price: q.orderTotal,
+        atMinimum: !!(q.appliedRules && q.appliedRules.minimum),
+      };
+    }));
+
+    const rate = (pn) => {
+      const row = (card.rates || []).find(x => x.PartNumber === pn);
+      return row ? Number(row.Rate) : null;
+    };
+
+    res.json({
+      presets: priced,
+      rateCard: {
+        perSqft: rate('BAN-SQFT'),
+        minimum: rate('BAN-MIN'),
+        grommet: rate('BAN-GROMMET'),
+        polePocketPerFt: rate('BAN-POLE-POCKET'),
+        doubleSidedMultiplier: rate('BAN-DOUBLE-SIDE'),
+      },
+      setupFee: card.setupFee || null,
+      source: card.source,
+      // 52in is the printable roll width; anything whose SHORT side exceeds it
+      // has to be panelled and seamed.
+      safeRollWidthIn: 52,
+    });
+  } catch (err) {
+    console.error('[banner-presets] failed:', err.message);
+    // Rule 4: no price rather than a guessed one.
+    res.status(502).json({ error: 'Banner pricing unavailable' });
+  }
 });
 
 // =============================================================================
