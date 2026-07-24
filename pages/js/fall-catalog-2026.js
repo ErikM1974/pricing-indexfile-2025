@@ -1,20 +1,25 @@
 /**
  * fall-catalog-2026.js — "Fall Catalog '26" new-arrivals landing page.
  *
- * A CURATED lookbook of the 170+ new SanMar Fall 2026 styles. These styles are
- * brand-new and are NOT yet in the product-search database (Sanmar_Bulk, Feb
- * 2024), so this page can't be a filtered /catalog view — the dataset below is
- * sourced directly from SanMar's Fall 2026 catalog PDF (style index, pp.117-118)
- * grouped by the catalog's own brand/page order.
+ * API-DRIVEN (2026-07-23 rebuild): the 179 Fall-2026 styles ARE in the product
+ * DB (Sanmar_Bulk) with PRODUCT_STATUS='New' — the earlier "not in the DB"
+ * conclusion came from /api/products/search's old PRODUCT_STATUS='Active'
+ * filter (fixed proxy-side the same day). Cards hydrate from
+ * /api/products/search?styleNumbers=<CSV> in batches of 50 (proxy-cached):
+ * model-shot images (images.display) + server-computed displayPriceLabel.
  *
- * IMAGES are the deterministic SanMar CDN main image
- * (https://cdnm.sanmar.com/catalog/images/{STYLE}.jpg) — verified live for these
- * new styles; a broken image degrades to a labeled placeholder.
+ * The embedded ITEMS/BRANDS/CATS taxonomy below stays authoritative for
+ * GROUPING because Caspio's CATEGORY_NAME is empty on PRODUCT_STATUS='New'
+ * rows — the PDF-derived brand/category curation is richer than the API's.
  *
- * PRICE RULE (Erik's iron rule — never show a wrong price): the PDF lists SanMar
- * blank-garment list prices, NOT NWCA decorated pricing, so NO price is rendered
- * here. Every card routes to Request-a-Quote with the style pre-filled, which is
- * the correct, pricing-safe call to action for not-yet-in-catalog styles.
+ * PRICE RULE (Erik's iron rule — same as catalog-2026.js): render the
+ * server-computed displayPriceLabel verbatim when present, else a neutral
+ * "See pricing →" link to the PDP. NEVER compute a price client-side.
+ * Hydration failure = VISIBLE notice (#fcAlert); cards keep working (SanMar
+ * CDN flat image + PDP link) — never a silent wrong price.
+ *
+ * Cards click through to /product.html?style=<STYLE> (same contract as
+ * catalog-2026.js buildCard) — the PDP with live pricing + add-to-quote.
  */
 (function () {
   'use strict';
@@ -228,7 +233,12 @@
   ];
 
   var QUOTE_URL = '/pages/request-a-quote.html';
-  var IMG_BASE = 'https://cdnm.sanmar.com/catalog/images/';
+  var CDN_IMG = 'https://cdnm.sanmar.com/catalog/images/';   // flat shot — instant placeholder + fallback
+  var HYDRATE_BATCH = 50;
+
+  function apiBase() {
+    return (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL) || '';
+  }
 
   function esc(v) {
     return String(v == null ? '' : v)
@@ -238,6 +248,9 @@
   function byId(id) { return document.getElementById(id); }
   function slug(s) { return String(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''); }
 
+  function pdpHref(item) {
+    return '/product.html?style=' + encodeURIComponent(item.s);
+  }
   function quoteHref(item) {
     return QUOTE_URL + '?style=' + encodeURIComponent(item.s) +
            '&product=' + encodeURIComponent(item.n) +
@@ -251,32 +264,116 @@
     count: byId('fcCount'),
     sections: byId('fcSections'),
     empty: byId('fcEmpty'),
-    clear: byId('fcClear')
+    clear: byId('fcClear'),
+    alert: byId('fcAlert')
   };
 
   var state = { cat: '', q: '' };
 
+  /* ── API hydration (styleNumber → products/search product) ─────── */
+  var hydrated = {};
+  var hydrateComplete = false;   // true only when EVERY batch succeeded — the
+                                 // absence of a style is then a verified fact,
+                                 // not a network failure.
+
+  function showAlert(msg) {
+    if (!els.alert) return;
+    els.alert.textContent = msg;
+    els.alert.hidden = false;
+  }
+
+  function hydrate() {
+    var base = apiBase();
+    if (!base) {
+      showAlert('Live pricing is unavailable right now — open any product for current pricing.');
+      return;
+    }
+    var styles = ITEMS.map(function (i) { return i.s; });
+    var batches = [];
+    for (var i = 0; i < styles.length; i += HYDRATE_BATCH) {
+      batches.push(styles.slice(i, i + HYDRATE_BATCH));
+    }
+    var failures = 0;
+    Promise.all(batches.map(function (batch) {
+      var url = base + '/api/products/search?styleNumbers=' +
+                encodeURIComponent(batch.join(',')) + '&limit=' + batch.length;
+      return fetch(url)
+        .then(function (resp) {
+          if (!resp.ok) throw new Error('HTTP ' + resp.status);
+          return resp.json();
+        })
+        .then(function (body) {
+          var prods = (body && body.data && body.data.products) || [];
+          prods.forEach(function (p) {
+            if (p && p.styleNumber) hydrated[String(p.styleNumber).toUpperCase()] = p;
+          });
+        })
+        .catch(function (err) {
+          failures++;
+          console.error('[fall-catalog] hydration batch failed:', err);
+        });
+    })).then(function () {
+      hydrateComplete = failures === 0;
+      if (failures > 0) {
+        // Visible per Erik's #1 rule — never degrade silently.
+        showAlert('Live pricing and photos are partially unavailable right now — open any product for current pricing.');
+      }
+      render();
+    });
+  }
+
   /* ── Card + section markup ─────────────────────────────────────── */
+
+  // Broken-image ladder: hydrated model shot → CDN flat shot → labeled fallback.
+  window.__fcImgErr = function (img) {
+    var alt = img.getAttribute('data-alt-src');
+    if (alt) {
+      img.removeAttribute('data-alt-src');
+      img.src = alt;
+      return;
+    }
+    var card = img.closest('.fc-card');
+    if (card) card.classList.add('no-img');
+  };
+
+  function priceHtml(item) {
+    // Server-computed label ONLY (catalog-2026.js rule) — else neutral link.
+    var h = hydrated[item.s];
+    var label = h && typeof h.displayPriceLabel === 'string' && h.displayPriceLabel
+      ? h.displayPriceLabel : null;
+    if (label) return '<p class="fc-card-price">' + esc(label) + '</p>';
+    if (!h && hydrateComplete) {
+      // Verified not in the product DB (e.g. CTT100617) — PDP would error.
+      return '<a class="fc-card-price-link" href="' + esc(quoteHref(item)) + '">Request pricing →</a>';
+    }
+    return '<a class="fc-card-price-link" href="' + esc(pdpHref(item)) + '">See pricing →</a>';
+  }
+
   function cardHtml(item) {
-    var img = IMG_BASE + item.s + '.jpg';
-    var href = quoteHref(item);
+    var h = hydrated[item.s];
+    var imgs = (h && h.images) || {};
+    var apiImg = imgs.display || imgs.main || imgs.thumbnail || '';
+    var cdnImg = CDN_IMG + item.s + '.jpg';
+    var primary = apiImg || cdnImg;
+    var altAttr = apiImg ? ' data-alt-src="' + esc(cdnImg) + '"' : '';
+    var href = (!h && hydrateComplete) ? quoteHref(item) : pdpHref(item);
+    var title = (h && h.productName) || item.n;
     return '' +
       '<article class="fc-card" data-cat="' + esc(item.c) + '" data-style="' + esc(item.s) + '">' +
         '<a class="fc-card-media" href="' + esc(href) + '">' +
-          '<img loading="lazy" src="' + esc(img) + '" alt="' + esc(item.n) + '" ' +
-               'onerror="this.closest(&#39;.fc-card&#39;).classList.add(&#39;no-img&#39;)">' +
+          '<img loading="lazy" src="' + esc(primary) + '"' + altAttr + ' alt="' + esc(title) + '" ' +
+               'onerror="window.__fcImgErr(this)">' +
           '<span class="fc-card-fallback">' + esc(item.s) + '</span>' +
         '</a>' +
         '<div class="fc-card-body">' +
           '<span class="fc-card-brand">' + esc(item.b) + '</span>' +
-          '<h3 class="fc-card-name"><a href="' + esc(href) + '">' + esc(item.n) + '</a></h3>' +
+          '<h3 class="fc-card-name"><a href="' + esc(href) + '">' + esc(title) + '</a></h3>' +
           '<div class="fc-card-foot">' +
             '<span class="fc-card-style">' + esc(item.s) + '</span>' +
             '<span class="fc-card-cat">' + esc(item.c) + '</span>' +
           '</div>' +
-          '<a class="fc-card-cta" href="' + esc(href) + '">Request a quote' +
-            '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg>' +
-          '</a>' +
+          priceHtml(item) +
+          '<a class="fc-card-quote" href="' + esc(quoteHref(item)) + '">or request a quote</a>' +
         '</div>' +
       '</article>';
   }
@@ -368,7 +465,8 @@
   function init() {
     if (!els.sections) return;
     buildChips();
-    render();
+    render();      // instant paint with CDN placeholders…
+    hydrate();     // …then swap in API model shots + price labels
 
     els.catChips.addEventListener('click', function (e) {
       var chip = e.target.closest('.fc-chip');
