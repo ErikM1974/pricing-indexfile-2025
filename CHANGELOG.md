@@ -1,3 +1,8 @@
+## v2026.07.24.4 (2026.07.24)
+
+- Money path: HMAC the totals hash, gate accept/pay, carry the token on every link
+- Deploy v2026.07.24.4: 2 files (quote-management.html,quote-view.html,...)
+
 ## v2026.07.24.3 (2026.07.24)
 
 - Phase 2: "Get this in writing" produces a real quote + tokenised share link
