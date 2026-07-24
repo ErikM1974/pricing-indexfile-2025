@@ -1,3 +1,9 @@
+## v2026.07.24.5 (2026.07.24)
+
+- Phase 3: public /custom-banners — a SIZE ladder, because there is no volume break
+- Real product photos on both public pages
+- Deploy v2026.07.24.5: 2 files (custom-banners.html,custom-stickers.html,...)
+
 ## v2026.07.24.4 (2026.07.24)
 
 - Money path: HMAC the totals hash, gate accept/pay, carry the token on every link
