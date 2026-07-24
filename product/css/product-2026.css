@@ -22,18 +22,25 @@
 /* ── Gallery ───────────────────────────────────────────────── */
 .pdp-stage {
     margin: 0;
+    position: relative;
     background: var(--card);
     border: 1px solid var(--line);
     border-radius: var(--radius);
     box-shadow: var(--shadow-card);
-    aspect-ratio: 1 / 1;
-    display: grid;
-    place-items: center;
+    /* 4:5 — SanMar photos are 2:3 portrait; a square stage shrank the garment,
+       and 2:3 native pushes pricing below the fold (Erik picked 4:5, 2026-07-23) */
+    aspect-ratio: 4 / 5;
     overflow: hidden;
 }
 .pdp-stage img {
-    max-width: 100%;
-    max-height: 100%;
+    /* Absolute-fill + contain: percentage max-height does NOT resolve inside an
+       auto grid track, so the old max-h:100% let the 2:3 photo overflow the
+       stage and overflow:hidden CROPPED the bottom of every garment
+       (2026-07-23). Absolute percentages resolve against the stage box. */
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
     display: block;
 }
@@ -55,7 +62,11 @@
     place-items: center;
     overflow: hidden;
 }
-.pdp-thumb img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+/* Definite height (not %) — the img sits in an auto-height <span> with the
+   label, so max-height:100% never resolved and the 2:3 photo cropped to
+   head-and-shoulders (same quirk as .pdp-stage, 2026-07-23). 76px thumb −
+   8px padding − ~18px label = 50px of photo. */
+.pdp-thumb img { width: 100%; height: 50px; object-fit: contain; display: block; }
 .pdp-thumb:hover { border-color: var(--green-700); }
 .pdp-thumb[aria-pressed="true"] {
     border-color: var(--green-700);
@@ -629,12 +640,15 @@
 .pdp-related-card:hover { border-color: var(--green-700); }
 .pdp-related-photo {
     background: var(--paper-deep);
+    position: relative;
     aspect-ratio: 1 / 1;
     display: grid;
     place-items: center;
     overflow: hidden;
 }
-.pdp-related-photo img { max-width: 88%; max-height: 88%; object-fit: contain; }
+/* Absolute-fill (same grid-track quirk as .pdp-stage img, 2026-07-23) — the old
+   max-w/h:88% cropped the 2:3 photos; inset 6% keeps the breathing room. */
+.pdp-related-photo img { position: absolute; inset: 6%; width: 88%; height: 88%; object-fit: contain; }
 .pdp-related-photo.is-pending {
     /* SanMar hasn't photographed the style yet — styled tile instead of
        their blue "image not yet available" badge */
@@ -681,6 +695,7 @@
 
 @media (max-width: 560px) {
     .pdp-thumb { width: 64px; height: 64px; }
+    .pdp-thumb img { height: 38px; } /* 64px thumb − padding − label */
     .pdp-cfg { padding: 14px 12px; }
     .pdp-cfg-methods { grid-template-columns: 1fr 1fr; }
     .pdp-cfg-method { min-height: 88px; padding: 10px 11px; }
