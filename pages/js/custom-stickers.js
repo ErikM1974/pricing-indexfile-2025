@@ -474,65 +474,78 @@
         // Honeypot: a real person never fills a field they cannot see.
         if (byId('hpWebsite').value) { showLeadSuccess(); return; }
 
-        var base = apiBase();
         var btn = byId('stkLeadSubmit');
         btn.disabled = true;
-        btn.textContent = 'Sending…';
+        btn.textContent = 'Creating your quote…';
 
-        var fee = state.setupFee ? state.setupFee.amount : 0;
-        var setupLabel = state.setupAnswer === 'reorder'
-            ? '$0.00 (reorder — design on file)'
-            : '$' + L.formatMoney(fee) + (state.setupAnswer === 'new' ? ' (new design)' : ' (not yet answered — assumed new)');
-
+        // Same-origin, and it sends only the CONFIGURATION — size, quantity and
+        // the setup answer. The server re-quotes against the published sheet and
+        // writes its own numbers, so nothing here can dictate a price.
         var payload = {
-            formId: 'quote-request',
-            company: byId('stkCompany').value.trim() || name,
-            summary: summaryText(),
-            payload: {
-                fields: [
-                    ['Product', 'Die-cut stickers'],
-                    ['Size', L.formatSize(state.resolved.size)],
-                    ['Quantity', String(state.resolved.quantity)],
-                    ['Part number', state.resolved.partNumber],
-                    ['Sticker price', '$' + L.formatMoney(state.resolved.totalPrice)],
-                    ['Art setup', setupLabel],
-                    ['Source', 'custom-stickers configurator'],
-                    ['Configured link', location.href]
-                ],
-                notes: [['Customer message', byId('stkMessage').value.trim()]]
-            },
+            width: state.sizeInfo ? state.sizeInfo.requested.width : parseFloat(state.effectiveSize),
+            height: state.sizeInfo ? state.sizeInfo.requested.height : parseFloat(state.effectiveSize),
+            qty: state.resolved.quantity,
+            setupAnswer: state.setupAnswer || 'unanswered',
             name: name,
             email: email,
             phone: phone,
-            hp: ''
+            company: byId('stkCompany').value.trim(),
+            message: byId('stkMessage').value.trim(),
+            configuredLink: location.href,
+            hp: byId('hpWebsite').value
         };
 
         try {
-            var r = await fetch(base + '/api/form-submissions', {
+            var r = await fetch('/api/public/sticker-quote', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
-            if (!r.ok) throw new Error('HTTP ' + r.status);
-            showLeadSuccess();
+            var data = await r.json().catch(function () { return {}; });
+            if (!r.ok) throw new Error(data.error || ('HTTP ' + r.status));
+            showLeadSuccess(data);
         } catch (e) {
-            console.error('[custom-stickers] lead submit failed:', e);
+            console.error('[custom-stickers] quote save failed:', e);
             btn.disabled = false;
             btn.textContent = 'Send my quote request';
-            err.innerHTML = 'That didn\'t go through. Please call <a href="tel:253-922-5793">(253) 922-5793</a> or email ' +
-                '<a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a> — we\'ve kept everything you typed.';
+            err.innerHTML = (e && e.message && /individual quote/.test(e.message))
+                ? esc(e.message)
+                : 'That didn\'t go through. Please call <a href="tel:253-922-5793">(253) 922-5793</a> or email ' +
+                  '<a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a> — we\'ve kept everything you typed.';
             err.hidden = false;
         }
     }
 
-    function showLeadSuccess() {
+    function showLeadSuccess(data) {
         // Replace the panel in place. Deliberately NOT scrolling to the top of
         // the page — the customer must land on their confirmation, not the hero.
-        byId('stkLead').innerHTML =
-            '<h3>Got it — thank you.</h3>' +
-            '<p class="stk-lead-sub">We\'ll email you this quote shortly. ' +
-            (summaryText() ? esc(summaryText()) + '. ' : '') +
-            'If it\'s urgent, call <a href="tel:253-922-5793">(253) 922-5793</a> and mention die-cut stickers.</p>';
+        var quoteId = data && data.quoteId;
+        var url = data && data.url;
+
+        var html = '<h3>' + (quoteId ? 'Quote ' + esc(quoteId) + ' is ready.' : 'Got it — thank you.') + '</h3>' +
+            '<p class="stk-lead-sub">' + (summaryText() ? esc(summaryText()) + '. ' : '');
+
+        if (url) {
+            html += 'Here it is in writing — the link is yours to keep or forward.</p>' +
+                '<p><a class="btn btn-primary" href="' + esc(url) + '">Open my quote →</a></p>' +
+                '<div class="stk-keep"><span class="stk-keep-label">Or:</span>' +
+                '<button type="button" id="stkCopyQuoteLink">Copy quote link</button></div>' +
+                '<p class="stk-lead-sub">A rep will follow up about your artwork. ' +
+                'Questions now? <a href="tel:253-922-5793">(253) 922-5793</a>.</p>';
+        } else {
+            html += 'We\'ll be in touch shortly. If it\'s urgent, call ' +
+                '<a href="tel:253-922-5793">(253) 922-5793</a> and mention die-cut stickers.</p>';
+        }
+        byId('stkLead').innerHTML = html;
+
+        var copyBtn = byId('stkCopyQuoteLink');
+        if (copyBtn) {
+            copyBtn.addEventListener('click', function () {
+                navigator.clipboard.writeText(url)
+                    .then(function () { toast('Quote link copied.'); })
+                    .catch(function () { toast('Couldn\'t copy — use the button above.'); });
+            });
+        }
         byId('stkLead').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     }
 

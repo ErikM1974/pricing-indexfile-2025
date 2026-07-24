@@ -6,6 +6,12 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 
 ---
 
+### A sizeless product vanished from its own quote while still counting toward the total (2026-07-24)
+- **Problem**: the first public sticker quote (STK-2026-032) rendered a **$346 total with only the $50 setup fee itemised**. The $296 sticker line — the actual product — was silently absent from the customer-facing quote.
+- **Root Cause**: `quote-view.js` `buildProductRows()` derives EVERY row from `parseSizeBreakdown(item.SizeBreakdown)`. Stickers/banners/patches have no garment sizes, so the breakdown was empty, the size loops produced nothing, and the function returned zero rows. The money still came from `TotalAmount`, so the totals looked right and only the itemisation was wrong — which is the dangerous shape of this bug. Related: the same page hardcoded 6 apparel size columns (a sticker got 6 empty cells) and defaulted `location || 'Left Chest'`, telling sticker customers their stickers go on the left chest.
+- **Solution**: fall back to one row built from the item's own `Quantity`/`LineTotal` when the breakdown yields nothing — keyed on **"no sizes found"**, NOT on a quote prefix, so it catches any future sizeless product. Plus `hideSizeColumns` for STK/PATCH (header, body, fee rows and the subhead `colspan` all track it) and an early return from `renderEmbroideryInfo()`.
+- **Prevention**: **when a renderer is shaped around one product type, adding a second type fails silently rather than loudly.** Verify a new quote type by asserting the RENDERED rows reconcile to the total, not just that the page loads. Regression-check an apparel quote in the same pass — shared renderer.
+
 ### 26 of 50 sticker rows displayed a per-unit price that didn't multiply back to its own total (2026-07-24)
 - **Problem**: the staff sticker table rendered Caspio's stored `PricePerSticker` next to `TotalPrice`. Verified live on teamnwca.com: **26 of 50 rows disagree**. `STK-4X4-10000` showed `$0.58` beside `$5,846` — multiply and you get **$5,800, a $46 gap**. Reps quote off this table and the AI drafted customer emails from the same field.
 - **Root Cause**: `PricePerSticker` is a 2-dp Caspio column, not a derived value. At 4- and 5-figure quantities the truncation is worth tens of dollars. Nobody noticed because the two numbers only contradict each other when someone multiplies — which is exactly what a customer does when total and per-unit sit side by side.

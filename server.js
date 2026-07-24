@@ -129,6 +129,9 @@ dotenv.config();
 //   GET /quote-cart[.html]                  — Add-to-Quote cart page (pages/quote-cart.html; sessionStorage store, engine-priced)
 //
 // CUSTOM STICKERS (public storefront, 2026-07-24)
+//   POST /api/public/sticker-quote           — Phase 2: config in → real STK quote + tokenised share link out.
+//                                              Price is RE-QUOTED server-side (browser sends size+qty only);
+//                                              the STK sequence is minted only after validation. Honeypot + strictLimiter.
 //   GET /custom-stickers[.html] · /stickers  — zero-click sticker configurator (pages/custom-stickers.html)
 //                                              One GET /api/sticker-pricing on boot; the ladder re-prices from
 //                                              memory, so a size change costs ZERO further calls. Ends in a
@@ -1272,6 +1275,46 @@ function parseNotesJson(notesStr) {
   } catch (_) {
     return { _legacyText: String(notesStr) };
   }
+}
+
+// =============================================================================
+// SHARE-LINK TOKENS (2026-07-24)
+//
+// Quote IDs are a short sequential counter (STK-2026-001, EMB-2026-314…) and
+// GET /api/public/quote/:id + /api/quote-sessions/:id/full are both anonymous,
+// so anyone could walk the range and read customers' quotes — company, contact,
+// line items and prices.
+//
+// Fix, deliberately BACKWARD-COMPATIBLE (Erik's call 2026-07-24): every quote
+// saved from now on carries an unguessable token in Notes.share_token, and its
+// share link must carry `?k=`. A row WITHOUT a stored token is a pre-existing
+// quote, and is still served without one — so no link already sitting in a
+// customer's inbox breaks. As old quotes age out the exposure closes itself.
+//
+// Staff sessions bypass the check entirely, so reps opening a quote from the
+// dashboard never need the token.
+// =============================================================================
+function mintShareToken() {
+  return crypto.randomBytes(16).toString('base64url'); // 22 chars, url-safe
+}
+
+/**
+ * Returns true when the request may read this session.
+ * Legacy rows (no stored token) stay readable — that is the compatibility
+ * promise, not an oversight.
+ */
+function shareTokenOk(req, session) {
+  if (req.session && req.session.crmUser) return true;   // staff
+  let stored = null;
+  try {
+    const notes = typeof session.Notes === 'string' ? JSON.parse(session.Notes) : (session.Notes || {});
+    stored = notes && notes.share_token ? String(notes.share_token) : null;
+  } catch (_) { /* unparseable Notes → treat as legacy */ }
+  if (!stored) return true;                              // legacy quote
+
+  const supplied = String(req.query.k || '');
+  if (supplied.length !== stored.length) return false;
+  return crypto.timingSafeEqual(Buffer.from(supplied), Buffer.from(stored));
 }
 
 // Binds a payment link to the exact numbers the rep enabled. Recomputed from
@@ -10704,6 +10747,150 @@ app.get('/invoice/:quoteId', (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'invoice.html'));
 });
 
+// =============================================================================
+// PUBLIC STICKER QUOTE — /custom-stickers "Get this in writing" (Phase 2, 2026-07-24)
+//
+// Turns a configured price into a real STK quote + share link, with no login.
+//
+// 🔴 THE PRICE IS RE-QUOTED SERVER-SIDE. The browser sends only size + quantity;
+// every dollar written to Caspio comes from /api/sticker-pricing/quote here. A
+// tampered client cannot dictate a total, and the saved quote can never disagree
+// with the published sheet.
+//
+// 🔴 THE STK SEQUENCE IS MINTED HERE, after validation — never on page load and
+// never from an unvalidated click, so bots and abandoned sessions don't burn
+// quote numbers.
+//
+// The share link carries an unguessable token (see mintShareToken). This page
+// never touches the CRM, so no customer PII beyond what the visitor typed is
+// persisted — nothing like payment terms or account owner can leak through the
+// public quote view.
+// =============================================================================
+app.post('/api/public/sticker-quote', strictLimiter, express.json({ limit: '32kb' }), async (req, res) => {
+  const b = req.body || {};
+
+  // Honeypot: report success and store nothing, same contract as the shared
+  // public-form module. A bot must not learn it was detected.
+  if (b.hp) return res.json({ ok: true, quoteId: null, url: null });
+
+  const name = String(b.name || '').trim();
+  const email = String(b.email || '').trim();
+  const phone = String(b.phone || '').trim();
+  if (!name || !phone || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+    return res.status(400).json({ error: 'Name, a valid email and a phone number are required.' });
+  }
+
+  const width = Number(b.width);
+  const height = Number(b.height);
+  const qty = parseInt(b.qty, 10);
+  if (!Number.isFinite(width) || width <= 0 || !Number.isFinite(height) || height <= 0
+      || !Number.isFinite(qty) || qty <= 0) {
+    return res.status(400).json({ error: 'A size and quantity are required.' });
+  }
+
+  try {
+    // 1. Authoritative price.
+    const pr = await fetch(`${CASPIO_PROXY_BASE}/api/sticker-pricing/quote`
+      + `?width=${encodeURIComponent(width)}&height=${encodeURIComponent(height)}&qty=${encodeURIComponent(qty)}`);
+    if (!pr.ok) throw new Error('pricing HTTP ' + pr.status);
+    const priced = await pr.json();
+    if (priced.offGrid) {
+      return res.status(400).json({
+        error: 'That size or quantity needs an individual quote — please call (253) 922-5793.',
+        reason: priced.reason
+      });
+    }
+
+    const setupAmount = Number((priced.setupFee && priced.setupFee.amount) != null
+      ? priced.setupFee.amount : 50);
+    const chargeSetup = b.setupAnswer !== 'reorder';       // reorder is the ONLY waiver
+    const setupFee = chargeSetup ? setupAmount : 0;
+    const subtotal = Number(priced.totalPrice);
+    const total = subtotal + setupFee;
+
+    // 2. Mint the quote number only now that everything above validated.
+    const sr = await fetch(`${CASPIO_PROXY_BASE}/api/quote-sequence/STK`);
+    if (!sr.ok) throw new Error('sequence HTTP ' + sr.status);
+    const sj = await sr.json();
+    const seq = Number(sj && sj.sequence);
+    if (!Number.isFinite(seq) || seq <= 0) throw new Error('bad sequence: ' + JSON.stringify(sj));
+    const quoteId = `STK-${new Date().getFullYear()}-${String(seq).padStart(3, '0')}`;
+
+    const shareToken = mintShareToken();
+    const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+      .toISOString().replace(/\.\d{3}Z$/, '');
+
+    // 3. Session row. Pre-tax on purpose — WA tax is applied downstream at
+    //    invoice, exactly as the staff sticker path does.
+    await makeApiRequest('/quote_sessions', 'POST', {
+      QuoteID: quoteId,
+      SessionID: `stickers_web_${Date.now()}`,
+      Status: 'Open',
+      CustomerEmail: email,
+      CustomerName: name,
+      CompanyName: String(b.company || '').trim(),
+      Phone: phone,
+      TotalQuantity: priced.quantity,
+      SubtotalAmount: subtotal,
+      LTMFeeTotal: 0,
+      TotalAmount: total,
+      ExpiresAt: expiresAt,
+      Notes: JSON.stringify({
+        share_token: shareToken,
+        setup_fee: setupFee,
+        setup_answer: b.setupAnswer || 'unanswered',
+        taxable: true,
+        tax_note: 'WA sales tax applied at invoice.',
+        source: 'custom-stickers configurator',
+        configured_link: String(b.configuredLink || '').slice(0, 300),
+        customer_message: String(b.message || '').slice(0, 1000),
+        applied_rules: priced.appliedRules || null
+      })
+    });
+
+    // 4. Line items — the sticker line, plus the setup fee as a FEE row
+    //    ('fee', not 'setup-fee': quote-view filters on exactly 'fee').
+    const lines = [{
+      QuoteID: quoteId,
+      LineNumber: 1,
+      StyleNumber: priced.partNumber,
+      ProductName: `${priced.size.replace('x', '" × ')}" die-cut stickers`,
+      EmbellishmentType: 'sticker',
+      Quantity: priced.quantity,
+      BaseUnitPrice: priced.unitPrice,
+      FinalUnitPrice: priced.unitPrice,
+      LineTotal: subtotal,
+      PricingTier: priced.isBestValue ? 'BestValue' : 'Standard'
+    }];
+    if (setupFee > 0) {
+      lines.push({
+        QuoteID: quoteId,
+        LineNumber: 2,
+        StyleNumber: 'GRT-50',
+        ProductName: 'Art Setup Fee (one-time)',
+        EmbellishmentType: 'fee',
+        Quantity: 1,
+        BaseUnitPrice: setupFee,
+        FinalUnitPrice: setupFee,
+        LineTotal: setupFee,
+        PricingTier: 'Standard'
+      });
+    }
+    for (const line of lines) {
+      await makeApiRequest('/quote_items', 'POST', line);
+    }
+
+    const url = `${PUBLIC_SITE_ORIGIN}/quote/${quoteId}?k=${shareToken}`;
+    console.log(`[sticker-quote] created ${quoteId} — ${priced.partNumber} × ${priced.quantity}, $${total}`);
+    res.json({ ok: true, quoteId, url, totalPrice: total, subtotal, setupFee });
+  } catch (err) {
+    console.error('[sticker-quote] save failed:', err.message);
+    // Rule 4: never pretend this worked. The page keeps what the customer typed
+    // and tells them to call.
+    res.status(502).json({ error: 'We could not save your quote just now.' });
+  }
+});
+
 // Public API - Get quote data with view tracking
 app.get('/api/public/quote/:quoteId', async (req, res) => {
   try {
@@ -10715,6 +10902,12 @@ app.get('/api/public/quote/:quoteId', async (req, res) => {
       return res.status(404).json({ error: 'Quote not found' });
     }
     const session = sessions[0];
+
+    // Share-link token (see shareTokenOk). 404 rather than 401 so a walk of the
+    // ID range can't distinguish "exists but wrong token" from "doesn't exist".
+    if (!shareTokenOk(req, session)) {
+      return res.status(404).json({ error: 'Quote not found' });
+    }
 
     // Fetch quote items
     let items = await makeApiRequest(`/quote_items?filter=QuoteID='${safeQuoteId}'`);
@@ -11185,6 +11378,12 @@ app.get('/api/quote-sessions/:quoteId/full', async (req, res) => {
       return res.status(404).json({ error: 'Quote not found' });
     }
     const session = sessions[0];
+
+    // Same share-link token gate as /api/public/quote/:id — this endpoint is
+    // equally anonymous and returns MORE (the full Notes blob).
+    if (!shareTokenOk(req, session)) {
+      return res.status(404).json({ error: 'Quote not found' });
+    }
 
     // Parse the original submission from Notes JSON (best-effort).
     let originalSubmission = null;
