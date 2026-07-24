@@ -1,0 +1,431 @@
+/* =============================================================================
+   custom-stickers.css — page layer for /custom-stickers
+   Loads AFTER nwca-2026-core.css and uses ITS tokens.
+
+   🔴 DECLARES NO :root. Two other stylesheets in this repo define colliding
+   token names with different values — shared_components/css/sticker-pricing-page.css
+   (--paper #fbf8f1 vs core's #faf8f3, --ink #131611 vs #182219) and
+   pages/forms/nwca-form-shared.css (plus a bare `body` rule). Loading either one
+   here would silently repaint the masthead and footer. Neither belongs on this
+   page; do not add them.
+
+   GEOMETRY IS THE PRODUCT. The whole point of this page is that a price is on
+   screen before the visitor touches anything. The configurator card is budgeted
+   to ~750px so that at 1280×800 the price AND the button are both above the
+   fold. Row heights below are load-bearing, not taste: 36px size rows and 26px
+   ladder rows. Core's .data-table is padding:10px 14px (~40px rows) — far too
+   tall for the card, which is why the ladder is a card-local table.
+   ============================================================================= */
+
+/* ── Layout shell ─────────────────────────────────────────────────── */
+/* Three grid items: copy and figure stack in column 1, the card owns column 2
+   and spans both rows. Explicit placement (rather than nesting the figure inside
+   the copy) is what lets the figure drop BELOW the card on mobile. */
+.stk-hero {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    grid-template-rows: auto auto;
+    gap: 24px 40px;
+    align-items: start;
+    padding: 18px 0 40px;
+}
+.stk-hero-copy { grid-column: 1; grid-row: 1; }
+.stk-figure { grid-column: 1; grid-row: 2; }
+.stk-card { grid-column: 2; grid-row: 1 / span 2; }
+
+.stk-hero-copy h1 {
+    font-family: var(--font-display);
+    font-size: clamp(30px, 4vw, 42px);
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+    margin: 0 0 10px;
+}
+
+/* One short H1 + a deck. A 7-word H1 wraps to four lines at 375px and shoves
+   the configurator ~150px down the page. */
+.stk-deck {
+    font-size: 17px;
+    color: var(--ink-soft);
+    margin: 0 0 18px;
+    max-width: 46ch;
+}
+
+.stk-trust-line {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin: 0 0 22px;
+    padding: 0;
+    list-style: none;
+}
+.stk-trust-line li { display: flex; align-items: center; gap: 7px; }
+.stk-trust-line svg { flex: none; color: var(--green-700); }
+
+/* ── Size-comparison diagram (inline SVG, updates with the radio) ──── */
+.stk-figure {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 22px;
+    box-shadow: var(--shadow-card);
+}
+.stk-figure svg { display: block; width: 100%; height: auto; }
+.stk-figure-note {
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin: 14px 0 0;
+    text-align: center;
+}
+
+/* ── The configurator card ────────────────────────────────────────── */
+.stk-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card);
+    padding: 16px;
+}
+
+.stk-card fieldset { border: 0; margin: 0; padding: 0; }
+.stk-card legend {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 700;
+    padding: 0;
+    margin: 0;
+}
+
+.stk-legend-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 2px;
+}
+
+.stk-textbtn {
+    background: none;
+    border: 0;
+    padding: 4px 2px;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--green-700);
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+.stk-textbtn:hover { color: var(--green-900); }
+
+/* Size rows — native radios in a fieldset. Not chips, not a select: six
+   options gets free arrow-key roving and a free "2 of 6" announcement. */
+.stk-sizes { list-style: none; margin: 0 0 6px; padding: 0; }
+/* 30px on desktop, 44px on touch (see the ≤900px block). Six rows × 6px saved
+   is 36px off the distance between the top of the card and the CTA — that is
+   the difference between the button landing above the fold and below it. */
+.stk-size-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 30px;
+    padding: 0 6px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+}
+.stk-size-row:hover { background: var(--green-50); }
+.stk-size-row input { margin: 0; flex: none; width: 16px; height: 16px; accent-color: var(--green-700); }
+.stk-size-row .stk-size-label { font-weight: 600; font-size: 14px; }
+.stk-size-row .stk-size-from { margin-left: auto; font-size: 12.5px; color: var(--ink-soft); }
+
+.stk-custom-dims {
+    display: none;
+    gap: 8px;
+    align-items: center;
+    padding: 8px 6px 10px 32px;
+    font-size: 13px;
+}
+.stk-custom-dims.is-open { display: flex; }
+.stk-custom-dims input {
+    width: 74px;
+    padding: 7px 8px;
+    font: inherit;
+    font-size: 14px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-sm);
+    background: var(--card);
+    color: var(--ink);
+}
+.stk-custom-dims input:focus-visible { outline: 2px solid var(--green-700); outline-offset: 1px; }
+.stk-custom-dims .is-invalid { border-color: var(--bad); }
+
+.stk-inline-note {
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    margin: 0 0 10px;
+    padding-left: 6px;
+}
+.stk-inline-note.is-upgrade { color: var(--green-900); }
+.stk-inline-note.is-error { color: var(--bad); font-weight: 600; }
+
+.stk-overflow-link {
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    margin: 0 0 14px;
+    padding-left: 6px;
+}
+.stk-overflow-link a { color: var(--green-700); font-weight: 600; }
+
+/* Quantity ladder — borderless, card-local, 26px rows. */
+.stk-ladder { width: 100%; border-collapse: collapse; margin-bottom: 4px; }
+.stk-ladder caption { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.stk-ladder td { padding: 0; height: 24px; font-size: 13.5px; vertical-align: middle; }
+.stk-ladder tr { cursor: pointer; }
+.stk-ladder tr:hover td { background: var(--green-50); }
+.stk-ladder tr.is-selected td { background: var(--green-100); }
+.stk-ladder .stk-l-radio { width: 26px; }
+.stk-ladder .stk-l-radio input { margin: 0; width: 15px; height: 15px; accent-color: var(--green-700); vertical-align: middle; }
+.stk-ladder .stk-l-qty { width: 62px; font-variant-numeric: tabular-nums; }
+.stk-ladder .stk-l-price { font-weight: 700; font-variant-numeric: tabular-nums; }
+.stk-ladder .stk-l-save { text-align: right; font-size: 12px; color: var(--green-900); white-space: nowrap; }
+.stk-ladder .stk-l-best { display: inline-block; margin-left: 6px; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--green-900); background: var(--green-100); border-radius: 999px; padding: 1px 6px; }
+.stk-ladder.is-disabled { opacity: 0.45; pointer-events: none; }
+
+.stk-custom-qty { display: none; padding: 6px 0 2px 26px; }
+.stk-custom-qty.is-open { display: block; }
+.stk-custom-qty input {
+    width: 96px;
+    padding: 7px 8px;
+    font: inherit;
+    font-size: 14px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-sm);
+}
+.stk-custom-qty input.is-invalid { border-color: var(--bad); }
+
+/* Price block — the FIRST of only two visual hierarchy breaks on the card. */
+.stk-price {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    border-top: 1px solid var(--line);
+    margin-top: 6px;
+    padding-top: 10px;
+}
+.stk-price-total {
+    font-family: var(--font-display);
+    font-size: 30px;
+    font-weight: 500;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+}
+.stk-price-unit { font-size: 13.5px; color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+.stk-price-rounding { font-size: 11.5px; color: var(--ink-soft); margin: 4px 0 0; }
+
+/* CTA — the SECOND hierarchy break. Nothing sits between the price and this. */
+.stk-cta {
+    display: block;
+    width: 100%;
+    min-height: 60px;
+    margin-top: 12px;
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: var(--rush-deep);   /* never --rush: small white-on-orange fails AA */
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: 19px;
+    font-weight: 700;
+    cursor: pointer;
+}
+.stk-cta:hover { background: var(--rush-deeper); }
+.stk-cta[disabled] { background: var(--line-strong); color: #fff; cursor: not-allowed; }
+.stk-cta-sub { font-size: 12px; color: var(--ink-soft); text-align: center; margin: 8px 0 0; }
+
+/* Everything below the CTA is deliberately quiet. */
+.stk-below {
+    border-top: 1px solid var(--line);
+    margin-top: 14px;
+    padding-top: 12px;
+    font-size: 13px;
+    color: var(--ink-soft);
+}
+.stk-below p { margin: 0 0 8px; }
+.stk-below p:last-child { margin-bottom: 0; }
+.stk-setup-q { font-weight: 600; color: var(--ink); }
+.stk-setup-opts { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 8px; }
+.stk-setup-opts label {
+    display: inline-flex; align-items: center; gap: 6px;
+    border: 1px solid var(--line-strong); border-radius: 999px;
+    padding: 6px 11px; font-size: 12.5px; cursor: pointer; min-height: 34px;
+}
+.stk-setup-opts label:hover { background: var(--green-50); }
+.stk-setup-opts input { margin: 0; accent-color: var(--green-700); }
+.stk-setup-opts label:has(input:checked) { border-color: var(--green-700); background: var(--green-100); color: var(--green-950); font-weight: 600; }
+.stk-setup-total { font-weight: 700; color: var(--ink); }
+.stk-nudge { color: var(--green-900); font-weight: 600; }
+
+/* Zero-field takeaways. The URL already IS the quote. */
+.stk-keep { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 12px; }
+.stk-keep-label { font-size: 12px; color: var(--ink-soft); }
+.stk-keep button {
+    background: none; border: 1px solid var(--line-strong); border-radius: 999px;
+    padding: 5px 11px; font: inherit; font-size: 12.5px; color: var(--ink-soft);
+    cursor: pointer; min-height: 32px;
+}
+.stk-keep button:hover { border-color: var(--green-700); color: var(--green-900); }
+
+/* ── Large-format branch (replaces the ladder above 6in) ───────────── */
+.stk-oversize { padding: 6px 0 2px; }
+.stk-oversize h3 { font-family: var(--font-display); font-size: 17px; margin: 0 0 8px; }
+.stk-oversize p { font-size: 13.5px; color: var(--ink-soft); margin: 0 0 12px; }
+
+/* ── Always-on action bar ─────────────────────────────────────────── */
+/* Same pattern as /custom-caps .order-bar. Deliberately NOT media-gated and
+   deliberately NOT a sticky card: `position:sticky` on an element taller than
+   the viewport pins its top and parks the CTA permanently off-screen. */
+body { --stk-bar-h: 62px; }
+.stk-bar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 90;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    background: var(--green-950); color: #fff;
+    padding: 9px 16px calc(9px + env(safe-area-inset-bottom, 0px));
+    min-height: var(--stk-bar-h);
+    box-shadow: 0 -8px 30px rgba(18, 43, 24, 0.35);
+    transition: transform 0.2s ease;
+}
+.stk-bar[hidden] { display: none; }
+.stk-bar.is-down { transform: translateY(110%); }
+.stk-bar-summary { display: grid; gap: 1px; }
+.stk-bar-summary strong { font-family: var(--font-display); font-size: 19px; font-variant-numeric: tabular-nums; }
+.stk-bar-summary span { font-size: 12px; opacity: 0.82; }
+.stk-bar-cta {
+    border: 0; border-radius: var(--radius-sm); background: var(--rush-deep); color: #fff;
+    font-family: var(--font-display); font-size: 15px; font-weight: 700;
+    padding: 0 18px; min-height: 44px; cursor: pointer;
+}
+.stk-bar-cta:hover { background: var(--rush-deeper); }
+
+/* ── Sections below the fold ──────────────────────────────────────── */
+.stk-band { padding: 40px 0; border-top: 1px solid var(--line); }
+.stk-band h2 { font-family: var(--font-display); font-size: 26px; margin: 0 0 6px; letter-spacing: -0.01em; }
+.stk-band-sub { color: var(--ink-soft); margin: 0 0 22px; }
+
+.stk-trust-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 26px; }
+.stk-trust-grid h3 { font-family: var(--font-display); font-size: 17px; margin: 0 0 6px; }
+.stk-trust-grid p { margin: 0; font-size: 14px; color: var(--ink-soft); }
+.stk-trust-grid svg { color: var(--green-700); margin-bottom: 8px; }
+
+.stk-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; counter-reset: stk-step; list-style: none; margin: 0; padding: 0; }
+.stk-steps li { counter-increment: stk-step; font-size: 14px; color: var(--ink-soft); }
+.stk-steps li::before {
+    content: counter(stk-step);
+    display: grid; place-items: center;
+    width: 28px; height: 28px; margin-bottom: 10px;
+    border-radius: 50%; background: var(--green-100); color: var(--green-950);
+    font-family: var(--font-display); font-weight: 700; font-size: 14px;
+}
+.stk-steps strong { display: block; color: var(--ink); margin-bottom: 3px; font-size: 15px; }
+
+/* Full rate card — all 50 combinations, published. */
+.stk-rates { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 22px; }
+.stk-rate-block h3 { font-family: var(--font-display); font-size: 16px; margin: 0 0 8px; }
+.stk-rate-block table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.stk-rate-block th { text-align: left; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-soft); border-bottom: 1px solid var(--line); padding: 0 6px 5px 0; font-weight: 600; }
+.stk-rate-block td { padding: 5px 6px 5px 0; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.stk-rate-block .num { text-align: right; }
+.stk-rate-block tr.is-active-tier td { background: var(--green-100); font-weight: 700; }
+.stk-rate-foot { font-size: 12.5px; color: var(--ink-soft); margin: 16px 0 0; }
+
+.stk-faq details { border-bottom: 1px solid var(--line); padding: 12px 0; }
+.stk-faq summary { font-weight: 600; cursor: pointer; font-size: 15px; }
+.stk-faq p { margin: 8px 0 0; color: var(--ink-soft); font-size: 14px; max-width: 72ch; }
+
+.stk-cross { background: var(--green-50); border-radius: var(--radius); padding: 26px; }
+.stk-cross h2 { margin-top: 0; }
+
+/* ── Size-help dialog ─────────────────────────────────────────────── */
+.stk-dialog {
+    border: 0; border-radius: var(--radius); padding: 0;
+    max-width: 560px; width: calc(100% - 32px);
+    box-shadow: var(--shadow-pop); color: var(--ink); background: var(--card);
+}
+.stk-dialog::backdrop { background: rgba(18, 34, 22, 0.55); }
+.stk-dialog-body { padding: 26px; }
+.stk-dialog h2 { font-family: var(--font-display); font-size: 21px; margin: 0 0 12px; }
+.stk-dialog p { font-size: 14.5px; color: var(--ink-soft); margin: 0 0 12px; }
+.stk-dialog strong { color: var(--ink); }
+.stk-dialog-close { margin-top: 6px; }
+
+/* ── Lead panel ───────────────────────────────────────────────────── */
+/* Styled with core .field primitives — NOT nwca-form-shared.css, which would
+   repaint the whole page (see the header note). */
+.stk-lead { display: none; margin-top: 16px; border-top: 1px solid var(--line); padding-top: 16px; }
+.stk-lead.is-open { display: block; }
+.stk-lead h3 { font-family: var(--font-display); font-size: 17px; margin: 0 0 4px; }
+.stk-lead-sub { font-size: 13px; color: var(--ink-soft); margin: 0 0 12px; }
+.stk-lead-grid { display: grid; gap: 10px; }
+.stk-lead label { display: block; font-size: 12.5px; font-weight: 600; margin-bottom: 3px; }
+.stk-lead input, .stk-lead textarea {
+    width: 100%; padding: 9px 10px; font: inherit; font-size: 14px;
+    border: 1px solid var(--line-strong); border-radius: var(--radius-sm);
+    background: var(--card); color: var(--ink);
+}
+.stk-lead .is-error { border-color: var(--bad); }
+.stk-hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+/* ── Alerts ───────────────────────────────────────────────────────── */
+.stk-alert { border-radius: var(--radius-sm); padding: 14px 16px; margin: 16px 0; font-size: 14px; }
+.stk-alert[hidden] { display: none; }
+.stk-alert-error { background: var(--bad-soft); border: 1px solid var(--bad); color: #7f1d1d; }
+.stk-alert-warn { background: var(--warn-soft); border: 1px solid var(--warn); color: #78350f; }
+.stk-alert strong { display: block; margin-bottom: 3px; }
+
+.stk-toast {
+    position: fixed; left: 50%; bottom: calc(var(--stk-bar-h) + 18px); transform: translateX(-50%);
+    background: var(--green-950); color: #fff; padding: 10px 18px; border-radius: 999px;
+    font-size: 13.5px; z-index: 290; opacity: 0; pointer-events: none; transition: opacity 0.18s ease;
+}
+.stk-toast.is-up { opacity: 1; }
+
+/* ── Responsive ───────────────────────────────────────────────────── */
+/* Single breakpoint at 900px: above it two columns, below it one. Combined with
+   the always-on bar this closes the 561–900px band (iPad portrait, small laptop
+   windows) that a mobile-only bar would strand. */
+@media (max-width: 900px) {
+    /* One column, and the price moves up: headline → configurator → diagram.
+       DOM order is unchanged (copy, card, figure is already the reading order
+       for a screen reader); this is presentation only. */
+    .stk-hero { grid-template-columns: 1fr; grid-template-rows: none; gap: 20px; padding-top: 14px; }
+    .stk-hero-copy { grid-column: 1; grid-row: auto; order: 1; }
+    .stk-card { grid-column: 1; grid-row: auto; order: 2; }
+    .stk-figure { grid-column: 1; grid-row: auto; order: 3; }
+    .stk-trust-grid, .stk-steps { grid-template-columns: 1fr 1fr; gap: 20px; }
+
+    /* The 11-row ladder does not fit; it collapses to a select whose option
+       labels carry price + savings, and the full table moves into a details. */
+    .stk-ladder-wrap { display: none; }
+    .stk-qty-select { display: block; }
+    .stk-qty-select select {
+        width: 100%; min-height: 44px; padding: 10px; font: inherit; font-size: 15px;
+        border: 1px solid var(--line-strong); border-radius: var(--radius-sm); background: var(--card);
+    }
+    .stk-size-row { min-height: 44px; }
+}
+@media (min-width: 901px) {
+    .stk-qty-select { display: none; }
+}
+@media (max-width: 620px) {
+    .stk-trust-grid, .stk-steps { grid-template-columns: 1fr; }
+    .stk-rates { grid-template-columns: 1fr; }
+
+    /* Keep only the strongest reassurance ("you approve a proof before we print
+       or charge") above the configurator. The other two are repeated verbatim in
+       the trust band below, and each one costs ~30px of the distance between the
+       top of the screen and the price. */
+    .stk-trust-line li:nth-child(n + 2) { display: none; }
+    .stk-deck { margin-bottom: 12px; font-size: 16px; }
+    .stk-trust-line { margin-bottom: 16px; }
+    .stk-hero-copy h1 { font-size: 27px; }
+}

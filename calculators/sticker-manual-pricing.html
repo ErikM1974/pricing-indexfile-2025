@@ -61,6 +61,18 @@
             <strong>Unable to load sticker pricing.</strong> Refresh the page, or contact Erik if this persists.
         </div>
 
+        <!-- Backup rate card notice — shown when the API answers 200 but served
+             its inline fallback (or a degraded read) instead of live Caspio.
+             Rule 4: a hardcoded fallback is only allowed WITH a visible warning. -->
+        <!-- Reuses .pricing-error deliberately: sticker-pricing-page.css is shared
+             by 5 pages (2 are quote builders), so this page adds no new CSS and
+             does not bump that file's ?v=. Red is the right severity anyway — a
+             rep about to quote from a backup card should notice. -->
+        <div id="pricingSourceWarn" class="pricing-error" role="alert" hidden>
+            <strong>Showing the backup rate card.</strong> Live Caspio pricing didn&rsquo;t load, so these are
+            our last published prices. Confirm the total before you send the quote.
+        </div>
+
         <!-- ========== Banner pricing — short, fast lookup, sits above sticker tables ========== -->
         <details class="pricing-accordion" id="bannerAccordion">
             <summary class="pricing-accordion-toggle">
@@ -280,6 +292,6 @@
          fallback (same pattern as the other calculators). True Rule #6 compliance
          would need a shared config file defining APP_CONFIG.API.BASE_URL — a
          codebase-wide change, out of scope here. -->
-    <script src="/shared_components/js/sticker-pricing-page.js?v=2026.06.18.7"></script>
+    <script src="/shared_components/js/sticker-pricing-page.js?v=2026.07.24.2"></script>
 </body>
 </html>
