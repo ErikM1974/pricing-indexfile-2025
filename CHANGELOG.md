@@ -1,3 +1,8 @@
+## v2026.07.23.5 (2026.07.23)
+
+- Deploy v2026.07.23.5: 5 files (ACTIVE_FILES.md,LESSONS_LEARNED.md,fall-catalog-2026.css...)
+- Fall Catalog '26 now API-driven: cards hydrate images + server price labels from products/search?styleNumbers=, click through to product pages (proxy fix surfaces PRODUCT_STATUS='New' styles in catalog search)
+
 ## v2026.07.23.4 (2026.07.23)
 
 - Deploy v2026.07.23.4: 10 files (ACTIVE_FILES.md,index.html,catalog.html,...)
