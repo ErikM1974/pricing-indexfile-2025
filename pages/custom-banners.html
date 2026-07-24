@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Custom vinyl banners printed in Milton, WA. See the price for every size before you ask - 2x4 up to 4x10 ft and any custom size. 13 oz Ultraflex, sewn hems and brass grommets included, $10 per square foot.">
+    <meta name="robots" content="index, follow">
+    <title>Custom Vinyl Banners &mdash; Every Size Priced | Northwest Custom Apparel</title>
+
+    <link rel="canonical" href="https://www.teamnwca.com/custom-banners">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Custom Vinyl Banners - every size priced, no login">
+    <meta property="og:description" content="13 oz Ultraflex vinyl, sewn hems and #2 brass grommets included. $10 per square foot, $40 minimum. Printed in Milton, WA since 1977.">
+    <meta property="og:image" content="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png">
+    <meta property="og:url" content="https://www.teamnwca.com/custom-banners">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <link rel="preconnect" href="https://cdn.caspio.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="icon" href="/favicon.png" type="image/png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/shared_components/css/nwca-2026-core.css?v=2026.07.13.4">
+    <link rel="stylesheet" href="/pages/css/instant-quote.css?v=2026.07.24.4">
+    <link rel="stylesheet" href="/pages/css/custom-banners.css?v=2026.07.24.4">
+    <!-- Do NOT add sticker-pricing-page.css or nwca-form-shared.css - both
+         declare :root tokens that collide with core. See instant-quote.css. -->
+</head>
+<body>
+    <a class="skip-link" href="#configurator">Skip to pricing</a>
+
+    <!-- Utility strip -->
+    <div class="util-strip">
+        <div class="util-inner">
+            <p class="util-fam"><strong>Northwest Custom Apparel</strong> — family-owned in Milton, WA since 1977</p>
+            <div class="util-contact">
+                <span class="util-hours">Mon–Fri 8:30–5:00 PT</span>
+                <a href="tel:253-922-5793">253-922-5793</a>
+                <a class="util-mail" href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a>
+                <a href="/staff-dashboard.html" title="Staff Portal">Staff</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Masthead -->
+    <header class="nav-bar">
+        <div class="nav-bar-inner">
+            <button class="mobile-menu-btn" id="mobileMenuBtn" type="button" aria-label="Open menu" aria-controls="sidebar">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+
+            <a href="/" class="brand" title="Northwest Custom Apparel — Home">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                     alt="Northwest Custom Apparel" class="brand-logo" width="160" height="46">
+            </a>
+
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/catalog" class="nav-link nav-products" aria-haspopup="true" aria-expanded="false">
+                        Products
+                        <svg class="nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </a>
+                    <div class="nav-dropdown mega-dropdown">
+                        <div class="dropdown-content">
+                            <div id="navDropdownSearch"></div>
+                            <div class="dropdown-categories" id="navCategories"></div>
+                        </div>
+                    </div>
+                </li>
+                <li class="nav-item brands-nav-item" data-dropdown="brands">
+                    <a href="/brands.html" class="nav-link nav-brands" aria-haspopup="true" aria-expanded="false">
+                        Brands
+                        <svg class="nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </a>
+                    <div class="nav-dropdown brands-dropdown mega-dropdown">
+                        <div class="dropdown-content">
+                            <div class="brands-grid" id="navBrandsGrid">
+                                <div class="brands-loading">Loading brands…</div>
+                            </div>
+                            <div class="brands-footer">
+                                <a href="/brands.html" class="view-all-brands-link">View all brands →</a>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <!-- Plain .nav-item, deliberately NOT --p1/--p2: core hides those
+                     at every viewport once the quote badge appears, which would
+                     make this link vanish for exactly the returning customers
+                     most likely to add stickers to an apparel order. -->
+                <li class="nav-item">
+                    <a href="/custom-stickers" class="nav-link">Stickers</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/custom-banners" class="nav-link" aria-current="page">Banners <span class="flag-new">New</span></a>
+                </li>
+                <li class="nav-item">
+                    <a href="/catalog?topSellers=1" class="nav-link">Top Sellers</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/pages/request-a-quote.html" class="nav-link">Get a Quote</a>
+                </li>
+            </ul>
+
+            <div class="nav-search" role="search">
+                <input type="text" id="navSearchInput" class="nav-search-input"
+                       placeholder="Search styles — PC61, hoodies, caps…" autocomplete="off"
+                       role="combobox" aria-expanded="false" aria-autocomplete="list"
+                       aria-controls="navAutocompleteList" aria-label="Search products">
+                <div id="navAutocompleteList" class="nav-autocomplete-list" role="listbox" aria-label="Product suggestions"></div>
+                <button id="navSearchBtn" class="nav-search-btn" type="button" aria-label="Search">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <a class="quote-badge" href="/quote-cart" data-quote-badge hidden>
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"></path>
+                    <rect x="9" y="3" width="6" height="4" rx="1"></rect>
+                    <path d="M9 12h6"></path><path d="M9 16h6"></path>
+                </svg>
+                <span class="quote-badge-label">Quote</span>
+                <span class="quote-badge-count" data-quote-badge-count>0</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Drawer -->
+    <aside class="sidebar" id="sidebar" aria-label="Browse menu">
+        <div class="drawer-head">
+            <span class="drawer-head-title">Browse NWCA</span>
+            <button class="drawer-close" id="drawerClose" type="button" aria-label="Close menu">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+        <nav class="drawer-links" aria-label="Quick links">
+            <a href="/">Home</a>
+            <a href="/catalog">Catalog</a>
+            <a href="/custom-stickers">Custom Stickers</a>
+            <a href="/custom-banners">Vinyl Banners <span class="flag-new">New</span></a>
+            <a href="/pages/fall-catalog-2026.html">Fall Catalog '26</a>
+            <a href="/catalog?topSellers=1">Top Sellers &amp; Free Samples</a>
+            <a href="/brands.html">Brands</a>
+            <a href="/pages/webstore-info.html">Custom Webstores</a>
+        </nav>
+        <h3 class="drawer-subhead">Shop by category</h3>
+        <ul class="category-list" id="categoryList"></ul>
+        <div class="drawer-contact">
+            Questions? A human answers.<br>
+            <a href="tel:253-922-5793">253-922-5793</a><br>
+            <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a><br>
+            2025 Freeman Rd E, Milton, WA 98354
+        </div>
+    </aside>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <main id="main">
+        <div class="wrap">
+
+            <div class="stk-alert stk-alert-error" id="bnAlert" role="alert" hidden>
+                <strong>We can't load live pricing right now.</strong>
+                We'd rather show you nothing than a price we're not sure about.
+                Refresh, or call <a href="tel:253-922-5793">(253) 922-5793</a> &mdash; we'll price it on the phone in about a minute.
+            </div>
+            <div class="stk-alert stk-alert-warn" id="bnWarn" role="alert" hidden>
+                <strong>These are our last published prices.</strong>
+                Live pricing didn't load just now, so please confirm your total with us before you order &mdash; <a href="tel:253-922-5793">(253) 922-5793</a>.
+            </div>
+
+            <section class="stk-hero">
+                <div class="stk-hero-copy">
+                    <h1>Custom vinyl banners</h1>
+                    <p class="stk-deck">Printed in Milton, Washington since 1977. Pick a size &mdash; the price is already on the screen.</p>
+                    <ul class="stk-trust-line">
+                        <li>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>
+                            Sewn hems and #2 brass grommets included
+                        </li>
+                        <li>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                            13 oz Ultraflex &mdash; built for outdoors
+                        </li>
+                        <li>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                            Free pickup in Milton, or we ship
+                        </li>
+                    </ul>
+
+                </div>
+
+                <!-- Sibling of the copy, not a child: on mobile it has to drop BELOW
+                     the configurator, and it can only be reordered independently if
+                     it is its own grid item (same as /custom-stickers). -->
+                <figure class="stk-figure">
+                        <svg id="bnFigure" viewBox="0 0 460 220" role="img" aria-labelledby="bnFigureTitle">
+                            <title id="bnFigureTitle">Banner sizes at true relative scale next to a six-foot person</title>
+                        </svg>
+                        <figcaption class="stk-figure-note">Sizes shown at true relative scale.</figcaption>
+                </figure>
+
+                <div class="stk-card" id="configurator">
+                    <fieldset>
+                        <div class="stk-legend-row">
+                            <legend>Choose a size</legend>
+                            <button type="button" class="stk-textbtn" id="bnSizeHelp">Size help</button>
+                        </div>
+                        <table class="stk-ladder bn-ladder" id="bnLadder">
+                            <caption>Price per banner by size</caption>
+                            <tbody></tbody>
+                        </table>
+                        <div class="bn-custom" id="bnCustomWrap">
+                            <input type="number" id="bnW" inputmode="decimal" step="0.5" min="0.5" placeholder="Width" aria-label="Width in feet">
+                            <span aria-hidden="true">&times;</span>
+                            <input type="number" id="bnH" inputmode="decimal" step="0.5" min="0.5" placeholder="Height" aria-label="Height in feet">
+                            <span>ft</span>
+                            <button type="button" class="stk-textbtn" id="bnCustomGo">Price it</button>
+                        </div>
+                        <p class="stk-inline-note" id="bnSizeNote" hidden></p>
+                    </fieldset>
+
+                    <fieldset class="bn-qty-fs">
+                        <div class="stk-legend-row"><legend>How many?</legend></div>
+                        <div class="bn-qty-row">
+                            <button type="button" class="bn-step" id="bnMinus" aria-label="One fewer">&minus;</button>
+                            <input type="number" id="bnQty" value="1" min="1" step="1" inputmode="numeric" aria-label="Quantity">
+                            <button type="button" class="bn-step" id="bnPlus" aria-label="One more">+</button>
+                            <span class="bn-qty-note">Same price each &mdash; banners have no volume break.</span>
+                        </div>
+                    </fieldset>
+
+                    <div class="stk-price">
+                        <output class="stk-price-total" id="bnTotal" aria-live="polite" aria-atomic="true">&mdash;</output>
+                        <span class="stk-price-unit" id="bnUnit"></span>
+                    </div>
+
+                    <button type="button" class="stk-cta" id="bnCta">Get this in writing &rarr;</button>
+                    <p class="stk-cta-sub">Next: send your artwork. You approve a proof before we print or charge anything.</p>
+
+                    <div class="stk-below">
+                        <fieldset class="bn-opts">
+                            <legend class="bn-opts-legend">Finishing</legend>
+                            <label><input type="checkbox" id="bnDouble"> Double-sided</label>
+                            <label><input type="checkbox" id="bnPockets"> Pole pockets (top &amp; bottom)</label>
+                            <p class="bn-included">Sewn hems and #2 brass grommets every 24&Prime; are already included.</p>
+                        </fieldset>
+                        <p id="bnSetupLine"></p>
+                        <p id="bnDelivery">Ready 10&ndash;12 business days from artwork approval. Free pickup in Milton, WA.</p>
+                        <div class="stk-keep">
+                            <span class="stk-keep-label">Keep this price:</span>
+                            <button type="button" id="bnCopyLink">Copy link</button>
+                            <button type="button" id="bnPrint">Print</button>
+                        </div>
+                    </div>
+
+                    <div class="stk-lead" id="bnLead">
+                        <h3 id="bnLeadTitle">Where should we send it?</h3>
+                        <p class="stk-lead-sub">We'll email you this exact quote &mdash; usually within the hour.</p>
+                        <div class="stk-lead-grid">
+                            <div><label for="bnName">Your name</label><input type="text" id="bnName" autocomplete="name"></div>
+                            <div><label for="bnEmail">Email</label><input type="email" id="bnEmail" autocomplete="email"></div>
+                            <div><label for="bnPhone">Phone</label><input type="tel" id="bnPhone" autocomplete="tel"></div>
+                            <div><label for="bnCompany">Company <span style="font-weight:400">(optional)</span></label><input type="text" id="bnCompany" autocomplete="organization"></div>
+                            <div><label for="bnMessage">What's it for? <span style="font-weight:400">(optional)</span></label><textarea id="bnMessage" rows="2"></textarea></div>
+                            <div class="stk-hp"><label for="bnHp">Website</label><input type="text" id="bnHp" tabindex="-1" autocomplete="off"></div>
+                        </div>
+                        <p class="stk-inline-note is-error" id="bnLeadError" hidden></p>
+                        <button type="button" class="stk-cta" id="bnLeadSubmit">Send my quote request</button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="stk-band">
+                <div class="stk-trust-grid">
+                    <div>
+                        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="m9 15 2 2 4-4"></path></svg>
+                        <h3>Approve a proof first</h3>
+                        <p>Nothing prints and nothing bills until you sign off on a digital proof. A real person sends it.</p>
+                    </div>
+                    <div>
+                        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        <h3>Finished, not just printed</h3>
+                        <p>Sewn hems and #2 brass grommets every 24 inches are included in the price &mdash; not an upsell.</p>
+                    </div>
+                    <div>
+                        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 21h18"></path><path d="M5 21V7l7-4 7 4v14"></path><path d="M9 21v-6h6v6"></path></svg>
+                        <h3>Printed here, not brokered</h3>
+                        <p>Milton, Washington since 1977. Family-owned, one building. You can pick your order up.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="stk-band">
+                <h2>Every size, priced</h2>
+                <p class="stk-band-sub">$10 per square foot, $40 minimum. No login, no &ldquo;request a quote&rdquo;. Any size you like &mdash; these are just the common ones.</p>
+                <div id="bnRateCard"></div>
+                <p class="stk-rate-foot">
+                    Prices exclude Washington sales tax and shipping. Pickup in Milton is free.
+                    Finishing extras and double-sided printing are priced on top; your quote shows them itemised.
+                </p>
+            </section>
+
+            <section class="stk-band">
+                <div class="stk-cross">
+                    <h2>Also printing stickers?</h2>
+                    <p class="stk-band-sub">
+                        We print <strong>die-cut vinyl stickers</strong> from 50 pieces up, with every price published,
+                        and <strong>large-format decals</strong> by the square foot. And we decorate apparel &mdash; so it can
+                        all be one order and one invoice.
+                    </p>
+                    <a class="btn btn-primary" href="/custom-stickers">See sticker pricing &rarr;</a>
+                </div>
+            </section>
+
+            <section class="stk-band stk-faq">
+                <h2>Questions</h2>
+                <details>
+                    <summary>What's included in the price?</summary>
+                    <p>Full-colour print on 13 oz Ultraflex Ultima Pro front-lit matte vinyl, sewn hems all the way round, and #2 brass grommets every 24 inches. That's the finished banner &mdash; hems and grommets aren't extras.</p>
+                </details>
+                <details>
+                    <summary>Is there a minimum?</summary>
+                    <p>$40 per banner. Because of that, every banner up to about 4 square feet (2 &times; 2 ft) costs the same $40 &mdash; going smaller than that doesn't reduce the price.</p>
+                </details>
+                <details>
+                    <summary>Do I get a discount for ordering several?</summary>
+                    <p>Not on the banner itself &mdash; banners are priced by the square foot, so ten cost ten times one. Where you save is size and setup: one art setup covers the whole order, however many you print.</p>
+                </details>
+                <details>
+                    <summary>How big can you go?</summary>
+                    <p>Any length. Our roll prints up to 52 inches wide, so a banner whose shorter side is over 52 inches is seamed from panels &mdash; still one banner, and we'll tell you before we print.</p>
+                </details>
+                <details>
+                    <summary>How long does it take?</summary>
+                    <p>10&ndash;12 business days from artwork approval. The clock starts when you approve your proof, not when you order. Need it faster? Rush production is available &mdash; ask your rep.</p>
+                </details>
+                <details>
+                    <summary>Can you do pole pockets instead of grommets?</summary>
+                    <p>Yes &mdash; pole pockets are priced by the linear foot and can go top, bottom or both. Tick the box above and your quote shows them itemised.</p>
+                </details>
+                <details>
+                    <summary>Is sales tax included?</summary>
+                    <p>No. Washington sales tax is added on your invoice.</p>
+                </details>
+            </section>
+        </div>
+    </main>
+
+    <dialog class="stk-dialog" id="bnSizeDialog">
+        <div class="stk-dialog-body">
+            <h2>Picking a banner size</h2>
+            <p><strong>Banners are priced by the square foot</strong> &mdash; $10 per square foot, with a $40 minimum per banner. A 3 &times; 6 ft banner is 18 square feet, so it's $180.</p>
+            <p><strong>Any size works.</strong> The sizes listed are the ones people ask for most, but enter whatever you need and we'll price it.</p>
+            <p><strong>Under about 4 square feet the $40 minimum takes over</strong>, so a 2 &times; 2 ft banner and a 1 &times; 1 ft banner both cost $40. If you're that small, go bigger &mdash; it's free.</p>
+            <p><strong>Our roll prints 52 inches wide.</strong> Length is unlimited, but if the SHORTER side of your banner is over 52 inches we seam it from panels. Still one banner &mdash; we'll just tell you before we print.</p>
+            <p><strong>Your rep confirms the finished size and price on your proof &mdash; before anything is printed or charged.</strong></p>
+            <button type="button" class="btn btn-primary stk-dialog-close" id="bnSizeDialogClose">Got it</button>
+        </div>
+    </dialog>
+
+    <div class="stk-bar" id="bnBar" hidden>
+        <div class="stk-bar-summary">
+            <strong id="bnBarTotal">&mdash;</strong>
+            <span id="bnBarDetail"></span>
+        </div>
+        <button type="button" class="stk-bar-cta" id="bnBarCta">Get this in writing &rarr;</button>
+    </div>
+
+    <div class="stk-toast" id="bnToast" role="status" aria-live="polite"></div>
+
+<footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20White%20Text.png?ver=1" alt="Northwest Custom Apparel" width="180" height="52" loading="lazy">
+                <p>Family-owned custom apparel decorator in Milton, Washington. Embroidery, screen printing, DTG, and DTF — done in-house since 1977.</p>
+                <span class="footer-est">Est. 1977 · Milton, WA</span>
+            </div>
+            <div class="footer-col">
+                <h3>Shop</h3>
+                <ul>
+                    <li><a href="/catalog">Product Catalog</a></li>
+                    <li><a href="/custom-stickers">Custom Stickers</a></li>
+                    <li><a href="/custom-banners">Vinyl Banners</a></li>
+                    <li><a href="/pages/fall-catalog-2026.html">Fall Catalog '26</a></li>
+                    <li><a href="/catalog?topSellers=1">Top Sellers</a></li>
+                    <li><a href="/brands.html">Brands</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Services</h3>
+                <ul>
+                    <li><a href="/custom-stickers">Die-Cut Stickers</a></li>
+                    <li><a href="/custom-banners">Vinyl Banners</a></li>
+                    <li><a href="/golf-tournament-apparel?utm_source=catalog&amp;utm_campaign=golf-2026-q2&amp;utm_medium=footer">Tournament Packages</a></li>
+                    <li><a href="/pages/webstore-info.html">Custom Webstores</a></li>
+                    <li><a href="/calculators/laser-tumbler-polarcamel.html">Laser-Engraved Tumblers</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Contact</h3>
+                <address>
+                    2025 Freeman Rd E<br>
+                    Milton, WA 98354<br>
+                    <a href="tel:253-922-5793">253-922-5793</a><br>
+                    <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a><br>
+                    Mon–Fri 8:30–5:00 PT
+                </address>
+                <ul><li><a href="/staff-dashboard.html">Staff Portal</a></li></ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="footer-bottom-inner">
+                <span>© 2026 Northwest Custom Apparel</span>
+                <span>Family-owned &amp; operated since 1977</span>
+            </div>
+        </div>
+    </footer>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://www.teamnwca.com/" },
+            { "@type": "ListItem", "position": 2, "name": "Custom Vinyl Banners", "item": "https://www.teamnwca.com/custom-banners" }
+          ]
+        },
+        {
+          "@type": "Product",
+          "name": "Custom Vinyl Banners",
+          "description": "Full-colour custom vinyl banners on 13 oz Ultraflex Ultima Pro front-lit matte, with sewn hems and #2 brass grommets included. Any size. Printed in Milton, Washington.",
+          "brand": { "@type": "Brand", "name": "Northwest Custom Apparel" },
+          "material": "13 oz Ultraflex Ultima Pro front-lit matte vinyl",
+          "manufacturer": {
+            "@type": "Organization",
+            "name": "Northwest Custom Apparel",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "2025 Freeman Rd E",
+              "addressLocality": "Milton", "addressRegion": "WA",
+              "postalCode": "98354", "addressCountry": "US"
+            },
+            "telephone": "+1-253-922-5793"
+          }
+        }
+      ]
+    }
+    </script>
+
+    <script src="/config/app.config.js"></script>
+    <script src="/product-search-service.js?v=2026.06.11.11"></script>
+    <script src="/shared_components/js/decoration-methods.js?v=2026.06.11.5"></script>
+    <script src="/brands-flyout.js?v=2026.07.13.13"></script>
+    <script src="/shared_components/js/nav-dropdown.js?v=2026.07.13.4" defer></script>
+    <script src="/app-modern.js?v=4" defer></script>
+    <script src="/shared_components/js/quote-cart-store.js?v=2026.07.04.2" defer></script>
+    <script src="/pages/js/custom-banners-ladder.js?v=2026.07.24.4" defer></script>
+    <script src="/pages/js/custom-banners.js?v=2026.07.24.4" defer></script>
+</body>
+</html>

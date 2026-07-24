@@ -1,6 +1,14 @@
 /* =============================================================================
-   custom-stickers.css — page layer for /custom-stickers
-   Loads AFTER nwca-2026-core.css and uses ITS tokens.
+   instant-quote.css — the SHARED instant-price configurator.
+   Used by /custom-stickers and /custom-banners. Loads AFTER nwca-2026-core.css
+   and uses ITS tokens.
+
+   Was custom-stickers.css until 2026-07-24; renamed when the banner page became
+   the second consumer. The `stk-` class prefix is kept deliberately rather than
+   churn every selector across two live pages — read it as "instant-quote", not
+   "sticker". Page-specific styling lives in pages/css/custom-{stickers,banners}.css.
+
+   🔴 A CHANGE HERE HITS BOTH PAGES. Check the other one before you ship.
 
    🔴 DECLARES NO :root. Two other stylesheets in this repo define colliding
    token names with different values — shared_components/css/sticker-pricing-page.css
