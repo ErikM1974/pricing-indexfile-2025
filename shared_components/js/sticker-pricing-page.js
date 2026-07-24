@@ -3,8 +3,9 @@
  *
  * Page logic for /calculators/sticker-manual-pricing.html:
  *   1. Fetch /api/sticker-pricing on load, render 5 pricing tables (one per size).
- *   2. AI chat panel — open/close, SSE streaming chat with Claude via
- *      /api/contract-sticker-ai/chat.
+ *   2. AI chat panel — open/close, SSE streaming chat with Claude via the
+ *      session-gated same-origin forwarder /api/sticker-ai/chat (which relays to
+ *      the proxy's /api/contract-sticker-ai/chat with the server secret).
  *   3. Parse PRICE_QUOTE blocks from the AI stream → highlight matching
  *      pricing-table row(s) on the page.
  *   4. Parse CUSTOMER_FINAL + EMAIL DRAFT blocks → render email-draft card,
@@ -25,7 +26,15 @@
     // -----------------------------------------------------------------
     const API_BASE_URL = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
         || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
-    const AI_ENDPOINT = API_BASE_URL + '/api/contract-sticker-ai/chat';
+    // SAME-ORIGIN, deliberately (2026-07-24). The AI chat is the one call on
+    // this page that can surface customer PII (lookup_customer returns email,
+    // phone, address, sales rep, payment terms), so it goes through the app's
+    // session-gated forwarder — which proves a SAML session and then talks to
+    // the proxy with the server secret. The browser never holds a credential and
+    // the proxy endpoint is no longer anonymously callable.
+    // Do NOT point this back at API_BASE_URL. See server.js "STICKER / BANNER AI
+    // ASSIST". The pricing/quote calls below stay direct — they carry no PII.
+    const AI_ENDPOINT = '/api/sticker-ai/chat';
     const QUOTE_PREFIX = 'STK';
 
     // -----------------------------------------------------------------

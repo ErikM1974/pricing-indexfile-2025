@@ -3559,6 +3559,71 @@ app.post(
 );
 console.log('✓ Policies AI Assist proxy loaded (forwards to caspio-pricing-proxy/api/policies-ai-assist)');
 
+// =============================================================================
+// STICKER / BANNER AI ASSIST — streaming proxy to caspio-pricing-proxy.
+//
+// SECURITY (2026-07-24): the browser used to call the proxy's
+// /api/contract-sticker-ai/chat DIRECTLY, and that endpoint was mounted with no
+// authentication at all. Its lookup_customer tool returns company, contact name,
+// email, phone, street address, sales rep, payment terms and last-ordered date —
+// five matches for any two-character query. Anyone on the internet could read
+// the customer list with curl.
+//
+// The fix is the one src/middleware/index.js:70 names as the airtight option:
+// the browser can't hold a server secret, so route it through the app, which
+// can. requireStaff proves a SAML session here; CRM_API_SECRET authenticates us
+// to the proxy server-to-server. Anonymous callers now fail at BOTH hops.
+//
+// Same client contract as before: POST returns text/event-stream with
+// delta / tool_result / done / error events.
+//
+// ⚠️ DEPLOY ORDER: ship THIS app first, then the proxy's secret gate. The
+// reverse order breaks the staff page for as long as the two are out of step
+// (MEMORY.md: "never flip secret-only until every caller repointed" — bit 3×).
+// =============================================================================
+app.post(
+  '/api/sticker-ai/chat',
+  requireStaff,
+  express.json({ limit: '256kb' }),
+  async (req, res) => {
+    const target = `${CRM_API_BASE}/api/contract-sticker-ai/chat`;
+    try {
+      const upstream = await fetch(target, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'text/event-stream',
+          'X-CRM-API-Secret': CRM_API_SECRET
+        },
+        body: JSON.stringify(req.body || {})
+      });
+
+      res.status(upstream.status);
+      res.setHeader('Content-Type', upstream.headers.get('content-type') || 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache, no-transform');
+      res.setHeader('Connection', 'keep-alive');
+      res.setHeader('X-Accel-Buffering', 'no');
+
+      if (!upstream.body) {
+        res.end();
+        return;
+      }
+      for await (const chunk of upstream.body) {
+        res.write(chunk);
+      }
+      res.end();
+    } catch (e) {
+      console.error('[sticker-ai proxy] error:', e.message);
+      if (!res.headersSent) {
+        res.status(502).json({ error: 'Upstream AI service unavailable', detail: e.message });
+      } else {
+        res.end();
+      }
+    }
+  }
+);
+console.log('✓ Sticker AI proxy loaded (session-gated, forwards to caspio-pricing-proxy/api/contract-sticker-ai/chat)');
+
 console.log('✓ CRM API proxy routes loaded (session-protected)');
 
 // robots.txt — staff/internal paths + credential-bearing share links disallowed (2026-06-11)
@@ -3716,6 +3781,31 @@ app.get('/quote-builders/:page', (req, res, next) => {
     console.error('[asset-manifest] builder page rewrite failed, falling back to static:', err.message);
     next();
   }
+});
+
+// -----------------------------------------------------------------------------
+// STAFF-GATED CALCULATOR PAGES — must be registered BEFORE the /calculators
+// static mount below, or Express serves the file and never reaches the gate.
+//
+// The sticker page fronts the AI quote assistant, whose lookup_customer tool
+// returns customer name, email, phone, street address, sales rep and payment
+// terms. It was reachable anonymously at BOTH of these URLs — `noindex` is not
+// access control (2026-07-24, Erik: "we don't want the user on the public site
+// to see customer info").
+//
+// requireStaff BOUNCES to SSO rather than hard-locking, so a logged-in rep never
+// notices; only an anonymous visitor is stopped. Do NOT blanket-gate
+// /calculators — laser-tumbler-polarcamel.html and embroidered-emblem/ are
+// customer-facing.
+//
+// The customer-facing sticker experience is a separate public page (planned
+// /custom-stickers) that calls NO AI endpoint at all.
+app.get(['/calculators/sticker-manual-pricing.html', '/pricing/stickers'], requireStaff, (req, res) => {
+  // Header, not robots.txt Disallow: a Disallow would stop Google FETCHING the
+  // page, so it could never see the page's own noindex meta — and a disallowed
+  // URL with inbound links can still surface as a bare result.
+  res.set('X-Robots-Tag', 'noindex, nofollow');
+  res.sendFile(path.join(__dirname, 'calculators', 'sticker-manual-pricing.html'));
 });
 
 // Serve specific directories as static
@@ -9286,9 +9376,9 @@ app.get('/pricing/dtf', (req, res) => {
   res.sendFile(path.join(__dirname, 'calculators', 'dtf-pricing.html'));
 });
 
-app.get('/pricing/stickers', (req, res) => {
-  res.sendFile(path.join(__dirname, 'calculators', 'sticker-manual-pricing.html'));
-});
+// /pricing/stickers MOVED (2026-07-24) — it now lives with the other staff-gated
+// calculator pages, registered before the /calculators static mount so the gate
+// actually runs. Search for "STAFF-GATED CALCULATOR PAGES".
 
 // Cart Sessions API
 app.get('/api/cart-sessions', async (req, res) => {
