@@ -1,3 +1,8 @@
+## v2026.07.24.3 (2026.07.24)
+
+- Phase 2: "Get this in writing" produces a real quote + tokenised share link
+- Deploy v2026.07.24.3: 3 files (quote-management.html,custom-stickers.html,quote-view.html,...)
+
 ## v2026.07.24.2 (2026.07.24)
 
 - Sticker page: derived per-sticker price, backup-card warning, fee row fix
