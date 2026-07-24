@@ -6,6 +6,12 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 
 ---
 
+### products/search silently hid every PRODUCT_STATUS='New' style — misread as "not in the DB" (2026-07-23)
+- **Problem**: All 179 Fall-2026 styles probed via `products/search?q=` returned 0 → Fall Catalog was built as a static PDF-sourced page (no API images, no prices, quote-form links). Erik caught it: styles were in the DB all along.
+- **Root Cause**: (a) `/api/products/search` was the ONLY route filtering `PRODUCT_STATUS='Active'` (exact equality) while new SanMar rows carry `'New'` — siblings use `<>'Discontinued'` and stylesearch/product-colors have no status filter; (b) verification relied on ONE endpoint. Two more bugs found during the fix: Phase-2 `STYLE IN` variant fetch had no `q.orderBy` → silent row drops made whole styles vanish from 50-style pages (the 2026-07-12 fetchAllCaspioPages lesson, re-bitten); Phase-1 groupBy emits one row per style×price, so list requests paginated real styles away.
+- **Solution**: proxy `abd1666`+`6912215`+`2e501bc` — default status `<>'Discontinued'`, new sanitized `?styleNumbers=CSV` filter (dedupes styles pre-pagination, skips non-SanMar merge), `q.orderBy:'PK_ID'` on Phase 2, cap-config-by-title fallback for the empty `CATEGORY_NAME` on 'New' rows; 8-test `products-search-route.test.js`. Fall page rebuilt API-driven.
+- **Prevention**: never conclude "not in the database" from one endpoint — cross-check `stylesearch` + `product-colors` + `pricing-bundle` before designing around absence; when one route's results contradict its siblings, diff their WHERE clauses first; `PRODUCT_STATUS='New'` rows also ship with EMPTY `CATEGORY_NAME` (category-based logic needs a fallback).
+
 ### New staff-dashboard sidebar section = solid green square (missing SVG mask) (2026-07-22)
 - **Problem**: AE Mission Control, Leads, Jim's Mailing List, and Forms rendered as solid NW-green squares in the sidebar (their `→` also a faint gray nub) while the older sections showed clean icons.
 - **Root Cause**: the sidebar does NOT display the emoji in `<span aria-hidden>`. `dashboard-v3-theme.css` sets that span to `font-size:0` + `background-color:var(--nw-green)` and cuts it out with a per-section `mask-image` (inline SVG). Each of the 4 sections was added AFTER the masking system and never got its `[data-section="X"] … :first-child { mask-image }` rule — no mask = green floods the whole 18×18 box. Same for the trailing-arrow `:last-child` (base `background-color:var(--ink-dim)` → gray nub).
@@ -85,12 +91,6 @@ Laser-patch EMB (EMB-2026-313) printed a $360 products table against a $420 Subt
 ### Push button stranded disabled (2026-06-07, ARCHIVED 2026-06-11): never replace a button's innerHTML when code reads a child by ID; gate the action button from the SAME function that renders its readiness checklist. Full entry in archive.
 
 ### OnSite DROPS the pushed order-level tax field — tax stays manual (2026-06-07): order-level tax fields (`coa_AccountSalesTax01`, `TaxPartNumber`, per-line `sts_EnableTax*`) do NOT survive the MO->OnSite conversion; LINE ITEMS do. Push `TaxTotal:0` + Notes-On-Order/Accounting tax block; rep applies tax from the ShopWorks dropdown. Full detail -> wa-sales-tax-rules.md (EMB section).
-
-### To-100 readiness: adversarial-verify caught money gaps in the FIXES themselves (2026-06-06/07, ARCHIVED 2026-06-25): adversarially verify your OWN fixes; persisted UI state must be set BEFORE the first async consumer on EVERY entry path. Full entry in archive.
-
-### Edit-reload audit — pickup tax overwrite + AL/OSFA mis-bills (2026-06-06, ARCHIVED 2026-06-25): any async call (tax/pricing/inventory) fired DURING a restore races the sync field-restore — gate on `_restoringQuote`; edit-reload is the #1 silent-data-loss surface (jsdom@22 round-trip test). Full entry in archive.
-
-### Deep review: systemic PDF-total bug + edit-reopen data loss, 4 builders (2026-06-01, ARCHIVED 2026-06-25): the shared invoice generator must tax the SAME on-screen pre-tax number; the 3 output paths (screen/saved/printed) must AGREE for a quote WITH fee+discount; edit-reopen must restore EVERY saved field. Full entry in archive.
 
 ### Push→import→sync-back loop (2026-06-01, ARCHIVED 2026-06-11 + 07-09): post-push `getorderno count:0` is EXPECTED ~15-30 min (FileMaker cycle, business hours); verify fresh writes by PK_ID never a cached list; sync-back cron = proxy `sync-quote-sessions-from-shopworks.js` + page-load auto-sync; `ShopWorks_Snapshot` MUST include `pushed` (Designs/Locations — quote-view reads `pushed.Designs[].id_DesignType`); salesperson = `snapshot.order.CustomerServiceRep`. Full entry in archive.
 
