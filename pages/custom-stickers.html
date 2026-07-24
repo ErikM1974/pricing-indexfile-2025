@@ -208,10 +208,19 @@
                      BELOW the configurator, and it can only be reordered
                      independently if it is its own grid item. -->
                 <figure class="stk-figure">
+                    <!-- Real work, not stock. Every sticker shown is one we printed.
+                         NOT lazy: this sits in the initial viewport on desktop, and
+                         lazy-loading an above-the-fold image just delays it. fetchpriority="low"
+                         keeps it behind the CSS/JS that render the price instead.
+                         width/height reserve the box so nothing shifts as it lands. -->
+                    <img class="stk-figure-photo"
+                         src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/sticker%20hero%20image_1.jpg?ver=1"
+                         alt="Die-cut stickers printed by Northwest Custom Apparel — stacks of finished customer stickers on the left, and a laptop lid covered in applied stickers on the right showing real-world size"
+                         width="1600" height="1067" fetchpriority="low" decoding="async">
                     <svg id="stkFigure" viewBox="0 0 420 200" role="img" aria-labelledby="stkFigureTitle">
                         <title id="stkFigureTitle">Sticker sizes shown at true relative scale next to a credit card</title>
                     </svg>
-                    <figcaption class="stk-figure-note" id="stkFigureNote">Sizes shown at true relative scale.</figcaption>
+                    <figcaption class="stk-figure-note" id="stkFigureNote">Our own work. Sizes below shown at true relative scale.</figcaption>
                 </figure>
 
                 <!-- ── The configurator ──────────────────────────────── -->

@@ -80,11 +80,39 @@
     box-shadow: var(--shadow-card);
 }
 .stk-figure svg { display: block; width: 100%; height: auto; }
+
+/* Real product photo above the scale diagram. `aspect-ratio` + the width/height
+   attributes on the tag reserve the box before the file arrives, so the copy
+   above it never jumps — the price is in the other column and must not move. */
+.stk-figure-photo {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    margin-bottom: 16px;
+    background: var(--paper-deep);   /* holds the space while it loads */
+}
+
 .stk-figure-note {
     font-size: 13px;
     color: var(--ink-soft);
     margin: 14px 0 0;
     text-align: center;
+}
+
+/* Trust-card photo — square source, cropped to a band so it sits as evidence
+   under the heading rather than dominating the card. */
+.stk-trust-photo {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    margin-bottom: 12px;
+    background: var(--paper-deep);
 }
 
 /* ── The configurator card ────────────────────────────────────────── */

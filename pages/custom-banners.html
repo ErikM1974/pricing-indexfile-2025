@@ -201,10 +201,17 @@
                      the configurator, and it can only be reordered independently if
                      it is its own grid item (same as /custom-stickers). -->
                 <figure class="stk-figure">
-                        <svg id="bnFigure" viewBox="0 0 460 220" role="img" aria-labelledby="bnFigureTitle">
-                            <title id="bnFigureTitle">Banner sizes at true relative scale next to a six-foot person</title>
-                        </svg>
-                        <figcaption class="stk-figure-note">Sizes shown at true relative scale.</figcaption>
+                    <!-- A banner we actually printed, hanging where it was hung.
+                         Portfolio use of our own work. NOT lazy — above the fold on
+                         desktop; fetchpriority="low" keeps it off the critical path. -->
+                    <img class="stk-figure-photo"
+                         src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Banner%201600%20x%20900.jpg?ver=1"
+                         alt="A vinyl banner printed by Northwest Custom Apparel hanging outside a storefront, grommeted along the top and bottom edges"
+                         width="1600" height="900" fetchpriority="low" decoding="async">
+                    <svg id="bnFigure" viewBox="0 0 460 220" role="img" aria-labelledby="bnFigureTitle">
+                        <title id="bnFigureTitle">Banner sizes at true relative scale next to a six-foot person</title>
+                    </svg>
+                    <figcaption class="stk-figure-note">Our own work. Sizes below shown at true relative scale.</figcaption>
                 </figure>
 
                 <div class="stk-card" id="configurator">
@@ -291,9 +298,15 @@
                         <p>Sewn hems and #2 brass grommets every 24 inches are included in the price &mdash; not an upsell.</p>
                     </div>
                     <div>
-                        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 21h18"></path><path d="M5 21V7l7-4 7 4v14"></path><path d="M9 21v-6h6v6"></path></svg>
+                        <!-- The claim is "printed here, not brokered", so the proof is
+                             a photo of us holding one in our own shop. Stock imagery
+                             would undercut the exact thing this card asserts. -->
+                        <img class="stk-trust-photo"
+                             src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/Banner%201000%20x%201000%20erik%20and%20don%20o%27neill.jpg?ver=1"
+                             alt="Two Northwest Custom Apparel staff holding a finished Lincoln Lynx Football banner in the Milton, Washington shop, brass grommets visible along both edges"
+                             width="1000" height="1000" loading="lazy" decoding="async">
                         <h3>Printed here, not brokered</h3>
-                        <p>Milton, Washington since 1977. Family-owned, one building. You can pick your order up.</p>
+                        <p>Milton, Washington since 1977. Family-owned, one building. That's one of ours, fresh off the printer — you can pick yours up the same way.</p>
                     </div>
                 </div>
             </section>
