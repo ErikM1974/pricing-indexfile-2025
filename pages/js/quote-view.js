@@ -4276,7 +4276,7 @@ class QuoteViewPage {
         btnLoading.style.display = 'inline';
 
         try {
-            const response = await fetch(`/api/public/quote/${this.quoteId}/accept`, {
+            const response = await fetch(`/api/public/quote/${this.quoteId}/accept${this.shareTokenParam()}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -4448,7 +4448,7 @@ class QuoteViewPage {
         const original = btn.textContent;
         btn.textContent = 'Opening secure checkout…';
         try {
-            const resp = await fetch(`/api/public/quote/${encodeURIComponent(this.quoteId)}/deposit-checkout`, {
+            const resp = await fetch(`/api/public/quote/${encodeURIComponent(this.quoteId)}/deposit-checkout${this.shareTokenParam()}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({})

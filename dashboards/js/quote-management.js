@@ -1272,8 +1272,22 @@ function editQuote(quoteId) {
     window.open(`${builderUrl}?edit=${quoteId}`, '_blank');
 }
 
-function copyQuoteLink(quoteId) {
-    const url = `${window.location.origin}/quote/${quoteId}`;
+// Quotes saved from 2026-07-24 carry a share token; their customer link needs
+// `?k=`. A rep copying a bare /quote/<id> for one of those would hand the
+// customer a 404. Staff bypass the token when THEY open it, so this can only be
+// caught by remembering to fetch it — hence the lookup.
+async function shareTokenFor(quoteId) {
+    try {
+        const r = await fetch(`/api/quote-sessions/${encodeURIComponent(quoteId)}/full`);
+        if (!r.ok) return '';
+        const d = await r.json();
+        const t = d && d.originalSubmission && d.originalSubmission.share_token;
+        return t ? `?k=${encodeURIComponent(t)}` : '';
+    } catch (_) { return ''; }
+}
+
+async function copyQuoteLink(quoteId) {
+    const url = `${window.location.origin}/quote/${quoteId}${await shareTokenFor(quoteId)}`;
     navigator.clipboard.writeText(url).then(() => {
         showToast('Link copied to clipboard!');
     }).catch(() => {
@@ -1398,7 +1412,7 @@ async function resendQuoteEmail(pkId) {
     // teamnwca.com origin, NOT window.location.origin (this dashboard can
     // be open on the Heroku domain, which customers shouldn't see).
     const siteOrigin = (window.APP_CONFIG && window.APP_CONFIG.SITE_ORIGIN) || 'https://www.teamnwca.com';
-    const quoteUrl = `${siteOrigin}/quote/${quoteId}`;
+    const quoteUrl = `${siteOrigin}/quote/${quoteId}${await shareTokenFor(quoteId)}`;
 
     resendInFlight.add(quoteId);
     showToast('Sending email…');

@@ -1225,7 +1225,7 @@ async function sendQuoteAcceptedEmails(session, acceptName, acceptEmail) {
   const companyName = session.CompanyName || '';
   const repEmail = (session.SalesRepEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(session.SalesRepEmail))
     ? session.SalesRepEmail : 'sales@nwcustomapparel.com';
-  const quoteUrl = `${PUBLIC_SITE_ORIGIN}/quote/${encodeURIComponent(quoteId)}`;
+  const quoteUrl = quoteShareUrl(quoteId, session);
   // Customer receipt → the person who just accepted.
   sendEmailJSTemplate(QUOTE_ACCEPTED_CUSTOMER_TEMPLATE, {
     to_email: acceptEmail, to_name: acceptName, quote_id: quoteId, quote_amount: amount,
@@ -1299,6 +1299,25 @@ function mintShareToken() {
 }
 
 /**
+ * The customer-facing URL for a quote, WITH its share token when it has one.
+ *
+ * 🔴 Use this everywhere a /quote/ link is handed to a customer — acceptance
+ * emails, payment receipts, Stripe return URLs, rep "copy link". Building
+ * `${PUBLIC_SITE_ORIGIN}/quote/${id}` by hand sends a tokenised quote a link
+ * that 404s, and the customer has no way to tell it apart from a deleted quote.
+ * Legacy rows have no token and come back exactly as before.
+ */
+function quoteShareUrl(quoteId, sessionOrNotes) {
+  const base = `${PUBLIC_SITE_ORIGIN}/quote/${encodeURIComponent(quoteId)}`;
+  try {
+    const src = sessionOrNotes && sessionOrNotes.Notes !== undefined ? sessionOrNotes.Notes : sessionOrNotes;
+    const notes = typeof src === 'string' ? JSON.parse(src) : (src || {});
+    if (notes && notes.share_token) return `${base}?k=${encodeURIComponent(notes.share_token)}`;
+  } catch (_) { /* unparseable → legacy, no token */ }
+  return base;
+}
+
+/**
  * Returns true when the request may read this session.
  * Legacy rows (no stored token) stay readable — that is the compatibility
  * promise, not an oversight.
@@ -1320,10 +1339,58 @@ function shareTokenOk(req, session) {
 // Binds a payment link to the exact numbers the rep enabled. Recomputed from
 // the CURRENT row before every Stripe session and again at the webhook — a rep
 // edit after enablement can never be charged at stale amounts.
+//
+// 🔐 v2 (2026-07-24) is an HMAC. v1 was a bare SHA-256 over
+// quoteID|subtotal|grandTotal|depositAmount — every input of which is visible to
+// (or guessable by) the payer, so anyone could compute a "valid" hash for
+// amounts of their choosing. That is not an integrity check on a link that
+// charges a card.
+//
+// Deposits enabled BEFORE the cutover carry no hashVersion and are still
+// verified with v1, so no rep has to re-enable anything. New deposits are
+// stamped hashVersion:2 and are verified with the HMAC ONLY — accepting either
+// form for a new deposit would leave the v1 forgery open and make this pointless.
+function totalsHashPayload(quoteID, subtotal, grandTotal, depositAmount) {
+  return [quoteID, Number(subtotal).toFixed(2), Number(grandTotal).toFixed(2), Number(depositAmount).toFixed(2)].join('|');
+}
+
+const QUOTE_TOTALS_HASH_VERSION = 2;
+
+function quoteTotalsSecret() {
+  return process.env.QUOTE_TOTALS_HMAC_SECRET || process.env.CRM_API_SECRET || '';
+}
+
 function computeQuoteTotalsHash(quoteID, subtotal, grandTotal, depositAmount) {
-  return crypto.createHash('sha256')
-    .update([quoteID, Number(subtotal).toFixed(2), Number(grandTotal).toFixed(2), Number(depositAmount).toFixed(2)].join('|'))
+  const secret = quoteTotalsSecret();
+  if (!secret) {
+    // Fail CLOSED. A missing secret must not silently degrade a money-path
+    // integrity check back to a forgeable digest.
+    throw new Error('QUOTE_TOTALS_HMAC_SECRET/CRM_API_SECRET not configured — refusing to sign quote totals');
+  }
+  return crypto.createHmac('sha256', secret)
+    .update(totalsHashPayload(quoteID, subtotal, grandTotal, depositAmount))
     .digest('hex').slice(0, 16);
+}
+
+// v1, retained ONLY to verify deposits enabled before the cutover.
+function legacyQuoteTotalsHash(quoteID, subtotal, grandTotal, depositAmount) {
+  return crypto.createHash('sha256')
+    .update(totalsHashPayload(quoteID, subtotal, grandTotal, depositAmount))
+    .digest('hex').slice(0, 16);
+}
+
+/**
+ * Verify a stored deposit's totals-hash against freshly-computed amounts.
+ * Picks the algorithm from the deposit's own stamped version — never "try both".
+ */
+function totalsHashMatches(dep, quoteID, subtotal, grandTotal, depositAmount) {
+  if (!dep || !dep.totalsHash) return false;
+  const expected = Number(dep.hashVersion) === QUOTE_TOTALS_HASH_VERSION
+    ? computeQuoteTotalsHash(quoteID, subtotal, grandTotal, depositAmount)
+    : legacyQuoteTotalsHash(quoteID, subtotal, grandTotal, depositAmount);
+  const a = Buffer.from(String(dep.totalsHash));
+  const b = Buffer.from(expected);
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
 }
 
 // Money-path alert for quote payments (deposit paid / stale-hash / ledger
@@ -1384,7 +1451,14 @@ async function getDepositPct() {
 // manually, exactly the pre-existing flow; acceptance itself is never blocked).
 async function autoEnablePickupDeposit(quoteId, row, notes) {
   const depositPct = await getDepositPct();
-  const tax = await resolveTdtTax({ deliveryMethod: 'pickup' }); // Milton DOR, same as 3DT pickup
+  // Honour the quote's own taxability. A reseller-permit / tax-exempt customer
+  // (Notes.taxable === false) was previously charged Milton WA sales tax anyway,
+  // because this always resolved the pickup rate — a real over-charge on a
+  // self-serve pay link with no rep in the loop (2026-07-24).
+  const taxable = notes && notes.taxable === false ? false : true;
+  const tax = taxable
+    ? await resolveTdtTax({ deliveryMethod: 'pickup' })   // Milton DOR, same as 3DT pickup
+    : { rate: 0 };
   const taxRatePct = Math.round(tax.rate * 100000) / 1000;       // decimal (0.102) -> percent (10.2)
   const terms = QuoteDepositMath.computeDepositTerms({
     subtotal: parseFloat(row.TotalAmount), shipping: 0, taxRatePct, depositPct,
@@ -1393,6 +1467,7 @@ async function autoEnablePickupDeposit(quoteId, row, notes) {
   notes.deposit = Object.assign({}, terms, {
     enabled: true,
     totalsHash,
+    hashVersion: QUOTE_TOTALS_HASH_VERSION,
     enabledAt: new Date().toISOString(),
     enabledBy: 'auto-pickup',
   });
@@ -1414,7 +1489,7 @@ function sendQuotePaymentEmails(row, payment) {
   const custEmail = payment.payerEmail || row.CustomerEmail || '';
   const repEmail = (row.SalesRepEmail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(row.SalesRepEmail))
     ? row.SalesRepEmail : 'sales@nwcustomapparel.com';
-  const quoteUrl = `${PUBLIC_SITE_ORIGIN}/quote/${encodeURIComponent(quoteId)}`;
+  const quoteUrl = quoteShareUrl(quoteId, row);
   if (custEmail) {
     sendEmailJSTemplate(DEPOSIT_CUSTOMER_TEMPLATE, {
       to_email: custEmail, to_name: row.CustomerName || 'there',
@@ -13003,6 +13078,13 @@ app.post('/api/public/quote/:quoteId/accept', strictLimiter, async (req, res) =>
     }
     const session = sessions[0];
 
+    // Share-link token — ACCEPTING is a state change (and on a pickup quote it
+    // auto-enables a pay link), so it needs the same gate as reading, not less.
+    // 404 to match the read endpoints: an ID walk learns nothing either way.
+    if (!shareTokenOk(req, session)) {
+      return res.status(404).json({ error: 'Quote not found' });
+    }
+
     // Check if quote is already accepted
     if (session.Status === 'Accepted') {
       return res.status(400).json({ error: 'Quote has already been accepted' });
@@ -13146,6 +13228,7 @@ app.post('/api/quotes/:quoteId/enable-deposit', requireStaff, async (req, res) =
     freshNotes.deposit = Object.assign({}, terms, {
       enabled: true,
       totalsHash,
+      hashVersion: QUOTE_TOTALS_HASH_VERSION,
       enabledAt: new Date().toISOString(),
       enabledBy: (req.session.crmUser && (req.session.crmUser.email || req.session.crmUser.Email || req.session.crmUser.name)) || 'staff',
     });
@@ -13156,7 +13239,7 @@ app.post('/api/quotes/:quoteId/enable-deposit', requireStaff, async (req, res) =
       success: true,
       quoteId,
       deposit: freshNotes.deposit,
-      payUrl: `${PUBLIC_SITE_ORIGIN}/quote/${encodeURIComponent(quoteId)}`,
+      payUrl: quoteShareUrl(quoteId, freshNotes),
     });
   } catch (error) {
     console.error('[QuoteDeposit] enable failed:', error);
@@ -13179,6 +13262,11 @@ app.post('/api/public/quote/:quoteId/deposit-checkout', strictLimiter, async (re
 
     const row = await fetchQuoteSessionRow(quoteId);
     if (!row) return res.status(404).json({ error: 'Quote not found' });
+    // Token gate — this one MINTS A STRIPE CHECKOUT SESSION. Anything that can
+    // start a payment against a quote must prove it holds that quote's link.
+    if (!shareTokenOk(req, row)) {
+      return res.status(404).json({ error: 'Quote not found' });
+    }
     const notes = parseNotesJson(row.Notes);
     const dep = notes.deposit;
     if (!dep || !dep.enabled) {
@@ -13191,10 +13279,9 @@ app.post('/api/public/quote/:quoteId/deposit-checkout', strictLimiter, async (re
       return res.status(409).json({ error: 'Deposit already paid — thank you!' });
     }
     // Re-verify stored terms against the CURRENT row (rep edits invalidate).
-    const expectHash = computeQuoteTotalsHash(
-      quoteId, QuoteDepositMath.r2(parseFloat(row.TotalAmount)), dep.grandTotal, dep.depositAmount
-    );
-    if (expectHash !== dep.totalsHash) {
+    if (!totalsHashMatches(
+      dep, quoteId, QuoteDepositMath.r2(parseFloat(row.TotalAmount)), dep.grandTotal, dep.depositAmount
+    )) {
       return res.status(409).json({ error: 'This quote changed after the deposit was set up. Ask your rep to re-enable the deposit.' });
     }
 
@@ -13244,8 +13331,11 @@ app.post('/api/public/quote/:quoteId/deposit-checkout', strictLimiter, async (re
         },
         quantity: 1,
       }],
-      success_url: `${siteOrigin}/quote/${encodeURIComponent(quoteId)}?deposit=success`,
-      cancel_url: `${siteOrigin}/quote/${encodeURIComponent(quoteId)}?deposit=canceled`,
+      // Token must ride on the return URLs too — a customer coming back from
+      // Stripe to a tokenised quote would otherwise land on a 404 immediately
+      // after paying, which is the worst possible moment for it.
+      success_url: `${quoteShareUrl(quoteId, row).replace(PUBLIC_SITE_ORIGIN, siteOrigin)}${quoteShareUrl(quoteId, row).includes('?') ? '&' : '?'}deposit=success`,
+      cancel_url: `${quoteShareUrl(quoteId, row).replace(PUBLIC_SITE_ORIGIN, siteOrigin)}${quoteShareUrl(quoteId, row).includes('?') ? '&' : '?'}deposit=canceled`,
       metadata: { quoteID: quoteId, kind: 'deposit', totalsHash: dep.totalsHash, source: 'quote-deposit' },
     });
 
