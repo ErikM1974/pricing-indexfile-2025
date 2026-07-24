@@ -1,3 +1,8 @@
+## v2026.07.24.1 (2026.07.24)
+
+- LESSONS: % max-height in auto grid tracks (PDP photo crop, 2026-07-23)
+- Deploy v2026.07.24.1: 1 files (index.html...)
+
 ## v2026.07.23.6 (2026.07.23)
 
 - Deploy v2026.07.23.6: 2 files (product.html,product-2026.css...)
