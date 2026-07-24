@@ -910,7 +910,11 @@
                     LineNumber: items.length + 1,
                     StyleNumber: 'DIG-100',
                     ProductName: 'Digitizing Fee (one-time)',
-                    EmbellishmentType: 'setup-fee',
+                    // 'fee', not 'setup-fee' — see the matching note in
+                    // sticker-pricing-page.js. quote-view.js:819 filters on 'fee';
+                    // these two files are written to mirror each other, so fixing
+                    // only one would fork them.
+                    EmbellishmentType: 'fee',
                     Quantity: 1,
                     BaseUnitPrice: digFee,
                     FinalUnitPrice: digFee,

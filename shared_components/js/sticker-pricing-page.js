@@ -96,6 +96,18 @@
         if (!Number.isFinite(n)) return '0';
         return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
     }
+    // 🔴 Per-sticker is ALWAYS derived from the total, never the stored
+    // PricePerSticker column — 26 of the 50 rows don't reconcile (STK-4X4-10000
+    // publishes $0.58, which multiplies back to $5,800 against a real $5,846).
+    // Reps quote off this table, so the number here has to survive being
+    // multiplied. 3dp under a dollar, 2dp above.
+    function fmtUnit(row) {
+        const unit = Number.isFinite(row.unitPrice)
+            ? row.unitPrice
+            : (row.Quantity > 0 ? row.TotalPrice / row.Quantity : 0);
+        if (!Number.isFinite(unit)) return '0.00';
+        return unit < 1 ? unit.toFixed(3) : fmtMoney(unit);
+    }
 
     // -----------------------------------------------------------------
     // Pricing tables: fetch + render
@@ -113,6 +125,13 @@
             pricingData = data;
             renderPricingTables(grid, data);
             errorEl.hidden = true;
+            // Rule 4: a hardcoded fallback is only permitted WITH a visible
+            // warning. loadGrid() returns HTTP 200 + source:'inline' when Caspio
+            // is unreachable, so without this the page shows backup prices that
+            // look live. (Today the copies happen to be identical — that's luck,
+            // not design.)
+            const srcWarn = document.getElementById('pricingSourceWarn');
+            if (srcWarn) srcWarn.hidden = (data.source === 'caspio' && !data.degraded);
         } catch (err) {
             console.error('[sticker-page] pricing load failed:', err);
             errorEl.hidden = false;
@@ -143,7 +162,7 @@
                         <td class="partnumber-cell">${escapeHtml(r.PartNumber)}</td>
                         <td>${fmtInt(r.Quantity)}${bestValueBadge}</td>
                         <td class="price-highlight">$${fmtMoney(r.TotalPrice)}</td>
-                        <td>$${fmtMoney(r.PricePerSticker)}</td>
+                        <td>&approx;&nbsp;$${fmtUnit(r)}</td>
                     </tr>`;
             }).join('');
             return `
@@ -158,11 +177,16 @@
                                 <th>Part #</th>
                                 <th>Quantity</th>
                                 <th>Total Price</th>
-                                <th>Per Sticker</th>
+                                <th>Per Sticker <small>(total ÷ qty)</small></th>
                             </tr>
                         </thead>
                         <tbody>${trs}</tbody>
                     </table>
+                    <p class="banner-formula">
+                        Quote the <strong>Total Price</strong> &mdash; it&rsquo;s exact.
+                        Per-sticker figures are rounded for reading, so multiplying one back out
+                        won&rsquo;t always land on the total.
+                    </p>
                 </section>`;
         }).join('');
         container.innerHTML = html;
@@ -1200,7 +1224,11 @@
                     LineNumber: items.length + 1,
                     StyleNumber: 'GRT-50',
                     ProductName: 'Art Setup Fee (one-time)',
-                    EmbellishmentType: 'setup-fee',
+                    // 'fee', not 'setup-fee' — pages/js/quote-view.js:819 filters
+                    // fee rows on exactly 'fee', so 'setup-fee' rendered the $50
+                    // GRT-50 line to the customer as if it were a product.
+                    // Mirrored in emblem-pricing-page.js (DIG-100).
+                    EmbellishmentType: 'fee',
                     Quantity: 1,
                     BaseUnitPrice: setupFee,
                     FinalUnitPrice: setupFee,

@@ -6,6 +6,18 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 
 ---
 
+### 26 of 50 sticker rows displayed a per-unit price that didn't multiply back to its own total (2026-07-24)
+- **Problem**: the staff sticker table rendered Caspio's stored `PricePerSticker` next to `TotalPrice`. Verified live on teamnwca.com: **26 of 50 rows disagree**. `STK-4X4-10000` showed `$0.58` beside `$5,846` — multiply and you get **$5,800, a $46 gap**. Reps quote off this table and the AI drafted customer emails from the same field.
+- **Root Cause**: `PricePerSticker` is a 2-dp Caspio column, not a derived value. At 4- and 5-figure quantities the truncation is worth tens of dollars. Nobody noticed because the two numbers only contradict each other when someone multiplies — which is exactly what a customer does when total and per-unit sit side by side.
+- **Solution**: derive `unitPrice = TotalPrice / Quantity` **server-side** in `sticker-pricing.js` (`deriveUnitPrice`/`decorateGrid`) and return it from all three sticker surfaces (`/sticker-pricing`, `/sticker-pricing/quote`, the AI tool). Front end renders `≈ $x.xxx` with a "quote the total, per-sticker is rounded" note. `TotalPrice` untouched — a display fix, not a rate change. `computeBestValue()` also switched off the stored field (no knee moved).
+- **Prevention**: `tests/jest/sticker-pricing.test.js` feeds a fixture where `PricePerSticker` is deliberately wrong and asserts the output ignores it, plus pins the six worst rows. **Never render a stored per-unit column beside its own total** — derive it. Applies to any Caspio table with both.
+
+### Two sticker pricing engines had silently drifted (2026-07-24)
+- **Problem**: `contract-sticker-ai.js`'s `quote_sticker_price` was a hand-copy of the `/api/sticker-pricing/quote` body. They had already diverged: different bounding-box message strings, different error shapes, and the AI carried a `useTool:'quote_custom_decal'` hand-off the route lacked.
+- **Root Cause**: copy-paste at creation, then independent edits. Rule 9 in miniature — two implementations of the same money.
+- **Solution**: extracted a pure `quoteStickerFromGrid()` returning a **data** result (`kind`, `boundingSize`, `roundedQty`, `sizeWasRounded`…); each caller maps it to its own wire shape. The AI keeps its decal hand-off, the route keeps its 400s.
+- **Prevention**: `tests/jest/sticker-quote-single-path.test.js` sweeps a 12-case matrix and asserts both paths return deep-equal money fields — **and separately pins the two intentional differences**, so "make them agree" can't be achieved by deleting the decal hand-off. When collapsing duplicated logic, lock the *differences* too, not just the sameness.
+
 ### PDP cropped the bottom of EVERY product photo — % max-height in auto grid tracks (2026-07-23)
 - **Problem**: product.html's main gallery cut off every garment mid-thigh (all SanMar photos are 2:3 portrait, 1200×1800); thumbnails and related-product cards cropped too.
 - **Root Cause**: `display:grid; place-items:center; overflow:hidden` containers with `max-width/max-height:100%` + `object-fit:contain` imgs — **percentage max-height does not resolve inside an auto-sized grid track (or an auto-height wrapper span)**, so the img rendered at natural ratio, overflowed, and `overflow:hidden` did the cropping. `object-fit` never got to act. Bit 3 spots in one file (`.pdp-stage`, `.pdp-related-photo`, `.pdp-thumb`); fixed-px boxes (76px thumb buttons) masked it as "small crop".
