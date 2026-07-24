@@ -1,3 +1,8 @@
+## v2026.07.23.6 (2026.07.23)
+
+- Deploy v2026.07.23.6: 2 files (product.html,product-2026.css...)
+- PDP gallery no longer crops product photos: 4:5 stage + absolute-contain fix (main image, thumbnails, related cards) — % max-height never resolved in auto grid tracks
+
 ## v2026.07.23.5 (2026.07.23)
 
 - Deploy v2026.07.23.5: 5 files (ACTIVE_FILES.md,LESSONS_LEARNED.md,fall-catalog-2026.css...)
