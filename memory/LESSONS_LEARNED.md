@@ -6,6 +6,12 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 
 ---
 
+### PDP cropped the bottom of EVERY product photo — % max-height in auto grid tracks (2026-07-23)
+- **Problem**: product.html's main gallery cut off every garment mid-thigh (all SanMar photos are 2:3 portrait, 1200×1800); thumbnails and related-product cards cropped too.
+- **Root Cause**: `display:grid; place-items:center; overflow:hidden` containers with `max-width/max-height:100%` + `object-fit:contain` imgs — **percentage max-height does not resolve inside an auto-sized grid track (or an auto-height wrapper span)**, so the img rendered at natural ratio, overflowed, and `overflow:hidden` did the cropping. `object-fit` never got to act. Bit 3 spots in one file (`.pdp-stage`, `.pdp-related-photo`, `.pdp-thumb`); fixed-px boxes (76px thumb buttons) masked it as "small crop".
+- **Solution** (v2026.07.23.6, product-2026.css): absolute-fill pattern — container `position:relative`, img `position:absolute; inset:0; width/height:100%; object-fit:contain` (absolute %s resolve against the box, immune to the quirk); thumbs got a definite px height instead. Stage ratio square→4:5 (Erik's pick — full photo + ~25% larger garment).
+- **Prevention**: centering an img in a fixed-aspect box = use absolute-fill+contain (or a definite px height), NEVER `max-*:100%` inside grid/auto wrappers; verify with `imgRect.height <= containerRect.height`, not by eyeballing the top of the photo.
+
 ### products/search silently hid every PRODUCT_STATUS='New' style — misread as "not in the DB" (2026-07-23)
 - **Problem**: All 179 Fall-2026 styles probed via `products/search?q=` returned 0 → Fall Catalog was built as a static PDF-sourced page (no API images, no prices, quote-form links). Erik caught it: styles were in the DB all along.
 - **Root Cause**: (a) `/api/products/search` was the ONLY route filtering `PRODUCT_STATUS='Active'` (exact equality) while new SanMar rows carry `'New'` — siblings use `<>'Discontinued'` and stylesearch/product-colors have no status filter; (b) verification relied on ONE endpoint. Two more bugs found during the fix: Phase-2 `STYLE IN` variant fetch had no `q.orderBy` → silent row drops made whole styles vanish from 50-style pages (the 2026-07-12 fetchAllCaspioPages lesson, re-bitten); Phase-1 groupBy emits one row per style×price, so list requests paginated real styles away.
@@ -87,8 +93,6 @@ Laser-patch EMB (EMB-2026-313) printed a $360 products table against a $420 Subt
 ### Order-form push: restart node to verify + fees need one source (2026-06-09, ARCHIVED 2026-06-30): Node does NOT hot-reload — restart `node server.js` to verify ANY server-side change (a stale process serves old API); a fee folded into a total must ALSO be an itemized line (one source screen+PDF+push read) and an unresolved/$0 fee must BLOCK the push, never drop silently. Full entry in archive.
 
 ### Duplicate `function NAME()` hoisting no-op'd the push button (SCP + DTF, 2026-06-14, ARCHIVED 2026-07-07): two `function NAME(){}` at one scope — the LAST wins at hoist time, both `window.X=X` bind to it; never alias with the same name; locked by `push-button-binding.test.js`. Full entry in archive.
-
-### Push button stranded disabled (2026-06-07, ARCHIVED 2026-06-11): never replace a button's innerHTML when code reads a child by ID; gate the action button from the SAME function that renders its readiness checklist. Full entry in archive.
 
 ### OnSite DROPS the pushed order-level tax field — tax stays manual (2026-06-07): order-level tax fields (`coa_AccountSalesTax01`, `TaxPartNumber`, per-line `sts_EnableTax*`) do NOT survive the MO->OnSite conversion; LINE ITEMS do. Push `TaxTotal:0` + Notes-On-Order/Accounting tax block; rep applies tax from the ShopWorks dropdown. Full detail -> wa-sales-tax-rules.md (EMB section).
 
