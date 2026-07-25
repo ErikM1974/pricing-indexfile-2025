@@ -1,3 +1,10 @@
+## v2026.07.25.1 (2026.07.25)
+
+- Drop the outdoor-life claim and the vinyl spec dump from /custom-stickers
+- Artwork upload on both public pages
+- Checkout parity: fix a false claim, add artwork previews, drop the phone gate
+- Rename the public artwork module — it collided with the rep-facing one
+
 ## v2026.07.24.7 (2026.07.24)
 
 - Homepage nav: add Stickers (Erik couldn't find the page)
