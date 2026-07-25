@@ -26,7 +26,7 @@
     <style>@layer reset, tokens, base, components, utilities, overrides;</style>
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/tokens.css?v=20260514-ai-phase1">
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/base.css?v=2026.07.06.11">
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css?v=2026.07.10.9">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css?v=2026.07.25.4">
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/utilities.css?v=20260514-ai-phase1">
     <!-- Claude Design handoff theme (2026-05-13) — unlayered variant, wins all cascade fights. -->
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=2026.07.22.2">
@@ -815,27 +815,28 @@
                         </div>
                     </article>
 
-                    <!-- Garment Tracker (real, bridged to legacy StaffDashboardService) -->
-                    <article class="garment-tracker-card col-span-full">
+                    <!-- Q3 Team Push. Replaced the Garment Tracker card on 2026-07-25.
+                         🔒 NO COMPENSATION ON THIS CARD — every employee opens this page, so
+                         per-rep bonus dollars live on each rep's own Mission Control instead.
+                         This shows the company Q3 number and the shared targets only; the
+                         /team endpoint forces that scope server-side. -->
+                    <article class="embroidery-bonus-card col-span-full">
                         <header class="metrics-team-header mb-3">
                             <div class="metrics-team-title-group">
                                 <h3 class="metrics-team-title">
-                                    <i class="fas fa-tshirt" aria-hidden="true"></i> Garment Tracker
+                                    <i class="fas fa-bullseye" aria-hidden="true"></i> Q3 Team Push
                                 </h3>
-                                <div class="metrics-date-range" id="garmentTrackerDateRange">Loading…</div>
+                                <div class="metrics-date-range" id="embroideryBonusDateRange">Loading…</div>
                             </div>
-                            <div class="garment-tracker-controls">
-                                <span class="sync-status num" id="garmentSyncStatus"></span>
-                                <button type="button" class="sync-btn" data-action="garment-tracker:sync" aria-label="Sync from ManageOrders" title="Sync from ManageOrders">
-                                    <i class="fas fa-cloud-download-alt" aria-hidden="true"></i>
-                                </button>
-                                <button type="button" class="refresh-btn" data-action="garment-tracker:refresh" aria-label="Refresh from table" title="Refresh from table">
+                            <div class="embroidery-bonus-controls">
+                                <span class="sync-status num" id="embroideryBonusStatus"></span>
+                                <button type="button" class="refresh-btn" data-action="embroidery-bonus:refresh" aria-label="Refresh embroidery bonus" title="Refresh">
                                     <i class="fas fa-sync-alt" aria-hidden="true"></i>
                                 </button>
                             </div>
                         </header>
-                        <div id="garmentTrackerContent">
-                            <div class="garment-tracker-loading"><div class="loading-spinner"></div><span>Loading garment tracker…</span></div>
+                        <div id="embroideryBonusContent">
+                            <div class="embroidery-bonus-loading"><div class="loading-spinner"></div><span>Loading embroidery bonus…</span></div>
                         </div>
                     </article>
 
@@ -927,13 +928,11 @@
     <script src="/shared_components/js/production-schedule-stats.js?v=20260512h"></script>
     <script src="/shared_components/js/production-schedule-predictor.js?v=20260512h"></script>
 
-    <!-- Legacy staff-dashboard-service.js — bridge for the garment tracker only.
-         Exposes window.StaffDashboardService with loadGarmentTrackerFromTable +
-         syncGarmentTracker + getGarmentTrackerConfig. v3's garment-tracker-controller
-         calls these. Will be replaced by a proper port in a follow-up phase.
-         (Note: legacy file hardcodes the proxy URL — known Rule #7 debt, isolated
-         to this bridge.) -->
-    <script src="/shared_components/js/staff-dashboard-service.js?v=2026.07.04.5"></script>
+    <!-- Legacy staff-dashboard-service.js UNMOUNTED 2026-07-25. It existed solely as the
+         garment-tracker bridge; the Embroidery Bonus card that replaced that tracker talks
+         to the API directly, so the 1,500-line legacy service (and its hardcoded proxy URL,
+         a known Rule #7 debt) no longer loads on this page. The file itself is left on disk
+         — flagged as dead code, not auto-deleted. -->
 
     <!-- Caspio timestamp parser (naive Pacific wall-clock → correct Date).
          Needed by the art-aging widget below; safe no-op for everything else. -->
@@ -945,6 +944,6 @@
     <!-- ===================================================
          APP ENTRY (ES module)
          =================================================== -->
-    <script type="module" src="/shared_components/js/staff-dashboard/core/dashboard-app.js?v=2026.07.23.3"></script>
+    <script type="module" src="/shared_components/js/staff-dashboard/core/dashboard-app.js?v=2026.07.25.4"></script>
 </body>
 </html>

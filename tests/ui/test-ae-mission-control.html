@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
     <link rel="stylesheet" href="/shared_components/css/sanmar-invoice-viewer.css?v=2026.07.19.17">
-    <link rel="stylesheet" href="/dashboards/css/ae-mission-control.css?v=2026.07.20.3">
+    <link rel="stylesheet" href="/dashboards/css/ae-mission-control.css?v=2026.07.25.4">
 </head>
 <body>
     <div class="dash-shell">
@@ -59,6 +59,22 @@
                 <div class="aemc-greeting" id="aemc-greeting">Loading your day…</div>
                 <div class="aemc-updated" id="aemc-updated"></div>
             </div>
+
+            <!-- ZONE 1b: Q3 Embroidery Bonus hero — mirrors dashboards/ae-mission-control.html -->
+            <section class="aemc-bonus-hero" id="aemc-bonus-hero" hidden aria-labelledby="aemc-bh-eyebrow">
+                <div class="aemc-bh-left">
+                    <div class="aemc-bh-eyebrow" id="aemc-bh-eyebrow">Your Q3 Embroidery Bonus</div>
+                    <div class="aemc-bh-amount" id="aemc-bh-amount">$0</div>
+                    <div class="aemc-bh-sub" id="aemc-bh-sub">earned so far this quarter</div>
+                </div>
+                <div class="aemc-bh-right">
+                    <div class="aemc-bh-next" id="aemc-bh-next">—</div>
+                    <div class="aemc-bh-track" role="img" aria-label="Progress to next milestone">
+                        <div class="aemc-bh-fill" id="aemc-bh-fill" style="width:0%"></div>
+                    </div>
+                    <div class="aemc-bh-chips" id="aemc-bh-chips"></div>
+                </div>
+            </section>
 
             <!-- ZONE 2: KPI strip -->
             <div class="dash-stat-grid aemc-kpis">
@@ -160,6 +176,16 @@
                 </div>
                 <p class="aemc-hint aemc-growth-hint">Accounts that are late against <em>their own</em> ordering rhythm, or spent real money in the next 45 days last year and haven't ordered yet. Call these first.</p>
                 <div id="aemc-growth"><div class="dash-loading">Scanning 24 months of your order history…</div></div>
+            </div>
+
+            <!-- Embroidery win-back radar — mirrors dashboards/ae-mission-control.html -->
+            <div class="dash-card aemc-emb-card aemc-collapsible" data-collapse-key="embwinback">
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title"><i class="fas fa-award"></i> Embroidery Win-Backs <span class="aemc-sub" id="aemc-emb-sub"></span></h2>
+                    <a class="aemc-viewall" id="aemc-emb-bonus-link" href="https://inksoft-transform-8a3dc4e38097.herokuapp.com/commissions" target="_blank" rel="noopener" hidden>My Bonus</a>
+                </div>
+                <p class="aemc-hint">Accounts you own that have embroidered with us before but have gone quiet. Each one you bring back earns a reactivation bounty once it reaches the quarter's minimum — sorted by how much embroidery they used to buy.</p>
+                <div id="aemc-emb"><div class="dash-loading">Finding your dormant embroidery accounts…</div></div>
             </div>
 
             <!-- Data-quality radar: ShopWorks orders/customers entered with essential fields missing -->
@@ -269,6 +295,6 @@
     <script src="/dashboards/js/sanmar-inbound-today.js?v=2026.07.22.4"></script>
     <script src="/shared_components/js/sanmar-invoice-viewer.js?v=2026.07.19.17"></script>
     <script src="/tests/ui/test-ae-mission-control-stub.js"></script>
-    <script src="/dashboards/js/ae-mission-control.js?v=2026.07.21.1"></script>
+    <script src="/dashboards/js/ae-mission-control.js?v=2026.07.25.4"></script>
 </body>
 </html>

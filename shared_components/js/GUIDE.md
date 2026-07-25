@@ -197,8 +197,9 @@
 
 | File | Purpose |
 |------|---------|
-| `staff-dashboard-init.js` | Dashboard initialization, widget toggles |
-| `staff-dashboard-service.js` | ManageOrders API integration |
+| `staff-dashboard-init.js` | Dashboard initialization, widget toggles — **dead** (no HTML loads it) |
+| `staff-dashboard-service.js` | ManageOrders API integration — **dead since 2026-07-25**; was the garment-tracker bridge only, and that card is gone. Don't build on it; it hardcodes the proxy URL. |
+| `staff-dashboard/controllers/embroidery-bonus-controller.js` | Embroidery Bonus card (Q3 2026+) — activation bounties, growth ladder, $3M team kicker, dormant "who to call" list. Replaced `garment-tracker-controller.js`. Every rate/goal comes from the API, never a constant. |
 | `staff-dashboard-announcements.js` | Priority announcements |
 | `staff-dashboard-employees.js` | Employee widget management |
 | `production-schedule-stats.js` | Precomputed turnaround stats |

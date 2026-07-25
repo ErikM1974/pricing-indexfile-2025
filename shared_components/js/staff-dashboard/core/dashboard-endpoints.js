@@ -25,10 +25,21 @@ export const endpoints = {
     manageOrders:          () => `/api/mo/orders`,
     lineItems:        (id) => `/api/mo/lineitems/${encodeURIComponent(id)}`,
 
-    // Garment tracker (Caspio cache)
+    // Garment tracker (Caspio cache) — SUPERSEDED for Q3 2026+ by the embroidery bonus
+    // below. Kept so the Q2 2026 archive stays reachable; not used by any live card.
     garmentTracker:        () => `${BASE}/garment-tracker`,
     garmentTrackerCfg:     () => `${BASE}/garment-tracker/config`,
     garmentTrackerArchive: () => `${BASE}/garment-tracker/archive-from-live`,
+
+    // Q3 2026 Embroidery Bonus. Routed through the main app's SAML-authed
+    // /api/crm-proxy/* forwarder (same-origin, sends the session cookie) — the proxy
+    // endpoints are secret-only because they carry customer names + payroll dollars.
+    // 🔒 The SHARED staff dashboard uses ONLY the /team feed — company revenue and targets,
+    // never a rep's earnings. Compensation belongs on each rep's own Mission Control page.
+    embroideryBonusTeam:    () => `/api/crm-proxy/embroidery-bonus/team`,
+    embroideryBonus:        () => `/api/crm-proxy/embroidery-bonus`,
+    embroideryBonusCfg:     () => `/api/crm-proxy/embroidery-bonus/config`,
+    embroideryBonusDormant: () => `/api/crm-proxy/embroidery-bonus/dormant`,
 
     // Caspio archived per-rep daily sales
     dailySalesByRep:       () => `${BASE}/caspio/daily-sales-by-rep`,

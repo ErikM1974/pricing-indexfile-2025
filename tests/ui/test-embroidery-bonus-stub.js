@@ -1,146 +1,14 @@
 /**
- * test-ae-mission-control-stub.js — fetch stub for tests/ui/test-ae-mission-control.html
+ * test-embroidery-bonus-stub.js — fetch stub for tests/ui/test-embroidery-bonus.html
  *
- * Replaces window.fetch for everything the Mission Control controller calls —
- * crm-session, the ae-dashboard summary aggregate, marketing-shipments (items +
- * POST), lead-outreach (preview + send), sanmar inbound-today, and the art
- * notification poll — so the SAML-gated page renders and clicks through with
- * zero backend. Session is stubbed as ADMIN so the view-as pill shows.
+ * Payload is REAL output captured from computeEmbroideryBonus/computeDormant against
+ * live ORDER_ODBC on 2026-07-25, so this harness renders the same numbers the verified
+ * backend produces (Q3-to-date, config in fallback state so the warning banner shows).
+ * Regenerate by re-running the helpers and dumping to JSON.
  */
 (function () {
     'use strict';
-
-    function hoursAgo(h) { return new Date(Date.now() - h * 3600000).toISOString(); }
-    function daysAgoDay(d) { return new Date(Date.now() - d * 86400000).toISOString().slice(0, 10); }
-
-    var REP = { email: 'taneisha@nwcustomapparel.com', fullName: 'Taneisha Clark', firstName: 'Taneisha' };
-    var NIKA = { email: 'nika@nwcustomapparel.com', fullName: 'Nika Lao', firstName: 'Nika' };
-
-    function summaryFor(rep) {
-        var isT = rep.email === REP.email;
-        return {
-            rep: rep,
-            generatedAt: new Date().toISOString(),
-            cacheHit: false,
-            kpis: {
-                ytdSales: isT ? 514178.8 : 796082.9,
-                mtdSales: isT ? 32572.96 : 66595.04,
-                salesAsOf: daysAgoDay(2),
-                openQuoteCount: isT ? 4 : 2,
-                openQuoteValue: isT ? 6890.5 : 3120,
-                commissionQtd: isT ? 60.75 : 0,
-                commissionQuarter: 'Q3 2026',
-                leadWinRate: isT ? 38 : 52,
-                leadsWon90: isT ? 6 : 11,
-            },
-            bonus: {
-                year: 2026, currentQuarter: 'Q3', previousQuarter: 'Q2',
-                previous: {
-                    rows: [
-                        // Realistic stored shape: base = TOTAL quarter revenue, rate = nominal 1%,
-                        // amount = composite math → caption must be SUPPRESSED (base×rate ≠ amount).
-                        { type: 'Online Store', quarter: 'Q2', amount: isT ? 131.7 : 2.97, base: isT ? 34639.68 : 25340.84, rate: 0.01, status: 'Calculated', paycheckDate: '', payrollNumber: '' },
-                        { type: 'Garment Spiff', quarter: 'Q2', amount: isT ? 53.75 : 128.25, base: 0, rate: 0, status: 'Calculated', paycheckDate: '' },
-                        { type: 'Win-Back Bounty', quarter: 'Q2', amount: isT ? 350.15 : 0, base: isT ? 7003 : 0, rate: 0.05, status: 'Calculated', paycheckDate: '' },
-                    ],
-                    total: isT ? 535.6 : 131.22, allPaid: false,
-                },
-                current: {
-                    rows: [
-                        { type: 'Online Store', quarter: 'Q3', amount: 0, base: 0, rate: 0.01, status: 'Calculated' },
-                        { type: 'Garment Spiff', quarter: 'Q3', amount: 0, base: 0, rate: 0, status: 'Calculated' },
-                        { type: 'Win-Back Bounty', quarter: 'Q3', amount: isT ? 60.75 : 0, base: isT ? 1215 : 0, rate: 0.05, status: 'Calculated' },
-                    ],
-                    total: isT ? 60.75 : 0,
-                },
-                paidYtd: isT ? 1241.14 : 1314.38,
-            },
-            actionQueue: {
-                overdueLeads: [{
-                    submissionId: 'JFL0714-1001', formId: 'jotform-lead', company: 'Rainier Roofing <script>alert(1)</script>',
-                    contactName: 'Dana Fox', email: 'dana@rainierroof.com', status: 'Contacted',
-                    dueDate: daysAgoDay(3), daysOverdue: 3, leadValue: 900, submittedAt: hoursAgo(120),
-                }],
-                dueTodayLeads: [{
-                    submissionId: 'JFL0719-1002', formId: 'quote-request', company: 'Puget Powerwash',
-                    contactName: 'Sam Lee', email: 'sam@pugetpw.com', status: 'Quoted',
-                    dueDate: daysAgoDay(0), leadValue: 0, submittedAt: hoursAgo(80),
-                }],
-                newUntouchedLeads: [{
-                    submissionId: 'JFL0717-1003', formId: 'jotform-lead', company: 'CITC of Washington',
-                    contactName: 'Alex Popescu', email: 'alex@citcwa.com', status: 'New',
-                    dueDate: '', leadValue: 450, submittedAt: hoursAgo(50),
-                }, {
-                    submissionId: 'MNL0716-1004', formId: 'manual-lead', company: 'Tacoma Tug & Barge',
-                    contactName: 'Rob Ortiz', email: '', status: 'New',
-                    dueDate: '', leadValue: 0, submittedAt: hoursAgo(70),
-                }],
-                staleQuotes: [{
-                    quoteId: 'EMB0710-3', customerName: 'Kim Vo', companyName: 'Harbor Electric',
-                    customerEmail: 'kim@harborelec.com', totalAmount: 2140.75, status: 'Open',
-                    createdAt: hoursAgo(9 * 24), updatedAt: hoursAgo(7 * 24),
-                }],
-                artAwaitingApproval: [{
-                    idDesign: 53041, companyName: 'Wagon Fest', status: 'Awaiting Approval',
-                    dueDate: daysAgoDay(-3), dateCreated: hoursAgo(48),
-                }],
-                kitsPending: [{
-                    shipmentId: 'KIT0718-4410', submissionId: 'JFL0717-1003', recipientName: 'Alex Popescu',
-                    company: 'CITC of Washington', status: 'Requested', createdAt: hoursAgo(26),
-                }],
-            },
-            counts: {
-                leads: { overdue: 1, dueToday: 1, newUntouched: 2, activeLeads: 14 },
-                quotes: { openQuotes: isT ? 4 : 2, staleQuotes: 1 },
-                art: { awaitingApproval: 1, openArt: 5 },
-                orders: { orders30: isT ? 69 : 139 },
-                kits: { kitsPending: 1 },
-            },
-            panels: {
-                leads: [
-                    { submissionId: 'JFL0717-1003', company: 'CITC of Washington', contactName: 'Alex Popescu', status: 'New', leadValue: 450, submittedAt: hoursAgo(50) },
-                    { submissionId: 'JFL0714-1001', company: 'Rainier Roofing', contactName: 'Dana Fox', status: 'Contacted', leadValue: 900, submittedAt: hoursAgo(120) },
-                ],
-                quotes: [
-                    { quoteId: 'EMB0710-3', companyName: 'Harbor Electric', customerName: 'Kim Vo', totalAmount: 2140.75, status: 'Open', createdAt: hoursAgo(9 * 24) },
-                    { quoteId: 'DTG0716-1', companyName: 'Puget Powerwash', customerName: 'Sam Lee', totalAmount: 812, status: 'Open', createdAt: hoursAgo(3 * 24) },
-                ],
-                art: [
-                    { idDesign: 53041, companyName: 'Wagon Fest', status: 'Awaiting Approval', dueDate: daysAgoDay(-3), dateCreated: hoursAgo(48) },
-                    { idDesign: 53012, companyName: 'Harbor Electric', status: 'Submitted', dueDate: '', dateCreated: hoursAgo(90) },
-                ],
-                orders: [
-                    { idOrder: 141220, companyName: 'Boeing Employees Club', subtotal: 3480.5, invoicedDate: daysAgoDay(1), shipped: true, orderType: 'Embroidery' },
-                    { idOrder: 141201, companyName: 'CITC of Washington', subtotal: 940, invoicedDate: daysAgoDay(4), shipped: false, orderType: 'DTG' },
-                ],
-            },
-            orders30Total: isT ? 51840.22 : 90210.11,
-            errors: undefined,
-        };
-    }
-
-    var kitItems = [
-        { Item_Code: 'CATALOG', Label: 'SanMar Catalog 2026', Sort: 1, Active: true },
-        { Item_Code: 'STICKERS', Label: 'NWCA Sticker Pack', Sort: 2, Active: true },
-        { Item_Code: 'SAMPLE-TEE', Label: 'Sample Tee (printed)', Sort: 3, Active: true },
-    ];
-
-    var inbound = {
-        date: daysAgoDay(0),
-        orders: [
-            { sanmarPO: '882211', workOrder: '55123', company: 'Harbor Electric', salesRep: 'Taneisha Clark', boxes: 3, piecesShipped: 96, received: false },
-            { sanmarPO: '882244', workOrder: '55140', company: 'Sound Transit Crew', salesRep: 'Nika Lao', boxes: 5, piecesShipped: 180, received: false },
-            { sanmarPO: '882250', workOrder: '', company: '', salesRep: '', boxes: 1, piecesShipped: 24, received: true },
-        ],
-    };
-
-    function json(body, status) {
-        return Promise.resolve(new Response(JSON.stringify(body), {
-            status: status || 200, headers: { 'Content-Type': 'application/json' },
-        }));
-    }
-
-    var EMB_BONUS = {
+    var BONUS = {
         "program": "EMB",
         "quarter": "Q3",
         "year": 2026,
@@ -465,7 +333,7 @@
         "generatedAt": "2026-07-25T14:28:24.367Z",
         "warning": "Bonus config could not be read from Caspio table Rep_Bonus_Config. Showing built-in default rates — these may not match the current plan. Verify before paying."
     };
-    var EMB_DORMANT = {
+    var DORMANT = {
         "quarter": "Q3",
         "year": 2026,
         "asOf": "2026-07-01",
@@ -622,6 +490,222 @@
                         "bountyIfWon": 50,
                         "quarterToDateRevenue": 0,
                         "alreadyReactivated": false
+                    },
+                    {
+                        "idCustomer": "12475",
+                        "company": "Wenatchee School District",
+                        "tier": "House-2026",
+                        "lifetimeEmbroidery": 8198.13,
+                        "embroideryOrders": 7,
+                        "lastEmbroideryDate": "2024-11-19",
+                        "monthsDormant": 19,
+                        "bountyIfWon": 50,
+                        "quarterToDateRevenue": 0,
+                        "alreadyReactivated": false
+                    },
+                    {
+                        "idCustomer": "12020",
+                        "company": "Vermeer Mountain West",
+                        "tier": "House-2026",
+                        "lifetimeEmbroidery": 7514.55,
+                        "embroideryOrders": 9,
+                        "lastEmbroideryDate": "2025-04-24",
+                        "monthsDormant": 14,
+                        "bountyIfWon": 50,
+                        "quarterToDateRevenue": 0,
+                        "alreadyReactivated": false
+                    },
+                    {
+                        "idCustomer": "2426",
+                        "company": "General Mechanical",
+                        "tier": "GOLD '26 - NIKA",
+                        "lifetimeEmbroidery": 7380,
+                        "embroideryOrders": 5,
+                        "lastEmbroideryDate": "2025-06-04",
+                        "monthsDormant": 12,
+                        "bountyIfWon": 50,
+                        "quarterToDateRevenue": 0,
+                        "alreadyReactivated": false
+                    },
+                    {
+                        "idCustomer": "12429",
+                        "company": "Evergreen Goodwill Of NW Washington",
+                        "tier": "BRONZE '26-NIKA",
+                        "lifetimeEmbroidery": 6710,
+                        "embroideryOrders": 2,
+                        "lastEmbroideryDate": "2024-07-17",
+                        "monthsDormant": 23,
+                        "bountyIfWon": 50,
+                        "quarterToDateRevenue": 0,
+                        "alreadyReactivated": false
+                    },
+                    {
+                        "idCustomer": "12048",
+                        "company": "ProEnd Painting",
+                        "tier": "House-2026",
+                        "lifetimeEmbroidery": 6674.2,
+                        "embroideryOrders": 5,
+                        "lastEmbroideryDate": "2024-05-16",
+                        "monthsDormant": 25,
+                        "bountyIfWon": 50,
+                        "quarterToDateRevenue": 0,
+                        "alreadyReactivated": false
+                    },
+                    {
+                        "idCustomer": "12230",
+                        "company": "Gafco Roofing and Construction",
+                        "tier": "House-2026",
+                        "lifetimeEmbroidery": 4826.6,
+                        "embroideryOrders": 6,
+                        "lastEmbroideryDate": "2025-02-19",
+                        "monthsDormant": 16,
+                        "bountyIfWon": 50,
+                        "quarterToDateRevenue": 0,
+                        "alreadyReactivated": false
+                    },
+                    {
+                        "idCustomer": "12586",
+                        "company": "Valley Property Services",
+                        "tier": "BRONZE '26-NIKA",
+                        "lifetimeEmbroidery": 4770.4,
+                        "embroideryOrders": 4,
+                        "lastEmbroideryDate": "2025-06-04",
+                        "monthsDormant": 12,
+                        "bountyIfWon": 50,
+                        "quarterToDateRevenue": 0,
+                        "alreadyReactivated": false
+                    },
+                    {
+                        "idCustomer": "12948",
+                        "company": "NuuCo Electric",
+                        "tier": "SILVER '26 -NIKA",
+                        "lifetimeEmbroidery": 4602.5,
+                        "embroideryOrders": 1,
+                        "lastEmbroideryDate": "2024-06-17",
+                        "monthsDormant": 24,
+                        "bountyIfWon": 50,
+                        "quarterToDateRevenue": 0,
+                        "alreadyReactivated": false
+                    },
+                    {
+                        "idCustomer": "9081",
+                        "company": "High Country Homes",
+                        "tier": "House-2026",
+                        "lifetimeEmbroidery": 4344.04,
+                        "embroideryOrders": 6,
+                        "lastEmbroideryDate": "2025-04-22",
+                        "monthsDormant": 14,
+                        "bountyIfWon": 50,
+                        "quarterToDateRevenue": 0,
+                        "alreadyReactivated": false
+                    },
+                    {
+                        "idCustomer": "12349",
+                        "company": "Grandview Early Learning Center",
+                        "tier": "BRONZE '26-NIKA",
+                        "lifetimeEmbroidery": 4182.1,
+                        "embroideryOrders": 7,
+                        "lastEmbroideryDate": "2025-06-19",
+                        "monthsDormant": 12,
+                        "bountyIfWon": 50,
+                        "quarterToDateRevenue": 0,
+                        "alreadyReactivated": false
+                    },
+                    {
+                        "idCustomer": "13109",
+                        "company": "Pacific Fish Company",
+                        "tier": "BRONZE '26-NIKA",
+                        "lifetimeEmbroidery": 4080.4,
+                        "embroideryOrders": 1,
+                        "lastEmbroideryDate": "2025-02-03",
+                        "monthsDormant": 16,
+                        "bountyIfWon": 50,
+                        "quarterToDateRevenue": 0,
+                        "alreadyReactivated": false
+                    },
+                    {
+                        "idCustomer": "10754",
+                        "company": "Geo Resources",
+                        "tier": "House-2026",
+                        "lifetimeEmbroidery": 3875.59,
+                        "embroideryOrders": 30,
+                        "lastEmbroideryDate": "2022-05-24",
+                        "monthsDormant": 49,
+                        "bountyIfWon": 50,
+                        "quarterToDateRevenue": 0,
+                        "alreadyReactivated": false
+                    },
+                    {
+                        "idCustomer": "10428",
+                        "company": "Tacoma Longshoremen Credit Union",
+                        "tier": "House-2026",
+                        "lifetimeEmbroidery": 3825.59,
+                        "embroideryOrders": 5,
+                        "lastEmbroideryDate": "2025-06-05",
+                        "monthsDormant": 12,
+                        "bountyIfWon": 50,
+                        "quarterToDateRevenue": 1626,
+                        "alreadyReactivated": true
+                    },
+                    {
+                        "idCustomer": "12280",
+                        "company": "Degrees Of change",
+                        "tier": "House-2026",
+                        "lifetimeEmbroidery": 3747,
+                        "embroideryOrders": 6,
+                        "lastEmbroideryDate": "2023-05-25",
+                        "monthsDormant": 37,
+                        "bountyIfWon": 50,
+                        "quarterToDateRevenue": 0,
+                        "alreadyReactivated": false
+                    },
+                    {
+                        "idCustomer": "12692",
+                        "company": "Stella Jones - Wilbur Plant",
+                        "tier": "GOLD '26 - NIKA",
+                        "lifetimeEmbroidery": 3284,
+                        "embroideryOrders": 1,
+                        "lastEmbroideryDate": "2025-01-13",
+                        "monthsDormant": 17,
+                        "bountyIfWon": 50,
+                        "quarterToDateRevenue": 0,
+                        "alreadyReactivated": false
+                    },
+                    {
+                        "idCustomer": "10545",
+                        "company": "Mechanical & Control Services, Inc",
+                        "tier": "House-2026",
+                        "lifetimeEmbroidery": 3165,
+                        "embroideryOrders": 5,
+                        "lastEmbroideryDate": "2024-02-08",
+                        "monthsDormant": 28,
+                        "bountyIfWon": 50,
+                        "quarterToDateRevenue": 0,
+                        "alreadyReactivated": false
+                    },
+                    {
+                        "idCustomer": "13269",
+                        "company": "Jake Faccone",
+                        "tier": "SILVER '26 -NIKA",
+                        "lifetimeEmbroidery": 3154.1,
+                        "embroideryOrders": 1,
+                        "lastEmbroideryDate": "2025-04-16",
+                        "monthsDormant": 14,
+                        "bountyIfWon": 50,
+                        "quarterToDateRevenue": 0,
+                        "alreadyReactivated": false
+                    },
+                    {
+                        "idCustomer": "12993",
+                        "company": "Terenn Houk",
+                        "tier": "House-2026",
+                        "lifetimeEmbroidery": 2998.9,
+                        "embroideryOrders": 3,
+                        "lastEmbroideryDate": "2025-03-25",
+                        "monthsDormant": 15,
+                        "bountyIfWon": 50,
+                        "quarterToDateRevenue": 0,
+                        "alreadyReactivated": false
                     }
                 ]
             },
@@ -775,153 +859,244 @@
                         "bountyIfWon": 50,
                         "quarterToDateRevenue": 0,
                         "alreadyReactivated": false
+                    },
+                    {
+                        "idCustomer": "3163",
+                        "company": "Pierce County Noxious Weed Control",
+                        "tier": "SILVER '26-TANEISHA",
+                        "lifetimeEmbroidery": 18116,
+                        "embroideryOrders": 6,
+                        "lastEmbroideryDate": "2024-05-22",
+                        "monthsDormant": 25,
+                        "bountyIfWon": 50,
+                        "quarterToDateRevenue": 0,
+                        "alreadyReactivated": false
+                    },
+                    {
+                        "idCustomer": "1438",
+                        "company": "Takehara Landscape",
+                        "tier": "GOLD '26- TANEISHA",
+                        "lifetimeEmbroidery": 13836.2,
+                        "embroideryOrders": 8,
+                        "lastEmbroideryDate": "2024-12-02",
+                        "monthsDormant": 18,
+                        "bountyIfWon": 50,
+                        "quarterToDateRevenue": 0,
+                        "alreadyReactivated": false
+                    },
+                    {
+                        "idCustomer": "11454",
+                        "company": "Swire Coca-Cola- Bellevue",
+                        "tier": "SILVER '26-TANEISHA",
+                        "lifetimeEmbroidery": 13220.5,
+                        "embroideryOrders": 5,
+                        "lastEmbroideryDate": "2024-04-17",
+                        "monthsDormant": 26,
+                        "bountyIfWon": 50,
+                        "quarterToDateRevenue": 0,
+                        "alreadyReactivated": false
+                    },
+                    {
+                        "idCustomer": "11915",
+                        "company": "Flagstone Construction LLC",
+                        "tier": "BRONZE '26-TANEISHA",
+                        "lifetimeEmbroidery": 12355.74,
+                        "embroideryOrders": 11,
+                        "lastEmbroideryDate": "2023-12-21",
+                        "monthsDormant": 30,
+                        "bountyIfWon": 50,
+                        "quarterToDateRevenue": 0,
+                        "alreadyReactivated": false
+                    },
+                    {
+                        "idCustomer": "9646",
+                        "company": "Fluke Metal Products",
+                        "tier": "SILVER '26-TANEISHA",
+                        "lifetimeEmbroidery": 12282.2,
+                        "embroideryOrders": 2,
+                        "lastEmbroideryDate": "2024-01-12",
+                        "monthsDormant": 29,
+                        "bountyIfWon": 50,
+                        "quarterToDateRevenue": 0,
+                        "alreadyReactivated": false
+                    },
+                    {
+                        "idCustomer": "10611",
+                        "company": "The Truck Shop",
+                        "tier": "SILVER '26-TANEISHA",
+                        "lifetimeEmbroidery": 11775,
+                        "embroideryOrders": 7,
+                        "lastEmbroideryDate": "2023-08-30",
+                        "monthsDormant": 34,
+                        "bountyIfWon": 50,
+                        "quarterToDateRevenue": 0,
+                        "alreadyReactivated": false
+                    },
+                    {
+                        "idCustomer": "10687",
+                        "company": "McKee Enterprises",
+                        "tier": "Win Back '26 TANEISHA",
+                        "lifetimeEmbroidery": 11471.15,
+                        "embroideryOrders": 8,
+                        "lastEmbroideryDate": "2022-09-21",
+                        "monthsDormant": 45,
+                        "bountyIfWon": 50,
+                        "quarterToDateRevenue": 0,
+                        "alreadyReactivated": false
+                    },
+                    {
+                        "idCustomer": "11021",
+                        "company": "Full Tilt Fabrication LLC",
+                        "tier": "SILVER '26-TANEISHA",
+                        "lifetimeEmbroidery": 11405.4,
+                        "embroideryOrders": 11,
+                        "lastEmbroideryDate": "2024-03-12",
+                        "monthsDormant": 27,
+                        "bountyIfWon": 50,
+                        "quarterToDateRevenue": 0,
+                        "alreadyReactivated": false
+                    },
+                    {
+                        "idCustomer": "2575",
+                        "company": "Northwest Indian Fisheries Commission",
+                        "tier": "BRONZE '26-TANEISHA",
+                        "lifetimeEmbroidery": 11374,
+                        "embroideryOrders": 7,
+                        "lastEmbroideryDate": "2025-05-14",
+                        "monthsDormant": 13,
+                        "bountyIfWon": 50,
+                        "quarterToDateRevenue": 0,
+                        "alreadyReactivated": false
+                    },
+                    {
+                        "idCustomer": "3238",
+                        "company": "KM Resorts of America",
+                        "tier": "SILVER '26-TANEISHA",
+                        "lifetimeEmbroidery": 11343.19,
+                        "embroideryOrders": 6,
+                        "lastEmbroideryDate": "2025-04-22",
+                        "monthsDormant": 14,
+                        "bountyIfWon": 50,
+                        "quarterToDateRevenue": 0,
+                        "alreadyReactivated": false
+                    },
+                    {
+                        "idCustomer": "10282",
+                        "company": "Commercial Fence Corporation",
+                        "tier": "SILVER '26-TANEISHA",
+                        "lifetimeEmbroidery": 10408.6,
+                        "embroideryOrders": 6,
+                        "lastEmbroideryDate": "2024-11-21",
+                        "monthsDormant": 19,
+                        "bountyIfWon": 50,
+                        "quarterToDateRevenue": 0,
+                        "alreadyReactivated": false
+                    },
+                    {
+                        "idCustomer": "9701",
+                        "company": "CondoCare",
+                        "tier": "GOLD '26- TANEISHA",
+                        "lifetimeEmbroidery": 9912,
+                        "embroideryOrders": 7,
+                        "lastEmbroideryDate": "2025-06-09",
+                        "monthsDormant": 12,
+                        "bountyIfWon": 50,
+                        "quarterToDateRevenue": 0,
+                        "alreadyReactivated": false
+                    },
+                    {
+                        "idCustomer": "8651",
+                        "company": "Roto-Rooter Services Co",
+                        "tier": "GOLD '26- TANEISHA",
+                        "lifetimeEmbroidery": 9561.01,
+                        "embroideryOrders": 29,
+                        "lastEmbroideryDate": "2024-10-07",
+                        "monthsDormant": 20,
+                        "bountyIfWon": 50,
+                        "quarterToDateRevenue": 0,
+                        "alreadyReactivated": false
+                    },
+                    {
+                        "idCustomer": "12320",
+                        "company": "Accessibath, LLC",
+                        "tier": "Win Back '26 TANEISHA",
+                        "lifetimeEmbroidery": 9244.99,
+                        "embroideryOrders": 21,
+                        "lastEmbroideryDate": "2024-06-10",
+                        "monthsDormant": 24,
+                        "bountyIfWon": 50,
+                        "quarterToDateRevenue": 0,
+                        "alreadyReactivated": false
+                    },
+                    {
+                        "idCustomer": "12615",
+                        "company": "East Bay Structural & Termite Co",
+                        "tier": "SILVER '26-TANEISHA",
+                        "lifetimeEmbroidery": 9196,
+                        "embroideryOrders": 2,
+                        "lastEmbroideryDate": "2024-12-10",
+                        "monthsDormant": 18,
+                        "bountyIfWon": 50,
+                        "quarterToDateRevenue": 0,
+                        "alreadyReactivated": false
+                    },
+                    {
+                        "idCustomer": "3057",
+                        "company": "Alaska Premier Charters",
+                        "tier": "House-2026",
+                        "lifetimeEmbroidery": 9187.23,
+                        "embroideryOrders": 5,
+                        "lastEmbroideryDate": "2007-02-19",
+                        "monthsDormant": 232,
+                        "bountyIfWon": 50,
+                        "quarterToDateRevenue": 0,
+                        "alreadyReactivated": false
+                    },
+                    {
+                        "idCustomer": "13073",
+                        "company": "UW Dept. Of Emergency Medicine",
+                        "tier": "SILVER '26-TANEISHA",
+                        "lifetimeEmbroidery": 9104.5,
+                        "embroideryOrders": 1,
+                        "lastEmbroideryDate": "2024-09-10",
+                        "monthsDormant": 21,
+                        "bountyIfWon": 50,
+                        "quarterToDateRevenue": 0,
+                        "alreadyReactivated": false
+                    },
+                    {
+                        "idCustomer": "11165",
+                        "company": "Commercial Technician Services",
+                        "tier": "SILVER '26-TANEISHA",
+                        "lifetimeEmbroidery": 9049.55,
+                        "embroideryOrders": 12,
+                        "lastEmbroideryDate": "2024-12-19",
+                        "monthsDormant": 18,
+                        "bountyIfWon": 50,
+                        "quarterToDateRevenue": 0,
+                        "alreadyReactivated": false
                     }
                 ]
             }
         }
     };
 
-    var realFetch = window.fetch;
-    window.fetch = function (url, options) {
+    function ok(body) {
+        return Promise.resolve({ ok: true, status: 200, json: function () { return Promise.resolve(body); } });
+    }
+
+    var realFetch = window.fetch.bind(window);
+    window.fetch = function (url, opts) {
         var u = String(url);
-        var method = (options && options.method) || 'GET';
-
-        // --- Q3 Embroidery Bonus (added 2026-07-25). Real captured backend payload, so the
-        // hero and win-back card render the same figures production produces. The server
-        // injects identity, so this returns ONLY the viewed rep. ---
-        if (u.indexOf('/api/crm-proxy/embroidery-bonus/dormant') !== -1) {
-            return json(Object.assign({ success: true }, EMB_DORMANT));
+        if (u.indexOf('/embroidery-bonus/dormant') !== -1) return ok(Object.assign({ success: true }, DORMANT));
+        // /team mirrors production: the server forces scope=team and blanks `reps`, so the
+        // shared staff dashboard can never receive per-rep compensation. Keeping that shape
+        // here means the harness fails if the strip ever starts reading rep dollars.
+        if (u.indexOf('/embroidery-bonus/team') !== -1) {
+            return ok(Object.assign({ success: true }, BONUS, { reps: {}, scope: 'team' }));
         }
-        if (u.indexOf('/api/crm-proxy/embroidery-bonus') !== -1) {
-            var vm = u.match(/viewAs=([^&]+)/);
-            var vEmail = vm ? decodeURIComponent(vm[1]) : REP.email;
-            var who = vEmail === NIKA.email ? NIKA.fullName : REP.fullName;
-            var scoped = {}; if (EMB_BONUS.reps[who]) scoped[who] = EMB_BONUS.reps[who];
-            return json(Object.assign({ success: true }, EMB_BONUS, { reps: scoped, scope: 'rep' }));
-        }
-        if (u.indexOf('/api/crm-session/me') !== -1) {
-            return json({ authenticated: true, name: 'Erik Mickelson', firstName: 'Erik', email: 'erik@nwcustomapparel.com', permissions: ['admin', 'accountant', 'house', 'policies-admin', 'taneisha', 'nika'] });
-        }
-        if (u.indexOf('/api/crm-proxy/ae-dashboard/summary') !== -1) {
-            var m = u.match(/viewAs=([^&]+)/);
-            var email = m ? decodeURIComponent(m[1]) : REP.email;
-            return json(summaryFor(email === NIKA.email ? NIKA : REP));
-        }
-        if (u.indexOf('/api/crm-proxy/ae-dashboard/growth') !== -1) {
-            return json({
-                rep: REP, generatedAt: new Date().toISOString(), windowMonths: 24,
-                accountsScanned: 214, flaggedCount: 9, potentialTotal: 18420.5, truncated: 0, cacheHit: false,
-                items: [
-                    { idCustomer: '7881', company: 'Cintas', orderCount24mo: 14, medianGapDays: 42, daysSinceLastOrder: 93, lastOrderDate: daysAgoDay(93), avgOrderValue: 1450.25, lyUpcoming45d: 0, estValue: 1450.25, reasons: [{ type: 'rhythm', text: 'usually orders every ~42 days — quiet for 93' }] },
-                    { idCustomer: '5120', company: 'Korsmo Construction', orderCount24mo: 9, medianGapDays: 61, daysSinceLastOrder: 44, lastOrderDate: daysAgoDay(44), avgOrderValue: 890, lyUpcoming45d: 4200, estValue: 4200, reasons: [{ type: 'season', text: 'spent $4,200 in the next 45 days LAST year' }] },
-                    { idCustomer: '3310', company: 'Harbor Electric', orderCount24mo: 11, medianGapDays: 38, daysSinceLastOrder: 71, lastOrderDate: daysAgoDay(71), avgOrderValue: 2140, lyUpcoming45d: 980, estValue: 2140, reasons: [{ type: 'rhythm', text: 'usually orders every ~38 days — quiet for 71' }, { type: 'season', text: 'spent $980 in the next 45 days LAST year' }] },
-                ],
-            });
-        }
-        if (u.indexOf('/api/crm-proxy/ae-dashboard/data-quality') !== -1) {
-            // 7 orders + 6 customers so the "show 5 + expand" accordion triggers
-            // in both sections. All orders are OPEN/in-process (invoiced &
-            // webstore rows are filtered out server-side now — no stage field).
-            var o = function (id, cust, company, placedAgo, issues) {
-                return { idOrder: id, idCustomer: cust, company: company, placedDate: daysAgoDay(placedAgo),
-                    errCount: issues.filter(function (i) { return i.severity === 'err'; }).length, issues: issues };
-            };
-            var e = function (field, text) { return { field: field, severity: 'err', text: text }; };
-            var w = function (field, text) { return { field: field, severity: 'warn', text: text }; };
-            return json({
-                rep: REP, generatedAt: new Date().toISOString(), windowDays: 30,
-                ordersScanned: 47, ordersExcluded: 78, customersScanned: 28, cacheHit: false,
-                counts: { ordersFlagged: 7, customersFlagged: 6, orderErrors: 12 },
-                orders: [
-                    o(142510, 3310, 'Harbor Electric <script>alert(1)</script>', 1, [e('phone', 'no contact phone'), e('terms', 'no payment terms'), e('due-date', 'no requested-ship date')]),
-                    o(142488, 5120, 'Korsmo Construction', 3, [e('ship-address', 'ship method "UPS Ground" chosen but NO ship-to address'), e('email', 'no contact email')]),
-                    o(142371, 7881, 'Cintas', 4, [e('tax', 'taxable order but $0 sales tax (customer is not tax-exempt)')]),
-                    o(142365, 6002, 'Puget Powerwash', 5, [e('last-name', 'no contact last name'), w('ship-address', 'no ship-to address (OK only if pickup)')]),
-                    o(142340, 6110, 'Sound Transit Crew', 6, [e('terms', 'no payment terms')]),
-                    o(142322, 6220, 'Tacoma Tug & Barge', 8, [e('phone', 'no contact phone')]),
-                    o(142301, 6330, 'CITC of Washington', 11, [e('terms', 'no payment terms'), e('phone', 'no contact phone')]),
-                ],
-                customers: [
-                    { idCustomer: 3310, company: 'Harbor Electric', errCount: 2, issues: [e('customer-type', 'customer type not set'), e('phone', 'no phone on the customer record')] },
-                    { idCustomer: 5120, company: 'Korsmo Construction', errCount: 0, issues: [w('terms', 'no default payment terms'), w('address', 'address incomplete')] },
-                    { idCustomer: 6002, company: 'Puget Powerwash', errCount: 1, issues: [e('customer-type', 'customer type not set')] },
-                    { idCustomer: 6110, company: 'Sound Transit Crew', errCount: 1, issues: [e('tax', 'marked tax-exempt but no exemption # on file')] },
-                    { idCustomer: 6220, company: 'Tacoma Tug & Barge', errCount: 0, issues: [w('address', 'address incomplete')] },
-                    { idCustomer: 6330, company: 'CITC of Washington', errCount: 1, issues: [e('phone', 'no phone on the customer record')] },
-                ],
-                ordersTruncated: 0, customersTruncated: 0,
-            });
-        }
-        if (u.indexOf('/api/crm-proxy/ae-dashboard/due-dates') !== -1) {
-            return json({
-                rep: REP, generatedAt: new Date().toISOString(), today: daysAgoDay(0),
-                dueSoonDays: 7, lookbackDays: 60, ordersScanned: 41, cacheHit: false,
-                counts: { late: 2, atRisk: 2, dueSoonOnTrack: 3 },
-                late: [
-                    { idOrder: 142280, idCustomer: 3310, company: 'Harbor Electric <b>xss</b>', orderType: 'Embroidery', placedDate: daysAgoDay(14), dueDate: daysAgoDay(5), daysUntilDue: -5, subtotal: 2140.75, invoiced: false, blanks: 'ordered', poCount: 1, vendors: ['SanMar'], flag: 'late', reason: '5d past due · blanks ordered, not received' },
-                    { idOrder: 142315, idCustomer: 5120, company: 'Korsmo Construction', orderType: 'DTG', placedDate: daysAgoDay(10), dueDate: daysAgoDay(1), daysUntilDue: -1, subtotal: 890, invoiced: true, blanks: 'received', poCount: 2, vendors: ['SanMar', 'S&S Activewear'], flag: 'late', reason: '1d past due' },
-                ],
-                atRisk: [
-                    { idOrder: 142501, idCustomer: 7881, company: 'Cintas', orderType: 'Screen Print', placedDate: daysAgoDay(3), dueDate: daysAgoDay(0), daysUntilDue: 0, subtotal: 1450.25, invoiced: false, blanks: 'none', poCount: 0, vendors: [], flag: 'risk', reason: 'due TODAY · blanks not purchased (no PO on this WO)' },
-                    { idOrder: 142449, idCustomer: 1102, company: 'Puget Powerwash', orderType: 'Embroidery', placedDate: daysAgoDay(6), dueDate: daysAgoDay(-4), daysUntilDue: 4, subtotal: 812, invoiced: false, blanks: 'partial', poCount: 2, vendors: ['SanMar'], flag: 'risk', reason: 'due in 4d · blanks only partially received' },
-                ],
-                lateTruncated: 0, atRiskTruncated: 0,
-            });
-        }
-        if (u.indexOf('/api/crm-proxy/ae-dashboard/purchasing') !== -1) {
-            return json({
-                rep: REP, generatedAt: new Date().toISOString(), windowDays: 60,
-                submissionCount: 4, truncated: 0, cacheHit: false,
-                counts: { sent: 1, ordered: 1, received: 1, shipped: 1 },
-                items: [
-                    { submissionId: '1', submittedAt: daysAgoDay(1) + ' 09:12:00', orderType: 'Regular Order', bradleyPo: '3702', orders: [
-                        { orderNumber: 142501, company: 'Harbor Electric', status: 'sent', poCount: 0, vendors: [], orderedDate: '', receivedDate: '' }] },
-                    { submissionId: '2', submittedAt: daysAgoDay(3) + ' 14:40:00', orderType: 'Rush', bradleyPo: '3691', orders: [
-                        { orderNumber: 142449, company: 'Korsmo Construction', status: 'ordered', poCount: 1, vendors: ['SanMar'], sanmarPos: [113777], orderedDate: daysAgoDay(2), receivedDate: '' }] },
-                    { submissionId: '3', submittedAt: daysAgoDay(7) + ' 10:05:00', orderType: 'Regular Order', bradleyPo: '3668', orders: [
-                        { orderNumber: 142398, company: 'CITC of Washington', status: 'received', poCount: 2, vendors: ['SanMar', 'S&S Activewear'], sanmarPos: [113606], orderedDate: daysAgoDay(6), receivedDate: daysAgoDay(2) }] },
-                    { submissionId: '4', submittedAt: daysAgoDay(12) + ' 16:22:00', orderType: 'Regular Order', bradleyPo: '', orders: [
-                        { orderNumber: 142301, company: 'Boeing Employees Club', status: 'shipped', poCount: 1, vendors: ['SanMar'], orderedDate: daysAgoDay(11), receivedDate: daysAgoDay(6) }] },
-                ],
-            });
-        }
-        if (u.indexOf('/api/sanmar-invoices/by-po/') !== -1) {
-            var po = u.split('/by-po/')[1].split('?')[0];
-            return json({ purchaseOrder: po, invoices: [{
-                invoiceNumber: 'INV-88' + po.slice(-3), invoiceDate: daysAgoDay(2), dueDate: daysAgoDay(-28),
-                purchaseOrderNo: po, orderDate: daysAgoDay(4), invoiceStatus: 'Unpaid', shipVia: 'UPS GROUND', terms: 'NET 30',
-                subtotal: 164.16, salesTax: 0, shippingCharges: 12.1, freightSavings: 0, totalAmount: 176.26,
-                shipTo: { name: 'Northwest Custom Apparel', city: 'Milton', state: 'WA' },
-                lineItems: [{ styleNo: 'PC54', color: 'Navy', description: 'Port & Company Core Cotton Tee', size: 'L', quantity: 48, unitPrice: 3.42, lineTotal: 164.16 }]
-            }], fetchedAt: new Date().toISOString() });
-        }
-        if (u.indexOf('/api/crm-proxy/marketing-shipments/items') !== -1) {
-            return json({ items: kitItems });
-        }
-        if (u.indexOf('/api/crm-proxy/marketing-shipments') !== -1 && method === 'POST') {
-            var body = JSON.parse(options.body || '{}');
-            if (!body.items || !body.items.length) return json({ error: 'Select at least one item to send' }, 400);
-            return json({ shipmentId: 'KIT0719-9999' }, 201);
-        }
-        if (u.indexOf('/api/crm-proxy/lead-outreach') !== -1) {
-            var ob = JSON.parse(options.body || '{}');
-            if (ob.preview) {
-                return json({
-                    subject: 'Quick intro from Northwest Custom Apparel',
-                    bodyHtml: '<p>Hi ' + (ob.lead.contactName || 'there') + ',</p><p>(stubbed template body — real HTML comes from lead-outreach-templates.js)</p>',
-                    label: 'Introduction',
-                });
-            }
-            return json({ sent: true, to: ob.lead.email, label: 'Introduction' });
-        }
-        if (u.indexOf('/api/sanmar-orders/inbound-today') !== -1) {
-            return json(inbound);
-        }
-        if (u.indexOf('/api/art-notifications') !== -1) {
-            return json({ notifications: [], serverTime: Date.now() });
-        }
-        return realFetch.apply(window, arguments);
+        if (u.indexOf('/embroidery-bonus') !== -1) return ok(Object.assign({ success: true }, BONUS));
+        console.warn('[stub] unstubbed fetch:', u);
+        return realFetch(url, opts);
     };
-
-    console.log('[test-stub] AE Mission Control fetch stub active');
 })();

@@ -3601,6 +3601,64 @@ app.get('/api/crm-proxy/ae-dashboard/purchasing', requireCrmRole(['taneisha', 'n
 // forwarder for the concurrent session's MC card after the 2026-07-19 server.js
 // hotfix revert (its proxy endpoint /api/ae-dashboard/data-quality is live).
 app.get('/api/crm-proxy/ae-dashboard/data-quality', requireCrmRole(['taneisha', 'nika', 'admin']), aeDashboardForwarder('/api/ae-dashboard/data-quality'));
+// Q3 2026 Embroidery Bonus — activation bounties + growth ladder + $3M team kicker.
+// Proxy side is secret-only (it exposes per-account customer names, revenue and payroll
+// dollars), so browsers come through here. Role-gated to the two AEs + admin, same as the
+// rest of the commission surfaces.
+function embroideryBonusForwarder(upstreamPath, { injectIdentity = false, teamOnly = false } = {}) {
+  return async (req, res) => {
+    try {
+      const caller = req.session.crmUser;
+      const perms = caller.permissions || [];
+      const params = new URLSearchParams();
+      if (req.query.quarter) params.set('quarter', String(req.query.quarter));
+      if (req.query.year) params.set('year', String(req.query.year));
+      // scope=team is forced server-side, never read from the query — a caller on the
+      // shared-dashboard route can't widen it into per-rep compensation.
+      if (teamOnly) params.set('scope', 'team');
+      if (injectIdentity) {
+        // Identity from the verified SAML session, never the browser. Admins may
+        // view as another rep (Erik's switcher); a rep can only ever see their own.
+        let email = String(caller.email || '').toLowerCase();
+        const viewAs = String(req.query.viewAs || '').toLowerCase().trim();
+        if (viewAs && perms.includes('admin')) email = viewAs;
+        if (perms.includes('admin') && !viewAs) {
+          // Admin with no override: return every rep (omit email entirely).
+        } else {
+          params.set('email', email);
+        }
+      }
+      const response = await fetch(`${CRM_API_BASE}${upstreamPath}?${params}`, {
+        headers: { 'X-CRM-API-Secret': CRM_API_SECRET }
+      });
+      const data = await response.json().catch(() => ({ error: 'Bad upstream response' }));
+      res.status(response.status).json(data);
+    } catch (error) {
+      console.error(`[CRM Proxy] embroidery-bonus ${upstreamPath} error:`, error.message);
+      res.status(500).json({ error: 'Proxy error', message: error.message });
+    }
+  };
+}
+// Per-rep figures. Identity injected from the session: a rep only ever receives their own
+// numbers, and an admin with no ?viewAs= gets every rep (the Erik overview).
+app.get('/api/crm-proxy/embroidery-bonus',
+  requireCrmRole(['taneisha', 'nika', 'admin']),
+  embroideryBonusForwarder('/api/embroidery-bonus', { injectIdentity: true }));
+app.get('/api/crm-proxy/embroidery-bonus/config',
+  requireCrmRole(['taneisha', 'nika', 'admin']),
+  embroideryBonusForwarder('/api/embroidery-bonus/config'));
+// 🔒 TEAM-ONLY feed for the shared staff dashboard, which EVERY employee opens.
+// Returns the company Q3 number and the kicker tiers — never a rep's earnings. Open to any
+// logged-in staff precisely because it carries no compensation.
+app.get('/api/crm-proxy/embroidery-bonus/team',
+  requireStaff,
+  embroideryBonusForwarder('/api/embroidery-bonus', { teamOnly: true }));
+// Dormant call list — the 378 accounts with embroidery history gone quiet 12+ months.
+// Identity injected so a rep sees only their own book.
+app.get('/api/crm-proxy/embroidery-bonus/dormant',
+  requireCrmRole(['taneisha', 'nika', 'admin']),
+  embroideryBonusForwarder('/api/embroidery-bonus/dormant', { injectIdentity: true }));
+
 // Purchasing Portal — company-wide view of the same feed (every request to
 // Bradley + requester + status). ANY logged-in staff; no identity injection.
 app.get('/api/crm-proxy/purchasing-portal', requireStaff, async (req, res) => {

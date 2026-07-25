@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>TEST HARNESS — Embroidery Bonus card</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Same stylesheet chain as staff-dashboard-v3, in the same order -->
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/tokens.css?v=20260514-ai-phase1">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/base.css?v=2026.07.06.11">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css?v=2026.07.25.4">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/utilities.css?v=20260514-ai-phase1">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=2026.07.22.2">
+
+    <!-- window.APP_CONFIG must exist before any dashboard module imports
+         dashboard-endpoints.js, which throws without APP_CONFIG.API.BASE_URL (Rule #7 guard).
+         This is the same config the real dashboard loads — note it is NOT
+         shared_components/js/app-config.js, which sets window.NWCA_APP_CONFIG instead. -->
+    <script src="/staff-dashboard-v3/config.js?v=20260512h"></script>
+    <!-- Fetch stub: real captured backend payload, no network, no SAML -->
+    <script src="/tests/ui/test-embroidery-bonus-stub.js"></script>
+</head>
+<body>
+    <div style="padding: 24px; max-width: 1200px; margin: 0 auto;">
+        <p style="color:#94a3b8;font:500 13px Inter,sans-serif;margin:0 0 16px;">
+            TEST HARNESS — renders the <strong>Q3 Team Push</strong> strip from a captured live
+            payload (Q3 2026 to date, config in <code>fallback</code> state so the warning banner
+            is exercised). 🔒 This card must show <strong>no compensation</strong>: the stub serves
+            the team-scoped shape (<code>reps: {}</code>) exactly as the server does, so if the
+            strip ever starts reading per-rep dollars it will render blank here.
+        </p>
+
+        <!-- Card markup copied verbatim from staff-dashboard-v3/index.html -->
+        <article class="embroidery-bonus-card col-span-full">
+            <header class="metrics-team-header mb-3">
+                <div class="metrics-team-title-group">
+                    <h3 class="metrics-team-title">
+                        <i class="fas fa-bullseye" aria-hidden="true"></i> Q3 Team Push
+                    </h3>
+                    <div class="metrics-date-range" id="embroideryBonusDateRange">Loading…</div>
+                </div>
+                <div class="embroidery-bonus-controls">
+                    <span class="sync-status num" id="embroideryBonusStatus"></span>
+                    <button type="button" class="refresh-btn" data-action="embroidery-bonus:refresh" aria-label="Refresh embroidery bonus" title="Refresh">
+                        <i class="fas fa-sync-alt" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </header>
+            <div id="embroideryBonusContent">
+                <div class="embroidery-bonus-loading"><div class="loading-spinner"></div><span>Loading embroidery bonus…</span></div>
+            </div>
+        </article>
+    </div>
+
+    <script type="module">
+        // register() installs the delegated click router on first call, which the
+        // controller does at import time — no explicit init needed here.
+        import { initEmbroideryBonus } from '/shared_components/js/staff-dashboard/controllers/embroidery-bonus-controller.js';
+        initEmbroideryBonus();
+    </script>
+</body>
+</html>

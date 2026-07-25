@@ -1127,6 +1127,131 @@
 }
 
 /* =====================================================
+   EMBROIDERY BONUS (Q3 2026+) — replaced the Garment Tracker card
+   Reuses the garment card's shell tokens; the inner layout is
+   per-rep columns of metrics rather than a style×qty matrix.
+   ===================================================== */
+.embroidery-bonus-card {
+    background: var(--surface-card);
+    border: 1px solid var(--border-soft);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-1);
+    padding: var(--pad-card, var(--space-5));
+}
+.embroidery-bonus-controls {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-left: auto;
+}
+.embroidery-bonus-controls .sync-status,
+.embroidery-bonus-loading {
+    color: #ffffff;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+}
+.embroidery-bonus-loading {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-4);
+}
+
+/* Fallback-config banner — Erik's #1 rule: a default must never look like real data. */
+.eb-warning {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    margin-bottom: var(--space-3);
+    border: 1px solid var(--warn-border, #b45309);
+    background: var(--warn-bg, rgba(180, 83, 9, 0.14));
+    color: var(--warn-text, #fbbf24);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+}
+
+/* --- Team strip. Company-wide numbers only; no per-rep compensation renders here. --- */
+.eb-team-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+}
+.eb-team-value {
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    line-height: 1.05;
+    font-weight: var(--font-weight-bold, 700);
+    color: var(--accent);
+}
+.eb-team-goal { text-align: right; }
+.eb-team-goal-value {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--warn-text, #f59e0b);
+}
+.eb-team-goal-value.is-hit { color: var(--accent); }
+.eb-team-label {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+.eb-team-track { height: 12px; }
+.eb-team-scale {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-4);
+    margin-top: 8px;
+}
+.eb-team-tier {
+    font-size: var(--font-size-xs, 0.75rem);
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+}
+.eb-team-tier.is-hit {
+    color: var(--accent);
+    font-weight: var(--font-weight-semibold);
+}
+.eb-team-note {
+    margin: var(--space-3) 0 0;
+    font-size: var(--font-size-sm);
+    color: var(--text-2, #cbd5e1);
+    line-height: 1.55;
+}
+
+.eb-ladder-track {
+    position: relative;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--surface-card-2, rgba(148, 163, 184, 0.22));
+    overflow: visible;
+}
+.eb-ladder-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: var(--warn-text, #f59e0b);
+    transition: width 240ms ease;
+}
+.eb-ladder-fill.is-reached { background: var(--accent); }
+.eb-ladder-mark {
+    position: absolute;
+    top: -3px;
+    width: 2px;
+    height: 14px;
+    background: var(--border-base, rgba(148, 163, 184, 0.7));
+    transform: translateX(-1px);
+}
+.eb-ladder-mark.is-hit { background: var(--accent); }
+@media (max-width: 720px) {
+    .eb-team-head { flex-direction: column; align-items: flex-start; }
+    .eb-team-goal { text-align: left; }
+    .eb-team-scale { justify-content: space-between; gap: var(--space-2); }
+}
+
+/* =====================================================
    TOP HEADER — TEAM widget (Phase 4.5)
    Single button replacing 3-pill cluster
    ===================================================== */
@@ -1721,7 +1846,9 @@ dashboard-modal:not([open]) { display: none; }
 .announcement-hero__preview,
 .announcement-hero__date,
 .garment-tracker-footer,
-.garment-tracker-controls .sync-status {
+.garment-tracker-controls .sync-status,
+.embroidery-bonus-controls .sync-status,
+.embroidery-bonus-loading {
     color: var(--text-2);
 }
 

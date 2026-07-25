@@ -19,7 +19,9 @@ import { initCelebrations }    from '../controllers/celebrations-controller.js';
 import { initMetrics }         from '../controllers/metrics-controller.js';
 import { initTeamPerformance } from '../controllers/team-performance-controller.js';
 import { initProduction }      from '../controllers/production-controller.js';
-import { initGarmentTracker }  from '../controllers/garment-tracker-controller.js';
+// Garment Tracker retired 2026-07-25 — superseded by the Q3 2026 Embroidery Bonus.
+// Q2 data stays readable in GarmentTrackerArchive; the controller/route are unmounted.
+import { initEmbroideryBonus } from '../controllers/embroidery-bonus-controller.js';
 // Phase 1 "alive + personal" widgets (2026-07-20). Win Bell removed 2026-07-23
 // (Erik: its first-run placeholder cluttered the top of the page).
 import { initPrideWall }       from '../controllers/pride-wall-controller.js';
@@ -56,7 +58,7 @@ async function bootstrap() {
     initSamplePipeline();    // sample orders w/o a later order — rep call list
     initMetrics();           // ManageOrders revenue + sparkline + YoY
     initTeamPerformance();   // Caspio archive YTD per-rep
-    initGarmentTracker();    // Caspio garment-tracker table (bridged to legacy service)
+    initEmbroideryBonus();   // Q3 2026 bonus — live from ORDER_ODBC via the CRM forwarder
     initPrideWall();         // finished-photos library → ambient photo strip
 
     await authPromise;
