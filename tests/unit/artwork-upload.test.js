@@ -113,3 +113,28 @@ describe('helpers', () => {
     expect(A.formatBytes(0)).toBe('');
   });
 });
+
+describe('thumbnail preview', () => {
+  test('formats a browser can paint get a real preview', () => {
+    ['logo.png', 'photo.JPG', 'art.jpeg', 'anim.gif', 'shot.webp', 'mark.svg']
+      .forEach(n => expect(A.isPreviewable(n)).toBe(true));
+  });
+
+  test('formats it cannot paint fall back to a badge, not a broken image', () => {
+    // A broken <img> reads as "your upload failed". Naming the format is honest.
+    ['proof.pdf', 'layers.psd', 'vector.ai', 'vector.eps', 'scan.tif']
+      .forEach(n => expect(A.isPreviewable(n)).toBe(false));
+  });
+
+  test('the badge names the actual format', () => {
+    expect(A.badgeFor('proof.pdf')).toBe('PDF');
+    expect(A.badgeFor('vector.AI')).toBe('AI');
+    expect(A.badgeFor('layers.psd')).toBe('PSD');
+    expect(A.badgeFor('noextension')).toBe('FILE');
+  });
+
+  test('everything previewable is also an accepted upload', () => {
+    // A preview for a file we would then reject would be a lie.
+    A.PREVIEWABLE.forEach(e => expect(A.ACCEPT_EXT).toContain(e));
+  });
+});

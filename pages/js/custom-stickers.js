@@ -461,12 +461,14 @@
         var email = byId('stkEmail').value.trim();
         var phone = byId('stkPhone').value.trim();
 
+        // Phone is OPTIONAL (2026-07-24). Email is how we send the quote, so it is
+        // the only contact detail we genuinely need — asking for a phone number
+        // before handing over a price is friction the competitor does not have.
         var missing = [];
         if (!name) missing.push('your name');
         if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) missing.push('a valid email');
-        if (!phone) missing.push('a phone number');
         if (missing.length) {
-            err.textContent = 'We still need ' + missing.join(', ') + '.';
+            err.textContent = 'We still need ' + missing.join(' and ') + '.';
             err.hidden = false;
             return;
         }
@@ -616,6 +618,7 @@
                 zone: byId('stkAwZone'),
                 input: byId('stkAwInput'),
                 status: byId('stkAwStatus'),
+                preview: byId('stkAwPreview'),
                 remove: byId('stkAwRemove'),
                 describe: function () {
                     return 'Sticker quote artwork — ' +

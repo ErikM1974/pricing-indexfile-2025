@@ -47,6 +47,21 @@
         return (n / (1024 * 1024)).toFixed(1) + ' MB';
     }
 
+    // Formats a browser can actually paint. PDF/AI/EPS/PSD cannot be rendered in
+    // an <img>, so those get a labelled badge instead of a broken image — which
+    // is more honest than a generic file icon that tells you nothing.
+    var PREVIEWABLE = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'];
+
+    function isPreviewable(name) {
+        return PREVIEWABLE.indexOf(extensionOf(name)) !== -1;
+    }
+
+    /** "PDF", "AI", "EPS"… for the non-renderable badge. */
+    function badgeFor(name) {
+        var e = extensionOf(name);
+        return e ? e.toUpperCase() : 'FILE';
+    }
+
     /**
      * Pure. Returns {ok:true} or {ok:false, reason, message}.
      * Messages are written to be read by a customer, not a developer: each one
@@ -110,6 +125,51 @@
 
         var state = { url: '', key: '', name: '', size: 0, status: 'idle' };
         var reqId = 0;   // guards against a slow first upload landing after a second
+        var previewUrl = '';   // object URL — must be revoked or it leaks the file
+
+        var preview = opts.preview || null;   // container for the thumbnail
+
+        function clearPreview() {
+            if (previewUrl) { URL.revokeObjectURL(previewUrl); previewUrl = ''; }
+            if (preview) { preview.innerHTML = ''; preview.hidden = true; }
+        }
+
+        /**
+         * Show the customer what they actually picked, immediately — before the
+         * upload finishes. "logo.png, 1 KB" is a filename; a thumbnail is a
+         * confirmation, and it is how someone catches that they grabbed last
+         * year's logo. Rendered from the local File, so it costs no round trip.
+         */
+        function showPreview(file) {
+            if (!preview) return;
+            clearPreview();
+            preview.hidden = false;
+            if (isPreviewable(file.name)) {
+                previewUrl = URL.createObjectURL(file);
+                var img = document.createElement('img');
+                img.className = 'aw-thumb';
+                img.alt = 'Preview of ' + file.name;
+                img.src = previewUrl;
+                // A file that claims to be a PNG but won't decode is a broken
+                // upload; say so rather than leaving a broken-image icon.
+                img.onerror = function () {
+                    clearPreview();
+                    preview.hidden = false;
+                    preview.appendChild(badgeEl(file.name));
+                };
+                preview.appendChild(img);
+            } else {
+                preview.appendChild(badgeEl(file.name));
+            }
+        }
+
+        function badgeEl(name) {
+            var d = document.createElement('span');
+            d.className = 'aw-thumb aw-thumb-badge';
+            d.textContent = badgeFor(name);
+            d.setAttribute('aria-hidden', 'true');   // the filename is already announced
+            return d;
+        }
 
         function emit() { if (opts.onChange) opts.onChange(Object.assign({}, state)); }
 
@@ -119,6 +179,7 @@
         }
 
         function reset(msg, kind) {
+            clearPreview();
             state = { url: '', key: '', name: '', size: 0, status: msg ? 'error' : 'idle' };
             if (remove) remove.hidden = true;
             zone.classList.remove('has-file');
@@ -140,6 +201,7 @@
             }
 
             var mine = ++reqId;
+            showPreview(file);          // instant, from the local File
             state.status = 'uploading';
             state.name = file.name;
             state.size = file.size;
@@ -233,6 +295,9 @@
         ACCEPT_ATTR: ACCEPT_ATTR,
         extensionOf: extensionOf,
         formatBytes: formatBytes,
+        isPreviewable: isPreviewable,
+        badgeFor: badgeFor,
+        PREVIEWABLE: PREVIEWABLE,
         validate: validate,
         init: init
     };

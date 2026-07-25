@@ -327,11 +327,11 @@
         var name = byId('bnName').value.trim();
         var email = byId('bnEmail').value.trim();
         var phone = byId('bnPhone').value.trim();
+        // Phone OPTIONAL — see the note in custom-stickers.js.
         var missing = [];
         if (!name) missing.push('your name');
         if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) missing.push('a valid email');
-        if (!phone) missing.push('a phone number');
-        if (missing.length) { err.textContent = 'We still need ' + missing.join(', ') + '.'; err.hidden = false; return; }
+        if (missing.length) { err.textContent = 'We still need ' + missing.join(' and ') + '.'; err.hidden = false; return; }
         err.hidden = true;
         if (byId('bnHp').value) { showSuccess(); return; }
 
@@ -423,6 +423,7 @@
                 zone: byId('bnAwZone'),
                 input: byId('bnAwInput'),
                 status: byId('bnAwStatus'),
+                preview: byId('bnAwPreview'),
                 remove: byId('bnAwRemove'),
                 describe: function () {
                     return 'Banner quote artwork — ' +

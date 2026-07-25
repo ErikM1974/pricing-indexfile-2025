@@ -10962,8 +10962,10 @@ app.post('/api/public/sticker-quote', strictLimiter, express.json({ limit: '32kb
   const name = String(b.name || '').trim();
   const email = String(b.email || '').trim();
   const phone = String(b.phone || '').trim();
-  if (!name || !phone || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-    return res.status(400).json({ error: 'Name, a valid email and a phone number are required.' });
+  // Phone is OPTIONAL (2026-07-24) — email is how the quote reaches them, so it
+  // is the only contact detail actually required to fulfil the request.
+  if (!name || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+    return res.status(400).json({ error: 'A name and a valid email are required.' });
   }
 
   const width = Number(b.width);
