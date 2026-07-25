@@ -1,3 +1,7 @@
+## v2026.07.25.5 (2026.07.25)
+
+- Deploy v2026.07.25.5: 12 files (ACTIVE_FILES.md,ae-mission-control.html,ae-mission-control.css,...)
+
 ## v2026.07.25.4 (2026.07.25)
 
 - Memory: Q3 2026 Embroidery Bonus + the retired-order-type trap
