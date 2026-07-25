@@ -140,6 +140,776 @@
         }));
     }
 
+    var EMB_TARGETS = {
+        "quarter": "Q3",
+        "year": 2026,
+        "asOf": "2026-07-01",
+        "minAccountRevenue": 1000,
+        "dormancyMonths": 12,
+        "configSource": "caspio",
+        "reps": {
+            "Nika Lao": {
+                "winBack": [
+                    {
+                        "idCustomer": "753",
+                        "company": "International Belt & Rubber",
+                        "tier": "GOLD '26 - NIKA",
+                        "lifetimeEmbroidery": 69502.66,
+                        "embroideryOrders": 9,
+                        "avgOrderValue": 7722.52,
+                        "monthsDormant": 19,
+                        "medianReorderDays": 108,
+                        "q3SharePct": 33,
+                        "bounty": 50,
+                        "score": 10296.69
+                    },
+                    {
+                        "idCustomer": "11974",
+                        "company": "Emerald Fire",
+                        "tier": "SILVER '26 -NIKA",
+                        "lifetimeEmbroidery": 32816.68,
+                        "embroideryOrders": 3,
+                        "avgOrderValue": 10938.89,
+                        "monthsDormant": 18,
+                        "medianReorderDays": 372,
+                        "q3SharePct": 0,
+                        "bounty": 50,
+                        "score": 5469.45
+                    },
+                    {
+                        "idCustomer": "1240",
+                        "company": "D.L. Henricksen",
+                        "tier": "SILVER '26 -NIKA",
+                        "lifetimeEmbroidery": 22897.5,
+                        "embroideryOrders": 6,
+                        "avgOrderValue": 3816.25,
+                        "monthsDormant": 13,
+                        "medianReorderDays": 125,
+                        "q3SharePct": 17,
+                        "bounty": 50,
+                        "score": 4452.29
+                    },
+                    {
+                        "idCustomer": "3001",
+                        "company": "Green Effects, Inc.",
+                        "tier": "SILVER '26 -NIKA",
+                        "lifetimeEmbroidery": 14218.41,
+                        "embroideryOrders": 6,
+                        "avgOrderValue": 2369.74,
+                        "monthsDormant": 14,
+                        "medianReorderDays": 107,
+                        "q3SharePct": 33,
+                        "bounty": 50,
+                        "score": 3159.65
+                    },
+                    {
+                        "idCustomer": "11781",
+                        "company": "Tilth Land Care",
+                        "tier": "SILVER '26 -NIKA",
+                        "lifetimeEmbroidery": 36376.76,
+                        "embroideryOrders": 13,
+                        "avgOrderValue": 2798.21,
+                        "monthsDormant": 18,
+                        "medianReorderDays": 40,
+                        "q3SharePct": 0,
+                        "bounty": 50,
+                        "score": 2798.21
+                    },
+                    {
+                        "idCustomer": "11858",
+                        "company": "Stella Jones - Poles Sales",
+                        "tier": "GOLD '26 - NIKA",
+                        "lifetimeEmbroidery": 40415,
+                        "embroideryOrders": 13,
+                        "avgOrderValue": 3108.85,
+                        "monthsDormant": 26,
+                        "medianReorderDays": 2,
+                        "q3SharePct": 0,
+                        "bounty": 50,
+                        "score": 1865.31
+                    },
+                    {
+                        "idCustomer": "2426",
+                        "company": "General Mechanical",
+                        "tier": "GOLD '26 - NIKA",
+                        "lifetimeEmbroidery": 7380,
+                        "embroideryOrders": 5,
+                        "avgOrderValue": 1476,
+                        "monthsDormant": 12,
+                        "medianReorderDays": 51,
+                        "q3SharePct": 40,
+                        "bounty": 50,
+                        "score": 1722
+                    },
+                    {
+                        "idCustomer": "12429",
+                        "company": "Evergreen Goodwill Of NW Washington",
+                        "tier": "BRONZE '26-NIKA",
+                        "lifetimeEmbroidery": 6710,
+                        "embroideryOrders": 2,
+                        "avgOrderValue": 3355,
+                        "monthsDormant": 23,
+                        "medianReorderDays": 842,
+                        "q3SharePct": 50,
+                        "bounty": 50,
+                        "score": 1677.5
+                    },
+                    {
+                        "idCustomer": "12475",
+                        "company": "Wenatchee School District",
+                        "tier": "House-2026",
+                        "lifetimeEmbroidery": 8198.13,
+                        "embroideryOrders": 7,
+                        "avgOrderValue": 1171.16,
+                        "monthsDormant": 19,
+                        "medianReorderDays": 65,
+                        "q3SharePct": 43,
+                        "bounty": 50,
+                        "score": 1673.09
+                    },
+                    {
+                        "idCustomer": "12020",
+                        "company": "Vermeer Mountain West",
+                        "tier": "House-2026",
+                        "lifetimeEmbroidery": 7514.55,
+                        "embroideryOrders": 9,
+                        "avgOrderValue": 834.95,
+                        "monthsDormant": 14,
+                        "medianReorderDays": 77,
+                        "q3SharePct": 22,
+                        "bounty": 50,
+                        "score": 1020.49
+                    },
+                    {
+                        "idCustomer": "12230",
+                        "company": "Gafco Roofing and Construction",
+                        "tier": "House-2026",
+                        "lifetimeEmbroidery": 4826.6,
+                        "embroideryOrders": 6,
+                        "avgOrderValue": 804.43,
+                        "monthsDormant": 16,
+                        "medianReorderDays": 78,
+                        "q3SharePct": 17,
+                        "bounty": 50,
+                        "score": 938.51
+                    },
+                    {
+                        "idCustomer": "11357",
+                        "company": "Capital Lumber",
+                        "tier": "SILVER '26 -NIKA",
+                        "lifetimeEmbroidery": 22561.97,
+                        "embroideryOrders": 32,
+                        "avgOrderValue": 705.06,
+                        "monthsDormant": 16,
+                        "medianReorderDays": 21,
+                        "q3SharePct": 31,
+                        "bounty": 50,
+                        "score": 925.39
+                    },
+                    {
+                        "idCustomer": "8727",
+                        "company": "Fife Junior Football",
+                        "tier": "BRONZE '26-NIKA",
+                        "lifetimeEmbroidery": 8564.58,
+                        "embroideryOrders": 10,
+                        "avgOrderValue": 856.46,
+                        "monthsDormant": 27,
+                        "medianReorderDays": 156,
+                        "q3SharePct": 60,
+                        "bounty": 50,
+                        "score": 822.2
+                    },
+                    {
+                        "idCustomer": "12586",
+                        "company": "Valley Property Services",
+                        "tier": "BRONZE '26-NIKA",
+                        "lifetimeEmbroidery": 4770.4,
+                        "embroideryOrders": 4,
+                        "avgOrderValue": 1192.6,
+                        "monthsDormant": 12,
+                        "medianReorderDays": 301,
+                        "q3SharePct": 0,
+                        "bounty": 50,
+                        "score": 795.07
+                    }
+                ],
+                "firstProgram": [
+                    {
+                        "idCustomer": "11954",
+                        "company": "Stella Jones - SYP Operations",
+                        "tier": "GOLD '26 - NIKA",
+                        "otherSpend": 15980.37,
+                        "otherOrders": 94,
+                        "monthsSinceOrder": 4,
+                        "bounty": 75,
+                        "score": 15980.37
+                    },
+                    {
+                        "idCustomer": "8409",
+                        "company": "Ketchikan Fire Dept",
+                        "tier": "House-2026",
+                        "otherSpend": 9165,
+                        "otherOrders": 4,
+                        "monthsSinceOrder": 1,
+                        "bounty": 75,
+                        "score": 9165
+                    },
+                    {
+                        "idCustomer": "12173",
+                        "company": "Stella Jones - Resources",
+                        "tier": "GOLD '26 - NIKA",
+                        "otherSpend": 6305.1,
+                        "otherOrders": 36,
+                        "monthsSinceOrder": 0,
+                        "bounty": 75,
+                        "score": 6305.1
+                    },
+                    {
+                        "idCustomer": "13515",
+                        "company": "MICHELS",
+                        "tier": "SILVER '26 -NIKA",
+                        "otherSpend": 5641,
+                        "otherOrders": 1,
+                        "monthsSinceOrder": 6,
+                        "bounty": 75,
+                        "score": 5641
+                    },
+                    {
+                        "idCustomer": "13295",
+                        "company": "Holy Family School",
+                        "tier": "BRONZE '26-NIKA",
+                        "otherSpend": 4924.5,
+                        "otherOrders": 2,
+                        "monthsSinceOrder": 2,
+                        "bounty": 75,
+                        "score": 4924.5
+                    },
+                    {
+                        "idCustomer": "12734",
+                        "company": "Bumblebee Services Inc.",
+                        "tier": "BRONZE '26-NIKA",
+                        "otherSpend": 4691.4,
+                        "otherOrders": 4,
+                        "monthsSinceOrder": 2,
+                        "bounty": 75,
+                        "score": 4691.4
+                    },
+                    {
+                        "idCustomer": "13206",
+                        "company": "Parkland ER",
+                        "tier": "House-2026",
+                        "otherSpend": 4342.8,
+                        "otherOrders": 7,
+                        "monthsSinceOrder": 4,
+                        "bounty": 75,
+                        "score": 4342.8
+                    },
+                    {
+                        "idCustomer": "13561",
+                        "company": "R.L. Alia Company",
+                        "tier": "House-2026",
+                        "otherSpend": 4225,
+                        "otherOrders": 2,
+                        "monthsSinceOrder": 1,
+                        "bounty": 75,
+                        "score": 4225
+                    },
+                    {
+                        "idCustomer": "12820",
+                        "company": "Church For All",
+                        "tier": "BRONZE '26-NIKA",
+                        "otherSpend": 3843,
+                        "otherOrders": 4,
+                        "monthsSinceOrder": 0,
+                        "bounty": 75,
+                        "score": 3843
+                    },
+                    {
+                        "idCustomer": "13066",
+                        "company": "Cedar Crest Academy",
+                        "tier": "BRONZE '26-NIKA",
+                        "otherSpend": 3307.53,
+                        "otherOrders": 21,
+                        "monthsSinceOrder": 7,
+                        "bounty": 75,
+                        "score": 3307.53
+                    },
+                    {
+                        "idCustomer": "2592",
+                        "company": "Stella Jones Western Operations",
+                        "tier": "GOLD '26 - NIKA",
+                        "otherSpend": 3281.92,
+                        "otherOrders": 33,
+                        "monthsSinceOrder": 1,
+                        "bounty": 75,
+                        "score": 3281.92
+                    },
+                    {
+                        "idCustomer": "13238",
+                        "company": "Stella Jones - WOLT",
+                        "tier": "GOLD '26 - NIKA",
+                        "otherSpend": 3050.5,
+                        "otherOrders": 39,
+                        "monthsSinceOrder": 14,
+                        "bounty": 75,
+                        "score": 3050.5
+                    },
+                    {
+                        "idCustomer": "12610",
+                        "company": "Stella Jones - Customer Service",
+                        "tier": "GOLD '26 - NIKA",
+                        "otherSpend": 2979,
+                        "otherOrders": 46,
+                        "monthsSinceOrder": 5,
+                        "bounty": 75,
+                        "score": 2979
+                    },
+                    {
+                        "idCustomer": "12521",
+                        "company": "Church 4 All",
+                        "tier": "BRONZE '26-NIKA",
+                        "otherSpend": 2752.5,
+                        "otherOrders": 2,
+                        "monthsSinceOrder": 6,
+                        "bounty": 75,
+                        "score": 2752.5
+                    }
+                ],
+                "almostThere": [
+                    {
+                        "idCustomer": "12069",
+                        "company": "Chris Holstrom Concepts",
+                        "tier": "House-2026",
+                        "quarterRevenue": 675,
+                        "gapToBounty": 325,
+                        "category": "Reactivated",
+                        "bounty": 50
+                    },
+                    {
+                        "idCustomer": "13681",
+                        "company": "Light Work Electrical",
+                        "tier": "House-2026",
+                        "quarterRevenue": 531.5,
+                        "gapToBounty": 468.5,
+                        "category": "New",
+                        "bounty": 75
+                    },
+                    {
+                        "idCustomer": "12979",
+                        "company": "Holden Village - Volunteer",
+                        "tier": "House-2026",
+                        "quarterRevenue": 240,
+                        "gapToBounty": 760,
+                        "category": "Reactivated",
+                        "bounty": 50
+                    },
+                    {
+                        "idCustomer": "13669",
+                        "company": "Concrete Technology Corporation",
+                        "tier": "House-2026",
+                        "quarterRevenue": 100,
+                        "gapToBounty": 900,
+                        "category": "New",
+                        "bounty": 75
+                    }
+                ],
+                "summary": {
+                    "winBackCount": 99,
+                    "winBackLifetime": 430712.67,
+                    "firstProgramCount": 87,
+                    "firstProgramSpend": 145505.83,
+                    "almostThereCount": 4,
+                    "almostThereGap": 2453.5,
+                    "almostThereBounty": 250
+                }
+            },
+            "Taneisha Clark": {
+                "winBack": [
+                    {
+                        "idCustomer": "6273",
+                        "company": "Materials Testing & Consulting",
+                        "tier": "SILVER '26-TANEISHA",
+                        "lifetimeEmbroidery": 75687.8,
+                        "embroideryOrders": 8,
+                        "avgOrderValue": 9460.98,
+                        "monthsDormant": 18,
+                        "medianReorderDays": 76,
+                        "q3SharePct": 0,
+                        "bounty": 50,
+                        "score": 9460.98
+                    },
+                    {
+                        "idCustomer": "7466",
+                        "company": "Fountainhead Development",
+                        "tier": "SILVER '26-TANEISHA",
+                        "lifetimeEmbroidery": 36108.5,
+                        "embroideryOrders": 8,
+                        "avgOrderValue": 4513.56,
+                        "monthsDormant": 19,
+                        "medianReorderDays": 109,
+                        "q3SharePct": 25,
+                        "bounty": 50,
+                        "score": 5641.95
+                    },
+                    {
+                        "idCustomer": "3815",
+                        "company": "Architectural Woods, L.P.",
+                        "tier": "BRONZE '26-TANEISHA",
+                        "lifetimeEmbroidery": 47643,
+                        "embroideryOrders": 9,
+                        "avgOrderValue": 5293.67,
+                        "monthsDormant": 24,
+                        "medianReorderDays": 24,
+                        "q3SharePct": 0,
+                        "bounty": 50,
+                        "score": 5293.67
+                    },
+                    {
+                        "idCustomer": "5144",
+                        "company": "The Henson Company Inc.",
+                        "tier": "SILVER '26-TANEISHA",
+                        "lifetimeEmbroidery": 23044.5,
+                        "embroideryOrders": 4,
+                        "avgOrderValue": 5761.13,
+                        "monthsDormant": 18,
+                        "medianReorderDays": 329,
+                        "q3SharePct": 0,
+                        "bounty": 50,
+                        "score": 3840.75
+                    },
+                    {
+                        "idCustomer": "7693",
+                        "company": "Caliber Concrete Construction",
+                        "tier": "GOLD '26- TANEISHA",
+                        "lifetimeEmbroidery": 58424.77,
+                        "embroideryOrders": 19,
+                        "avgOrderValue": 3074.99,
+                        "monthsDormant": 18,
+                        "medianReorderDays": 51,
+                        "q3SharePct": 16,
+                        "bounty": 50,
+                        "score": 3560.51
+                    },
+                    {
+                        "idCustomer": "13073",
+                        "company": "UW Dept. Of Emergency Medicine",
+                        "tier": "SILVER '26-TANEISHA",
+                        "lifetimeEmbroidery": 9104.5,
+                        "embroideryOrders": 1,
+                        "avgOrderValue": 9104.5,
+                        "monthsDormant": 21,
+                        "medianReorderDays": 0,
+                        "q3SharePct": 100,
+                        "bounty": 50,
+                        "score": 3034.83
+                    },
+                    {
+                        "idCustomer": "123",
+                        "company": "Fugate Ford",
+                        "tier": "GOLD '26- TANEISHA",
+                        "lifetimeEmbroidery": 33463.7,
+                        "embroideryOrders": 15,
+                        "avgOrderValue": 2230.91,
+                        "monthsDormant": 19,
+                        "medianReorderDays": 89,
+                        "q3SharePct": 13,
+                        "bounty": 50,
+                        "score": 2528.37
+                    },
+                    {
+                        "idCustomer": "3238",
+                        "company": "KM Resorts of America",
+                        "tier": "SILVER '26-TANEISHA",
+                        "lifetimeEmbroidery": 11343.19,
+                        "embroideryOrders": 6,
+                        "avgOrderValue": 1890.53,
+                        "monthsDormant": 14,
+                        "medianReorderDays": 236,
+                        "q3SharePct": 33,
+                        "bounty": 50,
+                        "score": 2520.71
+                    },
+                    {
+                        "idCustomer": "12854",
+                        "company": "Pease Construction",
+                        "tier": "SILVER '26-TANEISHA",
+                        "lifetimeEmbroidery": 8408,
+                        "embroideryOrders": 2,
+                        "avgOrderValue": 4204,
+                        "monthsDormant": 19,
+                        "medianReorderDays": 91,
+                        "q3SharePct": 50,
+                        "bounty": 50,
+                        "score": 2102
+                    },
+                    {
+                        "idCustomer": "9701",
+                        "company": "CondoCare",
+                        "tier": "GOLD '26- TANEISHA",
+                        "lifetimeEmbroidery": 9912,
+                        "embroideryOrders": 7,
+                        "avgOrderValue": 1416,
+                        "monthsDormant": 12,
+                        "medianReorderDays": 145,
+                        "q3SharePct": 43,
+                        "bounty": 50,
+                        "score": 2022.86
+                    },
+                    {
+                        "idCustomer": "10887",
+                        "company": "Designed Groundwater Services",
+                        "tier": "SILVER '26-TANEISHA",
+                        "lifetimeEmbroidery": 18668.34,
+                        "embroideryOrders": 15,
+                        "avgOrderValue": 1244.56,
+                        "monthsDormant": 19,
+                        "medianReorderDays": 115,
+                        "q3SharePct": 53,
+                        "bounty": 50,
+                        "score": 1908.32
+                    },
+                    {
+                        "idCustomer": "11454",
+                        "company": "Swire Coca-Cola- Bellevue",
+                        "tier": "SILVER '26-TANEISHA",
+                        "lifetimeEmbroidery": 13220.5,
+                        "embroideryOrders": 5,
+                        "avgOrderValue": 2644.1,
+                        "monthsDormant": 26,
+                        "medianReorderDays": 127,
+                        "q3SharePct": 40,
+                        "bounty": 50,
+                        "score": 1850.87
+                    },
+                    {
+                        "idCustomer": "3163",
+                        "company": "Pierce County Noxious Weed Control",
+                        "tier": "SILVER '26-TANEISHA",
+                        "lifetimeEmbroidery": 18116,
+                        "embroideryOrders": 6,
+                        "avgOrderValue": 3019.33,
+                        "monthsDormant": 25,
+                        "medianReorderDays": 0,
+                        "q3SharePct": 0,
+                        "bounty": 50,
+                        "score": 1811.6
+                    },
+                    {
+                        "idCustomer": "10282",
+                        "company": "Commercial Fence Corporation",
+                        "tier": "SILVER '26-TANEISHA",
+                        "lifetimeEmbroidery": 10408.6,
+                        "embroideryOrders": 6,
+                        "avgOrderValue": 1734.77,
+                        "monthsDormant": 19,
+                        "medianReorderDays": 157,
+                        "q3SharePct": 0,
+                        "bounty": 50,
+                        "score": 1734.77
+                    }
+                ],
+                "firstProgram": [
+                    {
+                        "idCustomer": "8742",
+                        "company": "HOPSNDROPS - Lacey",
+                        "tier": "GOLD '26- TANEISHA",
+                        "otherSpend": 12864.19,
+                        "otherOrders": 12,
+                        "monthsSinceOrder": 0,
+                        "bounty": 75,
+                        "score": 12864.19
+                    },
+                    {
+                        "idCustomer": "8701",
+                        "company": "HOPSNDROPS - Silverdale",
+                        "tier": "GOLD '26- TANEISHA",
+                        "otherSpend": 10747.06,
+                        "otherOrders": 10,
+                        "monthsSinceOrder": 2,
+                        "bounty": 75,
+                        "score": 10747.06
+                    },
+                    {
+                        "idCustomer": "7977",
+                        "company": "HOPSNDROPS - Bonney Lake",
+                        "tier": "GOLD '26- TANEISHA",
+                        "otherSpend": 8621.8,
+                        "otherOrders": 12,
+                        "monthsSinceOrder": 0,
+                        "bounty": 75,
+                        "score": 8621.8
+                    },
+                    {
+                        "idCustomer": "10419",
+                        "company": "HOPSNDROPS - Richland",
+                        "tier": "GOLD '26- TANEISHA",
+                        "otherSpend": 8177.19,
+                        "otherOrders": 11,
+                        "monthsSinceOrder": 2,
+                        "bounty": 75,
+                        "score": 8177.19
+                    },
+                    {
+                        "idCustomer": "11840",
+                        "company": "HOPSNDROPS - Frederickson",
+                        "tier": "GOLD '26- TANEISHA",
+                        "otherSpend": 7960.08,
+                        "otherOrders": 11,
+                        "monthsSinceOrder": 0,
+                        "bounty": 75,
+                        "score": 7960.08
+                    },
+                    {
+                        "idCustomer": "9055",
+                        "company": "HOPSNDROPS - Spokane North",
+                        "tier": "GOLD '26- TANEISHA",
+                        "otherSpend": 7757.79,
+                        "otherOrders": 10,
+                        "monthsSinceOrder": 1,
+                        "bounty": 75,
+                        "score": 7757.79
+                    },
+                    {
+                        "idCustomer": "11343",
+                        "company": "HOPSNDROPS - Snohomish",
+                        "tier": "GOLD '26- TANEISHA",
+                        "otherSpend": 7538.34,
+                        "otherOrders": 11,
+                        "monthsSinceOrder": 2,
+                        "bounty": 75,
+                        "score": 7538.34
+                    },
+                    {
+                        "idCustomer": "10211",
+                        "company": "HOPSNDROPS - Spokane Valley",
+                        "tier": "GOLD '26- TANEISHA",
+                        "otherSpend": 7346.21,
+                        "otherOrders": 18,
+                        "monthsSinceOrder": 3,
+                        "bounty": 75,
+                        "score": 7346.21
+                    },
+                    {
+                        "idCustomer": "13565",
+                        "company": "JMS Concrete Finishing LLC",
+                        "tier": "SILVER '26-TANEISHA",
+                        "otherSpend": 6358,
+                        "otherOrders": 1,
+                        "monthsSinceOrder": 4,
+                        "bounty": 75,
+                        "score": 6358
+                    },
+                    {
+                        "idCustomer": "11342",
+                        "company": "HOPSNDROPS - Lakewood",
+                        "tier": "GOLD '26- TANEISHA",
+                        "otherSpend": 5452.4,
+                        "otherOrders": 8,
+                        "monthsSinceOrder": 1,
+                        "bounty": 75,
+                        "score": 5452.4
+                    },
+                    {
+                        "idCustomer": "13282",
+                        "company": "Heatherstone",
+                        "tier": "SILVER '26-TANEISHA",
+                        "otherSpend": 5139.77,
+                        "otherOrders": 5,
+                        "monthsSinceOrder": 1,
+                        "bounty": 75,
+                        "score": 5139.77
+                    },
+                    {
+                        "idCustomer": "10460",
+                        "company": "HOPSNDROPS - Kennewick",
+                        "tier": "GOLD '26- TANEISHA",
+                        "otherSpend": 4855.7,
+                        "otherOrders": 10,
+                        "monthsSinceOrder": 0,
+                        "bounty": 75,
+                        "score": 4855.7
+                    },
+                    {
+                        "idCustomer": "11420",
+                        "company": "HOPSNDROPS - Gig Harbor",
+                        "tier": "GOLD '26- TANEISHA",
+                        "otherSpend": 4795.47,
+                        "otherOrders": 11,
+                        "monthsSinceOrder": 1,
+                        "bounty": 75,
+                        "score": 4795.47
+                    },
+                    {
+                        "idCustomer": "13629",
+                        "company": "AutoShield",
+                        "tier": "House-2026",
+                        "otherSpend": 4734.5,
+                        "otherOrders": 3,
+                        "monthsSinceOrder": 0,
+                        "bounty": 75,
+                        "score": 4734.5
+                    }
+                ],
+                "almostThere": [
+                    {
+                        "idCustomer": "12989",
+                        "company": "UnCruise Adventures",
+                        "tier": "Win Back '26 TANEISHA",
+                        "quarterRevenue": 892.5,
+                        "gapToBounty": 107.5,
+                        "category": "Reactivated",
+                        "bounty": 50
+                    },
+                    {
+                        "idCustomer": "13670",
+                        "company": "Bioclear",
+                        "tier": "House-2026",
+                        "quarterRevenue": 730,
+                        "gapToBounty": 270,
+                        "category": "New",
+                        "bounty": 75
+                    },
+                    {
+                        "idCustomer": "12337",
+                        "company": "Torco Construction",
+                        "tier": "SILVER '26-TANEISHA",
+                        "quarterRevenue": 426,
+                        "gapToBounty": 574,
+                        "category": "Reactivated",
+                        "bounty": 50
+                    },
+                    {
+                        "idCustomer": "13000",
+                        "company": "Temple Fitness",
+                        "tier": "BRONZE '26-TANEISHA",
+                        "quarterRevenue": 360,
+                        "gapToBounty": 640,
+                        "category": "New",
+                        "bounty": 75
+                    },
+                    {
+                        "idCustomer": "13693",
+                        "company": "Darren Diss",
+                        "tier": "House-2026",
+                        "quarterRevenue": 187.5,
+                        "gapToBounty": 812.5,
+                        "category": "New",
+                        "bounty": 75
+                    }
+                ],
+                "summary": {
+                    "winBackCount": 282,
+                    "winBackLifetime": 1232062.36,
+                    "firstProgramCount": 165,
+                    "firstProgramSpend": 233811.22,
+                    "almostThereCount": 5,
+                    "almostThereGap": 2404,
+                    "almostThereBounty": 325
+                }
+            }
+        }
+    };
+
     var EMB_BONUS = {
         "program": "EMB",
         "quarter": "Q3",
@@ -786,6 +1556,13 @@
         var u = String(url);
         var method = (options && options.method) || 'GET';
 
+        if (u.indexOf('/api/crm-proxy/embroidery-bonus/targets') !== -1) {
+            var tm = u.match(/viewAs=([^&]+)/);
+            var tEmail = tm ? decodeURIComponent(tm[1]) : REP.email;
+            var tWho = tEmail === NIKA.email ? NIKA.fullName : REP.fullName;
+            var tScoped = {}; if (EMB_TARGETS.reps[tWho]) tScoped[tWho] = EMB_TARGETS.reps[tWho];
+            return json(Object.assign({ success: true }, EMB_TARGETS, { reps: tScoped }));
+        }
         // --- Q3 Embroidery Bonus (added 2026-07-25). Real captured backend payload, so the
         // hero and win-back card render the same figures production produces. The server
         // injects identity, so this returns ONLY the viewed rep. ---

@@ -181,6 +181,31 @@ a blank hero beats a wrong bonus number.
 flattened shape `commission-payouts.js` builds for the Flask report (`newAccounts`,
 `newAccountBounty`). Mixing them renders `undefined` — it did, once.
 
+## 🗺 The roadmap — three ranked "who to call" lists (`/api/embroidery-bonus/targets`)
+
+The point of the bonus is a call list, not a scoreboard. Per rep, cheapest ask first:
+
+| List | Definition | Nika | Taneisha |
+|---|---|---|---|
+| **C. Almost there** | already embroidering this quarter, under the $1,000 bar, **and would actually earn** | 4 accts · $2,454 gap → $250 | 5 accts · $2,404 gap → $325 |
+| **A. Win back** | embroidered before, quiet 12+ months | 99 accts · $430,713 past | 282 accts · $1,232,062 past |
+| **B. First program** | buys other decoration from us, **never** embroidered | 87 accts · $145,506 spend | 165 accts · $233,811 spend |
+
+🔴 **List C MUST exclude repeat customers.** An account that ordered embroidery inside the
+dormancy window earns **nothing** at the threshold. The naive version listed every
+under-threshold account and overstated Nika's available bounties **5×** (26 accounts / $1,350
+claimed vs 4 / $250 real) — it would have sent her chasing Hollander Hospitality for "$34 more
+→ $50" that pays $0. Only New and Reactivated qualify.
+
+Win-back ranking is `avgOrderValue × loyalty × seasonalFit × recency`, not raw lifetime spend —
+what an account is worth *now* beats what it was once worth. `q3SharePct` surfaces accounts
+that historically order in exactly this quarter ("Q3 buyer" chip); they're due right now.
+
+**Strategic finding:** Taneisha's entire **Hops N Drops chain has never embroidered** — Lacey,
+Silverdale, Bonney Lake, Richland and more, each ordering monthly, all DTG/transfers only.
+That's her single biggest opportunity: warm relationships, constant order flow, zero embroidery.
+Nika's equivalent is the Stella Jones non-embroidery divisions.
+
 ## Where the code lives
 
 | Layer | File |

@@ -87,6 +87,90 @@
     transition: width 420ms ease;
 }
 
+/* The goal in DOLLARS. A bare percentage with no denominator is unactionable. */
+.aemc-bh-goal {
+    font-size: 0.82rem;
+    opacity: 0.9;
+    margin-top: 2px;
+    font-variant-numeric: tabular-nums;
+}
+.aemc-bh-track { position: relative; overflow: visible; }
+.aemc-bh-marks { position: absolute; inset: 0; }
+.aemc-bh-mark {
+    position: absolute;
+    top: -3px;
+    width: 2px;
+    height: 14px;
+    background: rgba(255, 255, 255, 0.55);
+    transform: translateX(-1px);
+}
+.aemc-bh-mark.is-hit { background: #fff; }
+
+/* Full ladder, always visible — the top rung must never hide behind "unlocks $150". */
+.aemc-bh-rungs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
+}
+.aemc-bh-rung {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 5px;
+    padding: 3px 8px;
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.12);
+    font-size: 0.74rem;
+    font-variant-numeric: tabular-nums;
+    opacity: 0.75;
+}
+.aemc-bh-rung.is-hit { background: rgba(255, 255, 255, 0.9); color: #22662a; opacity: 1; font-weight: 600; }
+.aemc-bh-rung.is-next { outline: 1.5px solid rgba(255, 255, 255, 0.85); opacity: 1; }
+.aemc-bh-rung-pay { font-weight: 700; }
+
+.aemc-bh-explain {
+    margin-top: var(--space-2);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    background: transparent;
+    color: #fff;
+    font: inherit;
+    font-size: 0.76rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: var(--radius-pill, 999px);
+    cursor: pointer;
+}
+.aemc-bh-explain:hover { background: rgba(255, 255, 255, 0.16); }
+
+.aemc-bh-how {
+    flex: 1 1 100%;
+    margin-top: var(--space-3);
+    padding-top: var(--space-3);
+    border-top: 1px solid rgba(255, 255, 255, 0.28);
+}
+.aemc-bh-how[hidden] { display: none; }
+.aemc-bh-how-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-4);
+}
+.aemc-bh-how h4 { margin: 0 0 4px; font-size: 0.82rem; font-weight: 700; }
+.aemc-bh-how p { margin: 0; font-size: 0.8rem; line-height: 1.5; opacity: 0.92; }
+.aemc-bh-how-foot {
+    margin: var(--space-3) 0 0;
+    font-size: 0.76rem;
+    line-height: 1.5;
+    opacity: 0.86;
+}
+.aemc-bh-how-foot a { color: #fff; font-weight: 600; }
+
+/* "Q3 buyer" — this account historically orders in exactly this quarter. */
+.aemc-growth-reason--season {
+    background: #eaf7ef;
+    color: #0f5132;
+    border: 1px solid #b7e0c5;
+}
+
 .aemc-bh-chips {
     display: flex;
     flex-wrap: wrap;
