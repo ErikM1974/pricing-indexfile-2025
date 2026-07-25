@@ -1,6 +1,6 @@
 # NWCA Documentation Index
 
-**Last Updated:** 2026-07-21 (regenerated from `git ls-files memory` by `/memory-maintain`)
+**Last Updated:** 2026-07-25 (regenerated from `git ls-files memory` by `/memory-maintain`)
 **Purpose:** Master navigation for `/memory`. How memory itself works → [MEMORY_SYSTEM.md](MEMORY_SYSTEM.md).
 **Regenerate:** run `/memory-maintain` (do not hand-edit file-by-file — it drifts).
 
@@ -154,6 +154,7 @@ _Per-feature topic files the index links to._
 
 ## 📊 Dashboards / Staff / Ops
 
+- [JIM_MAILING_LIST_2026-07.md](JIM_MAILING_LIST_2026-07.md) — Jim's senior CRM over Caspio `Prospect_Mailing_List` (2,905 Bigin non-customer import) + the engagement-gated Mailchimp sync; 🔑 never handle the MC/Anthropic key in chat
 - [STAFF_DASHBOARD_DATA_GUIDE.md](STAFF_DASHBOARD_DATA_GUIDE.md)
 - [NIKA_DASHBOARD_BUILD_GUIDE.md](NIKA_DASHBOARD_BUILD_GUIDE.md)
 - [STAFF_DIRECTORY.md](STAFF_DIRECTORY.md)
