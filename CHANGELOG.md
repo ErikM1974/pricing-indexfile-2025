@@ -1,3 +1,10 @@
+## v2026.07.25.2 (2026.07.25)
+
+- Memory: sticker launch, the 2-field gate decision, the basename-collision lesson
+- Memory maintenance: LESSONS 282->254, graduate 2 orphaned rules, de-dupe
+- fix(nav): Brands menu can no longer render empty; featured tier + filter
+- Deploy v2026.07.25.2: 18 files (custom-bella-canvas.html,custom-carhartt.html,custom-cornerstone.html...)
+
 ## v2026.07.25.1 (2026.07.25)
 
 - Drop the outdoor-life claim and the vinyl spec dump from /custom-stickers
