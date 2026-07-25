@@ -32,6 +32,7 @@
         qty: 1,
         doubleSided: false,
         polePockets: false,
+        artwork: null,         // { url, name } once an upload succeeds — always optional
         priced: null,          // last server quote
         pending: false
     };
@@ -360,6 +361,7 @@
                             ['Pole pockets', state.polePockets ? 'Top & bottom' : 'No (grommets included)'],
                             ['Banner price', '$' + L.formatMoney(state.priced.orderTotal)],
                             ['Source', 'custom-banners configurator'],
+                            ['Artwork', state.artwork ? state.artwork.url : 'Not uploaded — follow up by email'],
                             ['Configured link', location.href]
                         ],
                         notes: [['Customer message', byId('bnMessage').value.trim()]]
@@ -413,6 +415,24 @@
         var dlg = byId('bnSizeDialog');
         byId('bnSizeHelp').addEventListener('click', function () { dlg.showModal(); });
         byId('bnSizeDialogClose').addEventListener('click', function () { dlg.close(); });
+
+        // Artwork step — same shared module and same optional posture as
+        // /custom-stickers.
+        if (window.ArtworkUpload) {
+            window.ArtworkUpload.init({
+                zone: byId('bnAwZone'),
+                input: byId('bnAwInput'),
+                status: byId('bnAwStatus'),
+                remove: byId('bnAwRemove'),
+                describe: function () {
+                    return 'Banner quote artwork — ' +
+                        (byId('bnCompany').value.trim() || byId('bnName').value.trim() || 'web lead');
+                },
+                onChange: function (st) {
+                    state.artwork = (st.status === 'done' && st.url) ? { url: st.url, name: st.name } : null;
+                }
+            });
+        }
 
         byId('bnCta').addEventListener('click', openLead);
         byId('bnBarCta').addEventListener('click', openLead);

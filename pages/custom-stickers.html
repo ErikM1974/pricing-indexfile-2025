@@ -312,6 +312,29 @@
                     <div class="stk-lead" id="stkLead">
                         <h3 id="stkLeadTitle">Where should we send it?</h3>
                         <p class="stk-lead-sub" id="stkLeadSub">We'll email you this exact quote — usually within the hour.</p>
+
+                        <!-- Artwork first, contact second. The competitor gives the
+                             upload its own screen; we need contact details they
+                             don't, so combining them is one step fewer rather than
+                             one more. Optional at every point — see artwork-upload.js. -->
+                        <div class="aw-block">
+                            <label class="aw-zone" id="stkAwZone" for="stkAwInput">
+                                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                                <span class="aw-zone-main">Add your artwork</span>
+                                <span class="aw-zone-sub">Drag it here or <u>choose a file</u> — PNG, JPG, PDF, SVG, AI, EPS or PSD</span>
+                                <input type="file" id="stkAwInput" class="aw-input">
+                            </label>
+                            <p class="aw-status" id="stkAwStatus" role="status" aria-live="polite"></p>
+                            <div class="aw-actions">
+                                <button type="button" class="aw-remove" id="stkAwRemove" hidden>Remove file</button>
+                                <span class="aw-skip">Don't have it handy? Leave this empty — we'll ask for it by email.</span>
+                            </div>
+                        </div>
+
                         <div class="stk-lead-grid">
                             <div><label for="stkName">Your name</label><input type="text" id="stkName" autocomplete="name"></div>
                             <div><label for="stkEmail">Email</label><input type="email" id="stkEmail" autocomplete="email"></div>
@@ -543,6 +566,7 @@
     <script src="/shared_components/js/nav-dropdown.js?v=2026.07.13.4" defer></script>
     <script src="/app-modern.js?v=4" defer></script>
     <script src="/shared_components/js/quote-cart-store.js?v=2026.07.04.2" defer></script>
+    <script src="/pages/js/artwork-upload.js?v=2026.07.24.8" defer></script>
     <script src="/pages/js/custom-stickers-ladder.js?v=2026.07.24.2" defer></script>
     <script src="/pages/js/custom-stickers.js?v=2026.07.24.3" defer></script>
 </body>

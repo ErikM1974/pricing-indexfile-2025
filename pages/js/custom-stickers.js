@@ -40,6 +40,7 @@
         customH: '',
         customQty: '',
         setupAnswer: null,      // null | 'reorder' | 'new'   (null = unanswered)
+        artwork: null,          // { url, name } once an upload succeeds — always optional
         resolved: null,         // the row currently priced, or null
         blocked: null           // { reason, message } when we must NOT show a price
     };
@@ -492,6 +493,8 @@
             company: byId('stkCompany').value.trim(),
             message: byId('stkMessage').value.trim(),
             configuredLink: location.href,
+            artworkUrl: state.artwork ? state.artwork.url : '',
+            artworkName: state.artwork ? state.artwork.name : '',
             hp: byId('hpWebsite').value
         };
 
@@ -605,6 +608,25 @@
         var dlg = byId('stkSizeDialog');
         byId('stkSizeHelp').addEventListener('click', function () { dlg.showModal(); });
         byId('stkSizeDialogClose').addEventListener('click', function () { dlg.close(); });
+
+        // Artwork step. Optional at every point — a failure here must never
+        // cost us the lead, so nothing about the submit button depends on it.
+        if (window.ArtworkUpload) {
+            window.ArtworkUpload.init({
+                zone: byId('stkAwZone'),
+                input: byId('stkAwInput'),
+                status: byId('stkAwStatus'),
+                remove: byId('stkAwRemove'),
+                describe: function () {
+                    return 'Sticker quote artwork — ' +
+                        (byId('stkCompany').value.trim() || byId('stkName').value.trim() || 'web lead') +
+                        (state.resolved ? ' — ' + state.resolved.partNumber : '');
+                },
+                onChange: function (st) {
+                    state.artwork = (st.status === 'done' && st.url) ? { url: st.url, name: st.name } : null;
+                }
+            });
+        }
 
         byId('stkCta').addEventListener('click', function () { openLead('quote'); });
         byId('stkBarCta').addEventListener('click', function () { openLead('quote'); });

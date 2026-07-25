@@ -271,6 +271,27 @@
                     <div class="stk-lead" id="bnLead">
                         <h3 id="bnLeadTitle">Where should we send it?</h3>
                         <p class="stk-lead-sub">We'll email you this exact quote &mdash; usually within the hour.</p>
+
+                        <!-- Same artwork step as /custom-stickers, same shared
+                             module. Optional at every point. -->
+                        <div class="aw-block">
+                            <label class="aw-zone" id="bnAwZone" for="bnAwInput">
+                                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                                <span class="aw-zone-main">Add your artwork</span>
+                                <span class="aw-zone-sub">Drag it here or <u>choose a file</u> &mdash; PNG, JPG, PDF, SVG, AI, EPS or PSD</span>
+                                <input type="file" id="bnAwInput" class="aw-input">
+                            </label>
+                            <p class="aw-status" id="bnAwStatus" role="status" aria-live="polite"></p>
+                            <div class="aw-actions">
+                                <button type="button" class="aw-remove" id="bnAwRemove" hidden>Remove file</button>
+                                <span class="aw-skip">Don't have it handy? Leave this empty &mdash; we'll ask for it by email.</span>
+                            </div>
+                        </div>
+
                         <div class="stk-lead-grid">
                             <div><label for="bnName">Your name</label><input type="text" id="bnName" autocomplete="name"></div>
                             <div><label for="bnEmail">Email</label><input type="email" id="bnEmail" autocomplete="email"></div>
@@ -476,6 +497,7 @@
     <script src="/shared_components/js/nav-dropdown.js?v=2026.07.13.4" defer></script>
     <script src="/app-modern.js?v=4" defer></script>
     <script src="/shared_components/js/quote-cart-store.js?v=2026.07.04.2" defer></script>
+    <script src="/pages/js/artwork-upload.js?v=2026.07.24.8" defer></script>
     <script src="/pages/js/custom-banners-ladder.js?v=2026.07.24.5" defer></script>
     <script src="/pages/js/custom-banners.js?v=2026.07.24.5" defer></script>
 </body>
