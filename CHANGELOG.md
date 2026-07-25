@@ -1,3 +1,7 @@
+## v2026.07.24.7 (2026.07.24)
+
+- Homepage nav: add Stickers (Erik couldn't find the page)
+
 ## v2026.07.24.6 (2026.07.24)
 
 - Outdoor durability is 3 years, not 5 (Erik 2026-07-24)
