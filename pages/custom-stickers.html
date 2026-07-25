@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Custom die-cut vinyl stickers printed in Milton, WA. See every price for every size and quantity — 50 to 10,000, 2x2 to 6x6. UL 969 listed ORAJET 3651 vinyl, proof before we print, free local pickup.">
+    <meta name="description" content="Custom die-cut vinyl stickers printed in Milton, WA. See every price for every size and quantity — 50 to 10,000, 2x2 to 6x6. Cut to your shape, proof before we print, free local pickup.">
     <meta name="robots" content="index, follow">
     <title>Custom Die-Cut Stickers — Every Price, No Login | Northwest Custom Apparel</title>
 
@@ -11,7 +11,7 @@
 
     <meta property="og:type" content="website">
     <meta property="og:title" content="Custom Die-Cut Stickers — every price, no login">
-    <meta property="og:description" content="Pick a size and a quantity and the price is already on screen. 2x2 to 6x6, 50 to 10,000 pieces. UL 969 listed vinyl, printed in Milton, WA since 1977.">
+    <meta property="og:description" content="Pick a size and a quantity and the price is already on screen. 2x2 to 6x6, 50 to 10,000 pieces. Printed in Milton, WA since 1977.">
     <meta property="og:image" content="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png">
     <meta property="og:url" content="https://www.teamnwca.com/custom-stickers">
     <meta name="twitter:card" content="summary_large_image">
@@ -23,7 +23,7 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/shared_components/css/nwca-2026-core.css?v=2026.07.13.4">
-    <link rel="stylesheet" href="/pages/css/instant-quote.css?v=2026.07.24.5">
+    <link rel="stylesheet" href="/pages/css/instant-quote.css?v=2026.07.25.1">
     <!-- 🔴 Do NOT add sticker-pricing-page.css or nwca-form-shared.css here.
          Both declare :root tokens that collide with core and would repaint the
          masthead and footer. See the header note in instant-quote.css. -->
@@ -187,11 +187,11 @@
                     <ul class="stk-trust-line">
                         <li>
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>
-                            You approve a proof before we print or charge
+                            Nothing prints until you approve a proof
                         </li>
                         <li>
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                            UL 969 listed vinyl, rated 3 years outdoors
+                            Cut to your exact shape, not a square
                         </li>
                         <li>
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
@@ -245,7 +245,7 @@
                          the same time — they invert across the 6in boundary. -->
                     <div class="stk-oversize" id="stkOversize" hidden>
                         <h3>Larger than 6 inches — that's a large-format decal</h3>
-                        <p>Priced by the square foot, any size up to 52 inches wide, with volume breaks. Same ORAJET vinyl, same printer.</p>
+                        <p>Priced by the square foot, any size up to 52 inches wide, with volume breaks. Same material, same printer.</p>
                         <button type="button" class="stk-cta" id="stkOversizeCta">Get a large-format quote →</button>
                     </div>
 
@@ -284,7 +284,7 @@
                              number and the thing you click, and that distance is
                              what decides whether the CTA clears the fold. -->
                         <button type="button" class="stk-cta" id="stkCta">Get this in writing →</button>
-                        <p class="stk-cta-sub">Next: send your artwork. You approve a proof before we print or charge anything.</p>
+                        <p class="stk-cta-sub">Next: send your artwork. A real person sends you a proof, and nothing prints until you approve it.</p>
 
                         <div class="stk-below">
                             <p class="stk-price-rounding">Totals are exact. Per-sticker figures are rounded.</p>
@@ -312,12 +312,38 @@
                     <div class="stk-lead" id="stkLead">
                         <h3 id="stkLeadTitle">Where should we send it?</h3>
                         <p class="stk-lead-sub" id="stkLeadSub">We'll email you this exact quote — usually within the hour.</p>
+
+                        <!-- Artwork first, contact second. The competitor gives the
+                             upload its own screen; we need contact details they
+                             don't, so combining them is one step fewer rather than
+                             one more. Optional at every point — see artwork-upload.js. -->
+                        <div class="aw-block">
+                            <label class="aw-zone" id="stkAwZone" for="stkAwInput">
+                                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                                <span class="aw-zone-main">Add your artwork</span>
+                                <span class="aw-zone-sub">Drag it here or <u>choose a file</u> — PNG, JPG, PDF, SVG, AI, EPS or PSD</span>
+                                <input type="file" id="stkAwInput" class="aw-input">
+                            </label>
+                            <div class="aw-file">
+                                <div class="aw-preview" id="stkAwPreview" hidden></div>
+                                <p class="aw-status" id="stkAwStatus" role="status" aria-live="polite"></p>
+                            </div>
+                            <div class="aw-actions">
+                                <button type="button" class="aw-remove" id="stkAwRemove" hidden>Remove file</button>
+                                <span class="aw-skip">Don't have it handy? Leave this empty — we'll ask for it by email.</span>
+                            </div>
+                        </div>
+
                         <div class="stk-lead-grid">
                             <div><label for="stkName">Your name</label><input type="text" id="stkName" autocomplete="name"></div>
                             <div><label for="stkEmail">Email</label><input type="email" id="stkEmail" autocomplete="email"></div>
-                            <div><label for="stkPhone">Phone</label><input type="tel" id="stkPhone" autocomplete="tel"></div>
+                            <div><label for="stkPhone">Phone <span style="font-weight:400">(optional)</span></label><input type="tel" id="stkPhone" autocomplete="tel"></div>
                             <div><label for="stkCompany">Company <span style="font-weight:400">(optional)</span></label><input type="text" id="stkCompany" autocomplete="organization"></div>
-                            <div><label for="stkMessage">Anything else? <span style="font-weight:400">(optional)</span></label><textarea id="stkMessage" rows="2"></textarea></div>
+                            <div><label for="stkMessage">Instructions for your proof <span style="font-weight:400">(optional)</span></label><textarea id="stkMessage" rows="2" placeholder="Anything we should know before we prepare your proof — colours to match, how it will be used, a deadline."></textarea></div>
                             <div class="stk-hp"><label for="hpWebsite">Website</label><input type="text" id="hpWebsite" tabindex="-1" autocomplete="off"></div>
                         </div>
                         <p class="stk-inline-note is-error" id="stkLeadError" hidden></p>
@@ -333,12 +359,12 @@
                     <div>
                         <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="m9 15 2 2 4-4"></path></svg>
                         <h3>Approve a proof first</h3>
-                        <p>Nothing prints and nothing bills until you sign off on a digital proof. A real person sends it.</p>
+                        <p>Nothing goes on the printer until you sign off on a digital proof. A real person sends it, and you can ask for changes.</p>
                     </div>
                     <div>
                         <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                        <h3>UL 969 listed vinyl</h3>
-                        <p>ORAJET 3651 by ORAFOL — 2.75 mil calendered PVC, permanent solvent adhesive, rated 3 years outdoors.</p>
+                        <h3>Cut to your shape</h3>
+                        <p>Contour cut on the printer, so the sticker follows your artwork — not a square with your logo floating in the middle.</p>
                     </div>
                     <div>
                         <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 21h18"></path><path d="M5 21V7l7-4 7 4v14"></path><path d="M9 21v-6h6v6"></path></svg>
@@ -354,7 +380,7 @@
                 <ol class="stk-steps">
                     <li><strong>Pick size and quantity</strong>The price is on screen. No form, no account.</li>
                     <li><strong>Send your artwork</strong>Vector is ideal (AI, EPS, PDF with bleed). A JPG or PNG works too — we'll tell you if it needs work.</li>
-                    <li><strong>Approve your proof</strong>A digital proof with the exact die line. Nothing prints or bills until you say go.</li>
+                    <li><strong>Approve your proof</strong>A digital proof with the exact die line. Nothing prints until you say go — and you can ask for changes first.</li>
                     <li><strong>Pick up or we ship</strong>10–12 business days from approval. Pickup in Milton is free.</li>
                 </ol>
             </section>
@@ -404,7 +430,7 @@
                 </details>
                 <details>
                     <summary>What are they made of?</summary>
-                    <p>ORAJET 3651 by ORAFOL — 2.75 mil calendered PVC, white film, permanent solvent adhesive, rated 3 years outdoors, UL 969 / CSA C22.2 No. 015 listed. Printed on a Roland TrueVIS LG-540 with 7-colour ECO-UV ink at 1440 dpi and machine contour cut.</p>
+                    <p>Printed vinyl with a permanent adhesive, full colour, contour cut to your shape. If you have a particular use in mind — outdoors, vehicles, equipment — tell your rep and they will confirm the right material for it before you order.</p>
                 </details>
                 <details>
                     <summary>What about stickers bigger than 6 inches?</summary>
@@ -432,7 +458,7 @@
             <p>So a <strong>2 × 3 inch</strong> design prices at our <strong>3 × 3</strong> tier. We still cut it at your exact 2 × 3 shape. You're not paying for a bigger sticker — you're paying our 3 × 3 rate, because that's the tier your artwork falls into.</p>
             <p><strong>And since you're already on that tier</strong>, you can go up to a full 3 × 3 at no extra cost. Plenty of people do.</p>
             <p><strong>Odd shapes price by the bounding box</strong> — the smallest rectangle the art fits inside. A 10″ circle is a 10 × 10.</p>
-            <p><strong>Your rep confirms the exact size and the final price on your proof — before anything is printed or charged.</strong> If the artwork you send changes which tier you're on, you'll see it on the proof and you can say no.</p>
+            <p><strong>Your rep confirms the exact size and the final price on your proof, before anything is printed.</strong> If the artwork you send changes which tier you're on, you'll see it on the proof and you can say no.</p>
             <p><strong>Quantities work the same way.</strong> We price at the next break — enter 250 and you'll be quoted our 300 tier.</p>
             <button type="button" class="btn btn-primary stk-dialog-close" id="stkSizeDialogClose">Got it</button>
         </div>
@@ -515,9 +541,9 @@
         {
           "@type": "Product",
           "name": "Custom Die-Cut Vinyl Stickers",
-          "description": "Custom die-cut vinyl stickers on ORAJET 3651, UL 969 listed, rated 3 years outdoors. Sizes 2x2 to 6x6 inches, 50 to 10,000 pieces. Printed in Milton, Washington.",
+          "description": "Custom die-cut vinyl stickers, printed full colour and contour cut to your artwork. Sizes 2x2 to 6x6 inches, 50 to 10,000 pieces. Printed in Milton, Washington.",
           "brand": { "@type": "Brand", "name": "Northwest Custom Apparel" },
-          "material": "ORAJET 3651 calendered PVC vinyl",
+          "material": "Vinyl",
           "manufacturer": {
             "@type": "Organization",
             "name": "Northwest Custom Apparel",
@@ -543,7 +569,8 @@
     <script src="/shared_components/js/nav-dropdown.js?v=2026.07.13.4" defer></script>
     <script src="/app-modern.js?v=4" defer></script>
     <script src="/shared_components/js/quote-cart-store.js?v=2026.07.04.2" defer></script>
+    <script src="/pages/js/instant-quote-artwork.js?v=2026.07.25.1" defer></script>
     <script src="/pages/js/custom-stickers-ladder.js?v=2026.07.24.2" defer></script>
-    <script src="/pages/js/custom-stickers.js?v=2026.07.24.3" defer></script>
+    <script src="/pages/js/custom-stickers.js?v=2026.07.25.1" defer></script>
 </body>
 </html>

@@ -23,7 +23,7 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/shared_components/css/nwca-2026-core.css?v=2026.07.13.4">
-    <link rel="stylesheet" href="/pages/css/instant-quote.css?v=2026.07.24.5">
+    <link rel="stylesheet" href="/pages/css/instant-quote.css?v=2026.07.25.1">
     <link rel="stylesheet" href="/pages/css/custom-banners.css?v=2026.07.24.5">
     <!-- Do NOT add sticker-pricing-page.css or nwca-form-shared.css - both
          declare :root tokens that collide with core. See instant-quote.css. -->
@@ -250,7 +250,7 @@
                     </div>
 
                     <button type="button" class="stk-cta" id="bnCta">Get this in writing &rarr;</button>
-                    <p class="stk-cta-sub">Next: send your artwork. You approve a proof before we print or charge anything.</p>
+                    <p class="stk-cta-sub">Next: send your artwork. A real person sends you a proof, and nothing prints until you approve it.</p>
 
                     <div class="stk-below">
                         <fieldset class="bn-opts">
@@ -271,12 +271,36 @@
                     <div class="stk-lead" id="bnLead">
                         <h3 id="bnLeadTitle">Where should we send it?</h3>
                         <p class="stk-lead-sub">We'll email you this exact quote &mdash; usually within the hour.</p>
+
+                        <!-- Same artwork step as /custom-stickers, same shared
+                             module. Optional at every point. -->
+                        <div class="aw-block">
+                            <label class="aw-zone" id="bnAwZone" for="bnAwInput">
+                                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="17 8 12 3 7 8"></polyline>
+                                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                                </svg>
+                                <span class="aw-zone-main">Add your artwork</span>
+                                <span class="aw-zone-sub">Drag it here or <u>choose a file</u> &mdash; PNG, JPG, PDF, SVG, AI, EPS or PSD</span>
+                                <input type="file" id="bnAwInput" class="aw-input">
+                            </label>
+                            <div class="aw-file">
+                                <div class="aw-preview" id="bnAwPreview" hidden></div>
+                                <p class="aw-status" id="bnAwStatus" role="status" aria-live="polite"></p>
+                            </div>
+                            <div class="aw-actions">
+                                <button type="button" class="aw-remove" id="bnAwRemove" hidden>Remove file</button>
+                                <span class="aw-skip">Don't have it handy? Leave this empty &mdash; we'll ask for it by email.</span>
+                            </div>
+                        </div>
+
                         <div class="stk-lead-grid">
                             <div><label for="bnName">Your name</label><input type="text" id="bnName" autocomplete="name"></div>
                             <div><label for="bnEmail">Email</label><input type="email" id="bnEmail" autocomplete="email"></div>
-                            <div><label for="bnPhone">Phone</label><input type="tel" id="bnPhone" autocomplete="tel"></div>
+                            <div><label for="bnPhone">Phone <span style="font-weight:400">(optional)</span></label><input type="tel" id="bnPhone" autocomplete="tel"></div>
                             <div><label for="bnCompany">Company <span style="font-weight:400">(optional)</span></label><input type="text" id="bnCompany" autocomplete="organization"></div>
-                            <div><label for="bnMessage">What's it for? <span style="font-weight:400">(optional)</span></label><textarea id="bnMessage" rows="2"></textarea></div>
+                            <div><label for="bnMessage">Instructions for your proof <span style="font-weight:400">(optional)</span></label><textarea id="bnMessage" rows="2" placeholder="Anything we should know before we prepare your proof — where it's hanging, colours to match, a deadline."></textarea></div>
                             <div class="stk-hp"><label for="bnHp">Website</label><input type="text" id="bnHp" tabindex="-1" autocomplete="off"></div>
                         </div>
                         <p class="stk-inline-note is-error" id="bnLeadError" hidden></p>
@@ -290,7 +314,7 @@
                     <div>
                         <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path><path d="m9 15 2 2 4-4"></path></svg>
                         <h3>Approve a proof first</h3>
-                        <p>Nothing prints and nothing bills until you sign off on a digital proof. A real person sends it.</p>
+                        <p>Nothing goes on the printer until you sign off on a digital proof. A real person sends it, and you can ask for changes.</p>
                     </div>
                     <div>
                         <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
@@ -374,7 +398,7 @@
             <p><strong>Any size works.</strong> The sizes listed are the ones people ask for most, but enter whatever you need and we'll price it.</p>
             <p><strong>Under about 4 square feet the $40 minimum takes over</strong>, so a 2 &times; 2 ft banner and a 1 &times; 1 ft banner both cost $40. If you're that small, go bigger &mdash; it's free.</p>
             <p><strong>Our roll prints 52 inches wide.</strong> Length is unlimited, but if the SHORTER side of your banner is over 52 inches we seam it from panels. Still one banner &mdash; we'll just tell you before we print.</p>
-            <p><strong>Your rep confirms the finished size and price on your proof &mdash; before anything is printed or charged.</strong></p>
+            <p><strong>Your rep confirms the finished size and price on your proof, before anything is printed.</strong></p>
             <button type="button" class="btn btn-primary stk-dialog-close" id="bnSizeDialogClose">Got it</button>
         </div>
     </dialog>
@@ -476,7 +500,8 @@
     <script src="/shared_components/js/nav-dropdown.js?v=2026.07.13.4" defer></script>
     <script src="/app-modern.js?v=4" defer></script>
     <script src="/shared_components/js/quote-cart-store.js?v=2026.07.04.2" defer></script>
+    <script src="/pages/js/instant-quote-artwork.js?v=2026.07.25.1" defer></script>
     <script src="/pages/js/custom-banners-ladder.js?v=2026.07.24.5" defer></script>
-    <script src="/pages/js/custom-banners.js?v=2026.07.24.5" defer></script>
+    <script src="/pages/js/custom-banners.js?v=2026.07.25.1" defer></script>
 </body>
 </html>

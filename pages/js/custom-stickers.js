@@ -40,6 +40,7 @@
         customH: '',
         customQty: '',
         setupAnswer: null,      // null | 'reorder' | 'new'   (null = unanswered)
+        artwork: null,          // { url, name } once an upload succeeds — always optional
         resolved: null,         // the row currently priced, or null
         blocked: null           // { reason, message } when we must NOT show a price
     };
@@ -460,12 +461,14 @@
         var email = byId('stkEmail').value.trim();
         var phone = byId('stkPhone').value.trim();
 
+        // Phone is OPTIONAL (2026-07-24). Email is how we send the quote, so it is
+        // the only contact detail we genuinely need — asking for a phone number
+        // before handing over a price is friction the competitor does not have.
         var missing = [];
         if (!name) missing.push('your name');
         if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) missing.push('a valid email');
-        if (!phone) missing.push('a phone number');
         if (missing.length) {
-            err.textContent = 'We still need ' + missing.join(', ') + '.';
+            err.textContent = 'We still need ' + missing.join(' and ') + '.';
             err.hidden = false;
             return;
         }
@@ -492,6 +495,8 @@
             company: byId('stkCompany').value.trim(),
             message: byId('stkMessage').value.trim(),
             configuredLink: location.href,
+            artworkUrl: state.artwork ? state.artwork.url : '',
+            artworkName: state.artwork ? state.artwork.name : '',
             hp: byId('hpWebsite').value
         };
 
@@ -605,6 +610,26 @@
         var dlg = byId('stkSizeDialog');
         byId('stkSizeHelp').addEventListener('click', function () { dlg.showModal(); });
         byId('stkSizeDialogClose').addEventListener('click', function () { dlg.close(); });
+
+        // Artwork step. Optional at every point — a failure here must never
+        // cost us the lead, so nothing about the submit button depends on it.
+        if (window.InstantQuoteArtwork) {
+            window.InstantQuoteArtwork.init({
+                zone: byId('stkAwZone'),
+                input: byId('stkAwInput'),
+                status: byId('stkAwStatus'),
+                preview: byId('stkAwPreview'),
+                remove: byId('stkAwRemove'),
+                describe: function () {
+                    return 'Sticker quote artwork — ' +
+                        (byId('stkCompany').value.trim() || byId('stkName').value.trim() || 'web lead') +
+                        (state.resolved ? ' — ' + state.resolved.partNumber : '');
+                },
+                onChange: function (st) {
+                    state.artwork = (st.status === 'done' && st.url) ? { url: st.url, name: st.name } : null;
+                }
+            });
+        }
 
         byId('stkCta').addEventListener('click', function () { openLead('quote'); });
         byId('stkBarCta').addEventListener('click', function () { openLead('quote'); });

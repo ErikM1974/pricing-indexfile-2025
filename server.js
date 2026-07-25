@@ -10922,6 +10922,36 @@ app.get('/api/public/banner-presets', async (req, res) => {
 // persisted — nothing like payment terms or account owner can leak through the
 // public quote view.
 // =============================================================================
+/**
+ * Only accept an artwork URL that OUR proxy minted (/api/files/<key>).
+ *
+ * The browser tells us where the upload landed, so without this a caller could
+ * post any URL they liked and have it stored on a quote and mailed to a rep —
+ * turning our own quote email into a redirect to anywhere. Returns '' for
+ * anything that isn't ours, which is indistinguishable from "no artwork" and so
+ * degrades exactly the way the rest of this flow does.
+ */
+function sanitizeArtworkUrl(raw) {
+  const v = String(raw || '').trim();
+  if (!v) return '';
+  try {
+    const u = new URL(v);
+    const base = new URL(CASPIO_PROXY_BASE);
+    if (u.protocol !== 'https:') return '';
+    if (u.host !== base.host) return '';
+    const m = u.pathname.match(/^\/api\/files\/([A-Za-z0-9_-]+)$/);
+    if (!m) return '';
+    // REBUILD from the validated key rather than returning the input. Passing
+    // the original through kept its query string and hash, so
+    // /api/files/<key>?next=https://evil.com survived validation and would have
+    // been written onto a quote and mailed to a customer. Nothing the caller
+    // sent survives except the key itself.
+    return `${base.origin}/api/files/${m[1]}`;
+  } catch (_) {
+    return '';
+  }
+}
+
 app.post('/api/public/sticker-quote', strictLimiter, express.json({ limit: '32kb' }), async (req, res) => {
   const b = req.body || {};
 
@@ -10932,8 +10962,10 @@ app.post('/api/public/sticker-quote', strictLimiter, express.json({ limit: '32kb
   const name = String(b.name || '').trim();
   const email = String(b.email || '').trim();
   const phone = String(b.phone || '').trim();
-  if (!name || !phone || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
-    return res.status(400).json({ error: 'Name, a valid email and a phone number are required.' });
+  // Phone is OPTIONAL (2026-07-24) — email is how the quote reaches them, so it
+  // is the only contact detail actually required to fulfil the request.
+  if (!name || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+    return res.status(400).json({ error: 'A name and a valid email are required.' });
   }
 
   const width = Number(b.width);
@@ -10999,6 +11031,11 @@ app.post('/api/public/sticker-quote', strictLimiter, express.json({ limit: '32kb
         tax_note: 'WA sales tax applied at invoice.',
         source: 'custom-stickers configurator',
         configured_link: String(b.configuredLink || '').slice(0, 300),
+        // Artwork is OPTIONAL — a quote with no file is a normal quote, and the
+        // rep follows up by email. Only ever an /api/files/ URL our own proxy
+        // minted; never a customer-supplied link.
+        artwork_url: sanitizeArtworkUrl(b.artworkUrl),
+        artwork_name: String(b.artworkName || '').slice(0, 200),
         customer_message: String(b.message || '').slice(0, 1000),
         applied_rules: priced.appliedRules || null
       })

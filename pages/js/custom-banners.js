@@ -32,6 +32,7 @@
         qty: 1,
         doubleSided: false,
         polePockets: false,
+        artwork: null,         // { url, name } once an upload succeeds — always optional
         priced: null,          // last server quote
         pending: false
     };
@@ -326,11 +327,11 @@
         var name = byId('bnName').value.trim();
         var email = byId('bnEmail').value.trim();
         var phone = byId('bnPhone').value.trim();
+        // Phone OPTIONAL — see the note in custom-stickers.js.
         var missing = [];
         if (!name) missing.push('your name');
         if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) missing.push('a valid email');
-        if (!phone) missing.push('a phone number');
-        if (missing.length) { err.textContent = 'We still need ' + missing.join(', ') + '.'; err.hidden = false; return; }
+        if (missing.length) { err.textContent = 'We still need ' + missing.join(' and ') + '.'; err.hidden = false; return; }
         err.hidden = true;
         if (byId('bnHp').value) { showSuccess(); return; }
 
@@ -360,6 +361,7 @@
                             ['Pole pockets', state.polePockets ? 'Top & bottom' : 'No (grommets included)'],
                             ['Banner price', '$' + L.formatMoney(state.priced.orderTotal)],
                             ['Source', 'custom-banners configurator'],
+                            ['Artwork', state.artwork ? state.artwork.url : 'Not uploaded — follow up by email'],
                             ['Configured link', location.href]
                         ],
                         notes: [['Customer message', byId('bnMessage').value.trim()]]
@@ -413,6 +415,25 @@
         var dlg = byId('bnSizeDialog');
         byId('bnSizeHelp').addEventListener('click', function () { dlg.showModal(); });
         byId('bnSizeDialogClose').addEventListener('click', function () { dlg.close(); });
+
+        // Artwork step — same shared module and same optional posture as
+        // /custom-stickers.
+        if (window.InstantQuoteArtwork) {
+            window.InstantQuoteArtwork.init({
+                zone: byId('bnAwZone'),
+                input: byId('bnAwInput'),
+                status: byId('bnAwStatus'),
+                preview: byId('bnAwPreview'),
+                remove: byId('bnAwRemove'),
+                describe: function () {
+                    return 'Banner quote artwork — ' +
+                        (byId('bnCompany').value.trim() || byId('bnName').value.trim() || 'web lead');
+                },
+                onChange: function (st) {
+                    state.artwork = (st.status === 'done' && st.url) ? { url: st.url, name: st.name } : null;
+                }
+            });
+        }
 
         byId('bnCta').addEventListener('click', openLead);
         byId('bnBarCta').addEventListener('click', openLead);
