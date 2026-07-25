@@ -4,6 +4,14 @@
 
 ---
 
+## On-screen fee row in `#grand-total` but NOT emitted as a PDF line item → products table under-foots (2026-07-15) (archived 2026-07-25)
+**Problem:** Laser-patch EMB (EMB-2026-313) printed a $360 products table against a $420 Subtotal — the $5/cap "Laser Patch : Patch Upcharge" ($60) had no printed line.
+**Root Cause:** the fee was in engine `grandTotal` (`embroidery-quote-pricing.js:1851`) AND the on-screen `#cap-embellishment-fee-row`, but `_appendEmbServiceInvoiceItems` (`builders/emb/output.js`) never read that row into `invoiceProducts`. The printed table is built ONLY from `invoiceProducts` while the printed Subtotal = `grandTotal−setupFees`, so the $60 sat in the total with no line. 3D-puff caps shared the latent gap. NOT a double-count — the per-cap price EXCLUDES the upcharge (`decorationCost` stays `embCost`, `:658`; the `:775` comment claiming otherwise is stale).
+**Solution:** read `#cap-embellishment-fee-{qty,unit,total,label}` and push a service line, splitting the "CODE : Desc" label. E2E-verified the table foots to $420 = Subtotal; piece count stays 12 (surcharge rows carry $ not pieces, matching AS-CAP).
+**Prevention:** 3rd instance of this class (after the AS-Garm/AS-CAP stitch-surcharge fix 2026-06-04, which patched the SAME function but skipped this row). Any on-screen fee row feeding `#grand-total` MUST also be emitted in the builder's `_append*ServiceInvoiceItems` the same day, and re-diff the printed products TOTAL against the printed Subtotal.
+
+---
+
 ## Falsy-zero `||10.1` tax bug recurred in EMB after the DTF/SCP fix (2026-06-10) (archived 2026-07-25)
 **Problem:** The `|| 10.1` / `|| 0.101` falsy-zero tax fallback was fixed in DTF and SCP, but EMB kept its own copy and still coerced a legitimate `0` rate into 10.1%.
 **Root Cause:** Each of the 4 builders hand-rolled its own rate parsing, so a fix applied to one surface left the literal in place in the others (Rule 8 miss).
