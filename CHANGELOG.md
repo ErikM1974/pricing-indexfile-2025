@@ -1,3 +1,9 @@
+## v2026.07.25.3 (2026.07.25)
+
+- fix(brands): one registry for brand names, landing pages and search keywords
+- Memory: brand-registry drift lesson; archive the 2026-07-15 PDF fee-row entry
+- Deploy v2026.07.25.3: 6 files (brands.html,index.html,catalog.html...)
+
 ## v2026.07.25.2 (2026.07.25)
 
 - Memory: sticker launch, the 2-field gate decision, the basename-collision lesson
