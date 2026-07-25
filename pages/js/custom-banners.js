@@ -418,8 +418,8 @@
 
         // Artwork step — same shared module and same optional posture as
         // /custom-stickers.
-        if (window.ArtworkUpload) {
-            window.ArtworkUpload.init({
+        if (window.InstantQuoteArtwork) {
+            window.InstantQuoteArtwork.init({
                 zone: byId('bnAwZone'),
                 input: byId('bnAwInput'),
                 status: byId('bnAwStatus'),

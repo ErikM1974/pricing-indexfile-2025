@@ -1,7 +1,16 @@
 /**
- * artwork-upload.js — the artwork step for the public instant-quote pages.
+ * instant-quote-artwork.js — the artwork step for the PUBLIC instant-quote pages.
  * Shared by /custom-stickers and /custom-banners. One implementation, two
  * consumers; a change here must be checked on both.
+ *
+ * 🔴 NOT the same thing as shared_components/js/artwork-upload.js. That one is
+ * the REP-facing multi-file widget in the EMB/DTF/SCP quote builders (design
+ * names, placements, referenceArtwork). This one is customer-facing, single
+ * file, with a thumbnail and copy written for a buyer rather than a rep.
+ * They were briefly both named artwork-upload.js and both exported
+ * window.ArtworkUpload — which would have clobbered each other on any page
+ * loading both, and made the deploy cache-buster bump three quote builders for
+ * a change to this file. Hence the distinct name and the distinct global.
  *
  * 🔴 THE UPLOAD MUST NEVER COST US THE LEAD. Artwork is OPTIONAL at every point.
  * A rejected file, an oversized file, a dead network, a missing APP_CONFIG — none
@@ -289,7 +298,7 @@
         };
     }
 
-    var ArtworkUpload = {
+    var InstantQuoteArtwork = {
         MAX_BYTES: MAX_BYTES,
         ACCEPT_EXT: ACCEPT_EXT,
         ACCEPT_ATTR: ACCEPT_ATTR,
@@ -302,6 +311,6 @@
         init: init
     };
 
-    if (typeof module !== 'undefined' && module.exports) module.exports = ArtworkUpload;
-    if (typeof global !== 'undefined') global.ArtworkUpload = ArtworkUpload;
+    if (typeof module !== 'undefined' && module.exports) module.exports = InstantQuoteArtwork;
+    if (typeof global !== 'undefined') global.InstantQuoteArtwork = InstantQuoteArtwork;
 })(typeof window !== 'undefined' ? window : globalThis);

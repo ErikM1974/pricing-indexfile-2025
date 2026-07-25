@@ -5,7 +5,7 @@
 // and has to SAY so — a message that only reports a technical failure is a
 // customer who thinks they're stuck and leaves.
 
-const A = require('../../pages/js/artwork-upload');
+const A = require('../../pages/js/instant-quote-artwork');
 
 const file = (name, size, type) => ({ name, size, type: type || '' });
 const MB = 1024 * 1024;

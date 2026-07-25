@@ -613,8 +613,8 @@
 
         // Artwork step. Optional at every point — a failure here must never
         // cost us the lead, so nothing about the submit button depends on it.
-        if (window.ArtworkUpload) {
-            window.ArtworkUpload.init({
+        if (window.InstantQuoteArtwork) {
+            window.InstantQuoteArtwork.init({
                 zone: byId('stkAwZone'),
                 input: byId('stkAwInput'),
                 status: byId('stkAwStatus'),
