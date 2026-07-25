@@ -158,6 +158,29 @@ Plus **`EmbroideryBonusArchive`** for the quarter-end freeze:
 today and frozen in config at quarter start. If accounts move mid-quarter the baseline does not
 chase them. That's intentional; don't "fix" it.
 
+## 🔒 Where bonus dollars may appear (Erik, 2026-07-25)
+
+**Compensation shows on a rep's OWN Mission Control page and nowhere else.** The staff
+dashboard is opened by every employee, so it carries the *company* Q3 number and the shared
+targets with **no payout amounts at all** — not even the kicker dollars.
+
+The boundary is enforced in the backend, not in a render:
+
+| Caller | Route | Returns |
+|---|---|---|
+| Shared staff dashboard (any staff) | `/api/crm-proxy/embroidery-bonus/team` | kicker + company revenue; `reps: {}` **always** — `scope=team` is forced server-side and cannot be widened by the query |
+| Mission Control (the rep) | `/api/crm-proxy/embroidery-bonus` | that rep only — identity injected from the SAML session, so a rep can't request a colleague's |
+| Mission Control (admin) | same, no `?viewAs=` | every rep (Erik's overview); `?viewAs=` scopes to one |
+
+The rep-facing hero is `.aemc-bonus-hero`, above the KPI strip: earned-to-date, the nearest
+concrete ask ("$66,596 more embroidery unlocks $150"), and three chips (new programs / won
+back / % of goal). Hidden until loaded so it never flashes $0, and stays hidden on error —
+a blank hero beats a wrong bonus number.
+
+⚠️ The hero reads the **raw** `/api/embroidery-bonus` shape (`counts.*`, `bounties.*`), NOT the
+flattened shape `commission-payouts.js` builds for the Flask report (`newAccounts`,
+`newAccountBounty`). Mixing them renders `undefined` — it did, once.
+
 ## Where the code lives
 
 | Layer | File |

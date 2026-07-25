@@ -213,7 +213,9 @@
             state.summary = data;
             state.rep = data.rep;
             render(data);
+            loadBonusHero();
             loadGrowth();
+            loadEmbWinBacks();
             loadPurchasing();
             loadDueDates();
             loadDataQuality();
@@ -372,10 +374,15 @@
         'taneisha@nwcustomapparel.com': '/taneisha',
         'nika@nwcustomapparel.com': '/nika',
     };
-    // The three types the daily sync cron computes and materializes automatically.
+    // The types the daily sync cron computes and materializes automatically.
     // Anything else in the payout ledger (e.g. a hand-keyed Setup Bonus) is a manual
     // adjustment — flag it so the row is self-explanatory and the total is trusted.
-    var COMPUTED_BONUS_TYPES = { 'Online Store': 1, 'Garment Spiff': 1, 'Win-Back Bounty': 1 };
+    // ⚠️ Keep in sync with COMPUTED_TYPES in Python Inksoft web/templates/commissions.html.
+    // Flask totals a fixed list of types; this card sums the ledger type-agnostically — miss
+    // one here and the two surfaces disagree by exactly that bonus (the 2026-07-21 bug).
+    var COMPUTED_BONUS_TYPES = {
+        'Online Store': 1, 'Garment Spiff': 1, 'Win-Back Bounty': 1, 'Embroidery Bonus': 1,
+    };
 
     function bonusRowsHtml(rows) {
         if (!rows.length) return '<div class="aemc-empty">No bonus rows recorded yet this quarter.</div>';
@@ -662,6 +669,111 @@
                 (g.truncated ? '<p class="aemc-hint">…and ' + g.truncated + ' more flagged — work these first, then refresh tomorrow.</p>' : '');
         }).catch(function (err) {
             el('aemc-growth').innerHTML = '<div class="aemc-panel-error">Growth radar failed to load (' + esc(err.message) + '). Refresh to retry.</div>';
+        });
+    }
+
+    // ---------- Q3 embroidery bonus hero ----------
+    // The rep's OWN bonus, top of page. Identity is injected by the server forwarder, so this
+    // request can only ever return the caller's figures (admins with ?viewAs= see that rep).
+    function loadBonusHero() {
+        var params = (state.isAdmin && state.viewAs) ? '?viewAs=' + encodeURIComponent(state.viewAs) : '';
+        sameOriginJson('/api/crm-proxy/embroidery-bonus' + params).then(function (d) {
+            var names = Object.keys(d.reps || {});
+            if (!names.length) return;                       // admin overview or nothing to show
+            var mine = (state.rep && d.reps[state.rep.fullName]) || d.reps[names[0]];
+            if (!mine) return;
+
+            var l = mine.ladder || {};
+            var k = mine.teamKicker || {};
+            el('aemc-bh-amount').textContent = money2(mine.totalBonus);
+
+            // Lead with the nearest concrete ask. The ladder rung is usually the biggest
+            // single step available, so prefer it; fall back to the team goal once maxed.
+            var nextText, pct = 0;
+            if (l.nextRung) {
+                nextText = money0(l.amountToNextRung) + ' more embroidery unlocks ' + money2(l.nextRung.pay);
+                var prev = l.rungReached ? l.rungReached.threshold : 0;
+                var span = l.nextRung.threshold - prev;
+                pct = span > 0 ? Math.max(0, Math.min(((l.revenue - prev) / span) * 100, 100)) : 0;
+            } else if (k.next) {
+                nextText = 'Top rung cleared. ' + money0(k.amountToNext) + ' company-wide unlocks ' + money2(k.next.pay) + ' more.';
+                pct = 100;
+            } else {
+                nextText = 'Every milestone cleared this quarter. Outstanding.';
+                pct = 100;
+            }
+            el('aemc-bh-next').textContent = nextText;
+            el('aemc-bh-fill').style.width = pct.toFixed(1) + '%';
+
+            // NOTE: this reads the RAW /api/embroidery-bonus shape (counts.* / bounties.*),
+            // NOT the flattened shape commission-payouts.js builds for the Flask report
+            // (newAccounts / newAccountBounty). Mixing them up renders "undefined".
+            var counts = mine.counts || {};
+            var bounties = mine.bounties || {};
+            var chips = [
+                { n: counts.new || 0, label: 'new program' + (counts.new === 1 ? '' : 's'), each: bounties.newAccountBounty },
+                { n: counts.reactivated || 0, label: 'won back', each: bounties.reactivatedBounty },
+            ].map(function (c) {
+                return '<span class="aemc-bh-chip' + (c.n ? ' is-on' : '') + '">' +
+                    '<strong>' + c.n + '</strong> ' + esc(c.label) +
+                    '<span class="aemc-bh-chip-rate">' + money2(c.each) + ' ea</span></span>';
+            });
+            chips.push('<span class="aemc-bh-chip' + (l.rungReached ? ' is-on' : '') + '">' +
+                '<strong>' + (l.pctOfBaseline || 0) + '%</strong> of your goal' +
+                '<span class="aemc-bh-chip-rate">' + (l.rungReached ? money2(l.rungReached.pay) + ' earned' : 'no rung yet') + '</span></span>');
+            el('aemc-bh-chips').innerHTML = chips.join('');
+
+            el('aemc-bonus-hero').hidden = false;
+        }).catch(function (err) {
+            // Stay hidden on failure — a blank hero beats a wrong bonus number.
+            console.warn('[aemc] bonus hero failed:', err.message);
+        });
+    }
+
+    // ---------- embroidery win-back radar (dormant embroidery accounts) ----------
+    // Doubles as the Q3 2026 bonus worklist: every row here is worth a reactivation
+    // bounty once it reaches the quarter's minimum in embroidery.
+    function loadEmbWinBacks() {
+        var params = (state.isAdmin && state.viewAs) ? '?viewAs=' + encodeURIComponent(state.viewAs) : '';
+        var link = el('aemc-emb-bonus-link');
+        if (state.rep && BONUS_DASHBOARD_PATH[state.rep.email]) {
+            link.href = BONUS_DASHBOARD_BASE + BONUS_DASHBOARD_PATH[state.rep.email];
+            link.hidden = false;
+        }
+        sameOriginJson('/api/crm-proxy/embroidery-bonus/dormant' + params).then(function (d) {
+            // Admin with no viewAs gets every rep back; pick the one being viewed, else merge.
+            var repNames = Object.keys(d.reps || {});
+            if (!repNames.length) {
+                el('aemc-emb').innerHTML = '<div class="aemc-empty">No dormant embroidery accounts found.</div>';
+                return;
+            }
+            var mine = state.rep && d.reps[state.rep.fullName] ? d.reps[state.rep.fullName] : d.reps[repNames[0]];
+            var accounts = (mine.accounts || []).filter(function (a) { return !a.quarterToDateRevenue; });
+
+            el('aemc-emb-sub').textContent = mine.stillDormantCount
+                ? '(' + mine.stillDormantCount + ' account' + (mine.stillDormantCount === 1 ? '' : 's') +
+                  ' · ' + money0(mine.stillDormantLifetimeTotal) + ' of past embroidery)'
+                : '';
+
+            if (!accounts.length) {
+                el('aemc-emb').innerHTML = '<div class="aemc-empty">Every account with embroidery history has ordered within the last ' +
+                    (d.dormancyMonths || 12) + ' months. Nothing to win back — that is the good outcome.</div>';
+                return;
+            }
+
+            var won = mine.alreadyReactivatedCount || 0;
+            el('aemc-emb').innerHTML = expandableRows(accounts, function (a, hidden) {
+                return '<li class="aemc-row' + (hidden ? ' aemc-row--collapsed' : '') + '">' +
+                    '<span class="aemc-row-main">' + esc(a.company) + '</span>' +
+                    (a.tier ? '<span class="aemc-growth-reason">' + esc(a.tier) + '</span>' : '') +
+                    '<span class="aemc-row-right"><span class="aemc-money aemc-growth-total">' + money0(a.lifetimeEmbroidery) + '</span><br>' +
+                    '<span class="aemc-row-meta">last embroidery ' + fmtWhen(a.lastEmbroideryDate) +
+                    ' · ' + a.monthsDormant + ' mo quiet · ' + money2(a.bountyIfWon) + ' bounty</span></span>' +
+                    '</li>';
+            }, { noun: 'account' }) +
+                (won ? '<p class="aemc-hint">✅ ' + won + ' already won back this quarter — those are earning a bounty.</p>' : '');
+        }).catch(function (err) {
+            el('aemc-emb').innerHTML = '<div class="aemc-panel-error">Embroidery win-backs failed to load (' + esc(err.message) + '). Refresh to retry.</div>';
         });
     }
 
