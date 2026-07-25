@@ -73,6 +73,14 @@ For Caspio table queries:
 - `q.limit` - Max results (default: 100, max: 1000)
 - `q.select` - Specific fields to return
 
+**Param traps (each one cost us a live bug — full entries in `LESSONS_LEARNED_ARCHIVE.md`):**
+- **`q.sort` does not exist in v3** — it is silently ignored, so the query "works" and returns wrongly-ordered rows. Always `q.orderBy`.
+- **`q.limit` < 5 returns 400.** Asking for 1-4 rows is an error, not a small page.
+- **NEVER combine `q.limit` with `q.pageNumber`** — you get overlapping/partial duplicate pages (once returned 1,000 of 2,794 real rows). Paginate with `q.pageSize` and delete `q.limit` first.
+- **Every multi-page read needs `q.orderBy` on a stable column (`PK_ID`)** — v3 paginates unordered queries non-deterministically, so page N differs across runs and 5–10% of rows are silently skipped or duplicated. This hit 36 call sites including money paths.
+- **`q.distinct` is silently ignored** — use `q.groupBy`.
+- **`q.select` 500s on a field that doesn't exist** — verify field names against `/fields` first.
+
 ### Array Parameters
 For filters that accept multiple values:
 ```

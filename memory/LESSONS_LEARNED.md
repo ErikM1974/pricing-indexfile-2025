@@ -6,6 +6,18 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 
 ---
 
+### A truthy `[]` pinned an EMPTY brand list for 24h server-side + 6h in every browser — homepage Brands menu went blank (2026-07-25)
+- **Problem**: the homepage Brands mega-dropdown rendered "No brands available". `/api/all-brands` was healthy when checked (200, 46 brands, 0 broken logos) and a fresh browser was fine — but Erik's browser stayed broken, which is the tell.
+- **Root Cause**: `/api/all-brands` **cached its own empty result**. The guard was `if (!allBrandsCache.data || …)` over a plain `{at, data}` object, and **`[]` is truthy in JS** — so one bad Caspio read (stale token / `maxPages` truncation / transient failure) stored an empty array and served it for **24h** from the dyno, shipped with `Cache-Control: public, max-age=21600` which froze "no brands" into **every visitor's browser for 6h with no revalidation**. Three aggravators: `catch` never fired so nothing logged an error (it looked like success); `/api/product-cache/clear` couldn't flush it (a plain object, not in the `createTtlCache` registry) so only a dyno restart worked; and the front end **dead-ended** on empty instead of degrading. `/api/all-categories` carried the identical copy-pasted bug.
+- **Solution**: proxy — moved both routes onto `createTtlCache` (registry membership ⇒ `/product-cache/clear` + `?refresh=true` both work), `set()` only when `length > 0`, and an empty read now returns **503 + `Cache-Control: no-store`** (never a cacheable empty 200) so the next request retries. `max-age` 21600→600 + `stale-while-revalidate`. Front end — a static `FEATURED_BRANDS` tier (the 15 `/custom-<brand>` landing-page brands) paints on init with **zero network dependency** and is the fallback for empty/503/offline, so the menu is structurally incapable of rendering blank; layered static tier → CDN logo → 🏷️ glyph. 12-test `all-brands-empty-cache-guard.test.js` locks it, including "an empty read cannot overwrite an already-good cached list".
+- **Prevention**: **never cache an empty collection** — `if (!cache.data)` does NOT catch `[]`; guard on `.length`. Never pair a long `max-age` with a cache that has no flush path: a long TTL turns a one-minute upstream blip into a multi-hour outage you can't clear. An empty upstream result is a FAILURE (503/no-store), not a cacheable success. And for nav/chrome that's editorial and rarely changes, prefer a static list with an API-driven long tail — a menu should never be able to go blank because a backend hiccuped. Diagnostic tell: server healthy + fresh browser fine + one browser broken ⇒ suspect a cached bad response, not the code.
+
+### Two files named `artwork-upload.js` collided on one global — and the deploy script bumped 3 quote builders (2026-07-25)
+- **Problem**: I created `pages/js/artwork-upload.js` for the public sticker/banner pages. `shared_components/js/artwork-upload.js` already existed — a 458-line rep-facing multi-file widget loaded by **3 quote builders**. Both exported `window.ArtworkUpload`. Caught only because the deploy cache-buster bumped `?v=` on three Rule-8 builders for a file they don't use.
+- **Root Cause**: two independent failures that happened to fire together. (1) Same global name — nothing broke *today* because no page loads both, but any page that ever did would get whichever `<script>` came last, presenting as "upload stopped working," never as a name clash. (2) **The deploy cache-buster matches on the LAST TWO PATH SEGMENTS**, so `js/artwork-upload.js` matched both files; every future deploy touching either would re-bump three builders forever.
+- **Solution**: renamed the public one to `pages/js/instant-quote-artwork.js` exporting `InstantQuoteArtwork` (matching the `instant-quote.css` naming already on those pages) and reverted the three builder bumps. Kept as **separate modules deliberately** — merging a customer artwork step into a widget 3 builders depend on would be a Rule 8 change bought for nothing but a shared name.
+- **Prevention**: **basename uniqueness is load-bearing in this repo, not just style** — `grep -r "<basename>" --include=*.js -l` before creating any shared-ish JS file, and check the global it exports. A duplicate basename in a *different* directory is exactly as dangerous as one in the same directory, because the tooling keys on the tail of the path. Corollary: when a deploy script bumps a file you didn't touch, stop and read why — that's the tooling reporting a real collision, not noise to click through.
+
 ### A sizeless product vanished from its own quote while still counting toward the total (2026-07-24)
 - **Problem**: the first public sticker quote (STK-2026-032) rendered a **$346 total with only the $50 setup fee itemised**. The $296 sticker line — the actual product — was silently absent from the customer-facing quote.
 - **Root Cause**: `quote-view.js` `buildProductRows()` derives EVERY row from `parseSizeBreakdown(item.SizeBreakdown)`. Stickers/banners/patches have no garment sizes, so the breakdown was empty, the size loops produced nothing, and the function returned zero rows. The money still came from `TotalAmount`, so the totals looked right and only the itemisation was wrong — which is the dangerous shape of this bug. Related: the same page hardcoded 6 apparel size columns (a sticker got 6 empty cells) and defaulted `location || 'Left Chest'`, telling sticker customers their stickers go on the left chest.
@@ -36,11 +48,7 @@ Active reference of recurring bugs, critical patterns, and gotchas. For historic
 - **Solution**: proxy `abd1666`+`6912215`+`2e501bc` — default status `<>'Discontinued'`, new sanitized `?styleNumbers=CSV` filter (dedupes styles pre-pagination, skips non-SanMar merge), `q.orderBy:'PK_ID'` on Phase 2, cap-config-by-title fallback for the empty `CATEGORY_NAME` on 'New' rows; 8-test `products-search-route.test.js`. Fall page rebuilt API-driven.
 - **Prevention**: never conclude "not in the database" from one endpoint — cross-check `stylesearch` + `product-colors` + `pricing-bundle` before designing around absence; when one route's results contradict its siblings, diff their WHERE clauses first; `PRODUCT_STATUS='New'` rows also ship with EMPTY `CATEGORY_NAME` (category-based logic needs a fallback).
 
-### New staff-dashboard sidebar section = solid green square (missing SVG mask) (2026-07-22)
-- **Problem**: AE Mission Control, Leads, Jim's Mailing List, and Forms rendered as solid NW-green squares in the sidebar (their `→` also a faint gray nub) while the older sections showed clean icons.
-- **Root Cause**: the sidebar does NOT display the emoji in `<span aria-hidden>`. `dashboard-v3-theme.css` sets that span to `font-size:0` + `background-color:var(--nw-green)` and cuts it out with a per-section `mask-image` (inline SVG). Each of the 4 sections was added AFTER the masking system and never got its `[data-section="X"] … :first-child { mask-image }` rule — no mask = green floods the whole 18×18 box. Same for the trailing-arrow `:last-child` (base `background-color:var(--ink-dim)` → gray nub).
-- **Solution**: added the 4 first-child icon masks (rocket/magnet/mailbox/clipboard-list) + a chevron-right `:last-child` mask for the 3 link-style sections; bumped `?v=` on the theme `<link>`.
-- **Prevention**: adding a `.nav-section[data-section="…"]` to `staff-dashboard-v3/index.html` is a TWO-file change — you MUST also add its `:first-child` `mask-image` (and `:last-child` for header-link sections) in `dashboard-v3-theme.css`, else it's a green square. The emoji in the HTML is a placeholder the mask replaces, not the rendered icon. Validate hand-authored mask SVGs as XML before shipping (malformed = silent blank mask). Icons are 24×24 Feather/Lucide line, `stroke='white'` `stroke-width='1.8'`.
+### New staff-dashboard sidebar section = solid green square (missing SVG mask) (2026-07-22, ARCHIVED 2026-07-25): adding a `.nav-section[data-section="X"]` to `staff-dashboard-v3/index.html` is a TWO-FILE change — it MUST also get its `:first-child` `mask-image` (and `:last-child` chevron for header-link sections) in `dashboard-v3-theme.css`, else `font-size:0` + `background-color:var(--nw-green)` floods the whole 18x18 box. The emoji in the HTML is a placeholder the mask replaces, NOT the rendered icon. Validate hand-authored mask SVGs as XML (malformed = silent blank mask); icons are 24x24 Feather/Lucide line, stroke='white' stroke-width='1.8'. Full entry in archive.
 
 ### Caspio quota blown by uncached per-style endpoints + a dead-table probe (2026-07-18)
 - **Problem**: 507K/500K Integrations at day 22. Recurring baseline (~18K/day ≈ 545K/mo) exceeded the cap by itself — only ~100K was July's one-off backfills.
@@ -64,7 +72,6 @@ The 6/29 flip `app.use('/api/orders', requireCrmApiSecret)` matched only that pa
 ### Same calculator follow-up (2026-07-01, ARCHIVED 2026-07-07): displayed quote ID != saved ID (generateQuoteID called twice — mint ONCE, thread it through) + email failure masked a successful save (track save/notify outcomes separately). Full entry in archive.
 
 ### Expert audit of EMB/SCP/DTF builders — three DEFECT CLASSES (2026-07-07, ARCHIVED 2026-07-19): (a) computed-but-never-billed — an API money field with no consumer / any `|| 0` on a price component is a leak; (b) Rule 8 applies to FIXES — when you fix save/print/email/push in one builder, grep the other 3 the same day; (c) shipped-but-never-switched-on — an opt-in class/flag is NOT live until something opts in ("grep for adopters"), and every `var(--x, fallback)` fallback must equal the token's real value. 55 findings — inventory: QUOTE_BUILDER_EXPERT_AUDIT_2026-07-07.md; full entry in archive.
-
 
 ### Caspio Date/Time fields 400 on empty STRING — blank with null (live SCP save outage, 2026-07-07, CONDENSED 2026-07-15): Caspio REST rejects `''` for a Date/Time field (`ReqShipDate`/`DropDeadDate` 400 InvalidInputValue) — a blankable Date/Time is `value || null`, NEVER `|| ''`; when one builder's convention provably works in prod (EMB's `_toISODate()→null`), siblings copy it, not invent a third (Rule 8 applies to PAYLOADS too). Also in MEMORY gotchas.
 
@@ -104,8 +111,6 @@ Laser-patch EMB (EMB-2026-313) printed a $360 products table against a $420 Subt
 
 ### quote-view.js DEAD hardcoded upcharge map (2026-07-06, ARCHIVED 2026-07-19): quote-view + `embroidery-quote-invoice.js` are FROZEN-quote DISPLAY surfaces — render saved per-line prices, derive upcharge as (extended − base), NEVER re-price via API or front-end constant at display time (Rule-9 forbidden 4th path); before "fixing" a hardcoded-pricing finding, trace the call graph — an unreachable subtree is dead code to DELETE, not a surface to re-wire. Full entry in archive.
 
-### Falsy-zero `||10.1` tax bug recurred in EMB after the DTF/SCP fix (2026-06-10): when you fix a falsy-zero MONEY bug in one builder, grep the other 3 for the same literal (`\|\| 10\.1` / `\|\| 0\.101`) THAT DAY (Rule 8) — EMB was missed because each builder hand-rolls rate parsing. All rate inputs now go through shared `parseRatePercent` (quote-builder-utils.js, 0 valid via finite-check), locked by `parse-rate-percent.test.js`. See the Falsy-Zero rule below.
-
 ### PowerShell 5.1 Get-Content/Set-Content round-trip corrupts UTF-8 repo files (2026-06-10, ARCHIVED 2026-07-06): NEVER round-trip repo source through PS 5.1 Get-Content/Set-Content (BOM-less UTF-8 read as ANSI → mojibake file-wide) — use the Edit tool or node; after ANY scripted bulk edit, grep the diff for `â€|Ã|â†`. Full entry in archive.
 
 ### Order-form push: restart node to verify + fees need one source (2026-06-09, ARCHIVED 2026-06-30): Node does NOT hot-reload — restart `node server.js` to verify ANY server-side change (a stale process serves old API); a fee folded into a total must ALSO be an itemized line (one source screen+PDF+push read) and an unresolved/$0 fee must BLOCK the push, never drop silently. Full entry in archive.
@@ -137,9 +142,6 @@ Keep-alive: a frontend regex that pattern-matches a backend-generated note strin
 
 ### EMB/SCP/DTF push parity hardening — dropped notes, blank SCP ship-to, daily-colliding ExtOrderIDs (2026-06-01) — ARCHIVED 2026-06-15
 In [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive: the field name a downstream API reads is part of the contract — MO `/onsite/order-push` reads `Notes` (NOT `NotesOnOrders`); diff a new transformer's output keys against the PROVEN path (`manageorders-push-client.js`). An ExtOrderID must contain the FULL date+seq PLUS a year (daily-reset seq with date stripped collides within 24h) — all 3 builders share `buildExtOrderID()` in `manageorders-emb-config.js`. SCP ship-to reads `ShipTo*` columns. Factor shared artifacts into ONE helper so the working method can't drift.
-
-### ShopWorks ManageOrders integration ignores per-order TaxPartNumber (2026-05-20) — ARCHIVED 2026-06-11
-Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive: integration-level Tax Line Item/Account defaults stamp every `TaxTotal > 0` order and IGNORE payload tax fields — send `TaxTotal: 0` + Notes-On-Order tax block (current pattern; see the 2026-06-07 "OnSite DROPS the pushed order-level tax field" entry).
 
 ### Quote page froze the push-time design name + read ShopWorks status "8" as Shipped (2026-06-16, ARCHIVED 2026-07-10): the hourly sync writes a snapshot BLOB — render name/ship-status LIVE from JSON (`pushed.*` never reflects post-push edits); a `sts_*` is a multi-state code (8/222=N/A, .5=Partial), mirror the OnSite screen via ONE mapper, never collapse to Yes/No. Full entry in archive.
 
@@ -176,20 +178,11 @@ In [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive: when 
 
 ### Pricing-baselines gate red — drift was Erik's own Caspio margin lift (2026-06-11, ARCHIVED 2026-07-04): when baselines drift by a uniform rounded half-dollar, suspect a Caspio `MarginDenominator` change (invisible to git) — trace the delta to a named upstream change BEFORE re-locking; never rubber-stamp; a passing scenario does NOT prove the margin didn't move (only a fingerprint like `garmentSellPerPiece` does). Full entry in archive.
 
-### Richardson calculator drifted from the Embroidery Quote Builder — leatherette model, margin, tiers (2026-05-29) — ARCHIVED 2026-06-11
-Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive: a calculator that duplicates a quote-builder method MUST mirror its formula and pull margin/tiers/upcharges from the SAME Caspio endpoints (rule #7); validate tier-label strings against the live API — `lookup[key] || fallback` hides a key mismatch as a plausible price.
-
-### DTG LTM fee/threshold lived in 4 different files (2026-05-18) — ARCHIVED 2026-06-11
-Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive: pricing constants with a Caspio column MUST be read from the column (`Pricing_Tiers.LTM_Fee`); when the LTM tier has no `DTG_Costs` rows, the canonical fallback is the lowest non-LTM tier's costs.
-
 ### ALWAYS pull pricing from Caspio API — never hardcode (fallback ONLY + visible warning; sales adjusts prices with no deploy). Full rule -> CLAUDE.md "Pricing = API" + MEMORY.md "Quote Builders — Sync Rules".
 
 ---
 
 ## Dashboard / UI
-
-### Caspio Embed Script Overrides Host Page CSS (2026-05-13) — ARCHIVED 2026-06-11
-Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive: any page embedding a Caspio DataPage MUST load `caspio-isolation.js` early in `<head>` (Caspio injects its CSS after ours and wins the cascade). Pattern: [CASPIO_CSS_ISOLATION.md](./CASPIO_CSS_ISOLATION.md).
 
 ---
 
@@ -207,15 +200,9 @@ Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive:
 
 ### Caspio Yes/No fields in `q.where` — use `=1`, never `=true` (2026-07-06): proxy `/api/products/search?isTopSeller=true` had ALWAYS 500'd because it built `IsTopSeller=true` (Caspio 400s it); the same file's `/products/top-sellers` endpoint used `IsTopSeller=1` and worked. The filter shipped in 2025 and was never once exercised until the catalog Top Sellers view — an API param isn't "supported" until something calls it (fixed proxy `src/routes/products.js:506`).
 
-### Caspio multi-select List columns unwritable via REST/Triggered Actions (2026-05-09) — ARCHIVED 2026-06-16
-In [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive: NEVER put a Caspio `List - String` multi-select column in a REST POST/PUT — the whole submission 500s. Workaround = a parallel Text column (`Order_Type_Source`) + read-coalesce (`Order_Type || Order_Type_Source`).
-
 ### Proxy quote_sessions lookups cache 5 min — a pre-create existence check POISONS the key your webhook reads (2026-06-09, ARCHIVED 2026-07-06): a flow that READS a key it's ABOUT TO CREATE must bypass read caches (`&refresh=true`) — an existence check is a cache-poisoning write; status-polling reads (webhook idempotency, success pages) must always bypass the 5-min cache; a silently-caught HTTP call that never logs an error may be hitting a route that doesn't exist (`PUT /quote_sessions` routes by `/:id` only). Full entry in archive.
 
 ### Caspio pricing tiers without matching cost-table rows silently price at $0 — `?.PrintCost || 0` is a money trap (2026-06-09, ARCHIVED 2026-07-10): a missing price component must throw/error-banner, never `|| 0` (Erik #1 applies to lookup misses); when adding a tier row grep every TierLabel consumer, or reuse the shared service's lowest-non-LTM-tier fallback. `3dt-pricing.test.js`. Full entry in archive.
-
-### `/api/company-contacts/*` 3-bug cascade (2026-05-07) — ARCHIVED 2026-06-11
-Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive gotchas: `q.sort` is invalid in Caspio v3 (use `q.orderBy`); `q.limit < 5` 400s; cron jobs need content-level asserts, not status codes.
 
 ### Caspio v3 paginates UNORDERED queries non-deterministically — every multi-page read needs `q.orderBy` on a stable col (2026-07-12, ARCHIVED 2026-07-21): without it page N differs across runs → 5-10% of rows silently skipped/duped (hit 36 sites incl. money paths); `q.distinct` is silently ignored (use `q.groupBy`). Rule + example in MEMORY.md Backend + proxy CLAUDE.md. Full entry in archive.
 
@@ -242,16 +229,11 @@ Per-rep filters hit different shapes: `Form_Submissions.Sales_Rep`/`ORDER_ODBC.C
 
 ### Quote Sequence Race — duplicate IDs (ARCHIVED 2026-06-12): Caspio has no atomic increment — any read-modify-write needs an app-level lock (mutex per prefix). Full entry in archive.
 
-### Art-request notes notification fan-out (2026-05-29, ARCHIVED 2026-06-11, full entry in archive): notifications belong on the backend write chokepoint not the browser; audit/system note POSTs must send `notify:false` or they double-fire.
-
 ---
 
 ## Tax / Pricing
 
 ### Customer SCP calculator priced dark-garment underbase per-piece — builder says setup-screen only (2026-06-11, ARCHIVED 2026-06-23, full entry in archive): SCP underbase/flash = SETUP-SCREEN charges (per printed LOCATION), NEVER per-piece — per-piece lookups always use RAW design colors. When a pricing rule is fixed on one surface, grep ALL sibling surfaces THAT DAY.
-
-### WA DOR tax-rate lookup discarded valid rates on ResultCode 2 (2026-06-03) — ARCHIVED 2026-06-11
-Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive gotchas: DOR ResultCode 2 still carries a VALID ZIP-level rate (only `Rate=-1` is a true miss); retry ZIP-only before any hardcoded default.
 
 ### Routes outlive files — 7 zombie sendFile routes (2026-06-11, ARCHIVED 2026-06-17, full entry in archive): on ANY page delete, grep the filename AND its `app.get`/`sendFile` route in server.js (route TOC) + check `scripts/safety-tools/validate-critical-paths.js` — routes outlive deleted files.
 

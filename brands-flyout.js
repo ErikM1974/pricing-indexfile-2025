@@ -1,54 +1,85 @@
 /**
  * Brands Flyout Menu
- * Displays top brands in navigation dropdown with links to brand-filtered search
- * @version 6.0.0
+ * Masthead Brands mega-dropdown: a featured tier of the brands we actually
+ * promote, plus a type-to-filter box that reaches every brand in the catalog.
+ * @version 7.0.0
  *
+ * Update 7.0.0 (2026-07-25): featured tier + filter, and the dropdown can no
+ *   longer render empty.
+ *   - WHY: the dropdown showed "No brands available". Root cause was proxy-side
+ *     (/api/all-brands cached its own empty result — `[]` is truthy, so one bad
+ *     Caspio read pinned "no brands" for 24h server-side and 6h in every
+ *     browser). Fixed there, but the front end also dead-ended on empty instead
+ *     of degrading, which is what made a backend blip a visibly broken menu.
+ *   - FEATURED_BRANDS is static, so the tier paints on init with zero network
+ *     dependency and is the fallback whenever the API is slow, empty or down.
+ *     Layered: static tier -> CDN logo -> 🏷️ glyph + name. Never blank.
+ *   - 15 tiles (the brands with a /custom-<brand> landing page) instead of a
+ *     30-logo wall: 3 rows, no internal scrollbar, and clicks land on the
+ *     landing pages rather than a generic catalog filter.
+ *   - Filter searches all ~46 API brands; long-tail hits go to /?brand=<name>.
  * Update 6.0.0: Priority brand loading - Carhartt and top brands appear first
- *   - Carhartt loads first (0.3s), top 10 brands visible in 0.6s
- *   - Priority brands: Carhartt, Gildan, Port & Company, Bella+Canvas, Nike, Sport-Tek, etc.
- *   - Remaining brands load progressively in background
- *   - Perceived load time: 0.6s (was 3s) - 5x faster user experience
- * Update 5.0.0: Progressive image loading - reduces brand icons load time from 6-8s to <1s
- *   - Images load in 3 batches (10 brands each) with 200ms stagger
- *   - Shimmer placeholder animation during loading
- *   - Smooth fade-in transition as images load
- *   - Preconnect to SanMar CDN for faster DNS/SSL handshake
- *   - Prevents network waterfall congestion (30 simultaneous requests → 10 at a time)
- * Update 4.0.0: Implemented true on-demand loading - eliminates 8-second homepage delay
- *   - Brands now load only when dropdown is opened (not on page load)
- *   - Reduces homepage load time from 8s to ~0.5s
- *   - Shows loading spinner during first fetch
- *   - Results cached for instant subsequent opens
+ * Update 5.0.0: Progressive image loading (batches of 10, 200ms stagger)
+ * Update 4.0.0: On-demand loading - eliminates 8-second homepage delay
  * Update 3.0.0: Added lazy loading for performance optimization
  * Update 2.0.0: Added brand logo support from API
  */
+
+/**
+ * The featured tier. This is deliberately STATIC, and that is not a violation of
+ * the "pricing comes from the API" rule — no price is involved. *Which* brands
+ * we promote, and which have a landing page, is an editorial decision that
+ * changes a couple of times a year, so hardcoding it buys an instant, offline-
+ * proof menu. The full brand list stays API-driven (see loadBrands).
+ *
+ * Rule: one entry per /custom-<brand> landing page. Ship a landing page -> add
+ * a tile here. `brand` MUST match the /api/all-brands spelling exactly (all 15
+ * verified against the live payload 2026-07-25) so filtering de-dupes cleanly.
+ * `logo` URLs verified 200 on the SanMar CDN — note Bella's needs %20 escapes.
+ */
+const FEATURED_BRANDS = [
+    { brand: 'Carhartt',        href: '/custom-carhartt',          logo: 'https://cdnm.sanmar.com/catalog/images/Carharttheader.jpg' },
+    { brand: 'Port & Company',  href: '/custom-port-and-company',  logo: 'https://cdnm.sanmar.com/catalog/images/portandcompanyheader.jpg' },
+    { brand: 'Port Authority',  href: '/custom-port-authority',    logo: 'https://cdnm.sanmar.com/catalog/images/portauthorityheader.jpg' },
+    { brand: 'Sport-Tek',       href: '/custom-sport-tek',         logo: 'https://cdnm.sanmar.com/catalog/images/sporttekheader.jpg' },
+    { brand: 'Richardson',      href: '/custom-richardson',        logo: 'https://cdnm.sanmar.com/catalog/images/richardsonheader.jpg' },
+    { brand: 'Nike',            href: '/custom-nike',              logo: 'https://cdnm.sanmar.com/catalog/images/nikegolfheader.jpg' },
+    { brand: 'New Era',         href: '/custom-new-era',           logo: 'https://cdnm.sanmar.com/catalog/images/neweraheader.jpg' },
+    { brand: 'Gildan',          href: '/custom-gildan',            logo: 'https://cdnm.sanmar.com/catalog/images/gildanheader.jpg' },
+    { brand: 'Bella + Canvas',  href: '/custom-bella-canvas',      logo: 'https://cdnm.sanmar.com/catalog/images/Bella%20Logo%202000.jpg' },
+    { brand: 'District',        href: '/custom-district',          logo: 'https://cdnm.sanmar.com/catalog/images/districtheader.jpg' },
+    { brand: 'CornerStone',     href: '/custom-cornerstone',       logo: 'https://cdnm.sanmar.com/catalog/images/cornerstoneheader.jpg' },
+    { brand: 'The North Face',  href: '/custom-north-face',        logo: 'https://cdnm.sanmar.com/catalog/images/northfaceheader.jpg' },
+    { brand: 'OGIO',            href: '/custom-ogio',              logo: 'https://cdnm.sanmar.com/catalog/images/ogioheader.jpg' },
+    { brand: 'Eddie Bauer',     href: '/custom-eddie-bauer',       logo: 'https://cdnm.sanmar.com/catalog/images/eddiebauerheader.jpg' },
+    { brand: 'TravisMathew',    href: '/custom-travismathew',      logo: 'https://cdnm.sanmar.com/catalog/images/travismathewheader.jpg' }
+];
+
+/**
+ * Brand name -> landing page, DERIVED from FEATURED_BRANDS so the two can never
+ * drift. Plus aliases: the API really does return both 'Port & Co' and
+ * 'Port & Company' as separate brands sharing one logo, and both OGIO variants
+ * should reach the OGIO page.
+ */
+const BRAND_LANDING_PAGES = FEATURED_BRANDS.reduce((map, b) => {
+    map[b.brand] = b.href;
+    return map;
+}, {
+    'Port & Co': '/custom-port-and-company',
+    'OGIO Endurance': '/custom-ogio'
+});
 
 class BrandsFlyout {
     constructor() {
         this.apiBase = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
         this.brandsContainer = document.getElementById('navBrandsGrid');
         this.allBrands = [];
-        this.maxBrandsToShow = 30;
+        this.maxBrandsToShow = 30;   // cap on filter results
         this.brandsLoaded = false;
         this.isLoading = false;
+        this.filterQuery = '';
+        this.degraded = false;       // API empty/unreachable -> featured tier only
 
-        // Priority brands - load these first for perceived performance
-        // Carhartt is #1 priority per customer request
-        this.PRIORITY_BRANDS = [
-            'Carhartt',
-            'Richardson',
-            'Gildan',
-            'Port & Company',
-            'Bella + Canvas',
-            'Nike',
-            'Sport-Tek',
-            'Port Authority',
-            'Hanes',
-            'Comfort Colors',
-            'The North Face'
-        ];
-
-        console.log('[BrandsFlyout] Initializing brands flyout menu...');
         this.init();
     }
 
@@ -58,14 +89,14 @@ class BrandsFlyout {
             return;
         }
 
-        // Set up on-demand loading (only fetch when dropdown opens)
-        this.setupLazyLoading();
+        // Paint the featured tier synchronously. The dropdown is now useful
+        // before any network call resolves — and stays useful if none ever does.
+        this.injectFilterUI();
+        this.renderFeatured();
 
-        // Warm the dropdown during browser IDLE time so it opens instantly —
-        // the brand list + logos are fetched before the user ever hovers/clicks
-        // (the API is cached proxy-side, so this is cheap). Runs only when the
-        // browser is idle, well after critical page load, so it never competes
-        // with it — unlike the old eager-on-load approach that stalled the page.
+        // The full list only powers the filter + the footer count, so it can
+        // load whenever. Warm it on first interaction and during idle time.
+        this.setupLazyLoading();
         this.prefetchWhenIdle();
     }
 
@@ -81,11 +112,75 @@ class BrandsFlyout {
     }
 
     /**
-     * Set up lazy loading - only fetch brands when dropdown is opened
+     * Insert the filter box above the grid. Markup is injected here (rather than
+     * living in the 5 pages that ship this masthead) to match how the sibling
+     * Products dropdown builds its own search — see the `.brands-grid` and
+     * `.dropdown-search-*` notes in nwca-2026-core.css. Classes are REUSED from
+     * that dropdown so no new styling is introduced.
+     */
+    injectFilterUI() {
+        const content = this.brandsContainer.parentElement;
+        if (!content || content.querySelector('.brands-filter-container')) return;
+
+        const wrap = document.createElement('div');
+        wrap.className = 'dropdown-search-container brands-filter-container';
+        wrap.innerHTML = `
+            <svg class="dropdown-search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                <circle cx="11" cy="11" r="7"></circle><line x1="16.5" y1="16.5" x2="21" y2="21"></line>
+            </svg>
+            <input type="search" class="dropdown-search-input" id="navBrandsFilter"
+                   placeholder="Filter brands — Carhartt, Nike…" autocomplete="off"
+                   aria-label="Filter brands">
+        `;
+        content.insertBefore(wrap, this.brandsContainer);
+
+        const input = wrap.querySelector('#navBrandsFilter');
+        let debounce;
+        input.addEventListener('input', () => {
+            clearTimeout(debounce);
+            debounce = setTimeout(() => this.applyFilter(input.value), 120);
+        });
+        // Esc clears the filter rather than closing the whole dropdown
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && input.value) {
+                e.stopPropagation();
+                input.value = '';
+                this.applyFilter('');
+            }
+        });
+    }
+
+    /**
+     * Featured tier — the default view, and the fallback whenever the API can't
+     * be reached. Marked-up identically to filter results so hover/focus styles
+     * and the logo loader behave the same.
+     */
+    renderFeatured() {
+        const html = FEATURED_BRANDS.map(b => this.createBrandLink(b, b.logo)).join('');
+        const note = this.degraded
+            ? `<p class="brands-note">Showing our top brands — the full list is briefly unavailable.</p>`
+            : '';
+        this.brandsContainer.innerHTML = note + html;
+        this.initProgressiveLoading();
+    }
+
+    /**
+     * Skeleton tiles at the FINAL tile size, so swapping in real content never
+     * changes the panel height (the old one-line "Loading brands…" made the
+     * dropdown jump several rows). Only used for filter results, since the
+     * featured tier paints instantly from static data.
+     */
+    showFilterSkeleton(count = 10) {
+        this.brandsContainer.innerHTML = Array.from({ length: count }, () =>
+            `<div class="brand-tile-skeleton" aria-hidden="true"></div>`
+        ).join('');
+    }
+
+    /**
+     * Set up on-demand loading of the full list (for the filter)
      */
     setupLazyLoading() {
-        // Find the brands navigation item/button
-        // Try multiple selectors to find the trigger
         const brandsButton = document.querySelector('.nav-item[data-dropdown="brands"]') ||
                            document.querySelector('.brands-nav-item') ||
                            document.querySelector('[href*="brands"]')?.closest('.nav-item');
@@ -96,201 +191,145 @@ class BrandsFlyout {
             return;
         }
 
-        console.log('[BrandsFlyout] Lazy loading enabled - brands will load on first dropdown open');
-
-        // Load brands on first interaction
         const loadOnce = () => {
-            if (!this.brandsLoaded && !this.isLoading) {
-                console.log('[BrandsFlyout] User opened brands dropdown - loading brands...');
-                this.showLoadingState();
-                this.loadBrands();
-            }
+            if (!this.brandsLoaded && !this.isLoading) this.loadBrands();
         };
 
-        // Trigger on mouseenter (for hover dropdowns) or click
         brandsButton.addEventListener('mouseenter', loadOnce, { once: true });
         brandsButton.addEventListener('click', loadOnce, { once: true });
-
-        // Show initial placeholder
-        this.showPlaceholder();
     }
 
     /**
-     * Show placeholder before brands load
-     */
-    showPlaceholder() {
-        this.brandsContainer.innerHTML = `
-            <div class="brands-placeholder" style="text-align: center; padding: 20px; color: #6b7280;">
-                <p>Hover to load brands...</p>
-            </div>
-        `;
-    }
-
-    /**
-     * Show loading state while fetching brands
-     */
-    showLoadingState() {
-        this.brandsContainer.innerHTML = `
-            <div class="brands-loading" style="text-align: center; padding: 20px;">
-                <div class="spinner" style="width: 30px; height: 30px; margin: 0 auto 10px; border: 3px solid #e5e7eb; border-top-color: #2d5f3f; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-                <p style="color: #6b7280; font-size: 14px;">Loading brands...</p>
-            </div>
-        `;
-    }
-
-    /**
-     * Fetch brands from API
+     * Fetch the full brand list from the API. Only powers the filter and the
+     * footer count — a failure here degrades to the featured tier and NEVER
+     * blanks the menu.
      */
     async loadBrands() {
-        // Prevent duplicate loads
-        if (this.isLoading || this.brandsLoaded) {
-            console.log('[BrandsFlyout] Brands already loaded or loading, skipping');
-            return;
-        }
-
+        if (this.isLoading || this.brandsLoaded) return;
         this.isLoading = true;
 
         try {
-            console.log('[BrandsFlyout] Fetching brands from API...');
-
             const response = await fetch(`${this.apiBase}/api/all-brands`);
 
+            // The proxy now answers 503 (never a cacheable empty 200) when its
+            // upstream read comes back empty — treat it as "degrade", not "fail".
             if (!response.ok) {
                 throw new Error(`API request failed: ${response.status}`);
             }
 
             const data = await response.json();
-            console.log('[BrandsFlyout] API response:', data);
 
-            // API now returns objects with { brand, logo, sampleStyles }
-            // Handle both legacy string format and new object format
-            this.allBrands = data.brands || data.data?.brands || data;
+            // Bare array today; tolerate the wrapped shapes older builds returned.
+            const brands = data.brands || data.data?.brands || data;
 
-            if (!Array.isArray(this.allBrands)) {
+            if (!Array.isArray(brands)) {
                 throw new Error('Invalid brands data format');
             }
+            if (brands.length === 0) {
+                throw new Error('API returned an empty brand list');
+            }
 
-            // Sort brands by priority (Carhartt first), then alphabetically
-            this.allBrands = this.sortBrandsByPriority(this.allBrands);
-
-            console.log(`[BrandsFlyout] Loaded ${this.allBrands.length} brands`);
-
-            // Mark as loaded successfully
+            this.allBrands = this.sortBrandsByPriority(brands);
             this.brandsLoaded = true;
+            this.degraded = false;
 
-            // Display brands in flyout
-            this.displayBrands();
+            this.updateFooterCount(this.allBrands.length);
+
+            // Only repaint if the user is mid-filter; otherwise leave the
+            // featured tier alone so nothing flickers under the cursor.
+            if (this.filterQuery) this.applyFilter(this.filterQuery);
 
         } catch (error) {
-            console.error('[BrandsFlyout] Error loading brands:', error);
-            this.showError();
+            // Degrade, don't dead-end. The featured tier is already on screen.
+            console.error('[BrandsFlyout] Could not load the full brand list — showing featured brands only:', error);
+            this.degraded = true;
+            if (!this.filterQuery) this.renderFeatured();
         } finally {
             this.isLoading = false;
         }
     }
 
     /**
-     * Sort brands by priority order, with Carhartt first
-     * Priority brands appear first in exact order, then remaining brands alphabetically
+     * Sort brands with the featured names first (in FEATURED_BRANDS order), then
+     * everything else alphabetically.
      */
     sortBrandsByPriority(brands) {
-        return brands.sort((a, b) => {
-            // Extract brand names
-            const getNameString = (brand) => {
-                if (typeof brand === 'string') return brand;
-                if (typeof brand === 'object' && brand !== null) {
-                    return brand.name || brand.BrandName || brand.brand || brand.Brand || JSON.stringify(brand);
-                }
-                return String(brand);
-            };
-
-            const nameA = getNameString(a);
-            const nameB = getNameString(b);
-
-            // Find priority indexes
-            const indexA = this.PRIORITY_BRANDS.indexOf(nameA);
-            const indexB = this.PRIORITY_BRANDS.indexOf(nameB);
-
-            // Both are priority brands - maintain priority order
-            if (indexA !== -1 && indexB !== -1) {
-                return indexA - indexB;
+        const priority = FEATURED_BRANDS.map(b => b.brand);
+        const nameOf = (brand) => {
+            if (typeof brand === 'string') return brand;
+            if (typeof brand === 'object' && brand !== null) {
+                return brand.brand || brand.name || brand.BrandName || brand.Brand || '';
             }
+            return String(brand);
+        };
 
-            // A is priority, B is not - A comes first
+        return [...brands].sort((a, b) => {
+            const nameA = nameOf(a);
+            const nameB = nameOf(b);
+            const indexA = priority.indexOf(nameA);
+            const indexB = priority.indexOf(nameB);
+
+            if (indexA !== -1 && indexB !== -1) return indexA - indexB;
             if (indexA !== -1) return -1;
-
-            // B is priority, A is not - B comes first
             if (indexB !== -1) return 1;
-
-            // Neither is priority - sort alphabetically
             return nameA.toUpperCase().localeCompare(nameB.toUpperCase());
         });
     }
 
     /**
-     * Display brands in the flyout menu with progressive image loading
+     * Filter across every known brand. Falls back to filtering the featured
+     * tier when the API list hasn't arrived (or never will).
      */
-    displayBrands() {
-        if (!this.allBrands || this.allBrands.length === 0) {
-            this.showError('No brands available');
+    applyFilter(rawQuery) {
+        const query = (rawQuery || '').trim().toLowerCase();
+        this.filterQuery = query;
+
+        if (!query) {
+            this.renderFeatured();
             return;
         }
 
-        // Take top N brands
-        const brandsToShow = this.allBrands.slice(0, this.maxBrandsToShow);
+        const source = this.allBrands.length ? this.allBrands : FEATURED_BRANDS;
+        const nameOf = (b) => (typeof b === 'string' ? b : (b.brand || b.name || ''));
+        const matches = source.filter(b => nameOf(b).toLowerCase().includes(query));
 
-        // Generate brand links HTML with placeholders (images load progressively)
-        const brandsHTML = brandsToShow.map(brand => {
-            // Handle multiple API response formats defensively
-            let brandName;
-
-            if (typeof brand === 'string') {
-                // Simple string format: "Carhartt"
-                brandName = brand;
-            } else if (typeof brand === 'object' && brand !== null) {
-                // Object format: try multiple possible property names
-                brandName = brand.name || brand.BrandName || brand.brand || brand.Brand;
-
-                // If still an object, convert to string (shouldn't happen but defensive)
-                if (typeof brandName === 'object') {
-                    brandName = JSON.stringify(brand);
-                    console.warn('[BrandsFlyout] Unexpected brand object format:', brand);
-                }
-            } else {
-                // Fallback for unexpected types
-                brandName = String(brand);
+        if (matches.length === 0) {
+            // If the list is still in flight, say so rather than claiming no match.
+            if (!this.brandsLoaded && this.isLoading) {
+                this.showFilterSkeleton(5);
+                return;
             }
+            this.brandsContainer.innerHTML = `
+                <div class="dropdown-no-results">
+                    <p>No brands match “${this.escapeHtml(rawQuery.trim())}”</p>
+                    <a href="/brands.html" class="view-all-brands-link">Browse all brands →</a>
+                </div>
+            `;
+            return;
+        }
 
-            return this.createBrandLink(brand, brand.logo);
-        }).join('');
-
-        // Update container
-        this.brandsContainer.innerHTML = brandsHTML;
-
-        console.log(`[BrandsFlyout] Displayed ${brandsToShow.length} brands in flyout`);
-
-        // Initialize progressive image loading
+        this.brandsContainer.innerHTML = matches
+            .slice(0, this.maxBrandsToShow)
+            .map(b => this.createBrandLink(b, typeof b === 'object' ? b.logo : null))
+            .join('');
         this.initProgressiveLoading();
     }
 
+    /** Footer link picks up the real brand count once it's known. */
+    updateFooterCount(count) {
+        const link = document.querySelector('.brands-dropdown .view-all-brands-link');
+        if (link && count > 0) link.textContent = `View all ${count} brands →`;
+    }
+
     /**
-     * Initialize progressive image loading using IntersectionObserver
+     * Initialize progressive image loading
      */
     initProgressiveLoading() {
-        // Add preconnect hint for faster image loading
         this.addPreconnectHint();
 
-        // Get all brand logo images
         const brandImages = this.brandsContainer.querySelectorAll('.brand-link-logo[data-src]');
+        if (brandImages.length === 0) return;
 
-        if (brandImages.length === 0) {
-            console.log('[BrandsFlyout] No images to progressively load');
-            return;
-        }
-
-        console.log(`[BrandsFlyout] Initializing progressive loading for ${brandImages.length} images`);
-
-        // Load images in batches with staggered delays
         this.loadImagesBatched(brandImages);
     }
 
@@ -301,7 +340,6 @@ class BrandsFlyout {
         const BATCH_SIZE = 10;
         const BATCH_DELAY = 200; // ms between batches
 
-        // Convert NodeList to array and split into batches
         const imageArray = Array.from(images);
         const batches = [];
 
@@ -309,12 +347,8 @@ class BrandsFlyout {
             batches.push(imageArray.slice(i, i + BATCH_SIZE));
         }
 
-        console.log(`[BrandsFlyout] Loading ${batches.length} batches of images`);
-
-        // Load each batch with progressive delay
         batches.forEach((batch, batchIndex) => {
             setTimeout(() => {
-                console.log(`[BrandsFlyout] Loading batch ${batchIndex + 1}/${batches.length} (${batch.length} images)`);
                 batch.forEach(img => this.loadImage(img));
             }, batchIndex * BATCH_DELAY);
         });
@@ -327,11 +361,9 @@ class BrandsFlyout {
         const src = img.getAttribute('data-src');
         if (!src) return;
 
-        // Create new image to preload
         const loader = new Image();
 
         loader.onload = () => {
-            // Image loaded successfully - swap and fade in
             img.src = src;
             img.removeAttribute('data-src');
             img.classList.add('brand-logo-loaded');
@@ -339,17 +371,16 @@ class BrandsFlyout {
         };
 
         loader.onerror = () => {
-            // Image failed to load - show fallback
+            // Last layer of the fallback chain: drop the image, show the glyph.
             console.warn(`[BrandsFlyout] Failed to load image: ${src}`);
-            img.style.display = 'none';
+            img.classList.add('brand-logo-failed');
             const fallback = img.nextElementSibling;
             if (fallback && fallback.classList.contains('brand-link-icon-fallback')) {
-                fallback.style.display = 'inline';
+                fallback.classList.add('is-shown');
             }
             img.classList.remove('brand-logo-loading');
         };
 
-        // Start loading
         loader.src = src;
     }
 
@@ -357,69 +388,47 @@ class BrandsFlyout {
      * Add preconnect hint for faster CDN connection
      */
     addPreconnectHint() {
-        // Check if preconnect already exists
-        const existing = document.querySelector('link[rel="preconnect"][href*="cdnm.sanmar.com"]');
-        if (existing) return;
+        if (document.querySelector('link[rel="preconnect"][href*="cdnm.sanmar.com"]')) return;
 
-        // Add preconnect hint
         const preconnect = document.createElement('link');
         preconnect.rel = 'preconnect';
         preconnect.href = 'https://cdnm.sanmar.com';
         preconnect.crossOrigin = 'anonymous';
         document.head.appendChild(preconnect);
-
-        console.log('[BrandsFlyout] Added preconnect hint for SanMar CDN');
     }
 
     /**
      * Create a brand link element with logo support and progressive loading
      */
     createBrandLink(brand, logo) {
-        // Handle both object and string formats
         const brandName = typeof brand === 'object' ? (brand.brand || brand.name) : brand;
         const logoUrl = typeof brand === 'object' ? brand.logo : logo;
-        const encodedBrand = encodeURIComponent(brandName);
+        if (!brandName) return '';
 
-        // Create icon HTML with placeholder for progressive loading
         let iconHtml;
         if (logoUrl) {
-            // Use data-src for progressive loading instead of src
-            // Add shimmer placeholder and loading class
             iconHtml = `
                 <img data-src="${this.escapeHtml(logoUrl)}"
                      alt="${this.escapeHtml(brandName)}"
                      class="brand-link-logo brand-logo-loading"
-                     decoding="async"
-                     onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';">
-                <span class="brand-link-icon brand-link-icon-fallback" style="display:none;">🏷️</span>
+                     decoding="async">
+                <span class="brand-link-icon brand-link-icon-fallback">🏷️</span>
             `;
         } else {
             iconHtml = `<span class="brand-link-icon">🏷️</span>`;
         }
 
-        // Brands with a dedicated landing page route there instead of the
-        // catalog filter (SEO brand-program pages, 2026-07-13). Extend this
-        // map as more /custom-<brand> pages ship.
-        const BRAND_LANDING_PAGES = { 'Carhartt': '/custom-carhartt', 'Richardson': '/custom-richardson', 'Nike': '/custom-nike', 'New Era': '/custom-new-era', 'Sport-Tek': '/custom-sport-tek', 'OGIO': '/custom-ogio', 'District': '/custom-district', 'Port Authority': '/custom-port-authority', 'Port & Co': '/custom-port-and-company', 'Port & Company': '/custom-port-and-company', 'CornerStone': '/custom-cornerstone', 'The North Face': '/custom-north-face', 'Gildan': '/custom-gildan', 'Eddie Bauer': '/custom-eddie-bauer', 'TravisMathew': '/custom-travismathew', 'Bella + Canvas': '/custom-bella-canvas' };
-        const landingPage = BRAND_LANDING_PAGES[brandName];
+        // Featured/aliased brands go to their landing page; the long tail goes to
+        // the catalog filter on the homepage (verified: sets the brand checkbox,
+        // shows a chip and renders matching products).
+        const landingPage = (typeof brand === 'object' && brand.href) || BRAND_LANDING_PAGES[brandName];
+        const href = landingPage || `/?brand=${encodeURIComponent(brandName)}`;
 
         return `
-            <a href="${landingPage || `/?brand=${encodedBrand}`}" class="brand-link">
+            <a href="${href}" class="brand-link">
                 ${iconHtml}
                 <span class="brand-link-name">${this.escapeHtml(brandName)}</span>
             </a>
-        `;
-    }
-
-    /**
-     * Show error state
-     */
-    showError(message = 'Unable to load brands') {
-        this.brandsContainer.innerHTML = `
-            <div class="brands-error">
-                <p>${this.escapeHtml(message)}</p>
-                <a href="/brands.html" class="brands-error-link">View all brands →</a>
-            </div>
         `;
     }
 

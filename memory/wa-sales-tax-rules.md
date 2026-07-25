@@ -54,6 +54,8 @@ This is the SAME engine behind DOR's [public lookup tool](https://webgis.dor.wa.
 
 **Fallback**: when DOR API is unreachable, the proxy returns a state-level default with `fallback: true`. UI should warn the rep ("Default rate 10.2% — DOR unavailable") and the rep can override if they know the right rate.
 
+⚠️ **`ResultCode 2` still carries a VALID ZIP-level rate — do NOT treat it as a miss** (graduated from LESSONS 2026-06-03, full entry in `LESSONS_LEARNED_ARCHIVE.md`). Only `Rate = -1` is a true miss. We once discarded good DOR rates on ResultCode 2 and fell through to a hardcoded default — i.e. we charged a made-up rate while DOR was answering correctly. Retry **ZIP-only before any hardcoded default**; the hardcoded default is the last resort, never the second choice. (ResultCode 0 = exact address, 5 = ZIP-centroid approximate — see the per-address cache note below.)
+
 ---
 
 ## Exceptions That DON'T Apply to NWCA

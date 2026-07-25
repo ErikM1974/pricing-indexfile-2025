@@ -1,6 +1,6 @@
 # NWCA Documentation Index
 
-**Last Updated:** 2026-07-21 (regenerated from `git ls-files memory` by `/memory-maintain`)
+**Last Updated:** 2026-07-25 (regenerated from `git ls-files memory` by `/memory-maintain`)
 **Purpose:** Master navigation for `/memory`. How memory itself works → [MEMORY_SYSTEM.md](MEMORY_SYSTEM.md).
 **Regenerate:** run `/memory-maintain` (do not hand-edit file-by-file — it drifts).
 
@@ -150,9 +150,11 @@ _Per-feature topic files the index links to._
 - [blog-content-differentiation.md](blog-content-differentiation.md) — SEO lane split **v2 2026-07-14** (.net = local/service + education; teamnwca = product/style/tools); .net topic map + `reference/nwcustomapparel-net-blogs/` (316-post export)
 - [webstore-seo-strategy.md](webstore-seo-strategy.md) — hub + spokes; InkSoft webstore niche DATA (construction/property-mgmt/hospitality win, NOT schools/teams)
 - [TEAMNWCA_SEO_PLAN_2026-07.md](TEAMNWCA_SEO_PLAN_2026-07.md) — teamnwca SEO plan v2, phased to run alongside Mehar's .net recovery roadmap (`reference/net-seo-recovery-roadmap-2026-07.html`)
+- [STICKER_MULE_COMPETITIVE_2026-07.md](STICKER_MULE_COMPETITIVE_2026-07.md) — SM price teardown (our sheet = SM × ~1.76, but our savings % ladder ties/beats theirs) + `/custom-stickers` & `/custom-banners` build decisions; **🔒 the 2-field quote gate stays by design**
 
 ## 📊 Dashboards / Staff / Ops
 
+- [JIM_MAILING_LIST_2026-07.md](JIM_MAILING_LIST_2026-07.md) — Jim's senior CRM over Caspio `Prospect_Mailing_List` (2,905 Bigin non-customer import) + the engagement-gated Mailchimp sync; 🔑 never handle the MC/Anthropic key in chat
 - [STAFF_DASHBOARD_DATA_GUIDE.md](STAFF_DASHBOARD_DATA_GUIDE.md)
 - [NIKA_DASHBOARD_BUILD_GUIDE.md](NIKA_DASHBOARD_BUILD_GUIDE.md)
 - [STAFF_DIRECTORY.md](STAFF_DIRECTORY.md)

@@ -4,6 +4,14 @@
 
 ---
 
+## Falsy-zero `||10.1` tax bug recurred in EMB after the DTF/SCP fix (2026-06-10) (archived 2026-07-25)
+**Problem:** The `|| 10.1` / `|| 0.101` falsy-zero tax fallback was fixed in DTF and SCP, but EMB kept its own copy and still coerced a legitimate `0` rate into 10.1%.
+**Root Cause:** Each of the 4 builders hand-rolled its own rate parsing, so a fix applied to one surface left the literal in place in the others (Rule 8 miss).
+**Solution:** All rate inputs now flow through shared `parseRatePercent` (quote-builder-utils.js) which treats `0` as valid via a finite-check; locked by `parse-rate-percent.test.js`.
+**Prevention:** When you fix a falsy-zero MONEY bug in one builder, grep the other 3 for the same literal THAT DAY. Superseded by the general Falsy-Zero rule (use `??` when `0` is valid), which remains in the active file.
+
+---
+
 ## PowerShell 5.1 Get-Content/Set-Content round-trip corrupts UTF-8 repo files (2026-06-10) (archived 2026-07-06)
 **Problem:** A `(Get-Content -Raw) -replace ... | Set-Content` one-liner on embroidery-quote-service.js turned every em-dash/arrow into mojibake (`â€”`, `â†’`) across the whole file.
 **Root Cause:** PS 5.1 reads BOM-less UTF-8 as ANSI and `-Encoding utf8` writes UTF-16-adjacent BOM'd output — the decode/re-encode mangles multi-byte chars file-wide, not just on edited lines.
@@ -2404,3 +2412,12 @@ Multi-agent adversarial audit of the customer checkout funnel found two live-in-
 - **Problem/Root Cause**: EVERY page (incl. customer storefronts) served H10 503 for ~2 min until `heroku releases:rollback`. A concurrent session had 365 lines of vendor-portal routes in `server.js` (tracked-modified) with its `lib/vendor-magic-link.js` still UNTRACKED; the deploy's `git add -u` staged their hunks, the lib never made the slug → `Cannot find module` at boot. `node --check` can't catch missing modules; the orphan guard only covered HTML-referenced assets.
 - **Solution**: Rollback → restore server.js to the healthy release (their work preserved in commit `df1b62d4`, noted in the hotfix message) → redeploy v2026.07.19.16 behind a boot probe (`PORT=3113 timeout 15 node server.js` + startup-banner grep).
 - **Prevention** (now deploy-skill Step 3.6): (a) after staging, `git diff --cached --name-only` and INSPECT any staged file this session didn't knowingly edit — unstage foreign hunks with `git restore --staged` (never `checkout --`, which destroys the other session's tree); (b) BOOT-PROBE server.js before every push — a slug that can't boot is a total outage, and only actually loading the module graph catches it.
+
+## Archived 2026-07-25
+
+### New staff-dashboard sidebar section = solid green square (missing SVG mask) (2026-07-22)
+- **Problem**: AE Mission Control, Leads, Jim's Mailing List, and Forms rendered as solid NW-green squares in the sidebar (their `→` also a faint gray nub) while the older sections showed clean icons.
+- **Root Cause**: the sidebar does NOT display the emoji in `<span aria-hidden>`. `dashboard-v3-theme.css` sets that span to `font-size:0` + `background-color:var(--nw-green)` and cuts it out with a per-section `mask-image` (inline SVG). Each of the 4 sections was added AFTER the masking system and never got its `[data-section="X"] … :first-child { mask-image }` rule — no mask = green floods the whole 18×18 box. Same for the trailing-arrow `:last-child` (base `background-color:var(--ink-dim)` → gray nub).
+- **Solution**: added the 4 first-child icon masks (rocket/magnet/mailbox/clipboard-list) + a chevron-right `:last-child` mask for the 3 link-style sections; bumped `?v=` on the theme `<link>`.
+- **Prevention**: adding a `.nav-section[data-section="…"]` to `staff-dashboard-v3/index.html` is a TWO-file change — you MUST also add its `:first-child` `mask-image` (and `:last-child` for header-link sections) in `dashboard-v3-theme.css`, else it's a green square. The emoji in the HTML is a placeholder the mask replaces, not the rendered icon. Validate hand-authored mask SVGs as XML before shipping (malformed = silent blank mask). Icons are 24×24 Feather/Lucide line, `stroke='white'` `stroke-width='1.8'`.
+
