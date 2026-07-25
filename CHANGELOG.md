@@ -1,3 +1,9 @@
+## v2026.07.25.4 (2026.07.25)
+
+- Memory: Q3 2026 Embroidery Bonus + the retired-order-type trap
+- Q3 2026 Embroidery Bonus: replace the garment spiff, keep pay off the shared page
+- Deploy v2026.07.25.4: 4 files (ae-mission-control.html,index.html,test-ae-mission-control.html,...)
+
 ## v2026.07.25.3 (2026.07.25)
 
 - fix(brands): one registry for brand names, landing pages and search keywords
