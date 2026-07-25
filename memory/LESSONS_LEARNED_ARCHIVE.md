@@ -4,6 +4,14 @@
 
 ---
 
+## Falsy-zero `||10.1` tax bug recurred in EMB after the DTF/SCP fix (2026-06-10) (archived 2026-07-25)
+**Problem:** The `|| 10.1` / `|| 0.101` falsy-zero tax fallback was fixed in DTF and SCP, but EMB kept its own copy and still coerced a legitimate `0` rate into 10.1%.
+**Root Cause:** Each of the 4 builders hand-rolled its own rate parsing, so a fix applied to one surface left the literal in place in the others (Rule 8 miss).
+**Solution:** All rate inputs now flow through shared `parseRatePercent` (quote-builder-utils.js) which treats `0` as valid via a finite-check; locked by `parse-rate-percent.test.js`.
+**Prevention:** When you fix a falsy-zero MONEY bug in one builder, grep the other 3 for the same literal THAT DAY. Superseded by the general Falsy-Zero rule (use `??` when `0` is valid), which remains in the active file.
+
+---
+
 ## PowerShell 5.1 Get-Content/Set-Content round-trip corrupts UTF-8 repo files (2026-06-10) (archived 2026-07-06)
 **Problem:** A `(Get-Content -Raw) -replace ... | Set-Content` one-liner on embroidery-quote-service.js turned every em-dash/arrow into mojibake (`â€”`, `â†’`) across the whole file.
 **Root Cause:** PS 5.1 reads BOM-less UTF-8 as ANSI and `-Encoding utf8` writes UTF-16-adjacent BOM'd output — the decode/re-encode mangles multi-byte chars file-wide, not just on edited lines.
