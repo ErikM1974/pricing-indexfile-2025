@@ -23,20 +23,16 @@ class BrandsPage {
         this.allBrands = [];
         this.filteredBrands = [];
 
-        // Priority brands - Carhartt first for fastest perceived loading
-        this.PRIORITY_BRANDS = [
-            'Carhartt',
-            'Richardson',
-            'Gildan',
-            'Port & Company',
-            'Bella + Canvas',
-            'Nike',
-            'Sport-Tek',
-            'Port Authority',
-            'Hanes',
-            'Comfort Colors',
-            'The North Face'
-        ];
+        // Priority order + landing pages come from the shared brands registry
+        // (shared_components/js/brands-registry.js), tagged before this file.
+        // This page used to keep its own PRIORITY_BRANDS copy AND had no landing
+        // -page map at all, so every tile — including the 15 brands with a
+        // /custom-<brand> page — dumped the customer on the generic catalog
+        // filter instead of the brand's own page (2026-07-25 drift fix).
+        this.PRIORITY_BRANDS = (window.NWCA_BRANDS && window.NWCA_BRANDS.PRIORITY_ORDER) || [];
+        if (!this.PRIORITY_BRANDS.length) {
+            console.error('[BrandsPage] brands-registry.js not loaded — using plain alphabetical order');
+        }
 
         this.init();
     }
@@ -349,9 +345,10 @@ class BrandsPage {
     }
 
     navigateToBrand(brandName) {
-        console.log('[BrandsPage] Navigating to brand:', brandName);
-        // Navigate to main catalog with brand filter applied
-        window.location.href = `/?brand=${encodeURIComponent(brandName)}`;
+        // Brands with a dedicated landing page go there — it's the page built to
+        // sell that brand. Everything else falls back to the catalog filter.
+        const landingPage = window.NWCA_BRANDS && window.NWCA_BRANDS.landingPageFor(brandName);
+        window.location.href = landingPage || `/?brand=${encodeURIComponent(brandName)}`;
     }
 
     /**
