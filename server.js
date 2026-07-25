@@ -3658,6 +3658,11 @@ app.get('/api/crm-proxy/embroidery-bonus/team',
 app.get('/api/crm-proxy/embroidery-bonus/dormant',
   requireCrmRole(['taneisha', 'nika', 'admin']),
   embroideryBonusForwarder('/api/embroidery-bonus/dormant', { injectIdentity: true }));
+// Target roadmap — who to call to earn more: win-backs, never-embroidered accounts that
+// already buy from us, and accounts a nudge away from a bounty. Identity-injected.
+app.get('/api/crm-proxy/embroidery-bonus/targets',
+  requireCrmRole(['taneisha', 'nika', 'admin']),
+  embroideryBonusForwarder('/api/embroidery-bonus/targets', { injectIdentity: true }));
 
 // Purchasing Portal — company-wide view of the same feed (every request to
 // Bradley + requester + status). ANY logged-in staff; no identity injection.

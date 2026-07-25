@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
     <link rel="stylesheet" href="/shared_components/css/sanmar-invoice-viewer.css?v=2026.07.19.17">
-    <link rel="stylesheet" href="/dashboards/css/ae-mission-control.css?v=2026.07.25.4">
+    <link rel="stylesheet" href="/dashboards/css/ae-mission-control.css?v=2026.07.25.5">
 </head>
 <body>
     <div class="dash-shell">
@@ -69,10 +69,29 @@
                 </div>
                 <div class="aemc-bh-right">
                     <div class="aemc-bh-next" id="aemc-bh-next">—</div>
-                    <div class="aemc-bh-track" role="img" aria-label="Progress to next milestone">
+                    <div class="aemc-bh-goal" id="aemc-bh-goal"></div>
+                    <div class="aemc-bh-track" role="img" aria-label="Progress toward your embroidery goal">
                         <div class="aemc-bh-fill" id="aemc-bh-fill" style="width:0%"></div>
+                        <div class="aemc-bh-marks" id="aemc-bh-marks"></div>
                     </div>
+                    <div class="aemc-bh-rungs" id="aemc-bh-rungs"></div>
                     <div class="aemc-bh-chips" id="aemc-bh-chips"></div>
+                    <button type="button" class="aemc-bh-explain" id="aemc-bh-explain"
+                            aria-expanded="false" aria-controls="aemc-bh-how">
+                        <i class="fas fa-circle-question" aria-hidden="true"></i> How this works
+                    </button>
+                </div>
+                <div class="aemc-bh-how" id="aemc-bh-how" hidden>
+                    <div class="aemc-bh-how-grid">
+                        <div><h4>1 · Activation bounties</h4>
+                            <p><strong id="aemc-bh-h-new">$75</strong> never embroidered ·
+                            <strong id="aemc-bh-h-react">$50</strong> quiet
+                            <span id="aemc-bh-h-months">12</span>+ months · counts at
+                            <strong id="aemc-bh-h-min">$1,000</strong>.</p></div>
+                        <div><h4>2 · Growth ladder</h4><p>Your goal comes from your own book's history.</p></div>
+                        <div><h4>3 · Team kicker</h4><p>Company Q3 — <strong id="aemc-bh-h-kick">$740,000</strong>.</p></div>
+                    </div>
+                    <p class="aemc-bh-how-foot"><a href="/dashboards/embroidery-bonus-plan.html">Read the full plan →</a></p>
                 </div>
             </section>
 
@@ -178,14 +197,21 @@
                 <div id="aemc-growth"><div class="dash-loading">Scanning 24 months of your order history…</div></div>
             </div>
 
-            <!-- Embroidery win-back radar — mirrors dashboards/ae-mission-control.html -->
-            <div class="dash-card aemc-emb-card aemc-collapsible" data-collapse-key="embwinback">
+            <!-- Earned + roadmap — mirror dashboards/ae-mission-control.html -->
+            <div class="dash-card aemc-collapsible" data-collapse-key="embearned">
                 <div class="dash-card-header">
-                    <h2 class="dash-card-title"><i class="fas fa-award"></i> Embroidery Win-Backs <span class="aemc-sub" id="aemc-emb-sub"></span></h2>
-                    <a class="aemc-viewall" id="aemc-emb-bonus-link" href="https://inksoft-transform-8a3dc4e38097.herokuapp.com/commissions" target="_blank" rel="noopener" hidden>My Bonus</a>
+                    <h2 class="dash-card-title"><i class="fas fa-receipt"></i> What earned your bonus <span class="aemc-sub" id="aemc-earned-sub"></span></h2>
+                    <a class="aemc-viewall" id="aemc-emb-bonus-link" href="https://inksoft-transform-8a3dc4e38097.herokuapp.com/commissions" target="_blank" rel="noopener" hidden>Full bonus report</a>
                 </div>
-                <p class="aemc-hint">Accounts you own that have embroidered with us before but have gone quiet. Each one you bring back earns a reactivation bounty once it reaches the quarter's minimum — sorted by how much embroidery they used to buy.</p>
-                <div id="aemc-emb"><div class="dash-loading">Finding your dormant embroidery accounts…</div></div>
+                <div id="aemc-earned"><div class="dash-loading">Loading…</div></div>
+            </div>
+
+            <div class="dash-card aemc-emb-card aemc-collapsible" data-collapse-key="embtargets">
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title"><i class="fas fa-map-location-dot"></i> Where the money is <span class="aemc-sub" id="aemc-targets-sub"></span></h2>
+                </div>
+                <p class="aemc-hint">Your accounts, ranked by what they're realistically worth in embroidery this quarter.</p>
+                <div id="aemc-targets"><div class="dash-loading">Working out who to call…</div></div>
             </div>
 
             <!-- Data-quality radar: ShopWorks orders/customers entered with essential fields missing -->
@@ -295,6 +321,6 @@
     <script src="/dashboards/js/sanmar-inbound-today.js?v=2026.07.22.4"></script>
     <script src="/shared_components/js/sanmar-invoice-viewer.js?v=2026.07.19.17"></script>
     <script src="/tests/ui/test-ae-mission-control-stub.js"></script>
-    <script src="/dashboards/js/ae-mission-control.js?v=2026.07.25.4"></script>
+    <script src="/dashboards/js/ae-mission-control.js?v=2026.07.25.5"></script>
 </body>
 </html>
