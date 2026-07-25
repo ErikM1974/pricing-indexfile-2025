@@ -82,6 +82,20 @@ Fully public + SEO · Continue → upload art → quote to a rep (not Stripe) ·
 line, waived on reorder — **refined to: ask rather than charge** (default unanswered, two of three
 answers are $0, so the customer discovers a waiver; headline stays $124 not $174).
 
-**9 questions still open** — see the plan's "Questions for Erik". The load-bearing one: *does
-print-ready vector art really waive the $50 in practice?* The prompt publishes the waiver
-(`contract-sticker-ai-prompt.js:145-154`) **and** says "default to charging when uncertain."
+**Q1 ANSWERED 2026-07-24 — vector art does NOT waive the $50.** Charge GRT-50 on every new design
+even when the customer sends print-ready vector; the only $0 case is a reorder of a design already
+on file. The AI prompt had been publishing a waiver the shop doesn't honor — removed. Also removed:
+every outdoor-lifespan claim (the prompt said both 5 and 3 years; Erik wants no lifespan quoted at
+all, and no vinyl spec dump).
+
+**🔒 The two-field gate on `/custom-stickers` STAYS — Erik's call 2026-07-25. Do not "reduce
+friction" by removing it.** The price is already zero-field (ladder renders on load, Copy link
+copies a `?size=&qty=` URL that IS the quote). Name + email are required only behind *Get this in
+writing* (`pages/js/custom-stickers.js:468`), which mints a real STK and routes it to an AE.
+**Rationale: the gate is the product, not friction** — our model is a named human confirming the
+price before anything prints, and a cart with no name has nobody to send the proof to. SM can skip
+it because they're genuinely self-serve; we aren't, by choice. If it's ever revisited, the cheap
+version is a third takeaway button ("Text me this price", one field, contact blank for a rep) — but
+only with real bounce evidence at that panel first.
+
+**Still open** — shipping wording (§3) and priced JSON-LD (§6, default no). Both cosmetic.
