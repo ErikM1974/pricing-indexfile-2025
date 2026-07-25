@@ -16,8 +16,9 @@
 | `app-modern.js` | Main application logic | index.html | Move to shared_components |
 | `app-new.js` | New app version | Unknown | Verify if needed |
 | `autocomplete-new.js` | Search autocomplete | index.html | Move to shared_components |
-| `brands.js` | Brands listing page logic | brands.html | Move to shared_components |
-| `brands-flyout.js` | Brands flyout/dropdown menu (header nav) | index.html, multiple | Move to shared_components |
+| `shared_components/js/brands-registry.js` | **THE single source of truth for brand names, landing pages and search keywords.** Replaces four hand-maintained copies that had drifted (mega-menu, header search, /brands.html, drawer HTML) — the drift shipped real bugs: 5 brands had landing pages but no search keyword, and 7 keywords named brands the catalog doesn't have (`Bella+Canvas` vs the catalog's `Bella + Canvas` returned ZERO products for a top seller). Exports `FEATURED` (15 landing-page brands), `CATALOG_BRANDS` (46 verified API spellings), derived `LANDING_PAGES` + `SEARCH_KEYWORDS` (generated FROM catalog names, so a keyword can never name a missing brand). **Must be script-tagged BEFORE brands-flyout.js / product-search-service.js / brands.js.** Locked by `tests/unit/brands-registry.test.js` | index.html, brands.html, pages/catalog.html, pages/custom-stickers.html, pages/custom-banners.html, pages/fall-catalog-2026.html | ✅ Active (NEW 2026-07-25) |
+| `brands.js` | Brands listing page logic — priority order + landing-page routing now from `brands-registry.js` | brands.html, brands-registry.js | Move to shared_components |
+| `brands-flyout.js` | Brands flyout/dropdown menu (header nav) — static featured tier (never renders empty) + type-to-filter over all catalog brands; featured tier + landing pages from `brands-registry.js` | index.html, multiple, brands-registry.js | Move to shared_components |
 | `shared_components/js/nav-dropdown.js` | CLICK-to-open disclosure for the Products/Brands mega dropdowns — toggles `.nav-open`, closes on outside-click/Escape/other-trigger, one open at a time, `aria-expanded`. Replaced hover-open (finicky on desktop, absent on touch); CSS has NO `:hover` open rule | index.html, pages/catalog.html; CSS `.nav-item.nav-open` in nwca-2026-core.css | ✅ Active (NEW 2026-07-13) |
 | `c112-bogo-promo.js` | BOGO promotion logic | Specific promo | Move to calculators |
 | `cart.js` | Cart functionality | NONE (cart.html retired 2026-06-11) | 🚩 Dead — flagged for deletion |
@@ -28,7 +29,7 @@
 | `dp5-helper.js` | Helper functions (root copy — see also `/shared_components/js/dp5-helper.js`) | Unknown | Verify if needed |
 | `order-form-pdf.js` | PDF generation | NONE (cart.html retired 2026-06-11) | 🚩 Dead — flagged for deletion |
 | `pricing-matrix-api.js` | Pricing API (root copy — see also `/shared_components/js/pricing-matrix-api.js`) | NONE (cart.html retired 2026-06-11; calculators use the shared_components copy) | 🚩 Dead — flagged for deletion |
-| `product-search-service.js` | Product search | index.html, multiple | Move to shared_components |
+| `product-search-service.js` | Product search — `BRAND_KEYWORDS` now comes from `brands-registry.js` (was a hand-maintained local copy that drifted from the catalog's real brand spellings) | index.html, multiple, brands-registry.js | Move to shared_components |
 | `utils.js` | Utility functions | Multiple pages | Move to shared_components |
 
 ### Root-Level HTML & Backend (not migrated to subdirs)

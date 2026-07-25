@@ -20,41 +20,30 @@ class ProductSearchService {
         this.EMB_ADDER = null;
         this._adderPromise = null;
 
-        // Smart search - Brand name detection dictionary
-        this.BRAND_KEYWORDS = {
-            // Major brands (lowercase for matching)
-            'nike': 'Nike',
-            'carhartt': 'Carhartt',
-            'ogio': 'OGIO',
-            'port authority': 'Port Authority',
-            'portauthority': 'Port Authority',
-            'port & company': 'Port & Company',
-            'port company': 'Port & Company',
-            'gildan': 'Gildan',
-            'champion': 'Champion',
-            'hanes': 'Hanes',
-            'adidas': 'adidas',
-            'under armour': 'Under Armour',
-            'underarmour': 'Under Armour',
-            'new era': 'New Era',
-            'newera': 'New Era',
-            'richardson': 'Richardson',
-            'columbia': 'Columbia',
-            'patagonia': 'Patagonia',
-            'the north face': 'The North Face',
-            'northface': 'The North Face',
-            'north face': 'The North Face',
-            'allmade': 'AllMade',
-            'all made': 'AllMade',
-            'bella canvas': 'Bella+Canvas',
-            'bella+canvas': 'Bella+Canvas',
-            'bellacanvas': 'Bella+Canvas',
-            'next level': 'Next Level Apparel',
-            'nextlevel': 'Next Level Apparel',
-            'american apparel': 'American Apparel',
-            'yeti': 'YETI',
-            'stanley': 'Stanley'
-        };
+        // Smart search - Brand name detection dictionary.
+        //
+        // Comes from the shared brands registry (shared_components/js/brands-registry.js),
+        // NOT a hand-maintained list here. The old local copy had drifted badly
+        // enough to cost sales: it mapped 'bella canvas' -> 'Bella+Canvas' while
+        // the catalog spells it 'Bella + Canvas', so a search for one of our
+        // best-selling brands filtered to a brand with ZERO products and showed
+        // the customer nothing (verified live 2026-07-25). Same for 'stanley'
+        // (catalog: 'Stanley/Stella') plus adidas / Under Armour / Columbia /
+        // Patagonia / YETI, which SanMar doesn't carry at all — those now
+        // correctly fall through to a plain text search instead of a dead filter.
+        // The registry derives every keyword FROM the catalog's own spellings,
+        // so a keyword can no longer name a brand that doesn't exist.
+        //
+        // Load order matters: brands-registry.js must be tagged BEFORE this file.
+        // If it's ever missing we keep an empty map — brand detection silently
+        // stops, but every query still works as a plain text search. A wrong
+        // brand filter is worse than none (Erik's rule: never a silent wrong answer).
+        if (typeof window !== 'undefined' && window.NWCA_BRANDS) {
+            this.BRAND_KEYWORDS = window.NWCA_BRANDS.SEARCH_KEYWORDS;
+        } else {
+            console.error('[ProductSearch] brands-registry.js not loaded — brand detection disabled, falling back to text search');
+            this.BRAND_KEYWORDS = {};
+        }
 
         // Smart search - Category keyword mapping
         this.CATEGORY_KEYWORDS = {

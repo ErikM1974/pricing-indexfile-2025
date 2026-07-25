@@ -26,48 +26,31 @@
  */
 
 /**
- * The featured tier. This is deliberately STATIC, and that is not a violation of
- * the "pricing comes from the API" rule — no price is involved. *Which* brands
- * we promote, and which have a landing page, is an editorial decision that
- * changes a couple of times a year, so hardcoding it buys an instant, offline-
- * proof menu. The full brand list stays API-driven (see loadBrands).
+ * Featured tier + landing pages come from the shared brands registry
+ * (shared_components/js/brands-registry.js), which must be tagged BEFORE this
+ * file. Keeping them there rather than here is what stops the mega-menu, the
+ * header search, /brands.html and the drawer from drifting apart again — they
+ * had, badly, by 2026-07-25 (see the registry header for the damage).
  *
- * Rule: one entry per /custom-<brand> landing page. Ship a landing page -> add
- * a tile here. `brand` MUST match the /api/all-brands spelling exactly (all 15
- * verified against the live payload 2026-07-25) so filtering de-dupes cleanly.
- * `logo` URLs verified 200 on the SanMar CDN — note Bella's needs %20 escapes.
+ * The tier is STATIC by design, which is not a violation of the "pricing comes
+ * from the API" rule — no price is involved. *Which* brands we promote is an
+ * editorial decision that changes a couple of times a year, so a static list
+ * buys an instant, offline-proof menu that can never render blank. The full
+ * brand list stays API-driven (see loadBrands).
+ *
+ * If the registry is missing the menu still works — it just falls back to the
+ * API list with no featured tier, rather than breaking.
  */
-const FEATURED_BRANDS = [
-    { brand: 'Carhartt',        href: '/custom-carhartt',          logo: 'https://cdnm.sanmar.com/catalog/images/Carharttheader.jpg' },
-    { brand: 'Port & Company',  href: '/custom-port-and-company',  logo: 'https://cdnm.sanmar.com/catalog/images/portandcompanyheader.jpg' },
-    { brand: 'Port Authority',  href: '/custom-port-authority',    logo: 'https://cdnm.sanmar.com/catalog/images/portauthorityheader.jpg' },
-    { brand: 'Sport-Tek',       href: '/custom-sport-tek',         logo: 'https://cdnm.sanmar.com/catalog/images/sporttekheader.jpg' },
-    { brand: 'Richardson',      href: '/custom-richardson',        logo: 'https://cdnm.sanmar.com/catalog/images/richardsonheader.jpg' },
-    { brand: 'Nike',            href: '/custom-nike',              logo: 'https://cdnm.sanmar.com/catalog/images/nikegolfheader.jpg' },
-    { brand: 'New Era',         href: '/custom-new-era',           logo: 'https://cdnm.sanmar.com/catalog/images/neweraheader.jpg' },
-    { brand: 'Gildan',          href: '/custom-gildan',            logo: 'https://cdnm.sanmar.com/catalog/images/gildanheader.jpg' },
-    { brand: 'Bella + Canvas',  href: '/custom-bella-canvas',      logo: 'https://cdnm.sanmar.com/catalog/images/Bella%20Logo%202000.jpg' },
-    { brand: 'District',        href: '/custom-district',          logo: 'https://cdnm.sanmar.com/catalog/images/districtheader.jpg' },
-    { brand: 'CornerStone',     href: '/custom-cornerstone',       logo: 'https://cdnm.sanmar.com/catalog/images/cornerstoneheader.jpg' },
-    { brand: 'The North Face',  href: '/custom-north-face',        logo: 'https://cdnm.sanmar.com/catalog/images/northfaceheader.jpg' },
-    { brand: 'OGIO',            href: '/custom-ogio',              logo: 'https://cdnm.sanmar.com/catalog/images/ogioheader.jpg' },
-    { brand: 'Eddie Bauer',     href: '/custom-eddie-bauer',       logo: 'https://cdnm.sanmar.com/catalog/images/eddiebauerheader.jpg' },
-    { brand: 'TravisMathew',    href: '/custom-travismathew',      logo: 'https://cdnm.sanmar.com/catalog/images/travismathewheader.jpg' }
-];
+const FEATURED_BRANDS = (typeof window !== 'undefined' && window.NWCA_BRANDS)
+    ? window.NWCA_BRANDS.FEATURED
+    : [];
+const BRAND_LANDING_PAGES = (typeof window !== 'undefined' && window.NWCA_BRANDS)
+    ? window.NWCA_BRANDS.LANDING_PAGES
+    : {};
 
-/**
- * Brand name -> landing page, DERIVED from FEATURED_BRANDS so the two can never
- * drift. Plus aliases: the API really does return both 'Port & Co' and
- * 'Port & Company' as separate brands sharing one logo, and both OGIO variants
- * should reach the OGIO page.
- */
-const BRAND_LANDING_PAGES = FEATURED_BRANDS.reduce((map, b) => {
-    map[b.brand] = b.href;
-    return map;
-}, {
-    'Port & Co': '/custom-port-and-company',
-    'OGIO Endurance': '/custom-ogio'
-});
+if (!FEATURED_BRANDS.length) {
+    console.error('[BrandsFlyout] brands-registry.js not loaded — no featured tier, menu will use the API list only');
+}
 
 class BrandsFlyout {
     constructor() {
