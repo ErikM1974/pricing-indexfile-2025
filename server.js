@@ -113,6 +113,9 @@ dotenv.config();
 //   ALL /api/crm-proxy/lead-activity*    — Leads CRM timeline reads/appends (any staff; 2026-07-18)
 //   GET /api/crm-proxy/ae-dashboard/summary — AE Mission Control aggregate (taneisha/nika/admin;
 //     rep email derived from session, admin-only ?viewAs=; ~L3390, 2026-07-19)
+//   GET /api/crm-proxy/ae-dashboard/{growth,purchasing,data-quality,due-dates} — the four per-card
+//     MC radars, same aeDashboardForwarder identity rules (~L3596-3612). ⚠️ All five must stay
+//     listed here: due-dates was silently dropped by a revert and 404'd for a week unnoticed.
 //   GET /dashboards/ae-mission-control.html — per-AE cockpit page (role-gated taneisha/nika; ~L3059)
 //     + AE post-login landing redirect in the SAML ACS (default relay → mission control; ~L3033)
 //
@@ -3601,6 +3604,15 @@ app.get('/api/crm-proxy/ae-dashboard/purchasing', requireCrmRole(['taneisha', 'n
 // forwarder for the concurrent session's MC card after the 2026-07-19 server.js
 // hotfix revert (its proxy endpoint /api/ae-dashboard/data-quality is live).
 app.get('/api/crm-proxy/ae-dashboard/data-quality', requireCrmRole(['taneisha', 'nika', 'admin']), aeDashboardForwarder('/api/ae-dashboard/data-quality'));
+// Order Due Dates — unshipped ShopWorks orders that already missed their requested-ship
+// date, or fall due within 7 days with the blanks not yet purchased/received (PurchaseOrders
+// mirror join). Same identity rules as the summary.
+// ⚠️ RE-REGISTERED 2026-07-26: shipped in df1b62d4, then lost in the aa33b66f "revert foreign
+// vendor-portal server.js hunks" hotfix — the same revert that ate data-quality above. That
+// one got restored; this one did not, so the MC card 404'd for both reps for a week. The UI
+// harness could not catch it: tests/ui/test-ae-mission-control-stub.js replaces window.fetch
+// wholesale and answers this URL itself, so route REGISTRATION must be probed live.
+app.get('/api/crm-proxy/ae-dashboard/due-dates', requireCrmRole(['taneisha', 'nika', 'admin']), aeDashboardForwarder('/api/ae-dashboard/due-dates'));
 // Q3 2026 Embroidery Bonus — activation bounties + growth ladder + $3M team kicker.
 // Proxy side is secret-only (it exposes per-account customer names, revenue and payroll
 // dollars), so browsers come through here. Role-gated to the two AEs + admin, same as the
@@ -3613,6 +3625,10 @@ function embroideryBonusForwarder(upstreamPath, { injectIdentity = false, teamOn
       const params = new URLSearchParams();
       if (req.query.quarter) params.set('quarter', String(req.query.quarter));
       if (req.query.year) params.set('year', String(req.query.year));
+      // Cache bypass for the page's Refresh button. Without this the bonus hero and the
+      // target roadmap kept serving cache while every other card re-pulled — a Refresh
+      // that half works is worse than one that doesn't (added 2026-07-26).
+      if (req.query.refresh) params.set('refresh', String(req.query.refresh));
       // scope=team is forced server-side, never read from the query — a caller on the
       // shared-dashboard route can't widen it into per-rep compensation.
       if (teamOnly) params.set('scope', 'team');

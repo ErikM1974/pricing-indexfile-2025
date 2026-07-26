@@ -46,6 +46,20 @@
         rep: null,         // summary.rep {email, fullName, firstName}
         summary: null,
         lastNotifTime: Number(sessionStorage.getItem('aemcNotifLastSeen')) || Date.now(),
+
+        // --- tabs / motion ---
+        tab: 'today',      // mirror of tabs.current(); DashTabs owns the truth
+        reduceMotion: false,
+
+        // --- The One Thing candidate pools, filled in by each loader as it resolves ---
+        dueLate: null,
+        almostThere: null,
+        winBack: null,
+        growthItems: null,
+
+        // --- diff-line inputs (annotations on live values, never a stale substitute) ---
+        bonusTotal: 0,
+        queueCount: 0,
     };
 
     // ---------- utils ----------
@@ -80,6 +94,30 @@
         var h = new Date().getHours();
         return h < 12 ? 'Good morning' : (h < 17 ? 'Good afternoon' : 'Good evening');
     }
+    // ONE query-string builder for every rep-scoped endpoint. Was copy-pasted six times,
+    // which is how `refresh` came to be threaded through exactly one of them.
+    // viewAs is only ever sent by an admin — the server ignores it otherwise, but there's no
+    // reason to put another rep's email on a rep's own request.
+    function qs(refresh) {
+        var p = [];
+        if (state.isAdmin && state.viewAs) p.push('viewAs=' + encodeURIComponent(state.viewAs));
+        if (refresh) p.push('refresh=1');
+        return p.length ? '?' + p.join('&') : '';
+    }
+
+    // ---------- request memo (one fetch, many consumers) ----------
+    // Holds PROMISES, not payloads. Two cards fed by one endpoint share a single request,
+    // and a rejection is shared too — so both render their own visible error rather than one
+    // silently showing nothing. Deliberately NOT a payload cache: with no resolved value
+    // retained there is no way for stale data to be painted as if it were fresh (Rule 4).
+    // resetData() reassigns rather than mutating, so an in-flight request whose promise has
+    // been dropped can still resolve harmlessly into the old object.
+    var inflight = {};
+    function dataOnce(key, fetcher) {
+        if (!inflight[key]) inflight[key] = fetcher();
+        return inflight[key];
+    }
+    function resetData() { inflight = {}; }
     function leadLink(submissionId) {
         // #hash, never ?x= (query params get mangled in emailed links; house rule).
         return '/dashboards/lead.html#' + encodeURIComponent(submissionId);
@@ -169,6 +207,10 @@
             }
             state.me = me;
             state.isAdmin = (me.permissions || []).indexOf('admin') !== -1;
+            // Read once. The count-up (rAF) and the confetti (canvas) are invisible to the
+            // stylesheet's prefers-reduced-motion block, so they have to be gated in JS.
+            state.reduceMotion = !!(window.matchMedia &&
+                window.matchMedia('(prefers-reduced-motion: reduce)').matches);
             if (state.isAdmin) {
                 el('aemc-viewas').hidden = false;
                 // Default the admin view to Taneisha (admins have no cockpit of
@@ -178,8 +220,11 @@
             wireHeader();
             wireKitModal();
             wireExpandToggles();
+            migrateLayout();        // BEFORE wireCardCollapse — see the comment in there
             wireCardCollapse();
             wireBonusExplainer();
+            wireCondensedSpine();
+            initTabs();             // reads #tab=, switches visually, mounts nothing yet
             loadSummary(false);
             loadInbound();
             pollArtNotifications();
@@ -189,37 +234,178 @@
         });
     }
 
-    function wireHeader() {
-        el('aemc-refresh').addEventListener('click', function () { loadSummary(true); });
-        Array.prototype.forEach.call(document.querySelectorAll('.aemc-viewas-btn'), function (btn) {
-            btn.addEventListener('click', function () {
-                state.viewAs = btn.getAttribute('data-rep');
-                loadSummary(false);
-            });
+    // ---------- tabs ----------
+    // Registry of function REFERENCES, so every loadX/renderX body below is untouched by the
+    // move to tabs. `loaders` fetch on a tab's FIRST activation; `renderers` re-run from the
+    // already-in-hand summary whenever it changes (rep switch, Refresh).
+    //
+    // Only Today's four loaders fire on boot. Before tabs the page fired nine requests up
+    // front for sixteen cards and grew with every card added; now Money/My Book/Pipeline/Wins
+    // cost nothing until opened. That also cuts concurrent pressure on the 15s global fetch
+    // timeout from nine parallel Caspio-backed calls to five.
+    var TABS = [
+        {
+            id: 'today',
+            loaders: [loadDueDates, loadDataQuality, loadPurchasing],
+            renderers: [renderQueue, renderOneThing],
+        },
+        {
+            id: 'money',
+            loaders: [loadEarnedAccounts, loadTargets],
+            renderers: [renderBonus, renderMoneyKpis],
+        },
+        {
+            id: 'book',
+            loaders: [loadGrowth],
+            renderers: [],
+        },
+        {
+            id: 'pipeline',
+            loaders: [],                       // 100% summary-fed — a genuinely free tab
+            renderers: [renderPanels, renderPipelineKpis],
+        },
+        {
+            id: 'wins',
+            loaders: [loadPhotos],
+            renderers: [renderRecords, renderWonBack],
+        },
+    ];
+    // Painted regardless of which tab is open, because the spine is always on screen.
+    var SPINE_LOADERS = [loadBonusHero];
+
+    var tabs = null;
+
+    function tabById(id) {
+        for (var i = 0; i < TABS.length; i++) if (TABS[i].id === id) return TABS[i];
+        return null;
+    }
+
+    function initTabs() {
+        tabs = window.DashTabs.create({
+            tablist: '#mc-tablist',
+            tabSelector: '.mc-tab',
+            hashKey: 'tab',
+            defaultTab: 'today',
+            activateDelay: 250,
+            focusPanelOnDeepLink: true,
+            onActivate: function (id, isFirst) {
+                state.tab = id;
+                if (isFirst) mountTab(id, false);
+            },
+        });
+        if (!tabs) {                            // router failed to build — never a blank page
+            DashPage.showError('The tab bar failed to initialise. Reload the page.');
+            Array.prototype.forEach.call(document.querySelectorAll('.mc-panel'), function (p) { p.hidden = false; });
+            return;
+        }
+        state.tab = tabs.current();
+    }
+
+    // Fire a tab's loaders, and re-run its renderers if the summary is already in hand.
+    function mountTab(id, refresh) {
+        var t = tabById(id);
+        if (!t) return;
+        t.loaders.forEach(function (fn) { fn(refresh); });
+        if (state.summary) t.renderers.forEach(function (fn) { fn(state.summary); });
+    }
+
+    // Re-render every tab the rep has already opened. This one function is what makes rep
+    // switching and Refresh correct without a special case per card: unopened tabs stay
+    // unmounted and pick up the new data on their first activation.
+    function renderMountedTabs(data) {
+        TABS.forEach(function (t) {
+            if (tabs && tabs.isMounted(t.id)) t.renderers.forEach(function (fn) { fn(data); });
         });
     }
 
-    // ---------- summary ----------
-    function summaryUrl(refresh) {
-        var params = [];
-        if (state.isAdmin && state.viewAs) params.push('viewAs=' + encodeURIComponent(state.viewAs));
-        if (refresh) params.push('refresh=1');
-        return '/api/crm-proxy/ae-dashboard/summary' + (params.length ? '?' + params.join('&') : '');
+    // Tabs replace whole-card collapse as the decluttering mechanism, so the five cards that
+    // were only collapsible because the page was 3,400px tall lose the affordance (their
+    // markup no longer carries .aemc-collapsible). Both reps have been collapsing cards since
+    // 2026-07-20 though, and that state lives in their browsers — without this reset a rep who
+    // collapsed six cards would open the new Today tab to a stack of empty headers and
+    // reasonably conclude the redesign is broken. Idempotent, silent, runs once.
+    function migrateLayout() {
+        var LAYOUT_VERSION = '2';
+        try {
+            if (localStorage.getItem('aemcLayoutVersion') !== LAYOUT_VERSION) {
+                localStorage.removeItem('aemcCollapsed');
+                localStorage.setItem('aemcLayoutVersion', LAYOUT_VERSION);
+            }
+        } catch (e) { /* private mode — nothing to migrate */ }
     }
 
+    function wireHeader() {
+        el('aemc-refresh').addEventListener('click', refreshAll);
+        Array.prototype.forEach.call(document.querySelectorAll('.aemc-viewas-btn'), function (btn) {
+            btn.addEventListener('click', function () { switchRep(btn.getAttribute('data-rep')); });
+        });
+        // Wired ONCE, here, not inside loadInbound() — that function re-runs on every rep
+        // switch and Refresh, and a listener added there stacks up silently.
+        var inboundBtn = el('aemc-inbound-open');
+        if (inboundBtn) {
+            inboundBtn.addEventListener('click', function () {
+                if (typeof window.openInboundTodayModal === 'function') window.openInboundTodayModal();
+            });
+        }
+    }
+
+    // Admin view-as. ONE entry point, because the previous version set state.viewAs and
+    // called loadSummary() — which re-ran the six summary-driven loaders but NOT
+    // loadInbound(), so the SanMar card kept showing the previous rep's rows under the new
+    // rep's name until a full page reload. Dropping every memo means anything rep-scoped
+    // refetches, whether or not it hangs off the summary.
+    function switchRep(email) {
+        if (!email || email === state.viewAs) return;
+        state.viewAs = email;
+        resetData();
+        loadSummary(false);
+        loadInbound();
+    }
+
+    // Refresh has to mean refresh. It used to send ?refresh=1 to the summary only, so the
+    // other six cards re-rendered from server cache and the button looked like it worked.
+    // Now: drop every memo (including rejected ones, so a failed card gets a real retry),
+    // then re-request everything with the bypass. The summary endpoint throttles refresh
+    // server-side at 30s, so the button stays disabled a beat past resolve — otherwise an
+    // instant re-enable invites a second click that provably does nothing.
+    function refreshAll() {
+        var btn = el('aemc-refresh');
+        var icon = btn.querySelector('i');
+        btn.disabled = true;
+        if (icon) icon.classList.add('fa-spin');
+        DashPage.hideError();
+        resetData();
+        var done = function () {
+            setTimeout(function () {
+                btn.disabled = false;
+                if (icon) icon.classList.remove('fa-spin');
+            }, 2500);
+        };
+        Promise.all([
+            loadSummary(true).catch(function () { /* loadSummary renders its own error */ }),
+            loadInbound().catch(function () { /* card renders its own error */ }),
+        ]).then(done, done);
+    }
+
+    // ---------- summary ----------
+    // Returns its promise so refreshAll() can track completion for the button state.
     function loadSummary(refresh) {
         DashPage.hideError();
         el('aemc-greeting').textContent = 'Loading your day…';
-        sameOriginJson(summaryUrl(refresh)).then(function (data) {
+        return sameOriginJson('/api/crm-proxy/ae-dashboard/summary' + qs(refresh)).then(function (data) {
             state.summary = data;
             state.rep = data.rep;
             render(data);
-            loadBonusHero();
-            loadTargets();
-            loadGrowth();
-            loadPurchasing();
-            loadDueDates();
-            loadDataQuality();
+            // The spine is always on screen, so its loader always runs. Everything else is
+            // per-tab: the active tab mounts now, the rest on first open. `refresh` threads
+            // all the way into each request — before, only the summary got the bypass.
+            SPINE_LOADERS.forEach(function (fn) { fn(refresh); });
+            mountTab(state.tab, refresh);
+            if (refresh) {
+                // An explicit Refresh must not leave an already-opened tab on old data, so
+                // drop the mount flags: each reloads with the bypass on its next activation.
+                if (tabs) tabs.resetMounted();
+            }
         }).catch(function (err) {
             DashPage.showError('Could not load your dashboard: ' + err.message + ' — refresh to retry.');
             el('aemc-greeting').textContent = 'Your data could not be loaded.';
@@ -231,6 +417,11 @@
 
     function render(data) {
         var rep = data.rep || {};
+        // Read the diff baseline BEFORE overwriting it, and only once per rep resolution.
+        if (state.lastSeen === undefined || state.lastSeenFor !== rep.email) {
+            state.lastSeen = readLastSeen();
+            state.lastSeenFor = rep.email;
+        }
         el('aemc-greeting').textContent = greetingWord() + ', ' + (rep.firstName || 'there') + ' — here’s your day.';
         var updatedBits = ['Updated ' + new Date(data.generatedAt).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })];
         if (data.cacheHit) updatedBits.push('cached');
@@ -258,36 +449,609 @@
         }
 
         renderKpis(data);
-        renderQueue(data);
-        renderBonus(data);
-        renderPanels(data);
+        renderTabBadges(data);
+        renderMountedTabs(data);        // only tabs the rep has actually opened
 
         if (data.errors) {
             var failed = Object.keys(data.errors).join(', ');
             DashPage.showError('Some sections could not load (' + failed + '). The rest of the page is live — refresh to retry.');
         }
+
+        // Written only on SUCCESS, never in a catch: the baseline must always describe a state
+        // the rep actually saw, or tomorrow's diff is measured against a page that never loaded.
+        writeLastSeen(data);
     }
 
+    // Spine KPIs only. The quotes/win-rate tiles moved to Pipeline and the commission tile to
+    // Money, each rendered by that tab's own renderer, so nothing here touches a hidden panel.
     function renderKpis(data) {
         var k = data.kpis || {};
         el('kpi-ytd').textContent = money0(k.ytdSales);
         el('kpi-mtd').textContent = money0(k.mtdSales);
-        el('kpi-quotes').textContent = (k.openQuoteCount == null) ? '—'
-            : k.openQuoteCount + ' · ' + money0(k.openQuoteValue);
-        el('kpi-quotes-label').textContent = 'Open Quotes (90d)';
-        // Shows PAID-year-to-date, not quarter-to-date-earned. The hero banner above already
-        // owns "earned this quarter" and computes it live from orders, while this figure comes
-        // from the Commission_Payouts ledger which the sync only refreshes once a day. Labelling
-        // both "Bonus Earned" put $300 and $0 on the same screen (2026-07-25) — two numbers for
-        // one thing. Paid-YTD is genuinely different information and can never contradict it.
-        el('kpi-commission').textContent = money0((state.summary && state.summary.bonus && state.summary.bonus.paidYtd) || 0);
-        el('kpi-commission-label').textContent = 'Bonus Paid YTD';
-        el('kpi-winrate').textContent = (k.leadWinRate == null) ? '—' : k.leadWinRate + '%';
+        renderTrend(data.trend, data);
 
         var badge = el('aemc-art-badge');
         var awaiting = data.counts && data.counts.art ? data.counts.art.awaitingApproval : 0;
         badge.hidden = !awaiting;
         badge.textContent = awaiting || '';
+    }
+
+    function renderPipelineKpis(data) {
+        var k = data.kpis || {};
+        el('kpi-quotes').textContent = (k.openQuoteCount == null) ? '—'
+            : k.openQuoteCount + ' · ' + money0(k.openQuoteValue);
+        el('kpi-quotes-label').textContent = 'Open Quotes (90d)';
+        el('kpi-winrate').textContent = (k.leadWinRate == null) ? '—' : k.leadWinRate + '%';
+
+        // Quote → order conversion. ⚠️ In production today BOTH reps get attributed:0,
+        // because Quote_Sessions holds 8 rows for all of 2026 and only one carries a
+        // SalesRepEmail. Rather than print a meaningless "0%", say what's actually true —
+        // a tile reading 0 with no explanation is how a page loses a rep's trust.
+        var c = data.quoteConversion;
+        var conv = el('mc-conv'), note = el('mc-conv-note');
+        var convTile = conv ? conv.closest('.dash-stat-card') : null;
+        if (convTile) convTile.hidden = false;
+        if (!c) {
+            if (sourceFailed(data, 'quotes')) {
+                conv.textContent = '—';
+                note.textContent = 'Quote figures could not be loaded this time.';
+            } else {
+                // Field absent = proxy half not deployed yet. Not a failure; don't claim one.
+                if (convTile) convTile.hidden = true;
+                note.textContent = '';
+            }
+        } else if (!c.attributed) {
+            conv.textContent = '—';
+            note.textContent = 'No quotes from the last ' + c.windowDays + ' days carry your name yet, ' +
+                'so there is nothing to measure. Pick yourself as the rep when you build a quote and ' +
+                'this starts tracking.';
+        } else {
+            conv.textContent = c.ratePct + '%';
+            el('mc-conv-label').textContent = 'Quote → Order (' + c.windowDays + 'd)';
+            note.textContent = c.pushed + ' of ' + c.attributed + ' quotes with your name on them became orders (' +
+                money0(c.pushedValue) + ' of ' + money0(c.quotedValue) + ')' +
+                (c.staleCount ? ' · ' + c.staleCount + ' sitting quiet, worth ' + money0(c.staleValue) : '') + '.';
+        }
+    }
+
+    // The commission tile lives in the Money panel, so it must be written by MONEY's renderer.
+    // It was briefly in renderPipelineKpis, which meant the tile sat at "—" until the rep
+    // happened to open Pipeline — a renderer must only ever touch its own panel.
+    function renderMoneyKpis(data) {
+        // Shows PAID-year-to-date, not quarter-to-date-earned. The hero owns "earned this
+        // quarter" and computes it live from orders, while this comes from the
+        // Commission_Payouts ledger that the sync refreshes once a day. Labelling both "Bonus
+        // Earned" put $300 and $0 on one screen (2026-07-25) — two numbers for one thing.
+        // Paid-YTD is genuinely different information and can never contradict it.
+        el('kpi-commission').textContent = money0((data.bonus && data.bonus.paidYtd) || 0);
+        el('kpi-commission-label').textContent = 'Bonus Paid YTD';
+    }
+
+    // Only Today gets a count. A "12" on Money (12 target accounts) reads as twelve problems,
+    // and five badged tabs read as five inboxes — the opposite of what this redesign is for.
+    // Other tabs get a dot, and only for something genuinely wrong.
+    function renderTabBadges(data) {
+        if (!tabs) return;
+        var q = data.actionQueue || {};
+        var n = ['overdueLeads', 'dueTodayLeads', 'newUntouchedLeads', 'staleQuotes', 'artAwaitingApproval', 'kitsPending']
+            .reduce(function (sum, k) { return sum + ((q[k] || []).length); }, 0);
+        tabs.setBadge('today', n || null);
+    }
+
+    // ---------- motion helpers ----------
+    // CSS @media can't reach a requestAnimationFrame counter or a canvas confetti, so the
+    // preference is read once here and honored in JS as well as in the stylesheet.
+    function countUp(node, to, fmt) {
+        if (!node) return;
+        var paint = function (v) { node.textContent = fmt(v); };
+
+        // TRUTH FIRST, ALWAYS. requestAnimationFrame is throttled to ZERO in a background
+        // tab, so animating from a placeholder left the hero reading "$0" indefinitely for
+        // anyone who middle-clicked the page open from the staff dashboard or restored a
+        // multi-tab session — a rep seeing $0 for her bonus is exactly the wrong-number
+        // failure this codebase refuses to ship. Paint the real value before deciding whether
+        // to decorate it, and a frozen rAF can only ever cost the animation, never the number.
+        paint(to || 0);
+        if (state.reduceMotion || document.hidden || !to || to < 0) return;
+
+        var from = 0, dur = 650, t0 = null;
+        var step = function (ts) {
+            if (t0 === null) t0 = ts;
+            var p = Math.min((ts - t0) / dur, 1);
+            var eased = 1 - Math.pow(1 - p, 3);              // ease-out cubic
+            paint(from + (to - from) * eased);
+            if (p < 1) requestAnimationFrame(step); else paint(to);
+        };
+        requestAnimationFrame(step);
+    }
+
+    // ES5 port of the v3 dashboard's sparklineSvg (an ESM export this classic script can't
+    // import). reduce() instead of Math.min(...values) — also avoids spreading a 90-item array.
+    // aria-hidden because the adjacent text carries the meaning; a sparkline never stands alone.
+    function sparkSvg(values, opts) {
+        opts = opts || {};
+        var w = opts.width || 132, h = opts.height || 26;
+        if (!values || values.length < 2) return '';
+        var min = values.reduce(function (a, b) { return b < a ? b : a; }, values[0]);
+        var max = values.reduce(function (a, b) { return b > a ? b : a; }, values[0]);
+        var range = (max - min) || 1;
+        var stepX = w / (values.length - 1);
+        var pts = values.map(function (v, i) {
+            return (i * stepX).toFixed(1) + ',' + (h - ((v - min) / range) * h).toFixed(1);
+        }).join(' ');
+        return '<svg viewBox="0 0 ' + w + ' ' + h + '" width="' + w + '" height="' + h +
+            '" aria-hidden="true" focusable="false"><polyline points="' + pts +
+            '" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" ' +
+            'stroke-linejoin="round"/></svg>';
+    }
+
+    // The two repos deploy independently, so the frontend can be live against a proxy that
+    // doesn't return `trend`/`quoteConversion` yet. Distinguish the two cases: a source that
+    // FAILED is named in `errors` and must be reported (Rule 4); a field that is simply ABSENT
+    // means the backend half hasn't shipped, which is not a failure and must not be dressed up
+    // as one — hide the element and let it light up on its own when the proxy lands.
+    function sourceFailed(data, key) {
+        return !!(data && data.errors && data.errors[key]);
+    }
+
+    // ---------- spine: trend, streak, condensed bar ----------
+    function renderTrend(trend, data) {
+        var spark = el('mc-spark'), streak = el('mc-streak'), label = el('mc-streak-label'), note = el('mc-mtd-note');
+        var tile = streak ? streak.closest('.mc-kpi') : null;
+        if (!trend) {
+            if (spark) spark.innerHTML = '';
+            if (sourceFailed(data, 'sales')) {
+                if (tile) tile.hidden = false;
+                if (streak) streak.textContent = '—';
+                if (label) label.textContent = 'Order streak unavailable';
+            } else {
+                if (tile) tile.hidden = true;      // capability not deployed yet, not an error
+            }
+            return;
+        }
+        if (tile) tile.hidden = false;
+        // Last 30 days of the 90-day series — enough to read a shape, short enough that a
+        // single big day doesn't flatten everything else.
+        var last30 = trend.dailySeries.slice(-30).map(function (d) { return d.r; });
+        if (spark) spark.innerHTML = sparkSvg(last30);
+        if (note) {
+            var sum30 = last30.reduce(function (a, b) { return a + b; }, 0);
+            note.textContent = '· ' + money0(sum30) + ' last 30d';
+        }
+        var s = trend.streak || {};
+        if (streak) {
+            streak.textContent = s.currentDays ? s.currentDays + (s.currentDays >= 5 ? ' 🔥' : '') : '0';
+            streak.classList.toggle('mc-streak--hot', s.currentDays >= 5);
+        }
+        if (label) {
+            label.textContent = s.currentDays
+                ? 'Days in a row with an order' + (s.bestDays ? ' · best ' + s.bestDays : '')
+                : 'No streak yet · best ' + (s.bestDays || 0);
+        }
+    }
+
+    // Full hero (~220px) stays in flow; this 48px bar takes over once it scrolls off, so the
+    // bonus is always on screen without permanently costing a quarter of the viewport.
+    function renderCondensed(mine) {
+        var l = (mine && mine.ladder) || {};
+        var rungs = l.rungs || [];
+        var top = rungs.length ? rungs[rungs.length - 1] : null;
+        var amount = el('mc-condensed-amount'), next = el('mc-condensed-next'), fill = el('mc-condensed-fill');
+        if (amount) amount.textContent = money2(mine.totalBonus) + ' Q3 bonus';
+        if (next) {
+            next.textContent = l.nextRung
+                ? money0(l.amountToNextRung) + ' more → ' + money2(l.nextRung.pay)
+                : 'every rung cleared';
+        }
+        if (fill && top && top.threshold) {
+            fill.style.width = Math.max(0, Math.min((l.revenue / top.threshold) * 100, 100)).toFixed(1) + '%';
+        }
+    }
+
+    function wireCondensedSpine() {
+        var spine = el('mc-spine'), bar = el('mc-condensed');
+        if (!spine || !bar || !('IntersectionObserver' in window)) return;   // graceful: bar stays hidden
+        new IntersectionObserver(function (entries) {
+            bar.hidden = entries[0].isIntersecting;
+        }, { rootMargin: '-56px 0px 0px 0px', threshold: 0 }).observe(spine);
+    }
+
+    // ---------- "since you last looked" ----------
+    // A diff ANNOTATION on live values — never a cached substitute for them. Every number the
+    // page shows comes from this load's fetch; the snapshot only supplies the comparison point,
+    // and if the fetch failed no diff is shown at all (a delta against an unknown present is
+    // a lie). Rep-keyed, and never written while an admin is viewing as someone else.
+    function lastSeenKey() {
+        return 'aemcLastSeen:' + ((state.rep && state.rep.email) || 'unknown');
+    }
+    function readLastSeen() {
+        try { return JSON.parse(localStorage.getItem(lastSeenKey()) || 'null'); } catch (e) { return null; }
+    }
+    function writeLastSeen(data) {
+        if (state.isAdmin && state.viewAs) return;      // read-only view-as: don't move her baseline
+        var k = data.kpis || {};
+        try {
+            localStorage.setItem(lastSeenKey(), JSON.stringify({
+                at: new Date().toISOString(),
+                ytdSales: k.ytdSales,
+                bonusTotal: state.bonusTotal || 0,
+                queueCount: state.queueCount || 0,
+            }));
+        } catch (e) { /* private mode */ }
+    }
+    function renderDiff(data, prev) {
+        var host = el('mc-diff');
+        if (!host || !prev || !prev.at) return;
+        var when = new Date(prev.at);
+        var hoursAgo = (Date.now() - when.getTime()) / 3600000;
+        if (isNaN(hoursAgo) || hoursAgo < 6) return;    // same session — nothing interesting to say
+        var bits = [];
+        var k = data.kpis || {};
+        var dSales = (k.ytdSales || 0) - (prev.ytdSales || 0);
+        if (dSales > 0.5) bits.push('<span class="mc-diff-up">+' + money0(dSales) + '</span> invoiced');
+        var dBonus = (state.bonusTotal || 0) - (prev.bonusTotal || 0);
+        if (dBonus > 0.005) bits.push('<span class="mc-diff-up">+' + money2(dBonus) + '</span> bonus');
+        if (!bits.length) return;
+        var label = hoursAgo < 36 ? 'yesterday'
+            : when.toLocaleDateString('en-US', { weekday: 'long' });
+        host.innerHTML = '<span class="mc-diff-since">Since you last looked (' + esc(label) + '):</span> ' +
+            bits.join(' · ');
+        host.hidden = false;
+    }
+
+    // ---------- celebrations ----------
+    // Keys derive from SERVER data, never a client counter, so clearing storage can't re-fire a
+    // celebration for something that already happened weeks ago.
+    function celebratedKey() {
+        return 'aemcCelebrated:' + ((state.rep && state.rep.email) || 'unknown');
+    }
+    function readCelebrated() {
+        try { return JSON.parse(localStorage.getItem(celebratedKey()) || '{}') || {}; } catch (e) { return {}; }
+    }
+    function considerCelebration(mine) {
+        if (state.isAdmin && state.viewAs) return;      // never consume her moment from an admin view
+        var l = mine.ladder || {};
+        var acc = mine.accounts || {};
+        var quarter = 'q' + (mine.quarter || '3') + '-' + (mine.year || new Date().getFullYear());
+        var keys = [];
+        if (l.rungReached) keys.push(quarter + ':rung-' + l.rungReached.threshold);
+        (acc.reactivated || []).forEach(function (a) { keys.push(quarter + ':wonback-' + a.idCustomer); });
+        (acc['new'] || []).forEach(function (a) { keys.push(quarter + ':newprogram-' + a.idCustomer); });
+
+        var seen = readCelebrated();
+        // FIRST SIGHT SEEDS, IT DOES NOT FIRE. Without this, ship day is a confetti storm for
+        // three-week-old news, which teaches the rep to ignore confetti permanently.
+        var seeded = seen.__seeded;
+        var fresh = keys.filter(function (k) { return !seen[k]; });
+        keys.forEach(function (k) { seen[k] = 1; });
+        seen.__seeded = 1;
+        try { localStorage.setItem(celebratedKey(), JSON.stringify(seen)); } catch (e) { return; }
+        if (!seeded || !fresh.length) return;
+
+        // One fire per load, and always with a line saying WHAT happened — confetti with no
+        // explanation is just noise.
+        var first = fresh[0];
+        var msg = first.indexOf(':rung-') !== -1
+            ? 'New rung cleared — ' + money2((l.rungReached && l.rungReached.pay) || 0) + ' locked in.'
+            : (first.indexOf(':wonback-') !== -1 ? 'You won an account back. Bounty earned.'
+                                                 : 'First embroidery program on a new account. Nice.');
+        showToast('🎉 ' + msg);
+        if (!state.reduceMotion && window.NWCAConfetti && typeof window.NWCAConfetti.fire === 'function') {
+            window.NWCAConfetti.fire();
+        }
+    }
+
+    // ---------- team kicker (Money) ----------
+    // Legitimately shared compensation, and the one comparative element on the page: the
+    // company total and the tiers, never a per-rep figure. Nika at $842K next to Taneisha at
+    // $521K on an 857-account book with half the embroidery would read as a verdict on effort
+    // rather than on book composition, so there is no rep-vs-rep ranking anywhere.
+    // Takes the resolved top-level teamKicker object, not the rep.
+    function renderKicker(k) {
+        var host = el('mc-kicker'), card = el('mc-kicker-card');
+        var tiers = (k && k.tiers) || [];
+        if (!host || !card || !tiers.length) return;
+        var target = (k.next && k.next.target) || tiers[tiers.length - 1].target;
+        var revenue = k.companyRevenue != null ? k.companyRevenue
+            : (target && k.amountToNext != null ? target - k.amountToNext : null);
+        if (revenue == null) return;
+        var pct = target ? Math.max(0, Math.min((revenue / target) * 100, 100)) : 0;
+        host.innerHTML =
+            '<p class="mc-kicker-line"><strong>' + money0(revenue) + '</strong> of ' + money0(target) +
+                ' company-wide this quarter · ' + pct.toFixed(0) + '%</p>' +
+            '<span class="mc-kicker-track"><span class="mc-kicker-fill" style="width:' + pct.toFixed(1) + '%"></span></span>' +
+            (k.next
+                ? '<p class="mc-kicker-line">' + money0(k.amountToNext) + ' to go → <strong>' +
+                  money2(k.next.pay) + ' each</strong></p>'
+                : '<p class="mc-kicker-line">Every kicker tier cleared. Remarkable quarter.</p>') +
+            '<div class="mc-kicker-tiers">' + tiers.map(function (t) {
+                return '<span class="mc-kicker-tier' + (revenue >= t.target ? ' is-hit' : '') + '">' +
+                    money0(t.target) + ' → ' + money2(t.pay) + ' each</span>';
+            }).join('') + '</div>';
+        card.hidden = false;
+    }
+
+    // ---------- Wins ----------
+    function renderRecords(data) {
+        var host = el('mc-records'), sub = el('mc-records-sub');
+        if (!host) return;
+        var t = data.trend;
+        var card = host.closest('.dash-card');
+        if (card) card.hidden = false;
+        if (!t) {
+            if (sourceFailed(data, 'sales')) {
+                host.innerHTML = '<div class="aemc-panel-error">Your sales history could not be loaded, ' +
+                    'so records are unavailable. Refresh to retry.</div>';
+            } else if (card) {
+                // The daily-trend payload ships with the proxy half of this feature. Until that
+                // deploys the field is simply absent — hide the card rather than report a
+                // failure that hasn't happened. It appears by itself once the backend lands.
+                card.hidden = true;
+            }
+            return;
+        }
+        var r = t.records || {};
+        // NEVER "all-time": NW_Daily_Sales_By_Rep starts 2026-01-05 and holds no 2025 rows, so
+        // the honest claim is "since the archive began". Overstating it once costs the page its
+        // credibility for good.
+        if (sub) sub.textContent = '(since the daily archive began ' + fmtWhen(t.archiveStartsAt) + ')';
+        var cards = [];
+        if (r.bestMonth) cards.push({ v: money0(r.bestMonth.r), l: 'Best month', w: monthLabel(r.bestMonth.m) });
+        if (r.bestWeek) cards.push({ v: money0(r.bestWeek.r), l: 'Best week', w: 'week of ' + fmtWhen(r.bestWeek.weekStart) });
+        if (r.bestDay) cards.push({ v: money0(r.bestDay.r), l: 'Best single day', w: fmtWhen(r.bestDay.d) });
+        var s = t.streak || {};
+        if (s.bestDays) cards.push({ v: String(s.bestDays), l: 'Longest order streak', w: s.currentDays + ' right now' });
+        if (!cards.length) {
+            host.innerHTML = '<div class="aemc-empty">No records yet — they appear once the archive has a few weeks of your orders.</div>';
+            return;
+        }
+        host.innerHTML = '<div class="mc-records">' + cards.map(function (c) {
+            return '<div class="mc-record"><div class="mc-record-value">' + esc(c.v) + '</div>' +
+                '<div class="mc-record-label">' + esc(c.l) + '</div>' +
+                '<div class="mc-record-when">' + esc(c.w) + '</div></div>';
+        }).join('') + '</div>' +
+        '<p class="aemc-hint">Figures are as of ' + fmtWhen(t.asOf) + ', when the nightly sales archive last ran.</p>';
+    }
+
+    function monthLabel(m) {
+        var d = new Date(String(m) + '-15T12:00:00');
+        return isNaN(d.getTime()) ? String(m) : d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    }
+
+    // Reuses the memoized 'emb' payload the hero already fetched — zero extra requests.
+    function renderWonBack() {
+        var host = el('mc-wonback'), sub = el('mc-wonback-sub');
+        if (!host) return;
+        dataOnce('emb', function () { return fetchEmb(false); }).then(function (r) {
+            var mine = r && r.mine;
+            var acc = (mine && mine.accounts) || {};
+            var rows = (acc.reactivated || []).map(function (a) { return { a: a, kind: 'Won back', icon: '↩️' }; })
+                .concat((acc['new'] || []).map(function (a) { return { a: a, kind: 'First program', icon: '✨' }; }));
+            if (sub) sub.textContent = rows.length ? '(' + rows.length + ')' : '';
+            if (!rows.length) {
+                host.innerHTML = '<div class="aemc-empty">Nothing here yet this quarter. The moment an account ' +
+                    'you won back crosses the quarter minimum it shows up here — check <strong>Money → Where the ' +
+                    'money is</strong> for who is closest.</div>';
+                return;
+            }
+            rows.sort(function (x, y) { return y.a.revenue - x.a.revenue; });
+            host.innerHTML = '<ul class="aemc-rows">' + rows.map(function (x) {
+                return '<li class="aemc-row"><span class="aemc-row-main">' + x.icon + ' ' + esc(x.a.company) + '</span>' +
+                    '<span class="aemc-growth-reason">' + esc(x.kind) + '</span>' +
+                    '<span class="aemc-row-right"><span class="aemc-money">' + money2(x.a.bounty) + '</span><br>' +
+                    '<span class="aemc-row-meta">' + money0(x.a.revenue) + ' embroidery this quarter</span></span></li>';
+            }).join('') + '</ul>';
+        }).catch(function (err) {
+            host.innerHTML = '<div class="aemc-panel-error">Could not load your wins (' + esc(err.message) + '). Refresh to retry.</div>';
+        });
+    }
+
+    // Her own finished-product photos. Endpoint was already live and whitelisted server-side
+    // and had no consumer at all — the comment in server.js literally said it fed a Mission
+    // Control view that didn't exist yet.
+    function loadPhotos() {
+        var host = el('mc-photos'), sub = el('mc-photos-sub');
+        if (!host) return;
+        var rep = state.rep && state.rep.fullName;
+        if (!rep) { host.innerHTML = '<div class="aemc-empty">Sign-in still resolving…</div>'; return; }
+        // Session-resolved fullName, never a client guess — otherwise view-as shows the wrong
+        // rep's work.
+        return sameOriginJson('/api/staff/finished-photos/library?limit=24&rep=' + encodeURIComponent(rep))
+            .then(function (d) {
+                var photos = d.photos || [];
+                if (sub) sub.textContent = d.totalCount ? '(' + d.totalCount + ' on your accounts)' : '';
+                var link = el('mc-photos-all');
+                if (link) link.href = '/dashboards/finished-photos-library.html#rep=' + encodeURIComponent(rep);
+                if (!photos.length) {
+                    host.innerHTML = '<div class="aemc-empty">No finished photos on your accounts yet. ' +
+                        'They appear as production photographs completed jobs.</div>';
+                    return;
+                }
+                host.innerHTML = '<div class="mc-photo-grid">' + photos.map(function (p) {
+                    var cap = p.companyName || p.designName || '';
+                    return '<a class="mc-photo" href="' + esc(p.imageUrl || '#') + '" target="_blank" rel="noopener" ' +
+                        'title="' + esc(cap) + '"><img src="' + esc(p.imageUrl || '') + '" alt="' + esc(cap) +
+                        '" loading="lazy"><span class="mc-photo-cap">' + esc(cap) + '</span></a>';
+                }).join('') + '</div>';
+            }).catch(function (err) {
+                host.innerHTML = '<div class="aemc-panel-error">Finished photos failed to load (' +
+                    esc(err.message) + '). Refresh to retry.</div>';
+            });
+    }
+
+    // ---------- The One Thing ----------
+    // One ranked next-best-action, computed entirely from data the other cards already
+    // fetched — zero extra requests. The point is to answer "what do I do right now?" without
+    // making the rep triage six lists, and to state what each action is WORTH to her, because
+    // /embroidery-bonus/targets already returns bounty and gapToBounty per row.
+    //
+    // Ordering: a fire outranks a bounty. A late order is a customer already angry; a win-back
+    // is money that will still be there tomorrow. Within a kind, dollars × urgency.
+    var OT_SKIP_TTL_DAYS = 14;
+
+    function otSkipKey() {
+        return 'aemc.onething.skipped.v1.' + ((state.rep && state.rep.email) || 'unknown');
+    }
+    function readSkips() {
+        var raw;
+        try { raw = JSON.parse(localStorage.getItem(otSkipKey()) || '{}') || {}; } catch (e) { return {}; }
+        var now = Date.now(), out = {}, changed = false;
+        Object.keys(raw).forEach(function (k) {
+            if (Date.parse(raw[k]) > now) out[k] = raw[k]; else changed = true;
+        });
+        if (changed) { try { localStorage.setItem(otSkipKey(), JSON.stringify(out)); } catch (e) {} }
+        return out;
+    }
+    function skipOne(id) {
+        var skips = readSkips();
+        skips[id] = new Date(Date.now() + OT_SKIP_TTL_DAYS * 86400000).toISOString();
+        try { localStorage.setItem(otSkipKey(), JSON.stringify(skips)); } catch (e) {}
+    }
+    function clearSkips() {
+        try { localStorage.removeItem(otSkipKey()); } catch (e) {}
+    }
+
+    // Candidates from every source already in memory. state.candidates is topped up by each
+    // loader as it resolves, so this improves as the page settles rather than blocking on all.
+    function otCandidates() {
+        var out = [];
+        var q = (state.summary && state.summary.actionQueue) || {};
+
+        (state.dueLate || []).forEach(function (o) {
+            out.push({
+                id: 'late-' + o.idOrder,
+                kind: 'fire',
+                urgency: 3,
+                dollars: o.subtotal || 0,
+                title: 'WO #' + o.idOrder + (o.company ? ' — ' + o.company : '') + ' is ' +
+                       Math.abs(o.daysUntilDue) + ' days past its ship date',
+                why: 'Not shipped, and the requested date has passed' +
+                     (o.blanks && o.blanks !== 'received' ? ' — the blanks still are not in house.' : '.') +
+                     ' Chase this before the customer calls you about it.',
+                worth: 'Protects ' + money0(o.subtotal || 0),
+                urgent: true,
+                href: '/dashboards/purchasing-portal.html',
+                cta: 'Open purchasing',
+            });
+        });
+
+        (q.overdueLeads || []).forEach(function (l) {
+            out.push({
+                id: 'lead-' + l.submissionId,
+                kind: 'fire',
+                urgency: 2,
+                dollars: l.leadValue || 0,
+                title: (l.company || l.contactName || 'A lead') + ' is past its follow-up date',
+                why: 'This lead asked you for something and the date you set has gone by.',
+                worth: l.leadValue ? money0(l.leadValue) + ' in play' : 'Keeps the lead alive',
+                urgent: true,
+                href: leadLink(l.submissionId),
+                cta: 'Open lead',
+            });
+        });
+
+        (state.almostThere || []).forEach(function (x) {
+            out.push({
+                id: 'almost-' + (x.idCustomer || x.company),
+                kind: 'money',
+                urgency: 2,
+                dollars: x.bounty || 0,
+                title: x.company + ' is ' + money0(x.gapToBounty) + ' of embroidery from a bounty',
+                why: 'Already ordering with you this quarter — at ' + money0(x.quarterRevenue) +
+                     '. The cheapest bounty on your board: one add-on order gets you there.',
+                worth: 'Pays ' + money2(x.bounty),
+                href: '/quote-builders/embroidery-quote-builder.html',
+                cta: 'Start a quote',
+            });
+        });
+
+        (state.winBack || []).forEach(function (x) {
+            out.push({
+                id: 'winback-' + (x.idCustomer || x.company),
+                kind: 'money',
+                urgency: 1,
+                dollars: (x.bounty || 0) + (x.avgOrderValue || 0) * 0.25,
+                title: 'Call ' + x.company + ' — ' + x.monthsDormant + ' months quiet',
+                why: 'Embroidered with us ' + x.embroideryOrders + ' times, typical order ' +
+                     money0(x.avgOrderValue) +
+                     (x.q3SharePct >= 25 ? ', and this is historically their quarter.' : '.'),
+                worth: money2(x.bounty) + ' bounty + ' + money0(x.avgOrderValue) + ' typical order',
+                href: '/quote-builders/embroidery-quote-builder.html',
+                cta: 'Start a quote',
+            });
+        });
+
+        (state.growthItems || []).forEach(function (it) {
+            out.push({
+                id: 'growth-' + it.company,
+                kind: 'money',
+                urgency: 1,
+                dollars: it.estValue || 0,
+                title: it.company + ' is overdue against its own rhythm',
+                why: ((it.reasons || [])[0] || {}).text ||
+                     ('Last order ' + fmtWhen(it.lastOrderDate) + ', average ' + money0(it.avgOrderValue) + '.'),
+                worth: '~' + money0(it.estValue) + ' typically',
+                href: '/quote-builders/embroidery-quote-builder.html',
+                cta: 'Start a quote',
+            });
+        });
+
+        return out;
+    }
+
+    function renderOneThing() {
+        var host = el('mc-onething'), skipHost = el('mc-onething-skipped');
+        if (!host) return;
+        var skips = readSkips();
+        var all = otCandidates();
+        var live = all.filter(function (c) { return !skips[c.id]; });
+        var skippedCount = all.length - live.length;
+
+        // A skipped item must NEVER vanish silently — always offer the way back.
+        if (skipHost) {
+            if (skippedCount) {
+                skipHost.innerHTML = skippedCount + ' skipped · <button type="button" id="mc-ot-unskip">show them again</button>' +
+                    ' <span class="aemc-muted">(skips last ' + OT_SKIP_TTL_DAYS + ' days, on this device only)</span>';
+                skipHost.hidden = false;
+                var un = el('mc-ot-unskip');
+                if (un) un.addEventListener('click', function () { clearSkips(); renderOneThing(); });
+            } else {
+                skipHost.hidden = true;
+            }
+        }
+
+        if (!live.length) {
+            host.hidden = true;
+            return;
+        }
+        live.sort(function (a, b) {
+            if (a.kind !== b.kind) return a.kind === 'fire' ? -1 : 1;   // fires first, always
+            if (b.urgency !== a.urgency) return b.urgency - a.urgency;
+            return (b.dollars || 0) - (a.dollars || 0);
+        });
+        var c = live[0];
+        // ONE escaping chokepoint. Candidate builders above hold RAW strings on purpose:
+        // company names come from ShopWorks and lead forms, and when each builder was
+        // responsible for its own esc() three of five did it and two did not — the harness's
+        // 'Harbor Electric <b>xss</b>' fixture rendered as live markup. Escape here, once.
+        host.innerHTML =
+            '<div class="mc-ot-eyebrow"><i class="fas fa-star" aria-hidden="true"></i> ' +
+                (c.kind === 'fire' ? 'Do this first' : 'Best call you can make today') + '</div>' +
+            '<div class="mc-ot-title">' + esc(c.title) + '</div>' +
+            '<div class="mc-ot-why">' + esc(c.why) + '</div>' +
+            '<span class="mc-ot-worth' + (c.urgent ? ' mc-ot-worth--urgent' : '') + '">' +
+                '<i class="fas ' + (c.urgent ? 'fa-shield-halved' : 'fa-sack-dollar') + '" aria-hidden="true"></i> ' +
+                esc(c.worth) + '</span>' +
+            '<div class="mc-ot-actions">' +
+                '<a class="dash-btn dash-btn--primary" href="' + esc(c.href) + '">' + esc(c.cta) + '</a>' +
+                '<button type="button" class="dash-btn" id="mc-ot-skip">Not now →</button>' +
+                (live.length > 1 ? '<span class="aemc-muted">' + (live.length - 1) + ' more queued</span>' : '') +
+            '</div>';
+        host.hidden = false;
+        var skipBtn = el('mc-ot-skip');
+        if (skipBtn) {
+            skipBtn.addEventListener('click', function () { skipOne(c.id); renderOneThing(); });
+        }
     }
 
     // ---------- action queue ----------
@@ -540,9 +1304,8 @@
         received: 'Received', invoiced: 'Invoiced', shipped: 'Shipped',
     };
 
-    function loadPurchasing() {
-        var params = (state.isAdmin && state.viewAs) ? '?viewAs=' + encodeURIComponent(state.viewAs) : '';
-        sameOriginJson('/api/crm-proxy/ae-dashboard/purchasing' + params).then(function (p) {
+    function loadPurchasing(refresh) {
+        return sameOriginJson('/api/crm-proxy/ae-dashboard/purchasing' + qs(refresh)).then(function (p) {
             var c = p.counts || {};
             var waiting = (c.sent || 0);
             el('aemc-purch-sub').textContent = p.submissionCount
@@ -613,14 +1376,15 @@
             '</li>';
     }
 
-    function loadDueDates() {
-        var params = (state.isAdmin && state.viewAs) ? '?viewAs=' + encodeURIComponent(state.viewAs) : '';
-        sameOriginJson('/api/crm-proxy/ae-dashboard/due-dates' + params).then(function (d) {
+    function loadDueDates(refresh) {
+        return sameOriginJson('/api/crm-proxy/ae-dashboard/due-dates' + qs(refresh)).then(function (d) {
             var c = d.counts || {};
             var bits = [];
             if (c.late) bits.push(c.late + ' late');
             if (c.atRisk) bits.push(c.atRisk + ' at risk');
             el('aemc-due-sub').textContent = bits.length ? '(' + bits.join(' · ') + ')' : '';
+            state.dueLate = d.late || [];        // feeds The One Thing (fires outrank bounties)
+            renderOneThing();
             if (!(d.late || []).length && !(d.atRisk || []).length) {
                 el('aemc-due').innerHTML = '<div class="aemc-empty">Nothing is late and nothing due in the next ' +
                     (d.dueSoonDays || 7) + ' days is waiting on blanks' +
@@ -649,11 +1413,12 @@
     }
 
     // ---------- growth radar ("Money on the Table") ----------
-    function loadGrowth() {
-        var params = (state.isAdmin && state.viewAs) ? '?viewAs=' + encodeURIComponent(state.viewAs) : '';
+    function loadGrowth(refresh) {
         var acct = el('aemc-growth-accounts-link');
         if (state.rep && ACCOUNTS_PAGE[state.rep.email]) { acct.href = ACCOUNTS_PAGE[state.rep.email]; acct.hidden = false; }
-        sameOriginJson('/api/crm-proxy/ae-dashboard/growth' + params).then(function (g) {
+        return sameOriginJson('/api/crm-proxy/ae-dashboard/growth' + qs(refresh)).then(function (g) {
+            state.growthItems = g.items || [];
+            renderOneThing();
             el('aemc-growth-sub').textContent = g.flaggedCount
                 ? '(' + g.flaggedCount + ' account' + (g.flaggedCount === 1 ? '' : 's') + ' · ~' + money0(g.potentialTotal) + ' in reach)'
                 : '';
@@ -694,131 +1459,199 @@
         });
     }
 
-    // ---------- Q3 embroidery bonus hero ----------
-    // The rep's OWN bonus, top of page. Identity is injected by the server forwarder, so this
-    // request can only ever return the caller's figures (admins with ?viewAs= see that rep).
-    function loadBonusHero() {
-        var params = (state.isAdmin && state.viewAs) ? '?viewAs=' + encodeURIComponent(state.viewAs) : '';
-        sameOriginJson('/api/crm-proxy/embroidery-bonus' + params).then(function (d) {
+    // ---------- Q3 embroidery bonus ----------
+    // ONE request, TWO surfaces: the hero (always painted, whatever tab is open) and the
+    // "What earned your bonus" card (Money tab, mounted later). Both go through
+    // dataOnce('emb') so opening Money never re-requests what the hero already fetched.
+    // Identity is injected by the server forwarder, so this can only ever return the
+    // caller's figures (admins with ?viewAs= see that rep).
+    function fetchEmb(refresh) {
+        return sameOriginJson('/api/crm-proxy/embroidery-bonus' + qs(refresh)).then(function (d) {
             var names = Object.keys(d.reps || {});
-            if (!names.length) return;                       // admin overview or nothing to show
+            if (!names.length) return null;                  // admin overview or nothing to show
             var mine = (state.rep && d.reps[state.rep.fullName]) || d.reps[names[0]];
-            if (!mine) return;
-
-            var l = mine.ladder || {};
-            var k = mine.teamKicker || {};
-            // Raw /api/embroidery-bonus shape: counts.* / bounties.* live on the rep object,
-            // but minAccountRevenue + dormancyMonths are TOP-LEVEL on the response.
-            var counts = mine.counts || {};
-            var bounties = mine.bounties || {};
-            el('aemc-bh-amount').textContent = money2(mine.totalBonus);
-
-            // Always state the goal in DOLLARS. A bare "18.4% of your goal" with no
-            // denominator anywhere on the page is unactionable — it was the single biggest
-            // source of confusion when this shipped (2026-07-25).
-            var rungs = l.rungs || [];
-            var top = rungs.length ? rungs[rungs.length - 1] : null;
-            el('aemc-bh-goal').textContent = l.baseline
-                ? money0(l.revenue) + ' of your ' + money0(l.baseline) + ' goal · ' + (l.pctOfBaseline || 0).toFixed(1) + '%'
-                : '';
-
-            // Progress runs to the TOP rung, not the next one, so the full ladder is visible
-            // and the biggest payout never stays hidden behind "unlocks $150".
-            var pct = top && top.threshold ? Math.max(0, Math.min((l.revenue / top.threshold) * 100, 100)) : 0;
-            el('aemc-bh-fill').style.width = pct.toFixed(1) + '%';
-            el('aemc-bh-marks').innerHTML = rungs.map(function (r) {
-                var at = top && top.threshold ? Math.min((r.threshold / top.threshold) * 100, 100) : 0;
-                return '<span class="aemc-bh-mark' + (l.revenue >= r.threshold ? ' is-hit' : '') +
-                    '" style="left:' + at.toFixed(1) + '%" title="' + money0(r.threshold) + ' pays ' + money2(r.pay) + '"></span>';
-            }).join('');
-
-            el('aemc-bh-rungs').innerHTML = rungs.map(function (r) {
-                var hit = l.revenue >= r.threshold;
-                var isNext = l.nextRung && l.nextRung.pct === r.pct;
-                return '<span class="aemc-bh-rung' + (hit ? ' is-hit' : '') + (isNext ? ' is-next' : '') + '">' +
-                    (hit ? '<i class="fas fa-check"></i> ' : '') + money0(r.threshold) +
-                    '<span class="aemc-bh-rung-pay">' + money2(r.pay) + '</span></span>';
-            }).join('');
-
-            var nextText;
-            if (l.nextRung) {
-                nextText = money0(l.amountToNextRung) + ' more embroidery takes you to ' +
-                    money2(l.nextRung.pay) + (top && top.pay > l.nextRung.pay ? ' — and ' + money2(top.pay) + ' at the top' : '');
-            } else if (k.next) {
-                nextText = 'Top rung cleared. ' + money0(k.amountToNext) + ' company-wide adds ' + money2(k.next.pay) + ' each.';
-            } else {
-                nextText = 'Every milestone cleared this quarter. Outstanding.';
-            }
-            el('aemc-bh-next').textContent = nextText;
-
-            // Pace context. A raw "$110,651 more" a quarter of the way in reads as hopeless
-            // even when the rep is tracking to clear it — this says which it is. Projection
-            // uses the measured Q3 seasonal curve, not elapsed days, because Q3 embroidery is
-            // back-loaded (July is only 30% of the quarter).
-            var paceEl = el('aemc-bh-pace');
-            var p = l.pace;
-            if (paceEl && p) {
-                var txt, cls;
-                if (p.status === 'on-pace') {
-                    txt = 'On pace to clear it — tracking toward ' + money0(p.projectedRevenue) +
-                        ' by Sep 30' + (p.onPaceForPay ? ', which pays ' + money2(p.onPaceForPay) : '');
-                    cls = 'is-onpace';
-                } else if (p.status === 'behind') {
-                    txt = 'At this pace you land near ' + money0(p.projectedRevenue) + ' — ' +
-                        money0(p.shortfallToNextAtPace) + ' short of that rung';
-                    cls = 'is-behind';
-                } else if (p.status === 'topped-out') {
-                    txt = 'Top rung already cleared — tracking toward ' + money0(p.projectedRevenue);
-                    cls = 'is-onpace';
-                }
-                if (txt) {
-                    paceEl.className = 'aemc-bh-pace ' + cls;
-                    paceEl.innerHTML = '<i class="fas ' +
-                        (cls === 'is-onpace' ? 'fa-circle-check' : 'fa-circle-arrow-up') +
-                        '" aria-hidden="true"></i> ' + esc(txt);
-                    paceEl.hidden = false;
-                } else {
-                    paceEl.hidden = true;
-                }
-            } else if (paceEl) {
-                paceEl.hidden = true;   // too early in the quarter to project honestly
-            }
-
-            // Fill the explainer with the LIVE config values, never hardcoded copy.
-            var setTxt = function (id, v) { var e = el(id); if (e) e.textContent = v; };
-            setTxt('aemc-bh-h-new', money2(bounties.newAccountBounty));
-            setTxt('aemc-bh-h-react', money2(bounties.reactivatedBounty));
-            setTxt('aemc-bh-h-min', money0(d.minAccountRevenue || 1000));
-            setTxt('aemc-bh-h-months', String(d.dormancyMonths || 12));
-            var topKick = (k.tiers || []).slice(-1)[0];
-            if (topKick) setTxt('aemc-bh-h-kick', money0(topKick.target));
-
-            var chips = [
-                { n: counts.new || 0, label: 'new program' + (counts.new === 1 ? '' : 's'), each: bounties.newAccountBounty },
-                { n: counts.reactivated || 0, label: 'won back', each: bounties.reactivatedBounty },
-            ].map(function (c) {
-                return '<span class="aemc-bh-chip' + (c.n ? ' is-on' : '') + '">' +
-                    '<strong>' + c.n + '</strong> ' + esc(c.label) +
-                    '<span class="aemc-bh-chip-rate">' + money2(c.each) + ' ea</span></span>';
-            });
-            chips.push('<span class="aemc-bh-chip' + (l.rungReached ? ' is-on' : '') + '">' +
-                '<strong>' + (l.pctOfBaseline || 0) + '%</strong> of your goal' +
-                '<span class="aemc-bh-chip-rate">' + (l.rungReached ? money2(l.rungReached.pay) + ' earned' : 'no rung yet') + '</span></span>');
-            el('aemc-bh-chips').innerHTML = chips.join('');
-
-            el('aemc-bonus-hero').hidden = false;
-
-            // Which accounts actually produced the money — reps ask "who paid me this?"
-            renderEarnedAccounts(mine);
-        }).catch(function (err) {
-            // Stay hidden on failure — a blank hero beats a wrong bonus number.
-            console.warn('[aemc] bonus hero failed:', err.message);
+            return mine ? { mine: mine, raw: d } : null;
         });
+    }
+
+    // A missing hero used to be silent (console.warn, "a blank hero beats a wrong bonus
+    // number"). Right about wrongness — we still never show a number we don't trust — but a
+    // permanently-visible spine that just isn't there reads as a broken page. Explain the
+    // absence instead (Rule 4: failures are visible).
+    function spineError(err) {
+        var host = el('aemc-bh-fallback');
+        if (!host) return;
+        host.innerHTML = '<i class="fas fa-triangle-exclamation" aria-hidden="true"></i> ' +
+            'Your bonus figures couldn’t load (' + esc(err.message) + '). ' +
+            'Nothing else on this page is affected — hit Refresh to retry.';
+        host.hidden = false;
+    }
+
+    function loadBonusHero(refresh) {
+        return dataOnce('emb', function () { return fetchEmb(refresh); })
+            .then(function (r) { if (r) renderBonusSpine(r.mine, r.raw); })
+            .catch(spineError);
+    }
+
+    function loadEarnedAccounts(refresh) {
+        return dataOnce('emb', function () { return fetchEmb(refresh); })
+            .then(function (r) { renderEarnedAccounts(r && r.mine); })
+            .catch(function (err) {
+                el('aemc-earned').innerHTML = '<div class="aemc-panel-error">Bonus detail failed to load (' +
+                    esc(err.message) + '). Refresh to retry.</div>';
+            });
+    }
+
+    function renderBonusSpine(mine, d) {
+        var l = mine.ladder || {};
+        // 🔑 teamKicker is TOP-LEVEL on /api/embroidery-bonus, not on the rep object (whose keys
+        // are rep, accounts, counts, bounties, ladder, totalBonus — verified live 2026-07-26).
+        // This read was `mine.teamKicker` and therefore ALWAYS undefined in production, with two
+        // silent consequences: a rep who cleared the top rung was told "Every milestone cleared
+        // this quarter" while the team kicker was still wide open, and the explainer's kicker
+        // figure silently kept its hardcoded $740,000 markup instead of the live Caspio config.
+        var k = (d && d.teamKicker) || mine.teamKicker || {};
+        // Raw /api/embroidery-bonus shape: counts.* / bounties.* live on the rep object,
+        // but minAccountRevenue + dormancyMonths are TOP-LEVEL on the response.
+        var counts = mine.counts || {};
+        var bounties = mine.bounties || {};
+        countUp(el('aemc-bh-amount'), Number(mine.totalBonus) || 0, money2);
+        state.bonusTotal = Number(mine.totalBonus) || 0;
+
+        // Always state the goal in DOLLARS. A bare "18.4% of your goal" with no
+        // denominator anywhere on the page is unactionable — it was the single biggest
+        // source of confusion when this shipped (2026-07-25).
+        var rungs = l.rungs || [];
+        var top = rungs.length ? rungs[rungs.length - 1] : null;
+        el('aemc-bh-goal').textContent = l.baseline
+            ? money0(l.revenue) + ' of your ' + money0(l.baseline) + ' goal · ' + (l.pctOfBaseline || 0).toFixed(1) + '%'
+            : '';
+
+        // Progress runs to the TOP rung, not the next one, so the full ladder is visible
+        // and the biggest payout never stays hidden behind "unlocks $150".
+        var pct = top && top.threshold ? Math.max(0, Math.min((l.revenue / top.threshold) * 100, 100)) : 0;
+        el('aemc-bh-fill').style.width = pct.toFixed(1) + '%';
+        el('aemc-bh-marks').innerHTML = rungs.map(function (r) {
+            var at = top && top.threshold ? Math.min((r.threshold / top.threshold) * 100, 100) : 0;
+            return '<span class="aemc-bh-mark' + (l.revenue >= r.threshold ? ' is-hit' : '') +
+                '" style="left:' + at.toFixed(1) + '%" title="' + money0(r.threshold) + ' pays ' + money2(r.pay) + '"></span>';
+        }).join('');
+
+        // PACE MARKER — where she LANDS at today's pace, on the exact same axis as the rung
+        // ticks (same denominator, so it can never disagree with the ladder). Rendered as a
+        // flag rather than another tick so it doesn't read as one more milestone. The pace
+        // SENTENCE below stays as the text equivalent.
+        // Honest by construction: computePace() projects on the measured Q3 curve
+        // (Jul 30% / Aug 37% / Sep 33%), not elapsed days — straight-line maths makes a rep
+        // look further behind than she is on a back-loaded quarter.
+        var pace = l.pace;
+        if (pace && pace.projectedRevenue && top && top.threshold) {
+            var at = Math.min((pace.projectedRevenue / top.threshold) * 100, 100);
+            el('aemc-bh-marks').insertAdjacentHTML('beforeend',
+                '<span class="mc-bh-pace-mark' + (pace.status === 'behind' ? ' is-behind' : '') +
+                '" style="left:' + at.toFixed(1) + '%" role="img" aria-label="Projected ' +
+                money0(pace.projectedRevenue) + ' by September 30 at your current pace"></span>');
+        }
+
+        el('aemc-bh-rungs').innerHTML = rungs.map(function (r) {
+            var hit = l.revenue >= r.threshold;
+            var isNext = l.nextRung && l.nextRung.pct === r.pct;
+            return '<span class="aemc-bh-rung' + (hit ? ' is-hit' : '') + (isNext ? ' is-next' : '') + '">' +
+                (hit ? '<i class="fas fa-check"></i> ' : '') + money0(r.threshold) +
+                '<span class="aemc-bh-rung-pay">' + money2(r.pay) + '</span></span>';
+        }).join('');
+
+        var nextText;
+        if (l.nextRung) {
+            nextText = money0(l.amountToNextRung) + ' more embroidery takes you to ' +
+                money2(l.nextRung.pay) + (top && top.pay > l.nextRung.pay ? ' — and ' + money2(top.pay) + ' at the top' : '');
+        } else if (k.next) {
+            nextText = 'Top rung cleared. ' + money0(k.amountToNext) + ' company-wide adds ' + money2(k.next.pay) + ' each.';
+        } else {
+            nextText = 'Every milestone cleared this quarter. Outstanding.';
+        }
+        el('aemc-bh-next').textContent = nextText;
+
+        // Pace context. A raw "$110,651 more" a quarter of the way in reads as hopeless
+        // even when the rep is tracking to clear it — this says which it is. Projection
+        // uses the measured Q3 seasonal curve, not elapsed days, because Q3 embroidery is
+        // back-loaded (July is only 30% of the quarter).
+        var paceEl = el('aemc-bh-pace');
+        var p = l.pace;
+        if (paceEl && p) {
+            var txt, cls;
+            if (p.status === 'on-pace') {
+                txt = 'On pace to clear it — tracking toward ' + money0(p.projectedRevenue) +
+                    ' by Sep 30' + (p.onPaceForPay ? ', which pays ' + money2(p.onPaceForPay) : '');
+                cls = 'is-onpace';
+            } else if (p.status === 'behind') {
+                txt = 'At this pace you land near ' + money0(p.projectedRevenue) + ' — ' +
+                    money0(p.shortfallToNextAtPace) + ' short of that rung';
+                cls = 'is-behind';
+            } else if (p.status === 'topped-out') {
+                txt = 'Top rung already cleared — tracking toward ' + money0(p.projectedRevenue);
+                cls = 'is-onpace';
+            }
+            if (txt) {
+                paceEl.className = 'aemc-bh-pace ' + cls;
+                paceEl.innerHTML = '<i class="fas ' +
+                    (cls === 'is-onpace' ? 'fa-circle-check' : 'fa-circle-arrow-up') +
+                    '" aria-hidden="true"></i> ' + esc(txt);
+                paceEl.hidden = false;
+            } else {
+                paceEl.hidden = true;
+            }
+        } else if (paceEl) {
+            paceEl.hidden = true;   // too early in the quarter to project honestly
+        }
+
+        // Fill the explainer with the LIVE config values, never hardcoded copy.
+        var setTxt = function (id, v) { var e = el(id); if (e) e.textContent = v; };
+        setTxt('aemc-bh-h-new', money2(bounties.newAccountBounty));
+        setTxt('aemc-bh-h-react', money2(bounties.reactivatedBounty));
+        setTxt('aemc-bh-h-min', money0(d.minAccountRevenue || 1000));
+        setTxt('aemc-bh-h-months', String(d.dormancyMonths || 12));
+        var topKick = (k.tiers || []).slice(-1)[0];
+        if (topKick) setTxt('aemc-bh-h-kick', money0(topKick.target));
+
+        var chips = [
+            { n: counts.new || 0, label: 'new program' + (counts.new === 1 ? '' : 's'), each: bounties.newAccountBounty },
+            { n: counts.reactivated || 0, label: 'won back', each: bounties.reactivatedBounty },
+        ].map(function (c) {
+            return '<span class="aemc-bh-chip' + (c.n ? ' is-on' : '') + '">' +
+                '<strong>' + c.n + '</strong> ' + esc(c.label) +
+                '<span class="aemc-bh-chip-rate">' + money2(c.each) + ' ea</span></span>';
+        });
+        chips.push('<span class="aemc-bh-chip' + (l.rungReached ? ' is-on' : '') + '">' +
+            '<strong>' + (l.pctOfBaseline || 0) + '%</strong> of your goal' +
+            '<span class="aemc-bh-chip-rate">' + (l.rungReached ? money2(l.rungReached.pay) + ' earned' : 'no rung yet') + '</span></span>');
+        el('aemc-bh-chips').innerHTML = chips.join('');
+
+        var fb = el('aemc-bh-fallback');
+        if (fb) fb.hidden = true;                        // a later success clears an earlier error
+        el('aemc-bonus-hero').hidden = false;
+
+        renderCondensed(mine);      // the 48px sticky stand-in
+        renderKicker(k);            // shared team goal (Money tab)
+        considerCelebration(mine);  // seeds on first sight, only fires on genuinely new events
+        if (state.summary) {
+            // Diff against the baseline read at the START of render(), THEN re-stamp it now
+            // that state.bonusTotal is known. render()'s own write runs before this fetch
+            // resolves, so it banks bonusTotal:0 — which would make tomorrow's visit announce
+            // the entire quarter's bonus as if it had all landed overnight.
+            renderDiff(state.summary, state.lastSeen);
+            writeLastSeen(state.summary);
+        }
     }
 
     function renderEarnedAccounts(mine) {
         var host = el('aemc-earned');
         if (!host) return;
+        if (!mine) {
+            host.innerHTML = '<div class="aemc-panel-error">Bonus detail unavailable — no figures came back ' +
+                'for your account. Refresh to retry.</div>';
+            return;
+        }
         var link = el('aemc-emb-bonus-link');
         if (link && state.rep && BONUS_DASHBOARD_PATH[state.rep.email]) {
             link.href = BONUS_DASHBOARD_BASE + BONUS_DASHBOARD_PATH[state.rep.email];
@@ -846,9 +1679,8 @@
     }
 
     // ---------- where the money is: the target roadmap ----------
-    function loadTargets() {
-        var params = (state.isAdmin && state.viewAs) ? '?viewAs=' + encodeURIComponent(state.viewAs) : '';
-        sameOriginJson('/api/crm-proxy/embroidery-bonus/targets' + params).then(function (d) {
+    function loadTargets(refresh) {
+        return sameOriginJson('/api/crm-proxy/embroidery-bonus/targets' + qs(refresh)).then(function (d) {
             var names = Object.keys(d.reps || {});
             if (!names.length) return;
             var mine = (state.rep && d.reps[state.rep.fullName]) || d.reps[names[0]];
@@ -896,6 +1728,11 @@
 
             el('aemc-targets').innerHTML = html;
             el('aemc-targets-sub').textContent = '(' + (s.winBackCount + s.firstProgramCount + s.almostThereCount) + ' accounts)';
+            // Feed The One Thing. Both lists already carry bounty / gapToBounty / score, which
+            // is what lets every suggested action state what it's worth to her paycheck.
+            state.almostThere = mine.almostThere || [];
+            state.winBack = mine.winBack || [];
+            renderOneThing();
         }).catch(function (err) {
             el('aemc-targets').innerHTML = '<div class="aemc-panel-error">Target list failed to load (' + esc(err.message) + '). Refresh to retry.</div>';
         });
@@ -913,9 +1750,8 @@
         }).join(' ');
     }
 
-    function loadDataQuality() {
-        var params = (state.isAdmin && state.viewAs) ? '?viewAs=' + encodeURIComponent(state.viewAs) : '';
-        sameOriginJson('/api/crm-proxy/ae-dashboard/data-quality' + params).then(function (d) {
+    function loadDataQuality(refresh) {
+        return sameOriginJson('/api/crm-proxy/ae-dashboard/data-quality' + qs(refresh)).then(function (d) {
             var c = d.counts || {};
             el('aemc-dq-sub').textContent = (c.ordersFlagged || c.customersFlagged)
                 ? '(' + (c.ordersFlagged || 0) + ' order' + (c.ordersFlagged === 1 ? '' : 's') + ' · ' +
@@ -954,11 +1790,11 @@
     }
 
     // ---------- SanMar inbound (company-wide fetch, rep rows highlighted) ----------
+    // No listener wiring in here: this runs again on every rep switch and every Refresh, so
+    // an addEventListener would stack and the modal would open N times. The "Full view"
+    // button is wired once in wireHeader().
     function loadInbound() {
-        el('aemc-inbound-open').addEventListener('click', function () {
-            if (typeof window.openInboundTodayModal === 'function') window.openInboundTodayModal();
-        });
-        DashPage.fetchJson('/api/sanmar-orders/inbound-today').then(function (data) {
+        return DashPage.fetchJson('/api/sanmar-orders/inbound-today').then(function (data) {
             var orders = (data.orders || []).filter(function (o) { return !o.received; });
             var mineName = state.rep && state.rep.fullName;
             var mine = mineName ? orders.filter(function (o) { return String(o.salesRep || '').trim() === mineName; }) : [];

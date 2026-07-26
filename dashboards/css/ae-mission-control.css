@@ -4,6 +4,21 @@
 
 :root { --art-theme: #4cb354; }
 
+/* ---------- file-wide [hidden] guard — REQUIRED, do not remove ----------
+ * An author `display` rule beats the UA sheet's [hidden]{display:none} regardless of
+ * specificity, so any element the JS toggles with `.hidden = true` silently never hides.
+ * LESSONS_LEARNED 2026-07-19, recurrence #5 — and it was live on this page in three places
+ * until 2026-07-26:
+ *   #aemc-viewas      vs .aemc-viewas{display:inline-flex}  → the ADMIN "View as Taneisha /
+ *                                                             Nika" switcher rendered on both
+ *                                                             reps' own cockpits
+ *   #aemc-art-badge   vs .aemc-badge{display:inline-block}  → empty red pill on Send Artwork
+ *                                                             whenever nothing awaited approval
+ *   #aemc-accounts-link vs .dash-btn{display:inline-flex}   → "My Accounts" shown with no page
+ * Nothing on this page relies on a [hidden] element being painted (audited every toggle), and
+ * the tab panels below use `hidden` for visibility — so this rule is load-bearing now. */
+[hidden] { display: none !important; }
+
 /* ---------- greeting row ---------- */
 .aemc-greeting-row {
     display: flex;
@@ -27,8 +42,15 @@
  * The only place on any dashboard where a rep's bonus dollars appear (the shared staff
  * dashboard carries the company goal with no compensation on it). Deliberately the loudest
  * thing above the fold: big earned-to-date number on the left, the nearest concrete ask on
- * the right. NW green so it reads as "yours / good news" rather than another data card. */
+ * the right. NW green so it reads as "yours / good news" rather than another data card.
+ *
+ * ⚠️ CONTRAST (fixed 2026-07-26): the original ramp ran to #63c96b, and white text over that
+ * is ≈2.0:1 — failing AA outright — while the old 55% stop (#4cb354) is ≈2.9:1, also failing
+ * for anything under 24px bold. The goal line, the rung chips and the pace pill all sat in
+ * exactly that light region. Re-aimed so the whole typeset area stays on the dark half
+ * (#1f5f27 ≈8.4:1, #2f7d38 ≈5.6:1); the bright green survives only as an untyped accent. */
 .aemc-bonus-hero {
+    position: relative;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -36,11 +58,41 @@
     padding: var(--space-5) var(--space-6);
     margin-bottom: var(--space-4);
     border-radius: var(--radius-lg);
-    background: linear-gradient(135deg, #2f7d38 0%, var(--art-theme, #4cb354) 55%, #63c96b 100%);
+    background: linear-gradient(120deg, #1f5f27 0%, #2f7d38 45%, var(--art-theme, #4cb354) 100%);
     color: #fff;
-    box-shadow: 0 6px 18px rgba(47, 125, 56, 0.28);
+    box-shadow: 0 6px 18px rgba(31, 95, 39, 0.3);
+    overflow: hidden;
 }
-.aemc-bonus-hero[hidden] { display: none; }
+/* Keeps the lively NW green in the design without putting any text on top of it. */
+.aemc-bonus-hero::after {
+    content: '';
+    position: absolute;
+    right: -60px;
+    bottom: -90px;
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(99, 201, 107, 0.55) 0%, rgba(99, 201, 107, 0) 70%);
+    pointer-events: none;
+}
+.aemc-bonus-hero > * { position: relative; z-index: 1; }
+
+/* Stands in for the hero when the bonus feed fails, so the missing centerpiece is explained
+ * rather than just absent. Warning-toned, not danger — nothing else on the page is broken. */
+.aemc-bh-fallback {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    margin-bottom: var(--space-4);
+    border: 1px solid var(--state-warning);
+    border-left-width: 4px;
+    border-radius: var(--radius-md);
+    background: var(--state-warning-bg);
+    color: var(--gray-800);
+    font-size: 0.88rem;
+}
+.aemc-bh-fallback i { color: var(--state-warning); }
 
 .aemc-bh-left { flex: 0 0 auto; min-width: 190px; }
 .aemc-bh-eyebrow {
@@ -48,7 +100,7 @@
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    opacity: 0.85;
+    color: rgba(255, 255, 255, 0.88);
 }
 .aemc-bh-amount {
     font-size: clamp(2.2rem, 5vw, 3.1rem);
@@ -60,7 +112,7 @@
 }
 .aemc-bh-sub {
     font-size: 0.82rem;
-    opacity: 0.88;
+    color: rgba(255, 255, 255, 0.86);
     margin-top: 2px;
 }
 
@@ -98,14 +150,13 @@
     font-size: 0.78rem;
     font-weight: 600;
 }
-.aemc-bh-pace[hidden] { display: none; }
 .aemc-bh-pace.is-onpace { background: rgba(255, 255, 255, 0.92); color: #22662a; }
-.aemc-bh-pace.is-behind { background: rgba(255, 255, 255, 0.18); color: #fff; border: 1px solid rgba(255, 255, 255, 0.45); }
+.aemc-bh-pace.is-behind { background: rgba(0, 0, 0, 0.3); color: #fff; border: 1px solid rgba(255, 255, 255, 0.5); }
 
 /* The goal in DOLLARS. A bare percentage with no denominator is unactionable. */
 .aemc-bh-goal {
     font-size: 0.82rem;
-    opacity: 0.9;
+    color: rgba(255, 255, 255, 0.92);
     margin-top: 2px;
     font-variant-numeric: tabular-nums;
 }
@@ -134,10 +185,10 @@
     gap: 5px;
     padding: 3px 8px;
     border-radius: var(--radius-sm);
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(0, 0, 0, 0.22);
     font-size: 0.74rem;
     font-variant-numeric: tabular-nums;
-    opacity: 0.75;
+    color: rgba(255, 255, 255, 0.9);
 }
 .aemc-bh-rung.is-hit { background: rgba(255, 255, 255, 0.9); color: #22662a; opacity: 1; font-weight: 600; }
 .aemc-bh-rung.is-next { outline: 1.5px solid rgba(255, 255, 255, 0.85); opacity: 1; }
@@ -163,19 +214,18 @@
     padding-top: var(--space-3);
     border-top: 1px solid rgba(255, 255, 255, 0.28);
 }
-.aemc-bh-how[hidden] { display: none; }
 .aemc-bh-how-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: var(--space-4);
 }
 .aemc-bh-how h4 { margin: 0 0 4px; font-size: 0.82rem; font-weight: 700; }
-.aemc-bh-how p { margin: 0; font-size: 0.8rem; line-height: 1.5; opacity: 0.92; }
+.aemc-bh-how p { margin: 0; font-size: 0.8rem; line-height: 1.5; color: rgba(255, 255, 255, 0.92); }
 .aemc-bh-how-foot {
     margin: var(--space-3) 0 0;
     font-size: 0.76rem;
     line-height: 1.5;
-    opacity: 0.86;
+    color: rgba(255, 255, 255, 0.9);
 }
 .aemc-bh-how-foot a { color: #fff; font-weight: 600; }
 
@@ -212,7 +262,12 @@
     font-size: 0.95rem;
     font-variant-numeric: tabular-nums;
 }
-.aemc-bh-chip-rate { opacity: 0.75; font-size: 0.72rem; }
+/* Colour, not opacity — same reason as the rest of the hero text: opacity composites toward
+   the gradient behind it, so one rule renders at a different effective contrast at each end.
+   ⚠️ Needs BOTH states: .is-on flips the chip to a near-white background, so a single white
+   rate colour renders white-on-white and the "$75.00 ea" silently disappears. */
+.aemc-bh-chip-rate { color: rgba(255, 255, 255, 0.82); font-size: 0.72rem; }
+.aemc-bh-chip.is-on .aemc-bh-chip-rate { color: rgba(26, 82, 33, 0.82); }
 
 @media (max-width: 640px) {
     .aemc-bonus-hero { padding: var(--space-4); gap: var(--space-3); }
@@ -643,4 +698,451 @@ a.aemc-row-main:hover { text-decoration: underline; }
     box-shadow: var(--shadow-lg);
     font-size: 0.85rem;
     max-width: 320px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════════
+   TABBED SHELL (prefix mc-, added 2026-07-26)
+   Sixteen cards on one 3,400px scroll became five tabs over a persistent spine.
+   Everything above keeps the aemc- prefix; only the shell is mc-.
+
+   Tokens from art-hub.css ONLY. staff-dashboard/tokens.css redefines --space-5,
+   --radius-sm/md/lg/xl, --shadow-* and --ease-out with DIFFERENT values and is
+   @layer-wrapped, so borrowing a component from there silently reskins it.
+   ═══════════════════════════════════════════════════════════════════════════════ */
+
+/* Gutter must track .dash-content's own padding, which dash-shell.css drops to
+   --space-4 at 640px. Hardcoding --space-6 makes the sticky bar overhang 8px each
+   side on mobile and gives the whole page a horizontal scrollbar. */
+:root { --mc-gutter: var(--space-6); }
+
+/* ---------- spine: the "am I winning?" strip, visible from every tab ---------- */
+.mc-spine { margin-bottom: var(--space-4); }
+
+.mc-spine-kpis {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-3);
+}
+.mc-kpi {
+    background: var(--surface-card);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: var(--space-3) var(--space-4);
+    box-shadow: var(--shadow-sm);
+}
+.mc-kpi--accent { border-top: 3px solid var(--art-theme); }
+.mc-kpi-value {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 1.5rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--gray-900);
+    line-height: 1.15;
+}
+.mc-kpi-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--gray-500);
+    margin-top: 2px;
+}
+.mc-kpi-note { text-transform: none; letter-spacing: 0; font-weight: 500; color: var(--gray-400); }
+.mc-spark { margin-top: var(--space-2); color: var(--art-theme); line-height: 0; }
+.mc-streak--hot { color: #c2410c; }
+
+/* ---------- sticky bar: condensed spine + tablist ---------- */
+.mc-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 20;                        /* under .aemc-overlay (90) and .aemc-modal (100) */
+    background: var(--surface-page);    /* MUST be opaque — rows scroll through otherwise */
+    margin-inline: calc(-1 * var(--mc-gutter));
+    padding-inline: var(--mc-gutter);
+    border-bottom: 1px solid var(--gray-200);
+    margin-bottom: var(--space-4);
+}
+/* Anything scrolled to must clear the sticky bar or its heading tucks underneath. */
+.mc-panel, .dash-card { scroll-margin-top: 92px; }
+
+/* The 48px stand-in once the hero scrolls away. The full hero is ~220px; making THAT
+   sticky would cost ~28% of an 800px laptop viewport before any content appears. */
+.mc-condensed {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-2) 0 0;
+    font-size: 0.85rem;
+    color: var(--gray-700);
+}
+.mc-condensed-amount {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: #1f5f27;
+}
+.mc-condensed-next {
+    color: var(--gray-500);
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.mc-condensed-track {
+    flex: 0 0 120px;
+    height: 6px;
+    border-radius: var(--radius-pill);
+    background: var(--gray-200);
+    overflow: hidden;
+}
+.mc-condensed-fill {
+    display: block;
+    height: 100%;
+    background: var(--art-theme);
+    transition: width var(--dur-base) var(--ease-out);
+}
+
+/* ---------- tabs ----------
+   Modeled on unqualified-leads.css, deliberately NOT art-hub.css .tab-button: that one
+   is background:var(--art-theme) with white text = ~2.9:1, which fails AA for its 14px
+   label. --gray-900 on white is ~17:1. Styling hangs off [aria-selected] rather than a
+   parallel .is-active class, so visual state and accessible state cannot diverge. */
+.mc-tabs {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    padding: var(--space-2) 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+}
+.mc-tabs::-webkit-scrollbar { display: none; }
+.mc-tab {
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--gray-600);
+    background: var(--gray-100);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    padding: 9px 16px;
+    min-height: 44px;                   /* touch target on every viewport, not just mobile */
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    transition: background var(--dur-fast) var(--ease-out),
+                color var(--dur-fast) var(--ease-out),
+                border-color var(--dur-fast) var(--ease-out);
+}
+.mc-tab:hover { background: var(--gray-200); color: var(--gray-800); }
+.mc-tab[aria-selected="true"] {
+    background: var(--gray-900);
+    border-color: var(--gray-900);
+    color: var(--surface-card);
+}
+.mc-tab:focus-visible { outline: 2px solid var(--art-theme); outline-offset: 2px; }
+.mc-tab i { font-size: 0.85em; opacity: 0.8; }
+
+.mc-tab-badge {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: var(--state-danger);
+    color: #fff;
+    border-radius: var(--radius-pill);
+    padding: 1px 7px;
+    min-width: 18px;
+    text-align: center;
+}
+/* Inverted inside the dark active pill so the count stays legible. */
+.mc-tab[aria-selected="true"] .mc-tab-badge { background: var(--surface-card); color: var(--gray-900); }
+
+/* Only Today carries a number. Other tabs get a dot at most — a "12" on Money (12 target
+   accounts) reads as twelve problems, and five badged tabs read as five inboxes, which
+   undercuts the calm this redesign exists for. */
+.mc-tab-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #f59e0b;
+}
+
+/* ---------- panels ----------
+   NO `display` declared here on purpose: it would beat the UA [hidden] rule (silently
+   breaking tab switching) AND double-space against .dash-card's own margin-bottom. */
+.mc-panel { animation: fadeIn var(--dur-base) var(--ease-out); }
+.mc-panel:focus { outline: none; }
+.mc-panel:focus-visible { outline: 2px solid var(--art-theme); outline-offset: 4px; }
+
+/* ---------- "since you last looked" ---------- */
+.mc-diff {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    font-size: 0.85rem;
+    color: var(--gray-600);
+    margin: 0 0 var(--space-4);
+}
+.mc-diff-since { font-weight: 600; color: var(--gray-700); }
+.mc-diff-up { color: #1f7a32; font-weight: 600; }
+
+/* ---------- The One Thing ---------- */
+.mc-onething {
+    border: 1px solid var(--gray-200);
+    border-left: 4px solid var(--art-theme);
+    border-radius: var(--radius-lg);
+    background: var(--surface-card);
+    box-shadow: var(--shadow-md);
+    padding: var(--space-4) var(--space-5);
+    margin-bottom: var(--space-4);
+}
+.mc-ot-eyebrow {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: #2f7d38;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.mc-ot-title {
+    font-size: 1.12rem;
+    font-weight: 700;
+    color: var(--gray-900);
+    margin: var(--space-2) 0 4px;
+}
+.mc-ot-why { font-size: 0.9rem; color: var(--gray-600); line-height: 1.5; }
+.mc-ot-worth {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: var(--space-2);
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #1f5f27;
+    background: #eaf6ec;
+    border-radius: var(--radius-pill);
+    padding: 3px 11px;
+}
+.mc-ot-worth--urgent { color: #9a3412; background: var(--state-warning-bg); }
+.mc-ot-actions { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-3); }
+.mc-onething-skipped {
+    font-size: 0.8rem;
+    color: var(--gray-500);
+    margin: calc(-1 * var(--space-2)) 0 var(--space-4);
+}
+.mc-onething-skipped button {
+    font: inherit;
+    background: none;
+    border: none;
+    padding: 0;
+    color: #2f7d38;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+/* ---------- team kicker (Money) ---------- */
+.mc-kicker-track {
+    height: 12px;
+    border-radius: var(--radius-pill);
+    background: var(--gray-200);
+    overflow: hidden;
+    margin: var(--space-3) 0 var(--space-2);
+}
+.mc-kicker-fill {
+    display: block;
+    height: 100%;
+    border-radius: var(--radius-pill);
+    background: linear-gradient(90deg, #2f7d38, var(--art-theme));
+    transition: width 420ms var(--ease-out);
+}
+.mc-kicker-line { font-size: 0.9rem; color: var(--gray-700); }
+.mc-kicker-tiers { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-2); }
+.mc-kicker-tier {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--gray-600);
+    background: var(--surface-inset);
+    border-radius: var(--radius-pill);
+    padding: 3px 10px;
+}
+.mc-kicker-tier.is-hit { color: #1f5f27; background: #eaf6ec; }
+
+/* ---------- records (Wins) ---------- */
+.mc-records { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: var(--space-3); }
+.mc-record {
+    background: var(--surface-inset);
+    border-radius: var(--radius-lg);
+    padding: var(--space-3) var(--space-4);
+}
+.mc-record-value {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 1.25rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--gray-900);
+}
+.mc-record-label {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--gray-500);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 2px;
+}
+.mc-record-when { font-size: 0.8rem; color: var(--gray-500); margin-top: 2px; }
+
+/* ---------- finished photos (Wins) ---------- */
+.mc-photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--space-3); }
+.mc-photo {
+    display: block;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: var(--surface-inset);
+    border: 1px solid var(--gray-200);
+    text-decoration: none;
+    transition: transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast) var(--ease-out);
+}
+.mc-photo:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+.mc-photo img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; }
+.mc-photo-cap {
+    font-size: 0.75rem;
+    color: var(--gray-600);
+    padding: 6px 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ---------- skeletons (reuse art-hub's .skeleton-line + shimmer keyframe) ---------- */
+.mc-skel { display: grid; gap: 10px; padding: var(--space-2) 0; }
+
+/* ---------- reduced motion ----------
+   CSS alone is NOT enough: the count-up is requestAnimationFrame and the confetti is
+   canvas, both invisible to @media. ae-mission-control.js reads matchMedia once in init()
+   and skips them outright. This block covers the declarative half — and the whole
+   /dash-page family had no reduced-motion handling at all before this. */
+@media (prefers-reduced-motion: reduce) {
+    .mc-panel { animation: none; }
+    .mc-tab, .mc-photo { transition: none; }
+    .mc-photo:hover { transform: none; }
+    .aemc-bh-fill, .mc-kicker-fill, .mc-condensed-fill, .mc-bh-pace-mark { transition: none; }
+    .skeleton-line, .skeleton-header { animation: none; background: var(--gray-200); }
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
+/* ---------- mobile ---------- */
+@media (max-width: 900px) {
+    .mc-spine-kpis { grid-template-columns: 1fr 1fr; }
+    .mc-spine-kpis > .mc-kpi:last-child { grid-column: 1 / -1; }
+}
+@media (max-width: 640px) {
+    :root { --mc-gutter: var(--space-4); }
+    .mc-kpi-value { font-size: 1.25rem; }
+    .mc-condensed-next { display: none; }
+    /* iOS zooms any focused input under 16px. .aemc-field inputs are .9rem = 14.4px, so
+       every one of the kit modal's nine fields zoomed the page on focus. */
+    .aemc-field input, .aemc-field textarea, .aemc-field select { font-size: 16px; }
+    .aemc-mini-btn, .aemc-more-toggle { min-height: 44px; }
+    /* nowrap + margin-left:auto on the money/date column forced page-wide overflow at 375px */
+    .aemc-row-right { margin-left: 0; text-align: left; white-space: normal; }
+    .mc-records { grid-template-columns: 1fr; }
+    /* dash-shell.css sets .dash-header-right to flex-wrap:nowrap, so at 375px this page's
+       header measured 467px and pushed the whole document 103px sideways. Only bites an
+       ADMIN — the extra view-as group is what overflows, and a rep's header fits in 243px —
+       but a sideways-scrolling page is worth 3 lines to avoid. Scoped here rather than in the
+       shared shell so no other dashboard's header shifts; see the spawned task for the
+       repo-wide fix. */
+    .dash-header-right { flex-wrap: wrap; justify-content: flex-end; row-gap: var(--space-2); }
+    /* .aemc-dq-chip is white-space:nowrap, and a Missing-Info chip like "no requested-ship
+       date" measured 347px — wider than the row could give it, so it pushed the page 13px
+       sideways. The chips are the whole point of that card, so let them wrap their text
+       rather than shrink or truncate. */
+    .aemc-dq-chip { white-space: normal; max-width: 100%; }
+}
+
+/* ---------- pace marker on the bonus track ----------
+   Where she LANDS at today's pace, on the SAME axis as the rung ticks (identical
+   denominator in the JS, so it can never disagree with the ladder). A flag rather than
+   another tick, so it never reads as one more milestone to hit.
+   .aemc-bh-track is already position:relative + overflow:visible, so the negative top
+   is not clipped. */
+.mc-bh-pace-mark {
+    position: absolute;
+    top: -9px;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 7px solid #fff;
+    transform: translateX(-5px);
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
+    transition: left var(--dur-base) var(--ease-out);
+}
+.mc-bh-pace-mark.is-behind { border-top-color: #ffd27a; }
+
+/* ---------- action-rail menus (<details>, no JS) ----------
+   The rail was 12 wrapping buttons across two rows, competing with the spine for the top of
+   the page. Now 6 targets, with the builders behind one primary menu. <details>/<summary>
+   gives keyboard operation and Escape-free toggling for nothing; the only thing it needs is
+   a marker reset and an absolutely-positioned panel. */
+.mc-menu { position: relative; }
+.mc-menu > summary {
+    list-style: none;
+    cursor: pointer;
+    /* .dash-btn already supplies the look; summary just needs to stop being a disclosure. */
+}
+.mc-menu > summary::-webkit-details-marker { display: none; }
+.mc-menu > summary::marker { content: ''; }
+.mc-menu > summary::after {
+    content: '▾';                     /* small down triangle */
+    font-size: 0.7em;
+    margin-left: 2px;
+    opacity: 0.7;
+}
+.mc-menu[open] > summary::after { content: '▴'; }
+
+.mc-menu-panel {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 30;                           /* above .mc-sticky (20), below overlay (90) */
+    min-width: 220px;
+    display: grid;
+    padding: var(--space-2);
+    gap: 2px;
+    background: var(--surface-card);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+}
+.mc-menu-panel a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 10px;
+    min-height: 40px;
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--gray-700);
+    text-decoration: none;
+}
+.mc-menu-panel a:hover { background: var(--surface-hover); color: var(--gray-900); }
+.mc-menu-panel a:focus-visible { outline: 2px solid var(--art-theme); outline-offset: -2px; }
+.mc-menu-panel a i { width: 1em; text-align: center; color: var(--gray-400); }
+
+/* On a phone the panel would run off the right edge of a right-aligned trigger. */
+@media (max-width: 640px) {
+    .mc-menu-panel { left: auto; right: 0; min-width: 200px; }
+    .mc-menu-panel a { min-height: 44px; }
 }

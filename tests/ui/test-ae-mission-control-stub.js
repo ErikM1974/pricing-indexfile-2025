@@ -6,6 +6,17 @@
  * POST), lead-outreach (preview + send), sanmar inbound-today, and the art
  * notification poll — so the SAML-gated page renders and clicks through with
  * zero backend. Session is stubbed as ADMIN so the view-as pill shows.
+ *
+ * ⚠️ THIS IS A *RENDER* HARNESS, NEVER A *CONTRACT* HARNESS.
+ * It replaces window.fetch wholesale, so it answers every URL the controller asks for
+ * whether or not that route exists on the server. It cannot detect an unregistered
+ * endpoint, a changed response shape, or a broken auth gate — and it didn't: the
+ * /api/crm-proxy/ae-dashboard/due-dates forwarder was dropped by a revert on 2026-07-19
+ * and 404'd in production for a week while this harness stayed green (it answers that URL
+ * itself, below). Route registration and payload shape are verified by LIVE probes only;
+ * see the Verification section of the redesign plan. Use this file for layout, empty
+ * states, error states, XSS escaping and click-through — nothing that touches the network
+ * contract.
  */
 (function () {
     'use strict';
@@ -115,8 +126,100 @@
                 ],
             },
             orders30Total: isT ? 51840.22 : 90210.11,
+            // Daily trend + streak + personal records (added 2026-07-26; derived server-side
+            // from rows the sales read already fetched, so it costs no extra Caspio calls).
+            // archiveStartsAt is deliberately present: NW_Daily_Sales_By_Rep has no 2025 rows,
+            // so a "record" can only mean "best since the archive began" and the UI must say so.
+            trend: trendFor(isT),
+            // ⚠️ LIVE REALITY (verified 2026-07-26): Quote_Sessions holds 8 rows for all of
+            // 2026 and only ONE carries a SalesRepEmail, so in production BOTH reps get
+            // attributed:0 / ratePct:null and the panel is empty. The stub ships REAL numbers
+            // here on purpose — the empty case is exercised by ?degrade=quotes below — so the
+            // populated layout can be designed, but nothing should be built that *requires*
+            // this to be non-zero. See the spawned "Quote_Sessions rep attribution" task.
+            quoteConversion: {
+                windowDays: 90,
+                attributed: isT ? 24 : 17,
+                quotedValue: isT ? 84210.5 : 61300,
+                pushed: isT ? 9 : 7,
+                pushedValue: isT ? 31120.25 : 24800,
+                ratePct: isT ? 38 : 41,
+                staleCount: isT ? 3 : 1,
+                staleValue: isT ? 9410 : 2200,
+            },
             errors: undefined,
         };
+    }
+
+    // Synthetic 90-day series with a believable shape: weekends empty, a live streak, and one
+    // standout day/week/month so the records UI has something to render.
+    function trendFor(isT) {
+        var series = [];
+        var end = new Date(); end.setHours(12, 0, 0, 0);
+        end.setDate(end.getDate() - 2);                       // mirror the 2-day archive lag
+        for (var i = 89; i >= 0; i--) {
+            var d = new Date(end.getTime() - i * 86400000);
+            var dow = d.getDay();
+            var weekend = (dow === 0 || dow === 6);
+            var rev = weekend ? 0 : Math.round((isT ? 2600 : 4200) * (0.45 + ((i * 37) % 100) / 100) * 100) / 100;
+            series.push({ d: d.toISOString().slice(0, 10), r: rev, o: weekend ? 0 : 1 + (i % 4) });
+        }
+        var peak = series[series.length - 12];
+        if (peak) { peak.r = isT ? 30443.36 : 23002; peak.o = 9; }
+        return {
+            asOf: series[series.length - 1].d,
+            archiveStartsAt: '2026-01-05',
+            dailySeries: series,
+            streak: { currentDays: isT ? 2 : 7, bestDays: isT ? 19 : 40 },
+            records: {
+                bestDay: { d: peak ? peak.d : series[0].d, r: isT ? 30443.36 : 23002 },
+                bestWeek: { weekStart: '2026-02-02', r: isT ? 44722.52 : 50145.41 },
+                bestMonth: { m: isT ? '2026-02' : '2026-01', r: isT ? 117778.43 : 169951.78 },
+            },
+        };
+    }
+
+    // ?degrade=<key>[,<key>] — force a source to come back null the way the real aggregate
+    // does when one of its seven Caspio reads fails, so the DEGRADED path gets designed too.
+    // e.g. ?degrade=trend,quotes  → no sparkline, no streak, no conversion, visible errors.
+    var DEGRADE = (new URLSearchParams(location.search).get('degrade') || '')
+        .split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+    // ?as=rep | ?as=nika — stub a plain rep session instead of Erik-as-admin (see the
+    // /api/crm-session/me handler for why this exists).
+    var AS_REP = (function () {
+        var v = (new URLSearchParams(location.search).get('as') || '').toLowerCase().trim();
+        return (v === 'rep' || v === 'taneisha') ? 'taneisha' : (v === 'nika' ? 'nika' : '');
+    }());
+    function applyDegrade(payload) {
+        if (!DEGRADE.length) return payload;
+        var errors = {};
+        DEGRADE.forEach(function (k) {
+            if (k === 'trend' || k === 'sales') { payload.trend = null; errors.sales = 'stubbed failure'; }
+            if (k === 'quotes') {
+                payload.quoteConversion = null;
+                payload.counts.quotes = null;
+                payload.panels.quotes = null;
+                errors.quotes = 'stubbed failure';
+            }
+            // Simulates the CURRENTLY-DEPLOYED proxy: the fields simply don't exist yet, with
+            // NO entry in `errors`. The page must hide those pieces rather than report a
+            // failure — the app and the proxy deploy independently, so this is the real state
+            // of production between the two pushes.
+            if (k === 'old-proxy') {
+                delete payload.trend;
+                delete payload.quoteConversion;
+            }
+            if (k === 'empty-quotes') {                        // the REAL production shape today
+                payload.quoteConversion = {
+                    windowDays: 90, attributed: 0, quotedValue: 0, pushed: 0,
+                    pushedValue: 0, ratePct: null, staleCount: 0, staleValue: 0,
+                };
+                payload.counts.quotes = { openQuotes: 0, staleQuotes: 0 };
+                payload.panels.quotes = [];
+            }
+        });
+        if (Object.keys(errors).length) payload.errors = errors;
+        return payload;
     }
 
     var kitItems = [
@@ -1283,12 +1386,35 @@
             return json(Object.assign({ success: true }, EMB_BONUS, { reps: scoped, scope: 'rep' }));
         }
         if (u.indexOf('/api/crm-session/me') !== -1) {
+            // ?as=rep (or ?as=nika) stubs a NON-ADMIN rep session.
+            // This matters: the harness only ever stubbed Erik-as-admin, so the experience
+            // that actually ships to Nika and Taneisha had never been exercised here. Several
+            // behaviours are deliberately admin-suppressed — the view-as pill must be hidden,
+            // confetti must not fire, and the "since you last looked" baseline must not be
+            // written while an admin is looking over a rep's shoulder — and none of that is
+            // reachable from an admin session. Default stays admin so existing use is unchanged.
+            if (AS_REP) {
+                var who = AS_REP === 'nika' ? NIKA : REP;
+                return json({
+                    authenticated: true, name: who.fullName, firstName: who.firstName,
+                    email: who.email, permissions: [AS_REP === 'nika' ? 'nika' : 'taneisha'],
+                });
+            }
             return json({ authenticated: true, name: 'Erik Mickelson', firstName: 'Erik', email: 'erik@nwcustomapparel.com', permissions: ['admin', 'accountant', 'house', 'policies-admin', 'taneisha', 'nika'] });
         }
         if (u.indexOf('/api/crm-proxy/ae-dashboard/summary') !== -1) {
-            var m = u.match(/viewAs=([^&]+)/);
-            var email = m ? decodeURIComponent(m[1]) : REP.email;
-            return json(summaryFor(email === NIKA.email ? NIKA : REP));
+            // Mirror the server: identity comes from the SESSION, and ?viewAs= is honored only
+            // for an admin. A rep never sends viewAs, so keying off it alone made ?as=nika
+            // greet Taneisha — a harness that contradicts the real identity rules is how a
+            // real identity bug hides in plain sight.
+            var email;
+            if (AS_REP) {
+                email = AS_REP === 'nika' ? NIKA.email : REP.email;
+            } else {
+                var m = u.match(/viewAs=([^&]+)/);
+                email = m ? decodeURIComponent(m[1]) : REP.email;
+            }
+            return json(applyDegrade(summaryFor(email === NIKA.email ? NIKA : REP)));
         }
         if (u.indexOf('/api/crm-proxy/ae-dashboard/growth') !== -1) {
             return json({
@@ -1402,6 +1528,30 @@
         }
         if (u.indexOf('/api/art-notifications') !== -1) {
             return json({ notifications: [], serverTime: Date.now() });
+        }
+        // Wins → "Work that shipped". ?degrade=photos exercises the visible-error path, and
+        // ?degrade=empty-photos the zero-state, because a rep with no photos yet is the
+        // common case early on and that empty state has to read well.
+        if (u.indexOf('/api/staff/finished-photos/library') !== -1) {
+            if (DEGRADE.indexOf('photos') !== -1) return json({ error: 'Stubbed failure' }, 500);
+            if (DEGRADE.indexOf('empty-photos') !== -1) return json({ totalCount: 0, count: 0, photos: [] });
+            var shot = function (n, company, design) {
+                return {
+                    imageUrl: 'https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=' + n,
+                    companyName: company, designName: design, idOrder: 141000 + n,
+                };
+            };
+            return json({
+                totalCount: 37, count: 6, truncated: true,
+                photos: [
+                    shot(1, 'Boeing Employees Club', 'Left chest logo'),
+                    shot(2, 'Elfin Cove Lodge Sportfishing', 'Cap front'),
+                    shot(3, 'Archterra Landscape Service', 'Back print'),
+                    shot(4, 'CITC of Washington', 'Safety hoodie'),
+                    shot(5, 'Harbor Electric <b>xss</b>', 'Jacket back'),   // escaping probe
+                    shot(6, 'Puget Sound Marine', 'Polo left chest'),
+                ],
+            });
         }
         return realFetch.apply(window, arguments);
     };
