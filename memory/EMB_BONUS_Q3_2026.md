@@ -215,6 +215,57 @@ on the board traces to an order invoiced **before** the plan existed — Lobo Ro
 Robert The plumber 07-06, MG Car Club 07-08, Puyallup Tribal Housing 07-08, Tacoma
 Longshoremen 07-15, J&H Construction 07-16, GNW Excavation 07-17. Nothing needed backfilling.
 
+## 🔴 Online-store accounts are NOT eligible (Erik, 2026-07-26)
+
+*"InkSoft online stores — those companies don't get bonuses for Nika or Taneisha."* They already
+earn the Online Store commission; counting them here double-pays.
+
+**Detection is a UNION — the flag alone is not enough.** `Sales_Reps_2026.Inksoft_Store` catches
+only **11 of the 19 Hops N Drops locations** (Bonney Lake and Lacey are flagged `false` while
+ordering through the store monthly). Use `Inksoft_Store = true` **OR any type-31 order history` →
+19 of 19. Don't try to fix the flag: `Sales_Reps_2026` re-syncs from ShopWorks every 15 min and
+write-back is off the table. One predicate, `makeIsOnlineStore()`, feeds the ladder revenue, the
+bounties, the dormant list and all three target lists.
+
+⚠️ Type-21-only was ALWAYS true — InkSoft orders are type 31 and never counted. What leaked was a
+webstore **customer** placing a *direct* type-21 order. The fix is customer-level, not order-type.
+
+**Impact — Nika's book is ~45% webstore by embroidery revenue:**
+
+| | Excluded | Q3 2025 | 2026 Q1 | 2026 Q2 | Q3 to date |
+|---|---|---|---|---|---|
+| Nika | 144/468 | $191,269 → $105,605 | $230,720 → $124,494 | $147,879 → $83,884 | $53,849 → **$24,780** |
+| Taneisha | 276/861 | $72,520 → $50,438 | $138,705 → $111,885 | $86,610 → $66,194 | $18,404 → **$15,841** |
+
+It also removed one bounty-earning account from each rep. Percentage standing barely moved
+(numerator and denominator fall together), and the two books came out nearly level.
+
+## 💵 Mechanic: continuous rate, not a ladder (2026-07-26)
+
+> **$60 for every 1% above 85% of your goal. No ceiling.**
+
+Pro-rata on the **unrounded** percentage — half a point pays $30. The 4-rung ladder was replaced
+because between rungs extra effort earned **nothing**, and a rep who couldn't reach the next rung
+before quarter-end was rationally better off *deferring orders into next quarter*.
+
+🔑 **Per PERCENTAGE POINT, not per dollar.** A dollar rate would pay the bigger book 2.4× for the
+same achievement. Baseline-agnostic: 30 points pays $1,800 whatever the goal is.
+
+Rungs are kept in code and in Caspio as a **fallback** — zeroing `Rate_Per_Point` reverts the whole
+mechanic with no deploy.
+
+**Current config:** baselines **$104,189** (Nika) / **$89,039** (Taneisha) · bounties **$150** new /
+**$100** reactivated · rate **$60/pt above 85%** · kicker **$310K = $500 each**, **$340K = $1,000 each**.
+
+Nika's baseline is corroborated by her Q3-2025 eligible of $105,605 — two independent methods within
+1.3%. Taneisha's Q3-2025 ($50,438) is unusable; she took the book over 2025-08-12.
+
+**Team kicker measures ALL company embroidery** — every account and every person, webstores
+included. Deliberately wider than the individual bonus: company *eligible* Q3 embroidery is
+$186,214 against the two reps' combined baselines of $193,228, so an eligible-only kicker would
+just re-pay their own work. `loadCompanyEmbroidery()`, not the old all-order-types total.
+⚠️ This dropped the clean "$740,949 keeps $3M alive" arithmetic — that was all-order-types.
+
 ## 🗺 The roadmap — three ranked "who to call" lists (`/api/embroidery-bonus/targets`)
 
 The point of the bonus is a call list, not a scoreboard. Per rep, cheapest ask first:
