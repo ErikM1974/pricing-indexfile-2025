@@ -1,3 +1,7 @@
+## v2026.07.26.1 (2026.07.26)
+
+- Deploy v2026.07.26.1: 6 files (ae-mission-control.html,ae-mission-control.css,ae-mission-control.js,...)
+
 ## v2026.07.25.5 (2026.07.25)
 
 - Deploy v2026.07.25.5: 12 files (ACTIVE_FILES.md,ae-mission-control.html,ae-mission-control.css,...)
