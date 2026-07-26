@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
-    <link rel="stylesheet" href="/dashboards/css/embroidery-bonus-plan.css?v=2026.07.26.2">
+    <link rel="stylesheet" href="/dashboards/css/embroidery-bonus-plan.css?v=2026.07.26.11">
 </head>
 <body>
 
@@ -47,23 +47,24 @@
 
         <div class="ebp-cards">
             <div class="ebp-card ebp-card--accent">
-                <div class="ebp-amount">$150</div>
+                <div class="ebp-amount" data-ebp="bountyNew">&mdash;</div>
                 <h3>New embroidery program</h3>
                 <p>An account that has <strong>never</strong> embroidered with us — going back through
                 our full order history, including the old separate cap-embroidery orders.</p>
             </div>
             <div class="ebp-card">
-                <div class="ebp-amount">$100</div>
+                <div class="ebp-amount" data-ebp="bountyReact">&mdash;</div>
                 <h3>Won back</h3>
-                <p>An account that embroidered with us before but has been <strong>quiet for 12+
-                months</strong>, and has now come back.</p>
+                <p>An account that embroidered with us before but has been <strong>quiet for
+                <span data-ebp="dormancy">&mdash;</span>+ months</strong>, and has now come back.</p>
             </div>
         </div>
 
         <div class="ebp-note">
             <i class="fas fa-circle-info"></i>
             <div>
-                <strong>Each account counts once it reaches $1,000 of embroidery this quarter.</strong>
+                <strong>Each account counts once it reaches <span data-ebp="minAccount">&mdash;</span>
+                of embroidery this quarter.</strong>
                 Below that it hasn't qualified yet — which is why the dashboard shows you accounts
                 that are close, so you can nudge them over.
             </div>
@@ -93,34 +94,28 @@
         <h2><span class="ebp-num">2</span> Growth rate</h2>
         <p class="ebp-sub">On top of the bounties. No steps, no ceiling.</p>
 
-        <p class="ebp-math">Once you pass <strong>85%</strong> of your goal, you earn
-        <strong>$60</strong> for every <strong>1%</strong> you add.</p>
+        <p class="ebp-math">Once you pass <strong data-ebp="startPct">&mdash;</strong> of your goal, you earn
+        <strong data-ebp="perPoint">&mdash;</strong> for every <strong>1%</strong> you add.</p>
+
+        <div class="ebp-note ebp-note--warn" id="ebp-config-status" hidden>
+            <i class="fas fa-triangle-exclamation"></i>
+            <div id="ebp-config-status-msg"></div>
+        </div>
 
         <div class="ebp-table-wrap">
-            <table class="ebp-table">
-                <thead>
-                    <tr>
-                        <th>Where you finish</th>
-                        <th class="ebp-r">Rate pays</th>
-                        <th class="ebp-r">Nika<br><span class="ebp-th-sub">goal $104,189</span></th>
-                        <th class="ebp-r">Taneisha<br><span class="ebp-th-sub">goal $66,609</span></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr><td>85% — earning starts</td><td class="ebp-r ebp-pay">$0</td><td class="ebp-r">$88,561</td><td class="ebp-r">$56,618</td></tr>
-                    <tr><td>100% — at your goal</td><td class="ebp-r ebp-pay">$900</td><td class="ebp-r">$104,189</td><td class="ebp-r">$66,609</td></tr>
-                    <tr><td>115%</td><td class="ebp-r ebp-pay">$1,800</td><td class="ebp-r">$119,817</td><td class="ebp-r">$76,600</td></tr>
-                    <tr class="ebp-top"><td>130%</td><td class="ebp-r ebp-pay">$2,700</td><td class="ebp-r">$135,446</td><td class="ebp-r">$86,592</td></tr>
-                </tbody>
+            <table class="ebp-table" id="ebp-rate-table" hidden>
+                <thead><tr id="ebp-rate-head"></tr></thead>
+                <tbody id="ebp-rate-body"></tbody>
             </table>
         </div>
 
         <div class="ebp-note">
             <i class="fas fa-circle-info"></i>
             <div>
-                <strong>There are no dead spots.</strong> Every fraction of a percent above 85% pays —
-                half a point is $30. You are never in a position where the next order earns you
-                nothing, and there is no cap at the top.
+                <strong>There are no dead spots.</strong> Every fraction of a percent above
+                <span data-ebp="startPct">&mdash;</span> pays — half a point is
+                <span data-ebp="halfPoint">&mdash;</span>. You are never in a position where the next
+                order earns you nothing, and there is no cap at the top.
             </div>
         </div>
 
@@ -155,13 +150,13 @@
 
         <div class="ebp-cards">
             <div class="ebp-card">
-                <div class="ebp-amount">$500<span class="ebp-each">each</span></div>
-                <h3>Company Q3 embroidery hits $310,000</h3>
+                <div class="ebp-amount"><span data-ebp="kick1Pay">&mdash;</span><span class="ebp-each">each</span></div>
+                <h3>Company Q3 embroidery hits <span data-ebp="kick1Target">&mdash;</span></h3>
                 <p>Last year's Q3 came in at $298,155, so this is within reach of a normal quarter.</p>
             </div>
             <div class="ebp-card ebp-card--accent">
-                <div class="ebp-amount">$1,000<span class="ebp-each">each</span></div>
-                <h3>Company Q3 embroidery hits $340,000</h3>
+                <div class="ebp-amount"><span data-ebp="kick2Pay">&mdash;</span><span class="ebp-each">each</span></div>
+                <h3>Company Q3 embroidery hits <span data-ebp="kick2Target">&mdash;</span></h3>
                 <p>A genuine stretch — though Q3 2024 reached $380,036, so we've been there.</p>
             </div>
         </div>
@@ -222,5 +217,6 @@
     </footer>
 </main>
 
+<script src="/dashboards/js/embroidery-bonus-plan.js?v=2026.07.26.11"></script>
 </body>
 </html>

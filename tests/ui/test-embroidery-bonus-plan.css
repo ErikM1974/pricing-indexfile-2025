@@ -1,0 +1,14 @@
+/* Harness chrome only — the page under test brings its own stylesheet.
+ * External rather than inline because CLAUDE.md Rule 3 bans <style> content in HTML,
+ * and no other harness in tests/ui/ breaks it. */
+body { font-family: system-ui, sans-serif; margin: 0; padding: 16px; }
+.h-bar { display: flex; gap: 8px; align-items: center; margin-bottom: 14px; flex-wrap: wrap; }
+.h-bar button { padding: 6px 12px; cursor: pointer; }
+#h-result {
+    font: 13px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace;
+    white-space: pre;
+    background: #f4f4f4;
+    padding: 10px;
+    border-radius: 6px;
+    margin-top: 14px;
+}
