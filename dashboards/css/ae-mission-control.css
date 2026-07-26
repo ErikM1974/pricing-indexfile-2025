@@ -87,6 +87,21 @@
     transition: width 420ms ease;
 }
 
+/* Pace line — tells the rep whether a big raw gap is actually on track. */
+.aemc-bh-pace {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 6px;
+    padding: 3px 10px;
+    border-radius: var(--radius-pill, 999px);
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+.aemc-bh-pace[hidden] { display: none; }
+.aemc-bh-pace.is-onpace { background: rgba(255, 255, 255, 0.92); color: #22662a; }
+.aemc-bh-pace.is-behind { background: rgba(255, 255, 255, 0.18); color: #fff; border: 1px solid rgba(255, 255, 255, 0.45); }
+
 /* The goal in DOLLARS. A bare percentage with no denominator is unactionable. */
 .aemc-bh-goal {
     font-size: 0.82rem;
