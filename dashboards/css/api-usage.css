@@ -1,0 +1,225 @@
+/* ==========================================================================
+   api-usage.css — page-specific styles for dashboards/api-usage.html
+
+   Shell classes (.dash-header, .dash-back-link, .dash-stat-card, .dash-card,
+   .dash-error-banner) come from shared_components/css/dash-shell.css.
+   Design tokens (--surface-*, --gray-*, --shadow-*, --radius-*, --state-*,
+   --space-*) come from shared_components/css/art-hub.css.
+
+   Only page-specific styles here. Never redefine tokens, never hardcode
+   colors/shadows/radii.
+   ========================================================================== */
+
+/* --- Scope banner ------------------------------------------------------- */
+/* Deliberately prominent. The whole reason the 2026-07 overage went unnoticed
+   is that a confident-looking number was trusted without knowing its scope. */
+.au-scope {
+    display: flex;
+    gap: var(--space-3, 12px);
+    align-items: flex-start;
+    background: var(--surface-card);
+    border: 1px solid var(--gray-200);
+    border-left: 4px solid var(--state-info, var(--gray-400));
+    border-radius: var(--radius-lg);
+    padding: var(--space-4, 16px);
+    margin-bottom: var(--space-5, 20px);
+    box-shadow: var(--shadow-sm);
+    color: var(--gray-700);
+    line-height: 1.5;
+}
+
+.au-scope i {
+    color: var(--gray-400);
+    margin-top: 2px;
+}
+
+.au-path {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9em;
+    background: var(--gray-100);
+    border-radius: var(--radius-sm);
+    padding: 1px 6px;
+}
+
+.au-scope-mode {
+    margin-top: var(--space-2, 8px);
+    font-size: 0.875rem;
+    color: var(--gray-600);
+}
+
+.au-scope-mode--degraded {
+    color: var(--state-warning, var(--gray-700));
+    font-weight: 600;
+}
+
+/* --- Stat sublabels ----------------------------------------------------- */
+.au-sub {
+    display: block;
+    font-weight: 400;
+    color: var(--gray-400);
+    font-size: 0.8125rem;
+    margin-top: 2px;
+}
+
+/* --- Budget meter ------------------------------------------------------- */
+.au-meter {
+    background: var(--surface-card);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4, 16px);
+    margin-bottom: var(--space-5, 20px);
+    box-shadow: var(--shadow-sm);
+}
+
+.au-meter-track {
+    position: relative;
+    height: 14px;
+    background: var(--gray-100);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+
+.au-meter-fill {
+    height: 100%;
+    width: 0;
+    border-radius: var(--radius-sm);
+    background: var(--state-success, var(--gray-500));
+    transition: width 240ms ease;
+}
+
+.au-meter-fill--warn { background: var(--state-warning, var(--gray-600)); }
+.au-meter-fill--over { background: var(--state-danger); }
+
+/* The 100%-of-cap line, so "how close are we" is readable at a glance. */
+.au-meter-cap {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 100%;
+    width: 2px;
+    background: var(--gray-700);
+}
+
+.au-meter-caption {
+    margin-top: var(--space-2, 8px);
+    font-size: 0.875rem;
+    color: var(--gray-600);
+}
+
+/* --- Two-up card grid --------------------------------------------------- */
+.au-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: var(--space-4, 16px);
+    margin-bottom: var(--space-4, 16px);
+}
+
+.au-hint {
+    font-size: 0.8125rem;
+    color: var(--gray-400);
+    font-weight: 400;
+}
+
+/* --- Attribution rows --------------------------------------------------- */
+.au-rows {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2, 8px);
+}
+
+.au-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--space-2, 8px);
+    align-items: center;
+}
+
+.au-row-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8125rem;
+    color: var(--gray-700);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.au-row-count {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    color: var(--gray-800);
+}
+
+.au-row-share {
+    grid-column: 1 / -1;
+    height: 6px;
+    background: var(--gray-100);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+
+.au-row-share span {
+    display: block;
+    height: 100%;
+    background: var(--gray-400);
+    border-radius: var(--radius-sm);
+}
+
+/* A table taking a disproportionate share is the thing worth spotting. */
+.au-row--hot .au-row-share span { background: var(--state-danger); }
+.au-row--hot .au-row-count { color: var(--state-danger); }
+
+/* --- Daily trend -------------------------------------------------------- */
+.au-trend {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 120px;
+    padding-top: var(--space-2, 8px);
+}
+
+.au-bar {
+    flex: 1 1 0;
+    min-width: 4px;
+    background: var(--gray-300);
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    position: relative;
+}
+
+/* Over the daily budget — the bars that explain an overage. */
+.au-bar--over { background: var(--state-danger); }
+
+.au-trend-axis {
+    display: flex;
+    justify-content: space-between;
+    margin-top: var(--space-2, 8px);
+    font-size: 0.75rem;
+    color: var(--gray-400);
+}
+
+/* --- Empty / method chips ----------------------------------------------- */
+.au-empty {
+    color: var(--gray-500);
+    font-size: 0.9375rem;
+}
+
+.au-methods {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2, 8px);
+}
+
+.au-method {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    background: var(--gray-100);
+    border-radius: var(--radius-md);
+    padding: 6px 12px;
+    font-size: 0.875rem;
+    color: var(--gray-700);
+}
+
+.au-method b {
+    font-variant-numeric: tabular-nums;
+    color: var(--gray-900);
+}

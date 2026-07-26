@@ -14,7 +14,7 @@
 
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/bandit-integration.css?v=2026.07.21.1">
+    <link rel="stylesheet" href="/dashboards/css/bandit-integration.css?v=2026.07.26.1">
 </head>
 <body>
     <div class="dash-shell">
@@ -72,7 +72,7 @@
                         <tr><td>ShopWorks ODBC SalesReps Sync</td><td>ODBC <code>Cust</code></td><td><code>/sync-sales-reps</code></td><td>4 h</td><td>SYSTEM</td><td><span class="bi-ok">Live</span></td></tr>
                         <tr><td>ShopWorks ODBC Contacts Sync</td><td>ODBC (4 tables)</td><td><code>/sync-contacts</code></td><td>12 h</td><td>SYSTEM</td><td><span class="bi-ok">Live</span></td></tr>
                         <tr><td>Thumbnail Metadata Sync</td><td>ODBC <code>Thumbnails</code> (+ DesignLocations, Des)</td><td><code>/thumbnails/metadata-sync</code></td><td>30 min</td><td>SYSTEM</td><td><span class="bi-ok">Live</span></td></tr>
-                        <tr><td>Thumbnail Box Sync</td><td><code>\\NCA-FS01\Thumbnails</code></td><td><code>/thumbnails/upload-with-stub?target=box</code></td><td>20 min</td><td>SYSTEM</td><td><span class="bi-ok">Live</span></td></tr>
+                        <tr><td>Thumbnail Box Sync</td><td><code>\\NCA-FS01\Thumbnails</code></td><td><code>/thumbnails/upload-with-stub?target=box</code></td><td>20 min <span class="bi-off">→ 60 min pending</span></td><td>SYSTEM</td><td><span class="bi-ok">Live</span></td></tr>
                     </tbody>
                 </table>
                 </div>
@@ -80,6 +80,18 @@
                 <div class="bi-callout bi-callout--info">
                     <h4><i class="fas fa-triangle-exclamation"></i> Steady-state, not backfill — keep them from bursting together</h4>
                     <p>These are gentle now (deltas of a few rows/images per run). The one guard: don't let the metadata + image syncs fire a <b>large</b> batch at the exact same second (that's the per-second-limit trap). Steady-state overlap is fine; a future bulk re-load should be staggered or done via CSV import.</p>
+                </div>
+                <div class="bi-callout bi-callout--info">
+                    <h4><i class="fas fa-gauge-high"></i> Caspio quota: two changes pending on bandit (2026-07-26)</h4>
+                    <p>A <b>$358 Caspio overage</b> (689.8K calls against a 500K/period cap) traced ~24% of the entire quota to <b>one task</b>. Both changes below must be made <b>on the bandit box</b> — until then this table still reflects the old behaviour.</p>
+                    <ol class="bi-list">
+                        <li><b>Thumbnail Box Sync → 60 min.</b> Before it uploads anything, each run makes <b>two full scans</b> of the 27,613-row <code>Shopworks_Thumbnail_Report</code> (<code>/thumbnails/uploaded-ids</code> + <code>/thumbnails/all-ids</code>, ~28 Caspio pages each = <b>~56 calls per run</b>). The backfill is complete, so in steady state that is ~4,000 calls/day spent confirming nothing changed. At 60 min that drops to ~1,340/day.<br>
+                        <code>schtasks /Change /TN "\NWCA\Thumbnail Box Sync" /RI 60</code><br>
+                        <span class="bi-note">Trade-off: a brand-new thumbnail reaches Box/the portal in up to 60 min instead of 20.</span></li>
+                        <li><b>Re-copy the three updated agent scripts</b> from <code>caspio-pricing-proxy/scripts/bandit-agent/</code> to <code>C:\NWCA\odbc-sync\</code>: <code>sync-orders.ps1</code>, <code>sync-purchase-orders.ps1</code>, <code>sync-thumbnail-metadata.ps1</code>.</li>
+                    </ol>
+                    <p><b>⚠️ The overlap trap — do NOT "simplify" this back.</b> Order Sync and PO Sync run every <b>15</b> min but shared a <b>30</b>-min <code>OverlapMinutes</code>, so every changed row landed in 3 consecutive runs and the proxy PUTs unconditionally — each change written to Caspio ~3×. They now read their own <code>OrdersOverlapMinutes</code> (default <b>20</b> → 2 runs).<br>
+                    The shared <code>OverlapMinutes</code> stays at <b>30</b> because <b>Thumbnail Metadata Sync runs on a 30-minute cadence</b> — lowering the shared key to 20 would open a 10-minute window in which modified rows are <b>never seen again</b>. Rule: <b>overlap must always exceed (cadence + run duration + clock skew)</b>.</p>
                 </div>
             </section>
 
@@ -114,7 +126,7 @@
                         <tr><td>ShopWorks ODBC Designs Sync</td><td><code>sync-designs.ps1</code></td><td>4 h</td><td><code>sync-designs.log</code></td><td>Designs2026</td></tr>
                         <tr><td>ShopWorks ODBC SalesReps Sync</td><td><code>sync-sales-reps.ps1</code></td><td>4 h</td><td><code>sync-sales-reps.log</code></td><td>Sales_Reps_2026</td></tr>
                         <tr><td>Thumbnail Metadata Sync</td><td><code>sync-thumbnail-metadata.ps1</code></td><td>30 min</td><td><code>sync-thumbnail-metadata.log</code></td><td>Shopworks_Thumbnail_Report (rows)</td></tr>
-                        <tr><td>Thumbnail Box Sync</td><td><code>sync-thumbnails-to-box.ps1</code></td><td>20 min</td><td><code>sync-thumbnails-to-box.log</code></td><td>Shopworks_Thumbnail_Report (FileUrl)</td></tr>
+                        <tr><td>Thumbnail Box Sync</td><td><code>sync-thumbnails-to-box.ps1</code></td><td>20 min <span class="bi-off">→ 60 min pending</span></td><td><code>sync-thumbnails-to-box.log</code></td><td>Shopworks_Thumbnail_Report (FileUrl)</td></tr>
                     </tbody>
                 </table>
                 </div>

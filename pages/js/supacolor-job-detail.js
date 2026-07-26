@@ -19,6 +19,10 @@
         joblines: [],
         history: [],
         linkedTransfers: [],
+        // Distinguishes "this job has no linked transfers" from "the lookup broke".
+        // Before 2026-07-26 both collapsed to an empty array and a hidden card, so
+        // a failed lookup was indistinguishable from a genuine zero.
+        linkedTransfersError: null,
         pendingExtraction: null
     };
 
@@ -104,24 +108,29 @@
         return data;
     }
 
+    /**
+     * Transfers linked to a Supacolor job.
+     *
+     * Rewritten 2026-07-26 (Caspio quota + a silent wrong answer). This used to
+     * build a `q.where` URL into a variable it never used, then fetch
+     * `/api/transfer-orders?pageSize=500` with NO filter — a full-table read of up
+     * to 20 pages / 10,000 rows on every job-detail view — and match client-side.
+     * Two problems: the obvious quota cost, and a row that fell past the page cap
+     * made this return [] so the panel rendered "no linked transfers" as though
+     * that were a fact. `supacolorOrderNumber` is now a real server-side filter.
+     *
+     * Throws on failure rather than returning [] — the caller distinguishes
+     * "none linked" from "lookup broke" (Rule 4: never present an error as data).
+     */
     async function fetchLinkedTransfers(jobNumber) {
         if (!jobNumber) return [];
-        try {
-            var url = API_BASE + '/api/transfer-orders?pageSize=50&q.where=' +
-                encodeURIComponent("Supacolor_Order_Number='" + jobNumber.replace(/'/g, "''") + "'");
-            // The transfer-orders route uses companyName/etc as filter shortcuts, not q.where.
-            // Instead we filter client-side by fetching all and matching — fast enough.
-            var resp = await fetch(API_BASE + '/api/transfer-orders?pageSize=500');
-            if (!resp.ok) return [];
-            var data = await resp.json();
-            if (!data.success) return [];
-            return (data.records || []).filter(function (t) {
-                return t.Supacolor_Order_Number && String(t.Supacolor_Order_Number) === String(jobNumber);
-            });
-        } catch (e) {
-            console.warn('Linked-transfer lookup failed:', e);
-            return [];
-        }
+        var url = API_BASE + '/api/transfer-orders?supacolorOrderNumber=' +
+            encodeURIComponent(jobNumber);
+        var resp = await fetch(url);
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        var data = await resp.json();
+        if (!data.success) throw new Error(data.error || 'Linked-transfer lookup failed');
+        return data.records || [];
     }
 
     async function extractJobDetail(base64Image) {
@@ -435,6 +444,23 @@
 
     function renderLinkedTransfers() {
         var transfers = state.linkedTransfers || [];
+
+        // A broken lookup must never look like "no linked transfers" — surface it
+        // so the user knows the panel is unreliable rather than empty (Rule 4).
+        if (state.linkedTransfersError) {
+            $('sjd-linked-card').style.display = '';
+            $('sjd-linked-list').innerHTML =
+                '<div class="sjd-linked-item" role="alert">' +
+                    '<i class="fas fa-triangle-exclamation" style="color:#c0392b;"></i>' +
+                    '<div class="sjd-linked-info">' +
+                        '<div class="sjd-linked-design">Couldn’t load linked transfers</div>' +
+                        '<div class="sjd-linked-company">' + escapeHtml(state.linkedTransfersError) +
+                        ' — refresh to retry. This job may still have transfers.</div>' +
+                    '</div>' +
+                '</div>';
+            return;
+        }
+
         if (transfers.length === 0) {
             $('sjd-linked-card').style.display = 'none';
             return;
@@ -990,6 +1016,12 @@
             // Linked transfers in background
             fetchLinkedTransfers(state.job.Supacolor_Job_Number).then(function (linked) {
                 state.linkedTransfers = linked;
+                state.linkedTransfersError = null;
+                renderLinkedTransfers();
+            }).catch(function (err) {
+                console.error('Linked-transfer lookup failed:', err);
+                state.linkedTransfers = [];
+                state.linkedTransfersError = err.message || 'lookup failed';
                 renderLinkedTransfers();
             });
         } catch (err) {

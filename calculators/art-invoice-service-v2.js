@@ -205,6 +205,9 @@ class ArtInvoiceServiceV2 {
             // Add filters
             if (filters.pk_id) queryParams.append('pk_id', filters.pk_id);
             if (filters.id_design) queryParams.append('id_design', filters.id_design);
+            // Batch form — resolves many design numbers in ONE request/Caspio read.
+            // Prefer this over looping getArtRequests({id_design}) per id.
+            if (filters.id_designs) queryParams.append('id_designs', filters.id_designs);
             if (filters.status) queryParams.append('status', filters.status);
             if (filters.companyName) queryParams.append('companyName', filters.companyName);
             if (filters.customerServiceRep) queryParams.append('customerServiceRep', filters.customerServiceRep);
@@ -234,7 +237,50 @@ class ArtInvoiceServiceV2 {
             return [];
         }
     }
-    
+
+    /**
+     * Resolve MANY design numbers in one round trip.
+     *
+     * Replaces the per-id fan-out (2026-07-26 Caspio quota reduction): the Art
+     * Invoices dashboard used to issue one /api/artrequests request per design id,
+     * and that route has no server-side cache, so ~100 designs on screen cost ~100
+     * Caspio reads — repeated every 5 minutes by an unguarded auto-refresh.
+     *
+     * Rows come back in the route's default `Date_Created DESC` order, so the
+     * FIRST row for a given ID_Design is its most recent art request — the same
+     * record the old per-id `limit: 1` call returned.
+     *
+     * Chunked at 50 (the API caps a single request at 200) with limit=1000, so
+     * even 20 revisions per design fits in one response — the route's default
+     * limit is only 100, which would silently truncate a batch. Chunks run in
+     * parallel; a failed chunk yields no rows rather than poisoning the batch.
+     *
+     * @param {Array<number|string>} designIds
+     * @returns {Promise<Array>} flat array of ArtRequests rows, newest first
+     */
+    async getArtRequestsBatch(designIds) {
+        const ids = [...new Set(
+            (designIds || [])
+                .map(id => parseInt(id, 10))
+                .filter(id => Number.isInteger(id) && id > 0)
+        )];
+        if (ids.length === 0) return [];
+
+        const CHUNK = 50;
+        const chunks = [];
+        for (let i = 0; i < ids.length; i += CHUNK) {
+            chunks.push(ids.slice(i, i + CHUNK));
+        }
+
+        const results = await Promise.all(
+            chunks.map(chunk => this.getArtRequests({
+                id_designs: chunk.join(','),
+                limit: 1000
+            }))
+        );
+        return results.flat();
+    }
+
     // Get single art request
     async getArtRequest(id) {
         try {

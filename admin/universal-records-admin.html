@@ -719,8 +719,24 @@
             }
 
             initializeEventListeners() {
-                // Auto-refresh every 5 minutes
-                setInterval(() => this.loadInitialData(), 5 * 60 * 1000);
+                // Auto-refresh every 5 minutes, but ONLY while the tab is visible.
+                //
+                // This page fetches EVERY quote session with no filter, which the
+                // proxy cannot cache (its cache is keyed on the WHERE clause, and
+                // there isn't one) — so each refresh is a full multi-page Caspio
+                // scan. Left open in a background tab it burned 288 of those a day
+                // against nobody. The query stays unfiltered on purpose: this is
+                // the admin's find-any-record view, and a date window would hide
+                // older records from it. (2026-07-26 Caspio quota reduction)
+                setInterval(() => {
+                    if (document.hidden) return;
+                    this.loadInitialData();
+                }, 5 * 60 * 1000);
+
+                // Refresh on return so a backgrounded tab isn't showing stale rows.
+                document.addEventListener('visibilitychange', () => {
+                    if (!document.hidden) this.loadInitialData();
+                });
                 
                 // Filter change listeners
                 document.getElementById('quoteTypeFilter').addEventListener('change', () => this.applyFilters());

@@ -3458,6 +3458,17 @@ app.all('/api/crm-proxy/policy-comments*', ...createCrmProxy('policy-comments', 
 // Staff_Page_Access on the proxy). requireCrmRole(['admin']) + the proxy's secret gate.
 app.all('/api/crm-proxy/admin-rbac*', ...createCrmProxy('admin-rbac', ['admin']));
 
+// Caspio call meter + quota pacing — ADMIN ONLY. Powers /dashboards/api-usage.html.
+// Upstream (/api/admin/metrics, /api/admin/usage) is requireCrmApiSecret-gated, so the
+// browser MUST come through here — the secret never reaches the client.
+//
+// ⚠️ The path segment must MATCH upstream. createCrmProxy derives the target by
+// string-replacing the endpoint name out of req.originalUrl, so a prettier alias
+// like 'admin-metrics' would build /api/admin-metrics (404) and fail to strip the
+// prefix, mangling the query string.
+app.all('/api/crm-proxy/admin/metrics*', ...createCrmProxy('admin/metrics', ['admin']));
+app.all('/api/crm-proxy/admin/usage*', ...createCrmProxy('admin/usage', ['admin']));
+
 // Customer Portal admin — CRUD on the Customer_Portal_Access invite registry. Powers the
 // "Customer Portals" staff console. Role-gated (the management team) + the proxy's secret.
 app.all('/api/crm-proxy/customer-portal-access*', ...createCrmProxy('customer-portal-access', PORTAL_ADMIN_ROLES));
@@ -12725,9 +12736,14 @@ app.post('/api/quote-sessions/bulk-sync-from-shopworks', async (req, res) => {
     // cleanly support date-range comparisons via this proxy path, so we
     // pull all Processed rows + filter by date client-side. There are
     // typically <500 Processed quotes total at any time.
-    // Caspio proxy GET /quote_sessions accepts q.where for filtering.
-    // (The `filter=` param ONLY works for QuoteID lookups; for arbitrary
-    // field filters use Caspio's native q.where syntax.)
+    //
+    // ⚠️ 2026-07-26: this used to send `?q.where=...&q.pageSize=1000`, and the
+    // comment here claimed the proxy honoured q.where. IT NEVER DID — the proxy's
+    // GET /api/quote_sessions only reads named params, so q.where was silently
+    // dropped and every hourly run fell through to a full, uncached, UNORDERED
+    // scan of Quote_Sessions (up to 20 pages, silently truncating at the cap).
+    // Use the named `syncCandidates=true` filter, which encodes the exact
+    // predicate below server-side and is cacheable.
     //
     // Cron pickup criteria (2026-05-23): we sync rows that are EITHER
     //   • Status='Processed' (DTG OF flow) OR
@@ -12745,7 +12761,7 @@ app.post('/api/quote-sessions/bulk-sync-from-shopworks', async (req, res) => {
     // counts from Last_Synced). The purge pass below still handles them.
     let sessions;
     try {
-      sessions = await makeApiRequest(`/quote_sessions?q.where=${encodeURIComponent("(Status='Processed' OR PushedToShopWorks IS NOT NULL) AND Status<>'Cancelled_in_ShopWorks'")}&q.pageSize=1000`);
+      sessions = await makeApiRequest('/quote_sessions?syncCandidates=true');
     } catch (e) {
       return res.status(500).json({ success: false, error: 'Caspio fetch failed', details: e.message });
     }
@@ -12851,7 +12867,9 @@ app.post('/api/quote-sessions/bulk-sync-from-shopworks', async (req, res) => {
     const runPurgePass = fullSync || new Date().getUTCHours() === 6;
     if (!dryRun && runPurgePass) {
       try {
-        const cancelled = await makeApiRequest(`/quote_sessions?q.where=${encodeURIComponent("Status='Cancelled_in_ShopWorks'")}&q.pageSize=1000`);
+        // Named filter, not q.where — the proxy silently ignored q.where here too
+        // (see the bulk-sync note above) and now rejects it outright.
+        const cancelled = await makeApiRequest('/quote_sessions?cancelledInShopWorks=true');
         if (Array.isArray(cancelled) && cancelled.length > 0) {
           const purgeBeforeMs = Date.now() - PURGE_RETENTION_DAYS * 24 * 60 * 60 * 1000;
           const purgeList = cancelled.filter(s => {
@@ -13051,14 +13069,13 @@ app.post('/api/quote-sessions/bulk-sync-shipstation-tracking', async (req, res) 
     const daysBack = Math.min(Math.max(Number(req.body?.daysBack) || 30, 1), 90);
     const dryRun = req.body?.dryRun === true || req.query?.dryRun === '1';
 
-    // 1. Pull candidates from Caspio. Filter syntax: ShipStation_Order_ID
-    // is a Number column, so > 0 ensures it's set (NOT NULL would also work
-    // but Caspio's WHERE accepts > 0).
+    // 1. Pull candidates from Caspio via the named `shipstationPending` filter
+    // (ShipStation_Order_ID is a Number column, so the server-side predicate uses
+    // > 0 to mean "set"). This previously sent q.where, which the proxy silently
+    // ignored — see the note on bulk-sync-from-shopworks above.
     let sessions;
     try {
-      sessions = await makeApiRequest(
-        `/quote_sessions?q.where=${encodeURIComponent("ShipStation_Order_ID > 0 AND (ShipStation_Status IS NULL OR ShipStation_Status <> 'shipped')")}&q.pageSize=500`
-      );
+      sessions = await makeApiRequest('/quote_sessions?shipstationPending=true');
     } catch (e) {
       return res.status(500).json({ success: false, error: 'Caspio fetch failed', details: e.message });
     }

@@ -1309,8 +1309,19 @@
             // Load invoices
             loadInvoices();
             
-            // Auto-refresh every 5 minutes
-            setInterval(loadInvoices, 5 * 60 * 1000);
+            // Auto-refresh every 5 minutes — but ONLY while the tab is visible.
+            // Without this guard a dashboard left open overnight kept refreshing
+            // 288 times a day against nobody (2026-07-26 Caspio quota reduction).
+            // Same shape as dashboards/js/supacolor-orders.js.
+            setInterval(function () {
+                if (document.hidden) return;
+                loadInvoices();
+            }, 5 * 60 * 1000);
+
+            // Refresh once on return so a backgrounded tab isn't showing stale data.
+            document.addEventListener('visibilitychange', function () {
+                if (!document.hidden) loadInvoices();
+            });
             
             // Check for overdue invoices
             checkOverdueInvoices();
@@ -1385,51 +1396,24 @@
                 
                 console.log(`[Art Invoices] Loading art requests for ${designIds.length} design IDs`);
                 
-                // Batch fetch art requests in chunks of 10 to reduce API calls
-                const batchSize = 10;
-                const batches = [];
-                
-                for (let i = 0; i < designIds.length; i += batchSize) {
-                    batches.push(designIds.slice(i, i + batchSize));
-                }
-                
-                // Process batches concurrently for faster loading
-                const batchPromises = batches.map(async (batch) => {
-                    try {
-                        // Create promises for each ID in the batch
-                        const requests = await Promise.all(
-                            batch.map(async (designId) => {
-                                try {
-                                    const artRequests = await invoiceService.getArtRequests({
-                                        id_design: designId,
-                                        limit: 1
-                                    });
-                                    
-                                    if (artRequests.length > 0) {
-                                        return { designId, request: artRequests[0] };
-                                    }
-                                    return null;
-                                } catch (error) {
-                                    console.error(`Error loading art request for design ${designId}:`, error);
-                                    return null;
-                                }
-                            })
-                        );
-                        
-                        // Process successful requests
-                        requests.forEach(result => {
-                            if (result) {
-                                artRequestsMap.set(result.designId.toString(), result.request);
-                            }
-                        });
-                    } catch (error) {
-                        console.error('Error processing batch:', error);
+                // ONE request per 50 designs, not one per design (2026-07-26 Caspio
+                // quota reduction). The previous "batches of 10" only chunked
+                // CONCURRENCY — it still issued a separate /api/artrequests call per
+                // design id, and that route has no server-side cache, so ~100
+                // designs = ~100 Caspio reads. Repeated by the 5-minute auto-refresh
+                // below, that was thousands of calls a day from a single open tab.
+                const rows = await invoiceService.getArtRequestsBatch(designIds);
+
+                // Rows arrive newest-first (Date_Created DESC), so the first row we
+                // see for a design is its most recent art request — same record the
+                // old per-id `limit: 1` call returned.
+                rows.forEach(row => {
+                    const key = row?.ID_Design != null ? row.ID_Design.toString() : null;
+                    if (key && !artRequestsMap.has(key)) {
+                        artRequestsMap.set(key, row);
                     }
                 });
-                
-                // Wait for all batches to complete
-                await Promise.all(batchPromises);
-                
+
                 console.log(`[Art Invoices] Successfully loaded ${artRequestsMap.size} art requests with artwork data`);
                 
                 // Log summary of artwork found

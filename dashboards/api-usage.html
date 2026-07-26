@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>API Usage - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- 2026 design tokens (must load before dash-shell.css) -->
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css">
+    <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
+    <link rel="stylesheet" href="/dashboards/css/api-usage.css?v=2026.07.26.1">
+</head>
+<body>
+    <div class="dash-shell">
+        <header class="dash-header">
+            <div class="dash-header-left">
+                <a href="/staff-dashboard.html" title="Back to Staff Dashboard">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                         alt="Northwest Custom Apparel" class="dash-header-logo">
+                </a>
+                <h1 class="dash-header-title">API Usage</h1>
+            </div>
+            <div class="dash-header-right">
+                <button type="button" class="dash-back-link" id="au-refresh">
+                    <i class="fas fa-rotate"></i>
+                    Refresh
+                </button>
+                <a href="/staff-dashboard.html" class="dash-back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    Dashboard
+                </a>
+            </div>
+        </header>
+
+        <main class="dash-content">
+            <div class="dash-error-banner" role="alert">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span class="dash-error-banner-message"></span>
+                <button class="dash-error-banner-close" aria-label="Dismiss">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- What this page is, and what it is NOT. Caspio's own billing page is
+                 the authority on the billed total; this page exists to answer the
+                 question Caspio cannot: WHICH table is burning the calls. -->
+            <div class="au-scope" id="au-scope">
+                <i class="fas fa-circle-info" aria-hidden="true"></i>
+                <div>
+                    <strong>This page attributes calls; it does not bill them.</strong>
+                    For the authoritative period total go to
+                    <span class="au-path">Caspio → Plan and billing → Usage</span>.
+                    What you get here is the breakdown Caspio doesn't show:
+                    which tables and endpoints the calls came from.
+                    <div class="au-scope-mode" id="au-mode">Checking data source…</div>
+                </div>
+            </div>
+
+            <div class="dash-stat-grid">
+                <div class="dash-stat-card dash-stat-card--accent">
+                    <div class="dash-stat-value" id="au-projected">—</div>
+                    <div class="dash-stat-label">Projected this period <span class="au-sub">/ 500,000 cap</span></div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value" id="au-period-to-date">—</div>
+                    <div class="dash-stat-label">Calls so far <span class="au-sub" id="au-period-label"></span></div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value" id="au-budget">—</div>
+                    <div class="dash-stat-label">Daily budget <span class="au-sub">to stay under the cap</span></div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value" id="au-overage">—</div>
+                    <div class="dash-stat-label">Projected overage <span class="au-sub">at $0.002 / call</span></div>
+                </div>
+            </div>
+
+            <div class="au-meter" id="au-meter-wrap">
+                <div class="au-meter-track">
+                    <div class="au-meter-fill" id="au-meter-fill"></div>
+                    <div class="au-meter-cap" title="500,000 cap"></div>
+                </div>
+                <div class="au-meter-caption" id="au-meter-caption"></div>
+            </div>
+
+            <div class="au-grid">
+                <div class="dash-card">
+                    <div class="dash-card-header">
+                        <h2 class="dash-card-title">Top tables</h2>
+                        <span class="au-hint">The number Caspio can't give you</span>
+                    </div>
+                    <div id="au-tables" class="dash-loading">Loading…</div>
+                </div>
+
+                <div class="dash-card">
+                    <div class="dash-card-header">
+                        <h2 class="dash-card-title">Top endpoints</h2>
+                        <span class="au-hint">Caspio resource paths</span>
+                    </div>
+                    <div id="au-endpoints" class="dash-loading">Loading…</div>
+                </div>
+            </div>
+
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title">Calls by method</h2>
+                    <span class="au-hint">Distinguishes a read storm from a write storm</span>
+                </div>
+                <div id="au-methods" class="dash-loading">Loading…</div>
+            </div>
+
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title">Daily trend</h2>
+                    <span class="au-hint" id="au-trend-hint"></span>
+                </div>
+                <div id="au-trend" class="dash-loading">Loading…</div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Load order matters: APP_CONFIG → fetch-timeout → DashPage → page controller -->
+    <script src="/config/app.config.js"></script>
+    <script src="/shared_components/js/fetch-timeout.js"></script>
+    <script src="/shared_components/js/dash-page-helpers.js"></script>
+    <script src="/dashboards/js/api-usage.js?v=2026.07.26.1"></script>
+</body>
+</html>

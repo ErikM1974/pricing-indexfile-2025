@@ -95,6 +95,37 @@ ODBC does NOT do: images/attachments (Box/mockup flows unaffected), writes (keep
 - **⏳ ERIK**: add Heroku Scheduler entry hitting `POST /api/shopworks-odbc/po-health/alert` every ~30 min (Slack DM on stale) — like the order sync's health check. Parallel-runs with legacy daily "Purchase Orders Export" CSV; retire that CSV after a trust window.
 - **KEY DATA FINDING 2026-07-17**: all 7 of today's SanMar POs (Shio Sushi 113664, Chris Holstrom 113651/113660, etc.) = `sts_Received=0`/`date_Received=NULL` in ShopWorks, none modified today → the **PO-receiving count-in was never recorded in ShopWorks** (despite Ruthie saying received). Feature is correct; they'll drop within 15 min once Mikalah receives the PO in ShopWorks. ⚠ ALSO NOTED (separate, unconfirmed): dashboard shows Shio Sushi=WO 142238 but ShopWorks PO 113664→id_Order **142449** (SanMar_Orders vs PurchaseOrders WO-link disagree) — possible matching bug, investigate.
 
+## 💵 Caspio quota: bandit cadence + overlap changes (2026-07-26, $358 overage)
+
+Caspio invoice AI-334269 billed **178,874 calls over the 500K/period cap** at
+$0.002/call. **~24% of the entire quota traced to one bandit task.**
+
+- **Thumbnail Box Sync 20 min → 60 min.** Before uploading anything each run makes
+  **two full scans** of the 27,613-row `Shopworks_Thumbnail_Report` —
+  `/thumbnails/uploaded-ids` + `/thumbnails/all-ids`, both `{maxPages:100}`, ~28
+  Caspio pages each = **~56 calls/run**. Backfill is complete so steady-state
+  pending is 0: ~4,000 calls/day to learn nothing changed. 72 runs/day → 24 saves
+  **~2,690/day**. `schtasks /Change /TN "\NWCA\Thumbnail Box Sync" /RI 60`.
+  Trade-off: a new thumbnail reaches Box/portal in ≤60 min instead of ≤20.
+- **🔴 `OrdersOverlapMinutes` — the shared-key trap.** Order + PO sync run every
+  **15** min but shared `OverlapMinutes: 30`, and `shopworks-odbc-sync.js` PUTs
+  **unconditionally**, so each changed row was written to Caspio ~**3×**
+  (`floor(overlap/cadence)+1`). They now read their **own** `OrdersOverlapMinutes`
+  (default **20** → 2×) and deliberately do NOT fall back to the shared key.
+  **The shared `OverlapMinutes` MUST stay 30** because `sync-thumbnail-metadata.ps1`
+  runs on a **30-minute** cadence — lowering it to 20 opens a 10-minute window in
+  which modified rows are **never seen again** (silent data loss).
+  **Rule: overlap must always exceed (cadence + run duration + clock skew).**
+  Thumbnail-metadata also gained a `ThumbMetaOverlapMinutes` override; it sits at
+  overlap 30 / cadence 30 = **zero slack**, left as-is because any value >30 doubles
+  its writes. Raise to ~45 only if rows are observed going missing.
+- **⏳ ERIK (not applied — bandit is not reachable from the workstation)**: run the
+  `schtasks` line above, and re-copy `sync-orders.ps1`, `sync-purchase-orders.ps1`,
+  `sync-thumbnail-metadata.ps1` from `caspio-pricing-proxy/scripts/bandit-agent/`
+  to `C:\NWCA\odbc-sync\`. Until then the ~2,690/day saving is NOT live.
+- Living doc `/dashboards/bandit-integration.html` carries the same note and shows
+  the cadence as "20 min → 60 min pending" until the change is made on the box.
+
 ## ✅ Bandit tasks hardened + organized 2026-07-18 (all SYSTEM, \NWCA folder, verified)
 
 - **All 7 NWCA tasks moved into a `\NWCA` Task Scheduler folder** (via `schtasks /Query /XML` → `cmd` redirect → `/Create /TN "\NWCA\..." /XML` → `/Delete` old; the PS-captured XML mangles the encoding — must redirect through cmd). Names dropped the `NWCA ` prefix (folder provides it). Root is clean.

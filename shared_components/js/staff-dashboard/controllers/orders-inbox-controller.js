@@ -57,7 +57,11 @@ function emptyRow(text) {
 
 /* ── Orders Inbox ───────────────────────────────────── */
 
-async function loadOrdersInbox() {
+/**
+ * @param {boolean} [forceRefresh] bypass the proxy's 5-minute quote_sessions
+ *   cache. Only the explicit "refresh" action should pass true — see below.
+ */
+async function loadOrdersInbox(forceRefresh = false) {
     const paidList = document.getElementById('inboxPaidList');
     const acceptedList = document.getElementById('inboxAcceptedList');
     const alerts = document.getElementById('ordersInboxAlerts');
@@ -70,8 +74,14 @@ async function loadOrdersInbox() {
         // 30-day createdAfter window (proxy-side WHERE): UpdatedAt isn't
         // maintained on quote_sessions, so a quote accepted THIS week may have
         // been created weeks ago — fetch wide, filter narrow client-side.
+        //
+        // refresh=true used to be hardcoded here, so EVERY dashboard open/reload
+        // skipped the proxy's 5-minute cache and forced a fresh multi-page
+        // Quote_Sessions read. It is now opt-in, and only the explicit refresh
+        // action passes it. (2026-07-26 Caspio quota reduction)
         rows = await dashboardFetchJson(
-            `${apiBaseUrl}/quote_sessions?createdAfter=${ymdDaysAgo(30)}&refresh=true`);
+            `${apiBaseUrl}/quote_sessions?createdAfter=${ymdDaysAgo(30)}` +
+            (forceRefresh ? '&refresh=true' : ''));
     } catch (err) {
         console.error('[OrdersInbox] load failed:', err);
         errorCard('ordersInboxAlerts', 'Couldn’t load the orders inbox',
@@ -146,7 +156,8 @@ async function loadOrdersInbox() {
 }
 
 export function initOrdersInbox() {
-    events.register('orders-inbox:refresh', () => loadOrdersInbox());
+    // Explicit user refresh bypasses the cache; the initial load does not.
+    events.register('orders-inbox:refresh', () => loadOrdersInbox(true));
     loadOrdersInbox();
 }
 

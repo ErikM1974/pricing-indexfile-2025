@@ -1,0 +1,23 @@
+/* Harness chrome for test-api-usage.html — the scenario switcher bar only.
+   Deliberately separate from api-usage.css so nothing here can mask a real
+   styling bug on the production page. */
+
+.th-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3, 12px);
+    padding: var(--space-3, 12px) var(--space-4, 16px);
+    background: var(--gray-900, #111827);
+    color: var(--gray-100, #f3f4f6);
+    font-size: 0.875rem;
+}
+
+.th-bar a {
+    color: var(--gray-100, #f3f4f6);
+    text-decoration: underline;
+}
+
+.th-bar a:hover {
+    color: #fff;
+}
