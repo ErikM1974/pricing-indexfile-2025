@@ -638,13 +638,30 @@
         var top = rungs.length ? rungs[rungs.length - 1] : null;
         var amount = el('mc-condensed-amount'), next = el('mc-condensed-next'), fill = el('mc-condensed-fill');
         if (amount) amount.textContent = money2(mine.totalBonus) + ' Q3 bonus';
+
+        // ⚠️ On the rate path `rungs` is EMPTY and `nextRung` is null, so the old rung-only
+        // reading of this bar told a rep at 17.8% of goal that she had "every rung cleared"
+        // and left the fill at zero width. This bar is sticky — it is the one piece of the
+        // bonus always on screen — so a false congratulation here is the worst place for one.
+        // Same 130% display ceiling as the hero, so both read off the same axis.
+        var RATE_CEILING_PCT = 130;
+        var axisMax = l.rate
+            ? (l.baseline * RATE_CEILING_PCT / 100)
+            : (top && top.threshold ? top.threshold : 0);
+
         if (next) {
-            next.textContent = l.nextRung
-                ? money0(l.amountToNextRung) + ' more → ' + money2(l.nextRung.pay)
-                : 'every rung cleared';
+            if (l.rate) {
+                next.textContent = l.rate.payout > 0
+                    ? money2(l.rate.payout) + ' on the rate · ' + money2(l.rate.perPoint) + ' per 1%'
+                    : money0(Math.max(0, l.rate.revenueAtStart - l.revenue)) + ' more to start earning';
+            } else {
+                next.textContent = l.nextRung
+                    ? money0(l.amountToNextRung) + ' more → ' + money2(l.nextRung.pay)
+                    : 'every rung cleared';
+            }
         }
-        if (fill && top && top.threshold) {
-            fill.style.width = Math.max(0, Math.min((l.revenue / top.threshold) * 100, 100)).toFixed(1) + '%';
+        if (fill && axisMax) {
+            fill.style.width = Math.max(0, Math.min((l.revenue / axisMax) * 100, 100)).toFixed(1) + '%';
         }
     }
 
@@ -715,6 +732,10 @@
         var quarter = 'q' + (mine.quarter || '3') + '-' + (mine.year || new Date().getFullYear());
         var keys = [];
         if (l.rungReached) keys.push(quarter + ':rung-' + l.rungReached.threshold);
+        // The rate has no rungs, so without this the biggest moment in the quarter — the point
+        // where every further order starts paying — would pass with no acknowledgement at all.
+        // Fires once, on the crossing, not on every load above it (the seen-key handles that).
+        if (l.rate && l.rate.payout > 0) keys.push(quarter + ':rate-on');
         (acc.reactivated || []).forEach(function (a) { keys.push(quarter + ':wonback-' + a.idCustomer); });
         (acc['new'] || []).forEach(function (a) { keys.push(quarter + ':newprogram-' + a.idCustomer); });
 
@@ -731,7 +752,10 @@
         // One fire per load, and always with a line saying WHAT happened — confetti with no
         // explanation is just noise.
         var first = fresh[0];
-        var msg = first.indexOf(':rung-') !== -1
+        var msg = first.indexOf(':rate-on') !== -1
+            ? 'You passed ' + ((l.rate && l.rate.startPct) || 85) + '% — every 1% from here pays '
+              + money2((l.rate && l.rate.perPoint) || 0) + '.'
+            : first.indexOf(':rung-') !== -1
             ? 'New rung cleared — ' + money2((l.rungReached && l.rungReached.pay) || 0) + ' locked in.'
             : (first.indexOf(':wonback-') !== -1 ? 'You won an account back. Bounty earned.'
                                                  : 'First embroidery program on a new account. Nice.');
@@ -1662,9 +1686,21 @@
                 '<strong>' + c.n + '</strong> ' + esc(c.label) +
                 '<span class="aemc-bh-chip-rate">' + money2(c.each) + ' ea</span></span>';
         });
-        chips.push('<span class="aemc-bh-chip' + (l.rungReached ? ' is-on' : '') + '">' +
+        // The third chip mirrors the mechanic that is actually live. On the rate path
+        // `rungReached` is always null, so reading it here rendered a permanent "no rung yet" —
+        // naming a ladder the plan no longer has, and still saying it once a rep was earning.
+        var goalSub;
+        if (l.rate) {
+            goalSub = l.rate.payout > 0
+                ? money2(l.rate.payout) + ' earned'
+                : 'earning starts at ' + l.rate.startPct + '%';
+        } else {
+            goalSub = l.rungReached ? money2(l.rungReached.pay) + ' earned' : 'no rung yet';
+        }
+        var goalOn = l.rate ? l.rate.payout > 0 : !!l.rungReached;
+        chips.push('<span class="aemc-bh-chip' + (goalOn ? ' is-on' : '') + '">' +
             '<strong>' + (l.pctOfBaseline || 0) + '%</strong> of your goal' +
-            '<span class="aemc-bh-chip-rate">' + (l.rungReached ? money2(l.rungReached.pay) + ' earned' : 'no rung yet') + '</span></span>');
+            '<span class="aemc-bh-chip-rate">' + esc(goalSub) + '</span></span>');
         el('aemc-bh-chips').innerHTML = chips.join('');
 
         var fb = el('aemc-bh-fallback');

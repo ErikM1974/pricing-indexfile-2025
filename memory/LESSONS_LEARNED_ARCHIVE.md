@@ -2452,3 +2452,9 @@ Multi-agent adversarial audit of the customer checkout funnel found two live-in-
 ### Checkout-funnel audit (2026-07-06, ARCHIVED 2026-07-21): (a) deleting a `var` declaration throws a ReferenceError that aborts init() AFTER the visible render — a later feature (deposit PAY panel) dies silently; grep every use before deleting, and verify through the real page-load path, not direct-method eval; (b) a `perl -i` inside a double-quoted `bash -c` eats `${...}` template literals — use single-quoted perl and grep changed lines after any bulk rate edit. Full entry in archive.
 
 ### Referer-gated file endpoint 401'd staff clicks (2026-07-18, ARCHIVED 2026-07-19): never gate a browser-NAVIGATED download on Origin/Referer presence (`rel="noreferrer"`/privacy browsers strip it) — sessions/secrets via forwarders, or unguessable allow-listed paths. Full entry in archive.
+
+### Proxy jest suites must NOT import route files (2026-07-11, RESOLVED 2026-07-26, ARCHIVED 2026-07-26)
+- **Problem**: requiring `src/routes/*` in a jest suite pulled `utils/caspio` → `api-tracker`, whose module-level bare `setInterval` kept the event loop alive and hung the run.
+- **Root cause**: a timer created at module scope holds the process open. Importing the module for an unrelated reason was enough to inherit it.
+- **Solution**: `api-tracker`'s timer now calls `.unref()`. Route files are safe to import in tests — `quote-sessions-named-filters`, `artrequests-batch-filter` and `supacolor-sync-cadence` all mount real routers and exit cleanly. The old dependency-free-module workaround still works but is no longer required.
+- **Prevention**: any NEW module-level timer must `.unref()`. The failure mode is a hang with no error, which reads as "the test is slow" rather than "the test can never finish."
