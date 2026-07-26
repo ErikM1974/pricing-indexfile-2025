@@ -282,6 +282,26 @@ rebuild the dead zone the rungs already caused.
 baseline is a richer rate**. Lowering a baseline does two things, not one: it drops the bar AND
 raises the effective commission. Do it knowingly.
 
+### ⚠️ Changing a baseline in Caspio silently staleifies the plan PAGE
+
+`Rep_Bonus_Config` is deliberately no-deploy editable, but
+**`dashboards/embroidery-bonus-plan.html` hard-codes each rep's goal** — the table header, all four
+`85/100/115/130%` rows, and any callout comparing the two books. The $89,039 → $66,609 change left the
+handout contradicting the rep's own dashboard for several hours, and nothing warned: both surfaces
+render fine, they just disagree.
+
+**Whenever a `Baseline_Revenue` cell changes, re-derive the page in the same sitting**: rows are
+`baseline × 0.85 / 1.00 / 1.15 / 1.30`. The **"rate pays"** column ($0/$900/$1,800/$2,700) is
+baseline-agnostic — per *point*, so it never moves. Also re-read any sentence comparing the two books;
+"close in size" was true at $89,039 and false at $66,609.
+
+🔑 Same class as the brand-registry drift: one fact in two places, one of them hand-typed. The real fix
+is to render the table from `/api/embroidery-bonus/config` — until then this is a manual step.
+
+🔑 And a baseline change is never just "a lower bar" — effective rate is `6000/baseline`, so it also
+raises the commission (Taneisha 5.76% → **9.01%**; Nika stays 5.76%). The two reps are no longer on the
+same effective rate.
+
 ### Taneisha's baseline: $89,039 → $66,609 (Erik, 2026-07-26)
 
 At $89,039 her threshold was $75,683 while the seasonal curve projected her to **$62,960** —
