@@ -1,3 +1,8 @@
+## v2026.07.26.10 (2026.07.26)
+
+- Bonus memory: Taneisha's baseline 89039 -> 66609, and the 6000/baseline ceiling
+- Bonus plan: Taneisha's goal is $66,609, and drop two claims that stopped being true
+
 ## v2026.07.26.9 (2026.07.26)
 
 - Memory: an empty data source must never render as a healthy value
