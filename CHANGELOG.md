@@ -1,3 +1,10 @@
+## v2026.07.26.11 (2026.07.26)
+
+- Bonus memory: a Caspio baseline edit silently staleifies the hand-typed plan page
+- Memory: a counter that resets is not a total
+- Bonus plan: no figure is typed into the page any more
+- Deploy v2026.07.26.11: cache-bust bonus plan assets
+
 ## v2026.07.26.10 (2026.07.26)
 
 - Bonus memory: Taneisha's baseline 89039 -> 66609, and the 6000/baseline ceiling
