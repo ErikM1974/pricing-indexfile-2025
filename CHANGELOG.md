@@ -1,3 +1,14 @@
+## v2026.07.26.6 (2026.07.26)
+
+- Mission Control: spine + 5 lazy-loaded tabs (Today/Money/My Book/Pipeline/Wins), deep-linkable `#tab=`
+- New shared `dash-tabs.js` — first shared ARIA tab router (7 pages had hand-rolled their own)
+- Fix: `/api/crm-proxy/ae-dashboard/due-dates` forwarder, unregistered since the aa33b66f revert (card 404'd for a week)
+- Fix: missing `[hidden]` guard — the admin view-as switcher was rendering on both reps' own cockpits
+- Fix: Refresh reached only 1 of 7 cacheable endpoints; rep-switch never reloaded SanMar inbound
+- Fix: `teamKicker` read from the rep object instead of top-level, so it was always undefined
+- Fix: count-up left the bonus at $0 in a background tab (rAF is throttled to zero there)
+- Hero contrast now passes AA (white on the old light gradient stop was ~2.0:1); action rail 12 buttons → 6
+
 ## v2026.07.26.1 (2026.07.26)
 
 - Deploy v2026.07.26.1: 6 files (ae-mission-control.html,ae-mission-control.css,ae-mission-control.js,...)
