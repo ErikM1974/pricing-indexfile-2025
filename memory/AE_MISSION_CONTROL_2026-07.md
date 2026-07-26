@@ -56,6 +56,14 @@ Per-AE cockpit for Taneisha Clark & Nika Lao (admin view-as). One page, identity
 
 ## TABBED REDESIGN (2026-07-26) — spine + 5 lazy tabs
 
+> ⚠️ **Same-day mechanic change, by a concurrent session**: the 4-rung ladder was replaced with a
+> continuous **$/point above a start %** (live from proxy `6af1fde` / app `v2026.07.26.7`). Rung
+> language below is historical. The hero branches on `!!ladder.rate` and keeps the rung path as a
+> fallback, so zeroing `Rate_Per_Point` in Caspio reverts it with no deploy. **The two halves must
+> ship together** — for ~14 minutes on 2026-07-26 the proxy returned `rungs: []` while the
+> deployed frontend was still rung-only, and the hero rendered a 0% bar with no chips. Mechanic
+> detail lives in [EMB_BONUS_Q3_2026.md](EMB_BONUS_Q3_2026.md), not here.
+
 Erik's ask: clear/concise/fun/modern, "not crammed onto one scrollable page, use tabs". The 16 cards had grown onto one ~3,400px scroll and four of them were facets of the same Q3 bonus.
 
 **Shape**: greeting → since-last-looked diff → **SPINE** (bonus hero + YTD/MTD/streak + 30-day sparkline; hero stays IN FLOW at ~229px measured and a 48px `#mc-condensed` bar takes over on scroll via one IntersectionObserver — sticking the full hero would eat ~28% of an 800px viewport) → action rail → **sticky tablist** → 5 `role="tabpanel"` sections.
