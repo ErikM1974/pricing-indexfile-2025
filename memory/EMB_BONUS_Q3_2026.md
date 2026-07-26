@@ -181,6 +181,40 @@ a blank hero beats a wrong bonus number.
 flattened shape `commission-payouts.js` builds for the Flask report (`newAccounts`,
 `newAccountBounty`). Mixing them renders `undefined` — it did, once.
 
+## 📈 Pace, and the Q3 seasonal curve
+
+The banner shows whether a big raw gap is actually on track. Projection uses the **measured
+Q3 monthly curve, not elapsed days** — Q3 embroidery is back-loaded, so straight-line makes a
+rep look further behind than they are:
+
+| Month | Share of Q3 embroidery (2021–25 avg) |
+|---|---|
+| July | **30%** |
+| August | **37%** |
+| September | **33%** |
+
+`seasonalShareElapsed()` + `computePace()` in `embroidery-bonus.js`; other quarters have no
+measured curve and fall back to elapsed days. Below 2% elapsed it returns `null` rather than
+project nonsense.
+
+Why it matters — on 2026-07-26 (25.2% of Q3 by the curve, 28% by days):
+- Nika $53,849 → projects **$214,017**, clears the 90% rung: *"On pace to clear it."*
+  Her raw gap reads $110,651, which looks hopeless and isn't.
+- Taneisha $18,404 → projects **$73,146**: *"$11,854 short of that rung"* — honest and actionable.
+
+**Rung change 2026-07-25 (Erik):** Nika re-spaced 85/100/115/130 → **70/90/110/130** because
+the 85% rung read as unreachable at day 25 even though it cleared on trajectory. Baseline
+unchanged at $235,000; Taneisha untouched. ⚠️ `Rep_Bonus_Config.Notes` is capped at 255 chars —
+a longer value returns `InvalidInputValue`.
+
+## ✅ Retroactive to July 1 — confirmed
+
+The plan was written 2026-07-25 but the window is `date_OrderInvoiced >= 2026-07-01`, so
+everything already invoiced this quarter counts. Verified against live orders: every bounty
+on the board traces to an order invoiced **before** the plan existed — Lobo Roofing 07-07,
+Robert The plumber 07-06, MG Car Club 07-08, Puyallup Tribal Housing 07-08, Tacoma
+Longshoremen 07-15, J&H Construction 07-16, GNW Excavation 07-17. Nothing needed backfilling.
+
 ## 🗺 The roadmap — three ranked "who to call" lists (`/api/embroidery-bonus/targets`)
 
 The point of the bonus is a call list, not a scoreboard. Per rep, cheapest ask first:

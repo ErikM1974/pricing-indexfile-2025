@@ -751,6 +751,39 @@
             }
             el('aemc-bh-next').textContent = nextText;
 
+            // Pace context. A raw "$110,651 more" a quarter of the way in reads as hopeless
+            // even when the rep is tracking to clear it — this says which it is. Projection
+            // uses the measured Q3 seasonal curve, not elapsed days, because Q3 embroidery is
+            // back-loaded (July is only 30% of the quarter).
+            var paceEl = el('aemc-bh-pace');
+            var p = l.pace;
+            if (paceEl && p) {
+                var txt, cls;
+                if (p.status === 'on-pace') {
+                    txt = 'On pace to clear it — tracking toward ' + money0(p.projectedRevenue) +
+                        ' by Sep 30' + (p.onPaceForPay ? ', which pays ' + money2(p.onPaceForPay) : '');
+                    cls = 'is-onpace';
+                } else if (p.status === 'behind') {
+                    txt = 'At this pace you land near ' + money0(p.projectedRevenue) + ' — ' +
+                        money0(p.shortfallToNextAtPace) + ' short of that rung';
+                    cls = 'is-behind';
+                } else if (p.status === 'topped-out') {
+                    txt = 'Top rung already cleared — tracking toward ' + money0(p.projectedRevenue);
+                    cls = 'is-onpace';
+                }
+                if (txt) {
+                    paceEl.className = 'aemc-bh-pace ' + cls;
+                    paceEl.innerHTML = '<i class="fas ' +
+                        (cls === 'is-onpace' ? 'fa-circle-check' : 'fa-circle-arrow-up') +
+                        '" aria-hidden="true"></i> ' + esc(txt);
+                    paceEl.hidden = false;
+                } else {
+                    paceEl.hidden = true;
+                }
+            } else if (paceEl) {
+                paceEl.hidden = true;   // too early in the quarter to project honestly
+            }
+
             // Fill the explainer with the LIVE config values, never hardcoded copy.
             var setTxt = function (id, v) { var e = el(id); if (e) e.textContent = v; };
             setTxt('aemc-bh-h-new', money2(bounties.newAccountBounty));

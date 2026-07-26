@@ -918,7 +918,7 @@
             "start": "2026-07-01",
             "end": "2026-09-30"
         },
-        "configSource": "fallback",
+        "configSource": "caspio",
         "orderTypeIds": [
             21
         ],
@@ -1086,19 +1086,19 @@
                     "pctOfBaseline": 22.91,
                     "rungs": [
                         {
-                            "pct": 85,
+                            "pct": 70,
                             "pay": 150,
-                            "threshold": 199750
+                            "threshold": 164500
                         },
                         {
-                            "pct": 100,
+                            "pct": 90,
                             "pay": 400,
-                            "threshold": 235000
+                            "threshold": 211500
                         },
                         {
-                            "pct": 115,
+                            "pct": 110,
                             "pay": 700,
-                            "threshold": 270250
+                            "threshold": 258500
                         },
                         {
                             "pct": 130,
@@ -1108,12 +1108,23 @@
                     ],
                     "rungReached": null,
                     "nextRung": {
-                        "pct": 85,
+                        "pct": 70,
                         "pay": 150,
-                        "threshold": 199750
+                        "threshold": 164500
                     },
-                    "amountToNextRung": 145900.56,
-                    "payout": 0
+                    "amountToNextRung": 110650.56,
+                    "payout": 0,
+                    "pace": {
+                        "asOf": "2026-07-26",
+                        "pctOfQuarterElapsed": 25.2,
+                        "basis": "seasonal (Jul 30% / Aug 37% / Sep 33%, 2021-25 avg)",
+                        "projectedRevenue": 214017.01,
+                        "onPaceForRungPct": 90,
+                        "onPaceForPay": 400,
+                        "nextRungAtPacePct": 110,
+                        "shortfallToNextAtPace": 0,
+                        "status": "on-pace"
+                    }
                 },
                 "totalBonus": 150
             },
@@ -1227,328 +1238,23 @@
                         "threshold": 85000
                     },
                     "amountToNextRung": 66595.52,
-                    "payout": 0
+                    "payout": 0,
+                    "pace": {
+                        "asOf": "2026-07-26",
+                        "pctOfQuarterElapsed": 25.2,
+                        "basis": "seasonal (Jul 30% / Aug 37% / Sep 33%, 2021-25 avg)",
+                        "projectedRevenue": 73146.01,
+                        "onPaceForRungPct": null,
+                        "onPaceForPay": 0,
+                        "nextRungAtPacePct": 85,
+                        "shortfallToNextAtPace": 11853.99,
+                        "status": "behind"
+                    }
                 },
                 "totalBonus": 300
             }
         },
-        "generatedAt": "2026-07-25T14:28:24.367Z",
-        "warning": "Bonus config could not be read from Caspio table Rep_Bonus_Config. Showing built-in default rates — these may not match the current plan. Verify before paying."
-    };
-    var EMB_DORMANT = {
-        "quarter": "Q3",
-        "year": 2026,
-        "asOf": "2026-07-01",
-        "dormancyMonths": 12,
-        "configSource": "fallback",
-        "reps": {
-            "Nika Lao": {
-                "count": 104,
-                "lifetimeEmbroideryTotal": 454356.46,
-                "stillDormantCount": 99,
-                "stillDormantLifetimeTotal": 430712.67,
-                "alreadyReactivatedCount": 5,
-                "accounts": [
-                    {
-                        "idCustomer": "753",
-                        "company": "International Belt & Rubber",
-                        "tier": "GOLD '26 - NIKA",
-                        "lifetimeEmbroidery": 69502.66,
-                        "embroideryOrders": 9,
-                        "lastEmbroideryDate": "2024-11-26",
-                        "monthsDormant": 19,
-                        "bountyIfWon": 50,
-                        "quarterToDateRevenue": 0,
-                        "alreadyReactivated": false
-                    },
-                    {
-                        "idCustomer": "11858",
-                        "company": "Stella Jones - Poles Sales",
-                        "tier": "GOLD '26 - NIKA",
-                        "lifetimeEmbroidery": 40415,
-                        "embroideryOrders": 13,
-                        "lastEmbroideryDate": "2024-04-09",
-                        "monthsDormant": 26,
-                        "bountyIfWon": 50,
-                        "quarterToDateRevenue": 0,
-                        "alreadyReactivated": false
-                    },
-                    {
-                        "idCustomer": "11781",
-                        "company": "Tilth Land Care",
-                        "tier": "SILVER '26 -NIKA",
-                        "lifetimeEmbroidery": 36376.76,
-                        "embroideryOrders": 13,
-                        "lastEmbroideryDate": "2024-12-12",
-                        "monthsDormant": 18,
-                        "bountyIfWon": 50,
-                        "quarterToDateRevenue": 0,
-                        "alreadyReactivated": false
-                    },
-                    {
-                        "idCustomer": "11974",
-                        "company": "Emerald Fire",
-                        "tier": "SILVER '26 -NIKA",
-                        "lifetimeEmbroidery": 32816.68,
-                        "embroideryOrders": 3,
-                        "lastEmbroideryDate": "2024-12-11",
-                        "monthsDormant": 18,
-                        "bountyIfWon": 50,
-                        "quarterToDateRevenue": 0,
-                        "alreadyReactivated": false
-                    },
-                    {
-                        "idCustomer": "1240",
-                        "company": "D.L. Henricksen",
-                        "tier": "SILVER '26 -NIKA",
-                        "lifetimeEmbroidery": 22897.5,
-                        "embroideryOrders": 6,
-                        "lastEmbroideryDate": "2025-05-01",
-                        "monthsDormant": 13,
-                        "bountyIfWon": 50,
-                        "quarterToDateRevenue": 0,
-                        "alreadyReactivated": false
-                    },
-                    {
-                        "idCustomer": "11357",
-                        "company": "Capital Lumber",
-                        "tier": "SILVER '26 -NIKA",
-                        "lifetimeEmbroidery": 22561.97,
-                        "embroideryOrders": 32,
-                        "lastEmbroideryDate": "2025-02-04",
-                        "monthsDormant": 16,
-                        "bountyIfWon": 50,
-                        "quarterToDateRevenue": 0,
-                        "alreadyReactivated": false
-                    },
-                    {
-                        "idCustomer": "7421",
-                        "company": "Puyallup Tribal Housing",
-                        "tier": "SILVER '26 -NIKA",
-                        "lifetimeEmbroidery": 15540.2,
-                        "embroideryOrders": 5,
-                        "lastEmbroideryDate": "2025-04-24",
-                        "monthsDormant": 14,
-                        "bountyIfWon": 50,
-                        "quarterToDateRevenue": 4669,
-                        "alreadyReactivated": true
-                    },
-                    {
-                        "idCustomer": "3001",
-                        "company": "Green Effects, Inc.",
-                        "tier": "SILVER '26 -NIKA",
-                        "lifetimeEmbroidery": 14218.41,
-                        "embroideryOrders": 6,
-                        "lastEmbroideryDate": "2025-04-02",
-                        "monthsDormant": 14,
-                        "bountyIfWon": 50,
-                        "quarterToDateRevenue": 0,
-                        "alreadyReactivated": false
-                    },
-                    {
-                        "idCustomer": "11894",
-                        "company": "CBRE",
-                        "tier": "House-2026",
-                        "lifetimeEmbroidery": 9659.91,
-                        "embroideryOrders": 17,
-                        "lastEmbroideryDate": "2025-02-19",
-                        "monthsDormant": 16,
-                        "bountyIfWon": 50,
-                        "quarterToDateRevenue": 0,
-                        "alreadyReactivated": false
-                    },
-                    {
-                        "idCustomer": "12237",
-                        "company": "Chavira & Associates LLC",
-                        "tier": "House-2026",
-                        "lifetimeEmbroidery": 9461.42,
-                        "embroideryOrders": 17,
-                        "lastEmbroideryDate": "2025-02-21",
-                        "monthsDormant": 16,
-                        "bountyIfWon": 50,
-                        "quarterToDateRevenue": 0,
-                        "alreadyReactivated": false
-                    },
-                    {
-                        "idCustomer": "8727",
-                        "company": "Fife Junior Football",
-                        "tier": "BRONZE '26-NIKA",
-                        "lifetimeEmbroidery": 8564.58,
-                        "embroideryOrders": 10,
-                        "lastEmbroideryDate": "2024-03-22",
-                        "monthsDormant": 27,
-                        "bountyIfWon": 50,
-                        "quarterToDateRevenue": 0,
-                        "alreadyReactivated": false
-                    },
-                    {
-                        "idCustomer": "297",
-                        "company": "Elfin Cove Lodge",
-                        "tier": "SILVER '26 -NIKA",
-                        "lifetimeEmbroidery": 8441.5,
-                        "embroideryOrders": 6,
-                        "lastEmbroideryDate": "2023-05-22",
-                        "monthsDormant": 37,
-                        "bountyIfWon": 50,
-                        "quarterToDateRevenue": 0,
-                        "alreadyReactivated": false
-                    }
-                ]
-            },
-            "Taneisha Clark": {
-                "count": 284,
-                "lifetimeEmbroideryTotal": 1235089.36,
-                "stillDormantCount": 282,
-                "stillDormantLifetimeTotal": 1232062.36,
-                "alreadyReactivatedCount": 2,
-                "accounts": [
-                    {
-                        "idCustomer": "6273",
-                        "company": "Materials Testing & Consulting",
-                        "tier": "SILVER '26-TANEISHA",
-                        "lifetimeEmbroidery": 75687.8,
-                        "embroideryOrders": 8,
-                        "lastEmbroideryDate": "2024-12-02",
-                        "monthsDormant": 18,
-                        "bountyIfWon": 50,
-                        "quarterToDateRevenue": 0,
-                        "alreadyReactivated": false
-                    },
-                    {
-                        "idCustomer": "7693",
-                        "company": "Caliber Concrete Construction",
-                        "tier": "GOLD '26- TANEISHA",
-                        "lifetimeEmbroidery": 58424.77,
-                        "embroideryOrders": 19,
-                        "lastEmbroideryDate": "2024-12-10",
-                        "monthsDormant": 18,
-                        "bountyIfWon": 50,
-                        "quarterToDateRevenue": 0,
-                        "alreadyReactivated": false
-                    },
-                    {
-                        "idCustomer": "3815",
-                        "company": "Architectural Woods, L.P.",
-                        "tier": "BRONZE '26-TANEISHA",
-                        "lifetimeEmbroidery": 47643,
-                        "embroideryOrders": 9,
-                        "lastEmbroideryDate": "2024-06-05",
-                        "monthsDormant": 24,
-                        "bountyIfWon": 50,
-                        "quarterToDateRevenue": 0,
-                        "alreadyReactivated": false
-                    },
-                    {
-                        "idCustomer": "12472",
-                        "company": "Utility Trailer Sales of WA",
-                        "tier": "BRONZE '26-TANEISHA",
-                        "lifetimeEmbroidery": 44078.4,
-                        "embroideryOrders": 44,
-                        "lastEmbroideryDate": "2025-03-06",
-                        "monthsDormant": 15,
-                        "bountyIfWon": 50,
-                        "quarterToDateRevenue": 0,
-                        "alreadyReactivated": false
-                    },
-                    {
-                        "idCustomer": "7466",
-                        "company": "Fountainhead Development",
-                        "tier": "SILVER '26-TANEISHA",
-                        "lifetimeEmbroidery": 36108.5,
-                        "embroideryOrders": 8,
-                        "lastEmbroideryDate": "2024-11-05",
-                        "monthsDormant": 19,
-                        "bountyIfWon": 50,
-                        "quarterToDateRevenue": 0,
-                        "alreadyReactivated": false
-                    },
-                    {
-                        "idCustomer": "123",
-                        "company": "Fugate Ford",
-                        "tier": "GOLD '26- TANEISHA",
-                        "lifetimeEmbroidery": 33463.7,
-                        "embroideryOrders": 15,
-                        "lastEmbroideryDate": "2024-11-05",
-                        "monthsDormant": 19,
-                        "bountyIfWon": 50,
-                        "quarterToDateRevenue": 0,
-                        "alreadyReactivated": false
-                    },
-                    {
-                        "idCustomer": "11833",
-                        "company": "Gray Lumber",
-                        "tier": "SILVER '26-TANEISHA",
-                        "lifetimeEmbroidery": 23802,
-                        "embroideryOrders": 11,
-                        "lastEmbroideryDate": "2023-11-13",
-                        "monthsDormant": 31,
-                        "bountyIfWon": 50,
-                        "quarterToDateRevenue": 0,
-                        "alreadyReactivated": false
-                    },
-                    {
-                        "idCustomer": "5144",
-                        "company": "The Henson Company Inc.",
-                        "tier": "SILVER '26-TANEISHA",
-                        "lifetimeEmbroidery": 23044.5,
-                        "embroideryOrders": 4,
-                        "lastEmbroideryDate": "2024-12-20",
-                        "monthsDormant": 18,
-                        "bountyIfWon": 50,
-                        "quarterToDateRevenue": 0,
-                        "alreadyReactivated": false
-                    },
-                    {
-                        "idCustomer": "416",
-                        "company": "Waste Connections (Murrey Disposal)",
-                        "tier": "SILVER '26-TANEISHA",
-                        "lifetimeEmbroidery": 22604.69,
-                        "embroideryOrders": 29,
-                        "lastEmbroideryDate": "2024-06-25",
-                        "monthsDormant": 24,
-                        "bountyIfWon": 50,
-                        "quarterToDateRevenue": 0,
-                        "alreadyReactivated": false
-                    },
-                    {
-                        "idCustomer": "12078",
-                        "company": "Alpenrose Dairy",
-                        "tier": "Win Back '26 TANEISHA",
-                        "lifetimeEmbroidery": 20435.5,
-                        "embroideryOrders": 19,
-                        "lastEmbroideryDate": "2024-08-16",
-                        "monthsDormant": 22,
-                        "bountyIfWon": 50,
-                        "quarterToDateRevenue": 0,
-                        "alreadyReactivated": false
-                    },
-                    {
-                        "idCustomer": "12309",
-                        "company": "Sterling Septic & Plumbing, LLC",
-                        "tier": "SILVER '26-TANEISHA",
-                        "lifetimeEmbroidery": 19965.45,
-                        "embroideryOrders": 17,
-                        "lastEmbroideryDate": "2025-05-14",
-                        "monthsDormant": 13,
-                        "bountyIfWon": 50,
-                        "quarterToDateRevenue": 0,
-                        "alreadyReactivated": false
-                    },
-                    {
-                        "idCustomer": "10887",
-                        "company": "Designed Groundwater Services",
-                        "tier": "SILVER '26-TANEISHA",
-                        "lifetimeEmbroidery": 18668.34,
-                        "embroideryOrders": 15,
-                        "lastEmbroideryDate": "2024-10-31",
-                        "monthsDormant": 19,
-                        "bountyIfWon": 50,
-                        "quarterToDateRevenue": 0,
-                        "alreadyReactivated": false
-                    }
-                ]
-            }
-        }
+        "generatedAt": "2026-07-26T13:09:37.736Z"
     };
 
     var realFetch = window.fetch;
