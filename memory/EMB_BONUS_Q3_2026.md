@@ -254,11 +254,58 @@ same achievement. Baseline-agnostic: 30 points pays $1,800 whatever the goal is.
 Rungs are kept in code and in Caspio as a **fallback** — zeroing `Rate_Per_Point` reverts the whole
 mechanic with no deploy.
 
-**Current config:** baselines **$104,189** (Nika) / **$89,039** (Taneisha) · bounties **$150** new /
-**$100** reactivated · rate **$60/pt above 85%** · kicker **$310K = $500 each**, **$340K = $1,000 each**.
+**Current config:** baselines **$104,189** (Nika) / **$66,609** (Taneisha, lowered from $89,039 on
+2026-07-26 — see below) · bounties **$150** new / **$100** reactivated · rate **$60/pt above 85%** ·
+kicker **$310K = $500 each**, **$340K = $1,000 each**.
 
 Nika's baseline is corroborated by her Q3-2025 eligible of $105,605 — two independent methods within
 1.3%. Taneisha's Q3-2025 ($50,438) is unusable; she took the book over 2025-08-12.
+
+### 🔑 The ceiling nobody has to enforce: **effective rate = 6000 ÷ baseline**
+
+The rate is uncapped in dollars and needs no cap, because `payout = (R/B×100 − 85) × 60` means
+`payout/R → 6000/B` as revenue grows. That share is the **hard ceiling on what the bonus can ever
+cost as a fraction of what the rep sells**, and it's the number to reason with any time a baseline
+moves:
+
+| baseline | pays nothing until | marginal cost above it |
+|---|---|---|
+| $104,189 (Nika) | $88,561 | **5.76%** of embroidery revenue |
+| $66,609 (Taneisha) | $56,618 | **9.01%** |
+
+Below the threshold the marginal cost is **0%**. So the program is accretive for as long as
+incremental embroidery gross margin exceeds ~9% — which is not close — and capping it would only
+rebuild the dead zone the rungs already caused.
+
+⚠️ **This is the caveat to "baseline-agnostic" above.** Per-*point* is fair on *achievement*
+(30 points pays $1,800 on any goal), but the *cost per dollar sold* is `6000/B`, so a **lower
+baseline is a richer rate**. Lowering a baseline does two things, not one: it drops the bar AND
+raises the effective commission. Do it knowingly.
+
+### Taneisha's baseline: $89,039 → $66,609 (Erik, 2026-07-26)
+
+At $89,039 her threshold was $75,683 while the seasonal curve projected her to **$62,960** —
+`status: below-start`, $12,723 short, so the rate would have paid her **$0** for the whole quarter.
+A threshold a rep cannot reach stops motivating.
+
+🔑 **The parity method: equalize the PROJECTED percentage, not the dollars.** `projectedRevenue =
+revenue ÷ seasonalShareElapsed`, and both reps share one curve and one date, so setting
+`B = projectedRevenue ÷ Nika's projectedPct` puts them on identical footing against their own pace
+— and equalizes their current percentage as a side effect. Verified live after the write: both at
+**23.78%** of goal, both projected **94.52%**, both **~$571** at pace.
+
+Erik's first instinct was $75,000, which still paid **$0** — its 85% threshold ($63,750) sat $790
+above her projection. Worth re-deriving rather than eyeballing: a round number lands arbitrarily
+relative to the threshold.
+
+**Write path:** there is **no API endpoint** for `Rep_Bonus_Config` (GET only) — this was a one-off
+`putWithRecordsAffected('/tables/Rep_Bonus_Config/records', 'PK_ID=2', …)` targeting the PK, with
+`RecordsAffected === 1` asserted (Caspio returns 200 / `RecordsAffected: 0` on a no-match).
+**Rollback = PK_ID 2 → `Baseline_Revenue: 89039`**; only that field was touched.
+
+⚠️ **The team kicker looks unreachable at this pace.** Company Q3 embroidery was $73,328 on
+2026-07-26 against the $310K first tier; the same curve projects ~$291K. Decide whether to move the
+tier or accept it as decoration — it's a Caspio edit either way.
 
 **Team kicker measures ALL company embroidery** — every account and every person, webstores
 included. Deliberately wider than the individual bonus: company *eligible* Q3 embroidery is
