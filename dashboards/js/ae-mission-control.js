@@ -1527,15 +1527,30 @@
             ? money0(l.revenue) + ' of your ' + money0(l.baseline) + ' goal · ' + (l.pctOfBaseline || 0).toFixed(1) + '%'
             : '';
 
-        // Progress runs to the TOP rung, not the next one, so the full ladder is visible
-        // and the biggest payout never stays hidden behind "unlocks $150".
-        var pct = top && top.threshold ? Math.max(0, Math.min((l.revenue / top.threshold) * 100, 100)) : 0;
+        // RATE mode is the live mechanic (2026-07-26): a continuous $/point above a start
+        // percentage, so there are no rungs and no dead zones. The bar runs to a fixed
+        // 130%-of-goal display ceiling with the start line marked — that is the only
+        // threshold left. `axisMax` is the shared denominator for the fill, the start mark
+        // AND the pace flag, so those three can never disagree.
+        // The rung branch stays intact: zeroing Rate_Per_Point in Caspio reverts the whole
+        // mechanic with no deploy.
+        var RATE_CEILING_PCT = 130;
+        var isRate = !!l.rate;
+        var axisMax = isRate
+            ? (l.baseline * RATE_CEILING_PCT / 100)
+            : (top && top.threshold ? top.threshold : 0);
+
+        var pct = axisMax ? Math.max(0, Math.min((l.revenue / axisMax) * 100, 100)) : 0;
         el('aemc-bh-fill').style.width = pct.toFixed(1) + '%';
-        el('aemc-bh-marks').innerHTML = rungs.map(function (r) {
-            var at = top && top.threshold ? Math.min((r.threshold / top.threshold) * 100, 100) : 0;
-            return '<span class="aemc-bh-mark' + (l.revenue >= r.threshold ? ' is-hit' : '') +
-                '" style="left:' + at.toFixed(1) + '%" title="' + money0(r.threshold) + ' pays ' + money2(r.pay) + '"></span>';
-        }).join('');
+        el('aemc-bh-marks').innerHTML = isRate
+            ? '<span class="aemc-bh-mark' + (l.pctOfBaseline >= l.rate.startPct ? ' is-hit' : '') +
+              '" style="left:' + (axisMax ? ((l.rate.revenueAtStart / axisMax) * 100).toFixed(1) : '0') +
+              '%" title="' + money0(l.rate.revenueAtStart) + ' — earning starts here"></span>'
+            : rungs.map(function (r) {
+                var at = axisMax ? Math.min((r.threshold / axisMax) * 100, 100) : 0;
+                return '<span class="aemc-bh-mark' + (l.revenue >= r.threshold ? ' is-hit' : '') +
+                    '" style="left:' + at.toFixed(1) + '%" title="' + money0(r.threshold) + ' pays ' + money2(r.pay) + '"></span>';
+            }).join('');
 
         // PACE MARKER — where she LANDS at today's pace, on the exact same axis as the rung
         // ticks (same denominator, so it can never disagree with the ladder). Rendered as a
@@ -1545,30 +1560,46 @@
         // (Jul 30% / Aug 37% / Sep 33%), not elapsed days — straight-line maths makes a rep
         // look further behind than she is on a back-loaded quarter.
         var pace = l.pace;
-        if (pace && pace.projectedRevenue && top && top.threshold) {
-            var at = Math.min((pace.projectedRevenue / top.threshold) * 100, 100);
+        if (pace && pace.projectedRevenue && axisMax) {
+            var at = Math.min((pace.projectedRevenue / axisMax) * 100, 100);
+            var paceBehind = pace.status === 'behind' || pace.status === 'below-start';
             el('aemc-bh-marks').insertAdjacentHTML('beforeend',
-                '<span class="mc-bh-pace-mark' + (pace.status === 'behind' ? ' is-behind' : '') +
+                '<span class="mc-bh-pace-mark' + (paceBehind ? ' is-behind' : '') +
                 '" style="left:' + at.toFixed(1) + '%" role="img" aria-label="Projected ' +
                 money0(pace.projectedRevenue) + ' by September 30 at your current pace"></span>');
         }
 
-        el('aemc-bh-rungs').innerHTML = rungs.map(function (r) {
-            var hit = l.revenue >= r.threshold;
-            var isNext = l.nextRung && l.nextRung.pct === r.pct;
-            return '<span class="aemc-bh-rung' + (hit ? ' is-hit' : '') + (isNext ? ' is-next' : '') + '">' +
-                (hit ? '<i class="fas fa-check"></i> ' : '') + money0(r.threshold) +
-                '<span class="aemc-bh-rung-pay">' + money2(r.pay) + '</span></span>';
-        }).join('');
-
         var nextText;
-        if (l.nextRung) {
-            nextText = money0(l.amountToNextRung) + ' more embroidery takes you to ' +
-                money2(l.nextRung.pay) + (top && top.pay > l.nextRung.pay ? ' — and ' + money2(top.pay) + ' at the top' : '');
-        } else if (k.next) {
-            nextText = 'Top rung cleared. ' + money0(k.amountToNext) + ' company-wide adds ' + money2(k.next.pay) + ' each.';
+        if (isRate) {
+            var earning = l.rate.pointsEarned > 0;
+            el('aemc-bh-rungs').innerHTML = earning
+                ? '<span class="aemc-bh-rung is-hit">' + l.rate.pointsEarned + ' points over ' +
+                  l.rate.startPct + '%<span class="aemc-bh-rung-pay">' + money2(l.rate.payout) + '</span></span>' +
+                  '<span class="aemc-bh-rung">each extra 1%<span class="aemc-bh-rung-pay">+' +
+                  money2(l.rate.perPoint) + '</span></span>'
+                : '<span class="aemc-bh-rung is-next">earning starts at ' + l.rate.startPct + '% — ' +
+                  money0(l.rate.revenueAtStart) + '<span class="aemc-bh-rung-pay">then ' +
+                  money2(l.rate.perPoint) + ' per 1%</span></span>';
+            nextText = earning
+                ? 'Every extra 1% of your goal adds ' + money2(l.rate.perPoint) + ' — no ceiling.'
+                : money0(Math.max(0, l.rate.revenueAtStart - l.revenue)) + ' more embroidery and you start earning ' +
+                  money2(l.rate.perPoint) + ' per 1%.';
         } else {
-            nextText = 'Every milestone cleared this quarter. Outstanding.';
+            el('aemc-bh-rungs').innerHTML = rungs.map(function (r) {
+                var hit = l.revenue >= r.threshold;
+                var isNext = l.nextRung && l.nextRung.pct === r.pct;
+                return '<span class="aemc-bh-rung' + (hit ? ' is-hit' : '') + (isNext ? ' is-next' : '') + '">' +
+                    (hit ? '<i class="fas fa-check"></i> ' : '') + money0(r.threshold) +
+                    '<span class="aemc-bh-rung-pay">' + money2(r.pay) + '</span></span>';
+            }).join('');
+            if (l.nextRung) {
+                nextText = money0(l.amountToNextRung) + ' more embroidery takes you to ' +
+                    money2(l.nextRung.pay) + (top && top.pay > l.nextRung.pay ? ' — and ' + money2(top.pay) + ' at the top' : '');
+            } else if (k.next) {
+                nextText = 'Top rung cleared. ' + money0(k.amountToNext) + ' company-wide adds ' + money2(k.next.pay) + ' each.';
+            } else {
+                nextText = 'Every milestone cleared this quarter. Outstanding.';
+            }
         }
         el('aemc-bh-next').textContent = nextText;
 
@@ -1580,7 +1611,16 @@
         var p = l.pace;
         if (paceEl && p) {
             var txt, cls;
-            if (p.status === 'on-pace') {
+            // Rate mode has two states — earning, or not yet past the start line.
+            if (p.status === 'earning') {
+                txt = 'On pace to finish near ' + (p.projectedPct || 0).toFixed(0) + '% of goal (' +
+                    money0(p.projectedRevenue) + ') — about ' + money2(p.onPaceForPay) + ' on the rate';
+                cls = 'is-onpace';
+            } else if (p.status === 'below-start') {
+                txt = 'At this pace you land near ' + money0(p.projectedRevenue) + ' — ' +
+                    money0(p.shortfallToStartAtPace) + ' short of where earning starts';
+                cls = 'is-behind';
+            } else if (p.status === 'on-pace') {
                 txt = 'On pace to clear it — tracking toward ' + money0(p.projectedRevenue) +
                     ' by Sep 30' + (p.onPaceForPay ? ', which pays ' + money2(p.onPaceForPay) : '');
                 cls = 'is-onpace';

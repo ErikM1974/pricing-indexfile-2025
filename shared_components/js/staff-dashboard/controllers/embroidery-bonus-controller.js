@@ -80,7 +80,7 @@ function renderStrip(data) {
             <div class="eb-team-head">
                 <div>
                     <div class="eb-team-value num">${money(k.companyRevenue)}</div>
-                    <div class="eb-team-label">invoiced so far this quarter, company-wide</div>
+                    <div class="eb-team-label">of embroidery invoiced this quarter, company-wide</div>
                 </div>
                 <div class="eb-team-goal">
                     <div class="eb-team-goal-value num ${reached ? 'is-hit' : ''}">${escapeHtml(headline)}</div>
@@ -104,9 +104,10 @@ function renderStrip(data) {
             </div>
 
             <p class="eb-team-note">
-                Every order counts &mdash; every method, every rep. Clearing
-                <strong>${money(top.target)}</strong> this quarter is what keeps the
-                $3M year in reach.
+                Every embroidery order counts &mdash; every account, every person, webstores
+                included. Embroidery is our biggest line at 46% of everything we sell, so
+                clearing <strong>${money(top.target)}</strong> this quarter is the clearest
+                push toward a $3M year.
             </p>
         </div>
     `;
