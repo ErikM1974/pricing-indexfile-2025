@@ -1,3 +1,10 @@
+## v2026.07.26.8 (2026.07.26)
+
+- Memory: flag the rung -> rate mechanic change, and the two-half deploy trap
+- Memory: the 11-of-19 flag gap, and the test that passed because it tested nothing
+- Mission Control: three places still spoke in rungs after the rungs were gone
+- Deploy v2026.07.26.8: cache-bust ae-mission-control.js
+
 ## v2026.07.26.7 (2026.07.26)
 
 - Mission Control: spine + 5 lazy tabs, and fix 6 live bugs
