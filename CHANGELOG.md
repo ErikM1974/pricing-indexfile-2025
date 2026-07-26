@@ -1,3 +1,11 @@
+## v2026.07.26.7 (2026.07.26)
+
+- Mission Control: spine + 5 lazy tabs, and fix 6 live bugs
+- Caspio quota: app-side call cuts, usage dashboard, and two silent-empty fixes
+- Changelog v2026.07.26.6
+- Embroidery bonus UI: rate readout, webstore exclusion, embroidery-only kicker
+- Deploy v2026.07.26.7: 2 files (ae-mission-control.html, test-ae-mission-control.html)
+
 ## v2026.07.26.6 (2026.07.26)
 
 - Mission Control: spine + 5 lazy-loaded tabs (Today/Money/My Book/Pipeline/Wins), deep-linkable `#tab=`
