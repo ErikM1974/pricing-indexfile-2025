@@ -1,3 +1,9 @@
+## v2026.07.26.9 (2026.07.26)
+
+- Memory: an empty data source must never render as a healthy value
+- Memory: archive 8 resolved LESSONS entries (300 -> 263 lines)
+- Bonus plan: say that the goals were recalculated, before a rep works it out
+
 ## v2026.07.26.8 (2026.07.26)
 
 - Memory: flag the rung -> rate mechanic change, and the two-half deploy trap
