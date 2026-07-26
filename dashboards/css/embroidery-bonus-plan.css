@@ -3,6 +3,11 @@
  * A live page rather than a static PDF on purpose — the two 2026_Bonus_Cheat_Sheet_*.pdf
  * files this replaces drifted out of sync with the code within months. */
 
+/* Figures load from the config API, so the page toggles the table and the error banner with
+ * [hidden]. .ebp-note is display:flex and .ebp-table is display:table — both beat the bare
+ * attribute, which would leave an "unavailable" banner permanently on screen. */
+[hidden] { display: none !important; }
+
 :root {
     --ebp-green: #2f7d38;
     --ebp-green-light: #4cb354;

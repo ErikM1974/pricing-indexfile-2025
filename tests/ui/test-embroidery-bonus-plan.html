@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TEST HARNESS — Embroidery Bonus Plan (config-driven figures)</title>
+<!--
+  Harness for dashboards/js/embroidery-bonus-plan.js. The plan page itself is SAML-gated
+  and its figures come from /api/crm-proxy/embroidery-bonus/config, so this stubs the
+  endpoint and drives the three states that matter:
+
+    1. success        — slots fill, table renders from the config's baselines
+    2. fallback       — endpoint served built-in defaults; numbers show but are FLAGGED
+    3. hard failure   — nothing renders; slots stay as dashes and a banner explains
+
+  State 3 is the one worth having. It is the guarantee that a Caspio outage can never put
+  a stale goal in front of a rep, and it is invisible in normal use — exactly the kind of
+  path that rots unnoticed.
+
+  The DOM below mirrors only the ids and data-ebp slots the script touches; a companion
+  contract check asserts those match the real page in both directions, so this harness
+  cannot drift into testing a page that no longer exists.
+-->
+<link rel="stylesheet" href="/dashboards/css/embroidery-bonus-plan.css">
+<link rel="stylesheet" href="/tests/ui/test-embroidery-bonus-plan.css">
+</head>
+<body>
+
+<div class="h-bar">
+  <strong>Scenario:</strong>
+  <button type="button" id="h-ok">1 · success</button>
+  <button type="button" id="h-fallback">2 · config fallback</button>
+  <button type="button" id="h-fail">3 · endpoint down</button>
+  <button type="button" id="h-500">4 · HTTP 500</button>
+</div>
+
+<p class="ebp-math">Once you pass <strong data-ebp="startPct">&mdash;</strong> of your goal, you earn
+<strong data-ebp="perPoint">&mdash;</strong> for every <strong>1%</strong> you add.</p>
+
+<div class="ebp-note ebp-note--warn" id="ebp-config-status" hidden>
+  <i class="fas fa-triangle-exclamation"></i>
+  <div id="ebp-config-status-msg"></div>
+</div>
+
+<div class="ebp-table-wrap">
+  <table class="ebp-table" id="ebp-rate-table" hidden>
+    <thead><tr id="ebp-rate-head"></tr></thead>
+    <tbody id="ebp-rate-body"></tbody>
+  </table>
+</div>
+
+<div class="ebp-cards">
+  <div class="ebp-card"><div class="ebp-amount" data-ebp="bountyNew">&mdash;</div></div>
+  <div class="ebp-card"><div class="ebp-amount" data-ebp="bountyReact">&mdash;</div>
+    <span data-ebp="dormancy">&mdash;</span>+ months</div>
+  <div class="ebp-card"><span data-ebp="minAccount">&mdash;</span></div>
+  <div class="ebp-card">half a point is <span data-ebp="halfPoint">&mdash;</span></div>
+  <div class="ebp-card"><span data-ebp="kick1Pay">&mdash;</span> at <span data-ebp="kick1Target">&mdash;</span></div>
+  <div class="ebp-card"><span data-ebp="kick2Pay">&mdash;</span> at <span data-ebp="kick2Target">&mdash;</span></div>
+</div>
+
+<div id="h-result">pick a scenario</div>
+
+<script src="/tests/ui/test-embroidery-bonus-plan-stub.js"></script>
+<script src="/dashboards/js/embroidery-bonus-plan.js"></script>
+</body>
+</html>
