@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Payroll — Northwest Custom Apparel</title>
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <link href="/dashboards/css/payroll.css?v=2026.07.27.1" rel="stylesheet">
+</head>
+<body>
+  <div class="pr-wrap">
+    <header class="pr-header">
+      <div>
+        <h1>Payroll</h1>
+        <p class="pr-sub">Vacation and sick balances, hours by pay period, and packet upload. Admin only — pay rates are never shown here.</p>
+      </div>
+      <a class="pr-back" href="/staff-dashboard.html">← Dashboard</a>
+    </header>
+
+    <div id="pr-status" class="pr-status" role="status" aria-live="polite"></div>
+
+    <nav class="pr-tabs">
+      <button class="pr-tab is-active" data-panel="leave" type="button">Leave Balances</button>
+      <button class="pr-tab" data-panel="periods" type="button">Pay Periods</button>
+      <button class="pr-tab" data-panel="upload" type="button">Upload Packet</button>
+    </nav>
+
+    <!-- LEAVE BALANCES -->
+    <section id="panel-leave" class="pr-panel is-active">
+      <div class="pr-panel-head">
+        <h2>Leave Balances</h2>
+        <p>Current vacation and sick hours for active employees, refreshed from the last payroll packet.
+          A <strong>negative</strong> balance is not an error — staff accrue their first 40 vacation hours at
+          their one-year anniversary and can run negative until then.</p>
+      </div>
+      <div class="pr-toolbar">
+        <input id="leave-search" class="pr-search" type="search" placeholder="Filter by name or department…" autocomplete="off">
+        <span id="leave-asof" class="pr-asof"></span>
+      </div>
+      <div class="pr-tablewrap">
+        <table class="pr-table">
+          <thead>
+            <tr>
+              <th>Employee</th><th>Department</th>
+              <th class="pr-num">Vac Accrued</th><th class="pr-num">Vac Used</th><th class="pr-num">Vac Remaining</th>
+              <th class="pr-num">Sick Accrued</th><th class="pr-num">Sick Used</th><th class="pr-num">Sick Remaining</th>
+            </tr>
+          </thead>
+          <tbody id="leave-body"><tr><td colspan="8" class="pr-loading">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- PAY PERIODS -->
+    <section id="panel-periods" class="pr-panel">
+      <div class="pr-panel-head">
+        <h2>Pay Periods</h2>
+        <p>Hours recorded for each pay date. Select a period to see the per-employee breakdown.</p>
+      </div>
+      <div class="pr-toolbar">
+        <label class="pr-label" for="period-select">Pay date</label>
+        <select id="period-select" class="pr-select"></select>
+      </div>
+      <div class="pr-tablewrap">
+        <table class="pr-table">
+          <thead>
+            <tr>
+              <th>Employee</th><th>Paid</th>
+              <th class="pr-num">Regular</th><th class="pr-num">Overtime</th><th class="pr-num">Sick</th>
+              <th class="pr-num">Vacation/PTO</th><th class="pr-num">Holiday</th><th class="pr-num">Total Hours</th>
+            </tr>
+          </thead>
+          <tbody id="period-body"><tr><td colspan="8" class="pr-loading">Select a pay date.</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- UPLOAD -->
+    <section id="panel-upload" class="pr-panel">
+      <div class="pr-panel-head">
+        <h2>Upload Payroll Packet</h2>
+        <p>Upload the PDF from NW Regional Accounting. Hours and leave balances are read from it and
+          checked against the packet's own printed totals. <strong>Nothing is saved until the numbers
+          reconcile and you confirm.</strong></p>
+      </div>
+
+      <div class="pr-upload">
+        <input id="packet-file" class="pr-file" type="file" accept="application/pdf">
+        <button id="packet-parse" class="pr-btn" type="button" disabled>Read packet</button>
+        <span id="packet-note" class="pr-note"></span>
+      </div>
+
+      <div id="review" class="pr-review" hidden>
+        <div id="review-verdict" class="pr-verdict"></div>
+
+        <table class="pr-table pr-check-table">
+          <thead><tr><th>Check</th><th class="pr-num">From the packet</th><th class="pr-num">From this read</th><th>Result</th></tr></thead>
+          <tbody id="review-checks"></tbody>
+        </table>
+
+        <h3 class="pr-h3">Hours and leave to be saved</h3>
+        <div class="pr-tablewrap">
+          <table class="pr-table">
+            <thead>
+              <tr>
+                <th>Employee</th><th>Paid</th>
+                <th class="pr-num">Regular</th><th class="pr-num">OT</th><th class="pr-num">Sick</th>
+                <th class="pr-num">Vac/PTO</th><th class="pr-num">Total</th>
+                <th class="pr-num">Vac Avail</th><th class="pr-num">Sick Avail</th>
+              </tr>
+            </thead>
+            <tbody id="review-rows"></tbody>
+          </table>
+        </div>
+
+        <div class="pr-commit">
+          <button id="packet-commit" class="pr-btn pr-btn-primary" type="button" disabled>Save to payroll records</button>
+          <button id="packet-discard" class="pr-btn pr-btn-ghost" type="button">Discard</button>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script src="/dashboards/js/payroll.js?v=2026.07.27.1"></script>
+</body>
+</html>

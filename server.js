@@ -3444,6 +3444,16 @@ app.all('/api/crm-proxy/sales-reps-2026*', ...createCrmProxy('sales-reps-2026', 
 // forwarder never existed — every log call 404'd silently (caught 2026-07-19).
 app.all('/api/crm-proxy/assignment-history*', ...createCrmProxy('assignment-history', ['house']));
 
+// Payroll proxy — ADMIN ONLY. Payroll is the most sensitive data in the account, so
+// this is deliberately ['admin'] and not ['admin','accountant'] (Erik 2026-07-27).
+// permissionsFromRole gives admin the 'accountant' permission but not the reverse, so
+// an accountant session cannot reach this. The upstream never returns pay rates or
+// salaries; the page (payroll.html) is separately gated by its Staff_Page_Access row.
+// The parse route carries a base64 PDF, so it needs a bigger body parser than the 5mb
+// global — scoped to that one path, and mounted BEFORE the forwarder so it applies.
+app.use('/api/crm-proxy/payroll/parse', bodyParser.json({ limit: '40mb' }));
+app.all('/api/crm-proxy/payroll*', ...createCrmProxy('payroll', ['admin']));
+
 // Policies Hub admin proxy - requires 'policies-admin' role (currently Erik only).
 // Public reads do NOT go through here — frontend hits /api/policies-public on the
 // caspio-pricing-proxy directly (unprotected, Published+Active only).
