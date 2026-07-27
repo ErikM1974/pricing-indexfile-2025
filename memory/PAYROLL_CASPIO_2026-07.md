@@ -148,7 +148,40 @@ reconciling to the packet totals. Ask NW Regional Accounting for a CSV/Excel exp
 accountant** (Erik 7/27; payroll is the most sensitive data in the account).
 → [STAFF_AUTH_DESIGN.md](STAFF_AUTH_DESIGN.md)
 
-## 6. 🔴 No payroll API exists — and Caspio-direct editing is the current path
+## 6. ✅ Payroll dashboard + API — BUILT 2026-07-27 (not yet deployed)
+
+`/dashboards/payroll.html` (+ `css/payroll.css`, `js/payroll.js`) — **admin only**, three tabs:
+Leave Balances · Pay Periods · Upload Packet. App commit `374ad1c3`, proxy `56d029c`.
+
+🔴 **The page NEVER shows a pay rate or salary** (Erik 2026-07-27). Enforced upstream, not in the
+UI: `src/routes/payroll.js` selects through **`SAFE_EMPLOYEE_FIELDS` / `SAFE_REGISTER_FIELDS`
+allowlists**, so adding a column to either table cannot leak compensation. Verified live — a real
+call returned zero pay fields.
+
+**Auth = two independent gates** (matching the `admin-rbac` precedent): proxy routes mounted
+`requireCrmApiSecret`; the app exposes them only via `createCrmProxy('payroll', ['admin'])`.
+🔑 `['admin']` not `['admin','accountant']` — `permissionsFromRole` grants admin the *accountant*
+permission but not the reverse, so an accountant session is correctly excluded. Page itself gated
+by the `Staff_Page_Access` row.
+
+### Upload flow — read → reconcile → save (3 steps for a reason)
+🔴 **The parse CANNOT be synchronous**: Heroku requires a first byte within 30 s and vision
+extraction of a scanned packet takes longer. `POST /parse` starts a background job and returns a
+`jobId`; the browser polls `GET /parse/:jobId`. 🔑 **`POST /import` takes only the job id** — the
+parsed figures never round-trip through the browser, so they can't be edited between review and
+commit, and the server re-reconciles before writing. The Save button stays disabled unless the
+extraction reproduces the packet's own printed totals.
+- Model `claude-opus-5`, PDF as a base64 `document` block + `output_config.format` structured
+  output. 🔑 SDK 0.80.0's **non-beta** `messages` path already supports both and forwards the body
+  verbatim — no beta namespace needed (checked in `node_modules`, not assumed).
+- Body limits are raised **per-route** (`/api/crm-proxy/payroll/parse` 40 mb on the app,
+  `/api/payroll/parse` 40 mb on the proxy) — never app-wide. Cap: ~23 MB PDF (Anthropic's 32 MB
+  request limit after base64 inflation).
+- `ANTHROPIC_API_KEY` is set on the proxy's Heroku config but **absent from the local `.env`**, so
+  the parse path could not be exercised locally — reads, gating and UI were verified end-to-end
+  against real Caspio data; the upload is unproven until it runs in production.
+
+## 7. Before this was built: no payroll API existed
 
 The proxy still has **zero** endpoints touching `Employees` / `Payroll_Register` / any HR table.
 Rates and leave are editable **directly in Caspio** (datasheet or the Human Resources 2025 bridge app),
