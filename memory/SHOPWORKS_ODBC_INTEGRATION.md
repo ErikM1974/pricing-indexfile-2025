@@ -100,13 +100,31 @@ ODBC does NOT do: images/attachments (Box/mockup flows unaffected), writes (keep
 Caspio invoice AI-334269 billed **178,874 calls over the 500K/period cap** at
 $0.002/call. **~24% of the entire quota traced to one bandit task.**
 
-- **Thumbnail Box Sync 20 min → 60 min.** Before uploading anything each run makes
-  **two full scans** of the 27,613-row `Shopworks_Thumbnail_Report` —
-  `/thumbnails/uploaded-ids` + `/thumbnails/all-ids`, both `{maxPages:100}`, ~28
-  Caspio pages each = **~56 calls/run**. Backfill is complete so steady-state
-  pending is 0: ~4,000 calls/day to learn nothing changed. 72 runs/day → 24 saves
-  **~2,690/day**. `schtasks /Change /TN "\NWCA\Thumbnail Box Sync" /RI 60`.
-  Trade-off: a new thumbnail reaches Box/portal in ≤60 min instead of ≤20.
+- **Thumbnail Box Sync 20 min → 4 h** (revised 2026-07-26 from the earlier 60-min
+  plan, after measuring). Before uploading anything each run makes **two full scans**
+  of the 27,613-row `Shopworks_Thumbnail_Report` — `/thumbnails/uploaded-ids`
+  (27 pages; its `FileUrl IS NOT NULL` filter excludes ~674 imageless rows) +
+  `/thumbnails/all-ids` (28 pages), both `{maxPages:100}` = **55 Caspio calls/run,
+  FIXED, paid before a single byte moves**. Backfill is complete and steady state is
+  **~5 changed thumbnails/day** (measured: the cutover pulled 98 rows over 3 weeks),
+  so 72 runs/day = **3,960 calls/day ≈ 800 Caspio calls per image actually synced**.
+  → 6 runs/day = **330/day**, saving **~3,630/day ≈ $218/period**.
+  `schtasks /Change /TN "\NWCA\Thumbnail Box Sync" /RI 240`.
+  **Why 4 h and not daily:** the cost is fixed *per run*, so 72→6 captures 92% of
+  everything available and 6→1 adds only ~$16/period more — not worth a 24-hour
+  worst case. Trade-off as set: a new thumbnail reaches Box/portal in **≤~4.5 h**
+  (≤4 h image sync + ≤30 min for metadata to create its row first).
+  📏 **Measured live 2026-07-26** with the repaired meter: `Shopworks_Thumbnail_Report`
+  was **48% of ALL Caspio traffic** (909 of 1,883 calls in 4.3 h ≈ 211/hr). After the
+  change expect **~14/hr**.
+- **🔴 Do NOT slow the Thumbnail METADATA Sync to save quota — there is none to save.**
+  Its delta read is an **ODBC query against FileMaker = 0 Caspio calls**. Steady state
+  is ~48 calls/day for the whole task, nearly all heartbeats on `Sync_Heartbeats`, with
+  only **~6/day** touching the thumbnail table (1 PUT per changed row, 2 for a new one).
+  It is also the **record-creator**: `upload-with-stub` 404s `RECORD_NOT_FOUND` rather
+  than creating a row, because `Thumb_DesLocid_Design` is UNIQUE NOT NULL — so metadata
+  must always run *ahead of* the image sync. Slowing it to daily would additionally
+  require `ThumbMetaOverlapMinutes` > 1440 or modified rows are silently lost.
 - **🔴 `OrdersOverlapMinutes` — the shared-key trap.** Order + PO sync run every
   **15** min but shared `OverlapMinutes: 30`, and `shopworks-odbc-sync.js` PUTs
   **unconditionally**, so each changed row was written to Caspio ~**3×**
@@ -120,11 +138,18 @@ $0.002/call. **~24% of the entire quota traced to one bandit task.**
   overlap 30 / cadence 30 = **zero slack**, left as-is because any value >30 doubles
   its writes. Raise to ~45 only if rows are observed going missing.
 - **⏳ ERIK (not applied — bandit is not reachable from the workstation)**: run the
-  `schtasks` line above, and re-copy `sync-orders.ps1`, `sync-purchase-orders.ps1`,
-  `sync-thumbnail-metadata.ps1` from `caspio-pricing-proxy/scripts/bandit-agent/`
-  to `C:\NWCA\odbc-sync\`. Until then the ~2,690/day saving is NOT live.
+  `schtasks /RI 240` line above, and re-copy `sync-orders.ps1`,
+  `sync-purchase-orders.ps1`, `sync-thumbnail-metadata.ps1` from
+  `caspio-pricing-proxy/scripts/bandit-agent/` to `C:\NWCA\odbc-sync\`.
+  Until then the **~3,630/day (~$218/period)** saving is NOT live. A daily 9 AM
+  reminder task self-checks the meter and reports whether it is still outstanding.
 - Living doc `/dashboards/bandit-integration.html` carries the same note and shows
-  the cadence as "20 min → 60 min pending" until the change is made on the box.
+  the cadence as "20 min → 4 h pending" until the change is made on the box.
+- **⚠️ Log-reading gotcha for this task:** `sync-thumbnails-to-box.ps1:118` `continue`s
+  past files whose Caspio row does not exist yet **before** they are counted, so the
+  logged `pending (new/changed): N` **excludes images awaiting a row** and `$skip`
+  stays 0. The log can read "nothing to upload" while a real backlog waits on the
+  metadata side. Harmless at 20 min; at 4 h a backlog persists that much longer.
 
 ## ✅ Bandit tasks hardened + organized 2026-07-18 (all SYSTEM, \NWCA folder, verified)
 
