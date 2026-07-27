@@ -14,7 +14,7 @@
 
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/bandit-integration.css?v=2026.07.26.1">
+    <link rel="stylesheet" href="/dashboards/css/bandit-integration.css?v=2026.07.27.1">
 </head>
 <body>
     <div class="dash-shell">
@@ -72,7 +72,7 @@
                         <tr><td>ShopWorks ODBC SalesReps Sync</td><td>ODBC <code>Cust</code></td><td><code>/sync-sales-reps</code></td><td>4 h</td><td>SYSTEM</td><td><span class="bi-ok">Live</span></td></tr>
                         <tr><td>ShopWorks ODBC Contacts Sync</td><td>ODBC (4 tables)</td><td><code>/sync-contacts</code></td><td>12 h</td><td>SYSTEM</td><td><span class="bi-ok">Live</span></td></tr>
                         <tr><td>Thumbnail Metadata Sync</td><td>ODBC <code>Thumbnails</code> (+ DesignLocations, Des)</td><td><code>/thumbnails/metadata-sync</code></td><td>30 min</td><td>SYSTEM</td><td><span class="bi-ok">Live</span></td></tr>
-                        <tr><td>Thumbnail Box Sync</td><td><code>\\NCA-FS01\Thumbnails</code></td><td><code>/thumbnails/upload-with-stub?target=box</code></td><td>20 min <span class="bi-off">→ 60 min pending</span></td><td>SYSTEM</td><td><span class="bi-ok">Live</span></td></tr>
+                        <tr><td>Thumbnail Box Sync</td><td><code>\\NCA-FS01\Thumbnails</code></td><td><code>/thumbnails/upload-with-stub?target=box</code></td><td>20 min <span class="bi-off">→ 4 h pending</span></td><td>SYSTEM</td><td><span class="bi-ok">Live</span></td></tr>
                     </tbody>
                 </table>
                 </div>
@@ -83,11 +83,12 @@
                 </div>
                 <div class="bi-callout bi-callout--info">
                     <h4><i class="fas fa-gauge-high"></i> Caspio quota: two changes pending on bandit (2026-07-26)</h4>
-                    <p>A <b>$358 Caspio overage</b> (689.8K calls against a 500K/period cap) traced ~24% of the entire quota to <b>one task</b>. Both changes below must be made <b>on the bandit box</b> — until then this table still reflects the old behaviour.</p>
+                    <p>A <b>$358 Caspio overage</b> (689.8K calls against a 500K/period cap). Measured live on 2026-07-26 with the repaired meter: <code>Shopworks_Thumbnail_Report</code> was <b>48% of ALL Caspio traffic</b> — 909 of 1,883 calls in a 4.3-hour window. Both changes below must be made <b>on the bandit box</b> — until then this table still reflects the old behaviour.</p>
                     <ol class="bi-list">
-                        <li><b>Thumbnail Box Sync → 60 min.</b> Before it uploads anything, each run makes <b>two full scans</b> of the 27,613-row <code>Shopworks_Thumbnail_Report</code> (<code>/thumbnails/uploaded-ids</code> + <code>/thumbnails/all-ids</code>, ~28 Caspio pages each = <b>~56 calls per run</b>). The backfill is complete, so in steady state that is ~4,000 calls/day spent confirming nothing changed. At 60 min that drops to ~1,340/day.<br>
-                        <code>schtasks /Change /TN "\NWCA\Thumbnail Box Sync" /RI 60</code><br>
-                        <span class="bi-note">Trade-off: a brand-new thumbnail reaches Box/the portal in up to 60 min instead of 20.</span></li>
+                        <li><b>Thumbnail Box Sync → every 4 hours.</b> Before it uploads anything, each run makes <b>two full scans</b> of the 27,613-row <code>Shopworks_Thumbnail_Report</code> (<code>/thumbnails/uploaded-ids</code> 27 pages + <code>/thumbnails/all-ids</code> 28 pages = <b>55 Caspio calls per run, fixed</b>). The backfill is complete and steady state is <b>~5 changed thumbnails/day</b>, so 72 runs/day = <b>3,960 calls/day — roughly 800 Caspio calls per image actually synced</b>. At 4 h that becomes 6 runs = <b>330/day</b>, saving ~3,630/day (~$218/period).<br>
+                        <code>schtasks /Change /TN "\NWCA\Thumbnail Box Sync" /RI 240</code><br>
+                        <span class="bi-note">Why 4 h and not daily: the cost is <b>fixed per run</b>, so 72→6 runs already captures 92% of the saving and going all the way to once-daily adds only ~$16/period more — not worth a 24-hour worst case. Trade-off as set: a brand-new thumbnail reaches Box/the portal in up to <b>~4.5 h</b> (4 h for the image sync + up to 30 min for the metadata sync to create its row first) instead of ~20 min.</span></li>
+                        <li><b>Do NOT slow the Thumbnail Metadata Sync.</b> Its delta read is an <b>ODBC query against FileMaker — zero Caspio calls</b>. In steady state the whole task costs ~48 calls/day, nearly all heartbeats on <code>Sync_Heartbeats</code>, with only ~6/day touching the thumbnail table. There is no money in it, and it is the <b>record-creator</b> the image sync depends on (<code>upload-with-stub</code> 404s <code>RECORD_NOT_FOUND</code> rather than creating a row, because <code>Thumb_DesLocid_Design</code> is UNIQUE NOT NULL). Slowing it would also break its overlap — see the trap below.</li>
                         <li><b>Re-copy the three updated agent scripts</b> from <code>caspio-pricing-proxy/scripts/bandit-agent/</code> to <code>C:\NWCA\odbc-sync\</code>: <code>sync-orders.ps1</code>, <code>sync-purchase-orders.ps1</code>, <code>sync-thumbnail-metadata.ps1</code>.</li>
                     </ol>
                     <p><b>⚠️ The overlap trap — do NOT "simplify" this back.</b> Order Sync and PO Sync run every <b>15</b> min but shared a <b>30</b>-min <code>OverlapMinutes</code>, so every changed row landed in 3 consecutive runs and the proxy PUTs unconditionally — each change written to Caspio ~3×. They now read their own <code>OrdersOverlapMinutes</code> (default <b>20</b> → 2 runs).<br>
@@ -126,7 +127,7 @@
                         <tr><td>ShopWorks ODBC Designs Sync</td><td><code>sync-designs.ps1</code></td><td>4 h</td><td><code>sync-designs.log</code></td><td>Designs2026</td></tr>
                         <tr><td>ShopWorks ODBC SalesReps Sync</td><td><code>sync-sales-reps.ps1</code></td><td>4 h</td><td><code>sync-sales-reps.log</code></td><td>Sales_Reps_2026</td></tr>
                         <tr><td>Thumbnail Metadata Sync</td><td><code>sync-thumbnail-metadata.ps1</code></td><td>30 min</td><td><code>sync-thumbnail-metadata.log</code></td><td>Shopworks_Thumbnail_Report (rows)</td></tr>
-                        <tr><td>Thumbnail Box Sync</td><td><code>sync-thumbnails-to-box.ps1</code></td><td>20 min <span class="bi-off">→ 60 min pending</span></td><td><code>sync-thumbnails-to-box.log</code></td><td>Shopworks_Thumbnail_Report (FileUrl)</td></tr>
+                        <tr><td>Thumbnail Box Sync</td><td><code>sync-thumbnails-to-box.ps1</code></td><td>20 min <span class="bi-off">→ 4 h pending</span></td><td><code>sync-thumbnails-to-box.log</code></td><td>Shopworks_Thumbnail_Report (FileUrl)</td></tr>
                     </tbody>
                 </table>
                 </div>

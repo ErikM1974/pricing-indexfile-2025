@@ -1146,3 +1146,92 @@ a.aemc-row-main:hover { text-decoration: underline; }
     .mc-menu-panel { left: auto; right: 0; min-width: 200px; }
     .mc-menu-panel a { min-height: 44px; }
 }
+
+/* ── Call List ─────────────────────────────────────────────────────────────
+   A worklist row, not a stat row: it has to survive being read one-handed on a
+   phone between calls, so the company, the reason and the phone number each get
+   their own line rather than competing on one. Chip colours reuse the existing
+   growth-reason palette so the page keeps one visual language. */
+.aemc-calls { list-style: none; margin: 0; padding: 0; }
+.aemc-call {
+    padding: 12px 4px;
+    border-bottom: 1px solid var(--gray-100);
+}
+.aemc-call:last-child { border-bottom: none; }
+.aemc-call-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.aemc-call-co { font-weight: 600; color: var(--gray-900); }
+.aemc-call-chip {
+    display: inline-block;
+    font-size: 0.72rem;
+    padding: 2px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+    border: 1px solid var(--gray-200);
+    background: var(--surface-inset);
+    color: var(--gray-600);
+}
+.aemc-call-chip--near { background: #eefaf0; color: #1c7a37; border-color: #bfe6c9; }
+.aemc-call-chip--back { background: #f3f7ff; color: #0a4fb5; border-color: #c4d7f7; }
+.aemc-call-chip--new  { background: #fff8f0; color: #b85a00; border-color: #f5d3ad; }
+/* A promise the rep made — loud on purpose, it outranks the ranking. */
+.aemc-call-chip--due  { background: #fdecec; color: #b91c1c; border-color: #f3c3c3; font-weight: 600; }
+.aemc-call-chip--done { background: #eef2f6; color: #4b5563; border-color: #d7dee6; }
+.aemc-call-conf { margin-left: auto; font-size: 0.72rem; font-weight: 600; white-space: nowrap; }
+.aemc-call-conf--strong    { color: #1c7a37; }
+.aemc-call-conf--fair      { color: #b85a00; }
+.aemc-call-conf--long-shot { color: var(--gray-500); font-weight: 500; }
+.aemc-call-why { font-size: 0.84rem; color: var(--gray-600); margin: 4px 0 6px; line-height: 1.45; }
+.aemc-call-foot { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.aemc-call-worth { margin-left: auto; font-size: 0.8rem; color: var(--gray-600); white-space: nowrap; }
+.aemc-call-tel, .aemc-call-mail {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--nw-green, #2f7d38);
+    text-decoration: none;
+    font-weight: 600;
+}
+.aemc-call-tel:hover, .aemc-call-mail:hover { text-decoration: underline; }
+/* Matches how the data-quality radar talks about the same gap — a missing phone is a
+   fixable record problem, not a shrug. */
+.aemc-call-nophone { font-size: 0.8rem; color: #b85a00; }
+/* Called today: greyed and sunk, never removed. A row that vanishes makes the rep ask
+   "did I call them, or did it break?" */
+.aemc-call--done { opacity: 0.55; }
+.aemc-call-saved { font-size: 0.82rem; color: #1c7a37; font-weight: 600; }
+.aemc-call-saved--local { color: #b85a00; }
+.aemc-call-strip { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.aemc-call-strip-sep { font-size: 0.76rem; color: var(--gray-500); margin-left: 4px; }
+.aemc-call-btn, .aemc-call-fu, .aemc-call-retry {
+    font-size: 0.78rem;
+    padding: 5px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--gray-200);
+    background: #fff;
+    color: var(--gray-700);
+    cursor: pointer;
+}
+.aemc-call-btn:hover, .aemc-call-fu:hover, .aemc-call-retry:hover { border-color: var(--gray-400); background: var(--surface-inset); }
+.aemc-call-btn.is-on { border-color: #1c7a37; color: #1c7a37; font-weight: 600; }
+/* Separate class from .aemc-more-toggle on purpose — that one has a document-level
+   delegated handler, and sharing the class would fire both. */
+.aemc-loadmore {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    padding: 9px;
+    font-size: 0.82rem;
+    border: 1px dashed var(--gray-300);
+    border-radius: 8px;
+    background: var(--surface-inset);
+    color: var(--gray-600);
+    cursor: pointer;
+}
+.aemc-loadmore:hover:not(:disabled) { border-color: var(--gray-400); color: var(--gray-800); }
+.aemc-loadmore:disabled { cursor: progress; opacity: 0.7; }
+.aemc-calls-pointer { margin-top: var(--space-3); }
+.aemc-calls-print { background: none; border: none; cursor: pointer; font: inherit; }
+
+@media (max-width: 640px) {
+    .aemc-call-conf { margin-left: 0; width: 100%; }
+    .aemc-call-worth { margin-left: 0; }
+}
