@@ -188,6 +188,7 @@ _Forward-looking; verify status before trusting._
 - [QUOTE_BUILDER_UX_AUDIT_2026-07.md](QUOTE_BUILDER_UX_AUDIT_2026-07.md) — order-entry UX audit of all 4 quote builders: click scorecard, verified price-display risks (10.1 residuals, silent SCP fallbacks), P1–P3 rec list, skin verdict (2026-07-06)
 - [QUOTE_BUILDER_EXPERT_AUDIT_2026-07-07.md](QUOTE_BUILDER_EXPERT_AUDIT_2026-07-07.md) — 5-expert audit (EMB/DTF/SCP domain + workflow + CSS): 62 verified findings, NONE fixed — money leaks (DTF zero-location, EMB DECG LTM, SCP $0 back), SCP email dead end, PNW shell never switched on; week-1 punch list + Erik policy decisions (2026-07-07)
 - [HR_DASHBOARD_TRAINING_REORG_2026-07.md](HR_DASHBOARD_TRAINING_REORG_2026-07.md) — staff-dashboard 2-category reorg (Policies & Procedures + Training): all 436 SweetProcess docs classified vs live hub/training, worksheet in OneDrive HR folder, nav redesign pending Erik (2026-07-10)
+- [PAYROLL_CASPIO_2026-07.md](PAYROLL_CASPIO_2026-07.md) — 🔒 payroll audit: what the NW Regional packet contains, what Caspio already has (`Employees`/`Payroll_Bradley_2023`/`Time_Off_Request`), the finding that `Employees.Pay` + vacation columns are stale on ~every row, and the proposed 3-table design (NOT built, 2026-07-27)
 
 ## 🔎 Audit / findings detail — historical, still pointed-to (NOT current state)
 
