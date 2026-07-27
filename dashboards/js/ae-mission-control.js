@@ -1999,12 +1999,15 @@
 
         if (isRate) {
             var pointsToGoal = Math.max(0, 100 - (Number(l.rate.startPct) || 85));
-            var atGoal = bountyPaid + pointsToGoal * (Number(l.rate.perPoint) || 0);
+            var fromRate = pointsToGoal * (Number(l.rate.perPoint) || 0);
+            var atGoal = bountyPaid + fromRate;
+            // Reads "$450 + $900 on the rate", matching the pace card beside it. It used to say
+            // "15 points × $60" — correct, and jargon: "points" is an internal unit of the
+            // mechanic, not something a rep sells.
             cards.push('<div class="aemc-bh-sc aemc-bh-sc--goal">' +
                 '<div class="aemc-bh-sc-eyebrow">If you hit 100%</div>' +
                 '<div class="aemc-bh-sc-amt">' + money2(atGoal) + '</div>' +
-                '<div class="aemc-bh-sc-sub">' + money0(bountyPaid) + ' + ' + pointsToGoal + ' points × ' +
-                money2(l.rate.perPoint) + '</div>' +
+                '<div class="aemc-bh-sc-sub">' + money0(bountyPaid) + ' + ' + money2(fromRate) + ' on the rate</div>' +
             '</div>');
         }
         host.innerHTML = cards.join('');
@@ -2112,10 +2115,20 @@
         var nextText;
         if (isRate) {
             var earning = l.rate.pointsEarned > 0;
+            // 🔑 Say the DOLLAR STEP, not "every 1%".
+            // The rate is defined per percentage point of goal, and the headline used to say so
+            // — but a rep reading "every 1% pays $60" has no unit: 1% of the order? of her
+            // sales? To act on it she had to know her goal was $104,189 and divide by 100.
+            // Nobody does that between calls, and Erik asked what it meant, which settled it.
+            // The percentage still drives the track, the 85% marker and the explainer, because
+            // that is what makes two reps' different goals comparable — it just doesn't belong
+            // in the one sentence telling her what to do next.
+            // The step differs per rep BECAUSE the goals do: ~$1,042 for Nika, ~$666 for Taneisha.
+            var step = l.baseline ? l.baseline / 100 : 0;
             nextText = earning
-                ? 'Every extra 1% of your goal adds ' + money2(l.rate.perPoint) + ' — no ceiling.'
-                : money0(Math.max(0, l.rate.revenueAtStart - l.revenue)) + ' more embroidery and every 1% starts paying you ' +
-                  money2(l.rate.perPoint) + '.';
+                ? 'Every ' + money0(step) + ' of embroidery from here pays you ' + money2(l.rate.perPoint) + ' — no ceiling.'
+                : money0(Math.max(0, l.rate.revenueAtStart - l.revenue)) + ' more embroidery and you start earning — then every ' +
+                  money0(step) + ' after that pays you ' + money2(l.rate.perPoint) + '.';
         } else if (l.nextRung) {
             nextText = money0(l.amountToNextRung) + ' more embroidery takes you to ' +
                 money2(l.nextRung.pay) + (top && top.pay > l.nextRung.pay ? ' — and ' + money2(top.pay) + ' at the top' : '');
@@ -2183,6 +2196,9 @@
         if (isRate) {
             setTxt('aemc-bh-h-start', l.rate.startPct + '%');
             setTxt('aemc-bh-h-point', money2(l.rate.perPoint));
+            // Same dollar step as the headline — the explainer sat three inches below it and
+            // still said "every 1%", which is the phrasing that prompted "what does this mean".
+            setTxt('aemc-bh-h-step', l.baseline ? money0(l.baseline / 100) : '—');
         }
 
         var chips = [
