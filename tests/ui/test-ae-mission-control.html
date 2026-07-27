@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
     <link rel="stylesheet" href="/shared_components/css/sanmar-invoice-viewer.css?v=2026.07.19.17">
-    <link rel="stylesheet" href="/dashboards/css/ae-mission-control.css?v=2026.07.27.2">
+    <link rel="stylesheet" href="/dashboards/css/ae-mission-control.css?v=2026.07.27.3">
 </head>
 <body>
     <div class="dash-shell">
@@ -268,58 +268,97 @@
             <!-- ================== TAB: Today ================== -->
             <section class="mc-panel" id="mc-panel-today" role="tabpanel"
                      aria-labelledby="mc-tab-today" tabindex="0">
-                <!-- The single highest-value next action, ranked client-side from data
-                     already fetched for the other cards. Zero extra requests. -->
-                <div class="mc-onething" id="mc-onething" hidden></div>
+                <!-- Chapter chips. Counts come from the same fetches that feed the cards —
+                     no extra requests. A zero-count chip is omitted rather than shown as 0. -->
+                <nav class="mc-chapters" id="mc-chapters" aria-label="Jump to a section" hidden></nav>
+
+                <!-- ROW 1 — the single next action, beside the shape of the whole day. -->
+                <div class="mc-grid mc-grid--2-1">
+                    <!-- Ranked client-side from data already fetched for the other cards. -->
+                    <div class="mc-onething" id="mc-onething" hidden></div>
+
+                    <div class="dash-card mc-clock-card" id="mc-clock-card">
+                        <div class="dash-card-header">
+                            <h2 class="dash-card-title"><i class="fas fa-calendar-days"></i> Order clock</h2>
+                            <span class="aemc-sub" id="mc-clock-sub"></span>
+                        </div>
+                        <div id="mc-clock"><div class="dash-loading">Checking your order due dates…</div></div>
+                    </div>
+                </div>
                 <p class="mc-onething-skipped" id="mc-onething-skipped" hidden></p>
 
-                <!-- ZONE 1: Today / action queue -->
-                <div class="dash-card aemc-queue-card">
+                <!-- ROW 2 — the three things that are actually wrong today. Each capped at 4
+                     rows with the full list behind a drawer, so Today stays ~2 screens. -->
+                <div class="mc-grid mc-grid--3">
+                    <div class="dash-card mc-capped" id="mc-fires">
+                        <div class="dash-card-header">
+                            <h2 class="dash-card-title"><i class="fas fa-fire-flame-curved mc-ic-fire"></i> Late &amp; at risk</h2>
+                            <span class="mc-count-pill mc-count-pill--fire" id="aemc-due-sub"></span>
+                        </div>
+                        <div id="aemc-due"><div class="dash-loading">Checking your order due dates…</div></div>
+                        <button type="button" class="mc-viewall-btn" id="mc-fires-all" hidden></button>
+                    </div>
+
+                    <div class="dash-card mc-capped" id="mc-artwork">
+                        <div class="dash-card-header">
+                            <h2 class="dash-card-title"><i class="fas fa-palette mc-ic-art"></i> Artwork to approve</h2>
+                            <span class="mc-count-pill mc-count-pill--art" id="aemc-art-sub"></span>
+                        </div>
+                        <div id="aemc-artwork"><div class="dash-loading">Checking your approvals…</div></div>
+                        <button type="button" class="mc-viewall-btn" id="mc-artwork-all" hidden></button>
+                    </div>
+
+                    <div class="dash-card mc-capped" id="mc-missing">
+                        <div class="dash-card-header">
+                            <h2 class="dash-card-title"><i class="fas fa-list-check mc-ic-dq"></i> Missing info</h2>
+                            <span class="mc-count-pill" id="aemc-dq-sub"></span>
+                        </div>
+                        <div id="aemc-dq"><div class="dash-loading">Checking your recent ShopWorks entries…</div></div>
+                        <a class="mc-viewall-btn" id="mc-missing-all" href="/dashboards/purchasing-portal.html" hidden></a>
+                    </div>
+                </div>
+
+                <!-- ROW 3 — in-flight goods. Nothing here is wrong, it just needs watching. -->
+                <div class="mc-grid mc-grid--3">
+                    <div class="dash-card mc-capped" id="mc-inbound">
+                        <div class="dash-card-header">
+                            <h2 class="dash-card-title"><i class="fas fa-truck-fast"></i> Arriving today</h2>
+                            <span class="mc-count-pill mc-count-pill--ok" id="aemc-inbound-sub"></span>
+                        </div>
+                        <div id="aemc-inbound" class="aemc-inbound"><div class="dash-loading">Checking today's inbound…</div></div>
+                        <button type="button" class="mc-viewall-btn" id="aemc-inbound-open"><i class="fas fa-up-right-from-square"></i> Full view</button>
+                    </div>
+
+                    <div class="dash-card mc-capped" id="mc-purch">
+                        <div class="dash-card-header">
+                            <h2 class="dash-card-title"><i class="fas fa-cart-flatbed"></i> My purchasing</h2>
+                            <span class="mc-count-pill" id="aemc-purch-sub"></span>
+                        </div>
+                        <div id="aemc-purch"><div class="dash-loading">Checking your purchase requests…</div></div>
+                        <a class="mc-viewall-btn" href="/dashboards/purchasing-portal.html">Full purchasing portal</a>
+                    </div>
+
+                    <!-- The only non-problem on Today, and the reason it stays. -->
+                    <div class="dash-card mc-capped" id="mc-momentum" hidden>
+                        <div class="dash-card-header">
+                            <h2 class="dash-card-title"><i class="fas fa-fire mc-ic-streak"></i> Momentum</h2>
+                        </div>
+                        <div id="mc-momentum-body"></div>
+                    </div>
+                </div>
+
+                <!-- Leads, quotes and kits. The design moves these to Pipeline; that panel gets
+                     its real content in stage 3, so they stay here until then rather than
+                     disappearing from the page in between. Artwork has left this queue — it has
+                     its own card above, and rendering it twice would double-count the day. -->
+                <div class="dash-card aemc-queue-card aemc-collapsible" data-collapse-key="queue">
                     <div class="dash-card-header">
-                        <h2 class="dash-card-title"><i class="fas fa-bolt"></i> Needs You Today</h2>
+                        <h2 class="dash-card-title"><i class="fas fa-bolt"></i> Leads, quotes &amp; kits</h2>
                         <span class="aemc-queue-count" id="aemc-queue-count"></span>
                     </div>
                     <div id="aemc-queue" class="aemc-queue">
                         <div class="dash-loading">Loading your action queue…</div>
                     </div>
-                </div>
-
-                <!-- Order Due Dates: unshipped ShopWorks orders vs requested-ship date × blanks PO status -->
-                <div class="dash-card aemc-due-card aemc-collapsible" data-collapse-key="due">
-                    <div class="dash-card-header">
-                        <h2 class="dash-card-title"><i class="fas fa-calendar-days"></i> Order Due Dates <span class="aemc-sub" id="aemc-due-sub"></span></h2>
-                        <a class="aemc-viewall" href="/dashboards/purchasing-portal.html">Full purchasing portal</a>
-                    </div>
-                    <p class="aemc-hint">Your unshipped orders measured against their requested-ship date. <span class="aemc-due-flag aemc-due-flag--late">Late</span> = the date already passed. <span class="aemc-due-flag aemc-due-flag--risk">At risk</span> = due within 7 days and the blanks aren't purchased or received yet — chase Bradley or the vendor now.</p>
-                    <div id="aemc-due"><div class="dash-loading">Checking your order due dates…</div></div>
-                </div>
-
-                <!-- Data-quality radar: ShopWorks orders/customers entered with essential fields missing -->
-                <div class="dash-card aemc-dq-card aemc-collapsible" data-collapse-key="dq">
-                    <div class="dash-card-header">
-                        <h2 class="dash-card-title"><i class="fas fa-list-check"></i> Missing Info — Fix in ShopWorks <span class="aemc-sub" id="aemc-dq-sub"></span></h2>
-                    </div>
-                    <p class="aemc-hint">Orders you entered in the last 30 days that are missing essentials — contact name, phone, email, ship-to address, payment terms, ship date, or sales tax — plus the customer records behind them that need setup fixes. Open each one in ShopWorks and fill the gaps before production or accounting hits them.</p>
-                    <div id="aemc-dq"><div class="dash-loading">Checking your recent ShopWorks entries…</div></div>
-                </div>
-
-                <!-- ZONE 5: SanMar inbound -->
-                <div class="dash-card aemc-inbound-card aemc-collapsible" data-collapse-key="inbound">
-                    <div class="dash-card-header">
-                        <h2 class="dash-card-title"><i class="fas fa-truck-fast"></i> SanMar Arriving Today <span class="aemc-sub" id="aemc-inbound-sub"></span></h2>
-                        <button type="button" class="dash-btn" id="aemc-inbound-open"><i class="fas fa-up-right-from-square"></i> Full view</button>
-                    </div>
-                    <div id="aemc-inbound" class="aemc-inbound"><div class="dash-loading">Checking today's inbound…</div></div>
-                </div>
-
-                <!-- Purchasing tracker: JotForm requests to Bradley × ShopWorks PO mirror -->
-                <div class="dash-card aemc-purch-card aemc-collapsible" data-collapse-key="purch">
-                    <div class="dash-card-header">
-                        <h2 class="dash-card-title"><i class="fas fa-cart-flatbed"></i> My Purchasing <span class="aemc-sub" id="aemc-purch-sub"></span></h2>
-                        <a class="aemc-viewall" href="/dashboards/purchasing-portal.html">Full purchasing portal</a>
-                    </div>
-                    <p class="aemc-hint">Every purchase request you've sent Bradley (last 60 days) and where it stands: <span class="aemc-purch-chip aemc-purch--sent">Sent</span> → <span class="aemc-purch-chip aemc-purch--ordered">Ordered</span> → <span class="aemc-purch-chip aemc-purch--received">Received</span> → <span class="aemc-purch-chip aemc-purch--shipped">Shipped</span></p>
-                    <div id="aemc-purch"><div class="dash-loading">Checking your purchase requests…</div></div>
                 </div>
             </section>
 
@@ -545,6 +584,25 @@
         </div>
     </div>
 
+    <!-- Slide-over drawers for the full lists behind the capped Today cards. Scrim 90 /
+         panel 100 matches the existing .aemc-overlay / .aemc-modal ladder (.mc-sticky is 20,
+         .mc-menu-panel 30) so a drawer always sits above the sticky tab bar. -->
+    <div class="mc-drawer-scrim" id="mc-drawer-scrim" hidden></div>
+    <aside class="mc-drawer" id="mc-drawer" hidden role="dialog" aria-modal="true"
+           aria-labelledby="mc-drawer-title">
+        <header class="mc-drawer-head">
+            <div>
+                <h2 class="mc-drawer-title" id="mc-drawer-title"></h2>
+                <p class="mc-drawer-sum" id="mc-drawer-sum"></p>
+            </div>
+            <button type="button" class="mc-drawer-close" id="mc-drawer-close" aria-label="Close">
+                <i class="fas fa-times" aria-hidden="true"></i>
+            </button>
+        </header>
+        <div class="mc-drawer-body" id="mc-drawer-body"></div>
+        <footer class="mc-drawer-foot" id="mc-drawer-foot"></footer>
+    </aside>
+
     <!-- Load order matters: APP_CONFIG → fetch-timeout → DashPage → inbound modal → page controller -->
     <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/fetch-timeout.js"></script>
@@ -556,6 +614,6 @@
     <script src="/dashboards/js/sanmar-inbound-today.js?v=2026.07.22.4"></script>
     <script src="/shared_components/js/sanmar-invoice-viewer.js?v=2026.07.19.17"></script>
     <script src="/tests/ui/test-ae-mission-control-stub.js?v=2026.07.27.2"></script>
-    <script src="/dashboards/js/ae-mission-control.js?v=2026.07.27.2"></script>
+    <script src="/dashboards/js/ae-mission-control.js?v=2026.07.27.3"></script>
 </body>
 </html>
