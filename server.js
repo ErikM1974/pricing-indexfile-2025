@@ -3339,12 +3339,40 @@ async function getPageAccessRules() {
 // email-in-Allowed_Emails. Roles are matched against the user's derived permissions.
 function userMayAccessPage(crmUser, rule) {
   const userPerms = (crmUser.permissions || []).map(p => String(p).toLowerCase());
-  if (userPerms.includes('admin')) return true; // admin override — sees every page, can't lock self out
-  if (!rule) return true;                        // unlisted page → any logged-in staff
-  const roles = String(rule.Allowed_Roles || '').toLowerCase().split(',').map(s => s.trim()).filter(Boolean);
-  const emails = String(rule.Allowed_Emails || '').toLowerCase().split(',').map(s => s.trim()).filter(Boolean);
+  const roles = String(rule?.Allowed_Roles || '').toLowerCase().split(',').map(s => s.trim()).filter(Boolean);
+  const emails = String(rule?.Allowed_Emails || '').toLowerCase().split(',').map(s => s.trim()).filter(Boolean);
   const userEmail = String(crmUser.email || '').toLowerCase();
+  // A rule naming PEOPLE and no roles is an EXCLUSIVE allowlist — only those people, admin
+  // included. This is the only way to restrict a page below "any admin", and it's what makes
+  // payroll.html Erik-only (2026-07-27). Still table-driven: change the row, no deploy.
+  // ⚠ You CAN lock yourself out of such a page — keep your own email on the list.
+  if (rule && emails.length && !roles.length) return emails.includes(userEmail);
+  if (userPerms.includes('admin')) return true; // admin override — sees every other page
+  if (!rule) return true;                        // unlisted page → any logged-in staff
   return roles.some(r => userPerms.includes(r)) || emails.includes(userEmail);
+}
+
+// API-side twin of gateStaffPage: gate a data route by the SAME Staff_Page_Access row as
+// the page it feeds, so one table row controls both and they can never drift apart.
+// Unlike gateStaffPage this fails CLOSED — for payroll, "the access check is down" must
+// never resolve to "let them in".
+function requirePageAccess(page) {
+  const key = String(page).toLowerCase();
+  return async (req, res, next) => {
+    if (!req.session || !req.session.crmUser) {
+      return res.status(401).json({ error: 'Unauthorized', message: 'Session expired. Please log in again.' });
+    }
+    try {
+      const rules = await getPageAccessRules();
+      if (!userMayAccessPage(req.session.crmUser, rules[key])) {
+        return res.status(403).json({ error: 'Forbidden', message: 'You do not have access to this data.' });
+      }
+    } catch (e) {
+      console.error('[page-access] API gate error for ' + key + ':', e.message);
+      return res.status(503).json({ error: 'Access check unavailable' });
+    }
+    return next();
+  };
 }
 
 // Branded 403 page shown when a logged-in staffer opens a page they're not allowed on.
@@ -3444,15 +3472,15 @@ app.all('/api/crm-proxy/sales-reps-2026*', ...createCrmProxy('sales-reps-2026', 
 // forwarder never existed — every log call 404'd silently (caught 2026-07-19).
 app.all('/api/crm-proxy/assignment-history*', ...createCrmProxy('assignment-history', ['house']));
 
-// Payroll proxy — ADMIN ONLY. Payroll is the most sensitive data in the account, so
-// this is deliberately ['admin'] and not ['admin','accountant'] (Erik 2026-07-27).
-// permissionsFromRole gives admin the 'accountant' permission but not the reverse, so
-// an accountant session cannot reach this. The upstream never returns pay rates or
-// salaries; the page (payroll.html) is separately gated by its Staff_Page_Access row.
+// Payroll proxy — gated by the SAME Staff_Page_Access row as payroll.html, which is an
+// exclusive email allowlist (Erik only, 2026-07-27). Deliberately NOT requireCrmRole:
+// a role gate can't express "one person", and today's ['admin'] would silently widen the
+// moment a second admin is added. One table row now controls the page and its data
+// together — Erik changes who sees payroll without a deploy.
 // The parse route carries a base64 PDF, so it needs a bigger body parser than the 5mb
 // global — scoped to that one path, and mounted BEFORE the forwarder so it applies.
 app.use('/api/crm-proxy/payroll/parse', bodyParser.json({ limit: '40mb' }));
-app.all('/api/crm-proxy/payroll*', ...createCrmProxy('payroll', ['admin']));
+app.all('/api/crm-proxy/payroll*', requirePageAccess('payroll.html'), createCrmProxy('payroll', ['admin'])[1]);
 
 // Policies Hub admin proxy - requires 'policies-admin' role (currently Erik only).
 // Public reads do NOT go through here — frontend hits /api/policies-public on the
