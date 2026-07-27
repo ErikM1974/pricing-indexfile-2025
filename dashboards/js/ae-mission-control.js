@@ -1709,6 +1709,64 @@
             });
     }
 
+    /**
+     * The three payout scenarios: banked / at today's pace / at goal.
+     *
+     * This is the point of the redesigned banner — a rep asked "what does this actually pay
+     * me?" and the old hero answered with a percentage. Every figure here is derived from
+     * server values (bounties.payout, rate.perPoint, pace.onPaceForPay); nothing is invented
+     * client-side beyond adding two server numbers together.
+     */
+    function renderBonusScenarios(mine, l, bounties, counts, isRate, pace) {
+        var host = el('aemc-bh-scenarios');
+        if (!host) return;
+        var banked = Number(mine.totalBonus) || 0;
+        var bountyPaid = Number(bounties.payout) || 0;
+
+        // "3 new programs × $150" — name what actually produced the money.
+        var parts = [];
+        if (counts['new']) parts.push(counts['new'] + ' new program' + (counts['new'] === 1 ? '' : 's') + ' × ' + money0(bounties.newAccountBounty));
+        if (counts.reactivated) parts.push(counts.reactivated + ' won back × ' + money0(bounties.reactivatedBounty));
+        if (isRate && l.rate.payout > 0) parts.push(money2(l.rate.payout) + ' on the rate');
+        var cards = [
+            '<div class="aemc-bh-sc aemc-bh-sc--now">' +
+                '<div class="aemc-bh-sc-eyebrow">Now · locked in</div>' +
+                '<div class="aemc-bh-sc-amt">' + money2(banked) + '</div>' +
+                '<div class="aemc-bh-sc-sub">' + esc(parts.length ? parts.join(' · ') : 'nothing qualifying yet') + '</div>' +
+            '</div>',
+        ];
+
+        // Only shown once the projection is honest — computePace() returns nothing this
+        // early in a quarter rather than extrapolating from a handful of days.
+        if (isRate && pace && pace.projectedPct) {
+            var onRate = Number(pace.onPaceForPay) || 0;
+            var pacePay = bountyPaid + onRate;
+            // Below the start line the rate contributes nothing, so "+$0.00 on the rate"
+            // beside an amount identical to the locked-in card reads as a broken tile. Name
+            // the reason instead — that is the number she can actually act on.
+            var paceSub = onRate > 0
+                ? money0(bountyPaid) + ' + ' + money2(onRate) + ' on the rate'
+                : 'the rate pays nothing below ' + money0(l.rate.revenueAtStart);
+            cards.push('<div class="aemc-bh-sc aemc-bh-sc--pace">' +
+                '<div class="aemc-bh-sc-eyebrow">At today\'s pace · ' + Math.round(pace.projectedPct) + '%</div>' +
+                '<div class="aemc-bh-sc-amt">' + money2(pacePay) + '</div>' +
+                '<div class="aemc-bh-sc-sub">' + esc(paceSub) + '</div>' +
+            '</div>');
+        }
+
+        if (isRate) {
+            var pointsToGoal = Math.max(0, 100 - (Number(l.rate.startPct) || 85));
+            var atGoal = bountyPaid + pointsToGoal * (Number(l.rate.perPoint) || 0);
+            cards.push('<div class="aemc-bh-sc aemc-bh-sc--goal">' +
+                '<div class="aemc-bh-sc-eyebrow">If you hit 100%</div>' +
+                '<div class="aemc-bh-sc-amt">' + money2(atGoal) + '</div>' +
+                '<div class="aemc-bh-sc-sub">' + money0(bountyPaid) + ' + ' + pointsToGoal + ' points × ' +
+                money2(l.rate.perPoint) + '</div>' +
+            '</div>');
+        }
+        host.innerHTML = cards.join('');
+    }
+
     function renderBonusSpine(mine, d) {
         var l = mine.ladder || {};
         // 🔑 teamKicker is TOP-LEVEL on /api/embroidery-bonus, not on the rep object (whose keys
@@ -1730,85 +1788,102 @@
         // source of confusion when this shipped (2026-07-25).
         var rungs = l.rungs || [];
         var top = rungs.length ? rungs[rungs.length - 1] : null;
-        el('aemc-bh-goal').textContent = l.baseline
-            ? money0(l.revenue) + ' of your ' + money0(l.baseline) + ' goal · ' + (l.pctOfBaseline || 0).toFixed(1) + '%'
-            : '';
-
-        // RATE mode is the live mechanic (2026-07-26): a continuous $/point above a start
-        // percentage, so there are no rungs and no dead zones. The bar runs to a fixed
-        // 130%-of-goal display ceiling with the start line marked — that is the only
-        // threshold left. `axisMax` is the shared denominator for the fill, the start mark
-        // AND the pace flag, so those three can never disagree.
-        // The rung branch stays intact: zeroing Rate_Per_Point in Caspio reverts the whole
-        // mechanic with no deploy.
-        var RATE_CEILING_PCT = 130;
         var isRate = !!l.rate;
-        var axisMax = isRate
-            ? (l.baseline * RATE_CEILING_PCT / 100)
-            : (top && top.threshold ? top.threshold : 0);
+        var pace = l.pace;
 
-        var pct = axisMax ? Math.max(0, Math.min((l.revenue / axisMax) * 100, 100)) : 0;
-        el('aemc-bh-fill').style.width = pct.toFixed(1) + '%';
-        el('aemc-bh-marks').innerHTML = isRate
-            ? '<span class="aemc-bh-mark' + (l.pctOfBaseline >= l.rate.startPct ? ' is-hit' : '') +
-              '" style="left:' + (axisMax ? ((l.rate.revenueAtStart / axisMax) * 100).toFixed(1) : '0') +
-              '%" title="' + money0(l.rate.revenueAtStart) + ' — earning starts here"></span>'
-            : rungs.map(function (r) {
-                var at = axisMax ? Math.min((r.threshold / axisMax) * 100, 100) : 0;
+        // ⭐ ONE AXIS: percent of GOAL, 0–100. The dial arc, the dial's 85% tick, the track
+        // fill, the start tick, the pace flag and both endpoint labels all derive from this.
+        // The previous build ran the track to a 130% display ceiling, which is why the 85%
+        // start line sat at 65% of the bar and needed explaining. Overflow is CLAMPED for
+        // drawing only — the label still reads the true percentage, so passing goal shows a
+        // full bar and "118% of goal" rather than a bar that runs off the end.
+        var pctExact = Number(l.pctOfBaseline) || 0;
+        var pctDraw = Math.max(0, Math.min(pctExact, 100));
+
+        var CIRC = 452.39;                       // 2πr at r=72
+        var arc = el('aemc-bh-dial-arc');
+        var tick = el('aemc-bh-dial-tick');
+        if (arc) {
+            var lit = CIRC * pctDraw / 100;
+            arc.setAttribute('stroke-dasharray', lit.toFixed(1) + ' ' + (CIRC - lit).toFixed(1));
+        }
+        if (tick) {
+            // Same axis as the arc. Hidden entirely in rung mode — there is no start line.
+            if (isRate) {
+                var atTick = CIRC * (Number(l.rate.startPct) || 85) / 100;
+                tick.setAttribute('stroke-dasharray', '3 ' + (CIRC - 3).toFixed(1));
+                tick.setAttribute('stroke-dashoffset', (-atTick).toFixed(1));
+                tick.removeAttribute('hidden');
+            } else {
+                tick.setAttribute('hidden', '');
+            }
+        }
+        var dialPct = el('aemc-bh-dial-pct');
+        if (dialPct) dialPct.textContent = l.baseline ? pctExact.toFixed(1) + '% of goal' : '';
+
+        el('aemc-bh-fill').style.width = pctDraw.toFixed(1) + '%';
+        el('aemc-bh-goal').innerHTML = l.baseline
+            ? '<strong>' + money0(l.revenue) + '</strong> today · ' + pctExact.toFixed(1) + '%'
+            : '';
+        var goalMax = el('aemc-bh-goalmax');
+        if (goalMax) goalMax.textContent = l.baseline ? 'goal ' + money0(l.baseline) : '';
+
+        // Start tick + 100% end cap on the track, same axis.
+        var marks = '';
+        if (isRate && l.baseline) {
+            marks += '<span class="aemc-bh-mark' + (pctExact >= l.rate.startPct ? ' is-hit' : '') +
+                '" style="left:' + (Number(l.rate.startPct) || 85) + '%" title="' +
+                money0(l.rate.revenueAtStart) + ' — earning starts here"></span>';
+        } else {
+            marks += rungs.map(function (r) {
+                var at = l.baseline ? Math.min((r.threshold / l.baseline) * 100, 100) : 0;
                 return '<span class="aemc-bh-mark' + (l.revenue >= r.threshold ? ' is-hit' : '') +
                     '" style="left:' + at.toFixed(1) + '%" title="' + money0(r.threshold) + ' pays ' + money2(r.pay) + '"></span>';
             }).join('');
+        }
+        marks += '<span class="aemc-bh-endcap"></span>';
 
-        // PACE MARKER — where she LANDS at today's pace, on the exact same axis as the rung
-        // ticks (same denominator, so it can never disagree with the ladder). Rendered as a
-        // flag rather than another tick so it doesn't read as one more milestone. The pace
-        // SENTENCE below stays as the text equivalent.
-        // Honest by construction: computePace() projects on the measured Q3 curve
-        // (Jul 30% / Aug 37% / Sep 33%), not elapsed days — straight-line maths makes a rep
-        // look further behind than she is on a back-loaded quarter.
-        var pace = l.pace;
-        if (pace && pace.projectedRevenue && axisMax) {
-            var at = Math.min((pace.projectedRevenue / axisMax) * 100, 100);
+        // PACE FLAG — where she LANDS at today's pace, on the same axis so it can never
+        // disagree with the track. Honest by construction: computePace() projects on the
+        // measured Q3 curve (Jul 30% / Aug 37% / Sep 33%), not elapsed days — straight-line
+        // maths makes a rep look further behind than she is on a back-loaded quarter.
+        if (pace && pace.projectedPct) {
+            var atPace = Math.max(0, Math.min(Number(pace.projectedPct), 100));
             var paceBehind = pace.status === 'behind' || pace.status === 'below-start';
-            el('aemc-bh-marks').insertAdjacentHTML('beforeend',
-                '<span class="mc-bh-pace-mark' + (paceBehind ? ' is-behind' : '') +
-                '" style="left:' + at.toFixed(1) + '%" role="img" aria-label="Projected ' +
-                money0(pace.projectedRevenue) + ' by September 30 at your current pace"></span>');
+            marks += '<span class="mc-bh-pace-mark' + (paceBehind ? ' is-behind' : '') +
+                '" style="left:' + atPace.toFixed(1) + '%" role="img" aria-label="Projected ' +
+                money0(pace.projectedRevenue) + ' by September 30 at your current pace"></span>';
+        }
+        el('aemc-bh-marks').innerHTML = marks;
+
+        // The 85% caption, on its own row (see the HTML comment for why).
+        var startCap = el('aemc-bh-startcap');
+        if (startCap) {
+            startCap.innerHTML = (isRate && l.baseline)
+                ? '<span style="left:' + (Number(l.rate.startPct) || 85) + '%">' +
+                  (Number(l.rate.startPct) || 85) + '% · ' + money0(l.rate.revenueAtStart) +
+                  ' — earning starts ↓</span>'
+                : '';
         }
 
         var nextText;
         if (isRate) {
             var earning = l.rate.pointsEarned > 0;
-            el('aemc-bh-rungs').innerHTML = earning
-                ? '<span class="aemc-bh-rung is-hit">' + l.rate.pointsEarned + ' points over ' +
-                  l.rate.startPct + '%<span class="aemc-bh-rung-pay">' + money2(l.rate.payout) + '</span></span>' +
-                  '<span class="aemc-bh-rung">each extra 1%<span class="aemc-bh-rung-pay">+' +
-                  money2(l.rate.perPoint) + '</span></span>'
-                : '<span class="aemc-bh-rung is-next">earning starts at ' + l.rate.startPct + '% — ' +
-                  money0(l.rate.revenueAtStart) + '<span class="aemc-bh-rung-pay">then ' +
-                  money2(l.rate.perPoint) + ' per 1%</span></span>';
             nextText = earning
                 ? 'Every extra 1% of your goal adds ' + money2(l.rate.perPoint) + ' — no ceiling.'
-                : money0(Math.max(0, l.rate.revenueAtStart - l.revenue)) + ' more embroidery and you start earning ' +
-                  money2(l.rate.perPoint) + ' per 1%.';
+                : money0(Math.max(0, l.rate.revenueAtStart - l.revenue)) + ' more embroidery and every 1% starts paying you ' +
+                  money2(l.rate.perPoint) + '.';
+        } else if (l.nextRung) {
+            nextText = money0(l.amountToNextRung) + ' more embroidery takes you to ' +
+                money2(l.nextRung.pay) + (top && top.pay > l.nextRung.pay ? ' — and ' + money2(top.pay) + ' at the top' : '');
+        } else if (k.next) {
+            nextText = 'Top rung cleared. ' + money0(k.amountToNext) + ' company-wide adds ' + money2(k.next.pay) + ' each.';
         } else {
-            el('aemc-bh-rungs').innerHTML = rungs.map(function (r) {
-                var hit = l.revenue >= r.threshold;
-                var isNext = l.nextRung && l.nextRung.pct === r.pct;
-                return '<span class="aemc-bh-rung' + (hit ? ' is-hit' : '') + (isNext ? ' is-next' : '') + '">' +
-                    (hit ? '<i class="fas fa-check"></i> ' : '') + money0(r.threshold) +
-                    '<span class="aemc-bh-rung-pay">' + money2(r.pay) + '</span></span>';
-            }).join('');
-            if (l.nextRung) {
-                nextText = money0(l.amountToNextRung) + ' more embroidery takes you to ' +
-                    money2(l.nextRung.pay) + (top && top.pay > l.nextRung.pay ? ' — and ' + money2(top.pay) + ' at the top' : '');
-            } else if (k.next) {
-                nextText = 'Top rung cleared. ' + money0(k.amountToNext) + ' company-wide adds ' + money2(k.next.pay) + ' each.';
-            } else {
-                nextText = 'Every milestone cleared this quarter. Outstanding.';
-            }
+            nextText = 'Every milestone cleared this quarter. Outstanding.';
         }
         el('aemc-bh-next').textContent = nextText;
+
+        renderBonusScenarios(mine, l, bounties, counts, isRate, pace);
 
         // Pace context. A raw "$110,651 more" a quarter of the way in reads as hopeless
         // even when the rep is tracking to clear it — this says which it is. Projection
@@ -1860,6 +1935,12 @@
         setTxt('aemc-bh-h-months', String(d.dormancyMonths || 12));
         var topKick = (k.tiers || []).slice(-1)[0];
         if (topKick) setTxt('aemc-bh-h-kick', money0(topKick.target));
+        // The rate, from live config — the explainer used to describe a rung ladder that no
+        // longer exists, and the kicker figure sat hardcoded at $740,000 for the same reason.
+        if (isRate) {
+            setTxt('aemc-bh-h-start', l.rate.startPct + '%');
+            setTxt('aemc-bh-h-point', money2(l.rate.perPoint));
+        }
 
         var chips = [
             { n: counts.new || 0, label: 'new program' + (counts.new === 1 ? '' : 's'), each: bounties.newAccountBounty },

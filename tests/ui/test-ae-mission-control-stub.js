@@ -1124,17 +1124,21 @@
                     "reactivatedBounty": 100,
                     "payout": 450
                 },
+                // Re-captured live 2026-07-27 after Taneisha's baseline moved 89039 -> 66609.
+                // Kept in step deliberately: at the old baseline she read `below-start`, so the
+                // banner's earning path — the pace scenario card, the amber flag past the tick —
+                // was never exercised here and a break in it would have shipped unseen.
                 "ladder": {
-                    "baseline": 89039,
+                    "baseline": 66609,
                     "revenue": 15841.48,
-                    "pctOfBaseline": 17.79,
+                    "pctOfBaseline": 23.78,
                     "excludedOnlineStoreAccounts": 3,
                     "excludedOnlineStoreRevenue": 2563,
                     "rate": {
                         "startPct": 85,
                         "perPoint": 60,
                         "pointsEarned": 0,
-                        "revenueAtStart": 75683.15,
+                        "revenueAtStart": 56617.65,
                         "payout": 0
                     },
                     "payout": 0,
@@ -1143,14 +1147,14 @@
                     "nextRung": null,
                     "amountToNextRung": 0,
                     "pace": {
-                        "asOf": "2026-07-26",
-                        "pctOfQuarterElapsed": 25.2,
+                        "asOf": "2026-07-27",
+                        "pctOfQuarterElapsed": 26.1,
                         "basis": "seasonal (Jul 30% / Aug 37% / Sep 33%, 2021-25 avg)",
-                        "projectedRevenue": 62959.73,
-                        "projectedPct": 70.71,
-                        "onPaceForPay": 0,
-                        "shortfallToStartAtPace": 12723.42,
-                        "status": "below-start"
+                        "projectedRevenue": 60627.89,
+                        "projectedPct": 91.02,
+                        "onPaceForPay": 361.23,
+                        "shortfallToStartAtPace": 0,
+                        "status": "earning"
                     }
                 },
                 "totalBonus": 450
