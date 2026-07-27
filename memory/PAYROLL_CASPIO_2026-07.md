@@ -112,6 +112,22 @@ totals — gross 38,933.71 / net 30,962.34 / 22 subtotals / every row `gross −
   new field `Vacation_Eligible_Date` records why. (Only Clark's is set; backfill others as
   `Date_Hired + 1 yr` if that rule is universal.)
 
+### 🔴 Post-import drift caught by auditing a CSV export (2026-07-27) — audit, don't assume
+A Caspio CSV export of `Employees` compared against the packet found **6 defects the import's own
+verification missed**, because that check only printed *derived* columns:
+- **4 ex-employees had `Sick_Accum_Hours_Available` = 0 while `Sick_Hours_Remaining` held the
+  correct figure** — internally contradictory, since remaining was computed as accrued − used at
+  write time. 🔑 **Verify the SOURCE columns, not just the derived ones** — a derived value can be
+  right while its input is silently zero.
+- **2 salaried staff kept a stale HOURLY `Pay`** (Jim 51.92, Nika 23.00). The importer only writes
+  `Pay` when the packet prints a rate, so salaried staff keep whatever was there. Both were
+  provably wrong (51.92×40 ≠ 4,000; 23×80 ≠ 2,876.54) and are now cleared — `Pay_Type` +
+  `Salary_Per_Period` + `Annual_Salary_Est` carry the truth. 🔑 **A field the importer skips is a
+  field that silently keeps a stale value.**
+Fixed by `scripts/payroll-fix-employee-drift.js` (reads back after writing). Re-audit: **21/21
+match the packet.** Deliberate exception — 3 *inactive* ex-employees keep their last known `Pay`
+(the packet prints no rate for them because they got no check, not because they had none).
+
 ### Verified after apply (2026-07-27)
 `Employees` 38 → **46 fields**; `Payroll_Register` created (41 fields) and holds **21 rows** that
 round-trip to the packet exactly (net $30,962.34, gross $38,933.71). **21/21 employees join via
@@ -158,11 +174,18 @@ UI: `src/routes/payroll.js` selects through **`SAFE_EMPLOYEE_FIELDS` / `SAFE_REG
 allowlists**, so adding a column to either table cannot leak compensation. Verified live — a real
 call returned zero pay fields.
 
-**Auth = two independent gates** (matching the `admin-rbac` precedent): proxy routes mounted
-`requireCrmApiSecret`; the app exposes them only via `createCrmProxy('payroll', ['admin'])`.
-🔑 `['admin']` not `['admin','accountant']` — `permissionsFromRole` grants admin the *accountant*
-permission but not the reverse, so an accountant session is correctly excluded. Page itself gated
-by the `Staff_Page_Access` row.
+**Auth = ERIK ONLY (2026-07-27), via a new exclusive-allowlist primitive.** 🔑 A
+`Staff_Page_Access` row can normally never restrict below "any admin" — `userMayAccessPage`
+short-circuits on `admin` *before* reading the rule. So `userMayAccessPage` now treats **a rule
+with `Allowed_Emails` and NO `Allowed_Roles` as an exclusive allowlist the admin override does
+not bypass**. `payroll.html` = `roles[] emails[erik@nwcustomapparel.com]`. Still table-driven —
+Erik changes who sees payroll with no deploy. ⚠ You CAN lock yourself out of such a page.
+Regression-tested against every existing rule shape; only `sanmar-vendor-portal.html` matches the
+new shape and its result is unchanged.
+🔑 The API is gated by **`requirePageAccess('payroll.html')` — the same table row as the page**,
+not `requireCrmRole`: a role gate can't express "one person", and `['admin']` would silently widen
+the moment a second admin exists. It **fails CLOSED** (the page gate fails open). Proxy side stays
+`requireCrmApiSecret`. Nav link lives under **Administration** in `staff-dashboard-v3/index.html`.
 
 ### Upload flow — read → reconcile → save (3 steps for a reason)
 🔴 **The parse CANNOT be synchronous**: Heroku requires a first byte within 30 s and vision
