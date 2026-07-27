@@ -51,6 +51,10 @@
         tab: 'today',      // mirror of tabs.current(); DashTabs owns the truth
         reduceMotion: false,
 
+        // Chapter-chip counts, filled in by whichever loader owns each number. Rendered as
+        // chips only when > 0 — a chip reading "Fires 0" is worse than no chip.
+        chapterCounts: { fires: 0, artwork: 0, missing: 0, inbound: 0, purch: 0 },
+
         // --- The One Thing candidate pools, filled in by each loader as it resolves ---
         dueLate: null,
         almostThere: null,
@@ -162,6 +166,150 @@
                 var n = btn.getAttribute('data-more'), noun = btn.getAttribute('data-noun') || 'row';
                 btn.innerHTML = '<i class="fas fa-chevron-down"></i> Show ' + n + ' more ' + noun + (n === '1' ? '' : 's');
             }
+        });
+    }
+
+    // ---------- Today: capped cards, order clock, chapter chips, drawers ----------
+    var CAP = 4;                       // rows shown inline; the rest lives in a drawer
+    var drawerState = { open: null, opener: null, full: {} };
+
+    /**
+     * Render at most CAP rows and hand the overflow to a drawer.
+     *
+     * NOT expandableRows: that renders every item and hides the overflow with CSS, which is
+     * what made Today a 3,400px scroll in the first place — the rows were always in the DOM,
+     * just invisible. Here the overflow genuinely does not render until asked for.
+     */
+    function cappedRows(items, renderItem) {
+        return '<ul class="mc-rows">' + items.slice(0, CAP).map(renderItem).join('') + '</ul>';
+    }
+
+    function setViewAll(btnId, total, label) {
+        var b = el(btnId);
+        if (!b) return;
+        if (total > CAP) {
+            b.innerHTML = esc(label || ('View all ' + total)) + ' <i class="fas fa-arrow-right" aria-hidden="true"></i>';
+            b.hidden = false;
+        } else {
+            b.hidden = true;
+        }
+    }
+
+    /**
+     * Order clock. Arc lengths are DERIVED from the live counts — the design's dash values
+     * were illustrative and hardcoding them would draw yesterday's day forever.
+     */
+    function renderOrderClock(counts, total) {
+        var host = el('mc-clock');
+        if (!host) return;
+        var late = Number(counts.late) || 0;
+        var risk = Number(counts.atRisk) || 0;
+        var ok = Number(counts.dueSoonOnTrack) || 0;
+        var sum = late + risk + ok;
+        var CIRC = 301.6;                          // 2πr at r=48
+        var seg = function (n, colour, offset) {
+            if (!n || !sum) return '';
+            var len = CIRC * n / sum;
+            return '<circle cx="60" cy="60" r="48" fill="none" stroke="' + colour + '" stroke-width="16" ' +
+                'stroke-dasharray="' + len.toFixed(1) + ' ' + (CIRC - len).toFixed(1) + '" ' +
+                'stroke-dashoffset="' + (-offset).toFixed(1) + '" transform="rotate(-90 60 60)"></circle>';
+        };
+        var o1 = CIRC * late / (sum || 1);
+        var o2 = o1 + CIRC * risk / (sum || 1);
+        // Headline the worst thing that is true: late if there is any, else at-risk, else calm.
+        var headN = late || risk || ok;
+        var headLbl = late ? 'past due' : (risk ? 'at risk' : 'on track');
+
+        host.innerHTML =
+            '<div class="mc-clock">' +
+              '<svg viewBox="0 0 120 120" class="mc-clock-svg" role="img" aria-label="' +
+                late + ' past due, ' + risk + ' at risk, ' + ok + ' on track">' +
+                '<circle cx="60" cy="60" r="48" fill="none" stroke="var(--gray-100)" stroke-width="16"></circle>' +
+                seg(late, '#dc2626', 0) + seg(risk, '#f59e0b', o1) + seg(ok, '#4cb354', o2) +
+                '<text x="60" y="57" text-anchor="middle" class="mc-clock-n">' + headN + '</text>' +
+                '<text x="60" y="74" text-anchor="middle" class="mc-clock-l">' + headLbl + '</text>' +
+              '</svg>' +
+              '<div class="mc-clock-key">' +
+                '<div><span class="mc-sw" style="background:#dc2626"></span><b>' + late + '</b> past due</div>' +
+                '<div><span class="mc-sw" style="background:#f59e0b"></span><b>' + risk + '</b> at risk</div>' +
+                '<div><span class="mc-sw" style="background:#4cb354"></span><b>' + ok + '</b> on track</div>' +
+              '</div>' +
+            '</div>';
+        var sub = el('mc-clock-sub');
+        if (sub) sub.textContent = total ? total + ' unshipped' : '';
+    }
+
+    /** Chapter chips. Counts ride on data already fetched; a zero count is omitted, not shown. */
+    function renderChapters() {
+        var nav = el('mc-chapters');
+        if (!nav) return;
+        var defs = [
+            { id: 'mc-fires', label: 'Fires', n: state.chapterCounts.fires, cls: 'is-fire', dot: '#dc2626' },
+            { id: 'mc-artwork', label: 'Artwork', n: state.chapterCounts.artwork, cls: 'is-art', dot: '#8b5cf6' },
+            { id: 'mc-missing', label: 'Missing info', n: state.chapterCounts.missing, cls: '' },
+            { id: 'mc-inbound', label: 'Inbound', n: state.chapterCounts.inbound, cls: '' },
+            { id: 'mc-purch', label: 'Purchasing', n: state.chapterCounts.purch, cls: '' },
+        ].filter(function (c) { return c.n > 0; });
+        if (!defs.length) { nav.hidden = true; return; }
+        nav.innerHTML = '<span class="mc-chapters-label">Jump to</span>' + defs.map(function (c) {
+            return '<a class="mc-chip ' + c.cls + '" href="#' + c.id + '">' +
+                (c.dot ? '<span class="mc-chip-dot" style="background:' + c.dot + '"></span>' : '') +
+                esc(c.label) + ' ' + c.n + '</a>';
+        }).join('');
+        nav.hidden = false;
+    }
+
+    // ---------- drawer ----------
+    function openDrawer(kind, opener) {
+        var d = el('mc-drawer'), scrim = el('mc-drawer-scrim');
+        if (!d) return;
+        var cfg = drawerState.full[kind];
+        if (!cfg) return;
+        el('mc-drawer-title').textContent = cfg.title;
+        el('mc-drawer-sum').textContent = cfg.summary || '';
+        el('mc-drawer-body').innerHTML = cfg.body;
+        el('mc-drawer-foot').innerHTML = cfg.foot || '';
+        drawerState.open = kind;
+        drawerState.opener = opener || null;
+        scrim.hidden = false;
+        d.hidden = false;
+        document.body.style.overflow = 'hidden';
+        var first = d.querySelector('.mc-drawer-close');
+        if (first) first.focus();
+    }
+
+    function closeDrawer() {
+        var d = el('mc-drawer'), scrim = el('mc-drawer-scrim');
+        if (!d || d.hidden) return;
+        d.hidden = true;
+        scrim.hidden = true;
+        document.body.style.overflow = '';
+        // Focus goes back to whatever opened it, or the keyboard user is dumped at the top.
+        if (drawerState.opener && document.contains(drawerState.opener)) drawerState.opener.focus();
+        drawerState.open = null;
+        drawerState.opener = null;
+    }
+
+    function wireDrawer() {
+        document.addEventListener('click', function (e) {
+            if (e.target.closest('#mc-drawer-close') || e.target.closest('#mc-drawer-scrim')) { closeDrawer(); return; }
+            var fires = e.target.closest('#mc-fires-all');
+            if (fires) { openDrawer('fires', fires); return; }
+            var art = e.target.closest('#mc-artwork-all');
+            if (art) { openDrawer('artwork', art); return; }
+        });
+        document.addEventListener('keydown', function (e) {
+            if (!drawerState.open) return;
+            if (e.key === 'Escape') { closeDrawer(); return; }
+            if (e.key !== 'Tab') return;
+            // Focus trap. Without it, Tab walks straight out of an aria-modal dialog into the
+            // page behind the scrim, which is invisible and unusable.
+            var d = el('mc-drawer');
+            var f = d.querySelectorAll('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])');
+            if (!f.length) return;
+            var first = f[0], last = f[f.length - 1];
+            if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+            else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
         });
     }
 
@@ -395,6 +543,7 @@
             wireKitModal();
             wireExpandToggles();
             wireCallList();
+            wireDrawer();
             migrateLayout();        // BEFORE wireCardCollapse — see the comment in there
             wireCardCollapse();
             wireBonusExplainer();
@@ -1281,6 +1430,47 @@
         return '<div><h3 class="aemc-queue-section-title">' + title + '</h3><ul class="aemc-queue-list">' + itemsHtml + '</ul></div>';
     }
 
+    /**
+     * Artwork awaiting the rep's approval — its own capped card since 2026-07-27.
+     * Oldest wait first: an approval that has been sitting a fortnight is the one holding
+     * up a job, and the age colour says so without the rep doing date arithmetic.
+     */
+    function renderArtworkCard(items) {
+        var host = el('aemc-artwork');
+        if (!host) return;
+        var pill = el('aemc-art-sub');
+        state.chapterCounts.artwork = items.length;
+        renderChapters();
+        if (pill) pill.textContent = items.length ? String(items.length) : '';
+        if (!items.length) {
+            host.innerHTML = '<div class="aemc-empty">Nothing waiting on your approval.</div>';
+            setViewAll('mc-artwork-all', 0);
+            return;
+        }
+        var byAge = items.slice().sort(function (a, b) {
+            return new Date(a.dueDate || 0) - new Date(b.dueDate || 0);
+        });
+        var row = function (a) {
+            var days = a.dueDate ? Math.floor((Date.now() - new Date(a.dueDate).getTime()) / 86400000) : 0;
+            var ageCls = days >= 14 ? ' is-old' : (days >= 7 ? ' is-warm' : '');
+            return '<li class="aemc-row">' +
+                '<span class="aemc-row-main">#' + esc(a.idDesign) + ' — ' + esc(a.companyName || '') + '</span>' +
+                '<span class="aemc-row-right">' +
+                  '<span class="aemc-row-meta' + ageCls + '">' +
+                  (a.dueDate ? 'due ' + fmtWhen(a.dueDate) : 'awaiting you') + '</span> ' +
+                  '<a class="aemc-mini-btn" href="/dashboards/ae-dashboard.html"><i class="fas fa-eye"></i> Review</a>' +
+                '</span></li>';
+        };
+        host.innerHTML = cappedRows(byAge, row);
+        setViewAll('mc-artwork-all', byAge.length);
+        drawerState.full.artwork = {
+            title: 'Artwork to approve',
+            summary: byAge.length + ' waiting on you',
+            body: '<ul class="aemc-rows">' + byAge.map(row).join('') + '</ul>',
+            foot: '<a class="aemc-viewall" href="/dashboards/ae-dashboard.html">Open the art dashboard</a>',
+        };
+    }
+
     function renderQueue(data) {
         var q = data.actionQueue || {};
         var total = 0;
@@ -1315,13 +1505,9 @@
         total += (q.staleQuotes || []).length;
         html += section('🟠 Quotes needing a follow-up', quotes);
 
-        var art = (q.artAwaitingApproval || []).map(function (a) {
-            var main = '<a class="aemc-queue-main" href="/dashboards/ae-dashboard.html">#' + esc(a.idDesign) + ' — ' + esc(a.companyName || '') + '</a>';
-            return queueItem('art', main, 'Awaiting your approval' + (a.dueDate ? ' · due ' + fmtWhen(a.dueDate) : ''),
-                '<a class="aemc-mini-btn" href="/dashboards/ae-dashboard.html"><i class="fas fa-eye"></i> Review</a>');
-        }).join('');
-        total += (q.artAwaitingApproval || []).length;
-        html += section('🟣 Artwork awaiting your approval', art);
+        // Artwork left this queue on 2026-07-27 — it has its own capped card on Today, and
+        // rendering it in both places would double-count the day's workload.
+        renderArtworkCard(q.artAwaitingApproval || []);
 
         var kits = (q.kitsPending || []).map(function (k) {
             var main = k.submissionId
@@ -1515,9 +1701,9 @@
         return sameOriginJson('/api/crm-proxy/ae-dashboard/purchasing' + qs(refresh)).then(function (p) {
             var c = p.counts || {};
             var waiting = (c.sent || 0);
-            el('aemc-purch-sub').textContent = p.submissionCount
-                ? '(' + p.submissionCount + ' request' + (p.submissionCount === 1 ? '' : 's') + ' in ' + p.windowDays + 'd' + (waiting ? ' · ' + waiting + ' not yet ordered' : '') + ')'
-                : '';
+            el('aemc-purch-sub').textContent = p.submissionCount ? String(p.submissionCount) : '';
+            state.chapterCounts.purch = p.submissionCount || 0;
+            renderChapters();
             if (!p.items || !p.items.length) {
                 el('aemc-purch').innerHTML = '<div class="aemc-empty">No purchase requests sent to Bradley in the last ' + p.windowDays + ' days.</div>';
                 return;
@@ -1526,7 +1712,10 @@
             (p.items || []).forEach(function (m) {
                 (m.orders || []).forEach(function (o) { purchRows.push({ m: m, o: o }); });
             });
-            el('aemc-purch').innerHTML = expandableRows(purchRows, function (r, hidden) {
+            // Capped to CAP inline like every other Today card; the full history is one click
+            // away in the purchasing portal, which is where you act on it anyway.
+            el('aemc-purch').innerHTML = cappedRows(purchRows, function (r) {
+                var hidden = false;
                 var m = r.m, o = r.o;
                 var meta = [];
                 if (o.orderedDate) meta.push('ordered ' + fmtWhen(o.orderedDate) + (o.vendors && o.vendors.length ? ' (' + o.vendors.join(', ') + ')' : ''));
@@ -1543,7 +1732,8 @@
                     invBtn +
                     '<span class="aemc-row-right"><span class="aemc-row-meta">' + esc(meta.join(' · ')) + '</span></span>' +
                     '</li>';
-            }, { noun: 'request' }) +
+            }) + (purchRows.length > CAP
+                ? '<p class="aemc-hint">…and ' + (purchRows.length - CAP) + ' more in the portal.</p>' : '') +
                 (p.truncated ? '<p class="aemc-hint">…and ' + p.truncated + ' older request' + (p.truncated === 1 ? '' : 's') + ' in the form inbox.</p>' : '');
             Array.prototype.forEach.call(el('aemc-purch').querySelectorAll('.aemc-inv-btn'), function (btn) {
                 btn.addEventListener('click', function () {
@@ -1586,36 +1776,61 @@
     function loadDueDates(refresh) {
         return sameOriginJson('/api/crm-proxy/ae-dashboard/due-dates' + qs(refresh)).then(function (d) {
             var c = d.counts || {};
-            var bits = [];
-            if (c.late) bits.push(c.late + ' late');
-            if (c.atRisk) bits.push(c.atRisk + ' at risk');
-            el('aemc-due-sub').textContent = bits.length ? '(' + bits.join(' · ') + ')' : '';
             state.dueLate = d.late || [];        // feeds The One Thing (fires outrank bounties)
             renderOneThing();
-            if (!(d.late || []).length && !(d.atRisk || []).length) {
+
+            var late = d.late || [], risk = d.atRisk || [];
+            var fires = late.concat(risk);
+            var total = (c.late || 0) + (c.atRisk || 0) + (c.dueSoonOnTrack || 0);
+            renderOrderClock(c, total);
+
+            var pill = el('aemc-due-sub');
+            if (pill) pill.textContent = fires.length ? String((c.late || 0) + (c.atRisk || 0)) : '';
+            state.chapterCounts.fires = (c.late || 0) + (c.atRisk || 0);
+            renderChapters();
+
+            if (!fires.length) {
                 el('aemc-due').innerHTML = '<div class="aemc-empty">Nothing is late and nothing due in the next ' +
                     (d.dueSoonDays || 7) + ' days is waiting on blanks' +
                     (c.dueSoonOnTrack ? ' — ' + c.dueSoonOnTrack + ' order' + (c.dueSoonOnTrack === 1 ? '' : 's') + ' due soon already have goods in house' : '') + '.</div>';
+                setViewAll('mc-fires-all', 0);
                 return;
             }
-            var html = '';
-            if ((d.late || []).length) {
-                html += '<h3 class="aemc-queue-section-title">🔴 Past due — not shipped</h3>' +
-                    expandableRows(d.late, dueRow, { noun: 'order' }) +
+
+            // Worst first — the card shows the four that cost the most to ignore, and the
+            // drawer keeps the original two-section split so the distinction between "already
+            // late" and "about to be" survives.
+            el('aemc-due').innerHTML = cappedRows(fires, function (x) { return dueRow(x, false); });
+            setViewAll('mc-fires-all', fires.length, 'View all ' + ((c.late || 0) + (c.atRisk || 0)));
+
+            var body = '';
+            if (late.length) {
+                body += '<h3 class="aemc-queue-section-title">🔴 Past due — not shipped</h3>' +
+                    expandableRows(late, dueRow, { noun: 'order' }) +
                     (d.lateTruncated ? '<p class="aemc-hint">…and ' + d.lateTruncated + ' more past-due order' + (d.lateTruncated === 1 ? '' : 's') + '.</p>' : '');
             }
-            if ((d.atRisk || []).length) {
-                html += '<h3 class="aemc-queue-section-title">🟠 Due soon — blanks not in house</h3>' +
-                    expandableRows(d.atRisk, dueRow, { noun: 'order' }) +
+            if (risk.length) {
+                body += '<h3 class="aemc-queue-section-title">🟠 Due soon — blanks not in house</h3>' +
+                    expandableRows(risk, dueRow, { noun: 'order' }) +
                     (d.atRiskTruncated ? '<p class="aemc-hint">…and ' + d.atRiskTruncated + ' more at-risk order' + (d.atRiskTruncated === 1 ? '' : 's') + '.</p>' : '');
             }
             if (c.dueSoonOnTrack) {
-                html += '<p class="aemc-hint">' + c.dueSoonOnTrack + ' other order' + (c.dueSoonOnTrack === 1 ? '' : 's') + ' due in the next ' +
+                body += '<p class="aemc-hint">' + c.dueSoonOnTrack + ' other order' + (c.dueSoonOnTrack === 1 ? '' : 's') + ' due in the next ' +
                     (d.dueSoonDays || 7) + ' days already have blanks in house — on track.</p>';
             }
-            el('aemc-due').innerHTML = html;
+            drawerState.full.fires = {
+                title: 'Late & at risk',
+                summary: (c.late || 0) + ' past due · ' + (c.atRisk || 0) + ' at risk · ' + (c.dueSoonOnTrack || 0) + ' on track',
+                body: body,
+                foot: '<p class="aemc-hint"><span class="aemc-due-flag aemc-due-flag--late">Late</span> = the requested ship date already passed. ' +
+                      '<span class="aemc-due-flag aemc-due-flag--risk">At risk</span> = due within ' + (d.dueSoonDays || 7) +
+                      ' days with blanks not purchased or received.</p>' +
+                      '<a class="aemc-viewall" href="/dashboards/purchasing-portal.html">Full purchasing portal</a>',
+            };
         }).catch(function (err) {
             el('aemc-due').innerHTML = '<div class="aemc-panel-error">Order due dates failed to load (' + esc(err.message) + '). Refresh to retry.</div>';
+            var ck = el('mc-clock');
+            if (ck) ck.innerHTML = '<div class="aemc-panel-error">Couldn\'t read your due dates.</div>';
         });
     }
 
@@ -2195,36 +2410,46 @@
     function loadDataQuality(refresh) {
         return sameOriginJson('/api/crm-proxy/ae-dashboard/data-quality' + qs(refresh)).then(function (d) {
             var c = d.counts || {};
+            // Count pill reads "8 + 14" — orders and customer records are different fixes in
+            // different places, so one summed number would mislead about the work involved.
             el('aemc-dq-sub').textContent = (c.ordersFlagged || c.customersFlagged)
-                ? '(' + (c.ordersFlagged || 0) + ' order' + (c.ordersFlagged === 1 ? '' : 's') + ' · ' +
-                  (c.customersFlagged || 0) + ' customer' + (c.customersFlagged === 1 ? '' : 's') + ' need attention)'
+                ? (c.ordersFlagged || 0) + ' + ' + (c.customersFlagged || 0)
                 : '';
+            state.chapterCounts.missing = (c.ordersFlagged || 0) + (c.customersFlagged || 0);
+            renderChapters();
+            var dqAll = el('mc-missing-all');
+            if (dqAll) {
+                if (state.chapterCounts.missing) {
+                    dqAll.innerHTML = 'Open all ' + state.chapterCounts.missing + ' in ShopWorks <i class="fas fa-up-right-from-square" aria-hidden="true"></i>';
+                    dqAll.hidden = false;
+                } else { dqAll.hidden = true; }
+            }
             if (!(d.orders || []).length && !(d.customers || []).length) {
                 el('aemc-dq').innerHTML = '<div class="aemc-empty">Clean sweep — every open order you entered in the last ' +
                     (d.windowDays || 30) + ' days has contact, ship-to, terms, ship date, and tax filled in. Nice work.</div>';
                 return;
             }
-            var html = '';
-            if ((d.orders || []).length) {
-                html += '<h3 class="aemc-queue-section-title">Orders missing fields</h3>' +
-                    expandableRows(d.orders, function (o, hidden) {
-                        return '<li class="aemc-row' + (hidden ? ' aemc-row--collapsed' : '') + '">' +
-                            '<span class="aemc-row-main">WO #' + esc(o.idOrder) + (o.company ? ' — ' + esc(o.company) : '') + '</span>' +
-                            dqChips(o.issues) +
-                            '<span class="aemc-row-right"><span class="aemc-row-meta">entered ' + fmtWhen(o.placedDate) + '</span></span>' +
-                            '</li>';
-                    }, { noun: 'order' });
-            }
+            // Capped like its neighbours — the full list is a ShopWorks job anyway, and the
+            // footer link goes there. Orders first (they block production), then a single
+            // summary row standing in for the customer records.
+            var orderRow = function (o) {
+                return '<li class="aemc-row">' +
+                    '<span class="aemc-row-main">WO #' + esc(o.idOrder) + (o.company ? ' — ' + esc(o.company) : '') + '</span>' +
+                    dqChips(o.issues) +
+                    '<span class="aemc-row-right"><span class="aemc-row-meta">entered ' + fmtWhen(o.placedDate) + '</span></span>' +
+                    '</li>';
+            };
+            var shown = (d.orders || []).slice(0, CAP - ((d.customers || []).length ? 1 : 0));
+            var html = '<ul class="mc-rows">' + shown.map(orderRow).join('');
             if ((d.customers || []).length) {
-                html += '<h3 class="aemc-queue-section-title">Customer records needing updates</h3>' +
-                    expandableRows(d.customers, function (cu, hidden) {
-                        return '<li class="aemc-row' + (hidden ? ' aemc-row--collapsed' : '') + '">' +
-                            '<span class="aemc-row-main">' + esc(cu.company) + '</span>' +
-                            dqChips(cu.issues) +
-                            '<span class="aemc-row-right"><span class="aemc-row-meta">Cust #' + esc(cu.idCustomer) + '</span></span>' +
-                            '</li>';
-                    }, { noun: 'customer' });
+                html += '<li class="aemc-row">' +
+                    '<span class="aemc-row-main">' + (d.customers || []).length + ' customer record' +
+                    ((d.customers || []).length === 1 ? '' : 's') + ' need setup fixes</span>' +
+                    '<span class="aemc-row-right"><span class="aemc-row-meta">' +
+                    esc(((d.customers || []).slice(0, 2).map(function (cu) { return cu.company; }).join(', ')) ||
+                        '') + '</span></span></li>';
             }
+            html += '</ul>';
             el('aemc-dq').innerHTML = html;
         }).catch(function (err) {
             el('aemc-dq').innerHTML = '<div class="aemc-panel-error">Missing-info check failed to load (' + esc(err.message) + '). Refresh to retry.</div>';
@@ -2241,8 +2466,10 @@
             var mineName = state.rep && state.rep.fullName;
             var mine = mineName ? orders.filter(function (o) { return String(o.salesRep || '').trim() === mineName; }) : [];
             el('aemc-inbound-sub').textContent = orders.length
-                ? '(' + orders.length + ' PO' + (orders.length === 1 ? '' : 's') + ' company-wide · ' + mine.length + ' yours)'
+                ? mine.length + ' yours · ' + orders.length + ' all'
                 : '';
+            state.chapterCounts.inbound = mine.length;
+            renderChapters();
             if (!orders.length) {
                 el('aemc-inbound').innerHTML = '<div class="aemc-empty">No SanMar shipments due today.</div>';
                 return;
