@@ -1,3 +1,18 @@
+## v2026.07.27.8 (2026.07.27)
+
+- Memory: the four thumbnails that failed 643 times behind a clean-looking log
+- Memory: second archive pass — LESSONS 288 -> 247 lines
+- Memory: payroll-in-Caspio audit — existing HR tables, stale Pay/vacation columns, proposed 3-table design
+- Memory: payroll design decided — 1 table + Employees fields, scripts written, apply pending
+- Memory: payroll roster/name decisions confirmed with Erik
+- Memory: payroll tables LIVE 7/27 - applied and verified
+- Memory: payroll follow-ups applied - vacation eligibility rule, ex-staff removed, admin-only
+- Payroll dashboard: admin-only leave balances, period hours, packet upload
+- Memory: payroll dashboard + API built, with the design constraints that forced the shape
+- Payroll: Erik-only via exclusive email allowlist + Administration nav link
+- Memory: Erik-only allowlist primitive + the post-import drift the first audit missed
+- Deploy v2026.07.27.8: cache-bust payroll dashboard assets
+
 ## v2026.07.27.7 (2026.07.27)
 
 - Pre-push guard: production ships through /deploy, not by hand
