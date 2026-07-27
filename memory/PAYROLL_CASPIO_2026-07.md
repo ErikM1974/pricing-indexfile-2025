@@ -101,6 +101,13 @@ totals — gross 38,933.71 / net 30,962.34 / 22 subtotals / every row `gross −
   is 17 vs a 16-name roster purely because of her. OPEN — Erik to confirm.
 - 🔑 Name corrections are keyed by **payroll ID → resolved `ID_Record_Employee`, never by name**, and
   resolution falls back through known prior spellings so pre- and post-rename runs resolve identically.
+- 🔴 **`Vacation_Hours_Remaining` silently stopped being a Caspio formula (2026-07-27)** while the
+  table was open in Table Design. It is now a plain editable NUMBER, so it **no longer recomputes** —
+  the next packet would have left it stale while every other balance updated. Both importers now
+  write it; the API route **probes field editability first** so converting it back to a formula
+  degrades safely instead of 400-ing the whole record update. 🔑 **A Caspio formula field can become
+  a plain field without warning — never assume a derived column still derives.** (`Full_Address` and
+  `Full_Name_Formula` are still formulas, which is how the probe was confirmed accurate.)
 - 🔴 `Employees.First_Name` **UNIQUE cannot be cleared via REST** — returns
   `ReferentialIntegrity: "Object cannot be changed or deleted because it is referenced by one or more
   objects."` So the constraint is **load-bearing for a Caspio relationship**, not just a stray checkbox
