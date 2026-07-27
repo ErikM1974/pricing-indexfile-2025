@@ -137,14 +137,39 @@ $0.002/call. **~24% of the entire quota traced to one bandit task.**
   Thumbnail-metadata also gained a `ThumbMetaOverlapMinutes` override; it sits at
   overlap 30 / cadence 30 = **zero slack**, left as-is because any value >30 doubles
   its writes. Raise to ~45 only if rows are observed going missing.
-- **⏳ ERIK (not applied — bandit is not reachable from the workstation)**: run the
-  `schtasks /RI 240` line above, and re-copy `sync-orders.ps1`,
-  `sync-purchase-orders.ps1`, `sync-thumbnail-metadata.ps1` from
-  `caspio-pricing-proxy/scripts/bandit-agent/` to `C:\NWCA\odbc-sync\`.
-  Until then the **~3,630/day (~$218/period)** saving is NOT live. A daily 9 AM
-  reminder task self-checks the meter and reports whether it is still outstanding.
-- Living doc `/dashboards/bandit-integration.html` carries the same note and shows
-  the cadence as "20 min → 4 h pending" until the change is made on the box.
+- **✅ APPLIED 2026-07-27 over PS-remoting.** `schtasks /Change /RI 240` → verified
+  `Repeat: Every: 4 Hour(s), 0 Minute(s)`, duration still indefinite, SYSTEM, state
+  Enabled, `Last Result: 0`. Metadata Sync confirmed **untouched at 30 min**. All 7
+  `\NWCA` tasks surveyed: every other cadence already matched the docs.
+  **~3,630 calls/day (~$218/period) is now live.**
+  🔑 **Remoting DOES work from the laptop** — the older "bandit is not reachable"
+  note was wrong/stale. `Import-Clixml "$env:USERPROFILE\bandit-cred.xml"` +
+  `Invoke-Command -ComputerName bandit` succeeds even with `TrustedHosts` empty.
+  ⚠️ **Double-hop still applies**: an interactive remote session **cannot** read
+  `\\NCA-FS01\Thumbnails` (Access denied) — only the SYSTEM-run task can, because
+  the BANDIT *machine account* holds the share grant. Inspect the share via the
+  task's log, not via `Invoke-Command`.
+  ⚠️ `Get-ScheduledTask` still returns empty over remoting — use `schtasks`. And
+  `Select-String` output does not serialize back over `Invoke-Command`; filter with
+  `Where-Object` + `-replace` and `Write-Output` plain strings.
+- **⏳ ERIK still to do**: re-copy `sync-orders.ps1`, `sync-purchase-orders.ps1`,
+  `sync-thumbnail-metadata.ps1` from `caspio-pricing-proxy/scripts/bandit-agent/`
+  to `C:\NWCA\odbc-sync\` (the `OrdersOverlapMinutes` change).
+- **🔴 OPEN — 4 oversized thumbnails can NEVER sync (found 2026-07-27).**
+  `upload-with-stub` caps uploads at **20 MB** (`multer limits.fileSize`,
+  `src/routes/thumbnails.js:18`). Four files are **21–28 MB** and fail on **every**
+  run; multer's `LIMIT_FILE_SIZE` is not caught, so they surface as an **opaque
+  HTTP 500** instead of "file too large". Confirmed by `content-length` in the
+  Heroku log: all four failures 22.3–29.3 MB, all eight successes 0.03–1.7 MB.
+  Files: `106886_Copy of Warriors2.png`, `100641_36971 ETC Tacoma (9 Year Sports
+  Collage) (Final) A.png`, `98671_35921Coob Scooter Adult FF FP copy.png`,
+  `78223_BE KIND (1).png` — the names suggest full-res artwork dropped into the
+  thumbnails share, not real thumbnails. **The agent still logs `0 still pending`**
+  because it counts an errored file as processed, so the log reads clean while four
+  images are permanently stuck. Fix needs a decision: resize/remove at source, or
+  raise the cap (`multer.memoryStorage()` holds the whole file in dyno RAM).
+- Living doc `/dashboards/bandit-integration.html` now shows the cadence as plain
+  "4 h" and carries the oversized-file item as OPEN.
 - **⚠️ Log-reading gotcha for this task:** `sync-thumbnails-to-box.ps1:118` `continue`s
   past files whose Caspio row does not exist yet **before** they are counted, so the
   logged `pending (new/changed): N` **excludes images awaiting a row** and `$skip`
