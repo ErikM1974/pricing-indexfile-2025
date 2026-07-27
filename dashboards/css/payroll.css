@@ -1,0 +1,81 @@
+/* Payroll — admin-only leave/hours dashboard. NWCA green theme; no inline styles. */
+* { box-sizing: border-box; }
+body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: #f5f7f5; color: #1f2a24; }
+
+.pr-wrap { max-width: 1240px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
+
+.pr-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; border-bottom: 3px solid #1a472a; padding-bottom: 1rem; margin-bottom: 1rem; }
+.pr-header h1 { color: #1a472a; font-size: 1.6rem; margin: 0; }
+.pr-sub { color: #5a665e; margin: .35rem 0 0; font-size: .92rem; max-width: 72ch; }
+.pr-back { color: #3a7c52; text-decoration: none; font-weight: 600; font-size: .9rem; white-space: nowrap; }
+.pr-back:hover { color: #1a472a; }
+
+.pr-status { min-height: 1.4rem; margin: .25rem 0 .75rem; font-size: .9rem; font-weight: 500; }
+.pr-status.is-ok { color: #1a7c3a; }
+.pr-status.is-error { color: #b3261e; }
+.pr-status.is-info { color: #5a665e; }
+
+.pr-tabs { display: flex; gap: .5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+.pr-tab { background: #e7ede9; border: none; color: #3a4a42; padding: .55rem 1.1rem; border-radius: 8px 8px 0 0; font-weight: 600; cursor: pointer; font-size: .95rem; }
+.pr-tab.is-active { background: #1a472a; color: #fff; }
+
+.pr-panel { display: none; background: #fff; border-radius: 10px; padding: 1.25rem; box-shadow: 0 1px 3px rgba(26,71,42,.08); }
+.pr-panel.is-active { display: block; }
+.pr-panel-head h2 { color: #1a472a; font-size: 1.15rem; margin: 0 0 .35rem; }
+.pr-panel-head p { color: #5a665e; font-size: .9rem; margin: 0 0 1rem; max-width: 80ch; line-height: 1.5; }
+.pr-h3 { color: #1a472a; font-size: 1rem; margin: 1.5rem 0 .6rem; }
+
+.pr-toolbar { display: flex; align-items: center; gap: .75rem; margin-bottom: .9rem; flex-wrap: wrap; }
+.pr-label { font-size: .88rem; font-weight: 600; color: #3a4a42; }
+.pr-search, .pr-select { border: 1px solid #cfdad3; border-radius: 7px; padding: .5rem .7rem; font-size: .92rem; font-family: inherit; color: #1f2a24; background: #fff; }
+.pr-search { min-width: 18rem; }
+.pr-search:focus, .pr-select:focus { outline: 2px solid #3a7c52; outline-offset: 1px; }
+.pr-asof { font-size: .85rem; color: #5a665e; margin-left: auto; }
+
+/* Wide tables scroll inside their own container — the page never scrolls sideways. */
+.pr-tablewrap { overflow-x: auto; }
+.pr-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.pr-table th { text-align: left; background: #eef3f0; color: #2c3b33; font-weight: 600; padding: .55rem .65rem; border-bottom: 2px solid #d6e0da; white-space: nowrap; }
+.pr-table td { padding: .5rem .65rem; border-bottom: 1px solid #edf1ee; white-space: nowrap; }
+.pr-table tbody tr:hover { background: #f7faf8; }
+.pr-num { text-align: right; }
+.pr-loading { color: #8a968f; font-style: italic; padding: 1rem .65rem; }
+
+.pr-neg { color: #b3261e; font-weight: 600; }
+.pr-zero { color: #9aa69f; }
+.pr-name { font-weight: 600; color: #1f2a24; }
+.pr-dept { color: #5a665e; }
+.pr-pill { display: inline-block; font-size: .74rem; font-weight: 600; padding: .1rem .45rem; border-radius: 20px; background: #e7ede9; color: #3a4a42; margin-left: .4rem; }
+.pr-pill-wait { background: #fdf1dc; color: #8a5a10; }
+.pr-yes { color: #1a7c3a; font-weight: 600; }
+.pr-no { color: #9aa69f; }
+
+.pr-upload { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; padding: 1rem; background: #f7faf8; border: 1px dashed #cfdad3; border-radius: 9px; }
+.pr-file { font-size: .9rem; font-family: inherit; }
+.pr-note { font-size: .85rem; color: #5a665e; }
+
+.pr-btn { background: #e7ede9; border: none; color: #2c3b33; padding: .55rem 1.1rem; border-radius: 7px; font-weight: 600; font-size: .92rem; cursor: pointer; font-family: inherit; }
+.pr-btn:hover:not(:disabled) { background: #d8e3dc; }
+.pr-btn:disabled { opacity: .5; cursor: not-allowed; }
+.pr-btn-primary { background: #1a472a; color: #fff; }
+.pr-btn-primary:hover:not(:disabled) { background: #2a5c3a; }
+.pr-btn-ghost { background: transparent; color: #5a665e; }
+.pr-btn-ghost:hover:not(:disabled) { background: #f0f4f1; }
+
+.pr-review { margin-top: 1.5rem; border-top: 1px solid #e3eae6; padding-top: 1.25rem; }
+.pr-verdict { padding: .8rem 1rem; border-radius: 8px; font-size: .93rem; font-weight: 600; margin-bottom: 1rem; line-height: 1.5; }
+.pr-verdict.is-ok { background: #e8f5ec; color: #14682f; border-left: 4px solid #1a7c3a; }
+.pr-verdict.is-bad { background: #fdecea; color: #96201a; border-left: 4px solid #b3261e; }
+.pr-verdict ul { margin: .5rem 0 0; padding-left: 1.2rem; font-weight: 400; }
+
+.pr-check-table { max-width: 44rem; }
+.pr-ok { color: #1a7c3a; font-weight: 600; }
+.pr-bad { color: #b3261e; font-weight: 600; }
+
+.pr-commit { display: flex; gap: .6rem; margin-top: 1.25rem; align-items: center; flex-wrap: wrap; }
+
+@media (max-width: 720px) {
+  .pr-header { flex-direction: column; }
+  .pr-search { min-width: 100%; }
+  .pr-asof { margin-left: 0; }
+}
