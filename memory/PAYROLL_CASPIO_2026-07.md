@@ -86,9 +86,18 @@ totals — gross 38,933.71 / net 30,962.34 / 22 subtotals / every row `gross −
   multi-NULL behaviour under a unique index is unverified. The importer asserts uniqueness instead.
 - `Sick_Hours_Remaining` / `Annual_Salary_Est` are **plain fields, not formulas** — REST formula
   creation is undocumented; the importer is the single writer so a computed value can't drift.
-- 🔴 **Two name defects in `Employees`**, each self-contradictory — match the stored value, never guess:
-  `First_Name` "**Sreynai**" vs its own `Employee_Full_Name` "Sreyani Meang" (packet says SREYANI);
-  `Last_Name` "**Khiev**" (agrees with packet) vs `Employee_Full_Name` "Sothida Khieve".
+- 🔴 **Name defects in `Employees` — `Employee_Full_Name` is hand-typed and drifts from `First_Name`/
+  `Last_Name`.** (A `Full_Name_Formula` field already exists and computes it correctly — prefer that.)
+  Resolved with Erik 2026-07-27: **Sreyani** Meang is canonical (roster + Full_Name + packet agree;
+  `First_Name` held a transposition → corrected). Nhoung keeps **"Ruthie"** (preferred) even though
+  payroll and the roster carry her legal name **Ruth** — expected mismatch, don't "fix" it.
+- 🔑 **Erik's roster = 16 names and matches the 16 checks exactly**, but the leave report lists **21**.
+  Of the 5 extras, only **Sothida Khiev** is confirmed gone (deactivated — a DISTINCT record from
+  Sothea Tann: PK 27, hired 2024-03-01, `Pay` never set). **Hanson / Massey / Pon / Trujillo stay
+  active pending Erik's check.** Their register rows are still written — the packet is history, so a
+  former employee's row is a faithful record, and `Status` is what marks them non-current.
+- 🔑 Name corrections are keyed by **payroll ID → resolved `ID_Record_Employee`, never by name**, and
+  resolution falls back through known prior spellings so pre- and post-rename runs resolve identically.
 - ⚠ `Employees.First_Name` carries a **UNIQUE** constraint — a second employee sharing a first name
   fails to insert. Script clears it.
 - ⚠ Packet quirk: **Clark's vacation** reads Accum 0 / Used 16 / **Avail 0** (not −16), and the packet's
