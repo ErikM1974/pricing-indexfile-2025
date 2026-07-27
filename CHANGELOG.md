@@ -1,3 +1,8 @@
+## v2026.07.27.2 (2026.07.27)
+
+- Bonus banner: answer "what does this pay me?" in money
+- Deploy v2026.07.27.2: cache-bust Mission Control assets
+
 ## v2026.07.27.1 (2026.07.27)
 
 - Thumbnail Box Sync: 4 hours, not 60 minutes — and don't touch the metadata sync
