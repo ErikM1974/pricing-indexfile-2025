@@ -92,10 +92,13 @@ totals — gross 38,933.71 / net 30,962.34 / 22 subtotals / every row `gross −
   `First_Name` held a transposition → corrected). Nhoung keeps **"Ruthie"** (preferred) even though
   payroll and the roster carry her legal name **Ruth** — expected mismatch, don't "fix" it.
 - 🔑 **Erik's roster = 16 names and matches the 16 checks exactly**, but the leave report lists **21**.
-  Of the 5 extras, only **Sothida Khiev** is confirmed gone (deactivated — a DISTINCT record from
-  Sothea Tann: PK 27, hired 2024-03-01, `Pay` never set). **Hanson / Massey / Pon / Trujillo stay
-  active pending Erik's check.** Their register rows are still written — the packet is history, so a
-  former employee's row is a faithful record, and `Status` is what marks them non-current.
+  All 5 extras confirmed ex-employees and **deactivated 7/27** (Khiev — a DISTINCT record from Sothea
+  Tann, PK 27 — plus Hanson, Massey, Pon, Trujillo). 🔴 **Deactivated, never deleted**: their
+  `Payroll_Register` rows record what NW Regional actually reported, and deleting would orphan that
+  history. `Status` is what marks someone non-current.
+- ⏳ **`UT Thi Tran` is the one unexplained active record** — hired 2020-12-01, Embroidery Operator,
+  Pay $16, **no payroll ID**, on neither Erik's roster nor NW Regional's leave report. Active headcount
+  is 17 vs a 16-name roster purely because of her. OPEN — Erik to confirm.
 - 🔑 Name corrections are keyed by **payroll ID → resolved `ID_Record_Employee`, never by name**, and
   resolution falls back through known prior spellings so pre- and post-rename runs resolve identically.
 - 🔴 `Employees.First_Name` **UNIQUE cannot be cleared via REST** — returns
@@ -103,9 +106,11 @@ totals — gross 38,933.71 / net 30,962.34 / 22 subtotals / every row `gross −
   objects."` So the constraint is **load-bearing for a Caspio relationship**, not just a stray checkbox
   — do NOT blindly uncheck it in the UI; find the referencing object first. A second employee sharing
   a first name still fails to insert until that's untangled. **OPEN.**
-- ⚠ Packet quirk **CONFIRMED in the data**: **Clark's vacation** reads Accum 0 / Used 16 / **Avail 0**
-  (not −16), and the packet's own 316:00 total treats it as 0. `Vacation_Hours_Remaining` now computes
-  **−16** and is the single vacation disagreement (20/21 agree). Ask NW Regional which is right. **OPEN.**
+- ✅ **RESOLVED — Clark's −16 vacation is CORRECT; NW Regional's printed 0 is the wrong display.**
+  Vacation accrues at the **1-year anniversary (first 40 h)**; she was hired 2025-08-12 and is eligible
+  **2026-08-16**, so she legitimately runs negative until then. 🔴 **Never "fix" a negative balance** —
+  new field `Vacation_Eligible_Date` records why. (Only Clark's is set; backfill others as
+  `Date_Hired + 1 yr` if that rule is universal.)
 
 ### Verified after apply (2026-07-27)
 `Employees` 38 → **46 fields**; `Payroll_Register` created (41 fields) and holds **21 rows** that
@@ -139,5 +144,16 @@ Nothing else on `Employees` changes (10 bridge apps depend on it).
 **Load path:** Caspio **CSV import** ($0 API calls, per the bulk-backfill lesson), gated on the extraction
 reconciling to the packet totals. Ask NW Regional Accounting for a CSV/Excel export to skip OCR risk.
 
-**Access control (required before any UI):** new `Staff_Page_Access` row for the payroll page limited to
-`admin,accountant`; no proxy route without the staff-auth gate. → [STAFF_AUTH_DESIGN.md](STAFF_AUTH_DESIGN.md)
+**Access control:** ✅ `Staff_Page_Access` row `payroll.html → admin` seeded 7/27 — **admin only, NOT
+accountant** (Erik 7/27; payroll is the most sensitive data in the account).
+→ [STAFF_AUTH_DESIGN.md](STAFF_AUTH_DESIGN.md)
+
+## 6. 🔴 No payroll API exists — and Caspio-direct editing is the current path
+
+The proxy still has **zero** endpoints touching `Employees` / `Payroll_Register` / any HR table.
+Rates and leave are editable **directly in Caspio** (datasheet or the Human Resources 2025 bridge app),
+so no API is needed for manual edits. An endpoint is only required once a payroll **page** exists —
+at which point it must enforce **admin** server-side (role from `Staff_App_Roles`), not merely rely on
+the `Staff_Page_Access` page gate. Per-period maintenance needs no API at all: add the new packet's
+figures to `import-payroll-packet.js` and re-run — the reconciliation gate rejects anything that
+doesn't match the printed totals.
