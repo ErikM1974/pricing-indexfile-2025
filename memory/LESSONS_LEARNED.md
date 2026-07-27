@@ -256,6 +256,12 @@ Moved to [LESSONS_LEARNED_ARCHIVE.md](./LESSONS_LEARNED_ARCHIVE.md). Keep-alive:
 
 ### Quote Sequence Race — duplicate IDs (ARCHIVED 2026-06-12): Caspio has no atomic increment — any read-modify-write needs an app-level lock (mutex per prefix). Full entry in archive.
 
+### "The style exists" is not "the style is buyable" — the blog autopilot published a post recommending a DISCONTINUED vest (2026-07-27)
+- **Problem**: the Monday autopilot published `csv405-vs-csv400-ansi-vests` after its link check passed. **CSV400 is Discontinued** (3 colors left) — it was in the post title and had a full "buy this for year-round work" section. The checklist's product-link gate was `/api/product-details?styleNumber=X` returns a **non-empty 200**, which a discontinued style does: the row is still there, it's the `PRODUCT_STATUS` that changed. Caught only in step 6 (product-copy pass) because the `PRODUCT_TITLE` literally starts with "DISCONTINUED".
+- **Root Cause**: an existence check answered a different question than the one the content depends on. Drafts also sit in the bank for weeks (this one was written 2026-07-13, published 7/27) — **the catalog moves under a draft while it waits**, so link facts verified at authoring time are stale at publish time by design.
+- **Solution**: post body corrected in place (slug + title UNCHANGED — SEO permanence, and "CSV405 vs CSV400" is still a real query the post now answers correctly): CSV400 reframed as being phased out, active **CSV407** added as the all-season solid, chooser table repointed. Autopilot step 3b now checks `PRODUCT_STATUS === 'Active'`, not just a 200.
+- **Prevention**: **when a check gates content, assert the property the content actually claims** — a post that says "order this" needs *orderable*, not *exists*. Any write-ahead content bank needs its facts RE-verified at publish time, never trusted from authoring time. Corollary for the whole catalog: `PRODUCT_STATUS` and the `DISCONTINUED` title prefix are the two live signals — a style row never disappears.
+
 ---
 
 ## Tax / Pricing
