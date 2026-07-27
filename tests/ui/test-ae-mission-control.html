@@ -232,6 +232,9 @@
                     <span class="mc-tab-badge" id="mc-badge-money" hidden></span>
                     <span class="mc-tab-dot" id="mc-dot-money" hidden title="Needs a look"></span>
                 </button>
+                <!-- No badge on purpose. The badge rule ("five badged tabs read as five
+                     inboxes") is right, and this list would badge 250 — a number that is
+                     never zero and therefore says nothing. -->
                 <button type="button" class="mc-tab" role="tab" id="mc-tab-calls"
                         aria-controls="mc-panel-calls" aria-selected="false"
                         tabindex="-1" data-tab="calls" data-label="Call list"
@@ -421,7 +424,9 @@
                             <i class="fas fa-print" aria-hidden="true"></i> Print call sheet
                         </button>
                     </div>
-                    <p class="aemc-hint">One list, best opportunity first.</p>
+                    <p class="aemc-hint">One list, best opportunity first. Accounts a nudge away from a bounty,
+                    customers who used to embroider, and customers who buy everything else from you but have never
+                    embroidered — ranked together by what a call is realistically worth.</p>
                     <div id="aemc-calls"><div class="dash-loading">Working out who to call…</div></div>
                 </div>
             </section>
