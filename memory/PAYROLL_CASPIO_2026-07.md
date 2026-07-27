@@ -59,7 +59,7 @@ Compared live `Employees` against the 7/24/2026 packet:
 **Prevention:** `Employees.Pay` and the vacation columns are hand-maintained and unreconciled — treat the
 payroll packet as source of truth and make those columns *derived*, never authored.
 
-## 4. DESIGN AS DECIDED (Erik, 2026-07-27) — scripts written, `--apply` pending
+## 4. ✅ LIVE 2026-07-27 — applied and verified
 
 Erik's call: **fix `Employees` to work off the payroll report** rather than build a parallel
 structure. That collapsed the original 3-table proposal to **1 new table + additive fields**:
@@ -98,10 +98,21 @@ totals — gross 38,933.71 / net 30,962.34 / 22 subtotals / every row `gross −
   former employee's row is a faithful record, and `Status` is what marks them non-current.
 - 🔑 Name corrections are keyed by **payroll ID → resolved `ID_Record_Employee`, never by name**, and
   resolution falls back through known prior spellings so pre- and post-rename runs resolve identically.
-- ⚠ `Employees.First_Name` carries a **UNIQUE** constraint — a second employee sharing a first name
-  fails to insert. Script clears it.
-- ⚠ Packet quirk: **Clark's vacation** reads Accum 0 / Used 16 / **Avail 0** (not −16), and the packet's
-  own 316:00 total treats it as 0. The `Vacation_Hours_Remaining` formula will show −16. Ask NW Regional.
+- 🔴 `Employees.First_Name` **UNIQUE cannot be cleared via REST** — returns
+  `ReferentialIntegrity: "Object cannot be changed or deleted because it is referenced by one or more
+  objects."` So the constraint is **load-bearing for a Caspio relationship**, not just a stray checkbox
+  — do NOT blindly uncheck it in the UI; find the referencing object first. A second employee sharing
+  a first name still fails to insert until that's untangled. **OPEN.**
+- ⚠ Packet quirk **CONFIRMED in the data**: **Clark's vacation** reads Accum 0 / Used 16 / **Avail 0**
+  (not −16), and the packet's own 316:00 total treats it as 0. `Vacation_Hours_Remaining` now computes
+  **−16** and is the single vacation disagreement (20/21 agree). Ask NW Regional which is right. **OPEN.**
+
+### Verified after apply (2026-07-27)
+`Employees` 38 → **46 fields**; `Payroll_Register` created (41 fields) and holds **21 rows** that
+round-trip to the packet exactly (net $30,962.34, gross $38,933.71). **21/21 employees join via
+`Payroll_Employee_ID`** — the join key that didn't exist before. Vacation agrees 20/21 (Clark only),
+sick **21/21**. Active headcount 22 → **21** (Khiev deactivated). Every stale rate corrected —
+e.g. Wright 31.25 → 42.09, Nhoung 25 → 34, Chhorn 16.50 → 23, Hede blank → 22.50.
 
 ## 5. Original 3-table proposal (superseded by §4 — kept for rationale)
 
