@@ -1,3 +1,8 @@
+## v2026.07.27.4 (2026.07.27)
+
+- Stage 3: leads/quotes move to Pipeline, and Book gets its stat row
+- Deploy v2026.07.27.4: cache-bust Mission Control assets
+
 ## v2026.07.27.3 (2026.07.27)
 
 - Today tab: a capped card grid instead of a 3,400px scroll
