@@ -1,3 +1,7 @@
+## v2026.07.27.5 (2026.07.27)
+
+- Fail the build when the Mission Control harness drifts from the page
+
 ## v2026.07.27.4 (2026.07.27)
 
 - Stage 3: leads/quotes move to Pipeline, and Book gets its stat row
