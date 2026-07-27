@@ -1113,6 +1113,11 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 .sit-card--received .sit-card-main { background: #f4f7f4; border-bottom: none; }
 .sit-card--received .sit-logo { width: 46px; height: 46px; font-size: 20px; }
 .sit-recv { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: #dcfce7; color: #166534; border: 1px solid #86efac; white-space: nowrap; cursor: help; }
+
+/* Follow-on shipment — the PO was counted in, but SanMar shipped ANOTHER carton afterwards, so
+   these pieces are still inbound. Amber (not the green "received" treatment) because the row
+   looks like a duplicate of shelf stock and would otherwise be waved through at the dock. */
+.sit-followon { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; white-space: nowrap; cursor: help; }
 .sit-stat--recv { background: #f0fdf4; border-color: #bbf7d0; }
 .sit-stat--recv .sit-stat-num { color: #166534; }
 
@@ -1169,6 +1174,7 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 .sit-rt-method-sub { font-size: 10px; font-weight: 600; color: #667; }
 .sit-rt-due-soon { font-weight: 800; color: #a3300f; }
 .sit-rt-flag { display: inline-block; font-size: 8.5px; font-weight: 800; color: #a32d2d; border: 1px solid #e0a3a3; border-radius: 3px; padding: 0 4px; margin-left: 4px; vertical-align: 1px; }
+.sit-rt-followon { display: block; font-size: 8.5px; font-weight: 800; color: #92400e; margin-top: 1px; }
 .sit-rt-short { color: #a32d2d; font-weight: 800; }
 .sit-rt-cost { font-variant-numeric: tabular-nums; }
 .sit-rt-tot td { border-top: 2px solid #2e6f40; font-weight: 800; background: #f4f8f4; }
@@ -1178,6 +1184,7 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 .sit-ps-logo { width: 42px; height: 42px; flex: none; object-fit: contain; border: 1px solid #d5ddd5; border-radius: 3px; background: #fff; }
 .sit-ps-po-htxt { flex: 1; min-width: 0; }
 .sit-ps-fields { font-size: 9.5px; color: #555; margin-top: 2px; }
+.sit-ps-followon { font-size: 9.5px; font-weight: 800; color: #92400e; background: #fef3c7; border: 1px solid #fcd34d; border-radius: 3px; padding: 1px 5px; margin-top: 3px; display: inline-block; }
 .sit-ps-tbl { width: 100%; border-collapse: collapse; font-size: 10.5px; }
 .sit-ps-tbl th, .sit-ps-tbl td { border: 1px solid #e0e0e0; padding: 3px 6px; text-align: left; }
 .sit-ps-tbl th { background: #fafafa; font-weight: 600; }
@@ -1203,6 +1210,7 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 .sit-label:last-child { page-break-after: auto; }
 .sl-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 8px; }
 .sl-company { font-size: 33pt; font-weight: 800; line-height: 1.02; border-bottom: 3px solid #111; padding-bottom: 8px; }
+.sl-followon { font-size: 12pt; font-weight: 800; color: #92400e; background: #fef3c7; border: 2px solid #d9a406; border-radius: 4px; padding: 4px 8px; margin-top: 8px; }
 .sl-woblock { text-align: right; flex: none; min-width: 205px; }
 .sl-wolabel { font-size: 10pt; font-weight: 700; letter-spacing: 0.08em; color: #444; }
 .sl-wo { font-size: 27pt; font-weight: 800; line-height: 1; }

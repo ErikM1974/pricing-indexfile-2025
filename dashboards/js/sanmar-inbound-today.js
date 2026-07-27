@@ -70,6 +70,19 @@
     return `<span class="sit-issue ${isBo ? 'sit-issue--bo' : 'sit-issue--hold'}" title="${esc(tip)}">⚠ ${label}</span>`;
   }
 
+  // Follow-on shipment badge — this PO was already counted in by receiving, but SanMar shipped
+  // ANOTHER carton after that date, so these pieces are still genuinely inbound. Without the badge
+  // the row looks like a duplicate of something already on the shelf and gets waved through.
+  function followOnBadge(o) {
+    if (!o || !o.followOnShipment) return '';
+    const on = o.receivedDate ? ' ' + fmtShortDate(o.receivedDate) : '';
+    return `<span class="sit-followon" title="This PO was counted in${on ? ' on' + on : ''}, but SanMar shipped this carton afterwards — these pieces are NOT on the shelf yet.">↩ Follow-on shipment${on ? ' · counted in' + on : ''}</span>`;
+  }
+  function followOnText(o) {
+    if (!o || !o.followOnShipment) return '';
+    return 'FOLLOW-ON — PO counted in' + (o.receivedDate ? ' ' + fmtShortDate(o.receivedDate) : '') + ', this carton shipped after';
+  }
+
   // ── Line-item rows for one PO (screen) ──
   function linesTable(lines) {
     const rows = (lines || []).map(l => {
@@ -205,6 +218,7 @@
               <span class="sit-company">${company}</span>
               ${methodChip(o.method)}
               ${issueBadge(o.issue)}
+              ${followOnBadge(o)}
             </div>
             <span class="sit-wo">WO ${wo}</span>
           </div>
@@ -313,6 +327,7 @@
           <div><b>${esc(o.company || 'Unmatched')}</b> &nbsp; SanMar PO #${esc(o.sanmarPO)}${o.workOrder ? ' · WO #' + esc(o.workOrder) : ''} · ${esc(o.method)}
             <span class="sit-ps-r">${fmtNum(o.boxes)} box(es) · ${fmtNum(o.piecesShipped)} pcs${showCost && o.cost ? ' · <b>' + fmtMoney(o.cost) + '</b>' : ''}${o.upsDelivery && o.upsDelivery.date ? ' · UPS ' + fmtShortDate(o.upsDelivery.date) + (o.upsDelivery.type === 'rescheduled' ? ' (resched)' : o.upsDelivery.type === 'delivered' ? ' (delivered)' : '') : ''}</span></div>
           ${psFields ? `<div class="sit-ps-fields">${psFields}</div>` : ''}
+          ${o.followOnShipment ? `<div class="sit-ps-followon">${esc(followOnText(o))}</div>` : ''}
         </div>
       </div>
       ${body}
@@ -419,7 +434,7 @@
         : ((Number(o.boxes) || 1) > 1 ? `${fmtNum(o.boxes)} boxes` : '1 of 1');
       return `<tr>
         <td class="sit-rt-check"></td>
-        <td>${esc(o.company || 'Unmatched')}</td>
+        <td>${esc(o.company || 'Unmatched')}${o.followOnShipment ? `<span class="sit-rt-followon">${esc(followOnText(o))}</span>` : ''}</td>
         <td>${o.workOrder ? '#' + esc(o.workOrder) : '<span class="sit-rt-muted">no WO</span>'}</td>
         <td>${esc(o.sanmarPO)}</td>
         <td class="sit-rt-c">${boxCell}</td>
@@ -594,6 +609,7 @@
         </div>
       </div>
       <div class="sl-company">${esc(order.company || '—')}</div>
+      ${order.followOnShipment ? `<div class="sl-followon">${esc(followOnText(order))}</div>` : ''}
       <div class="sl-contact">
         <span class="sl-cname">${esc(order.contactName || '')}</span>
         <span class="sl-cright">${order.salesRep ? `<span class="sl-rep">REP: ${esc(initials(order.salesRep))}</span>` : ''}${order.dateOrdered ? `<span class="sl-ord">Ordered: ${esc(fmtShortDate(order.dateOrdered))}</span>` : ''}</span>
