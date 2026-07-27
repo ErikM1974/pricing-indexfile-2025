@@ -54,25 +54,28 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: var(--space-5);
+    gap: var(--space-6);
     padding: var(--space-5) var(--space-6);
     margin-bottom: var(--space-4);
-    border-radius: var(--radius-lg);
-    background: linear-gradient(120deg, #1f5f27 0%, #2f7d38 45%, var(--art-theme, #4cb354) 100%);
+    border-radius: var(--radius-xl);
+    background: linear-gradient(112deg, #12321a 0%, #1f5f27 42%, #2f7d38 100%);
     color: #fff;
-    box-shadow: 0 6px 18px rgba(31, 95, 39, 0.3);
+    box-shadow: 0 10px 26px -12px rgba(18, 50, 26, 0.5);
     overflow: hidden;
 }
-/* Keeps the lively NW green in the design without putting any text on top of it. */
+/* Keeps the lively NW green in the design without putting any text on top of it.
+ * 🔒 CONTRAST RULE: no text may sit on the light end of the gradient, and muted hero text
+ * uses a COLOUR, never opacity — opacity composites toward the gradient and lands at a
+ * different effective contrast at each end of the band. */
 .aemc-bonus-hero::after {
     content: '';
     position: absolute;
-    right: -60px;
-    bottom: -90px;
-    width: 320px;
-    height: 320px;
+    left: 38%;
+    top: -140px;
+    width: 420px;
+    height: 420px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(99, 201, 107, 0.55) 0%, rgba(99, 201, 107, 0) 70%);
+    background: radial-gradient(circle, rgba(99, 201, 107, 0.3) 0%, rgba(99, 201, 107, 0) 70%);
     pointer-events: none;
 }
 .aemc-bonus-hero > * { position: relative; z-index: 1; }
@@ -94,108 +97,165 @@
 }
 .aemc-bh-fallback i { color: var(--state-warning); }
 
-.aemc-bh-left { flex: 0 0 auto; min-width: 190px; }
-.aemc-bh-eyebrow {
-    font-size: 0.78rem;
+/* ── DIAL ── percent-of-goal ring. Both the arc and the 85% tick are set from ONE axis in
+ * renderBonusSpine; nothing here encodes a percentage. */
+.aemc-bh-dial { flex: 0 0 176px; display: flex; justify-content: center; }
+.aemc-bh-dial svg { width: 176px; height: 176px; }
+.aemc-bh-dial-track { fill: none; stroke: rgba(0, 0, 0, 0.28); stroke-width: 15; }
+.aemc-bh-dial-tick  { fill: none; stroke: #ffb703; stroke-width: 15; }
+.aemc-bh-dial-arc {
+    fill: none;
+    stroke: #fff;
+    stroke-width: 15;
+    stroke-linecap: round;
+    transition: stroke-dasharray 420ms var(--ease-out, cubic-bezier(.2,.8,.2,1));
+}
+.aemc-bh-dial-amount {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 34px;
     font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.88);
-}
-.aemc-bh-amount {
-    font-size: clamp(2.2rem, 5vw, 3.1rem);
-    font-weight: 800;
-    line-height: 1.05;
-    margin-top: 2px;
+    fill: #fff;
     font-variant-numeric: tabular-nums;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.14);
 }
-.aemc-bh-sub {
-    font-size: 0.82rem;
-    color: rgba(255, 255, 255, 0.86);
-    margin-top: 2px;
+.aemc-bh-dial-cap {
+    font-size: 11px; font-weight: 700; letter-spacing: 1px;
+    fill: rgba(255, 255, 255, 0.85);
 }
+.aemc-bh-dial-pct { font-size: 10px; font-weight: 500; fill: rgba(255, 255, 255, 0.7); }
 
-.aemc-bh-right {
-    flex: 1 1 320px;
-    min-width: 260px;
+/* ── LADDER ── */
+.aemc-bh-ladder { flex: 1 1 auto; min-width: 0; }
+.aemc-bh-eyebrow {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.75);
 }
 .aemc-bh-next {
-    font-size: 1rem;
-    font-weight: 600;
-    line-height: 1.4;
+    font-size: 1.45rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+    margin-top: 5px;
+}
+
+/* Three payout scenarios. The "now" card is an opaque white chip precisely so its text is
+ * never sitting on the gradient. */
+.aemc-bh-scenarios { display: flex; gap: 9px; margin-top: 15px; flex-wrap: wrap; }
+.aemc-bh-sc { flex: 1 1 150px; border-radius: 10px; padding: 10px 13px; }
+.aemc-bh-sc--now { background: rgba(255, 255, 255, 0.94); color: #12321a; }
+.aemc-bh-sc--pace,
+.aemc-bh-sc--goal { background: rgba(0, 0, 0, 0.26); border: 1px solid rgba(255, 255, 255, 0.24); }
+.aemc-bh-sc-eyebrow {
+    font-size: 0.66rem; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase;
+}
+.aemc-bh-sc--now  .aemc-bh-sc-eyebrow { color: #2f7d38; }
+.aemc-bh-sc--pace .aemc-bh-sc-eyebrow { color: #ffd27a; }
+.aemc-bh-sc--goal .aemc-bh-sc-eyebrow { color: #c9f0cd; }
+.aemc-bh-sc-amt {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.35rem; font-weight: 700; margin-top: 3px;
+    font-variant-numeric: tabular-nums;
+}
+.aemc-bh-sc-sub { font-size: 0.72rem; margin-top: 2px; color: rgba(255, 255, 255, 0.8); }
+.aemc-bh-sc--now .aemc-bh-sc-sub { color: #41514a; }
+
+/* The start caption owns a whole row. Sharing one absolutely-positioned line with the
+ * endpoint labels made this 176px label overlap "goal $66,609" below ~1300px — including
+ * 1280x800, which this repo treats as load-bearing. */
+.aemc-bh-startcap { position: relative; height: 16px; margin-top: 15px; font-size: 0.68rem; }
+.aemc-bh-startcap span {
+    position: absolute;
+    transform: translateX(-100%);
+    padding-right: 8px;
+    color: #ffd27a;
+    font-weight: 700;
+    white-space: nowrap;
 }
 .aemc-bh-track {
-    height: 8px;
-    margin: var(--space-2) 0 var(--space-3);
+    height: 12px;
+    margin-top: 2px;
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.28);
-    overflow: hidden;
+    background: rgba(0, 0, 0, 0.3);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.25);
 }
 .aemc-bh-fill {
-    height: 100%;
+    height: 12px;
     border-radius: 999px;
-    background: #fff;
-    transition: width 420ms ease;
+    background: linear-gradient(90deg, #8fe19a, #fff);
+    transition: width 420ms var(--ease-out, cubic-bezier(.2,.8,.2,1));
 }
+/* Flex, not absolute — that is what makes the endpoint labels collision-proof. */
+.aemc-bh-ends {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 6px;
+    font-size: 0.68rem;
+    color: rgba(255, 255, 255, 0.78);
+    font-variant-numeric: tabular-nums;
+}
+.aemc-bh-ends strong { color: #fff; }
+#aemc-bh-goalmax { color: #fff; font-weight: 700; white-space: nowrap; }
+.aemc-bh-endcap {
+    position: absolute;
+    right: 0; top: -6px; bottom: -6px;
+    width: 3px;
+    border-radius: 2px;
+    background: rgba(255, 255, 255, 0.75);
+}
+
+/* ── CTA column ── */
+.aemc-bh-cta { flex: 0 0 208px; display: flex; flex-direction: column; gap: 9px; }
+.aemc-bh-go {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 11px 14px;
+    border-radius: 9px;
+    background: #fff;
+    color: #1f5f27;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+.aemc-bh-go:hover { background: #eaf6ec; color: #12321a; }
 
 /* Pace line — tells the rep whether a big raw gap is actually on track. */
 .aemc-bh-pace {
     display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    margin-top: 6px;
-    padding: 3px 10px;
-    border-radius: var(--radius-pill, 999px);
-    font-size: 0.78rem;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 9px 12px;
+    border-radius: 9px;
+    font-size: 0.76rem;
     font-weight: 600;
+    line-height: 1.4;
 }
 .aemc-bh-pace.is-onpace { background: rgba(255, 255, 255, 0.92); color: #22662a; }
 .aemc-bh-pace.is-behind { background: rgba(0, 0, 0, 0.3); color: #fff; border: 1px solid rgba(255, 255, 255, 0.5); }
 
-/* The goal in DOLLARS. A bare percentage with no denominator is unactionable. */
-.aemc-bh-goal {
-    font-size: 0.82rem;
-    color: rgba(255, 255, 255, 0.92);
-    margin-top: 2px;
-    font-variant-numeric: tabular-nums;
-}
 .aemc-bh-track { position: relative; overflow: visible; }
 .aemc-bh-marks { position: absolute; inset: 0; }
+/* The 85% start line on the track. Amber, matching the dial's tick — same threshold, so it
+ * must read as the same thing in both places. */
 .aemc-bh-mark {
     position: absolute;
-    top: -3px;
-    width: 2px;
-    height: 14px;
-    background: rgba(255, 255, 255, 0.55);
+    top: -6px;
+    bottom: -6px;
+    width: 3px;
+    border-radius: 2px;
+    background: #ffb703;
     transform: translateX(-1px);
 }
 .aemc-bh-mark.is-hit { background: #fff; }
 
-/* Full ladder, always visible — the top rung must never hide behind "unlocks $150". */
-.aemc-bh-rungs {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--space-2);
-    margin-bottom: var(--space-2);
-}
-.aemc-bh-rung {
-    display: inline-flex;
-    align-items: baseline;
-    gap: 5px;
-    padding: 3px 8px;
-    border-radius: var(--radius-sm);
-    background: rgba(0, 0, 0, 0.22);
-    font-size: 0.74rem;
-    font-variant-numeric: tabular-nums;
-    color: rgba(255, 255, 255, 0.9);
-}
-.aemc-bh-rung.is-hit { background: rgba(255, 255, 255, 0.9); color: #22662a; opacity: 1; font-weight: 600; }
-.aemc-bh-rung.is-next { outline: 1.5px solid rgba(255, 255, 255, 0.85); opacity: 1; }
-.aemc-bh-rung-pay { font-weight: 700; }
+/* .aemc-bh-rungs / .aemc-bh-rung were retired with the rung ladder (2026-07-27) — the
+ * banner now shows three payout SCENARIOS instead. The rung fallback path in
+ * renderBonusSpine() no longer paints chips, only the headline sentence, so there is
+ * nothing left to style. */
 
 .aemc-bh-explain {
-    margin-top: var(--space-2);
     border: 1px solid rgba(255, 255, 255, 0.35);
     background: transparent;
     color: #fff;
@@ -269,9 +329,21 @@
 .aemc-bh-chip-rate { color: rgba(255, 255, 255, 0.82); font-size: 0.72rem; }
 .aemc-bh-chip.is-on .aemc-bh-chip-rate { color: rgba(26, 82, 33, 0.82); }
 
+/* The band is dial | ladder | CTA on desktop. Below 1100px the 208px CTA column squeezes the
+ * scenario cards under their content width, so it drops to a full-width row first; the dial
+ * only stacks at phone widths, where it becomes the page's headline number. */
+@media (max-width: 1100px) {
+    .aemc-bh-cta { flex: 1 1 100%; flex-direction: row; }
+    .aemc-bh-cta > * { flex: 1; justify-content: center; }
+}
 @media (max-width: 640px) {
     .aemc-bonus-hero { padding: var(--space-4); gap: var(--space-3); }
-    .aemc-bh-left { min-width: 0; }
+    .aemc-bh-dial { flex: 1 1 100%; }
+    .aemc-bh-ladder { flex: 1 1 100%; }
+    .aemc-bh-next { font-size: 1.15rem; }
+    .aemc-bh-scenarios { gap: 7px; }
+    .aemc-bh-sc { flex: 1 1 100%; }
+    .aemc-bh-cta { flex-direction: column; }
 }
 
 /* ---------- view-as (admin only) ---------- */

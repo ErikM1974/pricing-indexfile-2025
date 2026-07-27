@@ -10,7 +10,7 @@
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- 2026 design tokens (must load before dash-shell.css) -->
@@ -81,21 +81,54 @@
                      next milestone framed as a concrete, reachable ask. Hidden until loaded so it
                      never flashes a $0. -->
                 <section class="aemc-bonus-hero" id="aemc-bonus-hero" hidden aria-labelledby="aemc-bh-eyebrow">
-                    <div class="aemc-bh-left">
-                        <div class="aemc-bh-eyebrow" id="aemc-bh-eyebrow">Your Q3 Embroidery Bonus</div>
-                        <div class="aemc-bh-amount" id="aemc-bh-amount">$0</div>
-                        <div class="aemc-bh-sub" id="aemc-bh-sub">earned so far this quarter</div>
+                    <!-- DIAL. Percent-of-GOAL axis, and the 85% tick is drawn on that same axis —
+                         the arc and the tick MUST share a denominator. An earlier draft drew the arc
+                         from percent-of-goal and the tick from the 130% display ceiling, which put
+                         the 85% marker at 65% of the ring. r=72 → circumference 452.39. -->
+                    <div class="aemc-bh-dial">
+                        <svg viewBox="0 0 176 176" role="img" aria-labelledby="aemc-bh-dial-label">
+                            <title id="aemc-bh-dial-label">Bonus earned so far this quarter</title>
+                            <circle class="aemc-bh-dial-track" cx="88" cy="88" r="72"></circle>
+                            <circle class="aemc-bh-dial-tick" id="aemc-bh-dial-tick" cx="88" cy="88" r="72"
+                                    transform="rotate(-90 88 88)"></circle>
+                            <circle class="aemc-bh-dial-arc" id="aemc-bh-dial-arc" cx="88" cy="88" r="72"
+                                    transform="rotate(-90 88 88)"></circle>
+                            <text class="aemc-bh-dial-amount" id="aemc-bh-amount" x="88" y="80" text-anchor="middle">$0</text>
+                            <text class="aemc-bh-dial-cap" id="aemc-bh-dial-cap" x="88" y="100" text-anchor="middle">EARNED · Q3</text>
+                            <text class="aemc-bh-dial-pct" id="aemc-bh-dial-pct" x="88" y="118" text-anchor="middle"></text>
+                        </svg>
                     </div>
-                    <div class="aemc-bh-right">
+
+                    <div class="aemc-bh-ladder">
+                        <div class="aemc-bh-eyebrow" id="aemc-bh-eyebrow">Your Q3 embroidery bonus</div>
                         <div class="aemc-bh-next" id="aemc-bh-next">—</div>
-                        <div class="aemc-bh-pace" id="aemc-bh-pace" hidden></div>
-                        <div class="aemc-bh-goal" id="aemc-bh-goal"></div>
+
+                        <!-- Three payout scenarios: what is banked, what today's pace pays, and what
+                             finishing at goal pays. Money, not a percentage — the percentage was the
+                             single biggest source of confusion when this first shipped. -->
+                        <div class="aemc-bh-scenarios" id="aemc-bh-scenarios"></div>
+
+                        <!-- The 85% caption gets its OWN row. When all three labels were absolutely
+                             positioned on one 18px line, this one (176px wide) overlapped the
+                             right-hand goal label at any width below ~1300px — including 1280x800. -->
+                        <div class="aemc-bh-startcap" id="aemc-bh-startcap"></div>
                         <div class="aemc-bh-track" role="img" aria-label="Progress toward your embroidery goal">
                             <div class="aemc-bh-fill" id="aemc-bh-fill" style="width:0%"></div>
                             <div class="aemc-bh-marks" id="aemc-bh-marks"></div>
                         </div>
-                        <div class="aemc-bh-rungs" id="aemc-bh-rungs"></div>
+                        <!-- Flex, not absolute positioning — that is what makes it collision-proof. -->
+                        <div class="aemc-bh-ends">
+                            <span id="aemc-bh-goal"></span>
+                            <span id="aemc-bh-goalmax"></span>
+                        </div>
                         <div class="aemc-bh-chips" id="aemc-bh-chips"></div>
+                    </div>
+
+                    <div class="aemc-bh-cta">
+                        <div class="aemc-bh-pace" id="aemc-bh-pace" hidden></div>
+                        <a class="aemc-bh-go" id="aemc-bh-go" href="#tab=calls">
+                            <i class="fas fa-map-location-dot" aria-hidden="true"></i> Who gets me there?
+                        </a>
                         <button type="button" class="aemc-bh-explain" id="aemc-bh-explain"
                                 aria-expanded="false" aria-controls="aemc-bh-how">
                             <i class="fas fa-circle-question" aria-hidden="true"></i> How this works
@@ -112,10 +145,11 @@
                                 of embroidery this quarter. No cap.</p>
                             </div>
                             <div>
-                                <h4>2 · Growth ladder</h4>
+                                <h4>2 · Growth rate</h4>
                                 <p>Your goal comes from <em>your own book's</em> embroidery history, so a
-                                bigger book never means an easier target. Only the highest rung you reach
-                                pays.</p>
+                                bigger book never means an easier target. Past
+                                <strong id="aemc-bh-h-start">85%</strong> of it, every 1% you add pays
+                                <strong id="aemc-bh-h-point">$60</strong> — no steps, no ceiling.</p>
                             </div>
                             <div>
                                 <h4>3 · Team kicker</h4>
