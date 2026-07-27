@@ -1,3 +1,9 @@
+## v2026.07.27.1 (2026.07.27)
+
+- Thumbnail Box Sync: 4 hours, not 60 minutes — and don't touch the metadata sync
+- Call List tab: the bonus becomes a worklist
+- Deploy v2026.07.27.1: cache-bust Mission Control assets
+
 ## v2026.07.26.11 (2026.07.26)
 
 - Bonus memory: a Caspio baseline edit silently staleifies the hand-typed plan page
