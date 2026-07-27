@@ -1,3 +1,8 @@
+## v2026.07.27.7 (2026.07.27)
+
+- Pre-push guard: production ships through /deploy, not by hand
+- Bandit: Thumbnail Box Sync now 4 h (applied), and 4 images that can never sync
+
 ## v2026.07.27.6 (2026.07.27)
 
 - Inbound report: flag the carton that shipped after the count-in
