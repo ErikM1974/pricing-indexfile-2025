@@ -1429,3 +1429,8 @@ a.aemc-row-main:hover { text-decoration: underline; }
     .mc-drawer { width: 100vw; }
     .mc-clock { gap: 10px; }
 }
+
+/* Stage 3 — a stat tile that carries a warning meaning (drifting accounts). Same top-border
+   language as .mc-kpi--accent so the two read as one family. */
+.mc-stat--warn { border-top: 3px solid var(--state-warning); }
+.mc-stat--warn .dash-stat-value { color: #b85a00; }

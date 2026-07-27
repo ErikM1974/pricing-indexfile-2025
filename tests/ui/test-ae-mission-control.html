@@ -347,19 +347,6 @@
                     </div>
                 </div>
 
-                <!-- Leads, quotes and kits. The design moves these to Pipeline; that panel gets
-                     its real content in stage 3, so they stay here until then rather than
-                     disappearing from the page in between. Artwork has left this queue — it has
-                     its own card above, and rendering it twice would double-count the day. -->
-                <div class="dash-card aemc-queue-card aemc-collapsible" data-collapse-key="queue">
-                    <div class="dash-card-header">
-                        <h2 class="dash-card-title"><i class="fas fa-bolt"></i> Leads, quotes &amp; kits</h2>
-                        <span class="aemc-queue-count" id="aemc-queue-count"></span>
-                    </div>
-                    <div id="aemc-queue" class="aemc-queue">
-                        <div class="dash-loading">Loading your action queue…</div>
-                    </div>
-                </div>
             </section>
 
             <!-- ================== TAB: Money ================== -->
@@ -381,6 +368,10 @@
                     </div>
                 </div>
 
+                <!-- 2fr / 1fr per the design: what you earned on the left, the ledger on the
+                     right. The "who to call" lists that used to sit here live on the Call List
+                     tab now — Money is what you MADE, that tab is what's next. -->
+                <div class="mc-grid mc-grid--2-1">
                 <!-- Bonus & commission (Commission_Payouts = payroll system of record) -->
                 <div class="dash-card aemc-bonus-card aemc-collapsible" data-collapse-key="bonus">
                     <div class="dash-card-header">
@@ -400,7 +391,8 @@
                     <p class="aemc-bonus-foot" id="aemc-bonus-foot"></p>
                 </div>
 
-                <!-- Earned + roadmap — mirror dashboards/ae-mission-control.html -->
+                <!-- Which accounts actually produced the bonus. Reps ask "who paid me this?" and
+                     without an answer the hero number is just a figure they have to trust. -->
                 <div class="dash-card aemc-collapsible" data-collapse-key="embearned">
                     <div class="dash-card-header">
                         <h2 class="dash-card-title"><i class="fas fa-receipt"></i> What earned your bonus <span class="aemc-sub" id="aemc-earned-sub"></span></h2>
@@ -408,7 +400,11 @@
                     </div>
                     <div id="aemc-earned"><div class="dash-loading">Loading…</div></div>
                 </div>
+                </div><!-- /mc-grid--2-1 -->
 
+                <!-- The "who to call" lists used to live here. They moved to the Call List tab
+                     on 2026-07-27 so there is exactly one home for them — this card is now
+                     what you EARNED, that tab is what's next. -->
                 <p class="aemc-hint aemc-calls-pointer">
                     Looking for who to call next?
                     <a href="#tab=calls"><i class="fas fa-phone" aria-hidden="true"></i> Open your Call List</a>
@@ -433,6 +429,25 @@
             <!-- ================== TAB: My Book ================== -->
             <section class="mc-panel" id="mc-panel-book" role="tabpanel"
                      aria-labelledby="mc-tab-book" tabindex="0" hidden>
+                <!-- Three tiles, not the design's four. "Accounts assigned" and "ordered this
+                     year" would need an endpoint this page doesn't call, and the handoff is
+                     explicit that stage 3 adds no backend work — so the row shows what is
+                     genuinely measured rather than a fourth number nobody can trace. -->
+                <div class="dash-stat-grid">
+                    <div class="dash-stat-card mc-kpi--accent">
+                        <div class="dash-stat-value" id="mc-book-active">—</div>
+                        <div class="dash-stat-label">Accounts that ordered (24mo)</div>
+                    </div>
+                    <div class="dash-stat-card mc-stat--warn">
+                        <div class="dash-stat-value" id="mc-book-drift">—</div>
+                        <div class="dash-stat-label">Drifting off their rhythm</div>
+                    </div>
+                    <div class="dash-stat-card">
+                        <div class="dash-stat-value" id="mc-book-table">—</div>
+                        <div class="dash-stat-label">On the table</div>
+                    </div>
+                </div>
+
                 <div class="dash-card mc-book-intro">
                     <div class="dash-card-header">
                         <h2 class="dash-card-title"><i class="fas fa-address-book"></i> Your book</h2>
@@ -470,8 +485,24 @@
                         <div class="dash-stat-value" id="mc-conv">—</div>
                         <div class="dash-stat-label" id="mc-conv-label">Quote → Order</div>
                     </div>
+                    <div class="dash-stat-card">
+                        <div class="dash-stat-value" id="kpi-newleads">—</div>
+                        <div class="dash-stat-label">New leads, untouched</div>
+                    </div>
                 </div>
                 <p class="aemc-hint" id="mc-conv-note"></p>
+
+                <!-- Moved here from Today on 2026-07-27 (stage 3), which is where the design
+                     puts it. Artwork is NOT in this queue — it has its own card on Today. -->
+                <div class="dash-card aemc-queue-card">
+                    <div class="dash-card-header">
+                        <h2 class="dash-card-title"><i class="fas fa-bolt"></i> Needs you: leads, quotes &amp; kits</h2>
+                        <span class="aemc-queue-count" id="aemc-queue-count"></span>
+                    </div>
+                    <div id="aemc-queue" class="aemc-queue">
+                        <div class="dash-loading">Loading your action queue…</div>
+                    </div>
+                </div>
 
                 <!-- ZONE 3: work panels -->
                 <div class="aemc-panels">
