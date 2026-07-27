@@ -59,7 +59,42 @@ Compared live `Employees` against the 7/24/2026 packet:
 **Prevention:** `Employees.Pay` and the vacation columns are hand-maintained and unreconciled — treat the
 payroll packet as source of truth and make those columns *derived*, never authored.
 
-## 4. Proposed design (NOT built — awaiting Erik's go-ahead)
+## 4. DESIGN AS DECIDED (Erik, 2026-07-27) — scripts written, `--apply` pending
+
+Erik's call: **fix `Employees` to work off the payroll report** rather than build a parallel
+structure. That collapsed the original 3-table proposal to **1 new table + additive fields**:
+
+- `Employees` = **current truth** (rate, leave balances), refreshed from each packet.
+- `Payroll_Register` = employee × **pay date** history. Kept because the *values* aren't what
+  broke — the *mechanism* is; a one-time hand-correction just re-drifts. Employer-side totals
+  table **dropped** (doesn't serve the goal); separate leave-balance table **dropped** (the leave
+  report shares the payroll run's as-of date, so balances ride on the register row).
+- Grain covers all 21 packet employees, not just the 16 with checks — `Paid_This_Period` flags which.
+
+Decisions: salaried staff use **`Pay_Type` + `Salary_Per_Period`** (verbatim off the register)
+with `Annual_Salary_Est` = ×26; `Pay` stays the hourly rate. Backfill = **7/24/2026 only** for now.
+
+**Scripts** (proxy repo, dry-run by default, commit `b4c5566`):
+`scripts/create-payroll-register-table.js` (schema) → `scripts/import-payroll-packet.js` (data).
+
+🔑 The importer has **two abort gates**: (1) the extraction must reproduce the packet's own printed
+totals — gross 38,933.71 / net 30,962.34 / 22 subtotals / every row `gross − deductions = net`;
+(2) all 21 employees must resolve to exactly **one** `Employees` row. Both pass as of 2026-07-27.
+
+### Gotchas found while wiring it
+- `Payroll_Employee_ID` is **not** declared Unique — 8 of 29 rows have no payroll ID and Caspio's
+  multi-NULL behaviour under a unique index is unverified. The importer asserts uniqueness instead.
+- `Sick_Hours_Remaining` / `Annual_Salary_Est` are **plain fields, not formulas** — REST formula
+  creation is undocumented; the importer is the single writer so a computed value can't drift.
+- 🔴 **Two name defects in `Employees`**, each self-contradictory — match the stored value, never guess:
+  `First_Name` "**Sreynai**" vs its own `Employee_Full_Name` "Sreyani Meang" (packet says SREYANI);
+  `Last_Name` "**Khiev**" (agrees with packet) vs `Employee_Full_Name` "Sothida Khieve".
+- ⚠ `Employees.First_Name` carries a **UNIQUE** constraint — a second employee sharing a first name
+  fails to insert. Script clears it.
+- ⚠ Packet quirk: **Clark's vacation** reads Accum 0 / Used 16 / **Avail 0** (not −16), and the packet's
+  own 316:00 total treats it as 0. The `Vacation_Hours_Remaining` formula will show −16. Ask NW Regional.
+
+## 5. Original 3-table proposal (superseded by §4 — kept for rationale)
 
 Three grains ⇒ three tables. Names/fields deliberately mirror the report so import stays mechanical.
 
