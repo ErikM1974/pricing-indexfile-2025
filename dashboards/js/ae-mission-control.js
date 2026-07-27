@@ -571,7 +571,7 @@
         {
             id: 'today',
             loaders: [loadDueDates, loadDataQuality, loadPurchasing],
-            renderers: [renderQueue, renderOneThing],
+            renderers: [renderArtwork, renderOneThing],
         },
         {
             // loadTargetsForOneThing is DATA-ONLY — it paints nothing. It stays on money and
@@ -594,7 +594,7 @@
         {
             id: 'pipeline',
             loaders: [],                       // 100% summary-fed — a genuinely free tab
-            renderers: [renderPanels, renderPipelineKpis],
+            renderers: [renderPanels, renderPipelineKpis, renderQueue],
         },
         {
             id: 'wins',
@@ -814,6 +814,14 @@
             : k.openQuoteCount + ' · ' + money0(k.openQuoteValue);
         el('kpi-quotes-label').textContent = 'Open Quotes (90d)';
         el('kpi-winrate').textContent = (k.leadWinRate == null) ? '—' : k.leadWinRate + '%';
+        // Leads with no follow-up set. Labelled for what it measures rather than the design's
+        // "new leads this week" — that would need a date-windowed count this page doesn't have,
+        // and a tile whose label doesn't match its number is how a page loses trust.
+        var nl = el('kpi-newleads');
+        if (nl) {
+            var untouched = ((data.actionQueue || {}).newUntouchedLeads || []).length;
+            nl.textContent = String(untouched);
+        }
 
         // Quote → order conversion. ⚠️ In production today BOTH reps get attributed:0,
         // because Quote_Sessions holds 8 rows for all of 2026 and only one carries a
@@ -1435,6 +1443,11 @@
      * Oldest wait first: an approval that has been sitting a fortnight is the one holding
      * up a job, and the age colour says so without the rep doing date arithmetic.
      */
+    /** Today-tab renderer. Takes the summary so it can be registered in TABS like its peers. */
+    function renderArtwork(data) {
+        renderArtworkCard(((data || {}).actionQueue || {}).artAwaitingApproval || []);
+    }
+
     function renderArtworkCard(items) {
         var host = el('aemc-artwork');
         if (!host) return;
@@ -1505,9 +1518,11 @@
         total += (q.staleQuotes || []).length;
         html += section('🟠 Quotes needing a follow-up', quotes);
 
-        // Artwork left this queue on 2026-07-27 — it has its own capped card on Today, and
-        // rendering it in both places would double-count the day's workload.
-        renderArtworkCard(q.artAwaitingApproval || []);
+        // Artwork is NOT drawn here. It has its own capped card on Today, rendered by
+        // renderArtwork() which is registered on the TODAY tab — this function is registered
+        // on Pipeline, where the queue markup now lives. They were one renderer until the
+        // queue moved (2026-07-27), and leaving them joined meant deep-linking to Pipeline
+        // drew an empty queue while Today's artwork card only filled in after a visit here.
 
         var kits = (q.kitsPending || []).map(function (k) {
             var main = k.submissionId
@@ -1633,9 +1648,16 @@
         }
         return false;
     }
-    function rows(items, mapFn, emptyText) {
+    /** `limit` is opt-in — other callers rely on rows() rendering everything, so capping by
+     *  default would silently truncate lists elsewhere on the page. */
+    function rows(items, mapFn, emptyText, limit) {
         if (!items || !items.length) return '<div class="aemc-empty">' + esc(emptyText) + '</div>';
-        return '<ul class="aemc-rows">' + items.map(mapFn).join('') + '</ul>';
+        var shown = limit ? items.slice(0, limit) : items;
+        var extra = items.length - shown.length;
+        return '<ul class="aemc-rows">' + shown.map(mapFn).join('') + '</ul>' +
+            // Never truncate silently — the header's "View all" is the way through, and the
+            // count says how much is behind it.
+            (extra > 0 ? '<p class="aemc-hint">…and ' + extra + ' more — see “View all”.</p>' : '');
     }
 
     function renderPanels(data) {
@@ -1648,7 +1670,7 @@
                     '<span class="aemc-status">' + esc(l.status) + '</span>' +
                     '<span class="aemc-row-right">' + fmtWhen(l.submittedAt) + (l.leadValue ? ' · <span class="aemc-money">' + money0(l.leadValue) + '</span>' : '') + '</span>' +
                     '</li>';
-            }, 'No active leads assigned to you.');
+            }, 'No active leads assigned to you.', CAP);
         }
 
         if (!panelError('panel-quotes', 'quotes', data)) {
@@ -1662,7 +1684,7 @@
                     '<span class="aemc-status">' + esc(q.status || '') + '</span>' +
                     '<span class="aemc-row-right"><span class="aemc-money">' + money0(q.totalAmount) + '</span> · ' + fmtWhen(q.createdAt) + '</span>' +
                     '</li>';
-            }, 'No quotes with your name on them in the last 90 days. (Quotes count when you’re picked as sales rep in the builder.)');
+            }, 'No quotes with your name on them in the last 90 days. (Quotes count when you’re picked as sales rep in the builder.)', CAP);
         }
 
         if (!panelError('panel-art', 'art', data)) {
@@ -1673,7 +1695,7 @@
                     '<span class="aemc-status">' + esc(a.status || '') + '</span>' +
                     '<span class="aemc-row-right">' + (a.dueDate ? 'due ' + fmtWhen(a.dueDate) : fmtWhen(a.dateCreated)) + '</span>' +
                     '</li>';
-            }, 'No open art requests under your name.');
+            }, 'No open art requests under your name.', CAP);
         }
 
         if (!panelError('panel-orders', 'orders', data)) {
@@ -1687,7 +1709,7 @@
                     (o.shipped ? '<span class="aemc-status">Shipped</span>' : '') +
                     '<span class="aemc-row-right"><span class="aemc-money">' + money0(o.subtotal) + '</span> · ' + fmtWhen(o.invoicedDate) + '</span>' +
                     '</li>';
-            }, 'No orders invoiced to your customers in the last 30 days.');
+            }, 'No orders invoiced to your customers in the last 30 days.', CAP);
         }
     }
 
@@ -1844,6 +1866,12 @@
             el('aemc-growth-sub').textContent = g.flaggedCount
                 ? '(' + g.flaggedCount + ' account' + (g.flaggedCount === 1 ? '' : 's') + ' · ~' + money0(g.potentialTotal) + ' in reach)'
                 : '';
+            // Book stat row. Every tile comes from this one response — no extra request, and
+            // nothing shown that isn't actually measured.
+            var setStat = function (id, v) { var e = el(id); if (e) e.textContent = v; };
+            setStat('mc-book-active', g.accountsScanned == null ? '—' : String(g.accountsScanned));
+            setStat('mc-book-drift', g.flaggedCount == null ? '—' : String(g.flaggedCount));
+            setStat('mc-book-table', g.potentialTotal == null ? '—' : money0(g.potentialTotal));
             if (!g.items || !g.items.length) {
                 el('aemc-growth').innerHTML = '<div class="aemc-empty">Nothing overdue against its own rhythm right now — every active account is on schedule. Check back tomorrow.</div>';
                 return;
