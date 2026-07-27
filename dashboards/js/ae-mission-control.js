@@ -165,6 +165,180 @@
         });
     }
 
+    // ---------- Call List interactions ----------
+    // One delegated handler for the whole tab. Deliberately does NOT touch .aemc-more-toggle
+    // (see wireExpandToggles) — .aemc-loadmore is a different class doing a different job.
+    var CALL_STATUSES = [
+        { key: 'Reached', label: 'Reached them' },
+        { key: 'Left Message', label: 'Left message' },
+        { key: 'No Answer', label: 'No answer' },
+    ];
+    var FOLLOWUPS = [{ d: 3, label: '3 days' }, { d: 7, label: '1 week' }, { d: 14, label: '2 weeks' }];
+
+    /** Local YYYY-MM-DD. toISOString() is tomorrow after 5pm Pacific, which would write a
+     *  follow-up a day early and silently trip the CRM page's overdue rule. */
+    function localDay(offsetDays) {
+        var d = new Date();
+        if (offsetDays) d.setDate(d.getDate() + offsetDays);
+        var p = function (n) { return String(n).padStart(2, '0'); };
+        return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate());
+    }
+
+    /** Which per-rep table to write to. Keyed on the SAML-verified email, never a display
+     *  name. No mapping → no button, rather than a button that can only fail. */
+    var REP_ENDPOINT = {
+        'nika@nwcustomapparel.com': 'nika-accounts',
+        'taneisha@nwcustomapparel.com': 'taneisha-accounts',
+    };
+    function callLogEndpointFor() {
+        // 🔒 An admin viewing as a rep must not write as her — CRM_PERMISSIONS gives Erik both
+        // roles, so the PUT would succeed and land on her CRM page under her name.
+        if (state.isAdmin && state.viewAs) return null;
+        return REP_ENDPOINT[String((state.rep && state.rep.email) || '').toLowerCase()] || null;
+    }
+
+    function openLogStrip(host, custId) {
+        var ep = callLogEndpointFor();
+        if (!ep) {
+            host.innerHTML = '<span class="aemc-row-meta">'
+                + (state.isAdmin && state.viewAs ? 'Read-only while viewing as someone else.' : 'Call logging isn\'t set up for your account.')
+                + '</span>';
+            return;
+        }
+        host.innerHTML = '<div class="aemc-call-strip">'
+            + CALL_STATUSES.map(function (s) {
+                return '<button type="button" class="aemc-call-btn" data-status="' + esc(s.key) + '">' + esc(s.label) + '</button>';
+            }).join('')
+            + '<span class="aemc-call-strip-sep">then follow up in</span>'
+            + FOLLOWUPS.map(function (f) {
+                return '<button type="button" class="aemc-call-fu" data-days="' + f.d + '">' + esc(f.label) + '</button>';
+            }).join('')
+            + '</div>';
+    }
+
+    function submitCall(li, custId, status, days) {
+        var ep = callLogEndpointFor();
+        if (!ep) return;
+        var host = li.querySelector('[data-log]');
+        host.innerHTML = '<span class="aemc-row-meta">Saving…</span>';
+        var body = {
+            Last_Contact_Date: localDay(0),
+            Contact_Status: status,
+            Follow_Up_Type: 'Call',
+        };
+        // 🔴 Never send Contact_Notes — the whitelisted PUT REPLACES it, so logging a call
+        // would wipe whatever the rep typed on her CRM page.
+        if (days) body.Next_Follow_Up = localDay(days);
+
+        fetch('/api/crm-proxy/' + ep + '/' + encodeURIComponent(custId) + '/crm', {
+            method: 'PUT',
+            credentials: 'same-origin',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        }).then(function (r) {
+            return r.json().then(function (j) { return { ok: r.ok, status: r.status, body: j }; });
+        }).then(function (res) {
+            if (res.ok) {
+                host.innerHTML = '<span class="aemc-call-saved">✓ Logged — ' + esc(status)
+                    + (days ? ', follow up ' + esc(localDay(days)) : '') + '</span>';
+                li.classList.add('aemc-call--done');
+                var it = callState.items.filter(function (x) { return x.idCustomer === String(custId); })[0];
+                if (it) { it.calledToday = true; it.contactStatus = status; it.lastContactDate = localDay(0); }
+                return;
+            }
+            if (res.status === 404 && res.body && res.body.error === 'no_row') {
+                // The call still happened — don't lose it just because the CRM row is missing.
+                rememberLocalCall(custId, status);
+                host.innerHTML = '<span class="aemc-call-saved aemc-call-saved--local">✓ Noted on this device only — '
+                    + 'this account isn\'t in your CRM table yet.</span>';
+                li.classList.add('aemc-call--done');
+                return;
+            }
+            throw new Error((res.body && (res.body.error || res.body.message)) || ('HTTP ' + res.status));
+        }).catch(function (err) {
+            host.innerHTML = '<span class="aemc-panel-error">Couldn\'t save that (' + esc(err.message) + '). '
+                + '<button type="button" class="aemc-call-retry" data-cust="' + esc(custId) + '">Try again</button></span>';
+        });
+    }
+
+    /** Thin 3-day overlay for the no_row case and the window before the server cache expires. */
+    function rememberLocalCall(custId, status) {
+        try {
+            var key = 'aemcCalled:' + ((state.rep && state.rep.email) || 'unknown');
+            var m = JSON.parse(localStorage.getItem(key) || '{}') || {};
+            m[custId] = { d: localDay(0), s: status };
+            var cut = localDay(-3);
+            Object.keys(m).forEach(function (k) { if (!m[k] || m[k].d < cut) delete m[k]; });
+            localStorage.setItem(key, JSON.stringify(m));
+        } catch (e) { /* private mode — the server copy is the real one anyway */ }
+    }
+
+    function wireCallList() {
+        document.addEventListener('click', function (e) {
+            var more = e.target.closest('#aemc-calls-more');
+            if (more) { expandCallList(more); return; }
+
+            var printBtn = e.target.closest('#aemc-calls-print');
+            if (printBtn) { printCallSheet(); return; }
+
+            var status = e.target.closest('.aemc-call-btn');
+            if (status) {
+                var li1 = status.closest('.aemc-call');
+                submitCall(li1, li1.getAttribute('data-cust'), status.getAttribute('data-status'), 0);
+                return;
+            }
+            var fu = e.target.closest('.aemc-call-fu');
+            if (fu) {
+                var li2 = fu.closest('.aemc-call');
+                var picked = li2.querySelector('.aemc-call-btn.is-on');
+                submitCall(li2, li2.getAttribute('data-cust'),
+                    picked ? picked.getAttribute('data-status') : 'Reached',
+                    parseInt(fu.getAttribute('data-days'), 10));
+                return;
+            }
+            var retry = e.target.closest('.aemc-call-retry');
+            if (retry) {
+                var li3 = retry.closest('.aemc-call');
+                openLogStrip(li3.querySelector('[data-log]'), li3.getAttribute('data-cust'));
+                return;
+            }
+            // Tapping the row opens the log strip — but never when the tap was a phone or
+            // email link, or a button already inside the strip (rep-crm.js pattern).
+            var row = e.target.closest('.aemc-call');
+            if (row && !e.target.closest('a') && !e.target.closest('button')) {
+                openLogStrip(row.querySelector('[data-log]'), row.getAttribute('data-cust'));
+            }
+        });
+    }
+
+    /** A physical sheet is how this work actually gets done. Same-origin window, never a
+     *  downloadable file — it carries customer phone numbers. */
+    function printCallSheet() {
+        var rows = callState.items.slice(0, callState.rendered);
+        var who = (state.rep && state.rep.firstName) || 'Call';
+        var html = '<!DOCTYPE html><html><head><meta charset="utf-8"><title>' + esc(who) + ' — call sheet</title>'
+            + '<style>body{font:12pt system-ui,sans-serif;margin:18mm}h1{font-size:15pt;margin:0 0 2mm}'
+            + 'p.sub{color:#555;margin:0 0 6mm;font-size:10pt}'
+            + 'table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:5px 4px;border-bottom:1px solid #ddd;vertical-align:top}'
+            + 'th{font-size:9pt;text-transform:uppercase;color:#666}td.n{white-space:nowrap}'
+            + '.w{font-size:9.5pt;color:#444}.chk{width:14px;height:14px;border:1px solid #888;display:inline-block}</style>'
+            + '</head><body><h1>' + esc(who) + ' — embroidery call sheet</h1>'
+            + '<p class="sub">' + rows.length + ' accounts, best opportunity first · printed ' + esc(localDay(0)) + '</p>'
+            + '<table><thead><tr><th></th><th>Company</th><th>Phone</th><th>Why</th><th>Bounty</th></tr></thead><tbody>'
+            + rows.map(function (x) {
+                return '<tr><td><span class="chk"></span></td><td>' + esc(x.company)
+                    + '<br><span class="w">' + esc(x.playLabel) + (x.contactName ? ' · ' + esc(x.contactName) : '') + '</span></td>'
+                    + '<td class="n">' + esc(x.phone || '—') + '</td>'
+                    + '<td class="w">' + esc(x.why) + '</td>'
+                    + '<td class="n">' + money2(x.bounty) + '</td></tr>';
+            }).join('')
+            + '</tbody></table><script>window.onload=function(){window.print()}<\/script></body></html>';
+        var w = window.open('', '_blank');
+        if (!w) { alert('Your browser blocked the print window. Allow pop-ups for this page and try again.'); return; }
+        w.document.write(html);
+        w.document.close();
+    }
+
     // ---------- whole-card collapse (declutter the page) ----------
     // Secondary cards marked .aemc-collapsible collapse to just their header
     // (title + summary count) on header click. State persists per-card in
@@ -220,6 +394,7 @@
             wireHeader();
             wireKitModal();
             wireExpandToggles();
+            wireCallList();
             migrateLayout();        // BEFORE wireCardCollapse — see the comment in there
             wireCardCollapse();
             wireBonusExplainer();
@@ -250,9 +425,17 @@
             renderers: [renderQueue, renderOneThing],
         },
         {
+            // loadTargetsForOneThing is DATA-ONLY — it paints nothing. It stays on money and
+            // rides along on calls so The One Thing has its money candidates without putting a
+            // 20s cold endpoint on the default tab's boot path (against a 15s fetch timeout).
             id: 'money',
-            loaders: [loadEarnedAccounts, loadTargets],
+            loaders: [loadEarnedAccounts, loadTargetsForOneThing],
             renderers: [renderBonus, renderMoneyKpis],
+        },
+        {
+            id: 'calls',
+            loaders: [loadCallList, loadTargetsForOneThing],
+            renderers: [],
         },
         {
             id: 'book',
@@ -1740,7 +1923,8 @@
         if (sub) sub.textContent = rows.length ? '(' + money2(mine.bounties.payout) + ' from ' + rows.length + ' account' + (rows.length === 1 ? '' : 's') + ')' : '';
         if (!rows.length) {
             host.innerHTML = '<div class="aemc-empty">No bounty-earning accounts yet this quarter. ' +
-                'An account counts once it reaches the quarter minimum in embroidery — see <strong>Where the money is</strong> below for who to go after.</div>';
+                'An account counts once it reaches the quarter minimum in embroidery — your ' +
+                '<a href="#tab=calls">Call List</a> has who to go after.</div>';
             return;
         }
         rows.sort(function (x, y) { return y.a.revenue - x.a.revenue; });
@@ -1754,64 +1938,165 @@
         }, { noun: 'account' });
     }
 
-    // ---------- where the money is: the target roadmap ----------
-    function loadTargets(refresh) {
-        return sameOriginJson('/api/crm-proxy/embroidery-bonus/targets' + qs(refresh)).then(function (d) {
+    // ---------- The One Thing's money candidates ----------
+    // DATA ONLY — paints nothing. The rendering half of this moved to the Call List tab on
+    // 2026-07-27; what's left feeds The One Thing, which needs bounty / gapToBounty / score
+    // so every suggested action can say what it's worth to her paycheck.
+    //
+    // ⚠️ The catch must touch NO DOM. The old version wrote el('aemc-targets').innerHTML, and
+    // that element no longer exists on this tab — the catch itself would throw on null.
+    function loadTargetsForOneThing(refresh) {
+        return dataOnce('targets' + (refresh ? ':r' : ''), function () {
+            return sameOriginJson('/api/crm-proxy/embroidery-bonus/targets' + qs(refresh));
+        }).then(function (d) {
             var names = Object.keys(d.reps || {});
             if (!names.length) return;
             var mine = (state.rep && d.reps[state.rep.fullName]) || d.reps[names[0]];
             if (!mine) return;
-            var s = mine.summary || {};
-
-            // C first: the smallest asks on the board. An account already ordering that just
-            // needs a little more is the cheapest bounty a rep can earn all quarter.
-            var html = '';
-            if ((mine.almostThere || []).length) {
-                html += '<h3 class="aemc-queue-section-title">🎯 Almost there — ' +
-                    money0(s.almostThereGap) + ' of orders away from ' + money0(s.almostThereBounty) + '</h3>' +
-                    expandableRows(mine.almostThere, function (x, hidden) {
-                        return '<li class="aemc-row' + (hidden ? ' aemc-row--collapsed' : '') + '">' +
-                            '<span class="aemc-row-main">' + esc(x.company) + '</span>' +
-                            '<span class="aemc-growth-reason">' + esc(x.category) + '</span>' +
-                            '<span class="aemc-row-right"><span class="aemc-money">+' + money0(x.gapToBounty) + '</span><br>' +
-                            '<span class="aemc-row-meta">at ' + money0(x.quarterRevenue) + ' — pays ' + money2(x.bounty) + '</span></span>' +
-                            '</li>';
-                    }, { visible: 4, noun: 'account' });
-            }
-
-            html += '<h3 class="aemc-queue-section-title">↩️ Win back — ' + s.winBackCount +
-                ' accounts that used to embroider (' + money0(s.winBackLifetime) + ' of past work)</h3>' +
-                expandableRows(mine.winBack, function (x, hidden) {
-                    var season = x.q3SharePct >= 25 ? '<span class="aemc-growth-reason aemc-growth-reason--season">Q3 buyer</span>' : '';
-                    return '<li class="aemc-row' + (hidden ? ' aemc-row--collapsed' : '') + '">' +
-                        '<span class="aemc-row-main">' + esc(x.company) + '</span>' + season +
-                        '<span class="aemc-row-right"><span class="aemc-money">' + money0(x.avgOrderValue) + '</span><br>' +
-                        '<span class="aemc-row-meta">typical order · ' + x.embroideryOrders + ' past · ' +
-                        x.monthsDormant + ' mo quiet · ' + money2(x.bounty) + ' bounty</span></span>' +
-                        '</li>';
-                }, { visible: 5, noun: 'account' });
-
-            html += '<h3 class="aemc-queue-section-title">✨ Never embroidered — ' + s.firstProgramCount +
-                ' accounts already buying from you (' + money0(s.firstProgramSpend) + ' in other work)</h3>' +
-                expandableRows(mine.firstProgram, function (x, hidden) {
-                    return '<li class="aemc-row' + (hidden ? ' aemc-row--collapsed' : '') + '">' +
-                        '<span class="aemc-row-main">' + esc(x.company) + '</span>' +
-                        '<span class="aemc-row-right"><span class="aemc-money">' + money0(x.otherSpend) + '</span><br>' +
-                        '<span class="aemc-row-meta">spent on other work · ' + x.otherOrders + ' orders · last ' +
-                        x.monthsSinceOrder + ' mo ago · ' + money2(x.bounty) + ' bounty</span></span>' +
-                        '</li>';
-                }, { visible: 5, noun: 'account' });
-
-            el('aemc-targets').innerHTML = html;
-            el('aemc-targets-sub').textContent = '(' + (s.winBackCount + s.firstProgramCount + s.almostThereCount) + ' accounts)';
-            // Feed The One Thing. Both lists already carry bounty / gapToBounty / score, which
-            // is what lets every suggested action state what it's worth to her paycheck.
             state.almostThere = mine.almostThere || [];
             state.winBack = mine.winBack || [];
             renderOneThing();
         }).catch(function (err) {
-            el('aemc-targets').innerHTML = '<div class="aemc-panel-error">Target list failed to load (' + esc(err.message) + '). Refresh to retry.</div>';
+            // No card of its own to fail into. The One Thing simply falls back to its
+            // non-money candidates, which is a degraded suggestion, not a broken page.
+            console.error('[mission-control] target data for The One Thing failed:', err.message);
         });
+    }
+
+    // ---------- Call List ----------
+    // The three plays merged into one order of work, with a phone number attached.
+    //
+    // Rows past the first 15 have NO contact data until "See more" fetches it, so this can't
+    // use expandableRows (which renders everything and hides the overflow with CSS — the
+    // hidden rows would sit there claiming "no phone on file"). It also must not reuse the
+    // .aemc-more-toggle class: that has a document-level delegated handler which would fire
+    // alongside this one.
+    var callState = { items: [], hydratedThrough: 0, rendered: 0, rep: null, today: '' };
+
+    function callRowHtml(x) {
+        var chipCls = x.play === 'almostThere' ? ' aemc-call-chip--near'
+            : (x.play === 'winBack' ? ' aemc-call-chip--back' : ' aemc-call-chip--new');
+        var reach = '';
+        if (!x.hydrated) {
+            reach = '<span class="aemc-row-meta">Loading contact…</span>';
+        } else if (x.phone) {
+            // href strips formatting, the label keeps it readable (jim-mailing-list pattern).
+            reach = '<a class="aemc-call-tel" href="tel:' + esc(String(x.phone).replace(/[^0-9+]/g, '')) + '">'
+                + '<i class="fas fa-phone" aria-hidden="true"></i> ' + esc(x.phone) + '</a>';
+            if (x.email) reach += ' <a class="aemc-call-mail" href="mailto:' + esc(x.email) + '" title="' + esc(x.email) + '"><i class="fas fa-envelope" aria-hidden="true"></i></a>';
+        } else if (x.email) {
+            reach = '<a class="aemc-call-mail" href="mailto:' + esc(x.email) + '"><i class="fas fa-envelope" aria-hidden="true"></i> ' + esc(x.email) + '</a>';
+        } else {
+            // Erik's data-quality radar treats this as a hard error, so say the same thing.
+            reach = '<span class="aemc-call-nophone">No phone on the customer record — fix it in ShopWorks</span>';
+        }
+
+        var flags = '';
+        if (x.followUpDue) flags += '<span class="aemc-call-chip aemc-call-chip--due">Follow-up due</span>';
+        if (x.calledToday) flags += '<span class="aemc-call-chip aemc-call-chip--done">✓ Called today</span>';
+
+        return '<li class="aemc-call' + (x.calledToday ? ' aemc-call--done' : '') + '" data-cust="' + esc(x.idCustomer) + '">'
+            + '<div class="aemc-call-head">'
+            + '<span class="aemc-call-co">' + esc(x.company) + '</span>'
+            + '<span class="aemc-call-chip' + chipCls + '">' + esc(x.playLabel) + '</span>'
+            + flags
+            + '<span class="aemc-call-conf aemc-call-conf--' + esc(x.confidence.toLowerCase().replace(/\s+/g, '-')) + '">' + esc(x.confidence) + '</span>'
+            + '</div>'
+            + '<div class="aemc-call-why">' + esc(x.why) + '</div>'
+            + '<div class="aemc-call-foot">'
+            + '<span class="aemc-call-reach">' + reach + (x.contactName ? ' <span class="aemc-row-meta">' + esc(x.contactName) + '</span>' : '') + '</span>'
+            + '<span class="aemc-call-worth">' + money2(x.bounty) + ' bounty</span>'
+            + '</div>'
+            + '<div class="aemc-call-log" data-log="' + esc(x.idCustomer) + '"></div>'
+            + '</li>';
+    }
+
+    function renderCallRows(upto) {
+        var host = el('aemc-calls-list');
+        if (!host) return;
+        var slice = callState.items.slice(0, upto);
+        host.innerHTML = slice.map(callRowHtml).join('');
+        callState.rendered = slice.length;
+        var more = el('aemc-calls-more');
+        if (!more) return;
+        var left = callState.items.length - callState.rendered;
+        more.hidden = left <= 0;
+        more.textContent = left > 0 ? 'See the other ' + left + ' account' + (left === 1 ? '' : 's') : '';
+    }
+
+    function loadCallList(refresh) {
+        return dataOnce('callList' + (refresh ? ':r' : ''), function () {
+            return sameOriginJson('/api/crm-proxy/embroidery-bonus/call-list' + qs(refresh));
+        }).then(function (d) {
+            var names = Object.keys(d.reps || {});
+            if (!names.length) {
+                el('aemc-calls').innerHTML = '<div class="aemc-panel-error">No account list came back for you. Tell Erik — this usually means your book isn\'t mapped yet.</div>';
+                return;
+            }
+            // An admin with no view-as gets every rep back; guessing would silently label
+            // someone else's book as theirs.
+            if (!state.rep && names.length > 1) {
+                el('aemc-calls').innerHTML = '<div class="aemc-empty">Pick a rep above to see their call list.</div>';
+                return;
+            }
+            var mine = (state.rep && d.reps[state.rep.fullName]) || d.reps[names[0]];
+            if (!mine) {
+                el('aemc-calls').innerHTML = '<div class="aemc-panel-error">We couldn\'t find your account list.</div>';
+                return;
+            }
+
+            callState.items = mine.items || [];
+            callState.hydratedThrough = mine.hydratedThrough || 0;
+            callState.rep = state.rep ? state.rep.email : '';
+            callState.today = d.today || '';
+
+            var c = mine.counts || {};
+            var warn = d.configSource === 'fallback'
+                ? '<div class="aemc-panel-error">' + esc(d.configWarning || 'Bonus settings could not be read — these figures may not match the approved plan.') + '</div>'
+                : '';
+            var suppressed = c.notInRepTable
+                ? '<p class="aemc-hint">' + c.notInRepTable + ' of these aren\'t in your CRM table yet, so a logged call there stays on this device.</p>'
+                : '';
+
+            el('aemc-calls').innerHTML = warn
+                + '<ul class="aemc-calls" id="aemc-calls-list"></ul>'
+                + '<button type="button" class="aemc-loadmore" id="aemc-calls-more" hidden></button>'
+                + suppressed;
+            el('aemc-calls-sub').textContent = '(' + (c.total || 0) + ' accounts · '
+                + (c.almostThere || 0) + ' almost there, ' + (c.winBack || 0) + ' to win back, '
+                + (c.firstProgram || 0) + ' never embroidered)';
+            var pb = el('aemc-calls-print');
+            if (pb) pb.hidden = false;
+            renderCallRows(Math.min(15, callState.items.length));
+        }).catch(function (err) {
+            el('aemc-calls').innerHTML = '<div class="aemc-panel-error">Call list failed to load (' + esc(err.message) + '). Refresh to retry.</div>';
+        });
+    }
+
+    // "See more" — the remaining rows need their phone numbers fetched, so this is a real
+    // request, not a CSS reveal.
+    function expandCallList(btn) {
+        btn.disabled = true;
+        var was = btn.textContent;
+        btn.textContent = 'Loading contact details…';
+        return sameOriginJson('/api/crm-proxy/embroidery-bonus/call-list' + qs(false) + (qs(false) ? '&' : '?') + 'hydrate=all')
+            .then(function (d) {
+                var names = Object.keys(d.reps || {});
+                var mine = (state.rep && d.reps[state.rep.fullName]) || d.reps[names[0]];
+                if (mine && mine.items) {
+                    callState.items = mine.items;
+                    callState.hydratedThrough = mine.hydratedThrough || 0;
+                }
+                renderCallRows(callState.items.length);
+            })
+            .catch(function (err) {
+                btn.disabled = false;
+                btn.textContent = was;
+                var e = document.createElement('div');
+                e.className = 'aemc-panel-error';
+                e.textContent = 'Could not load the rest (' + err.message + ').';
+                btn.parentNode.insertBefore(e, btn.nextSibling);
+            });
     }
 
     // The standalone win-back radar was folded into "Where the money is" (loadTargets) on

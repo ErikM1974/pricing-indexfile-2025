@@ -1163,6 +1163,82 @@
         var u = String(url);
         var method = (options && options.method) || 'GET';
 
+        // --- Call list (2026-07-27). Shapes taken from the live endpoint, then bent to cover
+        // the states real data won't reliably produce on any given day: email-only, no phone
+        // at all, a follow-up already due, one already called, and one missing from the rep's
+        // CRM table (the no_row write path). Those are the branches that rot unseen. ---
+        if (u.indexOf('/api/crm-proxy/embroidery-bonus/call-list') !== -1) {
+            var wantAll = u.indexOf('hydrate=all') !== -1;
+            var cm = u.match(/viewAs=([^&]+)/);
+            var cEmail = cm ? decodeURIComponent(cm[1]) : REP.email;
+            var cWho = cEmail === NIKA.email ? NIKA.fullName : REP.fullName;
+            var mk = function (o) {
+                return Object.assign({
+                    tier: '', bounty: 100, expectedOrder: 1200, callScore: 40,
+                    confidence: 'Fair', calledToday: false, lastContactDate: '',
+                    contactStatus: '', nextFollowUp: '', followUpDue: false, inRepTable: true,
+                    contactName: 'Pat Rivera', email: 'pat@example.com', phone: '(253) 555-0111',
+                    phoneDisplay: '(253) 555-0111', hydrated: true
+                }, o);
+            };
+            var callItems = [
+                mk({ idCustomer: '9001', company: 'Sterling Septic & Plumbing', play: 'winBack', playLabel: 'Win back',
+                     callScore: 256.55, confidence: 'Strong', bounty: 100,
+                     nextFollowUp: '2026-07-20', followUpDue: true,
+                     why: 'Embroidered 17 times, typically $1,174, quiet 13 months — and Jul-Sep is historically their season.' }),
+                mk({ idCustomer: '9002', company: 'Temple Fitness', play: 'almostThere', playLabel: 'Almost there',
+                     callScore: 126.06, confidence: 'Strong', bounty: 150,
+                     why: '$640 more embroidery pays you $150. Already ordering — at $360 this quarter.' }),
+                mk({ idCustomer: '9003', company: 'Fountainhead Development', play: 'winBack', playLabel: 'Win back',
+                     callScore: 140.04, confidence: 'Strong', phone: '', phoneDisplay: '',
+                     email: 'orders@fountainhead.example', contactName: 'Dana Wu',
+                     why: 'Embroidered 8 times, typically $4,514, quiet 19 months — and Jul-Sep is historically their season.' }),
+                mk({ idCustomer: '9004', company: 'UW Dept. Of Emergency Medicine', play: 'winBack', playLabel: 'Win back',
+                     callScore: 70.14, confidence: 'Strong', phone: '', phoneDisplay: '', email: '', contactName: '',
+                     why: 'Embroidered once, $9,105, 21 months ago — one order only, so there’s no reorder pattern to go on.' }),
+                mk({ idCustomer: '9005', company: 'MG Car Club', play: 'winBack', playLabel: 'Win back',
+                     callScore: 6.2, confidence: 'Long shot', calledToday: true, contactStatus: 'Left Message',
+                     lastContactDate: '2026-07-27',
+                     why: 'Embroidered 3 times, typically $410, quiet 26 months.' }),
+                mk({ idCustomer: '9006', company: 'Griot’s Motors', play: 'firstProgram', playLabel: 'Never embroidered',
+                     callScore: 12.4, confidence: 'Fair', bounty: 150, inRepTable: false,
+                     why: 'Spends about $1,800 an order with you on other decoration, last order 4 months ago — has never bought embroidery.' })
+            ];
+            // 20 filler rows so "See more" has something to reveal and the 15-row cut shows.
+            for (var ci = 0; ci < 20; ci++) {
+                callItems.push(mk({ idCustomer: '95' + (10 + ci), company: 'Filler Account ' + (ci + 1),
+                    play: 'winBack', playLabel: 'Win back', callScore: 5 - ci * 0.2,
+                    confidence: 'Long shot', hydrated: wantAll,
+                    phone: wantAll ? '(253) 555-02' + String(10 + ci) : '',
+                    why: 'Embroidered 2 times, typically $380, quiet 29 months.' }));
+            }
+            var cScoped = {};
+            cScoped[cWho] = {
+                items: callItems,
+                hydratedThrough: wantAll ? callItems.length : 15,
+                counts: { total: callItems.length, almostThere: 1, winBack: 24, firstProgram: 1,
+                          withPhone: 14, noPhone: 1, notInRepTable: 1 }
+            };
+            return json({ success: true, quarter: 'Q3', year: 2026, asOf: '2026-07-01',
+                minAccountRevenue: 1000, dormancyMonths: 12, today: '2026-07-27',
+                configSource: 'caspio', configWarning: null, reps: cScoped });
+        }
+        // Log-a-call write. 9006 is deliberately absent from the rep's CRM table so the
+        // no_row path — which used to report a false success — is exercised every run.
+        if (u.indexOf('-accounts/') !== -1 && u.indexOf('/crm') !== -1 && method === 'PUT') {
+            var idm = u.match(/-accounts\/(\d+)\/crm/);
+            var putId = idm ? idm[1] : '';
+            if (putId === '9006') {
+                return Promise.resolve(new Response(JSON.stringify({
+                    success: false, error: 'no_row',
+                    message: 'No row in Taneisha_All_Accounts_Caspio for ID_Customer=9006',
+                    idCustomer: 9006
+                }), { status: 404, headers: { 'Content-Type': 'application/json' } }));
+            }
+            return json({ success: true, message: 'CRM fields updated successfully',
+                          updatedFields: ['Last_Contact_Date', 'Contact_Status'], recordsAffected: 1 });
+        }
+
         if (u.indexOf('/api/crm-proxy/embroidery-bonus/targets') !== -1) {
             var tm = u.match(/viewAs=([^&]+)/);
             var tEmail = tm ? decodeURIComponent(tm[1]) : REP.email;

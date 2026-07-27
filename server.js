@@ -3640,6 +3640,10 @@ function embroideryBonusForwarder(upstreamPath, { injectIdentity = false, teamOn
       // target roadmap kept serving cache while every other card re-pulled — a Refresh
       // that half works is worse than one that doesn't (added 2026-07-26).
       if (req.query.refresh) params.set('refresh', String(req.query.refresh));
+      // Call list only: 'top' hydrates phone/email for the first 15 rows, 'all' for the rest
+      // when the rep presses "See more". Whitelisted rather than forwarded raw so the query
+      // can't be used to force the expensive path.
+      if (req.query.hydrate === 'all') params.set('hydrate', 'all');
       // scope=team is forced server-side, never read from the query — a caller on the
       // shared-dashboard route can't widen it into per-rep compensation.
       if (teamOnly) params.set('scope', 'team');
@@ -3690,6 +3694,12 @@ app.get('/api/crm-proxy/embroidery-bonus/dormant',
 app.get('/api/crm-proxy/embroidery-bonus/targets',
   requireCrmRole(['taneisha', 'nika', 'admin']),
   embroideryBonusForwarder('/api/embroidery-bonus/targets', { injectIdentity: true }));
+// Call list — the same three plays merged into ONE ranked order of work, with a phone
+// number attached and the rep's own call history folded in. Identity-injected: this
+// carries customer phone numbers and contact names, so a rep sees only their own book.
+app.get('/api/crm-proxy/embroidery-bonus/call-list',
+  requireCrmRole(['taneisha', 'nika', 'admin']),
+  embroideryBonusForwarder('/api/embroidery-bonus/call-list', { injectIdentity: true }));
 
 // Purchasing Portal — company-wide view of the same feed (every request to
 // Bradley + requester + status). ANY logged-in staff; no identity injection.

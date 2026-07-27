@@ -180,6 +180,12 @@
                     <span class="mc-tab-badge" id="mc-badge-money" hidden></span>
                     <span class="mc-tab-dot" id="mc-dot-money" hidden title="Needs a look"></span>
                 </button>
+                <button type="button" class="mc-tab" role="tab" id="mc-tab-calls"
+                        aria-controls="mc-panel-calls" aria-selected="false"
+                        tabindex="-1" data-tab="calls" data-label="Call list"
+                        data-badge-noun="calls">
+                    <i class="fas fa-phone" aria-hidden="true"></i> Call List
+                </button>
                 <button type="button" class="mc-tab" role="tab" id="mc-tab-book"
                         aria-controls="mc-panel-book" aria-selected="false"
                         tabindex="-1" data-tab="book" data-label="My Book"
@@ -312,12 +318,24 @@
                     <div id="aemc-earned"><div class="dash-loading">Loading…</div></div>
                 </div>
 
-                <div class="dash-card aemc-emb-card aemc-collapsible" data-collapse-key="embtargets">
+                <p class="aemc-hint aemc-calls-pointer">
+                    Looking for who to call next?
+                    <a href="#tab=calls"><i class="fas fa-phone" aria-hidden="true"></i> Open your Call List</a>
+                </p>
+            </section>
+
+            <!-- ================== TAB: Call List ================== -->
+            <section class="mc-panel" id="mc-panel-calls" role="tabpanel"
+                     aria-labelledby="mc-tab-calls" tabindex="0" hidden>
+                <div class="dash-card aemc-emb-card">
                     <div class="dash-card-header">
-                        <h2 class="dash-card-title"><i class="fas fa-map-location-dot"></i> Where the money is <span class="aemc-sub" id="aemc-targets-sub"></span></h2>
+                        <h2 class="dash-card-title"><i class="fas fa-phone"></i> Who to call <span class="aemc-sub" id="aemc-calls-sub"></span></h2>
+                        <button type="button" class="aemc-viewall aemc-calls-print" id="aemc-calls-print" hidden>
+                            <i class="fas fa-print" aria-hidden="true"></i> Print call sheet
+                        </button>
                     </div>
-                    <p class="aemc-hint">Your accounts, ranked by what they're realistically worth in embroidery this quarter.</p>
-                    <div id="aemc-targets"><div class="dash-loading">Working out who to call…</div></div>
+                    <p class="aemc-hint">One list, best opportunity first.</p>
+                    <div id="aemc-calls"><div class="dash-loading">Working out who to call…</div></div>
                 </div>
             </section>
 
