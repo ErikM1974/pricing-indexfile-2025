@@ -11,7 +11,7 @@
   var MOCK = {
     date: '2026-07-22',
     note: 'Mock data — harness only.',
-    totals: { pos: 5, workOrders: 4, boxes: 6, piecesShipped: 95, cost: 613.68, received: 1 },
+    totals: { pos: 6, workOrders: 5, boxes: 7, piecesShipped: 101, cost: 646.32, received: 1 },
     orders: [
       {
         company: 'Absher Construction Company', method: 'Screen Print', workOrder: '142537', sanmarPO: '113747',
@@ -92,6 +92,24 @@
         received: true, receivedDate: '2026-07-22',
         boxDetailAvailable: false, boxDetail: [],
         lines: [{ style: 'PC54', title: 'Port & Company Core Tee', color: 'Red', size: 'L', qtyOrdered: 6, qtyShipped: 6, status: 'Shipped', lineCost: 48.00 }],
+        issue: null
+      },
+      {
+        // FOLLOW-ON SHIPMENT (2026-07-27, modelled on the real PO 113682): receiving counted this PO
+        // in on the 21st, but SanMar shipped another carton on the 24th. It must behave like a NORMAL
+        // arriving PO — full contents, a box label, counted in the totals — NOT collapse to "✓ Received".
+        company: "Swiss Sportsmen's Club", method: 'Embroidery', workOrder: '142473', sanmarPO: '113682',
+        dueDate: '2026-08-04', designNumber: '30011', designName: 'Swiss Club Crest', contactName: 'Hans Meier',
+        salesRep: 'Taneisha Clark', customerPO: '', terms: 'Net 10', dateOrdered: '2026-07-08',
+        boxes: 1, piecesShipped: 6, piecesOrdered: 6, cost: 32.64,
+        received: false, receivedDate: '2026-07-21', followOnShipment: true,
+        shipDate: '2026-07-24', fromState: 'NV', carrier: 'UPS', tracking: '1Z021W510351562544',
+        boxDetailAvailable: true,
+        boxDetail: [{
+          boxNumber: 1, trackingNumber: '1Z021W510351562544', carrier: 'UPS', pieces: 6, cost: 32.64,
+          items: [{ style: 'YST720', title: 'Sport-Tek Youth PosiCharge Tee', color: 'True Royal', size: 'L', qty: 6, lineCost: 32.64 }],
+        }],
+        lines: [{ style: 'YST720', title: 'Sport-Tek Youth PosiCharge Tee', color: 'True Royal', size: 'L', qtyOrdered: 6, qtyShipped: 6, status: 'Shipped', lineCost: 32.64 }],
         issue: null
       }
     ]

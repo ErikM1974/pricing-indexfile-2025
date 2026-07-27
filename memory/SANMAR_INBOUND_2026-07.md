@@ -88,6 +88,26 @@ were counted in but still showed, because UPS's live status was genuinely `Out f
   Label button; a **"✓ N already received"** summary tile (`.sit-stat--recv`). Received POs are excluded from Box
   Labels (`printAllLabels`) and the Print/PDF worklist (`buildPrintSheet`). Chose mark+collapse over hard-remove so a
   receiving mis-count never makes a box silently vanish. Verified render via local harness (mock API) — clean, no errors.
+- **📦 SHIPMENT-FIRST SWEEP added 2026-07-27 — the completeness guarantee.** Everything else is
+  PO-first ("what shipped for the POs I know about"), which can never prove we hold everything.
+  `sweepRecentShipments(3)` uses **OSN `queryType=3`** (`shipmentDateTimeStamp`, SanMar caps the
+  window at **7 days**, error 303 beyond it) = *"everything you shipped since X"* — the same view as
+  the **freight manifest / PSST** SanMar emails. Runs as **Phase 0 of `/sync-recent-completed`** (so
+  it inherits the existing daily schedule — no new cron), and POs it finds with no order row feed
+  straight into the A/B/C ingest pipeline. Cheap by design: ONE paged Caspio read builds a
+  `cartonKey(po,tracking)` seen-set, then only genuinely-new cartons are POSTed (a quiet day = 1 read;
+  contrast `pullAndStoreShipments`, which reads per carton). `isEmptyWindowError()` splits "quiet day"
+  (160 / Data not found) from a REAL failure (auth/303/fault) — the latter throws, because a sweep that
+  swallows an auth error reports "SanMar shipped nothing". The daily script prints `newPos` by name.
+  ⚠ The same `queryType=3` call also runs inside `/backfill` Phase 5 (90-day, manual) — don't confuse them.
+- **⚠ AMENDED 2026-07-27 — the count-in is per PO, the shipment is per CARTON.** `date_Received` alone was hiding
+  real inbound boxes, so suppression is now CONDITIONAL: `isFollowOnShipment(receivedDate, lastShipDate)` (exported
+  from `sanmar-orders.js`) — a PO counted in on the 21st whose carton shipped the 24th stays on the list, the
+  checklist and the labels, wearing an amber **"↩ Follow-on shipment · counted in M-D-YY"** badge (`.sit-followon` /
+  `.sit-ps-followon` / `.sit-rt-followon` / `.sl-followon`, payload field `followOnShipment`). Same release,
+  `scopeBoxesToArrival(allBoxes, arrivingTracking)` trims SanMar's box feed — which returns EVERY box the PO ever
+  shipped — to the cartons in THIS arrival window, so `boxes`/`piecesShipped`/`cost` stop double-counting a split
+  shipment's already-received half. Both fail OPEN (no tracking match ⇒ show every box). Why → LESSONS_LEARNED 2026-07-27.
 - **⚠ FRESHNESS CAVEAT (the one thing to tune)**: "received" only clears as fast as the bandit **Purchase Orders
   Export** (still on the legacy CSV→OneDrive→Caspio-import chain, NOT the 15-min direct ORDER_ODBC sync). If that's
   ~daily, a PO Mikalah counts at 10 AM won't drop off until the next export — tolerable for a day-view that rolls over
