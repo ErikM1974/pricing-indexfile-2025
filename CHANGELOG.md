@@ -1,3 +1,10 @@
+## v2026.07.27.6 (2026.07.27)
+
+- Inbound report: flag the carton that shipped after the count-in
+- Lessons: "style exists" is not "style is buyable" (blog autopilot 7/27)
+- Bonus headline: say the dollar step, not "every 1%"
+- Deploy v2026.07.27.6: 2 files (ae-mission-control.html,test-ae-mission-control.html,)
+
 ## v2026.07.27.5 (2026.07.27)
 
 - Fail the build when the Mission Control harness drifts from the page
