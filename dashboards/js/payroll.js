@@ -367,19 +367,30 @@
       var name = e.Employee_Full_Name || ((e.First_Name || '') + ' ' + (e.Last_Name || '')).trim();
       var vacRem = Number(e.Vacation_Hours_Remaining || 0);
       var eligible = day(e.Vacation_Eligible_Date);
+      var grant = Number(e.Vacation_Eligible_Hours || 0);
+      var pending = eligible && eligible > new Date().toISOString().slice(0, 10);
+
+      // Someone still short of their first anniversary gets an asterisk beside the
+      // vacation line and a matching footnote, so a negative balance reads as "not yet
+      // accrued" rather than "you are in the hole". Grant hours come from the record,
+      // not a hardcoded 40 — the next new hire is handled without a code change.
       var note = '';
-      if (eligible && eligible > new Date().toISOString().slice(0, 10)) {
-        note = 'Vacation hours begin accruing on ' + esc(eligible) + ', so this balance may be negative until then.';
+      if (pending) {
+        note = '* Your vacation resets on ' + esc(eligible) + ', your one-year anniversary'
+          + (grant ? ', when you receive ' + esc(grant.toFixed(0)) + ' hours' : '')
+          + '. Until then this balance can be negative.';
       } else if (vacRem < 0) {
-        note = 'This vacation balance is negative — you have used more than has accrued so far.';
+        note = '* You have used more vacation than has accrued so far this year.';
       }
+      var star = note ? '<span class="slip-star">*</span>' : '';
+
       return '<div class="slip">'
         + '<div class="slip-co">Northwest Custom Apparel</div>'
         + '<div class="slip-name">' + esc(name) + '</div>'
         + '<div class="slip-asof">Balances as of ' + esc(asOf) + '</div>'
         + '<div class="slip-rows">'
         + '<div class="slip-row"><span class="slip-label">Vacation hours used</span><span class="slip-val">' + slipHrs(e.Vacation_Hours_Used) + '</span></div>'
-        + '<div class="slip-row"><span class="slip-label">Vacation hours remaining</span><span class="slip-val">' + slipHrs(vacRem) + '</span></div>'
+        + '<div class="slip-row"><span class="slip-label">Vacation hours remaining' + star + '</span><span class="slip-val">' + slipHrs(vacRem) + '</span></div>'
         + '<div class="slip-row"><span class="slip-label">Sick hours remaining</span><span class="slip-val">' + slipHrs(e.Sick_Hours_Remaining) + '</span></div>'
         + '</div>'
         + (note ? '<div class="slip-note">' + note + '</div>' : '')
