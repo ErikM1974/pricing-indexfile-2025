@@ -1,3 +1,9 @@
+## v2026.07.28.6 (2026.07.28)
+
+- deploy skill: widen the smoke gate from test:parser to the whole tests/unit/
+- Fix: Administration menu could not be collapsed (CSS specificity tie)
+- Deploy v2026.07.28.6: 2 files (index.html,test-embroidery-bonus.html)
+
 ## v2026.07.28.5 (2026.07.28)
 
 - DTG: unpack init() into per-entry-mode handlers (155 -> 18 lines)
