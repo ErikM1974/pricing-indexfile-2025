@@ -1,3 +1,7 @@
+## v2026.07.28.2 (2026.07.28)
+
+- Payroll: printable cut-apart slips for handing out leave balances
+
 ## v2026.07.28.1 (2026.07.28)
 
 - Memory: Vacation_Hours_Remaining stopped being a Caspio formula
