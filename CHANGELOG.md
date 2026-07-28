@@ -1,3 +1,8 @@
+## v2026.07.28.4 (2026.07.28)
+
+- Admin menu: 5 sub-groups + close the RBAC fail-open on admin pages
+- Deploy v2026.07.28.4: 1 files (test-embroidery-bonus.html...)
+
 ## v2026.07.28.3 (2026.07.28)
 
 - Memory: restore payroll topic file (swept by the /memory reset) + First_Name root cause
