@@ -1,3 +1,9 @@
+## v2026.07.28.1 (2026.07.28)
+
+- Memory: Vacation_Hours_Remaining stopped being a Caspio formula
+- Clear repo /memory/ knowledge base for fresh start
+- Clean up dangling /memory/ references after knowledge-base reset
+
 ## v2026.07.27.8 (2026.07.27)
 
 - Memory: the four thumbnails that failed 643 times behind a clean-looking log
