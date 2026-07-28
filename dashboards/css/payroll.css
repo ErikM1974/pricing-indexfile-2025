@@ -127,6 +127,8 @@ body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Ro
               font-size: 11pt; padding: .055in 0; }
   .slip-row + .slip-row { border-top: 1px solid #ddd; }
   .slip-label { color: #222; }
+  /* Ties the vacation line to the footnote below it. */
+  .slip-star { font-weight: 700; margin-left: .04in; }
   .slip-val { font-weight: 700; font-variant-numeric: tabular-nums; }
   /* A negative balance is legitimate here (vacation accrues at one year), so it is
      printed plainly with a note rather than flagged red like an error on screen. */
