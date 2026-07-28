@@ -1,3 +1,7 @@
+## v2026.07.28.5 (2026.07.28)
+
+- DTG: unpack init() into per-entry-mode handlers (155 -> 18 lines)
+
 ## v2026.07.28.4 (2026.07.28)
 
 - Admin menu: 5 sub-groups + close the RBAC fail-open on admin pages
