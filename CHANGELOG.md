@@ -1,3 +1,8 @@
+## v2026.07.28.3 (2026.07.28)
+
+- Memory: restore payroll topic file (swept by the /memory reset) + First_Name root cause
+- Payroll slips: asterisk + footnote for staff whose vacation has not accrued yet
+
 ## v2026.07.28.2 (2026.07.28)
 
 - Payroll: printable cut-apart slips for handing out leave balances
