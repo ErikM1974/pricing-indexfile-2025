@@ -29,7 +29,7 @@
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css?v=2026.07.25.4">
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/utilities.css?v=20260514-ai-phase1">
     <!-- Claude Design handoff theme (2026-05-13) — unlayered variant, wins all cascade fights. -->
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=2026.07.22.2">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=2026.07.28.4">
     <!-- Claude Design PATCH 2 (spacing) — hide empty announcements, compress pinned row, tighten zones.
          PATCH 3 and PATCH 4 were REMOVED per PATCH-5-CLEANUP: their broad
          [class*="..."] selectors were over-matching and damaging styles that
@@ -211,8 +211,22 @@
                         </a>
                     </div>
 
-                    <!-- Administration -->
-                    <div class="nav-section collapsed" data-section="admin">
+                    <!-- Administration — ADMIN ONLY (2026-07-28 reorg).
+                         WAS: 18 flat links, ~700px of scroll when opened.
+                         NOW: 5 collapsed sub-groups, so opening the section shows
+                         5 rows instead of 18 and nothing scrolls off-screen.
+
+                         `hidden` + data-requires-role="admin": nav-access-controller.js
+                         REMOVES this whole block unless GET /api/crm-session/me reports
+                         the 'admin' permission (fails CLOSED). Removing — not merely
+                         hiding — also keeps these tools out of the Ctrl+K palette, which
+                         harvests its registry from the live DOM.
+
+                         ⚠ This is the UX layer only. The real gate is server-side:
+                         gateStaffPage + the Caspio Staff_Page_Access table (plus the
+                         explicit requireCrmRole/requireCrmEmail routes in server.js).
+                         Never treat this attribute as security. -->
+                    <div class="nav-section collapsed" data-section="admin" data-requires-role="admin" hidden>
                         <button type="button" class="nav-section-header" data-action="sidebar:toggle-section" aria-expanded="false" aria-controls="nav-admin">
                             <div class="nav-section-title">
                                 <span aria-hidden="true">⚙️</span>
@@ -222,24 +236,77 @@
                         </button>
                         <div class="nav-section-content" id="nav-admin">
                             <div>
-                                <a href="/dashboards/blog-editor.html" class="nav-link">📰 Blog Editor — write &amp; publish posts</a>
-                                <a href="/dashboards/seo-strategy.html" class="nav-link">📈 SEO Strategy — plan &amp; .net coordination</a>
-                                <a href="/dashboards/policy-migration.html" class="nav-link">Policy Migration Tracker</a>
-                                <a href="/dashboards/access-admin.html" class="nav-link">Access Admin — Roles &amp; Page Access</a>
-                                <a href="/dashboards/api-usage.html" class="nav-link">📊 API Usage — Caspio call attribution</a>
-                                <a href="/dashboards/sanmar-payables.html" class="nav-link">💵 SanMar Payables — invoices, CSV &amp; marketing fund</a>
-                                <a href="/dashboards/payroll.html" class="nav-link">🔒 Payroll — vacation hours &amp; packet upload</a>
-                                <a href="/sanmar-vendor-portal.html" class="nav-link">Sanmar Vendor Portal (legacy)</a>
-                                <a href="/universal-records-admin.html" class="nav-link">Universal Records Admin</a>
-                                <a href="/dashboards/commission-structure.html" class="nav-link">Commission Structure</a>
-                                <a href="/dashboards/caspio-api-reference.html" class="nav-link">Caspio API Reference (v4)</a>
-                                <a href="/dashboards/table-usage-audit.html" class="nav-link">Caspio Table Audit (cleanup)</a>
-                                <a href="/dashboards/manageorders-api-reference.html" class="nav-link">ManageOrders API Fields</a>
-                                <a href="/dashboards/sanmar-api-reference.html" class="nav-link">SanMar API Cheat Sheet</a>
-                                <a href="/dashboards/sanmar-ftp-integration.html" class="nav-link">⬇️ SanMar Downloads — pricing &amp; data files</a>
-                                <a href="/dashboards/sanmar-shopworks-converter.html" class="nav-link">🔄 SanMar → ShopWorks Parts converter</a>
-                                <a href="/dashboards/shopworks-odbc-reference.html" class="nav-link">ShopWorks ODBC Reference</a>
-                                <a href="/dashboards/bandit-integration.html" class="nav-link">Bandit Integration</a>
+
+                                <!-- 1. Money & Payroll — anything with dollars attached. -->
+                                <div class="nav-subsection collapsed" data-subsection="admin-money">
+                                    <button type="button" class="nav-subsection-header" data-action="sidebar:toggle-section" aria-expanded="false" aria-controls="nav-admin-money">
+                                        <span class="nav-subsection-title">Money &amp; Payroll</span>
+                                        <span class="chevron" aria-hidden="true">▼</span>
+                                    </button>
+                                    <div class="nav-subsection-content" id="nav-admin-money">
+                                        <a href="/dashboards/sanmar-payables.html" class="nav-link">💵 SanMar Payables — invoices, CSV &amp; marketing fund</a>
+                                        <a href="/dashboards/payroll.html" class="nav-link">🔒 Payroll — vacation hours &amp; packet upload</a>
+                                        <a href="/dashboards/commission-structure.html" class="nav-link">Commission Structure</a>
+                                    </div>
+                                </div>
+
+                                <!-- 2. Marketing & Content — publishes to the PUBLIC site. -->
+                                <div class="nav-subsection collapsed" data-subsection="admin-marketing">
+                                    <button type="button" class="nav-subsection-header" data-action="sidebar:toggle-section" aria-expanded="false" aria-controls="nav-admin-marketing">
+                                        <span class="nav-subsection-title">Marketing &amp; Content</span>
+                                        <span class="chevron" aria-hidden="true">▼</span>
+                                    </button>
+                                    <div class="nav-subsection-content" id="nav-admin-marketing">
+                                        <a href="/dashboards/blog-editor.html" class="nav-link">📰 Blog Editor — write &amp; publish posts</a>
+                                        <a href="/dashboards/seo-strategy.html" class="nav-link">📈 SEO Strategy — plan &amp; .net coordination</a>
+                                    </div>
+                                </div>
+
+                                <!-- 3. Access & Policy — who can see what, and policy rollout. -->
+                                <div class="nav-subsection collapsed" data-subsection="admin-access">
+                                    <button type="button" class="nav-subsection-header" data-action="sidebar:toggle-section" aria-expanded="false" aria-controls="nav-admin-access">
+                                        <span class="nav-subsection-title">Access &amp; Policy</span>
+                                        <span class="chevron" aria-hidden="true">▼</span>
+                                    </button>
+                                    <div class="nav-subsection-content" id="nav-admin-access">
+                                        <a href="/dashboards/access-admin.html" class="nav-link">🔑 Access Admin — Roles &amp; Page Access</a>
+                                        <a href="/dashboards/policy-migration.html" class="nav-link">Policy Migration Tracker</a>
+                                    </div>
+                                </div>
+
+                                <!-- 4. Integrations & Data — the plumbing that moves data
+                                     between SanMar / ShopWorks / Caspio / Box. -->
+                                <div class="nav-subsection collapsed" data-subsection="admin-integrations">
+                                    <button type="button" class="nav-subsection-header" data-action="sidebar:toggle-section" aria-expanded="false" aria-controls="nav-admin-integrations">
+                                        <span class="nav-subsection-title">Integrations &amp; Data</span>
+                                        <span class="chevron" aria-hidden="true">▼</span>
+                                    </button>
+                                    <div class="nav-subsection-content" id="nav-admin-integrations">
+                                        <a href="/dashboards/bandit-integration.html" class="nav-link">🤖 Bandit Integration — sync tasks &amp; agents</a>
+                                        <a href="/dashboards/sanmar-ftp-integration.html" class="nav-link">⬇️ SanMar Downloads — pricing &amp; data files</a>
+                                        <a href="/dashboards/sanmar-shopworks-converter.html" class="nav-link">🔄 SanMar → ShopWorks Parts converter</a>
+                                        <a href="/sanmar-vendor-portal.html" class="nav-link">Sanmar Vendor Portal (legacy)</a>
+                                        <a href="/universal-records-admin.html" class="nav-link">Universal Records Admin</a>
+                                    </div>
+                                </div>
+
+                                <!-- 5. System & API Reference — read-only developer docs +
+                                     the Caspio quota meter. Lowest traffic, so it sits last. -->
+                                <div class="nav-subsection collapsed" data-subsection="admin-reference">
+                                    <button type="button" class="nav-subsection-header" data-action="sidebar:toggle-section" aria-expanded="false" aria-controls="nav-admin-reference">
+                                        <span class="nav-subsection-title">System &amp; API Reference</span>
+                                        <span class="chevron" aria-hidden="true">▼</span>
+                                    </button>
+                                    <div class="nav-subsection-content" id="nav-admin-reference">
+                                        <a href="/dashboards/api-usage.html" class="nav-link">📊 API Usage — Caspio call attribution</a>
+                                        <a href="/dashboards/caspio-api-reference.html" class="nav-link">Caspio API Reference (v4)</a>
+                                        <a href="/dashboards/table-usage-audit.html" class="nav-link">Caspio Table Audit (cleanup)</a>
+                                        <a href="/dashboards/manageorders-api-reference.html" class="nav-link">ManageOrders API Fields</a>
+                                        <a href="/dashboards/sanmar-api-reference.html" class="nav-link">SanMar API Cheat Sheet</a>
+                                        <a href="/dashboards/shopworks-odbc-reference.html" class="nav-link">ShopWorks ODBC Reference</a>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -946,6 +1013,6 @@
     <!-- ===================================================
          APP ENTRY (ES module)
          =================================================== -->
-    <script type="module" src="/shared_components/js/staff-dashboard/core/dashboard-app.js?v=2026.07.25.4"></script>
+    <script type="module" src="/shared_components/js/staff-dashboard/core/dashboard-app.js?v=2026.07.28.4"></script>
 </body>
 </html>
