@@ -2,15 +2,16 @@
 const { useState, useMemo } = React;
 const { minToTime, segments } = window.NWCA_HELPERS;
 
-const TL_START = 7 * 60;    // 7:00 AM
+const TL_START = 8 * 60;    // 8:00 AM — earliest clock-in on the schedule
 const TL_END   = 17 * 60;   // 5:00 PM
 const TL_RANGE = TL_END - TL_START;
+const TL_HOURS = TL_RANGE / 60;
 const pct = (m) => Math.max(0, Math.min(100, ((m - TL_START) / TL_RANGE) * 100));
 
 const DEPTS = ["All", "Embroidery", "DTG", "Ruthie/Mikalah"];
 
 // Update this date whenever you change schedule data in data.js
-const SCHEDULE_EFFECTIVE_DATE = "5/26/2026";
+const SCHEDULE_EFFECTIVE_DATE = "8/3/2026";
 
 // stable hue from name → avatar tint
 function hue(str) {
@@ -89,6 +90,14 @@ function Header() {
 }
 
 // ---------------- Day Summary Bar ----------------
+// Names sharing an earliest/latest time — collapses once the list gets long
+// (with everyone on an 8:00 AM start, spelling out all ten reads as noise).
+function nameList(names, total) {
+  if (names.length === total) return "Whole team";
+  if (names.length > 3) return `${names.slice(0, 2).join(", ")} +${names.length - 2} more`;
+  return names.join(" & ");
+}
+
 function DaySummary({ employees }) {
   const dayStats = useMemo(() => {
     const startMins = employees.map(e => e.events.find(ev => ev.type === "start").min);
@@ -106,8 +115,8 @@ function DaySummary({ employees }) {
 
   const items = [
     { num: dayStats.headcount, label: "Production team", sub: "active employees" },
-    { num: minToTime(dayStats.earliest), label: "Earliest start", sub: dayStats.earliestNames.join(" & ") },
-    { num: minToTime(dayStats.latest),   label: "Latest finish",  sub: dayStats.latestNames.join(" & ") },
+    { num: minToTime(dayStats.earliest), label: "Earliest start", sub: nameList(dayStats.earliestNames, employees.length) },
+    { num: minToTime(dayStats.latest),   label: "Latest finish",  sub: nameList(dayStats.latestNames, employees.length) },
   ];
 
   return (
@@ -225,8 +234,8 @@ function Timeline({ employees, onSelect, selectedId }) {
           {/* hour axis */}
           <div className="tl-axis-label" />
           <div className="tl-axis">
-            {Array.from({ length: 11 }).map((_, i) => {
-              const h = 7 + i;
+            {Array.from({ length: TL_HOURS + 1 }).map((_, i) => {
+              const h = TL_START / 60 + i;
               const p = pct(h * 60);
               const label = h === 12 ? "12p" : h < 12 ? `${h}a` : `${h - 12}p`;
               return (
@@ -253,8 +262,8 @@ function Timeline({ employees, onSelect, selectedId }) {
                   </div>
                 </button>
                 <div className={`tl-row ${isSelected ? "selected" : ""}`}>
-                  {Array.from({ length: 10 }).map((_, i) => (
-                    <div key={i} className="tl-gridline" style={{ left: `${pct((8 + i) * 60)}%` }} />
+                  {Array.from({ length: TL_HOURS }).map((_, i) => (
+                    <div key={i} className="tl-gridline" style={{ left: `${pct((TL_START / 60 + 1 + i) * 60)}%` }} />
                   ))}
                   <div
                     className="tl-envelope"

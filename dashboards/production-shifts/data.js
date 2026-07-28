@@ -1,4 +1,5 @@
 // NWCA Production Schedule — single source of truth
+// Effective 8/3/2026. Built from TimeClick actual punch medians, 06/29/2026–07/28/2026.
 // minutes are minutes-since-midnight to keep timeline math trivial
 window.NWCA_SCHEDULE = [
   {
@@ -8,13 +9,13 @@ window.NWCA_SCHEDULE = [
     role: "Embroidery Supervisor",
     dept: "Embroidery",
     paidHrs: 6.25,
-    note: "Early shift. Historical clock-out at 1:45 PM preserved.",
+    note: "Shift moved to 8:00 AM – 2:45 PM to match actual punches. Paid hours unchanged at 6.25.",
     events: [
-      { type: "start", min: 420 },
+      { type: "start", min: 480 },
       { type: "break", min: 540, durMin: 10 },
-      { type: "lunch", min: 630, durMin: 30 },
+      { type: "lunch", min: 690, durMin: 30 },
       { type: "break", min: 750, durMin: 10 },
-      { type: "end",   min: 825 }
+      { type: "end",   min: 885 }
     ]
   },
   {
@@ -24,7 +25,7 @@ window.NWCA_SCHEDULE = [
     role: "Embroidery Operator",
     dept: "Embroidery",
     paidHrs: 8,
-    note: "Historical lunch at 11:00 AM preserved.",
+    note: "No change — actual punches already match the posted shift.",
     events: [
       { type: "start", min: 480 },
       { type: "break", min: 585, durMin: 10 },
@@ -40,7 +41,7 @@ window.NWCA_SCHEDULE = [
     role: "Embroidery Operator",
     dept: "Embroidery",
     paidHrs: 8,
-    note: "Historical 11 AM lunch preserved. Lunch must be full 30 min.",
+    note: "Times unchanged. Actual lunch averages 26 min — it must be the full 30.",
     events: [
       { type: "start", min: 480 },
       { type: "break", min: 600, durMin: 10 },
@@ -56,7 +57,7 @@ window.NWCA_SCHEDULE = [
     role: "Embroidery Operator",
     dept: "Embroidery",
     paidHrs: 8,
-    note: "Historical ~11:45 AM lunch (rounded to 11:30).",
+    note: "Times unchanged. Actual lunch averages 27 min — it must be the full 30.",
     events: [
       { type: "start", min: 480 },
       { type: "break", min: 615, durMin: 10 },
@@ -71,14 +72,14 @@ window.NWCA_SCHEDULE = [
     first: "Brian",
     role: "DTG Supervisor",
     dept: "DTG",
-    paidHrs: 8,
-    note: "Staggered with Joseph. End at 4:30 PM = 8 paid hours.",
+    paidHrs: 7.75,
+    note: "Lunch moved to 12:30 PM and clock-out to 4:15 PM to match actual punches. Actual lunch averages 21 min — it must be the full 30.",
     events: [
       { type: "start", min: 480 },
       { type: "break", min: 570, durMin: 10 },
-      { type: "lunch", min: 690, durMin: 30 },
+      { type: "lunch", min: 750, durMin: 30 },
       { type: "break", min: 855, durMin: 10 },
-      { type: "end",   min: 990 }
+      { type: "end",   min: 975 }
     ]
   },
   {
@@ -87,14 +88,14 @@ window.NWCA_SCHEDULE = [
     first: "Joseph",
     role: "DTG Operator",
     dept: "DTG",
-    paidHrs: 8,
-    note: "Staggered with Brian. End at 4:30 PM = 8 paid hours.",
+    paidHrs: 7.75,
+    note: "Lunch moved to 11:15 AM and clock-out to 4:15 PM to match actual punches.",
     events: [
       { type: "start", min: 480 },
       { type: "break", min: 630, durMin: 10 },
-      { type: "lunch", min: 720, durMin: 30 },
+      { type: "lunch", min: 675, durMin: 30 },
       { type: "break", min: 885, durMin: 10 },
-      { type: "end",   min: 990 }
+      { type: "end",   min: 975 }
     ]
   },
   {
@@ -104,11 +105,11 @@ window.NWCA_SCHEDULE = [
     role: "Embroidery Trimmer",
     dept: "Embroidery",
     paidHrs: 8,
-    note: "Added lunch. End extended to 4:30 PM to preserve 8 paid hrs.",
+    note: "Lunch moved to 11:30 AM to match actual punches; shift times unchanged. Actual lunch averages 28 min — it must be the full 30.",
     events: [
       { type: "start", min: 480 },
       { type: "break", min: 645, durMin: 10 },
-      { type: "lunch", min: 720, durMin: 30 },
+      { type: "lunch", min: 690, durMin: 30 },
       { type: "break", min: 885, durMin: 10 },
       { type: "end",   min: 990 }
     ]
@@ -120,12 +121,12 @@ window.NWCA_SCHEDULE = [
     role: "Production Manager",
     dept: "Ruthie/Mikalah",
     paidHrs: 8,
-    note: "Staggered with Mikalah for customer pickup coverage.",
+    note: "Lunch moved to 2:00 PM and break 2 to 3:30 PM to match actual punches. Shift times unchanged.",
     events: [
       { type: "start", min: 480 },
       { type: "break", min: 630, durMin: 10 },
-      { type: "lunch", min: 720, durMin: 30 },
-      { type: "break", min: 870, durMin: 10 },
+      { type: "lunch", min: 840, durMin: 30 },
+      { type: "break", min: 930, durMin: 10 },
       { type: "end",   min: 990 }
     ]
   },
@@ -136,11 +137,11 @@ window.NWCA_SCHEDULE = [
     role: "Shipping / Receiving",
     dept: "Ruthie/Mikalah",
     paidHrs: 8,
-    note: "Staggered with Ruthie. 60-min historical lunch preserved.",
+    note: "Lunch moved to 1:00 PM to match actual punches. Keeps her 60-min lunch, so 8:00 AM – 5:00 PM is 8.00 paid hrs.",
     events: [
       { type: "start", min: 480 },
       { type: "break", min: 615, durMin: 10 },
-      { type: "lunch", min: 750, durMin: 60 },
+      { type: "lunch", min: 780, durMin: 60 },
       { type: "break", min: 930, durMin: 10 },
       { type: "end",   min: 1020 }
     ]
@@ -151,14 +152,14 @@ window.NWCA_SCHEDULE = [
     first: "Theavy",
     role: "Embroidery Operator",
     dept: "Embroidery",
-    paidHrs: 7.5,
-    note: "Late start preserved. Added lunch.",
+    paidHrs: 8,
+    note: "Shift moved to 8:00 AM – 4:30 PM with lunch at 11:45 AM. Paid hours 7.50 → 8.00, matching what she already works.",
     events: [
-      { type: "start", min: 540 },
-      { type: "break", min: 690, durMin: 10 },
-      { type: "lunch", min: 750, durMin: 30 },
+      { type: "start", min: 480 },
+      { type: "break", min: 600, durMin: 10 },
+      { type: "lunch", min: 705, durMin: 30 },
       { type: "break", min: 900, durMin: 10 },
-      { type: "end",   min: 1020 }
+      { type: "end",   min: 990 }
     ]
   }
 ];
