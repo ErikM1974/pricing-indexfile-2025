@@ -1438,160 +1438,182 @@ export function renderBand() {
     try { QuoteOrderSummary.renderShipToCard(); } catch (_) {}
 }
 
-export function init() {
-    // [2026-06-10] Shared leave-guard (quote-builder-utils.js) — warn before
-    // navigating away with unsaved changes, same as EMB/SCP/DTF. Installed
-    // FIRST because the ?edit= branch below early-returns. Safe this early:
-    // dtgState.hasChanges starts false and only user mutations (markDirty) set it.
-    if (typeof setupBeforeUnloadGuard === 'function') setupBeforeUnloadGuard();
-    // [2026-06-08] Phase 0: wire the shared order-summary band to DTG's own #dtgShip*/#dtgCompany* fields
-    // (the module is selector-agnostic). No estimate/editOnclick yet → the module hides those buttons.
-    if (typeof QuoteOrderSummary !== 'undefined') {
-        QuoteOrderSummary.configure({
-            orderRecap: '#order-recap',
-            shipToCard: '#ship-to-card',
-            // [2026-06-09] Phase 2 — ship.fee wires the shared estimator's fee write +
-            // the ship-to card's "· $X" line to #dtgShipFee.
-            ship: { address: '#dtgShipAddress1', city: '#dtgShipCity', state: '#dtgShipState', zip: '#dtgShipZip', method: '#dtgShipMethod', fee: '#dtgShipFee' },
-            recap: { company: '#dtgCompanyInput', custNum: '#dtgCompanyId' },
-            logos: function () { return []; },
-            // [2026-06-09] Phase 2 — UPS-Ground estimator. collectProducts mirrors the
-            // PRICED rows (same isRowColorInvalid filter combinedQty uses) so the weight
-            // estimate matches what's billed. onApplied syncs the DOM fee → state then
-            // re-renders the summary (fee is in the tax base); no recomputeTaxRate here —
-            // the fee doesn't change the RATE, and skipping it avoids a redundant DOR hit.
-            estimateHooks: {
-                collectProducts: function () {
-                    return state.rows
-                        .filter(function (r) { return r.style && !isRowColorInvalid(r); })
-                        .map(function (r) { return { style: r.style, color: r.color, catalogColor: r.catalogColor, sizeBreakdown: r.sizes }; });
-                },
-                onApplied: function () { syncShipFeeFromDom(); renderSummary(); },
-                btn: '#dtgEstimateShipBtn',
-                result: '#dtgEstimateShipResult',
+// [2026-06-08] Phase 0: wire the shared order-summary band to DTG's own #dtgShip*/#dtgCompany* fields
+// (the module is selector-agnostic). No estimate/editOnclick yet → the module hides those buttons.
+function configureOrderSummaryBand() {
+    if (typeof QuoteOrderSummary === 'undefined') return;
+    QuoteOrderSummary.configure({
+        orderRecap: '#order-recap',
+        shipToCard: '#ship-to-card',
+        // [2026-06-09] Phase 2 — ship.fee wires the shared estimator's fee write +
+        // the ship-to card's "· $X" line to #dtgShipFee.
+        ship: { address: '#dtgShipAddress1', city: '#dtgShipCity', state: '#dtgShipState', zip: '#dtgShipZip', method: '#dtgShipMethod', fee: '#dtgShipFee' },
+        recap: { company: '#dtgCompanyInput', custNum: '#dtgCompanyId' },
+        logos: function () { return []; },
+        // [2026-06-09] Phase 2 — UPS-Ground estimator. collectProducts mirrors the
+        // PRICED rows (same isRowColorInvalid filter combinedQty uses) so the weight
+        // estimate matches what's billed. onApplied syncs the DOM fee → state then
+        // re-renders the summary (fee is in the tax base); no recomputeTaxRate here —
+        // the fee doesn't change the RATE, and skipping it avoids a redundant DOR hit.
+        estimateHooks: {
+            collectProducts: function () {
+                return state.rows
+                    .filter(function (r) { return r.style && !isRowColorInvalid(r); })
+                    .map(function (r) { return { style: r.style, color: r.color, catalogColor: r.catalogColor, sizeBreakdown: r.sizes }; });
             },
-        });
-    }
-    // Duplicate mode (?duplicate=DTG0311-1): load a COPY of the source quote
-    // as a brand-NEW quote (EMB/DTF parity 2026-07-05). Read-only on the
-    // source — locked/pushed quotes are fine to duplicate (the classic
-    // reorder case). Rows reprice from the live API via schedulePriceUpdate()
-    // — the saved prices are never trusted. Wins over ?edit= and the
-    // session-restore flow, same param priority as DTF/EMB.
-    const dupParam = (new URLSearchParams(window.location.search)).get('duplicate');
-    if (dupParam && /^DTG/i.test(dupParam)) {
-        if (state.rows.length === 0) state.rows.push(newBlankRow());
-        render();
-        // Kick load in background; render shows immediately, fills in async.
-        loadSavedDtgQuoteForEdit(dupParam, { forDuplicate: true }).catch(err => {
-            console.error('[DTG Duplicate] Load failed:', err);
-        });
-        return;
-    }
+            onApplied: function () { syncShipFeeFromDom(); renderSummary(); },
+            btn: '#dtgEstimateShipBtn',
+            result: '#dtgEstimateShipResult',
+        },
+    });
+}
 
-    // Phase 11.6 (Erik 2026-05-24): edit-reopen for pre-push revisions.
-    // If URL has ?edit=DTG-NNN, fetch the saved quote, populate the form,
-    // and enable revision-on-save. Mirrors EMB/DTF/SCP loadQuoteForEditing.
-    // Takes priority over the session-restore flow: if rep arrived via
-    // an explicit edit URL, that wins over auto-restore.
+// Every entry mode paints the form BEFORE its async load/prefill, so the rep
+// sees the table immediately and it fills in behind them.
+function ensureRowsAndRender() {
+    if (state.rows.length === 0) state.rows.push(newBlankRow());
+    render();
+}
+
+// Duplicate mode (?duplicate=DTG0311-1): load a COPY of the source quote
+// as a brand-NEW quote (EMB/DTF parity 2026-07-05). Read-only on the
+// source — locked/pushed quotes are fine to duplicate (the classic
+// reorder case). Rows reprice from the live API via schedulePriceUpdate()
+// — the saved prices are never trusted. Wins over ?edit= and the
+// session-restore flow, same param priority as DTF/EMB.
+function tryDuplicateMode() {
+    const dupParam = (new URLSearchParams(window.location.search)).get('duplicate');
+    if (!dupParam || !/^DTG/i.test(dupParam)) return false;
+    ensureRowsAndRender();
+    // Kick load in background; render shows immediately, fills in async.
+    loadSavedDtgQuoteForEdit(dupParam, { forDuplicate: true }).catch(err => {
+        console.error('[DTG Duplicate] Load failed:', err);
+    });
+    return true;
+}
+
+// Phase 11.6 (Erik 2026-05-24): edit-reopen for pre-push revisions.
+// If URL has ?edit=DTG-NNN, fetch the saved quote, populate the form,
+// and enable revision-on-save. Mirrors EMB/DTF/SCP loadQuoteForEditing.
+// Takes priority over the session-restore flow: if rep arrived via
+// an explicit edit URL, that wins over auto-restore.
+function tryEditMode() {
     const editParam = (new URLSearchParams(window.location.search)).get('edit');
     // DTG QuoteIDs are date-packed with NO hyphen after the prefix
     // (e.g. DTG0311-1), so the old /^DTG-/ guard NEVER matched a real quote
     // and edit-load silently never fired. Match the prefix only. (2026-06-01)
-    if (editParam && /^DTG/i.test(editParam)) {
-        if (state.rows.length === 0) state.rows.push(newBlankRow());
-        render();
-        // Kick load in background; render shows immediately, fills in async.
-        loadSavedDtgQuoteForEdit(editParam).catch(err => {
-            console.error('[DTG Edit] Load failed:', err);
-        });
-        return;
-    }
+    if (!editParam || !/^DTG/i.test(editParam)) return false;
+    ensureRowsAndRender();
+    // Kick load in background; render shows immediately, fills in async.
+    loadSavedDtgQuoteForEdit(editParam).catch(err => {
+        console.error('[DTG Edit] Load failed:', err);
+    });
+    return true;
+}
 
-    // Quick Quote handoff (?from=quickquote — param schema + parser:
-    // getQuickQuotePrefill() in quote-builder-utils.js). Prefills through
-    // fillFromQuote(), the SAME chat→form setter the AI quote fill uses (row
-    // hydrate, color fuzzy-match, inventory kick) — so pricing still comes from
-    // DTGPricingService, never from the URL. Wins over session-restore for this
-    // visit, same as ?edit=. (item #6, 2026-07-05)
+// Quick Quote handoff (?from=quickquote — param schema + parser:
+// getQuickQuotePrefill() in quote-builder-utils.js). Prefills through
+// fillFromQuote(), the SAME chat→form setter the AI quote fill uses (row
+// hydrate, color fuzzy-match, inventory kick) — so pricing still comes from
+// DTGPricingService, never from the URL. Wins over session-restore for this
+// visit, same as ?edit=. (item #6, 2026-07-05)
+function tryQuickQuotePrefill() {
     const qqPrefill = (typeof getQuickQuotePrefill === 'function') ? getQuickQuotePrefill() : null;
-    if (qqPrefill && qqPrefill.style) {
-        if (state.rows.length === 0) state.rows.push(newBlankRow());
-        render();
-        // locationCode was engine-whitelisted by Quick Quote (dtgCode());
-        // fillFromQuote's sanitizeLocationState() re-guards anyway.
-        fillFromQuote({
-            locationCode: qqPrefill.location || 'LC',
-            lineItems: [{
-                styleNumber: qqPrefill.style,
-                // COLOR_NAME preferred — fillFromQuote fuzzy-matches display names
-                // and promotes the canonical name + CATALOG_COLOR itself.
-                color: qqPrefill.colorName || qqPrefill.color,
-                sizes: qqPrefill.sizeBreakdown || {}
-            }]
-        }, null);
-        if (typeof showToast === 'function') showToast('Loaded ' + qqPrefill.style + ' from Quick Quote — verify details', 'info', 6000);
-        if (typeof clearQuickQuoteParams === 'function') clearQuickQuoteParams();
-        return;
-    }
+    if (!qqPrefill || !qqPrefill.style) return false;
+    ensureRowsAndRender();
+    // locationCode was engine-whitelisted by Quick Quote (dtgCode());
+    // fillFromQuote's sanitizeLocationState() re-guards anyway.
+    fillFromQuote({
+        locationCode: qqPrefill.location || 'LC',
+        lineItems: [{
+            styleNumber: qqPrefill.style,
+            // COLOR_NAME preferred — fillFromQuote fuzzy-matches display names
+            // and promotes the canonical name + CATALOG_COLOR itself.
+            color: qqPrefill.colorName || qqPrefill.color,
+            sizes: qqPrefill.sizeBreakdown || {}
+        }]
+    }, null);
+    if (typeof showToast === 'function') showToast('Loaded ' + qqPrefill.style + ' from Quick Quote — verify details', 'info', 6000);
+    if (typeof clearQuickQuoteParams === 'function') clearQuickQuoteParams();
+    return true;
+}
 
-    // Method-switch / Leads handoff (?from=methodswitch): carry the CUSTOMER
-    // identity only (the trio applies it via applyMethodSwitchCustomer; DTG's
-    // form is its own architecture so we map the shared payload onto the DTG
-    // customer fields through fillFromQuote — the same setter the AI/Quick-Quote
-    // paths use, so no pricing is carried). Lead fields are attacker-controlled;
-    // fillFromQuote sets input .value only (never innerHTML). Wins over
-    // session-restore for this visit, same priority as ?edit=/?from=quickquote.
+// Method-switch / Leads handoff (?from=methodswitch): carry the CUSTOMER
+// identity only (the trio applies it via applyMethodSwitchCustomer; DTG's
+// form is its own architecture so we map the shared payload onto the DTG
+// customer fields through fillFromQuote — the same setter the AI/Quick-Quote
+// paths use, so no pricing is carried). Lead fields are attacker-controlled;
+// fillFromQuote sets input .value only (never innerHTML). Wins over
+// session-restore for this visit, same priority as ?edit=/?from=quickquote.
+function tryMethodSwitchPrefill() {
     const msPrefill = (typeof takeMethodSwitchPrefill === 'function') ? takeMethodSwitchPrefill() : null;
-    if (msPrefill && msPrefill.customer && (msPrefill.customer.name || msPrefill.customer.company || msPrefill.customer.email)) {
-        const c = msPrefill.customer;
-        if (state.rows.length === 0) state.rows.push(newBlankRow());
-        render();
-        fillFromQuote(null, {
-            name: c.name || '',
-            company: c.company || '',
-            customer_number: c.customerNumber || '',
-            email: c.email || '',
-            phone: c.phone || '',
-        });
-        if (typeof showToast === 'function') {
-            showToast('Customer carried over from ' + (msPrefill.fromLabel || 'the lead') + ' — add products to price', 'info', 6000);
-        }
-        if (typeof markAsUnsaved === 'function') markAsUnsaved();
-        // Strip the param so a refresh doesn't re-run the (now-drained) handoff.
-        try { history.replaceState(null, '', window.location.pathname); } catch (_) { /* ignore */ }
-        return;
+    if (!msPrefill || !msPrefill.customer) return false;
+    const c = msPrefill.customer;
+    if (!c.name && !c.company && !c.email) return false;
+    ensureRowsAndRender();
+    fillFromQuote(null, {
+        name: c.name || '',
+        company: c.company || '',
+        customer_number: c.customerNumber || '',
+        email: c.email || '',
+        phone: c.phone || '',
+    });
+    if (typeof showToast === 'function') {
+        showToast('Customer carried over from ' + (msPrefill.fromLabel || 'the lead') + ' — add products to price', 'info', 6000);
     }
+    if (typeof markAsUnsaved === 'function') markAsUnsaved();
+    // Strip the param so a refresh doesn't re-run the (now-drained) handoff.
+    try { history.replaceState(null, '', window.location.pathname); } catch (_) { /* ignore */ }
+    return true;
+}
 
-    // B4 — try to restore from sessionStorage first. If we restored, show
-    // a small banner offering to start fresh.
+// B4 — the no-handoff default: try to restore from sessionStorage first. If we
+// restored, show a small banner offering to start fresh.
+function restoreOrStartFresh() {
     const restored = restoreStateFromSession();
-    if (state.rows.length === 0) state.rows.push(newBlankRow());
-    render();
-    if (restored) {
-        showResumeBanner();
-        // A restored draft is unsaved work that dies with the tab — arm the
-        // leave-guard so closing without saving warns. (Edit-reopen is the
-        // opposite: content came FROM Caspio, so that path stays clean.)
-        if (typeof markAsUnsaved === 'function') markAsUnsaved();
-        // Hydrate the restored rows' inventory + bundle data in the
-        // background so the size cells + badges fill in.
-        for (const row of state.rows) {
-            if (row.style && row.color) {
-                kickInventoryFetch(row);
-            }
-            if (row.style) {
-                // refresh available sizes from bundle (cached if hot)
-                fetchBundle(row.style).then(b => {
-                    if (b && Array.isArray(b.sizes)) {
-                        row.availableSizes = b.sizes.filter(s => Number(s.price) > 0).map(s => String(s.size).toUpperCase());
-                        renderTable();
-                        schedulePriceUpdate();
-                    }
-                }).catch(() => {});
-            }
+    ensureRowsAndRender();
+    if (!restored) return;
+    showResumeBanner();
+    // A restored draft is unsaved work that dies with the tab — arm the
+    // leave-guard so closing without saving warns. (Edit-reopen is the
+    // opposite: content came FROM Caspio, so that path stays clean.)
+    if (typeof markAsUnsaved === 'function') markAsUnsaved();
+    // Hydrate the restored rows' inventory + bundle data in the
+    // background so the size cells + badges fill in.
+    for (const row of state.rows) {
+        if (row.style && row.color) {
+            kickInventoryFetch(row);
+        }
+        if (row.style) {
+            // refresh available sizes from bundle (cached if hot)
+            fetchBundle(row.style).then(b => {
+                if (b && Array.isArray(b.sizes)) {
+                    row.availableSizes = b.sizes.filter(s => Number(s.price) > 0).map(s => String(s.size).toUpperCase());
+                    renderTable();
+                    schedulePriceUpdate();
+                }
+            }).catch(() => {});
         }
     }
+}
+
+export function init() {
+    // [2026-06-10] Shared leave-guard (quote-builder-utils.js) — warn before
+    // navigating away with unsaved changes, same as EMB/SCP/DTF. Installed
+    // FIRST because the entry-mode branches below early-return. Safe this early:
+    // dtgState.hasChanges starts false and only user mutations (markDirty) set it.
+    if (typeof setupBeforeUnloadGuard === 'function') setupBeforeUnloadGuard();
+    configureOrderSummaryBand();
+
+    // Entry modes, HIGHEST PRIORITY FIRST — each returns true when it owns this
+    // load, so the first match wins and the rest (including session-restore)
+    // are skipped. Order is behavioral, not cosmetic: ?duplicate= beats ?edit=,
+    // both beat the handoffs, and all four beat auto-restore. Matches DTF/EMB.
+    if (tryDuplicateMode()) return;
+    if (tryEditMode()) return;
+    if (tryQuickQuotePrefill()) return;
+    if (tryMethodSwitchPrefill()) return;
+    restoreOrStartFresh();
 }
 
 // Find the row to preview into. Returns the first empty row (no style),
