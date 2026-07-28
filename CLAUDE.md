@@ -32,13 +32,15 @@ Guidance for Claude Code when working in this repository.
 - ManageOrders discovery? Document per [ManageOrders Documentation Routing](#manageorders-documentation-routing).
 
 **After fixing a bug:**
-- Append entry to [LESSONS_LEARNED.md](/memory/LESSONS_LEARNED.md): Problem / Root Cause / Solution / Prevention.
+- Append entry to `/memory/LESSONS_LEARNED.md` (recreated on first write — see reset note below): Problem / Root Cause / Solution / Prevention.
 - LESSONS_LEARNED hard limit: 300 lines. If over 250 lines before adding, archive oldest resolved entry to `/memory/LESSONS_LEARNED_ARCHIVE.md` (no limit).
 - Keep only: recurring bugs, active architecture rules, gotchas likely to recur. Archive: one-time fixes, historical migrations.
 
 ## Auto-Update Memory (Don't Ask, Just Do)
 
-Memory updates are part of completing the task — not a separate ask-permission step. Route each fact per the table below, then notify Erik in one sentence (e.g. "Updated LESSONS_LEARNED.md and MEMORY.md"). **Full architecture, routing & budgets → [memory/MEMORY_SYSTEM.md](memory/MEMORY_SYSTEM.md)** — read it when unsure where a fact goes or when memory feels bloated.
+Memory updates are part of completing the task — not a separate ask-permission step. Route each fact per the table below, then notify Erik in one sentence (e.g. "Updated LESSONS_LEARNED.md and MEMORY.md").
+
+> ⚠️ **`/memory/` was reset to empty on 2026-07-28 (fresh start).** The routing below is the intended structure going forward — the target files (MEMORY.md, LESSONS_LEARNED.md, INDEX.md, topic files) no longer exist yet and are recreated on first write. A full backup lives in `Downloads/repo-memory-backup-2026-07-28` and in git history (commit before `cc9a61e4`) if anything needs restoring.
 
 ### Where things go (one fact, one home — never restate a fact in a second file)
 
@@ -49,7 +51,7 @@ Memory updates are part of completing the task — not a separate ask-permission
 | One-line "shipped / decided / gotcha" | **MEMORY.md** index (< 24 KB; age old lines down) |
 | > 2 lines of feature/domain detail | **topic file** in `/memory` + add to `INDEX.md` + 1-line pointer in MEMORY.md |
 
-Procedures → a **skill** in `.claude/skills/`; integration fields (ManageOrders/Caspio) → the routing table in MEMORY_SYSTEM.md. **Code = pointers, not bodies** (`file:line` + WHY + gotcha; re-fetch with Grep/Explore). **Repo `/memory` is canonical** over the volatile `~/.claude` auto-memory (repo copy wins when a topic is in both; auto-memory keeps a 1-line pointer). Commit repo memory edits immediately (OneDrive reverts). Run `/memory-maintain` when MEMORY.md > 22 KB or LESSONS > 250 lines.
+Procedures → a **skill** in `.claude/skills/`. **Code = pointers, not bodies** (`file:line` + WHY + gotcha; re-fetch with Grep/Explore). **Repo `/memory` is canonical** over the volatile `~/.claude` auto-memory (repo copy wins when a topic is in both; auto-memory keeps a 1-line pointer). Commit repo memory edits immediately (OneDrive reverts). Run `/memory-maintain` when MEMORY.md > 22 KB or LESSONS > 250 lines.
 
 ## File-Lifecycle Automation
 
@@ -132,11 +134,11 @@ PC54 has SKUs `PC54`, `PC54_2X`, `PC54_3X` mapped to `Size01–Size06`. **`PC54_
 - Tiers: 1-7 / 8-23 / 24-47 / 48-71 / 72+
 - **LTM threshold: `qty <= 7`** (NOT `< 24` like DTG/DTF — common mistake)
 - Caps and garments tier separately — never combine qty for a tier discount.
-- 5-tier structure + per-tier `MarginDenominator` from Caspio `Pricing_Tiers` (0.55 tier 1-7 / 0.53 others as of 2026-06 — NEVER hardcode it) + `LTM_Fee $50`. Detail: [emb-builder-details.md](memory/emb-builder-details.md).
+- 5-tier structure + per-tier `MarginDenominator` from Caspio `Pricing_Tiers` (0.55 tier 1-7 / 0.53 others as of 2026-06 — NEVER hardcode it) + `LTM_Fee $50`.
 
 ### Quote Builder Sync (all 4 builders)
 
-Detailed sync manifest lives in **[.claude/rules/quote-builders.md](.claude/rules/quote-builders.md)** — a path-scoped rule that auto-loads when you open a builder file. Headlines: **Rule 8** — sync CSS/layout/table/fees/modals/utils across all 4; pricing/location/logo stay method-specific. **Invoice/PDF/totals/tax = ONE shared `embroidery-quote-invoice.js`** (hits all 4); DTG = separate inline-form. Before changing any builder element, read [memory/quote-builder-architecture.md](memory/quote-builder-architecture.md).
+Detailed sync manifest lives in **[.claude/rules/quote-builders.md](.claude/rules/quote-builders.md)** — a path-scoped rule that auto-loads when you open a builder file. Headlines: **Rule 8** — sync CSS/layout/table/fees/modals/utils across all 4; pricing/location/logo stay method-specific. **Invoice/PDF/totals/tax = ONE shared `embroidery-quote-invoice.js`** (hits all 4); DTG = separate inline-form.
 
 ## Quick Reference
 
@@ -151,7 +153,7 @@ When adding endpoints or rendering user data:
 - **XSS**: use `escapeHTML()` when rendering external/user data via `innerHTML`.
 - **CORS**: EXACT-match allowlist in `lib/cors-allowlist.js` (or `CORS_ALLOWED_ORIGINS` env — no deploy needed) — never substring/wildcard matching (roadmap 1.2, jest-locked).
 - **Rate limit**: sensitive endpoints use `strictLimiter`.
-- **🔐 Staff RBAC = two Caspio tables (Erik-editable, no deploy)**: `Staff_App_Roles` (Email→Role: admin/accountant/sales/art/shipping/production/staff) drives `permissionsFromRole()` at SAML login; `Staff_Page_Access` (Page→Allowed_Roles/Allowed_Emails) gates `/dashboards/*.html` via the table-driven middleware (admin override; unlisted=any-staff). **When you build a NEW staff dashboard page that should be RESTRICTED, add a `Staff_Page_Access` row** (else it defaults to any logged-in staff). Detail → [memory/STAFF_AUTH_DESIGN.md](memory/STAFF_AUTH_DESIGN.md).
+- **🔐 Staff RBAC = two Caspio tables (Erik-editable, no deploy)**: `Staff_App_Roles` (Email→Role: admin/accountant/sales/art/shipping/production/staff) drives `permissionsFromRole()` at SAML login; `Staff_Page_Access` (Page→Allowed_Roles/Allowed_Emails) gates `/dashboards/*.html` via the table-driven middleware (admin override; unlisted=any-staff). **When you build a NEW staff dashboard page that should be RESTRICTED, add a `Staff_Page_Access` row** (else it defaults to any logged-in staff).
 
 ## Policies Hub ↔ Employee Handbook sync
 
@@ -181,13 +183,7 @@ Bump the page's `?v=` on any HTML/CSS edit. The page's task table + `C:\NWCA\` f
 
 ## Documentation Entry Points
 
-- [/memory/CROSS_PROJECT_HUB.md](memory/CROSS_PROJECT_HUB.md) — start here for cross-project work
-- [/memory/LESSONS_LEARNED.md](memory/LESSONS_LEARNED.md) — check first when debugging
-- [/memory/INDEX.md](memory/INDEX.md) — master navigation
-- [/memory/GLOSSARY.md](memory/GLOSSARY.md) — shared terminology
-- [/memory/CASPIO_REST_API_REFERENCE.md](memory/CASPIO_REST_API_REFERENCE.md) — Caspio **platform** REST v3 (Swagger) capability map: tables/views/files/**webhooks**/**directories**/tasks/bridge-apps, what NWCA uses vs untapped, auth, plan-gating, **webhooks fire on REST writes** (≠ Triggered Actions). Distinct from CASPIO_API_CORE.md (our proxy API).
-- [/memory/SANMAR_API_REFERENCE.md](memory/SANMAR_API_REFERENCE.md) — SanMar **read-side** SOAP (product/inventory/order-status/shipment/invoice)
-- [/memory/sanmar-po/README.md](memory/sanmar-po/README.md) — SanMar **PO submission** (outbound blank ordering): plan, field-mapping, onboarding + buildable PO templates (🟡 review/not built, 2026-06-23)
+> **The `/memory/` knowledge base was reset to empty on 2026-07-28.** The former entry-point docs (INDEX.md, LESSONS_LEARNED.md, CROSS_PROJECT_HUB.md, GLOSSARY.md, the Caspio/SanMar API references, etc.) no longer exist — recreate them as memory is re-established, and restore the pointer list here as topics come back. Full backup: `Downloads/repo-memory-backup-2026-07-28` and git history.
 
 For deep research, use the Task tool with `subagent_type='Explore'`.
 

@@ -11,5 +11,3 @@ Rules here load **only when Claude opens a file matching the `paths:` globs** in
 |---|---|
 | `quote-builders.md` | the 4 quote builders + shared builder JS/CSS/invoice file |
 | `pricing-services.md` | any `shared_components/js/*-pricing-service.js` |
-
-Full memory architecture → [`memory/MEMORY_SYSTEM.md`](../../memory/MEMORY_SYSTEM.md).
