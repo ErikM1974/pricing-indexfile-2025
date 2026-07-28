@@ -6,7 +6,7 @@
   <meta name="robots" content="noindex, nofollow">
   <title>Payroll — Northwest Custom Apparel</title>
   <link rel="icon" href="/favicon.png" type="image/png">
-  <link href="/dashboards/css/payroll.css?v=2026.07.27.8" rel="stylesheet">
+  <link href="/dashboards/css/payroll.css?v=2026.07.27.9" rel="stylesheet">
 </head>
 <body>
   <div class="pr-wrap">
@@ -36,6 +36,7 @@
       </div>
       <div class="pr-toolbar">
         <input id="leave-search" class="pr-search" type="search" placeholder="Filter by name or department…" autocomplete="off">
+        <button id="print-slips" class="pr-btn" type="button">🖨️ Print slips to hand out</button>
         <span id="leave-asof" class="pr-asof"></span>
       </div>
       <div class="pr-tablewrap">
@@ -121,6 +122,14 @@
       </div>
     </section>
   </div>
-  <script src="/dashboards/js/payroll.js?v=2026.07.27.8"></script>
+
+  <!-- Cut-apart slips, one per employee. Hidden on screen; replaces the whole page when
+       the Print-slips button runs (body.print-slips + @media print). Built from whatever
+       the Leave Balances tab is currently showing, so a filter narrows the printout too. -->
+  <div id="print-sheet" aria-hidden="true">
+    <div id="print-slips-grid"></div>
+  </div>
+
+  <script src="/dashboards/js/payroll.js?v=2026.07.27.9"></script>
 </body>
 </html>

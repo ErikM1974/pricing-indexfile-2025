@@ -342,6 +342,76 @@
     }
   });
 
+  // --- printable cut-apart slips ---------------------------------------------
+
+  // Slips are handed to a person, so hours print as plain numbers (no red, no dashes
+  // for zero) and a negative vacation balance gets an explanatory line instead of
+  // looking like a mistake.
+  function slipHrs(n) {
+    var v = Number(n);
+    return esc((isFinite(v) ? v : 0).toFixed(2));
+  }
+
+  function currentLeaveRows() {
+    var q = (document.getElementById('leave-search').value || '').trim().toLowerCase();
+    if (!q) return allEmployees;
+    return allEmployees.filter(function (e) {
+      var hay = ((e.Employee_Full_Name || '') + ' ' + (e.First_Name || '') + ' '
+        + (e.Last_Name || '') + ' ' + (e.Department || '') + ' ' + (e.Job_Title || '')).toLowerCase();
+      return hay.indexOf(q) !== -1;
+    });
+  }
+
+  function buildSlips(rows, asOf) {
+    return rows.map(function (e) {
+      var name = e.Employee_Full_Name || ((e.First_Name || '') + ' ' + (e.Last_Name || '')).trim();
+      var vacRem = Number(e.Vacation_Hours_Remaining || 0);
+      var eligible = day(e.Vacation_Eligible_Date);
+      var note = '';
+      if (eligible && eligible > new Date().toISOString().slice(0, 10)) {
+        note = 'Vacation hours begin accruing on ' + esc(eligible) + ', so this balance may be negative until then.';
+      } else if (vacRem < 0) {
+        note = 'This vacation balance is negative — you have used more than has accrued so far.';
+      }
+      return '<div class="slip">'
+        + '<div class="slip-co">Northwest Custom Apparel</div>'
+        + '<div class="slip-name">' + esc(name) + '</div>'
+        + '<div class="slip-asof">Balances as of ' + esc(asOf) + '</div>'
+        + '<div class="slip-rows">'
+        + '<div class="slip-row"><span class="slip-label">Vacation hours used</span><span class="slip-val">' + slipHrs(e.Vacation_Hours_Used) + '</span></div>'
+        + '<div class="slip-row"><span class="slip-label">Vacation hours remaining</span><span class="slip-val">' + slipHrs(vacRem) + '</span></div>'
+        + '<div class="slip-row"><span class="slip-label">Sick hours remaining</span><span class="slip-val">' + slipHrs(e.Sick_Hours_Remaining) + '</span></div>'
+        + '</div>'
+        + (note ? '<div class="slip-note">' + note + '</div>' : '')
+        + '</div>';
+    }).join('');
+  }
+
+  document.getElementById('print-slips').addEventListener('click', function () {
+    var rows = currentLeaveRows();
+    if (!rows.length) return setStatus('Nothing to print — no employees match the filter.', 'error');
+
+    var stamps = allEmployees.map(function (e) { return day(e.Leave_Balances_As_Of); }).filter(Boolean).sort();
+    var asOf = stamps.length ? stamps[stamps.length - 1] : '';
+
+    // Pad to a full row of 2 so the last sheet's cut lines run edge to edge rather than
+    // stopping halfway across — otherwise the final slip has no line to cut against.
+    var html = buildSlips(rows, asOf);
+    if (rows.length % 2 !== 0) html += '<div class="slip"></div>';
+    document.getElementById('print-slips-grid').innerHTML = html;
+
+    document.body.classList.add('print-slips');
+    var cleanup = function () {
+      document.body.classList.remove('print-slips');
+      window.removeEventListener('afterprint', cleanup);
+    };
+    window.addEventListener('afterprint', cleanup);
+    window.print();
+    // Safari/older browsers don't always fire afterprint — don't strand the page hidden.
+    setTimeout(cleanup, 3000);
+    setStatus('Sent ' + rows.length + ' slip' + (rows.length === 1 ? '' : 's') + ' to the printer.', 'ok');
+  });
+
   document.getElementById('leave-search').addEventListener('input', applyLeaveFilter);
 
   loadLeave();
