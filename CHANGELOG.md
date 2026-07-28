@@ -1,3 +1,7 @@
+## v2026.07.28.7 (2026.07.28)
+
+- Memory: match the vendor's clock before reconciling against their number
+
 ## v2026.07.28.6 (2026.07.28)
 
 - deploy skill: widen the smoke gate from test:parser to the whole tests/unit/
