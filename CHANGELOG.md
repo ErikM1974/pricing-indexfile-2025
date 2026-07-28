@@ -1,3 +1,8 @@
+## v2026.07.28.9 (2026.07.28)
+
+- Production Shifts: move Ruthie's lunch to 12:30 PM for WAC compliance
+- Deploy v2026.07.28.9: 1 files (production-shifts.html,...)
+
 ## v2026.07.28.8 (2026.07.28)
 
 - Production Shifts: rebuild schedule from TimeClick punch medians
