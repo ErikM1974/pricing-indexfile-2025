@@ -64,6 +64,8 @@
         </div>
     </div>
 
-    <script type="module" src="/tests/ui/test-admin-nav.js"></script>
+    <!-- Loads the harness through a cache-busting shim — see test-admin-nav-boot.js.
+         A plain module src gets hard-cached and reports stale assertion counts. -->
+    <script type="module" src="/tests/ui/test-admin-nav-boot.js"></script>
 </body>
 </html>
