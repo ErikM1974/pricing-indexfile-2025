@@ -9,7 +9,7 @@ paths:
 
 # Quote Builder rules
 
-Loads automatically when you open any of the 4 quote builders or their shared files. The always-loaded `CLAUDE.md` keeps only the never-break headlines (Rules 7/8/9); this is the detail. Full architecture manifest: `memory/quote-builder-architecture.md`.
+Loads automatically when you open any of the 4 quote builders or their shared files. The always-loaded `CLAUDE.md` keeps only the never-break headlines (Rules 7/8/9); this is the detail.
 
 ## The 4 builders share one structure
 - HTML: `quote-builders/{dtg,dtf,embroidery,screenprint}-quote-builder.html` — **external JS/CSS only** (no inline `<style>`/`<script>`).
@@ -30,7 +30,7 @@ Loads automatically when you open any of the 4 quote builders or their shared fi
 
 ## EMB specifics (if touching the EMB builder)
 - LTM threshold **qty ≤ 7** (NOT `< 24` like DTG/DTF). 5 tiers + per-tier `MarginDenominator` from Caspio `Pricing_Tiers` (0.55 tier 1-7 / 0.53 others — never hardcode) + `LTM_Fee $50` at qty 1-7. Caps and garments tier **separately**.
-- `Embroidery_Costs` uses `StitchCount` (NOT `StitchCountRange`). Beanie = flat, NOT cap (`ProductCategoryFilter.isFlatHeadwear()`). Detail: `memory/emb-builder-details.md`.
+- `Embroidery_Costs` uses `StitchCount` (NOT `StitchCountRange`). Beanie = flat, NOT cap (`ProductCategoryFilter.isFlatHeadwear()`).
 
 ## Quantity nudge tiers
 DTG 12/24/48/72 · DTF 10/24/48/72 · SCP 24/48/72/145 (2026-06-19 remap — old 24/37/73/145 labels linger only in the stale `SCREENPRINT_TIERS` fallback) · EMB 8/24/48/72.
