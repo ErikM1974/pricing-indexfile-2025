@@ -79,3 +79,57 @@ body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Ro
   .pr-search { min-width: 100%; }
   .pr-asof { margin-left: 0; }
 }
+
+/* ============================================================
+   CUT-APART SLIPS — one per employee, handed out on paper.
+   Letter portrait, 0.5in margins → 7.5in x 10in of usable page.
+   Grid is 2 cols x 3.333in rows = exactly 6 slips per sheet, so the
+   page break lands on a slip boundary instead of slicing one in half.
+   ============================================================ */
+#print-sheet { display: none; }
+
+@media print {
+  /* Only the Print-slips button prints slips. A plain Ctrl+P still prints the
+     dashboard, which is what someone expects when they didn't ask for slips. */
+  body.print-slips .pr-wrap { display: none !important; }
+  body.print-slips #print-sheet { display: block !important; }
+
+  @page { size: 8.5in 11in; margin: 0.5in; }
+  body.print-slips { background: #fff; margin: 0; }
+
+  #print-slips-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /* Dashed guides on the outside; each slip draws its own right/bottom edge, so
+       adjacent slips share ONE line and every cut is a single scissor pass. */
+    border-top: 1px dashed #999;
+    border-left: 1px dashed #999;
+  }
+  .slip {
+    height: 3.333in;
+    border-right: 1px dashed #999;
+    border-bottom: 1px dashed #999;
+    padding: 0.3in 0.32in;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    display: flex;
+    flex-direction: column;
+    color: #000;
+    /* Serif reads as a document rather than a screenshot — this is handed to a person. */
+    font-family: Georgia, 'Times New Roman', serif;
+  }
+  .slip-co { font-size: 8.5pt; letter-spacing: .06em; text-transform: uppercase; color: #444; }
+  .slip-name { font-size: 15pt; font-weight: 700; margin: .06in 0 .02in; line-height: 1.15; }
+  .slip-asof { font-size: 8.5pt; color: #555; margin-bottom: .16in; }
+
+  .slip-rows { border-top: 1.5px solid #000; padding-top: .1in; }
+  .slip-row { display: flex; justify-content: space-between; align-items: baseline;
+              font-size: 11pt; padding: .055in 0; }
+  .slip-row + .slip-row { border-top: 1px solid #ddd; }
+  .slip-label { color: #222; }
+  .slip-val { font-weight: 700; font-variant-numeric: tabular-nums; }
+  /* A negative balance is legitimate here (vacation accrues at one year), so it is
+     printed plainly with a note rather than flagged red like an error on screen. */
+  .slip-note { font-size: 8pt; color: #555; margin-top: auto; padding-top: .1in;
+               line-height: 1.35; font-style: italic; }
+}
