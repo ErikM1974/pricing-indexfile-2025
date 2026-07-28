@@ -5,7 +5,7 @@ description: Deploy current develop branch to production. Use when user says /de
 
 # Deploy to Production Skill
 
-Automates Northwest Custom Apparel's deploy pipeline `develop` → `main` → Heroku. Fast, non-interactive, traceable. End-to-end ~25–30 seconds when nothing's wrong.
+Automates Northwest Custom Apparel's deploy pipeline `develop` → `main` → Heroku. Fast, non-interactive, traceable. End-to-end ~35 seconds when nothing's wrong.
 
 ## What This Skill Does
 
@@ -95,12 +95,26 @@ Runs *before* deploy so a failure here doesn't strand state half-changed.
 If `--skip-tests` was NOT specified:
 
 ```bash
-if [ -f package.json ] && node -e "process.exit(require('./package.json').scripts['test:parser']?0:1)" 2>/dev/null; then
-  npm run test:parser
+if [ -f package.json ] && node -e "process.exit(require('./package.json').scripts['test:unit']?0:1)" 2>/dev/null; then
+  npm run test:unit
+elif [ -f package.json ] && node -e "process.exit(require('./package.json').scripts['test:parser']?0:1)" 2>/dev/null; then
+  npm run test:parser   # fallback for a repo without the full unit script
 fi
 ```
 
+**Why the WHOLE `tests/unit/` and not just `test:parser` (widened 2026-07-28).** This gate
+used to run `test:parser` — `tests/unit/parser` only — so anything else red in `tests/unit/`
+sailed straight through. It did: `builders-function-length.test.js` went red on 2026-07-19
+(DTG's `init()` grew to 155 lines against a 150 cap) and stayed red across several releases
+because no gate looked at it. `tests/unit/` is ~95 suites / ~1900 tests in **under 7 seconds**
+— cheaper than one Heroku build step, and it covers the pricing-parity, guard, and ratchet
+suites that actually encode the never-break rules.
+
 If tests fail → abort. Tell user: "Tests failed. Fix or re-run with `/deploy --skip-tests` for emergencies."
+
+⚠️ `--skip-tests` now bypasses considerably more. Treat it as a genuine emergency lever
+(prod is down and the fix is verified another way), not a way past an inconvenient red test —
+a red ratchet or parity suite is exactly what this gate exists to stop.
 
 ### Step 1 — Compute single deploy version
 
@@ -567,7 +581,7 @@ After: develop and main are both back to pre-release state. Investigate the bug,
 | develop behind origin | Abort | `git pull --ff-only origin develop` |
 | Not heroku-authed | Abort | `heroku login` |
 | MEMORY.md > 180 lines | Abort | Condense to topic files |
-| Tests fail | Abort | Fix tests, or `--skip-tests` for emergency |
+| Tests fail (any suite in `tests/unit/`) | Abort | Fix the test — it's the never-break rules speaking. `--skip-tests` is for prod-is-down emergencies only |
 | Untracked asset referenced by HTML (Step 3.5) | Abort — would 404 in prod | `git add` the new file, re-deploy |
 | Dirty tree blocks `checkout main` (Step 6) | Abort — won't deploy wrong branch | Commit/stash stray changes, re-deploy |
 | Merge conflict on main | Auto `merge --abort`, return to develop | Resolve manually, re-run |
@@ -632,3 +646,14 @@ Two rewrites in 2026-05-16:
 | MEMORY.md warning at 150–180 was silent | Explicit `⚠ MEMORY.md is X lines` echo |
 | Slack "skipped silently" debug echo | Truly silent (no echo at all) |
 | End-to-end 60–90s (with prompts) | End-to-end ~25–30s |
+
+**Pass 3 (2026-07-28) — the smoke gate was too narrow:**
+
+| Old behavior | New behavior |
+|---|---|
+| Step 0.6 ran `npm run test:parser` (`tests/unit/parser` only) | Runs `npm run test:unit` — the whole `tests/unit/` tree (~95 suites / ~1900 tests, <7s), falling back to `test:parser` if the script is absent |
+
+Prompted by a real miss: `builders-function-length.test.js` went red on 2026-07-19 and rode
+through several releases unnoticed, because the gate only ever looked at the parser suite.
+The pricing-parity, security-guard, and ratchet suites that encode the never-break rules all
+live in `tests/unit/` and were unguarded. Cost of the fix: ~7 seconds per deploy.
