@@ -1,3 +1,8 @@
+## v2026.07.28.8 (2026.07.28)
+
+- Production Shifts: rebuild schedule from TimeClick punch medians
+- Deploy v2026.07.28.8: 1 files (production-shifts.html,...)
+
 ## v2026.07.28.7 (2026.07.28)
 
 - Memory: match the vendor's clock before reconciling against their number
