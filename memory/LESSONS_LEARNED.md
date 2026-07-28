@@ -5,6 +5,54 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## An audit measured our own broken meter and declared us on budget (2026-07-28)
+
+**Problem.** An external code audit of Caspio call volume opened with "the cross-dyno rollup
+shows 16,055 calls on 7/27 vs the 16,129/day budget — the July fixes already took you from
+~22k to ~16k." Every savings estimate in it was then sized against that denominator. Caspio
+billed **23,959** that day. We were at ~132% of pace, not at it.
+
+**Root cause.** 16,055 was our own meter's known-low reading — the exact figure recorded one
+entry below as the *under-count*. The audit read the number from `/api/admin/usage`, saw the
+field labelled `mode: "rollup"`, and treated it as cross-dyno truth. It was one row from one
+web dyno. The label was accurate about the code path and silent about the coverage.
+
+**Solution.** Re-anchored on Caspio's own billing page and re-derived every estimate from it.
+Then closed the biggest remaining hole: `sync-manageorders`, `check-zero-billing` and
+`sync-commissions` build their own Caspio URLs with raw axios and never load `api-tracker`.
+The global interceptor installs as a side effect of **loading** that module, so it attaches
+**per-process** — the docs claiming it catches "any process that talks to Caspio" were wrong;
+it catches any process that *loads the tracker*. ~950 calls/day were invisible.
+
+**Prevention.**
+- **A meter may not grade its own coverage.** Reconcile against the party that bills you,
+  every time, before quoting a number to anyone — including to a tool you asked for advice.
+- **A label describes a code path, not a guarantee.** `mode: "rollup"` was true and useless.
+  When a field asserts scope, make it carry the evidence: row count, dyno list, first/last
+  write. A scope claim nothing can falsify will eventually be believed while wrong.
+- **Give an outside auditor your known-wrong numbers up front.** This audit was competent —
+  it independently found the metering hole — but nobody told it the baseline was suspect, so
+  it anchored on it and mis-ranked everything downstream. The brief is part of the tool.
+- Sixth appearance this week of the same shape: **the error always points DOWN, and
+  under-reporting reads as "we're fine."**
+
+### The same audit's fixes had to be adversarially checked before shipping
+
+Three of six proposed fixes would have introduced a silent wrong answer, each in the
+"looks healthy, isn't" family — worth internalizing as a pattern, not three anecdotes:
+- **`Promise.allSettled` status is not a completeness test.** `fetchAllCaspioPages` *resolves*
+  with PARTIAL results when pagination fails mid-way, so `status === 'fulfilled'` is true for
+  a truncated read. Test the DATA (`length > 0`, expected keys present), never promise state.
+- **A cache TTL borrowed from a neighbour imports its freshness assumptions.** Reusing the
+  1-hour `STATIC_TABLE_TTL_MS` for `Pricing_Tiers`/`DTG_Costs` would have quadrupled staleness
+  on the tables Erik actually edits, and desynced DTG from `/api/pricing-bundle`, which reads
+  the same two tables at 15 min. Match the TTL to the sibling that shares the table.
+- **Failing only when EVERYTHING fails is failing open.** `/api/dtg/quote-pricing` 502'd only
+  when every bundle was missing. A partial set still answered 200 — `priceLines()` drops the
+  failing line but keeps its quantity in `combinedQty`, and the cart engine index-aligns items
+  to a now-shorter array. Under-stated subtotal *and* mis-attributed line items. The
+  any/all distinction in an error guard is a pricing decision.
+
 ## Our "day" was 7 hours off the vendor's, and the offset looked like thousands of missing API calls (2026-07-28)
 
 **Problem.** Reconciling our Caspio call meter against Caspio's own usage chart showed a
