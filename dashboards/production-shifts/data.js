@@ -121,11 +121,11 @@ window.NWCA_SCHEDULE = [
     role: "Production Manager",
     dept: "Ruthie/Mikalah",
     paidHrs: 8,
-    note: "Lunch moved to 2:00 PM and break 2 to 3:30 PM to match actual punches. Shift times unchanged.",
+    note: "Lunch set to 12:30 PM — her actual 2:00 PM punch falls 6 hrs into the shift, outside the WAC 2–5 hr meal window. Break 2 moved to 3:30 PM. Shift times unchanged.",
     events: [
       { type: "start", min: 480 },
       { type: "break", min: 630, durMin: 10 },
-      { type: "lunch", min: 840, durMin: 30 },
+      { type: "lunch", min: 750, durMin: 30 },
       { type: "break", min: 930, durMin: 10 },
       { type: "end",   min: 990 }
     ]
