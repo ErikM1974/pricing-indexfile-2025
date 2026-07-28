@@ -201,6 +201,7 @@
 | `staff-dashboard-init.js` | Dashboard initialization, widget toggles — **dead** (no HTML loads it) |
 | `staff-dashboard-service.js` | ManageOrders API integration — **dead since 2026-07-25**; was the garment-tracker bridge only, and that card is gone. Don't build on it; it hardcodes the proxy URL. |
 | `staff-dashboard/controllers/embroidery-bonus-controller.js` | Embroidery Bonus card (Q3 2026+) — activation bounties, growth ladder, $3M team kicker, dormant "who to call" list. Replaced `garment-tracker-controller.js`. Every rate/goal comes from the API, never a constant. |
+| `staff-dashboard/controllers/nav-access-controller.js` | Role-aware sidebar. Reveals `[data-requires-role="admin"]` blocks only when `/api/crm-session/me` reports the permission; **removes** the node otherwise so it also leaves the Ctrl+K registry (harvested from the DOM). Fails closed. **Add `data-requires-role` + `hidden` to gate a new nav block — but always add the matching server-side rule too; this is UX, not security** (real gate: `lib/page-access.js`). |
 | `staff-dashboard-announcements.js` | Priority announcements |
 | `staff-dashboard-employees.js` | Employee widget management |
 | `production-schedule-stats.js` | Precomputed turnaround stats |

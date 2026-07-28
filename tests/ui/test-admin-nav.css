@@ -1,0 +1,61 @@
+/* QA harness chrome for test-admin-nav.html. Deliberately plain — the sidebar
+   itself must be styled ONLY by the real dashboard stylesheets so what you see
+   here is what ships. Nothing in this file targets .nav-* selectors. */
+
+body {
+    margin: 0;
+    background: var(--surface-app, #0d1117);
+    color: var(--ink-hi, #e6edf3);
+    font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+}
+
+/* Measurements must not race the collapse animations. This matters more than it
+   looks: a browser throttles CSS transitions while the tab is backgrounded
+   (document.visibilityState === 'hidden'), so a timing-based assertion reads the
+   START value forever and "fails" a perfectly good stylesheet. Snapping every
+   transition off makes the harness deterministic in a headless run. */
+.qa-no-motion *,
+.qa-no-motion *::before,
+.qa-no-motion *::after {
+    transition: none !important;
+    animation: none !important;
+}
+
+.qa-wrap { display: flex; flex-direction: column; min-height: 100vh; }
+
+.qa-head {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 12px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border, #30363d);
+}
+.qa-head h1 { font-size: 16px; margin: 0; font-weight: 600; }
+
+.qa-controls { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+.qa-controls select,
+.qa-controls button {
+    font: inherit;
+    padding: 5px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border, #30363d);
+    background: var(--surface-card, #161b22);
+    color: inherit;
+    cursor: pointer;
+}
+
+.qa-body { display: flex; align-items: flex-start; gap: 24px; padding: 20px; }
+.qa-body .sidebar { width: 280px; flex: 0 0 280px; }
+
+.qa-results { flex: 1; min-width: 0; font-size: 13.5px; }
+.qa-results h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-dim, #8b949e); margin: 0 0 8px; }
+.qa-results h2 + * { margin-bottom: 22px; }
+
+#qaAssertions { list-style: none; margin: 0; padding: 0; }
+#qaAssertions li { padding: 5px 0; border-bottom: 1px solid rgba(255, 255, 255, .05); }
+#qaAssertions li::before { display: inline-block; width: 22px; font-weight: 700; }
+#qaAssertions li.pass::before { content: '✔'; color: #3fb950; }
+#qaAssertions li.fail::before { content: '✘'; color: #f85149; }
+
+#qaMetrics { display: grid; grid-template-columns: max-content 1fr; gap: 5px 16px; margin: 0; }
+#qaMetrics dt { color: var(--ink-dim, #8b949e); }
+#qaMetrics dd { margin: 0; font-variant-numeric: tabular-nums; }

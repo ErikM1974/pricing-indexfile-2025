@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-accent="green" data-density="comfy" class="qa-no-motion">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>QA — Administration nav grouping &amp; role gate</title>
+
+    <!--
+        Harness for the 2026-07-28 Administration reorg (18 flat links → 5
+        collapsible sub-groups, admin-gated).
+
+        It pulls the REAL sidebar markup out of staff-dashboard-v3/index.html at
+        runtime (DOMParser — does not execute the page's Caspio auth embed, which
+        otherwise bounces a static load to the Caspio login) and drives it with the
+        REAL controllers and the REAL stylesheets. Nothing here is a copy, so this
+        can't drift from what ships.
+
+        Serve the repo root statically and open /tests/ui/test-admin-nav.html.
+    -->
+    <style>@layer reset, tokens, base, components, utilities, overrides;</style>
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/tokens.css">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/base.css">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/utilities.css">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css">
+    <link rel="stylesheet" href="/tests/ui/test-admin-nav.css">
+</head>
+<body>
+    <div class="qa-wrap">
+        <header class="qa-head">
+            <h1>Administration nav — grouping &amp; role gate</h1>
+            <div class="qa-controls">
+                <label for="qaRole">Simulated session</label>
+                <select id="qaRole">
+                    <option value="admin">admin</option>
+                    <option value="accountant">accountant</option>
+                    <option value="sales">sales</option>
+                    <option value="staff">staff (no role)</option>
+                    <option value="anon">not authenticated</option>
+                    <option value="error">/api/crm-session/me FAILS</option>
+                </select>
+                <button type="button" id="qaReload">Reload sidebar</button>
+            </div>
+        </header>
+
+        <div class="qa-body">
+            <aside class="sidebar" aria-label="Main navigation">
+                <div class="sidebar-header">
+                    <div class="company-name">Staff Portal</div>
+                    <div class="company-year">2026 · v3</div>
+                </div>
+                <nav class="sidebar-nav">
+                    <div class="sidebar-content" id="qaSidebar"></div>
+                </nav>
+            </aside>
+
+            <section class="qa-results">
+                <h2>Assertions</h2>
+                <ul id="qaAssertions"></ul>
+                <h2>Measured</h2>
+                <dl id="qaMetrics"></dl>
+            </section>
+        </div>
+    </div>
+
+    <script type="module" src="/tests/ui/test-admin-nav.js"></script>
+</body>
+</html>

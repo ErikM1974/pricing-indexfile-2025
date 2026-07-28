@@ -3334,23 +3334,11 @@ async function getPageAccessRules() {
   return _pageAccessCache.rules;
 }
 
-// True if the logged-in user may view a /dashboards page per its table rule (if any).
-// Unlisted page (no rule) → any logged-in staff. Listed → role-in-Allowed_Roles OR
-// email-in-Allowed_Emails. Roles are matched against the user's derived permissions.
-function userMayAccessPage(crmUser, rule) {
-  const userPerms = (crmUser.permissions || []).map(p => String(p).toLowerCase());
-  const roles = String(rule?.Allowed_Roles || '').toLowerCase().split(',').map(s => s.trim()).filter(Boolean);
-  const emails = String(rule?.Allowed_Emails || '').toLowerCase().split(',').map(s => s.trim()).filter(Boolean);
-  const userEmail = String(crmUser.email || '').toLowerCase();
-  // A rule naming PEOPLE and no roles is an EXCLUSIVE allowlist — only those people, admin
-  // included. This is the only way to restrict a page below "any admin", and it's what makes
-  // payroll.html Erik-only (2026-07-27). Still table-driven: change the row, no deploy.
-  // ⚠ You CAN lock yourself out of such a page — keep your own email on the list.
-  if (rule && emails.length && !roles.length) return emails.includes(userEmail);
-  if (userPerms.includes('admin')) return true; // admin override — sees every other page
-  if (!rule) return true;                        // unlisted page → any logged-in staff
-  return roles.some(r => userPerms.includes(r)) || emails.includes(userEmail);
-}
+// Page-access decision (who may open a gated staff page) lives in lib/page-access.js so it
+// can be jest-locked — tests/unit/admin-page-access.test.js. Read the header there for the
+// full rule; the short version is: exclusive email allowlist > admin override > "unlisted
+// page = any logged-in staff, EXCEPT the Administration set, which defaults to admin-only".
+const { ADMIN_DEFAULT_PAGES, userMayAccessPage } = require('./lib/page-access');
 
 // API-side twin of gateStaffPage: gate a data route by the SAME Staff_Page_Access row as
 // the page it feeds, so one table row controls both and they can never drift apart.
@@ -3364,7 +3352,7 @@ function requirePageAccess(page) {
     }
     try {
       const rules = await getPageAccessRules();
-      if (!userMayAccessPage(req.session.crmUser, rules[key])) {
+      if (!userMayAccessPage(req.session.crmUser, rules[key], key)) {
         return res.status(403).json({ error: 'Forbidden', message: 'You do not have access to this data.' });
       }
     } catch (e) {
@@ -3408,11 +3396,24 @@ async function gateStaffPage(req, res, next) {
     let page;
     try { page = decodeURIComponent(req.path.split('/').pop() || '').toLowerCase(); }
     catch (e) { page = (req.path.split('/').pop() || '').toLowerCase(); } // the *.html filename
-    if (!userMayAccessPage(req.session.crmUser, rules[page])) {
+    if (!userMayAccessPage(req.session.crmUser, rules[page], page)) {
       const fn = String(req.session.crmUser.firstName || '').replace(/[<>&"']/g, '');
       return res.status(403).type('html').send(accessRestrictedPage(fn));
     }
-  } catch (e) { console.error('[page-access] check error:', e.message); /* fail-open to any logged-in staff */ }
+  } catch (e) {
+    // Ordinary pages fail OPEN (a broken access check must not take the whole staff
+    // portal down). Admin-menu pages fail CLOSED — for those, "the check is down" must
+    // never resolve to "let them in" (same stance as requirePageAccess).
+    console.error('[page-access] check error:', e.message);
+    let page = '';
+    try { page = decodeURIComponent(req.path.split('/').pop() || '').toLowerCase(); }
+    catch (e2) { page = (req.path.split('/').pop() || '').toLowerCase(); }
+    const perms = ((req.session.crmUser && req.session.crmUser.permissions) || []).map(p => String(p).toLowerCase());
+    if (ADMIN_DEFAULT_PAGES.has(page) && !perms.includes('admin')) {
+      const fn = String(req.session.crmUser.firstName || '').replace(/[<>&"']/g, '');
+      return res.status(403).type('html').send(accessRestrictedPage(fn));
+    }
+  }
   return next();
 }
 
@@ -3768,8 +3769,13 @@ app.all('/api/crm-proxy/lead-classify*', requireStaff, leadClassifyForwarder);
 // Blog Editor (dashboards/blog-editor.html) — staff write posts through this
 // forwarder (adds the CRM secret the proxy's gateWritesOnly demands; also lets
 // the editor list/read Drafts, which the public blog-posts endpoint hides).
+// Gated by the SAME Staff_Page_Access row as blog-editor.html (2026-07-28): this
+// endpoint PUBLISHES TO THE PUBLIC SITE, and it was requireStaff — so gating only
+// the page would have left any logged-in staffer able to POST here directly. One
+// rule now controls the page and its writes together, and they can't drift.
+// (Public /blog reads don't touch this route; they use lib/blog.js.)
 const [, blogPostsForwarder] = createCrmProxy('blog-posts', []);
-app.all('/api/crm-proxy/blog-posts*', requireStaff, blogPostsForwarder);
+app.all('/api/crm-proxy/blog-posts*', requirePageAccess('blog-editor.html'), blogPostsForwarder);
 
 // =============================================================================
 // POLICIES HUB AI ASSIST — streaming proxy to caspio-pricing-proxy.
@@ -4751,7 +4757,13 @@ app.get('/api/staff/payments/recent', requireStaff, async (req, res) => {
 // goes through this staff-session-gated same-origin forwarder. Sending the CRM
 // secret also skips the proxy's per-IP SanMar rate limit. Validates the dates and
 // enforces SanMar's ≤3-month window before forwarding.
-app.get('/api/staff/sanmar-invoices/by-date', requireStaff, async (req, res) => {
+// SECURITY (2026-07-28): the SanMar Payables data routes below were requireStaff —
+// any logged-in staffer could pull vendor invoice + payables dollars. They now share
+// ONE gate with the page they feed (Staff_Page_Access → sanmar-payables.html, which
+// defaults to admin), the same page/API-twin pattern payroll uses. To let Ruth or
+// another accountant back in, add ONE row in Access Admin — no deploy, and the page
+// and its data move together.
+app.get('/api/staff/sanmar-invoices/by-date', requirePageAccess('sanmar-payables.html'), async (req, res) => {
   if (!CRM_API_SECRET) return res.status(503).json({ error: 'not_configured' });
   const start = String(req.query.start || '').trim();
   const end = String(req.query.end || '').trim();
@@ -4776,7 +4788,7 @@ app.get('/api/staff/sanmar-invoices/by-date', requireStaff, async (req, res) => 
 // SanMar OPEN payables — GetUnpaidInvoices (what we still owe SanMar). Drives the
 // SanMar Payables page's Invoices tab (the unpaid worklist). No params; the proxy
 // caches it. Same staff gate + secret as the by-date forwarder.
-app.get('/api/staff/sanmar-invoices/unpaid', requireStaff, async (req, res) => {
+app.get('/api/staff/sanmar-invoices/unpaid', requirePageAccess('sanmar-payables.html'), async (req, res) => {
   if (!CRM_API_SECRET) return res.status(503).json({ error: 'not_configured' });
   try {
     const r = await fetch(`${CRM_API_BASE}/api/sanmar-invoices/unpaid`, {
@@ -4896,7 +4908,7 @@ app.get('/api/staff/sanmar-ftp/download', requireCrmRole(['admin']), async (req,
 // cross-check (the bandit ODBC → Caspio ShopWorks_Payables sync). When this returns
 // rows, the page skips the manual ShopWorks-CSV upload. Empty (sync not live yet) →
 // the page falls back to upload. Staff-gated; adds the CRM secret upstream.
-app.get('/api/staff/shopworks-payables', requireStaff, async (req, res) => {
+app.get('/api/staff/shopworks-payables', requirePageAccess('sanmar-payables.html'), async (req, res) => {
   if (!CRM_API_SECRET) return res.status(503).json({ error: 'not_configured' });
   const sinceDays = Math.min(Math.max(parseInt(req.query.sinceDays, 10) || 365, 1), 3650);
   try {
@@ -4916,7 +4928,7 @@ app.get('/api/staff/shopworks-payables', requireStaff, async (req, res) => {
 // filter the worklist; Erik stamps invoices when he imports them. No ShopWorks
 // ODBC/upload dependency. Reads are staff-gated; writes add the CRM secret + the
 // signed-in user's email so the stamp records who imported it.
-app.get('/api/staff/sanmar-invoices/imports', requireStaff, async (req, res) => {
+app.get('/api/staff/sanmar-invoices/imports', requirePageAccess('sanmar-payables.html'), async (req, res) => {
   if (!CRM_API_SECRET) return res.status(503).json({ error: 'not_configured' });
   const since = String(req.query.since || '').trim();
   const qs = /^\d{4}-\d{2}-\d{2}$/.test(since) ? `?since=${since}` : '';
@@ -4929,7 +4941,7 @@ app.get('/api/staff/sanmar-invoices/imports', requireStaff, async (req, res) => 
   } catch (e) { console.error('[sanmar-imports-forward]', e.message); res.status(502).json({ error: 'upstream_unavailable' }); }
 });
 
-app.post('/api/staff/sanmar-invoices/mark-imported', requireStaff, express.json(), async (req, res) => {
+app.post('/api/staff/sanmar-invoices/mark-imported', requirePageAccess('sanmar-payables.html'), express.json(), async (req, res) => {
   if (!CRM_API_SECRET) return res.status(503).json({ error: 'not_configured' });
   const body = Object.assign({}, req.body || {}, { importedBy: (req.session.crmUser && req.session.crmUser.email) || 'staff' });
   try {
@@ -4942,7 +4954,7 @@ app.post('/api/staff/sanmar-invoices/mark-imported', requireStaff, express.json(
   } catch (e) { console.error('[sanmar-mark-imported-forward]', e.message); res.status(502).json({ error: 'upstream_unavailable' }); }
 });
 
-app.post('/api/staff/sanmar-invoices/unmark-imported', requireStaff, express.json(), async (req, res) => {
+app.post('/api/staff/sanmar-invoices/unmark-imported', requirePageAccess('sanmar-payables.html'), express.json(), async (req, res) => {
   if (!CRM_API_SECRET) return res.status(503).json({ error: 'not_configured' });
   try {
     const r = await fetch(`${CRM_API_BASE}/api/sanmar-invoices/unmark-imported`, {

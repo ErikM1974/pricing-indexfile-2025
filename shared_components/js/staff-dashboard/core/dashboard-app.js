@@ -12,6 +12,9 @@ import './dashboard-events.js';   // installs document click delegator
 import { initTweaks }          from '../widgets/tweaks-fab.js';
 import { initAuth }            from '../controllers/auth-controller.js';
 import { initSidebar }         from '../controllers/sidebar-controller.js';
+// Role-gated nav (2026-07-28): strips [data-requires-role] blocks the signed-in
+// staffer doesn't qualify for — today, the whole Administration section.
+import { initNavAccess }       from '../controllers/nav-access-controller.js';
 // announcements retired 2026-07-06 (Erik) — zone replaced by Orders Inbox + money widgets
 import { initOrdersInbox, initMoneyCollected, initSamplePipeline } from '../controllers/orders-inbox-controller.js';
 import { initSalesGoal }       from '../controllers/sales-goal-controller.js';
@@ -44,6 +47,12 @@ async function bootstrap() {
     // Auth runs in parallel with the rest — most controllers don't depend on it.
     const authPromise = initAuth();
 
+    // Role-gated nav — kicked off first so the Administration section resolves
+    // (revealed or removed) as early as possible. Not awaited: it's independent
+    // of every other controller, and the command palette re-harvests its
+    // registry on each open, so it picks up the result whenever it lands.
+    const navAccessPromise = initNavAccess();
+
     // Synchronous controller init (fast, no network)
     initSidebar();
     initSalesGoal();
@@ -61,7 +70,7 @@ async function bootstrap() {
     initEmbroideryBonus();   // Q3 2026 bonus — live from ORDER_ODBC via the CRM forwarder
     initPrideWall();         // finished-photos library → ambient photo strip
 
-    await authPromise;
+    await Promise.all([authPromise, navAccessPromise]);
 
     // Periodic refresh of revenue (5 min) — re-fetches from ShopWorks proxy.
     setInterval(() => {
