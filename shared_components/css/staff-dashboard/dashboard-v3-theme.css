@@ -300,9 +300,14 @@ a{ color: inherit; }
    Without this, a non-admin would briefly (or permanently) see the section. */
 [data-requires-role][hidden]{ display: none !important; }
 
-/* The admin section holds 5 sub-groups; the shared 800px cap could clip it
-   if several are open at once. Everything still collapses to 0. */
-.nav-section[data-section="admin"] > .nav-section-content{ max-height: 1400px; }
+/* The admin section holds 5 sub-groups; the shared 800px cap could clip it if
+   several are open at once. `:not(.collapsed)` is LOAD-BEARING, not decoration:
+   without it this selector ties `.nav-section.collapsed .nav-section-content`
+   (both are 3 class-level selectors — an attribute counts as one), and being
+   later in the file it won, pinning the section open forever. Administration
+   could not be collapsed at all (caught by Erik 2026-07-28). Scoping the raise
+   to the open state leaves the collapse rule unopposed. */
+.nav-section[data-section="admin"]:not(.collapsed) > .nav-section-content{ max-height: 1400px; }
 
 .nav-subsection{ display: flex; flex-direction: column; }
 
@@ -322,7 +327,10 @@ a{ color: inherit; }
   color: var(--ink-dim);
   font-family: inherit;
   font-size: 10.5px; font-weight: 700;
-  letter-spacing: .09em; text-transform: uppercase;
+  /* .06em not .09em — uppercase + wide tracking was ellipsizing these labels in
+     the 280px sidebar ("INTEGRATIONS & ..."). Labels were shortened too; this
+     buys the margin back so they survive a narrower sidebar. */
+  letter-spacing: .06em; text-transform: uppercase;
   text-align: left;
   cursor: pointer;
   transition: background .12s, color .12s, border-color .12s;

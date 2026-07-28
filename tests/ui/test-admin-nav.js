@@ -179,6 +179,54 @@ async function run(role) {
     const openHeight = admin.getBoundingClientRect().height;
     check('Whole section still fits without scrolling a 900px viewport', openHeight < 700);
 
+    // ── Collapse must actually HIDE ──────────────────────────────────────────
+    // The original harness only ever opened things, so it passed while
+    // Administration was pinned permanently open by a CSS specificity tie
+    // (a `max-height` raise on the admin section tied the `.collapsed` rule and,
+    // being later in the file, won). Asserting on the *closed* state is what
+    // catches that class of bug — "it opens" is only half the contract.
+    biggestHeader.click();                       // close the sub-group again
+    settle(admin);
+    check('Closing a sub-group hides its links',
+        [...biggest.querySelectorAll('a.nav-link')].every((a) => !isRevealed(a)));
+    check('Closed sub-group panel clamps to 0px',
+        getComputedStyle(panel).maxHeight === '0px');
+    check('Closed sub-group aria-expanded returns to false',
+        biggestHeader.getAttribute('aria-expanded') === 'false');
+
+    sectionHeader.click();                       // close Administration itself
+    settle(admin);
+    const sectionPanel = admin.querySelector(':scope > .nav-section-content');
+    check('Collapsing Administration clamps its panel to 0px',
+        getComputedStyle(sectionPanel).maxHeight === '0px');
+    check('Collapsing Administration hides all 5 sub-group headers',
+        [...admin.querySelectorAll('.nav-subsection-header')].every((h) => !isRevealed(h)));
+    check('Collapsed Administration occupies one row',
+        admin.getBoundingClientRect().height < 60);
+    check('Section aria-expanded returns to false', sectionHeader.getAttribute('aria-expanded') === 'false');
+
+    // Sibling sections must be unaffected by the admin-only max-height override.
+    const forms = host.querySelector('[data-section="forms"]');
+    if (forms) {
+        const formsHeader = forms.querySelector(':scope > .nav-section-header');
+        const formsPanel = forms.querySelector(':scope > .nav-section-content');
+        formsHeader.click(); settle(forms);
+        const formsOpened = getComputedStyle(formsPanel).maxHeight !== '0px';
+        formsHeader.click(); settle(forms);
+        check('A non-admin section still opens AND closes',
+            formsOpened && getComputedStyle(formsPanel).maxHeight === '0px');
+    }
+
+    sectionHeader.click(); settle(admin);        // re-open — the checks below need it rendered
+
+    // Labels must not be ellipsized at the shipped sidebar width. Measured with
+    // the section OPEN; a clipped panel reports zero widths and passes trivially.
+    const titles = [...admin.querySelectorAll('.nav-subsection-title')];
+    const truncated = titles.filter((t) => t.scrollWidth > t.clientWidth + 1)
+        .map((t) => t.textContent.trim());
+    check(`No sub-group label is truncated${truncated.length ? ' — ' + truncated.join(', ') : ''}`,
+        truncated.length === 0);
+
     // Collapse persistence — the controller writes through dashboard-store.js.
     const saved = (JSON.parse(localStorage.getItem(SIDEBAR_STORE_KEY) || '{}') || {}).data || {};
     check('Sub-group state persists under a namespaced key',
