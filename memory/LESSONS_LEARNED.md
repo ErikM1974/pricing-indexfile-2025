@@ -5,6 +5,37 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## Our "day" was 7 hours off the vendor's, and the offset looked like thousands of missing API calls (2026-07-28)
+
+**Problem.** Reconciling our Caspio call meter against Caspio's own usage chart showed a
+persistent 30-40% shortfall — 23,959 billed vs 16,055 measured on 27 Jul. A full day went
+into hunting the "missing" caller: audited Python Inksoft, the main app's runtime, every
+`fetch`/raw-HTTP path in the proxy, and the Caspio account's API profiles. All clean.
+
+**Root cause.** Two independent under-counts, and neither was an unknown integration.
+(a) Heroku Scheduler runs every `npm run sync-*` job as a **one-off dyno** that lives for
+seconds and exits via `process.exit(0)`. The rollup flushed on a 60-minute `setInterval`, so
+it never fired there and SIGTERM never arrived — the table held `web.1` rows and nothing
+else, hiding ~30% of traffic. (b) **Caspio buckets usage on the ACCOUNT timezone** — its
+Integrations log header reads literally `Log date (UTC-07:00)` — while we keyed days on UTC.
+Our "28 Jul" began at 5 PM Pacific on the 27th, so the two windows were never comparable.
+
+**Solution.** Flush on a **call-count threshold** (250) instead of a timer, so a trigger
+fires regardless of process lifetime; writes became **append-only deltas** (no read, no
+read-modify-write race between concurrent dynos); auto-start metering from `api-tracker` so
+any process talking to Caspio records, not just the one that loads `server.js`. And a single
+`utils/account-time.js` now owns "what day is it" (DST-aware `America/Los_Angeles`), used by
+the tracker, the rollup and the period window — they must agree, because the rollup looks
+days up by the tracker's own key.
+
+**Prevention.** **Before reconciling your number against a vendor's, match their clock —
+check the timezone on their own log/report headers first.** A whole-day offset is
+indistinguishable from missing data and will send you hunting a phantom. And **a time-based
+flush cannot work in a short-lived process**: if a metric must survive processes you don't
+control the lifetime of, trigger on *work done*, not on elapsed time. Both bugs shared the
+signature that has now appeared five times this week — the error only ever pointed one way,
+DOWN, and under-reporting always reads as "we're fine".
+
 ## A CSS specificity TIE pinned the Administration menu permanently open (2026-07-28)
 
 **Problem.** Erik reported the Administration sub-menus couldn't be closed. The section's
