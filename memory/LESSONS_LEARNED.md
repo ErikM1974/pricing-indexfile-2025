@@ -5,6 +5,43 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## The 4 AM inbound printout missed 4 POs — the WA cartons sync in AFTER it prints (2026-07-29)
+
+**Problem.** The Daily Inbound PDF Erik printed at **3:57 AM on 7/29** listed 8 POs / 17 boxes /
+751 pcs / $5,956. SanMar's PSST freight manifest for ship-date 7/28 showed 4 more POs
+(**142476, 113825, 113834, 113835** — 5 cartons, 126 pcs, $398) that UPS had already scheduled
+for 7/29 delivery. Reloading the page at 4:03 AM gave the correct **12 POs / 22 boxes / 877 pcs
+/ $6,354**. Nothing on the printed sheet was *wrong* — it was 6 minutes too early.
+
+**Root cause.** All four are **WA-INV (Issaquah)** shipments that SanMar packed between
+**4:58 and 6:55 PM PDT on 7/28**. The shipment sync writes those cartons to the Caspio
+`shipments` table in the small hours; on 7/29 they landed **between 10:56:56 and ~11:02 UTC**
+(3:57–4:02 AM PDT). `/api/sanmar-orders/inbound-today` caches its payload for **600 s**
+(`sanmar-orders.js` → `orderCache.set(cacheKey, payload, 600)`), and the print builders render
+`lastData` — the payload captured when the modal loaded. So a 3:57 AM print serves a payload
+built at 3:56:56 AM, before the WA rows existed. WA is the worst case precisely *because* its
+transit is 1 business day: an Issaquah carton packed at 6 PM is inbound **the next morning**,
+with no slack for the sync to catch up. NV/AZ/TX/VA cartons get 2–5 days, so a late sync never
+shows on their printout.
+
+**Fix (operational).** Print the inbound report **after ~5:00 AM**, and hit **Refresh** on the
+SanMar Inbound modal before printing or running Box Labels. Re-check any pre-5 AM printout
+against that day's PSST manifest CSV.
+
+**Prevention.** Treat `generatedAt` as the report's real timestamp, not the print time. Worth
+building: have the "Print for…" flow force `load(true, viewDate)` first, or surface a banner
+when `generatedAt` predates the last shipment sync. Same trap applies to Box Labels — labels
+printed at 3:57 AM would have been 5 cartons short.
+
+**Related drift found the same day (not fixed).** The calendar heat-map (`/daily-inbound`) and
+the detail modal (`/inbound-today`) disagree on the *same* day: 7/29 = 13 PO / 478 pcs on the
+calendar vs 12 PO / 877 pcs in the detail; PO 113805 sits on 8/4 in the calendar and 8/3 in the
+detail. Calendar buckets on ship-date + transit **estimate** and sums the PO items table;
+the detail view uses **UPS's real delivery date** and live carton contents. Clicking a "13 PO"
+day and getting 12 reads as a bug to staff.
+
+---
+
 ## An audit measured our own broken meter and declared us on budget (2026-07-28)
 
 **Problem.** An external code audit of Caspio call volume opened with "the cross-dyno rollup
