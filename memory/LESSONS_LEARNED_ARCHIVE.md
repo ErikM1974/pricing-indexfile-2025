@@ -232,3 +232,30 @@ signature that has now appeared five times this week — the error only ever poi
 DOWN, and under-reporting always reads as "we're fine".
 
 ---
+
+---
+
+## RBAC: an unlisted page defaults to OPEN, so half the Administration menu was public to staff (2026-07-28)
+
+Full entry archived to `LESSONS_LEARNED_ARCHIVE.md`. The durable parts now live in CLAUDE.md's
+Security Checklist: **an unlisted page defaults to any-logged-in-staff, so a new restricted page
+needs a `Staff_Page_Access` row (or a spot in `ADMIN_DEFAULT_PAGES`)** — and **gating a page is
+half the job; gate the routes that feed it with `requirePageAccess` too.**
+
+---
+
+## A ratchet test sat red for 9 days because /deploy only runs test:parser (2026-07-28)
+
+Full entry archived to `LESSONS_LEARNED_ARCHIVE.md`. The durable part: **`/deploy`'s smoke
+gate runs `npm run test:parser` only, so a red ratchet anywhere else in `tests/unit/` does
+not block a release** — run `npm test` yourself before shipping. And allowlisting a ratchet
+entry is almost always wrong; it freezes the regression as acceptable.
+
+---
+
+## A CSS specificity TIE pinned the Administration menu permanently open (2026-07-28)
+
+Full entry archived to `LESSONS_LEARNED_ARCHIVE.md`. Durable part: **two rules with EQUAL
+specificity are resolved by source order, so a later `max-height: none` silently beat the
+collapse** — when a CSS edit appears to do nothing, count specificity AND check what comes
+after it. See also the `@layer`-vs-unlayered entry above.

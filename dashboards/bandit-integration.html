@@ -14,7 +14,7 @@
 
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/bandit-integration.css?v=2026.07.27.2">
+    <link rel="stylesheet" href="/dashboards/css/bandit-integration.css?v=2026.07.29.1">
 </head>
 <body>
     <div class="dash-shell">
@@ -94,8 +94,13 @@
                         <li><b>Do NOT slow the Thumbnail Metadata Sync.</b> Its delta read is an <b>ODBC query against FileMaker — zero Caspio calls</b>. In steady state the whole task costs ~48 calls/day, nearly all heartbeats on <code>Sync_Heartbeats</code>, with only ~6/day touching the thumbnail table. There is no money in it, and it is the <b>record-creator</b> the image sync depends on (<code>upload-with-stub</code> 404s <code>RECORD_NOT_FOUND</code> rather than creating a row, because <code>Thumb_DesLocid_Design</code> is UNIQUE NOT NULL). Slowing it would also break its overlap — see the trap below.</li>
                         <li><b>Re-copy the three updated agent scripts</b> from <code>caspio-pricing-proxy/scripts/bandit-agent/</code> to <code>C:\NWCA\odbc-sync\</code>: <code>sync-orders.ps1</code>, <code>sync-purchase-orders.ps1</code>, <code>sync-thumbnail-metadata.ps1</code>.</li>
                     </ol>
-                    <p><b>⚠️ The overlap trap — do NOT "simplify" this back.</b> Order Sync and PO Sync run every <b>15</b> min but shared a <b>30</b>-min <code>OverlapMinutes</code>, so every changed row landed in 3 consecutive runs and the proxy PUTs unconditionally — each change written to Caspio ~3×. They now read their own <code>OrdersOverlapMinutes</code> (default <b>20</b> → 2 runs).<br>
-                    The shared <code>OverlapMinutes</code> stays at <b>30</b> because <b>Thumbnail Metadata Sync runs on a 30-minute cadence</b> — lowering the shared key to 20 would open a 10-minute window in which modified rows are <b>never seen again</b>. Rule: <b>overlap must always exceed (cadence + run duration + clock skew)</b>.</p>
+                    <p><b>⚠️ The overlap trap — do NOT "simplify" this back.</b> Order Sync and PO Sync run every <b>15</b> min but shared a <b>30</b>-min <code>OverlapMinutes</code>, so every changed row landed in multiple consecutive runs and the proxy PUTs unconditionally — each change written to Caspio several times. They now read their own <code>OrdersOverlapMinutes</code> (default <b>20</b>).<br>
+                    The shared <code>OverlapMinutes</code> stays at <b>30</b> because <b>Thumbnail Metadata Sync runs on a 30-minute cadence</b> — lowering the shared key to 20 would open a 10-minute window in which modified rows are <b>never seen again</b>. Note <code>if ($cfg.OrdersOverlapMinutes)</code> is PowerShell-truthy, so a literal <code>0</code> in config.json silently means 20.</p>
+
+                    <p><b>✅ Content dedupe (2026-07-29) — the overlap is now free, so stop trying to shorten it.</b>
+                    <code>ORDER_ODBC</code> was measured at <b>55% of all Caspio calls</b> on a fresh web dyno. <code>sync-orders.ps1</code> now keeps a SHA-1 of exactly what it last sent per order in <code>last-sent-orders.json</code> and skips rows whose content is unchanged. Proven on bandit against live data: first run <code>2 to send, 0 unchanged → posted 2</code>; immediately re-run inside the same overlap window, <code>0 to send, 2 unchanged → posted 0</code>.<br>
+                    <b>The overlap was NOT reduced</b> — it is the clock-skew and long-transaction safety net, and the dedupe delivers the same saving without spending it. Two guards that must survive any edit: a <b>capped run bypasses the dedupe entirely</b> (state is not advanced on a cap and <code>FETCH FIRST</code> has no <code>ORDER BY</code>, so deduping there would post <code>rows:[]</code> and stamp a <b>green heartbeat over a stalled sync</b>), and the state-advance test reads <code>$capped</code>, never the post-filter row count. Run with <code>-DryRun</code> to log every send/skip decision and post nothing.<br>
+                    <b>Monitoring note:</b> <code>lastRows: 0</code> on <code>/api/shopworks-odbc/health</code> is now the NORMAL steady state. Health is <code>reason: fresh</code> + <code>ageMin</code>, not row count. The per-run log line <code>dedupe: N to send, M unchanged</code> is where the real activity shows.</p>
                 </div>
             </section>
 
@@ -107,8 +112,11 @@
                 <h3 class="bi-h">Where everything lives on bandit</h3>
                 <div class="bi-code">C:\NWCA\
   odbc-sync\                       # the 5 ODBC syncs + the SHARED config
-    config.json                    # { ProxyBase, CrmApiSecret, Dsn=SWODBC }  ← proxy URL + secret
+    config.json                    # { ProxyBase, CrmApiSecret, Dsn=SWODBC,
+                                   #   OverlapMinutes=30, OrdersOverlapMinutes=20, MaxRows=900 }
+                                   #   SHARED by 7 scripts — one bad edit stops them all
     sync-orders.ps1            last-sync.txt                 sync-orders.log
+                               last-sent-orders.json         # content hashes (dedupe)
     sync-purchase-orders.ps1   last-sync-po.txt              sync-purchase-orders.log
     sync-contacts.ps1          last-snapshot-contacts.json   sync-contacts.log
     sync-designs.ps1           last-snapshot-designs.json    sync-designs.log
@@ -117,7 +125,7 @@
     sync-thumbnails-to-box.ps1                               sync-thumbnails-to-box.log
   thumb-sync\
     sync-thumbnail-metadata.ps1  last-sync-thumb-meta.txt     sync-thumbnail-metadata.log</div>
-                <p class="bi-note"><b>Master copies</b> of every <code>.ps1</code> live in the repo at <code>caspio-pricing-proxy/scripts/bandit-agent/</code>. Rule: <b>edit the repo copy, then re-copy it to the matching <code>C:\NWCA\…</code> path</b> — never hand-edit on bandit (it drifts and gets overwritten). Only <code>config.json</code> is bandit-only (it holds the secret). The <code>last-*.txt / *.json</code> files are each sync's delta bookmark — deleting one forces a full re-sync (don't, unless you mean to).</p>
+                <p class="bi-note"><b>Master copies</b> of every <code>.ps1</code> live in the repo at <code>caspio-pricing-proxy/scripts/bandit-agent/</code>. Rule: <b>edit the repo copy, then re-copy it to the matching <code>C:\NWCA\…</code> path</b> — never hand-edit on bandit (it drifts and gets overwritten). Only <code>config.json</code> is bandit-only (it holds the secret). The <code>last-*.txt / *.json</code> files are each sync's delta bookmark — deleting one forces a full re-sync (don't, unless you mean to). <code>last-sent-orders.json</code> is the newest of these: deleting it makes Order Sync re-send one full overlap window once, then settle — the named escape hatch if you ever suspect Caspio and ShopWorks have drifted apart.</p>
 
                 <h3 class="bi-h">Task → script → schedule → log</h3>
                 <div class="bi-table-wrap">
