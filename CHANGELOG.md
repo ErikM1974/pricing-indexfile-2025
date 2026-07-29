@@ -1,3 +1,13 @@
+## v2026.07.29.2 (2026.07.29)
+
+- SanMar Inbound: every print and box-label run re-pulls from SanMar first
+- Lessons: both 4 AM inbound gaps had the same shape — our copy lagged the truth
+- Retire the staff sticker page; split its three jobs to three homes
+- Lessons: deleting a gated route can ungate the file behind it
+- Split the SanMar Inbound modal's CSS out of quote-management.css
+- Lessons: a shared component's CSS must not live in one host page's stylesheet
+- Deploy v2026.07.29.2: 1 files (index.html,...)
+
 ## v2026.07.29.1 (2026.07.29)
 
 - Lessons: an audit that read our own broken meter as ground truth
