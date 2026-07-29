@@ -12,6 +12,9 @@ import './dashboard-events.js';   // installs document click delegator
 import { initTweaks }          from '../widgets/tweaks-fab.js';
 import { initAuth }            from '../controllers/auth-controller.js';
 import { initSidebar }         from '../controllers/sidebar-controller.js';
+// Quick Access housekeeping (2026-07-29): derives the category count badges
+// from the DOM and remembers which <details> widgets you left collapsed.
+import { initToolGrid }        from '../controllers/tool-grid-controller.js';
 // Role-gated nav (2026-07-28): strips [data-requires-role] blocks the signed-in
 // staffer doesn't qualify for — today, the whole Administration section.
 import { initNavAccess }       from '../controllers/nav-access-controller.js';
@@ -55,6 +58,7 @@ async function bootstrap() {
 
     // Synchronous controller init (fast, no network)
     initSidebar();
+    initToolGrid();          // count badges + <details> collapse memory
     initSalesGoal();
     initCelebrations();
     initProduction();        // renders from static stats — no network

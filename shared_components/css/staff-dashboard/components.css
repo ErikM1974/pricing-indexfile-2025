@@ -350,16 +350,15 @@
 /* =====================================================
    TOOL CATEGORIES + BUTTONS
    ===================================================== */
+/* Single-column base only. The live column-track rules (and the card
+   placement that goes with them) live in dashboard-v3-patch-2.css §7 —
+   that file is unlayered AND !important, so anything declared here loses.
+   2026-07-29: the 720px/1100px @container blocks that used to sit here
+   were removed; they had never once applied for exactly that reason. */
 .quick-access-grid {
     display: grid;
     grid-template-columns: 1fr;
     gap: var(--space-3);
-}
-@container (min-width: 720px) {
-    .quick-access-grid { grid-template-columns: 1fr 1fr; }
-}
-@container (min-width: 1100px) {
-    .quick-access-grid { grid-template-columns: 1fr 1fr 1fr; }
 }
 
 .tool-category {
@@ -417,16 +416,19 @@
     border-color: color-mix(in oklch, var(--accent) 30%, var(--border-base));
 }
 
-/* Reference category — collapsible via <details> */
-.tool-category--reference {
+/* Collapsible category cards — any .tool-category authored as <details>.
+   Generalized from .tool-category--reference 2026-07-29 so a second
+   collapsible card needs markup only, no new CSS. Dashed border while
+   closed is the "there's more in here" affordance. */
+details.tool-category {
     border-style: dashed;
 }
-.tool-category--reference[open] { border-style: solid; }
-.tool-category--reference > summary {
+details.tool-category[open] { border-style: solid; }
+details.tool-category > summary {
     list-style: none;
     cursor: pointer;
 }
-.tool-category--reference > summary::-webkit-details-marker { display: none; }
+details.tool-category > summary::-webkit-details-marker { display: none; }
 
 /* =====================================================
    METRICS ZONE

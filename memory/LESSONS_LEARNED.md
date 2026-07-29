@@ -5,6 +5,133 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## A closed `<details>` still reports its old size — `checkVisibility()`, not `getBoundingClientRect()` (2026-07-29)
+
+**Problem.** A layout test asserted that collapsing the Pride Wall hid its photo track:
+`pw.open = false; track.getBoundingClientRect().height === 0`. It failed at **every** viewport
+width — the track kept reporting 164.6px while the parent `<details>` correctly shrank 191px → 19px.
+The widget was working; the assertion could never pass.
+
+**Root cause.** A closed `<details>` hides its content with **`content-visibility: hidden`**, not
+`display: none`. The subtree is skipped for rendering but **retains its last laid-out geometry**, so
+`getBoundingClientRect()` returns the size it had when it was last open. `getComputedStyle(el).display`
+is likewise still `grid`. Nothing about the element's own boxes says "I am hidden".
+
+**Fix.** `!el.checkVisibility()` — it accounts for content-visibility, `visibility`, and opacity, and
+correctly returns `false` inside a closed `<details>`. Alternatively assert on the *parent*
+`<details>` height, which does collapse.
+
+**Prevention.** Never probe visibility through the geometry of a descendant — measure the collapsing
+container, or use `checkVisibility()`. This bites anything wrapped in `content-visibility`
+(`<details>`, `content-visibility: auto` virtualization), and it fails *silently in the passing
+direction* too: a "the panel is hidden" assertion written this way would pass while the panel is open.
+
+---
+
+## Three stylesheets declared the same grid; two had never applied (2026-07-29)
+
+**Problem.** `.quick-access-grid` column tracks were declared in components.css (with `@container`
+breakpoints), again in dashboard-v3-theme.css, and a third time in dashboard-v3-patch-2.css with
+`!important`. Editing the first two did nothing, and it was not obvious why.
+
+**Root cause.** components.css is inside `@layer components`; the theme and patch files are
+**unlayered**. Unlayered styles beat *any* layered style regardless of specificity or source order,
+so the container queries in components.css had never once matched — they looked live and were dead.
+
+**Fix.** patch-2 §7 is now the single owner of the tracks; components.css keeps a 1fr base and the
+theme keeps only the gap, each with a comment naming the owner.
+
+**Prevention.** In this codebase `@layer` = "loses to everything in the theme/patch files". Before
+editing a dashboard rule, check whether an unlayered file also declares it — and when a CSS edit
+appears to do nothing, suspect layering before specificity.
+
+---
+
+## The 4 AM inbound printout missed 4 POs — the WA cartons sync in AFTER it prints (2026-07-29)
+
+**Problem.** The Daily Inbound PDF Erik printed at **3:57 AM on 7/29** listed 8 POs / 17 boxes /
+751 pcs / $5,956. SanMar's PSST freight manifest for ship-date 7/28 showed 4 more POs
+(**142476, 113825, 113834, 113835** — 5 cartons, 126 pcs, $398) that UPS had already scheduled
+for 7/29 delivery. Reloading the page at 4:03 AM gave the correct **12 POs / 22 boxes / 877 pcs
+/ $6,354**. Nothing on the printed sheet was *wrong* — it was 6 minutes too early.
+
+**Root cause.** All four are **WA-INV (Issaquah)** shipments that SanMar packed between
+**4:58 and 6:55 PM PDT on 7/28**. The shipment sync writes those cartons to the Caspio
+`shipments` table in the small hours; on 7/29 they landed **between 10:56:56 and ~11:02 UTC**
+(3:57–4:02 AM PDT). `/api/sanmar-orders/inbound-today` caches its payload for **600 s**
+(`sanmar-orders.js` → `orderCache.set(cacheKey, payload, 600)`), and the print builders render
+`lastData` — the payload captured when the modal loaded. So a 3:57 AM print serves a payload
+built at 3:56:56 AM, before the WA rows existed. WA is the worst case precisely *because* its
+transit is 1 business day: an Issaquah carton packed at 6 PM is inbound **the next morning**,
+with no slack for the sync to catch up. NV/AZ/TX/VA cartons get 2–5 days, so a late sync never
+shows on their printout.
+
+**Fix (operational).** Print the inbound report **after ~5:00 AM**, and hit **Refresh** on the
+SanMar Inbound modal before printing or running Box Labels. Re-check any pre-5 AM printout
+against that day's PSST manifest CSV.
+
+**Prevention.** Treat `generatedAt` as the report's real timestamp, not the print time. Worth
+building: have the "Print for…" flow force `load(true, viewDate)` first, or surface a banner
+when `generatedAt` predates the last shipment sync. Same trap applies to Box Labels — labels
+printed at 3:57 AM would have been 5 cartons short.
+
+**Related drift found the same day (not fixed).** The calendar heat-map (`/daily-inbound`) and
+the detail modal (`/inbound-today`) disagree on the *same* day: 7/29 = 13 PO / 478 pcs on the
+calendar vs 12 PO / 877 pcs in the detail; PO 113805 sits on 8/4 in the calendar and 8/3 in the
+detail. Calendar buckets on ship-date + transit **estimate** and sums the PO items table;
+the detail view uses **UPS's real delivery date** and live carton contents. Clicking a "13 PO"
+day and getting 12 reads as a bug to staff.
+
+---
+
+## An audit measured our own broken meter and declared us on budget (2026-07-28)
+
+**Problem.** An external code audit of Caspio call volume opened with "the cross-dyno rollup
+shows 16,055 calls on 7/27 vs the 16,129/day budget — the July fixes already took you from
+~22k to ~16k." Every savings estimate in it was then sized against that denominator. Caspio
+billed **23,959** that day. We were at ~132% of pace, not at it.
+
+**Root cause.** 16,055 was our own meter's known-low reading — the exact figure recorded one
+entry below as the *under-count*. The audit read the number from `/api/admin/usage`, saw the
+field labelled `mode: "rollup"`, and treated it as cross-dyno truth. It was one row from one
+web dyno. The label was accurate about the code path and silent about the coverage.
+
+**Solution.** Re-anchored on Caspio's own billing page and re-derived every estimate from it.
+Then closed the biggest remaining hole: `sync-manageorders`, `check-zero-billing` and
+`sync-commissions` build their own Caspio URLs with raw axios and never load `api-tracker`.
+The global interceptor installs as a side effect of **loading** that module, so it attaches
+**per-process** — the docs claiming it catches "any process that talks to Caspio" were wrong;
+it catches any process that *loads the tracker*. ~950 calls/day were invisible.
+
+**Prevention.**
+- **A meter may not grade its own coverage.** Reconcile against the party that bills you,
+  every time, before quoting a number to anyone — including to a tool you asked for advice.
+- **A label describes a code path, not a guarantee.** `mode: "rollup"` was true and useless.
+  When a field asserts scope, make it carry the evidence: row count, dyno list, first/last
+  write. A scope claim nothing can falsify will eventually be believed while wrong.
+- **Give an outside auditor your known-wrong numbers up front.** This audit was competent —
+  it independently found the metering hole — but nobody told it the baseline was suspect, so
+  it anchored on it and mis-ranked everything downstream. The brief is part of the tool.
+- Sixth appearance this week of the same shape: **the error always points DOWN, and
+  under-reporting reads as "we're fine."**
+
+### The same audit's fixes had to be adversarially checked before shipping
+
+Three of six proposed fixes would have introduced a silent wrong answer, each in the
+"looks healthy, isn't" family — worth internalizing as a pattern, not three anecdotes:
+- **`Promise.allSettled` status is not a completeness test.** `fetchAllCaspioPages` *resolves*
+  with PARTIAL results when pagination fails mid-way, so `status === 'fulfilled'` is true for
+  a truncated read. Test the DATA (`length > 0`, expected keys present), never promise state.
+- **A cache TTL borrowed from a neighbour imports its freshness assumptions.** Reusing the
+  1-hour `STATIC_TABLE_TTL_MS` for `Pricing_Tiers`/`DTG_Costs` would have quadrupled staleness
+  on the tables Erik actually edits, and desynced DTG from `/api/pricing-bundle`, which reads
+  the same two tables at 15 min. Match the TTL to the sibling that shares the table.
+- **Failing only when EVERYTHING fails is failing open.** `/api/dtg/quote-pricing` 502'd only
+  when every bundle was missing. A partial set still answered 200 — `priceLines()` drops the
+  failing line but keeps its quantity in `combinedQty`, and the cart engine index-aligns items
+  to a now-shorter array. Under-stated subtotal *and* mis-attributed line items. The
+  any/all distinction in an error guard is a pricing decision.
+
 ## Our "day" was 7 hours off the vendor's, and the offset looked like thousands of missing API calls (2026-07-28)
 
 **Problem.** Reconciling our Caspio call meter against Caspio's own usage chart showed a
@@ -87,36 +214,10 @@ SERVER returns (`curl`) before concluding a fix didn't work.**
 
 ## A ratchet test sat red for 9 days because /deploy only runs test:parser (2026-07-28)
 
-**Problem.** `tests/unit/builders-function-length.test.js` was failing on `develop`:
-`dtg/form-core.js:init` measured 155 lines against a 150 cap. Nobody noticed for 9 days,
-across several deploys.
-
-**Root cause (two layers).**
-1. *The regression.* Commit `b25c68ca` (2026-07-19, "fix(leads): quote-builder prefill from
-   a lead now works") added the `?from=methodswitch` branch to DTG's `init()`, taking it
-   127 → 155. The change was correctly synced to all 4 builders per Rule 8, but only DTG
-   tipped over — DTG's `init` is the only one carrying every entry-mode branch inline
-   (emb/scp/dtf equivalents sit at 133–146, just under the cap).
-2. *Why it went unseen.* The `/deploy` skill's Step 0.6 smoke gate runs **`npm run
-   test:parser`** — `tests/unit/parser` only. A red ratchet in `tests/unit/` does not block
-   a deploy. `npm test` is the thing that catches it, and nothing runs it automatically.
-
-**Solution.** Genuinely refactored rather than allowlisted. `init()` was a 5-way entry-mode
-dispatcher, not the allowlist's justified case ("one cohesive HTML template", like
-`form-core.js:render` at 383). Extracted `configureOrderSummaryBand()`,
-`ensureRowsAndRender()`, and one predicate per entry mode (`tryDuplicateMode`, `tryEditMode`,
-`tryQuickQuotePrefill`, `tryMethodSwitchPrefill`, `restoreOrStartFresh`) — each returns true
-when it owns the load. `init()` is now 18 lines and the priority chain is explicit. DTG-only:
-this is `init` dispatch, not one of Rule 8's sync categories.
-
-**Prevention.**
-- **Allowlisting a ratchet entry is almost always the wrong call.** It freezes the regression
-  as acceptable and releases the pressure keeping the sibling builders at 133–146.
-- The entry-mode ORDER is behavioral, not cosmetic (`?duplicate=` > `?edit=` > handoffs >
-  auto-restore). Verify it with both params present, not one at a time — a one-at-a-time
-  pass looks identical whether or not the priority survived.
-- `adapter.js`'s JSDoc had already flagged this: *"the real split lands if init is ever
-  unpacked."* When a file comment names a future refactor, that's the map — follow it.
+Full entry archived to `LESSONS_LEARNED_ARCHIVE.md`. The durable part: **`/deploy`'s smoke
+gate runs `npm run test:parser` only, so a red ratchet anywhere else in `tests/unit/` does
+not block a release** — run `npm test` yourself before shipping. And allowlisting a ratchet
+entry is almost always wrong; it freezes the regression as acceptable.
 
 ---
 

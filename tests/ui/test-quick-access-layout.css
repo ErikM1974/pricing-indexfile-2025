@@ -1,0 +1,67 @@
+/* Chrome for the Quick Access layout harness. Nothing here styles the
+   dashboard markup itself — that must come from the real stylesheets so
+   the harness shows exactly what production shows. */
+
+body {
+    margin: 0;
+    background: #0d1117;
+    color: #e6edf3;
+    font-family: Inter, system-ui, sans-serif;
+}
+
+.harness-bar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 10px 14px;
+    background: #161b22;
+    border-bottom: 1px solid #30363d;
+    font-size: 13px;
+}
+
+.harness-bar button {
+    background: #21262d;
+    color: #e6edf3;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font: inherit;
+    cursor: pointer;
+}
+
+.harness-bar button:hover { border-color: #22c55e; }
+
+#widthReadout {
+    margin-right: auto;
+    color: #8b949e;
+    font-variant-numeric: tabular-nums;
+}
+
+.harness-results {
+    padding: 12px 14px;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 12px;
+    line-height: 1.65;
+    white-space: pre-wrap;
+    border-bottom: 1px solid #30363d;
+}
+
+.harness-results .pass { color: #3fb950; }
+.harness-results .fail { color: #f85149; font-weight: 700; }
+.harness-results .head { color: #58a6ff; }
+
+/* The stage is a fixed-width viewport stand-in. The dashboard grid sizes
+   itself from its container, so resizing this box exercises the exact
+   container queries production uses — no browser window resize needed. */
+.harness-stage {
+    width: 1440px;
+    max-width: 100%;
+    margin: 0;
+    overflow-x: auto;
+    resize: horizontal;
+    border-right: 2px dashed #30363d;
+}

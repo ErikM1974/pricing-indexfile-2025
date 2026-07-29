@@ -26,18 +26,18 @@
     <style>@layer reset, tokens, base, components, utilities, overrides;</style>
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/tokens.css?v=20260514-ai-phase1">
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/base.css?v=2026.07.06.11">
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css?v=2026.07.25.4">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css?v=2026.07.29.1">
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/utilities.css?v=20260514-ai-phase1">
     <!-- Claude Design handoff theme (2026-05-13) — unlayered variant, wins all cascade fights. -->
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=2026.07.28.6">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=2026.07.29.1">
     <!-- Claude Design PATCH 2 (spacing) — hide empty announcements, compress pinned row, tighten zones.
          PATCH 3 and PATCH 4 were REMOVED per PATCH-5-CLEANUP: their broad
          [class*="..."] selectors were over-matching and damaging styles that
          components.css already had correct (garment-bonus, celebration pills, etc). -->
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=2026.06.24.8">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=2026.07.29.1">
     <!-- Phase 1 "alive + personal" widgets (2026-07-20): Pride Wall photo
          strip, My Stuff pinned/recent tools row. (Win Bell removed 2026-07-23.) -->
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/phase1-widgets.css?v=2026.07.23.3">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/phase1-widgets.css?v=2026.07.29.1">
     <!-- Phase 2 (2026-07-20): Ctrl+K command palette — the Everything Bar. -->
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/command-palette.css?v=2026.07.20.7">
 
@@ -421,14 +421,19 @@
                  page). Controller (win-bell-controller.js) + its .wb-* CSS deleted. -->
 
             <!-- Pride Wall (2026-07-20 Phase 1) — ambient rotation of recent
-                 finished-product photos from the company photo library. -->
-            <section class="pw-strip" id="prideWall" aria-label="Pride Wall — recent finished work" hidden>
-                <div class="pw-head">
+                 finished-product photos from the company photo library.
+                 2026-07-29: became a <details> so anyone can fold away its
+                 ~185px and get the tools higher up. Open by default; the
+                 choice is remembered per browser (tool-grid-controller.js).
+                 pride-wall-controller.js is untouched — it only sets
+                 .hidden and fills #pwTrack, both of which work on <details>. -->
+            <details class="pw-strip" id="prideWall" data-collapse-key="prideWall" aria-label="Pride Wall — recent finished work" open hidden>
+                <summary class="pw-head">
                     <span class="pw-title">🖼️ Pride Wall — made by us, lately</span>
                     <a class="pw-link" href="/dashboards/finished-photos-library.html">Open the Photo Library →</a>
-                </div>
+                </summary>
                 <div class="pw-track" id="pwTrack"></div>
-            </section>
+            </details>
 
             <!-- Dashboard zones -->
             <div class="dashboard-zones">
@@ -454,14 +459,24 @@
 
                     <!-- Frequently Used Tools (ported from v2 staff-dashboard, 2026-05-13).
                          The Transfer Workflow strip visually teaches the
-                         Bradley → Supa sequence to new staff. -->
+                         Bradley → Supa sequence to new staff.
+
+                         2026-07-29 prune 8 → 3 + strip, so the row is ONE line
+                         again instead of wrapping to three. Nothing became
+                         unreachable — every href still exists on this page:
+                           Finished Photos, AE Dashboard  → dropped; they were
+                             exact duplicates of grid buttons a few rows below.
+                           SanMar Inbound Calendar        → moved to Production
+                           Purchasing Portal              → moved to Production
+                           Portal Admin (invites)         → moved to CRM & Customers
+                         Those three were the ONLY copy on the page, so they were
+                         relocated rather than deleted. -->
                     <div class="pinned-row pinned-row--frequent">
                         <div class="pinned-row__label">⭐ Frequently Used</div>
                         <div class="pinned-row__list" id="pinnedToolsList">
                             <a href="/dashboards/ae-mission-control.html" class="tool-btn" title="AE Mission Control — Taneisha & Nika's cockpit: action queue, KPIs, quotes, art, kits, commission"><i class="fas fa-rocket" aria-hidden="true"></i> AE Mission Control</a>
                             <!-- Production Shifts moved to the header Team dropdown 2026-07-20
                                  (Erik: it's a people thing) — still listed in the Production category below. -->
-                            <a href="/dashboards/finished-photos.html" class="tool-btn"><i class="fas fa-camera" aria-hidden="true"></i> Finished Photos</a>
                             <a href="/dashboards/finished-photos-library.html" class="tool-btn" title="Browse every finished-product photo by account and sales rep"><i class="fas fa-images" aria-hidden="true"></i> Photo Library</a>
                             <!-- Workflow Strip: Bradley's Queue → Supacolor API Orders -->
                             <div class="tool-workflow" aria-label="Transfer workflow">
@@ -474,11 +489,7 @@
                                     <a href="/dashboards/supacolor-orders.html" class="tool-btn"><img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/supacolor-mark.png?ver=1" alt="" class="tool-btn__inline-img"> API Orders</a>
                                 </div>
                             </div>
-                            <a href="/art-tools/ae-art-dashboard.html" class="tool-btn"><i class="fas fa-palette" aria-hidden="true"></i> AE Dashboard</a>
                             <a href="/calculators/purchasingform.html" class="tool-btn"><i class="fas fa-shopping-cart" aria-hidden="true"></i> Purchasing</a>
-                            <a href="/dashboards/quote-management.html?open=inbound-today" class="tool-btn" title="SanMar Inbound Calendar — pick any day to see its incoming SanMar boxes (each PO + work order, box-by-box contents with color/size) and print box labels or a PDF."><i class="fas fa-calendar-days" aria-hidden="true"></i> SanMar Inbound Calendar</a>
-                            <a href="/dashboards/purchasing-portal.html" class="tool-btn" title="Purchasing Portal — every blanks-purchase request sent to Bradley (last 60 days) with who requested it and where it stands: Sent → Ordered → Received → Shipped."><i class="fas fa-cart-flatbed" aria-hidden="true"></i> Purchasing Portal</a>
-                            <a href="/dashboards/customer-portal-admin.html" class="tool-btn"><i class="fas fa-id-card-clip" aria-hidden="true"></i> Portal Admin (invites)</a>
                         </div>
                     </div>
 
@@ -535,111 +546,66 @@
                             </div>
                         </div>
 
-                        <!-- Pricing & Calculators — general/lookup tools only after
-                             2026-05-13 Round 2 IA split: embroidery-specific deep-links
-                             moved to dedicated "Corporate Embroidery" category; contract
-                             pricing moved to "Contract" category. What's left is the
-                             multi-method/lookup grab-bag. -->
-                        <div class="tool-category">
+                        <!-- Pricing — ONE card, five sub-groups (2026-07-29 IA reorg).
+                             Merged from the five cards this replaces: Pricing &
+                             Calculators, Corporate Embroidery, Customer Supplied,
+                             Contract, Specialty Products. Every link is unchanged
+                             (same href, same icon, same beta/AI chip); only the five
+                             card headers went away.
+
+                             WHY: all five answered the same question — "what does
+                             this cost?" — so staff had to know our internal segment
+                             taxonomy (who supplies the blank, retail vs wholesale)
+                             before they could find a calculator. The sub-group labels
+                             below deliberately reuse the old card names, so the
+                             taxonomy is still there for anyone who thinks that way,
+                             just one level down instead of spread across the grid.
+
+                             Spans 2 grid tracks at ≥880px and lays its buttons out in
+                             2 internal columns (dashboard-v3-patch-2.css §7 + §15). -->
+                        <div class="tool-category tool-category--pricing">
                             <div class="tool-category-header">
                                 <div class="tool-category-icon">
                                     <i class="fas fa-calculator" aria-hidden="true"></i>
                                 </div>
-                                <span class="tool-category-title">Pricing &amp; Calculators</span>
-                                <span class="tool-category-count">3</span>
+                                <span class="tool-category-title">Pricing</span>
+                                <span class="tool-category-count">16</span>
                             </div>
                             <div class="tool-buttons">
+                                <div class="tool-subhead">Everyday pricing</div>
                                 <a href="/calculators/manual-pricing.html" class="tool-btn"><i class="fas fa-calculator" aria-hidden="true"></i> Manual Pricing 2026</a>
                                 <a href="/calculators/service-price-cheat-sheet.html" class="tool-btn"><i class="fas fa-clipboard-list" aria-hidden="true"></i> Service Prices</a>
                                 <a href="/calculators/compare-pricing.html" class="tool-btn tool-btn--beta" title="Beta — works but still being refined. Let Erik know if you hit issues."><i class="fas fa-search-dollar" aria-hidden="true"></i> Pricing by Style</a>
-                            </div>
-                        </div>
 
-                        <!-- Corporate Embroidery (Round 2, trimmed in Round 3) —
-                             retail / B2B end-user embroidery pricing on NWCA blanks.
-                             "Customer Supplied Garments" moved out to the new
-                             Customer Supplied category since it's labor-only — a
-                             different economic model from the NWCA-blank flow.
-                             What's left: Add Logo (NWCA blanks) + Additional
-                             Stitches modifier. Tab keys verified against JS whitelist. -->
-                        <div class="tool-category">
-                            <div class="tool-category-header">
-                                <div class="tool-category-icon">
-                                    <i class="fas fa-tshirt" aria-hidden="true"></i>
-                                </div>
-                                <span class="tool-category-title">Corporate Embroidery</span>
-                                <span class="tool-category-count">3</span>
-                            </div>
-                            <div class="tool-buttons">
+                                <!-- Was "Corporate Embroidery": retail / B2B end-user
+                                     embroidery on NWCA blanks. All three are tabs of
+                                     the same page; tab keys verified against the JS
+                                     whitelist — don't "simplify" them to one link. -->
+                                <div class="tool-subhead">Embroidery add-ons <span class="tool-subhead-note">on NWCA garments</span></div>
                                 <a href="/calculators/embroidery-pricing-all/?tab=al-retail" class="tool-btn"><i class="fas fa-tag" aria-hidden="true"></i> Additional Logo</a>
                                 <a href="/calculators/embroidery-pricing-all/?tab=stitch-charges" class="tool-btn"><i class="fas fa-layer-group" aria-hidden="true"></i> Additional Stitches</a>
                                 <a href="/calculators/embroidery-pricing-all/?tab=fullback" class="tool-btn"><i class="fas fa-expand" aria-hidden="true"></i> Full Back Embroidery</a>
-                            </div>
-                        </div>
 
-                        <!-- Customer Supplied (NEW 2026-05-13 Round 3) — retail /
-                             end-user labor-only segment. Customer brings own garments;
-                             we only charge for decoration. Distinct economic model
-                             from Corporate (we sell blank + decorate) and Contract
-                             (wholesale partner brings blanks at discount rate).
-                             Previously fragmented across Corporate Embroidery and
-                             Pricing & Calculators — now consolidated.
-                             Brief method names follow the Specialty Products pattern
-                             (category title implies "Customer Supplied" prefix).
-                             DTF and DTG are roadmap slots with disabled "Coming soon"
-                             pills — render as <span> so they're non-clickable.
-                             When those calculator pages ship, swap the spans for
-                             <a> tags with the right href; no other markup change. -->
-                        <div class="tool-category">
-                            <div class="tool-category-header">
-                                <div class="tool-category-icon">
-                                    <i class="fas fa-box-open" aria-hidden="true"></i>
-                                </div>
-                                <span class="tool-category-title">Customer Supplied</span>
-                                <span class="tool-category-count">4</span>
-                            </div>
-                            <div class="tool-buttons">
+                                <!-- Was "Customer Supplied": labor-only — customer
+                                     brings the garment, we charge decoration only.
+                                     The DTF and DTG roadmap slots used to sit here as
+                                     disabled pills; they're a note now (2026-07-29) so
+                                     the card shows only things you can actually click.
+                                     When those calculators ship, add plain <a> rows. -->
+                                <div class="tool-subhead">Customer supplied</div>
                                 <a href="/calculators/embroidery-pricing-all/?tab=decg-retail" class="tool-btn"><i class="fas fa-tshirt" aria-hidden="true"></i> Embroidery</a>
                                 <a href="/calculators/screenprint-customer/" class="tool-btn"><i class="fas fa-layer-group" aria-hidden="true"></i> Screen Print</a>
-                                <span class="tool-btn tool-btn--soon" aria-disabled="true" title="Coming soon — for now use Manual Pricing 2026"><i class="fas fa-fire" aria-hidden="true"></i> DTF</span>
-                                <span class="tool-btn tool-btn--soon" aria-disabled="true" title="Coming soon — for now use Manual Pricing 2026"><i class="fas fa-print" aria-hidden="true"></i> DTG</span>
-                            </div>
-                        </div>
+                                <div class="tool-subhead-note">DTF and DTG — coming soon; for now use Manual Pricing 2026</div>
 
-                        <!-- Contract (Round 2) — B2B wholesale segment.
-                             Decorator-to-decorator / ASI distributors / Ruthie partners
-                             who bring their own blanks. Industry-standard "Contract"
-                             label. Two buttons: Contract Embroidery deep-links to the
-                             Contract Embroidery tab on the embroidery pricing page;
-                             Contract DTG goes to its standalone page. Future Contract
-                             Screen Print / Contract DTF would slot in here. -->
-                        <div class="tool-category">
-                            <div class="tool-category-header">
-                                <div class="tool-category-icon">
-                                    <i class="fas fa-handshake" aria-hidden="true"></i>
-                                </div>
-                                <span class="tool-category-title">Contract</span>
-                                <span class="tool-category-count">2</span>
-                            </div>
-                            <div class="tool-buttons">
+                                <!-- Was "Contract": B2B wholesale — decorator-to-decorator,
+                                     ASI distributors, Ruthie partners who bring blanks.
+                                     Contract Screen Print / DTF would slot in here. -->
+                                <div class="tool-subhead">Contract <span class="tool-subhead-note">wholesale</span></div>
                                 <a href="/calculators/embroidery-contract/" class="tool-btn"><i class="fas fa-industry" aria-hidden="true"></i> Contract Embroidery</a>
                                 <a href="/calculators/dtg-contract/" class="tool-btn"><i class="fas fa-print" aria-hidden="true"></i> Contract DTG</a>
-                            </div>
-                        </div>
 
-                        <!-- Specialty Products (NEW 2026-05-13 — split off from
-                             Pricing & Calculators. Non-apparel / specialty SKU
-                             pricing tools: emblems, tumblers, stickers, webstore,
-                             non-Sanmar caps.) -->
-                        <div class="tool-category">
-                            <div class="tool-category-header">
-                                <div class="tool-category-icon">
-                                    <i class="fas fa-shapes" aria-hidden="true"></i>
-                                </div>
-                                <span class="tool-category-title">Specialty Products</span>
-                                <span class="tool-category-count">5</span>
-                            </div>
-                            <div class="tool-buttons">
+                                <!-- Was "Specialty Products": non-apparel / specialty SKUs. -->
+                                <div class="tool-subhead">Specialty &amp; non-apparel</div>
                                 <a href="/calculators/embroidered-emblem/" class="tool-btn"><i class="fas fa-certificate" aria-hidden="true"></i> Emblems</a>
                                 <a href="/calculators/laser-tumbler-polarcamel.html" class="tool-btn"><i class="fas fa-mug-hot" aria-hidden="true"></i> Laser Tumbler</a>
                                 <a href="/calculators/sticker-manual-pricing.html" class="tool-btn tool-btn--ai">
@@ -659,21 +625,32 @@
                                     <i class="fas fa-truck-fast" aria-hidden="true"></i>
                                 </div>
                                 <span class="tool-category-title">Production</span>
-                                <span class="tool-category-count">10</span>
+                                <span class="tool-category-count">12</span>
                             </div>
-                            <!-- Production: production-ready tools first, BETA tools last.
-                                 Maturity gradient is implicit via order + chip color. -->
+                            <!-- Production: 12 tools was too long to scan as one list, so
+                                 2026-07-29 grouped them by job. Within each group,
+                                 production-ready first and BETA last — the maturity
+                                 gradient is implicit via order + chip color.
+                                 SanMar Inbound Calendar and Purchasing Portal moved here
+                                 from the Frequently Used row the same day. -->
                             <div class="tool-buttons">
+                                <div class="tool-subhead">Queues &amp; schedule</div>
                                 <a href="/dashboards/production-shifts.html" class="tool-btn"><i class="fas fa-user-clock" aria-hidden="true"></i> Production Shifts</a>
                                 <a href="/dashboards/bradley-transfers.html" class="tool-btn"><i class="fas fa-truck" aria-hidden="true"></i> Bradley's Transfer Queue</a>
                                 <a href="/dashboards/supacolor-orders.html" class="tool-btn"><i class="fas fa-link" aria-hidden="true"></i> Supacolor API Orders</a>
                                 <a href="/dashboards/monogram-dashboard.html" class="tool-btn"><i class="fas fa-font" aria-hidden="true"></i> Monogram Dashboard</a>
                                 <a href="/dashboards/names-numbers-dashboard.html" class="tool-btn"><i class="fas fa-users" aria-hidden="true"></i> Names &amp; Numbers</a>
-                                <a href="/dashboards/finished-photos.html" class="tool-btn"><i class="fas fa-camera" aria-hidden="true"></i> Finished Photos</a>
-                                <a href="/dashboards/finished-photos-library.html" class="tool-btn" title="Browse every finished-product photo by account and sales rep"><i class="fas fa-images" aria-hidden="true"></i> Photo Library</a>
+
+                                <div class="tool-subhead">Purchasing &amp; receiving</div>
                                 <a href="/calculators/purchasingform.html" class="tool-btn"><i class="fas fa-shopping-cart" aria-hidden="true"></i> Purchasing</a>
+                                <a href="/dashboards/purchasing-portal.html" class="tool-btn" title="Purchasing Portal — every blanks-purchase request sent to Bradley (last 60 days) with who requested it and where it stands: Sent → Ordered → Received → Shipped."><i class="fas fa-cart-flatbed" aria-hidden="true"></i> Purchasing Portal</a>
+                                <a href="/dashboards/quote-management.html?open=inbound-today" class="tool-btn" title="SanMar Inbound Calendar — pick any day to see its incoming SanMar boxes (each PO + work order, box-by-box contents with color/size) and print box labels or a PDF."><i class="fas fa-calendar-days" aria-hidden="true"></i> SanMar Inbound Calendar</a>
                                 <a href="/dashboards/roland-printer-supplies.html" class="tool-btn"><i class="fas fa-print" aria-hidden="true"></i> Order Roland Supplies</a>
                                 <a href="/pages/box-labels.html" class="tool-btn tool-btn--beta" title="Beta — works but still being refined. Let Erik know if you hit issues."><i class="fas fa-box" aria-hidden="true"></i> Box Labels</a>
+
+                                <div class="tool-subhead">Photos</div>
+                                <a href="/dashboards/finished-photos.html" class="tool-btn"><i class="fas fa-camera" aria-hidden="true"></i> Finished Photos</a>
+                                <a href="/dashboards/finished-photos-library.html" class="tool-btn" title="Browse every finished-product photo by account and sales rep"><i class="fas fa-images" aria-hidden="true"></i> Photo Library</a>
                             </div>
                         </div>
 
@@ -708,7 +685,7 @@
                                     <i class="fas fa-address-book" aria-hidden="true"></i>
                                 </div>
                                 <span class="tool-category-title">CRM &amp; Customers</span>
-                                <span class="tool-category-count">5</span>
+                                <span class="tool-category-count">6</span>
                             </div>
                             <div class="tool-buttons">
                                 <a href="/dashboards/leads.html" class="tool-btn"><i class="fas fa-bullhorn" aria-hidden="true"></i> Leads</a>
@@ -716,11 +693,17 @@
                                 <a href="/dashboards/nika-crm.html" class="tool-btn"><i class="fas fa-user-tie" aria-hidden="true"></i> Nika's Accounts</a>
                                 <a href="/dashboards/house-accounts.html" class="tool-btn"><i class="fas fa-home" aria-hidden="true"></i> House Accounts</a>
                                 <a href="/dashboards/portal-directory.html" class="tool-btn"><i class="fas fa-globe" aria-hidden="true"></i> Portal Directory</a>
+                                <!-- Moved here from the Frequently Used row 2026-07-29 — it was
+                                     the only copy on the page, so it moved rather than dropped. -->
+                                <a href="/dashboards/customer-portal-admin.html" class="tool-btn"><i class="fas fa-id-card-clip" aria-hidden="true"></i> Portal Admin (invites)</a>
                             </div>
                         </div>
 
-                        <!-- Reference (collapsed by default via <details>) -->
-                        <details class="tool-category tool-category--reference">
+                        <!-- Reference (collapsed by default via <details>).
+                             2026-07-29: spans the full grid width as a footer bar
+                             rather than sitting in a column, and data-collapse-key
+                             makes "I left it open" stick across reloads. -->
+                        <details class="tool-category tool-category--reference" data-collapse-key="reference">
                             <summary class="tool-category-header">
                                 <div class="tool-category-icon">
                                     <i class="fas fa-book" aria-hidden="true"></i>
@@ -1013,6 +996,6 @@
     <!-- ===================================================
          APP ENTRY (ES module)
          =================================================== -->
-    <script type="module" src="/shared_components/js/staff-dashboard/core/dashboard-app.js?v=2026.07.28.4"></script>
+    <script type="module" src="/shared_components/js/staff-dashboard/core/dashboard-app.js?v=2026.07.29.1"></script>
 </body>
 </html>
