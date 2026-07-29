@@ -140,7 +140,8 @@ dotenv.config();
 //                                              memory, so a size change costs ZERO further calls. Ends in a
 //                                              quote-request lead (POST /api/form-submissions, formId
 //                                              'quote-request'). Calls NO AI endpoint.
-//   (the STAFF sticker tool with the AI drawer is /pricing/stickers — requireStaff, see "STAFF-GATED CALCULATOR PAGES")
+//   (the STAFF sticker tool with the AI drawer was /pricing/stickers — RETIRED 2026-07-29, now a 410 signpost.
+//    Its oversize-decal calculator lives on at /pricing/decals — requireStaff, see "STAFF-GATED CALCULATOR PAGES")
 //
 // CUSTOM T-SHIRTS (multi-style DTG storefront, 2026-06-10 — helpers ~L900: getCtsPricingConfig/getCtsCatalog/resolveCtsShipping/rebuildCtsQuote + stock gate getCtsStock/ctsStockConflicts ~L1135)
 //   GET  /custom-tees[.html]                — storefront page (gallery of 20 DTG top sellers + designer + Stripe)
@@ -276,7 +277,8 @@ dotenv.config();
 //   L1640 /pricing/dtg → dtg-pricing.html
 //   L1644 /pricing/screen-print → screen-print-pricing.html
 //   L1648 /pricing/dtf → /pricing/dtf/index.html
-//   L1652 /pricing/stickers → sticker-manual-pricing.html
+//   /pricing/stickers → 410 signpost (retired 2026-07-29)
+//   /pricing/decals   → custom-decal-pricing.html (requireStaff)
 // =============================================================================
 
 const app = express();
@@ -3850,6 +3852,13 @@ console.log('✓ Policies AI Assist proxy loaded (forwards to caspio-pricing-pro
 // ⚠️ DEPLOY ORDER: ship THIS app first, then the proxy's secret gate. The
 // reverse order breaks the staff page for as long as the two are out of step
 // (MEMORY.md: "never flip secret-only until every caller repointed" — bit 3×).
+//
+// 🔻 ORPHANED 2026-07-29 — its only caller was sticker-pricing-page.js, retired
+// with /calculators/sticker-manual-pricing.html. Nothing in the repo POSTs here
+// any more (grep: `sticker-ai`). Left mounted rather than removed per the
+// flag-don't-delete policy, and because the proxy side still expects it, but it
+// is a live PII-capable endpoint with zero consumers — a deliberate removal
+// candidate. If you kill it, drop the proxy's /api/contract-sticker-ai/chat too.
 // =============================================================================
 app.post(
   '/api/sticker-ai/chat',
@@ -4057,25 +4066,51 @@ app.get('/quote-builders/:page', (req, res, next) => {
 // STAFF-GATED CALCULATOR PAGES — must be registered BEFORE the /calculators
 // static mount below, or Express serves the file and never reaches the gate.
 //
-// The sticker page fronts the AI quote assistant, whose lookup_customer tool
-// returns customer name, email, phone, street address, sales rep and payment
-// terms. It was reachable anonymously at BOTH of these URLs — `noindex` is not
-// access control (2026-07-24, Erik: "we don't want the user on the public site
-// to see customer info").
-//
 // requireStaff BOUNCES to SSO rather than hard-locking, so a logged-in rep never
 // notices; only an anonymous visitor is stopped. Do NOT blanket-gate
 // /calculators — laser-tumbler-polarcamel.html and embroidered-emblem/ are
 // customer-facing.
 //
-// The customer-facing sticker experience is a separate public page (planned
-// /custom-stickers) that calls NO AI endpoint at all.
-app.get(['/calculators/sticker-manual-pricing.html', '/pricing/stickers'], requireStaff, (req, res) => {
+// RETIRED 2026-07-29 — /calculators/sticker-manual-pricing.html and its
+// /pricing/stickers alias. That page carried three things: the 2×2–6×6 sticker
+// grid, the banner rate card, and the oversize-decal calculator. Customers now
+// get the first two directly at /custom-stickers and /custom-banners (same
+// Caspio-backed prices — both surfaces always read /api/sticker-pricing), so
+// only the decal calculator needed to survive; it moved to its own page below.
+// The AI quote drawer and the staff-side STK quote-save did NOT come across
+// (Erik 2026-07-29 — rep attribution on sticker quotes is acceptable to lose).
+// The HTML/JS are left on disk, flagged dead in ACTIVE_FILES.md.
+//
+// TOMBSTONE — load-bearing, do not delete. The retired HTML is still on disk,
+// and `/calculators` is a static mount a few lines below. Without an explicit
+// route here, Express would happily serve sticker-manual-pricing.html to
+// ANYONE — dropping the requireStaff gate that was put on it on 2026-07-24
+// precisely because its AI drawer could surface customer email, phone, address,
+// sales rep and payment terms. Deleting the retired file is the only other way
+// to make this safe.
+app.get(['/calculators/sticker-manual-pricing.html', '/pricing/stickers'], (req, res) => {
+  res.status(410).set('X-Robots-Tag', 'noindex, nofollow').send(`<!DOCTYPE html>
+<meta charset="utf-8"><meta name="robots" content="noindex, nofollow">
+<title>This page moved</title>
+<body style="font:16px/1.6 Inter,system-ui,sans-serif;max-width:34rem;margin:4rem auto;padding:0 1rem">
+<h1 style="font-size:1.35rem">The sticker &amp; banner quote page was retired</h1>
+<p>Its three sections each have a better home now:</p>
+<ul>
+  <li><a href="/custom-stickers">Sticker pricing (2&times;2 &ndash; 6&times;6)</a> &mdash; the customer page, same prices</li>
+  <li><a href="/custom-banners">Banner pricing</a> &mdash; the customer page</li>
+  <li><a href="/pricing/decals">Custom &amp; oversize decals</a> &mdash; staff calculator</li>
+</ul>
+<p><a href="/staff-dashboard.html">Back to the dashboard</a></p>`);
+});
+
+// Oversize / custom decals — the ONLY consumer of /api/custom-decal-pricing.
+// Staff-gated because it exposes cost-side rate bands and tier minimums.
+app.get(['/calculators/custom-decal-pricing.html', '/pricing/decals'], requireStaff, (req, res) => {
   // Header, not robots.txt Disallow: a Disallow would stop Google FETCHING the
   // page, so it could never see the page's own noindex meta — and a disallowed
   // URL with inbound links can still surface as a bare result.
   res.set('X-Robots-Tag', 'noindex, nofollow');
-  res.sendFile(path.join(__dirname, 'calculators', 'sticker-manual-pricing.html'));
+  res.sendFile(path.join(__dirname, 'calculators', 'custom-decal-pricing.html'));
 });
 
 // Serve specific directories as static
@@ -4447,8 +4482,10 @@ app.get(['/custom-caps', '/custom-caps.html'], (req, res) => {
 // ladder re-prices from memory. Registered in the SAME commit as the page and
 // the sitemap entry (see the zombie-route note at the top of this file).
 //
-// Distinct from /pricing/stickers, which is the STAFF tool (AI quote drawer,
-// requireStaff-gated). This page calls no AI endpoint at all.
+// As of 2026-07-29 this is THE sticker pricing surface — the staff tool that
+// used to sit at /pricing/stickers was retired, and the staff dashboard now
+// links reps straight here. Both always read the same /api/sticker-pricing
+// grid, so there was never a second set of numbers to reconcile.
 app.get(['/custom-stickers', '/custom-stickers.html', '/stickers'], (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'custom-stickers.html'));
 });
@@ -9672,9 +9709,10 @@ app.get('/pricing/dtf', (req, res) => {
   res.sendFile(path.join(__dirname, 'calculators', 'dtf-pricing.html'));
 });
 
-// /pricing/stickers MOVED (2026-07-24) — it now lives with the other staff-gated
-// calculator pages, registered before the /calculators static mount so the gate
-// actually runs. Search for "STAFF-GATED CALCULATOR PAGES".
+// /pricing/stickers MOVED (2026-07-24) then RETIRED (2026-07-29) — it is a 410
+// signpost now, and its surviving oversize-decal calculator is /pricing/decals.
+// Both are registered before the /calculators static mount so the gate actually
+// runs. Search for "STAFF-GATED CALCULATOR PAGES".
 
 // Cart Sessions API
 app.get('/api/cart-sessions', async (req, res) => {

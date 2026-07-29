@@ -5,6 +5,61 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## A shared modal's CSS lived in ONE page's stylesheet — the other host printed the whole dashboard (2026-07-29)
+
+**Problem.** `sanmar-inbound-today.js` is loaded by BOTH `quote-management.html` and
+`ae-mission-control.html`, but every `.sit-*` rule lived in `quote-management.css`, which only
+the first page loads. From AE Mission Control the modal opened `position: static` at
+**y = 3862px** — ~3.8 screens below the fold, so the Inbound button looked dead — with no
+scroll container, and **without `body.sit-printing > *:not(#sit-print-sheet){display:none}`**,
+so printing a report or a box label would have printed the entire dashboard.
+
+**Root cause.** A page-named stylesheet became a silent dependency of a *shared* component.
+Nothing links the two: the JS loads fine, the modal builds fine, and the failure only shows on
+the page nobody tests. It also leaned on that file's generic `.modal` / `.modal-content` /
+`.btn-cancel` **and** its global `* { box-sizing: border-box }` — no stylesheet on the AE page
+declares one, which by itself moved the panel 960px → 945px.
+
+**Fix** (`d78e1391`). `dashboards/css/sanmar-inbound.css`, loaded by every host page. Block moved
+**verbatim** (byte-identical, diffed), plus a scoped border-box reset and restatements of
+`.modal`/`.modal-content`/`.btn-cancel` at `.modal.sit-modal` specificity (0,2,0) so they win
+regardless of load order — self-contained, no dependency on any other sheet.
+
+**Prevention.**
+- **A shared JS component owns a stylesheet of the same name, loaded by every page that loads
+  the JS.** Styles for `foo.js` never live in `some-page.css`. Grep for other offenders.
+- **Verify a CSS refactor by computed-style diff, not by eye.** Snapshotting 519 elements × 41
+  properties across three configurations (pre-split re-injected inline, and each new host page)
+  proved 0 differences on quote-management.html — and caught a `font-family` I had "helpfully"
+  pinned, which would have silently restyled the whole modal.
+- **What a modal inherits is part of its contract**: `box-sizing`, `color`, `font-family` all
+  came from the host page. List them explicitly before moving a component between hosts.
+
+---
+
+## Deleting a `requireStaff` route can UNGATE the file, not remove it (2026-07-29)
+
+**Problem.** Retiring `/calculators/sticker-manual-pricing.html` meant deleting its
+`app.get([...], requireStaff, …)` route. That route was the *only* thing gating a page whose AI
+drawer could return customer email, phone, address, sales rep and payment terms.
+
+**Root cause.** `app.use('/calculators', express.static(...))` is mounted a few lines below it.
+The gated route existed *because* it sits earlier in the stack and wins. Remove it and the request
+falls through to the static mount, which cheerfully serves the same file **to anyone** — so the
+"removal" would have silently converted a staff-only page into a public one. The file was staying
+on disk (flag-don't-delete policy), which is exactly what makes this reachable.
+
+**Fix.** An explicit tombstone route at the old paths returning **410** with a signpost to the
+replacements. Verified by status code, not by reading the diff: `410`, not `200`.
+
+**Prevention.** **Before deleting any route, check whether a `static` mount covers its path.** If
+one does, the route is load-bearing access control and deleting it is a privilege escalation, not
+a cleanup — replace it with a tombstone or delete the file too. Same trap as the 2026-07-29
+`express.static('.')` repo-root exposure, one layer down: *static mounts serve whatever the router
+didn't claim.* Grep `app.use\(.*express.static` and compare against the path you're removing.
+
+---
+
 ## A closed `<details>` still reports its old size — `checkVisibility()`, not `getBoundingClientRect()` (2026-07-29)
 
 **Problem.** A layout test asserted that collapsing the Pride Wall hid its photo track:
@@ -75,12 +130,57 @@ building: have the "Print for…" flow force `load(true, viewDate)` first, or su
 when `generatedAt` predates the last shipment sync. Same trap applies to Box Labels — labels
 printed at 3:57 AM would have been 5 cartons short.
 
+**Fixed 2026-07-29** (`b97868e2`): Print for…, Box Labels and the per-box label button all call
+`syncBeforeOutput()` first — force `refresh=true`, re-render, then build the sheet — with a
+2-minute freshness window so a printing session costs ONE re-pull, not one per sheet. A failed
+re-pull shows an alert strip and prints **nothing**.
+
 **Related drift found the same day (not fixed).** The calendar heat-map (`/daily-inbound`) and
 the detail modal (`/inbound-today`) disagree on the *same* day: 7/29 = 13 PO / 478 pcs on the
 calendar vs 12 PO / 877 pcs in the detail; PO 113805 sits on 8/4 in the calendar and 8/3 in the
 detail. Calendar buckets on ship-date + transit **estimate** and sums the PO items table;
 the detail view uses **UPS's real delivery date** and live carton contents. Clicking a "13 PO"
 day and getting 12 reads as a bug to staff.
+
+---
+
+## Two syncs land AFTER the 4 AM inbound print — the second one blanked the box labels (2026-07-29)
+
+**Problem.** POs 113825 and 113834 printed as **"Unmatched"** on the inbound sheet and, worse,
+on the receiving box label: no company, no due date, no design, no contact, no rep, method
+"Other". They were real orders — Stella Jones and All The Bases Youth Sports.
+
+**Root cause.** Same shape as the carton lag above, different sync. `scripts/sync-manageorders.js`
+runs on **Heroku Scheduler at 12:00 UTC = 5:00 AM PT**, an hour *after* the report prints, so a
+work order written yesterday afternoon has no `ManageOrders_Orders` row when the sheet is built.
+`inbound-today` reads only that archive, so it had nothing to show. `PurchaseOrders` resolves the
+WO **number** but carries no customer (its only name column is `VendorName` = SanMar), which is
+why the WO printed while the company didn't.
+
+**Fix** (`a0e2bc6`). For any arriving work order missing from the archive, pull it from the
+**live ManageOrders API** (`fetchOrderByNumber`). The API returns the *same field names* as the
+Caspio columns, so rows drop into `moByIdOrder` unchanged. Pooled 4-at-a-time, capped at 25 per
+request with a `console.warn` when it truncates — a silent cap would read as "nothing was
+missing" when the sync is down.
+
+**Prevention.**
+- **Anything printed at ~4 AM is upstream of both syncs.** Before trusting a field on that sheet,
+  ask which table feeds it and when that table is written — shipments ~4 AM, ManageOrders 5 AM.
+- **A staff-facing view should not be limited to the archive's freshness** when the live source is
+  one call away and the miss count is small. Archive first, live for the remainder.
+- Two independent bugs, one date, one cause: *our copy* of the truth lagged the truth.
+
+### The UI harness stalled because printing became async
+
+Making print `await` a refresh broke `tests/ui/test-inbound-print.js`, which read
+`#sit-print-sheet` on the same tick as the click. Converting it to `setInterval` polling then
+stalled at profile 3 in a way that looked like an app bug — it wasn't. **A backgrounded tab
+throttles `setInterval` to ~1 s and then to a crawl**, so a polling harness hangs while the page
+underneath is perfectly healthy. `MutationObserver` fires on the DOM change regardless of tab
+visibility — use it, never a timer, to wait for a node in a UI harness. (Second time this class
+of trap has cost a debugging session; the first was throttled CSS transitions.) Also: wait for a
+*new* node — the previous profile's sheet lingers until its 1500 ms cleanup, so "a sheet exists"
+silently clones the previous profile.
 
 ---
 
@@ -165,50 +265,10 @@ DOWN, and under-reporting always reads as "we're fine".
 
 ## A CSS specificity TIE pinned the Administration menu permanently open (2026-07-28)
 
-**Problem.** Erik reported the Administration sub-menus couldn't be closed. The section's
-chevron flipped to the collapsed arrow, but all 5 sub-group rows stayed on screen. Shipped
-in v2026.07.28.4.
-
-**Root cause.** Giving the admin section more room for its sub-groups:
-
-```css
-.nav-section.collapsed .nav-section-content        { max-height: 0; }      /* (0,3,0) */
-.nav-section[data-section="admin"] > .nav-section-content { max-height: 1400px; } /* (0,3,0) */
-```
-
-Both are **three class-level selectors** — an attribute selector weighs the same as a class,
-which is easy to misread as "more specific because it's longer". Equal specificity → source
-order decides → the later `1400px` rule won *even while `.collapsed` was applied*. The class
-toggled, `aria-expanded` flipped, the chevron rotated; only the height never changed.
-
-**Solution.** Scope the raise to the open state so it can't compete with the collapse rule:
-`.nav-section[data-section="admin"]:not(.collapsed) > .nav-section-content`. `:not()` adds
-specificity AND makes the rule inapplicable when collapsed — belt and braces.
-
-**Prevention.**
-- **Never let an override tie the rule it must not beat.** When adding a per-section override
-  next to a state rule (`.collapsed`, `.active`, `.is-open`), either scope it with `:not(<state>)`
-  or place it BEFORE the state rule. Count specificity properly: `[attr]` == `.class`.
-- **A UI test that only opens things proves nothing about closing.** The harness passed the
-  whole time because every assertion expanded and measured. The bug lived entirely in the
-  closed state. Assert both directions — "it opens" is half a contract.
-- **Symptom shape is a tell:** class/ARIA/chevron all correct but geometry wrong ⇒ the JS is
-  fine, a CSS rule is winning. Enumerate matching rules with `el.matches(r.selectorText)` over
-  `document.styleSheets` rather than eyeballing the file.
-
-### Stale-cache QA: the harness verified files that no longer existed
-
-Twice in one sitting the browser served cached copies while the fix sat on disk — an edited
-module kept reporting its OLD assertion count, then a fixed stylesheet kept computing the OLD
-`max-height`. **Neither a reload, `location.reload(true)`, nor a forced navigation evicts a
-cached ES module or stylesheet — they're keyed by URL.** For a harness whose job is asserting
-on computed CSS this manufactures confidence, which is worse than no harness.
-
-Fix: `tests/ui/test-admin-nav-boot.js` — a shim that never changes (so caching it is harmless),
-re-points every stylesheet at a timestamped URL, waits for them to apply, then imports the
-harness with the same stamp. The HTML document can still 304 with a stale `<script src>`;
-load it as `?bust=<anything>` when the assertion count looks wrong. **Always confirm what the
-SERVER returns (`curl`) before concluding a fix didn't work.**
+Full entry archived to `LESSONS_LEARNED_ARCHIVE.md`. Durable part: **two rules with EQUAL
+specificity are resolved by source order, so a later `max-height: none` silently beat the
+collapse** — when a CSS edit appears to do nothing, count specificity AND check what comes
+after it. See also the `@layer`-vs-unlayered entry above.
 
 ---
 
@@ -223,58 +283,7 @@ entry is almost always wrong; it freezes the regression as acceptable.
 
 ## RBAC: an unlisted page defaults to OPEN, so half the Administration menu was public to staff (2026-07-28)
 
-**Problem.** The staff dashboard's Administration menu held 18 links shown to every logged-in
-staffer. Ten had a hard route gate (`requireCrmRole(['admin'])` / `requireCrmEmail`), but
-eight did not — Blog Editor, SEO Strategy, API Usage, SanMar Payables, Commission Structure,
-Bandit Integration, Policy Migration, Universal Records Admin. Any staffer could open them.
-Two APIs were worse than the pages: `/api/crm-proxy/blog-posts*` (publishes to the PUBLIC
-website) and the `/api/staff/sanmar-invoices/*` + `/api/staff/shopworks-payables` feeds were
-only `requireStaff`.
-
-**Root cause.** `gateStaffPage` resolves a page with no `Staff_Page_Access` row to *"any
-logged-in staff"* (`if (!rule) return true`). That's the correct default for the ~100 ordinary
-staff pages, and it's why the table-driven design is pleasant to use — but it means security
-depends on someone **remembering** to add a Caspio row. Nothing in the code, the menu, or a
-test said a row was missing. A forgotten row failed OPEN and looked identical to a deliberate
-decision. The client had no role signal at all, so the menu rendered all 18 links for everyone.
-
-**Solution.**
-- Extracted the decision to `lib/page-access.js` (the `lib/cors-allowlist.js` precedent) and
-  added `ADMIN_DEFAULT_PAGES` — the 18 Administration pages. For that set only, no row now
-  means **admin-only** instead of any-staff. The Caspio table still wins, so widening is still
-  a no-deploy edit in Access Admin.
-- `gateStaffPage`'s error path used to fail open for everything; admin pages now fail closed.
-- Gave the exposed APIs the same page/API-twin gate payroll already used:
-  `requirePageAccess('blog-editor.html')` and `requirePageAccess('sanmar-payables.html')` —
-  one Caspio row governs a page and its data, so they can't drift.
-- Sidebar: `data-requires-role="admin"` + `hidden`, resolved by `nav-access-controller.js`.
-
-**Prevention.**
-- `tests/unit/admin-page-access.test.js` has a **drift lock**: it parses the Administration
-  menu out of `staff-dashboard-v3/index.html` and fails if the menu and `ADMIN_DEFAULT_PAGES`
-  disagree in *either* direction. A new admin page cannot land in the sidebar without an
-  access rule behind it, and a retired one can't rot in the list.
-- Rule of thumb: **gating a page is only half the job — gate the API that feeds it too.**
-  A page gate stops the UI; only the API gate stops a direct request.
-
-### Gotchas found while fixing this
-
-- **`[hidden]` does not hide `.nav-section`.** `base.css` sets `.nav-section { display: flex }`,
-  which outranks the UA `[hidden]` rule — the block stayed visible. Needs an explicit
-  `[data-requires-role][hidden] { display: none !important; }`.
-- **Hide is not enough — remove.** `command-palette-controller.js` harvests its Ctrl+K registry
-  from the live DOM on every open. A merely-hidden admin link is still searchable by name.
-- **Sidebar `aria-expanded` was decorative.** The markup shipped `aria-expanded="false"` and
-  `toggleSection` never updated it, so screen readers were told every section was collapsed
-  while open — and the `[aria-expanded="true"]` rule in `dashboard-v3-theme.css` never fired.
-  Now synced in `sidebar-controller.js`.
-- **New `.nav-section` headers render as a solid green square** unless they get a
-  `data-section`-specific `mask-image` — `.nav-section-title > span[aria-hidden]:first-child`
-  masks the emoji slot. Sub-group headers dodge this by having no leading icon span.
-- **A backgrounded tab throttles CSS transitions.** With `document.visibilityState === 'hidden'`
-  a `max-height` transition never advances, so a timing-based UI assertion reads the START
-  value forever and "fails" a perfectly correct stylesheet. Disable transitions in UI harnesses
-  (`.qa-no-motion`) and force a reflow instead of sleeping.
-- **A `max-height` collapse still reports a non-zero bounding box** for clipped children
-  (`overflow: hidden`). Counting "visible" rows by height over-counts; walk up to the nearest
-  collapsible ancestor and check its computed `max-height`.
+Full entry archived to `LESSONS_LEARNED_ARCHIVE.md`. The durable parts now live in CLAUDE.md's
+Security Checklist: **an unlisted page defaults to any-logged-in-staff, so a new restricted page
+needs a `Staff_Page_Access` row (or a spot in `ADMIN_DEFAULT_PAGES`)** — and **gating a page is
+half the job; gate the routes that feed it with `requirePageAccess` too.**

@@ -529,7 +529,9 @@
     document.body.appendChild(sheet);
     return sheet;
   }
-  function printProfile(kind, arg) {
+  async function printProfile(kind, arg) {
+    // Re-pull before rendering — see syncBeforeOutput(). Aborts the print on failure.
+    if (!(await syncBeforeOutput(modalEl && modalEl.querySelector('#sit-print')))) return;
     if (!lastData) return;
     const builder = PRINT_BUILDERS[kind] || PRINT_BUILDERS.full;
     renderPrintSheet(builder(lastData, arg));
@@ -649,17 +651,37 @@
     window.print();
     setTimeout(() => { if (document.body.classList.contains('sit-label-printing')) cleanup(); }, 1500);
   }
-  function printAllLabels() {
+  async function printAllLabels() {
+    // Same rule as the reports: a label run printed off a stale payload is short exactly the
+    // cartons that landed overnight — the ones receiving is least expecting.
+    if (!(await syncBeforeOutput(modalEl && modalEl.querySelector('#sit-labels')))) return;
     if (!lastData) return;
     // Received POs are already counted in — no receiving label needed.
     printLabels((lastData.orders || []).filter(o => !o.received).flatMap(boxesForOrder));
   }
 
+  // The "Print for…" button is only meaningful when there is something to print.
+  function syncOutputButtons() {
+    const printBtn = modalEl && modalEl.querySelector('#sit-print');
+    if (printBtn) printBtn.disabled = !lastData || !(lastData.orders && lastData.orders.length);
+  }
   function setContent(html) {
     const body = modalEl.querySelector('#sit-body');
     if (body) body.innerHTML = html;
-    const printBtn = modalEl.querySelector('#sit-print');
-    if (printBtn) printBtn.disabled = !lastData || !(lastData.orders && lastData.orders.length);
+    syncOutputButtons();
+  }
+
+  // Modal-level alert strip — used when an action fails but the view is worth keeping
+  // (an error rendered into #sit-body would throw away the report the user is looking at).
+  function showBanner(msg) {
+    const b = modalEl && modalEl.querySelector('#sit-banner');
+    if (!b) return;
+    b.innerHTML = `<i class="fas fa-triangle-exclamation"></i> <span>${esc(msg)}</span>`;
+    b.hidden = false;
+  }
+  function hideBanner() {
+    const b = modalEl && modalEl.querySelector('#sit-banner');
+    if (b) { b.hidden = true; b.innerHTML = ''; }
   }
 
   // Attach a logo thumbnail URL to each order from its design number (ShopWorks design-thumbnail
@@ -788,20 +810,66 @@
     else showCalendar();
   }
 
+  // The one place that talks to the inbound endpoint. `refresh` bypasses the server's
+  // 10-minute response cache — the only way to be certain a late-syncing carton is included.
+  async function fetchInbound(refresh, dateStr) {
+    const params = [];
+    if (refresh) params.push('refresh=true');
+    if (dateStr) params.push('date=' + encodeURIComponent(dateStr));
+    const url = `${API_BASE}/api/sanmar-orders/inbound-today${params.length ? '?' + params.join('&') : ''}`;
+    const resp = await fetch(url);
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const data = await resp.json();
+    if (data.error) throw new Error(data.error);
+    await attachLogos(data);
+    return data;
+  }
+
+  // ── Anything that leaves the screen re-pulls from SanMar first ──
+  // The payload behind an open modal goes stale on its own: SanMar's overnight shipment sync
+  // writes the previous evening's WA-warehouse cartons into Caspio around 4 AM, and this
+  // endpoint is server-cached for 10 minutes. On 2026-07-29 the daily report printed at
+  // 3:57 AM was built from a 3:56:56 payload and went out 4 POs / 5 boxes / 126 pieces short
+  // — every one of them already scanned by UPS for that same morning. Paper has no Refresh
+  // button, so the refresh happens here, at the moment of printing.
+  // OUTPUT_FRESH_MS keeps a printing session (full sheet + role sheets + labels) to ONE
+  // re-pull rather than one per sheet — `refresh=true` re-runs UPS + SanMar's box feed per PO.
+  const OUTPUT_FRESH_MS = 120000;
+  function dataAgeMs() {
+    const t = lastData && Date.parse(lastData.generatedAt || '');
+    return Number.isFinite(t) ? Date.now() - t : Infinity;
+  }
+  async function syncBeforeOutput(btn) {
+    if (lastData && dataAgeMs() < OUTPUT_FRESH_MS) return true;
+    const restore = btn ? btn.innerHTML : '';
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-rotate fa-spin"></i> Re-checking SanMar…'; }
+    try {
+      const data = await fetchInbound(true, viewDate);
+      lastData = data;
+      viewDate = data.date;
+      updateDateUI(data.date);
+      if (!calOpen) setContent(renderBody(data));
+      hideBanner();
+      return true;
+    } catch (err) {
+      // Never-Break Rule #4 — a silently stale receiving sheet is worse than no sheet.
+      // Say what failed, print nothing, and leave the report on screen to try again.
+      console.error('[SanMarInbound] Pre-print refresh failed:', err);
+      showBanner(`Couldn't re-check SanMar before printing (${err.message}) — nothing was printed, because the list on screen may be out of date. Try again once the connection is back.`);
+      return false;
+    } finally {
+      if (btn) { btn.innerHTML = restore; btn.disabled = false; }
+      syncOutputButtons();
+    }
+  }
+
   async function load(refresh, dateStr) {
     lastData = null;
     calOpen = false;
+    hideBanner();
     setContent('<div class="sit-loading"><i class="fas fa-spinner fa-spin"></i> Loading inbound…</div>');
     try {
-      const params = [];
-      if (refresh) params.push('refresh=true');
-      if (dateStr) params.push('date=' + encodeURIComponent(dateStr));
-      const url = `${API_BASE}/api/sanmar-orders/inbound-today${params.length ? '?' + params.join('&') : ''}`;
-      const resp = await fetch(url);
-      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-      const data = await resp.json();
-      if (data.error) throw new Error(data.error);
-      await attachLogos(data);
+      const data = await fetchInbound(refresh, dateStr);
       lastData = data;
       viewDate = data.date;
       updateDateUI(data.date);
@@ -879,6 +947,7 @@
             <button class="sit-close" id="sit-close" aria-label="Close">&times;</button>
           </div>
         </div>
+        <div class="sit-banner" id="sit-banner" role="alert" hidden></div>
         <div id="sit-body"></div>
       </div>`;
     document.body.appendChild(modalEl);
@@ -913,11 +982,19 @@
       if (!btn || !lastData) return;
       const po = btn.getAttribute('data-po');
       const boxNo = parseInt(btn.getAttribute('data-box'), 10) || 1;
-      const order = (lastData.orders || []).find(o => o.sanmarPO === po);
-      if (!order) return;
-      const all = boxesForOrder(order);
-      const pick = all.filter(p => p.boxNo === boxNo);
-      printLabels(pick.length ? pick : all.slice(0, 1));
+      // Re-pull, THEN resolve the PO and box again from the fresh payload — a single box label
+      // is as wrong as a whole sheet if the carton list moved underneath it.
+      syncBeforeOutput(btn).then(ok => {
+        if (!ok || !lastData) return;
+        const order = (lastData.orders || []).find(o => o.sanmarPO === po);
+        if (!order) {
+          showBanner(`SanMar PO ${po} is no longer arriving ${fmtDate(viewDate)} — the list was just re-checked and it moved. Nothing was printed.`);
+          return;
+        }
+        const all = boxesForOrder(order);
+        const pick = all.filter(p => p.boxNo === boxNo);
+        printLabels(pick.length ? pick : all.slice(0, 1));
+      });
     });
     document.addEventListener('keydown', (e) => {
       if (e.key !== 'Escape' || !modalEl || modalEl.style.display === 'none') return;
