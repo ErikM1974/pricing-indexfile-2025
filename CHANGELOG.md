@@ -1,3 +1,7 @@
+## v2026.07.29.5 (2026.07.29)
+
+- Lessons: sweep the family after a security fix; audits vs test layers
+
 ## v2026.07.29.4 (2026.07.29)
 
 - Route all six AI chats through a session-gated forwarder
