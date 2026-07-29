@@ -1,3 +1,14 @@
+## v2026.07.29.1 (2026.07.29)
+
+- Lessons: an audit that read our own broken meter as ground truth
+- Lessons: the 4 AM inbound printout misses the WA cartons that sync in at ~4:02
+- Dashboard: derive Quick Access count badges, remember collapsed widgets
+- Dashboard CSS: one owner for the Quick Access grid, styles for the reorg
+- Dashboard: 10 tool cards to 6, one Pricing card, shorter Frequently Used
+- Add Quick Access layout harness; document the reorg
+- Lessons: content-visibility hides geometry, @layer loses to unlayered
+- Deploy v2026.07.29.1: 1 files (test-embroidery-bonus.html,...)
+
 ## v2026.07.28.9 (2026.07.28)
 
 - Production Shifts: move Ruthie's lunch to 12:30 PM for WAC compliance
