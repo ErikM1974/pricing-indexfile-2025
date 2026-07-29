@@ -92,7 +92,7 @@ ODBC does NOT do: images/attachments (Box/mockup flows unaffected), writes (keep
 - **Agent**: `C:\NWCA\odbc-sync\sync-purchase-orders.ps1` on bandit (master: `caspio-pricing-proxy/scripts/bandit-agent/sync-purchase-orders.ps1` — edit THERE, recopy). Task Scheduler **`NWCA ShopWorks ODBC PO Sync`**, every 15 min as SYSTEM (mirrors the Order Sync task). **Reuses the SAME `config.json`** (ProxyBase/CrmApiSecret/Dsn); SEPARATE state `last-sync-po.txt` + log `sync-purchase-orders.log`. Delta on `timestamp_Modification` (24h first run — history already in table via legacy CSV).
 - **Proxy**: `POST /api/shopworks-odbc/sync-purchase-orders` (x-crm-api-secret, `?dryRun=true`) + `GET /po-health` + `POST /po-health/alert`, added to `src/routes/shopworks-odbc-sync.js` (v-latest 2026-07-17). Upsert `PurchaseOrders` by **ID_PO** (PUT-by-where→0→INSERT, no dupes vs CSV). 18-col whitelist aliased from ODBC `PO` table (`ct_VendorName AS VendorName`, `cnCur_TotalInvoice AS TotalInvoice`, `timestamp_Modification AS date_Modification`, etc.). Type-coerced (INTEGER cols rounded, DATE ''→null). **`Slack_Notified` enrichment NEVER written** (owned by check-transfers-received cron). Shared `stampHeartbeat`/`computeHealth` generalized w/ `syncName` param (default = orders, backward-compat).
 - **VERIFIED LIVE 2026-07-17**: dry-run probe (5 rows, clean field map) → real first run **22 POs (3 ins/19 upd/0 err)** → 2nd run delta **2 POs** → SYSTEM task run exit 0. `po-health` = fresh. Heartbeat `Sync_Name='shopworks-odbc-purchase-orders'` in `Sync_Heartbeats`.
-- **⏳ ERIK**: add Heroku Scheduler entry hitting `POST /api/shopworks-odbc/po-health/alert` every ~30 min (Slack DM on stale) — like the order sync's health check. Parallel-runs with legacy daily "Purchase Orders Export" CSV; retire that CSV after a trust window.
+- **⏳ ERIK**: add Heroku Scheduler entry hitting `POST /api/shopworks-odbc/po-health/alert` every ~30 min (Slack DM on stale) — like the order sync's health check. ~~Parallel-runs with legacy daily "Purchase Orders Export" CSV; retire that CSV after a trust window.~~ **✅ RETIRED — confirmed 2026-07-29.** The bandit `NWCA Purchase Orders Export to OneDrive` task was disabled 2026-07-17, no export task exists on the box today (verified by `schtasks` — only the 5 ODBC syncs + 2 thumbnail tasks), and Erik confirmed the Caspio-side CSV import no longer runs. **`sync-purchase-orders.ps1` is now the ONLY writer of `PurchaseOrders`**, which is what made the content dedupe safe to apply.
 - **KEY DATA FINDING 2026-07-17**: all 7 of today's SanMar POs (Shio Sushi 113664, Chris Holstrom 113651/113660, etc.) = `sts_Received=0`/`date_Received=NULL` in ShopWorks, none modified today → the **PO-receiving count-in was never recorded in ShopWorks** (despite Ruthie saying received). Feature is correct; they'll drop within 15 min once Mikalah receives the PO in ShopWorks. ⚠ ALSO NOTED (separate, unconfirmed): dashboard shows Shio Sushi=WO 142238 but ShopWorks PO 113664→id_Order **142449** (SanMar_Orders vs PurchaseOrders WO-link disagree) — possible matching bug, investigate.
 
 ## 💵 Caspio quota: bandit cadence + overlap changes (2026-07-26, $358 overage)
@@ -166,9 +166,16 @@ $0.002/call. **~24% of the entire quota traced to one bandit task.**
   NORMAL steady state. Health is `reason: fresh` + `ageMin`, not row count; the
   per-run log line `dedupe: N to send, M unchanged` shows real activity.
   `sync-orders.ps1 -DryRun` logs every send/skip decision and posts nothing.
-  **Not applied to `sync-purchase-orders.ps1`** — the backup documents a legacy
-  daily "Purchase Orders Export" CSV chain writing to the same table; confirm it
-  is retired before deduping PO, or the agent stops correcting what the CSV writes.
+  **✅ Applied to `sync-purchase-orders.ps1` too, 2026-07-29**, once the legacy
+  "Purchase Orders Export" CSV chain was confirmed retired (see above) — that
+  check mattered, because a second writer would have meant the agent was silently
+  correcting the CSV's writes, and dedupe would have stopped it doing so.
+  Same three-step proof on bandit: dry run, real run `2 to send → posted 2`,
+  immediate re-run `0 to send, 2 unchanged → posted 0`. State file
+  `last-sent-po.json`, keyed `ID_PO`.
+  ⚠️ **Do not name a PowerShell variable `$pid`** — it is a READ-ONLY automatic
+  variable (current process id) and assigning to it throws at runtime. Caught
+  during implementation; the PO loop uses `$poId`.
   Thumbnail-metadata also gained a `ThumbMetaOverlapMinutes` override; it sits at
   overlap 30 / cadence 30 = **zero slack**, left as-is because any value >30 doubles
   its writes. Raise to ~45 only if rows are observed going missing.

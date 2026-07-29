@@ -14,7 +14,7 @@
 
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/bandit-integration.css?v=2026.07.29.1">
+    <link rel="stylesheet" href="/dashboards/css/bandit-integration.css?v=2026.07.29.2">
 </head>
 <body>
     <div class="dash-shell">
@@ -100,7 +100,8 @@
                     <p><b>✅ Content dedupe (2026-07-29) — the overlap is now free, so stop trying to shorten it.</b>
                     <code>ORDER_ODBC</code> was measured at <b>55% of all Caspio calls</b> on a fresh web dyno. <code>sync-orders.ps1</code> now keeps a SHA-1 of exactly what it last sent per order in <code>last-sent-orders.json</code> and skips rows whose content is unchanged. Proven on bandit against live data: first run <code>2 to send, 0 unchanged → posted 2</code>; immediately re-run inside the same overlap window, <code>0 to send, 2 unchanged → posted 0</code>.<br>
                     <b>The overlap was NOT reduced</b> — it is the clock-skew and long-transaction safety net, and the dedupe delivers the same saving without spending it. Two guards that must survive any edit: a <b>capped run bypasses the dedupe entirely</b> (state is not advanced on a cap and <code>FETCH FIRST</code> has no <code>ORDER BY</code>, so deduping there would post <code>rows:[]</code> and stamp a <b>green heartbeat over a stalled sync</b>), and the state-advance test reads <code>$capped</code>, never the post-filter row count. Run with <code>-DryRun</code> to log every send/skip decision and post nothing.<br>
-                    <b>Monitoring note:</b> <code>lastRows: 0</code> on <code>/api/shopworks-odbc/health</code> is now the NORMAL steady state. Health is <code>reason: fresh</code> + <code>ageMin</code>, not row count. The per-run log line <code>dedupe: N to send, M unchanged</code> is where the real activity shows.</p>
+                    <b>Monitoring note:</b> <code>lastRows: 0</code> on <code>/api/shopworks-odbc/health</code> is now the NORMAL steady state. Health is <code>reason: fresh</code> + <code>ageMin</code>, not row count. The per-run log line <code>dedupe: N to send, M unchanged</code> is where the real activity shows.<br>
+                    <b>PO Sync got the same treatment</b> (state file <code>last-sent-po.json</code>, keyed <code>ID_PO</code>) once the legacy <b>"Purchase Orders Export" CSV chain was confirmed retired on 2026-07-29</b> — the bandit export task was disabled 2026-07-17, no export task exists on the box today, and the Caspio-side import no longer runs. That check was the precondition: with a second writer still active, the agent would have been silently correcting the CSV's writes and dedupe would have stopped it. <code>sync-purchase-orders.ps1</code> is now the <b>only</b> writer of <code>PurchaseOrders</code>. Proven the same way: <code>2 to send → posted 2</code>, then <code>0 to send, 2 unchanged → posted 0</code>.</p>
                 </div>
             </section>
 
@@ -118,6 +119,7 @@
     sync-orders.ps1            last-sync.txt                 sync-orders.log
                                last-sent-orders.json         # content hashes (dedupe)
     sync-purchase-orders.ps1   last-sync-po.txt              sync-purchase-orders.log
+                               last-sent-po.json             # content hashes (dedupe)
     sync-contacts.ps1          last-snapshot-contacts.json   sync-contacts.log
     sync-designs.ps1           last-snapshot-designs.json    sync-designs.log
     sync-sales-reps.ps1        last-snapshot-reps.json       sync-sales-reps.log
