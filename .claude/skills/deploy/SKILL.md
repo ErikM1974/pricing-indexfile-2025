@@ -527,6 +527,32 @@ git push origin develop
 
 ---
 
+## The pre-push guard (enable it per clone)
+
+`main` is protected by a `pre-push` hook: a push to `refs/heads/main` is refused unless the tip
+commit's subject starts `Release v` or `Changelog v` — i.e. one this skill produced. It catches
+`git push origin main`, `git push heroku main` and `git push heroku develop:main` alike. Pushing
+`develop` is never blocked.
+
+Git never version-controls `.git/hooks/`, so a fresh clone starts with **no** hook. Point git at
+the tracked directory instead of copying files into it:
+
+```bash
+git config core.hooksPath scripts/git-hooks
+```
+
+Check yours: `git config core.hooksPath` should print `scripts/git-hooks`. If it's empty, **the
+guard is off** and a hand push to main will succeed silently.
+
+Two things to know:
+
+- **It's local config, not tracked.** One command per clone; nothing can make it automatic.
+- **It replaces `.git/hooks/` entirely, it doesn't merge.** Anything living only in `.git/hooks/`
+  stops running the moment you set it, and a hook that isn't executable (`chmod +x`, tracked as
+  mode `100755`) is skipped *silently*. **Any new hook goes in `scripts/git-hooks/`.**
+
+---
+
 ## Rollback Procedure
 
 Two steps, in order. Step 1 stops the bleeding in seconds and touches no git; Step 2 is how the
