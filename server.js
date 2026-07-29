@@ -3831,77 +3831,20 @@ app.post(
 );
 console.log('✓ Policies AI Assist proxy loaded (forwards to caspio-pricing-proxy/api/policies-ai-assist)');
 
-// =============================================================================
-// STICKER / BANNER AI ASSIST — streaming proxy to caspio-pricing-proxy.
+// STICKER / BANNER AI ASSIST — REMOVED 2026-07-29.
 //
-// SECURITY (2026-07-24): the browser used to call the proxy's
-// /api/contract-sticker-ai/chat DIRECTLY, and that endpoint was mounted with no
-// authentication at all. Its lookup_customer tool returns company, contact name,
-// email, phone, street address, sales rep, payment terms and last-ordered date —
-// five matches for any two-character query. Anyone on the internet could read
-// the customer list with curl.
+// This was `POST /api/sticker-ai/chat`, a session-gated streaming forwarder to
+// the proxy's /api/contract-sticker-ai/chat. It existed only to serve the AI
+// quote drawer on /calculators/sticker-manual-pricing.html; that page was
+// retired the same day (its URLs now 410), leaving the endpoint with zero
+// callers while still able to reach a lookup_customer tool that returns
+// customer name, email, phone, address, sales rep and payment terms. A
+// PII-capable endpoint nobody calls is attack surface, not a spare part.
 //
-// The fix is the one src/middleware/index.js:70 names as the airtight option:
-// the browser can't hold a server secret, so route it through the app, which
-// can. requireStaff proves a SAML session here; CRM_API_SECRET authenticates us
-// to the proxy server-to-server. Anonymous callers now fail at BOTH hops.
-//
-// Same client contract as before: POST returns text/event-stream with
-// delta / tool_result / done / error events.
-//
-// ⚠️ DEPLOY ORDER: ship THIS app first, then the proxy's secret gate. The
-// reverse order breaks the staff page for as long as the two are out of step
-// (MEMORY.md: "never flip secret-only until every caller repointed" — bit 3×).
-//
-// 🔻 ORPHANED 2026-07-29 — its only caller was sticker-pricing-page.js, retired
-// with /calculators/sticker-manual-pricing.html. Nothing in the repo POSTs here
-// any more (grep: `sticker-ai`). Left mounted rather than removed per the
-// flag-don't-delete policy, and because the proxy side still expects it, but it
-// is a live PII-capable endpoint with zero consumers — a deliberate removal
-// candidate. If you kill it, drop the proxy's /api/contract-sticker-ai/chat too.
-// =============================================================================
-app.post(
-  '/api/sticker-ai/chat',
-  requireStaff,
-  express.json({ limit: '256kb' }),
-  async (req, res) => {
-    const target = `${CRM_API_BASE}/api/contract-sticker-ai/chat`;
-    try {
-      const upstream = await fetch(target, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'text/event-stream',
-          'X-CRM-API-Secret': CRM_API_SECRET
-        },
-        body: JSON.stringify(req.body || {})
-      });
-
-      res.status(upstream.status);
-      res.setHeader('Content-Type', upstream.headers.get('content-type') || 'text/event-stream');
-      res.setHeader('Cache-Control', 'no-cache, no-transform');
-      res.setHeader('Connection', 'keep-alive');
-      res.setHeader('X-Accel-Buffering', 'no');
-
-      if (!upstream.body) {
-        res.end();
-        return;
-      }
-      for await (const chunk of upstream.body) {
-        res.write(chunk);
-      }
-      res.end();
-    } catch (e) {
-      console.error('[sticker-ai proxy] error:', e.message);
-      if (!res.headersSent) {
-        res.status(502).json({ error: 'Upstream AI service unavailable', detail: e.message });
-      } else {
-        res.end();
-      }
-    }
-  }
-);
-console.log('✓ Sticker AI proxy loaded (session-gated, forwards to caspio-pricing-proxy/api/contract-sticker-ai/chat)');
+// The proxy's /api/contract-sticker-ai/chat still exists and is still gated by
+// CRM_API_SECRET, so removing this hop closes the browser-reachable path
+// without touching the proxy. Restore from git history if the AI drawer ever
+// comes back — and if it doesn't, drop the proxy route too.
 
 console.log('✓ CRM API proxy routes loaded (session-protected)');
 
