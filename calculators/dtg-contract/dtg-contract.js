@@ -525,7 +525,13 @@
        Same pattern as embroidery-contract.js (Round 11+).
        ===================================================== */
 
-    var AI_ENDPOINT = API_BASE_URL + '/api/contract-dtg-ai/chat';
+        // SAME-ORIGIN, deliberately (2026-07-29). This chat can reach a
+    // lookup_customer tool that returns customer email, phone, address, sales
+    // rep and payment terms, so it goes through the app's session-gated
+    // forwarder rather than straight to the proxy. The browser holds no
+    // credential; the app proves the SAML session and talks to the proxy with
+    // the server secret. Do NOT put API_BASE_URL back in front of this.
+var AI_ENDPOINT = '/api/contract-dtg-ai/chat';
     var QUOTE_PREFIX = 'CDTG';
     var aiState = {
         opened: false,
