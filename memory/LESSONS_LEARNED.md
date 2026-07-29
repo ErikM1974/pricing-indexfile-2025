@@ -5,6 +5,29 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## Deleting a `requireStaff` route can UNGATE the file, not remove it (2026-07-29)
+
+**Problem.** Retiring `/calculators/sticker-manual-pricing.html` meant deleting its
+`app.get([...], requireStaff, …)` route. That route was the *only* thing gating a page whose AI
+drawer could return customer email, phone, address, sales rep and payment terms.
+
+**Root cause.** `app.use('/calculators', express.static(...))` is mounted a few lines below it.
+The gated route existed *because* it sits earlier in the stack and wins. Remove it and the request
+falls through to the static mount, which cheerfully serves the same file **to anyone** — so the
+"removal" would have silently converted a staff-only page into a public one. The file was staying
+on disk (flag-don't-delete policy), which is exactly what makes this reachable.
+
+**Fix.** An explicit tombstone route at the old paths returning **410** with a signpost to the
+replacements. Verified by status code, not by reading the diff: `410`, not `200`.
+
+**Prevention.** **Before deleting any route, check whether a `static` mount covers its path.** If
+one does, the route is load-bearing access control and deleting it is a privilege escalation, not
+a cleanup — replace it with a tombstone or delete the file too. Same trap as the 2026-07-29
+`express.static('.')` repo-root exposure, one layer down: *static mounts serve whatever the router
+didn't claim.* Grep `app.use\(.*express.static` and compare against the path you're removing.
+
+---
+
 ## A closed `<details>` still reports its old size — `checkVisibility()`, not `getBoundingClientRect()` (2026-07-29)
 
 **Problem.** A layout test asserted that collapsing the Pride Wall hid its photo track:
