@@ -75,12 +75,57 @@ building: have the "Print for…" flow force `load(true, viewDate)` first, or su
 when `generatedAt` predates the last shipment sync. Same trap applies to Box Labels — labels
 printed at 3:57 AM would have been 5 cartons short.
 
+**Fixed 2026-07-29** (`b97868e2`): Print for…, Box Labels and the per-box label button all call
+`syncBeforeOutput()` first — force `refresh=true`, re-render, then build the sheet — with a
+2-minute freshness window so a printing session costs ONE re-pull, not one per sheet. A failed
+re-pull shows an alert strip and prints **nothing**.
+
 **Related drift found the same day (not fixed).** The calendar heat-map (`/daily-inbound`) and
 the detail modal (`/inbound-today`) disagree on the *same* day: 7/29 = 13 PO / 478 pcs on the
 calendar vs 12 PO / 877 pcs in the detail; PO 113805 sits on 8/4 in the calendar and 8/3 in the
 detail. Calendar buckets on ship-date + transit **estimate** and sums the PO items table;
 the detail view uses **UPS's real delivery date** and live carton contents. Clicking a "13 PO"
 day and getting 12 reads as a bug to staff.
+
+---
+
+## Two syncs land AFTER the 4 AM inbound print — the second one blanked the box labels (2026-07-29)
+
+**Problem.** POs 113825 and 113834 printed as **"Unmatched"** on the inbound sheet and, worse,
+on the receiving box label: no company, no due date, no design, no contact, no rep, method
+"Other". They were real orders — Stella Jones and All The Bases Youth Sports.
+
+**Root cause.** Same shape as the carton lag above, different sync. `scripts/sync-manageorders.js`
+runs on **Heroku Scheduler at 12:00 UTC = 5:00 AM PT**, an hour *after* the report prints, so a
+work order written yesterday afternoon has no `ManageOrders_Orders` row when the sheet is built.
+`inbound-today` reads only that archive, so it had nothing to show. `PurchaseOrders` resolves the
+WO **number** but carries no customer (its only name column is `VendorName` = SanMar), which is
+why the WO printed while the company didn't.
+
+**Fix** (`a0e2bc6`). For any arriving work order missing from the archive, pull it from the
+**live ManageOrders API** (`fetchOrderByNumber`). The API returns the *same field names* as the
+Caspio columns, so rows drop into `moByIdOrder` unchanged. Pooled 4-at-a-time, capped at 25 per
+request with a `console.warn` when it truncates — a silent cap would read as "nothing was
+missing" when the sync is down.
+
+**Prevention.**
+- **Anything printed at ~4 AM is upstream of both syncs.** Before trusting a field on that sheet,
+  ask which table feeds it and when that table is written — shipments ~4 AM, ManageOrders 5 AM.
+- **A staff-facing view should not be limited to the archive's freshness** when the live source is
+  one call away and the miss count is small. Archive first, live for the remainder.
+- Two independent bugs, one date, one cause: *our copy* of the truth lagged the truth.
+
+### The UI harness stalled because printing became async
+
+Making print `await` a refresh broke `tests/ui/test-inbound-print.js`, which read
+`#sit-print-sheet` on the same tick as the click. Converting it to `setInterval` polling then
+stalled at profile 3 in a way that looked like an app bug — it wasn't. **A backgrounded tab
+throttles `setInterval` to ~1 s and then to a crawl**, so a polling harness hangs while the page
+underneath is perfectly healthy. `MutationObserver` fires on the DOM change regardless of tab
+visibility — use it, never a timer, to wait for a node in a UI harness. (Second time this class
+of trap has cost a debugging session; the first was throttled CSS transitions.) Also: wait for a
+*new* node — the previous profile's sheet lingers until its 1500 ms cleanup, so "a sheet exists"
+silently clones the previous profile.
 
 ---
 
@@ -223,58 +268,7 @@ entry is almost always wrong; it freezes the regression as acceptable.
 
 ## RBAC: an unlisted page defaults to OPEN, so half the Administration menu was public to staff (2026-07-28)
 
-**Problem.** The staff dashboard's Administration menu held 18 links shown to every logged-in
-staffer. Ten had a hard route gate (`requireCrmRole(['admin'])` / `requireCrmEmail`), but
-eight did not — Blog Editor, SEO Strategy, API Usage, SanMar Payables, Commission Structure,
-Bandit Integration, Policy Migration, Universal Records Admin. Any staffer could open them.
-Two APIs were worse than the pages: `/api/crm-proxy/blog-posts*` (publishes to the PUBLIC
-website) and the `/api/staff/sanmar-invoices/*` + `/api/staff/shopworks-payables` feeds were
-only `requireStaff`.
-
-**Root cause.** `gateStaffPage` resolves a page with no `Staff_Page_Access` row to *"any
-logged-in staff"* (`if (!rule) return true`). That's the correct default for the ~100 ordinary
-staff pages, and it's why the table-driven design is pleasant to use — but it means security
-depends on someone **remembering** to add a Caspio row. Nothing in the code, the menu, or a
-test said a row was missing. A forgotten row failed OPEN and looked identical to a deliberate
-decision. The client had no role signal at all, so the menu rendered all 18 links for everyone.
-
-**Solution.**
-- Extracted the decision to `lib/page-access.js` (the `lib/cors-allowlist.js` precedent) and
-  added `ADMIN_DEFAULT_PAGES` — the 18 Administration pages. For that set only, no row now
-  means **admin-only** instead of any-staff. The Caspio table still wins, so widening is still
-  a no-deploy edit in Access Admin.
-- `gateStaffPage`'s error path used to fail open for everything; admin pages now fail closed.
-- Gave the exposed APIs the same page/API-twin gate payroll already used:
-  `requirePageAccess('blog-editor.html')` and `requirePageAccess('sanmar-payables.html')` —
-  one Caspio row governs a page and its data, so they can't drift.
-- Sidebar: `data-requires-role="admin"` + `hidden`, resolved by `nav-access-controller.js`.
-
-**Prevention.**
-- `tests/unit/admin-page-access.test.js` has a **drift lock**: it parses the Administration
-  menu out of `staff-dashboard-v3/index.html` and fails if the menu and `ADMIN_DEFAULT_PAGES`
-  disagree in *either* direction. A new admin page cannot land in the sidebar without an
-  access rule behind it, and a retired one can't rot in the list.
-- Rule of thumb: **gating a page is only half the job — gate the API that feeds it too.**
-  A page gate stops the UI; only the API gate stops a direct request.
-
-### Gotchas found while fixing this
-
-- **`[hidden]` does not hide `.nav-section`.** `base.css` sets `.nav-section { display: flex }`,
-  which outranks the UA `[hidden]` rule — the block stayed visible. Needs an explicit
-  `[data-requires-role][hidden] { display: none !important; }`.
-- **Hide is not enough — remove.** `command-palette-controller.js` harvests its Ctrl+K registry
-  from the live DOM on every open. A merely-hidden admin link is still searchable by name.
-- **Sidebar `aria-expanded` was decorative.** The markup shipped `aria-expanded="false"` and
-  `toggleSection` never updated it, so screen readers were told every section was collapsed
-  while open — and the `[aria-expanded="true"]` rule in `dashboard-v3-theme.css` never fired.
-  Now synced in `sidebar-controller.js`.
-- **New `.nav-section` headers render as a solid green square** unless they get a
-  `data-section`-specific `mask-image` — `.nav-section-title > span[aria-hidden]:first-child`
-  masks the emoji slot. Sub-group headers dodge this by having no leading icon span.
-- **A backgrounded tab throttles CSS transitions.** With `document.visibilityState === 'hidden'`
-  a `max-height` transition never advances, so a timing-based UI assertion reads the START
-  value forever and "fails" a perfectly correct stylesheet. Disable transitions in UI harnesses
-  (`.qa-no-motion`) and force a reflow instead of sleeping.
-- **A `max-height` collapse still reports a non-zero bounding box** for clipped children
-  (`overflow: hidden`). Counting "visible" rows by height over-counts; walk up to the nearest
-  collapsible ancestor and check its computed `max-height`.
+Full entry archived to `LESSONS_LEARNED_ARCHIVE.md`. The durable parts now live in CLAUDE.md's
+Security Checklist: **an unlisted page defaults to any-logged-in-staff, so a new restricted page
+needs a `Staff_Page_Access` row (or a spot in `ADMIN_DEFAULT_PAGES`)** — and **gating a page is
+half the job; gate the routes that feed it with `requirePageAccess` too.**
