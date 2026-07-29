@@ -1,3 +1,8 @@
+## v2026.07.29.4 (2026.07.29)
+
+- Route all six AI chats through a session-gated forwarder
+- Deploy v2026.07.29.4: cache-bust the six repointed AI callers
+
 ## v2026.07.29.3 (2026.07.29)
 
 - deploy skill: the documented rollback was blocked by our own pre-push hook
