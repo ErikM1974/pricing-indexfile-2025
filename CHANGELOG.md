@@ -1,3 +1,9 @@
+## v2026.07.29.3 (2026.07.29)
+
+- deploy skill: the documented rollback was blocked by our own pre-push hook
+- core.hooksPath: point git at the tracked hook instead of copying it in
+- Remove the orphaned /api/sticker-ai/chat forwarder
+
 ## v2026.07.29.2 (2026.07.29)
 
 - SanMar Inbound: every print and box-label run re-pulls from SanMar first
