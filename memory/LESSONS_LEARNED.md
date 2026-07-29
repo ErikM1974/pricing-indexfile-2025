@@ -37,6 +37,65 @@ regardless of load order — self-contained, no dependency on any other sheet.
 
 ---
 
+## A security fix landed on ONE route; six identical siblings sat open for 5 days (2026-07-29)
+
+**Problem.** Six proxy AI routes — `contract-embroidery-ai`, `contract-dtg-ai`, `contract-emblem-ai`,
+`contract-webstore-ai`, `dtg-quote-ai`, `emb-quote-ai` — each declare a `lookup_customer` tool
+returning company, contact, email, phone, address, sales rep, payment terms and last-ordered date,
+five matches for any 2-char query. All six were mounted with only a per-IP rate limiter. The
+customer list was readable with curl. Each request also spends Anthropic tokens, so it was an open
+tab on the bill as well.
+
+**Root cause.** The identical hole was found and fixed on `contract-sticker-ai` on 2026-07-24. The
+fix was applied to that one mount and stopped there. Nothing swept the siblings, and the file's own
+comment had been advertising the gap the whole time: *"These are unauthenticated … (Coarse guard;
+true protection is auth — TODO.)"* A TODO is not a ticket.
+
+**How it surfaced.** Only because a *removal* task made me diff the sticker route against its
+family. Nobody was looking for it.
+
+**Fix.** The sticker pattern, applied to all six: a session-gated forwarder per route in the app
+(`requireStaff` + `CRM_API_SECRET`, one loop, app path mirrors proxy path), each browser caller
+repointed to same-origin, then `requireCrmApiSecret` added to all six proxy mounts. App shipped
+first (v2026.07.29.4) then proxy (v2026.07.29.6) — reversed, every chat 401s until the app catches up.
+
+**Prevention.**
+- **A security fix on one member of a family is not done until you have swept the family.** Grep for
+  the shape (`app.use('/api/…-ai'`), not the instance. Sibling routes that "mirror" each other in a
+  header comment mirror each other's holes too.
+- **Probe, don't read.** An anonymous POST with an empty body told the whole story in one line: 401
+  on the gated route, `400 "messages array is required"` on the open ones — they answered strangers.
+  Status codes beat reading mount lines, and they cost nothing.
+- Don't demonstrate a PII hole by extracting PII. The mount line plus the 400-vs-401 split is proof.
+
+---
+
+## An audit said "zero coverage loss"; the only HTTP test of a live endpoint was in that file (2026-07-29)
+
+**Problem.** Removing `contract-sticker-ai` meant removing `sticker-quote-single-path.test.js`,
+which `require`s the route's `__testables`. Three independent audit passes all certified the deletion
+as "zero"/"nil" coverage loss, because `sticker-pricing.test.js` covers the same pricing rules.
+
+**Root cause.** It covers the same *engine*, by calling `loadGrid`/`quoteStickerFromGrid` directly.
+It never builds a req/res, so it cannot see the **route envelope** — and the envelope renames things:
+engine `kind` → wire `reason`; engine `bad_input` → wire `400 {error:'bad_request'}`; plus
+`pricePerSticker`, a wire-only money field matched by exactly one line in the whole test tree. That
+deleted file was the only test driving the real Express handler for `GET /api/sticker-pricing/quote`
+— live, customer-facing, behind the public `/custom-stickers` page.
+
+**Fix.** `git mv` to `sticker-quote-route-surface.test.js`: drop the AI-parity half (vacuous once
+there is one implementation), keep and sharpen the HTTP half. 16 tests, still green.
+
+**Prevention.**
+- **"Another test covers it" is a claim about a LAYER, not a file.** Before deleting a test, ask
+  which layer it drives — pure function, route handler, or wire. `rg -l "router.stack|req, res"` over
+  the test tree finds the handful that touch HTTP; they are rarely redundant.
+- **Have a skeptic try to REFUTE the audit, not confirm it.** Three passes agreed and were wrong in
+  the direction that ships risk; one adversarial pass instructed to default-to-refuted found it in
+  minutes. Agreement between agents that share a framing is not corroboration.
+
+---
+
 ## Deleting a `requireStaff` route can UNGATE the file, not remove it (2026-07-29)
 
 **Problem.** Retiring `/calculators/sticker-manual-pricing.html` meant deleting its
@@ -184,84 +243,14 @@ silently clones the previous profile.
 
 ---
 
-## An audit measured our own broken meter and declared us on budget (2026-07-28)
+## An audit measured our own broken meter, and our "day" was 7h off the vendor's (2026-07-28)
 
-**Problem.** An external code audit of Caspio call volume opened with "the cross-dyno rollup
-shows 16,055 calls on 7/27 vs the 16,129/day budget — the July fixes already took you from
-~22k to ~16k." Every savings estimate in it was then sized against that denominator. Caspio
-billed **23,959** that day. We were at ~132% of pace, not at it.
+Both archived to `LESSONS_LEARNED_ARCHIVE.md`. The durable pair: **before reconciling your number
+against a vendor's, match their clock** — check the timezone on their own report header first; a
+whole-day offset is indistinguishable from missing data. And **never treat your own meter as ground
+truth when auditing that meter** — under-reporting always reads as "we're fine".
 
-**Root cause.** 16,055 was our own meter's known-low reading — the exact figure recorded one
-entry below as the *under-count*. The audit read the number from `/api/admin/usage`, saw the
-field labelled `mode: "rollup"`, and treated it as cross-dyno truth. It was one row from one
-web dyno. The label was accurate about the code path and silent about the coverage.
-
-**Solution.** Re-anchored on Caspio's own billing page and re-derived every estimate from it.
-Then closed the biggest remaining hole: `sync-manageorders`, `check-zero-billing` and
-`sync-commissions` build their own Caspio URLs with raw axios and never load `api-tracker`.
-The global interceptor installs as a side effect of **loading** that module, so it attaches
-**per-process** — the docs claiming it catches "any process that talks to Caspio" were wrong;
-it catches any process that *loads the tracker*. ~950 calls/day were invisible.
-
-**Prevention.**
-- **A meter may not grade its own coverage.** Reconcile against the party that bills you,
-  every time, before quoting a number to anyone — including to a tool you asked for advice.
-- **A label describes a code path, not a guarantee.** `mode: "rollup"` was true and useless.
-  When a field asserts scope, make it carry the evidence: row count, dyno list, first/last
-  write. A scope claim nothing can falsify will eventually be believed while wrong.
-- **Give an outside auditor your known-wrong numbers up front.** This audit was competent —
-  it independently found the metering hole — but nobody told it the baseline was suspect, so
-  it anchored on it and mis-ranked everything downstream. The brief is part of the tool.
-- Sixth appearance this week of the same shape: **the error always points DOWN, and
-  under-reporting reads as "we're fine."**
-
-### The same audit's fixes had to be adversarially checked before shipping
-
-Three of six proposed fixes would have introduced a silent wrong answer, each in the
-"looks healthy, isn't" family — worth internalizing as a pattern, not three anecdotes:
-- **`Promise.allSettled` status is not a completeness test.** `fetchAllCaspioPages` *resolves*
-  with PARTIAL results when pagination fails mid-way, so `status === 'fulfilled'` is true for
-  a truncated read. Test the DATA (`length > 0`, expected keys present), never promise state.
-- **A cache TTL borrowed from a neighbour imports its freshness assumptions.** Reusing the
-  1-hour `STATIC_TABLE_TTL_MS` for `Pricing_Tiers`/`DTG_Costs` would have quadrupled staleness
-  on the tables Erik actually edits, and desynced DTG from `/api/pricing-bundle`, which reads
-  the same two tables at 15 min. Match the TTL to the sibling that shares the table.
-- **Failing only when EVERYTHING fails is failing open.** `/api/dtg/quote-pricing` 502'd only
-  when every bundle was missing. A partial set still answered 200 — `priceLines()` drops the
-  failing line but keeps its quantity in `combinedQty`, and the cart engine index-aligns items
-  to a now-shorter array. Under-stated subtotal *and* mis-attributed line items. The
-  any/all distinction in an error guard is a pricing decision.
-
-## Our "day" was 7 hours off the vendor's, and the offset looked like thousands of missing API calls (2026-07-28)
-
-**Problem.** Reconciling our Caspio call meter against Caspio's own usage chart showed a
-persistent 30-40% shortfall — 23,959 billed vs 16,055 measured on 27 Jul. A full day went
-into hunting the "missing" caller: audited Python Inksoft, the main app's runtime, every
-`fetch`/raw-HTTP path in the proxy, and the Caspio account's API profiles. All clean.
-
-**Root cause.** Two independent under-counts, and neither was an unknown integration.
-(a) Heroku Scheduler runs every `npm run sync-*` job as a **one-off dyno** that lives for
-seconds and exits via `process.exit(0)`. The rollup flushed on a 60-minute `setInterval`, so
-it never fired there and SIGTERM never arrived — the table held `web.1` rows and nothing
-else, hiding ~30% of traffic. (b) **Caspio buckets usage on the ACCOUNT timezone** — its
-Integrations log header reads literally `Log date (UTC-07:00)` — while we keyed days on UTC.
-Our "28 Jul" began at 5 PM Pacific on the 27th, so the two windows were never comparable.
-
-**Solution.** Flush on a **call-count threshold** (250) instead of a timer, so a trigger
-fires regardless of process lifetime; writes became **append-only deltas** (no read, no
-read-modify-write race between concurrent dynos); auto-start metering from `api-tracker` so
-any process talking to Caspio records, not just the one that loads `server.js`. And a single
-`utils/account-time.js` now owns "what day is it" (DST-aware `America/Los_Angeles`), used by
-the tracker, the rollup and the period window — they must agree, because the rollup looks
-days up by the tracker's own key.
-
-**Prevention.** **Before reconciling your number against a vendor's, match their clock —
-check the timezone on their own log/report headers first.** A whole-day offset is
-indistinguishable from missing data and will send you hunting a phantom. And **a time-based
-flush cannot work in a short-lived process**: if a metric must survive processes you don't
-control the lifetime of, trigger on *work done*, not on elapsed time. Both bugs shared the
-signature that has now appeared five times this week — the error only ever pointed one way,
-DOWN, and under-reporting always reads as "we're fine".
+---
 
 ## A CSS specificity TIE pinned the Administration menu permanently open (2026-07-28)
 
