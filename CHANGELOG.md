@@ -1,3 +1,7 @@
+## v2026.07.29.7 (2026.07.29)
+
+- Bandit living doc: PO dedupe + legacy CSV chain confirmed retired
+
 ## v2026.07.29.6 (2026.07.29)
 
 - Lessons: two renderings of the same timestamp never compared equal
