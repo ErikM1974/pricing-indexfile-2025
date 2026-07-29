@@ -527,49 +527,110 @@ git push origin develop
 
 ---
 
+## The pre-push guard (enable it per clone)
+
+`main` is protected by a `pre-push` hook: a push to `refs/heads/main` is refused unless the tip
+commit's subject starts `Release v` or `Changelog v` — i.e. one this skill produced. It catches
+`git push origin main`, `git push heroku main` and `git push heroku develop:main` alike. Pushing
+`develop` is never blocked.
+
+Git never version-controls `.git/hooks/`, so a fresh clone starts with **no** hook. Point git at
+the tracked directory instead of copying files into it:
+
+```bash
+git config core.hooksPath scripts/git-hooks
+```
+
+Check yours: `git config core.hooksPath` should print `scripts/git-hooks`. If it's empty, **the
+guard is off** and a hand push to main will succeed silently.
+
+Two things to know:
+
+- **It's local config, not tracked.** One command per clone; nothing can make it automatic.
+- **It replaces `.git/hooks/` entirely, it doesn't merge.** Anything living only in `.git/hooks/`
+  stops running the moment you set it, and a hook that isn't executable (`chmod +x`, tracked as
+  mode `100755`) is skipped *silently*. **Any new hook goes in `scripts/git-hooks/`.**
+
+---
+
 ## Rollback Procedure
 
-Two playbooks. Pick based on whether the bug is in the **slug** (env vars, Heroku platform) or the **code** (logic bug, regression).
+Two steps, in order. Step 1 stops the bleeding in seconds and touches no git; Step 2 is how the
+revert actually lands. **Step 2 is not optional** — after a slug rollback, `main` still contains
+the bad code, so the next `/deploy` would ship it straight back out.
 
-### Fast — Heroku slug rollback (code unchanged)
+### Step 1 — Stop the bleeding: Heroku slug rollback
 
-Use when: bad config var, Heroku platform glitch, dyno crash, or you need to revert NOW and investigate later.
+Instant, git history untouched. Use the moment prod is broken; investigate after.
 
 ```bash
 # See recent releases
 heroku releases --app sanmar-inventory-app
 
-# Roll back to a specific known-good release
-heroku releases:rollback v<NNN> --app sanmar-inventory-app
-
-# Or just roll back one release
+# Roll back one release
 heroku releases:rollback --app sanmar-inventory-app
+
+# …or to a specific known-good one
+heroku releases:rollback v<NNN> --app sanmar-inventory-app
 ```
 
-Git history is untouched. Re-deploying without further changes will redeploy the broken slug — so this is a stopgap, not a fix.
+Also the right and *only* tool when the bug is in the **slug, not the code** — a bad config var,
+a platform glitch, a crashed dyno. In that case there is nothing to revert in git; fix the config
+and redeploy.
 
-### Full — Git revert + redeploy
+### Step 2 — Land the revert in git: revert on develop, then `/deploy`
 
-Use when: the bug is in the actual code. Creates a clean revert commit and a new release.
+Revert on **develop** and ship it through the normal gated path. One revert commit, flowing
+develop → main the way every other change does, with a tag and a CHANGELOG entry.
+
+```bash
+# Find the release merge commit you're undoing
+git log main --first-parent --oneline | head -3      # look for "Release vYYYY.MM.DD.N"
+
+git checkout develop
+git pull --ff-only origin develop
+git revert -m 1 <release-merge-sha> --no-edit        # -m 1: it's a merge commit
+```
+
+Then:
+
+```
+/deploy
+```
+
+**Do NOT revert on `main` and push by hand.** It produces a second, duplicate revert commit that
+the next develop → main merge has to reconcile, and it skips every gate — which is how the bad
+release got out in the first place. Prefer fixing forward if the fix is small and obvious;
+`/deploy` runs the same gates either way.
+
+### Last resort — hand revert on main
+
+Only when the Heroku CLI is unavailable AND you cannot wait for `/deploy`'s gates.
 
 ```bash
 git checkout main
 git pull --ff-only origin main
-
-# Revert the release merge commit (-m 1 = keep main's history, drop develop's changes)
 git revert -m 1 HEAD --no-edit
 
-# Push the revert
-git push origin main
-git push heroku main
+git push --no-verify origin main
+git push --no-verify heroku main
+```
 
-# Bring develop back to a sane state
+⚠️ **`--no-verify` is REQUIRED here, and it is easy to lose ten minutes to.** `.git/hooks/pre-push`
+only lets a push to `main` through when the tip commit's subject starts `Release v` or
+`Changelog v` (source: `scripts/git-hooks/pre-push`). A revert's subject is
+`Revert "Release v2026.07.29.2"` — it does not match, so the push is refused. Mid-incident that
+reads like git itself is broken.
+
+Afterwards, resync and let the tooling catch up:
+
+```bash
 git checkout develop
-git revert -m 1 <release-merge-sha> --no-edit
+git merge --ff-only main
 git push origin develop
 ```
 
-After: develop and main are both back to pre-release state. Investigate the bug, fix on develop, `/deploy` again.
+Then run `/deploy` on the next real change so the tag and CHANGELOG stop lagging main.
 
 ---
 
@@ -590,6 +651,7 @@ After: develop and main are both back to pre-release state. Investigate the bug,
 | No `jq` / `python` for status parsing | Abort | Install jq (`scoop install jq` or `brew install jq`) |
 | Stale slug after release | Auto `ps:restart` → `ps:scale` cycle | Manual `heroku logs --tail` only if both fail |
 | Push to Heroku hangs | None | `Ctrl-C`, check `heroku status`, retry |
+| `✗ Push to main blocked` from pre-push hook | Abort — by design | You pushed to `main` by hand. Use `/deploy`. The one legitimate `--no-verify` case is the hand rollback (see Rollback Procedure) — a `Revert "Release v…"` subject never matches the allowlist |
 
 ---
 
