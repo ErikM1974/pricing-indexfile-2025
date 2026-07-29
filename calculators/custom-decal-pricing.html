@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Custom &amp; Oversize Decal Pricing — Northwest Custom Apparel</title>
+    <link rel="icon" href="/favicon.png" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Reuses sticker-pricing-page.css deliberately. That file already owns every
+         .decal-* rule this page needs and is shared by 5 other pages (emblem,
+         webstores, DTG + EMB builders, and formerly the sticker page), so it
+         cannot be deleted or renamed without touching all of them. Splitting the
+         ~200 decal lines into a new file would duplicate rules for no gain.
+         Its name is now slightly stale — see ACTIVE_FILES.md. -->
+    <link rel="stylesheet" href="/shared_components/css/sticker-pricing-page.css?v=2026.07.08.12">
+</head>
+<body>
+    <!-- ========== Header ========== -->
+    <header class="header">
+        <div class="header-container">
+            <div class="header-left">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                     alt="Northwest Custom Apparel" class="logo">
+                <nav class="breadcrumb">
+                    <a href="/staff-dashboard.html">Dashboard</a>
+                    <span>/</span>
+                    <span>Custom &amp; Oversize Decals</span>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- ========== Main ========== -->
+    <main class="main-container">
+
+        <section class="page-hero">
+            <div class="page-hero-content">
+                <div class="page-eyebrow"><i class="fas fa-vector-square" aria-hidden="true"></i> Custom &amp; oversize decals</div>
+                <h1>Price a decal the sticker grid can't</h1>
+                <div class="page-hero-hint">
+                    Anything larger than 6×6, odd or custom dimensions, circles &amp; ovals, mixed-size
+                    orders, or small runs below the 50-piece minimum.
+                    Standard 2×2–6×6 squares at 50+ pieces are priced on
+                    <a href="/custom-stickers">the customer sticker page</a>.
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick facts. Display text only — every number the calculator USES comes
+             from the API below and overwrites its placeholder on load. -->
+        <section class="quick-facts" aria-label="Pricing facts at a glance">
+            <div class="quick-fact"><i class="fas fa-ruler-combined"></i> <span>Priced by finished sq ft</span></div>
+            <div class="quick-fact"><i class="fas fa-palette"></i> <span>$50 setup if new art</span></div>
+            <div class="quick-fact"><i class="fas fa-bolt"></i> <span>+25% rush &lt;5 days</span></div>
+            <div class="quick-fact"><i class="fas fa-clock"></i> <span>10–12 day standard</span></div>
+        </section>
+
+        <!-- Rule 4: API failure is loud and total — no cached or guessed rate. -->
+        <div id="pricingError" class="pricing-error" hidden>
+            <strong>Unable to load decal rates.</strong> Refresh the page, or contact Erik if this persists.
+            Do not quote from memory — the rate card lives in Caspio and may have changed.
+        </div>
+
+        <p class="decal-help">
+            Full-color printed decals, ganged and contour-cut on the Roland. Normal ganging, contour
+            cutting, weeding, and waste are already built into the rate — priced on the finished decal size.
+        </p>
+
+        <!-- Live calculator -->
+        <section class="decal-calc" id="decalCalc" aria-label="Custom decal quote calculator">
+            <div class="decal-calc-head"><i class="fas fa-calculator"></i> Quick decal quote</div>
+
+            <div class="decal-rows-head" aria-hidden="true">
+                <span>Width&nbsp;(in)</span><span>Height&nbsp;(in)</span><span>Qty</span><span>Sq ft</span><span></span>
+            </div>
+            <div class="decal-rows" id="decalSizeRows"><!-- JS injects size rows --></div>
+            <button type="button" class="decal-add-row" id="decalAddRow"><i class="fas fa-plus"></i> Add another size</button>
+
+            <div class="decal-calc-controls">
+                <label class="decal-check">
+                    <input type="checkbox" id="decalArtOnFile"> Approved art on file (waive $50 setup)
+                </label>
+                <label class="decal-tax">
+                    <span>Sales tax %</span>
+                    <input type="number" id="decalTaxRate" value="10.2" min="0" step="0.01" inputmode="decimal">
+                    <small>Milton pickup = 10.2% · use ship-to rate otherwise</small>
+                </label>
+            </div>
+
+            <div class="decal-error" id="decalCalcError" role="alert" hidden></div>
+            <div class="decal-warnings" id="decalWarnings"></div>
+            <div class="decal-output" id="decalOutput"><!-- JS injects the price breakdown --></div>
+        </section>
+
+        <!-- Rate card (API-driven — never hardcoded) -->
+        <h3 class="decal-subhead"><i class="fas fa-table"></i> Square-foot rate card</h3>
+        <div id="decalRateGrid" class="decal-rate-wrap">
+            <div class="pricing-loading"><i class="fas fa-spinner fa-spin"></i> Loading decal rates…</div>
+        </div>
+
+        <div class="banner-formula">
+            <strong>Formula:</strong> (Width&nbsp;×&nbsp;Height&nbsp;÷&nbsp;144)&nbsp;×&nbsp;Qty&nbsp;=&nbsp;total&nbsp;sq&nbsp;ft, summed across all sizes &nbsp;·&nbsp;
+            × the $/sq&nbsp;ft for that band &nbsp;·&nbsp; <strong>Minimum:</strong> <span id="decalMinNote">$90 material</span> &nbsp;·&nbsp;
+            <strong>Setup:</strong> $50 (GRT-50, new art).<br>
+            <strong>Example —</strong> 6×(6×6) + 10×(12×12) + 10×(18×18) = 1.5 + 10 + 22.5 = <strong>34 sq ft</strong> → 34 × $12 = $408 + $50 setup = <strong>$458</strong> before tax.
+        </div>
+
+        <!-- Square-foot cheat sheet (geometry only — not pricing) -->
+        <h3 class="decal-subhead"><i class="fas fa-ruler-combined"></i> Square-foot cheat sheet</h3>
+        <div class="decal-cheat-wrap">
+            <table class="pricing-table decal-cheat">
+                <thead><tr><th>Size</th><th>Sq ft each</th></tr></thead>
+                <tbody>
+                    <tr><td>6" × 6"</td><td>0.25</td></tr>
+                    <tr><td>6" × 12"</td><td>0.50</td></tr>
+                    <tr><td>8" × 8"</td><td>0.44</td></tr>
+                    <tr><td>8" × 12"</td><td>0.67</td></tr>
+                    <tr><td>10" × 10"</td><td>0.69</td></tr>
+                    <tr><td>12" × 12"</td><td>1.00</td></tr>
+                    <tr><td>12" × 18"</td><td>1.50</td></tr>
+                    <tr><td>12" × 24"</td><td>2.00</td></tr>
+                    <tr><td>15" × 15"</td><td>1.56</td></tr>
+                    <tr><td>18" × 18"</td><td>2.25</td></tr>
+                    <tr><td>18" × 24"</td><td>3.00</td></tr>
+                    <tr><td>24" × 24"</td><td>4.00</td></tr>
+                    <tr><td>24" × 36"</td><td>6.00</td></tr>
+                    <tr><td>24" × 48"</td><td>8.00</td></tr>
+                    <tr><td>30" × 30"</td><td>6.25</td></tr>
+                    <tr><td>36" × 36"</td><td>9.00</td></tr>
+                    <tr><td>36" × 48"</td><td>12.00</td></tr>
+                    <tr><td>48" × 48"</td><td>16.00</td></tr>
+                    <tr><td>48" × 96"</td><td>32.00</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="decal-note">
+            <strong>Odd shapes:</strong> price by the bounding box — the smallest rectangle the art fits inside
+            (a 10" circle = 10×10; a 12"×8" oval = 12×8).<br>
+            <strong>May need custom pricing:</strong> complex weeding, fine text, specialty / laminated / reflective /
+            metallic vinyl, difficult contour cutting, heavy artwork cleanup, or decals that require paneling.
+        </div>
+
+        <!-- ========== Compact CTA ========== -->
+        <section class="cta-compact">
+            <div class="cta-text">Need a rush order, specialty vinyl, or help with art?</div>
+            <div class="cta-links">
+                <a href="tel:253-922-5793"><i class="fas fa-phone"></i> (253) 922-5793</a>
+                <a href="mailto:sales@nwcustomapparel.com"><i class="fas fa-envelope"></i> sales@nwcustomapparel.com</a>
+            </div>
+        </section>
+
+        <!-- ========== Footer ========== -->
+        <footer class="pricing-footer">
+            <strong>Northwest Custom Apparel</strong> · Decal rates maintained in Caspio ·
+            Stickers 2×2–6×6 → <a href="/custom-stickers">/custom-stickers</a> ·
+            Banners → <a href="/custom-banners">/custom-banners</a>
+        </footer>
+    </main>
+
+    <!-- /config/app.config.js is the one that defines APP_CONFIG.API.BASE_URL.
+         NOT /shared_components/js/app-config.js — that file sets NWCA_APP_CONFIG
+         (fees and modal copy) and would leave the proxy URL undefined. -->
+    <script src="/config/app.config.js?v=2026.07.29.2"></script>
+    <script src="/shared_components/js/custom-decal-pricing-page.js?v=2026.07.29.2"></script>
+</body>
+</html>

@@ -511,7 +511,14 @@
    and Linear's "In progress" workflow state, which AEs may already
    recognize from those products. */
 /* AI chip — flags buttons that drop into an AI-assisted flow.
-   Real markup (not ::after) because we want both icon + text inside. */
+   Real markup (not ::after) because we want both icon + text inside.
+
+   🔻 DEAD as of 2026-07-29 — no markup carries .tool-btn--ai any more. Its one
+   and only user was the Stickers/Banners button, which pointed at the staff
+   sticker page and its AI quote drawer; that page was retired and the button
+   became three plain links. Kept, not deleted: the next AI-assisted tool will
+   want exactly this treatment, and it costs ~35 lines. Delete if nothing
+   claims it. */
 .tool-btn--ai {
   position: relative;
   padding-right: 64px !important;            /* reserve room for the chip */
