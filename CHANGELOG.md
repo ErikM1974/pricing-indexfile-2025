@@ -1,3 +1,10 @@
+## v2026.07.29.6 (2026.07.29)
+
+- Lessons: two renderings of the same timestamp never compared equal
+- Lessons: archive one more entry to stay under the 300-line hard limit
+- Memory: first measured per-job cost of the Caspio morning sync cluster
+- Bandit living doc: ORDER_ODBC content dedupe
+
 ## v2026.07.29.5 (2026.07.29)
 
 - Lessons: sweep the family after a security fix; audits vs test layers
