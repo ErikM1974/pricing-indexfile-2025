@@ -1000,6 +1000,18 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 .sit-header-actions { display: flex; align-items: center; gap: 8px; flex: none; }
 .sit-header-actions .btn-cancel:disabled { opacity: 0.5; cursor: not-allowed; }
 
+/* Alert strip — an action failed but the report on screen is worth keeping (a pre-print
+   re-check that couldn't reach SanMar, a box that moved off the day). Never-Break Rule #4:
+   the failure is visible and nothing was printed. */
+.sit-banner {
+    display: flex; align-items: flex-start; gap: 9px;
+    margin: 0 0 14px; padding: 10px 13px;
+    border: 1px solid #f0c9a8; border-left: 4px solid #c2410c; border-radius: 8px;
+    background: #fff5ec; color: #8a3a06; font-size: 13px; line-height: 1.45;
+}
+.sit-banner[hidden] { display: none; }
+.sit-banner > i { margin-top: 1px; color: #c2410c; flex: none; }
+
 /* "Print for…" recipient dropdown (screen) — one item per person, tailored report each */
 .sit-printmenu-wrap { position: relative; display: inline-flex; }
 .sit-print-caret { font-size: 11px; margin-left: 2px; color: #6b8a72; }

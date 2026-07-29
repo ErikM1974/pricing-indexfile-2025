@@ -116,12 +116,27 @@
   };
 
   // Mock the network + suppress the OS print dialog.
+  //
+  // The plain load answers with a STALE generatedAt — that is exactly what the server's
+  // 10-minute response cache serves, and it is what produced the short 3:57 AM printout on
+  // 2026-07-29. A refresh=true call answers with a fresh one, like a real server rebuild.
+  // So the first print/label action must re-pull, and the rest must reuse it inside
+  // OUTPUT_FRESH_MS — both halves are asserted at the end of this harness.
+  var STALE_GENERATED_AT = '2026-07-22T10:56:56.000Z';
+  var refreshCalls = 0;
+  var totalInboundCalls = 0;
   window.APP_CONFIG = { API: { BASE_URL: 'https://mock.local' } };
   window.print = function () { /* no-op in harness */ };
   window.fetch = function (url) {
     var u = String(url);
     if (u.indexOf('/api/sanmar-orders/inbound-today') !== -1) {
-      return Promise.resolve({ ok: true, json: function () { return Promise.resolve(MOCK); } });
+      var forced = u.indexOf('refresh=true') !== -1;
+      totalInboundCalls++;
+      if (forced) refreshCalls++;
+      var payload = Object.assign({}, MOCK, {
+        generatedAt: forced ? new Date().toISOString() : STALE_GENERATED_AT
+      });
+      return Promise.resolve({ ok: true, json: function () { return Promise.resolve(payload); } });
     }
     if (u.indexOf('/api/thumbnails/by-designs') !== -1) {
       return Promise.resolve({ ok: true, json: function () { return Promise.resolve({ thumbnails: {} }); } });
@@ -148,32 +163,86 @@
     area.appendChild(wrap);
   }
 
+  // Wait for a sheet element to be built. Printing is ASYNC now — every print action
+  // re-pulls from SanMar first (syncBeforeOutput), so the sheet cannot be read on the
+  // same tick as the click.
+  //
+  // MutationObserver, NOT setInterval: a backgrounded tab throttles timers to ~1s and then
+  // to a crawl, which stalls a polling harness indefinitely while the page itself is fine.
+  // Observers fire on the DOM change regardless of tab visibility. (Same trap as the
+  // transition-timing one in LESSONS_LEARNED — never time a UI assertion in a hidden tab.)
+  function waitForNode(id, cb) {
+    var settled = false;
+    function finish(el) {
+      if (settled) return;
+      settled = true;
+      obs.disconnect();
+      clearTimeout(timer);
+      cb(el);
+    }
+    var obs = new MutationObserver(function () {
+      var el = document.getElementById(id);
+      if (el) finish(el);
+    });
+    obs.observe(document.body, { childList: true });
+    var timer = setTimeout(function () { finish(document.getElementById(id)); }, 8000);
+    var already = document.getElementById(id);
+    if (already) finish(already);
+  }
+
   // Build one profile by driving the real dropdown, then clone the sheet into a
   // visible frame (the live #sit-print-sheet is display:none except when printing).
-  function renderProfile(label, key, rep) {
+  function renderProfile(label, key, rep, done) {
     var printBtn = document.getElementById('sit-print');
     var menu = document.getElementById('sit-printmenu');
     if (menu.hidden) printBtn.click();               // open + populate the menu
     var sel = '[data-print="' + key + '"]' + (rep ? '[data-rep="' + rep + '"]' : ':not([data-rep])');
     var item = menu.querySelector(sel);
-    if (!item) { appendCard(label + '  — MENU ITEM NOT FOUND (' + sel + ')', document.createTextNode('')); return; }
-    item.click();                                     // builds #sit-print-sheet, print() is a no-op
-    var sheet = document.getElementById('sit-print-sheet');
-    if (!sheet) { appendCard(label + '  — NO SHEET BUILT', document.createTextNode('')); return; }
-    var clone = sheet.cloneNode(true);
-    clone.removeAttribute('id');
-    clone.style.cssText = 'display:block; color:#1a1d1a; font-family:system-ui,"Segoe UI",sans-serif; font-size:11px;';
-    appendCard(label, clone);
+    if (!item) { appendCard(label + '  — MENU ITEM NOT FOUND (' + sel + ')', document.createTextNode('')); return done(); }
+    // Clear the previous profile's sheet first — it lingers until its 1500 ms cleanup, and
+    // waiting on "a sheet exists" would otherwise clone the PREVIOUS profile into this card.
+    var stale = document.getElementById('sit-print-sheet');
+    if (stale) stale.remove();
+    item.click();                                     // re-pulls, then builds #sit-print-sheet
+    waitForNode('sit-print-sheet', function (sheet) {
+      if (!sheet) { appendCard(label + '  — NO SHEET BUILT', document.createTextNode('')); return done(); }
+      var clone = sheet.cloneNode(true);
+      clone.removeAttribute('id');
+      clone.style.cssText = 'display:block; color:#1a1d1a; font-family:system-ui,"Segoe UI",sans-serif; font-size:11px;';
+      appendCard(label, clone);
+      done();
+    });
   }
 
+  // Run the profile list one at a time (each click re-pulls; overlapping them would
+  // race on the single #sit-print-sheet node).
+  function renderSequence(list, done) {
+    var i = 0;
+    (function next() {
+      if (i >= list.length) return done();
+      var p = list[i++];
+      renderProfile(p[0], p[1], p[2], next);
+    })();
+  }
+
+  // Observer-driven for the same reason as waitForNode — no timer polling.
   function waitForLoad(cb) {
-    var tries = 0;
-    var iv = setInterval(function () {
-      tries++;
-      var loaded = document.querySelector('.sit-modal #sit-body .sit-summary') || document.querySelector('.sit-modal #sit-body .sit-cards');
-      if (loaded) { clearInterval(iv); cb(true); }
-      else if (tries > 80) { clearInterval(iv); cb(false); }
-    }, 100);
+    var settled = false;
+    function check() {
+      return document.querySelector('.sit-modal #sit-body .sit-summary')
+        || document.querySelector('.sit-modal #sit-body .sit-cards');
+    }
+    function finish(ok) {
+      if (settled) return;
+      settled = true;
+      obs.disconnect();
+      clearTimeout(timer);
+      cb(ok);
+    }
+    var obs = new MutationObserver(function () { if (check()) finish(true); });
+    obs.observe(document.body, { childList: true, subtree: true });
+    var timer = setTimeout(function () { finish(!!check()); }, 10000);
+    if (check()) finish(true);
   }
 
   try {
@@ -190,19 +259,38 @@
         menuClone.style.cssText = 'position:static; display:block; box-shadow:none; max-height:none;';
         appendCard('“Print for…” dropdown menu', menuClone);
 
-        // 2) Render every profile.
-        renderProfile('1 · Full report (Bradley / Mikalah / Ruthie master)', 'full');
-        renderProfile('2 · AE personal sheet — Nika Lao (cost hidden)', 'ae', 'Nika Lao');
-        renderProfile('3 · AE personal sheet — Taneisha Clark (cost hidden)', 'ae', 'Taneisha Clark');
-        renderProfile('4 · All AE sheets (one per page)', 'allAe');
-        renderProfile('5 · Receiving checklist (Mikalah)', 'receiving');
-        renderProfile('6 · Production plan (Ruthie)', 'production');
-        renderProfile('7 · Purchasing / PO reconcile (Bradley)', 'purchasing');
+        // 2) Render every profile, then the box-label run.
+        renderSequence([
+          ['1 · Full report (Bradley / Mikalah / Ruthie master)', 'full', null],
+          ['2 · AE personal sheet — Nika Lao (cost hidden)', 'ae', 'Nika Lao'],
+          ['3 · AE personal sheet — Taneisha Clark (cost hidden)', 'ae', 'Taneisha Clark'],
+          ['4 · All AE sheets (one per page)', 'allAe', null],
+          ['5 · Receiving checklist (Mikalah)', 'receiving', null],
+          ['6 · Production plan (Ruthie)', 'production', null],
+          ['7 · Purchasing / PO reconcile (Bradley)', 'purchasing', null]
+        ], function () {
+          // Box Labels goes through the same pre-print re-pull.
+          document.getElementById('sit-labels').click();
+          waitForNode('sit-label-sheet', function (labelSheet) {
+            var labelPages = labelSheet ? labelSheet.querySelectorAll('.sit-label').length : 0;
 
-        // 3) Hide the live modal so the preview panes are unobstructed.
-        var modal = document.querySelector('.sit-modal');
-        if (modal) modal.style.display = 'none';
-        setStatus('Rendered 7 previews + the dropdown. (Received PO “Emtech” is correctly excluded from all sheets.)', true);
+            // 3) Hide the live modal so the preview panes are unobstructed.
+            var modal = document.querySelector('.sit-modal');
+            if (modal) modal.style.display = 'none';
+
+            // 4) Assert the pre-print re-pull: the FIRST output action must force refresh=true
+            //    (the loaded payload is stale), and every action after it must reuse that fresh
+            //    payload rather than hammering SanMar once per sheet.
+            var pass = refreshCalls === 1 && totalInboundCalls === 2;
+            setStatus(
+              'Rendered 7 previews + the dropdown + ' + labelPages + ' box labels. ' +
+              'Pre-print re-pull: ' + refreshCalls + ' forced refresh / ' + totalInboundCalls +
+              ' inbound calls for 8 output actions — expected 1 / 2 → ' + (pass ? 'PASS' : 'FAIL') +
+              '. (Received PO “Emtech” is correctly excluded from all sheets and labels.)',
+              pass
+            );
+          });
+        });
       } catch (e2) {
         setStatus('Render error: ' + e2.message, false);
         console.error(e2);
