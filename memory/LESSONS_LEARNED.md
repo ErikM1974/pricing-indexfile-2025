@@ -5,6 +5,48 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## A closed `<details>` still reports its old size — `checkVisibility()`, not `getBoundingClientRect()` (2026-07-29)
+
+**Problem.** A layout test asserted that collapsing the Pride Wall hid its photo track:
+`pw.open = false; track.getBoundingClientRect().height === 0`. It failed at **every** viewport
+width — the track kept reporting 164.6px while the parent `<details>` correctly shrank 191px → 19px.
+The widget was working; the assertion could never pass.
+
+**Root cause.** A closed `<details>` hides its content with **`content-visibility: hidden`**, not
+`display: none`. The subtree is skipped for rendering but **retains its last laid-out geometry**, so
+`getBoundingClientRect()` returns the size it had when it was last open. `getComputedStyle(el).display`
+is likewise still `grid`. Nothing about the element's own boxes says "I am hidden".
+
+**Fix.** `!el.checkVisibility()` — it accounts for content-visibility, `visibility`, and opacity, and
+correctly returns `false` inside a closed `<details>`. Alternatively assert on the *parent*
+`<details>` height, which does collapse.
+
+**Prevention.** Never probe visibility through the geometry of a descendant — measure the collapsing
+container, or use `checkVisibility()`. This bites anything wrapped in `content-visibility`
+(`<details>`, `content-visibility: auto` virtualization), and it fails *silently in the passing
+direction* too: a "the panel is hidden" assertion written this way would pass while the panel is open.
+
+---
+
+## Three stylesheets declared the same grid; two had never applied (2026-07-29)
+
+**Problem.** `.quick-access-grid` column tracks were declared in components.css (with `@container`
+breakpoints), again in dashboard-v3-theme.css, and a third time in dashboard-v3-patch-2.css with
+`!important`. Editing the first two did nothing, and it was not obvious why.
+
+**Root cause.** components.css is inside `@layer components`; the theme and patch files are
+**unlayered**. Unlayered styles beat *any* layered style regardless of specificity or source order,
+so the container queries in components.css had never once matched — they looked live and were dead.
+
+**Fix.** patch-2 §7 is now the single owner of the tracks; components.css keeps a 1fr base and the
+theme keeps only the gap, each with a comment naming the owner.
+
+**Prevention.** In this codebase `@layer` = "loses to everything in the theme/patch files". Before
+editing a dashboard rule, check whether an unlayered file also declares it — and when a CSS edit
+appears to do nothing, suspect layering before specificity.
+
+---
+
 ## The 4 AM inbound printout missed 4 POs — the WA cartons sync in AFTER it prints (2026-07-29)
 
 **Problem.** The Daily Inbound PDF Erik printed at **3:57 AM on 7/29** listed 8 POs / 17 boxes /
@@ -172,36 +214,10 @@ SERVER returns (`curl`) before concluding a fix didn't work.**
 
 ## A ratchet test sat red for 9 days because /deploy only runs test:parser (2026-07-28)
 
-**Problem.** `tests/unit/builders-function-length.test.js` was failing on `develop`:
-`dtg/form-core.js:init` measured 155 lines against a 150 cap. Nobody noticed for 9 days,
-across several deploys.
-
-**Root cause (two layers).**
-1. *The regression.* Commit `b25c68ca` (2026-07-19, "fix(leads): quote-builder prefill from
-   a lead now works") added the `?from=methodswitch` branch to DTG's `init()`, taking it
-   127 → 155. The change was correctly synced to all 4 builders per Rule 8, but only DTG
-   tipped over — DTG's `init` is the only one carrying every entry-mode branch inline
-   (emb/scp/dtf equivalents sit at 133–146, just under the cap).
-2. *Why it went unseen.* The `/deploy` skill's Step 0.6 smoke gate runs **`npm run
-   test:parser`** — `tests/unit/parser` only. A red ratchet in `tests/unit/` does not block
-   a deploy. `npm test` is the thing that catches it, and nothing runs it automatically.
-
-**Solution.** Genuinely refactored rather than allowlisted. `init()` was a 5-way entry-mode
-dispatcher, not the allowlist's justified case ("one cohesive HTML template", like
-`form-core.js:render` at 383). Extracted `configureOrderSummaryBand()`,
-`ensureRowsAndRender()`, and one predicate per entry mode (`tryDuplicateMode`, `tryEditMode`,
-`tryQuickQuotePrefill`, `tryMethodSwitchPrefill`, `restoreOrStartFresh`) — each returns true
-when it owns the load. `init()` is now 18 lines and the priority chain is explicit. DTG-only:
-this is `init` dispatch, not one of Rule 8's sync categories.
-
-**Prevention.**
-- **Allowlisting a ratchet entry is almost always the wrong call.** It freezes the regression
-  as acceptable and releases the pressure keeping the sibling builders at 133–146.
-- The entry-mode ORDER is behavioral, not cosmetic (`?duplicate=` > `?edit=` > handoffs >
-  auto-restore). Verify it with both params present, not one at a time — a one-at-a-time
-  pass looks identical whether or not the priority survived.
-- `adapter.js`'s JSDoc had already flagged this: *"the real split lands if init is ever
-  unpacked."* When a file comment names a future refactor, that's the map — follow it.
+Full entry archived to `LESSONS_LEARNED_ARCHIVE.md`. The durable part: **`/deploy`'s smoke
+gate runs `npm run test:parser` only, so a red ratchet anywhere else in `tests/unit/` does
+not block a release** — run `npm test` yourself before shipping. And allowlisting a ratchet
+entry is almost always wrong; it freezes the regression as acceptable.
 
 ---
 
