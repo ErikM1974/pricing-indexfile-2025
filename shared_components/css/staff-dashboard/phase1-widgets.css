@@ -14,13 +14,43 @@
     margin-top: 12px;
 }
 
+/* Collapsible 2026-07-29: the strip is ~185px of the first screen, so it
+   is a <details> and each person can fold it away for good. State is
+   persisted per browser by tool-grid-controller.js. Open by default —
+   nobody loses the photos unless they choose to. */
 .pw-head {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
     gap: 12px;
     margin-bottom: 8px;
+    list-style: none;
+    cursor: pointer;
 }
+
+.pw-head::-webkit-details-marker { display: none; }
+
+/* Chevron sits before the title and points down when open. */
+.pw-head::before {
+    content: "\f078"; /* fa-chevron-down */
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: 9px;
+    color: var(--text-faint);
+    order: -1;
+    transition: transform var(--motion-fast, 0.15s) ease;
+}
+
+.pw-strip:not([open]) .pw-head::before { transform: rotate(-90deg); }
+
+.pw-strip:not([open]) .pw-head { margin-bottom: 0; }
+
+.pw-head:hover::before,
+.pw-head:hover .pw-title { color: var(--text-soft); }
+
+/* The title flexes so the "Open the Photo Library" link stays hard right
+   even with the chevron now occupying the start of the row. */
+.pw-title { flex: 1 1 auto; }
 
 .pw-title {
     font-size: var(--font-size-sm);

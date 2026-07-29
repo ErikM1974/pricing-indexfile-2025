@@ -112,12 +112,41 @@
   gap: 18px !important;
 }
 
-/* ── 7. Force Quick Access grid (in case existing CSS overrides it) ── */
+/* ── 7. Quick Access grid — THE one place column tracks are defined ────
+   2026-07-29 IA reorg. This is now the only live rule: components.css
+   keeps a 1fr base (layered, always loses) and dashboard-v3-theme.css
+   keeps only the gap. Don't re-declare tracks anywhere else.
+
+   Was repeat(auto-fit, minmax(280px,1fr)), which packed as many columns
+   as fit — 5 on a wide monitor — so 6 cards landed 5 + 1 ragged and card
+   order looked arbitrary. Fixed tracks make placement deliberate:
+
+     ≥880px   Quoting | Pricing (spans 2)      ← the two "sell" cards
+              Production | Art & Design | CRM  ← the three "do the work" cards
+              Reference (full width, collapsed)
+     ≥580px   2 tracks, Pricing back to 1 track so no cell is left empty
+     <580px   1 track
+
+   Breakpoints reproduce the old density (2 cols needed 574px, 3 needed
+   868px at minmax(280px)+14px gap) so nothing reflows at a width where
+   it didn't before. The container is .zone-quick-access, which sets
+   container-type: inline-size in components.css. */
 .quick-access-grid {
   display: grid !important;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+  grid-template-columns: minmax(0, 1fr) !important;
   gap: 14px !important;
 }
+@container (min-width: 580px) {
+  .quick-access-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+}
+@container (min-width: 880px) {
+  .quick-access-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+  /* span 2 is declared ONLY inside the 3-track query — at 1 or 2 tracks it
+     would create an implicit extra column and break the layout. */
+  .tool-category--pricing { grid-column: span 2 !important; }
+}
+/* Reference is a footer, not a card-shaped hole-filler. */
+.tool-category--reference { grid-column: 1 / -1 !important; }
 
 /* ── 8. Metrics zone grid ──────────────────────────────────────────── */
 .zone-metrics {
@@ -405,7 +434,13 @@
      mouseover even with pointer-events:none.
 
    When the calculator ships, swap <span class="tool-btn tool-btn--soon">
-   → <a class="tool-btn" href="...">. No other markup change. */
+   → <a class="tool-btn" href="...">. No other markup change.
+
+   ⚠️ DEAD as of 2026-07-29 — no markup uses .tool-btn--soon any more. The
+   only two users were the Customer Supplied DTF/DTG placeholders, and the
+   Pricing merge replaced them with a .tool-subhead-note line. Kept, not
+   deleted, because it's the ready-made treatment the next "announced but
+   not shipped" tool will want. Delete it if nothing claims it. */
 .tool-btn--soon {
   position: relative;
   padding-right: 102px !important;          /* reserve room for the badge */
@@ -668,4 +703,32 @@
   letter-spacing: 0;
   text-transform: none;
   color: #6b7c8f;
+}
+
+/* ── 15. Merged Pricing card (2026-07-29 IA reorg) ────────────────────
+   Five cards — Pricing & Calculators, Corporate Embroidery, Customer
+   Supplied, Contract, Specialty Products — became one card with five
+   .tool-subhead groups. Same 16 links, same hrefs; the subheads keep
+   the old card names so "where do I price X" still resolves the same
+   way. Two internal columns only when the card is actually wide (it
+   spans 2 tracks at ≥880px); below that it falls back to the theme's
+   single flex column. */
+@container (min-width: 880px) {
+  .tool-category--pricing .tool-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px 10px;
+    align-content: start;
+  }
+  .tool-category--pricing .tool-subhead,
+  .tool-category--pricing .tool-subhead-note {
+    grid-column: 1 / -1;
+  }
+  /* .tool-btn is white-space: nowrap in components.css — in a half-width
+     column that overflows the card on the long labels (Richardson
+     Non-Sanmar, Additional Stitches). Let them wrap instead. */
+  .tool-category--pricing .tool-btn {
+    white-space: normal;
+    min-width: 0;
+  }
 }

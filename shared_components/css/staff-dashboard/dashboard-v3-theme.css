@@ -553,9 +553,10 @@ a{ color: inherit; }
 .pinned-row__empty{ color: var(--ink-dim); font-size: 12.5px; font-style: italic; }
 
 /* ── 8. QUICK ACCESS GRID ───────────────────────────────────────────── */
+/* Column tracks + card placement are owned by dashboard-v3-patch-2.css §7
+   (loads after this file, with !important). Only the gap survives here. */
 .quick-access-grid{
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 14px;
 }
 .tool-category{
@@ -566,9 +567,11 @@ a{ color: inherit; }
   display: flex; align-items: center; gap: 12px;
   padding-bottom: 10px;
   border-bottom: 1px solid var(--surface-border);
-  cursor: pointer;
   list-style: none;
 }
+/* Pointer only where the header actually toggles something. A plain <div>
+   header used to advertise a click it never handled. */
+summary.tool-category-header{ cursor: pointer; }
 .tool-category-header::-webkit-details-marker{ display: none; }
 .tool-category-icon{
   width: 32px; height: 32px;
@@ -613,7 +616,7 @@ a{ color: inherit; }
   transform: translateX(2px);
 }
 .tool-btn i{ color: var(--nw-green); width: 14px; text-align: center; flex: 0 0 14px; }
-.tool-category--reference[open] .tool-category-header{ border-bottom: 1px solid var(--surface-border); }
+details.tool-category[open] .tool-category-header{ border-bottom: 1px solid var(--surface-border); }
 
 /* ── 9. METRICS ZONE ────────────────────────────────────────────────── */
 .zone-metrics{
