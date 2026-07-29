@@ -250,3 +250,12 @@ Full entry archived to `LESSONS_LEARNED_ARCHIVE.md`. The durable part: **`/deplo
 gate runs `npm run test:parser` only, so a red ratchet anywhere else in `tests/unit/` does
 not block a release** — run `npm test` yourself before shipping. And allowlisting a ratchet
 entry is almost always wrong; it freezes the regression as acceptable.
+
+---
+
+## A CSS specificity TIE pinned the Administration menu permanently open (2026-07-28)
+
+Full entry archived to `LESSONS_LEARNED_ARCHIVE.md`. Durable part: **two rules with EQUAL
+specificity are resolved by source order, so a later `max-height: none` silently beat the
+collapse** — when a CSS edit appears to do nothing, count specificity AND check what comes
+after it. See also the `@layer`-vs-unlayered entry above.

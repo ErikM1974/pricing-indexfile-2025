@@ -296,12 +296,3 @@ Both archived to `LESSONS_LEARNED_ARCHIVE.md`. The durable pair: **before reconc
 against a vendor's, match their clock** — check the timezone on their own report header first; a
 whole-day offset is indistinguishable from missing data. And **never treat your own meter as ground
 truth when auditing that meter** — under-reporting always reads as "we're fine".
-
----
-
-## A CSS specificity TIE pinned the Administration menu permanently open (2026-07-28)
-
-Full entry archived to `LESSONS_LEARNED_ARCHIVE.md`. Durable part: **two rules with EQUAL
-specificity are resolved by source order, so a later `max-height: none` silently beat the
-collapse** — when a CSS edit appears to do nothing, count specificity AND check what comes
-after it. See also the `@layer`-vs-unlayered entry above.
