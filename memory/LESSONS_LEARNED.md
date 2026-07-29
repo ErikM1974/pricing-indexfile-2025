@@ -5,6 +5,38 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## A shared modal's CSS lived in ONE page's stylesheet — the other host printed the whole dashboard (2026-07-29)
+
+**Problem.** `sanmar-inbound-today.js` is loaded by BOTH `quote-management.html` and
+`ae-mission-control.html`, but every `.sit-*` rule lived in `quote-management.css`, which only
+the first page loads. From AE Mission Control the modal opened `position: static` at
+**y = 3862px** — ~3.8 screens below the fold, so the Inbound button looked dead — with no
+scroll container, and **without `body.sit-printing > *:not(#sit-print-sheet){display:none}`**,
+so printing a report or a box label would have printed the entire dashboard.
+
+**Root cause.** A page-named stylesheet became a silent dependency of a *shared* component.
+Nothing links the two: the JS loads fine, the modal builds fine, and the failure only shows on
+the page nobody tests. It also leaned on that file's generic `.modal` / `.modal-content` /
+`.btn-cancel` **and** its global `* { box-sizing: border-box }` — no stylesheet on the AE page
+declares one, which by itself moved the panel 960px → 945px.
+
+**Fix** (`d78e1391`). `dashboards/css/sanmar-inbound.css`, loaded by every host page. Block moved
+**verbatim** (byte-identical, diffed), plus a scoped border-box reset and restatements of
+`.modal`/`.modal-content`/`.btn-cancel` at `.modal.sit-modal` specificity (0,2,0) so they win
+regardless of load order — self-contained, no dependency on any other sheet.
+
+**Prevention.**
+- **A shared JS component owns a stylesheet of the same name, loaded by every page that loads
+  the JS.** Styles for `foo.js` never live in `some-page.css`. Grep for other offenders.
+- **Verify a CSS refactor by computed-style diff, not by eye.** Snapshotting 519 elements × 41
+  properties across three configurations (pre-split re-injected inline, and each new host page)
+  proved 0 differences on quote-management.html — and caught a `font-family` I had "helpfully"
+  pinned, which would have silently restyled the whole modal.
+- **What a modal inherits is part of its contract**: `box-sizing`, `color`, `font-family` all
+  came from the host page. List them explicitly before moving a component between hosts.
+
+---
+
 ## Deleting a `requireStaff` route can UNGATE the file, not remove it (2026-07-29)
 
 **Problem.** Retiring `/calculators/sticker-manual-pricing.html` meant deleting its
@@ -233,50 +265,10 @@ DOWN, and under-reporting always reads as "we're fine".
 
 ## A CSS specificity TIE pinned the Administration menu permanently open (2026-07-28)
 
-**Problem.** Erik reported the Administration sub-menus couldn't be closed. The section's
-chevron flipped to the collapsed arrow, but all 5 sub-group rows stayed on screen. Shipped
-in v2026.07.28.4.
-
-**Root cause.** Giving the admin section more room for its sub-groups:
-
-```css
-.nav-section.collapsed .nav-section-content        { max-height: 0; }      /* (0,3,0) */
-.nav-section[data-section="admin"] > .nav-section-content { max-height: 1400px; } /* (0,3,0) */
-```
-
-Both are **three class-level selectors** — an attribute selector weighs the same as a class,
-which is easy to misread as "more specific because it's longer". Equal specificity → source
-order decides → the later `1400px` rule won *even while `.collapsed` was applied*. The class
-toggled, `aria-expanded` flipped, the chevron rotated; only the height never changed.
-
-**Solution.** Scope the raise to the open state so it can't compete with the collapse rule:
-`.nav-section[data-section="admin"]:not(.collapsed) > .nav-section-content`. `:not()` adds
-specificity AND makes the rule inapplicable when collapsed — belt and braces.
-
-**Prevention.**
-- **Never let an override tie the rule it must not beat.** When adding a per-section override
-  next to a state rule (`.collapsed`, `.active`, `.is-open`), either scope it with `:not(<state>)`
-  or place it BEFORE the state rule. Count specificity properly: `[attr]` == `.class`.
-- **A UI test that only opens things proves nothing about closing.** The harness passed the
-  whole time because every assertion expanded and measured. The bug lived entirely in the
-  closed state. Assert both directions — "it opens" is half a contract.
-- **Symptom shape is a tell:** class/ARIA/chevron all correct but geometry wrong ⇒ the JS is
-  fine, a CSS rule is winning. Enumerate matching rules with `el.matches(r.selectorText)` over
-  `document.styleSheets` rather than eyeballing the file.
-
-### Stale-cache QA: the harness verified files that no longer existed
-
-Twice in one sitting the browser served cached copies while the fix sat on disk — an edited
-module kept reporting its OLD assertion count, then a fixed stylesheet kept computing the OLD
-`max-height`. **Neither a reload, `location.reload(true)`, nor a forced navigation evicts a
-cached ES module or stylesheet — they're keyed by URL.** For a harness whose job is asserting
-on computed CSS this manufactures confidence, which is worse than no harness.
-
-Fix: `tests/ui/test-admin-nav-boot.js` — a shim that never changes (so caching it is harmless),
-re-points every stylesheet at a timestamped URL, waits for them to apply, then imports the
-harness with the same stamp. The HTML document can still 304 with a stale `<script src>`;
-load it as `?bust=<anything>` when the assertion count looks wrong. **Always confirm what the
-SERVER returns (`curl`) before concluding a fix didn't work.**
+Full entry archived to `LESSONS_LEARNED_ARCHIVE.md`. Durable part: **two rules with EQUAL
+specificity are resolved by source order, so a later `max-height: none` silently beat the
+collapse** — when a CSS edit appears to do nothing, count specificity AND check what comes
+after it. See also the `@layer`-vs-unlayered entry above.
 
 ---
 
