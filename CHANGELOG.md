@@ -1,3 +1,14 @@
+## v2026.07.30.1 (2026.07.30)
+
+- Memory: embroidery pricing realization findings + ShopWorks ODBC production tables
+- Add admin-only Pricing Analysis page + ten-year order profile
+- Memory: garment tracker jobs confirmed DEAD — delete, don't optimise
+- Memory: garment-tracker jobs DELETED and verified (18 -> 16 scheduler jobs)
+- Memory: clear the 3 stale 'still open' items in the cluster-cost doc
+- Memory: tier-break optimization, LTM fee design, reorder economics
+- Memory: state the 83% cost-curve figure precisely (fall from q=1, not share of total improvement)
+- Deploy v2026.07.30.1: Kanha clock-out 2:45 PM -> 2:00 PM
+
 ## v2026.07.29.7 (2026.07.29)
 
 - Bandit living doc: PO dedupe + legacy CSV chain confirmed retired
