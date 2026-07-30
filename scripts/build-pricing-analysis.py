@@ -26,8 +26,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, 'memory', 'pricing-analysis-data.json')
 OUT = os.path.join(ROOT, 'dashboards', 'pricing-analysis.html')
 
-CSS_VER = '2026.07.29.2'
-JS_VER = '2026.07.29.2'
+CSS_VER = '2026.07.30.2'
+JS_VER = '2026.07.30.2'
 TIERS = ['1-7', '8-23', '24-47', '48-71', '72+']
 BANDS = ['<$4', '$4-8', '$8-15', '$15-25', '$25+']
 BAND_LABEL = {
@@ -583,9 +583,244 @@ def sec_limits():
             </section>"""
 
 
+def sec_design():
+    """Where the breaks belong, what the fee must be, and the reorder economics."""
+    d = D['tierdesign']
+    cc = d['cost_curve']
+    f, c = cc['flat'], cc['cap']
+
+    fit = table(
+        ['fit', 'fixed setup S', 'variable v', 'R&sup2;', 'n'],
+        [['Flats &mdash; pooled tier points', '<b>%s hr/order</b>' % num(f['S'], 3),
+          '%s hr/pc' % num(f['v'], 5), num(f['r2'], 3), '5'],
+         ['Caps &mdash; pooled tier points', '<b>%s hr/order</b>' % num(c['S'], 3),
+          '%s hr/pc' % num(c['v'], 5), num(c['r2'], 3), '5'],
+         ['Order level, type 21', '%s hr' % num(cc['order_level']['type21']['S'], 3),
+          '%s hr/pc' % num(cc['order_level']['type21']['v'], 5),
+          num(cc['order_level']['type21']['r2'], 3),
+          num(cc['order_level']['type21']['n'])],
+         ['Order level, type 1 (with imprints)',
+          '%s hr' % num(cc['order_level']['type1']['S_imp'], 3),
+          '%s hr/pc' % num(cc['order_level']['type1']['v_imp'], 5),
+          num(cc['order_level']['type1']['r2_imp'], 3),
+          num(cc['order_level']['type1']['n'])]])
+
+    hp = cc['hrs_per_piece']
+    hrs_tab = table(['pieces'] + [num(h['q']) for h in hp],
+                    [['hours per piece'] + [num(h['hrs'], 3) for h in hp],
+                     ['share of the 1-piece figure'] + [pct(h['pct_of_q1'], 0) for h in hp]],
+                    align=['l'] + ['r'] * len(hp))
+
+    rows = []
+    prev = None
+    for t in TIERS:
+        fl = d['cph_now']['FLAT|' + t]
+        cp = d['cph_now'].get('CAP|' + t)
+        gain = ('<b>%s%s</b>' % ('+' if fl - prev >= 0 else '&minus;', money(abs(fl - prev)))
+                if prev is not None else '&mdash;')
+        rows.append(['<b>%s</b>' % t, num(d['orders_by_tier']['FLAT|' + t]),
+                     '%s %s' % (bar(fl / 400), money(fl)),
+                     money(cp) if cp else '&mdash;', gain])
+        prev = fl
+    cphtab = table(['tier', 'flat orders', 'flats &mdash; $ per production hour',
+                    'caps', 'gain over previous tier'], rows)
+
+    dpk = sorted(d['dp_breaks'], key=lambda k: int(k))
+    dprows = []
+    for k in dpk:
+        segs = d['dp_breaks'][k]
+        dprows.append(['target %s/hr' % money(float(k)),
+                       ' / '.join(num(s['lo']) for s in segs[1:])])
+    dprows.append(['<b>what we charge today</b>',
+                   '<b>%s</b>' % ' / '.join(num(x) for x in d['current_breaks'])])
+    dptab = table(['cost target used', 'breaks the solver chooses'], dprows,
+                  align=['l', 'r'])
+
+    srows = []
+    for s in d['scenarios']:
+        srows.append([s['label'], money(s['fee_rev']),
+                      ('+' + money(s['delta'])) if s['delta'] else '&mdash;',
+                      money(s['cph']['FLAT|1-7']), money(s['cph']['FLAT|8-23']),
+                      money(s['cph']['CAP|1-7']), money(s['cph']['CAP|8-23'])])
+    stab = table(['fee', 'fee revenue/yr', 'vs today', 'flats 1-7', 'flats 8-23',
+                  'caps 1-7', 'caps 8-23'], srows)
+
+    cv = table(['pieces', 'price/pc', 'goods', 'fee today', 'fee at $115',
+                'order total today', 'order total at $115'],
+               [[num(r['q']), money(r['price'], 2), money(r['goods']),
+                 money(r['fee_now']), money(r['fee_new']),
+                 money(r['total_now']), '%s <small>(%s/pc)</small>' % (
+                     money(r['total_new']), money(r['pc_new'], 2))]
+                for r in d['customer_view']])
+
+    rtab = table(['tier', 'orders/yr', 'gap to %s/hr' % money(d['target_T']), 'per order'],
+                 [[r['tier'], num(r['orders_yr'], 0), money(r['gap_yr']), money(r['gap_order'])]
+                  for r in d['residual']])
+
+    ro = d['reorder']
+    mig = []
+    for i, t in enumerate(TIERS):
+        rs = sum(ro['migration'][i])
+        shrink = sum(ro['migration'][i][:i])
+        mig.append(['<b>%s</b>' % t] + [num(ro['migration'][i][j]) for j in range(5)]
+                   + [num(rs), (pct(shrink / rs, 0) if rs else '&mdash;',
+                                'pa-neg' if rs and shrink / rs > 0.4 else '')])
+    migtab = table(['previous order was'] + ['&rarr; ' + t for t in TIERS]
+                   + ['total', 'dropped a tier'], mig)
+
+    con = table(['if two orders land within', 'pairs/yr', 'duplicated hours/yr', 'value/yr'],
+                [[num(x['window']) + ' days', num(x['pairs_yr'], 0), num(x['hours_yr'], 0),
+                  '<b>%s</b>' % money(x['value_yr'])] for x in d['consolidation']]
+                if 'consolidation' in d else
+                [[num(x['window']) + ' days', num(x['pairs_yr'], 0), num(x['hours_yr'], 0),
+                  '<b>%s</b>' % money(x['value_yr'])] for x in ro['consolidation']])
+
+    gp = ro['gaps']
+    best = d['scenarios'][2]
+
+    return """
+            <section class="dash-card" id="pa-design">
+                <h2 class="pa-h">Where the breaks belong <span class="pa-tag">solved, not estimated</span></h2>
+                <p class="pa-body">The tier ladder is a staircase approximation to a cost curve.
+                To know whether the steps are in the right places you first have to know the
+                curve &mdash; specifically how much of an order's cost is <em>fixed setup</em> that
+                does not shrink when the order does.</p>
+
+                <h3 class="pa-h3">The cost curve: hours(q) = S + v &times; q</h3>
+                <p class="pa-body">Fitted three independent ways. They agree on S, which is the
+                number every recommendation below depends on.</p>
+                %s
+                <p class="pa-note"><code>sts_Setup</code> is filled in on only <b>%s of %s</b>
+                production-log rows, so setup cannot be read off the log &mdash; it has to be
+                regressed out. Kornit and patch rows are excluded (different processes).</p>
+                <div class="pa-finding">
+                    <h3>Every order carries about %s hours of setup before a single garment runs</h3>
+                    <p>That is <strong>%s at the direct rate</strong>, or %s fully loaded. It is
+                    the same whether the order is for 4 pieces or 400, and it is the entire reason
+                    small orders behave differently.</p>
+                </div>
+
+                <h3 class="pa-h3">Which is why cost per piece collapses early, then flattens</h3>
+                %s
+                <div class="pa-callout pa-callout--danger">
+                    <h4>The breaks are clustered where the curve is flat and absent where it is steep</h4>
+                    <p>By 8 pieces, cost per piece has already fallen to <strong>%s of its
+                    one-piece value</strong> &mdash; %s of every efficiency gain that will ever be
+                    available. Yet the ladder has <strong>no break anywhere in 1&ndash;23</strong>,
+                    where cost falls roughly sixfold, and <strong>three breaks across
+                    24&ndash;72+</strong>, where it falls about 30%%. The 1&ndash;7 tier alone spans
+                    a 5.4&times; cost range at a single price.</p>
+                </div>
+
+                <h3 class="pa-h3">What the optimiser picks instead</h3>
+                <p class="pa-body">Choosing K intervals over an ordered domain to minimise weighted
+                error is the 1-D k-segmentation problem, which dynamic programming solves
+                <em>optimally</em> &mdash; there is no judgement call in it. Run against the real
+                order-size distribution, it lands in the same place at every cost target tested:</p>
+                %s
+
+                <h3 class="pa-h3">What each tier earns per production hour</h3>
+                <p class="pa-body">The machine hour is the scarce resource, so contribution per hour
+                is what makes tiers comparable. Note the last column.</p>
+                %s
+                <div class="pa-finding pa-finding--alt">
+                    <h3>Steer toward 48, not 72</h3>
+                    <p>The 72 break is worth <strong>%s per hour</strong> over 48&ndash;71 &mdash;
+                    about %s. Moving a 24-piece order to 48 is worth nine times more. And the
+                    single most valuable move available is getting an order <em>out of
+                    1&ndash;7</em>: that step is worth <strong>%s per hour</strong>.</p>
+                </div>
+                <p class="pa-note">Read the absolute numbers carefully: at the %s direct rate every
+                tier clears, so 1&ndash;7 is not losing cash &mdash; it is the worst <em>use</em> of
+                a constrained hour. The distance between %s and the %s loaded rate is a
+                utilization problem (only about a third of embroidery hours log as productive), and
+                no price change closes it.</p>
+
+                <h3 class="pa-h3">The small-order fee</h3>
+                <p class="pa-body">Today's <strong>%s</strong> recovers <strong>%s</strong> of the
+                %s setup it exists to cover, and it stops at 7 pieces &mdash; so 8&ndash;23 pays
+                nothing toward setup at all. The natural ceiling is where fixed and variable cost
+                cross, <strong>S/v = %s pieces</strong> for flats (%s for caps): below that an order
+                is mostly setup. The nearest existing tier boundary is 23, so extending the fee
+                there needs no new break.</p>
+                %s
+                <div class="pa-finding">
+                    <h3>%s &mdash; worth %s a year</h3>
+                    <p>It is the measured setup cost, it lifts 8&ndash;23 to
+                    <strong>%s per hour</strong> &mdash; exact parity with 24&ndash;47 &mdash; and
+                    the customer sees a %s line on the job, which is unremarkable in this trade.</p>
+                </div>
+                <h4 class="pa-h3">What the customer actually sees</h4>
+                %s
+                <div class="pa-callout pa-callout--danger">
+                    <h4>No sellable fee fixes 1&ndash;7 &mdash; and that is worth saying out loud</h4>
+                    <p>Full parity on a 1&ndash;7 order needs about <strong>%s per order</strong>,
+                    which puts four shirts at roughly $117 each. That is arithmetic, not a price.
+                    The residual below is a decide-whether-to-take-the-work number, not a pricing
+                    problem.</p>
+                </div>
+                %s
+
+                <h3 class="pa-h3">Reorders</h3>
+                <p class="pa-body"><strong>%s of customers reorder</strong> and <strong>%s of all
+                orders come from repeat customers</strong>, with a median gap of
+                <strong>%s days</strong> (quartiles %s and %s). So this is a repeat business, and
+                the fee lands mostly on people who already buy from us.</p>
+                <div class="pa-callout pa-callout--danger">
+                    <h4>A reorder is not cheaper to set up</h4>
+                    <p>Comparing like for like &mdash; only customers whose genuine first order
+                    falls inside the production-log window &mdash; a first order sets up in
+                    <strong>%s hr</strong> (n=%s) and later orders in <strong>%s hr</strong>
+                    (n=%s). There is no saving. <strong>An early-reorder discount cannot be funded
+                    from a setup saving, because the saving does not exist.</strong></p>
+                </div>
+                <p class="pa-body">The prize is <strong>consolidation, not earliness</strong>. Two
+                orders from one customer landing close together each pay a fresh %s-hour setup:</p>
+                %s
+                <p class="pa-body">Volume also leaks downward on reorder. Of %s consecutive order
+                pairs, <strong>%s dropped a tier</strong>, %s stayed level and %s moved up:</p>
+                %s
+                <div class="pa-finding pa-finding--alt">
+                    <h3>The reorder target: catch the second order before the first runs</h3>
+                    <p>At order entry, if the customer has ordered within 60 days, offer to combine
+                    &mdash; and ask what they need through the next quarter rather than taking the
+                    reorder as presented. One setup instead of two is <strong>%s</strong> every
+                    time it lands. Merging only the pairs already falling inside 30 days would cut
+                    1&ndash;7 orders from about 2,760 to 484.</p>
+                </div>
+            </section>""" % (
+        fit, num(cc['setup_logged_rows']), num(cc['prodlog_rows']),
+        num(f['S'], 2), money(cc['setup_direct_flat'], 2), money(cc['setup_loaded_flat'], 2),
+        hrs_tab,
+        pct(cc['hrs_per_piece'][3]['pct_of_q1'], 0),
+        pct((f['S'] + f['v'] - (f['S'] / 8 + f['v'])) / (f['S'] + f['v'] - f['v']), 1),
+        dptab, cphtab,
+        money(d['cph_now']['FLAT|72+'] - d['cph_now']['FLAT|48-71']),
+        pct((d['cph_now']['FLAT|72+'] - d['cph_now']['FLAT|48-71']) / d['cph_now']['FLAT|48-71'], 1),
+        money(d['cph_now']['FLAT|8-23'] - d['cph_now']['FLAT|1-7']),
+        money(D['cost']['per_production_hour'], 2), money(D['cost']['per_production_hour'], 2),
+        money(D['cost']['per_chargeable_hour'], 2),
+        money(d['ltm_now'], 2), pct(d['ltm_now'] / cc['setup_direct_flat'], 0),
+        money(cc['setup_direct_flat'], 2),
+        num(cc['crossover_flat'], 1), num(cc['crossover_cap'], 1),
+        stab,
+        escape(best['label']), money(best['delta']),
+        money(best['cph']['FLAT|8-23']), money(115),
+        cv, money(d['residual'][0]['gap_order']), rtab,
+        pct(ro['repeat_rate'], 0), pct(ro['orders_from_repeaters'], 0),
+        num(gp['p50']), num(gp['p25']), num(gp['p75']),
+        num(ro['first_S'], 3), num(ro['first_n']), num(ro['repeat_S'], 3), num(ro['repeat_n']),
+        num(f['S'], 2), con,
+        num(ro['migration_total']),
+        '%s (%s)' % (num(ro['down']), pct(ro['down'] / ro['migration_total'], 1)),
+        '%s (%s)' % (num(ro['same']), pct(ro['same'] / ro['migration_total'], 1)),
+        '%s (%s)' % (num(ro['up']), pct(ro['up'] / ro['migration_total'], 1)),
+        migtab, money(cc['setup_direct_flat'], 0))
+
+
 NAV = [('pa-tiers', 'Units by tier'), ('pa-year', 'Year by year'), ('pa-gap', 'The gap'),
-       ('pa-cost', 'Cost basis'), ('pa-pricing', 'Caspio today'), ('pa-rules', 'Five rules'),
-       ('pa-limits', 'Limits')]
+       ('pa-cost', 'Cost basis'), ('pa-pricing', 'Caspio today'), ('pa-design', 'Tier design'),
+       ('pa-rules', 'Five rules'), ('pa-limits', 'Limits')]
 
 
 def build():
@@ -646,13 +881,14 @@ def build():
 %s
 %s
 %s
+%s
         </main>
     </div>
     <script src="/dashboards/js/pricing-analysis.js?v=%s"></script>
 </body>
 </html>
 """ % (CSS_VER, nav, sec_provenance(), sec_hero(), sec_tiers(), sec_year(), sec_gap(),
-       sec_cost(), sec_pricing(), sec_rules(), sec_limits(), JS_VER)
+       sec_cost(), sec_pricing(), sec_design(), sec_rules(), sec_limits(), JS_VER)
 
 
 if __name__ == '__main__':

@@ -24,7 +24,7 @@
 
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/pricing-analysis.css?v=2026.07.30.1">
+    <link rel="stylesheet" href="/dashboards/css/pricing-analysis.css?v=2026.07.30.2">
 </head>
 <body>
     <div class="dash-shell">
@@ -42,7 +42,7 @@
             </div>
         </header>
 
-        <nav class="pa-nav" aria-label="Sections"><a href="#pa-tiers" class="pa-nav-link">Units by tier</a><a href="#pa-year" class="pa-nav-link">Year by year</a><a href="#pa-gap" class="pa-nav-link">The gap</a><a href="#pa-cost" class="pa-nav-link">Cost basis</a><a href="#pa-pricing" class="pa-nav-link">Caspio today</a><a href="#pa-rules" class="pa-nav-link">Five rules</a><a href="#pa-limits" class="pa-nav-link">Limits</a></nav>
+        <nav class="pa-nav" aria-label="Sections"><a href="#pa-tiers" class="pa-nav-link">Units by tier</a><a href="#pa-year" class="pa-nav-link">Year by year</a><a href="#pa-gap" class="pa-nav-link">The gap</a><a href="#pa-cost" class="pa-nav-link">Cost basis</a><a href="#pa-pricing" class="pa-nav-link">Caspio today</a><a href="#pa-design" class="pa-nav-link">Tier design</a><a href="#pa-rules" class="pa-nav-link">Five rules</a><a href="#pa-limits" class="pa-nav-link">Limits</a></nav>
 
         <main class="dash-content">
 
@@ -53,7 +53,7 @@
                 <code>scripts/build-pricing-analysis.py</code> from
                 <code>memory/pricing-analysis-data.json</code>; nothing on this page is typed by hand.</p>
                 <div class="pa-chips">
-                    <span class="pa-chip">Generated <b>2026-07-29</b></span>
+                    <span class="pa-chip">Generated <b>2026-07-30</b></span>
                     <span class="pa-chip">Scope <b>Custom Embroidery + Caps</b> (types 21, 1)</span>
                     <span class="pa-chip">Source <b>SWODBC on bandit</b> (read-only)</span>
                     <span class="pa-chip">Cost basis <b>$89.74/production hr</b></span>
@@ -192,7 +192,7 @@
             <section class="dash-card" id="pa-year">
                 <h2 class="pa-h">Year by year <span class="pa-tag">2016 &ndash; 2026</span></h2>
                 <p class="pa-body">Units per tier by year, with the garment-classified cap split
-                beside it. 2026 is a partial year (through 2026-07-29).</p>
+                beside it. 2026 is a partial year (through 2026-07-30).</p>
                 <div class="pa-scroll"><table class="pa-table">
 <thead><tr><th class="pa-l">year</th><th class="pa-r">orders</th><th class="pa-r">1-7</th><th class="pa-r">8-23</th><th class="pa-r">24-47</th><th class="pa-r">48-71</th><th class="pa-r">72+</th><th class="pa-r">units</th><th class="pa-r">cap units</th><th class="pa-r">garment units</th><th class="pa-r">cap %</th></tr></thead>
 <tbody>
@@ -323,6 +323,198 @@
                 small enough to warrant it.</p>
             </section>
 
+            <section class="dash-card" id="pa-design">
+                <h2 class="pa-h">Where the breaks belong <span class="pa-tag">solved, not estimated</span></h2>
+                <p class="pa-body">The tier ladder is a staircase approximation to a cost curve.
+                To know whether the steps are in the right places you first have to know the
+                curve &mdash; specifically how much of an order's cost is <em>fixed setup</em> that
+                does not shrink when the order does.</p>
+
+                <h3 class="pa-h3">The cost curve: hours(q) = S + v &times; q</h3>
+                <p class="pa-body">Fitted three independent ways. They agree on S, which is the
+                number every recommendation below depends on.</p>
+                <div class="pa-scroll"><table class="pa-table">
+<thead><tr><th class="pa-l">fit</th><th class="pa-r">fixed setup S</th><th class="pa-r">variable v</th><th class="pa-r">R&sup2;</th><th class="pa-r">n</th></tr></thead>
+<tbody>
+<tr><td class="pa-l">Flats &mdash; pooled tier points</td><td class="pa-r"><b>1.279 hr/order</b></td><td class="pa-r">0.06612 hr/pc</td><td class="pa-r">0.988</td><td class="pa-r">5</td></tr>
+<tr><td class="pa-l">Caps &mdash; pooled tier points</td><td class="pa-r"><b>1.224 hr/order</b></td><td class="pa-r">0.04550 hr/pc</td><td class="pa-r">0.985</td><td class="pa-r">5</td></tr>
+<tr><td class="pa-l">Order level, type 21</td><td class="pa-r">1.138 hr</td><td class="pa-r">0.07022 hr/pc</td><td class="pa-r">0.622</td><td class="pa-r">1,472</td></tr>
+<tr><td class="pa-l">Order level, type 1 (with imprints)</td><td class="pa-r">1.184 hr</td><td class="pa-r">0.06318 hr/pc</td><td class="pa-r">0.773</td><td class="pa-r">285</td></tr>
+</tbody>
+</table></div>
+                <p class="pa-note"><code>sts_Setup</code> is filled in on only <b>51 of 5,521</b>
+                production-log rows, so setup cannot be read off the log &mdash; it has to be
+                regressed out. Kornit and patch rows are excluded (different processes).</p>
+                <div class="pa-finding">
+                    <h3>Every order carries about 1.28 hours of setup before a single garment runs</h3>
+                    <p>That is <strong>$114.75 at the direct rate</strong>, or $365.59 fully loaded. It is
+                    the same whether the order is for 4 pieces or 400, and it is the entire reason
+                    small orders behave differently.</p>
+                </div>
+
+                <h3 class="pa-h3">Which is why cost per piece collapses early, then flattens</h3>
+                <div class="pa-scroll"><table class="pa-table">
+<thead><tr><th class="pa-l">pieces</th><th class="pa-r">1</th><th class="pa-r">2</th><th class="pa-r">4</th><th class="pa-r">8</th><th class="pa-r">16</th><th class="pa-r">24</th><th class="pa-r">48</th><th class="pa-r">72</th><th class="pa-r">144</th><th class="pa-r">288</th></tr></thead>
+<tbody>
+<tr><td class="pa-l">hours per piece</td><td class="pa-r">1.345</td><td class="pa-r">0.705</td><td class="pa-r">0.386</td><td class="pa-r">0.226</td><td class="pa-r">0.146</td><td class="pa-r">0.119</td><td class="pa-r">0.093</td><td class="pa-r">0.084</td><td class="pa-r">0.075</td><td class="pa-r">0.071</td></tr>
+<tr><td class="pa-l">share of the 1-piece figure</td><td class="pa-r">100%</td><td class="pa-r">52%</td><td class="pa-r">29%</td><td class="pa-r">17%</td><td class="pa-r">11%</td><td class="pa-r">9%</td><td class="pa-r">7%</td><td class="pa-r">6%</td><td class="pa-r">6%</td><td class="pa-r">5%</td></tr>
+</tbody>
+</table></div>
+                <div class="pa-callout pa-callout--danger">
+                    <h4>The breaks are clustered where the curve is flat and absent where it is steep</h4>
+                    <p>By 8 pieces, cost per piece has already fallen to <strong>17% of its
+                    one-piece value</strong> &mdash; 87.5% of every efficiency gain that will ever be
+                    available. Yet the ladder has <strong>no break anywhere in 1&ndash;23</strong>,
+                    where cost falls roughly sixfold, and <strong>three breaks across
+                    24&ndash;72+</strong>, where it falls about 30%. The 1&ndash;7 tier alone spans
+                    a 5.4&times; cost range at a single price.</p>
+                </div>
+
+                <h3 class="pa-h3">What the optimiser picks instead</h3>
+                <p class="pa-body">Choosing K intervals over an ordered domain to minimise weighted
+                error is the 1-D k-segmentation problem, which dynamic programming solves
+                <em>optimally</em> &mdash; there is no judgement call in it. Run against the real
+                order-size distribution, it lands in the same place at every cost target tested:</p>
+                <div class="pa-scroll"><table class="pa-table">
+<thead><tr><th class="pa-l">cost target used</th><th class="pa-r">breaks the solver chooses</th></tr></thead>
+<tbody>
+<tr><td class="pa-l">target $89/hr</td><td class="pa-r">2 / 4 / 8 / 18</td></tr>
+<tr><td class="pa-l">target $150/hr</td><td class="pa-r">2 / 4 / 8 / 18</td></tr>
+<tr><td class="pa-l">target $200/hr</td><td class="pa-r">2 / 4 / 8 / 26</td></tr>
+<tr><td class="pa-l">target $250/hr</td><td class="pa-r">2 / 4 / 8 / 26</td></tr>
+<tr><td class="pa-l">target $285/hr</td><td class="pa-r">2 / 4 / 8 / 26</td></tr>
+<tr><td class="pa-l"><b>what we charge today</b></td><td class="pa-r"><b>8 / 24 / 48 / 72</b></td></tr>
+</tbody>
+</table></div>
+
+                <h3 class="pa-h3">What each tier earns per production hour</h3>
+                <p class="pa-body">The machine hour is the scarce resource, so contribution per hour
+                is what makes tiers comparable. Note the last column.</p>
+                <div class="pa-scroll"><table class="pa-table">
+<thead><tr><th class="pa-l">tier</th><th class="pa-r">flat orders</th><th class="pa-r">flats &mdash; $ per production hour</th><th class="pa-r">caps</th><th class="pa-r">gain over previous tier</th></tr></thead>
+<tbody>
+<tr><td class="pa-l"><b>1-7</b></td><td class="pa-r">3,345</td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="width:33.5%"></span></span> $134</td><td class="pa-r">$101</td><td class="pa-r">&mdash;</td></tr>
+<tr><td class="pa-l"><b>8-23</b></td><td class="pa-r">3,140</td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="width:56.2%"></span></span> $225</td><td class="pa-r">$174</td><td class="pa-r"><b>+$91</b></td></tr>
+<tr><td class="pa-l"><b>24-47</b></td><td class="pa-r">1,703</td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="width:69.0%"></span></span> $276</td><td class="pa-r">$200</td><td class="pa-r"><b>+$51</b></td></tr>
+<tr><td class="pa-l"><b>48-71</b></td><td class="pa-r">727</td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="width:77.9%"></span></span> $312</td><td class="pa-r">$222</td><td class="pa-r"><b>+$36</b></td></tr>
+<tr><td class="pa-l"><b>72+</b></td><td class="pa-r">1,112</td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="width:80.3%"></span></span> $321</td><td class="pa-r">$255</td><td class="pa-r"><b>+$10</b></td></tr>
+</tbody>
+</table></div>
+                <div class="pa-finding pa-finding--alt">
+                    <h3>Steer toward 48, not 72</h3>
+                    <p>The 72 break is worth <strong>$10 per hour</strong> over 48&ndash;71 &mdash;
+                    about 3.1%. Moving a 24-piece order to 48 is worth nine times more. And the
+                    single most valuable move available is getting an order <em>out of
+                    1&ndash;7</em>: that step is worth <strong>$91 per hour</strong>.</p>
+                </div>
+                <p class="pa-note">Read the absolute numbers carefully: at the $89.74 direct rate every
+                tier clears, so 1&ndash;7 is not losing cash &mdash; it is the worst <em>use</em> of
+                a constrained hour. The distance between $89.74 and the $285.92 loaded rate is a
+                utilization problem (only about a third of embroidery hours log as productive), and
+                no price change closes it.</p>
+
+                <h3 class="pa-h3">The small-order fee</h3>
+                <p class="pa-body">Today's <strong>$50.00</strong> recovers <strong>44%</strong> of the
+                $114.75 setup it exists to cover, and it stops at 7 pieces &mdash; so 8&ndash;23 pays
+                nothing toward setup at all. The natural ceiling is where fixed and variable cost
+                cross, <strong>S/v = 19.3 pieces</strong> for flats (26.9 for caps): below that an order
+                is mostly setup. The nearest existing tier boundary is 23, so extending the fee
+                there needs no new break.</p>
+                <div class="pa-scroll"><table class="pa-table">
+<thead><tr><th class="pa-l">fee</th><th class="pa-r">fee revenue/yr</th><th class="pa-r">vs today</th><th class="pa-r">flats 1-7</th><th class="pa-r">flats 8-23</th><th class="pa-r">caps 1-7</th><th class="pa-r">caps 8-23</th></tr></thead>
+<tbody>
+<tr><td class="pa-l">today — $50 on 1-7</td><td class="pa-r">$16,425</td><td class="pa-r">&mdash;</td><td class="pa-r">$134</td><td class="pa-r">$225</td><td class="pa-r">$101</td><td class="pa-r">$174</td></tr>
+<tr><td class="pa-l">$115 on 1-7</td><td class="pa-r">$37,778</td><td class="pa-r">+$21,353</td><td class="pa-r">$176</td><td class="pa-r">$225</td><td class="pa-r">$148</td><td class="pa-r">$174</td></tr>
+<tr><td class="pa-l">$115 on 1-23</td><td class="pa-r">$75,633</td><td class="pa-r">+$59,208</td><td class="pa-r">$176</td><td class="pa-r">$277</td><td class="pa-r">$148</td><td class="pa-r">$233</td></tr>
+<tr><td class="pa-l">$150 on 1-23</td><td class="pa-r">$98,652</td><td class="pa-r">+$82,226</td><td class="pa-r">$199</td><td class="pa-r">$293</td><td class="pa-r">$173</td><td class="pa-r">$252</td></tr>
+<tr><td class="pa-l">$200 on 1-7, $100 on 8-23</td><td class="pa-r">$98,618</td><td class="pa-r">+$82,193</td><td class="pa-r">$232</td><td class="pa-r">$271</td><td class="pa-r">$209</td><td class="pa-r">$226</td></tr>
+</tbody>
+</table></div>
+                <div class="pa-finding">
+                    <h3>$115 on 1-23 &mdash; worth $59,208 a year</h3>
+                    <p>It is the measured setup cost, it lifts 8&ndash;23 to
+                    <strong>$277 per hour</strong> &mdash; exact parity with 24&ndash;47 &mdash; and
+                    the customer sees a $115 line on the job, which is unremarkable in this trade.</p>
+                </div>
+                <h4 class="pa-h3">What the customer actually sees</h4>
+                <div class="pa-scroll"><table class="pa-table">
+<thead><tr><th class="pa-l">pieces</th><th class="pa-r">price/pc</th><th class="pa-r">goods</th><th class="pa-r">fee today</th><th class="pa-r">fee at $115</th><th class="pa-r">order total today</th><th class="pa-r">order total at $115</th></tr></thead>
+<tbody>
+<tr><td class="pa-l">1</td><td class="pa-r">$67.00</td><td class="pa-r">$67</td><td class="pa-r">$50</td><td class="pa-r">$115</td><td class="pa-r">$117</td><td class="pa-r">$182 <small>($182.00/pc)</small></td></tr>
+<tr><td class="pa-l">2</td><td class="pa-r">$67.00</td><td class="pa-r">$134</td><td class="pa-r">$50</td><td class="pa-r">$115</td><td class="pa-r">$184</td><td class="pa-r">$249 <small>($124.50/pc)</small></td></tr>
+<tr><td class="pa-l">4</td><td class="pa-r">$67.00</td><td class="pa-r">$268</td><td class="pa-r">$50</td><td class="pa-r">$115</td><td class="pa-r">$318</td><td class="pa-r">$383 <small>($95.75/pc)</small></td></tr>
+<tr><td class="pa-l">6</td><td class="pa-r">$67.00</td><td class="pa-r">$402</td><td class="pa-r">$50</td><td class="pa-r">$115</td><td class="pa-r">$452</td><td class="pa-r">$517 <small>($86.17/pc)</small></td></tr>
+<tr><td class="pa-l">8</td><td class="pa-r">$55.00</td><td class="pa-r">$440</td><td class="pa-r">$0</td><td class="pa-r">$115</td><td class="pa-r">$440</td><td class="pa-r">$555 <small>($69.38/pc)</small></td></tr>
+<tr><td class="pa-l">12</td><td class="pa-r">$55.00</td><td class="pa-r">$660</td><td class="pa-r">$0</td><td class="pa-r">$115</td><td class="pa-r">$660</td><td class="pa-r">$775 <small>($64.58/pc)</small></td></tr>
+<tr><td class="pa-l">18</td><td class="pa-r">$55.00</td><td class="pa-r">$990</td><td class="pa-r">$0</td><td class="pa-r">$115</td><td class="pa-r">$990</td><td class="pa-r">$1,105 <small>($61.39/pc)</small></td></tr>
+<tr><td class="pa-l">23</td><td class="pa-r">$55.00</td><td class="pa-r">$1,265</td><td class="pa-r">$0</td><td class="pa-r">$115</td><td class="pa-r">$1,265</td><td class="pa-r">$1,380 <small>($60.00/pc)</small></td></tr>
+<tr><td class="pa-l">24</td><td class="pa-r">$46.00</td><td class="pa-r">$1,104</td><td class="pa-r">$0</td><td class="pa-r">$0</td><td class="pa-r">$1,104</td><td class="pa-r">$1,104 <small>($46.00/pc)</small></td></tr>
+<tr><td class="pa-l">36</td><td class="pa-r">$46.00</td><td class="pa-r">$1,656</td><td class="pa-r">$0</td><td class="pa-r">$0</td><td class="pa-r">$1,656</td><td class="pa-r">$1,656 <small>($46.00/pc)</small></td></tr>
+<tr><td class="pa-l">48</td><td class="pa-r">$44.00</td><td class="pa-r">$2,112</td><td class="pa-r">$0</td><td class="pa-r">$0</td><td class="pa-r">$2,112</td><td class="pa-r">$2,112 <small>($44.00/pc)</small></td></tr>
+</tbody>
+</table></div>
+                <div class="pa-callout pa-callout--danger">
+                    <h4>No sellable fee fixes 1&ndash;7 &mdash; and that is worth saying out loud</h4>
+                    <p>Full parity on a 1&ndash;7 order needs about <strong>$267 per order</strong>,
+                    which puts four shirts at roughly $117 each. That is arithmetic, not a price.
+                    The residual below is a decide-whether-to-take-the-work number, not a pricing
+                    problem.</p>
+                </div>
+                <div class="pa-scroll"><table class="pa-table">
+<thead><tr><th class="pa-l">tier</th><th class="pa-r">orders/yr</th><th class="pa-r">gap to $276/hr</th><th class="pa-r">per order</th></tr></thead>
+<tbody>
+<tr><td class="pa-l">FLAT 1-7</td><td class="pa-r">317</td><td class="pa-r">$84,537</td><td class="pa-r">$267</td></tr>
+<tr><td class="pa-l">FLAT 8-23</td><td class="pa-r">297</td><td class="pa-r">$33,175</td><td class="pa-r">$112</td></tr>
+<tr><td class="pa-l">CAP 1-7</td><td class="pa-r">12</td><td class="pa-r">$3,449</td><td class="pa-r">$294</td></tr>
+<tr><td class="pa-l">CAP 8-23</td><td class="pa-r">32</td><td class="pa-r">$6,262</td><td class="pa-r">$197</td></tr>
+</tbody>
+</table></div>
+
+                <h3 class="pa-h3">Reorders</h3>
+                <p class="pa-body"><strong>66% of customers reorder</strong> and <strong>95% of all
+                orders come from repeat customers</strong>, with a median gap of
+                <strong>56 days</strong> (quartiles 19 and 180). So this is a repeat business, and
+                the fee lands mostly on people who already buy from us.</p>
+                <div class="pa-callout pa-callout--danger">
+                    <h4>A reorder is not cheaper to set up</h4>
+                    <p>Comparing like for like &mdash; only customers whose genuine first order
+                    falls inside the production-log window &mdash; a first order sets up in
+                    <strong>1.299 hr</strong> (n=215) and later orders in <strong>1.382 hr</strong>
+                    (n=857). There is no saving. <strong>An early-reorder discount cannot be funded
+                    from a setup saving, because the saving does not exist.</strong></p>
+                </div>
+                <p class="pa-body">The prize is <strong>consolidation, not earliness</strong>. Two
+                orders from one customer landing close together each pay a fresh 1.28-hour setup:</p>
+                <div class="pa-scroll"><table class="pa-table">
+<thead><tr><th class="pa-l">if two orders land within</th><th class="pa-r">pairs/yr</th><th class="pa-r">duplicated hours/yr</th><th class="pa-r">value/yr</th></tr></thead>
+<tbody>
+<tr><td class="pa-l">30 days</td><td class="pa-r">374</td><td class="pa-r">479</td><td class="pa-r"><b>$42,967</b></td></tr>
+<tr><td class="pa-l">60 days</td><td class="pa-r">457</td><td class="pa-r">584</td><td class="pa-r"><b>$52,421</b></td></tr>
+<tr><td class="pa-l">90 days</td><td class="pa-r">499</td><td class="pa-r">638</td><td class="pa-r"><b>$57,213</b></td></tr>
+</tbody>
+</table></div>
+                <p class="pa-body">Volume also leaks downward on reorder. Of 13,339 consecutive order
+                pairs, <strong>4,303 (32.3%) dropped a tier</strong>, 4,979 (37.3%) stayed level and 4,057 (30.4%) moved up:</p>
+                <div class="pa-scroll"><table class="pa-table">
+<thead><tr><th class="pa-l">previous order was</th><th class="pa-r">&rarr; 1-7</th><th class="pa-r">&rarr; 8-23</th><th class="pa-r">&rarr; 24-47</th><th class="pa-r">&rarr; 48-71</th><th class="pa-r">&rarr; 72+</th><th class="pa-r">total</th><th class="pa-r">dropped a tier</th></tr></thead>
+<tbody>
+<tr><td class="pa-l"><b>1-7</b></td><td class="pa-r">2,074</td><td class="pa-r">1,015</td><td class="pa-r">490</td><td class="pa-r">222</td><td class="pa-r">386</td><td class="pa-r">4,187</td><td class="pa-r ">0%</td></tr>
+<tr><td class="pa-l"><b>8-23</b></td><td class="pa-r">1,094</td><td class="pa-r">1,317</td><td class="pa-r">640</td><td class="pa-r">241</td><td class="pa-r">311</td><td class="pa-r">3,603</td><td class="pa-r ">30%</td></tr>
+<tr><td class="pa-l"><b>24-47</b></td><td class="pa-r">588</td><td class="pa-r">620</td><td class="pa-r">723</td><td class="pa-r">281</td><td class="pa-r">264</td><td class="pa-r">2,476</td><td class="pa-r pa-neg">49%</td></tr>
+<tr><td class="pa-l"><b>48-71</b></td><td class="pa-r">230</td><td class="pa-r">270</td><td class="pa-r">263</td><td class="pa-r">207</td><td class="pa-r">207</td><td class="pa-r">1,177</td><td class="pa-r pa-neg">65%</td></tr>
+<tr><td class="pa-l"><b>72+</b></td><td class="pa-r">372</td><td class="pa-r">346</td><td class="pa-r">308</td><td class="pa-r">212</td><td class="pa-r">658</td><td class="pa-r">1,896</td><td class="pa-r pa-neg">65%</td></tr>
+</tbody>
+</table></div>
+                <div class="pa-finding pa-finding--alt">
+                    <h3>The reorder target: catch the second order before the first runs</h3>
+                    <p>At order entry, if the customer has ordered within 60 days, offer to combine
+                    &mdash; and ask what they need through the next quarter rather than taking the
+                    reorder as presented. One setup instead of two is <strong>$115</strong> every
+                    time it lands. Merging only the pairs already falling inside 30 days would cut
+                    1&ndash;7 orders from about 2,760 to 484.</p>
+                </div>
+            </section>
+
             <section class="dash-card" id="pa-rules">
                 <h2 class="pa-h">Five rules, priced individually</h2>
                 <p class="pa-body">Each rule is costed <strong>in isolation</strong> against the
@@ -419,6 +611,6 @@
             </section>
         </main>
     </div>
-    <script src="/dashboards/js/pricing-analysis.js?v=2026.07.30.1"></script>
+    <script src="/dashboards/js/pricing-analysis.js?v=2026.07.30.2"></script>
 </body>
 </html>
