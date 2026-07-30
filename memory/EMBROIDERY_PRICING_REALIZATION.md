@@ -288,3 +288,67 @@ Scripts: `cost_curve.py`, `optimize_breaks.py`, `optimal_tiers.py`, `final_answe
 `reorder_detail.py`, `scenarios.py` (session scratchpad). Customer pull =
 `hist_customers.tsv`. ⚠️ **PowerShell writes dates in the LOCAL culture (M/D/YYYY)** — parse
 before sorting or the sequence is wrong.
+
+---
+
+# Cost basis rebuilt from the general journal + TimeClick — added 2026-07-30
+
+## 🔴 The GL is NOT on the ShopWorks ODBC — verified, don't look again
+
+Scanned **all 2,724 columns across 18 exposed tables**. **Zero** columns match
+`payroll|salary|wage`. No ledger, no journal, no debit/credit transaction table.
+(`GetSchema("Columns")` throws `SQL_NO_NULLS already belongs to this DataTable` on the
+FileMaker driver — enumerate columns with `SELECT * FROM t WHERE 1=0` and read
+`rd.GetName(i)` instead.) ⚠️ **`LinesPur` errors `<File Missing>`** — it is listed but
+unreadable.
+
+Tables (19): `Addr Buttons ContactNumbers Contacts Cust Des DesignLocations Event InvLevel
+LinesOE LinesPur Machines Orders OrdTyp PO Prod ProductionLogDetails Thumbnails Version`.
+
+What exists is **account POINTERS, not postings**: `OrdTyp.coa_Revenue` /`coa_CostOfGoods`
+/`gt_DepartmentCode` (all blank via ODBC), `Orders.cur_JobCost_Labor`,
+`LinesOE.cnCur_LineCost_LaborDistribution`, `ProductionLogDetails.cnCur_TotalLabor`.
+**Source of record for GL/payroll is Erik's CSV exports**, not the ODBC.
+
+## Payroll by department (journal, 169 "YYYY Payroll NN" entries, 2019-2026)
+
+| year | 5220 Production | 5231 Digital Print | indirect + tax | all payroll |
+|---|---|---|---|---|
+| 2021 | $242,994 | $60,681 | $510,662 | $814,337 |
+| 2022 | $222,909 | $47,984 | $411,307 | $682,200 |
+| 2023 | $310,595 | $58,433 | $558,738 | $927,766 |
+| 2024 | $344,994 | $73,722 | $645,082 | $1,063,798 |
+| 2025 | $338,723 | $85,460 | $688,397 | $1,112,580 |
+
+Indirect = 6149 Admin + 6150 Art + 6155 Executive + 6472/3/6/8 taxes. 🔑 **Every $1 of
+production wage carries $1.64 of indirect payroll ⇒ a loaded hour is 2.64× the floor wage**,
+before any non-payroll cost. All payroll = **71-74% of the $1,494,241 non-material basis**,
+so the payroll-only rate needs a **1.34× gross-up** for rent/equipment/utilities/supplies.
+
+## 🔑 The $89.74/hr is CONSERVATIVE, and the rate choice changes no comparison
+
+2025 bracket: payroll-only loaded **$49.03-56.12** → grossed up **$65.70-75.20** vs the
+**$89.74** used in every table. So published profit figures understate by $14-24/hr.
+
+**This does not matter for any ranking.** `profit/hr = contribution/hours − rate`: the rate
+enters as a *subtraction*, so changing it shifts **every cell by the same amount**. Only the
+position of zero moves — i.e. whether 1-7 is called a small loss (−$17 at $89.74) or a small
+gain (+$6 at $66). Every conclusion about *relative* merit (garment mix beats quantity,
+48 vs 72, the dead zones) is **rate-independent**.
+
+⚠️ **The employee file holds CURRENT staff only**, so 5-14% of TimeClick hours per year
+can't be mapped to a department (worst: Meang Sreynai, 12,309 hrs). Hence the bracket rather
+than a point estimate.
+
+## ⚠️ Data-quality traps in these exports
+
+- **`General Journal Entries and payroll.csv` is a FileMaker portal export**: one header row
+  per entry then continuation rows carrying only the extra GL lines. A record starts where
+  `date_Transaction` is non-empty.
+- 🔴 **`GJ_GL_COA::AccountName` is MISALIGNED with `GJ_GL::id_AccountMain`** — 93 of 110
+  account ids carry two or more different names. **Key on the id**; get names from
+  `General Ledger Detail…csv` (`id_AccountMain` → `GL_COA::ct_AccountName_FullShort`).
+- `ProductionLogDetails.cur_LaborRate` is a **placeholder, not actual wages**: $17.00 flat on
+  4,424 of 5,024 rows, $21.55 hours-weighted, one row at $135,000. ShopWorks job costing is
+  therefore **wage-only with no overhead** — it reports every order far more profitable than
+  it is. `Machines.cur_MachineRate` ($50/hr embroidery) has the same flaw.
