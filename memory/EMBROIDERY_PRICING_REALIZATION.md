@@ -629,3 +629,63 @@ growth rate. But the honest argument is **"the tail is worth it"**, not "most of
 most do not.
 
 Scripts: `parse_designs.py`, `cohort_final.py`; parsed links at `%TEMP%/order_design.tsv`.
+
+---
+
+# 🔴 ACTIONABILITY AUDIT of the "recoverable gap" recommendations (2026-07-30)
+
+**The fee ceilings survive; the enforcement mechanism does not.** Corrected ceiling
+$39,784/yr ($21,334 digitizing + $18,450 LTM) vs the proposed $38,250 — within 4%.
+
+## The three enforcement facts that kill "make the fees non-optional at order entry"
+
+1. **NWCA cannot add a validation to ShopWorks OnSite.** ODBC `extro/extro` is read-only at
+   the account level; `SHOPWORKS_ODBC_INTEGRATION.md:20` — "MO push API remains the ONLY write
+   path into ShopWorks". MO push CREATES orders; it cannot block an invoice. No NWCA owner
+   can execute "block invoicing unless a DD line is present".
+2. **The one path NWCA owns carries 1 order.** Window 2024-08-01→2026-07-29: **2,613 embroidery
+   orders (types 21+1), 8 with an ExtOrderID, `ExtSource` = blank 2,607 / WebSite 5 /
+   NWCA-EMB 1.** The quote builder → `/api/embroidery-push/push-quote` path already implements
+   every recommended control (`LTM_Waived`, `LTM_Display_Mode`, `LTMFeeTotal`, `DigitizingFee`,
+   `GarmentDigitizing`, `CapDigitizing`, **`DiscountReason`**) — on 0.04% of orders.
+   🔑 **The "put a reason code on any price below list" recommendation describes a field that
+   already exists.** It sits on the dead path.
+3. 🔴 **The digitizing rule's trigger is not computable live.** 2026 embroidery via ODBC:
+   `LinesOE.id_Design` **0 of 3,077** lines · `LinesOE.DesignTitle` 0 · `gt_id_DesignBlock` 0 ·
+   `Event.id_Design` **0 of 2,340** · `Event.ct_DesignIDs` → **70 distinct orders of 643 (10.9%)**.
+   The 94-99% coverage every digitizing finding rests on came from Erik's ONE-OFF ShopWorks
+   layout export (`Downloads/desgns and orders.csv`), not a feed.
+4. **Caspio `ORDER_ODBC` is order-level only** (47 fields) — no line items (can't see a DD line)
+   and no quantity column (can't see qty ≤ 7). Both ODBC-readable ⇒ buildable sync, not a checkbox.
+
+## What IS actionable
+
+- **Order→invoice lag = median 14 days** (p25 9, p75 21, p90 29; 1,930 invoiced orders
+  2025-01→2026-07; only 30 = 1.6% invoice within a day). **A nightly exception report has a
+  two-week window** to catch a missing fee before the invoice leaves.
+- **LTM is fully computable today** from `Orders.cn_TotalProductQty_Act` ⇒ nightly "open order,
+  qty ≤ 7, no LTM" list. **738 window 1-7 orders = 369/yr × $50 = $18,450/yr** (not 421/yr).
+- **Digitizing is blocked behind restoring the order→design link** — the single highest-value
+  data fix, and the same one flagged for the small-order-growth question.
+- 🔑 **Order entry is TWO people**: 2026 type-21+1 creators = emp 169 (59.9%) + emp 281 (34.7%)
+  = 94.6%, only 6 distinct. The lever is a two-person conversation + a list, not a systems project.
+
+## 🔴 "Capture is 38% and falling" is wrong — it is ~43% and flat
+
+New-design orders in window (82,316-link export): **charged 302 / uncharged 404 = 42.8%**.
+By half-year **46.6 / 52.8 / 44.5 / 40.8 / 71.4%** — no decline (the claimed 16.7% for 2026 H2
+is a 21-order sample read the other way). All-orders DD rate is flat too: **11.4 / 12.1 / 14.8 /
+12.9 / 12.6%** 2022→2026.
+
+🔑 **Reps are discriminating, not forgetting.** Repeat-design orders carry a DD line **5 times in
+1,836 (0.3%)** — the rule is understood. Capture splits **70.3% brand-new customer** vs
+**26.1% existing customer with new artwork** (n=266 / 440). And the amount varies: window DD
+lines $100×254, $0×27, $50×23, $200×15, $150×14, $300×2 — **mean $105.61, median $100**.
+⇒ A hard block would misfire exactly where judgment is being exercised (existing customer,
+re-cut of a logo we already own).
+
+✅ Confirmed: ShopWorks computes no garment price — `cnCur_UnitPriceCalculated` populated on
+**678 of 25,543** garment lines (2.7%). ✅ Confirmed: LTM is essentially never a line item —
+15 orders in 5,989 (2022-2026); **5 of 738** window 1-7 orders (0.7%).
+
+Scripts: `fees.py`, `newdesign.py`, `ceil.py`, `entry.py` (session scratchpad).
