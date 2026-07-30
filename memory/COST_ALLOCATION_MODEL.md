@@ -192,3 +192,50 @@ $59 (2018) → $26 (2025) looks like a productivity story. It is not. Mapped pro
 **8,242 (2018) → 21,854 (2024)** while production cost only moves $486k → $592k. The employee
 file holds **current staff only**, so early years have far more unmappable people ⇒ hours
 understated ⇒ rate inflated. **Trust 2022-2025 only ($29 / $27 / $27 / $26).**
+
+## 🔴 CORRECTED BY ERIK 2026-07-30 — the per-order pool was too broad
+
+Erik: *"the front office would be under admin… I think your totals are too high."* He was
+right, and **it reverses the small-order conclusion.**
+
+The old "front office" bucket was every 6xxx account — $925k in 2025 — which swept in
+executive pay, marketing, credit-card fees, B&O tax, insurance and property tax alongside
+actual admin. **Erik's call: pool = Admin + Art only.**
+
+| 2025 pool | | $/order |
+|---|---|---|
+| 6149 Admin + taxes | $304,722 | |
+| 6150 Art + taxes | $81,322 | |
+| admin non-payroll (computers, phone, office, prof. services) | $63,530 | |
+| **POOL B** | **$449,574** | **$85 flat** |
+| same pool, driver-based (sales → 2,990 rep-touched; rest → all 5,271) | | **$120** |
+
+Excluded and covered from gross margin instead: executive $258,568, sales/marketing
+non-payroll $67,281, company non-payroll $104,851. ⚠️ **Total 2025 operating cost is
+$1,443,380 either way** — the line only decides what a single order must justify itself
+against, not what the company spends.
+
+### 🔑 The consequence: 1-7 is BREAK-EVEN, not a loser
+
+| tier | flats @$85 | flats @$120 | caps @$85 |
+|---|---|---|---|
+| **1-7** | **+$11** | **−$23** | **−$37** |
+| 8-23 | $250 | $216 | $151 |
+| 24-47 | $668 | $634 | $307 |
+| 48-71 | $1,109 | $1,075 | $547 |
+| 72+ | $2,515 | $2,481 | $1,581 |
+
+Previously recorded as **−$165** on pool E. **That was an artefact of charging every order a
+share of Jim and Erik's salaries.** Range across defensible treatments is −$23 to +$11.
+
+🔴 **The $450 minimum order is WITHDRAWN.** Three independent findings now agree: 1-7 is
+break-even; 68-75% of small orders are reorders from customers who just spent a median
+$2,278; and 27% of small-start designs grow to 24+ pieces carrying $1,510 of follow-on
+revenue. **The existing $50 fee is correctly sized.**
+
+**Unaffected and still actionable**: caps lose at 1-7 (−$37 to −$71) and are thin at 8-23;
+garment mix (a comparison, so per-order cost cancels); the revenue cliffs (pure price
+structure); the 85% realization gap (revenue side only).
+
+⚠️ **General lesson: the small-order conclusion was highly sensitive to one classification
+choice.** Any future per-order cost claim should be stated with the pool that produced it.
