@@ -158,3 +158,37 @@ base to the cost pool or the rate is wrong.
 
 **Older GL (2015-2021) is nice-to-have, not decision-relevant**: the four measured years are stable
 enough that pricing decisions use current cost either way.
+
+## 🔑 ELEVEN-YEAR SERIES from the full GL (added 2026-07-30)
+
+`Downloads/Big general journal from 2014.csv` — 202 MB, 652,226 dated rows, spans 1999-2027
+(effectively 2015+ for cost work). ✅ **Cross-checks EXACTLY against
+`General Ledger since 2022.csv`** — zero difference on 16 account-year spot checks — so the
+two exports agree and the long series is trustworthy. Netting **debit minus credit** on
+expense accounts avoids double-counting: a bill and its later payment both post, but the
+payment moves AP to cash and never touches the expense account.
+
+| | 2015 | 2017 | 2019 | 2021 | 2023 | 2024 | 2025 |
+|---|---|---|---|---|---|---|---|
+| production total | $536k | $416k | $438k | $422k | $585k | $592k | $519k |
+| front office total | $731k | $708k | $826k | $775k | $960k | $1,220k | $926k |
+| **office $/order** | **$141** | $177 | $189 | $184 | $194 | **$250*** | **$176** |
+| production $/hour | — | — | $45 | $32 | $27 | $27 | **$26** |
+
+🔑 **Office cost per order has been FLAT at $176-194 since 2017** — a stable ~$185, which is
+why Erik's own "$200 per order" instinct was well calibrated.
+
+## ✅ The 2024 office spike is SOLVED — it was a one-off
+
+**Account `6442` "Water Ice Damage": $234,437** in 2024 against **$0** in 2022-23 ($128,000
+Write A Check + $106,437 Receive A Bill). A flood/burst-pipe event, **not an operating cost**.
+Excluding it, 2024 office cost is **$202/order**, in line with 2023 ($194) and 2025 ($176).
+**Exclude 6442 from any run-rate.** (Next largest 2024 movers are trivial by comparison: web
+design +$17.6k, professional services +$15.9k, card fees +$8.8k.)
+
+## ⚠️ The production $/hour "decline" is probably an ARTIFACT — do not cite it
+
+$59 (2018) → $26 (2025) looks like a productivity story. It is not. Mapped production hours go
+**8,242 (2018) → 21,854 (2024)** while production cost only moves $486k → $592k. The employee
+file holds **current staff only**, so early years have far more unmappable people ⇒ hours
+understated ⇒ rate inflated. **Trust 2022-2025 only ($29 / $27 / $27 / $26).**
