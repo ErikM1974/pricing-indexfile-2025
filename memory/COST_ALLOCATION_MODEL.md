@@ -33,7 +33,7 @@ single **$89.74 production hour**. Wrong twice over:
 🔴 **Webstore (Inksoft/Shopify) orders are AUTOMATIC** — Erik confirmed Bradley imports them
 and buys the blanks; Nika and Taneisha never touch them. So they consume Bradley and nothing
 else. An earlier model weighted them at ⅓ of a normal order across ALL admin — wrong in kind,
-not degree. **Correcting it RAISED embroidery from $203 to $216**, because taking 2,281
+not degree. **Correcting it RAISED embroidery from $203 to $246**, because taking 2,281
 webstore orders out of the sales denominator concentrates rep cost onto the orders reps
 actually work. ⚠️ Outsourced screenprint/promo carry admin + executive but **ZERO production
 overhead** — no machine hours.
@@ -42,7 +42,7 @@ overhead** — no machine hours.
 of which 1,346 embroidery.
 
 Sensitivity — the executive base is the only remaining judgement call:
-revenue **$216** · rep-touched orders $206 · all orders $168 · unallocated $119.
+revenue **$246** · rep-touched orders $236 · all orders $198 · unallocated $149.
 
 ## 🔑 Measured rep capacity — stable for 15 years
 
@@ -64,8 +64,8 @@ mixing in Jim, Erik and Ruthie, who are managers, not order-entry reps.)
 
 ## 🔑 The daily nut — the number to manage to
 
-Total 2025 operating cost (everything that is not the blank) = **$1,494,241** =
-front office $644,177 + floor $468,403 + non-payroll $381,661.
+Total 2025 operating cost (everything that is not the blank) = **$1,444,538** =
+front office $925,968 + production $518,569 (four-year GL basis, below).
 
 - **$5,977 a working day** the company must clear in gross margin.
 - **$1,474 per rep-day** (1,014 rep-days worked) ≈ **$2,456/day of billing** at 60% GM.
@@ -99,7 +99,7 @@ Erik's instinct of ~$50 is exactly the rep's own time. 2025, per order:
 | + Steve (art) | $81,267 | $15 | $73 |
 | + Jim & Erik (executive) | $258,394 | $49 | **$122** |
 
-(That column spreads flat over all 5,271 orders; the $216 above is embroidery's share once
+(That column spreads flat over all 5,271 orders; the $246 above is embroidery's share once
 each pool sits on its true driver.)
 
 ## Data notes
@@ -120,3 +120,41 @@ minimum order / order-level fee is the right one.
 
 Final tier profit per order ($33.17/hr + $246/order): **1-7 −$160** · 8-23 $74 · 24-47 $483 ·
 48-71 $912 · 72+ $2,273. **1-7 has now lost money under seven different cost treatments.**
+
+## 🔑 FOUR FULL YEARS — the authoritative basis (added 2026-07-30)
+
+🔴 **`Downloads/General Ledger since 2022.csv` (289K rows) carries FULL payroll** — its 5220 reads
+$338,723 for 2025, exactly matching the journal. **It supersedes both the payroll journal and the
+19-month `General Ledger Detail` for all cost work.** (The GL *Detail* export is missing most
+payroll — 5220 shows $162,360 there. Do not use it for payroll.)
+
+| | 2022 | 2023 | 2024 | 2025 |
+|---|---|---|---|---|
+| material / blanks | $1,386,710 | $1,248,802 | $1,454,243 | $1,296,431 |
+| production payroll | $377,330 | $435,046 | $448,261 | $424,183 |
+| production non-payroll | $133,174 | $149,923 | $143,602 | $94,386 |
+| office payroll | $550,574 | $650,182 | $688,825 | $688,437 |
+| office non-payroll | $275,732 | $309,942 | **$531,497** | $237,531 |
+| **PRODUCTION TOTAL** | $510,503 | $584,968 | $591,863 | $518,569 |
+| **FRONT OFFICE TOTAL** | $826,306 | $960,124 | $1,220,323 | $925,968 |
+| production hours | 17,421 | 21,515 | 21,854 | 19,936 |
+| **PRODUCTION $/hour** | **$29.30** | **$27.19** | **$27.08** | **$26.01** |
+| all orders | 4,462 | 4,957 | 4,889 | 5,271 |
+| **FRONT OFFICE $/order** | **$185** | **$194** | **$250** | **$176** |
+
+🔑 **The production hour is $26-29 and drifting DOWN** — not $89.74, and not the $33.17 computed
+off a narrower hours base. Use **~$27/hr**.
+
+🔑 **Front office per order averages $201 across four years** — which is exactly Erik's instinct
+of "about $200 per order". Embroidery's $246 is that base redistributed by driver (it carries more
+because executive is revenue-weighted and sales cost concentrates on rep-touched orders).
+
+⚠️ **2024 office non-payroll spiked to $531,497** against ~$275K either side — unexplained, and it
+alone moves that year's office/order from ~$190 to $250. Worth identifying before quoting 2024.
+
+⚠️ Production hours here are TimeClick Garment Production + Digital Print (19,936 in 2025), a wider
+base than the 15,831 embroidery-only figure used earlier — hence $26.01 vs $33.17. Match the hours
+base to the cost pool or the rate is wrong.
+
+**Older GL (2015-2021) is nice-to-have, not decision-relevant**: the four measured years are stable
+enough that pricing decisions use current cost either way.
