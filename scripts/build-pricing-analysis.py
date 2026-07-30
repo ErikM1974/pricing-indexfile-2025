@@ -26,8 +26,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, 'memory', 'pricing-analysis-data.json')
 OUT = os.path.join(ROOT, 'dashboards', 'pricing-analysis.html')
 
-CSS_VER = '2026.07.30.6'
-JS_VER = '2026.07.30.6'
+CSS_VER = '2026.07.30.7'
+JS_VER = '2026.07.30.7'
 TIERS = ['1-7', '8-23', '24-47', '48-71', '72+']
 BANDS = ['<$4', '$4-8', '$8-15', '$15-25', '$25+']
 BAND_LABEL = {
@@ -1063,6 +1063,153 @@ def sec_costing():
         pct(rr['treated_next24'], 0), pct(rr['ctrl_next24'], 0))
 
 
+def sec_sales():
+    """The sales playbook -- which garment, at which quantity. Written for the desk."""
+    m = D['salesmix']
+    dt = D['costing']['settled']['detail']
+
+    brows = []
+    for b in m['bands']:
+        be = b['breakeven']
+        note = ('&mdash;' if be is None else
+                'sell <b>any</b> quantity' if be <= 4 else
+                'needs a modest run' if be <= 7 else
+                '<b>bulk only</b>')
+        brows.append([
+            '<b>%s</b>' % b['label'], num(b['lines']), num(b['pieces']),
+            money(b['blank'], 2), money(b['charged'], 2),
+            '<b>%s</b>' % money(b['contrib'], 2),
+            ('<b>%s pcs</b>' % num(be, 1)) if be else 'never', note])
+    btab = table(['blank cost', 'lines', 'pieces', 'median blank', 'median charged',
+                  'contribution/pc', 'BREAK-EVEN qty', 'what it means'], brows)
+
+    cg = m['capsvsgar']
+    ctab = table(['', 'lines', 'pieces', 'median blank', 'median charged',
+                  'contribution/pc', 'break-even'],
+                 [['<b>Caps</b>', num(cg['caps']['lines']), num(cg['caps']['pieces']),
+                   money(cg['caps']['blank'], 2), money(cg['caps']['charged'], 2),
+                   money(cg['caps']['contrib'], 2),
+                   '<b>%s pcs</b>' % num(cg['caps']['breakeven'], 1)],
+                  ['<b>Garments</b>', num(cg['garments']['lines']), num(cg['garments']['pieces']),
+                   money(cg['garments']['blank'], 2), money(cg['garments']['charged'], 2),
+                   money(cg['garments']['contrib'], 2),
+                   '<b>%s pcs</b>' % num(cg['garments']['breakeven'], 1)]])
+
+    srows = [['<b>%s</b>' % escape(s['style']), escape(s['desc']), num(s['pieces']),
+              money(s['contrib']), money(s['per_pc'], 2)] for s in m['topstyles']]
+    stab = table(['style', 'description', 'pieces', 'total contribution', '$/pc'], srows)
+
+    ppc = [(t, dt['flats'][t]['profit_flat'] / dt['flats'][t]['mean_q'])
+           for t in TIERS if t in dt['flats']]
+    best = max(ppc, key=lambda x: x[1])
+    ptab = table(['tier'] + [t for t, _ in ppc],
+                 [['<b>profit per piece</b>'] +
+                  [('<b>%s</b>' % money(v, 2)) if t == best[0] else money(v, 2)
+                   for t, v in ppc]])
+
+    return """
+            <section class="dash-card" id="pa-sales">
+                <h2 class="pa-h">Sales playbook &mdash; what to sell, and how much of it
+                    <span class="pa-tag">%s measured lines</span></h2>
+                <p class="pa-body">Everything here is measured, not modelled. The source file
+                carries <em>what NWCA charged</em> and <em>what NWCA paid SanMar</em> on the same
+                row, so contribution per piece is a subtraction rather than an estimate
+                (%s lines, %s orders, %s pieces).</p>
+
+                <div class="pa-callout pa-callout--good">
+                    <h4>Break-even is not 24 pieces. It is not one number at all.</h4>
+                    <p>It depends on <strong>what the logo is going on</strong>. A cheap tee has
+                    to clear <strong>%s pieces</strong> before the order pays for itself. A premium
+                    jacket clears at <strong>%s</strong>. Same paperwork, same setup, same machine
+                    &mdash; the garment decides. <strong>Six cheap tees lose money. Three jackets
+                    make money.</strong></p>
+                </div>
+
+                <h3 class="pa-h3">1. The break-even table &mdash; the number to actually use</h3>
+                <p class="pa-body">An order clears cost when <code>qty &times; contribution</code>
+                beats <strong>%s setup + %s order handling + %s per piece of machine time</strong>.</p>
+                %s
+                <p class="pa-note">The decoration charge barely moves between garments, but the
+                margin on the garment itself swings hugely. That is the whole mechanism:
+                <b>%s of contribution on a cheap blank against %s on a premium one &mdash;
+                one premium piece is worth %s cheap ones.</b></p>
+
+                <h3 class="pa-h3">2. Caps need more volume than garments</h3>
+                %s
+                <p class="pa-note">Caps are the one reliably negative order type at small
+                quantities &mdash; they break even %s pieces later than garments do.
+                <b>Under 8 pieces, a cap order should need a manager's OK and be quoted off the
+                actual cap cost on the PO, not the standard table.</b></p>
+
+                <h3 class="pa-h3">3. Where the money actually came from</h3>
+                %s
+                <p class="pa-note">Read the bottom of that list against the top. The premium
+                fleece and outerwear lines earn <b>%s&ndash;%s per piece</b> against
+                <b>%s</b> on the cheapest tee &mdash; so a few hundred pieces of the former match
+                a thousand of the latter. Same rep hours, same order count, same machine setups.</p>
+
+                <h3 class="pa-h3">4. The best quantity is 24&ndash;47, not 72+</h3>
+                %s
+                <p class="pa-note">Profit per piece <b>peaks at %s and falls to %s at 72+</b>:
+                above 48 the price drops faster than the cost does. A 72+ order is worth more in
+                total dollars &mdash; %s against %s &mdash; but each piece earns less. <b>The ideal
+                order is 24&ndash;47 pieces of a mid-to-premium garment.</b></p>
+
+                <div class="pa-callout pa-callout--good">
+                    <h4>The upsell worth more than doubling the quantity</h4>
+                    <p>Taking 12 tees to 24 tees adds about <strong>%s</strong> of contribution.
+                    Taking 12 tees to <em>12 hoodies</em> adds about <strong>%s</strong> &mdash;
+                    for half the pieces, half the machine time and the same paperwork. Reps chase
+                    quantity because it is the obvious lever. <strong>Garment mix is the better
+                    one, and it is easier to sell &mdash; nobody has to buy more than they
+                    need.</strong></p>
+                </div>
+
+                <h3 class="pa-h3">The rules, in one place</h3>
+                <ol class="pa-body">
+                    <li><b>Ask what it is going on before asking how many.</b> A 6-piece order is
+                        a bad order on a PC61 and a good one on a Carhartt hoodie.</li>
+                    <li><b>Cheap tees and caps: treat 12 as the practical floor.</b> Take them,
+                        but do not chase them, and never quote a small tee run as a favour.</li>
+                    <li><b>Hoodies, jackets, quarter-zips, premium outerwear: any quantity.</b>
+                        Three pieces is profitable. Steer here whenever the customer is open.</li>
+                    <li><b>Caps under 8: manager's OK, priced off the real cap cost.</b></li>
+                    <li><b>New artwork means a design fee on the quote</b> &mdash; capture is
+                        %s on new customers and only %s when an existing customer brings a new
+                        design.</li>
+                </ol>
+                <p class="pa-note"><b>What not to do:</b> do not set a minimum order &mdash;
+                one-time customers are 32%% of the customer count but %s of revenue, and a small
+                first order returns 8.2&times; what it costs to serve. Do not treat a small
+                reorder as a warning sign (see the retraction above). And remember the biggest
+                lever of all is not on this page: <b>customers who reorder within 90 days generate
+                %s of all revenue</b>, and whether that second order arrives predicts value better
+                than the first order's size does.</p>
+                <p class="pa-note">&#9888; <b>Scope.</b> This section measures SanMar-sourced
+                garment lines in %s. It does not see non-SanMar goods, separately-billed fees, or
+                the %s LTM, so it understates small-order revenue &mdash; use the tier table in
+                <a href="#pa-costing">Settled costing</a> for order-level profit, and this section
+                for garment choice. Contribution here is price minus blank only; machine and order
+                costs are applied in the break-even column, not in the contribution column.</p>
+            </section>""" % (
+        num(m['lines']), num(m['lines']), num(m['orders']), num(m['pieces']),
+        num(m['bands'][0]['breakeven'], 1), num(m['bands'][-1]['breakeven'], 1),
+        money(m['fixed']), money(m['pool']), money(m['var_hr'], 2), btab,
+        money(m['cheap_contrib'], 2), money(m['rich_contrib'], 2), '%.1f&times;' % m['ratio'],
+        ctab, num(cg['caps']['breakeven'] - cg['garments']['breakeven'], 1),
+        stab,
+        money(min(s['per_pc'] for s in m['topstyles'][-3:]), 2),
+        money(max(s['per_pc'] for s in m['topstyles'][-3:]), 2),
+        money(min(s['per_pc'] for s in m['topstyles']), 2),
+        ptab, money(best[1], 2), money(ppc[-1][1], 2),
+        money(dt['flats']['72+']['profit_flat']), money(dt['flats']['24-47']['profit_flat']),
+        money(12 * m['bands'][0]['contrib']),
+        money(12 * (m['bands'][2]['contrib'] - m['bands'][0]['contrib'])),
+        pct(0.785, 1), pct(0.29, 0), pct(D['customers']['once_share'], 1),
+        pct(D['customers']['second']['within90']['share'], 0),
+        escape(m['window']), money(50))
+
+
 def sec_customers():
     """How customers actually behave -- written to be used by a sales rep."""
     k = D['customers']
@@ -1209,7 +1356,7 @@ S_FLAT, V_FLAT = 1.2787, 0.06612
 
 NAV = [('pa-tiers', 'Units by tier'), ('pa-year', 'Year by year'), ('pa-gap', 'The gap'),
        ('pa-cost', 'Cost basis'), ('pa-costing', 'Settled costing'),
-       ('pa-customers', 'Customer behaviour'),
+       ('pa-sales', 'Sales playbook'), ('pa-customers', 'Customer behaviour'),
        ('pa-pricing', 'Caspio today'), ('pa-design', 'Tier design'),
        ('pa-rules', 'Five rules'), ('pa-limits', 'Limits')]
 
@@ -1275,14 +1422,15 @@ def build():
 %s
 %s
 %s
+%s
         </main>
     </div>
     <script src="/dashboards/js/pricing-analysis.js?v=%s"></script>
 </body>
 </html>
 """ % (CSS_VER, nav, sec_provenance(), sec_hero(), sec_tiers(), sec_year(), sec_gap(),
-       sec_cost(), sec_costing(), sec_customers(), sec_pricing(), sec_design(),
-       sec_rules(), sec_limits(), JS_VER)
+       sec_cost(), sec_costing(), sec_sales(), sec_customers(), sec_pricing(),
+       sec_design(), sec_rules(), sec_limits(), JS_VER)
 
 
 if __name__ == '__main__':

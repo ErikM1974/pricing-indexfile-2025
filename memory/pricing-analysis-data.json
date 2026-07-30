@@ -1903,5 +1903,178 @@
    }
   },
   "span_years": 20.6
+ },
+ "salesmix": {
+  "lines": 5263,
+  "orders": 1554,
+  "pieces": 33527,
+  "fixed": 38.476082999999996,
+  "pool": 100.0,
+  "var_hr": 1.9895508,
+  "rate": 30.09,
+  "window": "styles sold 2026, SanMar-sourced lines with a case price",
+  "bands": [
+   {
+    "label": "under $5",
+    "lines": 641,
+    "pieces": 11079,
+    "blank": 3.67,
+    "charged": 19.35,
+    "contrib": 15.6,
+    "breakeven": 10.174247812482191
+   },
+   {
+    "label": "$5-10",
+    "lines": 1358,
+    "pieces": 11762,
+    "blank": 6.99,
+    "charged": 24.0,
+    "contrib": 16.93,
+    "breakeven": 9.268535446712002
+   },
+   {
+    "label": "$10-20",
+    "lines": 1554,
+    "pieces": 6991,
+    "blank": 14.52,
+    "charged": 38.565,
+    "contrib": 23.72,
+    "breakeven": 6.37244456962261
+   },
+   {
+    "label": "$20-35",
+    "lines": 771,
+    "pieces": 1940,
+    "blank": 25.01,
+    "charged": 58.5,
+    "contrib": 32.48,
+    "breakeven": 4.541621610481226
+   },
+   {
+    "label": "$35-60",
+    "lines": 726,
+    "pieces": 1359,
+    "blank": 44.7,
+    "charged": 85.0,
+    "contrib": 41.144999999999996,
+    "breakeven": 3.536572452347195
+   },
+   {
+    "label": "$60+",
+    "lines": 213,
+    "pieces": 396,
+    "blank": 78.25,
+    "charged": 133.0,
+    "contrib": 55.5,
+    "breakeven": 2.5878325648591267
+   }
+  ],
+  "capsvsgar": {
+   "caps": {
+    "lines": 574,
+    "pieces": 9296,
+    "blank": 6.75,
+    "charged": 24.0,
+    "contrib": 17.25,
+    "breakeven": 9.074181315711204
+   },
+   "garments": {
+    "lines": 4689,
+    "pieces": 24231,
+    "blank": 15.2,
+    "charged": 40.0,
+    "contrib": 24.240000000000002,
+    "breakeven": 6.223518534628055
+   }
+  },
+  "topstyles": [
+   {
+    "style": "PC54",
+    "desc": "Size 2XL - Port & Co Core Cotton Tee",
+    "pieces": 3182,
+    "contrib": 45184.36000000004,
+    "per_pc": 14.199987429289767
+   },
+   {
+    "style": "112",
+    "desc": "Size OSFA - Richardson Trucker Cap",
+    "pieces": 1425,
+    "contrib": 25581.75,
+    "per_pc": 17.952105263157893
+   },
+   {
+    "style": "PC78H",
+    "desc": "Port & Co Core Fleece Pullover Hooded Sweatshirt",
+    "pieces": 785,
+    "contrib": 16296.579999999998,
+    "per_pc": 20.759974522292993
+   },
+   {
+    "style": "PC450",
+    "desc": "Port & Company Fan Favorite Tee",
+    "pieces": 1095,
+    "contrib": 15211.400000000001,
+    "per_pc": 13.891689497716897
+   },
+   {
+    "style": "PC55",
+    "desc": "Size 2XL - Port & Co Core Blend Tee",
+    "pieces": 715,
+    "contrib": 11405.84,
+    "per_pc": 15.952223776223777
+   },
+   {
+    "style": "PC61",
+    "desc": "Size 2XL - Port & Co Essential Tee",
+    "pieces": 1009,
+    "contrib": 11275.360000000002,
+    "per_pc": 11.17478691774034
+   },
+   {
+    "style": "C914",
+    "desc": "Port & Company Six-Panel Unstructured Twill Cap",
+    "pieces": 1016,
+    "contrib": 11053.599999999999,
+    "per_pc": 10.879527559055116
+   },
+   {
+    "style": "C865",
+    "desc": "Size L/XL - Port Authority Flexfit Cap",
+    "pieces": 726,
+    "contrib": 10573.749999999998,
+    "per_pc": 14.564393939393938
+   },
+   {
+    "style": "C402",
+    "desc": "Size OSFA - Port Authority Snapback Trucker Cap",
+    "pieces": 748,
+    "contrib": 10298.660000000002,
+    "per_pc": 13.768262032085564
+   },
+   {
+    "style": "CTK121",
+    "desc": "Carhartt Midweight Hooded Sweatshirt",
+    "pieces": 258,
+    "contrib": 9325.240000000002,
+    "per_pc": 36.14434108527132
+   },
+   {
+    "style": "PC90H",
+    "desc": "Port & Company  Ultimate Pullover Hooded Sweatsh",
+    "pieces": 321,
+    "contrib": 8883.539999999999,
+    "per_pc": 27.674579439252334
+   },
+   {
+    "style": "LST469",
+    "desc": "Sport-Tek Ladies Endeavor 1/4-Zip Pullover",
+    "pieces": 320,
+    "contrib": 8503.199999999992,
+    "per_pc": 26.572499999999973
+   }
+  ],
+  "cheap_contrib": 15.6,
+  "rich_contrib": 44.12,
+  "ratio": 2.828205128205128
  }
 }
