@@ -80,21 +80,33 @@ identifies an HTTP-shaped job — e.g. 8 flushes in 43 s at 13:00:08–13:00:51.
   is an Erik action, not something a session can do.
   If the spiff ever returns, rebuild it as a **Data import task** (separate 1,000/period meter,
   ~0 Integrations calls) rather than ~1,900 record writes.
-- **ORDER_ODBC overnight** — ~2,900 web.1 calls between midnight and 5 AM PT with no staff on
-  site. Fix is agent-side dedupe on `{ID_Order: timestamp_Modification}`. **Do NOT shorten the
-  20-min overlap window** — it is the clock-skew safety net.
-- **Crawler unconfirmed.** `robots.txt` is live (200, `Disallow: /`) but Heroku retained only an
-  11-min log window, too small and too late in the day to prove Googlebot stopped. Settle it by
-  capturing `heroku logs` around 04:00 PT.
+- ✅ **ORDER_ODBC overnight — FIXED 2026-07-29** (proxy v2026.07.29.9). Was ~2,900 web.1 calls
+  between midnight and 5 AM PT with no staff on site. `sync-orders.ps1` + `sync-purchase-orders.ps1`
+  now keep a SHA-1 of what they last sent per row and skip unchanged ones. **The 20-min overlap was
+  NOT shortened** — it is the clock-skew safety net and the dedupe makes it free. Proven on bandit:
+  `2 to send → posted 2`, immediate re-run `0 to send, 2 unchanged → posted 0`. Measured effect the
+  next morning: the evening of 7/29 went from ~350/hr to **63 calls across 7 hours**.
+- ✅ **Crawler CONFIRMED STOPPED 2026-07-30.** Googlebot was **0 of 117 router requests** in the
+  04:04–04:33 PT window; it had been ~11% at 2.2/min at the same hour the previous day. Google
+  re-read `robots.txt` roughly 24 h after it shipped, exactly as expected.
 
 ## Gotchas
 
 - **`/api/admin/usage` `projected` is biased LOW.** It divides periodToDate by `daysElapsed`,
   which counts today as a full day — at 08:45 PT it read 95% of cap while the real run rate
   was ~140%. Never quote `projected` before end of day.
-- **Our meter is a lower bound, always.** It read 67% of Caspio on 27 Jul and 79% on 28 Jul.
-  Scripts ending in `process.exit(0)` skip the `beforeExit` flush, so anything under the
-  250-call threshold records **zero**; a dyno restart loses the in-flight tail.
+- **Our meter WAS a lower bound** — 67% of Caspio on 27 Jul, 79% on 28 Jul. Both causes are now
+  closed, so treat a large gap as a NEW bug rather than the expected state:
+  - ✅ `process.exit(0)` skipping the `beforeExit` flush — fixed 2026-07-29 (v2026.07.29.11) with
+    `flushAndExit(code)`. Proven: `check-transfers-received` makes a fixed ~2 calls/run and had
+    recorded **zero every hour**; it now writes a 2-call row every run.
+  - ✅ A dyno restart losing the in-flight tail — fixed 2026-07-30 (v2026.07.30.1). `runOnce()` now
+    returns the RUNNING promise instead of `undefined`, and shutdown runs the flush in PARALLEL
+    with `server.close()` under a 10 s bound. Proven on a real dyno: `HTTP server closed` at
+    11:49:10.352 and the flush completing at .488 — **136 ms after the old code would have exited**
+    — with the 23-call row confirmed in Caspio.
+  - ⚠️ Still true: the flush is bounded, so a Caspio outage at shutdown can still drop a tail. It
+    now says so loudly with the count instead of failing silently.
 - Usage_Date buckets on the **Pacific** account clock, matching Caspio — verified: the last
   `2026-07-28` row is `2026-07-29T06:59Z` (23:59 PT) and the first `2026-07-29` row is
   `07:38Z` (00:38 PT).
