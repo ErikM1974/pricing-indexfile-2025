@@ -580,3 +580,52 @@ one data fix that would make this question answerable going forward.**
 
 Scripts: `pull_event_designs.ps1`, `pull_des.ps1`, `design_cohort2.py`; data
 `%TEMP%/event_designs.tsv` (19,707 links), `%TEMP%/des_table.tsv` (39,788 designs).
+
+---
+
+# ✅ DEFINITIVE: do small orders turn into big ones? (design export, 2026-07-30)
+
+**Supersedes both earlier attempts.** Erik exported `Order_OrderDes::id_Design` from a
+ShopWorks layout — the link the ODBC cannot reach. `Downloads/desgns and orders.csv`,
+96,212 rows → **82,316 order-design links, 23,093 named designs**.
+
+🔑 **Coverage 94-99% for 2010-2026** — sixteen unbroken years, against the old best of 0-17%
+for 2019-2026. ⚠️ It is a **FileMaker portal export**: a multi-design order writes the order
+once and leaves `ID_Order` BLANK on continuation rows (16,968 of them), so **ID_Order must be
+forward-filled**. Design ids arrive as `15992.00` — integer part is the design, decimal the
+location. 15% of orders carry more than one design.
+
+## The answer — 13 cohorts, 2012-2024, 24-month follow-up
+
+| | started SMALL (<24 pcs) | started BIG (24+) |
+|---|---|---|
+| designs | 2,532 | 3,117 |
+| ever ordered again | 45% | 49% |
+| **ever reached 24+ pieces** | **16%** | **36%** |
+| ever reached 48+ pieces | 7% | 24% |
+| mean later revenue (24 mo) | **$729** | $1,515 |
+| mean first order | $382 / 10.3 pcs | $1,655 / 97.8 pcs |
+| **median lifetime** | **$543** | $1,793 |
+| **mean lifetime** | **$1,753** | $4,895 |
+
+Small→24+ is **12-24% in every cohort year 2012-2024** — no trend in thirteen years.
+Median time to grow: **169 days**.
+
+🔴 **This CORRECTS the earlier 2016-18 figures of 27% and 89%.** Those came from a single
+cohort at 83-89% coverage, and 2016 turns out to be the highest year in the whole series
+(24%). The true rate is **16%**, and small starts return **48%** of a big start's later
+revenue, not 89%.
+
+## 🔑 The tail is the argument, not the average
+
+Median small-start lifetime **$543** but mean **$1,753** — a heavily skewed distribution.
+*"HILT Tire Circle"*: first order **5 pcs / $34**, then 60 pcs nineteen days later, 280 pcs
+two months on — **lifetime $71,419 over 24 orders**. *"RH PETERSON"*: 5 pcs / $160 →
+**$58,804 over 15 orders**.
+
+**Decision unchanged but better grounded: do NOT put a minimum on a design's first order.**
+$1,753 of expected lifetime revenue against ~$100 of order cost is a good trade even at a 16%
+growth rate. But the honest argument is **"the tail is worth it"**, not "most of them grow" —
+most do not.
+
+Scripts: `parse_designs.py`, `cohort_final.py`; parsed links at `%TEMP%/order_design.tsv`.
