@@ -470,3 +470,60 @@ directional only.
 
 Scripts: `ratchet.py`, `fillin.py`, `reorder20.py` (session scratchpad); data
 `%TEMP%/emb20.tsv` (Orders types 21+1, 2006-2026, 42,545 rows with qty + customer + rep).
+
+---
+
+# Do small orders turn into big ones? — design-level, 2007-2008 (2026-07-30)
+
+Erik's point, and he is right: at CUSTOMER level, 6 polos in March and 200 event tees in
+September looks like "a small order grew". It did not — two unrelated programmes sharing a
+customer. Only a **design-level** test answers whether a job that started small ever scales.
+
+## 🔴 `Orders.id_DesignBlock` was ABANDONED after 2008 — check before reusing
+
+Coverage: **98-99% for 2006-2008**, then **44% (2009), 15% (2010), 8% (2011), 5% (2012),
+~1% from 2013 onward.** `LinesOE.id_Design` is empty at every date. So design history is
+reconstructable **only for 2006-2008** and the question cannot be answered for the modern
+business. `cn_DesignCount` shows multi-design orders exist (4,441 twos, 744 threes) but
+`id_DesignBlock` never contains a separator — it holds **one** ID, so multi-design orders are
+attributed to a single design.
+
+⚠️ **The coverage collapse silently biases any cohort formed after 2008**: a design first
+ordered in 2008 has its 2009-10 follow-ups invisible, so it scores as one-and-done. A first
+run over a 2008+ cohort gave 11% growth; the clean 2007 window gives 17%. **Use 2007 only.**
+
+❌ Fallback checked and rejected: the decoration line's free text (class 9/10
+`PartDescription`) names a logo only rarely — 68% carry *something* but it is mostly garment
+types ("Jackets", "Polos") and fee labels ("Additional Stitches in Logo Charge"). Only ~20% of
+modern orders would get a usable key, and a noisy one.
+
+## The answer, clean window (first order 2007, followed through 2008)
+
+| | started SMALL (<24 pcs) | started BIG (24+) |
+|---|---|---|
+| designs | 316 | 697 |
+| ever ordered again | **47%** | 48% |
+| **ever reached 24+ pieces** | **17%** | **37%** |
+| ever reached 48+ pieces | 9% | 24% |
+| ever reached $1,000+ | 7% | 11% |
+| mean later revenue | **$657** | $914 |
+
+Under-$550 start (615 designs): 26% reach 24+ pieces but only **4% reach $1,000+** against 19%
+for big starts; later revenue **$412 vs $1,486**. Median time for a small start to reach 24+
+pieces: **141 days**.
+
+## 🔑 What it means for the minimum-order decision
+
+1. **Half of all designs never reorder at all — 47% vs 48%, identical regardless of start
+   size.** A small first order is a worse *volume* signal, not a worse *relationship* signal.
+2. **A small first order still carries ~$657 of follow-on revenue**, about 72% of a big first
+   order's. That is real option value and **argues against a hard minimum on a design's FIRST
+   order.**
+3. **But big starts repeat big at roughly twice the rate** (37% vs 17%). Small starts grow —
+   just less often.
+
+⚠️ This is **2007-2008 evidence**, from a business doing ~3,300 orders/yr against today's
+~1,300, and it cannot be refreshed. Weight it accordingly.
+
+Scripts: `pull_designs.ps1`, `design_cohort.py` (session scratchpad); data
+`%TEMP%/emb_designs.tsv` (43,764 rows, types 21+1, 2006-2026, with `id_DesignBlock`).
