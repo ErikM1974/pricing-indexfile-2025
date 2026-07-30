@@ -24,7 +24,7 @@
 
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/pricing-analysis.css?v=2026.07.30.4">
+    <link rel="stylesheet" href="/dashboards/css/pricing-analysis.css?v=2026.07.30.5">
 </head>
 <body>
     <div class="dash-shell">
@@ -42,7 +42,7 @@
             </div>
         </header>
 
-        <nav class="pa-nav" aria-label="Sections"><a href="#pa-tiers" class="pa-nav-link">Units by tier</a><a href="#pa-year" class="pa-nav-link">Year by year</a><a href="#pa-gap" class="pa-nav-link">The gap</a><a href="#pa-cost" class="pa-nav-link">Cost basis</a><a href="#pa-costing" class="pa-nav-link">Corrected costing</a><a href="#pa-pricing" class="pa-nav-link">Caspio today</a><a href="#pa-design" class="pa-nav-link">Tier design</a><a href="#pa-rules" class="pa-nav-link">Five rules</a><a href="#pa-limits" class="pa-nav-link">Limits</a></nav>
+        <nav class="pa-nav" aria-label="Sections"><a href="#pa-tiers" class="pa-nav-link">Units by tier</a><a href="#pa-year" class="pa-nav-link">Year by year</a><a href="#pa-gap" class="pa-nav-link">The gap</a><a href="#pa-cost" class="pa-nav-link">Cost basis</a><a href="#pa-costing" class="pa-nav-link">Settled costing</a><a href="#pa-customers" class="pa-nav-link">Customer behaviour</a><a href="#pa-pricing" class="pa-nav-link">Caspio today</a><a href="#pa-design" class="pa-nav-link">Tier design</a><a href="#pa-rules" class="pa-nav-link">Five rules</a><a href="#pa-limits" class="pa-nav-link">Limits</a></nav>
 
         <main class="dash-content">
 
@@ -56,10 +56,16 @@
                     <span class="pa-chip">Generated <b>2026-07-30</b></span>
                     <span class="pa-chip">Scope <b>Custom Embroidery + Caps</b> (types 21, 1)</span>
                     <span class="pa-chip">Source <b>SWODBC on bandit</b> (read-only)</span>
-                    <span class="pa-chip">Cost basis <b>$89.74/production hr</b></span>
-                    <span class="pa-chip">Chargeable <b>$285.92/hr</b></span>
+                    <span class="pa-chip">Cost basis <b>$30.09/production hr</b></span>
+                    <span class="pa-chip">Order cost <b>$70&ndash;$100</b></span>
                 </div>
                 <p class="pa-note">Order types 21 (Custom Embroidery) and 1 (Caps). Contract types excluded. ShopWorks OnSite FileMaker database via the SWODBC DSN on bandit (read-only).</p>
+                <p class="pa-note"><b>Read the sections in order.</b> &ldquo;Cost basis&rdquo;
+                below loads every company cost onto the machine hour and reaches $89.74/hr; that
+                framing is <em>superseded</em> by <a href="#pa-costing">Settled costing</a>, which
+                splits the pools properly and is the model the recommendations rest on. The earlier
+                sections are kept because their <em>measured</em> content &mdash; throughput,
+                stitch counts, realization &mdash; does not depend on the split.</p>
             </section>
 
             <section class="pa-hero">
@@ -264,7 +270,16 @@
             </section>
 
             <section class="dash-card" id="pa-cost">
-                <h2 class="pa-h">Cost basis and measured throughput</h2>
+                <h2 class="pa-h">Cost basis and measured throughput
+                    <span class="pa-tag">rate superseded &mdash; throughput stands</span></h2>
+                <div class="pa-callout">
+                    <h4>The rate in this section is the all-in one, kept for the throughput table</h4>
+                    <p>It divides <em>every</em> non-material cost in the company by matched
+                    production hours. <a href="#pa-costing">Settled costing</a> splits those pools
+                    onto the bases that drive them and is what the recommendations use. The pieces
+                    per hour, cost per piece and gap columns below are <strong>measured from the
+                    production log</strong> and are unaffected by that choice.</p>
+                </div>
                 <p class="pa-body">Non-material cost of <strong>$1,494,241</strong> over <strong>16,650</strong>
                 matched production hours gives <strong>$89.74 per production hour</strong>. Production
                 logging covers only part of paid time, so the loaded rate that a <em>chargeable</em>
@@ -297,9 +312,9 @@
             </section>
 
             <section class="dash-card" id="pa-costing">
-                <h2 class="pa-h">Corrected cost basis <span class="pa-tag">supersedes the $89.74 above</span></h2>
+                <h2 class="pa-h">Settled cost basis <span class="pa-tag">this is the model &mdash; it supersedes every rate above</span></h2>
                 <div class="pa-callout pa-callout--danger">
-                    <h4>The $89.74 production hour used elsewhere on this page was wrong</h4>
+                    <h4>The $89.74 production hour used earlier on this page was wrong</h4>
                     <p>It loaded <em>all</em> admin, executive, art and sales cost onto machine
                     time. Two consequences: a 150-piece order absorbed <strong>7.3&times; the
                     overhead of a 4-piece order</strong> for consuming the same sales effort, and
@@ -307,6 +322,32 @@
                     <strong>27% of orders and 52% of revenue</strong>. Split properly, the machine
                     hour is cheap and the <em>order</em> is expensive.</p>
                 </div>
+
+                <div class="pa-hero pa-hero--inline">
+                    <div class="pa-stat">
+                        <span class="pa-stat-label">Production hour</span>
+                        <span class="pa-stat-value">$30.09</span>
+                        <span class="pa-stat-sub">art included &mdash; 19,936 hrs, $599,891 pool</span>
+                    </div>
+                    <div class="pa-stat">
+                        <span class="pa-stat-label">Order cost &mdash; flat</span>
+                        <span class="pa-stat-value">$70</span>
+                        <span class="pa-stat-sub">$368,252 office pool &divide; 5,271 orders</span>
+                    </div>
+                    <div class="pa-stat">
+                        <span class="pa-stat-label">Order cost &mdash; driver-based</span>
+                        <span class="pa-stat-value">$100</span>
+                        <span class="pa-stat-sub">rep cost on rep-touched orders only</span>
+                    </div>
+                </div>
+                <p class="pa-note">Both order figures are shown throughout because the choice is a
+                judgement, not a measurement. <b>$70</b> is the whole front-office pool divided by
+                every order the company ships. <b>$100</b> is the same pool with rep cost concentrated
+                on the 2,990 orders a rep actually touches &mdash; webstore orders are automatic, so
+                they should not absorb rep time. <b>Every conclusion on this page holds under
+                both</b>; the driver figure is the conservative one and is what the tier table's
+                second column uses. Art is production labour, not overhead &mdash; Steve's $81,322 sits
+                in the production pool, which is why the hour is $30.09 and not lower.</p>
 
                 <h3 class="pa-h3">Four full years from the general ledger</h3>
                 <div class="pa-scroll"><table class="pa-table">
@@ -325,6 +366,15 @@
 <tr><td class="pa-l"><b>FRONT OFFICE $/order</b></td><td class="pa-r"><b>$185</b></td><td class="pa-r"><b>$194</b></td><td class="pa-r"><b>$250</b></td><td class="pa-r"><b>$176</b></td></tr>
 </tbody>
 </table></div>
+                <p class="pa-note"><b>How the last column becomes the two figures above.</b> The
+                table's own $26.01/hour and $176/order are the <em>raw</em> GL split, before two
+                corrections. <b>Art moves to production</b> &mdash; Steve's $81,322 is production
+                labour, not overhead &mdash; lifting the production pool to $599,891 over 19,936 hours, which
+                is the <b>$30.09 hour</b>. And the order pool is narrowed from the full $925,968 front office
+                to the <b>$368,252</b> that genuinely varies with taking an order, which over 5,271 orders
+                is <b>$70 each</b>. Executive time is deliberately <em>not</em> in it: Jim and Erik
+                do not cost more when one more order is written, so loading them per order would
+                make small orders look unprofitable by construction.</p>
                 <p class="pa-note">Payroll comes from the journal, non-payroll from the GL &mdash;
                 the GL <em>Detail</em> export is missing most payroll and must not be used for it.
                 NWCA owns its building, so there is no rent; property tax ($33,542/yr) is the only
@@ -334,46 +384,49 @@
                 than $250 &mdash; in line with 2023 and 2025. Exclude 6442 from any run rate.</p>
 
                 <div class="pa-finding pa-finding--flag">
-                    <h3>The paperwork costs about three times the stitching</h3>
-                    <p>A 24-piece order uses roughly <strong>$75 of machine time</strong> and
-                    <strong>$261 of order cost</strong>. NWCA is an order-processing business that
+                    <h3>The paperwork costs more than the stitching</h3>
+                    <p>A 24-piece order uses roughly <strong>$86 of machine time</strong> against
+                    <strong>$100 of order cost</strong>. NWCA is an order-processing business that
                     happens to embroider &mdash; which is why <strong>per-piece pricing is the
-                    wrong instrument for most of the cost</strong>, and a minimum order or
-                    order-level fee is the right one.</p>
+                    wrong instrument for most of the cost</strong>, and an order-level fee is the
+                    right one.</p>
                 </div>
 
                 <h3 class="pa-h3">Each cost on the base that actually drives it</h3>
                 <div class="pa-scroll"><table class="pa-table">
 <thead><tr><th class="pa-l">cost pool</th><th class="pa-r">spread over</th><th class="pa-r">per embroidery order</th></tr></thead>
 <tbody>
-<tr><td class="pa-l">Sales reps</td><td class="pa-r">2,990 rep-touched orders</td><td class="pa-r">$79</td></tr>
-<tr><td class="pa-l">Bradley &mdash; import + purchasing</td><td class="pa-r">5,271 ALL orders</td><td class="pa-r">$13</td></tr>
-<tr><td class="pa-l">Steve &mdash; art</td><td class="pa-r">2,990 rep-touched orders</td><td class="pa-r">$27</td></tr>
-<tr><td class="pa-l">Jim &amp; Erik &mdash; executive</td><td class="pa-r">share of revenue</td><td class="pa-r">$97</td></tr>
-<tr><td class="pa-l">other office non-payroll</td><td class="pa-r">5,271 ALL orders</td><td class="pa-r">$45</td></tr>
+<tr><td class="pa-l">Sales reps &mdash; Nika &amp; Taneisha</td><td class="pa-r">2,990 rep-touched orders</td><td class="pa-r">$69</td></tr>
+<tr><td class="pa-l">Bradley &mdash; import + purchasing</td><td class="pa-r">5,271 ALL orders</td><td class="pa-r">$19</td></tr>
+<tr><td class="pa-l">remaining front office</td><td class="pa-r">5,271 ALL orders</td><td class="pa-r">$12</td></tr>
 </tbody>
-<tfoot><tr><td class="pa-l">TOTAL</td><td class="pa-r"></td><td class="pa-r"><b>$261</b></td></tr></tfoot>
+<tfoot><tr><td class="pa-l">TOTAL &mdash; driver-based</td><td class="pa-r"></td><td class="pa-r"><b>$100</b></td></tr></tfoot>
 </table></div>
-                <p class="pa-note">A webstore order carries only <b>$73</b> &mdash; Inksoft and
-                Shopify orders are automatic, imported and purchased by Bradley, and never touched
-                by a sales rep. They are 43% of all orders, so removing them from the sales
-                denominator concentrates rep cost onto the orders reps actually work. Outsourced
-                screenprint and promo carry office cost but <b>zero</b> production overhead.</p>
+                <p class="pa-note">Inksoft and Shopify orders are automatic &mdash; imported and
+                purchased by Bradley, never touched by a sales rep &mdash; so they carry Bradley
+                and the office pool but <b>no rep cost at all</b>. Removing them from the sales
+                denominator concentrates rep cost onto the 2,990 orders reps actually work, which is
+                the whole difference between the $70 and $100 figures. Outsourced screenprint and
+                promo carry office cost but <b>zero</b> production overhead.</p>
 
                 <h3 class="pa-h3">What each tier really earns, per order</h3>
                 <div class="pa-scroll"><table class="pa-table">
-<thead><tr><th class="pa-l">tier</th><th class="pa-r">mean qty</th><th class="pa-r">flats bill</th><th class="pa-r">flats cost</th><th class="pa-r">flats profit/order</th><th class="pa-r">caps profit/order</th></tr></thead>
+<thead><tr><th class="pa-l">tier</th><th class="pa-r">mean qty</th><th class="pa-r">flats bill</th><th class="pa-r">flats cost</th><th class="pa-r">flats profit &mdash; $70 pool</th><th class="pa-r">flats profit &mdash; $100 pool</th><th class="pa-r">caps profit &mdash; $70 pool</th><th class="pa-r">caps profit &mdash; $100 pool</th></tr></thead>
 <tbody>
-<tr><td class="pa-l"><b>1-7</b></td><td class="pa-r">3.7</td><td class="pa-r">$236</td><td class="pa-r">$401</td><td class="pa-r pa-neg">&minus;$165</td><td class="pa-r pa-neg">&minus;$213</td></tr>
-<tr><td class="pa-l"><b>8-23</b></td><td class="pa-r">13.6</td><td class="pa-r">$695</td><td class="pa-r">$621</td><td class="pa-r pa-pos">$74</td><td class="pa-r pa-neg">&minus;$25</td></tr>
-<tr><td class="pa-l"><b>24-47</b></td><td class="pa-r">31.9</td><td class="pa-r">$1,495</td><td class="pa-r">$1,003</td><td class="pa-r pa-pos">$492</td><td class="pa-r pa-pos">$131</td></tr>
-<tr><td class="pa-l"><b>48-71</b></td><td class="pa-r">56.6</td><td class="pa-r">$2,435</td><td class="pa-r">$1,501</td><td class="pa-r pa-pos">$933</td><td class="pa-r pa-pos">$371</td></tr>
-<tr><td class="pa-l"><b>72+</b></td><td class="pa-r">152.9</td><td class="pa-r">$5,467</td><td class="pa-r">$3,128</td><td class="pa-r pa-pos">$2,339</td><td class="pa-r pa-pos">$1,405</td></tr>
+<tr><td class="pa-l"><b>1-7</b></td><td class="pa-r">3.7</td><td class="pa-r">$236</td><td class="pa-r">$216</td><td class="pa-r pa-pos">$20</td><td class="pa-r pa-neg">&minus;$9</td><td class="pa-r pa-neg">&minus;$27</td><td class="pa-r pa-neg">&minus;$57</td></tr>
+<tr><td class="pa-l"><b>8-23</b></td><td class="pa-r">13.6</td><td class="pa-r">$695</td><td class="pa-r">$438</td><td class="pa-r pa-pos">$257</td><td class="pa-r pa-pos">$227</td><td class="pa-r pa-pos">$159</td><td class="pa-r pa-pos">$129</td></tr>
+<tr><td class="pa-l"><b>24-47</b></td><td class="pa-r">31.9</td><td class="pa-r">$1,495</td><td class="pa-r">$825</td><td class="pa-r pa-pos">$670</td><td class="pa-r pa-pos">$640</td><td class="pa-r pa-pos">$312</td><td class="pa-r pa-pos">$282</td></tr>
+<tr><td class="pa-l"><b>48-71</b></td><td class="pa-r">56.6</td><td class="pa-r">$2,435</td><td class="pa-r">$1,331</td><td class="pa-r pa-pos">$1,104</td><td class="pa-r pa-pos">$1,074</td><td class="pa-r pa-pos">$548</td><td class="pa-r pa-pos">$518</td></tr>
+<tr><td class="pa-l"><b>72+</b></td><td class="pa-r">152.9</td><td class="pa-r">$5,467</td><td class="pa-r">$2,983</td><td class="pa-r pa-pos">$2,484</td><td class="pa-r pa-pos">$2,454</td><td class="pa-r pa-pos">$1,556</td><td class="pa-r pa-pos">$1,526</td></tr>
 </tbody>
 </table></div>
-                <p class="pa-note">Break-even is <b>6 pieces on flats</b> and <b>12 on caps</b>
-                &mdash; not 24. The 1-7 tier loses money only because its average order is under
-                4 pieces. Caps lose at 1-7 <em>and</em> 8-23.</p>
+                <p class="pa-note"><b>Only one cell on this table is negative under either pool:
+                caps at 1-7.</b> Flats at 1-7 land between &minus;$9 and $20 per order &mdash; break-even,
+                not a loss. Break-even is <b>4.0 pieces on flats</b> and <b>7.5 on caps</b> under the
+                conservative driver pool &mdash; nowhere near 24. <b>This is the finding that
+                killed the proposed $450 minimum</b>: the tier it was aimed at is not losing money.
+                Caps are the real problem, and the instrument for that is cap decoration pricing,
+                not an order minimum.</p>
 
                 <h2 class="pa-h pa-h--section" id="pa-reorders">Small orders are reorders <span class="pa-tag">21 years</span></h2>
                 <div class="pa-callout pa-callout--danger">
@@ -398,16 +451,17 @@
                 <div class="pa-scroll"><table class="pa-table">
 <thead><tr><th class="pa-l">what it is</th><th class="pa-r">orders/yr</th><th class="pa-r">treatment</th></tr></thead>
 <tbody>
-<tr><td class="pa-l">reorder within 90 days of a <b>24+</b> order</td><td class="pa-r">126</td><td class="pa-r">keep the $50 fee &mdash; it is short by only $45</td></tr>
-<tr><td class="pa-l">reorder after a <b>smaller</b> prior order</td><td class="pa-r">145</td><td class="pa-r">judgement call &mdash; relationship exists but is thin</td></tr>
-<tr><td class="pa-l"><b>standalone</b> &mdash; no recent order behind it</td><td class="pa-r">130</td><td class="pa-r"><b>the case a minimum is for</b></td></tr>
+<tr><td class="pa-l">reorder within 90 days of a <b>24+</b> order</td><td class="pa-r">126</td><td class="pa-r"><b>keep the $50 fee unchanged</b> &mdash; these orders already clear cost</td></tr>
+<tr><td class="pa-l">reorder after a <b>smaller</b> prior order</td><td class="pa-r">145</td><td class="pa-r">keep the $50 &mdash; thin, but the relationship is real</td></tr>
+<tr><td class="pa-l"><b>standalone</b> &mdash; no recent order behind it</td><td class="pa-r">130</td><td class="pa-r">the only case worth a higher fee &mdash; and it is 32% of 1-7 volume</td></tr>
 </tbody>
 </table></div>
-                <p class="pa-note">The existing $50 fee is the <em>right</em> number for a genuine
-                reorder: a re-run costs the blank, the machine time, the rep and Bradley &mdash;
-                about $230 against $185 billed &mdash; because art is zero on an existing design
-                and the office cost was already carried by the parent order. What is missing is
-                the standalone case, where $50 covers roughly a fifth of the real cost.</p>
+                <p class="pa-note"><b>The $50 fee is the right number and should not change.</b>
+                Under the settled model a 1-7 flat order bills $236 and costs $216, so it already
+                clears its cost with the fee included &mdash; art is zero on an existing design and
+                the machine time is small. The earlier claim that it was &ldquo;short by $45&rdquo;
+                came from the discredited $261 order cost. Raising the fee would tax the reorder
+                stream in order to reach a standalone case that is a minority of the tier.</p>
 
                 <div class="pa-finding pa-finding--alt">
                     <h3>A fill-in predicts an account that bills half as much next year</h3>
@@ -421,6 +475,115 @@
                     100-piece run may simply be winding down. Use it as a <strong>sales
                     trigger, not a fee</strong>.</p>
                 </div>
+            </section>
+
+            <section class="dash-card" id="pa-customers">
+                <h2 class="pa-h">How customers actually behave <span class="pa-tag">4,646 customers, 20.6 years</span></h2>
+                <p class="pa-body">This section exists to be <em>used</em>. Every figure below is
+                measured on 42,546 embroidery orders from 4,646 customers, restricted to customers whose
+                first order is recent enough to be genuinely first and old enough to judge
+                (2,873 of them, first seen 2008 or later with at least three years of runway).</p>
+
+                <div class="pa-callout pa-callout--good">
+                    <h4>The answer to &ldquo;do we waste time on small orders?&rdquo; is no</h4>
+                    <p>590 customers arrived with a first order under 8 pieces. Their mean lifetime
+                    value is <strong>$2,474</strong>, against roughly <strong>$300</strong> to serve
+                    that first order &mdash; a <strong>8&times; return</strong>. A firm minimum
+                    would be declining that bet. But the small order is not what makes them
+                    valuable: <strong>whether a second order arrives within 90 days is</strong>,
+                    and that is the thing a rep can influence.</p>
+                </div>
+
+                <h3 class="pa-h3">1. The first order tells you almost nothing</h3>
+                <p class="pa-body">Of everything a customer will ever spend, the first order is only
+                <strong>13%</strong> of it. By the end of month twelve you have still seen just
+                <strong>35%</strong>. Judging a customer by what they walk in with is judging on an
+                eighth of the evidence.</p>
+                <div class="pa-scroll"><table class="pa-table">
+<thead><tr><th class="pa-l">their FIRST order</th><th class="pa-r">customers</th><th class="pa-r">median lifetime</th><th class="pa-r">mean lifetime</th><th class="pa-r">orders</th><th class="pa-r">ever reach 24+?</th></tr></thead>
+<tbody>
+<tr><td class="pa-l"><b>under 8 pcs</b></td><td class="pa-r">590</td><td class="pa-r">$373</td><td class="pa-r">$2,474</td><td class="pa-r">5.3</td><td class="pa-r">22%</td></tr>
+<tr><td class="pa-l"><b>8&ndash;23 pcs</b></td><td class="pa-r">874</td><td class="pa-r">$846</td><td class="pa-r">$3,641</td><td class="pa-r">6.6</td><td class="pa-r">36%</td></tr>
+<tr><td class="pa-l"><b>24&ndash;47 pcs</b></td><td class="pa-r">665</td><td class="pa-r">$1,156</td><td class="pa-r">$4,263</td><td class="pa-r">6.1</td><td class="pa-r">49%</td></tr>
+<tr><td class="pa-l"><b>48&ndash;71 pcs</b></td><td class="pa-r">296</td><td class="pa-r">$2,027</td><td class="pa-r">$6,890</td><td class="pa-r">8.6</td><td class="pa-r">60%</td></tr>
+<tr><td class="pa-l"><b>72+ pcs</b></td><td class="pa-r">448</td><td class="pa-r">$3,361</td><td class="pa-r">$9,889</td><td class="pa-r">9.0</td><td class="pa-r">66%</td></tr>
+</tbody>
+</table></div>
+                <p class="pa-note">First-order size <em>does</em> predict &mdash; a 72+ starter is
+                worth $9,889 against $2,474 for an under-8 starter. It is a real signal. It is just not the
+                strongest one available, and it is the one a rep cannot change.</p>
+
+                <h3 class="pa-h3">2. The second order tells you almost everything</h3>
+                <div class="pa-scroll"><table class="pa-table">
+<thead><tr><th class="pa-l">did they come back?</th><th class="pa-r">customers</th><th class="pa-r">median lifetime</th><th class="pa-r">mean lifetime</th><th class="pa-r">share of all revenue</th></tr></thead>
+<tbody>
+<tr><td class="pa-l">never ordered again</td><td class="pa-r">966</td><td class="pa-r">$350</td><td class="pa-r"><b>$576</b></td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="width:4.0%"></span></span> 4%</td></tr>
+<tr><td class="pa-l"><b>came back within 90 days</b></td><td class="pa-r">1,066</td><td class="pa-r">$2,461</td><td class="pa-r"><b>$8,382</b></td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="width:64.1%"></span></span> 64%</td></tr>
+<tr><td class="pa-l">came back in 91&ndash;365 days</td><td class="pa-r">444</td><td class="pa-r">$2,048</td><td class="pa-r"><b>$6,521</b></td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="width:20.8%"></span></span> 21%</td></tr>
+<tr><td class="pa-l">came back after a year</td><td class="pa-r">397</td><td class="pa-r">$1,601</td><td class="pa-r"><b>$3,926</b></td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="width:11.2%"></span></span> 11%</td></tr>
+</tbody>
+</table></div>
+                <p class="pa-note"><b>Customers who reorder within 90 days generate 64% of all
+                embroidery revenue.</b> Customers who never return are 34% of them and 4% of the
+                money &mdash; which is also why they cost the company so little.</p>
+
+                <div class="pa-finding pa-finding--flag">
+                    <h3>The reorder signal beats the size signal</h3>
+                    <p>Sorted by whether they came back inside 90 days, mean lifetime value differs
+                    by <strong>3.0&times;</strong>. Sorted by whether the first order was 24+
+                    pieces, it differs by only <strong>2.1&times;</strong>. The rep-influenceable
+                    signal is the stronger one.</p>
+                </div>
+
+                <h3 class="pa-h3">3. Both signals together &mdash; the table to actually use</h3>
+                <div class="pa-scroll"><table class="pa-table">
+<thead><tr><th class="pa-l">their FIRST order</th><th class="pa-r">came back &le;90d</th><th class="pa-r">their lifetime</th><th class="pa-r">did not</th><th class="pa-r">their lifetime</th><th class="pa-r">difference</th></tr></thead>
+<tbody>
+<tr><td class="pa-l"><b>under 8 pcs</b></td><td class="pa-r">173</td><td class="pa-r pa-pos"><b>$5,479</b></td><td class="pa-r">417</td><td class="pa-r pa-neg">$1,227</td><td class="pa-r">4.5&times;</td></tr>
+<tr><td class="pa-l"><b>8&ndash;23 pcs</b></td><td class="pa-r">343</td><td class="pa-r pa-pos"><b>$6,736</b></td><td class="pa-r">531</td><td class="pa-r pa-neg">$1,642</td><td class="pa-r">4.1&times;</td></tr>
+<tr><td class="pa-l"><b>24&ndash;47 pcs</b></td><td class="pa-r">246</td><td class="pa-r pa-pos"><b>$7,633</b></td><td class="pa-r">419</td><td class="pa-r pa-neg">$2,284</td><td class="pa-r">3.3&times;</td></tr>
+<tr><td class="pa-l"><b>48&ndash;71 pcs</b></td><td class="pa-r">126</td><td class="pa-r pa-pos"><b>$10,318</b></td><td class="pa-r">170</td><td class="pa-r pa-neg">$4,350</td><td class="pa-r">2.4&times;</td></tr>
+<tr><td class="pa-l"><b>72+ pcs</b></td><td class="pa-r">178</td><td class="pa-r pa-pos"><b>$14,041</b></td><td class="pa-r">270</td><td class="pa-r pa-neg">$7,152</td><td class="pa-r">2.0&times;</td></tr>
+</tbody>
+</table></div>
+                <p class="pa-note">Read across, not down. <b>A small first order that reorders is
+                worth more than a 24&ndash;47 piece first order that does not</b> ($5,479 against $2,284).
+                The row that matters is not which band they started in &mdash; it is which column
+                they end up in.</p>
+
+                <div class="pa-callout pa-callout--good">
+                    <h4>Where the sales effort actually pays</h4>
+                    <p>71% of under-8 starters never come back inside 90 days; they are worth $1,227.
+                    The 29% who do are worth $5,479. Moving <strong>ten percentage points</strong> of
+                    them from the first column to the second is worth about
+                    <strong>$250,878</strong> of lifetime revenue on a cohort this size. No pricing
+                    change on this page comes close to that. A phone call does.</p>
+                </div>
+
+                <h3 class="pa-h3">4. When to make the call</h3>
+                <p class="pa-body">Median gap between orders is <strong>40 days</strong>; median
+                first-to-second is <strong>63 days</strong>. So a customer silent for 90 days is
+                already past normal.</p>
+                <div class="pa-scroll"><table class="pa-table">
+<thead><tr><th class="pa-l">how long since their last order</th><th class="pa-r">still ever order again</th><th class="pa-r"></th></tr></thead>
+<tbody>
+<tr><td class="pa-l">quiet 40 days &mdash; <i>the median gap</i></td><td class="pa-r"><b>75%</b></td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="width:74.5%"></span></span></td></tr>
+<tr><td class="pa-l">quiet 90 days</td><td class="pa-r"><b>68%</b></td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="width:67.7%"></span></span></td></tr>
+<tr><td class="pa-l">quiet 161 days &mdash; <i>the 75th percentile</i></td><td class="pa-r"><b>60%</b></td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="width:60.1%"></span></span></td></tr>
+<tr><td class="pa-l">quiet 393 days &mdash; <i>the 90th</i></td><td class="pa-r"><b>38%</b></td><td class="pa-r"><span class="pa-bar pa-bar--muted"><span class="pa-bar-fill" style="width:38.5%"></span></span></td></tr>
+</tbody>
+</table></div>
+                <p class="pa-note"><b>Speed of return barely matters &mdash; the fact of it is
+                everything.</b> Customers back within 30 days average $8,514; within 180 days, $8,334.
+                Nearly identical. Do not manufacture urgency; just make sure there is a second
+                order.</p>
+
+                <h3 class="pa-h3">5. Where the money is</h3>
+                <p class="pa-body">The top <strong>10%</strong> of customers are
+                <strong>68%</strong> of revenue and the top 20% are <strong>82%</strong>.
+                <strong>1,485</strong> customers &mdash; 32% of the book &mdash; ordered exactly once,
+                and together they are <strong>3.1%</strong> of revenue. The repeat customer's active
+                span runs 2.3 years at the median and 5.7 at the upper quartile.</p>
             </section>
 
             <section class="dash-card" id="pa-pricing">
@@ -534,11 +697,13 @@
                     single most valuable move available is getting an order <em>out of
                     1&ndash;7</em>: that step is worth <strong>$91 per hour</strong>.</p>
                 </div>
-                <p class="pa-note">Read the absolute numbers carefully: at the $89.74 direct rate every
-                tier clears, so 1&ndash;7 is not losing cash &mdash; it is the worst <em>use</em> of
-                a constrained hour. The distance between $89.74 and the $285.92 loaded rate is a
-                utilization problem (only about a third of embroidery hours log as productive), and
-                no price change closes it.</p>
+                <p class="pa-note">Read the absolute numbers carefully: every tier clears its direct
+                rate, so <b>1&ndash;7 is not losing cash &mdash; it is the worst <em>use</em> of a
+                constrained hour</b>. <a href="#pa-costing">Settled costing</a> reaches the same
+                conclusion from the other direction and puts a number on it: &minus;$9 to $20 per order on
+                flats at 1&ndash;7. The gap between the direct and $285.92 loaded rates is a utilization
+                problem &mdash; only about a third of embroidery hours log as productive &mdash;
+                and no price change closes it.</p>
 
                 <h3 class="pa-h3">The small-order fee</h3>
                 <p class="pa-body">Today's <strong>$50.00</strong> recovers <strong>44%</strong> of the
@@ -738,6 +903,6 @@
             </section>
         </main>
     </div>
-    <script src="/dashboards/js/pricing-analysis.js?v=2026.07.30.4"></script>
+    <script src="/dashboards/js/pricing-analysis.js?v=2026.07.30.5"></script>
 </body>
 </html>

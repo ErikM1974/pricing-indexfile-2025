@@ -76,6 +76,9 @@
 }
 /* The two figures that carry the argument get the accent rail. */
 .pa-stat--flag { border-left: 4px solid var(--state-warning); }
+/* A stat row sitting inside a section rather than at the top of the page — it needs the
+   spacing above that the page-level hero gets from the header. */
+.pa-hero--inline { margin-top: var(--space-4); }
 .pa-stat-label {
     font-size: 0.74rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
     color: var(--gray-500);
@@ -158,6 +161,10 @@
 .pa-callout p { margin: 0; font-size: 0.88rem; line-height: 1.6; color: var(--gray-700); max-width: 82ch; }
 .pa-callout--danger { border-left-color: var(--state-danger); background: var(--state-danger-bg); }
 .pa-callout--danger h4 { color: var(--state-danger); }
+/* Used where the finding is that something is working — the small-order economics and the
+   reorder lever. Same weight as the danger callout so neither reads as the louder claim. */
+.pa-callout--good { border-left-color: var(--state-success); background: var(--state-success-bg); }
+.pa-callout--good h4 { color: var(--state-success); }
 
 /* ---------- The five rules ---------- */
 .pa-rules { display: flex; flex-direction: column; gap: var(--space-3); margin: var(--space-4) 0; }

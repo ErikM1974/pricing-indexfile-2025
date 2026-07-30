@@ -16,17 +16,58 @@ single **$89.74 production hour**. Wrong twice over:
 2. **Embroidery was charged as if it were the whole company** — it is **27.2% of orders and
    51.6% of revenue** (2024-25: 2,765 of 10,160 orders, $3.18M of $6.15M).
 
-## 🔑 The rule: each cost on the base that actually drives it
+## ✅ THE SETTLED MODEL (2026-07-30) — use this one
 
-| cost pool | 2025 w/ taxes | base | per order |
-|---|---|---|---|
-| Sales reps (Nika, Taneisha) | $237,067 | **rep-touched orders only** | **$79** |
-| Bradley — import + purchasing | $67,449 | **ALL orders** (he touches every one) | **$13** |
-| Steve — art | $81,267 | **rep-touched orders** | **$27** |
-| Jim & Erik — executive | $258,394 | **% of revenue** (Erik's call) | **$97** |
-| Production floor + machines | $525,179 | **production hour, IN-HOUSE ONLY** | **$33.17/hr** |
+> **Production hour $30.09 · order cost $70 flat / $100 driver-based.**
 
-**An embroidery order carries $246. A webstore order carries $28.**
+Two corrections to the raw 2025 GL split ($26.01/hr, $176/order) get there:
+
+| | derivation | result |
+|---|---|---|
+| **Production pool** | GL production $518,569 **+ Steve's art $81,322** ÷ 19,936 hrs | **$30.09/hr** |
+| **Order pool — flat** | **$368,252** ÷ 5,271 all-company orders | **$70/order** |
+| **Order pool — driver** | rep cost concentrated on the 2,990 **rep-touched** orders | **$100/order** |
+
+- 🔑 **Art is production labour, not overhead** (Erik's call) — that is the whole $26.01 → $30.09.
+- 🔴 **Executive is deliberately NOT allocated per order.** Jim and Erik do not cost more when
+  one more order is written; loading them per order makes small orders look unprofitable *by
+  construction*. This was the single biggest distortion in the interim model.
+- 🔑 The order pool is **$368,252, not the full $925,968 front office** — Erik: *"the front
+  office would be under admin and i think your totals are too high."* Correct: it moved 1-7
+  flats from −$165/order to break-even.
+- Both order figures are carried everywhere because the choice is a judgement, not a
+  measurement. **Every conclusion holds under both**; the $100 driver figure is conservative.
+
+### What each tier actually earns, per order
+
+| tier | flats ($70 / $100 pool) | caps ($70 / $100 pool) |
+|---|---|---|
+| 1-7 | **+$20 / −$9** | **−$27 / −$57** |
+| 8-23 | +$257 / +$227 | +$159 / +$129 |
+| 24-47 | +$670 / +$640 | +$312 / +$282 |
+| 48-71 | +$1,104 / +$1,074 | +$548 / +$518 |
+| 72+ | +$2,484 / +$2,454 | +$1,556 / +$1,526 |
+
+🔴 **Break-even is 4.0 pieces on flats and 7.5 on caps — nowhere near 24.** Only ONE cell is
+negative under either pool: **caps at 1-7**. Flats at 1-7 are break-even, not a loss.
+
+**Consequences — do not re-propose these:**
+- ❌ **The $450 minimum is dead.** The tier it targeted is not losing money, and
+  [CUSTOMER_ORDER_BEHAVIOUR.md](CUSTOMER_ORDER_BEHAVIOUR.md) shows a small first order returns
+  8.2× its cost. Erik's instinct — *"they will freak out"* — was right on the numbers too.
+- ❌ **Do not raise the $50 LTM to $200.** A 1-7 flat order bills $236 and costs $216; it
+  already clears with the fee included. The "short by $45" claim came from the dead $261 model.
+- ✅ **Cap decoration pricing is the real gap** (~+$6.50/pc at 8-23), not an order minimum.
+
+## 📛 Superseded — kept only so the reasoning isn't re-litigated
+
+| model | per order | why it died |
+|---|---|---|
+| **$89.74/hr single rate** | — | loaded everything on machine time (see below) |
+| **interim driver model** | **$246** | front-office pool too broad; exec loaded per order |
+
+The interim table was: reps $79 (rep-touched), Bradley $13 (all orders), art $27
+(rep-touched), Jim & Erik $97 (% of revenue), floor $33.17/hr.
 
 🔴 **REVISED 2026-07-30 after Erik confirmed there is NO RENT** (NWCA owns the building) **and that machines/utilities are production.** Rebuilding from actual GL accounts — payroll from the journal, non-payroll from the GL detail — gives **production $525,179** (payroll $468,403 + utilities/factory $56,776) and **front office $800,635** (payroll $644,177 + non-payroll $156,458). True operating cost is **$1,325,814**, not the $1,494,241 carried earlier. ⚠️ **The GL detail export is MISSING most payroll** (shows 5220 = $162,360 where the journal has $338,723) — always take payroll from the journal and non-payroll from the GL. Only facility cost is **property tax $33,542/yr**; where it sits barely matters ($33.17/hr vs $34.76).
 
@@ -228,10 +269,15 @@ against, not what the company spends.
 Previously recorded as **−$165** on pool E. **That was an artefact of charging every order a
 share of Jim and Erik's salaries.** Range across defensible treatments is −$23 to +$11.
 
-🔴 **The $450 minimum order is WITHDRAWN.** Three independent findings now agree: 1-7 is
+🔴 **The $450 minimum order is WITHDRAWN.** Four independent findings agree: 1-7 is
 break-even; 68-75% of small orders are reorders from customers who just spent a median
-$2,278; and 27% of small-start designs grow to 24+ pieces carrying $1,510 of follow-on
-revenue. **The existing $50 fee is correctly sized.**
+$2,278; **16%** of small-start designs grow to 24+ pieces; and a small first order returns
+**8.2×** what it costs to serve ([CUSTOMER_ORDER_BEHAVIOUR.md](CUSTOMER_ORDER_BEHAVIOUR.md)).
+**The existing $50 fee is correctly sized.**
+
+⚠️ **The "27% of small-start designs grow" figure recorded earlier was WRONG** — it came from
+a 2016-18 window. With full 2010-2026 design coverage the true figure is **16%**, and their
+later revenue is **48%** (not 89%) of a big start's. Do not re-quote the 27%.
 
 **Unaffected and still actionable**: caps lose at 1-7 (−$37 to −$71) and are thin at 8-23;
 garment mix (a comparison, so per-order cost cancels); the revenue cliffs (pure price
@@ -240,23 +286,21 @@ structure); the 85% realization gap (revenue side only).
 ⚠️ **General lesson: the small-order conclusion was highly sensitive to one classification
 choice.** Any future per-order cost claim should be stated with the pool that produced it.
 
-## ✅ SETTLED MODEL (Erik, 2026-07-30) — art is PRODUCTION labour
+## Derivation detail for the settled model (summarised at the top of this file)
 
-Erik's final calls: **pool = Admin only** (executive, marketing, card fees, B&O, insurance and
+Erik's two calls: **pool = Admin only** (executive, marketing, card fees, B&O, insurance and
 property tax all come out of gross margin instead), and **art belongs in production labour,
 not the office**. The latter also matches his own `NWCA_Office_Overhead_2015-2026` report,
 which puts 6150 in PRODUCTION LABOR.
 
-| | 2025 |
-|---|---|
-| production pool (5220+5231+5085+5119) + **art $81,322** | **$599,891** |
-| ÷ 19,936 production hours | **$30.09/hour** (was $26.01 without art) |
-| order pool: admin $304,722 + office non-payroll $63,530 | **$368,252** |
-| ÷ 5,271 orders, flat | **$70/order** |
-| driver-based (sales→2,990 rep-touched; Bradley/office→all) | **$100/order** |
+- Production pool = accounts **5220 + 5231 + 5085 + 5119** ($518,569) **+ art 6150** ($81,322).
+- Order pool = **admin 6149** ($304,722) + **admin non-payroll** ($63,530) = $368,252.
+- Driver split uses **Erik's actual $89,000 for Bradley** rather than a salary-ratio estimate:
+  sales $69 + Bradley $19 + office $12 = $100. (The estimate had given $115.)
 
-Driver split uses **Erik's actual $89,000 for Bradley** rather than a salary-ratio estimate:
-sales $69 + Bradley $19 + office $12. (The estimate had given $115; the real figure gives $100.)
+⚠️ Production hours (19,936) are TimeClick **Garment Production + Digital Print**, a wider base
+than the 15,831 embroidery-only figure used in earlier drafts. **Match the hours base to the
+cost pool or the rate is wrong** — that mismatch is what produced the $33.17 interim rate.
 
 ⚠️ **Art COST is in the production pool but Steve's HOURS are NOT in the denominator.**
 Deliberate: `hours(q) = S + v·q` is fitted on embroidery machine time, which never includes
