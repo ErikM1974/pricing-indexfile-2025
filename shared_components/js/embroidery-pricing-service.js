@@ -111,7 +111,9 @@ class EmbroideryPricingService {
             '2XL': 2.00, '3XL': 3.00, '4XL': 4.00
         };
 
-        // Default rules
+        // Default rules for the synthetic manual-cost path (?manualCost=), which has no
+        // Caspio bundle to read. Half-dollar matches what roundPrice() does for the live
+        // 'HalfDollarCeil_Final', so manual mode and real styles round the same way.
         const defaultRules = {
             RoundingMethod: 'HalfDollarUp'
         };
@@ -224,16 +226,26 @@ class EmbroideryPricingService {
         const baseSize = sortedSizes.find(s => s.size.toUpperCase() === 'S') || sortedSizes[0];
         const baseSizeUpcharge = parseFloat(sellingPriceDisplayAddOns?.[baseSize.size] || 0);
 
-        // Rounding function based on rulesData
+        // Rounding function based on rulesData.
+        // Caspio sends RoundingMethod = 'HalfDollarCeil_Final'. This used to test only for
+        // 'HalfDollarUp' and fall through to Math.ceil, so the live value matched neither
+        // branch and every price here rounded to the WHOLE dollar -- $0.50 above the quote
+        // builder (KNOWN_HALF in embroidery-quote-pricing.js) and above cap-embroidery-
+        // pricing-service.js, on 195 of 380 real (style, tier) cells. That put Quick Quote
+        // and the customer golf pages half a dollar off the builders, breaking the rule that
+        // all three price surfaces agree by construction.
+        // Now mirrors cap-embroidery-pricing-service.js exactly: ONLY an explicit CeilDollar
+        // rounds to the dollar; anything else (including HalfDollarCeil_Final and an absent
+        // rule) rounds up to the half dollar. To move to whole-dollar pricing, change
+        // RoundingMethod to 'CeilDollar' in Caspio -- every path already honours it, no deploy.
         const roundPrice = (price, roundingMethod) => {
             if (isNaN(price)) return null;
-            if (roundingMethod === 'HalfDollarUp') {
-                // Round UP to nearest $0.50
-                if (price % 0.5 === 0) return price;
-                return Math.ceil(price * 2) / 2;
+            if (roundingMethod === 'CeilDollar') {
+                return Math.ceil(price);
             }
-            // Default to CeilDollar (matches quote builder)
-            return Math.ceil(price);
+            // Round UP to nearest $0.50
+            if (price % 0.5 === 0) return price;
+            return Math.ceil(price * 2) / 2;
         };
 
         const priceProfile = {};

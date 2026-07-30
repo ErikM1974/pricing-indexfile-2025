@@ -923,7 +923,7 @@ class EmbroideryInvoiceGenerator {
             const ltmPerPiece = (pricingData.ltmFee / pricingData.totalQuantity).toFixed(2);
             specsHTML += `
                 <div style="font-size: 10px; color: #dc3545; margin-top: 5px; font-style: italic;">
-                    ⚠ Small Batch Fee: +$${ltmPerPiece} per piece (orders under 24)
+                    ⚠ Small Batch Fee: +$${ltmPerPiece} per piece (orders under 8)
                 </div>
             `;
         }

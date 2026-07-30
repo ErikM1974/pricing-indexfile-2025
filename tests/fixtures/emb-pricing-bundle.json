@@ -16,6 +16,6 @@
         { "ItemType": "AS-Garm", "StitchCount": 25000, "EmbroideryCost": 10.00 }
     ],
     "rulesR": {
-        "RoundingMethod": "HalfDollarUp"
+        "RoundingMethod": "HalfDollarCeil_Final"
     }
 }
