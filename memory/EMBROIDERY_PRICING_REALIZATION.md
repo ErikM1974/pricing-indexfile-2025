@@ -352,3 +352,61 @@ than a point estimate.
   4,424 of 5,024 rows, $21.55 hours-weighted, one row at $135,000. ShopWorks job costing is
   therefore **wage-only with no overhead** — it reports every order far more profitable than
   it is. `Machines.cur_MachineRate` ($50/hr embroidery) has the same flaw.
+
+---
+
+# 🔴 Small orders are REORDERS — 21 years, and it revises the fee recommendation (2026-07-30)
+
+Erik's objection killed a flat minimum: *"a customer orders 48, comes back for 3 within a
+month, you hit them with $450 — they'll freak out."* He was right, and it is not an edge
+case — **it is the majority of small orders and always has been.**
+
+Pull: `Orders` types 21+1, **2006-2026, 42,545 orders** with `cn_TotalProductQty_Act`,
+`id_Customer`, `CustomerServiceRep` → `%TEMP%/emb20.tsv`. ⚠️ **`LinesOE.id_Design` returns
+EMPTY through the ODBC**, so "same customer within 90 days" is the proxy for "same job".
+
+## Two-thirds of every 1-7 order is a reorder, in every era
+
+| era | orders/yr | 1-7/yr | after a 24+ order | **reorder share of 1-7** |
+|---|---|---|---|---|
+| 2006-2010 | 2,859 | 755 | 351 | **78%** |
+| 2011-2015 | 2,537 | 806 | 322 | **76%** |
+| 2016-2020 | 1,688 | 492 | 209 | **74%** |
+| 2021-2026 | 1,188 | 401 | 126 | **68%** |
+
+Never below 63% in any single year, 2006→2026.
+
+## The "freak out" case, measured (5,170 cases, 246/yr)
+
+| | p25 | median | p75 |
+|---|---|---|---|
+| days since the big order | 10 | **27** | 49 |
+| size of that big order | 38 | **62** | 133 |
+| size of the follow-up | 2 | **3** | 5 |
+| value of the follow-up | $47 | **$90** | $162 |
+| **their spend in prior 90 days** | $1,185 | **$2,278** | $4,453 |
+
+**32% come back within 14 days.** Erik's "48 then 3 within a month" is the median almost
+exactly.
+
+## 🔑 The 1-7 tier is TWO problems, now roughly even
+
+| | 2021+ | treatment |
+|---|---|---|
+| **reorder after a 24+ order** | 126/yr | **keep the $50 fee** — incremental cost $230 vs $185 billed, short **$45** |
+| **standalone small order** | 130/yr | **$450 minimum** — no relationship to protect |
+
+🔑 **The existing $50 LTM is the RIGHT number for a reorder and always has been.** A re-run
+costs only the blank ($97) + machine time ($41) + rep ($79) + Bradley ($13) = **$230**; art is
+zero (design exists) and executive/office is already carried by the parent order. What is
+missing is the **standalone** case, where $50 covers about a fifth of the $381 real cost.
+
+**So: do NOT raise the fee to $200 and do NOT apply a flat minimum.** Keep $50 for reorders;
+add a minimum that bites only when there is no qualifying recent order behind it.
+
+## By rep — structural, not behavioural
+
+Brian Egan 1,440 cases (180/yr) · Shannon Lundrigan 1,104 (110/yr) · Tracy Murphy 446
+(112/yr) · Taylar Hanson 708 (64/yr) · **Nika Lao 468 (58/yr)**. Historical volume sits with
+former reps; among current staff it is Nika. **Every rep who has ever held the desk shows the
+same pattern** — it is customer behaviour, not anyone's habit, so it is not a coaching issue.
