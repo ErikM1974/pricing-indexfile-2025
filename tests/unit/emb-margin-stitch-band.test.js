@@ -4,6 +4,11 @@
  *   teamnwca.com/pricing/embroidery?StyleNumber=J790   (garment)
  *   teamnwca.com/pricing/cap-embroidery?StyleNumber=112 (cap)
  * If a future edit re-flattens the margin or breaks the band parse, these fail loudly.
+ *
+ * ⚠️ Runs on a SYNTHETIC fixture, deliberately — see makeCalc(). Caspio is uniform 0.53 as of
+ * 2026-07-30, and a uniform fixture cannot detect the flattening bug this suite guards, so the
+ * fixture keeps 1-7 at 0.55 on purpose. Every PRICE assertion below is on a 0.53 tier and so
+ * still matches the live pages; no assertion here prices tier 1-7.
  */
 const Calc = require('../../shared_components/js/embroidery-quote-pricing.js');
 
@@ -12,7 +17,13 @@ function makeCalc() {
   c.roundingMethod = 'CeilDollar';
   c.marginDenominator = 0.55;    // global garment fallback (tiersR[0] = 1-7)
   c.capMarginDenominator = 0.53; // global cap fallback (capTiersR[0] = 24-47)
-  // Per-tier data exactly as initialize() builds it from Caspio Pricing_Tiers + Embroidery_Costs
+  // Per-tier data in the SHAPE initialize() builds from Caspio Pricing_Tiers + Embroidery_Costs.
+  // The 0.55 on 1-7 is DELIBERATELY SYNTHETIC and no longer matches Caspio — measured
+  // 2026-07-30, live is 0.53 on every tier (shirts and caps); the 1-7 offset was retired.
+  // Keep it differing anyway: this suite exists to prove the builder honours a PER-TIER
+  // margin instead of flattening tiersR[0] across all tiers, and a fixture where every tier
+  // shares one value cannot detect that bug at all. Do NOT "correct" 0.55 to 0.53 — doing so
+  // silently guts the regression below. Live values belong in an integration test, not here.
   c.tiers = {
     '1-7':   { embCost: 18, marginDenominator: 0.55, hasLTM: true },
     '8-23':  { embCost: 18, marginDenominator: 0.53 },
@@ -41,7 +52,8 @@ describe('N2 per-tier margin — builder matches the live customer pages', () =>
   const g = (t) => c.roundPrice(34.19 / c.getMarginDenominator(t) + c.getEmbroideryCost(t));   // J790 blank $34.19
   const cap = (t) => c.roundCapPrice(6.75 / c.getCapMarginDenominator(t) + c.getCapEmbroideryCost(t)); // 112 blank $6.75
 
-  test('garment margin is per-tier: 1-7 = 0.55, 8+ = 0.53', () => {
+  // Asserts the MECHANISM (per-tier lookup), not Caspio's current numbers — see makeCalc().
+  test('garment margin is read per-tier, not flattened from tiersR[0]', () => {
     expect(c.getMarginDenominator('1-7')).toBe(0.55);
     expect(c.getMarginDenominator('8-23')).toBe(0.53);
     expect(c.getMarginDenominator('24-47')).toBe(0.53);

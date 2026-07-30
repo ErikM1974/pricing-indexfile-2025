@@ -9,6 +9,12 @@ class EmbroideryPricingCalculator {
         
         // Default fallback values (will be replaced by API data)
         // 2026-02 RESTRUCTURE: New tiers 1-7 (LTM) and 8-23 (no LTM, +$4 surcharge baked in)
+        // SEED VALUES ONLY — never authoritative, and never used to price.
+        // These exist so the object is shaped correctly before initializeConfig() resolves.
+        // _doInitializeConfig() throws if Caspio does not return a real ladder, so a quote can
+        // never be priced from these. Do NOT "update" them to match Caspio: keeping them stale
+        // is harmless, while treating them as a fallback is exactly the silent-wrong-price bug
+        // that guard exists to prevent.
         this.tiers = {
             '1-7': { embCost: 18.00, hasLTM: true },
             '8-23': { embCost: 18.00, hasLTM: false },
@@ -122,7 +128,27 @@ class EmbroideryPricingCalculator {
             const response = await fetch(`${this.baseURL}/api/pricing-bundle?method=EMB&styleNumber=PC54`);
             if (!response.ok) throw new Error(`EMB pricing bundle API returned ${response.status}: ${response.statusText}`);
             const data = await response.json();
-            
+
+            // A 200 with empty arrays is NOT success. When Caspio rate-limits, this endpoint
+            // answers 200 with {tiersR:[], allEmbroideryCostsR:[], ...} rather than an error
+            // (its sibling /api/pricing-tiers fails loudly). Every value those arrays populate
+            // is pre-seeded in the constructor, so without this guard the tier ladder below is
+            // simply skipped and the calculator prices the whole quote off hardcoded numbers
+            // frozen at the last edit of this file -- silently, and wrong the moment anyone
+            // changes a price in Caspio. Erik's #1 rule: never a silent wrong price.
+            // Throwing here routes into the existing catch, which sets apiError, shows the
+            // critical banner and calls disableQuoteCreation().
+            const tierCount = Array.isArray(data?.tiersR) ? data.tiersR.length : -1;
+            const costCount = Array.isArray(data?.allEmbroideryCostsR) ? data.allEmbroideryCostsR.length : -1;
+            if (tierCount <= 0 || costCount <= 0) {
+                throw new Error(
+                    `EMB pricing bundle returned no pricing data (HTTP ${response.status}; ` +
+                    `tiersR=${tierCount < 0 ? 'missing' : tierCount}, ` +
+                    `allEmbroideryCostsR=${costCount < 0 ? 'missing' : costCount}). ` +
+                    'Caspio is most likely rate-limiting. Refusing to price from seed values.'
+                );
+            }
+
             if (data) {
                 // Extract configuration from tiersR
                 if (data.tiersR && data.tiersR.length > 0) {
@@ -134,9 +160,12 @@ class EmbroideryPricingCalculator {
                         this.tiers[tier.TierLabel] = {
                             embCost: 0, // Will be set from allEmbroideryCostsR
                             hasLTM: tier.LTM_Fee > 0,
-                            // Per-tier margin (N2 fix): 1-7 = 0.55 (lower margin, offsets the $50 LTM on small
-                            // orders), 8+ = 0.53. Honor Caspio's per-tier value — NOT tiersR[0] for all tiers
-                            // (that flattened to 0.55 and under-charged every 8+ garment order vs the live page).
+                            // Per-tier margin (N2 fix): honor Caspio's PER-TIER value, never tiersR[0] for all
+                            // tiers — that flattening under-charged every 8+ garment order vs the live page.
+                            // The tiers are free to differ from each other; this code must not assume they do
+                            // or don't. (Measured 2026-07-30: Caspio has 0.53 on every tier, shirts and caps —
+                            // the old 1-7 = 0.55 offset is retired. Do not re-derive that from this comment:
+                            // read GET /api/pricing-tiers?method=EmbroideryShirts.)
                             marginDenominator: parseFloat(tier.MarginDenominator) || this.marginDenominator
                         };
                         if (tier.LTM_Fee > 0) {
@@ -266,8 +295,19 @@ class EmbroideryPricingCalculator {
             // Load service codes from database (replaces hardcoded pricing values)
             await this.loadServiceCodes();
 
+            // Belt and braces: only claim initialized if a real tier ladder actually landed.
+            // The guard above should make this unreachable, but `initialized` is what gates
+            // pricing everywhere else -- it must never be true off seed values.
+            if (!this.apiStatus.mainPricing || Object.keys(this.tiers).length === 0) {
+                throw new Error(
+                    'EMB pricing config incomplete after load ' +
+                    `(mainPricing=${this.apiStatus.mainPricing}, tiers=${Object.keys(this.tiers).length}). ` +
+                    'Refusing to mark the calculator initialized.'
+                );
+            }
+
             this.initialized = true;
-            
+
         } catch (error) {
             console.error('[EmbroideryPricingCalculator] CRITICAL ERROR: Failed to load pricing configuration');
             console.error('[EmbroideryPricingCalculator] Error:', error);
@@ -994,7 +1034,16 @@ class EmbroideryPricingCalculator {
     /**
      * Calculate price for a product line
      */
-    async calculateProductPrice(product, totalQuantity, additionalStitchCost) {
+    /**
+     * NOTE ON EXTRA STITCHES (2026-07-30): this deliberately takes no stitch-cost argument.
+     * Extra stitches are billed ONCE, as their own AS-Garm line (embroidery-quote-service.js)
+     * and as additionalStitchTotal in grandTotal — never inside a unit price. The old third
+     * parameter was passed 0 by its only caller, so nothing was double-billed, but any future
+     * caller passing a real value would have silently billed stitches twice: once in the line
+     * and again in AS-Garm. Removing it makes that impossible. calculateCapProductPrice()
+     * already works this way (see its "NOT added to unit price" note).
+     */
+    async calculateProductPrice(product, totalQuantity) {
         // Sell price override — non-SanMar products with a fixed decorated price
         if (product.sellPriceOverride && product.sellPriceOverride > 0) {
             return this.buildFixedPriceResult(product, product.sellPriceOverride);
@@ -1165,7 +1214,7 @@ class EmbroideryPricingCalculator {
             const baseDecoratedPrice = garmentCost + embCost;  // TRUE base with 8k stitches
             const roundedBase = this.roundPrice(baseDecoratedPrice);  // Round the base FIRST
             // Step 2: Add extra stitch fees on top (no more rounding)
-            const finalPrice = roundedBase + additionalStitchCost;
+            const finalPrice = roundedBase;  // extra stitches stay a separate AS-Garm line
 
             
             lineItems.push({
@@ -1173,7 +1222,7 @@ class EmbroideryPricingCalculator {
                 quantity: standardQty,
                 unitPrice: finalPrice,
                 basePrice: roundedBase,  // Store the rounded base for display
-                extraStitchCost: additionalStitchCost,  // Store extra stitch cost
+                extraStitchCost: 0,  // billed on the AS-Garm line, not here (display tooltip only)
                 alCost: 0,  // Will be added later if AL exists
                 total: roundedBase * standardQty  // CHANGED: Use base price for line total (extra stitches shown separately)
             });
@@ -1202,7 +1251,7 @@ class EmbroideryPricingCalculator {
             const roundedBase = standardRoundedBase + upchargeAmount;  // Add upcharge AFTER rounding
 
             // Step 3: Add extra stitch fees on top (no more rounding)
-            const finalPrice = roundedBase + additionalStitchCost;
+            const finalPrice = roundedBase;  // extra stitches stay a separate AS-Garm line
 
             
             lineItems.push({
@@ -1210,7 +1259,7 @@ class EmbroideryPricingCalculator {
                 quantity: upchargeQty,
                 unitPrice: finalPrice,
                 basePrice: roundedBase,  // Store the rounded base for display
-                extraStitchCost: additionalStitchCost,  // Store extra stitch cost
+                extraStitchCost: 0,  // billed on the AS-Garm line, not here (display tooltip only)
                 alCost: 0,  // Will be added later if AL exists
                 upcharge: upchargeAmount,  // Store the upcharge amount
                 total: roundedBase * upchargeQty,  // CHANGED: Use base price for line total (extra stitches shown separately)
@@ -1228,93 +1277,12 @@ class EmbroideryPricingCalculator {
         };
     }
 
-    /**
-     * Generate line items in ShopWorks PUSH API format
-     * One line item per size per color (proven pattern from 3-Day Tees)
-     *
-     * @param {Object} product - Product with sizeBreakdown, style, color, catalogColor
-     * @param {Object} pricingData - Pricing data with basePrices, sizeUpcharges
-     * @param {Object} logo - Logo with position, stitchCount
-     * @param {string} tier - Pricing tier
-     * @param {number} additionalStitchCost - Extra stitch fee to add to price
-     * @returns {Array} Array of line items in ShopWorks format
-     */
-    async generateLineItems(product, pricingData, logo, tier, additionalStitchCost = 0) {
-        const lineItems = [];
-        const skuService = window.skuValidationService || (window.SKUValidationService ? new window.SKUValidationService() : null);
-        const embCost = this.getEmbroideryCost(tier);
+    // REMOVED 2026-07-30: generateLineItems(). It had zero callers anywhere in the repo
+    // (jest coverage marked it "function not covered") and its price formula had drifted
+    // away from the live subtotal path, so resurrecting it would have quietly produced a
+    // different number than calculateProductPrice(). Push line items are built in
+    // embroidery-quote-service.js from the pricing result; that is the only path.
 
-        // Get standard base price for calculating upcharges
-        const standardSizes = ['S', 'M', 'L', 'XL'];
-        let standardBasePrice = 0;
-        let baseSize = null;
-
-        for (const size of standardSizes) {
-            if (pricingData.basePrices[size]) {
-                standardBasePrice = pricingData.basePrices[size];
-                baseSize = size;
-                break;
-            }
-        }
-
-        // Fallback if no standard sizes
-        if (standardBasePrice === 0) {
-            const availableSizes = Object.entries(pricingData.basePrices);
-            if (availableSizes.length > 0) {
-                availableSizes.sort((a, b) => a[1] - b[1]);
-                baseSize = availableSizes[0][0];
-                standardBasePrice = availableSizes[0][1];
-            }
-        }
-
-        const baseSizeUpcharge = baseSize ? (pricingData.sizeUpcharges[baseSize] || 0) : 0;
-
-        // Generate one line item per size
-        for (const [size, quantity] of Object.entries(product.sizeBreakdown)) {
-            if (quantity <= 0) continue;
-
-            // Calculate pricing for this size
-            const apiUpcharge = pricingData.sizeUpcharges[size] || 0;
-            const relativeUpcharge = apiUpcharge - baseSizeUpcharge;
-
-            // Calculate decorated price
-            const garmentCost = standardBasePrice / this.getMarginDenominator(tier);
-            const baseDecoratedPrice = garmentCost + embCost;
-            const roundedBase = this.roundPrice(baseDecoratedPrice);
-            const finalPrice = roundedBase + relativeUpcharge + additionalStitchCost;
-
-            // Build description: Brand Style Color | LogoPosition StitchK
-            const description = this.buildLineItemDescription(product, logo);
-
-            // Generate SKU using validation service
-            const inventorySku = skuService
-                ? skuService.sanmarToShopWorksSKU(product.style, size)
-                : product.style + (this.getSizeSuffix(size) || '');
-
-            lineItems.push({
-                // ShopWorks PUSH API format (proven pattern)
-                partNumber: product.style,              // BASE only - ShopWorks handles suffix via size field
-                inventorySku: inventorySku,             // Full SKU for internal tracking
-                description: description,
-                color: product.catalogColor,            // CATALOG_COLOR for API
-                displayColor: product.color,            // COLOR_NAME for display
-                size: size,
-                quantity: quantity,
-                unitPrice: finalPrice,
-                total: finalPrice * quantity,
-
-                // Embroidery-specific metadata
-                logoPosition: logo?.position || 'LC',
-                stitchCount: logo?.stitchCount || 8000,
-                hasUpcharge: relativeUpcharge > 0,
-                upchargeAmount: relativeUpcharge,
-                basePrice: roundedBase,
-                extraStitchCost: additionalStitchCost
-            });
-        }
-
-        return lineItems;
-    }
 
     /**
      * Build description string for line item
@@ -1536,9 +1504,9 @@ class EmbroideryPricingCalculator {
 
         // Calculate GARMENT products with standard EMB pricing
         // Uses garmentQuantity for tier determination (NOT combined total)
-        // NOTE: Pass 0 for additionalStitchCost - extra stitches shown as separate AS-GARM line item
+        // Extra stitches are NOT passed in — they are billed once as a separate AS-Garm line.
         for (const product of garmentProducts) {
-            const pricing = await this.calculateProductPrice(product, garmentQuantity, 0);
+            const pricing = await this.calculateProductPrice(product, garmentQuantity);
             if (pricing) {
                 pricing.isCap = false;
                 productPricing.push(pricing);
@@ -1900,7 +1868,14 @@ class EmbroideryPricingCalculator {
             capPatchSetupFee: capPatchSetupFee,
             puffUpchargePerCap: capEmbellishmentType === '3d-puff' ? this.puffUpchargePerCap : 0,
             patchUpchargePerCap: capEmbellishmentType === 'laser-patch' ? this.patchUpchargePerCap : 0,
-            ltmDistributed: true  // LTM baked into per-piece prices (2026-02-06)
+            // FALSE, deliberately. The LTM is NOT baked into the prices the invoice renders:
+            // subtotal is summed from base unit prices and the fee is added once at grandTotal
+            // (see the ltmTotal term above). unitPriceWithLTM exists for the ShopWorks push,
+            // which does distribute it, but the invoice reads item.unitPrice.
+            // While this said true, embroidery-quote-invoice.js suppressed the LTM row, so a
+            // <=7-piece invoice showed a products table $50 below the Subtotal printed directly
+            // under it with nothing accounting for the difference. (2026-07-30)
+            ltmDistributed: false
         };
     }
     

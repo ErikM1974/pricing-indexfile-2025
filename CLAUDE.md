@@ -134,7 +134,7 @@ PC54 has SKUs `PC54`, `PC54_2X`, `PC54_3X` mapped to `Size01–Size06`. **`PC54_
 - Tiers: 1-7 / 8-23 / 24-47 / 48-71 / 72+
 - **LTM threshold: `qty <= 7`** (NOT `< 24` like DTG/DTF — common mistake)
 - Caps and garments tier separately — never combine qty for a tier discount.
-- 5-tier structure + per-tier `MarginDenominator` from Caspio `Pricing_Tiers` (0.55 tier 1-7 / 0.53 others as of 2026-06 — NEVER hardcode it) + `LTM_Fee $50`.
+- 5-tier structure + per-tier `MarginDenominator` from Caspio `Pricing_Tiers` — **NEVER hardcode it**. Read it from **`GET /api/pricing-tiers?method=EmbroideryShirts`** (caps: `GET /api/pricing-bundle?method=CAP&styleNumber=…`, since that route rejects `EmbroideryCaps`). **Measured live 2026-07-30: 0.53 on EVERY tier, shirts and caps.** ⚠️ This line previously said "0.55 tier 1-7" — that was stale; the per-tier margin offset on 1-7 is retired, so 1-7 carries full margin *and* the `LTM_Fee $50`. Quote the API, not this note.
 
 ### Quote Builder Sync (all 4 builders)
 

@@ -288,3 +288,404 @@ Scripts: `cost_curve.py`, `optimize_breaks.py`, `optimal_tiers.py`, `final_answe
 `reorder_detail.py`, `scenarios.py` (session scratchpad). Customer pull =
 `hist_customers.tsv`. ⚠️ **PowerShell writes dates in the LOCAL culture (M/D/YYYY)** — parse
 before sorting or the sequence is wrong.
+
+---
+
+# Cost basis rebuilt from the general journal + TimeClick — added 2026-07-30
+
+## 🔴 The GL is NOT on the ShopWorks ODBC — verified, don't look again
+
+Scanned **all 2,724 columns across 18 exposed tables**. **Zero** columns match
+`payroll|salary|wage`. No ledger, no journal, no debit/credit transaction table.
+(`GetSchema("Columns")` throws `SQL_NO_NULLS already belongs to this DataTable` on the
+FileMaker driver — enumerate columns with `SELECT * FROM t WHERE 1=0` and read
+`rd.GetName(i)` instead.) ⚠️ **`LinesPur` errors `<File Missing>`** — it is listed but
+unreadable.
+
+Tables (19): `Addr Buttons ContactNumbers Contacts Cust Des DesignLocations Event InvLevel
+LinesOE LinesPur Machines Orders OrdTyp PO Prod ProductionLogDetails Thumbnails Version`.
+
+What exists is **account POINTERS, not postings**: `OrdTyp.coa_Revenue` /`coa_CostOfGoods`
+/`gt_DepartmentCode` (all blank via ODBC), `Orders.cur_JobCost_Labor`,
+`LinesOE.cnCur_LineCost_LaborDistribution`, `ProductionLogDetails.cnCur_TotalLabor`.
+**Source of record for GL/payroll is Erik's CSV exports**, not the ODBC.
+
+## Payroll by department (journal, 169 "YYYY Payroll NN" entries, 2019-2026)
+
+| year | 5220 Production | 5231 Digital Print | indirect + tax | all payroll |
+|---|---|---|---|---|
+| 2021 | $242,994 | $60,681 | $510,662 | $814,337 |
+| 2022 | $222,909 | $47,984 | $411,307 | $682,200 |
+| 2023 | $310,595 | $58,433 | $558,738 | $927,766 |
+| 2024 | $344,994 | $73,722 | $645,082 | $1,063,798 |
+| 2025 | $338,723 | $85,460 | $688,397 | $1,112,580 |
+
+Indirect = 6149 Admin + 6150 Art + 6155 Executive + 6472/3/6/8 taxes. 🔑 **Every $1 of
+production wage carries $1.64 of indirect payroll ⇒ a loaded hour is 2.64× the floor wage**,
+before any non-payroll cost. All payroll = **71-74% of the $1,494,241 non-material basis**,
+so the payroll-only rate needs a **1.34× gross-up** for rent/equipment/utilities/supplies.
+
+## 🔑 The $89.74/hr is CONSERVATIVE, and the rate choice changes no comparison
+
+2025 bracket: payroll-only loaded **$49.03-56.12** → grossed up **$65.70-75.20** vs the
+**$89.74** used in every table. So published profit figures understate by $14-24/hr.
+
+**This does not matter for any ranking.** `profit/hr = contribution/hours − rate`: the rate
+enters as a *subtraction*, so changing it shifts **every cell by the same amount**. Only the
+position of zero moves — i.e. whether 1-7 is called a small loss (−$17 at $89.74) or a small
+gain (+$6 at $66). Every conclusion about *relative* merit (garment mix beats quantity,
+48 vs 72, the dead zones) is **rate-independent**.
+
+⚠️ **The employee file holds CURRENT staff only**, so 5-14% of TimeClick hours per year
+can't be mapped to a department (worst: Meang Sreynai, 12,309 hrs). Hence the bracket rather
+than a point estimate.
+
+## ⚠️ Data-quality traps in these exports
+
+- **`General Journal Entries and payroll.csv` is a FileMaker portal export**: one header row
+  per entry then continuation rows carrying only the extra GL lines. A record starts where
+  `date_Transaction` is non-empty.
+- 🔴 **`GJ_GL_COA::AccountName` is MISALIGNED with `GJ_GL::id_AccountMain`** — 93 of 110
+  account ids carry two or more different names. **Key on the id**; get names from
+  `General Ledger Detail…csv` (`id_AccountMain` → `GL_COA::ct_AccountName_FullShort`).
+- `ProductionLogDetails.cur_LaborRate` is a **placeholder, not actual wages**: $17.00 flat on
+  4,424 of 5,024 rows, $21.55 hours-weighted, one row at $135,000. ShopWorks job costing is
+  therefore **wage-only with no overhead** — it reports every order far more profitable than
+  it is. `Machines.cur_MachineRate` ($50/hr embroidery) has the same flaw.
+
+---
+
+# 🔴 Small orders are REORDERS — 21 years, and it revises the fee recommendation (2026-07-30)
+
+Erik's objection killed a flat minimum: *"a customer orders 48, comes back for 3 within a
+month, you hit them with $450 — they'll freak out."* He was right, and it is not an edge
+case — **it is the majority of small orders and always has been.**
+
+Pull: `Orders` types 21+1, **2006-2026, 42,545 orders** with `cn_TotalProductQty_Act`,
+`id_Customer`, `CustomerServiceRep` → `%TEMP%/emb20.tsv`. ⚠️ **`LinesOE.id_Design` returns
+EMPTY through the ODBC**, so "same customer within 90 days" is the proxy for "same job".
+
+## Two-thirds of every 1-7 order is a reorder, in every era
+
+| era | orders/yr | 1-7/yr | after a 24+ order | **reorder share of 1-7** |
+|---|---|---|---|---|
+| 2006-2010 | 2,859 | 755 | 351 | **78%** |
+| 2011-2015 | 2,537 | 806 | 322 | **76%** |
+| 2016-2020 | 1,688 | 492 | 209 | **74%** |
+| 2021-2026 | 1,188 | 401 | 126 | **68%** |
+
+Never below 63% in any single year, 2006→2026.
+
+## The "freak out" case, measured (5,170 cases, 246/yr)
+
+| | p25 | median | p75 |
+|---|---|---|---|
+| days since the big order | 10 | **27** | 49 |
+| size of that big order | 38 | **62** | 133 |
+| size of the follow-up | 2 | **3** | 5 |
+| value of the follow-up | $47 | **$90** | $162 |
+| **their spend in prior 90 days** | $1,185 | **$2,278** | $4,453 |
+
+**32% come back within 14 days.** Erik's "48 then 3 within a month" is the median almost
+exactly.
+
+## 🔑 The 1-7 tier is TWO problems, now roughly even
+
+| | 2021+ | treatment |
+|---|---|---|
+| **reorder after a 24+ order** | 126/yr | **keep the $50 fee** — incremental cost $230 vs $185 billed, short **$45** |
+| **standalone small order** | 130/yr | **$450 minimum** — no relationship to protect |
+
+🔑 **The existing $50 LTM is the RIGHT number for a reorder and always has been.** A re-run
+costs only the blank ($97) + machine time ($41) + rep ($79) + Bradley ($13) = **$230**; art is
+zero (design exists) and executive/office is already carried by the parent order. What is
+missing is the **standalone** case, where $50 covers about a fifth of the $381 real cost.
+
+**So: do NOT raise the fee to $200 and do NOT apply a flat minimum.** Keep $50 for reorders;
+add a minimum that bites only when there is no qualifying recent order behind it.
+
+## By rep — structural, not behavioural
+
+Brian Egan 1,440 cases (180/yr) · Shannon Lundrigan 1,104 (110/yr) · Tracy Murphy 446
+(112/yr) · Taylar Hanson 708 (64/yr) · **Nika Lao 468 (58/yr)**. Historical volume sits with
+former reps; among current staff it is Nika. **Every rep who has ever held the desk shows the
+same pattern** — it is customer behaviour, not anyone's habit, so it is not a coaching issue.
+
+---
+
+# Erik's ratchet hypothesis, tested against a control (2026-07-30)
+
+**Claim:** big order → small fill-in (billed at the big-order price) → small becomes the norm
+→ **the big order never comes back**.
+
+## Design — why a control was needed
+
+Without one, "orders shrank 48% after a small follow-up" proves nothing: embroidery orders
+might shrink for everyone. **Treated** = customer placed ≥24 pieces then ≤7 within 90 days.
+**Control** = placed ≥24 pieces, no small follow-up, anchored on the big order's date.
+For the sharpened test both groups anchor on an **identical order N (≥48 pieces AND >$1,000)**.
+
+✅ **Groups verified comparable**: order N median **100 vs 110 pieces**, **$2,031 vs $1,968**,
+**19 prior orders each**, same era (2014 vs 2013). So the result is not composition.
+⚠️ Confound worth naming: average order size ROSE over the two decades, so every "after"
+window sits later in time and is biased **upward** — making the test conservative.
+
+## Verdict: right on steps 1-3, wrong on step 4
+
+| | after a fill-in | control |
+|---|---|---|
+| **order N+2 clears $1,000** | **26%** | 34% matched / 37% raw |
+| median value of N+2 | $396 | $600 |
+| median pieces of N+2 | 15 | 35 |
+
+**0.75× matched.** Real effect — but *"rarely"* overstates it: **one in four still clears
+$1,000.**
+
+🔑 **The dip is ONE ORDER deep.** % over $1,000 at N+2 / N+3 / N+4 / N+5 = **26 / 32 / 29 /
+30** against a flat **37** control (on the strict 2-3 piece definition the gap closes fully by
+N+3: 36% vs 36%). 🔴 **"The big order never comes back" is REFUTED — 83% place another 24+
+order within two years, statistically identical to the control's 82%** (median 133 days).
+
+🔑 **But the money does not recover the way the order count does.** Total billed in the 12
+months after order N: **$3,053 vs $6,080 median — half.** Within-customer, median order size
+falls **−48% vs −9%** control; share of orders ≥24 falls 55%→36% vs 52%→46%.
+
+**So the accurate statement is: a fill-in does not kill the next big order — it predicts an
+account that bills half as much over the following year.**
+
+## Does the fill-in get big-order pricing? Partly
+
+Price/piece on the small order as a multiple of the big order it followed: p25 **1.03×**,
+median **1.78×**, p75 4.08×. The tier structure implies ~1.35×, so the median IS charged more
+— but **29% pay the same or less per piece**, i.e. the big-order price carried over.
+
+## ⚠️ Association, not cause — and it matters for policy
+
+A customer needing 2-3 pieces three weeks after a 100-piece run may be one whose programme is
+winding down: the fill-in would then be **symptom, not cause**, and no pricing change fixes
+it. Order data cannot separate the two. **It is still a strong predictor** (~750 examples), so
+use it as a **sales trigger — a call, not a fee.** Samples: 240 treated / 354 control on the
+size test; only 91 treated survive the frequency test's span requirement, so that table is
+directional only.
+
+Scripts: `ratchet.py`, `fillin.py`, `reorder20.py` (session scratchpad); data
+`%TEMP%/emb20.tsv` (Orders types 21+1, 2006-2026, 42,545 rows with qty + customer + rep).
+
+---
+
+# Do small orders turn into big ones? — design-level, 2007-2008 (2026-07-30)
+
+Erik's point, and he is right: at CUSTOMER level, 6 polos in March and 200 event tees in
+September looks like "a small order grew". It did not — two unrelated programmes sharing a
+customer. Only a **design-level** test answers whether a job that started small ever scales.
+
+## 🔴 `Orders.id_DesignBlock` was ABANDONED after 2008 — check before reusing
+
+Coverage: **98-99% for 2006-2008**, then **44% (2009), 15% (2010), 8% (2011), 5% (2012),
+~1% from 2013 onward.** `LinesOE.id_Design` is empty at every date. So design history is
+reconstructable **only for 2006-2008** and the question cannot be answered for the modern
+business. `cn_DesignCount` shows multi-design orders exist (4,441 twos, 744 threes) but
+`id_DesignBlock` never contains a separator — it holds **one** ID, so multi-design orders are
+attributed to a single design.
+
+⚠️ **The coverage collapse silently biases any cohort formed after 2008**: a design first
+ordered in 2008 has its 2009-10 follow-ups invisible, so it scores as one-and-done. A first
+run over a 2008+ cohort gave 11% growth; the clean 2007 window gives 17%. **Use 2007 only.**
+
+❌ Fallback checked and rejected: the decoration line's free text (class 9/10
+`PartDescription`) names a logo only rarely — 68% carry *something* but it is mostly garment
+types ("Jackets", "Polos") and fee labels ("Additional Stitches in Logo Charge"). Only ~20% of
+modern orders would get a usable key, and a noisy one.
+
+## The answer, clean window (first order 2007, followed through 2008)
+
+| | started SMALL (<24 pcs) | started BIG (24+) |
+|---|---|---|
+| designs | 316 | 697 |
+| ever ordered again | **47%** | 48% |
+| **ever reached 24+ pieces** | **17%** | **37%** |
+| ever reached 48+ pieces | 9% | 24% |
+| ever reached $1,000+ | 7% | 11% |
+| mean later revenue | **$657** | $914 |
+
+Under-$550 start (615 designs): 26% reach 24+ pieces but only **4% reach $1,000+** against 19%
+for big starts; later revenue **$412 vs $1,486**. Median time for a small start to reach 24+
+pieces: **141 days**.
+
+## 🔑 What it means for the minimum-order decision
+
+1. **Half of all designs never reorder at all — 47% vs 48%, identical regardless of start
+   size.** A small first order is a worse *volume* signal, not a worse *relationship* signal.
+2. **A small first order still carries ~$657 of follow-on revenue**, about 72% of a big first
+   order's. That is real option value and **argues against a hard minimum on a design's FIRST
+   order.**
+3. **But big starts repeat big at roughly twice the rate** (37% vs 17%). Small starts grow —
+   just less often.
+
+⚠️ This is **2007-2008 evidence**, from a business doing ~3,300 orders/yr against today's
+~1,300, and it cannot be refreshed. Weight it accordingly.
+
+Scripts: `pull_designs.ps1`, `design_cohort.py` (session scratchpad); data
+`%TEMP%/emb_designs.tsv` (43,764 rows, types 21+1, 2006-2026, with `id_DesignBlock`).
+
+---
+
+# 🔑 SUPERSEDES the 2007-08 design finding: modern window says small orders DO grow (2026-07-30)
+
+Erik insisted the order↔design link must exist. **He was right** — there are TWO sources and
+they cover different eras:
+
+| source | populated |
+|---|---|
+| `Orders.id_DesignBlock` | **98-99% 2006-2008**, 44% 2009, then dead (~1% from 2013) |
+| **`Event.ct_DesignIDs`** (+ `ct_DesignTitle`) | 0% pre-2009, **83-89% 2016-2018**, 39% 2019, **0% 2020-21**, 16-17% 2022-24, 8% 2025 |
+
+🔑 **`Event` is the join table**: one row per order-event, `id_Order` always populated,
+`ct_DesignIDs` on the design rows. ⚠️ `Event.id_Design` and `id_OrderDesign` are ALWAYS empty —
+use `ct_DesignIDs`. `Des` (39,788 rows 2010-2026 via `date_Creation` chunking) gives
+`DesignName`, `id_Customer` and **`date_Creation`** — anchor cohorts on that, not on first
+appearance, because 2010-2015 is blind and a design "first seen" in 2016 may be years old.
+
+## The answer, 2016 cohort followed to end-2018 (443 designs)
+
+| | started SMALL (<24 pcs) | started BIG (24+) |
+|---|---|---|
+| designs | 206 | 237 |
+| ever ordered again | **50%** | 46% |
+| **ever reached 24+ pieces** | **27%** | **32%** |
+| ever reached 48+ pieces | 14% | 21% |
+| ever reached $1,000+ | 13% | 19% |
+| **mean later revenue** | **$1,510** | $1,705 |
+| mean first order value | $274 | $1,249 |
+
+Under-$550 start (258 designs): 27% vs 34% reach 24+; later revenue $1,204 vs $2,186.
+Median time for a small start to reach 24+ pieces: **105 days**.
+
+🔑 **The gap has closed.** In 2007-08 it was 17% vs 37%; in 2016-18 it is **27% vs 32%**.
+Small starts even reorder slightly MORE often and return **89% as much follow-on revenue off a
+first order worth a fifth as much.** Real cases: *Carlisle Foodservice* 1 pc/$71 (Feb 2016) →
+**70 pcs/$2,598** (Jan 2017); *Hop Jacks 12* 2 pcs → 26 pcs.
+
+## 🔴 Decision consequence
+
+**Do NOT apply a minimum to a design's FIRST order.** Option value is $1,510 of follow-on
+revenue off a $274 order. The minimum belongs only on a small order of an **existing** design
+with no recent big order behind it — a repeat that stayed small, not a new logo finding its
+feet. This is the third revision of the small-order policy and the reason each earlier version
+was wrong was always the same: too coarse a definition of "small order".
+
+⚠️ Coverage 83-89% biases the growth rates **DOWN**. ⚠️ 2019-2026 coverage collapses (0-17%),
+so the pattern cannot be confirmed for today — **restoring the design link on orders is the
+one data fix that would make this question answerable going forward.**
+
+Scripts: `pull_event_designs.ps1`, `pull_des.ps1`, `design_cohort2.py`; data
+`%TEMP%/event_designs.tsv` (19,707 links), `%TEMP%/des_table.tsv` (39,788 designs).
+
+---
+
+# ✅ DEFINITIVE: do small orders turn into big ones? (design export, 2026-07-30)
+
+**Supersedes both earlier attempts.** Erik exported `Order_OrderDes::id_Design` from a
+ShopWorks layout — the link the ODBC cannot reach. `Downloads/desgns and orders.csv`,
+96,212 rows → **82,316 order-design links, 23,093 named designs**.
+
+🔑 **Coverage 94-99% for 2010-2026** — sixteen unbroken years, against the old best of 0-17%
+for 2019-2026. ⚠️ It is a **FileMaker portal export**: a multi-design order writes the order
+once and leaves `ID_Order` BLANK on continuation rows (16,968 of them), so **ID_Order must be
+forward-filled**. Design ids arrive as `15992.00` — integer part is the design, decimal the
+location. 15% of orders carry more than one design.
+
+## The answer — 13 cohorts, 2012-2024, 24-month follow-up
+
+| | started SMALL (<24 pcs) | started BIG (24+) |
+|---|---|---|
+| designs | 2,532 | 3,117 |
+| ever ordered again | 45% | 49% |
+| **ever reached 24+ pieces** | **16%** | **36%** |
+| ever reached 48+ pieces | 7% | 24% |
+| mean later revenue (24 mo) | **$729** | $1,515 |
+| mean first order | $382 / 10.3 pcs | $1,655 / 97.8 pcs |
+| **median lifetime** | **$543** | $1,793 |
+| **mean lifetime** | **$1,753** | $4,895 |
+
+Small→24+ is **12-24% in every cohort year 2012-2024** — no trend in thirteen years.
+Median time to grow: **169 days**.
+
+🔴 **This CORRECTS the earlier 2016-18 figures of 27% and 89%.** Those came from a single
+cohort at 83-89% coverage, and 2016 turns out to be the highest year in the whole series
+(24%). The true rate is **16%**, and small starts return **48%** of a big start's later
+revenue, not 89%.
+
+## 🔑 The tail is the argument, not the average
+
+Median small-start lifetime **$543** but mean **$1,753** — a heavily skewed distribution.
+*"HILT Tire Circle"*: first order **5 pcs / $34**, then 60 pcs nineteen days later, 280 pcs
+two months on — **lifetime $71,419 over 24 orders**. *"RH PETERSON"*: 5 pcs / $160 →
+**$58,804 over 15 orders**.
+
+**Decision unchanged but better grounded: do NOT put a minimum on a design's first order.**
+$1,753 of expected lifetime revenue against ~$100 of order cost is a good trade even at a 16%
+growth rate. But the honest argument is **"the tail is worth it"**, not "most of them grow" —
+most do not.
+
+Scripts: `parse_designs.py`, `cohort_final.py`; parsed links at `%TEMP%/order_design.tsv`.
+
+---
+
+# 🔴 ACTIONABILITY AUDIT of the "recoverable gap" recommendations (2026-07-30)
+
+**The fee ceilings survive; the enforcement mechanism does not.** Corrected ceiling
+$39,784/yr ($21,334 digitizing + $18,450 LTM) vs the proposed $38,250 — within 4%.
+
+## The three enforcement facts that kill "make the fees non-optional at order entry"
+
+1. **NWCA cannot add a validation to ShopWorks OnSite.** ODBC `extro/extro` is read-only at
+   the account level; `SHOPWORKS_ODBC_INTEGRATION.md:20` — "MO push API remains the ONLY write
+   path into ShopWorks". MO push CREATES orders; it cannot block an invoice. No NWCA owner
+   can execute "block invoicing unless a DD line is present".
+2. **The one path NWCA owns carries 1 order.** Window 2024-08-01→2026-07-29: **2,613 embroidery
+   orders (types 21+1), 8 with an ExtOrderID, `ExtSource` = blank 2,607 / WebSite 5 /
+   NWCA-EMB 1.** The quote builder → `/api/embroidery-push/push-quote` path already implements
+   every recommended control (`LTM_Waived`, `LTM_Display_Mode`, `LTMFeeTotal`, `DigitizingFee`,
+   `GarmentDigitizing`, `CapDigitizing`, **`DiscountReason`**) — on 0.04% of orders.
+   🔑 **The "put a reason code on any price below list" recommendation describes a field that
+   already exists.** It sits on the dead path.
+3. 🔴 **The digitizing rule's trigger is not computable live.** 2026 embroidery via ODBC:
+   `LinesOE.id_Design` **0 of 3,077** lines · `LinesOE.DesignTitle` 0 · `gt_id_DesignBlock` 0 ·
+   `Event.id_Design` **0 of 2,340** · `Event.ct_DesignIDs` → **70 distinct orders of 643 (10.9%)**.
+   The 94-99% coverage every digitizing finding rests on came from Erik's ONE-OFF ShopWorks
+   layout export (`Downloads/desgns and orders.csv`), not a feed.
+4. **Caspio `ORDER_ODBC` is order-level only** (47 fields) — no line items (can't see a DD line)
+   and no quantity column (can't see qty ≤ 7). Both ODBC-readable ⇒ buildable sync, not a checkbox.
+
+## What IS actionable
+
+- **Order→invoice lag = median 14 days** (p25 9, p75 21, p90 29; 1,930 invoiced orders
+  2025-01→2026-07; only 30 = 1.6% invoice within a day). **A nightly exception report has a
+  two-week window** to catch a missing fee before the invoice leaves.
+- **LTM is fully computable today** from `Orders.cn_TotalProductQty_Act` ⇒ nightly "open order,
+  qty ≤ 7, no LTM" list. **738 window 1-7 orders = 369/yr × $50 = $18,450/yr** (not 421/yr).
+- **Digitizing is blocked behind restoring the order→design link** — the single highest-value
+  data fix, and the same one flagged for the small-order-growth question.
+- 🔑 **Order entry is TWO people**: 2026 type-21+1 creators = emp 169 (59.9%) + emp 281 (34.7%)
+  = 94.6%, only 6 distinct. The lever is a two-person conversation + a list, not a systems project.
+
+## 🔴 "Capture is 38% and falling" is wrong — it is ~43% and flat
+
+New-design orders in window (82,316-link export): **charged 302 / uncharged 404 = 42.8%**.
+By half-year **46.6 / 52.8 / 44.5 / 40.8 / 71.4%** — no decline (the claimed 16.7% for 2026 H2
+is a 21-order sample read the other way). All-orders DD rate is flat too: **11.4 / 12.1 / 14.8 /
+12.9 / 12.6%** 2022→2026.
+
+🔑 **Reps are discriminating, not forgetting.** Repeat-design orders carry a DD line **5 times in
+1,836 (0.3%)** — the rule is understood. Capture splits **70.3% brand-new customer** vs
+**26.1% existing customer with new artwork** (n=266 / 440). And the amount varies: window DD
+lines $100×254, $0×27, $50×23, $200×15, $150×14, $300×2 — **mean $105.61, median $100**.
+⇒ A hard block would misfire exactly where judgment is being exercised (existing customer,
+re-cut of a logo we already own).
+
+✅ Confirmed: ShopWorks computes no garment price — `cnCur_UnitPriceCalculated` populated on
+**678 of 25,543** garment lines (2.7%). ✅ Confirmed: LTM is essentially never a line item —
+15 orders in 5,989 (2022-2026); **5 of 738** window 1-7 orders (0.7%).
+
+Scripts: `fees.py`, `newdesign.py`, `ceil.py`, `entry.py` (session scratchpad).
