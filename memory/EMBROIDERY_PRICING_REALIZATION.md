@@ -410,3 +410,63 @@ Brian Egan 1,440 cases (180/yr) · Shannon Lundrigan 1,104 (110/yr) · Tracy Mur
 (112/yr) · Taylar Hanson 708 (64/yr) · **Nika Lao 468 (58/yr)**. Historical volume sits with
 former reps; among current staff it is Nika. **Every rep who has ever held the desk shows the
 same pattern** — it is customer behaviour, not anyone's habit, so it is not a coaching issue.
+
+---
+
+# Erik's ratchet hypothesis, tested against a control (2026-07-30)
+
+**Claim:** big order → small fill-in (billed at the big-order price) → small becomes the norm
+→ **the big order never comes back**.
+
+## Design — why a control was needed
+
+Without one, "orders shrank 48% after a small follow-up" proves nothing: embroidery orders
+might shrink for everyone. **Treated** = customer placed ≥24 pieces then ≤7 within 90 days.
+**Control** = placed ≥24 pieces, no small follow-up, anchored on the big order's date.
+For the sharpened test both groups anchor on an **identical order N (≥48 pieces AND >$1,000)**.
+
+✅ **Groups verified comparable**: order N median **100 vs 110 pieces**, **$2,031 vs $1,968**,
+**19 prior orders each**, same era (2014 vs 2013). So the result is not composition.
+⚠️ Confound worth naming: average order size ROSE over the two decades, so every "after"
+window sits later in time and is biased **upward** — making the test conservative.
+
+## Verdict: right on steps 1-3, wrong on step 4
+
+| | after a fill-in | control |
+|---|---|---|
+| **order N+2 clears $1,000** | **26%** | 34% matched / 37% raw |
+| median value of N+2 | $396 | $600 |
+| median pieces of N+2 | 15 | 35 |
+
+**0.75× matched.** Real effect — but *"rarely"* overstates it: **one in four still clears
+$1,000.**
+
+🔑 **The dip is ONE ORDER deep.** % over $1,000 at N+2 / N+3 / N+4 / N+5 = **26 / 32 / 29 /
+30** against a flat **37** control (on the strict 2-3 piece definition the gap closes fully by
+N+3: 36% vs 36%). 🔴 **"The big order never comes back" is REFUTED — 83% place another 24+
+order within two years, statistically identical to the control's 82%** (median 133 days).
+
+🔑 **But the money does not recover the way the order count does.** Total billed in the 12
+months after order N: **$3,053 vs $6,080 median — half.** Within-customer, median order size
+falls **−48% vs −9%** control; share of orders ≥24 falls 55%→36% vs 52%→46%.
+
+**So the accurate statement is: a fill-in does not kill the next big order — it predicts an
+account that bills half as much over the following year.**
+
+## Does the fill-in get big-order pricing? Partly
+
+Price/piece on the small order as a multiple of the big order it followed: p25 **1.03×**,
+median **1.78×**, p75 4.08×. The tier structure implies ~1.35×, so the median IS charged more
+— but **29% pay the same or less per piece**, i.e. the big-order price carried over.
+
+## ⚠️ Association, not cause — and it matters for policy
+
+A customer needing 2-3 pieces three weeks after a 100-piece run may be one whose programme is
+winding down: the fill-in would then be **symptom, not cause**, and no pricing change fixes
+it. Order data cannot separate the two. **It is still a strong predictor** (~750 examples), so
+use it as a **sales trigger — a call, not a fee.** Samples: 240 treated / 354 control on the
+size test; only 91 treated survive the frequency test's span requirement, so that table is
+directional only.
+
+Scripts: `ratchet.py`, `fillin.py`, `reorder20.py` (session scratchpad); data
+`%TEMP%/emb20.tsv` (Orders types 21+1, 2006-2026, 42,545 rows with qty + customer + rep).
