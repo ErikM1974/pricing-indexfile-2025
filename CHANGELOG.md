@@ -1,3 +1,7 @@
+## v2026.07.30.2 (2026.07.30)
+
+- Pricing Analysis: add Tier design section
+
 ## v2026.07.30.1 (2026.07.30)
 
 - Memory: embroidery pricing realization findings + ShopWorks ODBC production tables
