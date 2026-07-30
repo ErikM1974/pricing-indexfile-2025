@@ -290,7 +290,22 @@
                                     </div>
                                 </div>
 
-                                <!-- 5. System & API Reference — read-only developer docs +
+                                <!-- 5. Analysis — internal cost/margin studies. Sits above API
+                                     Reference because it is read by management, not developers.
+                                     Every page here carries company-wide revenue and cost figures,
+                                     so each one MUST also be listed in ADMIN_DEFAULT_PAGES
+                                     (lib/page-access.js) — the drift-lock test enforces it. -->
+                                <div class="nav-subsection collapsed" data-subsection="admin-analysis">
+                                    <button type="button" class="nav-subsection-header" data-action="sidebar:toggle-section" aria-expanded="false" aria-controls="nav-admin-analysis">
+                                        <span class="nav-subsection-title">Analysis</span>
+                                        <span class="chevron" aria-hidden="true">▼</span>
+                                    </button>
+                                    <div class="nav-subsection-content" id="nav-admin-analysis">
+                                        <a href="/dashboards/pricing-analysis.html" class="nav-link">📐 Pricing Analysis — embroidery cost, margin &amp; realization</a>
+                                    </div>
+                                </div>
+
+                                <!-- 6. System & API Reference — read-only developer docs +
                                      the Caspio quota meter. Lowest traffic, so it sits last. -->
                                 <div class="nav-subsection collapsed" data-subsection="admin-reference">
                                     <button type="button" class="nav-subsection-header" data-action="sidebar:toggle-section" aria-expanded="false" aria-controls="nav-admin-reference">
