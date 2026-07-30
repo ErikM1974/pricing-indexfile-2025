@@ -527,3 +527,56 @@ pieces: **141 days**.
 
 Scripts: `pull_designs.ps1`, `design_cohort.py` (session scratchpad); data
 `%TEMP%/emb_designs.tsv` (43,764 rows, types 21+1, 2006-2026, with `id_DesignBlock`).
+
+---
+
+# 🔑 SUPERSEDES the 2007-08 design finding: modern window says small orders DO grow (2026-07-30)
+
+Erik insisted the order↔design link must exist. **He was right** — there are TWO sources and
+they cover different eras:
+
+| source | populated |
+|---|---|
+| `Orders.id_DesignBlock` | **98-99% 2006-2008**, 44% 2009, then dead (~1% from 2013) |
+| **`Event.ct_DesignIDs`** (+ `ct_DesignTitle`) | 0% pre-2009, **83-89% 2016-2018**, 39% 2019, **0% 2020-21**, 16-17% 2022-24, 8% 2025 |
+
+🔑 **`Event` is the join table**: one row per order-event, `id_Order` always populated,
+`ct_DesignIDs` on the design rows. ⚠️ `Event.id_Design` and `id_OrderDesign` are ALWAYS empty —
+use `ct_DesignIDs`. `Des` (39,788 rows 2010-2026 via `date_Creation` chunking) gives
+`DesignName`, `id_Customer` and **`date_Creation`** — anchor cohorts on that, not on first
+appearance, because 2010-2015 is blind and a design "first seen" in 2016 may be years old.
+
+## The answer, 2016 cohort followed to end-2018 (443 designs)
+
+| | started SMALL (<24 pcs) | started BIG (24+) |
+|---|---|---|
+| designs | 206 | 237 |
+| ever ordered again | **50%** | 46% |
+| **ever reached 24+ pieces** | **27%** | **32%** |
+| ever reached 48+ pieces | 14% | 21% |
+| ever reached $1,000+ | 13% | 19% |
+| **mean later revenue** | **$1,510** | $1,705 |
+| mean first order value | $274 | $1,249 |
+
+Under-$550 start (258 designs): 27% vs 34% reach 24+; later revenue $1,204 vs $2,186.
+Median time for a small start to reach 24+ pieces: **105 days**.
+
+🔑 **The gap has closed.** In 2007-08 it was 17% vs 37%; in 2016-18 it is **27% vs 32%**.
+Small starts even reorder slightly MORE often and return **89% as much follow-on revenue off a
+first order worth a fifth as much.** Real cases: *Carlisle Foodservice* 1 pc/$71 (Feb 2016) →
+**70 pcs/$2,598** (Jan 2017); *Hop Jacks 12* 2 pcs → 26 pcs.
+
+## 🔴 Decision consequence
+
+**Do NOT apply a minimum to a design's FIRST order.** Option value is $1,510 of follow-on
+revenue off a $274 order. The minimum belongs only on a small order of an **existing** design
+with no recent big order behind it — a repeat that stayed small, not a new logo finding its
+feet. This is the third revision of the small-order policy and the reason each earlier version
+was wrong was always the same: too coarse a definition of "small order".
+
+⚠️ Coverage 83-89% biases the growth rates **DOWN**. ⚠️ 2019-2026 coverage collapses (0-17%),
+so the pattern cannot be confirmed for today — **restoring the design link on orders is the
+one data fix that would make this question answerable going forward.**
+
+Scripts: `pull_event_designs.ps1`, `pull_des.ps1`, `design_cohort2.py`; data
+`%TEMP%/event_designs.tsv` (19,707 links), `%TEMP%/des_table.tsv` (39,788 designs).
