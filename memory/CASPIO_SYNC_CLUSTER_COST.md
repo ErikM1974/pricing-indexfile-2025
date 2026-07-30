@@ -67,7 +67,12 @@ identifies an HTTP-shaped job — e.g. 8 flushes in 43 s at 13:00:08–13:00:51.
     queries `GarmentTrackerArchive` BY QUARTER. Q1/Q2 data already exists, so historical payout
     reports keep working with the jobs switched off.
 
-  **Action: delete the two Heroku Scheduler jobs** — `sync-garment-tracker` (15:00 UTC) and
+  **✅ DONE 2026-07-30 — Erik deleted both jobs.** Verified from the Heroku dashboard: 18 jobs
+  → 16, zero garment jobs remain. The 14:30 UTC slot is now clean `sync-crm-dashboards` only,
+  so that job can finally be costed on its own (it was previously inseparable from
+  `archive-garment-tracker`).
+
+  ~~**Action: delete the two Heroku Scheduler jobs**~~ — `sync-garment-tracker` (15:00 UTC) and
   `archive-garment-tracker` (14:00 UTC). ~1,900+/day, ~12% of the daily budget, for a programme
   that ended. **Keep the tables and the code** so Q1/Q2 spiffs still resolve and it is reversible.
   🔑 **Heroku Scheduler has NO CLI and NO Platform API** — verified 2026-07-30 (`heroku help`
