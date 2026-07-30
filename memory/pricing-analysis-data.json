@@ -1718,6 +1718,23 @@
      "breakeven_driver": 7.472311271399631
     }
    }
+  },
+  "ratchet_retest": {
+   "treated_n": 946,
+   "treated_mean": 8075.0,
+   "treated_median": 3071.0,
+   "treated_next24": 0.81,
+   "ctrl_n": 4104,
+   "ctrl_mean": 8718.0,
+   "ctrl_median": 3709.0,
+   "ctrl_next24": 0.9,
+   "naive_n": 2814,
+   "naive_mean": 3470.0,
+   "diff": -643.0,
+   "ci_lo": -1672.0,
+   "ci_hi": 386.0,
+   "significant": false,
+   "superseded": "the $3,053 vs $6,080 figure, which used a control that did not require a next order"
   }
  },
  "customers": {

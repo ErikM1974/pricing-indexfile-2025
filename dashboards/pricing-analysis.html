@@ -24,7 +24,7 @@
 
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/pricing-analysis.css?v=2026.07.30.5">
+    <link rel="stylesheet" href="/dashboards/css/pricing-analysis.css?v=2026.07.30.6">
 </head>
 <body>
     <div class="dash-shell">
@@ -464,16 +464,27 @@
                 stream in order to reach a standalone case that is a minority of the tier.</p>
 
                 <div class="pa-finding pa-finding--alt">
-                    <h3>A fill-in predicts an account that bills half as much next year</h3>
-                    <p>Tested against a control anchored on an identical order (48+ pieces, over
-                    $1,000; groups verified comparable). After a small fill-in, the next order
-                    clears $1,000 <strong>26% of the time against 34%</strong> for the control
-                    &mdash; but the dip is <strong>one order deep</strong> and 83% place another
-                    24+ order within two years, the same as the control. What does not recover is
-                    the money: <strong>12-month revenue of $3,053 against $6,080</strong>.
-                    &#9888; Association, not cause &mdash; a customer needing 3 pieces after a
-                    100-piece run may simply be winding down. Use it as a <strong>sales
-                    trigger, not a fee</strong>.</p>
+                    <h3>The &ldquo;fill-in ratchet&rdquo; does not survive a like-for-like control
+                        <span class="pa-tag">corrected 2026-07-30</span></h3>
+                    <p>An earlier version of this page reported that a small fill-in predicted an
+                    account billing half as much the following year ($3,053 against $6,080). <strong>That
+                    comparison was wrong.</strong> Its control did not require the customer to have
+                    placed a next order at all, so it swept in accounts that had simply stopped
+                    buying &mdash; it measured churn, not any ratchet.</p>
+                    <p>Re-run against a control anchored on an identical order (48+ pieces, over
+                    $1,000) that <em>also</em> placed a following order, the effect disappears:
+                    <strong>$8,075 against $8,718</strong> of 12-month revenue, a difference of
+                    <strong>&minus;$643</strong> with a 95% confidence interval of &minus;$1,672 to $386 &mdash; not
+                    distinguishable from zero. Against the original naive control the fill-in
+                    customers actually look <em>better</em> ($8,075 vs $3,470), which is the giveaway.</p>
+                    <p>One real difference does remain: fill-in customers return to a 24+ piece
+                    order <strong>81%</strong> of the time against <strong>90%</strong> for the
+                    control. So the behaviour is not identical &mdash; but the money is, and it is
+                    the money the earlier claim was about.</p>
+                    <p><strong>Do not treat a fill-in as a warning sign.</strong> Read it as
+                    ordinary reorder behaviour from a live account. &#9888; &ldquo;No evidence of
+                    harm&rdquo; is not &ldquo;proven zero&rdquo; &mdash; the interval is wide enough
+                    to hide a modest effect in either direction.</p>
                 </div>
             </section>
 
@@ -903,6 +914,6 @@
             </section>
         </main>
     </div>
-    <script src="/dashboards/js/pricing-analysis.js?v=2026.07.30.5"></script>
+    <script src="/dashboards/js/pricing-analysis.js?v=2026.07.30.6"></script>
 </body>
 </html>

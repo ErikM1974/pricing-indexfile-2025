@@ -26,8 +26,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, 'memory', 'pricing-analysis-data.json')
 OUT = os.path.join(ROOT, 'dashboards', 'pricing-analysis.html')
 
-CSS_VER = '2026.07.30.5'
-JS_VER = '2026.07.30.5'
+CSS_VER = '2026.07.30.6'
+JS_VER = '2026.07.30.6'
 TIERS = ['1-7', '8-23', '24-47', '48-71', '72+']
 BANDS = ['<$4', '$4-8', '$8-15', '$15-25', '$25+']
 BAND_LABEL = {
@@ -860,6 +860,7 @@ def sec_costing():
          ['<b>FRONT OFFICE $/order</b>'] + ['<b>%s</b>' % money(gl[y]['per_order']) for y in YS]])
 
     st = c['settled']
+    rr = c['ratchet_retest']
     dv = st['drivers']
     drv = table(['cost pool', 'spread over', 'per embroidery order'],
                 [['Sales reps &mdash; Nika &amp; Taneisha',
@@ -1012,16 +1013,27 @@ def sec_costing():
                 stream in order to reach a standalone case that is a minority of the tier.</p>
 
                 <div class="pa-finding pa-finding--alt">
-                    <h3>A fill-in predicts an account that bills half as much next year</h3>
-                    <p>Tested against a control anchored on an identical order (48+ pieces, over
-                    $1,000; groups verified comparable). After a small fill-in, the next order
-                    clears $1,000 <strong>26%% of the time against 34%%</strong> for the control
-                    &mdash; but the dip is <strong>one order deep</strong> and 83%% place another
-                    24+ order within two years, the same as the control. What does not recover is
-                    the money: <strong>12-month revenue of $3,053 against $6,080</strong>.
-                    &#9888; Association, not cause &mdash; a customer needing 3 pieces after a
-                    100-piece run may simply be winding down. Use it as a <strong>sales
-                    trigger, not a fee</strong>.</p>
+                    <h3>The &ldquo;fill-in ratchet&rdquo; does not survive a like-for-like control
+                        <span class="pa-tag">corrected 2026-07-30</span></h3>
+                    <p>An earlier version of this page reported that a small fill-in predicted an
+                    account billing half as much the following year (%s against %s). <strong>That
+                    comparison was wrong.</strong> Its control did not require the customer to have
+                    placed a next order at all, so it swept in accounts that had simply stopped
+                    buying &mdash; it measured churn, not any ratchet.</p>
+                    <p>Re-run against a control anchored on an identical order (48+ pieces, over
+                    $1,000) that <em>also</em> placed a following order, the effect disappears:
+                    <strong>%s against %s</strong> of 12-month revenue, a difference of
+                    <strong>%s</strong> with a 95%% confidence interval of %s to %s &mdash; not
+                    distinguishable from zero. Against the original naive control the fill-in
+                    customers actually look <em>better</em> (%s vs %s), which is the giveaway.</p>
+                    <p>One real difference does remain: fill-in customers return to a 24+ piece
+                    order <strong>%s</strong> of the time against <strong>%s</strong> for the
+                    control. So the behaviour is not identical &mdash; but the money is, and it is
+                    the money the earlier claim was about.</p>
+                    <p><strong>Do not treat a fill-in as a warning sign.</strong> Read it as
+                    ordinary reorder behaviour from a live account. &#9888; &ldquo;No evidence of
+                    harm&rdquo; is not &ldquo;proven zero&rdquo; &mdash; the interval is wide enough
+                    to hide a modest effect in either direction.</p>
                 </div>
             </section>""" % (
         money(st['rate'], 2), num(st['hours']), money(st['prod_pool']),
@@ -1043,7 +1055,12 @@ def sec_costing():
         signed(dt['flats']['1-7']['profit_flat']),
         num(dt['flats']['breakeven_driver'], 1), num(dt['caps']['breakeven_driver'], 1),
         etab, stab, money(dt['flats']['1-7']['bills']),
-        money(dt['flats']['1-7']['cost_flat']))
+        money(dt['flats']['1-7']['cost_flat']),
+        money(3053), money(6080),
+        money(rr['treated_mean']), money(rr['ctrl_mean']), signed(rr['diff']),
+        signed(rr['ci_lo']), signed(rr['ci_hi']),
+        money(rr['treated_mean']), money(rr['naive_mean']),
+        pct(rr['treated_next24'], 0), pct(rr['ctrl_next24'], 0))
 
 
 def sec_customers():
