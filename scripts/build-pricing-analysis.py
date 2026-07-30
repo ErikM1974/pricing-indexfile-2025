@@ -26,8 +26,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, 'memory', 'pricing-analysis-data.json')
 OUT = os.path.join(ROOT, 'dashboards', 'pricing-analysis.html')
 
-CSS_VER = '2026.07.30.2'
-JS_VER = '2026.07.30.2'
+CSS_VER = '2026.07.30.3'
+JS_VER = '2026.07.30.3'
 TIERS = ['1-7', '8-23', '24-47', '48-71', '72+']
 BANDS = ['<$4', '$4-8', '$8-15', '$15-25', '$25+']
 BAND_LABEL = {
@@ -818,8 +818,155 @@ def sec_design():
         migtab, money(cc['setup_direct_flat'], 0))
 
 
+def sec_costing():
+    """The corrected cost basis, and why small orders are mostly reorders."""
+    c = D['costing']
+    YS = c['years']
+    gl = c['gl']
+
+    glt = table(
+        ['component'] + YS,
+        [['material / blanks'] + [money(gl[y]['material']) for y in YS],
+         ['production payroll'] + [money(gl[y]['prod_pay']) for y in YS],
+         ['production non-payroll'] + [money(gl[y]['prod_np']) for y in YS],
+         ['office payroll'] + [money(gl[y]['off_pay']) for y in YS],
+         ['office non-payroll'] + [money(gl[y]['off_np']) for y in YS],
+         ['<b>PRODUCTION TOTAL</b>'] + ['<b>%s</b>' % money(gl[y]['prod_total']) for y in YS],
+         ['<b>FRONT OFFICE TOTAL</b>'] + ['<b>%s</b>' % money(gl[y]['off_total']) for y in YS],
+         ['production hours'] + [num(gl[y]['hours']) for y in YS],
+         ['<b>PRODUCTION $/hour</b>'] + ['<b>%s</b>' % money(gl[y]['rate'], 2) for y in YS],
+         ['all company orders'] + [num(gl[y]['orders']) for y in YS],
+         ['<b>FRONT OFFICE $/order</b>'] + ['<b>%s</b>' % money(gl[y]['per_order']) for y in YS]])
+
+    d = c['drivers']
+    sp = c['order_split']
+    drv = table(['cost pool', 'spread over', 'per embroidery order'],
+                [['Sales reps', '%s rep-touched orders' % num(sp['touched']), money(d['sales'])],
+                 ['Bradley &mdash; import + purchasing', '%s ALL orders' % num(sp['total']),
+                  money(d['bradley'])],
+                 ['Steve &mdash; art', '%s rep-touched orders' % num(sp['touched']), money(d['art'])],
+                 ['Jim &amp; Erik &mdash; executive', 'share of revenue', money(d['exec'])],
+                 ['other office non-payroll', '%s ALL orders' % num(sp['total']), money(d['other'])]],
+                foot=['TOTAL', '', '<b>%s</b>' % money(c['per_order'])])
+
+    trows = []
+    for t in TIERS:
+        f = c['tiers']['flats'].get(t)
+        cp = c['tiers']['caps'].get(t)
+        if not f:
+            continue
+        trows.append([
+            '<b>%s</b>' % t, num(f['mean_q'], 1), money(f['bills']), money(f['cost']),
+            (signed(f['profit']), cls_for(f['profit'])),
+            (signed(cp['profit']), cls_for(cp['profit'])) if cp else '&mdash;'])
+    ttab = table(['tier', 'mean qty', 'flats bill', 'flats cost', 'flats profit/order',
+                  'caps profit/order'], trows)
+
+    erows = [[e['era'], num(e['orders_yr']), num(e['small_yr']), num(e['afterbig_yr']),
+              pct(e['small_share'], 0), '<b>%s</b>' % pct(e['reorder_share'], 0)]
+             for e in c['eras']]
+    etab = table(['era', 'orders/yr', '1-7 orders/yr', 'after a 24+ order',
+                  '1-7 share of all', 'reorder share of 1-7'], erows)
+
+    s = c['small_split']
+    stab = table(['what it is', 'orders/yr', 'treatment'],
+                 [['reorder within 90 days of a <b>24+</b> order', num(s['reorder_yr']),
+                   'keep the $50 fee &mdash; it is short by only $45'],
+                  ['reorder after a <b>smaller</b> prior order', num(s['other_yr']),
+                   'judgement call &mdash; relationship exists but is thin'],
+                  ['<b>standalone</b> &mdash; no recent order behind it', num(s['standalone_yr']),
+                   '<b>the case a minimum is for</b>']])
+
+    return """
+            <section class="dash-card" id="pa-costing">
+                <h2 class="pa-h">Corrected cost basis <span class="pa-tag">supersedes the $89.74 above</span></h2>
+                <div class="pa-callout pa-callout--danger">
+                    <h4>The $89.74 production hour used elsewhere on this page was wrong</h4>
+                    <p>It loaded <em>all</em> admin, executive, art and sales cost onto machine
+                    time. Two consequences: a 150-piece order absorbed <strong>7.3&times; the
+                    overhead of a 4-piece order</strong> for consuming the same sales effort, and
+                    embroidery was charged as if it were the whole company when it is
+                    <strong>27%% of orders and 52%% of revenue</strong>. Split properly, the machine
+                    hour is cheap and the <em>order</em> is expensive.</p>
+                </div>
+
+                <h3 class="pa-h3">Four full years from the general ledger</h3>
+                %s
+                <p class="pa-note">Payroll comes from the journal, non-payroll from the GL &mdash;
+                the GL <em>Detail</em> export is missing most payroll and must not be used for it.
+                NWCA owns its building, so there is no rent; property tax (%s/yr) is the only
+                facility cost and where it sits barely moves the rate. &#9888; 2024 office
+                non-payroll spiked to %s against roughly %s either side, unexplained &mdash; it
+                alone lifts that year to %s per order.</p>
+
+                <div class="pa-finding pa-finding--flag">
+                    <h3>The paperwork costs about three times the stitching</h3>
+                    <p>A 24-piece order uses roughly <strong>%s of machine time</strong> and
+                    <strong>%s of order cost</strong>. NWCA is an order-processing business that
+                    happens to embroider &mdash; which is why <strong>per-piece pricing is the
+                    wrong instrument for most of the cost</strong>, and a minimum order or
+                    order-level fee is the right one.</p>
+                </div>
+
+                <h3 class="pa-h3">Each cost on the base that actually drives it</h3>
+                %s
+                <p class="pa-note">A webstore order carries only <b>%s</b> &mdash; Inksoft and
+                Shopify orders are automatic, imported and purchased by Bradley, and never touched
+                by a sales rep. They are %s of all orders, so removing them from the sales
+                denominator concentrates rep cost onto the orders reps actually work. Outsourced
+                screenprint and promo carry office cost but <b>zero</b> production overhead.</p>
+
+                <h3 class="pa-h3">What each tier really earns, per order</h3>
+                %s
+                <p class="pa-note">Break-even is <b>%s pieces on flats</b> and <b>%s on caps</b>
+                &mdash; not 24. The 1-7 tier loses money only because its average order is under
+                4 pieces. Caps lose at 1-7 <em>and</em> 8-23.</p>
+
+                <h2 class="pa-h pa-h--section" id="pa-reorders">Small orders are reorders <span class="pa-tag">21 years</span></h2>
+                <div class="pa-callout pa-callout--danger">
+                    <h4>A flat minimum would land on your best customers</h4>
+                    <p>Two-thirds to three-quarters of every 1-7 order is a reorder, in every era
+                    back to 2006 &mdash; never below 63%% in any single year. The median case is a
+                    <strong>3-piece follow-up worth $90, placed 27 days after a 62-piece
+                    order</strong>, from a customer who spent <strong>$2,278</strong> in the prior
+                    90 days. 32%% come back inside 14 days.</p>
+                </div>
+                %s
+
+                <h3 class="pa-h3">So the 1-7 tier is three different situations</h3>
+                %s
+                <p class="pa-note">The existing $50 fee is the <em>right</em> number for a genuine
+                reorder: a re-run costs the blank, the machine time, the rep and Bradley &mdash;
+                about $230 against $185 billed &mdash; because art is zero on an existing design
+                and the office cost was already carried by the parent order. What is missing is
+                the standalone case, where $50 covers roughly a fifth of the real cost.</p>
+
+                <div class="pa-finding pa-finding--alt">
+                    <h3>A fill-in predicts an account that bills half as much next year</h3>
+                    <p>Tested against a control anchored on an identical order (48+ pieces, over
+                    $1,000; groups verified comparable). After a small fill-in, the next order
+                    clears $1,000 <strong>26%% of the time against 34%%</strong> for the control
+                    &mdash; but the dip is <strong>one order deep</strong> and 83%% place another
+                    24+ order within two years, the same as the control. What does not recover is
+                    the money: <strong>12-month revenue of $3,053 against $6,080</strong>.
+                    &#9888; Association, not cause &mdash; a customer needing 3 pieces after a
+                    100-piece run may simply be winding down. Use it as a <strong>sales
+                    trigger, not a fee</strong>.</p>
+                </div>
+            </section>""" % (
+        glt, money(33542), money(gl['2024']['off_np']), money(275000),
+        money(gl['2024']['per_order']),
+        money((S_FLAT + V_FLAT * 24) * c['rate']), money(c['per_order']),
+        drv, money(c['web_per_order']), pct(sp['web'] / sp['total'], 0),
+        ttab, num(c['tiers']['flats']['breakeven']), num(c['tiers']['caps']['breakeven']),
+        etab, stab)
+
+
+S_FLAT, V_FLAT = 1.2787, 0.06612
+
 NAV = [('pa-tiers', 'Units by tier'), ('pa-year', 'Year by year'), ('pa-gap', 'The gap'),
-       ('pa-cost', 'Cost basis'), ('pa-pricing', 'Caspio today'), ('pa-design', 'Tier design'),
+       ('pa-cost', 'Cost basis'), ('pa-costing', 'Corrected costing'),
+       ('pa-pricing', 'Caspio today'), ('pa-design', 'Tier design'),
        ('pa-rules', 'Five rules'), ('pa-limits', 'Limits')]
 
 
@@ -882,13 +1029,15 @@ def build():
 %s
 %s
 %s
+%s
         </main>
     </div>
     <script src="/dashboards/js/pricing-analysis.js?v=%s"></script>
 </body>
 </html>
 """ % (CSS_VER, nav, sec_provenance(), sec_hero(), sec_tiers(), sec_year(), sec_gap(),
-       sec_cost(), sec_pricing(), sec_design(), sec_rules(), sec_limits(), JS_VER)
+       sec_cost(), sec_costing(), sec_pricing(), sec_design(), sec_rules(),
+       sec_limits(), JS_VER)
 
 
 if __name__ == '__main__':

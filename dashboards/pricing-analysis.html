@@ -24,7 +24,7 @@
 
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/pricing-analysis.css?v=2026.07.30.2">
+    <link rel="stylesheet" href="/dashboards/css/pricing-analysis.css?v=2026.07.30.3">
 </head>
 <body>
     <div class="dash-shell">
@@ -42,7 +42,7 @@
             </div>
         </header>
 
-        <nav class="pa-nav" aria-label="Sections"><a href="#pa-tiers" class="pa-nav-link">Units by tier</a><a href="#pa-year" class="pa-nav-link">Year by year</a><a href="#pa-gap" class="pa-nav-link">The gap</a><a href="#pa-cost" class="pa-nav-link">Cost basis</a><a href="#pa-pricing" class="pa-nav-link">Caspio today</a><a href="#pa-design" class="pa-nav-link">Tier design</a><a href="#pa-rules" class="pa-nav-link">Five rules</a><a href="#pa-limits" class="pa-nav-link">Limits</a></nav>
+        <nav class="pa-nav" aria-label="Sections"><a href="#pa-tiers" class="pa-nav-link">Units by tier</a><a href="#pa-year" class="pa-nav-link">Year by year</a><a href="#pa-gap" class="pa-nav-link">The gap</a><a href="#pa-cost" class="pa-nav-link">Cost basis</a><a href="#pa-costing" class="pa-nav-link">Corrected costing</a><a href="#pa-pricing" class="pa-nav-link">Caspio today</a><a href="#pa-design" class="pa-nav-link">Tier design</a><a href="#pa-rules" class="pa-nav-link">Five rules</a><a href="#pa-limits" class="pa-nav-link">Limits</a></nav>
 
         <main class="dash-content">
 
@@ -294,6 +294,132 @@
                 <strong>only garments at 72+ clear their hour</strong>. 8&ndash;23 is the weakest
                 tier of all: it carries the same decoration charge as 1&ndash;7 with no small-order
                 fee behind it.</p>
+            </section>
+
+            <section class="dash-card" id="pa-costing">
+                <h2 class="pa-h">Corrected cost basis <span class="pa-tag">supersedes the $89.74 above</span></h2>
+                <div class="pa-callout pa-callout--danger">
+                    <h4>The $89.74 production hour used elsewhere on this page was wrong</h4>
+                    <p>It loaded <em>all</em> admin, executive, art and sales cost onto machine
+                    time. Two consequences: a 150-piece order absorbed <strong>7.3&times; the
+                    overhead of a 4-piece order</strong> for consuming the same sales effort, and
+                    embroidery was charged as if it were the whole company when it is
+                    <strong>27% of orders and 52% of revenue</strong>. Split properly, the machine
+                    hour is cheap and the <em>order</em> is expensive.</p>
+                </div>
+
+                <h3 class="pa-h3">Four full years from the general ledger</h3>
+                <div class="pa-scroll"><table class="pa-table">
+<thead><tr><th class="pa-l">component</th><th class="pa-r">2022</th><th class="pa-r">2023</th><th class="pa-r">2024</th><th class="pa-r">2025</th></tr></thead>
+<tbody>
+<tr><td class="pa-l">material / blanks</td><td class="pa-r">$1,386,710</td><td class="pa-r">$1,248,802</td><td class="pa-r">$1,454,243</td><td class="pa-r">$1,296,431</td></tr>
+<tr><td class="pa-l">production payroll</td><td class="pa-r">$377,330</td><td class="pa-r">$435,046</td><td class="pa-r">$448,261</td><td class="pa-r">$424,183</td></tr>
+<tr><td class="pa-l">production non-payroll</td><td class="pa-r">$133,174</td><td class="pa-r">$149,923</td><td class="pa-r">$143,602</td><td class="pa-r">$94,386</td></tr>
+<tr><td class="pa-l">office payroll</td><td class="pa-r">$550,574</td><td class="pa-r">$650,182</td><td class="pa-r">$688,825</td><td class="pa-r">$688,437</td></tr>
+<tr><td class="pa-l">office non-payroll</td><td class="pa-r">$275,732</td><td class="pa-r">$309,942</td><td class="pa-r">$531,497</td><td class="pa-r">$237,531</td></tr>
+<tr><td class="pa-l"><b>PRODUCTION TOTAL</b></td><td class="pa-r"><b>$510,503</b></td><td class="pa-r"><b>$584,968</b></td><td class="pa-r"><b>$591,863</b></td><td class="pa-r"><b>$518,569</b></td></tr>
+<tr><td class="pa-l"><b>FRONT OFFICE TOTAL</b></td><td class="pa-r"><b>$826,306</b></td><td class="pa-r"><b>$960,124</b></td><td class="pa-r"><b>$1,220,323</b></td><td class="pa-r"><b>$925,968</b></td></tr>
+<tr><td class="pa-l">production hours</td><td class="pa-r">17,421</td><td class="pa-r">21,515</td><td class="pa-r">21,854</td><td class="pa-r">19,936</td></tr>
+<tr><td class="pa-l"><b>PRODUCTION $/hour</b></td><td class="pa-r"><b>$29.30</b></td><td class="pa-r"><b>$27.19</b></td><td class="pa-r"><b>$27.08</b></td><td class="pa-r"><b>$26.01</b></td></tr>
+<tr><td class="pa-l">all company orders</td><td class="pa-r">4,462</td><td class="pa-r">4,957</td><td class="pa-r">4,889</td><td class="pa-r">5,271</td></tr>
+<tr><td class="pa-l"><b>FRONT OFFICE $/order</b></td><td class="pa-r"><b>$185</b></td><td class="pa-r"><b>$194</b></td><td class="pa-r"><b>$250</b></td><td class="pa-r"><b>$176</b></td></tr>
+</tbody>
+</table></div>
+                <p class="pa-note">Payroll comes from the journal, non-payroll from the GL &mdash;
+                the GL <em>Detail</em> export is missing most payroll and must not be used for it.
+                NWCA owns its building, so there is no rent; property tax ($33,542/yr) is the only
+                facility cost and where it sits barely moves the rate. &#9888; 2024 office
+                non-payroll spiked to $531,497 against roughly $275,000 either side, unexplained &mdash; it
+                alone lifts that year to $250 per order.</p>
+
+                <div class="pa-finding pa-finding--flag">
+                    <h3>The paperwork costs about three times the stitching</h3>
+                    <p>A 24-piece order uses roughly <strong>$75 of machine time</strong> and
+                    <strong>$261 of order cost</strong>. NWCA is an order-processing business that
+                    happens to embroider &mdash; which is why <strong>per-piece pricing is the
+                    wrong instrument for most of the cost</strong>, and a minimum order or
+                    order-level fee is the right one.</p>
+                </div>
+
+                <h3 class="pa-h3">Each cost on the base that actually drives it</h3>
+                <div class="pa-scroll"><table class="pa-table">
+<thead><tr><th class="pa-l">cost pool</th><th class="pa-r">spread over</th><th class="pa-r">per embroidery order</th></tr></thead>
+<tbody>
+<tr><td class="pa-l">Sales reps</td><td class="pa-r">2,990 rep-touched orders</td><td class="pa-r">$79</td></tr>
+<tr><td class="pa-l">Bradley &mdash; import + purchasing</td><td class="pa-r">5,271 ALL orders</td><td class="pa-r">$13</td></tr>
+<tr><td class="pa-l">Steve &mdash; art</td><td class="pa-r">2,990 rep-touched orders</td><td class="pa-r">$27</td></tr>
+<tr><td class="pa-l">Jim &amp; Erik &mdash; executive</td><td class="pa-r">share of revenue</td><td class="pa-r">$97</td></tr>
+<tr><td class="pa-l">other office non-payroll</td><td class="pa-r">5,271 ALL orders</td><td class="pa-r">$45</td></tr>
+</tbody>
+<tfoot><tr><td class="pa-l">TOTAL</td><td class="pa-r"></td><td class="pa-r"><b>$261</b></td></tr></tfoot>
+</table></div>
+                <p class="pa-note">A webstore order carries only <b>$73</b> &mdash; Inksoft and
+                Shopify orders are automatic, imported and purchased by Bradley, and never touched
+                by a sales rep. They are 43% of all orders, so removing them from the sales
+                denominator concentrates rep cost onto the orders reps actually work. Outsourced
+                screenprint and promo carry office cost but <b>zero</b> production overhead.</p>
+
+                <h3 class="pa-h3">What each tier really earns, per order</h3>
+                <div class="pa-scroll"><table class="pa-table">
+<thead><tr><th class="pa-l">tier</th><th class="pa-r">mean qty</th><th class="pa-r">flats bill</th><th class="pa-r">flats cost</th><th class="pa-r">flats profit/order</th><th class="pa-r">caps profit/order</th></tr></thead>
+<tbody>
+<tr><td class="pa-l"><b>1-7</b></td><td class="pa-r">3.7</td><td class="pa-r">$236</td><td class="pa-r">$401</td><td class="pa-r pa-neg">&minus;$165</td><td class="pa-r pa-neg">&minus;$213</td></tr>
+<tr><td class="pa-l"><b>8-23</b></td><td class="pa-r">13.6</td><td class="pa-r">$695</td><td class="pa-r">$621</td><td class="pa-r pa-pos">$74</td><td class="pa-r pa-neg">&minus;$25</td></tr>
+<tr><td class="pa-l"><b>24-47</b></td><td class="pa-r">31.9</td><td class="pa-r">$1,495</td><td class="pa-r">$1,003</td><td class="pa-r pa-pos">$492</td><td class="pa-r pa-pos">$131</td></tr>
+<tr><td class="pa-l"><b>48-71</b></td><td class="pa-r">56.6</td><td class="pa-r">$2,435</td><td class="pa-r">$1,501</td><td class="pa-r pa-pos">$933</td><td class="pa-r pa-pos">$371</td></tr>
+<tr><td class="pa-l"><b>72+</b></td><td class="pa-r">152.9</td><td class="pa-r">$5,467</td><td class="pa-r">$3,128</td><td class="pa-r pa-pos">$2,339</td><td class="pa-r pa-pos">$1,405</td></tr>
+</tbody>
+</table></div>
+                <p class="pa-note">Break-even is <b>6 pieces on flats</b> and <b>12 on caps</b>
+                &mdash; not 24. The 1-7 tier loses money only because its average order is under
+                4 pieces. Caps lose at 1-7 <em>and</em> 8-23.</p>
+
+                <h2 class="pa-h pa-h--section" id="pa-reorders">Small orders are reorders <span class="pa-tag">21 years</span></h2>
+                <div class="pa-callout pa-callout--danger">
+                    <h4>A flat minimum would land on your best customers</h4>
+                    <p>Two-thirds to three-quarters of every 1-7 order is a reorder, in every era
+                    back to 2006 &mdash; never below 63% in any single year. The median case is a
+                    <strong>3-piece follow-up worth $90, placed 27 days after a 62-piece
+                    order</strong>, from a customer who spent <strong>$2,278</strong> in the prior
+                    90 days. 32% come back inside 14 days.</p>
+                </div>
+                <div class="pa-scroll"><table class="pa-table">
+<thead><tr><th class="pa-l">era</th><th class="pa-r">orders/yr</th><th class="pa-r">1-7 orders/yr</th><th class="pa-r">after a 24+ order</th><th class="pa-r">1-7 share of all</th><th class="pa-r">reorder share of 1-7</th></tr></thead>
+<tbody>
+<tr><td class="pa-l">2006-2010</td><td class="pa-r">2,859</td><td class="pa-r">755</td><td class="pa-r">351</td><td class="pa-r">26%</td><td class="pa-r"><b>78%</b></td></tr>
+<tr><td class="pa-l">2011-2015</td><td class="pa-r">2,538</td><td class="pa-r">806</td><td class="pa-r">322</td><td class="pa-r">32%</td><td class="pa-r"><b>76%</b></td></tr>
+<tr><td class="pa-l">2016-2020</td><td class="pa-r">1,688</td><td class="pa-r">492</td><td class="pa-r">209</td><td class="pa-r">29%</td><td class="pa-r"><b>74%</b></td></tr>
+<tr><td class="pa-l">2021-2026</td><td class="pa-r">1,188</td><td class="pa-r">401</td><td class="pa-r">126</td><td class="pa-r">34%</td><td class="pa-r"><b>68%</b></td></tr>
+</tbody>
+</table></div>
+
+                <h3 class="pa-h3">So the 1-7 tier is three different situations</h3>
+                <div class="pa-scroll"><table class="pa-table">
+<thead><tr><th class="pa-l">what it is</th><th class="pa-r">orders/yr</th><th class="pa-r">treatment</th></tr></thead>
+<tbody>
+<tr><td class="pa-l">reorder within 90 days of a <b>24+</b> order</td><td class="pa-r">126</td><td class="pa-r">keep the $50 fee &mdash; it is short by only $45</td></tr>
+<tr><td class="pa-l">reorder after a <b>smaller</b> prior order</td><td class="pa-r">145</td><td class="pa-r">judgement call &mdash; relationship exists but is thin</td></tr>
+<tr><td class="pa-l"><b>standalone</b> &mdash; no recent order behind it</td><td class="pa-r">130</td><td class="pa-r"><b>the case a minimum is for</b></td></tr>
+</tbody>
+</table></div>
+                <p class="pa-note">The existing $50 fee is the <em>right</em> number for a genuine
+                reorder: a re-run costs the blank, the machine time, the rep and Bradley &mdash;
+                about $230 against $185 billed &mdash; because art is zero on an existing design
+                and the office cost was already carried by the parent order. What is missing is
+                the standalone case, where $50 covers roughly a fifth of the real cost.</p>
+
+                <div class="pa-finding pa-finding--alt">
+                    <h3>A fill-in predicts an account that bills half as much next year</h3>
+                    <p>Tested against a control anchored on an identical order (48+ pieces, over
+                    $1,000; groups verified comparable). After a small fill-in, the next order
+                    clears $1,000 <strong>26% of the time against 34%</strong> for the control
+                    &mdash; but the dip is <strong>one order deep</strong> and 83% place another
+                    24+ order within two years, the same as the control. What does not recover is
+                    the money: <strong>12-month revenue of $3,053 against $6,080</strong>.
+                    &#9888; Association, not cause &mdash; a customer needing 3 pieces after a
+                    100-piece run may simply be winding down. Use it as a <strong>sales
+                    trigger, not a fee</strong>.</p>
+                </div>
             </section>
 
             <section class="dash-card" id="pa-pricing">
@@ -611,6 +737,6 @@
             </section>
         </main>
     </div>
-    <script src="/dashboards/js/pricing-analysis.js?v=2026.07.30.2"></script>
+    <script src="/dashboards/js/pricing-analysis.js?v=2026.07.30.3"></script>
 </body>
 </html>
