@@ -24,7 +24,7 @@
 
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/pricing-analysis.css?v=2026.07.30.3">
+    <link rel="stylesheet" href="/dashboards/css/pricing-analysis.css?v=2026.07.30.4">
 </head>
 <body>
     <div class="dash-shell">
@@ -328,9 +328,10 @@
                 <p class="pa-note">Payroll comes from the journal, non-payroll from the GL &mdash;
                 the GL <em>Detail</em> export is missing most payroll and must not be used for it.
                 NWCA owns its building, so there is no rent; property tax ($33,542/yr) is the only
-                facility cost and where it sits barely moves the rate. &#9888; 2024 office
-                non-payroll spiked to $531,497 against roughly $275,000 either side, unexplained &mdash; it
-                alone lifts that year to $250 per order.</p>
+                facility cost and where it sits barely moves the rate. <b>2024 is distorted by a
+                one-off:</b> account 6442 <em>Water Ice Damage</em> ran <b>$234,437</b> that year
+                against $0 in 2022&ndash;23. Excluding it, 2024 costs <b>$202</b> per order rather
+                than $250 &mdash; in line with 2023 and 2025. Exclude 6442 from any run rate.</p>
 
                 <div class="pa-finding pa-finding--flag">
                     <h3>The paperwork costs about three times the stitching</h3>
@@ -737,6 +738,6 @@
             </section>
         </main>
     </div>
-    <script src="/dashboards/js/pricing-analysis.js?v=2026.07.30.3"></script>
+    <script src="/dashboards/js/pricing-analysis.js?v=2026.07.30.4"></script>
 </body>
 </html>

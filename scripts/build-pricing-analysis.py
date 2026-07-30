@@ -26,8 +26,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, 'memory', 'pricing-analysis-data.json')
 OUT = os.path.join(ROOT, 'dashboards', 'pricing-analysis.html')
 
-CSS_VER = '2026.07.30.3'
-JS_VER = '2026.07.30.3'
+CSS_VER = '2026.07.30.4'
+JS_VER = '2026.07.30.4'
 TIERS = ['1-7', '8-23', '24-47', '48-71', '72+']
 BANDS = ['<$4', '$4-8', '$8-15', '$15-25', '$25+']
 BAND_LABEL = {
@@ -895,9 +895,10 @@ def sec_costing():
                 <p class="pa-note">Payroll comes from the journal, non-payroll from the GL &mdash;
                 the GL <em>Detail</em> export is missing most payroll and must not be used for it.
                 NWCA owns its building, so there is no rent; property tax (%s/yr) is the only
-                facility cost and where it sits barely moves the rate. &#9888; 2024 office
-                non-payroll spiked to %s against roughly %s either side, unexplained &mdash; it
-                alone lifts that year to %s per order.</p>
+                facility cost and where it sits barely moves the rate. <b>2024 is distorted by a
+                one-off:</b> account 6442 <em>Water Ice Damage</em> ran <b>%s</b> that year
+                against $0 in 2022&ndash;23. Excluding it, 2024 costs <b>%s</b> per order rather
+                than %s &mdash; in line with 2023 and 2025. Exclude 6442 from any run rate.</p>
 
                 <div class="pa-finding pa-finding--flag">
                     <h3>The paperwork costs about three times the stitching</h3>
@@ -954,8 +955,8 @@ def sec_costing():
                     trigger, not a fee</strong>.</p>
                 </div>
             </section>""" % (
-        glt, money(33542), money(gl['2024']['off_np']), money(275000),
-        money(gl['2024']['per_order']),
+        glt, money(33542), money(c['water_damage_2024']),
+        money(c['off_2024_ex_flood']), money(gl['2024']['per_order']),
         money((S_FLAT + V_FLAT * 24) * c['rate']), money(c['per_order']),
         drv, money(c['web_per_order']), pct(sp['web'] / sp['total'], 0),
         ttab, num(c['tiers']['flats']['breakeven']), num(c['tiers']['caps']['breakeven']),
