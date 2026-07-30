@@ -49,10 +49,32 @@ identifies an HTTP-shaped job — e.g. 8 flushes in 43 s at 13:00:08–13:00:51.
 
 ## Still open
 
-- **`sync-garment-tracker` is now the biggest remaining target** (~1,900/day). It POSTs one
-  HTTP request per garment record in a serial loop (`scripts/sync-garment-tracker.js:218`) —
-  1,750 Caspio calls in 43 seconds, an unconditional upsert per record. Same class of bug as
-  the one fixed in `sync-manageorders`; the fix is the same content-signature diff.
+- ~~**`sync-garment-tracker` is now the biggest remaining target** (~1,900/day)~~
+  **🔴 DO NOT OPTIMISE THIS — THE JOB IS DEAD. DELETE IT (2026-07-30).** Erik asked whether the
+  garment tracker was still in use; it is not, and the evidence is unambiguous:
+  - `GarmentTracker` (live) — **95 rows, latest `DateInvoiced` 2026-06-15**, i.e. nothing for
+    six weeks. Derived quarters: Q1 78, Q2 17, **Q3 zero** — and Q3 was 30 days old at the time.
+  - `GarmentTrackerArchive` — Q1 103, Q2 17, **Q3 zero**. `Quarter` is derived from the invoice
+    date (`src/routes/garment-tracker.js:26 getQuarterFromDate`), so qualifying Q3 orders WOULD
+    have landed as Q3 rows. None did. **The programme ended; the pipeline is not broken.**
+  - It was the Q2 spiff for **Nika Lao + Taneisha Clark** (live rows: Taneisha 43, Nika 42).
+  - The dashboard tile is gone — `staff-dashboard-v3/index.html:1004` says so in its own words:
+    *"the Embroidery Bonus card that replaced that tracker"*. The remaining `garment` hits in
+    that file are unrelated (Shirt Designer, "on NWCA garments").
+  - `dashboard-endpoints.js:30-32` still DEFINES `garmentTracker` / `…Cfg` / `…Archive`, but
+    nothing calls them — dead definitions.
+  - Only live reader is `commission-payouts.js:177 getGarmentSpiffs(quarter, year)`, which
+    queries `GarmentTrackerArchive` BY QUARTER. Q1/Q2 data already exists, so historical payout
+    reports keep working with the jobs switched off.
+
+  **Action: delete the two Heroku Scheduler jobs** — `sync-garment-tracker` (15:00 UTC) and
+  `archive-garment-tracker` (14:00 UTC). ~1,900+/day, ~12% of the daily budget, for a programme
+  that ended. **Keep the tables and the code** so Q1/Q2 spiffs still resolve and it is reversible.
+  🔑 **Heroku Scheduler has NO CLI and NO Platform API** — verified 2026-07-30 (`heroku help`
+  has no scheduler command; the addons API exposes no job definitions). It is UI-only, so this
+  is an Erik action, not something a session can do.
+  If the spiff ever returns, rebuild it as a **Data import task** (separate 1,000/period meter,
+  ~0 Integrations calls) rather than ~1,900 record writes.
 - **ORDER_ODBC overnight** — ~2,900 web.1 calls between midnight and 5 AM PT with no staff on
   site. Fix is agent-side dedupe on `{ID_Order: timestamp_Modification}`. **Do NOT shorten the
   20-min overlap window** — it is the clock-skew safety net.
