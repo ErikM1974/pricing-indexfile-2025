@@ -29,7 +29,7 @@ Loads automatically when you open any of the 4 quote builders or their shared fi
 - Print + save must single-source from state math (e.g. DTF `calculateFromState()` + `computeFeesAndTotals()`) — never re-derive prices from DOM text.
 
 ## EMB specifics (if touching the EMB builder)
-- LTM threshold **qty ≤ 7** (NOT `< 24` like DTG/DTF). 5 tiers + per-tier `MarginDenominator` from Caspio `Pricing_Tiers` (0.55 tier 1-7 / 0.53 others — never hardcode) + `LTM_Fee $50` at qty 1-7. Caps and garments tier **separately**.
+- LTM threshold **qty ≤ 7** (NOT `< 24` like DTG/DTF). 5 tiers + per-tier `MarginDenominator` from Caspio `Pricing_Tiers` — **never hardcode**; read `GET /api/pricing-tiers?method=EmbroideryShirts`. Measured live 2026-07-30: **0.53 on every tier, shirts and caps** (the old "0.55 tier 1-7" offset is retired). `LTM_Fee $50` at qty 1-7, added **once at grandTotal**, not baked per-piece. Caps and garments tier **separately**.
 - `Embroidery_Costs` uses `StitchCount` (NOT `StitchCountRange`). Beanie = flat, NOT cap (`ProductCategoryFilter.isFlatHeadwear()`).
 
 ## Quantity nudge tiers
