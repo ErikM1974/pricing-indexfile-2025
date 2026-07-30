@@ -1,3 +1,28 @@
+## v2026.07.30.3 (2026.07.30)
+
+- Memory: cost basis rebuilt from the general journal, and the ODBC GL question settled
+- Memory: cost allocation model - each cost on the base that drives it
+- Memory: revise cost split - no rent, machines are production, hour is $33 not $89.74
+- Memory: four-year GL basis - production hour is $26-29, office is $201/order
+- Memory: 21 years of data says small orders are reorders - revises the fee recommendation
+- Memory: ratchet hypothesis tested against a control - partly confirmed, step 4 refuted
+- Pricing Analysis: add corrected costing + the small-orders-are-reorders finding
+- Memory: design-level test of whether small orders grow - answerable only for 2007-2008
+- Memory: modern design window found - small orders DO grow, supersedes the 2007-08 finding
+- Memory: eleven-year GL series, and the 2024 office spike is solved
+- Pricing Analysis: name the cause of the 2024 office spike
+- Memory: Erik corrected the per-order pool - 1-7 is break-even, minimum order withdrawn
+- Memory: settled cost model - art is production labour, 1-7 flats break even
+- Memory: definitive design cohort - 16% of small starts grow, corrects the earlier 27%
+- Pricing Analysis: settled cost model + customer behaviour section
+- Pricing Analysis: retract the fill-in ratchet, it fails a like-for-like control
+- Pricing Analysis: add the sales playbook -- garment choice over piece count
+- Memory: actionability audit of the recoverable-gap recommendations
+- EMB pricing: refuse to quote when the bundle returns 200 with empty arrays
+- Correct the documented EMB margin: Caspio is 0.53 on every tier
+- EMB pricing: fix rounding split, invoice footing, and remove dead code
+- Deploy v2026.07.30.3: 11 files (index.html,pricing-analysis.html,customer-product.html,...)
+
 ## v2026.07.30.2 (2026.07.30)
 
 - Pricing Analysis: add Tier design section
