@@ -213,9 +213,11 @@ Setup = **$114.75 direct** ($89.74/hr) or **$365.59 loaded** ($285.92/hr). ⚠�
 logged on only 51 of 5,521 prodlog rows — setup CANNOT be measured directly, it must be
 regressed out. Kornit and patch rows must be excluded (they are DTG / a different process).
 
-## 🔴 The breaks are in the wrong place — 83% of the cost improvement happens by 8 pieces
+## 🔴 The breaks are in the wrong place — hours per piece fall 83% by 8 pieces
 
 Hours per piece: **1.345 (q=1) → 0.226 (q=8) → 0.119 (q=24) → 0.093 (q=48) → 0.084 (q=72) → 0.071 (q=288)**.
+By 8 pieces the figure is **17% of its q=1 value** (an 83% fall), which is **87.5% of the total
+improvement ever available** — the floor is v = 0.066 hr/pc no matter how big the order gets.
 So the ladder has **zero breaks across 1-23 where cost falls 6×**, and **three breaks across
 24-72+ where it falls 30%**. A DP k-segmentation on the real order distribution (piece-weighted,
 optimal by construction) picks **2 / 4 / 8 / 18-26 at EVERY target rate tested** ($89.74 → $285.92)
