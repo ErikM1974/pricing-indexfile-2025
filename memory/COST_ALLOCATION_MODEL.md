@@ -24,9 +24,11 @@ single **$89.74 production hour**. Wrong twice over:
 | Bradley — import + purchasing | $67,449 | **ALL orders** (he touches every one) | **$13** |
 | Steve — art | $81,267 | **rep-touched orders** | **$27** |
 | Jim & Erik — executive | $258,394 | **% of revenue** (Erik's call) | **$97** |
-| Production floor + machines | $468,403 + facility | **production hour, IN-HOUSE ONLY** | ~$35/hr |
+| Production floor + machines | $525,179 | **production hour, IN-HOUSE ONLY** | **$33.17/hr** |
 
-**An embroidery order carries $216. A webstore order carries $28.**
+**An embroidery order carries $246. A webstore order carries $28.**
+
+🔴 **REVISED 2026-07-30 after Erik confirmed there is NO RENT** (NWCA owns the building) **and that machines/utilities are production.** Rebuilding from actual GL accounts — payroll from the journal, non-payroll from the GL detail — gives **production $525,179** (payroll $468,403 + utilities/factory $56,776) and **front office $800,635** (payroll $644,177 + non-payroll $156,458). True operating cost is **$1,325,814**, not the $1,494,241 carried earlier. ⚠️ **The GL detail export is MISSING most payroll** (shows 5220 = $162,360 where the journal has $338,723) — always take payroll from the journal and non-payroll from the GL. Only facility cost is **property tax $33,542/yr**; where it sits barely matters ($33.17/hr vs $34.76).
 
 🔴 **Webstore (Inksoft/Shopify) orders are AUTOMATIC** — Erik confirmed Bradley imports them
 and buys the blanks; Nika and Taneisha never touch them. So they consume Bradley and nothing
@@ -71,11 +73,11 @@ front office $644,177 + floor $468,403 + non-payroll $381,661.
 
 ## ⚠️ Average vs marginal — both are right, for different questions
 
-**$216/order is an AVERAGE, not a marginal cost.** The rep is there 8 hours regardless.
+**$246/order is an AVERAGE, not a marginal cost.** The rep is there 8 hours regardless.
 
 | question | basis | verdict on a 1-7 order |
 |---|---|---|
-| "Is our pricing structurally sound?" | full $216/order | **loses ~$133** |
+| "Is our pricing structurally sound?" | full $246/order | **loses $160** |
 | "Should I take this order this afternoon?" | blank + machine time only | **profitable** — beats idle |
 
 Which applies depends on capacity, and **seasonality says exactly when**: embroidery orders
@@ -108,3 +110,13 @@ Sources: `General Journal Entries and payroll.csv` (169 payroll entries 2019-202
 `CustomerServiceRep`), `ORDER_ODBC_…csv` (`ORDER_TYPE` names — `OrdTyp` returns them blank).
 ⚠️ The employee file holds **current staff only**, so 5-14% of TimeClick hours a year cannot
 be mapped to a department.
+
+## 🔑 The headline this produces
+
+**A 24-piece order uses 2.87 machine hours = $95. The order itself costs $246 to take.**
+The paperwork costs **2.6× the stitching**. NWCA is an order-processing business that happens
+to embroider — so **per-piece pricing is the wrong instrument for most of the cost**, and a
+minimum order / order-level fee is the right one.
+
+Final tier profit per order ($33.17/hr + $246/order): **1-7 −$160** · 8-23 $74 · 24-47 $483 ·
+48-71 $912 · 72+ $2,273. **1-7 has now lost money under seven different cost treatments.**
