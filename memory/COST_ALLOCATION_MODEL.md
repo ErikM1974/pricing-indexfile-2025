@@ -239,3 +239,63 @@ structure); the 85% realization gap (revenue side only).
 
 ⚠️ **General lesson: the small-order conclusion was highly sensitive to one classification
 choice.** Any future per-order cost claim should be stated with the pool that produced it.
+
+## ✅ SETTLED MODEL (Erik, 2026-07-30) — art is PRODUCTION labour
+
+Erik's final calls: **pool = Admin only** (executive, marketing, card fees, B&O, insurance and
+property tax all come out of gross margin instead), and **art belongs in production labour,
+not the office**. The latter also matches his own `NWCA_Office_Overhead_2015-2026` report,
+which puts 6150 in PRODUCTION LABOR.
+
+| | 2025 |
+|---|---|
+| production pool (5220+5231+5085+5119) + **art $81,322** | **$599,891** |
+| ÷ 19,936 production hours | **$30.09/hour** (was $26.01 without art) |
+| order pool: admin $304,722 + office non-payroll $63,530 | **$368,252** |
+| ÷ 5,271 orders, flat | **$70/order** |
+| driver-based (sales→2,990 rep-touched; Bradley/office→all) | **$100/order** |
+
+Driver split uses **Erik's actual $89,000 for Bradley** rather than a salary-ratio estimate:
+sales $69 + Bradley $19 + office $12. (The estimate had given $115; the real figure gives $100.)
+
+⚠️ **Art COST is in the production pool but Steve's HOURS are NOT in the denominator.**
+Deliberate: `hours(q) = S + v·q` is fitted on embroidery machine time, which never includes
+art. Adding Steve's 4,144 hrs would drop the rate to $24.91 and under-recover art.
+
+### Final tier profit per order
+
+| tier | flats @$70 | flats @$100 | caps @$70 | caps @$100 |
+|---|---|---|---|---|
+| **1-7** | **+$20** | **−$9** | **−$27** | **−$57** |
+| 8-23 | $257 | $227 | $159 | $129 |
+| 24-47 | $670 | $640 | $312 | $282 |
+| 48-71 | $1,104 | $1,074 | $548 | $518 |
+| 72+ | $2,484 | $2,454 | $1,556 | $1,526 |
+
+🔑 **Flats at 1-7 are break-even (−$9 to +$20). Caps at 1-7 still lose (−$27 to −$57).**
+So the remaining small-order problem is **caps only**, not small orders generally.
+
+## 🔑 Erik's own overhead report — independent validation + a structural finding
+
+`Downloads/NWCA_Office_Overhead_2015-2026_1.csv`, built from the same big GL. **7 of 10
+categories reconcile to the dollar; totals agree within $912 (0.1%)** ($899,774 vs $900,686).
+It confirms the 2024 water damage independently: Occupancy & Facility **$308,445 against an
+$83,183 ten-year average**.
+
+🔴 **The structural finding, 2015 → 2025:**
+
+| | 2015 | 2025 | change |
+|---|---|---|---|
+| office overhead | $699,272 | $900,686 | **+29%** |
+| production labour | $519,087 | $543,852 | +5% |
+| **admin & office payroll** | $325,200 | $509,769 | **+57%** |
+| all company orders | 5,176 | 5,271 | +2% |
+| **embroidery orders** | 2,293 | 1,346 | **−41%** |
+
+**Office overhead is now 1.66× production labour, against 1.35× in 2015.** Admin payroll grew
+57% while order count was flat and embroidery orders nearly halved. The cost pressure is not
+on the shop floor.
+
+⚠️ Two flaws in that report, neither consequential: **Depreciation appears only in 2019-2020**
+($96,917, $82,344) and nowhere else in eleven years — an accounting change, not reality; and
+its "PRODUCTION LABOR" line includes **5119 Factory Expense** ($46,073), which is not labour.
