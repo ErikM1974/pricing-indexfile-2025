@@ -195,3 +195,94 @@ understated by roughly 4%.
 **`hist_lines_class.tsv` 81,694 (the good one — has `id_ProductClass`)**.
 ⚠️ The older `hist_lines.tsv` (173,547 rows) is **over-broad — it contains other order types**
 (stickers, bags, temporary tattoos). Do not use it.
+
+---
+
+# Tier design: where the breaks belong and what the LTM must be — added 2026-07-30
+
+## 🔑 The cost curve: hours(q) = S + v·q, fitted three ways
+
+| | fixed setup S | variable v | R² |
+|---|---|---|---|
+| Flats (pooled tiers) | **1.279 hr/order** | 0.06612 hr/pc | 0.988 |
+| Caps (pooled tiers) | **1.224 hr/order** | 0.04550 hr/pc | 0.985 |
+| Order-level OLS, type 21 | 1.138 hr | 0.07022 hr/pc | 0.622 |
+| Order-level OLS, type 1 (+imprints) | 1.184 hr | 0.06318 hr/pc | 0.773 |
+
+Setup = **$114.75 direct** ($89.74/hr) or **$365.59 loaded** ($285.92/hr). ⚠️ `sts_Setup` is
+logged on only 51 of 5,521 prodlog rows — setup CANNOT be measured directly, it must be
+regressed out. Kornit and patch rows must be excluded (they are DTG / a different process).
+
+## 🔴 The breaks are in the wrong place — 83% of the cost improvement happens by 8 pieces
+
+Hours per piece: **1.345 (q=1) → 0.226 (q=8) → 0.119 (q=24) → 0.093 (q=48) → 0.084 (q=72) → 0.071 (q=288)**.
+So the ladder has **zero breaks across 1-23 where cost falls 6×**, and **three breaks across
+24-72+ where it falls 30%**. A DP k-segmentation on the real order distribution (piece-weighted,
+optimal by construction) picks **2 / 4 / 8 / 18-26 at EVERY target rate tested** ($89.74 → $285.92)
+against today's 8 / 24 / 48 / 72.
+
+🔑 **S/v = 19.3 pieces (flats), 26.9 (caps)** — below that an order is mostly setup, above it
+mostly running. That is the natural ceiling for a setup fee, and 23 already aligns with an
+existing tier boundary.
+
+## Contribution per production hour — the metric that makes tiers comparable
+
+| tier | FLAT | CAP | marginal gain (flat) |
+|---|---|---|---|
+| 1-7 | $134 | $101 | — |
+| 8-23 | $225 | $174 | **+$91** |
+| 24-47 | $276 | $196 | +$51 |
+| 48-71 | $312 | $214 | +$36 |
+| 72+ | $321 | $255 | **+$9** |
+
+**Spread 3.2×.** 🔑 **The 72 break is worth almost nothing (+2.9%) — 48 is the target.** Getting an
+order out of 1-7 is the single highest-value move (+68%). ⚠️ At the $89.74 direct basis every tier
+clears; 1-7 is not losing cash, it is the **worst use of a constrained hour**. The gap between
+$89.74 and $285.92 is a *utilization* problem (only ~31% of embroidery hours log as productive)
+and pricing cannot fix it.
+
+## The small-order fee
+
+Today's **$50 covers 44% of the $114.75 direct setup** and stops at 7, leaving 8-23 (285 orders/yr)
+with nothing. Scenarios scored on 12,799 real orders over 11 years:
+
+| scenario | fee rev/yr | vs today | FLAT 1-7 | FLAT 8-23 |
+|---|---|---|---|---|
+| A today $50, q≤7 | $15,768 | — | $134 | $225 |
+| B $115, q≤7 | $36,267 | +$20,499 | $176 | $225 |
+| **C $115, q≤23** | **$72,607** | **+$56,839** | **$176** | **$277** |
+| D $150, q≤23 | $94,705 | +$78,936 | $199 | $293 |
+| F $200 q≤7 / $100 q8-23 | $94,673 | +$78,905 | $232 | $271 |
+
+**Recommend C**: $115 on every order of ≤23. Lands 8-23 exactly at 24-47 parity. 🔴 **No sellable
+fee closes 1-7** — full equalization needs **$267/order** (four shirts at $117 each). Residual gap
+$81,154/yr on 304 orders/yr; accept it or decline the work.
+
+## Reorder economics
+
+66% of customers reorder; **95.1% of all orders come from repeat customers**. Median gap **56 days**
+(p25 19, p50 56, p75 180, p90 399).
+
+🔴 **A reorder is NOT cheaper to set up.** Like-for-like (customers whose genuine first order is
+inside the log window): first **1.299 hr** vs later **1.382 hr** — no saving. **Do not fund a
+reorder discount from an assumed setup saving; it does not exist.** The naive all-orders
+comparison (1.299 vs 1.587) is confounded — "first" only means first *in the log window*.
+
+**The real prize is consolidation**, not earliness. Pairs of orders from one customer landing
+inside a window, each paying a fresh 1.28 hr setup:
+
+| window | pairs/yr | hours/yr | value/yr |
+|---|---|---|---|
+| 30 days | 374 | 478 | **$42,885** |
+| 60 days | 456 | 583 | $52,322 |
+| 90 days | 498 | 636 | $57,105 |
+
+Merging just the 30-day pairs would cut 1-7 orders **2,760 → 484**. ⚠️ **32.3% of reorders drop a
+tier** (37.3% same, 30.4% up); from 72+, **65% shrink and 372 of 1,896 fall all the way to 1-7**.
+Target: at order entry, if the customer ordered within 60 days, offer to combine — and ask what
+they need through the next quarter rather than taking the reorder as presented.
+
+Scripts: `cost_curve.py`, `optimize_breaks.py`, `optimal_tiers.py`, `final_answers.py`,
+`reorder_detail.py`, `scenarios.py` (session scratchpad). Customer pull =
+`hist_customers.tsv`. ⚠️ **PowerShell writes dates in the LOCAL culture (M/D/YYYY)** — parse
+before sorting or the sequence is wrong.
