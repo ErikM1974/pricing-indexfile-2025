@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Pricing Analysis &middot; Northwest Custom Apparel</title>
+    <link rel="icon" href="/favicon.png" type="image/png">
+
+    <!-- GENERATED FILE -- do not hand-edit.
+         Built by scripts/build-pricing-analysis.py from memory/pricing-analysis-data.json.
+         To change a figure, change the JSON and re-run the script.
+
+         ADMIN ONLY. Gated server-side by gateStaffHtml -> gateStaffPage, with
+         pricing-analysis.html listed in ADMIN_DEFAULT_PAGES (lib/page-access.js) so
+         a missing Staff_Page_Access row leaves it CLOSED rather than open.
+         The data JSON deliberately lives in memory/, NOT under /dashboards: the
+         static mount only gates *.html, so a JSON there would be world-readable. -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css">
+    <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
+    <link rel="stylesheet" href="/dashboards/css/pricing-analysis.css?v=2026.07.30.1">
+</head>
+<body>
+    <div class="dash-shell">
+        <header class="dash-header">
+            <div class="dash-header-left">
+                <a href="/staff-dashboard.html" title="Back to Staff Dashboard">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                         alt="Northwest Custom Apparel" class="dash-header-logo">
+                </a>
+                <h1 class="dash-header-title">Pricing Analysis <span class="pa-subhead">embroidery &amp; caps &mdash; what we charge, what it costs, what we are leaving behind</span></h1>
+            </div>
+            <div class="dash-header-right">
+                <span class="pa-lock" title="Admin only"><i class="fas fa-user-shield"></i> Admin</span>
+                <a href="/staff-dashboard.html" class="dash-back-link"><i class="fas fa-arrow-left"></i> Dashboard</a>
+            </div>
+        </header>
+
+        <nav class="pa-nav" aria-label="Sections"><a href="#pa-tiers" class="pa-nav-link">Units by tier</a><a href="#pa-year" class="pa-nav-link">Year by year</a><a href="#pa-gap" class="pa-nav-link">The gap</a><a href="#pa-cost" class="pa-nav-link">Cost basis</a><a href="#pa-pricing" class="pa-nav-link">Caspio today</a><a href="#pa-rules" class="pa-nav-link">Five rules</a><a href="#pa-limits" class="pa-nav-link">Limits</a></nav>
+
+        <main class="dash-content">
+
+            <section class="dash-card pa-prov" id="pa-top">
+                <p class="pa-lead">Everything on this page is measured from <strong>ShopWorks order
+                history</strong> and priced against the <strong>live Caspio tables</strong> &mdash; not
+                from a spreadsheet estimate. Figures are recomputed by
+                <code>scripts/build-pricing-analysis.py</code> from
+                <code>memory/pricing-analysis-data.json</code>; nothing on this page is typed by hand.</p>
+                <div class="pa-chips">
+                    <span class="pa-chip">Generated <b>2026-07-29</b></span>
+                    <span class="pa-chip">Scope <b>Custom Embroidery + Caps</b> (types 21, 1)</span>
+                    <span class="pa-chip">Source <b>SWODBC on bandit</b> (read-only)</span>
+                    <span class="pa-chip">Cost basis <b>$89.74/production hr</b></span>
+                    <span class="pa-chip">Chargeable <b>$285.92/hr</b></span>
+                </div>
+                <p class="pa-note">Order types 21 (Custom Embroidery) and 1 (Caps). Contract types excluded. ShopWorks OnSite FileMaker database via the SWODBC DSN on bandit (read-only).</p>
+            </section>
+
+            <section class="pa-hero">
+                <div class="pa-stat pa-stat--flag">
+                    <span class="pa-stat-label">Price realization, last 24 months</span>
+                    <span class="pa-stat-value">85.3%</span>
+                    <span class="pa-stat-sub">invoiced $2,561,910 against $3,003,911 at Caspio list</span>
+                </div>
+                <div class="pa-stat pa-stat--flag">
+                    <span class="pa-stat-label">Money left on the table</span>
+                    <span class="pa-stat-value">$442,001</span>
+                    <span class="pa-stat-sub">$221,000 per year, revenue-side only</span>
+                </div>
+                <div class="pa-stat">
+                    <span class="pa-stat-label">Orders measured</span>
+                    <span class="pa-stat-value">1,938</span>
+                    <span class="pa-stat-sub">78,707 pieces, 2024-08-01 to 2026-07-29</span>
+                </div>
+                <div class="pa-stat">
+                    <span class="pa-stat-label">Ten-year history</span>
+                    <span class="pa-stat-value">604,441</span>
+                    <span class="pa-stat-sub">units across 15,567 orders, 2016-01-01 to 2026-07-29</span>
+                </div>
+            </section>
+
+            <section class="dash-card" id="pa-tiers">
+                <h2 class="pa-h">Units by quantity tier <span class="pa-tag">ten years</span></h2>
+                <p class="pa-body">How much <em>volume</em> actually sits in each price break, as
+                opposed to how many orders do. These are the two numbers that get conflated when
+                deciding where to move a price.</p>
+
+                <div class="pa-finding">
+                    <h3>The order count and the unit count point in opposite directions</h3>
+                    <p><strong>1&ndash;7 is 31.3% of orders but only 2.8% of units. 72+ is 13.9% of orders and
+                    59.9% of units.</strong> A small-order fee is therefore an <em>order-count</em>
+                    lever &mdash; it touches a third of the paperwork and about a fortieth of the
+                    volume. A change to the 72+ break moves the majority of everything.</p>
+                </div>
+
+                <div class="pa-scroll"><table class="pa-table">
+<thead><tr><th class="pa-l">tier</th><th class="pa-r">orders</th><th class="pa-r">share of orders</th><th class="pa-r">units</th><th class="pa-r">share of units</th><th class="pa-r">units/order</th><th class="pa-r">revenue</th><th class="pa-r">$/unit</th></tr></thead>
+<tbody>
+<tr><td class="pa-l"><b>1-7</b></td><td class="pa-r">4,865</td><td class="pa-r"><span class="pa-bar pa-bar--muted"><span class="pa-bar-fill" style="width:31.3%"></span></span> 31.3%</td><td class="pa-r"><b>16,971</b></td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="width:2.8%"></span></span> 2.8%</td><td class="pa-r">3.5</td><td class="pa-r">$803,353</td><td class="pa-r">$47.34</td></tr>
+<tr><td class="pa-l"><b>8-23</b></td><td class="pa-r">4,206</td><td class="pa-r"><span class="pa-bar pa-bar--muted"><span class="pa-bar-fill" style="width:27.0%"></span></span> 27.0%</td><td class="pa-r"><b>58,126</b></td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="width:9.6%"></span></span> 9.6%</td><td class="pa-r">13.8</td><td class="pa-r">$2,144,172</td><td class="pa-r">$36.89</td></tr>
+<tr><td class="pa-l"><b>24-47</b></td><td class="pa-r">2,955</td><td class="pa-r"><span class="pa-bar pa-bar--muted"><span class="pa-bar-fill" style="width:19.0%"></span></span> 19.0%</td><td class="pa-r"><b>91,674</b></td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="width:15.2%"></span></span> 15.2%</td><td class="pa-r">31.0</td><td class="pa-r">$2,580,248</td><td class="pa-r">$28.15</td></tr>
+<tr><td class="pa-l"><b>48-71</b></td><td class="pa-r">1,374</td><td class="pa-r"><span class="pa-bar pa-bar--muted"><span class="pa-bar-fill" style="width:8.8%"></span></span> 8.8%</td><td class="pa-r"><b>75,662</b></td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="width:12.5%"></span></span> 12.5%</td><td class="pa-r">55.1</td><td class="pa-r">$1,865,419</td><td class="pa-r">$24.65</td></tr>
+<tr><td class="pa-l"><b>72+</b></td><td class="pa-r">2,167</td><td class="pa-r"><span class="pa-bar pa-bar--muted"><span class="pa-bar-fill" style="width:13.9%"></span></span> 13.9%</td><td class="pa-r"><b>362,008</b></td><td class="pa-r"><span class="pa-bar pa-bar--theme"><span class="pa-bar-fill" style="width:59.9%"></span></span> 59.9%</td><td class="pa-r">167.1</td><td class="pa-r">$6,639,609</td><td class="pa-r">$18.34</td></tr>
+</tbody>
+<tfoot><tr><td class="pa-l">TOTAL</td><td class="pa-r">15,567</td><td class="pa-r"></td><td class="pa-r"><b>604,441</b></td><td class="pa-r"></td><td class="pa-r">38.8</td><td class="pa-r">$14,032,801</td><td class="pa-r">$23.22</td></tr></tfoot>
+</table></div>
+
+                <h3 class="pa-h3">Caps versus garments</h3>
+                <p class="pa-body">Caps and garments are tiered <strong>separately</strong>, because
+                that is how the Caspio engine prices them &mdash; quantity is never combined across
+                the two for a tier discount. A mixed order therefore contributes one cap stream and
+                one garment stream, which is why the stream counts below add to more than the
+                15,567 orders in the table above.</p>
+                <div class="pa-scroll"><table class="pa-table">
+<thead><tr><th class="pa-l">tier</th><th class="pa-r">cap units</th><th class="pa-r">%</th><th class="pa-r">cap orders</th><th class="pa-r">cap $/unit</th><th class="pa-r">garment units</th><th class="pa-r">%</th><th class="pa-r">garment orders</th><th class="pa-r">garment $/unit</th><th class="pa-r">total units</th></tr></thead>
+<tbody>
+<tr><td class="pa-l"><b>1-7</b></td><td class="pa-r">2,527</td><td class="pa-r">0.9%</td><td class="pa-r">812</td><td class="pa-r">$31.84</td><td class="pa-r">16,781</td><td class="pa-r">5.3%</td><td class="pa-r">4,852</td><td class="pa-r">$47.67</td><td class="pa-r">19,307</td></tr>
+<tr><td class="pa-l"><b>8-23</b></td><td class="pa-r">12,951</td><td class="pa-r">4.6%</td><td class="pa-r">905</td><td class="pa-r">$22.37</td><td class="pa-r">51,847</td><td class="pa-r">16.3%</td><td class="pa-r">3,833</td><td class="pa-r">$39.73</td><td class="pa-r">64,798</td></tr>
+<tr><td class="pa-l"><b>24-47</b></td><td class="pa-r">38,915</td><td class="pa-r">13.7%</td><td class="pa-r">1,351</td><td class="pa-r">$18.16</td><td class="pa-r">59,194</td><td class="pa-r">18.6%</td><td class="pa-r">1,852</td><td class="pa-r">$34.39</td><td class="pa-r">98,109</td></tr>
+<tr><td class="pa-l"><b>48-71</b></td><td class="pa-r">38,100</td><td class="pa-r">13.4%</td><td class="pa-r">722</td><td class="pa-r">$16.34</td><td class="pa-r">40,840</td><td class="pa-r">12.8%</td><td class="pa-r">724</td><td class="pa-r">$31.96</td><td class="pa-r">78,940</td></tr>
+<tr><td class="pa-l"><b>72+</b></td><td class="pa-r">191,829</td><td class="pa-r">67.5%</td><td class="pa-r">1,076</td><td class="pa-r">$12.01</td><td class="pa-r">150,263</td><td class="pa-r">47.1%</td><td class="pa-r">1,033</td><td class="pa-r">$25.37</td><td class="pa-r">342,092</td></tr>
+</tbody>
+<tfoot><tr><td class="pa-l">TOTAL</td><td class="pa-r"><b>284,322</b></td><td class="pa-r">47.1%</td><td class="pa-r">4,866</td><td class="pa-r">$14.08</td><td class="pa-r"><b>318,925</b></td><td class="pa-r">52.9%</td><td class="pa-r">12,294</td><td class="pa-r">$31.40</td><td class="pa-r">603,247</td></tr></tfoot>
+</table></div>
+                <div class="pa-finding pa-finding--alt">
+                    <h3>Caps are half the volume and under a third of the money</h3>
+                    <p>Caps are <strong>47.1% of units</strong> but average <strong>$14.08 per unit</strong>
+                    against <strong>$31.40</strong> for garments. And <strong>67.5% of all cap volume sits in
+                    72+</strong> &mdash; the one tier where caps are cheapest.</p>
+                </div>
+
+                <h3 class="pa-h3">The same units, tiered by order total instead</h3>
+                <p class="pa-body">For comparison: tier assigned from the order's whole quantity,
+                then units split inside the tier. This is the more intuitive reading, but it is
+                <em>not</em> how the order was priced.</p>
+                <div class="pa-scroll"><table class="pa-table">
+<thead><tr><th class="pa-l">tier</th><th class="pa-r">orders</th><th class="pa-r">cap units</th><th class="pa-r">%</th><th class="pa-r">garment units</th><th class="pa-r">%</th><th class="pa-r">unclassified</th><th class="pa-r">total</th></tr></thead>
+<tbody>
+<tr><td class="pa-l"><b>1-7</b></td><td class="pa-r">4,865</td><td class="pa-r">1,191</td><td class="pa-r">7.1%</td><td class="pa-r">15,626</td><td class="pa-r">92.9%</td><td class="pa-r">154</td><td class="pa-r">16,971</td></tr>
+<tr><td class="pa-l"><b>8-23</b></td><td class="pa-r">4,206</td><td class="pa-r">9,663</td><td class="pa-r">16.7%</td><td class="pa-r">48,090</td><td class="pa-r">83.3%</td><td class="pa-r">373</td><td class="pa-r">58,126</td></tr>
+<tr><td class="pa-l"><b>24-47</b></td><td class="pa-r">2,955</td><td class="pa-r">35,134</td><td class="pa-r">38.4%</td><td class="pa-r">56,343</td><td class="pa-r">61.6%</td><td class="pa-r">197</td><td class="pa-r">91,674</td></tr>
+<tr><td class="pa-l"><b>48-71</b></td><td class="pa-r">1,374</td><td class="pa-r">35,558</td><td class="pa-r">47.1%</td><td class="pa-r">39,935</td><td class="pa-r">52.9%</td><td class="pa-r">169</td><td class="pa-r">75,662</td></tr>
+<tr><td class="pa-l"><b>72+</b></td><td class="pa-r">2,167</td><td class="pa-r">202,775</td><td class="pa-r">56.1%</td><td class="pa-r">158,933</td><td class="pa-r">43.9%</td><td class="pa-r">300</td><td class="pa-r">362,008</td></tr>
+</tbody>
+<tfoot><tr><td class="pa-l">TOTAL</td><td class="pa-r">15,567</td><td class="pa-r">284,322</td><td class="pa-r">47.1%</td><td class="pa-r">318,926</td><td class="pa-r">52.9%</td><td class="pa-r">1,193</td><td class="pa-r">604,441</td></tr></tfoot>
+</table></div>
+
+                <h3 class="pa-h3">How caps were identified, and why not by order type</h3>
+                <div class="pa-callout pa-callout--danger">
+                    <h4>Order type cannot be used to identify caps &mdash; in any year</h4>
+                    <p>Caps were progressively written under Custom Embroidery across the whole
+                    decade, not just recently. Cap units as a share of order-type-21 volume went
+                    <strong>8.0% in 2016 &rarr; 30.5% in 2025 &rarr; 53.4% in 2026</strong>. So the
+                    familiar &ldquo;cap orders fell from 582 to 154&rdquo; is largely a coding
+                    artifact: actual cap units went 40,342 to 21,379.</p>
+                </div>
+                <p class="pa-body">Caps are instead identified from the <strong>garment</strong>
+                (<code>cap</code>, <code>trucker</code>, <code>hat</code>, <code>beanie</code>,
+                <code>visor</code>, <code>snapback</code>, <code>flexfit</code>, <code>OSFA</code>,
+                <code>mesh back</code>, <code>knit cap</code>) &mdash; a definition that holds
+                regardless of how the order was coded. Validated against order type 1 in the years
+                where type 1 is still trustworthy:</p>
+                <div class="pa-scroll"><table class="pa-table">
+<thead><tr><th class="pa-l">year</th><th class="pa-r">type-1 orders</th><th class="pa-r">cap units recovered</th><th class="pa-r">type-21 orders</th><th class="pa-r">cap share of type-21 units</th></tr></thead>
+<tbody>
+<tr><td class="pa-l">2016</td><td class="pa-r">552</td><td class="pa-r">81.3%</td><td class="pa-r">1,863</td><td class="pa-r">8.0%</td></tr>
+<tr><td class="pa-l">2017</td><td class="pa-r">487</td><td class="pa-r">84.1%</td><td class="pa-r">1,598</td><td class="pa-r">12.7%</td></tr>
+<tr><td class="pa-l">2018</td><td class="pa-r">386</td><td class="pa-r">90.5%</td><td class="pa-r">1,269</td><td class="pa-r">19.2%</td></tr>
+<tr><td class="pa-l">2019</td><td class="pa-r">281</td><td class="pa-r">89.1%</td><td class="pa-r">1,056</td><td class="pa-r">22.0%</td></tr>
+<tr><td class="pa-l">2020</td><td class="pa-r">175</td><td class="pa-r">92.5%</td><td class="pa-r">719</td><td class="pa-r">22.4%</td></tr>
+<tr><td class="pa-l">2021</td><td class="pa-r">263</td><td class="pa-r">91.1%</td><td class="pa-r">969</td><td class="pa-r">14.1%</td></tr>
+<tr><td class="pa-l">2022</td><td class="pa-r">278</td><td class="pa-r">92.5%</td><td class="pa-r">974</td><td class="pa-r">24.7%</td></tr>
+<tr><td class="pa-l">2023</td><td class="pa-r">276</td><td class="pa-r">93.0%</td><td class="pa-r">1,029</td><td class="pa-r">20.2%</td></tr>
+<tr><td class="pa-l">2024</td><td class="pa-r">289</td><td class="pa-r">87.8%</td><td class="pa-r">1,093</td><td class="pa-r">22.5%</td></tr>
+<tr><td class="pa-l">2025</td><td class="pa-r">148</td><td class="pa-r">87.6%</td><td class="pa-r">1,161</td><td class="pa-r">30.5%</td></tr>
+<tr><td class="pa-l">2026</td><td class="pa-r">0</td><td class="pa-r">n/a</td><td class="pa-r">589</td><td class="pa-r">53.4%</td></tr>
+</tbody>
+</table></div>
+                <p class="pa-note">Orders that sold no blank &mdash; customer-supplied goods &mdash;
+                have no garment line, so they fall back to the decoration line, which names the
+                substrate (<code>DECC</code> = Dir Embroider Customer Caps, <code>CB</code> = Cap
+                Back). Coverage: <b>15,455 of 15,567 orders</b> classified, <b>603,248 of 604,441 units</b> (99.8%).
+                The remainder is shown as its own column rather than distributed.</p>
+            </section>
+
+            <section class="dash-card" id="pa-year">
+                <h2 class="pa-h">Year by year <span class="pa-tag">2016 &ndash; 2026</span></h2>
+                <p class="pa-body">Units per tier by year, with the garment-classified cap split
+                beside it. 2026 is a partial year (through 2026-07-29).</p>
+                <div class="pa-scroll"><table class="pa-table">
+<thead><tr><th class="pa-l">year</th><th class="pa-r">orders</th><th class="pa-r">1-7</th><th class="pa-r">8-23</th><th class="pa-r">24-47</th><th class="pa-r">48-71</th><th class="pa-r">72+</th><th class="pa-r">units</th><th class="pa-r">cap units</th><th class="pa-r">garment units</th><th class="pa-r">cap %</th></tr></thead>
+<tbody>
+<tr><td class="pa-l">2016</td><td class="pa-r">2,435</td><td class="pa-r">2,635</td><td class="pa-r">9,569</td><td class="pa-r">14,202</td><td class="pa-r">10,027</td><td class="pa-r">65,587</td><td class="pa-r">102,020</td><td class="pa-r">40,342</td><td class="pa-r">61,264</td><td class="pa-r">39.7%</td></tr>
+<tr><td class="pa-l">2017</td><td class="pa-r">2,108</td><td class="pa-r">1,981</td><td class="pa-r">8,290</td><td class="pa-r">13,061</td><td class="pa-r">11,645</td><td class="pa-r">49,911</td><td class="pa-r">84,888</td><td class="pa-r">36,514</td><td class="pa-r">48,141</td><td class="pa-r">43.1%</td></tr>
+<tr><td class="pa-l">2018</td><td class="pa-r">1,659</td><td class="pa-r">1,636</td><td class="pa-r">6,280</td><td class="pa-r">10,021</td><td class="pa-r">7,998</td><td class="pa-r">38,386</td><td class="pa-r">64,321</td><td class="pa-r">31,862</td><td class="pa-r">32,326</td><td class="pa-r">49.6%</td></tr>
+<tr><td class="pa-l">2019</td><td class="pa-r">1,342</td><td class="pa-r">1,356</td><td class="pa-r">5,258</td><td class="pa-r">8,705</td><td class="pa-r">7,362</td><td class="pa-r">22,214</td><td class="pa-r">44,895</td><td class="pa-r">20,809</td><td class="pa-r">24,066</td><td class="pa-r">46.4%</td></tr>
+<tr><td class="pa-l">2020</td><td class="pa-r">897</td><td class="pa-r">932</td><td class="pa-r">3,172</td><td class="pa-r">6,270</td><td class="pa-r">4,960</td><td class="pa-r">23,625</td><td class="pa-r">38,959</td><td class="pa-r">18,668</td><td class="pa-r">20,283</td><td class="pa-r">47.9%</td></tr>
+<tr><td class="pa-l">2021</td><td class="pa-r">1,237</td><td class="pa-r">1,419</td><td class="pa-r">4,784</td><td class="pa-r">6,247</td><td class="pa-r">5,315</td><td class="pa-r">26,644</td><td class="pa-r">44,409</td><td class="pa-r">22,113</td><td class="pa-r">22,269</td><td class="pa-r">49.8%</td></tr>
+<tr><td class="pa-l">2022</td><td class="pa-r">1,258</td><td class="pa-r">1,372</td><td class="pa-r">4,200</td><td class="pa-r">7,720</td><td class="pa-r">7,300</td><td class="pa-r">28,144</td><td class="pa-r">48,736</td><td class="pa-r">27,365</td><td class="pa-r">21,320</td><td class="pa-r">56.2%</td></tr>
+<tr><td class="pa-l">2023</td><td class="pa-r">1,310</td><td class="pa-r">1,498</td><td class="pa-r">4,680</td><td class="pa-r">7,766</td><td class="pa-r">7,249</td><td class="pa-r">29,658</td><td class="pa-r">50,851</td><td class="pa-r">26,227</td><td class="pa-r">24,534</td><td class="pa-r">51.7%</td></tr>
+<tr><td class="pa-l">2024</td><td class="pa-r">1,403</td><td class="pa-r">1,753</td><td class="pa-r">4,880</td><td class="pa-r">7,958</td><td class="pa-r">5,410</td><td class="pa-r">38,406</td><td class="pa-r">58,407</td><td class="pa-r">28,589</td><td class="pa-r">29,726</td><td class="pa-r">49.0%</td></tr>
+<tr><td class="pa-l">2025</td><td class="pa-r">1,323</td><td class="pa-r">1,634</td><td class="pa-r">4,717</td><td class="pa-r">7,349</td><td class="pa-r">5,783</td><td class="pa-r">27,861</td><td class="pa-r">47,344</td><td class="pa-r">21,379</td><td class="pa-r">25,870</td><td class="pa-r">45.2%</td></tr>
+<tr><td class="pa-l">2026</td><td class="pa-r">595</td><td class="pa-r">755</td><td class="pa-r">2,296</td><td class="pa-r">2,375</td><td class="pa-r">2,613</td><td class="pa-r">11,572</td><td class="pa-r">19,611</td><td class="pa-r">10,452</td><td class="pa-r">9,129</td><td class="pa-r">53.4%</td></tr>
+</tbody>
+</table></div>
+                <p class="pa-note">Order count fell far more than volume did &mdash; the shop moved
+                from many small orders to fewer large ones. Read the cap column, never the
+                order-type series, for any statement about caps.</p>
+            </section>
+
+            <section class="dash-card" id="pa-gap">
+                <h2 class="pa-h">The realization gap <span class="pa-tag">24 months</span></h2>
+                <div class="pa-finding pa-finding--flag">
+                    <h3>The pricing is sound. It is not being charged.</h3>
+                    <p>Across 1,938 orders and 78,707 pieces, we invoiced <strong>$2,561,910</strong> against
+                    <strong>$3,003,911</strong> at the prices already in Caspio. That is
+                    <strong>85.3% realization</strong> and a <strong>$442,001</strong> gap &mdash; about
+                    <strong>$221,000 a year</strong>. The gap is entirely revenue-side, so it holds
+                    regardless of which cost model you accept.</p>
+                </div>
+                <div class="pa-scroll"><table class="pa-table">
+<thead><tr><th class="pa-l"></th><th class="pa-r">orders</th><th class="pa-r">pieces</th><th class="pa-r">invoiced</th><th class="pa-r">at Caspio list</th><th class="pa-r">gap</th><th class="pa-r">realization</th></tr></thead>
+<tbody>
+<tr><td class="pa-l">Caps</td><td class="pa-r">205</td><td class="pa-r">16,695</td><td class="pa-r">$264,213</td><td class="pa-r">$319,877</td><td class="pa-r pa-neg"><b>$55,664</b></td><td class="pa-r"><span class="pa-bar pa-bar--warn"><span class="pa-bar-fill" style="width:82.6%"></span></span> 82.6%</td></tr>
+<tr><td class="pa-l">Custom Embroidery</td><td class="pa-r">1,733</td><td class="pa-r">62,012</td><td class="pa-r">$2,297,697</td><td class="pa-r">$2,684,034</td><td class="pa-r pa-neg"><b>$386,337</b></td><td class="pa-r"><span class="pa-bar pa-bar--warn"><span class="pa-bar-fill" style="width:85.6%"></span></span> 85.6%</td></tr>
+</tbody>
+<tfoot><tr><td class="pa-l">TOTAL</td><td class="pa-r">1,938</td><td class="pa-r">78,707</td><td class="pa-r">$2,561,910</td><td class="pa-r">$3,003,911</td><td class="pa-r"><b>$442,001</b></td><td class="pa-r">85.3%</td></tr></tfoot>
+</table></div>
+                <h3 class="pa-h3">By tier</h3>
+                <div class="pa-scroll"><table class="pa-table">
+<thead><tr><th class="pa-l">tier</th><th class="pa-r">orders</th><th class="pa-r">pieces</th><th class="pa-r">invoiced</th><th class="pa-r">at list</th><th class="pa-r">gap</th><th class="pa-r">realization</th></tr></thead>
+<tbody>
+<tr><td class="pa-l"><b>1-7</b></td><td class="pa-r">578</td><td class="pa-r">2,148</td><td class="pa-r">$139,641</td><td class="pa-r">$178,678</td><td class="pa-r">$39,038</td><td class="pa-r"><span class="pa-bar pa-bar--warn"><span class="pa-bar-fill" style="width:78.2%"></span></span> 78.2%</td></tr>
+<tr><td class="pa-l"><b>8-23</b></td><td class="pa-r">494</td><td class="pa-r">6,667</td><td class="pa-r">$345,528</td><td class="pa-r">$404,036</td><td class="pa-r">$58,507</td><td class="pa-r"><span class="pa-bar pa-bar--warn"><span class="pa-bar-fill" style="width:85.5%"></span></span> 85.5%</td></tr>
+<tr><td class="pa-l"><b>24-47</b></td><td class="pa-r">368</td><td class="pa-r">11,609</td><td class="pa-r">$470,240</td><td class="pa-r">$523,216</td><td class="pa-r">$52,976</td><td class="pa-r"><span class="pa-bar pa-bar--warn"><span class="pa-bar-fill" style="width:89.9%"></span></span> 89.9%</td></tr>
+<tr><td class="pa-l"><b>48-71</b></td><td class="pa-r">187</td><td class="pa-r">10,403</td><td class="pa-r">$332,318</td><td class="pa-r">$371,208</td><td class="pa-r">$38,889</td><td class="pa-r"><span class="pa-bar pa-bar--warn"><span class="pa-bar-fill" style="width:89.5%"></span></span> 89.5%</td></tr>
+<tr><td class="pa-l"><b>72+</b></td><td class="pa-r">311</td><td class="pa-r">47,880</td><td class="pa-r">$1,274,183</td><td class="pa-r">$1,526,774</td><td class="pa-r">$252,590</td><td class="pa-r"><span class="pa-bar pa-bar--warn"><span class="pa-bar-fill" style="width:83.5%"></span></span> 83.5%</td></tr>
+</tbody>
+</table></div>
+                <h3 class="pa-h3">By blank price &mdash; the variable that decides the outcome</h3>
+                <p class="pa-body">&ldquo;Profit at list&rdquo; is what the order would have earned
+                had it been billed at the Caspio price, after the blank and the loaded production
+                hour. <strong>Only the two most expensive bands cover their hour</strong>, and the
+                cheapest blanks are both the least profitable and the most discounted.</p>
+                <div class="pa-scroll"><table class="pa-table">
+<thead><tr><th class="pa-l">blank price band</th><th class="pa-r">orders</th><th class="pa-r">pieces</th><th class="pa-r">invoiced</th><th class="pa-r">at list</th><th class="pa-r">gap</th><th class="pa-r">realization</th><th class="pa-r">profit at list</th></tr></thead>
+<tbody>
+<tr><td class="pa-l">under $4 &mdash; basic tees</td><td class="pa-r">237</td><td class="pa-r">19,893</td><td class="pa-r">$270,145</td><td class="pa-r">$340,825</td><td class="pa-r">$70,680</td><td class="pa-r"><span class="pa-bar pa-bar--warn"><span class="pa-bar-fill" style="width:79.3%"></span></span> 79.3%</td><td class="pa-r pa-neg">&minus;$126,049</td></tr>
+<tr><td class="pa-l">$4&ndash;8 &mdash; heavier tees, basic polos</td><td class="pa-r">364</td><td class="pa-r">19,341</td><td class="pa-r">$400,031</td><td class="pa-r">$455,522</td><td class="pa-r">$55,490</td><td class="pa-r"><span class="pa-bar pa-bar--warn"><span class="pa-bar-fill" style="width:87.8%"></span></span> 87.8%</td><td class="pa-r pa-neg">&minus;$118,620</td></tr>
+<tr><td class="pa-l">$8&ndash;15 &mdash; mid-priced</td><td class="pa-r">415</td><td class="pa-r">16,014</td><td class="pa-r">$497,905</td><td class="pa-r">$565,826</td><td class="pa-r">$67,921</td><td class="pa-r"><span class="pa-bar pa-bar--warn"><span class="pa-bar-fill" style="width:88.0%"></span></span> 88.0%</td><td class="pa-r pa-neg">&minus;$51,594</td></tr>
+<tr><td class="pa-l">$15&ndash;25 &mdash; better polos, light outerwear</td><td class="pa-r">392</td><td class="pa-r">13,078</td><td class="pa-r">$566,753</td><td class="pa-r">$659,007</td><td class="pa-r">$92,254</td><td class="pa-r"><span class="pa-bar pa-bar--warn"><span class="pa-bar-fill" style="width:86.0%"></span></span> 86.0%</td><td class="pa-r pa-pos">$36,891</td></tr>
+<tr><td class="pa-l">$25+ &mdash; Carhartt, hoodies, North Face</td><td class="pa-r">530</td><td class="pa-r">10,381</td><td class="pa-r">$827,076</td><td class="pa-r">$982,732</td><td class="pa-r">$155,656</td><td class="pa-r"><span class="pa-bar pa-bar--warn"><span class="pa-bar-fill" style="width:84.2%"></span></span> 84.2%</td><td class="pa-r pa-pos">$206,852</td></tr>
+</tbody>
+</table></div>
+                <p class="pa-note">Excluded from the 24-month study: 521 no purchase order, 38 no quantity, 42 no revenue. Those orders lack the
+                purchase order, revenue, or quantity needed to cost them, and are reported rather
+                than silently dropped.</p>
+            </section>
+
+            <section class="dash-card" id="pa-cost">
+                <h2 class="pa-h">Cost basis and measured throughput</h2>
+                <p class="pa-body">Non-material cost of <strong>$1,494,241</strong> over <strong>16,650</strong>
+                matched production hours gives <strong>$89.74 per production hour</strong>. Production
+                logging covers only part of paid time, so the loaded rate that a <em>chargeable</em>
+                hour has to carry is <strong>$285.92</strong> &mdash; an uplift of
+                <strong>3.186&times;</strong>.</p>
+                <p class="pa-body">Throughput below is measured from the production log, not
+                estimated: <strong>caps 20.0 pcs/hr</strong> and <strong>flat embroidery
+                13.7 pcs/hr</strong> at 72+. &ldquo;Price covers&rdquo; is the garment margin plus the
+                decoration charge; &ldquo;gap/pc&rdquo; is that minus cost.</p>
+                <div class="pa-scroll"><table class="pa-table">
+<thead><tr><th class="pa-l">tier</th><th class="pa-r">pieces logged</th><th class="pa-r">hours logged</th><th class="pa-r">pcs/hr</th><th class="pa-r">cost/pc</th><th class="pa-r">avg blank</th><th class="pa-r">decoration charge</th><th class="pa-r">price covers</th><th class="pa-r">gap/pc</th></tr></thead>
+<tbody>
+<tr><td class="pa-l">Garments 1-7</td><td class="pa-r">1,591</td><td class="pa-r">416.6</td><td class="pa-r">3.82</td><td class="pa-r">$74.87</td><td class="pa-r">$27.85</td><td class="pa-r">$18.00</td><td class="pa-r">$42.70</td><td class="pa-r pa-neg">&minus;$32.17</td></tr>
+<tr><td class="pa-l">Garments 8-23</td><td class="pa-r">6,555</td><td class="pa-r">958.0</td><td class="pa-r">6.84</td><td class="pa-r">$41.79</td><td class="pa-r">$22.96</td><td class="pa-r">$18.00</td><td class="pa-r">$38.36</td><td class="pa-r pa-neg">&minus;$3.43</td></tr>
+<tr><td class="pa-l">Garments 24-47</td><td class="pa-r">9,223</td><td class="pa-r">1,117.0</td><td class="pa-r">8.26</td><td class="pa-r">$34.63</td><td class="pa-r">$18.21</td><td class="pa-r">$14.00</td><td class="pa-r">$30.15</td><td class="pa-r pa-neg">&minus;$4.48</td></tr>
+<tr><td class="pa-l">Garments 48-71</td><td class="pa-r">6,100</td><td class="pa-r">577.8</td><td class="pa-r">10.56</td><td class="pa-r">$27.08</td><td class="pa-r">$14.35</td><td class="pa-r">$13.00</td><td class="pa-r">$25.73</td><td class="pa-r pa-neg">&minus;$1.35</td></tr>
+<tr><td class="pa-l">Garments 72+</td><td class="pa-r">33,377</td><td class="pa-r">2,442.6</td><td class="pa-r">13.66</td><td class="pa-r">$20.92</td><td class="pa-r">$12.80</td><td class="pa-r">$12.00</td><td class="pa-r">$23.35</td><td class="pa-r pa-pos">$2.43</td></tr>
+<tr><td class="pa-l">Caps 1-7</td><td class="pa-r">75</td><td class="pa-r">16.7</td><td class="pa-r">4.50</td><td class="pa-r">$63.54</td><td class="pa-r">$6.91</td><td class="pa-r">$17.00</td><td class="pa-r">$23.13</td><td class="pa-r pa-neg">&minus;$40.41</td></tr>
+<tr><td class="pa-l">Caps 8-23</td><td class="pa-r">438</td><td class="pa-r">44.0</td><td class="pa-r">9.96</td><td class="pa-r">$28.70</td><td class="pa-r">$5.46</td><td class="pa-r">$17.00</td><td class="pa-r">$21.84</td><td class="pa-r pa-neg">&minus;$6.86</td></tr>
+<tr><td class="pa-l">Caps 24-47</td><td class="pa-r">2,753</td><td class="pa-r">244.1</td><td class="pa-r">11.28</td><td class="pa-r">$25.35</td><td class="pa-r">$5.88</td><td class="pa-r">$13.00</td><td class="pa-r">$18.22</td><td class="pa-r pa-neg">&minus;$7.13</td></tr>
+<tr><td class="pa-l">Caps 48-71</td><td class="pa-r">2,990</td><td class="pa-r">254.5</td><td class="pa-r">11.75</td><td class="pa-r">$24.34</td><td class="pa-r">$5.12</td><td class="pa-r">$11.00</td><td class="pa-r">$15.54</td><td class="pa-r pa-neg">&minus;$8.80</td></tr>
+<tr><td class="pa-l">Caps 72+</td><td class="pa-r">21,911</td><td class="pa-r">1,097.8</td><td class="pa-r">19.96</td><td class="pa-r">$14.32</td><td class="pa-r">$4.18</td><td class="pa-r">$9.50</td><td class="pa-r">$13.21</td><td class="pa-r pa-neg">&minus;$1.11</td></tr>
+</tbody>
+</table></div>
+                <p class="pa-note">Cost per piece swings 3.6&ndash;4.4&times; across the tiers while
+                price swings only 1.5&ndash;1.8&times;. That is why the small tiers lose and
+                <strong>only garments at 72+ clear their hour</strong>. 8&ndash;23 is the weakest
+                tier of all: it carries the same decoration charge as 1&ndash;7 with no small-order
+                fee behind it.</p>
+            </section>
+
+            <section class="dash-card" id="pa-pricing">
+                <h2 class="pa-h">What Caspio charges today</h2>
+                <p class="pa-body">The engine prices every surface the same way:
+                <code>price = round_up(blank_case_cost &divide; 0.53 + decoration)</code>. The
+                denominator is a margin divisor, so <strong>0.53 means a 47% margin on the garment
+                portion</strong> &mdash; and because decoration is added <em>after</em> that
+                divisor, the tier break is a flat dollar amount no matter how expensive the
+                garment is.</p>
+                <div class="pa-scroll"><table class="pa-table">
+<thead><tr><th class="pa-l">tier</th><th class="pa-r">garment decoration</th><th class="pa-r">cap decoration</th><th class="pa-r">small-order fee</th></tr></thead>
+<tbody>
+<tr><td class="pa-l"><b>1-7</b></td><td class="pa-r">$18.00</td><td class="pa-r">$17.00</td><td class="pa-r">$50.00</td></tr>
+<tr><td class="pa-l"><b>8-23</b></td><td class="pa-r">$18.00</td><td class="pa-r">$17.00</td><td class="pa-r">&mdash;</td></tr>
+<tr><td class="pa-l"><b>24-47</b></td><td class="pa-r">$14.00</td><td class="pa-r">$13.00</td><td class="pa-r">&mdash;</td></tr>
+<tr><td class="pa-l"><b>48-71</b></td><td class="pa-r">$13.00</td><td class="pa-r">$11.00</td><td class="pa-r">&mdash;</td></tr>
+<tr><td class="pa-l"><b>72+</b></td><td class="pa-r">$12.00</td><td class="pa-r">$9.50</td><td class="pa-r">&mdash;</td></tr>
+</tbody>
+</table></div>
+                <p class="pa-note">Consequence worth knowing on big-ticket bids: the ladder spread
+                from 1&ndash;7 to 72+ is the same <b>$6.00</b> on a $85 Carhartt as on a $4 tee. On
+                the tee that is a 32% price range; on the Carhartt it is about 3.5%. Rounding is
+                <code>HalfDollarCeil_Final</code> for garments and <code>HalfDollarCeil_Final</code> for caps.</p>
+                <p class="pa-note">The <b>$50.00 small-order fee is baked into the unit price rather
+                than shown as a line item</b>, and it reaches only about a fifth of the orders
+                small enough to warrant it.</p>
+            </section>
+
+            <section class="dash-card" id="pa-rules">
+                <h2 class="pa-h">Five rules, priced individually</h2>
+                <p class="pa-body">Each rule is costed <strong>in isolation</strong> against the
+                same 1,938 orders, so the figures do not double-count each other. Rule 1 needs no
+                price change at all.</p>
+                <div class="pa-rules">
+                <div class="pa-rule">
+                    <div class="pa-rule-n">1</div>
+                    <div class="pa-rule-body">
+                        <h3>Charge the price that is already in Caspio</h3>
+                        <p>Bill at list. No new price, no Caspio edit, no customer conversation about a rate increase &mdash; just stop discounting below the table. This is the single largest item on the page and the only one that needs no decision.</p>
+                    </div>
+                    <div class="pa-rule-value"><span>$442,001</span><small>over 24 months</small></div>
+                </div>
+                <div class="pa-rule">
+                    <div class="pa-rule-n">2</div>
+                    <div class="pa-rule-body">
+                        <h3>Bring cap decoration up to garment parity</h3>
+                        <p>Caps are decorated at $9.50 to $17.00 against $12.00 to $18.00 for garments, while measured cap throughput is only about 1.5&times; garment throughput. The discount is larger than the productivity difference justifies.</p>
+                    </div>
+                    <div class="pa-rule-value"><span>$49,060</span><small>over 24 months</small></div>
+                </div>
+                <div class="pa-rule">
+                    <div class="pa-rule-n">3</div>
+                    <div class="pa-rule-body">
+                        <h3>Extend the small-order fee to 8&ndash;23</h3>
+                        <p>The $50.00 fee stops at 7 pieces, so 8&ndash;23 carries the same $18.00 decoration charge as 1&ndash;7 with nothing behind it. It is the weakest tier in the book (494 orders in the window).</p>
+                    </div>
+                    <div class="pa-rule-value"><span>$37,050</span><small>over 24 months</small></div>
+                </div>
+                <div class="pa-rule">
+                    <div class="pa-rule-n">4</div>
+                    <div class="pa-rule-body">
+                        <h3>Make the small-order fee actually land on 1&ndash;7</h3>
+                        <p>It is currently absorbed into the unit price and reaches roughly a fifth of eligible orders (578 orders in the window). Charging it as a visible line item is the fix.</p>
+                    </div>
+                    <div class="pa-rule-value"><span>$28,900</span><small>over 24 months</small></div>
+                </div>
+                <div class="pa-rule">
+                    <div class="pa-rule-n">5</div>
+                    <div class="pa-rule-body">
+                        <h3>Surcharge the cheap blanks</h3>
+                        <p>The blank price decides whether an order earns anything, because the garment margin is a percentage of a small number. Add $4.00 per piece under $4, $2.50 from $4&ndash;8, $1.00 from $8&ndash;15, nothing above &mdash; the expensive garments already carry themselves.</p>
+                    </div>
+                    <div class="pa-rule-value"><span>$142,701</span><small>over 24 months</small></div>
+                </div></div>
+                <div class="pa-totals">
+                    <div><span>Rules 2&ndash;5, the structural changes</span><b>$257,712</b></div>
+                    <div><span>Rule 1, charging the existing price</span><b>$442,001</b></div>
+                    <div class="pa-totals-sum"><span>Both together, over 24 months</span><b>$699,712</b></div>
+                </div>
+                <h3 class="pa-h3">Rule 5 in detail</h3>
+                <div class="pa-scroll"><table class="pa-table">
+<thead><tr><th class="pa-l">blank price band</th><th class="pa-r">surcharge/pc</th><th class="pa-r">value over 24 months</th></tr></thead>
+<tbody>
+<tr><td class="pa-l">under $4 &mdash; basic tees</td><td class="pa-r">$4.00</td><td class="pa-r">$79,284</td></tr>
+<tr><td class="pa-l">$4&ndash;8 &mdash; heavier tees, basic polos</td><td class="pa-r">$2.50</td><td class="pa-r">$47,845</td></tr>
+<tr><td class="pa-l">$8&ndash;15 &mdash; mid-priced</td><td class="pa-r">$1.00</td><td class="pa-r">$15,572</td></tr>
+<tr><td class="pa-l">$15&ndash;25 &mdash; better polos, light outerwear</td><td class="pa-r">$0.00</td><td class="pa-r">$0</td></tr>
+<tr><td class="pa-l">$25+ &mdash; Carhartt, hoodies, North Face</td><td class="pa-r">$0.00</td><td class="pa-r">$0</td></tr>
+</tbody>
+<tfoot><tr><td class="pa-l">TOTAL</td><td class="pa-r"></td><td class="pa-r"><b>$142,701</b></td></tr></tfoot>
+</table></div>
+                <p class="pa-note">The $4.00 per piece under $4 is the largest single line because
+                that band is simultaneously the highest volume, the lowest realization, and the
+                furthest underwater at list.</p>
+            </section>
+
+            <section class="dash-card pa-limits" id="pa-limits">
+                <h2 class="pa-h">What this analysis cannot tell you</h2>
+                <ul>
+                    <li><strong>Production logging stopped 2026-05-20</strong> and covers roughly
+                    half of paid hours. Every throughput figure is a pooled tier average, which is
+                    the right way to use noisy logs &mdash; but it means no single order can be
+                    costed reliably from this data.</li>
+                    <li><strong>Order-level costing was attempted and rejected.</strong> About 3% of
+                    orders imply impossible rates (0.2 to 283 pcs/hr) purely from logging noise.
+                    Pooling averages that out; per-order figures inherit it.</li>
+                    <li><strong>No period-correct historical cost exists.</strong> There is no 2016
+                    general ledger or TimeClick data, so the ten-year section applies
+                    <em>today's</em> prices and costs to ten years of real order shapes. It answers
+                    &ldquo;how would today's pricing have fared against our actual history&rdquo;
+                    &mdash; not &ldquo;what did we earn in 2016&rdquo;.</li>
+                    <li><strong>Per-unit revenue in mixed cap/garment orders is split
+                    proportionally by unit count</strong>, which flatters caps and understates
+                    garments. Treat those $/unit columns as indicative, not line-accurate.</li>
+                    <li><strong>Purchase-order coverage varies by year</strong>, so blank-price
+                    bands are less reliable in the earliest years than the most recent ones.</li>
+                    <li><strong>Two earlier spreadsheet recommendations were price cuts of 44&ndash;68%
+                    on our best work</strong> ($6.75 a logo where the engine charges $12&ndash;18 and
+                    we realize $28.58; $3.25 a patch where we charge $10). They should not be
+                    revived &mdash; measured throughput contradicts both.</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+    <script src="/dashboards/js/pricing-analysis.js?v=2026.07.30.1"></script>
+</body>
+</html>

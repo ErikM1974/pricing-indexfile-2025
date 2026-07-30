@@ -8,14 +8,14 @@ window.NWCA_SCHEDULE = [
     first: "Kanha",
     role: "Embroidery Supervisor",
     dept: "Embroidery",
-    paidHrs: 6.25,
-    note: "Shift moved to 8:00 AM – 2:45 PM to match actual punches. Paid hours unchanged at 6.25.",
+    paidHrs: 5.5,
+    note: "Shift is 8:00 AM – 2:00 PM. Paid hours 5.5 (6.0 elapsed less the 30-min unpaid lunch).",
     events: [
       { type: "start", min: 480 },
       { type: "break", min: 540, durMin: 10 },
       { type: "lunch", min: 690, durMin: 30 },
       { type: "break", min: 750, durMin: 10 },
-      { type: "end",   min: 885 }
+      { type: "end",   min: 840 }
     ]
   },
   {

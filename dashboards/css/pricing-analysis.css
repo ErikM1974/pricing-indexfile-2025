@@ -1,0 +1,223 @@
+/* ==========================================================================
+   pricing-analysis.css — Pricing Analysis (admin only).
+   Page-specific styles for /dashboards/pricing-analysis.html.
+   Uses the 2026 tokens (art-hub.css) + dash-shell.css. Sibling pattern:
+   shopworks-odbc-reference.css. Never redefine tokens; never hardcode
+   colors/shadows/radii — var(--token) only.
+
+   The page is dense and numeric, so the job here is information design:
+   figures align, magnitudes are encoded as width alongside the number, and
+   sign is carried by both colour and a glyph so it is never colour-alone.
+   ========================================================================== */
+
+.pa-subhead { font-weight: 400; font-size: 0.7em; opacity: 0.85; }
+.pa-lock {
+    display: inline-flex; align-items: center; gap: 6px; font-size: 0.8rem; font-weight: 600; color: #fff;
+    background: rgba(0,0,0,0.18); border: 1px solid rgba(255,255,255,0.35);
+    padding: 5px 12px; border-radius: var(--radius-pill);
+}
+
+.pa-lead { font-size: 1rem; line-height: 1.6; color: var(--gray-700); margin: 0 0 var(--space-4); }
+.pa-body { font-size: 0.9rem; line-height: 1.65; color: var(--gray-700); margin: var(--space-3) 0; max-width: 78ch; }
+.pa-note { font-size: 0.82rem; line-height: 1.6; color: var(--gray-500); margin: var(--space-3) 0 0; max-width: 84ch; }
+
+.pa-h {
+    display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-3);
+    font-size: 1.15rem; font-weight: 700; color: var(--gray-900);
+    margin: 0 0 var(--space-4); padding-bottom: var(--space-3);
+    border-bottom: 1px solid var(--gray-200); letter-spacing: -0.01em;
+}
+.pa-h3 {
+    font-size: 0.95rem; font-weight: 700; color: var(--gray-900);
+    margin: var(--space-5) 0 var(--space-2); letter-spacing: -0.005em;
+}
+.pa-tag {
+    font-size: 0.72rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--gray-500); background: var(--surface-inset);
+    border-radius: var(--radius-pill); padding: 3px 10px;
+}
+
+/* ---------- Section nav ---------- */
+.pa-nav {
+    position: sticky; top: 0; z-index: 20;
+    display: flex; gap: var(--space-1); overflow-x: auto;
+    padding: var(--space-2) var(--space-4);
+    background: var(--surface-card); border-bottom: 1px solid var(--gray-200);
+    box-shadow: var(--shadow-sm);
+}
+.pa-nav-link {
+    flex: 0 0 auto; padding: 6px 12px; border-radius: var(--radius-pill);
+    font-size: 0.82rem; font-weight: 600; color: var(--gray-600); text-decoration: none;
+    white-space: nowrap; transition: background var(--dur-fast) var(--ease-out),
+                                     color var(--dur-fast) var(--ease-out);
+}
+.pa-nav-link:hover { background: var(--surface-inset); color: var(--gray-900); }
+.pa-nav-link.is-active { background: var(--dash-theme-bg); color: var(--dash-theme-dark); }
+.pa-nav-link:focus-visible { outline: 2px solid var(--dash-theme); outline-offset: 2px; }
+
+/* ---------- Provenance chips ---------- */
+.pa-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-3); }
+.pa-chip {
+    background: var(--surface-inset); border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md); padding: 5px 11px; font-size: 0.8rem; color: var(--gray-600);
+}
+.pa-chip b { color: var(--gray-900); font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
+/* ---------- Hero stat tiles ---------- */
+.pa-hero {
+    display: grid; gap: var(--space-3); margin-bottom: var(--space-4);
+    grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+}
+.pa-stat {
+    display: flex; flex-direction: column; gap: 4px;
+    background: var(--surface-card); border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg); padding: var(--space-4);
+    box-shadow: var(--shadow-sm);
+}
+/* The two figures that carry the argument get the accent rail. */
+.pa-stat--flag { border-left: 4px solid var(--state-warning); }
+.pa-stat-label {
+    font-size: 0.74rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+    color: var(--gray-500);
+}
+.pa-stat-value {
+    font-size: 1.9rem; font-weight: 700; color: var(--gray-900);
+    letter-spacing: -0.02em; font-variant-numeric: tabular-nums; line-height: 1.1;
+}
+.pa-stat-sub { font-size: 0.8rem; color: var(--gray-600); line-height: 1.5; }
+
+/* ---------- Tables ---------- */
+.pa-scroll { overflow-x: auto; margin: var(--space-3) 0; }
+.pa-table {
+    width: 100%; border-collapse: collapse; font-size: 0.84rem;
+    font-variant-numeric: tabular-nums;
+}
+.pa-table caption {
+    caption-side: top; text-align: left; font-size: 0.8rem; color: var(--gray-500);
+    padding-bottom: var(--space-2);
+}
+.pa-table th {
+    font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
+    color: var(--gray-500); background: var(--surface-inset);
+    padding: 8px 10px; border-bottom: 1px solid var(--gray-200); white-space: nowrap;
+}
+.pa-table td {
+    padding: 8px 10px; border-bottom: 1px solid var(--gray-100);
+    color: var(--gray-700); white-space: nowrap;
+}
+.pa-table tbody tr:hover td { background: var(--surface-hover); }
+.pa-table tfoot td {
+    padding: 9px 10px; font-weight: 700; color: var(--gray-900);
+    background: var(--surface-inset); border-top: 2px solid var(--gray-300); border-bottom: 0;
+}
+.pa-l { text-align: left; }
+.pa-r { text-align: right; }
+.pa-table td b, .pa-table tfoot td b { color: var(--gray-900); }
+
+/* Sign is carried by a glyph as well as colour — never colour alone. */
+.pa-pos { color: var(--state-success); font-weight: 600; }
+.pa-neg { color: var(--state-danger);  font-weight: 600; }
+.pa-pos::before { content: "\25B2\00a0"; font-size: 0.7em; }
+.pa-neg::before { content: "\25BC\00a0"; font-size: 0.7em; }
+
+/* ---------- Proportion bar ---------- */
+.pa-bar {
+    display: inline-block; vertical-align: middle; width: 46px; height: 6px;
+    margin-right: 6px; background: var(--gray-200); border-radius: var(--radius-pill);
+    overflow: hidden;
+}
+.pa-bar-fill { display: block; height: 100%; border-radius: var(--radius-pill); }
+.pa-bar--theme  .pa-bar-fill { background: var(--dash-theme); }
+.pa-bar--muted  .pa-bar-fill { background: var(--gray-400); }
+.pa-bar--warn   .pa-bar-fill { background: var(--state-warning); }
+
+/* ---------- Findings ---------- */
+.pa-finding {
+    border: 1px solid var(--gray-200); border-left: 4px solid var(--dash-theme);
+    border-radius: var(--radius-md); background: var(--dash-theme-bg);
+    padding: var(--space-4); margin: var(--space-4) 0;
+}
+.pa-finding--alt { border-left-color: var(--state-info); background: var(--state-info-bg); }
+.pa-finding--flag { border-left-color: var(--state-warning); background: var(--state-warning-bg); }
+.pa-finding h3 {
+    margin: 0 0 var(--space-2); font-size: 1rem; font-weight: 700; color: var(--gray-900);
+    letter-spacing: -0.01em;
+}
+.pa-finding p { margin: 0; font-size: 0.9rem; line-height: 1.65; color: var(--gray-700); max-width: 82ch; }
+
+/* ---------- Callout ---------- */
+.pa-callout {
+    border: 1px solid var(--gray-200); border-left: 4px solid var(--gray-400);
+    border-radius: var(--radius-md); padding: var(--space-3) var(--space-4);
+    margin: var(--space-4) 0; background: var(--surface-inset);
+}
+.pa-callout h4 {
+    margin: 0 0 var(--space-2); font-size: 0.95rem; font-weight: 700;
+    display: flex; align-items: center; gap: var(--space-2);
+}
+.pa-callout p { margin: 0; font-size: 0.88rem; line-height: 1.6; color: var(--gray-700); max-width: 82ch; }
+.pa-callout--danger { border-left-color: var(--state-danger); background: var(--state-danger-bg); }
+.pa-callout--danger h4 { color: var(--state-danger); }
+
+/* ---------- The five rules ---------- */
+.pa-rules { display: flex; flex-direction: column; gap: var(--space-3); margin: var(--space-4) 0; }
+.pa-rule {
+    display: grid; grid-template-columns: auto 1fr auto; gap: var(--space-4);
+    align-items: start; background: var(--surface-card);
+    border: 1px solid var(--gray-200); border-radius: var(--radius-lg);
+    padding: var(--space-4); box-shadow: var(--shadow-sm);
+}
+/* The number is the rule's stable ID from the original five-rules report, so it stays
+   referenceable in conversation. It is NOT a value ranking — rule 5 outranks 2, 3 and 4. */
+.pa-rule-n {
+    display: grid; place-items: center; width: 30px; height: 30px;
+    border-radius: var(--radius-pill); background: var(--dash-theme-bg);
+    color: var(--dash-theme-dark); font-weight: 700; font-size: 0.9rem;
+    font-variant-numeric: tabular-nums;
+}
+.pa-rule-body h3 { margin: 0 0 6px; font-size: 0.98rem; font-weight: 700; color: var(--gray-900); }
+.pa-rule-body p { margin: 0; font-size: 0.86rem; line-height: 1.6; color: var(--gray-600); max-width: 74ch; }
+.pa-rule-value { text-align: right; display: flex; flex-direction: column; gap: 2px; }
+.pa-rule-value span {
+    font-size: 1.25rem; font-weight: 700; color: var(--dash-theme-dark);
+    font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
+}
+.pa-rule-value small { font-size: 0.7rem; color: var(--gray-500); white-space: nowrap; }
+
+.pa-totals {
+    display: flex; flex-direction: column; gap: 0; margin: var(--space-4) 0 0;
+    border: 1px solid var(--gray-200); border-radius: var(--radius-lg); overflow: hidden;
+}
+.pa-totals > div {
+    display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-4);
+    padding: var(--space-3) var(--space-4); border-bottom: 1px solid var(--gray-100);
+}
+.pa-totals > div:last-child { border-bottom: 0; }
+.pa-totals span { font-size: 0.88rem; color: var(--gray-600); }
+.pa-totals b { font-size: 1.05rem; font-weight: 700; color: var(--gray-900); font-variant-numeric: tabular-nums; }
+.pa-totals-sum { background: var(--dash-theme-bg); }
+.pa-totals-sum span { color: var(--dash-theme-dark); font-weight: 600; }
+.pa-totals-sum b { color: var(--dash-theme-dark); font-size: 1.2rem; }
+
+/* ---------- Limits ---------- */
+.pa-limits ul { margin: var(--space-3) 0 0; padding-left: var(--space-5); }
+.pa-limits li {
+    margin: var(--space-2) 0; font-size: 0.88rem; line-height: 1.65; color: var(--gray-700);
+    max-width: 84ch;
+}
+
+.pa-prov code, .pa-body code, .pa-note code, .pa-callout code, .pa-limits code {
+    font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.82em;
+    background: var(--surface-inset); color: var(--gray-800);
+    padding: 1px 5px; border-radius: var(--radius-sm);
+}
+
+@media (max-width: 720px) {
+    .pa-rule { grid-template-columns: auto 1fr; }
+    .pa-rule-value { grid-column: 2; text-align: left; }
+    .pa-stat-value { font-size: 1.6rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .pa-nav-link { transition: none; }
+}
