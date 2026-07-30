@@ -160,9 +160,12 @@ class EmbroideryPricingCalculator {
                         this.tiers[tier.TierLabel] = {
                             embCost: 0, // Will be set from allEmbroideryCostsR
                             hasLTM: tier.LTM_Fee > 0,
-                            // Per-tier margin (N2 fix): 1-7 = 0.55 (lower margin, offsets the $50 LTM on small
-                            // orders), 8+ = 0.53. Honor Caspio's per-tier value — NOT tiersR[0] for all tiers
-                            // (that flattened to 0.55 and under-charged every 8+ garment order vs the live page).
+                            // Per-tier margin (N2 fix): honor Caspio's PER-TIER value, never tiersR[0] for all
+                            // tiers — that flattening under-charged every 8+ garment order vs the live page.
+                            // The tiers are free to differ from each other; this code must not assume they do
+                            // or don't. (Measured 2026-07-30: Caspio has 0.53 on every tier, shirts and caps —
+                            // the old 1-7 = 0.55 offset is retired. Do not re-derive that from this comment:
+                            // read GET /api/pricing-tiers?method=EmbroideryShirts.)
                             marginDenominator: parseFloat(tier.MarginDenominator) || this.marginDenominator
                         };
                         if (tier.LTM_Fee > 0) {
