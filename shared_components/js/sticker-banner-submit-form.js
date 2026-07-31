@@ -830,6 +830,14 @@ var StickerBannerSubmitForm = (function () {
             return;
         }
 
+        // No staff session = no valid submitter to stamp on the request and
+        // nobody to send the confirmation to. Fail visibly (Erik's #1 rule).
+        if (!getSubmitterEmail()) {
+            showToast('Cannot tell who you are — sign in to the staff dashboard again, then resubmit.', 'error');
+            console.error('[StickerBannerSubmitForm] No staff session — submit blocked');
+            return;
+        }
+
         var btn = document.getElementById('sbf-submit-btn');
         var statusEl = document.getElementById('sbf-submit-status');
         btn.disabled = true;
@@ -1157,7 +1165,10 @@ var StickerBannerSubmitForm = (function () {
         if (window.APP_CONFIG && window.APP_CONFIG.USER && window.APP_CONFIG.USER.email) {
             return window.APP_CONFIG.USER.email;
         }
-        return localStorage.getItem('userEmail') || 'ae@nwcustomapparel.com';
+        // '' when there's no staff session. Never fall back to
+        // 'ae@nwcustomapparel.com' — nobody owns that inbox, so the request
+        // saved under a bogus User_Email and the AE's confirmation vanished.
+        return localStorage.getItem('userEmail') || '';
     }
 
     function getSubmitterName() {
@@ -1169,6 +1180,7 @@ var StickerBannerSubmitForm = (function () {
             return window.APP_CONFIG.USER.name;
         }
         var email = getSubmitterEmail();
+        if (!email) return '';
         var atIdx = email.indexOf('@');
         var local = atIdx > 0 ? email.substring(0, atIdx) : email;
         return local.charAt(0).toUpperCase() + local.slice(1);

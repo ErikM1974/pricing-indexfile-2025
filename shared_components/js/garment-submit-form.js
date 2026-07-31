@@ -1473,6 +1473,15 @@ var GarmentSubmitForm = (function () {
             return;
         }
 
+        // No staff session = no way to stamp the request or send you a
+        // confirmation. Fail visibly rather than saving it under a fake
+        // address (Erik's #1 rule — a wrong record is worse than an error).
+        if (!getSubmitterEmail()) {
+            showToast('Cannot tell who you are — sign in to the staff dashboard again, then resubmit.', 'error');
+            console.error('[GarmentSubmitForm] No staff session — submit blocked');
+            return;
+        }
+
         var btn = document.getElementById('gsf-submit-btn');
         var statusEl = document.getElementById('gsf-submit-status');
         btn.disabled = true;
@@ -1799,13 +1808,18 @@ var GarmentSubmitForm = (function () {
         if (bytes < 1024 * 1024) return Math.round(bytes / 1024) + ' KB';
         return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
     }
+    // Returns '' when the staff session is missing. It used to fall back to
+    // 'ae@nwcustomapparel.com' — an inbox nobody owns — so the request saved
+    // with a bogus User_Email and the AE's own confirmation email went nowhere.
+    // Steve still got his (his address is hardcoded), which is why it went
+    // unnoticed for 14 requests. Never invent a submitter; block instead.
     function getSubmitterEmail() {
         if (typeof StaffAuthHelper !== 'undefined') {
             var email = StaffAuthHelper.getLoggedInStaffEmail();
             if (email) return email;
         }
         if (window.APP_CONFIG && window.APP_CONFIG.USER && window.APP_CONFIG.USER.email) return window.APP_CONFIG.USER.email;
-        return localStorage.getItem('userEmail') || 'ae@nwcustomapparel.com';
+        return localStorage.getItem('userEmail') || '';
     }
     function getSubmitterName() {
         if (typeof StaffAuthHelper !== 'undefined') {
@@ -1814,6 +1828,7 @@ var GarmentSubmitForm = (function () {
         }
         if (window.APP_CONFIG && window.APP_CONFIG.USER && window.APP_CONFIG.USER.name) return window.APP_CONFIG.USER.name;
         var email = getSubmitterEmail();
+        if (!email) return '';
         var atIdx = email.indexOf('@');
         var local = atIdx > 0 ? email.substring(0, atIdx) : email;
         return local.charAt(0).toUpperCase() + local.slice(1);
