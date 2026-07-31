@@ -259,3 +259,87 @@ Full entry archived to `LESSONS_LEARNED_ARCHIVE.md`. Durable part: **two rules w
 specificity are resolved by source order, so a later `max-height: none` silently beat the
 collapse** — when a CSS edit appears to do nothing, count specificity AND check what comes
 after it. See also the `@layer`-vs-unlayered entry above.
+
+---
+
+## The 4 AM inbound printout missed 4 POs — the WA cartons sync in AFTER it prints (2026-07-29)
+
+**Problem.** The Daily Inbound PDF Erik printed at **3:57 AM on 7/29** listed 8 POs / 17 boxes /
+751 pcs / $5,956. SanMar's PSST freight manifest for ship-date 7/28 showed 4 more POs
+(**142476, 113825, 113834, 113835** — 5 cartons, 126 pcs, $398) that UPS had already scheduled
+for 7/29 delivery. Reloading the page at 4:03 AM gave the correct **12 POs / 22 boxes / 877 pcs
+/ $6,354**. Nothing on the printed sheet was *wrong* — it was 6 minutes too early.
+
+**Root cause.** All four are **WA-INV (Issaquah)** shipments that SanMar packed between
+**4:58 and 6:55 PM PDT on 7/28**. The shipment sync writes those cartons to the Caspio
+`shipments` table in the small hours; on 7/29 they landed **between 10:56:56 and ~11:02 UTC**
+(3:57–4:02 AM PDT). `/api/sanmar-orders/inbound-today` caches its payload for **600 s**
+(`sanmar-orders.js` → `orderCache.set(cacheKey, payload, 600)`), and the print builders render
+`lastData` — the payload captured when the modal loaded. So a 3:57 AM print serves a payload
+built at 3:56:56 AM, before the WA rows existed. WA is the worst case precisely *because* its
+transit is 1 business day: an Issaquah carton packed at 6 PM is inbound **the next morning**,
+with no slack for the sync to catch up. NV/AZ/TX/VA cartons get 2–5 days, so a late sync never
+shows on their printout.
+
+**Fix (operational).** Print the inbound report **after ~5:00 AM**, and hit **Refresh** on the
+SanMar Inbound modal before printing or running Box Labels. Re-check any pre-5 AM printout
+against that day's PSST manifest CSV.
+
+**Prevention.** Treat `generatedAt` as the report's real timestamp, not the print time. Worth
+building: have the "Print for…" flow force `load(true, viewDate)` first, or surface a banner
+when `generatedAt` predates the last shipment sync. Same trap applies to Box Labels — labels
+printed at 3:57 AM would have been 5 cartons short.
+
+**Fixed 2026-07-29** (`b97868e2`): Print for…, Box Labels and the per-box label button all call
+`syncBeforeOutput()` first — force `refresh=true`, re-render, then build the sheet — with a
+2-minute freshness window so a printing session costs ONE re-pull, not one per sheet. A failed
+re-pull shows an alert strip and prints **nothing**.
+
+**Related drift found the same day (not fixed).** The calendar heat-map (`/daily-inbound`) and
+the detail modal (`/inbound-today`) disagree on the *same* day: 7/29 = 13 PO / 478 pcs on the
+calendar vs 12 PO / 877 pcs in the detail; PO 113805 sits on 8/4 in the calendar and 8/3 in the
+detail. Calendar buckets on ship-date + transit **estimate** and sums the PO items table;
+the detail view uses **UPS's real delivery date** and live carton contents. Clicking a "13 PO"
+day and getting 12 reads as a bug to staff.
+
+---
+
+## Two syncs land AFTER the 4 AM inbound print — the second one blanked the box labels (2026-07-29)
+
+**Problem.** POs 113825 and 113834 printed as **"Unmatched"** on the inbound sheet and, worse,
+on the receiving box label: no company, no due date, no design, no contact, no rep, method
+"Other". They were real orders — Stella Jones and All The Bases Youth Sports.
+
+**Root cause.** Same shape as the carton lag above, different sync. `scripts/sync-manageorders.js`
+runs on **Heroku Scheduler at 12:00 UTC = 5:00 AM PT**, an hour *after* the report prints, so a
+work order written yesterday afternoon has no `ManageOrders_Orders` row when the sheet is built.
+`inbound-today` reads only that archive, so it had nothing to show. `PurchaseOrders` resolves the
+WO **number** but carries no customer (its only name column is `VendorName` = SanMar), which is
+why the WO printed while the company didn't.
+
+**Fix** (`a0e2bc6`). For any arriving work order missing from the archive, pull it from the
+**live ManageOrders API** (`fetchOrderByNumber`). The API returns the *same field names* as the
+Caspio columns, so rows drop into `moByIdOrder` unchanged. Pooled 4-at-a-time, capped at 25 per
+request with a `console.warn` when it truncates — a silent cap would read as "nothing was
+missing" when the sync is down.
+
+**Prevention.**
+- **Anything printed at ~4 AM is upstream of both syncs.** Before trusting a field on that sheet,
+  ask which table feeds it and when that table is written — shipments ~4 AM, ManageOrders 5 AM.
+- **A staff-facing view should not be limited to the archive's freshness** when the live source is
+  one call away and the miss count is small. Archive first, live for the remainder.
+- Two independent bugs, one date, one cause: *our copy* of the truth lagged the truth.
+
+### The UI harness stalled because printing became async
+
+Making print `await` a refresh broke `tests/ui/test-inbound-print.js`, which read
+`#sit-print-sheet` on the same tick as the click. Converting it to `setInterval` polling then
+stalled at profile 3 in a way that looked like an app bug — it wasn't. **A backgrounded tab
+throttles `setInterval` to ~1 s and then to a crawl**, so a polling harness hangs while the page
+underneath is perfectly healthy. `MutationObserver` fires on the DOM change regardless of tab
+visibility — use it, never a timer, to wait for a node in a UI harness. (Second time this class
+of trap has cost a debugging session; the first was throttled CSS transitions.) Also: wait for a
+*new* node — the previous profile's sheet lingers until its 1500 ms cleanup, so "a sheet exists"
+silently clones the previous profile.
+
+---
