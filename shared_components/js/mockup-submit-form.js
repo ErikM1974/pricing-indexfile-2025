@@ -1019,6 +1019,14 @@ var MockupSubmitForm = (function () {
             return;
         }
 
+        // No staff session = no valid submitter to stamp on the request and
+        // nobody to send the confirmation to. Fail visibly (Erik's #1 rule).
+        if (!getSubmitterEmail()) {
+            showToast('Cannot tell who you are — sign in to the staff dashboard again, then resubmit.', 'error');
+            console.error('[MockupSubmitForm] No staff session — submit blocked');
+            return;
+        }
+
         var btn = document.getElementById('msf-submit-btn');
         var statusEl = document.getElementById('msf-submit-status');
         btn.disabled = true;
@@ -1339,7 +1347,10 @@ var MockupSubmitForm = (function () {
         if (window.APP_CONFIG && window.APP_CONFIG.USER && window.APP_CONFIG.USER.email) {
             return window.APP_CONFIG.USER.email;
         }
-        return localStorage.getItem('userEmail') || 'ae@nwcustomapparel.com';
+        // '' when there's no staff session. Never fall back to
+        // 'ae@nwcustomapparel.com' — nobody owns that inbox, so the request
+        // saved under a bogus User_Email and the AE's confirmation vanished.
+        return localStorage.getItem('userEmail') || '';
     }
 
     function getSubmitterName() {
@@ -1351,6 +1362,7 @@ var MockupSubmitForm = (function () {
             return window.APP_CONFIG.USER.name;
         }
         var email = getSubmitterEmail();
+        if (!email) return '';
         var atIdx = email.indexOf('@');
         var name = atIdx > 0 ? email.substring(0, atIdx) : email;
         return name.charAt(0).toUpperCase() + name.slice(1);

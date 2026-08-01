@@ -5,6 +5,58 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## A 200 with empty arrays is not success — the quote builder priced off seed values (2026-07-30)
+
+**Problem.** `/api/pricing-bundle` answers **HTTP 200 with `{tiersR:[], allEmbroideryCostsR:[]}`**
+when Caspio rate-limits, rather than erroring the way its sibling `/api/pricing-tiers` does.
+`embroidery-quote-pricing.js` pre-seeds a full tier ladder in the constructor and only replaces it
+`if (data.tiersR.length > 0)` — but set `initialized = true` regardless. So an empty 200 priced an
+entire quote from hardcoded numbers frozen at the last edit of the file, with no banner and no toast.
+
+**Root cause.** The guard tested the *shape* of the response (`if (data)`) instead of whether the
+data needed to price actually arrived. `response.ok` was true, so the catch never ran.
+
+**Why it hid.** The seed values happened to equal live Caspio, so the loss was $0 and nothing looked
+wrong. It would have broken silently the first time anyone changed a price in Caspio — i.e. exactly
+when the source-of-truth design matters.
+
+**Solution.** Throw when either array is empty/missing, which routes into the existing catch
+(apiError + critical banner + `disableQuoteCreation()`), plus a second check before
+`initialized = true`. Seed ladder kept but commented **never-authoritative** so nobody "helpfully"
+syncs it to Caspio and restores the bug. `tests/unit/emb-empty-bundle-guard.test.js`.
+
+**Prevention.** 🔑 **A fallback that happens to be correct is still a silent-wrong-price bug** —
+judge the mechanism, not today's output. And when a fixture pins a value production never sends
+(`RoundingMethod: 'HalfDollarUp'` vs the live `HalfDollarCeil_Final`), the tests exercise a branch
+that does not exist in prod: **fixtures must carry live values.**
+
+---
+
+## Realization figures are meaningless until webstore orders are separated out (2026-07-30)
+
+**Problem.** "Cap 8-23 is the worst cell in the book at 80% realization" sent a whole investigation
+at a cell that was fine. Quoted cap 8-23 actually realizes **88.9%**, and the real gap is
+**~$1,500/yr**, not the implied five figures.
+
+**Root cause.** Webstore/company-store orders carry their own program pricing (Hops n Drops hats at
+$11, company stores with a dozen assorted items at flat price points) and realize **76.5%**. Averaged
+in with quoted work at **97.9%**, they drag any tier-level figure down — hardest on small tiers,
+where they are the biggest share.
+
+**Two more confounds in the same measurement.** Some orders bill decoration on its **own line**
+(`id_ProductClass` 9/10, e.g. `DECG`), so the garment line's price legitimately excludes decoration
+and reads as a deep discount. And at least one order (141715) billed 20 caps at exactly blank cost
+with **no decoration line at all** — a missing charge, not a discount.
+
+**Solution / prevention.** 🔑 **Split by `Orders.ExtSource` before computing realization** — blank =
+quoted, populated = webstore. 🔑 **Check for class-9/10 lines on the order** before treating a low
+garment price as a discount. Both are cheap; neither is optional. The three-way split
+(webstore / separate-decoration / quoted) is what turned an alarming number into a real one.
+
+⚠️ Verified by reading the raw LinesOE rows for the outlier orders. **The line-level look is what
+found it** — every aggregate up to that point agreed with the wrong answer.
+
+---
 ## Two renderings of the same timestamp never compared equal, so a sync re-wrote 456 orders a day forever (2026-07-29)
 
 **Problem.** `sync-manageorders` spent **2,901 billed Caspio calls in 22 minutes** — ~18% of the
@@ -163,136 +215,3 @@ one does, the route is load-bearing access control and deleting it is a privileg
 a cleanup — replace it with a tombstone or delete the file too. Same trap as the 2026-07-29
 `express.static('.')` repo-root exposure, one layer down: *static mounts serve whatever the router
 didn't claim.* Grep `app.use\(.*express.static` and compare against the path you're removing.
-
----
-
-## A closed `<details>` still reports its old size — `checkVisibility()`, not `getBoundingClientRect()` (2026-07-29)
-
-**Problem.** A layout test asserted that collapsing the Pride Wall hid its photo track:
-`pw.open = false; track.getBoundingClientRect().height === 0`. It failed at **every** viewport
-width — the track kept reporting 164.6px while the parent `<details>` correctly shrank 191px → 19px.
-The widget was working; the assertion could never pass.
-
-**Root cause.** A closed `<details>` hides its content with **`content-visibility: hidden`**, not
-`display: none`. The subtree is skipped for rendering but **retains its last laid-out geometry**, so
-`getBoundingClientRect()` returns the size it had when it was last open. `getComputedStyle(el).display`
-is likewise still `grid`. Nothing about the element's own boxes says "I am hidden".
-
-**Fix.** `!el.checkVisibility()` — it accounts for content-visibility, `visibility`, and opacity, and
-correctly returns `false` inside a closed `<details>`. Alternatively assert on the *parent*
-`<details>` height, which does collapse.
-
-**Prevention.** Never probe visibility through the geometry of a descendant — measure the collapsing
-container, or use `checkVisibility()`. This bites anything wrapped in `content-visibility`
-(`<details>`, `content-visibility: auto` virtualization), and it fails *silently in the passing
-direction* too: a "the panel is hidden" assertion written this way would pass while the panel is open.
-
----
-
-## Three stylesheets declared the same grid; two had never applied (2026-07-29)
-
-**Problem.** `.quick-access-grid` column tracks were declared in components.css (with `@container`
-breakpoints), again in dashboard-v3-theme.css, and a third time in dashboard-v3-patch-2.css with
-`!important`. Editing the first two did nothing, and it was not obvious why.
-
-**Root cause.** components.css is inside `@layer components`; the theme and patch files are
-**unlayered**. Unlayered styles beat *any* layered style regardless of specificity or source order,
-so the container queries in components.css had never once matched — they looked live and were dead.
-
-**Fix.** patch-2 §7 is now the single owner of the tracks; components.css keeps a 1fr base and the
-theme keeps only the gap, each with a comment naming the owner.
-
-**Prevention.** In this codebase `@layer` = "loses to everything in the theme/patch files". Before
-editing a dashboard rule, check whether an unlayered file also declares it — and when a CSS edit
-appears to do nothing, suspect layering before specificity.
-
----
-
-## The 4 AM inbound printout missed 4 POs — the WA cartons sync in AFTER it prints (2026-07-29)
-
-**Problem.** The Daily Inbound PDF Erik printed at **3:57 AM on 7/29** listed 8 POs / 17 boxes /
-751 pcs / $5,956. SanMar's PSST freight manifest for ship-date 7/28 showed 4 more POs
-(**142476, 113825, 113834, 113835** — 5 cartons, 126 pcs, $398) that UPS had already scheduled
-for 7/29 delivery. Reloading the page at 4:03 AM gave the correct **12 POs / 22 boxes / 877 pcs
-/ $6,354**. Nothing on the printed sheet was *wrong* — it was 6 minutes too early.
-
-**Root cause.** All four are **WA-INV (Issaquah)** shipments that SanMar packed between
-**4:58 and 6:55 PM PDT on 7/28**. The shipment sync writes those cartons to the Caspio
-`shipments` table in the small hours; on 7/29 they landed **between 10:56:56 and ~11:02 UTC**
-(3:57–4:02 AM PDT). `/api/sanmar-orders/inbound-today` caches its payload for **600 s**
-(`sanmar-orders.js` → `orderCache.set(cacheKey, payload, 600)`), and the print builders render
-`lastData` — the payload captured when the modal loaded. So a 3:57 AM print serves a payload
-built at 3:56:56 AM, before the WA rows existed. WA is the worst case precisely *because* its
-transit is 1 business day: an Issaquah carton packed at 6 PM is inbound **the next morning**,
-with no slack for the sync to catch up. NV/AZ/TX/VA cartons get 2–5 days, so a late sync never
-shows on their printout.
-
-**Fix (operational).** Print the inbound report **after ~5:00 AM**, and hit **Refresh** on the
-SanMar Inbound modal before printing or running Box Labels. Re-check any pre-5 AM printout
-against that day's PSST manifest CSV.
-
-**Prevention.** Treat `generatedAt` as the report's real timestamp, not the print time. Worth
-building: have the "Print for…" flow force `load(true, viewDate)` first, or surface a banner
-when `generatedAt` predates the last shipment sync. Same trap applies to Box Labels — labels
-printed at 3:57 AM would have been 5 cartons short.
-
-**Fixed 2026-07-29** (`b97868e2`): Print for…, Box Labels and the per-box label button all call
-`syncBeforeOutput()` first — force `refresh=true`, re-render, then build the sheet — with a
-2-minute freshness window so a printing session costs ONE re-pull, not one per sheet. A failed
-re-pull shows an alert strip and prints **nothing**.
-
-**Related drift found the same day (not fixed).** The calendar heat-map (`/daily-inbound`) and
-the detail modal (`/inbound-today`) disagree on the *same* day: 7/29 = 13 PO / 478 pcs on the
-calendar vs 12 PO / 877 pcs in the detail; PO 113805 sits on 8/4 in the calendar and 8/3 in the
-detail. Calendar buckets on ship-date + transit **estimate** and sums the PO items table;
-the detail view uses **UPS's real delivery date** and live carton contents. Clicking a "13 PO"
-day and getting 12 reads as a bug to staff.
-
----
-
-## Two syncs land AFTER the 4 AM inbound print — the second one blanked the box labels (2026-07-29)
-
-**Problem.** POs 113825 and 113834 printed as **"Unmatched"** on the inbound sheet and, worse,
-on the receiving box label: no company, no due date, no design, no contact, no rep, method
-"Other". They were real orders — Stella Jones and All The Bases Youth Sports.
-
-**Root cause.** Same shape as the carton lag above, different sync. `scripts/sync-manageorders.js`
-runs on **Heroku Scheduler at 12:00 UTC = 5:00 AM PT**, an hour *after* the report prints, so a
-work order written yesterday afternoon has no `ManageOrders_Orders` row when the sheet is built.
-`inbound-today` reads only that archive, so it had nothing to show. `PurchaseOrders` resolves the
-WO **number** but carries no customer (its only name column is `VendorName` = SanMar), which is
-why the WO printed while the company didn't.
-
-**Fix** (`a0e2bc6`). For any arriving work order missing from the archive, pull it from the
-**live ManageOrders API** (`fetchOrderByNumber`). The API returns the *same field names* as the
-Caspio columns, so rows drop into `moByIdOrder` unchanged. Pooled 4-at-a-time, capped at 25 per
-request with a `console.warn` when it truncates — a silent cap would read as "nothing was
-missing" when the sync is down.
-
-**Prevention.**
-- **Anything printed at ~4 AM is upstream of both syncs.** Before trusting a field on that sheet,
-  ask which table feeds it and when that table is written — shipments ~4 AM, ManageOrders 5 AM.
-- **A staff-facing view should not be limited to the archive's freshness** when the live source is
-  one call away and the miss count is small. Archive first, live for the remainder.
-- Two independent bugs, one date, one cause: *our copy* of the truth lagged the truth.
-
-### The UI harness stalled because printing became async
-
-Making print `await` a refresh broke `tests/ui/test-inbound-print.js`, which read
-`#sit-print-sheet` on the same tick as the click. Converting it to `setInterval` polling then
-stalled at profile 3 in a way that looked like an app bug — it wasn't. **A backgrounded tab
-throttles `setInterval` to ~1 s and then to a crawl**, so a polling harness hangs while the page
-underneath is perfectly healthy. `MutationObserver` fires on the DOM change regardless of tab
-visibility — use it, never a timer, to wait for a node in a UI harness. (Second time this class
-of trap has cost a debugging session; the first was throttled CSS transitions.) Also: wait for a
-*new* node — the previous profile's sheet lingers until its 1500 ms cleanup, so "a sheet exists"
-silently clones the previous profile.
-
----
-
-## An audit measured our own broken meter, and our "day" was 7h off the vendor's (2026-07-28)
-
-Both archived to `LESSONS_LEARNED_ARCHIVE.md`. The durable pair: **before reconciling your number
-against a vendor's, match their clock** — check the timezone on their own report header first; a
-whole-day offset is indistinguishable from missing data. And **never treat your own meter as ground
-truth when auditing that meter** — under-reporting always reads as "we're fine".
