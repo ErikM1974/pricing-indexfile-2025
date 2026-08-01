@@ -1,6 +1,9 @@
 # HANDOFF — Steve gets no notification when Ruth submits artwork
 
-**Opened 2026-07-31. Status: diagnosis DONE, fix HALF SHIPPED (committed on `develop`, not deployed).**
+**Opened 2026-07-31. Updated 2026-08-01.**
+
+**Status: diagnosis DONE. Code fix DONE + tested on `develop` — awaiting deploy.
+The Ruth half (moving her off the legacy form) is NOT done and needs Erik.**
 
 ---
 
@@ -83,22 +86,29 @@ Per file: `getSubmitterEmail()` returns `''` instead of `'ae@nwcustomapparel.com
 visible toast ("Cannot tell who you are — sign in to the staff dashboard again, then
 resubmit.") plus a `console.error`, before any upload or POST.
 
-Verified so far: `node --check` passes on all four files.
+Locked by a new test, `tests/unit/art-submit-identity.test.js` (6 cases): the three
+resolution paths, the "unidentified → `''`, never a stand-in inbox" regression, plus two
+cross-file greps that fail if ANY of the four forms reintroduces the `|| 'ae@...'` fallback
+or drops the `if (!getSubmitterEmail())` guard. Mutation-checked — reverting
+`jds-submit-form.js` to the old shape fails both greps.
+
+`garment-submit-form.js` gained a `_getSubmitterIdentityForTest()` export hook, mirroring
+the existing `_buildPayloadForTest` idiom.
+
+**Verified 2026-08-01:** full unit suite 99/99 suites, 1967 passed / 4 skipped.
+
+Browser verification was NOT possible locally — `/dashboards/ae-dashboard.html` is behind
+`requireStaff` (`server.js:919`) and a session comes only from a real SAML ACS round-trip,
+with no dev bypass. The unit tests stand in for it.
 
 ---
 
 ## TODO when you pick this back up
 
-1. **Run the tests** — `tests/unit/garment-submit-form-payload.test.js` exists and exercises
-   the payload contract; confirm it still passes, and check whether it needs a case for the
-   no-session block. Then the wider suite.
-2. **Bump the `?v=` cache-bust** on all four scripts in `dashboards/ae-dashboard.html`
-   (lines ~629-634) — and check whether `mockup-submit-form.js` / `sticker-banner-submit-form.js`
-   load anywhere else that also needs bumping.
-3. **Manually verify** in the browser preview: form loads, a normal submit still works, and
-   a no-session submit shows the block toast instead of saving.
-4. **Deploy** via `/deploy`.
-5. **Ruth's move to the AE form** — this is the people half and it is NOT done:
+1. **Deploy** via `/deploy` (it applies one `$DEPLOY_VERSION` to every `?v=` string, so the
+   cache-bust on `dashboards/ae-dashboard.html:629-634` and `pages/garment-designer.html:450`
+   is handled automatically — do NOT hand-bump them).
+2. **Ruth's move to the AE form** — this is the people half and it is NOT done:
    - Confirm with Ruth which form she actually opens today.
    - Point her at `https://teamnwca.com/ae-dashboard.html#submit` (the page gate defaults to
      any logged-in staff — `ae-dashboard.html` is not in `ADMIN_DEFAULT_PAGES` — but confirm
@@ -109,16 +119,20 @@ Verified so far: `node --check` passes on all four files.
      for now on purpose — Steve may use it himself, and ripping it out was outside what
      Erik approved. Without some guard, anyone landing on it silently produces
      un-notified requests again.
-6. **After the fix ships**, append the lesson to `/memory/LESSONS_LEARNED.md`
-   (Problem / Root Cause / Solution / Prevention) and add a one-line entry to `MEMORY.md`.
-   Not written yet — nothing is deployed.
+3. **After the fix ships**, append the lesson to `/memory/LESSONS_LEARNED.md`
+   (Problem / Root Cause / Solution / Prevention) and add a one-line entry to `MEMORY.md`,
+   then delete this handoff file. Not written yet — nothing is deployed.
 
-## Diagnostic scripts (scratchpad, read-only, ~1 Caspio call each)
+## Diagnostic scripts
 
-`C:\Users\erik\AppData\Local\Temp\claude\C--Users-erik-OneDrive---Northwest-Custom-Apparel-2025-Pricing-Index-File-2025\25abf6c9-886a-4371-99ed-0d60cbcdf154\scratchpad\`
-- `art-rep-probe.js` — recent ArtRequests grouped by `Sales_Rep` / `User_Email`
-- `art-row-diff.js` — full-record field diff, Ruth vs Nika/Taneisha
-- `art-placement-check.js` — placement values vs the JS form's option list
+`scripts/art-request-source-audit.js` — read-only, ~1 Caspio call. Names anyone whose
+NEWEST art request bypassed the AE form. Re-run after Ruth moves to confirm it reports
+CLEAR.
 
-They load the proxy's `.env` for Caspio creds. Scratchpad is session-scoped, so copy them
-into the repo if you want them to survive.
+```bash
+node scripts/art-request-source-audit.js
+```
+
+Run 2026-08-01 — **Ruth is the only one still off-path, and has never used the AE form.**
+Nika, Taneisha and Erik all migrated by mid-June 2026 (their pre-June off-path rows are
+rollout-era history, not a live problem).

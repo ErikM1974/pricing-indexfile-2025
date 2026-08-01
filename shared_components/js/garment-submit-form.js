@@ -1846,6 +1846,12 @@ var GarmentSubmitForm = (function () {
 
     return {
         init: init,
+        // Exposed for unit testing the submitter-identity guard. An unidentified
+        // staffer MUST resolve to '' so handleSubmit blocks — never to a stand-in
+        // inbox, which is what silently swallowed 14 AEs' confirmation emails.
+        _getSubmitterIdentityForTest: function () {
+            return { email: getSubmitterEmail(), name: getSubmitterName() };
+        },
         // Exposed for unit testing of the payload contract.
         _buildPayloadForTest: function (deps) {
             garmentRows = deps.garmentRows || garmentRows;
