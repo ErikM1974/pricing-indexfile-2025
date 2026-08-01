@@ -1,3 +1,13 @@
+## v2026.08.01.1 (2026.08.01)
+
+- Remove stray pb.json probe dump; correct the margin note in the builder rule
+- Memory: cap 8-23 verdict, the two pricing-path lessons, and archive rotation
+- WIP: block art submits with no staff session (fake ae@ inbox fix)
+- Memory: the Caspio quota week, consolidated into one topic file
+- Lock the art-submit identity guard + add a submission-path audit
+- Memory: archive the 3 oldest lessons entries (268 -> 217 lines)
+- Deploy v2026.08.01.1: 2 files (ae-dashboard.html,garment-designer.html,...)
+
 ## v2026.07.30.3 (2026.07.30)
 
 - Memory: cost basis rebuilt from the general journal, and the ODBC GL question settled
