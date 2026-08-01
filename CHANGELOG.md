@@ -1,3 +1,10 @@
+## v2026.08.01.2 (2026.08.01)
+
+- Memory: the two art-notification lessons, post-deploy
+- Memory: two LESSONS entries for v2026.08.01.1 + archive rotation
+- Retire the Express Art Submission Form; guard against re-wiring
+- Deploy v2026.08.01.2: 12 files (ae-dashboard.html,art-hub-ruth.html,art-hub-steve.html,...)
+
 ## v2026.08.01.1 (2026.08.01)
 
 - Remove stray pb.json probe dump; correct the margin note in the builder rule
