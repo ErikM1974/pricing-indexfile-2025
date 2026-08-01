@@ -343,3 +343,54 @@ of trap has cost a debugging session; the first was throttled CSS transitions.) 
 silently clones the previous profile.
 
 ---
+
+---
+
+## A closed `<details>` still reports its old size — `checkVisibility()`, not `getBoundingClientRect()` (2026-07-29)
+
+**Problem.** A layout test asserted that collapsing the Pride Wall hid its photo track:
+`pw.open = false; track.getBoundingClientRect().height === 0`. It failed at **every** viewport
+width — the track kept reporting 164.6px while the parent `<details>` correctly shrank 191px → 19px.
+The widget was working; the assertion could never pass.
+
+**Root cause.** A closed `<details>` hides its content with **`content-visibility: hidden`**, not
+`display: none`. The subtree is skipped for rendering but **retains its last laid-out geometry**, so
+`getBoundingClientRect()` returns the size it had when it was last open. `getComputedStyle(el).display`
+is likewise still `grid`. Nothing about the element's own boxes says "I am hidden".
+
+**Fix.** `!el.checkVisibility()` — it accounts for content-visibility, `visibility`, and opacity, and
+correctly returns `false` inside a closed `<details>`. Alternatively assert on the *parent*
+`<details>` height, which does collapse.
+
+**Prevention.** Never probe visibility through the geometry of a descendant — measure the collapsing
+container, or use `checkVisibility()`. This bites anything wrapped in `content-visibility`
+(`<details>`, `content-visibility: auto` virtualization), and it fails *silently in the passing
+direction* too: a "the panel is hidden" assertion written this way would pass while the panel is open.
+
+---
+
+## Three stylesheets declared the same grid; two had never applied (2026-07-29)
+
+**Problem.** `.quick-access-grid` column tracks were declared in components.css (with `@container`
+breakpoints), again in dashboard-v3-theme.css, and a third time in dashboard-v3-patch-2.css with
+`!important`. Editing the first two did nothing, and it was not obvious why.
+
+**Root cause.** components.css is inside `@layer components`; the theme and patch files are
+**unlayered**. Unlayered styles beat *any* layered style regardless of specificity or source order,
+so the container queries in components.css had never once matched — they looked live and were dead.
+
+**Fix.** patch-2 §7 is now the single owner of the tracks; components.css keeps a 1fr base and the
+theme keeps only the gap, each with a comment naming the owner.
+
+**Prevention.** In this codebase `@layer` = "loses to everything in the theme/patch files". Before
+editing a dashboard rule, check whether an unlayered file also declares it — and when a CSS edit
+appears to do nothing, suspect layering before specificity.
+
+---
+
+## An audit measured our own broken meter, and our "day" was 7h off the vendor's (2026-07-28)
+
+Both archived to `LESSONS_LEARNED_ARCHIVE.md`. The durable pair: **before reconciling your number
+against a vendor's, match their clock** — check the timezone on their own report header first; a
+whole-day offset is indistinguishable from missing data. And **never treat your own meter as ground
+truth when auditing that meter** — under-reporting always reads as "we're fine".
