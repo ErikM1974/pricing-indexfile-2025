@@ -1,6 +1,6 @@
 # Active Files Registry
-**Last Updated:** 2026-07-24
-**Total Active Files:** 598 (HTML+JS+CSS, excludes `node_modules/`, `.git/`, `tests/`, `.claude/`, `archive-working-files/`)
+**Last Updated:** 2026-08-01
+**Total Active Files:** 611 (HTML+JS+CSS, excludes `node_modules/`, `.git/`, `tests/`, `.claude/`, `archive-working-files/`)
 **Purpose:** Track all active files to prevent orphaned code accumulation
 **Audit cadence:** Quarterly. Bump the timestamp on every file create/delete/move (CLAUDE.md Top 8 Rule #5).
 
@@ -241,6 +241,10 @@
 | `/pages/golf-tournament-product.html` | **NEW** Per-style detail page (colors/sizes/full pricing) — linked from golf-tournaments-2026.html product cards | golf-tournament-product.js, .css, embroidery-pricing-service.js | ✅ Active |
 | `/memory/emailjs-custom-tees-templates.md` | **NEW** Paste-ready Subject + HTML for EmailJS `template_sample_customer`/`template_sample_sales` (Custom T-Shirts rewire of the legacy 3DT templates) + wiring checklist | EmailJS dashboard | ✅ Reference |
 | `/reference/nwcustomapparel-net-blogs/` | **NEW (2026-07-13)** Full export of the nwcustomapparel.net WordPress blog (316 .md: 227 published / 69 draft / 18 trash + `INDEX.md`). REFERENCE ONLY — **never served** (no root static) and **never republished** on teamnwca.com (= duplicate content). Consult before writing teamnwca blogs so we don't duplicate .net topics or copy its text. | Blog writing (see memory/blog-content-differentiation.md) | 📖 Reference (NEW 2026-07-13) |
+| `/reference/net-local-landing-page-template-2026-07.html` | **NEW (2026-07)** Starter HTML template for nwcustomapparel.net local landing pages targeting Tacoma-area keywords (title/meta/H1/schema, green CTA section). Reference only — paste into site and customize per city/service. | — | 📖 Reference |
+| `/reference/net-local-page-playbook-2026-07.html` | **NEW (2026-07)** Local landing page playbook — step-by-step guide for writing and publishing .net city/service pages: keyword research, template usage, internal linking, success criteria. | — | 📖 Reference |
+| `/reference/net-seo-recovery-roadmap-2026-07.html` | **NEW (2026-07)** SEO audit and traffic recovery roadmap for nwcustomapparel.net — priority fixes, redirect cleanup, content calendar, target keywords. | — | 📖 Reference |
+| `/reference/two-site-seo-coordination-guide-2026-07.html` | **NEW (2026-07)** Two-site SEO coordination guide — lane split rules between nwcustomapparel.net (authority/education) and teamnwca.com (product/commercial), overlap detection checklist, topic ownership matrix. | — | 📖 Reference |
 | `/memory/blog-content-differentiation.md` | **NEW (2026-07-13)** Blog SEO lane split: teamnwca = product/style (commercial), .net = education/authority. .net topic map + overlap watch-list (🚨 hi-vis) + rules for teamnwca blogs | Blog writing + Monday autopilot | 📖 Reference (NEW 2026-07-13) |
 | `/pages/golf-tournament-lead-emailjs-template.html` | **NEW** Reference HTML for EmailJS `template_golf_lead` (paste into EmailJS dashboard) — internal lead alert to taneisha+nika+erik | EmailJS dashboard | ✅ Reference |
 | `/pages/golf-tournament-customer-emailjs-template.html` | **NEW** Reference HTML for EmailJS `template_golf_customer` (paste into EmailJS dashboard) — customer-facing "thanks, we got your inquiry" confirmation | EmailJS dashboard | ✅ Reference |
@@ -820,6 +824,7 @@
 | `/shared_components/js/shopworks-import-parser.js` | Parse ShopWorks order text into structured data | - | ✅ Active |
 | `/shared_components/css/shopworks-import.css` | Import modal and preview styling | - | ✅ Active |
 | `/shared_components/css/old-designs.css` | Old designs archive page styling (amber theme) | - | ✅ Active |
+| `/shared_components/css/jds-submit-form.css` | **NEW** Styling for the JDS vendor-product intake form on the AE dashboard (Submit Artwork to Steve tab, 4th pill) | jds-submit-form.js | ✅ Active |
 | `/shared_components/js/old-designs.js` | Old designs image modal and Caspio enhancements | - | ✅ Active |
 
 **Features:**
@@ -915,7 +920,7 @@
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
 | ~~`/shared_components/js/dtf-quote-adapter.js`~~ | **DELETED 2026-06-09** — orphaned DTF quote adapter carrying a full hardcoded DTF price grid (re-wire trap). Zero script refs. | — | ❌ Deleted |
-| `/shared_components/js/dtf-quote-page.js` | DTF quote page initialization | — | ✅ Active |
+| ~~`/shared_components/js/dtf-quote-page.js`~~ | **DELETED 2026-07-09** — page shims/init migrated to `builders/dtf/page-ui.js` (recovery: `git show v2026.07.09.8:shared_components/js/dtf-quote-page.js`) | — | ❌ Deleted |
 
 ### Embroidery Extended Services
 | File | Purpose | Dependencies | Status |
@@ -1013,6 +1018,7 @@
 | `/shared_components/js/toast-notifications.js` | Toast notification system (success/error/info) | — | ✅ Active |
 | `/shared_components/js/elapsed-time-utils.js` | Elapsed-time badges with urgency tiers (Fresh / Waiting / Overdue) — used by all art/mockup dashboards | caspio-date-utils.js | ✅ Active |
 | `/shared_components/js/caspio-date-utils.js` | Single source of truth for parsing Caspio timestamps (Pacific server time → correct UTC instant, DST-aware). Use `window.CaspioDate.parse/formatDateTime/formatDate/formatAge` instead of any `+ 'Z'` append idiom. | — | ✅ Active |
+| `/shared_components/js/nwca-date-utils.js` | **NEW** Small generic date helpers (not Caspio-specific) — e.g. relative-date strings, week/month boundaries. For Caspio timestamp parsing use `caspio-date-utils.js` instead. | — | ✅ Active |
 | `/shared_components/js/enhanced-loading-animations.js` | Enhanced loading animations (skeleton screens, spinners) | — | ✅ Active |
 | `/shared_components/js/manual-mode-indicator.js` | Visual banner shown when pricing pages are in manual cost override mode | — | ✅ Active |
 | `/shared_components/js/header-button-functions.js` | Header button helper functions (shareQuote, etc.) | — | ✅ Active |
@@ -1023,6 +1029,8 @@
 | `/shared_components/js/jds-api-service.js` | JDS Industries API service (laser tumblers, 1hr cache) | /api/jds | ✅ Active |
 | `/shared_components/js/laser-tumbler-simple.js` | Simple laser tumbler quote flow | jds-api-service.js | ✅ Active |
 | `/shared_components/js/laser-tumbler-mockup.js` | Customer logo mockup + instant quote on the laser tumbler page — page's 4 colors only, logo upload w/ artwork warnings, drag/size canvas preview, PNG download, qty→price via formula pricing | jds-tumbler-template.js, jds-api-service.js, laser-tumbler-simple.js, /api/jds-catalog | ✅ Active |
+| `/shared_components/js/jds-catalog-service.js` | **NEW** Frontend wrapper for `/api/jds-catalog` endpoints — returns curated NWCA-side product metadata used by AE intake pickers. Distinct from `jds-api-service.js` (which targets live JDS pricing); this service targets the NWCA catalog layer. | /api/jds-catalog | ✅ Active |
+| `/shared_components/js/jds-submit-form.js` | **NEW** AE JDS Vendor Product Art Request Submit Form — custom form for AEs to submit JDS Industries product art requests (laser tumblers, mugs, awards, plaques, pens, leather patches…) to Steve. | jds-catalog-service.js, company-contact-picker.js, design-name-picker.js, /api/artrequests | ✅ Active |
 | `/shared_components/js/dp5-helper.js` | Embroidery pricing UI helper — bridges hidden Caspio matrix to custom UI | Caspio datapage | ✅ Active |
 
 ### Staff Auth & Misc Dashboards
@@ -1415,7 +1423,7 @@ cap-embroidery-fix.css
 | `/dashboards/nika-crm.html` | **NEW** Nika's Account CRM dashboard | rep-crm.js, rep-crm.css | ✅ Active |
 | `/dashboards/css/rep-crm.css` | **SHARED** CRM dashboard styles (used by both reps) | - | ✅ Active |
 | `/dashboards/js/rep-crm.js` | **SHARED** CRM service/controller (config-driven) | APP_CONFIG, REP_CONFIG | ✅ Active |
-| `/dashboards/js/rep-calendar.js` | **SHARED** Calendar logic (config-driven) | APP_CONFIG, REP_CONFIG | ✅ Active |
+| `/dashboards/js/rep-calendar.js` | **SHARED** Calendar logic (config-driven) | APP_CONFIG, REP_CONFIG | ❌ Stale path — file not found on disk (2026-08-01 audit); logic likely merged into rep-crm.js |
 | `/dashboards/house-accounts.html` | **NEW** House Account assignment dashboard | house-accounts.js, house-accounts.css | ✅ Active |
 | `/dashboards/css/house-accounts.css` | **NEW** House Accounts dashboard styles | - | ✅ Active |
 | `/dashboards/js/house-accounts.js` | **NEW** House Accounts service/controller | APP_CONFIG | ✅ Active |
@@ -1427,6 +1435,9 @@ cap-embroidery-fix.css
 | `/shared_components/js/names-numbers-service.js` | Roster API service (CRUD, Excel parse, OCR) | APP_CONFIG | ✅ Active |
 | `/shared_components/js/names-numbers-dashboard.js` | Roster dashboard logic (search, filter, KPIs) | names-numbers-service.js | ✅ Active |
 | `/shared_components/css/names-numbers.css` | Names & Numbers shared styles (blue theme) | CSS variables | ✅ Active |
+| `/shared_components/js/company-contact-picker.js` | **NEW** Hybrid grouped Company + Contact autocomplete for AE intake forms — replaces the wall-of-duplicates pattern where typing a company name returned one row per contact; now groups contacts under their company header. | /api/company-contacts/search | ✅ Active |
+| `/shared_components/js/design-name-picker.js` | **NEW** Customer-scoped design autocomplete for AE intake forms — queries `/api/digitized-designs/search-all` (Caspio `Design_Lookup_2026`, synced from ShopWorks daily) and surfaces matching designs as the AE types. | /api/digitized-designs/search-all | ✅ Active |
+| `/shared_components/js/work-order-picker.js` | **NEW** Browse-on-focus picker for ShopWorks Work Order # on AE intake forms — mirrors `DesignNamePicker` UX but sources data from ManageOrders (the OnSite/ShopWorks ERP proxy) rather than Caspio. | /api/mo/orders | ✅ Active |
 | `/dashboards/staff-login.html` | Staff authentication login page | — | ✅ Active |
 | `/dashboards/staff-portal-simple.html` | Simplified staff portal | — | ✅ Active |
 | `/dashboards/staff-portal-final.html` | Final staff portal layout | — | ✅ Active |
@@ -1486,6 +1497,8 @@ Polish + code-quality pass. Plan: `~/.claude/plans/this-is-a-big-parsed-unicorn.
 | `/shared_components/css/staff-dashboard/tokens.css` | **NEW (v3)** Design tokens — oklch + NW green, space/motion/z-index/font-size/focus-ring scales, semantic alias layer. Wrapped in `@layer tokens`. | — | 🚧 In dev |
 | `/shared_components/css/staff-dashboard/phase1-widgets.css` | **Phase 1 widgets (2026-07-20)** Pride Wall (`.pw-`) · My Stuff (`.ms-`) · **2026 Goal chip** (`.goal-chip`, header-scoped to out-specify the big `.sales-goal-banner` rules; keeps #goal* IDs + is-loading so sales-goal-controller drives it unchanged). Loaded UNLAYERED after dashboard-v3-theme.css; all values from tokens. Reduced-motion + responsive. **Win Bell (`.wb-`) removed 2026-07-23.** | tokens.css | ✅ Active |
 | `/shared_components/css/staff-dashboard/command-palette.css` | **Phase 2 (2026-07-20; re-anchored same day)** Hero search bar (`.hero-search__*`, 52px, focus-within accent ring) + anchored results panel (`.cp-panel` absolute under the bar, drops downward) + grouped results/status + fixed bottom-center copy toast. Unlayered, token-driven. | tokens.css | ✅ Active |
+| `/shared_components/css/staff-dashboard/dashboard-v3-theme.css` | **NEW** Staff Dashboard v3 unlayered theme override — same rules as the `@layer overrides {}` variant but without the layer wrapper, for cases where specificity over component defaults is needed without layer ordering. Loaded as unlayered sheet after the main `@layer` stack. | tokens.css | ✅ Active |
+| `/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css` | **NEW** Staff Dashboard v3 patch 2 — targeted incremental fixes appended to the v3 CSS stack (border-box reset restated, specificity overrides for modal and print rules that `@layer utilities` can't win). Loaded last so it always wins. | tokens.css | ✅ Active |
 | `/shared_components/js/staff-dashboard/core/dashboard-endpoints.js` | **NEW (v3)** Endpoint registry — single source of truth for every URL the dashboard hits. Reads BASE from `window.APP_CONFIG.API.BASE_URL` (Rule #7). | window.APP_CONFIG | 🚧 In dev |
 | `/shared_components/js/staff-dashboard/core/dashboard-fetch.js` | **NEW (v3)** Uniform fetch wrapper. Always throws on error (Rule #4 — no silent fallbacks), GET dedup, 30s timeout, 429 jittered retry. Exports `dashboardFetch`, `dashboardFetchJson`, `DashboardApiError`. | — | 🚧 In dev |
 | `/shared_components/js/staff-dashboard/core/dashboard-store.js` | **NEW (v3)** Versioned state store — namespaced `nwca-dash:*` keys, per-key TTL + version stamping, safe corrupt-entry recovery. Replaces 10 scattered localStorage/sessionStorage keys. | — | 🚧 In dev |
