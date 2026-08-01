@@ -5,6 +5,61 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## "Steve gets no notification" was a second submission path, not broken notification code (2026-08-01)
+
+**Problem.** Steve got no email and no Slack ping for Ruth's art requests, and Ruth got no
+confirmation — yet the artwork landed in his queue normally. Worked fine for Nika and Taneisha.
+Every instinct said the notification code was broken for one user.
+
+**Root cause.** Ruth was never using the AE dashboard form. She submits through a legacy **Caspio
+DataPage**, which writes straight into the `ArtRequests` table and never calls
+`POST /api/artrequests` — and BOTH notifications hang off that POST (browser EmailJS in
+`garment-submit-form.js sendNotificationEmails`, plus server-side Slack in the proxy's
+`art.js notifyArtRequestSubmission`). Nothing was broken; the requests never touched the code.
+The Slack webhook was set and healthy the whole time.
+
+**Why it hid.** A DataPage write is indistinguishable from an API write *in the queue* — the row
+looks normal. Only the columns give it away.
+
+**Solution.** Moved Ruth to the AE form (people fix, zero code). Shipped
+`scripts/art-request-source-audit.js` to name anyone whose NEWEST request bypassed the form.
+
+**Prevention.** 🔑 **When a feature fails for exactly one person, verify they're on the code path
+before debugging the code.** Cheapest possible test: diff their DATA against a working user's.
+Fields a form writes *unconditionally* are a free fingerprint of which form produced a row —
+here `Item_Type`/`Sales_Rep`/`Status` were empty on 6/6 of Ruth's rows and populated on everyone
+else's, and her `Garment_Placement` values weren't even options in the AE form's dropdown.
+🔑 **A second write path into a shared table silently skips every side effect** the first path
+owns. Retiring the old UI isn't enough while the DataPage URL still works.
+
+---
+
+## A stand-in fallback address is a silent-failure bug (2026-08-01)
+
+**Problem.** 14 art requests saved with `User_Email: ae@nwcustomapparel.com` and
+`Sales_Rep: Taneisha Clark`. Nobody owns that inbox, so those AEs' confirmation emails went
+nowhere and the records carried a bogus submitter.
+
+**Root cause.** `getSubmitterEmail()` in all four AE submit forms ended
+`return localStorage.getItem('userEmail') || 'ae@nwcustomapparel.com';` — inventing an identity
+when the staff session was missing instead of refusing.
+
+**Why it hid for months.** Steve's notification still arrived, because **his** address is
+hardcoded in `sendNotificationEmails` rather than derived. Only the AE's own copy vanished, and
+nobody misses an email they never expected. Found while investigating an unrelated report.
+
+**Solution.** Return `''` when unidentified; `handleSubmit()` blocks with a visible toast before
+any upload or POST. Applied to all four forms (Rule 8). `tests/unit/art-submit-identity.test.js`
+— two of its six cases grep all four files so no form can quietly reintroduce it.
+
+**Prevention.** 🔑 **A fallback identity is the same class of bug as a fallback price** — it
+manufactures plausible-looking data instead of failing. If the answer is "we don't know who this
+is", the only safe output is an error. 🔑 When one recipient of a fan-out is hardcoded and the
+rest are derived, the hardcoded one **masks** breakage in the derived ones — an alert that always
+fires proves nothing about its siblings.
+
+---
+
 ## A 200 with empty arrays is not success — the quote builder priced off seed values (2026-07-30)
 
 **Problem.** `/api/pricing-bundle` answers **HTTP 200 with `{tiersR:[], allEmbroideryCostsR:[]}`**
@@ -192,26 +247,3 @@ there is one implementation), keep and sharpen the HTTP half. 16 tests, still gr
 - **Have a skeptic try to REFUTE the audit, not confirm it.** Three passes agreed and were wrong in
   the direction that ships risk; one adversarial pass instructed to default-to-refuted found it in
   minutes. Agreement between agents that share a framing is not corroboration.
-
----
-
-## Deleting a `requireStaff` route can UNGATE the file, not remove it (2026-07-29)
-
-**Problem.** Retiring `/calculators/sticker-manual-pricing.html` meant deleting its
-`app.get([...], requireStaff, …)` route. That route was the *only* thing gating a page whose AI
-drawer could return customer email, phone, address, sales rep and payment terms.
-
-**Root cause.** `app.use('/calculators', express.static(...))` is mounted a few lines below it.
-The gated route existed *because* it sits earlier in the stack and wins. Remove it and the request
-falls through to the static mount, which cheerfully serves the same file **to anyone** — so the
-"removal" would have silently converted a staff-only page into a public one. The file was staying
-on disk (flag-don't-delete policy), which is exactly what makes this reachable.
-
-**Fix.** An explicit tombstone route at the old paths returning **410** with a signpost to the
-replacements. Verified by status code, not by reading the diff: `410`, not `200`.
-
-**Prevention.** **Before deleting any route, check whether a `static` mount covers its path.** If
-one does, the route is load-bearing access control and deleting it is a privilege escalation, not
-a cleanup — replace it with a tombstone or delete the file too. Same trap as the 2026-07-29
-`express.static('.')` repo-root exposure, one layer down: *static mounts serve whatever the router
-didn't claim.* Grep `app.use\(.*express.static` and compare against the path you're removing.
