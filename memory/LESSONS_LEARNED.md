@@ -177,9 +177,16 @@ common* posting month either — on a 9th-to-8th cycle most charges fall in the 
 off by one the other way. 🔴 **Re-read before writing when the user is working in the same table**: a
 dry run showed 40 rows, not the 92 verified minutes earlier — Erik was hand-retagging them, and to a
 third format (`26-July` vs the table's `25-Jul`). Scope the fix by a stable key (`Reference_ID LIKE
-'R%'`), not by the value being edited. **Found separately: 239 rows carry the wrong YEAR** — the Feb/
-Mar/Apr **2026** statements are stored under `25-Feb`/`25-Mar`/`25-Apr`, and `26-Feb`/`26-Mar`/
-`26-Apr` are absent; those three months are overstated and the 2026 ones missing. Unfixed.
+'R%'`), not by the value being edited. **Found separately and FIXED: 239 rows carried the wrong YEAR** — the
+Feb/Mar/Apr **2026** statements sat under `25-Feb`/`25-Mar`/`25-Apr` (each label held two
+statements) while `26-Feb`/`26-Mar`/`26-Apr` didn't exist. Split on `PayableDate` year,
+`proxy scripts/fix-atmos-statement-year.js`. 🔑 **That split is only safe for Feb–Dec: a JANUARY
+cycle runs Dec 9 → Jan 8 and legitimately spans two calendar years**, so `26-Jan` must stay mixed
+and the script refuses month 1. 🔑 **Validate a bulk relabel by asserting the SHAPE of both
+resulting sets** — each must close in the month it claims and span less than one cycle; the 2025
+and 2026 windows mirroring each other day-for-day is what proved these were two statements and
+not one messy month. ⚠️ All 239 were already `Reconciled`, so this restated closed months —
+Erik's call, taken explicitly.
 
 ---
 
