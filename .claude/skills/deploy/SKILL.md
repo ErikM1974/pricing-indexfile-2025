@@ -651,9 +651,48 @@ Then run `/deploy` on the next real change so the tag and CHANGELOG stop lagging
 | No `jq` / `python` for status parsing | Abort | Install jq (`scoop install jq` or `brew install jq`) |
 | Stale slug after release | Auto `ps:restart` → `ps:scale` cycle | Manual `heroku logs --tail` only if both fail |
 | Push to Heroku hangs | None | `Ctrl-C`, check `heroku status`, retry |
+| `fatal: Authentication failed for 'https://git.heroku.com/…'` **while `heroku auth:whoami` succeeds** | Abort at Step 12 | Git and the API authenticate SEPARATELY — see "Heroku CLI v11 git auth" below. Do NOT keep re-running `heroku login`; it cannot fix this on its own |
 | `✗ Push to main blocked` from pre-push hook | Abort — by design | You pushed to `main` by hand. Use `/deploy`. The one legitimate `--no-verify` case is the hand rollback (see Rollback Procedure) — a `Revert "Release v…"` subject never matches the allowlist |
 
 ---
+
+## Heroku CLI v11 git auth (fixed 2026-08-03 — read before "just log in again")
+
+**Symptom:** `heroku auth:whoami` prints your email, but Step 12 dies with
+`fatal: Authentication failed for 'https://git.heroku.com/sanmar-inventory-app.git/'`.
+
+**Why:** the API and git authenticate through *different* stores. CLI **v11 removed the
+`heroku git:credentials` command**, but the global git config still registered
+`credential.https://git.heroku.com.helper = !heroku git:credentials`. That helper now
+resolves to nothing, and v11's `heroku login` no longer writes `~/_netrc` either — so git
+had no credential source at all while the API worked fine. Re-running `heroku login`
+cannot fix it: the CLI stores its token in `%LOCALAPPDATA%\heroku\`, which the dead helper
+never reads. Cost ~5 rounds of "I'm logged in" / "still unauthorized" before it was found.
+
+**Fix (already applied, global config — one-time per machine):**
+
+```bash
+KEY='credential.https://git.heroku.com.helper'
+git config --global --unset-all "$KEY"
+git config --global --add "$KEY" ""
+git config --global --add "$KEY" '!f() { if [ "$1" = get ]; then echo username=heroku; echo "password=$(heroku auth:token)"; fi; }; f'
+```
+
+The empty value resets the inherited helper list **for that host only**, so Windows
+Credential Manager can't answer first with nothing usable; GitHub keeps using `manager`
+and is untouched. The helper shells out to `heroku auth:token` on every push, so it always
+uses whatever the CLI currently holds — meaning a plain `heroku login` DOES fix an expired
+token from here on.
+
+**Verify without pushing:** `git ls-remote heroku HEAD` — a SHA means auth works.
+
+⚠️ `heroku auth:token` warns the session token expires (~30 days). When deploys start
+failing again, `heroku login` is now genuinely sufficient. For a year-long token instead,
+use `heroku authorizations:create`.
+
+⚠️ **Do not run `heroku logout` to "reset" a broken login.** It empties `_netrc`, which on
+an older CLI was the *last* thing still feeding git — that turns a working git push into a
+broken one and makes the diagnosis harder.
 
 ## Environment Variables
 
