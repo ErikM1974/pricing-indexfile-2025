@@ -322,7 +322,9 @@ the carryover cancels out of it.
   after the 7/24 import. The next Friday import overwrites it back to 112 and the transform
   starts doing real work then. 🔑 **Hand-correcting an imported column is the failure this
   feature replaces** — don't do it again.
-- ⏳ **OPEN for Erik**: confirm Sothea Tann's 40 is a full annual grant, not a partial year.
+- ✅ **Sothea Tann's 40 is a FULL annual grant, not a partial year** (Erik 2026-08-03). So a
+  non-80 entitlement is a normal, permanent case — never "correct" it to 80, and never infer an
+  entitlement from tenure. Her 40/40/0 import yields carryover 0 and a slip of 40/40/0.
 
 ## 8. Before this was built: no payroll API existed
 
