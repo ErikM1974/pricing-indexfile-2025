@@ -41,6 +41,18 @@ rewriting it to canonical form — migrating in place. Locked by
   check the group count against what actually landed — 21 groups vs 21 rows named the cause exactly,
   and the survivor of each group matched row-for-row.
 
+**Tail (same day, found only by exporting the WHOLE table).** The 92 rows landed clean but carried
+`Month_Reconciled` as `Aug-26` while all 1,354 older rows use `26-Aug` — so they grouped with
+nothing. 🔑 **A format built in two places must be changed in both**: the Python
+`month_year_to_reconciled()` AND `applyRecon()` in `static/atmos_formatter.js`, which rewrites the
+column client-side when the month dropdown moves. Fixing only the server would have let the dropdown
+put the old format straight back. That JS had **no `?v=` cache-bust** either, so a stale copy would
+have done it anyway — added one off the Heroku release number. 🔑 **Verifying the rows you just
+wrote is not enough; export the whole table and compare the new rows against the existing
+convention.** Every per-row check passed — the defect was only visible next to the other 1,577 rows.
+Realigned with one `q.where`-scoped Caspio PUT touching only that field
+(`proxy scripts/fix-atmos-month-reconciled.js`), so hand edits and `Reconciled` survived.
+
 ---
 
 ## "Steve gets no notification" was a second submission path, not broken notification code (2026-08-01)
