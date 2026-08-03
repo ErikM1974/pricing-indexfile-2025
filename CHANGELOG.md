@@ -1,3 +1,9 @@
+## v2026.08.03.1 (2026.08.03)
+
+- API usage dashboard: hatch the days written by the pre-repair meter
+- Delete the Express Submit Form tab from Steve's hub
+- Deploy v2026.08.03.1: 12 files (ae-dashboard.html,art-hub-ruth.html,art-hub-steve.html,...)
+
 ## v2026.08.01.2 (2026.08.01)
 
 - Memory: the two art-notification lessons, post-deploy
