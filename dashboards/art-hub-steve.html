@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
-    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.08.01.2">
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.08.01.3">
     <link rel="stylesheet" href="/shared_components/css/mockup-ruth.css?v=2026.06.17.5">
     <link rel="stylesheet" href="/shared_components/css/kanban.css?v=2026.06.17.5">
     <link rel="stylesheet" href="/shared_components/css/transfer-actions.css?v=9">
@@ -89,11 +89,13 @@
              divider via .tab-button-link--first-external. -->
         <div class="tab-buttons">
             <button class="tab-button active" onclick="showTab('gallery', event)">Gallery View</button>
-            <!-- Retired 2026-08-01 — label says so up front, so nobody opens it
-                 expecting to submit. Tab kept (not deleted) because people have it
-                 bookmarked and a vanished tab teaches nothing; the pane explains
-                 where to go instead. -->
-            <button class="tab-button" onclick="showTab('express', event)">Express Submit Form (Retired)</button>
+            <!-- "Express Submit Form" tab DELETED 2026-08-01. Its Caspio DataPage
+                 (a0e1500073092d827fb74d968d9d) wrote straight into ArtRequests,
+                 skipping POST /api/artrequests where both submission notifications
+                 live — so those jobs reached this queue with nobody notified. The
+                 DataPage is now disabled in Caspio too. Steve never used the form
+                 (0 submissions); it was AEs, and they all moved to the AE dashboard
+                 form on 2026-06-17. Submit art at /ae-dashboard.html#submit. -->
             <a class="tab-button tab-button-link tab-button-link--first-external" href="/dashboards/bradley-transfers.html?view=steve">My Transfer Queue</a>
             <a class="tab-button tab-button-link" href="/dashboards/bradley-screenprint.html?view=steve">My Screen Print Queue</a>
             <a class="tab-button tab-button-link" href="/dashboards/supacolor-orders.html">Supacolor API Orders</a>
@@ -135,38 +137,10 @@
                 <div id="steve-kanban-board" class="kanban-board"></div>
             </div>
 
-            <!-- Express Form Tab — RETIRED 2026-08-01 -->
-            <div id="express-tab" class="tab-pane">
-                <h2 class="tab-title">Express Art Submission Form &mdash; Retired</h2>
-                <!-- The Caspio Express Form DataPage (a0e1500073092d827fb74d968d9d) that
-                     lived here wrote STRAIGHT into the ArtRequests table, so it never
-                     called POST /api/artrequests — where BOTH submission notifications
-                     live (the #art-notifications Slack post and the EmailJS send to
-                     Steve + the submitting AE). Requests made through it landed in the
-                     queue with nobody told, and with Item_Type / Sales_Rep / Status
-                     blank. That is exactly how Ruth's jobs went unannounced for months.
-                     Do NOT re-add a submission DataPage here — tests/unit/
-                     art-submit-identity.test.js fails the build if one reappears.
-                     ⚠ Deleting this embed does not disable the DataPage itself: it is
-                     still reachable at its direct c3eku948.caspio.com URL until an admin
-                     disables it in Caspio. -->
-                <div class="retired-form">
-                    <div class="retired-form-icon">&#128683;</div>
-                    <h3 class="retired-form-title">This form no longer sends notifications</h3>
-                    <p class="retired-form-body">
-                        The old Express Form wrote directly into the art queue without telling
-                        anyone &mdash; no Slack message, no email to Steve, and no confirmation
-                        to whoever submitted it. Requests made this way sat in the queue unseen.
-                    </p>
-                    <p class="retired-form-body">
-                        Use the AE Dashboard submit form instead. It captures the full artwork
-                        brief and notifies Steve the moment you submit.
-                    </p>
-                    <a class="retired-form-cta" href="/dashboards/ae-dashboard.html#submit">
-                        Go to Submit Artwork &rarr;
-                    </a>
-                </div>
-            </div>
+            <!-- Express Form pane deleted 2026-08-01 — see the tab-row comment above.
+                 Gallery is now the only pane; a stale localStorage.artistDashboardTab
+                 of 'express' hits the `if (tab)` guard in showTab() and no-ops, same
+                 as 'requirements' has since 2026-04-26. -->
 
         </div>
     </div>
@@ -287,7 +261,7 @@
     <script src="/shared_components/js/confetti.js?v=1"></script>
     <script src="/shared_components/js/caspio-date-utils.js?v=1"></script>
     <script src="/shared_components/js/elapsed-time-utils.js?v=2"></script>
-    <script src="/shared_components/js/art-hub-steve.js?v=2026.07.04.3"></script>
+    <script src="/shared_components/js/art-hub-steve.js?v=2026.08.01.4"></script>
     <script src="/shared_components/js/art-hub-steve-gallery.js?v=2026.07.07.7"></script>
     <script src="/dashboards/js/steve-send-supacolor.js?v=5"></script>
     <script src="/dashboards/js/steve-send-screenprint.js?v=2"></script>

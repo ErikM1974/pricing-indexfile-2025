@@ -66,22 +66,29 @@
         document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
 
         const tabMap = {
-            'gallery':      { index: 0, pane: 'gallery-tab' },
-            'express':      { index: 1, pane: 'express-tab' }
+            'gallery':      { index: 0, pane: 'gallery-tab' }
             // 'requirements' tab removed 2026-04-26 — content extracted to
             // /pages/art-billing-reference.html (linked from gallery toolbar).
-            // If localStorage.artistDashboardTab still says 'requirements' from
-            // before, the lookup returns undefined and the `if (tab)` guard below
-            // gracefully no-ops, leaving the active tab on its default (Gallery).
+            // 'express' tab removed 2026-08-01 — its Caspio DataPage bypassed
+            // POST /api/artrequests and so notified nobody; submit art at
+            // /ae-dashboard.html#submit.
         };
 
-        const tab = tabMap[tabName];
-        if (tab) {
-            document.querySelectorAll('.tab-button')[tab.index].classList.add('active');
-            document.getElementById(tab.pane).classList.add('active');
-        }
+        // Unknown name (a retired tab still in someone's localStorage) falls back
+        // to Gallery. It must NOT just no-op: the two clearing loops above have
+        // already stripped `active` off every button and pane, so bailing here
+        // leaves the dashboard blank with a nav LINK highlighted — observed live
+        // 2026-08-01 with a stale 'express'. An earlier comment claimed this
+        // "gracefully no-ops, leaving Gallery active"; it never did.
+        const tab = tabMap[tabName] || tabMap.gallery;
+        const button = document.querySelectorAll('.tab-button')[tab.index];
+        const pane = document.getElementById(tab.pane);
+        if (button) button.classList.add('active');
+        if (pane) pane.classList.add('active');
 
-        localStorage.setItem('artistDashboardTab', tabName);
+        // Only remember names that still resolve, so a retired tab isn't
+        // re-saved on every visit.
+        if (tabMap[tabName]) localStorage.setItem('artistDashboardTab', tabName);
     }
 
     // ── Notes Slide-Out Panel ───────────────────────────────────────────
@@ -2283,11 +2290,10 @@
         // Show skeleton placeholders immediately
         showSkeletonCards();
 
-        // Restore saved tab preference
-        const savedTab = localStorage.getItem('artistDashboardTab');
-        if (savedTab && ['express', 'requirements'].includes(savedTab)) {
-            showTab(savedTab);
-        }
+        // Saved-tab restore removed 2026-08-01. It only ever restored 'express'
+        // and 'requirements', and both panes are now gone — so it could only
+        // ever re-save a dead name. Gallery is the sole pane and is active from
+        // markup, so there is nothing left to restore.
 
         // Always default to Grid view on page load
 
