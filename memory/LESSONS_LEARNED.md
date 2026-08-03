@@ -167,6 +167,20 @@ convention.** Every per-row check passed — the defect was only visible next to
 Realigned with one `q.where`-scoped Caspio PUT touching only that field
 (`proxy scripts/fix-atmos-month-reconciled.js`), so hand edits and `Reconciled` survived.
 
+**Second tail: the month was also off by one.** `compute_default_reconciled()` returned the month
+AFTER the latest posting date, so the 6/9–7/8 statement imported as August; a BoA cycle runs ~9th
+to 8th, so that IS the July statement. 🔑 **The convention was already sitting in the table — 1,669
+rows answered both "which format" and "which month" definitively (15/15 use the closing month, 0 use
+the month after). Derive a convention from the data instead of inventing one, then replay history
+through the new rule as the test** (reproduced 11/11 correct labels). ⚠️ Don't reach for the *most
+common* posting month either — on a 9th-to-8th cycle most charges fall in the earlier month, which is
+off by one the other way. 🔴 **Re-read before writing when the user is working in the same table**: a
+dry run showed 40 rows, not the 92 verified minutes earlier — Erik was hand-retagging them, and to a
+third format (`26-July` vs the table's `25-Jul`). Scope the fix by a stable key (`Reference_ID LIKE
+'R%'`), not by the value being edited. **Found separately: 239 rows carry the wrong YEAR** — the Feb/
+Mar/Apr **2026** statements are stored under `25-Feb`/`25-Mar`/`25-Apr`, and `26-Feb`/`26-Mar`/
+`26-Apr` are absent; those three months are overstated and the 2026 ones missing. Unfixed.
+
 ---
 
 ## "Steve gets no notification" was a second submission path, not broken notification code (2026-08-01)
