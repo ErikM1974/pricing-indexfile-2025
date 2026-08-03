@@ -5,6 +5,44 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## A 23-digit ID stored as a number is 7 digits of identity — 71 of 92 payables vanished (2026-08-03)
+
+**Problem.** The Atmos credit-card formatter's CSV imported into Caspio `CreditCard_NWCA_ATMOS`
+as **21 rows out of 92**, with "value is not unique" on the rest. The 21 that landed totalled
+**−$7,564.88** against the statement's true net of **$11,426.76** — wrong data, not just partial.
+
+**Root cause.** `Reference_ID` was emitted as the BoA reference stripped to **digits only** (23 of
+them). No numeric type holds 23 digits — a 64-bit integer tops out at 19 — so Excel (on open+save)
+and a numeric Caspio field both keep the leading ~7 significant digits. On a BoA reference those
+are the **acquirer/BIN prefix: they identify the payment PROCESSOR, not the charge.** So all 21
+SUPACOLOR + all 7 ANTHROPIC + INKSOFT + SHOPIFY + ZAPIER + PADDLE + ZOHO — 33 charges — became the
+single key `24011346`, and 92 references collapsed to 21. `Reference_ID` is marked Unique, so the
+rest were rejected.
+
+**Why it hid.** BoA's own export prefixes the field `Ref: `, which makes it text and protects it
+through Excel. `_bare_ref()` stripped exactly that guard — the code removed the thing keeping the
+value safe. Import "succeeded" with a row count nobody reconciled against the statement.
+
+**Fix.** Canonical key is now `R` + digits (`_ref_key()` in `Python Inksoft/web/atmos_formatter.py`;
+`refKey()`/`refDigits()` in the proxy's `src/routes/creditcard-lookups.js`). The upsert compares on
+the bare digit run so legacy bare-digit rows still match, and PUTs against the *stored* value while
+rewriting it to canonical form — migrating in place. Locked by
+`tests/jest/creditcard-atmos-refkey.test.js` (11 tests). Caspio field must be **Text (255), Unique**.
+
+**Prevention.**
+- 🔑 **An all-digits identifier is not a number — give it a non-numeric character.** A leading
+  letter costs nothing and makes every consumer (Excel, Caspio, CSV, JSON) treat it as text.
+  It also converts a wrong field type from a *silent merge* into a *loud rejection*.
+- 🔑 **Truncation of an ID is worse than loss of an ID**: the surviving prefix is usually a
+  *grouping* code (issuer, region, vendor), so unrelated records silently merge and look plausible.
+- **Verify an import by RECONCILING A TOTAL, never by "no error appeared."** 21 rows summing to the
+  wrong sign should have been the first thing checked.
+- Diagnosing: group the source rows by the suspected mangling (float32, N-digit truncation) and
+  check the group count against what actually landed — 21 groups vs 21 rows named the cause exactly,
+  and the survivor of each group matched row-for-row.
+
+---
+
 ## "Steve gets no notification" was a second submission path, not broken notification code (2026-08-01)
 
 **Problem.** Steve got no email and no Slack ping for Ruth's art requests, and Ruth got no
@@ -268,29 +306,3 @@ first (v2026.07.29.4) then proxy (v2026.07.29.6) — reversed, every chat 401s u
   on the gated route, `400 "messages array is required"` on the open ones — they answered strangers.
   Status codes beat reading mount lines, and they cost nothing.
 - Don't demonstrate a PII hole by extracting PII. The mount line plus the 400-vs-401 split is proof.
-
----
-
-## An audit said "zero coverage loss"; the only HTTP test of a live endpoint was in that file (2026-07-29)
-
-**Problem.** Removing `contract-sticker-ai` meant removing `sticker-quote-single-path.test.js`,
-which `require`s the route's `__testables`. Three independent audit passes all certified the deletion
-as "zero"/"nil" coverage loss, because `sticker-pricing.test.js` covers the same pricing rules.
-
-**Root cause.** It covers the same *engine*, by calling `loadGrid`/`quoteStickerFromGrid` directly.
-It never builds a req/res, so it cannot see the **route envelope** — and the envelope renames things:
-engine `kind` → wire `reason`; engine `bad_input` → wire `400 {error:'bad_request'}`; plus
-`pricePerSticker`, a wire-only money field matched by exactly one line in the whole test tree. That
-deleted file was the only test driving the real Express handler for `GET /api/sticker-pricing/quote`
-— live, customer-facing, behind the public `/custom-stickers` page.
-
-**Fix.** `git mv` to `sticker-quote-route-surface.test.js`: drop the AI-parity half (vacuous once
-there is one implementation), keep and sharpen the HTTP half. 16 tests, still green.
-
-**Prevention.**
-- **"Another test covers it" is a claim about a LAYER, not a file.** Before deleting a test, ask
-  which layer it drives — pure function, route handler, or wire. `rg -l "router.stack|req, res"` over
-  the test tree finds the handful that touch HTTP; they are rarely redundant.
-- **Have a skeptic try to REFUTE the audit, not confirm it.** Three passes agreed and were wrong in
-  the direction that ships risk; one adversarial pass instructed to default-to-refuted found it in
-  minutes. Agreement between agents that share a framing is not corroboration.

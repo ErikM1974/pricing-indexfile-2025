@@ -5,6 +5,31 @@ No limit here. Newest-archived first; each entry keeps its original date.
 
 ---
 
+## An audit said "zero coverage loss"; the only HTTP test of a live endpoint was in that file (2026-07-29)
+
+**Problem.** Removing `contract-sticker-ai` meant removing `sticker-quote-single-path.test.js`,
+which `require`s the route's `__testables`. Three independent audit passes all certified the deletion
+as "zero"/"nil" coverage loss, because `sticker-pricing.test.js` covers the same pricing rules.
+
+**Root cause.** It covers the same *engine*, by calling `loadGrid`/`quoteStickerFromGrid` directly.
+It never builds a req/res, so it cannot see the **route envelope** — and the envelope renames things:
+engine `kind` → wire `reason`; engine `bad_input` → wire `400 {error:'bad_request'}`; plus
+`pricePerSticker`, a wire-only money field matched by exactly one line in the whole test tree. That
+deleted file was the only test driving the real Express handler for `GET /api/sticker-pricing/quote`
+— live, customer-facing, behind the public `/custom-stickers` page.
+
+**Fix.** `git mv` to `sticker-quote-route-surface.test.js`: drop the AI-parity half (vacuous once
+there is one implementation), keep and sharpen the HTTP half. 16 tests, still green.
+
+**Prevention.**
+- **"Another test covers it" is a claim about a LAYER, not a file.** Before deleting a test, ask
+  which layer it drives — pure function, route handler, or wire. `rg -l "router.stack|req, res"` over
+  the test tree finds the handful that touch HTTP; they are rarely redundant.
+- **Have a skeptic try to REFUTE the audit, not confirm it.** Three passes agreed and were wrong in
+  the direction that ships risk; one adversarial pass instructed to default-to-refuted found it in
+  minutes. Agreement between agents that share a framing is not corroboration.
+
+---
 ## Deleting a `requireStaff` route can UNGATE the file, not remove it (2026-07-29)
 
 **Problem.** Retiring `/calculators/sticker-manual-pricing.html` meant deleting its
