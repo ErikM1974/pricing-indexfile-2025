@@ -226,14 +226,35 @@
         var budget = p.budgetPerDay || 0;
         var max = Math.max.apply(null, days.map(function (d) { return byDay[d]; }).concat([budget]));
 
-        if (hint) hint.textContent = 'Red bars are days over the ' + num(budget) + '/day budget';
+        // Days before this were written by the meter BEFORE it was repaired, and
+        // they disagree with Caspio by -33% to +18%. Draw them, because they are
+        // real evidence of what the overage cost — but never let them read as
+        // comparable with what came after. The server owns the date so there is
+        // one definition of "trustworthy"; if it stops sending one, trust all.
+        var trustedFrom = (p.trend && p.trend.trustedFrom) || '';
+        var untrusted = trustedFrom
+            ? days.filter(function (d) { return d < trustedFrom; }).length
+            : 0;
+
+        if (hint) {
+            hint.textContent = untrusted
+                ? 'Red bars are days over the ' + num(budget) + '/day budget · ' +
+                  'the first ' + untrusted + ' bar' + (untrusted === 1 ? ' is' : 's are') +
+                  ' hatched — pre-repair meter, understated vs Caspio, not comparable'
+                : 'Red bars are days over the ' + num(budget) + '/day budget';
+        }
 
         el.innerHTML =
             '<div class="au-trend">' + days.map(function (d) {
                 var v = byDay[d];
                 var h = max ? Math.max(Math.round((v / max) * 100), 2) : 2;
-                return '<div class="au-bar' + (budget && v > budget ? ' au-bar--over' : '') + '"' +
-                    ' style="height:' + h + '%" title="' + esc(d) + ': ' + num(v) + ' calls"></div>';
+                var stale = trustedFrom && d < trustedFrom;
+                var cls = 'au-bar' +
+                    (budget && v > budget ? ' au-bar--over' : '') +
+                    (stale ? ' au-bar--untrusted' : '');
+                var tip = esc(d) + ': ' + num(v) + ' calls' +
+                    (stale ? ' — pre-repair meter, not comparable with Caspio' : '');
+                return '<div class="' + cls + '" style="height:' + h + '%" title="' + tip + '"></div>';
             }).join('') + '</div>' +
             '<div class="au-trend-axis"><span>' + esc(days[0]) + '</span><span>' + esc(days[days.length - 1]) + '</span></div>';
     }
