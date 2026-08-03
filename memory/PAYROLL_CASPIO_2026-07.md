@@ -279,10 +279,38 @@ the carryover cancels out of it.
   the seeded 0 as JSON `0`, so his slip prints.
 - 🔴 **Sick hours are NEVER transformed** — WA State paid sick leave legitimately carries over
   (statutory, up to 40 h), so sick accrued above any annual figure is expected. Jest-locked.
-- **Gates before print**: identity `accrued − used == remaining` (±0.01) and a set entitlement
-  are **blocking**; negative carryover and balances >14 days old are **warnings**. A blocked
-  employee is named in a banner, named again in the status line, and written to the audit CSV
-  as `slip_printed=no` — a missing slip is explained, never merely absent.
+- **Gates before print**: a set entitlement, the identity `accrued − used == remaining` (±0.01),
+  and `slip_used >= 0` are **blocking**; negative carryover, a borrowed/unknown as-of, and
+  balances >14 days old are **warnings**. A blocked employee is named in a banner, named again
+  in the status line, and written to the audit CSV as `slip_printed=no` — a missing slip is
+  explained, never merely absent.
+- 🔴 **THE IDENTITY ASSERTION §7.1 DOES NOT VALIDATE THE ENTITLEMENT — `slip_used >= 0` does.**
+  Caught by an adversarial review, 2026-08-03. Whenever entitlement ≤ available the `max(0,…)`
+  clamp is inert and the entitlement **cancels out**: `E − (U − (A − E)) = A − U`, which the
+  import guarantees equals remaining (it writes `Vacation_Hours_Remaining = r2(accrued − used)`).
+  So the check is a **tautology** in exactly the regime the feature exists for. Sorphorn with a
+  mis-keyed entitlement of 8 produced `slip = {accrued 8, used −48, remaining 56}` — `printable:
+  true`, `flags: []`, and "Hours used −48.00" printed on paper. The guard that works: a carryover
+  is by construction hours both accrued AND used in the prior year, so **`carryover > used` is an
+  impossible state**. 🔑 **My own comment — "holds algebraically for every case" — was the
+  evidence the check was worthless, written as if it were reassurance.**
+- ⚠️ **Residual, deliberately documented**: a mis-keyed entitlement at or above `remaining`
+  yields a self-consistent slip and is undetectable (Sorphorn 70 instead of 80 → 70/14/56, no
+  flag). Detection covers a typo of ≥24 h for her. Closing it needs a **second authority** (an
+  entitlement history, or Liesl's own grant figure), not a cleverer assertion. Pinned by test.
+- 🔴 **Each employee is scored on THEIR OWN `Leave_Balances_As_Of`, never the roster's newest.**
+  The import PUTs `Employees` one row at a time inside a try/catch, and an active employee absent
+  from the packet is never touched — so one person can sit months behind. Because the roster max
+  is always ≥ the individual, borrowing it could only ever **suppress** the §7.4 warning, for
+  exactly the person it exists to catch (measured: 178 days old, scored as 3). It also had the
+  §9 gate evaluating one person's eligibility against another's date, and printed a balance date
+  the numbers did not come from. Roster max is now a **fallback only**, and flagged when used.
+- 🔒 **Pre-existing pay leak closed in the same pass**: `reconcile()` built `rowIssues` as
+  `"NAME: gross X - deductions Y != net Z"`, and `toSafeReview()` attaches the whole verdict
+  object, so a failed reconciliation put **per-employee gross, deductions and net into the
+  browser** and rendered them — on the one page whose entire reason for existing is that
+  compensation never reaches it. 🔑 **A field-by-field allowlist protects the fields; it does
+  nothing about a formatted STRING built from the same data.** Now names the row only.
 - **Audit trail** = a `payroll-slip-audit-YYYY-MM-DD.csv` the browser downloads on every print
   run (Erik's call over a new Caspio table: zero quota, no schema change, files with the
   packet). Carries raw + adjusted + entitlement + carryover + flags per employee, and the

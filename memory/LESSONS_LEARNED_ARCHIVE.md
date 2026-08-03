@@ -51,6 +51,57 @@ No limit here. Newest-archived first; each entry keeps its original date.
 
 ---
 
+## Realization figures are meaningless until webstore orders are separated out (2026-07-30)
+
+**Problem.** "Cap 8-23 is the worst cell in the book at 80% realization" sent a whole investigation
+at a cell that was fine. Quoted cap 8-23 actually realizes **88.9%**, and the real gap is
+**~$1,500/yr**, not the implied five figures.
+
+**Root cause.** Webstore/company-store orders carry their own program pricing (Hops n Drops hats at
+$11, company stores with a dozen assorted items at flat price points) and realize **76.5%**. Averaged
+in with quoted work at **97.9%**, they drag any tier-level figure down — hardest on small tiers,
+where they are the biggest share.
+
+**Two more confounds in the same measurement.** Some orders bill decoration on its **own line**
+(`id_ProductClass` 9/10, e.g. `DECG`), so the garment line's price legitimately excludes decoration
+and reads as a deep discount. And at least one order (141715) billed 20 caps at exactly blank cost
+with **no decoration line at all** — a missing charge, not a discount.
+
+**Solution / prevention.** 🔑 **Split by `Orders.ExtSource` before computing realization** — blank =
+quoted, populated = webstore. 🔑 **Check for class-9/10 lines on the order** before treating a low
+garment price as a discount. Both are cheap; neither is optional. The three-way split
+(webstore / separate-decoration / quoted) is what turned an alarming number into a real one.
+
+⚠️ Verified by reading the raw LinesOE rows for the outlier orders. **The line-level look is what
+found it** — every aggregate up to that point agreed with the wrong answer.
+
+## A 200 with empty arrays is not success — the quote builder priced off seed values (2026-07-30)
+
+**Problem.** `/api/pricing-bundle` answers **HTTP 200 with `{tiersR:[], allEmbroideryCostsR:[]}`**
+when Caspio rate-limits, rather than erroring the way its sibling `/api/pricing-tiers` does.
+`embroidery-quote-pricing.js` pre-seeds a full tier ladder in the constructor and only replaces it
+`if (data.tiersR.length > 0)` — but set `initialized = true` regardless. So an empty 200 priced an
+entire quote from hardcoded numbers frozen at the last edit of the file, with no banner and no toast.
+
+**Root cause.** The guard tested the *shape* of the response (`if (data)`) instead of whether the
+data needed to price actually arrived. `response.ok` was true, so the catch never ran.
+
+**Why it hid.** The seed values happened to equal live Caspio, so the loss was $0 and nothing looked
+wrong. It would have broken silently the first time anyone changed a price in Caspio — i.e. exactly
+when the source-of-truth design matters.
+
+**Solution.** Throw when either array is empty/missing, which routes into the existing catch
+(apiError + critical banner + `disableQuoteCreation()`), plus a second check before
+`initialized = true`. Seed ladder kept but commented **never-authoritative** so nobody "helpfully"
+syncs it to Caspio and restores the bug. `tests/unit/emb-empty-bundle-guard.test.js`.
+
+**Prevention.** 🔑 **A fallback that happens to be correct is still a silent-wrong-price bug** —
+judge the mechanism, not today's output. And when a fixture pins a value production never sends
+(`RoundingMethod: 'HalfDollarUp'` vs the live `HalfDollarCeil_Final`), the tests exercise a branch
+that does not exist in prod: **fixtures must carry live values.**
+
+---
+
 ## A shared modal's CSS lived in ONE page's stylesheet — the other host printed the whole dashboard (2026-07-29)
 
 **Problem.** `sanmar-inbound-today.js` is loaded by BOTH `quote-management.html` and
