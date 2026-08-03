@@ -6,7 +6,7 @@
   <meta name="robots" content="noindex, nofollow">
   <title>Payroll — Northwest Custom Apparel</title>
   <link rel="icon" href="/favicon.png" type="image/png">
-  <link href="/dashboards/css/payroll.css?v=2026.07.28.3" rel="stylesheet">
+  <link href="/dashboards/css/payroll.css?v=2026.08.03.1" rel="stylesheet">
 </head>
 <body>
   <div class="pr-wrap">
@@ -33,22 +33,36 @@
         <p>Current vacation and sick hours for active employees, refreshed from the last payroll packet.
           A <strong>negative</strong> balance is not an error — staff accrue their first 40 vacation hours at
           their one-year anniversary and can run negative until then.</p>
+        <p>Where vacation accrued or used shows <span class="pr-adj-demo">112 → 80</span>, the first figure is
+          what payroll imported and the second is what the slip prints. Payroll books hours to the tax year of
+          the <em>check</em> date, so vacation taken in the last pay period of a year inflates both accrued and
+          used by the same <strong>carryover</strong> in the following year. They cancel, which is why
+          <strong>remaining is always correct as imported</strong>. Sick hours are never adjusted — Washington
+          State sick leave legitimately carries over.</p>
       </div>
       <div class="pr-toolbar">
         <input id="leave-search" class="pr-search" type="search" placeholder="Filter by name or department…" autocomplete="off">
         <button id="print-slips" class="pr-btn" type="button">🖨️ Print slips to hand out</button>
         <span id="leave-asof" class="pr-asof"></span>
       </div>
+      <div id="leave-flags" class="pr-flags" hidden></div>
       <div class="pr-tablewrap">
         <table class="pr-table">
+          <!-- Grouped header: ten columns only fit the page width once "Vac"/"Sick" is
+               said once per group instead of on every column. -->
           <thead>
             <tr>
-              <th>Employee</th><th>Department</th>
-              <th class="pr-num">Vac Accrued</th><th class="pr-num">Vac Used</th><th class="pr-num">Vac Remaining</th>
-              <th class="pr-num">Sick Accrued</th><th class="pr-num">Sick Used</th><th class="pr-num">Sick Remaining</th>
+              <th rowspan="2">Employee</th><th rowspan="2">Department</th>
+              <th colspan="5" class="pr-group-head">Vacation</th>
+              <th colspan="3" class="pr-group-head">Sick</th>
+            </tr>
+            <tr>
+              <th class="pr-num">Entitled</th><th class="pr-num">Accrued</th>
+              <th class="pr-num">Used</th><th class="pr-num">Remaining</th><th class="pr-num">Carryover</th>
+              <th class="pr-num">Accrued</th><th class="pr-num">Used</th><th class="pr-num">Remaining</th>
             </tr>
           </thead>
-          <tbody id="leave-body"><tr><td colspan="8" class="pr-loading">Loading…</td></tr></tbody>
+          <tbody id="leave-body"><tr><td colspan="10" class="pr-loading">Loading…</td></tr></tbody>
         </table>
       </div>
     </section>
@@ -130,6 +144,9 @@
     <div id="print-slips-grid"></div>
   </div>
 
-  <script src="/dashboards/js/payroll.js?v=2026.07.28.3"></script>
+  <!-- The carryover transform is a separate file so it can be unit-tested in Node
+       (tests/unit/vacation-carryover.test.js). It must load before payroll.js. -->
+  <script src="/dashboards/js/vacation-carryover.js?v=2026.08.03.1"></script>
+  <script src="/dashboards/js/payroll.js?v=2026.08.03.1"></script>
 </body>
 </html>
