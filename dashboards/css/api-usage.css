@@ -188,6 +188,25 @@
 /* Over the daily budget — the bars that explain an overage. */
 .au-bar--over { background: var(--state-danger); }
 
+/* Written by the meter BEFORE it was repaired (see ROLLUP_TRUSTED_FROM in the
+   proxy's caspio-usage-pacing.js). These days disagree with Caspio's billing by
+   -33% to +18%, so they are shown as history but hatched and faded to stop
+   anyone reading them as comparable with the days after. Hatching rather than
+   hiding: the bars ARE the evidence of what the overage cost.
+
+   Dark stripes, not white, and only a light opacity knock-back: --gray-300 is
+   already pale, so fading it further would have made these bars near-invisible
+   on a white card rather than merely secondary. Works over the red --over
+   background too, which is the combination four of these days actually hit. */
+.au-bar--untrusted {
+    opacity: 0.8;
+    background-image: repeating-linear-gradient(
+        45deg,
+        transparent 0 3px,
+        rgba(15, 23, 42, 0.28) 3px 6px
+    );
+}
+
 .au-trend-axis {
     display: flex;
     justify-content: space-between;
