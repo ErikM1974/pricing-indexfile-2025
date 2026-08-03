@@ -5,6 +5,41 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## The blog content bank was written from style numbers it never looked up — 20 of 23 drafts misdescribe products (2026-08-03)
+
+**Problem.** The weekly blog autopilot reached `best-carhartt-styles-custom-company-workwear`.
+Every publish-time check the task specifies **passed**: all 5 linked styles returned HTTP 200,
+all 5 were `PRODUCT_STATUS: "Active"`, every internal link resolved. The body was still wrong
+on all five: CT104670 called a "Duck Jacket… rugged duck canvas" (it is the **Storm Defender
+Shoreline Jacket**, a rain shell), CTK121 called a "**Crewneck**… no-hood option" (it is the
+**Midweight Hooded** Sweatshirt), CT102208 called the "Gilliam **Vest**… without the sleeves"
+(it is the Gilliam **Jacket**), CT100617 given CTK121's name, CT100615 left unnamed filler.
+A reader clicking any link lands on a product that contradicts the sentence that sold it.
+
+**Root cause.** The 2026-07-13 seeding batch generated prose *around* style numbers instead of
+*from* the catalog — the numbers are real and active, so every existence check is satisfied while
+the identity behind each number is invented. An audit across all 23 drafts found the defect is
+systemic: **only 3 drafts are clean**; 2 recommend styles that are now **Discontinued**
+(NE1000 in 6 drafts, CS413), and CornerStone `CS410`/`CS413` are sold as "tee" and "pocket tee"
+when both are **polos**.
+
+**Fix.** Published the oldest genuinely-clean draft instead (`custom-ogio-bags-polos-corporate-gifts`
+— all 5 styles Active, every prose claim corroborated by the catalog, `COMPANION_STYLES` confirming
+its one relational claim). The other 20 drafts stay Draft pending rewrite; nothing was edited.
+
+**Prevention.**
+- **`PRODUCT_STATUS: "Active"` proves a style exists, not that the sentence about it is true.**
+  Diff the prose against `PRODUCT_TITLE` for every recommended style before publishing.
+- **Check prose, not just anchor text.** An anchor-text-only audit scored the Carhartt draft
+  1 mismatch; reading the body found 5. The regex could not see errors in the description
+  sentences, which is exactly where a generated draft puts them.
+- **A bare style number as anchor text (`[PC54](…)`) is fine and reads as a false positive** —
+  rank findings by whether the anchor *asserts a wrong identity*, not by string mismatch.
+- **Content written ahead of publication decays two ways**: the catalog moves under it (the
+  documented risk) *and* it may never have been right (the undocumented one). Verify both.
+
+---
+
 ## A 23-digit ID stored as a number is 7 digits of identity — 71 of 92 payables vanished (2026-08-03)
 
 **Problem.** The Atmos credit-card formatter's CSV imported into Caspio `CreditCard_NWCA_ATMOS`
@@ -253,35 +288,3 @@ byte-identical line items.
 - **`caspioReadAll` paged without `q.orderBy`.** Caspio's paged reads are not stably ordered, so
   rows silently drop and duplicate. Load-bearing now that "absent from the read" means "not
   archived" — a dropped row would read as a deletion.
-
----
-
-## A shared modal's CSS lived in ONE page's stylesheet — the other host printed the whole dashboard (2026-07-29)
-
-**Problem.** `sanmar-inbound-today.js` is loaded by BOTH `quote-management.html` and
-`ae-mission-control.html`, but every `.sit-*` rule lived in `quote-management.css`, which only
-the first page loads. From AE Mission Control the modal opened `position: static` at
-**y = 3862px** — ~3.8 screens below the fold, so the Inbound button looked dead — with no
-scroll container, and **without `body.sit-printing > *:not(#sit-print-sheet){display:none}`**,
-so printing a report or a box label would have printed the entire dashboard.
-
-**Root cause.** A page-named stylesheet became a silent dependency of a *shared* component.
-Nothing links the two: the JS loads fine, the modal builds fine, and the failure only shows on
-the page nobody tests. It also leaned on that file's generic `.modal` / `.modal-content` /
-`.btn-cancel` **and** its global `* { box-sizing: border-box }` — no stylesheet on the AE page
-declares one, which by itself moved the panel 960px → 945px.
-
-**Fix** (`d78e1391`). `dashboards/css/sanmar-inbound.css`, loaded by every host page. Block moved
-**verbatim** (byte-identical, diffed), plus a scoped border-box reset and restatements of
-`.modal`/`.modal-content`/`.btn-cancel` at `.modal.sit-modal` specificity (0,2,0) so they win
-regardless of load order — self-contained, no dependency on any other sheet.
-
-**Prevention.**
-- **A shared JS component owns a stylesheet of the same name, loaded by every page that loads
-  the JS.** Styles for `foo.js` never live in `some-page.css`. Grep for other offenders.
-- **Verify a CSS refactor by computed-style diff, not by eye.** Snapshotting 519 elements × 41
-  properties across three configurations (pre-split re-injected inline, and each new host page)
-  proved 0 differences on quote-management.html — and caught a `font-family` I had "helpfully"
-  pinned, which would have silently restyled the whole modal.
-- **What a modal inherits is part of its contract**: `box-sizing`, `color`, `font-family` all
-  came from the host page. List them explicitly before moving a component between hosts.

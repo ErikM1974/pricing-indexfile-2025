@@ -5,6 +5,37 @@ No limit here. Newest-archived first; each entry keeps its original date.
 
 ---
 
+## A shared modal's CSS lived in ONE page's stylesheet — the other host printed the whole dashboard (2026-07-29)
+
+**Problem.** `sanmar-inbound-today.js` is loaded by BOTH `quote-management.html` and
+`ae-mission-control.html`, but every `.sit-*` rule lived in `quote-management.css`, which only
+the first page loads. From AE Mission Control the modal opened `position: static` at
+**y = 3862px** — ~3.8 screens below the fold, so the Inbound button looked dead — with no
+scroll container, and **without `body.sit-printing > *:not(#sit-print-sheet){display:none}`**,
+so printing a report or a box label would have printed the entire dashboard.
+
+**Root cause.** A page-named stylesheet became a silent dependency of a *shared* component.
+Nothing links the two: the JS loads fine, the modal builds fine, and the failure only shows on
+the page nobody tests. It also leaned on that file's generic `.modal` / `.modal-content` /
+`.btn-cancel` **and** its global `* { box-sizing: border-box }` — no stylesheet on the AE page
+declares one, which by itself moved the panel 960px → 945px.
+
+**Fix** (`d78e1391`). `dashboards/css/sanmar-inbound.css`, loaded by every host page. Block moved
+**verbatim** (byte-identical, diffed), plus a scoped border-box reset and restatements of
+`.modal`/`.modal-content`/`.btn-cancel` at `.modal.sit-modal` specificity (0,2,0) so they win
+regardless of load order — self-contained, no dependency on any other sheet.
+
+**Prevention.**
+- **A shared JS component owns a stylesheet of the same name, loaded by every page that loads
+  the JS.** Styles for `foo.js` never live in `some-page.css`. Grep for other offenders.
+- **Verify a CSS refactor by computed-style diff, not by eye.** Snapshotting 519 elements × 41
+  properties across three configurations (pre-split re-injected inline, and each new host page)
+  proved 0 differences on quote-management.html — and caught a `font-family` I had "helpfully"
+  pinned, which would have silently restyled the whole modal.
+- **What a modal inherits is part of its contract**: `box-sizing`, `color`, `font-family` all
+  came from the host page. List them explicitly before moving a component between hosts.
+
+---
 ## A security fix landed on ONE route; six identical siblings sat open for 5 days (2026-07-29)
 
 **Problem.** Six proxy AI routes — `contract-embroidery-ai`, `contract-dtg-ai`, `contract-emblem-ai`,
