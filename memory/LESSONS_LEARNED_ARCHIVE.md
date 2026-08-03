@@ -5,6 +5,38 @@ No limit here. Newest-archived first; each entry keeps its original date.
 
 ---
 
+## A security fix landed on ONE route; six identical siblings sat open for 5 days (2026-07-29)
+
+**Problem.** Six proxy AI routes — `contract-embroidery-ai`, `contract-dtg-ai`, `contract-emblem-ai`,
+`contract-webstore-ai`, `dtg-quote-ai`, `emb-quote-ai` — each declare a `lookup_customer` tool
+returning company, contact, email, phone, address, sales rep, payment terms and last-ordered date,
+five matches for any 2-char query. All six were mounted with only a per-IP rate limiter. The
+customer list was readable with curl. Each request also spends Anthropic tokens, so it was an open
+tab on the bill as well.
+
+**Root cause.** The identical hole was found and fixed on `contract-sticker-ai` on 2026-07-24. The
+fix was applied to that one mount and stopped there. Nothing swept the siblings, and the file's own
+comment had been advertising the gap the whole time: *"These are unauthenticated … (Coarse guard;
+true protection is auth — TODO.)"* A TODO is not a ticket.
+
+**How it surfaced.** Only because a *removal* task made me diff the sticker route against its
+family. Nobody was looking for it.
+
+**Fix.** The sticker pattern, applied to all six: a session-gated forwarder per route in the app
+(`requireStaff` + `CRM_API_SECRET`, one loop, app path mirrors proxy path), each browser caller
+repointed to same-origin, then `requireCrmApiSecret` added to all six proxy mounts. App shipped
+first (v2026.07.29.4) then proxy (v2026.07.29.6) — reversed, every chat 401s until the app catches up.
+
+**Prevention.**
+- **A security fix on one member of a family is not done until you have swept the family.** Grep for
+  the shape (`app.use('/api/…-ai'`), not the instance. Sibling routes that "mirror" each other in a
+  header comment mirror each other's holes too.
+- **Probe, don't read.** An anonymous POST with an empty body told the whole story in one line: 401
+  on the gated route, `400 "messages array is required"` on the open ones — they answered strangers.
+  Status codes beat reading mount lines, and they cost nothing.
+- Don't demonstrate a PII hole by extracting PII. The mount line plus the 400-vs-401 split is proof.
+
+---
 ## An audit said "zero coverage loss"; the only HTTP test of a live endpoint was in that file (2026-07-29)
 
 **Problem.** Removing `contract-sticker-ai` meant removing `sticker-quote-single-path.test.js`,
