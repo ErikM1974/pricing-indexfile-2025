@@ -1,4 +1,50 @@
-# LESSONS LEARNED — ARCHIVE
+# L
+## Two renderings of the same timestamp never compared equal, so a sync re-wrote 456 orders a day forever (2026-07-29)
+
+**Problem.** `sync-manageorders` spent **2,901 billed Caspio calls in 22 minutes** — ~18% of the
+whole 16,129/day budget. It looked like legitimate churn in a 60-day window.
+
+**Root cause.** The ManageOrders API returns `"2026-07-27T00:00:00.000Z"`; Caspio hands the same
+value back as `"2026-07-27T00:00:00"` — no milliseconds, no zone. `normalize()` was
+`String(val).trim()`, so the two renderings of one instant were **never equal**. Every order
+carrying `date_Shipped`, `date_Invoiced` or `date_Produced` was detected as "changed" on **every
+run, forever**, re-PUT and had its entire line-item set deleted and re-posted. Measured: 457 of
+611 orders flagged — 403 / 43 / 10 on those three date fields, and exactly **one** real change (a
+`CustomerName` edit). Confirmed structurally: 402 of the newest 611 archived orders carry a
+`date_Shipped`; 403 were flagged on it.
+
+**Solution.** Canonicalise ISO datetimes to `YYYY-MM-DDTHH:MM:SS` before comparing — format noise
+only; a different date *or time-of-day* still registers. Same dry run afterwards: **457 → 1**.
+Second layer: compare line-item CONTENT before rewriting, so even a real order change (a payment
+posting) does not delete-and-repost identical rows. 29 of 29 sampled changed-orders had
+byte-identical line items.
+
+**Prevention.**
+- **A round-trip through a datastore is a format conversion.** Never compare a value you just sent
+  against the value it hands back without canonicalising first — especially dates, which every
+  system renders differently. Print both raw representations side by side before trusting `!==`.
+- **A change-detector that always fires is indistinguishable from a busy business.** If "changed"
+  counts sit near 100% of the window every run, suspect the comparator, not the data. Break the
+  count down BY TRIGGER FIELD — 403/43/10 on three date fields and 1 on everything else named the
+  bug instantly, where the total never would have.
+- **Prefer comparing content over guessing which upstream field implies a change.** The tempting
+  heuristic here — "only re-sync line items when `TotalProductQuantity` moves" — silently misses a
+  colour or description edit that leaves totals untouched, and that stale `PartColor` feeds
+  `check-zero-billing`'s match.
+- **Measure the fix against live data before shipping.** A read-only dry run using the real
+  exported helpers gave 457 → 1 and 29/29 identical, which is what turned an estimate into a number.
+
+### Found in passing, both worse than the cost bug
+
+- **`syncLineItems` was DELETE-then-fetch.** A rate-limited ManageOrders read (`fetchWithRetry`
+  throws after 3 attempts — I tripped exactly this with 11 consecutive 429s while sampling) left
+  the archive rows destroyed with nothing to put back. **Fetch first; remove nothing until the
+  replacement is in hand.**
+- **`caspioReadAll` paged without `q.orderBy`.** Caspio's paged reads are not stably ordered, so
+  rows silently drop and duplicate. Load-bearing now that "absent from the read" means "not
+  archived" — a dropped row would read as a deletion.
+
+ESSONS LEARNED — ARCHIVE
 
 Entries retired from `LESSONS_LEARNED.md` to keep it under its 300-line cap.
 No limit here. Newest-archived first; each entry keeps its original date.

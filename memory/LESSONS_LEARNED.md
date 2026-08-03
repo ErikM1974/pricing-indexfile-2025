@@ -5,6 +5,50 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## The vacation slip printed the accountant's tax year, not the employee's (2026-08-03)
+
+**Problem.** Sorphorn Sorm's slip read **112 accrued / 56 used / 56 remaining**. Both figures
+were wrong by the same 32 hours; it should read **80 / 24 / 56**.
+
+**Root cause.** Payroll books hours to the tax year of the **check date**, not the work date.
+She took 32 h on 12/22, 12/23, 12/29 and 12/30 of 2025 — a pay period whose check date was
+01/09/2026. Those hours therefore land in the 2026 payroll year and on her 2026 W-2, and to pay
+them the system carried 32 h of 2025 balance forward. **Accrued and used are both inflated by
+the same carryover, so they cancel** — which is why remaining was right the whole time and the
+defect was invisible in the one column anyone checks. Correct cash-basis accounting on the
+accountant's side; a display problem on ours.
+
+**Solution.** New hand-maintained Caspio column `Employees.Vacation_Annual_Entitlement`, read
+live at slip time: `carryover = max(0, available − entitlement)`, `slip_accrued = entitlement`,
+`slip_used = used − carryover`, `slip_remaining = remaining` untouched. Blocking gates before
+anything reaches paper (`accrued − used == remaining` ±0.01; entitlement must be set) and a
+per-run audit CSV carrying raw + adjusted + carryover + flags.
+
+**Prevention.**
+- 🔑 **Two errors that cancel leave one clean column and no symptom.** Remaining reconciled
+  perfectly for months while both inputs were wrong. When a derived figure is right, that is
+  evidence about the *derivation*, not about its inputs — check the source columns too. (Same
+  shape as the 2026-07-27 finding where `Sick_Hours_Remaining` was correct while
+  `Sick_Accum_Hours_Available` sat at 0.)
+- 🔑 **An "as of" date is not a date field, it is the frame every derived value must be read
+  in.** The entitlement is date-effective off `Leave_Balances_As_Of`, never `today` — otherwise
+  reprinting July's packet in September silently prints September's grant.
+- 🔴 **Never store a hand-maintained value in a column an importer writes.** The Friday import
+  overwrites all three `Vacation_Hours_*` columns; the entitlement had to be its own field or it
+  would be destroyed weekly. The tell that this was already happening: someone had hand-patched
+  Sorphorn to 80/24/56 in Caspio, and the next import would have silently reverted it.
+- 🔴 **`Number('') === 0`.** Caspio returns a blank NUMBER as `''`, so blank and zero collapse
+  under any numeric coercion. Here blank must *block* the slip while 0 is legitimate (salaried
+  staff) — the two had to be separated explicitly, and the round-trip verified against live
+  Caspio rather than assumed.
+- 🔴 **Do not generalise a correction to the neighbouring field because it looks similar.**
+  Sick hours carry over year to year *by Washington statute*, so the identical-looking inflation
+  there is correct. Both rules are jest-locked precisely because "fixing" sick too is the
+  obvious next mistake.
+- 🔑 **When a computed figure can't be trusted, refuse to print it — don't print a guess.** A
+  missing entitlement defaults to nothing, never to 80; the employee is named in a banner and in
+  the audit CSV so a missing slip is explained rather than merely absent.
+
 ## The blog content bank was written from style numbers it never looked up — 20 of 23 drafts misdescribe products (2026-08-03)
 
 **Problem.** The weekly blog autopilot reached `best-carhartt-styles-custom-company-workwear`.
@@ -242,49 +286,3 @@ garment price as a discount. Both are cheap; neither is optional. The three-way 
 
 ⚠️ Verified by reading the raw LinesOE rows for the outlier orders. **The line-level look is what
 found it** — every aggregate up to that point agreed with the wrong answer.
-
----
-## Two renderings of the same timestamp never compared equal, so a sync re-wrote 456 orders a day forever (2026-07-29)
-
-**Problem.** `sync-manageorders` spent **2,901 billed Caspio calls in 22 minutes** — ~18% of the
-whole 16,129/day budget. It looked like legitimate churn in a 60-day window.
-
-**Root cause.** The ManageOrders API returns `"2026-07-27T00:00:00.000Z"`; Caspio hands the same
-value back as `"2026-07-27T00:00:00"` — no milliseconds, no zone. `normalize()` was
-`String(val).trim()`, so the two renderings of one instant were **never equal**. Every order
-carrying `date_Shipped`, `date_Invoiced` or `date_Produced` was detected as "changed" on **every
-run, forever**, re-PUT and had its entire line-item set deleted and re-posted. Measured: 457 of
-611 orders flagged — 403 / 43 / 10 on those three date fields, and exactly **one** real change (a
-`CustomerName` edit). Confirmed structurally: 402 of the newest 611 archived orders carry a
-`date_Shipped`; 403 were flagged on it.
-
-**Solution.** Canonicalise ISO datetimes to `YYYY-MM-DDTHH:MM:SS` before comparing — format noise
-only; a different date *or time-of-day* still registers. Same dry run afterwards: **457 → 1**.
-Second layer: compare line-item CONTENT before rewriting, so even a real order change (a payment
-posting) does not delete-and-repost identical rows. 29 of 29 sampled changed-orders had
-byte-identical line items.
-
-**Prevention.**
-- **A round-trip through a datastore is a format conversion.** Never compare a value you just sent
-  against the value it hands back without canonicalising first — especially dates, which every
-  system renders differently. Print both raw representations side by side before trusting `!==`.
-- **A change-detector that always fires is indistinguishable from a busy business.** If "changed"
-  counts sit near 100% of the window every run, suspect the comparator, not the data. Break the
-  count down BY TRIGGER FIELD — 403/43/10 on three date fields and 1 on everything else named the
-  bug instantly, where the total never would have.
-- **Prefer comparing content over guessing which upstream field implies a change.** The tempting
-  heuristic here — "only re-sync line items when `TotalProductQuantity` moves" — silently misses a
-  colour or description edit that leaves totals untouched, and that stale `PartColor` feeds
-  `check-zero-billing`'s match.
-- **Measure the fix against live data before shipping.** A read-only dry run using the real
-  exported helpers gave 457 → 1 and 29/29 identical, which is what turned an estimate into a number.
-
-### Found in passing, both worse than the cost bug
-
-- **`syncLineItems` was DELETE-then-fetch.** A rate-limited ManageOrders read (`fetchWithRetry`
-  throws after 3 attempts — I tripped exactly this with 11 consecutive 429s while sampling) left
-  the archive rows destroyed with nothing to put back. **Fetch first; remove nothing until the
-  replacement is in hand.**
-- **`caspioReadAll` paged without `q.orderBy`.** Caspio's paged reads are not stably ordered, so
-  rows silently drop and duplicate. Load-bearing now that "absent from the read" means "not
-  archived" — a dropped row would read as a deletion.

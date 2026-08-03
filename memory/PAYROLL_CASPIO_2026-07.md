@@ -237,7 +237,66 @@ extraction reproduces the packet's own printed totals.
   the parse path could not be exercised locally — reads, gating and UI were verified end-to-end
   against real Caspio data; the upload is unproven until it runs in production.
 
-## 7. Before this was built: no payroll API existed
+## 7. ✅ Vacation carryover correction — BUILT 2026-08-03
+
+**The slip was printing the accountant's tax-year figures, not the employee's year.** Payroll
+books hours to the tax year of the **check** date. Vacation taken in the last pay period of a
+calendar year is paid on a January check, so it lands in the *next* payroll year — and to pay
+it, the prior year's balance is carried forward. Both accrued and used arrive inflated by the
+same carryover and **cancel**:
+
+```
+Sorphorn Sorm 2026 imports 112 / 56 / 56   (32 h taken 12/22, 12/23, 12/29, 12/30 2025,
+  112 = 80 (2026 grant) + 32 carried in     paid on the 01/09/2026 check)
+   56 = 24 (real 2026 use) + 32 the same
+   56 = 80 − 24 ✔                           slip must read 80 / 24 / 56
+```
+
+This is correct cash-basis accounting on Liesl's side — **a display problem on ours only**.
+🔑 **`Vacation_Hours_Remaining` is the ONE imported figure that needs no adjustment**, because
+the carryover cancels out of it.
+
+- **New Caspio column `Vacation_Annual_Entitlement`** (NUMBER, `Employees`, created + seeded
+  for all 16 actives 2026-08-03; read back verified). 🔴 **It MUST be its own column** — the
+  Friday import overwrites all three `Vacation_Hours_*` columns, so parking the entitlement in
+  one of them destroys it on the next import and silently reverts Sorphorn to 112.
+  `Vacation_Eligible_Hours` is **not** a substitute (set only for non-vested staff — Clark alone).
+  Erik hand-maintains it; the dashboard reads it live; nothing in code hardcodes a table.
+  Seed/repair script: proxy `scripts/add-vacation-entitlement-field.js` (dry-run default,
+  re-runnable, `--force` required to overwrite a hand-set value).
+- **Transform** (`dashboards/js/vacation-carryover.js`, 47 jest tests):
+  `carryover = max(0, available − entitlement)` · `slip_accrued = entitlement` ·
+  `slip_used = used − carryover` · `slip_remaining = remaining` (untouched).
+  🔴 **Never hardcode 32** — it changes with each December and clears at the year rollover.
+- 🔑 **Date-effective entitlement without a second column**: `entitlementInForce()` returns 0
+  when `asOf < Vacation_Eligible_Date`, else the stored value. That is exactly Taneisha Clark's
+  0 → 40 on **2026-08-12**, using a column Caspio already carries, and it needs no edit on the
+  day. It keys off `Leave_Balances_As_Of`, **not today**, so a reprint of an old packet is
+  still right.
+- 🔴 **Blank ≠ 0.** Caspio returns an empty NUMBER as `''` and `Number('') === 0`. A blank
+  entitlement **blocks the slip** (never defaults to 80 — a guess prints a wrong number on
+  paper); a real 0 is legitimate (Jim Mickelson, salaried). Verified live: Caspio round-trips
+  the seeded 0 as JSON `0`, so his slip prints.
+- 🔴 **Sick hours are NEVER transformed** — WA State paid sick leave legitimately carries over
+  (statutory, up to 40 h), so sick accrued above any annual figure is expected. Jest-locked.
+- **Gates before print**: identity `accrued − used == remaining` (±0.01) and a set entitlement
+  are **blocking**; negative carryover and balances >14 days old are **warnings**. A blocked
+  employee is named in a banner, named again in the status line, and written to the audit CSV
+  as `slip_printed=no` — a missing slip is explained, never merely absent.
+- **Audit trail** = a `payroll-slip-audit-YYYY-MM-DD.csv` the browser downloads on every print
+  run (Erik's call over a new Caspio table: zero quota, no schema change, files with the
+  packet). Carries raw + adjusted + entitlement + carryover + flags per employee, and the
+  reason string `prior-year vacation paid on a current-year check date`.
+- **Slip now prints accrued/used/remaining for BOTH vacation and sick** (was: vac used, vac
+  remaining, sick remaining). Still 6 slips/sheet — measured in Chromium under print media at
+  3.333 in, ~0.68 in of slack per slip.
+- ⚠️ **Sorphorn read 80/24/56 in Caspio on 2026-08-03, not 112/56/56** — a hand-patch applied
+  after the 7/24 import. The next Friday import overwrites it back to 112 and the transform
+  starts doing real work then. 🔑 **Hand-correcting an imported column is the failure this
+  feature replaces** — don't do it again.
+- ⏳ **OPEN for Erik**: confirm Sothea Tann's 40 is a full annual grant, not a partial year.
+
+## 8. Before this was built: no payroll API existed
 
 The proxy still has **zero** endpoints touching `Employees` / `Payroll_Register` / any HR table.
 Rates and leave are editable **directly in Caspio** (datasheet or the Human Resources 2025 bridge app),
