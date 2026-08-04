@@ -23,7 +23,7 @@
 <script src="https://cdn.jsdelivr.net/npm/ag-psd@27/dist/bundle.js" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" integrity="sha512-q+4liFwdPC/bNdhUpZx6aXDx/h77yEQtn4I1slHydcbZK34nLaR3cAeYSJshoxIOq3mjEf7xJE8YWIUHMn+oCQ==" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha512-XMVd28F1oH/O71fzwBnV7HucLxVwtxf26XV8P4wPk26EDxuGZ91N8bsOttmnomcCD3CS5ZMRL50H0GgOHvegtg==" crossorigin="anonymous"></script>
-<link rel="stylesheet" href="/pages/css/garment-designer.css?v=2026.06.20.13">
+<link rel="stylesheet" href="/pages/css/garment-designer.css?v=2026.08.04.1">
 <link rel="stylesheet" href="/shared_components/css/garment-submit-form.css?v=2026.07.04.1">
 <!-- Text tool — curated decoration fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -60,49 +60,38 @@
   <!-- Viewer -->
   <div id="viewerCol">
     <div id="toolbar" class="visible">
-      <!-- ADD -->
-      <div class="tb-group">
+      <!-- ADD — always visible -->
+      <div class="tb-group" data-label="Add">
         <button class="easy-main-btn primary" onclick="pickSide('front')">⬆ Add Front Logo</button>
         <button class="easy-main-btn primary" onclick="pickSide('back')">⬆ Add Back Logo</button>
         <button class="easy-main-btn" id="addTextBtn" title="Add editable text to the mockup">➕ Add Text</button>
       </div>
-      <div class="easy-divider"></div>
-      <!-- STYLE -->
-      <div class="tb-group">
+      <!-- SHIRT — always visible -->
+      <div class="tb-group" data-label="Shirt">
         <button class="easy-main-btn" id="palBtn" onclick="toggleColorDrawer()" title="Pick shirt color">🎨 Shirt Color</button>
         <select class="fabric-select" id="garmentStyleSelect" title="Garment style shown in the mockup" aria-label="Garment style"></select>
-        <button class="easy-main-btn" id="removeBgBtn" onclick="removeBgClick()" aria-pressed="false" title="Remove the white background from the logo">⬜ Remove White BG</button>
-        <select class="fabric-select" id="fabricSelect" onchange="setFabricType(this.value)" title="Garment fabric affects best print method">
-          <option value="cotton" selected>Cotton shirt</option>
-          <option value="blend">Cotton/poly blend</option>
-          <option value="polyester">Polyester</option>
-          <option value="nylon">Nylon</option>
-          <option value="unknown">Fabric unknown</option>
-        </select>
       </div>
-      <div class="easy-divider"></div>
-      <!-- PREVIEW -->
-      <div class="tb-group">
+      <!-- ARTWORK TOOLS — appear once art exists (body.has-art) -->
+      <div class="tb-group needs-art" data-label="Artwork">
+        <button class="easy-main-btn" id="removeBgBtn" onclick="removeBgClick()" aria-pressed="false" title="Remove the white background from the logo">⬜ Remove White BG</button>
+        <button class="details-btn" id="artDetailsBtn" onclick="openArtDetails()" title="View file and ink color details">ℹ️ Art Details</button>
+        <button class="details-btn" id="threadColorsBtn" onclick="openThreadColors()" title="Choose Robison-Anton Poly thread colors for DST files">🧵 Thread Colors</button>
+      </div>
+      <!-- REVIEW — appear once art exists -->
+      <div class="tb-group needs-art" data-label="Review">
         <button class="easy-main-btn" id="modelViewBtn" onclick="forceModelView()" title="Return to the shirt model view">👕 Model View</button>
-        <button class="easy-main-btn" id="spinBtn" onclick="toggleSpinPreview()" title="Spin the finished design">🔄 Spin Preview</button>
+        <button class="easy-main-btn" id="spinBtn" onclick="toggleSpinPreview()" title="Spin the finished design">🔄 Spin</button>
         <button class="easy-main-btn gold" id="proofBtn" onclick="printProofSheet()" title="Print or save customer proof">🖨 Customer Proof</button>
       </div>
-      <div class="easy-divider"></div>
-      <!-- DELIVER -->
-      <div class="tb-group">
+      <!-- SEND — appear once art exists -->
+      <div class="tb-group needs-art" data-label="Send">
         <button class="easy-main-btn download" id="dlBtn" onclick="downloadPNG()">⬇ Download PNG</button>
         <button class="easy-main-btn save-req" id="saveReqBtn" onclick="saveToArtRequest()" title="Attach this mockup to the art request as a reference for Steve" style="display:none;">💾 Save to Art Request</button>
         <button class="easy-main-btn send-steve" id="sendSteveBtn" title="Forward this mockup to Steve and complete the art-submission form">🧵 Send to Steve</button>
         <button class="easy-main-btn send-customer" id="sendCustomerBtn" title="Email this mockup to the customer for approval">📧 Send to Customer</button>
       </div>
-      <div class="easy-divider"></div>
-      <!-- DETAILS -->
-      <div class="tb-group">
-        <button class="details-btn" id="artDetailsBtn" onclick="openArtDetails()" title="View file and ink color details">ℹ️ Art Details</button>
-        <button class="details-btn" id="threadColorsBtn" onclick="openThreadColors()" title="Choose Robison-Anton Poly thread colors for DST files">🧵 Thread Colors</button>
-      </div>
       <div id="contrastWarn" class="contrast-warn" role="alert" style="display:none;"></div>
-      <div class="easy-status"><span class="easy-dot"></span><span>Step 1: choose front or back, then snap to a recommended placement</span></div>
+      <div class="easy-status"><span class="easy-dot"></span><span>Start by adding front or back artwork — or drag a file anywhere on the page</span></div>
 
       <div class="easy-hidden-tools" aria-hidden="true">
         <button class="tbtn" onclick="pickFiles()">📂 Open files</button>
@@ -118,7 +107,6 @@
         <input type="color" id="bgCustom" value="#3a6ea5">
         <button class="tbtn" id="eyeBtn" onclick="toggleEyedrop()">💧</button>
         <span id="eyeChip"><span class="dot" id="eyeDot"></span><span id="eyeHex"></span></span>
-        <div id="pageNav"><button class="tbtn" id="prevPage" onclick="changePage(-1)">‹</button><span id="pageLabel">Page 1 / 1</span><button class="tbtn" id="nextPage" onclick="changePage(1)">›</button></div>
         <button class="tbtn" id="mockBtn" onclick="toggleMockup()">👕 Mockup</button>
         <button class="tbtn" id="sideFrontBtn" onclick="setPrintSide('front')">Front</button>
         <button class="tbtn" id="sideBackBtn" onclick="setPrintSide('back')">Back</button>
@@ -136,6 +124,7 @@
     <div id="stageWrap">
       <div id="stage">
         <div id="canvasHolder" role="img" aria-label="T-shirt mockup preview — use the controls to change shirt color, placement, and artwork"></div>
+        <div id="pageNav" class="stage-pagenav"><button class="tbtn" id="prevPage" onclick="changePage(-1)">‹</button><span id="pageLabel">Page 1 / 1</span><button class="tbtn" id="nextPage" onclick="changePage(1)">›</button></div>
         <div class="stage-empty-note" id="stageEmptyNote">Use <b>Add Front Logo</b> or <b>Add Back Logo</b>. Artwork will stay on the shirt model automatically.</div>
         <div id="stageMsg">
           <div class="spinner" id="msgSpinner"></div>
@@ -147,28 +136,24 @@
           <div class="easy-hero">
             <div class="easy-hero-card">
               <h2>Start with the shirt.</h2>
-              <p class="lead">Upload artwork directly to the front or back. Then pick the shirt color, adjust placement, spin it, and print a customer proof.</p>
+              <p class="lead">Your mockup builds on a real shirt you can recolor, spin, and send for approval.</p>
               <canvas id="landingPreview" style="border-radius:14px;box-shadow:0 6px 24px rgba(20,40,10,.12);"></canvas>
             </div>
             <div class="easy-hero-card">
-              <h2>What are you adding?</h2>
+              <h2>Add your artwork</h2>
+              <p class="lead">Pick a side — the art snaps to a recommended placement. Drag, resize, and fine-tune after.</p>
               <div class="easy-upload-grid">
-                <div class="easy-upload-card" onclick="pickSide('front')">
-                  <strong>⬆ Front Logo</strong>
-                  <span>Use this for left chest, full front, or center chest artwork.</span>
-                </div>
-                <div class="easy-upload-card" onclick="pickSide('back')">
-                  <strong>⬆ Back Logo</strong>
-                  <span>Use this for full back, shoulder blade, or event graphics.</span>
-                </div>
+                <button type="button" class="easy-upload-card" onclick="pickSide('front')">
+                  <strong>⬆ Front artwork</strong>
+                  <span>Left chest, full front, or center chest.</span>
+                </button>
+                <button type="button" class="easy-upload-card" onclick="pickSide('back')">
+                  <strong>⬆ Back artwork</strong>
+                  <span>Full back, upper back, or event graphics.</span>
+                </button>
               </div>
-              <div class="easy-step-strip">
-                <div><b>1. Add Art</b>Front or back.</div>
-                <div><b>2. Pick Color</b>Choose shirt color.</div>
-                <div><b>3. Place It</b>Size and center.</div>
-                <div><b>4. Approve</b>Spin and proof.</div>
-              </div>
-              <p style="margin-top:14px;font-size:12px;color:var(--text-dim);line-height:1.5;">PNG, JPG, SVG, WEBP, AI, PSD, CDR, and PDF files are read right in your browser. Mockups upload only when you Save or Send.</p>
+              <button type="button" class="easy-text-start" onclick="addTextEntry()">➕ No art file yet? Start with text</button>
+              <p class="easy-formats">Or drag &amp; drop a file anywhere on this page.<br>PNG · JPG · SVG · WEBP · AI · PSD · CDR · PDF · EPS · DST — files are read in your browser and upload only when you save or send.</p>
             </div>
           </div>
         </div>
@@ -176,15 +161,7 @@
 
       <!-- Info panel -->
       <aside id="infoPanel">
-        <div class="side-head">Designer controls</div>
-        <div class="start-panel">
-          <h3>Start Here</h3>
-          <p>Choose where the uploaded artwork should go. Front uploads can snap to Left Chest or Full Front. Back uploads can snap to Upper Back or Full Back.</p>
-          <div class="start-big-grid">
-            <button class="start-big" onclick="pickSide('front')"><span class="icon">F</span><span><b>Add Front Artwork</b><span>Left chest, center chest, or full front.</span></span></button>
-            <button class="start-big" onclick="pickSide('back')"><span class="icon">B</span><span><b>Add Back Artwork</b><span>Full back or event artwork.</span></span></button>
-          </div>
-        </div>
+        <div class="side-head">Advisors</div>
         <div class="advisor-card" id="printAdvisorCard">
           <div class="advisor-head">
             <div class="advisor-title">Print Method Advisor</div>
@@ -197,6 +174,16 @@
             <div class="advisor-metric"><b>Clarity</b><span id="advisorQuality">—</span></div>
             <div class="advisor-metric"><b>Fabric</b><span id="advisorFabric">Cotton</span></div>
             <div class="advisor-metric"><b>Screen print</b><span id="advisorScreen">—</span></div>
+          </div>
+          <div class="advisor-fabric-row">
+            <label for="fabricSelect">Garment fabric</label>
+            <select class="fabric-select" id="fabricSelect" onchange="setFabricType(this.value)" title="Garment fabric affects the best print method">
+              <option value="cotton" selected>Cotton shirt</option>
+              <option value="blend">Cotton/poly blend</option>
+              <option value="polyester">Polyester</option>
+              <option value="nylon">Nylon</option>
+              <option value="unknown">Fabric unknown</option>
+            </select>
           </div>
           <div class="advisor-actions">
             <button onclick="openArtDetails()">Art Details</button>
@@ -449,6 +436,6 @@
 <script src="/shared_components/js/staff-auth-helper.js"></script>
 <script src="/shared_components/js/garment-submit-form.js?v=2026.08.01.1"></script>
 <script src="/shared_components/js/garment-text-engine.js?v=2026.06.20.13"></script>
-<script src="/pages/js/garment-designer.js?v=2026.07.04.4"></script>
+<script src="/pages/js/garment-designer.js?v=2026.08.04.1"></script>
 </body>
 </html>

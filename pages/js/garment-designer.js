@@ -744,6 +744,7 @@ function handleFiles(fileList) {
   $('dropzone').classList.add('hidden');
   $('toolbar').classList.add('visible');
   updateSidebarVisibility();
+  updateWorkflowState();
   selectEntry(entries[entries.length - files.length].id); // select first of the new batch
 }
 
@@ -1200,7 +1201,8 @@ function addFileItem(entry) {
     '<div class="thumb" id="thumb-' + entry.id + '">' + escapeHtml(entry.ext.toUpperCase()) + '</div>' +
     '<div class="meta"><div class="fname" title="' + escapeHtml(entry.name) + '">' + escapeHtml(entry.name) + '</div>' +
     '<div class="fsize">' + fmtSize(entry.size) + '</div><div class="file-advice" id="advice-' + entry.id + '"></div></div>' +
-    '<span class="badge load" id="badge-' + entry.id + '">…</span>';
+    '<span class="badge load" id="badge-' + entry.id + '">…</span>' +
+    '<button type="button" class="file-x" title="Remove this file from the mockup" aria-label="Remove ' + escapeHtml(entry.name) + '" onclick="removeEntry(' + entry.id + ', event)">×</button>';
   $('fileList').appendChild(div);
 }
 
@@ -1308,6 +1310,45 @@ function showEntry(entry) {
 function updateEasyStatus(msg) {
   const el = document.querySelector('.easy-status span:last-child');
   if (el) el.textContent = msg;
+}
+
+/* Guided-workflow state: body.has-art reveals the placement rail, advisors,
+   and the Artwork/Review/Send toolbar groups. Before any file exists the page
+   shows only Add + Shirt + the landing hero (see the CSS "Guided workflow
+   declutter" section). Call after any change to the entries[] list. */
+function updateWorkflowState() {
+  document.body.classList.toggle('has-art', entries.length > 0);
+}
+
+/* Remove any opened file (uploads included — deleteTextEntry only covers text). */
+function removeEntry(id, ev) {
+  if (ev) ev.stopPropagation();
+  const idx = entries.findIndex(x => x.id === id);
+  if (idx === -1) return;
+  const gone = entries[idx];
+  entries.splice(idx, 1);
+  const fi = $('fitem-' + id);
+  if (fi) fi.remove();
+  if (gone.textModel) closeTextPanel();
+  updateSidebarVisibility();
+  updateWorkflowState();
+  if (activeId === id) {
+    const next = entries[entries.length - 1];
+    if (next) {
+      selectEntry(next.id);
+      if (next.mockOn || next._customerForceMock) rebuildMockup(next);
+      refreshStage(next);
+    } else {
+      $('dropzone').classList.remove('hidden');
+      holder.innerHTML = '';
+      activeId = null;
+      updateEasyStatus('Start by adding front or back artwork — or drag a file anywhere on the page');
+    }
+  } else {
+    const cur = current();
+    if (cur && cur.mockOn) { rebuildMockup(cur); refreshStage(cur); }
+  }
+  showToast('Removed ' + (gone.name || 'file'));
 }
 function updateStageEmptyNote() {
   const note = $('stageEmptyNote');
@@ -5886,6 +5927,7 @@ function addTextEntry() {
   $('dropzone').classList.add('hidden');
   $('toolbar').classList.add('visible');
   updateSidebarVisibility();
+  updateWorkflowState();
   applyRecommendedPlacement(entry, 'Full Front', true);
   entry._customerForceMock = true;
   selectEntry(entry.id);
@@ -5915,15 +5957,7 @@ function txtSet(field, value) { const e = txtActiveEntry(); if (!e) return; e.te
 
 function deleteTextEntry() {
   const e = txtActiveEntry(); if (!e) return;
-  const idx = entries.findIndex(x => x.id === e.id);
-  if (idx > -1) entries.splice(idx, 1);
-  const fi = $('fitem-' + e.id); if (fi) fi.remove();
-  closeTextPanel();
-  updateSidebarVisibility();
-  const next = entries[entries.length - 1];
-  if (next) { selectEntry(next.id); if (next.mockOn || next._customerForceMock) rebuildMockup(next); refreshStage(next); }
-  else { $('dropzone').classList.remove('hidden'); $('toolbar').classList.remove('visible'); holder.innerHTML = ''; activeId = null; }
-  showToast('Text removed');
+  removeEntry(e.id);   // shared removal path — keeps the toolbar's Add/Shirt groups visible
 }
 
 // ── Text editor panel ─────────────────────────────────────────────────────
@@ -6002,3 +6036,7 @@ function syncTextPanelControls(e) {
 // Load the embedded shirt right away so the landing preview appears instantly
 initPhotoMock();
 applyUrlPreseed();
+// Guided workflow boot: placement card lives in the left rail from the start,
+// and body.has-art reflects the (empty) entries list before the first upload.
+movePlacementControlsToLeft();
+updateWorkflowState();
