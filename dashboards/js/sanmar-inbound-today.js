@@ -70,6 +70,25 @@
     return `<span class="sit-issue ${isBo ? 'sit-issue--bo' : 'sit-issue--hold'}" title="${esc(tip)}">⚠ ${label}</span>`;
   }
 
+  // RUSH badge (Erik 2026-08-04). Three or fewer WORKING days between these blanks landing
+  // and the due date — weekends and company holidays already excluded by the API, using the
+  // same calendar as the arrival estimate. `pastDue` means the due date is on or before the
+  // arrival day, which is worse than a rush and says so.
+  // Deliberately loud: this is the one thing on the sheet that changes what production does
+  // first, and it has to survive being read on a printout across the room.
+  function rushText(o) {
+    if (!o || !o.rush) return '';
+    const d = o.productionDays;
+    if (o.pastDue) return d === 0 ? 'PAST DUE — due the day it lands' : `PAST DUE by ${Math.abs(d)} working day${Math.abs(d) === 1 ? '' : 's'}`;
+    return `RUSH — ${d} working day${d === 1 ? '' : 's'} to due date`;
+  }
+  function rushBadge(o) {
+    const t = rushText(o);
+    if (!t) return '';
+    const tip = `Blanks arrive ${fmtShortDate(o.arrival)}, due ${fmtShortDate(o.dueDate)} — ${o.productionDays} working day(s) in between (weekends and holidays excluded). ${o.rushThreshold || 3} or fewer counts as a rush.`;
+    return `<span class="sit-rush${o.pastDue ? ' sit-rush--past' : ''}" title="${esc(tip)}">⚡ ${esc(t)}</span>`;
+  }
+
   // Follow-on shipment badge — this PO was already counted in by receiving, but SanMar shipped
   // ANOTHER carton after that date, so these pieces are still genuinely inbound. Without the badge
   // the row looks like a duplicate of something already on the shelf and gets waved through.
@@ -217,6 +236,7 @@
             <div class="sit-card-title">
               <span class="sit-company">${company}</span>
               ${methodChip(o.method)}
+              ${rushBadge(o)}
               ${issueBadge(o.issue)}
               ${followOnBadge(o)}
             </div>
@@ -258,6 +278,7 @@
         <div class="sit-stat"><span class="sit-stat-num">${fmtNum(t.boxes)}</span><span class="sit-stat-lbl">boxes</span></div>
         <div class="sit-stat"><span class="sit-stat-num">${fmtNum(t.piecesShipped)}</span><span class="sit-stat-lbl">pieces arriving</span></div>
         <div class="sit-stat sit-stat--cost"><span class="sit-stat-num">${fmtMoney0(t.cost)}</span><span class="sit-stat-lbl">blanks cost</span></div>
+        ${t.rush ? `<div class="sit-stat sit-stat--rush"><span class="sit-stat-num">⚡ ${fmtNum(t.rush)}</span><span class="sit-stat-lbl">rush${t.pastDue ? ` · ${fmtNum(t.pastDue)} past due` : ''}</span></div>` : ''}
         ${t.received ? `<div class="sit-stat sit-stat--recv"><span class="sit-stat-num">✓ ${fmtNum(t.received)}</span><span class="sit-stat-lbl">already received</span></div>` : ''}
       </div>
       <div class="sit-cards">${data.orders.map(poCard).join('')}</div>
@@ -271,6 +292,13 @@
   // "✓ Received" collapse uses). Never-Break Rule #4: a failed received-read leaves
   // the PO on the list, so this only ever hides blanks that are truly here.
   function activeOrders(data) { return (data && data.orders ? data.orders : []).filter(o => !o.received); }
+  // Rush count for the sheet headers — the number belongs where someone reads it first.
+  function rushSummary(orders) {
+    const rush = (orders || []).filter(o => o.rush);
+    if (!rush.length) return '';
+    const past = rush.filter(o => o.pastDue).length;
+    return ` &nbsp;·&nbsp; <b class="sit-ps-rushcount">⚡ ${rush.length} RUSH${past ? ` (${past} PAST DUE)` : ''}</b>`;
+  }
   function sumOrders(orders) {
     return (orders || []).reduce((a, o) => ({
       pos: a.pos + 1,
@@ -327,6 +355,7 @@
           <div><b>${esc(o.company || 'Unmatched')}</b> &nbsp; SanMar PO #${esc(o.sanmarPO)}${o.workOrder ? ' · WO #' + esc(o.workOrder) : ''} · ${esc(o.method)}
             <span class="sit-ps-r">${fmtNum(o.boxes)} box(es) · ${fmtNum(o.piecesShipped)} pcs${showCost && o.cost ? ' · <b>' + fmtMoney(o.cost) + '</b>' : ''}${o.upsDelivery && o.upsDelivery.date ? ' · UPS ' + fmtShortDate(o.upsDelivery.date) + (o.upsDelivery.type === 'rescheduled' ? ' (resched)' : o.upsDelivery.type === 'delivered' ? ' (delivered)' : '') : ''}</span></div>
           ${psFields ? `<div class="sit-ps-fields">${psFields}</div>` : ''}
+          ${rushText(o) ? `<div class="sit-ps-rush">⚡ ${esc(rushText(o))}</div>` : ''}
           ${o.followOnShipment ? `<div class="sit-ps-followon">${esc(followOnText(o))}</div>` : ''}
         </div>
       </div>
@@ -386,7 +415,7 @@
     const orders = activeOrders(data).slice().sort(byCompany);
     return psHeader(data, {
       title: 'Daily Inbound Report — SanMar Blanks',
-      subLine: `${fmtNum(t.pos)} POs · ${fmtNum(t.workOrders)} work orders · ${fmtNum(t.boxes)} boxes · ${fmtNum(t.piecesShipped)} pieces · <b>${fmtMoney0(t.cost)} blanks cost</b>`,
+      subLine: `${fmtNum(t.pos)} POs · ${fmtNum(t.workOrders)} work orders · ${fmtNum(t.boxes)} boxes · ${fmtNum(t.piecesShipped)} pieces · <b>${fmtMoney0(t.cost)} blanks cost</b>${rushSummary(orders)}`,
       note: 'Full day, all reps. Arrival = SanMar ship date + ground-transit estimate to Milton, WA. Blank cost = SanMar wholesale (CASE_PRICE × qty).',
     }) + (orders.length ? orders.map(o => poBlockHtml(o, { showCost: true })).join('') : '<p>No shipments arriving this day.</p>');
   }
@@ -399,7 +428,7 @@
       <div class="sit-ps-brand">Northwest Custom Apparel</div>
       <div class="sit-ps-title">Your inbound — SanMar blanks</div>
       <div class="sit-ps-recipient">${esc(repName)}${initials(repName) ? ' (' + esc(initials(repName)) + ')' : ''}</div>
-      <div class="sit-ps-sub">Arriving ${esc(fmtDate(data.date))} &nbsp;·&nbsp; ${fmtNum(s.pos)} of your PO${s.pos === 1 ? '' : 's'} · ${fmtNum(s.boxes)} boxes · ${fmtNum(s.pieces)} pieces</div>
+      <div class="sit-ps-sub">Arriving ${esc(fmtDate(data.date))} &nbsp;·&nbsp; ${fmtNum(s.pos)} of your PO${s.pos === 1 ? '' : 's'} · ${fmtNum(s.boxes)} boxes · ${fmtNum(s.pieces)} pieces${rushSummary(orders)}</div>
       <div class="sit-ps-note">Your customers' blanks landing today — a good moment to let them know their order is moving.</div>
     </div>`;
     const body = orders.length
@@ -434,7 +463,7 @@
         : ((Number(o.boxes) || 1) > 1 ? `${fmtNum(o.boxes)} boxes` : '1 of 1');
       return `<tr>
         <td class="sit-rt-check"></td>
-        <td>${esc(o.company || 'Unmatched')}${o.followOnShipment ? `<span class="sit-rt-followon">${esc(followOnText(o))}</span>` : ''}</td>
+        <td>${esc(o.company || 'Unmatched')}${rushText(o) ? `<span class="sit-rt-rush">⚡ ${esc(rushText(o))}</span>` : ''}${o.followOnShipment ? `<span class="sit-rt-followon">${esc(followOnText(o))}</span>` : ''}</td>
         <td>${o.workOrder ? '#' + esc(o.workOrder) : '<span class="sit-rt-muted">no WO</span>'}</td>
         <td>${esc(o.sanmarPO)}</td>
         <td class="sit-rt-c">${boxCell}</td>
@@ -446,7 +475,7 @@
     return psHeader(data, {
       title: 'Receiving checklist — SanMar inbound',
       recipient: 'Receiving · Mikalah',
-      subLine: `${fmtNum(s.pos)} orders · ${fmtNum(s.boxes)} boxes · ${fmtNum(s.pieces)} pieces to check in`,
+      subLine: `${fmtNum(s.pos)} orders · ${fmtNum(s.boxes)} boxes · ${fmtNum(s.pieces)} pieces to check in${rushSummary(orders)}`,
       note: 'Tick each box as it is scanned in. The full size breakdown prints on each box’s receiving label.',
     }) + `<table class="sit-rt-tbl sit-rt-recv">
       <thead><tr><th class="sit-rt-check">✓</th><th>Company</th><th>WO</th><th>SanMar PO</th><th class="sit-rt-c">Box</th><th>Carrier / tracking</th><th class="sit-rt-c">Pcs</th><th>Type</th></tr></thead>
@@ -463,7 +492,7 @@
       const list = byMethod.get(m).slice().sort(byDue);
       const pcs = list.reduce((a, o) => a + (Number(o.piecesShipped) || 0), 0);
       const rows = list.map(o => `<tr>
-        <td class="${isDueSoon(o.dueDate, data.date) ? 'sit-rt-due-soon' : ''}">${esc(fmtShortDate(o.dueDate)) || '—'}</td>
+        <td class="${o.rush ? 'sit-rt-rush-cell' : (isDueSoon(o.dueDate, data.date) ? 'sit-rt-due-soon' : '')}">${esc(fmtShortDate(o.dueDate)) || '—'}${o.rush ? ` <span class="sit-rt-rushtag">⚡${o.pastDue ? 'PAST DUE' : 'RUSH ' + o.productionDays + 'd'}</span>` : ''}</td>
         <td>${esc(o.company || 'Unmatched')}</td>
         <td>${o.workOrder ? '#' + esc(o.workOrder) : '<span class="sit-rt-muted">no WO</span>'}</td>
         <td>${esc(o.designNumber || '—')}${o.designName ? ' · ' + esc(o.designName) : ''}</td>
@@ -477,7 +506,7 @@
     return psHeader(data, {
       title: 'Production plan — SanMar inbound',
       recipient: 'Production · Ruthie',
-      subLine: `${fmtNum(s.pos)} orders · ${fmtNum(s.pieces)} pieces · grouped by method, soonest due first`,
+      subLine: `${fmtNum(s.pos)} orders · ${fmtNum(s.pieces)} pieces · grouped by method, soonest due first${rushSummary(orders)}`,
       note: 'Blanks arriving today, ready to schedule. Bold due dates land within a week.',
     }) + (sections || '<p>No shipments arriving this day.</p>');
   }
@@ -492,7 +521,7 @@
       return `<tr>
         <td>${esc(o.sanmarPO)}</td>
         <td>${o.workOrder ? '#' + esc(o.workOrder) : '<span class="sit-rt-muted">no WO</span>'}</td>
-        <td>${esc(o.company || 'Unmatched')} ${flag}</td>
+        <td>${esc(o.company || 'Unmatched')} ${flag}${o.rush ? `<span class="sit-rt-rushtag">⚡${o.pastDue ? 'PAST DUE' : 'RUSH'}</span>` : ''}</td>
         <td>${esc(initials(o.salesRep))}</td>
         <td class="sit-rt-c">${fmtNum(o.piecesOrdered)}</td>
         <td class="sit-rt-c${short ? ' sit-rt-short' : ''}">${fmtNum(o.piecesShipped)}${short ? ' ✗' : ''}</td>
@@ -607,6 +636,7 @@
           <div class="sl-wolabel">WORK ORDER</div>
           <div class="sl-wo">#${esc(order.workOrder || '?')}</div>
           ${order.dueDate ? `<div class="sl-duedate">Due: ${esc(fmtShortDate(order.dueDate))}</div>` : ''}
+          ${rushText(order) ? `<div class="sl-rush">⚡ ${esc(rushText(order))}</div>` : ''}
           <div class="sl-ddbox"><span class="sl-ddlabel">DROP DEAD DATE</span></div>
         </div>
       </div>

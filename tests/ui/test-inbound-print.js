@@ -11,11 +11,12 @@
   var MOCK = {
     date: '2026-07-22',
     note: 'Mock data — harness only.',
-    totals: { pos: 6, workOrders: 5, boxes: 7, piecesShipped: 101, cost: 646.32, received: 1 },
+    totals: { pos: 6, workOrders: 5, boxes: 7, piecesShipped: 101, cost: 646.32, received: 1, rush: 2, pastDue: 1 },
     orders: [
       {
         company: 'Absher Construction Company', method: 'Screen Print', workOrder: '142537', sanmarPO: '113747',
-        dueDate: '2026-08-05', designNumber: '23074', designName: 'Absher logo', contactName: 'Carissa Garcia',
+        dueDate: '2026-07-24', designNumber: '23074', designName: 'Absher logo', contactName: 'Carissa Garcia',
+        productionDays: 2, rush: true, pastDue: false, rushThreshold: 3, arrival: '2026-07-22',
         salesRep: 'Nika Lao', customerPO: '53096', terms: 'Net 10', dateOrdered: '2026-07-21',
         boxes: 1, piecesShipped: 1, piecesOrdered: 1, cost: 54.00,
         tracking: '1Z61R84A0313961139', carrier: 'UPS', trackingUrl: '#', shipDate: '2026-07-21', fromState: 'WA',
@@ -28,7 +29,8 @@
       },
       {
         company: 'Better Builders LLC', method: 'Embroidery', workOrder: '142511', sanmarPO: '113740',
-        dueDate: '2026-08-03', designNumber: '32418.03', designName: 'Better Builders — background fill', contactName: 'Sasha Martin',
+        dueDate: '2026-07-21', designNumber: '32418.03', designName: 'Better Builders — background fill', contactName: 'Sasha Martin',
+        productionDays: -1, rush: true, pastDue: true, rushThreshold: 3, arrival: '2026-07-22',
         salesRep: 'Taneisha Clark', customerPO: '', terms: 'Pay On Pickup', dateOrdered: '2026-07-20',
         boxes: 1, piecesShipped: 18, piecesOrdered: 18, cost: 229.68,
         tracking: '1Z61R84A0313960265', carrier: 'UPS', trackingUrl: '#', shipDate: '2026-07-21', fromState: 'WA',
