@@ -1,10 +1,243 @@
-# LESSONS LEARNED — ARCHIVE
+# L
+## Two renderings of the same timestamp never compared equal, so a sync re-wrote 456 orders a day forever (2026-07-29)
+
+**Problem.** `sync-manageorders` spent **2,901 billed Caspio calls in 22 minutes** — ~18% of the
+whole 16,129/day budget. It looked like legitimate churn in a 60-day window.
+
+**Root cause.** The ManageOrders API returns `"2026-07-27T00:00:00.000Z"`; Caspio hands the same
+value back as `"2026-07-27T00:00:00"` — no milliseconds, no zone. `normalize()` was
+`String(val).trim()`, so the two renderings of one instant were **never equal**. Every order
+carrying `date_Shipped`, `date_Invoiced` or `date_Produced` was detected as "changed" on **every
+run, forever**, re-PUT and had its entire line-item set deleted and re-posted. Measured: 457 of
+611 orders flagged — 403 / 43 / 10 on those three date fields, and exactly **one** real change (a
+`CustomerName` edit). Confirmed structurally: 402 of the newest 611 archived orders carry a
+`date_Shipped`; 403 were flagged on it.
+
+**Solution.** Canonicalise ISO datetimes to `YYYY-MM-DDTHH:MM:SS` before comparing — format noise
+only; a different date *or time-of-day* still registers. Same dry run afterwards: **457 → 1**.
+Second layer: compare line-item CONTENT before rewriting, so even a real order change (a payment
+posting) does not delete-and-repost identical rows. 29 of 29 sampled changed-orders had
+byte-identical line items.
+
+**Prevention.**
+- **A round-trip through a datastore is a format conversion.** Never compare a value you just sent
+  against the value it hands back without canonicalising first — especially dates, which every
+  system renders differently. Print both raw representations side by side before trusting `!==`.
+- **A change-detector that always fires is indistinguishable from a busy business.** If "changed"
+  counts sit near 100% of the window every run, suspect the comparator, not the data. Break the
+  count down BY TRIGGER FIELD — 403/43/10 on three date fields and 1 on everything else named the
+  bug instantly, where the total never would have.
+- **Prefer comparing content over guessing which upstream field implies a change.** The tempting
+  heuristic here — "only re-sync line items when `TotalProductQuantity` moves" — silently misses a
+  colour or description edit that leaves totals untouched, and that stale `PartColor` feeds
+  `check-zero-billing`'s match.
+- **Measure the fix against live data before shipping.** A read-only dry run using the real
+  exported helpers gave 457 → 1 and 29/29 identical, which is what turned an estimate into a number.
+
+### Found in passing, both worse than the cost bug
+
+- **`syncLineItems` was DELETE-then-fetch.** A rate-limited ManageOrders read (`fetchWithRetry`
+  throws after 3 attempts — I tripped exactly this with 11 consecutive 429s while sampling) left
+  the archive rows destroyed with nothing to put back. **Fetch first; remove nothing until the
+  replacement is in hand.**
+- **`caspioReadAll` paged without `q.orderBy`.** Caspio's paged reads are not stably ordered, so
+  rows silently drop and duplicate. Load-bearing now that "absent from the read" means "not
+  archived" — a dropped row would read as a deletion.
+
+ESSONS LEARNED — ARCHIVE
 
 Entries retired from `LESSONS_LEARNED.md` to keep it under its 300-line cap.
 No limit here. Newest-archived first; each entry keeps its original date.
 
 ---
 
+## The pacing alert's first real firing was a false alarm off its own repaired meter (2026-08-03)
+
+**Problem.** At 4 AM on 1 Aug the Caspio pacing alert DMed Erik: *projected 493,729 / 500,000 —
+99% of cap*. The true projection was **~341,000 (68%)**. The alert had worked end to end —
+computed, deduped, reached Slack — on its first real firing, and was wrong.
+
+**Root cause.** It projects `spent + (mean of the last 3 complete days × days remaining)`, read
+from our own `API_Usage_Daily` rollup. Two of those three days were written **before the meter
+was repaired**, and pre-repair rows disagree with Caspio's billing by amounts that change daily
+*and flip sign*: 27 Jul −33%, 30 Jul **+18%**. The window `{29,30,31 Jul}` averaged 16,415/day
+against a real ~10,600. A rate gets multiplied by every remaining day, so a 55% rate error
+became a 45% projection error.
+
+**Second, independent bias found while fixing it.** A 3-day window on a **Monday** reads
+{Fri, Sat, Sun} and on a **Friday** reads three weekdays. Weekends run about half a weekday here
+(Sat 6,657 / Sun 4,531 vs Fri 10,626), so the same data projected ~50,000 calls apart — a tenth
+of the cap — purely by which day you looked.
+
+**Solution.** `ROLLUP_TRUSTED_FROM = '2026-07-31'` (first day the repaired meter came in at
++2.2% vs Caspio) bars older rows from setting a **rate**, and `TREND_DAYS` 3 → **7** so the
+window always spans exactly two weekend days. The rows stay in the table and on the chart,
+hatched, because they are the evidence of what the overage cost. `computePacing` now returns
+`trend: {daysUsed, windowDays, trustedFrom, excludedDays}` and the Slack body states its basis.
+
+**Prevention.**
+- 🔑 **Exclude bad history from the RATE, never from the LEVEL.** Dropping those days from
+  `periodToDate` would have understated spend — the more dangerous direction. A number that is
+  multiplied by 25 needs different care from one that is merely displayed.
+- 🔑 **After repairing an instrument, mark the boundary in code.** "We fixed it on the 31st" in
+  someone's head is not a guard; the next consumer of that table silently averages across the
+  repair. The constant carries the measured per-day error table as its comment so the WHY
+  survives.
+- 🔑 **A trailing window inherits every seasonality shorter than itself.** For anything with a
+  weekly rhythm, 7 days is the smallest window that cannot be biased by the day you sample.
+- **Validate a monitor's first firing against the source of truth before trusting it.** The
+  plumbing being correct is not the same as the answer being right — and an alarm that cries
+  wolf on day 6 is one you have learned to ignore by day 30, which is the exact failure the
+  alert exists to prevent.
+
+**Found in passing.** The trend filter compared rollup keys (Pacific account days) against
+`ymd(now)` (**UTC**), so between 5 PM Pacific and midnight UTC the still-running day sorted as
+complete and its partial count dragged the rate down. Hidden because the scheduled run is 4 AM
+Pacific, outside that seven-hour window. Now uses `accountDay(now)` — the same
+UTC-vs-account-clock trap as [[caspio-account-clock]], third time in this subsystem.
+
+---
+
+---
+## Realization figures are meaningless until webstore orders are separated out (2026-07-30)
+
+**Problem.** "Cap 8-23 is the worst cell in the book at 80% realization" sent a whole investigation
+at a cell that was fine. Quoted cap 8-23 actually realizes **88.9%**, and the real gap is
+**~$1,500/yr**, not the implied five figures.
+
+**Root cause.** Webstore/company-store orders carry their own program pricing (Hops n Drops hats at
+$11, company stores with a dozen assorted items at flat price points) and realize **76.5%**. Averaged
+in with quoted work at **97.9%**, they drag any tier-level figure down — hardest on small tiers,
+where they are the biggest share.
+
+**Two more confounds in the same measurement.** Some orders bill decoration on its **own line**
+(`id_ProductClass` 9/10, e.g. `DECG`), so the garment line's price legitimately excludes decoration
+and reads as a deep discount. And at least one order (141715) billed 20 caps at exactly blank cost
+with **no decoration line at all** — a missing charge, not a discount.
+
+**Solution / prevention.** 🔑 **Split by `Orders.ExtSource` before computing realization** — blank =
+quoted, populated = webstore. 🔑 **Check for class-9/10 lines on the order** before treating a low
+garment price as a discount. Both are cheap; neither is optional. The three-way split
+(webstore / separate-decoration / quoted) is what turned an alarming number into a real one.
+
+⚠️ Verified by reading the raw LinesOE rows for the outlier orders. **The line-level look is what
+found it** — every aggregate up to that point agreed with the wrong answer.
+
+## A 200 with empty arrays is not success — the quote builder priced off seed values (2026-07-30)
+
+**Problem.** `/api/pricing-bundle` answers **HTTP 200 with `{tiersR:[], allEmbroideryCostsR:[]}`**
+when Caspio rate-limits, rather than erroring the way its sibling `/api/pricing-tiers` does.
+`embroidery-quote-pricing.js` pre-seeds a full tier ladder in the constructor and only replaces it
+`if (data.tiersR.length > 0)` — but set `initialized = true` regardless. So an empty 200 priced an
+entire quote from hardcoded numbers frozen at the last edit of the file, with no banner and no toast.
+
+**Root cause.** The guard tested the *shape* of the response (`if (data)`) instead of whether the
+data needed to price actually arrived. `response.ok` was true, so the catch never ran.
+
+**Why it hid.** The seed values happened to equal live Caspio, so the loss was $0 and nothing looked
+wrong. It would have broken silently the first time anyone changed a price in Caspio — i.e. exactly
+when the source-of-truth design matters.
+
+**Solution.** Throw when either array is empty/missing, which routes into the existing catch
+(apiError + critical banner + `disableQuoteCreation()`), plus a second check before
+`initialized = true`. Seed ladder kept but commented **never-authoritative** so nobody "helpfully"
+syncs it to Caspio and restores the bug. `tests/unit/emb-empty-bundle-guard.test.js`.
+
+**Prevention.** 🔑 **A fallback that happens to be correct is still a silent-wrong-price bug** —
+judge the mechanism, not today's output. And when a fixture pins a value production never sends
+(`RoundingMethod: 'HalfDollarUp'` vs the live `HalfDollarCeil_Final`), the tests exercise a branch
+that does not exist in prod: **fixtures must carry live values.**
+
+---
+
+## A shared modal's CSS lived in ONE page's stylesheet — the other host printed the whole dashboard (2026-07-29)
+
+**Problem.** `sanmar-inbound-today.js` is loaded by BOTH `quote-management.html` and
+`ae-mission-control.html`, but every `.sit-*` rule lived in `quote-management.css`, which only
+the first page loads. From AE Mission Control the modal opened `position: static` at
+**y = 3862px** — ~3.8 screens below the fold, so the Inbound button looked dead — with no
+scroll container, and **without `body.sit-printing > *:not(#sit-print-sheet){display:none}`**,
+so printing a report or a box label would have printed the entire dashboard.
+
+**Root cause.** A page-named stylesheet became a silent dependency of a *shared* component.
+Nothing links the two: the JS loads fine, the modal builds fine, and the failure only shows on
+the page nobody tests. It also leaned on that file's generic `.modal` / `.modal-content` /
+`.btn-cancel` **and** its global `* { box-sizing: border-box }` — no stylesheet on the AE page
+declares one, which by itself moved the panel 960px → 945px.
+
+**Fix** (`d78e1391`). `dashboards/css/sanmar-inbound.css`, loaded by every host page. Block moved
+**verbatim** (byte-identical, diffed), plus a scoped border-box reset and restatements of
+`.modal`/`.modal-content`/`.btn-cancel` at `.modal.sit-modal` specificity (0,2,0) so they win
+regardless of load order — self-contained, no dependency on any other sheet.
+
+**Prevention.**
+- **A shared JS component owns a stylesheet of the same name, loaded by every page that loads
+  the JS.** Styles for `foo.js` never live in `some-page.css`. Grep for other offenders.
+- **Verify a CSS refactor by computed-style diff, not by eye.** Snapshotting 519 elements × 41
+  properties across three configurations (pre-split re-injected inline, and each new host page)
+  proved 0 differences on quote-management.html — and caught a `font-family` I had "helpfully"
+  pinned, which would have silently restyled the whole modal.
+- **What a modal inherits is part of its contract**: `box-sizing`, `color`, `font-family` all
+  came from the host page. List them explicitly before moving a component between hosts.
+
+---
+## A security fix landed on ONE route; six identical siblings sat open for 5 days (2026-07-29)
+
+**Problem.** Six proxy AI routes — `contract-embroidery-ai`, `contract-dtg-ai`, `contract-emblem-ai`,
+`contract-webstore-ai`, `dtg-quote-ai`, `emb-quote-ai` — each declare a `lookup_customer` tool
+returning company, contact, email, phone, address, sales rep, payment terms and last-ordered date,
+five matches for any 2-char query. All six were mounted with only a per-IP rate limiter. The
+customer list was readable with curl. Each request also spends Anthropic tokens, so it was an open
+tab on the bill as well.
+
+**Root cause.** The identical hole was found and fixed on `contract-sticker-ai` on 2026-07-24. The
+fix was applied to that one mount and stopped there. Nothing swept the siblings, and the file's own
+comment had been advertising the gap the whole time: *"These are unauthenticated … (Coarse guard;
+true protection is auth — TODO.)"* A TODO is not a ticket.
+
+**How it surfaced.** Only because a *removal* task made me diff the sticker route against its
+family. Nobody was looking for it.
+
+**Fix.** The sticker pattern, applied to all six: a session-gated forwarder per route in the app
+(`requireStaff` + `CRM_API_SECRET`, one loop, app path mirrors proxy path), each browser caller
+repointed to same-origin, then `requireCrmApiSecret` added to all six proxy mounts. App shipped
+first (v2026.07.29.4) then proxy (v2026.07.29.6) — reversed, every chat 401s until the app catches up.
+
+**Prevention.**
+- **A security fix on one member of a family is not done until you have swept the family.** Grep for
+  the shape (`app.use('/api/…-ai'`), not the instance. Sibling routes that "mirror" each other in a
+  header comment mirror each other's holes too.
+- **Probe, don't read.** An anonymous POST with an empty body told the whole story in one line: 401
+  on the gated route, `400 "messages array is required"` on the open ones — they answered strangers.
+  Status codes beat reading mount lines, and they cost nothing.
+- Don't demonstrate a PII hole by extracting PII. The mount line plus the 400-vs-401 split is proof.
+
+---
+## An audit said "zero coverage loss"; the only HTTP test of a live endpoint was in that file (2026-07-29)
+
+**Problem.** Removing `contract-sticker-ai` meant removing `sticker-quote-single-path.test.js`,
+which `require`s the route's `__testables`. Three independent audit passes all certified the deletion
+as "zero"/"nil" coverage loss, because `sticker-pricing.test.js` covers the same pricing rules.
+
+**Root cause.** It covers the same *engine*, by calling `loadGrid`/`quoteStickerFromGrid` directly.
+It never builds a req/res, so it cannot see the **route envelope** — and the envelope renames things:
+engine `kind` → wire `reason`; engine `bad_input` → wire `400 {error:'bad_request'}`; plus
+`pricePerSticker`, a wire-only money field matched by exactly one line in the whole test tree. That
+deleted file was the only test driving the real Express handler for `GET /api/sticker-pricing/quote`
+— live, customer-facing, behind the public `/custom-stickers` page.
+
+**Fix.** `git mv` to `sticker-quote-route-surface.test.js`: drop the AI-parity half (vacuous once
+there is one implementation), keep and sharpen the HTTP half. 16 tests, still green.
+
+**Prevention.**
+- **"Another test covers it" is a claim about a LAYER, not a file.** Before deleting a test, ask
+  which layer it drives — pure function, route handler, or wire. `rg -l "router.stack|req, res"` over
+  the test tree finds the handful that touch HTTP; they are rarely redundant.
+- **Have a skeptic try to REFUTE the audit, not confirm it.** Three passes agreed and were wrong in
+  the direction that ships risk; one adversarial pass instructed to default-to-refuted found it in
+  minutes. Agreement between agents that share a framing is not corroboration.
+
+---
 ## Deleting a `requireStaff` route can UNGATE the file, not remove it (2026-07-29)
 
 **Problem.** Retiring `/calculators/sticker-manual-pricing.html` meant deleting its

@@ -10,6 +10,9 @@
  * Packet upload is deliberately three steps (read → review → save): the PDF is a scan,
  * so the server checks its extraction against the packet's own printed totals and the
  * Save button stays disabled until that reconciles.
+ *
+ * Vacation accrued/used are corrected for the prior-year carryover before they reach a
+ * slip — see vacation-carryover.js, which must load first. Sick hours are never touched.
  */
 (function () {
   'use strict';
@@ -19,6 +22,12 @@
   var jobId = null;
   var pollTimer = null;
   var allEmployees = [];
+  // employee record -> its computed slip figures + flags. Keyed by object identity rather
+  // than payroll ID, which 8 of the 29 Employees rows don't have. Rebuilt on every load so
+  // the leave table, the printed slips and the audit CSV can never disagree.
+  var slipFigures = new Map();
+
+  var VC = window.VacationCarryover;
 
   // --- helpers -------------------------------------------------------------
 
@@ -83,32 +92,72 @@
 
   // --- leave balances ------------------------------------------------------
 
+  function fullName(e) {
+    return e.Employee_Full_Name || ((e.First_Name || '') + ' ' + (e.Last_Name || '')).trim();
+  }
+
+  // "112 → 80" when the carryover moved the figure, plain otherwise. Showing both keeps the
+  // accountant's number on screen for reconciliation while making the printed one obvious.
+  function adjusted(rawValue, slipValue, carryover) {
+    if (!carryover) return hrs(rawValue);
+    return '<span class="pr-raw">' + hrs(rawValue) + '</span>'
+      + '<span class="pr-arrow">→</span>' + hrs(slipValue);
+  }
+
   function renderLeave(rows) {
     var body = document.getElementById('leave-body');
     if (!rows.length) {
-      body.innerHTML = '<tr><td colspan="8" class="pr-loading">No active employees found.</td></tr>';
+      body.innerHTML = '<tr><td colspan="10" class="pr-loading">No active employees found.</td></tr>';
       return;
     }
     body.innerHTML = rows.map(function (e) {
-      var name = e.Employee_Full_Name || ((e.First_Name || '') + ' ' + (e.Last_Name || '')).trim();
+      var f = slipFigures.get(e);
       // Not yet at the 1-year mark → the negative vacation balance is expected, so say so
       // instead of letting it read as a data error.
       var eligible = day(e.Vacation_Eligible_Date);
-      var pill = '';
+      var pills = '';
       if (eligible && eligible > new Date().toISOString().slice(0, 10)) {
-        pill = '<span class="pr-pill pr-pill-wait">accrues ' + esc(eligible) + '</span>';
+        pills += '<span class="pr-pill pr-pill-wait">accrues ' + esc(eligible) + '</span>';
       }
-      return '<tr>'
-        + '<td><span class="pr-name">' + esc(name) + '</span>' + pill + '</td>'
+      if (f && !f.printable) pills += '<span class="pr-pill pr-pill-flag">no slip</span>';
+
+      var slip = (f && f.slip) || null;
+      var carry = (f && f.carryover) || 0;
+
+      return '<tr' + (f && !f.printable ? ' class="pr-row-flag"' : '') + '>'
+        + '<td><span class="pr-name">' + esc(fullName(e)) + '</span>' + pills + '</td>'
         + '<td class="pr-dept">' + esc(e.Department || '—') + '</td>'
-        + '<td class="pr-num">' + hrs(e.Vacation_Hours_Available) + '</td>'
-        + '<td class="pr-num">' + hrs(e.Vacation_Hours_Used) + '</td>'
+        + '<td class="pr-num pr-entitle">'
+          + (f && f.entitlement !== null ? hrs(f.entitlement) : '<span class="pr-missing">not set</span>') + '</td>'
+        + '<td class="pr-num">' + adjusted(e.Vacation_Hours_Available, slip && slip.accrued, carry) + '</td>'
+        + '<td class="pr-num">' + adjusted(e.Vacation_Hours_Used, slip && slip.used, carry) + '</td>'
         + '<td class="pr-num">' + hrs(e.Vacation_Hours_Remaining) + '</td>'
+        + '<td class="pr-num">' + (carry ? hrs(carry) : '<span class="pr-zero">—</span>') + '</td>'
         + '<td class="pr-num">' + hrs(e.Sick_Accum_Hours_Available) + '</td>'
         + '<td class="pr-num">' + hrs(e.Sick_Hours_Used) + '</td>'
         + '<td class="pr-num">' + hrs(e.Sick_Hours_Remaining) + '</td>'
         + '</tr>';
     }).join('');
+  }
+
+  // Every flag, named, above the table. A blocked record must be impossible to miss —
+  // it silently drops out of the printout otherwise.
+  function renderFlags() {
+    var box = document.getElementById('leave-flags');
+    var items = [];
+    allEmployees.forEach(function (e) {
+      var f = slipFigures.get(e);
+      if (!f || !f.flags.length) return;
+      f.flags.forEach(function (flag) {
+        items.push('<li class="pr-flag-' + esc(flag.severity) + '">'
+          + '<strong>' + esc(fullName(e)) + '</strong> — ' + esc(flag.message)
+          + (flag.severity === 'block' ? ' <em>No slip will print for this employee.</em>' : '')
+          + '</li>');
+      });
+    });
+    if (!items.length) { box.hidden = true; box.innerHTML = ''; return; }
+    box.hidden = false;
+    box.innerHTML = '<ul class="pr-flag-list">' + items.join('') + '</ul>';
   }
 
   function applyLeaveFilter() {
@@ -121,19 +170,38 @@
     }));
   }
 
+  // The newest stamp on the roster — used for the toolbar summary, and as a LAST-RESORT
+  // fallback for an employee carrying no stamp of their own. 🔴 Never as the as-of for
+  // someone who has one: the import writes these per employee, so a single failed PUT (or
+  // an active employee absent from the packet) leaves one person months behind while the
+  // roster maximum advances. Each slip prints its own employee's date.
+  function rosterAsOf() {
+    var stamps = allEmployees.map(function (e) { return day(e.Leave_Balances_As_Of); })
+      .filter(Boolean).sort();
+    return stamps.length ? stamps[stamps.length - 1] : '';
+  }
+
   async function loadLeave() {
     try {
       var data = await api('/employees');
       allEmployees = data.employees || [];
+
+      // Compute once, here — the table, the slips and the audit CSV all read this map, so
+      // there is no second code path that could apply the carryover differently.
+      var asOf = rosterAsOf();
+      slipFigures = new Map();
+      allEmployees.forEach(function (e) {
+        slipFigures.set(e, VC.buildSlipFigures(e, { fallbackAsOf: asOf || undefined }));
+      });
+
       renderLeave(allEmployees);
-      var stamps = allEmployees.map(function (e) { return day(e.Leave_Balances_As_Of); })
-        .filter(Boolean).sort();
-      document.getElementById('leave-asof').textContent = stamps.length
-        ? 'Balances as of ' + stamps[stamps.length - 1]
+      renderFlags();
+      document.getElementById('leave-asof').textContent = asOf
+        ? 'Balances as of ' + asOf
         : 'No packet imported yet';
     } catch (e) {
       document.getElementById('leave-body').innerHTML =
-        '<tr><td colspan="8" class="pr-loading">Could not load balances.</td></tr>';
+        '<tr><td colspan="10" class="pr-loading">Could not load balances.</td></tr>';
       setStatus('Unable to load leave balances: ' + e.message, 'error');
     }
   }
@@ -362,53 +430,136 @@
     });
   }
 
-  function buildSlips(rows, asOf) {
+  function slipRow(label, value, star) {
+    return '<div class="slip-row"><span class="slip-label">' + label + (star || '')
+      + '</span><span class="slip-val">' + slipHrs(value) + '</span></div>';
+  }
+
+  function buildSlips(rows) {
     return rows.map(function (e) {
-      var name = e.Employee_Full_Name || ((e.First_Name || '') + ' ' + (e.Last_Name || '')).trim();
-      var vacRem = Number(e.Vacation_Hours_Remaining || 0);
+      var f = slipFigures.get(e);
+      // This employee's own balance date — never the roster's. Printing a borrowed date
+      // would have the paper assert a date the numbers did not come from.
+      var asOf = f.asOf || 'an unknown date';
       var eligible = day(e.Vacation_Eligible_Date);
       var grant = Number(e.Vacation_Eligible_Hours || 0);
-      var pending = eligible && eligible > new Date().toISOString().slice(0, 10);
+      // The note tracks the FIGURES, not the wall clock: the eligibility gate is what
+      // zeroed the entitlement, so it is what the employee needs explained.
+      var pending = eligible && f.entitlement === 0 && Number(e.Vacation_Annual_Entitlement) > 0;
 
       // Someone still short of their first anniversary gets an asterisk beside the
       // vacation line and a matching footnote, so a negative balance reads as "not yet
       // accrued" rather than "you are in the hole". Grant hours come from the record,
       // not a hardcoded 40 — the next new hire is handled without a code change.
-      var note = '';
+      var notes = [];
       if (pending) {
-        note = '* Your vacation resets on ' + esc(eligible) + ', your one-year anniversary'
+        notes.push('* Your vacation resets on ' + esc(eligible) + ', your one-year anniversary'
           + (grant ? ', when you receive ' + esc(grant.toFixed(0)) + ' hours' : '')
-          + '. Until then this balance can be negative.';
-      } else if (vacRem < 0) {
-        note = '* You have used more vacation than has accrued so far this year.';
+          + '. Until then this balance can be negative.');
+      } else if (f.slip.remaining < 0) {
+        notes.push('* You have used more vacation than has accrued so far this year.');
       }
-      var star = note ? '<span class="slip-star">*</span>' : '';
+      var star = notes.length ? '<span class="slip-star">*</span>' : '';
+
+      // §7.4 — say the balances are old rather than print one that looks current.
+      if (f.flags.some(function (x) {
+        return x.code === 'stale-balances' || x.code === 'unknown-as-of' || x.code === 'borrowed-as-of';
+      })) {
+        notes.push('These balances are from ' + esc(asOf) + ' and may not include recent time off.');
+      }
 
       return '<div class="slip">'
         + '<div class="slip-co">Northwest Custom Apparel</div>'
-        + '<div class="slip-name">' + esc(name) + '</div>'
+        + '<div class="slip-name">' + esc(fullName(e)) + '</div>'
         + '<div class="slip-asof">Balances as of ' + esc(asOf) + '</div>'
         + '<div class="slip-rows">'
-        + '<div class="slip-row"><span class="slip-label">Vacation hours used</span><span class="slip-val">' + slipHrs(e.Vacation_Hours_Used) + '</span></div>'
-        + '<div class="slip-row"><span class="slip-label">Vacation hours remaining' + star + '</span><span class="slip-val">' + slipHrs(vacRem) + '</span></div>'
-        + '<div class="slip-row"><span class="slip-label">Sick hours remaining</span><span class="slip-val">' + slipHrs(e.Sick_Hours_Remaining) + '</span></div>'
+        + '<div class="slip-group">Vacation</div>'
+        + slipRow('Hours accrued', f.slip.accrued)
+        + slipRow('Hours used', f.slip.used)
+        + slipRow('Hours remaining', f.slip.remaining, star)
+        + '<div class="slip-group">Sick</div>'
+        + slipRow('Hours accrued', f.sick.accrued)
+        + slipRow('Hours used', f.sick.used)
+        + slipRow('Hours remaining', f.sick.remaining)
         + '</div>'
-        + (note ? '<div class="slip-note">' + note + '</div>' : '')
+        + (notes.length ? '<div class="slip-note">' + notes.join('<br>') + '</div>' : '')
         + '</div>';
     }).join('');
+  }
+
+  // --- audit trail ------------------------------------------------------------
+
+  // §11 — every slip run is reconcilable back to the accountant's report, so the RAW
+  // imported figures are kept beside the adjusted ones. Written as a CSV the browser
+  // downloads: no Caspio quota, no new table, and it files alongside the payroll packet.
+  var AUDIT_COLUMNS = [
+    'employee_name', 'payroll_id', 'run_date', 'balances_as_of',
+    'raw_available', 'raw_used', 'raw_remaining',
+    'entitlement', 'carryover',
+    'slip_accrued', 'slip_used', 'slip_remaining',
+    'sick_accrued', 'sick_used', 'sick_remaining',
+    'slip_printed', 'carryover_reason', 'flags',
+  ];
+
+  function csvCell(v) {
+    return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+  }
+
+  function auditRow(e, f, runDate, printed) {
+    return [
+      fullName(e), f.payrollId || '', runDate, f.asOf,
+      f.raw.available, f.raw.used, f.raw.remaining,
+      f.entitlement === null ? '' : f.entitlement, f.carryover,
+      f.slip ? f.slip.accrued : '', f.slip ? f.slip.used : '', f.slip ? f.slip.remaining : '',
+      f.sick.accrued, f.sick.used, f.sick.remaining,
+      printed ? 'yes' : 'no', f.carryoverReason,
+      f.flags.map(function (x) { return x.code + ': ' + x.message; }).join(' | '),
+    ].map(csvCell).join(',');
+  }
+
+  function downloadAudit(rows, runDate) {
+    var lines = [AUDIT_COLUMNS.join(',')];
+    rows.forEach(function (r) { lines.push(auditRow(r.employee, r.figures, runDate, r.printed)); });
+    // BOM so Excel reads the UTF-8 in the flag messages instead of mojibake.
+    var blob = new Blob(['﻿' + lines.join('\r\n') + '\r\n'], { type: 'text/csv;charset=utf-8;' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'payroll-slip-audit-' + runDate + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
   }
 
   document.getElementById('print-slips').addEventListener('click', function () {
     var rows = currentLeaveRows();
     if (!rows.length) return setStatus('Nothing to print — no employees match the filter.', 'error');
 
-    var stamps = allEmployees.map(function (e) { return day(e.Leave_Balances_As_Of); }).filter(Boolean).sort();
-    var asOf = stamps.length ? stamps[stamps.length - 1] : '';
+    var runDate = new Date().toISOString().slice(0, 10);
+
+    // §7.1/§7.2 — a record whose figures don't reconcile, or that has no entitlement set,
+    // does NOT go on paper. It still goes in the audit CSV, marked not-printed, so a
+    // missing slip is explained rather than just absent.
+    var printable = rows.filter(function (e) {
+      var f = slipFigures.get(e);
+      return f && f.printable;
+    });
+    var blocked = rows.filter(function (e) { return printable.indexOf(e) === -1; });
+
+    downloadAudit(rows.map(function (e) {
+      return { employee: e, figures: slipFigures.get(e), printed: printable.indexOf(e) !== -1 };
+    }), runDate);
+
+    if (!printable.length) {
+      return setStatus('No slips printed — every matching employee is flagged. See the list above '
+        + 'and the audit CSV just downloaded.', 'error');
+    }
 
     // Pad to a full row of 2 so the last sheet's cut lines run edge to edge rather than
     // stopping halfway across — otherwise the final slip has no line to cut against.
-    var html = buildSlips(rows, asOf);
-    if (rows.length % 2 !== 0) html += '<div class="slip"></div>';
+    var html = buildSlips(printable);
+    if (printable.length % 2 !== 0) html += '<div class="slip"></div>';
     document.getElementById('print-slips-grid').innerHTML = html;
 
     document.body.classList.add('print-slips');
@@ -420,7 +571,15 @@
     window.print();
     // Safari/older browsers don't always fire afterprint — don't strand the page hidden.
     setTimeout(cleanup, 3000);
-    setStatus('Sent ' + rows.length + ' slip' + (rows.length === 1 ? '' : 's') + ' to the printer.', 'ok');
+
+    var msg = 'Sent ' + printable.length + ' slip' + (printable.length === 1 ? '' : 's')
+      + ' to the printer, and saved the audit CSV.';
+    if (blocked.length) {
+      setStatus(msg + ' ' + blocked.length + ' employee' + (blocked.length === 1 ? ' was' : 's were')
+        + ' skipped: ' + blocked.map(fullName).join(', ') + '. See the flags above.', 'error');
+    } else {
+      setStatus(msg, 'ok');
+    }
   });
 
   document.getElementById('leave-search').addEventListener('input', applyLeaveFilter);
