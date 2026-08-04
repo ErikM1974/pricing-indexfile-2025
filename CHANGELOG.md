@@ -1,3 +1,19 @@
+## v2026.08.03.2 (2026.08.03)
+
+- Deploy skill: document the Heroku CLI v11 git-auth break
+- Memory: Atmos Reference_ID collapse (23-digit ID stored as a number)
+- Memory: archive one more lesson to stay under the 300-line cap
+- Memory: Atmos Month_Reconciled format tail (server+client duplication)
+- Memory: blog content bank writes prose around style numbers it never looked up
+- Memory: vacation slip printed the accountant's tax year, not the employee's
+- Memory: the carryover validation gate was a tautology
+- Memory: Atmos reconciliation month was off by one (closing month, not month after)
+- Memory: Feb/Mar/Apr 2026 statements split out of their 2025 labels (239 rows)
+- Memory: archive oldest resolved lesson to stay under the 300-line cap
+- Memory: Sothea Tann's 40 confirmed as a full annual grant
+- Vacation slips: correct the prior-year carryover
+- Deploy v2026.08.03.2: 1 files (payroll.html...)
+
 ## v2026.08.03.1 (2026.08.03)
 
 - API usage dashboard: hatch the days written by the pre-repair meter
