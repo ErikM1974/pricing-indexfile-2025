@@ -5,6 +5,39 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## /deploy's cache-bust silently does nothing if you pushed develop first (2026-08-03)
+
+**Problem.** Deploying the vacation-slip work, the skill's Step 2 found **zero** changed assets
+and bumped no `?v=` string — even though `payroll.js`, `payroll.css` and the brand-new
+`vacation-carryover.js` were all in the release. Left alone, the deploy would have shipped new
+JS/CSS behind unchanged URLs, so every browser that had ever opened the page would keep serving
+the cached old files.
+
+**Root cause.** Step 2 detects changed assets with
+`git diff --name-only origin/develop HEAD` plus the dirty working tree. Both are empty in the
+**normal** workflow — commit your work, `git push origin develop`, *then* `/deploy`. Once
+develop is pushed, `origin/develop == HEAD`; once it's committed, the tree is clean. The
+comparison answers "what have I not pushed yet?", which has nothing to do with what is live.
+
+**Solution.** Compare against **`main`** — the branch that actually reflects production:
+`git diff --name-only main develop -- '*.js' '*.jsx' '*.css'`. That correctly returned all
+three files, and the bump then verified live (`/api/version` sha matched the deployed commit).
+
+**Prevention.**
+- 🔑 **A cache-bust's baseline must be what is LIVE (`main`), never what is PUSHED
+  (`origin/develop`).** Pushing develop is not deploying; any diff based on push state measures
+  the wrong thing.
+- 🔑 **This is a silent success, which is the dangerous kind.** The deploy reports ✅, the
+  Heroku release succeeds, and the backend SHA check *passes* — because the backend really did
+  update. Only the browser assets are stale, and nothing in the pipeline looks at them. It is
+  the same failure class the skill already documents for `.jsx` files ("deployed but nothing
+  changed"), reached by a different route.
+- ⚠️ The skill file still contains the `origin/develop` comparison. Until it's fixed, check
+  `git diff --name-only main develop -- '*.js' '*.jsx' '*.css'` by hand and confirm Step 2's
+  bump list is non-empty whenever a release touches front-end assets.
+
+---
+
 ## The vacation slip printed the accountant's tax year, not the employee's (2026-08-03)
 
 **Problem.** Sorphorn Sorm's slip read **112 accrued / 56 used / 56 remaining**. Both figures
@@ -216,29 +249,3 @@ here `Item_Type`/`Sales_Rep`/`Status` were empty on 6/6 of Ruth's rows and popul
 else's, and her `Garment_Placement` values weren't even options in the AE form's dropdown.
 🔑 **A second write path into a shared table silently skips every side effect** the first path
 owns. Retiring the old UI isn't enough while the DataPage URL still works.
-
----
-
-## A stand-in fallback address is a silent-failure bug (2026-08-01)
-
-**Problem.** 14 art requests saved with `User_Email: ae@nwcustomapparel.com` and
-`Sales_Rep: Taneisha Clark`. Nobody owns that inbox, so those AEs' confirmation emails went
-nowhere and the records carried a bogus submitter.
-
-**Root cause.** `getSubmitterEmail()` in all four AE submit forms ended
-`return localStorage.getItem('userEmail') || 'ae@nwcustomapparel.com';` — inventing an identity
-when the staff session was missing instead of refusing.
-
-**Why it hid for months.** Steve's notification still arrived, because **his** address is
-hardcoded in `sendNotificationEmails` rather than derived. Only the AE's own copy vanished, and
-nobody misses an email they never expected. Found while investigating an unrelated report.
-
-**Solution.** Return `''` when unidentified; `handleSubmit()` blocks with a visible toast before
-any upload or POST. Applied to all four forms (Rule 8). `tests/unit/art-submit-identity.test.js`
-— two of its six cases grep all four files so no form can quietly reintroduce it.
-
-**Prevention.** 🔑 **A fallback identity is the same class of bug as a fallback price** — it
-manufactures plausible-looking data instead of failing. If the answer is "we don't know who this
-is", the only safe output is an error. 🔑 When one recipient of a fan-out is hardcoded and the
-rest are derived, the hardcoded one **masks** breakage in the derived ones — an alert that always
-fires proves nothing about its siblings.

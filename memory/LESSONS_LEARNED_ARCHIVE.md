@@ -1,4 +1,33 @@
-# L
+# LESSONS LEARNED — ARCHIVE
+
+Resolved entries aged out of `LESSONS_LEARNED.md` (300-line cap). Newest first. No limit here.
+
+---
+
+## A stand-in fallback address is a silent-failure bug (2026-08-01)
+
+**Problem.** 14 art requests saved with `User_Email: ae@nwcustomapparel.com` and
+`Sales_Rep: Taneisha Clark`. Nobody owns that inbox, so those AEs' confirmation emails went
+nowhere and the records carried a bogus submitter.
+
+**Root cause.** `getSubmitterEmail()` in all four AE submit forms ended
+`return localStorage.getItem('userEmail') || 'ae@nwcustomapparel.com';` — inventing an identity
+when the staff session was missing instead of refusing.
+
+**Why it hid for months.** Steve's notification still arrived, because **his** address is
+hardcoded in `sendNotificationEmails` rather than derived. Only the AE's own copy vanished, and
+nobody misses an email they never expected. Found while investigating an unrelated report.
+
+**Solution.** Return `''` when unidentified; `handleSubmit()` blocks with a visible toast before
+any upload or POST. Applied to all four forms (Rule 8). `tests/unit/art-submit-identity.test.js`
+— two of its six cases grep all four files so no form can quietly reintroduce it.
+
+**Prevention.** 🔑 **A fallback identity is the same class of bug as a fallback price** — it
+manufactures plausible-looking data instead of failing. If the answer is "we don't know who this
+is", the only safe output is an error. 🔑 When one recipient of a fan-out is hardcoded and the
+rest are derived, the hardcoded one **masks** breakage in the derived ones — an alert that always
+fires proves nothing about its siblings.
+
 ## Two renderings of the same timestamp never compared equal, so a sync re-wrote 456 orders a day forever (2026-07-29)
 
 **Problem.** `sync-manageorders` spent **2,901 billed Caspio calls in 22 minutes** — ~18% of the
