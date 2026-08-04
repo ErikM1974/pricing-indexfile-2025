@@ -190,6 +190,19 @@
 .sit-stat-num { display: block; font-size: 22px; font-weight: 700; color: #2f6b34; }
 .sit-stat-lbl { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; color: #6b7280; margin-top: 2px; }
 /* Blank-cost ($) styling */
+/* RUSH (2026-08-04) — 3 or fewer WORKING days between the blanks landing and the due date.
+   Red because it changes what production picks up first; pastDue is inverted so it cannot be
+   skimmed past. Print rules below keep both readable in greyscale, since these sheets are
+   normally run off on a mono laser. */
+.sit-rush {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5;
+    border-radius: 5px; padding: 2px 8px; font-size: 12px; font-weight: 800;
+    letter-spacing: .01em; white-space: nowrap;
+}
+.sit-rush--past { background: #991b1b; color: #fff; border-color: #7f1d1d; }
+.sit-stat--rush { background: #fee2e2; border-color: #fca5a5; }
+.sit-stat--rush .sit-stat-num { color: #991b1b; }
 .sit-stat--cost { background: #eef7f0; border-color: #cfe6d4; }
 .sit-stat--cost .sit-stat-num { color: #1d7a3a; }
 .sit-cost { color: #1d7a3a; font-weight: 700; }
@@ -304,6 +317,18 @@
 .sit-ps-logo { width: 42px; height: 42px; flex: none; object-fit: contain; border: 1px solid #d5ddd5; border-radius: 3px; background: #fff; }
 .sit-ps-po-htxt { flex: 1; min-width: 0; }
 .sit-ps-fields { font-size: 9.5px; color: #555; margin-top: 2px; }
+.sit-ps-rush {
+    font-size: 11px; font-weight: 900; color: #7f1d1d; background: #fee2e2;
+    border: 1.5px solid #b91c1c; border-radius: 3px; padding: 2px 7px;
+    margin-top: 3px; display: inline-block; letter-spacing: .02em;
+}
+.sit-ps-rushcount { color: #7f1d1d; }
+.sit-rt-rush { display: block; font-size: 8.5px; font-weight: 900; color: #7f1d1d; margin-top: 1px; }
+.sit-rt-rushtag {
+    display: inline-block; font-size: 8px; font-weight: 900; color: #fff; background: #b91c1c;
+    border-radius: 3px; padding: 0 4px; margin-left: 4px; vertical-align: middle;
+}
+.sit-rt-rush-cell { font-weight: 900; color: #7f1d1d; }
 .sit-ps-followon { font-size: 9.5px; font-weight: 800; color: #92400e; background: #fef3c7; border: 1px solid #fcd34d; border-radius: 3px; padding: 1px 5px; margin-top: 3px; display: inline-block; }
 .sit-ps-tbl { width: 100%; border-collapse: collapse; font-size: 10.5px; }
 .sit-ps-tbl th, .sit-ps-tbl td { border: 1px solid #e0e0e0; padding: 3px 6px; text-align: left; }
@@ -365,6 +390,13 @@
 .sl-type-l { font-size: 10pt; font-weight: 700; letter-spacing: 0.08em; color: #666; }
 .sl-type-name { font-size: 28pt; font-weight: 800; line-height: 1; }
 .sl-duedate { font-size: 14pt; font-weight: 800; margin-top: 4px; }
+/* Box label: the label IS the instruction on the floor, so rush gets a solid block that
+   survives a mono laser and a glance from arm's length. */
+.sl-rush {
+    margin-top: 5px; padding: 3px 8px; display: inline-block;
+    font-size: 13pt; font-weight: 900; letter-spacing: .02em;
+    color: #fff; background: #b91c1c; border: 2px solid #7f1d1d; border-radius: 4px;
+}
 .sl-fill { border: 2px dashed #333; display: flex; flex-direction: column; align-items: flex-start; text-align: left; min-height: 50px; }
 .sl-hint { font-weight: 400; color: #888; }
 .sl-ship { display: flex; align-items: center; gap: 16px; margin-top: 6px; }
@@ -381,4 +413,14 @@
 .sl-mx .sl-tot td { background: #f3f3f3; font-weight: 800; }
 .sl-mx .sl-tot td:first-child { text-align: right; }
 .sl-mx--dense { font-size: 10pt; }
-.sl-mx--dense th, .sl-mx--dense td { padding: 2px 5px; }
+.sl-mx--dense th, .sl-mx--dense td { padding: 2px 5px; }
+
+/* Rush must survive a black-and-white printout — colour alone is not a signal on these
+   sheets (they print on the mono laser). Keep the fill dark and the text reversed. */
+@media print {
+    .sit-ps-rush, .sit-rt-rushtag, .sl-rush {
+        background: #000 !important; color: #fff !important;
+        border-color: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;
+    }
+    .sit-rt-rush, .sit-rt-rush-cell, .sit-ps-rushcount { color: #000 !important; font-weight: 900; }
+}
