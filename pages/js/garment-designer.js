@@ -2554,11 +2554,22 @@ function toggleAutoSpin() {
   stopSpinMomentum();
   autoSpinOn = true;
   const ab2 = $('autoBtn'); if (ab2) ab2.classList.add('primary');
-  const tick = () => {
+  // Motorized-turntable feel: ramp up to cruise over ~0.9s instead of jumping
+  // to full speed, and advance by real elapsed time so the revolution takes
+  // ~6.5s on every display (the old fixed per-frame step spun twice as fast
+  // on a 120Hz screen).
+  let t0 = null, last = null;
+  const tick = (ts) => {
     autoSpinAnim = null;
     const e2 = current();
     if (!autoSpinOn || !e2 || !e2.mockOn) { stopAutoSpin(); return; }
-    PHOTO.pos += Math.max(0.011, effectiveSpinSteps() * 0.0022);   // ~8s per revolution using virtual 96-step spin
+    if (t0 == null) { t0 = ts; last = ts; }
+    const dt = Math.min(0.05, Math.max(0, (ts - last) / 1000));   // seconds, clamped across tab switches
+    last = ts;
+    const cruise = Math.max(0.66, effectiveSpinSteps() * 0.152);  // virtual steps per second
+    const r = Math.min(1, (ts - t0) / 900);
+    const ease = r * r * (3 - 2 * r);                             // smoothstep spin-up
+    PHOTO.pos += cruise * (0.15 + 0.85 * ease) * dt;
     rebuildMockup(e2);
     autoSpinAnim = requestAnimationFrame(tick);
   };
@@ -2573,22 +2584,40 @@ function stopSpinMomentum() {
 function startSpinMomentum(v0) {
   stopSpinMomentum();
   let v = Math.max(-0.6, Math.min(0.6, v0));
-  const tick = () => {
+  let last = null;
+  const tick = (ts) => {
     spinAnim = null;
     const e = current();
     if (!e || !e.mockOn || PHOTO.frames.length < 2) return;
-    PHOTO.pos += v;
-    v *= 0.90;
-    if (Math.abs(v) < 0.01) {                  // glide onto the nearest whole view
-      const target = Math.round(PHOTO.pos);
-      const d = target - PHOTO.pos;
-      if (Math.abs(d) < 0.005) {
-        const N = PHOTO.frames.length;
-        PHOTO.pos = ((target % N) + N) % N;
+    // dt in 60fps-frame units so the coast feels identical on 60/120/144Hz screens
+    const dt = last == null ? 1 : Math.min(3, Math.max(0.2, (ts - last) / (1000 / 60)));
+    last = ts;
+    PHOTO.pos += v * dt;
+    v *= Math.pow(0.92, dt);
+    if (Math.abs(v) < 0.01) {
+      // Glide onto the nearest REAL photo angle — never park mid-crossfade
+      // (the old code rounded to a virtual step, leaving the shirt resting as
+      // a soft double-exposure, and wrapped pos by the frame count instead of
+      // effectiveSpinSteps(), jumping to a different angle at the end).
+      const S = effectiveSpinSteps();
+      const theta = spinThetaForPos(PHOTO.pos);
+      let bestA = 0, bd = 1e9;
+      for (const f of PHOTO.frames) {
+        const d = Math.abs(wrap180(theta - (f.angle || 0)));
+        if (d < bd) { bd = d; bestA = normalizeAngle360(f.angle || 0); }
+      }
+      const target = bestA / 360 * S;
+      let p = PHOTO.pos % S;
+      if (p < 0) p += S;
+      let d2 = target - p;
+      if (d2 > S / 2) d2 -= S;
+      if (d2 < -S / 2) d2 += S;
+      if (Math.abs(d2) < 0.005) {
+        PHOTO.pos = target;
         rebuildMockup(e);
         return;
       }
-      PHOTO.pos += d * 0.25;
+      PHOTO.pos = p + d2 * Math.min(0.6, 0.25 * dt);
     }
     rebuildMockup(e);
     spinAnim = requestAnimationFrame(tick);
@@ -4658,12 +4687,32 @@ function composeSpinMock(entry) {
 
   if (dense && !settledNow) {
     const K = W / PHOTO.frames[i0].W;
-    ctx.drawImage(v0, 0, 0, W, H);
-    if (frac > 0.001) {
-      ctx.globalAlpha = frac;
-      ctx.drawImage(getSpinShirtView(i1), 0, 0, W, H);
-      ctx.globalAlpha = 1;
-    }
+    // View morph: scale each neighbouring photo horizontally (about the shared
+    // registered torso axis) by the ratio of apparent turntable widths at the
+    // current angle vs the photo's own angle, THEN blend. Silhouettes align, so
+    // the crossfade reads as continuous rotation instead of a double exposure —
+    // and the shirt tracks the logo, which already glides at continuous theta.
+    // f is exactly 1 whenever theta sits on a real photo angle (no distortion).
+    const Bd = 0.28;                                   // depth factor, matches drawTurntable
+    const appW = (deg) => { const r = deg * Math.PI / 180; return Math.sqrt(Math.cos(r) ** 2 + Bd * Bd * Math.sin(r) ** 2); };
+    const cxAxis = PHOTO.frames[0].box.cx * K;         // frames share a registered box
+    const wT = appW(theta);
+    const drawWarp = (view, aDeg, alpha) => {
+      const f = Math.max(0.7, Math.min(1 / 0.7, wT / appW(aDeg)));
+      ctx.globalAlpha = alpha;
+      ctx.setTransform(f, 0, 0, 1, cxAxis * (1 - f), 0);
+      ctx.drawImage(view, 0, 0, W, H);
+    };
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    // The warp glides continuously, so the fade can be compressed into the
+    // middle 40% of each gap: sleeves (parallax the torso warp can't align)
+    // swap in a quick dissolve instead of ghosting through the whole gap.
+    const fade = frac <= 0.3 ? 0 : frac >= 0.7 ? 1 : (t => t * t * (3 - 2 * t))((frac - 0.3) / 0.4);
+    drawWarp(v0, PHOTO.frames[i0].angle || 0, 1);
+    if (fade > 0.001) drawWarp(getSpinShirtView(i1), PHOTO.frames[i1].angle || 0, fade);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.globalAlpha = 1;
     for (const e2 of mockEntries()) {
       const artLocs = [e2.printLoc || 'Full Front'];
       if (e2.printBoth && !isBackLoc(artLocs[0])) artLocs.push('Full Back');

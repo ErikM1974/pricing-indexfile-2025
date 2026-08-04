@@ -414,9 +414,9 @@
 ### Box Labels - Shipping & Receiving (NEW 2026-04-01)
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/pages/box-labels.html` | Box label management page — lookup, drag/drop, print labels | box-labels.js, box-labels.css, SortableJS, jsPDF, JsBarcode, qrcode-generator | ✅ Active |
-| `/pages/js/box-labels.js` | Box management logic — API calls, drag/drop, PDF generation | SortableJS CDN, jsPDF CDN, JsBarcode CDN | ✅ Active |
-| `/pages/css/box-labels.css` | Box labels page styling — production-floor UI | — | ✅ Active |
+| `/pages/box-labels.html` | Repack station — look up a SanMar PO / work order, arrange boxes (drag/drop + split), print the SAME 8.5×11 label receiving prints. **Rewritten 2026-08-04** onto proxy `/api/sanmar-orders/label-data` + the shared BoxLabelTemplate (`window.print()`; jsPDF/autotable/JsBarcode CDNs dropped) | box-labels.js, box-labels.css, box-label-print.css, box-label-template.js, app.config.js, SortableJS, qrcode-generator | ✅ Active |
+| `/pages/js/box-labels.js` | Repack-station logic — proxy label-data lookup (PO or WO → per-order box groups), drag/drop + split, localStorage draft (24h, never Caspio), pre-print `refresh=1` re-pull of ORDER fields only (boxes keep the human arrangement; loud error + explicit "Print anyway" on failure), QR deep-link + Repacked-by on every label | BoxLabelTemplate, APP_CONFIG, SortableJS CDN, qrcode-generator CDN | ✅ Active |
+| `/pages/css/box-labels.css` | Box labels page styling — production-floor UI (+ 2026-08-04: order-group heads, rush/follow-on/received chips, reference tables, draft note, split rows) | — | ✅ Active |
 
 ### Customer Portal (NEW 2026-03-21)
 | File | Purpose | Dependencies | Status |

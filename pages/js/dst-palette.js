@@ -2,7 +2,7 @@
  * dst-palette.js — Robison-Anton 40wt thread palette for the Embroidery Studio.
  *
  * SNAPSHOT of GET /api/embroidery/palette on the inksoft-transform backend
- * (the same palette the Mockup Generator uses), taken 2026-08-04, 226 colors.
+ * (the same palette the Mockup Generator uses), taken 2026-08-04, 225 colors (1 entry with catalog=None dropped — not orderable).
  * Embedded so the Studio works with zero backend dependencies; refresh by
  * re-running the curl in the file history if the RA catalog ever changes.
  * Catalog numbers are REAL RA numbers — never hand-edit hex/catalog pairs.
@@ -64,7 +64,6 @@
     { catalog: "2565", name: "H Charcoal", hex: "#54585A", family: "Gray" },
     { catalog: "2407", name: "Metal", hex: "#505759", family: "Gray" },
     { catalog: "2340", name: "Pearl Grey", hex: "#DBD3D3", family: "Gray" },
-    { catalog: "None", name: "Silver Gold", hex: "#C0C0C0", family: "Gray" },
     { catalog: "2592", name: "Silver Steel", hex: "#ADAFAA", family: "Gray" },
     { catalog: "2484", name: "Silvery Gray", hex: "#8C8984", family: "Gray" },
     { catalog: "2274", name: "Steel Grey", hex: "#B0B7BC", family: "Gray" },

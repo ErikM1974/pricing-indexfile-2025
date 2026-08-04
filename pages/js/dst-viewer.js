@@ -20,7 +20,7 @@
 
     /* ─── constants ─────────────────────────────────────────────────── */
 
-    var THREAD_MM = 0.42;            // visual 40wt thread diameter
+    var THREAD_MM = 0.46;            // visual 40wt thread diameter (slightly fat for coverage)
     var LIGHT_ANGLE = -0.55;         // radians; sheen direction (upper-left)
     var ANGLE_BUCKETS = 10;
     var BITMAP_MAX_PX = 4096;
@@ -303,26 +303,29 @@
             return out;
         }
         var runs = [];
-        // N — two verticals + diagonal, satin 2.6mm
+        // Satin pitch: one crossing every 0.21 mm ⇒ 0.42 mm same-side spacing
+        // (standard satin density — renders as a solid column, not open zigzag).
+        var P = 0.21;
+        // N — two verticals + diagonal, 3.4 mm satin
         var N = [].concat(
-            satin([[-30, -16], [-30, 16]], 1.3, 0.42),
-            satin([[-30, 16], [-12, -16]], 1.3, 0.42),
-            satin([[-12, -16], [-12, 16]], 1.3, 0.42)
+            satin([[-30, -16], [-30, 16]], 1.7, P),
+            satin([[-29, 15], [-13, -15]], 1.7, P),
+            satin([[-12, -16], [-12, 16]], 1.7, P)
         );
-        // W — 4 strokes
+        // W — 4 strokes, 3 mm satin
         var W = [].concat(
-            satin([[2, 16], [9, -16]], 1.2, 0.42),
-            satin([[9, -16], [16, 10]], 1.2, 0.42),
-            satin([[16, 10], [23, -16]], 1.2, 0.42),
-            satin([[23, -16], [30, 16]], 1.2, 0.42)
+            satin([[2, 16], [9, -16]], 1.5, P),
+            satin([[9, -16], [16, 10]], 1.5, P),
+            satin([[16, 10], [23, -16]], 1.5, P),
+            satin([[23, -16], [30, 16]], 1.5, P)
         );
-        // Border — double-pass ellipse
+        // Border — 2.4 mm satin ring
         var ell = [];
-        for (var i = 0; i <= 120; i++) {
-            var ang = i / 120 * Math.PI * 2;
+        for (var i = 0; i <= 180; i++) {
+            var ang = i / 180 * Math.PI * 2;
             ell.push([Math.cos(ang) * 46, Math.sin(ang) * 25]);
         }
-        var border = runStitch(ell, 2.2).concat(runStitch(ell.slice().reverse(), 2.2));
+        var border = satin(ell, 1.2, P);
         runs.push(N, W, border);
 
         // absolute mm → delta records (0.1mm), jumps between runs, CC records
@@ -411,7 +414,11 @@
         c.lineJoin = 'round';
 
         if (mode === 'wire') {
-            c.lineWidth = Math.max(0.6, pxPerMM * 0.06);
+            // Ink adapts to what it will sit on: light lines on dark fabric,
+            // dark lines on light fabric / white export.
+            var onDark = opts.transparent ? (Garments.luma(state.fabric) < 140) : false;
+            var wireInk = onDark ? 'rgba(214,222,232,0.85)' : 'rgba(52,58,66,0.92)';
+            c.lineWidth = Math.max(0.9, pxPerMM * 0.09);
             data.colorRuns.forEach(function (run) {
                 var path = new Path2D();
                 var jumps = new Path2D();
@@ -428,11 +435,11 @@
                         prev = p;
                     }
                 }
-                c.strokeStyle = opts.transparent ? 'rgba(40,44,52,0.9)' : 'rgba(52,58,66,0.92)';
+                c.strokeStyle = wireInk;
                 c.stroke(path);
                 c.save();
                 c.setLineDash([4, 4]);
-                c.strokeStyle = 'rgba(255,176,60,0.55)';
+                c.strokeStyle = 'rgba(255,176,60,0.8)';
                 c.stroke(jumps);
                 c.restore();
             });
@@ -1570,6 +1577,7 @@
                 fs.querySelectorAll('.fabric-dot').forEach(function (d) { d.classList.remove('active'); });
                 b.classList.add('active');
                 store(SETTINGS_KEY, { spm: state.spm, fabric: state.fabric });
+                if (state.mode === 'wire') bitmap.dirty = true; // wire ink adapts to fabric
                 draw();
             });
             fs.appendChild(b);

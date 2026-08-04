@@ -4,7 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Box Labels - NWCA Shipping &amp; Receiving</title>
-  <link rel="stylesheet" href="/pages/css/box-labels.css?v=20260401">
+  <link rel="stylesheet" href="/pages/css/box-labels.css?v=2026.08.04.2">
+  <!-- Shared 8.5x11 label styles — the SAME label receiving prints (box-label-template.js) -->
+  <link rel="stylesheet" href="/shared_components/css/box-label-print.css?v=2026.08.04.2">
 </head>
 <body>
   <!-- Sticky Header -->
@@ -32,112 +34,74 @@
     </div>
   </header>
 
-  <!-- Order Summary Banner (hidden until data loads) -->
-  <div id="orderBanner" class="bl-banner" style="display:none;">
-    <div class="bl-banner__row">
-      <span class="bl-banner__item"><strong>WO#</strong> <span id="bannerWO">—</span></span>
-      <span class="bl-banner__item"><strong>Company:</strong> <span id="bannerCompany">—</span></span>
-      <span class="bl-banner__item"><strong>Contact:</strong> <span id="bannerContact">—</span></span>
-      <span class="bl-banner__item"><strong>Ship Date:</strong> <span id="bannerShipDate">—</span></span>
-    </div>
-    <div class="bl-banner__row">
-      <span class="bl-banner__item"><strong>Design:</strong> <span id="bannerDesign">—</span></span>
-      <span class="bl-banner__item"><strong>Type:</strong> <span id="bannerType">—</span></span>
-      <span class="bl-banner__item"><strong>Cust PO:</strong> <span id="bannerCustPO">—</span></span>
-      <span class="bl-banner__item"><strong>Rep:</strong> <span id="bannerRep">—</span></span>
-    </div>
-    <!-- Link Work Order (shown when no order data found) -->
-    <div id="linkWOSection" class="bl-banner__link-wo" style="display:none;">
-      <span class="bl-banner__link-wo-label">No work order linked —</span>
-      <input type="text" id="linkWOInput" class="bl-input" placeholder="Enter Work Order #" style="width:140px; padding:4px 8px; font-size:14px;">
-      <button id="linkWOBtn" class="bl-btn bl-btn--primary bl-btn--small">Link WO</button>
-    </div>
-  </div>
-
-  <!-- Totals Summary Bar -->
-  <div id="totalsBar" class="bl-totals" style="display:none;">
-    <span class="bl-totals__item">All Boxes: <strong id="totalBoxed">0</strong> pcs</span>
-    <span class="bl-totals__item">Work Order: <strong id="totalWO">0</strong> pcs</span>
-    <span class="bl-totals__item">Unboxed: <strong id="totalUnboxed">0</strong> pcs</span>
-    <span id="mismatchWarning" class="bl-totals__warning" style="display:none;">
-      ⚠ Quantity mismatch — check for short shipment
-    </span>
-  </div>
-
   <!-- Loading State -->
   <div id="loadingState" class="bl-loading" style="display:none;">
     <div class="bl-spinner"></div>
     <p>Looking up shipment data...</p>
   </div>
 
-  <!-- Error State -->
+  <!-- Error State (Rule #4: failures are always visible, never silent) -->
   <div id="errorState" class="bl-error" style="display:none;">
     <p id="errorMessage"></p>
-    <button class="bl-btn bl-btn--primary" onclick="document.getElementById('errorState').style.display='none'">Dismiss</button>
+    <span id="errorActions"></span>
+    <button class="bl-btn bl-btn--primary" id="errorDismissBtn">Dismiss</button>
   </div>
 
-  <!-- Main Content: Two-column layout -->
+  <!-- Restored-draft note -->
+  <div id="draftNote" class="bl-draft-note" style="display:none;">
+    <span id="draftNoteText"></span>
+    <button id="draftResetBtn" class="bl-btn bl-btn--small bl-btn--outline">Reset to SanMar boxes</button>
+  </div>
+
+  <!-- Totals Summary Bar -->
+  <div id="totalsBar" class="bl-totals" style="display:none;">
+    <span class="bl-totals__item">In boxes: <strong id="totalBoxed">0</strong> pcs</span>
+    <span class="bl-totals__item">SanMar shipped: <strong id="totalShipped">0</strong> pcs</span>
+    <span class="bl-totals__item">Ordered: <strong id="totalOrdered">0</strong> pcs</span>
+    <span id="shortShipWarning" class="bl-totals__warning" style="display:none;">
+      ⚠ SanMar shipped fewer pieces than ordered — check for a short shipment
+    </span>
+  </div>
+
+  <!-- Main Content: order groups render here -->
   <div id="mainContent" class="bl-main" style="display:none;">
-    <!-- Left Column: Boxes -->
     <div class="bl-column bl-column--boxes">
       <div class="bl-column__header">
         <h2>Boxes</h2>
         <div class="bl-column__actions">
           <button id="expandAllBtn" class="bl-btn bl-btn--small">Expand All</button>
-          <button id="addBoxBtn" class="bl-btn bl-btn--small bl-btn--primary">+ New Box</button>
         </div>
       </div>
-      <div id="boxContainer" class="bl-box-container">
-        <!-- Box cards rendered by JS -->
-      </div>
+      <div id="ordersContainer"></div>
     </div>
 
-    <!-- Right Column: Items Not In A Box -->
     <div class="bl-column bl-column--unboxed">
       <div class="bl-column__header">
-        <h2>Items Not In A Box</h2>
+        <h2>Order Reference</h2>
       </div>
-
-      <div id="unboxedContainer" class="bl-unboxed-container">
-        <h3 class="bl-section-label">Other Vendor Items</h3>
-        <div id="unboxedItems" class="bl-item-list bl-droppable" data-box="0">
-          <!-- Unboxed item cards rendered by JS -->
-        </div>
-
-        <h3 class="bl-section-label">Excluded (fees/services)</h3>
-        <div id="excludedItems" class="bl-excluded-list">
-          <!-- Excluded items rendered by JS -->
-        </div>
-      </div>
-
-      <!-- Drop zone for removing items from boxes -->
-      <div id="removeDropZone" class="bl-drop-zone" data-box="0">
-        Drag items here to remove from boxes
-      </div>
+      <div id="orderReference"></div>
     </div>
   </div>
 
-  <!-- Size Split Modal -->
+  <!-- Split Modal: move N pieces of one line to another box -->
   <div id="splitModal" class="bl-modal" style="display:none;">
     <div class="bl-modal__content">
-      <h3 id="splitModalTitle">Move items</h3>
+      <h3 id="splitModalTitle">Split to another box</h3>
       <p id="splitModalSubtitle"></p>
-      <div id="splitModalSizes" class="bl-split-grid">
-        <!-- Size inputs rendered by JS -->
-      </div>
+      <div id="splitModalBody" class="bl-split-grid"></div>
       <div class="bl-modal__actions">
         <button id="splitCancelBtn" class="bl-btn bl-btn--large">Cancel</button>
-        <button id="splitConfirmBtn" class="bl-btn bl-btn--primary bl-btn--large">Move Selected</button>
+        <button id="splitConfirmBtn" class="bl-btn bl-btn--primary bl-btn--large">Move</button>
       </div>
     </div>
   </div>
 
-  <!-- CDN Libraries -->
+  <!-- Libraries: drag/drop + QR only. jsPDF/autotable/JsBarcode removed 2026-08-04 —
+       printing goes through window.print() via the shared BoxLabelTemplate. -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
-  <script src="/pages/js/box-labels.js?v=20260401"></script>
+  <script src="/config/app.config.js?v=2026.08.04.2"></script>
+  <script src="/shared_components/js/box-label-template.js?v=2026.08.04.2"></script>
+  <script src="/pages/js/box-labels.js?v=2026.08.04.2"></script>
 </body>
 </html>
