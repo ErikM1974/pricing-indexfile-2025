@@ -43,6 +43,14 @@ expensive part is sunk, and breaching 500K would now take a sustained 15,400/day
 Six independent under-counts, all closed. Residual vs Caspio by day:
 **−33% → −21% → −10% → +18% → +2.2%** (31 Jul, first clean day).
 
+⚠️ **Post-repair the residual settled POSITIVE and stayed there** — 31 Jul → 3 Aug measured
+**+2% / +11% / +12% / +14%**. It no longer flips sign; we consistently over-count. Cause
+**unidentified**. Ruled out 2026-08-04: `/oauth/token` fetches are counted (`__oauth_token__`)
+but are only **0.2%** of calls — nowhere near the gap. 🔑 **Do not chase it.** A uniform
+scaling error does not affect ATTRIBUTION (relative table shares are untouched), and it biases
+the projection *high*, so the alert fires early rather than late. Caspio remains the billing
+authority and is free to read.
+
 1. **3 scripts never loaded `api-tracker`** — the interceptor installs as a side effect of
    *loading* that module, so it attaches **per-process**. ~950/day invisible.
 2. **UTC vs Caspio's Pacific account clock** — a whole-day offset is indistinguishable from
