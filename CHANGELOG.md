@@ -1,3 +1,9 @@
+## v2026.08.04.1 (2026.08.04)
+
+- Memory: /deploy's cache-bust does nothing if you pushed develop first
+- Memory: the meter's post-repair residual is a consistent over-count
+- Show the RUSH flag on every inbound surface
+
 ## v2026.08.03.2 (2026.08.03)
 
 - Deploy skill: document the Heroku CLI v11 git-auth break
