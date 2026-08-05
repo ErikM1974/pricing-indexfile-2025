@@ -287,6 +287,12 @@
                                         <a href="/dashboards/sanmar-shopworks-converter.html" class="nav-link">🔄 SanMar → ShopWorks Parts converter</a>
                                         <a href="/sanmar-vendor-portal.html" class="nav-link">Sanmar Vendor Portal (legacy)</a>
                                         <a href="/universal-records-admin.html" class="nav-link">Universal Records Admin</a>
+                                        <!-- Moved here from Art &amp; Design 2026-08-05 (was a BETA tool-btn open to any
+                                             staff). It writes DTG_Calibration in Caspio via POST/DELETE, so it is Erik's
+                                             admin function, not a sales tool. Listing it here makes it admin-only:
+                                             /tools is covered by gateStaffHtml and the filename is in ADMIN_DEFAULT_PAGES.
+                                             KEEP BOTH IN SYNC — admin-page-access.test.js fails if they drift. -->
+                                        <a href="/tools/custom-tees-calibrate.html" class="nav-link">🎯 Tee Print-Box Calibration — where art prints on the shirt</a>
                                     </div>
                                 </div>
 
@@ -722,7 +728,9 @@
                                 <a href="/dashboards/art-hub-ruth.html" class="tool-btn"><i class="fas fa-drafting-compass" aria-hidden="true"></i> Ruth's Queue</a>
                                 <a href="/art-tools/ae-art-dashboard.html" class="tool-btn"><i class="fas fa-palette" aria-hidden="true"></i> AE Dashboard</a>
                                 <a href="/pages/jds-mockup-creator.html" class="tool-btn"><i class="fas fa-magic" aria-hidden="true"></i> JDS Tumbler Mockup</a>
-                                <a href="/tools/custom-tees-calibrate.html" class="tool-btn tool-btn--beta" title="Beta — adjust where the artwork prints on the shirt. Works but still being refined; let Erik know if you hit issues."><i class="fas fa-crosshairs" aria-hidden="true"></i> Tee Print-Box Calibration</a>
+                                <!-- Tee Print-Box Calibration MOVED 2026-08-05 to Administration → Integrations
+                                     (it edits DTG_Calibration in Caspio — an admin function, not a sales tool).
+                                     Not retired; it is admin-only now via ADMIN_DEFAULT_PAGES. -->
                                 <!-- Mockup Generator retired 2026-08-05 — DST Studio (above) is the entry point now.
                                      Zero mockups generated in the full retained backend log window; /pages/mockup-generator.html
                                      302s to DST Studio in server.js. Nothing deleted, so restoring this line is the whole rollback. -->
