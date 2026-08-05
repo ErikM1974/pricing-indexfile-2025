@@ -246,6 +246,7 @@
 | `jds-api-service.js` | JDS supplier API service |
 | `monogram-form-service.js` | Monogram form API service |
 | `monogram-form-controller.js` | Monogram form UI controller |
+| `monogram-name-qa.js` | "Stitch Check" pure QA engine for monogram name lists (whitespace/case/dup/near-dup/punctuation/completeness) + thread-grouped machine run plan. UMD, no DOM — jest: `tests/unit/monogram-name-qa.test.js` |
 | `names-numbers-service.js` | Names & Numbers roster API service (CRUD, Excel parse, OCR) |
 | `names-numbers-controller.js` | Names & Numbers roster form UI controller (tabs, groups, import) |
 | `names-numbers-dashboard.js` | Names & Numbers dashboard logic (search, filter, KPIs) |

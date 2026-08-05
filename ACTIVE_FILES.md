@@ -579,13 +579,15 @@
 ### Monogram Form System (NEW 2026-01-08)
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/quote-builders/monogram-form.html` | Monogram/personalization tracking form | monogram-form-service.js, monogram-form-controller.js | ✅ Active |
+| `/quote-builders/monogram-form.html` | Monogram/personalization tracking form | monogram-form-service.js, monogram-form-controller.js, monogram-name-qa.js, dst-palette.js | ✅ Active |
 | `/shared_components/js/monogram-form-service.js` | API service (ManageOrders, Caspio) | ManageOrders API | ✅ Active |
-| `/shared_components/js/monogram-form-controller.js` | UI controller and state management | monogram-form-service.js | ✅ Active |
-| `/shared_components/css/monogram-form.css` | Monogram form styling | quote-builder-common.css | ✅ Active |
+| `/shared_components/js/monogram-form-controller.js` | UI controller and state management | monogram-form-service.js, monogram-name-qa.js | ✅ Active |
+| `/shared_components/js/monogram-name-qa.js` | **NEW (2026-08-04)** "Stitch Check" pure QA engine: whitespace/case/duplicate/near-dup/punctuation/completeness checks + thread-grouped machine run plan (UMD, jest-tested) | none (pure) | ✅ Active |
+| `/tests/unit/monogram-name-qa.test.js` | **NEW (2026-08-04)** Pins every Stitch Check rule (41 tests) | jest, monogram-name-qa.js | ✅ Active |
+| `/shared_components/css/monogram-form.css` | Monogram form styling (incl. Stitch Check panel + customer proof sheet print styles) | quote-builder-common.css | ✅ Active |
 | `/memory/MONOGRAM_FORM_SYSTEM.md` | Implementation documentation | - | 📚 Docs |
 
-**Features:** Order lookup from ShopWorks, dynamic name entry (up to 50), print PDF for production, search by order/company.
+**Features:** Order lookup from ShopWorks, dynamic name entry (up to 50), print PDF for production (thread-grouped machine run plan when 2+ threads), live Stitch Check QA panel, customer proof sheet with per-name approval checkboxes + signature line (names rendered in mapped font + real thread hex from Caspio `Hex_Color`, RA palette fallback), search by order/company.
 
 ### Cap Embroidery System
 | File | Purpose | Dependencies | Status |

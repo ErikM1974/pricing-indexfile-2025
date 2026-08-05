@@ -101,6 +101,12 @@ class MonogramFormController {
         document.getElementById('clearFormBtn')?.addEventListener('click', () => this.clearForm());
         document.getElementById('saveDraftBtn')?.addEventListener('click', () => this.saveDraft());
         document.getElementById('printPdfBtn')?.addEventListener('click', () => this.printPDF());
+        document.getElementById('printProofBtn')?.addEventListener('click', () => this.printProof());
+
+        // Proof print uses a body class to choose which template prints
+        window.addEventListener('afterprint', () => {
+            document.body.classList.remove('print-mode-proof');
+        });
 
         // Search functionality
         document.getElementById('searchBtn')?.addEventListener('click', () => this.toggleSearchPanel());
@@ -108,9 +114,13 @@ class MonogramFormController {
         document.getElementById('doSearchBtn')?.addEventListener('click', () => this.handleSearch());
         document.getElementById('newFormBtn')?.addEventListener('click', () => this.newForm());
 
-        // Track form changes
+        // Track form changes (input covers typing + selects; change catches the rest)
         document.getElementById('monogramForm')?.addEventListener('input', () => {
             this.isDirty = true;
+            this.scheduleStitchCheck();
+        });
+        document.getElementById('monogramForm')?.addEventListener('change', () => {
+            this.scheduleStitchCheck();
         });
 
         // Warn before navigating away with unsaved changes
@@ -140,6 +150,7 @@ class MonogramFormController {
         const orderNumber = params.get('order');
         const loadOrder = params.get('load');  // Load existing monogram by order number
         const autoPrint = params.get('print') === 'true';
+        const autoProof = params.get('proof') === 'true';
 
         if (loadOrder) {
             // Load existing monogram from database
@@ -147,6 +158,8 @@ class MonogramFormController {
                 if (autoPrint) {
                     // Delay to allow form to render before triggering print
                     setTimeout(() => this.printPDF(), 500);
+                } else if (autoProof) {
+                    setTimeout(() => this.printProof(), 500);
                 }
             });
         } else if (orderNumber) {
@@ -312,6 +325,7 @@ class MonogramFormController {
         this.updateThreadColorButtonText();
         this.updateAllRowThreadColorDropdowns();  // Update row dropdowns
         this.isDirty = true;
+        this.scheduleStitchCheck();  // multi-thread context affects QA
     }
 
     /**
@@ -559,6 +573,7 @@ class MonogramFormController {
         this.updateLocationButtonText();
         this.updateAllRowLocationDropdowns();
         this.isDirty = true;
+        this.scheduleStitchCheck();  // multi-location context affects QA
     }
 
     /**
@@ -770,6 +785,7 @@ class MonogramFormController {
 
         this.showToast(`Imported ${this.importedNames.length} names`, 'success');
         this.isDirty = true;
+        this.scheduleStitchCheck();
     }
 
     /**
@@ -785,6 +801,7 @@ class MonogramFormController {
         this.updateUnassignedList();
         this.updateAllRowNameDropdowns();
         this.isDirty = true;
+        this.scheduleStitchCheck();
     }
 
     /**
@@ -906,6 +923,7 @@ class MonogramFormController {
         this.updateUnassignedList();
         this.updateAllRowNameDropdowns();
         this.isDirty = true;
+        this.scheduleStitchCheck();
     }
 
     // ============================================
@@ -1334,6 +1352,7 @@ class MonogramFormController {
         this.updateNameCount();
         this.updateAllSizeDropdowns();
         this.isDirty = true;
+        this.scheduleStitchCheck();
     }
 
     renumberRows() {
@@ -1827,6 +1846,7 @@ class MonogramFormController {
         }
 
         this.updateNameCount();
+        this.scheduleStitchCheck();
     }
 
     // ============================================
@@ -1936,6 +1956,227 @@ class MonogramFormController {
     }
 
     // ============================================
+    // Stitch Check (live name QA — monogram-name-qa.js)
+    // ============================================
+
+    scheduleStitchCheck() {
+        clearTimeout(this._qaTimer);
+        this._qaTimer = setTimeout(() => this.runStitchCheck(), 400);
+    }
+
+    /** Snapshot the visible rows in the shape the QA engine expects. */
+    collectQAItems() {
+        const tbody = document.getElementById('namesTableBody');
+        const items = [];
+        if (!tbody) return items;
+        tbody.querySelectorAll('tr').forEach((row, index) => {
+            items.push({
+                row: index + 1,
+                name: row.querySelector('.name-input')?.value || '',
+                size: row.querySelector('.size-input')?.value || '',
+                threadColor: row.querySelector('.row-thread-color')?.value || '',
+                location: row.querySelector('.row-location')?.value || ''
+            });
+        });
+        return items;
+    }
+
+    runStitchCheck() {
+        if (typeof MonogramNameQA === 'undefined') return null;
+        const items = this.collectQAItems();
+        const result = MonogramNameQA.analyze(items, {
+            multiThread: this.selectedThreadColors.length > 1,
+            multiLocation: this.selectedLocations.length > 1,
+            unassignedNames: this.getAvailableNames().map(a => a.name)
+        });
+        this.renderStitchCheck(result, items);
+        return result;
+    }
+
+    renderStitchCheck(result, items) {
+        const panel = document.getElementById('stitchCheckPanel');
+        const listEl = document.getElementById('stitchCheckList');
+        const summaryEl = document.getElementById('stitchCheckSummary');
+        if (!panel || !listEl || !summaryEl) return;
+
+        const namedCount = items.filter(it => it.name && it.name.trim()).length;
+        if (namedCount === 0) {
+            panel.style.display = 'none';
+            return;
+        }
+        panel.style.display = 'block';
+
+        const { findings, summary } = result;
+        if (findings.length === 0) {
+            summaryEl.textContent = `All clear — ${namedCount} name${namedCount !== 1 ? 's' : ''} ready to stitch`;
+            summaryEl.classList.add('all-clear');
+            listEl.innerHTML = '';
+            return;
+        }
+
+        summaryEl.classList.remove('all-clear');
+        const parts = [];
+        if (summary.errors) parts.push(`${summary.errors} error${summary.errors > 1 ? 's' : ''}`);
+        if (summary.warnings) parts.push(`${summary.warnings} warning${summary.warnings > 1 ? 's' : ''}`);
+        if (summary.infos) parts.push(`${summary.infos} note${summary.infos > 1 ? 's' : ''}`);
+        summaryEl.textContent = parts.join(' · ');
+
+        const icons = { error: 'fa-times-circle', warn: 'fa-exclamation-triangle', info: 'fa-info-circle' };
+        listEl.innerHTML = findings.map((f, i) => `
+            <li class="stitch-finding severity-${f.severity}" data-finding="${i}" title="Click to highlight the row(s)">
+                <span class="finding-icon"><i class="fas ${icons[f.severity] || icons.info}"></i></span>
+                <span class="finding-message">${this.escapeHTML(f.message)}</span>
+                ${f.fixable ? '<button type="button" class="btn-fix-finding">Fix</button>' : ''}
+            </li>
+        `).join('');
+
+        listEl.querySelectorAll('.stitch-finding').forEach(li => {
+            const finding = findings[parseInt(li.dataset.finding, 10)];
+            if (!finding) return;
+            li.addEventListener('click', () => this.highlightRows(finding.rows));
+            const fixBtn = li.querySelector('.btn-fix-finding');
+            if (fixBtn) {
+                fixBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.applyWhitespaceFixes(finding.fixes);
+                });
+            }
+        });
+    }
+
+    /** Scroll to and flash the rows a finding refers to. */
+    highlightRows(rows) {
+        if (!rows || !rows.length) return;
+        const tbody = document.getElementById('namesTableBody');
+        if (!tbody) return;
+        const all = tbody.querySelectorAll('tr');
+        let first = null;
+        rows.forEach(rowNum => {
+            const tr = all[rowNum - 1];
+            if (!tr) return;
+            if (!first) first = tr;
+            tr.classList.remove('qa-flash');
+            void tr.offsetWidth;  // restart the CSS animation
+            tr.classList.add('qa-flash');
+        });
+        first?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    /** One-click cleanup for the whitespace finding (trim + collapse spaces). */
+    applyWhitespaceFixes(fixes) {
+        const tbody = document.getElementById('namesTableBody');
+        if (!tbody || !fixes) return;
+        const all = tbody.querySelectorAll('tr');
+        fixes.forEach(fix => {
+            const input = all[fix.row - 1]?.querySelector('.name-input');
+            // Only fix if the value hasn't changed since the finding was produced
+            if (input && input.value === fix.from) input.value = fix.to;
+        });
+        this.isDirty = true;
+        this.showToast(`Cleaned up spacing on ${fixes.length} name${fixes.length > 1 ? 's' : ''}`, 'success');
+        this.runStitchCheck();
+    }
+
+    // ============================================
+    // Customer Proof Sheet
+    // ============================================
+
+    /**
+     * Thread name → hex. The Caspio Thread_Colors row (loaded for the
+     * dropdown) carries the authoritative Hex_Color; the RA palette snapshot
+     * (dst-palette.js) is the fallback for names Caspio has no hex for.
+     */
+    getThreadHex(threadName) {
+        const name = (threadName || '').trim().toLowerCase();
+        if (!name) return null;
+        const validHex = (hex) => /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(hex || '') ? hex : null;
+
+        const apiMatch = (this.threadColors || []).find(c =>
+            (c.Thread_Color || '').trim().toLowerCase() === name);
+        if (apiMatch && validHex(apiMatch.Hex_Color)) return apiMatch.Hex_Color;
+
+        if (typeof DSTPalette === 'undefined') return null;
+        const colors = DSTPalette.COLORS || [];
+        let match = colors.find(c => c.name.toLowerCase() === name);
+        if (!match) {
+            // Caspio names embed the catalog number ("Almond 2479") — allow contains
+            match = colors.find(c =>
+                c.name.toLowerCase().includes(name) || name.includes(c.name.toLowerCase()));
+        }
+        return match ? validHex(match.hex) : null;
+    }
+
+    /** Map the free-text font style to a screen-approximation web font. */
+    getProofFontCSS(fontStyle) {
+        const style = (fontStyle || '').toLowerCase();
+        if (/script|cursive|hand|sansita|brush/.test(style)) {
+            return "font-family:'Dancing Script',cursive;font-weight:700;";
+        }
+        if (/block|varsity|athletic|college|impact/.test(style)) {
+            return "font-family:'Archivo Black','Inter',sans-serif;font-weight:400;";
+        }
+        if (/serif|roman|times|book/.test(style)) {
+            return "font-family:Georgia,'Times New Roman',serif;font-weight:700;";
+        }
+        return "font-family:'Inter',sans-serif;font-weight:700;";
+    }
+
+    /**
+     * Print the customer-facing proof: every name rendered large in the mapped
+     * font and thread color, with a per-name approval checkbox and signature
+     * line. The customer signs off on EXACT spellings before anything is sewn.
+     */
+    printProof() {
+        const formData = this.collectFormData();
+        const filledItems = formData.items.filter(item => item.monogramName);
+        if (filledItems.length === 0) {
+            this.showToast('Please add at least one name to proof', 'warning');
+            return;
+        }
+
+        // A known error should never reach a customer proof silently
+        const qa = this.runStitchCheck();
+        if (qa && qa.summary.errors > 0) {
+            if (!confirm(`Stitch Check found ${qa.summary.errors} error(s) — see the panel under the Names table.\n\nPrint the customer proof anyway?`)) {
+                return;
+            }
+        }
+
+        document.getElementById('proofDate').textContent = this.service.getCurrentDate();
+        document.getElementById('proofOrderNumber').textContent = formData.orderNumber || '-';
+        document.getElementById('proofCompanyName').textContent = formData.companyName || '-';
+        document.getElementById('proofFontStyle').textContent = formData.fontStyle || 'Not specified';
+
+        const fontCSS = this.getProofFontCSS(formData.fontStyle);
+        const proofList = document.getElementById('proofList');
+        proofList.innerHTML = filledItems.map(item => {
+            const threadLabel = item.rowThreadColor || formData.threadColor || '';
+            const hex = this.getThreadHex(threadLabel);
+            const colorCSS = hex ? `color:${hex};` : '';
+            const metaParts = [
+                item.styleNumber, item.shirtColor, item.size,
+                item.rowLocation || formData.location
+            ].filter(Boolean).map(p => this.escapeHTML(p));
+            const swatch = hex ? `<span class="proof-swatch" style="background:${hex};"></span>` : '';
+            return `
+                <div class="proof-item">
+                    <span class="proof-checkbox"></span>
+                    <div class="proof-name" style="${fontCSS}${colorCSS}">${this.escapeHTML(item.monogramName)}</div>
+                    <div class="proof-meta">
+                        ${metaParts.join(' · ')}
+                        ${threadLabel ? `<br><span class="proof-meta-thread">${swatch}Thread: ${this.escapeHTML(threadLabel)}</span>` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        document.body.classList.add('print-mode-proof');
+        window.print();
+        // afterprint removes the class; timeout is a fallback (class is inert on screen)
+        setTimeout(() => document.body.classList.remove('print-mode-proof'), 2000);
+    }
+
+    // ============================================
     // Print PDF
     // ============================================
 
@@ -1961,6 +2202,14 @@ class MonogramFormController {
             return;
         }
 
+        // Stitch Check gate — a known error should not reach production silently
+        const qa = this.runStitchCheck();
+        if (qa && qa.summary.errors > 0) {
+            if (!confirm(`Stitch Check found ${qa.summary.errors} error(s) — see the panel under the Names table.\n\nPrint the production sheet anyway?`)) {
+                return;
+            }
+        }
+
         // Populate print template
         document.getElementById('printDate').textContent = this.service.getCurrentDate();
         document.getElementById('printOrderNumber').textContent = formData.orderNumber || '-';
@@ -1973,7 +2222,7 @@ class MonogramFormController {
 
         // Populate names table
         const printTbody = document.getElementById('printNamesTableBody');
-        printTbody.innerHTML = filledItems.map((item, index) => {
+        const renderPrintRow = (item, rowNum) => {
             // Combine thread color and location for stacked display
             const threadLocationParts = [];
             if (item.rowThreadColor) threadLocationParts.push(item.rowThreadColor);
@@ -1982,7 +2231,7 @@ class MonogramFormController {
 
             return `
                 <tr>
-                    <td>${index + 1}</td>
+                    <td>${rowNum}</td>
                     <td>${this.escapeHTML(item.styleNumber)}</td>
                     <td>${this.escapeHTML(item.description)}</td>
                     <td>${this.escapeHTML(item.shirtColor)}</td>
@@ -1991,7 +2240,44 @@ class MonogramFormController {
                     <td><strong>${this.escapeHTML(item.monogramName)}</strong></td>
                 </tr>
             `;
-        }).join('');
+        };
+
+        // Machine run plan: with 2+ thread colors, group by thread so the
+        // operator sews all of one cone before changing (style→color→size
+        // order is preserved inside each group by the sort above).
+        const planEl = document.getElementById('printRunPlan');
+        const runPlan = (typeof MonogramNameQA !== 'undefined')
+            ? MonogramNameQA.buildRunPlan(filledItems.map(item => ({
+                name: item.monogramName,
+                threadColor: item.rowThreadColor,
+                item: item
+            })))
+            : null;
+
+        if (runPlan && runPlan.groups.length > 1) {
+            let rows = '';
+            let n = 0;
+            runPlan.groups.forEach((group, gi) => {
+                const label = group.thread
+                    ? `${gi === 0 ? 'Start with' : '&#9660; Thread change'} &mdash; ${this.escapeHTML(group.thread)} (${group.count} name${group.count !== 1 ? 's' : ''})`
+                    : `Thread not specified (${group.count}) &mdash; resolve before sewing`;
+                rows += `<tr class="thread-change-row"><td colspan="7">${label}</td></tr>`;
+                group.items.forEach(entry => {
+                    n += 1;
+                    rows += renderPrintRow(entry.item, n);
+                });
+            });
+            printTbody.innerHTML = rows;
+            if (planEl) {
+                planEl.textContent = `Machine run plan: ${runPlan.groups.length} thread colors · ` +
+                    `${runPlan.threadChanges} thread change${runPlan.threadChanges !== 1 ? 's' : ''} · ` +
+                    `${runPlan.totalNames} hoopings`;
+                planEl.style.display = 'block';
+            }
+        } else {
+            printTbody.innerHTML = filledItems.map((item, index) => renderPrintRow(item, index + 1)).join('');
+            if (planEl) planEl.style.display = 'none';
+        }
 
         // Trigger print
         window.print();
