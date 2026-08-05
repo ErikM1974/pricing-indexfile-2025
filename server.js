@@ -4207,6 +4207,19 @@ app.get(['/pages/3-day-tees.html', '/3-day-tees.html', '/3-day-tees'], (req, res
   res.redirect(301, '/custom-tees');
 });
 
+// ── Design Gallery beta → Design Vault cutover (Erik approved 2026-08-05) ───
+// The beta lived under /pages, which has NO staff gate, so it served customer
+// ids, sales reps, order history and art notes to anyone with the URL. The
+// rebuild lives under /dashboards, which gateStaffHtml covers. Same MUST-be-
+// before-the-static-mount rule as the 3DT block above.
+// 302 (not 301) for the first week: browsers cache 301s hard, which would make
+// a rollback stick in reps' browsers. Flip to 301 after it soaks.
+// NOTE: the customer-facing /design/:designNumber share page is a SEPARATE,
+// deliberately public, field-scrubbed route — it is not affected by this.
+app.get('/pages/design-gallery.html', (req, res) => {
+  res.redirect(302, '/dashboards/design-gallery.html');
+});
+
 app.use('/pages', express.static(path.join(__dirname, 'pages'), staticOptions));
 
 // Serve CSS and JS files from root directory
