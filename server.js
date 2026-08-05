@@ -4368,12 +4368,19 @@ app.get(['/calculators/custom-decal-pricing.html', '/pricing/decals'], requireSt
 // MUST stay above the serveHashedCalculator catch-alls below (which would
 // serve the page) as well as the /calculators static mount under them.
 //
-// ⚠️ Open and unrelated to the retirement: on DTF 10-23 this page showed $25.50
-// /pc at qty 10 while baseline DTF-01 records perPiece 20.5 / lineSubtotal 205
-// — one whole $50 LTM apart. dtf-pricing-service.js:298 says basePrice excludes
-// LTM and "consumers add (ltmFee / userSelectedQty)", which is what this page
-// did, so the suspicion is the DTF QUOTE path drops the fee on small orders.
-// Retiring this page hides the symptom; it does not fix that. Still open.
+// ✅ DTF LTM checked and CLEAN — no action needed. A mid-review scare that this
+// page and baseline DTF-01 were one $50 LTM apart was a like-for-like error:
+// the page was showing the MEDIUM transfer, the baseline is SMALL. Measured
+// both code paths on identical inputs (PC54, garmentCost 3, qty 10) and they
+// agree to the cent at every size — ladder basePrice + floor(ltmFee/qty) ==
+// calculatePriceForQuantity().finalUnitPrice:
+//     small  15.50 + 5.00 = 20.50 == 20.50   (matches baseline DTF-01)
+//     medium 20.50 + 5.00 = 25.50 == 25.50
+//     large  24.00 + 5.00 = 29.00 == 29.00
+// calculatePriceForQuantity folds ltmFeePerUnit into subtotalBeforeRounding
+// BEFORE the ceil-to-half-dollar, so the $50 IS collected on small DTF orders.
+// Recorded here because "is the LTM being dropped?" is a question worth not
+// re-opening from scratch — it isn't.
 app.get('/calculators/compare-pricing.html', (req, res) => {
   res.redirect(302, '/calculators/quick-quote/');
 });
