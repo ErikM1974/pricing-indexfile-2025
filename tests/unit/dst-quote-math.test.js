@@ -169,12 +169,15 @@ describe('combineLines', () => {
 // ─── staff margin ──────────────────────────────────────────────────────────
 
 describe('estimateMargin', () => {
-    // 🔴 DELIBERATELY FICTIONAL RATES. Everything under /tests is served by a
-    // PUBLIC static mount (server.js `app.use('/tests', express.static(...))`)
-    // and ships in the Heroku slug, so a real rate written here is published to
-    // the open web — which would defeat the whole point of putting the cost
-    // model behind requireStaff. The assertions below are pure arithmetic and
-    // do not care what the numbers are. NEVER paste the real model in here.
+    // 🔴 DELIBERATELY FICTIONAL RATES. This file once published the real cost
+    // model to the open web: tests/ was a PUBLIC static mount AND shipped in
+    // the Heroku slug, so `curl …/tests/unit/dst-quote-math.test.js` returned
+    // it 200/no-auth — defeating the requireStaff endpoint these very tests
+    // verify. Both holes are closed now (the /tests mount is gone and
+    // .slugignore keeps the tree out of the slug), but CLAUDE.md rule 2 puts
+    // EVERY test under tests/, so treat this file as world-readable anyway.
+    // The assertions are pure arithmetic and never need the real figures.
+    // NEVER paste the production cost model in here.
     const model = { productionHourRate: 100, orderPool: 10 };
 
     test('cost is machine time x the loaded hour, plus ONE order pool', () => {

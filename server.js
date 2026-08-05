@@ -279,7 +279,7 @@ dotenv.config();
 //   L1648 /pricing/dtf → /pricing/dtf/index.html
 //   /pricing/stickers → 410 signpost (retired 2026-07-29)
 //   /pricing/decals   → custom-decal-pricing.html (requireStaff)
-//   /pages/mockup-generator.html → 302 /pages/dst-viewer.html (retired 2026-08-05;
+//   /pages/mockup-generator.html → 301 /pages/dst-viewer.html (retired 2026-08-05;
 //     MUST stay above the /pages static mount — see the block at the redirect)
 // =============================================================================
 
@@ -4222,9 +4222,24 @@ app.use('/admin', (req, res, next) => {
 app.use('/admin', express.static(path.join(__dirname, 'admin'), staticOptions));
 app.use('/email-templates', express.static(path.join(__dirname, 'email-templates'), staticOptions));
 app.use('/mockups', express.static(path.join(__dirname, 'mockups'), staticOptions));
-app.use('/tests', express.static(path.join(__dirname, 'tests'), staticOptions));
+// ⛔ NO `/tests` MOUNT — REMOVED 2026-08-05, do not re-add.
+// It served the whole tests/ tree to anyone, with no gate. CLAUDE.md rule 2
+// requires EVERY test to live in tests/, so that mount published whatever the
+// newest fixture happened to contain: a unit test for the staff-only contract
+// embroidery margin overlay hardcoded the real production cost model, and
+// `curl https://…/tests/unit/dst-quote-math.test.js` returned it 200/no-auth —
+// defeating the requireStaff endpoint the test existed to verify.
+// `.slugignore` keeps tests/ out of the slug as well; this line is the half
+// that survives someone deleting that file. Nothing references /tests/ (no
+// href/src anywhere), so requests now fall through to the normal 404.
 app.use('/styles', express.static(path.join(__dirname, 'styles'), staticOptions));
-app.use('/scripts', express.static(path.join(__dirname, 'scripts'), staticOptions));
+// ⛔ NO `/scripts` MOUNT — REMOVED 2026-08-05, do not re-add.
+// scripts/ holds build + one-off maintenance tooling, never anything a browser
+// loads (verified: zero src=/href= references to /scripts/ across every HTML in
+// the repo). It cannot be handled with .slugignore the way tests/ was, because
+// heroku-postbuild runs `node scripts/build.js` — the slug genuinely needs the
+// files; it was only ever the HTTP mount that had to go. Removing this changes
+// nothing about the build.
 app.use('/images', express.static(path.join(__dirname, 'images'), staticOptions));
 app.use('/forms', express.static(path.join(__dirname, 'forms'), staticOptions));
 app.use('/guides', express.static(path.join(__dirname, 'guides'), staticOptions));
@@ -4273,24 +4288,61 @@ app.get('/pages/design-gallery.html', (req, res) => {
 //
 // Known gap, accepted: EMB↔PDF thread comparison and the recolored-EMB
 // download exist nowhere else. mockup-detail.html covers EMB thread reads.
-// 302 (not 301) so a rollback isn't stuck in reps' cached browsers; flip to
-// 301 after it soaks, same as the Design Vault cutover above.
+//
+// Shipped as a 302 in v2026.08.05.10; flipped to 301 the same day at Erik's
+// request (the soak was cut short deliberately). ⚠️ A 301 is cached hard and
+// effectively forever, so deleting this route no longer restores the page for
+// anyone whose browser already followed it — reviving the generator now means
+// republishing it at a DIFFERENT path, or telling those users to hard-reload.
+// Acceptable because the retirement was justified by ~zero traffic to this URL
+// in the first place, so almost no browser holds the cached entry.
 app.get('/pages/mockup-generator.html', (req, res) => {
-  res.redirect(302, '/pages/dst-viewer.html');
+  res.redirect(301, '/pages/dst-viewer.html');
 });
 
 app.use('/pages', express.static(path.join(__dirname, 'pages'), staticOptions));
 
-// Serve CSS and JS files from root directory
-app.get('/*.css', (req, res) => {
-  const fileName = req.params[0] + '.css';
-  res.sendFile(path.join(__dirname, fileName));
-});
+// APP_CONFIG lives here (config/app.config.js) and is loaded by ~77 pages.
+// It had NO mount of its own and only ever resolved because the wildcards
+// below happened to serve any depth — so it must be mounted explicitly BEFORE
+// they are tightened, or every page loses APP_CONFIG.API.BASE_URL.
+app.use('/config', express.static(path.join(__dirname, 'config'), staticOptions));
 
-app.get('/*.js', (req, res) => {
-  const fileName = req.params[0] + '.js';
-  res.sendFile(path.join(__dirname, fileName));
-});
+// Serve CSS and JS files from THE ROOT DIRECTORY ONLY.
+//
+// 🔴 SECURITY (fixed 2026-08-05): `/*` matches slashes, so these two routes
+// used to resolve ANY depth — `GET /server.js` returned the entire 704 KB
+// server source in production, and `/lib/page-access.js` handed out the RBAC
+// decision logic. They also re-served the whole tests/ tree, which is how a
+// unit-test fixture published the staff-only cost model even though tests/ was
+// removed from the slug. Real subdirectories are served by the explicit mounts
+// registered above this line; anything else now falls through to 404.
+//
+// The guard rejects any separator or dot-segment rather than trying to
+// sanitise it — `path.join` would happily normalise `a/../../secret` for us.
+// The repo root is a legacy dumping ground: ~18 genuine front-end assets
+// (utils.js, catalog-search.js, main.css …) sitting next to server-side files.
+// Denying the server-side handful beats allowlisting the assets, because a
+// missed allowlist entry silently breaks a page while a missed deny entry is
+// caught by this list being short and obvious. ADD ANY NEW SERVER-SIDE ROOT
+// FILE HERE.
+const ROOT_ASSET_DENY = new Set(['server.js']);
+function serveRootAsset(ext) {
+  return (req, res, next) => {
+    const name = req.params[0] || '';
+    if (name.includes('/') || name.includes('\\') || name.includes('..') || name.includes('\0')) {
+      return next();
+    }
+    const file = name + ext;
+    // `*.config.js` covers jest.config.js and anything like it added later.
+    if (ROOT_ASSET_DENY.has(file) || /\.config\.js$/i.test(file)) return next();
+    res.sendFile(path.join(__dirname, file), err => {
+      if (err) next();
+    });
+  };
+}
+app.get('/*.css', serveRootAsset('.css'));
+app.get('/*.js', serveRootAsset('.js'));
 
 // Redirect old embroidery-contract URL to unified page
 app.get('/calculators/embroidery-contract*', (req, res) => {
@@ -7092,21 +7144,12 @@ app.get('/brands.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'brands.html'));
 });
 
-// Phase 1 Infrastructure Test Pages
-app.get('/test-phase1-infrastructure.html', (req, res) => {
-  console.log('Serving test-phase1-infrastructure.html page');
-  res.sendFile(path.join(__dirname, 'tests', 'test-phase1-infrastructure.html'));
-});
-
-app.get('/test-phase1-verification.html', (req, res) => {
-  console.log('Serving test-phase1-verification.html page');
-  res.sendFile(path.join(__dirname, 'tests', 'test-phase1-verification.html'));
-});
-
-app.get('/test-screenprint-sizes.html', (req, res) => {
-  console.log('Serving test-screenprint-sizes.html page');
-  res.sendFile(path.join(__dirname, 'tests', 'test-screenprint-sizes.html'));
-});
+// Phase 1 Infrastructure Test Pages — REMOVED 2026-08-05.
+// These three routes sendFile'd out of tests/. All three target files had
+// already been deleted, so every one of them was serving an error in
+// production before this change; they were also the last runtime readers of
+// tests/, which is now neither mounted nor shipped in the slug. No tombstone
+// needed — there is no static mount underneath that could pick these paths up.
 
 // Also serve the new JS files explicitly if needed
 app.get('/app-new.js', (req, res) => {
