@@ -210,8 +210,10 @@ class MonogramFormController {
             }
         });
 
-        // Load thread colors from API
-        await this.loadThreadColors();
+        // Load thread colors from API. The promise is exposed so the auto-print
+        // paths can wait for real Caspio hexes instead of racing them.
+        this.threadColorsReady = this.loadThreadColors();
+        await this.threadColorsReady;
     }
 
     /**
@@ -220,9 +222,13 @@ class MonogramFormController {
     async loadThreadColors() {
         try {
             this.threadColors = await this.service.fetchThreadColors();
+            this.threadColorsFailed = false;
             this.renderThreadColorOptions();
         } catch (error) {
             console.error('[MonogramController] Failed to load thread colors:', error);
+            // Remembered (not just toasted) so the proof sheet can say its colors
+            // are approximations rather than silently printing guessed hexes
+            this.threadColorsFailed = true;
             this.showToast('Failed to load thread colors', 'error');
         }
     }
@@ -1209,11 +1215,14 @@ class MonogramFormController {
         }
 
         return this.products.map(product => {
-            const label = `${product.partNumber} - ${product.color}`;
-            return `<option value="${product.partNumber}|${product.color}"
+            // ManageOrders text — escape the value attribute and label too, not
+            // just the data-* siblings (a quote in PartColor breaks the option)
+            const value = this.escapeHTML(`${product.partNumber}|${product.color}`);
+            const label = this.escapeHTML(`${product.partNumber} - ${product.color}`);
+            return `<option value="${value}"
                             data-description="${this.escapeHTML(product.description)}"
                             data-color="${this.escapeHTML(product.color)}"
-                            data-sizes='${JSON.stringify(product.sizes)}'>${label}</option>`;
+                            data-sizes='${this.escapeHTML(JSON.stringify(product.sizes))}'>${label}</option>`;
         }).join('');
     }
 
@@ -1351,8 +1360,9 @@ class MonogramFormController {
         this.renumberRows();
         this.updateNameCount();
         this.updateAllSizeDropdowns();
+        this.updateUnassignedList();
         this.isDirty = true;
-        this.scheduleStitchCheck();
+        this.scheduleStitchCheck(true);  // rows renumbered — refresh findings now
     }
 
     renumberRows() {
@@ -1532,6 +1542,7 @@ class MonogramFormController {
             const colorInput = row.querySelector('.color-input');
             const sizeInput = row.querySelector('.size-input');
             const rowThreadColorSelect = row.querySelector('.row-thread-color');
+            const rowLocationSelect = row.querySelector('.row-location');
             const nameInput = row.querySelector('.name-input');
 
             rowData.push({
@@ -1543,6 +1554,7 @@ class MonogramFormController {
                 color: colorInput?.value || '',
                 size: sizeInput?.value || '',
                 rowThreadColor: rowThreadColorSelect?.value || '',
+                rowLocation: rowLocationSelect?.value || '',
                 name: nameInput?.value || ''
             });
         });
@@ -1563,6 +1575,7 @@ class MonogramFormController {
         const colorInput = row.querySelector('.color-input');
         const sizeInput = row.querySelector('.size-input');
         const rowThreadColorSelect = row.querySelector('.row-thread-color');
+        const rowLocationSelect = row.querySelector('.row-location');
         const nameInput = row.querySelector('.name-input');
 
         // Set values
@@ -1592,6 +1605,8 @@ class MonogramFormController {
         if (colorInput) colorInput.value = data.color || '';
         if (sizeInput) sizeInput.value = data.size || '';
         if (rowThreadColorSelect) rowThreadColorSelect.value = data.rowThreadColor || '';
+        // Without this, every order lookup silently cleared per-row locations
+        if (rowLocationSelect) rowLocationSelect.value = data.rowLocation || '';
         if (nameInput) nameInput.value = data.name || '';
     }
 
@@ -1884,22 +1899,36 @@ class MonogramFormController {
             if (result.sessions.length === 0) {
                 resultsEl.innerHTML = '<p class="no-results">No forms found</p>';
             } else {
-                resultsEl.innerHTML = result.sessions.map(session => `
+                // Every field is API data (CompanyName is free text on an
+                // anonymous-writable endpoint) — escape it all, and carry the
+                // order number in a data-* attribute instead of an inline
+                // onclick string that a quote could break out of.
+                resultsEl.innerHTML = result.sessions.map(session => {
+                    const monogramID = this.escapeHTML(String(session.monogramID || session.MonogramID || ''));
+                    const company = this.escapeHTML(String(session.companyName || session.CompanyName || ''));
+                    const orderNo = this.escapeHTML(String(session.orderNumber || session.OrderNumber || ''));
+                    const totalNames = this.escapeHTML(String(session.totalNames || session.TotalNames || 0));
+                    return `
                     <div class="search-result-item">
                         <div class="search-result-info">
-                            <span><strong>${session.monogramID || session.MonogramID}</strong></span>
-                            <span>${session.companyName || session.CompanyName}</span>
-                            <span>Order: ${session.orderNumber || session.OrderNumber}</span>
-                            <span>${session.totalNames || session.TotalNames} names</span>
+                            <span><strong>${monogramID}</strong></span>
+                            <span>${company}</span>
+                            <span>Order: ${orderNo}</span>
+                            <span>${totalNames} names</span>
                         </div>
                         <div class="search-result-actions">
-                            <button type="button" class="btn-secondary btn-sm"
-                                    onclick="monogramController.loadExistingForm('${session.OrderNumber || session.orderNumber}')">
+                            <button type="button" class="btn-secondary btn-sm btn-load-result"
+                                    data-order="${orderNo}">
                                 <i class="fas fa-edit"></i> Edit
                             </button>
                         </div>
                     </div>
-                `).join('');
+                `;
+                }).join('');
+
+                resultsEl.querySelectorAll('.btn-load-result').forEach(btn => {
+                    btn.addEventListener('click', () => this.loadExistingForm(btn.dataset.order));
+                });
             }
         } catch (error) {
             console.error('[MonogramController] Search error:', error);
@@ -1959,8 +1988,17 @@ class MonogramFormController {
     // Stitch Check (live name QA — monogram-name-qa.js)
     // ============================================
 
-    scheduleStitchCheck() {
+    /**
+     * @param immediate  Structural changes (row delete, load) must refresh NOW —
+     *   findings hold row numbers, and the debounce window would leave the panel
+     *   pointing click-to-highlight at rows that have already been renumbered.
+     */
+    scheduleStitchCheck(immediate = false) {
         clearTimeout(this._qaTimer);
+        if (immediate) {
+            this.runStitchCheck();
+            return;
+        }
         this._qaTimer = setTimeout(() => this.runStitchCheck(), 400);
     }
 
@@ -1987,7 +2025,11 @@ class MonogramFormController {
         const result = MonogramNameQA.analyze(items, {
             multiThread: this.selectedThreadColors.length > 1,
             multiLocation: this.selectedLocations.length > 1,
-            unassignedNames: this.getAvailableNames().map(a => a.name)
+            // Pass the FULL roster, not getAvailableNames(): usedNameIndices is
+            // never reconciled when a row is deleted or its name overwritten, so
+            // a "used" name can exist in no row at all. The engine diffs the
+            // roster against the actual row names, which can't go stale.
+            unassignedNames: this.importedNames
         });
         this.renderStitchCheck(result, items);
         return result;
@@ -2042,6 +2084,25 @@ class MonogramFormController {
                 });
             }
         });
+    }
+
+    /**
+     * Gate a print on Stitch Check. Returns false when the operator cancels.
+     * A MISSING engine (null result) is never treated as "passed" — an absent
+     * safety check is itself worth surfacing (Rule #4).
+     */
+    confirmQAGate(qa, sheetLabel) {
+        if (!qa) {
+            return confirm(
+                `Stitch Check could not run — the name-QA script did not load, so ` +
+                `spelling/spacing/duplicate checks were skipped.\n\nPrint the ${sheetLabel} anyway?`);
+        }
+        if (qa.summary.errors > 0) {
+            return confirm(
+                `Stitch Check found ${qa.summary.errors} error(s) — see the panel under the Names table.\n\n` +
+                `Print the ${sheetLabel} anyway?`);
+        }
+        return true;
     }
 
     /** Scroll to and flash the rows a finding refers to. */
@@ -2122,11 +2183,35 @@ class MonogramFormController {
     }
 
     /**
+     * The proof fonts are used ONLY inside the display:none print template, so
+     * the browser never downloads them until print layout begins — and the print
+     * snapshot doesn't wait. Force the download and wait for it before printing,
+     * or the customer approves names in a fallback typeface.
+     */
+    async ensureProofFontLoaded(fontCSS) {
+        if (!document.fonts || !document.fonts.load) return;
+        const m = /font-family:'([^']+)'/.exec(fontCSS);
+        const family = m && m[1];
+        // Georgia/Inter are system or already-rendered; only the two proof-only
+        // web fonts need forcing.
+        if (!family || !/Dancing Script|Archivo Black/.test(family)) return;
+        const weight = /font-weight:(\d+)/.exec(fontCSS)?.[1] || '400';
+        try {
+            await Promise.race([
+                document.fonts.load(`${weight} 22pt "${family}"`),
+                new Promise(resolve => setTimeout(resolve, 3000))  // never block printing
+            ]);
+        } catch (error) {
+            console.warn('[MonogramController] Proof font load failed:', error);
+        }
+    }
+
+    /**
      * Print the customer-facing proof: every name rendered large in the mapped
      * font and thread color, with a per-name approval checkbox and signature
      * line. The customer signs off on EXACT spellings before anything is sewn.
      */
-    printProof() {
+    async printProof() {
         const formData = this.collectFormData();
         const filledItems = formData.items.filter(item => item.monogramName);
         if (filledItems.length === 0) {
@@ -2136,10 +2221,13 @@ class MonogramFormController {
 
         // A known error should never reach a customer proof silently
         const qa = this.runStitchCheck();
-        if (qa && qa.summary.errors > 0) {
-            if (!confirm(`Stitch Check found ${qa.summary.errors} error(s) — see the panel under the Names table.\n\nPrint the customer proof anyway?`)) {
-                return;
-            }
+        if (!this.confirmQAGate(qa, 'customer proof')) return;
+
+        // Wait for the authoritative Caspio hexes rather than racing them —
+        // the ?proof=true auto-print path fires on a timer (Rule #4: a silently
+        // approximated color on a signed proof is worse than a moment's wait).
+        if (this.threadColorsReady) {
+            try { await this.threadColorsReady; } catch (error) { /* handled in loadThreadColors */ }
         }
 
         document.getElementById('proofDate').textContent = this.service.getCurrentDate();
@@ -2150,18 +2238,29 @@ class MonogramFormController {
         const fontCSS = this.getProofFontCSS(formData.fontStyle);
         const proofList = document.getElementById('proofList');
         proofList.innerHTML = filledItems.map(item => {
-            const threadLabel = item.rowThreadColor || formData.threadColor || '';
+            // Only fall back to the order-level thread when it is unambiguous.
+            // getThreadColorString() joins ALL selected colors ("Black, White"),
+            // which would fuzzy-match to one arbitrary hex — never guess a color
+            // the customer is about to sign off on.
+            const threadLabel = item.rowThreadColor ||
+                (this.selectedThreadColors.length === 1 ? this.selectedThreadColors[0] : '');
             const hex = this.getThreadHex(threadLabel);
-            const colorCSS = hex ? `color:${hex};` : '';
+            // !important: quote-builder-common.css's print block forces
+            // `* { color: black !important }`, which would otherwise flatten
+            // every proof name to black — the one thing this sheet must show.
+            const colorCSS = hex ? `color:${hex} !important;` : '';
+            // White/pale thread is invisible on white paper — render on a dark chip
+            const lightChip = (hex && typeof MonogramNameQA !== 'undefined' &&
+                MonogramNameQA.isLightHex(hex)) ? ' proof-name-light' : '';
             const metaParts = [
                 item.styleNumber, item.shirtColor, item.size,
-                item.rowLocation || formData.location
+                item.rowLocation || (this.selectedLocations.length === 1 ? formData.location : '')
             ].filter(Boolean).map(p => this.escapeHTML(p));
             const swatch = hex ? `<span class="proof-swatch" style="background:${hex};"></span>` : '';
             return `
                 <div class="proof-item">
                     <span class="proof-checkbox"></span>
-                    <div class="proof-name" style="${fontCSS}${colorCSS}">${this.escapeHTML(item.monogramName)}</div>
+                    <div class="proof-name${lightChip}" style="${fontCSS}${colorCSS}">${this.escapeHTML(item.monogramName)}</div>
                     <div class="proof-meta">
                         ${metaParts.join(' · ')}
                         ${threadLabel ? `<br><span class="proof-meta-thread">${swatch}Thread: ${this.escapeHTML(threadLabel)}</span>` : ''}
@@ -2169,6 +2268,22 @@ class MonogramFormController {
                 </div>
             `;
         }).join('');
+
+        // Rule #4: if the Caspio thread table never loaded, say the colors are
+        // approximations rather than letting a customer sign off on guesses.
+        const noticeEl = document.getElementById('proofColorNotice');
+        if (noticeEl) {
+            if (this.threadColorsFailed) {
+                noticeEl.textContent = 'Thread colors could not be loaded from the color library — ' +
+                    'the colors shown are approximations. Confirm exact thread colors with your sales rep.';
+                noticeEl.style.display = 'block';
+            } else {
+                noticeEl.style.display = 'none';
+            }
+        }
+
+        // Force the proof-only web font to download before the print snapshot
+        await this.ensureProofFontLoaded(fontCSS);
 
         document.body.classList.add('print-mode-proof');
         window.print();
@@ -2181,6 +2296,9 @@ class MonogramFormController {
     // ============================================
 
     printPDF() {
+        // Defensive: never let a lingering proof-mode class print the wrong template
+        document.body.classList.remove('print-mode-proof');
+
         const formData = this.collectFormData();
 
         // Sort items by Style → Color → Size for PDF output
@@ -2204,11 +2322,7 @@ class MonogramFormController {
 
         // Stitch Check gate — a known error should not reach production silently
         const qa = this.runStitchCheck();
-        if (qa && qa.summary.errors > 0) {
-            if (!confirm(`Stitch Check found ${qa.summary.errors} error(s) — see the panel under the Names table.\n\nPrint the production sheet anyway?`)) {
-                return;
-            }
-        }
+        if (!this.confirmQAGate(qa, 'production sheet')) return;
 
         // Populate print template
         document.getElementById('printDate').textContent = this.service.getCurrentDate();
@@ -2318,9 +2432,11 @@ class MonogramFormController {
             info: 'fa-info-circle'
         };
 
+        // Messages can carry API/error text (e.g. a proxy HTML error page in a
+        // JSON parse error) — escape before it reaches innerHTML
         toast.innerHTML = `
             <span class="toast-icon"><i class="fas ${icons[type] || icons.info}"></i></span>
-            <span class="toast-message">${message}</span>
+            <span class="toast-message">${this.escapeHTML(String(message))}</span>
             <button type="button" class="toast-close">&times;</button>
         `;
 

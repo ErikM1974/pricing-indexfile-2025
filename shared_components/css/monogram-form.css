@@ -1485,6 +1485,13 @@ body {
     print-color-adjust: exact;
 }
 
+/* Never let a thread-change banner orphan at the foot of a page — the
+   operator would start a group with no visible cone instruction. */
+.print-names-table tr.thread-change-row {
+    break-after: avoid;
+    page-break-after: avoid;
+}
+
 /* ============================================
    CUSTOMER PROOF SHEET
    ============================================ */
@@ -1494,6 +1501,16 @@ body {
     border: 1px solid #000;
     font-size: 10pt;
     line-height: 1.5;
+}
+
+/* Shown only when the Caspio thread-color library failed to load, so the
+   printed colors are palette approximations rather than the real threads. */
+.proof-color-notice {
+    margin: 0 0 1rem;
+    padding: 0.5rem 0.8rem;
+    border: 1.5pt solid #000;
+    font-size: 9.5pt;
+    font-weight: 700;
 }
 
 .proof-list {
@@ -1522,6 +1539,21 @@ body {
     flex: 1 1 auto;
     font-size: 22pt;
     line-height: 1.25;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+/* White/pale thread on white paper: show the name on a dark chip so it stays
+   legible while keeping the true thread color (set via isLightHex()).
+   flex + fit-content keeps the chip hugging the name — .proof-name's
+   `flex: 1 1 auto` would otherwise stretch it into a full-width bar. */
+.proof-name-light {
+    background: #4a4a4a;
+    border-radius: 4px;
+    padding: 0 0.5rem;
+    flex: 0 1 auto;
+    width: fit-content;
+    max-width: 100%;
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
 }
