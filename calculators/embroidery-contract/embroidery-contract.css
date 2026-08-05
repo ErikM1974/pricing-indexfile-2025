@@ -138,13 +138,16 @@ table.price tfoot td.cell-hi {
    during drag-over.
    ===================================================== */
 /* 🔴 The [hidden] attribute is a UA-stylesheet rule, so ANY author `display`
-   declaration beats it — .dst-drop/.dst-note/.dst-suggest are flex containers
-   and would stay on screen with el.hidden = true (an empty bordered strip in
-   the card, and a drop zone showing under the loaded file). These
-   attribute-qualified rules outrank the plain class rules and restore it. */
+   declaration beats it — these are all flex/grid containers and would stay on
+   screen with el.hidden = true (an empty bordered strip in the card, a drop
+   zone showing under the loaded file). These attribute-qualified rules
+   outrank the plain class rules and restore it. Every NEW rule below that
+   sets `display` on a hideable element must be added here too. */
 .dst-drop[hidden],
 .dst-note[hidden],
-.dst-suggest[hidden] { display: none; }
+.dst-suggest[hidden],
+.dst-prod[hidden],
+.res-lines[hidden] { display: none; }
 
 /* Screen-reader-only live region — announces a parsed file to AT users, who
    get nothing from the visual card appearing. */
@@ -300,8 +303,173 @@ table.price tfoot td.cell-hi {
 .dst-mini-btn:hover { border-color: var(--pink-600); background: var(--paper); }
 .dst-mini-btn:focus-visible { outline: 2px solid var(--pink-600); outline-offset: 2px; }
 
+/* ── Multi-location (Round 13) ─────────────────────────────────────────── */
+
+/* Cards stack; the drop zone shrinks to an "add another" affordance once at
+   least one file is loaded. */
+#dstLines { display: flex; flex-direction: column; gap: 10px; }
+#dstLines + .dst-prod,
+#dstLines:not(:empty) { margin-bottom: 10px; }
+
+.dst-drop.is-compact { padding: 10px 14px; }
+.dst-drop.is-compact svg { width: 18px; height: 18px; }
+
+.dst-thumb {
+    width: 40px;
+    height: 40px;
+    flex: none;
+    object-fit: contain;
+    background: var(--paper-3);
+    border: 1px solid var(--line);
+    border-radius: 7px;
+}
+.dst-card-ico { display: inline-flex; flex: none; color: var(--pink-600); }
+
+.dst-loc-badge {
+    font-size: 9.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--pink-600);
+    font-weight: 600;
+}
+.dst-line-price {
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink);
+    white-space: nowrap;
+}
+/* The ✕ follows the price, so it must not also claim the auto margin. */
+.dst-card-head .dst-line-price + .dst-remove { margin-left: 4px; }
+
+.dst-line-ctl {
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+}
+.dst-chips { display: inline-flex; gap: 4px; }
+.dst-chip {
+    background: var(--paper-3);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 11.5px;
+    font-weight: 500;
+    color: var(--slate);
+    cursor: pointer;
+    transition: background 120ms, color 120ms, border-color 120ms;
+}
+.dst-chip:hover { color: var(--ink); border-color: var(--slate-3); }
+.dst-chip.active {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: #fff;
+}
+.dst-chip:focus-visible { outline: 2px solid var(--pink-600); outline-offset: 2px; }
+
+.dst-line-stitch { display: inline-flex; align-items: center; gap: 8px; }
+.dst-line-stitch span {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--slate);
+}
+.dst-line-stitch input { width: 110px; padding: 6px 10px; font-size: 13px; }
+
+/* ── Production read ───────────────────────────────────────────────────── */
+
+.dst-prod {
+    display: block;
+    margin-top: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--r);
+    background: var(--paper-2);
+}
+.dst-prod-head {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--ink);
+}
+.dst-prod-sub {
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 11px;
+    color: var(--slate);
+}
+.dst-time { margin-top: 8px; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.dst-time-big {
+    font-family: var(--mono);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--ink);
+}
+.dst-time-sub { font-size: 11.5px; color: var(--slate); }
+
+.dst-risks { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 8px; }
+.dst-risk {
+    display: grid;
+    gap: 2px;
+    padding-left: 10px;
+    border-left: 3px solid var(--slate-3);
+}
+.dst-risk.warn { border-left-color: var(--warn); }
+.dst-risk.ok { border-left-color: var(--ok); }
+.dst-risk-title { font-size: 12px; font-weight: 600; color: var(--ink); }
+.dst-risk.warn .dst-risk-title { color: var(--warn); }
+.dst-risk.ok .dst-risk-title { color: var(--ok); }
+.dst-risk-detail { font-size: 11.5px; line-height: 1.45; color: var(--slate); }
+
+/* ── Per-location breakdown in the result panel ────────────────────────── */
+
+.res-lines {
+    list-style: none;
+    margin: 12px 0 0;
+    padding: 0;
+    display: grid;
+    gap: 6px;
+}
+.res-lines li {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0 10px;
+    align-items: baseline;
+    font-size: 12px;
+}
+.res-lines .rl-name {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    color: var(--ink);
+    overflow-wrap: anywhere;
+}
+.res-lines .rl-meta {
+    grid-column: 1;
+    font-size: 10.5px;
+    color: var(--slate);
+}
+.res-lines .rl-amt {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    font-family: var(--mono);
+    font-weight: 600;
+    color: var(--ink);
+    white-space: nowrap;
+}
+
 /* Responsive — stack the two-column qty/stitch row on narrow screens */
 @media (max-width: 980px) {
     .calc-form .row { grid-template-columns: 1fr; }
     .dst-facts { grid-template-columns: repeat(2, auto); }
+    .dst-line-stitch { width: 100%; }
+    .dst-line-stitch input { flex: 1; width: auto; }
 }
