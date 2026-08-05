@@ -1,3 +1,7 @@
+## v2026.08.05.4 (2026.08.05)
+
+- Deploy v2026.08.05.4: Design Vault card — New badge + real description
+
 ## v2026.08.05.3 (2026.08.05)
 
 - Contract Embroidery Phase 2: production read + multi-location combos (WIP, pre-review)
