@@ -13,6 +13,7 @@ const path = require('path');
 const {
     BUILDER_PAGES,
     STOREFRONT_PAGES,
+    STAFF_PAGES,
     HASHED_PAGES,
     HASHED_PAGES_UNDER_PAGES_MOUNT,
 } = require('../../../lib/hashed-pages');
@@ -39,8 +40,16 @@ describe('hashed page list', () => {
         }
     });
 
-    test('builders and storefront pages together make the full list', () => {
-        expect(HASHED_PAGES).toEqual([...BUILDER_PAGES, ...STOREFRONT_PAGES]);
+    test('the three tranches together make the full list', () => {
+        expect(HASHED_PAGES).toEqual([...BUILDER_PAGES, ...STOREFRONT_PAGES, ...STAFF_PAGES]);
+    });
+
+    test('staff pages come only from the two uniformly gated mounts', () => {
+        // /calculators and /staff-dashboard-v3 gate per-page rather than at the
+        // mount, so they are NOT safe to sweep in the same way.
+        const stray = STAFF_PAGES.filter((p) => !/^(dashboards|tools)\//.test(p));
+        expect(stray).toEqual([]);
+        expect(STAFF_PAGES.length).toBeGreaterThan(0);
     });
 });
 
@@ -86,6 +95,39 @@ describe('serve side', () => {
 
     test('product.html keeps its SEO injection — the rewrite composes, not replaces', () => {
         expect(serverSrc).toMatch(/sendHashedHtml\(res, productHtmlPath, productSeo\.injectHead\(/);
+    });
+
+    // ─────────────────────────────────────────────────────────────────────
+    // SECURITY. For the staff mounts the ORDER of registration is the access
+    // control: gateStaffHtml must run before the rewrite, or an anonymous
+    // request gets payroll/payables HTML instead of a bounce to SSO. These
+    // assertions exist so a future reorder fails the build, not production.
+    // ─────────────────────────────────────────────────────────────────────
+    describe.each(['dashboards', 'tools'])('%s mount ordering', (mount) => {
+        const gate = serverSrc.indexOf(`app.use('/${mount}', gateStaffHtml)`);
+        const rewrite = serverSrc.indexOf(`app.get('/${mount}/:page', serveHashedStaffPage`);
+        const staticMount = serverSrc.indexOf(`app.use('/${mount}', express.static`);
+
+        test('all three are registered', () => {
+            expect(gate).toBeGreaterThan(-1);
+            expect(rewrite).toBeGreaterThan(-1);
+            expect(staticMount).toBeGreaterThan(-1);
+        });
+
+        test('the staff gate runs BEFORE the rewrite (anonymous must never reach the HTML)', () => {
+            expect(gate).toBeLessThan(rewrite);
+        });
+
+        test('the rewrite runs BEFORE express.static (or it would never run at all)', () => {
+            expect(rewrite).toBeLessThan(staticMount);
+        });
+    });
+
+    test('the staff rewrite performs no auth of its own — it relies on the gate above it', () => {
+        const fn = serverSrc.slice(serverSrc.indexOf('function serveHashedStaffPage'));
+        const body = fn.slice(0, fn.indexOf('\n}'));
+        // If this ever needs its own auth, the ordering guarantee has been broken.
+        expect(body).not.toMatch(/crmUser|requireStaff|requirePageAccess|redirect/);
     });
 
     test('sendHashedHtml falls back to the static file when the manifest is absent', () => {

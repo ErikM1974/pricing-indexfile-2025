@@ -3564,6 +3564,83 @@ app.delete('/api/crm-proxy/form-submissions/:submissionId', requireCrmRole(['adm
   }
 });
 
+// ── Box asset forwarder (session-gated) ──────────────────────────────────────
+// The proxy's Box routes are ANONYMOUS in production: /api/box/download/:fileId
+// serves any file the Box service account can see, /api/box/thumbnail/:fileId
+// the same as an image, and /api/box/art-folders enumerates 9,147 customer
+// folders. They cannot simply be given the shared secret, because ~8 staff
+// pages use box/thumbnail as <img> URLs straight from the browser and a browser
+// cannot hold a secret.
+//
+// This is the fix. The browser calls THIS origin, so the SAML session cookie
+// rides along automatically — including on plain <img> requests, which is the
+// property that makes this work at all. requireStaff proves the session
+// server-side, and only the app holds the secret it uses to call the proxy.
+// Once every caller is repointed here, the proxy routes get gated and the
+// anonymous surface disappears.
+//
+// 🔴 Deliberately ENUMERATED routes and a numeric fileId check — no wildcard,
+// no path passthrough. This forwarder must never become the thing it replaced.
+const BOX_FORWARD_QUERY = new Set(['size', 'folderId', 'designNumber', 'limit', 'offset']);
+
+function boxForward(buildPath) {
+  return async (req, res) => {
+    if (!CRM_API_SECRET) {
+      console.error('[box-forward] CRM_API_SECRET is not set — refusing to forward');
+      return res.status(503).json({ error: 'Box proxy is not configured' });
+    }
+    let suffix;
+    try {
+      suffix = buildPath(req);
+    } catch (e) {
+      return res.status(400).json({ error: e.message });
+    }
+    // Only known params travel onward, so a caller cannot smuggle anything into
+    // the upstream URL.
+    const qs = new URLSearchParams();
+    for (const [k, v] of Object.entries(req.query || {})) {
+      if (BOX_FORWARD_QUERY.has(k) && typeof v === 'string') qs.set(k, v);
+    }
+    const target = `${CRM_API_BASE}/api/box/${suffix}${qs.toString() ? '?' + qs : ''}`;
+    try {
+      const upstream = await fetch(target, {
+        headers: { 'X-CRM-API-Secret': CRM_API_SECRET },
+      });
+      res.status(upstream.status);
+      // Carry the headers that make an <img>/download behave; drop the rest.
+      for (const h of ['content-type', 'content-length', 'content-disposition',
+                       'cache-control', 'etag', 'last-modified']) {
+        const v = upstream.headers.get(h);
+        if (v) res.setHeader(h, v);
+      }
+      // Box assets are per-staff-session now; never let a shared cache hold one.
+      if (!upstream.headers.get('cache-control')) res.setHeader('Cache-Control', 'private, max-age=300');
+      if (!upstream.body) return res.end();
+      upstream.body.pipe(res);          // node-fetch v2 body is a Node stream
+      upstream.body.on('error', (err) => {
+        console.error('[box-forward] upstream stream error:', err.message);
+        res.destroy(err);
+      });
+    } catch (err) {
+      console.error('[box-forward] ' + target + ' failed:', err.message);
+      if (!res.headersSent) res.status(502).json({ error: 'Box request failed' });
+    }
+  };
+}
+
+// Box file IDs are numeric; anything else is rejected rather than forwarded.
+function boxFileId(req) {
+  const id = String(req.params.fileId || '');
+  if (!/^\d{1,25}$/.test(id)) throw new Error('Invalid Box file id');
+  return id;
+}
+
+app.get('/api/box/thumbnail/:fileId', requireStaff, boxForward(req => 'thumbnail/' + boxFileId(req)));
+app.get('/api/box/download/:fileId', requireStaff, boxForward(req => 'download/' + boxFileId(req)));
+app.get('/api/box/art-folders', requireStaff, boxForward(() => 'art-folders'));
+app.get('/api/box/mockup-folders', requireStaff, boxForward(() => 'mockup-folders'));
+app.get('/api/box/folder-files', requireStaff, boxForward(() => 'folder-files'));
+
 // ── Contract embroidery COST MODEL (staff only) ──────────────────────────────
 // Feeds the margin overlay on /calculators/embroidery-contract/.
 //
@@ -4110,7 +4187,7 @@ app.use('/dist', express.static(path.join(__dirname, 'dist'), {
 // static mount below and serve the original source paths — the build is an
 // overlay, never a requirement.
 const { rewriteHtmlAssets, createManifestLoader, createHtmlLoader } = require('./lib/asset-manifest');
-const { HASHED_PAGES, HASHED_PAGES_UNDER_PAGES_MOUNT } = require('./lib/hashed-pages');
+const { HASHED_PAGES, HASHED_PAGES_UNDER_PAGES_MOUNT, HASHED_STAFF_UNDER_MOUNT } = require('./lib/hashed-pages');
 const loadAssetManifest = createManifestLoader(path.join(__dirname, 'dist', 'asset-manifest.json'));
 const loadBuilderHtml = createHtmlLoader();
 
@@ -4165,6 +4242,23 @@ app.get('/quote-builders/:page', (req, res, next) => {
   if (!loadAssetManifest()) return next();
   sendHashedHtml(res, path.join(__dirname, 'quote-builders', req.params.page));
 });
+
+/**
+ * Rewrite route factory for a staff mount (/dashboards, /tools).
+ *
+ * Returns a handler, so it must be registered AFTER that mount's gateStaffHtml
+ * and BEFORE its express.static — see the call sites. It deliberately does no
+ * auth of its own: by the time it runs, the gate has already accepted the
+ * request. next() on anything unexpected hands back to the static mount.
+ */
+function serveHashedStaffPage(mount) {
+  const allowed = HASHED_STAFF_UNDER_MOUNT[mount];
+  return (req, res, next) => {
+    if (!allowed || !allowed.has(req.params.page)) return next();
+    if (!loadAssetManifest()) return next();
+    sendHashedHtml(res, path.join(__dirname, mount, req.params.page));
+  };
+}
 
 // Storefront pages under /pages reached through the static mount below rather
 // than a bespoke route. MUST stay above that mount or express.static answers
@@ -4246,6 +4340,12 @@ function gateStaffHtml(req, res, next) {
   return gateStaffPage(req, res, next);
 }
 app.use('/dashboards', gateStaffHtml);
+// Asset rewrite for staff pages. Registered AFTER gateStaffHtml and BEFORE the
+// static mount ON PURPOSE: the gate runs first, so an anonymous request is
+// bounced to SSO before this ever reads a file. Moving it above the gate would
+// serve payroll/payables HTML to the public — the ordering IS the security
+// property, and hashed-pages.test.js fails if it changes.
+app.get('/dashboards/:page', serveHashedStaffPage('dashboards'));
 app.use('/dashboards', express.static(path.join(__dirname, 'dashboards'), staticOptions));
 app.use('/quote-builders', express.static(path.join(__dirname, 'quote-builders'), staticOptions));
 // SECURITY (2026-06-30): vendor-portals (SanMar invoices/credits) + tools (internal
@@ -4255,6 +4355,8 @@ app.use('/vendor-portals', gateStaffHtml);
 app.use('/vendor-portals', express.static(path.join(__dirname, 'vendor-portals'), staticOptions));
 app.use('/art-tools', express.static(path.join(__dirname, 'art-tools'), staticOptions));
 app.use('/tools', gateStaffHtml);
+// Same gate-then-rewrite-then-static ordering as /dashboards above.
+app.get('/tools/:page', serveHashedStaffPage('tools'));
 app.use('/tools', express.static(path.join(__dirname, 'tools'), staticOptions));
 // /admin is staff-only EXCEPT the customer-facing c112-bogo-promo landing page.
 app.use('/admin', (req, res, next) => {
