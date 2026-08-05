@@ -5,6 +5,48 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## A per-frame `getImageData` capped the spin at whatever the readback allowed (2026-08-04)
+
+**Problem.** The garment designer's 🔄 Spin preview looked choppy and "unreal" no matter how the
+motion was tuned. Three defects were stacked, and each masked the next.
+
+**Root cause.**
+1. **Rendering.** 24 photos 15° apart were composited as a *permanent linear crossfade* — the
+   shirt was a double exposure 100% of the time, and it stepped photo-to-photo while the printed
+   logo (drawn from continuous `theta`) glided. The eye reads that desync as chop.
+2. **Settle.** On release, momentum rounded to a virtual step but wrapped `PHOTO.pos` by
+   `PHOTO.frames.length` (24) instead of `effectiveSpinSteps()` (96). Measured from four
+   arbitrary positions it jumped **180°, 1.5°, 179.3°, 91.1°** and parked at blend fractions
+   0.52/0.56/0.96 — i.e. the resting shirt was usually a half-and-half ghost.
+3. **Throughput.** `rebuildMockup()` runs every tick, and it called `maybeWarnLowContrast()` →
+   `artMeanLuminance()` → **`getImageData()`**: a GPU→CPU readback that stalls the pipeline,
+   inside a 6.1 ms frame budget.
+
+**Solution.** View morph (scale each neighbour photo horizontally about the shared registered
+torso axis by the ratio of apparent turntable widths, *then* blend — silhouettes align, so the
+fade stops reading as a ghost); fade compressed to the middle 40% of each gap so the shirt is a
+single pure photo 60% of the time; settle glides onto the nearest **real photo angle**;
+delta-time scaling on both momentum and auto-spin; and the contrast warning memoized on
+`id§eraseN§knockOn§garment`. Measured after: **163.9 fps on a 163.9 Hz display**, median frame
+6.1 ms in a 6.1 ms budget, 5 dropped frames per 400, revolution 6.58 s.
+
+**Prevention.**
+- 🔑 **`getImageData()` anywhere reachable from an animation tick is a frame-rate cap, not a
+  slow function.** It forces a pipeline flush. Memoize on the inputs that actually change, or
+  hoist it out of the loop entirely.
+- 🔑 **Fixed per-frame increments are a refresh-rate bug**: `pos += k` ran twice as fast on a
+  120 Hz screen. Advance by measured elapsed time and clamp `dt` for tab switches.
+- 🔑 **Two position spaces (24 real frames vs 96 virtual steps) invite a wrap in the wrong one** —
+  and the symptom (an occasional jump at the *end* of a coast) looks like a physics-tuning
+  problem, not an indexing one. Assert the parked state, not just the motion.
+- 🔑 **Blending frames is not interpolating geometry.** If a crossfade looks like ghosting,
+  align the silhouettes before fading rather than tuning the fade curve.
+- ⚠️ **rAF is paused in a hidden tab, so any in-page fps probe hangs there** (a CDP eval waiting
+  on it times out at 45 s and reads as "renderer frozen"). Arm the probe on `visibilitychange`
+  and read the stored result afterwards.
+
+---
+
 ## The shared print block flattens every color you set inline (2026-08-04)
 
 **Problem.** The monogram Customer Proof renders each name in its real thread color — the whole
@@ -176,119 +218,5 @@ three files, and the bump then verified live (`/api/version` sha matched the dep
 - âš ï¸ The skill file still contains the `origin/develop` comparison. Until it's fixed, check
   `git diff --name-only main develop -- '*.js' '*.jsx' '*.css'` by hand and confirm Step 2's
   bump list is non-empty whenever a release touches front-end assets.
-
----
-
-## The vacation slip printed the accountant's tax year, not the employee's (2026-08-03)
-
-**Problem.** Sorphorn Sorm's slip read **112 accrued / 56 used / 56 remaining**. Both figures
-were wrong by the same 32 hours; it should read **80 / 24 / 56**.
-
-**Root cause.** Payroll books hours to the tax year of the **check date**, not the work date.
-She took 32 h on 12/22, 12/23, 12/29 and 12/30 of 2025 â€” a pay period whose check date was
-01/09/2026. Those hours therefore land in the 2026 payroll year and on her 2026 W-2, and to pay
-them the system carried 32 h of 2025 balance forward. **Accrued and used are both inflated by
-the same carryover, so they cancel** â€” which is why remaining was right the whole time and the
-defect was invisible in the one column anyone checks. Correct cash-basis accounting on the
-accountant's side; a display problem on ours.
-
-**Solution.** New hand-maintained Caspio column `Employees.Vacation_Annual_Entitlement`, read
-live at slip time: `carryover = max(0, available âˆ’ entitlement)`, `slip_accrued = entitlement`,
-`slip_used = used âˆ’ carryover`, `slip_remaining = remaining` untouched. Blocking gates before
-anything reaches paper (`accrued âˆ’ used == remaining` Â±0.01; entitlement must be set) and a
-per-run audit CSV carrying raw + adjusted + carryover + flags.
-
-**Prevention.**
-- ðŸ”‘ **Two errors that cancel leave one clean column and no symptom.** Remaining reconciled
-  perfectly for months while both inputs were wrong. When a derived figure is right, that is
-  evidence about the *derivation*, not about its inputs â€” check the source columns too. (Same
-  shape as the 2026-07-27 finding where `Sick_Hours_Remaining` was correct while
-  `Sick_Accum_Hours_Available` sat at 0.)
-- ðŸ”‘ **An "as of" date is not a date field, it is the frame every derived value must be read
-  in.** The entitlement is date-effective off `Leave_Balances_As_Of`, never `today` â€” otherwise
-  reprinting July's packet in September silently prints September's grant.
-- ðŸ”´ **Never store a hand-maintained value in a column an importer writes.** The Friday import
-  overwrites all three `Vacation_Hours_*` columns; the entitlement had to be its own field or it
-  would be destroyed weekly. The tell that this was already happening: someone had hand-patched
-  Sorphorn to 80/24/56 in Caspio, and the next import would have silently reverted it.
-- ðŸ”´ **`Number('') === 0`.** Caspio returns a blank NUMBER as `''`, so blank and zero collapse
-  under any numeric coercion. Here blank must *block* the slip while 0 is legitimate (salaried
-  staff) â€” the two had to be separated explicitly, and the round-trip verified against live
-  Caspio rather than assumed.
-- ðŸ”´ **Do not generalise a correction to the neighbouring field because it looks similar.**
-  Sick hours carry over year to year *by Washington statute*, so the identical-looking inflation
-  there is correct. Both rules are jest-locked precisely because "fixing" sick too is the
-  obvious next mistake.
-- ðŸ”‘ **When a computed figure can't be trusted, refuse to print it â€” don't print a guess.** A
-  missing entitlement defaults to nothing, never to 80; the employee is named in a banner and in
-  the audit CSV so a missing slip is explained rather than merely absent.
-
-### The validation gate I wrote was a tautology, and my own comment said so (same day)
-
-An adversarial review of the above found the spec-mandated check had **zero power over the
-value it existed to guard**. `carryover = max(0, available âˆ’ entitlement)` makes the clamp inert
-whenever entitlement â‰¤ available, so `accrued âˆ’ used` collapses to `available âˆ’ used` â€” the
-entitlement cancels, and the importer writes `remaining = accrued âˆ’ used` by construction. A
-mis-keyed entitlement of 8 gave `{accrued 8, used âˆ’48, remaining 56}`: identity satisfied, no
-flags, "Hours used âˆ’48.00" printed for an employee. Fixed by asserting the one relation the
-identity cannot see â€” a carryover is hours both accrued *and* used last year, so
-`carryover > used` is impossible.
-
-- ðŸ”‘ **"This always holds" written next to an assertion is a bug report, not reassurance.** My
-  comment read "holds algebraically for every case, because the carryover is added to accrued and
-  used in equal measure" â€” a correct proof that the check could never fail, i.e. never fire.
-  **An invariant that cannot fail is not validating anything.** Before trusting a check, ask what
-  input makes it trip; if the answer is only "corrupt data from a system that can't produce it",
-  the check is decorative.
-- ðŸ”‘ **A hand-maintained value needs a check that constrains IT, not the machine-written values
-  around it.** Everything else on the record came from one importer and agreed with itself by
-  construction, so any relation among those fields was self-satisfying. Only a relation the
-  hand-typed number participates in asymmetrically has power.
-- ðŸ”‘ **State the limits of a guard in the same breath as the guard.** The fix catches an
-  entitlement below `remaining` and nothing above it â€” so 70 instead of 80 still prints silently.
-  That gap is now a passing test named "documenting the gap", because the failure mode of a
-  partial guard is someone later assuming it was total.
-- ðŸ”‘ **Adversarial review earns its keep on code that already passes its own tests.** 47 green
-  tests, a live round-trip against Caspio and a rendered print check all missed this; four
-  independent reviewers found it, and asking each finding's verifier to *refute* it killed 10 of
-  17 claims. Confirming passes would have kept all 17.
-- ðŸ”´ **A field allowlist protects fields, not strings built from them.** The same review found a
-  pre-existing leak: the payroll reconciliation put `"NAME: gross X - deductions Y != net Z"`
-  into a `rowIssues` array that bypassed the careful per-field `toSafeReview()` filter, and the
-  page rendered it â€” on the one page whose stated purpose is that compensation never reaches the
-  browser. **Audit the error and log paths with the same rigour as the data path.**
-
-## The blog content bank was written from style numbers it never looked up — 20 of 23 drafts misdescribe products (2026-08-03)
-
-**Problem.** The weekly blog autopilot reached `best-carhartt-styles-custom-company-workwear`.
-Every publish-time check the task specifies **passed**: all 5 linked styles returned HTTP 200,
-all 5 were `PRODUCT_STATUS: "Active"`, every internal link resolved. The body was still wrong
-on all five: CT104670 called a "Duck Jacket… rugged duck canvas" (it is the **Storm Defender
-Shoreline Jacket**, a rain shell), CTK121 called a "**Crewneck**… no-hood option" (it is the
-**Midweight Hooded** Sweatshirt), CT102208 called the "Gilliam **Vest**… without the sleeves"
-(it is the Gilliam **Jacket**), CT100617 given CTK121's name, CT100615 left unnamed filler.
-A reader clicking any link lands on a product that contradicts the sentence that sold it.
-
-**Root cause.** The 2026-07-13 seeding batch generated prose *around* style numbers instead of
-*from* the catalog — the numbers are real and active, so every existence check is satisfied while
-the identity behind each number is invented. An audit across all 23 drafts found the defect is
-systemic: **only 3 drafts are clean**; 2 recommend styles that are now **Discontinued**
-(NE1000 in 6 drafts, CS413), and CornerStone `CS410`/`CS413` are sold as "tee" and "pocket tee"
-when both are **polos**.
-
-**Fix.** Published the oldest genuinely-clean draft instead (`custom-ogio-bags-polos-corporate-gifts`
-— all 5 styles Active, every prose claim corroborated by the catalog, `COMPANION_STYLES` confirming
-its one relational claim). The other 20 drafts stay Draft pending rewrite; nothing was edited.
-
-**Prevention.**
-- **`PRODUCT_STATUS: "Active"` proves a style exists, not that the sentence about it is true.**
-  Diff the prose against `PRODUCT_TITLE` for every recommended style before publishing.
-- **Check prose, not just anchor text.** An anchor-text-only audit scored the Carhartt draft
-  1 mismatch; reading the body found 5. The regex could not see errors in the description
-  sentences, which is exactly where a generated draft puts them.
-- **A bare style number as anchor text (`[PC54](…)`) is fine and reads as a false positive** —
-  rank findings by whether the anchor *asserts a wrong identity*, not by string mismatch.
-- **Content written ahead of publication decays two ways**: the catalog moves under it (the
-  documented risk) *and* it may never have been right (the undocumented one). Verify both.
 
 ---
