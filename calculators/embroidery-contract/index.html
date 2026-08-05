@@ -143,7 +143,11 @@
                          so a script failure degrades to the manual input. -->
                     <div class="field" id="dstField" hidden>
                         <label id="dstFieldLabel">Stitch file <span class="dst-opt">· optional</span></label>
-                        <div class="dst-drop" id="dstDrop" role="button" tabindex="0" aria-labelledby="dstFieldLabel" aria-describedby="dstDropHint">
+                        <!-- aria-label MUST contain the visible label text (WCAG 2.5.3
+                             Label in Name) — pointing it at the field <label> instead
+                             would announce "Stitch file, button", which neither matches
+                             the visible words nor says what activating it does. -->
+                        <div class="dst-drop" id="dstDrop" role="button" tabindex="0" aria-label="Drop the .DST here or click to browse" aria-describedby="dstDropHint">
                             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4"/><path d="M8 8l4-4 4 4"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
                             <span class="dst-drop-text">
                                 <strong>Drop the .DST here</strong> or click to browse
@@ -151,6 +155,10 @@
                             </span>
                         </div>
                         <input type="file" id="dstFileInput" accept=".dst" hidden tabindex="-1">
+                        <!-- The card appearing is silent to assistive tech; this
+                             announces the parsed result. Updated ONLY on a
+                             successful load, so re-renders don't spam. -->
+                        <p class="dst-sr-only" id="dstStatus" role="status" aria-live="polite"></p>
                         <div class="dst-error" id="dstError" role="alert" hidden></div>
                         <div class="dst-card" id="dstCard" hidden>
                             <div class="dst-card-head">

@@ -137,9 +137,31 @@ table.price tfoot td.cell-hi {
    the ✕ on the card brings it back. #dstField.dragging is toggled by JS
    during drag-over.
    ===================================================== */
+/* 🔴 The [hidden] attribute is a UA-stylesheet rule, so ANY author `display`
+   declaration beats it — .dst-drop/.dst-note/.dst-suggest are flex containers
+   and would stay on screen with el.hidden = true (an empty bordered strip in
+   the card, and a drop zone showing under the loaded file). These
+   attribute-qualified rules outrank the plain class rules and restore it. */
+.dst-drop[hidden],
+.dst-note[hidden],
+.dst-suggest[hidden] { display: none; }
+
+/* Screen-reader-only live region — announces a parsed file to AT users, who
+   get nothing from the visual card appearing. */
+.dst-sr-only {
+    position: absolute;
+    width: 1px; height: 1px;
+    margin: -1px; padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+}
+
 .dst-opt {
     font-weight: 400;
-    color: var(--slate-2);
+    color: var(--slate);
     text-transform: none;
     letter-spacing: 0;
 }
@@ -171,17 +193,20 @@ table.price tfoot td.cell-hi {
 .dst-drop-text .hint {
     display: block;
     font-size: 11px;
-    color: var(--slate-2);
+    color: var(--slate);
     margin-top: 2px;
 }
 
+/* Matches the page's ONE established error treatment (.pricing-error in the
+   shared CSS) — same --warn token + left accent, no off-palette reds. */
 .dst-error {
     margin-top: 8px;
     padding: 10px 12px;
-    border: 1px solid #e5484d;
+    border: 1px solid rgba(180, 122, 0, 0.25);
+    border-left: 3px solid var(--warn);
     border-radius: var(--r);
-    background: rgba(229, 72, 77, 0.06);
-    color: #c0353a;
+    background: rgba(180, 122, 0, 0.08);
+    color: var(--warn);
     font-size: 12.5px;
     line-height: 1.4;
     word-break: break-word;
@@ -212,7 +237,7 @@ table.price tfoot td.cell-hi {
     color: var(--ink);
     word-break: break-all;
 }
-.dst-file-label { font-size: 11px; color: var(--slate-2); }
+.dst-file-label { font-size: 11px; color: var(--slate); }
 .dst-remove {
     margin-left: auto;
     background: transparent;
@@ -238,7 +263,7 @@ table.price tfoot td.cell-hi {
     font-size: 10px;
     text-transform: uppercase;
     letter-spacing: 0.07em;
-    color: var(--slate-2);
+    color: var(--slate);
     margin-bottom: 2px;
 }
 .dst-facts dd {

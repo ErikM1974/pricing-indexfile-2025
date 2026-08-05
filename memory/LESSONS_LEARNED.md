@@ -5,6 +5,57 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## A corrupt file that "parses" becomes a silent wrong price — DST has no magic bytes (2026-08-04)
+
+**Problem.** Browser-verifying the contract calculator's new DST drop zone: 2,000 bytes of
+arbitrary garbage named `.dst` didn't error — it "decoded" into ~500 nonsense stitches, silently
+replaced the previously loaded file, and priced the order at the 8K contract minimum.
+
+**Root cause.** Tajima DST has no file signature: ANY 3-byte record decodes into *some* stitch
+delta. `dst-parser.js`'s only guardrails were "file too small" and "zero stitches decoded" —
+tuned for the Embroidery Studio VIEWER, where garbage is self-evident as noise on the canvas.
+On a PRICING surface the same parse produces a plausible number with no visual to contradict it.
+
+**Solution.** Calculator-side validity gate (`embroidery-contract.js handleDstFile`): every real
+DST declares its record count in the `ST:` header — refuse loudly when it's 0 or disagrees with
+the decoded record total by >25%.
+
+**Prevention.**
+- 🔑 **A parser succeeding ≠ the input being valid. For signature-less formats, cross-check an
+  internal redundancy** (declared vs decoded counts) before trusting the result with money.
+- 🔑 **The same parse carries different risk per surface**: viewer → garbage renders as visible
+  noise; calculator → silent wrong price (Erik's #1 rule). Reused code inherits the validation
+  needs of its STRICTEST consumer.
+- Verify error paths with actively hostile bytes, not just wrong extensions — 12 green jest
+  tests and a clean happy path coexisted with this hole.
+
+---
+
+## Monogram thread-color dropdown dead in prod: API envelope change nobody re-tested (2026-08-04)
+
+**Problem.** The monogram form's thread-color selector had been silently broken live:
+`this.threadColors.filter is not a function` on every page load. Users could still type
+names, so nobody reported it.
+
+**Root cause.** `GET /api/thread-colors` originally returned a bare array; at some point the
+proxy started returning an `{success, count, colors}` envelope. `fetchThreadColors()` kept
+`return await response.json()` with the comment "Returns array directly" — HTTP 200, valid
+JSON, wrong shape. The error surfaced only in the console + a toast reps ignored.
+
+**Solution.** Service now unwraps both shapes and **throws** on anything else
+(`monogram-form-service.js` `fetchThreadColors`). Found while browser-verifying the
+Stitch-Proof feature, fixed in `ced3bc2f`.
+
+**Prevention.**
+- 🔑 **HTTP 200 + valid JSON ≠ valid response — assert the SHAPE at every fetch boundary**
+  (same family as the pricing-bundle empty-arrays-on-rate-limit lesson, v1791).
+- 🔑 **When a proxy route's response shape changes, grep ALL frontend consumers** — the app
+  and proxy deploy independently, so shape drift breaks quietly.
+- 🔑 A broken feature users can work around generates zero bug reports; only a
+  browser-verification pass with the console open finds it.
+
+---
+
 ## /deploy's cache-bust silently does nothing if you pushed develop first (2026-08-03)
 
 **Problem.** Deploying the vacation-slip work, the skill's Step 2 found **zero** changed assets
@@ -223,29 +274,4 @@ Erik's call, taken explicitly.
 
 ---
 
-## "Steve gets no notification" was a second submission path, not broken notification code (2026-08-01)
-
-**Problem.** Steve got no email and no Slack ping for Ruth's art requests, and Ruth got no
-confirmation — yet the artwork landed in his queue normally. Worked fine for Nika and Taneisha.
-Every instinct said the notification code was broken for one user.
-
-**Root cause.** Ruth was never using the AE dashboard form. She submits through a legacy **Caspio
-DataPage**, which writes straight into the `ArtRequests` table and never calls
-`POST /api/artrequests` — and BOTH notifications hang off that POST (browser EmailJS in
-`garment-submit-form.js sendNotificationEmails`, plus server-side Slack in the proxy's
-`art.js notifyArtRequestSubmission`). Nothing was broken; the requests never touched the code.
-The Slack webhook was set and healthy the whole time.
-
-**Why it hid.** A DataPage write is indistinguishable from an API write *in the queue* — the row
-looks normal. Only the columns give it away.
-
-**Solution.** Moved Ruth to the AE form (people fix, zero code). Shipped
-`scripts/art-request-source-audit.js` to name anyone whose NEWEST request bypassed the form.
-
-**Prevention.** 🔑 **When a feature fails for exactly one person, verify they're on the code path
-before debugging the code.** Cheapest possible test: diff their DATA against a working user's.
-Fields a form writes *unconditionally* are a free fingerprint of which form produced a row —
-here `Item_Type`/`Sales_Rep`/`Status` were empty on 6/6 of Ruth's rows and populated on everyone
-else's, and her `Garment_Placement` values weren't even options in the AE form's dropdown.
-🔑 **A second write path into a shared table silently skips every side effect** the first path
-owns. Retiring the old UI isn't enough while the DataPage URL still works.
+*(Older resolved entries live in `LESSONS_LEARNED_ARCHIVE.md`.)*

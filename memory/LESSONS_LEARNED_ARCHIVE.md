@@ -679,3 +679,32 @@ Both archived to `LESSONS_LEARNED_ARCHIVE.md`. The durable pair: **before reconc
 against a vendor's, match their clock** — check the timezone on their own report header first; a
 whole-day offset is indistinguishable from missing data. And **never treat your own meter as ground
 truth when auditing that meter** — under-reporting always reads as "we're fine".
+
+---
+
+## "Steve gets no notification" was a second submission path, not broken notification code (2026-08-01)
+
+**Problem.** Steve got no email and no Slack ping for Ruth's art requests, and Ruth got no
+confirmation — yet the artwork landed in his queue normally. Worked fine for Nika and Taneisha.
+Every instinct said the notification code was broken for one user.
+
+**Root cause.** Ruth was never using the AE dashboard form. She submits through a legacy **Caspio
+DataPage**, which writes straight into the `ArtRequests` table and never calls
+`POST /api/artrequests` — and BOTH notifications hang off that POST (browser EmailJS in
+`garment-submit-form.js sendNotificationEmails`, plus server-side Slack in the proxy's
+`art.js notifyArtRequestSubmission`). Nothing was broken; the requests never touched the code.
+The Slack webhook was set and healthy the whole time.
+
+**Why it hid.** A DataPage write is indistinguishable from an API write *in the queue* — the row
+looks normal. Only the columns give it away.
+
+**Solution.** Moved Ruth to the AE form (people fix, zero code). Shipped
+`scripts/art-request-source-audit.js` to name anyone whose NEWEST request bypassed the form.
+
+**Prevention.** 🔑 **When a feature fails for exactly one person, verify they're on the code path
+before debugging the code.** Cheapest possible test: diff their DATA against a working user's.
+Fields a form writes *unconditionally* are a free fingerprint of which form produced a row —
+here `Item_Type`/`Sales_Rep`/`Status` were empty on 6/6 of Ruth's rows and populated on everyone
+else's, and her `Garment_Placement` values weren't even options in the AE form's dropdown.
+🔑 **A second write path into a shared table silently skips every side effect** the first path
+owns. Retiring the old UI isn't enough while the DataPage URL still works.

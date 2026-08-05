@@ -505,8 +505,8 @@
         if (!PRODUCT_META[newProduct] || newProduct === state.product) return;
         state.product = newProduct;
         state.tableProduct = newProduct;
-        var p = PRODUCT_META[newProduct];
-        if (state.stitches < p.minStitches) state.stitches = p.minStitches;
+        var newMin = minStitchesFor(newProduct);
+        if (state.stitches < newMin) state.stitches = newMin;
         document.getElementById('stitch').value = state.stitches;
         renderStitchPresets();
         renderSegmentedActiveStates();
@@ -527,6 +527,24 @@
        no new pricing path is created: the parsed count flows into
        the same computeUnit() per-1K × tier math as a typed count.
        ===================================================== */
+
+    // Contract minimums come from Caspio where the API supplies them (the
+    // "pricing = API, never hardcoded" rule) — PRODUCT_META is the offline
+    // fallback only. Without this, the full-back SUGGESTION would trigger at
+    // the API's minimum while the CLAMP used the hardcoded 25K, so a Caspio
+    // change would quietly split the two apart.
+    function minStitchesFor(product) {
+        if (product === 'fullback' && pricing && pricing.fullBack && pricing.fullBack.minStitches) {
+            return pricing.fullBack.minStitches;
+        }
+        return PRODUCT_META[product].minStitches;
+    }
+
+    // Real production DSTs are tiny (a 63K-stitch jacket back ≈ 190 KB). A
+    // multi-MB file is either not a DST or pathological, and decoding it
+    // would build millions of point objects and lock the tab before any
+    // validity check could run — so bound it before the read.
+    var DST_MAX_BYTES = 8 * 1024 * 1024;
 
     function showDstError(msg) {
         var el = document.getElementById('dstError');
@@ -574,17 +592,18 @@
         var note = document.getElementById('dstNote');
         var noteText = document.getElementById('dstNoteText');
         var reapply = document.getElementById('dstReapply');
-        var appliedTarget = Math.max(p.minStitches, d.stitches);
+        var minStitches = minStitchesFor(state.product);
+        var appliedTarget = Math.max(minStitches, d.stitches);
         if (state.stitches !== appliedTarget) {
             note.hidden = false;
             reapply.hidden = false;
             noteText.textContent = 'Stitch count was edited by hand — the file reads ' +
                 fmtInt(d.stitches) + '.';
-        } else if (d.stitches < p.minStitches) {
+        } else if (d.stitches < minStitches) {
             note.hidden = false;
             reapply.hidden = true;
             noteText.textContent = 'File sews ' + fmtInt(d.stitches) +
-                ' stitches — priced at the ' + fmtK(p.minStitches) +
+                ' stitches — priced at the ' + fmtK(minStitches) +
                 ' contract minimum for ' + p.label.toLowerCase() + 's.';
         } else {
             note.hidden = true;
@@ -594,8 +613,7 @@
         var suggest = document.getElementById('dstSuggest');
         var suggestText = document.getElementById('dstSuggestText');
         var suggestBtn = document.getElementById('dstSuggestBtn');
-        var fbMin = (pricing && pricing.fullBack && pricing.fullBack.minStitches) ||
-            PRODUCT_META.fullback.minStitches;
+        var fbMin = minStitchesFor('fullback');
         var target = null;
         if (state.product !== 'fullback' && d.stitches >= fbMin) {
             target = 'fullback';
@@ -614,8 +632,7 @@
      *  product's contract minimum — same rule as typing it by hand). */
     function applyDstStitches() {
         if (!state.dst) return;
-        var p = PRODUCT_META[state.product];
-        state.stitches = Math.max(p.minStitches, state.dst.stitches);
+        state.stitches = Math.max(minStitchesFor(state.product), state.dst.stitches);
         document.getElementById('stitch').value = state.stitches;
         renderSegmentedActiveStates();
         renderCalculator();
@@ -631,10 +648,33 @@
                 'Tajima DST from your digitizing software — PES/EXP/JEF aren\'t supported here yet.');
             return;
         }
+        if (file.size > DST_MAX_BYTES) {
+            showDstError('"' + file.name + '" is ' + (file.size / 1048576).toFixed(1) +
+                ' MB — far larger than any real stitch file (a 63,000-stitch back design ' +
+                'is about 0.2 MB). Check that this is the DST and not a packed archive.');
+            return;
+        }
+        // Keyboard users activate the drop zone itself; it hides once the card
+        // renders, which would drop focus to <body>. Remember to re-place it.
+        var drop = document.getElementById('dstDrop');
+        var hadFocus = drop && drop.contains(document.activeElement);
         var reader = new FileReader();
         reader.onload = function (e) {
             try {
                 var data = window.DSTParser.parse(e.target.result);
+                // Tajima DST has no magic bytes — random binary "decodes" into
+                // nonsense stitches, and on a PRICING surface that becomes a
+                // silent wrong price (Erik's #1 rule). Every real DST declares
+                // its record count in the ST: header — refuse loudly when the
+                // decoded records disagree with it (25% tolerance absorbs
+                // digitizer counting quirks; garbage fails by miles).
+                var declared = (data.header && data.header.stitchCount) || 0;
+                var decoded = data.stats.totalStitches + data.stats.jumps + data.stats.colorChanges;
+                if (!declared || Math.abs(declared - decoded) / declared > 0.25) {
+                    throw new Error('the header declares ' + fmtInt(declared) +
+                        ' stitches but ' + fmtInt(decoded) +
+                        ' decoded — the file looks corrupt or is not a Tajima DST.');
+                }
                 clearDstError();
                 state.dst = {
                     name: file.name,
@@ -646,7 +686,19 @@
                     trims: data.stats.trims,
                 };
                 applyDstStitches();
-                showToast(file.name + ' — ' + fmtInt(state.dst.stitches) + ' stitches read from the file');
+                var summary = file.name + ' — ' + fmtInt(state.dst.stitches) + ' stitches read from the file';
+                showToast(summary);
+                // The toast is decorative; this is what assistive tech hears.
+                var statusEl = document.getElementById('dstStatus');
+                if (statusEl) {
+                    statusEl.textContent = summary + '. Priced at ' +
+                        fmtK(state.stitches) + ' stitches, $' +
+                        document.getElementById('unitPrice').textContent + ' per piece.';
+                }
+                if (hadFocus) {
+                    var removeBtn = document.getElementById('dstRemove');
+                    if (removeBtn) removeBtn.focus();
+                }
             } catch (err) {
                 showDstError('Couldn\'t read this DST: ' + err.message);
             }
@@ -715,7 +767,14 @@
         });
         document.getElementById('dstReapply').addEventListener('click', applyDstStitches);
         document.getElementById('dstSuggestBtn').addEventListener('click', function (e) {
+            // The suggestion is a FILE-driven action, so after switching
+            // products re-apply the file's exact count under the new
+            // product's minimum rules. Without this, moving OFF the Full
+            // Back tab would keep the old 25K clamp instead of the file's
+            // real count. (The segmented picker deliberately does NOT
+            // re-apply — hand-picked counts survive a manual tab switch.)
             setProduct(e.currentTarget.getAttribute('data-target'));
+            applyDstStitches();
         });
 
         // Hand-edits to the stitch input flip the card's note row live.
