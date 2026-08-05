@@ -1,3 +1,8 @@
+## v2026.08.05.14 (2026.08.05)
+
+- memory: 302->301 flip done; note it shipped in another session's commit
+- Extend content-hashed caching to the public storefront (26 pages)
+
 ## v2026.08.05.13 (2026.08.05)
 
 - memory: record the orphaned-Heroku-tip chain from today's deploy
