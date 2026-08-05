@@ -427,7 +427,7 @@ class SampleOrderService {
             console.groupEnd();
 
             // Submit to ManageOrders PUSH API
-            const response = await fetch(`${this.apiBase}/api/manageorders/orders/create`, {
+            const response = await fetch(`/api/manageorders/orders/create`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

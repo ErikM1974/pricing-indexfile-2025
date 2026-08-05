@@ -1938,7 +1938,8 @@ async function handleSamplesOrderPaid(session, quoteID, res) {
     });
     const pushResp = await fetch(`${CASPIO_PROXY_BASE}/api/manageorders/orders/create`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      // Secret required since proxy v2026.08.05.9 gated this route.
+      headers: { 'Content-Type': 'application/json', 'X-CRM-API-Secret': CRM_API_SECRET },
       body: JSON.stringify(payload)
     });
     const pushResult = await pushResp.json().catch(() => ({}));
@@ -3561,6 +3562,71 @@ app.delete('/api/crm-proxy/form-submissions/:submissionId', requireCrmRole(['adm
   } catch (err) {
     console.error('[lead-delete] error:', err.message);
     res.status(500).json({ error: 'Delete failed', message: err.message });
+  }
+});
+
+// ── Sample-order push forwarder (PUBLIC by necessity) ────────────────────────
+// The last anonymous route on the proxy: POST /api/manageorders/orders/create
+// creates a real ShopWorks order, and pages/sample-cart.html posted to it
+// DIRECTLY from the browser at a hardcoded proxy URL.
+//
+// 🔴 This one CANNOT take requireStaff. Unlike every Box caller, the sample cart
+// is a CUSTOMER flow — there is no SAML session to prove. So this forwarder is
+// deliberately public, and what it buys is:
+//   · the proxy route stops being an open order-creation endpoint to the entire
+//     internet — only this app can reach it, using the shared secret
+//   · abuse controls live in one place we own (strictLimiter, 20/hr per IP,
+//     the same bucket the other order-submission endpoints use)
+//   · the payload is validated and bounded before it can reach ShopWorks
+//
+// ⚠️ BE CLEAR ABOUT WHAT THIS IS NOT: order creation is still unauthenticated.
+// A determined caller can still POST here. The real fix is verifying a payment
+// before pushing to ShopWorks — a product change, not plumbing.
+function validateSampleOrder(body) {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) return 'Body must be an object';
+  if (typeof body.orderNumber !== 'string' || !body.orderNumber.trim() || body.orderNumber.length > 64) {
+    return 'orderNumber must be a non-empty string under 64 chars';
+  }
+  if (!body.customer || typeof body.customer !== 'object') return 'customer object is required';
+  if (!Array.isArray(body.lineItems) || body.lineItems.length === 0) return 'lineItems must be a non-empty array';
+  if (body.lineItems.length > 200) return 'lineItems exceeds 200';
+  if (body.files !== undefined) {
+    if (!Array.isArray(body.files)) return 'files must be an array';
+    if (body.files.length > 5) return 'files exceeds 5';
+    for (const f of body.files) {
+      if (!f || typeof f !== 'object') return 'each file must be an object';
+      // ~4 MB of base64. bodyParser caps the whole request at 5 MB anyway; this
+      // rejects the pathological single-file case with a clear message.
+      if (typeof f.fileData === 'string' && f.fileData.length > 5.6e6) return 'file too large';
+    }
+  }
+  return null;
+}
+
+app.post('/api/manageorders/orders/create', strictLimiter, async (req, res) => {
+  if (!CRM_API_SECRET) {
+    console.error('[sample-order] CRM_API_SECRET is not set — refusing to forward');
+    return res.status(503).json({ error: 'Order service is not configured' });
+  }
+  const invalid = validateSampleOrder(req.body);
+  if (invalid) {
+    console.warn('[sample-order] rejected: ' + invalid);
+    return res.status(400).json({ error: invalid });
+  }
+  try {
+    const upstream = await fetch(`${CRM_API_BASE}/api/manageorders/orders/create`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CRM-API-Secret': CRM_API_SECRET },
+      body: JSON.stringify(req.body),
+    });
+    const text = await upstream.text();
+    res.status(upstream.status);
+    res.set('Content-Type', upstream.headers.get('content-type') || 'application/json');
+    res.set('Cache-Control', 'no-store');
+    return res.send(text);
+  } catch (err) {
+    console.error('[sample-order] forward failed:', err.message);
+    return res.status(502).json({ error: 'Order submission failed' });
   }
 });
 
@@ -8719,8 +8785,10 @@ TAX: ${taxPct ? `APPLY ${taxPartDescription}` : 'DO NOT APPLY - out-of-state shi
 
     const response = await fetch(MANAGEORDERS_API, {
       method: 'POST',
+      // Secret required since proxy v2026.08.05.9 gated this route.
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'X-CRM-API-Secret': CRM_API_SECRET
       },
       body: JSON.stringify(manageOrdersPayload)
     });
@@ -10014,7 +10082,8 @@ app.post('/api/submit-order-form', async (req, res) => {
     const MANAGEORDERS_API = `${CASPIO_PROXY_BASE}/api/manageorders/orders/create`;
     const response = await fetch(MANAGEORDERS_API, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      // Secret required since proxy v2026.08.05.9 gated this route.
+      headers: { 'Content-Type': 'application/json', 'X-CRM-API-Secret': CRM_API_SECRET },
       body: JSON.stringify(manageOrdersPayload)
     });
     const result = await response.json().catch(() => ({}));
