@@ -590,7 +590,12 @@
                                 <div class="tool-subhead">Everyday pricing</div>
                                 <a href="/calculators/manual-pricing.html" class="tool-btn"><i class="fas fa-calculator" aria-hidden="true"></i> Manual Pricing 2026</a>
                                 <a href="/calculators/service-price-cheat-sheet.html" class="tool-btn"><i class="fas fa-clipboard-list" aria-hidden="true"></i> Service Prices</a>
-                                <a href="/calculators/compare-pricing.html" class="tool-btn tool-btn--beta" title="Beta — works but still being refined. Let Erik know if you hit issues."><i class="fas fa-search-dollar" aria-hidden="true"></i> Pricing by Style</a>
+                                <!-- Pricing by Style (compare-pricing) retired 2026-08-05 — Quick Quote is what sales actually uses.
+                                     The page priced correctly (same 5 pricing services, verified against the locked PC54 baselines)
+                                     but was the only pricing surface with no parity test, so it could drift silently.
+                                     /calculators/compare-pricing.html 302s to Quick Quote in server.js; nothing deleted,
+                                     so restoring this line is the whole rollback. -->
+
 
                                 <!-- Was "Corporate Embroidery": retail / B2B end-user
                                      embroidery on NWCA blanks. All three are tabs of

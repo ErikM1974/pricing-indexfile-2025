@@ -4349,6 +4349,35 @@ app.get(['/calculators/custom-decal-pricing.html', '/pricing/decals'], requireSt
   sendHashedHtml(res, path.join(__dirname, 'calculators', 'custom-decal-pricing.html'));
 });
 
+// ── "Pricing by Style" (compare-pricing) retired 2026-08-05 (Erik approved) ──
+// Superseded by Quick Quote, which is what the sales staff actually use. The
+// page was NOT wrong: it instantiates the same five *-pricing-service.js
+// classes as the quote builders, has zero hardcoded prices, and its Math.min
+// base-cost convention matches dtg-canonical-pricing.js / quote-cart-engine.js.
+// Verified live against the locked baselines on PC54 — EMB 24-47 $20.00,
+// EMB 1-7 base $24.00 and DTG 12-23 $14.50 all matched to the cent.
+//
+// It was retired because it was the ONE pricing surface with NO parity test
+// (13 guard DTF/DTG/EMB/SCP/quick-quote/web-quote-cart; none covered this), so
+// any change to a pricing service could drift it silently — the exact failure
+// CLAUDE.md rule 9 exists to prevent. Unlike the mockup generator, usage could
+// NOT be measured: this app's Heroku logs retain ~30 minutes, far too short to
+// call it unused. Hence 302, not 301 — restoring the card and deleting this
+// block is the whole rollback, and no browser caches its way past it.
+//
+// MUST stay above the serveHashedCalculator catch-alls below (which would
+// serve the page) as well as the /calculators static mount under them.
+//
+// ⚠️ Open and unrelated to the retirement: on DTF 10-23 this page showed $25.50
+// /pc at qty 10 while baseline DTF-01 records perPiece 20.5 / lineSubtotal 205
+// — one whole $50 LTM apart. dtf-pricing-service.js:298 says basePrice excludes
+// LTM and "consumers add (ltmFee / userSelectedQty)", which is what this page
+// did, so the suspicion is the DTF QUOTE path drops the fee on small orders.
+// Retiring this page hides the symptom; it does not fix that. Still open.
+app.get('/calculators/compare-pricing.html', (req, res) => {
+  res.redirect(302, '/calculators/quick-quote/');
+});
+
 // Asset rewrite for calculator pages. /calculators has NO mount gate — it is
 // mostly public, and the one staff-only page (custom-decal-pricing.html) is
 // gated by its own requireStaff route ABOVE, which serves the file itself and
