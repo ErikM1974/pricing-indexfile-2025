@@ -279,6 +279,8 @@ dotenv.config();
 //   L1648 /pricing/dtf → /pricing/dtf/index.html
 //   /pricing/stickers → 410 signpost (retired 2026-07-29)
 //   /pricing/decals   → custom-decal-pricing.html (requireStaff)
+//   /pages/mockup-generator.html → 302 /pages/dst-viewer.html (retired 2026-08-05;
+//     MUST stay above the /pages static mount — see the block at the redirect)
 // =============================================================================
 
 const app = express();
@@ -4251,6 +4253,30 @@ app.get(['/pages/3-day-tees.html', '/3-day-tees.html', '/3-day-tees'], (req, res
 // deliberately public, field-scrubbed route — it is not affected by this.
 app.get('/pages/design-gallery.html', (req, res) => {
   res.redirect(302, '/dashboards/design-gallery.html');
+});
+
+// ── Embroidery Mockup Generator retired 2026-08-05 (Erik approved) ──────────
+// Superseded as an entry point by DST Studio. Retired on usage, not on parity:
+// across the full retained inksoft-transform log window (2026-06-30 → 08-05)
+// generate-mockup / compare / recolor-emb / identify-elements took ZERO hits.
+// The only traffic was /api/embroidery/palette, which mockup-generator.js
+// fetches eagerly on page load — i.e. page opens that never produced a mockup.
+// MUST stay above the /pages static mount or express.static serves the file
+// and this never fires.
+//
+// Nothing was deleted, so this is a one-line rollback:
+//   • pages/mockup-generator.{html,js,css} still on disk
+//   • pages/js/thread-color-picker.{js,css} STILL LOADED by mockup-detail.html
+//     — do not delete them with the generator
+//   • the Flask /api/embroidery/* routes + embroidery_mockup.py stay:
+//     mockup-detail.js depends on parse-emb-full, parse-dst-elements, palette
+//
+// Known gap, accepted: EMB↔PDF thread comparison and the recolored-EMB
+// download exist nowhere else. mockup-detail.html covers EMB thread reads.
+// 302 (not 301) so a rollback isn't stuck in reps' cached browsers; flip to
+// 301 after it soaks, same as the Design Vault cutover above.
+app.get('/pages/mockup-generator.html', (req, res) => {
+  res.redirect(302, '/pages/dst-viewer.html');
 });
 
 app.use('/pages', express.static(path.join(__dirname, 'pages'), staticOptions));
