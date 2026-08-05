@@ -193,10 +193,33 @@ dying on `raise_for_status()`. Verified against production before and after.
 🔑 **CLAUDE.md's cross-project rule earned its place here** — a repo-local caller
 search would have found nothing and the gate would have looked safe.
 
-### Still anonymous in the push router (each needs its own caller audit)
+## 5. auth/test (CLOSED, proxy `v2026.08.05.12`)
 
-`GET /push/health` (no data) · `POST /auth/test` (exercises the ManageOrders
-credentials). Tracking is closed — see section 4.
+`POST /api/manageorders/auth/test` was anonymous. Gated for what it **does**, not
+what it returns: `testAuth()` discloses only success, expiry and token *length* —
+never the token or the credentials — so this was never a data fix.
+
+The problem is its first line: `getToken(true)` forces a **fresh signin against
+ManageOrders on every call**. Anonymously that let anyone trigger upstream
+credential operations on demand — burning API quota, risking lockout on repeated
+signins, and churning the shared token cache real order pushes depend on.
+
+Zero callers in any of the three repos. A human testing credentials sends the
+secret (verified: 200 with it, 401 without).
+
+🔑 **`GET /push/health` deliberately stays OPEN** — no data, useful liveness
+probe. A test guards the reverse mistake, since gating the whole `/push` prefix
+would take it with it.
+
+### The proxy surface as of 2026-08-05
+
+Anonymous sweep — everything 401 except the two health probes:
+
+| Route | Anonymous |
+|---|---|
+| `/api/manageorders/{orders,lineitems,tracking,auth}` | 401 |
+| all 11 `/api/box/*` | 401 |
+| `/api/manageorders/push/health`, `/api/health` | 200 (deliberate) |
 
 ---
 
