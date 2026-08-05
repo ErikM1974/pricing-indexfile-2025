@@ -208,6 +208,9 @@ function renderTable(data) {
                     <button class="action-btn print" onclick="printMonogram(${orderNum})" title="Print">
                         <i class="fas fa-print"></i>
                     </button>
+                    <button class="action-btn proof" onclick="proofMonogram(${orderNum})" title="Customer Proof">
+                        <i class="fas fa-file-signature"></i>
+                    </button>
                     ${status !== 'Printed' ? `
                     <button class="action-btn done" onclick="markPrinted(${idMonogram})" title="Mark as Printed">
                         <i class="fas fa-check"></i>
@@ -286,6 +289,14 @@ function editMonogram(orderNumber) {
  */
 function printMonogram(orderNumber) {
     window.open(`/quote-builders/monogram-form.html?load=${encodeURIComponent(orderNumber)}&print=true`, '_blank');
+}
+
+/**
+ * Open customer proof print view (names rendered as they will be stitched,
+ * per-name approval checkboxes + signature line)
+ */
+function proofMonogram(orderNumber) {
+    window.open(`/quote-builders/monogram-form.html?load=${encodeURIComponent(orderNumber)}&proof=true`, '_blank');
 }
 
 /**

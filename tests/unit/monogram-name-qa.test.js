@@ -186,6 +186,30 @@ describe('analyze — unassigned imported names', () => {
         const r = QA.analyze([item(1, 'Jim Smith')], { unassignedNames: [] });
         expect(codes(r)).not.toContain('unassigned');
     });
+    test('roster name already present as a row name is not "skipped" (loaded-form case)', () => {
+        // Loading a saved form fills rows from ItemsJSON, leaving the whole
+        // roster formally unassigned — but nobody was actually skipped.
+        const r = QA.analyze(
+            [item(1, 'Diego'), item(2, 'Saul')],
+            { unassignedNames: ['DIEGO', ' saul ', 'Ramon'] });
+        const f = r.findings.find(x => x.code === 'unassigned');
+        expect(f).toBeDefined();
+        expect(f.message).toContain('1 imported name is');
+        expect(f.message).toContain('Ramon');
+        expect(f.message).not.toContain('Diego');
+    });
+});
+
+describe('isLightHex', () => {
+    test('white thread is light', () => expect(QA.isLightHex('#FAFAFF')).toBe(true));
+    test('pale yellow is light', () => expect(QA.isLightHex('#FFD700')).toBe(true));
+    test('black is not', () => expect(QA.isLightHex('#2D2926')).toBe(false));
+    test('royal is not', () => expect(QA.isLightHex('#003DA5')).toBe(false));
+    test('garbage input is not light', () => {
+        expect(QA.isLightHex('')).toBe(false);
+        expect(QA.isLightHex(null)).toBe(false);
+        expect(QA.isLightHex('#FFF')).toBe(false);  // 3-digit not expected from sources
+    });
 });
 
 describe('analyze — clean list', () => {

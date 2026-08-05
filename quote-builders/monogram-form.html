@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -6,10 +6,10 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Monogram Form - Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Dancing+Script:wght@600;700&family=Archivo+Black&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link href="/shared_components/css/quote-builder-common.css" rel="stylesheet">
-    <link href="/shared_components/css/monogram-form.css" rel="stylesheet">
+    <link href="/shared_components/css/monogram-form.css?v=2026.08.04.3" rel="stylesheet">
 </head>
 <body>
     <!-- Header -->
@@ -257,6 +257,15 @@
                         <i class="fas fa-plus"></i> Add Row
                     </button>
                 </div>
+
+                <!-- Stitch Check: live QA on the name list (monogram-name-qa.js) -->
+                <div class="stitch-check-panel" id="stitchCheckPanel" style="display: none;">
+                    <div class="stitch-check-header">
+                        <strong><i class="fas fa-spell-check"></i> Stitch Check</strong>
+                        <span class="stitch-check-summary" id="stitchCheckSummary"></span>
+                    </div>
+                    <ul class="stitch-check-list" id="stitchCheckList"></ul>
+                </div>
             </section>
 
             <!-- Action Buttons -->
@@ -269,6 +278,9 @@
                 <div class="actions-right">
                     <button type="button" class="btn-secondary" id="saveDraftBtn">
                         <i class="fas fa-save"></i> Save Draft
+                    </button>
+                    <button type="button" class="btn-secondary" id="printProofBtn">
+                        <i class="fas fa-file-signature"></i> Print Customer Proof
                     </button>
                     <button type="button" class="btn-primary" id="printPdfBtn">
                         <i class="fas fa-print"></i> Print PDF
@@ -324,6 +336,7 @@
                 <strong>Notes to Production</strong>
                 <p id="printNotes"></p>
             </div>
+            <div class="print-run-plan" id="printRunPlan" style="display: none;"></div>
         </div>
 
         <div class="print-names-section">
@@ -350,6 +363,55 @@
         </div>
     </div>
 
+    <!-- Customer Proof Template (Hidden; printed via body.print-mode-proof) -->
+    <div id="proofTemplate" class="print-template proof-template">
+        <div class="print-header">
+            <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                 alt="Northwest Custom Apparel" class="print-logo">
+            <div class="print-header-right">
+                <span class="print-date" id="proofDate"></span>
+                <h1 class="print-title">Embroidery Name Proof</h1>
+            </div>
+        </div>
+
+        <div class="print-order-info">
+            <div class="print-field">
+                <strong>Order#</strong>
+                <span id="proofOrderNumber"></span>
+            </div>
+            <div class="print-field">
+                <strong>Company</strong>
+                <span id="proofCompanyName"></span>
+            </div>
+            <div class="print-field">
+                <strong>Font Style</strong>
+                <span id="proofFontStyle"></span>
+            </div>
+        </div>
+
+        <p class="proof-instructions">
+            Please review each name below. Names are embroidered <strong>exactly as shown</strong> â€”
+            including capitalization, spacing, and punctuation. Check the box beside each name to
+            approve it, then sign at the bottom. On-screen fonts and thread colors are close
+            approximations of the actual embroidery.
+        </p>
+        <p class="proof-color-notice" id="proofColorNotice" style="display: none;"></p>
+
+        <div class="proof-list" id="proofList"></div>
+
+        <div class="proof-signoff">
+            <div class="proof-signoff-line">
+                <span class="proof-signoff-label">Approved by (print name)</span>
+            </div>
+            <div class="proof-signoff-line">
+                <span class="proof-signoff-label">Signature</span>
+            </div>
+            <div class="proof-signoff-line proof-signoff-date">
+                <span class="proof-signoff-label">Date</span>
+            </div>
+        </div>
+    </div>
+
     <!-- Loading Overlay -->
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-content">
@@ -363,7 +425,9 @@
 
     <!-- Scripts -->
     <script src="/config/app.config.js"></script>
-    <script src="/shared_components/js/monogram-form-service.js?v=2026.07.04.5"></script>
-    <script src="/shared_components/js/monogram-form-controller.js"></script>
+    <script src="/pages/js/dst-palette.js?v=2026.08.04.2"></script>
+    <script src="/shared_components/js/monogram-name-qa.js?v=2026.08.04.3"></script>
+    <script src="/shared_components/js/monogram-form-service.js?v=2026.08.04.3"></script>
+    <script src="/shared_components/js/monogram-form-controller.js?v=2026.08.04.3"></script>
 </body>
 </html>

@@ -24,7 +24,7 @@ const HOST_RE = /caspio-pricing-proxy-ab30a049961a/g;
 const EMAILJS_RE = /service_jgrave3|4qSbDO-SQs19TbP80/g;
 
 // Frozen 2026-07-07 (task 0.3 sweep complete). Only lower these.
-const HOST_BASELINE = 225;
+const HOST_BASELINE = 224; // 225 -> 224: pages/js/design-view.js lost its fallback literal (Design Vault)
 const EMAILJS_BASELINE = 69;
 
 const SKIP_DIRS = new Set(['node_modules', '.claude', '.git', 'dist', 'tests', 'memory', 'docs', 'migrations', 'workflows']);
@@ -44,6 +44,15 @@ const CLEAN_FILES = [
     'config/tenant.js', // logic, not data — the literals live in app.config.js / tenants/*.json
     'lib/asset-manifest.js',
     'scripts/build.js',
+    // Design Vault — APP_CONFIG only, no fallback literal anywhere
+    'dashboards/design-gallery.html',
+    'dashboards/js/design-gallery.js',
+    'dashboards/js/design-gallery-search.js',
+    'dashboards/js/design-gallery-store.js',
+    'dashboards/js/design-gallery-grid.js',
+    'dashboards/js/design-gallery-rails.js',
+    'dashboards/js/design-gallery-drawer.js',
+    'pages/js/design-view.js',
 ];
 
 const CLEAN_DIRS = ['shared_components/js/builders'];

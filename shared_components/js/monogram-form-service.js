@@ -566,7 +566,14 @@ class MonogramFormService {
             if (!response.ok) {
                 throw new Error(`Failed to fetch thread colors: ${response.status}`);
             }
-            return await response.json(); // Returns array directly
+            const data = await response.json();
+            // API shape changed from a bare array to {success, count, colors: [...]}
+            // (rows carry Thread_Color, Thead_ID, Hex_Color, ...). Accept both.
+            const colors = Array.isArray(data) ? data : data.colors;
+            if (!Array.isArray(colors)) {
+                throw new Error('Unexpected thread colors response format');
+            }
+            return colors;
         } catch (error) {
             console.error('[MonogramService] Thread colors fetch error:', error);
             throw error; // CLAUDE.md Rule #4: No silent API failures

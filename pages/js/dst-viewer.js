@@ -596,6 +596,10 @@
 
     function fitView() {
         var s = resizeStage();
+        // A stage that measures 0 (page opened in a hidden/zero-size container)
+        // would fit to the clamp minimum and never recover — the design reads as
+        // "blank". Remember it and re-fit as soon as the stage has real size.
+        state.fitDeferred = (s.w < 2 || s.h < 2);
         var bb = state.data.bbox;
         var margin = 90;
         var scale = Math.min((s.w - margin * 2) / Math.max(1, bb.widthMM), (s.h - margin * 2) / Math.max(1, bb.heightMM));
@@ -1702,7 +1706,9 @@
         });
 
         window.addEventListener('resize', function () {
-            if (state.data) draw();
+            if (!state.data) return;
+            if (state.fitDeferred) { fitView(); }
+            draw();
         });
 
         // print: rebuild is done in printSheet(); ctrl+P works too if a design is loaded

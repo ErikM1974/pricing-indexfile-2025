@@ -225,7 +225,15 @@
         }
 
         // --- unassigned imported names: a person simply gets skipped ---
-        var unassigned = (context.unassignedNames || []).filter(function (n) { return cleanName(n).length > 0; });
+        // A roster name that already appears as a row name is NOT skipped, even if
+        // it was never formally "assigned" via the dropdown (loaded forms populate
+        // rows straight from saved items, leaving the whole roster "unused").
+        var rowNameSet = {};
+        named.forEach(function (it) { rowNameSet[cleanName(it.name).toLowerCase()] = true; });
+        var unassigned = (context.unassignedNames || []).filter(function (n) {
+            var key = cleanName(n).toLowerCase();
+            return key.length > 0 && !rowNameSet[key];
+        });
         if (unassigned.length) {
             pushFinding(findings, 'unassigned', 'warn', [],
                 unassigned.length + ' imported name' + (unassigned.length > 1 ? 's are' : ' is') +
@@ -276,6 +284,18 @@
         };
     }
 
+    /**
+     * True when a hex color is too light to read on white paper (white/cream/
+     * pale-yellow thread) — the proof renders those on a dark chip instead.
+     */
+    function isLightHex(hex) {
+        var m = /^#?([0-9a-f]{6})$/i.exec(String(hex || ''));
+        if (!m) return false;
+        var v = parseInt(m[1], 16);
+        var lum = (0.299 * ((v >> 16) & 255) + 0.587 * ((v >> 8) & 255) + 0.114 * (v & 255)) / 255;
+        return lum > 0.72;
+    }
+
     return {
         analyze: analyze,
         cleanName: cleanName,
@@ -283,6 +303,7 @@
         levenshtein: levenshtein,
         classifyCase: classifyCase,
         buildRunPlan: buildRunPlan,
+        isLightHex: isLightHex,
         LONG_NAME_CHARS: LONG_NAME_CHARS
     };
 }));

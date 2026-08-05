@@ -9,12 +9,18 @@
 (function () {
     'use strict';
 
-    var API_BASE = (window.APP_CONFIG && APP_CONFIG.API && APP_CONFIG.API.BASE_URL)
-        || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    // The page loads /config/app.config.js (tenant-aware). No hardcoded
+    // fallback: an unreachable config means we do not know which backend to
+    // ask, and inventing one would silently serve the wrong tenant's designs.
+    var API_BASE = (window.APP_CONFIG && APP_CONFIG.API && APP_CONFIG.API.BASE_URL) || '';
 
     document.addEventListener('DOMContentLoaded', init);
 
     function init() {
+        if (!API_BASE) {
+            showError('Configuration failed to load', 'Please refresh the page. If this keeps happening, contact us.');
+            return;
+        }
         var designNumber = getDesignNumberFromUrl();
         if (!designNumber) {
             showError('Invalid URL', 'No design number found in the URL.');

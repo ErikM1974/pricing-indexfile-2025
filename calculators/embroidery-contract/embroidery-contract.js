@@ -105,6 +105,11 @@
         qty: 24,
         stitches: 8000,
         tableProduct: 'garment',  // which table tab is active (independent of calculator product)
+        // Round 12 (2026-08-04): facts parsed from a dropped .DST file, or
+        // null when the rep is typing the stitch count by hand. Immutable
+        // snapshot of the file — presentation (min-clamp note, full-back
+        // suggestion) is derived fresh in renderDstCard() on every change.
+        dst: null,            // {name, label, stitches, widthMM, heightMM, colors, trims}
     };
 
     /* ---------------------- Helpers ---------------------- */
@@ -114,6 +119,18 @@
         return Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
     function fmtInt(n) { return Number(n || 0).toLocaleString('en-US'); }
+
+    // Round 12 (2026-08-04): stitch counts are no longer always round
+    // thousands — a parsed DST gives e.g. 9,412. "9.41K" for odd counts,
+    // "8K" for round ones. The MATH always uses the exact count; this is
+    // display only.
+    function fmtK(stitches) {
+        return (stitches / 1000).toFixed(2).replace(/\.?0+$/, '') + 'K';
+    }
+
+    function fmtInches(mm) {
+        return (mm / 25.4).toFixed(1).replace(/\.0$/, '') + '"';
+    }
 
     function tierIndexForQty(qty) {
         if (qty <= 7)  return 0;
@@ -221,7 +238,7 @@
             document.getElementById('resTier').textContent = 'Tier ' + TIER_LABELS[calc.tierIdx];
             document.getElementById('unitPrice').textContent = fmtMoney(ltmCalc.finalUnitPrice);
             // Sub-line — show the rate breakdown, plus LTM math when it applies
-            var subText = (state.stitches / 1000).toFixed(0) + 'K × <b>$' + calc.rate.toFixed(2) + '/1K</b>';
+            var subText = fmtK(state.stitches) + ' × <b>$' + calc.rate.toFixed(2) + '/1K</b>';
             if (calc.minChargeApplied) subText += ' · min charge applied';
             if (ltmCalc.hasLtm) {
                 subText += ' · incl. $' + fmtMoney(ltmCalc.ltmFee) + ' LTM ÷ ' + state.qty +
@@ -471,7 +488,7 @@
             ? ' (incl. $' + fmtMoney(ltmCalc.ltmPerPiece) + ' LTM/pc)'
             : '';
         var text =
-            p.label + ' · ' + fmtInt(state.qty) + ' pcs · ' + (state.stitches / 1000).toFixed(0) + 'K stitches\n' +
+            p.label + ' · ' + fmtInt(state.qty) + ' pcs · ' + fmtK(state.stitches) + ' stitches\n' +
             'Unit: $' + fmtMoney(ltmCalc.finalUnitPrice) + ' / piece' + ltmNote +
             '  •  Total: $' + fmtMoney(total);
         copyToClipboard(text)
@@ -479,25 +496,300 @@
             .catch(function () { showToast('Couldn\'t copy — try again'); });
     }
 
+    /* ---------------------- Product switching ---------------------- */
+
+    // ONE path for changing the item type — used by the segmented picker and
+    // the DST card's suggestion button. Keeps the "bump stitches below the
+    // new product's minimum" rule in a single place.
+    function setProduct(newProduct) {
+        if (!PRODUCT_META[newProduct] || newProduct === state.product) return;
+        state.product = newProduct;
+        state.tableProduct = newProduct;
+        var newMin = minStitchesFor(newProduct);
+        if (state.stitches < newMin) state.stitches = newMin;
+        document.getElementById('stitch').value = state.stitches;
+        renderStitchPresets();
+        renderSegmentedActiveStates();
+        renderCalculator();
+        renderPriceTable();
+        renderDstCard();
+        if (aiState.opened) updateContextPill();
+    }
+
+    /* =====================================================
+       DST stitch file → exact stitch count (Round 12, 2026-08-04)
+
+       Contract partners hold the production DST — drop it on the
+       calculator and the quote prices from the file's ACTUAL stitch
+       count instead of a typed guess. Parsing is fully client-side
+       via /pages/js/dst-parser.js (shared with the Embroidery
+       Studio, jest-locked) — the file never leaves the browser and
+       no new pricing path is created: the parsed count flows into
+       the same computeUnit() per-1K × tier math as a typed count.
+       ===================================================== */
+
+    // Contract minimums come from Caspio where the API supplies them (the
+    // "pricing = API, never hardcoded" rule) — PRODUCT_META is the offline
+    // fallback only. Without this, the full-back SUGGESTION would trigger at
+    // the API's minimum while the CLAMP used the hardcoded 25K, so a Caspio
+    // change would quietly split the two apart.
+    function minStitchesFor(product) {
+        if (product === 'fullback' && pricing && pricing.fullBack && pricing.fullBack.minStitches) {
+            return pricing.fullBack.minStitches;
+        }
+        return PRODUCT_META[product].minStitches;
+    }
+
+    // Real production DSTs are tiny (a 63K-stitch jacket back ≈ 190 KB). A
+    // multi-MB file is either not a DST or pathological, and decoding it
+    // would build millions of point objects and lock the tab before any
+    // validity check could run — so bound it before the read.
+    var DST_MAX_BYTES = 8 * 1024 * 1024;
+
+    function showDstError(msg) {
+        var el = document.getElementById('dstError');
+        if (!el) return;
+        el.textContent = msg;   // textContent — file names are user data (XSS)
+        el.hidden = false;
+    }
+
+    function clearDstError() {
+        var el = document.getElementById('dstError');
+        if (el) { el.textContent = ''; el.hidden = true; }
+    }
+
+    /**
+     * Paint the file card from state.dst + the CURRENT product/stitch state.
+     * Cheap and idempotent — call whenever product or stitch count changes.
+     * All dynamic strings go in via textContent (file name + header label
+     * are attacker-controlled bytes from the dropped file).
+     */
+    function renderDstCard() {
+        var card = document.getElementById('dstCard');
+        var drop = document.getElementById('dstDrop');
+        if (!card) return;
+        var d = state.dst;
+        card.hidden = !d;
+        if (drop) drop.hidden = !!d;   // card replaces the drop zone; ✕ restores it
+        if (!d) return;
+
+        var p = PRODUCT_META[state.product];
+
+        document.getElementById('dstFileName').textContent = d.name;
+        var labelEl = document.getElementById('dstFileLabel');
+        labelEl.textContent = d.label ? 'Design: ' + d.label : '';
+        labelEl.hidden = !d.label;
+
+        document.getElementById('dstFactStitches').textContent = fmtInt(d.stitches);
+        document.getElementById('dstFactSize').textContent =
+            fmtInches(d.widthMM) + ' × ' + fmtInches(d.heightMM) +
+            ' (' + d.widthMM.toFixed(0) + ' × ' + d.heightMM.toFixed(0) + ' mm)';
+        document.getElementById('dstFactColors').textContent = String(d.colors);
+        document.getElementById('dstFactTrims').textContent = String(d.trims);
+
+        // Note row — contract-minimum clamp, or a hand-edited divergence from
+        // the file's count. appliedTarget = what "Use file count" would set.
+        var note = document.getElementById('dstNote');
+        var noteText = document.getElementById('dstNoteText');
+        var reapply = document.getElementById('dstReapply');
+        var minStitches = minStitchesFor(state.product);
+        var appliedTarget = Math.max(minStitches, d.stitches);
+        if (state.stitches !== appliedTarget) {
+            note.hidden = false;
+            reapply.hidden = false;
+            noteText.textContent = 'Stitch count was edited by hand — the file reads ' +
+                fmtInt(d.stitches) + '.';
+        } else if (d.stitches < minStitches) {
+            note.hidden = false;
+            reapply.hidden = true;
+            noteText.textContent = 'File sews ' + fmtInt(d.stitches) +
+                ' stitches — priced at the ' + fmtK(minStitches) +
+                ' contract minimum for ' + p.label.toLowerCase() + 's.';
+        } else {
+            note.hidden = true;
+        }
+
+        // Suggestion row — the file's size says it belongs on another tab.
+        var suggest = document.getElementById('dstSuggest');
+        var suggestText = document.getElementById('dstSuggestText');
+        var suggestBtn = document.getElementById('dstSuggestBtn');
+        var fbMin = minStitchesFor('fullback');
+        var target = null;
+        if (state.product !== 'fullback' && d.stitches >= fbMin) {
+            target = 'fullback';
+            suggestText.textContent = 'Looks like a full-back design (' + fmtK(fbMin) + '+ stitches).';
+            suggestBtn.textContent = 'Switch to Full Back';
+        } else if (state.product === 'fullback' && d.stitches < fbMin) {
+            target = 'garment';
+            suggestText.textContent = 'This file is under the ' + fmtK(fbMin) + ' full-back minimum.';
+            suggestBtn.textContent = 'Price as Garment';
+        }
+        suggest.hidden = !target;
+        if (target) suggestBtn.setAttribute('data-target', target);
+    }
+
+    /** Push the file's exact count into the calculator (clamped to the
+     *  product's contract minimum — same rule as typing it by hand). */
+    function applyDstStitches() {
+        if (!state.dst) return;
+        state.stitches = Math.max(minStitchesFor(state.product), state.dst.stitches);
+        document.getElementById('stitch').value = state.stitches;
+        renderSegmentedActiveStates();
+        renderCalculator();
+        renderPriceTable();
+        renderDstCard();
+        if (aiState.opened) updateContextPill();
+    }
+
+    function handleDstFile(file) {
+        if (!file) return;
+        if (!/\.dst$/i.test(file.name)) {
+            showDstError('"' + file.name + '" is not a .DST file. Export the design as ' +
+                'Tajima DST from your digitizing software — PES/EXP/JEF aren\'t supported here yet.');
+            return;
+        }
+        if (file.size > DST_MAX_BYTES) {
+            showDstError('"' + file.name + '" is ' + (file.size / 1048576).toFixed(1) +
+                ' MB — far larger than any real stitch file (a 63,000-stitch back design ' +
+                'is about 0.2 MB). Check that this is the DST and not a packed archive.');
+            return;
+        }
+        // Keyboard users activate the drop zone itself; it hides once the card
+        // renders, which would drop focus to <body>. Remember to re-place it.
+        var drop = document.getElementById('dstDrop');
+        var hadFocus = drop && drop.contains(document.activeElement);
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            try {
+                var data = window.DSTParser.parse(e.target.result);
+                // Tajima DST has no magic bytes — random binary "decodes" into
+                // nonsense stitches, and on a PRICING surface that becomes a
+                // silent wrong price (Erik's #1 rule). Every real DST declares
+                // its record count in the ST: header — refuse loudly when the
+                // decoded records disagree with it (25% tolerance absorbs
+                // digitizer counting quirks; garbage fails by miles).
+                var declared = (data.header && data.header.stitchCount) || 0;
+                var decoded = data.stats.totalStitches + data.stats.jumps + data.stats.colorChanges;
+                if (!declared || Math.abs(declared - decoded) / declared > 0.25) {
+                    throw new Error('the header declares ' + fmtInt(declared) +
+                        ' stitches but ' + fmtInt(decoded) +
+                        ' decoded — the file looks corrupt or is not a Tajima DST.');
+                }
+                clearDstError();
+                state.dst = {
+                    name: file.name,
+                    label: (data.header && data.header.label) || '',
+                    stitches: data.stats.totalStitches,
+                    widthMM: data.bbox.widthMM,
+                    heightMM: data.bbox.heightMM,
+                    colors: data.stats.totalColors,
+                    trims: data.stats.trims,
+                };
+                applyDstStitches();
+                var summary = file.name + ' — ' + fmtInt(state.dst.stitches) + ' stitches read from the file';
+                showToast(summary);
+                // The toast is decorative; this is what assistive tech hears.
+                var statusEl = document.getElementById('dstStatus');
+                if (statusEl) {
+                    statusEl.textContent = summary + '. Priced at ' +
+                        fmtK(state.stitches) + ' stitches, $' +
+                        document.getElementById('unitPrice').textContent + ' per piece.';
+                }
+                if (hadFocus) {
+                    var removeBtn = document.getElementById('dstRemove');
+                    if (removeBtn) removeBtn.focus();
+                }
+            } catch (err) {
+                showDstError('Couldn\'t read this DST: ' + err.message);
+            }
+        };
+        reader.onerror = function () { showDstError('File read failed — try dropping it again.'); };
+        reader.readAsArrayBuffer(file);
+    }
+
+    function bindDstEvents() {
+        var field = document.getElementById('dstField');
+        if (!field) return;
+        // Parser script failed to load → leave the whole field hidden and the
+        // manual stitch input untouched (graceful degradation, no dead UI).
+        if (!window.DSTParser) return;
+        field.hidden = false;
+
+        var drop = document.getElementById('dstDrop');
+        var input = document.getElementById('dstFileInput');
+
+        drop.addEventListener('click', function () { input.click(); });
+        drop.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); input.click(); }
+        });
+        input.addEventListener('change', function () {
+            if (input.files.length) handleDstFile(input.files[0]);
+            input.value = '';   // allow re-selecting the same file after ✕
+        });
+
+        // Drops land anywhere on the field — including on the loaded card,
+        // which replaces the current file.
+        ['dragover', 'dragenter'].forEach(function (ev) {
+            field.addEventListener(ev, function (e) {
+                e.preventDefault();
+                field.classList.add('dragging');
+            });
+        });
+        field.addEventListener('dragleave', function (e) {
+            // dragleave fires when crossing INTO children — only clear when
+            // actually leaving the field (relatedTarget null = left window).
+            if (!e.relatedTarget || !field.contains(e.relatedTarget)) {
+                field.classList.remove('dragging');
+            }
+        });
+        field.addEventListener('drop', function (e) {
+            e.preventDefault();
+            field.classList.remove('dragging');
+            if (!e.dataTransfer || !e.dataTransfer.files.length) return;
+            if (e.dataTransfer.files.length > 1) {
+                showToast('One file at a time — reading ' + e.dataTransfer.files[0].name);
+            }
+            handleDstFile(e.dataTransfer.files[0]);
+        });
+
+        // A drop that misses the target would navigate the tab straight to
+        // the file — swallow stray drops at the document level.
+        document.addEventListener('dragover', function (e) { e.preventDefault(); });
+        document.addEventListener('drop', function (e) { e.preventDefault(); });
+
+        document.getElementById('dstRemove').addEventListener('click', function () {
+            state.dst = null;
+            clearDstError();
+            renderDstCard();
+            // Deliberate: the stitch count STAYS — removing the file must not
+            // zero out a quote the rep is mid-way through.
+            if (drop) drop.focus();
+        });
+        document.getElementById('dstReapply').addEventListener('click', applyDstStitches);
+        document.getElementById('dstSuggestBtn').addEventListener('click', function (e) {
+            // The suggestion is a FILE-driven action, so after switching
+            // products re-apply the file's exact count under the new
+            // product's minimum rules. Without this, moving OFF the Full
+            // Back tab would keep the old 25K clamp instead of the file's
+            // real count. (The segmented picker deliberately does NOT
+            // re-apply — hand-picked counts survive a manual tab switch.)
+            setProduct(e.currentTarget.getAttribute('data-target'));
+            applyDstStitches();
+        });
+
+        // Hand-edits to the stitch input flip the card's note row live.
+        document.getElementById('stitch').addEventListener('input', renderDstCard);
+    }
+
     /* ---------------------- Event wiring ---------------------- */
 
     function bindEvents() {
-        // Segmented item type picker
+        // Segmented item type picker (Round 12: switch logic extracted to
+        // setProduct so the DST card's suggestion button shares ONE path)
         document.getElementById('segItemType').addEventListener('click', function (e) {
             var btn = e.target.closest('button[data-product]');
             if (!btn) return;
-            var newProduct = btn.getAttribute('data-product');
-            if (newProduct === state.product) return;
-            state.product = newProduct;
-            state.tableProduct = newProduct;
-            // Bump stitches if below the new product's minimum
-            var p = PRODUCT_META[newProduct];
-            if (state.stitches < p.minStitches) state.stitches = p.minStitches;
-            document.getElementById('stitch').value = state.stitches;
-            renderStitchPresets();
-            renderSegmentedActiveStates();
-            renderCalculator();
-            renderPriceTable();
+            setProduct(btn.getAttribute('data-product'));
         });
 
         // Quantity input
@@ -567,6 +859,7 @@
         if (aiBtn) aiBtn.addEventListener('click', openAiChatPanel);
 
         bindAiChat();
+        bindDstEvents();
     }
 
     /* =====================================================
@@ -763,7 +1056,9 @@ var AI_ENDPOINT = '/api/contract-embroidery-ai/chat';
         var expiresISO = new Date(Date.now() + 30 * 24 * 3600 * 1000).toISOString().replace(/\.\d{3}Z$/, '');
 
         var productLabel = (PRODUCT_META[calcContext.product] && PRODUCT_META[calcContext.product].label) || calcContext.product;
-        var stitchK = Math.round(calcContext.stitches / 1000);
+        // Round 12: exact-count label ("9.41K") — StitchCount already stores
+        // the exact integer; the label should not round it away either.
+        var stitchLabel = fmtK(calcContext.stitches);
         // Phase 6: fullback uses DECG-FB to match the calculator's
         // segmented-picker label + the corporate embroidery pricing page +
         // ShopWorks. CTR-FB was a Phase 3 mistake; renderer accepts both.
@@ -810,7 +1105,7 @@ var AI_ENDPOINT = '/api/contract-embroidery-ai/chat';
         // Phase 9 (2026-05-14): hardcoded the tax-exempt line to a reminder
         // for the rep ("verify WA Reseller Permit on file") instead of a
         // typed-in permit number — Ruthie no longer enters one in the chat.
-        var notesLines = ['Contract embroidery quote · ' + productLabel + ' · ' + stitchK + 'K stitches'];
+        var notesLines = ['Contract embroidery quote · ' + productLabel + ' · ' + stitchLabel + ' stitches'];
         if (cfBundle && !taxable) {
             notesLines.push('Tax-exempt · WA Reseller Permit on file (verify)');
         }
@@ -888,7 +1183,7 @@ var AI_ENDPOINT = '/api/contract-embroidery-ai/chat';
             QuoteID: quoteID,
             LineNumber: 1,
             StyleNumber: skuBase,
-            ProductName: 'Contract ' + productLabel + ' embroidery · ' + stitchK + 'K stitches',
+            ProductName: 'Contract ' + productLabel + ' embroidery · ' + stitchLabel + ' stitches',
             Quantity: calcContext.qty,
             FinalUnitPrice: parseFloat(calcContext.finalUnit.toFixed(2)),
             LineTotal: parseFloat(calcContext.orderTotal.toFixed(2)),
@@ -1091,6 +1386,17 @@ var AI_ENDPOINT = '/api/contract-embroidery-ai/chat';
             quoteID: aiState.quoteID || null,
             ltmPerPiece: Number(ltmCalc.ltmPerPiece.toFixed(2)),
             orderTotal: Number((ltmCalc.finalUnitPrice * state.qty).toFixed(2)),
+            // Round 12 (2026-08-04): when the stitch count came from a parsed
+            // DST file, pass the file facts through so the AI can reference
+            // them in the email ("based on your stitch file EAGLE_LC.dst…").
+            // Servers that don't know the field simply ignore it.
+            dstFile: state.dst ? {
+                name: state.dst.name,
+                exactStitches: state.dst.stitches,
+                widthMM: Number(state.dst.widthMM.toFixed(1)),
+                heightMM: Number(state.dst.heightMM.toFixed(1)),
+                colors: state.dst.colors,
+            } : null,
         };
     }
 
@@ -1105,7 +1411,7 @@ var AI_ENDPOINT = '/api/contract-embroidery-ai/chat';
         var label = PRODUCT_META[ctx.product]?.label || ctx.product;
         pill.innerHTML =
             '<b>' + fmtInt(ctx.qty) + ' ' + label.toLowerCase() + (ctx.qty === 1 ? '' : 's') + '</b>' +
-            ' · ' + (ctx.stitches / 1000) + 'K stitches' +
+            ' · ' + fmtK(ctx.stitches) + ' stitches' +
             ' · <b>$' + fmtMoney(ctx.finalUnit) + '/pc</b>' +
             ' · Total <b>$' + fmtMoney(ctx.orderTotal) + '</b>' +
             (ctx.ltmFee > 0 ? ' · incl. $' + ctx.ltmFee + ' LTM' : '');

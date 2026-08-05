@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Design Vault — Northwest Custom Apparel</title>
+    <link rel="icon" type="image/png" href="/assets/favicon-32.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.08.05.1">
+    <link rel="stylesheet" href="/shared_components/css/dash-shell.css?v=2026.08.05.1">
+    <link rel="stylesheet" href="/dashboards/css/design-gallery.css?v=2026.08.04.3">
+</head>
+<body class="dg-body">
+
+    <!-- Boot surface: first-visit index download / build-wait / hard error -->
+    <div id="dg-boot" class="dg-boot" hidden>
+        <div class="dg-boot-card">
+            <div class="dg-boot-logo"><i class="fas fa-vault"></i></div>
+            <h1 class="dg-boot-title">Design Vault</h1>
+            <p id="dg-boot-msg" class="dg-boot-msg">Preparing the design index…</p>
+            <div class="dg-boot-track"><div id="dg-boot-bar" class="dg-boot-bar"></div></div>
+            <button id="dg-boot-retry" class="dash-btn" type="button" hidden>Retry</button>
+        </div>
+    </div>
+
+    <header class="dash-header dg-header">
+        <div class="dash-header-inner">
+            <a href="/staff-dashboard.html" class="dash-back-link"><i class="fas fa-arrow-left"></i> Dashboard</a>
+            <div class="dg-header-title">
+                <h1><i class="fas fa-vault"></i> Design Vault</h1>
+                <span id="dg-subtitle" class="dg-subtitle">Every design, one search</span>
+            </div>
+            <button id="dg-freshness" class="dg-freshness" type="button" title="Index freshness">
+                <i class="fas fa-circle-check"></i> <span id="dg-freshness-label">Loading…</span>
+            </button>
+        </div>
+    </header>
+
+    <div id="dg-error"></div>
+
+    <main class="dash-content dg-main">
+
+        <!-- Toolbar: omnibox + customer + filters -->
+        <section class="dg-toolbar" aria-label="Search and filters">
+            <div class="dg-toolbar-row dg-toolbar-row--search">
+                <div class="dg-omnibox-wrap">
+                    <i class="fas fa-magnifying-glass dg-omnibox-icon"></i>
+                    <input id="dg-omnibox" class="dg-omnibox" type="search" autocomplete="off" spellcheck="false"
+                           placeholder="Search designs, companies, design # — instant" aria-label="Search designs">
+                    <button id="dg-search-clear" class="dg-omnibox-clear" type="button" aria-label="Clear search" hidden>
+                        <i class="fas fa-xmark"></i>
+                    </button>
+                    <kbd class="dg-omnibox-kbd">/</kbd>
+                </div>
+                <div class="dg-customer-wrap">
+                    <label class="dg-customer-label" for="dg-customer-input">Customer #</label>
+                    <input id="dg-customer-input" class="dg-customer-input" type="text" inputmode="numeric"
+                           maxlength="10" autocomplete="off" placeholder="12025">
+                    <button id="dg-customer-load" class="dash-btn dg-customer-btn" type="button" title="Open customer portfolio">
+                        <i class="fas fa-folder-open"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="dg-toolbar-row dg-toolbar-row--filters">
+                <div id="dg-tier-pills" class="dg-pills" role="group" aria-label="Stitch tier filter"></div>
+                <div id="dg-src-chips" class="dg-chips" role="group" aria-label="Source filter"></div>
+                <label class="dg-toggle"><input id="dg-has-image" type="checkbox"> <span>Has image</span></label>
+                <select id="dg-year-select" class="dg-year" aria-label="Last order year" hidden></select>
+                <div id="dg-density" class="dg-density" role="group" aria-label="Card density">
+                    <button type="button" class="dg-density-btn" data-density="comfortable" title="Comfortable"><i class="fas fa-table-cells-large"></i></button>
+                    <button type="button" class="dg-density-btn" data-density="wall" title="Wall"><i class="fas fa-table-cells"></i></button>
+                </div>
+            </div>
+            <div id="dg-filter-tokens" class="dg-tokens" aria-live="polite"></div>
+        </section>
+
+        <!-- Customer portfolio band (customer mode only) -->
+        <section id="dg-portfolio" class="dg-portfolio" hidden aria-label="Customer portfolio"></section>
+
+        <!-- Browse mode: rails + daily wall (rendered by DG.rails) -->
+        <section id="dg-browse" class="dg-browse" aria-label="Browse designs"></section>
+
+        <!-- Search results -->
+        <section id="dg-results" class="dg-results" hidden aria-label="Search results">
+            <div id="dg-results-header" class="dg-results-header">
+                <span class="dg-results-count"><strong id="dg-count">0</strong> matches · <span id="dg-ms">0</span> ms</span>
+                <span id="dg-customer-banner" class="dg-customer-banner" hidden></span>
+            </div>
+            <div id="dg-deep-row" class="dg-deep-row" hidden></div>
+            <div id="dg-grid-viewport" class="dg-grid-viewport" tabindex="0" role="grid" aria-label="Design results">
+                <div id="dg-sentinel-top" class="dg-sentinel" aria-hidden="true"></div>
+                <div id="dg-spacer-top" class="dg-spacer" aria-hidden="true"></div>
+                <div id="dg-grid" class="dg-grid"></div>
+                <div id="dg-spacer-bottom" class="dg-spacer" aria-hidden="true"></div>
+                <div id="dg-sentinel-bottom" class="dg-sentinel" aria-hidden="true"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Inspector drawer -->
+    <div id="dg-drawer-overlay" class="dg-drawer-overlay" hidden></div>
+    <aside id="dg-drawer" class="dg-drawer" role="dialog" aria-modal="true" aria-label="Design detail" hidden>
+        <div id="dg-drawer-body" class="dg-drawer-body"></div>
+    </aside>
+
+    <!-- Lightbox -->
+    <div id="dg-lightbox" class="dg-lightbox" role="dialog" aria-modal="true" aria-label="Image zoom" hidden>
+        <button id="dg-lightbox-close" class="dg-lightbox-close" type="button" aria-label="Close"><i class="fas fa-xmark"></i></button>
+        <img id="dg-lightbox-img" class="dg-lightbox-img" alt="">
+        <div id="dg-lightbox-cap" class="dg-lightbox-cap"></div>
+    </div>
+
+    <script src="/config/app.config.js?v=2026.08.05.1"></script>
+    <script src="/shared_components/js/fetch-timeout.js?v=2026.08.05.1"></script>
+    <script src="/shared_components/js/dash-page-helpers.js?v=2026.08.05.1"></script>
+    <script src="/shared_components/js/toast-notifications.js?v=2026.08.05.1"></script>
+    <script src="/shared_components/js/design-thumbnail-service.js?v=2026.08.05.1"></script>
+    <script src="/dashboards/js/design-gallery-search.js?v=2026.08.04.3"></script>
+    <script src="/dashboards/js/design-gallery-store.js?v=2026.08.04.3"></script>
+    <script src="/dashboards/js/design-gallery-grid.js?v=2026.08.04.3"></script>
+    <script src="/dashboards/js/design-gallery-rails.js?v=2026.08.04.3"></script>
+    <script src="/dashboards/js/design-gallery-drawer.js?v=2026.08.04.3"></script>
+    <script src="/dashboards/js/design-gallery.js?v=2026.08.04.3"></script>
+</body>
+</html>

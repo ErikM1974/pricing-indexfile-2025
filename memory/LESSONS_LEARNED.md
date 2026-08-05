@@ -1,251 +1,222 @@
-# LESSONS LEARNED
+﻿# LESSONS LEARNED
 
-Bug → root cause → fix → prevention. Newest first. **Hard limit 300 lines** — archive the
+Bug â†’ root cause â†’ fix â†’ prevention. Newest first. **Hard limit 300 lines** â€” archive the
 oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
+
+---
+
+## A per-frame `getImageData` capped the spin at whatever the readback allowed (2026-08-04)
+
+**Problem.** The garment designer's 🔄 Spin preview looked choppy and "unreal" no matter how the
+motion was tuned. Three defects were stacked, and each masked the next.
+
+**Root cause.**
+1. **Rendering.** 24 photos 15° apart were composited as a *permanent linear crossfade* — the
+   shirt was a double exposure 100% of the time, and it stepped photo-to-photo while the printed
+   logo (drawn from continuous `theta`) glided. The eye reads that desync as chop.
+2. **Settle.** On release, momentum rounded to a virtual step but wrapped `PHOTO.pos` by
+   `PHOTO.frames.length` (24) instead of `effectiveSpinSteps()` (96). Measured from four
+   arbitrary positions it jumped **180°, 1.5°, 179.3°, 91.1°** and parked at blend fractions
+   0.52/0.56/0.96 — i.e. the resting shirt was usually a half-and-half ghost.
+3. **Throughput.** `rebuildMockup()` runs every tick, and it called `maybeWarnLowContrast()` →
+   `artMeanLuminance()` → **`getImageData()`**: a GPU→CPU readback that stalls the pipeline,
+   inside a 6.1 ms frame budget.
+
+**Solution.** View morph (scale each neighbour photo horizontally about the shared registered
+torso axis by the ratio of apparent turntable widths, *then* blend — silhouettes align, so the
+fade stops reading as a ghost); fade compressed to the middle 40% of each gap so the shirt is a
+single pure photo 60% of the time; settle glides onto the nearest **real photo angle**;
+delta-time scaling on both momentum and auto-spin; and the contrast warning memoized on
+`id§eraseN§knockOn§garment`. Measured after: **163.9 fps on a 163.9 Hz display**, median frame
+6.1 ms in a 6.1 ms budget, 5 dropped frames per 400, revolution 6.58 s.
+
+**Prevention.**
+- 🔑 **`getImageData()` anywhere reachable from an animation tick is a frame-rate cap, not a
+  slow function.** It forces a pipeline flush. Memoize on the inputs that actually change, or
+  hoist it out of the loop entirely.
+- 🔑 **Fixed per-frame increments are a refresh-rate bug**: `pos += k` ran twice as fast on a
+  120 Hz screen. Advance by measured elapsed time and clamp `dt` for tab switches.
+- 🔑 **Two position spaces (24 real frames vs 96 virtual steps) invite a wrap in the wrong one** —
+  and the symptom (an occasional jump at the *end* of a coast) looks like a physics-tuning
+  problem, not an indexing one. Assert the parked state, not just the motion.
+- 🔑 **Blending frames is not interpolating geometry.** If a crossfade looks like ghosting,
+  align the silhouettes before fading rather than tuning the fade curve.
+- ⚠️ **rAF is paused in a hidden tab, so any in-page fps probe hangs there** (a CDP eval waiting
+  on it times out at 45 s and reads as "renderer frozen"). Arm the probe on `visibilitychange`
+  and read the stored result afterwards.
+
+---
+
+## The shared print block flattens every color you set inline (2026-08-04)
+
+**Problem.** The monogram Customer Proof renders each name in its real thread color — the whole
+point of the sheet. On screen it was perfect. **On paper every name printed black**, and the
+tiny color swatch beside it still printed correct, so the sheet looked deliberate rather than
+broken. Found by review, not by the browser pass that had already "verified" the feature.
+
+**Root cause.** `quote-builder-common.css`'s `@media print` block contains
+`* { color: black !important; }`. The controller set the thread color as a *normal* inline
+declaration (`style="color:#003DA5"`), and an author `!important` beats any normal declaration —
+including inline. Backgrounds were unaffected, which is why the swatch survived and the defect
+read as intentional.
+
+**Solution.** The inline color is now `!important` too (inline `!important` outranks stylesheet
+`!important`). Proven in-page rather than assumed: the same cascade reproduced synthetically
+yields `rgb(0,0,0)` without the flag and the true color with it.
+
+**Prevention.**
+- 🔑 **A print stylesheet is a second rendering nobody looks at.** Screen verification says
+  nothing about it — check print explicitly, or the defect ships looking fine.
+- 🔑 **`quote-builder-common.css` forces black text and is loaded by ALL 4 quote builders** — any
+  feature whose *meaning* is carried by color (thread, status, warning) must use `!important`
+  inline or a rule with its own `!important`, or it silently prints monochrome.
+- 🔑 **A partial survivor disguises the failure**: the swatch (background) printed while the text
+  (color) did not, which reads as a design choice instead of a bug. When one half of a visual
+  pair works, suspect a property-scoped override rather than a broken feature.
+
+---
+
+## Releasing from a SHARED checkout: excluding a file cuts both ways (2026-08-04)
+
+**Problem.** Deploying the Embroidery Studio, the release also carried
+`quote-builders/monogram-form.html` â€” a parallel session's WIP that another session's
+`git add -A` had swept into `baafe9f3`. Shipping it would have put a **dead "Print Customer
+Proof" button** in front of reps (its controller/CSS were still in review on develop). Two
+further traps followed: `git checkout main` **aborted** because the shared tree was dirty with
+three sessions' edits, and the develop sync-back **silently reverted** the WIP the release had
+deliberately excluded.
+
+**Root cause.** A shared working tree makes branch-level operations sweep in work whose owner
+isn't in the room. And a merge that restores a file to main's version encodes "main's copy
+wins" â€” merging that commit back into develop faithfully replays the deletion.
+
+**Solution.** Cut the release at *my* verified sha in an isolated `git worktree`
+(`git merge --no-ff --no-commit <sha>` â†’ `git checkout HEAD -- <foreign file>` â†’ commit with the
+exclusion stated in the message), then on the sync-back re-take develop's copy
+(`git checkout origin/develop -- <file>`) before pushing.
+
+**Prevention.**
+- ðŸ”‘ **Never `git checkout <branch>` in a shared checkout â€” release from a `git worktree`.** Also
+  put that worktree at a SHORT path: `/Temp/nwca-rel` worked where the session scratchpad path
+  blew Windows MAX_PATH on a deep blog filename ("Filename too long", `Could not reset index`).
+- ðŸ”‘ **Every file-level exclusion needs a matching restore on the merge-back**, or the release
+  silently deletes the work it was protecting. Verify with `grep` for a marker from the WIP
+  *before* pushing the sync â€” not after.
+- ðŸ”‘ **Deploy the dependency first and prove it with a live probe**: the box-labels page needed
+  proxy `/api/sanmar-orders/label-data` â€” curl'd for HTTP 200 (and absence of `ContactEmail`)
+  before the app slug went out.
+
+---
+
+## `el.hidden` doesn't hide a flex element â€” and asserting the property hides the bug too (2026-08-04)
+
+**Problem.** On the contract calculator's DST card, `el.hidden = true` left three elements fully
+visible: the drop zone stayed on screen *under* the loaded file card, and two empty note rows
+rendered inside the card as stray dashed-bordered strips whenever no note applied.
+
+**Root cause.** `[hidden] { display: none }` lives in the **UA stylesheet**, so ANY author
+`display` declaration beats it regardless of specificity â€” and `.dst-drop` / `.dst-note` /
+`.dst-suggest` are all `display: flex`. Elements with no author `display` (the card, the error,
+the buttons) hid correctly, which is exactly why it looked like the pattern worked.
+
+**Why the first verification pass missed it.** The browser check asserted `el.hidden` â€” the
+**property** â€” which is just reading back the attribute that was set. It is true whether or not
+the element is visible. Only `getComputedStyle(el).display` answers the actual question.
+
+**Solution.** Attribute-qualified rules, which outrank the plain class rule:
+`.dst-drop[hidden], .dst-note[hidden], .dst-suggest[hidden] { display: none; }`
+
+**Prevention.**
+- ðŸ”‘ **Any component that sets both a `display` and `[hidden]` needs an explicit
+  `.thing[hidden]{display:none}`** â€” assume the UA rule loses.
+- ðŸ”‘ **Verify visibility with `getComputedStyle().display` / `getBoundingClientRect()`, never
+  the `.hidden` property or a class check.** Asserting the input you just set proves nothing;
+  assert the rendered consequence.
+- ðŸ”‘ An adversarial review pass caught this after a "passing" browser pass. When a verification
+  result is a tautology, it will pass forever.
+
+---
+
+## A corrupt file that "parses" becomes a silent wrong price â€” DST has no magic bytes (2026-08-04)
+
+**Problem.** Browser-verifying the contract calculator's new DST drop zone: 2,000 bytes of
+arbitrary garbage named `.dst` didn't error â€” it "decoded" into ~500 nonsense stitches, silently
+replaced the previously loaded file, and priced the order at the 8K contract minimum.
+
+**Root cause.** Tajima DST has no file signature: ANY 3-byte record decodes into *some* stitch
+delta. `dst-parser.js`'s only guardrails were "file too small" and "zero stitches decoded" â€”
+tuned for the Embroidery Studio VIEWER, where garbage is self-evident as noise on the canvas.
+On a PRICING surface the same parse produces a plausible number with no visual to contradict it.
+
+**Solution.** Calculator-side validity gate (`embroidery-contract.js handleDstFile`): every real
+DST declares its record count in the `ST:` header â€” refuse loudly when it's 0 or disagrees with
+the decoded record total by >25%.
+
+**Prevention.**
+- ðŸ”‘ **A parser succeeding â‰  the input being valid. For signature-less formats, cross-check an
+  internal redundancy** (declared vs decoded counts) before trusting the result with money.
+- ðŸ”‘ **The same parse carries different risk per surface**: viewer â†’ garbage renders as visible
+  noise; calculator â†’ silent wrong price (Erik's #1 rule). Reused code inherits the validation
+  needs of its STRICTEST consumer.
+- Verify error paths with actively hostile bytes, not just wrong extensions â€” 12 green jest
+  tests and a clean happy path coexisted with this hole.
+
+---
+
+## Monogram thread-color dropdown dead in prod: API envelope change nobody re-tested (2026-08-04)
+
+**Problem.** The monogram form's thread-color selector had been silently broken live:
+`this.threadColors.filter is not a function` on every page load. Users could still type
+names, so nobody reported it.
+
+**Root cause.** `GET /api/thread-colors` originally returned a bare array; at some point the
+proxy started returning an `{success, count, colors}` envelope. `fetchThreadColors()` kept
+`return await response.json()` with the comment "Returns array directly" â€” HTTP 200, valid
+JSON, wrong shape. The error surfaced only in the console + a toast reps ignored.
+
+**Solution.** Service now unwraps both shapes and **throws** on anything else
+(`monogram-form-service.js` `fetchThreadColors`). Found while browser-verifying the
+Stitch-Proof feature, fixed in `ced3bc2f`.
+
+**Prevention.**
+- ðŸ”‘ **HTTP 200 + valid JSON â‰  valid response â€” assert the SHAPE at every fetch boundary**
+  (same family as the pricing-bundle empty-arrays-on-rate-limit lesson, v1791).
+- ðŸ”‘ **When a proxy route's response shape changes, grep ALL frontend consumers** â€” the app
+  and proxy deploy independently, so shape drift breaks quietly.
+- ðŸ”‘ A broken feature users can work around generates zero bug reports; only a
+  browser-verification pass with the console open finds it.
 
 ---
 
 ## /deploy's cache-bust silently does nothing if you pushed develop first (2026-08-03)
 
 **Problem.** Deploying the vacation-slip work, the skill's Step 2 found **zero** changed assets
-and bumped no `?v=` string — even though `payroll.js`, `payroll.css` and the brand-new
+and bumped no `?v=` string â€” even though `payroll.js`, `payroll.css` and the brand-new
 `vacation-carryover.js` were all in the release. Left alone, the deploy would have shipped new
 JS/CSS behind unchanged URLs, so every browser that had ever opened the page would keep serving
 the cached old files.
 
 **Root cause.** Step 2 detects changed assets with
 `git diff --name-only origin/develop HEAD` plus the dirty working tree. Both are empty in the
-**normal** workflow — commit your work, `git push origin develop`, *then* `/deploy`. Once
+**normal** workflow â€” commit your work, `git push origin develop`, *then* `/deploy`. Once
 develop is pushed, `origin/develop == HEAD`; once it's committed, the tree is clean. The
 comparison answers "what have I not pushed yet?", which has nothing to do with what is live.
 
-**Solution.** Compare against **`main`** — the branch that actually reflects production:
+**Solution.** Compare against **`main`** â€” the branch that actually reflects production:
 `git diff --name-only main develop -- '*.js' '*.jsx' '*.css'`. That correctly returned all
 three files, and the bump then verified live (`/api/version` sha matched the deployed commit).
 
 **Prevention.**
-- 🔑 **A cache-bust's baseline must be what is LIVE (`main`), never what is PUSHED
+- ðŸ”‘ **A cache-bust's baseline must be what is LIVE (`main`), never what is PUSHED
   (`origin/develop`).** Pushing develop is not deploying; any diff based on push state measures
   the wrong thing.
-- 🔑 **This is a silent success, which is the dangerous kind.** The deploy reports ✅, the
-  Heroku release succeeds, and the backend SHA check *passes* — because the backend really did
+- ðŸ”‘ **This is a silent success, which is the dangerous kind.** The deploy reports âœ…, the
+  Heroku release succeeds, and the backend SHA check *passes* â€” because the backend really did
   update. Only the browser assets are stale, and nothing in the pipeline looks at them. It is
   the same failure class the skill already documents for `.jsx` files ("deployed but nothing
   changed"), reached by a different route.
-- ⚠️ The skill file still contains the `origin/develop` comparison. Until it's fixed, check
+- âš ï¸ The skill file still contains the `origin/develop` comparison. Until it's fixed, check
   `git diff --name-only main develop -- '*.js' '*.jsx' '*.css'` by hand and confirm Step 2's
   bump list is non-empty whenever a release touches front-end assets.
 
 ---
-
-## The vacation slip printed the accountant's tax year, not the employee's (2026-08-03)
-
-**Problem.** Sorphorn Sorm's slip read **112 accrued / 56 used / 56 remaining**. Both figures
-were wrong by the same 32 hours; it should read **80 / 24 / 56**.
-
-**Root cause.** Payroll books hours to the tax year of the **check date**, not the work date.
-She took 32 h on 12/22, 12/23, 12/29 and 12/30 of 2025 — a pay period whose check date was
-01/09/2026. Those hours therefore land in the 2026 payroll year and on her 2026 W-2, and to pay
-them the system carried 32 h of 2025 balance forward. **Accrued and used are both inflated by
-the same carryover, so they cancel** — which is why remaining was right the whole time and the
-defect was invisible in the one column anyone checks. Correct cash-basis accounting on the
-accountant's side; a display problem on ours.
-
-**Solution.** New hand-maintained Caspio column `Employees.Vacation_Annual_Entitlement`, read
-live at slip time: `carryover = max(0, available − entitlement)`, `slip_accrued = entitlement`,
-`slip_used = used − carryover`, `slip_remaining = remaining` untouched. Blocking gates before
-anything reaches paper (`accrued − used == remaining` ±0.01; entitlement must be set) and a
-per-run audit CSV carrying raw + adjusted + carryover + flags.
-
-**Prevention.**
-- 🔑 **Two errors that cancel leave one clean column and no symptom.** Remaining reconciled
-  perfectly for months while both inputs were wrong. When a derived figure is right, that is
-  evidence about the *derivation*, not about its inputs — check the source columns too. (Same
-  shape as the 2026-07-27 finding where `Sick_Hours_Remaining` was correct while
-  `Sick_Accum_Hours_Available` sat at 0.)
-- 🔑 **An "as of" date is not a date field, it is the frame every derived value must be read
-  in.** The entitlement is date-effective off `Leave_Balances_As_Of`, never `today` — otherwise
-  reprinting July's packet in September silently prints September's grant.
-- 🔴 **Never store a hand-maintained value in a column an importer writes.** The Friday import
-  overwrites all three `Vacation_Hours_*` columns; the entitlement had to be its own field or it
-  would be destroyed weekly. The tell that this was already happening: someone had hand-patched
-  Sorphorn to 80/24/56 in Caspio, and the next import would have silently reverted it.
-- 🔴 **`Number('') === 0`.** Caspio returns a blank NUMBER as `''`, so blank and zero collapse
-  under any numeric coercion. Here blank must *block* the slip while 0 is legitimate (salaried
-  staff) — the two had to be separated explicitly, and the round-trip verified against live
-  Caspio rather than assumed.
-- 🔴 **Do not generalise a correction to the neighbouring field because it looks similar.**
-  Sick hours carry over year to year *by Washington statute*, so the identical-looking inflation
-  there is correct. Both rules are jest-locked precisely because "fixing" sick too is the
-  obvious next mistake.
-- 🔑 **When a computed figure can't be trusted, refuse to print it — don't print a guess.** A
-  missing entitlement defaults to nothing, never to 80; the employee is named in a banner and in
-  the audit CSV so a missing slip is explained rather than merely absent.
-
-### The validation gate I wrote was a tautology, and my own comment said so (same day)
-
-An adversarial review of the above found the spec-mandated check had **zero power over the
-value it existed to guard**. `carryover = max(0, available − entitlement)` makes the clamp inert
-whenever entitlement ≤ available, so `accrued − used` collapses to `available − used` — the
-entitlement cancels, and the importer writes `remaining = accrued − used` by construction. A
-mis-keyed entitlement of 8 gave `{accrued 8, used −48, remaining 56}`: identity satisfied, no
-flags, "Hours used −48.00" printed for an employee. Fixed by asserting the one relation the
-identity cannot see — a carryover is hours both accrued *and* used last year, so
-`carryover > used` is impossible.
-
-- 🔑 **"This always holds" written next to an assertion is a bug report, not reassurance.** My
-  comment read "holds algebraically for every case, because the carryover is added to accrued and
-  used in equal measure" — a correct proof that the check could never fail, i.e. never fire.
-  **An invariant that cannot fail is not validating anything.** Before trusting a check, ask what
-  input makes it trip; if the answer is only "corrupt data from a system that can't produce it",
-  the check is decorative.
-- 🔑 **A hand-maintained value needs a check that constrains IT, not the machine-written values
-  around it.** Everything else on the record came from one importer and agreed with itself by
-  construction, so any relation among those fields was self-satisfying. Only a relation the
-  hand-typed number participates in asymmetrically has power.
-- 🔑 **State the limits of a guard in the same breath as the guard.** The fix catches an
-  entitlement below `remaining` and nothing above it — so 70 instead of 80 still prints silently.
-  That gap is now a passing test named "documenting the gap", because the failure mode of a
-  partial guard is someone later assuming it was total.
-- 🔑 **Adversarial review earns its keep on code that already passes its own tests.** 47 green
-  tests, a live round-trip against Caspio and a rendered print check all missed this; four
-  independent reviewers found it, and asking each finding's verifier to *refute* it killed 10 of
-  17 claims. Confirming passes would have kept all 17.
-- 🔴 **A field allowlist protects fields, not strings built from them.** The same review found a
-  pre-existing leak: the payroll reconciliation put `"NAME: gross X - deductions Y != net Z"`
-  into a `rowIssues` array that bypassed the careful per-field `toSafeReview()` filter, and the
-  page rendered it — on the one page whose stated purpose is that compensation never reaches the
-  browser. **Audit the error and log paths with the same rigour as the data path.**
-
-## The blog content bank was written from style numbers it never looked up — 20 of 23 drafts misdescribe products (2026-08-03)
-
-**Problem.** The weekly blog autopilot reached `best-carhartt-styles-custom-company-workwear`.
-Every publish-time check the task specifies **passed**: all 5 linked styles returned HTTP 200,
-all 5 were `PRODUCT_STATUS: "Active"`, every internal link resolved. The body was still wrong
-on all five: CT104670 called a "Duck Jacket… rugged duck canvas" (it is the **Storm Defender
-Shoreline Jacket**, a rain shell), CTK121 called a "**Crewneck**… no-hood option" (it is the
-**Midweight Hooded** Sweatshirt), CT102208 called the "Gilliam **Vest**… without the sleeves"
-(it is the Gilliam **Jacket**), CT100617 given CTK121's name, CT100615 left unnamed filler.
-A reader clicking any link lands on a product that contradicts the sentence that sold it.
-
-**Root cause.** The 2026-07-13 seeding batch generated prose *around* style numbers instead of
-*from* the catalog — the numbers are real and active, so every existence check is satisfied while
-the identity behind each number is invented. An audit across all 23 drafts found the defect is
-systemic: **only 3 drafts are clean**; 2 recommend styles that are now **Discontinued**
-(NE1000 in 6 drafts, CS413), and CornerStone `CS410`/`CS413` are sold as "tee" and "pocket tee"
-when both are **polos**.
-
-**Fix.** Published the oldest genuinely-clean draft instead (`custom-ogio-bags-polos-corporate-gifts`
-— all 5 styles Active, every prose claim corroborated by the catalog, `COMPANION_STYLES` confirming
-its one relational claim). The other 20 drafts stay Draft pending rewrite; nothing was edited.
-
-**Prevention.**
-- **`PRODUCT_STATUS: "Active"` proves a style exists, not that the sentence about it is true.**
-  Diff the prose against `PRODUCT_TITLE` for every recommended style before publishing.
-- **Check prose, not just anchor text.** An anchor-text-only audit scored the Carhartt draft
-  1 mismatch; reading the body found 5. The regex could not see errors in the description
-  sentences, which is exactly where a generated draft puts them.
-- **A bare style number as anchor text (`[PC54](…)`) is fine and reads as a false positive** —
-  rank findings by whether the anchor *asserts a wrong identity*, not by string mismatch.
-- **Content written ahead of publication decays two ways**: the catalog moves under it (the
-  documented risk) *and* it may never have been right (the undocumented one). Verify both.
-
----
-
-## A 23-digit ID stored as a number is 7 digits of identity — 71 of 92 payables vanished (2026-08-03)
-
-**Problem.** The Atmos credit-card formatter's CSV imported into Caspio `CreditCard_NWCA_ATMOS`
-as **21 rows out of 92**, with "value is not unique" on the rest. The 21 that landed totalled
-**−$7,564.88** against the statement's true net of **$11,426.76** — wrong data, not just partial.
-
-**Root cause.** `Reference_ID` was emitted as the BoA reference stripped to **digits only** (23 of
-them). No numeric type holds 23 digits — a 64-bit integer tops out at 19 — so Excel (on open+save)
-and a numeric Caspio field both keep the leading ~7 significant digits. On a BoA reference those
-are the **acquirer/BIN prefix: they identify the payment PROCESSOR, not the charge.** So all 21
-SUPACOLOR + all 7 ANTHROPIC + INKSOFT + SHOPIFY + ZAPIER + PADDLE + ZOHO — 33 charges — became the
-single key `24011346`, and 92 references collapsed to 21. `Reference_ID` is marked Unique, so the
-rest were rejected.
-
-**Why it hid.** BoA's own export prefixes the field `Ref: `, which makes it text and protects it
-through Excel. `_bare_ref()` stripped exactly that guard — the code removed the thing keeping the
-value safe. Import "succeeded" with a row count nobody reconciled against the statement.
-
-**Fix.** Canonical key is now `R` + digits (`_ref_key()` in `Python Inksoft/web/atmos_formatter.py`;
-`refKey()`/`refDigits()` in the proxy's `src/routes/creditcard-lookups.js`). The upsert compares on
-the bare digit run so legacy bare-digit rows still match, and PUTs against the *stored* value while
-rewriting it to canonical form — migrating in place. Locked by
-`tests/jest/creditcard-atmos-refkey.test.js` (11 tests). Caspio field must be **Text (255), Unique**.
-
-**Prevention.**
-- 🔑 **An all-digits identifier is not a number — give it a non-numeric character.** A leading
-  letter costs nothing and makes every consumer (Excel, Caspio, CSV, JSON) treat it as text.
-  It also converts a wrong field type from a *silent merge* into a *loud rejection*.
-- 🔑 **Truncation of an ID is worse than loss of an ID**: the surviving prefix is usually a
-  *grouping* code (issuer, region, vendor), so unrelated records silently merge and look plausible.
-- **Verify an import by RECONCILING A TOTAL, never by "no error appeared."** 21 rows summing to the
-  wrong sign should have been the first thing checked.
-- Diagnosing: group the source rows by the suspected mangling (float32, N-digit truncation) and
-  check the group count against what actually landed — 21 groups vs 21 rows named the cause exactly,
-  and the survivor of each group matched row-for-row.
-
-**Tail (same day, found only by exporting the WHOLE table).** The 92 rows landed clean but carried
-`Month_Reconciled` as `Aug-26` while all 1,354 older rows use `26-Aug` — so they grouped with
-nothing. 🔑 **A format built in two places must be changed in both**: the Python
-`month_year_to_reconciled()` AND `applyRecon()` in `static/atmos_formatter.js`, which rewrites the
-column client-side when the month dropdown moves. Fixing only the server would have let the dropdown
-put the old format straight back. That JS had **no `?v=` cache-bust** either, so a stale copy would
-have done it anyway — added one off the Heroku release number. 🔑 **Verifying the rows you just
-wrote is not enough; export the whole table and compare the new rows against the existing
-convention.** Every per-row check passed — the defect was only visible next to the other 1,577 rows.
-Realigned with one `q.where`-scoped Caspio PUT touching only that field
-(`proxy scripts/fix-atmos-month-reconciled.js`), so hand edits and `Reconciled` survived.
-
-**Second tail: the month was also off by one.** `compute_default_reconciled()` returned the month
-AFTER the latest posting date, so the 6/9–7/8 statement imported as August; a BoA cycle runs ~9th
-to 8th, so that IS the July statement. 🔑 **The convention was already sitting in the table — 1,669
-rows answered both "which format" and "which month" definitively (15/15 use the closing month, 0 use
-the month after). Derive a convention from the data instead of inventing one, then replay history
-through the new rule as the test** (reproduced 11/11 correct labels). ⚠️ Don't reach for the *most
-common* posting month either — on a 9th-to-8th cycle most charges fall in the earlier month, which is
-off by one the other way. 🔴 **Re-read before writing when the user is working in the same table**: a
-dry run showed 40 rows, not the 92 verified minutes earlier — Erik was hand-retagging them, and to a
-third format (`26-July` vs the table's `25-Jul`). Scope the fix by a stable key (`Reference_ID LIKE
-'R%'`), not by the value being edited. **Found separately and FIXED: 239 rows carried the wrong YEAR** — the
-Feb/Mar/Apr **2026** statements sat under `25-Feb`/`25-Mar`/`25-Apr` (each label held two
-statements) while `26-Feb`/`26-Mar`/`26-Apr` didn't exist. Split on `PayableDate` year,
-`proxy scripts/fix-atmos-statement-year.js`. 🔑 **That split is only safe for Feb–Dec: a JANUARY
-cycle runs Dec 9 → Jan 8 and legitimately spans two calendar years**, so `26-Jan` must stay mixed
-and the script refuses month 1. 🔑 **Validate a bulk relabel by asserting the SHAPE of both
-resulting sets** — each must close in the month it claims and span less than one cycle; the 2025
-and 2026 windows mirroring each other day-for-day is what proved these were two statements and
-not one messy month. ⚠️ All 239 were already `Reconciled`, so this restated closed months —
-Erik's call, taken explicitly.
-
----
-
-## "Steve gets no notification" was a second submission path, not broken notification code (2026-08-01)
-
-**Problem.** Steve got no email and no Slack ping for Ruth's art requests, and Ruth got no
-confirmation — yet the artwork landed in his queue normally. Worked fine for Nika and Taneisha.
-Every instinct said the notification code was broken for one user.
-
-**Root cause.** Ruth was never using the AE dashboard form. She submits through a legacy **Caspio
-DataPage**, which writes straight into the `ArtRequests` table and never calls
-`POST /api/artrequests` — and BOTH notifications hang off that POST (browser EmailJS in
-`garment-submit-form.js sendNotificationEmails`, plus server-side Slack in the proxy's
-`art.js notifyArtRequestSubmission`). Nothing was broken; the requests never touched the code.
-The Slack webhook was set and healthy the whole time.
-
-**Why it hid.** A DataPage write is indistinguishable from an API write *in the queue* — the row
-looks normal. Only the columns give it away.
-
-**Solution.** Moved Ruth to the AE form (people fix, zero code). Shipped
-`scripts/art-request-source-audit.js` to name anyone whose NEWEST request bypassed the form.
-
-**Prevention.** 🔑 **When a feature fails for exactly one person, verify they're on the code path
-before debugging the code.** Cheapest possible test: diff their DATA against a working user's.
-Fields a form writes *unconditionally* are a free fingerprint of which form produced a row —
-here `Item_Type`/`Sales_Rep`/`Status` were empty on 6/6 of Ruth's rows and populated on everyone
-else's, and her `Garment_Placement` values weren't even options in the AE form's dropdown.
-🔑 **A second write path into a shared table silently skips every side effect** the first path
-owns. Retiring the old UI isn't enough while the DataPage URL still works.

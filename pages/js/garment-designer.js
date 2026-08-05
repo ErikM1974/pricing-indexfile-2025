@@ -4783,10 +4783,22 @@ function maybeWarnLowContrast(entry) {
   if (!el) return;
   let warn = '';
   if (entry && entry.mockOn && entry.kind === 'canvas') {
-    warn = GarmentTextEngine.pickContrastWarning(artMeanLuminance(entry), currentGarmentLuminance());
+    // Memoized: rebuildMockup() runs every animation tick during spin, and
+    // artMeanLuminance() does a getImageData readback — a GPU pipeline stall
+    // that would eat the frame budget at 120Hz. The inputs only change when
+    // the art is edited (eraseN), knockout toggles, or the garment recolors.
+    const key = entry.id + '§' + (entry.eraseN || 0) + '§' + (entry.knockOn ? 1 : 0) + '§' + currentGarment;
+    if (entry._contrastKey === key) {
+      warn = entry._contrastWarn || '';
+    } else {
+      warn = GarmentTextEngine.pickContrastWarning(artMeanLuminance(entry), currentGarmentLuminance());
+      entry._contrastKey = key;
+      entry._contrastWarn = warn;
+    }
   }
-  el.textContent = warn;
-  el.style.display = warn ? 'inline-flex' : 'none';
+  if (el.textContent !== warn) el.textContent = warn;
+  const disp = warn ? 'inline-flex' : 'none';
+  if (el.style.display !== disp) el.style.display = disp;
 }
 
 /* ---- Load shirt photo(s) picked by the user (works locally too) ----

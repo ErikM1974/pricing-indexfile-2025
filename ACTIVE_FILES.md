@@ -254,11 +254,11 @@
 | `/pages/garment-designer.html` | **NEW (2026-06-17)** NWCA Easy Shirt Designer — standalone canvas tool: place artwork (PNG/JPG/SVG/AI/PSD/PDF) **+ Tajima DST embroidery files** on a recolored shirt mockup by placement (Left Chest/Full Front/Upper/Full Back), assign Robison-Anton Poly thread colors per stitch element, generate a Customer Proof. Productionized from an 868KB single-file app → extracted JS/CSS (no-inline). Phase 1 integration (pre-seed + attach-to-ArtRequest) pending. | garment-designer.js, garment-designer.css, ag-psd@27, pdf.js@3.11, jszip@3.10 | ✅ Active |
 | `/pages/data-entry-guide.js` | **NEW** API price fetching for data entry guide | /api/service-codes | ✅ Active |
 | `/pages/data-entry-guide.css` | **NEW** Data entry guide styles (print-friendly) | — | ✅ Active |
-| `/pages/design-gallery.html` | **NEW** Standalone design gallery — search 39K+ digitized designs | design-gallery.js, design-gallery.css, design-thumbnail-service.js, app-config.js | ✅ Active |
-| `/pages/js/design-gallery.js` | **NEW** Design gallery controller — search, cards, share with customer, lightbox zoom | /api/digitized-designs/search-all, /by-customer | ✅ Active |
-| `/pages/css/design-gallery.css` | **NEW** Design gallery page styles (responsive grid, cards, enlarged modal, lightbox) | — | ✅ Active |
-| `/pages/design-view.html` | **NEW** Public customer-facing design preview page — shareable via /design/:designNumber | design-view.js, design-view.css, app-config.js | ✅ Active |
-| `/pages/js/design-view.js` | **NEW** Customer design view — fetches design images, renders gallery + lightbox | /api/digitized-designs/lookup | ✅ Active |
+| `/pages/design-gallery.html` | ⚠️ **SUPERSEDED (2026-08-05)** by `/dashboards/design-gallery.html` (Design Vault). Public + unauthenticated; deleted at cutover, when `/pages/design-gallery.html` starts 302-ing to the dashboards page. | design-gallery.js, design-gallery.css, design-thumbnail-service.js, app-config.js | ⚠️ Retiring |
+| `/pages/js/design-gallery.js` | ⚠️ **SUPERSEDED** — see above. Known issues that motivated the rebuild: loads the wrong config file (hardcoded proxy fallback) and splices company names into `onclick=` handlers. | /api/digitized-designs/search-all, /by-customer | ⚠️ Retiring |
+| `/pages/css/design-gallery.css` | ⚠️ **SUPERSEDED** — see above (49 hardcoded hex values, zero design tokens). | — | ⚠️ Retiring |
+| `/pages/design-view.html` | **NEW** Public customer-facing design preview page — shareable via /design/:designNumber. Loads `/config/app.config.js` (tenant-aware) since 2026-08-05. | design-view.js, design-view.css, /config/app.config.js | ✅ Active |
+| `/pages/js/design-view.js` | **NEW** Customer design view — fetches design images, renders gallery + lightbox. No hardcoded API host: missing config surfaces a visible error instead of guessing a backend (2026-08-05). | /api/digitized-designs/lookup | ✅ Active |
 | `/pages/css/design-view.css` | **NEW** Customer design view styles (branded, responsive, lightbox overlay) | — | ✅ Active |
 | `/pages/art-request-detail.html` | **NEW** Staff-facing art request detail page — shareable via /art-request/:designId | art-request-detail.js, art-request-detail.css, app-config.js | ✅ Active |
 | `/pages/art-billing-reference.html` | **NEW** Standalone billing-codes / file-requirements / file-definitions reference. Linked from Steve's gallery toolbar; shareable URL for customers and AEs. Was a tab on art-hub-steve.html (extracted 2026-04-26 to declutter Steve's nav). | art-hub.css | ✅ Active |
@@ -579,13 +579,15 @@
 ### Monogram Form System (NEW 2026-01-08)
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/quote-builders/monogram-form.html` | Monogram/personalization tracking form | monogram-form-service.js, monogram-form-controller.js | ✅ Active |
+| `/quote-builders/monogram-form.html` | Monogram/personalization tracking form | monogram-form-service.js, monogram-form-controller.js, monogram-name-qa.js, dst-palette.js | ✅ Active |
 | `/shared_components/js/monogram-form-service.js` | API service (ManageOrders, Caspio) | ManageOrders API | ✅ Active |
-| `/shared_components/js/monogram-form-controller.js` | UI controller and state management | monogram-form-service.js | ✅ Active |
-| `/shared_components/css/monogram-form.css` | Monogram form styling | quote-builder-common.css | ✅ Active |
+| `/shared_components/js/monogram-form-controller.js` | UI controller and state management | monogram-form-service.js, monogram-name-qa.js | ✅ Active |
+| `/shared_components/js/monogram-name-qa.js` | **NEW (2026-08-04)** "Stitch Check" pure QA engine: whitespace/case/duplicate/near-dup/punctuation/completeness checks + thread-grouped machine run plan (UMD, jest-tested) | none (pure) | ✅ Active |
+| `/tests/unit/monogram-name-qa.test.js` | **NEW (2026-08-04)** Pins every Stitch Check rule (41 tests) | jest, monogram-name-qa.js | ✅ Active |
+| `/shared_components/css/monogram-form.css` | Monogram form styling (incl. Stitch Check panel + customer proof sheet print styles) | quote-builder-common.css | ✅ Active |
 | `/memory/MONOGRAM_FORM_SYSTEM.md` | Implementation documentation | - | 📚 Docs |
 
-**Features:** Order lookup from ShopWorks, dynamic name entry (up to 50), print PDF for production, search by order/company.
+**Features:** Order lookup from ShopWorks, dynamic name entry (up to 50), print PDF for production (thread-grouped machine run plan when 2+ threads), live Stitch Check QA panel, customer proof sheet with per-name approval checkboxes + signature line (names rendered in mapped font + real thread hex from Caspio `Hex_Color`, RA palette fallback), search by order/company.
 
 ### Cap Embroidery System
 | File | Purpose | Dependencies | Status |
@@ -1391,6 +1393,16 @@ cap-embroidery-fix.css
 |------|---------|--------------|--------|
 | `/staff-dashboard-v3/index.html` | **CANONICAL (V3 sole survivor, 2026-05-28)** Main staff dashboard served at `/staff-dashboard.html`. Uses @layer CSS (tokens → base → components → utilities → overrides) + unlayered theme. v2 and v1 files deleted; their URLs 301-redirect to canonical. Recovery: `git show v2026.05.27.5:staff-dashboard.html`. | staff-dashboard/{tokens,base,components,utilities,dashboard-v3-theme,dashboard-v3-patch-2}.css, staff-dashboard-v3/{config,caspio-isolation}.js + modular controllers under shared_components/js/staff-dashboard/ | ✅ Active |
 | `/dashboards/ae-dashboard.html` | AE dashboard | Multiple | ✅ Active |
+| `/dashboards/design-gallery.html` | **NEW (2026-08-05) — Design Vault.** Master design search across every source (digitized masters, ShopWorks thumbnails, Steve's ArtRequests, Ruth's Digitizing_Mockups, finished photos), deduped to one card per design number. Browse rails + date-seeded daily wall, instant local search over a client-cached ~39k-group index, windowed grid, inspector drawer, customer portfolio. Staff-gated by the `/dashboards` `gateStaffHtml` mount (replaces the unauthenticated `/pages/design-gallery.html`). | design-gallery.css, design-gallery{-search,-store,-grid,-rails,-drawer}.js, design-gallery.js, dash-page-helpers.js, toast-notifications.js, design-thumbnail-service.js, `/api/design-search/*` | ✅ Active |
+| `/dashboards/css/design-gallery.css` | **NEW (2026-08-05)** Design Vault styles — art-hub tokens + dash-shell only; the sole hex values are the 3-line forest theme override. Light "gallery wall" (white-background artwork reads badly on charcoal). | art-hub.css, dash-shell.css | ✅ Active |
+| `/dashboards/js/design-gallery-search.js` | **NEW (2026-08-05)** Pure search core — positional row decode, ranking ladder, filter composition, seeded daily wall, `DG.esc`. Dual browser/Node export so jest requires it directly. | — (pure) | ✅ Active |
+| `/dashboards/js/design-gallery-store.js` | **NEW (2026-08-05)** Index lifecycle — streamed `/index` download w/ progress, IndexedDB cache, ETag revalidation via `/meta`, `/recent` delta-merge, `patchImage` for on-demand thumbnails. | `/api/design-search/{index,meta,recent}` | ✅ Active |
+| `/dashboards/js/design-gallery-grid.js` | **NEW (2026-08-05)** Windowed result grid — dual-spacer chunking (200/chunk, ≤3 mounted) so 39k results hold ~600 DOM cards; batched thumbnail fill, density toggle, roving keyboard focus. Owns the shared card template. | `/api/thumbnails/by-designs` (via design-thumbnail-service.js) | ✅ Active |
+| `/dashboards/js/design-gallery-rails.js` | **NEW (2026-08-05)** Browse surface — stat strip, "Fresh off the digitizer", "Recently stitched", top-client collages, date-seeded Today's Wall. Zero API calls (reads the loaded index). | design-gallery-search.js, design-gallery-grid.js | ✅ Active |
+| `/dashboards/js/design-gallery-drawer.js` | **NEW (2026-08-05)** Inspector drawer — instant paint from the index, then 3 parallel hydrations with per-section inline errors + retry; merged URL-deduped image strip, hi-res lightbox, Copy/Share/Quote/prev-next. | `/api/digitized-designs/lookup`, `/api/artrequests`, `/api/mockups`, `/api/box/thumbnail/:id` | ✅ Active |
+| `/dashboards/js/design-gallery.js` | **NEW (2026-08-05)** Design Vault controller — URL state machine (`?q&tier&src&yr&has&customer&sort` + `#design=`), mode transitions, Esc unwind ladder, keyboard map, deep-search escalation, freshness pill, boot/offline surfaces. | all design-gallery-*.js, dash-page-helpers.js | ✅ Active |
+| `/tests/unit/design-search-core.test.js` | **NEW (2026-08-05)** Locks the Design Vault wire contract — row decode, imgRef expansion, ranking ladder, filter composition, `/recent` delta-merge, seeded wall determinism (41 tests). Moves only WITH the proxy-side index tests. | jest, design-gallery-search.js | ✅ Active |
+| `/tests/unit/design-gallery-xss.test.js` | **NEW (2026-08-05)** XSS regression lock — 7 hostile company/design names through card/grid/drawer render paths assert no script nodes, no `on*` attributes, no attribute breakout; plus source-level bans on handler templates and hardcoded proxy hosts (22 tests, jsdom). | jest, jsdom, design-gallery-{search,grid,drawer}.js | ✅ Active |
 | `/dashboards/art-hub-dashboard.html` | ~~DELETED~~ Coordinator redirect (removed 2026-03-15) | — | ❌ Deleted |
 | `/dashboards/art-invoices-dashboard.html` | Art invoices | art-invoice-* files | ✅ Active |
 | `/dashboards/commission-structure.html` | Online store commission structure reference | commission-structure.css | ✅ Active |
