@@ -1,1122 +1,522 @@
 /**
- * Box Labels - Shipping & Receiving Management
- * Drag/drop box management with PDF label generation
+ * Box Labels — repack station ("Print-in-Box Labels")
+ * ---------------------------------------------------
+ * Look up a SanMar PO (or ShopWorks work order), arrange the physical boxes
+ * with drag & drop / splits, and print the SAME 8.5×11 label receiving prints:
+ * rendering goes through shared_components/js/box-label-template.js, data comes
+ * from the proxy's shared assembly — so rush, due date, follow-on and method
+ * can never differ between a receiving label and a repack label.
+ *
+ * Data:   GET {API}/api/sanmar-orders/label-data/:id?type=po|wo
+ *         (same order shape as /inbound-today; ?refresh=1 bypasses its cache)
+ * Print:  BoxLabelTemplate.renderLabel(...) + printSheet() → window.print()
+ * State:  LOCAL ONLY. This station describes how a human just repacked
+ *         physical boxes; the arrangement is a localStorage draft (24h),
+ *         deliberately never written to Caspio (quota + no reader for it).
+ *         Order-level fields are re-pulled at print time so a label never
+ *         carries a stale rush/due — boxes keep the human arrangement.
  */
 
 (function () {
   'use strict';
 
-  // ==========================================
-  // Configuration
-  // ==========================================
-  const API_BASE = window.location.origin;
-  const HEROKU_BASE = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
-  const SIZE_COLUMNS = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL', 'Other'];
-  // SanMar uses XXL/XXXL, we normalize to 2XL/3XL
-  const SIZE_ALIASES = { 'XXL': '2XL', 'XXXL': '3XL', 'XXXXL': '4XL', 'XXXXXL': '5XL' };
-  const BOX_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#6366f1', '#84cc16'];
+  const API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
+    || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+  const DRAFT_TTL_MS = 24 * 60 * 60 * 1000;
 
-  // ==========================================
-  // State
-  // ==========================================
-  let currentData = null;       // Full response from /api/box-label-data
-  let savedShipmentId = null;   // Caspio ID_Shipment after save
-  let allExpanded = false;
-  let sortableInstances = [];
+  // ── State ──
+  // box: { key, po, source:'SanMar'|'Custom', trackingNumber, carrier, shipmentDate,
+  //        items:[{style,title,color,size,qty}], verified, verifiedBy }
+  const state = { identifier: '', type: 'po', orders: [], boxes: [], loadedAt: 0 };
+  let sortables = [];
+  let splitCtx = null;        // { fromKey, itemIdx }
+  let draftTimer = null;
 
-  // ==========================================
-  // DOM References
-  // ==========================================
-  const els = {};
-  function initDomRefs() {
-    els.searchInput = document.getElementById('searchInput');
-    els.lookupBtn = document.getElementById('lookupBtn');
-    els.repackerName = document.getElementById('repackerName');
-    els.printAllBtn = document.getElementById('printAllBtn');
-    els.orderBanner = document.getElementById('orderBanner');
-    els.totalsBar = document.getElementById('totalsBar');
-    els.loadingState = document.getElementById('loadingState');
-    els.errorState = document.getElementById('errorState');
-    els.errorMessage = document.getElementById('errorMessage');
-    els.mainContent = document.getElementById('mainContent');
-    els.boxContainer = document.getElementById('boxContainer');
-    els.unboxedItems = document.getElementById('unboxedItems');
-    els.excludedItems = document.getElementById('excludedItems');
-    els.expandAllBtn = document.getElementById('expandAllBtn');
-    els.addBoxBtn = document.getElementById('addBoxBtn');
-    els.splitModal = document.getElementById('splitModal');
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+  function fmtNum(v) { return Math.round(Number(v) || 0).toLocaleString('en-US'); }
+  function todayShort() {
+    const n = new Date();
+    return `${n.getMonth() + 1}-${n.getDate()}-${String(n.getFullYear()).slice(-2)}`;
   }
 
-  // ==========================================
-  // Initialization
-  // ==========================================
+  // ── DOM ──
+  const els = {};
+  function grab(id) { return document.getElementById(id); }
+  function initDomRefs() {
+    ['searchInput', 'lookupBtn', 'repackerName', 'printAllBtn', 'loadingState', 'errorState',
+      'errorMessage', 'errorActions', 'errorDismissBtn', 'draftNote', 'draftNoteText', 'draftResetBtn',
+      'totalsBar', 'totalBoxed', 'totalShipped', 'totalOrdered', 'shortShipWarning',
+      'mainContent', 'ordersContainer', 'orderReference', 'expandAllBtn',
+      'splitModal', 'splitModalTitle', 'splitModalSubtitle', 'splitModalBody',
+      'splitCancelBtn', 'splitConfirmBtn'].forEach(id => { els[id] = grab(id); });
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     initDomRefs();
-    loadRepackerName();
+    els.repackerName.value = localStorage.getItem('bl_repacker_name') || '';
+    if (!window.BoxLabelTemplate) {
+      // The shared renderer didn't load — nothing on this page can work without it.
+      showError('box-label-template.js didn\'t load — refresh the page. Labels can\'t render without it.');
+      els.lookupBtn.disabled = true;
+      return;
+    }
     bindEvents();
+    const p = new URLSearchParams(window.location.search);
+    const po = p.get('po'), wo = p.get('wo');
+    if (po || wo) {
+      els.searchInput.value = po || wo;
+      document.querySelector(`input[name="searchType"][value="${po ? 'po' : 'wo'}"]`).checked = true;
+      handleLookup();
+    }
   });
 
   function bindEvents() {
     els.lookupBtn.addEventListener('click', handleLookup);
-    els.searchInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') handleLookup();
-    });
-    els.printAllBtn.addEventListener('click', () => printAllLabels());
+    els.searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') handleLookup(); });
+    els.printAllBtn.addEventListener('click', () => printLabels(null));
     els.expandAllBtn.addEventListener('click', toggleExpandAll);
-    els.addBoxBtn.addEventListener('click', addNewBox);
-    els.repackerName.addEventListener('change', saveRepackerName);
-
-    document.getElementById('splitCancelBtn').addEventListener('click', closeSplitModal);
-    document.getElementById('splitConfirmBtn').addEventListener('click', confirmSplit);
-    document.getElementById('linkWOBtn').addEventListener('click', handleLinkWO);
-    document.getElementById('linkWOInput').addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') handleLinkWO();
-    });
-
-    // Auto-load from URL params (QR code scan support)
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('po')) {
-      els.searchInput.value = urlParams.get('po');
-      document.querySelector('input[name="searchType"][value="po"]').checked = true;
-      setTimeout(handleLookup, 300);
-    } else if (urlParams.get('wo')) {
-      els.searchInput.value = urlParams.get('wo');
-      document.querySelector('input[name="searchType"][value="wo"]').checked = true;
-      setTimeout(handleLookup, 300);
-    }
+    els.repackerName.addEventListener('change', () => localStorage.setItem('bl_repacker_name', els.repackerName.value.trim()));
+    els.errorDismissBtn.addEventListener('click', hideError);
+    els.draftResetBtn.addEventListener('click', resetDraft);
+    els.splitCancelBtn.addEventListener('click', closeSplitModal);
+    els.splitConfirmBtn.addEventListener('click', confirmSplit);
+    // Delegated clicks for everything rendered per-lookup.
+    els.ordersContainer.addEventListener('click', onOrdersClick);
   }
 
-  // ==========================================
-  // Repacker Name (localStorage)
-  // ==========================================
-  function loadRepackerName() {
-    const name = localStorage.getItem('bl_repacker_name') || '';
-    els.repackerName.value = name;
-  }
-
-  function saveRepackerName() {
-    localStorage.setItem('bl_repacker_name', els.repackerName.value.trim());
-  }
-
-  function getRepackerName() {
-    return els.repackerName.value.trim() || 'Unknown';
-  }
-
-  // ==========================================
-  // Work Order Linking
-  // ==========================================
-  async function handleLinkWO() {
-    const woNum = document.getElementById('linkWOInput').value.trim();
-    if (!woNum) return;
-
-    try {
-      // Fetch order data from Caspio by work order number
-      const resp = await fetch(`${HEROKU_BASE}/api/box-labels/order/${woNum}`);
-      if (!resp.ok) throw new Error('Work order not found');
-
-      const data = await resp.json();
-      if (!data.success || !data.order) throw new Error('Work order not found in system');
-
-      // Merge order data into current state
-      const o = data.order;
-      currentData.order = {
-        ...currentData.order,
-        orderNumber: o.orderNumber || woNum,
-        company: o.company || currentData.order.company || '',
-        contact: o.contact || '',
-        contactEmail: o.contactEmail || '',
-        customerPO: o.customerPO || currentData.order.customerPO || '',
-        salesRep: o.salesRep || '',
-        designs: []
-      };
-      if (o.designName || o.designNumber) {
-        currentData.order.designs.push({
-          number: String(o.designNumber || ''),
-          name: o.designName || ''
-        });
-      }
-
-      // Re-render with the new order data
-      renderBanner(currentData.order);
-      document.getElementById('linkWOSection').style.display = 'none';
-
-      // Show success briefly
-      const linkBtn = document.getElementById('linkWOBtn');
-      linkBtn.textContent = 'Linked!';
-      linkBtn.style.background = '#16a34a';
-      setTimeout(() => { linkBtn.textContent = 'Link WO'; linkBtn.style.background = ''; }, 2000);
-    } catch (error) {
-      alert(`Could not find work order: ${woNum}\n${error.message}`);
-    }
-  }
-
-  // ==========================================
-  // Lookup & Data Fetching
-  // ==========================================
+  // ── Lookup ──
   async function handleLookup() {
     const identifier = els.searchInput.value.trim();
-    if (!identifier) {
-      els.searchInput.focus();
-      return;
-    }
-
+    if (!identifier) { els.searchInput.focus(); return; }
     const type = document.querySelector('input[name="searchType"]:checked').value;
-    showLoading(true);
-    hideError();
 
+    showLoading(true); hideError(); hideDraftNote();
     try {
-      const resp = await fetch(`${API_BASE}/api/box-label-data/${encodeURIComponent(identifier)}?type=${type}`);
-      if (!resp.ok) {
-        const err = await resp.json().catch(() => ({}));
-        throw new Error(err.error || `Lookup failed (${resp.status})`);
+      const data = await fetchLabelData(identifier, type, false);
+      state.identifier = identifier;
+      state.type = type;
+      state.orders = data.orders || [];
+      state.loadedAt = Date.now();
+      state.boxes = buildBoxesFromOrders(state.orders);
+      if (!state.orders.length) {
+        showError(data.note || `Nothing found for ${identifier}.`);
+      } else {
+        maybeRestoreDraft();
+        fetchThumbnails(state.orders); // best-effort artwork for the labels
       }
-
-      currentData = await resp.json();
-      if (!currentData.success) throw new Error(currentData.error || 'Unknown error');
-
-      // Store PO for QR code
-      if (currentData.sanmarPO) currentData.sanmarPO = currentData.sanmarPO;
-
-      // Show message if no data found
-      if (currentData.message && (!currentData.boxes?.length) && (!currentData.unboxedItems?.length)) {
-        showError(currentData.message);
-      }
-
       renderAll();
-    } catch (error) {
-      showError(error.message);
+    } catch (err) {
+      showError(`Lookup failed: ${err.message}`);
     } finally {
       showLoading(false);
     }
   }
 
-  // ==========================================
-  // Rendering
-  // ==========================================
+  async function fetchLabelData(identifier, type, refresh) {
+    const url = `${API_BASE}/api/sanmar-orders/label-data/${encodeURIComponent(identifier)}?type=${type}${refresh ? '&refresh=1' : ''}`;
+    const resp = await fetch(url);
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.details || err.error || `HTTP ${resp.status}`);
+    }
+    return resp.json();
+  }
+
+  function buildBoxesFromOrders(orders) {
+    const boxes = [];
+    for (const o of orders) {
+      if (o.boxDetailAvailable && o.boxDetail && o.boxDetail.length) {
+        o.boxDetail.forEach((b, i) => boxes.push({
+          key: `${o.sanmarPO}#${i + 1}`, po: o.sanmarPO, source: 'SanMar',
+          trackingNumber: b.trackingNumber || '', carrier: b.carrier || '', shipmentDate: b.shipmentDate || '',
+          items: (b.items || []).map(it => ({ style: it.style || '', title: it.title || '', color: it.color || '', size: it.size || '', qty: it.qty || 0 })),
+          verified: false, verifiedBy: '',
+        }));
+      } else {
+        // No live box feed — one synthesized box from the PO lines (same rule the
+        // receiving labels use). The repacker can split it into real boxes here.
+        boxes.push({
+          key: `${o.sanmarPO}#1`, po: o.sanmarPO, source: 'SanMar',
+          trackingNumber: o.tracking || '', carrier: o.carrier || '', shipmentDate: o.shipDate || '',
+          items: (o.lines || []).map(l => ({ style: l.style || '', title: l.title || '', color: l.color || '', size: l.size || '', qty: l.qtyShipped || l.qtyOrdered || 0 }))
+            .filter(it => it.qty > 0),
+          verified: false, verifiedBy: '',
+        });
+      }
+    }
+    return boxes;
+  }
+
+  // Best-effort design artwork for the label (same endpoint the inbound board uses).
+  async function fetchThumbnails(orders) {
+    const ids = [...new Set(orders.map(o => o.designNumber).filter(Boolean))];
+    if (!ids.length) return;
+    try {
+      const resp = await fetch(`${API_BASE}/api/thumbnails/by-designs?ids=${encodeURIComponent(ids.join(','))}`);
+      if (!resp.ok) return; // label falls back to "No artwork on file"
+      const data = await resp.json();
+      const map = (data && data.thumbnails) || {};
+      for (const o of orders) { if (o.designNumber && map[o.designNumber]) o.logoUrl = map[o.designNumber]; }
+    } catch (e) { /* artwork is best-effort; the label says "No artwork on file" */ }
+  }
+
+  // ── Draft (localStorage, 24h) ──
+  function draftKey() { return `bl_draft_v2_${state.type}_${state.identifier.toUpperCase()}`; }
+  function saveDraft() {
+    clearTimeout(draftTimer);
+    draftTimer = setTimeout(() => {
+      try {
+        localStorage.setItem(draftKey(), JSON.stringify({ savedAt: Date.now(), boxes: state.boxes }));
+      } catch (e) { /* storage full — the arrangement still lives on screen */ }
+    }, 300);
+  }
+  function maybeRestoreDraft() {
+    let draft = null;
+    try { draft = JSON.parse(localStorage.getItem(draftKey()) || 'null'); } catch (e) { draft = null; }
+    if (!draft || !Array.isArray(draft.boxes) || (Date.now() - (draft.savedAt || 0)) > DRAFT_TTL_MS) return;
+    const pos = new Set(state.orders.map(o => o.sanmarPO));
+    const boxes = draft.boxes.filter(b => b && pos.has(b.po) && Array.isArray(b.items));
+    if (!boxes.length) return;
+    state.boxes = boxes;
+    els.draftNoteText.textContent = `Restored your box arrangement from ${new Date(draft.savedAt).toLocaleString()} — SanMar's original cartons are one click away.`;
+    els.draftNote.style.display = 'flex';
+  }
+  function resetDraft() {
+    try { localStorage.removeItem(draftKey()); } catch (e) { /* nothing to lose */ }
+    state.boxes = buildBoxesFromOrders(state.orders);
+    hideDraftNote();
+    renderAll();
+  }
+  function hideDraftNote() { els.draftNote.style.display = 'none'; }
+
+  // ── Rendering ──
+  function orderBoxes(po) { return state.boxes.filter(b => b.po === po); }
+  function boxByKey(key) { return state.boxes.find(b => b.key === key); }
+  function boxPieces(b) { return b.items.reduce((t, it) => t + (it.qty || 0), 0); }
+
   function renderAll() {
-    if (!currentData) return;
-
-    renderBanner(currentData.order);
-    renderTotals(currentData.summary);
-    renderBoxes(currentData.boxes || []);
-    renderUnboxedItems(currentData.unboxedItems || []);
-    renderExcludedItems(currentData.excludedItems || []);
-    initAllDragDrop();
-
+    if (!state.orders.length) {
+      els.mainContent.style.display = 'none';
+      els.totalsBar.style.display = 'none';
+      els.printAllBtn.disabled = true;
+      return;
+    }
+    els.ordersContainer.innerHTML = state.orders.map(renderOrderGroup).join('');
+    els.orderReference.innerHTML = state.orders.map(renderOrderReference).join('');
     els.mainContent.style.display = 'flex';
-    els.printAllBtn.disabled = false;
+    renderTotals();
+    initDragDrop();
+    els.printAllBtn.disabled = !state.boxes.some(b => b.items.length);
+    saveDraft();
   }
 
-  function renderBanner(order) {
-    if (!order) return;
-    document.getElementById('bannerWO').textContent = order.orderNumber || '—';
-    document.getElementById('bannerCompany').textContent = order.company || '—';
-    document.getElementById('bannerContact').textContent = order.contact || '—';
-    document.getElementById('bannerShipDate').textContent = formatDate(order.requestedShipDate) || '—';
-    document.getElementById('bannerDesign').textContent =
-      order.designs?.length ? `${order.designs[0].number} ${order.designs[0].name}` : '—';
-    document.getElementById('bannerType').textContent = order.orderType || '—';
-    document.getElementById('bannerCustPO').textContent = order.customerPO || '—';
-    document.getElementById('bannerRep').textContent = order.salesRep || '—';
-    els.orderBanner.style.display = 'block';
-
-    // Show "Link Work Order" section if no real order data
-    const hasOrderData = order.orderNumber && order.company && !order.company.startsWith('SanMar PO:');
-    document.getElementById('linkWOSection').style.display = hasOrderData ? 'none' : 'flex';
+  function renderOrderGroup(o) {
+    const T = window.BoxLabelTemplate;
+    const rush = T.rushText(o);
+    const follow = T.followOnText(o);
+    const boxes = orderBoxes(o.sanmarPO);
+    return `
+      <section class="bl-order" data-po="${esc(o.sanmarPO)}">
+        <div class="bl-order__head" style="border-left-color:${T.METHOD_DARK[o.method] || '#444'}">
+          <div class="bl-order__title">
+            <span class="bl-order__company">${esc(o.company || `SanMar PO ${o.sanmarPO}`)}</span>
+            <span class="bl-order__meta">WO# ${esc(o.workOrder || '?')} · PO ${esc(o.sanmarPO)} · ${esc(o.method || 'Other')}${o.dueDate ? ` · Due ${esc(o.dueDate)}` : ''}${o.salesRep ? ` · Rep ${esc(o.salesRep)}` : ''}</span>
+          </div>
+          <div class="bl-order__flags">
+            ${rush ? `<span class="bl-rush-chip${o.pastDue ? ' bl-rush-chip--past' : ''}">⚡ ${esc(rush)}</span>` : ''}
+            ${follow ? `<span class="bl-follow-chip">↩ ${esc(follow)}</span>` : ''}
+            ${o.received && !o.followOnShipment ? `<span class="bl-received-chip">✓ Counted in${o.receivedDate ? ' ' + esc(o.receivedDate) : ''}</span>` : ''}
+            ${!o.workOrder ? `<span class="bl-nowo-chip" title="No ShopWorks work order linked to this PO yet — the label prints WO '?'. Try the Work Order# lookup if you know it.">No WO linked</span>` : ''}
+          </div>
+        </div>
+        ${boxes.map((b, i) => renderBoxCard(b, i + 1, boxes.length)).join('') || '<div class="bl-box-empty">No boxes on this PO</div>'}
+        <button class="bl-btn bl-btn--small bl-btn--primary" data-act="add-box" data-po="${esc(o.sanmarPO)}">+ New Box</button>
+      </section>`;
   }
 
-  function renderTotals(summary) {
-    if (!summary) return;
-    document.getElementById('totalBoxed').textContent = summary.totalBoxedQty || 0;
-    document.getElementById('totalWO').textContent = summary.totalWOQty || 0;
-    document.getElementById('totalUnboxed').textContent = summary.totalUnboxedQty || 0;
-    document.getElementById('mismatchWarning').style.display = summary.mismatch ? 'inline-block' : 'none';
+  function renderBoxCard(b, posNo, posTotal) {
+    const pcs = boxPieces(b);
+    return `
+      <div class="bl-box-card bl-box-card--expanded ${b.verified ? 'bl-box-card--verified' : ''}" data-key="${esc(b.key)}">
+        <div class="bl-box-card__header" data-act="toggle-box">
+          <div class="bl-box-card__title">
+            <div class="bl-box-card__number">${posNo}</div>
+            <div class="bl-box-card__info">
+              <div class="bl-box-card__label">Box ${posNo} of ${posTotal}
+                <span class="bl-box-card__tag bl-box-card__tag--${b.source.toLowerCase()}">${esc(b.source)}</span>
+              </div>
+              <div class="bl-box-card__meta">
+                ${b.trackingNumber ? `<span>${esc(b.carrier || '')} ${esc(b.trackingNumber)}</span>` : ''}
+                <span>${b.items.length} line${b.items.length !== 1 ? 's' : ''}</span>
+                <span>${fmtNum(pcs)} pcs</span>
+              </div>
+            </div>
+          </div>
+          <div class="bl-box-card__right">
+            <button class="bl-box-card__verify ${b.verified ? 'bl-box-card__verify--checked' : ''}" data-act="verify" title="Mark contents checked">
+              ${b.verified ? '&#10003; Verified' : '&#9744; Verify'}
+            </button>
+            <span class="bl-box-card__chevron">&#9660;</span>
+          </div>
+        </div>
+        <div class="bl-box-card__body">
+          <div class="bl-item-list bl-droppable" data-key="${esc(b.key)}">
+            ${b.items.map((it, i) => renderItemCard(it, i)).join('') || '<div class="bl-box-empty">Drop items here</div>'}
+          </div>
+          <div class="bl-box-card__actions">
+            <button class="bl-btn bl-btn--small bl-btn--outline" data-act="print-box">&#128438; Print this box</button>
+            <button class="bl-btn bl-btn--small bl-btn--danger" data-act="delete-box" ${b.items.length ? 'disabled title="Move all items out first"' : ''}>Delete Box</button>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  function renderItemCard(it, idx) {
+    return `
+      <div class="bl-item-card" data-idx="${idx}">
+        <div class="bl-item-card__header">
+          <div>
+            <div class="bl-item-card__style">${esc(it.style)}${it.size ? ` <span class="bl-size-chip">${esc(it.size)}</span>` : ''}</div>
+            <div class="bl-item-card__color">${esc(it.color || '—')}</div>
+          </div>
+          <div class="bl-item-card__qty">${fmtNum(it.qty)} pcs</div>
+        </div>
+        ${it.title ? `<div class="bl-item-card__desc">${esc(it.title)}</div>` : ''}
+        ${it.qty > 1 ? `<button class="bl-btn bl-btn--small bl-btn--outline bl-item-card__split" data-act="split">Split to another box</button>` : ''}
+      </div>`;
+  }
+
+  function renderOrderReference(o) {
+    const rows = (o.lines || []).map(l => `
+      <tr>
+        <td>${esc(l.style)}</td><td>${esc(l.color || '—')}</td><td>${esc(l.size || '—')}</td>
+        <td class="bl-num">${fmtNum(l.qtyOrdered)}</td><td class="bl-num">${fmtNum(l.qtyShipped)}</td>
+      </tr>`).join('');
+    return `
+      <div class="bl-ref">
+        <div class="bl-ref__head">PO ${esc(o.sanmarPO)} — SanMar order lines</div>
+        ${rows ? `<table class="bl-ref__table"><thead><tr><th>Style</th><th>Color</th><th>Size</th><th class="bl-num">Ord</th><th class="bl-num">Shp</th></tr></thead><tbody>${rows}</tbody></table>`
+          : '<div class="bl-box-empty">No line detail on file</div>'}
+      </div>`;
+  }
+
+  function renderTotals() {
+    const boxed = state.boxes.reduce((t, b) => t + boxPieces(b), 0);
+    const shipped = state.orders.reduce((t, o) => t + (o.piecesShipped || 0), 0);
+    const ordered = state.orders.reduce((t, o) => t + (o.piecesOrdered || 0), 0);
+    els.totalBoxed.textContent = fmtNum(boxed);
+    els.totalShipped.textContent = fmtNum(shipped);
+    els.totalOrdered.textContent = fmtNum(ordered);
+    els.shortShipWarning.style.display = (ordered > 0 && shipped < ordered) ? 'inline-block' : 'none';
     els.totalsBar.style.display = 'flex';
   }
 
-  function renderBoxes(boxes) {
-    // Destroy existing sortable instances
-    sortableInstances.forEach(s => s.destroy());
-    sortableInstances = [];
-
-    els.boxContainer.innerHTML = boxes.map((box, idx) => {
-      const color = BOX_COLORS[idx % BOX_COLORS.length];
-      const itemCount = box.items?.length || 0;
-      const totalQty = box.items?.reduce((s, i) => s + (i.totalQty || 0), 0) || 0;
-      const isVerified = box.isVerified || false;
-      const source = box.source || 'Custom';
-
-      return `
-        <div class="bl-box-card ${isVerified ? 'bl-box-card--verified' : ''}" data-box="${box.boxNumber}" id="box-${box.boxNumber}">
-          <div class="bl-box-card__header" onclick="window.BL.toggleBox(${box.boxNumber})">
-            <div class="bl-box-card__title">
-              <div class="bl-box-card__number" style="background:${color};">${box.boxNumber}</div>
-              <div class="bl-box-card__info">
-                <div class="bl-box-card__label">
-                  Box ${box.boxNumber}
-                  <span class="bl-box-card__tag bl-box-card__tag--${source.toLowerCase()}">${source}</span>
-                </div>
-                <div class="bl-box-card__meta">
-                  ${box.trackingNumber ? `<span>${box.trackingNumber}</span>` : ''}
-                  <span>${itemCount} item${itemCount !== 1 ? 's' : ''}</span>
-                  <span>${totalQty} pcs</span>
-                </div>
-              </div>
-            </div>
-            <div class="bl-box-card__right">
-              <button class="bl-box-card__verify ${isVerified ? 'bl-box-card__verify--checked' : ''}"
-                onclick="event.stopPropagation(); window.BL.verifyBox(${box.boxNumber});"
-                title="Mark as verified">
-                ${isVerified ? '&#10003; Verified' : '&#9744; Verify'}
-              </button>
-              <span class="bl-box-card__chevron">&#9660;</span>
-            </div>
-          </div>
-          <div class="bl-box-card__body">
-            <div class="bl-item-list bl-droppable" data-box="${box.boxNumber}" id="itemlist-${box.boxNumber}">
-              ${itemCount > 0 ? box.items.map((item, i) => renderItemCard(item, i, box.boxNumber)).join('') : `
-                <div class="bl-box-empty">Drop items here</div>
-              `}
-            </div>
-            <div class="bl-box-card__actions">
-              <button class="bl-btn bl-btn--small bl-btn--outline" onclick="window.BL.printBoxLabel(${box.boxNumber})">
-                &#128438; Print Box ${box.boxNumber}
-              </button>
-              <button class="bl-btn bl-btn--small bl-btn--danger" onclick="window.BL.deleteBox(${box.boxNumber})"
-                ${itemCount > 0 ? 'disabled title="Remove all items first"' : ''}>
-                Delete Box
-              </button>
-            </div>
-          </div>
-        </div>
-      `;
-    }).join('');
-  }
-
-  function renderItemCard(item, index, boxNumber) {
-    const contentId = item.contentId || item.Box_ID || `${boxNumber}-${index}`;
-    const sizeHtml = renderSizeGrid(item.sizes || item);
-    const totalQty = item.totalQty || item.Total_Qty || 0;
-
-    // Count active sizes to decide whether to show split button
-    const sizes = item.sizes || {};
-    const activeSizeCount = Object.values(sizes).filter(v => v > 0).length;
-    const showSplit = activeSizeCount > 1 || totalQty > 1;
-
-    return `
-      <div class="bl-item-card" data-content-id="${contentId}" data-box="${boxNumber}">
-        <div class="bl-item-card__header">
-          <div>
-            <div class="bl-item-card__style">${escapeHtml(item.style || item.Style_Number || '')}</div>
-            <div class="bl-item-card__color">${escapeHtml(item.color || item.Color || '')}</div>
-          </div>
-          <div class="bl-item-card__qty">${totalQty} pcs</div>
-        </div>
-        <div class="bl-item-card__desc">${escapeHtml(item.description || item.Description || '')}</div>
-        ${sizeHtml}
-        ${showSplit && boxNumber > 0 ? `<button class="bl-btn bl-btn--small bl-btn--outline bl-item-card__split" onclick="event.stopPropagation(); window.BL.startSplit('${contentId}', ${boxNumber})">Split to another box</button>` : ''}
-      </div>
-    `;
-  }
-
-  function renderSizeGrid(sizes) {
-    // Handle multiple formats: { S: 1 }, { Size_S: 1 }, { XXL: 1 }
-    const sizeMap = {};
-    if (sizes.Size_S !== undefined) {
-      // Caspio format
-      SIZE_COLUMNS.forEach(s => {
-        const key = s === '2XL' ? 'Size_2XL' : s === '3XL' ? 'Size_3XL' : s === '4XL' ? 'Size_4XL' : s === '5XL' ? 'Size_5XL' : `Size_${s}`;
-        sizeMap[s] = sizes[key] || 0;
-      });
-    } else {
-      // Standard or SanMar format — check for aliases (XXL→2XL, etc.)
-      SIZE_COLUMNS.forEach(s => { sizeMap[s] = sizes[s] || 0; });
-      // Also check SanMar aliases
-      for (const [alias, standard] of Object.entries(SIZE_ALIASES)) {
-        if (sizes[alias]) sizeMap[standard] = (sizeMap[standard] || 0) + sizes[alias];
-      }
+  // ── Interactions (delegated) ──
+  function onOrdersClick(e) {
+    const btn = e.target.closest('[data-act]');
+    if (!btn) return;
+    const act = btn.getAttribute('data-act');
+    const card = e.target.closest('.bl-box-card');
+    const key = card && card.getAttribute('data-key');
+    if (act === 'toggle-box' && !e.target.closest('button')) { card.classList.toggle('bl-box-card--expanded'); return; }
+    if (act === 'add-box') { addBox(btn.getAttribute('data-po')); return; }
+    if (!key) return;
+    if (act === 'verify') { const b = boxByKey(key); b.verified = !b.verified; b.verifiedBy = b.verified ? repacker() : ''; renderAll(); }
+    if (act === 'delete-box') { deleteBox(key); }
+    if (act === 'print-box') { printLabels(key); }
+    if (act === 'split') {
+      const itemEl = e.target.closest('.bl-item-card');
+      openSplitModal(key, parseInt(itemEl.getAttribute('data-idx'), 10));
     }
-
-    const activeSizes = SIZE_COLUMNS.filter(s => sizeMap[s] > 0);
-    if (activeSizes.length === 0) return '';
-
-    return `<div class="bl-size-grid">${
-      SIZE_COLUMNS.map(s => {
-        const val = sizeMap[s] || 0;
-        if (val === 0 && !activeSizes.includes(s)) return '';
-        const hasValue = val > 0;
-        return `
-          <div class="bl-size-cell ${hasValue ? 'bl-size-cell--has-value' : 'bl-size-cell--empty'}"
-               onclick="window.BL.editSizeQty(this, '${s}')" title="Click to edit">
-            <div class="bl-size-cell__label">${s}</div>
-            <div class="bl-size-cell__value">${hasValue ? val : '-'}</div>
-          </div>
-        `;
-      }).join('')
-    }</div>`;
-  }
-
-  function renderUnboxedItems(items) {
-    if (!items.length) {
-      els.unboxedItems.innerHTML = '<div class="bl-box-empty">No unboxed items</div>';
-      return;
-    }
-
-    els.unboxedItems.innerHTML = items.map((item, i) => {
-      const contentId = item.contentId || item.Box_ID || `unboxed-${i}`;
-      const totalQty = item.totalQty || item.Total_Qty || 0;
-      const vendor = item.vendor || 'Other';
-
-      return `
-        <div class="bl-item-card" data-content-id="${contentId}" data-box="0">
-          <div class="bl-item-card__header">
-            <div>
-              <div class="bl-item-card__style">${escapeHtml(item.style || item.Style_Number || '')}</div>
-              <div class="bl-item-card__color">${escapeHtml(item.color || item.Color || '')} <small>(${vendor})</small></div>
-            </div>
-            <div class="bl-item-card__qty">${totalQty} pcs</div>
-          </div>
-          <div class="bl-item-card__desc">${escapeHtml(item.description || item.Description || '')}</div>
-          ${renderSizeGrid(item.sizes || item)}
-        </div>
-      `;
-    }).join('');
-  }
-
-  function renderExcludedItems(items) {
-    if (!items.length) {
-      els.excludedItems.innerHTML = '<div class="bl-excluded-item"><span>No excluded items</span></div>';
-      return;
-    }
-
-    els.excludedItems.innerHTML = items.map(item => `
-      <div class="bl-excluded-item">
-        <span class="bl-excluded-item__name">${escapeHtml(item.description || item.partNumber || '')}</span>
-        <small>${item.reason || ''}</small>
-      </div>
-    `).join('');
-  }
-
-  // ==========================================
-  // Drag & Drop (SortableJS)
-  // ==========================================
-  function initAllDragDrop() {
-    sortableInstances.forEach(s => s.destroy());
-    sortableInstances = [];
-
-    // Make each box's item list sortable
-    document.querySelectorAll('.bl-item-list.bl-droppable').forEach(list => {
-      const s = new Sortable(list, {
-        group: 'box-items',
-        animation: 150,
-        ghostClass: 'sortable-ghost',
-        dragClass: 'sortable-drag',
-        chosenClass: 'sortable-chosen',
-        handle: '.bl-item-card',
-        onEnd: handleDragEnd,
-        onMove: function (evt) {
-          // Allow dropping on empty boxes
-          return true;
-        }
-      });
-      sortableInstances.push(s);
-    });
-  }
-
-  function handleDragEnd(evt) {
-    const itemEl = evt.item;
-    const contentId = itemEl.dataset.contentId;
-    const fromBox = parseInt(evt.from.dataset.box) || 0;
-    const toBox = parseInt(evt.to.dataset.box) || 0;
-
-    if (fromBox === toBox) return; // No change
-
-    // Update the data-box attribute on the DOM element
-    itemEl.dataset.box = toBox;
-
-    // Remove empty placeholders
-    const emptyPlaceholder = evt.to.querySelector('.bl-box-empty');
-    if (emptyPlaceholder) emptyPlaceholder.remove();
-    if (evt.from.children.length === 0) {
-      evt.from.innerHTML = '<div class="bl-box-empty">Drop items here</div>';
-    }
-
-    // Update in-memory state so printing reflects the move
-    if (currentData) {
-      const sourceBox = currentData.boxes.find(b => b.boxNumber === fromBox);
-      const targetBox = currentData.boxes.find(b => b.boxNumber === toBox);
-
-      if (sourceBox && targetBox) {
-        // Find the item by contentId or index
-        const itemIdx = sourceBox.items.findIndex((it, idx) =>
-          (it.contentId || `${fromBox}-${idx}`) === contentId
-        );
-        if (itemIdx >= 0) {
-          const [movedItem] = sourceBox.items.splice(itemIdx, 1);
-          targetBox.items.push(movedItem);
-        }
-      }
-    }
-
-    // Save the move to backend (debounced)
-    saveMoveToBackend(contentId, fromBox, toBox);
-
-    // Update totals
-    recalcTotals();
-  }
-
-  let saveTimeout = null;
-  function saveMoveToBackend(contentId, fromBox, toBox) {
-    clearTimeout(saveTimeout);
-    saveTimeout = setTimeout(async () => {
-      try {
-        if (savedShipmentId) {
-          await fetch(`${API_BASE}/api/box-contents/move`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ contentId, fromBox, toBox })
-          });
-        }
-      } catch (err) {
-        console.error('[BoxLabels] Save move failed:', err);
-      }
-    }, 500);
-  }
-
-  // ==========================================
-  // Box Actions
-  // ==========================================
-  function toggleBox(boxNumber) {
-    const card = document.getElementById(`box-${boxNumber}`);
-    if (card) card.classList.toggle('bl-box-card--expanded');
   }
 
   function toggleExpandAll() {
-    allExpanded = !allExpanded;
-    document.querySelectorAll('.bl-box-card').forEach(card => {
-      if (allExpanded) {
-        card.classList.add('bl-box-card--expanded');
-      } else {
-        card.classList.remove('bl-box-card--expanded');
-      }
+    const cards = [...document.querySelectorAll('.bl-box-card')];
+    const expand = !cards.every(c => c.classList.contains('bl-box-card--expanded'));
+    cards.forEach(c => c.classList.toggle('bl-box-card--expanded', expand));
+    els.expandAllBtn.textContent = expand ? 'Collapse All' : 'Expand All';
+  }
+
+  function addBox(po) {
+    const n = orderBoxes(po).length + 1;
+    state.boxes.push({ key: `${po}#custom${Date.now()}`, po, source: 'Custom', trackingNumber: '', carrier: '', shipmentDate: '', items: [], verified: false, verifiedBy: '' });
+    renderAll();
+  }
+
+  function deleteBox(key) {
+    const b = boxByKey(key);
+    if (!b || b.items.length) return;
+    state.boxes = state.boxes.filter(x => x.key !== key);
+    renderAll();
+  }
+
+  function repacker() { return els.repackerName.value.trim(); }
+
+  // ── Drag & drop ──
+  function initDragDrop() {
+    sortables.forEach(s => s.destroy());
+    sortables = [];
+    document.querySelectorAll('.bl-item-list.bl-droppable').forEach(list => {
+      sortables.push(new Sortable(list, {
+        group: 'bl-items', animation: 150, handle: '.bl-item-card',
+        ghostClass: 'sortable-ghost', dragClass: 'sortable-drag', chosenClass: 'sortable-chosen',
+        onEnd: (evt) => {
+          const fromKey = evt.from.getAttribute('data-key');
+          const toKey = evt.to.getAttribute('data-key');
+          if (fromKey === toKey) return;
+          const from = boxByKey(fromKey), to = boxByKey(toKey);
+          if (!from || !to) return;
+          if (from.po !== to.po) {
+            // A label prints per PO/work order — items can't hop orders.
+            showError('Items can only move between boxes of the same PO — each label belongs to one work order.');
+            renderAll();
+            return;
+          }
+          const [moved] = from.items.splice(evt.oldIndex, 1);
+          if (moved) to.items.splice(Math.min(evt.newIndex, to.items.length), 0, moved);
+          renderAll();
+        },
+      }));
     });
-    els.expandAllBtn.textContent = allExpanded ? 'Collapse All' : 'Expand All';
   }
 
-  function addNewBox() {
-    if (!currentData) return;
-
-    const boxes = currentData.boxes || [];
-    const newBoxNumber = boxes.length > 0 ? Math.max(...boxes.map(b => b.boxNumber)) + 1 : 1;
-
-    boxes.push({
-      boxNumber: newBoxNumber,
-      source: 'Custom',
-      trackingNumber: '',
-      carrier: '',
-      items: [],
-      isVerified: false
-    });
-
-    currentData.boxes = boxes;
-    renderBoxes(boxes);
-    initAllDragDrop();
-
-    // Expand the new box
-    const newCard = document.getElementById(`box-${newBoxNumber}`);
-    if (newCard) newCard.classList.add('bl-box-card--expanded');
-  }
-
-  function deleteBox(boxNumber) {
-    if (!currentData) return;
-    const box = currentData.boxes.find(b => b.boxNumber === boxNumber);
-    if (box && box.items && box.items.length > 0) {
-      alert('Remove all items from this box before deleting it.');
-      return;
-    }
-
-    currentData.boxes = currentData.boxes.filter(b => b.boxNumber !== boxNumber);
-    renderBoxes(currentData.boxes);
-    initAllDragDrop();
-    recalcTotals();
-  }
-
-  async function verifyBox(boxNumber) {
-    if (!currentData) return;
-    const box = currentData.boxes.find(b => b.boxNumber === boxNumber);
-    if (!box) return;
-
-    box.isVerified = !box.isVerified;
-    box.verifiedBy = box.isVerified ? getRepackerName() : '';
-
-    renderBoxes(currentData.boxes);
-    initAllDragDrop();
-
-    // Save to backend if we have a shipment ID
-    if (savedShipmentId && box.isVerified) {
-      try {
-        await fetch(`${API_BASE}/api/box-shipments/${savedShipmentId}/verify-box`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ boxNumber, verifiedBy: getRepackerName() })
-        });
-      } catch (err) {
-        console.error('[BoxLabels] Verify save failed:', err);
-      }
-    }
-  }
-
-  function recalcTotals() {
-    if (!currentData) return;
-    const boxes = currentData.boxes || [];
-    const totalBoxedQty = boxes.reduce((s, b) =>
-      s + (b.items || []).reduce((s2, i) => s2 + (i.totalQty || i.Total_Qty || 0), 0), 0
-    );
-    const totalWO = currentData.summary?.totalWOQty || 0;
-
-    document.getElementById('totalBoxed').textContent = totalBoxedQty;
-    document.getElementById('totalUnboxed').textContent = totalWO - totalBoxedQty;
-    document.getElementById('mismatchWarning').style.display =
-      totalBoxedQty !== totalWO ? 'inline-block' : 'none';
-  }
-
-  // ==========================================
-  // Split Modal
-  // ==========================================
-  let splitState = {};
-
-  function startSplit(contentId, fromBox) {
-    if (!currentData) return;
-    const box = currentData.boxes.find(b => b.boxNumber === fromBox);
-    if (!box) return;
-
-    const item = box.items.find((it, idx) =>
-      (it.contentId || `${fromBox}-${idx}`) === contentId
-    );
-    if (!item) return;
-
-    // Ask which box to move to
-    const otherBoxes = currentData.boxes
-      .filter(b => b.boxNumber !== fromBox)
-      .map(b => b.boxNumber);
-
-    if (otherBoxes.length === 0) {
-      alert('Create a new box first, then split items into it.');
-      return;
-    }
-
-    // Default to the next box
-    const toBox = otherBoxes[0];
-    openSplitModal(contentId, item, fromBox, toBox);
-  }
-
-  function openSplitModal(contentId, item, fromBox, toBox) {
-    splitState = { contentId, item, fromBox, toBox };
-
-    // Build box selector
-    const otherBoxes = currentData.boxes.filter(b => b.boxNumber !== fromBox);
-    const boxOptions = otherBoxes.map(b =>
-      `<option value="${b.boxNumber}" ${b.boxNumber === toBox ? 'selected' : ''}>Box ${b.boxNumber}</option>`
-    ).join('');
-
-    document.getElementById('splitModalTitle').textContent = `Split items from Box ${fromBox}`;
-    document.getElementById('splitModalSubtitle').innerHTML =
-      `<strong>${escapeHtml(item.style || '')} - ${escapeHtml(item.color || '')}</strong><br>` +
-      `Move to: <select id="splitTargetBox" style="padding:4px 8px; font-size:14px; border-radius:4px; border:1px solid #ccc;">${boxOptions}</select>`;
-
-    const sizes = item.sizes || {};
-    const grid = document.getElementById('splitModalSizes');
-    grid.innerHTML = SIZE_COLUMNS.map(s => {
-      const avail = sizes[s] || 0;
-      if (avail === 0) return '';
-      return `
-        <div class="bl-split-cell">
-          <label>${s}</label>
-          <div class="bl-split-cell__avail">Avail: ${avail}</div>
-          <input type="number" min="0" max="${avail}" value="0" data-size="${s}" data-max="${avail}">
-        </div>
-      `;
-    }).join('');
-
+  // ── Split modal ──
+  function openSplitModal(fromKey, itemIdx) {
+    const from = boxByKey(fromKey);
+    const it = from && from.items[itemIdx];
+    if (!it) return;
+    splitCtx = { fromKey, itemIdx };
+    const targets = orderBoxes(from.po).filter(b => b.key !== fromKey);
+    els.splitModalTitle.textContent = 'Split to another box';
+    els.splitModalSubtitle.innerHTML = `<strong>${esc(it.style)} ${esc(it.size || '')} — ${esc(it.color || '')}</strong> · ${fmtNum(it.qty)} pcs in this box`;
+    els.splitModalBody.innerHTML = `
+      <div class="bl-split-row">
+        <label>Move</label>
+        <input type="number" id="splitQty" min="1" max="${it.qty}" value="1"> of ${fmtNum(it.qty)} pcs
+      </div>
+      <div class="bl-split-row">
+        <label>To</label>
+        <select id="splitTarget">
+          ${targets.map(b => `<option value="${esc(b.key)}">Box ${orderBoxes(from.po).indexOf(b) + 1}${b.trackingNumber ? ` (${esc(b.trackingNumber)})` : ''}</option>`).join('')}
+          <option value="__new__">＋ New box</option>
+        </select>
+      </div>`;
     els.splitModal.style.display = 'flex';
+    grab('splitQty').focus();
   }
 
-  function closeSplitModal() {
-    els.splitModal.style.display = 'none';
-    splitState = {};
-  }
+  function closeSplitModal() { els.splitModal.style.display = 'none'; splitCtx = null; }
 
   function confirmSplit() {
-    const targetBoxSelect = document.getElementById('splitTargetBox');
-    const toBox = targetBoxSelect ? parseInt(targetBoxSelect.value) : splitState.toBox;
-
-    const splitSizes = {};
-    els.splitModal.querySelectorAll('input[data-size]').forEach(input => {
-      const val = parseInt(input.value) || 0;
-      const max = parseInt(input.dataset.max) || 0;
-      if (val > 0) splitSizes[input.dataset.size] = Math.min(val, max);
-    });
-
-    if (Object.keys(splitSizes).length === 0) {
-      closeSplitModal();
-      return;
+    if (!splitCtx) return closeSplitModal();
+    const from = boxByKey(splitCtx.fromKey);
+    const it = from && from.items[splitCtx.itemIdx];
+    if (!it) return closeSplitModal();
+    const qty = Math.min(Math.max(parseInt(grab('splitQty').value, 10) || 0, 1), it.qty);
+    let targetKey = grab('splitTarget').value;
+    if (targetKey === '__new__') {
+      const key = `${from.po}#custom${Date.now()}`;
+      state.boxes.push({ key, po: from.po, source: 'Custom', trackingNumber: '', carrier: '', shipmentDate: '', items: [], verified: false, verifiedBy: '' });
+      targetKey = key;
     }
-
-    // Update in-memory state
-    if (currentData) {
-      const sourceBox = currentData.boxes.find(b => b.boxNumber === splitState.fromBox);
-      const targetBox = currentData.boxes.find(b => b.boxNumber === toBox);
-      const sourceItem = splitState.item;
-
-      if (sourceBox && targetBox && sourceItem) {
-        // Create new item in target box with split quantities
-        const newItem = {
-          style: sourceItem.style,
-          color: sourceItem.color,
-          description: sourceItem.description,
-          brand: sourceItem.brand,
-          sizes: { ...splitSizes },
-          totalQty: Object.values(splitSizes).reduce((s, v) => s + v, 0)
-        };
-        targetBox.items.push(newItem);
-
-        // Reduce source item quantities
-        for (const [size, qty] of Object.entries(splitSizes)) {
-          sourceItem.sizes[size] = (sourceItem.sizes[size] || 0) - qty;
-          if (sourceItem.sizes[size] <= 0) delete sourceItem.sizes[size];
-        }
-        sourceItem.totalQty = Object.values(sourceItem.sizes).reduce((s, v) => s + (v || 0), 0);
-
-        // Remove source item if empty
-        if (sourceItem.totalQty <= 0) {
-          const idx = sourceBox.items.indexOf(sourceItem);
-          if (idx >= 0) sourceBox.items.splice(idx, 1);
-        }
-      }
+    const to = boxByKey(targetKey);
+    if (!to) return closeSplitModal();
+    if (qty >= it.qty) {
+      from.items.splice(splitCtx.itemIdx, 1);
+      to.items.push(it);
+    } else {
+      it.qty -= qty;
+      const existing = to.items.find(x => x.style === it.style && x.color === it.color && x.size === it.size && x.title === it.title);
+      if (existing) existing.qty += qty;
+      else to.items.push({ style: it.style, title: it.title, color: it.color, size: it.size, qty });
     }
-
     closeSplitModal();
-
-    // Re-render everything with updated state
-    renderBoxes(currentData.boxes);
-    initAllDragDrop();
-    recalcTotals();
+    renderAll();
   }
 
-  // ==========================================
-  // PDF Generation
-  // ==========================================
-  function buildLabelFilename(order, boxInfo) {
-    const po = currentData?.sanmarPO || order?.customerPO || 'PO';
-    const company = (order?.company || 'Unknown').replace(/[^a-zA-Z0-9 ]/g, '').trim().replace(/\s+/g, '-');
-    const woNum = order?.orderNumber || '';
-    const suffix = boxInfo || 'all-boxes';
-    return `BoxLabel-${po}-${company}${woNum ? '-WO' + woNum : ''}-${suffix}.pdf`;
-  }
-
-  function printAllLabels() {
-    if (!currentData?.boxes?.length) return;
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'letter' });
-
-    const boxes = currentData.boxes.filter(b => b.items && b.items.length > 0);
-    const totalBoxes = boxes.length;
-
-    boxes.forEach((box, idx) => {
-      if (idx > 0) doc.addPage();
-      drawBoxLabel(doc, box, currentData.order, idx + 1, totalBoxes);
-    });
-
-    const filename = buildLabelFilename(currentData.order, totalBoxes + 'boxes');
-    doc.save(filename);
-  }
-
-  function printBoxLabel(boxNumber) {
-    if (!currentData) return;
-    const box = currentData.boxes.find(b => b.boxNumber === boxNumber);
-    if (!box) return;
-
-    const totalBoxes = currentData.boxes.filter(b => b.items?.length > 0).length;
-    const boxIdx = currentData.boxes.filter(b => b.items?.length > 0).indexOf(box) + 1;
-
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'letter' });
-    drawBoxLabel(doc, box, currentData.order, boxIdx, totalBoxes);
-
-    const filename = buildLabelFilename(currentData.order, 'box' + boxIdx);
-    doc.save(filename);
-  }
-
-  function drawBoxLabel(doc, box, order, boxIdx, totalBoxes) {
-    const pageW = 215.9;
-    const pageH = 279.4;
-    const margin = 10;
-    const contentW = pageW - margin * 2;
-    const R = pageW - margin; // right edge
-    let y = margin;
-
-    // ── Data extraction ──
-    const orderNum = String(order.orderNumber || '');
-    const company = order.company || '';
-    const hasCompany = company && !company.startsWith('SanMar PO:');
-    const shipDate = formatDate(order.requestedShipDate);
-    const custPO = order.customerPO || '';
-    const orderType = order.orderType || '';
-    const terms = order.terms || '';
-    const salesRep = order.salesRep || '';
-    const paidStatus = order.paidStatus || '';
-    const totalPcs = (box.items || []).reduce((s, i) => s + (i.totalQty || 0), 0);
-
-    // ════════════════════════════════════════════════════════
-    // ZONE 1: HEADER — Company + QR + WO# (y = 10-30mm)
-    // ════════════════════════════════════════════════════════
-
-    // QR Code — top right corner (above WO#)
-    const qrSize = 18;
-    const qrX = R - qrSize;
+  // ── Printing ──
+  function makeQr(po) {
     try {
       const qr = qrcode(0, 'M');
-      const poNum = currentData?.sanmarPO || currentData?.order?.customerPO || '';
-      const labelUrl = `${window.location.origin}/pages/box-labels.html?po=${poNum}`;
-      qr.addData(labelUrl);
+      qr.addData(`${window.location.origin}/pages/box-labels.html?po=${encodeURIComponent(po)}`);
       qr.make();
-      doc.addImage(qr.createDataURL(4, 0), 'PNG', qrX, margin, qrSize, qrSize);
-    } catch (e) { /* QR failed */ }
-
-    // WO# — right side, next to QR (no "WO#" label)
-    if (orderNum) {
-      doc.setFontSize(44);
-      doc.setFont('helvetica', 'bold');
-      doc.text(orderNum, qrX - 3, margin + 14, { align: 'right' });
-    }
-
-    // Company name — left side, 28pt
-    if (hasCompany) {
-      doc.setFont('helvetica', 'bold');
-      // Try to fit on one line — shrink font if needed
-      const maxCompanyW = contentW * 0.52;
-      let companyFontSize = 28;
-      doc.setFontSize(companyFontSize);
-      while (companyFontSize > 18 && doc.getTextWidth(company) > maxCompanyW) {
-        companyFontSize -= 2;
-        doc.setFontSize(companyFontSize);
-      }
-      const companyLines = doc.splitTextToSize(company, maxCompanyW);
-      companyLines.forEach(line => { doc.text(line, margin, y + 9); y += companyFontSize * 0.38; });
-    }
-
-    y = Math.max(y, margin + 18);
-
-    // ════════════════════════════════════════════════════════
-    // ZONE 2: ORDER INFO (y ≈ 30-48mm)
-    // ════════════════════════════════════════════════════════
-
-    // Order Type | Terms | Paid Status (all inline, left-aligned)
-    const infoParts = [orderType, terms, paidStatus].filter(Boolean);
-    if (infoParts.length) {
-      doc.setFontSize(13);
-      doc.setFont('helvetica', 'normal');
-      const mainInfo = [orderType, terms].filter(Boolean).join('  |  ');
-      doc.text(mainInfo, margin, y);
-      // Paid status — smaller, black, appended after terms
-      if (paidStatus && mainInfo) {
-        const mainWidth = doc.getTextWidth(mainInfo);
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'normal');
-        doc.text(`  —  ${paidStatus}`, margin + mainWidth, y);
-      } else if (paidStatus) {
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'normal');
-        doc.text(paidStatus, margin, y);
-      }
-    }
-    y += 6;
-
-    // Design info
-    if (order.designs?.length && order.designs[0]?.name) {
-      doc.setFontSize(11);
-      doc.setFont('helvetica', 'bold');
-      doc.text('Design:', margin, y);
-      doc.setFont('helvetica', 'normal');
-      const d = order.designs[0];
-      doc.text(`${d.number ? d.number + '  ' : ''}${d.name}`, margin + 18, y);
-      y += 5;
-    }
-
-    // PO Number + Rep
-    const detailParts = [];
-    if (custPO) detailParts.push(`PO Number: ${custPO}`);
-    if (salesRep) detailParts.push(`Rep: ${salesRep}`);
-    if (detailParts.length) {
-      doc.setFontSize(11);
-      doc.setFont('helvetica', 'normal');
-      doc.text(detailParts.join('   |   '), margin, y);
-      y += 5;
-    }
-
-    // ════════════════════════════════════════════════════════
-    // ZONE 3: KEY METRICS BAR (y ≈ 48-62mm)
-    // ════════════════════════════════════════════════════════
-
-    y += 1;
-    doc.setDrawColor(80);
-    doc.setLineWidth(0.5);
-    doc.line(margin, y, R, y);
-    doc.setLineWidth(0.2);
-    y += 3;
-
-    // Pcs total (left, 18pt)
-    doc.setFontSize(18);
-    doc.setFont('helvetica', 'bold');
-    doc.text(`${totalPcs} pcs total`, margin, y + 5);
-
-    // Ship date (right, 28pt)
-    if (shipDate) {
-      doc.setFontSize(9);
-      doc.setFont('helvetica', 'normal');
-      doc.text('Req. Ship Date', R, y, { align: 'right' });
-      doc.setFontSize(28);
-      doc.setFont('helvetica', 'bold');
-      doc.text(shipDate, R, y + 10, { align: 'right' });
-    }
-    y += 14;
-
-    doc.setDrawColor(80);
-    doc.setLineWidth(0.5);
-    doc.line(margin, y, R, y);
-    doc.setLineWidth(0.2);
-    y += 3;
-
-    // ════════════════════════════════════════════════════════
-    // ZONE 4: BOX IDENTIFIER (y ≈ 65-80mm) — above fold line
-    // ════════════════════════════════════════════════════════
-
-    doc.setFontSize(36);
-    doc.setFont('helvetica', 'bold');
-    doc.text(`BOX  ${boxIdx}  OF  ${totalBoxes}`, pageW / 2, y + 10, { align: 'center' });
-    y += 16;
-
-    doc.setDrawColor(80);
-    doc.setLineWidth(0.5);
-    doc.line(margin, y, R, y);
-    doc.setLineWidth(0.2);
-    y += 4;
-
-    // ════════════════════════════════════════════════════════
-    // ZONE 5: CONTENTS (y ≈ 84mm → fills remaining space)
-    // ════════════════════════════════════════════════════════
-
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'bold');
-    doc.text('Contents', margin, y);
-    y += 6;
-
-    // Dynamic sizing based on item count
-    const itemCount = (box.items || []).length;
-    const compact = itemCount > 5;
-    const styleFontSize = compact ? 10 : 11;
-    const colorFontSize = compact ? 8 : 9;
-    const gridFontSize = compact ? 11 : 13;
-    const gridHeadSize = compact ? 7 : 8;
-    const gridPadding = compact ? 1.5 : 2;
-    const itemSpacing = compact ? 3 : 4;
-    const maxY = pageH - margin - 15; // Leave 15mm for footer
-
-    for (const item of (box.items || [])) {
-      if (y + 15 > maxY) break;
-
-      const style = item.style || item.Style_Number || '';
-      const desc = item.description || item.Description || '';
-      let displayDesc = desc;
-      if (desc !== style && desc.endsWith(`. ${style}`)) displayDesc = desc.slice(0, -(style.length + 2));
-      if (desc === style) displayDesc = '';
-
-      doc.setFontSize(styleFontSize);
-      doc.setFont('helvetica', 'bold');
-      const styleLabel = displayDesc ? `${style} - ${displayDesc}` : style;
-      doc.text(doc.splitTextToSize(styleLabel, contentW - 4)[0], margin + 1, y);
-      y += styleFontSize * 0.4 + 1;
-
-      doc.setFontSize(colorFontSize);
-      doc.setFont('helvetica', 'normal');
-      doc.text(`${item.color || ''} — ${item.totalQty || 0} pcs`, margin + 1, y);
-      y += colorFontSize * 0.35 + 1.5;
-
-      // Size grid
-      const sizes = item.sizes || {};
-      const activeCols = [];
-      const activeVals = [];
-      SIZE_COLUMNS.forEach(s => {
-        let val = sizes[s] || 0;
-        if (!val) {
-          for (const [alias, std] of Object.entries(SIZE_ALIASES)) {
-            if (std === s && sizes[alias]) { val = sizes[alias]; break; }
-          }
-        }
-        if (val > 0) { activeCols.push(s); activeVals.push(String(val)); }
-      });
-
-      // OSFA/one-size items: if no standard sizes found, show a Qty box
-      if (activeCols.length === 0 && (item.totalQty || 0) > 0) {
-        // Check for OSFA or Other in sizes
-        const osfaVal = sizes['OSFA'] || sizes['Other'] || sizes['ONE SIZE'] || sizes['O/S'] || item.totalQty;
-        activeCols.push('Qty');
-        activeVals.push(String(osfaVal));
-      }
-
-      if (activeCols.length > 0) {
-        doc.autoTable({
-          startY: y,
-          margin: { left: margin + 1 },
-          head: [activeCols],
-          body: [activeVals],
-          theme: 'grid',
-          styles: {
-            fontSize: gridFontSize, fontStyle: 'bold', halign: 'center',
-            cellPadding: gridPadding, lineWidth: 0.3, lineColor: [100, 100, 100]
-          },
-          headStyles: {
-            fillColor: [235, 235, 235], textColor: [50, 50, 50],
-            fontSize: gridHeadSize, fontStyle: 'bold', cellPadding: 1
-          },
-          bodyStyles: { fillColor: [255, 255, 255], textColor: [0, 0, 0] },
-          tableWidth: Math.min(activeCols.length * 18, contentW * 0.55)
-        });
-        y = doc.lastAutoTable.finalY + itemSpacing;
-      } else {
-        y += 2;
-      }
-    }
-
-    // ════════════════════════════════════════════════════════
-    // ZONE 6: FOOTER — minimal (OK if cut off when folded)
-    // ════════════════════════════════════════════════════════
-
-    const footerY = pageH - margin - 10;
-    doc.setDrawColor(150);
-    doc.setLineWidth(0.3);
-    doc.line(margin, footerY, R, footerY);
-
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(120, 120, 120);
-    const footerParts = [];
-    if (custPO) footerParts.push(`PO Number: ${custPO}`);
-    if (orderNum) footerParts.push(`WO# ${orderNum}`);
-    if (footerParts.length) {
-      doc.text(footerParts.join('   |   '), pageW / 2, footerY + 5, { align: 'center' });
-    }
-    doc.setTextColor(0, 0, 0);
+      return qr.createDataURL(4, 0);
+    } catch (e) { return null; } // label simply prints without a QR
   }
 
-  // ==========================================
-  // Utilities
-  // ==========================================
-  function formatDate(dateStr) {
-    if (!dateStr) return '';
+  // Re-pull order-level fields right before printing so the label never carries a stale
+  // rush/due (same stance as the receiving sheets' syncBeforeOutput) — but the BOXES stay
+  // exactly as arranged: they describe what a human just physically packed.
+  async function freshenOrders() {
+    const data = await fetchLabelData(state.identifier, state.type, true);
+    const byPo = new Map((data.orders || []).map(o => [o.sanmarPO, o]));
+    state.orders = state.orders.map(o => {
+      const fresh = byPo.get(o.sanmarPO);
+      return fresh ? Object.assign({}, fresh, { logoUrl: o.logoUrl || fresh.logoUrl }) : o;
+    });
+    state.loadedAt = Date.now();
+  }
+
+  async function printLabels(onlyKey) {
+    const T = window.BoxLabelTemplate;
+    hideError();
+    const btn = els.printAllBtn;
+    const restore = btn.textContent;
+    btn.disabled = true; btn.textContent = 'Re-checking order…';
     try {
-      const d = new Date(dateStr);
-      if (isNaN(d.getTime())) return dateStr;
-      return `${d.getMonth() + 1}/${d.getDate()}/${String(d.getFullYear()).slice(2)}`;
-    } catch {
-      return dateStr;
+      await freshenOrders();
+      renderAll(); // fresh rush/due chips on screen too
+    } catch (err) {
+      // Loud, with an explicit escape hatch — never a silent stale label (Rule #4).
+      btn.disabled = false; btn.textContent = restore;
+      showError(`Couldn't re-check the order before printing (${err.message}). The rush/due info on the label may be out of date.`,
+        [{ label: 'Print anyway', onClick: () => { hideError(); doPrint(onlyKey); } }]);
+      return;
     }
+    btn.disabled = false; btn.textContent = restore;
+    doPrint(onlyKey);
   }
 
-  function escapeHtml(str) {
-    const div = document.createElement('div');
-    div.textContent = str || '';
-    return div.innerHTML;
-  }
-
-  function showLoading(show) {
-    els.loadingState.style.display = show ? 'block' : 'none';
-    if (show) {
-      els.mainContent.style.display = 'none';
-      els.orderBanner.style.display = 'none';
-      els.totalsBar.style.display = 'none';
+  function doPrint(onlyKey) {
+    const T = window.BoxLabelTemplate;
+    const printedOn = todayShort();
+    const repackedBy = repacker();
+    const pieces = [];
+    for (const o of state.orders) {
+      const boxes = orderBoxes(o.sanmarPO).filter(b => b.items.length);
+      const qrUrl = makeQr(o.sanmarPO);
+      boxes.forEach((b, i) => {
+        if (onlyKey && b.key !== onlyKey) return;
+        pieces.push(T.renderLabel(o, { items: b.items, trackingNumber: b.trackingNumber, carrier: b.carrier }, i + 1, boxes.length, {
+          printedOn,
+          repackedBy: repackedBy || undefined,
+          qr: qrUrl ? { dataUrl: qrUrl, hint: 'Scan → reprint labels' } : undefined,
+        }));
+      });
     }
+    if (!pieces.length) { showError('Nothing to print — every box is empty.'); return; }
+    T.printSheet(pieces.join(''));
   }
 
-  function showError(msg) {
+  // ── UI chrome ──
+  function showLoading(on) {
+    els.loadingState.style.display = on ? 'block' : 'none';
+    if (on) { els.mainContent.style.display = 'none'; els.totalsBar.style.display = 'none'; }
+  }
+  function showError(msg, actions) {
     els.errorMessage.textContent = msg;
+    els.errorActions.innerHTML = '';
+    (actions || []).forEach(a => {
+      const b = document.createElement('button');
+      b.className = 'bl-btn bl-btn--danger';
+      b.textContent = a.label;
+      b.addEventListener('click', a.onClick);
+      els.errorActions.appendChild(b);
+    });
     els.errorState.style.display = 'flex';
   }
-
-  function hideError() {
-    els.errorState.style.display = 'none';
-  }
-
-  // ==========================================
-  // Inline Quantity Editing
-  // ==========================================
-  function editSizeQty(cellEl, sizeName) {
-    // Don't re-edit if already editing
-    if (cellEl.querySelector('input')) return;
-
-    const valueEl = cellEl.querySelector('.bl-size-cell__value');
-    const currentVal = parseInt(valueEl.textContent) || 0;
-
-    // Replace value with input
-    const input = document.createElement('input');
-    input.type = 'number';
-    input.min = '0';
-    input.max = '999';
-    input.value = currentVal;
-    input.style.cssText = 'width:50px; text-align:center; font-size:16px; font-weight:700; padding:2px; border:2px solid #3b82f6; border-radius:4px;';
-    valueEl.textContent = '';
-    valueEl.appendChild(input);
-    input.focus();
-    input.select();
-
-    // Find the parent item card to update data
-    const itemCard = cellEl.closest('.bl-item-card');
-    const boxNumber = parseInt(itemCard?.dataset?.box) || 0;
-
-    function commitEdit() {
-      const newVal = Math.max(0, parseInt(input.value) || 0);
-      valueEl.textContent = newVal || '-';
-      cellEl.classList.toggle('bl-size-cell--has-value', newVal > 0);
-      cellEl.classList.toggle('bl-size-cell--empty', newVal === 0);
-
-      // Update the underlying data
-      if (currentData && boxNumber > 0) {
-        const box = currentData.boxes.find(b => b.boxNumber === boxNumber);
-        if (box) {
-          const contentId = itemCard.dataset.contentId;
-          const item = box.items.find((it, idx) => (it.contentId || `${boxNumber}-${idx}`) === contentId);
-          if (item && item.sizes) {
-            const oldVal = item.sizes[sizeName] || 0;
-            item.sizes[sizeName] = newVal;
-            item.totalQty = (item.totalQty || 0) - oldVal + newVal;
-            // Update the qty display on the card
-            const qtyEl = itemCard.querySelector('.bl-item-card__qty');
-            if (qtyEl) qtyEl.textContent = `${item.totalQty} pcs`;
-          }
-        }
-        recalcTotals();
-      }
-    }
-
-    input.addEventListener('blur', commitEdit);
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') { input.blur(); }
-      if (e.key === 'Escape') { input.value = currentVal; input.blur(); }
-      e.stopPropagation(); // Don't trigger drag
-    });
-  }
-
-  // ==========================================
-  // Public API (called from HTML onclick)
-  // ==========================================
-  window.BL = {
-    toggleBox,
-    verifyBox,
-    printBoxLabel,
-    deleteBox,
-    openSplitModal,
-    startSplit,
-    editSizeQty
-  };
-
+  function hideError() { els.errorState.style.display = 'none'; els.errorActions.innerHTML = ''; }
 })();

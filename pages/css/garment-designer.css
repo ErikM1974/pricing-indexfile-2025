@@ -2154,3 +2154,119 @@
   #toolbar > .easy-divider { display: none; }
 }
 
+
+/* ============================================================
+   2026-08-04 — Guided workflow declutter
+   One entry point (the landing hero). Chrome reveals as the mockup
+   progresses: garment-designer.js sets body.has-art whenever the
+   entries[] list is non-empty (updateWorkflowState). Until then the
+   page shows only the Add + Shirt toolbar groups and the landing —
+   no disabled placement rail, no empty "—" advisors, no send buttons
+   for a mockup that doesn't exist yet.
+   ============================================================ */
+
+/* Empty state: hide everything that can't act on artwork yet */
+body:not(.has-art) .tb-group.needs-art { display: none; }
+body:not(.has-art) #sidebar { display: none; }
+body.left-controls-layout:not(.has-art) #sidebar { display: none; }
+body:not(.has-art) #infoPanel { display: none !important; }
+
+/* Labeled toolbar groups — the button wall becomes a scannable map */
+#toolbar .tb-group[data-label] {
+  position: relative;
+  border: 1px solid #e2e9dc;
+  background: #fbfdf9;
+  border-radius: 12px;
+  padding: 17px 9px 7px;
+  gap: 7px;
+}
+#toolbar .tb-group[data-label]::before {
+  content: attr(data-label);
+  position: absolute;
+  top: 3px;
+  left: 10px;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+  color: #7d8a76;
+  pointer-events: none;
+}
+@media (max-width: 900px) {
+  /* groups dissolve to display:contents here — a positioned label would float loose */
+  #toolbar .tb-group[data-label]::before { display: none; }
+}
+
+/* Landing hero: upload cards are real <button>s now */
+button.easy-upload-card { font: inherit; width: 100%; }
+.easy-text-start {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  cursor: pointer;
+}
+.easy-text-start:hover { background: var(--brand-light); border-color: var(--brand-mid); }
+.easy-formats {
+  margin-top: 14px;
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+/* Fabric input lives with the advice it feeds (Print Method Advisor) */
+.advisor-fabric-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+.advisor-fabric-row label {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+.advisor-fabric-row .fabric-select { flex: 1; min-width: 0; }
+
+/* Multi-page PDF navigation — floats over the stage (it previously sat
+   inside .easy-hidden-tools where display:none made it unreachable) */
+#pageNav.stage-pagenav {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 14px;
+  z-index: 30;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 8px;
+  box-shadow: 0 6px 18px rgba(18,34,11,.15);
+}
+
+/* Per-file remove — uploads were previously permanent for the session */
+.file-x {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: #fff;
+  color: var(--text-dim);
+  font-size: 14px;
+  line-height: 1;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.file-x:hover { background: #fde8e8; border-color: #d9534f; color: #b52b27; }

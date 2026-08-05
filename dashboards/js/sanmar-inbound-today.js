@@ -10,7 +10,11 @@
  * Plus a one-click "Print / Save PDF" of the whole day's incoming report.
  *
  * Data: GET {API_BASE}/api/sanmar-orders/inbound-today
- * Self-contained — reads APP_CONFIG, builds its own modal, no dependencies.
+ * Reads APP_CONFIG and builds its own modal. ONE dependency (2026-08-04):
+ * shared_components/js/box-label-template.js (+ its box-label-print.css) renders
+ * the per-box labels and owns the rush/follow-on wording — shared with the
+ * repack station (pages/box-labels.html) so the two label surfaces can't drift.
+ * Load both shared files BEFORE this one; the modal fails loud if they're missing.
  * Exposes: window.openInboundTodayModal()
  * ============================================================ */
 (function () {
@@ -26,7 +30,6 @@
 
   let modalEl = null;
   let lastData = null;
-  let labelPrintedOn = '';
   let viewDate = null;   // ISO date currently shown (set after each load)
   let calOpen = false;   // is the calendar shown in the body?
   let calMonth = null;   // 'YYYY-MM' the calendar is showing
@@ -70,18 +73,11 @@
     return `<span class="sit-issue ${isBo ? 'sit-issue--bo' : 'sit-issue--hold'}" title="${esc(tip)}">⚠ ${label}</span>`;
   }
 
-  // RUSH badge (Erik 2026-08-04). Three or fewer WORKING days between these blanks landing
-  // and the due date — weekends and company holidays already excluded by the API, using the
-  // same calendar as the arrival estimate. `pastDue` means the due date is on or before the
-  // arrival day, which is worse than a rush and says so.
-  // Deliberately loud: this is the one thing on the sheet that changes what production does
-  // first, and it has to survive being read on a printout across the room.
-  function rushText(o) {
-    if (!o || !o.rush) return '';
-    const d = o.productionDays;
-    if (o.pastDue) return d === 0 ? 'PAST DUE — due the day it lands' : `PAST DUE by ${Math.abs(d)} working day${Math.abs(d) === 1 ? '' : 's'}`;
-    return `RUSH — ${d} working day${d === 1 ? '' : 's'} to due date`;
-  }
+  // RUSH wording lives in BoxLabelTemplate (shared with the repack station's labels) so a
+  // printed label and an on-screen badge can never phrase the same order differently.
+  // Direct call, no fallback: openInboundTodayModal refuses to load without the template,
+  // so a silent '' here could only ever hide a real defect (Rule #4).
+  function rushText(o) { return window.BoxLabelTemplate.rushText(o); }
   function rushBadge(o) {
     const t = rushText(o);
     if (!t) return '';
@@ -97,10 +93,7 @@
     const on = o.receivedDate ? ' ' + fmtShortDate(o.receivedDate) : '';
     return `<span class="sit-followon" title="This PO was counted in${on ? ' on' + on : ''}, but SanMar shipped this carton afterwards — these pieces are NOT on the shelf yet.">↩ Follow-on shipment${on ? ' · counted in' + on : ''}</span>`;
   }
-  function followOnText(o) {
-    if (!o || !o.followOnShipment) return '';
-    return 'FOLLOW-ON — PO counted in' + (o.receivedDate ? ' ' + fmtShortDate(o.receivedDate) : '') + ', this carton shipped after';
-  }
+  function followOnText(o) { return window.BoxLabelTemplate.followOnText(o); }
 
   // ── Line-item rows for one PO (screen) ──
   function linesTable(lines) {
@@ -499,7 +492,7 @@
         <td class="sit-rt-c">${fmtNum(o.piecesShipped)}</td>
         <td>${esc(initials(o.salesRep))}</td>
       </tr>`).join('');
-      return `<div class="sit-rt-method" style="border-left-color:${METHOD_DARK[m] || '#444'}">${esc(m)} <span class="sit-rt-method-sub">${list.length} order${list.length === 1 ? '' : 's'} · ${fmtNum(pcs)} pcs</span></div>
+      return `<div class="sit-rt-method" style="border-left-color:${window.BoxLabelTemplate.METHOD_DARK[m] || '#444'}">${esc(m)} <span class="sit-rt-method-sub">${list.length} order${list.length === 1 ? '' : 's'} · ${fmtNum(pcs)} pcs</span></div>
         <table class="sit-rt-tbl"><thead><tr><th>Due</th><th>Company</th><th>WO</th><th>Design</th><th class="sit-rt-c">Pcs</th><th>Rep</th></tr></thead><tbody>${rows}</tbody></table>`;
     }).join('');
     const s = sumOrders(orders);
@@ -583,26 +576,7 @@
     if (!y) return '';
     return new Date(y, (m || 1) - 1, day || 1).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
   }
-  const SIZE_ORDER = ['XS', 'S', 'M', 'L', 'XL', '2XL', 'XXL', '3XL', '4XL', '5XL', '6XL'];
-  function sizeRank(s) { const i = SIZE_ORDER.indexOf(String(s || '').toUpperCase()); return i < 0 ? 999 : i; }
-  // Dark, print-legible color per method for the order-type band.
-  const METHOD_DARK = { 'Embroidery': '#2e6f40', 'Screen Print': '#185fa5', 'DTG': '#854f0b', 'DTF': '#534ab7', 'Sticker': '#993556', 'Emblem': '#0f6e56', 'Online Store': '#444', 'Inksoft': '#b23b0e', 'Other': '#444' };
-  // Pivot a box's flat items into a size matrix: one row per style+color, dynamic size columns
-  // (standard sizes XS..6XL first, then any others like OSFA/pant sizes/NB appended).
-  function buildMatrix(items) {
-    const rows = new Map(); const sizes = new Set();
-    for (const it of (items || [])) {
-      const key = (it.style || '') + '|' + (it.color || '');
-      let r = rows.get(key);
-      if (!r) { r = { style: it.style || '', title: it.title || '', color: it.color || '', q: {}, total: 0 }; rows.set(key, r); }
-      const sz = it.size || '—';
-      r.q[sz] = (r.q[sz] || 0) + (it.qty || 0);
-      r.total += (it.qty || 0);
-      sizes.add(sz);
-    }
-    const cols = [...sizes].sort((a, b) => { const ra = sizeRank(a), rb = sizeRank(b); return ra !== rb ? ra - rb : String(a).localeCompare(String(b)); });
-    return { rows: [...rows.values()], cols };
-  }
+  // (Size pivot, method colors and the label markup live in BoxLabelTemplate.)
   // Resolve an order to its print-ready boxes (live box detail, or one synthesized box from PO lines).
   function boxesForOrder(order) {
     if (order.boxDetailAvailable && order.boxDetail && order.boxDetail.length) {
@@ -616,70 +590,14 @@
     };
     return [{ order, box, boxNo: 1, boxTotal: 1 }];
   }
-  function oneLabel(order, box, boxNo, boxTotal) {
-    const method = order.method || 'Other';
-    const mColor = METHOD_DARK[method] || '#444';
-    const mx = buildMatrix(box.items);
-    const dense = (mx.rows.length > 14 || mx.cols.length > 9) ? ' sl-mx--dense' : '';
-    const head = `<tr><th>Style</th><th>Description</th><th>Color</th>${mx.cols.map(c => `<th class="sl-c">${esc(c)}</th>`).join('')}<th class="sl-c">Tot</th></tr>`;
-    const body = mx.rows.map(r => `<tr><td class="sl-style">${esc(r.style)}</td><td>${esc(r.title)}</td><td>${esc(r.color || '—')}</td>${mx.cols.map(c => { const q = r.q[c] || 0; return `<td class="sl-c${q ? '' : ' sl-z'}">${q ? fmtNum(q) : '·'}</td>`; }).join('')}<td class="sl-c sl-rt">${fmtNum(r.total)}</td></tr>`).join('');
-    const colTot = mx.cols.map(c => mx.rows.reduce((t, r) => t + (r.q[c] || 0), 0));
-    const grand = colTot.reduce((a, b) => a + b, 0);
-    const totalRow = `<tr class="sl-tot"><td colspan="3">TOTAL</td>${colTot.map(t => `<td class="sl-c">${fmtNum(t)}</td>`).join('')}<td class="sl-c">${fmtNum(grand)}</td></tr>`;
-    const logo = order.logoUrl
-      ? `<img class="sl-logo-img" src="${esc(order.logoUrl)}" alt="Design ${esc(order.designNumber || '')} artwork" onerror="this.outerHTML='<span class=\\'sl-logo-none\\'>artwork unavailable</span>';">`
-      : `<span class="sl-logo-none">No artwork on file</span>`;
-    return `<div class="sit-label">
-      <div class="sl-top">
-        <div class="sl-type" style="border-left-color:${mColor}"><span class="sl-type-l">ORDER TYPE</span><span class="sl-type-name" style="color:${mColor}">${esc(method.toUpperCase())}</span></div>
-        <div class="sl-woblock">
-          <div class="sl-wolabel">WORK ORDER</div>
-          <div class="sl-wo">#${esc(order.workOrder || '?')}</div>
-          ${order.dueDate ? `<div class="sl-duedate">Due: ${esc(fmtShortDate(order.dueDate))}</div>` : ''}
-          ${rushText(order) ? `<div class="sl-rush">⚡ ${esc(rushText(order))}</div>` : ''}
-          <div class="sl-ddbox"><span class="sl-ddlabel">DROP DEAD DATE</span></div>
-        </div>
-      </div>
-      <div class="sl-company">${esc(order.company || '—')}</div>
-      ${order.followOnShipment ? `<div class="sl-followon">${esc(followOnText(order))}</div>` : ''}
-      <div class="sl-contact">
-        <span class="sl-cname">${esc(order.contactName || '')}</span>
-        <span class="sl-cright">${order.salesRep ? `<span class="sl-rep">REP: ${esc(initials(order.salesRep))}</span>` : ''}${order.dateOrdered ? `<span class="sl-ord">Ordered: ${esc(fmtShortDate(order.dateOrdered))}</span>` : ''}</span>
-      </div>
-      ${order.customerPO ? `<div class="sl-custpo">Cust PO: ${esc(order.customerPO)}</div>` : ''}
-      <div class="sl-meta">
-        <div class="sl-mb"><span class="sl-l">DESIGN #</span><span class="sl-v">${esc(order.designNumber || '—')}</span>${order.designName ? `<span class="sl-dn">${esc(order.designName)}</span>` : ''}</div>
-        <div class="sl-mb sl-mb--ctr"><span class="sl-l">BOX</span><span class="sl-v">${fmtNum(boxNo)} of ${fmtNum(boxTotal)}</span></div>
-      </div>
-      <div class="sl-meta sl-meta--manual">
-        <div class="sl-mb sl-fill" style="flex:1.7">
-          <span class="sl-l">SHIP METHOD <span class="sl-hint">— circle one</span></span>
-          <span class="sl-ship"><b>PICKUP</b><b>SHIP</b><span class="sl-other">Other ______</span></span>
-          ${order.terms ? `<span class="sl-terms">Terms: ${esc(order.terms)}</span>` : ''}
-        </div>
-        <div class="sl-mb sl-logo">${logo}</div>
-      </div>
-      <table class="sl-mx${dense}"><thead>${head}</thead><tbody>${body}${totalRow}</tbody></table>
-      <div class="sl-foot"><span>SanMar PO ${esc(order.sanmarPO)}${box.trackingNumber ? ('&nbsp;&nbsp;·&nbsp;&nbsp;' + esc(box.carrier || '') + ' ' + esc(box.trackingNumber)) : ''}&nbsp;&nbsp;·&nbsp;&nbsp;Received by __________</span>${labelPrintedOn ? `<span class="sl-printed">Printed ${esc(labelPrintedOn)}</span>` : ''}</div>
-    </div>`;
-  }
+  // Render + print through the shared template — the receiving label and the repack
+  // station's label are the same markup by construction.
   function printLabels(pairs) {
     if (!pairs || !pairs.length) return;
-    labelPrintedOn = todayShort();
-    const old = document.getElementById('sit-label-sheet'); if (old) old.remove();
-    const sheet = document.createElement('div');
-    sheet.id = 'sit-label-sheet';
-    sheet.innerHTML = pairs.map(p => oneLabel(p.order, p.box, p.boxNo, p.boxTotal)).join('');
-    document.body.appendChild(sheet);
-    document.body.classList.add('sit-label-printing');
-    const cleanup = () => {
-      document.body.classList.remove('sit-label-printing');
-      const s = document.getElementById('sit-label-sheet'); if (s) s.remove();
-      window.removeEventListener('afterprint', cleanup);
-    };
-    window.addEventListener('afterprint', cleanup);
-    window.print();
-    setTimeout(() => { if (document.body.classList.contains('sit-label-printing')) cleanup(); }, 1500);
+    const printedOn = todayShort();
+    window.BoxLabelTemplate.printSheet(
+      pairs.map(p => window.BoxLabelTemplate.renderLabel(p.order, p.box, p.boxNo, p.boxTotal, { printedOn })).join('')
+    );
   }
   async function printAllLabels() {
     // Same rule as the reports: a label run printed off a stale payload is short exactly the
@@ -1039,6 +957,14 @@
   window.openInboundTodayModal = function () {
     if (!modalEl) build();
     modalEl.style.display = 'flex';
+    if (!window.BoxLabelTemplate) {
+      // The shared label renderer didn't load — refuse to run rather than render sheets
+      // with blank rush badges and a dead Box Labels button (Never-Break Rule #4).
+      setContent(`<div class="sit-error"><i class="fas fa-triangle-exclamation"></i>
+        box-label-template.js didn't load — refresh the page.<br>
+        <small>Rush badges and box labels can't render without it, so nothing was loaded.</small></div>`);
+      return;
+    }
     load(false);
   };
 

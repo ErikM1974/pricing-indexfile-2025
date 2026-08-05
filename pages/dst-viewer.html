@@ -4,101 +4,318 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
-<title>DST Stitch Viewer — NW Custom Apparel</title>
-<link rel="icon" href="https://images.squarespace-cdn.com/content/v1/60f1a60d5f21c03fe5549985/4e1acba2-7884-430e-ba05-42daac3dbc2a/favicon.ico" type="image/x-icon">
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+<title>Embroidery Studio — DST Viewer | NWCA</title>
+<link rel="icon" href="https://cdn.caspio.com/A0E1B000/Images/Favicon/nwca-favicon-32.png">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="/pages/css/dst-viewer.css">
+<link rel="stylesheet" href="/pages/css/dst-viewer.css?v=20260804">
 </head>
 <body>
 
-<div class="header">
-  <a href="/staff-dashboard.html" title="Back to Dashboard">
-    <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9324467" alt="NWCA" class="header-logo" onerror="this.style.display='none'">
-  </a>
-  <div class="header-divider"></div>
-  <h1>DST Stitch Viewer</h1>
+<div class="studio-root">
+
+  <header class="topbar">
+    <a class="brand" href="/staff-dashboard.html" title="Back to Dashboard">
+      <img src="https://cdn.caspio.com/A0E1B000/Images/1702507702032_nwca-logo-white-h_200.png" alt="NWCA" class="brand-logo">
+    </a>
+    <div class="brand-title">
+      <span class="brand-name">Embroidery Studio</span>
+      <span class="brand-sub">DST viewer · true-scale mockups · production planner</span>
+    </div>
+
+    <button type="button" id="fileChip" class="file-chip" title="Click to replace the loaded file">
+      <i class="fas fa-file-lines"></i>
+      <span class="file-chip-text">
+        <span id="fileChipName">No file loaded</span>
+        <span id="fileChipMeta">drop a .DST anywhere on this page</span>
+      </span>
+    </button>
+
+    <div class="topbar-actions">
+      <button type="button" id="btnSample" class="tb-btn ghost needs-nofile"><i class="fas fa-wand-magic-sparkles"></i> Sample</button>
+      <button type="button" id="btnCopySummary" class="tb-btn needs-file" title="Copy a production summary for ShopWorks or email"><i class="fas fa-copy"></i> Summary</button>
+      <button type="button" id="btnExportDesign" class="tb-btn needs-file" title="Download the stitch render as a transparent PNG"><i class="fas fa-image"></i> PNG</button>
+      <button type="button" id="btnPrintSheet" class="tb-btn accent needs-file"><i class="fas fa-file-signature"></i> Approval Sheet</button>
+      <button type="button" id="btnNewFile" class="tb-btn ghost"><i class="fas fa-folder-open"></i> Open</button>
+      <a class="tb-link" href="/pages/mockup-generator.html" title="EMB + ShopWorks PDF color tools">Mockup Generator <i class="fas fa-arrow-right-long"></i></a>
+    </div>
+  </header>
+
+  <div class="workbench">
+
+    <nav class="toolrail" aria-label="View tools">
+      <div class="rail-group">
+        <span class="rail-label">View</span>
+        <button type="button" class="rail-btn active" data-mode="stitch" title="Realistic thread render (1)"><i class="fas fa-braille"></i><span>Stitch</span></button>
+        <button type="button" class="rail-btn" data-mode="flat" title="Flat color lines (2)"><i class="fas fa-draw-polygon"></i><span>Flat</span></button>
+        <button type="button" class="rail-btn" data-mode="wire" title="Structure + jumps (3)"><i class="fas fa-diagram-project"></i><span>Wire</span></button>
+        <button type="button" class="rail-btn" data-mode="trace" title="Sew-order playback (4)"><i class="fas fa-circle-play"></i><span>Trace</span></button>
+      </div>
+      <div class="rail-group">
+        <span class="rail-label">Overlay</span>
+        <button type="button" id="btnGrid" class="rail-btn active" title="mm grid (G)"><i class="fas fa-border-all"></i><span>Grid</span></button>
+        <button type="button" id="btnDensity" class="rail-btn" title="Stitch density heatmap (D)"><i class="fas fa-fire"></i><span>Density</span></button>
+      </div>
+      <div class="rail-group">
+        <span class="rail-label">Zoom</span>
+        <button type="button" id="btnZoomIn" class="rail-btn" title="Zoom in (+)"><i class="fas fa-plus"></i></button>
+        <button type="button" id="btnZoomOut" class="rail-btn" title="Zoom out (−)"><i class="fas fa-minus"></i></button>
+        <button type="button" id="btnZoomFit" class="rail-btn" title="Fit design (F)"><i class="fas fa-compress"></i><span>Fit</span></button>
+        <button type="button" id="btnZoom11" class="rail-btn" title="Approximate real size on screen"><span class="one2one">1:1</span></button>
+      </div>
+      <div class="rail-group">
+        <span class="rail-label">Mockup</span>
+        <button type="button" id="btnMockupMode" class="rail-btn tall" title="Place the design on a garment (M)"><i class="fas fa-shirt"></i><span>On&nbsp;Garment</span></button>
+      </div>
+      <div class="rail-spacer"></div>
+      <div class="rail-group rail-help" title="Shortcuts: 1-4 modes · G grid · D density · M garment · F fit · space play">
+        <i class="fas fa-keyboard"></i>
+      </div>
+    </nav>
+
+    <main class="stage-wrap" id="stageWrap">
+      <canvas id="stage"></canvas>
+
+      <div class="fabric-chip mockup-hide">
+        <span class="fabric-label"><i class="fas fa-swatchbook"></i> Fabric</span>
+        <span id="fabricSwatches" class="fabric-swatches"></span>
+      </div>
+
+      <button type="button" id="btnExitMockup" class="exit-mockup"><i class="fas fa-arrow-left"></i> Back to stitch view</button>
+
+      <div id="traceControls" class="trace-controls">
+        <button type="button" id="btnTracePrev" class="trace-btn" title="Previous color"><i class="fas fa-backward-step"></i></button>
+        <button type="button" id="btnTracePlay" class="trace-btn primary" title="Play / pause (space)"><i class="fas fa-play"></i></button>
+        <button type="button" id="btnTraceNext" class="trace-btn" title="Next color"><i class="fas fa-forward-step"></i></button>
+        <button type="button" id="btnTraceAll" class="trace-btn" title="Show finished design">All</button>
+        <div class="trace-progress">
+          <div class="trace-bar-wrap" id="traceProgressWrap"><div class="trace-bar" id="traceProgressBar"></div></div>
+          <div class="trace-meta"><span id="traceRunLabel">—</span><span id="traceStitchLabel">—</span></div>
+        </div>
+        <div class="trace-speed">
+          <i class="fas fa-gauge-high"></i>
+          <input type="range" id="traceSpeed" min="1" max="10" value="5">
+          <span id="traceSpeedLabel">5x</span>
+        </div>
+      </div>
+
+      <div class="statusbar">
+        <span class="status-cell pos"><i class="fas fa-crosshairs"></i> <span id="statPos">—</span></span>
+        <span class="status-cell"><i class="fas fa-ruler-combined"></i> <span id="statSizeRO">—</span></span>
+        <span class="status-cell"><i class="fas fa-braille"></i> <span id="statStitchRO">—</span></span>
+        <span class="status-hint">scroll = zoom · drag = pan · double-click = fit</span>
+        <span class="status-cell zoom"><i class="fas fa-magnifying-glass"></i> <span id="statZoom">—</span></span>
+      </div>
+
+      <div id="dropzone" class="dropzone">
+        <div class="drop-inner">
+          <svg class="drop-hoop" viewBox="0 0 200 200" aria-hidden="true">
+            <circle cx="100" cy="100" r="86" fill="none" stroke="currentColor" stroke-width="7" opacity="0.9"/>
+            <circle cx="100" cy="100" r="72" fill="none" stroke="currentColor" stroke-width="3" opacity="0.5"/>
+            <rect x="86" y="4" width="28" height="18" rx="4" fill="none" stroke="currentColor" stroke-width="5" opacity="0.9"/>
+            <path d="M60,118 C74,86 96,84 100,102 C104,120 128,118 140,88" fill="none" stroke="currentColor" stroke-width="3" stroke-dasharray="1 6" stroke-linecap="round" opacity="0.9"/>
+          </svg>
+          <h2>Drop a <span class="mono">.DST</span> file</h2>
+          <p class="drop-sub">Tajima stitch file — straight from the digitizer or ShopWorks art folder</p>
+          <div class="drop-actions">
+            <button type="button" id="btnBrowse" class="drop-btn"><i class="fas fa-folder-open"></i> Browse files</button>
+            <button type="button" id="btnSample2" class="drop-btn ghost"><i class="fas fa-wand-magic-sparkles"></i> Load sample badge</button>
+          </div>
+          <p class="drop-note"><i class="fas fa-lock"></i> 100% local — files are parsed in your browser and never uploaded.</p>
+          <div id="recentsWrap" class="recents-wrap">
+            <h3>Recent designs</h3>
+            <div id="recentsGrid" class="recents-grid"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <aside class="sidebar">
+      <div class="side-tabs">
+        <button type="button" class="side-tab active" data-panel="design"><i class="fas fa-circle-info"></i> Design</button>
+        <button type="button" class="side-tab" data-panel="threads"><i class="fas fa-palette"></i> Threads</button>
+        <button type="button" class="side-tab" data-panel="production"><i class="fas fa-industry"></i> Production</button>
+        <button type="button" class="side-tab" data-panel="mockup"><i class="fas fa-shirt"></i> Mockup</button>
+      </div>
+
+      <div class="side-panel active" id="panelDesign">
+        <div class="side-empty">Load a design to see stats.</div>
+        <div class="side-content">
+          <div class="meta-rows">
+            <div class="meta-row"><span>Label</span><b id="designLabelMeta">—</b></div>
+            <div class="meta-row"><span>Stitch length</span><b id="avgStitchMeta">—</b></div>
+          </div>
+          <div class="tile-grid">
+            <div class="tile"><span class="tile-label">Stitches</span><span class="tile-value" id="tileStitches">—</span></div>
+            <div class="tile"><span class="tile-label">Colors</span><span class="tile-value" id="tileColors">—</span></div>
+            <div class="tile wide"><span class="tile-label">Size</span><span class="tile-value" id="tileSize">—</span><span class="tile-sub" id="tileSizeSub"></span></div>
+            <div class="tile wide"><span class="tile-label">Est. run time</span><span class="tile-value" id="tileTime">—</span><span class="tile-sub" id="tileTimeSub"></span></div>
+            <div class="tile"><span class="tile-label">Trims</span><span class="tile-value" id="tileTrims">—</span></div>
+            <div class="tile"><span class="tile-label">Jumps</span><span class="tile-value" id="tileJumps">—</span></div>
+            <div class="tile"><span class="tile-label">Top thread</span><span class="tile-value" id="tileThread">—</span></div>
+            <div class="tile" id="tileDensityCard"><span class="tile-label">Peak density</span><span class="tile-value" id="tileDensity">—</span><span class="tile-sub" id="tileDensitySub"></span></div>
+          </div>
+          <div class="side-section">
+            <div class="side-section-head">
+              <h3>Thread breaks &amp; events</h3>
+              <span class="pill" id="breaksCount">—</span>
+            </div>
+            <div class="breaks-list" id="breaksList"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="side-panel" id="panelThreads">
+        <div class="side-empty">Load a design to assign threads.</div>
+        <div class="side-content">
+          <div class="threads-head">
+            <span class="pill" id="threadCount">—</span>
+            <button type="button" id="btnResetColors" class="mini-btn"><i class="fas fa-rotate-left"></i> Reset</button>
+          </div>
+          <p class="side-note">Click a swatch to pick the real Robison-Anton thread. Choices are remembered per design on this computer and flow into the approval sheet.</p>
+          <div class="thread-list" id="threadList"></div>
+        </div>
+      </div>
+
+      <div class="side-panel" id="panelProduction">
+        <div class="side-empty">Load a design to plan the run.</div>
+        <div class="side-content">
+          <div class="side-section">
+            <div class="side-section-head"><h3>Sew time</h3><span class="pill est">estimate</span></div>
+            <div class="spm-row">
+              <span class="spm-cap">Machine speed</span>
+              <input type="range" id="spmRange" min="400" max="1200" step="25" value="750">
+              <span class="spm-val" id="spmLabel">750 spm</span>
+            </div>
+            <div class="calc-rows">
+              <div class="calc-row"><span>Sewing</span><b id="tbSew">—</b></div>
+              <div class="calc-row"><span>Color changes</span><b id="tbChanges">—</b></div>
+              <div class="calc-row"><span>Trims</span><b id="tbTrims">—</b></div>
+              <div class="calc-row"><span>Start / finish</span><b id="tbOverhead">—</b></div>
+              <div class="calc-row total"><span>Per piece</span><b id="tbTotal">—</b></div>
+            </div>
+          </div>
+          <div class="side-section">
+            <div class="side-section-head"><h3>Thread usage</h3><span class="pill est">±15%</span></div>
+            <table class="usage-table">
+              <thead><tr><th>Thread</th><th class="num">Stitches</th><th class="num">Top</th></tr></thead>
+              <tbody id="usageBody"></tbody>
+              <tfoot>
+                <tr><td>Total top</td><td></td><td class="num" id="usageTop">—</td></tr>
+                <tr><td>Bobbin</td><td></td><td class="num" id="usageBobbin">—</td></tr>
+              </tfoot>
+            </table>
+          </div>
+          <div class="side-section">
+            <div class="side-section-head"><h3>Density check</h3><span class="pill" id="densityThreshold">—</span></div>
+            <div class="calc-row"><span>Peak</span><b id="densityMax">—</b></div>
+            <div class="hotspot-list" id="hotspotList"></div>
+            <button type="button" id="btnToggleDensity" class="mini-btn block"><i class="fas fa-fire"></i> Toggle heatmap overlay</button>
+            <p class="side-note">Hotspots are cells with stacked needle penetrations — the usual cause of thread breaks, puckering and holes. Check them with the digitizer before a big run.</p>
+          </div>
+          <a class="quote-cta" href="/quote-builders/embroidery-quote-builder.html">
+            <i class="fas fa-calculator"></i>
+            <span><b>Price this design</b><small>open the Embroidery Quote Builder</small></span>
+            <i class="fas fa-arrow-right-long"></i>
+          </a>
+        </div>
+      </div>
+
+      <div class="side-panel" id="panelMockup">
+        <div class="side-empty">Load a design to build a mockup.</div>
+        <div class="side-content">
+          <div class="side-section">
+            <div class="side-section-head"><h3>Garment</h3></div>
+            <div class="garment-tiles" id="garmentTiles"></div>
+          </div>
+          <div class="side-section">
+            <div class="side-section-head"><h3>Fabric color</h3><input type="color" id="mockupCustom" value="#1F2A44" title="Custom color"></div>
+            <div class="fabric-grid" id="mockupSwatches"></div>
+          </div>
+          <div class="side-section">
+            <div class="side-section-head"><h3>Placement</h3></div>
+            <div class="chip-row" id="placementChips"></div>
+            <div class="spm-row">
+              <span class="spm-cap">Scale</span>
+              <input type="range" id="scaleRange" min="25" max="150" step="5" value="100">
+              <span class="spm-val" id="scaleLabel">100% · true size</span>
+            </div>
+            <div class="calc-rows">
+              <div class="calc-row"><span>Sewn size</span><b id="mockSizeLabel">—</b></div>
+              <div class="calc-row"><span>Position</span><b id="mockOffsetLabel">—</b></div>
+            </div>
+            <div class="mock-actions">
+              <button type="button" id="btnOffsetReset" class="mini-btn"><i class="fas fa-crosshairs"></i> Re-center</button>
+            </div>
+            <div class="mockup-warning" id="mockupWarning"></div>
+            <p class="side-note">Drag the design on the garment to fine-tune. Placement is true to physical scale — a 4" logo renders 4" wide on a 22" chest.</p>
+          </div>
+          <button type="button" id="btnExportMockup" class="cta-btn"><i class="fas fa-download"></i> Download mockup PNG</button>
+        </div>
+      </div>
+    </aside>
+
+  </div>
 </div>
 
-<div class="app">
-  <div class="canvas-area" id="canvasArea">
-    <div class="upload-zone" id="uploadZone">
-      <div class="upload-box">
-        <div class="upload-icon"><i class="fas fa-folder-open"></i></div>
-        <h2>Drop a .DST file here</h2>
-        <p>or click to browse</p>
-        <span class="ext">.dst</span>
-      </div>
-      <input type="file" id="fileInput" accept=".dst" style="display:none">
-    </div>
-    <canvas id="stitchCanvas" width="800" height="600" style="display:none;"></canvas>
-    <div class="canvas-toolbar" id="toolbar">
-      <button id="btnMono" onclick="setRenderMode('mono')">Mono</button>
-      <button id="btnColors" class="active" onclick="setRenderMode('colors')">Color</button>
-      <button id="btnTrace" onclick="setRenderMode('trace')">Trace</button>
-    </div>
-  </div>
+<input type="file" id="fileInput" accept=".dst" class="visually-hidden">
 
-  <div class="sidebar">
-    <div class="sidebar-header">
-      <h2>Design Info</h2>
-      <button class="reload-btn" id="reloadBtn" onclick="resetViewer()">New File</button>
+<div id="pickerOverlay" class="picker-overlay">
+  <div class="picker-modal">
+    <div class="picker-head">
+      <h3><i class="fas fa-palette"></i> Robison-Anton 40wt</h3>
+      <button type="button" id="pickerClose" class="mini-btn"><i class="fas fa-xmark"></i></button>
     </div>
-
-    <div class="file-info" id="fileInfo">
-      <div class="name" id="fileName"></div>
-      <div class="stats-grid">
-        <div class="stat"><div class="stat-label">Stitches</div><div class="stat-value" id="statStitches" style="color:var(--stitch)">—</div></div>
-        <div class="stat"><div class="stat-label">Colors</div><div class="stat-value" id="statColors" style="color:var(--thread-change)">—</div></div>
-        <div class="stat"><div class="stat-label">Jumps</div><div class="stat-value" id="statJumps" style="color:var(--jump)">—</div></div>
-        <div class="stat"><div class="stat-label">Size</div><div class="stat-value" id="statSize" style="color:var(--accent);font-size:11px;">—</div></div>
-      </div>
-    </div>
-
-    <div class="tabs" id="tabs">
-      <div class="tab active" onclick="switchTab('sequence')">Color Sequence</div>
-      <div class="tab" onclick="switchTab('breaks')">Thread Breaks</div>
-    </div>
-
-    <div class="panel active" id="panelSequence">
-      <div class="scroll-list" id="colorRunsList"></div>
-    </div>
-
-    <div class="panel" id="panelBreaks">
-      <div class="scroll-list" id="breaksList"></div>
-    </div>
-
-    <div class="sidebar-empty" id="sidebarEmpty">
-      Upload a .dst file to see<br>thread breaks and color sequence
-    </div>
-
-    <div class="trace-controls" id="traceControls">
-      <div class="trace-row">
-        <button class="trace-btn" onclick="traceStep(-1)">&#9664; Prev</button>
-        <button class="trace-btn primary" id="btnPlayPause" onclick="traceTogglePlay()">&#9654; Play</button>
-        <button class="trace-btn" onclick="traceStep(1)">Next &#9654;</button>
-        <button class="trace-btn" onclick="traceShowAll()">All</button>
-        <div class="speed-control">
-          <span>Speed</span>
-          <input type="range" min="1" max="10" value="5" id="speedSlider" oninput="updateSpeed()">
-          <span id="speedLabel">5x</span>
-        </div>
-      </div>
-      <div class="trace-progress">
-        <div class="trace-bar-wrap" id="traceBarWrap" onclick="traceSeek(event)">
-          <div class="trace-bar" id="traceBar"></div>
-        </div>
-        <div class="trace-label">
-          <span id="traceRunLabel">Color 0 / 0</span>
-          <span id="traceStitchLabel">0 stitches</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="size-bar" id="sizeBar"></div>
+    <div class="picker-current" id="pickerCurrent"></div>
+    <input type="text" id="pickerSearch" class="picker-search" placeholder="Search name or catalog #…">
+    <div class="chip-row picker-families" id="pickerFamilies"></div>
+    <div class="picker-grid" id="pickerGrid"></div>
   </div>
 </div>
 
-<script src="/pages/js/dst-viewer.js"></script>
+<div id="toast" class="toast"></div>
+
+<section id="printSheet" class="print-sheet" aria-hidden="true">
+  <header class="sheet-head">
+    <img src="https://cdn.caspio.com/A0E1B000/Images/1702507702032_nwca-logo-white-h_200.png" alt="Northwest Custom Apparel" class="sheet-logo">
+    <div class="sheet-title">
+      <h1>Embroidery Design Approval</h1>
+      <span id="sheetDate"></span>
+    </div>
+  </header>
+  <div class="sheet-meta">
+    <div><span>File</span><b id="sheetFile"></b></div>
+    <div><span>Design label</span><b id="sheetLabel"></b></div>
+    <div><span>Finished size</span><b id="sheetSize"></b></div>
+    <div><span>Stitch count</span><b id="sheetStitches"></b></div>
+    <div><span>Thread colors</span><b id="sheetColors"></b></div>
+    <div><span>Run time</span><b id="sheetTime"></b></div>
+  </div>
+  <div class="sheet-visuals">
+    <figure class="sheet-fig">
+      <img id="sheetDesignImg" alt="Stitch render">
+      <figcaption>Digital stitch-out preview</figcaption>
+    </figure>
+    <figure class="sheet-fig" id="sheetMockupWrap">
+      <img id="sheetMockupImg" alt="Garment mockup">
+      <figcaption id="sheetMockupCaption"></figcaption>
+    </figure>
+  </div>
+  <table class="sheet-table">
+    <thead><tr><th>Run</th><th></th><th>Catalog</th><th>Thread</th><th class="num">Stitches</th></tr></thead>
+    <tbody id="sheetThreadRows"></tbody>
+  </table>
+  <p class="sheet-disclaimer">Thread colors shown are digital approximations of Robison-Anton 40wt polyester. Actual sewn colors may vary slightly by fabric and dye lot. Sew-time figures are production estimates, not billing.</p>
+  <div class="sheet-sign">
+    <div class="sign-box"><span class="sign-line"></span><span>Customer approval</span></div>
+    <div class="sign-box"><span class="sign-line"></span><span>Date</span></div>
+  </div>
+  <footer class="sheet-foot">Northwest Custom Apparel · nwcustomapparel.com · 253-922-5793</footer>
+</section>
+
+<script src="/pages/js/dst-parser.js?v=20260804"></script>
+<script src="/pages/js/dst-palette.js?v=20260804"></script>
+<script src="/pages/js/dst-garments.js?v=20260804"></script>
+<script src="/pages/js/dst-viewer.js?v=20260804"></script>
 </body>
 </html>

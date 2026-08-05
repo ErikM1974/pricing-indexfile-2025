@@ -263,6 +263,7 @@
 | `enhanced-loading-animations.js` | Loading animation components |
 | `header-button-functions.js` | Header button event handlers |
 | `dp5-helper.js` | DataPage 5 (Caspio) helper |
+| `box-label-template.js` | THE 8.5×11 box-label renderer (`window.BoxLabelTemplate`) + rush/follow-on wording — shared by the SanMar Inbound modal and the repack station (pages/box-labels.html) so labels can't drift. Pair with `../css/box-label-print.css`. NEW 2026-08-04 |
 
 ## Test Utilities (in shared_components — should be in /tests/)
 
