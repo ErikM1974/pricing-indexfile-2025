@@ -1,3 +1,14 @@
+## v2026.08.05.18 (2026.08.05)
+
+- Box reads: session-gated same-origin forwarder + normalise stored URLs
+- Deploy v2026.08.05.17: cache-bust the Box read-forwarder assets
+- Merge release v2026.08.05.17 back into develop
+- memory: the Box read forwarder (app half live, proxy gate pending)
+- WIP: calculators content-hashing (checkpoint before verification)
+- Memory: the pacing alert is blind to local tooling, by construction
+- Box Labels leaves beta: drop the BETA chip from the dashboard card
+- Calculators content-hashing: verified, and document the tranche
+
 ## v2026.08.05.17 (2026.08.05)
 
 - Box reads: session-gated same-origin forwarder + normalise stored URLs
