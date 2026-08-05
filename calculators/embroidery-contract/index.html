@@ -16,7 +16,7 @@
          buttons, table base, contact, AI chat panel) — must load BEFORE the page CSS. -->
     <link rel="stylesheet" href="/shared_components/css/contract-pricing-2026.css?v=2026.05.29.3">
     <!-- Page-specific styles (segmented item-type picker, table tabs, divider) -->
-    <link rel="stylesheet" href="embroidery-contract.css?v=2026.08.05.3">
+    <link rel="stylesheet" href="embroidery-contract.css?v=2026.08.05.9">
 </head>
 <body>
 
@@ -168,6 +168,27 @@
                              createElement/textContent throughout — file names and DST
                              header labels are attacker-controlled bytes. -->
                         <div id="dstLines"></div>
+
+                        <!-- ===== STAFF ONLY — internal cost & margin (Round 14) =====
+                             This page is PUBLIC (served by the /calculators static
+                             mount, no login — Ruthie AND ASI distributors). The cost
+                             rates therefore never ship in this page's JS: they come
+                             from /api/contract-embroidery/cost-model, which is
+                             requireStaff-gated and answers 401 for everyone else, so
+                             for a distributor this block simply never renders.
+                             It is also hidden from print — a quote handed to a
+                             customer must never carry a cost line. -->
+                        <div class="dst-margin" id="dstMargin" hidden>
+                            <div class="dst-margin-head">
+                                <span class="dst-staff-chip">Staff only · internal</span>
+                                <span class="dst-margin-asof" id="dstMarginAsOf"></span>
+                            </div>
+                            <div class="dst-margin-grid" id="dstMarginGrid"></div>
+                            <p class="dst-margin-note">
+                                Estimated from stitch-file machine time &mdash; not an accounting figure.
+                                Do not quote or share.
+                            </p>
+                        </div>
 
                         <!-- Production read on the loaded file(s): advisory risk
                              flags + single-head machine time. Never changes a price. -->
@@ -431,10 +452,10 @@
     <script src="/config/app.config.js"></script>
     <!-- Tajima DST parser (shared with the Embroidery Studio) — must load
          before the page JS so the stitch-file drop zone can activate. -->
-    <script src="/pages/js/dst-parser.js?v=2026.08.05.1"></script>
+    <script src="/pages/js/dst-parser.js?v=2026.08.05.4"></script>
     <!-- Risk assessment, machine-time and multi-location combination (pure,
          jest-locked). Must load before the page JS. -->
-    <script src="/shared_components/js/dst-quote-math.js?v=2026.08.05.3"></script>
-    <script src="embroidery-contract.js?v=2026.08.05.5"></script>
+    <script src="/shared_components/js/dst-quote-math.js?v=2026.08.05.9"></script>
+    <script src="embroidery-contract.js?v=2026.08.05.9"></script>
 </body>
 </html>

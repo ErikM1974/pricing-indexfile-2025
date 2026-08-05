@@ -134,9 +134,15 @@ ONE version per deploy applied uniformly. No per-file divergence.
 1. Identify changed JS/JSX/CSS (both committed-vs-remote and working-tree dirty):
 
 ```bash
-CHANGED_ASSETS=$( (git diff --name-only origin/develop HEAD -- '*.js' '*.jsx' '*.css'; \
+CHANGED_ASSETS=$( (git diff --name-only origin/main HEAD -- '*.js' '*.jsx' '*.css'; \
                    git status --porcelain | awk '/\.(jsx?|css)$/ {print $2}') | sort -u )
 ```
+
+**The baseline is `origin/main` — what is LIVE — not `origin/develop`.** Diffing against
+develop makes this whole step a no-op whenever develop was pushed before deploying (a
+normal thing to do): `origin/develop..HEAD` is then empty, nothing gets bumped, the deploy
+reports ✅, the SHA check passes, and every browser keeps serving cached assets. Caught
+2026-08-03; assets had to be hand-bumped for several releases.
 
 **`.jsx` MUST be included** (`*.jsx` pathspec + `jsx?` in the regex). In-browser-Babel
 `.jsx` pages (today `dashboards/production-shifts/app.jsx`; originally the order form,
@@ -148,29 +154,74 @@ changed" failure (caught 2026-06-09).
 
 ```bash
 BUMPED_HTML=""
+MISSED_ASSETS=""
 for ASSET in $CHANGED_ASSETS; do
-  # Match on the LAST TWO path segments (e.g. "pricing/shared.js"), NOT the bare
-  # basename. Basenames like shared.js / print.css / index.js / utils.js collide
-  # across apps — a basename bump rewrites the ?v= of UNRELATED pages that
-  # reference a different file with the same name (caught 2026-06-09: an
-  # order-form pricing/shared.js change bumped 8 dashboards' shared.js). HTML refs
-  # are relative (e.g. "order-form/pricing/shared.js?v="), so a 2-segment suffix
-  # is specific enough to hit the right ref and skip same-name lookalikes.
   # Last two path segments, pure-bash (NO `rev`/`cut` — `rev` is absent in
   # Windows git-bash, the deploy host; an empty MATCH would bump EVERY ?v=).
   BASE="${ASSET##*/}"; DIR="${ASSET%/*}"
   if [ "$DIR" = "$ASSET" ]; then MATCH="$BASE"; else MATCH="${DIR##*/}/$BASE"; fi
+  HIT=0
+
+  # ── PASS 1 — cross-directory refs, matched on the LAST TWO path segments
+  # (e.g. "pricing/shared.js"), NOT the bare basename. Basenames like shared.js /
+  # print.css / index.js / utils.js collide across apps — a basename bump rewrites
+  # the ?v= of UNRELATED pages that reference a different file with the same name
+  # (caught 2026-06-09: an order-form pricing/shared.js change bumped 8 dashboards'
+  # shared.js). A page in ANOTHER directory must write at least one parent segment
+  # to reach this file, so a 2-segment suffix hits it and skips lookalikes.
   # --exclude-dir=.claude: NEVER write into .claude/worktrees/* — those are OTHER
   # sessions' checkouts; bumping them mutates cross-session state (caught 2026-07-08).
-  for HTML in $(grep -rl --include="*.html" --exclude-dir=.claude "${MATCH}?v=" .); do
+  for HTML in $(grep -rl --include="*.html" --exclude-dir=.claude "${MATCH}?v=" . 2>/dev/null); do
     perl -i -pe "s|(\Q${MATCH}\E\?v=)[^\"' >]+|\${1}${DEPLOY_VERSION}|g" "$HTML"
-    BUMPED_HTML="$BUMPED_HTML $HTML"
+    BUMPED_HTML="$BUMPED_HTML $HTML"; HIT=1
     echo "  bumped ${MATCH} in $HTML → ?v=${DEPLOY_VERSION}"
   done
+
+  # ── PASS 2 — SIBLING refs, which pass 1 structurally cannot see. A page sitting
+  # in the asset's OWN directory references it by BARE name ("embroidery-contract.js?v="),
+  # so the 2-segment token "embroidery-contract/embroidery-contract.js" never matches
+  # and the ?v= silently stays stale — new code served, old code cached. Caught
+  # 2026-08-05 at v2026.08.05.3, where ~1000 changed lines of contract PRICING js
+  # were about to ship behind a cached ?v=. EVERY self-contained
+  # /calculators/*/index.html has this shape.
+  # Two things keep the 2026-06-09 collision from coming back: the search is scoped
+  # to HTML in the asset's own directory, and the negative lookbehind refuses to
+  # match when the basename is preceded by a path separator — so a sibling page that
+  # ALSO references "other/shared.js?v=" keeps its own version.
+  if [ "$DIR" != "$ASSET" ]; then
+    for HTML in $(grep -ls --include="*.html" "${BASE}?v=" "$DIR"/*.html 2>/dev/null); do
+      perl -i -pe "s|(?<![\\w./-])(\Q${BASE}\E\?v=)[^\"' >]+|\${1}${DEPLOY_VERSION}|g" "$HTML"
+      BUMPED_HTML="$BUMPED_HTML $HTML"; HIT=1
+      echo "  bumped ${BASE} (sibling) in $HTML → ?v=${DEPLOY_VERSION}"
+    done
+  fi
+
+  # ── Silent-no-op detector. The failure mode this whole step exists to prevent is
+  # invisible by construction: nothing bumped looks identical to nothing needed
+  # bumping. If a changed asset's basename carries a ?v= SOMEWHERE in the HTML but
+  # neither pass touched it, the ref uses a shape we don't match (e.g. "../foo.js?v=")
+  # — flag it rather than ship stale.
+  if [ "$HIT" = "0" ] && grep -rqs --include="*.html" --exclude-dir=.claude "${BASE}?v=" .; then
+    MISSED_ASSETS="$MISSED_ASSETS $ASSET"
+  fi
 done
+
+BUMPED_HTML=$(echo "$BUMPED_HTML" | tr ' ' '\n' | grep -v '^$' | sort -u | tr '\n' ' ')
+
+if [ -n "$MISSED_ASSETS" ] && [ "$CACHEBUST_ALLOW_MISS" != "1" ]; then
+  echo "✗ DEPLOY ABORTED — changed asset(s) whose ?v= was NOT bumped:"
+  for A in $MISSED_ASSETS; do echo "    $A"; done
+  echo "  Something in the HTML references that basename with a ?v=, but neither the"
+  echo "  2-segment nor the sibling pass matched it. Shipping now would serve new code"
+  echo "  behind a cached old ?v= — silently, on customers' and reps' browsers."
+  echo "  Fix: bump that ref by hand (or teach Step 2 the shape), then re-deploy."
+  echo "  False positive? If the ?v= hit is a DIFFERENT file that merely shares this"
+  echo "  basename, re-run with CACHEBUST_ALLOW_MISS=1 after confirming by eye."
+  exit 1
+fi
 ```
 
-The regex `[^"' >]+` matches alphanumeric and any suffix format — `20260424b`, `v15`, `1.2.3-rc1` all replaced cleanly. `\Q…\E` quotes the match token so the `/` and `.` in the 2-segment suffix are literal.
+The regex `[^"' >]+` matches alphanumeric and any suffix format — `20260424b`, `v15`, `1.2.3-rc1` all replaced cleanly. `\Q…\E` quotes the match token so the `/` and `.` in it are literal. Pass 2's `(?<![\w./-])` is what makes a bare-basename rewrite safe.
 
 If no JS/JSX/CSS files changed, skip this step.
 
@@ -197,11 +248,19 @@ Catch it BEFORE committing:
 ```bash
 ORPHAN=""
 for ASSET in $(git ls-files --others --exclude-standard -- '*.js' '*.jsx' '*.css'); do
-  # Same 2-segment match as Step 2 (pure-bash, no `rev`) — a bare basename would
-  # false-positive on a same-name file in another dir and abort spuriously. Incl .jsx.
+  # Same two passes as Step 2 (pure-bash, no `rev`). Incl .jsx.
   BASE="${ASSET##*/}"; DIR="${ASSET%/*}"
   if [ "$DIR" = "$ASSET" ]; then MATCH="$BASE"; else MATCH="${DIR##*/}/$BASE"; fi
-  if grep -rqs --include="*.html" "$MATCH" .; then ORPHAN="$ORPHAN $ASSET"; fi
+  # Pass 1 — 2-segment suffix; a bare basename searched repo-wide would
+  # false-positive on a same-name file in another dir and abort spuriously.
+  if grep -rqs --include="*.html" "$MATCH" .; then ORPHAN="$ORPHAN $ASSET"; continue; fi
+  # Pass 2 — sibling refs. A brand-new asset dropped next to the page that uses it
+  # is referenced by BARE name, which pass 1 can't see: the guard stayed silent and
+  # the page shipped pointing at a file that was never committed. Scoping the search
+  # to the asset's own directory keeps the basename safe to match.
+  if [ "$DIR" != "$ASSET" ] && grep -qs --include="*.html" "$BASE" "$DIR"/*.html 2>/dev/null; then
+    ORPHAN="$ORPHAN $ASSET"
+  fi
 done
 if [ -n "$ORPHAN" ]; then
   echo "✗ DEPLOY ABORTED — untracked asset(s) referenced by HTML (would 404 in prod):"
@@ -699,6 +758,7 @@ broken one and makes the diagnosis harder.
 | Var | Required? | Purpose |
 |---|---|---|
 | `SLACK_DEPLOY_WEBHOOK_URL` | Optional | Posts deploy summary to a Slack channel. Skill skips silently if unset. Use same pattern as existing `SLACK_SUPACOLOR_HEALTH_WEBHOOK_URL`. |
+| `CACHEBUST_ALLOW_MISS` | Optional | Set to `1` to proceed past Step 2's silent-no-op abort. **Only** after eyeballing the listed assets and confirming the `?v=` hit belongs to a *different* file that merely shares the basename. If the ref really is unbumped, fix it instead — that is the exact failure this abort exists to catch. |
 
 ## Known cosmetic noise
 
@@ -758,3 +818,25 @@ Prompted by a real miss: `builders-function-length.test.js` went red on 2026-07-
 through several releases unnoticed, because the gate only ever looked at the parser suite.
 The pricing-parity, security-guard, and ratchet suites that encode the never-break rules all
 live in `tests/unit/` and were unguarded. Cost of the fix: ~7 seconds per deploy.
+
+**Pass 4 (2026-08-05) — the cache-bust silently skipped whole classes of asset:**
+
+| Old behavior | New behavior |
+|---|---|
+| `CHANGED_ASSETS` diffed against `origin/develop` | Diffs against **`origin/main`** — what is actually live. The old baseline made the step a no-op whenever develop had been pushed first |
+| One matching pass (2-segment suffix only) | **Two passes**: 2-segment for cross-directory refs, plus a directory-scoped bare-basename pass for SIBLING refs |
+| A miss was invisible | **Silent-no-op detector** aborts when a changed asset's basename carries a `?v=` that neither pass bumped (`CACHEBUST_ALLOW_MISS=1` to override after eyeballing) |
+| Step 3.5 orphan guard used the 2-segment match only | Same two passes, so a brand-new sibling asset can't ship as a 404 |
+
+Prompted by v2026.08.05.3: `calculators/embroidery-contract/index.html` references its own
+assets as `embroidery-contract.js?v=` (bare — they're siblings), which the 2-segment token
+`embroidery-contract/embroidery-contract.js` can never match. ~1000 changed lines of contract
+**pricing** JS were about to ship behind a cached `?v=`, i.e. reps' browsers running the old
+pricing code against the new server. Caught by hand during the deploy; every self-contained
+`/calculators/*/index.html` has that shape.
+
+The 2026-06-09 collision (a bare-basename bump rewriting 8 unrelated dashboards) does NOT come
+back: pass 2 only searches HTML in the asset's **own directory**, and its `(?<![\w./-])`
+lookbehind refuses to match a basename preceded by a path separator. Verified on fixtures — a
+sibling `shared.js?v=` bumps while `sub/shared.js?v=` in the same file and another app's own
+`shared.js?v=` both stay untouched.
