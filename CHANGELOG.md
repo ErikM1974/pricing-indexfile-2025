@@ -1,3 +1,8 @@
+## v2026.08.05.10 (2026.08.05)
+
+- Retire Embroidery Mockup Generator; 302 its URL to DST Studio
+- memory: DST Studio topic file (consolidates two MEMORY.md entries)
+
 ## v2026.08.05.9 (2026.08.05)
 
 - Fix the deploy skill's cache-bust holes: sibling refs + wrong baseline
