@@ -1,3 +1,8 @@
+## v2026.08.05.17 (2026.08.05)
+
+- Box reads: session-gated same-origin forwarder + normalise stored URLs
+- Deploy v2026.08.05.17: cache-bust the Box read-forwarder assets
+
 ## v2026.08.05.16 (2026.08.05)
 
 - memory: proxy + app file-exposure security topic file
