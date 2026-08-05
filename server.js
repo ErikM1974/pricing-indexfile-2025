@@ -3603,6 +3603,64 @@ function validateSampleOrder(body) {
   return null;
 }
 
+/**
+ * Prove server-side that a FREE-path order really is free.
+ *
+ * 🔴 THE HOLE THIS CLOSES. The cart decides free-vs-paid in the BROWSER:
+ *   if (SampleCheckout.hasPaid(samples)) { start Stripe checkout; return; }
+ * and hasPaid() simply trusts `s.type === 'paid'` off the client object. Paid
+ * carts are handled correctly — Stripe hosted checkout, then the
+ * signature-verified webhook (`metadata.kind === 'samples-order'`) pushes the
+ * order with a PAID payments block. But a doctored payload that labels paid
+ * samples as free, or just posts `price: 0`, skips that branch entirely and
+ * lands a real ShopWorks order for goods nobody paid for.
+ *
+ * So this repeats what the paid route already does — "client prices are
+ * advisory" — using the SAME repricer (shared_components/js/sample-pricing.js)
+ * and the SAME data path (/api/size-pricing, /api/pricing-bundle fallback).
+ * No second pricing path: if the authoritative price is not zero, the order is
+ * refused and the customer is sent through checkout.
+ */
+async function verifySampleOrderIsFree(lineItems) {
+  const seen = new Set();
+  for (const item of lineItems) {
+    const style = String((item && item.partNumber) || '').trim().toUpperCase();
+    const size = String((item && item.size) || '').trim();
+    if (!style || !size) return { ok: false, status: 400, error: 'Each sample needs a style and a size.' };
+    // One sample per style, same rule the paid route enforces.
+    if (seen.has(style + '|' + size)) {
+      return { ok: false, status: 400, error: `Duplicate sample in the cart: ${style} ${size}.` };
+    }
+    seen.add(style + '|' + size);
+
+    const spr = await fetch(`${TDT_PROXY}/api/size-pricing?styleNumber=${encodeURIComponent(style)}`);
+    const rows = spr.ok ? await spr.json() : null;
+    let result = SAMPLE_PRICING.priceSample({ sizePricingRows: rows, blankBundle: null, size });
+    if (!result.eligible && result.reason === 'no_margin') {
+      const br = await fetch(`${TDT_PROXY}/api/pricing-bundle?method=BLANK&styleNumber=${encodeURIComponent(style)}`);
+      const bundle = br.ok ? await br.json() : null;
+      result = SAMPLE_PRICING.priceSample({ sizePricingRows: rows, blankBundle: bundle, size });
+    }
+    if (!result.eligible) {
+      return {
+        ok: false, status: 400,
+        error: result.reason === 'bad_size'
+          ? `${style} isn’t offered in size ${size} — remove it and try again.`
+          : `${style} isn’t available as an online sample right now — remove it, or call 253-922-5793.`,
+      };
+    }
+    // The whole point: this path is for FREE samples only.
+    if (result.type !== 'free' || result.price > 0) {
+      console.warn(`[sample-order] BLOCKED free-path push: ${style} ${size} prices at $${result.price}`);
+      return {
+        ok: false, status: 402,
+        error: `${style} (${size}) is a paid sample — please check out so payment is collected. Nothing was ordered.`,
+      };
+    }
+  }
+  return { ok: true };
+}
+
 app.post('/api/manageorders/orders/create', strictLimiter, async (req, res) => {
   if (!CRM_API_SECRET) {
     console.error('[sample-order] CRM_API_SECRET is not set — refusing to forward');
@@ -3612,6 +3670,18 @@ app.post('/api/manageorders/orders/create', strictLimiter, async (req, res) => {
   if (invalid) {
     console.warn('[sample-order] rejected: ' + invalid);
     return res.status(400).json({ error: invalid });
+  }
+  try {
+    // Reprice BEFORE forwarding — a paid item must never reach ShopWorks
+    // through this route.
+    const freeCheck = await verifySampleOrderIsFree(req.body.lineItems);
+    if (!freeCheck.ok) {
+      return res.status(freeCheck.status).json({ error: freeCheck.error });
+    }
+  } catch (err) {
+    // Erik's #1 rule: never let a pricing lookup fail OPEN into a free order.
+    console.error('[sample-order] reprice check failed:', err.message);
+    return res.status(502).json({ error: 'Could not verify sample pricing — nothing was ordered. Please try again.' });
   }
   try {
     const upstream = await fetch(`${CRM_API_BASE}/api/manageorders/orders/create`, {
