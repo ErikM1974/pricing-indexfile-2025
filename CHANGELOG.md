@@ -1,3 +1,9 @@
+## v2026.08.05.13 (2026.08.05)
+
+- memory: record the orphaned-Heroku-tip chain from today's deploy
+- memory: the repo already has content-hashed caching — for 4 pages
+- Remove the /tests mount — and close the wildcard that made it moot
+
 ## v2026.08.05.12 (2026.08.05)
 
 - memory: mark mockup generator retirement live (v2026.08.05.10)
