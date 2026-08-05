@@ -1,3 +1,7 @@
+## v2026.08.05.1 (2026.08.05)
+
+- Design Vault cutover: retire the public beta gallery
+
 ## v2026.08.04.4 (2026.08.04)
 
 - Design Vault: don't let a paused rAF swallow keystrokes
