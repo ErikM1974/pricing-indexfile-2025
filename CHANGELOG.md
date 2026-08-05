@@ -1,3 +1,8 @@
+## v2026.08.05.6 (2026.08.05)
+
+- DST Studio leaves beta: dashboard card promoted, tool renamed
+- Design Vault: stop the Top-clients collage rendering one full-page image
+
 ## v2026.08.05.5 (2026.08.05)
 
 - Contract Embroidery Phase 2: fix six defects found by adversarial review
