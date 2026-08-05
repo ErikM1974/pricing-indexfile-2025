@@ -130,18 +130,42 @@ untouched and still go browser→proxy directly.
 
 ---
 
-## 3. Still open in the proxy
+## 3. Sample-order push: the one that could not take a session (CLOSED)
 
-`POST /api/manageorders/orders/create` — creates real ShopWorks orders, still
-anonymous. `pages/sample-cart.html` posts to it **directly from the browser** at a
-hardcoded proxy URL, so gating it breaks paid sample orders. The fix is the one
-proven above: move that caller behind the app's session-gated forwarder, then gate
-the route, app first.
+`POST /api/manageorders/orders/create` creates a real ShopWorks order, and
+`pages/sample-cart.html` posted to it **directly from the browser** at a
+hardcoded proxy URL — anyone could create orders with curl, no auth, no
+payment.
 
-**The Box surface is fully closed** — all 11 routes, reads (`v2026.08.05.7`) and
-writes (`v2026.08.05.8`). The guard test asserts every route declared in
-`box-upload.js` is covered, so a Box route added later fails the build until
-someone decides its auth story.
+🔴 **This one could not take `requireStaff`.** Every Box caller was a staff page;
+the sample cart is a CUSTOMER flow with no SAML session to prove. So the app
+forwarder (`v2026.08.05.21`) is deliberately PUBLIC. What it actually buys:
+
+- the proxy route stops being an open order-creation endpoint to the whole
+  internet — only the app can reach it, with the shared secret
+- abuse controls live somewhere we own: `strictLimiter`, 20/hr per IP (the same
+  bucket the other order-submission routes use), verified tripping at exactly 20
+- the payload is validated and bounded before it can reach ShopWorks
+  (orderNumber / customer / non-empty lineItems ≤200 / files ≤5 / per-file size);
+  a rejection never reaches upstream
+
+⚠️ **Order creation is still UNAUTHENTICATED.** Relocation is not authentication.
+The real fix is verifying a payment before pushing — a product change.
+
+🔴 **The three SERVER-SIDE callers in the app sent NO secret at all**
+(`server.js` 1939 / 8783 / 10079). Gating would have broken all three; they were
+fixed in the same release. Nothing in Python Inksoft calls this route.
+
+Proxy side: the `guardReadsOnly` wrapper came off `/api/manageorders/orders`, so
+writes are gated too (`proxy v2026.08.05.9`). `/lineitems` keeps it — no write
+callers to migrate.
+
+### Still anonymous in the push router (each needs its own caller audit)
+
+`GET /push/health` · `GET /tracking/pull` (returns customer tracking data) ·
+`POST /auth/test`.
+
+---
 
 ### Forwarding a body: three modes, and the distinction is load-bearing
 
