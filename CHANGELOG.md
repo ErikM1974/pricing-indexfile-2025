@@ -1,3 +1,11 @@
+## v2026.08.05.23 (2026.08.05)
+
+- memory: free sample path proven free; correcting the earlier payment read
+- Memory: Send Mockup Box picker + gated-thumbnail lessons
+- Memory: customer-portal proof images broke for every customer
+- Memory: customer route must not inherit the staff param allowlist
+- Send Mockup Box picker + customer-visible artwork
+
 ## v2026.08.05.22 (2026.08.05)
 
 - memory: sample-order push closed; what a public forwarder does and does not buy
