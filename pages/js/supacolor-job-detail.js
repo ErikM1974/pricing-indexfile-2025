@@ -311,8 +311,8 @@
             var detailForMeta = (line.Detail_Line || '').replace(/\s*\n\s*/g, ' · ');
             var thumb = line.Thumbnail_URL
                 ? '<img class="sjd-line-thumb sjd-line-thumb--clickable"' +
-                  ' src="' + escapeHtml(line.Thumbnail_URL) + '"' +
-                  ' data-thumb-url="' + escapeHtml(line.Thumbnail_URL) + '"' +
+                  ' src="' + escapeHtml(boxUrl(line.Thumbnail_URL)) + '"' +
+                  ' data-thumb-url="' + escapeHtml(boxUrl(line.Thumbnail_URL)) + '"' +
                   ' data-item-code="' + escapeHtml(line.Item_Code || '') + '"' +
                   ' data-description="' + escapeHtml(line.Description || '') + '"' +
                   ' data-detail="' + escapeHtml(detailForMeta) + '"' +

@@ -143,7 +143,7 @@
         if (!url) return url;
         var thumbMatch = url.match(/\/api\/box\/thumbnail\/(\d+)/);
         if (thumbMatch) {
-            return API_BASE + '/api/box/thumbnail/' + thumbMatch[1];
+            return '/api/box/thumbnail/' + thumbMatch[1];
         }
         return url;
     }
@@ -1868,7 +1868,7 @@
             url = normalizeBoxProxyUrl(url);
             if (url.indexOf('/api/box/') !== -1) return url;
             if (/cdn\.caspio\.com/i.test(url)) return url;
-            if (/box\.com/i.test(url)) return API_BASE + '/api/box/shared-image?url=' + encodeURIComponent(url);
+            if (/box\.com/i.test(url)) return '/api/box/shared-image?url=' + encodeURIComponent(url);
             return url;
         }
         var artImgs = [];
@@ -2601,7 +2601,7 @@
         // server-side. If that also 404s we fall through to mark the slot broken.
         if (originalSrc.indexOf('/shared/static/') !== -1 && !img.dataset.proxyAttempted) {
             img.dataset.proxyAttempted = '1';
-            var proxyUrl = API_BASE + '/api/box/shared-image?url=' + encodeURIComponent(originalSrc);
+            var proxyUrl = '/api/box/shared-image?url=' + encodeURIComponent(originalSrc);
             img.src = proxyUrl;
             return; // Let the proxy attempt load; if it also fails, we'll fall through again
         }
@@ -3280,7 +3280,7 @@
         }
 
         loadingEl.style.display = 'flex';
-        fetch(API_BASE + '/api/box/art-folders?limit=500')
+        fetch('/api/box/art-folders?limit=500')
             .then(function (resp) {
                 loadingEl.style.display = 'none';
                 if (!resp.ok) throw new Error('Box API ' + resp.status);
@@ -3365,7 +3365,7 @@
             });
         }
 
-        fetch(API_BASE + '/api/box/folder-files?folderId=' + folderId)
+        fetch('/api/box/folder-files?folderId=' + folderId)
             .then(function (resp) {
                 if (!resp.ok) throw new Error('Box API ' + resp.status);
                 return resp.json();
@@ -3504,8 +3504,8 @@
             }
 
             var downloadUrl = m
-                ? API_BASE + '/api/box/download/' + m[1]
-                : API_BASE + '/api/box/shared-image?url=' + encodeURIComponent(url) + '&full=1';
+                ? '/api/box/download/' + m[1]
+                : '/api/box/shared-image?url=' + encodeURIComponent(url) + '&full=1';
             var resp = await fetch(downloadUrl);
             if (!resp.ok) {
                 if (resp.status === 404) {
@@ -3650,7 +3650,7 @@
         lightboxImg.onerror = function () {
             if (url.indexOf('/shared/static/') !== -1 && !lightboxImg.dataset.proxyAttempted) {
                 lightboxImg.dataset.proxyAttempted = '1';
-                lightboxImg.src = API_BASE + '/api/box/shared-image?url=' + encodeURIComponent(url) + '&full=1';
+                lightboxImg.src = '/api/box/shared-image?url=' + encodeURIComponent(url) + '&full=1';
             } else if (lightboxUrl.indexOf('size=large') !== -1 && !lightboxImg.dataset.largeFailed) {
                 // Large variant failed (rep not ready) — fall back to the default small version
                 lightboxImg.dataset.largeFailed = '1';

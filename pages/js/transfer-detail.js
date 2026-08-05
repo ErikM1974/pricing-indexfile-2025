@@ -405,8 +405,8 @@
             var detailForMeta = (line.Detail_Line || '').replace(/\s*\n\s*/g, ' · ');
             var thumb = line.Thumbnail_URL
                 ? '<img class="td-jobline-thumb td-jobline-thumb--clickable"' +
-                  ' src="' + escapeHtml(line.Thumbnail_URL) + '"' +
-                  ' data-thumb-url="' + escapeHtml(line.Thumbnail_URL) + '"' +
+                  ' src="' + escapeHtml(boxUrl(line.Thumbnail_URL)) + '"' +
+                  ' data-thumb-url="' + escapeHtml(boxUrl(line.Thumbnail_URL)) + '"' +
                   ' data-item-code="' + escapeHtml(line.Item_Code || '') + '"' +
                   ' data-description="' + escapeHtml(line.Description || '') + '"' +
                   ' data-detail="' + escapeHtml(detailForMeta) + '"' +
@@ -700,7 +700,7 @@
         if (mockupFile) {
             var mockupName = mockupFile.File_Name || 'mockup';
             var mockupUrl = mockupFile.File_URL || '#';
-            var thumbSrc = mockupFile.Thumbnail_URL || mockupFile.File_URL;
+            var thumbSrc = boxUrl(mockupFile.Thumbnail_URL) || mockupFile.File_URL;
             html += '<div class="td-artwork-mockup-hero">' +
                         '<a href="' + escapeHtml(mockupUrl) + '" target="_blank" rel="noopener" class="td-artwork-mockup-link">' +
                             '<img src="' + escapeHtml(thumbSrc) + '" alt="' + escapeHtml(mockupName) + '" class="td-artwork-mockup-img" onerror="this.classList.add(\'td-artwork-mockup-img--err\'); this.removeAttribute(\'src\');">' +
@@ -723,7 +723,7 @@
                 var mime = f.File_MIME || '';
                 var isImage = /\.(jpe?g|png|gif|webp)$/i.test(name) ||
                     /^image\//i.test(mime);
-                var thumbSrc = f.Thumbnail_URL || (isImage ? url : null);
+                var thumbSrc = boxUrl(f.Thumbnail_URL) || (isImage ? url : null);
                 var thumb = thumbSrc
                     ? '<img src="' + escapeHtml(thumbSrc) + '" alt="" class="td-artwork-tile-thumb" onerror="this.parentElement.innerHTML = \'<div class=&quot;td-artwork-tile-thumb td-artwork-tile-thumb--placeholder&quot;><i class=&quot;fas fa-file&quot;></i></div>\';">'
                     : '<div class="td-artwork-tile-thumb td-artwork-tile-thumb--placeholder"><i class="fas fa-file"></i></div>';
