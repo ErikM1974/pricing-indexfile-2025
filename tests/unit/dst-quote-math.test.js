@@ -169,16 +169,21 @@ describe('combineLines', () => {
 // ─── staff margin ──────────────────────────────────────────────────────────
 
 describe('estimateMargin', () => {
-    // The settled 2026-07-30 allocation model, as the gated endpoint returns it
-    const model = { productionHourRate: 30.09, orderPool: 70 };
+    // 🔴 DELIBERATELY FICTIONAL RATES. Everything under /tests is served by a
+    // PUBLIC static mount (server.js `app.use('/tests', express.static(...))`)
+    // and ships in the Heroku slug, so a real rate written here is published to
+    // the open web — which would defeat the whole point of putting the cost
+    // model behind requireStaff. The assertions below are pure arithmetic and
+    // do not care what the numbers are. NEVER paste the real model in here.
+    const model = { productionHourRate: 100, orderPool: 10 };
 
     test('cost is machine time x the loaded hour, plus ONE order pool', () => {
-        const r = QM.estimateMargin(1000, 10, model, 24);
-        expect(r.productionCost).toBeCloseTo(300.90, 5);
-        expect(r.orderPool).toBe(70);
-        expect(r.cost).toBeCloseTo(370.90, 5);
-        expect(r.margin).toBeCloseTo(629.10, 5);
-        expect(r.marginPct).toBeCloseTo(62.91, 4);
+        const r = QM.estimateMargin(2000, 10, model, 24);
+        expect(r.productionCost).toBeCloseTo(1000, 5);
+        expect(r.orderPool).toBe(10);
+        expect(r.cost).toBeCloseTo(1010, 5);
+        expect(r.margin).toBeCloseTo(990, 5);
+        expect(r.marginPct).toBeCloseTo(49.5, 4);
     });
 
     test('returns NULL without a model — a non-staff caller gets no cost data', () => {
@@ -201,9 +206,9 @@ describe('estimateMargin', () => {
     });
 
     test('per-piece figures divide by quantity and never by zero', () => {
-        const r = QM.estimateMargin(1000, 10, model, 0);
+        const r = QM.estimateMargin(2000, 10, model, 0);
         expect(Number.isFinite(r.perPieceCost)).toBe(true);
-        expect(r.perPieceCost).toBeCloseTo(370.90, 5);   // qty 0 treated as 1
+        expect(r.perPieceCost).toBeCloseTo(1010, 5);   // qty 0 treated as 1
     });
 });
 

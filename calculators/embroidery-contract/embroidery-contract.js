@@ -711,25 +711,50 @@
         saveRecall(list);
     }
 
-    /** Stamp every currently-loaded file with the quote it just became. */
-    function rememberCurrentQuote(quoteID) {
+    /**
+     * Snapshot what is about to be saved, so recall records what the quote
+     * ACTUALLY contained. Taken BEFORE the save round-trip: re-reading live
+     * state in the .then() would attribute whatever the rep typed while the
+     * POST was in flight (a qty change lands as "12 pcs" on a quote for 48).
+     */
+    function snapshotForRecall() {
         var result = priceAllLines();
+        if (!result) return null;
+        return {
+            qty: state.qty,
+            lines: result.priced.map(function (pr) {
+                return {
+                    file: pr.line.file,
+                    unit: Number(pr.unit.toFixed(2)),
+                    product: pr.product
+                };
+            })
+        };
+    }
+
+    /** Stamp every file in the SNAPSHOT with the quote it just became. */
+    function rememberCurrentQuote(quoteID, snap) {
+        var result = snap || snapshotForRecall();
         if (!result) return;
         var nowISO = new Date().toISOString();
-        result.priced.forEach(function (pr) {
-            var f = pr.line.file;
+        result.lines.forEach(function (pr) {
+            var f = pr.file;
             if (!f || !f.fp) return;
             rememberQuote(f.fp, {
                 name: f.name,
                 stitches: f.stitches,
                 quoteID: quoteID || null,
-                qty: state.qty,
-                unit: Number(pr.unit.toFixed(2)),
+                // From the SNAPSHOT, not live state — see snapshotForRecall.
+                qty: result.qty,
+                unit: pr.unit,
                 product: pr.product,
                 at: nowISO
             });
         });
-        renderDstCard();   // the card can now say "quoted before"
+        // Refresh the cards so they can say "quoted before" — but never while a
+        // per-location input is focused, since the rebuild would eat the caret.
+        var ae = document.activeElement;
+        if (!(ae && ae.closest && ae.closest('#dstLines'))) renderDstCard();
     }
 
     /* ---------- staff cost model ---------- */
@@ -766,20 +791,43 @@
         var grid = document.getElementById('dstMarginGrid');
         var result = costModel ? priceAllLines() : null;
 
-        // Machine time only exists when a file is loaded — without one there is
-        // no cost basis, so show nothing rather than a made-up number.
+        // 🔴 Machine time only exists for a location with a PARSED FILE, but
+        // revenue (combo.orderTotal) prices EVERY location. Counting all the
+        // revenue against only some of the cost overstates margin badly — a
+        // dropped left chest plus a hand-typed full back once read +63% on a
+        // job that actually loses money. So the panel refuses to show a number
+        // unless every priced location is costed, and says which one is missing.
         var machineHours = 0;
+        var untimed = [];
         if (result) {
-            result.priced.forEach(function (pr) {
+            result.priced.forEach(function (pr, i) {
                 if (pr.line.file && pr.line.file.stats) {
                     machineHours += QuoteMath.estimateMachineHours(
                         DSTParser, pr.line.file.stats, state.qty, {}).totalHours;
+                } else {
+                    untimed.push(PRODUCT_META[pr.product].label + ' (location ' + (i + 1) + ')');
                 }
             });
         }
-        var m = (result && machineHours > 0)
-            ? QuoteMath.estimateMargin(result.combo.orderTotal, machineHours, costModel, state.qty)
-            : null;
+        if (!result || machineHours <= 0) { wrap.hidden = true; return; }
+
+        if (untimed.length) {
+            // Partial cost basis — show the gap loudly instead of a flattering
+            // number. Erik's #1 rule: never a silent wrong figure.
+            wrap.hidden = false;
+            document.getElementById('dstMarginAsOf').textContent = 'cost basis incomplete';
+            grid.textContent = '';
+            var warn = el('div', 'dm-incomplete');
+            warn.appendChild(el('span', 'dm-incomplete-title', 'No margin — cost basis incomplete'));
+            warn.appendChild(el('span', 'dm-incomplete-detail',
+                'These locations are priced but have no stitch file, so their machine time ' +
+                'is unknown: ' + untimed.join(', ') + '. Drop the file to cost the whole job.'));
+            grid.appendChild(warn);
+            return;
+        }
+
+        var m = QuoteMath.estimateMargin(
+            result.combo.orderTotal, machineHours, costModel, state.qty);
         if (!m) { wrap.hidden = true; return; }
         wrap.hidden = false;
 
@@ -2123,6 +2171,8 @@ var AI_ENDPOINT = '/api/contract-embroidery-ai/chat';
         // Phase 4: pass the pre-generated quote ID through so we don't burn
         // a fresh sequence at click-time (the AI's email already references
         // this ID, so they must match).
+        // Snapshot BEFORE the save round-trip — see snapshotForRecall().
+        var recallSnap = snapshotForRecall();
         saveContractEmbroideryQuote({
             calcContext: calcCtx,
             customer: customer,
@@ -2131,9 +2181,9 @@ var AI_ENDPOINT = '/api/contract-embroidery-ai/chat';
         })
             .then(function (quoteID) {
                 showToast('Saved as ' + quoteID);
-                // Round 14: bind every loaded file to the quote it became, so a
-                // re-drop months later recalls it.
-                rememberCurrentQuote(quoteID);
+                // Round 14: bind every file in the snapshot to the quote it
+                // became, so a re-drop months later recalls it.
+                rememberCurrentQuote(quoteID, recallSnap);
             })
             .catch(function (err) {
                 console.warn('[ai-chat] quote save failed:', err);

@@ -309,7 +309,9 @@ table.price tfoot td.cell-hi {
 /* Cards stack; the drop zone shrinks to an "add another" affordance once at
    least one file is loaded. */
 #dstLines { display: flex; flex-direction: column; gap: 10px; }
-#dstLines + .dst-prod,
+/* The adjacent-sibling form broke when the margin panel was inserted between
+   #dstLines and .dst-prod (Round 14). The spacing only ever needed to hang off
+   the card list itself. */
 #dstLines:not(:empty) { margin-bottom: 10px; }
 
 .dst-drop.is-compact { padding: 10px 14px; }
@@ -503,15 +505,32 @@ table.price tfoot td.cell-hi {
     flex-wrap: wrap;
     gap: 4px 10px;
 }
+/* --pink-400 (#E45D92) gives only 3.34:1 against white at 10px/700 — under the
+   4.5:1 AA floor. This chip is the single visual thing stopping a rep pasting a
+   cost screenshot into a distributor thread, so it gets the darkest pink:
+   --pink-600 (#B91C5C) measures 6.2:1. */
 .dst-staff-chip {
     font-size: 10px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.09em;
-    background: var(--pink-400);
+    background: var(--pink-600);
     color: #fff;
     padding: 2px 8px;
     border-radius: 999px;
+}
+
+/* Partial cost basis — deliberately plain and unmissable, no numbers. */
+.dm-incomplete { display: grid; gap: 3px; }
+.dm-incomplete-title {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #FFD08A;
+}
+.dm-incomplete-detail {
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: rgba(255,255,255,0.78);
 }
 .dst-margin-asof {
     font-family: var(--mono);
