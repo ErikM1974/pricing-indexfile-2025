@@ -166,6 +166,88 @@ describe('combineLines', () => {
     });
 });
 
+// ─── staff margin ──────────────────────────────────────────────────────────
+
+describe('estimateMargin', () => {
+    // The settled 2026-07-30 allocation model, as the gated endpoint returns it
+    const model = { productionHourRate: 30.09, orderPool: 70 };
+
+    test('cost is machine time x the loaded hour, plus ONE order pool', () => {
+        const r = QM.estimateMargin(1000, 10, model, 24);
+        expect(r.productionCost).toBeCloseTo(300.90, 5);
+        expect(r.orderPool).toBe(70);
+        expect(r.cost).toBeCloseTo(370.90, 5);
+        expect(r.margin).toBeCloseTo(629.10, 5);
+        expect(r.marginPct).toBeCloseTo(62.91, 4);
+    });
+
+    test('returns NULL without a model — a non-staff caller gets no cost data', () => {
+        expect(QM.estimateMargin(1000, 10, null, 24)).toBeNull();
+        expect(QM.estimateMargin(1000, 10, {}, 24)).toBeNull();
+        expect(QM.estimateMargin(1000, 10, { productionHourRate: 0 }, 24)).toBeNull();
+    });
+
+    test('a loss is reported as a negative margin, not clamped away', () => {
+        // The cap 1-7 shape: tiny revenue, real machine time
+        const r = QM.estimateMargin(60, 3, model, 6);
+        expect(r.margin).toBeLessThan(0);
+        expect(r.marginPct).toBeLessThan(0);
+    });
+
+    test('zero revenue reports a null percentage rather than Infinity', () => {
+        const r = QM.estimateMargin(0, 5, model, 12);
+        expect(r.marginPct).toBeNull();
+        expect(Number.isFinite(r.margin)).toBe(true);
+    });
+
+    test('per-piece figures divide by quantity and never by zero', () => {
+        const r = QM.estimateMargin(1000, 10, model, 0);
+        expect(Number.isFinite(r.perPieceCost)).toBe(true);
+        expect(r.perPieceCost).toBeCloseTo(370.90, 5);   // qty 0 treated as 1
+    });
+});
+
+// ─── file fingerprint ──────────────────────────────────────────────────────
+
+describe('fingerprint', () => {
+    const buf = s => new TextEncoder().encode(s).buffer;
+
+    test('same bytes → same id; one changed byte → different id', async () => {
+        const a = await QM.fingerprint(buf('EAGLE_LC stitches'));
+        const b = await QM.fingerprint(buf('EAGLE_LC stitches'));
+        const c = await QM.fingerprint(buf('EAGLE_LC stitchez'));
+        expect(a).toBe(b);
+        expect(a).not.toBe(c);
+    });
+
+    test('uses SHA-256 when subtle crypto is available', async () => {
+        const fp = await QM.fingerprint(buf('x'), require('crypto').webcrypto.subtle);
+        expect(fp).toMatch(/^sha256:[0-9a-f]{64}$/);
+    });
+
+    test('falls back to FNV when subtle crypto is absent, still stable+distinct', async () => {
+        const noSubtle = null;
+        // Force the fallback by passing an object without digest
+        const a = await QM.fingerprint(buf('hello'), {});
+        const b = await QM.fingerprint(buf('hello'), {});
+        const c = await QM.fingerprint(buf('hellp'), {});
+        expect(a).toMatch(/^fnv:/);
+        expect(a).toBe(b);
+        expect(a).not.toBe(c);
+    });
+
+    test('the two schemes are namespaced so they can never collide in one store', async () => {
+        const sha = await QM.fingerprint(buf('same'), require('crypto').webcrypto.subtle);
+        const fnv = await QM.fingerprint(buf('same'), {});
+        expect(sha.split(':')[0]).not.toBe(fnv.split(':')[0]);
+    });
+
+    test('a digest that rejects degrades to the fallback instead of throwing', async () => {
+        const broken = { digest: () => Promise.reject(new Error('no')) };
+        await expect(QM.fingerprint(buf('z'), broken)).resolves.toMatch(/^fnv:/);
+    });
+});
+
 // ─── saved-quote money invariant ───────────────────────────────────────────
 
 /**

@@ -189,6 +189,83 @@
         };
     }
 
+    /**
+     * Staff-only margin for a run.
+     *
+     * cost = machine time × the fully-loaded production hour + one order pool.
+     * The rates are NEVER hardcoded here — they arrive from the staff-gated
+     * /api/contract-embroidery/cost-model, because the calculator page itself is
+     * public and anything in its bundle is readable by every ASI distributor.
+     *
+     * @param revenue     order total the customer is quoted
+     * @param machineHours single-head machine time for the whole run
+     * @param model       {productionHourRate, orderPool} from the gated endpoint
+     * @returns {cost, productionCost, orderPool, margin, marginPct, perPieceCost}
+     *          or null when the model is missing (i.e. the caller is not staff).
+     */
+    function estimateMargin(revenue, machineHours, model, qty) {
+        if (!model || !(Number(model.productionHourRate) > 0)) return null;
+        var rev = Number(revenue) || 0;
+        var hours = Math.max(0, Number(machineHours) || 0);
+        var pieces = Math.max(1, Number(qty) || 1);
+        var productionCost = hours * Number(model.productionHourRate);
+        var pool = Number(model.orderPool) || 0;
+        var cost = productionCost + pool;
+        var margin = rev - cost;
+        return {
+            cost: cost,
+            productionCost: productionCost,
+            orderPool: pool,
+            margin: margin,
+            // Margin as a share of REVENUE (contribution margin). Guarded so a
+            // zero-revenue quote reports null rather than Infinity/NaN.
+            marginPct: rev > 0 ? (margin / rev) * 100 : null,
+            perPieceCost: cost / pieces,
+            perPieceMargin: margin / pieces
+        };
+    }
+
+    /**
+     * Stable identity for a stitch file.
+     *
+     * Prefers a real SHA-256 of the bytes (crypto.subtle, available in any
+     * secure context incl. localhost). Falls back to FNV-1a when subtle crypto
+     * is unavailable — this is an identity key for a local "seen before"
+     * lookup, never a security boundary, so a non-cryptographic fallback is
+     * acceptable and keeps the feature working on plain http.
+     *
+     * @returns Promise<string> hex digest, prefixed so the two schemes can
+     *          never collide in the same store.
+     */
+    function fingerprint(buffer, subtleCrypto) {
+        var subtle = subtleCrypto ||
+            (typeof crypto !== 'undefined' && crypto && crypto.subtle) || null;
+        if (subtle && subtle.digest) {
+            return subtle.digest('SHA-256', buffer).then(function (hash) {
+                var bytes = new Uint8Array(hash);
+                var hex = '';
+                for (var i = 0; i < bytes.length; i++) {
+                    hex += (bytes[i] < 16 ? '0' : '') + bytes[i].toString(16);
+                }
+                return 'sha256:' + hex;
+            }).catch(function () {
+                return 'fnv:' + fnv1a(buffer);
+            });
+        }
+        return Promise.resolve('fnv:' + fnv1a(buffer));
+    }
+
+    function fnv1a(buffer) {
+        var bytes = new Uint8Array(buffer);
+        var h = 0x811c9dc5;
+        for (var i = 0; i < bytes.length; i++) {
+            h ^= bytes[i];
+            // 32-bit FNV prime multiply, kept in range without BigInt
+            h = (h + ((h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24))) >>> 0;
+        }
+        return ('00000000' + h.toString(16)).slice(-8) + '-' + bytes.length.toString(16);
+    }
+
     return {
         MAX_SATIN_MM: MAX_SATIN_MM,
         DENSITY_CELL_MM: DENSITY_CELL_MM,
@@ -199,6 +276,8 @@
         assessRisk: assessRisk,
         densityFor: densityFor,
         estimateMachineHours: estimateMachineHours,
-        combineLines: combineLines
+        combineLines: combineLines,
+        estimateMargin: estimateMargin,
+        fingerprint: fingerprint
     };
 }));

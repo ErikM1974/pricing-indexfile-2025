@@ -3559,6 +3559,39 @@ app.delete('/api/crm-proxy/form-submissions/:submissionId', requireCrmRole(['adm
   }
 });
 
+// ── Contract embroidery COST MODEL (staff only) ──────────────────────────────
+// Feeds the margin overlay on /calculators/embroidery-contract/.
+//
+// 🔴 That calculator is served by the PUBLIC `/calculators` static mount — it is
+// deliberately reachable without a login (Ruthie's desk AND ASI distributors).
+// So the cost side can NEVER live in its JS: anything shipped to that page is
+// readable by every distributor who has the link. It lives here instead, behind
+// requireStaff, exactly like /pricing/decals is gated "because it exposes
+// cost-side rate bands".
+//
+// requireStaff answers /api/* with 401 JSON, which doubles as the page's
+// "am I staff?" probe — a 401 simply means the overlay never renders.
+//
+// Figures are the settled 2026-07-30 allocation model (memory/COST_ALLOCATION_MODEL.md).
+// Env vars let Erik retune without a deploy; `asOf` is returned so a stale model
+// is visible on screen instead of silently trusted.
+app.get('/api/contract-embroidery/cost-model', requireStaff, (req, res) => {
+  const num = (v, fallback) => {
+    const n = Number(v);
+    return Number.isFinite(n) && n > 0 ? n : fallback;
+  };
+  res.set('Cache-Control', 'no-store');   // never cached into a shared proxy
+  res.json({
+    // Fully-loaded production hour — art INCLUDED (the 2026-07-30 decision).
+    productionHourRate: num(process.env.EMB_PRODUCTION_HOUR_RATE, 30.09),
+    // Per-ORDER overhead pool. Flat $70 is the settled figure; the $100
+    // driver-based variant is deliberately not the default.
+    orderPool: num(process.env.EMB_ORDER_POOL, 70),
+    asOf: process.env.EMB_COST_MODEL_AS_OF || '2026-07-30',
+    source: 'memory/COST_ALLOCATION_MODEL.md',
+  });
+});
+
 // Form Submissions (Forms Inbox) — saved fillable-form twins. ANY logged-in staff
 // (like unlisted dashboard pages), so we reuse the factory's forwarder but swap the
 // role gate for requireStaff. Proxy side is secret-only (holds customer contact info).

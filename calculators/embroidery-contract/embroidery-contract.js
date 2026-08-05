@@ -666,6 +666,143 @@
         return product === 'fullback' ? 100 : (pricing ? pricing.ltmFee : 50);
     }
 
+    /* =====================================================
+       Round 14 (2026-08-05) — reorder recall + staff margin
+
+       RECALL: contract business is repeat business. Every dropped file is
+       fingerprinted (SHA-256 of the bytes) and, once a quote is saved, the
+       fingerprint remembers which quote it became. Re-drop the same file and
+       the card says so. Deliberately localStorage: exact matches, no false
+       positives, no schema change — and it is Ruthie's desk that quotes.
+
+       MARGIN: staff-only. See the big comment on the markup — this page is
+       PUBLIC, so the rates arrive from a requireStaff endpoint and a 401
+       (i.e. anyone who is not signed-in staff) leaves the panel unrendered.
+       ===================================================== */
+
+    var RECALL_KEY = 'nwca.contractEmb.fileHistory.v1';
+    var RECALL_MAX = 60;               // newest-first; keeps localStorage bounded
+
+    function loadRecall() {
+        try {
+            var raw = JSON.parse(localStorage.getItem(RECALL_KEY));
+            return Array.isArray(raw) ? raw : [];
+        } catch (e) { return []; }     // corrupt/again-quota → behave as empty
+    }
+
+    function saveRecall(list) {
+        try {
+            localStorage.setItem(RECALL_KEY, JSON.stringify(list.slice(0, RECALL_MAX)));
+        } catch (e) { /* quota or private mode — recall is a nicety, never fatal */ }
+    }
+
+    function recallFor(fp) {
+        if (!fp) return null;
+        var list = loadRecall();
+        for (var i = 0; i < list.length; i++) if (list[i].fp === fp) return list[i];
+        return null;
+    }
+
+    /** Record (or refresh) what a fingerprint became. Newest entry first. */
+    function rememberQuote(fp, entry) {
+        if (!fp) return;
+        var list = loadRecall().filter(function (e) { return e.fp !== fp; });
+        list.unshift(Object.assign({ fp: fp }, entry));
+        saveRecall(list);
+    }
+
+    /** Stamp every currently-loaded file with the quote it just became. */
+    function rememberCurrentQuote(quoteID) {
+        var result = priceAllLines();
+        if (!result) return;
+        var nowISO = new Date().toISOString();
+        result.priced.forEach(function (pr) {
+            var f = pr.line.file;
+            if (!f || !f.fp) return;
+            rememberQuote(f.fp, {
+                name: f.name,
+                stitches: f.stitches,
+                quoteID: quoteID || null,
+                qty: state.qty,
+                unit: Number(pr.unit.toFixed(2)),
+                product: pr.product,
+                at: nowISO
+            });
+        });
+        renderDstCard();   // the card can now say "quoted before"
+    }
+
+    /* ---------- staff cost model ---------- */
+
+    // null = not fetched yet · false = not staff (401) · object = staff
+    var costModel = null;
+
+    function loadCostModel() {
+        // Same-origin by design: the gate is the app's SAML session cookie, and
+        // API_BASE_URL (the proxy) has no session to check.
+        return fetch('/api/contract-embroidery/cost-model', { credentials: 'same-origin' })
+            .then(function (r) {
+                if (r.status === 401 || r.status === 403) { costModel = false; return null; }
+                if (!r.ok) throw new Error('cost-model returned ' + r.status);
+                return r.json();
+            })
+            .then(function (data) {
+                if (data) costModel = data;
+                renderMargin();
+            })
+            .catch(function (err) {
+                // Not a customer-facing failure: the quote is unaffected and the
+                // panel simply stays hidden. Logged, never surfaced as an error
+                // banner, because for a distributor this path is EXPECTED.
+                costModel = false;
+                console.warn('[contract-embroidery] cost model unavailable:', err.message);
+                renderMargin();
+            });
+    }
+
+    function renderMargin() {
+        var wrap = document.getElementById('dstMargin');
+        if (!wrap) return;
+        var grid = document.getElementById('dstMarginGrid');
+        var result = costModel ? priceAllLines() : null;
+
+        // Machine time only exists when a file is loaded — without one there is
+        // no cost basis, so show nothing rather than a made-up number.
+        var machineHours = 0;
+        if (result) {
+            result.priced.forEach(function (pr) {
+                if (pr.line.file && pr.line.file.stats) {
+                    machineHours += QuoteMath.estimateMachineHours(
+                        DSTParser, pr.line.file.stats, state.qty, {}).totalHours;
+                }
+            });
+        }
+        var m = (result && machineHours > 0)
+            ? QuoteMath.estimateMargin(result.combo.orderTotal, machineHours, costModel, state.qty)
+            : null;
+        if (!m) { wrap.hidden = true; return; }
+        wrap.hidden = false;
+
+        document.getElementById('dstMarginAsOf').textContent =
+            'model ' + (costModel.asOf || '—') + ' · $' +
+            Number(costModel.productionHourRate).toFixed(2) + '/hr + $' +
+            Number(costModel.orderPool).toFixed(0) + ' order';
+
+        grid.textContent = '';
+        var neg = m.margin < 0;
+        [
+            ['Revenue', '$' + fmtMoney(result.combo.orderTotal), ''],
+            ['Est. cost', '$' + fmtMoney(m.cost), ''],
+            ['Margin', (neg ? '−$' : '$') + fmtMoney(Math.abs(m.margin)), neg ? 'neg' : 'pos'],
+            ['Margin %', m.marginPct == null ? '—' : m.marginPct.toFixed(1) + '%', neg ? 'neg' : 'pos']
+        ].forEach(function (row) {
+            var cell = el('div', 'dm-cell' + (row[2] ? ' ' + row[2] : ''));
+            cell.appendChild(el('span', 'dm-k', row[0]));
+            cell.appendChild(el('span', 'dm-v', row[1]));
+            grid.appendChild(cell);
+        });
+    }
+
     function showDstError(msg) {
         var el = document.getElementById('dstError');
         if (!el) return;
@@ -863,6 +1000,23 @@
             card.appendChild(ctl);
         }
 
+        // Reorder recall — this exact file has been quoted before.
+        if (f && f.recall) {
+            var r = f.recall;
+            var rc = el('div', 'dst-recall');
+            var when = '';
+            try { when = new Date(r.at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }); }
+            catch (e) { when = ''; }
+            var bits = ['Quoted before'];
+            if (r.quoteID) bits.push(r.quoteID);
+            if (r.qty) bits.push(fmtInt(r.qty) + ' pc' + (r.qty === 1 ? '' : 's'));
+            if (r.unit != null) bits.push('$' + fmtMoney(r.unit) + '/pc');
+            if (when) bits.push(when);
+            rc.appendChild(el('span', 'dst-recall-ico', '↺'));
+            rc.appendChild(el('span', null, bits.join(' · ')));
+            card.appendChild(rc);
+        }
+
         var notes = buildLineNotes(line);
         notes.forEach(function (n) { card.appendChild(n); });
         return card;
@@ -972,6 +1126,7 @@
         }
 
         renderProductionRead(lines);
+        renderMargin();
     }
 
     /** Advisory production read across every loaded file. Never prices. */
@@ -1109,6 +1264,7 @@
             }
         }
         renderProductionRead(allLines());
+        renderMargin();
         if (aiState.opened) updateContextPill();
     }
 
@@ -1172,6 +1328,7 @@
                 clearDstError();
 
                 var density = QuoteMath.densityFor(DSTParser, data);
+                var buf = e.target.result;
                 var facts = {
                     name: file.name,
                     label: (data.header && data.header.label) || '',
@@ -1185,7 +1342,11 @@
                     // released so six locations don't pin millions of objects.
                     stats: data.stats,
                     risk: QuoteMath.assessRisk(data, density),
-                    thumb: renderThumb(data)
+                    thumb: renderThumb(data),
+                    // Filled asynchronously below — the card renders immediately
+                    // and gains its "quoted before" line a tick later.
+                    fp: null,
+                    recall: null
                 };
 
                 var target;
@@ -1218,6 +1379,14 @@
                     statusEl.textContent = summary + '. Quote is now $' +
                         document.getElementById('unitPrice').textContent + ' per piece.';
                 }
+                // Identity + prior-quote recall. Never blocks the quote: a
+                // failed digest just means no "quoted before" line.
+                QuoteMath.fingerprint(buf).then(function (fp) {
+                    facts.fp = fp;
+                    facts.recall = recallFor(fp);
+                    renderDstCard();
+                }).catch(function () { /* recall is a nicety */ });
+
                 if (hadFocus && drop) drop.focus();
                 resolve(true);
             } catch (err) {
@@ -1962,6 +2131,9 @@ var AI_ENDPOINT = '/api/contract-embroidery-ai/chat';
         })
             .then(function (quoteID) {
                 showToast('Saved as ' + quoteID);
+                // Round 14: bind every loaded file to the quote it became, so a
+                // re-drop months later recalls it.
+                rememberCurrentQuote(quoteID);
             })
             .catch(function (err) {
                 console.warn('[ai-chat] quote save failed:', err);
@@ -2468,6 +2640,11 @@ var AI_ENDPOINT = '/api/contract-embroidery-ai/chat';
             });
 
         bindEvents();
+
+        // Staff cost model. Fire-and-forget: a 401 (every non-staff visitor)
+        // simply leaves the margin panel unrendered, and the quote is
+        // unaffected either way.
+        if (window.DSTQuoteMath) loadCostModel();
     }
 
     if (document.readyState === 'loading') {

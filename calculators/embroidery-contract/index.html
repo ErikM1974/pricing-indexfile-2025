@@ -169,6 +169,27 @@
                              header labels are attacker-controlled bytes. -->
                         <div id="dstLines"></div>
 
+                        <!-- ===== STAFF ONLY — internal cost & margin (Round 14) =====
+                             This page is PUBLIC (served by the /calculators static
+                             mount, no login — Ruthie AND ASI distributors). The cost
+                             rates therefore never ship in this page's JS: they come
+                             from /api/contract-embroidery/cost-model, which is
+                             requireStaff-gated and answers 401 for everyone else, so
+                             for a distributor this block simply never renders.
+                             It is also hidden from print — a quote handed to a
+                             customer must never carry a cost line. -->
+                        <div class="dst-margin" id="dstMargin" hidden>
+                            <div class="dst-margin-head">
+                                <span class="dst-staff-chip">Staff only · internal</span>
+                                <span class="dst-margin-asof" id="dstMarginAsOf"></span>
+                            </div>
+                            <div class="dst-margin-grid" id="dstMarginGrid"></div>
+                            <p class="dst-margin-note">
+                                Estimated from stitch-file machine time &mdash; not an accounting figure.
+                                Do not quote or share.
+                            </p>
+                        </div>
+
                         <!-- Production read on the loaded file(s): advisory risk
                              flags + single-head machine time. Never changes a price. -->
                         <div class="dst-prod" id="dstProd" hidden>
