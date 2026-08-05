@@ -174,14 +174,30 @@
         return (d.header.label || state.fileName) + '|' + d.stats.totalStitches + '|' + d.colorRuns.length;
     }
 
+    function defaultColorForRun(i) {
+        // First few runs use the curated defaults; beyond that, walk the hue
+        // wheel by the golden angle and snap to the nearest REAL RA thread so
+        // even a 30-run file starts with distinct, orderable colors.
+        if (i < Palette.DEFAULT_CATALOGS.length) {
+            var c = Palette.byCatalog(Palette.DEFAULT_CATALOGS[i]);
+            if (c) return c;
+        }
+        var hue = (i * 137.508) % 360;
+        var h = hue / 60, x = 1 - Math.abs(h % 2 - 1);
+        var rgb = [[1, x, 0], [x, 1, 0], [0, 1, x], [0, x, 1], [x, 0, 1], [1, 0, x]][Math.floor(h) % 6];
+        var hex = '#' + rgb.map(function (v) {
+            return Math.round((v * 0.72 + 0.14) * 255).toString(16).padStart(2, '0');
+        }).join('');
+        return Palette.nearest(hex) || Palette.byCatalog(Palette.DEFAULT_CATALOGS[0]);
+    }
+
     function assignColors() {
         var saved = load(COLORS_KEY, {});
         var fp = fingerprint();
         var entry = saved[fp];
         state.colors = state.data.colorRuns.map(function (run, i) {
             if (entry && entry[i] && entry[i].hex) return entry[i];
-            var cat = Palette.DEFAULT_CATALOGS[i % Palette.DEFAULT_CATALOGS.length];
-            var c = Palette.byCatalog(cat);
+            var c = defaultColorForRun(i);
             return { hex: c.hex, name: c.name, catalog: c.catalog };
         });
     }
@@ -1039,13 +1055,30 @@
         return lines.join('\n');
     }
 
+    function copyTextFallback(text) {
+        var ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = false;
+        try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+        document.body.removeChild(ta);
+        return ok;
+    }
+
     function copySummary() {
         if (!state.data) return;
         var text = summaryText();
+        var done = function () { toast('Summary copied — paste into ShopWorks or an email.'); };
+        var fail = function () {
+            if (copyTextFallback(text)) done();
+            else toast('Clipboard blocked by the browser.', true);
+        };
         if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(text).then(function () { toast('Summary copied — paste into ShopWorks or an email.'); },
-                function () { toast('Clipboard blocked by the browser.', true); });
-        } else { toast('Clipboard not available in this browser.', true); }
+            navigator.clipboard.writeText(text).then(done, fail);
+        } else { fail(); }
     }
 
     function buildApprovalSheet() {
