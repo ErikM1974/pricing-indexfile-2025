@@ -4,6 +4,31 @@ Resolved entries aged out of `LESSONS_LEARNED.md` (300-line cap). Newest first. 
 
 ---
 
+## Monogram thread-color dropdown dead in prod: API envelope change nobody re-tested (2026-08-04)
+
+**Problem.** The monogram form's thread-color selector had been silently broken live:
+`this.threadColors.filter is not a function` on every page load. Users could still type
+names, so nobody reported it.
+
+**Root cause.** `GET /api/thread-colors` originally returned a bare array; at some point the
+proxy started returning an `{success, count, colors}` envelope. `fetchThreadColors()` kept
+`return await response.json()` with the comment "Returns array directly" â€” HTTP 200, valid
+JSON, wrong shape. The error surfaced only in the console + a toast reps ignored.
+
+**Solution.** Service now unwraps both shapes and **throws** on anything else
+(`monogram-form-service.js` `fetchThreadColors`). Found while browser-verifying the
+Stitch-Proof feature, fixed in `ced3bc2f`.
+
+**Prevention.**
+- ðŸ”‘ **HTTP 200 + valid JSON â‰  valid response â€” assert the SHAPE at every fetch boundary**
+  (same family as the pricing-bundle empty-arrays-on-rate-limit lesson, v1791).
+- ðŸ”‘ **When a proxy route's response shape changes, grep ALL frontend consumers** â€” the app
+  and proxy deploy independently, so shape drift breaks quietly.
+- ðŸ”‘ A broken feature users can work around generates zero bug reports; only a
+  browser-verification pass with the console open finds it.
+
+---
+
 ## /deploy's cache-bust silently does nothing if you pushed develop first (2026-08-03)
 
 **Problem.** Deploying the vacation-slip work, the skill's Step 2 found **zero** changed assets

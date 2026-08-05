@@ -5,6 +5,49 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## Gating a shared image route broke every CUSTOMER, and only a real login showed it (2026-08-05)
+
+**Problem.** The Aug 5 Box gating (`b9e9d2a3`) put `/api/box/thumbnail/:fileId` behind
+`requireStaff`. Customer-portal artwork is STORED as absolute URLs pointing at exactly that route,
+so every proof a customer saw started 401ing. Measured against live data: **92% of art proofs, 8 of
+9 mockup proofs, and 100% of the logo library** (128/128) — the whole "My Logos" showcase was blank.
+Nobody reported it, because customers do not file bug reports.
+
+**Root cause.** The gate was designed and verified entirely from a STAFF session, where
+same-origin + the SAML cookie makes it work. `/portal` is a different identity: `requireCustomer`
+sets `req.customerSession.portalCustomer`, which has no `crmUser`, so `requireStaff` rejects it.
+The obvious fix — `boxUrl()`, which repointed stored URLs at this origin and fixed all the staff
+pages — does **nothing** here: same-origin still lands on `requireStaff`.
+
+**Solution.** A capability, not a relaxation. `portalProofUrl()` rewrites each stored Box URL to
+`/api/portal/proof-image/<token>` while projecting rows the server has ALREADY authorized as that
+customer's; the token is HMAC-signed (`lib/customer-magic-link`) and binds one fileId to one
+customer. The route takes the fileId ONLY from the verified token, so the customer never supplies a
+Box id and there is nothing to enumerate — the "any id, any file" power the staff route still has
+was deliberately not extended. Not `requireCustomer`-gated, because `/mockup/:id` and
+`/art-request/:designId` are public email-link pages whose images must render for a logged-out
+customer; when a session IS present it must match, so a token cannot be replayed into another
+customer's browser.
+
+**Prevention.**
+- 🔑 **"Verify with a real session" is not a formality.** 18 unit tests passed and the whole thing
+  was still broken end to end: `portalLimiter` allows 60 req/15 min, and one portal page view is
+  **53 images**, so the customer 429'd out of their own portal partway down the page. Nothing short
+  of loading a real customer's portal would have found that. Images now have their own budget.
+- 🔑 **A gate is per-IDENTITY, not per-origin.** Before gating a shared route, enumerate every
+  identity that reaches it — staff SAML, customer portal cookie, logged-out email link, server-side
+  callers — and test each. Two of the four here were never considered.
+- 🔑 **Two token types signed with the same key need a `t` discriminator**, or a stolen session
+  cookie is an image capability and vice versa. Jest-locked both directions.
+- 🔑 Distinguish "my code is broken" from "the data is": 2 of the 53 failures were Box files that
+  no longer exist (`Item not found`) — a pre-existing dead reference, not the fix. Check the asset
+  before blaming the change.
+- Drift guard: `tests/unit/portal-proof-image.test.js` fails if any Box-carrying field in the four
+  portal projections stops going through `portalProofUrl` — an unwrapped field is invisible, it
+  just renders broken for a customer who will never tell you.
+
+---
+
 ## Steve's Box picker searched a number that has never existed (2026-08-05)
 
 **Problem.** Steve loaded a mockup into Box, opened **Send Mockup**, and got the yellow "No Box
@@ -235,31 +278,6 @@ the decoded record total by >25%.
   needs of its STRICTEST consumer.
 - Verify error paths with actively hostile bytes, not just wrong extensions â€” 12 green jest
   tests and a clean happy path coexisted with this hole.
-
----
-
-## Monogram thread-color dropdown dead in prod: API envelope change nobody re-tested (2026-08-04)
-
-**Problem.** The monogram form's thread-color selector had been silently broken live:
-`this.threadColors.filter is not a function` on every page load. Users could still type
-names, so nobody reported it.
-
-**Root cause.** `GET /api/thread-colors` originally returned a bare array; at some point the
-proxy started returning an `{success, count, colors}` envelope. `fetchThreadColors()` kept
-`return await response.json()` with the comment "Returns array directly" â€” HTTP 200, valid
-JSON, wrong shape. The error surfaced only in the console + a toast reps ignored.
-
-**Solution.** Service now unwraps both shapes and **throws** on anything else
-(`monogram-form-service.js` `fetchThreadColors`). Found while browser-verifying the
-Stitch-Proof feature, fixed in `ced3bc2f`.
-
-**Prevention.**
-- ðŸ”‘ **HTTP 200 + valid JSON â‰  valid response â€” assert the SHAPE at every fetch boundary**
-  (same family as the pricing-bundle empty-arrays-on-rate-limit lesson, v1791).
-- ðŸ”‘ **When a proxy route's response shape changes, grep ALL frontend consumers** â€” the app
-  and proxy deploy independently, so shape drift breaks quietly.
-- ðŸ”‘ A broken feature users can work around generates zero bug reports; only a
-  browser-verification pass with the console open finds it.
 
 ---
 
