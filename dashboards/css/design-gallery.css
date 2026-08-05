@@ -1,0 +1,1655 @@
+/* ==========================================================================
+   design-gallery.css — Design Vault (Design Gallery v3)
+   Page: dashboards/design-gallery.html
+
+   Contract: scratchpad DG-CONTRACTS.md (CSS section). Loads AFTER
+   shared_components/css/art-hub.css (2026 tokens) and dash-shell.css
+   (shell classes). Tokens ONLY — the sole hex values in this file are the
+   3-line page theme override below. The artwork provides the color; the
+   chrome stays calm: light surfaces, generous --space-6 gutters, Inter
+   body, JetBrains Mono for design numbers and counts.
+
+   JS emits the .dg-* classes styled here (grid/rails/drawer agents) —
+   renaming a class here breaks their markup contract.
+   ========================================================================== */
+
+/* File-wide [hidden] guard — REQUIRED first rule. An author display rule
+   (grid/flex) beats the UA [hidden]{display:none}; this keeps JS `hidden`
+   toggles honest (LESSONS 2026-07-19, recurrence #5). */
+[hidden] { display: none !important; }
+
+/* ---------- Page theme (the ONLY hex in this file) ---------- */
+:root {
+    --dash-theme:      #2e5827;
+    --dash-theme-dark: #234420;
+    --dash-theme-bg:   #eef4ec;
+}
+
+/* ==========================================================================
+   Base / layout
+   ========================================================================== */
+.dg-body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background: var(--surface-page);
+    color: var(--gray-800);
+}
+
+.dg-main {
+    width: 100%;
+}
+
+.dg-body :focus-visible {
+    outline: 2px solid var(--dash-theme);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+}
+
+/* Shared monospace voice for design numbers, counts, timings */
+.dg-mono,
+.dg-card-number,
+.dg-results-count,
+.dg-dst-list,
+.dg-variants,
+.dg-omnibox-kbd,
+.dg-lightbox-cap {
+    font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   Boot overlay — first-visit index download / build-wait
+   ========================================================================== */
+.dg-boot {
+    position: fixed;
+    inset: 0;
+    z-index: 500;
+    display: grid;
+    place-items: center;
+    background:
+        radial-gradient(1100px 560px at 50% 28%, var(--dash-theme-bg), transparent 70%),
+        var(--surface-page);
+}
+
+.dg-boot-card {
+    width: min(420px, calc(100vw - var(--space-8)));
+    padding: var(--space-8);
+    background: var(--surface-card);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+}
+
+.dg-boot-logo {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto var(--space-4);
+    display: grid;
+    place-items: center;
+    font-size: 1.4rem;
+    color: var(--dash-theme);
+    background: var(--dash-theme-bg);
+    border-radius: var(--radius-lg);
+}
+
+.dg-boot-title {
+    margin: 0 0 var(--space-2);
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--gray-900);
+}
+
+.dg-boot-msg {
+    margin: 0 0 var(--space-5);
+    font-size: 0.9rem;
+    color: var(--gray-500);
+    min-height: 1.3em;
+}
+
+.dg-boot-track {
+    height: 6px;
+    background: var(--surface-inset);
+    border-radius: var(--radius-pill);
+    overflow: hidden;
+}
+
+/* Width % is set inline by JS (store progress events) */
+.dg-boot-bar {
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, var(--dash-theme), var(--dash-theme-dark));
+    border-radius: var(--radius-pill);
+    transition: width 280ms var(--ease-out);
+}
+
+.dg-boot-retry {
+    margin-top: var(--space-5);
+}
+
+/* ==========================================================================
+   Header — dash-shell green band + freshness pill
+   ========================================================================== */
+.dash-header-inner {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+}
+
+.dg-header-title {
+    flex: 1;
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    min-width: 0;
+}
+
+.dg-header-title h1 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+    color: var(--surface-card);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.dg-subtitle {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: color-mix(in srgb, var(--surface-card) 72%, transparent);
+}
+
+/* Freshness pill: quiet gray glass while fresh, amber when the index ages */
+.dg-freshness {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.3rem 0.8rem;
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--surface-card);
+    background: color-mix(in srgb, var(--surface-card) 14%, transparent);
+    border: 1px solid color-mix(in srgb, var(--surface-card) 30%, transparent);
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    transition: background var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out);
+}
+
+.dg-freshness:hover {
+    background: color-mix(in srgb, var(--surface-card) 24%, transparent);
+}
+
+.dg-freshness.is-fresh {
+    color: color-mix(in srgb, var(--surface-card) 85%, transparent);
+}
+
+.dg-freshness.is-stale {
+    color: var(--state-warning);
+    background: var(--state-warning-bg);
+    border-color: color-mix(in srgb, var(--state-warning) 45%, transparent);
+}
+
+/* ==========================================================================
+   Toolbar — omnibox, customer #, filters
+   ========================================================================== */
+.dg-toolbar {
+    background: var(--surface-card);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: var(--space-4) var(--space-5);
+    margin-bottom: var(--space-6);
+}
+
+.dg-toolbar-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+}
+
+.dg-toolbar-row--filters {
+    margin-top: var(--space-3);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--gray-100);
+    gap: var(--space-3);
+}
+
+/* -- omnibox -- */
+.dg-omnibox-wrap {
+    position: relative;
+    flex: 1 1 340px;
+    min-width: 240px;
+}
+
+.dg-omnibox-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-400);
+    font-size: 0.9rem;
+    pointer-events: none;
+}
+
+.dg-omnibox {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.65rem 4.4rem 0.65rem 2.5rem;
+    font: inherit;
+    font-size: 0.95rem;
+    color: var(--gray-900);
+    background: var(--surface-inset);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    transition: background var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out);
+}
+
+.dg-omnibox::placeholder { color: var(--gray-400); }
+
+.dg-omnibox:focus {
+    outline: none;
+    background: var(--surface-card);
+    border-color: var(--dash-theme);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--dash-theme) 14%, transparent);
+}
+
+.dg-omnibox::-webkit-search-cancel-button { display: none; }
+
+.dg-omnibox-clear {
+    position: absolute;
+    right: 42px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 26px;
+    height: 26px;
+    display: grid;
+    place-items: center;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: var(--gray-200);
+    color: var(--gray-600);
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: background var(--dur-fast) var(--ease-out);
+}
+
+.dg-omnibox-clear:hover { background: var(--gray-300); color: var(--gray-800); }
+
+.dg-omnibox-kbd {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 1px 7px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--gray-400);
+    background: var(--surface-card);
+    border: 1px solid var(--gray-300);
+    border-bottom-width: 2px;
+    border-radius: var(--radius-sm);
+    pointer-events: none;
+    transition: opacity var(--dur-fast) var(--ease-out);
+}
+
+.dg-omnibox:focus ~ .dg-omnibox-kbd { opacity: 0; }
+
+/* -- customer # -- */
+.dg-customer-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.dg-customer-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--gray-500);
+    white-space: nowrap;
+}
+
+.dg-customer-input {
+    width: 96px;
+    box-sizing: border-box;
+    padding: 0.55rem 0.7rem;
+    font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    font-size: 0.85rem;
+    color: var(--gray-900);
+    background: var(--surface-inset);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    transition: border-color var(--dur-base) var(--ease-out), background var(--dur-base) var(--ease-out);
+}
+
+.dg-customer-input:focus {
+    outline: none;
+    background: var(--surface-card);
+    border-color: var(--dash-theme);
+}
+
+.dg-customer-btn { padding: 8px 12px; }
+
+/* -- tier pills -- */
+.dg-pills {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    padding: 3px;
+    background: var(--surface-inset);
+    border-radius: var(--radius-pill);
+}
+
+.dg-pill {
+    padding: 0.3rem 0.85rem;
+    font: inherit;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--gray-600);
+    background: transparent;
+    border: 0;
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+
+.dg-pill:hover { color: var(--gray-900); }
+
+.dg-pill--active {
+    background: var(--dash-theme);
+    color: var(--surface-card);
+    box-shadow: var(--shadow-sm);
+}
+
+/* -- source chips -- */
+.dg-chips {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+.dg-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.3rem 0.75rem;
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--gray-600);
+    background: var(--surface-card);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: border-color var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+
+.dg-chip:hover { border-color: var(--gray-400); }
+
+.dg-chip--active {
+    background: var(--dash-theme-bg);
+    border-color: var(--dash-theme);
+    color: var(--dash-theme-dark);
+}
+
+/* -- has-image toggle + year -- */
+.dg-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--gray-600);
+    cursor: pointer;
+    user-select: none;
+}
+
+.dg-toggle input {
+    accent-color: var(--dash-theme);
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+}
+
+.dg-year {
+    font: inherit;
+    font-size: 0.82rem;
+    color: var(--gray-700);
+    background: var(--surface-card);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    padding: 0.35rem 0.5rem;
+    cursor: pointer;
+}
+
+/* -- density segmented control -- */
+.dg-density {
+    display: inline-flex;
+    margin-left: auto;
+    background: var(--surface-card);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.dg-density-btn {
+    padding: 6px 11px;
+    font-size: 0.8rem;
+    color: var(--gray-500);
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    transition: background var(--dur-fast) var(--ease-out), color var(--dur-fast) var(--ease-out);
+}
+
+.dg-density-btn + .dg-density-btn { border-left: 1px solid var(--gray-200); }
+
+.dg-density-btn:hover { color: var(--gray-800); }
+
+.dg-density-btn.is-active,
+.dg-density-btn[aria-pressed="true"] {
+    background: var(--dash-theme-bg);
+    color: var(--dash-theme);
+}
+
+/* -- active-filter tokens -- */
+.dg-tokens {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+}
+
+.dg-tokens:empty { display: none; margin: 0; }
+
+.dg-token {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.22rem 0.4rem 0.22rem 0.7rem;
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: var(--dash-theme-dark);
+    background: var(--dash-theme-bg);
+    border: 1px solid color-mix(in srgb, var(--dash-theme) 30%, transparent);
+    border-radius: var(--radius-pill);
+}
+
+.dg-token button {
+    display: grid;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: inherit;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: background var(--dur-fast) var(--ease-out);
+}
+
+.dg-token button:hover {
+    background: color-mix(in srgb, var(--dash-theme) 18%, transparent);
+}
+
+/* ==========================================================================
+   Banners — offline / cached-index / customer match
+   ========================================================================== */
+.dg-banner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    margin-bottom: var(--space-4);
+    font-size: 0.875rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--gray-200);
+    background: var(--surface-card);
+    color: var(--gray-700);
+}
+
+.dg-banner--warn {
+    background: var(--state-warning-bg);
+    border-color: color-mix(in srgb, var(--state-warning) 40%, transparent);
+    color: var(--state-warning);
+}
+
+.dg-banner--info {
+    background: var(--state-info-bg);
+    border-color: color-mix(in srgb, var(--state-info) 35%, transparent);
+    color: var(--state-info);
+}
+
+.dg-customer-banner {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--state-info);
+    background: var(--state-info-bg);
+    border: 1px solid color-mix(in srgb, var(--state-info) 35%, transparent);
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+}
+
+/* ==========================================================================
+   Browse mode — rails, stat strip, collage, daily wall
+   ========================================================================== */
+.dg-browse,
+.dg-results {
+    display: block;
+    min-width: 0;
+}
+
+.dg-rail {
+    margin-bottom: var(--space-8);
+}
+
+.dg-rail-head {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-3);
+    margin-bottom: var(--space-3);
+}
+
+.dg-rail-head h2 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+    color: var(--gray-900);
+}
+
+.dg-rail-sub {
+    font-size: 0.8rem;
+    color: var(--gray-500);
+}
+
+.dg-rail-nav {
+    margin-left: auto;
+    display: inline-flex;
+    gap: var(--space-2);
+}
+
+.dg-rail-btn {
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    font-size: 0.8rem;
+    color: var(--gray-600);
+    background: var(--surface-card);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    transition: background var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+}
+
+.dg-rail-btn:hover { background: var(--gray-100); border-color: var(--gray-400); }
+.dg-rail-btn:disabled { opacity: 0.35; cursor: default; }
+
+/* Horizontal snap track with soft edge fade */
+.dg-rail-track {
+    display: flex;
+    gap: var(--space-4);
+    overflow-x: auto;
+    padding: var(--space-1) var(--space-1) var(--space-3);
+    scroll-snap-type: x proximity;
+    scroll-padding-left: var(--space-1);
+    scrollbar-width: thin;
+    scrollbar-color: var(--gray-300) transparent;
+    -webkit-mask-image: linear-gradient(to right, transparent, black 26px, black calc(100% - 26px), transparent);
+    mask-image: linear-gradient(to right, transparent, black 26px, black calc(100% - 26px), transparent);
+}
+
+.dg-rail-track > * {
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+}
+
+.dg-rail-track .dg-card { width: 196px; }
+
+.dg-rail-track::-webkit-scrollbar { height: 8px; }
+.dg-rail-track::-webkit-scrollbar-thumb {
+    background: var(--gray-300);
+    border-radius: var(--radius-pill);
+}
+.dg-rail-track::-webkit-scrollbar-track { background: transparent; }
+
+/* -- stat strip (uses dash-shell .dash-stat-card) -- */
+.dg-stat-strip {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
+}
+
+.dg-stat-strip .dash-stat-card {
+    padding: var(--space-4) var(--space-5);
+}
+
+.dg-stat-strip .dash-stat-value { color: var(--dash-theme-dark); }
+
+/* -- top-clients 2×2 collage tile -- */
+.dg-collage {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 2px;
+    aspect-ratio: 1 / 1;
+    background: var(--surface-inset);
+    border-radius: calc(var(--radius-lg) - 2px) calc(var(--radius-lg) - 2px) 0 0;
+    overflow: hidden;
+}
+
+.dg-collage img,
+.dg-collage .dg-card-tile {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background: var(--surface-card);
+    display: block;
+    border-radius: 0;
+    aspect-ratio: auto;
+}
+
+/* -- daily wall -- */
+.dg-wall-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: var(--space-3);
+}
+
+/* ==========================================================================
+   Customer portfolio band
+   ========================================================================== */
+.dg-portfolio {
+    background: var(--surface-card);
+    border: 1px solid var(--gray-200);
+    border-left: 4px solid var(--dash-theme);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: var(--space-5) var(--space-6);
+    margin-bottom: var(--space-6);
+}
+
+.dg-portfolio h2 {
+    margin: 0 0 var(--space-1);
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--gray-900);
+}
+
+.dg-portfolio-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+    font-size: 0.82rem;
+    color: var(--gray-500);
+}
+
+/* ==========================================================================
+   Results — header, deep row, windowed grid
+   ========================================================================== */
+.dg-results-header {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
+    min-height: 30px;
+}
+
+.dg-results-count {
+    font-size: 0.82rem;
+    color: var(--gray-500);
+}
+
+.dg-results-count strong {
+    color: var(--gray-900);
+    font-weight: 600;
+}
+
+/* Deep-search escalation row */
+.dg-deep-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    margin-bottom: var(--space-4);
+    font-size: 0.85rem;
+    color: var(--gray-600);
+    background: var(--surface-card);
+    border: 1px dashed var(--gray-300);
+    border-radius: var(--radius-lg);
+}
+
+.dg-deep-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 0.14rem 0.55rem;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--state-info);
+    background: var(--state-info-bg);
+    border-radius: var(--radius-pill);
+}
+
+/* Grid viewport (roving-focus container) */
+.dg-grid-viewport { outline: none; }
+
+.dg-grid-viewport:focus-visible {
+    outline: 2px solid var(--dash-theme);
+    outline-offset: 4px;
+    border-radius: var(--radius-md);
+}
+
+.dg-sentinel { height: 2px; }
+.dg-spacer { width: 100%; }
+
+.dg-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(196px, 1fr));
+    gap: var(--space-4);
+}
+
+.dg-grid--wall {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: var(--space-3);
+}
+
+/* ==========================================================================
+   Cards
+   ========================================================================== */
+.dg-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: var(--surface-card);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    cursor: pointer;
+    content-visibility: auto;
+    contain-intrinsic-size: auto 300px;
+    transition: transform var(--dur-base) var(--ease-out), box-shadow var(--dur-base) var(--ease-out), border-color var(--dur-base) var(--ease-out);
+}
+
+.dg-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--gray-300);
+}
+
+.dg-card:focus-visible {
+    outline: 2px solid var(--dash-theme);
+    outline-offset: 2px;
+}
+
+/* Thumb: uniform square mat, artwork letterboxed on the inset surface */
+.dg-card-thumb {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    display: grid;
+    place-items: center;
+    background: var(--surface-inset);
+    overflow: hidden;
+}
+
+.dg-card-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: var(--space-2);
+    box-sizing: border-box;
+    transition: transform var(--dur-base) var(--ease-out);
+}
+
+.dg-card:hover .dg-card-thumb img { transform: scale(1.03); }
+
+/* Placeholder tile — deterministic initials on state-bg pairs (dn % 8) */
+.dg-card-tile {
+    aspect-ratio: 1 / 1;
+    display: grid;
+    place-items: center;
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    user-select: none;
+}
+
+.dg-tile-0 { background: var(--state-info-bg);    color: var(--state-info); }
+.dg-tile-1 { background: var(--state-success-bg); color: var(--state-success); }
+.dg-tile-2 { background: var(--state-warning-bg); color: var(--state-warning); }
+.dg-tile-3 { background: var(--state-danger-bg);  color: var(--state-danger); }
+.dg-tile-4 { background: var(--state-violet-bg);  color: var(--state-violet); }
+.dg-tile-5 { background: var(--dash-theme-bg);    color: var(--dash-theme); }
+.dg-tile-6 { background: var(--gray-100);         color: var(--gray-600); }
+.dg-tile-7 { background: var(--surface-inset);    color: var(--gray-500); }
+
+/* Card body */
+.dg-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding: var(--space-3);
+}
+
+.dg-card-number {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--gray-500);
+}
+
+.dg-card-company {
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: var(--gray-900);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dg-card-name {
+    font-size: 0.78rem;
+    color: var(--gray-600);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dg-card-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-top: var(--space-1);
+    font-size: 0.72rem;
+    color: var(--gray-500);
+}
+
+/* Tier badges — Standard/Mid/Large/Full Back on state pairs */
+.dg-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.1rem 0.5rem;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+}
+
+.dg-badge--std { background: var(--state-success-bg); color: var(--state-success); }
+.dg-badge--mid { background: var(--state-warning-bg); color: var(--state-warning); }
+.dg-badge--lg  { background: var(--state-danger-bg);  color: var(--state-danger); }
+.dg-badge--fb  { background: var(--state-violet-bg);  color: var(--state-violet); }
+
+/* Source glyph row */
+.dg-src-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--gray-400);
+    font-size: 0.68rem;
+}
+
+.dg-src { display: inline-flex; }
+
+/* Variants ×N + duplicate hint */
+.dg-variants {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.08rem 0.45rem;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--gray-600);
+    background: var(--gray-100);
+    border-radius: var(--radius-pill);
+}
+
+.dg-dup {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0.08rem 0.5rem;
+    font-size: 0.66rem;
+    font-weight: 600;
+    color: var(--state-warning);
+    background: var(--state-warning-bg);
+    border-radius: var(--radius-pill);
+    cursor: help;
+}
+
+/* Hover-revealed copy button over the thumb */
+.dg-copy {
+    position: absolute;
+    top: var(--space-2);
+    right: var(--space-2);
+    z-index: 2;
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    font-size: 0.72rem;
+    color: var(--gray-600);
+    background: color-mix(in srgb, var(--surface-card) 92%, transparent);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity var(--dur-fast) var(--ease-out), background var(--dur-fast) var(--ease-out);
+}
+
+.dg-card:hover .dg-copy,
+.dg-card:focus-within .dg-copy,
+.dg-copy:focus-visible { opacity: 1; }
+
+.dg-copy:hover { background: var(--surface-card); color: var(--dash-theme); }
+
+@media (hover: none) {
+    .dg-copy { opacity: 1; }
+}
+
+/* Wall density card — thumb-forward, quiet text */
+.dg-card--wall .dg-card-body { padding: var(--space-2) var(--space-3); gap: 2px; }
+.dg-card--wall .dg-card-name,
+.dg-card--wall .dg-src-row,
+.dg-card--wall .dg-card-meta { display: none; }
+.dg-card--wall .dg-card-company { font-size: 0.78rem; }
+.dg-card--wall .dg-card-number { font-size: 0.68rem; }
+
+/* Search-term highlight */
+.dg-mark,
+mark.dg-mark {
+    background: color-mix(in srgb, var(--dash-theme) 16%, transparent);
+    color: inherit;
+    font-weight: 650;
+    border-radius: 2px;
+    padding: 0 1px;
+}
+
+/* ==========================================================================
+   Skeleton shimmer
+   ========================================================================== */
+.dg-skel {
+    position: relative;
+    overflow: hidden;
+    background: var(--surface-inset);
+    border-radius: var(--radius-md);
+    min-height: 14px;
+}
+
+.dg-skel::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg,
+        transparent,
+        color-mix(in srgb, var(--surface-card) 70%, transparent),
+        transparent);
+    transform: translateX(-100%);
+    animation: dg-shimmer 1.4s var(--ease-out) infinite;
+}
+
+@keyframes dg-shimmer {
+    to { transform: translateX(100%); }
+}
+
+/* Per-section inline error (drawer hydration failures) */
+.dg-section-err {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    font-size: 0.82rem;
+    color: var(--state-danger);
+    background: var(--state-danger-bg);
+    border: 1px solid color-mix(in srgb, var(--state-danger) 35%, transparent);
+    border-radius: var(--radius-md);
+}
+
+.dg-section-err button {
+    margin-left: auto;
+    padding: 0.25rem 0.7rem;
+    font: inherit;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--state-danger);
+    background: var(--surface-card);
+    border: 1px solid color-mix(in srgb, var(--state-danger) 45%, transparent);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: background var(--dur-fast) var(--ease-out);
+}
+
+.dg-section-err button:hover { background: var(--state-danger-bg); }
+
+/* ==========================================================================
+   Inspector drawer
+   ========================================================================== */
+.dg-drawer-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 310;
+    background: color-mix(in srgb, var(--gray-900) 42%, transparent);
+    opacity: 1;
+    transition: opacity 240ms var(--ease-out), display 240ms allow-discrete;
+}
+
+@starting-style {
+    .dg-drawer-overlay { opacity: 0; }
+}
+
+.dg-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 320;
+    width: 520px;
+    max-width: 100vw;
+    display: flex;
+    flex-direction: column;
+    background: var(--surface-card);
+    border-left: 1px solid var(--gray-200);
+    box-shadow: var(--shadow-lg);
+    transform: translateX(0);
+    transition: transform 240ms var(--ease-out), display 240ms allow-discrete;
+}
+
+/* Slide-in on un-hide (no JS class needed); .is-closing supports an exit slide */
+@starting-style {
+    .dg-drawer { transform: translateX(100%); }
+}
+
+.dg-drawer.is-closing { transform: translateX(100%); }
+
+.dg-drawer-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--gray-300) transparent;
+}
+
+/* Drawer sections — generous, separated panels */
+.dg-drawer-section {
+    padding: var(--space-5) var(--space-6);
+    border-top: 1px solid var(--gray-100);
+}
+
+.dg-drawer-section:first-child { border-top: 0; }
+
+.dg-drawer-body h2 {
+    margin: 0 0 var(--space-2);
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--gray-900);
+}
+
+.dg-drawer-body h3 {
+    margin: 0 0 var(--space-3);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--gray-500);
+}
+
+.dg-drawer-close {
+    position: absolute;
+    top: var(--space-4);
+    right: var(--space-4);
+    z-index: 3;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    font-size: 0.85rem;
+    color: var(--gray-600);
+    background: color-mix(in srgb, var(--surface-card) 92%, transparent);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    transition: background var(--dur-fast) var(--ease-out);
+}
+
+.dg-drawer-close:hover { background: var(--gray-100); color: var(--gray-900); }
+
+/* Hero image — click to zoom */
+.dg-drawer-hero {
+    position: relative;
+    display: grid;
+    place-items: center;
+    aspect-ratio: 4 / 3;
+    background: var(--surface-inset);
+    cursor: zoom-in;
+    overflow: hidden;
+}
+
+.dg-drawer-hero img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: var(--space-3);
+    box-sizing: border-box;
+}
+
+/* Labeled thumbnail strip */
+.dg-drawer-strip {
+    display: flex;
+    gap: var(--space-2);
+    overflow-x: auto;
+    padding: var(--space-3) var(--space-6);
+    background: var(--surface-elevated);
+    border-bottom: 1px solid var(--gray-100);
+    scrollbar-width: thin;
+    scrollbar-color: var(--gray-300) transparent;
+}
+
+.dg-strip-thumb {
+    flex: 0 0 auto;
+    width: 64px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    font-size: 0.6rem;
+    font-weight: 600;
+    color: var(--gray-500);
+}
+
+.dg-strip-thumb img,
+.dg-strip-thumb .dg-strip-img {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+    background: var(--surface-inset);
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    box-sizing: border-box;
+    transition: border-color var(--dur-fast) var(--ease-out);
+}
+
+.dg-strip-thumb:hover img { border-color: var(--gray-400); }
+
+.dg-strip-thumb--active { color: var(--dash-theme-dark); }
+
+.dg-strip-thumb--active img,
+.dg-strip-thumb--active .dg-strip-img {
+    border-color: var(--dash-theme);
+}
+
+/* Metadata rows — label / value grid */
+.dg-meta-rows {
+    display: grid;
+    grid-template-columns: minmax(96px, 130px) 1fr;
+    row-gap: var(--space-2);
+    column-gap: var(--space-4);
+    font-size: 0.86rem;
+    margin: 0;
+}
+
+.dg-meta-rows dt,
+.dg-meta-rows .dg-meta-label {
+    margin: 0;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--gray-500);
+    align-self: baseline;
+    padding-top: 2px;
+}
+
+.dg-meta-rows dd,
+.dg-meta-rows .dg-meta-value {
+    margin: 0;
+    color: var(--gray-800);
+    overflow-wrap: anywhere;
+}
+
+/* DST file list — mono, copy-friendly */
+.dg-dst-list {
+    margin: 0;
+    padding: var(--space-2) var(--space-3);
+    list-style: none;
+    font-size: 0.76rem;
+    color: var(--gray-700);
+    background: var(--surface-inset);
+    border-radius: var(--radius-md);
+}
+
+.dg-dst-list li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 0.3rem 0.2rem;
+    overflow-wrap: anywhere;
+}
+
+.dg-dst-list li + li { border-top: 1px solid var(--gray-200); }
+
+.dg-dst-list button {
+    margin-left: auto;
+    flex: 0 0 auto;
+    padding: 2px 7px;
+    font-size: 0.68rem;
+    color: var(--gray-500);
+    background: var(--surface-card);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: color var(--dur-fast) var(--ease-out), border-color var(--dur-fast) var(--ease-out);
+}
+
+.dg-dst-list button:hover { color: var(--dash-theme); border-color: var(--dash-theme); }
+
+/* Sticky actions bar */
+.dg-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 2;
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-6);
+    background: var(--surface-card);
+    border-top: 1px solid var(--gray-200);
+    box-shadow: 0 -4px 12px color-mix(in srgb, var(--gray-900) 5%, transparent);
+}
+
+.dg-actions .dash-btn { padding: 7px 12px; font-size: 0.82rem; }
+
+.dg-actions-pos {
+    margin-left: auto;
+    font-size: 0.76rem;
+    color: var(--gray-500);
+    white-space: nowrap;
+}
+
+/* ==========================================================================
+   Lightbox — fullscreen dark
+   ========================================================================== */
+.dg-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 400;
+    display: grid;
+    place-items: center;
+    background: color-mix(in srgb, var(--gray-900) 93%, transparent);
+    opacity: 1;
+    transition: opacity 200ms var(--ease-out), display 200ms allow-discrete;
+}
+
+@starting-style {
+    .dg-lightbox { opacity: 0; }
+}
+
+.dg-lightbox-img {
+    max-width: 92vw;
+    max-height: 84vh;
+    object-fit: contain;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    background: var(--surface-card);
+}
+
+.dg-lightbox-cap {
+    position: fixed;
+    left: 50%;
+    bottom: var(--space-6);
+    transform: translateX(-50%);
+    max-width: 88vw;
+    padding: 0.35rem 1rem;
+    font-size: 0.8rem;
+    color: color-mix(in srgb, var(--surface-card) 88%, transparent);
+    background: color-mix(in srgb, var(--gray-900) 65%, transparent);
+    border-radius: var(--radius-pill);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dg-lightbox-close {
+    position: fixed;
+    top: var(--space-5);
+    right: var(--space-5);
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    font-size: 1rem;
+    color: var(--surface-card);
+    background: color-mix(in srgb, var(--surface-card) 14%, transparent);
+    border: 1px solid color-mix(in srgb, var(--surface-card) 25%, transparent);
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    transition: background var(--dur-fast) var(--ease-out);
+}
+
+.dg-lightbox-close:hover {
+    background: color-mix(in srgb, var(--surface-card) 28%, transparent);
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+@media (max-width: 900px) {
+    .dg-toolbar-row--search { flex-direction: column; align-items: stretch; }
+    .dg-omnibox-wrap { flex: 1 1 auto; min-width: 0; }
+    .dg-customer-wrap { justify-content: flex-start; }
+    .dg-toolbar-row--filters { gap: var(--space-2); }
+    .dg-density { margin-left: 0; }
+    .dg-omnibox-kbd { display: none; }
+}
+
+@media (max-width: 640px) {
+    .dg-main { padding: var(--space-4); }
+    .dg-toolbar { padding: var(--space-3) var(--space-4); margin-bottom: var(--space-4); }
+    .dg-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--space-3); }
+    .dg-grid--wall { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+    .dg-wall-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
+    .dg-rail-track .dg-card { width: 160px; }
+    .dg-stat-strip { grid-template-columns: repeat(2, 1fr); gap: var(--space-3); margin-bottom: var(--space-6); }
+    .dg-rail { margin-bottom: var(--space-6); }
+
+    /* Drawer becomes a full sheet */
+    .dg-drawer { width: 100vw; border-left: 0; }
+    .dg-drawer-section { padding: var(--space-4) var(--space-4); }
+    .dg-drawer-strip { padding: var(--space-3) var(--space-4); }
+    .dg-actions { padding: var(--space-3) var(--space-4); flex-wrap: wrap; }
+
+    .dg-lightbox-img { max-width: 96vw; max-height: 80vh; }
+}
+
+/* ==========================================================================
+   Reduced motion — kill lifts, slides, shimmer
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+    .dg-body *,
+    .dg-body *::before,
+    .dg-body *::after,
+    .dg-drawer,
+    .dg-drawer-overlay,
+    .dg-lightbox {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+    .dg-card:hover { transform: none; }
+    .dg-card:hover .dg-card-thumb img { transform: none; }
+    .dg-skel::after { animation: none; }
+    .dg-rail-track { scroll-snap-type: none; }
+}
+
+/* ==========================================================================
+   Print — the grid is the record; chrome disappears
+   ========================================================================== */
+@media print {
+    .dg-boot,
+    .dg-toolbar,
+    .dg-drawer,
+    .dg-drawer-overlay,
+    .dg-lightbox,
+    .dg-freshness,
+    .dg-deep-row,
+    .dg-rail-btn,
+    .dg-copy,
+    .dg-banner,
+    .dash-back-link {
+        display: none !important;
+    }
+
+    .dg-body { background: var(--surface-card); }
+
+    .dash-header {
+        background: none;
+        box-shadow: none;
+        border-bottom: 1px solid var(--gray-300);
+    }
+
+    .dg-header-title h1,
+    .dg-subtitle { color: var(--gray-900); }
+
+    .dg-card {
+        content-visibility: visible;
+        break-inside: avoid;
+        box-shadow: none;
+    }
+
+    .dg-rail-track {
+        flex-wrap: wrap;
+        overflow: visible;
+        -webkit-mask-image: none;
+        mask-image: none;
+    }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Browse rails, portfolio band, and drawer internals
+   Classes emitted by design-gallery-rails.js / -drawer.js / design-gallery.js.
+   Tokens only — no new colour values.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── top-client collage tiles ───────────────────────────────────────────── */
+.dg-collage-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 2px;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: var(--gray-200);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.dg-collage-grid img,
+.dg-collage-grid .dg-card-tile {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.dg-collage-name {
+    display: block;
+    margin-top: var(--space-2);
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--gray-800);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dg-collage-count {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--gray-500);
+}
+
+.dg-rail-shuffle {
+    margin-left: auto;
+    font-size: 0.8125rem;
+}
+
+/* ── portfolio band ─────────────────────────────────────────────────────── */
+.dg-portfolio-head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+
+.dg-portfolio-head h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: var(--gray-900);
+}
+
+.dg-portfolio-head .dash-btn {
+    margin-left: auto;
+}
+
+/* ── filter tokens ──────────────────────────────────────────────────────── */
+.dg-token--clear {
+    background: transparent;
+    border-style: dashed;
+    color: var(--gray-600);
+}
+
+/* ── deep-search row ────────────────────────────────────────────────────── */
+.dg-deep-hint {
+    color: var(--gray-500);
+    font-size: 0.75rem;
+}
+
+/* ── drawer header ──────────────────────────────────────────────────────── */
+.dg-drawer-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--gray-200);
+}
+
+.dg-drawer-head h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: var(--gray-900);
+}
+
+.dg-drawer-company {
+    margin: var(--space-1) 0 0;
+    font-weight: 600;
+    color: var(--gray-800);
+}
+
+.dg-drawer-name {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--gray-500);
+}
+
+/* ── drawer sections ────────────────────────────────────────────────────── */
+.dg-section-body {
+    font-size: 0.875rem;
+    color: var(--gray-700);
+}
+
+.dg-meta-row {
+    display: grid;
+    grid-template-columns: 8.5rem 1fr;
+    gap: var(--space-2);
+    padding: var(--space-2) 0;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.dg-meta-row dt {
+    color: var(--gray-500);
+    font-size: 0.8125rem;
+}
+
+.dg-meta-row dd {
+    margin: 0;
+    color: var(--gray-800);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    align-items: center;
+}
+
+.dg-mini-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.dg-mini-list li {
+    padding: var(--space-2);
+    background: var(--surface-inset);
+    border-radius: var(--radius-sm);
+    font-size: 0.8125rem;
+    color: var(--gray-700);
+}
+
+.dg-mini-list em {
+    color: var(--gray-500);
+    font-style: normal;
+}
+
+.dg-empty {
+    margin: 0;
+    color: var(--gray-500);
+    font-size: 0.8125rem;
+    font-style: italic;
+}
+
+.dg-copy-inline {
+    background: none;
+    border: 0;
+    padding: var(--space-1);
+    color: var(--gray-400);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+}
+
+.dg-copy-inline:hover,
+.dg-copy-inline:focus-visible {
+    color: var(--dash-theme);
+    background: var(--dash-theme-bg);
+}
+
+/* ── drawer action bar ──────────────────────────────────────────────────── */
+.dg-actions-nav {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+/* ── skeleton variant for hydrating sections ────────────────────────────── */
+.dg-skel--rows {
+    height: 4.5rem;
+    width: 100%;
+    border-radius: var(--radius-sm);
+}
