@@ -54,6 +54,12 @@
             });
     }
 
+    // Stored Caspio rows hold absolute proxy Box urls that 401 since the Box
+    // surface was session-gated; boxUrl() re-points them at this origin so the
+    // session cookie authorises the <img>. Guarded so a missing box-url.js
+    // script tag degrades instead of throwing.
+    function resolveBoxUrl(u) { return (typeof boxUrl === 'function') ? boxUrl(u) : u; }
+
     function normalizeStatus(raw) {
         if (!raw || raw === '') return 'Submitted';
         var s = String(raw).trim();
@@ -417,7 +423,7 @@
             //      → Already an image URL; use directly. Wrapping it in shared-image
             //        produces nonsense like ?url=<proxy-url> which the converter rejects.
             var src = (mockupUrl.indexOf('/api/box/') !== -1)
-                ? mockupUrl
+                ? resolveBoxUrl(mockupUrl)
                 : '/api/box/shared-image?url=' + encodeURIComponent(mockupUrl);
             thumbHtml = '<img src="' + src + '"' +
                 ' alt="' + company + ' mockup" loading="lazy"' +
@@ -831,7 +837,7 @@
                     // Mutate the in-memory record's SAME slot so a re-render keeps the URL.
                     req[slotField] = resp.body.newUrl;
                     // Swap the broken card for a fresh image without touching the rest of the card.
-                    thumb.innerHTML = '<img src="' + resp.body.newUrl + '"' +
+                    thumb.innerHTML = '<img src="' + resolveBoxUrl(resp.body.newUrl) + '"' +
                         ' alt="' + (req.CompanyName || 'mockup') + '" loading="lazy"' +
                         ' onerror="window.SteveGallery.handleThumbError(this)">';
                 }

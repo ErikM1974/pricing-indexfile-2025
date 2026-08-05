@@ -30,6 +30,12 @@
     var ART_SLOTS = ['Box_File_Mockup', 'BoxFileLink', 'Company_Mockup', 'Mockup_4', 'Mockup_5', 'Mockup_6'];
     var RUTH_SLOTS = ['Box_Mockup_1', 'Box_Mockup_2', 'Box_Mockup_3', 'Box_Mockup_4', 'Box_Mockup_5', 'Box_Mockup_6'];
 
+    // Stored Caspio rows hold absolute proxy Box urls that 401 since the Box
+    // surface was session-gated; boxUrl() re-points them at this origin so the
+    // session cookie authorises the <img>. Guarded so a missing box-url.js
+    // script tag degrades instead of throwing.
+    function resolveBoxUrl(u) { return (typeof boxUrl === 'function') ? boxUrl(u) : u; }
+
     function base() {
         if (!window.APP_CONFIG || !APP_CONFIG.API || !APP_CONFIG.API.BASE_URL) {
             throw new Error('APP_CONFIG.API.BASE_URL missing');
@@ -106,13 +112,13 @@
         }
         var img = state.images[state.active] || state.images[0];
         var hero = els.body.querySelector('[data-hero]');
-        hero.innerHTML = '<img src="' + DG.esc(img.url) + '" alt="' + DG.esc(img.label + ' for design ' + state.dn) + '" data-hero-img>';
+        hero.innerHTML = '<img src="' + DG.esc(resolveBoxUrl(img.url)) + '" alt="' + DG.esc(img.label + ' for design ' + state.dn) + '" data-hero-img>';
 
         var strip = '';
         for (var i = 0; i < state.images.length; i++) {
             strip += '<button type="button" class="dg-strip-thumb' + (i === state.active ? ' dg-strip-thumb--active' : '') + '"'
                 + ' data-img="' + i + '" title="' + DG.esc(state.images[i].label) + '">'
-                + '<img src="' + DG.esc(state.images[i].url) + '" alt="" loading="lazy" decoding="async">'
+                + '<img src="' + DG.esc(resolveBoxUrl(state.images[i].url)) + '" alt="" loading="lazy" decoding="async">'
                 + '<span>' + DG.esc(state.images[i].label) + '</span>'
                 + '</button>';
         }
@@ -342,15 +348,18 @@
     function openLightbox() {
         var img = state.images[state.active];
         if (!img || !els.lightbox) return;
-        els.lightboxImg.src = img.url;
+        var displayUrl = resolveBoxUrl(img.url);
+        els.lightboxImg.src = displayUrl;
         els.lightboxCap.textContent = img.label + ' · design ' + state.dn;
         els.lightbox.hidden = false;
         // Upgrade to the large Box render only once it has actually decoded —
         // a failed upgrade must never blank a working image.
-        if (/\/api\/box\/thumbnail\//.test(img.url) && img.url.indexOf('size=large') === -1) {
+        if (/\/api\/box\/thumbnail\//.test(displayUrl) && displayUrl.indexOf('size=large') === -1) {
             var big = new Image();
-            var target = img.url + (img.url.indexOf('?') === -1 ? '?' : '&') + 'size=large';
-            big.onload = function () { if (!els.lightbox.hidden && els.lightboxImg.src === img.url) els.lightboxImg.src = target; };
+            var target = displayUrl + (displayUrl.indexOf('?') === -1 ? '?' : '&') + 'size=large';
+            // getAttribute, not .src — the property resolves a same-origin
+            // relative url to absolute and would never match the literal set.
+            big.onload = function () { if (!els.lightbox.hidden && els.lightboxImg.getAttribute('src') === displayUrl) els.lightboxImg.src = target; };
             big.src = target;
         }
         if (els.lightboxClose) els.lightboxClose.focus();

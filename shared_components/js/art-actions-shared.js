@@ -69,6 +69,46 @@
     }
 
     /**
+     * Render-time normaliser for STORED Box URLs (box-url.js).
+     *
+     * Caspio rows hold absolute proxy URLs like
+     * `https://caspio-pricing-proxy-….herokuapp.com/api/box/thumbnail/<id>`.
+     * Since the Box surface was session-gated those 401 in the browser, which
+     * is why "Previously Sent" thumbnails render as grey File placeholders.
+     * boxUrl() drops the origin so the request goes same-origin and the SAML
+     * cookie rides along.
+     *
+     * Every page loading this file must also load box-url.js — a drift-lock
+     * test enforces it, so the identity fallback here is belt-and-braces
+     * against a hard ReferenceError killing the whole modal, not a licence to
+     * skip the script tag.
+     */
+    function resolveBoxUrl(url) {
+        return (typeof boxUrl === 'function') ? boxUrl(url) : url;
+    }
+
+    /**
+     * Box file id out of a proxy thumbnail URL, absolute or relative, else ''.
+     * `https://caspio-pricing-proxy-….herokuapp.com/api/box/thumbnail/123` → '123'
+     */
+    function boxFileIdFromThumbUrl(url) {
+        var m = /\/api\/box\/thumbnail\/(\d+)/.exec(String(url || ''));
+        return m ? m[1] : '';
+    }
+
+    /** Mint an open Box shared link for a file id. Rejects on a non-2xx. */
+    function createBoxSharedLink(fileId) {
+        return fetch('/api/box/shared-link', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fileId: fileId })
+        }).then(function (r) {
+            if (!r.ok) throw new Error('Shared link ' + r.status);
+            return r.json();
+        }).then(function (d) { return d.downloadUrl || d.sharedLink; });
+    }
+
+    /**
      * Handle image load failure — try Box proxy fallback for broken shared/static URLs,
      * or detect a 404 on our proxy URL (file truly gone from Box). Exposed via ArtActions
      * so inline onerror handlers across art-ae/mockup-ae/mockup-ruth can reuse it.
@@ -1052,14 +1092,48 @@
         // Multi-select: fresh selection set each time the modal opens.
         modal._selectedMockups = new Map();
 
+        // Steve names his Box folders with the SHOPWORKS design number
+        // (Design_Num_SW — "40733 Ironside Marine"), NOT Caspio's ID_Design
+        // autonumber. The two series are unrelated: across 2,710 art requests
+        // they coincide 4 times, all hand-typed. Searching by designId therefore
+        // found a folder essentially never, and Steve always landed on the
+        // paste-URL fallback.
+        //
+        // Deliberately NO company-name fallback: a company search resolves to
+        // the first folder merely CONTAINING the name, which is a different
+        // design's artwork (that is how the proxy's findArtFolder filed design
+        // 53069's mockup into "40640 Ironside Marine"). An honest empty state
+        // beats offering Steve another job's mockup as a valid pick.
+        var swDesignNum = String((artReqData && artReqData.Design_Num_SW) || '').trim();
+
         (async function loadBoxFiles() {
+            if (!swDesignNum) {
+                boxLoading.style.display = 'none';
+                boxEmpty.textContent = 'No ShopWorks design number on this request yet, so there is no Box folder to search. Paste a mockup URL below instead.';
+                boxEmpty.style.display = 'block';
+                boxPasteFallback.style.display = 'block';
+                return;
+            }
             try {
-                var boxResp = await fetch('/api/box/folder-files?designNumber=' + designId);
+                var boxResp = await fetch('/api/box/folder-files?designNumber=' + encodeURIComponent(swDesignNum));
                 boxLoading.style.display = 'none';
                 if (!boxResp.ok) throw new Error('Box API ' + boxResp.status);
                 var boxData = await boxResp.json();
 
-                if (!boxData.found || boxData.files.length === 0) {
+                // Two very different misses, so say which one it is — a bare
+                // "not found" is undiagnosable when the folder is sitting right
+                // there in Box.
+                if (!boxData.found) {
+                    boxEmpty.textContent = 'No Box folder starting with ' + swDesignNum + '. Paste a mockup URL below instead.';
+                    boxEmpty.style.display = 'block';
+                    boxPasteFallback.style.display = 'block';
+                    return;
+                }
+                if ((boxData.files || []).length === 0) {
+                    // The proxy lists one level only and drops sub-folders, so a
+                    // folder whose mockups live in a sub-folder lands here.
+                    boxEmpty.textContent = 'Box folder "' + (boxData.folderName || swDesignNum)
+                        + '" has no files at its top level (sub-folders are not searched). Paste a mockup URL below instead.';
                     boxEmpty.style.display = 'block';
                     boxPasteFallback.style.display = 'block';
                     return;
@@ -1146,12 +1220,17 @@
 
                 var fileCard = document.createElement('div');
                 fileCard.className = 'approval-file-card approval-file-selectable';
-                fileCard.dataset.mockupUrl = url.trim();
+                // dataset keeps the STORED url — that is what the send path
+                // turns into a Box shared link. Only the <img> is rewritten
+                // same-origin so it renders behind the session gate.
+                var storedUrl = url.trim();
+                var displayUrl = resolveBoxUrl(storedUrl);
+                fileCard.dataset.mockupUrl = storedUrl;
                 fileCard.title = 'Click to select this mockup';
                 var noteVal = field.noteKey ? (artReqData[field.noteKey] || '') : '';
                 fileCard.innerHTML =
-                    '<img src="' + escapeHtml(url) + '" alt="' + escapeHtml(field.label) + '" loading="lazy"'
-                    + ' data-original-src="' + escapeHtml(url) + '">'
+                    '<img src="' + escapeHtml(displayUrl) + '" alt="' + escapeHtml(field.label) + '" loading="lazy"'
+                    + ' data-original-src="' + escapeHtml(displayUrl) + '">'
                     + '<div class="approval-file-placeholder" style="display:none;">File</div>'
                     + '<div class="approval-file-label">' + escapeHtml(field.label) + '</div>'
                     + (noteVal ? '<div class="approval-file-note">' + escapeHtml(noteVal) + '</div>' : '')
@@ -1257,14 +1336,7 @@
             submitBtn.disabled = true;
             submitBtn.textContent = 'Creating links...';
             var linkResults = await Promise.allSettled(boxEntries.map(function (e) {
-                return fetch('/api/box/shared-link', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ fileId: e.id })
-                }).then(function (r) {
-                    if (!r.ok) throw new Error('Shared link ' + r.status);
-                    return r.json();
-                }).then(function (d) { return d.downloadUrl || d.sharedLink; });
+                return createBoxSharedLink(e.id);
             }));
             var failedNames = [];
             linkResults.forEach(function (res, i) {
@@ -1278,6 +1350,43 @@
             if (failedNames.length > 0) {
                 console.error('Box shared-link failures:', linkResults);
                 alert('Could not create shared links for: ' + failedNames.join(', ') + '.\nNo email was sent — please retry.');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Send Mockup';
+                return;
+            }
+        }
+
+        // 4) Anything still pointing at /api/box/thumbnail/<id> is a
+        //    SESSION-GATED url. It renders in-app because the staff cookie rides
+        //    along, but the email lands in a rep's inbox — and often gets
+        //    forwarded to the customer — where there is no session at all, so it
+        //    arrives as a broken image. Swap those for real Box shared links
+        //    before they go anywhere. Hits the "Previously Sent" cards (whose
+        //    stored Caspio value is exactly that shape) and a pasted proxy url.
+        //    Same rule as above: if a link cannot be made, send NOTHING.
+        var gatedUrls = [];
+        mockupUrls.forEach(function (u, i) {
+            var fid = boxFileIdFromThumbUrl(u);
+            if (fid) gatedUrls.push({ index: i, fileId: fid });
+        });
+        if (gatedUrls.length > 0) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Creating links...';
+            var convResults = await Promise.allSettled(gatedUrls.map(function (g) {
+                return createBoxSharedLink(g.fileId);
+            }));
+            var convFailed = 0;
+            convResults.forEach(function (res, i) {
+                if (res.status === 'fulfilled' && res.value) {
+                    mockupUrls[gatedUrls[i].index] = res.value;
+                } else {
+                    convFailed++;
+                }
+            });
+            if (convFailed > 0) {
+                console.error('Box shared-link conversion failures:', convResults);
+                alert('Could not create a shareable link for ' + convFailed + ' previously-sent mockup(s).\n'
+                    + 'No email was sent — re-pick them from the Box list above and retry.');
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Send Mockup';
                 return;
@@ -1547,6 +1656,21 @@
             })
         }).then(function (resp) {
             if (!resp.ok) throw new Error('Note failed ' + resp.status);
+
+            // The stored mockup url is usually /api/box/thumbnail/<id>, which is
+            // session-gated — it would reach the rep's inbox as a broken image.
+            // Mint a real Box shared link first. Same swap the Send Mockup modal
+            // does; if it fails we keep the original rather than lose the
+            // reminder, and the console says why.
+            var fid = boxFileIdFromThumbUrl(mockupUrl);
+            return (fid
+                ? createBoxSharedLink(fid).catch(function (err) {
+                    console.warn('Reminder: could not mint a Box shared link, sending the stored url:', err);
+                    return mockupUrl;
+                })
+                : Promise.resolve(mockupUrl));
+        }).then(function (emailMockupUrl) {
+            mockupUrl = emailMockupUrl || mockupUrl;
 
             // 2. Send EmailJS approval reminder
             if (typeof emailjs !== 'undefined' && rep.email) {

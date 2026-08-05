@@ -333,8 +333,14 @@
     // One logo/proof card. Opens a LIGHTBOX (not the internal staff page, which errors for customers).
     // Box + Caspio /api/files URLs are already caspio-proxy image endpoints on an allowed host — load
     // them DIRECTLY (grid 256px; lightbox ?size=large). Non-proxy URLs go via the FE image-proxy.
+    //
+    // /api/portal/proof-image/<token> is the CUSTOMER-side Box image route (the raw
+    // /api/box/thumbnail/ one is staff-only and 401s here — that is what left every
+    // proof blank after the Aug 5 gating). The server rewrites stored Box urls to it,
+    // so it must be recognised as a proxy image AND as size=large-capable; miss that
+    // and these get shoved through /api/image-proxy, which cannot fetch them either.
     function renderLogoCard(l, actionKeys, typeLabel) {
-        var isBox = /\/api\/box\/thumbnail\//.test(l.img);
+        var isBox = /\/api\/box\/thumbnail\/|\/api\/portal\/proof-image\//.test(l.img);
         var isProxyImg = isBox || /\/api\/files\//.test(l.img);
         var gridSrc = isProxyImg ? l.img : ('/api/image-proxy?url=' + encodeURIComponent(l.img));
         var largeRaw = isBox ? (l.img + (l.img.indexOf('?') === -1 ? '?' : '&') + 'size=large') : l.img;

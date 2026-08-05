@@ -12,6 +12,12 @@
     const API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
         || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 
+    // Stored Caspio rows hold absolute proxy Box urls that 401 since the Box
+    // surface was session-gated; boxUrl() re-points them at this origin so the
+    // session cookie authorises the <img>. Guarded so a missing box-url.js
+    // script tag degrades instead of throwing.
+    function resolveBoxUrl(u) { return (typeof boxUrl === 'function') ? boxUrl(u) : u; }
+
     // ── Dropdown Functionality ──────────────────────────────────────
 
     window.toggleMoreDropdown = function () {
@@ -457,9 +463,12 @@
         if (!lb) return;
         var img = document.getElementById('ae-lightbox-img');
         var largeUrl = upgradeBoxThumbUrl(url);
-        // If the large variant fails (representation not ready), fall back to the small one
+        // If the large variant fails (representation not ready), fall back to the
+        // small one. getAttribute, not .src — the property resolves a relative
+        // same-origin url to an absolute one, so it never equals the relative
+        // literal we set and the fallback would silently never fire.
         img.onerror = function () {
-            if (img.src === largeUrl && largeUrl !== url) img.src = url;
+            if (img.getAttribute('src') === largeUrl && largeUrl !== url) img.src = url;
         };
         img.src = largeUrl;
         document.getElementById('ae-lightbox-label').textContent = label || '';
@@ -593,6 +602,8 @@
                     if (!mockupUrl || BARE_CDN_RE.test(mockupUrl)) mockupUrl = req.Mockup_6 || '';
                     if (!mockupUrl || BARE_CDN_RE.test(mockupUrl)) mockupUrl = req.File_Upload || '';
                     if (BARE_CDN_RE.test(mockupUrl)) mockupUrl = '';
+                    // Display-only copy — mockupUrl keeps the stored Caspio value.
+                    var mockupDisplayUrl = resolveBoxUrl(mockupUrl);
 
                     var statusInfo = getStatusInfo(status);
                     var detailId = idDesign.replace(/[^0-9]/g, '');
@@ -611,7 +622,7 @@
 
                     var imageHtml;
                     if (mockupUrl) {
-                        imageHtml = '<div class="ae-art-card__image ae-art-card__image--loading"><img src="' + escapeHtml(mockupUrl) + '" alt="' + escapeHtml(company) + ' mockup" loading="lazy" style="cursor:pointer" data-mockup-url="' + escapeHtml(mockupUrl) + '" onload="this.parentElement.classList.remove(\'ae-art-card__image--loading\')" onerror="this.parentElement.classList.remove(\'ae-art-card__image--loading\'); this.parentElement.innerHTML=\'<div class=ae-art-card__placeholder><svg width=48 height=48 viewBox=&quot;0 0 24 24&quot; fill=none stroke=#9ca3af stroke-width=1.5><rect x=3 y=3 width=18 height=18 rx=2/><circle cx=8.5 cy=8.5 r=1.5/><path d=&quot;M21 15l-5-5L5 21&quot;/></svg></div>\'"></div>';
+                        imageHtml = '<div class="ae-art-card__image ae-art-card__image--loading"><img src="' + escapeHtml(mockupDisplayUrl) + '" alt="' + escapeHtml(company) + ' mockup" loading="lazy" style="cursor:pointer" data-mockup-url="' + escapeHtml(mockupDisplayUrl) + '" onload="this.parentElement.classList.remove(\'ae-art-card__image--loading\')" onerror="this.parentElement.classList.remove(\'ae-art-card__image--loading\'); this.parentElement.innerHTML=\'<div class=ae-art-card__placeholder><svg width=48 height=48 viewBox=&quot;0 0 24 24&quot; fill=none stroke=#9ca3af stroke-width=1.5><rect x=3 y=3 width=18 height=18 rx=2/><circle cx=8.5 cy=8.5 r=1.5/><path d=&quot;M21 15l-5-5L5 21&quot;/></svg></div>\'"></div>';
                     } else {
                         imageHtml = '<div class="ae-art-card__image"><div class="ae-art-card__placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div></div>';
                     }

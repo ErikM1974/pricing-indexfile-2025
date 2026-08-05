@@ -8,8 +8,12 @@
  * thing standing between the proxy gate and every art image 401ing.
  */
 
+const fs = require('fs');
+const path = require('path');
+
 const PROXY = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 const { boxUrl } = require('../../shared_components/js/box-url.js');
+const REPO = path.join(__dirname, '..', '..');
 
 describe('boxUrl — persisted proxy READ urls come back to this origin', () => {
     test.each([
@@ -82,4 +86,78 @@ describe('boxUrl — leaves everything else alone', () => {
         const u = 'not a url /api/box/thumbnail/1';
         expect(typeof boxUrl(u)).toBe('string');
     });
+});
+
+/**
+ * DRIFT LOCK — the guard that was missing on 2026-08-05.
+ *
+ * box-url.js shipped with the Box gating but its <script> tag was only added to
+ * the two transfer pages. Every art and mockup surface kept rendering stored
+ * absolute proxy URLs, which 401 behind the gate, so Steve's "Previously Sent"
+ * thumbnails (and the AE / Ruth / gallery cards) all went grey. The function
+ * itself was fine and fully unit-tested — nothing loaded it.
+ *
+ * So: any page that loads a script calling boxUrl() must also load box-url.js,
+ * and must load it FIRST. A page that drifts out of sync fails here.
+ */
+describe('box-url.js is loaded by every page whose scripts call boxUrl()', () => {
+    const JS_DIRS = ['shared_components/js', 'pages/js', 'dashboards/js'];
+    const CALLS_BOX_URL = /\bboxUrl\s*\(/;
+
+    const listFiles = (dir, ext) => {
+        const abs = path.join(REPO, dir);
+        if (!fs.existsSync(abs)) return [];
+        return fs.readdirSync(abs).filter(f => f.endsWith(ext)).map(f => `${dir}/${f}`);
+    };
+
+    // Every JS file that actually calls boxUrl() (box-url.js itself excluded).
+    const consumers = JS_DIRS
+        .flatMap(d => listFiles(d, '.js'))
+        .filter(rel => !rel.endsWith('box-url.js'))
+        .filter(rel => CALLS_BOX_URL.test(fs.readFileSync(path.join(REPO, rel), 'utf8')));
+
+    // Every HTML page in the repo, with its markup.
+    const pages = ['.', 'pages', 'dashboards', 'admin']
+        .flatMap(d => listFiles(d, '.html'))
+        .map(rel => ({ rel, html: fs.readFileSync(path.join(REPO, rel), 'utf8') }));
+
+    test('the scan actually found consumers (guards against a silently empty test)', () => {
+        expect(consumers.length).toBeGreaterThan(0);
+        expect(pages.length).toBeGreaterThan(0);
+    });
+
+    // Index of the actual <script src="…basename…"> tag, or -1. Matching on a
+    // bare filename would also hit prose in HTML comments — several pages name
+    // their own script in a comment near the top, which made an order check
+    // read backwards.
+    const scriptTagIndex = (html, base) => {
+        const re = new RegExp('<script[^>]+src=["\'][^"\']*' + base.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+        const m = re.exec(html);
+        return m ? m.index : -1;
+    };
+
+    // One case per (page, consumer script) pair that actually exists.
+    const pairs = [];
+    for (const c of consumers) {
+        const base = path.basename(c);
+        for (const p of pages) {
+            if (scriptTagIndex(p.html, base) !== -1) pairs.push([p.rel, base, p.html]);
+        }
+    }
+
+    test('every consumer script is reachable from at least one page', () => {
+        const orphans = consumers.filter(c => !pairs.some(([, base]) => base === path.basename(c)));
+        expect(orphans).toEqual([]);
+    });
+
+    test.each(pairs.map(([page, script]) => [page, script]))(
+        '%s loads box-url.js for %s',
+        (page, script) => {
+            const html = pairs.find(([p, s]) => p === page && s === script)[2];
+            const boxUrlAt = scriptTagIndex(html, 'box-url.js');
+            expect(boxUrlAt).not.toBe(-1);
+            // Order matters — boxUrl must be defined before the consumer runs.
+            expect(boxUrlAt).toBeLessThan(scriptTagIndex(html, script));
+        }
+    );
 });

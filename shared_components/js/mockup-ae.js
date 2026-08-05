@@ -30,6 +30,12 @@ var MockupAeGallery = (function () {
         'Erik': 'erik@nwcustomapparel.com'
     };
 
+    // Stored Caspio rows hold absolute proxy Box urls that 401 since the Box
+    // surface was session-gated; boxUrl() re-points them at this origin so the
+    // session cookie authorises the <img>. Guarded so a missing box-url.js
+    // script tag degrades instead of throwing.
+    function resolveBoxUrl(u) { return (typeof boxUrl === 'function') ? boxUrl(u) : u; }
+
     function resolveRepName(email) {
         if (!email) return '';
         for (var name in REP_EMAIL_MAP) {
@@ -429,11 +435,12 @@ var MockupAeGallery = (function () {
         }
 
         var thumbUrl = mockup.Box_Mockup_1 || '';
+        var thumbDisplayUrl = resolveBoxUrl(thumbUrl);
         var thumbHtml = '';
         if (thumbUrl) {
             thumbHtml = '<div class="card-thumb">'
-                + '<img src="' + escapeHtml(thumbUrl) + '" alt="Mockup preview" loading="lazy"'
-                + ' data-original-src="' + escapeHtml(thumbUrl) + '"'
+                + '<img src="' + escapeHtml(thumbDisplayUrl) + '" alt="Mockup preview" loading="lazy"'
+                + ' data-original-src="' + escapeHtml(thumbDisplayUrl) + '"'
                 + ' onerror="if(window.ArtActions&&window.ArtActions.handleBoxImageError){window.ArtActions.handleBoxImageError(this);}else{this.parentElement.style.display=\'none\';}">'
                 + '</div>';
         }
@@ -601,7 +608,8 @@ var MockupAeGallery = (function () {
 
         var thumbHtml = '';
         if (m.Box_Mockup_1) {
-            thumbHtml = '<img class="kanban-card-thumb" src="' + escapeHtml(m.Box_Mockup_1) + '" loading="lazy" data-original-src="' + escapeHtml(m.Box_Mockup_1) + '" onerror="if(window.ArtActions&&window.ArtActions.handleBoxImageError){window.ArtActions.handleBoxImageError(this);}else{this.style.display=\'none\';}" alt="">';
+            var kanbanThumbUrl = resolveBoxUrl(m.Box_Mockup_1);
+            thumbHtml = '<img class="kanban-card-thumb" src="' + escapeHtml(kanbanThumbUrl) + '" loading="lazy" data-original-src="' + escapeHtml(kanbanThumbUrl) + '" onerror="if(window.ArtActions&&window.ArtActions.handleBoxImageError){window.ArtActions.handleBoxImageError(this);}else{this.style.display=\'none\';}" alt="">';
         }
 
         var kanbanElapsed = (typeof ElapsedTimeUtils !== 'undefined')
