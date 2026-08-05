@@ -678,6 +678,11 @@
         if (el) { el.textContent = ''; el.hidden = true; }
     }
 
+    function currentDstErrorText() {
+        var el = document.getElementById('dstError');
+        return el && !el.hidden ? el.textContent : '';
+    }
+
     /* ---------- thumbnail ---------- */
 
     // Small standalone stitch render. Deliberately NOT imported from
@@ -783,14 +788,20 @@
         price.title = 'Per piece, this location, before LTM';
         head.appendChild(price);
 
-        var rm = el('button', 'dst-remove');
-        rm.type = 'button';
-        rm.setAttribute('aria-label', f
-            ? 'Remove ' + f.name
-            : 'Remove location ' + (index + 1));
-        rm.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>';
-        rm.addEventListener('click', function () { removeLine(line); });
-        head.appendChild(rm);
+        // Location 1 with no file is the TYPED base line — it is not removable
+        // (its stitch count lives in the top input and there is nothing to take
+        // away). Rendering a ✕ there gave a live control that silently did
+        // nothing; omit it instead.
+        if (f || !line.primary) {
+            var rm = el('button', 'dst-remove');
+            rm.type = 'button';
+            rm.setAttribute('aria-label', f
+                ? 'Remove ' + f.name
+                : 'Remove location ' + (index + 1));
+            rm.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>';
+            rm.addEventListener('click', function () { removeLine(line); });
+            head.appendChild(rm);
+        }
         card.appendChild(head);
 
         if (f) {
@@ -837,17 +848,35 @@
                 line.stitches = isNaN(v) ? 0 : v;
                 refreshPricesOnly();
             });
+            // 🔴 blur fires on MOUSEDOWN, before the click it belongs to. A full
+            // card rebuild here removes the very button being pressed, so its
+            // click never dispatches and every ✕/chip needs TWO clicks. Nothing
+            // structural changes on blur anyway — effectiveStitches() already
+            // clamped during typing — so only normalise the visible value.
             inp.addEventListener('blur', function () {
                 line.stitches = effectiveStitches(line);
                 inp.value = String(line.stitches);
-                refreshAll();
+                refreshPricesOnly();
             });
             sw.appendChild(inp);
             ctl.appendChild(sw);
             card.appendChild(ctl);
         }
 
-        // Note row — min clamp, or a hand-edited divergence from the file.
+        var notes = buildLineNotes(line);
+        notes.forEach(function (n) { card.appendChild(n); });
+        return card;
+    }
+
+    /**
+     * The note + suggestion rows for a location, as a fresh array of nodes.
+     * Split out of buildLineCard so refreshPricesOnly() can swap JUST these
+     * rows in place — the ✕ and the product chips must survive, because
+     * destroying them mid-interaction eats the click.
+     */
+    function buildLineNotes(line) {
+        var out = [];
+        var f = line.file;
         if (f) {
             var min2 = minStitchesFor(line.product);
             var target = Math.max(min2, f.stitches);
@@ -861,9 +890,9 @@
                 b1.type = 'button';
                 b1.addEventListener('click', function () { applyFileCount(line); });
                 n1.appendChild(b1);
-                card.appendChild(n1);
+                out.push(n1);
             } else if (f.stitches < min2) {
-                card.appendChild(el('div', 'dst-note',
+                out.push(el('div', 'dst-note',
                     'File sews ' + fmtInt(f.stitches) + ' stitches — priced at the ' +
                     fmtK(min2) + ' contract minimum for ' +
                     PRODUCT_META[line.product].label.toLowerCase() + 's.'));
@@ -896,11 +925,11 @@
                     }
                 });
                 sg.appendChild(sb);
-                card.appendChild(sg);
+                out.push(sg);
             }
         }
 
-        return card;
+        return out;
     }
 
     /** Re-render every location card from state. */
@@ -972,20 +1001,30 @@
             (withFiles.length > 1 ? ' across ' + withFiles.length + ' locations' : '') +
             ' · not a delivery date'));
 
-        // Risk flags — deduped by code across locations, named when it matters.
+        // Risk flags. Grouped by code so the same problem in two files reads as
+        // one entry — but EVERY affected file is named and the WORST instance's
+        // detail is kept. (Plain dedupe silently hid the second file's problem,
+        // which on a production read is the opposite of the point.)
         risksEl.textContent = '';
-        var seen = {};
+        var groups = [];
+        var byCode = {};
         withFiles.forEach(function (l) {
             (l.file.risk || []).forEach(function (flag) {
-                var key = flag.code;
-                if (seen[key]) return;
-                seen[key] = true;
-                var li = el('li', 'dst-risk ' + flag.level);
-                li.appendChild(el('span', 'dst-risk-title',
-                    flag.title + (withFiles.length > 1 ? ' · ' + l.file.name : '')));
-                li.appendChild(el('span', 'dst-risk-detail', flag.detail));
-                risksEl.appendChild(li);
+                var g = byCode[flag.code];
+                if (!g) {
+                    g = byCode[flag.code] = { flag: flag, files: [], worst: Number(flag.value) || 0 };
+                    groups.push(g);
+                }
+                if ((Number(flag.value) || 0) > g.worst) { g.worst = Number(flag.value) || 0; g.flag = flag; }
+                if (g.files.indexOf(l.file.name) === -1) g.files.push(l.file.name);
             });
+        });
+        groups.forEach(function (g) {
+            var li = el('li', 'dst-risk ' + g.flag.level);
+            li.appendChild(el('span', 'dst-risk-title',
+                g.flag.title + (withFiles.length > 1 ? ' · ' + g.files.join(', ') : '')));
+            li.appendChild(el('span', 'dst-risk-detail', g.flag.detail));
+            risksEl.appendChild(li);
         });
         if (!risksEl.children.length) {
             var ok = el('li', 'dst-risk ok');
@@ -1054,10 +1093,19 @@
         renderPriceTable();
         var result = priceAllLines();
         var host = document.getElementById('dstLines');
-        if (result && host) {
-            var priceEls = host.querySelectorAll('.dst-line-price');
-            for (var i = 0; i < priceEls.length && i < result.priced.length; i++) {
-                priceEls[i].textContent = '$' + fmtMoney(result.priced[i].unit);
+        if (host) {
+            var cards = host.querySelectorAll('.dst-card');
+            var lines = allLines();
+            for (var i = 0; i < cards.length && i < lines.length; i++) {
+                if (result && result.priced[i]) {
+                    var pe = cards[i].querySelector('.dst-line-price');
+                    if (pe) pe.textContent = '$' + fmtMoney(result.priced[i].unit);
+                }
+                // Swap ONLY the note/suggest rows — leaving the head (✕) and the
+                // product chips untouched so an in-flight click still lands.
+                var old = cards[i].querySelectorAll('.dst-note, .dst-suggest');
+                for (var k = 0; k < old.length; k++) old[k].parentNode.removeChild(old[k]);
+                buildLineNotes(lines[i]).forEach(function (n) { cards[i].appendChild(n); });
             }
         }
         renderProductionRead(allLines());
@@ -1199,13 +1247,29 @@
         var multi = files.length > 1;
         if (multi) showToast('Reading ' + files.length + ' stitch files as separate locations');
         var loaded = 0;
+        var rejected = [];
         return files.reduce(function (chain, f) {
             return chain.then(function () {
                 return handleDstFile(f, { quiet: multi }).then(function (ok) {
-                    if (ok) loaded++;
+                    if (ok) { loaded++; return; }
+                    // A LATER success calls clearDstError(), which used to wipe
+                    // the message explaining why an EARLIER file was rejected —
+                    // the file just vanished with no reason given. Collect the
+                    // rejections and re-state them once the batch settles.
+                    rejected.push({ name: f.name, why: currentDstErrorText() });
                 });
             });
         }, Promise.resolve()).then(function () {
+            if (rejected.length) {
+                if (rejected.length === 1 && rejected[0].why) {
+                    showDstError(rejected[0].why);
+                } else {
+                    showDstError(rejected.length + ' of ' + files.length +
+                        ' files could not be used: ' +
+                        rejected.map(function (r) { return r.name; }).join(', ') +
+                        '. Drop one at a time to see why.');
+                }
+            }
             if (multi && loaded > 0) {
                 showToast(loaded + ' of ' + files.length + ' files loaded as locations');
             }
@@ -1695,10 +1759,23 @@ var AI_ENDPOINT = '/api/contract-embroidery-ai/chat';
         // because it is one fee per ORDER (Erik 2026-08-04). That keeps
         // Σ LineTotal === session TotalAmount, which is what the quote
         // renderer and ShopWorks both reconcile against.
+        // 🔴 Σ LineTotal MUST equal session TotalAmount. The quote renderer sums
+        // LineTotal for the products table but prints TotalAmount as the grand
+        // total (and taxes it), so any drift shows the customer a table that
+        // doesn't add up to its own total. Per-line rounding drifts by cents, so
+        // the LAST line absorbs the residual — the standard invoice treatment,
+        // and for a single location it reduces to the exact pre-Phase-2 value.
         var ltmPerPiece = Number(calcContext.ltmPerPiece) || 0;
+        var orderTotalExact = Number(calcContext.orderTotal) || 0;
+        var allocated = 0;
         for (var li = 0; li < quoteLocations.length; li++) {
             var loc = quoteLocations[li];
             var unit = (Number(loc.unit) || 0) + (li === 0 ? ltmPerPiece : 0);
+            var isLast = li === quoteLocations.length - 1;
+            var lineTotal = isLast
+                ? Number((orderTotalExact - allocated).toFixed(2))
+                : Number((unit * calcContext.qty).toFixed(2));
+            if (!isLast) allocated += lineTotal;
             var locLabel = locationFor(loc.product);
             var item = {
                 QuoteID: quoteID,
@@ -1709,7 +1786,7 @@ var AI_ENDPOINT = '/api/contract-embroidery-ai/chat';
                     (loc.file ? ' · ' + loc.file : ''),
                 Quantity: calcContext.qty,
                 FinalUnitPrice: parseFloat(unit.toFixed(2)),
-                LineTotal: parseFloat((unit * calcContext.qty).toFixed(2)),
+                LineTotal: lineTotal,
                 SizeBreakdown: '',
                 EmbellishmentType: 'customer-supplied',
                 PrintLocation: locLabel,
