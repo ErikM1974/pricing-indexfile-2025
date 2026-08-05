@@ -5,6 +5,35 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## The shared print block flattens every color you set inline (2026-08-04)
+
+**Problem.** The monogram Customer Proof renders each name in its real thread color — the whole
+point of the sheet. On screen it was perfect. **On paper every name printed black**, and the
+tiny color swatch beside it still printed correct, so the sheet looked deliberate rather than
+broken. Found by review, not by the browser pass that had already "verified" the feature.
+
+**Root cause.** `quote-builder-common.css`'s `@media print` block contains
+`* { color: black !important; }`. The controller set the thread color as a *normal* inline
+declaration (`style="color:#003DA5"`), and an author `!important` beats any normal declaration —
+including inline. Backgrounds were unaffected, which is why the swatch survived and the defect
+read as intentional.
+
+**Solution.** The inline color is now `!important` too (inline `!important` outranks stylesheet
+`!important`). Proven in-page rather than assumed: the same cascade reproduced synthetically
+yields `rgb(0,0,0)` without the flag and the true color with it.
+
+**Prevention.**
+- 🔑 **A print stylesheet is a second rendering nobody looks at.** Screen verification says
+  nothing about it — check print explicitly, or the defect ships looking fine.
+- 🔑 **`quote-builder-common.css` forces black text and is loaded by ALL 4 quote builders** — any
+  feature whose *meaning* is carried by color (thread, status, warning) must use `!important`
+  inline or a rule with its own `!important`, or it silently prints monochrome.
+- 🔑 **A partial survivor disguises the failure**: the swatch (background) printed while the text
+  (color) did not, which reads as a design choice instead of a bug. When one half of a visual
+  pair works, suspect a property-scoped override rather than a broken feature.
+
+---
+
 ## Releasing from a SHARED checkout: excluding a file cuts both ways (2026-08-04)
 
 **Problem.** Deploying the Embroidery Studio, the release also carried
@@ -229,7 +258,37 @@ identity cannot see â€” a carryover is hours both accrued *and* used last y
   page rendered it â€” on the one page whose stated purpose is that compensation never reaches the
   browser. **Audit the error and log paths with the same rigour as the data path.**
 
-## The blog content bank was written from style numbers it never looked up â€” 20 of 23 drafts misdescribe products (2026-08-03)
+## The blog content bank was written from style numbers it never looked up — 20 of 23 drafts misdescribe products (2026-08-03)
 
 **Problem.** The weekly blog autopilot reached `best-carhartt-styles-custom-company-workwear`.
 Every publish-time check the task specifies **passed**: all 5 linked styles returned HTTP 200,
+all 5 were `PRODUCT_STATUS: "Active"`, every internal link resolved. The body was still wrong
+on all five: CT104670 called a "Duck Jacket… rugged duck canvas" (it is the **Storm Defender
+Shoreline Jacket**, a rain shell), CTK121 called a "**Crewneck**… no-hood option" (it is the
+**Midweight Hooded** Sweatshirt), CT102208 called the "Gilliam **Vest**… without the sleeves"
+(it is the Gilliam **Jacket**), CT100617 given CTK121's name, CT100615 left unnamed filler.
+A reader clicking any link lands on a product that contradicts the sentence that sold it.
+
+**Root cause.** The 2026-07-13 seeding batch generated prose *around* style numbers instead of
+*from* the catalog — the numbers are real and active, so every existence check is satisfied while
+the identity behind each number is invented. An audit across all 23 drafts found the defect is
+systemic: **only 3 drafts are clean**; 2 recommend styles that are now **Discontinued**
+(NE1000 in 6 drafts, CS413), and CornerStone `CS410`/`CS413` are sold as "tee" and "pocket tee"
+when both are **polos**.
+
+**Fix.** Published the oldest genuinely-clean draft instead (`custom-ogio-bags-polos-corporate-gifts`
+— all 5 styles Active, every prose claim corroborated by the catalog, `COMPANION_STYLES` confirming
+its one relational claim). The other 20 drafts stay Draft pending rewrite; nothing was edited.
+
+**Prevention.**
+- **`PRODUCT_STATUS: "Active"` proves a style exists, not that the sentence about it is true.**
+  Diff the prose against `PRODUCT_TITLE` for every recommended style before publishing.
+- **Check prose, not just anchor text.** An anchor-text-only audit scored the Carhartt draft
+  1 mismatch; reading the body found 5. The regex could not see errors in the description
+  sentences, which is exactly where a generated draft puts them.
+- **A bare style number as anchor text (`[PC54](…)`) is fine and reads as a false positive** —
+  rank findings by whether the anchor *asserts a wrong identity*, not by string mismatch.
+- **Content written ahead of publication decays two ways**: the catalog moves under it (the
+  documented risk) *and* it may never have been right (the undocumented one). Verify both.
+
+---
