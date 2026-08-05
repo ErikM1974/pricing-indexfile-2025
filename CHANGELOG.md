@@ -1,3 +1,8 @@
+## v2026.08.04.4 (2026.08.04)
+
+- Design Vault: don't let a paused rAF swallow keystrokes
+- Deploy v2026.08.04.4: 1 files (design-gallery.html,)
+
 ## v2026.08.04.3 (2026.08.04)
 
 - Contract Embroidery: DST drop zone prices from the file's exact stitch count (WIP checkpoint - pending browser verification)
