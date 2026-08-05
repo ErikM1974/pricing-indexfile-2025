@@ -72,8 +72,34 @@ impossible to type ("26000" dies at "2").
 - Thumbnails are rasterised at load and the `points` array released — six locations would
   otherwise pin millions of objects.
 
-## Phase 3 (not built)
+## Phase 3 (shipped 2026-08-05)
 
-File-fingerprint reorder recognition ("Quoted before: EMBC-1234"), "Open in Embroidery Studio"
-cross-link, staff-gated margin overlay (sew-time × $30.09/hr from `COST_ALLOCATION_MODEL.md` —
-the data to finally settle cap 1-7, the only negative cell).
+**Reorder recall.** Every dropped file is fingerprinted (`DSTQuoteMath.fingerprint` —
+SHA-256 via `crypto.subtle`, FNV-1a fallback off a secure context) and, on a successful
+quote save, bound to `{quoteID, qty, unit, product, at}` in `localStorage`
+(`nwca.contractEmb.fileHistory.v1`, newest-first, capped at 60). A re-drop shows
+"Quoted before · CEMB-2026-014 · 48 pcs · $8.47/pc · Jul 2". Erik chose localStorage over a
+shared store: exact matches, no false positives, no schema change.
+
+**Staff margin overlay.** 🔴 **This calculator is a PUBLIC page** — `app.use('/calculators',
+express.static(...))` with no auth, used by outside ASI distributors as well as Ruthie. So
+**no cost figure may ever ship in its bundle.** Rates come from
+`GET /api/contract-embroidery/cost-model` behind `requireStaff` (app `server.js`), the same
+treatment `/pricing/decals` gets "because it exposes cost-side rate bands". `requireStaff`
+answers `/api/*` with 401, which doubles as the page's am-I-staff probe, so for everyone else
+the panel never renders. Also hidden from `@media print`, and absent from `copyQuoteText`,
+`buildCalcContext` (the AI) and the saved quote.
+
+Rates are env-overridable (`EMB_PRODUCTION_HOUR_RATE`, `EMB_ORDER_POOL`,
+`EMB_COST_MODEL_AS_OF`) and returned with an `asOf` date so a stale model shows on screen
+instead of being silently trusted. Defaults are the settled 2026-07-30 model: $30.09
+fully-loaded production hour (art included) + $70 flat order pool.
+
+⚠️ **First real reading: 24 garments × 9,412 stitches quoted −$41.82 (−20.6%)** — revenue
+$203.30 against $245.12 of modelled cost (5.8 machine-hours). Worth checking against
+`COST_ALLOCATION_MODEL.md` before acting: the biggest levers in the estimate are the
+parser's default 750 spm and its 60 s/piece hooping allowance.
+
+**Not built:** the "Open in Embroidery Studio" cross-link — the Studio is fully client-side,
+so handing it the file would mean writing its private `localStorage` recents format from
+another page. Skipped rather than coupling to another page's internals.
