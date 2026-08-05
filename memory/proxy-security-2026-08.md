@@ -130,23 +130,37 @@ untouched and still go browser→proxy directly.
 
 ---
 
-## 3. Still open in the proxy — deliberately not blind-gated
+## 3. Still open in the proxy
 
-Anonymous in production today (the Box **reads** in this list are now closed — see 2b):
+`POST /api/manageorders/orders/create` — creates real ShopWorks orders, still
+anonymous. `pages/sample-cart.html` posts to it **directly from the browser** at a
+hardcoded proxy URL, so gating it breaks paid sample orders. The fix is the one
+proven above: move that caller behind the app's session-gated forwarder, then gate
+the route, app first.
 
-- `POST /api/manageorders/orders/create` — creates real ShopWorks orders
-- The four Box **WRITE** routes: `POST shared-link`, `POST create-mockup-folder`,
-  `POST upload-to-folder`, `DELETE file/:fileId`
+**The Box surface is fully closed** — all 11 routes, reads (`v2026.08.05.7`) and
+writes (`v2026.08.05.8`). The guard test asserts every route declared in
+`box-upload.js` is covered, so a Box route added later fails the build until
+someone decides its auth story.
 
-🔑 **A secret cannot simply be added.** `pages/sample-cart.html` posts to the push route
-**directly from the browser** at a hardcoded proxy URL, so gating it breaks paid sample
-orders; the Box write routes are likewise called straight from the browser. Anything in
-browser JS is not a secret.
+### Forwarding a body: three modes, and the distinction is load-bearing
 
-**The fix is the one proven in 2b** — move each caller behind the app's session-gated
-same-origin forwarder, then gate the proxy route, app first. `upload-to-folder` is the
-awkward one: it is multipart, so the forwarder has to stream the upload rather than
-`fetch`-and-forward the way the read routes do.
+- **json** — `bodyParser.json` (global, mounted long before these routes) has
+  ALREADY consumed and parsed the stream. Re-serialise from `req.body`; piping
+  `req` here sends an empty body.
+- **stream** — multipart. `bodyParser.json` ignores it precisely because the
+  content-type doesn't match, so `req` is unread and pipes straight through. The
+  app relays a 20 MB upload without buffering it, and multer upstream still sees
+  an intact body with its boundary.
+- **none** — DELETE carries no body; only the query needs carrying.
+
+🔑 **Verify a forwarder's body against an echo server, never against the 401.**
+The gate fires before the body code ever runs, so a 401 proves nothing about
+whether the body arrives — and an empty forwarded body fails silently. A
+throwaway echo server standing in for the proxy showed the real bytes: 22 B of
+correct JSON, `?force=true` preserved on a bodyless DELETE, and 358,743 B of
+multipart with the boundary header intact — all carrying the secret, and nothing
+created in Box.
 
 ---
 
