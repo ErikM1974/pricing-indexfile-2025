@@ -1,3 +1,9 @@
+## v2026.08.05.11 (2026.08.05)
+
+- Contract Embroidery Phase 3: fix review findings, incl. a LIVE cost leak
+- Merge release v2026.08.05.10 back into develop
+- Deploy v2026.08.05.11: cache-bust the contract calculator js+css
+
 ## v2026.08.05.10 (2026.08.05)
 
 - Retire Embroidery Mockup Generator; 302 its URL to DST Studio
