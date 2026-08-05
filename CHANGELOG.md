@@ -1,3 +1,7 @@
+## v2026.08.05.8 (2026.08.05)
+
+- Fix the broken NWCA logo and favicon on DST Studio + Mockup Generator
+
 ## v2026.08.05.7 (2026.08.05)
 
 - memory: contract embroidery stitch-file quoting topic file
