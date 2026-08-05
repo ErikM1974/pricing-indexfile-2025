@@ -20,7 +20,7 @@
         if (!url) return url;
         var thumbMatch = url.match(/\/api\/box\/thumbnail\/(\d+)/);
         if (thumbMatch) {
-            return API_BASE + '/api/box/thumbnail/' + thumbMatch[1];
+            return '/api/box/thumbnail/' + thumbMatch[1];
         }
         return url;
     }
@@ -94,7 +94,7 @@
         var placeholder = img.nextElementSibling;
         if (originalSrc.indexOf('/shared/static/') !== -1 && !img.dataset.proxyAttempted) {
             img.dataset.proxyAttempted = '1';
-            img.src = API_BASE + '/api/box/shared-image?url=' + encodeURIComponent(originalSrc);
+            img.src = '/api/box/shared-image?url=' + encodeURIComponent(originalSrc);
             return;
         }
 
@@ -2349,7 +2349,7 @@
         loadingEl.style.display = 'flex';
         fileList.innerHTML = '';
 
-        fetch(API_BASE + '/api/box/mockup-folders?limit=500')
+        fetch('/api/box/mockup-folders?limit=500')
             .then(function (resp) {
                 if (!resp.ok) throw new Error('Box API ' + resp.status);
                 return resp.json();
@@ -2403,7 +2403,7 @@
         selectedBoxFile = null;
         document.getElementById('pmd-box-confirm').disabled = true;
 
-        fetch(API_BASE + '/api/box/folder-files?folderId=' + folderId)
+        fetch('/api/box/folder-files?folderId=' + folderId)
             .then(function (resp) {
                 if (!resp.ok) throw new Error('Failed to load files');
                 return resp.json();
@@ -3374,7 +3374,7 @@
         showToast('Downloading DST from Box + identifying elements...', 'info');
 
         // Step 1: Download DST from Box via proxy
-        fetch(API_BASE + '/api/box/download/' + dstBoxFileId)
+        fetch('/api/box/download/' + dstBoxFileId)
         .then(function (resp) {
             if (!resp.ok) throw new Error('Box download failed (HTTP ' + resp.status + ')');
             return resp.blob();
@@ -4683,9 +4683,9 @@
         var downloadUrl = url;
         var thumbMatch = url.match(/\/api\/box\/thumbnail\/(\d+)/);
         if (thumbMatch) {
-            downloadUrl = API_BASE + '/api/box/download/' + thumbMatch[1];
+            downloadUrl = '/api/box/download/' + thumbMatch[1];
         } else if (url.indexOf('.box.com/shared/static/') !== -1 || url.indexOf('.box.com/s/') !== -1) {
-            downloadUrl = API_BASE + '/api/box/shared-image?url=' + encodeURIComponent(url) + '&full=1';
+            downloadUrl = '/api/box/shared-image?url=' + encodeURIComponent(url) + '&full=1';
         }
         fetch(downloadUrl)
             .then(function (resp) {
@@ -5421,7 +5421,7 @@
         emptyEl.style.display = 'none';
         grid.innerHTML = '';
 
-        fetch(API_BASE + '/api/box/folder-files?folderId=' + folderId)
+        fetch('/api/box/folder-files?folderId=' + folderId)
             .then(function (resp) {
                 if (!resp.ok) throw new Error('Failed to load Box files');
                 return resp.json();

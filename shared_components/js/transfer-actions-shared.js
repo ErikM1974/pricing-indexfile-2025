@@ -826,7 +826,7 @@
         if (recent) recent.innerHTML = '';
         results.innerHTML = '<div class="tas-picker-busy"><i class="fas fa-spinner fa-spin"></i> Searching Box...</div>';
         try {
-            var resp = await fetch(API_BASE + '/api/box/search?query=' + encodeURIComponent(query) + '&type=folder&limit=20');
+            var resp = await fetch('/api/box/search?query=' + encodeURIComponent(query) + '&type=folder&limit=20');
             var data = await resp.json();
             if (!resp.ok || !data.success) throw new Error(data.error || 'search failed');
             renderSearchResults(data.entries || []);
@@ -866,7 +866,7 @@
         results.innerHTML = '<div class="tas-picker-busy"><i class="fas fa-spinner fa-spin"></i> Loading files...</div>';
         recordRecentFolder({ id: folderId, name: folderName });
         try {
-            var resp = await fetch(API_BASE + '/api/box/folder-files?folderId=' + encodeURIComponent(folderId));
+            var resp = await fetch('/api/box/folder-files?folderId=' + encodeURIComponent(folderId));
             var data = await resp.json();
             if (!resp.ok || !data.success) throw new Error(data.error || 'folder-files failed');
             renderFileGrid(folderId, folderName, data.files || []);
@@ -1598,7 +1598,7 @@
                     File_Name: t.fileName,
                     File_MIME: t.mimeType || null,
                     Box_File_ID: t.fileId,
-                    Thumbnail_URL: t.fileId ? (API_BASE + '/api/box/thumbnail/' + encodeURIComponent(t.fileId)) : null,
+                    Thumbnail_URL: t.fileId ? ('/api/box/thumbnail/' + encodeURIComponent(t.fileId)) : null,
                     Width_Px: t.pixelWidth || null,
                     Height_Px: t.pixelHeight || null,
                     Width_In: t.physicalWidthIn || null,
@@ -1613,7 +1613,7 @@
                     File_Name: mockup.fileName,
                     File_MIME: mockup.mimeType || null,
                     Box_File_ID: mockup.fileId,
-                    Thumbnail_URL: mockup.fileId ? (API_BASE + '/api/box/thumbnail/' + encodeURIComponent(mockup.fileId)) : null,
+                    Thumbnail_URL: mockup.fileId ? ('/api/box/thumbnail/' + encodeURIComponent(mockup.fileId)) : null,
                     Width_Px: mockup.pixelWidth || null,
                     Height_Px: mockup.pixelHeight || null,
                     Width_In: mockup.physicalWidthIn || null,

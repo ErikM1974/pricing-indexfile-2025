@@ -78,7 +78,7 @@
         var placeholder = img.nextElementSibling;
         if (originalSrc.indexOf('/shared/static/') !== -1 && !img.dataset.proxyAttempted) {
             img.dataset.proxyAttempted = '1';
-            img.src = API_BASE + '/api/box/shared-image?url=' + encodeURIComponent(originalSrc);
+            img.src = '/api/box/shared-image?url=' + encodeURIComponent(originalSrc);
             return;
         }
 
@@ -1054,7 +1054,7 @@
 
         (async function loadBoxFiles() {
             try {
-                var boxResp = await fetch(API_BASE + '/api/box/folder-files?designNumber=' + designId);
+                var boxResp = await fetch('/api/box/folder-files?designNumber=' + designId);
                 boxLoading.style.display = 'none';
                 if (!boxResp.ok) throw new Error('Box API ' + boxResp.status);
                 var boxData = await boxResp.json();
