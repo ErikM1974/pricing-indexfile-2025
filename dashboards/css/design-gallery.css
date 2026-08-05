@@ -1466,6 +1466,42 @@ mark.dg-mark {
    ══════════════════════════════════════════════════════════════════════════ */
 
 /* ── top-client collage tiles ───────────────────────────────────────────── */
+
+/* 🔴 .dg-collage is a CARD here (column: 2x2 collage, then name, then count).
+   An earlier rule styles .dg-collage as the 2x2 grid ITSELF — that markup was
+   never built; the grid lives on .dg-collage-grid below. Left unresolved, the
+   button had no width in the flex rail (`.dg-rail-track > * { flex: 0 0 auto }`),
+   so it sized to its natural image content and rendered ONE full-page-wide
+   thumbnail (seen in production 2026-08-05). Width is pinned to match
+   `.dg-rail-track .dg-card`, and aspect-ratio is handed back to the grid child. */
+.dg-collage {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    aspect-ratio: auto;
+    width: 196px;
+    max-width: 196px;
+    padding: 0;
+    background: none;
+    border: 0;
+    border-radius: var(--radius-lg);
+    text-align: left;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.dg-collage:hover,
+.dg-collage:focus-visible {
+    box-shadow: var(--shadow-md);
+}
+
+/* Belt-and-braces: no image inside a collage may ever exceed its cell, whatever
+   else changes above. This is the rule that would have contained the blow-up. */
+.dg-collage img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
 .dg-collage-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
