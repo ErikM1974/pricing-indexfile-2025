@@ -16,7 +16,7 @@
          buttons, table base, contact, AI chat panel) — must load BEFORE the page CSS. -->
     <link rel="stylesheet" href="/shared_components/css/contract-pricing-2026.css?v=2026.05.29.3">
     <!-- Page-specific styles (segmented item-type picker, table tabs, divider) -->
-    <link rel="stylesheet" href="embroidery-contract.css?v=2026.05.29.3">
+    <link rel="stylesheet" href="embroidery-contract.css?v=2026.08.04.1">
 </head>
 <body>
 
@@ -130,6 +130,53 @@
                         <div class="field">
                             <label for="stitch">Stitch count</label>
                             <input id="stitch" class="input num" type="number" min="1000" step="500" value="8000">
+                        </div>
+                    </div>
+
+                    <!-- Stitch-file drop zone (Round 12, 2026-08-04): contract
+                         partners have the production DST in hand — drop it and
+                         the calculator prices from the file's EXACT stitch
+                         count instead of a typed guess. Parsing is 100%
+                         client-side (pages/js/dst-parser.js, shared with the
+                         Embroidery Studio); the file never uploads. The field
+                         stays hidden unless the parser script actually loaded,
+                         so a script failure degrades to the manual input. -->
+                    <div class="field" id="dstField" hidden>
+                        <label id="dstFieldLabel">Stitch file <span class="dst-opt">· optional</span></label>
+                        <div class="dst-drop" id="dstDrop" role="button" tabindex="0" aria-labelledby="dstFieldLabel" aria-describedby="dstDropHint">
+                            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4"/><path d="M8 8l4-4 4 4"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+                            <span class="dst-drop-text">
+                                <strong>Drop the .DST here</strong> or click to browse
+                                <span class="hint" id="dstDropHint">Reads the exact stitch count in your browser &mdash; the file never leaves your computer</span>
+                            </span>
+                        </div>
+                        <input type="file" id="dstFileInput" accept=".dst" hidden tabindex="-1">
+                        <div class="dst-error" id="dstError" role="alert" hidden></div>
+                        <div class="dst-card" id="dstCard" hidden>
+                            <div class="dst-card-head">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+                                <span class="dst-card-names">
+                                    <span class="dst-file-name" id="dstFileName"></span>
+                                    <span class="dst-file-label" id="dstFileLabel" hidden></span>
+                                </span>
+                                <button type="button" class="dst-remove" id="dstRemove" aria-label="Remove stitch file">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                                </button>
+                            </div>
+                            <dl class="dst-facts">
+                                <div class="df"><dt>Stitches</dt><dd id="dstFactStitches"></dd></div>
+                                <div class="df"><dt>Size</dt><dd id="dstFactSize"></dd></div>
+                                <div class="df"><dt>Colors</dt><dd id="dstFactColors"></dd></div>
+                                <div class="df"><dt>Trims</dt><dd id="dstFactTrims"></dd></div>
+                            </dl>
+                            <div class="dst-note" id="dstNote" hidden>
+                                <span id="dstNoteText"></span>
+                                <button type="button" class="dst-mini-btn" id="dstReapply" hidden>Use file count</button>
+                            </div>
+                            <div class="dst-suggest" id="dstSuggest" hidden>
+                                <span id="dstSuggestText"></span>
+                                <button type="button" class="dst-mini-btn" id="dstSuggestBtn"></button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -306,7 +353,7 @@
                         <span class="num">02</span>
                         <div>
                             <div class="what">Stitch count per logo location</div>
-                            <div class="why">Drives the row in the pricing table</div>
+                            <div class="why">Drives the pricing row &mdash; or drop the .DST in the calculator and it&rsquo;s read exactly</div>
                         </div>
                     </li>
                     <li>
@@ -377,6 +424,9 @@
 
     <!-- Shared config — exposes APP_CONFIG.API.BASE_URL (Rule #6). Must load first. -->
     <script src="/config/app.config.js"></script>
-    <script src="embroidery-contract.js?v=2026.07.29.4"></script>
+    <!-- Tajima DST parser (shared with the Embroidery Studio) — must load
+         before the page JS so the stitch-file drop zone can activate. -->
+    <script src="/pages/js/dst-parser.js?v=2026.08.04.1"></script>
+    <script src="embroidery-contract.js?v=2026.08.04.1"></script>
 </body>
 </html>

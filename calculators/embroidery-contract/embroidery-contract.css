@@ -131,7 +131,152 @@ table.price tfoot td.cell-hi {
     color: var(--pink-700);
 }
 
+/* =====================================================
+   DST stitch-file drop zone + parsed-file card (Round 12, 2026-08-04)
+   The drop zone hides while a file is loaded (the card takes its place);
+   the ✕ on the card brings it back. #dstField.dragging is toggled by JS
+   during drag-over.
+   ===================================================== */
+.dst-opt {
+    font-weight: 400;
+    color: var(--slate-2);
+    text-transform: none;
+    letter-spacing: 0;
+}
+.dst-drop {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border: 1.5px dashed var(--line);
+    border-radius: var(--r);
+    background: var(--paper-3);
+    color: var(--slate);
+    cursor: pointer;
+    transition: border-color 120ms, background 120ms, color 120ms;
+}
+.dst-drop:hover,
+#dstField.dragging .dst-drop {
+    border-color: var(--pink-600);
+    background: var(--paper);
+    color: var(--ink);
+}
+.dst-drop:focus-visible {
+    outline: 2px solid var(--pink-600);
+    outline-offset: 2px;
+}
+.dst-drop svg { flex: none; }
+.dst-drop-text { font-size: 13px; line-height: 1.35; }
+.dst-drop-text strong { color: var(--ink); font-weight: 600; }
+.dst-drop-text .hint {
+    display: block;
+    font-size: 11px;
+    color: var(--slate-2);
+    margin-top: 2px;
+}
+
+.dst-error {
+    margin-top: 8px;
+    padding: 10px 12px;
+    border: 1px solid #e5484d;
+    border-radius: var(--r);
+    background: rgba(229, 72, 77, 0.06);
+    color: #c0353a;
+    font-size: 12.5px;
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+.dst-card {
+    border: 1px solid var(--pink-200);
+    border-radius: var(--r);
+    background: var(--paper);
+    padding: 12px 14px;
+}
+#dstField.dragging .dst-card { border-color: var(--pink-600); }
+.dst-card-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--pink-600);
+}
+.dst-card-names {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+.dst-file-name {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--ink);
+    word-break: break-all;
+}
+.dst-file-label { font-size: 11px; color: var(--slate-2); }
+.dst-remove {
+    margin-left: auto;
+    background: transparent;
+    border: 0;
+    color: var(--slate-2);
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 6px;
+    display: inline-flex;
+    transition: color 120ms, background 120ms;
+}
+.dst-remove:hover { color: var(--ink); background: var(--paper-3); }
+.dst-remove:focus-visible { outline: 2px solid var(--pink-600); outline-offset: 2px; }
+
+.dst-facts {
+    display: grid;
+    grid-template-columns: repeat(4, auto);
+    justify-content: start;
+    gap: 6px 22px;
+    margin: 10px 0 0;
+}
+.dst-facts dt {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--slate-2);
+    margin-bottom: 2px;
+}
+.dst-facts dd {
+    margin: 0;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    color: var(--ink);
+}
+
+.dst-note,
+.dst-suggest {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px 10px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px dashed var(--pink-200);
+    font-size: 12px;
+    color: var(--slate);
+    line-height: 1.4;
+}
+.dst-mini-btn {
+    background: var(--paper-3);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 3px 10px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--ink);
+    cursor: pointer;
+    transition: border-color 120ms, background 120ms;
+}
+.dst-mini-btn:hover { border-color: var(--pink-600); background: var(--paper); }
+.dst-mini-btn:focus-visible { outline: 2px solid var(--pink-600); outline-offset: 2px; }
+
 /* Responsive — stack the two-column qty/stitch row on narrow screens */
 @media (max-width: 980px) {
     .calc-form .row { grid-template-columns: 1fr; }
+    .dst-facts { grid-template-columns: repeat(2, auto); }
 }
