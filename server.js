@@ -3727,6 +3727,80 @@ app.post('/api/box/create-mockup-folder', requireStaff, boxForwardWrite('create-
 app.post('/api/box/upload-to-folder', requireStaff, boxForwardWrite('upload-to-folder', 'stream'));
 app.delete('/api/box/file/:fileId', requireStaff, boxForwardWrite(req => 'file/' + boxFileId(req), 'none'));
 
+// ── DTG print-box calibration WRITES (admin only) ────────────────────────────
+// The calibration tool (/tools/custom-tees-calibrate.html) used to POST and
+// DELETE straight from the browser to the proxy, which required no credentials
+// at all — so anyone who knew the URL could move or delete the print box for
+// every style. That does not leak data; it silently misprints customer orders,
+// which is worse to discover.
+//
+// 🔴 THE GET DELIBERATELY STAYS OPEN AND IS NOT FORWARDED. The PUBLIC customer
+// designer at /custom-tees (verified 200 anonymously) reads
+// GET /api/dtg-calibration?styleNumber=… via pages/js/custom-tees-app.js:433.
+// Gating that would break the customer-facing tee designer. Only the writes are
+// the hole, so only the writes move behind the session. Same lesson as the Box
+// gating: check for a public caller BEFORE adding a secret.
+//
+// requirePageAccess (not requireStaff) so ONE Staff_Page_Access rule governs
+// both the page and its writes — matching custom-tees-calibrate.html's entry in
+// ADMIN_DEFAULT_PAGES, and letting Erik widen access from Caspio with no deploy.
+//
+// ⚠️ DEPLOY ORDER: this app change must be LIVE BEFORE the proxy starts
+// requiring the secret on those two routes, or the tool breaks in between.
+function dtgCalibrationForwardWrite(buildSuffix, mode) {
+  return async (req, res) => {
+    if (!CRM_API_SECRET) {
+      console.error('[dtg-calibration-forward] CRM_API_SECRET is not set — refusing to forward');
+      return res.status(503).json({ error: 'Calibration proxy is not configured' });
+    }
+    let target;
+    try {
+      target = `${CRM_API_BASE}/api/dtg-calibration${buildSuffix(req)}`;
+    } catch (e) {
+      return res.status(400).json({ error: e.message });
+    }
+    const headers = { 'X-CRM-API-Secret': CRM_API_SECRET };
+    let body;
+    if (mode === 'json') {
+      // bodyParser.json has already consumed the stream, so it must be
+      // re-serialised — piping req here would send an empty body.
+      headers['Content-Type'] = 'application/json';
+      body = JSON.stringify(req.body || {});
+    }
+    try {
+      const upstream = await fetch(target, { method: req.method, headers, body });
+      const text = await upstream.text();
+      res.status(upstream.status);
+      const ct = upstream.headers.get('content-type');
+      if (ct) res.setHeader('content-type', ct);
+      res.setHeader('Cache-Control', 'no-store');
+      return res.send(text);
+    } catch (err) {
+      console.error('[dtg-calibration-forward] ' + target + ' failed:', err.message);
+      if (!res.headersSent) return res.status(502).json({ error: 'Calibration request failed' });
+    }
+  };
+}
+
+// Caspio PK_ID is numeric; anything else is rejected rather than forwarded, so a
+// caller cannot smuggle path segments into the upstream URL.
+function dtgCalibrationPkId(req) {
+  const id = String(req.params.pkId || '');
+  if (!/^\d{1,15}$/.test(id)) throw new Error('Invalid calibration record id');
+  return '/' + id;
+}
+
+// No express.json() here: bodyParser.json is mounted globally (~L1837), so
+// req.body is already parsed by the time this runs — which is exactly why the
+// forwarder re-serialises it instead of piping req.
+app.post('/api/dtg-calibration',
+  requirePageAccess('custom-tees-calibrate.html'),
+  dtgCalibrationForwardWrite(() => '', 'json'));
+
+app.delete('/api/dtg-calibration/:pkId',
+  requirePageAccess('custom-tees-calibrate.html'),
+  dtgCalibrationForwardWrite(dtgCalibrationPkId, 'none'));
+
 // ── Contract embroidery COST MODEL (staff only) ──────────────────────────────
 // Feeds the margin overlay on /calculators/embroidery-contract/.
 //

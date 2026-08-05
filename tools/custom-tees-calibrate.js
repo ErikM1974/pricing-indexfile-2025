@@ -323,8 +323,14 @@
         const rec = currentRecord();
         $('cal-save').disabled = true;
         try {
-            const r = await fetch(`${API_BASE}/api/dtg-calibration`, {
+            // SAME-ORIGIN on purpose (no API_BASE): the write goes to this app's
+            // session-gated forwarder so the SAML cookie rides along. Going
+            // straight to the proxy was unauthenticated — anyone could move the
+            // print box for every style. Reads stay on the proxy; the PUBLIC
+            // /custom-tees designer needs that GET.
+            const r = await fetch('/api/dtg-calibration', {
                 method: 'POST',
+                credentials: 'same-origin',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(rec),
             });
@@ -354,7 +360,8 @@
         const row = savedRowForCurrent();
         if (!row || !row.PK_ID) return;
         try {
-            const r = await fetch(`${API_BASE}/api/dtg-calibration/${row.PK_ID}`, { method: 'DELETE' });
+            // SAME-ORIGIN — see the note on save(); this is the session-gated forwarder.
+            const r = await fetch(`/api/dtg-calibration/${row.PK_ID}`, { method: 'DELETE', credentials: 'same-origin' });
             const j = await r.json();
             if (!j.success) { toast('Delete failed', 'error'); return; }
             toast('Saved layout removed — back to auto-detect.', 'ok');
