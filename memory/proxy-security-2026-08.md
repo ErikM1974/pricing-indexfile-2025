@@ -165,10 +165,38 @@ Proxy side: the `guardReadsOnly` wrapper came off `/api/manageorders/orders`, so
 writes are gated too (`proxy v2026.08.05.9`). `/lineitems` keeps it — no write
 callers to migrate.
 
+## 4. ManageOrders tracking (CLOSED, proxy `v2026.08.05.11`)
+
+`GET /api/manageorders/tracking` returned **~911 KB of tracking records** —
+customer shipment identifiers and addresses — to anyone with the URL.
+`/tracking/{pull,verify}` were open beside it, and `/tracking/push` WRITES
+tracking numbers into OnSite.
+
+Gated with `requireCrmApiSecret` on the `/api/manageorders/tracking` prefix —
+**every method, not `guardReadsOnly`**, since a reads-only wrapper is exactly
+what left `/orders/create` anonymous for months. One prefix covers BOTH routers
+(`manageorders.js` and `manageorders-push.js` both hang off it), registered
+above both mounts.
+
+🔴 **The only real caller was in a THIRD repo.** Python Inksoft's order view
+(`web/app.py`) calls `GET /tracking/{shopworks_id}` and sent no secret. It was
+fixed and deployed FIRST (`inksoft-transform`). Its call sits inside a
+`try/except` that swallows failures — "tracking is optional" — so gating without
+that fix would have made tracking **silently vanish** from the order view rather
+than error. The worst failure mode: no alarm, just missing data.
+
+⭐ **That fix repaired a live bug two lines above it.** The same function's order
+lookup (`GET /api/manageorders/orders/{id}`) also skipped the existing
+`_proxy_headers()` helper, so it had been 401ing since the July GET gate and
+dying on `raise_for_status()`. Verified against production before and after.
+
+🔑 **CLAUDE.md's cross-project rule earned its place here** — a repo-local caller
+search would have found nothing and the gate would have looked safe.
+
 ### Still anonymous in the push router (each needs its own caller audit)
 
-`GET /push/health` · `GET /tracking/pull` (returns customer tracking data) ·
-`POST /auth/test`.
+`GET /push/health` (no data) · `POST /auth/test` (exercises the ManageOrders
+credentials). Tracking is closed — see section 4.
 
 ---
 
