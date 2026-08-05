@@ -1,3 +1,8 @@
+## v2026.08.05.2 (2026.08.05)
+
+- Monogram: the unassigned-names panel counted a fully-assigned roster as unassigned
+- Deploy v2026.08.05.2: 1 file (monogram-form.html)
+
 ## v2026.08.05.1 (2026.08.05)
 
 - Design Vault cutover: retire the public beta gallery
