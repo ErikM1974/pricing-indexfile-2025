@@ -109,7 +109,13 @@
         // null when the rep is typing the stitch count by hand. Immutable
         // snapshot of the file — presentation (min-clamp note, full-back
         // suggestion) is derived fresh in renderDstCard() on every change.
-        dst: null,            // {name, label, stitches, widthMM, heightMM, colors, trims}
+        // This is LOCATION 1; state.product/stitches are its product + count.
+        dst: null,            // {name, label, stitches, widthMM, heightMM, colors, trims, stats, risk, thumb}
+        // Round 13 (2026-08-05): locations 2+ on the SAME garments (left chest
+        // + full back). Each owns its product + stitch count; quantity is
+        // shared. Empty array = the single-location behaviour that shipped in
+        // Round 12, unchanged.
+        extraLines: [],       // [{id, product, stitches, file, primary:false}]
     };
 
     /* ---------------------- Helpers ---------------------- */
@@ -219,30 +225,35 @@
 
     function renderCalculator() {
         var p = PRODUCT_META[state.product];
-        var calc = computeUnit(state.product, state.qty, state.stitches);
+        // Round 13 (2026-08-05): price EVERY decorated location and combine.
+        // With one location this is arithmetically identical to the Round 8
+        // single-line path (jest-locked in dst-quote-math.test.js), so the
+        // common case is unchanged.
+        var result = priceAllLines();
+        var calc = result ? result.priced[0].calc : null;
+        var combo = result ? result.combo : null;
+        var multi = result ? result.priced.length > 1 : false;
 
-        // Round 8 (2026-05-14): roll LTM into the per-piece price the same way
-        // every other NWCA calculator does. Reps see ONE all-in unit price —
-        // no separate "LTM fee" line in the totals, no extra ShopWorks invoice
-        // row. The pricing tables still show base rates; the LTM warning
-        // chip under the qty input bridges the gap.
-        var ltmThreshold = pricing ? pricing.ltmThreshold : 23;
-        var ltmFeeBase = state.product === 'fullback' ? 100 : (pricing ? pricing.ltmFee : 50);
-        var baseUnit = calc ? calc.unit : 0;
-        var ltmCalc = calculateUnitPriceWithLTM(baseUnit, state.qty, ltmThreshold, ltmFeeBase);
-        var orderTotal = ltmCalc.finalUnitPrice * state.qty;
-
-        // Result panel — header + hero price (now all-in)
-        document.getElementById('resProductLabel').textContent = p.label;
-        if (calc) {
+        // Result panel — header + hero price (all-in)
+        document.getElementById('resProductLabel').textContent =
+            multi ? result.priced.length + ' locations' : p.label;
+        if (calc && combo) {
             document.getElementById('resTier').textContent = 'Tier ' + TIER_LABELS[calc.tierIdx];
-            document.getElementById('unitPrice').textContent = fmtMoney(ltmCalc.finalUnitPrice);
-            // Sub-line — show the rate breakdown, plus LTM math when it applies
-            var subText = fmtK(state.stitches) + ' × <b>$' + calc.rate.toFixed(2) + '/1K</b>';
-            if (calc.minChargeApplied) subText += ' · min charge applied';
-            if (ltmCalc.hasLtm) {
-                subText += ' · incl. $' + fmtMoney(ltmCalc.ltmFee) + ' LTM ÷ ' + state.qty +
-                    ' = <b>+$' + fmtMoney(ltmCalc.ltmPerPiece) + '/pc</b>';
+            document.getElementById('unitPrice').textContent = fmtMoney(combo.finalUnit);
+            // Sub-line — rate breakdown for a single location; a combined
+            // summary once there are several (the per-location rates are
+            // spelled out in the breakdown list below).
+            var subText;
+            if (multi) {
+                subText = '<b>$' + fmtMoney(combo.baseUnit) + '</b> across ' +
+                    result.priced.length + ' locations';
+            } else {
+                subText = fmtK(state.stitches) + ' × <b>$' + calc.rate.toFixed(2) + '/1K</b>';
+                if (calc.minChargeApplied) subText += ' · min charge applied';
+            }
+            if (combo.hasLtm) {
+                subText += ' · incl. $' + fmtMoney(combo.ltmFee) + ' LTM ÷ ' + state.qty +
+                    ' = <b>+$' + fmtMoney(combo.ltmPerPiece) + '/pc</b>';
             }
             document.getElementById('unitSub').innerHTML = subText;
         } else {
@@ -251,11 +262,16 @@
             document.getElementById('unitSub').innerHTML = 'Pricing unavailable';
         }
 
+        renderResultLines(result);
+
         // Single Order Total card (replaces Subtotal + LTM cards)
+        var orderTotal = combo ? combo.orderTotal : 0;
         document.getElementById('orderTotal').textContent = '$' + fmtMoney(orderTotal);
         var orderTotalNote = document.getElementById('orderTotalNote');
         if (orderTotalNote) {
-            orderTotalNote.textContent = fmtInt(state.qty) + ' × $' + fmtMoney(ltmCalc.finalUnitPrice);
+            orderTotalNote.textContent = combo
+                ? fmtInt(state.qty) + ' × $' + fmtMoney(combo.finalUnit)
+                : '';
         }
 
         // LTM helper chip — REMOVED in Round 9 (2026-05-14). The table's
@@ -263,7 +279,33 @@
         // no gap to explain, no warning needed. Defensive null-check kept
         // in case the markup ever returns.
         var ltmHelp = document.getElementById('ltmHelp');
-        if (ltmHelp) ltmHelp.hidden = !ltmCalc.hasLtm;
+        if (ltmHelp) ltmHelp.hidden = !(combo && combo.hasLtm);
+    }
+
+    /** Per-location breakdown under the hero. Hidden for a single location. */
+    function renderResultLines(result) {
+        var host = document.getElementById('resLines');
+        if (!host) return;
+        host.textContent = '';
+        if (!result || result.priced.length < 2) { host.hidden = true; return; }
+        host.hidden = false;
+        result.priced.forEach(function (pr, i) {
+            var li = document.createElement('li');
+            var name = document.createElement('span');
+            name.className = 'rl-name';
+            // File name is user data — textContent, never innerHTML.
+            name.textContent = (pr.line.file ? pr.line.file.name : PRODUCT_META[pr.product].label);
+            var meta = document.createElement('span');
+            meta.className = 'rl-meta';
+            meta.textContent = PRODUCT_META[pr.product].label + ' · ' + fmtK(pr.stitches);
+            var amt = document.createElement('span');
+            amt.className = 'rl-amt';
+            amt.textContent = '$' + fmtMoney(pr.unit);
+            li.appendChild(name);
+            li.appendChild(meta);
+            li.appendChild(amt);
+            host.appendChild(li);
+        });
     }
 
     /* ---------------------- Segmented picker + presets ---------------------- */
@@ -349,7 +391,11 @@
         // swap is gated on product match — rolling LTM into a different
         // method's price would be misleading, so non-matching intersection
         // cells stay at base rate.
-        var productMatches = state.product === state.tableProduct;
+        // Round 13: the all-in intersection swap is only honest for a SINGLE
+        // location. With a combo the hero price is the sum across locations,
+        // so stamping it into one location's rate cell would misread as that
+        // location costing the whole quote.
+        var productMatches = state.product === state.tableProduct && state.extraLines.length === 0;
         var activeTierIdx = tierIndexForQty(state.qty);
         var activeStitches = state.stitches;
 
@@ -475,23 +521,28 @@
     }
 
     function copyQuoteText() {
-        var p = PRODUCT_META[state.product];
-        var calc = computeUnit(state.product, state.qty, state.stitches);
-        if (!calc) return;
-        var ltmThreshold = pricing ? pricing.ltmThreshold : 23;
-        var ltmFeeBase = state.product === 'fullback' ? 100 : (pricing ? pricing.ltmFee : 50);
-        var ltmCalc = calculateUnitPriceWithLTM(calc.unit, state.qty, ltmThreshold, ltmFeeBase);
-        var total = ltmCalc.finalUnitPrice * state.qty;
+        var result = priceAllLines();
+        if (!result) return;
+        var combo = result.combo;
         // Customer-friendly format — single per-piece price (LTM built in), no
         // separate "LTM fee" jargon that the customer would need to decode.
-        var ltmNote = ltmCalc.hasLtm
-            ? ' (incl. $' + fmtMoney(ltmCalc.ltmPerPiece) + ' LTM/pc)'
+        var ltmNote = combo.hasLtm
+            ? ' (incl. $' + fmtMoney(combo.ltmPerPiece) + ' LTM/pc)'
             : '';
-        var text =
-            p.label + ' · ' + fmtInt(state.qty) + ' pcs · ' + fmtK(state.stitches) + ' stitches\n' +
-            'Unit: $' + fmtMoney(ltmCalc.finalUnitPrice) + ' / piece' + ltmNote +
-            '  •  Total: $' + fmtMoney(total);
-        copyToClipboard(text)
+        var lines = [];
+        if (result.priced.length > 1) {
+            lines.push(fmtInt(state.qty) + ' pcs · ' + result.priced.length + ' locations');
+            result.priced.forEach(function (pr) {
+                lines.push('  · ' + PRODUCT_META[pr.product].label + ' ' +
+                    fmtK(pr.stitches) + ' stitches — $' + fmtMoney(pr.unit) + '/pc');
+            });
+        } else {
+            lines.push(PRODUCT_META[state.product].label + ' · ' + fmtInt(state.qty) +
+                ' pcs · ' + fmtK(state.stitches) + ' stitches');
+        }
+        lines.push('Unit: $' + fmtMoney(combo.finalUnit) + ' / piece' + ltmNote +
+            '  •  Total: $' + fmtMoney(combo.orderTotal));
+        copyToClipboard(lines.join('\n'))
             .then(function () { showToast('Quote text copied'); })
             .catch(function () { showToast('Couldn\'t copy — try again'); });
     }
@@ -517,16 +568,35 @@
     }
 
     /* =====================================================
-       DST stitch file → exact stitch count (Round 12, 2026-08-04)
+       DST stitch files → exact stitch counts, per LOCATION
+       (Round 12, 2026-08-04 · multi-location + production read Round 13, 2026-08-05)
 
        Contract partners hold the production DST — drop it on the
        calculator and the quote prices from the file's ACTUAL stitch
        count instead of a typed guess. Parsing is fully client-side
        via /pages/js/dst-parser.js (shared with the Embroidery
        Studio, jest-locked) — the file never leaves the browser and
-       no new pricing path is created: the parsed count flows into
-       the same computeUnit() per-1K × tier math as a typed count.
+       no new pricing path is created: each parsed count flows into
+       the same computeUnit() per-1K × tier math as a typed count,
+       and DSTQuoteMath.combineLines only SUMS the already-priced
+       locations and picks the LTM.
+
+       STATE MODEL — deliberately additive so the single-location
+       behaviour is bit-for-bit what shipped in Round 12:
+         state.product / state.stitches  →  location 1, driven by the
+                                            top picker + stitch input
+         state.dst                       →  location 1's file (or null)
+         state.extraLines[]              →  locations 2+, each owning
+                                            its own product + stitches
+       With extraLines empty, combineLines([one]) returns exactly what
+       calculateUnitPriceWithLTM used to (jest-locked in
+       tests/unit/dst-quote-math.test.js).
        ===================================================== */
+
+    var QuoteMath = window.DSTQuoteMath;
+
+    // Locations 2+ ; location 1 lives in state.product/stitches/dst.
+    var nextLineId = 1;
 
     // Contract minimums come from Caspio where the API supplies them (the
     // "pricing = API, never hardcoded" rule) — PRODUCT_META is the offline
@@ -540,11 +610,61 @@
         return PRODUCT_META[product].minStitches;
     }
 
-    // Real production DSTs are tiny (a 63K-stitch jacket back ≈ 190 KB). A
-    // multi-MB file is either not a DST or pathological, and decoding it
-    // would build millions of point objects and lock the tab before any
-    // validity check could run — so bound it before the read.
-    var DST_MAX_BYTES = 8 * 1024 * 1024;
+    /** Every decorated location, location 1 first. */
+    function allLines() {
+        var lines = [{
+            id: 0,
+            product: state.product,
+            stitches: state.stitches,
+            file: state.dst,
+            primary: true
+        }];
+        for (var i = 0; i < state.extraLines.length; i++) lines.push(state.extraLines[i]);
+        return lines;
+    }
+
+    /**
+     * The stitch count a location is actually PRICED at.
+     *
+     * A location's raw `stitches` is whatever is in its input, including the
+     * half-typed states ("2" on the way to "26000"). Clamping the input itself
+     * on every keystroke makes any count whose prefix is below the minimum
+     * impossible to type, so the minimum is enforced HERE — the quote can
+     * never price below contract minimum, and typing still works.
+     */
+    function effectiveStitches(line) {
+        return Math.max(minStitchesFor(line.product), Number(line.stitches) || 0);
+    }
+
+    /** Price every location through the ONE pricing function, then combine. */
+    function priceAllLines() {
+        var lines = allLines();
+        var priced = [];
+        for (var i = 0; i < lines.length; i++) {
+            var calc = computeUnit(lines[i].product, state.qty, effectiveStitches(lines[i]));
+            if (!calc) return null;               // pricing not loaded → caller shows the error state
+            priced.push({
+                line: lines[i],
+                calc: calc,
+                unit: calc.unit,
+                product: lines[i].product,
+                // The count this line is actually priced at — always use THIS
+                // for display and saving, never line.stitches (which can hold
+                // a half-typed value).
+                stitches: effectiveStitches(lines[i])
+            });
+        }
+        var combo = QuoteMath.combineLines(priced, state.qty, {
+            threshold: pricing ? pricing.ltmThreshold : 23,
+            feeFor: ltmFeeForProduct
+        });
+        return { priced: priced, combo: combo };
+    }
+
+    /** LTM band for a product. Full back carries its own higher fee. */
+    function ltmFeeForProduct(product) {
+        return product === 'fullback' ? 100 : (pricing ? pricing.ltmFee : 50);
+    }
 
     function showDstError(msg) {
         var el = document.getElementById('dstError');
@@ -558,82 +678,362 @@
         if (el) { el.textContent = ''; el.hidden = true; }
     }
 
-    /**
-     * Paint the file card from state.dst + the CURRENT product/stitch state.
-     * Cheap and idempotent — call whenever product or stitch count changes.
-     * All dynamic strings go in via textContent (file name + header label
-     * are attacker-controlled bytes from the dropped file).
-     */
-    function renderDstCard() {
-        var card = document.getElementById('dstCard');
-        var drop = document.getElementById('dstDrop');
-        if (!card) return;
-        var d = state.dst;
-        card.hidden = !d;
-        if (drop) drop.hidden = !!d;   // card replaces the drop zone; ✕ restores it
-        if (!d) return;
+    /* ---------- thumbnail ---------- */
 
-        var p = PRODUCT_META[state.product];
+    // Small standalone stitch render. Deliberately NOT imported from
+    // dst-viewer.js — that renderer is coupled to the Studio's canvas, zoom
+    // and palette state. This draws the colour runs at a fixed thumbnail size
+    // and returns a data URL, so the heavy points array can be released
+    // immediately afterwards (a 60K-stitch design holds ~60K objects).
+    var THUMB_PX = 128;
 
-        document.getElementById('dstFileName').textContent = d.name;
-        var labelEl = document.getElementById('dstFileLabel');
-        labelEl.textContent = d.label ? 'Design: ' + d.label : '';
-        labelEl.hidden = !d.label;
+    function renderThumb(parsed) {
+        try {
+            var bb = parsed.bbox;
+            var wMM = Math.max(bb.widthMM, 1), hMM = Math.max(bb.heightMM, 1);
+            var scale = (THUMB_PX - 8) / Math.max(wMM, hMM);
+            var cv = document.createElement('canvas');
+            cv.width = THUMB_PX; cv.height = THUMB_PX;
+            var c = cv.getContext('2d');
+            if (!c) return null;
+            var offX = (THUMB_PX - wMM * scale) / 2;
+            var offY = (THUMB_PX - hMM * scale) / 2;
+            var X = function (p) { return (p.x - bb.minX) / 10 * scale + offX; };
+            var Y = function (p) { return (bb.maxY - p.y) / 10 * scale + offY; };
 
-        document.getElementById('dstFactStitches').textContent = fmtInt(d.stitches);
-        document.getElementById('dstFactSize').textContent =
-            fmtInches(d.widthMM) + ' × ' + fmtInches(d.heightMM) +
-            ' (' + d.widthMM.toFixed(0) + ' × ' + d.heightMM.toFixed(0) + ' mm)';
-        document.getElementById('dstFactColors').textContent = String(d.colors);
-        document.getElementById('dstFactTrims').textContent = String(d.trims);
+            c.lineCap = 'round';
+            c.lineJoin = 'round';
+            c.lineWidth = Math.max(0.7, scale * 0.35);
+            c.strokeStyle = 'rgba(52,58,66,0.92)';
 
-        // Note row — contract-minimum clamp, or a hand-edited divergence from
-        // the file's count. appliedTarget = what "Use file count" would set.
-        var note = document.getElementById('dstNote');
-        var noteText = document.getElementById('dstNoteText');
-        var reapply = document.getElementById('dstReapply');
-        var minStitches = minStitchesFor(state.product);
-        var appliedTarget = Math.max(minStitches, d.stitches);
-        if (state.stitches !== appliedTarget) {
-            note.hidden = false;
-            reapply.hidden = false;
-            noteText.textContent = 'Stitch count was edited by hand — the file reads ' +
-                fmtInt(d.stitches) + '.';
-        } else if (d.stitches < minStitches) {
-            note.hidden = false;
-            reapply.hidden = true;
-            noteText.textContent = 'File sews ' + fmtInt(d.stitches) +
-                ' stitches — priced at the ' + fmtK(minStitches) +
-                ' contract minimum for ' + p.label.toLowerCase() + 's.';
-        } else {
-            note.hidden = true;
+            var path = new Path2D();
+            var pts = parsed.points;
+            var prev = null;
+            for (var i = 0; i < pts.length; i++) {
+                var p = pts[i];
+                if (p.type === DSTParser.STITCH_NORMAL) {
+                    if (prev && prev.type === DSTParser.STITCH_NORMAL) {
+                        path.moveTo(X(prev), Y(prev));
+                        path.lineTo(X(p), Y(p));
+                    }
+                    prev = p;
+                } else {
+                    prev = p;   // jumps/colour changes break the run
+                }
+            }
+            c.stroke(path);
+            return cv.toDataURL('image/png');
+        } catch (e) {
+            return null;   // a thumbnail is a nicety; never fail a quote over it
         }
-
-        // Suggestion row — the file's size says it belongs on another tab.
-        var suggest = document.getElementById('dstSuggest');
-        var suggestText = document.getElementById('dstSuggestText');
-        var suggestBtn = document.getElementById('dstSuggestBtn');
-        var fbMin = minStitchesFor('fullback');
-        var target = null;
-        if (state.product !== 'fullback' && d.stitches >= fbMin) {
-            target = 'fullback';
-            suggestText.textContent = 'Looks like a full-back design (' + fmtK(fbMin) + '+ stitches).';
-            suggestBtn.textContent = 'Switch to Full Back';
-        } else if (state.product === 'fullback' && d.stitches < fbMin) {
-            target = 'garment';
-            suggestText.textContent = 'This file is under the ' + fmtK(fbMin) + ' full-back minimum.';
-            suggestBtn.textContent = 'Price as Garment';
-        }
-        suggest.hidden = !target;
-        if (target) suggestBtn.setAttribute('data-target', target);
     }
 
-    /** Push the file's exact count into the calculator (clamped to the
-     *  product's contract minimum — same rule as typing it by hand). */
-    function applyDstStitches() {
-        if (!state.dst) return;
-        state.stitches = Math.max(minStitchesFor(state.product), state.dst.stitches);
-        document.getElementById('stitch').value = state.stitches;
+    /* ---------- rendering ---------- */
+
+    function productChip(product, active, onPick) {
+        var b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'dst-chip' + (active ? ' active' : '');
+        b.textContent = PRODUCT_META[product].label;
+        b.setAttribute('aria-pressed', active ? 'true' : 'false');
+        b.addEventListener('click', onPick);
+        return b;
+    }
+
+    function el(tag, cls, text) {
+        var n = document.createElement(tag);
+        if (cls) n.className = cls;
+        if (text != null) n.textContent = text;
+        return n;
+    }
+
+    /**
+     * Build one location card. `line` is the entry from allLines(); `priced`
+     * is its computeUnit result (may be null while pricing loads).
+     *
+     * Location 1's product + stitch count are owned by the top picker and
+     * stitch input, so its card shows facts only — two controls for one value
+     * would be ambiguous. Locations 2+ carry their own controls.
+     */
+    function buildLineCard(line, priced, index, total) {
+        var f = line.file;
+        var card = el('div', 'dst-card');
+        if (!f) card.classList.add('is-manual');
+
+        var head = el('div', 'dst-card-head');
+        if (f && f.thumb) {
+            var img = document.createElement('img');
+            img.className = 'dst-thumb';
+            img.src = f.thumb;
+            img.alt = '';                 // decorative; the facts below carry the meaning
+            head.appendChild(img);
+        } else {
+            var ico = el('span', 'dst-card-ico');
+            ico.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>';
+            head.appendChild(ico);
+        }
+
+        var names = el('span', 'dst-card-names');
+        if (total > 1) names.appendChild(el('span', 'dst-loc-badge', 'Location ' + (index + 1)));
+        names.appendChild(el('span', 'dst-file-name', f ? f.name : 'Typed stitch count'));
+        if (f && f.label) names.appendChild(el('span', 'dst-file-label', 'Design: ' + f.label));
+        head.appendChild(names);
+
+        var price = el('span', 'dst-line-price', priced ? '$' + fmtMoney(priced.unit) : '—');
+        price.title = 'Per piece, this location, before LTM';
+        head.appendChild(price);
+
+        var rm = el('button', 'dst-remove');
+        rm.type = 'button';
+        rm.setAttribute('aria-label', f
+            ? 'Remove ' + f.name
+            : 'Remove location ' + (index + 1));
+        rm.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>';
+        rm.addEventListener('click', function () { removeLine(line); });
+        head.appendChild(rm);
+        card.appendChild(head);
+
+        if (f) {
+            var facts = el('dl', 'dst-facts');
+            [['Stitches', fmtInt(f.stitches)],
+             ['Size', fmtInches(f.widthMM) + ' × ' + fmtInches(f.heightMM)],
+             ['Colors', String(f.colors)],
+             ['Trims', String(f.trims)]].forEach(function (pair) {
+                var d = el('div', 'df');
+                d.appendChild(el('dt', null, pair[0]));
+                d.appendChild(el('dd', null, pair[1]));
+                facts.appendChild(d);
+            });
+            card.appendChild(facts);
+        }
+
+        // Locations 2+ own their product + stitch controls.
+        if (!line.primary) {
+            var ctl = el('div', 'dst-line-ctl');
+            var chips = el('div', 'dst-chips');
+            ['garment', 'cap', 'fullback'].forEach(function (p) {
+                chips.appendChild(productChip(p, p === line.product, function () {
+                    line.product = p;
+                    var min = minStitchesFor(p);
+                    if (line.stitches < min) line.stitches = min;
+                    refreshAll();
+                }));
+            });
+            ctl.appendChild(chips);
+
+            var sw = el('label', 'dst-line-stitch');
+            sw.appendChild(el('span', null, 'Stitches'));
+            var inp = document.createElement('input');
+            inp.type = 'number';
+            inp.className = 'input num';
+            inp.min = String(minStitchesFor(line.product));
+            inp.step = '500';
+            inp.value = String(line.stitches);
+            // Live typing must NOT rebuild the card — the rebuild replaces this
+            // very input, dropping focus to <body> after one keystroke. Update
+            // the prices in place instead, and normalise on blur.
+            inp.addEventListener('input', function () {
+                var v = parseInt(inp.value, 10);
+                line.stitches = isNaN(v) ? 0 : v;
+                refreshPricesOnly();
+            });
+            inp.addEventListener('blur', function () {
+                line.stitches = effectiveStitches(line);
+                inp.value = String(line.stitches);
+                refreshAll();
+            });
+            sw.appendChild(inp);
+            ctl.appendChild(sw);
+            card.appendChild(ctl);
+        }
+
+        // Note row — min clamp, or a hand-edited divergence from the file.
+        if (f) {
+            var min2 = minStitchesFor(line.product);
+            var target = Math.max(min2, f.stitches);
+            // Compare the EFFECTIVE count — a raw half-typed value would make
+            // the "edited by hand" note flicker on during typing.
+            if (effectiveStitches(line) !== target) {
+                var n1 = el('div', 'dst-note');
+                n1.appendChild(el('span', null,
+                    'Stitch count was edited by hand — the file reads ' + fmtInt(f.stitches) + '.'));
+                var b1 = el('button', 'dst-mini-btn', 'Use file count');
+                b1.type = 'button';
+                b1.addEventListener('click', function () { applyFileCount(line); });
+                n1.appendChild(b1);
+                card.appendChild(n1);
+            } else if (f.stitches < min2) {
+                card.appendChild(el('div', 'dst-note',
+                    'File sews ' + fmtInt(f.stitches) + ' stitches — priced at the ' +
+                    fmtK(min2) + ' contract minimum for ' +
+                    PRODUCT_META[line.product].label.toLowerCase() + 's.'));
+            }
+
+            // Size-based suggestion that this belongs on another rate table.
+            var fbMin = minStitchesFor('fullback');
+            var suggestTo = null, suggestMsg = '', suggestBtn = '';
+            if (line.product !== 'fullback' && f.stitches >= fbMin) {
+                suggestTo = 'fullback';
+                suggestMsg = 'Looks like a full-back design (' + fmtK(fbMin) + '+ stitches).';
+                suggestBtn = 'Switch to Full Back';
+            } else if (line.product === 'fullback' && f.stitches < fbMin) {
+                suggestTo = 'garment';
+                suggestMsg = 'This file is under the ' + fmtK(fbMin) + ' full-back minimum.';
+                suggestBtn = 'Price as Garment';
+            }
+            if (suggestTo) {
+                var sg = el('div', 'dst-suggest');
+                sg.appendChild(el('span', null, suggestMsg));
+                var sb = el('button', 'dst-mini-btn', suggestBtn);
+                sb.type = 'button';
+                sb.addEventListener('click', function () {
+                    if (line.primary) {
+                        setProduct(suggestTo);
+                        applyFileCount(line);
+                    } else {
+                        line.product = suggestTo;
+                        applyFileCount(line);
+                    }
+                });
+                sg.appendChild(sb);
+                card.appendChild(sg);
+            }
+        }
+
+        return card;
+    }
+
+    /** Re-render every location card from state. */
+    function renderDstCard() {
+        var host = document.getElementById('dstLines');
+        if (!host) return;
+        var result = priceAllLines();
+        var lines = allLines();
+        var drop = document.getElementById('dstDrop');
+        var anyFile = lines.some(function (l) { return !!l.file; });
+
+        host.textContent = '';
+        // Only render cards once at least one FILE exists — with no file the
+        // top picker + stitch input already are the location-1 UI, and an
+        // empty "Typed stitch count" card would be pure noise.
+        if (anyFile) {
+            lines.forEach(function (line, i) {
+                host.appendChild(buildLineCard(
+                    line,
+                    result ? result.priced[i] : null,
+                    i,
+                    lines.length
+                ));
+            });
+        }
+
+        if (drop) {
+            drop.classList.toggle('is-compact', anyFile);
+            var strong = drop.querySelector('.dst-drop-text strong');
+            var hint = drop.querySelector('.dst-drop-text .hint');
+            if (strong) strong.textContent = anyFile ? 'Add another location' : 'Drop the .DST here';
+            if (hint) {
+                hint.textContent = anyFile
+                    ? 'Left chest + full back on the same garments? Drop the second file.'
+                    : 'Reads the exact stitch count in your browser — the file never leaves your computer';
+            }
+            drop.setAttribute('aria-label', anyFile
+                ? 'Add another location — drop a .DST or click to browse'
+                : 'Drop the .DST here or click to browse');
+        }
+
+        renderProductionRead(lines);
+    }
+
+    /** Advisory production read across every loaded file. Never prices. */
+    function renderProductionRead(lines) {
+        var wrap = document.getElementById('dstProd');
+        var timeEl = document.getElementById('dstTime');
+        var risksEl = document.getElementById('dstRisks');
+        if (!wrap || !timeEl || !risksEl) return;
+
+        var withFiles = lines.filter(function (l) { return l.file && l.file.stats; });
+        if (!withFiles.length) { wrap.hidden = true; return; }
+        wrap.hidden = false;
+
+        // Machine time — every location is sewn on every piece, so the run's
+        // time is the sum across locations.
+        var totalHours = 0, totalStopped = 0;
+        withFiles.forEach(function (l) {
+            var t = QuoteMath.estimateMachineHours(DSTParser, l.file.stats, state.qty, {});
+            totalHours += t.totalHours;
+            totalStopped += t.stoppedMin;
+        });
+        timeEl.textContent = '';
+        var big = el('span', 'dst-time-big', fmtHours(totalHours));
+        timeEl.appendChild(big);
+        timeEl.appendChild(el('span', 'dst-time-sub',
+            'single-head machine time for ' + fmtInt(state.qty) + ' pc' + (state.qty === 1 ? '' : 's') +
+            (withFiles.length > 1 ? ' across ' + withFiles.length + ' locations' : '') +
+            ' · not a delivery date'));
+
+        // Risk flags — deduped by code across locations, named when it matters.
+        risksEl.textContent = '';
+        var seen = {};
+        withFiles.forEach(function (l) {
+            (l.file.risk || []).forEach(function (flag) {
+                var key = flag.code;
+                if (seen[key]) return;
+                seen[key] = true;
+                var li = el('li', 'dst-risk ' + flag.level);
+                li.appendChild(el('span', 'dst-risk-title',
+                    flag.title + (withFiles.length > 1 ? ' · ' + l.file.name : '')));
+                li.appendChild(el('span', 'dst-risk-detail', flag.detail));
+                risksEl.appendChild(li);
+            });
+        });
+        if (!risksEl.children.length) {
+            var ok = el('li', 'dst-risk ok');
+            ok.appendChild(el('span', 'dst-risk-title', 'No production flags'));
+            ok.appendChild(el('span', 'dst-risk-detail',
+                'Stitch length, density, trims and colour changes all read normal.'));
+            risksEl.appendChild(ok);
+        }
+    }
+
+    function fmtHours(h) {
+        if (!isFinite(h) || h <= 0) return '—';
+        if (h < 1) return Math.round(h * 60) + ' min';
+        return h.toFixed(1) + ' hr';
+    }
+
+    /* ---------- mutations ---------- */
+
+    /** Push a line's file count into its stitch count (clamped to the minimum). */
+    function applyFileCount(line) {
+        if (!line.file) return;
+        var v = Math.max(minStitchesFor(line.product), line.file.stitches);
+        if (line.primary) {
+            state.stitches = v;
+            document.getElementById('stitch').value = v;
+        } else {
+            line.stitches = v;
+        }
+        refreshAll();
+    }
+
+    function removeLine(line) {
+        if (line.primary) {
+            // Deliberate: the stitch count STAYS — removing the file must not
+            // zero out a quote the rep is mid-way through.
+            state.dst = null;
+        } else {
+            var i = state.extraLines.indexOf(line);
+            if (i > -1) state.extraLines.splice(i, 1);
+        }
+        clearDstError();
+        refreshAll();
+        var drop = document.getElementById('dstDrop');
+        if (drop) drop.focus();
+    }
+
+    /** One redraw path for every mutation that changes the SET of locations. */
+    function refreshAll() {
         renderSegmentedActiveStates();
         renderCalculator();
         renderPriceTable();
@@ -641,27 +1041,73 @@
         if (aiState.opened) updateContextPill();
     }
 
-    function handleDstFile(file) {
-        if (!file) return;
+    /**
+     * Redraw prices WITHOUT rebuilding the location cards.
+     *
+     * Used while a per-location stitch input is being typed into: a full
+     * renderDstCard() would replace the focused input mid-keystroke. Only text
+     * inside existing cards is rewritten, so focus and caret survive.
+     */
+    function refreshPricesOnly() {
+        renderSegmentedActiveStates();
+        renderCalculator();
+        renderPriceTable();
+        var result = priceAllLines();
+        var host = document.getElementById('dstLines');
+        if (result && host) {
+            var priceEls = host.querySelectorAll('.dst-line-price');
+            for (var i = 0; i < priceEls.length && i < result.priced.length; i++) {
+                priceEls[i].textContent = '$' + fmtMoney(result.priced[i].unit);
+            }
+        }
+        renderProductionRead(allLines());
+        if (aiState.opened) updateContextPill();
+    }
+
+    /* ---------- file intake ---------- */
+
+    // Real production DSTs are tiny (a 63K-stitch jacket back ≈ 190 KB). A
+    // multi-MB file is either not a DST or pathological, and decoding it
+    // would build millions of point objects and lock the tab before any
+    // validity check could run — so bound it before the read.
+    var DST_MAX_BYTES = 8 * 1024 * 1024;
+    var MAX_LOCATIONS = 6;
+
+    /**
+     * Read + validate one file and attach it as a location.
+     * Returns a Promise that always RESOLVES (never rejects) so a bad file in
+     * a multi-file drop doesn't strand the ones after it.
+     */
+    function handleDstFile(file, opts) {
+        opts = opts || {};
+        if (!file) return Promise.resolve(false);
         if (!/\.dst$/i.test(file.name)) {
             showDstError('"' + file.name + '" is not a .DST file. Export the design as ' +
                 'Tajima DST from your digitizing software — PES/EXP/JEF aren\'t supported here yet.');
-            return;
+            return Promise.resolve(false);
         }
         if (file.size > DST_MAX_BYTES) {
             showDstError('"' + file.name + '" is ' + (file.size / 1048576).toFixed(1) +
                 ' MB — far larger than any real stitch file (a 63,000-stitch back design ' +
                 'is about 0.2 MB). Check that this is the DST and not a packed archive.');
-            return;
+            return Promise.resolve(false);
         }
-        // Keyboard users activate the drop zone itself; it hides once the card
-        // renders, which would drop focus to <body>. Remember to re-place it.
+        if (allLines().filter(function (l) { return l.file; }).length >= MAX_LOCATIONS) {
+            showDstError('That is ' + MAX_LOCATIONS + ' locations already — more than fits on ' +
+                'one garment. Remove one before adding another.');
+            return Promise.resolve(false);
+        }
+        return new Promise(function (resolve) {
+
+        // Keyboard users activate the drop zone itself; it may lose focus when
+        // the cards re-render, so remember to re-place it.
         var drop = document.getElementById('dstDrop');
         var hadFocus = drop && drop.contains(document.activeElement);
+
         var reader = new FileReader();
         reader.onload = function (e) {
             try {
-                var data = window.DSTParser.parse(e.target.result);
+                var data = DSTParser.parse(e.target.result);
                 // Tajima DST has no magic bytes — random binary "decodes" into
                 // nonsense stitches, and on a PRICING surface that becomes a
                 // silent wrong price (Erik's #1 rule). Every real DST declares
@@ -676,7 +1122,9 @@
                         ' decoded — the file looks corrupt or is not a Tajima DST.');
                 }
                 clearDstError();
-                state.dst = {
+
+                var density = QuoteMath.densityFor(DSTParser, data);
+                var facts = {
                     name: file.name,
                     label: (data.header && data.header.label) || '',
                     stitches: data.stats.totalStitches,
@@ -684,35 +1132,93 @@
                     heightMM: data.bbox.heightMM,
                     colors: data.stats.totalColors,
                     trims: data.stats.trims,
+                    // Kept for the production read; `points` is deliberately NOT
+                    // retained — the thumbnail is rasterised here and the array
+                    // released so six locations don't pin millions of objects.
+                    stats: data.stats,
+                    risk: QuoteMath.assessRisk(data, density),
+                    thumb: renderThumb(data)
                 };
-                applyDstStitches();
-                var summary = file.name + ' — ' + fmtInt(state.dst.stitches) + ' stitches read from the file';
-                showToast(summary);
-                // The toast is decorative; this is what assistive tech hears.
+
+                var target;
+                if (!state.dst) {
+                    state.dst = facts;
+                    target = allLines()[0];
+                } else {
+                    target = {
+                        id: nextLineId++,
+                        product: state.product === 'fullback' ? 'garment' : state.product,
+                        stitches: 0,
+                        file: facts,
+                        primary: false
+                    };
+                    // A second file that is clearly a back design lands on the
+                    // full-back table rather than making the rep notice.
+                    if (facts.stitches >= minStitchesFor('fullback')) target.product = 'fullback';
+                    target.stitches = Math.max(minStitchesFor(target.product), facts.stitches);
+                    state.extraLines.push(target);
+                }
+                applyFileCount(target);
+
+                var n = allLines().filter(function (l) { return l.file; }).length;
+                var summary = file.name + ' — ' + fmtInt(facts.stitches) + ' stitches read from the file' +
+                    (n > 1 ? ' · location ' + n : '');
+                if (!opts.quiet) showToast(summary);
+
                 var statusEl = document.getElementById('dstStatus');
                 if (statusEl) {
-                    statusEl.textContent = summary + '. Priced at ' +
-                        fmtK(state.stitches) + ' stitches, $' +
+                    statusEl.textContent = summary + '. Quote is now $' +
                         document.getElementById('unitPrice').textContent + ' per piece.';
                 }
-                if (hadFocus) {
-                    var removeBtn = document.getElementById('dstRemove');
-                    if (removeBtn) removeBtn.focus();
-                }
+                if (hadFocus && drop) drop.focus();
+                resolve(true);
             } catch (err) {
                 showDstError('Couldn\'t read this DST: ' + err.message);
+                resolve(false);
             }
         };
-        reader.onerror = function () { showDstError('File read failed — try dropping it again.'); };
+        reader.onerror = function () {
+            showDstError('File read failed — try dropping it again.');
+            resolve(false);
+        };
         reader.readAsArrayBuffer(file);
+        });
+    }
+
+    /**
+     * Load a FileList as separate locations.
+     *
+     * Reads are SEQUENTIAL on purpose: FileReader resolves on a later tick, so
+     * firing them in parallel lets two files both observe "no location 1 yet"
+     * and race to claim it — one silently overwrites the other. Chaining also
+     * keeps the "Location 1/2/3" numbering matching drop order.
+     */
+    function handleDstFiles(fileList) {
+        var files = Array.prototype.slice.call(fileList || []);
+        if (!files.length) return Promise.resolve(0);
+        var multi = files.length > 1;
+        if (multi) showToast('Reading ' + files.length + ' stitch files as separate locations');
+        var loaded = 0;
+        return files.reduce(function (chain, f) {
+            return chain.then(function () {
+                return handleDstFile(f, { quiet: multi }).then(function (ok) {
+                    if (ok) loaded++;
+                });
+            });
+        }, Promise.resolve()).then(function () {
+            if (multi && loaded > 0) {
+                showToast(loaded + ' of ' + files.length + ' files loaded as locations');
+            }
+            return loaded;
+        });
     }
 
     function bindDstEvents() {
         var field = document.getElementById('dstField');
         if (!field) return;
-        // Parser script failed to load → leave the whole field hidden and the
-        // manual stitch input untouched (graceful degradation, no dead UI).
-        if (!window.DSTParser) return;
+        // Parser or math module failed to load → leave the whole field hidden
+        // and the manual stitch input untouched (graceful degradation).
+        if (!window.DSTParser || !window.DSTQuoteMath) return;
         field.hidden = false;
 
         var drop = document.getElementById('dstDrop');
@@ -723,12 +1229,10 @@
             if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); input.click(); }
         });
         input.addEventListener('change', function () {
-            if (input.files.length) handleDstFile(input.files[0]);
+            handleDstFiles(input.files);
             input.value = '';   // allow re-selecting the same file after ✕
         });
 
-        // Drops land anywhere on the field — including on the loaded card,
-        // which replaces the current file.
         ['dragover', 'dragenter'].forEach(function (ev) {
             field.addEventListener(ev, function (e) {
                 e.preventDefault();
@@ -746,10 +1250,7 @@
             e.preventDefault();
             field.classList.remove('dragging');
             if (!e.dataTransfer || !e.dataTransfer.files.length) return;
-            if (e.dataTransfer.files.length > 1) {
-                showToast('One file at a time — reading ' + e.dataTransfer.files[0].name);
-            }
-            handleDstFile(e.dataTransfer.files[0]);
+            handleDstFiles(e.dataTransfer.files);
         });
 
         // A drop that misses the target would navigate the tab straight to
@@ -757,30 +1258,9 @@
         document.addEventListener('dragover', function (e) { e.preventDefault(); });
         document.addEventListener('drop', function (e) { e.preventDefault(); });
 
-        document.getElementById('dstRemove').addEventListener('click', function () {
-            state.dst = null;
-            clearDstError();
-            renderDstCard();
-            // Deliberate: the stitch count STAYS — removing the file must not
-            // zero out a quote the rep is mid-way through.
-            if (drop) drop.focus();
-        });
-        document.getElementById('dstReapply').addEventListener('click', applyDstStitches);
-        document.getElementById('dstSuggestBtn').addEventListener('click', function (e) {
-            // The suggestion is a FILE-driven action, so after switching
-            // products re-apply the file's exact count under the new
-            // product's minimum rules. Without this, moving OFF the Full
-            // Back tab would keep the old 25K clamp instead of the file's
-            // real count. (The segmented picker deliberately does NOT
-            // re-apply — hand-picked counts survive a manual tab switch.)
-            setProduct(e.currentTarget.getAttribute('data-target'));
-            applyDstStitches();
-        });
-
-        // Hand-edits to the stitch input flip the card's note row live.
+        // Hand-edits to location 1's stitch input flip its note row live.
         document.getElementById('stitch').addEventListener('input', renderDstCard);
     }
-
     /* ---------------------- Event wiring ---------------------- */
 
     function bindEvents() {
@@ -792,10 +1272,13 @@
             setProduct(btn.getAttribute('data-product'));
         });
 
-        // Quantity input
+        // Quantity input — shared by every location (same garments), so a
+        // change re-renders the cards' per-location prices and the run's
+        // machine time too.
         var qtyInput = document.getElementById('qty');
         qtyInput.addEventListener('input', function () {
             state.qty = Math.max(1, parseInt(qtyInput.value, 10) || 1);
+            renderDstCard();
             renderSegmentedActiveStates();
             renderCalculator();
             renderPriceTable();
@@ -1062,12 +1545,29 @@ var AI_ENDPOINT = '/api/contract-embroidery-ai/chat';
         // Phase 6: fullback uses DECG-FB to match the calculator's
         // segmented-picker label + the corporate embroidery pricing page +
         // ShopWorks. CTR-FB was a Phase 3 mistake; renderer accepts both.
-        var skuBase = calcContext.product === 'cap' ? 'CTR-Cap'
-            : calcContext.product === 'fullback' ? 'DECG-FB'
-            : 'CTR-Garmt';
-        var locationLabel = calcContext.product === 'cap' ? 'Cap'
-            : calcContext.product === 'fullback' ? 'Full Back'
-            : 'Left Chest';
+        function skuFor(product) {
+            return product === 'cap' ? 'CTR-Cap'
+                : product === 'fullback' ? 'DECG-FB'
+                : 'CTR-Garmt';
+        }
+        function locationFor(product) {
+            return product === 'cap' ? 'Cap'
+                : product === 'fullback' ? 'Full Back'
+                : 'Left Chest';
+        }
+        var skuBase = skuFor(calcContext.product);
+        var locationLabel = locationFor(calcContext.product);
+        // Round 13: one saved line item per decorated location. Falls back to
+        // the single-location shape when `locations` is absent.
+        var quoteLocations = (calcContext.locations && calcContext.locations.length)
+            ? calcContext.locations
+            : [{
+                product: calcContext.product,
+                productLabel: productLabel,
+                stitches: calcContext.stitches,
+                unit: calcContext.baseUnit,
+                file: calcContext.dstFile ? calcContext.dstFile.name : null,
+            }];
 
         // Phase 7 (+ Phase 8 ship method): assemble shipping + tax + reseller
         // permit data from the cfBundle (pre-flight checklist result).
@@ -1105,7 +1605,16 @@ var AI_ENDPOINT = '/api/contract-embroidery-ai/chat';
         // Phase 9 (2026-05-14): hardcoded the tax-exempt line to a reminder
         // for the rep ("verify WA Reseller Permit on file") instead of a
         // typed-in permit number — Ruthie no longer enters one in the chat.
-        var notesLines = ['Contract embroidery quote · ' + productLabel + ' · ' + stitchLabel + ' stitches'];
+        var notesLines;
+        if (quoteLocations.length > 1) {
+            notesLines = ['Contract embroidery quote · ' + quoteLocations.length + ' locations'];
+            quoteLocations.forEach(function (loc) {
+                notesLines.push('  · ' + loc.productLabel + ' — ' + fmtK(loc.stitches) +
+                    ' stitches' + (loc.file ? ' (' + loc.file + ')' : ''));
+            });
+        } else {
+            notesLines = ['Contract embroidery quote · ' + productLabel + ' · ' + stitchLabel + ' stitches'];
+        }
         if (cfBundle && !taxable) {
             notesLines.push('Tax-exempt · WA Reseller Permit on file (verify)');
         }
@@ -1179,31 +1688,48 @@ var AI_ENDPOINT = '/api/contract-embroidery-ai/chat';
         // standard product-rows path where parseSizeBreakdown('') returns {}
         // and NO row gets rendered — table headers without a body.
         // (locationLabel hoisted above for re-use on the session row.)
-        var item = {
-            QuoteID: quoteID,
-            LineNumber: 1,
-            StyleNumber: skuBase,
-            ProductName: 'Contract ' + productLabel + ' embroidery · ' + stitchLabel + ' stitches',
-            Quantity: calcContext.qty,
-            FinalUnitPrice: parseFloat(calcContext.finalUnit.toFixed(2)),
-            LineTotal: parseFloat(calcContext.orderTotal.toFixed(2)),
-            SizeBreakdown: '',
-            EmbellishmentType: 'customer-supplied',
-            PrintLocation: locationLabel,
-            PrintLocationName: locationLabel,
-            AddedAt: nowISO,
-        };
-        var itemRes = await fetch(proxyBase + '/api/quote_items', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(item),
-        });
-        if (!itemRes.ok) {
-            var t2 = await itemRes.text();
-            // Session was saved but line item failed — log and surface to caller.
-            console.warn('[ai-chat] quote_items POST failed: ' + itemRes.status + ' ' + t2.slice(0, 120) +
-                ' — session ' + quoteID + ' was saved but has no line items.');
-            throw new Error('quote_items POST returned ' + itemRes.status);
+        //
+        // Round 13: ONE row per decorated location. The LTM stays rolled into
+        // a per-piece price (the convention every NWCA surface uses — no
+        // separate "LTM" invoice row), and it is added to the FIRST line only,
+        // because it is one fee per ORDER (Erik 2026-08-04). That keeps
+        // Σ LineTotal === session TotalAmount, which is what the quote
+        // renderer and ShopWorks both reconcile against.
+        var ltmPerPiece = Number(calcContext.ltmPerPiece) || 0;
+        for (var li = 0; li < quoteLocations.length; li++) {
+            var loc = quoteLocations[li];
+            var unit = (Number(loc.unit) || 0) + (li === 0 ? ltmPerPiece : 0);
+            var locLabel = locationFor(loc.product);
+            var item = {
+                QuoteID: quoteID,
+                LineNumber: li + 1,
+                StyleNumber: skuFor(loc.product),
+                ProductName: 'Contract ' + (loc.productLabel || productLabel) +
+                    ' embroidery · ' + fmtK(loc.stitches) + ' stitches' +
+                    (loc.file ? ' · ' + loc.file : ''),
+                Quantity: calcContext.qty,
+                FinalUnitPrice: parseFloat(unit.toFixed(2)),
+                LineTotal: parseFloat((unit * calcContext.qty).toFixed(2)),
+                SizeBreakdown: '',
+                EmbellishmentType: 'customer-supplied',
+                PrintLocation: locLabel,
+                PrintLocationName: locLabel,
+                AddedAt: nowISO,
+            };
+            var itemRes = await fetch(proxyBase + '/api/quote_items', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(item),
+            });
+            if (!itemRes.ok) {
+                var t2 = await itemRes.text();
+                // Session was saved but a line item failed — log and surface.
+                console.warn('[ai-chat] quote_items POST failed on line ' + (li + 1) + ': ' +
+                    itemRes.status + ' ' + t2.slice(0, 120) +
+                    ' — session ' + quoteID + ' is saved but incomplete.');
+                throw new Error('quote_items POST returned ' + itemRes.status +
+                    ' on line ' + (li + 1) + ' of ' + quoteLocations.length);
+            }
         }
 
         return quoteID;
@@ -1367,29 +1893,41 @@ var AI_ENDPOINT = '/api/contract-embroidery-ai/chat';
     }
 
     function buildCalcContext() {
-        var calc = computeUnit(state.product, state.qty, state.stitches);
-        if (!calc) return null;
-        var ltmThreshold = pricing ? pricing.ltmThreshold : 23;
-        var ltmFeeBase = state.product === 'fullback' ? 100 : (pricing ? pricing.ltmFee : 50);
-        var ltmCalc = calculateUnitPriceWithLTM(calc.unit, state.qty, ltmThreshold, ltmFeeBase);
+        var result = priceAllLines();
+        if (!result) return null;
+        var combo = result.combo;
+        var calc = result.priced[0].calc;
+
+        // Machine time across every location, for the run.
+        var machineHours = 0;
+        result.priced.forEach(function (pr) {
+            if (pr.line.file && pr.line.file.stats) {
+                machineHours += QuoteMath.estimateMachineHours(
+                    DSTParser, pr.line.file.stats, state.qty, {}).totalHours;
+            }
+        });
+
         return {
+            // product/stitches stay LOCATION 1 so an older proxy that only
+            // knows the single-location shape still renders a correct quote
+            // for the primary location instead of breaking.
             product: state.product,
             qty: state.qty,
             stitches: state.stitches,
-            baseUnit: Number(calc.unit.toFixed(2)),
-            finalUnit: Number(ltmCalc.finalUnitPrice.toFixed(2)),
-            ltmFee: ltmCalc.hasLtm ? ltmFeeBase : 0,
+            baseUnit: Number(combo.baseUnit.toFixed(2)),
+            finalUnit: Number(combo.finalUnit.toFixed(2)),
+            ltmFee: combo.ltmFee,
             // Phase 4: include the pre-generated CEMB quote ID so the AI can
             // reference it in the subject + intro. May be null if first
             // message hasn't fired yet OR ensureQuoteID() failed — the AI
             // gracefully omits it in that case.
             quoteID: aiState.quoteID || null,
-            ltmPerPiece: Number(ltmCalc.ltmPerPiece.toFixed(2)),
-            orderTotal: Number((ltmCalc.finalUnitPrice * state.qty).toFixed(2)),
-            // Round 12 (2026-08-04): when the stitch count came from a parsed
-            // DST file, pass the file facts through so the AI can reference
-            // them in the email ("based on your stitch file EAGLE_LC.dst…").
-            // Servers that don't know the field simply ignore it.
+            ltmPerPiece: Number(combo.ltmPerPiece.toFixed(2)),
+            orderTotal: Number(combo.orderTotal.toFixed(2)),
+            // Round 12/13: file-derived facts so the AI can write "priced from
+            // your file EAGLE_LC.dst — 9,412 stitches" instead of a round
+            // number the customer might dispute. dstFile stays LOCATION 1 for
+            // back-compat; `locations` carries the full picture.
             dstFile: state.dst ? {
                 name: state.dst.name,
                 exactStitches: state.dst.stitches,
@@ -1397,6 +1935,37 @@ var AI_ENDPOINT = '/api/contract-embroidery-ai/chat';
                 heightMM: Number(state.dst.heightMM.toFixed(1)),
                 colors: state.dst.colors,
             } : null,
+            locations: result.priced.map(function (pr) {
+                var f = pr.line.file;
+                return {
+                    product: pr.product,
+                    productLabel: PRODUCT_META[pr.product].label,
+                    stitches: pr.stitches,
+                    unit: Number(pr.unit.toFixed(2)),
+                    file: f ? f.name : null,
+                    exactStitches: f ? f.stitches : null,
+                    widthMM: f ? Number(f.widthMM.toFixed(1)) : null,
+                    heightMM: f ? Number(f.heightMM.toFixed(1)) : null,
+                    colors: f ? f.colors : null,
+                };
+            }),
+            // Advisory production read. The AI is instructed to mention these
+            // only as pre-production notes — they never move a price.
+            production: machineHours > 0 ? {
+                machineHours: Number(machineHours.toFixed(1)),
+                risks: result.priced.reduce(function (acc, pr) {
+                    var f = pr.line.file;
+                    if (f && f.risk) {
+                        f.risk.forEach(function (r) {
+                            if (!acc.some(function (a) { return a.code === r.code; })) {
+                                acc.push({ code: r.code, level: r.level, title: r.title, detail: r.detail });
+                            }
+                        });
+                    }
+                    return acc;
+                }, []),
+            } : null,
+            tierLabel: TIER_LABELS[calc.tierIdx],
         };
     }
 
@@ -1409,9 +1978,12 @@ var AI_ENDPOINT = '/api/contract-embroidery-ai/chat';
             return;
         }
         var label = PRODUCT_META[ctx.product]?.label || ctx.product;
+        var multi = ctx.locations && ctx.locations.length > 1;
         pill.innerHTML =
-            '<b>' + fmtInt(ctx.qty) + ' ' + label.toLowerCase() + (ctx.qty === 1 ? '' : 's') + '</b>' +
-            ' · ' + fmtK(ctx.stitches) + ' stitches' +
+            '<b>' + fmtInt(ctx.qty) + ' ' + (multi ? 'pcs' : label.toLowerCase() + (ctx.qty === 1 ? '' : 's')) + '</b>' +
+            ' · ' + (multi
+                ? ctx.locations.length + ' locations'
+                : fmtK(ctx.stitches) + ' stitches') +
             ' · <b>$' + fmtMoney(ctx.finalUnit) + '/pc</b>' +
             ' · Total <b>$' + fmtMoney(ctx.orderTotal) + '</b>' +
             (ctx.ltmFee > 0 ? ' · incl. $' + ctx.ltmFee + ' LTM' : '');

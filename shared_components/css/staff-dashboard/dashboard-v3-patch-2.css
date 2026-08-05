@@ -739,3 +739,24 @@
     min-width: 0;
   }
 }
+
+/* ── "Updated" chip inside a tool button (2026-08-05) ──────────────────────
+   Art & Design → Shirt Designer reuses the amber .qs-new-badge from the New
+   Quote CTA rather than getting its own colour language. Two resets are needed
+   because that chip was authored for INLINE layout while .tool-btn is a flex
+   row: `vertical-align` is inert here, and the chip's own margin-left would
+   stack on top of the button's `gap`. Deliberately NOT .tool-btn--beta — that
+   chip means "still being refined", which is the wrong signal for a shipped
+   tool we want people to trust and use. */
+.tool-btn .qs-new-badge {
+  margin-left: 0;
+  flex: 0 0 auto;                            /* never squeeze the chip */
+}
+@media (max-width: 900px) {
+  /* Narrow columns: drop the chip rather than the tool's name. .tool-btn is
+     `white-space: nowrap`, so the ~110px chip pushes the label out of the
+     button instead of wrapping (BETA avoids this by being absolutely
+     positioned into reserved padding). The chip is an advisory nudge — the
+     name is the function, so the name wins. */
+  .tool-btn .qs-new-badge { display: none; }
+}

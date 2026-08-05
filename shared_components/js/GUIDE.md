@@ -178,6 +178,7 @@
 
 | File | Purpose |
 |------|---------|
+| `dst-quote-math.js` | **Stitch-file quoting math (2026-08-05)** — pure UMD (no DOM), used by `/calculators/embroidery-contract/` and require()d by `tests/unit/dst-quote-math.test.js`. Three jobs: `assessRisk()` advisory production flags (satin >12.7 mm, density hotspots, trims per 1K, colour changes), `estimateMachineHours()` single-head run time, and `combineLines()` multi-location totals. 🔑 **It never converts stitches→dollars** — `combineLines` takes ALREADY-priced lines so the calculator's `computeUnit()` stays the only pricing path (rule 9). 🔑 **LTM is ONE fee per ORDER at the highest applicable rate** (Erik 2026-08-04): a left-chest + full-back combo under 24 pcs is $100, never $150. |
 | `calculator-utilities.js` | Shared calculator utilities |
 | `pricing-calculator.js` | Generic pricing calculator |
 | `pricing-matrix-api.js` | Pricing matrix API calls |
