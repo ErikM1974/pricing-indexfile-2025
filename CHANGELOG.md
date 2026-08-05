@@ -1,3 +1,9 @@
+## v2026.08.05.5 (2026.08.05)
+
+- Contract Embroidery Phase 2: fix six defects found by adversarial review
+- Deploy v2026.08.05.5: cache-bust the contract calculator JS
+- Merge release v2026.08.05.4 back into develop
+
 ## v2026.08.05.4 (2026.08.05)
 
 - Deploy v2026.08.05.4: Design Vault card — New badge + real description
