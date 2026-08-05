@@ -22,6 +22,18 @@ guard (`if ! git checkout main`) silently passes and the rest of the deploy runs
 wrong branch — exactly the failure that step exists to catch. Check the *output*, not just `$?`,
 or don't pipe it.
 
+🔴 **The orphaned-Heroku-tip chain — three steps, none of them obviously wrong:** another
+session's deploy left the shared checkout on `main` → my next `git commit` landed on `main`
+instead of `develop` → their `git push heroku main` swept that commit into *their* release →
+I moved it back to `develop` with a cherry-pick, which left **Heroku's git tip no longer an
+ancestor of `origin/main`**, so the next `git push heroku main` would have been rejected as
+non-fast-forward (a mid-deploy failure that leaves GitHub updated and Heroku not). Their next
+deploy force-pushed past it and it self-resolved.
+🔑 **`git branch --show-current` immediately before EVERY commit in a shared checkout** — not
+just before the deploy. 🔑 Diagnose with `git ls-remote heroku main` +
+`git merge-base --is-ancestor <heroku-tip> origin/main`; the fix is
+`git push heroku origin/main:main --force` (Heroku is a deploy target, not shared history).
+
 ## What changed
 
 | File | Change |
