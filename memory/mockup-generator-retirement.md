@@ -1,7 +1,26 @@
 # Embroidery Mockup Generator — retired 2026-08-05
 
-Status: **coded, jest-green (2310 tests), NOT yet committed or deployed** as of 2026-08-05.
+Status: **LIVE** — app `v2026.08.05.10` (Heroku release v1809, sha `e4db63b`), 2026-08-05.
 Erik approved "full retire" after the investigation below.
+
+Verified in production after deploy: `/pages/mockup-generator.html` → 302 → DST Studio (both on
+the Heroku domain and `www.teamnwca.com`), the served `dst-viewer.html` contains **0** occurrences
+of `mockup-generator`, and `mockup-detail.html`, `thread-color-picker.js`, `thread-color-picker.css`
+and the Flask `/api/embroidery/palette` endpoint all still return 200.
+
+⏭️ **Flip the 302 → 301 after ~a week** (server.js, the block above the `/pages` static mount).
+
+## 🔑 Deploy note — this release needed a worktree
+
+The shared checkout went dirty **mid-deploy** (another session was actively editing contract
+embroidery files), so Step 6's `git checkout main` aborted. Released from
+`git worktree add C:/Temp/nwca-rel main` instead — short path, because the scratchpad path
+blows Windows MAX_PATH. The other session's uncommitted work was never touched.
+
+⚠️ **Piping `git checkout main` into `tail` swallows its exit code**, so the skill's Step 6
+guard (`if ! git checkout main`) silently passes and the rest of the deploy runs against the
+wrong branch — exactly the failure that step exists to catch. Check the *output*, not just `$?`,
+or don't pipe it.
 
 ## What changed
 
