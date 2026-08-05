@@ -1,3 +1,9 @@
+## v2026.08.05.16 (2026.08.05)
+
+- memory: proxy + app file-exposure security topic file
+- Merge released main back into develop (v2026.08.05.15)
+- Extend content-hashed caching to the staff pages (dashboards + tools)
+
 ## v2026.08.05.15 (2026.08.05)
 
 - Root pages: make bare asset refs absolute so the homepage caches too
