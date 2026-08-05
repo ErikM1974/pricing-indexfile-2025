@@ -1,3 +1,13 @@
+## v2026.08.04.2 (2026.08.04)
+
+- Declutter the garment designer into a guided workflow
+- Close 8 anonymous dead Caspio write endpoints; stop leaking contactEmail
+- Embroidery Studio: rebuild DST viewer to production (WIP checkpoint — pending browser verification)
+- Extract the box label into a shared template (one renderer, two surfaces)
+- Rewrite the repack station onto the shared label pipeline
+- Embroidery Studio: verification-pass fixes (browser-tested on real 63k-stitch DST)
+- (release note) quote-builders/monogram-form.html excluded — companion commits in review
+
 ## v2026.08.04.1 (2026.08.04)
 
 - Memory: /deploy's cache-bust does nothing if you pushed develop first
