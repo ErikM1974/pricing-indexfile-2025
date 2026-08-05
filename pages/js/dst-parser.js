@@ -1,7 +1,7 @@
 /**
  * dst-parser.js — Tajima DST binary parser + production math (pure, no DOM).
  *
- * Used by /pages/dst-viewer.html (Embroidery Studio) in the browser and by
+ * Used by /pages/dst-viewer.html (DST Studio) in the browser and by
  * tests/unit/dst-parser.test.js under Node. Keep this file free of DOM,
  * fetch, and rendering concerns so it stays require()-able.
  *

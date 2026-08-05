@@ -658,7 +658,14 @@
                                 <a href="/dashboards/production-shifts.html" class="tool-btn"><i class="fas fa-user-clock" aria-hidden="true"></i> Production Shifts</a>
                                 <a href="/dashboards/bradley-transfers.html" class="tool-btn"><i class="fas fa-truck" aria-hidden="true"></i> Bradley's Transfer Queue</a>
                                 <a href="/dashboards/supacolor-orders.html" class="tool-btn"><i class="fas fa-link" aria-hidden="true"></i> Supacolor API Orders</a>
-                                <a href="/dashboards/monogram-dashboard.html" class="tool-btn"><i class="fas fa-font" aria-hidden="true"></i> Monogram Dashboard</a>
+                                <!-- Name kept as-is on purpose: "Monogram Dashboard" is what staff
+                                     already say, and the card still goes exactly where it always did.
+                                     What changed Aug 5 is INSIDE (Stitch Check + Customer Proof), and
+                                     a rep has no way to discover that from a card that looks
+                                     identical — hence the same .qs-new-badge nudge Shirt Designer and
+                                     DST Studio use. Not .tool-btn--beta: this is production-ready.
+                                     REMOVE the chip span once staff have seen it, ~Sept 2026. -->
+                                <a href="/dashboards/monogram-dashboard.html" class="tool-btn" title="Every monogram order in one place. New: names are checked for stray spaces, odd capitalization and near-duplicate spellings before they reach the machine, and you can print a customer proof showing each name the way it will be stitched, with a signature line."><i class="fas fa-font" aria-hidden="true"></i> Monogram Dashboard <span class="qs-new-badge">Updated · Aug 5</span></a>
                                 <a href="/dashboards/names-numbers-dashboard.html" class="tool-btn"><i class="fas fa-users" aria-hidden="true"></i> Names &amp; Numbers</a>
 
                                 <div class="tool-subhead">Purchasing &amp; receiving</div>
@@ -701,7 +708,15 @@
                                 <a href="/pages/mockup-generator.html" class="tool-btn tool-btn--beta" title="Beta — works but still being refined. Let Erik know if you hit issues."><i class="fas fa-magic" aria-hidden="true"></i> Mockup Generator</a>
                                 <a href="/dashboards/design-gallery.html" class="tool-btn" title="Search all 37,600+ designs in one place — digitized designs, ShopWorks thumbnails, Steve's art, Ruth's mockups and finished photos, one card per design. Type to search instantly; enter a Customer # for their whole history."><i class="fas fa-vault" aria-hidden="true"></i> Design Vault <span class="qs-new-badge">New · Aug 5</span></a>
                                 <a href="/dashboards/digitized-designs.html" class="tool-btn tool-btn--beta" title="Beta — works but still being refined. Let Erik know if you hit issues."><i class="fas fa-th-list" aria-hidden="true"></i> Digitized Designs</a>
-                                <a href="/pages/dst-viewer.html" class="tool-btn tool-btn--beta" title="Beta — works but still being refined. Let Erik know if you hit issues."><i class="fas fa-microscope" aria-hidden="true"></i> DST Stitch Viewer</a>
+                                <!-- DST Studio left beta on Aug 5 (was "DST Stitch Viewer").
+                                     .tool-btn--beta REMOVED — it is production-ready — and given the
+                                     same .qs-new-badge nudge as Shirt Designer. Kept "DST" in the
+                                     name deliberately: it is the word staff have in hand, and on THIS
+                                     dashboard "Embroidery ___" disambiguates nothing (Contract
+                                     Embroidery, Additional Stitches, Embroidery customer-supplied are
+                                     all neighbours). Page title matches this name exactly.
+                                     REMOVE the chip span once staff have seen it, ~Sept 2026. -->
+                                <a href="/pages/dst-viewer.html" class="tool-btn" title="Open any .DST stitch file — realistic thread preview, exact size and stitch count, true-to-scale mockup on a shirt or cap, density warnings, and a printable customer approval sheet."><i class="fas fa-braille" aria-hidden="true"></i> DST Studio <span class="qs-new-badge">Updated · Aug 5</span></a>
                             </div>
                         </div>
 

@@ -1,5 +1,5 @@
 /**
- * dst-garments.js — vector garment templates for the Embroidery Studio mockup stage.
+ * dst-garments.js — vector garment templates for the DST Studio mockup stage.
  *
  * Each garment is an SVG built at runtime in any fabric color, plus REAL-WORLD
  * scale metadata (mmPerUnit) and placement anchors with industry max sizes, so
