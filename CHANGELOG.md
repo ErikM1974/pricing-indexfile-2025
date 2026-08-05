@@ -1,3 +1,11 @@
+## v2026.08.05.19 (2026.08.05)
+
+- memory: Box read gate shipped end-to-end
+- memory: correct the still-open list now Box reads are gated
+- Retire Pricing by Style (compare-pricing); 302 to Quick Quote
+- Correct the DTF LTM note: checked and clean, no fee is being dropped
+- Box writes: same-origin session-gated forwarder
+
 ## v2026.08.05.18 (2026.08.05)
 
 - Box reads: session-gated same-origin forwarder + normalise stored URLs
