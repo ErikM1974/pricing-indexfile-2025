@@ -822,13 +822,31 @@ class MonogramFormController {
         }
     }
 
+    /** Lowercased set of the names currently typed into rows. */
+    getRowNameSet() {
+        const set = new Set();
+        const tbody = document.getElementById('namesTableBody');
+        if (!tbody) return set;
+        tbody.querySelectorAll('.name-input').forEach(input => {
+            const name = (input.value || '').replace(/\s+/g, ' ').trim().toLowerCase();
+            if (name) set.add(name);
+        });
+        return set;
+    }
+
     /**
-     * Get available (unused) names for dropdown
+     * Get available (unassigned) names for the dropdown / unassigned panel.
+     * Filtered by BOTH the dropdown bookkeeping and the names actually present
+     * in rows: loading a saved form fills rows directly (never via the
+     * dropdown), so an index-only check reports a fully-assigned roster as
+     * entirely unassigned.
      */
     getAvailableNames() {
+        const rowNames = this.getRowNameSet();
         return this.importedNames
             .map((name, index) => ({ name, index }))
-            .filter(item => !this.usedNameIndices.has(item.index));
+            .filter(item => !this.usedNameIndices.has(item.index) &&
+                            !rowNames.has(String(item.name).replace(/\s+/g, ' ').trim().toLowerCase()));
     }
 
     /**
@@ -2032,6 +2050,9 @@ class MonogramFormController {
             unassignedNames: this.importedNames
         });
         this.renderStitchCheck(result, items);
+        // Keep the yellow "Unassigned Names" panel consistent with the check —
+        // it reads the same row names, so the two can never disagree.
+        this.updateUnassignedList();
         return result;
     }
 
