@@ -90,6 +90,43 @@ while `GET` → 401. Now gates `['GET','HEAD']`; verified live HEAD → 401.
 
 ---
 
+## 2b. Box reads: the session-gated forwarder (app half LIVE `v2026.08.05.17`)
+
+The proxy's Box READ routes move behind a same-origin forwarder in the app
+(`server.js` `boxForward`). The property that makes this work: a browser sends
+its SAML cookie automatically on **same-origin `<img>` requests**, so
+`<img src="/api/box/thumbnail/123">` authenticates where a cross-origin call to
+the proxy never could. `requireStaff` proves the session; only the app holds the
+secret it uses upstream.
+
+Shape: **7 explicitly enumerated read routes**, numeric-only `fileId`, and a
+query allowlist (`size, full, folderId, designNumber, limit, offset, query,
+type, url`) checked against the real call sites — dropping `full=1` or
+`size=large` silently degrades an image instead of failing. No wildcard: after
+the `/*.js` incident this forwarder must never become the thing it replaced.
+
+🔴 **Absolute proxy URLs were already PERSISTED in Caspio.** Transfer/mockup
+rows store `Thumbnail_URL` as a full proxy URL (written by
+`transfer-actions-shared.js`), so gating the proxy would 401 every existing
+record. Rather than rewrite the rows, `shared_components/js/box-url.js`
+normalises them at RENDER time — read routes only, idempotent, null-safe.
+
+`art-request-detail` / `mockup-detail` / `transfer-detail` were **public** while
+every dashboard caller was gated; now gated (evidence they are internal: noindex,
+linked only from gated dashboards, every emailed link goes to an
+`@nwcustomapparel.com` address). 🔑 **`app.get`, not `app.use`** — `app.use`
+strips the mount path, so `gateStaffHtml` saw `req.path === '/'`, failed its
+`.html` test, and waved the request through. The gate looked installed and did
+nothing.
+
+⏭️ **The proxy gate is NOT shipped.** The success path needs a real SAML session
+and cannot be verified from here — only the 401 path can. It ships after the
+imagery is confirmed working in a browser. The 4 Box WRITE routes
+(`shared-link`, `create-mockup-folder`, `upload-to-folder`, `file` delete) are
+untouched and still go browser→proxy directly.
+
+---
+
 ## 3. Still open in the proxy — deliberately not blind-gated
 
 Both are anonymous in production today:
