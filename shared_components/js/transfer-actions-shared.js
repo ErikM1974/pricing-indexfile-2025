@@ -954,7 +954,7 @@
         }
 
         try {
-            var resp = await fetch(API_BASE + '/api/box/shared-link', {
+            var resp = await fetch('/api/box/shared-link', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ fileId: fileId })

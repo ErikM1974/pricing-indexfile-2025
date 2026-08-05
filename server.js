@@ -3651,11 +3651,81 @@ app.get('/api/box/search', requireStaff, boxForward(() => 'search'));
 // a box.com URL, so this only carries it across — it never fetches it itself.
 app.get('/api/box/shared-image', requireStaff, boxForward(() => 'shared-image'));
 
-// The four Box WRITE routes (POST shared-link / create-mockup-folder /
-// upload-to-folder, DELETE file/:id) are deliberately NOT forwarded yet — they
-// still go browser→proxy directly and stay anonymous. They create and delete Box
-// content rather than disclosing it, and upload-to-folder needs multipart
-// streamed through here, which is its own piece of work.
+// ── Box WRITE routes, same session gate (2026-08-05) ─────────────────────────
+// Every page that calls these is already SAML-gated (verified: ae-dashboard,
+// art-hub-steve, bradley-*, art-request-detail, mockup-detail, transfer-detail
+// all 302 anonymously), so unlike the reads there was no public caller to work
+// around — the forwarder is the whole fix.
+//
+// Body handling differs per route and that distinction is load-bearing:
+//   'json'   — bodyParser.json (mounted globally above) has ALREADY consumed and
+//              parsed the stream, so it must be re-serialised from req.body.
+//              Piping req here would send an empty body.
+//   'stream' — multipart. bodyParser.json ignores it precisely because the
+//              content-type doesn't match, so req is still unread and can be
+//              piped straight through. That also means the app never buffers a
+//              20 MB upload; it just relays it.
+//   'none'   — DELETE carries no body.
+//
+// `force=true` is the only query any write route uses (delete confirmation).
+const BOX_FORWARD_WRITE_QUERY = new Set(['force']);
+
+function boxForwardWrite(suffix, mode) {
+  return async (req, res) => {
+    if (!CRM_API_SECRET) {
+      console.error('[box-forward] CRM_API_SECRET is not set — refusing to forward');
+      return res.status(503).json({ error: 'Box proxy is not configured' });
+    }
+    let target;
+    try {
+      target = `${CRM_API_BASE}/api/box/${typeof suffix === 'function' ? suffix(req) : suffix}`;
+    } catch (e) {
+      return res.status(400).json({ error: e.message });
+    }
+    const qs = new URLSearchParams();
+    for (const [k, v] of Object.entries(req.query || {})) {
+      if (BOX_FORWARD_WRITE_QUERY.has(k) && typeof v === 'string') qs.set(k, v);
+    }
+    if (qs.toString()) target += '?' + qs;
+
+    const headers = { 'X-CRM-API-Secret': CRM_API_SECRET };
+    let body;
+    if (mode === 'json') {
+      headers['Content-Type'] = 'application/json';
+      body = JSON.stringify(req.body || {});
+    } else if (mode === 'stream') {
+      // Carry the multipart boundary and length across verbatim, or the
+      // proxy's multer cannot parse the parts.
+      if (req.headers['content-type']) headers['Content-Type'] = req.headers['content-type'];
+      if (req.headers['content-length']) headers['Content-Length'] = req.headers['content-length'];
+      body = req;
+    }
+
+    try {
+      const upstream = await fetch(target, { method: req.method, headers, body });
+      res.status(upstream.status);
+      for (const h of ['content-type', 'content-length', 'content-disposition']) {
+        const v = upstream.headers.get(h);
+        if (v) res.setHeader(h, v);
+      }
+      res.setHeader('Cache-Control', 'no-store');
+      if (!upstream.body) return res.end();
+      upstream.body.pipe(res);
+      upstream.body.on('error', (err) => {
+        console.error('[box-forward] upstream stream error:', err.message);
+        res.destroy(err);
+      });
+    } catch (err) {
+      console.error('[box-forward] ' + req.method + ' ' + target + ' failed:', err.message);
+      if (!res.headersSent) res.status(502).json({ error: 'Box request failed' });
+    }
+  };
+}
+
+app.post('/api/box/shared-link', requireStaff, boxForwardWrite('shared-link', 'json'));
+app.post('/api/box/create-mockup-folder', requireStaff, boxForwardWrite('create-mockup-folder', 'json'));
+app.post('/api/box/upload-to-folder', requireStaff, boxForwardWrite('upload-to-folder', 'stream'));
+app.delete('/api/box/file/:fileId', requireStaff, boxForwardWrite(req => 'file/' + boxFileId(req), 'none'));
 
 // ── Contract embroidery COST MODEL (staff only) ──────────────────────────────
 // Feeds the margin overlay on /calculators/embroidery-contract/.

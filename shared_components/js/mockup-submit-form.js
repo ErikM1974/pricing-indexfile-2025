@@ -1218,7 +1218,7 @@ var MockupSubmitForm = (function () {
     }
 
     function createBoxFolder(folderName) {
-        return fetch(API_BASE + '/api/box/create-mockup-folder', {
+        return fetch('/api/box/create-mockup-folder', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ companyName: folderName })

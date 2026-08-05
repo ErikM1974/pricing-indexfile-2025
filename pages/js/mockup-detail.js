@@ -2462,7 +2462,7 @@
         confirmBtn.textContent = 'Creating link...';
 
         // Create shared link for the selected Box file
-        fetch(API_BASE + '/api/box/shared-link', {
+        fetch('/api/box/shared-link', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ fileId: selectedBoxFile.id })
@@ -3004,7 +3004,7 @@
             formData.append('folderId', currentMockup.Box_Folder_ID);
             formData.append('fileName', boxFileName);
 
-            boxPromise = fetch(API_BASE + '/api/box/upload-to-folder', {
+            boxPromise = fetch('/api/box/upload-to-folder', {
                 method: 'POST',
                 body: formData
             })
@@ -3253,7 +3253,7 @@
         formData.append('folderId', currentMockup.Box_Folder_ID);
         formData.append('fileName', boxFileName);
 
-        fetch(API_BASE + '/api/box/upload-to-folder', {
+        fetch('/api/box/upload-to-folder', {
             method: 'POST',
             body: formData
         })
@@ -5539,7 +5539,7 @@
     function handleBoxToSlotDrop(fileId, fileName, slotKey) {
         showToast('Assigning file to slot...', 'info');
 
-        fetch(API_BASE + '/api/box/shared-link', {
+        fetch('/api/box/shared-link', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ fileId: fileId })
@@ -5599,7 +5599,7 @@
     function deleteBoxFile(fileId, force) {
         showToast(force ? 'Force-deleting file...' : 'Deleting file...', 'info');
 
-        var url = API_BASE + '/api/box/file/' + fileId + (force ? '?force=true' : '');
+        var url = '/api/box/file/' + fileId + (force ? '?force=true' : '');
         fetch(url, { method: 'DELETE' })
             .then(function (resp) {
                 if (resp.status === 409) {
