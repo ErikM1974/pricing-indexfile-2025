@@ -1,3 +1,12 @@
+## v2026.08.05.12 (2026.08.05)
+
+- memory: mark mockup generator retirement live (v2026.08.05.10)
+- Deploy skill: the stale-asset detector must resolve refs, not just match basenames
+- Monogram form: point dst-palette.js at the current version
+- memory: deploy cache-bust topic file (the two skill fixes + the no-store finding)
+- Pin the 14 stale ?v= refs to each asset's real last-change date
+- Add .slugignore so tests/ stops shipping to the public web
+
 ## v2026.08.05.11 (2026.08.05)
 
 - Contract Embroidery Phase 3: fix review findings, incl. a LIVE cost leak
