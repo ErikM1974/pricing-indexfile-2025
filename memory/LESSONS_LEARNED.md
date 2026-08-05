@@ -39,6 +39,12 @@ customer's browser.
   callers — and test each. Two of the four here were never considered.
 - 🔑 **Two token types signed with the same key need a `t` discriminator**, or a stolen session
   cookie is an image capability and vice versa. Jest-locked both directions.
+- 🔑 **A customer route must not inherit a staff forwarder's param allowlist.** Reusing
+  `boxForward` also reused `BOX_FORWARD_QUERY` (`full`, `url`, `folderId`, …). The proxy's
+  thumbnail route ignores those *today*, so nothing leaked — but the customer route would have
+  silently widened the day upstream started honouring one. It now forwards `size` only, and forces
+  `Cache-Control: private` rather than echoing upstream, since the response is a per-caller
+  capability that must never land in a shared cache.
 - 🔑 Distinguish "my code is broken" from "the data is": 2 of the 53 failures were Box files that
   no longer exist (`Item not found`) — a pre-existing dead reference, not the fix. Check the asset
   before blaming the change.
