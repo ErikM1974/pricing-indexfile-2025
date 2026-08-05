@@ -1,3 +1,7 @@
+## v2026.08.05.21 (2026.08.05)
+
+- Sample-order push: same-origin forwarder, rate-limited and validated
+
 ## v2026.08.05.20 (2026.08.05)
 
 - memory: Box surface fully closed; the three body-forwarding modes
