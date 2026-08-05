@@ -255,16 +255,25 @@
     function onInput() {
         st.q = els.omnibox.value.trim();
         els.searchClear.hidden = !st.q;
-        if (!rafPending) {
-            rafPending = true;
-            requestAnimationFrame(function () {
-                rafPending = false;
-                pushURL(true);
-                render();
-                var res = DG.search.query(queryState(), 1);
-                scheduleAutoDeep(res.total);
-            });
-        }
+        if (rafPending) return;
+        rafPending = true;
+
+        // Coalesce to a frame so a fast typist repaints once per frame — but
+        // rAF is PAUSED in a background tab (and in non-compositing contexts
+        // like a headless pane), which would latch rafPending and silently
+        // swallow every later keystroke. The timeout is the floor: whichever
+        // fires first wins, so search can never stall.
+        var done = false;
+        var run = function () {
+            if (done) return;
+            done = true;
+            rafPending = false;
+            pushURL(true);
+            render();
+            scheduleAutoDeep(DG.search.query(queryState(), 1).total);
+        };
+        requestAnimationFrame(run);
+        setTimeout(run, 100);
     }
 
     function setCustomer(cid) {
