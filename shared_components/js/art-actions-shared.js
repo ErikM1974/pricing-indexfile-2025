@@ -1257,7 +1257,7 @@
             submitBtn.disabled = true;
             submitBtn.textContent = 'Creating links...';
             var linkResults = await Promise.allSettled(boxEntries.map(function (e) {
-                return fetch(API_BASE + '/api/box/shared-link', {
+                return fetch('/api/box/shared-link', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ fileId: e.id })

@@ -3651,11 +3651,81 @@ app.get('/api/box/search', requireStaff, boxForward(() => 'search'));
 // a box.com URL, so this only carries it across — it never fetches it itself.
 app.get('/api/box/shared-image', requireStaff, boxForward(() => 'shared-image'));
 
-// The four Box WRITE routes (POST shared-link / create-mockup-folder /
-// upload-to-folder, DELETE file/:id) are deliberately NOT forwarded yet — they
-// still go browser→proxy directly and stay anonymous. They create and delete Box
-// content rather than disclosing it, and upload-to-folder needs multipart
-// streamed through here, which is its own piece of work.
+// ── Box WRITE routes, same session gate (2026-08-05) ─────────────────────────
+// Every page that calls these is already SAML-gated (verified: ae-dashboard,
+// art-hub-steve, bradley-*, art-request-detail, mockup-detail, transfer-detail
+// all 302 anonymously), so unlike the reads there was no public caller to work
+// around — the forwarder is the whole fix.
+//
+// Body handling differs per route and that distinction is load-bearing:
+//   'json'   — bodyParser.json (mounted globally above) has ALREADY consumed and
+//              parsed the stream, so it must be re-serialised from req.body.
+//              Piping req here would send an empty body.
+//   'stream' — multipart. bodyParser.json ignores it precisely because the
+//              content-type doesn't match, so req is still unread and can be
+//              piped straight through. That also means the app never buffers a
+//              20 MB upload; it just relays it.
+//   'none'   — DELETE carries no body.
+//
+// `force=true` is the only query any write route uses (delete confirmation).
+const BOX_FORWARD_WRITE_QUERY = new Set(['force']);
+
+function boxForwardWrite(suffix, mode) {
+  return async (req, res) => {
+    if (!CRM_API_SECRET) {
+      console.error('[box-forward] CRM_API_SECRET is not set — refusing to forward');
+      return res.status(503).json({ error: 'Box proxy is not configured' });
+    }
+    let target;
+    try {
+      target = `${CRM_API_BASE}/api/box/${typeof suffix === 'function' ? suffix(req) : suffix}`;
+    } catch (e) {
+      return res.status(400).json({ error: e.message });
+    }
+    const qs = new URLSearchParams();
+    for (const [k, v] of Object.entries(req.query || {})) {
+      if (BOX_FORWARD_WRITE_QUERY.has(k) && typeof v === 'string') qs.set(k, v);
+    }
+    if (qs.toString()) target += '?' + qs;
+
+    const headers = { 'X-CRM-API-Secret': CRM_API_SECRET };
+    let body;
+    if (mode === 'json') {
+      headers['Content-Type'] = 'application/json';
+      body = JSON.stringify(req.body || {});
+    } else if (mode === 'stream') {
+      // Carry the multipart boundary and length across verbatim, or the
+      // proxy's multer cannot parse the parts.
+      if (req.headers['content-type']) headers['Content-Type'] = req.headers['content-type'];
+      if (req.headers['content-length']) headers['Content-Length'] = req.headers['content-length'];
+      body = req;
+    }
+
+    try {
+      const upstream = await fetch(target, { method: req.method, headers, body });
+      res.status(upstream.status);
+      for (const h of ['content-type', 'content-length', 'content-disposition']) {
+        const v = upstream.headers.get(h);
+        if (v) res.setHeader(h, v);
+      }
+      res.setHeader('Cache-Control', 'no-store');
+      if (!upstream.body) return res.end();
+      upstream.body.pipe(res);
+      upstream.body.on('error', (err) => {
+        console.error('[box-forward] upstream stream error:', err.message);
+        res.destroy(err);
+      });
+    } catch (err) {
+      console.error('[box-forward] ' + req.method + ' ' + target + ' failed:', err.message);
+      if (!res.headersSent) res.status(502).json({ error: 'Box request failed' });
+    }
+  };
+}
+
+app.post('/api/box/shared-link', requireStaff, boxForwardWrite('shared-link', 'json'));
+app.post('/api/box/create-mockup-folder', requireStaff, boxForwardWrite('create-mockup-folder', 'json'));
+app.post('/api/box/upload-to-folder', requireStaff, boxForwardWrite('upload-to-folder', 'stream'));
+app.delete('/api/box/file/:fileId', requireStaff, boxForwardWrite(req => 'file/' + boxFileId(req), 'none'));
 
 // ── Contract embroidery COST MODEL (staff only) ──────────────────────────────
 // Feeds the margin overlay on /calculators/embroidery-contract/.
@@ -4347,6 +4417,42 @@ app.get(['/calculators/custom-decal-pricing.html', '/pricing/decals'], requireSt
   // URL with inbound links can still surface as a bare result.
   res.set('X-Robots-Tag', 'noindex, nofollow');
   sendHashedHtml(res, path.join(__dirname, 'calculators', 'custom-decal-pricing.html'));
+});
+
+// ── "Pricing by Style" (compare-pricing) retired 2026-08-05 (Erik approved) ──
+// Superseded by Quick Quote, which is what the sales staff actually use. The
+// page was NOT wrong: it instantiates the same five *-pricing-service.js
+// classes as the quote builders, has zero hardcoded prices, and its Math.min
+// base-cost convention matches dtg-canonical-pricing.js / quote-cart-engine.js.
+// Verified live against the locked baselines on PC54 — EMB 24-47 $20.00,
+// EMB 1-7 base $24.00 and DTG 12-23 $14.50 all matched to the cent.
+//
+// It was retired because it was the ONE pricing surface with NO parity test
+// (13 guard DTF/DTG/EMB/SCP/quick-quote/web-quote-cart; none covered this), so
+// any change to a pricing service could drift it silently — the exact failure
+// CLAUDE.md rule 9 exists to prevent. Unlike the mockup generator, usage could
+// NOT be measured: this app's Heroku logs retain ~30 minutes, far too short to
+// call it unused. Hence 302, not 301 — restoring the card and deleting this
+// block is the whole rollback, and no browser caches its way past it.
+//
+// MUST stay above the serveHashedCalculator catch-alls below (which would
+// serve the page) as well as the /calculators static mount under them.
+//
+// ✅ DTF LTM checked and CLEAN — no action needed. A mid-review scare that this
+// page and baseline DTF-01 were one $50 LTM apart was a like-for-like error:
+// the page was showing the MEDIUM transfer, the baseline is SMALL. Measured
+// both code paths on identical inputs (PC54, garmentCost 3, qty 10) and they
+// agree to the cent at every size — ladder basePrice + floor(ltmFee/qty) ==
+// calculatePriceForQuantity().finalUnitPrice:
+//     small  15.50 + 5.00 = 20.50 == 20.50   (matches baseline DTF-01)
+//     medium 20.50 + 5.00 = 25.50 == 25.50
+//     large  24.00 + 5.00 = 29.00 == 29.00
+// calculatePriceForQuantity folds ltmFeePerUnit into subtotalBeforeRounding
+// BEFORE the ceil-to-half-dollar, so the $50 IS collected on small DTF orders.
+// Recorded here because "is the LTM being dropped?" is a question worth not
+// re-opening from scratch — it isn't.
+app.get('/calculators/compare-pricing.html', (req, res) => {
+  res.redirect(302, '/calculators/quick-quote/');
 });
 
 // Asset rewrite for calculator pages. /calculators has NO mount gate — it is

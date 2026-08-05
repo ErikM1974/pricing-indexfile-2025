@@ -506,9 +506,9 @@
 ### Compare Pricing by Style
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/calculators/compare-pricing.html` | Compare pricing by SanMar style — all methods on one page | compare-pricing.js, compare-pricing.css, manual-pricing.css, all 5 pricing services | ✅ Active |
-| `/calculators/compare-pricing.js` | Page logic — fetches SanMar product data then pricing | All 5 *-pricing-service.js files | ✅ Active |
-| `/calculators/compare-pricing.css` | Page styles — product info banner, extends manual-pricing.css | manual-pricing.css, manual-calculator-styles.css | ✅ Active |
+| `/calculators/compare-pricing.html` | "Pricing by Style" — all 5 decoration methods on one page. **RETIRED 2026-08-05** (dashboard card removed; 302s to `/calculators/quick-quote/` in server.js, above the `serveHashedCalculator` catch-alls). Retired for being the ONLY pricing surface with no parity test, not for being wrong — it matched the locked PC54 baselines to the cent. Files kept on disk; restoring the card + deleting the redirect is the whole rollback. | compare-pricing.js, compare-pricing.css, manual-pricing.css, all 5 pricing services | 🚫 Retired (files kept) |
+| `/calculators/compare-pricing.js` | Page logic — fetches SanMar product data then prices via the 5 shared services. No hardcoded prices; `Math.min` base cost matches the canonical engine. | All 5 *-pricing-service.js files | 🚫 Retired (files kept) |
+| `/calculators/compare-pricing.css` | Page styles — product info banner, extends manual-pricing.css | manual-pricing.css, manual-calculator-styles.css | 🚫 Retired (files kept) |
 
 ### DTG System
 | File | Purpose | Dependencies | Status |

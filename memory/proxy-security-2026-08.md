@@ -119,9 +119,12 @@ strips the mount path, so `gateStaffHtml` saw `req.path === '/'`, failed its
 `.html` test, and waved the request through. The gate looked installed and did
 nothing.
 
-⏭️ **The proxy gate is NOT shipped.** The success path needs a real SAML session
-and cannot be verified from here — only the 401 path can. It ships after the
-imagery is confirmed working in a browser. The 4 Box WRITE routes
+✅ **Proxy gate SHIPPED** (`v2026.08.05.7`) after Erik confirmed the imagery in a
+browser. All 7 read routes now 401 anonymously; the same requests carrying the
+app's `CRM_API_SECRET` return 200, which is the leg the forwarder uses.
+🔑 **Check the two `CRM_API_SECRET` config vars MATCH before gating** — the
+forwarder appears to work while the proxy is open regardless of whether its
+secret is correct, so that proves nothing until the gate is on. The 4 Box WRITE routes
 (`shared-link`, `create-mockup-folder`, `upload-to-folder`, `file` delete) are
 untouched and still go browser→proxy directly.
 
@@ -129,22 +132,21 @@ untouched and still go browser→proxy directly.
 
 ## 3. Still open in the proxy — deliberately not blind-gated
 
-Both are anonymous in production today:
+Anonymous in production today (the Box **reads** in this list are now closed — see 2b):
 
 - `POST /api/manageorders/orders/create` — creates real ShopWorks orders
-- `GET /api/box/{download,thumbnail,art-folders}` — any Box file the service account can
-  see; `art-folders` reports 9,147 customer folders
+- The four Box **WRITE** routes: `POST shared-link`, `POST create-mockup-folder`,
+  `POST upload-to-folder`, `DELETE file/:fileId`
 
 🔑 **A secret cannot simply be added.** `pages/sample-cart.html` posts to the push route
-**directly from the browser** at a hardcoded proxy URL (gating it breaks paid sample
-orders), and ~8 staff pages use `box/thumbnail` as `<img>` URLs straight from the browser
-(gating breaks all art/design imagery). Anything in browser JS is not a secret.
+**directly from the browser** at a hardcoded proxy URL, so gating it breaks paid sample
+orders; the Box write routes are likewise called straight from the browser. Anything in
+browser JS is not a secret.
 
-**The real fix** is to move those callers behind the app's session-gated same-origin
-forwarder — the pattern already used by `/api/contract-embroidery-ai/chat`, where the
-browser holds no credential and the app proves the SAML session server-side — and only
-then gate the proxy routes. That is a multi-file change across two repos and needs its
-own plan.
+**The fix is the one proven in 2b** — move each caller behind the app's session-gated
+same-origin forwarder, then gate the proxy route, app first. `upload-to-folder` is the
+awkward one: it is multipart, so the forwarder has to stream the upload rather than
+`fetch`-and-forward the way the read routes do.
 
 ---
 

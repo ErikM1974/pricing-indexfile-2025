@@ -3014,7 +3014,7 @@
 
                 try {
                     // Create shared link
-                    var linkResp = await fetch(API_BASE + '/api/box/shared-link', {
+                    var linkResp = await fetch('/api/box/shared-link', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ fileId: selectedBoxFile.id })
