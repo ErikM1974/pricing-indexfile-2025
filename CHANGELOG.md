@@ -1,3 +1,9 @@
+## v2026.08.05.7 (2026.08.05)
+
+- memory: contract embroidery stitch-file quoting topic file
+- Merge release v2026.08.05.6 back into develop
+- Promote DST Studio beside Shirt Designer in Art & Design
+
 ## v2026.08.05.6 (2026.08.05)
 
 - DST Studio leaves beta: dashboard card promoted, tool renamed
