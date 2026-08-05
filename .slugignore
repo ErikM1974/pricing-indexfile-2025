@@ -1,0 +1,28 @@
+# .slugignore — paths Heroku strips from the compiled slug at build time.
+# Same matching as .gitignore, EXCEPT there is no negation: you cannot write
+# `tests` here and re-include `tests/foo.html`. Exclude whole directories only.
+#
+# WHY THIS FILE EXISTS (2026-08-05)
+# server.js mounts a lot of the repo as PUBLIC static directories. `tests` was
+# one of them (`app.use('/tests', express.static(...))`, no gate), so every
+# file committed under tests/ was published to the open web. A unit-test
+# fixture for the staff-only contract-embroidery margin overlay hardcoded the
+# real production cost model, and `curl https://…/tests/unit/dst-quote-math.test.js`
+# returned it 200/no-auth — defeating the requireStaff endpoint it was testing.
+# CLAUDE.md rule 2 requires ALL tests live in /tests, so keeping them out of
+# the slug is what stops that recurring for the next fixture.
+#
+# Verified safe before adding (2026-08-05):
+#   · scripts/build.js (heroku-postbuild + prestart) has zero tests/ references
+#   · nothing in the app links to /tests/ (no href/src anywhere outside tests/)
+#   · the three sendFile routes at server.js:7096-7108 point at files that were
+#     already deleted and already 404 in production
+#
+# ⚠️ NOT a substitute for removing the mount. If this file is ever deleted the
+# directory becomes public again — the durable fix is dropping the `/tests`
+# static mount in server.js.
+#
+# ⚠️ `scripts` canNOT be added here: heroku-postbuild runs `node scripts/build.js`,
+# so excluding it breaks the build. It is also publicly mounted — close that one
+# by removing its static mount, not here.
+tests

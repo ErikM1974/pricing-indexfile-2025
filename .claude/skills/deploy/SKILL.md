@@ -198,11 +198,37 @@ for ASSET in $CHANGED_ASSETS; do
 
   # ── Silent-no-op detector. The failure mode this whole step exists to prevent is
   # invisible by construction: nothing bumped looks identical to nothing needed
-  # bumping. If a changed asset's basename carries a ?v= SOMEWHERE in the HTML but
-  # neither pass touched it, the ref uses a shape we don't match (e.g. "../foo.js?v=")
-  # — flag it rather than ship stale.
-  if [ "$HIT" = "0" ] && grep -rqs --include="*.html" --exclude-dir=.claude "${BASE}?v=" .; then
-    MISSED_ASSETS="$MISSED_ASSETS $ASSET"
+  # bumping. If a changed asset is referenced with a ?v= in a shape neither pass
+  # matches (e.g. "../foo.js?v="), flag it rather than ship stale.
+  #
+  # The ref must RESOLVE to this asset — a basename test alone is not enough.
+  # Measured 2026-08-05: basename-only flagged 14 of 763 assets FALSELY, and they
+  # clustered in the most-edited code in the repo (builders/{emb,dtg,scp}/*.js —
+  # pricing.js, persistence.js, utils.js are ESM imports with no ?v= of their own,
+  # but those basenames DO appear with ?v= on unrelated pages). A gate that fires
+  # on every quote-builder release just teaches everyone to set
+  # CACHEBUST_ALLOW_MISS=1 by reflex, which is how a red gate becomes no gate.
+  # Resolving first: 0 false positives, and a genuine "../foo.js?v=" miss is still
+  # caught (both directions verified against this repo).
+  if [ "$HIT" = "0" ]; then
+    BASE_RE=$(printf '%s' "$BASE" | sed 's/[.[\*^$]/\\&/g')
+    for HTML in $(grep -rls --include="*.html" --exclude-dir=.claude "${BASE}?v=" . 2>/dev/null); do
+      for REF in $(grep -oE "[\"'][^\"' >]*${BASE_RE}\?v=" "$HTML" 2>/dev/null \
+                   | sed "s/^[\"']//; s/?v=\$//"); do
+        # normalize the written ref against the page that contains it
+        RESOLVED=$(case "$REF" in
+                     /*) printf '%s' "${REF#/}" ;;
+                     *)  printf '%s/%s' "$(dirname "${HTML#./}")" "$REF" ;;
+                   esac | awk -F/ '{n=0
+                     for(i=1;i<=NF;i++){ if($i==".."){if(n>0)n--}
+                                         else if($i!="."&&$i!=""){a[++n]=$i} }
+                     s=""; for(i=1;i<=n;i++) s=s (i>1?"/":"") a[i]; print s}')
+        if [ "$RESOLVED" = "$ASSET" ]; then
+          MISSED_ASSETS="$MISSED_ASSETS $ASSET"
+          break 2
+        fi
+      done
+    done
   fi
 done
 
