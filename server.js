@@ -4203,7 +4203,7 @@ app.use('/dist', express.static(path.join(__dirname, 'dist'), {
 // static mount below and serve the original source paths — the build is an
 // overlay, never a requirement.
 const { rewriteHtmlAssets, createManifestLoader, createHtmlLoader } = require('./lib/asset-manifest');
-const { HASHED_PAGES, HASHED_PAGES_UNDER_PAGES_MOUNT, HASHED_STAFF_UNDER_MOUNT } = require('./lib/hashed-pages');
+const { HASHED_PAGES, HASHED_PAGES_UNDER_PAGES_MOUNT, HASHED_STAFF_UNDER_MOUNT, HASHED_CALCULATOR_PATHS } = require('./lib/hashed-pages');
 const loadAssetManifest = createManifestLoader(path.join(__dirname, 'dist', 'asset-manifest.json'));
 const loadBuilderHtml = createHtmlLoader();
 

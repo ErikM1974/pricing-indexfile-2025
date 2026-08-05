@@ -14,6 +14,7 @@ const {
     BUILDER_PAGES,
     STOREFRONT_PAGES,
     STAFF_PAGES,
+    CALCULATOR_PAGES,
     HASHED_PAGES,
     HASHED_PAGES_UNDER_PAGES_MOUNT,
 } = require('../../../lib/hashed-pages');
@@ -40,8 +41,18 @@ describe('hashed page list', () => {
         }
     });
 
-    test('the three tranches together make the full list', () => {
-        expect(HASHED_PAGES).toEqual([...BUILDER_PAGES, ...STOREFRONT_PAGES, ...STAFF_PAGES]);
+    test('the four tranches together make the full list', () => {
+        expect(HASHED_PAGES).toEqual([
+            ...BUILDER_PAGES, ...STOREFRONT_PAGES, ...STAFF_PAGES, ...CALCULATOR_PAGES,
+        ]);
+    });
+
+    test('calculators are all under calculators/, at most one level deep, never archive', () => {
+        expect(CALCULATOR_PAGES.length).toBeGreaterThan(0);
+        for (const p of CALCULATOR_PAGES) {
+            expect(p).toMatch(/^calculators\/[^/]+(\/[^/]+)?$/);
+            expect(p).not.toMatch(/^calculators\/archive\//);
+        }
     });
 
     test('staff pages come only from the two uniformly gated mounts', () => {
@@ -128,6 +139,34 @@ describe('serve side', () => {
         const body = fn.slice(0, fn.indexOf('\n}'));
         // If this ever needs its own auth, the ordering guarantee has been broken.
         expect(body).not.toMatch(/crmUser|requireStaff|requirePageAccess|redirect/);
+    });
+
+    describe('calculators mount ordering', () => {
+        // /calculators has no mount gate; the one staff-only page has its own
+        // requireStaff route. The rewrite must sit below that gate and above
+        // express.static — "above static" is what makes it below EVERY gate,
+        // since a gate under static would already be bypassed.
+        const decalGate = serverSrc.indexOf("'/pricing/decals'], requireStaff");
+        const rewrite = serverSrc.indexOf("app.get('/calculators/:a/:b', serveHashedCalculator)");
+        const staticMount = serverSrc.indexOf("app.use('/calculators', express.static");
+
+        test('all three are registered', () => {
+            expect(decalGate).toBeGreaterThan(-1);
+            expect(rewrite).toBeGreaterThan(-1);
+            expect(staticMount).toBeGreaterThan(-1);
+        });
+
+        test('the staff-gated decal route precedes the rewrite', () => {
+            expect(decalGate).toBeLessThan(rewrite);
+        });
+
+        test('the rewrite precedes express.static', () => {
+            expect(rewrite).toBeLessThan(staticMount);
+        });
+
+        test('nested calculators are reachable (two-param route registered)', () => {
+            expect(serverSrc).toMatch(/app\.get\('\/calculators\/:a\/:b', serveHashedCalculator\)/);
+        });
     });
 
     test('sendHashedHtml falls back to the static file when the manifest is absent', () => {
