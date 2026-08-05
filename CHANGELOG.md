@@ -1,3 +1,11 @@
+## v2026.08.05.22 (2026.08.05)
+
+- memory: sample-order push closed; what a public forwarder does and does not buy
+- memory: correct 2b — Box writes are gated too
+- memory: tracking gated; the cross-repo caller that made it dangerous
+- memory: auth/test gated; the proxy surface as of today
+- Sample orders: prove server-side that the FREE path is actually free
+
 ## v2026.08.05.21 (2026.08.05)
 
 - Sample-order push: same-origin forwarder, rate-limited and validated
