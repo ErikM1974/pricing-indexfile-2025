@@ -90,7 +90,7 @@ while `GET` → 401. Now gates `['GET','HEAD']`; verified live HEAD → 401.
 
 ---
 
-## 2b. Box reads: the session-gated forwarder (app half LIVE `v2026.08.05.17`)
+## 2b. Box: the session-gated forwarder (FULLY CLOSED — reads `v2026.08.05.7`, writes `.8`)
 
 The proxy's Box READ routes move behind a same-origin forwarder in the app
 (`server.js` `boxForward`). The property that makes this work: a browser sends
@@ -124,9 +124,14 @@ browser. All 7 read routes now 401 anonymously; the same requests carrying the
 app's `CRM_API_SECRET` return 200, which is the leg the forwarder uses.
 🔑 **Check the two `CRM_API_SECRET` config vars MATCH before gating** — the
 forwarder appears to work while the proxy is open regardless of whether its
-secret is correct, so that proves nothing until the gate is on. The 4 Box WRITE routes
-(`shared-link`, `create-mockup-folder`, `upload-to-folder`, `file` delete) are
-untouched and still go browser→proxy directly.
+secret is correct, so that proves nothing until the gate is on.
+
+✅ **The 4 WRITE routes followed** (`shared-link`, `create-mockup-folder`,
+`upload-to-folder`, `file` delete — app `v2026.08.05.19` → proxy `.8`). Every
+page calling them was already SAML-gated, so there was no public caller to
+migrate. The guard test now asserts EVERY route declared in `box-upload.js` is
+covered, so a Box route added later fails the build until someone decides its
+auth story. All 11 Box routes are gated.
 
 ---
 
