@@ -315,6 +315,27 @@ window.handleCellKeydown = handleCellKeydown;
 // exactly when the monolith's own listener used to register).
 const embAdapter = new EmbAdapter();
 new QuoteBuilderBase(embAdapter).init();
+
+// ── ?design=<n> prefill (Design Vault "Quote" action) ────────────────────
+// Runs AFTER the base init so draft restore wins: a rep with an in-progress
+// quote must never have their design number overwritten by a stale link, so
+// this only fills an empty field. lookupDesignNumber cascades stitch count,
+// tier, thumbnail and customer autofill for free.
+(function prefillDesignFromUrl() {
+    const raw = new URLSearchParams(window.location.search).get('design');
+    if (!raw || !/^\d{1,10}$/.test(raw)) return;
+    const apply = () => {
+        const input = document.getElementById('garment-design-number');
+        if (!input || input.value.trim()) return;
+        input.value = raw;
+        Promise.resolve(lookupDesignNumber('garment')).catch(() => { /* lookup surfaces its own error */ });
+    };
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => setTimeout(apply, 0));
+    } else {
+        setTimeout(apply, 0);
+    }
+})();
 window.__embAdapter = embAdapter; // inspection/debug handle
 window.__embState = embState; // state handle (tests + console diagnostics)
 window.__quoteState = quoteState; // canonical line-item store (0.5)
