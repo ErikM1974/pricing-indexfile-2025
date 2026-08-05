@@ -193,6 +193,42 @@ dying on `raise_for_status()`. Verified against production before and after.
 🔑 **CLAUDE.md's cross-project rule earned its place here** — a repo-local caller
 search would have found nothing and the gate would have looked safe.
 
+## 4b. Sample orders: the free path is now proven free (`v2026.08.05.22`)
+
+⚠️ **Correcting an earlier read in this same document.** Paid sample carts were
+never unverified. The cart branches in the BROWSER:
+
+```js
+if (SampleCheckout.hasPaid(samples)) { start Stripe checkout; return; }
+```
+
+so paid carts go to Stripe hosted checkout and the **signature-verified webhook**
+(`metadata.kind === 'samples-order'`) pushes the order with a PAID payments
+block. Payment verification for money already existed — reading
+`sample-order-service.js` without tracing the branch above its caller is what
+produced the wrong conclusion.
+
+🔴 **The actual hole:** `hasPaid()` runs client-side and trusts `s.type`. A
+payload labelling paid samples as free — or just posting `price: 0` — skips that
+branch and lands a real ShopWorks order for goods nobody paid for. Confirmed
+against live pricing: **J790 is a $65 jacket, CT104670 is $192**, both orderable
+through the free path.
+
+**Fix:** the free-path forwarder now does what the paid route already did —
+"client prices are advisory" — repricing every line through the SAME module
+(`shared_components/js/sample-pricing.js`) and the SAME data path
+(`/api/size-pricing`, `/api/pricing-bundle` fallback). No second pricing path.
+Not authoritatively $0 → **402** and point at checkout; ineligible style or bad
+size → 400; **pricing lookup failure → 502, never a free order** (a lookup that
+cannot answer must not fail open).
+
+🔑 **Verify both directions on ONE build.** Blocking the exploit proves nothing
+if the legitimate path also broke. With the push aimed at a throwaway echo
+server: PC54/PC61/DT6000 pushed through with the secret attached, J790 and
+CT104670 blocked 402 — same binary, same run.
+
+---
+
 ## 5. auth/test (CLOSED, proxy `v2026.08.05.12`)
 
 `POST /api/manageorders/auth/test` was anonymous. Gated for what it **does**, not

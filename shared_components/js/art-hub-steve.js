@@ -2932,6 +2932,10 @@
         fd.append('file', file);
         fd.append('pkId', pkId);
         fd.append('companyName', companyName);
+        // Steve's Box folders lead with the ShopWorks number. Send it so the
+        // re-upload lands in the design's own folder instead of the first
+        // folder that merely contains the company name.
+        fd.append('designNumSw', row.dataset.designNumSw || '');
         // targetSlotField tells the upload route to overwrite a specific slot
         // rather than write to the first empty one. Required here because the
         // target slot is occupied by a broken URL \u2014 the empty-slot guard would

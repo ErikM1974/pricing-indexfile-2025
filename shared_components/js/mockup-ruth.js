@@ -44,6 +44,12 @@
         return div.innerHTML;
     }
 
+    // Stored Caspio rows hold absolute proxy Box urls that 401 since the Box
+    // surface was session-gated; boxUrl() re-points them at this origin so the
+    // session cookie authorises the <img>. Guarded so a missing box-url.js
+    // script tag degrades instead of throwing.
+    function resolveBoxUrl(u) { return (typeof boxUrl === 'function') ? boxUrl(u) : u; }
+
     function formatDate(dateStr) {
         if (!dateStr) return '';
         const d = new Date(dateStr);
@@ -445,7 +451,7 @@
 
         const thumbUrl = mockup.Box_Mockup_1 || '';
         const thumbHtml = thumbUrl
-            ? `<div class="card-thumb"><img src="${escapeHtml(thumbUrl)}" alt="Mockup preview" loading="lazy" data-original-src="${escapeHtml(thumbUrl)}" onerror="if(window.ArtActions&&window.ArtActions.handleBoxImageError){window.ArtActions.handleBoxImageError(this);}else{this.parentElement.style.display='none';}"></div>`
+            ? `<div class="card-thumb"><img src="${escapeHtml(resolveBoxUrl(thumbUrl))}" alt="Mockup preview" loading="lazy" data-original-src="${escapeHtml(resolveBoxUrl(thumbUrl))}" onerror="if(window.ArtActions&&window.ArtActions.handleBoxImageError){window.ArtActions.handleBoxImageError(this);}else{this.parentElement.style.display='none';}"></div>`
             : '';
 
         const workOrder = escapeHtml(mockup.Work_Order_Number || '');
@@ -849,7 +855,7 @@
 
                 var thumbHtml = '';
                 if (m.Box_Mockup_1) {
-                    thumbHtml = '<img class="kanban-card-thumb" src="' + escapeHtml(m.Box_Mockup_1) + '" loading="lazy" data-original-src="' + escapeHtml(m.Box_Mockup_1) + '" onerror="if(window.ArtActions&&window.ArtActions.handleBoxImageError){window.ArtActions.handleBoxImageError(this);}else{this.style.display=\'none\';}" alt="">';
+                    thumbHtml = '<img class="kanban-card-thumb" src="' + escapeHtml(resolveBoxUrl(m.Box_Mockup_1)) + '" loading="lazy" data-original-src="' + escapeHtml(resolveBoxUrl(m.Box_Mockup_1)) + '" onerror="if(window.ArtActions&&window.ArtActions.handleBoxImageError){window.ArtActions.handleBoxImageError(this);}else{this.style.display=\'none\';}" alt="">';
                 }
 
                 var kanbanElapsed = (typeof ElapsedTimeUtils !== 'undefined')

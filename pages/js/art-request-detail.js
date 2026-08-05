@@ -148,6 +148,12 @@
         return url;
     }
 
+    // Stored Caspio rows hold absolute proxy Box urls that 401 since the Box
+    // surface was session-gated; boxUrl() re-points them at this origin so the
+    // session cookie authorises the <img>. Guarded so a missing box-url.js
+    // script tag degrades instead of throwing.
+    function resolveBoxUrl(u) { return (typeof boxUrl === 'function') ? boxUrl(u) : u; }
+
     // ── Smart Back Navigation ──────────────────────────────────────────
     (function setupBackNavigation() {
         var backLink = document.querySelector('.ard-back-link');
@@ -1865,7 +1871,7 @@
         // Same URL resolution the detail-page gallery uses (Box proxy / CDN direct).
         function imgSrc(url) {
             if (!url || isEmptySlot(url)) return '';
-            url = normalizeBoxProxyUrl(url);
+            url = resolveBoxUrl(normalizeBoxProxyUrl(url));
             if (url.indexOf('/api/box/') !== -1) return url;
             if (/cdn\.caspio\.com/i.test(url)) return url;
             if (/box\.com/i.test(url)) return '/api/box/shared-image?url=' + encodeURIComponent(url);
@@ -1979,7 +1985,7 @@
         section.style.display = '';
         container.innerHTML = '';
 
-        finalUrl = normalizeBoxProxyUrl(finalUrl);
+        finalUrl = resolveBoxUrl(normalizeBoxProxyUrl(finalUrl));
         var ext = getFileExtension(finalUrl);
         var isImage = ext === '' || IMAGE_EXTENSIONS.indexOf(ext) !== -1;
 
@@ -2095,7 +2101,7 @@
         card.className = 'ard-rep-mockup-card';
         card.innerHTML =
             '<div class="ard-rep-mockup-imgwrap">'
-            + '<img src="' + escapeHtml(url) + '" alt="Rep Reference Mockup" loading="lazy">'
+            + '<img src="' + escapeHtml(resolveBoxUrl(url)) + '" alt="Rep Reference Mockup" loading="lazy">'
             + '<div class="ard-rep-mockup-badge">Reference · not the production proof</div>'
             + '</div>'
             + '<div class="ard-rep-mockup-info">'
@@ -2109,7 +2115,7 @@
         if (img) {
             img.addEventListener('error', function () { handleImageError(img); });
             img.style.cursor = 'zoom-in';
-            img.addEventListener('click', function () { openLightbox(url, 'Rep Reference Mockup'); });
+            img.addEventListener('click', function () { openLightbox(resolveBoxUrl(url), 'Rep Reference Mockup'); });
         }
 
         container.appendChild(card);
@@ -2295,7 +2301,7 @@
                 }
                 feedbackHtml += '<div class="ard-rev-section">';
                 if (thumbUrl) {
-                    feedbackHtml += '<img src="' + escapeHtml(thumbUrl) + '" class="ard-rev-thumb" alt="' + escapeHtml(label) + '">';
+                    feedbackHtml += '<img src="' + escapeHtml(resolveBoxUrl(thumbUrl)) + '" class="ard-rev-thumb" alt="' + escapeHtml(label) + '">';
                 }
                 feedbackHtml += '<div class="ard-rev-section-content">'
                     + '<strong>' + escapeHtml(label) + ':</strong> '
@@ -2733,7 +2739,7 @@
 
     /** Render a filled gallery thumbnail for a file */
     function renderFilledThumb(url, field, showRemove) {
-        url = normalizeBoxProxyUrl(url);
+        url = resolveBoxUrl(normalizeBoxProxyUrl(url));
         var thumb = document.createElement('div');
         thumb.className = 'ard-gallery-thumb';
         var ext = getFileExtension(url);
@@ -3145,6 +3151,12 @@
             formData.append('pkId', String(pkId));
             formData.append('customerId', String(currentRequest.Shopwork_customer_number || currentRequest.id_customer || ''));
             formData.append('companyName', currentRequest.CompanyName || '');
+            // Steve's Box folders are named "{Design_Num_SW} {Company}". Without
+            // this the backend falls back to a company-name search and files the
+            // mockup into whichever folder merely CONTAINS the company — i.e. an
+            // older design's folder (real case: design 53069 landed in
+            // "40640 Ironside Marine").
+            formData.append('designNumSw', String(currentRequest.Design_Num_SW || ''));
             // Name the slot explicitly (2026-07-07, broken-mockups audit): the
             // backend overwrites THIS slot in place. Before this, uploads went to
             // the first EMPTY slot and a "swap" PUT wrote the OLD broken URL into
@@ -3412,7 +3424,7 @@
                     else if (['psd','ai','eps','cdr','indd','indt','idml'].indexOf(ext) !== -1) phClass += ' ph-design';
                     else if (ext === 'pdf') phClass += ' ph-pdf';
 
-                    var thumbSrc = file.thumbnailUrl ? API_BASE + file.thumbnailUrl : '';
+                    var thumbSrc = file.thumbnailUrl ? resolveBoxUrl(API_BASE + file.thumbnailUrl) : '';
                     // Full filename on hover — card is truncated; this lets staff read the
                     // whole name without guessing from the ellipsis.
                     card.title = file.name;
@@ -3812,7 +3824,7 @@
                 ' is ready for review. Please take a look and let us know if you\'d like any changes.';
 
             if (ctx.url) {
-                previewImg.src = ctx.url;
+                previewImg.src = resolveBoxUrl(ctx.url);
                 previewSection.style.display = '';
                 if (previewLabel) {
                     previewLabel.textContent = isPerSlot ? (ctx.label + ' Preview') : 'Mockup Preview';
@@ -4584,7 +4596,7 @@
                 var thumbUrl = currentRequest[slot.key] || '';
                 var slotDiv = document.createElement('div');
                 slotDiv.className = 'ard-revise-slot';
-                slotDiv.innerHTML = '<img src="' + escapeHtml(thumbUrl) + '" class="ard-revise-thumb" alt="' + escapeHtml(slot.label) + '">'
+                slotDiv.innerHTML = '<img src="' + escapeHtml(resolveBoxUrl(thumbUrl)) + '" class="ard-revise-thumb" alt="' + escapeHtml(slot.label) + '">'
                     + '<div class="ard-revise-slot-right">'
                     + '<label class="ard-revise-slot-label">' + escapeHtml(slot.label) + '</label>'
                     + '<textarea class="ard-revise-slot-textarea" data-slot="' + escapeHtml(slot.label) + '" placeholder="Changes needed for ' + escapeHtml(slot.label) + '..."></textarea>'

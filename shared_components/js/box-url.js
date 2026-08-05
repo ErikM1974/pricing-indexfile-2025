@@ -19,8 +19,14 @@
  * at RENDER time and the data can stay exactly as it is.
  *
  * Only READ routes are rewritten. The four write routes (shared-link,
- * create-mockup-folder, upload-to-folder, file delete) still go directly to the
- * proxy and are left untouched here.
+ * create-mockup-folder, upload-to-folder, file delete) are same-origin too now,
+ * but callers already build those paths relative, so there is no stored URL to
+ * normalise — they stay out of READ_PATHS deliberately.
+ *
+ * EVERY page whose scripts render a stored Box URL must load this file, or its
+ * thumbnails 401 and render as broken placeholders. That is not advisory: it
+ * shipped that way on 2026-08-05 and broke every art/mockup surface, so
+ * tests/unit/box-url.test.js now fails the build if a page drifts out of sync.
  *
  * Idempotent, null-safe, and leaves anything it does not recognise alone — a
  * URL that is already same-origin, a plain Box link, or a data: URI all pass

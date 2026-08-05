@@ -3725,7 +3725,14 @@ const BOX_FORWARD_QUERY = new Set([
   'size', 'folderId', 'designNumber', 'limit', 'offset', 'query', 'type', 'url', 'full',
 ]);
 
-function boxForward(buildPath) {
+// opts.query        — narrower param allowlist than the staff default (a customer
+//                     route should forward only what it actually needs).
+// opts.cacheControl  — force this Cache-Control instead of echoing upstream's.
+//                     Needed where the response is a PER-CALLER capability and
+//                     must never inherit a public/shared cache header.
+function boxForward(buildPath, opts) {
+  const allowQuery = (opts && opts.query) || BOX_FORWARD_QUERY;
+  const forcedCacheControl = opts && opts.cacheControl;
   return async (req, res) => {
     if (!CRM_API_SECRET) {
       console.error('[box-forward] CRM_API_SECRET is not set — refusing to forward');
@@ -3741,7 +3748,7 @@ function boxForward(buildPath) {
     // the upstream URL.
     const qs = new URLSearchParams();
     for (const [k, v] of Object.entries(req.query || {})) {
-      if (BOX_FORWARD_QUERY.has(k) && typeof v === 'string') qs.set(k, v);
+      if (allowQuery.has(k) && typeof v === 'string') qs.set(k, v);
     }
     const target = `${CRM_API_BASE}/api/box/${suffix}${qs.toString() ? '?' + qs : ''}`;
     try {
@@ -3756,7 +3763,11 @@ function boxForward(buildPath) {
         if (v) res.setHeader(h, v);
       }
       // Box assets are per-staff-session now; never let a shared cache hold one.
-      if (!upstream.headers.get('cache-control')) res.setHeader('Cache-Control', 'private, max-age=300');
+      // A forced value WINS over upstream's — the loop above may already have
+      // copied a public header across, and for a capability response that would
+      // let a shared cache serve one customer's artwork to the next caller.
+      if (forcedCacheControl) res.setHeader('Cache-Control', forcedCacheControl);
+      else if (!upstream.headers.get('cache-control')) res.setHeader('Cache-Control', 'private, max-age=300');
       if (!upstream.body) return res.end();
       upstream.body.pipe(res);          // node-fetch v2 body is a Node stream
       upstream.body.on('error', (err) => {
@@ -6349,6 +6360,18 @@ const portalLimiter = rateLimit({
   message: { error: 'Too many requests, please try again shortly' },
 });
 
+// Proof images need their OWN budget. portalLimiter's 60/15min was sized for a
+// handful of JSON calls, but ONE portal page view is one <img> per proof — a
+// real customer (Binford Metals) loads 53, so sharing that budget 429s the
+// customer out of their own portal halfway down the page. Measured, not guessed.
+// Still bounded, and each response carries `private, max-age=300`, so a reload
+// inside five minutes costs nothing.
+const portalImageLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 600,
+  message: { error: 'Too many requests, please try again shortly' },
+});
+
 // Identity seam (#6 Phase 2): the verified customer SESSION wins. Falls back to the URL
 // :customerId ONLY for the detail endpoints reached from un-logged-in art-approval EMAIL
 // links (those rows are authorized by an ownership check downstream). A logged-in customer
@@ -6372,8 +6395,34 @@ function portalOnOrAfterCutoff(dateStr) {
   if (isNaN(d.getTime())) return true;
   return d >= new Date(PORTAL_DATE_CUTOFF);
 }
+// ── Customer-safe Box proof images (2026-08-05) ─────────────────────────────
+// Stored artwork URLs point at the proxy's /api/box/thumbnail/<fileId>, which is
+// requireStaff — so since the Box surface was gated a CUSTOMER's <img> 401s and
+// every proof in the portal renders broken (measured: 92% of art proofs, 100% of
+// the logo library). Swap each one for a capability URL bound to this customer,
+// minted only here, where the row has already been authorized as theirs.
+//
+// Anything that is NOT a Box proxy thumbnail passes through untouched — box.com
+// shared links and cdn.caspio.com are public and already work.
+// Unanchored on purpose — stored values are absolute proxy URLs, relative paths,
+// or the odd hand-pasted link, and all of them should mint. The id it extracts is
+// whatever the STORED row contained, so the trust boundary is "who can write that
+// row": staff, via the upload routes or the Send Mockup paste field. A staffer
+// pasting a crafted URL could therefore attach a Box file to a customer record —
+// but they already hold full Box access, so that is a choice they can make
+// anyway, not an escalation. A CUSTOMER never reaches this function.
+const BOX_THUMB_RE = /\/api\/box\/thumbnail\/(\d+)/;
+function portalProofUrl(storedUrl, cid) {
+  if (!storedUrl || typeof storedUrl !== 'string') return storedUrl || null;
+  const m = BOX_THUMB_RE.exec(storedUrl);
+  if (!m) return storedUrl;
+  const token = customerMagicLink.mintProofToken({ fileId: m[1], idCustomer: cid });
+  // No SESSION_SECRET (dev) → leave the URL alone rather than emit a dead link.
+  return token ? `/api/portal/proof-image/${token}` : storedUrl;
+}
+
 // ALLOWLIST projections — copy ONLY customer-safe fields; never spread the raw row.
-function projectPortalMockup(m) {
+function projectPortalMockup(m, cid) {
   return {
     ID: m.ID,
     Design_Number: m.Design_Number || null,
@@ -6382,10 +6431,10 @@ function projectPortalMockup(m) {
     Mockup_Type: m.Mockup_Type || null,
     Status: m.Status || null,
     Submitted_Date: m.Submitted_Date || null,
-    Box_Mockup_1: m.Box_Mockup_1 || null,
+    Box_Mockup_1: portalProofUrl(m.Box_Mockup_1, cid),
   };
 }
-function projectPortalArt(a) {
+function projectPortalArt(a, cid) {
   return {
     ID_Design: a.ID_Design || null,
     Design_Num_SW: a.Design_Num_SW || null,
@@ -6397,9 +6446,9 @@ function projectPortalArt(a) {
     // The actual DESIGN proof (garment + logo / the artwork) — customer-safe. Prefer these over
     // MAIN_IMAGE_URL_1, which is a plain SanMar garment catalog photo ("just the shirt").
     // Deliberately NOT exposed: Art_Minutes, Amount_Art_Billed, Artwork_Locations, file paths, internal notes.
-    Final_Approved_Mockup: a.Final_Approved_Mockup || null,
-    Box_File_Mockup: a.Box_File_Mockup || null,
-    Box_File_Link: a.BoxFileLink || null,
+    Final_Approved_Mockup: portalProofUrl(a.Final_Approved_Mockup, cid),
+    Box_File_Mockup: portalProofUrl(a.Box_File_Mockup, cid),
+    Box_File_Link: portalProofUrl(a.BoxFileLink, cid),
     MAIN_IMAGE_URL_1: a.MAIN_IMAGE_URL_1 || null,
   };
 }
@@ -6438,10 +6487,10 @@ async function getPortalData(customerId) {
 
   const mockups = mRecs
     .filter((m) => (m.Box_Mockup_1 || m.Box_Mockup_2 || m.Box_Mockup_3) && portalOnOrAfterCutoff(m.Submitted_Date))
-    .map(projectPortalMockup);
+    .map((m) => projectPortalMockup(m, customerId));
   const artRequests = aRecs
     .filter((a) => (a.Final_Approved_Mockup || a.Box_File_Mockup || a.BoxFileLink || a.MAIN_IMAGE_URL_1 || a.MAIN_IMAGE_URL_2 || a.MAIN_IMAGE_URL_3 || a.MAIN_IMAGE_URL_4) && portalOnOrAfterCutoff(a.Date_Created))
-    .map(projectPortalArt);
+    .map((a) => projectPortalArt(a, customerId));
 
   // Logo library: the customer's FULL historical design set (all decoration methods) with
   // thumbnails, via Designs2026.ID_Customer → Shopworks_Thumbnail_Report. NOT date-gated —
@@ -6456,7 +6505,9 @@ async function getPortalData(customerId) {
         idDesign: d.idDesign || null,
         designName: d.designName || null,
         designType: d.designType || null,
-        thumbnailUrl: d.thumbnailUrl,
+        // 100% of these measured as gated Box thumbnails — the whole "My Logos"
+        // showcase was blank for customers until this rewrite.
+        thumbnailUrl: portalProofUrl(d.thumbnailUrl, customerId),
         dateCreated: d.dateCreated || null,
       }));
   } catch (e) { console.warn('[Portal] logo library fetch failed:', e.message); }
@@ -6475,7 +6526,7 @@ async function getPortalData(customerId) {
         designName: p.designName || null,
         companyName: p.companyName || null,
         caption: p.caption || null,
-        imageUrl: p.imageUrl,
+        imageUrl: portalProofUrl(p.imageUrl, customerId),
         uploadedDate: p.uploadedDate || null,
       }));
   } catch (e) { console.warn('[Portal] finished photos fetch failed:', e.message); }
@@ -6514,6 +6565,45 @@ app.get('/api/portal', portalLimiter, requireCustomer, async (req, res) => {
     res.status(503).json({ error: 'Portal temporarily unavailable' });
   }
 });
+
+// ── Customer proof images (2026-08-05) ──────────────────────────────────────
+// GET /api/portal/proof-image/:token — the customer-side counterpart to the
+// staff /api/box/thumbnail/:fileId, which is requireStaff and therefore 401s for
+// every customer since the Box surface was gated.
+//
+// 🔴 The customer never supplies a Box file id. The id lives INSIDE an
+// HMAC-signed token that only portalProofUrl() mints, and only while projecting
+// a row already authorized as belonging to that customer. So this cannot become
+// "any customer may read any Box file by id" — the failure mode the staff
+// forwarder still has and that must not be extended to customers.
+//
+// Deliberately NOT requireCustomer: /mockup/:id and /art-request/:designId are
+// public email-link pages whose images must render for a customer who is not
+// logged in, exactly as resolvePortalCustomer already allows for their DATA.
+function requireProofToken(req, res, next) {
+  const claim = customerMagicLink.verifyProofToken(String(req.params.token || ''));
+  // Forged, wrong-type, or expired all answer 404 — never 401 and never a
+  // distinct code, so the response cannot be used as an oracle.
+  if (!claim) return res.status(404).json({ error: 'Not found' });
+  // A token belongs to ONE customer. If this browser is signed in as somebody
+  // else, refuse: a token pasted into another customer's session is not theirs.
+  const sid = req.customerSession && req.customerSession.portalCustomer
+    && req.customerSession.portalCustomer.idCustomer;
+  if (sid && String(sid) !== claim.idCustomer) return res.status(404).json({ error: 'Not found' });
+  req.params.fileId = claim.fileId;   // boxFileId() re-validates it is numeric
+  return next();
+}
+
+// `size` is the ONLY param a customer needs (the portal lightbox sends
+// size=large). Deliberately narrower than the staff forwarder's allowlist: the
+// staff list also carries `full` and `url`, which the proxy's thumbnail route
+// ignores today — but inheriting that list would silently widen what customers
+// can ask for the moment the proxy starts honouring them.
+// Cache-Control is forced rather than echoed: this response is a per-customer
+// capability and must never sit in a shared cache.
+app.get('/api/portal/proof-image/:token', portalImageLimiter, requireProofToken,
+  boxForward((req) => 'thumbnail/' + boxFileId(req),
+    { query: new Set(['size']), cacheControl: 'private, max-age=300' }));
 
 // ── Customer portal ORDERS + INVOICES (#6 Phase 3) ─────────────────────────
 // One ManageOrders fetch by id_Customer feeds BOTH the Orders table and the
@@ -7517,7 +7607,7 @@ app.get('/portal-admin/preview/:id/product/:style', requireCrmRole(PORTAL_ADMIN_
 // SW refs, art charges (Art_Minutes/Amount_Art_Billed/Prelim_Charges), internal
 // statuses, Rep_Mockup, working files (File_Upload/CDN_Link), and the per-slot
 // Mockup_N_Note fields (artist commentary, never shown to a customer).
-function projectPortalArtDetail(a) {
+function projectPortalArtDetail(a, cid) {
   return {
     PK_ID: a.PK_ID, ID_Design: a.ID_Design || null, // ids needed for the existing customer approve/revise writes
     Status: a.Status || null, Revision_Count: a.Revision_Count || null, Artwork_Status: a.Artwork_Status || null,
@@ -7539,9 +7629,9 @@ function projectPortalArtDetail(a) {
     Uploaded_File_Type: a.Uploaded_File_Type || null,
     Prev_Order_Num: a.Prev_Order_Num || null, Prev_Design_Num: a.Prev_Design_Num || null,
     Repeat_Keep_Same: a.Repeat_Keep_Same || null, Repeat_Change: a.Repeat_Change || null,
-    Final_Approved_Mockup: a.Final_Approved_Mockup || null,
-    Box_File_Mockup: a.Box_File_Mockup || null, BoxFileLink: a.BoxFileLink || null, Company_Mockup: a.Company_Mockup || null,
-    Mockup_4: a.Mockup_4 || null, Mockup_5: a.Mockup_5 || null, Mockup_6: a.Mockup_6 || null,
+    Final_Approved_Mockup: portalProofUrl(a.Final_Approved_Mockup, cid),
+    Box_File_Mockup: portalProofUrl(a.Box_File_Mockup, cid), BoxFileLink: portalProofUrl(a.BoxFileLink, cid), Company_Mockup: portalProofUrl(a.Company_Mockup, cid),
+    Mockup_4: portalProofUrl(a.Mockup_4, cid), Mockup_5: portalProofUrl(a.Mockup_5, cid), Mockup_6: portalProofUrl(a.Mockup_6, cid),
   };
 }
 
@@ -7559,7 +7649,7 @@ app.get('/api/portal/:customerId/art-request/:designId', portalLimiter, resolveP
     const cid = req.portalCustomerId;
     const owns = row && (String(row.id_customer) === cid || String(row.Shopwork_customer_number) === cid);
     if (!owns) return res.status(404).json({ error: 'Not found' }); // missing OR not-this-customer → identical
-    res.json([projectPortalArtDetail(row)]);
+    res.json([projectPortalArtDetail(row, cid)]);
   } catch (err) {
     console.error('[Portal] art-request detail failed:', err.message);
     res.status(503).json({ error: 'Portal temporarily unavailable' });
@@ -7594,7 +7684,7 @@ function projectPortalThread(t) { return { Mockup_Slot: t.Mockup_Slot, Thread_Se
 // Excludes AE_Notes, Artist_Notes, Sales_Rep, Work_Order_Number, Id_Customer,
 // Customer_Email, Box_Folder_ID, Deleted_*, Garment_*, Thread_Colors, Due/Completion
 // dates; Submitted_By is reduced to a first-name only.
-function projectPortalMockupDetail(m) {
+function projectPortalMockupDetail(m, cid) {
   return {
     ID: m.ID, PK_ID: m.PK_ID,
     Status: m.Status || null, Revision_Count: m.Revision_Count || null,
@@ -7605,8 +7695,8 @@ function projectPortalMockupDetail(m) {
     Design_Size: m.Design_Size || null, Size_Specs: m.Size_Specs || null,
     Submitted_Date: m.Submitted_Date || null, Submitted_By: portalRepDisplayName(m.Submitted_By),
     Customer_Name: m.Customer_Name || null, Customer_Approval_Sent_Date: m.Customer_Approval_Sent_Date || null,
-    Box_Mockup_1: m.Box_Mockup_1 || null, Box_Mockup_2: m.Box_Mockup_2 || null, Box_Mockup_3: m.Box_Mockup_3 || null,
-    Box_Mockup_4: m.Box_Mockup_4 || null, Box_Mockup_5: m.Box_Mockup_5 || null, Box_Mockup_6: m.Box_Mockup_6 || null,
+    Box_Mockup_1: portalProofUrl(m.Box_Mockup_1, cid), Box_Mockup_2: portalProofUrl(m.Box_Mockup_2, cid), Box_Mockup_3: portalProofUrl(m.Box_Mockup_3, cid),
+    Box_Mockup_4: portalProofUrl(m.Box_Mockup_4, cid), Box_Mockup_5: portalProofUrl(m.Box_Mockup_5, cid), Box_Mockup_6: portalProofUrl(m.Box_Mockup_6, cid),
   };
 }
 // Fetch + authorize a mockup belongs to :customerId; returns the raw row or null.
@@ -7632,7 +7722,7 @@ app.get('/api/portal/:customerId/mockup/:id', portalLimiter, resolvePortalCustom
     ]);
     res.json({
       success: true,
-      record: projectPortalMockupDetail(rec),
+      record: projectPortalMockupDetail(rec, req.portalCustomerId),
       notes: ((notesResp && notesResp.notes) || []).map(sanitizePortalNote),
       versions: ((versionsResp && versionsResp.versions) || []).map(projectPortalVersion),
     });

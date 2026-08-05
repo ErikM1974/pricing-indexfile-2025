@@ -5,6 +5,98 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## Gating a shared image route broke every CUSTOMER, and only a real login showed it (2026-08-05)
+
+**Problem.** The Aug 5 Box gating (`b9e9d2a3`) put `/api/box/thumbnail/:fileId` behind
+`requireStaff`. Customer-portal artwork is STORED as absolute URLs pointing at exactly that route,
+so every proof a customer saw started 401ing. Measured against live data: **92% of art proofs, 8 of
+9 mockup proofs, and 100% of the logo library** (128/128) — the whole "My Logos" showcase was blank.
+Nobody reported it, because customers do not file bug reports.
+
+**Root cause.** The gate was designed and verified entirely from a STAFF session, where
+same-origin + the SAML cookie makes it work. `/portal` is a different identity: `requireCustomer`
+sets `req.customerSession.portalCustomer`, which has no `crmUser`, so `requireStaff` rejects it.
+The obvious fix — `boxUrl()`, which repointed stored URLs at this origin and fixed all the staff
+pages — does **nothing** here: same-origin still lands on `requireStaff`.
+
+**Solution.** A capability, not a relaxation. `portalProofUrl()` rewrites each stored Box URL to
+`/api/portal/proof-image/<token>` while projecting rows the server has ALREADY authorized as that
+customer's; the token is HMAC-signed (`lib/customer-magic-link`) and binds one fileId to one
+customer. The route takes the fileId ONLY from the verified token, so the customer never supplies a
+Box id and there is nothing to enumerate — the "any id, any file" power the staff route still has
+was deliberately not extended. Not `requireCustomer`-gated, because `/mockup/:id` and
+`/art-request/:designId` are public email-link pages whose images must render for a logged-out
+customer; when a session IS present it must match, so a token cannot be replayed into another
+customer's browser.
+
+**Prevention.**
+- 🔑 **"Verify with a real session" is not a formality.** 18 unit tests passed and the whole thing
+  was still broken end to end: `portalLimiter` allows 60 req/15 min, and one portal page view is
+  **53 images**, so the customer 429'd out of their own portal partway down the page. Nothing short
+  of loading a real customer's portal would have found that. Images now have their own budget.
+- 🔑 **A gate is per-IDENTITY, not per-origin.** Before gating a shared route, enumerate every
+  identity that reaches it — staff SAML, customer portal cookie, logged-out email link, server-side
+  callers — and test each. Two of the four here were never considered.
+- 🔑 **Two token types signed with the same key need a `t` discriminator**, or a stolen session
+  cookie is an image capability and vice versa. Jest-locked both directions.
+- 🔑 **A customer route must not inherit a staff forwarder's param allowlist.** Reusing
+  `boxForward` also reused `BOX_FORWARD_QUERY` (`full`, `url`, `folderId`, …). The proxy's
+  thumbnail route ignores those *today*, so nothing leaked — but the customer route would have
+  silently widened the day upstream started honouring one. It now forwards `size` only, and forces
+  `Cache-Control: private` rather than echoing upstream, since the response is a per-caller
+  capability that must never land in a shared cache.
+- 🔑 Distinguish "my code is broken" from "the data is": 2 of the 53 failures were Box files that
+  no longer exist (`Item not found`) — a pre-existing dead reference, not the fix. Check the asset
+  before blaming the change.
+- Drift guard: `tests/unit/portal-proof-image.test.js` fails if any Box-carrying field in the four
+  portal projections stops going through `portalProofUrl` — an unwrapped field is invisible, it
+  just renders broken for a customer who will never tell you.
+
+---
+
+## Steve's Box picker searched a number that has never existed (2026-08-05)
+
+**Problem.** Steve loaded a mockup into Box, opened **Send Mockup**, and got the yellow "No Box
+folder found for this design", an empty picker, and a Send button stuck disabled at "0 of 6
+selected". The one "Previously Sent" card rendered as a grey **File** placeholder. Erik's read
+was "this used to work" — half right, and the half that was right pointed at the wrong defect.
+
+**Root cause — two independent bugs, only one a regression.**
+1. The picker called `/api/box/folder-files?designNumber=` with Caspio's **`ID_Design`** (53069).
+   Steve names his Box folders with the **ShopWorks** number **`Design_Num_SW`** ("40733 Ironside
+   Marine"). The two series are unrelated: across 2,710 art requests they coincide **4 times**,
+   all hand-typed in 2024. `ID_Design` runs 50092-53069, `Design_Num_SW` runs 111-1232434. So the
+   search matched nothing, ever — wrong since `7193982d` / proxy `3b05395`, masked all along by
+   the paste-URL fallback. The proxy's own comment (`box-upload.js:1432`) had documented the
+   correct key the whole time.
+2. The broken thumbnail WAS a regression, two days old. `b9e9d2a3` session-gated the Box surface;
+   335 stored Caspio mockup URLs are absolute `https://caspio-pricing-proxy…/api/box/thumbnail/<id>`
+   and now 401. `box-url.js` was written **in that same commit** to fix exactly this — and wired
+   into only the two transfer pages. Every art/mockup surface kept rendering raw stored URLs.
+
+**Solution.** Picker keys off `Design_Num_SW` (6/6 on recent jobs) with a named empty state, and
+**no** company-name fallback — a company search resolves to the first folder merely *containing*
+the name, i.e. another design's artwork (it is how design 53069's mockup got filed into
+"40640 Ironside Marine"). `boxUrl()` adopted across all 10 art/mockup renderers + 6 pages. The
+send path converts any `/api/box/thumbnail/<id>` into a real Box shared link before it reaches an
+email. Proxy upload routes accept `designNumSw` so uploads and the picker agree on one folder.
+
+**Prevention.**
+- `tests/unit/box-url.test.js` drift-locks it: any page loading a script that calls `boxUrl()`
+  must also load `box-url.js`, **and load it first**.
+- `tests/jest/box-folder-files-design-number.test.js` (proxy) pins that a ShopWorks number
+  resolves and a Caspio `ID_Design` returns an honest `200 + found:false`.
+- 🔑 **A module that ships unwired is invisible to unit tests that only exercise the module.**
+  `box-url.js` had 20 passing tests while doing nothing on 8 of the 10 pages that needed it.
+- 🔑 **"It used to work" is a hypothesis — check git before redesigning.** Two minutes of
+  `git log -S` separated a year-old latent bug from a 2-day-old regression.
+- 🔑 **Two ID series that both read as "the design number" WILL be confused.** Name the variable
+  for the system it belongs to (`swDesignNum`, not `designId`).
+- 🔑 **`img.src` returns an ABSOLUTE url** — comparing it against the relative literal you just
+  set is always false. Use `getAttribute('src')`. It silently killed a lightbox fallback in two files.
+
+---
+
 ## A 403 <img> is invisible to every automated check — only eyes caught it (2026-08-05)
 
 **Problem.** DST Studio shipped with a broken NWCA logo in the header: the alt text and a
@@ -195,60 +287,3 @@ the decoded record total by >25%.
 
 ---
 
-## Monogram thread-color dropdown dead in prod: API envelope change nobody re-tested (2026-08-04)
-
-**Problem.** The monogram form's thread-color selector had been silently broken live:
-`this.threadColors.filter is not a function` on every page load. Users could still type
-names, so nobody reported it.
-
-**Root cause.** `GET /api/thread-colors` originally returned a bare array; at some point the
-proxy started returning an `{success, count, colors}` envelope. `fetchThreadColors()` kept
-`return await response.json()` with the comment "Returns array directly" â€” HTTP 200, valid
-JSON, wrong shape. The error surfaced only in the console + a toast reps ignored.
-
-**Solution.** Service now unwraps both shapes and **throws** on anything else
-(`monogram-form-service.js` `fetchThreadColors`). Found while browser-verifying the
-Stitch-Proof feature, fixed in `ced3bc2f`.
-
-**Prevention.**
-- ðŸ”‘ **HTTP 200 + valid JSON â‰  valid response â€” assert the SHAPE at every fetch boundary**
-  (same family as the pricing-bundle empty-arrays-on-rate-limit lesson, v1791).
-- ðŸ”‘ **When a proxy route's response shape changes, grep ALL frontend consumers** â€” the app
-  and proxy deploy independently, so shape drift breaks quietly.
-- ðŸ”‘ A broken feature users can work around generates zero bug reports; only a
-  browser-verification pass with the console open finds it.
-
----
-
-## /deploy's cache-bust silently does nothing if you pushed develop first (2026-08-03)
-
-**Problem.** Deploying the vacation-slip work, the skill's Step 2 found **zero** changed assets
-and bumped no `?v=` string â€” even though `payroll.js`, `payroll.css` and the brand-new
-`vacation-carryover.js` were all in the release. Left alone, the deploy would have shipped new
-JS/CSS behind unchanged URLs, so every browser that had ever opened the page would keep serving
-the cached old files.
-
-**Root cause.** Step 2 detects changed assets with
-`git diff --name-only origin/develop HEAD` plus the dirty working tree. Both are empty in the
-**normal** workflow â€” commit your work, `git push origin develop`, *then* `/deploy`. Once
-develop is pushed, `origin/develop == HEAD`; once it's committed, the tree is clean. The
-comparison answers "what have I not pushed yet?", which has nothing to do with what is live.
-
-**Solution.** Compare against **`main`** â€” the branch that actually reflects production:
-`git diff --name-only main develop -- '*.js' '*.jsx' '*.css'`. That correctly returned all
-three files, and the bump then verified live (`/api/version` sha matched the deployed commit).
-
-**Prevention.**
-- ðŸ”‘ **A cache-bust's baseline must be what is LIVE (`main`), never what is PUSHED
-  (`origin/develop`).** Pushing develop is not deploying; any diff based on push state measures
-  the wrong thing.
-- ðŸ”‘ **This is a silent success, which is the dangerous kind.** The deploy reports âœ…, the
-  Heroku release succeeds, and the backend SHA check *passes* â€” because the backend really did
-  update. Only the browser assets are stale, and nothing in the pipeline looks at them. It is
-  the same failure class the skill already documents for `.jsx` files ("deployed but nothing
-  changed"), reached by a different route.
-- âš ï¸ The skill file still contains the `origin/develop` comparison. Until it's fixed, check
-  `git diff --name-only main develop -- '*.js' '*.jsx' '*.css'` by hand and confirm Step 2's
-  bump list is non-empty whenever a release touches front-end assets.
-
----

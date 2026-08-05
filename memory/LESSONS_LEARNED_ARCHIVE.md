@@ -4,6 +4,63 @@ Resolved entries aged out of `LESSONS_LEARNED.md` (300-line cap). Newest first. 
 
 ---
 
+## Monogram thread-color dropdown dead in prod: API envelope change nobody re-tested (2026-08-04)
+
+**Problem.** The monogram form's thread-color selector had been silently broken live:
+`this.threadColors.filter is not a function` on every page load. Users could still type
+names, so nobody reported it.
+
+**Root cause.** `GET /api/thread-colors` originally returned a bare array; at some point the
+proxy started returning an `{success, count, colors}` envelope. `fetchThreadColors()` kept
+`return await response.json()` with the comment "Returns array directly" â€” HTTP 200, valid
+JSON, wrong shape. The error surfaced only in the console + a toast reps ignored.
+
+**Solution.** Service now unwraps both shapes and **throws** on anything else
+(`monogram-form-service.js` `fetchThreadColors`). Found while browser-verifying the
+Stitch-Proof feature, fixed in `ced3bc2f`.
+
+**Prevention.**
+- ðŸ”‘ **HTTP 200 + valid JSON â‰  valid response â€” assert the SHAPE at every fetch boundary**
+  (same family as the pricing-bundle empty-arrays-on-rate-limit lesson, v1791).
+- ðŸ”‘ **When a proxy route's response shape changes, grep ALL frontend consumers** â€” the app
+  and proxy deploy independently, so shape drift breaks quietly.
+- ðŸ”‘ A broken feature users can work around generates zero bug reports; only a
+  browser-verification pass with the console open finds it.
+
+---
+
+## /deploy's cache-bust silently does nothing if you pushed develop first (2026-08-03)
+
+**Problem.** Deploying the vacation-slip work, the skill's Step 2 found **zero** changed assets
+and bumped no `?v=` string â€” even though `payroll.js`, `payroll.css` and the brand-new
+`vacation-carryover.js` were all in the release. Left alone, the deploy would have shipped new
+JS/CSS behind unchanged URLs, so every browser that had ever opened the page would keep serving
+the cached old files.
+
+**Root cause.** Step 2 detects changed assets with
+`git diff --name-only origin/develop HEAD` plus the dirty working tree. Both are empty in the
+**normal** workflow â€” commit your work, `git push origin develop`, *then* `/deploy`. Once
+develop is pushed, `origin/develop == HEAD`; once it's committed, the tree is clean. The
+comparison answers "what have I not pushed yet?", which has nothing to do with what is live.
+
+**Solution.** Compare against **`main`** â€” the branch that actually reflects production:
+`git diff --name-only main develop -- '*.js' '*.jsx' '*.css'`. That correctly returned all
+three files, and the bump then verified live (`/api/version` sha matched the deployed commit).
+
+**Prevention.**
+- ðŸ”‘ **A cache-bust's baseline must be what is LIVE (`main`), never what is PUSHED
+  (`origin/develop`).** Pushing develop is not deploying; any diff based on push state measures
+  the wrong thing.
+- ðŸ”‘ **This is a silent success, which is the dangerous kind.** The deploy reports âœ…, the
+  Heroku release succeeds, and the backend SHA check *passes* â€” because the backend really did
+  update. Only the browser assets are stale, and nothing in the pipeline looks at them. It is
+  the same failure class the skill already documents for `.jsx` files ("deployed but nothing
+  changed"), reached by a different route.
+- âš ï¸ The skill file still contains the `origin/develop` comparison. Until it's fixed, check
+  `git diff --name-only main develop -- '*.js' '*.jsx' '*.css'` by hand and confirm Step 2's
+  bump list is non-empty whenever a release touches front-end assets.
+
+---
 on all five: CT104670 called a "Duck Jacketâ€¦ rugged duck canvas" (it is the **Storm Defender
 Shoreline Jacket**, a rain shell), CTK121 called a "**Crewneck**â€¦ no-hood option" (it is the
 **Midweight Hooded** Sweatshirt), CT102208 called the "Gilliam **Vest**â€¦ without the sleeves"

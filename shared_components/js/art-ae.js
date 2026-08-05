@@ -41,6 +41,12 @@ var ArtAeGallery = (function () {
         return 'Garment';
     }
 
+    // Stored Caspio rows hold absolute proxy Box urls that 401 since the Box
+    // surface was session-gated; boxUrl() re-points them at this origin so the
+    // session cookie authorises the <img>. Guarded so a missing box-url.js
+    // script tag degrades instead of throwing.
+    function resolveBoxUrl(u) { return (typeof boxUrl === 'function') ? boxUrl(u) : u; }
+
     var containerId = null;
     var allRequests = [];
     var activeFilter = null;
@@ -473,9 +479,12 @@ var ArtAeGallery = (function () {
             || req.Mockup_4 || req.Mockup_5 || req.Mockup_6 || '';
         var thumbHtml = '';
         if (thumbUrl) {
+            // Display-only value — the card never stores/sends this url, so the
+            // same-origin rewrite is safe here.
+            var thumbDisplayUrl = resolveBoxUrl(thumbUrl);
             thumbHtml = '<div class="card-thumb">'
-                + '<img src="' + escapeHtml(thumbUrl) + '" alt="Mockup" loading="lazy"'
-                + ' data-original-src="' + escapeHtml(thumbUrl) + '"'
+                + '<img src="' + escapeHtml(thumbDisplayUrl) + '" alt="Mockup" loading="lazy"'
+                + ' data-original-src="' + escapeHtml(thumbDisplayUrl) + '"'
                 + ' onerror="if(window.ArtActions&&window.ArtActions.handleBoxImageError){window.ArtActions.handleBoxImageError(this);}else{this.parentElement.style.display=\'none\';}">'
                 + '</div>';
         }

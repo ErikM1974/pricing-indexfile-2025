@@ -25,6 +25,12 @@
         return url;
     }
 
+    // Stored Caspio rows hold absolute proxy Box urls that 401 since the Box
+    // surface was session-gated; boxUrl() re-points them at this origin so the
+    // session cookie authorises the <img>. Guarded so a missing box-url.js
+    // script tag degrades instead of throwing.
+    function resolveBoxUrl(u) { return (typeof boxUrl === 'function') ? boxUrl(u) : u; }
+
     // ─── Display-time Auto-Heal (Layer 3) ──────────────────────────────
     // When a Box thumbnail URL returns 404, automatically fire Ruth's
     // recovery route — searches the design's Box folder for a replacement
@@ -79,8 +85,9 @@
         if (img) {
             img.dataset.headChecked = '';   // reset so a future error can re-check
             img.dataset.proxyAttempted = '';
-            img.setAttribute('data-original-src', newUrl);
-            img.src = newUrl;
+            var displayUrl = resolveBoxUrl(newUrl);
+            img.setAttribute('data-original-src', displayUrl);
+            img.src = displayUrl;
             img.style.display = '';
         }
     }
@@ -1717,7 +1724,7 @@
                 var thumbUrl = slotKey && mockup[slotKey] ? mockup[slotKey] : '';
                 feedbackHtml += '<div class="pmd-rev-section">';
                 if (thumbUrl) {
-                    feedbackHtml += '<img src="' + escapeHtml(thumbUrl) + '" class="pmd-rev-thumb" alt="' + escapeHtml(label) + '">';
+                    feedbackHtml += '<img src="' + escapeHtml(resolveBoxUrl(thumbUrl)) + '" class="pmd-rev-thumb" alt="' + escapeHtml(label) + '">';
                 }
                 feedbackHtml += '<div class="pmd-rev-section-content">'
                     + '<strong>' + escapeHtml(label) + ':</strong> '
@@ -1841,7 +1848,8 @@
         }
 
         slotsToRender.forEach(function (slot) {
-            var url = normalizeBoxProxyUrl(mockup[slot.key]);
+            // Display copy only — the stored Caspio value in mockup[slot.key] is untouched.
+            var url = resolveBoxUrl(normalizeBoxProxyUrl(mockup[slot.key]));
             var isEmpty = !url || !url.trim();
             isRefFile = slot.key === 'Box_Reference_File';
             var slotEl = document.createElement('div');
@@ -4126,7 +4134,7 @@
 
             // Mockup image
             if (imgUrl) {
-                html += '<img src="' + escapeHtml(imgUrl) + '" class="mockup-img" alt="Mockup ' + s + '">';
+                html += '<img src="' + escapeHtml(resolveBoxUrl(imgUrl)) + '" class="mockup-img" alt="Mockup ' + s + '">';
             } else {
                 html += '<div class="mockup-img" style="display:flex;align-items:center;justify-content:center;color:#999;">No Image</div>';
             }
@@ -4410,7 +4418,7 @@
                 var thumbUrl = currentMockup[slot.key] || '';
                 var slotDiv = document.createElement('div');
                 slotDiv.className = 'pmd-revise-slot';
-                slotDiv.innerHTML = '<img src="' + escapeHtml(thumbUrl) + '" class="pmd-revise-thumb" alt="' + escapeHtml(slot.label) + '">'
+                slotDiv.innerHTML = '<img src="' + escapeHtml(resolveBoxUrl(thumbUrl)) + '" class="pmd-revise-thumb" alt="' + escapeHtml(slot.label) + '">'
                     + '<div class="pmd-revise-slot-right">'
                     + '<label class="pmd-revise-slot-label">' + escapeHtml(slot.label) + '</label>'
                     + '<textarea class="pmd-revise-slot-textarea" data-slot="' + escapeHtml(slot.label) + '" placeholder="Changes needed for ' + escapeHtml(slot.label) + '..."></textarea>'
@@ -4574,7 +4582,7 @@
             item.addEventListener('click', function (e) {
                 e.stopPropagation();
                 dropdown.remove();
-                var vUrl = normalizeBoxProxyUrl(v.File_URL);
+                var vUrl = resolveBoxUrl(normalizeBoxProxyUrl(v.File_URL));
                 var vExt = getFileExtension(vUrl);
                 if (vExt === '' || IMAGE_EXTENSIONS.indexOf(vExt) !== -1) {
                     openLightbox(vUrl, 'v' + v.Version_Number + ' \u2014 ' + (v.File_Name || ''));
@@ -5020,7 +5028,7 @@
             if (ext !== '' && IMAGE_EXTENSIONS.indexOf(ext) === -1) return;
             mockupCount++;
             previewHtml += '<div class="pmd-send-preview-item">'
-                + '<img src="' + escapeHtml(url) + '" alt="' + escapeHtml(slot.label) + '" class="pmd-send-preview-thumb">'
+                + '<img src="' + escapeHtml(resolveBoxUrl(url)) + '" alt="' + escapeHtml(slot.label) + '" class="pmd-send-preview-thumb">'
                 + '<span class="pmd-send-preview-label">' + escapeHtml(slot.label) + '</span>'
                 + '</div>';
         });
@@ -5467,7 +5475,7 @@
             item.title = file.name;
 
             if (file.thumbnailUrl) {
-                item.innerHTML = '<img src="' + escapeHtml(API_BASE + file.thumbnailUrl) + '" alt="' + escapeHtml(file.name) + '" loading="lazy">'
+                item.innerHTML = '<img src="' + escapeHtml(resolveBoxUrl(API_BASE + file.thumbnailUrl)) + '" alt="' + escapeHtml(file.name) + '" loading="lazy">'
                     + '<div class="pmd-box-panel-item-name">' + escapeHtml(file.name) + '</div>'
                     + '<button type="button" class="pmd-box-panel-item-delete" data-box-file-id="' + file.id + '" title="Delete from Box">&times;</button>';
             } else {
@@ -5495,7 +5503,7 @@
             if (file.thumbnailUrl) {
                 item.addEventListener('click', function (e) {
                     if (e.target.closest('.pmd-box-panel-item-delete')) return;
-                    openLightbox(API_BASE + file.thumbnailUrl, file.name);
+                    openLightbox(resolveBoxUrl(API_BASE + file.thumbnailUrl), file.name);
                 });
             }
 
