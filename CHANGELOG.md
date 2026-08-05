@@ -1,3 +1,21 @@
+## v2026.08.04.3 (2026.08.04)
+
+- Contract Embroidery: DST drop zone prices from the file's exact stitch count (WIP checkpoint - pending browser verification)
+- Rebuild the spin preview motion: view morph, sharp parking, 120Hz-ready
+- Monogram Stitch-Proof workflow: live name QA, customer proof sheet, machine run plan (WIP checkpoint - pending final browser verification)
+- Sync release v2026.08.04.2 back into develop
+- Embroidery Studio: recover the fit when the stage starts at zero size
+- Monogram Stitch-Proof: fix 14 defects found by adversarial review
+- Contract Embroidery DST drop: verification-pass fixes (browser-verified)
+- LESSONS_LEARNED: releasing from a shared checkout (worktree, exclusions, sync-back)
+- LESSONS_LEARNED: el.hidden vs flex, and asserting the property hides the bug
+- Merge released main back into develop (studio fit-recovery + lessons)
+- LESSONS_LEARNED: the shared print block flattens inline colors (+ restore a truncated entry)
+- Design Vault frontend: the Design Gallery rebuild (dark — not yet linked)
+- Design Vault: config fix, quote deep link, and the conformance gaps
+- Deploy v2026.08.04.3: 4 files (design-gallery.html,monogram-dashboard.html,dst-viewer.html,...)
+- Record the spin-preview lessons; archive two oldest entries
+
 ## v2026.08.04.2 (2026.08.04)
 
 - Declutter the garment designer into a guided workflow
