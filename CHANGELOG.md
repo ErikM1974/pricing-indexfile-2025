@@ -1,3 +1,13 @@
+## v2026.08.05.9 (2026.08.05)
+
+- Fix the deploy skill's cache-bust holes: sibling refs + wrong baseline
+- Fix the broken NWCA logo and favicon on DST Studio + Mockup Generator
+- Contract Embroidery Phase 3: reorder recall + staff-only margin
+- Docs: Phase 3 in GUIDE.md + the stitch-file topic file
+- LESSONS_LEARNED: a 403 <img> passes every check except eyes
+- Merge develop
+- Deploy v2026.08.05.9: 1 files (index.html,...)
+
 ## v2026.08.05.8 (2026.08.05)
 
 - Fix the broken NWCA logo and favicon on DST Studio + Mockup Generator
