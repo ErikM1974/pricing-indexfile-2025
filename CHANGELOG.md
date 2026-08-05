@@ -1,3 +1,10 @@
+## v2026.08.05.3 (2026.08.05)
+
+- Contract Embroidery Phase 2: production read + multi-location combos (WIP, pre-review)
+- Merge released main back into develop (v2026.08.05.2)
+- Lead Art & Design with Shirt Designer + an Updated chip
+- Deploy v2026.08.05.3: 2 files (index.html,index.html,...)
+
 ## v2026.08.05.2 (2026.08.05)
 
 - Monogram: the unassigned-names panel counted a fully-assigned roster as unassigned
