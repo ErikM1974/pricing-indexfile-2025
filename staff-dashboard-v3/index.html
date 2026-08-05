@@ -34,7 +34,7 @@
          PATCH 3 and PATCH 4 were REMOVED per PATCH-5-CLEANUP: their broad
          [class*="..."] selectors were over-matching and damaging styles that
          components.css already had correct (garment-bonus, celebration pills, etc). -->
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=2026.07.29.2">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=2026.08.05.1">
     <!-- Phase 1 "alive + personal" widgets (2026-07-20): Pride Wall photo
          strip, My Stuff pinned/recent tools row. (Win Bell removed 2026-07-23.) -->
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/phase1-widgets.css?v=2026.07.29.1">
@@ -685,10 +685,17 @@
                                 <span class="tool-category-count">10</span>
                             </div>
                             <div class="tool-buttons">
+                                <!-- Shirt Designer leads the section 2026-08-05: the queues below are
+                                     art-staff destinations, this is the one an AE opens to build a
+                                     customer mockup — the widest audience here. The amber chip is the
+                                     same .qs-new-badge the New Quote CTA uses; it's a temporary
+                                     "come look again" nudge after the UX rebuild, NOT a beta caveat
+                                     (deliberately no .tool-btn--beta — the tool is production-ready).
+                                     REMOVE the chip span once staff have seen it, ~Sept 2026. -->
+                                <a href="/pages/garment-designer.html" class="tool-btn" title="Rebuilt Aug 5 — one-step start, smoother 360° spin, and you can now remove an uploaded file."><i class="fas fa-tshirt" aria-hidden="true"></i> Shirt Designer <span class="qs-new-badge">Updated · Aug 5</span></a>
                                 <a href="/dashboards/art-hub-steve.html" class="tool-btn"><i class="fas fa-paint-brush" aria-hidden="true"></i> Steve's Queue</a>
                                 <a href="/dashboards/art-hub-ruth.html" class="tool-btn"><i class="fas fa-drafting-compass" aria-hidden="true"></i> Ruth's Queue</a>
                                 <a href="/art-tools/ae-art-dashboard.html" class="tool-btn"><i class="fas fa-palette" aria-hidden="true"></i> AE Dashboard</a>
-                                <a href="/pages/garment-designer.html" class="tool-btn"><i class="fas fa-tshirt" aria-hidden="true"></i> Shirt Designer</a>
                                 <a href="/pages/jds-mockup-creator.html" class="tool-btn"><i class="fas fa-magic" aria-hidden="true"></i> JDS Tumbler Mockup</a>
                                 <a href="/tools/custom-tees-calibrate.html" class="tool-btn tool-btn--beta" title="Beta — adjust where the artwork prints on the shirt. Works but still being refined; let Erik know if you hit issues."><i class="fas fa-crosshairs" aria-hidden="true"></i> Tee Print-Box Calibration</a>
                                 <a href="/pages/mockup-generator.html" class="tool-btn tool-btn--beta" title="Beta — works but still being refined. Let Erik know if you hit issues."><i class="fas fa-magic" aria-hidden="true"></i> Mockup Generator</a>
