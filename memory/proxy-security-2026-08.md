@@ -119,9 +119,12 @@ strips the mount path, so `gateStaffHtml` saw `req.path === '/'`, failed its
 `.html` test, and waved the request through. The gate looked installed and did
 nothing.
 
-⏭️ **The proxy gate is NOT shipped.** The success path needs a real SAML session
-and cannot be verified from here — only the 401 path can. It ships after the
-imagery is confirmed working in a browser. The 4 Box WRITE routes
+✅ **Proxy gate SHIPPED** (`v2026.08.05.7`) after Erik confirmed the imagery in a
+browser. All 7 read routes now 401 anonymously; the same requests carrying the
+app's `CRM_API_SECRET` return 200, which is the leg the forwarder uses.
+🔑 **Check the two `CRM_API_SECRET` config vars MATCH before gating** — the
+forwarder appears to work while the proxy is open regardless of whether its
+secret is correct, so that proves nothing until the gate is on. The 4 Box WRITE routes
 (`shared-link`, `create-mockup-folder`, `upload-to-folder`, `file` delete) are
 untouched and still go browser→proxy directly.
 
