@@ -4203,7 +4203,7 @@ app.use('/dist', express.static(path.join(__dirname, 'dist'), {
 // static mount below and serve the original source paths — the build is an
 // overlay, never a requirement.
 const { rewriteHtmlAssets, createManifestLoader, createHtmlLoader } = require('./lib/asset-manifest');
-const { HASHED_PAGES, HASHED_PAGES_UNDER_PAGES_MOUNT, HASHED_STAFF_UNDER_MOUNT } = require('./lib/hashed-pages');
+const { HASHED_PAGES, HASHED_PAGES_UNDER_PAGES_MOUNT, HASHED_STAFF_UNDER_MOUNT, HASHED_CALCULATOR_PATHS } = require('./lib/hashed-pages');
 const loadAssetManifest = createManifestLoader(path.join(__dirname, 'dist', 'asset-manifest.json'));
 const loadBuilderHtml = createHtmlLoader();
 
@@ -4267,6 +4267,18 @@ app.get('/quote-builders/:page', (req, res, next) => {
  * auth of its own: by the time it runs, the gate has already accepted the
  * request. next() on anything unexpected hands back to the static mount.
  */
+/**
+ * Rewrite handler for /calculators (flat and one level nested). Allowlisted by
+ * lib/hashed-pages.js, so a path outside the list — or anything with a slash in
+ * a param — falls straight through to express.static.
+ */
+function serveHashedCalculator(req, res, next) {
+  const rel = req.params.b ? `${req.params.a}/${req.params.b}` : req.params.a;
+  if (!HASHED_CALCULATOR_PATHS.has(rel)) return next();
+  if (!loadAssetManifest()) return next();
+  sendHashedHtml(res, path.join(__dirname, 'calculators', ...rel.split('/')));
+}
+
 function serveHashedStaffPage(mount) {
   const allowed = HASHED_STAFF_UNDER_MOUNT[mount];
   return (req, res, next) => {
@@ -4334,8 +4346,19 @@ app.get(['/calculators/custom-decal-pricing.html', '/pricing/decals'], requireSt
   // page, so it could never see the page's own noindex meta — and a disallowed
   // URL with inbound links can still surface as a bare result.
   res.set('X-Robots-Tag', 'noindex, nofollow');
-  res.sendFile(path.join(__dirname, 'calculators', 'custom-decal-pricing.html'));
+  sendHashedHtml(res, path.join(__dirname, 'calculators', 'custom-decal-pricing.html'));
 });
+
+// Asset rewrite for calculator pages. /calculators has NO mount gate — it is
+// mostly public, and the one staff-only page (custom-decal-pricing.html) is
+// gated by its own requireStaff route ABOVE, which serves the file itself and
+// so never reaches this. Registering immediately before express.static puts
+// this after EVERY gate for the prefix: a gate placed after the static mount
+// would already be bypassed by it, so "above static" means "below all gates".
+// Two params to cover the nested self-contained calculators
+// (/calculators/embroidery-contract/index.html).
+app.get('/calculators/:a/:b', serveHashedCalculator);
+app.get('/calculators/:a', serveHashedCalculator);
 
 // Serve specific directories as static
 app.use('/calculators', express.static(path.join(__dirname, 'calculators'), staticOptions));

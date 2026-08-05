@@ -114,5 +114,13 @@ authority and is free to read.
 
 - 🔴 **`config.js:19` uses `/rest/v2`, which Caspio deprecated 1 June 2026.** Not a cost issue.
 - ⚠️ **Our own tooling is now the biggest single swing factor.** One
-  `capture-pricing-baselines` run = ~5,600 calls, half a day's budget.
+  `capture-pricing-baselines` run = ~5,600 calls, half a day's budget. Measured again
+  2026-08-05: a morning of Claude table updates = **~9,400 calls, over half the day's total**.
+- 🔑 **The pacing alert is BLIND to local tooling — by construction.** It reads
+  `API_Usage_Daily`, which only Heroku dynos write; a script run from the laptop hits Caspio
+  directly and never touches the proxy. On 2026-08-05 Caspio showed **17,824** while the
+  rollup showed **9,466** — the alert would have called it a normal day. **Caspio's page is
+  the only thing that sees local work.** One heavy session ≈ 2% of the period cap and is
+  free; ~13 sessions is the headroom, and a DAILY habit is the one realistic path to an
+  overage left in these numbers.
 - ⚠️ **Heroku Scheduler has NO CLI and NO API** — job changes are UI-only, Erik's hand.
