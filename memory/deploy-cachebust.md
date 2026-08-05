@@ -56,7 +56,40 @@ synthetic `../widget.js?v=` miss still aborts.
 SKILL.md, `sh -n` it, then execute it against a throwaway copy of the repo's HTML tree
 and diff. That tests the документed code rather than a paraphrase of it.
 
-## ⚠️ The `?v=` scheme currently protects nothing
+## 🔑 There are TWO asset pipelines — and the good one already exists
+
+`scripts/build.js` (run by `heroku-postbuild`) content-hashes assets and rewrites
+the tags, but **only for the four pages listed in `BUILDER_HTML`** (build.js:50):
+
+```
+quote-builders/{embroidery,screenprint,dtf,dtg}-quote-builder.html
+```
+
+For those pages the `?v=` is **discarded** — `discoverAssets()` does
+`raw.split('?')[0]` (build.js:94) — and the tag becomes
+`/dist/shared_components/js/exact-match-search.eff233623e.js`. Verified live: 33 of
+34 scripts on the DTF builder are hashed `/dist/` paths, and those are served
+
+```
+Cache-Control: public, max-age=31536000, immutable
+```
+
+Every other page (~340 of them) keeps the source path and gets
+`no-cache, no-store, must-revalidate`.
+
+**So the caching question is not "should we flip `max-age` on `?v=` URLs".** The
+right mechanism is already built, proven in production, and automatic (the URL
+changes exactly when the bytes change — no human has to remember a version).
+Extending caching = adding pages to `BUILDER_HTML`, not changing headers on
+hand-versioned URLs. `?v=` is the legacy path that the build already replaced for
+the pages that matter most.
+
+Consequence for the deploy skill: Step 2 dutifully bumps `?v=` on those four
+builder pages, and the build then throws those strings away. Harmless, but it is
+doing nothing there — and its silent-no-op detector could in principle abort a
+release over a version string with no effect.
+
+## ⚠️ On the unbuilt pages, the `?v=` scheme protects nothing either
 
 Every JS/CSS response carries:
 
