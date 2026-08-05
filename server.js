@@ -3581,7 +3581,13 @@ app.delete('/api/crm-proxy/form-submissions/:submissionId', requireCrmRole(['adm
 //
 // 🔴 Deliberately ENUMERATED routes and a numeric fileId check — no wildcard,
 // no path passthrough. This forwarder must never become the thing it replaced.
-const BOX_FORWARD_QUERY = new Set(['size', 'folderId', 'designNumber', 'limit', 'offset']);
+// Every param the callers actually send. `full=1` is what the art/mockup
+// lightboxes use for the full-resolution image, and `size=large` the hi-res
+// thumbnail — dropping either silently degrades the image rather than failing,
+// so this list is checked against the call sites, not guessed.
+const BOX_FORWARD_QUERY = new Set([
+  'size', 'folderId', 'designNumber', 'limit', 'offset', 'query', 'type', 'url', 'full',
+]);
 
 function boxForward(buildPath) {
   return async (req, res) => {
@@ -3640,6 +3646,16 @@ app.get('/api/box/download/:fileId', requireStaff, boxForward(req => 'download/'
 app.get('/api/box/art-folders', requireStaff, boxForward(() => 'art-folders'));
 app.get('/api/box/mockup-folders', requireStaff, boxForward(() => 'mockup-folders'));
 app.get('/api/box/folder-files', requireStaff, boxForward(() => 'folder-files'));
+app.get('/api/box/search', requireStaff, boxForward(() => 'search'));
+// shared-image takes a caller-supplied ?url=; the PROXY is what validates it is
+// a box.com URL, so this only carries it across — it never fetches it itself.
+app.get('/api/box/shared-image', requireStaff, boxForward(() => 'shared-image'));
+
+// The four Box WRITE routes (POST shared-link / create-mockup-folder /
+// upload-to-folder, DELETE file/:id) are deliberately NOT forwarded yet — they
+// still go browser→proxy directly and stay anonymous. They create and delete Box
+// content rather than disclosing it, and upload-to-folder needs multipart
+// streamed through here, which is its own piece of work.
 
 // ── Contract embroidery COST MODEL (staff only) ──────────────────────────────
 // Feeds the margin overlay on /calculators/embroidery-contract/.
@@ -4446,6 +4462,23 @@ app.get('/pages/design-gallery.html', (req, res) => {
 app.get('/pages/mockup-generator.html', (req, res) => {
   res.redirect(301, '/pages/dst-viewer.html');
 });
+
+// Staff-only detail pages that live under /pages (which is otherwise public).
+// These three drive the Box art/mockup/transfer workflows: they read customer
+// design files, and art-request-detail carries the AE approval action bar.
+// Every link to them is emailed to an @nwcustomapparel.com address (the sales
+// rep, Bradley, art@) and they are linked only from gated dashboards — they
+// were simply never gated themselves, the same gap the public design-gallery
+// beta had. MUST be registered BEFORE the static mount below or it serves them
+// first and the gate never runs.
+// 🔴 app.get, NOT app.use: app.use STRIPS the mount path, so gateStaffHtml would
+// see req.path === '/' , fail its `.html` suffix test, and wave the request
+// through as if it were a css/js asset — the gate silently does nothing.
+app.get([
+  '/pages/art-request-detail.html',
+  '/pages/mockup-detail.html',
+  '/pages/transfer-detail.html',
+], gateStaffHtml);
 
 app.use('/pages', express.static(path.join(__dirname, 'pages'), staticOptions));
 

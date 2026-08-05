@@ -418,7 +418,7 @@
             //        produces nonsense like ?url=<proxy-url> which the converter rejects.
             var src = (mockupUrl.indexOf('/api/box/') !== -1)
                 ? mockupUrl
-                : API_BASE + '/api/box/shared-image?url=' + encodeURIComponent(mockupUrl);
+                : '/api/box/shared-image?url=' + encodeURIComponent(mockupUrl);
             thumbHtml = '<img src="' + src + '"' +
                 ' alt="' + company + ' mockup" loading="lazy"' +
                 ' onerror="window.SteveGallery.handleThumbError(this)">';

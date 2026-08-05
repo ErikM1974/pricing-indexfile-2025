@@ -105,10 +105,14 @@ describe('decode — positional row mapping', () => {
 describe('imgRef expansion', () => {
     beforeAll(() => search.decode(coreIndex()));
 
-    test('b:<boxId> → box thumbnail URL with ?size=large hi-res twin', () => {
+    // Box thumbnails are SAME-ORIGIN as of 2026-08-05, not absolute proxy URLs.
+    // The proxy's Box read routes are moving behind the app's session-gated
+    // forwarder, and an <img> only sends the SAML cookie when the request goes
+    // to our own origin — so a BASE-prefixed URL here would mean a 401 image.
+    test('b:<boxId> → same-origin box thumbnail URL with ?size=large hi-res twin', () => {
         const d = search.byDn(31442);
-        expect(d.imgUrl).toBe(BASE + '/api/box/thumbnail/42');
-        expect(d.imgLargeUrl).toBe(BASE + '/api/box/thumbnail/42?size=large');
+        expect(d.imgUrl).toBe('/api/box/thumbnail/42');
+        expect(d.imgLargeUrl).toBe('/api/box/thumbnail/42?size=large');
     });
 
     test('f:<key> → files URL, no large variant', () => {

@@ -58,7 +58,7 @@
             return { url: base + '/api/files/' + ref.slice(2), large: null };
         }
         if (ref.lastIndexOf('b:', 0) === 0) {
-            var u = base + '/api/box/thumbnail/' + ref.slice(2);
+            var u = '/api/box/thumbnail/' + ref.slice(2);
             return { url: u, large: u + '?size=large' };
         }
         if (ref.lastIndexOf('u:', 0) === 0) {
