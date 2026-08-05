@@ -8,7 +8,17 @@ the Heroku domain and `www.teamnwca.com`), the served `dst-viewer.html` contains
 of `mockup-generator`, and `mockup-detail.html`, `thread-color-picker.js`, `thread-color-picker.css`
 and the Flask `/api/embroidery/palette` endpoint all still return 200.
 
-⏭️ **Flip the 302 → 301 after ~a week** (server.js, the block above the `/pages` static mount).
+✅ **302 → 301 DONE the same day** (Erik cut the soak short deliberately; live and verified in
+`v2026.08.05.13`, sha `57b7b5d`). ⚠️ A 301 is cached hard, so deleting the route no longer
+restores the page for anyone whose browser followed it — reviving the generator means a
+DIFFERENT path. Tolerable only because ~zero browsers ever hit this URL.
+
+🔴 **That flip reached production inside ANOTHER session's commit** (`53f6d11a`, their `/tests`
+mount removal) — I edited `server.js`, was blocked mid-task, and they committed the file with my
+lines in it. Third time in one day that the shared checkout moved work between sessions. It was
+never verified locally; the only check it ever got was `curl` against production after the fact.
+🔑 **In this checkout, an uncommitted edit is not "yours" — it is a deploy candidate for whoever
+commits that file next.** Commit narrowly and immediately, or don't start.
 
 ## 🔑 Deploy note — this release needed a worktree
 
