@@ -1,3 +1,9 @@
+## v2026.08.05.20 (2026.08.05)
+
+- memory: Box surface fully closed; the three body-forwarding modes
+- Move Tee Print-Box Calibration to Administration (admin-only); drop its BETA chip
+- Gate DTG calibration WRITES behind the staff session (admin-only)
+
 ## v2026.08.05.19 (2026.08.05)
 
 - memory: Box read gate shipped end-to-end
