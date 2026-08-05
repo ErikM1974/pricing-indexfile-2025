@@ -1,5 +1,5 @@
 /**
- * dst-palette.js — Robison-Anton 40wt thread palette for the Embroidery Studio.
+ * dst-palette.js — Robison-Anton 40wt thread palette for the DST Studio.
  *
  * SNAPSHOT of GET /api/embroidery/palette on the inksoft-transform backend
  * (the same palette the Mockup Generator uses), taken 2026-08-04, 225 colors (1 entry with catalog=None dropped — not orderable).
