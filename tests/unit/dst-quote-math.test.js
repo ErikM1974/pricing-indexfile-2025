@@ -166,6 +166,69 @@ describe('combineLines', () => {
     });
 });
 
+// ─── saved-quote money invariant ───────────────────────────────────────────
+
+/**
+ * Mirrors saveContractEmbroideryQuote's line-item allocation. The saved
+ * quote_items rows MUST sum to the quote_sessions TotalAmount: the quote
+ * renderer sums LineTotal for the products table but prints TotalAmount as the
+ * grand total and taxes it, so any drift shows the customer a table that does
+ * not add up to its own total. Per-line rounding always drifts, so the LAST
+ * line absorbs the residual.
+ */
+function allocateLineTotals(locations, qty, ltmPerPiece, orderTotalExact) {
+    const rows = [];
+    let allocated = 0;
+    locations.forEach((loc, i) => {
+        const unit = loc.unit + (i === 0 ? ltmPerPiece : 0);
+        const isLast = i === locations.length - 1;
+        const lineTotal = isLast
+            ? Number((orderTotalExact - allocated).toFixed(2))
+            : Number((unit * qty).toFixed(2));
+        if (!isLast) allocated += lineTotal;
+        rows.push({ unit: Number(unit.toFixed(2)), lineTotal });
+    });
+    return rows;
+}
+
+describe('saved line items reconcile to the session total', () => {
+    const sum = rows => Number(rows.reduce((t, r) => t + r.lineTotal, 0).toFixed(2));
+
+    test('multi-location: rows sum EXACTLY to the order total', () => {
+        // 12 pcs, garment 9,412 st @ $1.00/1K = $9.411667, full back 25K = $26.00, $100 LTM
+        const qty = 12, ltmPerPiece = 100 / 12;
+        const locs = [{ unit: 9.411666666 }, { unit: 26.00 }];
+        const orderTotal = Number(((9.411666666 + 26.00 + ltmPerPiece) * qty).toFixed(2));
+        expect(sum(allocateLineTotals(locs, qty, ltmPerPiece, orderTotal))).toBe(orderTotal);
+    });
+
+    test('single location at a large qty — the case that drifted 23 cents', () => {
+        const qty = 288, ltmPerPiece = 0;
+        const locs = [{ unit: 8.4708 }];
+        const orderTotal = Number((8.4708 * qty).toFixed(2));
+        const rows = allocateLineTotals(locs, qty, ltmPerPiece, orderTotal);
+        expect(sum(rows)).toBe(orderTotal);
+        // and a single line must equal the total outright (pre-Phase-2 behaviour)
+        expect(rows[0].lineTotal).toBe(orderTotal);
+    });
+
+    test('three locations still reconcile', () => {
+        const qty = 7, ltmPerPiece = 100 / 7;
+        const locs = [{ unit: 3.333333 }, { unit: 6.666666 }, { unit: 9.999999 }];
+        const orderTotal = Number(((3.333333 + 6.666666 + 9.999999 + ltmPerPiece) * qty).toFixed(2));
+        expect(sum(allocateLineTotals(locs, qty, ltmPerPiece, orderTotal))).toBe(orderTotal);
+    });
+
+    test('the residual lands on the last line, never on the first', () => {
+        const qty = 3, ltmPerPiece = 0;
+        const locs = [{ unit: 1.005 }, { unit: 2.005 }];
+        const orderTotal = Number(((1.005 + 2.005) * qty).toFixed(2));
+        const rows = allocateLineTotals(locs, qty, ltmPerPiece, orderTotal);
+        expect(rows[0].lineTotal).toBe(Number((1.005 * 3).toFixed(2)));
+        expect(sum(rows)).toBe(orderTotal);
+    });
+});
+
 // ─── end-to-end against a real parsed buffer ───────────────────────────────
 
 describe('integration with the DST parser', () => {
