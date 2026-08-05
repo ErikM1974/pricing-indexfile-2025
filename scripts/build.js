@@ -47,12 +47,9 @@ const WATCH = process.argv.includes('--watch');
 
 // The pages whose assets get hashed + whose <script src> tags server.js
 // rewrites. Other pages keep loading the original (no-cache) source paths.
-const BUILDER_HTML = [
-    'quote-builders/embroidery-quote-builder.html',
-    'quote-builders/screenprint-quote-builder.html',
-    'quote-builders/dtf-quote-builder.html',
-    'quote-builders/dtg-quote-builder.html',
-];
+// ONE list, shared with server.js, so the build and the serve side cannot
+// drift — see lib/hashed-pages.js for why each page is on it.
+const { HASHED_PAGES: BUILDER_HTML } = require('../lib/hashed-pages');
 
 // Per-builder ESM entry points (bundled IIFE). outbase keeps the dist path
 // mirrored: dist/shared_components/js/builders/emb/index.<hash>.js
