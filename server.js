@@ -3067,13 +3067,16 @@ async function serveProductPage(req, res) {
       if (head) {
         const html = await fs.promises.readFile(productHtmlPath, 'utf8');
         res.set('Cache-Control', 'public, max-age=300');
-        return res.type('html').send(productSeo.injectHead(html, head));
+        // SEO head first, THEN the asset rewrite — the injected <head> must be
+        // in the string the rewriter sees, and its 5-min cache header is kept
+        // (sendHashedHtml leaves headers alone when given pre-rendered HTML).
+        return sendHashedHtml(res, productHtmlPath, productSeo.injectHead(html, head));
       }
     } catch (e) {
       console.error('[product-seo] injection failed (serving static):', e.message);
     }
   }
-  res.sendFile(productHtmlPath);
+  sendHashedHtml(res, productHtmlPath);
 }
 
 app.get('/product', serveProductPage);
@@ -4107,28 +4110,70 @@ app.use('/dist', express.static(path.join(__dirname, 'dist'), {
 // static mount below and serve the original source paths — the build is an
 // overlay, never a requirement.
 const { rewriteHtmlAssets, createManifestLoader, createHtmlLoader } = require('./lib/asset-manifest');
+const { HASHED_PAGES, HASHED_PAGES_UNDER_PAGES_MOUNT } = require('./lib/hashed-pages');
 const loadAssetManifest = createManifestLoader(path.join(__dirname, 'dist', 'asset-manifest.json'));
 const loadBuilderHtml = createHtmlLoader();
-const REWRITTEN_BUILDER_PAGES = new Set([
-  'embroidery-quote-builder.html',
-  'screenprint-quote-builder.html',
-  'dtf-quote-builder.html',
-  'dtg-quote-builder.html'
-]);
+
+/**
+ * Serve an HTML page with its asset tags rewritten to hashed /dist URLs.
+ *
+ * Call this INSTEAD of res.sendFile() from a page's own route. Doing the
+ * rewrite inside the handler (rather than in a middleware keyed on the URL) is
+ * deliberate: most storefront pages answer to pretty aliases as well as the
+ * .html path — /catalog, /stickers, /banners, /product — and a path allowlist
+ * would silently miss every alias. It also composes with handlers that
+ * transform the HTML themselves (product.html injects SEO head tags), which a
+ * middleware in front would have bypassed.
+ *
+ * The HTML itself stays no-store so a new manifest is picked up immediately;
+ * only the hashed assets it points at are cached forever.
+ *
+ * Fail-open at every step — no manifest, unreadable file, anything thrown —
+ * serves the original static file. The build is an overlay, never a
+ * requirement (a broken build must not take the storefront down).
+ *
+ * @param {import('express').Response} res
+ * @param {string} absPath absolute path to the .html file
+ * @param {string} [preRenderedHtml] already-transformed HTML to rewrite instead
+ *   of reading from disk (used by the product SEO path)
+ */
+function sendHashedHtml(res, absPath, preRenderedHtml) {
+  const manifest = loadAssetManifest();
+  if (!manifest) {
+    return preRenderedHtml ? res.type('html').send(preRenderedHtml) : res.sendFile(absPath);
+  }
+  try {
+    const html = preRenderedHtml !== undefined ? preRenderedHtml : loadBuilderHtml(absPath);
+    if (preRenderedHtml === undefined) {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+    }
+    return res.type('html').send(rewriteHtmlAssets(html, manifest));
+  } catch (err) {
+    console.error('[asset-manifest] rewrite failed, serving static:', err.message);
+    return preRenderedHtml ? res.type('html').send(preRenderedHtml) : res.sendFile(absPath);
+  }
+}
+
+// Quote builders keep their own route (they are reached only by .html path).
+const REWRITTEN_BUILDER_PAGES = new Set(
+  HASHED_PAGES.filter((p) => p.startsWith('quote-builders/')).map((p) => p.slice('quote-builders/'.length))
+);
 app.get('/quote-builders/:page', (req, res, next) => {
   if (!REWRITTEN_BUILDER_PAGES.has(req.params.page)) return next();
-  const manifest = loadAssetManifest();
-  if (!manifest) return next();
-  try {
-    const html = loadBuilderHtml(path.join(__dirname, 'quote-builders', req.params.page));
-    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-    res.setHeader('Pragma', 'no-cache');
-    res.setHeader('Expires', '0');
-    res.type('html').send(rewriteHtmlAssets(html, manifest));
-  } catch (err) {
-    console.error('[asset-manifest] builder page rewrite failed, falling back to static:', err.message);
-    next();
-  }
+  if (!loadAssetManifest()) return next();
+  sendHashedHtml(res, path.join(__dirname, 'quote-builders', req.params.page));
+});
+
+// Storefront pages under /pages reached through the static mount below rather
+// than a bespoke route. MUST stay above that mount or express.static answers
+// first and the rewrite never runs.
+const HASHED_PAGES_MOUNT_SET = new Set(HASHED_PAGES_UNDER_PAGES_MOUNT);
+app.get('/pages/:page', (req, res, next) => {
+  if (!HASHED_PAGES_MOUNT_SET.has('/pages/' + req.params.page)) return next();
+  if (!loadAssetManifest()) return next();
+  sendHashedHtml(res, path.join(__dirname, 'pages', req.params.page));
 });
 
 // -----------------------------------------------------------------------------
@@ -4597,7 +4642,7 @@ app.get(['/top-sellers-product.html', '/pages/top-sellers-product.html'], (req, 
 });
 
 app.get('/sample-cart.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'pages', 'sample-cart.html'));
+  sendHashedHtml(res, path.join(__dirname, 'pages', 'sample-cart.html'));
 });
 
 app.get('/dtg-compatible-products.html', (req, res) => {
@@ -4620,19 +4665,19 @@ app.get('/pricing-negotiation-policy.html', (req, res) => {
 // Custom T-Shirts — multi-style DTG storefront (2026-06-10). Clean URL +
 // .html alias; the success page resolves via the static /pages mount.
 app.get(['/custom-tees', '/custom-tees.html'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'pages', 'custom-tees.html'));
+  sendHashedHtml(res, path.join(__dirname, 'pages', 'custom-tees.html'));
 });
 
 // Catalog — dedicated URL-driven product discovery page (customer redesign P2,
 // 2026-06-11). Clean URL + .html alias; same pattern as /custom-tees.
 app.get(['/catalog', '/catalog.html'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'pages', 'catalog.html'));
+  sendHashedHtml(res, path.join(__dirname, 'pages', 'catalog.html'));
 });
 
 // Custom Hats — embroidered caps storefront (custom-caps channel, 2026-06-11).
 // Clean URL + .html alias; success page resolves via the static /pages mount.
 app.get(['/custom-caps', '/custom-caps.html'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'pages', 'custom-caps.html'));
+  sendHashedHtml(res, path.join(__dirname, 'pages', 'custom-caps.html'));
 });
 
 // Custom die-cut stickers — public, indexed storefront page (2026-07-24).
@@ -4645,7 +4690,7 @@ app.get(['/custom-caps', '/custom-caps.html'], (req, res) => {
 // links reps straight here. Both always read the same /api/sticker-pricing
 // grid, so there was never a second set of numbers to reconcile.
 app.get(['/custom-stickers', '/custom-stickers.html', '/stickers'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'pages', 'custom-stickers.html'));
+  sendHashedHtml(res, path.join(__dirname, 'pages', 'custom-stickers.html'));
 });
 
 // Custom vinyl banners — public, indexed storefront page (Phase 3, 2026-07-24).
@@ -4654,7 +4699,7 @@ app.get(['/custom-stickers', '/custom-stickers.html', '/stickers'], (req, res) =
 // with no volume break, so a quantity ladder would imply a discount that does
 // not exist. Boot payload: GET /api/public/banner-presets.
 app.get(['/custom-banners', '/custom-banners.html', '/banners'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'pages', 'custom-banners.html'));
+  sendHashedHtml(res, path.join(__dirname, 'pages', 'custom-banners.html'));
 });
 
 // Custom Carhartt — static SEO brand landing page (2026-07-12): curated
@@ -4827,7 +4872,7 @@ app.get('/sitemap-pages.xml', (req, res) => {
 // Customer quote cart — sessionStorage quote builder (quote-cart Phase 2,
 // 2026-06-11). Clean URL + .html alias; same pattern as /custom-tees.
 app.get(['/quote-cart', '/quote-cart.html'], (req, res) => {
-  res.sendFile(path.join(__dirname, 'pages', 'quote-cart.html'));
+  sendHashedHtml(res, path.join(__dirname, 'pages', 'quote-cart.html'));
 });
 
 // ── Customer order-status page (token link, no login — 2026-06-10) ──────────
@@ -7141,7 +7186,7 @@ app.get('/api/portal/:customerId/mockup/:id/threads', portalLimiter, resolvePort
 
 // Brands browse page
 app.get('/brands.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'brands.html'));
+  sendHashedHtml(res, path.join(__dirname, 'brands.html'));
 });
 
 // Phase 1 Infrastructure Test Pages — REMOVED 2026-08-05.
@@ -7206,13 +7251,13 @@ async function makeApiRequest(endpoint, method = 'GET', body = null) {
 // 1. First define the root route
 app.get('/', (req, res) => {
   console.log('Serving index.html for root route');
-  res.sendFile(path.join(__dirname, 'index.html'));
+  sendHashedHtml(res, path.join(__dirname, 'index.html'));
 });
 
 // Also serve index.html when accessed with .html extension
 app.get('/index.html', (req, res) => {
   console.log('Serving index.html for /index.html route');
-  res.sendFile(path.join(__dirname, 'index.html'));
+  sendHashedHtml(res, path.join(__dirname, 'index.html'));
 });
 
 // 2. API routes
