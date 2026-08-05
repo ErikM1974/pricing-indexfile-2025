@@ -5,6 +5,38 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## Releasing from a SHARED checkout: excluding a file cuts both ways (2026-08-04)
+
+**Problem.** Deploying the Embroidery Studio, the release also carried
+`quote-builders/monogram-form.html` — a parallel session's WIP that another session's
+`git add -A` had swept into `baafe9f3`. Shipping it would have put a **dead "Print Customer
+Proof" button** in front of reps (its controller/CSS were still in review on develop). Two
+further traps followed: `git checkout main` **aborted** because the shared tree was dirty with
+three sessions' edits, and the develop sync-back **silently reverted** the WIP the release had
+deliberately excluded.
+
+**Root cause.** A shared working tree makes branch-level operations sweep in work whose owner
+isn't in the room. And a merge that restores a file to main's version encodes "main's copy
+wins" — merging that commit back into develop faithfully replays the deletion.
+
+**Solution.** Cut the release at *my* verified sha in an isolated `git worktree`
+(`git merge --no-ff --no-commit <sha>` → `git checkout HEAD -- <foreign file>` → commit with the
+exclusion stated in the message), then on the sync-back re-take develop's copy
+(`git checkout origin/develop -- <file>`) before pushing.
+
+**Prevention.**
+- 🔑 **Never `git checkout <branch>` in a shared checkout — release from a `git worktree`.** Also
+  put that worktree at a SHORT path: `/Temp/nwca-rel` worked where the session scratchpad path
+  blew Windows MAX_PATH on a deep blog filename ("Filename too long", `Could not reset index`).
+- 🔑 **Every file-level exclusion needs a matching restore on the merge-back**, or the release
+  silently deletes the work it was protecting. Verify with `grep` for a marker from the WIP
+  *before* pushing the sync — not after.
+- 🔑 **Deploy the dependency first and prove it with a live probe**: the box-labels page needed
+  proxy `/api/sanmar-orders/label-data` — curl'd for HTTP 200 (and absence of `ContactEmail`)
+  before the app slug went out.
+
+---
+
 ## A corrupt file that "parses" becomes a silent wrong price — DST has no magic bytes (2026-08-04)
 
 **Problem.** Browser-verifying the contract calculator's new DST drop zone: 2,000 bytes of
