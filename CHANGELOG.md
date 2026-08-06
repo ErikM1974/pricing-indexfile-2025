@@ -1,3 +1,8 @@
+## v2026.08.06.7 (2026.08.06)
+
+- Memory: window.print() snapshots the DOM — await image decode first
+- Deploy v2026.08.06.7: DTG art charges (GRT-50 setup + GRT-75 design) — 16 files
+
 ## v2026.08.06.6 (2026.08.06)
 
 - Memory: print sheet has its own tile; mono-laser constraints
