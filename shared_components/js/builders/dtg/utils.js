@@ -162,6 +162,15 @@ export function escapeHtml(s) {
         .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
+// Design thumbnails come back as ABSOLUTE proxy Box urls, which 401 since the Box
+// surface was session-gated — cross-origin means the SAML cookie never travels.
+// boxUrl() re-points them at this origin, where the cookie authorises the <img>.
+// box-url.js is a classic script setting a global, so reach it off window; guarded
+// so a missing script tag degrades instead of throwing.
+export function resolveBoxUrl(u) {
+    return typeof window.boxUrl === 'function' ? window.boxUrl(u) : u;
+}
+
 export function fmtMoney(n) {
     if (!Number.isFinite(Number(n))) return '0.00';
     return Number(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');

@@ -10,7 +10,7 @@ import { scheduleStateSave } from './persistence.js';
 import { fetchBundle, schedulePriceUpdate } from './pricing.js';
 import { API_BASE, _colorsCache, _companySearchCache, _designsCacheByCustomer, _styleSearchCache, dtgIF, state } from './state.js';
 import { recomputeTaxRate } from './tax-shipping.js';
-import { escapeHtml, markDirty, positionPortaledMenu } from './utils.js';
+import { escapeHtml, markDirty, positionPortaledMenu, resolveBoxUrl } from './utils.js';
 
 // ── F2 a11y (2026-07-09): full combobox/listbox wiring for the portaled menus.
 // Menus re-render per keystroke, so roles/ids are (re)stamped after each paint
@@ -551,9 +551,10 @@ export function syncDesignThumbnail() {
     const designs = _designsCacheByCustomer.get(String(dtgIF._designComboboxCustomerId)) || [];
     const match = designs.find((d) => d.idDesign === designNum);
     if (match && match.thumbnailUrl) {
-        img.src = match.thumbnailUrl;
+        const thumbSrc = resolveBoxUrl(match.thumbnailUrl);
+        img.src = thumbSrc;
         img.alt = match.designName || `Design ${designNum}`;
-        anchor.href = match.thumbnailUrl;
+        anchor.href = thumbSrc;
         anchor.title = `${match.designName || 'Design ' + designNum} — click to enlarge`;
         anchor.hidden = false;
     } else {
@@ -577,7 +578,7 @@ function paintDesignMenuItems(cbx) {
         // eslint-disable-next-line no-unsanitized/property -- audited (Batch 5 move): every interpolation is escapeHtml()d, numeric, or static config
         cbx.menu.innerHTML = cbx.filtered.slice(0, 30).map((d, i) => {
             const thumb = d.thumbnailUrl
-                ? `<img class="dtg-design-row-thumb" src="${escapeHtml(d.thumbnailUrl)}" alt="" loading="lazy">`
+                ? `<img class="dtg-design-row-thumb" src="${escapeHtml(resolveBoxUrl(d.thumbnailUrl))}" alt="" loading="lazy">`
                 : `<div class="dtg-design-row-thumb dtg-design-row-thumb--blank"><i class="fas fa-image"></i></div>`;
             const meta = [];
             if (d.locationCount > 1) meta.push(`${d.locationCount} locations`);

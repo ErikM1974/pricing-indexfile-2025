@@ -38,6 +38,10 @@
     return String(s == null ? '' : s).replace(/[&<>"']/g, c =>
       ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   }
+  // Stored/returned Box urls are absolute proxy links that 401 since the Box surface
+  // was session-gated; boxUrl() re-points them at this origin so the session cookie
+  // authorises them. Guarded so a missing box-url.js tag degrades instead of throwing.
+  function resolveBoxUrl(u) { return (typeof boxUrl === 'function') ? boxUrl(u) : u; }
   function fmtNum(v) { return Math.round(Number(v) || 0).toLocaleString('en-US'); }
   function fmtMoney(v) { return '$' + (Math.round((Number(v) || 0) * 100) / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
   function fmtMoney0(v) { return '$' + Math.round(Number(v) || 0).toLocaleString('en-US'); }
@@ -646,7 +650,11 @@
         if (!resp.ok) continue;
         const j = await resp.json();
         const th = j.thumbnails || {};
-        for (const k in th) { if (th[k] && th[k].found && th[k].imageUrl) map[k] = th[k].imageUrl; }
+        // /api/thumbnails returns an ABSOLUTE proxy Box url, which 401s cross-origin
+        // since the Box surface was session-gated — the <img> then falls back to the
+        // "no artwork" tile, on screen AND in the printed sheet. Normalise once here,
+        // at ingest, so every consumer (screen tile + print/PDF) gets a working url.
+        for (const k in th) { if (th[k] && th[k].found && th[k].imageUrl) map[k] = resolveBoxUrl(th[k].imageUrl); }
       }
       orders.forEach(o => { const b = String(o.designNumber || '').split('.')[0]; if (map[b]) o.logoUrl = map[b]; });
     } catch (e) { console.warn('Inbound logo fetch failed (non-blocking):', e); }

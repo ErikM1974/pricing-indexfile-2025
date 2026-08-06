@@ -72,6 +72,11 @@
             .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
+    // Stored Caspio rows hold absolute proxy Box urls that 401 since the Box
+    // surface was session-gated; boxUrl() re-points them at this origin so the
+    // session cookie authorises the <img>. Guarded so a missing box-url.js
+    // script tag degrades instead of throwing.
+    function resolveBoxUrl(u) { return (typeof boxUrl === 'function') ? boxUrl(u) : u; }
     function money0(v) {
         if (v == null) return '—';
         return '$' + Math.round(Number(v) || 0).toLocaleString('en-US');
@@ -1233,8 +1238,11 @@
                 }
                 host.innerHTML = '<div class="mc-photo-grid">' + photos.map(function (p) {
                     var cap = p.companyName || p.designName || '';
-                    return '<a class="mc-photo" href="' + esc(p.imageUrl || '#') + '" target="_blank" rel="noopener" ' +
-                        'title="' + esc(cap) + '"><img src="' + esc(p.imageUrl || '') + '" alt="' + esc(cap) +
+                    // Stored Image_URL is an absolute proxy url that 401s cross-origin since
+                    // the Box surface was session-gated; boxUrl() brings it to this origin.
+                    var src = resolveBoxUrl(p.imageUrl || '');
+                    return '<a class="mc-photo" href="' + esc(src || '#') + '" target="_blank" rel="noopener" ' +
+                        'title="' + esc(cap) + '"><img src="' + esc(src) + '" alt="' + esc(cap) +
                         '" loading="lazy"><span class="mc-photo-cap">' + esc(cap) + '</span></a>';
                 }).join('') + '</div>';
             }).catch(function (err) {

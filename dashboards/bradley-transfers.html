@@ -148,8 +148,11 @@
          the "+ Send Another" button injected by ?view=steve. EmailJS is
          needed so the submit notification email actually fires. -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <script src="/shared_components/js/transfer-actions-shared.js?v=2026.08.05.19"></script>
+    <!-- Normalises stored absolute proxy Box urls onto this origin so the session-gated
+         forwarder authorises them. Must precede both consumers below. -->
+    <script src="/shared_components/js/box-url.js?v=2026.08.06.1"></script>
+    <script src="/shared_components/js/transfer-actions-shared.js?v=2026.08.06.2"></script>
     <script src="/shared_components/js/caspio-date-utils.js?v=1"></script>
-    <script src="/dashboards/js/bradley-transfers.js?v=18"></script>
+    <script src="/dashboards/js/bradley-transfers.js?v=2026.08.06.2"></script>
 </body>
 </html>

@@ -31,6 +31,16 @@ import { updateLogoCardHeader } from './product-rows.js';
 import { embState } from './state.js';
 //  it resolves via window at click time; the monolith still owns it.)
 
+// A design's preview falls back through mockupUrl → dstPreviewUrl → thumbnailUrl →
+// artworkUrl. The first is a public box.com share link and renders fine; thumbnailUrl
+// is an ABSOLUTE proxy Box url that 401s since the Box surface was session-gated, so
+// designs without a mockup silently lose their preview. boxUrl() re-points those at
+// this origin and leaves the public box.com links untouched, so it is safe to apply
+// to whichever branch wins. Guarded: a missing box-url.js tag degrades, not throws.
+function resolveBoxUrl(u) {
+    return typeof window.boxUrl === 'function' ? window.boxUrl(u) : u;
+}
+
 // ============================================================
 // DESIGN NUMBER LOOKUP / SEARCH
 // ============================================================
@@ -398,7 +408,7 @@ async function applyDesignToCard(type, designNum, design) {
     showToast('Design #' + designNum + ' linked — ' + (company || 'design found'), 'success');
 
     // Use thumbnail from enriched /lookup response (faster, no extra API call)
-    const thumbUrl = design.mockupUrl || design.dstPreviewUrl || design.thumbnailUrl || design.artworkUrl || '';
+    const thumbUrl = resolveBoxUrl(design.mockupUrl || design.dstPreviewUrl || design.thumbnailUrl || design.artworkUrl || '');
     if (thumbUrl) {
         showDesignThumbnail(type, thumbUrl);
         if (type === 'garment') {
@@ -822,7 +832,7 @@ function renderDesignSearchGrid(designs) {
  */
 function buildDesignSearchCardHtml(d) {
     const dn = escapeHtml(String(d.designNumber));
-    const previewUrl = d.mockupUrl || d.artworkUrl || d.thumbnailUrl || null;
+    const previewUrl = resolveBoxUrl(d.mockupUrl || d.artworkUrl || d.thumbnailUrl || null);
     const thumbHtml = previewUrl
         ? '<img src="' + escapeHtml(previewUrl) + '" alt="Design #' + dn + '" onerror="this.parentElement.innerHTML=\'<i class=\\\'fas fa-image\\\'></i>\'">'
         : '<i class="fas fa-image"></i>';
@@ -1018,7 +1028,7 @@ export async function selectDesignFromSearch(designNum) {
         if (input) input.value = designNum;
 
         // Show thumbnail instantly from partial cache
-        const previewUrl = cached?.mockupUrl || cached?.artworkUrl || cached?.thumbnailUrl || null;
+        const previewUrl = resolveBoxUrl(cached?.mockupUrl || cached?.artworkUrl || cached?.thumbnailUrl || null);
         if (previewUrl) {
             showDesignThumbnail(_designSearchTarget, previewUrl);
             if (_designSearchTarget === 'garment') embState.primaryLogo.thumbnailUrl = previewUrl;
