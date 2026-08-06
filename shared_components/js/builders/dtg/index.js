@@ -18,10 +18,19 @@
 import { QuoteBuilderBase } from '../shared/quote-builder-base.js';
 import { DtgAdapter } from './adapter.js';
 import { showErrorBanner, hideErrorBanner, showFallbackPricingWarning } from '../shared/errors.js';
+import { loadServiceCodePrices, getServicePrice } from '../shared/service-codes.js';
 
 window.showErrorBanner = showErrorBanner;
 window.hideErrorBanner = hideErrorBanner;
 window.showFallbackPricingWarning = showFallbackPricingWarning;
+
+// [2026-08-06] Service_Codes bridge — DTG was the ONLY builder entry point without
+// one (EMB/DTF/SCP have bridged it since Batch 3.5), because DTG had no Caspio-priced
+// fees until the GRT-50 / GRT-75 art charges landed. quote-builder-utils.js's
+// warnIfServiceCodeMissing() reads window._serviceCodes, and the adapter kicks the
+// fetch — without these two lines the art charges would sit on their fallback rates.
+window.loadServiceCodePrices = loadServiceCodePrices;
+window.getServicePrice = getServicePrice;
 
 new QuoteBuilderBase(new DtgAdapter()).init();
 

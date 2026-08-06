@@ -21,7 +21,11 @@ const ALLOWLISTS = {
   dtf: {},
   dtg: {
     // measured 2026-07-09 at the Batch 5 decomposition (monolith → 10 modules)
-    'form-core.js:render': 383, // one cohesive HTML template (rubric's justified case, like emb renderImportPreview)
+    // 383 → 384 on 2026-08-06: the art-charge section (GRT-50/GRT-75) added ONE line
+    // to the template — a `${renderArtFeeSection()}` call, with the ~40 lines of markup
+    // extracted into that function rather than inlined. Ratchet intent intact: the next
+    // section that wants to grow render() has to earn its line the same way.
+    'form-core.js:render': 384, // one cohesive HTML template (rubric's justified case, like emb renderImportPreview)
   },
   shared: {},
 };

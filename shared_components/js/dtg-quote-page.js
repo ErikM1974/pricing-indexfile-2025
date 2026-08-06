@@ -1462,6 +1462,19 @@ const AI_ENDPOINT = '/api/dtg-quote-ai/chat';
             // carry no shippingFee → 0 (no SHIP item, unchanged).
             const shippingFee = Number(priceQuote.shippingFee) || 0;
 
+            // [2026-08-06] Art charges (Caspio GRT-50 setup + GRT-75 design). They ride
+            // in the SESSION COLUMNS (not fee line items) exactly like DTF/EMB, because
+            // quote-view.js + invoice.js already render "Logo Mockup & Print Review" and
+            // "Graphic design services" from ArtCharge / GraphicDesignCharge — and their
+            // fee-item catch-all SUPPRESSES those codes once the columns are non-zero, so
+            // writing both would double-bill the customer. Unlike shipping (which the
+            // readers detect only via the SHIP item and add on top), these columns are
+            // expected to be INSIDE TotalAmount — hence the TotalAmount below.
+            const artCharge = Number(priceQuote.artCharge) || 0;
+            const graphicDesignCharge = Number(priceQuote.graphicDesignCharge) || 0;
+            const graphicDesignHours = Number(priceQuote.graphicDesignHours) || 0;
+            const artFeesTotal = Math.round((artCharge + graphicDesignCharge) * 100) / 100;
+
             // Phase 11.6 (Erik 2026-05-24): edit-reopen mode — when the rep
             // loaded the form via /quote-builders/dtg-quote-builder.html?edit=DTG-NNN,
             // dtg-inline-form set window._dtgEditingQuoteId + _dtgEditingPK_ID
@@ -1495,9 +1508,16 @@ const AI_ENDPOINT = '/api/dtg-quote-ai/chat';
                 // TotalAmount), so round to the nominal whole-dollar fee — recovers ~$50 and satisfies
                 // the integer column. (Fix for the qty<24 save-400 found in DTG Phase 2 live testing.)
                 LTMFeeTotal: Math.round(lineItems.reduce((s, it) => s + (Number(it.ltmPerUnit) * Number(it.totalQuantity) || 0), 0)),
-                // PRE-tax, products-only (matches EMB/SCP/DTF). EXCLUDES shipping — the SHIP line
-                // item carries it. /quote + /invoice add SHIP + TaxAmount on top → grand foots.
-                TotalAmount: subtotal,
+                // PRE-tax (matches EMB/SCP/DTF). EXCLUDES shipping — the SHIP line item carries
+                // it. INCLUDES the art charges, which the readers render from the columns below
+                // and do NOT re-add. /quote + /invoice compute grand = TotalAmount + SHIP +
+                // TaxAmount → foots to the on-screen total. With no art charge this is `subtotal`,
+                // byte-identical to the pre-2026-08-06 behaviour.
+                TotalAmount: Math.round((subtotal + artFeesTotal) * 100) / 100,
+                // [2026-08-06] Art-department charges — same columns DTF/EMB write.
+                ArtCharge: artCharge,
+                GraphicDesignHours: graphicDesignHours,
+                GraphicDesignCharge: graphicDesignCharge,
                 // [2026-06-08] Phase 1 Chunk C — persist tax so saved record + /quote + /invoice
                 // + push agree. TaxRate is a DECIMAL (0.101) like EMB; readers normalize >1?/100.
                 TaxRate: taxRate,
@@ -1512,6 +1532,13 @@ const AI_ENDPOINT = '/api/dtg-quote-ai/chat';
                     // Chunk E (edit-reload) restores these so a reopened exempt/wholesale/
                     // out-of-state quote doesn't silently revert to 10.2% Milton pickup.
                     shipping: priceQuote.shipping || null,
+                    // [2026-08-06] Art-charge COUNTS for edit-reload. The COUNTS are canonical,
+                    // not the dollars: reopening reprices them off the live Caspio rate, so a
+                    // Service_Codes price change flows into a revision like every other price.
+                    fees: {
+                        artSetupQty: Number(priceQuote.artSetupQty) || 0,
+                        designHours: graphicDesignHours,
+                    },
                     tax: {
                         isWholesale,
                         isTaxExempt: !!priceQuote.isTaxExempt,

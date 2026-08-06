@@ -4,6 +4,7 @@
  */
 /* global alert,
    emailQuote, markAsSaved, EmbroideryInvoiceGenerator */
+import { artFeeAddOns, artFeeTotals } from './fees.js';
 import { effectiveLocationCode, effectiveLocationLabel, isRowColorInvalid, updateSubmitEnabled } from './form-core.js';
 import { clearSessionState, getQuoteID } from './persistence.js';
 import { computePriceQuoteFromState } from './pricing.js';
@@ -219,9 +220,15 @@ export async function dtgPrintQuote() {
         // preTaxSubtotal = products + fee (the TAXED base → shipping is taxed in WA),
         // shippingFee = fee (the display row). Pickup → effectiveShipFee() = 0 (no change).
         const shipFee = effectiveShipFee();
-        const preTaxWithShip = Math.round((invoiceSubtotal + shipFee) * 100) / 100;
+        // [2026-08-06] Art charges ride into the SAME pre-tax base as shipping: the
+        // generator taxes preTaxSubtotal and prints "Logo Mockup & Review" +
+        // "Graphic Design (N hrs × $R/hr)" rows off artCharge/graphicDesignCharge,
+        // then closes with Subtotal = that base. Read from the ONE authority so the
+        // printed PDF foots to the on-screen total to the cent.
+        const artFees = artFeeTotals();
+        const preTaxWithShip = Math.round((invoiceSubtotal + artFees.total + shipFee) * 100) / 100;
         // Contract derives isDTG from method, normalizes tax, and zero-fills
-        // any fee fields not set here (artCharge, rushFee, discount, etc.).
+        // any fee fields not set here (rushFee, discount, etc.).
         const pricingData = window.QuotePricingData.buildPricingData({
             method: 'DTG',
             quoteId: getQuoteID() || `DTG-PREVIEW-${Date.now()}`,
@@ -238,7 +245,12 @@ export async function dtgPrintQuote() {
             grandTotal: invoiceSubtotal,
             preTaxSubtotal: preTaxWithShip,
             taxRate: Number(state.shipping?.taxRate) || 0,
-            shippingFee: shipFee
+            shippingFee: shipFee,
+            // Art charges — the generator renders one row each and includes both in
+            // the closing Subtotal (= preTaxSubtotal above), so they're taxed.
+            artCharge: artFees.artCharge,
+            graphicDesignCharge: artFees.graphicDesignCharge,
+            graphicDesignHours: artFees.designHours
         });
 
         const customerData = {
@@ -362,15 +374,21 @@ function computeSubmitMoney(items, pricing) {
     // effectiveShipFee() is 0 for pickup. server.js maps ship.fee → cur_Shipping and
     // breakdown.shipping → the Notes "Shipping (taxable)" line + taxable base.
     const shipFee = effectiveShipFee();
-    const taxBase = Math.round((subtotal + shipFee) * 100) / 100;
+    // [2026-08-06] Art charges (GRT-50 / GRT-75) — taxable, so they join the push's
+    // tax base too, and the ShopWorks order + Notes On Order foot to the same total
+    // the rep saw. The charges themselves reach ShopWorks as addOns (buildSubmitBody),
+    // which server.js prices from Service_Codes: FLAT → qty × SellPrice, i.e. exactly
+    // artFeeTotals(). Counts are the whole reason a typed dollar amount was rejected.
+    const artFees = artFeeTotals();
+    const taxBase = Math.round((subtotal + artFees.total + shipFee) * 100) / 100;
     const taxEstimate = Math.round(taxBase * (Number.isFinite(taxRate) ? taxRate : 0) * 100) / 100;
     const grandTotal = Math.round((taxBase + taxEstimate) * 100) / 100;
-    return { subtotal, ltmTotal, taxRate, shipFee, taxEstimate, grandTotal };
+    return { subtotal, ltmTotal, taxRate, shipFee, artFees, taxEstimate, grandTotal };
 }
 
 function buildSubmitBody(ctx) {
     const { pricing, items, rows, byRow, rep, shipMethodLabel, isPickup,
-        subtotal, ltmTotal, taxRate, shipFee, taxEstimate, grandTotal } = ctx;
+        subtotal, ltmTotal, taxRate, shipFee, artFees, taxEstimate, grandTotal } = ctx;
     const body = {
         info: {
             company: state.customer.company || '',
@@ -473,7 +491,13 @@ function buildSubmitBody(ctx) {
             taxEstimate,
             depositDue: 0,
             grandTotal,
-            fees: [],
+            // [2026-08-06] Art charges, itemised for the audit trail / retry payload.
+            // The BILLING copy is addOns below (server.js only reads that); this
+            // mirrors it so a copied payload explains where the dollars came from.
+            fees: [
+                ...(artFees.artCharge > 0 ? [{ code: 'GRT-50', label: 'Art setup / logo mockup', qty: artFees.artSetupQty, unitPrice: artFees.artSetupRate, amount: artFees.artCharge }] : []),
+                ...(artFees.graphicDesignCharge > 0 ? [{ code: 'GRT-75', label: 'Graphic design', qty: artFees.designHours, unitPrice: artFees.designRate, amount: artFees.graphicDesignCharge }] : []),
+            ],
             errors: [],
         },
         methodNotesBlock: `DTG · ${effectiveLocationLabel()} · Tier ${pricing.tier} · ${items.length} line${items.length === 1 ? '' : 's'} · ${pricing.combinedQuantity} combined pieces · Ship: ${shipMethodLabel}`,
@@ -483,7 +507,11 @@ function buildSubmitBody(ctx) {
         // before opening the order details.
         printLocations: effectiveLocationLabel(),
         designNumbers: state.customer.designNumber ? [state.customer.designNumber] : [],
-        addOns: [],
+        // [2026-08-06] Art charges → ShopWorks LinesOE. server.js resolves each code
+        // against Caspio Service_Codes (GRT-50 + GRT-75 are both PricingMethod FLAT →
+        // line price = qty × SellPrice), so what ShopWorks bills equals what the rep
+        // quoted. Empty array when no art charge is on the quote (unchanged behaviour).
+        addOns: artFeeAddOns(),
     };
     return body;
 }

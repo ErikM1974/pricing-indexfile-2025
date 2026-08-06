@@ -145,6 +145,15 @@ export const state = {
         dropDeadDate: '',    // optional customer event date
         autoDueDate: true,   // true = recompute on qty change; false = rep manually overrode
     },
+    // [2026-08-06] Art-department charges. COUNTS ONLY — the dollars come from
+    // the live Caspio Service_Codes rate via fees.js artFeeTotals(), so a price
+    // change in Caspio reprices every open quote with no deploy (Pricing=API).
+    // Taxable in WA: they're part of the retail sale, so they enter the tax base
+    // alongside products + shipping (parity with EMB/DTF/SCP).
+    fees: {
+        artSetupQty: 0,  // GRT-50 — # of art setups / logo mockups (0 = not charged)
+        designHours: 0,  // GRT-75 — graphic-design hours (0.5 steps)
+    },
     // New-artwork upload (Erik 2026-05-20).
     // Used when the rep has NEW artwork (not in Design_Lookup_2026 / no
     // ShopWorks id_Design yet). Frontend uploads file(s) to Caspio via

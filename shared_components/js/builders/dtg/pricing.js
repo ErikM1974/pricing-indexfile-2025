@@ -3,7 +3,8 @@
  * dtg-inline-form.js IIFE; lexical references became the imports below.
  */
 /* global */
-import { effectiveLocationCode, effectiveLocationLabel, isRowColorInvalid, renderBand, renderTable, syncDueDateFromQty, updateSubmitEnabled } from './form-core.js';
+import { effectiveLocationCode, effectiveLocationLabel, isRowColorInvalid, renderBand, renderTable, syncDueDateFromQty, updateArtFeeDisplay, updateSubmitEnabled } from './form-core.js';
+import { artFeeTotals } from './fees.js';
 import { _bundleCache, dtgIF, state } from './state.js';
 import { effectiveShipFee } from './tax-shipping.js';
 import { escapeHtml, fmtMoney, isPickupMethod, shipLabel } from './utils.js';
@@ -46,6 +47,10 @@ export function renderSummary() {
     const cq = combinedQty();
     // Recompute due date based on current qty (auto-mode only).
     syncDueDateFromQty();
+    // [2026-08-06] Repaint the art-charge rates/line totals BEFORE the empty-form
+    // early return, so the GRT-50/GRT-75 rates fill in the moment
+    // /api/service-codes resolves — even on a form with no rows yet.
+    updateArtFeeDisplay();
     if (cq === 0) {
         el.innerHTML = `<div class="dps-empty">Add at least one row with sizes to see live pricing.</div>`;
         updateSubmitEnabled();
@@ -76,8 +81,13 @@ export function renderSummary() {
     // fee enters the tax BASE here, NOT added after tax. effectiveShipFee() is 0 for
     // pickup. Same base formula at submit / PDF / save so the 4 sites can't desync.
     const shipFee = effectiveShipFee();
+    // [2026-08-06] Art charges (GRT-50 setup + GRT-75 design) are part of the retail
+    // sale, so they're TAXABLE in WA and enter the tax BASE here — same treatment
+    // EMB/DTF/SCP give them (both sit inside their preTaxSubtotal). Same base formula
+    // at submit / PDF / save so the sites can't desync.
+    const artFees = artFeeTotals();
     const taxRate = Number(state.shipping.taxRate);
-    const taxBase = Math.round((subtotal + shipFee) * 100) / 100;
+    const taxBase = Math.round((subtotal + artFees.total + shipFee) * 100) / 100;
     const taxEstimate = Math.round(taxBase * (Number.isFinite(taxRate) ? taxRate : 0) * 100) / 100;
     const grandTotal = Math.round((taxBase + taxEstimate) * 100) / 100;
     const taxPct = (taxRate * 100).toFixed(taxRate * 100 < 10 ? 1 : 2);
@@ -108,6 +118,8 @@ export function renderSummary() {
         </div>
         <div class="dps-totals-rows">
             <div class="dps-totals-row"><span>Subtotal</span><span class="dps-mono">$${fmtMoney(subtotal)}</span></div>
+            ${artFees.artCharge > 0 ? `<div class="dps-totals-row dps-fee-row"><span>Art setup (${artFees.artSetupQty} × $${fmtMoney(artFees.artSetupRate)})</span><span class="dps-mono">$${fmtMoney(artFees.artCharge)}</span></div>` : ''}
+            ${artFees.graphicDesignCharge > 0 ? `<div class="dps-totals-row dps-fee-row"><span>Graphic design (${artFees.designHours} hrs × $${fmtMoney(artFees.designRate)}/hr)</span><span class="dps-mono">$${fmtMoney(artFees.graphicDesignCharge)}</span></div>` : ''}
             ${shipFee > 0 ? `<div class="dps-totals-row dps-ship-row"><span>Shipping</span><span class="dps-mono">$${fmtMoney(shipFee)}</span></div>` : ''}
             <div class="dps-totals-row dps-tax-row"><span>${taxLabel}</span><span class="dps-mono">$${fmtMoney(taxEstimate)}</span></div>
             <div class="dps-totals-row dps-grand-row"><span>Order total</span><span class="dps-mono">$${fmtMoney(grandTotal)}</span></div>
@@ -342,7 +354,12 @@ export function computePriceQuoteFromState() {
     // so the SAVE (handleSaveQuote reads this) + the PDF foot to the same number the screen
     // shows. effectiveShipFee() is 0 for pickup. subtotal stays products-only (→ SubtotalAmount).
     const shippingFee = effectiveShipFee();
-    const taxBase = Math.round((subtotal + shippingFee) * 100) / 100;
+    // [2026-08-06] Art charges from the ONE authority (fees.js) — taxable, so they
+    // join the base here too. subtotal stays products-only (→ SubtotalAmount); the
+    // save adds these into TotalAmount and writes the ArtCharge/GraphicDesign*
+    // session columns so /quote + /invoice render + foot them (DTF parity).
+    const artFees = artFeeTotals();
+    const taxBase = Math.round((subtotal + artFees.total + shippingFee) * 100) / 100;
     const taxAmount = Math.round(taxBase * taxRate * 100) / 100;
     const grandTotal = Math.round((taxBase + taxAmount) * 100) / 100;
     return {
@@ -350,6 +367,15 @@ export function computePriceQuoteFromState() {
         combinedQuantity,
         subtotal,
         shippingFee,
+        // Art charges — flat fields so handleSaveQuote + the invoice builder read
+        // them without reaching back into state (screen == saved == printed).
+        artSetupQty: artFees.artSetupQty,
+        artSetupRate: artFees.artSetupRate,
+        artCharge: artFees.artCharge,
+        graphicDesignHours: artFees.designHours,
+        graphicDesignRate: artFees.designRate,
+        graphicDesignCharge: artFees.graphicDesignCharge,
+        artFeesTotal: artFees.total,
         grandTotal,
         totalLtmFee,
         tier: (dtgIF._lastTier && (dtgIF._lastTier.TierLabel || dtgIF._lastTier.tierLabel)) || 'Standard',
@@ -365,6 +391,6 @@ export function computePriceQuoteFromState() {
         isWholesale: !!(state.customer && state.customer.isWholesale),
         isTaxExempt: !!(state.customer && state.customer.isTaxExempt),
         taxExemptNumber: (state.customer && state.customer.taxExemptNumber) || '',
-        totals: { subtotal, shippingFee, taxRate, taxAmount, grandTotal },
+        totals: { subtotal, artFeesTotal: artFees.total, shippingFee, taxRate, taxAmount, grandTotal },
     };
 }
