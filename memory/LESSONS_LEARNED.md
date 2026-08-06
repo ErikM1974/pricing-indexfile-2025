@@ -32,6 +32,20 @@ of 18 found, and the 2 remaining genuinely have no row.
   real when single-id queries returned artwork the batch had denied.
 - 🔑 A mock that ignores `q.limit` cannot catch this — the regression test makes the fake Caspio
   honour the limit, so it fails against the old code (verified by reverting).
+- 🔑 **Same route file, same disease: `/thumbnails/sync-status` reported `totalRecords: 20000`,
+  which was `maxPages 20 × 1000` — the CAP, presented as a count** (true size 27,665). It also
+  counted `recordsWithImages` off **`ExternalKey`, the retired Caspio Files key**, so it answered
+  "0 of 20,000 have images" about a table where 26,990 do — artwork moved to Box and lives in
+  `FileUrl`. **A metric outliving its schema reads as a catastrophe rather than a stale field.**
+  Now counts `ExternalKey || FileUrl`, `strict: true` so truncation throws, and counts are opt-in
+  behind `?counts=true` (a count means ~28 Caspio reads; `lastSync` is one).
+- 🔑 **Caspio v2 does NOT return `TotalRecords`** on a `q.limit=1` read — the body is just
+  `Result`, and `makeCaspioRequest` strips even that. There is no cheap COUNT; verify before
+  designing around one. Use `discardResults: true` + `pageCallback` to count without holding
+  27k rows in dyno memory.
+- 🔑 **`lastSync` is the field that actually answers "is the sync stalled?"** — it showed the
+  bandit thumbnail sync running 09:22 the same morning, which proved the two remaining blank
+  designs had no artwork attached in ShopWorks rather than a sync lag.
 
 ---
 
