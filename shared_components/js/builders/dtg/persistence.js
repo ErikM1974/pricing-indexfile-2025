@@ -6,7 +6,8 @@
    markAsUnsaved, markAsSaved, showToast,
    */
 import { fetchProductColors, fuzzyMatchColor, kickInventoryFetch } from './catalog-search.js';
-import { effectiveLocationCode, newBlankRow, render, renderLocationPills, renderTable, updateSubmitEnabled } from './form-core.js';
+import { artFeeTotals } from './fees.js';
+import { effectiveLocationCode, newBlankRow, render, renderLocationPills, renderTable, syncArtFeeInputsFromState, updateSubmitEnabled } from './form-core.js';
 import { genericConfirm } from './output.js';
 import { combinedQty, fetchBundle, renderSummary, schedulePriceUpdate } from './pricing.js';
 import { QUOTEID_KEY, STATE_KEY, STATE_VERSION, _designsCacheByCustomer, dtgIF, state } from './state.js';
@@ -36,6 +37,9 @@ export function scheduleStateSave() {
                 })),
                 customer: state.customer,
                 shipping: state.shipping,
+                // [2026-08-06] Art-charge COUNTS (GRT-50 setups / GRT-75 hours). Rates
+                // are deliberately NOT stored — a resumed draft reprices off live Caspio.
+                fees: state.fees,
             }));
         } catch (e) { /* quota or disabled storage — ignore */ }
     }, 500);
@@ -62,6 +66,9 @@ export function restoreStateFromSession() {
             sanitizeLocationState(); // stale session may hold FF_JB/JF_FB
             if (snap.customer) state.customer = { ...state.customer, ...snap.customer };
             if (snap.shipping) state.shipping = { ...state.shipping, ...snap.shipping };
+            // Merged (not assigned) so a pre-2026-08-06 snapshot with no `fees` key
+            // keeps the zeroed defaults instead of blowing up artFeeTotals().
+            if (snap.fees) state.fees = { ...state.fees, ...snap.fees };
             return true;
         }
     } catch (e) {
@@ -309,6 +316,10 @@ export function resetForm() {
         dropDeadDate: '',
         autoDueDate: true,
     };
+    // [2026-08-06] Art charges — MUST reset, or a prior quote's setup/design counts
+    // bleed into the next "New Quote" and silently bill it (same reset-bleed class
+    // as the Phase 1 tax flags and the Phase 2 shipping fee above).
+    state.fees = { artSetupQty: 0, designHours: 0 };
     // New-artwork upload state: clear all uploaded files + design name.
     state.newArtwork = {
         designName: '',
@@ -366,6 +377,28 @@ function restoreEditShipTaxControls() {
         if (feeEl) feeEl.value = Number(state.shipping.fee) > 0 ? Number(state.shipping.fee).toFixed(2) : '';
         if (typeof syncPickupToggleFromShipMethod === 'function') syncPickupToggleFromShipMethod();
     } catch (_) { /* controls may be absent on older markup */ }
+}
+
+// D-companion to restoreEditShipTaxControls: pull the art-charge counts back out of
+// a saved quote and re-sync the (already-rendered) inputs.
+function restoreEditArtFees(notes, session) {
+    const savedFees = (notes && notes.fees) || {};
+    let setupQty = Math.floor(Number(savedFees.artSetupQty) || 0);
+    let designHours = Number(savedFees.designHours) || 0;
+
+    // Legacy fallback — a record saved before Notes.fees. GraphicDesignHours IS the
+    // count. For GRT-50 only the DOLLARS were stored, so recover the count from the
+    // live rate; guard the divide so a missing/zero rate can't produce Infinity.
+    if (!setupQty) {
+        const savedArt = parseFloat(session && session.ArtCharge) || 0;
+        const rate = artFeeTotals().artSetupRate;
+        if (savedArt > 0 && rate > 0) setupQty = Math.max(1, Math.round(savedArt / rate));
+    }
+    if (!designHours) designHours = Number(parseFloat(session && session.GraphicDesignHours)) || 0;
+
+    state.fees.artSetupQty = setupQty > 0 ? setupQty : 0;
+    state.fees.designHours = designHours > 0 ? designHours : 0;
+    if (typeof syncArtFeeInputsFromState === 'function') syncArtFeeInputsFromState();
 }
 
 function restoreEditPrintLocation(items) {
@@ -543,6 +576,14 @@ export async function loadSavedDtgQuoteForEdit(quoteId, opts = {}) {
     if (savedTax.taxAccount) state.shipping.taxAccount = savedTax.taxAccount;
     if (savedTax.taxAccountName) state.shipping.taxAccountName = savedTax.taxAccountName;
     restoreEditShipTaxControls();
+
+    // [2026-08-06] Restore the art-charge COUNTS. Without this a reopened quote loses
+    // its GRT-50/GRT-75 charges and Save Revision silently drops them off the total.
+    // Notes.fees is the canonical source (counts survive a Caspio rate change);
+    // the ArtCharge / GraphicDesignHours columns are the fallback for any record
+    // written before Notes.fees existed. Dollars are always re-derived from the
+    // LIVE rate, so a reopened quote reprices exactly like the rest of the builder.
+    restoreEditArtFees(notes, session);
 
     restoreEditPrintLocation(items);
 

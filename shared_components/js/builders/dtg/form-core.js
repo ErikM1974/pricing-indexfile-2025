@@ -8,12 +8,13 @@
 import { attachNewArtworkUpload } from './artwork.js';
 import { attachColorCombobox, attachCompanyCombobox, attachDesignCombobox, attachStyleCombobox, closeDesignLightbox, fuzzyMatchColor, kickInventoryFetch, openDesignLightbox, refreshDesignComboboxForNewCustomer } from './catalog-search.js';
 import { applyContact, populateContactPicker, wireHistoryPillHandlers } from './crm.js';
+import { artFeeTotals } from './fees.js';
 import { dtgEmailQuote, dtgPrintQuote, submitToShopWorks } from './output.js';
 import { fillFromQuote, getQuoteID, getState, loadSavedDtgQuoteForEdit, resetForm, restoreStateFromSession, scheduleStateSave, showResumeBanner } from './persistence.js';
 import { combinedQty, computePriceQuoteFromState, fetchBundle, findNextTier, renderSummary, schedulePriceUpdate } from './pricing.js';
 import { BACK_LOCATIONS, FRONT_LOCATIONS, LOCATION_LABELS, SALES_REPS, SHIP_METHODS, STANDARD_SIZES, _designsCacheByCustomer, dtgIF, state } from './state.js';
 import { effectiveShipFee, recomputeTaxRate, syncPickupToggleFromShipMethod, syncShipFeeFromDom } from './tax-shipping.js';
-import { clearDirty, computeAutoDueDate, dueDateAutoLabel, escapeHtml, isComboSupported, isPickupMethod, markDirty, parseBulkSizes, sanitizeLocationState, showToastSafe } from './utils.js';
+import { clearDirty, computeAutoDueDate, dueDateAutoLabel, escapeHtml, fmtMoney, isComboSupported, isPickupMethod, markDirty, parseBulkSizes, sanitizeLocationState, showToastSafe } from './utils.js';
 
 export function newBlankRow() {
     return {
@@ -77,6 +78,53 @@ export function isRowColorInvalid(row) {
     return !row.catalogColor || String(row.catalogColor).trim().length === 0;
 }
 
+// [2026-08-06] Art charges — Caspio Service_Codes GRT-50 (art setup / logo mockup)
+// + GRT-75 (graphic design, per hour). Its own function so render() stays inside the
+// builders-function-length ratchet.
+//
+// The rep enters COUNTS; every DOLLAR on screen is written by updateArtFeeDisplay()
+// from the live rate, so nothing in this markup hardcodes a price — the "× —"
+// placeholders are replaced the moment /api/service-codes resolves. Counts (not a
+// typed amount) so the ShopWorks push bills the identical figure — see fees.js.
+function renderArtFeeSection() {
+    const qty = Math.floor(Number(state.fees.artSetupQty) || 0);
+    const hours = Number(state.fees.designHours) || 0;
+    return `
+            <section class="dtg-art-fees" id="dtgArtFees">
+                <div class="daf-label">
+                    <i class="fas fa-palette"></i> Art charges
+                    <span class="daf-sub">from Caspio Service_Codes · taxable · pushes to ShopWorks</span>
+                </div>
+                <div class="daf-row">
+                    <label class="daf-toggle" for="dtgArtSetupToggle">
+                        <input type="checkbox" id="dtgArtSetupToggle"${qty > 0 ? ' checked' : ''}>
+                        <span>Art setup <span class="daf-note">logo mockup &amp; review</span></span>
+                        <span class="daf-code">GRT-50</span>
+                    </label>
+                    <div class="daf-calc" id="dtgArtSetupCalc">
+                        <input type="number" id="dtgArtSetupQty" min="0" max="99" step="1" inputmode="numeric"
+                               aria-label="Number of art setups" autocomplete="off" placeholder="0"
+                               value="${qty > 0 ? qty : ''}"${qty > 0 ? '' : ' disabled'}>
+                        <span class="daf-rate" id="dtgArtSetupRate">× —</span>
+                        <span class="daf-line-total" id="dtgArtSetupTotal">$0.00</span>
+                    </div>
+                </div>
+                <div class="daf-row">
+                    <label class="daf-toggle daf-toggle-plain" for="dtgDesignHours">
+                        <span>Graphic design</span>
+                        <span class="daf-code">GRT-75</span>
+                    </label>
+                    <div class="daf-calc">
+                        <input type="number" id="dtgDesignHours" min="0" max="100" step="0.5" inputmode="decimal"
+                               aria-label="Graphic design hours" autocomplete="off" placeholder="0"
+                               value="${hours > 0 ? hours : ''}">
+                        <span class="daf-rate" id="dtgDesignRate">hrs × —</span>
+                        <span class="daf-line-total" id="dtgDesignTotal">$0.00</span>
+                    </div>
+                </div>
+            </section>`;
+}
+
 // ----- Render ------------------------------------------------------------
 export function render() {
     const host = document.getElementById('dtgInlineFormMount');
@@ -136,6 +184,7 @@ export function render() {
                     <div class="dtg-rows-cards" id="dtgRowsCards"></div>
                     <button type="button" class="dtg-add-row-btn" id="dtgAddRowBtn"><i class="fas fa-plus"></i> Add row</button>
 
+                    ${renderArtFeeSection()}
                     <div id="dtgPriceSummary" class="dtg-price-summary"></div>
                     <!-- [2026-06-08] Order-at-a-glance band (Phase 0) — both :empty-hidden until populated by quote-order-summary.js -->
                     <div class="order-recap" id="order-recap"></div>
@@ -1406,6 +1455,81 @@ function wireTaxControls() {
     });
 }
 
+// [2026-08-06] Art charges (GRT-50 / GRT-75). The rep edits COUNTS; every dollar
+// on screen is derived here from the live Caspio rate via artFeeTotals().
+//
+// Updates IN PLACE — it must never re-render the section's innerHTML. renderSummary()
+// calls this on every priced change (so the labels fill in the moment
+// /api/service-codes resolves), and a re-render would yank the input the rep is
+// typing into out from under them (the blur-on-mousedown class of bug).
+function wireArtFeeControls() {
+    const toggle = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgArtSetupToggle'));
+    const qtyEl = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgArtSetupQty'));
+    const hoursEl = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgDesignHours'));
+
+    // Fees are NOT in the tax RATE's inputs, so re-render the summary (which
+    // recomputes tax on subtotal + fees + shipping) rather than recomputeTaxRate() —
+    // same reasoning as the shipping-charge handler above, and it avoids a DOR hit.
+    const afterFeeChange = () => { markDirty(); scheduleStateSave(); renderSummary(); };
+
+    if (toggle) toggle.addEventListener('change', () => {
+        // Checking it charges ONE setup by default (the overwhelmingly common case);
+        // unchecking zeroes the count so nothing lingers in the total.
+        state.fees.artSetupQty = toggle.checked ? Math.max(1, Math.floor(Number(state.fees.artSetupQty) || 0)) : 0;
+        if (qtyEl) {
+            qtyEl.value = state.fees.artSetupQty > 0 ? String(state.fees.artSetupQty) : '';
+            qtyEl.disabled = !toggle.checked;
+        }
+        afterFeeChange();
+    });
+
+    if (qtyEl) qtyEl.addEventListener('input', () => {
+        const n = Math.floor(Number(qtyEl.value));
+        state.fees.artSetupQty = Number.isFinite(n) && n > 0 ? n : 0;
+        // Typing 0 into an enabled box means "don't charge it" — keep the toggle honest.
+        if (toggle && state.fees.artSetupQty === 0) toggle.checked = false;
+        afterFeeChange();
+    });
+
+    if (hoursEl) hoursEl.addEventListener('input', () => {
+        const n = Number(hoursEl.value);
+        state.fees.designHours = Number.isFinite(n) && n > 0 ? n : 0;
+        afterFeeChange();
+    });
+}
+
+// Paint the live rates + line totals into the art-charge section. Text/attribute
+// updates ONLY (never innerHTML on a container holding an input) — see
+// wireArtFeeControls. Deliberately does NOT write input.value: renderSummary runs
+// on every keystroke, and echoing state back would fight a rep mid-type ("1." → "1").
+export function updateArtFeeDisplay() {
+    const f = artFeeTotals();
+    const setText = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text; };
+    setText('dtgArtSetupRate', `× $${fmtMoney(f.artSetupRate)}`);
+    setText('dtgArtSetupTotal', `$${fmtMoney(f.artCharge)}`);
+    setText('dtgDesignRate', `hrs × $${fmtMoney(f.designRate)}/hr`);
+    setText('dtgDesignTotal', `$${fmtMoney(f.graphicDesignCharge)}`);
+    const calc = document.getElementById('dtgArtSetupCalc');
+    if (calc) calc.classList.toggle('daf-calc-off', f.artSetupQty === 0);
+    const section = document.getElementById('dtgArtFees');
+    if (section) section.classList.toggle('daf-active', f.total > 0);
+}
+
+// Push state.fees BACK into the inputs. Only for paths that mutate state after
+// render() has already painted them (edit-reopen / duplicate); the normal flow
+// seeds the values in render() itself.
+export function syncArtFeeInputsFromState() {
+    const qty = Math.floor(Number(state.fees.artSetupQty) || 0);
+    const hours = Number(state.fees.designHours) || 0;
+    const toggle = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgArtSetupToggle'));
+    const qtyEl = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgArtSetupQty'));
+    const hoursEl = /** @type {HTMLInputElement|null} */ (document.getElementById('dtgDesignHours'));
+    if (toggle) toggle.checked = qty > 0;
+    if (qtyEl) { qtyEl.value = qty > 0 ? String(qty) : ''; qtyEl.disabled = qty <= 0; }
+    if (hoursEl) hoursEl.value = hours > 0 ? String(hours) : '';
+    updateArtFeeDisplay();
+}
+
 export function wireGlobalHandlers() {
     // F3 split (2026-07-09): the wiring blocks moved VERBATIM into the section
     // functions above - call order unchanged.
@@ -1415,6 +1539,7 @@ export function wireGlobalHandlers() {
     wireCustomerFields();
     wireShippingHandlers();
     wireTaxControls();
+    wireArtFeeControls();
 }
 
 export function bindInputToState(elId, stateKey) {

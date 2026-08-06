@@ -10,7 +10,9 @@
  * initPricingAndRoute verbatim and setupPage is a documented no-op — the
  * real split lands if init is ever unpacked.
  */
+import { loadServiceCodePrices } from '../shared/service-codes.js';
 import { init } from './form-core.js';
+import { renderSummary } from './pricing.js';
 import { dtgIF, state } from './state.js';
 
 export class DtgAdapter {
@@ -47,10 +49,21 @@ export class DtgAdapter {
         /* intentionally empty until the base drives row rendering (0.5) */
     }
 
-    // ── Lifecycle hook 1 — deliberate no-op (see file JSDoc: init interleaves
-    //    wiring and routing; reordering it would change behavior). ──────────
+    // ── Lifecycle hook 1 ──────────────────────────────────────────────────
+    // Still a no-op for WIRING (see file JSDoc: init interleaves wiring and
+    // routing; reordering it would change behavior). It does own one thing:
+    // loading Caspio Service_Codes for the GRT-50 / GRT-75 art charges, so those
+    // dollars come from the API and not the documented fallbacks (Erik's
+    // Pricing=API rule). Fire-and-forget, exactly like the SCP adapter —
+    // artFeeTotals() returns the fallback rate until it resolves, and the
+    // renderSummary() below repaints the rates + totals the moment it does.
     async setupPage() {
         /* all wiring rides initPricingAndRoute verbatim */
+        if (typeof loadServiceCodePrices === 'function') {
+            loadServiceCodePrices()
+                .then(() => { try { renderSummary(); } catch (_) { /* form not painted yet — init's own render covers it */ } })
+                .catch(() => { /* loadServiceCodePrices already toasts + badges on failure */ });
+        }
     }
 
     // ── Lifecycle hook 2: form-core's init, verbatim call ─────────────────
