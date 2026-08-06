@@ -1,3 +1,8 @@
+## v2026.08.06.6 (2026.08.06)
+
+- Memory: print sheet has its own tile; mono-laser constraints
+- Wait for sheet images to decode before opening the print dialog
+
 ## v2026.08.06.5 (2026.08.06)
 
 - Memory: inbound sheet has three artwork states; print tile is separate
