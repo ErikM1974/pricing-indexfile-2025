@@ -1,3 +1,7 @@
+## v2026.08.06.2 (2026.08.06)
+
+- Deploy v2026.08.06.2: 24 files (ae-mission-control.html,art-hub-steve.html,bradley-screenprint.html,...)
+
 ## v2026.08.06.1 (2026.08.06)
 
 - Rule: big Caspio table writes go through a CSV data import
