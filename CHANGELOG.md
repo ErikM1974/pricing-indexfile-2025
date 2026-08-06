@@ -1,3 +1,8 @@
+## v2026.08.06.5 (2026.08.06)
+
+- Memory: inbound sheet has three artwork states; print tile is separate
+- Printed inbound sheet: mark NO ART vs BLANKS instead of empty space
+
 ## v2026.08.06.4 (2026.08.06)
 
 - Memory: vendor portal capability tokens + verification pitfalls
