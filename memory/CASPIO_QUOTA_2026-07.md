@@ -82,6 +82,31 @@ authority and is free to read.
   whole-period average, which stays anchored to how the period started and would have fired
   every day forever. Today is excluded (partial days read as false comfort).
 
+## ADOPTED 2026-08-06 — big table writes go through a CSV data import
+
+Erik's standing instruction after the 5 Aug spike. **Was** listed below as "shelved"; it is
+now the default for bulk writes. The always-loaded rule lives in `CLAUDE.md` → Critical
+Patterns; this is the evidence behind it.
+
+**Trigger: roughly 1,000+ rows.** Erik's framing — *"only if possible, like for big data,
+lots of it."* Under a few hundred rows the API is fine; the import definition costs more to
+set up and verify than the calls save. This is a routing rule, not a ban on API writes.
+
+- **Separate 1,000/period meter**, ~0 Integrations cost. Caspio **PULLS** the file
+  (HTTPS/Box/OneDrive/S3/FTP), so the transfer is free too. Ceiling ~32 runs/day ⇒ big
+  infrequent jobs only, never a frequent sync.
+- **Pattern already in the repo:** `scripts/sync-design-lookup.js --csv-out`. Rebuilding
+  `Design_Lookup_2026` live costs **38,785 POSTs (~7.8% of the monthly budget)**; as a CSV
+  import it is ~0. REPLACE semantics — empty the table first.
+- 🔴 **The upsert key is configured in the Caspio UI, invisible to code review.** A wrong key
+  silently writes wrong data. Verify it on the import definition, never by reading the script.
+- ⚠️ **Why per-row is so expensive:** `POST .../records/bulk` takes an array (≤1,000 = 1 billed
+  call), but **`PATCH .../records/bulk` is `{where, recordValues}` — one value-set for every
+  match, so it CANNOT do per-row upserts.** Updates therefore cost 1 call per row.
+- **Measured 2026-08-05:** a morning of per-row Claude table updates = **~11,800 calls**, 73%
+  of a day's budget, split ~7,500 direct-to-Caspio + ~4,300 through the proxy. Day total
+  **23,799** — the period's worst, effectively tying 27 Jul (23,959), the day that billed $358.
+
 ## Killed by measurement — do NOT re-propose
 
 - `archive-daily-sales` diff-before-write: ~120/day, risks duplicate rows in a financial
@@ -102,10 +127,6 @@ authority and is free to read.
   — one value-set for all matches, so it CANNOT do per-row upserts**. And v4 renames
   everything: `tableId` is an opaque **6-char code** (a wrong code reads the WRONG TABLE
   silently), `q.where` → `Where`. ~600 call sites: a project, not an edit.
-- **Data import tasks** — a **SEPARATE 1,000/period meter**, ~0 Integrations cost, and Caspio
-  **PULLS** the file (HTTPS/Box/OneDrive/S3/FTP), so the transfer is free too. Ceiling ~32
-  runs/day ⇒ big infrequent write jobs only, never a 15-min sync. Upsert matches on a field
-  configured **in the Caspio UI**, invisible to code review — a silent-wrong-data hazard.
 - **`pricing-bundle` per-method cache split.** Keyed `{method, styleNumber}`, so
   `Pricing_Tiers`/`Pricing_Rules`/`location`/cost re-fetch for **every style**. Production
   traffic does not justify it; **dev tooling does** — one baseline capture cost ~5,600.
