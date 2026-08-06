@@ -106,9 +106,11 @@ describe('box-url.js is loaded by every page whose scripts call boxUrl()', () =>
     // (the dashboard Pride Wall), which rendered stored Box urls raw for weeks
     // while this file stayed green — see the finished-photos incident, 2026-08-06.
     const JS_DIRS = ['shared_components/js', 'pages/js', 'dashboards/js'];
-    // Likewise: staff-dashboard-v3/ hosts a page that consumes those urls, so a
-    // page scan that skips it cannot see the very break this test exists to catch.
-    const HTML_DIRS = ['.', 'pages', 'dashboards', 'admin', 'staff-dashboard-v3'];
+    // Likewise: staff-dashboard-v3/, quote-builders/ and calculators/ all host pages
+    // that consume those urls, so a page scan that skips them cannot see the very
+    // break this test exists to catch (the quote builders' design combobox was one).
+    const HTML_DIRS = ['.', 'pages', 'dashboards', 'admin', 'staff-dashboard-v3',
+                       'quote-builders', 'calculators'];
     const CALLS_BOX_URL = /\bboxUrl\s*\(/;
     const SKIP_DIRS = new Set(['node_modules', 'vendor', '.git']);
 
@@ -182,35 +184,43 @@ describe('box-url.js is loaded by every page whose scripts call boxUrl()', () =>
         }
         return seen;
     };
-    // Every <script type="module" src=…> on a page, with the tag's position.
-    const moduleEntries = (html) => {
+    // EVERY <script src=…> on a page, resolved to a repo-relative path, with the tag's
+    // position. Resolving the whole path (not the basename) is load-bearing: basenames
+    // like utils.js / shared.js / index.js repeat across app directories, and matching
+    // on one makes every page that loads ANY utils.js look like a consumer of THIS one.
+    // That is the same collision that once bumped 8 unrelated dashboards' ?v=.
+    const scriptEntries = (html) => {
         const out = [];
         const tagRe = /<script\b[^>]*>/gi;
         let m;
         while ((m = tagRe.exec(html))) {
-            if (!/\btype=["']module["']/i.test(m[0])) continue;
             const src = /\bsrc=["']([^"']+)["']/i.exec(m[0]);
-            if (src) out.push({ rel: src[1].split('?')[0].replace(/^\//, ''), index: m.index });
+            if (!src || /^https?:/i.test(src[1])) continue;      // skip CDN/vendor
+            out.push({ rel: src[1].split('?')[0].replace(/^\//, ''), index: m.index });
         }
         return out;
     };
 
-    // One case per (page, consumer) pair that actually exists. `at` is the position
-    // the consumer starts running from — its own tag, or the module entry that pulls
-    // it in — and box-url.js must be declared before that.
+    // One case per (page, consumer) pair that actually exists. `at` is the position the
+    // consumer starts running from — its own tag, or the entry script that pulls it in.
+    // The import walk covers BOTH shapes this repo uses: a type="module" entry (the
+    // staff dashboard) and an esbuild-bundled IIFE entry (the quote builders, see
+    // scripts/build.js) whose sources are plain ESM on disk.
     const pairs = [];
     for (const p of pages) {
-        for (const c of consumers) {
-            const base = path.basename(c);
-            const at = scriptTagIndex(p.html, base);
-            if (at !== -1) pairs.push({ page: p.rel, label: base, html: p.html, at });
-        }
-        for (const entry of moduleEntries(p.html)) {
-            const graph = moduleGraph(entry.rel);
-            for (const c of consumers) {
-                if (!graph.has(c)) continue;
-                const label = `${path.basename(c)} (imported by ${path.basename(entry.rel)})`;
-                pairs.push({ page: p.rel, label, html: p.html, at: entry.index });
+        for (const entry of scriptEntries(p.html)) {
+            const direct = consumers.find(c => c === entry.rel);
+            if (direct) {
+                pairs.push({ page: p.rel, label: path.basename(direct), html: p.html, at: entry.index });
+            }
+            for (const c of moduleGraph(entry.rel)) {
+                if (c === entry.rel || !consumers.includes(c)) continue;
+                pairs.push({
+                    page: p.rel,
+                    label: `${path.basename(c)} (imported by ${path.basename(entry.rel)})`,
+                    html: p.html,
+                    at: entry.index,
+                });
             }
         }
     }

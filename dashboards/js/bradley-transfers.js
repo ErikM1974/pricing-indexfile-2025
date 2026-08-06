@@ -35,6 +35,10 @@
     // ── DOM helpers ──────────────────────────────────────────────────
     function $(id) { return document.getElementById(id); }
 
+    // Stored mockup urls are absolute proxy Box urls that 401 since the Box surface
+    // was session-gated; boxUrl() re-points them at this origin so the session cookie
+    // authorises the <img>. Guarded so a missing box-url.js tag degrades, not throws.
+    function resolveBoxUrl(u) { return (typeof boxUrl === 'function') ? boxUrl(u) : u; }
     function escapeHtml(str) {
         if (str === null || str === undefined) return '';
         return String(str)
@@ -218,7 +222,9 @@
         // links → /api/box/thumbnail/{fileId} proxy URLs that render as images.
         var thumb;
         if (t.mockup_thumbnail_url) {
-            thumb = '<img class="bt-card-thumb" src="' + escapeHtml(t.mockup_thumbnail_url) +
+            // Those proxy urls are stored ABSOLUTE and 401 cross-origin since the Box
+            // surface was session-gated; boxUrl() returns them to this origin.
+            thumb = '<img class="bt-card-thumb" src="' + escapeHtml(resolveBoxUrl(t.mockup_thumbnail_url)) +
                 '" alt="" loading="lazy" onerror="this.classList.add(\'bt-card-thumb--err\');this.removeAttribute(\'src\');">';
         } else {
             thumb = '<div class="bt-card-thumb bt-card-thumb--placeholder"><i class="fas fa-image"></i></div>';

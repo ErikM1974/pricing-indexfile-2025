@@ -27,6 +27,12 @@
     // ── Config ───────────────────────────────────────────────────────
     var API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
         || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    // The picker builds thumbnail urls as API_BASE + '/api/box/thumbnail/<id>', which is
+    // CROSS-ORIGIN and 401s since the Box surface was session-gated — a browser can't hold
+    // the proxy secret and the SAML cookie doesn't travel to another origin. boxUrl() folds
+    // that back to this origin, where the cookie authorises it. Guarded so a missing
+    // box-url.js script tag degrades instead of throwing.
+    function resolveBoxUrl(u) { return (typeof boxUrl === 'function') ? boxUrl(u) : u; }
     // Multi-file flow (v2026.04.28): the modal accepts up to MAX_WORKING_FILES
     // working files + 1 mockup. Hard stop at 20 so Steve can't paste a folder
     // index and accidentally send hundreds of rows; soft warn at 10.
@@ -902,7 +908,7 @@
                 : '<div class="tas-picker-file-grid">' +
                     sorted.map(function (f) {
                         var thumb = f.thumbnailUrl
-                            ? '<img src="' + escapeHtml(API_BASE + f.thumbnailUrl) + '" alt="" class="tas-picker-file-thumb" onerror="this.style.display=\'none\'">'
+                            ? '<img src="' + escapeHtml(resolveBoxUrl(API_BASE + f.thumbnailUrl)) + '" alt="" class="tas-picker-file-thumb" onerror="this.style.display=\'none\'">'
                             : '<div class="tas-picker-file-thumb tas-picker-file-thumb--placeholder"><i class="fas fa-file"></i></div>';
                         var ext = String(f.extension || '').toUpperCase();
                         var size = f.size ? formatBytes(f.size) : '';

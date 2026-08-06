@@ -52,6 +52,11 @@
         }[c]));
     }
 
+    // Design thumbnails come back as absolute proxy Box urls, which 401 since the Box
+    // surface was session-gated; boxUrl() re-points them at this origin so the session
+    // cookie authorises the <img>. Guarded so a missing box-url.js tag degrades.
+    function resolveBoxUrl(u) { return (typeof boxUrl === 'function') ? boxUrl(u) : u; }
+
     function formatDate(iso) {
         if (!iso) return '';
         try {
@@ -154,7 +159,7 @@
             const rows = filtered.slice(0, 50).map((d, idx) => {
                 const isActive = idx === activeIndex;
                 const thumb = d.thumbnailUrl
-                    ? '<img src="' + escapeHtml(d.thumbnailUrl) + '" alt="" class="cdcb-thumb" style="width:40px;height:40px;object-fit:cover;border-radius:4px;background:#f3f4f6;flex-shrink:0;">'
+                    ? '<img src="' + escapeHtml(resolveBoxUrl(d.thumbnailUrl)) + '" alt="" class="cdcb-thumb" style="width:40px;height:40px;object-fit:cover;border-radius:4px;background:#f3f4f6;flex-shrink:0;">'
                     : '<div class="cdcb-thumb cdcb-thumb-empty" style="width:40px;height:40px;border-radius:4px;background:#f3f4f6;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#9ca3af;font-size:10px;">No img</div>';
                 const status = [];
                 if (d.locationCount > 1) status.push(d.locationCount + ' locations');
