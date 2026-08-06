@@ -163,11 +163,22 @@
     </div>`;
   }
 
-  // ── Logo thumbnail (screen) — ShopWorks design artwork, or a graceful "no logo" tile ──
+  // ── Logo thumbnail (screen + print) ────────────────────────────────────────
+  // THREE states, not two. An order that HAS a design number but no artwork is a
+  // real gap for someone to chase; an order with NO design at all (blanks /
+  // undecorated, method "Other") has nothing to show and is already correct.
+  // Both used to render the same 🎨 tile, which sent people hunting for artwork
+  // that was never meant to exist — on the 2026-08-05 sheet, 3 of the 4 "missing"
+  // tiles were blanks orders. The tiles now say which is which, in the tooltip
+  // AND in the glyph, because the printed sheet has no tooltips.
   function logoTile(o) {
-    return o.logoUrl
-      ? `<img class="sit-logo" src="${esc(o.logoUrl)}" alt="Design ${esc(o.designNumber || '')} artwork" loading="lazy" onerror="this.outerHTML='<div class=\\'sit-logo sit-logo--off\\' title=\\'artwork unavailable\\'>🎨</div>';">`
-      : `<div class="sit-logo sit-logo--off" title="No ShopWorks artwork on file for this design">🎨</div>`;
+    if (o.logoUrl) {
+      return `<img class="sit-logo" src="${esc(o.logoUrl)}" alt="Design ${esc(o.designNumber || '')} artwork" loading="lazy" onerror="this.outerHTML='<div class=\\'sit-logo sit-logo--off\\' title=\\'Artwork unavailable\\'>🎨</div>';">`;
+    }
+    const design = String(o.designNumber || '').trim();
+    return design
+      ? `<div class="sit-logo sit-logo--off" title="No ShopWorks artwork on file for design ${esc(design)}">🎨</div>`
+      : `<div class="sit-logo sit-logo--blank" title="No design on this order — blanks / undecorated">📦</div>`;
   }
 
   // UPS live-arrival chip — UPS's REAL delivery date when known (else nothing; the view's day is our
