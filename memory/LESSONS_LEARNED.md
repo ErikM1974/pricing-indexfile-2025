@@ -63,10 +63,16 @@ finished-photos.js ×2 — design tiles AND the manage list, pride-wall-controll
 - 🔑 **A wall of 404s looks exactly like a working deny-list.** Prove the negative AND the positive
   in the same run: the customer token 404ing at the vendor route only means something because the
   same token returned a 200 PNG at the customer route seconds earlier.
-- ⚠️ **A hand-minted portal session is NOT a verification path.** `requireCustomer` re-checks the
-  live `Customer_Portal_Access` table, so a signed cookie for an unregistered email 401s and
-  *clears itself*. Worse, the 401 body has no `mockups` key — so a naive parse prints "0 mockups"
-  and reads as a real empty result. Check the HTTP status before interpreting a body.
+- 🔑 **To see a customer-facing change, use the STAFF PORTAL PREVIEW:
+  `/portal-admin/preview/<idCustomer>`** (linked from `dashboards/customer-portal-admin.html`) —
+  read-only, renders exactly what the customer sees, no customer credentials needed. Erik had to
+  point this out after I'd concluded it was unverifiable: I grepped
+  `customer-portal-admin.html` for "preview|viewAs|impersonat" and the *route* lives elsewhere.
+  **Grep the route table, not just the page you expect to host the button.**
+- ⚠️ **A hand-minted portal session is NOT a substitute.** `requireCustomer` re-checks the live
+  `Customer_Portal_Access` table, so a signed cookie for an unregistered email 401s and *clears
+  itself*. Worse, the 401 body has no `mockups` key — so a naive parse prints "0 mockups" and
+  reads as a real empty result. Check the HTTP status before interpreting a body.
 - ⚠️ **Do not read `img.complete`/`naturalWidth` on a polling board.** Bradley's queue re-renders
   every 60s, replacing every `<img>`, so a snapshot mid-poll shows "0 decoded, 38 pending" on a
   page that is working perfectly. The network log (40/40 → 200) was the truthful instrument.
