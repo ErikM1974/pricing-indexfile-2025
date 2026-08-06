@@ -5,6 +5,36 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## A page size counted DESIGNS while the table stores design×LOCATION (2026-08-06)
+
+**Problem.** After the artwork fix shipped, the SanMar inbound sheet still showed the 🎨 "no
+logo" tile for 6 of 18 orders. Erik's read: "probably no thumbnail in ShopWorks yet." True for
+2 of them; the other 4 had artwork the whole time.
+
+**Root cause.** `proxy src/routes/thumbnails.js` `/thumbnails/by-designs` built its Caspio page
+as `'q.limit': uncachedIds.length`. `Shopworks_Thumbnail_Report` is keyed
+`Thumb_DesLocid_Design` — **one row per design PER LOCATION** — so 18 designs can match far more
+than 18 rows. Caspio truncated the page, every design past the cut was reported `found:false`,
+and that wrong answer was then cached for the 5-minute TTL. Rows arrive in serial order, so the
+designs dropped were the NEWEST — exactly what an inbound sheet is made of, which is why it
+looked like a bandit/ShopWorks sync lag. Fixed to `min(1000, ids × 25)`; live batch went 12 → 16
+of 18 found, and the 2 remaining genuinely have no row.
+
+**Prevention.**
+- 🔑 **Size a page by the ROWS it can return, not the KEYS you asked for.** Any `q.limit` derived
+  from an input count is wrong the moment the table is one-to-many.
+- 🔴 **Truncation that reports `found:false` is indistinguishable from real absence** — and here
+  it was cached, so it persisted. A short page should be detected and retried/raised, never
+  reinterpreted as "no data".
+- ⚠️ **My own probe was the broken instrument twice.** A 33-id sweep read `.thumbnails` off a
+  400 body (`Maximum 20 design IDs`) and printed "all missing"; earlier runs disagreed with each
+  other for the same reason. **Check the HTTP status before parsing.** The finding only became
+  real when single-id queries returned artwork the batch had denied.
+- 🔑 A mock that ignores `q.limit` cannot catch this — the regression test makes the fake Caspio
+  honour the limit, so it fails against the old code (verified by reverting).
+
+---
+
 ## The boxUrl() migration missed every surface that never called boxUrl() (2026-08-06)
 
 **Problem.** Erik: finished-photo thumbnails were blank on the Photo Library, the capture page's
