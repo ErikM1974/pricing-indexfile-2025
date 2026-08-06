@@ -1,3 +1,8 @@
+## v2026.08.06.3 (2026.08.06)
+
+- Memory: boxUrl migration blast radius + drift-lock path matching
+- Deploy v2026.08.06.3: 3 files (vendor-magic-link.js,server.js,vendor-proof-image.test.js,...)
+
 ## v2026.08.06.2 (2026.08.06)
 
 - Deploy v2026.08.06.2: 24 files (ae-mission-control.html,art-hub-steve.html,bradley-screenprint.html,...)
