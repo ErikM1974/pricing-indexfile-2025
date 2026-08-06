@@ -1,3 +1,13 @@
+## v2026.08.06.4 (2026.08.06)
+
+- Memory: vendor portal capability tokens + verification pitfalls
+- Memory: archive oldest resolved lesson (300-line cap)
+- Memory: staff portal preview is the customer-facing verification path
+- Memory: thumbnail batch page-size truncation (design x location rows)
+- Memory: archive oldest resolved lesson (300-line cap)
+- Memory: sync-status metric measured a retired field; page cap reported as count
+- Inbound sheet: blanks orders no longer look like missing artwork
+
 ## v2026.08.06.3 (2026.08.06)
 
 - Memory: boxUrl migration blast radius + drift-lock path matching
