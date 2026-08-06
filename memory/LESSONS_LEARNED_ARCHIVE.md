@@ -1104,3 +1104,46 @@ yields `rgb(0,0,0)` without the flag and the true color with it.
   pair works, suspect a property-scoped override rather than a broken feature.
 
 ---
+
+
+## A per-frame `getImageData` capped the spin at whatever the readback allowed (2026-08-04)
+
+**Problem.** The garment designer's 🔄 Spin preview looked choppy and "unreal" no matter how the
+motion was tuned. Three defects were stacked, and each masked the next.
+
+**Root cause.**
+1. **Rendering.** 24 photos 15° apart were composited as a *permanent linear crossfade* — the
+   shirt was a double exposure 100% of the time, and it stepped photo-to-photo while the printed
+   logo (drawn from continuous `theta`) glided. The eye reads that desync as chop.
+2. **Settle.** On release, momentum rounded to a virtual step but wrapped `PHOTO.pos` by
+   `PHOTO.frames.length` (24) instead of `effectiveSpinSteps()` (96). Measured from four
+   arbitrary positions it jumped **180°, 1.5°, 179.3°, 91.1°** and parked at blend fractions
+   0.52/0.56/0.96 — i.e. the resting shirt was usually a half-and-half ghost.
+3. **Throughput.** `rebuildMockup()` runs every tick, and it called `maybeWarnLowContrast()` →
+   `artMeanLuminance()` → **`getImageData()`**: a GPU→CPU readback that stalls the pipeline,
+   inside a 6.1 ms frame budget.
+
+**Solution.** View morph (scale each neighbour photo horizontally about the shared registered
+torso axis by the ratio of apparent turntable widths, *then* blend — silhouettes align, so the
+fade stops reading as a ghost); fade compressed to the middle 40% of each gap so the shirt is a
+single pure photo 60% of the time; settle glides onto the nearest **real photo angle**;
+delta-time scaling on both momentum and auto-spin; and the contrast warning memoized on
+`id§eraseN§knockOn§garment`. Measured after: **163.9 fps on a 163.9 Hz display**, median frame
+6.1 ms in a 6.1 ms budget, 5 dropped frames per 400, revolution 6.58 s.
+
+**Prevention.**
+- 🔑 **`getImageData()` anywhere reachable from an animation tick is a frame-rate cap, not a
+  slow function.** It forces a pipeline flush. Memoize on the inputs that actually change, or
+  hoist it out of the loop entirely.
+- 🔑 **Fixed per-frame increments are a refresh-rate bug**: `pos += k` ran twice as fast on a
+  120 Hz screen. Advance by measured elapsed time and clamp `dt` for tab switches.
+- 🔑 **Two position spaces (24 real frames vs 96 virtual steps) invite a wrap in the wrong one** —
+  and the symptom (an occasional jump at the *end* of a coast) looks like a physics-tuning
+  problem, not an indexing one. Assert the parked state, not just the motion.
+- 🔑 **Blending frames is not interpolating geometry.** If a crossfade looks like ghosting,
+  align the silhouettes before fading rather than tuning the fade curve.
+- ⚠️ **rAF is paused in a hidden tab, so any in-page fps probe hangs there** (a CDP eval waiting
+  on it times out at 45 s and reads as "renderer frozen"). Arm the probe on `visibilitychange`
+  and read the stored result afterwards.
+
+---
