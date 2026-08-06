@@ -324,6 +324,17 @@
 .sit-ps-po-head { display: flex; gap: 8px; align-items: flex-start; background: #f1f5f1; padding: 5px 8px; font-size: 11px; border: 1px solid #dde5dd; }
 .sit-ps-po-head .sit-ps-r { float: right; color: #555; }
 .sit-ps-logo { width: 42px; height: 42px; flex: none; object-fit: contain; border: 1px solid #d5ddd5; border-radius: 3px; background: #fff; }
+/* Printed stand-ins for the two no-image states. Text, not emoji: these sheets go
+   to a mono laser, where a 42px glyph is a smudge and colour carries nothing.
+   The BORDER does the signalling — dashed "something belongs here" vs solid
+   "this is settled" — so it survives grayscale. */
+.sit-ps-logo--off,
+.sit-ps-logo--blank {
+    display: flex; align-items: center; justify-content: center; text-align: center;
+    font-size: 7px; font-weight: 700; letter-spacing: .03em; line-height: 1.1;
+}
+.sit-ps-logo--off { border-style: dashed; border-color: #9aa79a; color: #44514a; background: #fff; }
+.sit-ps-logo--blank { border-style: solid; color: #97a097; background: #f4f6f4; }
 .sit-ps-po-htxt { flex: 1; min-width: 0; }
 .sit-ps-fields { font-size: 9.5px; color: #555; margin-top: 2px; }
 .sit-ps-rush {
@@ -364,4 +375,15 @@
         border-color: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;
     }
     .sit-rt-rush, .sit-rt-rush-cell, .sit-ps-rushcount { color: #000 !important; font-weight: 900; }
+    /* Browsers drop backgrounds when printing unless told otherwise, and BLANKS
+       leans on its flat fill to read as "settled". Without this it would print as
+       a plain box and lose the contrast with NO ART. */
+    .sit-ps-logo--blank {
+        background: #f0f2f0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;
+    }
+    /* NO ART is the actionable one — make it hold its own on a grey page. */
+    .sit-ps-logo--off {
+        border-color: #000 !important; color: #000 !important;
+        -webkit-print-color-adjust: exact; print-color-adjust: exact;
+    }
 }
