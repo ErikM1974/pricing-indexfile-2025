@@ -59,6 +59,16 @@ of 18 found, and the 2 remaining genuinely have no row.
   must be shape/text, never colour — and a 42px emoji is a smudge. Print uses the words `NO ART`
   (dashed border, black) and `BLANKS` (solid, flat fill + `print-color-adjust: exact`, since
   browsers drop backgrounds when printing).
+- 🔴 **`window.print()` SNAPSHOTS the DOM — an `<img>` still in flight is simply absent from the
+  PDF.** No error, no gap, nothing to notice. The sheet builds fresh `<img>` tags and the screen
+  tiles are `loading="lazy"`, so only orders the user had scrolled past were warm: everything
+  below the fold silently lost its thumbnail. Measured on a real AE sheet — **7 POs with artwork,
+  3 images in the PDF**; and cold-loading the full sheet, only **8 of 16** screen tiles were warm.
+  Fix: `await img.decode()` on every sheet image before printing (`decode()` resolves when the
+  bitmap can PAINT; `load` can fire a frame earlier — that frame is where this lived), capped at
+  6s so a dead Box file degrades to the old behaviour instead of hanging the dialog. After: 14/14
+  decoded, 0 missing, 4.5s wait. 🔑 **This masqueraded as the artwork bug being only half-fixed —
+  two different causes producing the same "missing thumbnail".**
 - ⚠️ **A fixture with a real Box url would 401 offline** and silently exercise the FALLBACK path
   while looking like it covered the image case — the print harness uses a `data:` URI instead.
   Note `/tests` is not served (removed in the 2026-08-05 source-exposure fix), so that harness
