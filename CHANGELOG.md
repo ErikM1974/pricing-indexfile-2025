@@ -1,3 +1,8 @@
+## v2026.08.06.1 (2026.08.06)
+
+- Rule: big Caspio table writes go through a CSV data import
+- Deploy v2026.08.06.1: 9 files (finished-photos-library.html,finished-photos.html,finished-photos-library.js,...)
+
 ## v2026.08.05.23 (2026.08.05)
 
 - memory: free sample path proven free; correcting the earlier payment read
