@@ -39,6 +39,22 @@ finished-photos.js ×2 — design tiles AND the manage list, pride-wall-controll
   endpoint beat reading the writer code.
 - ⚠️ **"Upload works" ≠ "images work."** The capture preview is a local `URL.createObjectURL`
   blob, so a phone upload looks completely healthy while every stored url is 401ing.
+- 🔑 **The reported pages were a third of it.** A 43-agent sweep found the same defect on AE
+  Mission Control, the Send Mockup picker (shipped the day before, `807184ee` — it *builds*
+  `API_BASE + thumbnailUrl`, so it was cross-origin by construction), both Bradley boards, the
+  quote-builder design combobox, the DTG catalog search, the EMB design search, and the SanMar
+  inbound sheet (`/api/thumbnails` returns the same absolute shape — that is why the printed
+  PDF had no artwork). **When a shared gate changes, enumerate every reader of the gated data
+  and check them all — the ones a human happens to notice are a biased sample.**
+- 🔑 **A path-blind drift lock creates the collision it is meant to prevent.** Matching consumers
+  to pages by BASENAME made every page loading any `utils.js` fail once a helper landed in
+  `builders/dtg/utils.js` — 20 false failures, the same shape as the 2026-06-09 `?v=` incident.
+  Match on the resolved repo path, and follow `<script src>` → import graph (that covers both
+  the `type="module"` dashboard and the esbuild-bundled quote builders).
+- ⚠️ **Do not read `img.complete`/`naturalWidth` on a polling board.** Bradley's queue re-renders
+  every 60s, replacing every `<img>`, so a snapshot mid-poll shows "0 decoded, 38 pending" on a
+  page that is working perfectly. The network log (40/40 → 200) was the truthful instrument.
+  Also: 401 vs 404 matters — one 404 here is a Box file that was genuinely deleted, not a break.
 
 ---
 
