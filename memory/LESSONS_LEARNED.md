@@ -51,8 +51,19 @@ of 18 found, and the 2 remaining genuinely have no row.
   `designNumber` — nothing is missing). Rendering the last two identically sent people hunting
   for artwork that never existed: on 2026-08-05, 3 of 4 "missing" tiles were blanks orders.
   Blanks now get their own glyph + solid tile; **the glyph must differ, not just the tooltip,
-  because the printed sheet has none.** ⚠️ The PRINT builder uses `psLogo`, a separate tile that
-  renders *nothing* when there is no art — screen and print do NOT share this code.
+  because the printed sheet has none.**
+- ⚠️ **Screen and print do NOT share the logo tile** — `logoTile()` vs `psLogo` in the print
+  builders. Fixing one leaves the other; print used to render *nothing* for both no-image cases,
+  so a missing proof, a blanks order and a failed image were indistinguishable on paper.
+- 🔑 **These sheets go to a MONO LASER** (the `.sit-ps-rush` rule says so). On paper the signal
+  must be shape/text, never colour — and a 42px emoji is a smudge. Print uses the words `NO ART`
+  (dashed border, black) and `BLANKS` (solid, flat fill + `print-color-adjust: exact`, since
+  browsers drop backgrounds when printing).
+- ⚠️ **A fixture with a real Box url would 401 offline** and silently exercise the FALLBACK path
+  while looking like it covered the image case — the print harness uses a `data:` URI instead.
+  Note `/tests` is not served (removed in the 2026-08-05 source-exposure fix), so that harness
+  only runs from disk; verify print by stubbing `window.print` on the real page and grabbing
+  `#sit-print-sheet` before its 1.5s self-cleanup removes it.
 
 ---
 
