@@ -1041,3 +1041,66 @@ the element is visible. Only `getComputedStyle(el).display` answers the actual q
   result is a tautology, it will pass forever.
 
 ---
+
+
+## Releasing from a SHARED checkout: excluding a file cuts both ways (2026-08-04)
+
+**Problem.** Deploying the Embroidery Studio, the release also carried
+`quote-builders/monogram-form.html` â€” a parallel session's WIP that another session's
+`git add -A` had swept into `baafe9f3`. Shipping it would have put a **dead "Print Customer
+Proof" button** in front of reps (its controller/CSS were still in review on develop). Two
+further traps followed: `git checkout main` **aborted** because the shared tree was dirty with
+three sessions' edits, and the develop sync-back **silently reverted** the WIP the release had
+deliberately excluded.
+
+**Root cause.** A shared working tree makes branch-level operations sweep in work whose owner
+isn't in the room. And a merge that restores a file to main's version encodes "main's copy
+wins" â€” merging that commit back into develop faithfully replays the deletion.
+
+**Solution.** Cut the release at *my* verified sha in an isolated `git worktree`
+(`git merge --no-ff --no-commit <sha>` â†’ `git checkout HEAD -- <foreign file>` â†’ commit with the
+exclusion stated in the message), then on the sync-back re-take develop's copy
+(`git checkout origin/develop -- <file>`) before pushing.
+
+**Prevention.**
+- ðŸ”‘ **Never `git checkout <branch>` in a shared checkout â€” release from a `git worktree`.** Also
+  put that worktree at a SHORT path: `/Temp/nwca-rel` worked where the session scratchpad path
+  blew Windows MAX_PATH on a deep blog filename ("Filename too long", `Could not reset index`).
+- ðŸ”‘ **Every file-level exclusion needs a matching restore on the merge-back**, or the release
+  silently deletes the work it was protecting. Verify with `grep` for a marker from the WIP
+  *before* pushing the sync â€” not after.
+- ðŸ”‘ **Deploy the dependency first and prove it with a live probe**: the box-labels page needed
+  proxy `/api/sanmar-orders/label-data` â€” curl'd for HTTP 200 (and absence of `ContactEmail`)
+  before the app slug went out.
+
+---
+
+
+## The shared print block flattens every color you set inline (2026-08-04)
+
+**Problem.** The monogram Customer Proof renders each name in its real thread color — the whole
+point of the sheet. On screen it was perfect. **On paper every name printed black**, and the
+tiny color swatch beside it still printed correct, so the sheet looked deliberate rather than
+broken. Found by review, not by the browser pass that had already "verified" the feature.
+
+**Root cause.** `quote-builder-common.css`'s `@media print` block contains
+`* { color: black !important; }`. The controller set the thread color as a *normal* inline
+declaration (`style="color:#003DA5"`), and an author `!important` beats any normal declaration —
+including inline. Backgrounds were unaffected, which is why the swatch survived and the defect
+read as intentional.
+
+**Solution.** The inline color is now `!important` too (inline `!important` outranks stylesheet
+`!important`). Proven in-page rather than assumed: the same cascade reproduced synthetically
+yields `rgb(0,0,0)` without the flag and the true color with it.
+
+**Prevention.**
+- 🔑 **A print stylesheet is a second rendering nobody looks at.** Screen verification says
+  nothing about it — check print explicitly, or the defect ships looking fine.
+- 🔑 **`quote-builder-common.css` forces black text and is loaded by ALL 4 quote builders** — any
+  feature whose *meaning* is carried by color (thread, status, warning) must use `!important`
+  inline or a rule with its own `!important`, or it silently prints monochrome.
+- 🔑 **A partial survivor disguises the failure**: the swatch (background) printed while the text
+  (color) did not, which reads as a design choice instead of a bug. When one half of a visual
+  pair works, suspect a property-scoped override rather than a broken feature.
+
+---

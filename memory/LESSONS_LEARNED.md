@@ -5,6 +5,50 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## A page size counted DESIGNS while the table stores design×LOCATION (2026-08-06)
+
+**Problem.** After the artwork fix shipped, the SanMar inbound sheet still showed the 🎨 "no
+logo" tile for 6 of 18 orders. Erik's read: "probably no thumbnail in ShopWorks yet." True for
+2 of them; the other 4 had artwork the whole time.
+
+**Root cause.** `proxy src/routes/thumbnails.js` `/thumbnails/by-designs` built its Caspio page
+as `'q.limit': uncachedIds.length`. `Shopworks_Thumbnail_Report` is keyed
+`Thumb_DesLocid_Design` — **one row per design PER LOCATION** — so 18 designs can match far more
+than 18 rows. Caspio truncated the page, every design past the cut was reported `found:false`,
+and that wrong answer was then cached for the 5-minute TTL. Rows arrive in serial order, so the
+designs dropped were the NEWEST — exactly what an inbound sheet is made of, which is why it
+looked like a bandit/ShopWorks sync lag. Fixed to `min(1000, ids × 25)`; live batch went 12 → 16
+of 18 found, and the 2 remaining genuinely have no row.
+
+**Prevention.**
+- 🔑 **Size a page by the ROWS it can return, not the KEYS you asked for.** Any `q.limit` derived
+  from an input count is wrong the moment the table is one-to-many.
+- 🔴 **Truncation that reports `found:false` is indistinguishable from real absence** — and here
+  it was cached, so it persisted. A short page should be detected and retried/raised, never
+  reinterpreted as "no data".
+- ⚠️ **My own probe was the broken instrument twice.** A 33-id sweep read `.thumbnails` off a
+  400 body (`Maximum 20 design IDs`) and printed "all missing"; earlier runs disagreed with each
+  other for the same reason. **Check the HTTP status before parsing.** The finding only became
+  real when single-id queries returned artwork the batch had denied.
+- 🔑 A mock that ignores `q.limit` cannot catch this — the regression test makes the fake Caspio
+  honour the limit, so it fails against the old code (verified by reverting).
+- 🔑 **Same route file, same disease: `/thumbnails/sync-status` reported `totalRecords: 20000`,
+  which was `maxPages 20 × 1000` — the CAP, presented as a count** (true size 27,665). It also
+  counted `recordsWithImages` off **`ExternalKey`, the retired Caspio Files key**, so it answered
+  "0 of 20,000 have images" about a table where 26,990 do — artwork moved to Box and lives in
+  `FileUrl`. **A metric outliving its schema reads as a catastrophe rather than a stale field.**
+  Now counts `ExternalKey || FileUrl`, `strict: true` so truncation throws, and counts are opt-in
+  behind `?counts=true` (a count means ~28 Caspio reads; `lastSync` is one).
+- 🔑 **Caspio v2 does NOT return `TotalRecords`** on a `q.limit=1` read — the body is just
+  `Result`, and `makeCaspioRequest` strips even that. There is no cheap COUNT; verify before
+  designing around one. Use `discardResults: true` + `pageCallback` to count without holding
+  27k rows in dyno memory.
+- 🔑 **`lastSync` is the field that actually answers "is the sync stalled?"** — it showed the
+  bandit thumbnail sync running 09:22 the same morning, which proved the two remaining blank
+  designs had no artwork attached in ShopWorks rather than a sync lag.
+
+---
+
 ## The boxUrl() migration missed every surface that never called boxUrl() (2026-08-06)
 
 **Problem.** Erik: finished-photo thumbnails were blank on the Photo Library, the capture page's
@@ -51,6 +95,28 @@ finished-photos.js ×2 — design tiles AND the manage list, pride-wall-controll
   `builders/dtg/utils.js` — 20 false failures, the same shape as the 2026-06-09 `?v=` incident.
   Match on the resolved repo path, and follow `<script src>` → import graph (that covers both
   the `type="module"` dashboard and the esbuild-bundled quote builders).
+- 🔑 **The VENDOR portal needed a third mechanism, not a third copy of the second.** Supacolor/L&P
+  are neither staff nor customers, so `boxUrl()` (origin) and `portalProofUrl()` (customer token)
+  both miss. `vendorProofUrl` + `lib/vendor-magic-link.mintProofToken` mints a capability bound to
+  `{fileId, vendorName}` from rows `vendorOwnsRow()` already cleared. 🔴 **Type tag `'vproof'`, not
+  `'proof'`** — both families sign with SESSION_SECRET, so without it one outside company's image
+  URL verifies inside another identity. Jest-locked in BOTH directions.
+- 🔑 **`.map(projectVendorJob)` hands map's INDEX to the second parameter** — every token would be
+  minted for vendor "0"/"1"/… and 404 on redemption. Silent at author time, total at runtime;
+  a regex test now forbids the bare reference.
+- 🔑 **A wall of 404s looks exactly like a working deny-list.** Prove the negative AND the positive
+  in the same run: the customer token 404ing at the vendor route only means something because the
+  same token returned a 200 PNG at the customer route seconds earlier.
+- 🔑 **To see a customer-facing change, use the STAFF PORTAL PREVIEW:
+  `/portal-admin/preview/<idCustomer>`** (linked from `dashboards/customer-portal-admin.html`) —
+  read-only, renders exactly what the customer sees, no customer credentials needed. Erik had to
+  point this out after I'd concluded it was unverifiable: I grepped
+  `customer-portal-admin.html` for "preview|viewAs|impersonat" and the *route* lives elsewhere.
+  **Grep the route table, not just the page you expect to host the button.**
+- ⚠️ **A hand-minted portal session is NOT a substitute.** `requireCustomer` re-checks the live
+  `Customer_Portal_Access` table, so a signed cookie for an unregistered email 401s and *clears
+  itself*. Worse, the 401 body has no `mockups` key — so a naive parse prints "0 mockups" and
+  reads as a real empty result. Check the HTTP status before interpreting a body.
 - ⚠️ **Do not read `img.complete`/`naturalWidth` on a polling board.** Bradley's queue re-renders
   every 60s, replacing every `<img>`, so a snapshot mid-poll shows "0 decoded, 38 pending" on a
   page that is working perfectly. The network log (40/40 → 200) was the truthful instrument.
@@ -221,66 +287,5 @@ delta-time scaling on both momentum and auto-spin; and the contrast warning memo
 - ⚠️ **rAF is paused in a hidden tab, so any in-page fps probe hangs there** (a CDP eval waiting
   on it times out at 45 s and reads as "renderer frozen"). Arm the probe on `visibilitychange`
   and read the stored result afterwards.
-
----
-
-## The shared print block flattens every color you set inline (2026-08-04)
-
-**Problem.** The monogram Customer Proof renders each name in its real thread color — the whole
-point of the sheet. On screen it was perfect. **On paper every name printed black**, and the
-tiny color swatch beside it still printed correct, so the sheet looked deliberate rather than
-broken. Found by review, not by the browser pass that had already "verified" the feature.
-
-**Root cause.** `quote-builder-common.css`'s `@media print` block contains
-`* { color: black !important; }`. The controller set the thread color as a *normal* inline
-declaration (`style="color:#003DA5"`), and an author `!important` beats any normal declaration —
-including inline. Backgrounds were unaffected, which is why the swatch survived and the defect
-read as intentional.
-
-**Solution.** The inline color is now `!important` too (inline `!important` outranks stylesheet
-`!important`). Proven in-page rather than assumed: the same cascade reproduced synthetically
-yields `rgb(0,0,0)` without the flag and the true color with it.
-
-**Prevention.**
-- 🔑 **A print stylesheet is a second rendering nobody looks at.** Screen verification says
-  nothing about it — check print explicitly, or the defect ships looking fine.
-- 🔑 **`quote-builder-common.css` forces black text and is loaded by ALL 4 quote builders** — any
-  feature whose *meaning* is carried by color (thread, status, warning) must use `!important`
-  inline or a rule with its own `!important`, or it silently prints monochrome.
-- 🔑 **A partial survivor disguises the failure**: the swatch (background) printed while the text
-  (color) did not, which reads as a design choice instead of a bug. When one half of a visual
-  pair works, suspect a property-scoped override rather than a broken feature.
-
----
-
-## Releasing from a SHARED checkout: excluding a file cuts both ways (2026-08-04)
-
-**Problem.** Deploying the Embroidery Studio, the release also carried
-`quote-builders/monogram-form.html` â€” a parallel session's WIP that another session's
-`git add -A` had swept into `baafe9f3`. Shipping it would have put a **dead "Print Customer
-Proof" button** in front of reps (its controller/CSS were still in review on develop). Two
-further traps followed: `git checkout main` **aborted** because the shared tree was dirty with
-three sessions' edits, and the develop sync-back **silently reverted** the WIP the release had
-deliberately excluded.
-
-**Root cause.** A shared working tree makes branch-level operations sweep in work whose owner
-isn't in the room. And a merge that restores a file to main's version encodes "main's copy
-wins" â€” merging that commit back into develop faithfully replays the deletion.
-
-**Solution.** Cut the release at *my* verified sha in an isolated `git worktree`
-(`git merge --no-ff --no-commit <sha>` â†’ `git checkout HEAD -- <foreign file>` â†’ commit with the
-exclusion stated in the message), then on the sync-back re-take develop's copy
-(`git checkout origin/develop -- <file>`) before pushing.
-
-**Prevention.**
-- ðŸ”‘ **Never `git checkout <branch>` in a shared checkout â€” release from a `git worktree`.** Also
-  put that worktree at a SHORT path: `/Temp/nwca-rel` worked where the session scratchpad path
-  blew Windows MAX_PATH on a deep blog filename ("Filename too long", `Could not reset index`).
-- ðŸ”‘ **Every file-level exclusion needs a matching restore on the merge-back**, or the release
-  silently deletes the work it was protecting. Verify with `grep` for a marker from the WIP
-  *before* pushing the sync â€” not after.
-- ðŸ”‘ **Deploy the dependency first and prove it with a live probe**: the box-labels page needed
-  proxy `/api/sanmar-orders/label-data` â€” curl'd for HTTP 200 (and absence of `ContactEmail`)
-  before the app slug went out.
 
 ---
