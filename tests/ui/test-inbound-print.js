@@ -15,6 +15,12 @@
     orders: [
       {
         company: 'Absher Construction Company', method: 'Screen Print', workOrder: '142537', sanmarPO: '113747',
+        // Artwork present. A data: URI, not a real Box url — the harness runs offline
+        // and a /api/box/thumbnail link would 401 here, which would silently exercise
+        // the FALLBACK path while looking like it covered the image one. With this,
+        // the sheet shows all three logo states at once: image / NO ART / BLANKS.
+        logoUrl: 'data:image/svg+xml;utf8,' + encodeURIComponent(
+          '<svg xmlns="http://www.w3.org/2000/svg" width="42" height="42"><rect width="42" height="42" fill="#2e6f40"/><text x="21" y="26" font-size="13" fill="#fff" text-anchor="middle" font-family="sans-serif">ART</text></svg>'),
         dueDate: '2026-07-24', designNumber: '23074', designName: 'Absher logo', contactName: 'Carissa Garcia',
         productionDays: 2, rush: true, pastDue: false, rushThreshold: 3, arrival: '2026-07-22',
         salesRep: 'Nika Lao', customerPO: '53096', terms: 'Net 10', dateOrdered: '2026-07-21',

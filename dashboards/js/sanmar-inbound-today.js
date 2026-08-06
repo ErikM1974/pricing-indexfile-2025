@@ -346,7 +346,17 @@
           <thead><tr><th>Style</th><th>Description</th><th>Color</th><th>Size</th><th style="text-align:right">Ord</th><th style="text-align:right">Ship</th><th>Status</th>${showCost ? '<th style="text-align:right">Cost</th>' : ''}</tr></thead>
           <tbody>${(o.lines || []).map(l => `<tr><td>${esc(l.style)}</td><td>${esc(l.title || '')}</td><td>${esc(l.color || '—')}</td><td>${esc(l.size)}</td><td style="text-align:right">${fmtNum(l.qtyOrdered)}</td><td style="text-align:right">${fmtNum(l.qtyShipped)}</td><td>${esc(l.status)}</td>${showCost ? `<td style="text-align:right">${l.lineCost ? fmtMoney(l.lineCost) : '—'}</td>` : ''}</tr>`).join('')}</tbody>
         </table>`;
-    const psLogo = o.logoUrl ? `<img class="sit-ps-logo" src="${esc(o.logoUrl)}" alt="" onerror="this.style.display='none'">` : '';
+    // Same three states as the screen tile (logoTile), but spelled for PAPER.
+    // These sheets go to a mono laser, so the distinction cannot ride on colour —
+    // and a 42px emoji prints as a grey smudge. Words + border style instead:
+    // NO ART is dashed and dark (a gap to chase), BLANKS is solid and light
+    // (nothing missing). Before this, both rendered as empty space, which also
+    // made a failed image indistinguishable from "there was never any artwork".
+    const psLogo = o.logoUrl
+      ? `<img class="sit-ps-logo" src="${esc(o.logoUrl)}" alt="" onerror="this.style.display='none'">`
+      : (String(o.designNumber || '').trim()
+        ? `<div class="sit-ps-logo sit-ps-logo--off">NO ART</div>`
+        : `<div class="sit-ps-logo sit-ps-logo--blank">BLANKS</div>`);
     const psFields = [
       fmtShortDate(o.dueDate) ? 'Due ' + fmtShortDate(o.dueDate) : '',
       o.designNumber ? 'Design ' + o.designNumber + (o.designName ? ' ' + o.designName : '') : '',
