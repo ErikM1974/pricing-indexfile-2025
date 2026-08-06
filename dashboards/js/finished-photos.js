@@ -43,6 +43,12 @@
         if (!(bytes > 0)) return '';
         return bytes >= 1024 * 1024 ? (bytes / (1024 * 1024)).toFixed(1) + ' MB' : Math.round(bytes / 1024) + ' KB';
     }
+    // A stored Image_URL is an ABSOLUTE proxy url (the proxy writes
+    // `${PROXY_BASE_URL}/api/box/thumbnail/<id>` on upload) and 401s since the Box
+    // surface was session-gated — cross-origin means no SAML cookie. boxUrl() brings
+    // it back to this origin, where the cookie authorises the <img>. Guarded so a
+    // missing box-url.js script tag degrades instead of throwing.
+    function resolveBoxUrl(u) { return (typeof boxUrl === 'function') ? boxUrl(u) : u; }
     function debounce(fn, ms) {
         var t; return function () { var a = arguments, self = this; clearTimeout(t); t = setTimeout(function () { fn.apply(self, a); }, ms); };
     }
@@ -236,8 +242,11 @@
                 var ds = (d && d.designs) || [];
                 if (!ds.length) { grid.innerHTML = '<div class="fp-muted">No registered designs — use “No specific design” below.</div>'; return; }
                 grid.innerHTML = ds.map(function (x) {
+                    // Design thumbnails come back as absolute proxy Box urls too
+                    // (designs-by-method.js falls back to the stored FileUrl), so they
+                    // need the same normalisation as the photos below.
                     var img = x.thumbnailUrl
-                        ? '<img class="fp-d-img" src="' + esc(x.thumbnailUrl) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">'
+                        ? '<img class="fp-d-img" src="' + esc(resolveBoxUrl(x.thumbnailUrl)) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">'
                         : '<div class="fp-d-img"></div>';
                     return '<button type="button" class="fp-design" data-num="' + esc(x.idDesign) + '" data-name="' + esc(x.designName || '') + '">'
                         + img + '<div class="fp-d-cap"><b>#' + esc(x.idDesign) + '</b>' + esc(x.designName || '') + '</div></button>';
@@ -389,9 +398,10 @@
                     if (p.caption) subParts.push(p.caption);
                     var dt = fmtDate(p.uploadedDate); if (dt) subParts.push(dt);
                     var sub = subParts.map(esc).join(' · ');
+                    var src = resolveBoxUrl(p.imageUrl);
                     return '<div class="fp-mrow' + (on ? ' is-live' : '') + '" data-pk="' + esc(p.pkId) + '">'
-                        + '<button type="button" class="fp-mrow-thumb" data-act="view" data-src="' + esc(p.imageUrl) + '" aria-label="View photo full size">'
-                        + '<img src="' + esc(p.imageUrl) + '" alt="" loading="lazy"></button>'
+                        + '<button type="button" class="fp-mrow-thumb" data-act="view" data-src="' + esc(src) + '" aria-label="View photo full size">'
+                        + '<img src="' + esc(src) + '" alt="" loading="lazy"></button>'
                         + '<div class="fp-mrow-body"><div class="fp-mrow-title">' + esc(title) + '</div>'
                         + '<div class="fp-mrow-sub">' + (on ? '<span class="fp-live-dot">Live on portal</span>' + (sub ? ' · ' : '') : '') + sub + '</div></div>'
                         + '<div class="fp-mrow-actions">'

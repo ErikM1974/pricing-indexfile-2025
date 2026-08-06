@@ -40,6 +40,14 @@
         return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     }
 
+    // Finished_Photos.Image_URL is written as an ABSOLUTE proxy url
+    // (https://caspio-pricing-proxy…/api/box/thumbnail/<id>, see the proxy's
+    // routes/finished-photos.js), which 401s since the Box surface was
+    // session-gated — a cross-origin <img> carries no SAML cookie. boxUrl()
+    // re-points it at this origin, where the cookie authorises it. Guarded so a
+    // missing box-url.js script tag degrades instead of throwing.
+    function resolveBoxUrl(u) { return (typeof boxUrl === 'function') ? boxUrl(u) : u; }
+
     document.addEventListener('DOMContentLoaded', function () {
         state.rep = repFromHash();
         wireControls();
@@ -164,9 +172,10 @@
         if (p.idOrder) subParts.push('Order #' + p.idOrder);
         var dt = fmtDate(p.uploadedDate); if (dt) subParts.push(dt);
         var capBits = [p.companyName, title, p.caption].filter(Boolean).join(' · ');
+        var src = resolveBoxUrl(p.imageUrl);
         return '<article class="fpl-card" data-pk="' + esc(p.pkId) + '">' +
-            '<button type="button" class="fpl-card-imgbtn" data-act="view" data-src="' + esc(p.imageUrl) + '" data-cap="' + esc(capBits) + '" aria-label="View full size">' +
-            '<img src="' + esc(p.imageUrl) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' +
+            '<button type="button" class="fpl-card-imgbtn" data-act="view" data-src="' + esc(src) + '" data-cap="' + esc(capBits) + '" aria-label="View full size">' +
+            '<img src="' + esc(src) + '" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">' +
             '</button>' +
             '<div class="fpl-card-body">' +
             '<div class="fpl-card-title">' + esc(title) + '</div>' +
