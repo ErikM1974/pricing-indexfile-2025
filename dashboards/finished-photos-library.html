@@ -104,10 +104,13 @@
         </figure>
     </div>
 
-    <!-- Load order matters: APP_CONFIG → fetch-timeout → DashPage → page controller -->
+    <!-- Load order matters: APP_CONFIG → fetch-timeout → DashPage → box-url → page controller.
+         box-url.js MUST precede the controller: stored photo urls are absolute proxy
+         urls that 401 cross-origin, and boxUrl() is what brings them back to this origin. -->
     <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/dash-page-helpers.js"></script>
-    <script src="/dashboards/js/finished-photos-library.js?v=2026.07.20.5"></script>
+    <script src="/shared_components/js/box-url.js?v=2026.08.05.23"></script>
+    <script src="/dashboards/js/finished-photos-library.js?v=2026.08.06.1"></script>
 </body>
 </html>

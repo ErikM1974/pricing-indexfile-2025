@@ -1055,6 +1055,12 @@
          fetch after DOMContentLoaded), GET-only, visible retry state on failure. -->
     <script src="/staff-dashboard-v3/art-aging-widget.js?v=2026.07.05.4" defer></script>
 
+    <!-- Box url normaliser — the Pride Wall renders Finished_Photos rows whose stored
+         Image_URL is an absolute proxy url that 401s cross-origin. Classic (non-module)
+         script on purpose: it sets a global, and classic scripts run before any
+         type="module", so window.boxUrl exists by the time the app entry below runs. -->
+    <script src="/shared_components/js/box-url.js?v=2026.08.05.23"></script>
+
     <!-- ===================================================
          APP ENTRY (ES module)
          =================================================== -->

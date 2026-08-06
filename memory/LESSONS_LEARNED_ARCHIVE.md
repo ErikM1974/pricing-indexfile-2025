@@ -984,3 +984,60 @@ identity cannot see â€” a carryover is hours both accrued *and* used last y
   into a `rowIssues` array that bypassed the careful per-field `toSafeReview()` filter, and the
   page rendered it â€” on the one page whose stated purpose is that compensation never reaches the
   browser. **Audit the error and log paths with the same rigour as the data path.**
+
+
+## A corrupt file that "parses" becomes a silent wrong price â€” DST has no magic bytes (2026-08-04)
+
+**Problem.** Browser-verifying the contract calculator's new DST drop zone: 2,000 bytes of
+arbitrary garbage named `.dst` didn't error â€” it "decoded" into ~500 nonsense stitches, silently
+replaced the previously loaded file, and priced the order at the 8K contract minimum.
+
+**Root cause.** Tajima DST has no file signature: ANY 3-byte record decodes into *some* stitch
+delta. `dst-parser.js`'s only guardrails were "file too small" and "zero stitches decoded" â€”
+tuned for the Embroidery Studio VIEWER, where garbage is self-evident as noise on the canvas.
+On a PRICING surface the same parse produces a plausible number with no visual to contradict it.
+
+**Solution.** Calculator-side validity gate (`embroidery-contract.js handleDstFile`): every real
+DST declares its record count in the `ST:` header â€” refuse loudly when it's 0 or disagrees with
+the decoded record total by >25%.
+
+**Prevention.**
+- ðŸ”‘ **A parser succeeding â‰  the input being valid. For signature-less formats, cross-check an
+  internal redundancy** (declared vs decoded counts) before trusting the result with money.
+- ðŸ”‘ **The same parse carries different risk per surface**: viewer â†’ garbage renders as visible
+  noise; calculator â†’ silent wrong price (Erik's #1 rule). Reused code inherits the validation
+  needs of its STRICTEST consumer.
+- Verify error paths with actively hostile bytes, not just wrong extensions â€” 12 green jest
+  tests and a clean happy path coexisted with this hole.
+
+---
+
+
+## `el.hidden` doesn't hide a flex element â€” and asserting the property hides the bug too (2026-08-04)
+
+**Problem.** On the contract calculator's DST card, `el.hidden = true` left three elements fully
+visible: the drop zone stayed on screen *under* the loaded file card, and two empty note rows
+rendered inside the card as stray dashed-bordered strips whenever no note applied.
+
+**Root cause.** `[hidden] { display: none }` lives in the **UA stylesheet**, so ANY author
+`display` declaration beats it regardless of specificity â€” and `.dst-drop` / `.dst-note` /
+`.dst-suggest` are all `display: flex`. Elements with no author `display` (the card, the error,
+the buttons) hid correctly, which is exactly why it looked like the pattern worked.
+
+**Why the first verification pass missed it.** The browser check asserted `el.hidden` â€” the
+**property** â€” which is just reading back the attribute that was set. It is true whether or not
+the element is visible. Only `getComputedStyle(el).display` answers the actual question.
+
+**Solution.** Attribute-qualified rules, which outrank the plain class rule:
+`.dst-drop[hidden], .dst-note[hidden], .dst-suggest[hidden] { display: none; }`
+
+**Prevention.**
+- ðŸ”‘ **Any component that sets both a `display` and `[hidden]` needs an explicit
+  `.thing[hidden]{display:none}`** â€” assume the UA rule loses.
+- ðŸ”‘ **Verify visibility with `getComputedStyle().display` / `getBoundingClientRect()`, never
+  the `.hidden` property or a class check.** Asserting the input you just set proves nothing;
+  assert the rendered consequence.
+- ðŸ”‘ An adversarial review pass caught this after a "passing" browser pass. When a verification
+  result is a tautology, it will pass forever.
+
+---

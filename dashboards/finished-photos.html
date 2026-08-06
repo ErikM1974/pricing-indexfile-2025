@@ -159,7 +159,10 @@
     </div>
 
     <script src="/config/app.config.js?v=2026.07.17.1"></script>
+    <!-- box-url.js before the controller: stored photo urls are absolute proxy urls
+         that 401 cross-origin, and boxUrl() is what brings them back to this origin. -->
+    <script src="/shared_components/js/box-url.js?v=2026.08.05.23"></script>
     <script src="/dashboards/js/vendor/html5-qrcode.min.js?v=2026.07.17.11" defer></script>
-    <script src="/dashboards/js/finished-photos.js?v=2026.07.17.11" defer></script>
+    <script src="/dashboards/js/finished-photos.js?v=2026.08.06.1" defer></script>
 </body>
 </html>

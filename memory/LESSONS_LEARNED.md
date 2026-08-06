@@ -5,6 +5,43 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## The boxUrl() migration missed every surface that never called boxUrl() (2026-08-06)
+
+**Problem.** Erik: finished-photo thumbnails were blank on the Photo Library, the capture page's
+design picker, its "on file" list, and the dashboard Pride Wall. Cards, captions, counts and
+"18 photos / 18 live" were all correct — only the images were dead.
+
+**Root cause.** The Aug-5 Box gating put the proxy's `/api/box/thumbnail/:fileId` behind
+`requireCrmApiSecret`. `Finished_Photos.Image_URL` is written ABSOLUTE at upload time
+(`proxy src/routes/finished-photos.js:125` → `${PROXY_BASE_URL}/api/box/thumbnail/<id>`), and
+`designs-by-method.js` returns stored `FileUrl` thumbnails in the same absolute shape. Absolute =
+cross-origin = no SAML cookie → **401 on every `<img>`** (verified live: anonymous GET returns
+`401 {"error":"Unauthorized"}`). The fix everywhere else was `boxUrl()`, which re-points stored
+urls at this origin so the cookie authorises them — these four renderers were never migrated.
+
+**Solution.** `resolveBoxUrl()` at each render site (finished-photos-library.js,
+finished-photos.js ×2 — design tiles AND the manage list, pride-wall-controller.js) plus the
+`box-url.js` script tag on their three pages. The Pride Wall is an ES module, so it reads
+`window.boxUrl`; a classic script always executes before any `type="module"`.
+
+**Prevention.**
+- 🔑 **A migration guarded by "everyone who calls X must also load X" cannot see the files that
+  never call X.** `box-url.test.js` was green throughout — its consumer scan starts from
+  `boxUrl(` call sites, so an unmigrated renderer is invisible by construction. The blast radius
+  of a gating change is *every reader of the gated data*, not the subset already adapted to it.
+- 🔑 **Scans define the blind spot.** That test listed JS non-recursively and skipped
+  `staff-dashboard-v3/`, so the Pride Wall was doubly unreachable. Both widened; the JS walk is
+  now recursive and the page walk follows `type="module"` **import graphs**, since a module
+  consumer has no `<script src>` of its own to match on.
+- 🔑 **Ask what the field actually holds before assuming which fixer applies.** The design tiles
+  looked like a different bug (`/api/files/<key>`, which is open and returns 400 not 401); the
+  live payload showed they were `/api/box/thumbnail/` urls after all. One `curl` of the real
+  endpoint beat reading the writer code.
+- ⚠️ **"Upload works" ≠ "images work."** The capture preview is a local `URL.createObjectURL`
+  blob, so a phone upload looks completely healthy while every stored url is 401ing.
+
+---
+
 ## Gating a shared image route broke every CUSTOMER, and only a real login showed it (2026-08-05)
 
 **Problem.** The Aug 5 Box gating (`b9e9d2a3`) put `/api/box/thumbnail/:fileId` behind
@@ -231,59 +268,3 @@ exclusion stated in the message), then on the sync-back re-take develop's copy
   before the app slug went out.
 
 ---
-
-## `el.hidden` doesn't hide a flex element â€” and asserting the property hides the bug too (2026-08-04)
-
-**Problem.** On the contract calculator's DST card, `el.hidden = true` left three elements fully
-visible: the drop zone stayed on screen *under* the loaded file card, and two empty note rows
-rendered inside the card as stray dashed-bordered strips whenever no note applied.
-
-**Root cause.** `[hidden] { display: none }` lives in the **UA stylesheet**, so ANY author
-`display` declaration beats it regardless of specificity â€” and `.dst-drop` / `.dst-note` /
-`.dst-suggest` are all `display: flex`. Elements with no author `display` (the card, the error,
-the buttons) hid correctly, which is exactly why it looked like the pattern worked.
-
-**Why the first verification pass missed it.** The browser check asserted `el.hidden` â€” the
-**property** â€” which is just reading back the attribute that was set. It is true whether or not
-the element is visible. Only `getComputedStyle(el).display` answers the actual question.
-
-**Solution.** Attribute-qualified rules, which outrank the plain class rule:
-`.dst-drop[hidden], .dst-note[hidden], .dst-suggest[hidden] { display: none; }`
-
-**Prevention.**
-- ðŸ”‘ **Any component that sets both a `display` and `[hidden]` needs an explicit
-  `.thing[hidden]{display:none}`** â€” assume the UA rule loses.
-- ðŸ”‘ **Verify visibility with `getComputedStyle().display` / `getBoundingClientRect()`, never
-  the `.hidden` property or a class check.** Asserting the input you just set proves nothing;
-  assert the rendered consequence.
-- ðŸ”‘ An adversarial review pass caught this after a "passing" browser pass. When a verification
-  result is a tautology, it will pass forever.
-
----
-
-## A corrupt file that "parses" becomes a silent wrong price â€” DST has no magic bytes (2026-08-04)
-
-**Problem.** Browser-verifying the contract calculator's new DST drop zone: 2,000 bytes of
-arbitrary garbage named `.dst` didn't error â€” it "decoded" into ~500 nonsense stitches, silently
-replaced the previously loaded file, and priced the order at the 8K contract minimum.
-
-**Root cause.** Tajima DST has no file signature: ANY 3-byte record decodes into *some* stitch
-delta. `dst-parser.js`'s only guardrails were "file too small" and "zero stitches decoded" â€”
-tuned for the Embroidery Studio VIEWER, where garbage is self-evident as noise on the canvas.
-On a PRICING surface the same parse produces a plausible number with no visual to contradict it.
-
-**Solution.** Calculator-side validity gate (`embroidery-contract.js handleDstFile`): every real
-DST declares its record count in the `ST:` header â€” refuse loudly when it's 0 or disagrees with
-the decoded record total by >25%.
-
-**Prevention.**
-- ðŸ”‘ **A parser succeeding â‰  the input being valid. For signature-less formats, cross-check an
-  internal redundancy** (declared vs decoded counts) before trusting the result with money.
-- ðŸ”‘ **The same parse carries different risk per surface**: viewer â†’ garbage renders as visible
-  noise; calculator â†’ silent wrong price (Erik's #1 rule). Reused code inherits the validation
-  needs of its STRICTEST consumer.
-- Verify error paths with actively hostile bytes, not just wrong extensions â€” 12 green jest
-  tests and a clean happy path coexisted with this hole.
-
----
-

@@ -101,23 +101,41 @@ describe('boxUrl — leaves everything else alone', () => {
  * and must load it FIRST. A page that drifts out of sync fails here.
  */
 describe('box-url.js is loaded by every page whose scripts call boxUrl()', () => {
+    // Recursive on purpose. The flat version of this scan missed
+    // shared_components/js/staff-dashboard/controllers/pride-wall-controller.js
+    // (the dashboard Pride Wall), which rendered stored Box urls raw for weeks
+    // while this file stayed green — see the finished-photos incident, 2026-08-06.
     const JS_DIRS = ['shared_components/js', 'pages/js', 'dashboards/js'];
+    // Likewise: staff-dashboard-v3/ hosts a page that consumes those urls, so a
+    // page scan that skips it cannot see the very break this test exists to catch.
+    const HTML_DIRS = ['.', 'pages', 'dashboards', 'admin', 'staff-dashboard-v3'];
     const CALLS_BOX_URL = /\bboxUrl\s*\(/;
+    const SKIP_DIRS = new Set(['node_modules', 'vendor', '.git']);
 
     const listFiles = (dir, ext) => {
         const abs = path.join(REPO, dir);
         if (!fs.existsSync(abs)) return [];
         return fs.readdirSync(abs).filter(f => f.endsWith(ext)).map(f => `${dir}/${f}`);
     };
+    // Deep variant for the JS scan only. The HTML scan stays flat — its dir list
+    // includes the repo root, and recursing that would walk node_modules.
+    const listFilesDeep = (dir, ext) => {
+        const abs = path.join(REPO, dir);
+        if (!fs.existsSync(abs)) return [];
+        return fs.readdirSync(abs, { withFileTypes: true }).flatMap((e) => {
+            if (e.isDirectory()) return SKIP_DIRS.has(e.name) ? [] : listFilesDeep(`${dir}/${e.name}`, ext);
+            return e.name.endsWith(ext) ? [`${dir}/${e.name}`] : [];
+        });
+    };
 
     // Every JS file that actually calls boxUrl() (box-url.js itself excluded).
     const consumers = JS_DIRS
-        .flatMap(d => listFiles(d, '.js'))
+        .flatMap(d => listFilesDeep(d, '.js'))
         .filter(rel => !rel.endsWith('box-url.js'))
         .filter(rel => CALLS_BOX_URL.test(fs.readFileSync(path.join(REPO, rel), 'utf8')));
 
     // Every HTML page in the repo, with its markup.
-    const pages = ['.', 'pages', 'dashboards', 'admin']
+    const pages = HTML_DIRS
         .flatMap(d => listFiles(d, '.html'))
         .map(rel => ({ rel, html: fs.readFileSync(path.join(REPO, rel), 'utf8') }));
 
@@ -136,28 +154,83 @@ describe('box-url.js is loaded by every page whose scripts call boxUrl()', () =>
         return m ? m.index : -1;
     };
 
-    // One case per (page, consumer script) pair that actually exists.
+    // A consumer can also be reached by `import`, with no <script src> of its own —
+    // that is exactly how the Pride Wall (pride-wall-controller.js) hangs off the
+    // dashboard's single type="module" entry point. Matching only on script tags
+    // declared such a consumer unreachable, so walk the module graph too.
+    const SPEC_RES = [
+        /\bfrom\s*['"]([^'"]+)['"]/g,          // import … from / export … from
+        /\bimport\s*\(\s*['"]([^'"]+)['"]\s*\)/g, // dynamic import()
+        /\bimport\s+['"]([^'"]+)['"]/g,        // side-effect import
+    ];
+    const resolveSpec = (fromRel, spec) => {
+        if (!spec.startsWith('.')) return null;   // bare specifier — not a repo file
+        const abs = path.join(path.dirname(path.join(REPO, fromRel)), spec.split('?')[0]);
+        return fs.existsSync(abs) ? path.relative(REPO, abs).split(path.sep).join('/') : null;
+    };
+    const moduleGraph = (entryRel, seen = new Set()) => {
+        if (!entryRel || seen.has(entryRel) || !fs.existsSync(path.join(REPO, entryRel))) return seen;
+        seen.add(entryRel);
+        const src = fs.readFileSync(path.join(REPO, entryRel), 'utf8');
+        for (const re of SPEC_RES) {
+            re.lastIndex = 0;
+            let m;
+            while ((m = re.exec(src))) {
+                const dep = resolveSpec(entryRel, m[1]);
+                if (dep) moduleGraph(dep, seen);
+            }
+        }
+        return seen;
+    };
+    // Every <script type="module" src=…> on a page, with the tag's position.
+    const moduleEntries = (html) => {
+        const out = [];
+        const tagRe = /<script\b[^>]*>/gi;
+        let m;
+        while ((m = tagRe.exec(html))) {
+            if (!/\btype=["']module["']/i.test(m[0])) continue;
+            const src = /\bsrc=["']([^"']+)["']/i.exec(m[0]);
+            if (src) out.push({ rel: src[1].split('?')[0].replace(/^\//, ''), index: m.index });
+        }
+        return out;
+    };
+
+    // One case per (page, consumer) pair that actually exists. `at` is the position
+    // the consumer starts running from — its own tag, or the module entry that pulls
+    // it in — and box-url.js must be declared before that.
     const pairs = [];
-    for (const c of consumers) {
-        const base = path.basename(c);
-        for (const p of pages) {
-            if (scriptTagIndex(p.html, base) !== -1) pairs.push([p.rel, base, p.html]);
+    for (const p of pages) {
+        for (const c of consumers) {
+            const base = path.basename(c);
+            const at = scriptTagIndex(p.html, base);
+            if (at !== -1) pairs.push({ page: p.rel, label: base, html: p.html, at });
+        }
+        for (const entry of moduleEntries(p.html)) {
+            const graph = moduleGraph(entry.rel);
+            for (const c of consumers) {
+                if (!graph.has(c)) continue;
+                const label = `${path.basename(c)} (imported by ${path.basename(entry.rel)})`;
+                pairs.push({ page: p.rel, label, html: p.html, at: entry.index });
+            }
         }
     }
 
     test('every consumer script is reachable from at least one page', () => {
-        const orphans = consumers.filter(c => !pairs.some(([, base]) => base === path.basename(c)));
+        const reached = new Set(pairs.map(x => x.label.split(' ')[0]));
+        const orphans = consumers.filter(c => !reached.has(path.basename(c)));
         expect(orphans).toEqual([]);
     });
 
-    test.each(pairs.map(([page, script]) => [page, script]))(
+    test.each(pairs.map(x => [x.page, x.label]))(
         '%s loads box-url.js for %s',
-        (page, script) => {
-            const html = pairs.find(([p, s]) => p === page && s === script)[2];
-            const boxUrlAt = scriptTagIndex(html, 'box-url.js');
+        (page, label) => {
+            const pair = pairs.find(x => x.page === page && x.label === label);
+            const boxUrlAt = scriptTagIndex(pair.html, 'box-url.js');
             expect(boxUrlAt).not.toBe(-1);
             // Order matters — boxUrl must be defined before the consumer runs.
-            expect(boxUrlAt).toBeLessThan(scriptTagIndex(html, script));
+            // (A classic script always beats a deferred module, but keeping the
+            // declaration above the entry tag makes the dependency readable.)
+            expect(boxUrlAt).toBeLessThan(pair.at);
         }
     );
 });

@@ -113,6 +113,25 @@ every builder reflects it with **no deploy**.
 - When you add ANY new charge to a builder, wire it to the API FIRST. Audit target: Rush 25%,
   LTM, 3D-puff/laser upcharges, and all SCP/DTF/DTG fees are still being migrated to this.
 
+### 🗂️ Big Caspio table writes = CSV + data import, NOT per-row API (Erik's rule, 2026-08-06)
+
+**Writing roughly 1,000+ rows to a Caspio table? Export a CSV and use a Caspio data import.**
+Imports bill against a **separate 1,000/period meter**, cost ~0 Integrations calls, and Caspio
+**pulls** the file (Box/OneDrive/S3/HTTPS) so the transfer is free too.
+
+- **Only for big data.** Under a few hundred rows the API is fine — the import setup and its
+  verification cost more than the calls save. This is not a ban on writing via the API.
+- Measured 2026-08-05: a morning of per-row table updates cost **~11,800 calls** (73% of a
+  day's budget) that would have been ~0 as an import.
+- Pattern to copy: `../caspio-pricing-proxy/scripts/sync-design-lookup.js --csv-out`.
+- 🔴 **The upsert key is set in the Caspio UI, invisible to code review** — a wrong key
+  silently writes wrong data. Verify it on the import definition, never by reading the script.
+- Ceiling ~32 runs/day ⇒ big infrequent jobs only, never a frequent sync.
+- ⚠️ Why per-row adds up: `PATCH .../records/bulk` takes ONE value-set for all matches, so it
+  **cannot** do per-row upserts. Bulk helps inserts (≤1,000 = 1 call); updates cost 1 each.
+
+Detail + the cost measurements: `memory/CASPIO_QUOTA_2026-07.md`.
+
 ### Two Color-Field System (inventory-critical)
 
 | Field | Use for | Example |

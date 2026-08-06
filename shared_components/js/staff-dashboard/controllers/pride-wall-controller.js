@@ -52,6 +52,16 @@ function fmtDate(s) {
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }
 
+// Finished_Photos.Image_URL is stored ABSOLUTE (the proxy writes
+// `${PROXY_BASE_URL}/api/box/thumbnail/<id>` at upload time) and 401s since the Box
+// surface was session-gated — a cross-origin <img> carries no SAML cookie. boxUrl()
+// re-points it at this origin, where the cookie authorises it. box-url.js is a
+// classic script setting a global; this is a module, so reach it off window (and
+// guard, so a missing script tag degrades instead of throwing).
+function resolveBoxUrl(u) {
+    return typeof window.boxUrl === 'function' ? window.boxUrl(u) : u;
+}
+
 function tileHtml(p) {
     const co = p.companyName || '';
     const dsn = p.designNumber ? `#${p.designNumber}` : '';
@@ -67,7 +77,7 @@ function tileHtml(p) {
         : '';
     return `
         <a class="pw-tilelink" href="/dashboards/finished-photos-library.html" title="${escapeHtml(title)}">
-            <img src="${escapeHtml(p.imageUrl)}" alt="${escapeHtml(co || 'Finished product photo')}" loading="lazy"
+            <img src="${escapeHtml(resolveBoxUrl(p.imageUrl))}" alt="${escapeHtml(co || 'Finished product photo')}" loading="lazy"
                  onerror="this.closest('.pw-tile').classList.add('pw-tile--dead')">
             <span class="pw-cap">
                 ${line1}
