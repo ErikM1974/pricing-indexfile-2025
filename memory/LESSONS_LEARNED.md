@@ -51,6 +51,22 @@ finished-photos.js ×2 — design tiles AND the manage list, pride-wall-controll
   `builders/dtg/utils.js` — 20 false failures, the same shape as the 2026-06-09 `?v=` incident.
   Match on the resolved repo path, and follow `<script src>` → import graph (that covers both
   the `type="module"` dashboard and the esbuild-bundled quote builders).
+- 🔑 **The VENDOR portal needed a third mechanism, not a third copy of the second.** Supacolor/L&P
+  are neither staff nor customers, so `boxUrl()` (origin) and `portalProofUrl()` (customer token)
+  both miss. `vendorProofUrl` + `lib/vendor-magic-link.mintProofToken` mints a capability bound to
+  `{fileId, vendorName}` from rows `vendorOwnsRow()` already cleared. 🔴 **Type tag `'vproof'`, not
+  `'proof'`** — both families sign with SESSION_SECRET, so without it one outside company's image
+  URL verifies inside another identity. Jest-locked in BOTH directions.
+- 🔑 **`.map(projectVendorJob)` hands map's INDEX to the second parameter** — every token would be
+  minted for vendor "0"/"1"/… and 404 on redemption. Silent at author time, total at runtime;
+  a regex test now forbids the bare reference.
+- 🔑 **A wall of 404s looks exactly like a working deny-list.** Prove the negative AND the positive
+  in the same run: the customer token 404ing at the vendor route only means something because the
+  same token returned a 200 PNG at the customer route seconds earlier.
+- ⚠️ **A hand-minted portal session is NOT a verification path.** `requireCustomer` re-checks the
+  live `Customer_Portal_Access` table, so a signed cookie for an unregistered email 401s and
+  *clears itself*. Worse, the 401 body has no `mockups` key — so a naive parse prints "0 mockups"
+  and reads as a real empty result. Check the HTTP status before interpreting a body.
 - ⚠️ **Do not read `img.complete`/`naturalWidth` on a polling board.** Bradley's queue re-renders
   every 60s, replacing every `<img>`, so a snapshot mid-poll shows "0 decoded, 38 pending" on a
   page that is working perfectly. The network log (40/40 → 200) was the truthful instrument.
