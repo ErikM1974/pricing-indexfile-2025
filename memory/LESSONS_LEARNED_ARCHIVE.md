@@ -1074,3 +1074,33 @@ exclusion stated in the message), then on the sync-back re-take develop's copy
   before the app slug went out.
 
 ---
+
+
+## The shared print block flattens every color you set inline (2026-08-04)
+
+**Problem.** The monogram Customer Proof renders each name in its real thread color — the whole
+point of the sheet. On screen it was perfect. **On paper every name printed black**, and the
+tiny color swatch beside it still printed correct, so the sheet looked deliberate rather than
+broken. Found by review, not by the browser pass that had already "verified" the feature.
+
+**Root cause.** `quote-builder-common.css`'s `@media print` block contains
+`* { color: black !important; }`. The controller set the thread color as a *normal* inline
+declaration (`style="color:#003DA5"`), and an author `!important` beats any normal declaration —
+including inline. Backgrounds were unaffected, which is why the swatch survived and the defect
+read as intentional.
+
+**Solution.** The inline color is now `!important` too (inline `!important` outranks stylesheet
+`!important`). Proven in-page rather than assumed: the same cascade reproduced synthetically
+yields `rgb(0,0,0)` without the flag and the true color with it.
+
+**Prevention.**
+- 🔑 **A print stylesheet is a second rendering nobody looks at.** Screen verification says
+  nothing about it — check print explicitly, or the defect ships looking fine.
+- 🔑 **`quote-builder-common.css` forces black text and is loaded by ALL 4 quote builders** — any
+  feature whose *meaning* is carried by color (thread, status, warning) must use `!important`
+  inline or a rule with its own `!important`, or it silently prints monochrome.
+- 🔑 **A partial survivor disguises the failure**: the swatch (background) printed while the text
+  (color) did not, which reads as a design choice instead of a bug. When one half of a visual
+  pair works, suspect a property-scoped override rather than a broken feature.
+
+---
