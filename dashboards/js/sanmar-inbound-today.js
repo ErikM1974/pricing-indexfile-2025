@@ -576,12 +576,43 @@
     document.body.appendChild(sheet);
     return sheet;
   }
+  // window.print() snapshots the DOM as it stands, so any <img> still in flight is
+  // simply ABSENT from the PDF — silently, with no error and no gap in the layout.
+  // The sheet builds fresh <img> tags each time, and the on-screen tiles are
+  // loading="lazy", so only the orders the user happened to scroll past are warm:
+  // a printed sheet routinely lost the thumbnails further down. Measured on a real
+  // AE sheet 2026-08-06 — 7 POs with artwork, 3 images in the PDF.
+  //
+  // Bounded on purpose. A dead Box file (404) or a slow one must never hold the
+  // print dialog hostage — after PRINT_IMAGE_WAIT_MS we print what we have, which
+  // is exactly the old behaviour rather than a regression.
+  const PRINT_IMAGE_WAIT_MS = 6000;
+  function awaitSheetImages(root) {
+    const pending = Array.from(root.querySelectorAll('img'))
+      .filter(img => !(img.complete && img.naturalWidth > 0));
+    if (!pending.length) return Promise.resolve();
+    const settled = pending.map(img => new Promise(resolve => {
+      // decode() resolves once the bitmap is ready to PAINT; 'load' can fire a
+      // frame earlier, which is precisely the window this bug lived in. Both
+      // outcomes resolve — a broken image should print as absent, not block.
+      if (typeof img.decode === 'function') { img.decode().then(resolve, resolve); return; }
+      img.addEventListener('load', resolve, { once: true });
+      img.addEventListener('error', resolve, { once: true });
+    }));
+    return Promise.race([
+      Promise.all(settled),
+      new Promise(resolve => setTimeout(resolve, PRINT_IMAGE_WAIT_MS)),
+    ]);
+  }
+
   async function printProfile(kind, arg) {
     // Re-pull before rendering — see syncBeforeOutput(). Aborts the print on failure.
     if (!(await syncBeforeOutput(modalEl && modalEl.querySelector('#sit-print')))) return;
     if (!lastData) return;
     const builder = PRINT_BUILDERS[kind] || PRINT_BUILDERS.full;
-    renderPrintSheet(builder(lastData, arg));
+    const sheet = renderPrintSheet(builder(lastData, arg));
+    // Before the dialog, not after — once print() is called the snapshot is taken.
+    await awaitSheetImages(sheet);
     document.body.classList.add('sit-printing');
     const cleanup = () => {
       document.body.classList.remove('sit-printing');
