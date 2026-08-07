@@ -46,9 +46,23 @@ blank note behaves byte-identically to before (Steve still gets `template_art_co
   assignment is idempotent; the clone trick used by `openChangesModal()` also copies the
   reflected `disabled` attribute and `innerHTML`, so a modal closed mid-error reopens dead.
   `openCustomerReviseModal():4344` additionally leaks one overlay listener per open.
-- ⚠️ **`showToast(...)` is called at 3 sites in `pages/js/art-request-detail.js` and is not
-  defined on that page** (only `window.TransferActions.showToast` exists). Those three
-  upload-failure messages throw instead of showing. Use `showArdToast()`. Not fixed here.
+- 🔴 **A namespaced export reads like a global at the call site — and the ReferenceError
+  landed INSIDE a `.catch()`, so it soft-locked the modal (FIXED 2026-08-07).** Three sites in
+  `pages/js/art-request-detail.js` called a bare `showToast(...)`. It is defined only as
+  `window.TransferActions.showToast` (`transfer-actions-shared.js:593`, inside that file's
+  IIFE), so a bare reference threw — proven at runtime: `TransferActions.showToast` is a
+  `function` while `window.showToast` is `undefined` and `showToast` alone throws
+  `ReferenceError`. Fixed by switching all three to the page's own `showArdToast()`.
+  - 🔑 **The upload-failure one was in a `.catch()` handler, so the two lines AFTER it never
+    ran** — `btn.disabled = false` and `btn.textContent = 'Submit Revision Request'`. A failed
+    upload left Submit permanently disabled reading "Uploading N files…". Compounded by the
+    `cloneNode` bug above: reopening the modal clones the *disabled* button, so the flow stayed
+    dead. **An error handler that can itself throw converts a visible failure into a soft-lock.**
+  - 🔑 The two size/count guards threw *before* their `return`, so they rejected the file by
+    accident while aborting the caller's loop — remaining dropped files were silently skipped.
+  - 🔑 **Prevention: prefer the page's own helper over one that "seems" global.** Grep for
+    `function <name>` AND `window.<name>` before calling — a helper exported as
+    `window.NS.<name>` is not in scope, and nothing in a browser fails at load time to tell you.
 
 ---
 
