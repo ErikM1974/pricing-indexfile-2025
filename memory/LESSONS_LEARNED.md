@@ -47,6 +47,21 @@ map (`253gear-media-maps.json`). Two new audit checks in `src/utils/shopify-audi
   before writing, not after.
 - 🔑 **`productReorderMedia` returns `UserError`, which has no `code` field** (unlike
   `MediaUserError`). Selecting it fails the whole query at parse time.
+- 🔴 **A BAD GATE DOES NOT FAIL LOUDLY — IT REPORTS SUCCESS.** Both new checks shipped green
+  and an adversarial review found **11 defects, 6 real**, in code I had just written and
+  self-reviewed as safe. My own confirming pass called it "safe to deploy". Specifics worth
+  keeping:
+  - **`MediaImage` GID ≠ `ProductImage` GID** — two namespaces for one picture, so
+    `media.id === variant.image.id` is NEVER true. Only the **normalised URL** joins them.
+    (This bit me twice in one day: first in a script, then again in the audit check.)
+  - **A check is only as good as the query feeding it.** `checkOrphanMedia` was inert on the
+    publish gate because that query never selected `media { image { url } }` — it reported
+    "no media to check" on products full of photos. Now drift-locked by a test.
+  - **When a check cannot answer, it must SAY so** — never return a clean pass on data it
+    never received.
+  - **`byPair[k] = x` in a loop is last-write-wins.** It silently hid pairs whose sizes
+    disagreed. Collect a Set when "these must all agree" is the actual invariant.
+  - 🔑 Strip the CDN `?v=` before comparing image URLs — it differs between reads of one file.
 - 🔑 Verified on the **live storefront by clicking every thumbnail**, not in the admin —
   both prior binding incidents were invisible to the API. Set a distinctive size first:
   if a click moves Size, the image is bound to too few variants.
