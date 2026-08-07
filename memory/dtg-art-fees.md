@@ -5,7 +5,11 @@ The Leads workspace only *links out* to the four builders (`dashboards/js/lead-w
 `QUOTE_BUILDERS`) — the builder in question is **DTG**, the one method that had no art charges
 at all. EMB/SCP/DTF have had GRT-50 + GRT-75 since the 2026 fee refactor.
 
-**Status: built + verified locally, NOT deployed. Erik has not seen it yet.**
+**Status: LIVE — `v2026.08.06.7` / Heroku release v1829, deployed 2026-08-06.** Verified in
+production (backend SHA `b8a25d5`): the section renders, Service_Codes loads live (54 codes,
+GRT-50 $50 / GRT-75 $75), and 24 × PC54 Full Front goes $423.17 → $657.34 with 2 setups +
+1.5 hrs, footing exactly as it does locally. ⏭️ Erik/Taneisha have NOT run a real customer
+quote through it yet — that is the remaining gap, same shape as the Contract Embroidery tool.
 
 ## What was added
 

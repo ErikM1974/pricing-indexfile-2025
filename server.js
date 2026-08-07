@@ -119,6 +119,23 @@ dotenv.config();
 //   GET /dashboards/ae-mission-control.html — per-AE cockpit page (role-gated taneisha/nika; ~L3059)
 //     + AE post-login landing redirect in the SAML ACS (default relay → mission control; ~L3033)
 //
+// 253GEAR PUBLISHER (2026-08-08) — Steve's tab drafts products on the retail storefront.
+//   ALL /api/gear/*                      — page-gated forwarders to proxy /api/shopify/* (~L4361)
+//     GET  /api/gear/config                       prices, ladder, styles, tag vocabulary
+//     GET  /api/gear/products?designNumber=       duplicate check
+//     POST /api/gear/products                     create a DRAFT → 202
+//     GET  /api/gear/jobs/:designNumber           progress (derived from Shopify)
+//     POST /api/gear/jobs/:designNumber/resume    resume a stalled run
+//     POST /api/gear/classify                     hero image → city / tags / SEO suggestions
+//     POST /api/gear/products/:productId/audit    re-run the pre-publish checks
+//     POST /api/gear/products/:productId/publish  the publish click (409s unless audit clean)
+//     POST /api/gear/config/refresh-collections   re-read live smart-collection rules
+//     POST /api/gear/extract-shopworks            ShopWorks screenshot → design number/name
+//       (own handler, not gearForward: targets /api/vision and needs a 12mb body)
+//   ⚠️ Gated with requirePageAccess('gear-publisher.html'), NOT bare requireStaff:
+//     write_products is catalogue-wide, so this must not be open to every staffer.
+//   ⚠️ All nine must stay listed here — see the due-dates note above.
+//
 // SAMPLE PROGRAM ('samples' channel, 2026-07-06 — SAM{MMDD}-{rand4} QuoteIDs; handleSamplesOrderPaid ~L1400)
 //   POST /api/samples/create-checkout-session — PAID blank samples: dedicated multi-style route (shared
 //     sample-pricing.js reprice, DOR tax on ship address, free shipping, free items ride as $0 lines);
@@ -4311,6 +4328,9 @@ const AI_CHAT_ROUTES = [
   'contract-webstore-ai',
   'dtg-quote-ai',
   'emb-quote-ai',
+  // 253gear product-copy drafter (2026-08-08). Same SSE contract as the quote chats,
+  // so adding the slug here is the whole app-side integration.
+  'shopify-description-ai',
 ];
 
 for (const slug of AI_CHAT_ROUTES) {
@@ -4358,6 +4378,143 @@ for (const slug of AI_CHAT_ROUTES) {
   );
 }
 console.log(`✓ AI chat forwarders loaded (session-gated, ${AI_CHAT_ROUTES.length} routes)`);
+
+// =============================================================================
+// 253GEAR PUBLISHER FORWARDERS — same-origin, page-gated proxies to the
+// caspio-pricing-proxy /api/shopify/* surface.
+//
+// WHY. Steve's tab (/dashboards/gear-publisher.html) creates DRAFT products on the
+// public retail storefront 253gear.com. The Shopify credential lives on the proxy and
+// a browser cannot hold a server secret, so the browser calls us same-origin with its
+// SAML cookie, requirePageAccess proves the session AND the per-page rule, and we add
+// CRM_API_SECRET server-to-server.
+//
+// GATE CHOICE. requirePageAccess('gear-publisher.html'), NOT bare requireStaff.
+// `write_products` is catalogue-wide — it can reprice or unimage all 47 live products,
+// not just create new ones — so this must not be open to every logged-in staffer by
+// default. requirePageAccess fails CLOSED, and the same Caspio Staff_Page_Access row
+// governs both the page and its data, which is the pattern CLAUDE.md prescribes.
+// Erik seeds it with Allowed_Emails = himself + art@nwcustomapparel.com and no roles;
+// an emails-only rule is an exclusive allowlist (admins included).
+//
+// The proxy path is MIRRORED exactly, so repointing a caller is just dropping the
+// base URL. Query strings are rebuilt from an allowlist — never passed through.
+//
+// ⚠️ DEPLOY ORDER, and it is the reverse of the usual rule: ship the PROXY first.
+// The "app forwarder first" convention exists for closing a gate on an
+// already-public route; these routes are born gated with no legacy caller, so a
+// forwarder deployed first would forward to a 404.
+// =============================================================================
+const GEAR_PAGE = 'gear-publisher.html';
+const GEAR_UPSTREAM = `${CRM_API_BASE}/api/shopify`;
+
+/** Build a forwarder for one method+path, with an explicit query allowlist. */
+function gearForward(method, suffix, { allowQuery = [], timeoutMs = 20000, parseJson = false } = {}) {
+  const handlers = [requirePageAccess(GEAR_PAGE)];
+  if (parseJson) handlers.push(express.json({ limit: '512kb' }));
+
+  handlers.push(async (req, res) => {
+    if (!CRM_API_SECRET) return res.status(503).json({ error: 'not_configured' });
+
+    // Rebuild the query from an allowlist. Passing req.query through would let a
+    // caller reach upstream parameters this surface never meant to expose.
+    const params = new URLSearchParams();
+    for (const key of allowQuery) {
+      const v = req.query[key];
+      if (v !== undefined && v !== null && String(v) !== '') params.set(key, String(v));
+    }
+
+    const path = typeof suffix === 'function' ? suffix(req) : suffix;
+    if (path === null) return res.status(400).json({ error: 'bad_request' });
+
+    const qs = params.toString();
+    const url = `${GEAR_UPSTREAM}${path}${qs ? `?${qs}` : ''}`;
+
+    try {
+      const headers = { 'X-CRM-API-Secret': CRM_API_SECRET };
+      // Identity is stamped server-side from the verified session, never the body,
+      // so the browser cannot attribute a publish to someone else.
+      const email = (req.session && req.session.crmUser && req.session.crmUser.email) || '';
+      if (email) headers['X-Staff-Email'] = email;
+      const idem = req.get('Idempotency-Key');
+      if (idem) headers['Idempotency-Key'] = idem;
+
+      let body;
+      if (parseJson && ['POST', 'PUT', 'PATCH'].includes(method)) {
+        // bodyParser already consumed the stream, so it must be re-serialised —
+        // piping req here would send an empty body.
+        headers['Content-Type'] = 'application/json';
+        body = JSON.stringify(req.body || {});
+      }
+
+      const upstream = await fetch(url, { method, headers, body, signal: AbortSignal.timeout(timeoutMs) });
+      const text = await upstream.text();
+      res.status(upstream.status)
+        .type(upstream.headers.get('content-type') || 'application/json')
+        .send(text);
+    } catch (e) {
+      console.error(`[gear-forward:${method} ${path}]`, e.message);
+      res.status(502).json({ error: 'upstream_unavailable' });
+    }
+  });
+
+  return handlers;
+}
+
+const GEAR_ID_RE = /^\d{1,20}$/;
+const GEAR_DESIGN_RE = /^\d{4,6}$/;
+
+app.get('/api/gear/config', ...gearForward('GET', '/config', { allowQuery: ['refresh'] }));
+app.get('/api/gear/products', ...gearForward('GET', '/products', { allowQuery: ['designNumber'] }));
+
+app.get('/api/gear/jobs/:designNumber', ...gearForward('GET',
+  (req) => (GEAR_DESIGN_RE.test(req.params.designNumber) ? `/jobs/${req.params.designNumber}` : null)));
+
+app.post('/api/gear/products', ...gearForward('POST', '/products', { parseJson: true, timeoutMs: 30000 }));
+
+app.post('/api/gear/classify', ...gearForward('POST', '/classify', { parseJson: true, timeoutMs: 60000 }));
+
+app.post('/api/gear/jobs/:designNumber/resume', ...gearForward('POST',
+  (req) => (GEAR_DESIGN_RE.test(req.params.designNumber) ? `/jobs/${req.params.designNumber}/resume` : null),
+  { parseJson: true, timeoutMs: 30000 }));
+
+app.post('/api/gear/products/:productId/audit', ...gearForward('POST',
+  (req) => (GEAR_ID_RE.test(req.params.productId) ? `/products/${req.params.productId}/audit` : null),
+  { timeoutMs: 30000 }));
+
+// Publish runs the storefront verification loop upstream, so it gets the long timeout.
+app.post('/api/gear/products/:productId/publish', ...gearForward('POST',
+  (req) => (GEAR_ID_RE.test(req.params.productId) ? `/products/${req.params.productId}/publish` : null),
+  { parseJson: true, timeoutMs: 60000 }));
+
+app.post('/api/gear/config/refresh-collections', ...gearForward('POST', '/config/refresh-collections', { timeoutMs: 30000 }));
+
+// ShopWorks screenshot OCR. Separate from gearForward for two reasons: it targets
+// /api/vision (not /api/shopify), and a pasted screenshot needs a far larger body
+// than the 512kb the rest of this surface allows — same 12mb allowance the Jim
+// mailing-list extractor uses. The upstream route was secret-gated as part of this
+// work; it had no browser caller of its own.
+app.post('/api/gear/extract-shopworks',
+  requirePageAccess(GEAR_PAGE),
+  express.json({ limit: '12mb' }),
+  async (req, res) => {
+    if (!CRM_API_SECRET) return res.status(503).json({ error: 'not_configured' });
+    try {
+      const upstream = await fetch(`${CRM_API_BASE}/api/vision/extract-shopworks`, {
+        method: 'POST',
+        headers: { 'X-CRM-API-Secret': CRM_API_SECRET, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: (req.body && req.body.image) || '' }),
+        signal: AbortSignal.timeout(60000)
+      });
+      const text = await upstream.text();
+      res.status(upstream.status).type(upstream.headers.get('content-type') || 'application/json').send(text);
+    } catch (e) {
+      console.error('[gear-forward:POST /extract-shopworks]', e.message);
+      res.status(502).json({ error: 'upstream_unavailable' });
+    }
+  });
+
+console.log('✓ 253Gear publisher forwarders loaded (page-gated: gear-publisher.html)');
 
 console.log('✓ CRM API proxy routes loaded (session-protected)');
 
