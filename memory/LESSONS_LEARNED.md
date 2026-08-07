@@ -62,6 +62,33 @@ map (`253gear-media-maps.json`). Two new audit checks in `src/utils/shopify-audi
   - **`byPair[k] = x` in a loop is last-write-wins.** It silently hid pairs whose sizes
     disagreed. Collect a Set when "these must all agree" is the actual invariant.
   - 🔑 Strip the CDN `?v=` before comparing image URLs — it differs between reads of one file.
+- 🔴 **Shopify options are PRODUCT-level, so a colour listed is offered for EVERY style.** Four
+  products sold "tee in one colour, hoodie in the other" while advertising all four pairs; the
+  theme does no availability filtering, so half of each was **"Unavailable" with a dead Add to
+  Cart**. Two fixes: recolour to one colour (Colour survives single-value and renders as static
+  text), or **fold the colour into the Style value** ("T-Shirt - Royal") and delete the Colour
+  option. Delete it with **`NON_DESTRUCTIVE`**, which refuses rather than deleting variants.
+- 🔑 **Folding colour into Style silently breaks every config lookup** — price, weight, SKU and
+  filter tag all key on the option string, and each tool **SKIPS an unknown style rather than
+  erroring**, so the product drops out of coverage with nothing reporting it. `baseStyleOption()`
+  resolves it, exact match first. ⚠️ It treats ANY `" - suffix"` as a colour, so
+  `T-Shirt - Premium` would price as a plain tee — `align-prices` now names every style it
+  resolved that way, because it is the one path that rewrites what a customer pays.
+- 🔑 **`productDeleteMedia` does NOT delete the file.** It detaches the image; the file stays in
+  Shopify Files, still `READY`, at a **different CDN url** (the `/products/` path, no attachment
+  UUID) while the url the product was serving 404s. Recovery is a `files(query:)` lookup, not a
+  re-upload — that turned a reshoot into five minutes.
+- 🔑 **Only `productUpdate` and `publishablePublish` return a plain `UserError` with NO `code`
+  field**; every other product mutation returns a typed error that has one. Selecting `code` on
+  those two fails the whole query at parse time. **`productReorderMedia`'s canonical field is
+  `mediaUserErrors`** — `userErrors` is a deprecated alias that can read empty while the real
+  errors sit in the other, so select both.
+- ⚠️ **A scripted edit to this repo can be silently reverted (OneDrive) — re-read before
+  assuming it landed.** Two python-rewrite edits reported success and left the file unchanged;
+  one produced a warning whose feeder set existed but whose print block was never inserted, so
+  the warning could never fire. Verify the OUTPUT, not the edit's exit code.
+- 🔑 **Backticks inside a JS template literal end the string** — a GraphQL `#` comment containing
+  `` `userErrors` `` broke two files. No backticks in embedded GraphQL.
 - 🔑 Verified on the **live storefront by clicking every thumbnail**, not in the admin —
   both prior binding incidents were invisible to the API. Set a distinctive size first:
   if a click moves Size, the image is bound to too few variants.
