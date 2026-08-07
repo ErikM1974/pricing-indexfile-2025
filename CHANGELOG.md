@@ -1,3 +1,14 @@
+## v2026.08.07.2 (2026.08.07)
+
+- Memory: 253gear colour-image binding + the distinctness lesson
+- Memory: a bad gate reports success — 6 real defects in self-reviewed audit code
+- Memory: dead option combinations, the style fallback, and Shopify media/error traps
+- Memory: archive oldest resolved entry (LESSONS back under the 300 cap)
+- Memory: repair LESSONS archive I truncated (1224 -> 50 lines)
+- Memory: two note endpoints write the same table, only one notifies
+- Memory: bare showToast() threw inside a catch and soft-locked the modal
+- Deploy v2026.08.07.2: 3 files (art-request-detail.html,art-request-detail.css,art-request-detail.js,...)
+
 ## v2026.08.07.1 (2026.08.07)
 
 - Memory: DTG art charges shipped v2026.08.06.7 (Heroku v1829)
