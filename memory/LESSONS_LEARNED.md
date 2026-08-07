@@ -5,6 +5,53 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## Two note endpoints write the same table; only one of them tells anybody (2026-08-07)
+
+**Problem.** The AE "Approve Design" button on `/art-request/:id?view=ae` fired a native
+`confirm()` and collected no free text, so anything the AE wanted Steve to know had to go
+through a separate `+ Add Note` afterwards. Adding an optional note box meant picking a
+route for it.
+
+**Root cause / the trap.** The page has TWO note endpoints that look interchangeable and
+are not:
+- `POST /api/art-requests/:designId/note` (proxy `src/routes/art.js:1436`) — writes
+  `DesignNotes`, **no fan-out, and no length validation at all**.
+- `POST /api/design-notes` (`art.js:760`) — writes the **same table with the same fields**,
+  plus direction-aware Slack + email. `Posted_By_Role:'ae'` routes the primary email to
+  Steve at `art@nwcustomapparel.com`; `notify:false` short-circuits the whole fan-out
+  before any lookup.
+
+So `/api/design-notes` is a strict **superset** — swapping to it is one row, not two. The
+tempting wrong move is to keep the thin call and *add* a design-notes call for the Slack
+ping; that duplicates the timeline row.
+
+**Solution.** Swap the approve step to `/api/design-notes` with `notify: !!typedNote`, so a
+blank note behaves byte-identically to before (Steve still gets `template_art_completed`
++ the dashboard push, and gains no third ping) and a typed note reaches him.
+
+**Prevention.**
+- 🔑 **Before adding a second call to get a side effect, check whether the endpoint you are
+  already calling has a superset sibling.** Two routes writing one Caspio table is the norm
+  in this repo, not the exception.
+- 🔴 **The status write commits BEFORE the note write and is never rolled back.** A rejected
+  note leaves the record `Approved` in Caspio while the UI shows "Error — retry", and a
+  retry re-fires the status write, the note, the EmailJS to Steve and the dashboard push.
+  Free text is the first input that can realistically trigger it — hence `maxlength="2000"`
+  on the textarea *plus* a JS length guard (maxlength does not apply to a programmatic
+  `.value` set).
+- 🔑 **`approveDesign()` never called `refreshNotes()`.** Tolerable for an auto-generated
+  status line, invisible-looking for a note the user just typed. If a write is user-authored,
+  the surface that displays it must refresh in the same success block.
+- 🔑 **`.onclick =` beats `cloneNode`/`replaceChild` for re-openable modals.** Property
+  assignment is idempotent; the clone trick used by `openChangesModal()` also copies the
+  reflected `disabled` attribute and `innerHTML`, so a modal closed mid-error reopens dead.
+  `openCustomerReviseModal():4344` additionally leaks one overlay listener per open.
+- ⚠️ **`showToast(...)` is called at 3 sites in `pages/js/art-request-detail.js` and is not
+  defined on that page** (only `window.TransferActions.showToast` exists). Those three
+  upload-failure messages throw instead of showing. Use `showArdToast()`. Not fixed here.
+
+---
+
 ## Colour never changed the photo, and every existing check passed (2026-08-07)
 
 **Problem.** On 253gear.com, choosing a colour did not change the product photo. A
@@ -192,80 +239,5 @@ of 18 found, and the 2 remaining genuinely have no row.
   Note `/tests` is not served (removed in the 2026-08-05 source-exposure fix), so that harness
   only runs from disk; verify print by stubbing `window.print` on the real page and grabbing
   `#sit-print-sheet` before its 1.5s self-cleanup removes it.
-
----
-
-## The boxUrl() migration missed every surface that never called boxUrl() (2026-08-06)
-
-**Problem.** Erik: finished-photo thumbnails were blank on the Photo Library, the capture page's
-design picker, its "on file" list, and the dashboard Pride Wall. Cards, captions, counts and
-"18 photos / 18 live" were all correct — only the images were dead.
-
-**Root cause.** The Aug-5 Box gating put the proxy's `/api/box/thumbnail/:fileId` behind
-`requireCrmApiSecret`. `Finished_Photos.Image_URL` is written ABSOLUTE at upload time
-(`proxy src/routes/finished-photos.js:125` → `${PROXY_BASE_URL}/api/box/thumbnail/<id>`), and
-`designs-by-method.js` returns stored `FileUrl` thumbnails in the same absolute shape. Absolute =
-cross-origin = no SAML cookie → **401 on every `<img>`** (verified live: anonymous GET returns
-`401 {"error":"Unauthorized"}`). The fix everywhere else was `boxUrl()`, which re-points stored
-urls at this origin so the cookie authorises them — these four renderers were never migrated.
-
-**Solution.** `resolveBoxUrl()` at each render site (finished-photos-library.js,
-finished-photos.js ×2 — design tiles AND the manage list, pride-wall-controller.js) plus the
-`box-url.js` script tag on their three pages. The Pride Wall is an ES module, so it reads
-`window.boxUrl`; a classic script always executes before any `type="module"`.
-
-**Prevention.**
-- 🔑 **A migration guarded by "everyone who calls X must also load X" cannot see the files that
-  never call X.** `box-url.test.js` was green throughout — its consumer scan starts from
-  `boxUrl(` call sites, so an unmigrated renderer is invisible by construction. The blast radius
-  of a gating change is *every reader of the gated data*, not the subset already adapted to it.
-- 🔑 **Scans define the blind spot.** That test listed JS non-recursively and skipped
-  `staff-dashboard-v3/`, so the Pride Wall was doubly unreachable. Both widened; the JS walk is
-  now recursive and the page walk follows `type="module"` **import graphs**, since a module
-  consumer has no `<script src>` of its own to match on.
-- 🔑 **Ask what the field actually holds before assuming which fixer applies.** The design tiles
-  looked like a different bug (`/api/files/<key>`, which is open and returns 400 not 401); the
-  live payload showed they were `/api/box/thumbnail/` urls after all. One `curl` of the real
-  endpoint beat reading the writer code.
-- ⚠️ **"Upload works" ≠ "images work."** The capture preview is a local `URL.createObjectURL`
-  blob, so a phone upload looks completely healthy while every stored url is 401ing.
-- 🔑 **The reported pages were a third of it.** A 43-agent sweep found the same defect on AE
-  Mission Control, the Send Mockup picker (shipped the day before, `807184ee` — it *builds*
-  `API_BASE + thumbnailUrl`, so it was cross-origin by construction), both Bradley boards, the
-  quote-builder design combobox, the DTG catalog search, the EMB design search, and the SanMar
-  inbound sheet (`/api/thumbnails` returns the same absolute shape — that is why the printed
-  PDF had no artwork). **When a shared gate changes, enumerate every reader of the gated data
-  and check them all — the ones a human happens to notice are a biased sample.**
-- 🔑 **A path-blind drift lock creates the collision it is meant to prevent.** Matching consumers
-  to pages by BASENAME made every page loading any `utils.js` fail once a helper landed in
-  `builders/dtg/utils.js` — 20 false failures, the same shape as the 2026-06-09 `?v=` incident.
-  Match on the resolved repo path, and follow `<script src>` → import graph (that covers both
-  the `type="module"` dashboard and the esbuild-bundled quote builders).
-- 🔑 **The VENDOR portal needed a third mechanism, not a third copy of the second.** Supacolor/L&P
-  are neither staff nor customers, so `boxUrl()` (origin) and `portalProofUrl()` (customer token)
-  both miss. `vendorProofUrl` + `lib/vendor-magic-link.mintProofToken` mints a capability bound to
-  `{fileId, vendorName}` from rows `vendorOwnsRow()` already cleared. 🔴 **Type tag `'vproof'`, not
-  `'proof'`** — both families sign with SESSION_SECRET, so without it one outside company's image
-  URL verifies inside another identity. Jest-locked in BOTH directions.
-- 🔑 **`.map(projectVendorJob)` hands map's INDEX to the second parameter** — every token would be
-  minted for vendor "0"/"1"/… and 404 on redemption. Silent at author time, total at runtime;
-  a regex test now forbids the bare reference.
-- 🔑 **A wall of 404s looks exactly like a working deny-list.** Prove the negative AND the positive
-  in the same run: the customer token 404ing at the vendor route only means something because the
-  same token returned a 200 PNG at the customer route seconds earlier.
-- 🔑 **To see a customer-facing change, use the STAFF PORTAL PREVIEW:
-  `/portal-admin/preview/<idCustomer>`** (linked from `dashboards/customer-portal-admin.html`) —
-  read-only, renders exactly what the customer sees, no customer credentials needed. Erik had to
-  point this out after I'd concluded it was unverifiable: I grepped
-  `customer-portal-admin.html` for "preview|viewAs|impersonat" and the *route* lives elsewhere.
-  **Grep the route table, not just the page you expect to host the button.**
-- ⚠️ **A hand-minted portal session is NOT a substitute.** `requireCustomer` re-checks the live
-  `Customer_Portal_Access` table, so a signed cookie for an unregistered email 401s and *clears
-  itself*. Worse, the 401 body has no `mockups` key — so a naive parse prints "0 mockups" and
-  reads as a real empty result. Check the HTTP status before interpreting a body.
-- ⚠️ **Do not read `img.complete`/`naturalWidth` on a polling board.** Bradley's queue re-renders
-  every 60s, replacing every `<img>`, so a snapshot mid-poll shows "0 decoded, 38 pending" on a
-  page that is working perfectly. The network log (40/40 → 200) was the truthful instrument.
-  Also: 401 vs 404 matters — one 404 here is a Box file that was genuinely deleted, not a break.
 
 ---

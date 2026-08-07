@@ -1271,3 +1271,78 @@ customer's browser.
   just renders broken for a customer who will never tell you.
 
 ---
+
+## The boxUrl() migration missed every surface that never called boxUrl() (2026-08-06)
+
+**Problem.** Erik: finished-photo thumbnails were blank on the Photo Library, the capture page's
+design picker, its "on file" list, and the dashboard Pride Wall. Cards, captions, counts and
+"18 photos / 18 live" were all correct — only the images were dead.
+
+**Root cause.** The Aug-5 Box gating put the proxy's `/api/box/thumbnail/:fileId` behind
+`requireCrmApiSecret`. `Finished_Photos.Image_URL` is written ABSOLUTE at upload time
+(`proxy src/routes/finished-photos.js:125` → `${PROXY_BASE_URL}/api/box/thumbnail/<id>`), and
+`designs-by-method.js` returns stored `FileUrl` thumbnails in the same absolute shape. Absolute =
+cross-origin = no SAML cookie → **401 on every `<img>`** (verified live: anonymous GET returns
+`401 {"error":"Unauthorized"}`). The fix everywhere else was `boxUrl()`, which re-points stored
+urls at this origin so the cookie authorises them — these four renderers were never migrated.
+
+**Solution.** `resolveBoxUrl()` at each render site (finished-photos-library.js,
+finished-photos.js ×2 — design tiles AND the manage list, pride-wall-controller.js) plus the
+`box-url.js` script tag on their three pages. The Pride Wall is an ES module, so it reads
+`window.boxUrl`; a classic script always executes before any `type="module"`.
+
+**Prevention.**
+- 🔑 **A migration guarded by "everyone who calls X must also load X" cannot see the files that
+  never call X.** `box-url.test.js` was green throughout — its consumer scan starts from
+  `boxUrl(` call sites, so an unmigrated renderer is invisible by construction. The blast radius
+  of a gating change is *every reader of the gated data*, not the subset already adapted to it.
+- 🔑 **Scans define the blind spot.** That test listed JS non-recursively and skipped
+  `staff-dashboard-v3/`, so the Pride Wall was doubly unreachable. Both widened; the JS walk is
+  now recursive and the page walk follows `type="module"` **import graphs**, since a module
+  consumer has no `<script src>` of its own to match on.
+- 🔑 **Ask what the field actually holds before assuming which fixer applies.** The design tiles
+  looked like a different bug (`/api/files/<key>`, which is open and returns 400 not 401); the
+  live payload showed they were `/api/box/thumbnail/` urls after all. One `curl` of the real
+  endpoint beat reading the writer code.
+- ⚠️ **"Upload works" ≠ "images work."** The capture preview is a local `URL.createObjectURL`
+  blob, so a phone upload looks completely healthy while every stored url is 401ing.
+- 🔑 **The reported pages were a third of it.** A 43-agent sweep found the same defect on AE
+  Mission Control, the Send Mockup picker (shipped the day before, `807184ee` — it *builds*
+  `API_BASE + thumbnailUrl`, so it was cross-origin by construction), both Bradley boards, the
+  quote-builder design combobox, the DTG catalog search, the EMB design search, and the SanMar
+  inbound sheet (`/api/thumbnails` returns the same absolute shape — that is why the printed
+  PDF had no artwork). **When a shared gate changes, enumerate every reader of the gated data
+  and check them all — the ones a human happens to notice are a biased sample.**
+- 🔑 **A path-blind drift lock creates the collision it is meant to prevent.** Matching consumers
+  to pages by BASENAME made every page loading any `utils.js` fail once a helper landed in
+  `builders/dtg/utils.js` — 20 false failures, the same shape as the 2026-06-09 `?v=` incident.
+  Match on the resolved repo path, and follow `<script src>` → import graph (that covers both
+  the `type="module"` dashboard and the esbuild-bundled quote builders).
+- 🔑 **The VENDOR portal needed a third mechanism, not a third copy of the second.** Supacolor/L&P
+  are neither staff nor customers, so `boxUrl()` (origin) and `portalProofUrl()` (customer token)
+  both miss. `vendorProofUrl` + `lib/vendor-magic-link.mintProofToken` mints a capability bound to
+  `{fileId, vendorName}` from rows `vendorOwnsRow()` already cleared. 🔴 **Type tag `'vproof'`, not
+  `'proof'`** — both families sign with SESSION_SECRET, so without it one outside company's image
+  URL verifies inside another identity. Jest-locked in BOTH directions.
+- 🔑 **`.map(projectVendorJob)` hands map's INDEX to the second parameter** — every token would be
+  minted for vendor "0"/"1"/… and 404 on redemption. Silent at author time, total at runtime;
+  a regex test now forbids the bare reference.
+- 🔑 **A wall of 404s looks exactly like a working deny-list.** Prove the negative AND the positive
+  in the same run: the customer token 404ing at the vendor route only means something because the
+  same token returned a 200 PNG at the customer route seconds earlier.
+- 🔑 **To see a customer-facing change, use the STAFF PORTAL PREVIEW:
+  `/portal-admin/preview/<idCustomer>`** (linked from `dashboards/customer-portal-admin.html`) —
+  read-only, renders exactly what the customer sees, no customer credentials needed. Erik had to
+  point this out after I'd concluded it was unverifiable: I grepped
+  `customer-portal-admin.html` for "preview|viewAs|impersonat" and the *route* lives elsewhere.
+  **Grep the route table, not just the page you expect to host the button.**
+- ⚠️ **A hand-minted portal session is NOT a substitute.** `requireCustomer` re-checks the live
+  `Customer_Portal_Access` table, so a signed cookie for an unregistered email 401s and *clears
+  itself*. Worse, the 401 body has no `mockups` key — so a naive parse prints "0 mockups" and
+  reads as a real empty result. Check the HTTP status before interpreting a body.
+- ⚠️ **Do not read `img.complete`/`naturalWidth` on a polling board.** Bradley's queue re-renders
+  every 60s, replacing every `<img>`, so a snapshot mid-poll shows "0 decoded, 38 pending" on a
+  page that is working perfectly. The network log (40/40 → 200) was the truthful instrument.
+  Also: 401 vs 404 matters — one 404 here is a Box file that was genuinely deleted, not a break.
+
+---
