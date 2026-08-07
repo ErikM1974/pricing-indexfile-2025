@@ -5,6 +5,155 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## Two note endpoints write the same table; only one of them tells anybody (2026-08-07)
+
+**Problem.** The AE "Approve Design" button on `/art-request/:id?view=ae` fired a native
+`confirm()` and collected no free text, so anything the AE wanted Steve to know had to go
+through a separate `+ Add Note` afterwards. Adding an optional note box meant picking a
+route for it.
+
+**Root cause / the trap.** The page has TWO note endpoints that look interchangeable and
+are not:
+- `POST /api/art-requests/:designId/note` (proxy `src/routes/art.js:1436`) — writes
+  `DesignNotes`, **no fan-out, and no length validation at all**.
+- `POST /api/design-notes` (`art.js:760`) — writes the **same table with the same fields**,
+  plus direction-aware Slack + email. `Posted_By_Role:'ae'` routes the primary email to
+  Steve at `art@nwcustomapparel.com`; `notify:false` short-circuits the whole fan-out
+  before any lookup.
+
+So `/api/design-notes` is a strict **superset** — swapping to it is one row, not two. The
+tempting wrong move is to keep the thin call and *add* a design-notes call for the Slack
+ping; that duplicates the timeline row.
+
+**Solution.** Swap the approve step to `/api/design-notes` with `notify: !!typedNote`, so a
+blank note behaves byte-identically to before (Steve still gets `template_art_completed`
++ the dashboard push, and gains no third ping) and a typed note reaches him.
+
+**Prevention.**
+- 🔑 **Before adding a second call to get a side effect, check whether the endpoint you are
+  already calling has a superset sibling.** Two routes writing one Caspio table is the norm
+  in this repo, not the exception.
+- 🔴 **The status write commits BEFORE the note write and is never rolled back.** A rejected
+  note leaves the record `Approved` in Caspio while the UI shows "Error — retry", and a
+  retry re-fires the status write, the note, the EmailJS to Steve and the dashboard push.
+  Free text is the first input that can realistically trigger it — hence `maxlength="2000"`
+  on the textarea *plus* a JS length guard (maxlength does not apply to a programmatic
+  `.value` set).
+- 🔑 **`approveDesign()` never called `refreshNotes()`.** Tolerable for an auto-generated
+  status line, invisible-looking for a note the user just typed. If a write is user-authored,
+  the surface that displays it must refresh in the same success block.
+- 🔑 **`.onclick =` beats `cloneNode`/`replaceChild` for re-openable modals.** Property
+  assignment is idempotent; the clone trick used by `openChangesModal()` also copies the
+  reflected `disabled` attribute and `innerHTML`, so a modal closed mid-error reopens dead.
+  `openCustomerReviseModal():4344` additionally leaks one overlay listener per open.
+- 🔴 **A namespaced export reads like a global at the call site — and the ReferenceError
+  landed INSIDE a `.catch()`, so it soft-locked the modal (FIXED 2026-08-07).** Three sites in
+  `pages/js/art-request-detail.js` called a bare `showToast(...)`. It is defined only as
+  `window.TransferActions.showToast` (`transfer-actions-shared.js:593`, inside that file's
+  IIFE), so a bare reference threw — proven at runtime: `TransferActions.showToast` is a
+  `function` while `window.showToast` is `undefined` and `showToast` alone throws
+  `ReferenceError`. Fixed by switching all three to the page's own `showArdToast()`.
+  - 🔑 **The upload-failure one was in a `.catch()` handler, so the two lines AFTER it never
+    ran** — `btn.disabled = false` and `btn.textContent = 'Submit Revision Request'`. A failed
+    upload left Submit permanently disabled reading "Uploading N files…". Compounded by the
+    `cloneNode` bug above: reopening the modal clones the *disabled* button, so the flow stayed
+    dead. **An error handler that can itself throw converts a visible failure into a soft-lock.**
+  - 🔑 The two size/count guards threw *before* their `return`, so they rejected the file by
+    accident while aborting the caller's loop — remaining dropped files were silently skipped.
+  - 🔑 **Prevention: prefer the page's own helper over one that "seems" global.** Grep for
+    `function <name>` AND `window.<name>` before calling — a helper exported as
+    `window.NS.<name>` is not in scope, and nothing in a browser fails at load time to tell you.
+
+---
+
+## Colour never changed the photo, and every existing check passed (2026-08-07)
+
+**Problem.** On 253gear.com, choosing a colour did not change the product photo. A
+shopper picking Charcoal was shown Athletic Heather and bought on that picture. Live on
+**6 of the 7 multi-colour products**; on two of them the correct photo was already
+uploaded and bound to nothing. Nobody reported it — Erik only asked how to *structure*
+the product.
+
+**Root cause.** Variants were bound to a photo by **Style alone**; Colour was never part
+of the key. The audit asked only whether each variant had *an* image, which was true
+throughout — so `variant_image_binding`, the headline check written after this defect
+shipped twice before, passed cleanly on every affected product.
+
+**Solution.** `scripts/253gear-align-media.js` + a declared `(Style|Colour) -> position`
+map (`253gear-media-maps.json`). Two new audit checks in `src/utils/shopify-audit.js`:
+`colour_image_distinct` (blocking — every pair resolves to its OWN photo) and
+`orphan_media` (non-blocking — names uploaded-but-unbound photos and their position).
+
+**Prevention.**
+- 🔴 **"Every X has a Y" does not imply "every X has its OWN Y."** The reciprocal check is
+  a different check. Whenever a binding is one-per-group, assert **distinctness**, not
+  just presence — presence passes for the entire lifetime of the bug.
+- 🔴 **Media ORDER is load-bearing.** The theme gives an **unbound** photo the options of
+  the *nearest preceding bound* photo (`product-template.CURRENT.liquid:393-402`), so a
+  lifestyle shot after the wrong flat-lay silently switches the shopper's colour on click.
+  Calico's maroon lifestyle shot sat behind the charcoal tee and did exactly that. My own
+  first instinct — "move lifestyle photos to the end" — would have *created* this bug on
+  Spanaway; the theme code said otherwise.
+- 🔴 **Never infer a binding from a filename.** Two of Spanaway's photos are named `34082`
+  for design `34084`; the lifestyle files are stock names with no colour at all. Both
+  Calico lifestyle shots had to be **opened and looked at** to learn their colour.
+- 🔑 **A dry run that previews the wrong state is worse than none.** The first version
+  validated against the *pre*-reorder gallery and printed bindings that were plainly
+  wrong. Simulate every mutation in memory so the preview describes the state that will
+  actually exist.
+- 🔑 **Pick the statistic before trusting the data.** Taking the **max** of SanMar's
+  `PIECE_WEIGHT` per size picked single outlier rows (hoodie L: 74 of 75 colourways say
+  558 g, one says 567 g) and would have re-weighed **284 variants across 37 products**.
+  The **mode** matched the catalogue on PC54 7/7 and PC78H 6/7. Check the distribution
+  before writing, not after.
+- 🔑 **`productReorderMedia` returns `UserError`, which has no `code` field** (unlike
+  `MediaUserError`). Selecting it fails the whole query at parse time.
+- 🔴 **A BAD GATE DOES NOT FAIL LOUDLY — IT REPORTS SUCCESS.** Both new checks shipped green
+  and an adversarial review found **11 defects, 6 real**, in code I had just written and
+  self-reviewed as safe. My own confirming pass called it "safe to deploy". Specifics worth
+  keeping:
+  - **`MediaImage` GID ≠ `ProductImage` GID** — two namespaces for one picture, so
+    `media.id === variant.image.id` is NEVER true. Only the **normalised URL** joins them.
+    (This bit me twice in one day: first in a script, then again in the audit check.)
+  - **A check is only as good as the query feeding it.** `checkOrphanMedia` was inert on the
+    publish gate because that query never selected `media { image { url } }` — it reported
+    "no media to check" on products full of photos. Now drift-locked by a test.
+  - **When a check cannot answer, it must SAY so** — never return a clean pass on data it
+    never received.
+  - **`byPair[k] = x` in a loop is last-write-wins.** It silently hid pairs whose sizes
+    disagreed. Collect a Set when "these must all agree" is the actual invariant.
+  - 🔑 Strip the CDN `?v=` before comparing image URLs — it differs between reads of one file.
+- 🔴 **Shopify options are PRODUCT-level, so a colour listed is offered for EVERY style.** Four
+  products sold "tee in one colour, hoodie in the other" while advertising all four pairs; the
+  theme does no availability filtering, so half of each was **"Unavailable" with a dead Add to
+  Cart**. Two fixes: recolour to one colour (Colour survives single-value and renders as static
+  text), or **fold the colour into the Style value** ("T-Shirt - Royal") and delete the Colour
+  option. Delete it with **`NON_DESTRUCTIVE`**, which refuses rather than deleting variants.
+- 🔑 **Folding colour into Style silently breaks every config lookup** — price, weight, SKU and
+  filter tag all key on the option string, and each tool **SKIPS an unknown style rather than
+  erroring**, so the product drops out of coverage with nothing reporting it. `baseStyleOption()`
+  resolves it, exact match first. ⚠️ It treats ANY `" - suffix"` as a colour, so
+  `T-Shirt - Premium` would price as a plain tee — `align-prices` now names every style it
+  resolved that way, because it is the one path that rewrites what a customer pays.
+- 🔑 **`productDeleteMedia` does NOT delete the file.** It detaches the image; the file stays in
+  Shopify Files, still `READY`, at a **different CDN url** (the `/products/` path, no attachment
+  UUID) while the url the product was serving 404s. Recovery is a `files(query:)` lookup, not a
+  re-upload — that turned a reshoot into five minutes.
+- 🔑 **Only `productUpdate` and `publishablePublish` return a plain `UserError` with NO `code`
+  field**; every other product mutation returns a typed error that has one. Selecting `code` on
+  those two fails the whole query at parse time. **`productReorderMedia`'s canonical field is
+  `mediaUserErrors`** — `userErrors` is a deprecated alias that can read empty while the real
+  errors sit in the other, so select both.
+- ⚠️ **A scripted edit to this repo can be silently reverted (OneDrive) — re-read before
+  assuming it landed.** Two python-rewrite edits reported success and left the file unchanged;
+  one produced a warning whose feeder set existed but whose print block was never inserted, so
+  the warning could never fire. Verify the OUTPUT, not the edit's exit code.
+- 🔑 **Backticks inside a JS template literal end the string** — a GraphQL `#` comment containing
+  `` `userErrors` `` broke two files. No backticks in embedded GraphQL.
+- 🔑 Verified on the **live storefront by clicking every thumbnail**, not in the admin —
+  both prior binding incidents were invisible to the API. Set a distinctive size first:
+  if a click moves Size, the image is bound to too few variants.
+
 ## Two Shopify shapes both use `name`, so every variant keyed to the same string (2026-08-07)
 
 **Problem.** In the 253Gear Publisher build, `buildVariantMediaBindings()` produced a binding key
@@ -104,172 +253,5 @@ of 18 found, and the 2 remaining genuinely have no row.
   Note `/tests` is not served (removed in the 2026-08-05 source-exposure fix), so that harness
   only runs from disk; verify print by stubbing `window.print` on the real page and grabbing
   `#sit-print-sheet` before its 1.5s self-cleanup removes it.
-
----
-
-## The boxUrl() migration missed every surface that never called boxUrl() (2026-08-06)
-
-**Problem.** Erik: finished-photo thumbnails were blank on the Photo Library, the capture page's
-design picker, its "on file" list, and the dashboard Pride Wall. Cards, captions, counts and
-"18 photos / 18 live" were all correct — only the images were dead.
-
-**Root cause.** The Aug-5 Box gating put the proxy's `/api/box/thumbnail/:fileId` behind
-`requireCrmApiSecret`. `Finished_Photos.Image_URL` is written ABSOLUTE at upload time
-(`proxy src/routes/finished-photos.js:125` → `${PROXY_BASE_URL}/api/box/thumbnail/<id>`), and
-`designs-by-method.js` returns stored `FileUrl` thumbnails in the same absolute shape. Absolute =
-cross-origin = no SAML cookie → **401 on every `<img>`** (verified live: anonymous GET returns
-`401 {"error":"Unauthorized"}`). The fix everywhere else was `boxUrl()`, which re-points stored
-urls at this origin so the cookie authorises them — these four renderers were never migrated.
-
-**Solution.** `resolveBoxUrl()` at each render site (finished-photos-library.js,
-finished-photos.js ×2 — design tiles AND the manage list, pride-wall-controller.js) plus the
-`box-url.js` script tag on their three pages. The Pride Wall is an ES module, so it reads
-`window.boxUrl`; a classic script always executes before any `type="module"`.
-
-**Prevention.**
-- 🔑 **A migration guarded by "everyone who calls X must also load X" cannot see the files that
-  never call X.** `box-url.test.js` was green throughout — its consumer scan starts from
-  `boxUrl(` call sites, so an unmigrated renderer is invisible by construction. The blast radius
-  of a gating change is *every reader of the gated data*, not the subset already adapted to it.
-- 🔑 **Scans define the blind spot.** That test listed JS non-recursively and skipped
-  `staff-dashboard-v3/`, so the Pride Wall was doubly unreachable. Both widened; the JS walk is
-  now recursive and the page walk follows `type="module"` **import graphs**, since a module
-  consumer has no `<script src>` of its own to match on.
-- 🔑 **Ask what the field actually holds before assuming which fixer applies.** The design tiles
-  looked like a different bug (`/api/files/<key>`, which is open and returns 400 not 401); the
-  live payload showed they were `/api/box/thumbnail/` urls after all. One `curl` of the real
-  endpoint beat reading the writer code.
-- ⚠️ **"Upload works" ≠ "images work."** The capture preview is a local `URL.createObjectURL`
-  blob, so a phone upload looks completely healthy while every stored url is 401ing.
-- 🔑 **The reported pages were a third of it.** A 43-agent sweep found the same defect on AE
-  Mission Control, the Send Mockup picker (shipped the day before, `807184ee` — it *builds*
-  `API_BASE + thumbnailUrl`, so it was cross-origin by construction), both Bradley boards, the
-  quote-builder design combobox, the DTG catalog search, the EMB design search, and the SanMar
-  inbound sheet (`/api/thumbnails` returns the same absolute shape — that is why the printed
-  PDF had no artwork). **When a shared gate changes, enumerate every reader of the gated data
-  and check them all — the ones a human happens to notice are a biased sample.**
-- 🔑 **A path-blind drift lock creates the collision it is meant to prevent.** Matching consumers
-  to pages by BASENAME made every page loading any `utils.js` fail once a helper landed in
-  `builders/dtg/utils.js` — 20 false failures, the same shape as the 2026-06-09 `?v=` incident.
-  Match on the resolved repo path, and follow `<script src>` → import graph (that covers both
-  the `type="module"` dashboard and the esbuild-bundled quote builders).
-- 🔑 **The VENDOR portal needed a third mechanism, not a third copy of the second.** Supacolor/L&P
-  are neither staff nor customers, so `boxUrl()` (origin) and `portalProofUrl()` (customer token)
-  both miss. `vendorProofUrl` + `lib/vendor-magic-link.mintProofToken` mints a capability bound to
-  `{fileId, vendorName}` from rows `vendorOwnsRow()` already cleared. 🔴 **Type tag `'vproof'`, not
-  `'proof'`** — both families sign with SESSION_SECRET, so without it one outside company's image
-  URL verifies inside another identity. Jest-locked in BOTH directions.
-- 🔑 **`.map(projectVendorJob)` hands map's INDEX to the second parameter** — every token would be
-  minted for vendor "0"/"1"/… and 404 on redemption. Silent at author time, total at runtime;
-  a regex test now forbids the bare reference.
-- 🔑 **A wall of 404s looks exactly like a working deny-list.** Prove the negative AND the positive
-  in the same run: the customer token 404ing at the vendor route only means something because the
-  same token returned a 200 PNG at the customer route seconds earlier.
-- 🔑 **To see a customer-facing change, use the STAFF PORTAL PREVIEW:
-  `/portal-admin/preview/<idCustomer>`** (linked from `dashboards/customer-portal-admin.html`) —
-  read-only, renders exactly what the customer sees, no customer credentials needed. Erik had to
-  point this out after I'd concluded it was unverifiable: I grepped
-  `customer-portal-admin.html` for "preview|viewAs|impersonat" and the *route* lives elsewhere.
-  **Grep the route table, not just the page you expect to host the button.**
-- ⚠️ **A hand-minted portal session is NOT a substitute.** `requireCustomer` re-checks the live
-  `Customer_Portal_Access` table, so a signed cookie for an unregistered email 401s and *clears
-  itself*. Worse, the 401 body has no `mockups` key — so a naive parse prints "0 mockups" and
-  reads as a real empty result. Check the HTTP status before interpreting a body.
-- ⚠️ **Do not read `img.complete`/`naturalWidth` on a polling board.** Bradley's queue re-renders
-  every 60s, replacing every `<img>`, so a snapshot mid-poll shows "0 decoded, 38 pending" on a
-  page that is working perfectly. The network log (40/40 → 200) was the truthful instrument.
-  Also: 401 vs 404 matters — one 404 here is a Box file that was genuinely deleted, not a break.
-
----
-
-## Gating a shared image route broke every CUSTOMER, and only a real login showed it (2026-08-05)
-
-**Problem.** The Aug 5 Box gating (`b9e9d2a3`) put `/api/box/thumbnail/:fileId` behind
-`requireStaff`. Customer-portal artwork is STORED as absolute URLs pointing at exactly that route,
-so every proof a customer saw started 401ing. Measured against live data: **92% of art proofs, 8 of
-9 mockup proofs, and 100% of the logo library** (128/128) — the whole "My Logos" showcase was blank.
-Nobody reported it, because customers do not file bug reports.
-
-**Root cause.** The gate was designed and verified entirely from a STAFF session, where
-same-origin + the SAML cookie makes it work. `/portal` is a different identity: `requireCustomer`
-sets `req.customerSession.portalCustomer`, which has no `crmUser`, so `requireStaff` rejects it.
-The obvious fix — `boxUrl()`, which repointed stored URLs at this origin and fixed all the staff
-pages — does **nothing** here: same-origin still lands on `requireStaff`.
-
-**Solution.** A capability, not a relaxation. `portalProofUrl()` rewrites each stored Box URL to
-`/api/portal/proof-image/<token>` while projecting rows the server has ALREADY authorized as that
-customer's; the token is HMAC-signed (`lib/customer-magic-link`) and binds one fileId to one
-customer. The route takes the fileId ONLY from the verified token, so the customer never supplies a
-Box id and there is nothing to enumerate — the "any id, any file" power the staff route still has
-was deliberately not extended. Not `requireCustomer`-gated, because `/mockup/:id` and
-`/art-request/:designId` are public email-link pages whose images must render for a logged-out
-customer; when a session IS present it must match, so a token cannot be replayed into another
-customer's browser.
-
-**Prevention.**
-- 🔑 **"Verify with a real session" is not a formality.** 18 unit tests passed and the whole thing
-  was still broken end to end: `portalLimiter` allows 60 req/15 min, and one portal page view is
-  **53 images**, so the customer 429'd out of their own portal partway down the page. Nothing short
-  of loading a real customer's portal would have found that. Images now have their own budget.
-- 🔑 **A gate is per-IDENTITY, not per-origin.** Before gating a shared route, enumerate every
-  identity that reaches it — staff SAML, customer portal cookie, logged-out email link, server-side
-  callers — and test each. Two of the four here were never considered.
-- 🔑 **Two token types signed with the same key need a `t` discriminator**, or a stolen session
-  cookie is an image capability and vice versa. Jest-locked both directions.
-- 🔑 **A customer route must not inherit a staff forwarder's param allowlist.** Reusing
-  `boxForward` also reused `BOX_FORWARD_QUERY` (`full`, `url`, `folderId`, …). The proxy's
-  thumbnail route ignores those *today*, so nothing leaked — but the customer route would have
-  silently widened the day upstream started honouring one. It now forwards `size` only, and forces
-  `Cache-Control: private` rather than echoing upstream, since the response is a per-caller
-  capability that must never land in a shared cache.
-- 🔑 Distinguish "my code is broken" from "the data is": 2 of the 53 failures were Box files that
-  no longer exist (`Item not found`) — a pre-existing dead reference, not the fix. Check the asset
-  before blaming the change.
-- Drift guard: `tests/unit/portal-proof-image.test.js` fails if any Box-carrying field in the four
-  portal projections stops going through `portalProofUrl` — an unwrapped field is invisible, it
-  just renders broken for a customer who will never tell you.
-
----
-
-## Steve's Box picker searched a number that has never existed (2026-08-05)
-
-**Problem.** Steve loaded a mockup into Box, opened **Send Mockup**, and got the yellow "No Box
-folder found for this design", an empty picker, and a Send button stuck disabled at "0 of 6
-selected". The one "Previously Sent" card rendered as a grey **File** placeholder. Erik's read
-was "this used to work" — half right, and the half that was right pointed at the wrong defect.
-
-**Root cause — two independent bugs, only one a regression.**
-1. The picker called `/api/box/folder-files?designNumber=` with Caspio's **`ID_Design`** (53069).
-   Steve names his Box folders with the **ShopWorks** number **`Design_Num_SW`** ("40733 Ironside
-   Marine"). The two series are unrelated: across 2,710 art requests they coincide **4 times**,
-   all hand-typed in 2024. `ID_Design` runs 50092-53069, `Design_Num_SW` runs 111-1232434. So the
-   search matched nothing, ever — wrong since `7193982d` / proxy `3b05395`, masked all along by
-   the paste-URL fallback. The proxy's own comment (`box-upload.js:1432`) had documented the
-   correct key the whole time.
-2. The broken thumbnail WAS a regression, two days old. `b9e9d2a3` session-gated the Box surface;
-   335 stored Caspio mockup URLs are absolute `https://caspio-pricing-proxy…/api/box/thumbnail/<id>`
-   and now 401. `box-url.js` was written **in that same commit** to fix exactly this — and wired
-   into only the two transfer pages. Every art/mockup surface kept rendering raw stored URLs.
-
-**Solution.** Picker keys off `Design_Num_SW` (6/6 on recent jobs) with a named empty state, and
-**no** company-name fallback — a company search resolves to the first folder merely *containing*
-the name, i.e. another design's artwork (it is how design 53069's mockup got filed into
-"40640 Ironside Marine"). `boxUrl()` adopted across all 10 art/mockup renderers + 6 pages. The
-send path converts any `/api/box/thumbnail/<id>` into a real Box shared link before it reaches an
-email. Proxy upload routes accept `designNumSw` so uploads and the picker agree on one folder.
-
-**Prevention.**
-- `tests/unit/box-url.test.js` drift-locks it: any page loading a script that calls `boxUrl()`
-  must also load `box-url.js`, **and load it first**.
-- `tests/jest/box-folder-files-design-number.test.js` (proxy) pins that a ShopWorks number
-  resolves and a Caspio `ID_Design` returns an honest `200 + found:false`.
-- 🔑 **A module that ships unwired is invisible to unit tests that only exercise the module.**
-  `box-url.js` had 20 passing tests while doing nothing on 8 of the 10 pages that needed it.
-- 🔑 **"It used to work" is a hypothesis — check git before redesigning.** Two minutes of
-  `git log -S` separated a year-old latent bug from a 2-day-old regression.
-- 🔑 **Two ID series that both read as "the design number" WILL be confused.** Name the variable
-  for the system it belongs to (`swDesignNum`, not `designId`).
-- 🔑 **`img.src` returns an ABSOLUTE url** — comparing it against the relative literal you just
-  set is always false. Use `getAttribute('src')`. It silently killed a lightbox fallback in two files.
 
 ---

@@ -1430,6 +1430,46 @@ body {
     margin-right: 6px;
 }
 
+/* ── Approve Design Modal ────────────────────────────────
+   Reuses the .ard-changes-* shell (overlay / modal / body / label / textarea /
+   actions / cancel button, plus the mobile width:95% override). Only the green
+   identity and the summary chip are new. These modifiers share specificity with
+   the base .ard-changes-* rules, so they MUST stay below them in source order. */
+.ard-changes-header--approve {
+    background: linear-gradient(135deg, #16a34a, #15803d);
+}
+
+.ard-approve-summary {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 14px;
+    color: #166534;
+    margin-bottom: 14px;
+}
+
+/* Scoped to the approve modal so it outranks .ard-changes-textarea:focus on
+   specificity (0,3,0 vs 0,2,0) rather than relying on source order. */
+.ard-approve-modal .ard-changes-textarea:focus {
+    border-color: #16a34a;
+    box-shadow: 0 0 0 3px rgba(22,163,74,0.15);
+}
+
+.ard-approve-hint {
+    font-size: 12px;
+    color: #6b7280;
+    margin: -10px 0 16px;
+}
+
+.ard-changes-btn-submit--approve {
+    background: linear-gradient(135deg, #16a34a, #15803d);
+}
+
+.ard-changes-btn-submit--approve:hover {
+    background: linear-gradient(135deg, #15803d, #166534);
+}
+
 /* ── Success Message ─────────────────────────────────── */
 .ard-success-msg {
     position: fixed;

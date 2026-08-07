@@ -3706,6 +3706,7 @@
             if (e.key === 'Escape') {
                 closeLightbox();
                 closeChangesModal();
+                closeApproveModal();
                 // Close edit modal if open
                 var editModal = document.getElementById('ard-edit-modal');
                 if (editModal && editModal.style.display !== 'none') editModal.style.display = 'none';
@@ -3752,12 +3753,7 @@
                 showArdToast('Please click a mockup to select which one you\'re approving.', 'error');
                 return;
             }
-            var slotLabel = 'Mockup';
-            MOCKUP_SLOTS.forEach(function (s) {
-                if (s.key === selectedMockupSlot) slotLabel = s.label;
-            });
-            if (!confirm(`Approve ${slotLabel} as ${aeName}?`)) return;
-            approveDesign(designId, aeName);
+            openApproveModal(aeName);
         });
 
         changesBtn.addEventListener('click', () => {
@@ -4470,8 +4466,83 @@
         }
     }
 
+    // ── Approve Design Modal ───────────────────────────────────────────
+    // Replaces the old native confirm(). Carries the same information that
+    // confirm string did (which mockup, as whom) plus an OPTIONAL note for
+    // Steve. Leaving the note blank behaves exactly like the old path.
+    //
+    // Handlers are attached with `.onclick =` rather than the
+    // cloneNode/replaceChild dance used by openChangesModal(): property
+    // assignment is idempotent, so re-opening can never stack duplicate submit
+    // handlers, and no node reference goes stale.
+    function openApproveModal(aeName) {
+        var overlay = document.getElementById('ard-approve-overlay');
+        var modal = document.getElementById('ard-approve-modal');
+        var noteEl = document.getElementById('ard-approve-note');
+        var summaryEl = document.getElementById('ard-approve-summary');
+        var cancelBtn = document.getElementById('ard-approve-cancel');
+        var submitBtn = document.getElementById('ard-approve-submit');
+
+        if (!overlay || !modal || !noteEl || !summaryEl || !cancelBtn || !submitBtn) {
+            // Stale cached HTML against new JS — never swallow an approval.
+            showArdToast('Approve dialog failed to load. Hard-refresh the page (Ctrl+Shift+R).', 'error');
+            return;
+        }
+
+        var slotLabel = 'Mockup';
+        MOCKUP_SLOTS.forEach(function (s) {
+            if (s.key === selectedMockupSlot) slotLabel = s.label;
+        });
+
+        summaryEl.innerHTML = 'Approving <strong>' + escapeHtml(slotLabel)
+            + '</strong> as <strong>' + escapeHtml(aeName) + '</strong>';
+
+        // Reset every piece of per-open state — a previous attempt may have left
+        // the button disabled and spinning.
+        noteEl.value = '';
+        noteEl.disabled = false;
+        cancelBtn.disabled = false;
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Approve Design';
+
+        overlay.style.display = 'block';
+        modal.style.display = 'block';
+        noteEl.focus();
+
+        cancelBtn.onclick = closeApproveModal;
+        overlay.onclick = closeApproveModal;
+
+        submitBtn.onclick = function () {
+            var note = noteEl.value.trim();
+            // maxlength guards typing and pasting, but not a programmatic .value
+            // set. The note POST is awaited AFTER the status write has already
+            // committed, so a rejected note leaves the record Approved while the
+            // UI says "Error — retry" — cheap insurance against that.
+            if (note.length > 2000) {
+                showArdToast('Note is too long — please keep it under 2000 characters.', 'error');
+                return;
+            }
+            submitBtn.disabled = true;
+            cancelBtn.disabled = true;
+            noteEl.disabled = true;
+            submitBtn.innerHTML = '<span class="ard-btn-spinner"></span>Approving...';
+            // Close BEFORE approveDesign so both outcomes land on an unobstructed
+            // page: the green success banner, or the red "Error — retry" state the
+            // catch leaves on #ard-btn-approve in the action bar behind the modal.
+            closeApproveModal();
+            approveDesign(designId, aeName, note);
+        };
+    }
+
+    function closeApproveModal() {
+        var overlay = document.getElementById('ard-approve-overlay');
+        var modal = document.getElementById('ard-approve-modal');
+        if (overlay) overlay.style.display = 'none';
+        if (modal) modal.style.display = 'none';
+    }
+
     // ── Approve Design ─────────────────────────────────────────────────
-    async function approveDesign(id, aeName) {
+    async function approveDesign(id, aeName, approvalNote) {
         const approveBtn = document.getElementById('ard-btn-approve');
         const changesBtn = document.getElementById('ard-btn-changes');
         approveBtn.disabled = true;
@@ -4515,18 +4586,37 @@
                 showArdToast('Status pill sync failed — refresh to confirm', 'warn');
             });
 
-            // 2. Create approval note (includes which mockup was selected)
+            // 2. Create approval note (which mockup was selected, plus the AE's
+            //    optional note from the approve modal). .ard-note-text is
+            //    white-space:pre-wrap, so the blank line renders as a real
+            //    paragraph break in the timeline.
+            //
+            //    Posted via /api/design-notes rather than the thin
+            //    /api/art-requests/:id/note route so a typed note fans out to
+            //    Steve on Slack + email. Both routes write the same DesignNotes
+            //    row with the same fields; design-notes just adds the notify
+            //    path. notify is FALSE when the box was left blank, keeping the
+            //    no-note path identical to before — Steve still gets
+            //    template_art_completed (step 4) and the dashboard push (step 5),
+            //    and gains no third ping.
             const aeEmail = REP_MAP[aeName] || 'sales@nwcustomapparel.com';
             var noteText = selectedMockupSlot
                 ? `Design approved by ${aeName} (${slotLabel})`
                 : `Design approved by ${aeName}`;
-            const noteResp = await fetch(`${API_BASE}/api/art-requests/${id}/note`, {
+            var typedNote = (approvalNote || '').trim();
+            if (typedNote) noteText += '\n\n' + typedNote;
+
+            const noteResp = await fetch(`${API_BASE}/api/design-notes`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    noteType: 'Status Update',
-                    noteText: noteText,
-                    noteBy: aeEmail
+                    ID_Design: parseInt(id, 10),
+                    Note_Type: 'Status Update',
+                    Note_Text: noteText,
+                    Note_By: aeEmail,
+                    Posted_By_Role: 'ae',
+                    Posted_By_Email: aeEmail,
+                    notify: !!typedNote
                 })
             });
             if (!noteResp.ok) throw new Error(`Note creation failed: ${noteResp.status}`);
@@ -4569,6 +4659,9 @@
 
             if (typeof NWCAConfetti !== 'undefined') NWCAConfetti.fire();
             showSuccessMessage('Design approved! Steve will finalize and mark complete.');
+            // Surface the note the AE just wrote — without this the timeline only
+            // updates on a manual reload, so a typed note appears to have vanished.
+            refreshNotes();
             disableActionBar();
             updateStatusBadge('Approved', 'ard-status-badge--approved');
         } catch (err) {
@@ -4698,7 +4791,7 @@
                     btn.innerHTML = '<span class="ard-btn-spinner"></span>Submitting...';
                     requestChanges(designId, aeName, updatedNotes);
                 }).catch(function (err) {
-                    showToast('File upload failed: ' + err.message, 'error');
+                    showArdToast('File upload failed: ' + err.message, 'error');
                     btn.disabled = false;
                     btn.textContent = 'Submit Revision Request';
                 });
@@ -4710,11 +4803,11 @@
 
     function addChangesFile(file) {
         if (file.size > 20 * 1024 * 1024) {
-            showToast('File too large (max 20MB)', 'error');
+            showArdToast('File too large (max 20MB)', 'error');
             return;
         }
         if (changesAttachedFiles.length >= 2) {
-            showToast('Maximum 2 files allowed', 'error');
+            showArdToast('Maximum 2 files allowed', 'error');
             return;
         }
         changesAttachedFiles.push(file);
@@ -4927,6 +5020,9 @@
         document.getElementById('ard-btn-changes').disabled = true;
         document.getElementById('ard-ae-select').disabled = true;
         document.getElementById('ard-btn-approve').textContent = 'Approved';
+        // Clear the red set by the approveDesign catch — otherwise a failed
+        // attempt that succeeds on retry leaves a red button reading "Approved".
+        document.getElementById('ard-btn-approve').style.background = '';
         document.getElementById('ard-btn-approve').style.opacity = '0.6';
         document.getElementById('ard-btn-changes').style.opacity = '0.6';
     }

@@ -6,7 +6,7 @@
     <meta name="robots" content="noindex, nofollow">
     <title>Art Request Detail - Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
-    <link rel="stylesheet" href="/pages/css/art-request-detail.css?v=2026.07.04.1">
+    <link rel="stylesheet" href="/pages/css/art-request-detail.css?v=2026.08.07.2">
     <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.08.03.1">
     <link rel="stylesheet" href="/shared_components/css/transfer-actions.css?v=9">
 </head>
@@ -553,6 +553,27 @@
         </div>
     </div>
 
+    <!-- Approve Design Modal (AE view) — replaces the old native confirm().
+         Deliberately a SEPARATE node from #ard-changes-modal: that one is already
+         shared by openChangesModal() + openCustomerReviseModal() and carries
+         per-slot textareas and an upload dropzone. Reuses the .ard-changes-*
+         shell classes so the only new CSS is the green modifier. -->
+    <div class="ard-changes-overlay" id="ard-approve-overlay" style="display:none;"></div>
+    <div class="ard-changes-modal ard-approve-modal" id="ard-approve-modal" style="display:none;">
+        <div class="ard-changes-header ard-changes-header--approve">Approve Design</div>
+        <div class="ard-changes-body">
+            <div class="ard-approve-summary" id="ard-approve-summary"></div>
+            <label class="ard-changes-label" for="ard-approve-note">Note for Steve (optional)</label>
+            <textarea id="ard-approve-note" rows="3" maxlength="2000" class="ard-changes-textarea"
+                      placeholder="Anything Steve should know? e.g. rush this one, customer wants it on navy..."></textarea>
+            <div class="ard-approve-hint">Leave blank to approve without a note. A note emails and Slacks Steve.</div>
+            <div class="ard-changes-actions">
+                <button type="button" class="ard-changes-btn-cancel" id="ard-approve-cancel">Cancel</button>
+                <button type="button" class="ard-changes-btn-submit ard-changes-btn-submit--approve" id="ard-approve-submit">Approve Design</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Success/Status Message -->
     <div class="ard-success-msg" id="ard-success-msg" style="display:none;"></div>
 
@@ -668,6 +689,6 @@
     <script src="/shared_components/js/box-url.js?v=2026.08.05.23"></script>
     <script src="/shared_components/js/art-actions-shared.js?v=2026.08.05.23"></script>
     <script src="/shared_components/js/transfer-actions-shared.js?v=2026.08.06.2"></script>
-    <script src="/pages/js/art-request-detail.js?v=2026.08.05.23"></script>
+    <script src="/pages/js/art-request-detail.js?v=2026.08.07.2"></script>
 </body>
 </html>
