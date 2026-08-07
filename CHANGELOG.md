@@ -1,3 +1,13 @@
+## v2026.08.07.1 (2026.08.07)
+
+- Memory: DTG art charges shipped v2026.08.06.7 (Heroku v1829)
+- Memory: 253Gear Publisher in progress + the two-shapes binding lesson
+- 253Gear Publisher: app-side forwarders + copy-drafter slug
+- 253Gear Publisher: the dashboard page
+- Memory: 253Gear Publisher code complete, blocked on the Shopify app + config table
+- Merge 253Gear Publisher: Steve's tab for publishing to 253gear.com
+- Deploy v2026.08.07.1: 1 files (gear-publisher.html,...)
+
 ## v2026.08.06.7 (2026.08.06)
 
 - Memory: window.print() snapshots the DOM — await image decode first
