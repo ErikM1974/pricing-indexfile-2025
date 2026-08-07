@@ -1147,3 +1147,35 @@ delta-time scaling on both momentum and auto-spin; and the contrast warning memo
   and read the stored result afterwards.
 
 ---
+
+## A 403 <img> is invisible to every automated check — only eyes caught it (2026-08-05)
+
+**Problem.** DST Studio shipped with a broken NWCA logo in the header: the alt text and a
+broken-image icon, on every visit. The same dead URL was in the **customer-facing Approval
+Sheet**, so a printed proof would have carried a broken logo to a customer. It survived a
+full live-verification pass and only surfaced when Erik sent a screenshot.
+
+**Root cause.** I built the studio's header by copying `mockup-generator.html`, inheriting its
+`cdn.caspio.com/A0E1B000/...` logo and favicon. That host returns **403**. Those two pages were
+the only places in the repo still using it — the house standard is `/favicon.png` (179 pages)
+and the `A0E15000` logo (230 pages).
+
+**Why every check passed.** A failed `<img>` does not fail the page: the HTML is 200, the DOM
+is correct, `grep` of served markup matches, and a broken image logs nothing my
+console-error probe surfaced. I verified *the page*, never *the page's sub-resources*.
+
+**Solution.** Point both pages at the house-standard URLs. The logo PNG is RGBA, so the existing
+`brightness(0) invert(1)` (white on dark header) and `brightness(0)` (black on printed sheet)
+filters still work untouched.
+
+**Prevention.**
+- 🔑 **Assert `img.naturalWidth > 0`, not that the page loaded.** `complete` is true for a
+  failed image too — `naturalWidth` is the only honest signal, and it works headless where
+  screenshots don't.
+- 🔑 **Copying a header inherits its bugs.** Before reusing markup from a neighbouring page,
+  probe its absolute asset URLs; a `grep -c` for the repo's dominant favicon/logo URL tells you
+  instantly whether the source page is the odd one out.
+- 🔑 **Anything that prints for a customer deserves its own asset check** — the broken sheet
+  logo was the costlier half of this bug and the half no staff member would have reported.
+
+---

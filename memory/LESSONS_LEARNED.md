@@ -5,6 +5,36 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## Two Shopify shapes both use `name`, so every variant keyed to the same string (2026-08-07)
+
+**Problem.** In the 253Gear Publisher build, `buildVariantMediaBindings()` produced a binding key
+of the literal string `"season|||color"` for EVERY variant. Had it shipped, an entire product would
+have bound to one image — or to none — which is exactly the defect that already hit 253gear.com
+twice (644 variants after the tee/hoodie merge, then 7 Fall variants of #40749).
+
+**Root cause.** Shopify uses the key `name` for two different things depending on direction:
+
+    input  (ProductVariantSetInput):  { optionName: 'Style', name: 'T-Shirt' }   -> name is the VALUE
+    output (variant.selectedOptions): { name: 'Style', value: 'T-Shirt' }        -> name is the OPTION
+
+My helper did `found.name || found.value`, which is correct for the shape I SEND and silently
+returns the option NAME for the shape Shopify RETURNS. Nothing throws; the keys just collapse.
+
+**Solution.** Disambiguate on the presence of `optionName`, never on `name` — `optionValue()` in
+`src/utils/shopify-product-builder.js` (caspio-pricing-proxy).
+
+**Prevention.**
+- 🔑 **Test against the shape the API RETURNS, not the shape you send.** The builder's own unit
+  tests passed throughout — they exercised objects the builder had just constructed, which carried
+  an internal `_key`. Only a fixture shaped like a real `productSet` response exposed it.
+- 🔑 **A field name reused with two meanings is a silent-failure generator.** When an API round-trips
+  through differently-shaped input and output types, write the collision down at the read site —
+  a fallback chain like `a.x || a.y` will pick the wrong one and never complain.
+- 🔑 **A key-building function deserves a test that two DIFFERENT inputs produce two different keys.**
+  Asserting the happy path only would have passed here: every key was well-formed, just identical.
+
+---
+
 ## A page size counted DESIGNS while the table stores design×LOCATION (2026-08-06)
 
 **Problem.** After the artwork fix shipped, the SanMar inbound sheet still showed the 🎨 "no
@@ -241,37 +271,5 @@ email. Proxy upload routes accept `designNumSw` so uploads and the picker agree 
   for the system it belongs to (`swDesignNum`, not `designId`).
 - 🔑 **`img.src` returns an ABSOLUTE url** — comparing it against the relative literal you just
   set is always false. Use `getAttribute('src')`. It silently killed a lightbox fallback in two files.
-
----
-
-## A 403 <img> is invisible to every automated check — only eyes caught it (2026-08-05)
-
-**Problem.** DST Studio shipped with a broken NWCA logo in the header: the alt text and a
-broken-image icon, on every visit. The same dead URL was in the **customer-facing Approval
-Sheet**, so a printed proof would have carried a broken logo to a customer. It survived a
-full live-verification pass and only surfaced when Erik sent a screenshot.
-
-**Root cause.** I built the studio's header by copying `mockup-generator.html`, inheriting its
-`cdn.caspio.com/A0E1B000/...` logo and favicon. That host returns **403**. Those two pages were
-the only places in the repo still using it — the house standard is `/favicon.png` (179 pages)
-and the `A0E15000` logo (230 pages).
-
-**Why every check passed.** A failed `<img>` does not fail the page: the HTML is 200, the DOM
-is correct, `grep` of served markup matches, and a broken image logs nothing my
-console-error probe surfaced. I verified *the page*, never *the page's sub-resources*.
-
-**Solution.** Point both pages at the house-standard URLs. The logo PNG is RGBA, so the existing
-`brightness(0) invert(1)` (white on dark header) and `brightness(0)` (black on printed sheet)
-filters still work untouched.
-
-**Prevention.**
-- 🔑 **Assert `img.naturalWidth > 0`, not that the page loaded.** `complete` is true for a
-  failed image too — `naturalWidth` is the only honest signal, and it works headless where
-  screenshots don't.
-- 🔑 **Copying a header inherits its bugs.** Before reusing markup from a neighbouring page,
-  probe its absolute asset URLs; a `grep -c` for the repo's dominant favicon/logo URL tells you
-  instantly whether the source page is the odd one out.
-- 🔑 **Anything that prints for a customer deserves its own asset check** — the broken sheet
-  logo was the costlier half of this bug and the half no staff member would have reported.
 
 ---
