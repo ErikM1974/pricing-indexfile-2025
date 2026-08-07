@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Publish to 253gear - Northwest Custom Apparel</title>
+    <link rel="icon" href="/favicon.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.08.08.1">
+    <link rel="stylesheet" href="/shared_components/css/dash-shell.css?v=2026.08.08.1">
+    <link rel="stylesheet" href="/dashboards/css/gear-publisher.css?v=2026.08.08.1">
+</head>
+<body>
+<div class="dash-shell">
+    <header class="dash-header">
+        <div class="dash-header-left">
+            <img class="dash-header-logo"
+                 src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                 alt="Northwest Custom Apparel">
+            <h1 class="dash-header-title">Publish to 253gear</h1>
+        </div>
+        <div class="dash-header-right">
+            <a class="dash-back-link" href="/dashboards/art-hub-steve.html">&larr; Steve's Queue</a>
+        </div>
+    </header>
+
+    <div class="dash-error-banner" role="alert">
+        <span class="dash-error-banner-message"></span>
+        <button type="button" class="dash-error-banner-close" aria-label="Dismiss">&times;</button>
+    </div>
+
+    <main class="dash-content">
+        <ol class="gp-rail" aria-label="Steps">
+            <li data-step="identity">1 Design</li>
+            <li data-step="products">2 Garments</li>
+            <li data-step="photos">3 Photos</li>
+            <li data-step="story">4 Story</li>
+            <li data-step="review">5 Review</li>
+            <li data-step="live">6 Live</li>
+        </ol>
+
+        <!-- Step 1 — identity. Design number and description are mandatory; the
+             server refuses without them, this form just says so earlier. -->
+        <section id="gp-step-identity" class="dash-card gp-step" hidden>
+            <h2>Which design is this?</h2>
+            <p class="gp-muted">
+                Type the ShopWorks details, or paste a screenshot of the design info
+                (Ctrl+V anywhere on this page) and they will be read out of it.
+                Everything read stays editable — check it before you continue.
+            </p>
+
+            <label class="gp-field">
+                <span>Paste or choose a ShopWorks screenshot</span>
+                <input type="file" id="gp-screenshot" accept="image/*">
+            </label>
+            <p id="gp-ocr-status" class="gp-muted"></p>
+
+            <label class="gp-field">
+                <span>ShopWorks design number <em>(required)</em></span>
+                <input type="text" id="gp-designNumber" inputmode="numeric" placeholder="34293" maxlength="6">
+            </label>
+            <p id="gp-dup-status" class="gp-muted"></p>
+
+            <label class="gp-field">
+                <span>Design name <em>(required)</em></span>
+                <input type="text" id="gp-designName" placeholder="Retro Sumner">
+            </label>
+
+            <label class="gp-field">
+                <span>ShopWorks design description <em>(required)</em></span>
+                <textarea id="gp-designDescription" rows="3"
+                          placeholder="The description you typed into ShopWorks"></textarea>
+            </label>
+            <p class="gp-muted">
+                This is the ShopWorks description, kept on the product for the record.
+                The storefront copy customers read is written in step 4.
+            </p>
+        </section>
+
+        <!-- Step 2 — garments, colours, sizes. Prices come from the settings table. -->
+        <section id="gp-step-products" class="dash-card gp-step" hidden>
+            <h2>Garments, colours and sizes</h2>
+            <h3>Garments</h3>
+            <div id="gp-style-list" class="gp-check-grid"></div>
+            <h3>Colours</h3>
+            <div id="gp-color-list" class="gp-check-grid"></div>
+            <h3>Sizes</h3>
+            <div id="gp-size-list" class="gp-check-grid"></div>
+            <p id="gp-counter" class="gp-counter"></p>
+        </section>
+
+        <!-- Step 3 — the photo grid IS the variant-to-image binding surface. -->
+        <section id="gp-step-photos" class="dash-card gp-step" hidden>
+            <h2>Photos</h2>
+            <p class="gp-muted">
+                One photo per garment-and-colour pair. Drop a file on a cell, or click it.
+                Sizes share their colour's photo, which is what lets a shopper click a
+                thumbnail without losing the size they picked.
+            </p>
+            <div id="gp-grid-host"></div>
+
+            <label class="gp-field">
+                <span>Alt text — describe the <em>design</em>, not the garment</span>
+                <input type="text" id="gp-alt" placeholder="Retro arch over a rail bridge, one colour">
+            </label>
+
+            <div class="gp-row">
+                <button type="button" id="gp-classify-btn" class="dash-btn">Read the design</button>
+                <button type="button" id="gp-refresh-collections" class="dash-btn dash-btn--ghost">
+                    Refresh collection rules
+                </button>
+            </div>
+            <div id="gp-classify-result"></div>
+        </section>
+
+        <!-- Step 4 — copy. Hook and body are separate so a rewrite can't lose the hook. -->
+        <section id="gp-step-story" class="dash-card gp-step" hidden>
+            <h2>The story</h2>
+            <p class="gp-muted">
+                Paste what you know. Claude drafts from your facts and checks anything it
+                is unsure of, citing a source per claim. It will not invent local history,
+                say a business has closed, or mention fabric.
+            </p>
+            <label class="gp-field"><span>What do you know about this place?</span>
+                <textarea id="gp-facts" rows="5"></textarea></label>
+            <div class="gp-row">
+                <label class="gp-field gp-field--sm"><span>Landmark / subject</span><input type="text" id="gp-fact-landmark"></label>
+                <label class="gp-field gp-field--sm"><span>Years it ran</span><input type="text" id="gp-fact-years"></label>
+                <label class="gp-field gp-field--sm"><span>Who ran it</span><input type="text" id="gp-fact-who"></label>
+                <label class="gp-field gp-field--sm"><span>Sources</span><input type="text" id="gp-fact-sources"></label>
+            </div>
+            <button type="button" id="gp-draft-btn" class="dash-btn">Draft the description</button>
+            <p id="gp-copy-status" class="gp-muted"></p>
+
+            <label class="gp-field"><span>Hook — one line, shown under the price</span>
+                <input type="text" id="gp-hook"></label>
+            <label class="gp-field"><span>Body</span><textarea id="gp-body" rows="12"></textarea></label>
+            <p id="gp-wordcount" class="gp-muted">0 / 200 words</p>
+        </section>
+
+        <!-- Step 5 — build the draft, then the audit decides whether Publish lights up. -->
+        <section id="gp-step-review" class="dash-card gp-step" hidden>
+            <h2>Review and publish</h2>
+            <p class="gp-muted">
+                This creates a <strong>draft</strong> on 253gear.com. Nothing is visible to
+                customers until you press Publish.
+            </p>
+            <button type="button" id="gp-create-btn" class="dash-btn">Build the draft</button>
+
+            <div id="gp-job-panel" class="gp-job" hidden>
+                <h3>Build progress</h3>
+                <div id="gp-job-body"></div>
+                <div class="gp-row">
+                    <button type="button" id="gp-publish-btn" class="dash-btn dash-btn--primary" disabled>
+                        Publish to 253gear
+                    </button>
+                    <span id="gp-publish-reason" class="gp-muted"></span>
+                </div>
+            </div>
+        </section>
+
+        <section id="gp-step-live" class="dash-card gp-step" hidden>
+            <h2>Live</h2>
+            <div id="gp-live" hidden><div id="gp-live-body"></div></div>
+        </section>
+
+        <div id="gp-blockers" class="gp-blockers"></div>
+        <div class="gp-nav">
+            <button type="button" id="gp-back-btn" class="dash-btn dash-btn--ghost">Back</button>
+            <button type="button" id="gp-next-btn" class="dash-btn">Next</button>
+        </div>
+    </main>
+</div>
+
+<script src="/config/app.config.js?v=2026.08.08.1"></script>
+<script src="/shared_components/js/fetch-timeout.js?v=2026.08.08.1"></script>
+<script src="/shared_components/js/dash-page-helpers.js?v=2026.08.08.1"></script>
+<script src="/dashboards/js/gear-publisher-store.js?v=2026.08.08.1"></script>
+<script src="/dashboards/js/gear-publisher-images.js?v=2026.08.08.1"></script>
+<script src="/dashboards/js/gear-publisher.js?v=2026.08.08.1"></script>
+</body>
+</html>

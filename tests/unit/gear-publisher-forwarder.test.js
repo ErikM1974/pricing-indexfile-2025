@@ -32,8 +32,8 @@ const CODE = BLOCK
     .join('\n');
 
 describe('the routes exist and are page-gated', () => {
-    test('all nine forwarders are declared', () => {
-        expect(GEAR_ROUTES).toHaveLength(9);
+    test('all ten forwarders are declared', () => {
+        expect(GEAR_ROUTES).toHaveLength(10);
         const routes = GEAR_ROUTES.map((r) => r.route);
         expect(routes).toEqual(expect.arrayContaining([
             '/api/gear/config',
@@ -43,15 +43,28 @@ describe('the routes exist and are page-gated', () => {
             '/api/gear/jobs/:designNumber/resume',
             '/api/gear/products/:productId/audit',
             '/api/gear/products/:productId/publish',
-            '/api/gear/config/refresh-collections'
+            '/api/gear/config/refresh-collections',
+            '/api/gear/extract-shopworks'
         ]));
     });
 
-    test('every one goes through gearForward, which applies the page gate', () => {
+    test('EVERY route is page-gated, whether or not it uses the shared helper', () => {
+        // The real invariant is the gate, not the helper. extract-shopworks has its
+        // own handler because it targets /api/vision and needs a 12mb body for a
+        // pasted screenshot, so it applies requirePageAccess directly.
+        const lines = BLOCK.split('\n');
         for (const { route } of GEAR_ROUTES) {
-            const line = BLOCK.split('\n').find((l) => l.includes(`'${route}'`));
-            expect(`${route}: ${/gearForward\(/.test(line)}`).toBe(`${route}: true`);
+            const at = lines.findIndex((l) => l.includes(`'${route}'`));
+            const statement = lines.slice(at, at + 4).join('\n');
+            const gated = /gearForward\(/.test(statement) || /requirePageAccess\(GEAR_PAGE\)/.test(statement);
+            expect(`${route}: ${gated}`).toBe(`${route}: true`);
         }
+    });
+
+    test('the screenshot route gets a body limit big enough for a screenshot', () => {
+        // The shared helper caps at 512kb; a pasted PNG blows straight past that.
+        const at = BLOCK.indexOf("'/api/gear/extract-shopworks'");
+        expect(BLOCK.slice(at, at + 400)).toMatch(/express\.json\(\{ limit: '12mb' \}\)/);
     });
 
     test('the gate is requirePageAccess on the page filename, not bare requireStaff', () => {

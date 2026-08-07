@@ -130,6 +130,8 @@ dotenv.config();
 //     POST /api/gear/products/:productId/audit    re-run the pre-publish checks
 //     POST /api/gear/products/:productId/publish  the publish click (409s unless audit clean)
 //     POST /api/gear/config/refresh-collections   re-read live smart-collection rules
+//     POST /api/gear/extract-shopworks            ShopWorks screenshot → design number/name
+//       (own handler, not gearForward: targets /api/vision and needs a 12mb body)
 //   ⚠️ Gated with requirePageAccess('gear-publisher.html'), NOT bare requireStaff:
 //     write_products is catalogue-wide, so this must not be open to every staffer.
 //   ⚠️ All nine must stay listed here — see the due-dates note above.
@@ -4486,6 +4488,31 @@ app.post('/api/gear/products/:productId/publish', ...gearForward('POST',
   { parseJson: true, timeoutMs: 60000 }));
 
 app.post('/api/gear/config/refresh-collections', ...gearForward('POST', '/config/refresh-collections', { timeoutMs: 30000 }));
+
+// ShopWorks screenshot OCR. Separate from gearForward for two reasons: it targets
+// /api/vision (not /api/shopify), and a pasted screenshot needs a far larger body
+// than the 512kb the rest of this surface allows — same 12mb allowance the Jim
+// mailing-list extractor uses. The upstream route was secret-gated as part of this
+// work; it had no browser caller of its own.
+app.post('/api/gear/extract-shopworks',
+  requirePageAccess(GEAR_PAGE),
+  express.json({ limit: '12mb' }),
+  async (req, res) => {
+    if (!CRM_API_SECRET) return res.status(503).json({ error: 'not_configured' });
+    try {
+      const upstream = await fetch(`${CRM_API_BASE}/api/vision/extract-shopworks`, {
+        method: 'POST',
+        headers: { 'X-CRM-API-Secret': CRM_API_SECRET, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: (req.body && req.body.image) || '' }),
+        signal: AbortSignal.timeout(60000)
+      });
+      const text = await upstream.text();
+      res.status(upstream.status).type(upstream.headers.get('content-type') || 'application/json').send(text);
+    } catch (e) {
+      console.error('[gear-forward:POST /extract-shopworks]', e.message);
+      res.status(502).json({ error: 'upstream_unavailable' });
+    }
+  });
 
 console.log('✓ 253Gear publisher forwarders loaded (page-gated: gear-publisher.html)');
 
