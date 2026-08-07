@@ -5,6 +5,52 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## Colour never changed the photo, and every existing check passed (2026-08-07)
+
+**Problem.** On 253gear.com, choosing a colour did not change the product photo. A
+shopper picking Charcoal was shown Athletic Heather and bought on that picture. Live on
+**6 of the 7 multi-colour products**; on two of them the correct photo was already
+uploaded and bound to nothing. Nobody reported it — Erik only asked how to *structure*
+the product.
+
+**Root cause.** Variants were bound to a photo by **Style alone**; Colour was never part
+of the key. The audit asked only whether each variant had *an* image, which was true
+throughout — so `variant_image_binding`, the headline check written after this defect
+shipped twice before, passed cleanly on every affected product.
+
+**Solution.** `scripts/253gear-align-media.js` + a declared `(Style|Colour) -> position`
+map (`253gear-media-maps.json`). Two new audit checks in `src/utils/shopify-audit.js`:
+`colour_image_distinct` (blocking — every pair resolves to its OWN photo) and
+`orphan_media` (non-blocking — names uploaded-but-unbound photos and their position).
+
+**Prevention.**
+- 🔴 **"Every X has a Y" does not imply "every X has its OWN Y."** The reciprocal check is
+  a different check. Whenever a binding is one-per-group, assert **distinctness**, not
+  just presence — presence passes for the entire lifetime of the bug.
+- 🔴 **Media ORDER is load-bearing.** The theme gives an **unbound** photo the options of
+  the *nearest preceding bound* photo (`product-template.CURRENT.liquid:393-402`), so a
+  lifestyle shot after the wrong flat-lay silently switches the shopper's colour on click.
+  Calico's maroon lifestyle shot sat behind the charcoal tee and did exactly that. My own
+  first instinct — "move lifestyle photos to the end" — would have *created* this bug on
+  Spanaway; the theme code said otherwise.
+- 🔴 **Never infer a binding from a filename.** Two of Spanaway's photos are named `34082`
+  for design `34084`; the lifestyle files are stock names with no colour at all. Both
+  Calico lifestyle shots had to be **opened and looked at** to learn their colour.
+- 🔑 **A dry run that previews the wrong state is worse than none.** The first version
+  validated against the *pre*-reorder gallery and printed bindings that were plainly
+  wrong. Simulate every mutation in memory so the preview describes the state that will
+  actually exist.
+- 🔑 **Pick the statistic before trusting the data.** Taking the **max** of SanMar's
+  `PIECE_WEIGHT` per size picked single outlier rows (hoodie L: 74 of 75 colourways say
+  558 g, one says 567 g) and would have re-weighed **284 variants across 37 products**.
+  The **mode** matched the catalogue on PC54 7/7 and PC78H 6/7. Check the distribution
+  before writing, not after.
+- 🔑 **`productReorderMedia` returns `UserError`, which has no `code` field** (unlike
+  `MediaUserError`). Selecting it fails the whole query at parse time.
+- 🔑 Verified on the **live storefront by clicking every thumbnail**, not in the admin —
+  both prior binding incidents were invisible to the API. Set a distinctive size first:
+  if a click moves Size, the image is bound to too few variants.
+
 ## Two Shopify shapes both use `name`, so every variant keyed to the same string (2026-08-07)
 
 **Problem.** In the 253Gear Publisher build, `buildVariantMediaBindings()` produced a binding key
@@ -228,48 +274,5 @@ customer's browser.
 - Drift guard: `tests/unit/portal-proof-image.test.js` fails if any Box-carrying field in the four
   portal projections stops going through `portalProofUrl` — an unwrapped field is invisible, it
   just renders broken for a customer who will never tell you.
-
----
-
-## Steve's Box picker searched a number that has never existed (2026-08-05)
-
-**Problem.** Steve loaded a mockup into Box, opened **Send Mockup**, and got the yellow "No Box
-folder found for this design", an empty picker, and a Send button stuck disabled at "0 of 6
-selected". The one "Previously Sent" card rendered as a grey **File** placeholder. Erik's read
-was "this used to work" — half right, and the half that was right pointed at the wrong defect.
-
-**Root cause — two independent bugs, only one a regression.**
-1. The picker called `/api/box/folder-files?designNumber=` with Caspio's **`ID_Design`** (53069).
-   Steve names his Box folders with the **ShopWorks** number **`Design_Num_SW`** ("40733 Ironside
-   Marine"). The two series are unrelated: across 2,710 art requests they coincide **4 times**,
-   all hand-typed in 2024. `ID_Design` runs 50092-53069, `Design_Num_SW` runs 111-1232434. So the
-   search matched nothing, ever — wrong since `7193982d` / proxy `3b05395`, masked all along by
-   the paste-URL fallback. The proxy's own comment (`box-upload.js:1432`) had documented the
-   correct key the whole time.
-2. The broken thumbnail WAS a regression, two days old. `b9e9d2a3` session-gated the Box surface;
-   335 stored Caspio mockup URLs are absolute `https://caspio-pricing-proxy…/api/box/thumbnail/<id>`
-   and now 401. `box-url.js` was written **in that same commit** to fix exactly this — and wired
-   into only the two transfer pages. Every art/mockup surface kept rendering raw stored URLs.
-
-**Solution.** Picker keys off `Design_Num_SW` (6/6 on recent jobs) with a named empty state, and
-**no** company-name fallback — a company search resolves to the first folder merely *containing*
-the name, i.e. another design's artwork (it is how design 53069's mockup got filed into
-"40640 Ironside Marine"). `boxUrl()` adopted across all 10 art/mockup renderers + 6 pages. The
-send path converts any `/api/box/thumbnail/<id>` into a real Box shared link before it reaches an
-email. Proxy upload routes accept `designNumSw` so uploads and the picker agree on one folder.
-
-**Prevention.**
-- `tests/unit/box-url.test.js` drift-locks it: any page loading a script that calls `boxUrl()`
-  must also load `box-url.js`, **and load it first**.
-- `tests/jest/box-folder-files-design-number.test.js` (proxy) pins that a ShopWorks number
-  resolves and a Caspio `ID_Design` returns an honest `200 + found:false`.
-- 🔑 **A module that ships unwired is invisible to unit tests that only exercise the module.**
-  `box-url.js` had 20 passing tests while doing nothing on 8 of the 10 pages that needed it.
-- 🔑 **"It used to work" is a hypothesis — check git before redesigning.** Two minutes of
-  `git log -S` separated a year-old latent bug from a 2-day-old regression.
-- 🔑 **Two ID series that both read as "the design number" WILL be confused.** Name the variable
-  for the system it belongs to (`swDesignNum`, not `designId`).
-- 🔑 **`img.src` returns an ABSOLUTE url** — comparing it against the relative literal you just
-  set is always false. Use `getAttribute('src')`. It silently killed a lightbox fallback in two files.
 
 ---

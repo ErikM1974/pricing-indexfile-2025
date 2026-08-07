@@ -1179,3 +1179,46 @@ filters still work untouched.
   logo was the costlier half of this bug and the half no staff member would have reported.
 
 ---
+
+## Steve's Box picker searched a number that has never existed (2026-08-05)
+
+**Problem.** Steve loaded a mockup into Box, opened **Send Mockup**, and got the yellow "No Box
+folder found for this design", an empty picker, and a Send button stuck disabled at "0 of 6
+selected". The one "Previously Sent" card rendered as a grey **File** placeholder. Erik's read
+was "this used to work" — half right, and the half that was right pointed at the wrong defect.
+
+**Root cause — two independent bugs, only one a regression.**
+1. The picker called `/api/box/folder-files?designNumber=` with Caspio's **`ID_Design`** (53069).
+   Steve names his Box folders with the **ShopWorks** number **`Design_Num_SW`** ("40733 Ironside
+   Marine"). The two series are unrelated: across 2,710 art requests they coincide **4 times**,
+   all hand-typed in 2024. `ID_Design` runs 50092-53069, `Design_Num_SW` runs 111-1232434. So the
+   search matched nothing, ever — wrong since `7193982d` / proxy `3b05395`, masked all along by
+   the paste-URL fallback. The proxy's own comment (`box-upload.js:1432`) had documented the
+   correct key the whole time.
+2. The broken thumbnail WAS a regression, two days old. `b9e9d2a3` session-gated the Box surface;
+   335 stored Caspio mockup URLs are absolute `https://caspio-pricing-proxy…/api/box/thumbnail/<id>`
+   and now 401. `box-url.js` was written **in that same commit** to fix exactly this — and wired
+   into only the two transfer pages. Every art/mockup surface kept rendering raw stored URLs.
+
+**Solution.** Picker keys off `Design_Num_SW` (6/6 on recent jobs) with a named empty state, and
+**no** company-name fallback — a company search resolves to the first folder merely *containing*
+the name, i.e. another design's artwork (it is how design 53069's mockup got filed into
+"40640 Ironside Marine"). `boxUrl()` adopted across all 10 art/mockup renderers + 6 pages. The
+send path converts any `/api/box/thumbnail/<id>` into a real Box shared link before it reaches an
+email. Proxy upload routes accept `designNumSw` so uploads and the picker agree on one folder.
+
+**Prevention.**
+- `tests/unit/box-url.test.js` drift-locks it: any page loading a script that calls `boxUrl()`
+  must also load `box-url.js`, **and load it first**.
+- `tests/jest/box-folder-files-design-number.test.js` (proxy) pins that a ShopWorks number
+  resolves and a Caspio `ID_Design` returns an honest `200 + found:false`.
+- 🔑 **A module that ships unwired is invisible to unit tests that only exercise the module.**
+  `box-url.js` had 20 passing tests while doing nothing on 8 of the 10 pages that needed it.
+- 🔑 **"It used to work" is a hypothesis — check git before redesigning.** Two minutes of
+  `git log -S` separated a year-old latent bug from a 2-day-old regression.
+- 🔑 **Two ID series that both read as "the design number" WILL be confused.** Name the variable
+  for the system it belongs to (`swDesignNum`, not `designId`).
+- 🔑 **`img.src` returns an ABSOLUTE url** — comparing it against the relative literal you just
+  set is always false. Use `getAttribute('src')`. It silently killed a lightbox fallback in two files.
+
+---
