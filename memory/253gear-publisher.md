@@ -1,7 +1,7 @@
 # 253Gear Publisher — artwork → Shopify draft from Steve's dashboard
 
-**Status: IN PROGRESS, foundation built and verified, blocked on Erik creating the Shopify app.**
-Started 2026-08-07. Nothing deployed. Nothing on `develop`.
+**Status: CODE COMPLETE, nothing deployed, blocked on two things only Erik can do.**
+Started 2026-08-07, finished building 2026-08-08. Nothing is on `develop` in either repo.
 
 Approved plan: `C:\Users\erik\.claude\plans\we-have-our-retail-zippy-truffle.md` — read it first,
 it carries the full design, the rejected alternatives and the verification plan.
@@ -18,50 +18,57 @@ Reference material (NOT deployed, Python, from a prior Cowork session):
 
 ## Where the code is
 
-**Branch `feature/253gear-publisher` in `caspio-pricing-proxy`.** Not merged, not deployed.
-`git checkout feature/253gear-publisher` to resume.
+Branch **`feature/253gear-publisher` in BOTH repos** — proxy and app. Not merged, not deployed.
+`git checkout feature/253gear-publisher` in each to resume.
 
-| File | State |
+**proxy** (`942dee6` → `93f05a1` → `4dc4a18`)
+
+| File | Role |
 |---|---|
-| `src/utils/shopify-client.js` | DONE + tested. Auth, transport, throttle, redaction |
-| `src/utils/shopify-product-builder.js` | DONE + tested. Pure; config is a parameter |
-| `src/utils/shopify-audit.js` | DONE + tested. `audit.py` port + convention checks |
-| `scripts/253gear-inspect.js` | DONE. Read-only Step 0. **Cannot run until creds exist** |
-| `src/routes/vision.js` | EDITED — `designDescription` added to prompt + schema |
-| `server.js` | EDITED — `extract-shopworks` secret-gated |
+| `src/utils/shopify-client.js` | Auth, transport, throttle, redaction |
+| `src/utils/shopify-product-builder.js` | Pure; config is a parameter |
+| `src/utils/shopify-audit.js` | `audit.py` port + convention checks |
+| `src/utils/shopify-config.js` | Caspio key/value config, NO built-in defaults |
+| `src/utils/shopify-orchestrator.js` | The create sequence, resumable |
+| `src/utils/shopify-classify.js` | Deterministic city match → tags |
+| `src/utils/shopify-vision.js` | Narrow, non-persisting mockup read |
+| `src/routes/shopify-products.js` | 10 endpoints, fixed allowlist |
+| `src/routes/shopify-description-ai.js` | SSE copy drafter + web search |
+| `scripts/253gear-inspect.js` | Read-only Step 0 — **needs creds to run** |
+| `scripts/253gear-seed-config.js` | Table spec + `--csv-out` seed |
 
-**100 new tests, all green. Full proxy suite 1267/1267, no regressions.**
-Test files: `shopify-throttle-token`, `shopify-product-builder`, `shopify-variant-media-binding`,
-`shopify-audit`, `vision-gate`.
+**app** (`3e0e4b75` → `b13ad1cf`) — `dashboards/gear-publisher.html`, its css, 3 JS modules,
+10 `/api/gear/*` forwarders in `server.js`, one tab link on `art-hub-steve.html`.
 
-## 🔴 BLOCKED ON ERIK
+**Tests: proxy 107 suites / 1381 green. App deploy gate 112 suites / 2362 green.**
 
-Create the custom app **"253Gear Publisher"** in the Shopify Dev Dashboard —
-scopes `write_products`, `read_products`, `read_publications` — then:
+## 🔴 BLOCKED ON ERIK — two things
+
+**1. Create the app "253Gear Publisher"** (Dev Dashboard, org 25292041): scopes
+`write_products`, `read_products`, `read_publications`. Erik types the secret himself —
+it must never land in a transcript:
 
 ```
-heroku config:set -a caspio-pricing-proxy \
-  SHOPIFY_SHOP_DOMAIN=nw-custom-apparel.myshopify.com \
-  SHOPIFY_CLIENT_ID=… SHOPIFY_CLIENT_SECRET=… \
-  SHOPIFY_API_VERSION=2025-01 SHOPIFY_STOREFRONT_ORIGIN=https://253gear.com
+heroku config:set -a caspio-pricing-proxy SHOPIFY_SHOP_DOMAIN=nw-custom-apparel.myshopify.com SHOPIFY_CLIENT_ID=… SHOPIFY_CLIENT_SECRET=… SHOPIFY_API_VERSION=2025-01 SHOPIFY_STOREFRONT_ORIGIN=https://253gear.com
 ```
 
-Then `node scripts/253gear-inspect.js`. Until that runs, three things are **assumptions**:
+**2. Create Caspio table `Shopify_Config_2026`** — run
+`node scripts/253gear-seed-config.js --csv-out` and import the CSV (Caspio builds the
+table from the header row). Widen `Config_Value` to Text(64000).
+
+Then `node scripts/253gear-inspect.js`. Until it runs, three things are **assumptions**:
 the `ProductSetInput` field names, what the automatic collections key on, and the live
-variant→media binding pattern. Also still unanswered: the **crewneck retail price**, and
-confirmation that **PC78 / PC78H** are the SanMar styles behind the hoodie and crewneck.
+variant→media binding pattern. Still unanswered: the **crewneck retail price** (its seed
+row is deliberately `Active=No` so the code refuses that garment rather than inventing a
+price), and whether **PC78 / PC78H** are the right SanMar styles.
 
-⏭️ Afterwards: delete the old **"Claude Store Ops"** app (holds `write_themes` + `write_content`).
+## Then, in order
 
-## Remaining work, in order
-
-1. Caspio tables `Shopify_Config_2026` (key/value, Erik-editable) + `Shopify_Publish_Jobs` (ledger)
-2. `src/utils/shopify-ledger.js`, `src/utils/shopify-orchestrator.js`, `src/routes/shopify-products.js`
-3. `POST /api/shopify/classify` + `src/routes/shopify-description-ai.js` (wire in `lib/web-search.js`)
-4. `dashboards/gear-publisher.html` + 7 JS/CSS files (app repo) — `/dash-page new gear-publisher`
-5. App forwarders in `server.js` ~L4361 + TOC ~L110, `requirePageAccess('gear-publisher.html')`
-6. ACTIVE_FILES.md, `npm run routes-map`, `memory/API_CHANGELOG.md`
-7. Deploy **PROXY FIRST** (born gated, no legacy caller), then the app
+1. `POST /api/shopify/config/refresh-collections` — discovers the real tag vocabulary
+2. `Staff_Page_Access` row: `gear-publisher.html` → `Allowed_Emails` = Erik + art@, NO roles
+3. Deploy **PROXY FIRST** (born gated, no legacy caller), then the app
+4. `npm run routes-map` + `memory/API_CHANGELOG.md` in the proxy
+5. Delete the old **"Claude Store Ops"** app (holds `write_themes` + `write_content`)
 
 ## Decisions that are settled — do not relitigate
 
