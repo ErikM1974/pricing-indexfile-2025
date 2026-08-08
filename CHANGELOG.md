@@ -1,3 +1,9 @@
+## v2026.08.08.1 (2026.08.08)
+
+- Memory: 253gear-publisher doc was stale — it said nothing was deployed
+- Design Queue: tell Steve which subject to draw next, and why
+- Design Queue: per-subject brief, and why there is no search-volume column
+
 ## v2026.08.07.2 (2026.08.07)
 
 - Memory: 253gear colour-image binding + the distinctness lesson
