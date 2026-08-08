@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Design Queue - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- 2026 design tokens must load before dash-shell.css -->
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css">
+    <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
+    <link rel="stylesheet" href="/dashboards/css/design-queue.css?v=2026.08.08.1">
+</head>
+<body>
+    <div class="dash-shell">
+        <header class="dash-header">
+            <div class="dash-header-left">
+                <a href="/dashboards/art-hub-steve.html" title="Back to Art Hub">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                         alt="Northwest Custom Apparel" class="dash-header-logo">
+                </a>
+                <h1 class="dash-header-title">Design Queue</h1>
+            </div>
+            <div class="dash-header-right">
+                <a href="/dashboards/art-hub-steve.html" class="dash-back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    Art Hub
+                </a>
+            </div>
+        </header>
+
+        <main class="dash-content">
+            <div class="dash-error-banner" role="alert">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span class="dash-error-banner-message"></span>
+                <button class="dash-error-banner-close" aria-label="Dismiss">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- The one idea the whole page exists to convey. Steve reads this first. -->
+            <section class="dq-thesis">
+                <p class="dq-thesis-lead">Pick the subject nobody has written up &mdash; not the one people love most.</p>
+                <p class="dq-thesis-body">
+                    253gear holds <strong>#1 and #2</strong> for &ldquo;Clyde Rushton Puyallup water slide&rdquo;.
+                    Position #3 is a Facebook post. We didn&rsquo;t outrank anyone &mdash; we wrote the only
+                    <em>page</em> about something that until then existed solely in comment threads.
+                </p>
+                <p class="dq-thesis-body">
+                    <strong>Bob&rsquo;s Java Jive scores just as high on affection and doesn&rsquo;t rank</strong>,
+                    because news outlets already told that story. Same pull, opposite result. The difference is
+                    whether the seat was empty.
+                </p>
+            </section>
+
+            <div class="dash-stat-grid">
+                <div class="dash-stat-card dash-stat-card--accent">
+                    <div class="dash-stat-value" id="stat-draw">&mdash;</div>
+                    <div class="dash-stat-label">Ready to draw</div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value" id="stat-research">&mdash;</div>
+                    <div class="dash-stat-label">Research first</div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value" id="stat-skip">&mdash;</div>
+                    <div class="dash-stat-label">Skip &mdash; can&rsquo;t rank</div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value" id="stat-checked">&mdash;</div>
+                    <div class="dash-stat-label">Subjects checked</div>
+                </div>
+            </div>
+
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title">What to draw next</h2>
+                    <div class="dq-filters" id="dq-filters" role="group" aria-label="Filter by verdict"></div>
+                </div>
+                <div id="queue-root" class="dash-loading">Loading the queue&hellip;</div>
+            </div>
+
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title">The 47 already on the store</h2>
+                </div>
+                <p class="dq-note">
+                    Scored the same way. A design sitting in an empty seat with thin copy is a cheaper win
+                    than a new drawing &mdash; the words are what rank, and they can be added today.
+                </p>
+                <div id="catalogue-root" class="dash-loading">Loading&hellip;</div>
+            </div>
+
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title">Before you draw &mdash; the 30-second check</h2>
+                </div>
+                <ol class="dq-checklist">
+                    <li><strong>Google the subject name.</strong> Not &ldquo;&lt;subject&gt; t shirt&rdquo; &mdash; the name itself. If the best result is a Facebook thread, a forum post, or nothing, that is the signal.</li>
+                    <li><strong>Could a marketplace swap in another city?</strong> &ldquo;Retro Tacoma&rdquo; yes, &ldquo;Calico Cat Motel&rdquo; no. If yes, Etsy and TeePublic already sell it and we lose.</li>
+                    <li><strong>Is the business still trading?</strong> Then it&rsquo;s a licensing conversation, not a free design &mdash; and a link from their site is worth more than the margin on the shirt.</li>
+                    <li><strong>Search the name at <a href="https://tmsearch.uspto.gov" target="_blank" rel="noopener">tmsearch.uspto.gov</a>.</strong> A live mark is a veto, not a score.</li>
+                    <li><strong>Do we know something nobody wrote down?</strong> A first-hand detail &mdash; the tiled floor, the smell, who ran it. That is what actually wins the ranking.</li>
+                </ol>
+                <p class="dq-note dq-note--warn">
+                    <i class="fas fa-triangle-exclamation"></i>
+                    If Keyword Planner shows <strong>1,000+ searches a month, skip it</strong> &mdash; that&rsquo;s a
+                    national keyword and we lose. Use it to reject things that are too big, never to choose between
+                    things that are small.
+                </p>
+            </div>
+
+            <p class="dq-provenance" id="dq-provenance"></p>
+        </main>
+    </div>
+
+    <script src="/config/app.config.js"></script>
+    <script src="/shared_components/js/fetch-timeout.js"></script>
+    <script src="/shared_components/js/dash-page-helpers.js"></script>
+    <script src="/dashboards/js/design-queue.js?v=2026.08.08.1"></script>
+</body>
+</html>
