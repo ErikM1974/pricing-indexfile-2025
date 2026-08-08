@@ -171,6 +171,79 @@
 .dq-row--skip .dq-subject,
 .dq-row--skip .dq-score-value { color: var(--gray-500); }
 
+/* ── The brief ─────────────────────────────────────────────────────────────
+   Collapsed by default. 23 open research notes is a wall nobody reads; one
+   open note on the row Steve has chosen is the thing he works from. */
+.dq-brief {
+    grid-column: 2;
+    margin-top: 8px;
+    max-width: 80ch;
+}
+
+.dq-brief-summary {
+    cursor: pointer;
+    display: inline-block;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--state-info, var(--gray-600));
+    padding: 3px 0;
+    list-style: none;
+}
+
+.dq-brief-summary::-webkit-details-marker { display: none; }
+
+.dq-brief-summary::before {
+    content: '\25B8';           /* right-pointing triangle; rotates when open */
+    display: inline-block;
+    margin-right: 6px;
+    transition: transform 0.12s ease;
+}
+
+.dq-brief[open] > .dq-brief-summary::before { transform: rotate(90deg); }
+
+.dq-brief-summary:hover { text-decoration: underline; }
+
+.dq-brief-query {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 8px;
+    margin: 8px 0 10px;
+}
+
+.dq-brief-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gray-400);
+}
+
+.dq-brief-code {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 13px;
+    padding: 3px 8px;
+    border-radius: var(--radius-sm);
+    background: var(--gray-100);
+    color: var(--gray-800);
+}
+
+.dq-brief-body {
+    margin: 0 0 10px;
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--gray-600);
+}
+
+.dq-brief-link {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--state-info, var(--gray-600));
+    text-decoration: none;
+}
+
+.dq-brief-link:hover { text-decoration: underline; }
+
 /* ── Supporting copy ───────────────────────────────────────────────────── */
 .dq-note {
     margin: 0 0 16px;
@@ -233,6 +306,7 @@
     }
     .dq-subject { grid-column: 1 / -1; }
     .dq-reason,
+    .dq-brief,
     .dq-flags { grid-column: 1 / -1; }
     .dq-score {
         grid-row: 1;

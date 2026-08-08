@@ -170,6 +170,8 @@
         row.appendChild(el('div', 'dq-reason', verdictReason(r)));
         if (r.heldBy) row.appendChild(el('div', 'dq-reason', 'Best result now: ' + r.heldBy));
 
+        if (r.research) row.appendChild(briefEl(r));
+
         var flags = el('div', 'dq-flags');
         if (r.templatable) flags.appendChild(el('span', 'dq-flag dq-flag--warn', 'a marketplace can template this'));
         if (r.stillTrading) flags.appendChild(el('span', 'dq-flag dq-flag--warn', 'still trading — ask first'));
@@ -179,6 +181,49 @@
         if (flags.childNodes.length) row.appendChild(flags);
 
         return row;
+    }
+
+    /**
+     * The brief — collapsed by default, because the queue's job is triage and 23 open
+     * research notes is a wall of text nobody reads. Opens on the row Steve has picked.
+     *
+     * There is no search-volume number here and there is not going to be one. Every tool
+     * that reports volume omits terms below its threshold, and every subject on this page
+     * is below it — "Clyde Rushton Puyallup water slide" returns no row in any of them,
+     * and 253gear holds #1 for it. A zero from a keyword tool means "below threshold",
+     * never "no demand", and printing a zero next to a subject would be worse than
+     * printing nothing: Steve would read it as a verdict.
+     *
+     * So the brief carries the two things that DO decide the outcome — the phrase the
+     * page has to own, and the specific proper nouns the research turned up. Those nouns
+     * are the ranking material. "Chicken Man" and "Beak Patrol" are why a KTAC page could
+     * win; without them it is a generic radio-station shirt.
+     */
+    function briefEl(r) {
+        var d = document.createElement('details');
+        d.className = 'dq-brief';
+
+        var s = document.createElement('summary');
+        s.className = 'dq-brief-summary';
+        s.textContent = 'The brief — what goes on the page';
+        d.appendChild(s);
+
+        var q = el('div', 'dq-brief-query');
+        q.appendChild(el('span', 'dq-brief-label', 'Phrase the page must own'));
+        q.appendChild(el('code', 'dq-brief-code', r.query || r.subject));
+        d.appendChild(q);
+
+        d.appendChild(el('p', 'dq-brief-body', r.research));
+
+        var a = document.createElement('a');
+        a.className = 'dq-brief-link';
+        a.href = 'https://www.google.com/search?q=' + encodeURIComponent(r.query || r.subject);
+        a.target = '_blank';
+        a.rel = 'noopener';
+        a.textContent = 'Search it yourself →';
+        d.appendChild(a);
+
+        return d;
     }
 
     function heldBy(r) {
