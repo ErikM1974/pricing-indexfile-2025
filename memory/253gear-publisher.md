@@ -1,7 +1,12 @@
 # 253Gear Publisher — artwork → Shopify draft from Steve's dashboard
 
-**Status: CODE COMPLETE, nothing deployed, blocked on two things only Erik can do.**
-Started 2026-08-07, finished building 2026-08-08. Nothing is on `develop` in either repo.
+**Status: LIVE. Merged and deployed in both repos.** Built 2026-08-07, shipped the same day;
+proxy through `v2026.08.07.4` (Heroku release 1071). The Shopify app "253Gear Publisher" is
+created, installed and configured; `Shopify_Config_2026` is seeded; the theme `#designnumber`
+leak is fixed (verified live — `itemprop="name"` reads `Spanaway Speedway`).
+
+⏭️ **The remaining step is not code.** Nobody has published a real design end-to-end. Steve
+running one through is the next action, not more building.
 
 Approved plan: `C:\Users\erik\.claude\plans\we-have-our-retail-zippy-truffle.md` — read it first,
 it carries the full design, the rejected alternatives and the verification plan.
@@ -18,8 +23,8 @@ Reference material (NOT deployed, Python, from a prior Cowork session):
 
 ## Where the code is
 
-Branch **`feature/253gear-publisher` in BOTH repos** — proxy and app. Not merged, not deployed.
-`git checkout feature/253gear-publisher` in each to resume.
+**Merged to `develop` and `main` in BOTH repos, deployed.** The `feature/253gear-publisher`
+branch is historical; work on `develop`.
 
 **proxy** (`942dee6` → `93f05a1` → `4dc4a18`)
 
@@ -42,14 +47,19 @@ Branch **`feature/253gear-publisher` in BOTH repos** — proxy and app. Not merg
 
 **Tests: proxy 107 suites / 1381 green. App deploy gate 112 suites / 2362 green.**
 
-## 🔴 BLOCKED ON ERIK — two things
+## ✅ DONE — both former blockers are cleared
+
+The app is created, installed and configured; `Shopify_Config_2026` exists and is seeded;
+`253gear-inspect.js` has run, so the `ProductSetInput` field names, the collection rules and
+the variant→media binding pattern are **measured, not assumed**. Crewneck price confirmed
+($39.00) and PC78/PC78H confirmed as the SanMar styles. Kept below for reference only.
 
 **1. Create the app "253Gear Publisher"** (Dev Dashboard, org 25292041): scopes
 `write_products`, `read_products`, `read_publications`. Erik types the secret himself —
 it must never land in a transcript:
 
 ```
-heroku config:set -a caspio-pricing-proxy SHOPIFY_SHOP_DOMAIN=nw-custom-apparel.myshopify.com SHOPIFY_CLIENT_ID=… SHOPIFY_CLIENT_SECRET=… SHOPIFY_API_VERSION=2025-01 SHOPIFY_STOREFRONT_ORIGIN=https://253gear.com
+heroku config:set -a caspio-pricing-proxy SHOPIFY_SHOP_DOMAIN=nw-custom-apparel.myshopify.com SHOPIFY_CLIENT_ID=… SHOPIFY_CLIENT_SECRET=… SHOPIFY_API_VERSION=2026-07 SHOPIFY_STOREFRONT_ORIGIN=https://253gear.com
 ```
 
 **2. Create Caspio table `Shopify_Config_2026`** — run
@@ -98,11 +108,14 @@ price), and whether **PC78 / PC78H** are the right SanMar styles.
   `supacolor-orders.js:280` and `:303`, `supacolor-job-detail.js:137`. A blanket gate 401s four
   working staff tools. Only `extract-shopworks` (no browser caller) was gated. Closing the rest
   needs an app forwarder per caller — **separate job, not a rider on this one.**
-- 🔴 **The theme leaks the design number into Google's product name.**
-  `theme/product-template.CURRENT.liquid:28` sets `itemprop="name"` from `{{ product.title }}` (the
-  full title, `#34293` included) while the H1 at L119 correctly uses `display_title`. Affects all 47
-  live products. One-word fix, but needs `write_themes` which this app deliberately lacks — **Erik
-  should do it once, separately.**
+- ✅ **The theme design-number leak is FIXED** (verified live 2026-08-08: a product page's
+  `<meta itemprop="name">` reads `Spanaway Speedway`, no `#34084`).
+  `theme/product-template.CURRENT.liquid:28` had set `itemprop="name"` from the full
+  `{{ product.title }}` while the H1 at L119 correctly used `display_title`.
+  🔑 **The product page emits schema.org MICRODATA and ZERO JSON-LD** — worth knowing before
+  anyone proposes adding JSON-LD, because two partly-contradictory markup layers are worse
+  than one correct one. Any theme edit needs `write_themes`, which the publisher app
+  deliberately lacks.
 - **`/api/product-details` DOES return `BACK_FLAT`** — 542/542 PC78H rows, 280/280 PC78. An earlier
   claim that back photos don't exist came from querying `/api/product-colors`, which omits back
   fields by design (`products.js:1400-1405`).
