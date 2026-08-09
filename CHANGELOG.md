@@ -1,3 +1,10 @@
+## v2026.08.09.1 (2026.08.09)
+
+- Memory: 253gear's Google properties are on an account we don't have
+- Design Queue: live 253gear store metrics, or the reason there are none
+- Lock the store-metrics gate choice in the forwarder ratchet
+- Deploy v2026.08.09.1: cache-bust design-queue assets
+
 ## v2026.08.08.1 (2026.08.08)
 
 - Memory: 253gear-publisher doc was stale — it said nothing was deployed
