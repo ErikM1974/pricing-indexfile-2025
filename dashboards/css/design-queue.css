@@ -171,6 +171,124 @@
 .dq-row--skip .dq-subject,
 .dq-row--skip .dq-score-value { color: var(--gray-500); }
 
+/* ── Store metrics ─────────────────────────────────────────────────────────
+   A LOCKED block must not look like a block reporting zero. The tiles carry
+   figures; the notices carry prose. They are deliberately different objects,
+   because "0 visitors" and "we cannot see visitors" are different facts and
+   only one of them is a measurement. */
+.dq-refresh {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    background: var(--surface-card, #fff);
+    color: var(--gray-600);
+    cursor: pointer;
+}
+
+.dq-refresh:hover { background: var(--gray-50); color: var(--gray-800); }
+
+.dq-metrics-block { margin-bottom: 20px; }
+.dq-metrics-block:last-of-type { margin-bottom: 0; }
+
+.dq-metrics-title {
+    margin: 0 0 10px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--gray-500);
+}
+
+.dq-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.dq-metric {
+    padding: 12px 14px;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    background: var(--gray-50);
+}
+
+.dq-metric--warn { border-color: var(--state-warning, var(--gray-300)); }
+.dq-metric--good { border-color: var(--state-success, var(--gray-300)); }
+
+.dq-metric-value {
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--gray-900);
+    font-variant-numeric: tabular-nums;
+}
+
+.dq-metric-label {
+    margin-top: 4px;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--gray-500);
+}
+
+/* Prose, never a figure — this is what an unreadable block looks like. */
+.dq-notice {
+    padding: 12px 14px;
+    border-radius: var(--radius-md);
+    border-left: 3px solid var(--gray-300);
+    background: var(--gray-50);
+    margin-bottom: 10px;
+}
+
+.dq-notice--locked { border-left-color: var(--state-info, var(--gray-400)); }
+.dq-notice--warn   { border-left-color: var(--state-warning, var(--gray-400)); }
+
+.dq-notice-head {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--gray-800);
+}
+
+.dq-notice-line {
+    margin: 6px 0 0;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--gray-600);
+    max-width: 84ch;
+}
+
+.dq-metrics-scroll { overflow-x: auto; }
+
+.dq-metrics-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.dq-metrics-table th {
+    text-align: left;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    padding: 6px 10px 6px 0;
+    border-bottom: 1px solid var(--gray-200);
+    white-space: nowrap;
+}
+
+.dq-metrics-table td {
+    padding: 7px 10px 7px 0;
+    border-bottom: 1px solid var(--gray-100);
+    color: var(--gray-700);
+}
+
+.dq-metrics-table td:last-child { font-variant-numeric: tabular-nums; }
+
+.dq-metrics-foot { margin-top: 14px; margin-bottom: 0; font-size: 12px; color: var(--gray-400); }
+
 /* ── The brief ─────────────────────────────────────────────────────────────
    Collapsed by default. 23 open research notes is a wall nobody reads; one
    open note on the row Steve has chosen is the thing he works from. */

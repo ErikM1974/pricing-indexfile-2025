@@ -80,6 +80,14 @@
 
             <div class="dash-card">
                 <div class="dash-card-header">
+                    <h2 class="dash-card-title">253gear.com right now</h2>
+                    <button type="button" class="dq-refresh" id="metrics-refresh">Refresh</button>
+                </div>
+                <div id="metrics-root" class="dash-loading">Reading the store&hellip;</div>
+            </div>
+
+            <div class="dash-card">
+                <div class="dash-card-header">
                     <h2 class="dash-card-title">What to draw next</h2>
                     <div class="dq-filters" id="dq-filters" role="group" aria-label="Filter by verdict"></div>
                 </div>
@@ -148,5 +156,6 @@
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/dash-page-helpers.js"></script>
     <script src="/dashboards/js/design-queue.js?v=2026.08.08.1"></script>
+    <script src="/dashboards/js/design-queue-metrics.js?v=2026.08.08.1"></script>
 </body>
 </html>

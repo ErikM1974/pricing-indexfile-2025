@@ -121,6 +121,7 @@ dotenv.config();
 //
 // 253GEAR PUBLISHER (2026-08-08) — Steve's tab drafts products on the retail storefront.
 //   ALL /api/gear/*                      — page-gated forwarders to proxy /api/shopify/* (~L4361)
+//   GET /api/gear/store-metrics          — 253gear store metrics for the Design Queue (~L4491)
 //     GET  /api/gear/config                       prices, ladder, styles, tag vocabulary
 //     GET  /api/gear/products?designNumber=       duplicate check
 //     POST /api/gear/products                     create a DRAFT → 202
@@ -4488,6 +4489,37 @@ app.post('/api/gear/products/:productId/publish', ...gearForward('POST',
   { parseJson: true, timeoutMs: 60000 }));
 
 app.post('/api/gear/config/refresh-collections', ...gearForward('POST', '/config/refresh-collections', { timeoutMs: 30000 }));
+
+// Store metrics for the Design Queue. Gated on DESIGN-QUEUE, not gear-publisher:
+// the panel lives on design-queue.html, and gear-publisher is an emails-only allowlist
+// (Erik + art@) so reusing its gate would blank the panel for anyone else who can
+// legitimately read the queue. One Caspio row still governs the page and its data —
+// just design-queue.html's row rather than the publisher's.
+//
+// Walks the whole catalogue upstream, hence the longer timeout; the proxy caches it
+// for 5 minutes so an open tab is cheap.
+app.get('/api/gear/store-metrics',
+  requirePageAccess('design-queue.html'),
+  async (req, res) => {
+    if (!CRM_API_SECRET) return res.status(503).json({ error: 'not_configured' });
+    const params = new URLSearchParams();
+    if (String(req.query.refresh || '') === 'true') params.set('refresh', 'true');
+    const qs = params.toString();
+    try {
+      const upstream = await fetch(`${GEAR_UPSTREAM}/store-metrics${qs ? `?${qs}` : ''}`, {
+        method: 'GET',
+        headers: { 'X-CRM-API-Secret': CRM_API_SECRET },
+        signal: AbortSignal.timeout(45000)
+      });
+      const text = await upstream.text();
+      res.status(upstream.status)
+        .type(upstream.headers.get('content-type') || 'application/json')
+        .send(text);
+    } catch (e) {
+      console.error('[gear-forward:GET /store-metrics]', e.message);
+      res.status(502).json({ error: 'upstream_unavailable' });
+    }
+  });
 
 // ShopWorks screenshot OCR. Separate from gearForward for two reasons: it targets
 // /api/vision (not /api/shopify), and a pasted screenshot needs a far larger body
