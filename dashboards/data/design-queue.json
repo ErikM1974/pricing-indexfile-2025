@@ -247,36 +247,42 @@
    "rank": 8,
    "subject": "112th Street Drive-In Theater",
    "where": "500 112th St E, Parkland",
-   "confidence": "memory",
-   "status": "research-first",
-   "why": "The natural companion to Pat's. Ken Ruether's comment on the Pat's photograph already links them — Pat's was where you ate before the movie. Two shirts, one Friday night, the same stretch of 112th. Vacancy 17 on the long-tail query against 9 on the bare name.",
+   "confidence": "confirmed",
+   "status": "draw",
+   "why": "Off hold. Cinema Treasures has yielded both double bills and a grand-opening newspaper ad, which is a better reference for a vintage tee than a photograph would be — period type, drawn by the theatre itself. Vacancy 17 on the long-tail query against 9 on the bare name. And it pairs with Pat's: Ken Ruether's comment says Pat's was where you ate before the movie. Two shirts, one Friday night, the same stretch of 112th.",
    "shirtText": {
     "main": "112TH STREET DRIVE-IN",
     "secondary": "Parkland, Washington",
-    "small": "1968 – 1988"
+    "small": "Opened August 2, 1968"
    },
-   "textNotes": "Both dates are sourced and safe to print: opened 2 August 1968, closed November 1988 when a 20-year lease expired. 1968 + 20 is internally consistent, which is exactly why this pair can go on a shirt when most date claims cannot.",
-   "designDirection": "🔴 HOLD. Not one source — not Cinema Treasures, not drive-ins.com, nothing across a dozen phrasings — describes the marquee, the sign, the neon, the lettering or the screen tower. Two images are known to exist and neither could be opened. Drawing this today means inventing the sign, which is the exact failure that forced two of our pages to be rewritten.",
-   "signage": "Unknown. That is the blocker, and it is the whole blocker.",
-   "theStory": "Single screen, opened 2 August 1968 by United Theatres (owned by Pacific Theatres). Star Cinemas took it over in 1987. Closed November 1988 at the expiry of a 20-year lease. Demolished — the Monterra Apartments stand on the site now.",
+   "textNotes": "Only the OPENING date is safe to print. It is firmly sourced to 2 August 1968 and a grand-opening ad backs it. 🔴 The CLOSING date is genuinely disputed on the source page: the main entry says 17 November 1988 with 'Iron Eagle II', and user 50sSNIPES corrects it to 27 November 1988 with 'Child's Play' and 'Betrayed'. Do not print a closing date until that is settled — this is exactly the kind of precise-sounding claim that had to be stripped from two of our pages.",
+   "designDirection": "The grand-opening ad is the reference. Newspaper display ads from 1968 carry their own type treatment — heavy condensed capitals, starbursts, rules — and copying that ENERGY (not the artwork) gives an authentic period tee without inventing a marquee nobody has described. The opening double bill is the hook: 'The Red Berets' and 'Cool Hand Luke'. Cool Hand Luke was already a year old in 1968, so this was a second-run house from its first night — a working-class drive-in, and that is the tone.",
+   "signage": "⚠️ Still unknown. No source describes the marquee, neon, lettering or screen tower. Draw the ad, not the sign — until somebody produces a photograph of the entrance.",
+   "theStory": "Opened 2 August 1968 with 'The Red Berets' and 'Cool Hand Luke'. Single screen, run by United Theatres, owned by Pacific Theatres. Star Cinemas — who also ran the Rialto and the Parkland — took it over in 1987 and closed it a year later when the 20-year lease ran out. The last bill was 'Child's Play' and 'Betrayed'. The Monterra Apartments stand on the site now.",
    "references": [
     {
-     "label": "Cinema Treasures — 112th St Drive-In",
-     "url": "https://cinematreasures.org/theaters?utf8=%E2%9C%93&search%5Bkeywords%5D=112th+Street+Drive-In",
-     "what": "Carries the 2 August 1968 opening date and photo 514998, a 1980 aerial. Listing address 500 112th St E; drive-ins.com gives 11200 East D St, almost certainly the same site approached from a different road."
+     "label": "Cinema Treasures — 112th Street Drive-In (theater 65501)",
+     "url": "https://cinematreasures.org/theaters/65501",
+     "what": "Both double bills, the operator chain, and the closing-date dispute in the comments."
+    },
+    {
+     "label": "Cinema Treasures — photos, including the grand-opening ad",
+     "url": "https://cinematreasures.org/theaters/65501/photos",
+     "what": "rivest266 posted the grand-opening ad; photo 514998 is a 1980 aerial. THE AD IS THE DESIGN REFERENCE — open it before drawing."
     },
     {
      "label": "Rob Riley — 'the iconic 112th Street Drive-In'",
      "url": "https://www.facebook.com/groups/303862382366901/search/?q=112th%20Street%20Drive-In",
-     "what": "71 reactions. Check the comments for anyone describing the sign — that is what unblocks this subject."
+     "what": "71 reactions. Worth reading the comments for anyone who describes the entrance."
     }
    ],
    "firstHand": [
     "Ken Ruether — ate at Pat's before going to the 112th St Drive-In Theater"
    ],
    "openQuestions": [
-    "🔴 Open Cinema Treasures photo 514998 (the 1980 aerial) and whatever image the group post carries. Until somebody has actually SEEN the marquee, this cannot be drawn.",
-    "Ask the group directly: what did the 112th Street Drive-In sign look like?"
+    "🔴 Settle the closing date before anything ships. Main entry says 17 Nov 1988 / 'Iron Eagle II'; a commenter corrects it to 27 Nov 1988 / 'Child's Play' + 'Betrayed'. Until one wins, print neither.",
+    "Does a photograph of the marquee or entrance exist anywhere? That would turn this from a good shirt into an obvious one.",
+    "Car capacity is not recorded on any source."
    ]
   },
   {
@@ -306,6 +312,52 @@
    "openQuestions": [
     "🔴 ERIK'S CALL, before any art is made. The store and its blockhouse were built during the Yakama War of 1855 — a blockhouse is a fortification built against Native people. Sold as uncomplicated pioneer heritage, this shirt could land badly with the Puyallup Tribe, who are both a neighbour and a customer. Either handle it honestly in the page copy or leave the subject alone.",
     "Is Steilacoom too far outside our patch? The hook is the Puyallup ending, not the Steilacoom building."
+   ]
+  },
+  {
+   "rank": 10,
+   "subject": "House of Kee",
+   "where": "15305 Meridian Ave E, South Hill, Puyallup",
+   "confidence": "confirmed",
+   "status": "research-first",
+   "why": "The highest-engagement post the group has ever run — 254 reactions, 92 comments and 60 SHARES, and the shares are the number that matters: reactions measure recognition, shares measure 'I need to send this to someone'. 46 years on Meridian, 204 Yelp reviews, and southhillhistory.com calls it South Hill's oldest ethnic restaurant. Erik has asked for it knowing the caveats below.",
+   "shirtText": {
+    "main": "HOUSE OF KEE",
+    "secondary": "Meridian Ave · South Hill",
+    "small": "Puyallup, Washington"
+   },
+   "textNotes": "🔴 NO DATES ON THIS SHIRT. Three defensible numbers exist and they mean different things: 1977 (the family's first Puyallup restaurant, the Sea Dragon on East Main, opened 14 July), 1982 (the Meridian building opened, originally as a second Sea Dragon), and '46 years' (1977 to the close). Printing any one of them states something the others contradict. The family is writing their own history — let them fix the date, not us.",
+   "designDirection": "Draw from the photographs, of which there are many: Yelp carries 53, Restaurantji 61, plus the Facebook post and an Instagram location page. The two most distinctive things in the reference shots are the CARVED STONE FOUNTAIN and the deep RED/BURGUNDY VINYL BOOTHS. The fountain is the stronger t-shirt subject — it is specific, it is theirs, and nobody else's restaurant has it. ⚠️ Both come from photographs only; not one written source anywhere describes the building, the sign, the roofline or the colours, so anything added to fill a gap will be unsourceable.",
+   "signage": "A pole sign stands in the reference photo, but no written description of its shape, lettering, colours or whether it was neon exists in any reachable source. Work from the images.",
+   "theStory": "Peter Kee, born 1933 in Yantai, Shandong, opened the first Sea Dragon on East Main in downtown Puyallup on 14 July 1977. The Meridian restaurant followed in 1982 and became House of Kee. Cantonese and Mandarin — homemade egg rolls, Hong Kong style sweet and sour pork, egg foo young, almond chicken, family-style dinners. It closed on Friday 15 December 2023 at six in the evening, after 46 years. Not a failure and not an eviction: a retirement.",
+   "references": [
+    {
+     "label": "houseofkee.com — the family's own site, still live",
+     "url": "https://houseofkee.com/",
+     "what": "Carries a /history page and a /peter memorial page. Read this first. It is also the reason the subject ranks poorly: the family owns page one of their own name."
+    },
+    {
+     "label": "The demolition post — Puyallup Valley History Group, 27 June 2024",
+     "url": "https://www.facebook.com/groups/303862382366901/search/?q=House%20of%20Kee",
+     "what": "Lori Haun. The building, the excavator mid-swing, the burgundy booths and the carved fountain. 254 reactions, 92 comments, 60 shares."
+    },
+    {
+     "label": "South Hill Historical Society — 'South Hill's Oldest Ethnic Restaurant'",
+     "url": "https://www.southhillhistory.com/",
+     "what": "A dedicated article. Note its '30 years at the same location' line is stale text written around 2012."
+    },
+    {
+     "label": "Yelp — 53 photographs",
+     "url": "https://www.yelp.com/biz/house-of-kee-puyallup",
+     "what": "The largest photo set. Interior and exterior. Draw from these."
+    }
+   ],
+   "firstHand": [],
+   "openQuestions": [
+    "🔴 CALL WILLIAM AND MARY KEE BEFORE ANY ART EXISTS. This is a living family's surname, not a brand. Their father Peter died on 15 October 2022 and they keep a memorial page for him; their mother Shirley is likely still living. They are also writing a memory-and-recipes book about this exact subject — so a shirt made without asking would compete with their own product, and that is a complaint waiting to happen. Ask, and it becomes a collaboration with a family who will share it.",
+    "🔴 FRAME IT AS A RETIREMENT, NOT A LOSS. They chose to close after 46 years. 'Another one bites the dust' is the group's framing, not the family's, and repeating it on a product would misrepresent their decision.",
+    "⚠️ NOBODY HAS CHECKED THE TRADEMARK REGISTER. USPTO's search is JavaScript-driven and Justia returned 403 to automated access — this is explicitly NOT a 'nothing found' result. Someone must run it by hand.",
+    "Vacancy scores 2, the lowest of any subject in this queue. We will not rank for the name; the family's own site, the historical society and a dozen directories hold page one. Sell this one to people who already know it, not to search."
    ]
   }
  ],
@@ -339,11 +391,6 @@
    "subject": "Spanaway Speedway",
    "reason": "Already live on the store as #34084 — and currently our best seller.",
    "instead": "Do not redraw."
-  },
-  {
-   "subject": "House of Kee — South Hill",
-   "reason": "🔴 The highest-engagement post in the group (254 reactions, 92 comments, 60 shares) and still the wrong subject to draw. Vacancy 2. The name is UNIQUE, so adding 'South Hill' or 'Puyallup' does not clear noise — it surfaces MORE competition: the family's own live site houseofkee.com (with a history page and a memorial page for the founder), southhillhistory.com's dedicated article, and a dozen directory listings. The rights-holders own page one. This is the exact inverse of Clyde's Water Slide.",
-   "instead": "🔴 A COURTESY CALL, NOT A DESIGN. Kee is a living family's surname. Founder Peter Kee died 15 October 2022 and the family keeps a memorial page for him. His widow Shirley and his children William and Mary are living and named. The closure on 15 December 2023 was a chosen RETIREMENT after 46 years, not a beloved place killed off — framing it as a sad loss would misrepresent their own decision. And they are writing a memory-and-recipes book about this exact subject, so a shirt would compete with their own product. Talk to William and Mary Kee before any art exists."
   },
   {
    "subject": "Graham Shopping Center — 224th & Meridian",
