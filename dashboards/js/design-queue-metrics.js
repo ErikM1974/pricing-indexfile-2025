@@ -66,6 +66,8 @@
             'This is the number that should decide what gets drawn next. A session is interest; '
             + 'a sale is the thing itself.'));
 
+        root.appendChild(leaksBlock(d.leaks));
+
         var f = el('p', 'dq-note dq-metrics-foot');
         f.textContent = 'Read live from Shopify' + (d.cached ? ' (cached up to 5 min)' : '')
             + '. Window: last ' + (d.windowDays || 30) + ' days.';
@@ -188,6 +190,84 @@
                 'No orders in the last ' + block.windowDays + ' days. That is a measured zero, '
                 + 'not a missing reading.'));
         }
+        return wrap;
+    }
+
+    /**
+     * Where traffic is being lost. Deliberately the loudest block on the page.
+     *
+     * It exists because no amount of drawing fixes it: on the first run, 76% of everything
+     * landing on a product URL never reached a live product. A new design cannot help a
+     * visitor who is looking at a 404, and nothing else on this dashboard would have said so.
+     */
+    function leaksBlock(block) {
+        var wrap = el('div', 'dq-metrics-block');
+        wrap.appendChild(el('h3', 'dq-metrics-title', 'Where traffic is being lost'));
+
+        if (!block) {
+            wrap.appendChild(notice('warn', 'Not reported', ['The server did not return this block.']));
+            return wrap;
+        }
+        if (!block.available) {
+            var lines = [];
+            if (block.note) lines.push(block.note);
+            (block.howToFix || []).forEach(function (h) { lines.push(h); });
+            if (block.error) lines.push(block.error);
+            wrap.appendChild(notice('locked',
+                (block.missing || []).length ? 'Locked — needs ' + block.missing.join(', ') : 'Not available', lines));
+            return wrap;
+        }
+
+        var s = block.summary || {};
+        var grid = el('div', 'dq-metrics-grid');
+        grid.appendChild(tile(s.brokenPercent + '%', 'of product traffic broken', s.brokenPercent >= 25 ? 'warn' : null));
+        grid.appendChild(tile(s.lostTo404, 'sessions hit a 404', s.lostTo404 ? 'warn' : 'good'));
+        grid.appendChild(tile(s.misrouted, 'sent to the wrong product', s.misrouted ? 'warn' : 'good'));
+        grid.appendChild(tile(s.reachingALivePage, 'reached a live page', null));
+        wrap.appendChild(grid);
+
+        if ((block.dead || []).length) {
+            wrap.appendChild(el('div', 'dq-metrics-sub', 'Dead URLs — no product, no redirect'));
+            wrap.appendChild(rowsTable(['Path', 'Sessions, 90d'],
+                block.dead.map(function (x) { return [x.path, x.sessions]; })));
+            // The blank-SKU pattern is the whole story here and it is a business call, not
+            // an SEO fix — so it is stated rather than silently "fixed" with a redirect to
+            // a nostalgia tee, which would just be a prettier dead end.
+            wrap.appendChild(notice('warn', 'These are blank garment style numbers',
+                ['PC54, PC147, BC3001 and the rest are Port & Company, Bella+Canvas and Nike style '
+                 + 'codes. The people searching them want blanks, not a nostalgia tee — so pointing '
+                 + 'them at one would not convert. But NWCA prints on exactly these garments, which '
+                 + 'makes this a decision about where they should go, not a broken link to patch.']));
+        }
+
+        if ((block.misrouted || []).length) {
+            wrap.appendChild(el('div', 'dq-metrics-sub', 'Redirects pointing at the wrong product'));
+            wrap.appendChild(rowsTable(['Path', 'Goes to', 'Why it is flagged', 'Sessions'],
+                block.misrouted.map(function (x) { return [x.path, x.target, x.why, x.sessions]; })));
+            wrap.appendChild(el('p', 'dq-notice-line',
+                'Cause: duplicating a product in the Shopify admin makes a "copy-of-" handle, and '
+                + 'renaming the duplicate auto-creates a redirect from it. Correct for Shopify, wrong '
+                + 'once Google has indexed the old URL under the original name. A redirect whose '
+                + 'design number changes is the reliable tell.'));
+        }
+
+        if ((block.trafficNoSales || []).length) {
+            wrap.appendChild(el('div', 'dq-metrics-sub', 'Found, but not bought'));
+            wrap.appendChild(rowsTable(['Design', 'Sessions, 90d'],
+                block.trafficNoSales.map(function (x) { return [x.title, x.sessions]; })));
+            wrap.appendChild(el('p', 'dq-notice-line',
+                'People reach these pages and leave. That is a page problem — copy, photos, price, '
+                + 'or a colour with no photograph behind it — not a reason to draw something new.'));
+        }
+
+        if (block.noTraffic && block.noTraffic.count) {
+            wrap.appendChild(notice('warn', block.noTraffic.count + ' live designs got no traffic at all',
+                ['Nobody landed on them once in 90 days. That is findability, and it is the opposite '
+                 + 'problem to the list above: those pages need to exist in search before anything '
+                 + 'else about them matters. Starting with: '
+                 + block.noTraffic.sample.slice(0, 4).map(function (x) { return x.title; }).join('; ')]));
+        }
+
         return wrap;
     }
 
