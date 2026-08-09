@@ -15,7 +15,7 @@
     <!-- 2026 design tokens must load before dash-shell.css -->
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/design-queue.css?v=2026.08.08.1">
+    <link rel="stylesheet" href="/dashboards/css/design-queue.css?v=2026.08.09.1">
 </head>
 <body>
     <div class="dash-shell">
@@ -76,6 +76,14 @@
                     <div class="dash-stat-value" id="stat-checked">&mdash;</div>
                     <div class="dash-stat-label">Subjects checked</div>
                 </div>
+            </div>
+
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title">253gear.com right now</h2>
+                    <button type="button" class="dq-refresh" id="metrics-refresh">Refresh</button>
+                </div>
+                <div id="metrics-root" class="dash-loading">Reading the store&hellip;</div>
             </div>
 
             <div class="dash-card">
@@ -148,5 +156,6 @@
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/dash-page-helpers.js"></script>
     <script src="/dashboards/js/design-queue.js?v=2026.08.08.1"></script>
+    <script src="/dashboards/js/design-queue-metrics.js?v=2026.08.09.1"></script>
 </body>
 </html>

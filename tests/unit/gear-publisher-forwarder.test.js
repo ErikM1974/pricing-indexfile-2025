@@ -32,8 +32,8 @@ const CODE = BLOCK
     .join('\n');
 
 describe('the routes exist and are page-gated', () => {
-    test('all ten forwarders are declared', () => {
-        expect(GEAR_ROUTES).toHaveLength(10);
+    test('all eleven forwarders are declared', () => {
+        expect(GEAR_ROUTES).toHaveLength(11);
         const routes = GEAR_ROUTES.map((r) => r.route);
         expect(routes).toEqual(expect.arrayContaining([
             '/api/gear/config',
@@ -44,21 +44,40 @@ describe('the routes exist and are page-gated', () => {
             '/api/gear/products/:productId/audit',
             '/api/gear/products/:productId/publish',
             '/api/gear/config/refresh-collections',
-            '/api/gear/extract-shopworks'
+            '/api/gear/extract-shopworks',
+            '/api/gear/store-metrics'
         ]));
     });
 
     test('EVERY route is page-gated, whether or not it uses the shared helper', () => {
-        // The real invariant is the gate, not the helper. extract-shopworks has its
-        // own handler because it targets /api/vision and needs a 12mb body for a
-        // pasted screenshot, so it applies requirePageAccess directly.
+        // The real invariant is the gate, not the helper, and not any one page.
+        // extract-shopworks has its own handler because it targets /api/vision and
+        // needs a 12mb body for a pasted screenshot; store-metrics has its own because
+        // it is gated on a DIFFERENT page (see below). Both apply requirePageAccess
+        // directly, which is what actually matters.
         const lines = BLOCK.split('\n');
         for (const { route } of GEAR_ROUTES) {
             const at = lines.findIndex((l) => l.includes(`'${route}'`));
             const statement = lines.slice(at, at + 4).join('\n');
-            const gated = /gearForward\(/.test(statement) || /requirePageAccess\(GEAR_PAGE\)/.test(statement);
+            const gated = /gearForward\(/.test(statement) || /requirePageAccess\(/.test(statement);
             expect(`${route}: ${gated}`).toBe(`${route}: true`);
         }
+    });
+
+    test('store-metrics is gated on design-queue.html, NOT the publisher page', () => {
+        // Deliberate, and worth locking rather than leaving to the next reader's
+        // judgement. gear-publisher.html is an emails-only allowlist (Erik + art@),
+        // which under userMayAccessPage() is EXCLUSIVE — admins included. The metrics
+        // panel lives on the Design Queue, which anyone who can read the queue should
+        // see, so reusing the publisher gate would silently blank the panel for them.
+        //
+        // The rule it still honours: one Caspio row governs a page AND its data. Just
+        // design-queue.html's row rather than the publisher's.
+        const at = BLOCK.indexOf("'/api/gear/store-metrics'");
+        expect(at).toBeGreaterThan(-1);
+        const statement = BLOCK.slice(at, at + 300);
+        expect(statement).toMatch(/requirePageAccess\('design-queue\.html'\)/);
+        expect(statement).not.toMatch(/requirePageAccess\(GEAR_PAGE\)/);
     });
 
     test('the screenshot route gets a body limit big enough for a screenshot', () => {
