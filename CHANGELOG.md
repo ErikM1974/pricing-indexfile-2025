@@ -1,3 +1,7 @@
+## v2026.08.09.4 (2026.08.09)
+
+- Design Queue: 3 more briefs from the group, 3 more blocked
+
 ## v2026.08.09.3 (2026.08.09)
 
 - Memory: 253gear store metrics, and the two traps that nearly shipped silently
