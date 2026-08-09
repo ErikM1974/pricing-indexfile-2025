@@ -1,3 +1,7 @@
+## v2026.08.09.5 (2026.08.09)
+
+- Design Queue: House of Kee added, 112th Street Drive-In off hold
+
 ## v2026.08.09.4 (2026.08.09)
 
 - Design Queue: 3 more briefs from the group, 3 more blocked
