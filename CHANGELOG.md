@@ -1,3 +1,9 @@
+## v2026.08.09.3 (2026.08.09)
+
+- Memory: 253gear store metrics, and the two traps that nearly shipped silently
+- Design Queue: 'Draw these' — shirt text, references and briefs for Steve
+- Deploy v2026.08.09.3: cache-bust design-queue briefs assets
+
 ## v2026.08.09.2 (2026.08.09)
 
 - Design Queue: render live traffic, landing pages, and the bot-spike flag
