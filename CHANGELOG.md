@@ -1,3 +1,8 @@
+## v2026.08.09.6 (2026.08.09)
+
+- Design Queue: render the leaks panel
+- Deploy v2026.08.09.6: cache-bust leaks panel
+
 ## v2026.08.09.5 (2026.08.09)
 
 - Design Queue: House of Kee added, 112th Street Drive-In off hold
