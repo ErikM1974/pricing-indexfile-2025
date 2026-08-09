@@ -1,3 +1,8 @@
+## v2026.08.09.2 (2026.08.09)
+
+- Design Queue: render live traffic, landing pages, and the bot-spike flag
+- Deploy v2026.08.09.2: cache-bust design-queue metrics assets
+
 ## v2026.08.09.1 (2026.08.09)
 
 - Memory: 253gear's Google properties are on an account we don't have
