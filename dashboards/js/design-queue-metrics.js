@@ -141,16 +141,37 @@
             return wrap;
         }
 
-        // Available. Render whatever shape came back, defensively — these queries have
-        // never executed against a granted scope, so the first real run is the test.
+        // Available.
         if (block.totals && block.totals.rows && block.totals.rows.length) {
             var total = block.totals.rows[0] && block.totals.rows[0][0];
             var grid = el('div', 'dq-metrics-grid');
             grid.appendChild(tile(total, 'sessions, ' + block.windowDays + 'd', null));
             wrap.appendChild(grid);
         }
+
+        // A single day carrying a quarter or more of the window is a bot sweep far more
+        // often than an audience. Say so next to the headline, not in a footnote —
+        // an unflagged spike is how "traffic tripled" survives into a meeting.
+        if (block.spike) {
+            wrap.appendChild(notice('warn', 'One day is ' + block.spike.shareOfWindow + '% of that total',
+                [block.spike.day + ' alone recorded ' + block.spike.sessions + ' sessions against single '
+                 + 'and double digits on every other day. A spike that shape is usually a crawler or a '
+                 + 'scrape, not people. Treat the headline number as an upper bound until it is explained.']));
+        }
+
         if (block.bySource && block.bySource.rows && block.bySource.rows.length) {
+            wrap.appendChild(el('div', 'dq-metrics-sub', 'Where they came from'));
             wrap.appendChild(rowsTable(block.bySource.columns, block.bySource.rows));
+        }
+        if (block.byReferrer && block.byReferrer.rows && block.byReferrer.rows.length) {
+            wrap.appendChild(el('div', 'dq-metrics-sub', 'Named referrers'));
+            wrap.appendChild(rowsTable(block.byReferrer.columns, block.byReferrer.rows));
+        }
+        // The block Steve should read first: a design whose page nobody lands on is a
+        // drawing, not a product.
+        if (block.byLanding && block.byLanding.rows && block.byLanding.rows.length) {
+            wrap.appendChild(el('div', 'dq-metrics-sub', 'Pages people actually land on'));
+            wrap.appendChild(rowsTable(block.byLanding.columns, block.byLanding.rows));
         }
         if (typeof block.orders === 'number') {
             var g2 = el('div', 'dq-metrics-grid');

@@ -260,6 +260,13 @@
     max-width: 84ch;
 }
 
+.dq-metrics-sub {
+    margin: 14px 0 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray-500);
+}
+
 .dq-metrics-scroll { overflow-x: auto; }
 
 .dq-metrics-table {
