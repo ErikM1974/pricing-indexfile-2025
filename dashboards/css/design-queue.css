@@ -171,6 +171,199 @@
 .dq-row--skip .dq-subject,
 .dq-row--skip .dq-score-value { color: var(--gray-500); }
 
+/* ── Design briefs ─────────────────────────────────────────────────────────
+   The working end of the page. A card per subject, because Steve reads ONE
+   of these at a time and then goes and draws — unlike the queue above it,
+   which is scanned. */
+.dq-brief-card {
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: 18px 20px;
+    margin-bottom: 16px;
+    background: var(--surface-card, #fff);
+}
+
+.dq-brief-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.dq-brief-rank {
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--gray-800);
+    color: var(--surface-card, #fff);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.dq-brief-subject {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--gray-900);
+    line-height: 1.25;
+}
+
+.dq-brief-where {
+    font-size: 13px;
+    color: var(--gray-500);
+}
+
+.dq-conf {
+    margin-left: auto;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 9px;
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+}
+
+.dq-conf--confirmed { background: var(--state-success-bg, var(--gray-100)); color: var(--state-success); }
+.dq-conf--memory    { background: var(--state-warning-bg, var(--gray-100)); color: var(--state-warning); }
+
+.dq-brief-why {
+    margin: 0 0 14px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--gray-600);
+    max-width: 82ch;
+}
+
+/* The shirt block is styled AS a shirt layout so the hierarchy is obvious
+   without reading the labels. */
+.dq-shirt {
+    text-align: center;
+    padding: 18px 14px;
+    border: 1px dashed var(--gray-300);
+    border-radius: var(--radius-md);
+    background: var(--gray-50);
+    margin-bottom: 14px;
+}
+
+.dq-shirt-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    margin-bottom: 10px;
+}
+
+.dq-shirt-main {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    color: var(--gray-900);
+    line-height: 1.15;
+    text-wrap: balance;
+}
+
+.dq-shirt-sec {
+    margin-top: 6px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--gray-600);
+}
+
+.dq-shirt-small {
+    margin-top: 4px;
+    font-size: 11.5px;
+    letter-spacing: 0.06em;
+    color: var(--gray-500);
+}
+
+.dq-row-block { margin-bottom: 12px; }
+
+.dq-row-block--warn {
+    padding: 10px 12px;
+    border-left: 3px solid var(--state-warning, var(--gray-300));
+    background: var(--state-warning-bg, var(--gray-50));
+    border-radius: var(--radius-sm);
+}
+
+.dq-row-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--gray-400);
+    margin-bottom: 4px;
+}
+
+.dq-row-text {
+    margin: 0;
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--gray-700);
+    max-width: 84ch;
+}
+
+.dq-refs { margin: 14px 0 12px; }
+
+.dq-ref { margin-bottom: 8px; }
+
+.dq-ref-link {
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--state-info, var(--gray-700));
+}
+
+.dq-ref-what {
+    margin: 2px 0 0;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--gray-500);
+    max-width: 84ch;
+}
+
+/* Deliberately loud: this is a copyright rule, not a style note. */
+.dq-ref-rule {
+    margin: 10px 0 0;
+    font-size: 12.5px;
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--state-warning, var(--gray-600));
+}
+
+.dq-list-block { margin-bottom: 12px; }
+
+.dq-ul {
+    margin: 0;
+    padding-left: 20px;
+    max-width: 84ch;
+}
+
+.dq-ul li {
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--gray-600);
+    margin-bottom: 4px;
+}
+
+.dq-blocked-list { margin-top: 8px; }
+
+.dq-blocked {
+    padding: 12px 14px;
+    border-left: 3px solid var(--gray-300);
+    background: var(--gray-50);
+    border-radius: var(--radius-sm);
+    margin-bottom: 10px;
+}
+
+.dq-blocked-subject {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gray-700);
+}
+
 /* ── Store metrics ─────────────────────────────────────────────────────────
    A LOCKED block must not look like a block reporting zero. The tiles carry
    figures; the notices carry prose. They are deliberately different objects,

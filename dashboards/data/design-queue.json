@@ -1,6 +1,250 @@
 {
- "generatedAt": "2026-08-08",
+ "generatedAt": "2026-08-09",
  "method": "Vacancy scored by searching each subject name and reading what already ranks. No keyword tool reports volume at this scale.",
+ "briefs": [
+  {
+   "rank": 1,
+   "subject": "Pat's Drive-In",
+   "where": "112th and Canyon Road, Puyallup",
+   "confidence": "confirmed",
+   "status": "draw",
+   "why": "A colour photograph of the building exists and 220 people reacted to it. The open web has nothing — searching \"Pat's Drive-In Puyallup Canyon Road\" returns present-day businesses and an unrelated restaurant in Tucson. Nobody has written this page. That is the exact shape that put Clyde's Water Slide at #1.",
+   "shirtText": {
+    "main": "PAT'S DRIVE IN",
+    "secondary": "112th & Canyon Road · Puyallup, Washington",
+    "small": "Burgers · Onion Rings · Milkshakes"
+   },
+   "textNotes": "Spelled 'Pat's Drive In' with no hyphen — that is how it reads on the pole sign in the photograph and how the group's admin wrote it. Do not add a year: nobody has given one, and inventing it is how two of our pages had to be rewritten.",
+   "designDirection": "The photograph shows a low single-storey building, cream/pale yellow walls with a red-trimmed roofline and a deep overhang, cars nosed in on gravel. A tall roadside pole sign stands at the right. Draw the building from the angle in the photo, or the pole sign alone — the sign is the stronger t-shirt shape.",
+   "signage": "Visible in the photograph: a 7UP sign carrying the Pat's Drive In name, a Dr Pepper sign, and a separate tall pole sign. 🔴 Do NOT reproduce the 7UP or Dr Pepper marks — both are live trademarks. Draw the building and Pat's own signage only.",
+   "theStory": "Ken Ruether, in the comments: you ordered and paid at the window, went back to your car, and waited for them to wave at you through the window when your food was ready. That wave is the most specific thing anyone remembers and it belongs in the page copy, not on the shirt.",
+   "references": [
+    {
+     "label": "The photograph — Puyallup Valley History Group",
+     "url": "https://www.facebook.com/groups/303862382366901/permalink/542479265171877/",
+     "what": "Lori Haun, 11 Nov 2024. Colour photo of the building and pole sign. 220 reactions, 67 comments. The comments are the source material — read them before drawing."
+    }
+   ],
+   "firstHand": [
+    "Diane Pederson Uhrich — worked there in the late 1970s",
+    "Ken Ruether — order at the window, wait in the car, they wave when it's ready; a stop before the 112th St Drive-In Theater",
+    "Dewayne Iverson — before it was Pat's it was originally Walt's",
+    "Tammy Farmer — best cheeseburgers, best onion rings, very best milkshakes",
+    "Susan Chesley-Balogh — loved their burgers and shakes, nothing like it around here now",
+    "Tina Christensen — her dad's favourite milkshakes; Ken Christensen, class of '61"
+   ],
+   "openQuestions": [
+    "What years did it operate? Nobody has given a date. Diane worked there in the late 70s, so it was trading then.",
+    "When did it become Pat's, and who was Walt? Dewayne Iverson's comment is the only mention.",
+    "Does anyone have a photo of the sign lit at night?"
+   ]
+  },
+  {
+   "rank": 2,
+   "subject": "Hi-Ho Shopping Center",
+   "where": "1100 N Meridian St, at River Road, Puyallup",
+   "confidence": "confirmed",
+   "status": "draw",
+   "why": "Six dated photographs in the Tacoma Public Library Northwest Room, plus a News Tribune citation. Unusually well documented for a subject nobody has written about — page one is Pinterest pins, a personal blog and two Facebook posts. The name was retired around 1999, so there is nobody to license from.",
+   "shirtText": {
+    "main": "HI-HO SHOPPING CENTER",
+    "secondary": "Puyallup, Washington",
+    "small": "River Road at Meridian"
+   },
+   "textNotes": "🔴 Do NOT print 'Est. 1962' or any founding year. That date traces to a single user-edited web page whose actual subject is a 1983 movie theatre. The archive only proves the centre existed by March 1963. 🔴 Do NOT create a standalone red-and-yellow neon HI-HO lockup — too close to a live motel trademark. Always carry the full name plus Puyallup.",
+   "designDirection": "The strongest idea is the naming convention: the in-house shops were Hi-Ho Food Center, Hi-Ho Launder Center and Hi-Ho Shoe Center, so the façade carried repeated 'HI-HO ___ CENTER' signage down its length. Draw that repetition. Alternative: the period bus-ad line as a design element — 'just 10 minutes away from Tacoma.'",
+   "signage": "⚠️ Nobody has ever described the Hi-Ho sign in words. Work from the library photographs, not from imagination. Do not let anyone write sign copy from memory alone.",
+   "theStory": "14 retailers plus a bank across 25 acres. Elvins department store at one end, Sears at the other. Groceries, prescriptions, clothing, gardening supplies, flowers and gasoline. Over $9,000,000 gross in 1965. Acquired by Fred Meyer in 1980 and traded as Fred Meyer's Hi-Ho.",
+   "references": [
+    {
+     "label": "Tacoma Public Library — Richards Studio A149103-2",
+     "url": "https://tacomalibrary.contentdm.oclc.org/digital/collection/p17061coll21/id/15781/",
+     "what": "8 Jul 1966, street view. The catalogue record carries the 25 acres / 14 retailers / $9M detail."
+    },
+    {
+     "label": "TPL D137936-1 — aerial, 9 March 1963",
+     "url": "https://tacomalibrary.contentdm.oclc.org/digital/collection/p17061coll21/",
+     "what": "The earliest dated proof the centre existed. Search the collection for D137936-1. Also names the Hi-Ho Food/Launder/Shoe Center tenants."
+    },
+    {
+     "label": "TPL D149103-3 — the Elvins end, 8 July 1966",
+     "url": "https://tacomalibrary.contentdm.oclc.org/digital/collection/p17061coll21/",
+     "what": "Shows Elvins and Sears at opposite ends. Search the collection for D149103-3."
+    },
+    {
+     "label": "TPL D144357-1 — the bus ad, 18 Feb 1965",
+     "url": "https://tacomalibrary.contentdm.oclc.org/digital/collection/p17061coll21/",
+     "what": "The Tacoma Transit bus ad reading 'on River Road in Puyallup, just 10 minutes away from Tacoma.' Photographed on Bus #303."
+    },
+    {
+     "label": "TPL D150443-1 — interior, 20 Jan 1967",
+     "url": "https://tacomalibrary.contentdm.oclc.org/digital/collection/p17061coll21/",
+     "what": "A Green Giant promotional display inside the centre."
+    }
+   ],
+   "firstHand": [],
+   "openQuestions": [
+    "What did the pylon sign actually look like — colours, typeface, wording? The photographs are the only answer.",
+    "Who was Elvins? No founder, origin or closure date exists anywhere.",
+    "Exact opening date — the 1962 claim has no archival backing."
+   ]
+  },
+  {
+   "rank": 3,
+   "subject": "Matlock's Fruit Farms",
+   "where": "Alderton, Puyallup Valley",
+   "confidence": "confirmed",
+   "status": "research-first",
+   "why": "250 acres, the largest berry farm in the valley, over a million pounds of fruit — and thousands of school-age kids employed over the years, collected by the farm's own fleet of buses. Berries ran to 1987/88, so the youngest former pickers are about fifty and live exactly where we sell.",
+   "shirtText": {
+    "main": "MATLOCK'S FRUIT FARMS",
+    "secondary": "Puyallup Valley · Washington",
+    "small": "Berry Pickers Wanted"
+   },
+   "textNotes": "🔴 Use the FULL farm name — never the bare word MATLOCK. CBS holds a live trademark and is currently airing a series by that name; a bare MATLOCK shirt risks a marketplace takedown. ⚠️ It is Alderton, not Puyallup — 'Puyallup Valley' is correct, 'Puyallup' alone is wrong. The legal name carries an apostrophe: Matlock's Fruit Farms, Inc.",
+   "designDirection": "The buses are the design. Anyone who picked berries in this valley remembers being collected by one. A vintage fruit-crate label shape with a bus in it beats a generic berry badge. Mt Rainier and valley fields belong in the background.",
+   "signage": "⚠️ No photograph, drawing or description of any Matlock sign, barn, packing shed or bus livery has been located. A descendant has posted bus photos to Facebook — somebody needs to open that post before this is drawn.",
+   "theStory": "Started 1933 on 3 acres on River Road; moved to Alderton in 1945. Three owners across two generations: G. Lee Matlock and his sons David and Ivan. Berries until 1987/88, then tree rootstock; the brothers retired in 1996. In 2015 the 153-acre farm became the largest farmland conservation project in Pierce County history.",
+   "references": [
+    {
+     "label": "Matlock Fruit Farms buses for berry pickers — Puyallup History Page Group",
+     "url": "https://www.facebook.com/groups/303862382366901/",
+     "what": "A descendant's post carrying bus photographs. Search the group for 'Matlock'. This is the only known image source and nobody has opened it yet."
+    }
+   ],
+   "firstHand": [
+    "A granddaughter posts in the Puyallup History group — identifies G. Lee Matlock as her grandfather, David as her father, Ivan as her uncle"
+   ],
+   "openQuestions": [
+    "🔴 Erik to call the family before finals. They are living and local, and the granddaughter posting about the buses is also the person most likely to share the finished design. Courtesy, not obligation.",
+    "Is Ivan Matlock still living? He was publicly quoted in February 2015.",
+    "What did the buses actually look like — colour, lettering?"
+   ]
+  },
+  {
+   "rank": 4,
+   "subject": "Brown Cow Drive-In",
+   "where": "112th and Canyon Road, Puyallup — across the street from Pat's",
+   "confidence": "memory",
+   "status": "research-first",
+   "why": "Confirmed by first-hand memory but no photograph yet. Don Bagley, in the comments on the Pat's photograph: 'Also enjoyed the Brown Cow across the street.' That locates it precisely and pairs it with Pat's — two drive-ins facing each other on the same corner is a better story than either alone.",
+   "shirtText": {
+    "main": "BROWN COW DRIVE-IN",
+    "secondary": "112th & Canyon Road · Puyallup, WA",
+    "small": ""
+   },
+   "textNotes": "⚠️ A live Brown Cow Drive-In trades in Corbin, Kentucky, so the bare name will not rank on its own. Always carry '112th & Canyon' or 'Puyallup' in the design and in the page title. Do not add a year — nobody has given one.",
+   "designDirection": "Hold until somebody produces a photograph or describes the building. An original retro cow character is the obvious route, but drawing one before we know what the place looked like risks a design that locals say is wrong.",
+   "signage": "Nothing known.",
+   "theStory": "Across the street from Pat's at 112th and Canyon. That is currently the whole verified record.",
+   "references": [
+    {
+     "label": "Don Bagley's comment on the Pat's Drive-In photo",
+     "url": "https://www.facebook.com/groups/303862382366901/permalink/542479265171877/",
+     "what": "'Also enjoyed the Brown Cow across the street.' 3 reactions. The only sourced statement about this business."
+    }
+   ],
+   "firstHand": [
+    "Don Bagley — remembers it across the street from Pat's"
+   ],
+   "openQuestions": [
+    "🔴 Ask the group directly: who remembers the Brown Cow at 112th and Canyon, what did it look like, what years? One post costs an hour of waiting instead of a day of drawing.",
+    "Was it before, after, or at the same time as Pat's?"
+   ]
+  },
+  {
+   "rank": 5,
+   "subject": "Willows Corner / The Willows Dance Hall",
+   "where": "112th & Meridian, South Hill",
+   "confidence": "memory",
+   "status": "research-first",
+   "why": "Replaces 'South Hill Before the Mall', which is templatable — Amazon already sells that template with Virginia swapped in. Willows Corner is a proper noun, so it can rank, and no other town has one. The mall was not built on nothing.",
+   "shirtText": {
+    "main": "WILLOWS CORNER",
+    "secondary": "112th & Meridian · South Hill",
+    "small": "Gentlemen 75¢ · Ladies 25¢"
+   },
+   "textNotes": "The 75/25 admission is the detail people repeat — letter it. Do not date the dance hall precisely; sources give '1920s-30s' and no more.",
+   "designDirection": "1920s-30s dance hall. Willow trees are the name's origin and the obvious motif. The corner was Kupfer's Corner before it was Willows Corner, after the family who owned 240+ acres there by 1915.",
+   "signage": "Nothing known — no image or sign wording located.",
+   "theStory": "A dance hall on 112th, then called Airport Road, booking live regional bands. The roof caved under snow in the 1930s; it burned in the early-to-mid 1940s and was never rebuilt. The South Hill Historical Society says old Willows Corner 'probably would be dubbed the South Hill Mall and adjacent areas.'",
+   "references": [
+    {
+     "label": "South Hill Historical Society",
+     "url": "https://www.southhillhistory.com/",
+     "what": "Source for Kupfer's Corner, the willow trees, and the placement relative to the modern mall."
+    }
+   ],
+   "firstHand": [],
+   "openQuestions": [
+    "Any photograph of the dance hall? Nothing has surfaced.",
+    "What was it actually called on the sign — 'The Willows'?"
+   ]
+  },
+  {
+   "rank": 6,
+   "subject": "Ray's Cameras",
+   "where": "Meridian, downtown Puyallup",
+   "confidence": "memory",
+   "status": "research-first",
+   "why": "The emptiest field of anything screened — the entire open web is one retired employee's memoir with four comments — and the cleanest legal path: Ray's became Cameras Et Cetera, then Kits, then Ritz, then dissolved. Nobody is left to object. But the name died in the early 1970s, so the people who remember it are 70-plus.",
+   "shirtText": {
+    "main": "RAY'S CAMERAS",
+    "secondary": "Downtown Puyallup, Washington",
+    "small": "Leica · Contax · Hasselblad · Rollei"
+   },
+   "textNotes": "⚠️ Sources use both 'Ray's Cameras' and 'Ray's Camera'. Nobody knows what the storefront actually read. Pick one and flag the choice to Erik. Do not print a founding year — none exists.",
+   "designDirection": "The one drawable detail: Lyman K. Raymond was trying to clear European stock — Leica, Contax, Hasselblad, Rollei — while his branch managers pushed for the Japanese brands taking over. That is a period-correct window display, and the brand names as a list are a strong typographic element. A vintage 35mm body with a film strip is the fallback.",
+   "signage": "🔴 There is no photograph, no address number, and no description of the storefront or sign anywhere. Cap effort here.",
+   "theStory": "Founded and owned by Lyman K. Raymond, original store on Meridian in the downtown core. By 1970 the chain had stores at Northgate, Southcenter, Tacoma Mall and the Hi-Ho.",
+   "references": [
+    {
+     "label": "J R Hudson's memoir — jrwave.wordpress.com",
+     "url": "https://jrwave.wordpress.com/tag/hi-ho-shopping-center/",
+     "what": "First-hand: Hudson was hired personally by Raymond and worked the Hi-Ho and downtown stores c.1970-73. The only substantial account that exists."
+    }
+   ],
+   "firstHand": [
+    "J R Hudson — hired by Raymond, worked the Hi-Ho store then downtown",
+    "RK Henderson — shopped the Lacey store as a kid in the early 70s"
+   ],
+   "openQuestions": [
+    "🔴 One visit to the Puyallup History Room, 324 S Meridian. City directories run 1964-65 and 1967-1986 and will give the address, the printed name, and probably a display ad. If they come back thin, drop this one."
+   ]
+  }
+ ],
+ "blocked": [
+  {
+   "subject": "Cruisin' the Loop",
+   "reason": "CRUISE THE LOOP is a live federal trademark registration (Reg. 2996455) owned by the City of Williams, Arizona. Separately, Cruise Puyallup is a live city-permitted event whose official merchandise store is run by AllColorInk — a rival local decorator.",
+   "instead": "This is a sales call, not a design. Pitch Mark Crosby on the 2027 merch programme. Do not use their event photography — their site carries an aggressive copyright notice."
+  },
+  {
+   "subject": "Puyallup Roller Nights / Tiffany's",
+   "reason": "The rink still trades as KING Family Fun Center, 1113 N Meridian. 'EAT. SKATE. PLAY.' is a live registration (Reg. 5998787) owned by Tiffany's Puyallup, Inc. An apparel campaign already ran for this venue after the 2020 fire.",
+   "instead": "Licensing conversation with Dennis and Melinda King. Check their existing online store first so a pitch does not compete with something they already sell."
+  },
+  {
+   "subject": "Graham Tavern",
+   "reason": "Pierce County's Graham Community Plan confirms a tavern operated 1905-1960s but does not name it. 30411 Mountain Hwy E is the Roundup Restaurant & Lounge, open and trading today.",
+   "instead": "One question decides it: was the Roundup previously the Graham Tavern? Ask them, or ask the Graham Community Historical Society."
+  },
+  {
+   "subject": "Timberline Drive-In",
+   "reason": "Four independent sources that should list it do not: Pierce County's Graham Community Plan, Cinema Treasures, driveinmovie.com and the WA Secretary of State. Nobody publicly remembers it, which for a highway landmark is itself diagnostic.",
+   "instead": "One post to the Graham Community Historical Society page asking for a photo. Do not draw first."
+  },
+  {
+   "subject": "South Hill Before the Mall",
+   "reason": "Templatable, and already templated — Amazon carries 'Vintage South Hill Washington T-Shirt' and the identical template with Virginia swapped in. 'X before the mall' fits every American suburb, and 'South Hill' collides with Spokane, Virginia and New York.",
+   "instead": "Draw Willows Corner instead — same era, same corner, proper noun, nobody sells it."
+  },
+  {
+   "subject": "Spanaway Speedway",
+   "reason": "Already live on the store as #34084 — and currently our best seller.",
+   "instead": "Do not redraw."
+  }
+ ],
  "candidates": [
   {
    "subject": "Autoview Drive-In Tacoma",
