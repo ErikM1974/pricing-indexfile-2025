@@ -211,6 +211,102 @@
    "openQuestions": [
     "🔴 One visit to the Puyallup History Room, 324 S Meridian. City directories run 1964-65 and 1967-1986 and will give the address, the printed name, and probably a display ad. If they come back thin, drop this one."
    ]
+  },
+  {
+   "rank": 7,
+   "subject": "Puyallup Bowling Center",
+   "where": "323 Meridian South, Puyallup",
+   "confidence": "confirmed",
+   "status": "draw",
+   "why": "The best drawable subject of everything screened, by a distance — and the clearest proof that scoring bare names was wrong. On the bare name it scores 4; on the long-tail query it scores 18. Nobody has written about it. The catch, stated honestly: nostalgia scores only 6, so fewer people will recognise it than Pat's. Draw this one for the sign, not for the crowd.",
+   "shirtText": {
+    "main": "PUYALLUP BOWLING CENTER",
+    "secondary": "323 Meridian South",
+    "small": "Six Brunswick Lanes"
+   },
+   "textNotes": "⚠️ Do NOT print 'Circa 1956'. The photograph is c.1956, but Scott Handley cites Tacoma Bowling News, 6 August 1951 — the business predates the picture, so a 1956 date on the shirt would be wrong. 'Six Brunswick Lanes' is verbatim from the caption and is safe to letter.",
+   "designDirection": "The sign is the whole design. A tall vertical projecting blade sign on the building's front-right corner, rising well above the roofline, with a rounded bullnose top. BOWLING reads down it one letter per line in chunky rounded cream letters on a dark maroon panel, a fluted banded collar sits beneath the lettering, and the blade tapers to an angled point at the bottom. Draw that alone on a dark garment and it needs almost nothing else.",
+   "signage": "The detail almost nobody draws, and the reason this will read as real: exposed diagonal and X-pattern steel guy-bracing runs from the sign back to the roof, clearly silhouetted against the sky. Keep it. Behind the sign the building is a single-storey flat-roofed cream stucco block with a stepped ziggurat parapet stepping down to the left.",
+   "theStory": "Six lanes on Meridian, trading by August 1951. The only photograph is a faded 1950s colour print — heavy magenta shift, deep sky — with a two-tone light-blue-and-white station wagon at the kerb on a two-lane street.",
+   "references": [
+    {
+     "label": "Rob Riley — Puyallup Valley History Group, 5 Dec 2024",
+     "url": "https://www.facebook.com/groups/303862382366901/search/?q=Puyallup%20Bowling%20Center",
+     "what": "Caption verbatim: 'Puyallup Bowling Center, Featuring 6 Brunswick Lanes. 323 Meridian South. Circa 1956.' 67 reactions, 26 comments. The only known image."
+    }
+   ],
+   "firstHand": [
+    "Scott Handley — the oldest reference he had ever found was Tacoma Bowling News, 6 August 1951"
+   ],
+   "openQuestions": [
+    "🔴 PHOTO RIGHTS. The image has unestablished provenance, and a researcher publicly asked the poster for a credit and got no answer. Draw an ORIGINAL interpretation from it — do not trace it, and do not reuse the photograph anywhere.",
+    "When did it close, and what stands at 323 Meridian South now?"
+   ]
+  },
+  {
+   "rank": 8,
+   "subject": "112th Street Drive-In Theater",
+   "where": "500 112th St E, Parkland",
+   "confidence": "memory",
+   "status": "research-first",
+   "why": "The natural companion to Pat's. Ken Ruether's comment on the Pat's photograph already links them — Pat's was where you ate before the movie. Two shirts, one Friday night, the same stretch of 112th. Vacancy 17 on the long-tail query against 9 on the bare name.",
+   "shirtText": {
+    "main": "112TH STREET DRIVE-IN",
+    "secondary": "Parkland, Washington",
+    "small": "1968 – 1988"
+   },
+   "textNotes": "Both dates are sourced and safe to print: opened 2 August 1968, closed November 1988 when a 20-year lease expired. 1968 + 20 is internally consistent, which is exactly why this pair can go on a shirt when most date claims cannot.",
+   "designDirection": "🔴 HOLD. Not one source — not Cinema Treasures, not drive-ins.com, nothing across a dozen phrasings — describes the marquee, the sign, the neon, the lettering or the screen tower. Two images are known to exist and neither could be opened. Drawing this today means inventing the sign, which is the exact failure that forced two of our pages to be rewritten.",
+   "signage": "Unknown. That is the blocker, and it is the whole blocker.",
+   "theStory": "Single screen, opened 2 August 1968 by United Theatres (owned by Pacific Theatres). Star Cinemas took it over in 1987. Closed November 1988 at the expiry of a 20-year lease. Demolished — the Monterra Apartments stand on the site now.",
+   "references": [
+    {
+     "label": "Cinema Treasures — 112th St Drive-In",
+     "url": "https://cinematreasures.org/theaters?utf8=%E2%9C%93&search%5Bkeywords%5D=112th+Street+Drive-In",
+     "what": "Carries the 2 August 1968 opening date and photo 514998, a 1980 aerial. Listing address 500 112th St E; drive-ins.com gives 11200 East D St, almost certainly the same site approached from a different road."
+    },
+    {
+     "label": "Rob Riley — 'the iconic 112th Street Drive-In'",
+     "url": "https://www.facebook.com/groups/303862382366901/search/?q=112th%20Street%20Drive-In",
+     "what": "71 reactions. Check the comments for anyone describing the sign — that is what unblocks this subject."
+    }
+   ],
+   "firstHand": [
+    "Ken Ruether — ate at Pat's before going to the 112th St Drive-In Theater"
+   ],
+   "openQuestions": [
+    "🔴 Open Cinema Treasures photo 514998 (the 1980 aerial) and whatever image the group post carries. Until somebody has actually SEEN the marquee, this cannot be drawn.",
+    "Ask the group directly: what did the 112th Street Drive-In sign look like?"
+   ]
+  },
+  {
+   "rank": 9,
+   "subject": "J.R. Meeker & Sons general store",
+   "where": "Steilacoom, Washington Territory",
+   "confidence": "confirmed",
+   "status": "research-first",
+   "why": "An 1855 store, photographed in 1941, and the photograph has been retrieved and examined. Vacancy 18 on the long-tail query against 3 on the bare name. And the story ends exactly where our customers live: the venture failed in 1862 and Ezra Meeker moved his family to the Puyallup Valley and planted hops. That is the origin of Puyallup itself, and nobody sells it.",
+   "shirtText": {
+    "main": "J.R. MEEKER & SONS",
+    "secondary": "General Store · Steilacoom, W.T. · 1855",
+    "small": "Failed 1862 · Went to Puyallup · Planted hops"
+   },
+   "textNotes": "The trading name was J.R. Meeker and Sons — Ezra, his brother Oliver, and their father Jacob. Using the firm's real name rather than 'Ezra Meeker's store' is both more accurate and more distinctive, and it is the version that will rank.",
+   "designDirection": "Strong, and unusual. The 1941 photograph shows a two-storey rectangular wood-frame commercial block from a three-quarter angle off its front-left corner. THE DETAIL TO KEEP: the front façade is painted white/pale clapboard while the entire side elevation is unpainted weathered board — they only painted the side people saw. That contrast is the design.",
+   "signage": "Boarded up by 1941. The building was later taken over by gunsmith W. D. Vaughn.",
+   "theStory": "Built during the Yakama War of 1855 while the Meekers sheltered at Steilacoom. A branch opened at Whatcom in 1858 selling provisions to Fraser River gold miners. Oliver Meeker drowned on 5 January 1861 when the steamer Northerner sank off the California coast, returning from a buying trip to San Francisco. The venture failed in 1862 and Ezra took his family to the Puyallup Valley.",
+   "references": [
+    {
+     "label": "Steilacoom Historical Photos — Buildings235",
+     "url": "https://www.steilacoomhistoricalphotos.com/Buildings235.jpg",
+     "what": "The 1941 photograph of the boarded-up store. The archive dates it a flat '1941' where neighbouring rows are hedged ('1900?', '1919?'), which indicates the archivist was confident rather than guessing."
+    }
+   ],
+   "firstHand": [],
+   "openQuestions": [
+    "🔴 ERIK'S CALL, before any art is made. The store and its blockhouse were built during the Yakama War of 1855 — a blockhouse is a fortification built against Native people. Sold as uncomplicated pioneer heritage, this shirt could land badly with the Puyallup Tribe, who are both a neighbour and a customer. Either handle it honestly in the page copy or leave the subject alone.",
+    "Is Steilacoom too far outside our patch? The hook is the Puyallup ending, not the Steilacoom building."
+   ]
   }
  ],
  "blocked": [
@@ -243,6 +339,21 @@
    "subject": "Spanaway Speedway",
    "reason": "Already live on the store as #34084 — and currently our best seller.",
    "instead": "Do not redraw."
+  },
+  {
+   "subject": "House of Kee — South Hill",
+   "reason": "🔴 The highest-engagement post in the group (254 reactions, 92 comments, 60 shares) and still the wrong subject to draw. Vacancy 2. The name is UNIQUE, so adding 'South Hill' or 'Puyallup' does not clear noise — it surfaces MORE competition: the family's own live site houseofkee.com (with a history page and a memorial page for the founder), southhillhistory.com's dedicated article, and a dozen directory listings. The rights-holders own page one. This is the exact inverse of Clyde's Water Slide.",
+   "instead": "🔴 A COURTESY CALL, NOT A DESIGN. Kee is a living family's surname. Founder Peter Kee died 15 October 2022 and the family keeps a memorial page for him. His widow Shirley and his children William and Mary are living and named. The closure on 15 December 2023 was a chosen RETIREMENT after 46 years, not a beloved place killed off — framing it as a sad loss would misrepresent their own decision. And they are writing a memory-and-recipes book about this exact subject, so a shirt would compete with their own product. Talk to William and Mary Kee before any art exists."
+  },
+  {
+   "subject": "Graham Shopping Center — 224th & Meridian",
+   "reason": "Nothing drawable exists. After a dozen phrasings: no photograph, no sketch, no sign description, no colour, no architectural detail, no anchor tenant and no construction date for the c.1987 centre. Separately, every property at that intersection is actively trading and actively leasing right now under names within a word of the proposed design — Graham Town Center, Graham Towne Square, Graham Village. Starbucks officially names its store there '224th & Meridian'.",
+   "instead": "Nothing to salvage. Drop it."
+  },
+  {
+   "subject": "Garfield Barracks (harvested as 'Garfield Hall')",
+   "reason": "🔴 It is an ACTIVE state-run skilled nursing facility caring for living, frail veterans — the Washington Soldiers Home at Orting, run by WDVA and still named in current law (RCW 72.36.010). The harvested facts were also wrong: 1891 is the founding of the Soldiers Home, not of the building. Garfield Barracks was built 1916-17 and was condemned for residence in 1978.",
+   "instead": "If Erik wants it, that is a conversation with WDVA, not a design. A good 1917 photograph does exist on p.14 of their centennial history."
   }
  ],
  "candidates": [
