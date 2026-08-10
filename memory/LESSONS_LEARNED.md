@@ -5,6 +5,46 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## A new lead source saved fine and stayed invisible — the form-ID vocabulary lives in 12 places (2026-08-10)
+
+**Problem.** A customer's free sample request (`NWCA-SAMPLE-0808-1-480`, Inland Beef Company)
+reached Erik's inbox and nowhere else. Erik: "shouldn't it be in Leads so Taneisha can follow up?"
+
+**Root cause.** The free branch of `/sample-cart.html` pushed a ShopWorks order and fired two
+EmailJS sends — and wrote **no database row at all**. Leads reads exactly one table
+(`Form_Submissions`) filtered to a hard-coded list of lead `Form_ID`s, and the cart called neither
+of that table's writers. The dashboard's "Sample Follow-ups" widget *looks* like the safety net but
+filters on `date_Invoiced`, so it can only show samples already invoiced — a post-sale call
+list, not an inbox. No dashboard surface reads uninvoiced ShopWorks orders at all.
+
+**Solution.** New `sample-request` formId, POSTed from the cart to the already-public
+`POST /api/form-submissions` — which buys AE auto-assign (email match → their rep, else
+Taneisha), the "new lead" email and the Slack card for free. Full site list + fix detail:
+`memory/sample-request-routing.md`.
+
+**Prevention.**
+- 🔑 **The lead form-ID vocabulary is duplicated in 12 places across 2 repos.** Adding a
+  source means updating all of them; miss one and the row saves but stays invisible.
+- 🔴 **A missing map entry becomes a WRONG DEFAULT, not an error.** No `STATUS_CHOICES`
+  entry → the Forms Inbox falls back to `['New','Completed']`, and `Completed` is a **WON**
+  status (`leads-common.js:40,50`) → closing the lead banks a $0 win and drops it from the
+  follow-up digest. Same family as `[]`-is-truthy and `Number(null) === 0`.
+- 🔑 **Derive a filter list from the canonical constant, never re-type it.** `leads.js`
+  built its Source dropdown from a literal that *happened* to equal `LEAD_FORM_IDS` minus
+  `jotform-lead`; the 6th id broke that invariant silently.
+- 🔑 **A payload only "saves" if a renderer knows its shape.** The Inbox renders only
+  `fields`/`checks`/`tables`/`notes` — a bespoke object stores fine and shows a blank modal.
+- 🔴 **`House` is a dropdown DEFAULT, not a rep.** Sending it satisfies the server's
+  "rep already set" check, suppresses auto-assign and leaves the lead owned by nobody — the
+  exact failure the change existed to prevent. Send blank and let the server assign.
+- 🔑 **A content-hashed page serves `dist/`, not your file.** The preview runs
+  `node server.js` (no `prestart`), so the browser executed a stale asset and the new function read
+  as `undefined` — indistinguishable from a scope bug. Run `npm run build`, then confirm the
+  asset HASH changed.
+- ⚠️ 3 of the 4 review defects were on STAFF surfaces the customer path never touches:
+  the customer flow was right on the first pass, the staff rendering was not.
+
+---
 ## Two note endpoints write the same table; only one of them tells anybody (2026-08-07)
 
 **Problem.** The AE "Approve Design" button on `/art-request/:id?view=ae` fired a native
@@ -181,77 +221,5 @@ returns the option NAME for the shape Shopify RETURNS. Nothing throws; the keys 
   a fallback chain like `a.x || a.y` will pick the wrong one and never complain.
 - 🔑 **A key-building function deserves a test that two DIFFERENT inputs produce two different keys.**
   Asserting the happy path only would have passed here: every key was well-formed, just identical.
-
----
-
-## A page size counted DESIGNS while the table stores design×LOCATION (2026-08-06)
-
-**Problem.** After the artwork fix shipped, the SanMar inbound sheet still showed the 🎨 "no
-logo" tile for 6 of 18 orders. Erik's read: "probably no thumbnail in ShopWorks yet." True for
-2 of them; the other 4 had artwork the whole time.
-
-**Root cause.** `proxy src/routes/thumbnails.js` `/thumbnails/by-designs` built its Caspio page
-as `'q.limit': uncachedIds.length`. `Shopworks_Thumbnail_Report` is keyed
-`Thumb_DesLocid_Design` — **one row per design PER LOCATION** — so 18 designs can match far more
-than 18 rows. Caspio truncated the page, every design past the cut was reported `found:false`,
-and that wrong answer was then cached for the 5-minute TTL. Rows arrive in serial order, so the
-designs dropped were the NEWEST — exactly what an inbound sheet is made of, which is why it
-looked like a bandit/ShopWorks sync lag. Fixed to `min(1000, ids × 25)`; live batch went 12 → 16
-of 18 found, and the 2 remaining genuinely have no row.
-
-**Prevention.**
-- 🔑 **Size a page by the ROWS it can return, not the KEYS you asked for.** Any `q.limit` derived
-  from an input count is wrong the moment the table is one-to-many.
-- 🔴 **Truncation that reports `found:false` is indistinguishable from real absence** — and here
-  it was cached, so it persisted. A short page should be detected and retried/raised, never
-  reinterpreted as "no data".
-- ⚠️ **My own probe was the broken instrument twice.** A 33-id sweep read `.thumbnails` off a
-  400 body (`Maximum 20 design IDs`) and printed "all missing"; earlier runs disagreed with each
-  other for the same reason. **Check the HTTP status before parsing.** The finding only became
-  real when single-id queries returned artwork the batch had denied.
-- 🔑 A mock that ignores `q.limit` cannot catch this — the regression test makes the fake Caspio
-  honour the limit, so it fails against the old code (verified by reverting).
-- 🔑 **Same route file, same disease: `/thumbnails/sync-status` reported `totalRecords: 20000`,
-  which was `maxPages 20 × 1000` — the CAP, presented as a count** (true size 27,665). It also
-  counted `recordsWithImages` off **`ExternalKey`, the retired Caspio Files key**, so it answered
-  "0 of 20,000 have images" about a table where 26,990 do — artwork moved to Box and lives in
-  `FileUrl`. **A metric outliving its schema reads as a catastrophe rather than a stale field.**
-  Now counts `ExternalKey || FileUrl`, `strict: true` so truncation throws, and counts are opt-in
-  behind `?counts=true` (a count means ~28 Caspio reads; `lastSync` is one).
-- 🔑 **Caspio v2 does NOT return `TotalRecords`** on a `q.limit=1` read — the body is just
-  `Result`, and `makeCaspioRequest` strips even that. There is no cheap COUNT; verify before
-  designing around one. Use `discardResults: true` + `pageCallback` to count without holding
-  27k rows in dyno memory.
-- 🔑 **`lastSync` is the field that actually answers "is the sync stalled?"** — it showed the
-  bandit thumbnail sync running 09:22 the same morning, which proved the two remaining blank
-  designs had no artwork attached in ShopWorks rather than a sync lag.
-- 🔑 **The inbound sheet has THREE artwork states, not two**: has art · has a design but no art
-  (a real gap) · **no design at all** (blanks/undecorated, `method: "Other"`, empty
-  `designNumber` — nothing is missing). Rendering the last two identically sent people hunting
-  for artwork that never existed: on 2026-08-05, 3 of 4 "missing" tiles were blanks orders.
-  Blanks now get their own glyph + solid tile; **the glyph must differ, not just the tooltip,
-  because the printed sheet has none.**
-- ⚠️ **Screen and print do NOT share the logo tile** — `logoTile()` vs `psLogo` in the print
-  builders. Fixing one leaves the other; print used to render *nothing* for both no-image cases,
-  so a missing proof, a blanks order and a failed image were indistinguishable on paper.
-- 🔑 **These sheets go to a MONO LASER** (the `.sit-ps-rush` rule says so). On paper the signal
-  must be shape/text, never colour — and a 42px emoji is a smudge. Print uses the words `NO ART`
-  (dashed border, black) and `BLANKS` (solid, flat fill + `print-color-adjust: exact`, since
-  browsers drop backgrounds when printing).
-- 🔴 **`window.print()` SNAPSHOTS the DOM — an `<img>` still in flight is simply absent from the
-  PDF.** No error, no gap, nothing to notice. The sheet builds fresh `<img>` tags and the screen
-  tiles are `loading="lazy"`, so only orders the user had scrolled past were warm: everything
-  below the fold silently lost its thumbnail. Measured on a real AE sheet — **7 POs with artwork,
-  3 images in the PDF**; and cold-loading the full sheet, only **8 of 16** screen tiles were warm.
-  Fix: `await img.decode()` on every sheet image before printing (`decode()` resolves when the
-  bitmap can PAINT; `load` can fire a frame earlier — that frame is where this lived), capped at
-  6s so a dead Box file degrades to the old behaviour instead of hanging the dialog. After: 14/14
-  decoded, 0 missing, 4.5s wait. 🔑 **This masqueraded as the artwork bug being only half-fixed —
-  two different causes producing the same "missing thumbnail".**
-- ⚠️ **A fixture with a real Box url would 401 offline** and silently exercise the FALLBACK path
-  while looking like it covered the image case — the print harness uses a `data:` URI instead.
-  Note `/tests` is not served (removed in the 2026-08-05 source-exposure fix), so that harness
-  only runs from disk; verify print by stubbing `window.print` on the real page and grabbing
-  `#sit-print-sheet` before its 1.5s self-cleanup removes it.
 
 ---

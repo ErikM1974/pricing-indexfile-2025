@@ -1,122 +1,135 @@
-# Sample requests — where they go, and why Leads never sees them
+# Sample requests → Leads
 
-**Established 2026-08-10** by tracing a real request end-to-end
-(`NWCA-SAMPLE-0808-1-480`, Cory Kelly / Inland Beef Company, submitted Sat 8 Aug).
-Diagnosis only — **nothing has been changed yet.**
+**Diagnosed + BUILT 2026-08-10. NOT DEPLOYED YET** (Erik's call). Traced from a real request:
+`NWCA-SAMPLE-0808-1-480`, Cory Kelly / Inland Beef Company, submitted Sat 8 Aug, imported by
+Erik as **ShopWorks order 142752**. That one was added to Leads BY HAND — deliberately, so the
+first run of the new code path is a fresh request nobody has to un-break.
 
-## The one-line fact
+## What was wrong
 
-🔴 **A FREE sample request is email-only. It writes NO Caspio row of any kind, so it can
-never appear in Leads, Quote Management, or any other dashboard surface.** Its only durable
-record is the ShopWorks order created by the ManageOrders push.
+🔴 **A FREE sample request was EMAIL-ONLY.** It wrote NO Caspio row of any kind, so it could
+never appear in Leads, Quote Management, or any other dashboard. Its only durable record was
+the ShopWorks order. Every free sample request since the flow shipped had the same fate.
 
-## The flow (free branch)
-
-One customer-facing form: [pages/sample-cart.html:179](../pages/sample-cart.html) →
-handler [pages/js/sample-cart-page.js:451](../pages/js/sample-cart-page.js). It forks at
-`sample-cart-page.js:561` — **paid** (any blank cost ≥ $10, `shared_components/js/sample-pricing.js:28`)
-goes to Stripe; **free** does this and only this:
+The free branch of [pages/sample-cart.html](../pages/sample-cart.html) (handler
+`pages/js/sample-cart-page.js:451`, forks at `:561` — paid goes to Stripe) did exactly this:
 
 | Step | Where | Durable? |
 |---|---|---|
 | Mint `SAMPLE-MMDD-seq-ms` | `shared_components/js/sample-order-service.js:55` | localStorage only |
 | POST order to ShopWorks | `sample-order-service.js:430` → `server.js:3682` → `proxy:src/routes/manageorders-push.js:63` | ✅ ShopWorks order |
-| EmailJS #1 `template_wjxuice` → erik@ hardcoded | `sample-order-service.js:491`, sent :501 | ❌ email only |
+| EmailJS #1 `template_wjxuice` → erik@ hardcoded | `sample-order-service.js:491` | ❌ email only |
 | EmailJS #2 `template_sample_request` | `sample-cart-page.js:629` | ❌ email only |
 
 - `NWCA-` prefix is added **server-side** on successful push: `proxy:config/manageorders-push-config.js:242`.
-- 🔑 **Two staff emails fire per free request, not one.** #2 is the one with the contact
-  block + "Samples requested" list (built at `sample-cart-page.js:618-624`).
+- 🔑 **Two staff emails fire per request.** #2 is the one carrying the contact block + samples list.
 - 🔑 **#2's recipient is NOT in either repo** — its payload has no `to_email`/subject/reply-to.
-  To/CC/BCC live in the **EmailJS dashboard**. Changing who gets it = a dashboard edit, no deploy.
-- 🔴 Both sends are fire-and-forget with swallowed errors (`sample-cart-page.js:630-632`,
-  `sample-order-service.js:509-512`). If EmailJS is down the customer still sees success, the
-  ShopWorks order still exists, and **nobody is told anything.** Silent worst case.
+  To/CC/BCC live in the **EmailJS dashboard**, so changing who gets it needs no deploy.
+- 🔴 Both sends are fire-and-forget with swallowed errors. If EmailJS is down the customer sees
+  success, the order exists, and nobody is told. That failure mode still exists.
 
-## Why Leads can't see it
+## Why Leads couldn't see it
 
-Leads = `/dashboards/leads.html`, and it reads **exactly one Caspio table, `Form_Submissions`**
-(`proxy:src/routes/form-submissions.js:29`, via SAML forwarder `server.js:4008`), filtered to
-five Form_IDs in `dashboards/js/leads-common.js:18`:
-`jotform-lead · quote-request · webstore-request · team-roster · manual-lead`.
-Only two writers exist: public `POST /api/form-submissions` and the JotForm webhook. **The
-sample cart calls neither** — its only backend call is `/api/manageorders/orders/create`, and
-that route writes nothing to Caspio.
+Leads (`/dashboards/leads.html`) reads **exactly one Caspio table, `Form_Submissions`**
+(`proxy:src/routes/form-submissions.js:29`, via SAML forwarder `server.js:4008`), filtered to a
+hard-coded list of lead Form_IDs. Only two writers exist: public `POST /api/form-submissions`
+and the JotForm webhook. The cart called **neither** — its only backend call creates the
+ShopWorks order, and that route writes nothing to Caspio.
 
-⚠️ One sample↔Leads thread exists but runs the **wrong direction**: `finishSampleLeadHandoff()`
-(`sample-cart-page.js:698-714`) appends a `Lead_Activity` note when an AE started the order
-from the Leads board (localStorage `nwca-sample-prefill` stash). It **annotates an existing
-lead, never creates one**, and is `requireStaff` (`server.js:4022`) so a customer tab 401s.
+⚠️ One sample↔Leads thread already existed but runs the **wrong direction**:
+`finishSampleLeadHandoff()` (`sample-cart-page.js:698`) appends a `Lead_Activity` note when an AE
+started the order from the Leads board. It **annotates an existing lead, never creates one**, and
+is `requireStaff` so a customer tab 401s.
 
-## The near-miss widget
+## The fix (built, not deployed)
 
-Dashboard home has **"Sample Follow-ups"** (`staff-dashboard-v3/index.html:852-861`, controller
-`shared_components/js/staff-dashboard/controllers/orders-inbox-controller.js:252-306`).
-Its matcher is right (`po.startsWith('SAMPLE-')` at :242 — the push does set
-`CustomerPurchaseOrder`). 🔴 **It filters on `date_Invoiced`** (:258-259, re-filtered :275-277),
-so `'' >= cutoff` is false for an uninvoiced order. **It is a post-sale call list, not an inbox.**
-All three ManageOrders-reading dashboard services use the same invoiced window
-(`shopworks-service.js:104-105`, `staff-dashboard-service.js:216-217`) — **no dashboard surface
-reads uninvoiced ShopWorks orders at all.**
+New `sample-request` formId. `createSampleLead()` in `pages/js/sample-cart-page.js` POSTs to the
+already-public `POST /api/form-submissions` after the ShopWorks push, which buys **AE auto-assign**
+(customer email → their rep, else **Taneisha Clark**, `proxy:src/utils/jotform.js:45`), the rep's
+"new lead" email, and the Slack lead card — no new endpoint.
 
-Two live bugs in that widget (code-level, not verified against a live response):
-- `:299-300` renders `s.Contact_Name`, which the ManageOrders pull model doesn't have (it has
-  `ContactFirstName`/`ContactLastName`) → **contact subline permanently blank.**
-- `:247-250` keys customers on `o.CustomerName`, but every web sample lands on ShopWorks
-  **catch-all customer 2791** (`proxy:config/manageorders-push-config.js:15`), so all web
-  samples collapse to one key and the "ordered since?" suppression at :285-289 lets **one
-  unrelated web order hide the whole list.**
+### 🔴 The form-ID vocabulary lives in 12 places across 2 repos
 
-## Rep assignment: none
+Miss one and the row saves but stays invisible. This list is the whole checklist:
 
-The cart's "Sales representative" dropdown (`pages/sample-cart.html:205-211`, incl. Taneisha,
-default **House**) feeds exactly one field: `salesRep` → ShopWorks `CustomerServiceRep`
-(`sample-order-service.js:322` → `proxy:lib/manageorders-push-client.js:129`). **No routing,
-no email, no CRM.** By contrast `POST /api/form-submissions` auto-assigns the AE (customer
-email → their rep, else **Taneisha Clark** default), emails that rep, and posts a Slack card
-(`proxy:src/routes/form-submissions.js:136-185`). **All that machinery exists; the cart never
-calls it.**
+**Proxy** (deploy FIRST — `validateSubmission` 400s an unknown formId)
+1. `src/utils/form-submission-helpers.js` — `FORM_PREFIX` (`SRQ`; **`SAM` is a quote prefix**, hence SRQ)
+2. `src/utils/form-submission-helpers.js` — `DEFAULT_STATUS`
+3. `src/utils/form-submission-helpers.js` — `LEAD_NOTIFY_FORMS`
+4. `src/routes/form-submissions.js` — `DELETABLE_FORM_IDS`
+5. `src/routes/form-submissions.js` — `IN_APP_SOURCE_TITLES`
+6. `src/routes/ae-dashboard.js` — `LEAD_FORM_IDS`
+7. `src/utils/lead-classify-ai.js` — `LEAD_FORM_IDS`
+8. `src/utils/lead-conversion.js` — `LEAD_FORM_IDS`
+9. `src/utils/lead-followup-digest.js` — `LEAD_FORM_IDS` **+ `SOURCE_LABELS`**
+10. `src/utils/slack-form-lead-notify.js` — `FORM_LABELS` **+ `LEADS_BOARD_FORMS`** (new: routes the
+    card to the Leads board instead of the Forms Inbox; existing forms unchanged)
 
-## Fix options (none applied)
+**App**
+11. `dashboards/js/leads-common.js` — `LEAD_FORM_IDS`, `SOURCE_META`, `STATUS_CHOICES`, `DRAG_STATUS`
+12. `dashboards/js/form-submissions.js` — `FORM_META` **and `STATUS_CHOICES`**, plus
+    `dashboards/css/form-submissions.css` `.badge--srq`
 
-- **A — cheapest, no backend change.** After the push in `sample-cart-page.js` (~:606) add one
-  non-blocking `fetch` to the already-public `POST {proxyBase}/api/form-submissions` with
-  `formId: 'quote-request'` (or `manual-lead`). Buys the Leads row + AE auto-assign + rep email
-  + Slack card free. ⚠️ No same-origin forwarder exists for that POST — hit the proxy base
-  directly like the other public forms. Must never break a submitted order on failure.
-- **B — a real `sample-request` source.** `LEAD_FORM_IDS` is duplicated in **five** places
-  (proxy: `form-submission-helpers.js:7,30,57`, `form-submissions.js:154`, `ae-dashboard.js:46`,
-  `lead-classify-ai.js:19`, `lead-conversion.js:21`, `lead-followup-digest.js:29`; app:
-  `leads-common.js:18,20,29,50`, `form-submissions.js:18`). Miss one and the row saves invisible.
-  **Deploy proxy first** (`validateSubmission` rejects unknown formIds).
-- **C — 5-min stopgap, zero deploy.** Add taneisha@ to To/CC of `template_sample_request` in the
-  **EmailJS dashboard**. (Email #1 is hardcoded and would need a deploy.)
+Also changed: `dashboards/js/leads.js` Source dropdown (now **derived** from `LEAD_FORM_IDS`
+instead of a re-typed literal), `pages/sample-cart.html` (+`/config/app.config.js` script tag).
+
+### Three traps this hit (all caught by adversarial review, none by tests)
+
+- 🔴 **A missing map entry becomes a WRONG DEFAULT, not an error.** No `STATUS_CHOICES` entry in
+  the Forms Inbox → falls back to `['New','Completed']`, and **`Completed` is a WON status**
+  (`leads-common.js:40,50`) → closing the lead banks a $0 win and drops it from the digest.
+  *(The same gap existed for `manual-lead` and was closed in passing.)*
+- 🔴 **`House` is the dropdown DEFAULT, not a rep**, and isn't in the Leads rep list. Sending it
+  satisfies the server's "rep already set" check (`form-submissions.js:166` only fills blanks),
+  suppresses auto-assign, and leaves the lead owned by nobody. Send `''`.
+- 🔑 **A payload only "saves" if a renderer knows its shape.** The Inbox renders only
+  `fields`/`checks`/`tables`/`notes`; a bespoke object stores fine and shows a **blank modal**.
+
+## Deploy
+
+**PROXY FIRST, then app.** App-first means every sample lead silently degrades to the old
+email-only behaviour for the length of the window (order still pushes, both emails still fire,
+`createSampleLead` swallows the 400 by design).
+
+🔴 **`/deploy` must cache-bust three STAFF assets** — `dashboards/leads.html` and
+`dashboards/form-submissions.html` are **not** in `lib/hashed-pages.js`, so without a `?v=` bump
+reps keep the old JS and none of this appears: `leads-common.js` (referenced by `leads.html` +
+`lead.html`), `dashboards/js/form-submissions.js`, `dashboards/css/form-submissions.css`.
+`pages/sample-cart.html` **is** hashed, so its `?v=` bump is harmless but redundant.
+
+## Verify on the first REAL request (nothing here is proven live)
+
+1. 🔴 **Does Caspio `Form_Submissions.Form_ID` accept a new value?** Strong indirect evidence yes:
+   `manual-lead` was added in a **code-only commit** (proxy `e6feff6`, Jul 18) with no schema
+   change. But if that column has a value list, the row saves invisible. **First real request:
+   confirm an `SRQ…` card on `/dashboards/leads.html`.**
+2. A lead POST failure logs to the **customer's** browser console — nobody sees it. Worst case is
+   today's behaviour (both emails still fire), so it degrades, it doesn't lose data.
+3. **Auto-assign may never match.** `assignLead` resolves via `CompanyContactsMerge2026` by email;
+   sample requesters tend to use consumer domains, so most will fall to the **Taneisha default**.
+   Erik's call whether she's the right catch-all.
+4. Slack/rep email only fire if `SLACK_FORM_LEADS_WEBHOOK_URL` is set — `notifyFormLead` is a
+   silent no-op otherwise. Watch the proxy logs on the first one.
+5. The 06:30 PT AI classifier now sees these rows — check `/dashboards/unqualified-leads.html`
+   in week 1 that sample requests aren't being auto-archived.
+
+## Still open / out of scope
+
+- **Paid (Stripe) sample carts create no lead** — they return early at `sample-cart-page.js:561`
+  and get a `SAM` `quote_sessions` row instead (visible in Quote Management). Erik's call whether
+  they should also produce a Leads card.
+- **No dedupe** — an existing lead who then orders samples gets a second card. Matches the other forms.
+- **"Sample Follow-ups" widget** (`orders-inbox-controller.js:252-306`) is unchanged and still a
+  post-sale call list: matcher is right (`po.startsWith('SAMPLE-')`) but it filters `date_Invoiced`.
+  Two live bugs in it: renders `s.Contact_Name` which ManageOrders doesn't have (permanently blank),
+  and keys customers on `CustomerName` while every web sample lands on **catch-all customer 2791**,
+  so one unrelated web order can hide the whole list.
 
 ## Decoys — do not chase
 
-- **Forms Inbox "Samples" tab** = `Form_ID: 'sample-checkout'`, the staff front-counter
-  **loaner-sample tracker** (`Sample_Checkout_Items`). Different thing entirely.
-- **`dashboards/bundle-orders-dashboard.html`** has a "Sample Requests" table filtering QuoteID
-  prefixes `SR`/`XMAS`/`BCA` (`dashboards/bundle-orders.js:165`) — prefixes this flow never
-  mints, and it's linked from no nav menu.
-- **Ctrl+K** searches `ORDER_ODBC` by numeric `ID_Order` or `CompanyName`; catch-all customer
-  2791 means the company name isn't the customer's.
+- **Forms Inbox "Samples" tab** = `Form_ID: 'sample-checkout'`, the staff front-counter **loaner**
+  tracker (`Sample_Checkout_Items`). Different thing.
+- **`dashboards/bundle-orders-dashboard.html`** "Sample Requests" table filters QuoteID prefixes
+  `SR`/`XMAS`/`BCA` — prefixes this flow never mints, linked from no nav menu.
 
-## Backwards, and worth knowing
-
-**Paid** samples DO persist — `server.js:8722-8735` saves a `quote_sessions` row (SAM prefix)
-fail-closed before Stripe, and Quote Management shows all quote_sessions with no prefix
-whitelist. So **paid samples are visible and free samples are not** — the opposite of what you
-want, since the free sample is the one needing a follow-up call.
-
-**Every free sample request since this flow shipped has the same fate.** How many is unknown
-(no one queried ShopWorks).
-
-## Unknowns (stated, not guessed)
-
-- Whether `NWCA-SAMPLE-0808-1-480` actually landed in OnSite (code proves a successful push
-  response, not the import).
-- Who else is on To/CC/BCC of `template_sample_request` (EmailJS dashboard).
-- Which rep, if any, Cory Kelly picked.
-
-See also [[LESSONS_LEARNED]], `memory/SHOPWORKS_ODBC_INTEGRATION.md`.
+See also [[LESSONS_LEARNED]].

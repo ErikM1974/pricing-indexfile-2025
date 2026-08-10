@@ -15,7 +15,7 @@
 (function (global) {
     'use strict';
 
-    var LEAD_FORM_IDS = ['jotform-lead', 'quote-request', 'webstore-request', 'team-roster', 'manual-lead'];
+    var LEAD_FORM_IDS = ['jotform-lead', 'quote-request', 'webstore-request', 'team-roster', 'manual-lead', 'sample-request'];
 
     var SOURCE_META = {
         'jotform-lead': { label: 'Website', icon: 'fa-globe' },
@@ -23,6 +23,9 @@
         'webstore-request': { label: 'Webstore', icon: 'fa-store' },
         'team-roster': { label: 'Roster', icon: 'fa-people-group' },
         'manual-lead': { label: 'Phone/Walk-in', icon: 'fa-phone' },
+        // Free samples from /sample-cart.html (2026-08-10). The ShopWorks order
+        // ships the samples; THIS is the follow-up call that sells the run.
+        'sample-request': { label: 'Sample Request', icon: 'fa-shirt' },
     };
 
     // Per-form pipelines — mirrors dashboards/js/form-submissions.js STATUS_CHOICES.
@@ -32,6 +35,7 @@
         'webstore-request': ['New', 'In Progress', 'Store Built', 'Launched', 'Archived'],
         'team-roster': ['New', 'In Progress', 'Entered in ShopWorks', 'Completed', 'Archived'],
         'manual-lead': ['New', 'Contacted', 'Quoted', 'Won', 'Lost', 'Archived'],
+        'sample-request': ['New', 'Contacted', 'Quoted', 'Won', 'Lost', 'Archived'],
     };
     var WON_STATUSES = ['Won', 'Launched', 'Completed', 'Entered in ShopWorks'];
     var PIPELINE_STATUSES = ['Contacted', 'Quoted', 'In Progress', 'Store Built'];
@@ -53,6 +57,7 @@
         'webstore-request': { new: 'New', contacted: 'In Progress', quoted: 'Store Built', won: 'Launched', lost: null },
         'team-roster': { new: 'New', contacted: 'In Progress', quoted: null, won: 'Entered in ShopWorks', lost: null },
         'manual-lead': { new: 'New', contacted: 'Contacted', quoted: 'Quoted', won: 'Won', lost: 'Lost' },
+        'sample-request': { new: 'New', contacted: 'Contacted', quoted: 'Quoted', won: 'Won', lost: 'Lost' },
     };
 
     // Display names match Sales_Reps_2026.CustomerServiceRep / the quote-builder
