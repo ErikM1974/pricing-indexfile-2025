@@ -1,0 +1,180 @@
+/* ==========================================================================
+   past-due-orders.css — page-specific styles for dashboards/past-due-orders.html
+
+   Shell classes (.dash-header, .dash-back-link, .dash-stat-card, .dash-card…)
+   come from shared_components/css/dash-shell.css. Design tokens (--surface-*,
+   --gray-*, --shadow-*, --radius-*, --state-*) come from
+   shared_components/css/art-hub.css.
+
+   Only page-specific styles here. Never redefine a token, never hardcode a
+   colour/shadow/radius that a token already covers.
+   ========================================================================== */
+
+/* Header controls -------------------------------------------------------- */
+.pdo-window {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: var(--gray-600);
+}
+
+.pdo-window select {
+    font: inherit;
+    padding: 4px 8px;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    background: var(--surface-card, #fff);
+    color: var(--gray-800);
+}
+
+.pdo-asof {
+    font-size: 0.8rem;
+    color: var(--gray-500);
+}
+
+/* Per-rep grouping ------------------------------------------------------- */
+.pdo-rep {
+    margin-bottom: 28px;
+}
+
+.pdo-rep-name {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin: 0 0 8px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--gray-800);
+}
+
+.pdo-rep-count {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--gray-500);
+}
+
+/* Table ------------------------------------------------------------------ */
+/* Wide content scrolls inside its own container so the page body never does. */
+.pdo-scroll {
+    overflow-x: auto;
+}
+
+.pdo-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.pdo-table th {
+    text-align: left;
+    padding: 6px 10px;
+    border-bottom: 2px solid var(--gray-200);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: var(--gray-500);
+    white-space: nowrap;
+}
+
+.pdo-table td {
+    padding: 7px 10px;
+    border-bottom: 1px solid var(--gray-100);
+    color: var(--gray-800);
+    vertical-align: top;
+}
+
+.pdo-table tbody tr:hover {
+    background: var(--gray-50);
+}
+
+.pdo-num {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.pdo-wo {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    white-space: nowrap;
+}
+
+/* A past-due row must not rely on colour alone — the weight carries it in
+   greyscale and for anyone who can't distinguish the red. */
+.pdo-late .pdo-wo,
+.pdo-late td:nth-child(2) {
+    font-weight: 700;
+}
+
+.pdo-badge {
+    display: inline-block;
+    padding: 1px 7px;
+    border-radius: var(--radius-sm);
+    background: var(--state-danger-bg, #fee2e2);
+    color: var(--state-danger-fg, #991b1b);
+    font-weight: 700;
+    font-size: 0.78rem;
+    white-space: nowrap;
+}
+
+.pdo-risk {
+    color: var(--gray-600);
+}
+
+/* The single most actionable cell on the page: more than half of past-due
+   orders are waiting on blanks nobody has ordered yet. */
+.pdo-nopo {
+    font-weight: 700;
+    color: var(--state-danger-fg, #991b1b);
+}
+
+/* States ----------------------------------------------------------------- */
+.pdo-none {
+    padding: 18px;
+    color: var(--gray-600);
+}
+
+.pdo-none i {
+    color: var(--state-success-fg, #15803d);
+    margin-right: 6px;
+}
+
+.pdo-trunc,
+.pdo-failed {
+    padding: 12px 14px;
+    margin-bottom: 14px;
+    border-radius: var(--radius-md);
+    background: var(--state-warning-bg, #fef3c7);
+    color: var(--state-warning-fg, #92400e);
+    font-size: 0.85rem;
+}
+
+/* Print ------------------------------------------------------------------ */
+/* The shop prints on a mono laser, which drops backgrounds by default — the
+   badge would come out an unreadable grey smudge without print-color-adjust,
+   the same rule the SanMar inbound sheets use. */
+@media print {
+    .dash-header-right,
+    .dash-error-banner {
+        display: none !important;
+    }
+
+    .pdo-badge {
+        background: #000 !important;
+        color: #fff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .pdo-nopo {
+        color: #000 !important;
+        font-weight: 900;
+    }
+
+    .pdo-rep {
+        page-break-inside: avoid;
+    }
+
+    .pdo-table tbody tr {
+        page-break-inside: avoid;
+    }
+}

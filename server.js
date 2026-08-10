@@ -3242,7 +3242,7 @@ app.get('/dashboards/nika-crm.html', requireCrmRole(['nika']), (req, res) => {
 // AE Mission Control — the per-AE cockpit. Hard code gate (like the rep CRM pages)
 // because the page surfaces the rep's commission dollars; admin passes automatically
 // (admin permissions include 'taneisha' + 'nika' via permissionsFromRole).
-app.get('/dashboards/ae-mission-control.html', requireCrmRole(['taneisha', 'nika']), (req, res) => {
+app.get('/dashboards/ae-mission-control.html', requireCrmRole(['taneisha', 'nika', 'ruth']), (req, res) => {
   res.sendFile(path.join(__dirname, 'dashboards', 'ae-mission-control.html'));
 });
 app.get('/dashboards/house-accounts.html', requireCrmRole(['house']), (req, res) => {
@@ -4086,16 +4086,16 @@ function aeDashboardForwarder(upstreamPath) {
     }
   };
 }
-app.get('/api/crm-proxy/ae-dashboard/summary', requireCrmRole(['taneisha', 'nika', 'admin']), aeDashboardForwarder('/api/ae-dashboard/summary'));
+app.get('/api/crm-proxy/ae-dashboard/summary', requireCrmRole(['taneisha', 'nika', 'ruth', 'admin']), aeDashboardForwarder('/api/ae-dashboard/summary'));
 // Growth radar ("Money on the Table") — same identity rules as the summary.
-app.get('/api/crm-proxy/ae-dashboard/growth', requireCrmRole(['taneisha', 'nika', 'admin']), aeDashboardForwarder('/api/ae-dashboard/growth'));
+app.get('/api/crm-proxy/ae-dashboard/growth', requireCrmRole(['taneisha', 'nika', 'ruth', 'admin']), aeDashboardForwarder('/api/ae-dashboard/growth'));
 // Purchasing tracker — JotForm "Purchasing" form (requests to Bradley) joined
 // to the ShopWorks PurchaseOrders mirror (ordered/received) per work order.
-app.get('/api/crm-proxy/ae-dashboard/purchasing', requireCrmRole(['taneisha', 'nika', 'admin']), aeDashboardForwarder('/api/ae-dashboard/purchasing'));
+app.get('/api/crm-proxy/ae-dashboard/purchasing', requireCrmRole(['taneisha', 'nika', 'ruth', 'admin']), aeDashboardForwarder('/api/ae-dashboard/purchasing'));
 // Data-quality radar ("Missing Info — Fix in ShopWorks") — restores the
 // forwarder for the concurrent session's MC card after the 2026-07-19 server.js
 // hotfix revert (its proxy endpoint /api/ae-dashboard/data-quality is live).
-app.get('/api/crm-proxy/ae-dashboard/data-quality', requireCrmRole(['taneisha', 'nika', 'admin']), aeDashboardForwarder('/api/ae-dashboard/data-quality'));
+app.get('/api/crm-proxy/ae-dashboard/data-quality', requireCrmRole(['taneisha', 'nika', 'ruth', 'admin']), aeDashboardForwarder('/api/ae-dashboard/data-quality'));
 // Order Due Dates — unshipped ShopWorks orders that already missed their requested-ship
 // date, or fall due within 7 days with the blanks not yet purchased/received (PurchaseOrders
 // mirror join). Same identity rules as the summary.
@@ -4104,7 +4104,30 @@ app.get('/api/crm-proxy/ae-dashboard/data-quality', requireCrmRole(['taneisha', 
 // one got restored; this one did not, so the MC card 404'd for both reps for a week. The UI
 // harness could not catch it: tests/ui/test-ae-mission-control-stub.js replaces window.fetch
 // wholesale and answers this URL itself, so route REGISTRATION must be probed live.
-app.get('/api/crm-proxy/ae-dashboard/due-dates', requireCrmRole(['taneisha', 'nika', 'admin']), aeDashboardForwarder('/api/ae-dashboard/due-dates'));
+app.get('/api/crm-proxy/ae-dashboard/due-dates', requireCrmRole(['taneisha', 'nika', 'ruth', 'admin']), aeDashboardForwarder('/api/ae-dashboard/due-dates'));
+// Company-wide past-due roll-up — every rep, grouped, ?days= window (2026-08-10). The
+// per-rep route above injects the caller's own email; this one deliberately does not, so
+// it is the whole shop and gets a wider gate. Not aeDashboardForwarder: that helper's
+// whole job is to attach the session email, which is exactly what must NOT happen here.
+// requireStaff, not a role list (Erik, 2026-08-10): anyone logged into the staff
+// dashboard should see this. Bradley raises the purchase orders and 12 of the 22
+// past-due orders are waiting on a PO nobody has cut yet; production and receiving
+// have the same reason to look. Still SAML-gated — never public.
+app.get('/api/crm-proxy/ae-dashboard/due-dates-all', requireStaff, async (req, res) => {
+  if (!CRM_API_SECRET) return res.status(503).json({ error: 'not_configured' });
+  try {
+    const days = Math.min(Math.max(parseInt(req.query.days, 10) || 30, 1), 180);
+    const refresh = (req.query.refresh === '1' || req.query.refresh === 'true') ? '&refresh=1' : '';
+    const r = await fetch(`${CRM_API_BASE}/api/ae-dashboard/due-dates-all?days=${days}${refresh}`, {
+      headers: { 'X-CRM-API-Secret': CRM_API_SECRET }, signal: AbortSignal.timeout(60000)
+    });
+    const body = await r.text();
+    res.status(r.status).type(r.headers.get('content-type') || 'application/json').send(body);
+  } catch (e) {
+    console.error('[due-dates-all]', e.message);
+    res.status(502).json({ error: 'upstream_unavailable' });
+  }
+});
 // Q3 2026 Embroidery Bonus — activation bounties + growth ladder + $3M team kicker.
 // Proxy side is secret-only (it exposes per-account customer names, revenue and payroll
 // dollars), so browsers come through here. Role-gated to the two AEs + admin, same as the
