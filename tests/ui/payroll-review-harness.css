@@ -1,0 +1,15 @@
+/* Chrome for the payroll review QA harness. Nothing here ships — it exists so the harness
+   bar is distinguishable from the real page it is wrapping. */
+.qa-bar {
+  position: sticky; top: 0; z-index: 10;
+  background: #1a472a; color: #fff;
+  padding: .6rem 1rem;
+  font: 600 .88rem/1.4 system-ui, -apple-system, sans-serif;
+  display: flex; gap: .8rem; align-items: center; flex-wrap: wrap;
+}
+.qa-bar select,
+.qa-bar button {
+  font: inherit; padding: .3rem .6rem; border-radius: 6px;
+  border: 1px solid #cfdad3; color: #1f2a24; background: #fff; cursor: pointer;
+}
+.qa-bar #qa-state { font-weight: 400; opacity: .85; }

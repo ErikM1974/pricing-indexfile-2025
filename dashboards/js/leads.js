@@ -344,8 +344,11 @@
 
     function renderFilters() {
         var sources = [];
-        ['quote-request', 'webstore-request', 'team-roster', 'manual-lead'].forEach(function (f) {
-            sources.push({ value: f, label: L.SOURCE_META[f].label });
+        // Derived from LEAD_FORM_IDS so a new lead source can never load into the
+        // board yet be unselectable in this filter. jotform-lead is excluded because
+        // its sources are expanded per JotForm form just below.
+        L.LEAD_FORM_IDS.filter(function (f) { return f !== 'jotform-lead'; }).forEach(function (f) {
+            sources.push({ value: f, label: (L.SOURCE_META[f] || {}).label || f });
         });
         var seenJf = {};
         state.leads.forEach(function (l) {

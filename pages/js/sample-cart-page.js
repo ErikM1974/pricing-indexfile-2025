@@ -634,6 +634,10 @@ document.getElementById('sampleRequestForm').addEventListener('submit', async fu
         // Clear cart
         sessionStorage.removeItem('sampleCart');
 
+        // Put the request on the Leads board so a rep actually follows up.
+        // Runs BEFORE the handoff below because that one consumes the stash.
+        await createSampleLead(shopWorksOrderNumber, customerData, cart);
+
         // If an AE started this order from a lead, log it to that lead's timeline
         // and clear the handoff stash (no-op for real customers).
         finishSampleLeadHandoff(shopWorksOrderNumber);
@@ -691,6 +695,110 @@ function applySampleLeadPrefill() {
     if (rep && s.salesRep) {
         var ok = Array.prototype.some.call(rep.options, function (o) { return o.value === s.salesRep; });
         if (ok) rep.value = s.salesRep;
+    }
+}
+
+// --- Leads CRM: a customer-placed sample request becomes a lead (2026-08-10).
+// Free samples used to be EMAIL-ONLY — no row, no rep, invisible to the Leads
+// board — so a live buying signal died in one inbox. The ShopWorks order ships
+// the samples; THIS row is the follow-up call that sells the run.
+//
+// Deliberately reuses the same public endpoint as the other customer lead forms,
+// so it inherits AE auto-assign (customer email → their rep, else Taneisha), the
+// "new lead" email to that rep, and the Slack lead card at no extra cost.
+//
+// NEVER throws. The order is already placed; a CRM hiccup must not tell the
+// customer their request failed. A failure degrades to the old email-only
+// behaviour, so it is logged loudly instead of surfaced.
+async function createSampleLead(orderNumber, customerData, items) {
+    // An AE who started this from the Leads board already HAS a lead — that one
+    // gets a timeline note in finishSampleLeadHandoff(). A second row here would
+    // be a duplicate card for the same customer.
+    var stash = readSampleLeadStash();
+    if (stash && stash.submissionId) return;
+
+    var base = (window.APP_CONFIG && APP_CONFIG.API && APP_CONFIG.API.BASE_URL || '').replace(/\/+$/, '');
+    if (!base) {
+        console.error('[Sample Cart] APP_CONFIG.API.BASE_URL missing — request NOT added to Leads:', orderNumber);
+        return;
+    }
+
+    try {
+        var cart = items || [];
+        var totalQty = 0;
+        var lines = cart.map(function (item) {
+            var sizes = Object.entries(item.sizes || {}).filter(function (e) { return e[1] > 0; });
+            sizes.forEach(function (e) { totalQty += Number(e[1]) || 0; });
+            return {
+                style: item.style,
+                name: item.name,
+                color: item.color,                // COLOR_NAME — display
+                catalogColor: item.catalogColor,  // CATALOG_COLOR — inventory/PO
+                sizes: sizes.map(function (e) { return e[0] + '(' + e[1] + ')'; }).join(' '),
+            };
+        });
+
+        var styles = cart.map(function (i) { return i.style; }).filter(Boolean).join(', ');
+        var summary = totalQty + ' free sample' + (totalQty === 1 ? '' : 's')
+            + (styles ? ' · ' + styles : '')
+            + (orderNumber ? ' · ' + orderNumber : '');
+
+        // company is REQUIRED by the endpoint but OPTIONAL on this form — fall
+        // back to the person's name so a lead is never rejected outright.
+        var who = ((customerData.firstName || '') + ' ' + (customerData.lastName || '')).trim();
+        var company = (customerData.company || '').trim() || who || 'Sample request';
+
+        // 'House' is the dropdown DEFAULT, not a real rep, and it is not in the
+        // Leads rep list. Sending it would satisfy the server's "rep already set"
+        // check, suppress auto-assign, and leave the lead owned by nobody — send
+        // blank instead so it routes to the matched AE (else Taneisha).
+        var chosenRep = (customerData.salesRep || '').trim();
+        var salesRep = (chosenRep && chosenRep !== 'House') ? chosenRep : '';
+
+        var resp = await fetch(base + '/api/form-submissions', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                formId: 'sample-request',
+                company: company,
+                contactName: who,
+                phone: customerData.phone || '',
+                email: customerData.email || '',
+                salesRep: salesRep,
+                summary: summary,
+                // Self-describing payload — the house convention every other form
+                // uses. The Forms Inbox detail modal renders ONLY fields/checks/
+                // tables/notes, and the Leads drawer shows fields once present, so
+                // anything a rep must READ has to live in these three keys.
+                payload: {
+                    fields: [
+                        ['ShopWorks Order', orderNumber || ''],
+                        ['Rep chosen', chosenRep || 'House'],
+                        ['Shipping', customerData.shippingMethod || ''],
+                        ['Ship to', [customerData.shipping_address1, customerData.shipping_address2,
+                            customerData.shipping_city, customerData.shipping_state,
+                            customerData.shipping_zip].filter(Boolean).join(', ')],
+                    ],
+                    tables: [{
+                        title: 'Samples requested',
+                        columns: ['Style', 'Description', 'Color', 'Sizes'],
+                        rows: lines.map(function (l) { return [l.style, l.name, l.color, l.sizes]; }),
+                    }],
+                    notes: customerData.notes ? [['Customer notes', customerData.notes]] : [],
+                    // Machine-readable extras (kept out of the rendered keys):
+                    // catalogColor is CATALOG_COLOR, needed for inventory/PO.
+                    orderNumber: orderNumber || '',
+                    requestedAt: new Date().toISOString(),
+                    items: lines,
+                },
+            }),
+        });
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        var body = await resp.json().catch(function () { return {}; });
+        console.log('[Sample Cart] lead created for follow-up:', body.submissionId || '(no id returned)');
+    } catch (e) {
+        console.error('[Sample Cart] request NOT added to Leads (order '
+            + (orderNumber || '?') + ' WAS still placed):', e);
     }
 }
 

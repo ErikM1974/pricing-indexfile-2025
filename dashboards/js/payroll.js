@@ -269,6 +269,25 @@
   var discardBtn = document.getElementById('packet-discard');
   var noteEl = document.getElementById('packet-note');
   var reviewEl = document.getElementById('review');
+  var modeEl = document.getElementById('packet-mode');
+  var hintEl = document.getElementById('packet-hint');
+
+  // The mode is sent to the server, never inferred there. A leave page pushed through the
+  // packet reader reconciles $0 against $0 and passes a gate that checked nothing.
+  var MODE_HINT = {
+    packet: 'The full monthly packet — Payroll Register, Check Register and the vacation/sick '
+      + 'page. Saving writes a pay period and refreshes leave balances.',
+    leave: 'The "Available Vacation And Sick Time" page on its own. Saving refreshes vacation '
+      + 'and sick balances only — no pay period, no hours, no pay rates.',
+  };
+
+  function syncMode() {
+    hintEl.textContent = MODE_HINT[modeEl.value] || '';
+    parseBtn.textContent = modeEl.value === 'leave' ? 'Read page' : 'Read packet';
+    resetReview();
+  }
+  modeEl.addEventListener('change', syncMode);
+  syncMode();
 
   fileInput.addEventListener('change', function () {
     var f = fileInput.files && fileInput.files[0];
@@ -306,12 +325,13 @@
     if (!f) return;
     resetReview();
     parseBtn.disabled = true;
-    setStatus('Uploading and reading the packet — this usually takes under a minute…', 'info');
+    setStatus('Uploading and reading the ' + (modeEl.value === 'leave' ? 'page' : 'packet')
+      + ' — this usually takes under a minute…', 'info');
     try {
       var b64 = await readAsBase64(f);
       var started = await api('/parse', {
         method: 'POST',
-        body: JSON.stringify({ filename: f.name, dataBase64: b64 }),
+        body: JSON.stringify({ filename: f.name, dataBase64: b64, mode: modeEl.value }),
       });
       jobId = started.jobId;
       pollParse();
@@ -337,16 +357,39 @@
     }, 3000);
   }
 
+  var HEAD_PACKET = '<tr>'
+    + '<th>Employee</th><th>Paid</th>'
+    + '<th class="pr-num">Regular</th><th class="pr-num">OT</th><th class="pr-num">Sick</th>'
+    + '<th class="pr-num">Vac/PTO</th><th class="pr-num">Total</th>'
+    + '<th class="pr-num">Vac Avail</th><th class="pr-num">Sick Avail</th></tr>';
+
+  var HEAD_LEAVE = '<tr>'
+    + '<th>Employee</th><th class="pr-num">ID</th>'
+    + '<th class="pr-num">Vac accrued</th><th class="pr-num">Vac used</th><th class="pr-num">Vac avail</th>'
+    + '<th class="pr-num">Sick accrued</th><th class="pr-num">Sick used</th><th class="pr-num">Sick avail</th></tr>';
+
+  // Each check carries its own unit — the vacation rows were being printed as dollars.
+  // hrs() emits its own escaped markup, so it must not be run through esc() again.
+  function checkNum(v, unit) {
+    if (unit === 'hours') return hrs(v);
+    if (unit === 'count') return esc(String(Number(v) || 0));
+    return esc(money(v));
+  }
+
   function renderReview(rev) {
     var rec = rev.reconciliation || {};
     var checks = rec.checks || [];
     var issues = rec.rowIssues || [];
+    var notes = rec.notes || [];
+    var leave = rev.mode === 'leave';
+    var count = (rev.employees || []).length;
+    var dated = leave ? (rev.asOfDate || '') : (rev.checkDate || '');
 
     document.getElementById('review-checks').innerHTML = checks.map(function (c) {
       return '<tr>'
         + '<td>' + esc(c.label) + '</td>'
-        + '<td class="pr-num">' + esc(money(c.printed)) + '</td>'
-        + '<td class="pr-num">' + esc(money(c.derived)) + '</td>'
+        + '<td class="pr-num">' + checkNum(c.printed, c.unit) + '</td>'
+        + '<td class="pr-num">' + checkNum(c.derived, c.unit) + '</td>'
         + '<td>' + (c.ok ? '<span class="pr-ok">Matches</span>' : '<span class="pr-bad">Differs</span>') + '</td>'
         + '</tr>';
     }).join('');
@@ -354,17 +397,46 @@
     var verdict = document.getElementById('review-verdict');
     if (rec.passed) {
       verdict.className = 'pr-verdict is-ok';
-      verdict.innerHTML = 'Every figure matches the packet\'s own printed totals — '
-        + esc(String((rev.employees || []).length)) + ' employees read from '
-        + esc(rev.checkDate || '') + '. Safe to save.';
+      verdict.innerHTML = leave
+        ? 'All six columns match the report\'s own Total row — ' + esc(String(count))
+          + ' employees, as of ' + esc(dated) + '. Saving updates vacation and sick balances '
+          + 'only; <strong>no pay period is created.</strong>'
+        : 'Every figure matches the packet\'s own printed totals — ' + esc(String(count))
+          + ' employees read from ' + esc(dated) + '. Safe to save.';
     } else {
       verdict.className = 'pr-verdict is-bad';
-      verdict.innerHTML = 'This read does <strong>not</strong> match the packet. Nothing can be saved '
-        + 'until it does — re-scan the packet or enter this period by hand.'
+      verdict.innerHTML = 'This read does <strong>not</strong> match the '
+        + (leave ? 'report' : 'packet') + '. Nothing can be saved until it does — re-scan it '
+        + 'or enter these figures by hand.'
         + (issues.length ? '<ul>' + issues.map(function (i) { return '<li>' + esc(i) + '</li>'; }).join('') + '</ul>' : '');
     }
 
+    // Reconciled but noteworthy — shown, never blocking. Save stays enabled.
+    var notesEl = document.getElementById('review-notes');
+    notesEl.hidden = !notes.length;
+    notesEl.innerHTML = notes.length
+      ? 'Reconciled, but worth a look before saving:<ul>'
+        + notes.map(function (n) { return '<li>' + esc(n) + '</li>'; }).join('') + '</ul>'
+      : '';
+
+    document.getElementById('review-rows-title').textContent = leave
+      ? 'Leave balances to be saved'
+      : 'Hours and leave to be saved';
+    document.getElementById('review-head').innerHTML = leave ? HEAD_LEAVE : HEAD_PACKET;
+
     document.getElementById('review-rows').innerHTML = (rev.employees || []).map(function (x) {
+      if (leave) {
+        return '<tr>'
+          + '<td><span class="pr-name">' + esc(x.nameOnPacket || '') + '</span></td>'
+          + '<td class="pr-num">' + esc(x.payrollEmployeeId == null ? '' : String(x.payrollEmployeeId)) + '</td>'
+          + '<td class="pr-num">' + hrs(x.vacationAccrued) + '</td>'
+          + '<td class="pr-num">' + hrs(x.vacationUsed) + '</td>'
+          + '<td class="pr-num">' + hrs(x.vacationAvailable) + '</td>'
+          + '<td class="pr-num">' + hrs(x.sickAccrued) + '</td>'
+          + '<td class="pr-num">' + hrs(x.sickUsed) + '</td>'
+          + '<td class="pr-num">' + hrs(x.sickAvailable) + '</td>'
+          + '</tr>';
+      }
       return '<tr>'
         + '<td><span class="pr-name">' + esc(x.nameOnPacket || '') + '</span></td>'
         + '<td>' + (x.paid ? '<span class="pr-yes">Yes</span>' : '<span class="pr-no">No check</span>') + '</td>'
@@ -380,9 +452,11 @@
 
     reviewEl.hidden = false;
     commitBtn.disabled = !rec.passed;
+    commitBtn.textContent = leave ? 'Save leave balances' : 'Save to payroll records';
     setStatus(rec.passed
-      ? 'Packet read and verified. Review below, then save.'
-      : 'Packet read, but the totals do not reconcile.', rec.passed ? 'ok' : 'error');
+      ? (leave ? 'Page read and verified. Review below, then save.'
+        : 'Packet read and verified. Review below, then save.')
+      : 'Read finished, but the totals do not reconcile.', rec.passed ? 'ok' : 'error');
   }
 
   commitBtn.addEventListener('click', async function () {
@@ -392,7 +466,10 @@
     try {
       // Only the job id goes up — the server writes its own verified copy of the figures.
       var res = await api('/import', { method: 'POST', body: JSON.stringify({ jobId: jobId }) });
-      var msg = 'Saved ' + res.imported + ' of ' + res.total + ' employees for ' + res.checkDate + '.';
+      var msg = res.mode === 'leave'
+        ? 'Saved leave balances for ' + res.imported + ' of ' + res.total + ' employees, as of '
+          + res.effectiveDate + '. No pay period was created.'
+        : 'Saved ' + res.imported + ' of ' + res.total + ' employees for ' + res.checkDate + '.';
       if (res.failures && res.failures.length) {
         setStatus(msg + ' ' + res.failures.length + ' row(s) failed: ' + res.failures.join('; '), 'error');
       } else {
@@ -458,6 +535,12 @@
           + '. Until then this balance can be negative.');
       } else if (f.slip.remaining < 0) {
         notes.push('* You have used more vacation than has accrued so far this year.');
+      } else if (f.flags.some(function (x) { return x.code === 'floored-remaining'; })) {
+        // The packet floors an over-drawn balance at 00:00 and we print what it says, so
+        // without this the slip shows "Hours used 16.00" above "Hours remaining 0.00" and
+        // reads as an error to the person holding it.
+        notes.push('* This shows 0.00 because the payroll report does not print a negative '
+          + 'balance. You have used more vacation than has accrued so far this year.');
       }
       var star = notes.length ? '<span class="slip-star">*</span>' : '';
 

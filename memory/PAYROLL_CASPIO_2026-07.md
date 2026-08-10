@@ -335,3 +335,83 @@ at which point it must enforce **admin** server-side (role from `Staff_App_Roles
 the `Staff_Page_Access` page gate. Per-period maintenance needs no API at all: add the new packet's
 figures to `import-payroll-packet.js` and re-run — the reconciliation gate rejects anything that
 doesn't match the printed totals.
+
+## 9. Leave-only upload mode (2026-08-10)
+
+The uploader takes **two document shapes**, declared by the caller as `mode` on `POST /parse`:
+
+| mode | Document | Writes |
+|---|---|---|
+| `packet` | the full monthly packet (all 3 reports) | `Payroll_Register` rows **and** the `Employees` leave columns |
+| `leave` | "Available Vacation And Sick Time" **on its own** | the `Employees` leave columns only — **no register row, no `Pay`** |
+
+- 🔴 **The mode is never inferred.** An unknown value is a 400, not a fallback to `packet`. See the
+  vacuous-gate entry in LESSONS_LEARNED — a leave page run through the packet reader extracted 0 for
+  every money figure and *passed* a gate that had checked nothing.
+- `reconcileLeave()` checks **all six** leave columns against the report's own `Total:` row. There is
+  no money field in `LEAVE_SCHEMA` at all, so there is nothing to zero out and no free pass.
+- 🔑 **`Hrs Avail.` is a printed column, not accrued − used.** The report floors an over-drawn balance
+  at `00:00` instead of printing a negative. On the 2026-08-07 page that is **Taneisha Clark** (0
+  accrued, 16 used, printed `00:00`) — and it is the whole reason the vacation totals read
+  **1112 / 796 / 332** when 1112 − 796 = 316.
+- ✅ **BOTH paths save the printed figure** into `Vacation_Hours_Remaining` / `Sick_Hours_Remaining`
+  (Erik, asked directly 2026-08-10: *"exactly what Liesls payroll packet says"*). A row where the
+  printed column disagrees with accrued − used surfaces as a **non-blocking amber note** on the review
+  screen — shared `flooredRowNotes()`, so the packet and leave screens explain the same employee the
+  same way. Nothing derives a leave balance any more.
+- 🔴 **The packet gate had NO sick check before 2026-08-10** — `PACKET_SCHEMA.printedTotals` carried
+  only the vacation trio, so `sickAccrued/Used/Available` were written to `Employees` unverified from
+  day one. Added with the printed-column switch: packet reconcile is now **10 checks** (4 money/count
+  + 6 leave), matching the leave gate's coverage of the same report.
+- 🔴 **The printed-column switch BROKE the printable slips, and had to be fixed in
+  `vacation-carryover.js`.** Its blocking `identity-failed` flag compared the entitlement algebra
+  straight against `Vacation_Hours_Remaining`, which was safe only while the import derived that
+  column. With the printed value, **Taneisha's slip stopped printing** — she is short of her one-year
+  anniversary, so `entitlementInForce()` forces the entitlement to **0**, the carryover clamp is
+  inert, and the old check passed exactly (−16 vs −16). She printed before, blocked after.
+  ⚠️ Do not trust the "the clamp fires anyway" argument — it does not hold for a new hire.
+- ✅ **Fix: the one comparison became two.** `algebraOff` = does the entitlement/carryover maths land
+  on `available − used`; `importOff` = does the imported `remaining` contradict `available − used`.
+  Both still **block**. Exempted narrowly: over-drawn on the arithmetic **AND** printed as exactly
+  zero → `floored-remaining`, severity **warn**, slip still prints. A bogus floor (`remaining: -16`
+  where the arithmetic says 40) and a non-over-drawn `remaining: 0` both still block.
+- 📄 **The slip explains the floor in plain English** — `buildSlips()` adds *"This shows 0.00 because
+  the payroll report does not print a negative balance…"* when `floored-remaining` is present and the
+  employee is past their anniversary (a new hire gets the existing "vacation resets on…" note first).
+  Verified on paper through the harness, both branches.
+- 🧪 `tests/unit/vacation-carryover.test.js` — 63 pre-existing tests still pass **unchanged** (that is
+  the proof the guards were not weakened), plus 11 new ones (floored shape, anniversary, 2027 reset).
+
+### 9a. A new hire's vacation arrives in TWO stages (Erik, 2026-08-10)
+
+Not derivable from the code or the packet — Erik stated it: a new employee gets a **pro-rated grant
+on their one-year anniversary**, then joins the **company-wide 1 January reset**, "so she is on track
+with all the other employees". **Taneisha Clark: 40 hours on 2026-08-12, then her 2027 hours on
+2027-01-01.**
+
+- 🔑 **Stage two needs no code.** `Vacation_Eligible_Date` is a ONE-TIME gate — `entitlementInForce()`
+  forces the entitlement to 0 only while the **balance date** is before it, then returns the stored
+  value forever after. The hand-off to the normal calendar cycle is automatic.
+- 🔑 **The gate compares the BALANCE date to the anniversary, NOT today.** So entitlement and balances
+  move together and there is no window where a granted entitlement meets stale balances… with one
+  exception below.
+- ⚠️ **DATED EXPOSURE:** if the first packet dated on/after 2026-08-12 has **not yet posted her 40
+  hours**, entitlement flips to 40 against an imported accrual of 0 → `identity-failed`, **no slip**.
+  Pinned by a test so it reads as intent, not accident. Re-check after the next import.
+- 🔴 **1 Jan 2027, a human must act:** `Vacation_Annual_Entitlement` is hand-maintained and never
+  written by the import. If her 2027 grant differs from 40 and the column is left stale, a grant that
+  went UP blocks loudly (`used-below-zero`) — but a stale value that stays **at or above** remaining
+  is **self-consistent and undetectable**, and prints a wrong number. See §7's own warning.
+- Her Caspio record must read: `Vacation_Eligible_Date` **2026-08-12**, `Vacation_Eligible_Hours`
+  **40**, `Vacation_Annual_Entitlement` **40**. With those, her current slip prints
+  *"Your vacation resets on 2026-08-12, your one-year anniversary, when you receive 40 hours."*
+- Extraction checksum for the 2026-08-07 page: vacation **1112:00 / 796:00 / 332:00**, sick
+  **937:10 / 460:00 / 477:10**, 21 employees. Locked in `tests/jest/payroll-leave-reconcile.test.js`
+  (proxy) with every row, so a prompt or schema change that breaks the read fails a test.
+- The page is behind SAML + the `payroll.html` `Staff_Page_Access` row, so the review screen cannot be
+  eyeballed locally. `tests/ui/payroll-review-harness.html` (app repo) mounts the **real** markup and
+  **real** `payroll.js` with only `fetch` stubbed — serve the repo root via the `static-qa` launch
+  entry and open it.
+- 🔑 Parse jobs are **in-memory with a 30-minute TTL**, and `jobId` is a plain JS variable: reloading
+  the page loses the review and the Save button even though the server still holds the parsed payload.
+  There is no way back to it — re-read the file.

@@ -4,6 +4,77 @@ Resolved entries aged out of `LESSONS_LEARNED.md` (300-line cap). Newest first. 
 
 ---
 
+## A page size counted DESIGNS while the table stores design×LOCATION (2026-08-06)
+
+**Problem.** After the artwork fix shipped, the SanMar inbound sheet still showed the 🎨 "no
+logo" tile for 6 of 18 orders. Erik's read: "probably no thumbnail in ShopWorks yet." True for
+2 of them; the other 4 had artwork the whole time.
+
+**Root cause.** `proxy src/routes/thumbnails.js` `/thumbnails/by-designs` built its Caspio page
+as `'q.limit': uncachedIds.length`. `Shopworks_Thumbnail_Report` is keyed
+`Thumb_DesLocid_Design` — **one row per design PER LOCATION** — so 18 designs can match far more
+than 18 rows. Caspio truncated the page, every design past the cut was reported `found:false`,
+and that wrong answer was then cached for the 5-minute TTL. Rows arrive in serial order, so the
+designs dropped were the NEWEST — exactly what an inbound sheet is made of, which is why it
+looked like a bandit/ShopWorks sync lag. Fixed to `min(1000, ids × 25)`; live batch went 12 → 16
+of 18 found, and the 2 remaining genuinely have no row.
+
+**Prevention.**
+- 🔑 **Size a page by the ROWS it can return, not the KEYS you asked for.** Any `q.limit` derived
+  from an input count is wrong the moment the table is one-to-many.
+- 🔴 **Truncation that reports `found:false` is indistinguishable from real absence** — and here
+  it was cached, so it persisted. A short page should be detected and retried/raised, never
+  reinterpreted as "no data".
+- ⚠️ **My own probe was the broken instrument twice.** A 33-id sweep read `.thumbnails` off a
+  400 body (`Maximum 20 design IDs`) and printed "all missing"; earlier runs disagreed with each
+  other for the same reason. **Check the HTTP status before parsing.** The finding only became
+  real when single-id queries returned artwork the batch had denied.
+- 🔑 A mock that ignores `q.limit` cannot catch this — the regression test makes the fake Caspio
+  honour the limit, so it fails against the old code (verified by reverting).
+- 🔑 **Same route file, same disease: `/thumbnails/sync-status` reported `totalRecords: 20000`,
+  which was `maxPages 20 × 1000` — the CAP, presented as a count** (true size 27,665). It also
+  counted `recordsWithImages` off **`ExternalKey`, the retired Caspio Files key**, so it answered
+  "0 of 20,000 have images" about a table where 26,990 do — artwork moved to Box and lives in
+  `FileUrl`. **A metric outliving its schema reads as a catastrophe rather than a stale field.**
+  Now counts `ExternalKey || FileUrl`, `strict: true` so truncation throws, and counts are opt-in
+  behind `?counts=true` (a count means ~28 Caspio reads; `lastSync` is one).
+- 🔑 **Caspio v2 does NOT return `TotalRecords`** on a `q.limit=1` read — the body is just
+  `Result`, and `makeCaspioRequest` strips even that. There is no cheap COUNT; verify before
+  designing around one. Use `discardResults: true` + `pageCallback` to count without holding
+  27k rows in dyno memory.
+- 🔑 **`lastSync` is the field that actually answers "is the sync stalled?"** — it showed the
+  bandit thumbnail sync running 09:22 the same morning, which proved the two remaining blank
+  designs had no artwork attached in ShopWorks rather than a sync lag.
+- 🔑 **The inbound sheet has THREE artwork states, not two**: has art · has a design but no art
+  (a real gap) · **no design at all** (blanks/undecorated, `method: "Other"`, empty
+  `designNumber` — nothing is missing). Rendering the last two identically sent people hunting
+  for artwork that never existed: on 2026-08-05, 3 of 4 "missing" tiles were blanks orders.
+  Blanks now get their own glyph + solid tile; **the glyph must differ, not just the tooltip,
+  because the printed sheet has none.**
+- ⚠️ **Screen and print do NOT share the logo tile** — `logoTile()` vs `psLogo` in the print
+  builders. Fixing one leaves the other; print used to render *nothing* for both no-image cases,
+  so a missing proof, a blanks order and a failed image were indistinguishable on paper.
+- 🔑 **These sheets go to a MONO LASER** (the `.sit-ps-rush` rule says so). On paper the signal
+  must be shape/text, never colour — and a 42px emoji is a smudge. Print uses the words `NO ART`
+  (dashed border, black) and `BLANKS` (solid, flat fill + `print-color-adjust: exact`, since
+  browsers drop backgrounds when printing).
+- 🔴 **`window.print()` SNAPSHOTS the DOM — an `<img>` still in flight is simply absent from the
+  PDF.** No error, no gap, nothing to notice. The sheet builds fresh `<img>` tags and the screen
+  tiles are `loading="lazy"`, so only orders the user had scrolled past were warm: everything
+  below the fold silently lost its thumbnail. Measured on a real AE sheet — **7 POs with artwork,
+  3 images in the PDF**; and cold-loading the full sheet, only **8 of 16** screen tiles were warm.
+  Fix: `await img.decode()` on every sheet image before printing (`decode()` resolves when the
+  bitmap can PAINT; `load` can fire a frame earlier — that frame is where this lived), capped at
+  6s so a dead Box file degrades to the old behaviour instead of hanging the dialog. After: 14/14
+  decoded, 0 missing, 4.5s wait. 🔑 **This masqueraded as the artwork bug being only half-fixed —
+  two different causes producing the same "missing thumbnail".**
+- ⚠️ **A fixture with a real Box url would 401 offline** and silently exercise the FALLBACK path
+  while looking like it covered the image case — the print harness uses a `data:` URI instead.
+  Note `/tests` is not served (removed in the 2026-08-05 source-exposure fix), so that harness
+  only runs from disk; verify print by stubbing `window.print` on the real page and grabbing
+  `#sit-print-sheet` before its 1.5s self-cleanup removes it.
+
+---
 ## Monogram thread-color dropdown dead in prod: API envelope change nobody re-tested (2026-08-04)
 
 **Problem.** The monogram form's thread-color selector had been silently broken live:
