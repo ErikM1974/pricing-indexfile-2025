@@ -260,12 +260,42 @@
                 + 'or a colour with no photograph behind it — not a reason to draw something new.'));
         }
 
+        // 🔴 The crawler floor, and the reason this block is worded so carefully. An earlier
+        // version of this panel announced "38 live designs got no traffic at all". It was
+        // false — every product had traffic; the query behind it was capped at 60 rows and
+        // everything quieter than the cut looked like a zero. What is actually true is
+        // duller and more useful: most of the catalogue sits on an identical session count,
+        // which is a machine, not an audience.
+        if (block.crawlerFloor && block.crawlerFloor.count) {
+            wrap.appendChild(notice('warn',
+                block.crawlerFloor.count + ' designs sit at ' + block.crawlerFloor.sessions + ' sessions — a crawler floor, not readers',
+                ['Real visitor counts spread out. When this many products land on the SAME number it is '
+                 + 'automated traffic, so treat these as effectively undiscovered rather than lightly '
+                 + 'visited. They are published, in collections and carry full SEO fields — nothing is '
+                 + 'misconfigured. Nothing points at them. Starting with: '
+                 + block.crawlerFloor.sample.slice(0, 4).map(function (x) { return x.title; }).join('; ')]));
+        }
+
+        // Only ever shown when the query saw the whole tail. Absence from a truncated list
+        // is not evidence of zero, and saying so out loud is cheaper than being wrong twice.
         if (block.noTraffic && block.noTraffic.count) {
             wrap.appendChild(notice('warn', block.noTraffic.count + ' live designs got no traffic at all',
-                ['Nobody landed on them once in 90 days. That is findability, and it is the opposite '
-                 + 'problem to the list above: those pages need to exist in search before anything '
-                 + 'else about them matters. Starting with: '
+                ['Nobody landed on them once in 90 days — and the landing-page query DID reach the '
+                 + 'bottom of the list, so this is a real zero rather than a reporting gap. '
                  + block.noTraffic.sample.slice(0, 4).map(function (x) { return x.title; }).join('; ')]));
+        } else if (block.noTraffic && block.noTraffic.unknown) {
+            wrap.appendChild(notice('warn', 'Cannot tell which designs are unvisited',
+                [block.noTraffic.note]));
+        }
+
+        if (block.coverage) {
+            wrap.appendChild(el('p', 'dq-notice-line',
+                'Coverage: ' + block.coverage.productsSeen + ' of ' + block.coverage.activeProducts
+                + ' live products appeared in the landing-page data'
+                + (block.coverage.truncated
+                    ? ' — but the query was TRUNCATED at ' + block.coverage.lowestSessions
+                      + ' sessions, so quieter pages are missing rather than absent.'
+                    : ', and the query reached the bottom of the list.')));
         }
 
         return wrap;
