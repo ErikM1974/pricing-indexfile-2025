@@ -21,6 +21,10 @@
   var statusEl = document.getElementById('pr-status');
   var jobId = null;
   var pollTimer = null;
+  // True only between "the upload was accepted" and "the poll came back done/error". Lets
+  // resetReview() tell an ABANDONED read apart from a finished one, so cancelling says so
+  // while a successful save keeps its own message.
+  var parsing = false;
   var allEmployees = [];
   // employee record -> its computed slip figures + flags. Keyed by object identity rather
   // than payroll ID, which 8 of the 29 Employees rows don't have. Rebuilt on every load so
@@ -297,10 +301,28 @@
   });
 
   function resetReview() {
+    // 🔴 THIS ABANDONS AN IN-FLIGHT READ, and it is reachable from the Document dropdown,
+    // the file picker and Discard — all of which stay live while a read is running. On
+    // 2026-08-10 that stranded the page in production: the poll chain was killed mid-read,
+    // so parseBtn (disabled on click, re-enabled only inside the poll callback) stayed
+    // DISABLED, and the status line went on claiming "Uploading and reading…" forever. The
+    // server had the answer the whole time. A cancelled read must say so and hand the button
+    // back, or the page is simply stuck with no way out but a reload.
+    var wasParsing = parsing;
+    var hadReview = !reviewEl.hidden;
+    parsing = false;
     jobId = null;
     if (pollTimer) { clearTimeout(pollTimer); pollTimer = null; }
     reviewEl.hidden = true;
     commitBtn.disabled = true;
+    // Throwing away a running read OR a rendered review both leave the status line
+    // describing something that is no longer on screen. Callers that set their own message
+    // (read, discard, save) do it straight after and overwrite this.
+    if (wasParsing || hadReview) {
+      parseBtn.disabled = !(fileInput.files && fileInput.files[0]);
+      setStatus((wasParsing ? 'That read was cancelled before it finished.' : 'That review was discarded.')
+        + ' Click ' + (modeEl.value === 'leave' ? 'Read page' : 'Read packet') + ' to start again.', 'info');
+    }
   }
 
   discardBtn.addEventListener('click', function () {
@@ -334,6 +356,7 @@
         body: JSON.stringify({ filename: f.name, dataBase64: b64, mode: modeEl.value }),
       });
       jobId = started.jobId;
+      parsing = true;
       pollParse();
     } catch (e) {
       parseBtn.disabled = false;
@@ -347,10 +370,12 @@
       try {
         var res = await api('/parse/' + encodeURIComponent(jobId));
         if (res.status === 'running') return pollParse();
+        parsing = false;
         parseBtn.disabled = false;
         if (res.status === 'error') return setStatus('Could not read the packet: ' + res.error, 'error');
         renderReview(res.review);
       } catch (e) {
+        parsing = false;
         parseBtn.disabled = false;
         setStatus('Could not read the packet: ' + e.message, 'error');
       }
@@ -470,12 +495,14 @@
         ? 'Saved leave balances for ' + res.imported + ' of ' + res.total + ' employees, as of '
           + res.effectiveDate + '. No pay period was created.'
         : 'Saved ' + res.imported + ' of ' + res.total + ' employees for ' + res.checkDate + '.';
+      // resetReview() FIRST — it clears the status when it hides a rendered review, so the
+      // save result has to be written after it or it gets wiped by the tidy-up.
+      resetReview();
       if (res.failures && res.failures.length) {
         setStatus(msg + ' ' + res.failures.length + ' row(s) failed: ' + res.failures.join('; '), 'error');
       } else {
         setStatus(msg, 'ok');
       }
-      resetReview();
       fileInput.value = '';
       noteEl.textContent = '';
       loadLeave();

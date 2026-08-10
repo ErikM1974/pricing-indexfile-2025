@@ -187,6 +187,10 @@
 
   // --- network stub --------------------------------------------------------
   var realFetch = window.fetch.bind(window);
+  var pollCounts = {};
+  // ~9s of "running" before the review lands, like production. Override with ?running=N to
+  // widen the window when testing what happens if a read is interrupted mid-flight.
+  var RUNNING_POLLS = Number(new URLSearchParams(location.search).get('running') || 3);
 
   // The print button ends in window.print() plus a CSV download. Neither belongs in a
   // harness run — stub them so the slip markup can be inspected without a print dialog.
@@ -205,7 +209,17 @@
     var u = String(url);
     if (u.indexOf('/api/crm-proxy/payroll') === -1) return realFetch(url, opts);
 
-    if (/\/parse\/[^/]+$/.test(u)) return json({ status: 'done', review: currentReview() });
+    // 🔑 Answers "running" for the first few polls, like the real thing. The stub used to
+    // return done on poll #1, so the harness never exercised the poll chain at all — which
+    // is how a bug that KILLS that chain (cancelling a read left the page stuck with the
+    // button disabled) shipped to production on 2026-08-10 past a green harness run.
+    if (/\/parse\/[^/]+$/.test(u)) {
+      var id = u.split('/').pop();
+      pollCounts[id] = (pollCounts[id] || 0) + 1;
+      say('poll ' + pollCounts[id] + ' for ' + id);
+      if (pollCounts[id] <= RUNNING_POLLS) return json({ status: 'running' });
+      return json({ status: 'done', review: currentReview() });
+    }
     if (/\/parse$/.test(u)) {
       var body = {};
       try { body = JSON.parse((opts && opts.body) || '{}'); } catch (e) { /* ignore */ }
