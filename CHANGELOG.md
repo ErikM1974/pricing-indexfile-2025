@@ -1,3 +1,15 @@
+## v2026.08.10.7 (2026.08.10)
+
+- Memory: sample-request routing diagnosis (free samples are email-only, never reach Leads)
+- feat(leads): free sample requests become leads so a rep follows up
+- docs(memory): Taneisha confirmed as sample-request catch-all rep
+- feat(payroll): upload the vacation/sick page on its own, without minting a pay period
+- docs(payroll): the import no longer derives leave remaining — correct the invariant
+- fix(payroll): the printed-column switch stopped a real slip printing — unbreak it
+- test(payroll): pin Taneisha's anniversary and the 1 January reset
+- Merge payroll leave-only upload + sample-request leads into develop
+- Deploy v2026.08.10.7: 8 files (form-submissions.html,lead.html,leads.html,...)
+
 ## v2026.08.10.6 (2026.08.10)
 
 - Past Due Orders nav: a real icon, and a badge that knows when it doesn't know
