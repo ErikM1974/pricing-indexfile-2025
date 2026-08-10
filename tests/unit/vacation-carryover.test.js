@@ -556,3 +556,100 @@ describe('a balance the packet floors at zero', () => {
     expect(r.printable).toBe(false);
   });
 });
+
+/**
+ * The anniversary hand-over (Erik, 2026-08-10: Taneisha's year starts 2026-08-12, 40 hours).
+ *
+ * 🔑 entitlementInForce() compares the BALANCE date to the eligibility date, NOT the wall
+ * clock — so the entitlement flips the moment a packet dated on or after the anniversary is
+ * imported, and it flips whether or not that packet actually posted the grant. Balances and
+ * entitlement therefore move together, which is what keeps the changeover safe.
+ */
+describe('crossing a one-year anniversary', () => {
+  const taneisha = (asOf, available, used, remaining) => build({
+    Leave_Balances_As_Of: asOf,
+    Vacation_Annual_Entitlement: 40,
+    Vacation_Eligible_Date: '2026-08-12',
+    Vacation_Eligible_Hours: 40,
+    Vacation_Hours_Available: available,
+    Vacation_Hours_Used: used,
+    Vacation_Hours_Remaining: remaining,
+  });
+
+  test('balances predating the anniversary still print, entitlement held at 0', () => {
+    const r = taneisha('2026-08-07', 0, 16, 0);
+    expect(r.entitlement).toBe(0);
+    expect(r.printable).toBe(true);
+    expect(r.slip).toEqual({ accrued: 0, used: 16, remaining: 0 });
+  });
+
+  test('once a packet posts the 40-hour grant it prints normally', () => {
+    const r = taneisha('2026-08-21', 40, 16, 24);
+    expect(r.entitlement).toBe(40);
+    expect(r.printable).toBe(true);
+    expect(r.slip).toEqual({ accrued: 40, used: 16, remaining: 24 });
+    expect(r.flags).toEqual([]);
+  });
+
+  // ⚠️ KNOWN, DATED EXPOSURE — pinned deliberately, not an accident. If the first packet
+  // dated on/after 2026-08-12 has NOT yet posted her 40 hours, the entitlement flips to 40
+  // against an imported accrual of 0 and the slip BLOCKS. Printing 40 accrued / 16 used /
+  // 0 remaining would be worse — it contradicts itself on paper — but the operator sees only
+  // "no slip", so this is the case to re-check after the next import.
+  test('a post-anniversary packet that has not posted the grant blocks, by design', () => {
+    const r = taneisha('2026-08-21', 0, 16, 0);
+    expect(r.entitlement).toBe(40);
+    expect(r.printable).toBe(false);
+    expect(codes(r)).toContain('identity-failed');
+    expect(codes(r)).toContain('negative-carryover');
+  });
+});
+
+/**
+ * The 2027 calendar reset (Erik, 2026-08-10). A new hire's vacation comes in TWO stages:
+ * a pro-rated grant on their one-year anniversary, then the normal 1 January company-wide
+ * reset — "so she is on track with all the other employees". Taneisha: 40 hours on
+ * 2026-08-12, then her 2027 hours on 2027-01-01.
+ *
+ * 🔑 Nothing in the code models stage two, and nothing needs to. Vacation_Eligible_Date is a
+ * ONE-TIME gate: once it is in the past, entitlementInForce() just returns the stored
+ * entitlement and she is an ordinary employee. The hand-off is automatic.
+ *
+ * ⚠️ What is NOT automatic is Vacation_Annual_Entitlement — hand-maintained, never written by
+ * the import. If her 2027 grant differs from her 2026 one it must be updated on 1 January.
+ */
+describe('the 1 January reset that follows the anniversary', () => {
+  const jan2027 = (entitlement, available, used, remaining) => build({
+    Leave_Balances_As_Of: '2027-01-08',
+    Vacation_Eligible_Date: '2026-08-12', // last year's anniversary — now inert
+    Vacation_Eligible_Hours: 40,
+    Vacation_Annual_Entitlement: entitlement,
+    Vacation_Hours_Available: available,
+    Vacation_Hours_Used: used,
+    Vacation_Hours_Remaining: remaining,
+  });
+
+  test('the anniversary gate goes inert once its date is past', () => {
+    const r = jan2027(40, 40, 0, 40);
+    expect(r.entitlement).toBe(40); // no longer forced to 0
+    expect(r.printable).toBe(true);
+    expect(r.slip).toEqual({ accrued: 40, used: 0, remaining: 40 });
+    expect(r.flags).toEqual([]);
+  });
+
+  test('a December 2026 carryover cancels out of her slip like anyone else\'s', () => {
+    // 8 hours taken in Dec 2026 but paid on a January check inflate BOTH accrued and used.
+    const r = jan2027(40, 48, 8, 40);
+    expect(r.carryover).toBe(8);
+    expect(r.slip).toEqual({ accrued: 40, used: 0, remaining: 40 });
+    expect(r.printable).toBe(true);
+  });
+
+  // 🔴 The one thing a human has to do. If her 2027 grant rises to 80 and the entitlement is
+  // left at 40, the slip does NOT quietly print a wrong number — used-below-zero blocks it.
+  test('a stale entitlement against a bigger 2027 grant blocks, it does not print', () => {
+    const r = jan2027(40, 80, 0, 80);
+    expect(r.printable).toBe(false);
+    expect(codes(r)).toContain('used-below-zero');
+  });
+});

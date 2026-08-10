@@ -164,10 +164,12 @@
     },
     {
       // 🔴 The floored row: 0 accrued, 16 used, packet prints 00:00 rather than -16:00.
-      // Short of her one-year anniversary, so the entitlement is forced to 0.
+      // Real record (Erik, 2026-08-10): one-year anniversary 2026-08-12, grant 40 hours. The
+      // 8/07 balances predate it, and entitlementInForce() compares the BALANCE date to the
+      // anniversary — not today — so her entitlement is still 0 here and the slip prints.
       Payroll_Employee_ID: 6391, Employee_Full_Name: 'Taneisha Clark',
       Leave_Balances_As_Of: '2026-08-07', Vacation_Annual_Entitlement: 40,
-      Vacation_Eligible_Date: '2027-03-01', Vacation_Eligible_Hours: 40,
+      Vacation_Eligible_Date: '2026-08-12', Vacation_Eligible_Hours: 40,
       Vacation_Hours_Available: 0, Vacation_Hours_Used: 16, Vacation_Hours_Remaining: 0,
       Sick_Accum_Hours_Available: 38.4333, Sick_Hours_Used: 78.5, Sick_Hours_Remaining: -40.0667,
     },

@@ -380,7 +380,31 @@ The uploader takes **two document shapes**, declared by the caller as `mode` on 
   employee is past their anniversary (a new hire gets the existing "vacation resets on…" note first).
   Verified on paper through the harness, both branches.
 - 🧪 `tests/unit/vacation-carryover.test.js` — 63 pre-existing tests still pass **unchanged** (that is
-  the proof the guards were not weakened), plus 5 new ones for the floored shape.
+  the proof the guards were not weakened), plus 11 new ones (floored shape, anniversary, 2027 reset).
+
+### 9a. A new hire's vacation arrives in TWO stages (Erik, 2026-08-10)
+
+Not derivable from the code or the packet — Erik stated it: a new employee gets a **pro-rated grant
+on their one-year anniversary**, then joins the **company-wide 1 January reset**, "so she is on track
+with all the other employees". **Taneisha Clark: 40 hours on 2026-08-12, then her 2027 hours on
+2027-01-01.**
+
+- 🔑 **Stage two needs no code.** `Vacation_Eligible_Date` is a ONE-TIME gate — `entitlementInForce()`
+  forces the entitlement to 0 only while the **balance date** is before it, then returns the stored
+  value forever after. The hand-off to the normal calendar cycle is automatic.
+- 🔑 **The gate compares the BALANCE date to the anniversary, NOT today.** So entitlement and balances
+  move together and there is no window where a granted entitlement meets stale balances… with one
+  exception below.
+- ⚠️ **DATED EXPOSURE:** if the first packet dated on/after 2026-08-12 has **not yet posted her 40
+  hours**, entitlement flips to 40 against an imported accrual of 0 → `identity-failed`, **no slip**.
+  Pinned by a test so it reads as intent, not accident. Re-check after the next import.
+- 🔴 **1 Jan 2027, a human must act:** `Vacation_Annual_Entitlement` is hand-maintained and never
+  written by the import. If her 2027 grant differs from 40 and the column is left stale, a grant that
+  went UP blocks loudly (`used-below-zero`) — but a stale value that stays **at or above** remaining
+  is **self-consistent and undetectable**, and prints a wrong number. See §7's own warning.
+- Her Caspio record must read: `Vacation_Eligible_Date` **2026-08-12**, `Vacation_Eligible_Hours`
+  **40**, `Vacation_Annual_Entitlement` **40**. With those, her current slip prints
+  *"Your vacation resets on 2026-08-12, your one-year anniversary, when you receive 40 hours."*
 - Extraction checksum for the 2026-08-07 page: vacation **1112:00 / 796:00 / 332:00**, sick
   **937:10 / 460:00 / 477:10**, 21 employees. Locked in `tests/jest/payroll-leave-reconcile.test.js`
   (proxy) with every row, so a prompt or schema change that breaks the read fails a test.
