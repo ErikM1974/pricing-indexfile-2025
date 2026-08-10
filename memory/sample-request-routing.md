@@ -105,9 +105,11 @@ reps keep the old JS and none of this appears: `leads-common.js` (referenced by 
    confirm an `SRQ…` card on `/dashboards/leads.html`.**
 2. A lead POST failure logs to the **customer's** browser console — nobody sees it. Worst case is
    today's behaviour (both emails still fire), so it degrades, it doesn't lose data.
-3. **Auto-assign may never match.** `assignLead` resolves via `CompanyContactsMerge2026` by email;
-   sample requesters tend to use consumer domains, so most will fall to the **Taneisha default**.
-   Erik's call whether she's the right catch-all.
+3. **Auto-assign will mostly NOT match, and that is fine.** `assignLead` resolves via
+   `CompanyContactsMerge2026` by email; sample requesters tend to use consumer domains, so most
+   fall to the **Taneisha default** (`proxy:src/utils/jotform.js:45` `DEFAULT_LEAD_REP`).
+   ✅ **Erik confirmed 2026-08-10: Taneisha IS the intended catch-all** — no code change; a
+   customer who matches an existing contact still routes to their own rep.
 4. Slack/rep email only fire if `SLACK_FORM_LEADS_WEBHOOK_URL` is set — `notifyFormLead` is a
    silent no-op otherwise. Watch the proxy logs on the first one.
 5. The 06:30 PT AI classifier now sees these rows — check `/dashboards/unqualified-leads.html`
