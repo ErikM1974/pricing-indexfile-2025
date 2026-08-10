@@ -1,3 +1,8 @@
+## v2026.08.10.9 (2026.08.10)
+
+- feat(payroll): show the read working, and bring the finished review to the operator
+- Deploy v2026.08.10.9: 2 files (payroll.html, payroll-review-harness.html)
+
 ## v2026.08.10.8 (2026.08.10)
 
 - fix(payroll): cancelling a read left the page stuck with no way out
