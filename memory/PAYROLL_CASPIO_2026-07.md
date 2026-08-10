@@ -353,12 +353,21 @@ The uploader takes **two document shapes**, declared by the caller as `mode` on 
 - 🔑 **`Hrs Avail.` is a printed column, not accrued − used.** The report floors an over-drawn balance
   at `00:00` instead of printing a negative. On the 2026-08-07 page that is **Taneisha Clark** (0
   accrued, 16 used, printed `00:00`) — and it is the whole reason the vacation totals read
-  **1112 / 796 / 332** when 1112 − 796 = 316. Leave mode saves the printed figure into
-  `Vacation_Hours_Remaining` / `Sick_Hours_Remaining`; a mismatch surfaces as a **non-blocking note**
-  on the review screen rather than being silently resolved.
-- ⚠️ **The `packet` path still derives remaining as accrued − used** — deliberately left alone, since
-  changing it moves balances on the monthly import too. If both paths are used on the same period they
-  will disagree for exactly the floored rows.
+  **1112 / 796 / 332** when 1112 − 796 = 316.
+- ✅ **BOTH paths save the printed figure** into `Vacation_Hours_Remaining` / `Sick_Hours_Remaining`
+  (Erik, asked directly 2026-08-10: *"exactly what Liesls payroll packet says"*). A row where the
+  printed column disagrees with accrued − used surfaces as a **non-blocking amber note** on the review
+  screen — shared `flooredRowNotes()`, so the packet and leave screens explain the same employee the
+  same way. Nothing derives a leave balance any more.
+- 🔴 **The packet gate had NO sick check before 2026-08-10** — `PACKET_SCHEMA.printedTotals` carried
+  only the vacation trio, so `sickAccrued/Used/Available` were written to `Employees` unverified from
+  day one. Added with the printed-column switch: packet reconcile is now **10 checks** (4 money/count
+  + 6 leave), matching the leave gate's coverage of the same report.
+- ⚠️ **`vacation-carryover.js` no longer has a tautological identity check.** Its blocking
+  `identity-failed` flag was documented as inert because the import wrote remaining as exactly
+  accrued − used. It doesn't any more. No new block appears (a floored row fails `E − U` vs `A − U`
+  when `A < E` either way), but a mismatch there can now legitimately mean *the packet disagrees with
+  its own arithmetic* rather than *our entitlement is stale*.
 - Extraction checksum for the 2026-08-07 page: vacation **1112:00 / 796:00 / 332:00**, sick
   **937:10 / 460:00 / 477:10**, 21 employees. Locked in `tests/jest/payroll-leave-reconcile.test.js`
   (proxy) with every row, so a prompt or schema change that breaks the read fails a test.

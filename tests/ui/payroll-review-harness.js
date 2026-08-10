@@ -115,8 +115,15 @@
           check('Vacation accrued', 80, 80),
           check('Vacation used', 72, 72),
           check('Vacation available', 24, 24),
+          // Sick joined the packet gate on 2026-08-10, alongside saving the printed column.
+          check('Sick accrued', hm(147, 50), hm(147, 50)),
+          check('Sick used', hm(78, 30), hm(78, 30)),
+          check('Sick available', hm(69, 20), hm(69, 20)),
         ],
         rowIssues: [],
+        // A floored row is noted on this path too — both gates share flooredRowNotes().
+        notes: ['CLARK TANEISHA: vacation available is printed as 0h, but accrued minus used '
+          + 'is -16h — saving the printed 0h'],
         passed: true,
       },
     };

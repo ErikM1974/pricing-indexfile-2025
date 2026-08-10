@@ -207,11 +207,18 @@
     // §7.1 — assert it, but do NOT rely on it to validate the entitlement.
     // 🔴 Whenever entitlement <= available the max() clamp is inert, so
     //      accrued − used = E − (U − (A − E)) = A − U
-    // and the entitlement CANCELS OUT. The import writes Vacation_Hours_Remaining as
-    // exactly r2(accrued − used), so in that regime this check is a tautology. It has real
-    // power in only two places: when the clamp fires (entitlement above accrued, §7.3), and
-    // when the imported figures contradict each other. The used-below-zero guard above is
-    // what covers the other direction.
+    // and the entitlement CANCELS OUT. It has real power in only two places: when the clamp
+    // fires (entitlement above accrued, §7.3), and when the imported figures contradict each
+    // other. The used-below-zero guard above is what covers the other direction.
+    //
+    // ⚠️ CHANGED 2026-08-10 — this is no longer a tautology. The import used to write
+    // Vacation_Hours_Remaining as exactly r2(accrued − used); it now writes the PRINTED
+    // "Hrs Avail." column from the packet (Erik: save "exactly what Liesls payroll packet
+    // says"). The two differ only where the report floors an over-drawn balance at 00:00
+    // rather than printing a negative — and such a row already trips this check anyway, via
+    // E − U against A − U with A < E, so no NEW block was introduced. But remaining is now an
+    // independently printed figure, so a mismatch here can legitimately mean "the accountant's
+    // page disagrees with its own arithmetic" rather than "our entitlement is wrong".
     var identity = round2(slip.accrued - slip.used);
     if (Math.abs(identity - slip.remaining) > TOLERANCE + 1e-9) {
       flags.push({

@@ -259,6 +259,19 @@ its own prompt, and `reconcileLeave()`, which checks all six leave columns again
   prints `Hrs Avail.` as a column; the importer recomputed it as accrued − used. Those differ whenever
   the report floors an over-drawn balance at zero (Taneisha Clark: 0 accrued, 16 used, printed 0, not
   −16) — the entire 16-hour gap between the 1112/796 and 332 totals. **Save the printed column, don't
-  re-derive it.** The packet path still derives it; that is a known, deliberate leftover.
+  re-derive it.** Erik, asked directly 2026-08-10: *"exactly what Liesls payroll packet says"* —
+  **both** paths now save it.
+- 🔑 **"It's already validated" is worth one grep.** Extending the printed-column rule to the packet
+  path looked like a two-line edit because `reconcile()` checks `Vacation available`. It has **no sick
+  check at all** — `PACKET_SCHEMA.printedTotals` carried only vacation, so all three sick figures had
+  been reaching `Employees` unverified since the uploader shipped. Saving the printed sick column
+  without fixing that would have traded a derived-but-consistent number for an unchecked one. The
+  packet gate went from 7 checks to 10.
+- 🔑 **Changing what a column MEANS can invalidate a comment three files away.**
+  `vacation-carryover.js` guarded its blocking `identity-failed` flag with *"the import writes
+  Vacation_Hours_Remaining as exactly r2(accrued − used), so this check is a tautology"*. That premise
+  is now false. The algebra says no NEW block appears (a floored row already fails `E − U` vs `A − U`
+  when `A < E`), but a stale comment asserting an invariant you just removed is how the next person
+  mis-diagnoses it.
 
 ---
