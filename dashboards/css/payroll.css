@@ -79,6 +79,23 @@ body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Ro
 .pr-file { font-size: .9rem; font-family: inherit; }
 .pr-note { font-size: .85rem; color: #5a665e; }
 
+/* Busy indicator for the packet read. The read takes ~40s, and a greyed-out button with no
+   motion reads as BROKEN rather than working — Erik, 2026-08-10, having just been burned by a
+   read that genuinely was dead. Motion is the part that says "still alive"; the seconds
+   counter is the part that says "and it is making progress".
+   🔑 display:inline-flex would BEAT the UA's [hidden]{display:none}, so the attribute alone
+   would not hide it — the explicit [hidden] rule is what makes it actually disappear. */
+.pr-progress { display: inline-flex; align-items: center; gap: .45rem; font-size: .85rem; font-weight: 600; color: #3a4a42; }
+.pr-progress[hidden] { display: none; }
+.pr-spin {
+  width: .85em; height: .85em; flex: none;
+  border: 2px solid #cfdad3; border-top-color: #1a472a; border-radius: 50%;
+  animation: pr-spin .7s linear infinite;
+}
+@keyframes pr-spin { to { transform: rotate(360deg); } }
+/* Still turns, just slowly — a frozen ring next to "reading…" would read as hung. */
+@media (prefers-reduced-motion: reduce) { .pr-spin { animation-duration: 2.4s; } }
+
 .pr-btn { background: #e7ede9; border: none; color: #2c3b33; padding: .55rem 1.1rem; border-radius: 7px; font-weight: 600; font-size: .92rem; cursor: pointer; font-family: inherit; }
 .pr-btn:hover:not(:disabled) { background: #d8e3dc; }
 .pr-btn:disabled { opacity: .5; cursor: not-allowed; }
