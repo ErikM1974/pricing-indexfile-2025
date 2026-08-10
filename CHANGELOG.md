@@ -1,3 +1,8 @@
+## v2026.08.10.3 (2026.08.10)
+
+- Design Queue: reference photographs on the brief, credit under each
+- Deploy v2026.08.10.3: cache-bust brief gallery
+
 ## v2026.08.10.2 (2026.08.10)
 
 - Design Queue: direct image links, and the Hi-Ho logo
