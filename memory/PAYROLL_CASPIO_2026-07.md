@@ -335,3 +335,37 @@ at which point it must enforce **admin** server-side (role from `Staff_App_Roles
 the `Staff_Page_Access` page gate. Per-period maintenance needs no API at all: add the new packet's
 figures to `import-payroll-packet.js` and re-run — the reconciliation gate rejects anything that
 doesn't match the printed totals.
+
+## 9. Leave-only upload mode (2026-08-10)
+
+The uploader takes **two document shapes**, declared by the caller as `mode` on `POST /parse`:
+
+| mode | Document | Writes |
+|---|---|---|
+| `packet` | the full monthly packet (all 3 reports) | `Payroll_Register` rows **and** the `Employees` leave columns |
+| `leave` | "Available Vacation And Sick Time" **on its own** | the `Employees` leave columns only — **no register row, no `Pay`** |
+
+- 🔴 **The mode is never inferred.** An unknown value is a 400, not a fallback to `packet`. See the
+  vacuous-gate entry in LESSONS_LEARNED — a leave page run through the packet reader extracted 0 for
+  every money figure and *passed* a gate that had checked nothing.
+- `reconcileLeave()` checks **all six** leave columns against the report's own `Total:` row. There is
+  no money field in `LEAVE_SCHEMA` at all, so there is nothing to zero out and no free pass.
+- 🔑 **`Hrs Avail.` is a printed column, not accrued − used.** The report floors an over-drawn balance
+  at `00:00` instead of printing a negative. On the 2026-08-07 page that is **Taneisha Clark** (0
+  accrued, 16 used, printed `00:00`) — and it is the whole reason the vacation totals read
+  **1112 / 796 / 332** when 1112 − 796 = 316. Leave mode saves the printed figure into
+  `Vacation_Hours_Remaining` / `Sick_Hours_Remaining`; a mismatch surfaces as a **non-blocking note**
+  on the review screen rather than being silently resolved.
+- ⚠️ **The `packet` path still derives remaining as accrued − used** — deliberately left alone, since
+  changing it moves balances on the monthly import too. If both paths are used on the same period they
+  will disagree for exactly the floored rows.
+- Extraction checksum for the 2026-08-07 page: vacation **1112:00 / 796:00 / 332:00**, sick
+  **937:10 / 460:00 / 477:10**, 21 employees. Locked in `tests/jest/payroll-leave-reconcile.test.js`
+  (proxy) with every row, so a prompt or schema change that breaks the read fails a test.
+- The page is behind SAML + the `payroll.html` `Staff_Page_Access` row, so the review screen cannot be
+  eyeballed locally. `tests/ui/payroll-review-harness.html` (app repo) mounts the **real** markup and
+  **real** `payroll.js` with only `fetch` stubbed — serve the repo root via the `static-qa` launch
+  entry and open it.
+- 🔑 Parse jobs are **in-memory with a 30-minute TTL**, and `jobId` is a plain JS variable: reloading
+  the page loses the review and the Save button even though the server still holds the parsed payload.
+  There is no way back to it — re-read the file.

@@ -223,3 +223,42 @@ returns the option NAME for the shape Shopify RETURNS. Nothing throws; the keys 
   Asserting the happy path only would have passed here: every key was well-formed, just identical.
 
 ---
+
+## A sum-based gate passes vacuously on a document that has no sums (2026-08-10)
+
+**Problem.** Erik uploaded the one-page "Available Vacation And Sick Time" report to the payroll
+uploader. It read fine — 21 employees — and the reconciliation gate returned **`passed=true`**,
+enabling *Save to payroll records*. Saving would have written 21 `Payroll_Register` rows with every
+hour and wage 0, `Paid_This_Period=false`, under a check date the model had to guess: a pay period
+that never happened, permanently in the Pay Periods tab.
+
+**Root cause.** `reconcile()` ran 7 checks, 4 of them money/count (gross, net, deductions, check
+count). A leave-only page prints none of those. The extraction schema marked them `required`, so the
+model returned 0; the gate compared **0 to 0** and called it a match. The gate reported success having
+verified nothing. Only the 3 vacation checks did real work.
+
+**Solution.** An explicit `mode` on `POST /parse` — `'packet'` or `'leave'`, rejected if it is
+anything else, never inferred. Leave mode uses its own schema (no money field exists to zero out),
+its own prompt, and `reconcileLeave()`, which checks all six leave columns against the report's own
+`Total:` row. Leave mode writes only the `Employees` leave columns — no register row, no `Pay`.
+`tests/jest/payroll-leave-reconcile.test.js` locks it with the real 21-row page.
+
+**Prevention.**
+- 🔑 **A gate that compares derived to printed is only as strong as the printed side being NON-ZERO.**
+  Assert the reference values exist before trusting the verdict. `expect(checks.every(c => c.printed
+  !== 0))` is the whole lesson in one line.
+- 🔑 **"Required field" + "figure isn't on the page" = a fabricated zero.** A schema cannot ask for
+  something that isn't there and get an honest answer; it gets a plausible one that then sails through
+  arithmetic. Give each document shape its own schema instead of one superset.
+- 🔑 **Never infer which document you were handed — make the caller declare it.** Auto-detection here
+  would have had to fail *safe*, and the failure mode of guessing "packet" is exactly the vacuous gate.
+- 🔑 **A sum-based check is invariant to row permutation.** On a skewed photo the totals can reconcile
+  while every individual row is attributed to the wrong person. Totals matching is necessary, not
+  sufficient — the prompt now tells the reader to verify alignment against the ID column.
+- 🔑 **Erik's "16 vacation hours" was real and the import would have contradicted it.** The report
+  prints `Hrs Avail.` as a column; the importer recomputed it as accrued − used. Those differ whenever
+  the report floors an over-drawn balance at zero (Taneisha Clark: 0 accrued, 16 used, printed 0, not
+  −16) — the entire 16-hour gap between the 1112/796 and 332 totals. **Save the printed column, don't
+  re-derive it.** The packet path still derives it; that is a known, deliberate leftover.
+
+---
