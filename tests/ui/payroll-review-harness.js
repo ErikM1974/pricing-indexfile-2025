@@ -135,8 +135,64 @@
     return leaveReview(s === 'leave-bad');
   }
 
+  // Employees-table rows for the Leave Balances tab and the printable slips. Four shapes
+  // that exercise every footnote branch: an ordinary balance, a carryover case, a genuine
+  // negative, and a balance the packet floors at 00:00.
+  var LEAVE_EMPLOYEES = [
+    {
+      Payroll_Employee_ID: 6087, Employee_Full_Name: 'Erik Mickelson',
+      Leave_Balances_As_Of: '2026-08-07', Vacation_Annual_Entitlement: 80,
+      Vacation_Eligible_Date: '2000-01-01',
+      Vacation_Hours_Available: 80, Vacation_Hours_Used: 56, Vacation_Hours_Remaining: 24,
+      Sick_Accum_Hours_Available: 109.4, Sick_Hours_Used: 0, Sick_Hours_Remaining: 109.4,
+    },
+    {
+      // Carryover: 112 accrued includes 32 taken last December, so the slip reads 80/32/48.
+      Payroll_Employee_ID: 6295, Employee_Full_Name: 'Sorphorn Sorm',
+      Leave_Balances_As_Of: '2026-08-07', Vacation_Annual_Entitlement: 80,
+      Vacation_Eligible_Date: '2000-01-01',
+      Vacation_Hours_Available: 112, Vacation_Hours_Used: 64, Vacation_Hours_Remaining: 48,
+      Sick_Accum_Hours_Available: 55.15, Sick_Hours_Used: 31, Sick_Hours_Remaining: 24.15,
+    },
+    {
+      // A genuine negative the report DOES print — footnote says so, balance stays -8.
+      Payroll_Employee_ID: 6333, Employee_Full_Name: 'Bunsereytheavy Hoeu',
+      Leave_Balances_As_Of: '2026-08-07', Vacation_Annual_Entitlement: 80,
+      Vacation_Eligible_Date: '2000-01-01',
+      Vacation_Hours_Available: 80, Vacation_Hours_Used: 88, Vacation_Hours_Remaining: -8,
+      Sick_Accum_Hours_Available: 56.8167, Sick_Hours_Used: 40, Sick_Hours_Remaining: 16.8167,
+    },
+    {
+      // 🔴 The floored row: 0 accrued, 16 used, packet prints 00:00 rather than -16:00.
+      // Short of her one-year anniversary, so the entitlement is forced to 0.
+      Payroll_Employee_ID: 6391, Employee_Full_Name: 'Taneisha Clark',
+      Leave_Balances_As_Of: '2026-08-07', Vacation_Annual_Entitlement: 40,
+      Vacation_Eligible_Date: '2027-03-01', Vacation_Eligible_Hours: 40,
+      Vacation_Hours_Available: 0, Vacation_Hours_Used: 16, Vacation_Hours_Remaining: 0,
+      Sick_Accum_Hours_Available: 38.4333, Sick_Hours_Used: 78.5, Sick_Hours_Remaining: -40.0667,
+    },
+    {
+      // Floored AND past their anniversary, so the "vacation resets on…" note does not apply.
+      // This is the only row that reaches the floored-remaining footnote — without it that
+      // branch ships unseen, and it is text an employee reads off paper.
+      Payroll_Employee_ID: 6999, Employee_Full_Name: 'Floored Past-Anniversary',
+      Leave_Balances_As_Of: '2026-08-07', Vacation_Annual_Entitlement: 0,
+      Vacation_Eligible_Date: '2026-03-01',
+      Vacation_Hours_Available: 0, Vacation_Hours_Used: 24, Vacation_Hours_Remaining: 0,
+      Sick_Accum_Hours_Available: 10, Sick_Hours_Used: 2, Sick_Hours_Remaining: 8,
+    },
+  ];
+
   // --- network stub --------------------------------------------------------
   var realFetch = window.fetch.bind(window);
+
+  // The print button ends in window.print() plus a CSV download. Neither belongs in a
+  // harness run — stub them so the slip markup can be inspected without a print dialog.
+  window.print = function () { };
+  var realCreateObjectURL = URL.createObjectURL.bind(URL);
+  URL.createObjectURL = function (blob) {
+    try { return realCreateObjectURL(blob); } catch (e) { return 'blob:stubbed'; }
+  };
 
   function json(body, status) {
     return Promise.resolve(new Response(JSON.stringify(body),
@@ -166,17 +222,20 @@
         failures: [], reconciliation: rev.reconciliation,
       });
     }
-    if (/\/employees/.test(u)) return json({ employees: [] });
+    if (/\/employees/.test(u)) return json({ employees: LEAVE_EMPLOYEES });
     if (/\/periods/.test(u)) return json({ periods: [] });
     if (/\/register/.test(u)) return json({ rows: [] });
     return json({}, 404);
   };
 
   // --- boot ----------------------------------------------------------------
+  // 🔑 Always cache-busted. Without this the harness happily runs a stale copy of the very
+  // file you just edited and reports the OLD behaviour as current — which is exactly what it
+  // did on 2026-08-10, showing a blocked slip that the fix on disk had already unblocked.
   function loadScript(src) {
     return new Promise(function (resolve, reject) {
       var s = document.createElement('script');
-      s.src = src;
+      s.src = src + (src.indexOf('?') === -1 ? '?' : '&') + 'qa=' + Date.now();
       s.onload = resolve;
       s.onerror = function () { reject(new Error('failed to load ' + src)); };
       document.body.appendChild(s);

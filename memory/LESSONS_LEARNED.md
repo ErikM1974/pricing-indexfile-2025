@@ -267,11 +267,26 @@ its own prompt, and `reconcileLeave()`, which checks all six leave columns again
   been reaching `Employees` unverified since the uploader shipped. Saving the printed sick column
   without fixing that would have traded a derived-but-consistent number for an unchecked one. The
   packet gate went from 7 checks to 10.
-- 🔑 **Changing what a column MEANS can invalidate a comment three files away.**
-  `vacation-carryover.js` guarded its blocking `identity-failed` flag with *"the import writes
-  Vacation_Hours_Remaining as exactly r2(accrued − used), so this check is a tautology"*. That premise
-  is now false. The algebra says no NEW block appears (a floored row already fails `E − U` vs `A − U`
-  when `A < E`), but a stale comment asserting an invariant you just removed is how the next person
-  mis-diagnoses it.
+- 🔴 **Changing what a column MEANS silently broke a feature two files away — and my algebra said it
+  hadn't.** `vacation-carryover.js` guarded its blocking `identity-failed` flag with *"the import
+  writes Vacation_Hours_Remaining as exactly r2(accrued − used), so this check is a tautology"*.
+  Switching to the printed column made that false. I reasoned it through and concluded no NEW block
+  appears, because a floored row already fails `E − U` vs `A − U` **when `A < E`**. That qualifier was
+  the whole problem: a new hire short of their anniversary has the entitlement forced to **0**, so
+  `A = E = 0`, the carryover clamp is **inert**, and the old check passed *exactly* (−16 vs −16).
+  Taneisha's slip printed before the change and was blocked after it. **Erik caught it by asking
+  "will the print still work" — nothing in 1490 passing tests did.**
+- 🔑 **When you change an invariant, RUN the dependent code over real rows — don't reason about it.**
+  The module was already Node-requireable with 63 tests; a 20-line script over the actual figures,
+  old value vs new, showed `printable: true → false` in one line. Algebra with an unexamined case
+  reads exactly like algebra without one.
+- 🔑 **A relaxed check needs the narrow shape, not a looser threshold.** The fix splits the one
+  comparison into the entitlement algebra (`slip.accrued − slip.used` vs `available − used`) and the
+  import's self-consistency (`remaining` vs `available − used`), and exempts ONLY over-drawn-and-
+  printed-as-exactly-zero. Both original guards still block — including `remaining: 999` and a
+  `remaining: 0` on a row that is not over-drawn, which a sloppier exemption would have waved through.
+- 🔑 **A QA harness must cache-bust the files it is testing.** The browser served a stale
+  `vacation-carryover.js` and the harness confidently showed the OLD blocked slip after the fix was
+  already on disk. A harness that can show you yesterday's build is worse than no harness.
 
 ---

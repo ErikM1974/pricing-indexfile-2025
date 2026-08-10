@@ -535,6 +535,12 @@
           + '. Until then this balance can be negative.');
       } else if (f.slip.remaining < 0) {
         notes.push('* You have used more vacation than has accrued so far this year.');
+      } else if (f.flags.some(function (x) { return x.code === 'floored-remaining'; })) {
+        // The packet floors an over-drawn balance at 00:00 and we print what it says, so
+        // without this the slip shows "Hours used 16.00" above "Hours remaining 0.00" and
+        // reads as an error to the person holding it.
+        notes.push('* This shows 0.00 because the payroll report does not print a negative '
+          + 'balance. You have used more vacation than has accrued so far this year.');
       }
       var star = notes.length ? '<span class="slip-star">*</span>' : '';
 

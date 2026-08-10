@@ -363,11 +363,24 @@ The uploader takes **two document shapes**, declared by the caller as `mode` on 
   only the vacation trio, so `sickAccrued/Used/Available` were written to `Employees` unverified from
   day one. Added with the printed-column switch: packet reconcile is now **10 checks** (4 money/count
   + 6 leave), matching the leave gate's coverage of the same report.
-- ⚠️ **`vacation-carryover.js` no longer has a tautological identity check.** Its blocking
-  `identity-failed` flag was documented as inert because the import wrote remaining as exactly
-  accrued − used. It doesn't any more. No new block appears (a floored row fails `E − U` vs `A − U`
-  when `A < E` either way), but a mismatch there can now legitimately mean *the packet disagrees with
-  its own arithmetic* rather than *our entitlement is stale*.
+- 🔴 **The printed-column switch BROKE the printable slips, and had to be fixed in
+  `vacation-carryover.js`.** Its blocking `identity-failed` flag compared the entitlement algebra
+  straight against `Vacation_Hours_Remaining`, which was safe only while the import derived that
+  column. With the printed value, **Taneisha's slip stopped printing** — she is short of her one-year
+  anniversary, so `entitlementInForce()` forces the entitlement to **0**, the carryover clamp is
+  inert, and the old check passed exactly (−16 vs −16). She printed before, blocked after.
+  ⚠️ Do not trust the "the clamp fires anyway" argument — it does not hold for a new hire.
+- ✅ **Fix: the one comparison became two.** `algebraOff` = does the entitlement/carryover maths land
+  on `available − used`; `importOff` = does the imported `remaining` contradict `available − used`.
+  Both still **block**. Exempted narrowly: over-drawn on the arithmetic **AND** printed as exactly
+  zero → `floored-remaining`, severity **warn**, slip still prints. A bogus floor (`remaining: -16`
+  where the arithmetic says 40) and a non-over-drawn `remaining: 0` both still block.
+- 📄 **The slip explains the floor in plain English** — `buildSlips()` adds *"This shows 0.00 because
+  the payroll report does not print a negative balance…"* when `floored-remaining` is present and the
+  employee is past their anniversary (a new hire gets the existing "vacation resets on…" note first).
+  Verified on paper through the harness, both branches.
+- 🧪 `tests/unit/vacation-carryover.test.js` — 63 pre-existing tests still pass **unchanged** (that is
+  the proof the guards were not weakened), plus 5 new ones for the floored shape.
 - Extraction checksum for the 2026-08-07 page: vacation **1112:00 / 796:00 / 332:00**, sick
   **937:10 / 460:00 / 477:10**, 21 employees. Locked in `tests/jest/payroll-leave-reconcile.test.js`
   (proxy) with every row, so a prompt or schema change that breaks the read fails a test.

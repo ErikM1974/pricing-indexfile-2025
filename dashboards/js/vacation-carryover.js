@@ -211,23 +211,56 @@
     // fires (entitlement above accrued, §7.3), and when the imported figures contradict each
     // other. The used-below-zero guard above is what covers the other direction.
     //
-    // ⚠️ CHANGED 2026-08-10 — this is no longer a tautology. The import used to write
-    // Vacation_Hours_Remaining as exactly r2(accrued − used); it now writes the PRINTED
-    // "Hrs Avail." column from the packet (Erik: save "exactly what Liesls payroll packet
-    // says"). The two differ only where the report floors an over-drawn balance at 00:00
-    // rather than printing a negative — and such a row already trips this check anyway, via
-    // E − U against A − U with A < E, so no NEW block was introduced. But remaining is now an
-    // independently printed figure, so a mismatch here can legitimately mean "the accountant's
-    // page disagrees with its own arithmetic" rather than "our entitlement is wrong".
+    // ⚠️ REWORKED 2026-08-10, and the first attempt was WRONG — worth reading before touching.
+    // The import used to write Vacation_Hours_Remaining as exactly r2(accrued − used); it now
+    // writes the PRINTED "Hrs Avail." column (Erik: save "exactly what Liesls payroll packet
+    // says"). Comparing the entitlement algebra against that printed column silently stopped
+    // a real slip printing: Taneisha Clark, 0 accrued / 16 used, printed 00:00. Not yet at her
+    // one-year anniversary, so entitlement is forced to 0, the carryover clamp is INERT, and
+    // the old check passed exactly (−16 against −16) — the "the clamp fires anyway" reasoning
+    // does not hold for a new hire. She printed fine before and blocked after.
+    //
+    // So the two jobs this one comparison used to do are now separate:
+    //   algebraOff — does the entitlement/carryover maths land on the imported arithmetic?
+    //   importOff  — does the imported remaining contradict its own available/used?
+    // Both still block. Only the narrow floored-at-zero shape is let through, as a warn.
+    // The arithmetic the imported figures imply, which is what the entitlement algebra has
+    // to land on. Before 2026-08-10 this was always equal to rawRemaining, which is why one
+    // comparison could do both jobs; now they part company on exactly one shape of row.
+    var derivedRemaining = round2(rawAvailable - rawUsed);
+
+    // 🔑 THE ONE legitimate disagreement: the packet floors an over-drawn balance at 00:00
+    // rather than printing a negative, and the import saves that printed figure verbatim.
+    // Recognised NARROWLY — over-drawn on the arithmetic AND printed as exactly zero — so a
+    // genuinely contradictory import (remaining 999 against 80/40) still blocks below.
+    var flooredAtZero = derivedRemaining < -TOLERANCE
+      && Math.abs(rawRemaining) <= TOLERANCE;
+
     var identity = round2(slip.accrued - slip.used);
-    if (Math.abs(identity - slip.remaining) > TOLERANCE + 1e-9) {
+    var algebraOff = Math.abs(identity - derivedRemaining) > TOLERANCE + 1e-9;
+    var importOff = !flooredAtZero
+      && Math.abs(rawRemaining - derivedRemaining) > TOLERANCE + 1e-9;
+    if (algebraOff || importOff) {
       flags.push({
         code: 'identity-failed',
         severity: 'block',
         message: 'accrued − used ≠ remaining (' + slip.accrued + ' − ' + slip.used + ' = '
-          + identity + ', but remaining is ' + slip.remaining + '). Raw import was '
-          + rawAvailable + ' / ' + rawUsed + ' / ' + rawRemaining
+          + identity + ', against ' + derivedRemaining + ' from the import'
+          + (importOff ? ', which itself reports remaining as ' + rawRemaining : '')
+          + '). Raw import was ' + rawAvailable + ' / ' + rawUsed + ' / ' + rawRemaining
           + ' against an entitlement of ' + entitlement + '.',
+      });
+    }
+
+    // Printable, but the paper needs a sentence — a bare 0.00 next to hours used reads as a
+    // mistake to the person holding it. buildSlips() in payroll.js turns this into a footnote.
+    if (flooredAtZero) {
+      flags.push({
+        code: 'floored-remaining',
+        severity: 'warn',
+        message: 'The packet prints 0.00 available where accrued minus used is '
+          + derivedRemaining + ' — this employee has taken more vacation than has accrued and '
+          + 'the report does not show a negative. Saving what the packet prints, as instructed.',
       });
     }
 

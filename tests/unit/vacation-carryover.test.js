@@ -483,3 +483,76 @@ describe('the live 2026-07-24 roster all reconciles', () => {
     expect(r.printable).toBe(true);
   });
 });
+
+/**
+ * A floored balance still reaches paper (2026-08-10).
+ *
+ * The payroll import stopped deriving Vacation_Hours_Remaining and now saves the packet's
+ * printed "Hrs Avail." column verbatim (Erik: "exactly what Liesls payroll packet says").
+ * The report floors an over-drawn balance at 00:00 rather than printing a negative, so for
+ * one shape of row the saved figure no longer equals available − used.
+ *
+ * 🔴 The first cut of that change compared the entitlement algebra straight against the
+ * printed column and BLOCKED Taneisha Clark's slip — 0 accrued, 16 used, printed 00:00. She
+ * is short of her one-year anniversary, so her entitlement is forced to 0, the carryover
+ * clamp is inert, and the old check passed exactly (−16 against −16). She printed before the
+ * change and not after. These tests exist so that cannot happen again quietly.
+ */
+describe('a balance the packet floors at zero', () => {
+  const floored = {
+    Vacation_Hours_Available: 0, Vacation_Hours_Used: 16, Vacation_Hours_Remaining: 0,
+  };
+
+  test('Taneisha still gets a slip, and it prints what the packet prints', () => {
+    const r = build(Object.assign({}, floored, {
+      Vacation_Annual_Entitlement: 40, Vacation_Eligible_Date: '2027-03-01', // not yet eligible
+    }));
+    expect(r.printable).toBe(true);
+    expect(r.slip).toEqual({ accrued: 0, used: 16, remaining: 0 });
+    expect(codes(r)).toContain('floored-remaining');
+    expect(codes(r)).not.toContain('identity-failed');
+  });
+
+  test('the floor is a warning, never a block', () => {
+    const r = build(Object.assign({}, floored, {
+      Vacation_Annual_Entitlement: 0, Vacation_Eligible_Date: '2026-03-01',
+    }));
+    expect(r.flags.filter((f) => f.severity === 'block')).toEqual([]);
+    const warn = r.flags.find((f) => f.code === 'floored-remaining');
+    expect(warn.severity).toBe('warn');
+    expect(warn.message).toContain('-16'); // says how far over-drawn, for the footnote
+  });
+
+  test('an ordinary balance is untouched by any of this', () => {
+    const r = build({
+      Vacation_Hours_Available: 80, Vacation_Hours_Used: 56, Vacation_Hours_Remaining: 24,
+      Vacation_Eligible_Date: '2000-01-01',
+    });
+    expect(r.printable).toBe(true);
+    expect(r.flags).toEqual([]);
+  });
+
+  // The floor is recognised NARROWLY — over-drawn on the arithmetic AND printed as exactly
+  // zero. Anything else that disagrees with available − used is still a contradictory import.
+  test('a negative remaining that is NOT the packet\'s floor still blocks', () => {
+    const r = build({
+      Vacation_Hours_Available: 80, Vacation_Hours_Used: 40, Vacation_Hours_Remaining: -16,
+      Vacation_Eligible_Date: '2000-01-01',
+    });
+    expect(codes(r)).toContain('identity-failed');
+    expect(codes(r)).not.toContain('floored-remaining');
+    expect(r.printable).toBe(false);
+  });
+
+  test('a zero remaining that is not over-drawn still blocks', () => {
+    // 80 accrued, 40 used, remaining printed 0 — the arithmetic says 40, and nothing about
+    // this row is a floor. Reading it as one would let a misread wipe someone's balance.
+    const r = build({
+      Vacation_Hours_Available: 80, Vacation_Hours_Used: 40, Vacation_Hours_Remaining: 0,
+      Vacation_Eligible_Date: '2000-01-01',
+    });
+    expect(codes(r)).toContain('identity-failed');
+    expect(codes(r)).not.toContain('floored-remaining');
+    expect(r.printable).toBe(false);
+  });
+});
