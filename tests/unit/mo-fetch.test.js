@@ -57,9 +57,34 @@ describe('moFetch — same-origin-first with proxy fallback', () => {
     expect(r.ok).toBe(true);
   });
 
-  test('non-forwardable path (customers) goes straight to the proxy — never /api/mo', async () => {
-    await moFetch('customers');
+  // inventorylevels is the standing example of a path that must NOT be forwarded:
+  // /calculators/laser-tumbler-polarcamel.html is customer-facing (server.js says so
+  // outright: "Do NOT blanket-gate /calculators"), so it has no staff session and the
+  // same-origin forwarder would 401 on every anonymous visitor. It therefore stays a
+  // direct proxy call, and the proxy keeps that route ungated.
+  test('non-forwardable path (inventorylevels) goes straight to the proxy — never /api/mo', async () => {
+    await moFetch('inventorylevels?PartNumber=PC54');
     expect(calls).toHaveLength(1);
-    expect(calls[0].url).toBe('https://proxy.example/api/manageorders/customers');
+    expect(calls[0].url).toBe('https://proxy.example/api/manageorders/inventorylevels?PartNumber=PC54');
+  });
+
+  // 2026-08-10 security fix. These four answered the public internet — the proxy gates
+  // /orders, /lineitems, /tracking and /auth, but the router mounts at /api, so nothing
+  // else in that file was covered. Verified live: GET /api/manageorders/customers
+  // returned ~85 KB including ContactEmail and ContactPhone with no credentials.
+  // If any of these stops routing through /api/mo the proxy gate starts 401ing real
+  // staff pages, so this test is the canary for that.
+  describe.each([
+    ['customers', 'customers'],
+    ['payments', 'payments'],
+    ['payments/142552', 'payments/142552'],
+    ['getorderno/ABC-1', 'getorderno/ABC-1'],
+    ['order/ABC-1/snapshot', 'order/ABC-1/snapshot'],
+  ])('PII read %s', (path, expectedSuffix) => {
+    test('goes through the staff-gated same-origin forwarder first', async () => {
+      await moFetch(path);
+      expect(calls[0].url).toBe('/api/mo/' + expectedSuffix);
+      expect(calls[0].opts.credentials).toBe('same-origin');
+    });
   });
 });
