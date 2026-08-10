@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>QA harness — payroll packet review</title>
+<!--
+  Renders the REAL dashboards/payroll.html markup with the REAL payroll.css and payroll.js,
+  stubbing only the network. The live page is behind SAML + a Staff_Page_Access row, so this
+  is the only way to actually look at the upload review without an admin session.
+
+  Serve the repo root and open /tests/ui/payroll-review-harness.html:
+      python -m http.server 8099        (the "static-qa" entry in .claude/launch.json)
+
+  Pick a scenario, then use the page normally — choose any PDF, click Read packet. The stub
+  answers with the fixture instead of calling the proxy. Nothing here is imported anywhere;
+  it is a manual harness, not part of the jest run.
+-->
+<link href="/dashboards/css/payroll.css?v=2026.08.10.1" rel="stylesheet">
+<link href="/tests/ui/payroll-review-harness.css" rel="stylesheet">
+</head>
+<body>
+<div class="qa-bar">
+  <span>QA harness — network stubbed</span>
+  <label for="qa-scenario">Scenario</label>
+  <select id="qa-scenario">
+    <option value="leave">Vacation &amp; sick page — reconciles (2026-08-07, 21 staff)</option>
+    <option value="leave-bad">Vacation &amp; sick page — totals differ</option>
+    <option value="packet">Full packet — reconciles</option>
+  </select>
+  <button id="qa-run" type="button">Run read + review</button>
+  <span id="qa-state">idle</span>
+</div>
+<div id="qa-mount"></div>
+
+<script src="/tests/ui/payroll-review-harness.js"></script>
+</body>
+</html>

@@ -6,7 +6,7 @@
   <meta name="robots" content="noindex, nofollow">
   <title>Payroll — Northwest Custom Apparel</title>
   <link rel="icon" href="/favicon.png" type="image/png">
-  <link href="/dashboards/css/payroll.css?v=2026.08.03.2" rel="stylesheet">
+  <link href="/dashboards/css/payroll.css?v=2026.08.10.1" rel="stylesheet">
 </head>
 <body>
   <div class="pr-wrap">
@@ -94,37 +94,36 @@
     <!-- UPLOAD -->
     <section id="panel-upload" class="pr-panel">
       <div class="pr-panel-head">
-        <h2>Upload Payroll Packet</h2>
-        <p>Upload the PDF from NW Regional Accounting. Hours and leave balances are read from it and
-          checked against the packet's own printed totals. <strong>Nothing is saved until the numbers
-          reconcile and you confirm.</strong></p>
+        <h2>Upload from NW Regional Accounting</h2>
+        <p>Upload the PDF. Everything read from it is checked against the document's own printed
+          totals. <strong>Nothing is saved until the numbers reconcile and you confirm.</strong></p>
       </div>
 
       <div class="pr-upload">
+        <label class="pr-label" for="packet-mode">Document</label>
+        <select id="packet-mode" class="pr-select">
+          <option value="packet">Full payroll packet</option>
+          <option value="leave">Vacation &amp; sick page only</option>
+        </select>
         <input id="packet-file" class="pr-file" type="file" accept="application/pdf">
         <button id="packet-parse" class="pr-btn" type="button" disabled>Read packet</button>
         <span id="packet-note" class="pr-note"></span>
       </div>
+      <p id="packet-hint" class="pr-sub"></p>
 
       <div id="review" class="pr-review" hidden>
         <div id="review-verdict" class="pr-verdict"></div>
+        <div id="review-notes" class="pr-verdict is-warn" hidden></div>
 
         <table class="pr-table pr-check-table">
-          <thead><tr><th>Check</th><th class="pr-num">From the packet</th><th class="pr-num">From this read</th><th>Result</th></tr></thead>
+          <thead><tr><th>Check</th><th class="pr-num">Printed on the document</th><th class="pr-num">From this read</th><th>Result</th></tr></thead>
           <tbody id="review-checks"></tbody>
         </table>
 
-        <h3 class="pr-h3">Hours and leave to be saved</h3>
+        <h3 id="review-rows-title" class="pr-h3">Hours and leave to be saved</h3>
         <div class="pr-tablewrap">
           <table class="pr-table">
-            <thead>
-              <tr>
-                <th>Employee</th><th>Paid</th>
-                <th class="pr-num">Regular</th><th class="pr-num">OT</th><th class="pr-num">Sick</th>
-                <th class="pr-num">Vac/PTO</th><th class="pr-num">Total</th>
-                <th class="pr-num">Vac Avail</th><th class="pr-num">Sick Avail</th>
-              </tr>
-            </thead>
+            <thead id="review-head"></thead>
             <tbody id="review-rows"></tbody>
           </table>
         </div>
@@ -146,7 +145,7 @@
 
   <!-- The carryover transform is a separate file so it can be unit-tested in Node
        (tests/unit/vacation-carryover.test.js). It must load before payroll.js. -->
-  <script src="/dashboards/js/vacation-carryover.js?v=2026.08.03.2"></script>
-  <script src="/dashboards/js/payroll.js?v=2026.08.03.2"></script>
+  <script src="/dashboards/js/vacation-carryover.js?v=2026.08.10.1"></script>
+  <script src="/dashboards/js/payroll.js?v=2026.08.10.1"></script>
 </body>
 </html>

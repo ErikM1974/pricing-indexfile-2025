@@ -5,6 +5,46 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## A new lead source saved fine and stayed invisible — the form-ID vocabulary lives in 12 places (2026-08-10)
+
+**Problem.** A customer's free sample request (`NWCA-SAMPLE-0808-1-480`, Inland Beef Company)
+reached Erik's inbox and nowhere else. Erik: "shouldn't it be in Leads so Taneisha can follow up?"
+
+**Root cause.** The free branch of `/sample-cart.html` pushed a ShopWorks order and fired two
+EmailJS sends — and wrote **no database row at all**. Leads reads exactly one table
+(`Form_Submissions`) filtered to a hard-coded list of lead `Form_ID`s, and the cart called neither
+of that table's writers. The dashboard's "Sample Follow-ups" widget *looks* like the safety net but
+filters on `date_Invoiced`, so it can only show samples already invoiced — a post-sale call
+list, not an inbox. No dashboard surface reads uninvoiced ShopWorks orders at all.
+
+**Solution.** New `sample-request` formId, POSTed from the cart to the already-public
+`POST /api/form-submissions` — which buys AE auto-assign (email match → their rep, else
+Taneisha), the "new lead" email and the Slack card for free. Full site list + fix detail:
+`memory/sample-request-routing.md`.
+
+**Prevention.**
+- 🔑 **The lead form-ID vocabulary is duplicated in 12 places across 2 repos.** Adding a
+  source means updating all of them; miss one and the row saves but stays invisible.
+- 🔴 **A missing map entry becomes a WRONG DEFAULT, not an error.** No `STATUS_CHOICES`
+  entry → the Forms Inbox falls back to `['New','Completed']`, and `Completed` is a **WON**
+  status (`leads-common.js:40,50`) → closing the lead banks a $0 win and drops it from the
+  follow-up digest. Same family as `[]`-is-truthy and `Number(null) === 0`.
+- 🔑 **Derive a filter list from the canonical constant, never re-type it.** `leads.js`
+  built its Source dropdown from a literal that *happened* to equal `LEAD_FORM_IDS` minus
+  `jotform-lead`; the 6th id broke that invariant silently.
+- 🔑 **A payload only "saves" if a renderer knows its shape.** The Inbox renders only
+  `fields`/`checks`/`tables`/`notes` — a bespoke object stores fine and shows a blank modal.
+- 🔴 **`House` is a dropdown DEFAULT, not a rep.** Sending it satisfies the server's
+  "rep already set" check, suppresses auto-assign and leaves the lead owned by nobody — the
+  exact failure the change existed to prevent. Send blank and let the server assign.
+- 🔑 **A content-hashed page serves `dist/`, not your file.** The preview runs
+  `node server.js` (no `prestart`), so the browser executed a stale asset and the new function read
+  as `undefined` — indistinguishable from a scope bug. Run `npm run build`, then confirm the
+  asset HASH changed.
+- ⚠️ 3 of the 4 review defects were on STAFF surfaces the customer path never touches:
+  the customer flow was right on the first pass, the staff rendering was not.
+
+---
 ## Two note endpoints write the same table; only one of them tells anybody (2026-08-07)
 
 **Problem.** The AE "Approve Design" button on `/art-request/:id?view=ae` fired a native
@@ -184,74 +224,69 @@ returns the option NAME for the shape Shopify RETURNS. Nothing throws; the keys 
 
 ---
 
-## A page size counted DESIGNS while the table stores design×LOCATION (2026-08-06)
+## A sum-based gate passes vacuously on a document that has no sums (2026-08-10)
 
-**Problem.** After the artwork fix shipped, the SanMar inbound sheet still showed the 🎨 "no
-logo" tile for 6 of 18 orders. Erik's read: "probably no thumbnail in ShopWorks yet." True for
-2 of them; the other 4 had artwork the whole time.
+**Problem.** Erik uploaded the one-page "Available Vacation And Sick Time" report to the payroll
+uploader. It read fine — 21 employees — and the reconciliation gate returned **`passed=true`**,
+enabling *Save to payroll records*. Saving would have written 21 `Payroll_Register` rows with every
+hour and wage 0, `Paid_This_Period=false`, under a check date the model had to guess: a pay period
+that never happened, permanently in the Pay Periods tab.
 
-**Root cause.** `proxy src/routes/thumbnails.js` `/thumbnails/by-designs` built its Caspio page
-as `'q.limit': uncachedIds.length`. `Shopworks_Thumbnail_Report` is keyed
-`Thumb_DesLocid_Design` — **one row per design PER LOCATION** — so 18 designs can match far more
-than 18 rows. Caspio truncated the page, every design past the cut was reported `found:false`,
-and that wrong answer was then cached for the 5-minute TTL. Rows arrive in serial order, so the
-designs dropped were the NEWEST — exactly what an inbound sheet is made of, which is why it
-looked like a bandit/ShopWorks sync lag. Fixed to `min(1000, ids × 25)`; live batch went 12 → 16
-of 18 found, and the 2 remaining genuinely have no row.
+**Root cause.** `reconcile()` ran 7 checks, 4 of them money/count (gross, net, deductions, check
+count). A leave-only page prints none of those. The extraction schema marked them `required`, so the
+model returned 0; the gate compared **0 to 0** and called it a match. The gate reported success having
+verified nothing. Only the 3 vacation checks did real work.
+
+**Solution.** An explicit `mode` on `POST /parse` — `'packet'` or `'leave'`, rejected if it is
+anything else, never inferred. Leave mode uses its own schema (no money field exists to zero out),
+its own prompt, and `reconcileLeave()`, which checks all six leave columns against the report's own
+`Total:` row. Leave mode writes only the `Employees` leave columns — no register row, no `Pay`.
+`tests/jest/payroll-leave-reconcile.test.js` locks it with the real 21-row page.
 
 **Prevention.**
-- 🔑 **Size a page by the ROWS it can return, not the KEYS you asked for.** Any `q.limit` derived
-  from an input count is wrong the moment the table is one-to-many.
-- 🔴 **Truncation that reports `found:false` is indistinguishable from real absence** — and here
-  it was cached, so it persisted. A short page should be detected and retried/raised, never
-  reinterpreted as "no data".
-- ⚠️ **My own probe was the broken instrument twice.** A 33-id sweep read `.thumbnails` off a
-  400 body (`Maximum 20 design IDs`) and printed "all missing"; earlier runs disagreed with each
-  other for the same reason. **Check the HTTP status before parsing.** The finding only became
-  real when single-id queries returned artwork the batch had denied.
-- 🔑 A mock that ignores `q.limit` cannot catch this — the regression test makes the fake Caspio
-  honour the limit, so it fails against the old code (verified by reverting).
-- 🔑 **Same route file, same disease: `/thumbnails/sync-status` reported `totalRecords: 20000`,
-  which was `maxPages 20 × 1000` — the CAP, presented as a count** (true size 27,665). It also
-  counted `recordsWithImages` off **`ExternalKey`, the retired Caspio Files key**, so it answered
-  "0 of 20,000 have images" about a table where 26,990 do — artwork moved to Box and lives in
-  `FileUrl`. **A metric outliving its schema reads as a catastrophe rather than a stale field.**
-  Now counts `ExternalKey || FileUrl`, `strict: true` so truncation throws, and counts are opt-in
-  behind `?counts=true` (a count means ~28 Caspio reads; `lastSync` is one).
-- 🔑 **Caspio v2 does NOT return `TotalRecords`** on a `q.limit=1` read — the body is just
-  `Result`, and `makeCaspioRequest` strips even that. There is no cheap COUNT; verify before
-  designing around one. Use `discardResults: true` + `pageCallback` to count without holding
-  27k rows in dyno memory.
-- 🔑 **`lastSync` is the field that actually answers "is the sync stalled?"** — it showed the
-  bandit thumbnail sync running 09:22 the same morning, which proved the two remaining blank
-  designs had no artwork attached in ShopWorks rather than a sync lag.
-- 🔑 **The inbound sheet has THREE artwork states, not two**: has art · has a design but no art
-  (a real gap) · **no design at all** (blanks/undecorated, `method: "Other"`, empty
-  `designNumber` — nothing is missing). Rendering the last two identically sent people hunting
-  for artwork that never existed: on 2026-08-05, 3 of 4 "missing" tiles were blanks orders.
-  Blanks now get their own glyph + solid tile; **the glyph must differ, not just the tooltip,
-  because the printed sheet has none.**
-- ⚠️ **Screen and print do NOT share the logo tile** — `logoTile()` vs `psLogo` in the print
-  builders. Fixing one leaves the other; print used to render *nothing* for both no-image cases,
-  so a missing proof, a blanks order and a failed image were indistinguishable on paper.
-- 🔑 **These sheets go to a MONO LASER** (the `.sit-ps-rush` rule says so). On paper the signal
-  must be shape/text, never colour — and a 42px emoji is a smudge. Print uses the words `NO ART`
-  (dashed border, black) and `BLANKS` (solid, flat fill + `print-color-adjust: exact`, since
-  browsers drop backgrounds when printing).
-- 🔴 **`window.print()` SNAPSHOTS the DOM — an `<img>` still in flight is simply absent from the
-  PDF.** No error, no gap, nothing to notice. The sheet builds fresh `<img>` tags and the screen
-  tiles are `loading="lazy"`, so only orders the user had scrolled past were warm: everything
-  below the fold silently lost its thumbnail. Measured on a real AE sheet — **7 POs with artwork,
-  3 images in the PDF**; and cold-loading the full sheet, only **8 of 16** screen tiles were warm.
-  Fix: `await img.decode()` on every sheet image before printing (`decode()` resolves when the
-  bitmap can PAINT; `load` can fire a frame earlier — that frame is where this lived), capped at
-  6s so a dead Box file degrades to the old behaviour instead of hanging the dialog. After: 14/14
-  decoded, 0 missing, 4.5s wait. 🔑 **This masqueraded as the artwork bug being only half-fixed —
-  two different causes producing the same "missing thumbnail".**
-- ⚠️ **A fixture with a real Box url would 401 offline** and silently exercise the FALLBACK path
-  while looking like it covered the image case — the print harness uses a `data:` URI instead.
-  Note `/tests` is not served (removed in the 2026-08-05 source-exposure fix), so that harness
-  only runs from disk; verify print by stubbing `window.print` on the real page and grabbing
-  `#sit-print-sheet` before its 1.5s self-cleanup removes it.
+- 🔑 **A gate that compares derived to printed is only as strong as the printed side being NON-ZERO.**
+  Assert the reference values exist before trusting the verdict. `expect(checks.every(c => c.printed
+  !== 0))` is the whole lesson in one line.
+- 🔑 **"Required field" + "figure isn't on the page" = a fabricated zero.** A schema cannot ask for
+  something that isn't there and get an honest answer; it gets a plausible one that then sails through
+  arithmetic. Give each document shape its own schema instead of one superset.
+- 🔑 **Never infer which document you were handed — make the caller declare it.** Auto-detection here
+  would have had to fail *safe*, and the failure mode of guessing "packet" is exactly the vacuous gate.
+- 🔑 **A sum-based check is invariant to row permutation.** On a skewed photo the totals can reconcile
+  while every individual row is attributed to the wrong person. Totals matching is necessary, not
+  sufficient — the prompt now tells the reader to verify alignment against the ID column.
+- 🔑 **Erik's "16 vacation hours" was real and the import would have contradicted it.** The report
+  prints `Hrs Avail.` as a column; the importer recomputed it as accrued − used. Those differ whenever
+  the report floors an over-drawn balance at zero (Taneisha Clark: 0 accrued, 16 used, printed 0, not
+  −16) — the entire 16-hour gap between the 1112/796 and 332 totals. **Save the printed column, don't
+  re-derive it.** Erik, asked directly 2026-08-10: *"exactly what Liesls payroll packet says"* —
+  **both** paths now save it.
+- 🔑 **"It's already validated" is worth one grep.** Extending the printed-column rule to the packet
+  path looked like a two-line edit because `reconcile()` checks `Vacation available`. It has **no sick
+  check at all** — `PACKET_SCHEMA.printedTotals` carried only vacation, so all three sick figures had
+  been reaching `Employees` unverified since the uploader shipped. Saving the printed sick column
+  without fixing that would have traded a derived-but-consistent number for an unchecked one. The
+  packet gate went from 7 checks to 10.
+- 🔴 **Changing what a column MEANS silently broke a feature two files away — and my algebra said it
+  hadn't.** `vacation-carryover.js` guarded its blocking `identity-failed` flag with *"the import
+  writes Vacation_Hours_Remaining as exactly r2(accrued − used), so this check is a tautology"*.
+  Switching to the printed column made that false. I reasoned it through and concluded no NEW block
+  appears, because a floored row already fails `E − U` vs `A − U` **when `A < E`**. That qualifier was
+  the whole problem: a new hire short of their anniversary has the entitlement forced to **0**, so
+  `A = E = 0`, the carryover clamp is **inert**, and the old check passed *exactly* (−16 vs −16).
+  Taneisha's slip printed before the change and was blocked after it. **Erik caught it by asking
+  "will the print still work" — nothing in 1490 passing tests did.**
+- 🔑 **When you change an invariant, RUN the dependent code over real rows — don't reason about it.**
+  The module was already Node-requireable with 63 tests; a 20-line script over the actual figures,
+  old value vs new, showed `printable: true → false` in one line. Algebra with an unexamined case
+  reads exactly like algebra without one.
+- 🔑 **A relaxed check needs the narrow shape, not a looser threshold.** The fix splits the one
+  comparison into the entitlement algebra (`slip.accrued − slip.used` vs `available − used`) and the
+  import's self-consistency (`remaining` vs `available − used`), and exempts ONLY over-drawn-and-
+  printed-as-exactly-zero. Both original guards still block — including `remaining: 999` and a
+  `remaining: 0` on a row that is not over-drawn, which a sloppier exemption would have waved through.
+- 🔑 **A QA harness must cache-bust the files it is testing.** The browser served a stale
+  `vacation-carryover.js` and the harness confidently showed the OLD blocked slip after the fix was
+  already on disk. A harness that can show you yesterday's build is worse than no harness.
 
 ---

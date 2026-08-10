@@ -33,6 +33,7 @@
         'injury-report': { label: 'Incident', icon: 'fa-kit-medical', cls: 'badge--inj' },
         'credit-card-auth': { label: 'Card Auth', icon: 'fa-credit-card', cls: 'badge--cca' },
         'quote-request': { label: 'Quote Lead', icon: 'fa-bullhorn', cls: 'badge--qrq' },
+        'sample-request': { label: 'Sample Request', icon: 'fa-shirt', cls: 'badge--srq' },
     };
 
     var STATUS_CLS = {
@@ -90,6 +91,12 @@
         'injury-report': ['Open', 'Under Review', 'L&I Filed', 'Closed', 'Archived'],
         'credit-card-auth': ['New', 'Card on File', 'Expired', 'Archived'],
         'quote-request': ['New', 'Contacted', 'Quoted', 'Won', 'Lost', 'Archived'],
+        // Lead pipelines — MUST mirror leads-common.js STATUS_CHOICES. Without an
+        // entry here the detail modal falls back to ['New','Completed'], and
+        // 'Completed' is a WON status everywhere else (leads-common.js:40,50) —
+        // so closing a lead from the Inbox would silently bank it as a $0 win.
+        'manual-lead': ['New', 'Contacted', 'Quoted', 'Won', 'Lost', 'Archived'],
+        'sample-request': ['New', 'Contacted', 'Quoted', 'Won', 'Lost', 'Archived'],
     };
 
     var state = {
