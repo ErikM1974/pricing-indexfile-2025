@@ -29,7 +29,7 @@
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css?v=2026.07.29.1">
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/utilities.css?v=20260514-ai-phase1">
     <!-- Claude Design handoff theme (2026-05-13) — unlayered variant, wins all cascade fights. -->
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=2026.07.29.1">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=2026.08.10.6">
     <!-- Claude Design PATCH 2 (spacing) — hide empty announcements, compress pinned row, tighten zones.
          PATCH 3 and PATCH 4 were REMOVED per PATCH-5-CLEANUP: their broad
          [class*="..."] selectors were over-matching and damaging styles that
@@ -110,7 +110,12 @@
                                 <span aria-hidden="true">⏰</span>
                                 <span>Past Due Orders</span>
                             </div>
-                            <span aria-hidden="true">→</span>
+                            <!-- Live count, filled by past-due-badge.js. Starts hidden and
+                                 stays hidden if the count can't be fetched — an "all clear"
+                                 that appears when we simply don't know is worse than no
+                                 badge at all. aria-live so it is announced when it lands. -->
+                            <span class="nav-pd-badge" id="nav-pd-badge" hidden role="status" aria-live="polite"></span>
+                            <span class="nav-pd-arrow" aria-hidden="true">→</span>
                         </a>
                     </div>
 
@@ -1047,6 +1052,10 @@
         </div>
     </div>
     <script src="/staff-dashboard-v3/quote-launcher.js?v=2026.07.07.4" defer></script>
+    <!-- Live past-due count on the sidebar link. Shows a red count when something is
+         late, a green "All clear" on a CONFIRMED zero, and nothing at all if the count
+         can't be fetched — an all-clear we haven't verified is worse than no badge. -->
+    <script src="/staff-dashboard-v3/past-due-badge.js?v=2026.08.10.6" defer></script>
 
     <!-- Command palette markup moved UP into the hero search bar (2026-07-20).
          #cpInput / #cpPanel / #cpResults / #cpStatus / #cpToast + #cp-backdrop
