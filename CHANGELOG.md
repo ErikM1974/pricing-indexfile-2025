@@ -1,3 +1,7 @@
+## v2026.08.10.1 (2026.08.10)
+
+- Design Queue: Pat's brief carries the actual sign lettering
+
 ## v2026.08.09.7 (2026.08.09)
 
 - Design Queue: report the crawler floor, not a false zero
