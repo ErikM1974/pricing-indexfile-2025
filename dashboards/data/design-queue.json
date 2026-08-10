@@ -53,39 +53,44 @@
     "small": "River Road at Meridian"
    },
    "textNotes": "🔴 Do NOT print 'Est. 1962' or any founding year. That date traces to a single user-edited web page whose actual subject is a 1983 movie theatre. The archive only proves the centre existed by March 1963. 🔴 Do NOT create a standalone red-and-yellow neon HI-HO lockup — too close to a live motel trademark. Always carry the full name plus Puyallup.",
-   "designDirection": "The strongest idea is the naming convention: the in-house shops were Hi-Ho Food Center, Hi-Ho Launder Center and Hi-Ho Shoe Center, so the façade carried repeated 'HI-HO ___ CENTER' signage down its length. Draw that repetition. Alternative: the period bus-ad line as a design element — 'just 10 minutes away from Tacoma.'",
-   "signage": "⚠️ Nobody has ever described the Hi-Ho sign in words. Work from the library photographs, not from imagination. Do not let anyone write sign copy from memory alone.",
+   "designDirection": "Two designs are sitting in one photograph, and either would work.\n\nTHE LOGO. The oval HI-HO lockup on its own, centred, with Puyallup underneath. Clean, instantly period, and it reproduces at any size — the strongest single option.\n\nTHE WHOLE ADVERT. The 1965 bus panel reads: \"Only 10 minutes from DOWNTOWN TACOMA\" on the left with the oval logo centre and \"On the RIVER ROAD Puyallup\" on the right. The typography mixes a fat brush script (Only, minutes, from, On the, Puyallup) with heavy condensed slab capitals (DOWNTOWN TACOMA, RIVER ROAD) — a genuine 1965 sign-painter mix that no font library reproduces convincingly. Redrawn as a chest print it is both a joke and a landmark: ten minutes from Tacoma is exactly how far away Tacoma used to feel.\n\nThe façade repetition idea (Hi-Ho Food Center / Launder Center / Shoe Center) still works, but it is now the third-best option rather than the first.",
+   "signage": "🎯 THE LOGO EXISTS AND IT IS ON THE BUS ADVERT. A vertical OVAL, white with a dark outline. Inside, split by a diagonal: HI on the upper left, HO on the lower right, both in heavy slab capitals. Curved above the letters in small caps: SHOP THE MODERN WAY. Curved below: ONE STOP SHOPPING. This is a complete, period-correct, drawable mark and it settles what the brief previously called unknowable. Work from the photograph — do not stylise it into something else, because the people who remember the Hi-Ho will remember this shape.",
    "theStory": "14 retailers plus a bank across 25 acres. Elvins department store at one end, Sears at the other. Groceries, prescriptions, clothing, gardening supplies, flowers and gasoline. Over $9,000,000 gross in 1965. Acquired by Fred Meyer in 1980 and traded as Fred Meyer's Hi-Ho.",
    "references": [
     {
-     "label": "Tacoma Public Library — Richards Studio A149103-2",
-     "url": "https://tacomalibrary.contentdm.oclc.org/digital/collection/p17061coll21/id/15781/",
-     "what": "8 Jul 1966, street view. The catalogue record carries the 25 acres / 14 retailers / $9M detail."
+     "label": "THE LOGO — Tacoma Transit bus advert, 18 Feb 1965 (D144357-1)",
+     "url": "https://tacomalibrary.contentdm.oclc.org/digital/iiif/p17061coll21/33470/full/1600,/0/default.jpg",
+     "what": "🎯 START HERE. Bus #303, a conductor pointing at the panel. It carries the Hi-Ho logo at full size and the whole advert layout. Opens straight to the image."
     },
     {
-     "label": "TPL D137936-1 — aerial, 9 March 1963",
-     "url": "https://tacomalibrary.contentdm.oclc.org/digital/collection/p17061coll21/",
-     "what": "The earliest dated proof the centre existed. Search the collection for D137936-1. Also names the Hi-Ho Food/Launder/Shoe Center tenants."
+     "label": "Street view, 8 July 1966 (A149103-2)",
+     "url": "https://tacomalibrary.contentdm.oclc.org/digital/iiif/p17061coll21/15781/full/1600,/0/default.jpg",
+     "what": "The catalogue record behind this one carries the 25 acres / 14 retailers / $9M detail."
     },
     {
-     "label": "TPL D149103-3 — the Elvins end, 8 July 1966",
-     "url": "https://tacomalibrary.contentdm.oclc.org/digital/collection/p17061coll21/",
-     "what": "Shows Elvins and Sears at opposite ends. Search the collection for D149103-3."
+     "label": "Aerial, 9 March 1963 (D137936-1)",
+     "url": "https://tacomalibrary.contentdm.oclc.org/digital/iiif/p17061coll21/17250/full/1600,/0/default.jpg",
+     "what": "The earliest dated proof the centre existed, and it shows the site layout."
     },
     {
-     "label": "TPL D144357-1 — the bus ad, 18 Feb 1965",
-     "url": "https://tacomalibrary.contentdm.oclc.org/digital/collection/p17061coll21/",
-     "what": "The Tacoma Transit bus ad reading 'on River Road in Puyallup, just 10 minutes away from Tacoma.' Photographed on Bus #303."
+     "label": "The Elvins end, 8 July 1966 (D149103-3)",
+     "url": "https://tacomalibrary.contentdm.oclc.org/digital/iiif/p17061coll21/16150/full/1600,/0/default.jpg",
+     "what": "Elvins and Sears at opposite ends of the row."
     },
     {
-     "label": "TPL D150443-1 — interior, 20 Jan 1967",
-     "url": "https://tacomalibrary.contentdm.oclc.org/digital/collection/p17061coll21/",
+     "label": "Interior, 20 January 1967 (D150443-1)",
+     "url": "https://tacomalibrary.contentdm.oclc.org/digital/iiif/p17061coll21/24275/full/1600,/0/default.jpg",
      "what": "A Green Giant promotional display inside the centre."
+    },
+    {
+     "label": "Library viewer (needs a login — use the image links above)",
+     "url": "https://tacomalibrary.contentdm.oclc.org/digital/collection/p17061coll21/id/33470/",
+     "what": "⚠️ The Northwest Room web viewer is RESTRICTED and answers \"the collection cannot be displayed, log in and refresh\". Kept only so the catalogue record can be cited."
     }
    ],
    "firstHand": [],
    "openQuestions": [
-    "What did the pylon sign actually look like — colours, typeface, wording? The photographs are the only answer.",
+    "What COLOUR was the logo? The bus advert is a black-and-white photograph, so the oval reads white-on-dark there. The street views may settle it — or somebody in the group will.",
     "Who was Elvins? No founder, origin or closure date exists anywhere.",
     "Exact opening date — the 1962 claim has no archival backing."
    ]
@@ -110,7 +115,7 @@
     {
      "label": "Matlock Fruit Farms buses for berry pickers — Puyallup History Page Group",
      "url": "https://www.facebook.com/groups/303862382366901/",
-     "what": "A descendant's post carrying bus photographs. Search the group for 'Matlock'. This is the only known image source and nobody has opened it yet."
+     "what": "A descendant's post carrying bus photographs. Search the group for 'Matlock'. This is the only known image source and nobody has opened it yet. ⚠️ This opens the GROUP, not the post — search it for the subject name."
     }
    ],
    "firstHand": [
@@ -233,7 +238,7 @@
     {
      "label": "Rob Riley — Puyallup Valley History Group, 5 Dec 2024",
      "url": "https://www.facebook.com/groups/303862382366901/search/?q=Puyallup%20Bowling%20Center",
-     "what": "Caption verbatim: 'Puyallup Bowling Center, Featuring 6 Brunswick Lanes. 323 Meridian South. Circa 1956.' 67 reactions, 26 comments. The only known image."
+     "what": "Caption verbatim: 'Puyallup Bowling Center, Featuring 6 Brunswick Lanes. 323 Meridian South. Circa 1956.' 67 reactions, 26 comments. The only known image. ⚠️ This opens SEARCH RESULTS, not the post itself — the exact permalink has not been captured yet. Scroll to the matching post."
     }
    ],
    "firstHand": [
@@ -274,7 +279,7 @@
     {
      "label": "Rob Riley — 'the iconic 112th Street Drive-In'",
      "url": "https://www.facebook.com/groups/303862382366901/search/?q=112th%20Street%20Drive-In",
-     "what": "71 reactions. Worth reading the comments for anyone who describes the entrance."
+     "what": "71 reactions. Worth reading the comments for anyone who describes the entrance. ⚠️ This opens SEARCH RESULTS, not the post itself — the exact permalink has not been captured yet. Scroll to the matching post."
     }
    ],
    "firstHand": [
@@ -340,7 +345,7 @@
     {
      "label": "The demolition post — Puyallup Valley History Group, 27 June 2024",
      "url": "https://www.facebook.com/groups/303862382366901/search/?q=House%20of%20Kee",
-     "what": "Lori Haun. The building, the excavator mid-swing, the burgundy booths and the carved fountain. 254 reactions, 92 comments, 60 shares."
+     "what": "Lori Haun. The building, the excavator mid-swing, the burgundy booths and the carved fountain. 254 reactions, 92 comments, 60 shares. ⚠️ This opens SEARCH RESULTS, not the post itself — the exact permalink has not been captured yet. Scroll to the matching post."
     },
     {
      "label": "South Hill Historical Society — 'South Hill's Oldest Ethnic Restaurant'",
