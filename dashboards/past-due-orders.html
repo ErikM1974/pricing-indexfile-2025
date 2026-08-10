@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Past Due Orders - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- 2026 design tokens (must load before dash-shell.css) -->
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css">
+    <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
+    <link rel="stylesheet" href="/dashboards/css/past-due-orders.css?v=2026.08.10.5">
+</head>
+<body>
+    <div class="dash-shell">
+        <header class="dash-header">
+            <div class="dash-header-left">
+                <a href="/staff-dashboard.html" title="Back to Staff Dashboard">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                         alt="Northwest Custom Apparel" class="dash-header-logo">
+                </a>
+                <h1 class="dash-header-title">Past Due Orders</h1>
+            </div>
+            <div class="dash-header-right">
+                <label class="pdo-window">
+                    <span>Window</span>
+                    <select id="pdo-days">
+                        <option value="30" selected>30 days</option>
+                        <option value="60">60 days</option>
+                        <option value="90">90 days</option>
+                    </select>
+                </label>
+                <button id="pdo-refresh" class="dash-back-link" type="button">
+                    <i class="fas fa-rotate"></i> Refresh
+                </button>
+                <button id="pdo-print" class="dash-back-link" type="button">
+                    <i class="fas fa-print"></i> Print
+                </button>
+                <a href="/staff-dashboard.html" class="dash-back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    Dashboard
+                </a>
+            </div>
+        </header>
+
+        <main class="dash-content">
+            <div class="dash-error-banner" role="alert">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span class="dash-error-banner-message"></span>
+                <button class="dash-error-banner-close" aria-label="Dismiss">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="dash-stat-grid">
+                <div class="dash-stat-card dash-stat-card--accent">
+                    <div class="dash-stat-value" id="stat-late">—</div>
+                    <div class="dash-stat-label">Past due</div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value" id="stat-risk">—</div>
+                    <div class="dash-stat-label">At risk &middot; due within 7 days, blanks not in house</div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value" id="stat-nopo">—</div>
+                    <div class="dash-stat-label">No purchase order raised yet</div>
+                </div>
+                <div class="dash-stat-card">
+                    <div class="dash-stat-value" id="stat-ontrack">—</div>
+                    <div class="dash-stat-label">Due soon, on track</div>
+                </div>
+            </div>
+
+            <div class="dash-card">
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title">Past due &mdash; every rep, every vendor</h2>
+                    <span class="pdo-asof" id="pdo-asof"></span>
+                </div>
+                <div id="content-root" class="dash-loading">Loading…</div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Load order matters: APP_CONFIG → fetch-timeout → DashPage → page controller -->
+    <script src="/config/app.config.js"></script>
+    <script src="/shared_components/js/fetch-timeout.js"></script>
+    <script src="/shared_components/js/dash-page-helpers.js"></script>
+    <script src="/dashboards/js/past-due-orders.js?v=2026.08.10.5"></script>
+</body>
+</html>
