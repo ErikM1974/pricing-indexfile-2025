@@ -5646,6 +5646,27 @@ app.get('/api/mo/orders', requireStaff, moForwardTo(() => 'orders'));
 app.get('/api/mo/orders/:no', requireStaff, moForwardTo(req => 'orders/' + encodeURIComponent(req.params.no)));
 app.get('/api/mo/lineitems/:no', requireStaff, moForwardTo(req => 'lineitems/' + encodeURIComponent(req.params.no)));
 
+// 2026-08-10 — the rest of the ManageOrders read surface, so the proxy side can be
+// gated. These were NEVER covered by the proxy's gate: it protects four sub-prefixes
+// (/orders, /lineitems, /tracking, /auth) while the router itself mounts at /api, so
+// everything else in that file answered the public internet. Verified live before this
+// change: GET /api/manageorders/customers returned 200 with ~85 KB of customer names,
+// ContactEmail and ContactPhone to an anonymous request, and /payments/:no returned a
+// real order's payment records.
+//
+// /customers is the big one — deduplicateCustomers() emits ContactEmail + ContactPhone
+// (proxy src/utils/manageorders.js:425-426) for every customer with an order in the
+// last 60 days. Live callers are exactly two, both on pages that already load
+// mo-fetch.js: pages/js/art-request-detail.js and pages/js/mockup-detail.js.
+// (shared_components/js/manageorders-customer-service.js is loaded by no page, and
+// staff-dashboard-service.js only declares it in an endpoints map nothing reads —
+// both dead, both verified 2026-08-10, neither migrated.)
+app.get('/api/mo/customers', requireStaff, moForwardTo(() => 'customers'));
+app.get('/api/mo/payments', requireStaff, moForwardTo(() => 'payments'));
+app.get('/api/mo/payments/:no', requireStaff, moForwardTo(req => 'payments/' + encodeURIComponent(req.params.no)));
+app.get('/api/mo/getorderno/:id', requireStaff, moForwardTo(req => 'getorderno/' + encodeURIComponent(req.params.id)));
+app.get('/api/mo/order/:id/snapshot', requireStaff, moForwardTo(req => 'order/' + encodeURIComponent(req.params.id) + '/snapshot'));
+
 // Order_Payments ledger READ for the staff dashboard's Money Collected widget
 // (2026-07-06). The proxy mounts /api/order-payments behind the CRM secret
 // (payer emails = PII), so the browser goes through this staff-session-gated

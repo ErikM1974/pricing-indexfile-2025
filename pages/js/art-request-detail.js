@@ -5820,7 +5820,11 @@
     }
 
     function searchOrdersByName(companyName, container) {
-        fetch(API_BASE + '/api/manageorders/customers')
+        // moFetch, not fetch: this returns every customer's name, email and phone, so it
+        // goes through the staff-gated same-origin forwarder (/api/mo/customers) and the
+        // proxy route is secret-gated. mo-fetch falls back to the direct proxy call if the
+        // forwarder is unavailable, so this cannot break the page. (2026-08-10)
+        moFetch('customers')
             .then(function (resp) {
                 if (!resp.ok) throw new Error('HTTP ' + resp.status);
                 return resp.json();

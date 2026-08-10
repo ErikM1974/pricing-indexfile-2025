@@ -30,7 +30,12 @@
     // 'orders?id_Customer=5&date_Ordered_start=...'. Returns a Response (like fetch).
     function moFetch(path, opts) {
         opts = opts || {};
-        var forwardable = /^(orders|lineitems)(\/|\?|$)/.test(path);
+        // Kept in step with the /api/mo/* routes in server.js. Anything listed here has a
+        // staff-session-gated same-origin forwarder; anything else still goes direct.
+        // customers/payments/getorderno/order-snapshot added 2026-08-10 — they were
+        // answering the public internet because the proxy gates four sub-prefixes while
+        // the router mounts at /api.
+        var forwardable = /^(orders|lineitems|customers|payments|getorderno|order)(\/|\?|$)/.test(path);
         var proxyCall = function () { return fetch(apiBase() + '/api/manageorders/' + path, opts); };
         if (!forwardable) return proxyCall();
         var sameOriginOpts = {};
