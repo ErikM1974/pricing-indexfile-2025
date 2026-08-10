@@ -1,3 +1,7 @@
+## v2026.08.10.6 (2026.08.10)
+
+- Past Due Orders nav: a real icon, and a badge that knows when it doesn't know
+
 ## v2026.08.10.5 (2026.08.10)
 
 - Past Due Orders page — live for all staff, and Ruth can finally see her own
