@@ -1,3 +1,7 @@
+## v2026.08.10.2 (2026.08.10)
+
+- Design Queue: direct image links, and the Hi-Ho logo
+
 ## v2026.08.10.1 (2026.08.10)
 
 - Design Queue: Pat's brief carries the actual sign lettering
