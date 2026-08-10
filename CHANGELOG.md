@@ -1,3 +1,7 @@
+## v2026.08.10.5 (2026.08.10)
+
+- Past Due Orders page — live for all staff, and Ruth can finally see her own
+
 ## v2026.08.10.4 (2026.08.10)
 
 - Forward the ManageOrders PII reads through the staff-gated same-origin path
