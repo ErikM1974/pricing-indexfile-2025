@@ -1,3 +1,8 @@
+## v2026.08.09.7 (2026.08.09)
+
+- Design Queue: report the crawler floor, not a false zero
+- Deploy v2026.08.09.7: cache-bust leaks panel
+
 ## v2026.08.09.6 (2026.08.09)
 
 - Design Queue: render the leaks panel
