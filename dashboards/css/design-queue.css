@@ -306,6 +306,53 @@
     max-width: 84ch;
 }
 
+/* Reference photographs. The credit sits under the picture and is not optional —
+   it is the library's licence condition, so it must survive any restyling. */
+.dq-gallery { margin: 14px 0 16px; }
+
+.dq-gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 12px;
+    margin-top: 6px;
+}
+
+.dq-fig {
+    margin: 0;
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: var(--gray-50);
+}
+
+.dq-fig img {
+    display: block;
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+    background: var(--gray-100);
+}
+
+.dq-fig-cap {
+    display: block;
+    padding: 7px 9px 8px;
+}
+
+.dq-fig-note {
+    display: block;
+    font-size: 11.5px;
+    line-height: 1.4;
+    color: var(--gray-700);
+    margin-bottom: 3px;
+}
+
+.dq-fig-credit {
+    display: block;
+    font-size: 10px;
+    line-height: 1.35;
+    color: var(--gray-500);
+}
+
 .dq-refs { margin: 14px 0 12px; }
 
 .dq-ref { margin-bottom: 8px; }

@@ -93,6 +93,56 @@
         if (b.signage) card.appendChild(warnRow('Signage', b.signage));
         if (b.theStory) card.appendChild(row('The story', b.theStory));
 
+        // ── Archived reference images.
+        //
+        // These are the ONLY images shown on this page, and they are shown because the
+        // Tacoma Public Library's own Rights field permits it: "Images used must credit
+        // Tacoma Public Library as follows: Northwest Room at The Tacoma Public Library,
+        // (image number)". Attribution-only, no commercial restriction.
+        //
+        // 🔴 THE CREDIT IS THE LICENCE, SO IT RENDERS WITH THE IMAGE, ALWAYS. Not in a
+        // tooltip, not in a footer — under the picture, where anyone looking at the picture
+        // reads it. If an image ever arrives here without a credit string it is NOT drawn,
+        // because an uncredited copy is an unlicensed one.
+        //
+        // Facebook photographs are deliberately absent. They have no stated licence, and on
+        // one of them the photographer is unknown and a request for credit went unanswered.
+        if ((b.images || []).length) {
+            var gal = el('div', 'dq-gallery');
+            gal.appendChild(el('div', 'dq-row-label', 'Reference photographs'));
+            var grid = el('div', 'dq-gallery-grid');
+            b.images.forEach(function (im) {
+                if (!im.url || !im.credit) return;      // no credit, no image
+                var fig = document.createElement('figure');
+                fig.className = 'dq-fig';
+                var a = document.createElement('a');
+                a.href = im.url;
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+                var img = document.createElement('img');
+                img.src = im.url;
+                img.alt = im.caption || im.imageNumber || 'reference photograph';
+                // 🔴 NO loading="lazy". With it, these never fetched at all — currentSrc
+                // stayed empty and complete stayed false even after scrolling them into
+                // view, while an identical element without the attribute loaded instantly.
+                // Five images at ~150KB is nothing for a staff page, and an artist opening
+                // a brief to find five empty boxes is a far worse trade than the bytes.
+                a.appendChild(img);
+                fig.appendChild(a);
+                var cap = document.createElement('figcaption');
+                cap.className = 'dq-fig-cap';
+                if (im.caption) cap.appendChild(el('span', 'dq-fig-note', im.caption));
+                cap.appendChild(el('span', 'dq-fig-credit', im.credit));
+                fig.appendChild(cap);
+                grid.appendChild(fig);
+            });
+            gal.appendChild(grid);
+            gal.appendChild(el('p', 'dq-ref-rule',
+                'Draw your own work from these — do not trace or reproduce them. '
+                + 'Wherever one of these pictures goes, the credit line goes with it.'));
+            card.appendChild(gal);
+        }
+
         // ── References. Links only — see the header note.
         if ((b.references || []).length) {
             var refs = el('div', 'dq-refs');

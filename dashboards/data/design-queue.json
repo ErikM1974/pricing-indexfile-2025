@@ -58,34 +58,9 @@
    "theStory": "14 retailers plus a bank across 25 acres. Elvins department store at one end, Sears at the other. Groceries, prescriptions, clothing, gardening supplies, flowers and gasoline. Over $9,000,000 gross in 1965. Acquired by Fred Meyer in 1980 and traded as Fred Meyer's Hi-Ho.",
    "references": [
     {
-     "label": "THE LOGO — Tacoma Transit bus advert, 18 Feb 1965 (D144357-1)",
-     "url": "https://tacomalibrary.contentdm.oclc.org/digital/iiif/p17061coll21/33470/full/1600,/0/default.jpg",
-     "what": "🎯 START HERE. Bus #303, a conductor pointing at the panel. It carries the Hi-Ho logo at full size and the whole advert layout. Opens straight to the image."
-    },
-    {
-     "label": "Street view, 8 July 1966 (A149103-2)",
-     "url": "https://tacomalibrary.contentdm.oclc.org/digital/iiif/p17061coll21/15781/full/1600,/0/default.jpg",
-     "what": "The catalogue record behind this one carries the 25 acres / 14 retailers / $9M detail."
-    },
-    {
-     "label": "Aerial, 9 March 1963 (D137936-1)",
-     "url": "https://tacomalibrary.contentdm.oclc.org/digital/iiif/p17061coll21/17250/full/1600,/0/default.jpg",
-     "what": "The earliest dated proof the centre existed, and it shows the site layout."
-    },
-    {
-     "label": "The Elvins end, 8 July 1966 (D149103-3)",
-     "url": "https://tacomalibrary.contentdm.oclc.org/digital/iiif/p17061coll21/16150/full/1600,/0/default.jpg",
-     "what": "Elvins and Sears at opposite ends of the row."
-    },
-    {
-     "label": "Interior, 20 January 1967 (D150443-1)",
-     "url": "https://tacomalibrary.contentdm.oclc.org/digital/iiif/p17061coll21/24275/full/1600,/0/default.jpg",
-     "what": "A Green Giant promotional display inside the centre."
-    },
-    {
-     "label": "Library viewer (needs a login — use the image links above)",
+     "label": "Tacoma Public Library — Northwest Room catalogue record",
      "url": "https://tacomalibrary.contentdm.oclc.org/digital/collection/p17061coll21/id/33470/",
-     "what": "⚠️ The Northwest Room web viewer is RESTRICTED and answers \"the collection cannot be displayed, log in and refresh\". Kept only so the catalogue record can be cited."
+     "what": "⚠️ The viewer is RESTRICTED and answers \"log in and refresh\". Kept for citation only — the images themselves are above, archived on our own store."
     }
    ],
    "firstHand": [],
@@ -93,6 +68,38 @@
     "What COLOUR was the logo? The bus advert is a black-and-white photograph, so the oval reads white-on-dark there. The street views may settle it — or somebody in the group will.",
     "Who was Elvins? No founder, origin or closure date exists anywhere.",
     "Exact opening date — the 1962 claim has no archival backing."
+   ],
+   "images": [
+    {
+     "url": "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/files/522106aa-6933-4cc2-8d73-1cdb6640ebf9",
+     "credit": "Northwest Room at The Tacoma Public Library, D144357-1",
+     "caption": "THE LOGO. Tacoma Transit Bus #303, 18 Feb 1965.",
+     "imageNumber": "D144357-1"
+    },
+    {
+     "url": "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/files/485a02fa-a892-4a41-b7a2-b9f8cc23474e",
+     "credit": "Northwest Room at The Tacoma Public Library, A149103-2",
+     "caption": "Street view, 8 Jul 1966.",
+     "imageNumber": "A149103-2"
+    },
+    {
+     "url": "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/files/869a21e7-8b51-4bd6-b57d-814783e42d0e",
+     "credit": "Northwest Room at The Tacoma Public Library, D137936-1",
+     "caption": "Aerial, 9 Mar 1963 — earliest dated proof the centre existed.",
+     "imageNumber": "D137936-1"
+    },
+    {
+     "url": "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/files/b57c7f21-aa09-40c6-a2d4-7b42d905388b",
+     "credit": "Northwest Room at The Tacoma Public Library, D149103-3",
+     "caption": "The Elvins end, 8 Jul 1966.",
+     "imageNumber": "D149103-3"
+    },
+    {
+     "url": "https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/files/26aaf823-fb25-4b00-9adc-9115e152d540",
+     "credit": "Northwest Room at The Tacoma Public Library, D150443-1",
+     "caption": "Interior with a Green Giant display, 20 Jan 1967.",
+     "imageNumber": "D150443-1"
+    }
    ]
   },
   {
