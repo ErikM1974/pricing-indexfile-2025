@@ -275,6 +275,36 @@
   var reviewEl = document.getElementById('review');
   var modeEl = document.getElementById('packet-mode');
   var hintEl = document.getElementById('packet-hint');
+  var progressEl = document.getElementById('packet-progress');
+  var readStartedAt = 0;
+  var tickTimer = null;
+
+  function readLabel() { return modeEl.value === 'leave' ? 'Read page' : 'Read packet'; }
+
+  // The spinner element is built ONCE and only its sibling's text is rewritten each second.
+  // Re-rendering the innerHTML every tick would recreate the element and restart its CSS
+  // animation, so the ring would stutter in place — the exact "hung" look this exists to
+  // dispel.
+  function startBusy() {
+    readStartedAt = Date.now();
+    parseBtn.textContent = 'Reading…';
+    progressEl.innerHTML = '<span class="pr-spin"></span><span class="pr-elapsed">reading… 0s</span>';
+    progressEl.hidden = false;
+    if (tickTimer) clearInterval(tickTimer);
+    tickTimer = setInterval(tickBusy, 1000);
+  }
+
+  function tickBusy() {
+    var el = progressEl.querySelector('.pr-elapsed');
+    if (el) el.textContent = 'reading… ' + Math.round((Date.now() - readStartedAt) / 1000) + 's';
+  }
+
+  function stopBusy() {
+    if (tickTimer) { clearInterval(tickTimer); tickTimer = null; }
+    progressEl.hidden = true;
+    progressEl.innerHTML = '';
+    parseBtn.textContent = readLabel();
+  }
 
   // The mode is sent to the server, never inferred there. A leave page pushed through the
   // packet reader reconciles $0 against $0 and passes a gate that checked nothing.
@@ -287,8 +317,8 @@
 
   function syncMode() {
     hintEl.textContent = MODE_HINT[modeEl.value] || '';
-    parseBtn.textContent = modeEl.value === 'leave' ? 'Read page' : 'Read packet';
-    resetReview();
+    resetReview();            // may cancel a read in flight and reset the label via stopBusy
+    parseBtn.textContent = readLabel();
   }
   modeEl.addEventListener('change', syncMode);
   syncMode();
@@ -313,6 +343,7 @@
     parsing = false;
     jobId = null;
     if (pollTimer) { clearTimeout(pollTimer); pollTimer = null; }
+    stopBusy();
     reviewEl.hidden = true;
     commitBtn.disabled = true;
     // Throwing away a running read OR a rendered review both leave the status line
@@ -321,7 +352,7 @@
     if (wasParsing || hadReview) {
       parseBtn.disabled = !(fileInput.files && fileInput.files[0]);
       setStatus((wasParsing ? 'That read was cancelled before it finished.' : 'That review was discarded.')
-        + ' Click ' + (modeEl.value === 'leave' ? 'Read page' : 'Read packet') + ' to start again.', 'info');
+        + ' Click ' + readLabel() + ' to start again.', 'info');
     }
   }
 
@@ -349,6 +380,9 @@
     parseBtn.disabled = true;
     setStatus('Uploading and reading the ' + (modeEl.value === 'leave' ? 'page' : 'packet')
       + ' — this usually takes under a minute…', 'info');
+    // Starts before the upload, not after it: a 2.8 MB base64 POST is itself several seconds
+    // of nothing happening on screen.
+    startBusy();
     try {
       var b64 = await readAsBase64(f);
       var started = await api('/parse', {
@@ -359,6 +393,8 @@
       parsing = true;
       pollParse();
     } catch (e) {
+      parsing = false;
+      stopBusy();
       parseBtn.disabled = false;
       setStatus('Upload failed: ' + e.message, 'error');
     }
@@ -371,11 +407,13 @@
         var res = await api('/parse/' + encodeURIComponent(jobId));
         if (res.status === 'running') return pollParse();
         parsing = false;
+        stopBusy();
         parseBtn.disabled = false;
         if (res.status === 'error') return setStatus('Could not read the packet: ' + res.error, 'error');
         renderReview(res.review);
       } catch (e) {
         parsing = false;
+        stopBusy();
         parseBtn.disabled = false;
         setStatus('Could not read the packet: ' + e.message, 'error');
       }
@@ -478,6 +516,17 @@
     reviewEl.hidden = false;
     commitBtn.disabled = !rec.passed;
     commitBtn.textContent = leave ? 'Save leave balances' : 'Save to payroll records';
+
+    // 🔴 Bring the review TO the operator. A read takes ~40s, so by the time it lands the
+    // person has usually looked away — on 2026-08-10 Erik read the page successfully, went
+    // to the Leave Balances tab to check, saw the old figures and reported "nothing was
+    // updated". The review had rendered perfectly, below the fold on another tab, with the
+    // Save button nobody had pressed. A read that finishes unseen is a read that never
+    // happened, so the panel it lives on is re-shown and scrolled into view.
+    var uploadTab = document.querySelector('.pr-tab[data-panel="upload"]');
+    if (uploadTab && !uploadTab.classList.contains('is-active')) uploadTab.click();
+    try { reviewEl.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    catch (_) { reviewEl.scrollIntoView(); }   // older browsers: no options object
     setStatus(rec.passed
       ? (leave ? 'Page read and verified. Review below, then save.'
         : 'Packet read and verified. Review below, then save.')

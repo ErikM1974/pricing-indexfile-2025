@@ -108,6 +108,10 @@
         <input id="packet-file" class="pr-file" type="file" accept="application/pdf">
         <button id="packet-parse" class="pr-btn" type="button" disabled>Read packet</button>
         <span id="packet-note" class="pr-note"></span>
+        <!-- Busy indicator lives NEXT TO THE BUTTON, where the eye already is after a click.
+             aria-hidden because #pr-status is a polite live region and a per-second counter
+             in it would re-announce forever; the status line says the sentence once. -->
+        <span id="packet-progress" class="pr-progress" aria-hidden="true" hidden></span>
       </div>
       <p id="packet-hint" class="pr-sub"></p>
 
