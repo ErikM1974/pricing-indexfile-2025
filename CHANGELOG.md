@@ -1,3 +1,8 @@
+## v2026.08.10.4 (2026.08.10)
+
+- Forward the ManageOrders PII reads through the staff-gated same-origin path
+- Deploy v2026.08.10.4: cache-bust mo-fetch consumers
+
 ## v2026.08.10.3 (2026.08.10)
 
 - Design Queue: reference photographs on the brief, credit under each
