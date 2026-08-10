@@ -1,3 +1,8 @@
+## v2026.08.10.8 (2026.08.10)
+
+- fix(payroll): cancelling a read left the page stuck with no way out
+- Deploy v2026.08.10.8: 1 file (payroll.html)
+
 ## v2026.08.10.7 (2026.08.10)
 
 - Memory: sample-request routing diagnosis (free samples are email-only, never reach Leads)
