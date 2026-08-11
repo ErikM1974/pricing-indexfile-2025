@@ -64,7 +64,7 @@ var MockupAeGallery = (function () {
         // Submitted_Date (Caspio field type changed away from auto-populated
         // Timestamp) and would otherwise sort to the bottom under 41 Completed
         // records. ID is auto-increment, always populated, monotonic by submission.
-        fetch(API_BASE + '/api/mockups?orderBy=ID DESC&limit=200')
+        fetch('/api/mockups?orderBy=ID DESC&limit=200')
             .then(function (r) {
                 if (!r.ok) throw new Error('API returned ' + r.status);
                 return r.json();

@@ -387,7 +387,11 @@
             return r.json();
         })
     ] : [
-        fetch(API_BASE + '/api/mockups/' + mockupId).then(function (r) {
+        // Same-origin (no API_BASE): these carry customer names, Id_Customer, work
+        // order numbers and AE notes, so they go through the app's session-gated
+        // mockup forwarder rather than straight to the proxy. The SAML cookie rides
+        // along automatically; only the app holds the upstream secret.
+        fetch('/api/mockups/' + mockupId).then(function (r) {
             if (r.status === 404) {
                 var e = new Error('This mockup request no longer exists — it was deleted by Ruth or an AE.');
                 e.code = 'DELETED';
@@ -396,11 +400,11 @@
             if (!r.ok) throw new Error('Server error (HTTP ' + r.status + ')');
             return r.json();
         }),
-        fetch(API_BASE + '/api/mockup-notes/' + mockupId).then(function (r) {
+        fetch('/api/mockup-notes/' + mockupId).then(function (r) {
             if (!r.ok) return { notes: [] };
             return r.json();
         }),
-        fetch(API_BASE + '/api/mockup-versions/' + mockupId).then(function (r) {
+        fetch('/api/mockup-versions/' + mockupId).then(function (r) {
             if (!r.ok) return { versions: [] };
             return r.json();
         })
@@ -620,7 +624,7 @@
         // Submitted_Date (Caspio field type changed away from auto-populated
         // Timestamp) and would otherwise mess up prev/next nav order.
         // ID is auto-increment, always populated, monotonic by submission.
-        var apiUrl = API_BASE + '/api/mockups?orderBy=ID DESC&limit=500';
+        var apiUrl = '/api/mockups?orderBy=ID DESC&limit=500';
         if (repFilter && repFilter !== 'All') {
             if (REP_EMAIL_MAP[repFilter]) {
                 apiUrl += '&submittedBy=' + encodeURIComponent(REP_EMAIL_MAP[repFilter]);
@@ -4283,7 +4287,7 @@
     }
 
     function refreshNotes() {
-        fetch(API_BASE + '/api/mockup-notes/' + mockupId)
+        fetch('/api/mockup-notes/' + mockupId)
             .then(function (r) { return r.ok ? r.json() : { notes: [] }; })
             .then(function (data) { renderNotes(data.notes || []); })
             .catch(function (err) { console.error('Notes refresh failed:', err); });
@@ -4607,7 +4611,7 @@
 
     // ── Version Helpers ────────────────────────────────────────────────────
     function refreshVersionsThenRender() {
-        fetch(API_BASE + '/api/mockup-versions/' + mockupId).then(function (r) {
+        fetch('/api/mockup-versions/' + mockupId).then(function (r) {
             if (!r.ok) return { versions: [] };
             return r.json();
         }).then(function (data) {

@@ -118,6 +118,14 @@ dotenv.config();
 //     listed here: due-dates was silently dropped by a revert and 404'd for a week unnoticed.
 //   GET /dashboards/ae-mission-control.html — per-AE cockpit page (role-gated taneisha/nika; ~L3059)
 //     + AE post-login landing redirect in the SAML ACS (default relay → mission control; ~L3033)
+//   GET /api/mockups[?…], /api/mockups/:id, /api/mockups/broken-mockups,
+//   GET /api/mockup-notes/:id, /api/mockup-versions/:id, /api/mockup-notifications
+//                                        — mockup record data (mockupForward, ~L3917, 2026-08-11).
+//     READS ONLY: the customer approval view writes these paths with no staff session, so
+//     PUT/POST stay on the proxy. Replaced a proxy gate that accepted a browser Origin —
+//     which is caller-supplied, so one curl flag returned Company_Name/Id_Customer/AE_Notes
+//     500 rows at a time. Callers: mockup-detail, art-hub-ruth, ae-dashboard,
+//     portal-directory, design-gallery drawer — all repointed same-origin.
 //
 // 253GEAR PUBLISHER (2026-08-08) — Steve's tab drafts products on the retail storefront.
 //   ALL /api/gear/*                      — page-gated forwarders to proxy /api/shopify/* (~L4361)
@@ -3913,6 +3921,93 @@ app.post('/api/box/shared-link', requireStaff, boxForwardWrite('shared-link', 'j
 app.post('/api/box/create-mockup-folder', requireStaff, boxForwardWrite('create-mockup-folder', 'json'));
 app.post('/api/box/upload-to-folder', requireStaff, boxForwardWrite('upload-to-folder', 'stream'));
 app.delete('/api/box/file/:fileId', requireStaff, boxForwardWrite(req => 'file/' + boxFileId(req), 'none'));
+
+// ── Mockup data forwarder (session-gated) ────────────────────────────────────
+// The same move as the Box forwarder above, for the mockup RECORD data.
+//
+// The proxy gates these reads secret-OR-browser-Origin, and an Origin header is
+// caller-controlled: `curl -H 'Origin: https://www.teamnwca.com'` reproduces a
+// staff browser exactly and returns Company_Name, Id_Customer, Work_Order_Number
+// and AE_Notes — in bulk from the list route, which will happily return 500 rows.
+// The browser cannot hold a secret, so the fix is the one that already worked for
+// Box: the page calls THIS origin, the SAML cookie rides along, requireStaff
+// proves the session server-side, and only the app holds the secret used upstream.
+// Once every caller is repointed here the proxy reads go secret-only and the
+// Origin bypass disappears.
+//
+// 🔴 GET reads only, deliberately. The CUSTOMER approval view (?view=customer)
+// performs writes — PUT /api/mockups/:id/status and POST /api/mockup-notes — with
+// no staff session to prove, so routing writes through requireStaff would break
+// approve/revise. Those stay on the proxy until they get the capability-token
+// treatment the portal read bundle already has.
+//
+// Params are rebuilt from an allowlist rather than passed through, so a caller
+// cannot smuggle anything into the upstream query. This list is taken from the
+// actual call sites, not guessed: art-hub-ruth and ae-dashboard send orderBy+limit,
+// portal-directory dateFrom+pageSize, design-gallery designNumber+limit, and the
+// broken-mockups scan sends refresh.
+const MOCKUP_FORWARD_QUERY = new Set([
+  'designNumber', 'idCustomer', 'dateFrom', 'dateTo', 'orderBy', 'limit', 'pageSize', 'refresh',
+  'since', 'user', // mockup-notifications poll
+]);
+
+function mockupForward(buildPath) {
+  return async (req, res) => {
+    if (!CRM_API_SECRET) {
+      console.error('[mockup-forward] CRM_API_SECRET is not set — refusing to forward');
+      return res.status(503).json({ error: 'Mockup proxy is not configured' });
+    }
+    let suffix;
+    try {
+      suffix = buildPath(req);
+    } catch (e) {
+      return res.status(400).json({ error: e.message });
+    }
+    const qs = new URLSearchParams();
+    for (const [k, v] of Object.entries(req.query || {})) {
+      if (MOCKUP_FORWARD_QUERY.has(k) && typeof v === 'string') qs.set(k, v);
+    }
+    const target = `${CRM_API_BASE}/api/${suffix}${qs.toString() ? '?' + qs : ''}`;
+    try {
+      const upstream = await fetch(target, {
+        headers: { 'X-CRM-API-Secret': CRM_API_SECRET },
+        signal: AbortSignal.timeout(20000),
+      });
+      const body = await upstream.text();
+      // Customer data behind a per-session gate must never sit in a shared cache.
+      res.status(upstream.status)
+        .type(upstream.headers.get('content-type') || 'application/json')
+        .set('Cache-Control', 'no-store')
+        .send(body);
+    } catch (err) {
+      console.error('[mockup-forward] ' + target + ' failed:', err.message);
+      if (!res.headersSent) res.status(502).json({ error: 'Mockup request failed' });
+    }
+  };
+}
+
+// Mockup ids are numeric; anything else is rejected rather than forwarded.
+function mockupRecordId(req) {
+  const id = String(req.params.id || '');
+  if (!/^\d{1,12}$/.test(id)) throw new Error('Invalid mockup id');
+  return id;
+}
+
+// 🔴 The literal segment MUST be registered before the :id pattern, or Express
+// captures 'broken-mockups' as an id. mockupRecordId()'s numeric check makes that
+// safe even if the order were wrong — but both guards exist because relying on
+// registration order alone is how this breaks the day someone loosens the regex.
+app.get('/api/mockups/broken-mockups', requireStaff, mockupForward(() => 'mockups/broken-mockups'));
+app.get('/api/mockups', requireStaff, mockupForward(() => 'mockups'));
+app.get('/api/mockups/:id', requireStaff, mockupForward(req => 'mockups/' + mockupRecordId(req)));
+app.get('/api/mockup-notes/:id', requireStaff, mockupForward(req => 'mockup-notes/' + mockupRecordId(req)));
+app.get('/api/mockup-versions/:id', requireStaff, mockupForward(req => 'mockup-versions/' + mockupRecordId(req)));
+// The notification feed looks harmless and is not: each entry carries companyName
+// and designNumber, and the handler only filters by ?user= when that param is
+// present — so an anonymous poll with no user returns EVERY queued notification.
+// In-memory and pruned, so it is usually empty, which is exactly why it went
+// unnoticed.
+app.get('/api/mockup-notifications', requireStaff, mockupForward(() => 'mockup-notifications'));
 
 // ── DTG print-box calibration WRITES (admin only) ────────────────────────────
 // The calibration tool (/tools/custom-tees-calibrate.html) used to POST and
