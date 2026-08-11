@@ -4,6 +4,67 @@ Resolved entries aged out of `LESSONS_LEARNED.md` (300-line cap). Newest first. 
 
 ---
 
+## Two note endpoints write the same table; only one of them tells anybody (2026-08-07)
+
+**Problem.** The AE "Approve Design" button on `/art-request/:id?view=ae` fired a native
+`confirm()` and collected no free text, so anything the AE wanted Steve to know had to go
+through a separate `+ Add Note` afterwards. Adding an optional note box meant picking a
+route for it.
+
+**Root cause / the trap.** The page has TWO note endpoints that look interchangeable and
+are not:
+- `POST /api/art-requests/:designId/note` (proxy `src/routes/art.js:1436`) — writes
+  `DesignNotes`, **no fan-out, and no length validation at all**.
+- `POST /api/design-notes` (`art.js:760`) — writes the **same table with the same fields**,
+  plus direction-aware Slack + email. `Posted_By_Role:'ae'` routes the primary email to
+  Steve at `art@nwcustomapparel.com`; `notify:false` short-circuits the whole fan-out
+  before any lookup.
+
+So `/api/design-notes` is a strict **superset** — swapping to it is one row, not two. The
+tempting wrong move is to keep the thin call and *add* a design-notes call for the Slack
+ping; that duplicates the timeline row.
+
+**Solution.** Swap the approve step to `/api/design-notes` with `notify: !!typedNote`, so a
+blank note behaves byte-identically to before (Steve still gets `template_art_completed`
++ the dashboard push, and gains no third ping) and a typed note reaches him.
+
+**Prevention.**
+- 🔑 **Before adding a second call to get a side effect, check whether the endpoint you are
+  already calling has a superset sibling.** Two routes writing one Caspio table is the norm
+  in this repo, not the exception.
+- 🔴 **The status write commits BEFORE the note write and is never rolled back.** A rejected
+  note leaves the record `Approved` in Caspio while the UI shows "Error — retry", and a
+  retry re-fires the status write, the note, the EmailJS to Steve and the dashboard push.
+  Free text is the first input that can realistically trigger it — hence `maxlength="2000"`
+  on the textarea *plus* a JS length guard (maxlength does not apply to a programmatic
+  `.value` set).
+- 🔑 **`approveDesign()` never called `refreshNotes()`.** Tolerable for an auto-generated
+  status line, invisible-looking for a note the user just typed. If a write is user-authored,
+  the surface that displays it must refresh in the same success block.
+- 🔑 **`.onclick =` beats `cloneNode`/`replaceChild` for re-openable modals.** Property
+  assignment is idempotent; the clone trick used by `openChangesModal()` also copies the
+  reflected `disabled` attribute and `innerHTML`, so a modal closed mid-error reopens dead.
+  `openCustomerReviseModal():4344` additionally leaks one overlay listener per open.
+- 🔴 **A namespaced export reads like a global at the call site — and the ReferenceError
+  landed INSIDE a `.catch()`, so it soft-locked the modal (FIXED 2026-08-07).** Three sites in
+  `pages/js/art-request-detail.js` called a bare `showToast(...)`. It is defined only as
+  `window.TransferActions.showToast` (`transfer-actions-shared.js:593`, inside that file's
+  IIFE), so a bare reference threw — proven at runtime: `TransferActions.showToast` is a
+  `function` while `window.showToast` is `undefined` and `showToast` alone throws
+  `ReferenceError`. Fixed by switching all three to the page's own `showArdToast()`.
+  - 🔑 **The upload-failure one was in a `.catch()` handler, so the two lines AFTER it never
+    ran** — `btn.disabled = false` and `btn.textContent = 'Submit Revision Request'`. A failed
+    upload left Submit permanently disabled reading "Uploading N files…". Compounded by the
+    `cloneNode` bug above: reopening the modal clones the *disabled* button, so the flow stayed
+    dead. **An error handler that can itself throw converts a visible failure into a soft-lock.**
+  - 🔑 The two size/count guards threw *before* their `return`, so they rejected the file by
+    accident while aborting the caller's loop — remaining dropped files were silently skipped.
+  - 🔑 **Prevention: prefer the page's own helper over one that "seems" global.** Grep for
+    `function <name>` AND `window.<name>` before calling — a helper exported as
+    `window.NS.<name>` is not in scope, and nothing in a browser fails at load time to tell you.
+
+---
+
 ## Colour never changed the photo, and every existing check passed (2026-08-07)
 
 **Problem.** On 253gear.com, choosing a colour did not change the product photo. A
