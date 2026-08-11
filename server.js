@@ -3443,6 +3443,28 @@ async function gateStaffPage(req, res, next) {
   return next();
 }
 
+// Gate for the id-addressed detail pages (/mockup/:id, /art-request/:designId).
+// These render a shell whose images and Box files ALL ride the staff session
+// (requireStaff on /api/box/*), while the record itself loads anonymously — so
+// ungated, a signed-out staffer got a page that looked fine with every image
+// broken and no way to recover. The staff session cookie has no maxAge (it dies
+// with the browser), so this is reached routinely, not just after a long idle.
+// Bounce to SSO and come straight back instead.
+//
+// Deliberately NOT gateStaffPage: that derives a Staff_Page_Access key from the
+// last path segment, which for these routes is the record id (e.g. "173") and
+// would only ever match by accident. Presence of a staff session is the whole
+// rule here.
+//
+// 🔴 Customer-view links (?view=customer&cid=<token>) are external recipients
+// approving a mockup. They carry their own capability token and must never be
+// bounced to staff SSO — the token, not this gate, is their authorization.
+function gateStaffDetailPage(req, res, next) {
+  if (req.query.view === 'customer') return next();
+  if (req.session && req.session.crmUser) return next();
+  return res.redirect('/auth/saml/login?next=' + encodeURIComponent(req.originalUrl));
+}
+
 // Generic CRM proxy handler factory
 function createCrmProxy(endpoint, allowedRoles) {
   return [
@@ -5189,7 +5211,7 @@ app.get('/art-hub-ruth.html', gateStaffPage, (req, res) => {
 });
 
 // Ruth mockup detail page (serves for /mockup/123, /mockup/456, etc.)
-app.get('/mockup/:id', (req, res) => {
+app.get('/mockup/:id', gateStaffDetailPage, (req, res) => {
   res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
   res.set('Pragma', 'no-cache');
   res.set('Expires', '0');
@@ -12035,7 +12057,7 @@ app.get('/design/:designNumber', (req, res) => {
 });
 
 // Art request detail page - staff-facing shareable link
-app.get('/art-request/:designId', (req, res) => {
+app.get('/art-request/:designId', gateStaffDetailPage, (req, res) => {
   const designId = req.params.designId;
   if (!designId || !/^\d+(\.\d+)?$/.test(designId)) {
     return res.status(400).send('Invalid design ID');

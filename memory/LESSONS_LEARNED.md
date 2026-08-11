@@ -5,6 +5,51 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## An ungated shell over gated assets tells the user the wrong story (2026-08-11)
+
+**Problem.** Ruth: "I can't see any images, the screen is completely dark." Her mockup detail page
+showed a black overlay reading *"Image could not be loaded — link may have expired"*, a red
+*"Failed to load Box files"*, and an anonymous `IMG` badge — while Ruth's Fields, the notes and the
+slots all rendered perfectly. Nothing was broken and no link had expired: **she was signed out.**
+
+**Root cause.** Two halves of the same page authenticate differently. The record, notes and versions
+load **anonymously** from the proxy (`mockup-detail.js:336-352`), so the page renders fully. Every
+Box asset goes through the app's same-origin forwarders (`server.js:3809-3817`), all `requireStaff`,
+so all of them 401. And `/mockup/:id` (`server.js:5192`) was registered with **no gate at all** —
+unlike `/art-hub-ruth.html` five lines above it — so she was never bounced to SSO. The staff session
+is `cookie-session` with **no `maxAge`** (`server.js:786-792`): it dies when the browser closes, so
+this is reached routinely, not after some long idle. "Expired" was impossible by construction.
+
+**Solution.** `gateStaffDetailPage` on `/mockup/:id` and `/art-request/:designId`, exempting
+`?view=customer` (external approval links carry their own capability token and cannot complete staff
+SSO). Client side, `mockup-detail.js` now branches on the real HTTP status — 401 → "You're signed
+out" + a `/auth/saml/login?next=…` link in both a page banner and the lightbox label; 502/503 →
+"Box service is temporarily unavailable". An `<img>` error carries no status, so the lightbox
+HEAD-probes to recover one. Locked by `tests/unit/detail-page-gate.test.js`.
+
+**Prevention.**
+- 🔑 **If a page's shell and its assets have different auth requirements, the weaker one sets what
+  the user sees.** Anonymous data + gated images = a page that looks healthy and is useless. Gate
+  the shell at the same level as its most-protected dependency, or the failure is silent.
+- 🔴 **Never let an error string assert a cause the code cannot know.** An `<img>` error event has
+  no status, so "link may have expired" was a guess — and it was wrong in the common case, sending
+  the diagnosis toward Box and expiry instead of toward a missing cookie. Probe for the status, or
+  say only what you know.
+- 🔑 **A 401 that renders as a generic broken-file badge is unactionable.** `handleBoxImageError()`
+  branched on 404 only; every other status fell to the same anonymous placeholder. The page had
+  **zero** references to `401`, `loginUrl` or `auth/saml` — nothing to click.
+- 🔑 **"Only one person is affected" can mean "only one person is signed out."** These routes gate on
+  session *presence*, not role, so no registry/allowlist entry could have caused it — which ruled
+  out the whole `Ruthie`-vs-`ruth@` family of causes before any code was read.
+- 🔑 **Verify a suspected auth hole with a CLEAN client.** A browser fetch returned 200 for a Box
+  endpoint while `/api/crm-session/me` said `authenticated:false` — which looked exactly like an
+  anonymous data leak. It was `Cache-Control: private, max-age=300` replaying the earlier
+  authenticated response. `curl` with no cookie returned 401 and killed the false positive.
+- 🔑 **`/api/crm-session/me` is the cheap "are you actually signed in?" test** — 200 either way, safe
+  to paste into the address bar, no redirect. Reach for it before theorising.
+
+---
+
 ## A new lead source saved fine and stayed invisible — the form-ID vocabulary lives in 12 places (2026-08-10)
 
 **Problem.** A customer's free sample request (`NWCA-SAMPLE-0808-1-480`, Inland Beef Company)
@@ -103,124 +148,6 @@ blank note behaves byte-identically to before (Steve still gets `template_art_co
   - 🔑 **Prevention: prefer the page's own helper over one that "seems" global.** Grep for
     `function <name>` AND `window.<name>` before calling — a helper exported as
     `window.NS.<name>` is not in scope, and nothing in a browser fails at load time to tell you.
-
----
-
-## Colour never changed the photo, and every existing check passed (2026-08-07)
-
-**Problem.** On 253gear.com, choosing a colour did not change the product photo. A
-shopper picking Charcoal was shown Athletic Heather and bought on that picture. Live on
-**6 of the 7 multi-colour products**; on two of them the correct photo was already
-uploaded and bound to nothing. Nobody reported it — Erik only asked how to *structure*
-the product.
-
-**Root cause.** Variants were bound to a photo by **Style alone**; Colour was never part
-of the key. The audit asked only whether each variant had *an* image, which was true
-throughout — so `variant_image_binding`, the headline check written after this defect
-shipped twice before, passed cleanly on every affected product.
-
-**Solution.** `scripts/253gear-align-media.js` + a declared `(Style|Colour) -> position`
-map (`253gear-media-maps.json`). Two new audit checks in `src/utils/shopify-audit.js`:
-`colour_image_distinct` (blocking — every pair resolves to its OWN photo) and
-`orphan_media` (non-blocking — names uploaded-but-unbound photos and their position).
-
-**Prevention.**
-- 🔴 **"Every X has a Y" does not imply "every X has its OWN Y."** The reciprocal check is
-  a different check. Whenever a binding is one-per-group, assert **distinctness**, not
-  just presence — presence passes for the entire lifetime of the bug.
-- 🔴 **Media ORDER is load-bearing.** The theme gives an **unbound** photo the options of
-  the *nearest preceding bound* photo (`product-template.CURRENT.liquid:393-402`), so a
-  lifestyle shot after the wrong flat-lay silently switches the shopper's colour on click.
-  Calico's maroon lifestyle shot sat behind the charcoal tee and did exactly that. My own
-  first instinct — "move lifestyle photos to the end" — would have *created* this bug on
-  Spanaway; the theme code said otherwise.
-- 🔴 **Never infer a binding from a filename.** Two of Spanaway's photos are named `34082`
-  for design `34084`; the lifestyle files are stock names with no colour at all. Both
-  Calico lifestyle shots had to be **opened and looked at** to learn their colour.
-- 🔑 **A dry run that previews the wrong state is worse than none.** The first version
-  validated against the *pre*-reorder gallery and printed bindings that were plainly
-  wrong. Simulate every mutation in memory so the preview describes the state that will
-  actually exist.
-- 🔑 **Pick the statistic before trusting the data.** Taking the **max** of SanMar's
-  `PIECE_WEIGHT` per size picked single outlier rows (hoodie L: 74 of 75 colourways say
-  558 g, one says 567 g) and would have re-weighed **284 variants across 37 products**.
-  The **mode** matched the catalogue on PC54 7/7 and PC78H 6/7. Check the distribution
-  before writing, not after.
-- 🔑 **`productReorderMedia` returns `UserError`, which has no `code` field** (unlike
-  `MediaUserError`). Selecting it fails the whole query at parse time.
-- 🔴 **A BAD GATE DOES NOT FAIL LOUDLY — IT REPORTS SUCCESS.** Both new checks shipped green
-  and an adversarial review found **11 defects, 6 real**, in code I had just written and
-  self-reviewed as safe. My own confirming pass called it "safe to deploy". Specifics worth
-  keeping:
-  - **`MediaImage` GID ≠ `ProductImage` GID** — two namespaces for one picture, so
-    `media.id === variant.image.id` is NEVER true. Only the **normalised URL** joins them.
-    (This bit me twice in one day: first in a script, then again in the audit check.)
-  - **A check is only as good as the query feeding it.** `checkOrphanMedia` was inert on the
-    publish gate because that query never selected `media { image { url } }` — it reported
-    "no media to check" on products full of photos. Now drift-locked by a test.
-  - **When a check cannot answer, it must SAY so** — never return a clean pass on data it
-    never received.
-  - **`byPair[k] = x` in a loop is last-write-wins.** It silently hid pairs whose sizes
-    disagreed. Collect a Set when "these must all agree" is the actual invariant.
-  - 🔑 Strip the CDN `?v=` before comparing image URLs — it differs between reads of one file.
-- 🔴 **Shopify options are PRODUCT-level, so a colour listed is offered for EVERY style.** Four
-  products sold "tee in one colour, hoodie in the other" while advertising all four pairs; the
-  theme does no availability filtering, so half of each was **"Unavailable" with a dead Add to
-  Cart**. Two fixes: recolour to one colour (Colour survives single-value and renders as static
-  text), or **fold the colour into the Style value** ("T-Shirt - Royal") and delete the Colour
-  option. Delete it with **`NON_DESTRUCTIVE`**, which refuses rather than deleting variants.
-- 🔑 **Folding colour into Style silently breaks every config lookup** — price, weight, SKU and
-  filter tag all key on the option string, and each tool **SKIPS an unknown style rather than
-  erroring**, so the product drops out of coverage with nothing reporting it. `baseStyleOption()`
-  resolves it, exact match first. ⚠️ It treats ANY `" - suffix"` as a colour, so
-  `T-Shirt - Premium` would price as a plain tee — `align-prices` now names every style it
-  resolved that way, because it is the one path that rewrites what a customer pays.
-- 🔑 **`productDeleteMedia` does NOT delete the file.** It detaches the image; the file stays in
-  Shopify Files, still `READY`, at a **different CDN url** (the `/products/` path, no attachment
-  UUID) while the url the product was serving 404s. Recovery is a `files(query:)` lookup, not a
-  re-upload — that turned a reshoot into five minutes.
-- 🔑 **Only `productUpdate` and `publishablePublish` return a plain `UserError` with NO `code`
-  field**; every other product mutation returns a typed error that has one. Selecting `code` on
-  those two fails the whole query at parse time. **`productReorderMedia`'s canonical field is
-  `mediaUserErrors`** — `userErrors` is a deprecated alias that can read empty while the real
-  errors sit in the other, so select both.
-- ⚠️ **A scripted edit to this repo can be silently reverted (OneDrive) — re-read before
-  assuming it landed.** Two python-rewrite edits reported success and left the file unchanged;
-  one produced a warning whose feeder set existed but whose print block was never inserted, so
-  the warning could never fire. Verify the OUTPUT, not the edit's exit code.
-- 🔑 **Backticks inside a JS template literal end the string** — a GraphQL `#` comment containing
-  `` `userErrors` `` broke two files. No backticks in embedded GraphQL.
-- 🔑 Verified on the **live storefront by clicking every thumbnail**, not in the admin —
-  both prior binding incidents were invisible to the API. Set a distinctive size first:
-  if a click moves Size, the image is bound to too few variants.
-
-## Two Shopify shapes both use `name`, so every variant keyed to the same string (2026-08-07)
-
-**Problem.** In the 253Gear Publisher build, `buildVariantMediaBindings()` produced a binding key
-of the literal string `"season|||color"` for EVERY variant. Had it shipped, an entire product would
-have bound to one image — or to none — which is exactly the defect that already hit 253gear.com
-twice (644 variants after the tee/hoodie merge, then 7 Fall variants of #40749).
-
-**Root cause.** Shopify uses the key `name` for two different things depending on direction:
-
-    input  (ProductVariantSetInput):  { optionName: 'Style', name: 'T-Shirt' }   -> name is the VALUE
-    output (variant.selectedOptions): { name: 'Style', value: 'T-Shirt' }        -> name is the OPTION
-
-My helper did `found.name || found.value`, which is correct for the shape I SEND and silently
-returns the option NAME for the shape Shopify RETURNS. Nothing throws; the keys just collapse.
-
-**Solution.** Disambiguate on the presence of `optionName`, never on `name` — `optionValue()` in
-`src/utils/shopify-product-builder.js` (caspio-pricing-proxy).
-
-**Prevention.**
-- 🔑 **Test against the shape the API RETURNS, not the shape you send.** The builder's own unit
-  tests passed throughout — they exercised objects the builder had just constructed, which carried
-  an internal `_key`. Only a fixture shaped like a real `productSet` response exposed it.
-- 🔑 **A field name reused with two meanings is a silent-failure generator.** When an API round-trips
-  through differently-shaped input and output types, write the collision down at the read site —
-  a fallback chain like `a.x || a.y` will pick the wrong one and never complain.
-- 🔑 **A key-building function deserves a test that two DIFFERENT inputs produce two different keys.**
-  Asserting the happy path only would have passed here: every key was well-formed, just identical.
 
 ---
 

@@ -462,9 +462,9 @@
 ### Mockup Detail Page (NEW 2026-04)
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/pages/mockup-detail.html` | Single-mockup detail page — full image, design info, history | mockup-detail.js, mockup-detail.css | ✅ Active |
-| `/pages/js/mockup-detail.js` | Mockup detail controller — fetches record + thumbnails, history timeline | /api/mockups/:id | ✅ Active |
-| `/pages/css/mockup-detail.css` | Mockup detail styling | — | ✅ Active |
+| `/pages/mockup-detail.html` | Single-mockup detail page — full image, design info, history. Served at **`/mockup/:id`** (the URL every link uses) and `/pages/mockup-detail.html`. Both are staff-gated; `/mockup/:id` uses `gateStaffDetailPage`, which exempts `?view=customer` — **2026-08-11**: it was UNGATED, so a signed-out staffer got the shell (the record loads anonymously) with every Box image 401ing. Carries `#pmd-auth-banner`, raised by the controller on a 401. | mockup-detail.js, mockup-detail.css | ✅ Active |
+| `/pages/js/mockup-detail.js` | Mockup detail controller — fetches record + thumbnails, history timeline. **Translates Box failures by HTTP status** (`isAuthStatus`/`boxFailureReason`/`probeBoxStatus`/`showSignedOutBanner`): a 401 now says "You're signed out" with a `/auth/saml/login?next=…` link instead of "link may have expired", and 502/503 report as a Box outage rather than a missing file. An `<img>` error carries no status, so the lightbox HEAD-probes to recover one. | /api/mockups/:id, /api/box/* | ✅ Active |
+| `/pages/css/mockup-detail.css` | Mockup detail styling — incl. `.pmd-auth-banner` (signed-out prompt) and `.pmd-box-panel-error` | — | ✅ Active |
 
 ### Supacolor Job Detail (NEW 2026-04)
 | File | Purpose | Dependencies | Status |
