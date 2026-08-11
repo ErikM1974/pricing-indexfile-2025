@@ -602,7 +602,10 @@
         var REP_EMAIL_MAP = {
             'Taneisha': 'taneisha@nwcustomapparel.com',
             'Nika': 'nika@nwcustomapparel.com',
-            'Ruthie': 'ruthie@nwcustomapparel.com',
+            // ruth@ — ruthie@ is not a real account. Records spell her "Ruthie",
+            // so both keys resolve. Keep in sync with art-actions-shared.js.
+            'Ruthie': 'ruth@nwcustomapparel.com',
+            'Ruth': 'ruth@nwcustomapparel.com',
             'Erik': 'erik@nwcustomapparel.com'
         };
 

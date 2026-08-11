@@ -26,7 +26,10 @@ var MockupAeGallery = (function () {
     var REP_EMAIL_MAP = {
         'Taneisha': 'taneisha@nwcustomapparel.com',
         'Nika': 'nika@nwcustomapparel.com',
-        'Ruthie': 'ruthie@nwcustomapparel.com',
+        // ruth@ — ruthie@ is not a real account. The rep filter's option value is
+        // the string "Ruthie", so that key must stay; it just points at her inbox.
+        'Ruthie': 'ruth@nwcustomapparel.com',
+        'Ruth': 'ruth@nwcustomapparel.com',
         'Erik': 'erik@nwcustomapparel.com'
     };
 
