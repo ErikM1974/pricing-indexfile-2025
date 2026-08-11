@@ -215,7 +215,9 @@
     }
 
     function hydrateRuth(dn, token) {
-        return getJSON(base() + '/api/mockups?designNumber=' + encodeURIComponent(dn) + '&limit=20')
+        // Same-origin (no base()): mockup rows carry customer PII, so they come
+        // through the app's session-gated forwarder rather than the proxy directly.
+        return getJSON('/api/mockups?designNumber=' + encodeURIComponent(dn) + '&limit=20')
             .then(function (data) {
                 if (token !== state.token) return;
                 var rows = (data && data.records) || [];

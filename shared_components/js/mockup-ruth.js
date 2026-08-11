@@ -144,7 +144,8 @@
             // Submitted_Date (Caspio field type changed away from auto-populated
             // Timestamp) and would otherwise sort to the bottom of the queue.
             // ID is auto-increment, always populated, monotonic by submission.
-            const resp = await fetch(`${API_BASE}/api/mockups?orderBy=ID DESC&limit=500`);
+            // Same-origin: session-gated mockup forwarder (server.js mockupForward).
+            const resp = await fetch(`/api/mockups?orderBy=ID DESC&limit=500`);
             if (!resp.ok) throw new Error(`API returned ${resp.status}`);
             const data = await resp.json();
             allMockups = data.records || [];
@@ -663,7 +664,7 @@
     // ── Notification Polling ─────────────────────────────────────────────
     async function pollNotifications() {
         try {
-            const resp = await fetch(`${API_BASE}/api/mockup-notifications?since=${lastNotificationPoll}&user=ruth@nwcustomapparel.com`);
+            const resp = await fetch(`/api/mockup-notifications?since=${lastNotificationPoll}&user=ruth@nwcustomapparel.com`);
             if (!resp.ok) return;
             const data = await resp.json();
             if (data.notifications && data.notifications.length > 0) {
@@ -977,7 +978,7 @@
             + 'Checking mockup files in Box...'
             + '</div>';
 
-        fetch(API_BASE + '/api/mockups/broken-mockups')
+        fetch('/api/mockups/broken-mockups')
             .then(function (resp) {
                 if (!resp.ok) throw new Error('HTTP ' + resp.status);
                 return resp.json();
@@ -1429,7 +1430,7 @@
     }
 
     function bmlReloadFromServer() {
-        return fetch(API_BASE + '/api/mockups/broken-mockups?refresh=true')
+        return fetch('/api/mockups/broken-mockups?refresh=true')
             .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
             .then(function (data) {
                 brokenMockupsData = data;

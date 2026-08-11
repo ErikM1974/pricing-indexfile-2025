@@ -31,6 +31,57 @@
     // script tag degrades instead of throwing.
     function resolveBoxUrl(u) { return (typeof boxUrl === 'function') ? boxUrl(u) : u; }
 
+    // ─── Honest Box failures ───────────────────────────────────────────────
+    // Every Box asset on this page rides the staff session cookie through the
+    // app's same-origin forwarders (requireStaff on /api/box/*). That cookie has
+    // no maxAge — it dies when the browser closes — so a signed-out staffer used
+    // to get "link may have expired" and a generic IMG badge, which is a lie with
+    // nothing to click. Translate the real HTTP status into a true message.
+    // NOTE: 502/503 from the forwarder produce a byte-identical screen, so we
+    // report the status rather than assuming every failure is a sign-in problem.
+    var _authBannerShown = false;
+
+    /** Statuses that mean "no valid staff session". */
+    function isAuthStatus(status) { return status === 401 || status === 403; }
+
+    /** Plain-language reason for a failed Box request, by HTTP status. */
+    function boxFailureReason(status) {
+        if (isAuthStatus(status)) return "You're signed out";
+        if (status === 404) return 'File missing from Box';
+        if (status === 502 || status === 503) return 'Box service is temporarily unavailable';
+        return status ? ('Could not load image (HTTP ' + status + ')') : 'Could not load image';
+    }
+
+    /** SAML login URL that returns the user to this exact mockup. */
+    function loginHref() {
+        return '/auth/saml/login?next='
+            + encodeURIComponent(window.location.pathname + window.location.search);
+    }
+
+    /**
+     * An <img> error event carries no status. HEAD the same URL to recover it so
+     * the message can name the real cause. Network failure → 0.
+     */
+    function probeBoxStatus(url, cb) {
+        fetch(url, { method: 'HEAD' })
+            .then(function (resp) { cb(resp.status); })
+            .catch(function () { cb(0); });
+    }
+
+    /**
+     * One-time page banner telling a signed-out user why the images are missing.
+     * Never shown in customer view — a customer has no staff SSO to sign in to.
+     */
+    function showSignedOutBanner() {
+        if (_authBannerShown || isCustomerView) return;
+        var banner = document.getElementById('pmd-auth-banner');
+        if (!banner) return;
+        _authBannerShown = true;
+        var btn = document.getElementById('pmd-auth-banner-btn');
+        if (btn) btn.href = loginHref();
+        banner.style.display = '';
+    }
+
     // ─── Display-time Auto-Heal (Layer 3) ──────────────────────────────
     // When a Box thumbnail URL returns 404, automatically fire Ruth's
     // recovery route — searches the design's Box folder for a replacement
@@ -124,6 +175,9 @@
                         }
                         return;
                     }
+                    // 401/403 = signed out, not a broken file. Say so once, at the
+                    // page level, instead of leaving a wall of anonymous IMG badges.
+                    if (isAuthStatus(resp.status)) showSignedOutBanner();
                     img.style.display = 'none';
                     if (placeholder) placeholder.style.display = 'flex';
                 })
@@ -333,7 +387,11 @@
             return r.json();
         })
     ] : [
-        fetch(API_BASE + '/api/mockups/' + mockupId).then(function (r) {
+        // Same-origin (no API_BASE): these carry customer names, Id_Customer, work
+        // order numbers and AE notes, so they go through the app's session-gated
+        // mockup forwarder rather than straight to the proxy. The SAML cookie rides
+        // along automatically; only the app holds the upstream secret.
+        fetch('/api/mockups/' + mockupId).then(function (r) {
             if (r.status === 404) {
                 var e = new Error('This mockup request no longer exists — it was deleted by Ruth or an AE.');
                 e.code = 'DELETED';
@@ -342,11 +400,11 @@
             if (!r.ok) throw new Error('Server error (HTTP ' + r.status + ')');
             return r.json();
         }),
-        fetch(API_BASE + '/api/mockup-notes/' + mockupId).then(function (r) {
+        fetch('/api/mockup-notes/' + mockupId).then(function (r) {
             if (!r.ok) return { notes: [] };
             return r.json();
         }),
-        fetch(API_BASE + '/api/mockup-versions/' + mockupId).then(function (r) {
+        fetch('/api/mockup-versions/' + mockupId).then(function (r) {
             if (!r.ok) return { versions: [] };
             return r.json();
         })
@@ -544,7 +602,10 @@
         var REP_EMAIL_MAP = {
             'Taneisha': 'taneisha@nwcustomapparel.com',
             'Nika': 'nika@nwcustomapparel.com',
-            'Ruthie': 'ruthie@nwcustomapparel.com',
+            // ruth@ — ruthie@ is not a real account. Records spell her "Ruthie",
+            // so both keys resolve. Keep in sync with art-actions-shared.js.
+            'Ruthie': 'ruth@nwcustomapparel.com',
+            'Ruth': 'ruth@nwcustomapparel.com',
             'Erik': 'erik@nwcustomapparel.com'
         };
 
@@ -566,7 +627,7 @@
         // Submitted_Date (Caspio field type changed away from auto-populated
         // Timestamp) and would otherwise mess up prev/next nav order.
         // ID is auto-increment, always populated, monotonic by submission.
-        var apiUrl = API_BASE + '/api/mockups?orderBy=ID DESC&limit=500';
+        var apiUrl = '/api/mockups?orderBy=ID DESC&limit=500';
         if (repFilter && repFilter !== 'All') {
             if (REP_EMAIL_MAP[repFilter]) {
                 apiUrl += '&submittedBy=' + encodeURIComponent(REP_EMAIL_MAP[repFilter]);
@@ -4229,7 +4290,7 @@
     }
 
     function refreshNotes() {
-        fetch(API_BASE + '/api/mockup-notes/' + mockupId)
+        fetch('/api/mockup-notes/' + mockupId)
             .then(function (r) { return r.ok ? r.json() : { notes: [] }; })
             .then(function (data) { renderNotes(data.notes || []); })
             .catch(function (err) { console.error('Notes refresh failed:', err); });
@@ -4553,7 +4614,7 @@
 
     // ── Version Helpers ────────────────────────────────────────────────────
     function refreshVersionsThenRender() {
-        fetch(API_BASE + '/api/mockup-versions/' + mockupId).then(function (r) {
+        fetch('/api/mockup-versions/' + mockupId).then(function (r) {
             if (!r.ok) return { versions: [] };
             return r.json();
         }).then(function (data) {
@@ -4667,7 +4728,20 @@
                 return;
             }
             img.style.display = 'none';
-            labelEl.textContent = 'Image could not be loaded \u2014 link may have expired';
+            labelEl.textContent = 'Image could not be loaded\u2026';
+            // The error event gives no status, so ask the server what actually
+            // happened rather than blaming an expired link (it usually isn't one \u2014
+            // a signed-out session produces this exact screen).
+            probeBoxStatus(url, function (status) {
+                if (isAuthStatus(status) && !isCustomerView) {
+                    showSignedOutBanner();
+                    // The banner sits behind this overlay, so repeat the action here.
+                    labelEl.innerHTML = "You're signed out \u2014 <a href=\""
+                        + escapeHtml(loginHref()) + '">sign in</a> to view this image.';
+                    return;
+                }
+                labelEl.textContent = boxFailureReason(status);
+            });
         };
 
         img.src = largeUrl;
@@ -4678,7 +4752,12 @@
     function closeLightbox() {
         var lightbox = document.getElementById('pmd-lightbox');
         lightbox.classList.remove('show');
-        document.getElementById('pmd-lightbox-img').src = '';
+        var img = document.getElementById('pmd-lightbox-img');
+        // Detach BEFORE clearing src: assigning '' re-fires onerror, which would
+        // re-request the image and re-run the status probe on a closed lightbox.
+        img.onerror = null;
+        img.src = '';
+        document.getElementById('pmd-lightbox-label').textContent = '';
         document.body.style.overflow = '';
     }
 
@@ -5431,7 +5510,13 @@
 
         fetch('/api/box/folder-files?folderId=' + folderId)
             .then(function (resp) {
-                if (!resp.ok) throw new Error('Failed to load Box files');
+                if (!resp.ok) {
+                    // Carry the status so the catch can tell "signed out" apart from
+                    // "Box is down" — they used to render the same red sentence.
+                    var err = new Error(boxFailureReason(resp.status));
+                    err.status = resp.status;
+                    throw err;
+                }
                 return resp.json();
             })
             .then(function (data) {
@@ -5457,7 +5542,13 @@
             })
             .catch(function (err) {
                 loadingEl.style.display = 'none';
-                grid.innerHTML = '<p style="color:#dc2626;padding:12px;font-size:13px;">Failed to load: ' + escapeHtml(err.message) + '</p>';
+                if (isAuthStatus(err.status) && !isCustomerView) {
+                    showSignedOutBanner();
+                    grid.innerHTML = '<p class="pmd-box-panel-error">You\'re signed out — <a href="'
+                        + escapeHtml(loginHref()) + '">sign in</a> to see Box files.</p>';
+                    return;
+                }
+                grid.innerHTML = '<p class="pmd-box-panel-error">' + escapeHtml(err.message) + '</p>';
             });
     }
 

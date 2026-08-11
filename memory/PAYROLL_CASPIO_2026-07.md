@@ -415,3 +415,21 @@ with all the other employees". **Taneisha Clark: 40 hours on 2026-08-12, then he
 - 🔑 Parse jobs are **in-memory with a 30-minute TTL**, and `jobId` is a plain JS variable: reloading
   the page loses the review and the Save button even though the server still holds the parsed payload.
   There is no way back to it — re-read the file.
+
+### 9b. The upload is THREE steps and step 3 is the one that gets missed (2026-08-10)
+
+read → review → **save**. Twice in one day a read succeeded, reconciled, and was never committed —
+`/import` call count in the logs: **0** both times.
+
+- 🔑 **"Nothing was updated" almost always means Save was never clicked.** Check
+  `heroku logs | grep -c payroll/import` FIRST — it separates "the reader is broken" from "the
+  operator never reached step 3" in one command, and the two look identical from the page.
+- 🔴 **A read takes ~40s, so the operator looks away** — usually to the Leave Balances tab, where the
+  OLD figures sit. The review had rendered perfectly, below the fold, on a tab they had left. Fixed:
+  a successful read re-activates the upload panel and scrolls the review into view.
+- 🔑 **A greyed-out button with no motion is indistinguishable from a dead page** — especially right
+  after being handed a genuinely dead one. There is now a spinner + elapsed-seconds counter beside
+  the button and the label reads "Reading…". Build the spinner ONCE and rewrite only the counter
+  text, or every tick restarts the CSS animation and the ring stutters in place (= looks hung).
+- ⚠️ **Parse jobs are in-memory, 30-min TTL, and `jobId` is a plain JS variable** — reloading the page
+  abandons a finished review the server still holds. Tell the operator to SAVE, not to refresh.

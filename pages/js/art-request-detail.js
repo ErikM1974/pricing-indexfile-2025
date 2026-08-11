@@ -1104,7 +1104,10 @@
             var repEmailMap = {
                 'Taneisha': 'taneisha@nwcustomapparel.com',
                 'Nika': 'nika@nwcustomapparel.com',
-                'Ruthie': 'ruthie@nwcustomapparel.com',
+                // ruth@ — ruthie@ is not a real account. ArtRequests stores her as
+                // "Ruthie", so both spellings must resolve. Mirrors REP_MAP above.
+                'Ruthie': 'ruth@nwcustomapparel.com',
+                'Ruth': 'ruth@nwcustomapparel.com',
                 'Erik': 'erik@nwcustomapparel.com'
             };
             if (repEmailMap[repFilter]) {
