@@ -1,3 +1,14 @@
+## v2026.08.11.1 (2026.08.11)
+
+- Memory: the payroll upload is three steps and step 3 is the one that gets missed
+- Memory: restore PAYROLL topic file and add the three-step upload lesson
+- Mockup/art-request detail: gate the page, and tell a signed-out user the truth
+- Route mockup record reads through a session-gated forwarder
+- Memory: a prefix gate covers only its prefix, and Origin is not authentication
+- Point four rep maps at Ruth's real inbox
+- Merge mockup detail fixes: signed-out gate, mockup PII forwarder, rep email maps
+- Deploy v2026.08.11.1: 6 files (ae-dashboard.html,art-hub-ruth.html,design-gallery.html,...)
+
 ## v2026.08.10.9 (2026.08.10)
 
 - feat(payroll): show the read working, and bring the finished review to the operator
