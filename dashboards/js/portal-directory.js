@@ -79,7 +79,7 @@
 
     // ── Fetch mockups (2026+ with images) ──
     function fetchMockups() {
-        return fetch(API_BASE + '/api/mockups?dateFrom=' + encodeURIComponent(DATE_CUTOFF) + '&pageSize=1000')
+        return fetch('/api/mockups?dateFrom=' + encodeURIComponent(DATE_CUTOFF) + '&pageSize=1000')
             .then(function (r) {
                 if (!r.ok) throw new Error('Mockups: ' + r.status);
                 return r.json();

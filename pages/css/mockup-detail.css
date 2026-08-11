@@ -27,6 +27,61 @@ body {
     flex-direction: column;
 }
 
+/* ── Signed-out banner ──────────────────────────────── */
+/* Raised when a Box asset returns 401/403. Amber, not red: nothing is broken —
+   the user just needs to sign in. */
+.pmd-auth-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 1100px;
+    margin: 16px auto 0;
+    padding: 12px 16px;
+    background: #fffbeb;
+    border: 1px solid #fcd34d;
+    border-left: 4px solid #f59e0b;
+    border-radius: 6px;
+    color: #78350f;
+    font-size: 14px;
+}
+
+.pmd-auth-banner-icon {
+    flex: 0 0 auto;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #f59e0b;
+    color: #fff;
+    font-weight: 700;
+    font-size: 13px;
+    line-height: 20px;
+    text-align: center;
+}
+
+.pmd-auth-banner-text { flex: 1 1 auto; }
+
+.pmd-auth-banner-btn {
+    flex: 0 0 auto;
+    padding: 7px 16px;
+    background: #b45309;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.pmd-auth-banner-btn:hover { background: #92400e; }
+
+/* Box Files panel failure text (was an inline style on a generated <p>) */
+.pmd-box-panel-error {
+    color: #dc2626;
+    padding: 12px;
+    font-size: 13px;
+}
+
+.pmd-box-panel-error a { color: #b45309; font-weight: 600; }
+
 /* ── Header ─────────────────────────────────────────── */
 .pmd-header {
     background: linear-gradient(135deg, var(--art-theme), var(--art-theme-dark));

@@ -1,4 +1,4 @@
-# Active Files Registry
+﻿# Active Files Registry
 **Last Updated:** 2026-07-24
 **Total Active Files:** 598 (HTML+JS+CSS, excludes `node_modules/`, `.git/`, `tests/`, `.claude/`, `archive-working-files/`)
 **Purpose:** Track all active files to prevent orphaned code accumulation
@@ -462,9 +462,9 @@
 ### Mockup Detail Page (NEW 2026-04)
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/pages/mockup-detail.html` | Single-mockup detail page — full image, design info, history | mockup-detail.js, mockup-detail.css | ✅ Active |
-| `/pages/js/mockup-detail.js` | Mockup detail controller — fetches record + thumbnails, history timeline | /api/mockups/:id | ✅ Active |
-| `/pages/css/mockup-detail.css` | Mockup detail styling | — | ✅ Active |
+| `/pages/mockup-detail.html` | Single-mockup detail page — full image, design info, history. Served at **`/mockup/:id`** (the URL every link uses) and `/pages/mockup-detail.html`. Both are staff-gated; `/mockup/:id` uses `gateStaffDetailPage`, which exempts `?view=customer` — **2026-08-11**: it was UNGATED, so a signed-out staffer got the shell (the record loads anonymously) with every Box image 401ing. Carries `#pmd-auth-banner`, raised by the controller on a 401. | mockup-detail.js, mockup-detail.css | ✅ Active |
+| `/pages/js/mockup-detail.js` | Mockup detail controller — fetches record + thumbnails, history timeline. **Translates Box failures by HTTP status** (`isAuthStatus`/`boxFailureReason`/`probeBoxStatus`/`showSignedOutBanner`): a 401 now says "You're signed out" with a `/auth/saml/login?next=…` link instead of "link may have expired", and 502/503 report as a Box outage rather than a missing file. An `<img>` error carries no status, so the lightbox HEAD-probes to recover one. Record/notes/versions reads are **same-origin** through `mockupForward` — never `API_BASE`; writes still go to the proxy because the customer approval view performs them with no staff session. | same-origin /api/mockups/:id, /api/mockup-{notes,versions}/:id, /api/box/* | ✅ Active |
+| `/pages/css/mockup-detail.css` | Mockup detail styling — incl. `.pmd-auth-banner` (signed-out prompt) and `.pmd-box-panel-error` | — | ✅ Active |
 
 ### Supacolor Job Detail (NEW 2026-04)
 | File | Purpose | Dependencies | Status |
@@ -979,8 +979,8 @@
 ### Mockup Workflow Services
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/shared_components/js/mockup-ae.js` | AE mockup workflow logic (review, send, approve) | — | ✅ Active |
-| `/shared_components/js/mockup-ruth.js` | Ruth mockup workflow logic (digitizing) | — | ✅ Active |
+| `/shared_components/js/mockup-ae.js` | AE mockup workflow logic (review, send, approve). Mockup list read is **same-origin** (`/api/mockups`) through the session-gated forwarder — never `API_BASE`. | server.js `mockupForward` | ✅ Active |
+| `/shared_components/js/mockup-ruth.js` | Ruth mockup workflow logic (digitizing). Reads (list, broken-mockups, notifications poll) are **same-origin** through the session-gated forwarder; writes still go to the proxy. ⚠️ The notification poll runs every 30 s, so it now counts against the app's shared 200-req/15-min `/api/` limiter. | server.js `mockupForward` | ✅ Active |
 | `/shared_components/js/mockup-submit-form.js` | Mockup submit form controller | — | ✅ Active |
 | `/shared_components/js/sticker-banner-submit-form.js` | **NEW** AE Sticker/Banner art-request intake form (posts to /api/artrequests with Item_Type=Sticker/Banner + structured Item_Specs_Notes block) | /api/artrequests, /api/files/upload, EmailJS | ✅ Active |
 | `/shared_components/js/garment-submit-form.js` | **NEW (2026-06-17)** AE Garment art-request intake form — replaced Caspio DataPage a0e150009f0e9f9d4ff3457dae47. Fully structured fields (Artwork_Status, Approval_Status, Artwork_Locations JSON, Color_Mode/PMS/Thread/Underbase, Exact_Text, prev-order ref, Uploaded_File_Type, AE checklist). Style→Color cascade via /api/stylesearch + /api/product-colors. | /api/artrequests, /api/files/upload, /api/stylesearch, /api/product-colors, CompanyContactPicker, DesignNamePicker, WorkOrderPicker, EmailJS | ✅ Active |
@@ -1355,7 +1355,7 @@ cap-embroidery-fix.css
 | `/dashboards/js/product-manager.js` | Product Manager controller — list/filter/stats, add-edit form, /api/files/upload image flow, POST/PUT /api/non-sanmar-products | DashPage, APP_CONFIG | ✅ Active |
 | `/dashboards/css/product-manager.css` | Product Manager page styles (2026 tokens) | dash-shell.css, art-hub.css | ✅ Active |
 | `/dashboards/portal-directory.html` | Customer portal directory — index of customer portals | portal-directory.js, portal-directory.css | ✅ Active |
-| `/dashboards/js/portal-directory.js` | Portal directory controller — customer list, search | /api/customers | ✅ Active |
+| `/dashboards/js/portal-directory.js` | Portal directory controller — customer list, search. Mockup list read is **same-origin** through the session-gated forwarder. | /api/customers, server.js `mockupForward` | ✅ Active |
 | `/dashboards/css/portal-directory.css` | Portal directory styles | — | ✅ Active |
 | `/dashboards/supacolor-orders.html` | Supacolor orders dashboard — local mirror of Supacolor jobs | supacolor-orders.js, supacolor-orders.css, kanban.css | ✅ Active |
 | `/dashboards/js/supacolor-orders.js` | Supacolor orders controller — sync trigger, kanban view, filters | /api/supacolor-jobs | ✅ Active |
@@ -1411,7 +1411,7 @@ cap-embroidery-fix.css
 | `/dashboards/js/design-gallery-store.js` | **NEW (2026-08-05)** Index lifecycle — streamed `/index` download w/ progress, IndexedDB cache, ETag revalidation via `/meta`, `/recent` delta-merge, `patchImage` for on-demand thumbnails. | `/api/design-search/{index,meta,recent}` | ✅ Active |
 | `/dashboards/js/design-gallery-grid.js` | **NEW (2026-08-05)** Windowed result grid — dual-spacer chunking (200/chunk, ≤3 mounted) so 39k results hold ~600 DOM cards; batched thumbnail fill, density toggle, roving keyboard focus. Owns the shared card template. | `/api/thumbnails/by-designs` (via design-thumbnail-service.js) | ✅ Active |
 | `/dashboards/js/design-gallery-rails.js` | **NEW (2026-08-05)** Browse surface — stat strip, "Fresh off the digitizer", "Recently stitched", top-client collages, date-seeded Today's Wall. Zero API calls (reads the loaded index). | design-gallery-search.js, design-gallery-grid.js | ✅ Active |
-| `/dashboards/js/design-gallery-drawer.js` | **NEW (2026-08-05)** Inspector drawer — instant paint from the index, then 3 parallel hydrations with per-section inline errors + retry; merged URL-deduped image strip, hi-res lightbox, Copy/Share/Quote/prev-next. | `/api/digitized-designs/lookup`, `/api/artrequests`, `/api/mockups`, `/api/box/thumbnail/:id` | ✅ Active |
+| `/dashboards/js/design-gallery-drawer.js` | **NEW (2026-08-05)** Inspector drawer — instant paint from the index, then 3 parallel hydrations with per-section inline errors + retry; merged URL-deduped image strip, hi-res lightbox, Copy/Share/Quote/prev-next. | `/api/digitized-designs/lookup`, `/api/artrequests`, **same-origin** `/api/mockups` (session-gated forwarder), `/api/box/thumbnail/:id` | ✅ Active |
 | `/dashboards/js/design-gallery.js` | **NEW (2026-08-05)** Design Vault controller — URL state machine (`?q&tier&src&yr&has&customer&sort` + `#design=`), mode transitions, Esc unwind ladder, keyboard map, deep-search escalation, freshness pill, boot/offline surfaces. | all design-gallery-*.js, dash-page-helpers.js | ✅ Active |
 | `/tests/unit/design-search-core.test.js` | **NEW (2026-08-05)** Locks the Design Vault wire contract — row decode, imgRef expansion, ranking ladder, filter composition, `/recent` delta-merge, seeded wall determinism (41 tests). Moves only WITH the proxy-side index tests. | jest, design-gallery-search.js | ✅ Active |
 | `/tests/unit/design-gallery-xss.test.js` | **NEW (2026-08-05)** XSS regression lock — 7 hostile company/design names through card/grid/drawer render paths assert no script nodes, no `on*` attributes, no attribute breakout; plus source-level bans on handler templates and hardcoded proxy hosts (22 tests, jsdom). | jest, jsdom, design-gallery-{search,grid,drawer}.js | ✅ Active |
