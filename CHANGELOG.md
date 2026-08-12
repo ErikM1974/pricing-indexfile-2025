@@ -1,3 +1,9 @@
+## v2026.08.12.1 (2026.08.12)
+
+- Fix Box forwarder truncating responses (Unterminated string in JSON)
+- Merge fix/box-forward-content-length: Box forwarder response truncation
+- Deploy v2026.08.12.1: 6 files (art-hub-steve.html,bradley-screenprint.html,bradley-transfers.html,...)
+
 ## v2026.08.11.1 (2026.08.11)
 
 - Memory: the payroll upload is three steps and step 3 is the one that gets missed
