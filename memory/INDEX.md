@@ -16,6 +16,7 @@ Last Updated: 2026-08-12
 | [`CASPIO_SYNC_CLUSTER_COST.md`](CASPIO_SYNC_CLUSTER_COST.md) | Per-job Caspio call attribution for the sync cluster |
 | [`COST_ALLOCATION_MODEL.md`](COST_ALLOCATION_MODEL.md) | Production-hour + order-pool cost model ($30.09/hr, art included) |
 | [`CUSTOMER_ORDER_BEHAVIOUR.md`](CUSTOMER_ORDER_BEHAVIOUR.md) | Reorder behaviour — the 2nd order beats the 1st order’s size as a predictor |
+| [`DURABLE_GOTCHAS.md`](DURABLE_GOTCHAS.md) | The expensive traps, by trigger (verification / auth / JS / deploy / API) — moved out of the auto-loaded index 2026-08-12 |
 | [`EMBROIDERY_PRICING_REALIZATION.md`](EMBROIDERY_PRICING_REALIZATION.md) | 85% realization, the $442K gap — pricing is sound, it is not being charged |
 | [`LESSONS_LEARNED.md`](LESSONS_LEARNED.md) | Active bug log — problem/root cause/fix/prevention (cap 300 lines) |
 | [`LESSONS_LEARNED_ARCHIVE.md`](LESSONS_LEARNED_ARCHIVE.md) | Aged-out lessons (unbounded) |
@@ -34,7 +35,8 @@ Last Updated: 2026-08-12
 
 - `MEMORY_SYSTEM.md` (the governing design `/memory-maintain` cites) was lost in the
   2026-07-28 reset and has not been rewritten. Recover from
-  `Downloadsepo-memory-backup-2026-07-28\` or git history before `cc9a61e4`.
+  `Downloads
+epo-memory-backup-2026-07-28\` or git history before `cc9a61e4`.
 - Auto-memory `caspio-api-usage-audit-2026-07.md` (166 lines, waves 2–3: 18 + 26 Jul)
   overlaps `CASPIO_QUOTA_2026-07.md` (27 Jul–1 Aug) in SUBJECT but not in DATE RANGE.
   Not collapsed — folding it into the repo copy would drop the wave-2 record. Reconcile
