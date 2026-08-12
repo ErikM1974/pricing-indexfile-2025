@@ -20,6 +20,7 @@ Last Updated: 2026-08-12
 | [`EMBROIDERY_PRICING_REALIZATION.md`](EMBROIDERY_PRICING_REALIZATION.md) | 85% realization, the $442K gap — pricing is sound, it is not being charged |
 | [`LESSONS_LEARNED.md`](LESSONS_LEARNED.md) | Active bug log — problem/root cause/fix/prevention (cap 300 lines) |
 | [`LESSONS_LEARNED_ARCHIVE.md`](LESSONS_LEARNED_ARCHIVE.md) | Aged-out lessons (unbounded) |
+| [`MEMORY_SYSTEM.md`](MEMORY_SYSTEM.md) | **How the memory system works** (not what is in it) — where a new fact goes, the 6 surfaces and when each loads, size budgets, which tree is canonical |
 | [`PAYROLL_CASPIO_2026-07.md`](PAYROLL_CASPIO_2026-07.md) | Payroll/Caspio — leave upload, entitlement traps, slip generation |
 | [`SHOPWORKS_ODBC_INTEGRATION.md`](SHOPWORKS_ODBC_INTEGRATION.md) | ShopWorks ODBC + bandit sync cluster, thumbnails, ORDER_ODBC reconcile |
 | [`contract-embroidery-dst.md`](contract-embroidery-dst.md) | Contract embroidery .DST quoting |
@@ -33,10 +34,12 @@ Last Updated: 2026-08-12
 
 ## Known backlog
 
-- `MEMORY_SYSTEM.md` (the governing design `/memory-maintain` cites) was lost in the
-  2026-07-28 reset and has not been rewritten. Recover from
-  `Downloads
-epo-memory-backup-2026-07-28\` or git history before `cc9a61e4`.
+- 🔴 **CLAUDE.md routes ManageOrders discoveries to files that do not exist.**
+  `MANAGEORDERS_COMPLETE_REFERENCE.md` and `MANAGEORDERS_CRM_CAPABILITY_REFERENCE.md`
+  (plus `CASPIO_API_CORE.md`, `SANMAR_API_REFERENCE.md`, `sanmar-po/README.md`,
+  `3-day-tees/ORDER_PUSH_FLOW.md`) survive ONLY in Downloads/repo-memory-backup-2026-07-28/.
+  Restore them or retarget the rule — but they predate 2026-07-28 and ManageOrders has
+  moved since (ORDER_ODBC reconcile, 2026-08-10), so check currency before copying back.
 - Auto-memory `caspio-api-usage-audit-2026-07.md` (166 lines, waves 2–3: 18 + 26 Jul)
   overlaps `CASPIO_QUOTA_2026-07.md` (27 Jul–1 Aug) in SUBJECT but not in DATE RANGE.
   Not collapsed — folding it into the repo copy would drop the wave-2 record. Reconcile
