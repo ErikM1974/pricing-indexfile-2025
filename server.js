@@ -3805,7 +3805,23 @@ function boxForward(buildPath, opts) {
       });
       res.status(upstream.status);
       // Carry the headers that make an <img>/download behave; drop the rest.
-      for (const h of ['content-type', 'content-length', 'content-disposition',
+      //
+      // content-length is deliberately ABSENT. node-fetch asks for gzip and
+      // inflates the body transparently, so upstream's length describes the
+      // COMPRESSED bytes while the pipe below sends the decompressed ones.
+      // Copying it framed every response short: a Box search matching 14-20
+      // folders died in the browser on "Unterminated string in JSON at position
+      // 476", and ~50% of art folders broke the file picker the same way.
+      // (Live 2026-08-05 → 2026-08-12.) Our own compression() masked it above
+      // ~1 KB gzipped by stripping the header again, which is why it looked
+      // intermittent and size-dependent rather than simply broken.
+      //
+      // Do NOT restore it — and do not "improve" this by copying it only when
+      // upstream sent no content-encoding: axios (the proxy's jotform forwarder)
+      // DELETES content-encoding after inflating while keeping the stale length,
+      // so that test is not portable across clients. Never forward a length you
+      // did not measure; let Node frame the response.
+      for (const h of ['content-type', 'content-disposition',
                        'cache-control', 'etag', 'last-modified']) {
         const v = upstream.headers.get(h);
         if (v) res.setHeader(h, v);
@@ -3899,7 +3915,12 @@ function boxForwardWrite(suffix, mode) {
     try {
       const upstream = await fetch(target, { method: req.method, headers, body });
       res.status(upstream.status);
-      for (const h of ['content-type', 'content-length', 'content-disposition']) {
+      // content-length omitted for the reason spelled out in boxForward above:
+      // the piped body is inflated, upstream's length is not. Latent rather than
+      // live here — write responses run 30-200 bytes so the proxy never gzips
+      // them — except DELETE's 409 "file in use" body, which carries one entry
+      // per referencing record and crosses 1 KB at ~13 references.
+      for (const h of ['content-type', 'content-disposition']) {
         const v = upstream.headers.get(h);
         if (v) res.setHeader(h, v);
       }
