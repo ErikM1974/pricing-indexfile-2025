@@ -826,15 +826,48 @@
         });
     }
 
+    // Box reads go through the same-origin forwarder. Two failure modes reach the
+    // user as gibberish unless they are named here, because both surface only as a
+    // JSON parser message:
+    //   • signed out — requireStaff bounces to SSO and `resp.json()` chokes on the
+    //     HTML. The staff cookie has no maxAge, so this is the commonest failure.
+    //   • a malformed body — what the 2026-08-05 forwarder bug looked like from
+    //     Steve's side for a week ("Unterminated string in JSON at position 476").
+    // Status is checked BEFORE parsing and a parse failure is reported as a
+    // transport fault instead of echoed raw. The underlying error still goes to
+    // the console with the sizes that identify a truncation — the failure stays
+    // visible, it just stops being addressed to a JS engine.
+    async function boxGetJson(url, what) {
+        var resp = await fetch(url, { credentials: 'same-origin' });
+        if (resp.redirected || resp.status === 401 || resp.status === 403) {
+            throw new Error('Your staff session expired. Reload the page, sign in, then try again.');
+        }
+        var text = await resp.text();
+        var data;
+        try {
+            data = JSON.parse(text);
+        } catch (parseErr) {
+            console.error('[tas picker] ' + what + ' returned an unparseable body', {
+                status: resp.status,
+                contentLengthHeader: resp.headers.get('content-length'),
+                bytesReceived: text.length,
+                head: text.slice(0, 200)
+            });
+            throw new Error(what + ' failed — the server sent a malformed response. Try again, and report it if it repeats.');
+        }
+        if (!resp.ok || !data.success) throw new Error(data.error || (what + ' failed'));
+        return data;
+    }
+
     async function pickerSearch(query) {
         var results = $('#tas-picker-results');
         var recent = $('#tas-picker-recent');
         if (recent) recent.innerHTML = '';
         results.innerHTML = '<div class="tas-picker-busy"><i class="fas fa-spinner fa-spin"></i> Searching Box...</div>';
         try {
-            var resp = await fetch('/api/box/search?query=' + encodeURIComponent(query) + '&type=folder&limit=20');
-            var data = await resp.json();
-            if (!resp.ok || !data.success) throw new Error(data.error || 'search failed');
+            var data = await boxGetJson(
+                '/api/box/search?query=' + encodeURIComponent(query) + '&type=folder&limit=20',
+                'Box search');
             renderSearchResults(data.entries || []);
         } catch (err) {
             console.warn('[tas picker] search failed:', err);
@@ -872,9 +905,9 @@
         results.innerHTML = '<div class="tas-picker-busy"><i class="fas fa-spinner fa-spin"></i> Loading files...</div>';
         recordRecentFolder({ id: folderId, name: folderName });
         try {
-            var resp = await fetch('/api/box/folder-files?folderId=' + encodeURIComponent(folderId));
-            var data = await resp.json();
-            if (!resp.ok || !data.success) throw new Error(data.error || 'folder-files failed');
+            var data = await boxGetJson(
+                '/api/box/folder-files?folderId=' + encodeURIComponent(folderId),
+                'Loading Box files');
             renderFileGrid(folderId, folderName, data.files || []);
         } catch (err) {
             console.warn('[tas picker] folder load failed:', err);
