@@ -5,6 +5,55 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## Never forward a Content-Length you did not measure (2026-08-12)
+
+**Problem.** Steve's "Send to Supacolor" Box picker answered searches with
+`Unterminated string in JSON at position 476`. Not Box, not the search — the browser was
+being told the response was shorter than it was and stopped reading mid-string. The same
+defect broke `/api/box/folder-files` for any folder holding 5–27 files: **8 of 16 real art
+folders sampled**, i.e. a coin flip every time a picker opened. Live 7 days (2026-08-05→12).
+
+**Root cause.** `boxForward` (server.js) copied `content-length` from upstream and then piped
+the body. **node-fetch asks for gzip and inflates transparently**, so that header described the
+COMPRESSED bytes while the pipe sent the decompressed ones. `content-encoding` was correctly
+not copied — which is exactly what turned a stale header into a *lie* rather than a mismatch.
+
+**Why it looked intermittent — the band, not a threshold.** Corruption needs BOTH:
+uncompressed ≥ 1024 (so the proxy gzips at all) AND gzip < 1024 (so our own `compression()`
+declines to re-compress and leaves the bogus header on the wire). Below the band the proxy
+sends plaintext; above it `compression()` strips the header and goes chunked — accidentally
+correct. Small lists are safe by being small, huge ones by being huge; **the useful middle is
+where every picker lives.** Search caps at `limit=20`, so it can never reach the size that
+recovers: 14+ hits always failed, ≤13 always worked.
+
+**Solution.** Stop copying `content-length` in both `boxForward` and `boxForwardWrite`; let
+Node frame the response. App-only — the proxy was clean.
+
+**Prevention.**
+- 🔑 **Do NOT "improve" this by copying the length only when `content-encoding` is absent.**
+  That works for node-fetch/undici but **axios DELETES `content-encoding` after inflating while
+  keeping the stale length** (verified: 47-byte length on a 3008-byte stream) — so the test is
+  unwritable at `caspio-pricing-proxy/src/routes/jotform.js:183`, which has this same bug.
+- 🔑 **The obvious source-grep lock is VACUOUS.** `not.toContain("upstream.headers.get('content-length')")`
+  would have been GREEN all week — that literal never existed; the code reads `.get(h)` in a
+  loop. `tests/unit/box-forward-content-length.test.js` instead **parses the real array out of
+  server.js** and drives it through a live round trip.
+- 🔑 **An express+`compression()` upstream cannot reproduce this** — it removes Content-Length
+  when it gzips. The gzip+length pairing comes from Heroku re-framing. The test upstream must
+  be a raw `http.createServer` writing both headers by hand, or the harness is a stub that
+  skips the hard part and passes against the bug.
+- 🔑 **Test the BAND, not a size.** One small + one large payload both pass while broken.
+- ⚠️ Severity is worse than a truncated body: with keep-alive the surplus bytes are read as the
+  next response and the connection desynchronises (`HPE_INVALID_CONSTANT`).
+- ⚠️ `application/octet-stream` is compressible in the app's mime-db 1.54.0 (the proxy still has
+  1.52.0, where it is not) — so a routine proxy `npm install` would have started **silently
+  corrupting small `.DST`/`.EMB` downloads**, a bad stitch file rather than a visible error.
+  This fix defuses that permanently.
+- ⚠️ `git blame` misleads here: the loop arrived in `76b6aa85`, whose message is about
+  content-hashed caching and never mentions the forwarder.
+
+---
+
 ## A prefix gate covers its prefix and nothing beside it; Origin is not auth (2026-08-11)
 
 **Problem.** `GET /api/mockup-notes/:id` and `GET /api/mockup-versions/:id` answered a bare
