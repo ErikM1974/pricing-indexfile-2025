@@ -33,7 +33,13 @@ Node frame the response. App-only — the proxy was clean.
 - 🔑 **Do NOT "improve" this by copying the length only when `content-encoding` is absent.**
   That works for node-fetch/undici but **axios DELETES `content-encoding` after inflating while
   keeping the stale length** (verified: 47-byte length on a 3008-byte stream) — so the test is
-  unwritable at `caspio-pricing-proxy/src/routes/jotform.js:183`, which has this same bug.
+  unwritable at `caspio-pricing-proxy/src/routes/jotform.js:183`, which had the same bug.
+  **Both are now fixed** (app `v2026.08.12.1`; proxy same day, `tests/jest/jotform-file-content-length.test.js`).
+  A repo-wide sweep confirms these were the only two: the app has 3 `.pipe(res)` sites and the
+  proxy 2, and every other one copies `content-type`/`content-disposition` only. Every other
+  `Content-Length` in either repo is self-measured (`Buffer.byteLength`) or a SOAP request header
+  — both fine. **The rule generalises: only ever set a length you computed from the bytes you
+  are about to write.**
 - 🔑 **The obvious source-grep lock is VACUOUS.** `not.toContain("upstream.headers.get('content-length')")`
   would have been GREEN all week — that literal never existed; the code reads `.get(h)` in a
   loop. `tests/unit/box-forward-content-length.test.js` instead **parses the real array out of
