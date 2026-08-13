@@ -5,6 +5,39 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## `table-layout: fixed` reads widths from the FIRST ROW, not from your `<th>` classes (2026-08-13)
+
+**Problem.** The new per-rep Past Due print sheets came out with all 8 columns an identical
+90 px despite explicit per-column width classes on the `<th>`. Customer names wrapped to two
+lines, which nearly doubled sheet height (Nika: 9.7 in of a 10 in page for 23 rows).
+
+**Root cause.** Under `table-layout: fixed` the browser derives every column width from the
+**first row of the table** and ignores later rows. The first row here was the repeating rep
+banner — `<tr><th colspan="8">` — which expresses no per-column width, so the engine fell back
+to equal division. The width classes on the third row were never consulted.
+
+**Solution.** Move the widths onto a `<colgroup>` / `<col>` set. `<colgroup>` outranks all rows
+under fixed layout, so it works regardless of what the first row looks like.
+
+**Prevention.**
+- 🔑 **`table-layout: fixed` + any `colspan` in the first row ⇒ you MUST use `<colgroup>`.** This
+  is the normal shape for a print table, because the repeating `<thead>` banner that carries the
+  rep/customer name onto spilled pages is itself a full-width `colspan` row.
+- 🔑 **A repeating identity row belongs in `<thead>`, not in an `<h*>` above the table.** Only
+  `thead { display: table-header-group }` reprints on the next physical page. The old printout
+  put the rep name in an `<h3>`, which is exactly why page 3 of Erik's 8/13 PDF was an orphan
+  list belonging to nobody.
+- 🔑 **Verify print layout by MEASURING, not by eyeballing.** `getBoundingClientRect()` per cell
+  plus `Range.getClientRects().length` for line count found this in one pass; the rendered page
+  looked plausible. Careful: an inline-block (the days-late badge) reports 2 rects without
+  wrapping, so line-count alone false-positives.
+- 🔴 **Harness trap:** the sheet's typography is scoped to `#pdo-print-sheet`. Cloning its
+  *innerHTML* into a differently-id'd preview div silently drops every rule and renders at
+  browser-default 16 px — the first measurements were 2× too tall and entirely fictional. Move
+  the real node, or reuse the real id.
+
+---
+
 ## Never forward a Content-Length you did not measure (2026-08-12)
 
 **Problem.** Steve's "Send to Supacolor" picker answered searches with `Unterminated string in
