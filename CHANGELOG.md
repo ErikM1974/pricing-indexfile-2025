@@ -1,3 +1,13 @@
+## v2026.08.13.1 (2026.08.13)
+
+- LESSONS_LEARNED: note the proxy jotform twin is fixed too
+- Memory: preserve ORDER_ODBC near-miss, rebuild INDEX.md, trim lessons
+- Memory: move durable gotchas out of the auto-loaded index into git
+- Memory: recover MEMORY_SYSTEM.md from git, annotate post-reset reality
+- Memory: INDEX — list MEMORY_SYSTEM.md, fix a path mangled by a \r escape
+- Memory: table-layout:fixed reads column widths from the first row
+- Past Due Orders: per-rep printable sheets for the 8am handout
+
 ## v2026.08.12.1 (2026.08.12)
 
 - Fix Box forwarder truncating responses (Unterminated string in JSON)
