@@ -11,12 +11,15 @@
    ========================================================================== */
 
 /* Header controls -------------------------------------------------------- */
+/* These labels sit ON the green header, not on the page surface — --gray-600 is a
+   dark grey that all but disappears against it. White at 88% reads clearly while
+   staying subordinate to the solid-white control text beside it. */
 .pdo-window {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     font-size: 0.85rem;
-    color: var(--gray-600);
+    color: rgba(255, 255, 255, 0.88);
 }
 
 .pdo-window select {
@@ -35,10 +38,10 @@
 }
 
 /* Both print controls sit disabled until a load succeeds — they have to LOOK inert,
-   or a click that deliberately does nothing reads as a broken button. */
-.pdo-printfor select:disabled,
-.dash-back-link:disabled {
-    opacity: 0.5;
+   or a click that deliberately does nothing reads as a broken button. The button half
+   of this now lives on .dash-back-link:disabled in dash-shell.css. */
+.pdo-printfor select:disabled {
+    opacity: 0.6;
     cursor: not-allowed;
 }
 

@@ -70,23 +70,45 @@
 }
 
 /* ---------- Back link ---------- */
+/* Works as either <a> or <button>. The background/font/cursor declarations are what make
+   the <button> form work: a button that sets `color: #fff` but no background keeps the UA's
+   grey `buttonface`, which is white-on-light-grey — effectively invisible on the themed
+   header. Buttons also don't inherit font-family, so without `font-family: inherit` they
+   render in the UA's default face next to identically-classed links. */
 .dash-back-link {
     display: inline-flex;
     align-items: center;
     gap: 6px;
     padding: 8px 16px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
     color: #fff;
     text-decoration: none;
+    font-family: inherit;
     font-size: 0.875rem;
     font-weight: 500;
     border: 1px solid rgba(255,255,255,0.5);
     border-radius: var(--radius-md);
+    cursor: pointer;
     transition: background var(--dur-base) var(--ease-out), color var(--dur-base) var(--ease-out);
 }
 
 .dash-back-link:hover {
     background: #fff;
     color: var(--dash-theme);
+}
+
+/* Inert but still READABLE. Fading a control until it can't be read tells the user the page
+   is broken rather than busy — a disabled button still has to say what it is. */
+.dash-back-link:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.dash-back-link:disabled:hover {
+    background: transparent;
+    color: #fff;
 }
 
 /* ---------- Content container ---------- */
