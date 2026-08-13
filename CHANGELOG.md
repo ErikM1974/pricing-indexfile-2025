@@ -1,3 +1,9 @@
+## v2026.08.13.2 (2026.08.13)
+
+- LESSONS: a print-isolation rule hides disclosures that used to print
+- Memory: archive the oldest lesson to get back under the 300-line cap
+- dash-shell: make button.dash-back-link visible (it kept the UA grey)
+
 ## v2026.08.13.1 (2026.08.13)
 
 - LESSONS_LEARNED: note the proxy jotform twin is fixed too
