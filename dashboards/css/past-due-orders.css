@@ -28,6 +28,20 @@
     color: var(--gray-800);
 }
 
+/* Rep options carry their counts ("Nika Lao (14 past due · 9 at risk)"), which is long
+   enough to push the Dashboard link off the header without a ceiling. */
+.pdo-printfor select {
+    max-width: 15rem;
+}
+
+/* Both print controls sit disabled until a load succeeds — they have to LOOK inert,
+   or a click that deliberately does nothing reads as a broken button. */
+.pdo-printfor select:disabled,
+.dash-back-link:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 .pdo-asof {
     font-size: 0.8rem;
     color: var(--gray-500);
@@ -148,33 +162,263 @@
     font-size: 0.85rem;
 }
 
-/* Print ------------------------------------------------------------------ */
-/* The shop prints on a mono laser, which drops backgrounds by default — the
-   badge would come out an unreadable grey smudge without print-color-adjust,
-   the same rule the SanMar inbound sheets use. */
+/* Printed rep sheets ------------------------------------------------------ */
+/* Erik prints these at 8am and hands each rep their page. The sheet is built into
+   #pdo-print-sheet by the controller and everything else on the page is hidden —
+   the same isolation the SanMar inbound sheets use (sanmar-inbound.css:291), and
+   the reason the printout no longer carries the stat tiles or the header controls. */
+#pdo-print-sheet {
+    display: none;
+}
+
 @media print {
-    .dash-header-right,
-    .dash-error-banner {
+    body.pdo-printing > *:not(#pdo-print-sheet) {
         display: none !important;
     }
 
-    .pdo-badge {
+    body.pdo-printing #pdo-print-sheet {
+        display: block !important;
+    }
+
+    @page {
+        size: letter portrait;
+        margin: 0.5in;
+    }
+
+    /* Last-resort fallback: a keyboard print that could NOT build a sheet (no data loaded
+       yet) still lands here. The controller's beforeprint handler covers the normal case;
+       without these the board would print as the raw 4-page blob the sheets replaced,
+       which would be a regression on the old behaviour rather than an improvement. */
+    body:not(.pdo-printing) .dash-header-right,
+    body:not(.pdo-printing) .dash-error-banner,
+    body:not(.pdo-printing) .dash-stat-grid {
+        display: none !important;
+    }
+
+    body:not(.pdo-printing) .pdo-rep {
+        page-break-inside: avoid;
+    }
+
+    body:not(.pdo-printing) .pdo-table tbody tr {
+        page-break-inside: avoid;
+    }
+
+    body:not(.pdo-printing) .pdo-badge {
         background: #000 !important;
         color: #fff !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
 
-    .pdo-nopo {
+    body:not(.pdo-printing) .pdo-nopo {
         color: #000 !important;
         font-weight: 900;
     }
+}
 
-    .pdo-rep {
-        page-break-inside: avoid;
-    }
+/* Sheet body. Fixed px sizes, not tokens: this is paper, where a rem that follows
+   the browser's font setting would change how many rows land on a page. */
+#pdo-print-sheet {
+    color: #111;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 9.5px;
+    line-height: 1.3;
+}
 
-    .pdo-table tbody tr {
-        page-break-inside: avoid;
-    }
+/* One rep per PAGE. The first section never breaks, so a run doesn't lead with a
+   blank sheet — and a single-rep print is exactly one page. */
+.pdo-ps-brk {
+    page-break-before: always;
+    break-before: page;
+}
+
+/* table-layout: fixed is what stops the wrapping. Without it the browser sized
+   columns to content and split dates across two lines ("2026-" / "07-31"). */
+.pdo-ps-tbl {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    margin-bottom: 14px;
+}
+
+/* Reprints the rep's name and the column headers at the top of every physical page
+   the table spills onto. This is the fix for the orphan page that belonged to nobody. */
+.pdo-ps-tbl thead {
+    display: table-header-group;
+}
+
+.pdo-ps-tbl tbody tr {
+    page-break-inside: avoid;
+    break-inside: avoid;
+}
+
+/* Header rows ------------------------------------------------------------- */
+.pdo-ps-banner th {
+    text-align: left;
+    padding: 0 0 5px;
+    border-bottom: 2px solid #2e6f40;
+    font-weight: 400;
+}
+
+.pdo-ps-brand {
+    font-size: 10px;
+    font-weight: 800;
+    color: #2e6f40;
+    letter-spacing: 0.02em;
+}
+
+.pdo-ps-repname {
+    font-size: 19px;
+    font-weight: 800;
+    color: #111;
+    line-height: 1.15;
+    margin-top: 1px;
+}
+
+/* The continued/second-section banner — smaller, because the full brand block has
+   already appeared above it on the same sheet. */
+.pdo-ps-repname--cont {
+    font-size: 12px;
+    color: #444;
+}
+
+.pdo-ps-sub {
+    font-size: 10px;
+    color: #444;
+    margin-top: 2px;
+}
+
+/* The scope disclaimer. Small, but it is the difference between "your past-due list" and
+   "your past-due list for the last 30 days" — a rep who reads the first will close an
+   older order out of their head. */
+.pdo-ps-note {
+    font-size: 8.5px;
+    color: #666;
+    margin-top: 2px;
+}
+
+.pdo-ps-sect th {
+    text-align: left;
+    padding: 9px 0 3px;
+    font-size: 10.5px;
+    font-weight: 800;
+    color: #2e6f40;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.pdo-ps-sect-n {
+    float: right;
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0;
+    color: #555;
+}
+
+.pdo-ps-cols th {
+    text-align: left;
+    padding: 3px 5px;
+    border-top: 1px solid #2e6f40;
+    border-bottom: 1px solid #2e6f40;
+    font-size: 8.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    color: #333;
+}
+
+/* `.pdo-ps-cols th` outranks the bare alignment classes, so the numeric headers need
+   to be named here or they sit left of the figures they label. */
+.pdo-ps-cols th.pdo-ps-c   { text-align: center; }
+.pdo-ps-cols th.pdo-ps-val { text-align: right; }
+
+/* Column widths sum to 100% of the 7.5in text block, sized so that no ordinary value
+   wraps: "Asphalt Patch Systems Inc.", "Custom Embroidery", "ordered, not in" and a
+   6-figure WO all fit on one line. Customer keeps the slack — a genuinely long name
+   is the only cell allowed to run to two lines.
+
+   These live on <col>, not on the <th>: under table-layout:fixed the browser reads
+   column widths from the first row, which is the full-width banner. */
+.pdo-ps-w-wo    { width: 8%; }
+.pdo-ps-w-cust  { width: 26%; }
+.pdo-ps-w-type  { width: 14.5%; }
+.pdo-ps-w-date  { width: 8.5%; }
+.pdo-ps-w-late  { width: 7%; }
+.pdo-ps-w-val   { width: 9.5%; }
+.pdo-ps-w-blank { width: 18%; }
+
+/* Body rows --------------------------------------------------------------- */
+.pdo-ps-tbl td {
+    padding: 3.5px 5px;
+    border-bottom: 1px solid #dcdcdc;
+    vertical-align: top;
+    overflow-wrap: break-word;
+}
+
+.pdo-ps-wo {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.pdo-ps-cust {
+    font-weight: 700;
+}
+
+.pdo-ps-nowrap { white-space: nowrap; }
+.pdo-ps-c      { text-align: center; white-space: nowrap; }
+
+.pdo-ps-val {
+    text-align: right;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+/* The date the rep is here to change — the one cell the whole sheet exists for. */
+.pdo-ps-due {
+    font-weight: 800;
+}
+
+/* At-risk rows are context, not the job. Greyed so the past-due list stays dominant. */
+.pdo-ps-risk td {
+    color: #555;
+}
+
+.pdo-ps-risk .pdo-ps-cust,
+.pdo-ps-risk .pdo-ps-wo {
+    font-weight: 600;
+}
+
+.pdo-ps-vendor {
+    display: block;
+    font-size: 8.5px;
+    color: #555;
+}
+
+.pdo-ps-tot td {
+    border-top: 1.5px solid #2e6f40;
+    border-bottom: none;
+    padding-top: 4px;
+    font-weight: 800;
+    color: #333;
+}
+
+/* Mono laser: it drops backgrounds unless told otherwise, so a tinted badge would
+   print as an unreadable grey smudge and "no PO raised" would lose its red entirely.
+   Both are forced to black — weight and reverse carry the signal in greyscale. */
+.pdo-ps-badge {
+    display: inline-block;
+    padding: 0 5px;
+    border-radius: 2px;
+    background: #000;
+    color: #fff;
+    font-weight: 800;
+    white-space: nowrap;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+.pdo-ps-nopo {
+    font-weight: 900;
+    color: #000;
 }

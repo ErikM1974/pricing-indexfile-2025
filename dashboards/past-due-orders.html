@@ -16,7 +16,7 @@
     <!-- 2026 design tokens (must load before dash-shell.css) -->
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/past-due-orders.css?v=2026.08.10.5">
+    <link rel="stylesheet" href="/dashboards/css/past-due-orders.css?v=2026.08.13.1">
 </head>
 <body>
     <div class="dash-shell">
@@ -40,7 +40,13 @@
                 <button id="pdo-refresh" class="dash-back-link" type="button">
                     <i class="fas fa-rotate"></i> Refresh
                 </button>
-                <button id="pdo-print" class="dash-back-link" type="button">
+                <label class="pdo-window pdo-printfor">
+                    <span>Print for</span>
+                    <select id="pdo-print-who" disabled>
+                        <option value="">All rep sheets &mdash; one per page</option>
+                    </select>
+                </label>
+                <button id="pdo-print" class="dash-back-link" type="button" disabled>
                     <i class="fas fa-print"></i> Print
                 </button>
                 <a href="/staff-dashboard.html" class="dash-back-link">
@@ -92,6 +98,6 @@
     <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/dash-page-helpers.js"></script>
-    <script src="/dashboards/js/past-due-orders.js?v=2026.08.10.5"></script>
+    <script src="/dashboards/js/past-due-orders.js?v=2026.08.13.1"></script>
 </body>
 </html>

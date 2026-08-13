@@ -386,3 +386,25 @@ match. Two paths (the DSN schema decides which):
   in bandit `config.json`, `sync-payables.ps1 -DryRun`, schedule the 15-min task → page fully automatic. **Until then:
   the manual upload stays the accurate invoice-level source.** (Bandit is now remotely reachable from the laptop for
   the activation — `bandit-cred.xml` + Invoke-Command work.)
+
+## ⚠️ ORDER_ODBC reconcile — deletes, and the near-miss that nearly removed 530 live orders (2026-08-10, proxy `v2026.08.10.4`/v1079, cron 4:20 AM PT)
+
+**Why deletes were needed.** `sync-orders.ps1` queries `WHERE timestamp_Modification >= last-sync`.
+A DELETED order has no modification to report — it simply stops appearing. The ingest route is
+upsert-only, so **the mirror was a one-way ratchet**: orders Erik deleted in ShopWorks sat on the
+Past Due page for days.
+
+**🔴 THE NEAR-MISS — ShopWorks order IDs are NOT sequential by order date.** The first reconcile
+scoped the delete by ID RANGE on that assumption. They are not: **id 139304 was ordered 2026-01-29
+while id 139305 was ordered 2025-11-26.** ~530 completed orders fell “in range”, were absent from a
+December-start live query, and would have been DELETED.
+
+**All three numeric guards PASSED** — non-empty result, in-range, 16.3% against a 25% ceiling. What
+caught it was **reading the dry-run SAMPLE by eye**: 12 consecutive ids all from Arrow Lumber /
+Pacific Power Group, a clustering nothing automated would have flagged.
+
+**Fix.** Scope by `date_OrderPlaced` matching the live query's own window. 542 ghosts → 10, each
+verified individually before removal.
+
+🔑 **A destructive sync needs a dry run a HUMAN reads, not just numeric guards.** Percentage
+ceilings and non-empty checks are invariant to the thing that was actually wrong here.
