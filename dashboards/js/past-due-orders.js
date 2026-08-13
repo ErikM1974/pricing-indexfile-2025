@@ -17,13 +17,30 @@
 
     var ENDPOINT = '/api/crm-proxy/ae-dashboard/due-dates-all';
 
+    // The payload the screen is currently showing. The print sheets are built from this
+    // and nothing else, so paper can never disagree with the board Erik is looking at.
+    // Cleared on every failure — see load()'s catch.
+    var lastData = null;
+    var loading = false;
+    var lastLoadedAt = 0;
+    // Monotonic request token. Without it the LAST RESPONSE wins rather than the last
+    // request: flip 30→90→30 quickly and a slow 90 can land after the 30 and leave the
+    // board — and therefore the sheets — showing a window nobody selected.
+    var loadSeq = 0;
+
+    // A sheet is handed to a rep who then resets a due date from it. Anything older than
+    // this gets re-pulled before printing, and a failed re-pull ABORTS the print — the
+    // house rule is that no sheet beats a quietly stale one. Matches the 120s bound
+    // sanmar-inbound-today.js uses for the same reason.
+    var PRINT_FRESH_MS = 120000;
+
     document.addEventListener('DOMContentLoaded', function () {
         var days = document.getElementById('pdo-days');
         var refresh = document.getElementById('pdo-refresh');
         var print = document.getElementById('pdo-print');
         if (days) days.addEventListener('change', function () { load(false); });
         if (refresh) refresh.addEventListener('click', function () { load(true); });
-        if (print) print.addEventListener('click', function () { window.print(); });
+        if (print) print.addEventListener('click', doPrint);
         load(false);
     });
 
@@ -32,23 +49,46 @@
         return (el && el.value) || '30';
     }
 
+    // Resolves true when this load produced the data now on screen, false otherwise
+    // (failed, or superseded by a newer request). doPrint() gates on that.
     async function load(force) {
+        var seq = ++loadSeq;
         var root = document.getElementById('content-root');
         if (root) { root.className = 'dash-loading'; root.textContent = 'Loading…'; }
+        // While a load is in flight lastData still holds the PREVIOUS window's payload.
+        // Printing now would hand a rep a sheet that disagrees with the screen behind it
+        // — e.g. the 30-day list under a 60-day heading. Lock the controls until it lands.
+        // (Options are left intact so the chosen rep survives the reload.)
+        loading = true;
+        setPrintEnabled(false);
         try {
             var url = ENDPOINT + '?days=' + encodeURIComponent(selectedDays()) + (force ? '&refresh=1' : '');
             var resp = await fetch(url, { credentials: 'same-origin' });
             if (!resp.ok) throw new Error('HTTP ' + resp.status + ' ' + (resp.statusText || ''));
             var data = await resp.json();
             if (data.error) throw new Error(data.details || data.error);
+            if (seq !== loadSeq) return false;   // superseded — leave the newer load's state alone
             DashPage.hideError();
+            lastData = data;
+            lastLoadedAt = Date.now();
             render(data);
+            fillRepPicker(data);
+            return true;
         } catch (err) {
+            if (seq !== loadSeq) return false;
             console.error('[past-due-orders] load failed:', err);
             // Never leave a stale or empty table looking like "nothing is late".
             if (root) { root.className = 'pdo-failed'; root.textContent = 'Could not load the past-due list — nothing is shown rather than something wrong.'; }
             setStats(null);
+            // Same rule on paper as on screen: a sheet built from the PREVIOUS load would
+            // hand a rep a list that is quietly out of date, which is worse than no sheet.
+            lastData = null;
+            lastLoadedAt = 0;
+            fillRepPicker(null);
             DashPage.showError('Unable to load past-due orders (' + err.message + '). Nothing is displayed, because a blank list would read as "nothing is late". Try Refresh.');
+            return false;
+        } finally {
+            if (seq === loadSeq) loading = false;
         }
     }
 
@@ -77,10 +117,7 @@
         if (!root) return;
         root.className = '';
 
-        var reps = (d.reps || []).filter(function (r) {
-            var g = d.byRep[r];
-            return g && (g.late.length || g.atRisk.length);
-        });
+        var reps = activeReps(d);
 
         if (!reps.length) {
             root.innerHTML = '<p class="pdo-none"><i class="fas fa-check-circle"></i> '
@@ -95,10 +132,14 @@
         }
         reps.forEach(function (rep) {
             var g = d.byRep[rep];
+            // Same rule as the printed banner: a rep with nothing late reads "2 at risk",
+            // not "0 past due · 2 at risk".
+            var counts = [];
+            if (g.late.length) counts.push(g.late.length + ' past due');
+            if (g.atRisk.length) counts.push(g.atRisk.length + ' at risk');
             html += '<section class="pdo-rep">'
                 + '<h3 class="pdo-rep-name">' + esc(rep)
-                + '<span class="pdo-rep-count">' + g.late.length + ' past due'
-                + (g.atRisk.length ? ' · ' + g.atRisk.length + ' at risk' : '') + '</span></h3>'
+                + '<span class="pdo-rep-count">' + esc(counts.join(' · ')) + '</span></h3>'
                 + table(g.late.concat(g.atRisk))
                 + '</section>';
         });
@@ -145,5 +186,260 @@
         return String(s === null || s === undefined ? '' : s)
             .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
             .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    // Reps who actually have something on the list. Shared by the screen and the print
+    // picker so the sheets on paper are exactly the sections shown on screen.
+    function activeReps(d) {
+        return ((d && d.reps) || []).filter(function (r) {
+            var g = d.byRep[r];
+            return g && (g.late.length || g.atRisk.length);
+        });
+    }
+
+    /* ====================================================================
+       PRINTED REP SHEETS
+
+       Erik prints these at 8am and hands each rep their page, so the rep can
+       go into ShopWorks and reset the due date. That drives every choice below:
+
+       - One rep per PAGE (never per section) — the stack has to be splittable.
+       - The rep's name repeats inside <thead>, so a rep whose list spills onto a
+         second sheet still has their name on it. An <h2> above the table would
+         not repeat, which is exactly how the old printout produced an orphan
+         page 3 that belonged to nobody.
+       - Fixed column widths — the old printout wrapped dates into "2026-" /
+         "07-31" and floated the late badge onto the wrong row.
+       - Vendor and placed-date are printed here but not on screen: on paper the
+         rep has no hover, no second tab, and needs to know who to chase and how
+         old the job is before committing to a new date.
+       ==================================================================== */
+
+    var SHEET_ID = 'pdo-print-sheet';
+    var PRINTING_CLASS = 'pdo-printing';
+
+    async function doPrint() {
+        // No data means the load failed or hasn't finished. Printing here would emit a
+        // sheet that reads "all clear" — the one outcome that must never reach paper.
+        // Not just the disabled button: this must hold even if something re-enables it.
+        if (loading) {
+            DashPage.showError('Nothing to print yet — the past-due list is still loading. Try again in a moment.');
+            return;
+        }
+        if (!lastData) {
+            DashPage.showError('Nothing to print yet — the past-due list has not loaded. Try Refresh first.');
+            return;
+        }
+
+        // Erik opens this page and prints at 8am; those are not the same moment. A sheet
+        // built from a list pulled 25 minutes ago still prints TODAY'S date, so nothing on
+        // paper reveals its age. Re-pull first and abort the print if that fails.
+        // load(false) rides the upstream 10-minute cache, so this is ~free on Caspio quota.
+        if (Date.now() - lastLoadedAt > PRINT_FRESH_MS) {
+            if (!(await load(false))) return;   // load() already surfaced the error
+        }
+
+        var who = document.getElementById('pdo-print-who');
+        if (!buildAndPrint((who && who.value) || '')) {
+            DashPage.showError('Nothing to print — no past-due or at-risk orders in this window.');
+        }
+    }
+
+    // false when there was nothing to build.
+    function buildAndPrint(pick) {
+        if (!renderSheet(pick)) return false;
+        document.body.classList.add(PRINTING_CLASS);
+        window.print();
+        // Some browsers never fire afterprint; without this the page would stay blank.
+        setTimeout(function () {
+            if (document.body.classList.contains(PRINTING_CLASS)) teardownSheet();
+        }, 1500);
+        return true;
+    }
+
+    function renderSheet(pick) {
+        var inner = pick ? repSheet(lastData, pick, false) : buildAllRepsInner(lastData);
+        if (!inner) return false;
+        teardownSheet();
+        var sheet = document.createElement('div');
+        sheet.id = SHEET_ID;
+        sheet.innerHTML = inner;
+        document.body.appendChild(sheet);
+        return true;
+    }
+
+    function teardownSheet() {
+        document.body.classList.remove(PRINTING_CLASS);
+        var s = document.getElementById(SHEET_ID);
+        if (s) s.remove();
+    }
+
+    window.addEventListener('afterprint', teardownSheet);
+
+    // Ctrl+P / File→Print must not fall back to printing the raw board. Every print rule is
+    // scoped to .pdo-printing, so without this a keyboard print would emit the very 4-page
+    // blob these sheets replaced. beforeprint cannot await, so it cannot re-pull — the
+    // sheet stamping its own window and print time is what keeps that honest.
+    window.addEventListener('beforeprint', function () {
+        if (document.getElementById(SHEET_ID)) return;   // the button path already built it
+        if (!lastData || loading) return;                // nothing safe to build
+        var who = document.getElementById('pdo-print-who');
+        if (renderSheet((who && who.value) || '')) document.body.classList.add(PRINTING_CLASS);
+    });
+
+    // Every rep, each starting a fresh page. This is the 8am default.
+    function buildAllRepsInner(d) {
+        return activeReps(d).map(function (rep, i) {
+            return repSheet(d, rep, i > 0);
+        }).join('');
+    }
+
+    // One rep's sheet. `breakBefore` starts it on a new page — false for the first rep
+    // in a run (and for a single-rep print), so neither leads with a blank page.
+    function repSheet(d, rep, breakBefore) {
+        var g = (d.byRep || {})[rep];
+        if (!g || (!g.late.length && !g.atRisk.length)) return '';
+
+        var html = '';
+        if (g.late.length) {
+            html += sheetTable(d, rep, g, g.late, 'Past due', g.late.length + ' order' + (g.late.length === 1 ? '' : 's'), true);
+        }
+        if (g.atRisk.length) {
+            // "First banner on the sheet" carries the brand block — so a rep with nothing
+            // past due still gets a properly headed page rather than a bare table.
+            html += sheetTable(d, rep, g, g.atRisk, 'At risk — due within 7 days, blanks not in house',
+                g.atRisk.length + ' order' + (g.atRisk.length === 1 ? '' : 's'), !g.late.length);
+        }
+        return '<section class="pdo-ps-rep' + (breakBefore ? ' pdo-ps-brk' : '') + '">' + html + '</section>';
+    }
+
+    // The rep banner, section label and column headers all live in <thead> so the browser
+    // reprints them at the top of every physical page this table spills onto.
+    function sheetTable(d, rep, g, rows, label, countText, primary) {
+        // "0 past due · 2 at risk" reads as a defect on the sheet of a rep who simply has
+        // nothing late — drop whichever half is zero.
+        var parts = [];
+        if (g.late.length) parts.push(g.late.length + ' past due');
+        if (g.atRisk.length) parts.push(g.atRisk.length + ' at risk');
+        parts.push(esc(longDate(d.today)));
+
+        // The window is NOT decoration. Upstream filters on the requested-ship date being
+        // within `lookbackDays`, so the 8am 30-day default silently omits anything that
+        // slipped more than 30 days ago — and two sheets printed from different windows are
+        // otherwise identical on paper. Without this a rep reads their sheet as complete.
+        var note = esc(d.lookbackDays) + '-day window &mdash; orders that slipped more than '
+            + esc(d.lookbackDays) + ' days ago are not listed. Printed ' + esc(clockTime()) + '.';
+
+        var banner = primary
+            ? '<div class="pdo-ps-brand">Northwest Custom Apparel &middot; Past Due Orders</div>'
+              + '<div class="pdo-ps-repname">' + esc(rep) + '</div>'
+              + '<div class="pdo-ps-sub">' + parts.join(' &middot; ') + '</div>'
+              + '<div class="pdo-ps-note">' + note + '</div>'
+            : '<div class="pdo-ps-repname pdo-ps-repname--cont">' + esc(rep) + '</div>';
+
+        var sorted = rows.slice().sort(function (a, b) { return a.daysUntilDue - b.daysUntilDue; });
+        var total = sorted.reduce(function (sum, o) { return sum + (Number(o.subtotal) || 0); }, 0);
+
+        // <colgroup>, not widths on the <th>. Under table-layout:fixed the browser takes
+        // column widths from the FIRST ROW — which here is the colspan=8 banner, so any
+        // width on the header cells is ignored and all 8 columns come out equal.
+        var h = '<table class="pdo-ps-tbl">'
+            + '<colgroup><col class="pdo-ps-w-wo"><col class="pdo-ps-w-cust">'
+            + '<col class="pdo-ps-w-type"><col class="pdo-ps-w-date"><col class="pdo-ps-w-date">'
+            + '<col class="pdo-ps-w-late"><col class="pdo-ps-w-val"><col class="pdo-ps-w-blank">'
+            + '</colgroup><thead>'
+            + '<tr class="pdo-ps-banner"><th colspan="8">' + banner + '</th></tr>'
+            + '<tr class="pdo-ps-sect"><th colspan="8">' + esc(label)
+            + '<span class="pdo-ps-sect-n">' + esc(countText) + '</span></th></tr>'
+            + '<tr class="pdo-ps-cols">'
+            + '<th>WO</th><th>Customer</th><th>Type</th><th>Placed</th>'
+            + '<th>Due</th><th class="pdo-ps-c">Late</th>'
+            + '<th class="pdo-ps-val">Value</th><th>Blanks</th>'
+            + '</tr></thead><tbody>';
+
+        sorted.forEach(function (o) {
+            var late = o.daysUntilDue < 0;
+            h += '<tr class="' + (late ? 'pdo-ps-late' : 'pdo-ps-risk') + '">'
+                + '<td class="pdo-ps-wo">' + esc(o.idOrder) + '</td>'
+                + '<td class="pdo-ps-cust">' + esc(o.company) + '</td>'
+                + '<td>' + esc(o.orderType || '') + '</td>'
+                + '<td class="pdo-ps-nowrap">' + esc(shortDate(o.placedDate)) + '</td>'
+                + '<td class="pdo-ps-nowrap pdo-ps-due">' + esc(shortDate(o.dueDate)) + '</td>'
+                + '<td class="pdo-ps-c">' + (late
+                    ? '<span class="pdo-ps-badge">' + Math.abs(o.daysUntilDue) + 'd</span>'
+                    : (o.daysUntilDue === 0 ? 'today' : 'in ' + o.daysUntilDue + 'd')) + '</td>'
+                + '<td class="pdo-ps-val">' + money(o.subtotal) + '</td>'
+                + '<td class="' + (o.blanks === 'none' ? 'pdo-ps-nopo' : '') + '">'
+                + blanks(o.blanks) + vendorLine(o) + '</td>'
+                + '</tr>';
+        });
+
+        h += '<tr class="pdo-ps-tot"><td colspan="6">Total &middot; ' + esc(countText) + '</td>'
+            + '<td class="pdo-ps-val">' + (total ? money(total) : '') + '</td><td></td></tr>';
+        return h + '</tbody></table>';
+    }
+
+    // Who to chase. Only meaningful once a PO exists — on a "no PO raised" row the job is
+    // to raise one, and there is no vendor yet to name.
+    function vendorLine(o) {
+        if (o.blanks === 'none' || o.blanks === 'received') return '';
+        var v = (o.vendors || []).filter(Boolean);
+        if (!v.length) return '';
+        return '<span class="pdo-ps-vendor">' + esc(v.join(', ')) + '</span>';
+    }
+
+    // 'YYYY-MM-DD' → '8/12/26'. Split by hand: new Date('2026-08-12') parses as UTC
+    // midnight and prints as the 11th once the browser shifts it to Pacific.
+    function shortDate(s) {
+        var p = String(s || '').slice(0, 10).split('-');
+        if (p.length !== 3 || !p[0]) return '';
+        return Number(p[1]) + '/' + Number(p[2]) + '/' + p[0].slice(2);
+    }
+
+    // Wall-clock moment the paper was made. Deliberately the CLIENT clock, not the payload:
+    // this answers "how old is the sheet in my hand", which is a printing fact, not a data one.
+    function clockTime() {
+        return new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    }
+
+    var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'];
+
+    // d.today is the server's Pacific date — the same day stamp the board is computed
+    // against, so the sheet is dated by the data rather than by the printer's clock.
+    function longDate(s) {
+        var p = String(s || '').slice(0, 10).split('-');
+        if (p.length !== 3 || !p[0]) return '';
+        return MONTHS[Number(p[1]) - 1] + ' ' + Number(p[2]) + ', ' + p[0];
+    }
+
+    // Rebuilt on every load so a rep who clears their list drops off the menu.
+    function fillRepPicker(d) {
+        var sel = document.getElementById('pdo-print-who');
+        if (!sel) return;
+        var reps = activeReps(d);
+        var prev = sel.value;
+
+        var opts = '<option value="">All rep sheets — one per page</option>';
+        reps.forEach(function (r) {
+            var g = d.byRep[r];
+            var counts = [];
+            if (g.late.length) counts.push(g.late.length + ' past due');
+            if (g.atRisk.length) counts.push(g.atRisk.length + ' at risk');
+            opts += '<option value="' + esc(r) + '">' + esc(r)
+                + ' (' + esc(counts.join(' · ')) + ')</option>';
+        });
+        sel.innerHTML = opts;
+        // Keep the rep the user had selected, unless they have nothing left to print.
+        if (prev && reps.indexOf(prev) !== -1) sel.value = prev;
+
+        setPrintEnabled(!!d && !!reps.length);
+    }
+
+    function setPrintEnabled(on) {
+        var sel = document.getElementById('pdo-print-who');
+        var btn = document.getElementById('pdo-print');
+        if (sel) sel.disabled = !on;
+        if (btn) btn.disabled = !on;
     }
 })();
