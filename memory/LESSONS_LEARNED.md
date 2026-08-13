@@ -36,6 +36,27 @@ under fixed layout, so it works regardless of what the first row looks like.
   browser-default 16 px — the first measurements were 2× too tall and entirely fictional. Move
   the real node, or reuse the real id.
 
+### The print-isolation rule also hides disclosures that used to print
+
+Shipping this, a pre-deploy review caught what the isolation rule
+`body.pdo-printing > *:not(#pdo-print-sheet) { display: none }` costs. The OLD printout
+carried "30-day window · 475 orders scanned" because `#pdo-asof` sits in `<main>`, not in the
+hidden `.dash-header-right`. Hiding the whole shell removed it — so a 30-day sheet read as a
+rep's *complete* past-due list while silently omitting the oldest orders, the ones most needing
+action. Fixed by stamping the window + print time on every rep sheet.
+
+- 🔑 **When you replace a whole-page print with an isolated sheet, diff what the old print
+  DISCLOSED, not just how it looked.** Scope/as-of/provenance lines are the easiest to lose and
+  the most expensive to lose, because the artifact leaves the building and states a count.
+- 🔑 **A handout needs a freshness gate, not just a data gate.** `!lastData` is not enough:
+  the page is opened at 7:40 and printed at 8:05, and a 25-minute-old list still prints
+  *today's* date, so nothing on paper reveals its age. Re-pull past a bound (120 s here) and
+  ABORT the print if the re-pull fails — same call `sanmar-inbound-today.js:syncBeforeOutput`
+  makes. Riding the upstream cache keeps it ~free on Caspio quota.
+- 🔑 **Scoping every print rule to a class the button sets regresses Ctrl+P**, which then falls
+  back to the raw board. Handle `beforeprint` so a keyboard print builds the same sheet, and
+  keep a `body:not(.printing)` fallback for when there is no data to build from.
+
 ---
 
 ## Never forward a Content-Length you did not measure (2026-08-12)
