@@ -1,3 +1,9 @@
+## v2026.08.14.1 (2026.08.14)
+
+- Memory: record the unfixed contacts-sync waste before it is forgotten
+- Memory: notify:false is right for audit notes, wrong for human-written ones
+- Deploy v2026.08.14.1: 3 files (mockup-detail.css,mockup-detail.js,mockup-detail.html,...)
+
 ## v2026.08.13.2 (2026.08.13)
 
 - LESSONS: a print-isolation rule hides disclosures that used to print
