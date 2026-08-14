@@ -107,6 +107,26 @@ set up and verify than the calls save. This is a routing rule, not a ban on API 
   of a day's budget, split ~7,500 direct-to-Caspio + ~4,300 through the proxy. Day total
   **23,799** — the period's worst, effectively tying 27 Jul (23,959), the day that billed $358.
 
+## Known remaining waste — FOUND 2026-08-07, not fixed (no urgency at ~74%)
+
+**`upsertContact` PUTs every contact row on every run, with no content comparison**
+(`src/routes/shopworks-odbc-sync.js`, `upsertContact` — PUT with `q.where=ID_Contact=N`,
+then POST if `RecordsAffected` is 0). This is the exact pattern the 30 Jul row-hash dedupe
+removed from **`sync-orders.ps1`** and **`sync-purchase-orders.ps1`** (55% of a dyno window →
+`PUT: 2`). **I fixed two siblings and never checked for a third** — same miss as the
+"security fix landed on ONE route, six siblings sat open" lesson.
+
+- Measured 2026-08-11: `CompanyContactsMerge2026` was the **#1 table**, 749 calls over a
+  13.6 h dyno window, with `PUT: 1,144` of 3,653 calls (31% writes).
+- ⚠️ **Not cleanly trendable from dyno windows** — the sync is bursty, so a short window
+  may or may not catch a run. Size it from the bandit task cadence + row count, not from
+  a `/api/admin/metrics` snapshot.
+- 🔑 The argument for fixing it is **structural, not volume**: it scales with the CONTACT
+  COUNT, not with traffic, so it grows on its own regardless of how busy the business is.
+- ❌ Do NOT infer the state of this from `sync-contacts.ps1` — that script POSTs *batches*
+  to the proxy and has its own skip logic; the unconditional write is on the PROXY side.
+  Checking the PowerShell layer for `Get-RowHash` gives a false read (I made this mistake).
+
 ## Killed by measurement — do NOT re-propose
 
 - `archive-daily-sales` diff-before-write: ~120/day, risks duplicate rows in a financial
