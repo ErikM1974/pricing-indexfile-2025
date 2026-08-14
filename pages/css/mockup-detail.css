@@ -1544,6 +1544,34 @@ body {
     gap: 10px;
 }
 
+/* ── Approve Mockup Modal ───────────────────────────── */
+/* Reuses the .pmd-modal* shell (overlay, body, styled textarea/label,
+   footer); only the green identity and the summary chip are new.
+   #16a34a matches Ruth's Mark Complete modal so the two read as a family. */
+.pmd-modal--approve {
+    width: 460px;
+}
+
+.pmd-modal-header--approve {
+    background: #16a34a;
+}
+
+.pmd-approve-summary {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 6px;
+    padding: 10px 12px;
+    font-size: 14px;
+    color: #166534;
+    margin-bottom: 14px;
+}
+
+.pmd-approve-hint {
+    font-size: 12px;
+    color: #6b7280;
+    margin-top: 6px;
+}
+
 /* ── Delete Modal ───────────────────────────────────── */
 .pmd-modal--delete {
     width: 460px;

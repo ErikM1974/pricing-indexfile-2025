@@ -1211,12 +1211,7 @@
                         showToast('Please click one or more mockup images to select them first', 'error');
                         return;
                     }
-                    var slotLabels = selectedMockupSlots.map(function (key) {
-                        var slot = MOCKUP_SLOTS.filter(function (s) { return s.key === key; })[0];
-                        return slot ? slot.label : key;
-                    });
-                    var approvalNote = 'AE approved ' + slotLabels.join(', ');
-                    handleStatusUpdate('Approved', approvalNote, this);
+                    openApproveModal(this);
                 });
                 document.getElementById('pmd-btn-revise').addEventListener('click', function () {
                     openReviseModal();
@@ -1589,7 +1584,14 @@
                         Author_Name: getLoggedInUser().firstName,
                         Note_Text: noteText,
                         Note_Type: 'status_change',
-                        notify: false  // audit note: sendStatusNotifications handles the emails
+                        // Ruth's "Final notes" used to post notify:false, so anything
+                        // she typed was stored and reached nobody. 'artist' resolves
+                        // the primary recipient to the rep of record. Blank note keeps
+                        // today's behaviour exactly — sendStatusNotifications('Completed')
+                        // below still sends the completion email either way.
+                        Posted_By_Role: 'artist',
+                        Posted_By_Email: getLoggedInUser().email,
+                        notify: !!notesText
                     })
                 });
             }).then(function () {
@@ -1655,7 +1657,10 @@
 
     // ── Status Update ──────────────────────────────────────────────────────
     var statusUpdateInProgress = false;
-    function handleStatusUpdate(newStatus, notes, btnEl) {
+    // notifyNote (optional) — true only when the user typed a free-text note that
+    // the other party should actually receive. Every other caller omits it, so
+    // notify stays false and the backend skips the whole fan-out, exactly as before.
+    function handleStatusUpdate(newStatus, notes, btnEl, notifyNote) {
         if (statusUpdateInProgress) return;
         statusUpdateInProgress = true;
         if (btnEl) {
@@ -1703,7 +1708,13 @@
                     Author_Name: authorName,
                     Note_Text: noteText,
                     Note_Type: 'status_change',
-                    notify: false  // audit note: status-change emails fire below
+                    // Direction is explicit rather than left to the backend's
+                    // author-name heuristic (['ruth','digitiz',...]): 'ae' routes
+                    // the primary email to Ruth. Both routing fields are ignored
+                    // when notify is false, which is every caller but Approve.
+                    Posted_By_Role: 'ae',
+                    Posted_By_Email: sessionStorage.getItem('nwca_user_email') || '',
+                    notify: notifyNote === true
                 })
             }).catch(function (err) { console.warn('Note logging failed (non-blocking):', err); });
         }).then(function () {
@@ -4460,6 +4471,75 @@
             btnEl.textContent = 'Delete Permanently';
             showToast('Failed to delete: ' + err.message, 'error');
         });
+    }
+
+    // ── Approve Mockup Modal (AE) ──────────────────────────────────────────
+    // Adds an OPTIONAL note for Ruth to the approval. Leaving it blank must
+    // behave exactly like the old one-click approve.
+    //
+    // Handlers use `.onclick =` rather than addEventListener: openReviseModal()
+    // below re-adds its listeners on every open and never removes them, so
+    // re-opening it stacks handlers. Property assignment is idempotent.
+    function openApproveModal(btnEl) {
+        var overlay = document.getElementById('pmd-approve-overlay');
+        var summaryEl = document.getElementById('pmd-approve-summary');
+        var noteEl = document.getElementById('pmd-approve-note');
+        var cancelBtn = document.getElementById('pmd-approve-cancel');
+        var submitBtn = document.getElementById('pmd-approve-submit');
+
+        if (!overlay || !summaryEl || !noteEl || !cancelBtn || !submitBtn) {
+            // Stale cached HTML against new JS — never swallow an approval.
+            showToast('Approve dialog failed to load. Hard-refresh the page (Ctrl+Shift+R).', 'error');
+            return;
+        }
+
+        // Multi-select: this page approves one OR MORE slots at once.
+        var slotLabels = selectedMockupSlots.map(function (key) {
+            var slot = MOCKUP_SLOTS.filter(function (s) { return s.key === key; })[0];
+            return slot ? slot.label : key;
+        });
+
+        summaryEl.textContent = 'Approving ' + slotLabels.join(', ');
+
+        // Reset per-open state — a previous attempt may have left these disabled.
+        noteEl.value = '';
+        noteEl.disabled = false;
+        cancelBtn.disabled = false;
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Approve Mockup';
+
+        overlay.classList.add('show');
+        noteEl.focus();
+
+        cancelBtn.onclick = closeApproveModal;
+        overlay.onclick = function (e) { if (e.target === overlay) closeApproveModal(); };
+
+        submitBtn.onclick = function () {
+            var note = noteEl.value.trim();
+            // maxlength guards typing and pasting, but not a programmatic
+            // .value set — keep this check.
+            if (note.length > 2000) {
+                showToast('Note is too long — please keep it under 2000 characters.', 'error');
+                return;
+            }
+            submitBtn.disabled = true;
+            cancelBtn.disabled = true;
+            noteEl.disabled = true;
+            submitBtn.textContent = 'Approving...';
+
+            var approvalNote = 'AE approved ' + slotLabels.join(', ');
+            if (note) approvalNote += '\n\n' + note;
+
+            // Close BEFORE the status update so its failure state — the action-bar
+            // button reset to "Retry" behind this modal — is actually visible.
+            closeApproveModal();
+            handleStatusUpdate('Approved', approvalNote, btnEl, !!note);
+        };
+    }
+
+    function closeApproveModal() {
+        var overlay = document.getElementById('pmd-approve-overlay');
+        if (overlay) overlay.classList.remove('show');
     }
 
     // ── Request Changes Modal (AE) ─────────────────────────────────────────
