@@ -52,6 +52,15 @@ key names. `CTR-FB` and `FB` rows retired. Erik's ruling: one rate for everyone,
 - 🔑 **A per-design negotiated price is an override, not drift** — keep it, but LABEL it, or the
   line just looks like the published table is wrong and the rep can't explain the number.
 
+**Retired rows — recovery values** (captured live 2026-08-15, before deletion; the endpoints no
+longer expose them, so this is the only record). Both sets are safe to delete: the two queries that
+still SELECT them ignore the results, and each query still returns its other ItemTypes so the
+"no records → 404" guards cannot trip.
+- `Embroidery_Costs` `ItemType='CTR-FB'` — 5 rows, `StitchCount` 25000, `PerThousandRate` by
+  `TierLabel`: 1-7 **1.20** · 8-23 **1.00** · 24-47 **0.90** · 48-71 **0.85** · 72+ **0.80**; `LTM` 50.
+- `Embroidery_Costs` `ItemType='FB'` — flat **1.25** /1K in `EmbroideryCost`, `BaseStitchCount` 25000.
+- ⚠️ Do NOT delete `CTR-Garmt`, `CTR-Cap`, `AL`, `AL-CAP`, `CB`, `CS` — live pricing depends on them.
+
 ## A dashboard promised cost-plus pricing the builder could not read (2026-08-14)
 
 **Problem.** The staff Product Manager has offered **"Automatic (cost ÷ margin + logo — same as
