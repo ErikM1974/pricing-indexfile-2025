@@ -24,6 +24,7 @@ const ENTRIES = {
     'scp-persistence.cjs': 'shared_components/js/builders/scp/persistence.js',
     'emb-persistence.cjs': 'shared_components/js/builders/emb/persistence.js',
     'emb-pricing-sync.cjs': 'shared_components/js/builders/emb/pricing-sync.js',
+    'emb-product-rows.cjs': 'shared_components/js/builders/emb/product-rows.js',
 };
 
 module.exports = async function globalSetup() {
