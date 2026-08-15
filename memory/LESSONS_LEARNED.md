@@ -5,6 +5,35 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## OnSite keeps an unknown PartNumber and throws every tax field away (2026-08-15)
+
+**Problem.** Vendor garments (S&S et al.) push whatever style the rep typed as `PartNumber`.
+Product lines are NOT gated by `KNOWN_FEE_PNS` — only fee lines are — so nobody knew whether
+OnSite would reject, substitute or silently drop a part it had never seen.
+
+**Root cause.** Never tested. The gate exists for fees; product parts were assumed safe.
+
+**Solution.** Pushed a real TEST order and diffed our payload against OnSite's own transform
+(`EMB-TEST-2026-315`).
+
+**Prevention.**
+- ✅ **An unknown PartNumber SURVIVES intact.** `SS-LIVE-CHECK` came back verbatim with
+  `Color`, `Size`, `Qty`, `Price` and `id_ProductClass: 1` unchanged, and all 12 typed notes
+  present. Vendor styles are safe to push; product lines need no allowlist.
+- 🔴 **OnSite DISCARDS every tax field we send.** `TaxPartNumber`, `TaxPartDescription`,
+  `coa_AccountSalesTax01` and the per-line `sts_EnableTax01..04` / `sts_TaxOverride` are ALL
+  absent from the transform. That is why the payload carries "Apply Tax: Manually in
+  ShopWorks" — the manual step is forced by OnSite, not a choice. Do NOT try to fix the tax
+  push by sending more fields; they get dropped too.
+- 🔑 `Attachments` / `Designs` / `Payments` are dropped when empty; `"30"`→`30` and `\n`→`\r`
+  are normalised; OnSite ADDS `id_Integration: "200"` + `id_Receiving/Sales/ShippingStatus`.
+- 🔑 **Upload ≠ order.** The push returns `'ExtOrderID … has been uploaded.'` while
+  `GET /api/manageorders/getorderno/{id}` stays **count 0** — it queues for import, and the
+  proforma prints "Order # — (pending import)". An empty order number straight after a push is
+  EXPECTED, not a failure. Don't debug it.
+- 🔑 A **manual** vendor item has no `VendorCode`, so the "VENDOR: …" `LineItemNotes` never
+  fires — deliberate (Erik). The vendor rides in the rep's DESCRIPTION, which OnSite keeps.
+
 ## Five prices for one ShopWorks part — and a $50 fee hidden behind a misspelled column (2026-08-15)
 
 **Problem.** Full-back embroidery had **five** price sources across **three** Caspio tables, so what
@@ -227,52 +256,5 @@ action. Fixed by stamping the window + print time on every rep sheet.
 - 🔑 **Scoping every print rule to a class the button sets regresses Ctrl+P**, which then falls
   back to the raw board. Handle `beforeprint` so a keyboard print builds the same sheet, and
   keep a `body:not(.printing)` fallback for when there is no data to build from.
-
----
-
-## Never forward a Content-Length you did not measure (2026-08-12)
-
-**Problem.** Steve's "Send to Supacolor" picker answered searches with `Unterminated string in
-JSON at position 476` — the browser was told the response was shorter than it was and stopped
-mid-string. `/api/box/folder-files` broke the same way for folders of 5–27 files: **8 of 16 real
-art folders sampled**. Live 7 days (2026-08-05→12); fixed app `v2026.08.12.1` + proxy same day.
-
-**Root cause.** `boxForward` copied `content-length` from upstream then piped the body, but
-**node-fetch asks for gzip and inflates transparently** — so the header described the COMPRESSED
-bytes while the pipe sent decompressed ones. `content-encoding` was correctly NOT copied, which is
-what made the length a *lie* rather than a detectable mismatch.
-
-**Why it looked intermittent — a BAND, not a threshold.** Corruption needs uncompressed ≥ 1024 (so
-the proxy gzips) AND gzip < 1024 (so our own `compression()` declines to re-compress and leaves
-the bogus header). Below the band the proxy sends plaintext; above it `compression()` strips the
-header and goes chunked — accidentally correct. **Small is safe by being small, huge by being
-huge, and every picker lives in the broken middle.** Search caps at `limit=20`, so it could never
-reach the size that recovers: 14+ hits always failed, ≤13 always worked.
-
-**Solution.** Stop copying `content-length` in `boxForward`, `boxForwardWrite` and the proxy's `jotform.js`; let Node frame the response.
-
-**Prevention.**
-- 🔑 **Do NOT gate the copy on `content-encoding` being absent.** That works for
-  node-fetch/undici, but **axios DELETES that header after inflating while keeping the stale
-  length** (measured: 47 on a 3008-byte stream), so the conditional form is unwritable in the
-  proxy. Portable rule: **only ever set a length you computed from the bytes you are about to
-  write.** Sweep: 5 `.pipe(res)` sites across both repos, these two the only offenders.
-- 🔑 **The obvious source-grep lock is VACUOUS.**
-  `not.toContain("upstream.headers.get('content-length')")` would have been GREEN all week — that
-  literal never existed; the code reads `.get(h)` in a loop. Both tests instead PARSE the real
-  array/handler out of source and drive it through a live HTTP round trip.
-- 🔑 **An express+`compression()` upstream CANNOT reproduce this** — it removes Content-Length
-  when it gzips, so the harness passes against the bug. Use a raw `http.createServer` writing
-  `Content-Encoding: gzip` AND a gzip-sized `Content-Length` by hand.
-- 🔑 **Test the BAND** — one small + one large payload both pass while broken. Assert the
-  predicate and guard that the sizes straddle it.
-- ⚠️ Worse than truncation: with keep-alive the surplus bytes are parsed as the next response and
-  the connection desynchronises (`HPE_INVALID_CONSTANT`).
-- ⚠️ `application/octet-stream` is compressible in the app's mime-db 1.54.0 but not the proxy's
-  1.52.0 — a routine proxy `npm install` would have started **silently corrupting small `.DST`
-  downloads** (a bad stitch file, not a visible error). Closed permanently by the same change.
-- ⚠️ `git blame` misleads: the loop arrived in `76b6aa85`, a commit about content-hashed caching.
-- Locked by `box-forward-content-length.test.js` + `jotform-file-content-length.test.js`, both
-  verified to go red when the bug is reintroduced.
 
 ---
