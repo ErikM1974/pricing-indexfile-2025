@@ -24,7 +24,11 @@ import { positionColorDropdown } from '../shared/color-dropdown-position.js';
 import { recalculatePricing, updateTaxCalculation, collectProductsFromTable, getOrderPieceCounts, syncALRows, syncDECGRows } from './pricing-sync.js';
 import { updateNotesBadge, updateEmbellishmentDropdownLabels, getCapEmbellishmentType } from './logo-config.js';
 import { updateAdditionalCharges } from './quote-lifecycle.js';
-import { showAddNonSanmarModal } from './shopworks-import.js';
+// NOTE: the "Add Product" modal (showAddNonSanmarModal in shopworks-import.js) is no
+// longer imported here. As of 2026-08-15 an unknown style is entered MANUALLY on the
+// line instead of being registered in the catalog first — see _handleStyleNotFound.
+// The modal function still exists for the ShopWorks-import path; if nothing ends up
+// calling it, delete it and its markup rather than leaving it to mislead.
 import { embState, SIZE06_EXTENDED_SIZES, sizeDetectionCache, productColorsCache, API_BASE } from './state.js';
 
 export function updateLogoCardHeader(type, designNumber) {
@@ -1121,28 +1125,34 @@ async function _handleStyleNotFound(row, rowId, descInput, styleNumber) {
         console.warn('[onStyleChange] Non-SanMar lookup failed:', nsErr.message);
     }
 
-    // Not in SanMar or Non-SanMar database — show "Not found" with Add button
-    descInput.value = 'Not found';
-    showToast(`Style ${styleNumber} not found — click "Add" to register it`, 'warning');
+    // Not in SanMar or the vendor table — offer MANUAL entry (Erik 2026-08-15).
+    //
+    // Most vendor items are one-offs: a rep gets a price from S&S, Alphabroder or
+    // whoever for a style we will never quote again. Making them register it in a
+    // database first is friction for no payoff, so the primary path is now "type it
+    // on the line": style, colour, description and the unit cost we pay. The cost
+    // feeds the SAME engine a SanMar garment uses (buildSyntheticSizePricing), so
+    // margin, tier, embroidery, size upcharges and LTM all apply. NOTHING is saved
+    // to Caspio — the item lives on this quote only.
+    descInput.value = '';
+    descInput.placeholder = 'Type the description…';
+    showToast(`${styleNumber} isn't in our pricing — enter it manually below`, 'info', 6000);
 
-    // Store import data on the row for the Add modal
     row.dataset.style = styleNumber;
     row.dataset.notFound = 'true';
 
-    // Add "Add Product" button below the description
     const descCell = descInput.closest('td') || descInput.parentElement;
     if (descCell && !descCell.querySelector('.btn-add-nonsanmar')) {
         const btnWrap = document.createElement('div');
         btnWrap.className = 'btn-add-nonsanmar-block';
-        const addBtn = document.createElement('button');
-        addBtn.className = 'btn-add-nonsanmar pulse';
-        addBtn.title = 'Add to Non-SanMar database';
-        addBtn.innerHTML = '<i class="fas fa-plus-circle"></i> Add Product';
-        addBtn.onclick = () => showAddNonSanmarModal(rowId);
-        btnWrap.appendChild(addBtn);
+        const manualBtn = document.createElement('button');
+        manualBtn.className = 'btn-add-nonsanmar pulse';
+        manualBtn.title = 'Enter this item manually — nothing is saved to the catalog';
+        manualBtn.innerHTML = '<i class="fas fa-pen-to-square"></i> Enter manually';
+        manualBtn.onclick = () => openManualItemDialog(rowId);
+        btnWrap.appendChild(manualBtn);
         descCell.appendChild(btnWrap);
-        // Stop pulse animation after 5s
-        setTimeout(() => addBtn.classList.remove('pulse'), 5000);
+        setTimeout(() => manualBtn.classList.remove('pulse'), 5000);
     }
 }
 
@@ -1288,6 +1298,163 @@ function _applyNonSanmarPricingMode(row, product) {
         '2XL': parseFloat(product.SizeUpcharge2XL) || 0,
         '3XL': parseFloat(product.SizeUpcharge3XL) || 0
     });
+}
+
+/**
+ * Manual (unpriced) item — type style, colour, description and the unit cost we pay.
+ *
+ * For vendors whose pricing we don't carry (S&S Activewear, Alphabroder, a one-off
+ * specialty supplier). NOTHING is written to Caspio: the item exists on this quote
+ * only, which is the whole point — a rep should not have to register a database
+ * record to quote a shirt once.
+ *
+ * The typed cost lands in `dataset.blankCost` and from there flows through the
+ * IDENTICAL pricing path a SanMar garment uses (collectProductsFromTable →
+ * buildSyntheticSizePricing → the untouched formula), so it picks up the quantity
+ * tier, the margin denominator, the embroidery cost, extended-size upcharges and the
+ * LTM fee automatically. There is no second pricing path (Rule 9).
+ *
+ * On reload the row is rebuilt from the quote itself — the cost round-trips in
+ * LogoSpecs.ns (see EmbroideryQuoteService._withVendorSpecs), so a manual item
+ * re-prices correctly with no catalog entry to look up.
+ */
+export function openManualItemDialog(rowId) {
+    const row = document.getElementById(`row-${rowId}`);
+    if (!row) return;
+
+    document.getElementById('manual-item-dialog')?.remove();
+    const wrap = document.createElement('div');
+    wrap.id = 'manual-item-dialog';
+    wrap.className = 'monogram-names-dialog';
+    const style = row.dataset.style || '';
+    // The only interpolated value is escapeHtml(style); everything else is static markup.
+    wrap.innerHTML =
+        '<div class="mnd-card" role="dialog" aria-modal="true" aria-labelledby="mi-title">' +
+        '  <div id="mi-title" class="mnd-title"><i class="fas fa-pen-to-square"></i> Enter this item manually</div>' +
+        '  <div class="mnd-hint">We don\'t carry pricing for this style. Enter what we pay per blank and we price it exactly like a SanMar garment — margin, tier, embroidery and size upcharges all applied. Nothing is saved to the catalog.</div>' +
+        '  <input type="text" class="mnd-input mi-style" maxlength="40" placeholder="Style" value="' + escapeHtml(style) + '">' +
+        '  <input type="text" class="mnd-input mi-desc" maxlength="120" placeholder="Description — e.g. Bella+Canvas Unisex Jersey Tee">' +
+        '  <input type="text" class="mnd-input mi-color" maxlength="40" placeholder="Color — e.g. Navy">' +
+        '  <input type="number" class="mnd-input mi-cost" step="0.01" min="0.01" placeholder="Our cost per blank ($) — e.g. 8.42">' +
+        '  <input type="text" class="mnd-input mi-sizes" maxlength="120" placeholder="Sizes (comma-separated) — default S,M,L,XL,2XL,3XL">' +
+        '  <div class="mnd-actions">' +
+        '    <button type="button" class="mnd-skip">Cancel</button>' +
+        '    <button type="button" class="mnd-apply">Add to quote</button>' +
+        '  </div>' +
+        '</div>';
+    document.body.appendChild(wrap);
+
+    const close = () => { wrap.remove(); document.removeEventListener('keydown', onKey); };
+    const onKey = (e) => { if (e.key === 'Escape') close(); };
+    wrap.querySelector('.mnd-skip').addEventListener('click', close);
+    wrap.addEventListener('click', (e) => { if (e.target === wrap) close(); });
+    document.addEventListener('keydown', onKey);
+
+    wrap.querySelector('.mnd-apply').addEventListener('click', () => {
+        const val = sel => /** @type {HTMLInputElement} */ (wrap.querySelector(sel)).value.trim();
+        const cost = parseFloat(val('.mi-cost'));
+        if (!Number.isFinite(cost) || cost <= 0) {
+            showToast('Enter what we pay per blank — the price is built from it.', 'error');
+            /** @type {HTMLElement} */ (wrap.querySelector('.mi-cost')).focus();
+            return;
+        }
+        applyManualItem(row, rowId, {
+            style: val('.mi-style') || style,
+            description: val('.mi-desc'),
+            color: val('.mi-color'),
+            cost: cost,
+            sizes: val('.mi-sizes')
+        });
+        close();
+    });
+    setTimeout(() => /** @type {HTMLElement} */ (wrap.querySelector('.mi-desc')).focus(), 50);
+}
+window.openManualItemDialog = openManualItemDialog;
+
+/**
+ * Stamp a manual item onto the row. Deliberately mirrors what populateNonSanmarRow()
+ * does for a catalogued vendor product — same dataset contract, so every downstream
+ * consumer (pricing, save, print, ShopWorks push, reload) treats the two identically.
+ * The ONLY difference is that nothing was persisted to Caspio.
+ */
+export function applyManualItem(row, rowId, item) {
+    stampManualItem(row, rowId, item);
+    markAsUnsaved();
+    recalculatePricing();
+    showToast(`${item.style} added — priced from a $${item.cost.toFixed(2)} blank cost`, 'success', 5000);
+}
+
+/**
+ * The pure DOM half of applyManualItem — stamps the row and returns. Split out from the
+ * side effects (unsaved flag, recalc, toast) so it can be tested without mounting the
+ * entire builder page: the recalc is async and needs the totals/fee/recap DOM, and its
+ * failure surfaces as an unhandled rejection rather than a catchable throw.
+ */
+export function stampManualItem(row, rowId, item) {
+    const descInput = row.querySelector('[data-field="description"]');
+    const label = item.description || item.style;
+
+    row.dataset.nonSanmar = 'true';
+    row.dataset.manualItem = 'true';        // distinguishes "typed once" from "in the vendor table"
+    row.dataset.nsPricingMode = 'costPlus';
+    row.dataset.blankCost = String(item.cost);
+    delete row.dataset.sellPrice;           // cost-plus is engine-priced, never a typed sell price
+    delete row.dataset.notFound;
+    row.dataset.style = item.style;
+    row.dataset.productName = label;
+    row.dataset.sizeUpchargeOverrides = '{}';   // fall back to the shared Caspio ladder
+    if (descInput) descInput.value = label;
+
+    const styleInput = row.querySelector('.style-input');
+    if (styleInput) /** @type {HTMLInputElement} */ (styleInput).value = item.style;
+
+    row.querySelector('.btn-add-nonsanmar-block')?.remove();
+
+    const isCap = isCapProduct(item.style, label, '');
+    row.dataset.isCap = isCap ? 'true' : 'false';
+    const capBadge = document.getElementById(`cap-badge-${rowId}`);
+    if (capBadge) capBadge.style.display = isCap ? 'inline-flex' : 'none';
+    reorderRowByProductType(row);
+    updateCapLogoSectionVisibility();
+    updateGarmentLogoSectionVisibility();
+
+    _applyManualColor(row, item.color);
+
+    const sizes = (item.sizes || '').trim() || (isCap ? 'OSFA' : 'S,M,L,XL,2XL,3XL');
+    if (isCap) setNonSanmarCapSizes(row, rowId, sizes);
+    else setNonSanmarGarmentSizes(row, rowId, sizes);
+
+    const styleCell = row.querySelector('.style-input')?.closest('td');
+    if (styleCell && !styleCell.querySelector('.non-sanmar-badge')) {
+        const badge = document.createElement('span');
+        badge.className = 'non-sanmar-badge';
+        badge.textContent = 'Manual';
+        badge.title = `Manually entered — priced from a $${item.cost.toFixed(2)} blank cost. Not in the catalog.`;
+        styleCell.appendChild(badge);
+    }
+
+    const dupBtn = row.querySelector('.btn-duplicate-row');
+    if (dupBtn) /** @type {HTMLButtonElement} */ (dupBtn).disabled = false;
+}
+
+/** Single free-text colour on a manual row (no swatch, no SanMar colour list). */
+function _applyManualColor(row, color) {
+    const name = (color || '').trim();
+    if (!name) return;
+    row.dataset.color = name;
+    row.dataset.catalogColor = name;   // CATALOG_COLOR drives inventory/ShopWorks; the typed value IS it here
+    row.dataset.colors = JSON.stringify([{ COLOR_NAME: name, CATALOG_COLOR: name }]);
+    const picker = row.querySelector('.color-picker-selected');
+    if (!picker) return;
+    const swatch = picker.querySelector('.color-swatch');
+    const nameSpan = picker.querySelector('.color-name');
+    if (swatch) {
+        /** @type {HTMLElement} */ (swatch).style.backgroundImage = '';
+        /** @type {HTMLElement} */ (swatch).style.backgroundColor = '#ccc';
+        swatch.classList.remove('empty');
+    }
+    if (nameSpan) { nameSpan.textContent = name; nameSpan.classList.remove('placeholder'); }
+    picker.classList.remove('disabled');
 }
 
 /**

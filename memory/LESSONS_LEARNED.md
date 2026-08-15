@@ -52,6 +52,30 @@ key names. `CTR-FB` and `FB` rows retired. Erik's ruling: one rate for everyone,
 - 🔑 **A per-design negotiated price is an override, not drift** — keep it, but LABEL it, or the
   line just looks like the published table is wrong and the rep can't explain the number.
 
+**Retired rows — recovery values** (captured live 2026-08-15, before deletion; the endpoints no
+longer expose them, so this is the only record). Both sets are safe to delete: the two queries that
+still SELECT them ignore the results, and each query still returns its other ItemTypes so the
+"no records → 404" guards cannot trip.
+- `Embroidery_Costs` `ItemType='CTR-FB'` — 5 rows, `EmbroideryCostID` **163-167**, `StitchCount`
+  25000, `BaseStitchCount` 25000, `StitchIncrement` 1000, `DigitizingFee` 100,
+  `LogoPositions` "Full Back", `LTM` 50 on the 1-7 row / 0 on the rest. Per `TierLabel`:
+
+  | Tier | `EmbroideryCost` (25K total) | `AdditionalStitchRate` |
+  |---|---|---|
+  | 1-7 | 30.0000 | 1.2 |
+  | 8-23 | 25.0000 | 1.0 |
+  | 24-47 | 22.5000 | 0.9 |
+  | 48-71 | 21.2500 | 0.85 |
+  | 72+ | 20.0000 | 0.8 |
+
+  🔑 **`PerThousandRate` is BLANK on these rows** — the $/1K the API served was DERIVED
+  (`EmbroideryCost / (StitchCount/1000)`, `pricing.js`), i.e. 30 ÷ 25 = 1.20. Restoring the
+  per-1K figure into `PerThousandRate` would NOT reproduce these rows; write `EmbroideryCost`.
+- `Embroidery_Costs` `ItemType='FB'` — flat **1.25** /1K in `EmbroideryCost`, `BaseStitchCount` 25000.
+- ⚠️ Do NOT delete `CTR-Garmt`, `CTR-Cap`, `AL`, `AL-CAP`, `CB`, `CS` — live pricing depends on them.
+- 🔴 **Filter `ItemType` with EQUALS, never CONTAINS.** "FB" as a contains-match also selects
+  `CTR-FB` and — fatally — `DECG-FB`, which is the master full-back ladder every surface reads.
+
 ## A dashboard promised cost-plus pricing the builder could not read (2026-08-14)
 
 **Problem.** The staff Product Manager has offered **"Automatic (cost ÷ margin + logo — same as
