@@ -608,23 +608,42 @@ class EmbroideryPricingService {
         // Fetch AL pricing from API (or use cached)
         const alPricing = cachedPricing || await this.fetchALPricing();
 
-        // Handle full back separately (flat rate per 1K)
+        // Full back: ONE ladder for every surface (2026-08-15, Erik). Priced per 1,000
+        // stitches at a rate that drops with order quantity, sourced from Caspio
+        // Embroidery_Costs ItemType='DECG-FB' — the same rows the reference page and the
+        // contract calculator now read, so a full back costs the same no matter which
+        // screen quoted it. ShopWorks has exactly one full-back part ('DECG-FB'), so one
+        // part = one price.
+        //
+        // Was: a FLAT rate with `tier: 'ALL'` and no LTM, which meant a 3-piece job and a
+        // 500-piece job paid the same per 1K, and the $50 small-batch fee sitting in
+        // Caspio was never charged.
         if (itemType === 'fullback') {
-            const { ratePerThousand, minStitches } = alPricing.fullBack;
+            const { ratesPerThousand, minStitches, ltmFee, ltmThreshold } = alPricing.fullBack;
+            const tier = this.getALTier(quantity);
+            const rate = ratesPerThousand && ratesPerThousand[tier];
+
+            // Missing rate → throw. The caller flags the row with data-price-error and the
+            // save/push gate blocks it. Never bill a guessed or $0 full back.
+            if (!Number.isFinite(rate) || rate <= 0) {
+                throw new Error(`No full-back rate for tier ${tier} — check Embroidery_Costs DECG-FB rows in Caspio.`);
+            }
+
             const actualStitches = Math.max(stitchCount, minStitches);
             const stitchesK = actualStitches / 1000;
-            const unitPrice = stitchesK * ratePerThousand;
-
+            const unitPrice = stitchesK * rate;
 
             return {
                 unitPrice: parseFloat(unitPrice.toFixed(2)),
-                ltmFee: 0, // No LTM for full back
-                tier: 'ALL',
+                // Charged ONCE at the order level as its own row (see _syncDecgLtmRow),
+                // never baked into the per-piece price.
+                ltmFee: (quantity <= (ltmThreshold || 0)) ? (parseFloat(ltmFee) || 0) : 0,
+                tier: tier,
                 stitchCount: actualStitches,
                 itemType: itemType,
                 breakdown: {
                     basePrice: unitPrice,
-                    ratePerThousand: ratePerThousand,
+                    ratePerThousand: rate,
                     stitchesK: stitchesK,
                     extraCharge: 0
                 },

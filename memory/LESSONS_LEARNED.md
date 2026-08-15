@@ -5,6 +5,53 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## Five prices for one ShopWorks part — and a $50 fee hidden behind a misspelled column (2026-08-15)
+
+**Problem.** Full-back embroidery had **five** price sources across **three** Caspio tables, so what
+a customer paid depended on *which screen the rep used*, not on the job. At 25K stitches / 12 pcs:
+the staff reference page said **$25.00/pc**, the quote builder charged **$31.25**, and the retail
+rows nobody read said **$35.00**. The page was even titled "Full Back Embroidery — **DECG-FB**"
+while rendering **CTR-FB contract/wholesale** numbers, and its own banner claimed "same rate
+applies whether wholesale, NWCA-supplied, or customer-supplied" — false in code, three ways.
+Full-back LTM was simultaneously **$50** (reference page), **$100** (contract calculator) and
+**$0** (quote builder). **No test anywhere pinned any of it.**
+
+**Root cause.** Each surface was built at a different time and read whichever endpoint it already
+had open. Nobody ever asked "how many ItemTypes does one ShopWorks part need?" — the answer was
+always one: OnSite has exactly one full-back part, `DECG-FB`, and `FEE_PN_ALIASES` already mapped
+`FB → DECG-FB`. The *part* was unified years ago; only the *pricing* forked.
+
+**Solution.** One ladder — `Embroidery_Costs` where `ItemType='DECG-FB'` — read once by a shared
+`getFullBackLadder()` and served into all three endpoints' `.fullBack` blocks under their existing
+key names. `CTR-FB` and `FB` rows retired. Erik's ruling: one rate for everyone, contract included.
+
+**Prevention.**
+- 🔑 **One ShopWorks part should mean one price ladder.** When a part number is universal but the
+  price isn't, that asymmetry IS the bug. Use `KNOWN_FEE_PNS` / `FEE_PN_ALIASES` as the map of what
+  ought to be unified.
+- 🔴 **`LTM`, not `LTM_Fee`.** `Embroidery_Costs` has no `LTM_Fee` column. Reading it returned
+  `undefined`, so the fee silently became `0` — and the $50 the DECG garment/cap paths *appeared*
+  to charge came from a hardcoded default that happened to match. **Editing that fee in Caspio did
+  nothing, on already-shipped pricing.** A fallback that matches the real value hides a dead read
+  indefinitely; verify against the raw row, not against the rendered number.
+- 🔴 **`PerThousandRate` is NULL on the DECG-FB rows — the rate is in `EmbroideryCost`.** The
+  contract path *prefers* `PerThousandRate`, so a shared helper that inherited that preference
+  would have priced every full back at **$0**. When consolidating readers, check the columns are
+  actually populated on the rows you're consolidating *onto*.
+- 🔴 **A cached object handed out by reference gets decorated by its callers.** Each endpoint added
+  its own back-compat key (`perThousandRates` / `ratePerThousand`) to the shared ladder, which
+  leaked into every other response through the cache. Return a copy from any cached-price getter.
+- 🔑 **"Min charge $20" was a hardcoded `|| 20.00` in four files, presented to staff as policy.**
+  No Caspio column ever fed it. It was also inert — the cheapest cell equalled it exactly. Deleted
+  rather than wired up: under the new ladder the cheapest full back is $30, so it could never fire.
+  **Before building a knob, check whether it can ever move.**
+- ⚠️ **Dead renderers keep myths alive.** Three full-back matrix builders (127 lines) had lost their
+  target divs and rendered nothing — but one carried the comment *"DECG Full Back uses same pricing
+  (DECG-FB)"*, which is where the whole misconception came from. Delete dead code or it keeps
+  teaching.
+- 🔑 **A per-design negotiated price is an override, not drift** — keep it, but LABEL it, or the
+  line just looks like the published table is wrong and the rep can't explain the number.
+
 ## A dashboard promised cost-plus pricing the builder could not read (2026-08-14)
 
 **Problem.** The staff Product Manager has offered **"Automatic (cost ÷ margin + logo — same as
@@ -203,50 +250,5 @@ reach the size that recovers: 14+ hits always failed, ≤13 always worked.
 - ⚠️ `git blame` misleads: the loop arrived in `76b6aa85`, a commit about content-hashed caching.
 - Locked by `box-forward-content-length.test.js` + `jotform-file-content-length.test.js`, both
   verified to go red when the bug is reintroduced.
-
----
-
-## A prefix gate covers its prefix and nothing beside it; Origin is not auth (2026-08-11)
-
-**Problem.** `GET /api/mockup-notes/:id` and `GET /api/mockup-versions/:id` answered a bare
-anonymous curl with AE note text, author emails, thread colours and Box file ids. Separately,
-`curl -H 'Origin: https://www.teamnwca.com'` returned `Company_Name`, `Id_Customer`,
-`Work_Order_Number` and `AE_Notes` — 500 rows a time from the list route.
-
-**Root cause.** Two different holes wearing one costume. `src/routes/mockup-routes.js` is ONE
-router serving FOUR PII prefixes, and the 2026-07-04 fix gated `app.use('/api/mockups', …)` —
-a path-prefix gate, so the three sibling prefixes were never covered. And the gate it did have
-was `secret-OR-browser-Origin`, which accepts a header the caller supplies.
-
-**Solution.** Every prefix gated, reads secret-only, with an app-side session-gated forwarder
-(`mockupForward`) so browsers authenticate by SAML cookie and only the server holds the secret.
-`guardReadsOnly` throughout — the customer approval view writes these same paths with no staff
-session. Locked in both repos; the app-side test greps browser JS for cross-origin GETs.
-
-**Prevention.**
-- 🔑 **A prefix gate secures exactly its prefix.** Ask what OTHER prefixes the router serves —
-  derive the list from the router source in a test, so a new prefix fails until someone makes an
-  auth decision about it. Third time this shape has bitten (four gated sub-prefixes on `/api`,
-  the Box family, now this).
-- 🔴 **`Origin` is a CSRF signal, never an authentication one.** It is caller-controlled: one
-  curl flag impersonates any allowlisted browser. "secret-or-origin" reads like defence in depth
-  and is really just "or".
-- 🔑 **Check the sibling that looks like plumbing.** `mockup-notifications` looked like transient
-  toast machinery; each entry carries `companyName` + `designNumber`, and it filters by `?user=`
-  only when that param is *supplied*, so an anonymous poll with no user returned everything. It
-  is in-memory and usually empty, which is exactly why it read as harmless.
-- 🔴 **Gating reads changes who can still call it server-side.** `send-ruth-digest.js` scans via
-  `localhost/api/mockups/broken-mockups` — loopback still goes through Express, so without the
-  secret the nightly digest 401s and reports *nothing broken*. Grep for internal callers,
-  including ones that look local.
-- 🔑 **Moving a call same-origin moves it under the app's rate limiter.** These reads bypassed the
-  200-req/15-min `/api/` bucket while they were cross-origin; a 30 s notification poll now counts
-  against a ceiling the whole office shares behind one egress IP.
-- 🔑 **A content-hashed page serves `dist/`, not your edit** — art-hub-ruth kept calling the proxy
-  after the fix because the browser had `mockup-ruth.c1a6c72b6a.js`. Run `npm run build` and
-  confirm the HASH changed before believing a dashboard behaves the old way.
-- 🔑 **`EADDRINUSE` means you just tested the OLD code.** A restart that silently failed to bind
-  left the previous process serving, and the first "verification" showed the pre-fix behaviour.
-  Read the startup log, not just the response.
 
 ---

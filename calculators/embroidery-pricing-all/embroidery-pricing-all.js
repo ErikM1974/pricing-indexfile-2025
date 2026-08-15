@@ -87,16 +87,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Fetch cap upgrades pricing
         await fetchCapUpgrades();
 
-        // Build all matrices
+        // Build all matrices.
+        // The per-tab Full Back matrices were removed 2026-08-15: their target divs had
+        // long since been replaced by cross-reference links to the Full Back tab, so the
+        // three builders rendered nothing — while still carrying the comment that started
+        // the "DECG full back uses contract pricing" myth. The Full Back tab's own table
+        // (buildStitchChargesFullBackTable, below) is the single rendering.
         buildContractGarmentsMatrix();
         buildContractCapsMatrix();
-        buildContractFullBackMatrix();
         buildAlRetailGarmentsMatrix();
         buildAlRetailCapsMatrix();
-        buildAlRetailFullBackMatrix();
         buildDecgRetailGarmentsMatrix();
         buildDecgRetailCapsMatrix();
-        buildDecgRetailFullBackMatrix();
 
         // Build stitch-charges tab (API-driven)
         updateStitchChargesTierCards();
@@ -161,19 +163,30 @@ async function fetchContractPricing() {
     }
     const data = await response.json();
 
-    // Transform API response to match expected structure
+    // Transform API response to match expected structure.
+    //
+    // `fullBack` is the ONE shared ladder (Embroidery_Costs ItemType='DECG-FB') that the
+    // quote builder and the contract calculator now read too — this page used to render
+    // the CTR-FB contract/wholesale numbers under a "DECG-FB" heading, ~29% below retail.
+    //
+    // The `minPrice || 20.00` floor is GONE, not moved: no Caspio column ever fed it, and
+    // under this ladder the cheapest possible full back is 25K × $1.20 = $30.00, so a $20
+    // floor could never fire. The 25,000-stitch minimum IS the floor. (Erik 2026-08-15)
+    //
+    // LTM is read from the fullBack block, where the API actually puts it. The old
+    // `data.ltmFee` read the TOP level, which has never existed — so the $50 shown here
+    // was the hardcoded fallback, not Caspio, and editing the fee changed nothing.
     return {
         garments: data.garments,
         caps: data.caps,
         fullBack: {
             perThousandRates: data.fullBack.perThousandRates,
             minStitches: data.fullBack.minStitches || 25000,
-            minPrice: data.fullBack.minPrice || 20.00,
-            ltmFee: data.ltmFee || 50,
-            ltmThreshold: data.ltmThreshold || 23
+            ltmFee: data.fullBack.ltmFee || 0,
+            ltmThreshold: data.fullBack.ltmThreshold || 0
         },
-        ltmFee: data.ltmFee || 50,
-        ltmThreshold: data.ltmThreshold || 23
+        ltmFee: data.garments?.ltmFee || 0,
+        ltmThreshold: data.garments?.ltmThreshold || 0
     };
 }
 
@@ -490,49 +503,6 @@ function buildContractCapsMatrix() {
     tbody.innerHTML = html;
 }
 
-function buildContractFullBackMatrix() {
-    const tbody = document.querySelector('#contractFullBackMatrix tbody');
-    if (!tbody) return;
-
-    if (!CONTRACT_PRICING || !CONTRACT_PRICING.fullBack || !CONTRACT_PRICING.fullBack.perThousandRates) {
-        tbody.innerHTML = '<tr><td colspan="6" class="error-cell">Full back pricing not available</td></tr>';
-        return;
-    }
-
-    const rates = CONTRACT_PRICING.fullBack.perThousandRates;
-    const minPrice = CONTRACT_PRICING.fullBack.minPrice || 20.00;
-    let html = '';
-
-    // Build rows for each stitch count (like Garments/Caps)
-    FB_STITCH_COUNTS.forEach(stitches => {
-        html += '<tr>';
-        html += `<td>${(stitches / 1000).toFixed(0)}K</td>`;
-
-        TIER_ORDER.forEach((tier, idx) => {
-            const rate = rates[tier];
-            const stitchesK = stitches / 1000;
-            const price = Math.max(stitchesK * rate, minPrice);
-            // LTM applies to first two tiers (1-7 and 8-23)
-            const cellClass = idx <= 1 ? 'ltm-col' : (idx === TIER_ORDER.length - 1 ? 'best-col' : '');
-            html += `<td class="${cellClass}">${formatPrice(price)}</td>`;
-        });
-
-        html += '</tr>';
-    });
-
-    // Add footer row with per-thousand rates
-    html += '<tr class="rate-footer">';
-    html += '<td><strong>$/1K</strong></td>';
-    TIER_ORDER.forEach((tier, idx) => {
-        const rate = rates[tier];
-        const cellClass = idx <= 1 ? 'ltm-col' : (idx === TIER_ORDER.length - 1 ? 'best-col' : '');
-        html += `<td class="${cellClass}"><strong>${formatPrice(rate)}</strong></td>`;
-    });
-    html += '</tr>';
-
-    tbody.innerHTML = html;
-}
-
 // ============================================
 // AL RETAIL MATRICES (Simplified)
 // ============================================
@@ -599,48 +569,6 @@ function buildAlRetailCapsMatrix() {
     tbody.innerHTML = html;
 }
 
-function buildAlRetailFullBackMatrix() {
-    const tbody = document.querySelector('#alRetailFullBackMatrix tbody');
-    if (!tbody) return;
-
-    // Use CONTRACT_PRICING since AL Full Back uses same pricing (DECG-FB)
-    if (!CONTRACT_PRICING || !CONTRACT_PRICING.fullBack || !CONTRACT_PRICING.fullBack.perThousandRates) {
-        tbody.innerHTML = '<tr><td colspan="6" class="error-cell">Full back pricing not available</td></tr>';
-        return;
-    }
-
-    const rates = CONTRACT_PRICING.fullBack.perThousandRates;
-    const minPrice = CONTRACT_PRICING.fullBack.minPrice || 20.00;
-    let html = '';
-
-    FB_STITCH_COUNTS.forEach(stitches => {
-        html += '<tr>';
-        html += `<td>${(stitches / 1000).toFixed(0)}K</td>`;
-
-        TIER_ORDER.forEach((tier, idx) => {
-            const rate = rates[tier];
-            const stitchesK = stitches / 1000;
-            const price = Math.max(stitchesK * rate, minPrice);
-            const cellClass = idx <= 1 ? 'ltm-col' : (idx === TIER_ORDER.length - 1 ? 'best-col' : '');
-            html += `<td class="${cellClass}">${formatPrice(price)}</td>`;
-        });
-
-        html += '</tr>';
-    });
-
-    // Footer row with per-thousand rates
-    html += '<tr class="rate-footer">';
-    html += '<td><strong>$/1K</strong></td>';
-    TIER_ORDER.forEach((tier, idx) => {
-        const rate = rates[tier];
-        const cellClass = idx <= 1 ? 'ltm-col' : (idx === TIER_ORDER.length - 1 ? 'best-col' : '');
-        html += `<td class="${cellClass}"><strong>${formatPrice(rate)}</strong></td>`;
-    });
-    html += '</tr>';
-
-    tbody.innerHTML = html;
-}
-
 // ============================================
 // DECG RETAIL MATRICES (Simplified)
 // ============================================
@@ -701,48 +629,6 @@ function buildDecgRetailCapsMatrix() {
         html += `<td class="price-cell">${formatPrice(price)} each</td>`;
         html += '</tr>';
     });
-
-    tbody.innerHTML = html;
-}
-
-function buildDecgRetailFullBackMatrix() {
-    const tbody = document.querySelector('#decgRetailFullBackMatrix tbody');
-    if (!tbody) return;
-
-    // Use CONTRACT_PRICING since DECG Full Back uses same pricing (DECG-FB)
-    if (!CONTRACT_PRICING || !CONTRACT_PRICING.fullBack || !CONTRACT_PRICING.fullBack.perThousandRates) {
-        tbody.innerHTML = '<tr><td colspan="6" class="error-cell">Full back pricing not available</td></tr>';
-        return;
-    }
-
-    const rates = CONTRACT_PRICING.fullBack.perThousandRates;
-    const minPrice = CONTRACT_PRICING.fullBack.minPrice || 20.00;
-    let html = '';
-
-    FB_STITCH_COUNTS.forEach(stitches => {
-        html += '<tr>';
-        html += `<td>${(stitches / 1000).toFixed(0)}K</td>`;
-
-        TIER_ORDER.forEach((tier, idx) => {
-            const rate = rates[tier];
-            const stitchesK = stitches / 1000;
-            const price = Math.max(stitchesK * rate, minPrice);
-            const cellClass = idx <= 1 ? 'ltm-col' : (idx === TIER_ORDER.length - 1 ? 'best-col' : '');
-            html += `<td class="${cellClass}">${formatPrice(price)}</td>`;
-        });
-
-        html += '</tr>';
-    });
-
-    // Footer row with per-thousand rates
-    html += '<tr class="rate-footer">';
-    html += '<td><strong>$/1K</strong></td>';
-    TIER_ORDER.forEach((tier, idx) => {
-        const rate = rates[tier];
-        const cellClass = idx <= 1 ? 'ltm-col' : (idx === TIER_ORDER.length - 1 ? 'best-col' : '');
-        html += `<td class="${cellClass}"><strong>${formatPrice(rate)}</strong></td>`;
-    });
-    html += '</tr>';
 
     tbody.innerHTML = html;
 }
@@ -813,8 +699,19 @@ function updateStitchChargesTierCards() {
 }
 
 /**
- * Build the DECG-FB Full Back table on the stitch-charges tab from CONTRACT_PRICING
- * Uses the same data as the contract/AL/DECG Full Back tables
+ * Build the Full Back (DECG-FB) table.
+ *
+ * Renders the ONE full-back ladder — Caspio Embroidery_Costs ItemType='DECG-FB' — the
+ * same rows the quote builder and the contract calculator price from, so what a rep
+ * reads here is what the builder charges. (Erik 2026-08-15.)
+ *
+ * It reaches us through CONTRACT_PRICING.fullBack because that is the endpoint this page
+ * already fetches; the numbers are NOT contract rates. Until this change the page really
+ * did render CTR-FB wholesale rates under a DECG-FB heading — ~29% under retail — so a
+ * rep transcribing a cell undercharged.
+ *
+ * No minimum-charge floor: nothing in Caspio ever fed one, and the cheapest cell here is
+ * 25K × $1.20 = $30.00, so the old hardcoded $20 could never bind.
  */
 function buildStitchChargesFullBackTable() {
     const tbody = document.getElementById('esFbTableBody');
@@ -826,7 +723,6 @@ function buildStitchChargesFullBackTable() {
     }
 
     const rates = CONTRACT_PRICING.fullBack.perThousandRates;
-    const minPrice = CONTRACT_PRICING.fullBack.minPrice || 20.00;
     let html = '';
 
     FB_STITCH_COUNTS.forEach(stitches => {
@@ -835,9 +731,7 @@ function buildStitchChargesFullBackTable() {
 
         TIER_ORDER.forEach(tier => {
             const rate = rates[tier];
-            const stitchesK = stitches / 1000;
-            const price = Math.max(stitchesK * rate, minPrice);
-            html += `<td>${formatPrice(price)}</td>`;
+            html += `<td>${Number.isFinite(rate) ? formatPrice((stitches / 1000) * rate) : '—'}</td>`;
         });
 
         html += '</tr>';
@@ -854,10 +748,18 @@ function buildStitchChargesFullBackTable() {
 
     tbody.innerHTML = html;
 
-    // LTM fee + range are LIVE from Caspio (contract-pricing fullBack.ltmFee/ltmThreshold),
-    // never hardcoded — matches the $50 the retail EMB builder + Service_Codes LTM use.
-    // (Fixed 2026-07-01: the static text said $100, contradicting the live $50 shown
-    //  everywhere else on the page.)
+    // LTM fee + range, now GENUINELY live from Caspio. The previous comment claimed this
+    // already, but fetchContractPricing() read a TOP-LEVEL data.ltmFee the API has never
+    // emitted, so the $50 was the hardcoded fallback and editing Caspio did nothing. The
+    // real value lives on the DECG-FB 1-7 row, in a column named `LTM`. (2026-08-15)
+    // Minimum stitches straight from the API rather than a static string, so raising it
+    // in Caspio updates the badge and the table's first row together.
+    const minStitchesEl = document.getElementById('esFbMinStitches');
+    const fbMinStitches = CONTRACT_PRICING.fullBack.minStitches;
+    if (minStitchesEl && Number.isFinite(fbMinStitches)) {
+        minStitchesEl.textContent = `${(fbMinStitches / 1000).toFixed(0)}K stitches`;
+    }
+
     const ltmFeeEl = document.getElementById('esFbLtmFee');
     const ltmRangeEl = document.getElementById('esFbLtmRange');
     const fbLtmFee = CONTRACT_PRICING.fullBack.ltmFee;

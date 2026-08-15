@@ -99,7 +99,12 @@ describe('estimateMachineHours', () => {
 // ─── multi-location price combination ──────────────────────────────────────
 
 describe('combineLines', () => {
-    // Mirrors the calculator's live config: $50 flat/cap, $100 full back, 1-23 pcs
+    // SYNTHETIC fixture — deliberately NOT the live config. Full back stopped being $100
+    // on 2026-08-15 (one ladder for every full back; the fee is now the same $50 as
+    // everything else, read from Caspio Embroidery_Costs DECG-FB column `LTM`). The two
+    // values are kept DIFFERENT here on purpose: these tests pin combineLines' rule that
+    // one order pays the HIGHEST fee once, not the sum — and a fixture where every fee is
+    // equal cannot tell "highest" apart from "first" or "last".
     const ltm = { threshold: 23, feeFor: p => (p === 'fullback' ? 100 : 50) };
 
     test('sums the per-piece base price across locations', () => {

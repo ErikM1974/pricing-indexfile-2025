@@ -36,7 +36,10 @@ class EmbroideryPricingCalculator {
             { max: 25000, fee: 10 }    // Large: +$10 per piece
         ];
         this.fbBaseStitchCount = 25000; // base included stitches for Full Back position (overridden by API)
-        this.fbStitchRate = 1.25; // Full Back stitch rate per 1K (overridden by API)
+        this.fbStitchRate = 1.25; // legacy FLAT Full Back rate (Service_Codes 'FB') — fallback only
+        // Full Back $/1K BY QUANTITY TIER — the one shared ladder (Embroidery_Costs
+        // DECG-FB). Preferred over fbStitchRate; see _getFBRateForQty().
+        this.fbTierRates = {};
         this.monogramPrice = 12.50; // Monogram/Name price (overridden by API)
         this.stitchIncrement = 1000; // rounding increment
         
@@ -268,6 +271,25 @@ class EmbroideryPricingCalculator {
                 }
             }
             
+            // Full back: the ONE shared ladder (Caspio Embroidery_Costs ItemType='DECG-FB'),
+            // the same rows the Services-bar full back, the staff reference page and the
+            // contract calculator price from. Before 2026-08-15 this path priced off the
+            // Service_Codes 'FB' row at a FLAT rate with no quantity tiering, so the two
+            // ways of adding a full back in this very builder could disagree.
+            // Server-cached 15 min, so this costs ~one Caspio read per session.
+            try {
+                const fbResponse = await fetch(`${this.baseURL}/api/decg-pricing`);
+                const fbData = await fbResponse.json();
+                if (fbData && fbData.fullBack && fbData.fullBack.ratesPerThousand) {
+                    this.fbTierRates = fbData.fullBack.ratesPerThousand;
+                    if (fbData.fullBack.minStitches > 0) this.fbBaseStitchCount = fbData.fullBack.minStitches;
+                }
+            } catch (fbErr) {
+                // Non-fatal: the Service_Codes rate below still applies, and any full-back
+                // line surfaces the normal pricing error if neither source resolves.
+                console.error('[EMB pricing] Full-back ladder unavailable:', fbErr.message);
+            }
+
             // Fetch Additional Logo (AL) pricing from EMB-AL endpoint
             try {
                 const alResponse = await fetch(`${this.baseURL}/api/pricing-bundle?method=EMB-AL`);
@@ -974,6 +996,21 @@ class EmbroideryPricingCalculator {
     }
 
     /**
+     * Full Back $/1K for an order quantity, from the ONE shared ladder
+     * (Caspio Embroidery_Costs ItemType='DECG-FB' via /api/decg-pricing).
+     *
+     * Falls back to the legacy flat Service_Codes 'FB' rate only if the ladder didn't
+     * load — that rate has no quantity dimension, so it over-charges large orders and
+     * under-charges small ones. Never returns 0: a $0 full back must fail loudly upstream.
+     */
+    _getFBRateForQty(quantity) {
+        const tier = this.getTier(quantity);
+        const rate = this.fbTierRates && this.fbTierRates[tier];
+        if (Number.isFinite(rate) && rate > 0) return rate;
+        return this.fbStitchRate || this.additionalStitchRate;
+    }
+
+    /**
      * Get embroidery cost for tier.
      * $12 is a FALLBACK for a missing tier row — flag it so calculateQuote can
      * surface a visible warning (Erik's #1 rule: never a silent wrong price).
@@ -1580,12 +1617,14 @@ class EmbroideryPricingCalculator {
                 if (logo.position === 'Full Back') {
                     const fbStitchCount = Math.max(logo.stitchCount, this.fbBaseStitchCount);
                     if (logo.fbPriceTiers && logo.fbPriceTiers.fbPrice1_7 > 0) {
-                        // Design-specific tier pricing — price varies by quantity
+                        // NEGOTIATED price for this design (Digitized Designs Master) —
+                        // deliberately overrides the shared ladder. Flagged so the UI can
+                        // say why this line differs from the published table.
                         primaryFullBackStitchCost += this._getFBTierPrice(logo.fbPriceTiers, garmentQuantity);
                         primaryFBUsedTierPricing = true;
                     } else {
-                        // Formula-based: $1.25 per 1,000 stitches (min 25K)
-                        primaryFullBackStitchCost += (fbStitchCount / 1000) * (this.fbStitchRate || this.additionalStitchRate);  // FB-specific rate (FB service code), not the garment STITCH-RATE (review C16)
+                        // The one shared DECG-FB ladder: $/1K by quantity tier, min 25K.
+                        primaryFullBackStitchCost += (fbStitchCount / 1000) * this._getFBRateForQty(garmentQuantity);  // one shared DECG-FB ladder, tiered by qty
                     }
                 } else {
                     // Other positions: flat tier surcharge (Mid $4, Large $10)
@@ -1746,12 +1785,16 @@ class EmbroideryPricingCalculator {
                                 let description;
 
                                 if (logo.fbPriceTiers && logo.fbPriceTiers.fbPrice1_7 > 0) {
-                                    // Design-specific tier pricing from Digitized Designs Master
+                                    // NEGOTIATED price for this specific design (Digitized Designs
+                                    // Master fbPrice* columns) — deliberately overrides the shared
+                                    // ladder. Say so in the description: without it the line just
+                                    // looks like the standard table got the price wrong, and a rep
+                                    // has no way to explain the number to the customer.
                                     unitPrice = this._getFBTierPrice(logo.fbPriceTiers, quantity);
-                                    description = `FB Full Back (${fbStitchCount/1000}K st, tier pricing)`;
+                                    description = `FB Full Back (${fbStitchCount/1000}K st — negotiated price for this design)`;
                                 } else {
                                     // Formula-based pricing
-                                    const fbStitchRate = this.fbStitchRate || this.additionalStitchRate; // FB rate (FB service code), falls back to garment rate (review C16)
+                                    const fbStitchRate = this._getFBRateForQty(quantity); // one shared DECG-FB ladder, tiered by qty
                                     unitPrice = (fbStitchCount / 1000) * fbStitchRate;
                                     description = `FB Full Back (${fbStitchCount/1000}K stitches)`;
                                 }
@@ -1934,7 +1977,12 @@ class EmbroideryPricingCalculator {
             capTier: capTier,  // NEW: Separate cap tier
             embroideryRate: tierEmbCost,
             additionalStitchCost: primaryAdditionalStitchCost + primaryFullBackStitchCost,
-            fullBackStitchCost: primaryFullBackStitchCost, // Full Back: ALL stitches at $1.25/1K
+            fullBackStitchCost: primaryFullBackStitchCost, // Full Back: all stitches at the DECG-FB $/1K for this quantity tier
+            // True when this quote's Full Back came from a NEGOTIATED per-design price
+            // (Digitized Designs Master) instead of the published ladder. Surfaced so the
+            // UI can say why the number differs from the reference table — otherwise it
+            // just looks like the table is wrong and the rep can't explain it.
+            fullBackUsedNegotiatedPrice: primaryFBUsedTierPricing,
             additionalStitchTotal: additionalStitchTotal,  // Total extra stitch charge across all items
             garmentStitchTotal: garmentStitchTotal,  // NEW: Garment-only stitch charges (AS-GARM)
             capStitchTotal: capStitchTotal,          // NEW: Cap-only stitch charges (AS-CAP)

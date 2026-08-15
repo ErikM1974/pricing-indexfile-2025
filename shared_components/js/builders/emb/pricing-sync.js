@@ -34,6 +34,13 @@ let _alPricingCache = null;      // AL tier snapshot (cleared per recalc — sta
 let _decgPricingCache = null;    // DECG tier snapshot (same lifecycle)
 let _alPricingSvc = null;        // lazy EmbroideryPricingService instance for AL/DECG fetches
 let _decgLtmState = null;        // DECG-LTM row bookkeeping { rowId, sig, waivedSig }
+// Small-batch fee contributions, keyed by what earned them. Full back is priced by
+// syncALRows() and customer-supplied by syncDECGRows(), but they share ONE fee row —
+// so each writes its own slot here and both re-render from the combined picture.
+// Module state (not a param) because the two syncs run independently: recalc drives
+// syncALRows every cycle, while syncDECGRows only fires on DECG edits.
+const _ltmParts = { garment: 0, cap: 0, fullback: 0 };
+const _ltmQty = { garment: 0, cap: 0, fullback: 0 };
 let _embRecalcSeq = 0;           // recalc race-guard sequence (newer run supersedes)
 let _ddFeeMismatchWarned = false; // once-per-page digitizing-fee mismatch warning
 
@@ -176,13 +183,21 @@ export function getOrderPieceCounts() {
 
 export async function syncALRows() {
     const alRows = document.querySelectorAll('#product-tbody tr.service-product-row[data-al-priced="true"]');
-    if (!alRows.length) return;
+    if (!alRows.length) {
+        // Last AL/full-back row deleted → its share of the small-batch fee goes with it.
+        if (_ltmParts.fullback) { _ltmParts.fullback = 0; _ltmQty.fullback = 0; _syncDecgLtmRow(_ltmParts, _ltmQty); }
+        return;
+    }
     const cache = await loadALPricing();
     // [A3] (audit 2026-06-06): API down → do NOT leave a stale/$0 AL price the save gate would accept. Flag
     // every AL row so saveAndGetLink's priceError gate blocks it (Erik's #1 rule). Toast already surfaced.
     if (!cache) { alRows.forEach(r => { /** @type {HTMLElement} */ (r).dataset.priceError = 'true'; }); return; }
     const svc = _alPricingSvc;
     const counts = getOrderPieceCounts();
+    // A full back under the small-batch threshold earns the same $50 fee customer-supplied
+    // rows do — one per order, not one per row, so take the largest rather than summing.
+    let fbLtm = 0;
+    let fbQty = 0;
     for (const row of alRows) {
         const rid = /** @type {HTMLElement} */ (row).dataset.rowId;
         const itemType = /** @type {HTMLElement} */ (row).dataset.alItemType || 'garment';
@@ -202,6 +217,12 @@ export async function syncALRows() {
         try {
             const res = await svc.calculateALPrice(qty || 1, stitch, itemType, cache);
             unit = res.unitPrice || 0;
+            // Full back now returns the Caspio small-batch fee at low quantity (it used to
+            // hardcode 0). One fee per order → keep the largest, never a sum.
+            if (itemType === 'fullback' && res.ltmFee > 0 && res.ltmFee > fbLtm) {
+                fbLtm = res.ltmFee;
+                fbQty = qty || 1;
+            }
             delete /** @type {HTMLElement} */ (row).dataset.priceError;
         } catch (e) {
             // P1-4 (audit 2026-06-06): a pricing throw must NOT silently bill $0 (Erik's #1 rule). Flag the
@@ -217,6 +238,13 @@ export async function syncALRows() {
         const totalCell = document.getElementById(`row-total-${rid}`);
         if (priceCell) priceCell.textContent = '$' + unit.toFixed(2);
         if (totalCell) totalCell.textContent = '$' + (unit * qty).toFixed(2);
+    }
+
+    // Publish this path's share of the shared small-batch fee row.
+    if (_ltmParts.fullback !== fbLtm) {
+        _ltmParts.fullback = fbLtm;
+        _ltmQty.fullback = fbQty;
+        _syncDecgLtmRow(_ltmParts, _ltmQty);
     }
 }
 window.syncALRows = syncALRows;
@@ -247,8 +275,11 @@ async function loadDECGPricing() {
 export async function syncDECGRows() {
     const rows = document.querySelectorAll('#product-tbody tr.service-product-row[data-decg-priced="true"]');
     if (!rows.length) {
-        // Last DECG row deleted → the synthesized small-batch fee goes with it.
-        _syncDecgLtmRow({ garment: 0, cap: 0 }, { garment: 0, cap: 0 });
+        // Last DECG row deleted → its share of the fee goes with it. A full back on the
+        // same order keeps its own share (_ltmParts.fullback), so the row survives.
+        _ltmParts.garment = 0; _ltmParts.cap = 0;
+        _ltmQty.garment = 0; _ltmQty.cap = 0;
+        _syncDecgLtmRow(_ltmParts, _ltmQty);
         return;
     }
     const cache = await loadDECGPricing();
@@ -269,6 +300,8 @@ export async function syncDECGRows() {
         pooledQty[t] += parseFloat(/** @type {HTMLInputElement|null} */ (r.querySelector('.service-qty'))?.value) || 0;
     });
     const decgLtm = { garment: 0, cap: 0 };
+    _ltmQty.garment = pooledQty.garment;
+    _ltmQty.cap = pooledQty.cap;
 
     for (const row of rows) {
         const rid = /** @type {HTMLElement} */ (row).dataset.rowId;
@@ -311,7 +344,9 @@ export async function syncDECGRows() {
         if (totalCell) totalCell.textContent = '$' + (unit * qty).toFixed(2);
     }
 
-    _syncDecgLtmRow(decgLtm, pooledQty);
+    _ltmParts.garment = decgLtm.garment;
+    _ltmParts.cap = decgLtm.cap;
+    _syncDecgLtmRow(_ltmParts, _ltmQty);
 }
 window.syncDECGRows = syncDECGRows;
 
@@ -326,8 +361,16 @@ window.syncDECGRows = syncDECGRows;
  * re-adopted via data-service-type="ltm" so edits keep the amount live.
  */
 export function _syncDecgLtmRow(decgLtm, pooledQty) {
-    const total = (decgLtm.garment || 0) + (decgLtm.cap || 0);
-    const sig = `${decgLtm.garment || 0}|${decgLtm.cap || 0}`;
+    // Customer-supplied garments and caps each earn their own fee — they tier and run
+    // separately (CLAUDE.md), so this SUM is deliberate and predates full back. Unchanged.
+    //
+    // Full back (2026-08-15) joins the same row but does NOT stack on top: it is a
+    // decoration location on garments that have usually already been counted above, so a
+    // customer-supplied order with a full back must not jump to $100. It only supplies the
+    // fee when nothing else has — i.e. a full back on OUR garments, which earns it alone.
+    const suppliedTotal = (decgLtm.garment || 0) + (decgLtm.cap || 0);
+    const total = suppliedTotal || (decgLtm.fullback || 0);
+    const sig = `${decgLtm.garment || 0}|${decgLtm.cap || 0}|${decgLtm.fullback || 0}`;
     const st = (_decgLtmState = _decgLtmState || { rowId: null, sig: null, waivedSig: null });
 
     let row = st.rowId ? document.getElementById(`row-${st.rowId}`) : null;
@@ -356,8 +399,10 @@ export function _syncDecgLtmRow(decgLtm, pooledQty) {
         const parts = [];
         if (decgLtm.garment > 0) parts.push(`${pooledQty.garment} supplied garment pc`);
         if (decgLtm.cap > 0) parts.push(`${pooledQty.cap} supplied cap pc`);
+        if (!parts.length && decgLtm.fullback > 0) parts.push(`${pooledQty.fullback} full-back pc`);
         if (typeof showToast === 'function') {
-            showToast(`Customer-supplied small-batch fee added: $${total.toFixed(2)} (${parts.join(' + ')} under the 8-pc minimum). Delete the row to waive it.`, 'info', 8000);
+            const label = suppliedTotal > 0 ? 'Customer-supplied small-batch fee' : 'Small-batch fee';
+            showToast(`${label} added: $${total.toFixed(2)} (${parts.join(' + ')} under the small-batch threshold). Delete the row to waive it.`, 'info', 8000);
         }
         return;
     }

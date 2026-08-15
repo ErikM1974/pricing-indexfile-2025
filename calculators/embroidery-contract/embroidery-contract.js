@@ -93,7 +93,6 @@
             stitchCounts: FB_STITCH_COUNTS,
             stitchPresets: STITCH_PRESETS_FULLBACK,
             minStitches: 25000,
-            minCharge: 20.00,
         },
     };
 
@@ -162,12 +161,10 @@
         if (rate == null) return null;
         var kStitches = stitchCount / 1000;
         var unit = rate * kStitches;
-        var minChargeApplied = false;
-        if (product === 'fullback') {
-            var minPrice = (pricing.fullBack && pricing.fullBack.minPrice) || 20.00;
-            if (unit < minPrice) { unit = minPrice; minChargeApplied = true; }
-        }
-        return { unit: unit, rate: rate, kStitches: kStitches, tierIdx: idx, tier: tier, minChargeApplied: minChargeApplied };
+        // Full back's minimum-charge floor was removed 2026-08-15: no Caspio column ever
+        // fed it (it was a hardcoded `|| 20.00`), and the cheapest full back is now
+        // 25K x $1.20 = $30.00, so it could never bind. The 25K stitch minimum is the floor.
+        return { unit: unit, rate: rate, kStitches: kStitches, tierIdx: idx, tier: tier };
     }
 
     /**
@@ -213,7 +210,7 @@
                     fullBack: {
                         perThousandRates: data.fullBack.perThousandRates,
                         minStitches: data.fullBack.minStitches || 25000,
-                        minPrice: data.fullBack.minPrice || 20.00
+                        minStitches: data.fullBack.minStitches || 25000
                     },
                     ltmFee: data.ltmFee || 50,
                     ltmThreshold: data.ltmThreshold || 23
@@ -249,7 +246,6 @@
                     result.priced.length + ' locations';
             } else {
                 subText = fmtK(state.stitches) + ' × <b>$' + calc.rate.toFixed(2) + '/1K</b>';
-                if (calc.minChargeApplied) subText += ' · min charge applied';
             }
             if (combo.hasLtm) {
                 subText += ' · incl. $' + fmtMoney(combo.ltmFee) + ' LTM ÷ ' + state.qty +
@@ -411,7 +407,7 @@
         // — that cell IS the rep's quote. Other cells stay base as the rate
         // card. Pre-compute LTM details once so we don't redo the math per cell.
         var ltmThreshold = pricing ? pricing.ltmThreshold : 23;
-        var ltmFeeBase = state.tableProduct === 'fullback' ? 100 : (pricing ? pricing.ltmFee : 50);
+        var ltmFeeBase = ltmFeeForProduct(state.tableProduct);
 
         // Build body rows
         var rowsHtml = '';
@@ -424,8 +420,6 @@
                 var stitchesK = stitches / 1000;
                 var price = stitchesK * rates[tier];
                 if (state.tableProduct === 'fullback') {
-                    var minPrice = (pricing.fullBack && pricing.fullBack.minPrice) || 20;
-                    if (price < minPrice) price = minPrice;
                 }
                 // Intersection cell ALL-IN swap — only when the rep is
                 // actually quoting this product. Reps browsing OTHER tabs see
@@ -663,7 +657,11 @@
 
     /** LTM band for a product. Full back carries its own higher fee. */
     function ltmFeeForProduct(product) {
-        return product === 'fullback' ? 100 : (pricing ? pricing.ltmFee : 50);
+        // Full back's fee comes from the ONE shared ladder (Embroidery_Costs DECG-FB,
+        // column LTM) like every other surface. It used to be a hardcoded 100 here while
+        // the reference page showed 50 and the quote builder charged 0. (2026-08-15)
+        if (product === 'fullback') return (pricing && pricing.fullBack && pricing.fullBack.ltmFee) || 0;
+        return pricing ? pricing.ltmFee : 50;
     }
 
     /* =====================================================
