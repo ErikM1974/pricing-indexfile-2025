@@ -1,3 +1,9 @@
+## v2026.08.15.2 (2026.08.15)
+
+- Record CTR-FB / FB row values before they are deleted from Caspio
+- Correct the CTR-FB recovery record: the rate is EmbroideryCost, not PerThousandRate
+- Manual vendor items: type the cost on the line, no catalog entry
+
 ## v2026.08.15.1 (2026.08.15)
 
 - Quote vendor garments off blank cost; describe customer-supplied goods
