@@ -1333,7 +1333,13 @@ export function openManualItemDialog(rowId) {
         '  <div id="mi-title" class="mnd-title"><i class="fas fa-pen-to-square"></i> Enter this item manually</div>' +
         '  <div class="mnd-hint">We don\'t carry pricing for this style. Enter what we pay per blank and we price it exactly like a SanMar garment — margin, tier, embroidery and size upcharges all applied. Nothing is saved to the catalog.</div>' +
         '  <input type="text" class="mnd-input mi-style" maxlength="40" placeholder="Style" value="' + escapeHtml(style) + '">' +
-        '  <input type="text" class="mnd-input mi-desc" maxlength="120" placeholder="Description — e.g. Bella+Canvas Unisex Jersey Tee">' +
+        // Include the VENDOR in the description. It is the only thing that carries the
+        // supplier to ShopWorks on this path: the description becomes Quote_Items.ProductName,
+        // which the push sends as the LinesOE `Description` a buyer reads. A manual item has
+        // no VendorCode to put in LineItemNotes (Erik's call 2026-08-15 — a vendor picker is
+        // not worth the typing on a one-off), so if the rep leaves the vendor out, nothing
+        // downstream knows where to buy it.
+        '  <input type="text" class="mnd-input mi-desc" maxlength="120" placeholder="Description — include the vendor, e.g. S&amp;S Bella+Canvas Jersey Tee">' +
         '  <input type="text" class="mnd-input mi-color" maxlength="40" placeholder="Color — e.g. Navy">' +
         '  <input type="number" class="mnd-input mi-cost" step="0.01" min="0.01" placeholder="Our cost per blank ($) — e.g. 8.42">' +
         '  <input type="text" class="mnd-input mi-sizes" maxlength="120" placeholder="Sizes (comma-separated) — default S,M,L,XL,2XL,3XL">' +

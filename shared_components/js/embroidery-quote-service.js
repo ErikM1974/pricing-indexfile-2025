@@ -81,6 +81,15 @@ class EmbroideryQuoteService {
      * Called from BOTH saveQuote() and updateQuote() — patching only one silently drops
      * the vendor on every revision.
      *
+     * ⚠️ `v` is EMPTY for a MANUAL item, and that is deliberate — not a bug to fix.
+     * A manual (typed-on-the-line) vendor item has no VendorCode: the vendor picker lived
+     * in the Add-Product modal, which was deleted 2026-08-15 when register-first was
+     * replaced by type-it-once. Erik's call: rely on the DESCRIPTION instead, which the
+     * push already sends as the LinesOE `Description` a buyer reads. So an empty `v` means
+     * "manual item", and the vendor travels in the text. Only CATALOGUED vendor products
+     * (Non_SanMar_Products rows, which do carry VendorCode) produce the LineItemNotes
+     * "VENDOR: …" line. Verified on a real TEST push: EMB-TEST-2026-315.
+     *
      * @param {string} logoSpecsJson - the item's LogoSpecs so far (may be '')
      * @param {Object} product - pricing product entry (blankCost / vendorCode)
      * @returns {string} LogoSpecs JSON, unchanged when this isn't a vendor product
