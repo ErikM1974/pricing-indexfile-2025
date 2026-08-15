@@ -537,7 +537,7 @@
             <div class="use-case-banner">
                 <i class="fas fa-info-circle"></i>
                 <div>
-                    <strong>Full Back Embroidery (DECG-FB):</strong> Priced per 1,000 stitches for designs 25K and up — typically jacket-back logos, school-spirit backs, full-coverage embroidery. Same rate applies whether the garment is wholesale (Contract), NWCA-supplied (Add Logo), or customer-supplied.
+                    <strong>Full Back Embroidery (DECG-FB):</strong> Priced per 1,000 stitches for designs 25K and up — typically jacket-back logos, school-spirit backs, full-coverage embroidery. One rate for every full back — wholesale (Contract), NWCA-supplied (Add Logo) or customer-supplied all price from this table, and it is the same table the quote builder charges from.
                 </div>
                 <button class="share-link-btn" onclick="copyShareableLink()">
                     <i class="fas fa-link"></i> Copy Link
@@ -548,10 +548,13 @@
                 <div class="es-fb-inner">
                     <div class="es-fb-header">
                         <div class="es-fb-title">Full Back Embroidery — DECG-FB</div>
+                        <!-- "Min charge $20.00" removed 2026-08-15: no Caspio column ever
+                             fed it (it was a hardcoded `|| 20.00` in JS), and the cheapest
+                             cell in this table is 25K x $1.20 = $30.00, so it could never
+                             bind. The 25,000-stitch minimum is the real floor. -->
                         <div class="es-fb-meta">
                             <span>Priced per <strong>1,000 stitches</strong></span>
-                            <span>Min <strong>25K stitches</strong></span>
-                            <span>Min charge <strong>$20.00</strong></span>
+                            <span>Min <strong id="esFbMinStitches">25K stitches</strong></span>
                         </div>
                     </div>
                     <table class="es-fb-table">
@@ -722,6 +725,6 @@
         </div>
     </div>
 
-    <script src="/calculators/embroidery-pricing-all/embroidery-pricing-all.js?v=20260514-fb1k"></script>
+    <script src="/calculators/embroidery-pricing-all/embroidery-pricing-all.js?v=2026.08.15.1"></script>
 </body>
 </html>

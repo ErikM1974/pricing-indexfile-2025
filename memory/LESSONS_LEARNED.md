@@ -5,6 +5,116 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## Five prices for one ShopWorks part — and a $50 fee hidden behind a misspelled column (2026-08-15)
+
+**Problem.** Full-back embroidery had **five** price sources across **three** Caspio tables, so what
+a customer paid depended on *which screen the rep used*, not on the job. At 25K stitches / 12 pcs:
+the staff reference page said **$25.00/pc**, the quote builder charged **$31.25**, and the retail
+rows nobody read said **$35.00**. The page was even titled "Full Back Embroidery — **DECG-FB**"
+while rendering **CTR-FB contract/wholesale** numbers, and its own banner claimed "same rate
+applies whether wholesale, NWCA-supplied, or customer-supplied" — false in code, three ways.
+Full-back LTM was simultaneously **$50** (reference page), **$100** (contract calculator) and
+**$0** (quote builder). **No test anywhere pinned any of it.**
+
+**Root cause.** Each surface was built at a different time and read whichever endpoint it already
+had open. Nobody ever asked "how many ItemTypes does one ShopWorks part need?" — the answer was
+always one: OnSite has exactly one full-back part, `DECG-FB`, and `FEE_PN_ALIASES` already mapped
+`FB → DECG-FB`. The *part* was unified years ago; only the *pricing* forked.
+
+**Solution.** One ladder — `Embroidery_Costs` where `ItemType='DECG-FB'` — read once by a shared
+`getFullBackLadder()` and served into all three endpoints' `.fullBack` blocks under their existing
+key names. `CTR-FB` and `FB` rows retired. Erik's ruling: one rate for everyone, contract included.
+
+**Prevention.**
+- 🔑 **One ShopWorks part should mean one price ladder.** When a part number is universal but the
+  price isn't, that asymmetry IS the bug. Use `KNOWN_FEE_PNS` / `FEE_PN_ALIASES` as the map of what
+  ought to be unified.
+- 🔴 **`LTM`, not `LTM_Fee`.** `Embroidery_Costs` has no `LTM_Fee` column. Reading it returned
+  `undefined`, so the fee silently became `0` — and the $50 the DECG garment/cap paths *appeared*
+  to charge came from a hardcoded default that happened to match. **Editing that fee in Caspio did
+  nothing, on already-shipped pricing.** A fallback that matches the real value hides a dead read
+  indefinitely; verify against the raw row, not against the rendered number.
+- 🔴 **`PerThousandRate` is NULL on the DECG-FB rows — the rate is in `EmbroideryCost`.** The
+  contract path *prefers* `PerThousandRate`, so a shared helper that inherited that preference
+  would have priced every full back at **$0**. When consolidating readers, check the columns are
+  actually populated on the rows you're consolidating *onto*.
+- 🔴 **A cached object handed out by reference gets decorated by its callers.** Each endpoint added
+  its own back-compat key (`perThousandRates` / `ratePerThousand`) to the shared ladder, which
+  leaked into every other response through the cache. Return a copy from any cached-price getter.
+- 🔑 **"Min charge $20" was a hardcoded `|| 20.00` in four files, presented to staff as policy.**
+  No Caspio column ever fed it. It was also inert — the cheapest cell equalled it exactly. Deleted
+  rather than wired up: under the new ladder the cheapest full back is $30, so it could never fire.
+  **Before building a knob, check whether it can ever move.**
+- ⚠️ **Dead renderers keep myths alive.** Three full-back matrix builders (127 lines) had lost their
+  target divs and rendered nothing — but one carried the comment *"DECG Full Back uses same pricing
+  (DECG-FB)"*, which is where the whole misconception came from. Delete dead code or it keeps
+  teaching.
+- 🔑 **A per-design negotiated price is an override, not drift** — keep it, but LABEL it, or the
+  line just looks like the published table is wrong and the rep can't explain the number.
+
+## A dashboard promised cost-plus pricing the builder could not read (2026-08-14)
+
+**Problem.** The staff Product Manager has offered **"Automatic (cost ÷ margin + logo — same as
+SanMar)"** since 2026-07-06 (`PricingMethod: 'Margin'`, `DefaultSellPrice: 0`). A product created
+that way **could not be quoted at all**: `populateNonSanmarRow()` did
+`row.dataset.sellPrice = product.DefaultSellPrice || 0` → the string `'0'` → a ⚠ $0.00 price cell
+→ the save gate refused the quote. The rep saw a zero and no explanation. Reps were instead
+hand-computing a decorated price for every S&S Activewear garment (~5% of orders), so the margin,
+tier, embroidery cost, size upcharges and LTM were all bypassed and nobody could see whether the
+number was right.
+
+**Root cause.** Two halves of one feature were built a month apart against no shared contract.
+The dashboard wrote a *mode*; the builder only ever read a *price*. `PricingMethod` had also
+drifted to **three spellings** in live data — `'FIXED'` (builder modal + proxy seed),
+`'FixedPrice'` and `'Margin'` (dashboard) — with older rows blank, so there was no single value a
+naïve reader could test for.
+
+**Solution.** `resolveNonSanmarPricingMode()` in `quote-builder-utils.js` reads all three
+spellings tolerantly (and infers from whichever of cost/sell is > 0 when blank); writers now emit
+only the canonical two. The price itself comes from `buildSyntheticSizePricing()`
+(`embroidery-quote-pricing.js`), which builds a **`/api/size-pricing`-shaped payload** from the
+rep's blank cost — because that endpoint never returned prices, only SanMar's raw `CASE_PRICE`
+plus the upcharge ladder. The formula is untouched; only its input differs.
+
+**Prevention.**
+- 🔑 **`/api/size-pricing` returns COST, not price.** The engine does
+  `cost / marginDenominator + embCost → round → + upcharge`. Feed it a synthesized payload and a
+  non-SanMar garment prices identically to a SanMar one — **one new input shape, no 4th pricing
+  path** (Rule 9). `tests/unit/emb-nonsanmar-costplus.test.js` asserts *byte-identical* lineItems
+  between the two; point reviewers there rather than re-arguing it.
+- 🔴 **Do NOT seed `sizePricingCache` to do this.** It is keyed by bare style, **never cleared**,
+  and shared with `getProductSizePrices()` — a seeded entry is a permanent page-lifetime shadow
+  over a real SanMar style, and vendor styles demonstrably drift into SanMar
+  (`non-sanmar-products.js` documents six that had to be deleted for exactly that). Passing the
+  cost on the product object has no shared state, so there is nothing to invalidate.
+- 🔑 **Anchor sizes are load-bearing, not clutter.** The garment path computes upcharges
+  *relative* to its chosen base size; the cap path adds them *absolutely*. Injecting S/M/L/XL
+  (garments) / OSFA (caps) pins the base to a zero-upcharge size so relative ≡ absolute and
+  neither path needs a branch. They never emit a line (the loop iterates `sizeBreakdown`, not
+  `basePrices`) — delete them and a 2XL/3XL-only order silently loses its upcharge.
+- 🔴 **`quote_items.SizeBreakdown` is an ALLOWLIST, not a bag.** `buildProductLines()` filters a
+  short list of known metadata keys and treats **every other key as a SIZE** — a stray `vendor`
+  key would ship a LinesOE line with `Size:"SSA"`, `Qty:"SSA"` and a real Price. Per-item
+  metadata goes in `LogoSpecs` (already JSON, 60 KB `LONG_FIELDS`). `heavyweight` was already
+  being written and was NOT in that filter; it survived only because customer-supplied items route
+  to `buildServiceLine()`. Added it to the list — one refactor and it would have been a live bug.
+- 🔴 **`saveQuote()` and `updateQuote()` are byte-identical duplicates.** Patch one and every
+  *revision* silently drops the new field, while reload masks it by re-reading Caspio. Both, always.
+- 🔑 **A search-result cache can defeat a source guard.** `showSearchSuggestions()` wrote every
+  autocomplete hit into `embState.productCache`, which `_lookupStyleProduct()` checks **before**
+  the API — so a cached vendor row would have sailed past the `source: 'non-sanmar'` check. Fixing
+  the API alone was not enough.
+- ⚠️ **Making a style findable can break the path that handled it.** Once `/api/stylesearch`
+  returned vendor styles, `_lookupStyleProduct()` started *succeeding*, sending the row down the
+  SanMar branch (`/api/product-colors` → empty) and never reaching `populateNonSanmarRow()`. The
+  proxy and builder changes must ship as ONE unit.
+- 🔑 **A free-text code column plus an exact-match filter is a reporting trap.**
+  `GET /api/non-sanmar-products?vendor=` compares uppercase-exact, so "S&S" / "SS" / "SSA" typed
+  by three reps split the vendor forever. Curated `<select>` + an `Other…` escape; the two copies
+  (builder + dashboard) are drift-locked by a test.
+
+---
+
 ## Ruth's "Final notes" box saved her words and told nobody (2026-08-14)
 
 **Problem.** Porting the Approve-note box from the art-request page to the mockup page
@@ -142,132 +252,3 @@ reach the size that recovers: 14+ hits always failed, ≤13 always worked.
   verified to go red when the bug is reintroduced.
 
 ---
-
-## A prefix gate covers its prefix and nothing beside it; Origin is not auth (2026-08-11)
-
-**Problem.** `GET /api/mockup-notes/:id` and `GET /api/mockup-versions/:id` answered a bare
-anonymous curl with AE note text, author emails, thread colours and Box file ids. Separately,
-`curl -H 'Origin: https://www.teamnwca.com'` returned `Company_Name`, `Id_Customer`,
-`Work_Order_Number` and `AE_Notes` — 500 rows a time from the list route.
-
-**Root cause.** Two different holes wearing one costume. `src/routes/mockup-routes.js` is ONE
-router serving FOUR PII prefixes, and the 2026-07-04 fix gated `app.use('/api/mockups', …)` —
-a path-prefix gate, so the three sibling prefixes were never covered. And the gate it did have
-was `secret-OR-browser-Origin`, which accepts a header the caller supplies.
-
-**Solution.** Every prefix gated, reads secret-only, with an app-side session-gated forwarder
-(`mockupForward`) so browsers authenticate by SAML cookie and only the server holds the secret.
-`guardReadsOnly` throughout — the customer approval view writes these same paths with no staff
-session. Locked in both repos; the app-side test greps browser JS for cross-origin GETs.
-
-**Prevention.**
-- 🔑 **A prefix gate secures exactly its prefix.** Ask what OTHER prefixes the router serves —
-  derive the list from the router source in a test, so a new prefix fails until someone makes an
-  auth decision about it. Third time this shape has bitten (four gated sub-prefixes on `/api`,
-  the Box family, now this).
-- 🔴 **`Origin` is a CSRF signal, never an authentication one.** It is caller-controlled: one
-  curl flag impersonates any allowlisted browser. "secret-or-origin" reads like defence in depth
-  and is really just "or".
-- 🔑 **Check the sibling that looks like plumbing.** `mockup-notifications` looked like transient
-  toast machinery; each entry carries `companyName` + `designNumber`, and it filters by `?user=`
-  only when that param is *supplied*, so an anonymous poll with no user returned everything. It
-  is in-memory and usually empty, which is exactly why it read as harmless.
-- 🔴 **Gating reads changes who can still call it server-side.** `send-ruth-digest.js` scans via
-  `localhost/api/mockups/broken-mockups` — loopback still goes through Express, so without the
-  secret the nightly digest 401s and reports *nothing broken*. Grep for internal callers,
-  including ones that look local.
-- 🔑 **Moving a call same-origin moves it under the app's rate limiter.** These reads bypassed the
-  200-req/15-min `/api/` bucket while they were cross-origin; a 30 s notification poll now counts
-  against a ceiling the whole office shares behind one egress IP.
-- 🔑 **A content-hashed page serves `dist/`, not your edit** — art-hub-ruth kept calling the proxy
-  after the fix because the browser had `mockup-ruth.c1a6c72b6a.js`. Run `npm run build` and
-  confirm the HASH changed before believing a dashboard behaves the old way.
-- 🔑 **`EADDRINUSE` means you just tested the OLD code.** A restart that silently failed to bind
-  left the previous process serving, and the first "verification" showed the pre-fix behaviour.
-  Read the startup log, not just the response.
-
----
-
-## An ungated shell over gated assets tells the user the wrong story (2026-08-11)
-
-**Problem.** Ruth: "I can't see any images, the screen is completely dark." Her mockup detail page
-showed a black overlay reading *"Image could not be loaded — link may have expired"*, a red
-*"Failed to load Box files"*, and an anonymous `IMG` badge — while Ruth's Fields, the notes and the
-slots all rendered perfectly. Nothing was broken and no link had expired: **she was signed out.**
-
-**Root cause.** Two halves of the same page authenticate differently. The record, notes and versions
-load **anonymously** from the proxy (`mockup-detail.js:336-352`), so the page renders fully. Every
-Box asset goes through the app's same-origin forwarders (`server.js:3809-3817`), all `requireStaff`,
-so all of them 401. And `/mockup/:id` (`server.js:5192`) was registered with **no gate at all** —
-unlike `/art-hub-ruth.html` five lines above it — so she was never bounced to SSO. The staff session
-is `cookie-session` with **no `maxAge`** (`server.js:786-792`): it dies when the browser closes, so
-this is reached routinely, not after some long idle. "Expired" was impossible by construction.
-
-**Solution.** `gateStaffDetailPage` on `/mockup/:id` and `/art-request/:designId`, exempting
-`?view=customer` (external approval links carry their own capability token and cannot complete staff
-SSO). Client side, `mockup-detail.js` now branches on the real HTTP status — 401 → "You're signed
-out" + a `/auth/saml/login?next=…` link in both a page banner and the lightbox label; 502/503 →
-"Box service is temporarily unavailable". An `<img>` error carries no status, so the lightbox
-HEAD-probes to recover one. Locked by `tests/unit/detail-page-gate.test.js`.
-
-**Prevention.**
-- 🔑 **If a page's shell and its assets have different auth requirements, the weaker one sets what
-  the user sees.** Anonymous data + gated images = a page that looks healthy and is useless. Gate
-  the shell at the same level as its most-protected dependency, or the failure is silent.
-- 🔴 **Never let an error string assert a cause the code cannot know.** An `<img>` error event has
-  no status, so "link may have expired" was a guess — and it was wrong in the common case, sending
-  the diagnosis toward Box and expiry instead of toward a missing cookie. Probe for the status, or
-  say only what you know.
-- 🔑 **A 401 that renders as a generic broken-file badge is unactionable.** `handleBoxImageError()`
-  branched on 404 only; every other status fell to the same anonymous placeholder. The page had
-  **zero** references to `401`, `loginUrl` or `auth/saml` — nothing to click.
-- 🔑 **"Only one person is affected" can mean "only one person is signed out."** These routes gate on
-  session *presence*, not role, so no registry/allowlist entry could have caused it — which ruled
-  out the whole `Ruthie`-vs-`ruth@` family of causes before any code was read.
-- 🔑 **Verify a suspected auth hole with a CLEAN client.** A browser fetch returned 200 for a Box
-  endpoint while `/api/crm-session/me` said `authenticated:false` — which looked exactly like an
-  anonymous data leak. It was `Cache-Control: private, max-age=300` replaying the earlier
-  authenticated response. `curl` with no cookie returned 401 and killed the false positive.
-- 🔑 **`/api/crm-session/me` is the cheap "are you actually signed in?" test** — 200 either way, safe
-  to paste into the address bar, no redirect. Reach for it before theorising.
-
----
-
-## A new lead source saved fine and stayed invisible — the form-ID vocabulary lives in 12 places (2026-08-10)
-
-**Problem.** A customer's free sample request (`NWCA-SAMPLE-0808-1-480`, Inland Beef Company)
-reached Erik's inbox and nowhere else. Erik: "shouldn't it be in Leads so Taneisha can follow up?"
-
-**Root cause.** The free branch of `/sample-cart.html` pushed a ShopWorks order and fired two
-EmailJS sends — and wrote **no database row at all**. Leads reads exactly one table
-(`Form_Submissions`) filtered to a hard-coded list of lead `Form_ID`s, and the cart called neither
-of that table's writers. The dashboard's "Sample Follow-ups" widget *looks* like the safety net but
-filters on `date_Invoiced`, so it can only show samples already invoiced — a post-sale call
-list, not an inbox. No dashboard surface reads uninvoiced ShopWorks orders at all.
-
-**Solution.** New `sample-request` formId, POSTed from the cart to the already-public
-`POST /api/form-submissions` — which buys AE auto-assign (email match → their rep, else
-Taneisha), the "new lead" email and the Slack card for free. Full site list + fix detail:
-`memory/sample-request-routing.md`.
-
-**Prevention.**
-- 🔑 **The lead form-ID vocabulary is duplicated in 12 places across 2 repos.** Adding a
-  source means updating all of them; miss one and the row saves but stays invisible.
-- 🔴 **A missing map entry becomes a WRONG DEFAULT, not an error.** No `STATUS_CHOICES`
-  entry → the Forms Inbox falls back to `['New','Completed']`, and `Completed` is a **WON**
-  status (`leads-common.js:40,50`) → closing the lead banks a $0 win and drops it from the
-  follow-up digest. Same family as `[]`-is-truthy and `Number(null) === 0`.
-- 🔑 **Derive a filter list from the canonical constant, never re-type it.** `leads.js`
-  built its Source dropdown from a literal that *happened* to equal `LEAD_FORM_IDS` minus
-  `jotform-lead`; the 6th id broke that invariant silently.
-- 🔑 **A payload only "saves" if a renderer knows its shape.** The Inbox renders only
-  `fields`/`checks`/`tables`/`notes` — a bespoke object stores fine and shows a blank modal.
-- 🔴 **`House` is a dropdown DEFAULT, not a rep.** Sending it satisfies the server's
-  "rep already set" check, suppresses auto-assign and leaves the lead owned by nobody — the
-  exact failure the change existed to prevent. Send blank and let the server assign.
-- 🔑 **A content-hashed page serves `dist/`, not your file.** The preview runs
-  `node server.js` (no `prestart`), so the browser executed a stale asset and the new function read
-  as `undefined` — indistinguishable from a scope bug. Run `npm run build`, then confirm the
-  asset HASH changed.
-- ⚠️ 3 of the 4 review defects were on STAFF surfaces the customer path never touches:
-  the customer flow was right on the first pass, the staff rendering was not.

@@ -306,17 +306,27 @@ function showSearchSuggestions(products) {
     suggestions.innerHTML = products.map(product => {
         // Extract product name (remove style prefix from label)
         const productName = (product.label || '').split(' - ').slice(1).join(' - ') || '';
+        // Vendor styles come back from /api/stylesearch tagged source:'non-sanmar' —
+        // flag them so a rep can see at a glance that this blank isn't from SanMar.
+        const vendorTag = product.source === 'non-sanmar'
+            ? '<span class="suggestion-vendor-tag">Vendor</span>' : '';
         return `
             <div class="suggestion-item" onclick="selectProduct('${escapeHtml(product.value)}')">
                 <span class="style">${escapeHtml(product.value)}</span>
                 <span class="name">${escapeHtml(productName)}</span>
+                ${vendorTag}
             </div>
         `;
     }).join('');
     suggestions.classList.add('show');
 
-    // Cache product data (convert to expected format)
+    // Cache product data (convert to expected format).
+    // 🔴 Vendor rows are deliberately NOT cached: _lookupStyleProduct() checks this cache
+    // BEFORE calling the API, so a cached non-SanMar entry would sail past the
+    // source:'non-sanmar' guard there and be treated as a SanMar product — no colors, no
+    // sizes, no price. Leaving them out makes that lookup go to the API, which tags them.
     products.forEach(p => {
+        if (p.source === 'non-sanmar') return;
         embState.productCache[p.value] = {
             STYLE: p.value,
             PRODUCT_TITLE: p.label
@@ -572,6 +582,7 @@ export function createServiceProductRow(serviceType, data) {
             <div class="desc-row">
                 <span class="service-description" style="font-size: 13px; color: #334155;">${escapeHtml(displayDescription)}</span>
                 ${isCap ? '<span class="cap-badge" style="display: inline-flex;"><i class="fas fa-hat-cowboy"></i> Cap</span>' : ''}
+                ${['DECG', 'DECC'].includes(serviceType) ? `<button type="button" class="btn-describe-cs" onclick="openCustomerSuppliedDialog(${rowId})" title="Describe the customer's goods"><i class="fas fa-pencil-alt"></i> Describe</button>` : ''}
             </div>
         </td>
         <td>
@@ -818,6 +829,97 @@ export function addExtraColorSurchargeRow(type, extraColors, perPiece) {
 }
 window.addExtraColorSurchargeRow = addExtraColorSurchargeRow;
 
+/** The unchanging part of a customer-supplied row label, e.g.
+ *  "Customer-Supplied Garments (8K stitches)". Everything after the em dash is the
+ *  rep's description of what the customer actually brought. */
+function _csDescriptionPrefix(row) {
+    const desc = row.querySelector('.service-description');
+    return String(desc ? desc.textContent : '').split(' — ')[0];
+}
+
+/**
+ * Write the rep's description of the customer's goods onto a DECG/DECC row.
+ *
+ * Two fields, both of which already flow all the way downstream, so nothing new
+ * has to be plumbed:
+ *   .service-description → collectProductsFromTable() productName/title → the
+ *                          printed quote's Description column
+ *   dataset.csNotes      → the item's Quote_Items.Notes → 'Notes To Receiving'
+ *                          on the ShopWorks order (Receiving counts the boxes in)
+ *
+ * The one-liner is capped: EMB does not truncate Description on push and OnSite's
+ * own limit is unverified, so the long manifest belongs in Notes, not the label.
+ */
+function _applyCustomerSuppliedDescription(row, fields) {
+    const parts = [fields.brandStyle, fields.color].map(s => String(s || '').trim()).filter(Boolean);
+    const oneLiner = parts.join(' · ').slice(0, 120);
+    const desc = row.querySelector('.service-description');
+    if (desc) {
+        desc.textContent = oneLiner
+            ? `${_csDescriptionPrefix(row)} — ${oneLiner}`
+            : _csDescriptionPrefix(row);
+    }
+    row.dataset.csDescription = oneLiner;
+    row.dataset.csNotes = String(fields.details || '').trim();
+}
+
+/**
+ * Editor for "what is the customer actually bringing us?" on a DECG/DECC row.
+ *
+ * Customer-supplied lines used to read only "Customer-Supplied Garments (8K
+ * stitches)" — the quote, the work order and Receiving all had no idea whose
+ * jackets these were or how many of each size to expect. Modelled on
+ * openMonogramNamesDialog() and reusing its dialog CSS.
+ *
+ * Deliberately edited on the ROW, not on the services-bar chip: the customer
+ * usually sends the manifest AFTER the line is quoted, and the shared
+ * quote-services-bar only supports checkbox/number/select fields anyway (adding a
+ * text type there would be a Rule-8 change across all 4 builders).
+ */
+export function openCustomerSuppliedDialog(rowId) {
+    const row = document.getElementById(`row-${rowId}`);
+    if (!row || row.dataset.decgPriced !== 'true') return;
+
+    document.getElementById('cs-goods-dialog')?.remove();
+    const existing = String(row.dataset.csDescription || '').split(' · ');
+    const wrap = document.createElement('div');
+    wrap.id = 'cs-goods-dialog';
+    wrap.className = 'monogram-names-dialog';
+    // Every interpolated value goes through escapeHtml (rep-typed free text).
+    wrap.innerHTML =
+        '<div class="mnd-card" role="dialog" aria-modal="true" aria-labelledby="csg-title">' +
+        '  <div id="csg-title" class="mnd-title"><i class="fas fa-box-open"></i> What is the customer bringing?</div>' +
+        '  <div class="mnd-hint">Shows on the quote and the work order, so production and Receiving know what to expect. All optional.</div>' +
+        '  <input type="text" class="mnd-input csg-brand" maxlength="80" placeholder="Brand / style — e.g. Carhartt CTK87" value="' + escapeHtml(existing[0] || '') + '">' +
+        '  <input type="text" class="mnd-input csg-color" maxlength="40" placeholder="Color — e.g. Navy" value="' + escapeHtml(existing[1] || '') + '">' +
+        '  <textarea class="mnd-names csg-details" rows="4" placeholder="Sizes and details — e.g. S(4) M(10) L(8) XL(2)&#10;Customer ships to us by Aug 22">' + escapeHtml(row.dataset.csNotes || '') + '</textarea>' +
+        '  <div class="mnd-actions">' +
+        '    <button type="button" class="mnd-skip">Cancel</button>' +
+        '    <button type="button" class="mnd-apply">Save</button>' +
+        '  </div>' +
+        '</div>';
+    document.body.appendChild(wrap);
+
+    const close = () => { wrap.remove(); document.removeEventListener('keydown', onKey); };
+    const onKey = (e) => { if (e.key === 'Escape') close(); };
+    wrap.querySelector('.mnd-skip').addEventListener('click', close);
+    wrap.addEventListener('click', (e) => { if (e.target === wrap) close(); });
+    document.addEventListener('keydown', onKey);
+    wrap.querySelector('.mnd-apply').addEventListener('click', () => {
+        _applyCustomerSuppliedDescription(row, {
+            brandStyle: /** @type {HTMLInputElement} */ (wrap.querySelector('.csg-brand')).value,
+            color: /** @type {HTMLInputElement} */ (wrap.querySelector('.csg-color')).value,
+            details: /** @type {HTMLTextAreaElement} */ (wrap.querySelector('.csg-details')).value
+        });
+        close();
+        markAsUnsaved();
+        recalculatePricing();
+        showToast('Customer goods description saved', 'success');
+    });
+    setTimeout(() => /** @type {HTMLElement} */ (wrap.querySelector('.csg-brand')).focus(), 50);
+}
+window.openCustomerSuppliedDialog = openCustomerSuppliedDialog;
+
 /**
  * Lightweight names dialog for Monogram / Name-Number rows (expert audit
  * 2026-07-07 F6). One name per line → the count auto-fills the row qty and the
@@ -955,6 +1057,15 @@ async function _lookupStyleProduct(input, row, styleNumber) {
             // Find exact match or use first result
             const exactMatch = data.find(p => p.value.toUpperCase() === styleNumber);
             const result = exactMatch || data[0];
+            // /api/stylesearch now also returns vendor styles from Non_SanMar_Products,
+            // tagged source:'non-sanmar'. Report those as NOT FOUND so onStyleChange
+            // still routes into _handleStyleNotFound() → the non-SanMar lookup →
+            // populateNonSanmarRow(). Treating them as found would send the row down
+            // the SanMar path, where /api/product-colors returns nothing and the row
+            // silently ends up with no colors, no sizes and no price.
+            if (result && result.source === 'non-sanmar') {
+                return { product: null, styleNumber };
+            }
             product = {
                 STYLE: result.value,
                 PRODUCT_TITLE: result.label
@@ -973,6 +1084,10 @@ async function _lookupStyleProduct(input, row, styleNumber) {
             if (retryData && retryData.length > 0) {
                 const exactMatch = retryData.find(p => p.value.toUpperCase() === baseStyle);
                 const result = exactMatch || retryData[0];
+                // Same guard as above — a vendor style must not be mistaken for a SanMar one.
+                if (result && result.source === 'non-sanmar') {
+                    return { product: null, styleNumber };
+                }
                 product = {
                     STYLE: result.value,
                     PRODUCT_TITLE: result.label
@@ -1140,6 +1255,42 @@ export async function onStyleChange(input, rowId) {
 // escapeHtml() is now provided by quote-builder-utils.js
 
 /**
+ * Stamp the row with how this vendor product prices, and with the vendor itself.
+ *
+ * Two modes (see resolveNonSanmarPricingMode in quote-builder-utils.js):
+ *   costPlus — dataset.blankCost feeds buildSyntheticSizePricing(), so the normal
+ *              engine adds margin + embroidery + upcharges + tier + LTM. NO
+ *              dataset.sellPrice: writing a phantom '0' there is what used to make
+ *              every Margin-mode product from the Product Manager unquotable (the
+ *              price cell showed ⚠ $0.00 and the save gate blocked the quote).
+ *   fixed    — dataset.sellPrice is the final decorated price, as before.
+ * Extracted from populateNonSanmarRow() to stay under the 150-line function cap.
+ */
+function _applyNonSanmarPricingMode(row, product) {
+    const resolve = (typeof window !== 'undefined' && window.resolveNonSanmarPricingMode)
+        || (() => 'unpriced');
+    const mode = resolve(product);
+    row.dataset.nsPricingMode = mode;
+    row.dataset.vendorCode = product.VendorCode || '';
+
+    if (mode === 'costPlus') {
+        row.dataset.blankCost = String(parseFloat(product.DefaultCost) || 0);
+        delete row.dataset.sellPrice;
+    } else {
+        delete row.dataset.blankCost;
+        row.dataset.sellPrice = String(parseFloat(product.DefaultSellPrice) || 0);
+    }
+
+    // Per-style extended-size upcharges; blank/zero entries fall back to the shared
+    // Caspio ladder inside buildSyntheticSizePricing().
+    row.dataset.sizeUpchargeOverrides = JSON.stringify({
+        XL: parseFloat(product.SizeUpchargeXL) || 0,
+        '2XL': parseFloat(product.SizeUpcharge2XL) || 0,
+        '3XL': parseFloat(product.SizeUpcharge3XL) || 0
+    });
+}
+
+/**
  * Populate a product row from Non_SanMar_Products data
  */
 export function populateNonSanmarRow(row, rowId, product) {
@@ -1150,7 +1301,7 @@ export function populateNonSanmarRow(row, rowId, product) {
     // Set description and mark as non-SanMar
     descInput.value = product.ProductName || product.StyleNumber;
     row.dataset.nonSanmar = 'true';
-    row.dataset.sellPrice = product.DefaultSellPrice || 0;
+    _applyNonSanmarPricingMode(row, product);
     row.dataset.style = product.StyleNumber;
     row.dataset.productName = product.ProductName || product.StyleNumber;
 
@@ -1170,7 +1321,9 @@ export function populateNonSanmarRow(row, rowId, product) {
     if (isCap) {
         row.dataset.isCap = 'true';
         if (capBadge) capBadge.style.display = 'inline-flex';
-        showToast('Non-SanMar cap detected — using sell price override', 'info', 3000);
+        showToast(row.dataset.nsPricingMode === 'costPlus'
+            ? 'Vendor cap detected — pricing from your blank cost'
+            : 'Non-SanMar cap detected — using sell price override', 'info', 3000);
     } else {
         row.dataset.isCap = 'false';
         if (capBadge) capBadge.style.display = 'none';
@@ -1214,8 +1367,14 @@ export function populateNonSanmarRow(row, rowId, product) {
     if (styleCell && !styleCell.querySelector('.non-sanmar-badge')) {
         const badge = document.createElement('span');
         badge.className = 'non-sanmar-badge';
-        badge.textContent = 'Custom';
-        badge.title = 'Non-SanMar product — sell price override';
+        // Name the vendor when we know it — whoever raises the PO needs to see that
+        // this blank does NOT come from SanMar. textContent, so no escaping needed.
+        const label = (typeof window !== 'undefined' && window.vendorLabel)
+            ? window.vendorLabel(product.VendorCode) : '';
+        badge.textContent = label || 'Custom';
+        badge.title = row.dataset.nsPricingMode === 'costPlus'
+            ? `${label || 'Non-SanMar'} product — priced from your blank cost`
+            : `${label || 'Non-SanMar'} product — fixed sell price`;
         styleCell.appendChild(badge);
     }
 
@@ -1234,6 +1393,15 @@ export function populateNonSanmarRow(row, rowId, product) {
 export function updateNonSanmarPriceCell(row, rowId) {
     const priceCell = document.getElementById(`row-price-${rowId}`);
     if (!priceCell) return;
+
+    // Cost-plus vendor rows are priced by the engine like any SanMar row, so leave the
+    // cell to paintRowPrices(). Stamping a pencil (or the ⚠ $0.00 warning) here would
+    // both lie about where the price comes from and fight the recalc that follows.
+    if (row.dataset.nsPricingMode === 'costPlus') {
+        row.classList.remove('price-warning');
+        priceCell.classList.remove('ns-price-zero');
+        return;
+    }
 
     const sellPrice = parseFloat(row.dataset.sellPrice) || 0;
     if (sellPrice > 0) {

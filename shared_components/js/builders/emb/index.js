@@ -48,6 +48,8 @@ import {
     closeAddNonSanmarModal,
     toggleNsMoreOptions,
     validateNsModalFields,
+    onNsVendorChange,
+    onNsPricingModeChange,
     saveNonSanmarProduct,
     parseAndPreviewShopWorks,
     confirmShopWorksImport,
@@ -202,6 +204,8 @@ window.closeShopWorksImportModal = closeShopWorksImportModal;
 window.closeAddNonSanmarModal = closeAddNonSanmarModal;
 window.toggleNsMoreOptions = toggleNsMoreOptions;
 window.validateNsModalFields = validateNsModalFields;
+window.onNsVendorChange = onNsVendorChange;
+window.onNsPricingModeChange = onNsPricingModeChange;
 window.saveNonSanmarProduct = saveNonSanmarProduct;
 window.parseAndPreviewShopWorks = parseAndPreviewShopWorks;
 window.confirmShopWorksImport = confirmShopWorksImport;

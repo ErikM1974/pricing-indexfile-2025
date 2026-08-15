@@ -36,7 +36,11 @@ const refCapUnit=(pd,size,tier)=>ceil$(stdBlank(pd)/calc.getCapMarginDenominator
 const refStitch=(s)=>calc.getStitchSurcharge(s);
 const refLTM=(q)=>(q<=7?(calc.ltmFee||50):0);
 // AL reference (from live /api/al-pricing)
-const refAL=(tier,stitch,type)=>{ if(type==='fullback') return Math.max(stitch,AL.fullBack.minStitches)/1000*AL.fullBack.ratePerThousand;
+// Full back is TIERED as of 2026-08-15 (one shared DECG-FB ladder); it used to be a flat
+// ratePerThousand with no quantity dimension. Fall back to the scalar only if the tiered
+// map is missing, so this audit keeps working against an older deploy.
+const refAL=(tier,stitch,type)=>{ if(type==='fullback'){ const r=(AL.fullBack.ratesPerThousand&&AL.fullBack.ratesPerThousand[tier])||AL.fullBack.ratePerThousand;
+    return Math.max(stitch,AL.fullBack.minStitches)/1000*r; }
   const c=type==='cap'?AL.caps:AL.garments; return c.basePrices[tier]+Math.max(0,(stitch-c.baseStitches)/1000)*c.perThousandUpcharge; };
 // DECG reference (from live /api/decg-pricing): base 8K both, + heavyweight $10
 const refDECG=(tier,stitch,type,heavy)=>{ const c=type==='cap'?DECG.caps:DECG.garments; const bs=c.baseStitches||8000;

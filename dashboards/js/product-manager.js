@@ -18,6 +18,22 @@
     let products = [];
     let filterText = '';
 
+    // Curated vendor codes. MIRROR of NON_SANMAR_VENDORS in
+    // shared_components/js/quote-builder-utils.js — the two lists are locked by
+    // tests/unit/non-sanmar-vendor-drift.test.js. Duplicated rather than shared
+    // because this dashboard does not load the (builder-only) utils bundle.
+    // VendorCode is free text and GET /api/non-sanmar-products?vendor= filters on
+    // EXACT uppercase equality, so free-typed spellings split vendor reporting
+    // permanently — hence the list, with 'Other…' kept for real one-offs.
+    const NON_SANMAR_VENDORS = [
+        { code: 'SSA', label: 'S&S Activewear' },
+        { code: 'ALP', label: 'Alphabroder' },
+        { code: 'CARH', label: 'Carhartt (direct)' },
+        { code: 'RICH', label: 'Richardson' },
+        { code: 'JDS', label: 'JDS Industries' },
+        { code: 'AUG', label: 'Augusta / Holloway' }
+    ];
+
     const $ = (id) => document.getElementById(id);
 
     function escapeHtml(str) {
@@ -122,7 +138,7 @@
         $('fSell').value = product && parseFloat(product.DefaultSellPrice) > 0 ? parseFloat(product.DefaultSellPrice) : '';
         $('fSizes').value = product ? (product.AvailableSizes || '') : '';
         $('fColors').value = product ? (product.DefaultColors || '') : '';
-        $('fVendor').value = product ? (product.VendorCode || '') : '';
+        setVendorFields(product ? product.VendorCode : '');
         $('fVendorUrl').value = product ? (product.VendorURL || '') : '';
         $('fImageUrl').value = product ? (product.ImageURL || '') : '';
         $('fImageFile').value = '';
@@ -140,6 +156,47 @@
 
     function syncSellVisibility() {
         $('fSellWrap').hidden = $('fPricingMethod').value !== 'FixedPrice';
+    }
+
+    /** Fill the vendor <select> once (curated codes + an Other… escape). */
+    function buildVendorOptions() {
+        const sel = $('fVendorSelect');
+        if (!sel || sel.options.length) return;
+        const opt = (label, value) => {
+            const o = document.createElement('option');
+            o.value = value;
+            o.textContent = label;   // textContent — vendor labels are never markup
+            return o;
+        };
+        sel.appendChild(opt('— none —', ''));
+        NON_SANMAR_VENDORS.forEach(v => sel.appendChild(opt(v.label, v.code)));
+        sel.appendChild(opt('Other…', '__other'));
+    }
+
+    /**
+     * Point the select at the row's stored code. A code that is NOT in the curated
+     * list (older rows carry arbitrary values) falls through to Other… with the raw
+     * value in the text box, so editing an unrelated field can never silently
+     * rewrite someone's vendor.
+     */
+    function setVendorFields(code) {
+        buildVendorOptions();
+        const raw = String(code || '').trim();
+        const known = NON_SANMAR_VENDORS.some(v => v.code === raw.toUpperCase());
+        $('fVendorSelect').value = raw ? (known ? raw.toUpperCase() : '__other') : '';
+        $('fVendor').value = known ? '' : raw;
+        syncVendorOther();
+    }
+
+    function syncVendorOther() {
+        $('fVendor').hidden = $('fVendorSelect').value !== '__other';
+    }
+
+    /** The code we actually persist to VendorCode. */
+    function readVendorCode() {
+        const sel = $('fVendorSelect').value;
+        if (sel === '__other') return $('fVendor').value.trim().toUpperCase();
+        return sel;
     }
 
     function syncImagePreview() {
@@ -198,7 +255,7 @@
                 PricingMethod: pricingMethod,
                 AvailableSizes: $('fSizes').value.trim(),
                 DefaultColors: $('fColors').value.trim(),
-                VendorCode: $('fVendor').value.trim(),
+                VendorCode: readVendorCode(),
                 VendorURL: $('fVendorUrl').value.trim(),
                 ImageURL: imageUrl,
                 Notes: $('fNotes').value.trim(),
@@ -238,6 +295,7 @@
         $('pmFormClose').addEventListener('click', closeForm);
         $('pmForm').addEventListener('submit', saveProduct);
         $('fPricingMethod').addEventListener('change', syncSellVisibility);
+        $('fVendorSelect').addEventListener('change', syncVendorOther);
         $('fImageUrl').addEventListener('input', syncImagePreview);
         $('pmFilter').addEventListener('input', function () {
             filterText = this.value.trim().toLowerCase();

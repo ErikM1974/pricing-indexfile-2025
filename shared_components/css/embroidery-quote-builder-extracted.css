@@ -2697,6 +2697,10 @@ td.size-disabled input {
 }
 .ns-input:focus { border-color: #7c3aed; outline: none; box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.15); }
 .ns-input-readonly { background: #f1f5f9; color: #64748b; }
+/* Explains which number the rep is typing (blank cost vs final decorated price) —
+   the two modes look identical without it. */
+.ns-field-hint { display: block; margin-top: 4px; font-size: 11px; line-height: 1.35; color: #64748b; }
+#ns-vendor-other { margin-top: 6px; }
 .btn-add-nonsanmar {
     display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px;
     background: #7c3aed; color: white; border: none; border-radius: 5px;
@@ -2980,6 +2984,44 @@ td.size-disabled input {
     outline: none;
     border-color: var(--pnw-forest, #2e5827);
     box-shadow: var(--pnw-glow-focus, 0 0 0 3px rgba(46, 88, 39, 0.2));
+}
+/* Single-line inputs in the same dialog shell (customer-supplied goods editor) */
+.monogram-names-dialog .mnd-input {
+    width: 100%;
+    border: 1px solid var(--pnw-rule, #d1d5db);
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin-bottom: 8px;
+    font-size: 13px;
+    box-sizing: border-box;
+}
+.monogram-names-dialog .mnd-input:focus-visible {
+    outline: none;
+    border-color: var(--pnw-forest, #2e5827);
+    box-shadow: var(--pnw-glow-focus, 0 0 0 3px rgba(46, 88, 39, 0.2));
+}
+/* "Describe" affordance on a customer-supplied line — without it the row only ever
+   reads "Customer-Supplied Garments (8K stitches)" and nobody downstream knows what
+   the customer actually sent in. */
+.btn-describe-cs {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 8px;
+    padding: 2px 8px;
+    border: 1px dashed var(--pnw-rule, #cbd5e1);
+    border-radius: 10px;
+    background: transparent;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+}
+.btn-describe-cs:hover {
+    border-style: solid;
+    border-color: var(--pnw-forest, #2e5827);
+    color: var(--pnw-forest, #2e5827);
+    background: #f0fdf4;
 }
 .monogram-names-dialog .mnd-actions {
     display: flex;

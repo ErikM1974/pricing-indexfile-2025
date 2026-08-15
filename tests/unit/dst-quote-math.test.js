@@ -99,7 +99,12 @@ describe('estimateMachineHours', () => {
 // ─── multi-location price combination ──────────────────────────────────────
 
 describe('combineLines', () => {
-    // Mirrors the calculator's live config: $50 flat/cap, $100 full back, 1-23 pcs
+    // SYNTHETIC fixture — deliberately NOT the live config. Full back stopped being $100
+    // on 2026-08-15 (one ladder for every full back; the fee is now the same $50 as
+    // everything else, read from Caspio Embroidery_Costs DECG-FB column `LTM`). The two
+    // values are kept DIFFERENT here on purpose: these tests pin combineLines' rule that
+    // one order pays the HIGHEST fee once, not the sum — and a fixture where every fee is
+    // equal cannot tell "highest" apart from "first" or "last".
     const ltm = { threshold: 23, feeFor: p => (p === 'fullback' ? 100 : 50) };
 
     test('sums the per-piece base price across locations', () => {
@@ -116,6 +121,39 @@ describe('combineLines', () => {
         expect(r.ltmFee).toBe(100);
         expect(r.ltmPerPiece).toBeCloseTo(100 / 12, 5);
         expect(r.finalUnit).toBeCloseTo(34.20 + 100 / 12, 5);
+    });
+
+    test('a product can decline the fee inside the outer band (per-product band)', () => {
+        // Full back bands at 1-7; contract garments band at 1-23. Before 2026-08-15 the
+        // single global threshold charged a 12-pc full back here while the quote builder
+        // charged nothing — the same job, two answers. feeFor now receives the quantity
+        // and self-gates; ltm.threshold stays the OUTER (widest) bound.
+        const banded = {
+            threshold: 23,
+            feeFor: (p, qty) => (p === 'fullback' ? (qty <= 7 ? 50 : 0) : 50),
+        };
+        const fbOnly = n => QM.combineLines([{ unit: 30, product: 'fullback' }], n, banded);
+
+        expect(fbOnly(5).ltmFee).toBe(50);    // inside full back's own band
+        expect(fbOnly(12).ltmFee).toBe(0);    // inside the OUTER band but past full back's
+        expect(fbOnly(12).hasLtm).toBe(false);
+        expect(fbOnly(30).ltmFee).toBe(0);    // outside both
+    });
+
+    test('a garment on the same order still earns its own fee at 12 pcs', () => {
+        const banded = {
+            threshold: 23,
+            feeFor: (p, qty) => (p === 'fullback' ? (qty <= 7 ? 50 : 0) : 50),
+        };
+        const r = QM.combineLines(
+            [{ unit: 7.20, product: 'garment' }, { unit: 30, product: 'fullback' }], 12, banded);
+        expect(r.ltmFee).toBe(50);   // from the garment; still ONE fee, not two
+    });
+
+    test('a feeFor that ignores the quantity argument behaves exactly as before', () => {
+        // Back-compat: every existing caller passed a 1-arg feeFor.
+        const legacy = { threshold: 23, feeFor: p => (p === 'fullback' ? 100 : 50) };
+        expect(QM.combineLines([{ unit: 1, product: 'fullback' }], 12, legacy).ltmFee).toBe(100);
     });
 
     test('order of the lines cannot change the fee', () => {

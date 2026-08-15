@@ -66,6 +66,42 @@ class EmbroideryQuoteService {
      * Format: EMB-2026-001 (prefix-year-sequence, zero-padded to 3 digits)
      * Resets annually, persists across sessions/browsers
      */
+    /**
+     * Merge the vendor (non-SanMar) block into an item's LogoSpecs JSON.
+     *
+     * Quote_Items has no vendor column, and adding one is not needed: LogoSpecs is
+     * already the per-item JSON metadata bag (priceOverride lives there) and is in the
+     * proxy's LONG_FIELDS, so it holds 60 KB.
+     *
+     * 🔴 This must NEVER move to SizeBreakdown. buildProductLines() in the push
+     * transformer filters a short list of known non-size keys and treats EVERY other key
+     * as a SIZE — a `vendor` key there would emit a LinesOE line with Size:"SSA",
+     * Qty:"SSA" and a real Price: a phantom, mis-priced production line.
+     *
+     * Called from BOTH saveQuote() and updateQuote() — patching only one silently drops
+     * the vendor on every revision.
+     *
+     * @param {string} logoSpecsJson - the item's LogoSpecs so far (may be '')
+     * @param {Object} product - pricing product entry (blankCost / vendorCode)
+     * @returns {string} LogoSpecs JSON, unchanged when this isn't a vendor product
+     */
+    _withVendorSpecs(logoSpecsJson, product) {
+        const vendorCode = (product && product.vendorCode) || '';
+        const blankCost = parseFloat(product && product.blankCost) || 0;
+        if (!vendorCode && blankCost <= 0) return logoSpecsJson;
+
+        let parsed = {};
+        try { parsed = logoSpecsJson ? JSON.parse(logoSpecsJson) : {}; } catch (e) { parsed = {}; }
+        // Short keys: the first item's LogoSpecs is truncated at 250 chars ABOVE this
+        // point, so keep the addition small.
+        parsed.ns = {
+            v: vendorCode,
+            mode: blankCost > 0 ? 'costPlus' : 'fixed',
+            cost: blankCost
+        };
+        return JSON.stringify(parsed);
+    }
+
     async generateQuoteID() {
         try {
             const response = await fetch(`${this.baseURL}/api/quote-sequence/${this.quotePrefix}`);
@@ -486,6 +522,10 @@ class EmbroideryQuoteService {
                         }
                     }
 
+                    // Vendor (non-SanMar) provenance — merged LAST so it survives every
+                    // override branch above. No-op for SanMar products.
+                    itemLogoSpecs = this._withVendorSpecs(itemLogoSpecs, productPricing.product);
+
                     const itemData = {
                         QuoteID: quoteID,
                         LineNumber: lineNumber++,
@@ -578,7 +618,13 @@ class EmbroideryQuoteService {
                         QuoteID: quoteID,
                         LineNumber: lineNumber++,
                         StyleNumber: decgItem.type,  // DECG or DECC
-                        ProductName: isDECC ? 'Customer-Supplied Caps' : 'Customer-Supplied Garments',
+                        // Append what the customer is bringing, when the rep recorded it.
+                        // ProductName is ALREADY rendered by the quote viewer and sent as
+                        // the ShopWorks line Description, so this one field reaches both
+                        // with no further plumbing. Capped at the 2,000-char column limit
+                        // well before it matters (the composer caps at 120).
+                        ProductName: (isDECC ? 'Customer-Supplied Caps' : 'Customer-Supplied Garments')
+                            + (decgItem.description ? ` — ${decgItem.description}` : ''),
                         Color: '',
                         ColorCode: '',
                         EmbellishmentType: 'customer-supplied',
@@ -590,7 +636,12 @@ class EmbroideryQuoteService {
                         LTMPerUnit: 0,
                         FinalUnitPrice: parseFloat(decgItem.unitPrice.toFixed(2)),
                         LineTotal: parseFloat(decgItem.total.toFixed(2)),
+                        // 🔴 Metadata keys only — the push transformer's SizeBreakdown filter
+                        // treats every UNLISTED key as a SIZE. Anything added here must also
+                        // be added to that allowlist (embroidery-push-transformer.js).
                         SizeBreakdown: JSON.stringify({ type: decgItem.type, stitchCount: decgItem.stitchCount || 8000, heavyweight: !!decgItem.heavyweight }),
+                        // Sizes/details manifest → the order's 'Notes To Receiving'.
+                        Notes: decgItem.notes || '',
                         PricingTier: pricingResults.tier || '',
                         ImageURL: '',
                         AddedAt: new Date().toISOString().replace(/\.\d{3}Z$/, ''),
@@ -1305,6 +1356,11 @@ class EmbroideryQuoteService {
                         }
                     }
 
+                    // Vendor (non-SanMar) provenance — merged LAST so it survives every
+                    // override branch above. No-op for SanMar products. Mirrors saveQuote();
+                    // both loops must carry it or revisions drop the vendor.
+                    itemLogoSpecs = this._withVendorSpecs(itemLogoSpecs, productPricing.product);
+
                     const itemData = {
                         QuoteID: quoteId,
                         LineNumber: lineNumber++,
@@ -1393,7 +1449,13 @@ class EmbroideryQuoteService {
                         QuoteID: quoteId,
                         LineNumber: lineNumber++,
                         StyleNumber: decgItem.type,  // DECG or DECC
-                        ProductName: isDECC ? 'Customer-Supplied Caps' : 'Customer-Supplied Garments',
+                        // Append what the customer is bringing, when the rep recorded it.
+                        // ProductName is ALREADY rendered by the quote viewer and sent as
+                        // the ShopWorks line Description, so this one field reaches both
+                        // with no further plumbing. Capped at the 2,000-char column limit
+                        // well before it matters (the composer caps at 120).
+                        ProductName: (isDECC ? 'Customer-Supplied Caps' : 'Customer-Supplied Garments')
+                            + (decgItem.description ? ` — ${decgItem.description}` : ''),
                         Color: '',
                         ColorCode: '',
                         EmbellishmentType: 'customer-supplied',
@@ -1405,7 +1467,12 @@ class EmbroideryQuoteService {
                         LTMPerUnit: 0,
                         FinalUnitPrice: parseFloat(decgItem.unitPrice.toFixed(2)),
                         LineTotal: parseFloat(decgItem.total.toFixed(2)),
+                        // 🔴 Metadata keys only — the push transformer's SizeBreakdown filter
+                        // treats every UNLISTED key as a SIZE. Anything added here must also
+                        // be added to that allowlist (embroidery-push-transformer.js).
                         SizeBreakdown: JSON.stringify({ type: decgItem.type, stitchCount: decgItem.stitchCount || 8000, heavyweight: !!decgItem.heavyweight }),
+                        // Sizes/details manifest → the order's 'Notes To Receiving'.
+                        Notes: decgItem.notes || '',
                         PricingTier: pricingResults.tier || '',
                         ImageURL: '',
                         AddedAt: new Date().toISOString().replace(/\.\d{3}Z$/, ''),

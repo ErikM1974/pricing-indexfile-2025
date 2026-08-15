@@ -36,13 +36,23 @@ class EmbroideryPricingCalculator {
             { max: 25000, fee: 10 }    // Large: +$10 per piece
         ];
         this.fbBaseStitchCount = 25000; // base included stitches for Full Back position (overridden by API)
-        this.fbStitchRate = 1.25; // Full Back stitch rate per 1K (overridden by API)
+        this.fbStitchRate = 1.25; // legacy FLAT Full Back rate (Service_Codes 'FB') — fallback only
+        // Full Back $/1K BY QUANTITY TIER — the one shared ladder (Embroidery_Costs
+        // DECG-FB). Preferred over fbStitchRate; see _getFBRateForQty().
+        this.fbTierRates = {};
         this.monogramPrice = 12.50; // Monogram/Name price (overridden by API)
         this.stitchIncrement = 1000; // rounding increment
         
         // Cache for size pricing data
         this.sizePricingCache = {};
-        
+
+        // Shared Caspio Standard_Size_Upcharges ladder (UPPERCASE size keys), captured
+        // from the EMB pricing bundle's `sellingPriceDisplayAddOns`. Used ONLY by
+        // buildSyntheticSizePricing() for non-SanMar cost-plus garments — SanMar styles
+        // get their own per-style upcharges from /api/size-pricing. Empty until
+        // initializeConfig() runs.
+        this.standardSizeUpcharges = {};
+
         // Additional Logo (AL) tiers - will be fetched from API
         this.alTiers = {};
 
@@ -243,6 +253,15 @@ class EmbroideryPricingCalculator {
                     this.apiStatus.configuration = true;
                 }
                 
+                // Shared size-upcharge ladder (Standard_Size_Upcharges, UPPERCASE keys).
+                // Already in this response — the calculator used to parse tiersR/costs/rules
+                // and throw this away. Feeds buildSyntheticSizePricing() for non-SanMar
+                // cost-plus garments, so extended sizes carry the SAME upcharge a SanMar
+                // garment would. Zero extra API calls, zero hardcoded upcharges.
+                if (data.sellingPriceDisplayAddOns && typeof data.sellingPriceDisplayAddOns === 'object') {
+                    this.standardSizeUpcharges = data.sellingPriceDisplayAddOns;
+                }
+
                 // Extract rounding method
                 if (data.rulesR && data.rulesR.RoundingMethod) {
                     this.roundingMethod = data.rulesR.RoundingMethod;
@@ -252,6 +271,25 @@ class EmbroideryPricingCalculator {
                 }
             }
             
+            // Full back: the ONE shared ladder (Caspio Embroidery_Costs ItemType='DECG-FB'),
+            // the same rows the Services-bar full back, the staff reference page and the
+            // contract calculator price from. Before 2026-08-15 this path priced off the
+            // Service_Codes 'FB' row at a FLAT rate with no quantity tiering, so the two
+            // ways of adding a full back in this very builder could disagree.
+            // Server-cached 15 min, so this costs ~one Caspio read per session.
+            try {
+                const fbResponse = await fetch(`${this.baseURL}/api/decg-pricing`);
+                const fbData = await fbResponse.json();
+                if (fbData && fbData.fullBack && fbData.fullBack.ratesPerThousand) {
+                    this.fbTierRates = fbData.fullBack.ratesPerThousand;
+                    if (fbData.fullBack.minStitches > 0) this.fbBaseStitchCount = fbData.fullBack.minStitches;
+                }
+            } catch (fbErr) {
+                // Non-fatal: the Service_Codes rate below still applies, and any full-back
+                // line surfaces the normal pricing error if neither source resolves.
+                console.error('[EMB pricing] Full-back ladder unavailable:', fbErr.message);
+            }
+
             // Fetch Additional Logo (AL) pricing from EMB-AL endpoint
             try {
                 const alResponse = await fetch(`${this.baseURL}/api/pricing-bundle?method=EMB-AL`);
@@ -712,8 +750,12 @@ class EmbroideryPricingCalculator {
         } else {
         }
 
-        // Fetch size pricing for this cap style
-        const sizePricingData = await this.fetchSizePricing(product.style);
+        // Fetch size pricing for this cap style. A vendor (non-SanMar) cap carries a
+        // rep-entered blank cost instead — synthesize the same payload shape so the
+        // formula below is untouched. See buildSyntheticSizePricing().
+        const sizePricingData = (product.blankCost > 0)
+            ? this.buildSyntheticSizePricing(product)
+            : await this.fetchSizePricing(product.style);
 
         if (!sizePricingData || sizePricingData.length === 0) {
             console.error('[CRITICAL] No size pricing data for cap', product.style);
@@ -954,6 +996,21 @@ class EmbroideryPricingCalculator {
     }
 
     /**
+     * Full Back $/1K for an order quantity, from the ONE shared ladder
+     * (Caspio Embroidery_Costs ItemType='DECG-FB' via /api/decg-pricing).
+     *
+     * Falls back to the legacy flat Service_Codes 'FB' rate only if the ladder didn't
+     * load — that rate has no quantity dimension, so it over-charges large orders and
+     * under-charges small ones. Never returns 0: a $0 full back must fail loudly upstream.
+     */
+    _getFBRateForQty(quantity) {
+        const tier = this.getTier(quantity);
+        const rate = this.fbTierRates && this.fbTierRates[tier];
+        if (Number.isFinite(rate) && rate > 0) return rate;
+        return this.fbStitchRate || this.additionalStitchRate;
+    }
+
+    /**
      * Get embroidery cost for tier.
      * $12 is a FALLBACK for a missing tier row — flag it so calculateQuote can
      * surface a visible warning (Erik's #1 rule: never a silent wrong price).
@@ -996,6 +1053,81 @@ class EmbroideryPricingCalculator {
         return null;
     }
     
+    /**
+     * Build a SanMar-shaped size-pricing payload from a rep-entered BLANK COST.
+     *
+     * /api/size-pricing does not return prices — it returns the raw SanMar CASE_PRICE
+     * (the blank cost) per size plus the shared size-upcharge ladder. The formula in
+     * calculateProductPrice()/calculateCapProductPrice() then does
+     *     cost / marginDenominator + embCost -> roundPrice() -> + sizeUpcharge
+     * So handing that formula this synthesized payload prices a non-SanMar garment
+     * through the IDENTICAL path — tiers, per-tier margin, embroidery cost, upcharges
+     * and LTM all included. One new INPUT SHAPE, no second pricing path (Rule 9).
+     *
+     * Deliberately NOT written into this.sizePricingCache: that cache is keyed by bare
+     * style, is never cleared, and is shared with getProductSizePrices(). A seeded entry
+     * would be a permanent page-lifetime shadow over a real SanMar style — and vendor
+     * styles do drift into SanMar over time. Passing the cost on the product object has
+     * no shared state, so there is nothing to invalidate.
+     *
+     * @param {Object} product - needs { blankCost, isCap, sizeBreakdown, sizeUpchargeOverrides? }
+     * @returns {Array|null} [{styleNumber, color, basePrices, sizeUpcharges}] or null
+     */
+    buildSyntheticSizePricing(product) {
+        const cost = parseFloat(product.blankCost);
+        if (!Number.isFinite(cost) || cost <= 0) return null;
+
+        const basePrices = {};
+        const sizeUpcharges = {};
+
+        // ANCHOR SIZES — do not "clean these up".
+        // The garment path computes each size's upcharge RELATIVE to whichever size it
+        // picked as the base (getting 0 for the base itself); the cap path adds upcharges
+        // ABSOLUTELY. Injecting sizes the base-size search looks at first (S/M/L/XL for
+        // garments, OSFA for caps) — none of which carry an upcharge — pins the base to a
+        // zero-upcharge size, making relative === absolute so neither path needs a branch.
+        // Anchors never emit a line item: the line loop iterates product.sizeBreakdown,
+        // not basePrices. So a big-and-tall product ordered only in 2XL/3XL still gets the
+        // S/M/L/XL anchors, and removing them would silently zero its 2XL upcharge.
+        const anchors = product.isCap ? ['OSFA'] : ['S', 'M', 'L', 'XL'];
+        anchors.forEach(s => { basePrices[s] = cost; });
+        // Every ordered size costs the same blank cost, so all four base-price fallback
+        // ladders in both calculators converge on it whichever one fires.
+        Object.keys(product.sizeBreakdown || {}).forEach(s => {
+            if (!(s in basePrices)) basePrices[s] = cost;
+        });
+
+        const shared = this.standardSizeUpcharges || {};        // Caspio Standard_Size_Upcharges
+        const perStyle = product.sizeUpchargeOverrides || {};   // SizeUpchargeXL/2XL/3XL on the row
+        let missingUpcharge = false;
+        Object.keys(basePrices).forEach(size => {
+            if (anchors.indexOf(size) !== -1) return;
+            const key = String(size).toUpperCase();
+            const override = parseFloat(perStyle[key]);
+            const amount = Number.isFinite(override) && override > 0
+                ? override
+                : (parseFloat(shared[key]) || 0);
+            // Mirror the API, which only emits non-zero upcharge keys.
+            if (amount > 0) sizeUpcharges[size] = amount;
+            else if (!Object.keys(shared).length) missingUpcharge = true;
+        });
+
+        // An empty shared ladder means the pricing bundle came back degraded (Caspio
+        // rate-limiting). Silently pricing a 2XL with no upcharge is the classic silent
+        // wrong price, so flag it into the existing visible-warning machinery.
+        if (missingUpcharge) {
+            this._costFallbackUsed = 'size upcharges (vendor product)';
+            console.error('[EmbroideryPricing] No size-upcharge ladder loaded — extended sizes on vendor products would price without an upcharge.');
+        }
+
+        return [{
+            styleNumber: product.style,
+            color: product.color || '',
+            basePrices: basePrices,
+            sizeUpcharges: sizeUpcharges
+        }];
+    }
+
     /**
      * Build a pricing result with a fixed sell price (non-SanMar products)
      * Skips margin formula and embroidery cost — the sell price IS the final decorated price
@@ -1058,9 +1190,13 @@ class EmbroideryPricingCalculator {
         // TODO: When API supports different item types, use itemType to get correct cost
         const embCost = this.getEmbroideryCost(tier);
 
-        // Fetch size pricing for this style
-        const sizePricingData = await this.fetchSizePricing(product.style);
-        
+        // Fetch size pricing for this style. A vendor (non-SanMar) garment carries a
+        // rep-entered blank cost instead — synthesize the same payload shape so the
+        // formula below is untouched. See buildSyntheticSizePricing().
+        const sizePricingData = (product.blankCost > 0)
+            ? this.buildSyntheticSizePricing(product)
+            : await this.fetchSizePricing(product.style);
+
         if (!sizePricingData || sizePricingData.length === 0) {
             console.error('[CRITICAL] No size pricing data for', product.style);
             console.error('[CRITICAL] API call failed - system will likely use hardcoded fallback values!');
@@ -1481,12 +1617,14 @@ class EmbroideryPricingCalculator {
                 if (logo.position === 'Full Back') {
                     const fbStitchCount = Math.max(logo.stitchCount, this.fbBaseStitchCount);
                     if (logo.fbPriceTiers && logo.fbPriceTiers.fbPrice1_7 > 0) {
-                        // Design-specific tier pricing — price varies by quantity
+                        // NEGOTIATED price for this design (Digitized Designs Master) —
+                        // deliberately overrides the shared ladder. Flagged so the UI can
+                        // say why this line differs from the published table.
                         primaryFullBackStitchCost += this._getFBTierPrice(logo.fbPriceTiers, garmentQuantity);
                         primaryFBUsedTierPricing = true;
                     } else {
-                        // Formula-based: $1.25 per 1,000 stitches (min 25K)
-                        primaryFullBackStitchCost += (fbStitchCount / 1000) * (this.fbStitchRate || this.additionalStitchRate);  // FB-specific rate (FB service code), not the garment STITCH-RATE (review C16)
+                        // The one shared DECG-FB ladder: $/1K by quantity tier, min 25K.
+                        primaryFullBackStitchCost += (fbStitchCount / 1000) * this._getFBRateForQty(garmentQuantity);  // one shared DECG-FB ladder, tiered by qty
                     }
                 } else {
                     // Other positions: flat tier surcharge (Mid $4, Large $10)
@@ -1647,12 +1785,16 @@ class EmbroideryPricingCalculator {
                                 let description;
 
                                 if (logo.fbPriceTiers && logo.fbPriceTiers.fbPrice1_7 > 0) {
-                                    // Design-specific tier pricing from Digitized Designs Master
+                                    // NEGOTIATED price for this specific design (Digitized Designs
+                                    // Master fbPrice* columns) — deliberately overrides the shared
+                                    // ladder. Say so in the description: without it the line just
+                                    // looks like the standard table got the price wrong, and a rep
+                                    // has no way to explain the number to the customer.
                                     unitPrice = this._getFBTierPrice(logo.fbPriceTiers, quantity);
-                                    description = `FB Full Back (${fbStitchCount/1000}K st, tier pricing)`;
+                                    description = `FB Full Back (${fbStitchCount/1000}K st — negotiated price for this design)`;
                                 } else {
                                     // Formula-based pricing
-                                    const fbStitchRate = this.fbStitchRate || this.additionalStitchRate; // FB rate (FB service code), falls back to garment rate (review C16)
+                                    const fbStitchRate = this._getFBRateForQty(quantity); // one shared DECG-FB ladder, tiered by qty
                                     unitPrice = (fbStitchCount / 1000) * fbStitchRate;
                                     description = `FB Full Back (${fbStitchCount/1000}K stitches)`;
                                 }
@@ -1835,7 +1977,12 @@ class EmbroideryPricingCalculator {
             capTier: capTier,  // NEW: Separate cap tier
             embroideryRate: tierEmbCost,
             additionalStitchCost: primaryAdditionalStitchCost + primaryFullBackStitchCost,
-            fullBackStitchCost: primaryFullBackStitchCost, // Full Back: ALL stitches at $1.25/1K
+            fullBackStitchCost: primaryFullBackStitchCost, // Full Back: all stitches at the DECG-FB $/1K for this quantity tier
+            // True when this quote's Full Back came from a NEGOTIATED per-design price
+            // (Digitized Designs Master) instead of the published ladder. Surfaced so the
+            // UI can say why the number differs from the reference table — otherwise it
+            // just looks like the table is wrong and the rep can't explain it.
+            fullBackUsedNegotiatedPrice: primaryFBUsedTierPricing,
             additionalStitchTotal: additionalStitchTotal,  // Total extra stitch charge across all items
             garmentStitchTotal: garmentStitchTotal,  // NEW: Garment-only stitch charges (AS-GARM)
             capStitchTotal: capStitchTotal,          // NEW: Cap-only stitch charges (AS-CAP)

@@ -201,5 +201,32 @@
     }
   }
 
-  window.QuoteServicesBar = { render };
+  /**
+   * Open a category dropdown by its visible group name and scroll it into view.
+   *
+   * Lets a page point a rep straight at a group they'd otherwise have to know was
+   * there — the builder's empty state uses it for 'Customer-Supplied', which reps
+   * were not finding on their own. Matched case-insensitively on the button text so
+   * callers use the same label that appears in the catalog.
+   *
+   * @param {string} groupName - visible group label, e.g. 'Customer-Supplied'
+   * @returns {boolean} true if a matching group was found and opened
+   */
+  function openServiceGroup(groupName) {
+    const want = String(groupName || '').trim().toLowerCase();
+    if (!want) return false;
+    const btn = Array.from(document.querySelectorAll('.service-cat-btn'))
+      .find((b) => b.textContent.trim().toLowerCase().startsWith(want));
+    if (!btn) { console.warn('[ServicesBar] no such group:', groupName); return false; }
+    btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    // Deferred: this is normally called FROM a click handler elsewhere on the page, and
+    // that click is still bubbling toward the document-level "close every menu" listener
+    // below. Opening synchronously would open the menu and then have the same click shut
+    // it again. Going through the button's own handler keeps "close the others" in one place.
+    setTimeout(() => btn.click(), 0);
+    return true;
+  }
+
+  window.QuoteServicesBar = { render, openServiceGroup };
+  window.openServiceGroup = openServiceGroup;
 })();

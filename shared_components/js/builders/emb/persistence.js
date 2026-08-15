@@ -897,6 +897,38 @@ export function populateLogoConfig(session, items) {
 }
 
 /**
+ * Restore a saved Customer-Supplied (DECG/DECC) row on reload/revision.
+ *
+ * Two jobs: keep the row LIVE API-priced (without decgPriced it freezes and loses its
+ * tier the moment the rep edits the qty), and put back what the rep recorded about the
+ * customer's goods. ProductName was saved as "Customer-Supplied Garments — <desc>", so
+ * everything after the em dash is the description.
+ *
+ * Extracted from populateProducts() to stay under the 150-line function ratchet.
+ */
+function _restoreCustomerSuppliedRow(serviceRow, serviceItem, serviceType) {
+    serviceRow.dataset.decgPriced = 'true';
+    serviceRow.dataset.decgItemType = serviceType === 'DECC' ? 'cap' : 'garment';
+    // Restore the Heavyweight (+$10/pc) flag from SizeBreakdown so the live re-price keeps it.
+    try {
+        serviceRow.dataset.decgHeavyweight = JSON.parse(serviceItem.SizeBreakdown || '{}').heavyweight ? 'true' : 'false';
+    } catch (e) {
+        serviceRow.dataset.decgHeavyweight = 'false';
+    }
+
+    const savedName = String(serviceItem.ProductName || '');
+    const dashAt = savedName.indexOf(' — ');
+    if (dashAt > -1) {
+        serviceRow.dataset.csDescription = savedName.slice(dashAt + 3);
+        const descEl = serviceRow.querySelector('.service-description');
+        if (descEl) {
+            descEl.textContent = `${String(descEl.textContent).split(' — ')[0]} — ${serviceRow.dataset.csDescription}`;
+        }
+    }
+    if (serviceItem.Notes) serviceRow.dataset.csNotes = serviceItem.Notes;
+}
+
+/**
  * Populate products from line items
  * Handles regular products AND service items (DECG, DECC, MONOGRAM)
  */
@@ -955,6 +987,12 @@ async function populateProducts(items) {
                         productGroups[key].priceOverride = specs.overridePrice;
                     }
                 }
+                // Vendor (non-SanMar) provenance saved by _withVendorSpecs(). Kept as a
+                // FALLBACK only: addProductFromQuote() re-runs onStyleChange(), which
+                // re-reads the live Non_SanMar_Products row, so current Caspio data wins.
+                // This copy is what stops a since-deactivated vendor product from
+                // reloading as an unpriceable $0.
+                if (specs.ns) productGroups[key].nsSaved = specs.ns;
             } catch (e) { /* ignore parse errors */ }
         }
         // Merge size breakdowns
@@ -1018,10 +1056,7 @@ async function populateProducts(items) {
         // Re-flag bar Customer-Supplied (DECG/DECC) rows so they stay LIVE API-priced on revisions
         // (same as AL above) — without this the row freezes and loses its tier if the rep edits qty.
         if (serviceRow && ['DECG', 'DECC'].includes(serviceType)) {
-            serviceRow.dataset.decgPriced = 'true';
-            serviceRow.dataset.decgItemType = serviceType === 'DECC' ? 'cap' : 'garment';
-            // Restore the Heavyweight (+$10/pc) flag from SizeBreakdown so the live re-price keeps it.
-            try { serviceRow.dataset.decgHeavyweight = JSON.parse(serviceItem.SizeBreakdown || '{}').heavyweight ? 'true' : 'false'; } catch (e) { serviceRow.dataset.decgHeavyweight = 'false'; }
+            _restoreCustomerSuppliedRow(serviceRow, serviceItem, serviceType);
         }
 
         // Restore price override for DECG/DECC if saved
@@ -1138,6 +1173,25 @@ export async function addProductFromQuote(product) {
     // Restore price override if saved
     if (product.priceOverride > 0) {
         row.dataset.sellPrice = product.priceOverride.toString();
+    }
+
+    // Vendor product whose Caspio row has since gone (deactivated/deleted): onStyleChange
+    // above found nothing, so restore what the quote itself recorded rather than reloading
+    // it as an unpriceable $0. A live lookup that DID succeed is left alone — current
+    // Caspio wins — and the toast tells the rep the cost moved since the quote was written.
+    if (product.nsSaved && row.dataset.nonSanmar !== 'true') {
+        row.dataset.nonSanmar = 'true';
+        row.dataset.vendorCode = product.nsSaved.v || '';
+        if (parseFloat(product.nsSaved.cost) > 0) {
+            row.dataset.nsPricingMode = 'costPlus';
+            row.dataset.blankCost = String(product.nsSaved.cost);
+        }
+        showToast(`${product.styleNumber} is no longer in the vendor catalog — priced from the cost saved on this quote.`, 'warning', 7000);
+    } else if (product.nsSaved && parseFloat(product.nsSaved.cost) > 0) {
+        const liveCost = parseFloat(row.dataset.blankCost) || 0;
+        if (liveCost > 0 && Math.abs(liveCost - parseFloat(product.nsSaved.cost)) > 0.005) {
+            showToast(`${product.styleNumber}: blank cost changed since this quote was saved ($${parseFloat(product.nsSaved.cost).toFixed(2)} → $${liveCost.toFixed(2)}). Prices have been recalculated.`, 'warning', 8000);
+        }
     }
 
     // Restore per-size price overrides on child rows

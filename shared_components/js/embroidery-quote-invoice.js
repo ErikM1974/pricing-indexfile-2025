@@ -1401,6 +1401,13 @@ class EmbroideryInvoiceGenerator {
                 let rowDescription = pp.product.title || '';
                 let rowColor = pp.product.color || '';
 
+                // Name the vendor on the printed quote when the blank isn't from SanMar,
+                // so the customer (and whoever raises the PO) can see where it comes from.
+                // No-op for SanMar products; escaped downstream with the rest of the cell.
+                const vendorFn = (typeof window !== 'undefined' && window.vendorLabel);
+                const rowVendor = vendorFn ? vendorFn(pp.product.vendorCode) : '';
+                if (rowVendor) rowDescription = `${rowDescription} (${rowVendor})`;
+
                 // For extended size rows, modify the style and description
                 if (!isFirstRow) {
                     // Extended size row - find which size this is

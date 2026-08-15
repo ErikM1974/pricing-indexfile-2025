@@ -411,14 +411,22 @@ function validateSaveInputs(products) {
         return null;
     }
 
-    // Validate non-SanMar products have pricing set
+    // Validate non-SanMar products have SOMETHING to price from. Deliberately narrow:
+    // this catches only "the rep entered neither a cost nor a price". A cost-plus row
+    // that HAS a cost but still fails to price returns null from the calculator and is
+    // already blocked upstream by buildSavePricing()'s failedProducts check — so this
+    // must not also demand a sellPriceOverride, or every vendor product created in
+    // Margin mode would be unsaveable.
     const zeroPriceRows = products.filter(p => {
         const row = document.getElementById(`row-${p.rowId}`);
-        return row && row.dataset.nonSanmar === 'true' && p.sellPriceOverride <= 0;
+        if (!row || row.dataset.nonSanmar !== 'true') return false;
+        if (p.sellPriceOverride > 0) return false;                    // fixed price / manual override
+        if (parseFloat(row.dataset.blankCost) > 0) return false;      // cost-plus — the engine priced it
+        return true;
     });
     if (zeroPriceRows.length > 0) {
         const styleList = zeroPriceRows.map(p => p.style).join(', ');
-        showToast(`Non-SanMar product(s) have $0 pricing: ${styleList}. Double-click the price cell to set a price.`, 'error', 6000);
+        showToast(`No cost and no price on: ${styleList}. Open the product to enter a blank cost, or double-click the price cell to set a fixed price.`, 'error', 7000);
         return null;
     }
 

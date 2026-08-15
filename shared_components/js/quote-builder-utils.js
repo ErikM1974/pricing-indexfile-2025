@@ -2043,6 +2043,71 @@ if (typeof window !== 'undefined') {
 }
 
 // ============================================================
+// Non-SanMar vendor products (S&S Activewear et al., 2026-08-14)
+// ============================================================
+// Garments we supply but do NOT buy from SanMar. They live in the Caspio
+// `Non_SanMar_Products` table and price one of two ways:
+//   costPlus — the rep enters the BLANK COST and the normal engine adds margin,
+//              embroidery, size upcharges, tier and LTM (identical to a SanMar
+//              garment; see buildSyntheticSizePricing in embroidery-quote-pricing.js)
+//   fixed    — the rep enters a final decorated price (escape hatch for oddballs)
+
+// This is a LABEL vocabulary, not a price — Rule 7 ("pricing = API, never
+// hardcoded") does not apply, so do NOT try to move it to Caspio. It exists
+// because `Non_SanMar_Products.VendorCode` is free text and
+// GET /api/non-sanmar-products?vendor= filters on EXACT uppercase equality:
+// "S&S" vs "SS" vs "SSA" typed by three reps would permanently split vendor
+// reporting. Curated codes keep that filter usable; 'Other…' keeps one-offs
+// possible. Mirrored in dashboards/js/product-manager.js — locked by
+// tests/unit/non-sanmar-vendor-drift.test.js.
+const NON_SANMAR_VENDORS = [
+    { code: 'SSA', label: 'S&S Activewear' },
+    { code: 'ALP', label: 'Alphabroder' },
+    { code: 'CARH', label: 'Carhartt (direct)' },
+    { code: 'RICH', label: 'Richardson' },
+    { code: 'JDS', label: 'JDS Industries' },
+    { code: 'AUG', label: 'Augusta / Holloway' }
+];
+
+/** Display name for a VendorCode; unknown codes echo back verbatim (they are real one-offs). */
+function vendorLabel(code) {
+    const c = String(code || '').trim();
+    if (!c) return '';
+    const hit = NON_SANMAR_VENDORS.find(v => v.code === c.toUpperCase());
+    return hit ? hit.label : c;
+}
+
+/**
+ * Which pricing mode a Non_SanMar_Products row is in.
+ *
+ * `PricingMethod` exists in production with THREE spellings, from three writers:
+ *   'FIXED'      — the builder's Add-Product modal (shopworks-import.js) + the proxy seed row
+ *   'FixedPrice' — the staff Product Manager dashboard
+ *   'Margin'     — the staff Product Manager dashboard
+ * …and older rows have it blank. Read tolerantly (here), write canonically
+ * ('Margin' | 'FixedPrice'), or existing rows mis-price.
+ *
+ * @returns {'costPlus'|'fixed'|'unpriced'}
+ */
+function resolveNonSanmarPricingMode(product) {
+    const pm = String((product && product.PricingMethod) || '').toUpperCase();
+    const cost = parseFloat(product && product.DefaultCost) || 0;
+    const sell = parseFloat(product && product.DefaultSellPrice) || 0;
+    if (pm.includes('FIX')) return sell > 0 ? 'fixed' : 'unpriced';
+    if (pm.includes('MARGIN')) return cost > 0 ? 'costPlus' : 'unpriced';
+    // Blank/legacy PricingMethod — infer from whichever number the row carries.
+    if (cost > 0) return 'costPlus';
+    if (sell > 0) return 'fixed';
+    return 'unpriced';
+}
+
+if (typeof window !== 'undefined') {
+    window.NON_SANMAR_VENDORS = NON_SANMAR_VENDORS;
+    window.vendorLabel = vendorLabel;
+    window.resolveNonSanmarPricingMode = resolveNonSanmarPricingMode;
+}
+
+// ============================================================
 // In-flight reprice indicator (old-audit price-display #5, 2026-07-07)
 // ============================================================
 // During a slow /api/pricing-bundle refresh the table shows the PREVIOUS
@@ -2575,7 +2640,7 @@ if (typeof window !== 'undefined') {
 
 // Node.js export (testing) — pure functions only
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { escapeHtml, formatPrice, cleanProductTitle, getSwatchStyle, parseRatePercent, parseBulkSizes, distributeProportionally, stashMethodSwitchPrefill, takeMethodSwitchPrefill };
+    module.exports = { escapeHtml, formatPrice, cleanProductTitle, getSwatchStyle, parseRatePercent, parseBulkSizes, distributeProportionally, stashMethodSwitchPrefill, takeMethodSwitchPrefill, NON_SANMAR_VENDORS, vendorLabel, resolveNonSanmarPricingMode };
 }
 
 // QuoteBuilderUtils v3.1.0 loaded
