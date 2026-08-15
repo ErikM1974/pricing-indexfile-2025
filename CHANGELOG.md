@@ -1,3 +1,8 @@
+## v2026.08.15.3 (2026.08.15)
+
+- Delete the Add-Product modal — manual entry replaced it
+- Deploy v2026.08.15.3: 1 files (embroidery-quote-builder.html)
+
 ## v2026.08.15.2 (2026.08.15)
 
 - Record CTR-FB / FB row values before they are deleted from Caspio
