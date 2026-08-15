@@ -2684,23 +2684,9 @@ td.size-disabled input {
 .spr-size-label-cell { font-weight: 500; font-size: 12px; color: #475569; }
 
 /* ============================================
-   NON-SANMAR PRODUCT MODAL (extracted from inline <style> 2026-03-23)
+   NON-SANMAR / MANUAL VENDOR ROWS (modal deleted 2026-08-15 — items
+   are now typed straight onto the line; these style the row affordances)
    ============================================ */
-.ns-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.ns-full-width { grid-column: 1 / -1; }
-.ns-form-group label { display: block; font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 4px; }
-.ns-form-group label small { font-weight: 400; color: #94a3b8; }
-.ns-required { color: #ef4444; }
-.ns-input {
-    width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1;
-    border-radius: 6px; font-size: 14px; box-sizing: border-box;
-}
-.ns-input:focus { border-color: #7c3aed; outline: none; box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.15); }
-.ns-input-readonly { background: #f1f5f9; color: #64748b; }
-/* Explains which number the rep is typing (blank cost vs final decorated price) —
-   the two modes look identical without it. */
-.ns-field-hint { display: block; margin-top: 4px; font-size: 11px; line-height: 1.35; color: #64748b; }
-#ns-vendor-other { margin-top: 6px; }
 .btn-add-nonsanmar {
     display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px;
     background: #7c3aed; color: white; border: none; border-radius: 5px;
@@ -2736,16 +2722,6 @@ td.size-disabled input {
     padding: 4px 8px; border-radius: 4px;
 }
 .import-summary-banner .btn-dismiss-banner:hover { background: rgba(0,0,0,0.05); color: #475569; }
-.ns-more-options-toggle {
-    display: flex; align-items: center; gap: 6px; background: none;
-    border: none; color: #7c3aed; font-size: 12px; font-weight: 600;
-    cursor: pointer; padding: 8px 0 4px; margin-top: 4px;
-}
-.ns-more-options-toggle:hover { color: #5b21b6; }
-.ns-more-options-toggle i { transition: transform 0.2s; }
-.ns-more-options-toggle.expanded i { transform: rotate(90deg); }
-.ns-more-options-section { display: none; padding-top: 8px; }
-.ns-more-options-section.visible { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .ns-price-display { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; }
 .ns-price-display .fa-pencil-alt { font-size: 10px; color: #94a3b8; opacity: 0; transition: opacity 0.15s; }
 .ns-price-display:hover .fa-pencil-alt { opacity: 1; color: #7c3aed; }

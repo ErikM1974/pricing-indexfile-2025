@@ -45,12 +45,6 @@ import {
 import {
     openShopWorksImportModal,
     closeShopWorksImportModal,
-    closeAddNonSanmarModal,
-    toggleNsMoreOptions,
-    validateNsModalFields,
-    onNsVendorChange,
-    onNsPricingModeChange,
-    saveNonSanmarProduct,
     parseAndPreviewShopWorks,
     confirmShopWorksImport,
     dismissImportBanner,
@@ -197,16 +191,12 @@ window.onSprStitchChange = onSprStitchChange;
 window.cancelServicePricingReview = cancelServicePricingReview;
 window.applyServicePricingReview = applyServicePricingReview;
 
-// shopworks-import (callers: static HTML modal handlers, generated banner
-// markup, and the search cluster's add-non-SanMar entry point)
+// shopworks-import (callers: the paste-from-ShopWorks modal's static HTML handlers
+// and its generated banner markup). The Add-Product modal bridges were dropped
+// 2026-08-15 with the modal itself — an unknown style is now typed straight onto
+// the line (see stampManualItem in product-rows.js), never registered first.
 window.openShopWorksImportModal = openShopWorksImportModal;
 window.closeShopWorksImportModal = closeShopWorksImportModal;
-window.closeAddNonSanmarModal = closeAddNonSanmarModal;
-window.toggleNsMoreOptions = toggleNsMoreOptions;
-window.validateNsModalFields = validateNsModalFields;
-window.onNsVendorChange = onNsVendorChange;
-window.onNsPricingModeChange = onNsPricingModeChange;
-window.saveNonSanmarProduct = saveNonSanmarProduct;
 window.parseAndPreviewShopWorks = parseAndPreviewShopWorks;
 window.confirmShopWorksImport = confirmShopWorksImport;
 window.dismissImportBanner = dismissImportBanner;

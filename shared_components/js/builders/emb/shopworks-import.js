@@ -24,8 +24,11 @@ import { showServicePricingReview, getSprEmbConfigOptions } from './spr-modal.js
 import { lookupTaxRate, onShipMethodChange, recalculatePricing, updateTaxCalculation } from './pricing-sync.js';
 import { applyDesignFromCache, lookupDesignNumber } from './design-search.js';
 import { _syncALArrays, handleCapEmbellishmentChange, updateNotesBadge } from './logo-config.js';
-import { addNewRow, createServiceProductRow, dateToInputValue, hideVariantOnlyParents, isCapProduct, onSizeChange, onStyleChange, parseShopWorksDescription, populateNonSanmarRow, selectColor, selectNonSanmarColor, updateCapLogoSectionVisibility, updateLogoCardHeader, updateNonSanmarPriceCell } from './product-rows.js';
-import { embState, SIZE06_EXTENDED_SIZES, API_BASE } from './state.js';
+// populateNonSanmarRow + API_BASE dropped 2026-08-15: their only consumer here was
+// saveNonSanmarProduct, which went with the Add-Product modal. The catalog-lookup path
+// in product-rows.js still uses populateNonSanmarRow directly.
+import { addNewRow, createServiceProductRow, dateToInputValue, hideVariantOnlyParents, isCapProduct, onSizeChange, onStyleChange, parseShopWorksDescription, selectColor, selectNonSanmarColor, updateCapLogoSectionVisibility, updateLogoCardHeader, updateNonSanmarPriceCell } from './product-rows.js';
+import { embState, SIZE06_EXTENDED_SIZES } from './state.js';
 
 
 // DECG stitch-count modal DELETED 2026-07-07 (roadmap 0.4 cluster #9 audit):
@@ -90,138 +93,10 @@ export function closeShopWorksImportModal() {
     embState.pendingShopWorksImport = null;
 }
 
-/**
- * Show the Add Non-SanMar Product modal, pre-filled from row data
- */
-export function showAddNonSanmarModal(rowId) {
-    const row = document.getElementById(`row-${rowId}`);
-    if (!row) return;
-
-    const styleNumber = row.dataset.style || /** @type {HTMLInputElement|null} */ (row.querySelector('.style-input'))?.value?.trim().toUpperCase() || '';
-    const importData = row.dataset.importData ? JSON.parse(row.dataset.importData) : {};
-
-    // Pre-parse description from import data
-    const description = importData.description || '';
-    const parsed = parseShopWorksDescription(description, styleNumber);
-
-    // Fill modal fields
-    /** @type {HTMLInputElement} */ (document.getElementById('ns-modal-row-id')).value = rowId;
-    /** @type {HTMLInputElement} */ (document.getElementById('ns-style-number')).value = styleNumber;
-    /** @type {HTMLInputElement} */ (document.getElementById('ns-brand')).value = parsed.brand || importData.brand || '';
-    /** @type {HTMLInputElement} */ (document.getElementById('ns-product-name')).value = parsed.name || '';
-    /** @type {HTMLInputElement} */ (document.getElementById('ns-category')).value = parsed.category || '';
-    /** @type {HTMLInputElement} */ (document.getElementById('ns-default-colors')).value = parsed.color || importData.color || '';
-
-    // Vendor list + pricing mode. A ShopWorks paste carries a charged unit PRICE, not a
-    // blank cost, so an import defaults to FixedPrice (that number is already decorated);
-    // a rep typing a style by hand gets cost-plus, which is the mode we want them in.
-    buildNsVendorOptions();
-    /** @type {HTMLSelectElement} */ (document.getElementById('ns-vendor')).value = '';
-    /** @type {HTMLInputElement} */ (document.getElementById('ns-vendor-other')).value = '';
-    const importedPrice = parseFloat(importData.unitPrice) || 0;
-    /** @type {HTMLSelectElement} */ (document.getElementById('ns-pricing-mode')).value = importedPrice > 0 ? 'FixedPrice' : 'Margin';
-    /** @type {HTMLInputElement} */ (document.getElementById('ns-sell-price')).value = importedPrice > 0 ? String(importedPrice) : '';
-    /** @type {HTMLInputElement} */ (document.getElementById('ns-blank-cost')).value = '';
-    onNsVendorChange();
-    onNsPricingModeChange();
-
-    // Auto-fill available sizes based on detected category
-    if (parsed.category === 'Caps') {
-        /** @type {HTMLInputElement} */ (document.getElementById('ns-available-sizes')).value = 'OSFA';
-    } else {
-        /** @type {HTMLInputElement} */ (document.getElementById('ns-available-sizes')).value = 'S,M,L,XL,2XL,3XL';
-    }
-
-    // Collapse "More Options" by default
-    const moreSection = document.getElementById('ns-more-options');
-    const moreToggle = document.querySelector('.ns-more-options-toggle');
-    if (moreSection) moreSection.classList.remove('visible');
-    if (moreToggle) moreToggle.classList.remove('expanded');
-
-    // Show modal
-    const modal = document.getElementById('add-nonsanmar-modal');
-    modal.classList.add('active');
-
-    // Validate fields (enables/disables Save button)
-    validateNsModalFields();
-
-    // Focus the brand field (first editable field)
-    setTimeout(() => document.getElementById('ns-brand').focus(), 100);
-}
-
-/**
- * Close the Add Non-SanMar Product modal
- */
-export function closeAddNonSanmarModal() {
-    const modal = document.getElementById('add-nonsanmar-modal');
-    modal.classList.remove('active');
-}
-
-/**
- * Toggle "More Options" collapsible in the Add Non-SanMar modal
- */
-export function toggleNsMoreOptions(btn) {
-    const section = document.getElementById('ns-more-options');
-    const isExpanded = section.classList.toggle('visible');
-    btn.classList.toggle('expanded', isExpanded);
-}
-
 /** Populate the vendor <select> once, from the shared curated list. */
-function buildNsVendorOptions() {
-    const sel = /** @type {HTMLSelectElement|null} */ (document.getElementById('ns-vendor'));
-    if (!sel || sel.options.length) return;
-    const list = (typeof window !== 'undefined' && window.NON_SANMAR_VENDORS) || [];
-    const opt = (label, value) => {
-        const o = document.createElement('option');
-        o.value = value;
-        o.textContent = label;   // textContent — vendor labels are never markup
-        return o;
-    };
-    sel.appendChild(opt('— not set —', ''));
-    list.forEach(v => sel.appendChild(opt(v.label, v.code)));
-    sel.appendChild(opt('Other…', '__other'));
-}
-
 /** Reveal the free-text vendor box only for the Other… escape. */
-export function onNsVendorChange() {
-    const sel = /** @type {HTMLSelectElement} */ (document.getElementById('ns-vendor'));
-    /** @type {HTMLInputElement} */ (document.getElementById('ns-vendor-other')).hidden = sel.value !== '__other';
-}
-
 /** The VendorCode we persist (curated code, or the typed one-off, upper-cased). */
-function readNsVendorCode() {
-    const sel = /** @type {HTMLSelectElement} */ (document.getElementById('ns-vendor')).value;
-    if (sel === '__other') {
-        return /** @type {HTMLInputElement} */ (document.getElementById('ns-vendor-other')).value.trim().toUpperCase();
-    }
-    return sel;
-}
-
 /** Show exactly one money field — the two numbers mean very different things. */
-export function onNsPricingModeChange() {
-    const mode = /** @type {HTMLSelectElement} */ (document.getElementById('ns-pricing-mode')).value;
-    document.getElementById('ns-cost-group').hidden = mode !== 'Margin';
-    document.getElementById('ns-sell-group').hidden = mode !== 'FixedPrice';
-    validateNsModalFields();
-}
-
-/**
- * Live validation for the required fields in the Non-SanMar modal.
- * The money field that must be filled depends on the pricing mode.
- */
-export function validateNsModalFields() {
-    const brand = /** @type {HTMLInputElement} */ (document.getElementById('ns-brand')).value.trim();
-    const name = /** @type {HTMLInputElement} */ (document.getElementById('ns-product-name')).value.trim();
-    const mode = /** @type {HTMLSelectElement} */ (document.getElementById('ns-pricing-mode')).value;
-    const moneyId = mode === 'Margin' ? 'ns-blank-cost' : 'ns-sell-price';
-    const money = parseFloat(/** @type {HTMLInputElement} */ (document.getElementById(moneyId)).value);
-    const saveBtn = /** @type {HTMLInputElement|null} */ (document.getElementById('btn-save-nonsanmar'));
-    const isValid = brand && name && money > 0;
-    saveBtn.disabled = !isValid;
-    saveBtn.title = isValid ? ''
-        : `Fill Brand, Product Name, and ${mode === 'Margin' ? 'the blank cost' : 'the sell price'}`;
-}
-
 /**
  * Show a post-import summary banner above the product table.
  * Lists non-SanMar products with price status indicators.
@@ -303,109 +178,6 @@ export function scrollToProductRow(rowId) {
     row.style.transition = 'background 0.3s';
     row.style.background = '#ede9fe';
     setTimeout(() => { row.style.background = ''; }, 1500);
-}
-
-/**
- * Save non-SanMar product to database and re-populate the row
- */
-export async function saveNonSanmarProduct() {
-    const rowId = parseInt(/** @type {HTMLInputElement} */ (document.getElementById('ns-modal-row-id')).value);
-    const styleNumber = /** @type {HTMLInputElement} */ (document.getElementById('ns-style-number')).value.trim();
-    const brand = /** @type {HTMLInputElement} */ (document.getElementById('ns-brand')).value.trim();
-    const productName = /** @type {HTMLInputElement} */ (document.getElementById('ns-product-name')).value.trim();
-    const category = /** @type {HTMLInputElement} */ (document.getElementById('ns-category')).value;
-    const sellPrice = parseFloat(/** @type {HTMLInputElement} */ (document.getElementById('ns-sell-price')).value) || 0;
-    const blankCost = parseFloat(/** @type {HTMLInputElement} */ (document.getElementById('ns-blank-cost')).value) || 0;
-    const pricingMode = /** @type {HTMLSelectElement} */ (document.getElementById('ns-pricing-mode')).value;
-    const vendorCode = readNsVendorCode();
-    const defaultColors = /** @type {HTMLInputElement} */ (document.getElementById('ns-default-colors')).value.trim();
-    const availableSizes = /** @type {HTMLInputElement} */ (document.getElementById('ns-available-sizes')).value.trim();
-    const isCostPlus = pricingMode === 'Margin';
-
-    // Validate required fields
-    if (!brand) {
-        showToast('Brand is required', 'error');
-        document.getElementById('ns-brand').focus();
-        return;
-    }
-    if (!productName) {
-        showToast('Product Name is required', 'error');
-        document.getElementById('ns-product-name').focus();
-        return;
-    }
-    if (isCostPlus && blankCost <= 0) {
-        showToast('Blank cost is required — it is what the price is built from', 'error');
-        document.getElementById('ns-blank-cost').focus();
-        return;
-    }
-    if (!isCostPlus && sellPrice <= 0) {
-        showToast('Sell Price is required — cannot save a $0 product', 'error');
-        document.getElementById('ns-sell-price').focus();
-        return;
-    }
-
-    const saveBtn = /** @type {HTMLInputElement|null} */ (document.getElementById('btn-save-nonsanmar'));
-    saveBtn.disabled = true;
-    saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-
-    try {
-        // Write the CANONICAL PricingMethod spellings ('Margin' | 'FixedPrice') — the
-        // same two the staff Product Manager writes. Readers stay tolerant of the legacy
-        // 'FIXED' rows (resolveNonSanmarPricingMode), but nothing new should add to the
-        // drift. Only the mode's own money field is sent; the other is 0.
-        const payload = {
-            StyleNumber: styleNumber,
-            Brand: brand,
-            ProductName: productName,
-            Category: category,
-            DefaultCost: isCostPlus ? blankCost : 0,
-            DefaultSellPrice: isCostPlus ? 0 : sellPrice,
-            DefaultColors: defaultColors,
-            AvailableSizes: availableSizes,
-            VendorCode: vendorCode,
-            PricingMethod: isCostPlus ? 'Margin' : 'FixedPrice',
-            IsActive: true
-        };
-
-        const response = await fetch(`${API_BASE}/api/non-sanmar-products`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-
-        if (!response.ok) {
-            const errData = await response.json().catch(() => ({}));
-            throw new Error(errData.error || `Save failed (${response.status})`);
-        }
-
-        // eslint-disable-next-line no-unused-vars -- pre-existing write-only local (verbatim move)
-        const result = await response.json();
-        showToast(`${styleNumber} saved to database`, 'success');
-
-        // Close modal
-        closeAddNonSanmarModal();
-
-        // Re-populate the row with the saved product data
-        const row = document.getElementById(`row-${rowId}`);
-        if (row) {
-            populateNonSanmarRow(row, rowId, payload);
-
-            // If we have import data, re-apply color and sizes
-            const importData = row.dataset.importData ? JSON.parse(row.dataset.importData) : null;
-            if (importData) {
-                await reImportNonSanmarRow(row, rowId, importData);
-            }
-        }
-
-        recalculatePricing();
-
-    } catch (error) {
-        console.error('[saveNonSanmarProduct] Error:', error);
-        showToast('Failed to save: ' + error.message, 'error');
-    } finally {
-        /** @type {HTMLInputElement} */ (saveBtn).disabled = false;
-        saveBtn.innerHTML = '<i class="fas fa-save"></i> Save & Apply';
-    }
 }
 
 /**

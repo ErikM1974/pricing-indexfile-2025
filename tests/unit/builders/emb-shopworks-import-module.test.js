@@ -11,25 +11,34 @@ const fs = require('fs');
 const path = require('path');
 const esbuild = require('esbuild');
 
+// The Add-Product modal and its 8 helpers were DELETED 2026-08-15 along with their
+// bridges: an unknown style is now typed straight onto the line (stampManualItem in
+// product-rows.js) instead of being registered in Non_SanMar_Products first. What
+// remains here is the paste-from-ShopWorks import flow only.
 const BRIDGED = [
     'openShopWorksImportModal',
     'closeShopWorksImportModal',
-    'showAddNonSanmarModal',
-    'closeAddNonSanmarModal',
-    'toggleNsMoreOptions',
-    'validateNsModalFields',
-    'saveNonSanmarProduct',
     'parseAndPreviewShopWorks',
     'confirmShopWorksImport',
     'dismissImportBanner',
     'scrollToProductRow',
 ];
 
-// Batch 3.3 bridge diet (2026-07-09): these are still EXPORTED (siblings import
-// them) but their window bridges were DELETED — no classic/HTML/test consumer.
-// Two-way lock: they must stay exported AND stay off the window surface.
-const DIET_UNBRIDGED = [
+// Batch 3.3 bridge diet (2026-07-09): exports whose window bridges were deleted —
+// no classic/HTML/test consumer. Two-way lock: exported AND off the window surface.
+// Emptied 2026-08-15 when showAddNonSanmarModal (its only member) was removed.
+const DIET_UNBRIDGED = [];
+
+// Regression lock for the deletion: these must NOT come back as exports. Re-adding
+// a register-first path would put the friction back that this removed.
+const DELETED_MODAL_API = [
     'showAddNonSanmarModal',
+    'closeAddNonSanmarModal',
+    'toggleNsMoreOptions',
+    'validateNsModalFields',
+    'onNsVendorChange',
+    'onNsPricingModeChange',
+    'saveNonSanmarProduct',
 ];
 
 function loadModule() {
@@ -65,5 +74,19 @@ describe('builders/emb/shopworks-import.js', () => {
         );
         for (const name of BRIDGED.filter((n) => !DIET_UNBRIDGED.includes(n))) expect(indexSrc).toContain(`window.${name} = ${name};`);
         for (const name of DIET_UNBRIDGED) expect(indexSrc).not.toContain(`window.${name} = ${name};`);
+    });
+
+    test('the deleted Add-Product modal API stays deleted', () => {
+        // Reintroducing any of these means an unknown style has to be registered in
+        // Non_SanMar_Products before it can be quoted — the friction removed 2026-08-15.
+        const mod = loadModule();
+        const indexSrc = fs.readFileSync(
+            path.join(__dirname, '../../../shared_components/js/builders/emb/index.js'),
+            'utf8'
+        );
+        for (const name of DELETED_MODAL_API) {
+            expect(mod[name]).toBeUndefined();
+            expect(indexSrc).not.toContain(`window.${name}`);
+        }
     });
 });
