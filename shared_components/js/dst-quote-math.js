@@ -172,7 +172,14 @@
         var fee = 0;
         if (ltm && pieces <= ltm.threshold) {
             for (var j = 0; j < list.length; j++) {
-                var f = Number(ltm.feeFor(list[j].product)) || 0;
+                // feeFor receives the QUANTITY as well as the product (2026-08-15) so a
+                // product whose own small-batch band is narrower than the order-level
+                // `threshold` can decline the fee. Full back bands at 1-7 while contract
+                // garments band at 1-23; without this a 12-pc full back was charged here
+                // and not in the quote builder — the same job, two answers.
+                // `ltm.threshold` stays the OUTER bound (the widest band); each product
+                // self-gates inside it. Callers that ignore the 2nd arg are unaffected.
+                var f = Number(ltm.feeFor(list[j].product, pieces)) || 0;
                 if (f > fee) fee = f;           // highest applicable, charged once
             }
         }

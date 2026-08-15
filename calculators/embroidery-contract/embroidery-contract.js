@@ -406,7 +406,10 @@
         // ALL-IN price (base + LTM÷qty), not the base. Matches the hero exactly
         // — that cell IS the rep's quote. Other cells stay base as the rate
         // card. Pre-compute LTM details once so we don't redo the math per cell.
-        var ltmThreshold = pricing ? pricing.ltmThreshold : 23;
+        // Both the band and the fee are product-specific: full back bands at the DECG-FB
+        // ladder's own tier (1-7), contract garments/caps at 1-23. Using the global 23 for
+        // full back charged a 12-pc job here that the quote builder charges nothing for.
+        var ltmThreshold = ltmThresholdForProduct(state.tableProduct);
         var ltmFeeBase = ltmFeeForProduct(state.tableProduct);
 
         // Build body rows
@@ -419,8 +422,6 @@
             TIER_ORDER.forEach(function (tier, ci) {
                 var stitchesK = stitches / 1000;
                 var price = stitchesK * rates[tier];
-                if (state.tableProduct === 'fullback') {
-                }
                 // Intersection cell ALL-IN swap — only when the rep is
                 // actually quoting this product. Reps browsing OTHER tabs see
                 // base rates in the intersection cell (LTM rollin would be
@@ -655,13 +656,35 @@
         return { priced: priced, combo: combo };
     }
 
-    /** LTM band for a product. Full back carries its own higher fee. */
-    function ltmFeeForProduct(product) {
-        // Full back's fee comes from the ONE shared ladder (Embroidery_Costs DECG-FB,
-        // column LTM) like every other surface. It used to be a hardcoded 100 here while
-        // the reference page showed 50 and the quote builder charged 0. (2026-08-15)
-        if (product === 'fullback') return (pricing && pricing.fullBack && pricing.fullBack.ltmFee) || 0;
+    /**
+     * Small-batch fee for a product at this order quantity.
+     *
+     * Full back's fee AND its band both come from the ONE shared ladder
+     * (Embroidery_Costs DECG-FB — the fee is column `LTM` on the 1-7 row, so that tier
+     * is also the band). Unifying only the amount was not enough: contract garments band
+     * at 1-23, so a 12-piece full back was charged $50 here and $0 in the quote builder.
+     * Same job, two answers. Now both surfaces gate full back at the ladder's own band.
+     * (2026-08-15; the fee used to be a hardcoded 100 here while the reference page showed
+     * 50 and the builder charged 0 — all three live at once.)
+     */
+    function ltmFeeForProduct(product, qty) {
+        if (product === 'fullback') {
+            var fb = (pricing && pricing.fullBack) || {};
+            var band = ltmThresholdForProduct('fullback');
+            // qty omitted (matrix header asks "what IS the fee") → don't gate.
+            if (band > 0 && Number(qty) > band) return 0;
+            return Number(fb.ltmFee) || 0;
+        }
         return pricing ? pricing.ltmFee : 50;
+    }
+
+    /** Small-batch BAND for a product — see ltmFeeForProduct for why they differ. */
+    function ltmThresholdForProduct(product) {
+        if (product === 'fullback') {
+            var band = pricing && pricing.fullBack && Number(pricing.fullBack.ltmThreshold);
+            if (band > 0) return band;
+        }
+        return pricing ? pricing.ltmThreshold : 23;
     }
 
     /* =====================================================

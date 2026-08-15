@@ -23,6 +23,7 @@ const ENTRIES = {
     'dtf-quote-builder-class.cjs': 'shared_components/js/builders/dtf/quote-builder-class.js',
     'scp-persistence.cjs': 'shared_components/js/builders/scp/persistence.js',
     'emb-persistence.cjs': 'shared_components/js/builders/emb/persistence.js',
+    'emb-pricing-sync.cjs': 'shared_components/js/builders/emb/pricing-sync.js',
 };
 
 module.exports = async function globalSetup() {
