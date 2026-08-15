@@ -1,3 +1,8 @@
+## v2026.08.15.4 (2026.08.15)
+
+- Manual items: ask for the vendor in the description; record OnSite's transform
+- Deploy v2026.08.15.4: 1 files (embroidery-quote-builder.html)
+
 ## v2026.08.15.3 (2026.08.15)
 
 - Delete the Add-Product modal — manual entry replaced it
