@@ -1,3 +1,10 @@
+## v2026.08.15.1 (2026.08.15)
+
+- Quote vendor garments off blank cost; describe customer-supplied goods
+- Full back: one price ladder for every surface (app side)
+- Full back: unify the small-batch BAND, and cover the fee row
+- Deploy v2026.08.15.1: 14 files (index.html,index.html,index.html...)
+
 ## v2026.08.14.1 (2026.08.14)
 
 - Memory: record the unfixed contacts-sync waste before it is forgotten
