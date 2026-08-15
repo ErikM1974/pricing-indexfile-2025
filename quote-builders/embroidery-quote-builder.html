@@ -30,7 +30,7 @@
     <link rel="stylesheet" href="/shared_components/css/quote-builder-guided.css?v=2026.07.08.12">
 
     <!-- Embroidery Quote Builder Styles (overrides common + shell) -->
-    <link rel="stylesheet" href="/shared_components/css/embroidery-quote-builder-extracted.css?v=2026.08.15.1">
+    <link rel="stylesheet" href="/shared_components/css/embroidery-quote-builder-extracted.css?v=2026.08.15.3">
 
     <!-- Shared Color Picker Component -->
     <link rel="stylesheet" href="/shared_components/css/color-picker-shared.css?v=2026.07.07.7">
@@ -1197,94 +1197,6 @@ Company:Absher Construction Company
     </div>
 
     <!-- DECG Stitch Count + Service Pricing Review modal styles moved to embroidery-quote-builder-extracted.css (2026-03-23) -->
-
-    <!-- Add Non-SanMar Product Modal -->
-    <div class="shopworks-import-modal" id="add-nonsanmar-modal" role="dialog" aria-modal="true" aria-labelledby="add-nonsanmar-modal-title">
-        <div class="shopworks-import-content" style="max-width: 520px;">
-            <div class="shopworks-import-header" style="background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);">
-                <h3 id="add-nonsanmar-modal-title"><i class="fas fa-plus-circle"></i> Add Non-SanMar Product</h3>
-                <button class="shopworks-import-close" onclick="closeAddNonSanmarModal()" aria-label="Close">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="shopworks-import-body">
-                <p class="shopworks-import-hint">
-                    <i class="fas fa-info-circle"></i>
-                    This product is not in the SanMar database. Add it for future use.
-                </p>
-                <input type="hidden" id="ns-modal-row-id" value="">
-                <div class="ns-form-grid">
-                    <div class="ns-form-group ns-full-width">
-                        <label>Style Number</label>
-                        <input type="text" id="ns-style-number" readonly class="ns-input ns-input-readonly" aria-label="Non-SanMar style number">
-                    </div>
-                    <div class="ns-form-group">
-                        <label>Brand <span class="ns-required">*</span></label>
-                        <input type="text" id="ns-brand" aria-label="Brand" class="ns-input" placeholder="e.g. Under Armour" oninput="validateNsModalFields()">
-                    </div>
-                    <div class="ns-form-group">
-                        <label for="ns-vendor">Vendor</label>
-                        <select id="ns-vendor" class="ns-input" aria-label="Vendor we buy this blank from" onchange="onNsVendorChange()"></select>
-                        <input type="text" id="ns-vendor-other" aria-label="Other vendor code" class="ns-input" maxlength="40" placeholder="Vendor code" hidden>
-                    </div>
-                    <div class="ns-form-group ns-full-width">
-                        <label>Product Name <span class="ns-required">*</span></label>
-                        <input type="text" id="ns-product-name" aria-label="Product name" class="ns-input" placeholder="e.g. Performance Polo" oninput="validateNsModalFields()">
-                    </div>
-                    <div class="ns-form-group">
-                        <label for="ns-pricing-mode">Pricing</label>
-                        <select id="ns-pricing-mode" class="ns-input" aria-label="How to price this product" onchange="onNsPricingModeChange()">
-                            <option value="Margin">Automatic — your cost + our margin + embroidery</option>
-                            <option value="FixedPrice">Fixed decorated price (special cases)</option>
-                        </select>
-                    </div>
-                    <div class="ns-form-group" id="ns-cost-group">
-                        <label for="ns-blank-cost">Blank cost ($) <span class="ns-required">*</span></label>
-                        <input type="number" id="ns-blank-cost" aria-label="Blank cost per piece in dollars" class="ns-input" step="0.01" min="0.01" placeholder="8.42" oninput="validateNsModalFields()">
-                        <small class="ns-field-hint">What we pay per blank piece, before freight. Prices like a SanMar garment.</small>
-                    </div>
-                    <div class="ns-form-group" id="ns-sell-group" hidden>
-                        <label for="ns-sell-price">Sell Price ($) <span class="ns-required">*</span></label>
-                        <input type="number" id="ns-sell-price" aria-label="Sell price in dollars" class="ns-input" step="0.01" min="0.01" placeholder="29.50" oninput="validateNsModalFields()">
-                        <small class="ns-field-hint">The final decorated price per piece — no margin or embroidery is added.</small>
-                    </div>
-                </div>
-                <button type="button" class="ns-more-options-toggle" onclick="toggleNsMoreOptions(this)">
-                    <i class="fas fa-chevron-right"></i> More Options
-                </button>
-                <div class="ns-more-options-section" id="ns-more-options">
-                    <div class="ns-form-group">
-                        <label>Category</label>
-                        <select id="ns-category" class="ns-input" aria-label="Product category">
-                            <option value="">Auto-detect</option>
-                            <option value="Caps">Caps</option>
-                            <option value="T-Shirts">T-Shirts</option>
-                            <option value="Polos/Knits">Polos/Knits</option>
-                            <option value="Fleece">Fleece</option>
-                            <option value="Outerwear">Outerwear</option>
-                            <option value="Woven Shirts">Woven Shirts</option>
-                            <option value="Activewear">Activewear</option>
-                            <option value="Accessories">Accessories</option>
-                        </select>
-                    </div>
-                    <div class="ns-form-group">
-                        <label>Default Colors <small>(comma-separated)</small></label>
-                        <input type="text" id="ns-default-colors" aria-label="Available colors" class="ns-input" placeholder="e.g. Black, White, Navy">
-                    </div>
-                    <div class="ns-form-group ns-full-width">
-                        <label>Available Sizes <small>(comma-separated)</small></label>
-                        <input type="text" id="ns-available-sizes" aria-label="Available sizes" class="ns-input" placeholder="e.g. S,M,L,XL,2XL or OSFA">
-                    </div>
-                </div>
-            </div>
-            <div class="shopworks-import-footer">
-                <button class="btn-cancel-import" onclick="closeAddNonSanmarModal()">Cancel</button>
-                <button class="btn-parse-import" id="btn-save-nonsanmar" onclick="saveNonSanmarProduct()" disabled title="Fill Brand, Product Name, and the blank cost">
-                    <i class="fas fa-save"></i> Save & Apply
-                </button>
-            </div>
-        </div>
-    </div>
 
     <!-- Design Search Modal -->
     <div class="shopworks-import-modal" id="design-search-modal" role="dialog" aria-modal="true" aria-labelledby="design-search-modal-title">
