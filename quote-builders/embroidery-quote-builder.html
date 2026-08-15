@@ -377,6 +377,8 @@
                                         <span style="background:#f0fdf4; padding:2px 8px; border-radius:4px; color:#166534;">2</span> <a href="javascript:void(0)" onclick="openShopWorksImportModal()" style="color:#4f46e5; text-decoration:underline; cursor:pointer;">Paste from ShopWorks</a>
                                         &nbsp;&bull;&nbsp;
                                         <span style="background:#fef3c7; padding:2px 8px; border-radius:4px; color:#92400e;">3</span> Use the <strong>Add to order</strong> bar below for Monogram, Additional Logo, Rush, etc.
+                                        &nbsp;&bull;&nbsp;
+                                        <span style="background:#f5f3ff; padding:2px 8px; border-radius:4px; color:#5b21b6;">4</span> Customer bringing their own garments? Use <a href="javascript:void(0)" onclick="openServiceGroup('Customer-Supplied')" style="color:#4f46e5; text-decoration:underline; cursor:pointer;"><strong>Customer-Supplied</strong></a> in the bar below.
                                     </div>
                                 </td>
                             </tr>
@@ -1221,12 +1223,30 @@ Company:Absher Construction Company
                         <input type="text" id="ns-brand" aria-label="Brand" class="ns-input" placeholder="e.g. Under Armour" oninput="validateNsModalFields()">
                     </div>
                     <div class="ns-form-group">
-                        <label>Sell Price ($) <span class="ns-required">*</span></label>
-                        <input type="number" id="ns-sell-price" aria-label="Sell price in dollars" class="ns-input" step="0.01" min="0.01" placeholder="29.50" oninput="validateNsModalFields()">
+                        <label for="ns-vendor">Vendor</label>
+                        <select id="ns-vendor" class="ns-input" aria-label="Vendor we buy this blank from" onchange="onNsVendorChange()"></select>
+                        <input type="text" id="ns-vendor-other" aria-label="Other vendor code" class="ns-input" maxlength="40" placeholder="Vendor code" hidden>
                     </div>
                     <div class="ns-form-group ns-full-width">
                         <label>Product Name <span class="ns-required">*</span></label>
                         <input type="text" id="ns-product-name" aria-label="Product name" class="ns-input" placeholder="e.g. Performance Polo" oninput="validateNsModalFields()">
+                    </div>
+                    <div class="ns-form-group">
+                        <label for="ns-pricing-mode">Pricing</label>
+                        <select id="ns-pricing-mode" class="ns-input" aria-label="How to price this product" onchange="onNsPricingModeChange()">
+                            <option value="Margin">Automatic — your cost + our margin + embroidery</option>
+                            <option value="FixedPrice">Fixed decorated price (special cases)</option>
+                        </select>
+                    </div>
+                    <div class="ns-form-group" id="ns-cost-group">
+                        <label for="ns-blank-cost">Blank cost ($) <span class="ns-required">*</span></label>
+                        <input type="number" id="ns-blank-cost" aria-label="Blank cost per piece in dollars" class="ns-input" step="0.01" min="0.01" placeholder="8.42" oninput="validateNsModalFields()">
+                        <small class="ns-field-hint">What we pay per blank piece, before freight. Prices like a SanMar garment.</small>
+                    </div>
+                    <div class="ns-form-group" id="ns-sell-group" hidden>
+                        <label for="ns-sell-price">Sell Price ($) <span class="ns-required">*</span></label>
+                        <input type="number" id="ns-sell-price" aria-label="Sell price in dollars" class="ns-input" step="0.01" min="0.01" placeholder="29.50" oninput="validateNsModalFields()">
+                        <small class="ns-field-hint">The final decorated price per piece — no margin or embroidery is added.</small>
                     </div>
                 </div>
                 <button type="button" class="ns-more-options-toggle" onclick="toggleNsMoreOptions(this)">
@@ -1259,7 +1279,7 @@ Company:Absher Construction Company
             </div>
             <div class="shopworks-import-footer">
                 <button class="btn-cancel-import" onclick="closeAddNonSanmarModal()">Cancel</button>
-                <button class="btn-parse-import" id="btn-save-nonsanmar" onclick="saveNonSanmarProduct()" disabled title="Fill Brand, Product Name, and Sell Price">
+                <button class="btn-parse-import" id="btn-save-nonsanmar" onclick="saveNonSanmarProduct()" disabled title="Fill Brand, Product Name, and the blank cost">
                     <i class="fas fa-save"></i> Save & Apply
                 </button>
             </div>

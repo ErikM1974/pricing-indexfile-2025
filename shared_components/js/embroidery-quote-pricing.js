@@ -42,7 +42,14 @@ class EmbroideryPricingCalculator {
         
         // Cache for size pricing data
         this.sizePricingCache = {};
-        
+
+        // Shared Caspio Standard_Size_Upcharges ladder (UPPERCASE size keys), captured
+        // from the EMB pricing bundle's `sellingPriceDisplayAddOns`. Used ONLY by
+        // buildSyntheticSizePricing() for non-SanMar cost-plus garments — SanMar styles
+        // get their own per-style upcharges from /api/size-pricing. Empty until
+        // initializeConfig() runs.
+        this.standardSizeUpcharges = {};
+
         // Additional Logo (AL) tiers - will be fetched from API
         this.alTiers = {};
 
@@ -243,6 +250,15 @@ class EmbroideryPricingCalculator {
                     this.apiStatus.configuration = true;
                 }
                 
+                // Shared size-upcharge ladder (Standard_Size_Upcharges, UPPERCASE keys).
+                // Already in this response — the calculator used to parse tiersR/costs/rules
+                // and throw this away. Feeds buildSyntheticSizePricing() for non-SanMar
+                // cost-plus garments, so extended sizes carry the SAME upcharge a SanMar
+                // garment would. Zero extra API calls, zero hardcoded upcharges.
+                if (data.sellingPriceDisplayAddOns && typeof data.sellingPriceDisplayAddOns === 'object') {
+                    this.standardSizeUpcharges = data.sellingPriceDisplayAddOns;
+                }
+
                 // Extract rounding method
                 if (data.rulesR && data.rulesR.RoundingMethod) {
                     this.roundingMethod = data.rulesR.RoundingMethod;
@@ -712,8 +728,12 @@ class EmbroideryPricingCalculator {
         } else {
         }
 
-        // Fetch size pricing for this cap style
-        const sizePricingData = await this.fetchSizePricing(product.style);
+        // Fetch size pricing for this cap style. A vendor (non-SanMar) cap carries a
+        // rep-entered blank cost instead — synthesize the same payload shape so the
+        // formula below is untouched. See buildSyntheticSizePricing().
+        const sizePricingData = (product.blankCost > 0)
+            ? this.buildSyntheticSizePricing(product)
+            : await this.fetchSizePricing(product.style);
 
         if (!sizePricingData || sizePricingData.length === 0) {
             console.error('[CRITICAL] No size pricing data for cap', product.style);
@@ -997,6 +1017,81 @@ class EmbroideryPricingCalculator {
     }
     
     /**
+     * Build a SanMar-shaped size-pricing payload from a rep-entered BLANK COST.
+     *
+     * /api/size-pricing does not return prices — it returns the raw SanMar CASE_PRICE
+     * (the blank cost) per size plus the shared size-upcharge ladder. The formula in
+     * calculateProductPrice()/calculateCapProductPrice() then does
+     *     cost / marginDenominator + embCost -> roundPrice() -> + sizeUpcharge
+     * So handing that formula this synthesized payload prices a non-SanMar garment
+     * through the IDENTICAL path — tiers, per-tier margin, embroidery cost, upcharges
+     * and LTM all included. One new INPUT SHAPE, no second pricing path (Rule 9).
+     *
+     * Deliberately NOT written into this.sizePricingCache: that cache is keyed by bare
+     * style, is never cleared, and is shared with getProductSizePrices(). A seeded entry
+     * would be a permanent page-lifetime shadow over a real SanMar style — and vendor
+     * styles do drift into SanMar over time. Passing the cost on the product object has
+     * no shared state, so there is nothing to invalidate.
+     *
+     * @param {Object} product - needs { blankCost, isCap, sizeBreakdown, sizeUpchargeOverrides? }
+     * @returns {Array|null} [{styleNumber, color, basePrices, sizeUpcharges}] or null
+     */
+    buildSyntheticSizePricing(product) {
+        const cost = parseFloat(product.blankCost);
+        if (!Number.isFinite(cost) || cost <= 0) return null;
+
+        const basePrices = {};
+        const sizeUpcharges = {};
+
+        // ANCHOR SIZES — do not "clean these up".
+        // The garment path computes each size's upcharge RELATIVE to whichever size it
+        // picked as the base (getting 0 for the base itself); the cap path adds upcharges
+        // ABSOLUTELY. Injecting sizes the base-size search looks at first (S/M/L/XL for
+        // garments, OSFA for caps) — none of which carry an upcharge — pins the base to a
+        // zero-upcharge size, making relative === absolute so neither path needs a branch.
+        // Anchors never emit a line item: the line loop iterates product.sizeBreakdown,
+        // not basePrices. So a big-and-tall product ordered only in 2XL/3XL still gets the
+        // S/M/L/XL anchors, and removing them would silently zero its 2XL upcharge.
+        const anchors = product.isCap ? ['OSFA'] : ['S', 'M', 'L', 'XL'];
+        anchors.forEach(s => { basePrices[s] = cost; });
+        // Every ordered size costs the same blank cost, so all four base-price fallback
+        // ladders in both calculators converge on it whichever one fires.
+        Object.keys(product.sizeBreakdown || {}).forEach(s => {
+            if (!(s in basePrices)) basePrices[s] = cost;
+        });
+
+        const shared = this.standardSizeUpcharges || {};        // Caspio Standard_Size_Upcharges
+        const perStyle = product.sizeUpchargeOverrides || {};   // SizeUpchargeXL/2XL/3XL on the row
+        let missingUpcharge = false;
+        Object.keys(basePrices).forEach(size => {
+            if (anchors.indexOf(size) !== -1) return;
+            const key = String(size).toUpperCase();
+            const override = parseFloat(perStyle[key]);
+            const amount = Number.isFinite(override) && override > 0
+                ? override
+                : (parseFloat(shared[key]) || 0);
+            // Mirror the API, which only emits non-zero upcharge keys.
+            if (amount > 0) sizeUpcharges[size] = amount;
+            else if (!Object.keys(shared).length) missingUpcharge = true;
+        });
+
+        // An empty shared ladder means the pricing bundle came back degraded (Caspio
+        // rate-limiting). Silently pricing a 2XL with no upcharge is the classic silent
+        // wrong price, so flag it into the existing visible-warning machinery.
+        if (missingUpcharge) {
+            this._costFallbackUsed = 'size upcharges (vendor product)';
+            console.error('[EmbroideryPricing] No size-upcharge ladder loaded — extended sizes on vendor products would price without an upcharge.');
+        }
+
+        return [{
+            styleNumber: product.style,
+            color: product.color || '',
+            basePrices: basePrices,
+            sizeUpcharges: sizeUpcharges
+        }];
+    }
+
+    /**
      * Build a pricing result with a fixed sell price (non-SanMar products)
      * Skips margin formula and embroidery cost — the sell price IS the final decorated price
      */
@@ -1058,9 +1153,13 @@ class EmbroideryPricingCalculator {
         // TODO: When API supports different item types, use itemType to get correct cost
         const embCost = this.getEmbroideryCost(tier);
 
-        // Fetch size pricing for this style
-        const sizePricingData = await this.fetchSizePricing(product.style);
-        
+        // Fetch size pricing for this style. A vendor (non-SanMar) garment carries a
+        // rep-entered blank cost instead — synthesize the same payload shape so the
+        // formula below is untouched. See buildSyntheticSizePricing().
+        const sizePricingData = (product.blankCost > 0)
+            ? this.buildSyntheticSizePricing(product)
+            : await this.fetchSizePricing(product.style);
+
         if (!sizePricingData || sizePricingData.length === 0) {
             console.error('[CRITICAL] No size pricing data for', product.style);
             console.error('[CRITICAL] API call failed - system will likely use hardcoded fallback values!');

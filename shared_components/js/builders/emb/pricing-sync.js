@@ -37,6 +37,13 @@ let _decgLtmState = null;        // DECG-LTM row bookkeeping { rowId, sig, waive
 let _embRecalcSeq = 0;           // recalc race-guard sequence (newer run supersedes)
 let _ddFeeMismatchWarned = false; // once-per-page digitizing-fee mismatch warning
 
+/** Read a JSON blob out of a dataset attribute; never throws (a malformed
+ *  attribute must not take the whole recalc down). */
+function parseJsonDataset(raw) {
+    if (!raw) return {};
+    try { return JSON.parse(raw) || {}; } catch (_) { return {}; }
+}
+
 // Debounce utility for input handlers that fire on every keystroke
 export function debounce(fn, delay) {
     let timer;
@@ -690,8 +697,15 @@ function paintRowPrices(pricing, logoConfigs, ltmDisplayMode) {
                             : (standardLineItem.unitPrice || 0);
                         const hasOverride = parseFloat(/** @type {HTMLElement} */ (parentRow).dataset.sellPrice) > 0;
                         const isNsRow = /** @type {HTMLElement} */ (parentRow).dataset.nonSanmar === 'true';
+                        // Gate the pencil on MANUALLY PRICED, not on non-SanMar. A cost-plus
+                        // vendor row came out of the same engine as a SanMar row, so it paints
+                        // like one — a pencil there would imply the number was typed. The rep
+                        // can still override (enablePriceOverride allows non-SanMar rows); that
+                        // sets dataset.sellPrice and lands in the hasOverride branch below,
+                        // which — unlike the old pencil — offers a ✕ to clear it again.
+                        const isCostPlus = /** @type {HTMLElement} */ (parentRow).dataset.nsPricingMode === 'costPlus';
 
-                        if (isNsRow) {
+                        if (isNsRow && !isCostPlus) {
                             // Non-SanMar: pencil icon, no clear button (price override IS the price)
                             priceCell.classList.remove('price-overridden');
                             priceCell.classList.remove('ns-price-zero');
@@ -1061,6 +1075,9 @@ export function collectProductsFromTable() {
                     rowId: rowId,  // Track row for AL price updates
                     imageUrl: /** @type {HTMLElement} */ (row).dataset.imageUrl || '',  // Image URL for quote view display
                     sellPriceOverride: parseFloat(/** @type {HTMLElement} */ (row).dataset.sellPrice) || 0,  // Non-SanMar fixed sell price
+                    blankCost: parseFloat(/** @type {HTMLElement} */ (row).dataset.blankCost) || 0,  // Vendor (non-SanMar) cost-plus: feeds buildSyntheticSizePricing()
+                    sizeUpchargeOverrides: parseJsonDataset(/** @type {HTMLElement} */ (row).dataset.sizeUpchargeOverrides),  // Per-style XL/2XL/3XL upcharges
+                    vendorCode: /** @type {HTMLElement} */ (row).dataset.vendorCode || '',  // Non_SanMar_Products.VendorCode (e.g. 'SSA')
                     sizeOverrides: sizeOverrides,  // Per-size price overrides from child rows (e.g., { '2XL': 27, '3XL': 29 })
                     _swUnitPrice: parseFloat(/** @type {HTMLElement} */ (row).dataset.swUnitPrice) || 0,  // ShopWorks charged price for audit
                     logoAssignments: {

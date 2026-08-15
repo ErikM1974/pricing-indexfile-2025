@@ -669,6 +669,12 @@ export function collectDECGItems() {
                     total: qty * unitPrice,
                     stitchCount: stitchCount,
                     heavyweight: heavyweight,
+                    // What the customer is actually bringing (openCustomerSuppliedDialog).
+                    // description → Quote_Items.ProductName, which already feeds the quote
+                    // viewer AND the ShopWorks line Description. notes → Quote_Items.Notes,
+                    // which becomes the order's 'Notes To Receiving'.
+                    description: /** @type {HTMLElement} */ (row).dataset.csDescription || '',
+                    notes: /** @type {HTMLElement} */ (row).dataset.csNotes || '',
                     rowId: /** @type {HTMLElement} */ (row).dataset.rowId,
                     hasPriceOverride: overridePrice > 0
                 });

@@ -141,8 +141,10 @@
                             <input type="text" id="fColors" placeholder="Black, Navy, White" maxlength="240">
                         </div>
                         <div class="pm-field">
-                            <label for="fVendor">Vendor code</label>
-                            <input type="text" id="fVendor" maxlength="40" placeholder="e.g. JDS">
+                            <label for="fVendorSelect">Vendor</label>
+                            <select id="fVendorSelect"></select>
+                            <input type="text" id="fVendor" maxlength="40" placeholder="Vendor code, e.g. JDS" hidden>
+                            <small>Who we buy the blank from. Pick from the list so vendor reports stay accurate.</small>
                         </div>
                         <div class="pm-field">
                             <label for="fVendorUrl">Vendor URL</label>
@@ -182,6 +184,6 @@
     <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/dash-page-helpers.js"></script>
-    <script src="/dashboards/js/product-manager.js?v=2026.07.06.11"></script>
+    <script src="/dashboards/js/product-manager.js?v=2026.08.14.1"></script>
 </body>
 </html>

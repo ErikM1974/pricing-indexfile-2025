@@ -110,8 +110,20 @@ export function showAddNonSanmarModal(rowId) {
     /** @type {HTMLInputElement} */ (document.getElementById('ns-brand')).value = parsed.brand || importData.brand || '';
     /** @type {HTMLInputElement} */ (document.getElementById('ns-product-name')).value = parsed.name || '';
     /** @type {HTMLInputElement} */ (document.getElementById('ns-category')).value = parsed.category || '';
-    /** @type {HTMLInputElement} */ (document.getElementById('ns-sell-price')).value = importData.unitPrice || '';
     /** @type {HTMLInputElement} */ (document.getElementById('ns-default-colors')).value = parsed.color || importData.color || '';
+
+    // Vendor list + pricing mode. A ShopWorks paste carries a charged unit PRICE, not a
+    // blank cost, so an import defaults to FixedPrice (that number is already decorated);
+    // a rep typing a style by hand gets cost-plus, which is the mode we want them in.
+    buildNsVendorOptions();
+    /** @type {HTMLSelectElement} */ (document.getElementById('ns-vendor')).value = '';
+    /** @type {HTMLInputElement} */ (document.getElementById('ns-vendor-other')).value = '';
+    const importedPrice = parseFloat(importData.unitPrice) || 0;
+    /** @type {HTMLSelectElement} */ (document.getElementById('ns-pricing-mode')).value = importedPrice > 0 ? 'FixedPrice' : 'Margin';
+    /** @type {HTMLInputElement} */ (document.getElementById('ns-sell-price')).value = importedPrice > 0 ? String(importedPrice) : '';
+    /** @type {HTMLInputElement} */ (document.getElementById('ns-blank-cost')).value = '';
+    onNsVendorChange();
+    onNsPricingModeChange();
 
     // Auto-fill available sizes based on detected category
     if (parsed.category === 'Caps') {
@@ -154,18 +166,60 @@ export function toggleNsMoreOptions(btn) {
     btn.classList.toggle('expanded', isExpanded);
 }
 
+/** Populate the vendor <select> once, from the shared curated list. */
+function buildNsVendorOptions() {
+    const sel = /** @type {HTMLSelectElement|null} */ (document.getElementById('ns-vendor'));
+    if (!sel || sel.options.length) return;
+    const list = (typeof window !== 'undefined' && window.NON_SANMAR_VENDORS) || [];
+    const opt = (label, value) => {
+        const o = document.createElement('option');
+        o.value = value;
+        o.textContent = label;   // textContent — vendor labels are never markup
+        return o;
+    };
+    sel.appendChild(opt('— not set —', ''));
+    list.forEach(v => sel.appendChild(opt(v.label, v.code)));
+    sel.appendChild(opt('Other…', '__other'));
+}
+
+/** Reveal the free-text vendor box only for the Other… escape. */
+export function onNsVendorChange() {
+    const sel = /** @type {HTMLSelectElement} */ (document.getElementById('ns-vendor'));
+    /** @type {HTMLInputElement} */ (document.getElementById('ns-vendor-other')).hidden = sel.value !== '__other';
+}
+
+/** The VendorCode we persist (curated code, or the typed one-off, upper-cased). */
+function readNsVendorCode() {
+    const sel = /** @type {HTMLSelectElement} */ (document.getElementById('ns-vendor')).value;
+    if (sel === '__other') {
+        return /** @type {HTMLInputElement} */ (document.getElementById('ns-vendor-other')).value.trim().toUpperCase();
+    }
+    return sel;
+}
+
+/** Show exactly one money field — the two numbers mean very different things. */
+export function onNsPricingModeChange() {
+    const mode = /** @type {HTMLSelectElement} */ (document.getElementById('ns-pricing-mode')).value;
+    document.getElementById('ns-cost-group').hidden = mode !== 'Margin';
+    document.getElementById('ns-sell-group').hidden = mode !== 'FixedPrice';
+    validateNsModalFields();
+}
+
 /**
- * Live validation for the 3 required fields in the Non-SanMar modal.
- * Enables/disables the Save button.
+ * Live validation for the required fields in the Non-SanMar modal.
+ * The money field that must be filled depends on the pricing mode.
  */
 export function validateNsModalFields() {
     const brand = /** @type {HTMLInputElement} */ (document.getElementById('ns-brand')).value.trim();
     const name = /** @type {HTMLInputElement} */ (document.getElementById('ns-product-name')).value.trim();
-    const price = parseFloat(/** @type {HTMLInputElement} */ (document.getElementById('ns-sell-price')).value);
+    const mode = /** @type {HTMLSelectElement} */ (document.getElementById('ns-pricing-mode')).value;
+    const moneyId = mode === 'Margin' ? 'ns-blank-cost' : 'ns-sell-price';
+    const money = parseFloat(/** @type {HTMLInputElement} */ (document.getElementById(moneyId)).value);
     const saveBtn = /** @type {HTMLInputElement|null} */ (document.getElementById('btn-save-nonsanmar'));
-    const isValid = brand && name && price > 0;
+    const isValid = brand && name && money > 0;
     saveBtn.disabled = !isValid;
-    saveBtn.title = isValid ? '' : 'Fill Brand, Product Name, and Sell Price';
+    saveBtn.title = isValid ? ''
+        : `Fill Brand, Product Name, and ${mode === 'Margin' ? 'the blank cost' : 'the sell price'}`;
 }
 
 /**
@@ -261,8 +315,12 @@ export async function saveNonSanmarProduct() {
     const productName = /** @type {HTMLInputElement} */ (document.getElementById('ns-product-name')).value.trim();
     const category = /** @type {HTMLInputElement} */ (document.getElementById('ns-category')).value;
     const sellPrice = parseFloat(/** @type {HTMLInputElement} */ (document.getElementById('ns-sell-price')).value) || 0;
+    const blankCost = parseFloat(/** @type {HTMLInputElement} */ (document.getElementById('ns-blank-cost')).value) || 0;
+    const pricingMode = /** @type {HTMLSelectElement} */ (document.getElementById('ns-pricing-mode')).value;
+    const vendorCode = readNsVendorCode();
     const defaultColors = /** @type {HTMLInputElement} */ (document.getElementById('ns-default-colors')).value.trim();
     const availableSizes = /** @type {HTMLInputElement} */ (document.getElementById('ns-available-sizes')).value.trim();
+    const isCostPlus = pricingMode === 'Margin';
 
     // Validate required fields
     if (!brand) {
@@ -275,7 +333,12 @@ export async function saveNonSanmarProduct() {
         document.getElementById('ns-product-name').focus();
         return;
     }
-    if (!sellPrice || sellPrice <= 0) {
+    if (isCostPlus && blankCost <= 0) {
+        showToast('Blank cost is required — it is what the price is built from', 'error');
+        document.getElementById('ns-blank-cost').focus();
+        return;
+    }
+    if (!isCostPlus && sellPrice <= 0) {
         showToast('Sell Price is required — cannot save a $0 product', 'error');
         document.getElementById('ns-sell-price').focus();
         return;
@@ -286,15 +349,21 @@ export async function saveNonSanmarProduct() {
     saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
 
     try {
+        // Write the CANONICAL PricingMethod spellings ('Margin' | 'FixedPrice') — the
+        // same two the staff Product Manager writes. Readers stay tolerant of the legacy
+        // 'FIXED' rows (resolveNonSanmarPricingMode), but nothing new should add to the
+        // drift. Only the mode's own money field is sent; the other is 0.
         const payload = {
             StyleNumber: styleNumber,
             Brand: brand,
             ProductName: productName,
             Category: category,
-            DefaultSellPrice: sellPrice,
+            DefaultCost: isCostPlus ? blankCost : 0,
+            DefaultSellPrice: isCostPlus ? 0 : sellPrice,
             DefaultColors: defaultColors,
             AvailableSizes: availableSizes,
-            PricingMethod: 'FIXED',
+            VendorCode: vendorCode,
+            PricingMethod: isCostPlus ? 'Margin' : 'FixedPrice',
             IsActive: true
         };
 

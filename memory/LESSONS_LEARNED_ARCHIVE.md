@@ -4,6 +4,94 @@ Resolved entries aged out of `LESSONS_LEARNED.md` (300-line cap). Newest first. 
 
 ---
 
+## An ungated shell over gated assets tells the user the wrong story (2026-08-11)
+
+**Problem.** Ruth: "I can't see any images, the screen is completely dark." Her mockup detail page
+showed a black overlay reading *"Image could not be loaded — link may have expired"*, a red
+*"Failed to load Box files"*, and an anonymous `IMG` badge — while Ruth's Fields, the notes and the
+slots all rendered perfectly. Nothing was broken and no link had expired: **she was signed out.**
+
+**Root cause.** Two halves of the same page authenticate differently. The record, notes and versions
+load **anonymously** from the proxy (`mockup-detail.js:336-352`), so the page renders fully. Every
+Box asset goes through the app's same-origin forwarders (`server.js:3809-3817`), all `requireStaff`,
+so all of them 401. And `/mockup/:id` (`server.js:5192`) was registered with **no gate at all** —
+unlike `/art-hub-ruth.html` five lines above it — so she was never bounced to SSO. The staff session
+is `cookie-session` with **no `maxAge`** (`server.js:786-792`): it dies when the browser closes, so
+this is reached routinely, not after some long idle. "Expired" was impossible by construction.
+
+**Solution.** `gateStaffDetailPage` on `/mockup/:id` and `/art-request/:designId`, exempting
+`?view=customer` (external approval links carry their own capability token and cannot complete staff
+SSO). Client side, `mockup-detail.js` now branches on the real HTTP status — 401 → "You're signed
+out" + a `/auth/saml/login?next=…` link in both a page banner and the lightbox label; 502/503 →
+"Box service is temporarily unavailable". An `<img>` error carries no status, so the lightbox
+HEAD-probes to recover one. Locked by `tests/unit/detail-page-gate.test.js`.
+
+**Prevention.**
+- 🔑 **If a page's shell and its assets have different auth requirements, the weaker one sets what
+  the user sees.** Anonymous data + gated images = a page that looks healthy and is useless. Gate
+  the shell at the same level as its most-protected dependency, or the failure is silent.
+- 🔴 **Never let an error string assert a cause the code cannot know.** An `<img>` error event has
+  no status, so "link may have expired" was a guess — and it was wrong in the common case, sending
+  the diagnosis toward Box and expiry instead of toward a missing cookie. Probe for the status, or
+  say only what you know.
+- 🔑 **A 401 that renders as a generic broken-file badge is unactionable.** `handleBoxImageError()`
+  branched on 404 only; every other status fell to the same anonymous placeholder. The page had
+  **zero** references to `401`, `loginUrl` or `auth/saml` — nothing to click.
+- 🔑 **"Only one person is affected" can mean "only one person is signed out."** These routes gate on
+  session *presence*, not role, so no registry/allowlist entry could have caused it — which ruled
+  out the whole `Ruthie`-vs-`ruth@` family of causes before any code was read.
+- 🔑 **Verify a suspected auth hole with a CLEAN client.** A browser fetch returned 200 for a Box
+  endpoint while `/api/crm-session/me` said `authenticated:false` — which looked exactly like an
+  anonymous data leak. It was `Cache-Control: private, max-age=300` replaying the earlier
+  authenticated response. `curl` with no cookie returned 401 and killed the false positive.
+- 🔑 **`/api/crm-session/me` is the cheap "are you actually signed in?" test** — 200 either way, safe
+  to paste into the address bar, no redirect. Reach for it before theorising.
+
+---
+
+---
+
+## A new lead source saved fine and stayed invisible — the form-ID vocabulary lives in 12 places (2026-08-10)
+
+**Problem.** A customer's free sample request (`NWCA-SAMPLE-0808-1-480`, Inland Beef Company)
+reached Erik's inbox and nowhere else. Erik: "shouldn't it be in Leads so Taneisha can follow up?"
+
+**Root cause.** The free branch of `/sample-cart.html` pushed a ShopWorks order and fired two
+EmailJS sends — and wrote **no database row at all**. Leads reads exactly one table
+(`Form_Submissions`) filtered to a hard-coded list of lead `Form_ID`s, and the cart called neither
+of that table's writers. The dashboard's "Sample Follow-ups" widget *looks* like the safety net but
+filters on `date_Invoiced`, so it can only show samples already invoiced — a post-sale call
+list, not an inbox. No dashboard surface reads uninvoiced ShopWorks orders at all.
+
+**Solution.** New `sample-request` formId, POSTed from the cart to the already-public
+`POST /api/form-submissions` — which buys AE auto-assign (email match → their rep, else
+Taneisha), the "new lead" email and the Slack card for free. Full site list + fix detail:
+`memory/sample-request-routing.md`.
+
+**Prevention.**
+- 🔑 **The lead form-ID vocabulary is duplicated in 12 places across 2 repos.** Adding a
+  source means updating all of them; miss one and the row saves but stays invisible.
+- 🔴 **A missing map entry becomes a WRONG DEFAULT, not an error.** No `STATUS_CHOICES`
+  entry → the Forms Inbox falls back to `['New','Completed']`, and `Completed` is a **WON**
+  status (`leads-common.js:40,50`) → closing the lead banks a $0 win and drops it from the
+  follow-up digest. Same family as `[]`-is-truthy and `Number(null) === 0`.
+- 🔑 **Derive a filter list from the canonical constant, never re-type it.** `leads.js`
+  built its Source dropdown from a literal that *happened* to equal `LEAD_FORM_IDS` minus
+  `jotform-lead`; the 6th id broke that invariant silently.
+- 🔑 **A payload only "saves" if a renderer knows its shape.** The Inbox renders only
+  `fields`/`checks`/`tables`/`notes` — a bespoke object stores fine and shows a blank modal.
+- 🔴 **`House` is a dropdown DEFAULT, not a rep.** Sending it satisfies the server's
+  "rep already set" check, suppresses auto-assign and leaves the lead owned by nobody — the
+  exact failure the change existed to prevent. Send blank and let the server assign.
+- 🔑 **A content-hashed page serves `dist/`, not your file.** The preview runs
+  `node server.js` (no `prestart`), so the browser executed a stale asset and the new function read
+  as `undefined` — indistinguishable from a scope bug. Run `npm run build`, then confirm the
+  asset HASH changed.
+- ⚠️ 3 of the 4 review defects were on STAFF surfaces the customer path never touches:
+  the customer flow was right on the first pass, the staff rendering was not.
+
+---
+
 ## A sum-based gate passes vacuously on a document that has no sums (2026-08-10)
 
 **Problem.** Erik uploaded the one-page "Available Vacation And Sick Time" report to the payroll

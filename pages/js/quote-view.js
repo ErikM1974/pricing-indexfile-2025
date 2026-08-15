@@ -1667,14 +1667,22 @@ class QuoteViewPage {
             const key = `${item.StyleNumber}-${normalizedColor}`;
 
             if (!groups[key]) {
+                // Vendor (non-SanMar) provenance from LogoSpecs.ns — appended to the
+                // DISPLAY name only, after extractProductName() has already split off the
+                // colour suffix, so the ' - ' split can't mangle it and nothing here
+                // reaches the ShopWorks Description.
+                const vendorCode = this.extractVendorCode(item.LogoSpecs);
+                const vendorName = this.vendorDisplayName(vendorCode);
+                const baseName = this.extractProductName(item.ProductName);
                 groups[key] = {
                     styleNumber: item.StyleNumber,
-                    productName: this.extractProductName(item.ProductName),
+                    productName: vendorName ? `${baseName} (${vendorName})` : baseName,
                     color: item.Color || item.ColorCode || 'N/A', // Keep original for display
                     colorCode: item.ColorCode || item.Color || '', // For image URL construction
                     imageUrl: item.ImageURL,
                     printLocation: item.PrintLocationName || item.PrintLocation,
                     embellishmentType: item.EmbellishmentType,
+                    vendorCode: vendorCode,
                     items: []
                 };
             }
@@ -1717,6 +1725,35 @@ class QuoteViewPage {
         // Remove " - ColorName" suffix if present
         const parts = fullName.split(' - ');
         return parts[0].trim();
+    }
+
+    /**
+     * Pull the vendor code out of an item's LogoSpecs JSON bag.
+     * Never throws — LogoSpecs is free-form and older items have no `ns` block at all.
+     */
+    extractVendorCode(logoSpecs) {
+        if (!logoSpecs) return '';
+        try {
+            const parsed = JSON.parse(logoSpecs);
+            return (parsed && parsed.ns && parsed.ns.v) || '';
+        } catch (e) {
+            return '';
+        }
+    }
+
+    /**
+     * Display name for a vendor code. Self-contained: quote-view is a customer-facing
+     * page and does not load the builder utils bundle where NON_SANMAR_VENDORS lives.
+     * Unknown codes echo back verbatim, so a one-off vendor still reads sensibly.
+     */
+    vendorDisplayName(code) {
+        const c = String(code || '').trim().toUpperCase();
+        if (!c) return '';
+        const NAMES = {
+            SSA: 'S&S Activewear', ALP: 'Alphabroder', CARH: 'Carhartt',
+            RICH: 'Richardson', JDS: 'JDS Industries', AUG: 'Augusta / Holloway'
+        };
+        return NAMES[c] || c;
     }
 
     /**
