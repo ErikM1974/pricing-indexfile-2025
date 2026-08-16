@@ -225,10 +225,6 @@
 
 | File | Purpose |
 |------|---------|
-| `art-invoice-config.js` | Art invoice configuration |
-| `art-invoice-creator.js` | Art invoice creation logic |
-| `art-invoice-utils.js` | Art invoice utilities |
-| `art-invoice-viewer.js` | Art invoice display/view |
 
 ## Services & APIs
 

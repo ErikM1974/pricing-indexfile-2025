@@ -465,6 +465,6 @@ echo "Lift complete. NOTHING has been committed. Verify visually before /deploy.
 
 ## Follow-up tasks (not part of this skill)
 
-1. **Soak the canonical files for a week**, then offer to lift the 8 known violators (`digitized-designs`, `names-numbers-dashboard`, `bundle-orders-dashboard`, `art-invoices-dashboard`, `DrainPro-Bundle`, `staff-login`, `staff-portal-final`, `staff-portal-simple`) one at a time.
+1. **Soak the canonical files for a week**, then offer to lift the 8 known violators (`digitized-designs`, `names-numbers-dashboard`, `bundle-orders-dashboard`, `DrainPro-Bundle`, `staff-login`, `staff-portal-final`, `staff-portal-simple`) one at a time.
 2. **Visual diff harness for `lift`** — auto-`preview_screenshot` before and after so Erik can spot regressions.
 3. **Calculator scaffold variant** — if the pattern works for dashboards, fork into `/calc-page` for `/calculators/*.html`. Different shell (sidebar nav vs no nav, embedded Caspio iframes), different conventions — out of scope for v1.
