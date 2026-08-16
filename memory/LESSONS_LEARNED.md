@@ -5,6 +5,42 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## A regression gate's scenario NAME is not evidence of what it tests (2026-08-16)
+
+**Problem.** `baselines.locked.json` had a scenario called *"EMB-04 — Full Back (DECG-FB
+pricing)"*. Full back was consolidated onto one Caspio source on 2026-08-15, the price moved on
+**every** full-back surface, and all 22 locked scenarios passed unchanged. The gate whose entire
+job is catching price drift sat green through a deliberate, repo-wide price change.
+
+**Root cause.** `capture-pricing-baselines.js` branches on `inputs.location === 'Full Back'` and
+prices it with `calculateDECGPrice(qty, stitches, 'garment')` — the customer-supplied **garment**
+path (base + per-1K stitch upcharge). It has never called a full-back rate. The name said full
+back; the code said DECG garment; nobody diffed the two. EMB-04 also sits at 15K, **below** the
+25,000-stitch full-back minimum, so even a correctly-routed scenario there would have been
+floored and insensitive to the rate.
+
+**Fix.** Renamed EMB-04 to what it actually measures (its number is fine, the label lied) and
+added **EMB-08**: an `isFullBackLadder` flag routing to `calculateALPrice(qty, stitches,
+'fullback')`. 25K @ qty 24 puts both knobs in play — 25,000 is exactly ON the minimum, qty 24 is
+the 24-47 tier ($1.30/1K) clear of the 1-7 fee. Baseline $32.50/pc, $780 line, LTM $0. Its price
+is **decoration-only**, unlike every other EMB scenario, because that's what `calculateALPrice`
+returns for a full back — noted in `SCENARIOS.md` so nobody "fixes" it later by adding a garment.
+
+**Prevention.**
+- 🔴 **A new gate is unproven until you make it fail.** After locking EMB-08 I reverted its
+  values to the old flat $1.25/1K and confirmed it failed (+$1.25/pc, +$30/line), then restored.
+  A green test proves nothing about a test that *cannot* go red.
+- 🔴 **Re-lock surgically, never `cp captured.json locked.json`.** The documented re-lock step in
+  `pricing-baselines.test.js` is a wholesale copy, which re-blesses all 23 scenarios against
+  whatever Caspio holds today — any unrelated live drift gets silently adopted as the new truth.
+  Insert only the changed keys and leave the rest with their original provenance.
+- 🔑 **When a price change lands and the pricing gate does NOT move, that is the alarm.** Ask
+  which scenario should have caught it and go read its runner — don't take the green as proof.
+- 🔑 Same trap wherever a fixture is named after an intent instead of a code path. Check the
+  runner, not the label.
+
+---
+
 ## OnSite keeps an unknown PartNumber and throws every tax field away (2026-08-15)
 
 **Problem.** Vendor garments (S&S et al.) push whatever style the rep typed as `PartNumber`.
@@ -202,59 +238,3 @@ behaviour; typed note = the other party actually gets it.
   removes them; `statusUpdateInProgress` masks the duplicate status write but **the
   file-upload branch is unguarded, so a re-opened revise modal uploads twice.** Not fixed.
   New modals here use `.onclick =`, which is idempotent.
-
----
-
-## `table-layout: fixed` reads widths from the FIRST ROW, not from your `<th>` classes (2026-08-13)
-
-**Problem.** The new per-rep Past Due print sheets came out with all 8 columns an identical
-90 px despite explicit per-column width classes on the `<th>`. Customer names wrapped to two
-lines, which nearly doubled sheet height (Nika: 9.7 in of a 10 in page for 23 rows).
-
-**Root cause.** Under `table-layout: fixed` the browser derives every column width from the
-**first row of the table** and ignores later rows. The first row here was the repeating rep
-banner — `<tr><th colspan="8">` — which expresses no per-column width, so the engine fell back
-to equal division. The width classes on the third row were never consulted.
-
-**Solution.** Move the widths onto a `<colgroup>` / `<col>` set. `<colgroup>` outranks all rows
-under fixed layout, so it works regardless of what the first row looks like.
-
-**Prevention.**
-- 🔑 **`table-layout: fixed` + any `colspan` in the first row ⇒ you MUST use `<colgroup>`.** This
-  is the normal shape for a print table, because the repeating `<thead>` banner that carries the
-  rep/customer name onto spilled pages is itself a full-width `colspan` row.
-- 🔑 **A repeating identity row belongs in `<thead>`, not in an `<h*>` above the table.** Only
-  `thead { display: table-header-group }` reprints on the next physical page. The old printout
-  put the rep name in an `<h3>`, which is exactly why page 3 of Erik's 8/13 PDF was an orphan
-  list belonging to nobody.
-- 🔑 **Verify print layout by MEASURING, not by eyeballing.** `getBoundingClientRect()` per cell
-  plus `Range.getClientRects().length` for line count found this in one pass; the rendered page
-  looked plausible. Careful: an inline-block (the days-late badge) reports 2 rects without
-  wrapping, so line-count alone false-positives.
-- 🔴 **Harness trap:** the sheet's typography is scoped to `#pdo-print-sheet`. Cloning its
-  *innerHTML* into a differently-id'd preview div silently drops every rule and renders at
-  browser-default 16 px — the first measurements were 2× too tall and entirely fictional. Move
-  the real node, or reuse the real id.
-
-### The print-isolation rule also hides disclosures that used to print
-
-Shipping this, a pre-deploy review caught what the isolation rule
-`body.pdo-printing > *:not(#pdo-print-sheet) { display: none }` costs. The OLD printout
-carried "30-day window · 475 orders scanned" because `#pdo-asof` sits in `<main>`, not in the
-hidden `.dash-header-right`. Hiding the whole shell removed it — so a 30-day sheet read as a
-rep's *complete* past-due list while silently omitting the oldest orders, the ones most needing
-action. Fixed by stamping the window + print time on every rep sheet.
-
-- 🔑 **When you replace a whole-page print with an isolated sheet, diff what the old print
-  DISCLOSED, not just how it looked.** Scope/as-of/provenance lines are the easiest to lose and
-  the most expensive to lose, because the artifact leaves the building and states a count.
-- 🔑 **A handout needs a freshness gate, not just a data gate.** `!lastData` is not enough:
-  the page is opened at 7:40 and printed at 8:05, and a 25-minute-old list still prints
-  *today's* date, so nothing on paper reveals its age. Re-pull past a bound (120 s here) and
-  ABORT the print if the re-pull fails — same call `sanmar-inbound-today.js:syncBeforeOutput`
-  makes. Riding the upstream cache keeps it ~free on Caspio quota.
-- 🔑 **Scoping every print rule to a class the button sets regresses Ctrl+P**, which then falls
-  back to the raw board. Handle `beforeprint` so a keyboard print builds the same sheet, and
-  keep a `body:not(.printing)` fallback for when there is no data to build from.
-
----
