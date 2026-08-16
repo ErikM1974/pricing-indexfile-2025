@@ -1,9 +1,9 @@
 {
   "_meta": {
-    "capturedAt": "2026-08-05T15:17:16.461Z",
+    "capturedAt": "2026-08-16T23:31:20.955Z",
     "capturedBy": "scripts/capture-pricing-baselines.js",
-    "scenarios": 22,
-    "successful": 22,
+    "scenarios": 23,
+    "successful": 23,
     "stubs": 0,
     "errors": 0,
     "errorList": []
@@ -349,7 +349,7 @@
   },
   "EMB-04": {
     "builder": "EMB",
-    "description": "Full Back 15K (DECG path)",
+    "description": "Customer-supplied garment 15K (DECG stitch upcharge)",
     "inputs": {
       "style": "PC54",
       "color": "Black",
@@ -492,6 +492,49 @@
       "lineSubtotal": 500,
       "grandTotalBeforeTax": 500,
       "_path": "PRIMARY"
+    }
+  },
+  "EMB-08": {
+    "builder": "EMB",
+    "description": "Full Back 25K decoration (DECG-FB rate ladder)",
+    "inputs": {
+      "style": "PC54",
+      "color": "Black",
+      "qty": 24,
+      "location": "Full Back",
+      "stitches": 25000,
+      "isFullBackLadder": true,
+      "sizes": {
+        "M": 8,
+        "L": 8,
+        "XL": 8
+      }
+    },
+    "expected": {
+      "tier": "24-47",
+      "ltmFee": 0,
+      "stitchCount": 25000,
+      "ratePerThousand": 1.3,
+      "perSizeBreakdown": {
+        "M": {
+          "qty": 8,
+          "perPiece": 32.5,
+          "sizeTotal": 260
+        },
+        "L": {
+          "qty": 8,
+          "perPiece": 32.5,
+          "sizeTotal": 260
+        },
+        "XL": {
+          "qty": 8,
+          "perPiece": 32.5,
+          "sizeTotal": 260
+        }
+      },
+      "lineSubtotal": 780,
+      "grandTotalBeforeTax": 780,
+      "_path": "DECG-FB-ladder"
     }
   },
   "DTF-01": {

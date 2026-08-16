@@ -27,7 +27,7 @@ Style PC54 is the canonical NWCA t-shirt. Locations: LC = Left Chest, FB = Full 
 
 ---
 
-## EMB (Embroidery) Quote Builder — 7 scenarios
+## EMB (Embroidery) Quote Builder — 8 scenarios
 
 Stitch tiers: <=10k Standard, >10k-15k +per-1K surcharge. LTM threshold qty<=7.
 AS-Garm = Additional Stitches garment (per-1K stitch surcharge).
@@ -38,10 +38,31 @@ AL = Additional Logo (per-piece additional logo location).
 | EMB-01 | Small standard garment | PC54 | Navy | 24 | Left Chest | 8,000 |
 | EMB-02 | LTM edge (qty<=7) | PC54 | Black | 7 | Left Chest | 8,000 |
 | EMB-03 | Primary + AL right sleeve | PC54 | Athletic Heather | 48 | LC + RS | 8K LC + 5K RS |
-| EMB-04 | Full Back (DECG-FB pricing) | PC54 | Black | 24 | Full Back | 15,000 |
+| EMB-04 | Customer-supplied garment, DECG stitch upcharge | PC54 | Black | 24 | Full Back | 15,000 |
 | EMB-05 | Cap-only (AS-CAP separate tier) | C112 | Navy | 24 | Cap Front | 8,000 |
 | EMB-06 | Beanie (flat headwear distinction) | CP90 | Black | 24 | Beanie Front | 5,000 |
 | EMB-07 | Extended sizes 2XL/3XL upcharge | PC54 | Black | 24 | LC | 8K (sizes: M:8 XL:8 2XL:4 3XL:4) |
+| EMB-08 | **Full Back decoration — DECG-FB rate ladder** | PC54 | Black | 24 | Full Back | 25,000 |
+
+> ⚠️ **EMB-04 was called "Full Back (DECG-FB pricing)" until 2026-08-16 and never was.**
+> The harness prices it via `calculateDECGPrice(qty, stitches, 'garment')` — the
+> customer-supplied *garment* path (base + per-1K stitch upcharge). It has never read a
+> full-back rate. Renamed rather than re-pointed: the number it locks is worth keeping.
+>
+> **EMB-08 is the only scenario that touches the full-back ladder**
+> (`Embroidery_Costs` `ItemType='DECG-FB'`). It routes through
+> `calculateALPrice(qty, stitches, 'fullback')` via the `isFullBackLadder` input flag, and
+> unlike every other EMB scenario its price is **decoration-only** (no garment) because
+> that is what `calculateALPrice` returns for a full back.
+>
+> Why 25K @ qty 24: 25,000 sits exactly *on* the stitch minimum and qty 24 lands in the
+> 24-47 tier ($1.30/1K) clear of the 1-7 small-batch fee, so a change to **either** the
+> rate or the floor moves the captured number. Baseline: **$32.50/pc, $780 line, LTM $0**.
+>
+> This gate existed before the 2026-08-15 full-back consolidation and all 22 scenarios
+> passed it unchanged while every full-back surface's price moved — verified 2026-08-16 by
+> reverting EMB-08's locked values to the old flat $1.25/1K and confirming it now fails
+> (+$1.25/pc, +$30/line). Before EMB-08 there was nothing to fail.
 
 ---
 
@@ -74,7 +95,7 @@ Color counts × locations drive the screen charges. Dark garments add flash char
 
 ---
 
-## Total: 22 scenarios across 4 builders
+## Total: 23 scenarios across 4 builders
 
 **Capture format** (`baselines.json`):
 ```json
