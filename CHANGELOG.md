@@ -1,3 +1,7 @@
+## v2026.08.16.2 (2026.08.16)
+
+- Delete cart-ui.js — the last consumer of the pricing-matrix API
+
 ## v2026.08.16.1 (2026.08.16)
 
 - Remove the art-invoice pages — superseded by per-request invoicing
