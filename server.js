@@ -5300,17 +5300,12 @@ app.get('/wcttr-bundle.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'employee-bundles', 'wcttr-bundle.html'));
 });
 
-app.get('/art-invoices-dashboard.html', gateStaffPage, (req, res) => {
-  res.sendFile(path.join(__dirname, 'dashboards', 'art-invoices-dashboard.html'));
-});
-
-app.get('/art-invoice-view.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dashboards', 'art-invoice-view.html'));
-});
-
-app.get('/art-invoice-unified-dashboard.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'art-invoice-unified-dashboard.html'));
-});
+// Art-invoice pages REMOVED 2026-08-16. Art invoicing moved onto the art request
+// itself (ArtRequests.Amount_Art_Billed / Invoiced / Invoiced_Date), which the art
+// hub and request-detail pages read; the separate Art_Invoices Caspio table was
+// deleted, so /api/art-invoices had been 500ing and these pages could not load data.
+// The third route here served art-invoice-unified-dashboard.html, a file that does
+// not exist in the repo at all — it had been returning an error for an unknown time.
 
 // Removed duplicate route - webstore-info.html is now served from /pages/ directory (see line 328)
 

@@ -131,15 +131,6 @@ const CRITICAL_PATHS = {
         { type: 'element', selector: '#stripe-creator', name: 'Stripe creator form' },
         { type: 'console', maxErrors: 0, name: 'No console errors' }
       ]
-    },
-    {
-      name: 'Art Invoice Creator',
-      path: '/calculators/art-invoice-creator.html',
-      dependencies: ['art-invoice-service-v2.js'],
-      tests: [
-        { type: 'element', selector: '#invoice-form', name: 'Invoice form' },
-        { type: 'console', maxErrors: 0, name: 'No console errors' }
-      ]
     }
   ],
   'Dashboards': [
@@ -158,15 +149,6 @@ const CRITICAL_PATHS = {
       dependencies: [],
       tests: [
         { type: 'element', selector: '#ae-dashboard', name: 'AE dashboard' },
-        { type: 'console', maxErrors: 0, name: 'No console errors' }
-      ]
-    },
-    {
-      name: 'Art Invoices Dashboard',
-      path: '/dashboards/art-invoices-dashboard.html',
-      dependencies: [],
-      tests: [
-        { type: 'element', selector: '#invoices-dashboard', name: 'Invoices dashboard' },
         { type: 'console', maxErrors: 0, name: 'No console errors' }
       ]
     }

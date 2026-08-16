@@ -630,9 +630,6 @@
 | `/calculators/safety-stripe-creator.html` | Safety stripes creator (drag-drop config builder) | safety-stripe-calculator.js, safety-stripe-creator-service.js | ✅ Active |
 | `/calculators/safety-stripe-calculator.js` | Safety stripes pricing logic | screenprint-pricing-service.js | ✅ Active |
 | `/calculators/safety-stripe-creator-service.js` | Safety stripes quote save/email service | base-quote-service.js, EmailJS | ✅ Active |
-| `/calculators/art-invoice-creator.html` | Art invoices | art-invoice-service-v2.js | ✅ Active |
-| `/calculators/art-invoice-service-v2.js` | Art invoice creation/save/email service (v2) | Caspio API, EmailJS | ✅ Active |
-| `/calculators/art-invoice-emailjs-template.html` | EmailJS HTML template for art invoices | EmailJS service | ✅ Active |
 | `/calculators/embroidery-manual-service.js` | Embroidery manual pricing service (used by unified manual calculator) | embroidery-pricing-service.js | ✅ Active |
 | `/calculators/leatherette-patch-quote-service.js` | Leatherette patch (PATCH) quote save service | base-quote-service.js | ✅ Active |
 
@@ -908,10 +905,6 @@
 ### Art Invoice System
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/shared_components/js/art-invoice-config.js` | Art invoice business constants (tiers, defaults) | — | ✅ Active |
-| `/shared_components/js/art-invoice-creator.js` | Art invoice creator UI controller | art-invoice-config.js, EmailJS | ✅ Active |
-| `/shared_components/js/art-invoice-utils.js` | Shared art invoice utility functions | — | ✅ Active |
-| `/shared_components/js/art-invoice-viewer.js` | Art invoice viewer / PDF rendering | jsPDF | ✅ Active |
 
 ### Art Hub Extended
 | File | Purpose | Dependencies | Status |
@@ -1140,8 +1133,6 @@
 | `/shared_components/css/dtg-quote-page.css` | **NEW (2026-05-17)** DTG quote-builder overrides — loads ON TOP of sticker-pricing-page.css. Adds: deep-green `.dtg-quote-card` for the live price card, `.top-seller-card` recommendation cards (rendered inline in chat by the recommend_top_sellers tool), `.shopworks-success-card`, `.shopworks-error-card`. | sticker-pricing-page.css, /quote-builders/dtg-quote-builder.html | ✅ Active |
 | `/shared_components/css/dtg-inline-form.css` | **NEW (2026-05-18)** Inline DTG order form styles — NWCA-green, replaces the iframed legacy Bootstrap form. Adds `.dtg-form-wrap` (paper card), `.dtg-location-pill` (front/back imprint chooser), `.dtg-rows-table` (multi-row table with style/color combobox + size grid), `.dtg-price-summary` (live tier + LTM card), `.dtg-customer-pane` (right-side customer panel mirroring the order form). | /quote-builders/dtg-quote-builder.html, builders/dtg | ✅ Active |
 | `/shared_components/css/dtg-catalog.css` | **NEW (2026-05-18)** NWCA-Approved DTG Catalog browser styles — category-tabbed style grid (`.dtg-catalog-grid` + `.dtg-catalog-card`) with rank badges, plus full-screen detail modal (`.dtg-catalog-modal`) with per-color "Add to quote" cards. **2026-06-03**: + full-catalog fallback styles (`.dtg-fullcat-*`: empty-state CTA, results header/back link, compact result cards, suitability warning chips, footer link). Loaded on dtg-quote-builder.html. | /quote-builders/dtg-quote-builder.html, dtg-catalog.js | ✅ Active |
-| `/shared_components/css/art-invoice-shared.css` | Shared art invoice styles | Art invoice creator + viewer | ✅ Active |
-| `/shared_components/css/art-invoice-dashboard.css` | Art invoice dashboard styles | art-invoices-dashboard.html | ✅ Active |
 | `/shared_components/css/mockup-ruth.css` | Ruth mockup workflow styles | art-hub-ruth.html | ✅ Active |
 | `/shared_components/css/mockup-submit-form.css` | Mockup submit form styles | mockup-submit-form | ✅ Active |
 | `/shared_components/css/sticker-banner-submit-form.css` | **NEW** Sticker/Banner intake form + Item-Type pill bar styles (ae-dashboard Submit Artwork tab) | ae-dashboard.html | ✅ Active |
@@ -1420,7 +1411,6 @@ cap-embroidery-fix.css
 | `/tests/unit/design-search-core.test.js` | **NEW (2026-08-05)** Locks the Design Vault wire contract — row decode, imgRef expansion, ranking ladder, filter composition, `/recent` delta-merge, seeded wall determinism (41 tests). Moves only WITH the proxy-side index tests. | jest, design-gallery-search.js | ✅ Active |
 | `/tests/unit/design-gallery-xss.test.js` | **NEW (2026-08-05)** XSS regression lock — 7 hostile company/design names through card/grid/drawer render paths assert no script nodes, no `on*` attributes, no attribute breakout; plus source-level bans on handler templates and hardcoded proxy hosts (22 tests, jsdom). | jest, jsdom, design-gallery-{search,grid,drawer}.js | ✅ Active |
 | `/dashboards/art-hub-dashboard.html` | ~~DELETED~~ Coordinator redirect (removed 2026-03-15) | — | ❌ Deleted |
-| `/dashboards/art-invoices-dashboard.html` | Art invoices | art-invoice-* files | ✅ Active |
 | `/dashboards/commission-structure.html` | Online store commission structure reference | commission-structure.css | ✅ Active |
 | `/dashboards/css/commission-structure.css` | Commission dashboard styles | - | ✅ Active |
 | `/dashboards/access-admin.html` | **NEW (2026-06-30)** Erik-only RBAC control panel — manage staff roles (`Staff_App_Roles`) + page access (`Staff_Page_Access`). Code-gated `requireCrmRole(['admin'])`. | access-admin.js, access-admin.css, `/api/crm-proxy/admin-rbac/*` | ✅ Active |
@@ -1472,7 +1462,6 @@ cap-embroidery-fix.css
 | `/shared_components/css/box-label-print.css` | **NEW (2026-08-04)** Print styles for the shared box label (`#sit-label-sheet`/`.sit-label`/`.sl-*`): letter-portrait one-page-per-box, `body.sit-label-printing` isolation, mono-laser black-fill rush block, deep-link QR. Moved verbatim out of sanmar-inbound.css. **Load wherever box-label-template.js loads** (quote-management, ae-mission-control, box-labels page, both test harnesses) | — | ✅ Active |
 | `/dashboards/digitized-designs.html` | Digitized designs management dashboard | — | ✅ Active |
 | `/dashboards/old-designs.html` | Old designs archive search (Caspio embed) | old-designs.css, old-designs.js | ✅ Active |
-| `/dashboards/art-invoice-view.html` | Art invoice detail view page | — | ✅ Active |
 | `/dashboards/bundle-orders-dashboard.html` | Bundle orders management dashboard | bundle-orders.js | ✅ Active |
 | `/dashboards/bundle-orders.js` | Bundle orders dashboard logic | — | ✅ Active |
 | `/dashboards/art-hub-coordinator.html` | ~~DELETED~~ Coordinator workflow (removed 2026-03-15) | — | ❌ Deleted |
