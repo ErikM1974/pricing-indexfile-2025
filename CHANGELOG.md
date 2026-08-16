@@ -1,3 +1,7 @@
+## v2026.08.16.1 (2026.08.16)
+
+- Remove the art-invoice pages — superseded by per-request invoicing
+
 ## v2026.08.15.4 (2026.08.15)
 
 - Manual items: ask for the vendor in the description; record OnSite's transform
