@@ -1778,7 +1778,9 @@ class EmbroideryPricingCalculator {
                             const isFullBack = logo.position === 'Full Back';
 
                             // FULL BACK: Use design-specific tier pricing if available,
-                            // otherwise fall back to formula ($1.25 per 1,000 stitches)
+                            // otherwise the shared DECG-FB ladder, tiered by quantity
+                            // ($1.50/1K at 1-7 down to $1.20/1K at 72+). NOT a flat rate —
+                            // that comment survived the 2026-08-15 consolidation by 1 day.
                             if (isFullBack) {
                                 const fbStitchCount = Math.max(logo.stitchCount, this.fbBaseStitchCount); // Min 25K
                                 let unitPrice;
@@ -2371,8 +2373,19 @@ class EmbroideryPricingCalculator {
                 return tierInfo.embCost + (extra / 1000) * rate;
             }
             case 'fb': {
+                // ONE shared DECG-FB ladder, tiered by quantity — same helper the other two
+                // full-back paths use (~:1627 primary logo, ~:1798 additional logo). This
+                // branch was missed by the 2026-08-15 consolidation and kept charging the
+                // legacy FLAT Service_Codes 'FB' rate, so it would have quoted a 100-piece
+                // full back at $1.25/1K where every other surface says $1.20, and a 5-piece
+                // one at $1.25 where they say $1.50.
+                //
+                // `quantity` is the ORDER quantity for tiering, which is what every caller
+                // already passes (see collectAlReviewItem / the DECG-DECC loop in
+                // shopworks-import.js — each sums qty across its lines before calling).
+                // _getFBRateForQty never returns 0: a $0 full back must fail loudly upstream.
                 const base = Math.max(stitchCount, this.fbBaseStitchCount || 25000);
-                return (base / 1000) * (this.fbStitchRate || 1.25);
+                return (base / 1000) * this._getFBRateForQty(quantity);
             }
             case 'monogram':
                 return this.monogramPrice || 12.50;
