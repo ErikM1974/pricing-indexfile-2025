@@ -1,7 +1,7 @@
 # Pricing Baselines — CI Regression Gate
 
 **What this protects**: every per-piece price, line subtotal, LTM fee, and grand
-total across all 22 scenarios in `SCENARIOS.md`. If a refactor accidentally
+total across all 23 scenarios in `SCENARIOS.md`. If a refactor accidentally
 moves a price by even $0.50, the test fails before deploy.
 
 **Source of truth**: `baselines.locked.json` — Erik signs off ONCE; CI
@@ -114,5 +114,5 @@ grand = line + LTM + screen setup) — a bad re-lock can't smuggle in inconsiste
 
 - **DTF returns "decoration only" prices** (no garment cost added). This matches what the DTFPricingService returns when `garmentCost=0`. Verify against the DTF builder UI — if the UI adds garment, we'll need to update the runner to fetch garment cost separately.
 - **Pricing depends on live Caspio + ManageOrders** — if those are down, tests skip with a clear error. Not silently passing.
-- **Per-test timeout 3min** — Puppeteer + 4 builders + 22 scenarios + network ≈ 60-90s normally.
+- **Per-test timeout 3min** — Puppeteer + 4 builders + 23 scenarios + network ≈ 60-90s normally.
 - **Heroku scheduler**: don't run this on the prod Heroku scheduler; it's a deploy-time gate, not a runtime check.

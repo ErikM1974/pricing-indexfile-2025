@@ -2,7 +2,7 @@
 /**
  * Pricing Baseline Capture — Phase 0b
  *
- * Runs the live pricing engines for all 22 baseline scenarios and writes the
+ * Runs the live pricing engines for all 23 baseline scenarios and writes the
  * results to tests/pricing-baselines/baselines.captured.json. Used by:
  *   - Devs: `npm run capture:pricing` (uses your running dev server on :3000)
  *   - CI:   `npm run test:pricing-baselines` (starts its own server, captures, diffs vs locked)
@@ -68,7 +68,7 @@ const SCENARIOS = {
               sizes: { M: 1, L: 1, XL: 1, '2XL': 3, '3XL': 3, '4XL': 3 } }
   },
 
-  // ── EMB (7 scenarios) ─────────────────────────────────────────────────
+  // ── EMB (8 scenarios) ─────────────────────────────────────────────────
   'EMB-01': {
     builder: 'EMB', description: 'Small standard garment 8K LC',
     inputs: { style: 'PC54', color: 'Navy', qty: 24, location: 'Left Chest',
@@ -86,8 +86,13 @@ const SCENARIOS = {
                           { name: 'Right Sleeve', stitches: 5000, isAL: true }],
               sizes: { M: 16, L: 16, XL: 16 } }
   },
+  // NOTE the name: this scenario is labelled "Full Back" but the harness prices it via
+  // calculateDECGPrice(qty, stitches, 'garment') — the customer-supplied GARMENT path
+  // (base + per-1K stitch upcharge). It has never touched a full-back rate. Renaming it
+  // rather than re-pointing it, because the number it locks IS worth locking; EMB-08
+  // below is the one that actually covers full back.
   'EMB-04': {
-    builder: 'EMB', description: 'Full Back 15K (DECG path)',
+    builder: 'EMB', description: 'Customer-supplied garment 15K (DECG stitch upcharge)',
     inputs: { style: 'PC54', color: 'Black', qty: 24, location: 'Full Back',
               stitches: 15000, sizes: { M: 8, L: 8, XL: 8 } }
   },
@@ -105,6 +110,19 @@ const SCENARIOS = {
     builder: 'EMB', description: 'Extended sizes 2XL/3XL upcharge',
     inputs: { style: 'PC54', color: 'Black', qty: 24, location: 'Left Chest',
               stitches: 8000, sizes: { M: 8, XL: 8, '2XL': 4, '3XL': 4 } }
+  },
+  // The ONLY scenario that touches the full-back rate ladder (Embroidery_Costs
+  // ItemType='DECG-FB'). Nothing else in this suite did: when full back was consolidated
+  // onto one ladder on 2026-08-15 and every surface's price moved, all 22 scenarios
+  // passed unchanged — the gate could not have caught a regression in either direction.
+  // qty 24 lands in the 24-47 tier ($1.30/1K), clear of the 1-7 small-batch fee, and 25K
+  // sits exactly ON the minimum so a change to EITHER the rate or the floor moves it.
+  // isFullBackLadder routes to calculateALPrice(..., 'fullback'); expect a DECORATION-ONLY
+  // unit price (no garment), unlike every other EMB scenario here.
+  'EMB-08': {
+    builder: 'EMB', description: 'Full Back 25K decoration (DECG-FB rate ladder)',
+    inputs: { style: 'PC54', color: 'Black', qty: 24, location: 'Full Back',
+              stitches: 25000, isFullBackLadder: true, sizes: { M: 8, L: 8, XL: 8 } }
   },
 
   // ── DTF (5 scenarios) ─────────────────────────────────────────────────
@@ -290,7 +308,39 @@ const PAGE_RUNNERS = {
     const qty = inputs.qty;
     const sizes = inputs.sizes;
 
-    // ── EMB-04: Full Back DECG path ───────────────────────────────
+    // ── EMB-08: the real Full Back rate ladder ────────────────────
+    // Embroidery_Costs ItemType='DECG-FB' — $/1K by quantity tier, min 25K stitches.
+    // This is a DECORATION-ONLY price (no garment), unlike the other EMB scenarios,
+    // because that is what calculateALPrice returns for a full back. It exists because
+    // NOTHING else in this suite touches the ladder: the branch below is named "Full
+    // Back" but actually prices a customer-supplied GARMENT, so when full back was
+    // consolidated on 2026-08-15 and every surface's price moved, this gate stayed green.
+    if (inputs.isFullBackLadder) {
+      const al = await service.calculateALPrice(qty, inputs.stitches || 25000, 'fullback');
+      const perSizeBreakdown = {};
+      let lineSubtotal = 0;
+      for (const size of Object.keys(sizes)) {
+        const q = sizes[size];
+        const sizeTotal = +(al.unitPrice * q).toFixed(2);
+        perSizeBreakdown[size] = { qty: q, perPiece: al.unitPrice, sizeTotal: sizeTotal };
+        lineSubtotal += sizeTotal;
+      }
+      lineSubtotal = +lineSubtotal.toFixed(2);
+      return {
+        tier: al.tier,
+        ltmFee: al.ltmFee,
+        stitchCount: al.stitchCount,
+        ratePerThousand: al.breakdown && al.breakdown.ratePerThousand,
+        perSizeBreakdown: perSizeBreakdown,
+        lineSubtotal: lineSubtotal,
+        grandTotalBeforeTax: +(lineSubtotal + al.ltmFee).toFixed(2),
+        _path: 'DECG-FB-ladder'
+      };
+    }
+
+    // ── EMB-04: customer-supplied GARMENT at a high stitch count ──
+    // NOTE: despite the scenario's historical "Full Back" label this is the DECG
+    // customer-supplied garment path (base + per-1K stitch upcharge), NOT full back.
     if (inputs.location === 'Full Back') {
       const decg = await service.calculateDECGPrice(qty, inputs.stitches || 8000, 'garment');
       const perSizeBreakdown = {};

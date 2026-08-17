@@ -5,6 +5,123 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## Never assert on serialized data with a substring grep (2026-08-16)
+
+**Problem.** `tests/unit/quote-cart-store.test.js` failed at random on a clean tree, roughly
+1 run in N. Everyone re-ran it and moved on — which is the real damage: it trains the team to
+treat a red suite as noise.
+
+**Root cause.** The assertion was
+`expect(JSON.stringify(raw)).not.toContain('504')` — stringify the WHOLE stored record and grep
+it for the digits of a price that must not persist. But the record also holds `createdAt` /
+`addedAt` epoch-ms and a base36 `id`. Any clock whose digits happen to contain "504" fails it.
+Caught red-handed at `createdAt: 1786925049163` → "…25**049**163…". The store was always correct;
+only the assertion was wrong.
+
+**Fix.** Assert the INVARIANT, not the bytes. `add()` builds its item from an explicit allowlist
+(`quote-cart-store.js:130-146`), so the test now pins the whole key set, checks the deep-copied
+`sizes` (the one nested object a caller could smuggle through), and runs a recursive
+**key** scan for price-bearing names. Plus a regression lock that stubs `Date.now()` to the exact
+repro timestamp and asserts `toContain('504')` — proving the timestamps really do carry it while
+the invariant still holds. Verified 50/50 clean runs, and a deliberately injected price leak fails
+both tests with exact paths (`items[0].price.total`).
+
+**Prevention.**
+- 🔴 **A negative substring assertion over serialized data is a time bomb** — timestamps, ids,
+  hashes and random suffixes all inject arbitrary digits. Assert on the field, not the string.
+  Positive `toContain` on a NARROW value is fine; it was the whole-record negative that broke.
+  Swept both repos: this was the only instance.
+- 🔑 **A key-set assertion beats naming the bad fields.** Pinning all 15 keys also catches the
+  refactor that actually lets money in — someone replacing the allowlist with a spread.
+- 🔴 **Mutation-test the fix, and check the mutation applied.** My first injection silently did
+  nothing (searched `\n`, the file is CRLF) and the suite "passed", which looked like proof and
+  was the opposite. Always confirm the injected break actually landed — `git diff --stat` — before
+  believing a green run means the test is watching.
+
+---
+
+## A consolidation is only as complete as the LAST thing that writes the value (2026-08-16)
+
+**Problem.** The 2026-08-15 "one full-back ladder" work moved every surface onto Caspio
+`Embroidery_Costs` `ItemType='DECG-FB'`. Two follow-on defects survived it, both invisible to a
+green suite.
+
+**Root cause 1 — a later init step clobbers the ladder.** `_doInitializeConfig()` reads the
+ladder at ~:284 (`fbBaseStitchCount = fullBack.minStitches`), then calls `loadServiceCodes()` at
+:334, which at :420 did an **unconditional** `this.fbBaseStitchCount = fb.StitchBase || 25000`
+from the retired `Service_Codes` 'FB' row — overwriting the ladder's own minimum moments after
+it was read, on all three full-back paths.
+⚠️ **LATENT, not live — I first reported this as live and was wrong.** `GET
+/api/service-codes?code=FB` returns **count 0**: the row is deleted, so `if (fb)` never fires and
+nothing is being clobbered today. It would fire the moment anyone recreated an 'FB' row — exactly
+the kind of no-deploy Caspio edit this shop makes. Same reason `fbStitchRate`'s "fallback" is
+really the constructor constant `1.25` (`:39`), not a Caspio value, despite comments saying so.
+
+**Root cause 2 — one branch was simply missed**, and nothing could catch it:
+`getServiceUnitPrice`'s `'fb'` case kept multiplying by the flat `Service_Codes` rate. It lives
+on `EmbroideryPricingCalculator` (`embroidery-quote-pricing.js`) — a **different class in a
+different file** from the `EmbroideryPricingService` (`embroidery-pricing-service.js`) that the
+full-back tests and the EMB-08 baseline both exercise. Two classes, same money, one tested.
+
+**Fix.** `StitchBase` is taken only when no ladder loaded (`SellPrice` stays unconditional — it
+IS the documented fallback). `'fb'` now calls `_getFBRateForQty(quantity)`. Seven new cases in
+`emb-fullback-one-ladder.test.js`, including a **to-the-cent cross-check between the two
+classes** — the assertion that makes them unable to drift again.
+
+**Prevention.**
+- 🔴 **Grep for every WRITE to a config field, not just the read you are fixing.** A migration
+  that changes where a value comes from is incomplete until you have checked what else assigns
+  it, and in what order. `initializeConfig` is a sequence — last writer wins.
+- 🔴 **"All surfaces" means all CLASSES.** Two classes in two files own EMB pricing
+  (`EmbroideryPricingCalculator` = builder/import, `EmbroideryPricingService` = services/AL).
+  A consolidation that only touches one is half done, and the tests for one prove nothing about
+  the other. Cross-check them in the same test.
+- 🔑 **A dead branch is still worth fixing, but say that it is dead.** `case 'fb'` has no
+  production caller — Full Backs parsed from ShopWorks lose their position at
+  `shopworks-import.js:1219` / `_syncALArrays()` and get priced as plain additional logos. Fixing
+  the rate is right; claiming it moved money would have been wrong. Verify reachability before
+  writing an impact claim, and re-check any claim about *why* something is broken — the first
+  explanation here (that the review modal's displayed price was billed) was refuted: that price
+  is a comparison display, `applyServiceResults` discards it.
+
+---
+
+## A regression gate's scenario NAME is not evidence of what it tests (2026-08-16)
+
+**Problem.** `baselines.locked.json` had a scenario called *"EMB-04 — Full Back (DECG-FB
+pricing)"*. Full back was consolidated onto one Caspio source on 2026-08-15, the price moved on
+**every** full-back surface, and all 22 locked scenarios passed unchanged. The gate whose entire
+job is catching price drift sat green through a deliberate, repo-wide price change.
+
+**Root cause.** `capture-pricing-baselines.js` branches on `inputs.location === 'Full Back'` and
+prices it with `calculateDECGPrice(qty, stitches, 'garment')` — the customer-supplied **garment**
+path (base + per-1K stitch upcharge). It has never called a full-back rate. The name said full
+back; the code said DECG garment; nobody diffed the two. EMB-04 also sits at 15K, **below** the
+25,000-stitch full-back minimum, so even a correctly-routed scenario there would have been
+floored and insensitive to the rate.
+
+**Fix.** Renamed EMB-04 to what it actually measures (its number is fine, the label lied) and
+added **EMB-08**: an `isFullBackLadder` flag routing to `calculateALPrice(qty, stitches,
+'fullback')`. 25K @ qty 24 puts both knobs in play — 25,000 is exactly ON the minimum, qty 24 is
+the 24-47 tier ($1.30/1K) clear of the 1-7 fee. Baseline $32.50/pc, $780 line, LTM $0. Its price
+is **decoration-only**, unlike every other EMB scenario, because that's what `calculateALPrice`
+returns for a full back — noted in `SCENARIOS.md` so nobody "fixes" it later by adding a garment.
+
+**Prevention.**
+- 🔴 **A new gate is unproven until you make it fail.** After locking EMB-08 I reverted its
+  values to the old flat $1.25/1K and confirmed it failed (+$1.25/pc, +$30/line), then restored.
+  A green test proves nothing about a test that *cannot* go red.
+- 🔴 **Re-lock surgically, never `cp captured.json locked.json`.** The documented re-lock step in
+  `pricing-baselines.test.js` is a wholesale copy, which re-blesses all 23 scenarios against
+  whatever Caspio holds today — any unrelated live drift gets silently adopted as the new truth.
+  Insert only the changed keys and leave the rest with their original provenance.
+- 🔑 **When a price change lands and the pricing gate does NOT move, that is the alarm.** Ask
+  which scenario should have caught it and go read its runner — don't take the green as proof.
+- 🔑 Same trap wherever a fixture is named after an intent instead of a code path. Check the
+  runner, not the label.
+
+---
+
 ## OnSite keeps an unknown PartNumber and throws every tax field away (2026-08-15)
 
 **Problem.** Vendor garments (S&S et al.) push whatever style the rep typed as `PartNumber`.
@@ -104,157 +221,3 @@ still SELECT them ignore the results, and each query still returns its other Ite
 - ⚠️ Do NOT delete `CTR-Garmt`, `CTR-Cap`, `AL`, `AL-CAP`, `CB`, `CS` — live pricing depends on them.
 - 🔴 **Filter `ItemType` with EQUALS, never CONTAINS.** "FB" as a contains-match also selects
   `CTR-FB` and — fatally — `DECG-FB`, which is the master full-back ladder every surface reads.
-
-## A dashboard promised cost-plus pricing the builder could not read (2026-08-14)
-
-**Problem.** The staff Product Manager has offered **"Automatic (cost ÷ margin + logo — same as
-SanMar)"** since 2026-07-06 (`PricingMethod: 'Margin'`, `DefaultSellPrice: 0`). A product created
-that way **could not be quoted at all**: `populateNonSanmarRow()` did
-`row.dataset.sellPrice = product.DefaultSellPrice || 0` → the string `'0'` → a ⚠ $0.00 price cell
-→ the save gate refused the quote. The rep saw a zero and no explanation. Reps were instead
-hand-computing a decorated price for every S&S Activewear garment (~5% of orders), so the margin,
-tier, embroidery cost, size upcharges and LTM were all bypassed and nobody could see whether the
-number was right.
-
-**Root cause.** Two halves of one feature were built a month apart against no shared contract.
-The dashboard wrote a *mode*; the builder only ever read a *price*. `PricingMethod` had also
-drifted to **three spellings** in live data — `'FIXED'` (builder modal + proxy seed),
-`'FixedPrice'` and `'Margin'` (dashboard) — with older rows blank, so there was no single value a
-naïve reader could test for.
-
-**Solution.** `resolveNonSanmarPricingMode()` in `quote-builder-utils.js` reads all three
-spellings tolerantly (and infers from whichever of cost/sell is > 0 when blank); writers now emit
-only the canonical two. The price itself comes from `buildSyntheticSizePricing()`
-(`embroidery-quote-pricing.js`), which builds a **`/api/size-pricing`-shaped payload** from the
-rep's blank cost — because that endpoint never returned prices, only SanMar's raw `CASE_PRICE`
-plus the upcharge ladder. The formula is untouched; only its input differs.
-
-**Prevention.**
-- 🔑 **`/api/size-pricing` returns COST, not price.** The engine does
-  `cost / marginDenominator + embCost → round → + upcharge`. Feed it a synthesized payload and a
-  non-SanMar garment prices identically to a SanMar one — **one new input shape, no 4th pricing
-  path** (Rule 9). `tests/unit/emb-nonsanmar-costplus.test.js` asserts *byte-identical* lineItems
-  between the two; point reviewers there rather than re-arguing it.
-- 🔴 **Do NOT seed `sizePricingCache` to do this.** It is keyed by bare style, **never cleared**,
-  and shared with `getProductSizePrices()` — a seeded entry is a permanent page-lifetime shadow
-  over a real SanMar style, and vendor styles demonstrably drift into SanMar
-  (`non-sanmar-products.js` documents six that had to be deleted for exactly that). Passing the
-  cost on the product object has no shared state, so there is nothing to invalidate.
-- 🔑 **Anchor sizes are load-bearing, not clutter.** The garment path computes upcharges
-  *relative* to its chosen base size; the cap path adds them *absolutely*. Injecting S/M/L/XL
-  (garments) / OSFA (caps) pins the base to a zero-upcharge size so relative ≡ absolute and
-  neither path needs a branch. They never emit a line (the loop iterates `sizeBreakdown`, not
-  `basePrices`) — delete them and a 2XL/3XL-only order silently loses its upcharge.
-- 🔴 **`quote_items.SizeBreakdown` is an ALLOWLIST, not a bag.** `buildProductLines()` filters a
-  short list of known metadata keys and treats **every other key as a SIZE** — a stray `vendor`
-  key would ship a LinesOE line with `Size:"SSA"`, `Qty:"SSA"` and a real Price. Per-item
-  metadata goes in `LogoSpecs` (already JSON, 60 KB `LONG_FIELDS`). `heavyweight` was already
-  being written and was NOT in that filter; it survived only because customer-supplied items route
-  to `buildServiceLine()`. Added it to the list — one refactor and it would have been a live bug.
-- 🔴 **`saveQuote()` and `updateQuote()` are byte-identical duplicates.** Patch one and every
-  *revision* silently drops the new field, while reload masks it by re-reading Caspio. Both, always.
-- 🔑 **A search-result cache can defeat a source guard.** `showSearchSuggestions()` wrote every
-  autocomplete hit into `embState.productCache`, which `_lookupStyleProduct()` checks **before**
-  the API — so a cached vendor row would have sailed past the `source: 'non-sanmar'` check. Fixing
-  the API alone was not enough.
-- ⚠️ **Making a style findable can break the path that handled it.** Once `/api/stylesearch`
-  returned vendor styles, `_lookupStyleProduct()` started *succeeding*, sending the row down the
-  SanMar branch (`/api/product-colors` → empty) and never reaching `populateNonSanmarRow()`. The
-  proxy and builder changes must ship as ONE unit.
-- 🔑 **A free-text code column plus an exact-match filter is a reporting trap.**
-  `GET /api/non-sanmar-products?vendor=` compares uppercase-exact, so "S&S" / "SS" / "SSA" typed
-  by three reps split the vendor forever. Curated `<select>` + an `Other…` escape; the two copies
-  (builder + dashboard) are drift-locked by a test.
-
----
-
-## Ruth's "Final notes" box saved her words and told nobody (2026-08-14)
-
-**Problem.** Porting the Approve-note box from the art-request page to the mockup page
-(`pages/js/mockup-detail.js`, Ruth's digitizing surface, route `/mockup/:id`) surfaced a
-live bug beside it: `openMarkCompleteModal()` collects a "Final notes (optional)" textarea
-and posts it with **`notify: false`**, so anything Ruth typed on completion was stored in
-Caspio and reached no one. The AE got only the fixed one-liner from `sendStatusNotifications`.
-
-**Root cause.** `notify: false` was a correct default for *audit* notes (status rows the
-timeline scanner needs) and was copy-pasted onto a note that carries **user-authored text**.
-Those are different things wearing the same shape.
-
-**Solution.** `notify: !!notesText` + explicit `Posted_By_Role`. Blank note = today's exact
-behaviour; typed note = the other party actually gets it.
-
-**Prevention.**
-- 🔑 **`notify: false` is right for a note the system wrote and wrong for a note a human
-  wrote.** Audit the distinction wherever both share a POST body — there are 10 `notify:`
-  sites in `mockup-detail.js` alone, and the free-text ones are the minority.
-- 🔑 **Routing direction: `Posted_By_Role: 'ae'` → Ruth (`mockup-routes.js:1489`); `'artist'`
-  → the rep of record.** Omitting it falls through to an author-NAME heuristic
-  (`['ruth','digitiz',…]`, :1477) — right today, fragile forever. Set it explicitly.
-  Same contract as `/api/design-notes` on the art-request side; only the field names differ
-  (`Mockup_ID`/`Author`/snake_case `Note_Type` vs `ID_Design`/`Note_By`).
-- 🔑 **To add opt-in notify to a function shared by N callers, add a trailing parameter that
-  defaults to the old behaviour** — `handleStatusUpdate(status, notes, btnEl, notifyNote)`
-  has 4 callers; only Approve passes the 4th, so the other three are provably unchanged.
-- ⚠️ **This page's approve had NO `confirm()` to replace**, unlike the art-request one — so
-  the modal ADDS a click rather than swapping one. Worth saying out loud before shipping a
-  "same as the other page" change; the two are not the same UX delta.
-- ⚠️ `openReviseModal()` re-`addEventListener`s its cancel/submit on every open and never
-  removes them; `statusUpdateInProgress` masks the duplicate status write but **the
-  file-upload branch is unguarded, so a re-opened revise modal uploads twice.** Not fixed.
-  New modals here use `.onclick =`, which is idempotent.
-
----
-
-## `table-layout: fixed` reads widths from the FIRST ROW, not from your `<th>` classes (2026-08-13)
-
-**Problem.** The new per-rep Past Due print sheets came out with all 8 columns an identical
-90 px despite explicit per-column width classes on the `<th>`. Customer names wrapped to two
-lines, which nearly doubled sheet height (Nika: 9.7 in of a 10 in page for 23 rows).
-
-**Root cause.** Under `table-layout: fixed` the browser derives every column width from the
-**first row of the table** and ignores later rows. The first row here was the repeating rep
-banner — `<tr><th colspan="8">` — which expresses no per-column width, so the engine fell back
-to equal division. The width classes on the third row were never consulted.
-
-**Solution.** Move the widths onto a `<colgroup>` / `<col>` set. `<colgroup>` outranks all rows
-under fixed layout, so it works regardless of what the first row looks like.
-
-**Prevention.**
-- 🔑 **`table-layout: fixed` + any `colspan` in the first row ⇒ you MUST use `<colgroup>`.** This
-  is the normal shape for a print table, because the repeating `<thead>` banner that carries the
-  rep/customer name onto spilled pages is itself a full-width `colspan` row.
-- 🔑 **A repeating identity row belongs in `<thead>`, not in an `<h*>` above the table.** Only
-  `thead { display: table-header-group }` reprints on the next physical page. The old printout
-  put the rep name in an `<h3>`, which is exactly why page 3 of Erik's 8/13 PDF was an orphan
-  list belonging to nobody.
-- 🔑 **Verify print layout by MEASURING, not by eyeballing.** `getBoundingClientRect()` per cell
-  plus `Range.getClientRects().length` for line count found this in one pass; the rendered page
-  looked plausible. Careful: an inline-block (the days-late badge) reports 2 rects without
-  wrapping, so line-count alone false-positives.
-- 🔴 **Harness trap:** the sheet's typography is scoped to `#pdo-print-sheet`. Cloning its
-  *innerHTML* into a differently-id'd preview div silently drops every rule and renders at
-  browser-default 16 px — the first measurements were 2× too tall and entirely fictional. Move
-  the real node, or reuse the real id.
-
-### The print-isolation rule also hides disclosures that used to print
-
-Shipping this, a pre-deploy review caught what the isolation rule
-`body.pdo-printing > *:not(#pdo-print-sheet) { display: none }` costs. The OLD printout
-carried "30-day window · 475 orders scanned" because `#pdo-asof` sits in `<main>`, not in the
-hidden `.dash-header-right`. Hiding the whole shell removed it — so a 30-day sheet read as a
-rep's *complete* past-due list while silently omitting the oldest orders, the ones most needing
-action. Fixed by stamping the window + print time on every rep sheet.
-
-- 🔑 **When you replace a whole-page print with an isolated sheet, diff what the old print
-  DISCLOSED, not just how it looked.** Scope/as-of/provenance lines are the easiest to lose and
-  the most expensive to lose, because the artifact leaves the building and states a count.
-- 🔑 **A handout needs a freshness gate, not just a data gate.** `!lastData` is not enough:
-  the page is opened at 7:40 and printed at 8:05, and a 25-minute-old list still prints
-  *today's* date, so nothing on paper reveals its age. Re-pull past a bound (120 s here) and
-  ABORT the print if the re-pull fails — same call `sanmar-inbound-today.js:syncBeforeOutput`
-  makes. Riding the upstream cache keeps it ~free on Caspio quota.
-- 🔑 **Scoping every print rule to a class the button sets regresses Ctrl+P**, which then falls
-  back to the raw board. Handle `beforeprint` so a keyboard print builds the same sheet, and
-  keep a `body:not(.printing)` fallback for when there is no data to build from.
-
----
