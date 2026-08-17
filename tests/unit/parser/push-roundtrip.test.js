@@ -115,6 +115,67 @@ describe('an order WE pushed round-trips', () => {
     });
 });
 
+// ⚠️ THESE TWO MOVE MONEY. Both make the existing ">= $40 Back Logo is really a full back" rule
+// fire in cases where it silently did not. That rule was already approved and already in the code;
+// what was broken was its implementation. Prices go UP on the affected lines.
+describe('the Full Back reclassify guard actually fires', () => {
+    const order = (desc, price) => [
+        '**************', 'Order #: 99997', 'Salesperson: Test Rep',
+        'Email: test@nwcustomapparel.com', '**************', 'Customer #: 10001',
+        'Company: Test Company', '**************', 'Order Information',
+        'Ordered by: Test User', 'Email: test@test.com', 'Date Order Placed: 01/01/2026',
+        'Terms: COD', '**************', 'Items Purchased', 'Item 1 of 1', '',
+        'Part Number: AL', `Description: ${desc}`, 'Item Quantity: 10',
+        `Unit Price:${price}`, 'Adult:Quantity', 'S:10', '',
+    ].join('\n');
+
+    const parse = (desc, price) => new ShopWorksImportParser().parse(order(desc, price));
+
+    test('a $-prefixed price is a price, not zero', () => {
+        // parseFloat('$45.00') is NaN → 0. That zero did not just look wrong in the review
+        // modal, it walked the line straight past its own >= $40 reclassify threshold.
+        const r = parse('Additional Logo Back Logo', '$45.00');
+        const fb = r.services.additionalLogos.find((a) => a.type === 'fb');
+        expect(fb).toBeDefined();
+        expect(fb.unitPrice).toBe(45);
+        expect(fb.reclassifiedFromAL).toBe(true);
+    });
+
+    test('other currency noise parses too', () => {
+        expect(parse('Additional Logo Back Logo', ' $1,250.00 ')
+            .services.additionalLogos[0].unitPrice).toBe(1250);
+    });
+
+    test('an AL that literally says "Full Back" is reclassified', () => {
+        // _parseALPosition returns the MORE SPECIFIC 'Full Back', so the old
+        // `position === 'Back'` guard could never match the clearest spelling of the thing
+        // it was written to catch.
+        const r = parse('Additional Logo Full Back', '45.00');
+        const fb = r.services.additionalLogos.find((a) => a.type === 'fb');
+        expect(fb).toBeDefined();
+        expect(fb.position).toBe('Full Back');
+        expect(fb.reclassifiedFromAL).toBe(true);
+    });
+
+    test('the $10-$40 warning band also sees "Full Back"', () => {
+        const r = parse('Additional Logo Full Back', '12.50');
+        expect(r.services.additionalLogos[0].type).toBe('al');   // still AL, only a warning
+        expect(r.warnings.find((w) => w.includes('may be Full Back'))).toBeDefined();
+    });
+
+    test('a genuinely cheap back logo is left alone — the threshold still means something', () => {
+        const r = parse('Additional Logo Back Logo', '6.00');
+        expect(r.services.additionalLogos[0].type).toBe('al');
+        expect(r.warnings.filter((w) => w.includes('Full Back'))).toHaveLength(0);
+    });
+
+    test('a non-back AL is untouched at any price', () => {
+        const r = parse('Additional Logo Right Sleeve', '95.00');
+        expect(r.services.additionalLogos[0].type).toBe('al');
+        expect(r.warnings.filter((w) => w.includes('Full Back'))).toHaveLength(0);
+    });
+});
+
 describe('the legacy reclassify path also keeps its price', () => {
     test('a $45 "Back Logo" AL reclassified to FB carries the $45 forward', () => {
         const text = fs.readFileSync(path.join(FIXTURES_DIR, 'al-back-logo-reclassify.txt'), 'utf8');

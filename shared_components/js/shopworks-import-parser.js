@@ -1068,7 +1068,14 @@ class ShopWorksImportParser {
                 // Format: "Product Name, Color Name" (e.g., "Sport-Tek Womens 1/4-Zip Sweatshirt, Athletic Hthr")
                 item.color = this._extractColorFromDescription(fullDesc);
             } else if (trimmed.startsWith('Unit Price:')) {
-                item.unitPrice = parseFloat(trimmed.replace('Unit Price:', '').trim()) || 0;
+                // Strip currency symbols, thousands separators and whitespace before parsing.
+                // parseFloat('$45.00') is NaN → 0, which is not merely a display bug: the AL
+                // "Back Logo" reclassify guard below tests `item.unitPrice >= 40`, so a
+                // $-prefixed $45 back logo silently failed its own threshold and stayed a plain
+                // Additional Logo. A price that a human can read must never parse to zero.
+                item.unitPrice = parseFloat(
+                    trimmed.replace('Unit Price:', '').replace(/[$,\s]/g, '')
+                ) || 0;
             } else if (trimmed.startsWith('Item Quantity:')) {
                 item.quantity = parseInt(trimmed.replace('Item Quantity:', '').trim()) || 0;
             } else if (trimmed === 'Adult:Quantity' || trimmed === 'Youth:Quantity' || trimmed === 'Other:Quantity') {
@@ -1238,7 +1245,15 @@ class ShopWorksImportParser {
                 // Detect potential Full Back mislabeled as AL
                 // "Back" position at ≥$40 → auto-reclassify as DECG-FB
                 // "Back" position at ≥$10 → warning only, keep as AL
-                if (position === 'Back' && item.unitPrice >= 40) {
+                //
+                // `_parseALPosition` returns the MORE SPECIFIC 'Full Back' when the description
+                // actually says so, and only falls back to 'Back' otherwise — so testing
+                // `position === 'Back'` alone meant an AL line reading "Additional Logo Full
+                // Back" was never reclassified. The most explicit spelling of a full back was
+                // the one spelling the full-back detector could not see. (2026-08-16)
+                const looksLikeBack = position === 'Back' || position === 'Full Back';
+
+                if (looksLikeBack && item.unitPrice >= 40) {
                     result.warnings.push(
                         `AL item "${item.description}" at $${item.unitPrice}/pc reclassified as Full Back (DECG-FB). ` +
                         `Price exceeds $40 threshold for standard AL.`
@@ -1254,7 +1269,7 @@ class ShopWorksImportParser {
                     break;
                 }
 
-                if (position === 'Back' && item.unitPrice >= 10) {
+                if (looksLikeBack && item.unitPrice >= 10) {
                     result.warnings.push(
                         `AL item "${item.description}" at $${item.unitPrice}/pc may be Full Back (DECG-FB). ` +
                         `Standard AL tier price is $5-$8. Review in import modal.`
