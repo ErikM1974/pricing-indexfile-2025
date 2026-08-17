@@ -1,0 +1,39 @@
+**************
+Order #: 99998
+Salesperson: Test Rep
+Email: test@nwcustomapparel.com
+**************
+Customer #: 10001
+Company: Test Company
+**************
+Order Information
+Ordered by: Test User
+Email: test@test.com
+Date Order Placed: 01/01/2026
+Terms: COD
+**************
+Items Purchased
+Item 1 of 3
+
+Part Number: PC54
+Description: Core Cotton Tee
+Item Quantity: 24
+Unit Price:15.00
+Adult:Quantity
+M:8
+L:8
+XL:8
+
+Item 2 of 3
+
+Part Number: DECG-FB
+Description: Full Back Embroidery 25000 stitches
+Item Quantity: 24
+Unit Price:32.50
+
+Item 3 of 3
+
+Part Number: AL-CAP
+Description: Additional Logo Cap Back
+Item Quantity: 24
+Unit Price:7.00

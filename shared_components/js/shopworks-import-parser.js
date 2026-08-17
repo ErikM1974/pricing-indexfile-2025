@@ -1205,7 +1205,12 @@ class ShopWorksImportParser {
                     position: 'Full Back',
                     type: 'fb',
                     quantity: item.quantity,
-                    description: item.description
+                    description: item.description,
+                    // Keep what ShopWorks actually charged. Without it the review modal's
+                    // ShopWorks radio is disabled (spr-modal.js: swAvail = swPrice > 0), so the
+                    // rep cannot choose "keep the price the customer was really billed" on the
+                    // one line where our recomputed price is most likely to differ.
+                    unitPrice: item.unitPrice || 0
                 });
                 break;
 
@@ -1218,7 +1223,8 @@ class ShopWorksImportParser {
                     position: 'Cap Back',
                     type: 'cb',
                     quantity: item.quantity,
-                    description: item.description
+                    description: item.description,
+                    unitPrice: item.unitPrice || 0
                 });
                 break;
 
@@ -1242,6 +1248,7 @@ class ShopWorksImportParser {
                         type: 'fb',
                         quantity: item.quantity,
                         description: item.description,
+                        unitPrice: item.unitPrice || 0,
                         reclassifiedFromAL: true
                     });
                     break;
@@ -1383,7 +1390,8 @@ class ShopWorksImportParser {
                     position: 'Cap Side',
                     type: 'cs',
                     quantity: item.quantity,
-                    description: item.description
+                    description: item.description,
+                    unitPrice: item.unitPrice || 0
                 });
                 break;
 
@@ -1585,13 +1593,22 @@ class ShopWorksImportParser {
             return 'graphic-design';
         }
 
-        // Full Back embroidery (large back design)
-        if (pn === 'FB') {
+        // Full Back embroidery (large back design).
+        // 'FB' is the LEGACY part number; 'DECG-FB' is what the current builder actually PUSHES
+        // (embroidery-quote-pricing.js ~:1820, and it is in the proxy's KNOWN_FEE_PNS). Without
+        // the second spelling, re-importing one of OUR OWN orders silently classified the full
+        // back as 'product' — a garment row whose style number was the literal "DECG-FB", priced
+        // at the decoration charge, with no warning. Orders from the old system round-tripped;
+        // orders from the current one did not. (2026-08-16)
+        if (pn === 'FB' || pn === 'DECG-FB') {
             return 'fb';
         }
 
-        // Cap Back embroidery
-        if (pn === 'CB') {
+        // Cap Back embroidery. Same story: 'CB' is legacy, 'AL-CAP' is what the current builder
+        // pushes for a cap additional logo (KNOWN_FEE_PNS even annotates it "new builder uses
+        // AL-CAP"). Mapped to 'cb' rather than a new type so it takes the existing Cap Back path
+        // — a cap additional logo and a cap back are the same charge here.
+        if (pn === 'CB' || pn === 'AL-CAP') {
             return 'cb';
         }
 
