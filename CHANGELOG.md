@@ -1,3 +1,7 @@
+## v2026.08.17.3 (2026.08.17)
+
+- Retire the C112 cap BOGO promo (410) and close the /admin gate hole
+
 ## v2026.08.17.2 (2026.08.17)
 
 - Pricing: make four silent fallbacks visible, retire stale calculators
