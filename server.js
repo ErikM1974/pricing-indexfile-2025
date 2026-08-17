@@ -255,7 +255,7 @@ dotenv.config();
 //   L2067 GET  /api/sizes-by-style-color
 //   L2083 GET  /api/base-item-costs
 //   L2099 GET  /api/inventory
-//   L2254 GET  /api/christmas-products
+//         GET  /api/christmas-products — DELETED 2026-08-17 (anonymous vendor-cost leak)
 //   L2328 GET  /api/embroidery-pricing
 //   L2346 GET  /api/size-pricing
 //   L2397 GET  /api/image-proxy
@@ -11566,79 +11566,20 @@ app.get('/api/pricing-matrix/:id', async (req, res) => {
   }
 });
 
-// Christmas Bundle Products API
-app.get('/api/christmas-products', async (req, res) => {
-  try {
-    // Define Christmas bundle products
-    const bundleProducts = {
-      products: {
-        'CTJ162': {
-          style: 'CTJ162',
-          name: 'Carhartt Shoreline Jacket',
-          category: 'jacket',
-          basePrice: 141.00,
-          vendor: 'SANMAR',
-          sanmar_cost: 84.60
-        },
-        'CT100617': {
-          style: 'CT100617',
-          name: 'Carhartt Rain Defender Jacket',
-          category: 'jacket',
-          basePrice: 79.00,
-          vendor: 'SANMAR',
-          sanmar_cost: 47.40
-        },
-        'CT103828': {
-          style: 'CT103828',
-          name: 'Carhartt Duck Detroit Jacket',
-          category: 'jacket',
-          basePrice: 124.00,
-          vendor: 'SANMAR',
-          sanmar_cost: 74.40
-        },
-        'CTK121': {
-          style: 'CTK121',
-          name: 'Carhartt Midweight Hoodie',
-          category: 'hoodie',
-          basePrice: 44.00,
-          vendor: 'SANMAR',
-          sanmar_cost: 26.40
-        },
-        'F281': {
-          style: 'F281',
-          name: 'Sport-Tek Super Heavyweight Hoodie',
-          category: 'hoodie',
-          basePrice: 45.00,
-          vendor: 'SANMAR',
-          sanmar_cost: 27.00
-        },
-        'CT104597': {
-          style: 'CT104597',
-          name: 'Carhartt Watch Cap 2.0',
-          category: 'accessory',
-          basePrice: 22.00,
-          vendor: 'SANMAR',
-          sanmar_cost: 13.20
-        },
-        'CTGD0794': {
-          style: 'CTGD0794',
-          name: 'Carhartt Insulated Work Gloves',
-          category: 'accessory',
-          basePrice: 19.00,
-          vendor: 'SANMAR',
-          sanmar_cost: 11.40
-        }
-      },
-      smallBatchFee: 6.25,
-      giftBoxCost: 9.00
-    };
-
-    res.json(bundleProducts);
-  } catch (error) {
-    console.error('Error fetching Christmas products:', error);
-    res.status(500).json({ error: 'Failed to fetch Christmas products' });
-  }
-});
+// ⛔ GET /api/christmas-products — DELETED 2026-08-17. Do not re-add.
+//
+// It made no API call: it returned a hardcoded 7-product list, and each product
+// carried `sanmar_cost` (the raw blank vendor cost) NEXT TO `basePrice`. The route
+// was anonymous, so our gross margin was published to anyone who asked
+// (CTJ162: basePrice 141.00 / sanmar_cost 84.60 = 40% GP). Verified zero callers
+// repo-wide before deleting — the Christmas storefront never used it; it carries
+// its own inline product data.
+//
+// The 2025 figures live in git if the October rebuild wants them:
+//   git show v2026.08.17.3:server.js
+// Whatever replaces it must read from Caspio and MUST NOT project cost fields to
+// a customer-reachable surface (see lib/page-access.js: pricing-analysis.html is
+// admin-only for exactly this reason).
 
 // Embroidery Pricing API
 app.get('/api/embroidery-pricing', async (req, res) => {
