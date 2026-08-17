@@ -85,6 +85,14 @@ describe('gateStaffOnlyForms — the gated file, however it is spelled', () => {
         expect(extractAllowlist(SERVER)).toContain(FILE);
     });
 
+    // Lives at forms/policies/…, so this also pins that a NESTED file is covered
+    // — the basename match is what makes that work, and it is easy to "tidy" away.
+    test('the card authorization PDF is gated from its real nested path', () => {
+        expect(extractAllowlist(SERVER)).toContain('credit-card-authorization.pdf');
+        expect(ask('/policies/credit-card-authorization.pdf')).toBe('gated');
+        expect(ask('/policies/credit-card-authorization.pdf::$DATA')).toBe('gated');
+    });
+
     test.each([
         ['plain',                     `/${FILE}`],
         ['uppercase',                 `/${FILE.toUpperCase()}`],

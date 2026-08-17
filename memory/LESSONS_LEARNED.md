@@ -45,6 +45,25 @@ to `/forms/` — `forms/business-credit-application-no-personal-guaranty.pdf`, s
   temp file, verify its size, then `os.replace`. Also: this repo's markdown is **CRLF**, and
   LESSONS/MEMORY carry a **BOM** — an LF-only anchor match silently finds nothing.
 
+**Follow-up the same day — Erik asked for the form to be staff-only, and the first gate leaked.**
+`/forms` is a PUBLIC `express.static` mount, so gating one file meant a middleware above it.
+The obvious version compared `req.path` to the filename with string equality and looked right.
+It was measured serving the **complete PDF, 200 and anonymous**, to `/forms/<file>.pdf::$DATA` —
+Win32 opens a file's default NTFS data stream under that name, so serve-static returned all
+321,188 bytes while the gate saw a string it didn't recognise. Fix: canonicalise to a BARE
+FILENAME (basename → cut at `:` → strip trailing dots/spaces), never compare the raw path.
+Live `v2026.08.17.8`, verified anonymously in prod across 5 URL shapes.
+- 🔴 **A path gate must collapse every spelling that resolves to the same file.** serve-static
+  resolves the path its own way; anything the gate normalises differently is a bypass. Dot-segments
+  (`/forms/x/../f.pdf`) are the shape that applies on Linux, where prod runs — `::$DATA` is Win32-only
+  but defended anyway, because "it happens to hold on this OS" is not a security property.
+- 🔑 **Test the gate from BOTH sides.** Over-gating is a real failure here: the handbook and the
+  meal-period waiver are opened by signed-OUT employees, and bouncing them into staff SSO they can't
+  complete would be the same size of bug. `forms-staff-only.test.js` walks every PDF on disk.
+- 🔑 **Probe the running server, don't reason about the router.** Whether Express normalises `..`
+  before routing decided the whole design; one curl battery answered it in seconds, and it is what
+  turned up `::$DATA`, which no amount of reading the code would have.
+
 ---
 
 ## Two silent no-ops in the quote sync: '' IS NOT NULL, and a clock read in the wrong zone (2026-08-17)
@@ -248,36 +267,3 @@ see.
   assertions. Absence of a fixture is why none of this surfaced.
 
 ---
-
-## Never assert on serialized data with a substring grep (2026-08-16)
-
-**Problem.** `tests/unit/quote-cart-store.test.js` failed at random on a clean tree, roughly
-1 run in N. Everyone re-ran it and moved on — which is the real damage: it trains the team to
-treat a red suite as noise.
-
-**Root cause.** The assertion was
-`expect(JSON.stringify(raw)).not.toContain('504')` — stringify the WHOLE stored record and grep
-it for the digits of a price that must not persist. But the record also holds `createdAt` /
-`addedAt` epoch-ms and a base36 `id`. Any clock whose digits happen to contain "504" fails it.
-Caught red-handed at `createdAt: 1786925049163` → "…25**049**163…". The store was always correct;
-only the assertion was wrong.
-
-**Fix.** Assert the INVARIANT, not the bytes. `add()` builds its item from an explicit allowlist
-(`quote-cart-store.js:130-146`), so the test now pins the whole key set, checks the deep-copied
-`sizes` (the one nested object a caller could smuggle through), and runs a recursive
-**key** scan for price-bearing names. Plus a regression lock that stubs `Date.now()` to the exact
-repro timestamp and asserts `toContain('504')` — proving the timestamps really do carry it while
-the invariant still holds. Verified 50/50 clean runs, and a deliberately injected price leak fails
-both tests with exact paths (`items[0].price.total`).
-
-**Prevention.**
-- 🔴 **A negative substring assertion over serialized data is a time bomb** — timestamps, ids,
-  hashes and random suffixes all inject arbitrary digits. Assert on the field, not the string.
-  Positive `toContain` on a NARROW value is fine; it was the whole-record negative that broke.
-  Swept both repos: this was the only instance.
-- 🔑 **A key-set assertion beats naming the bad fields.** Pinning all 15 keys also catches the
-  refactor that actually lets money in — someone replacing the allowlist with a spread.
-- 🔴 **Mutation-test the fix, and check the mutation applied.** My first injection silently did
-  nothing (searched `\n`, the file is CRLF) and the suite "passed", which looked like proof and
-  was the opposite. Always confirm the injected break actually landed — `git diff --stat` — before
-  believing a green run means the test is watching.
