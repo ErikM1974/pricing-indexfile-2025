@@ -1,3 +1,8 @@
+## v2026.08.17.1 (2026.08.17)
+
+- Security: gate /quote-builders, close two XSS sinks
+- Deploy v2026.08.17.1: 1 files (index.html,...)
+
 ## v2026.08.16.5 (2026.08.16)
 
 - Import: a discount survives the round-trip (captured, and surfaced loudly)
