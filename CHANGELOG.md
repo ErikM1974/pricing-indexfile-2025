@@ -1,3 +1,14 @@
+## v2026.08.16.3 (2026.08.16)
+
+- Baselines: add EMB-08, the first scenario that touches full-back pricing
+- LESSONS: a gate's scenario NAME is not evidence of what it tests
+- Full back: getServiceUnitPrice reads the shared ladder, not the flat rate
+- Full back: the retired Service_Codes FB row can no longer clobber the ladder
+- LESSONS: a consolidation is only as complete as the last thing that writes the value
+- LESSONS: archive the 2026-08-14 Ruth notes entry to stay under the line cap
+- Fix flaky quote-cart-store assertion; assert the invariant, not the bytes
+- Deploy v2026.08.16.3: 5 files (index.html,customer-product.html,quote-cart.html,...)
+
 ## v2026.08.16.2 (2026.08.16)
 
 - Delete cart-ui.js — the last consumer of the pricing-matrix API
