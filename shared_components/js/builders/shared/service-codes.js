@@ -40,14 +40,57 @@ export async function loadServiceCodePrices() {
 }
 
 /**
+ * Surface a fallback substitution (2026-08-17). Split out so BOTH fallback
+ * paths warn — the missing-row case and the unparseable-SellPrice case.
+ *
+ * `warnIfServiceCodeMissing` (quote-builder-utils.js) owns the missing-row
+ * case: it is once-per-page-per-code and deliberately silent until the fetch
+ * resolves, so an early call during load doesn't warn about a map that simply
+ * hasn't arrived yet. It returns false when the row EXISTS, so it cannot cover
+ * a present-but-junk SellPrice — that path goes straight to the badge.
+ * @param {string} code
+ * @param {number} fallback
+ * @param {boolean} rowExists true when the row was found but its price was unusable
+ */
+function warnFallbackUsed(code, fallback, rowExists) {
+    if (typeof window === 'undefined') return;
+    if (!rowExists && typeof window.warnIfServiceCodeMissing === 'function') {
+        window.warnIfServiceCodeMissing(code, fallback);
+        return;
+    }
+    if (rowExists) {
+        console.warn(`[ServiceCodes] ${code} returned an unparseable SellPrice — using fallback ${fallback}`);
+        showFallbackPricingWarning(String(code));
+    }
+}
+
+/**
  * Live Service_Codes price with documented fallback.
+ *
+ * 🔴 The fallback is now VISIBLE (2026-08-17). It used to return silently when
+ * the map had loaded but this row was missing — so a service code renamed or
+ * deleted in Caspio substituted a hardcoded literal into a CHARGED, SAVED and
+ * PUSHED total with nothing on screen. That is the exact shape of Erik's #1
+ * rule ("wrong pricing is worse than an error"). `warnIfServiceCodeMissing`
+ * already existed for this and was wired at only ~4 of the ~20 call sites;
+ * warning HERE covers every caller by construction, including future ones.
+ *
+ * In a healthy system this is silent: it fires only when Caspio is genuinely
+ * missing the row, which is a real misconfiguration, not per-render noise.
  * @param {string} code Service code (case-insensitive)
  * @param {number} fallback Used only when the API was unreachable or the code is missing
  * @returns {number}
  */
 export function getServicePrice(code, fallback) {
     const sc = window._serviceCodes && window._serviceCodes[String(code).toUpperCase()];
-    if (!sc) return fallback;
+    if (!sc) {
+        warnFallbackUsed(code, fallback, false);
+        return fallback;
+    }
     const sell = parseFloat(sc.SellPrice);
-    return isNaN(sell) ? fallback : sell;
+    if (isNaN(sell)) {
+        warnFallbackUsed(code, fallback, true);
+        return fallback;
+    }
+    return sell;
 }

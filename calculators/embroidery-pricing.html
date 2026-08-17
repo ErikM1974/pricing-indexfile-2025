@@ -2260,17 +2260,52 @@
             }
         }
 
+        // Live LTM fee from Caspio (Pricing_Tiers.LTM_Fee on the small-order row).
+        // null until pricing loads, or if the API didn't carry it.
+        let _ltmFeeLive = null;
+
+        // Fallback ONLY — Erik's rule: a hardcoded price is allowed only when the
+        // API is unreachable AND it surfaces a visible warning. Before 2026-08-17
+        // this page hardcoded 50 unconditionally, so changing the LTM fee in Caspio
+        // repriced every quote builder and left THIS page quoting the old number
+        // forever, silently, to reps.
+        const LTM_FEE_FALLBACK = 50;
+
         // Update LTM pricing data from loaded pricing — stores base prices and triggers column update
         function updateLTMPricingData(pricingData) {
             if (!pricingData || !pricingData.pricing) return;
+            // The small-order row is the one carrying a non-zero LTM_Fee (tiers above
+            // 1-7 have 0). Matching on the FEE rather than a '1-7' label keeps this
+            // working if Erik ever relabels or re-bands the tier in Caspio.
+            const tiers = pricingData.tierData || pricingData.apiData?.tiersR || [];
+            const ltmTier = Array.isArray(tiers) ? tiers.find(t => Number(t?.LTM_Fee) > 0) : null;
+            _ltmFeeLive = ltmTier ? Number(ltmTier.LTM_Fee) : null;
             updateLTMCalculator();
+        }
+
+        // Show/hide the estimate warning when the live fee wasn't available.
+        function renderLtmFeeWarning(isFallback, fee) {
+            const host = document.querySelector('.ltm-input-section');
+            if (!host) return;
+            let el = document.getElementById('ltmFeeWarning');
+            if (!isFallback) { if (el) el.remove(); return; }
+            if (!el) {
+                el = document.createElement('p');
+                el.id = 'ltmFeeWarning';
+                el.setAttribute('role', 'status');
+                el.style.cssText = 'margin:.5rem 0 0;color:#92400e;background:#fef3c7;border:1px solid #fcd34d;border-radius:4px;padding:.4rem .6rem;font-size:.85rem;';
+                host.appendChild(el);
+            }
+            el.textContent = `⚠ Small-order fee shown as an estimate ($${fee.toFixed(2)}) — live pricing didn't return it. Verify before quoting.`;
         }
 
         // Recalculate all 1-7 column cells based on selected quantity
         function updateLTMCalculator() {
             const qty = parseInt(document.getElementById('ltmQuantity')?.value || 3);
-            const LTM_FEE = 50;
-            const ltmPerUnit = LTM_FEE / qty;
+            const isFallback = _ltmFeeLive == null;
+            const ltmFee = isFallback ? LTM_FEE_FALLBACK : _ltmFeeLive;
+            renderLtmFeeWarning(isFallback, ltmFee);
+            const ltmPerUnit = ltmFee / qty;
 
             // Update main pricing table 1-7 column
             const rows = document.querySelectorAll('.pricing-table:not(.additional-logo-table) tbody tr');

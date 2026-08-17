@@ -25,6 +25,7 @@ const ENTRIES = {
     'emb-persistence.cjs': 'shared_components/js/builders/emb/persistence.js',
     'emb-pricing-sync.cjs': 'shared_components/js/builders/emb/pricing-sync.js',
     'emb-product-rows.cjs': 'shared_components/js/builders/emb/product-rows.js',
+    'shared-service-codes.cjs': 'shared_components/js/builders/shared/service-codes.js',
 };
 
 module.exports = async function globalSetup() {

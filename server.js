@@ -5040,6 +5040,30 @@ app.get('/calculators/compare-pricing.html', (req, res) => {
   res.redirect(302, '/calculators/quick-quote/');
 });
 
+// TOMBSTONE — /calculators/archive/** (2026-08-17). Load-bearing, do not delete.
+//
+// These are superseded copies kept on disk for reference, but `/calculators` is a
+// public static mount with NO gate a few lines below, and archive/ is not in
+// robots.txt — so every one of them was live at HTTP 200 to anyone, and
+// crawlable. They still WORK (their JS deps all resolve), and they quote from
+// FROZEN numbers: archive/cap-embroidery-pricing-integrated.html carries
+// `marginDenominator = 0.57` where live is 0.53, plus a hardcoded LTM_FEE = 50.
+// A stale calculator that answers confidently is the fastest path to quoting a
+// customer a wrong price — Erik's #1 rule, from a page nobody remembers exists.
+//
+// Verified before adding: nothing in the app links to calculators/archive (no
+// href/src anywhere outside ACTIVE_FILES.md and dist/), so this breaks no flow.
+// MUST stay ABOVE the serveHashedCalculator routes and the static mount below —
+// `/calculators/:a/:b` would otherwise match archive/<page>.html and serve it.
+// Deleting the archived files is the only other way to make this safe.
+app.use('/calculators/archive', (req, res) => {
+  res.status(410).set('X-Robots-Tag', 'noindex, nofollow').send(`<!DOCTYPE html>
+<meta charset="utf-8"><meta name="robots" content="noindex, nofollow">
+<title>This calculator is retired</title>
+<p>This calculator has been retired and its pricing is out of date.</p>
+<p><a href="/calculators/quick-quote/">Use Quick Quote</a> for current pricing.</p>`);
+});
+
 // Asset rewrite for calculator pages. /calculators has NO mount gate — it is
 // mostly public, and the one staff-only page (custom-decal-pricing.html) is
 // gated by its own requireStaff route ABOVE, which serves the file itself and
