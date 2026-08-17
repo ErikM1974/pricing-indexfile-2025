@@ -20,7 +20,13 @@ import { embState } from './state.js';
 export function _syncALArrays() {
     embState.additionalLogos = embState.globalAL.garment.enabled ? [{
         id: 'global-al-garment',
-        position: 'AL',
+        // Read the position from state rather than hardcoding 'AL'. It is almost always 'AL',
+        // but a ShopWorks import can now set 'Full Back' here, and the engine decides full back
+        // purely by `logo.position === 'Full Back'`. Hardcoding meant these arrays disagreed
+        // with the per-product assignments collectProducts() builds from the SAME state
+        // (pricing-sync.js already reads `alConfig.position`), so save/invoice/output described
+        // a full back as a plain additional logo. Default preserved for every other caller.
+        position: embState.globalAL.garment.position || 'AL',
         stitchCount: embState.globalAL.garment.stitchCount,
         needsDigitizing: embState.globalAL.garment.needsDigitizing,
         isPrimary: false
