@@ -1,3 +1,8 @@
+## v2026.08.17.9 (2026.08.17)
+
+- Memory: path gates must canonicalise, not string-match; archive one entry
+- Gate the credit card authorization PDF too
+
 ## v2026.08.17.8 (2026.08.17)
 
 - Memory: fillable PDFs need /NeedAppearances; Forms_Library 502 was a length cap
