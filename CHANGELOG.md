@@ -1,3 +1,8 @@
+## v2026.08.16.5 (2026.08.16)
+
+- Import: a discount survives the round-trip (captured, and surfaced loudly)
+- Deploy v2026.08.16.5: 1 files (embroidery-quote-builder.html,...)
+
 ## v2026.08.16.4 (2026.08.16)
 
 - Parser: read the part numbers we actually push (DECG-FB, AL-CAP) + keep their price
