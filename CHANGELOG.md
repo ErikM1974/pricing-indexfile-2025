@@ -1,3 +1,7 @@
+## v2026.08.17.4 (2026.08.17)
+
+- Send the CRM secret on the MO snapshot fetch — quote sync has 401'd since Aug 10
+
 ## v2026.08.17.3 (2026.08.17)
 
 - Retire the C112 cap BOGO promo (410) and close the /admin gate hole
