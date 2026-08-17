@@ -5,6 +5,48 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## Gating a proxy route breaks every caller that never sent the secret (2026-08-17)
+
+**Problem.** Slack fired `Quote→ShopWorks sync unhealthy / sync-errors+sync-noop` every hour.
+The cron was running fine; every row it touched failed — `errors == candidates`, `synced: 0`.
+ShopWorks snapshots had been frozen on EVERY quote for a week: not just the cron, but
+quote-management's "Sync all", quote-view's page-load auto-sync and manual refresh, and
+`pages/js/invoice.js`, which all call the same endpoint.
+
+**Root cause.** Proxy `191c906` (2026-08-10 09:35 PT, "Gate the ManageOrders PII reads") added
+`app.use('/api/manageorders/order', requireCrmApiSecret)`. That prefix covers `/order/:id/snapshot`,
+and the fetch in `sync-from-shopworks` (`server.js` ~12770) was **the one proxy call in the whole
+file sending no `X-CRM-API-Secret`**. Every sync 401'd; the handler turns that into a 502.
+
+**Solution.** Send the secret, guarded like every other proxy call in the file, and `console.warn`
+the non-OK response. Shipped `v2026.08.17.4` (Heroku v1866). Verified in prod: OF-0061/OF-0062 now
+return `synced:true, status:Imported` with real snapshots, health is `ok:true, reason:null`.
+
+**Prevention.**
+- 🔴 **A gate lands on a PREFIX; the blast radius is every caller of every route under it.** The
+  commit gated six prefixes and its message reasoned carefully about `/customers` (2 callers,
+  correctly deployed app-first). `/order` got one line and no caller audit — and it had a caller.
+  Before gating a prefix, grep all three repos for the prefix, not for the route you had in mind.
+- 🔑 **The odd one out is the bug.** `server.js` sends `X-CRM-API-Secret` on ~80 proxy calls and
+  omitted it on exactly one. `grep -c` the header against the count of `SYNC_PROXY_BASE`/
+  `CRM_API_BASE` fetches — a single unauthenticated straggler is findable in one command, and is
+  a live outage waiting for someone to gate its route.
+- 🔴 **A 502 return path that logs nothing hides the outage completely.** `grep bulk-sync` showed
+  only the summary line; there were ZERO `[sync-from-shopworks]` entries, so the logs looked like
+  the sync wasn't even reaching the handler. Erik's #1 rule applies to SERVER logs too, not just
+  customer-facing banners: every early `return res.status(5xx)` needs a `console.warn` naming the
+  quote and the upstream status.
+- 🔑 **Fast failure is a fingerprint.** 3 candidates in 3.2s with a 1s throttle each = ~0ms of real
+  work per row. A run whose elapsed time is exactly its own throttle never talked to upstream.
+- 🔑 The watchdog earned its keep — it caught a silent no-op within the hour and named it precisely
+  (`sync-errors+sync-noop`). What it could NOT do is say WHICH quote or WHY: `recordQuoteSyncRun()`
+  drops `errorDetails`. Worth carrying the first error string into the health payload.
+- ⚠️ **Deploy left the repo on `main` with `develop` 2 commits behind** (a prior run's Step 16
+  never completed), and a concurrent session moved the branch mid-diagnosis. In this shared
+  OneDrive checkout, re-read `git branch --show-current` immediately before staging — never trust
+  the branch you saw one command ago.
+
+---
 ## Four silent pricing fallbacks, and the one that was never read (2026-08-17)
 
 **Problem.** Four places substituted a hardcoded price with nothing on screen:
@@ -200,70 +242,3 @@ classes** — the assertion that makes them unable to drift again.
   writing an impact claim, and re-check any claim about *why* something is broken — the first
   explanation here (that the review modal's displayed price was billed) was refuted: that price
   is a comparison display, `applyServiceResults` discards it.
-
----
-
-## A regression gate's scenario NAME is not evidence of what it tests (2026-08-16)
-
-**Problem.** `baselines.locked.json` had a scenario called *"EMB-04 — Full Back (DECG-FB
-pricing)"*. Full back was consolidated onto one Caspio source on 2026-08-15, the price moved on
-**every** full-back surface, and all 22 locked scenarios passed unchanged. The gate whose entire
-job is catching price drift sat green through a deliberate, repo-wide price change.
-
-**Root cause.** `capture-pricing-baselines.js` branches on `inputs.location === 'Full Back'` and
-prices it with `calculateDECGPrice(qty, stitches, 'garment')` — the customer-supplied **garment**
-path (base + per-1K stitch upcharge). It has never called a full-back rate. The name said full
-back; the code said DECG garment; nobody diffed the two. EMB-04 also sits at 15K, **below** the
-25,000-stitch full-back minimum, so even a correctly-routed scenario there would have been
-floored and insensitive to the rate.
-
-**Fix.** Renamed EMB-04 to what it actually measures (its number is fine, the label lied) and
-added **EMB-08**: an `isFullBackLadder` flag routing to `calculateALPrice(qty, stitches,
-'fullback')`. 25K @ qty 24 puts both knobs in play — 25,000 is exactly ON the minimum, qty 24 is
-the 24-47 tier ($1.30/1K) clear of the 1-7 fee. Baseline $32.50/pc, $780 line, LTM $0. Its price
-is **decoration-only**, unlike every other EMB scenario, because that's what `calculateALPrice`
-returns for a full back — noted in `SCENARIOS.md` so nobody "fixes" it later by adding a garment.
-
-**Prevention.**
-- 🔴 **A new gate is unproven until you make it fail.** After locking EMB-08 I reverted its
-  values to the old flat $1.25/1K and confirmed it failed (+$1.25/pc, +$30/line), then restored.
-  A green test proves nothing about a test that *cannot* go red.
-- 🔴 **Re-lock surgically, never `cp captured.json locked.json`.** The documented re-lock step in
-  `pricing-baselines.test.js` is a wholesale copy, which re-blesses all 23 scenarios against
-  whatever Caspio holds today — any unrelated live drift gets silently adopted as the new truth.
-  Insert only the changed keys and leave the rest with their original provenance.
-- 🔑 **When a price change lands and the pricing gate does NOT move, that is the alarm.** Ask
-  which scenario should have caught it and go read its runner — don't take the green as proof.
-- 🔑 Same trap wherever a fixture is named after an intent instead of a code path. Check the
-  runner, not the label.
-
----
-
-## OnSite keeps an unknown PartNumber and throws every tax field away (2026-08-15)
-
-**Problem.** Vendor garments (S&S et al.) push whatever style the rep typed as `PartNumber`.
-Product lines are NOT gated by `KNOWN_FEE_PNS` — only fee lines are — so nobody knew whether
-OnSite would reject, substitute or silently drop a part it had never seen.
-
-**Root cause.** Never tested. The gate exists for fees; product parts were assumed safe.
-
-**Solution.** Pushed a real TEST order and diffed our payload against OnSite's own transform
-(`EMB-TEST-2026-315`).
-
-**Prevention.**
-- ✅ **An unknown PartNumber SURVIVES intact.** `SS-LIVE-CHECK` came back verbatim with
-  `Color`, `Size`, `Qty`, `Price` and `id_ProductClass: 1` unchanged, and all 12 typed notes
-  present. Vendor styles are safe to push; product lines need no allowlist.
-- 🔴 **OnSite DISCARDS every tax field we send.** `TaxPartNumber`, `TaxPartDescription`,
-  `coa_AccountSalesTax01` and the per-line `sts_EnableTax01..04` / `sts_TaxOverride` are ALL
-  absent from the transform. That is why the payload carries "Apply Tax: Manually in
-  ShopWorks" — the manual step is forced by OnSite, not a choice. Do NOT try to fix the tax
-  push by sending more fields; they get dropped too.
-- 🔑 `Attachments` / `Designs` / `Payments` are dropped when empty; `"30"`→`30` and `\n`→`\r`
-  are normalised; OnSite ADDS `id_Integration: "200"` + `id_Receiving/Sales/ShippingStatus`.
-- 🔑 **Upload ≠ order.** The push returns `'ExtOrderID … has been uploaded.'` while
-  `GET /api/manageorders/getorderno/{id}` stays **count 0** — it queues for import, and the
-  proforma prints "Order # — (pending import)". An empty order number straight after a push is
-  EXPECTED, not a failure. Don't debug it.
-- 🔑 A **manual** vendor item has no `VendorCode`, so the "VENDOR: …" `LineItemNotes` never
-  fires — deliberate (Erik). The vendor rides in the rep's DESCRIPTION, which OnSite keeps.

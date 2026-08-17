@@ -4,6 +4,71 @@ Resolved entries aged out of `LESSONS_LEARNED.md` (300-line cap). Newest first. 
 
 ---
 
+## A regression gate's scenario NAME is not evidence of what it tests (2026-08-16)
+
+**Problem.** `baselines.locked.json` had a scenario called *"EMB-04 — Full Back (DECG-FB
+pricing)"*. Full back was consolidated onto one Caspio source on 2026-08-15, the price moved on
+**every** full-back surface, and all 22 locked scenarios passed unchanged. The gate whose entire
+job is catching price drift sat green through a deliberate, repo-wide price change.
+
+**Root cause.** `capture-pricing-baselines.js` branches on `inputs.location === 'Full Back'` and
+prices it with `calculateDECGPrice(qty, stitches, 'garment')` — the customer-supplied **garment**
+path (base + per-1K stitch upcharge). It has never called a full-back rate. The name said full
+back; the code said DECG garment; nobody diffed the two. EMB-04 also sits at 15K, **below** the
+25,000-stitch full-back minimum, so even a correctly-routed scenario there would have been
+floored and insensitive to the rate.
+
+**Fix.** Renamed EMB-04 to what it actually measures (its number is fine, the label lied) and
+added **EMB-08**: an `isFullBackLadder` flag routing to `calculateALPrice(qty, stitches,
+'fullback')`. 25K @ qty 24 puts both knobs in play — 25,000 is exactly ON the minimum, qty 24 is
+the 24-47 tier ($1.30/1K) clear of the 1-7 fee. Baseline $32.50/pc, $780 line, LTM $0. Its price
+is **decoration-only**, unlike every other EMB scenario, because that's what `calculateALPrice`
+returns for a full back — noted in `SCENARIOS.md` so nobody "fixes" it later by adding a garment.
+
+**Prevention.**
+- 🔴 **A new gate is unproven until you make it fail.** After locking EMB-08 I reverted its
+  values to the old flat $1.25/1K and confirmed it failed (+$1.25/pc, +$30/line), then restored.
+  A green test proves nothing about a test that *cannot* go red.
+- 🔴 **Re-lock surgically, never `cp captured.json locked.json`.** The documented re-lock step in
+  `pricing-baselines.test.js` is a wholesale copy, which re-blesses all 23 scenarios against
+  whatever Caspio holds today — any unrelated live drift gets silently adopted as the new truth.
+  Insert only the changed keys and leave the rest with their original provenance.
+- 🔑 **When a price change lands and the pricing gate does NOT move, that is the alarm.** Ask
+  which scenario should have caught it and go read its runner — don't take the green as proof.
+- 🔑 Same trap wherever a fixture is named after an intent instead of a code path. Check the
+  runner, not the label.
+
+---
+## OnSite keeps an unknown PartNumber and throws every tax field away (2026-08-15)
+
+**Problem.** Vendor garments (S&S et al.) push whatever style the rep typed as `PartNumber`.
+Product lines are NOT gated by `KNOWN_FEE_PNS` — only fee lines are — so nobody knew whether
+OnSite would reject, substitute or silently drop a part it had never seen.
+
+**Root cause.** Never tested. The gate exists for fees; product parts were assumed safe.
+
+**Solution.** Pushed a real TEST order and diffed our payload against OnSite's own transform
+(`EMB-TEST-2026-315`).
+
+**Prevention.**
+- ✅ **An unknown PartNumber SURVIVES intact.** `SS-LIVE-CHECK` came back verbatim with
+  `Color`, `Size`, `Qty`, `Price` and `id_ProductClass: 1` unchanged, and all 12 typed notes
+  present. Vendor styles are safe to push; product lines need no allowlist.
+- 🔴 **OnSite DISCARDS every tax field we send.** `TaxPartNumber`, `TaxPartDescription`,
+  `coa_AccountSalesTax01` and the per-line `sts_EnableTax01..04` / `sts_TaxOverride` are ALL
+  absent from the transform. That is why the payload carries "Apply Tax: Manually in
+  ShopWorks" — the manual step is forced by OnSite, not a choice. Do NOT try to fix the tax
+  push by sending more fields; they get dropped too.
+- 🔑 `Attachments` / `Designs` / `Payments` are dropped when empty; `"30"`→`30` and `\n`→`\r`
+  are normalised; OnSite ADDS `id_Integration: "200"` + `id_Receiving/Sales/ShippingStatus`.
+- 🔑 **Upload ≠ order.** The push returns `'ExtOrderID … has been uploaded.'` while
+  `GET /api/manageorders/getorderno/{id}` stays **count 0** — it queues for import, and the
+  proforma prints "Order # — (pending import)". An empty order number straight after a push is
+  EXPECTED, not a failure. Don't debug it.
+- 🔑 A **manual** vendor item has no `VendorCode`, so the "VENDOR: …" `LineItemNotes` never
+  fires — deliberate (Erik). The vendor rides in the rep's DESCRIPTION, which OnSite keeps.
+
+---
 ## Five prices for one ShopWorks part — and a $50 fee hidden behind a misspelled column (2026-08-15)
 
 **Problem.** Full-back embroidery had **five** price sources across **three** Caspio tables, so what
@@ -2080,3 +2145,5 @@ finished-photos.js ×2 — design tiles AND the manage list, pride-wall-controll
   Also: 401 vs 404 matters — one 404 here is a Box file that was genuinely deleted, not a break.
 
 ---
+
+
