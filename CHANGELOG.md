@@ -1,3 +1,8 @@
+## v2026.08.17.5 (2026.08.17)
+
+- Memory: gating a proxy prefix breaks every caller that never sent the secret
+- Stamp ShopWorks_Last_Synced in Pacific — the writer disagreed with every reader
+
 ## v2026.08.17.4 (2026.08.17)
 
 - Send the CRM secret on the MO snapshot fetch — quote sync has 401'd since Aug 10
