@@ -5,6 +5,49 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## Two silent no-ops in the quote sync: '' IS NOT NULL, and a clock read in the wrong zone (2026-08-17)
+
+**Problem.** Both were found while fixing the Aug 10-17 sync outage, and neither had ever
+shown a symptom. ① The proxy's `syncCandidates=true` filter returned **9 of 9** non-cancelled
+rows, so the hourly cron synced a `Status='Web Quote Request'` quote with no WO# forever. ②
+`ShopWorks_Last_Synced` was **written UTC and read Pacific**, so a just-synced row parsed ~7-8 h
+in the FUTURE, `now - lastSynced` went NEGATIVE, and the 30-minute staleness test could not fire
+— the hourly re-sync was really running ~3x/day.
+
+**Root cause.** ① Caspio stores an unset column as an **EMPTY STRING**, and `'' IS NOT NULL`, so
+`(Status='Processed' OR PushedToShopWorks IS NOT NULL)` matched everything and the OR swallowed
+the Status test. Only 1 of the 9 rows had a real `PushedToShopWorks`. ② `nowPacificNaiveIso()`
+already existed in `server.js` and the sync handler simply didn't use it.
+
+**Solution.** ① `PushedToShopWorks<>''` **plus** `ShopWorks_Order_Number>0`; proxy `v2026.08.17.1`
+(Heroku v1088), verified live 9→8. ② `nowIso = nowPacificNaiveIso()`; app `v2026.08.17.5`
+(Heroku v1867), verified live: stored `05:55:52` vs Pacific-now `05:56:05`, exactly 7 h behind UTC.
+
+**Prevention.**
+- 🔴 **In Caspio, `IS NOT NULL` does NOT mean "has a value".** Unset text columns come back as
+  `''`. Any "was this ever stamped?" predicate needs `AND col<>''`, and a bare `IS NOT NULL`
+  inside an `OR` silently promotes the whole clause to `TRUE`. Check the other named filters
+  before trusting one.
+- 🔴 **Tightening an over-matching filter can silently DROP real work.** Two DTG rows sat at
+  `Status='Accepted'` with an empty `PushedToShopWorks` but a REAL WO# — they were being synced
+  *only because of the bug*. The obvious one-line fix would have stopped their deletion detection
+  and the ShipStation cancel-cascade with no error anywhere. **Before narrowing a predicate, dump
+  what it currently matches and account for EVERY row you are about to exclude.**
+- 🔑 **`toContain()` cannot see a MISSING conjunct.** The jest lock asserted
+  `toContain('PushedToShopWorks IS NOT NULL')`, which passes with or without the `<>''` half. A
+  substring assertion tests presence, never sufficiency — assert the part that carries the meaning.
+- 🔴 **A timestamp has no type.** Nothing failed, nothing logged; the only tell was a cadence
+  nobody was measuring. **When a column is written in one place and read in another, the writer
+  and reader must name the same zone out loud** — and the fix belongs in the WRITER when every
+  reader already agrees. The June "Purges in 31 days" patch fixed the *reader* on the dashboard;
+  the reader had been right all along.
+- 🔑 The regression test **parses both functions out of the shipped `server.js` and round-trips
+  them**, with a negative control that re-creates the old writer and asserts the skew is still
+  6.5-8.5 h. A source-grep for the call would pass whether or not the two agree.
+- ⚠️ **The proxy caches `quote_sessions` reads** — a verification GET without `&refresh=true`
+  returned the PRE-fix row and read as "not fixed". Always add `refresh=true` when checking a write.
+
+---
 ## Gating a proxy route breaks every caller that never sent the secret (2026-08-17)
 
 **Problem.** Slack fired `Quote→ShopWorks sync unhealthy / sync-errors+sync-noop` every hour.
@@ -196,49 +239,3 @@ both tests with exact paths (`items[0].price.total`).
   nothing (searched `\n`, the file is CRLF) and the suite "passed", which looked like proof and
   was the opposite. Always confirm the injected break actually landed — `git diff --stat` — before
   believing a green run means the test is watching.
-
----
-
-## A consolidation is only as complete as the LAST thing that writes the value (2026-08-16)
-
-**Problem.** The 2026-08-15 "one full-back ladder" work moved every surface onto Caspio
-`Embroidery_Costs` `ItemType='DECG-FB'`. Two follow-on defects survived it, both invisible to a
-green suite.
-
-**Root cause 1 — a later init step clobbers the ladder.** `_doInitializeConfig()` reads the
-ladder at ~:284 (`fbBaseStitchCount = fullBack.minStitches`), then calls `loadServiceCodes()` at
-:334, which at :420 did an **unconditional** `this.fbBaseStitchCount = fb.StitchBase || 25000`
-from the retired `Service_Codes` 'FB' row — overwriting the ladder's own minimum moments after
-it was read, on all three full-back paths.
-⚠️ **LATENT, not live — I first reported this as live and was wrong.** `GET
-/api/service-codes?code=FB` returns **count 0**: the row is deleted, so `if (fb)` never fires and
-nothing is being clobbered today. It would fire the moment anyone recreated an 'FB' row — exactly
-the kind of no-deploy Caspio edit this shop makes. Same reason `fbStitchRate`'s "fallback" is
-really the constructor constant `1.25` (`:39`), not a Caspio value, despite comments saying so.
-
-**Root cause 2 — one branch was simply missed**, and nothing could catch it:
-`getServiceUnitPrice`'s `'fb'` case kept multiplying by the flat `Service_Codes` rate. It lives
-on `EmbroideryPricingCalculator` (`embroidery-quote-pricing.js`) — a **different class in a
-different file** from the `EmbroideryPricingService` (`embroidery-pricing-service.js`) that the
-full-back tests and the EMB-08 baseline both exercise. Two classes, same money, one tested.
-
-**Fix.** `StitchBase` is taken only when no ladder loaded (`SellPrice` stays unconditional — it
-IS the documented fallback). `'fb'` now calls `_getFBRateForQty(quantity)`. Seven new cases in
-`emb-fullback-one-ladder.test.js`, including a **to-the-cent cross-check between the two
-classes** — the assertion that makes them unable to drift again.
-
-**Prevention.**
-- 🔴 **Grep for every WRITE to a config field, not just the read you are fixing.** A migration
-  that changes where a value comes from is incomplete until you have checked what else assigns
-  it, and in what order. `initializeConfig` is a sequence — last writer wins.
-- 🔴 **"All surfaces" means all CLASSES.** Two classes in two files own EMB pricing
-  (`EmbroideryPricingCalculator` = builder/import, `EmbroideryPricingService` = services/AL).
-  A consolidation that only touches one is half done, and the tests for one prove nothing about
-  the other. Cross-check them in the same test.
-- 🔑 **A dead branch is still worth fixing, but say that it is dead.** `case 'fb'` has no
-  production caller — Full Backs parsed from ShopWorks lose their position at
-  `shopworks-import.js:1219` / `_syncALArrays()` and get priced as plain additional logos. Fixing
-  the rate is right; claiming it moved money would have been wrong. Verify reachability before
-  writing an impact claim, and re-check any claim about *why* something is broken — the first
-  explanation here (that the review modal's displayed price was billed) was refuted: that price
-  is a comparison display, `applyServiceResults` discards it.
