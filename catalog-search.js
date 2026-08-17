@@ -4,6 +4,30 @@
  * @version 1.0.0
  */
 
+/**
+ * HTML-escape untrusted text before it reaches innerHTML.
+ *
+ * 🔴 WHY (2026-08-17 security fix): `?brand=` and `?category=` are read straight
+ * off the URL (parseURLParams below) and rendered into innerHTML. This file runs
+ * on index.html — the PUBLIC homepage — so an unescaped param was a one-click
+ * reflected XSS on the real domain, with CSP running report-only in production
+ * (server.js helmet config) so nothing blocked execution.
+ *
+ * ⚠️ TEXT and QUOTED-ATTRIBUTE contexts only. Entity-escaping does NOT protect
+ * an inline event handler, because the HTML parser decodes entities before the
+ * JS is parsed — which is exactly why the old `escapedBrand` (quote-slashing for
+ * an onclick) was not a fix. Filter chips now use data-* + a delegated listener.
+ */
+function escapeHtml(value) {
+    if (value === null || value === undefined) return '';
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
 class CatalogSearch {
     constructor() {
         this.searchService = new ProductSearchService();
@@ -422,10 +446,10 @@ class CatalogSearch {
                 <div class="no-results">
                     <div class="no-results-icon">🔍</div>
                     <h3>No products found</h3>
-                    <p>${message}</p>
+                    <p>${escapeHtml(message)}</p>
                     ${this.currentFilters.category ? `
                         <button class="btn-show-all" onclick="catalogSearch.showAllInCategory()">
-                            Show all ${this.currentFilters.category}
+                            Show all ${escapeHtml(this.currentFilters.category)}
                         </button>
                     ` : ''}
                 </div>
@@ -906,18 +930,31 @@ class CatalogSearch {
         // Brand chips
         if (this.currentFilters.brand && this.currentFilters.brand.length > 0) {
             this.currentFilters.brand.forEach(brand => {
-                // Escape brand name for use in onclick attribute
-                const escapedBrand = brand.replace(/'/g, "\\'");
                 html += `
-                    <div class="filter-chip" data-filter-type="brand" data-filter-value="${brand}">
-                        <span>${brand}</span>
-                        <button class="filter-chip-remove" onclick="window.catalogSearch.removeFilter('brand', '${escapedBrand}')">×</button>
+                    <div class="filter-chip" data-filter-type="brand" data-filter-value="${escapeHtml(brand)}">
+                        <span>${escapeHtml(brand)}</span>
+                        <button class="filter-chip-remove" data-action="remove-filter">×</button>
                     </div>
                 `;
             });
         }
 
         container.innerHTML = html;
+
+        // Delegated remove — replaces an inline onclick that interpolated the
+        // brand name into a JS string literal. Reading it back off the chip's
+        // data-filter-value never parses it as code. Rebound each render because
+        // `container` itself is stable but we only need one live listener.
+        if (!container.dataset.removeBound) {
+            container.addEventListener('click', (e) => {
+                const btn = e.target.closest('button[data-action="remove-filter"]');
+                if (!btn || !container.contains(btn)) return;
+                const chip = btn.closest('.filter-chip');
+                if (!chip) return;
+                this.removeFilter(chip.dataset.filterType, chip.dataset.filterValue);
+            });
+            container.dataset.removeBound = '1';
+        }
 
         // Show/hide clear all button
         const clearAllBtn = document.getElementById('clearAllFiltersBtn');

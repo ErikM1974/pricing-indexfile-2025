@@ -4890,6 +4890,20 @@ function sendHashedHtml(res, absPath, preRenderedHtml) {
   }
 }
 
+// SECURITY (2026-08-17): /quote-builders had NO gate at all — it sat between
+// /dashboards (gated below) and /vendor-portals (gated below) and was simply
+// missed. Verified live: teamnwca.com/quote-builders/embroidery-quote-builder.html
+// returned the fully working staff tool anonymously — customer search, product
+// pricing and ShopWorks import/export included. staff-auth-helper.js is
+// sessionStorage rep-name autofill, NOT authentication.
+//
+// 🔴 THIS GATE MUST STAY ABOVE the /quote-builders/:page route below, not next to
+// the express.static mount further down. Express matches in registration order, so
+// a gate placed by the static mount would be bypassed by this route, which is
+// registered here and serves the same HTML. The ordering IS the security property
+// (same rule as the /dashboards block).
+app.use('/quote-builders', gateStaffHtml);
+
 // Quote builders keep their own route (they are reached only by .html path).
 const REWRITTEN_BUILDER_PAGES = new Set(
   HASHED_PAGES.filter((p) => p.startsWith('quote-builders/')).map((p) => p.slice('quote-builders/'.length))
@@ -5350,12 +5364,16 @@ app.get('/announcements-manage.html', gateStaffPage, (req, res) => {
 });
 
 // Serve the embroidery quote builder
-app.get('/embroidery-quote-builder.html', (req, res) => {
+// gateStaffPage (2026-08-17): these ROOT aliases serve the same staff builders as
+// /quote-builders/*, so the mount gate above does NOT cover them — a different path
+// is a different route. Gated individually, same pattern as the /announcements-*
+// aliases directly above.
+app.get('/embroidery-quote-builder.html', gateStaffPage, (req, res) => {
   res.sendFile(path.join(__dirname, 'quote-builders', 'embroidery-quote-builder.html'));
 });
 
 // Serve the cap embroidery quote builder
-app.get('/cap-embroidery-quote-builder.html', (req, res) => {
+app.get('/cap-embroidery-quote-builder.html', gateStaffPage, (req, res) => {
   console.log('Serving cap-embroidery-quote-builder.html page');
   res.sendFile(path.join(__dirname, 'quote-builders', 'cap-embroidery-quote-builder.html'));
 });
@@ -5366,13 +5384,13 @@ app.get('/calculators/cap-embroidery-pricing.html', (req, res) => {
 });
 
 // Serve the DTG quote builder
-app.get('/dtg-quote-builder.html', (req, res) => {
+app.get('/dtg-quote-builder.html', gateStaffPage, (req, res) => {
   console.log('Serving dtg-quote-builder.html page');
   res.sendFile(path.join(__dirname, 'quote-builders', 'dtg-quote-builder.html'));
 });
 
 // Serve the screen print quote builder
-app.get('/screenprint-quote-builder.html', (req, res) => {
+app.get('/screenprint-quote-builder.html', gateStaffPage, (req, res) => {
   console.log('Serving screenprint-quote-builder.html page');
   res.sendFile(path.join(__dirname, 'quote-builders', 'screenprint-quote-builder.html'));
 });

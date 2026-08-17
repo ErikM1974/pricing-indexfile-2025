@@ -702,6 +702,34 @@
 
     <script>
         /**
+         * HTML-escape untrusted text before it reaches innerHTML.
+         *
+         * 🔴 WHY (2026-08-17 security fix): every quote field rendered on this page
+         * is ANONYMOUSLY WRITABLE. The proxy's quote-write-guard
+         * (src/utils/quote-write-guard.js) whitelists CustomerName, CompanyName,
+         * CustomerEmail, Notes, Status and QuoteID as writable columns and enforces
+         * only a LENGTH cap — it never escapes. Combined with the unauthenticated
+         * POST /api/quote_sessions write path, a stranger could store markup that
+         * executed here, on page load, inside an authenticated SAML staff session.
+         * CSP is report-only in production, so nothing blocked it.
+         *
+         * ⚠️ This is safe for TEXT and QUOTED-ATTRIBUTE contexts only. It is NOT
+         * safe inside an inline event handler: the HTML parser decodes entities
+         * BEFORE the JS is parsed, so `onclick="f('&#39;')"` still breaks out.
+         * That is why the row actions below use data-* attributes + a delegated
+         * listener instead of inline onclick/onchange.
+         */
+        function escapeHtml(value) {
+            if (value === null || value === undefined) return '';
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        /**
          * Universal Records Admin Panel
          * Manages all quote types and provides analytics
          */
@@ -749,6 +777,33 @@
                 
                 document.getElementById('dateToFilter').value = today.toISOString().split('T')[0];
                 document.getElementById('dateFromFilter').value = thirtyDaysAgo.toISOString().split('T')[0];
+
+                // Row actions are DELEGATED, not inline onclick/onchange (2026-08-17).
+                // QuoteID and PK_ID are anonymously writable columns, and an inline
+                // handler is a second injection context that HTML-escaping cannot
+                // protect — the parser decodes entities before the JS is parsed.
+                // Reading the value from a data-* attribute never parses it as code.
+                // Bound to the tbody element itself, which is static markup, so it
+                // survives every renderTable() innerHTML replacement of its children.
+                const tbody = document.getElementById('recordsTableBody');
+                tbody.addEventListener('click', (e) => {
+                    const btn = e.target.closest('button[data-action]');
+                    if (!btn || !tbody.contains(btn)) return;
+                    const quoteId = btn.dataset.quoteId;
+                    const pkId = btn.dataset.pkId;
+                    switch (btn.dataset.action) {
+                        case 'view': viewQuote(quoteId); break;
+                        case 'edit': editQuote(quoteId, pkId); break;
+                        case 'duplicate': duplicateQuote(quoteId); break;
+                        case 'export': exportQuote(quoteId); break;
+                        case 'delete': deleteQuote(quoteId, pkId); break;
+                    }
+                });
+                tbody.addEventListener('change', (e) => {
+                    const sel = e.target.closest('select[data-action="status"]');
+                    if (!sel || !tbody.contains(sel)) return;
+                    updateQuoteStatus(sel.dataset.quoteId, sel.dataset.pkId, sel.value);
+                });
             }
 
             // Debounced filter for search input
@@ -923,29 +978,29 @@
                 tbody.innerHTML = pageRecords.map(quote => `
                     <tr>
                         <td>
-                            <strong>${quote.QuoteID}</strong>
+                            <strong>${escapeHtml(quote.QuoteID)}</strong>
                         </td>
                         <td>
-                            <span class="quote-type ${this.getQuoteTypeClass(quote.QuoteID)}">
-                                ${this.getQuoteTypeName(quote.QuoteID)}
+                            <span class="quote-type ${escapeHtml(this.getQuoteTypeClass(quote.QuoteID))}">
+                                ${escapeHtml(this.getQuoteTypeName(quote.QuoteID))}
                             </span>
                         </td>
                         <td>
                             <div>
-                                <strong>${quote.CustomerName || 'Unknown'}</strong>
+                                <strong>${escapeHtml(quote.CustomerName || 'Unknown')}</strong>
                                 <br>
-                                <small style="color: var(--text-secondary);">${quote.CustomerEmail || ''}</small>
+                                <small style="color: var(--text-secondary);">${escapeHtml(quote.CustomerEmail || '')}</small>
                             </div>
                         </td>
-                        <td>${quote.CompanyName || 'N/A'}</td>
+                        <td>${escapeHtml(quote.CompanyName || 'N/A')}</td>
                         <td>
                             <strong>$${(quote.TotalAmount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</strong>
                         </td>
                         <td>
-                            <select class="status-select ${quote.Status.toLowerCase()}" 
-                                    data-quote-id="${quote.QuoteID}"
-                                    data-pk-id="${quote.PK_ID}"
-                                    onchange="updateQuoteStatus('${quote.QuoteID}', '${quote.PK_ID}', this.value)">
+                            <select class="status-select ${escapeHtml(String(quote.Status || '').toLowerCase())}"
+                                    data-quote-id="${escapeHtml(quote.QuoteID)}"
+                                    data-pk-id="${escapeHtml(quote.PK_ID)}"
+                                    data-action="status">
                                 <option value="Open" ${quote.Status === 'Open' ? 'selected' : ''}>Open</option>
                                 <option value="Sent" ${quote.Status === 'Sent' ? 'selected' : ''}>Sent</option>
                                 <option value="Converted" ${quote.Status === 'Converted' ? 'selected' : ''}>Converted</option>
@@ -964,19 +1019,19 @@
                         </td>
                         <td>
                             <div style="display: flex; gap: 0.25rem;">
-                                <button class="btn btn-sm btn-secondary" onclick="viewQuote('${quote.QuoteID}')" title="View Details">
+                                <button class="btn btn-sm btn-secondary" data-action="view" data-quote-id="${escapeHtml(quote.QuoteID)}" title="View Details">
                                     <i class="fas fa-eye"></i>
                                 </button>
-                                <button class="btn btn-sm btn-primary" onclick="editQuote('${quote.QuoteID}', '${quote.PK_ID}')" title="Edit">
+                                <button class="btn btn-sm btn-primary" data-action="edit" data-quote-id="${escapeHtml(quote.QuoteID)}" data-pk-id="${escapeHtml(quote.PK_ID)}" title="Edit">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button class="btn btn-sm btn-secondary" onclick="duplicateQuote('${quote.QuoteID}')" title="Duplicate">
+                                <button class="btn btn-sm btn-secondary" data-action="duplicate" data-quote-id="${escapeHtml(quote.QuoteID)}" title="Duplicate">
                                     <i class="fas fa-copy"></i>
                                 </button>
-                                <button class="btn btn-sm btn-secondary" onclick="exportQuote('${quote.QuoteID}')" title="Export">
+                                <button class="btn btn-sm btn-secondary" data-action="export" data-quote-id="${escapeHtml(quote.QuoteID)}" title="Export">
                                     <i class="fas fa-download"></i>
                                 </button>
-                                <button class="btn btn-sm btn-secondary" style="background: #fee2e2; color: #991b1b; border-color: #fecaca;" onclick="deleteQuote('${quote.QuoteID}', '${quote.PK_ID}')" title="Delete">
+                                <button class="btn btn-sm btn-secondary" style="background: #fee2e2; color: #991b1b; border-color: #fecaca;" data-action="delete" data-quote-id="${escapeHtml(quote.QuoteID)}" data-pk-id="${escapeHtml(quote.PK_ID)}" title="Delete">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
@@ -1151,7 +1206,9 @@
         async function updateQuoteStatus(quoteID, pkID, newStatus) {
             try {
                 // Update the dropdown immediately for responsive UI
-                const dropdown = document.querySelector(`select[data-quote-id="${quoteID}"]`);
+                // CSS.escape: QuoteID is an anonymously-writable column, so a value
+                // containing a quote or bracket would otherwise throw here.
+                const dropdown = document.querySelector(`select[data-quote-id="${CSS.escape(quoteID)}"]`);
                 const originalStatus = dropdown.getAttribute('data-original-status') || dropdown.value;
                 
                 // Store original status for rollback if needed
@@ -1192,7 +1249,9 @@
                 console.error('[UniversalRecordsAdmin] Error updating status:', error);
                 
                 // Rollback on error
-                const dropdown = document.querySelector(`select[data-quote-id="${quoteID}"]`);
+                // CSS.escape: QuoteID is an anonymously-writable column, so a value
+                // containing a quote or bracket would otherwise throw here.
+                const dropdown = document.querySelector(`select[data-quote-id="${CSS.escape(quoteID)}"]`);
                 const originalStatus = dropdown.getAttribute('data-original-status');
                 if (originalStatus) {
                     dropdown.value = originalStatus;
@@ -1210,7 +1269,7 @@
             toast.className = `toast toast-${type}`;
             toast.innerHTML = `
                 <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
-                <span>${message}</span>
+                <span>${escapeHtml(message)}</span>
             `;
             
             // Add to body
@@ -1300,14 +1359,14 @@
                                 <div class="quote-info-grid">
                                     <div class="info-section">
                                         <h3>Customer Information</h3>
-                                        <p><strong>Name:</strong> ${quote.CustomerName || 'N/A'}</p>
-                                        <p><strong>Email:</strong> ${quote.CustomerEmail || 'N/A'}</p>
-                                        <p><strong>Company:</strong> ${quote.CompanyName || 'N/A'}</p>
-                                        <p><strong>Phone:</strong> ${quote.Phone || 'N/A'}</p>
+                                        <p><strong>Name:</strong> ${escapeHtml(quote.CustomerName || 'N/A')}</p>
+                                        <p><strong>Email:</strong> ${escapeHtml(quote.CustomerEmail || 'N/A')}</p>
+                                        <p><strong>Company:</strong> ${escapeHtml(quote.CompanyName || 'N/A')}</p>
+                                        <p><strong>Phone:</strong> ${escapeHtml(quote.Phone || 'N/A')}</p>
                                     </div>
                                     <div class="info-section">
                                         <h3>Quote Information</h3>
-                                        <p><strong>Status:</strong> <span class="status ${quote.Status.toLowerCase()}">${quote.Status}</span></p>
+                                        <p><strong>Status:</strong> <span class="status ${escapeHtml(String(quote.Status || '').toLowerCase())}">${escapeHtml(quote.Status)}</span></p>
                                         <p><strong>Created:</strong> ${new Date(quote.CreatedAt).toLocaleDateString()}</p>
                                         <p><strong>Expires:</strong> ${new Date(quote.ExpiresAt).toLocaleDateString()}</p>
                                         <p><strong>Total:</strong> $${quote.TotalAmount.toFixed(2)}</p>
@@ -1317,7 +1376,7 @@
                                 ${quote.Notes ? `
                                     <div class="notes-section">
                                         <h3>Notes</h3>
-                                        <p>${quote.Notes.replace(/\n/g, '<br>')}</p>
+                                        <p>${escapeHtml(quote.Notes).replace(/\n/g, '<br>')}</p>
                                     </div>
                                 ` : ''}
                                 
@@ -1337,9 +1396,9 @@
                                             <tbody>
                                                 ${items.map(item => `
                                                     <tr>
-                                                        <td>${item.LineNumber}</td>
-                                                        <td>${item.ProductName}<br><small>${item.StyleNumber}</small></td>
-                                                        <td>${item.Quantity}</td>
+                                                        <td>${escapeHtml(item.LineNumber)}</td>
+                                                        <td>${escapeHtml(item.ProductName)}<br><small>${escapeHtml(item.StyleNumber)}</small></td>
+                                                        <td>${escapeHtml(item.Quantity)}</td>
                                                         <td>$${item.FinalUnitPrice.toFixed(2)}</td>
                                                         <td>$${item.LineTotal.toFixed(2)}</td>
                                                     </tr>
@@ -1350,10 +1409,10 @@
                                 ` : ''}
                             </div>
                             <div class="modal-footer">
-                                <button class="btn btn-secondary" onclick="exportQuote('${quoteID}')">
+                                <button class="btn btn-secondary" data-action="export" data-quote-id="${escapeHtml(quoteID)}">
                                     <i class="fas fa-download"></i> Export
                                 </button>
-                                <button class="btn btn-primary" onclick="duplicateQuote('${quoteID}')">
+                                <button class="btn btn-primary" data-action="duplicate" data-quote-id="${escapeHtml(quoteID)}">
                                     <i class="fas fa-copy"></i> Duplicate
                                 </button>
                                 <button class="btn" onclick="document.querySelector('.quote-view-modal').remove()">Close</button>
@@ -1476,8 +1535,19 @@
                     document.head.appendChild(style);
                 }
                 
+                // Footer actions are bound here rather than as inline onclick:
+                // quoteID is attacker-influenceable, and an inline handler is a
+                // JS-string context that HTML-escaping cannot protect.
+                modal.addEventListener('click', (e) => {
+                    const btn = e.target.closest('button[data-action]');
+                    if (!btn) return;
+                    const id = btn.dataset.quoteId;
+                    if (btn.dataset.action === 'export') exportQuote(id);
+                    if (btn.dataset.action === 'duplicate') duplicateQuote(id);
+                });
+
                 document.body.appendChild(modal);
-                
+
             } catch (error) {
                 console.error('Error viewing quote:', error);
                 alert('Error loading quote details');
@@ -1640,43 +1710,43 @@
                     <div class="modal-overlay" onclick="document.querySelector('.quote-edit-modal').remove()">
                         <div class="modal-content" onclick="event.stopPropagation()">
                             <div class="modal-header">
-                                <h2>Edit Quote - ${quoteID}</h2>
+                                <h2>Edit Quote - ${escapeHtml(quoteID)}</h2>
                                 <button class="close-btn" onclick="document.querySelector('.quote-edit-modal').remove()">×</button>
                             </div>
-                            <form id="editQuoteForm" onsubmit="saveQuoteChanges(event, '${quoteID}', '${pkID}')">
+                            <form id="editQuoteForm" data-quote-id="${escapeHtml(quoteID)}" data-pk-id="${escapeHtml(pkID)}">
                                 <div class="modal-body">
                                     <div class="form-grid">
                                         <div class="form-group">
                                             <label for="editCustomerName">Customer Name</label>
-                                            <input type="text" id="editCustomerName" class="form-control" value="${quote.CustomerName || ''}" required>
+                                            <input type="text" id="editCustomerName" class="form-control" value="${escapeHtml(quote.CustomerName || '')}" required>
                                         </div>
                                         <div class="form-group">
                                             <label for="editCustomerEmail">Customer Email</label>
-                                            <input type="email" id="editCustomerEmail" class="form-control" value="${quote.CustomerEmail || ''}" required>
+                                            <input type="email" id="editCustomerEmail" class="form-control" value="${escapeHtml(quote.CustomerEmail || '')}" required>
                                         </div>
                                         <div class="form-group">
                                             <label for="editCompanyName">Company Name</label>
-                                            <input type="text" id="editCompanyName" class="form-control" value="${quote.CompanyName || ''}">
+                                            <input type="text" id="editCompanyName" class="form-control" value="${escapeHtml(quote.CompanyName || '')}">
                                         </div>
                                         <div class="form-group">
                                             <label for="editPhone">Phone</label>
-                                            <input type="tel" id="editPhone" class="form-control" value="${quote.Phone || ''}">
+                                            <input type="tel" id="editPhone" class="form-control" value="${escapeHtml(quote.Phone || '')}">
                                         </div>
                                         <div class="form-group">
                                             <label for="editTotalQuantity">Total Quantity</label>
-                                            <input type="number" id="editTotalQuantity" class="form-control" value="${quote.TotalQuantity || 0}" min="0">
+                                            <input type="number" id="editTotalQuantity" class="form-control" value="${escapeHtml(quote.TotalQuantity || 0)}" min="0">
                                         </div>
                                         <div class="form-group">
                                             <label for="editSubtotalAmount">Subtotal Amount</label>
-                                            <input type="number" id="editSubtotalAmount" class="form-control" value="${quote.SubtotalAmount || 0}" step="0.01" min="0">
+                                            <input type="number" id="editSubtotalAmount" class="form-control" value="${escapeHtml(quote.SubtotalAmount || 0)}" step="0.01" min="0">
                                         </div>
                                         <div class="form-group">
                                             <label for="editLTMFeeTotal">LTM Fee Total</label>
-                                            <input type="number" id="editLTMFeeTotal" class="form-control" value="${quote.LTMFeeTotal || 0}" step="0.01" min="0">
+                                            <input type="number" id="editLTMFeeTotal" class="form-control" value="${escapeHtml(quote.LTMFeeTotal || 0)}" step="0.01" min="0">
                                         </div>
                                         <div class="form-group">
                                             <label for="editTotalAmount">Total Amount</label>
-                                            <input type="number" id="editTotalAmount" class="form-control" value="${quote.TotalAmount || 0}" step="0.01" min="0">
+                                            <input type="number" id="editTotalAmount" class="form-control" value="${escapeHtml(quote.TotalAmount || 0)}" step="0.01" min="0">
                                         </div>
                                         <div class="form-group">
                                             <label for="editStatus">Status</label>
@@ -1690,7 +1760,7 @@
                                         </div>
                                         <div class="form-group full-width">
                                             <label for="editNotes">Notes</label>
-                                            <textarea id="editNotes" class="form-control" rows="3">${quote.Notes || ''}</textarea>
+                                            <textarea id="editNotes" class="form-control" rows="3">${escapeHtml(quote.Notes || '')}</textarea>
                                         </div>
                                     </div>
                                 </div>
@@ -1817,8 +1887,17 @@
                     document.head.appendChild(style);
                 }
                 
+                // Bound here rather than as an inline onsubmit: quoteID/pkID are
+                // attacker-influenceable and an inline handler is a JS-string
+                // context that HTML-escaping cannot protect. Values round-trip
+                // through data-* attributes instead.
+                const editForm = modal.querySelector('#editQuoteForm');
+                editForm.addEventListener('submit', (e) => {
+                    saveQuoteChanges(e, editForm.dataset.quoteId, editForm.dataset.pkId);
+                });
+
                 document.body.appendChild(modal);
-                
+
             } catch (error) {
                 console.error('Error opening edit modal:', error);
                 alert('Error opening edit form');
