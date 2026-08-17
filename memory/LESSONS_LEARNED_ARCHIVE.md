@@ -4,6 +4,51 @@ Resolved entries aged out of `LESSONS_LEARNED.md` (300-line cap). Newest first. 
 
 ---
 
+## A consolidation is only as complete as the LAST thing that writes the value (2026-08-16)
+
+**Problem.** The 2026-08-15 "one full-back ladder" work moved every surface onto Caspio
+`Embroidery_Costs` `ItemType='DECG-FB'`. Two follow-on defects survived it, both invisible to a
+green suite.
+
+**Root cause 1 — a later init step clobbers the ladder.** `_doInitializeConfig()` reads the
+ladder at ~:284 (`fbBaseStitchCount = fullBack.minStitches`), then calls `loadServiceCodes()` at
+:334, which at :420 did an **unconditional** `this.fbBaseStitchCount = fb.StitchBase || 25000`
+from the retired `Service_Codes` 'FB' row — overwriting the ladder's own minimum moments after
+it was read, on all three full-back paths.
+⚠️ **LATENT, not live — I first reported this as live and was wrong.** `GET
+/api/service-codes?code=FB` returns **count 0**: the row is deleted, so `if (fb)` never fires and
+nothing is being clobbered today. It would fire the moment anyone recreated an 'FB' row — exactly
+the kind of no-deploy Caspio edit this shop makes. Same reason `fbStitchRate`'s "fallback" is
+really the constructor constant `1.25` (`:39`), not a Caspio value, despite comments saying so.
+
+**Root cause 2 — one branch was simply missed**, and nothing could catch it:
+`getServiceUnitPrice`'s `'fb'` case kept multiplying by the flat `Service_Codes` rate. It lives
+on `EmbroideryPricingCalculator` (`embroidery-quote-pricing.js`) — a **different class in a
+different file** from the `EmbroideryPricingService` (`embroidery-pricing-service.js`) that the
+full-back tests and the EMB-08 baseline both exercise. Two classes, same money, one tested.
+
+**Fix.** `StitchBase` is taken only when no ladder loaded (`SellPrice` stays unconditional — it
+IS the documented fallback). `'fb'` now calls `_getFBRateForQty(quantity)`. Seven new cases in
+`emb-fullback-one-ladder.test.js`, including a **to-the-cent cross-check between the two
+classes** — the assertion that makes them unable to drift again.
+
+**Prevention.**
+- 🔴 **Grep for every WRITE to a config field, not just the read you are fixing.** A migration
+  that changes where a value comes from is incomplete until you have checked what else assigns
+  it, and in what order. `initializeConfig` is a sequence — last writer wins.
+- 🔴 **"All surfaces" means all CLASSES.** Two classes in two files own EMB pricing
+  (`EmbroideryPricingCalculator` = builder/import, `EmbroideryPricingService` = services/AL).
+  A consolidation that only touches one is half done, and the tests for one prove nothing about
+  the other. Cross-check them in the same test.
+- 🔑 **A dead branch is still worth fixing, but say that it is dead.** `case 'fb'` has no
+  production caller — Full Backs parsed from ShopWorks lose their position at
+  `shopworks-import.js:1219` / `_syncALArrays()` and get priced as plain additional logos. Fixing
+  the rate is right; claiming it moved money would have been wrong. Verify reachability before
+  writing an impact claim, and re-check any claim about *why* something is broken — the first
+  explanation here (that the review modal's displayed price was billed) was refuted: that price
+  is a comparison display, `applyServiceResults` discards it.
+
+---
 ## A regression gate's scenario NAME is not evidence of what it tests (2026-08-16)
 
 **Problem.** `baselines.locked.json` had a scenario called *"EMB-04 — Full Back (DECG-FB
@@ -2145,5 +2190,6 @@ finished-photos.js ×2 — design tiles AND the manage list, pride-wall-controll
   Also: 401 vs 404 matters — one 404 here is a Box file that was genuinely deleted, not a break.
 
 ---
+
 
 

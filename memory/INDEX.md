@@ -4,7 +4,7 @@ Repo `/memory/` is the CANONICAL tree (git-tracked). The machine-local auto-memo
 `~/.claude/projects/<slug>/memory/` holds `MEMORY.md` (the auto-loaded index) plus per-fact
 files; where a topic exists in both, **the repo copy wins** and auto-memory keeps a pointer.
 
-Last Updated: 2026-08-12
+Last Updated: 2026-08-17 (`/memory-maintain`: 27/27 files indexed, 0 orphans, 0 untracked; 4 promoted out of machine-local auto-memory)
 
 | File | What it holds |
 |---|---|
@@ -27,7 +27,11 @@ Last Updated: 2026-08-12
 | [`deploy-cachebust.md`](deploy-cachebust.md) | Content-hashed assets + the ?v= cache-bust rules |
 | [`dst-studio.md`](dst-studio.md) | DST Studio |
 | [`dtg-art-fees.md`](dtg-art-fees.md) | DTG art charges GRT-50/GRT-75 — counts × live Caspio rate, never a typed $ |
+| [`handbook-sync-workflow.md`](handbook-sync-workflow.md) | Employee Handbook ↔ Caspio chapters ↔ handbook.html ↔ PDF sync + Canva-scan cadence — **routed to by CLAUDE.md** (promoted from auto-memory 2026-08-17) |
 | [`mockup-generator-retirement.md`](mockup-generator-retirement.md) | Mockup Generator + Pricing by Style retirement (302s, do-not-delete list) |
+| [`nwca-policy-reconciliation-2026-08.md`](nwca-policy-reconciliation-2026-08.md) | Rough Draft 3 vs all 138 live policies — 8 rulings pending from Erik (promoted 2026-08-17) |
+| [`policies-hub-update-playbook.md`](policies-hub-update-playbook.md) | Insert/edit/delete Policies Hub policies via the proxy admin endpoints — **routed to by CLAUDE.md** (promoted from auto-memory 2026-08-17) |
+| [`policy-corpus-bulk-read.md`](policy-corpus-bulk-read.md) | Pull all 138 live policy bodies in one call — `/api/policies-public/tree` carries `Body_Plain` (promoted 2026-08-17) |
 | [`pricing-analysis-data.json`](pricing-analysis-data.json) | Data behind the GENERATED Pricing Analysis page (edit Python+JSON, never HTML) |
 | [`proxy-security-2026-08.md`](proxy-security-2026-08.md) | August 2026 proxy/app file-exposure + gating work |
 | [`sample-request-routing.md`](sample-request-routing.md) | Free-sample request → Leads routing; the 12-place form-ID vocabulary |
@@ -40,6 +44,18 @@ Last Updated: 2026-08-12
   `3-day-tees/ORDER_PUSH_FLOW.md`) survive ONLY in Downloads/repo-memory-backup-2026-07-28/.
   Restore them or retarget the rule — but they predate 2026-07-28 and ManageOrders has
   moved since (ORDER_ODBC reconcile, 2026-08-10), so check currency before copying back.
+- 🔴 **WA sales tax rules are UNRECOVERED and the pointer to them dangled.** The repo copy died in
+  the 2026-07-28 reset while the auto-memory stub still said "canonical copy is the repo file", so
+  anyone following it found nothing — a wrong-price trap on a TAX fact. The stub now names the
+  recovery source (`git show cc9a61e4^:memory/wa-sales-tax-rules.md`, also in the Downloads
+  backup). ⏭️ **Restore it to THIS tree after a currency check against Caspio/DOR** — it predates
+  2026-07-28 and nobody should quote a rate from it until verified.
+- ✅ **Resolved 2026-08-17:** four durable docs lived ONLY in machine-local auto-memory while
+  CLAUDE.md and this index routed real work to them (`handbook-sync-workflow.md`,
+  `policies-hub-update-playbook.md`, `nwca-policy-reconciliation-2026-08.md`,
+  `policy-corpus-bulk-read.md`). Promoted into this tree; auto-memory keeps one-line pointers.
+  🔑 Deliberately NOT promoted: `MEMORY.md` (the auto-loaded index belongs there by design),
+  `caspio-schema.md`, and the `feedback_*` per-fact files (auto-memory's native format).
 - Auto-memory `caspio-api-usage-audit-2026-07.md` (166 lines, waves 2–3: 18 + 26 Jul)
   overlaps `CASPIO_QUOTA_2026-07.md` (27 Jul–1 Aug) in SUBJECT but not in DATE RANGE.
   Not collapsed — folding it into the repo copy would drop the wave-2 record. Reconcile
