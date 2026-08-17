@@ -12788,12 +12788,12 @@ app.post('/api/quote-sessions/:quoteId/sync-from-shopworks', async (req, res) =>
         await makeApiRequest(`/quote_sessions/${pkId}`, 'PUT', {
           ShopWorks_Order_Number: manualOrderNumber,
           ShopWorks_Status: 'Pending',
-          ShopWorks_Last_Synced: new Date().toISOString().replace(/\.\d{3}Z$/, ''),
+          ShopWorks_Last_Synced: nowPacificNaiveIso(),
         }).catch(() => {});
         return res.json({
           success: true, synced: true, deleted: false, status: 'Pending',
           shopWorksOrderNumber: manualOrderNumber,
-          lastSynced: new Date().toISOString().replace(/\.\d{3}Z$/, ''),
+          lastSynced: nowPacificNaiveIso(),
           reason: 'shopworks_order_not_in_mo_v1_yet',
           note: 'Order # saved. ManageOrders /v1 syncs from OnSite every 15 min between 7am-7pm Pacific. Refresh in a few minutes for live data.',
         });
@@ -12802,7 +12802,16 @@ app.post('/api/quote-sessions/:quoteId/sync-from-shopworks', async (req, res) =>
       return res.status(502).json({ success: false, error: `MO snapshot fetch error: ${e.message}` });
     }
 
-    const nowIso = new Date().toISOString().replace(/\.\d{3}Z$/, '');
+    // PACIFIC, not UTC (fixed 2026-08-17). ShopWorks_Last_Synced is READ back by
+    // parseCaspioPacificMs (staleness + purge, below) and by CaspioDate.parse on the
+    // dashboard — i.e. everything treats it as the naive Pacific wall-clock Caspio
+    // stores everywhere else. Writing UTC made every fresh row parse ~7-8 h in the
+    // FUTURE, so `now - lastSynced` went NEGATIVE and the 30-minute staleness test
+    // could not fire: a just-synced quote was skipped for ~7.5 h instead of 30 min,
+    // quietly turning the hourly re-sync into ~3x/day. That cadence is exactly what
+    // detects ShopWorks-side deletions and fires the ShipStation cancel-cascade.
+    // It also pushed the 30-day purge (and the dashboard's "Purges in N days") late.
+    const nowIso = nowPacificNaiveIso();
 
     // 4. Branch: order found in ShopWorks vs. not.
     if (snapshot.found) {
