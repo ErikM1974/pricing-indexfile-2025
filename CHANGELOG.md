@@ -1,3 +1,8 @@
+## v2026.08.17.2 (2026.08.17)
+
+- Pricing: make four silent fallbacks visible, retire stale calculators
+- Deploy v2026.08.17.2: 5 files (index.html,customer-product.html,quote-cart.html,...)
+
 ## v2026.08.17.1 (2026.08.17)
 
 - Security: gate /quote-builders, close two XSS sinks
