@@ -202,8 +202,11 @@ class ShopWorksImportParser {
         };
 
         // Invalid part numbers to skip
+        // 'DISCOUNT' deliberately NOT here (2026-08-16): ShopWorks prints a real price
+        // reduction as an ordinary line, and dropping it re-billed the customer the
+        // discount on any re-quote. GIFT CODE stays — it is a PAYMENT, not a reduction.
         this.INVALID_PARTS = [
-            'GIFT CODE', 'DISCOUNT', 'TEST',
+            'GIFT CODE', 'TEST',
             'TAX', 'TOTAL'
         ];
 
@@ -1203,6 +1206,31 @@ class ShopWorksImportParser {
                 };
                 break;
 
+            case 'discount': {
+                // ShopWorks writes a reduction as a NEGATIVE unit price ('Unit Price: $-100.00'),
+                // but the builder's #discount-amount is a POSITIVE number it subtracts, and
+                // ManageOrders' TotalDiscounts is positive too. Take the magnitude so the sign
+                // convention can never invert: importing the raw negative would leave the row
+                // hidden (`if (discountAmount > 0)`), and importing it unsigned as a fee would
+                // ADD the money instead of removing it. A line called DISCOUNT is a reduction
+                // whichever way ShopWorks signed it.
+                const amt = Math.abs((item.unitPrice || 0) * (item.quantity || 1));
+                if (amt > 0) {
+                    if (!result.services.discount) {
+                        result.services.discount = { amount: 0, description: '' };
+                    }
+                    result.services.discount.amount += amt;
+                    const label = (item.description || '').trim();
+                    if (label) {
+                        result.services.discount.description =
+                            result.services.discount.description
+                                ? `${result.services.discount.description}; ${label}`
+                                : label;
+                    }
+                }
+                break;
+            }
+
             case 'fb':
                 // Full Back embroidery - treated as additional logo with specific position
                 if (!result.services.additionalLogos) {
@@ -1606,6 +1634,12 @@ class ShopWorksImportParser {
         // Graphic design
         if (pn === 'GRT-75') {
             return 'graphic-design';
+        }
+
+        // Order-level price reduction. Round-trips with the push side, which sums these
+        // into ManageOrders' `TotalDiscounts` rather than emitting a line.
+        if (pn === 'DISCOUNT') {
+            return 'discount';
         }
 
         // Full Back embroidery (large back design).
