@@ -1,3 +1,8 @@
+## v2026.08.17.8 (2026.08.17)
+
+- Memory: fillable PDFs need /NeedAppearances; Forms_Library 502 was a length cap
+- Gate the Business Credit Application to staff; /forms stays public otherwise
+
 ## v2026.08.17.7 (2026.08.17)
 
 - Add Business Credit Application (No Personal Guaranty) fillable PDF
