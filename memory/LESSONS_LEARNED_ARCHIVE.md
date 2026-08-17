@@ -4,6 +4,41 @@ Resolved entries aged out of `LESSONS_LEARNED.md` (300-line cap). Newest first. 
 
 ---
 
+## Never assert on serialized data with a substring grep (2026-08-16)
+
+**Problem.** `tests/unit/quote-cart-store.test.js` failed at random on a clean tree, roughly
+1 run in N. Everyone re-ran it and moved on — which is the real damage: it trains the team to
+treat a red suite as noise.
+
+**Root cause.** The assertion was
+`expect(JSON.stringify(raw)).not.toContain('504')` — stringify the WHOLE stored record and grep
+it for the digits of a price that must not persist. But the record also holds `createdAt` /
+`addedAt` epoch-ms and a base36 `id`. Any clock whose digits happen to contain "504" fails it.
+Caught red-handed at `createdAt: 1786925049163` → "…25**049**163…". The store was always correct;
+only the assertion was wrong.
+
+**Fix.** Assert the INVARIANT, not the bytes. `add()` builds its item from an explicit allowlist
+(`quote-cart-store.js:130-146`), so the test now pins the whole key set, checks the deep-copied
+`sizes` (the one nested object a caller could smuggle through), and runs a recursive
+**key** scan for price-bearing names. Plus a regression lock that stubs `Date.now()` to the exact
+repro timestamp and asserts `toContain('504')` — proving the timestamps really do carry it while
+the invariant still holds. Verified 50/50 clean runs, and a deliberately injected price leak fails
+both tests with exact paths (`items[0].price.total`).
+
+**Prevention.**
+- 🔴 **A negative substring assertion over serialized data is a time bomb** — timestamps, ids,
+  hashes and random suffixes all inject arbitrary digits. Assert on the field, not the string.
+  Positive `toContain` on a NARROW value is fine; it was the whole-record negative that broke.
+  Swept both repos: this was the only instance.
+- 🔑 **A key-set assertion beats naming the bad fields.** Pinning all 15 keys also catches the
+  refactor that actually lets money in — someone replacing the allowlist with a spread.
+- 🔴 **Mutation-test the fix, and check the mutation applied.** My first injection silently did
+  nothing (searched `\n`, the file is CRLF) and the suite "passed", which looked like proof and
+  was the opposite. Always confirm the injected break actually landed — `git diff --stat` — before
+  believing a green run means the test is watching.
+
+---
+
 ## A consolidation is only as complete as the LAST thing that writes the value (2026-08-16)
 
 **Problem.** The 2026-08-15 "one full-back ladder" work moved every surface onto Caspio
