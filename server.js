@@ -12767,8 +12767,17 @@ app.post('/api/quote-sessions/:quoteId/sync-from-shopworks', async (req, res) =>
       const snapshotUrl = manualOrderNumber
         ? `${SYNC_PROXY_BASE}/api/manageorders/order/${encodeURIComponent(extOrderId)}/snapshot?orderNumber=${manualOrderNumber}&refresh=true`
         : `${SYNC_PROXY_BASE}/api/manageorders/order/${encodeURIComponent(extOrderId)}/snapshot`;
-      const r = await fetch(snapshotUrl);
+      // The secret is REQUIRED here: proxy 191c906 (2026-08-10) put
+      // /api/manageorders/order behind requireCrmApiSecret, and this was the one
+      // proxy call in this file sending no credentials — so every sync 401'd →
+      // 502 → errors==candidates, synced:0, hourly, for a week. The 502 return
+      // below logs nothing, which is why `grep bulk-sync` showed only the
+      // summary line. Log the failure so the next gate change is one grep away.
+      const r = await fetch(snapshotUrl, {
+        headers: CRM_API_SECRET ? { 'X-CRM-API-Secret': CRM_API_SECRET } : {},
+      });
       if (!r.ok) {
+        console.warn(`[sync-from-shopworks] ✗ ${safeQuoteId} — MO snapshot HTTP ${r.status} (${snapshotUrl.split('?')[0]})`);
         return res.status(502).json({ success: false, error: `MO snapshot fetch failed: HTTP ${r.status}` });
       }
       snapshot = await r.json();
