@@ -1,3 +1,13 @@
+## v2026.08.16.4 (2026.08.16)
+
+- Parser: read the part numbers we actually push (DECG-FB, AL-CAP) + keep their price
+- Parser: make the Full Back reclassify guard actually fire
+- LESSONS: we push part numbers our own importer cannot read
+- LESSONS: archive the 2026-08-15 five-full-back-prices entry to stay under the cap
+- Import: a Full Back is not an Additional Logo, and a cap logo is not a garment one
+- Import: close four gaps an audit found in the routing fix
+- Deploy v2026.08.16.4: 1 files (embroidery-quote-builder.html,...)
+
 ## v2026.08.16.3 (2026.08.16)
 
 - Baselines: add EMB-08, the first scenario that touches full-back pricing
