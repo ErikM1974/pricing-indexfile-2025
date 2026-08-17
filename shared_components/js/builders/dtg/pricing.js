@@ -3,6 +3,7 @@
  * dtg-inline-form.js IIFE; lexical references became the imports below.
  */
 /* global */
+import { showFallbackPricingWarning } from '../shared/errors.js';
 import { effectiveLocationCode, effectiveLocationLabel, isRowColorInvalid, renderBand, renderTable, syncDueDateFromQty, updateArtFeeDisplay, updateSubmitEnabled } from './form-core.js';
 import { artFeeTotals } from './fees.js';
 import { _bundleCache, dtgIF, state } from './state.js';
@@ -215,6 +216,17 @@ export async function updateLivePrices() {
             // no more hardcoded $50.
             const tier = svc.getTierForQuantity(bundle.tiers, cq);
             if (!tier) { row._perPiece = null; row._lineTotal = 0; continue; }
+            // 🔴 Caspio returned NO tiers, so the canonical engine synthesised one
+            // (dtg-canonical-pricing.js tierForCombinedQty: TierLabel '24-47',
+            // LTM_Fee 0, _fallback true). It has always set that flag and NOTHING
+            // has ever read it — so a 6-piece order silently priced at the 24-47
+            // rate with the $50 LTM missing entirely. Under-charging is still a
+            // wrong price. Surfaced 2026-08-17; the flag lives on the vendored
+            // engine, which is byte-locked to the proxy, so the fix belongs here
+            // at the consumer rather than in that file.
+            if (tier._fallback) {
+                showFallbackPricingWarning('DTG tiers (no LTM applied)');
+            }
             // Cache for the pre-flight panel's tier-break hint.
             dtgIF._lastTier = tier;
             dtgIF._allTiers = bundle.tiers;

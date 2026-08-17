@@ -56,8 +56,12 @@ class EmbroideryPricingCalculator {
         // Additional Logo (AL) tiers - will be fetched from API
         this.alTiers = {};
 
-        // Rounding method - will be fetched from API
+        // Rounding method - will be fetched from API.
+        // null is MEANINGFUL: roundPrice() treats it as half-dollar-up, the
+        // garment default. Only an explicit 'CeilDollar' rounds to whole dollars.
         this.roundingMethod = null;
+        // Set when the rounding rule had to be assumed (see fetchRoundingRules).
+        this._roundingFallbackUsed = null;
 
         // =========================================
         // CAP EMBROIDERY PRICING (for unified builder)
@@ -389,8 +393,17 @@ class EmbroideryPricingCalculator {
                 }
             }
         } catch (error) {
+            // 🔴 This CHANGES THE PRICE, so it must be visible (2026-08-17).
+            // roundingMethod starts as null, and roundPrice() treats null as
+            // half-dollar-up. Setting 'CeilDollar' here flips every garment to
+            // WHOLE-dollar rounding — up to +$0.49 a piece — and until now the
+            // only trace was a console.warn nobody reads. Erik's #1 rule: a
+            // fallback that moves a price carries a visible warning.
+            // (Reached only when the pricing-bundle had no rulesR.RoundingMethod
+            // AND this endpoint failed, so it cannot clobber a good value.)
             console.warn('[EmbroideryPricingCalculator] Could not fetch rounding rules, using default CeilDollar');
             this.roundingMethod = 'CeilDollar'; // Default for embroidery
+            this._roundingFallbackUsed = 'rounding rule (whole-dollar assumed)';
         }
     }
 
@@ -1984,10 +1997,23 @@ class EmbroideryPricingCalculator {
             showToast(`Pricing data incomplete (${this._costFallbackUsed} missing from Caspio) — quoted with the default decoration cost. Verify pricing before sending.`, 'warning', 8000);
         }
 
+        // Same rule for the rounding-rule fallback (2026-08-17). Sticky for the
+        // life of the calculator (set once during init, unlike _costFallbackUsed
+        // which is per-run), so it is NOT reset at the top of this method.
+        // Deliberately NOT escalated to a hard error the way costFallbackUsed is
+        // in quote-cart-engine.js: a guessed decoration COST can be wildly wrong,
+        // whereas this only coarsens rounding by at most $0.49 and always rounds
+        // UP — so refusing to quote would take the customer catalog down over a
+        // rounding hiccup. Rep sees it; the number is still returned.
+        if (this._roundingFallbackUsed && typeof showToast === 'function') {
+            showToast(`Live rounding rule unavailable — prices rounded UP to the whole dollar (up to $0.49/pc high). Verify before sending.`, 'warning', 8000);
+        }
+
         return {
             products: productPricing,
             failedProducts: failedProducts,  // review C5 — builder gates save/push if any product price failed
             costFallbackUsed: this._costFallbackUsed || null,  // customer engine REFUSES fallback-derived prices (Rule 4)
+            roundingFallbackUsed: this._roundingFallbackUsed || null,  // advisory: prices rounded whole-dollar, not refused (see toast above)
             totalQuantity: totalQuantity,
             tier: garmentTier,  // Primary tier for backward compat (garment-based)
             garmentTier: garmentTier,  // NEW: Separate garment tier
