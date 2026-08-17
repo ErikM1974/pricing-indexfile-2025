@@ -412,13 +412,24 @@ class EmbroideryPricingCalculator {
             if (data.success && data.data) {
                 const codes = data.data;
 
-                // FB (Full Back) - stitch-based pricing
+                // FB (Full Back) — LEGACY Service_Codes row, now FALLBACK ONLY.
                 // BUG FIX 2026-02-01: Removed PricingMethod filter - API may return null
                 // FB pricing is determined by ServiceCode alone; PricingMethod is metadata only
+                //
+                // 🔴 Runs AFTER the DECG-FB ladder fetch (~:284), so an unconditional write
+                // here CLOBBERS it. Until 2026-08-16 this line did exactly that to
+                // fbBaseStitchCount, which meant the ladder's own `minStitches` was dead on
+                // every full-back path — Erik could change the 25,000 minimum in
+                // Embroidery_Costs and nothing moved, because this retired row overwrote it
+                // moments later. Only take these values when the ladder did NOT supply them.
                 const fb = codes.find(c => c.ServiceCode === 'FB');
                 if (fb) {
-                    this.fbBaseStitchCount = fb.StitchBase || 25000;
-                    // FB stitch rate from SellPrice (per 1K stitches)
+                    if (!(this.fbTierRates && Object.keys(this.fbTierRates).length)) {
+                        if (fb.StitchBase) this.fbBaseStitchCount = fb.StitchBase;
+                    }
+                    // FB stitch rate from SellPrice (per 1K stitches). Kept unconditionally:
+                    // it is the documented fallback _getFBRateForQty() uses when the ladder
+                    // is unavailable, and it never wins over a loaded ladder.
                     if (fb.SellPrice) {
                         this.fbStitchRate = fb.SellPrice;
                     }
@@ -2380,9 +2391,13 @@ class EmbroideryPricingCalculator {
                 // full back at $1.25/1K where every other surface says $1.20, and a 5-piece
                 // one at $1.25 where they say $1.50.
                 //
-                // `quantity` is the ORDER quantity for tiering, which is what every caller
-                // already passes (see collectAlReviewItem / the DECG-DECC loop in
-                // shopworks-import.js — each sums qty across its lines before calling).
+                // ⚠️ `quantity` here is the caller's PER-SERVICE summed quantity, NOT the
+                // order quantity — collectAlReviewItem sums the additional-logo lines, the
+                // DECG/DECC loop sums that flavor's lines. The true order total is
+                // embConfigOptions.totalQty (shopworks-import.js ~:1004) and is never passed
+                // in. The two coincide on a typical order (every garment gets the logo) but
+                // are NOT the same number, so anyone making this branch reachable must pass
+                // the order quantity or the tier lookup silently picks the wrong rate.
                 // _getFBRateForQty never returns 0: a $0 full back must fail loudly upstream.
                 const base = Math.max(stitchCount, this.fbBaseStitchCount || 25000);
                 return (base / 1000) * this._getFBRateForQty(quantity);

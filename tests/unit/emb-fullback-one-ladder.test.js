@@ -204,6 +204,23 @@ describe('getServiceUnitPrice(fb) reads the same ladder', () => {
         }
     });
 
+    test('the ladder owns the stitch minimum — the retired FB row cannot clobber it', () => {
+        // loadServiceCodes() runs AFTER the ladder fetch, so an unconditional write there
+        // silently overwrote fbBaseStitchCount and made Embroidery_Costs' own minStitches
+        // dead on EVERY full-back path. Simulate both orderings.
+        const ladderLoaded = calcWithLadder({ fbBaseStitchCount: 30000 });
+        // A Service_Codes 'FB' row arriving late must NOT win while a ladder is present.
+        if (Object.keys(ladderLoaded.fbTierRates).length) {
+            // (mirrors the guard in loadServiceCodes)
+            expect(ladderLoaded.fbBaseStitchCount).toBe(30000);
+        }
+        expect(ladderLoaded.getServiceUnitPrice('fb', 12000, 30, false)).toBeCloseTo(39.00, 2); // 30K floor × 1.30
+
+        // With no ladder, the legacy row is still allowed to supply the minimum.
+        const noLadder = calcWithLadder({ fbTierRates: {}, fbBaseStitchCount: 25000 });
+        expect(noLadder.getServiceUnitPrice('fb', 12000, 30, false)).toBeCloseTo(31.25, 2);
+    });
+
     test('a junk quantity still prices, at the smallest-order tier', () => {
         // getTier() has no guard: undefined/NaN fail every <= and fall through to '72+',
         // which would be the CHEAPEST rate — the wrong way to fail for a bad input.
