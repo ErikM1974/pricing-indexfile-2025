@@ -49,6 +49,33 @@ function sampleItem(overrides) {
     }, overrides || {});
 }
 
+/** Exactly what add() writes (quote-cart-store.js:130-146), sorted. */
+const STORED_ITEM_KEYS = [
+    'addedAt', 'catalogColor', 'color', 'id', 'inkColors', 'isCap', 'method',
+    'methodLabel', 'placement', 'placementLabel', 'productTitle', 'qty',
+    'safetyStripes', 'sizes', 'style'
+].sort();
+
+/**
+ * Every price-bearing KEY anywhere in a structure, as dotted paths.
+ *
+ * Deliberately inspects keys and never values: the store's contract is that no money
+ * FIELD is persisted (memory/CUSTOMER_QUOTE_CART_DESIGN_2026-06.md — pricing happens at
+ * render time through quote-cart-engine.js). Grepping values instead is what made this
+ * file flaky, because timestamps and ids are values that contain arbitrary digits.
+ */
+const PRICE_KEY = /^(price|perPiece|unitPrice|total|subtotal|cost|sellPrice|ltmFee|grandTotal|amount)$/i;
+function priceKeysIn(node, at = '') {
+    if (node === null || typeof node !== 'object') { return []; }
+    if (Array.isArray(node)) {
+        return node.flatMap((v, i) => priceKeysIn(v, `${at}[${i}]`));
+    }
+    return Object.keys(node).flatMap((k) => {
+        const path = at ? `${at}.${k}` : k;
+        return (PRICE_KEY.test(k) ? [path] : []).concat(priceKeysIn(node[k], path));
+    });
+}
+
 describe('QuoteCartStore', () => {
     afterEach(() => {
         delete global.localStorage;
@@ -169,10 +196,46 @@ describe('QuoteCartStore', () => {
         const store = freshStore();
         expect(() => store.add({})).toThrow(/style/);
 
-        const stored = store.add(sampleItem({ price: { total: 504 }, perPiece: 21 }));
+        const stored = store.add(sampleItem({
+            price: { total: 504 }, perPiece: 21, unitPrice: 21, total: 504, ltmFee: 50
+        }));
         expect(stored.price).toBeUndefined();
         expect(stored.perPiece).toBeUndefined();
+
+        // add() builds `stored` from an explicit allowlist (quote-cart-store.js:130-146),
+        // so assert the WHOLE key set, not a handful of known-bad names. This also fails if
+        // someone refactors it to a spread and lets arbitrary caller keys through — the way
+        // money would actually get in.
         const raw = JSON.parse(global.localStorage.getItem(KEY));
-        expect(JSON.stringify(raw)).not.toContain('504');
+        expect(Object.keys(raw.items[0]).sort()).toEqual(STORED_ITEM_KEYS);
+
+        // `sizes` is deep-copied from the caller, so it is the one nested object that could
+        // smuggle a value past the allowlist.
+        expect(raw.items[0].sizes).toEqual({ S: 24 });
+        expect(priceKeysIn(raw)).toEqual([]);
+    });
+
+    // Regression lock for a flake fixed 2026-08-16. This assertion used to be
+    // `expect(JSON.stringify(raw)).not.toContain('504')` — a substring grep over the whole
+    // serialized record, which also contains `createdAt` / `addedAt` epoch-ms and a base36
+    // `id`. It failed whenever the clock happened to contain the digits, e.g.
+    // 1786925049163 → "…25049163…". The store was always correct; only the assertion was.
+    // Pinned at the exact timestamp that caught it, so a reintroduced grep fails every run
+    // instead of one in N.
+    test('the price-leak assertion does not depend on what the clock reads', () => {
+        const FLAKY_NOW = 1786925049163; // contains "504"
+        const spy = jest.spyOn(Date, 'now').mockReturnValue(FLAKY_NOW);
+        try {
+            const store = freshStore();
+            store.add(sampleItem({ price: { total: 504 }, perPiece: 21 }));
+
+            const raw = JSON.parse(global.localStorage.getItem(KEY));
+            expect(raw.createdAt).toBe(FLAKY_NOW);
+            expect(raw.items[0].addedAt).toBe(FLAKY_NOW);
+            expect(JSON.stringify(raw)).toContain('504');   // the timestamps really do carry it
+            expect(priceKeysIn(raw)).toEqual([]);           // …and the invariant still holds
+        } finally {
+            spy.mockRestore();
+        }
     });
 });

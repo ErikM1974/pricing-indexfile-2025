@@ -418,10 +418,14 @@ class EmbroideryPricingCalculator {
                 //
                 // 🔴 Runs AFTER the DECG-FB ladder fetch (~:284), so an unconditional write
                 // here CLOBBERS it. Until 2026-08-16 this line did exactly that to
-                // fbBaseStitchCount, which meant the ladder's own `minStitches` was dead on
-                // every full-back path — Erik could change the 25,000 minimum in
-                // Embroidery_Costs and nothing moved, because this retired row overwrote it
-                // moments later. Only take these values when the ladder did NOT supply them.
+                // fbBaseStitchCount, which would make the ladder's own `minStitches` dead on
+                // every full-back path.
+                //
+                // LATENT, not live: verified 2026-08-16 that `GET /api/service-codes?code=FB`
+                // returns count 0 — the row has been deleted, so `if (fb)` never fires and
+                // nothing is being clobbered today. It would have fired the moment anyone
+                // recreated an 'FB' row, which is exactly the kind of Caspio edit Erik makes
+                // without a deploy. Only take these values when the ladder did NOT supply them.
                 const fb = codes.find(c => c.ServiceCode === 'FB');
                 if (fb) {
                     if (!(this.fbTierRates && Object.keys(this.fbTierRates).length)) {

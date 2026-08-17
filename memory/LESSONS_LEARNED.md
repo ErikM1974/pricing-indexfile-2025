@@ -5,18 +5,57 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## Never assert on serialized data with a substring grep (2026-08-16)
+
+**Problem.** `tests/unit/quote-cart-store.test.js` failed at random on a clean tree, roughly
+1 run in N. Everyone re-ran it and moved on — which is the real damage: it trains the team to
+treat a red suite as noise.
+
+**Root cause.** The assertion was
+`expect(JSON.stringify(raw)).not.toContain('504')` — stringify the WHOLE stored record and grep
+it for the digits of a price that must not persist. But the record also holds `createdAt` /
+`addedAt` epoch-ms and a base36 `id`. Any clock whose digits happen to contain "504" fails it.
+Caught red-handed at `createdAt: 1786925049163` → "…25**049**163…". The store was always correct;
+only the assertion was wrong.
+
+**Fix.** Assert the INVARIANT, not the bytes. `add()` builds its item from an explicit allowlist
+(`quote-cart-store.js:130-146`), so the test now pins the whole key set, checks the deep-copied
+`sizes` (the one nested object a caller could smuggle through), and runs a recursive
+**key** scan for price-bearing names. Plus a regression lock that stubs `Date.now()` to the exact
+repro timestamp and asserts `toContain('504')` — proving the timestamps really do carry it while
+the invariant still holds. Verified 50/50 clean runs, and a deliberately injected price leak fails
+both tests with exact paths (`items[0].price.total`).
+
+**Prevention.**
+- 🔴 **A negative substring assertion over serialized data is a time bomb** — timestamps, ids,
+  hashes and random suffixes all inject arbitrary digits. Assert on the field, not the string.
+  Positive `toContain` on a NARROW value is fine; it was the whole-record negative that broke.
+  Swept both repos: this was the only instance.
+- 🔑 **A key-set assertion beats naming the bad fields.** Pinning all 15 keys also catches the
+  refactor that actually lets money in — someone replacing the allowlist with a spread.
+- 🔴 **Mutation-test the fix, and check the mutation applied.** My first injection silently did
+  nothing (searched `\n`, the file is CRLF) and the suite "passed", which looked like proof and
+  was the opposite. Always confirm the injected break actually landed — `git diff --stat` — before
+  believing a green run means the test is watching.
+
+---
+
 ## A consolidation is only as complete as the LAST thing that writes the value (2026-08-16)
 
 **Problem.** The 2026-08-15 "one full-back ladder" work moved every surface onto Caspio
 `Embroidery_Costs` `ItemType='DECG-FB'`. Two follow-on defects survived it, both invisible to a
 green suite.
 
-**Root cause 1 — a later init step clobbered the ladder.** `_doInitializeConfig()` reads the
+**Root cause 1 — a later init step clobbers the ladder.** `_doInitializeConfig()` reads the
 ladder at ~:284 (`fbBaseStitchCount = fullBack.minStitches`), then calls `loadServiceCodes()` at
 :334, which at :420 did an **unconditional** `this.fbBaseStitchCount = fb.StitchBase || 25000`
-from the retired `Service_Codes` 'FB' row. The ladder's own minimum was overwritten moments
-after being read, on **all three** full-back paths. Erik could edit the 25,000 minimum in Caspio
-and nothing would move.
+from the retired `Service_Codes` 'FB' row — overwriting the ladder's own minimum moments after
+it was read, on all three full-back paths.
+⚠️ **LATENT, not live — I first reported this as live and was wrong.** `GET
+/api/service-codes?code=FB` returns **count 0**: the row is deleted, so `if (fb)` never fires and
+nothing is being clobbered today. It would fire the moment anyone recreated an 'FB' row — exactly
+the kind of no-deploy Caspio edit this shop makes. Same reason `fbStitchRate`'s "fallback" is
+really the constructor constant `1.25` (`:39`), not a Caspio value, despite comments saying so.
 
 **Root cause 2 — one branch was simply missed**, and nothing could catch it:
 `getServiceUnitPrice`'s `'fb'` case kept multiplying by the flat `Service_Codes` rate. It lives
@@ -182,64 +221,3 @@ still SELECT them ignore the results, and each query still returns its other Ite
 - ⚠️ Do NOT delete `CTR-Garmt`, `CTR-Cap`, `AL`, `AL-CAP`, `CB`, `CS` — live pricing depends on them.
 - 🔴 **Filter `ItemType` with EQUALS, never CONTAINS.** "FB" as a contains-match also selects
   `CTR-FB` and — fatally — `DECG-FB`, which is the master full-back ladder every surface reads.
-
-## A dashboard promised cost-plus pricing the builder could not read (2026-08-14)
-
-**Problem.** The staff Product Manager has offered **"Automatic (cost ÷ margin + logo — same as
-SanMar)"** since 2026-07-06 (`PricingMethod: 'Margin'`, `DefaultSellPrice: 0`). A product created
-that way **could not be quoted at all**: `populateNonSanmarRow()` did
-`row.dataset.sellPrice = product.DefaultSellPrice || 0` → the string `'0'` → a ⚠ $0.00 price cell
-→ the save gate refused the quote. The rep saw a zero and no explanation. Reps were instead
-hand-computing a decorated price for every S&S Activewear garment (~5% of orders), so the margin,
-tier, embroidery cost, size upcharges and LTM were all bypassed and nobody could see whether the
-number was right.
-
-**Root cause.** Two halves of one feature were built a month apart against no shared contract.
-The dashboard wrote a *mode*; the builder only ever read a *price*. `PricingMethod` had also
-drifted to **three spellings** in live data — `'FIXED'` (builder modal + proxy seed),
-`'FixedPrice'` and `'Margin'` (dashboard) — with older rows blank, so there was no single value a
-naïve reader could test for.
-
-**Solution.** `resolveNonSanmarPricingMode()` in `quote-builder-utils.js` reads all three
-spellings tolerantly (and infers from whichever of cost/sell is > 0 when blank); writers now emit
-only the canonical two. The price itself comes from `buildSyntheticSizePricing()`
-(`embroidery-quote-pricing.js`), which builds a **`/api/size-pricing`-shaped payload** from the
-rep's blank cost — because that endpoint never returned prices, only SanMar's raw `CASE_PRICE`
-plus the upcharge ladder. The formula is untouched; only its input differs.
-
-**Prevention.**
-- 🔑 **`/api/size-pricing` returns COST, not price.** The engine does
-  `cost / marginDenominator + embCost → round → + upcharge`. Feed it a synthesized payload and a
-  non-SanMar garment prices identically to a SanMar one — **one new input shape, no 4th pricing
-  path** (Rule 9). `tests/unit/emb-nonsanmar-costplus.test.js` asserts *byte-identical* lineItems
-  between the two; point reviewers there rather than re-arguing it.
-- 🔴 **Do NOT seed `sizePricingCache` to do this.** It is keyed by bare style, **never cleared**,
-  and shared with `getProductSizePrices()` — a seeded entry is a permanent page-lifetime shadow
-  over a real SanMar style, and vendor styles demonstrably drift into SanMar
-  (`non-sanmar-products.js` documents six that had to be deleted for exactly that). Passing the
-  cost on the product object has no shared state, so there is nothing to invalidate.
-- 🔑 **Anchor sizes are load-bearing, not clutter.** The garment path computes upcharges
-  *relative* to its chosen base size; the cap path adds them *absolutely*. Injecting S/M/L/XL
-  (garments) / OSFA (caps) pins the base to a zero-upcharge size so relative ≡ absolute and
-  neither path needs a branch. They never emit a line (the loop iterates `sizeBreakdown`, not
-  `basePrices`) — delete them and a 2XL/3XL-only order silently loses its upcharge.
-- 🔴 **`quote_items.SizeBreakdown` is an ALLOWLIST, not a bag.** `buildProductLines()` filters a
-  short list of known metadata keys and treats **every other key as a SIZE** — a stray `vendor`
-  key would ship a LinesOE line with `Size:"SSA"`, `Qty:"SSA"` and a real Price. Per-item
-  metadata goes in `LogoSpecs` (already JSON, 60 KB `LONG_FIELDS`). `heavyweight` was already
-  being written and was NOT in that filter; it survived only because customer-supplied items route
-  to `buildServiceLine()`. Added it to the list — one refactor and it would have been a live bug.
-- 🔴 **`saveQuote()` and `updateQuote()` are byte-identical duplicates.** Patch one and every
-  *revision* silently drops the new field, while reload masks it by re-reading Caspio. Both, always.
-- 🔑 **A search-result cache can defeat a source guard.** `showSearchSuggestions()` wrote every
-  autocomplete hit into `embState.productCache`, which `_lookupStyleProduct()` checks **before**
-  the API — so a cached vendor row would have sailed past the `source: 'non-sanmar'` check. Fixing
-  the API alone was not enough.
-- ⚠️ **Making a style findable can break the path that handled it.** Once `/api/stylesearch`
-  returned vendor styles, `_lookupStyleProduct()` started *succeeding*, sending the row down the
-  SanMar branch (`/api/product-colors` → empty) and never reaching `populateNonSanmarRow()`. The
-  proxy and builder changes must ship as ONE unit.
-- 🔑 **A free-text code column plus an exact-match filter is a reporting trap.**
-  `GET /api/non-sanmar-products?vendor=` compares uppercase-exact, so "S&S" / "SS" / "SSA" typed
-  by three reps split the vendor forever. Curated `<select>` + an `Other…` escape; the two copies
-  (builder + dashboard) are drift-locked by a test.

@@ -4,6 +4,69 @@ Resolved entries aged out of `LESSONS_LEARNED.md` (300-line cap). Newest first. 
 
 ---
 
+## A dashboard promised cost-plus pricing the builder could not read (2026-08-14)
+
+**Problem.** The staff Product Manager has offered **"Automatic (cost ÷ margin + logo — same as
+SanMar)"** since 2026-07-06 (`PricingMethod: 'Margin'`, `DefaultSellPrice: 0`). A product created
+that way **could not be quoted at all**: `populateNonSanmarRow()` did
+`row.dataset.sellPrice = product.DefaultSellPrice || 0` → the string `'0'` → a ⚠ $0.00 price cell
+→ the save gate refused the quote. The rep saw a zero and no explanation. Reps were instead
+hand-computing a decorated price for every S&S Activewear garment (~5% of orders), so the margin,
+tier, embroidery cost, size upcharges and LTM were all bypassed and nobody could see whether the
+number was right.
+
+**Root cause.** Two halves of one feature were built a month apart against no shared contract.
+The dashboard wrote a *mode*; the builder only ever read a *price*. `PricingMethod` had also
+drifted to **three spellings** in live data — `'FIXED'` (builder modal + proxy seed),
+`'FixedPrice'` and `'Margin'` (dashboard) — with older rows blank, so there was no single value a
+naïve reader could test for.
+
+**Solution.** `resolveNonSanmarPricingMode()` in `quote-builder-utils.js` reads all three
+spellings tolerantly (and infers from whichever of cost/sell is > 0 when blank); writers now emit
+only the canonical two. The price itself comes from `buildSyntheticSizePricing()`
+(`embroidery-quote-pricing.js`), which builds a **`/api/size-pricing`-shaped payload** from the
+rep's blank cost — because that endpoint never returned prices, only SanMar's raw `CASE_PRICE`
+plus the upcharge ladder. The formula is untouched; only its input differs.
+
+**Prevention.**
+- 🔑 **`/api/size-pricing` returns COST, not price.** The engine does
+  `cost / marginDenominator + embCost → round → + upcharge`. Feed it a synthesized payload and a
+  non-SanMar garment prices identically to a SanMar one — **one new input shape, no 4th pricing
+  path** (Rule 9). `tests/unit/emb-nonsanmar-costplus.test.js` asserts *byte-identical* lineItems
+  between the two; point reviewers there rather than re-arguing it.
+- 🔴 **Do NOT seed `sizePricingCache` to do this.** It is keyed by bare style, **never cleared**,
+  and shared with `getProductSizePrices()` — a seeded entry is a permanent page-lifetime shadow
+  over a real SanMar style, and vendor styles demonstrably drift into SanMar
+  (`non-sanmar-products.js` documents six that had to be deleted for exactly that). Passing the
+  cost on the product object has no shared state, so there is nothing to invalidate.
+- 🔑 **Anchor sizes are load-bearing, not clutter.** The garment path computes upcharges
+  *relative* to its chosen base size; the cap path adds them *absolutely*. Injecting S/M/L/XL
+  (garments) / OSFA (caps) pins the base to a zero-upcharge size so relative ≡ absolute and
+  neither path needs a branch. They never emit a line (the loop iterates `sizeBreakdown`, not
+  `basePrices`) — delete them and a 2XL/3XL-only order silently loses its upcharge.
+- 🔴 **`quote_items.SizeBreakdown` is an ALLOWLIST, not a bag.** `buildProductLines()` filters a
+  short list of known metadata keys and treats **every other key as a SIZE** — a stray `vendor`
+  key would ship a LinesOE line with `Size:"SSA"`, `Qty:"SSA"` and a real Price. Per-item
+  metadata goes in `LogoSpecs` (already JSON, 60 KB `LONG_FIELDS`). `heavyweight` was already
+  being written and was NOT in that filter; it survived only because customer-supplied items route
+  to `buildServiceLine()`. Added it to the list — one refactor and it would have been a live bug.
+- 🔴 **`saveQuote()` and `updateQuote()` are byte-identical duplicates.** Patch one and every
+  *revision* silently drops the new field, while reload masks it by re-reading Caspio. Both, always.
+- 🔑 **A search-result cache can defeat a source guard.** `showSearchSuggestions()` wrote every
+  autocomplete hit into `embState.productCache`, which `_lookupStyleProduct()` checks **before**
+  the API — so a cached vendor row would have sailed past the `source: 'non-sanmar'` check. Fixing
+  the API alone was not enough.
+- ⚠️ **Making a style findable can break the path that handled it.** Once `/api/stylesearch`
+  returned vendor styles, `_lookupStyleProduct()` started *succeeding*, sending the row down the
+  SanMar branch (`/api/product-colors` → empty) and never reaching `populateNonSanmarRow()`. The
+  proxy and builder changes must ship as ONE unit.
+- 🔑 **A free-text code column plus an exact-match filter is a reporting trap.**
+  `GET /api/non-sanmar-products?vendor=` compares uppercase-exact, so "S&S" / "SS" / "SSA" typed
+  by three reps split the vendor forever. Curated `<select>` + an `Other…` escape; the two copies
+  (builder + dashboard) are drift-locked by a test.
+
+---
+
 ## Ruth's "Final notes" box saved her words and told nobody (2026-08-14)
 
 **Problem.** Porting the Approve-note box from the art-request page to the mockup page

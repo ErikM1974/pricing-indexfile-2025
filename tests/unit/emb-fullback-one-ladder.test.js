@@ -149,12 +149,25 @@ describe('cross-surface agreement', () => {
 // green while it disagreed with the other three surfaces. (fixed 2026-08-16)
 const EmbroideryPricingCalculator = require('../../shared_components/js/embroidery-quote-pricing.js');
 
-/** A calculator with the ladder loaded, as _doInitializeConfig() leaves it. */
+/**
+ * A calculator with the ladder loaded, as _doInitializeConfig() leaves it.
+ *
+ * `skipInit: true` is the repo convention for constructing this class in tests
+ * (tests/fixtures/pricing-test-helper.js:14 and four others). Without it the
+ * constructor fires _doInitializeConfig(), the fetch fails under node, and the error
+ * path reaches showAPIWarning() → document.getElementById → an unhandled
+ * `ReferenceError: document is not defined`. It does not fail the run today, but it
+ * prints on every invocation and is one jest-config change away from doing so.
+ */
 function calcWithLadder(overrides = {}) {
-    const c = new EmbroideryPricingCalculator();
+    const c = new EmbroideryPricingCalculator({ skipInit: true });
     c.fbTierRates = { ...AL_PRICING.fullBack.ratesPerThousand };
     c.fbBaseStitchCount = 25000;
-    c.fbStitchRate = 1.25;   // legacy flat rate still present as the fallback
+    // The ladder-missing fallback. NOT a live Caspio value: verified 2026-08-16 that
+    // `GET /api/service-codes?code=FB` returns count 0 — the row is gone, so
+    // loadServiceCodes() never assigns fbStitchRate and it stays at this constructor
+    // constant (embroidery-quote-pricing.js:39).
+    c.fbStitchRate = 1.25;
     return Object.assign(c, overrides);
 }
 
