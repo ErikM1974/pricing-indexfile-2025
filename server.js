@@ -5160,6 +5160,47 @@ app.use('/styles', express.static(path.join(__dirname, 'styles'), staticOptions)
 // files; it was only ever the HTTP mount that had to go. Removing this changes
 // nothing about the build.
 app.use('/images', express.static(path.join(__dirname, 'images'), staticOptions));
+// Staff-only PDFs inside the otherwise-public /forms tree (Erik, 2026-08-17).
+// MOST of /forms is public ON PURPOSE and must stay that way — the Employee
+// Handbook, the meal-period waiver and the customer drop-off form are all linked
+// from pages an employee or a customer opens without signing in. This allowlist
+// is the exception: business paperwork a rep EMAILS to a named customer, which
+// has no reason to be fetchable by anyone who guesses the URL. Add a filename
+// here (lowercase, no leading slash) to gate it; forms-staff-only.test.js pins
+// both the list and the ordering.
+//
+// ⚠️ MUST stay ABOVE the /forms static mount below — the gate is only a gate if
+// it runs first (same ordering property as /dashboards, /tools and /admin).
+//
+// The lookup canonicalises to a BARE FILENAME, and that is load-bearing rather
+// than tidiness. serve-static resolves the path its own way, so any URL spelling
+// that resolves to the same file must collapse to the same key here or it walks
+// straight past the gate and gets served anonymously. Each step below is a shape
+// that was MEASURED serving the real PDF (or would have, on the matching OS)
+// against an earlier string-equality version of this gate:
+//   • dot-segments   /forms/policies/../<file>.pdf   → basename, so they cancel
+//   • NTFS streams   /forms/<file>.pdf::$DATA        → Win32 opens the file; 200
+//   • Win32 trailing /forms/<file>.pdf.              → trailing '.'/' ' stripped
+// Production is Linux, where only the first shape applies — the rest are defended
+// anyway because "the gate happens to hold on this OS" is not a security property.
+// Matching the basename deliberately over-gates (a same-named file in a subfolder
+// is gated too): failing toward SSO is the safe direction.
+const STAFF_ONLY_FORMS = new Set([
+  'business-credit-application-no-personal-guaranty.pdf',
+]);
+function gateStaffOnlyForms(req, res, next) {
+  let p;
+  try { p = decodeURIComponent(req.path); }
+  catch (e) { p = String(req.path); }
+  const name = p.toLowerCase()
+    .replace(/\\/g, '/')   // Win32 separator
+    .split('/').pop()      // basename — dot-segments cancel out
+    .split(':')[0]         // NTFS alternate data stream
+    .replace(/[. ]+$/, ''); // Win32 strips trailing dots/spaces
+  if (!STAFF_ONLY_FORMS.has(name)) return next();
+  return requireStaff(req, res, next);
+}
+app.use('/forms', gateStaffOnlyForms);
 app.use('/forms', express.static(path.join(__dirname, 'forms'), staticOptions));
 app.use('/guides', express.static(path.join(__dirname, 'guides'), staticOptions));
 app.use('/hr', express.static(path.join(__dirname, 'hr'), staticOptions));

@@ -5,6 +5,48 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## A fillable PDF that opens BLANK, and a Caspio 502 that was really a length cap (2026-08-17)
+
+**Problem.** Adding the Business Credit Application (No Personal Guaranty) to the Forms Library
+turned up two traps. ① The source PDF's 34 AcroForm fields each had their own `/DA`, but the
+AcroForm carried **no `/NeedAppearances`** — so a viewer that doesn't regenerate appearance
+streams renders the stale EMPTY ones. The customer types, signs, emails it back, and the copy we
+open looks blank. ② `POST /api/forms-library` returned an opaque **502 "Forms library create
+failed"** — which reads like Caspio being down, or a bad secret.
+
+**Root cause.** ① `/NeedAppearances` is the flag that tells a viewer "regenerate the field
+appearance on edit"; without it the widget's pre-baked (empty) `/AP` is what gets drawn and saved.
+Nothing warns you — it looks perfect in the viewer you happen to test in. ② The `Description`
+column has a length cap. **284 chars → 502; 188 chars → 201.** The route wraps every Caspio error
+as one generic 502, so a field-length rejection is indistinguishable from an outage or an auth
+failure.
+
+**Fix.** ① Set `/NeedAppearances = true` (plus a form-level `/DA` fallback) on the copy committed
+to `/forms/` — `forms/business-credit-application-no-personal-guaranty.pdf`, shipped
+`v2026.08.17.7`. ② Shortened the Description to 188 chars; row created, live under Payments
+(Sort_Order 33).
+
+**Prevention.**
+- 🔴 **A fillable PDF is not verified until you check `/NeedAppearances`.** Any PDF landing in
+  `/forms/` that customers or staff TYPE INTO gets the flag set before commit. This is the same
+  shape as Erik's #1 rule: the failure is silent and looks like success — blank fields read as
+  "they forgot to fill it in", not "our PDF ate their answers".
+- 🔑 **Re-open the written copy and count the fields.** `PdfWriter` can silently drop the
+  AcroForm; assert pages + field-name set + editability against the source, then curl the SERVED
+  file and re-parse it (the byte count matching the file on disk is the cheap version).
+- 🔴 **`Forms_Library.Description` is capped — keep it ≤ 200 chars**, in line with the longest
+  existing row (203). Over-length surfaces as a generic 502, never as a validation message.
+- 🔑 **Order matters: deploy the PDF BEFORE adding the registry row.** The row goes live within
+  the route's 60 s cache, so a row added first puts a Download button pointing at a 404 in front of
+  every staff member. (Escape hatch if you can't deploy yet: create it `Is_Active = No` — the GET
+  filters to `Yes` — then PUT it to `Yes` after.)
+- ⚠️ **`io.open(path,'w')` TRUNCATES before it writes** — a `UnicodeEncodeError` mid-write left
+  ACTIVE_FILES.md at 0 bytes (recovered with `git checkout --`). Build the full string, write a
+  temp file, verify its size, then `os.replace`. Also: this repo's markdown is **CRLF**, and
+  LESSONS/MEMORY carry a **BOM** — an LF-only anchor match silently finds nothing.
+
+---
+
 ## Two silent no-ops in the quote sync: '' IS NOT NULL, and a clock read in the wrong zone (2026-08-17)
 
 **Problem.** Both were found while fixing the Aug 10-17 sync outage, and neither had ever
