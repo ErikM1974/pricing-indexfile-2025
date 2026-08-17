@@ -21,7 +21,7 @@
 | `brands.js` | Brands listing page logic — priority order + landing-page routing now from `brands-registry.js` | brands.html, brands-registry.js | Move to shared_components |
 | `brands-flyout.js` | Brands flyout/dropdown menu (header nav) — static featured tier (never renders empty) + type-to-filter over all catalog brands; featured tier + landing pages from `brands-registry.js` | index.html, multiple, brands-registry.js | Move to shared_components |
 | `shared_components/js/nav-dropdown.js` | CLICK-to-open disclosure for the Products/Brands mega dropdowns — toggles `.nav-open`, closes on outside-click/Escape/other-trigger, one open at a time, `aria-expanded`. Replaced hover-open (finicky on desktop, absent on touch); CSS has NO `:hover` open rule | index.html, pages/catalog.html; CSS `.nav-item.nav-open` in nwca-2026-core.css | ✅ Active (NEW 2026-07-13) |
-| `c112-bogo-promo.js` | BOGO promotion logic | Specific promo | Move to calculators |
+| `c112-bogo-promo.js` | BOGO promotion logic (swatches, BOGO math, PDF quote) | NONE — `admin/c112-bogo-promo.html` retired 2026-08-17 (Erik: promo no longer offered); page 410s via a tombstone in server.js. Was ALREADY broken: the page loaded it relatively so it 404'd in prod | 🚩 Dead — flagged for deletion |
 | `cart.js` | Cart functionality | NONE (cart.html retired 2026-06-11) | 🚩 Dead — flagged for deletion |
 | `cart-price-recalculator.js` | Price recalculation | NONE (cart.html retired 2026-06-11) | 🚩 Dead — flagged for deletion |
 | `catalog-search.js` | Catalog search | index.html | Move to shared_components |
