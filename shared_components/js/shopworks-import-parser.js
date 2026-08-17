@@ -1068,7 +1068,14 @@ class ShopWorksImportParser {
                 // Format: "Product Name, Color Name" (e.g., "Sport-Tek Womens 1/4-Zip Sweatshirt, Athletic Hthr")
                 item.color = this._extractColorFromDescription(fullDesc);
             } else if (trimmed.startsWith('Unit Price:')) {
-                item.unitPrice = parseFloat(trimmed.replace('Unit Price:', '').trim()) || 0;
+                // Strip currency symbols, thousands separators and whitespace before parsing.
+                // parseFloat('$45.00') is NaN → 0, which is not merely a display bug: the AL
+                // "Back Logo" reclassify guard below tests `item.unitPrice >= 40`, so a
+                // $-prefixed $45 back logo silently failed its own threshold and stayed a plain
+                // Additional Logo. A price that a human can read must never parse to zero.
+                item.unitPrice = parseFloat(
+                    trimmed.replace('Unit Price:', '').replace(/[$,\s]/g, '')
+                ) || 0;
             } else if (trimmed.startsWith('Item Quantity:')) {
                 item.quantity = parseInt(trimmed.replace('Item Quantity:', '').trim()) || 0;
             } else if (trimmed === 'Adult:Quantity' || trimmed === 'Youth:Quantity' || trimmed === 'Other:Quantity') {
@@ -1205,7 +1212,12 @@ class ShopWorksImportParser {
                     position: 'Full Back',
                     type: 'fb',
                     quantity: item.quantity,
-                    description: item.description
+                    description: item.description,
+                    // Keep what ShopWorks actually charged. Without it the review modal's
+                    // ShopWorks radio is disabled (spr-modal.js: swAvail = swPrice > 0), so the
+                    // rep cannot choose "keep the price the customer was really billed" on the
+                    // one line where our recomputed price is most likely to differ.
+                    unitPrice: item.unitPrice || 0
                 });
                 break;
 
@@ -1218,7 +1230,8 @@ class ShopWorksImportParser {
                     position: 'Cap Back',
                     type: 'cb',
                     quantity: item.quantity,
-                    description: item.description
+                    description: item.description,
+                    unitPrice: item.unitPrice || 0
                 });
                 break;
 
@@ -1232,7 +1245,15 @@ class ShopWorksImportParser {
                 // Detect potential Full Back mislabeled as AL
                 // "Back" position at ≥$40 → auto-reclassify as DECG-FB
                 // "Back" position at ≥$10 → warning only, keep as AL
-                if (position === 'Back' && item.unitPrice >= 40) {
+                //
+                // `_parseALPosition` returns the MORE SPECIFIC 'Full Back' when the description
+                // actually says so, and only falls back to 'Back' otherwise — so testing
+                // `position === 'Back'` alone meant an AL line reading "Additional Logo Full
+                // Back" was never reclassified. The most explicit spelling of a full back was
+                // the one spelling the full-back detector could not see. (2026-08-16)
+                const looksLikeBack = position === 'Back' || position === 'Full Back';
+
+                if (looksLikeBack && item.unitPrice >= 40) {
                     result.warnings.push(
                         `AL item "${item.description}" at $${item.unitPrice}/pc reclassified as Full Back (DECG-FB). ` +
                         `Price exceeds $40 threshold for standard AL.`
@@ -1242,12 +1263,13 @@ class ShopWorksImportParser {
                         type: 'fb',
                         quantity: item.quantity,
                         description: item.description,
+                        unitPrice: item.unitPrice || 0,
                         reclassifiedFromAL: true
                     });
                     break;
                 }
 
-                if (position === 'Back' && item.unitPrice >= 10) {
+                if (looksLikeBack && item.unitPrice >= 10) {
                     result.warnings.push(
                         `AL item "${item.description}" at $${item.unitPrice}/pc may be Full Back (DECG-FB). ` +
                         `Standard AL tier price is $5-$8. Review in import modal.`
@@ -1383,7 +1405,8 @@ class ShopWorksImportParser {
                     position: 'Cap Side',
                     type: 'cs',
                     quantity: item.quantity,
-                    description: item.description
+                    description: item.description,
+                    unitPrice: item.unitPrice || 0
                 });
                 break;
 
@@ -1585,13 +1608,22 @@ class ShopWorksImportParser {
             return 'graphic-design';
         }
 
-        // Full Back embroidery (large back design)
-        if (pn === 'FB') {
+        // Full Back embroidery (large back design).
+        // 'FB' is the LEGACY part number; 'DECG-FB' is what the current builder actually PUSHES
+        // (embroidery-quote-pricing.js ~:1820, and it is in the proxy's KNOWN_FEE_PNS). Without
+        // the second spelling, re-importing one of OUR OWN orders silently classified the full
+        // back as 'product' — a garment row whose style number was the literal "DECG-FB", priced
+        // at the decoration charge, with no warning. Orders from the old system round-tripped;
+        // orders from the current one did not. (2026-08-16)
+        if (pn === 'FB' || pn === 'DECG-FB') {
             return 'fb';
         }
 
-        // Cap Back embroidery
-        if (pn === 'CB') {
+        // Cap Back embroidery. Same story: 'CB' is legacy, 'AL-CAP' is what the current builder
+        // pushes for a cap additional logo (KNOWN_FEE_PNS even annotates it "new builder uses
+        // AL-CAP"). Mapped to 'cb' rather than a new type so it takes the existing Cap Back path
+        // — a cap additional logo and a cap back are the same charge here.
+        if (pn === 'CB' || pn === 'AL-CAP') {
             return 'cb';
         }
 

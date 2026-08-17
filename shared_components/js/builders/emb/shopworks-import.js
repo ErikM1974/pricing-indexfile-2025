@@ -877,30 +877,77 @@ async function lookupImportDesigns(data, progress) {
     return designLookup;
 }
 
-/** Review-payload 9a — fold the parsed additional logos into ONE AL review row
- * (summed qty, first logo drives stitch count / digitizing / SW price). */
-function collectAlReviewItem(additionalLogos, serviceReviewItems) {
-    // 9a. Collect AL items
-    if (additionalLogos.length > 0) {
-        const alQty = additionalLogos.reduce((sum, al) => sum + al.quantity, 0);
-        const firstAL = additionalLogos[0];
-        const alStitchCount = firstAL.stitchCount || 8000;
-        const swPrice = firstAL.unitPrice || 0;
-        const apiPrice = embState.pricingCalculator
-            ? embState.pricingCalculator.getServiceUnitPrice('al', alStitchCount, alQty, false)
-            : null;
-
-        serviceReviewItems.push({
-            type: 'AL',
-            quantity: alQty,
-            stitchCount: alStitchCount,
-            isCap: false,
-            shopWorksPrice: swPrice,
-            apiPrice: apiPrice,
-            label: 'Additional Logo',
-            originalData: { additionalLogos, needsDigitizing: firstAL.needsDigitizing }
-        });
+/**
+ * Split parsed additional logos by what they ACTUALLY are.
+ *
+ * `result.services.additionalLogos` is a mixed bag: garment ALs, Full Backs ('fb') and cap
+ * logos ('cb'/'cs') all land in it. Folding them into one row erased both distinctions — a
+ * full back priced as a garment AL, and a cap logo priced off the garment ladder (or, on a
+ * cap-only order, attached to no product at all and silently UNBILLED). (2026-08-16)
+ */
+export function _groupAdditionalLogos(additionalLogos) {
+    const groups = { garment: [], cap: [], fullBack: [] };
+    for (const al of additionalLogos) {
+        const t = String(al.type || 'al').toLowerCase();
+        if (t === 'fb') groups.fullBack.push(al);
+        else if (t === 'cb' || t === 'cs') groups.cap.push(al);
+        else groups.garment.push(al);
     }
+    return groups;
+}
+
+/**
+ * One review row from a group of like logos.
+ *
+ * `orderQty` is the ORDER quantity, not the summed line quantity: it is what tiers the price,
+ * and the two differ whenever only some pieces carry the logo. The full-back ladder tiers on
+ * order quantity specifically — see the comment on `getServiceUnitPrice` in
+ * embroidery-quote-pricing.js.
+ */
+function _pushLogoReviewRow(cfg, logos, orderQty, serviceReviewItems) {
+    if (!logos.length) return;
+    const qty = logos.reduce((sum, l) => sum + (l.quantity || 0), 0);
+    const first = logos[0];
+    const stitchCount = first.stitchCount || cfg.baseStitches;
+    const apiPrice = embState.pricingCalculator
+        ? embState.pricingCalculator.getServiceUnitPrice(
+            cfg.serviceType, stitchCount, orderQty || qty, cfg.isCap)
+        : null;
+
+    serviceReviewItems.push({
+        type: cfg.type,
+        quantity: qty,
+        stitchCount: stitchCount,
+        isCap: cfg.isCap,
+        shopWorksPrice: first.unitPrice || 0,
+        apiPrice: apiPrice,
+        label: cfg.label,
+        position: first.position || cfg.position,
+        originalData: { additionalLogos: logos, needsDigitizing: first.needsDigitizing }
+    });
+}
+
+/** Review-payload 9a — one row per KIND of additional logo (garment / cap / full back). */
+export function collectAlReviewItem(additionalLogos, serviceReviewItems, orderQty) {
+    if (!additionalLogos.length) return;
+    const g = _groupAdditionalLogos(additionalLogos);
+
+    // 8,000 is the garment AL base; caps use 5,000 and full backs bill at a 25,000 minimum.
+    // Defaulting all three to 8,000 (as the single folded row did) charged caps for 3,000
+    // stitches they don't have and floored full backs below their own minimum.
+    _pushLogoReviewRow({ type: 'AL', serviceType: 'al', isCap: false, baseStitches: 8000,
+        label: 'Additional Logo', position: 'AL' }, g.garment, orderQty, serviceReviewItems);
+
+    // Typed 'CB', not 'AL-CAP': the review modal reprices via `item.type.toLowerCase()` into
+    // getServiceUnitPrice, which has a 'cb' case and no 'al-cap' one — an 'AL-CAP' row would go
+    // to `default: return null` and show "(unavailable)" the moment a rep edited cap stitches.
+    // '.spr-type-cb' also already exists as a badge style. The AL-CAP *part number* is applied
+    // downstream from globalAL.cap, which is where it belongs.
+    _pushLogoReviewRow({ type: 'CB', serviceType: 'cb', isCap: true, baseStitches: 5000,
+        label: 'Cap Logo', position: 'AL-Cap' }, g.cap, orderQty, serviceReviewItems);
+
+    _pushLogoReviewRow({ type: 'FB', serviceType: 'fb', isCap: false, baseStitches: 25000,
+        label: 'Full Back', position: 'Full Back' }, g.fullBack, orderQty, serviceReviewItems);
 }
 
 /** Import steps 8-10 — collect product + service review items (AL / DECG / DECC /
@@ -945,7 +992,9 @@ async function buildReviewPayload(data, additionalLogos, progress) {
     const serviceReviewItems = [];
 
     // 9a. Collect AL items — extracted Batch 3.1
-    collectAlReviewItem(additionalLogos, serviceReviewItems);
+    // totalProductQty (the ORDER quantity) tiers the price — NOT the summed logo-line
+    // quantity, which is what this used to fall back to.
+    collectAlReviewItem(additionalLogos, serviceReviewItems, totalProductQty);
 
     // 9b. Collect DECG/DECC items (ONE loop — the two blocks were pasted twins, Batch 3.5)
     if (data.decgItems && data.decgItems.length > 0) {
@@ -1203,8 +1252,81 @@ async function importSanmarProducts(mergedProductResults, progress) {
     return productsImported;
 }
 
-/** Import services from the review modal — AL (global toggle or service row when no
- * products), DECG/DECC, Monogram (+ names into notes). */
+/** An imported cap logo (CB / CS / AL-CAP) → the CAP side of globalAL. */
+function _applyImportedCapLogo(result) {
+    embState.globalAL.cap.enabled = true;
+    // Position stays the canonical 'AL-Cap': it is a FEE PART NAME downstream
+    // (output.js expectedFees, persistence, state defaults), not a free-text label.
+    embState.globalAL.cap.position = 'AL-Cap';
+    embState.globalAL.cap.stitchCount = result.stitchCount;
+    if (result.originalData && result.originalData.needsDigitizing) {
+        embState.globalAL.cap.needsDigitizing = true;
+    }
+
+    const capToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('cap-al-toggle'));
+    const capSwitch = document.getElementById('cap-al-switch');
+    const capLabel = document.getElementById('cap-al-label');
+    const capConfig = document.getElementById('cap-al-config-new');
+    if (capToggle) capToggle.checked = true;
+    if (capSwitch) capSwitch.classList.add('active');
+    if (capLabel) capLabel.classList.add('active');
+    if (capConfig) capConfig.classList.add('visible');
+
+    const positions = (result.originalData && result.originalData.additionalLogos || [])
+        .map((al) => al.position).filter(Boolean);
+    if (positions.length) appendImportNote(`Cap logo positions: ${positions.join(', ')}`);
+
+    _syncALArrays();
+}
+
+/**
+ * An imported Full Back → ONE full back per order (Erik, 2026-08-16).
+ *
+ * Two independent signals say "this order has a full back" and they do not know about each
+ * other: the DESIGN LOOKUP sets the primary garment logo to 'Full Back' when the looked-up
+ * design is >= 25,000 stitches (spr-modal.js), and the parsed FB FEE LINE arrives here. Until
+ * now the fee line unconditionally switched on a standard Additional Logo, so an order
+ * carrying both got a ladder-priced full back on the primary AND an AL on every garment on
+ * top — a double charge for one decoration.
+ *
+ * The rule: the primary logo wins if it is already a Full Back; otherwise the fee line becomes
+ * a real Full Back additional logo. That is correct in all four combinations, including the
+ * Left Chest + Full Back order, which gets both priced properly.
+ */
+function _applyImportedFullBack(result) {
+    if (embState.primaryLogo && embState.primaryLogo.position === 'Full Back') {
+        // Already priced as the primary, off the DECG-FB ladder. Adding a second charge here
+        // is the double-count. Leave a note so the rep can see we recognised the fee line.
+        appendImportNote('Full Back matched the primary logo — charged once, via the full-back ladder.');
+        return;
+    }
+
+    embState.globalAL.garment.enabled = true;
+    // 'Full Back' is load-bearing: collectProducts() copies this straight into each product's
+    // logo assignment (pricing-sync.js), and the engine decides full back purely by
+    // `logo.position === 'Full Back'`. Writing 'AL' here is what discarded it before.
+    embState.globalAL.garment.position = 'Full Back';
+    // Never below the ladder's 25,000-stitch minimum.
+    embState.globalAL.garment.stitchCount = Math.max(Number(result.stitchCount) || 0, 25000);
+    if (result.originalData && result.originalData.needsDigitizing) {
+        embState.globalAL.garment.needsDigitizing = true;
+    }
+
+    const alToggle = /** @type {HTMLInputElement|null} */ (document.getElementById('garment-al-toggle'));
+    const alSwitch = document.getElementById('garment-al-switch');
+    const alLabel = document.getElementById('garment-al-label');
+    const alConfig = document.getElementById('garment-al-config-new');
+    if (alToggle) alToggle.checked = true;
+    if (alSwitch) alSwitch.classList.add('active');
+    if (alLabel) alLabel.classList.add('active');
+    if (alConfig) alConfig.classList.add('visible');
+
+    appendImportNote('Full Back imported as an additional logo (priced on the full-back ladder).');
+    _syncALArrays();
+}
+
+/** Import services from the review modal — AL / cap logo / Full Back (global toggles, or a
+ * service row when there are no products), DECG/DECC, Monogram (+ names into notes). */
 function applyServiceResults(serviceResults, data, progress) {
     // 12. Process service results
     progress.step++;
@@ -1212,6 +1334,48 @@ function applyServiceResults(serviceResults, data, progress) {
     if (serviceResults && serviceResults.length > 0) {
         for (const result of serviceResults) {
             const typeUpper = result.type.toUpperCase();
+            const hasAnyProduct = data.products.length > 0 ||
+                (data.customProducts && data.customProducts.length > 0);
+
+            if (typeUpper === 'CB' || typeUpper === 'CS') {
+                // Cap logos (CB / CS / AL-CAP) drive the CAP side of globalAL. Nothing in the
+                // import path ever set this, so `_syncALArrays()` left `capAdditionalLogos`
+                // empty by construction and `collectProducts()` — which reads
+                // `isCap ? globalAL.cap : globalAL.garment` — gave every cap product an empty
+                // additional-logo list. A cap-only order therefore lost the charge entirely,
+                // and a mixed order billed it to the garments at garment rates. (2026-08-16)
+                if (hasAnyProduct) {
+                    _applyImportedCapLogo(result);
+                } else {
+                    // No products to hang a global logo on — same fallback the AL branch
+                    // uses, or the charge simply vanishes from a service-only order.
+                    createServiceProductRow('AL-CAP', {
+                        quantity: result.quantity,
+                        stitchCount: result.stitchCount,
+                        unitPrice: result.unitPrice,
+                        total: result.quantity * result.unitPrice,
+                        isCap: true,
+                        position: result.position || 'AL-Cap'
+                    });
+                }
+                continue;
+            }
+
+            if (typeUpper === 'FB') {
+                if (hasAnyProduct) {
+                    _applyImportedFullBack(result);
+                } else {
+                    createServiceProductRow('DECG-FB', {
+                        quantity: result.quantity,
+                        stitchCount: result.stitchCount,
+                        unitPrice: result.unitPrice,
+                        total: result.quantity * result.unitPrice,
+                        isCap: false,
+                        position: 'Full Back'
+                    });
+                }
+                continue;
+            }
 
             if (typeUpper === 'AL') {
                 if (data.products.length > 0 || (data.customProducts && data.customProducts.length > 0)) {

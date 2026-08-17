@@ -5,6 +5,44 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## We push part numbers our own importer cannot read (2026-08-16)
+
+**Problem.** Re-importing a ShopWorks order that OUR builder created misrouted its decoration
+lines. `DECG-FB` (every full back we push) and `AL-CAP` (every cap additional logo) classified as
+**`product`** — not a mispriced decoration but a GARMENT ROW whose style number was the literal
+string `"DECG-FB"`, carrying the decoration charge as its unit price, with no warning.
+
+**Root cause.** The parser knew only the LEGACY vocabulary — `FB`, `CB`, `CS`. The builder's push
+side moved on to `DECG-FB` / `AL-CAP` (the proxy's `KNOWN_FEE_PNS` even annotates `CB`/`CS` as
+"legacy/imported; new builder uses AL-CAP") and nothing kept the two vocabularies in step. Orders
+from the old system round-tripped; orders from the current one did not.
+
+**Fix.** Both spellings classify. `unitPrice` is now kept on `fb`/`cb`/`cs` too — only the `al`
+branch had it, so everything else hit the review modal with `shopWorksPrice 0`, which DISABLES its
+ShopWorks radio (`swAvail = swPrice > 0`) and removes the rep's option to bill what the customer
+was actually billed. Also fixed two defects that stopped the ">= $40 Back Logo is really a full
+back" rule ever firing: `parseFloat('$45.00')` is NaN → 0 (so the line missed its own threshold),
+and the guard tested `position === 'Back'` while `_parseALPosition` returns the more specific
+`'Full Back'` — the clearest spelling of a full back was the one the full-back detector could not
+see.
+
+**Prevention.**
+- 🔴 **Round-trip vocabulary is a CONTRACT, and nothing was checking it.** A test now
+  parameterises the whole `KNOWN_FEE_PNS` list, so the next fee part we invent and forget to teach
+  the parser fails there instead of appearing as a garment row named "GRT-75" in a customer quote.
+  Push-side and parse-side vocabularies must be asserted against each other, not maintained in
+  parallel by hand across two repos.
+- 🔴 **"It classified as something" is not "it classified correctly".** A wrong-but-valid
+  classification produces no error anywhere. Enumerate what a value SHOULD be, don't check that it
+  parsed.
+- 🔑 **A price a human can read must never parse to zero.** That zero wasn't cosmetic — it silently
+  changed routing, because a downstream guard compared it to a threshold.
+- 🔑 The fixture corpus (24 files / 100 orders) contains ZERO `FB`/`CB`/`CS` lines — the entire
+  legacy decoration path had no fixture coverage, only three string-level `classifyPartNumber`
+  assertions. Absence of a fixture is why none of this surfaced.
+
+---
+
 ## Never assert on serialized data with a substring grep (2026-08-16)
 
 **Problem.** `tests/unit/quote-cart-store.test.js` failed at random on a clean tree, roughly
@@ -150,74 +188,3 @@ OnSite would reject, substitute or silently drop a part it had never seen.
   EXPECTED, not a failure. Don't debug it.
 - 🔑 A **manual** vendor item has no `VendorCode`, so the "VENDOR: …" `LineItemNotes` never
   fires — deliberate (Erik). The vendor rides in the rep's DESCRIPTION, which OnSite keeps.
-
-## Five prices for one ShopWorks part — and a $50 fee hidden behind a misspelled column (2026-08-15)
-
-**Problem.** Full-back embroidery had **five** price sources across **three** Caspio tables, so what
-a customer paid depended on *which screen the rep used*, not on the job. At 25K stitches / 12 pcs:
-the staff reference page said **$25.00/pc**, the quote builder charged **$31.25**, and the retail
-rows nobody read said **$35.00**. The page was even titled "Full Back Embroidery — **DECG-FB**"
-while rendering **CTR-FB contract/wholesale** numbers, and its own banner claimed "same rate
-applies whether wholesale, NWCA-supplied, or customer-supplied" — false in code, three ways.
-Full-back LTM was simultaneously **$50** (reference page), **$100** (contract calculator) and
-**$0** (quote builder). **No test anywhere pinned any of it.**
-
-**Root cause.** Each surface was built at a different time and read whichever endpoint it already
-had open. Nobody ever asked "how many ItemTypes does one ShopWorks part need?" — the answer was
-always one: OnSite has exactly one full-back part, `DECG-FB`, and `FEE_PN_ALIASES` already mapped
-`FB → DECG-FB`. The *part* was unified years ago; only the *pricing* forked.
-
-**Solution.** One ladder — `Embroidery_Costs` where `ItemType='DECG-FB'` — read once by a shared
-`getFullBackLadder()` and served into all three endpoints' `.fullBack` blocks under their existing
-key names. `CTR-FB` and `FB` rows retired. Erik's ruling: one rate for everyone, contract included.
-
-**Prevention.**
-- 🔑 **One ShopWorks part should mean one price ladder.** When a part number is universal but the
-  price isn't, that asymmetry IS the bug. Use `KNOWN_FEE_PNS` / `FEE_PN_ALIASES` as the map of what
-  ought to be unified.
-- 🔴 **`LTM`, not `LTM_Fee`.** `Embroidery_Costs` has no `LTM_Fee` column. Reading it returned
-  `undefined`, so the fee silently became `0` — and the $50 the DECG garment/cap paths *appeared*
-  to charge came from a hardcoded default that happened to match. **Editing that fee in Caspio did
-  nothing, on already-shipped pricing.** A fallback that matches the real value hides a dead read
-  indefinitely; verify against the raw row, not against the rendered number.
-- 🔴 **`PerThousandRate` is NULL on the DECG-FB rows — the rate is in `EmbroideryCost`.** The
-  contract path *prefers* `PerThousandRate`, so a shared helper that inherited that preference
-  would have priced every full back at **$0**. When consolidating readers, check the columns are
-  actually populated on the rows you're consolidating *onto*.
-- 🔴 **A cached object handed out by reference gets decorated by its callers.** Each endpoint added
-  its own back-compat key (`perThousandRates` / `ratePerThousand`) to the shared ladder, which
-  leaked into every other response through the cache. Return a copy from any cached-price getter.
-- 🔑 **"Min charge $20" was a hardcoded `|| 20.00` in four files, presented to staff as policy.**
-  No Caspio column ever fed it. It was also inert — the cheapest cell equalled it exactly. Deleted
-  rather than wired up: under the new ladder the cheapest full back is $30, so it could never fire.
-  **Before building a knob, check whether it can ever move.**
-- ⚠️ **Dead renderers keep myths alive.** Three full-back matrix builders (127 lines) had lost their
-  target divs and rendered nothing — but one carried the comment *"DECG Full Back uses same pricing
-  (DECG-FB)"*, which is where the whole misconception came from. Delete dead code or it keeps
-  teaching.
-- 🔑 **A per-design negotiated price is an override, not drift** — keep it, but LABEL it, or the
-  line just looks like the published table is wrong and the rep can't explain the number.
-
-**Retired rows — recovery values** (captured live 2026-08-15, before deletion; the endpoints no
-longer expose them, so this is the only record). Both sets are safe to delete: the two queries that
-still SELECT them ignore the results, and each query still returns its other ItemTypes so the
-"no records → 404" guards cannot trip.
-- `Embroidery_Costs` `ItemType='CTR-FB'` — 5 rows, `EmbroideryCostID` **163-167**, `StitchCount`
-  25000, `BaseStitchCount` 25000, `StitchIncrement` 1000, `DigitizingFee` 100,
-  `LogoPositions` "Full Back", `LTM` 50 on the 1-7 row / 0 on the rest. Per `TierLabel`:
-
-  | Tier | `EmbroideryCost` (25K total) | `AdditionalStitchRate` |
-  |---|---|---|
-  | 1-7 | 30.0000 | 1.2 |
-  | 8-23 | 25.0000 | 1.0 |
-  | 24-47 | 22.5000 | 0.9 |
-  | 48-71 | 21.2500 | 0.85 |
-  | 72+ | 20.0000 | 0.8 |
-
-  🔑 **`PerThousandRate` is BLANK on these rows** — the $/1K the API served was DERIVED
-  (`EmbroideryCost / (StitchCount/1000)`, `pricing.js`), i.e. 30 ÷ 25 = 1.20. Restoring the
-  per-1K figure into `PerThousandRate` would NOT reproduce these rows; write `EmbroideryCost`.
-- `Embroidery_Costs` `ItemType='FB'` — flat **1.25** /1K in `EmbroideryCost`, `BaseStitchCount` 25000.
-- ⚠️ Do NOT delete `CTR-Garmt`, `CTR-Cap`, `AL`, `AL-CAP`, `CB`, `CS` — live pricing depends on them.
-- 🔴 **Filter `ItemType` with EQUALS, never CONTAINS.** "FB" as a contains-match also selects
-  `CTR-FB` and — fatally — `DECG-FB`, which is the master full-back ladder every surface reads.

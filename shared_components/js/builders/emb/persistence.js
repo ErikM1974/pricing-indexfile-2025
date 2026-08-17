@@ -62,7 +62,12 @@ export function getEmbroideryQuoteData() {
         capPrimaryLogo: typeof embState.capPrimaryLogo !== 'undefined' ? { ...embState.capPrimaryLogo } : null,
         garmentAL: {
             enabled: embState.globalAL.garment.enabled,
-            position: 'AL',
+            // Persist the REAL position. A ShopWorks import can set 'Full Back' here, and the
+            // engine decides full back purely by `logo.position === 'Full Back'` — writing the
+            // literal 'AL' meant a correctly-priced full back silently reverted to the (much
+            // cheaper) additional-logo rate on the next save/reload, with nothing on screen to
+            // show it had happened. (2026-08-16)
+            position: embState.globalAL.garment.position || 'AL',
             stitches: embState.globalAL.garment.stitchCount,
             needsDigitizing: embState.globalAL.garment.needsDigitizing
         },
@@ -272,7 +277,7 @@ export function restoreEmbroideryDraft(draft) {
     // Restore garment AL configuration
     if (draft.garmentAL && draft.garmentAL.enabled) {
         embState.globalAL.garment.enabled = true;
-        embState.globalAL.garment.position = 'AL';
+        embState.globalAL.garment.position = draft.garmentAL.position || 'AL';
         embState.globalAL.garment.stitchCount = parseInt(draft.garmentAL.stitches) || 8000;
         embState.globalAL.garment.needsDigitizing = draft.garmentAL.needsDigitizing || false;
 
@@ -820,6 +825,11 @@ export function populateLogoConfig(session, items) {
         ['AL', 'AL-CAP', 'DECG-FB'].includes((i.StyleNumber || '').toUpperCase()));
     if (session.AdditionalLogoLocation && !hasALRow) {
         embState.globalAL.garment.enabled = true;
+        // 'AL' stays hardcoded here ON PURPOSE, unlike the save/draft paths above. This is the
+        // legacy repair branch for a session that has an AdditionalLogoLocation but NO AL row,
+        // and its own guard already excludes 'DECG-FB' rows — so by construction there is no
+        // full back to preserve, and AdditionalLogoLocation is written nowhere in this repo
+        // (read-only legacy field). Reading it as a position would be guessing.
         embState.globalAL.garment.position = 'AL';
         embState.globalAL.garment.stitchCount = session.AdditionalStitchCount || EMB_DEFAULTS.AL_GARMENT_STITCH_COUNT;
 
