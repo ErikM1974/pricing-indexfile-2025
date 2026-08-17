@@ -5,6 +5,44 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## We push part numbers our own importer cannot read (2026-08-16)
+
+**Problem.** Re-importing a ShopWorks order that OUR builder created misrouted its decoration
+lines. `DECG-FB` (every full back we push) and `AL-CAP` (every cap additional logo) classified as
+**`product`** — not a mispriced decoration but a GARMENT ROW whose style number was the literal
+string `"DECG-FB"`, carrying the decoration charge as its unit price, with no warning.
+
+**Root cause.** The parser knew only the LEGACY vocabulary — `FB`, `CB`, `CS`. The builder's push
+side moved on to `DECG-FB` / `AL-CAP` (the proxy's `KNOWN_FEE_PNS` even annotates `CB`/`CS` as
+"legacy/imported; new builder uses AL-CAP") and nothing kept the two vocabularies in step. Orders
+from the old system round-tripped; orders from the current one did not.
+
+**Fix.** Both spellings classify. `unitPrice` is now kept on `fb`/`cb`/`cs` too — only the `al`
+branch had it, so everything else hit the review modal with `shopWorksPrice 0`, which DISABLES its
+ShopWorks radio (`swAvail = swPrice > 0`) and removes the rep's option to bill what the customer
+was actually billed. Also fixed two defects that stopped the ">= $40 Back Logo is really a full
+back" rule ever firing: `parseFloat('$45.00')` is NaN → 0 (so the line missed its own threshold),
+and the guard tested `position === 'Back'` while `_parseALPosition` returns the more specific
+`'Full Back'` — the clearest spelling of a full back was the one the full-back detector could not
+see.
+
+**Prevention.**
+- 🔴 **Round-trip vocabulary is a CONTRACT, and nothing was checking it.** A test now
+  parameterises the whole `KNOWN_FEE_PNS` list, so the next fee part we invent and forget to teach
+  the parser fails there instead of appearing as a garment row named "GRT-75" in a customer quote.
+  Push-side and parse-side vocabularies must be asserted against each other, not maintained in
+  parallel by hand across two repos.
+- 🔴 **"It classified as something" is not "it classified correctly".** A wrong-but-valid
+  classification produces no error anywhere. Enumerate what a value SHOULD be, don't check that it
+  parsed.
+- 🔑 **A price a human can read must never parse to zero.** That zero wasn't cosmetic — it silently
+  changed routing, because a downstream guard compared it to a threshold.
+- 🔑 The fixture corpus (24 files / 100 orders) contains ZERO `FB`/`CB`/`CS` lines — the entire
+  legacy decoration path had no fixture coverage, only three string-level `classifyPartNumber`
+  assertions. Absence of a fixture is why none of this surfaced.
+
+---
+
 ## Never assert on serialized data with a substring grep (2026-08-16)
 
 **Problem.** `tests/unit/quote-cart-store.test.js` failed at random on a clean tree, roughly
