@@ -463,6 +463,11 @@ function _paintImportServices(data) {
     if (data.services.rush) {
         servicesHtml += `<span class="preview-service-badge warning"><i class="fas fa-bolt"></i> Rush Fee: $${data.services.rush.amount.toFixed(2)}</span>`;
     }
+    if (data.services.discount && data.services.discount.amount > 0) {
+        // 'warning' on purpose: this is the one imported figure the builder CANNOT apply
+        // for the rep (the discount input was removed 2026-06-04), so it has to be loud.
+        servicesHtml += `<span class="preview-service-badge warning"><i class="fas fa-tag"></i> Discount NOT applied: -$${data.services.discount.amount.toFixed(2)}</span>`;
+    }
     if (data.services.artCharges) {
         servicesHtml += `<span class="preview-service-badge"><i class="fas fa-palette"></i> Art Charge: $${data.services.artCharges.amount.toFixed(2)}</span>`;
     }
@@ -1513,6 +1518,23 @@ function createAuxiliaryServiceRows(data) {
  * (Step 16 runs between 15 and 17 in the orchestrator; it writes rows, not notes,
  * so the note ORDER in the textarea is unchanged.) */
 function writeImportNotes(data) {
+    // A discount on the pasted order is captured but CANNOT be re-applied automatically:
+    // the builder's #discount-amount input was removed on 2026-06-04 when the discount panel
+    // was replaced, so getAdditionalCharges() reads 0 no matter what. Until that input comes
+    // back, the honest behaviour is to put the number somewhere the rep will see it. Silently
+    // dropping it re-billed the customer the discount on every re-quote.
+    if (data.services.discount && data.services.discount.amount > 0) {
+        const d = data.services.discount;
+        const why = d.description ? ` (${d.description})` : '';
+        appendImportNote(`--- DISCOUNT FROM ORIGINAL ORDER ---
+`
+            + `-$${d.amount.toFixed(2)}${why}
+`
+            + `NOT applied automatically — this builder has no discount field. `
+            + `Adjust prices manually if the discount still applies.`);
+        showToast(`Original order had a $${d.amount.toFixed(2)} discount — NOT applied, see notes`, 'warning', 8000);
+    }
+
     // 15. Populate notes from import (employee names, warnings, etc.)
     if (data.notes && data.notes.length > 0) {
         appendImportNote('--- ShopWorks Import Notes ---\n' + data.notes.join('\n'));
@@ -1547,7 +1569,10 @@ function writeImportNotes(data) {
         'rush', 'ltmFee', 'sewing', 'additionalStitches',
         'shipping', 'weights',
         'designTransfer', 'contract',
-        'capEmbellishments'
+        'capEmbellishments',
+        // Reported explicitly at the top of this function with its own note + toast; without
+        // this entry the catch-all below would dump it into the notes a SECOND time.
+        'discount'
     ];
     const unhandled = Object.entries(data.services || {})
         .filter(([key, val]) => !handledServiceKeys.includes(key) && val != null)

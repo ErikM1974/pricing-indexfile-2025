@@ -171,8 +171,12 @@ describe('classifyPartNumber() — INVALID_PARTS', () => {
         expect(parser.classifyPartNumber('GIFT CODE')).toBe('invalid');
     });
 
-    test('DISCOUNT → invalid', () => {
-        expect(parser.classifyPartNumber('DISCOUNT')).toBe('invalid');
+    // CHANGED 2026-08-16: DISCOUNT is no longer 'invalid'. It was grouped with TAX / TOTAL /
+    // GIFT CODE as summary noise, but it is a real price reduction, and dropping it re-billed
+    // the customer the discount on any re-quote. GIFT CODE stays invalid — it is a PAYMENT.
+    // See tests/unit/parser/discount-roundtrip.test.js.
+    test('DISCOUNT → discount (was: invalid)', () => {
+        expect(parser.classifyPartNumber('DISCOUNT')).toBe('discount');
     });
 
     test('TAX → invalid', () => {
@@ -264,6 +268,12 @@ describe('DISCOUNT handling', () => {
     test('DISCOUNT goes to reviewItems or is filtered, not products', () => {
         const discountInProducts = result.products.find(p => p.partNumber === 'DISCOUNT');
         expect(discountInProducts).toBeUndefined();
+    });
+
+    test('and it is CAPTURED, not discarded (2026-08-16)', () => {
+        // caps-oos.txt carries `Unit Price: $-100.00` on a 'Volume Discount' line.
+        expect(result.services.discount).toBeDefined();
+        expect(result.services.discount.amount).toBe(100);   // positive: the builder subtracts it
     });
 });
 
