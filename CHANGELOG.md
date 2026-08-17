@@ -1,3 +1,7 @@
+## v2026.08.17.7 (2026.08.17)
+
+- Add Business Credit Application (No Personal Guaranty) fillable PDF
+
 ## v2026.08.17.6 (2026.08.17)
 
 - Memory: Caspio '' IS NOT NULL, and a timestamp written in the wrong zone
