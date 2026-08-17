@@ -938,7 +938,12 @@ export function collectAlReviewItem(additionalLogos, serviceReviewItems, orderQt
     _pushLogoReviewRow({ type: 'AL', serviceType: 'al', isCap: false, baseStitches: 8000,
         label: 'Additional Logo', position: 'AL' }, g.garment, orderQty, serviceReviewItems);
 
-    _pushLogoReviewRow({ type: 'AL-CAP', serviceType: 'cb', isCap: true, baseStitches: 5000,
+    // Typed 'CB', not 'AL-CAP': the review modal reprices via `item.type.toLowerCase()` into
+    // getServiceUnitPrice, which has a 'cb' case and no 'al-cap' one — an 'AL-CAP' row would go
+    // to `default: return null` and show "(unavailable)" the moment a rep edited cap stitches.
+    // '.spr-type-cb' also already exists as a badge style. The AL-CAP *part number* is applied
+    // downstream from globalAL.cap, which is where it belongs.
+    _pushLogoReviewRow({ type: 'CB', serviceType: 'cb', isCap: true, baseStitches: 5000,
         label: 'Cap Logo', position: 'AL-Cap' }, g.cap, orderQty, serviceReviewItems);
 
     _pushLogoReviewRow({ type: 'FB', serviceType: 'fb', isCap: false, baseStitches: 25000,
@@ -1329,20 +1334,46 @@ function applyServiceResults(serviceResults, data, progress) {
     if (serviceResults && serviceResults.length > 0) {
         for (const result of serviceResults) {
             const typeUpper = result.type.toUpperCase();
+            const hasAnyProduct = data.products.length > 0 ||
+                (data.customProducts && data.customProducts.length > 0);
 
-            if (typeUpper === 'AL-CAP') {
+            if (typeUpper === 'CB' || typeUpper === 'CS') {
                 // Cap logos (CB / CS / AL-CAP) drive the CAP side of globalAL. Nothing in the
                 // import path ever set this, so `_syncALArrays()` left `capAdditionalLogos`
                 // empty by construction and `collectProducts()` — which reads
                 // `isCap ? globalAL.cap : globalAL.garment` — gave every cap product an empty
                 // additional-logo list. A cap-only order therefore lost the charge entirely,
                 // and a mixed order billed it to the garments at garment rates. (2026-08-16)
-                _applyImportedCapLogo(result);
+                if (hasAnyProduct) {
+                    _applyImportedCapLogo(result);
+                } else {
+                    // No products to hang a global logo on — same fallback the AL branch
+                    // uses, or the charge simply vanishes from a service-only order.
+                    createServiceProductRow('AL-CAP', {
+                        quantity: result.quantity,
+                        stitchCount: result.stitchCount,
+                        unitPrice: result.unitPrice,
+                        total: result.quantity * result.unitPrice,
+                        isCap: true,
+                        position: result.position || 'AL-Cap'
+                    });
+                }
                 continue;
             }
 
             if (typeUpper === 'FB') {
-                _applyImportedFullBack(result);
+                if (hasAnyProduct) {
+                    _applyImportedFullBack(result);
+                } else {
+                    createServiceProductRow('DECG-FB', {
+                        quantity: result.quantity,
+                        stitchCount: result.stitchCount,
+                        unitPrice: result.unitPrice,
+                        total: result.quantity * result.unitPrice,
+                        isCap: false,
+                        position: 'Full Back'
+                    });
+                }
                 continue;
             }
 

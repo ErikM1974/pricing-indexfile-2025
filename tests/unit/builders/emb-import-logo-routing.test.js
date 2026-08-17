@@ -78,7 +78,7 @@ describe('collectAlReviewItem emits one row per kind', () => {
 
     test('a mixed order produces THREE distinct rows, not one', () => {
         const out = rows([al(), fb(), cb()]);
-        expect(out.map((r) => r.type).sort()).toEqual(['AL', 'AL-CAP', 'FB']);
+        expect(out.map((r) => r.type).sort()).toEqual(['AL', 'CB', 'FB']);
     });
 
     test('the Full Back row carries the Full Back position — the engine keys off it', () => {
@@ -97,14 +97,18 @@ describe('collectAlReviewItem emits one row per kind', () => {
 
     test('the cap row is marked isCap and uses the CAP stitch base', () => {
         const [row] = rows([cb()]);
-        expect(row.type).toBe('AL-CAP');
+        // 'CB', not 'AL-CAP': the review modal reprices through getServiceUnitPrice via
+        // `item.type.toLowerCase()`, which has a 'cb' case and no 'al-cap' one — an 'AL-CAP'
+        // row would hit `default: return null` and read "(unavailable)" the moment a rep
+        // edited the cap stitch count.
+        expect(row.type).toBe('CB');
         expect(row.isCap).toBe(true);
         expect(row.stitchCount).toBe(5000);   // not the garment 8000
     });
 
     test('Cap Side rides the same cap row as Cap Back', () => {
         const out = rows([cb({ quantity: 10 }), cs({ quantity: 5 })]);
-        const cap = out.find((r) => r.type === 'AL-CAP');
+        const cap = out.find((r) => r.type === 'CB');
         expect(cap.quantity).toBe(15);
         expect(cap.isCap).toBe(true);
     });
@@ -121,14 +125,14 @@ describe('collectAlReviewItem emits one row per kind', () => {
         // The old single row summed a 24-piece full back with a 24-piece cap logo into 48.
         const out = rows([fb({ quantity: 24 }), cb({ quantity: 24 }), al({ quantity: 12 })]);
         expect(out.find((r) => r.type === 'FB').quantity).toBe(24);
-        expect(out.find((r) => r.type === 'AL-CAP').quantity).toBe(24);
+        expect(out.find((r) => r.type === 'CB').quantity).toBe(24);
         expect(out.find((r) => r.type === 'AL').quantity).toBe(12);
     });
 
     test('the ShopWorks price survives onto every kind of row', () => {
         const out = rows([fb({ unitPrice: 32.5 }), cb({ unitPrice: 7 })]);
         expect(out.find((r) => r.type === 'FB').shopWorksPrice).toBe(32.5);
-        expect(out.find((r) => r.type === 'AL-CAP').shopWorksPrice).toBe(7);
+        expect(out.find((r) => r.type === 'CB').shopWorksPrice).toBe(7);
     });
 
     test('nothing in, nothing out', () => {
