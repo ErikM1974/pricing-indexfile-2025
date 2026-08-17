@@ -5112,14 +5112,32 @@ app.use('/tools', gateStaffHtml);
 // Same gate-then-rewrite-then-static ordering as /dashboards above.
 app.get('/tools/:page', serveHashedStaffPage('tools'));
 app.use('/tools', express.static(path.join(__dirname, 'tools'), staticOptions));
-// /admin is staff-only EXCEPT the customer-facing c112-bogo-promo landing page.
-app.use('/admin', (req, res, next) => {
-  let p;
-  try { p = decodeURIComponent(req.path).toLowerCase(); }
-  catch (e) { p = String(req.path).toLowerCase(); }
-  if (p === '/c112-bogo-promo.html') return next(); // public customer-facing promo page
-  return gateStaffHtml(req, res, next);
+// TOMBSTONE — the C112 cap BOGO promo is RETIRED (Erik, 2026-08-17). Load-bearing.
+//
+// The HTML/JS stay on disk, and /admin serves static below, so without this route
+// Express would keep serving a dead promo. It carried HARDCODED prices in the
+// markup ($17.00 / $16.00 / $15.50 per cap), so it rendered a confident, frozen
+// price card to anyone who still had the link — the same wrong-price-to-a-customer
+// risk as the archived calculators, from an offer we no longer honour.
+//
+// It was ALSO broken: the page loads `src="c112-bogo-promo.js"` relatively, which
+// resolves to /admin/c112-bogo-promo.js while the file sits at the repo root, so
+// it 404'd in production. Swatches and the PDF quote generator were dead while the
+// static price card still rendered — which is exactly why nobody noticed.
+//
+// MUST stay ABOVE the /admin gate + static mount below.
+app.get('/admin/c112-bogo-promo.html', (req, res) => {
+  res.status(410).set('X-Robots-Tag', 'noindex, nofollow').send(`<!DOCTYPE html>
+<meta charset="utf-8"><meta name="robots" content="noindex, nofollow">
+<title>This promotion has ended</title>
+<p>The C112 cap BOGO promotion has ended, and the prices on this page are no longer current.</p>
+<p><a href="/">Browse current products</a> or call 253-922-5793 for a quote.</p>`);
 });
+
+// /admin is staff-only. (The c112-bogo-promo exemption that used to live here was
+// removed 2026-08-17 with that promo — /admin is now uniformly gated, so a future
+// admin page can't inherit a public hole meant for one retired landing page.)
+app.use('/admin', gateStaffHtml);
 app.use('/admin', express.static(path.join(__dirname, 'admin'), staticOptions));
 app.use('/email-templates', express.static(path.join(__dirname, 'email-templates'), staticOptions));
 app.use('/mockups', express.static(path.join(__dirname, 'mockups'), staticOptions));

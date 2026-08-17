@@ -43,7 +43,7 @@ The frontend is built with HTML, CSS, and JavaScript, interacting with a Caspio 
     *   **Key Features**:
         *   Embeds a Caspio script (`https://c3eku948.caspio.com/dp/a0e15000f1348807501f41ef9d03/emb`) for product search and display.
         *   Provides users with a step-by-step guide on how to find products and view decoration pricing.
-        *   Features promotional banners, such as a link to the [`c112-bogo-promo.html`](c112-bogo-promo.html) page.
+        *   Features promotional banners. (The C112 BOGO banner was removed when that promo was retired — see §3.2.)
     *   **Navigation Flow**:
         1.  Users utilize the search filters on `index.html` to find apparel items.
         2.  Clicking a product in the search results navigates the user to a generic product detail page (likely [`product.html`](product.html), though this specific file's role needs final verification in the live flow).
@@ -133,9 +133,10 @@ This architecture applies to dynamic pricing pages like Cap Embroidery, DTG, Scr
 
 ### 3.2. Specific Pricing Pages
 
-*   **C112 BOGO Cap Promotion (`c112-bogo-promo.html`)**
-    *   **Purpose**: A standalone landing page for a "Buy One, Get One 25% OFF" deal on C112 embroidered trucker caps.
-    *   **JavaScript**: Primarily uses its own [`c112-bogo-promo.js`](c112-bogo-promo.js).
+*   **C112 BOGO Cap Promotion (`admin/c112-bogo-promo.html`) — 🚩 RETIRED 2026-08-17**
+    *   **Status**: The promo is no longer offered (Erik). The page now returns **410 Gone** via a tombstone route in `server.js`; the HTML/JS remain on disk and are flagged dead in `ACTIVE_FILES.md`. It carried hardcoded prices in its markup, so leaving it reachable meant quoting an offer we don't honour.
+    *   **Purpose** (historical): A standalone landing page for a "Buy One, Get One 25% OFF" deal on C112 embroidered trucker caps.
+    *   **JavaScript**: Used its own `c112-bogo-promo.js` (repo root). Note it was already broken in production — the page referenced the script *relatively*, so it resolved to `/admin/c112-bogo-promo.js` and 404'd.
         *   Handles BOGO-specific pricing logic.
         *   Manages selection of C112 cap colors and quantities.
         *   Calculates BOGO-adjusted totals.
