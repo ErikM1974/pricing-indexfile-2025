@@ -1,3 +1,9 @@
+## v2026.08.17.6 (2026.08.17)
+
+- Memory: Caspio '' IS NOT NULL, and a timestamp written in the wrong zone
+- Delete GET /api/christmas-products — anonymous vendor-cost leak, zero callers
+- Memory maintenance: promote 4 machine-local docs into git, fix a dangling tax pointer
+
 ## v2026.08.17.5 (2026.08.17)
 
 - Memory: gating a proxy prefix breaks every caller that never sent the secret
