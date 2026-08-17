@@ -5185,8 +5185,15 @@ app.use('/images', express.static(path.join(__dirname, 'images'), staticOptions)
 // anyway because "the gate happens to hold on this OS" is not a security property.
 // Matching the basename deliberately over-gates (a same-named file in a subfolder
 // is gated too): failing toward SSO is the safe direction.
+// Matched on BASENAME, so a nested path (forms/policies/…) is covered too.
 const STAFF_ONLY_FORMS = new Set([
   'business-credit-application-no-personal-guaranty.pdf',
+  // Linked from the "Credit Card SOP" policy, whose hub page IS public — so
+  // signed-out staff following that link now land on SSO first. That is the
+  // intended trade: the SOP's audience is staff, who have credentials. Checked
+  // 2026-08-17 by grepping Body_HTML across all 142 live policies (a repo grep
+  // MISSES this — policy bodies live in Caspio, not in the tree).
+  'credit-card-authorization.pdf',
 ]);
 function gateStaffOnlyForms(req, res, next) {
   let p;
