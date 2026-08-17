@@ -4,6 +4,43 @@ Resolved entries aged out of `LESSONS_LEARNED.md` (300-line cap). Newest first. 
 
 ---
 
+## Ruth's "Final notes" box saved her words and told nobody (2026-08-14)
+
+**Problem.** Porting the Approve-note box from the art-request page to the mockup page
+(`pages/js/mockup-detail.js`, Ruth's digitizing surface, route `/mockup/:id`) surfaced a
+live bug beside it: `openMarkCompleteModal()` collects a "Final notes (optional)" textarea
+and posts it with **`notify: false`**, so anything Ruth typed on completion was stored in
+Caspio and reached no one. The AE got only the fixed one-liner from `sendStatusNotifications`.
+
+**Root cause.** `notify: false` was a correct default for *audit* notes (status rows the
+timeline scanner needs) and was copy-pasted onto a note that carries **user-authored text**.
+Those are different things wearing the same shape.
+
+**Solution.** `notify: !!notesText` + explicit `Posted_By_Role`. Blank note = today's exact
+behaviour; typed note = the other party actually gets it.
+
+**Prevention.**
+- 🔑 **`notify: false` is right for a note the system wrote and wrong for a note a human
+  wrote.** Audit the distinction wherever both share a POST body — there are 10 `notify:`
+  sites in `mockup-detail.js` alone, and the free-text ones are the minority.
+- 🔑 **Routing direction: `Posted_By_Role: 'ae'` → Ruth (`mockup-routes.js:1489`); `'artist'`
+  → the rep of record.** Omitting it falls through to an author-NAME heuristic
+  (`['ruth','digitiz',…]`, :1477) — right today, fragile forever. Set it explicitly.
+  Same contract as `/api/design-notes` on the art-request side; only the field names differ
+  (`Mockup_ID`/`Author`/snake_case `Note_Type` vs `ID_Design`/`Note_By`).
+- 🔑 **To add opt-in notify to a function shared by N callers, add a trailing parameter that
+  defaults to the old behaviour** — `handleStatusUpdate(status, notes, btnEl, notifyNote)`
+  has 4 callers; only Approve passes the 4th, so the other three are provably unchanged.
+- ⚠️ **This page's approve had NO `confirm()` to replace**, unlike the art-request one — so
+  the modal ADDS a click rather than swapping one. Worth saying out loud before shipping a
+  "same as the other page" change; the two are not the same UX delta.
+- ⚠️ `openReviseModal()` re-`addEventListener`s its cancel/submit on every open and never
+  removes them; `statusUpdateInProgress` masks the duplicate status write but **the
+  file-upload branch is unguarded, so a re-opened revise modal uploads twice.** Not fixed.
+  New modals here use `.onclick =`, which is idempotent.
+
+---
+
 ## `table-layout: fixed` reads widths from the FIRST ROW, not from your `<th>` classes (2026-08-13)
 
 **Problem.** The new per-rep Past Due print sheets came out with all 8 columns an identical
