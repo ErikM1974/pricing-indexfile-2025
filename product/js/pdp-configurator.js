@@ -1175,7 +1175,16 @@
             if (token !== matrixSeq) return;
         }
 
-        const showFeeRow = model.tiers.some(function (t) { return t.ltmFee > 0; });
+        // ── Small-order fee row ──────────────────────────────────────────
+        // On many styles the two cheapest tiers carry the SAME per-piece price
+        // (identical Caspio decoration cost — e.g. EMB 1-7 and 8-23 are both
+        // $177.50 on CT103828), so this fee is the ONLY thing separating them.
+        // It therefore gets a fee pill and an explicit "No fee", never a bare
+        // em dash — an em dash reads as "no data", not "you don't pay this".
+        const feeTiers = model.tiers.filter(function (t) { return t.ltmFee > 0; });
+        const firstFree = model.tiers.filter(function (t) { return !(t.ltmFee > 0); })[0];
+        const unit = state.ctx.isCap ? 'caps' : 'pieces';
+
         const head = model.tiers.map(function (t) {
             return '<th data-min="' + t.min + '" data-max="' + (t.max === Infinity ? '' : t.max) + '">'
                 + escapeHtml(t.label) + '</th>';
@@ -1183,9 +1192,30 @@
         const priceRow = model.tiers.map(function (t) {
             return '<td>' + formatPrice(t.price) + '</td>';
         }).join('');
-        const feeRow = showFeeRow ? '<tr><td>Small-order fee</td>' + model.tiers.map(function (t) {
-            return '<td>' + (t.ltmFee > 0 ? '+' + formatPrice(t.ltmFee) + ' per order' : '—') + '</td>';
-        }).join('') + '</tr>' : '';
+        const feeRow = feeTiers.length
+            ? '<tr><td class="tier-fee-label">Small-order fee</td>' + model.tiers.map(function (t) {
+                return '<td>' + (t.ltmFee > 0
+                    ? '<span class="tier-fee-yes">+' + formatPrice(t.ltmFee) + '</span>'
+                        + '<span class="tier-fee-unit">per order</span>'
+                    : '<span class="tier-fee-no">No fee</span>') + '</td>';
+            }).join('') + '</tr>'
+            : '';
+
+        // Spell out the threshold in words, and — only when it is literally
+        // true of THIS ladder — that the fee is the entire difference between
+        // the last fee tier and the first free one.
+        let feeNote = '';
+        if (feeTiers.length && firstFree) {
+            const lastFee = feeTiers[feeTiers.length - 1];
+            feeNote = 'Orders under ' + firstFree.min + ' ' + unit + ' add a one-time '
+                + formatPrice(lastFee.ltmFee) + ' small-order fee.';
+            if (lastFee.price != null && firstFree.price != null && r2(lastFee.price) === r2(firstFree.price)) {
+                feeNote += ' At ' + escapeHtml(lastFee.label) + ' and ' + escapeHtml(firstFree.label)
+                    + ' the per-' + (state.ctx.isCap ? 'cap' : 'piece')
+                    + ' price is identical — the fee is the whole difference.';
+            }
+            feeNote = '<p class="pdp-cfg-fee-note">' + feeNote + '</p>';
+        }
 
         box.innerHTML =
             (model.approx ? '<p class="pdp-panel-note pdp-panel-note--warn" role="status">⚠ Live pricing is temporarily unavailable — this table is approximate. Your free proof confirms exact pricing.</p>' : '')
@@ -1194,6 +1224,7 @@
             + '<thead><tr><th>Quantity</th>' + head + '</tr></thead>'
             + '<tbody><tr><td>Price per ' + (state.ctx.isCap ? 'cap' : 'piece') + '</td>' + priceRow + '</tr>' + feeRow + '</tbody>'
             + '</table></div>'
+            + feeNote
             + '<p class="pdp-panel-foot">'
             + (model.multiSize ? 'Prices shown for size ' + escapeHtml(model.stdSize) + ' — extended sizes carry a small upcharge. ' : '')
             + escapeHtml(model.foot || '')

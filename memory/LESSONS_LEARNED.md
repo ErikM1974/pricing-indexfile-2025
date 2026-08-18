@@ -27,7 +27,18 @@ full list if the intersection is ever empty. `init()` re-seats `state.loc` onto 
 Zero backend work — the data to compute this was already on the page. Same commit made the tier
 matrix render open by default (`state.matrixOpen`, `product.html:287`).
 
+**Follow-up (same day).** With the table now the first thing a customer reads, its two cheapest
+columns were indistinguishable: EMB `1-7` and `8-23` are BOTH $177.50 (same Caspio
+`EmbroideryCost` of $18.00), so the `$50` small-order fee was the entire difference — and it
+rendered as a plain row whose other cells were bare em dashes. Fixed by styling the cell
+CONTENTS (fee pill + explicit "No fee") rather than the row background, so it never fights
+`.tier-table .is-active-tier` for the column the customer is actually in, plus a note derived
+from the ladder itself that names the threshold and states the identical-price fact only when
+it is literally true of that ladder.
+
 **Prevention.**
+- 🔑 **An em dash reads as "no data", not "you don't pay this".** In any table where a row means
+  a charge, spell the absence out.
 - 🔴 **When two gates narrow the same UI, one must consume the other's output.** Eligibility drove
   the method chips but not the placement chips; nothing in the code linked them, so they drifted
   the moment a method with narrower `supports` became the only eligible one.
