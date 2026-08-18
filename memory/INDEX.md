@@ -64,6 +64,24 @@ Last Updated: 2026-08-18 (branch/deploy audit: LESSONS_LEARNED trimmed 275→231
   🔑 Superseded two earlier notes that both said "parked, no PR": Erik opened the PR on
   2026-08-18. Deploying is still a separate, human `/deploy` step — merging to develop does
   not touch the live site.
+- ⏭️ **E2E money-path sleeps: 41s of the 48s is still unconverted, and NOT for lack of trying**
+  (2026-08-18). The a11y half is done — `document.fonts.ready` replaced two fixed 3500ms waits,
+  measured 116s → 101s locally. The eight remaining `page.waitForTimeout` calls in
+  `tests/e2e/money-path.spec.js` (lines 111/134/152/186/208/226/234, plus 216) were deliberately
+  left alone: **the money-path suite cannot run in the Claude Code cloud container.** The builder
+  page loads and `#product-search` renders, but typing a style fires ZERO network requests
+  (only `/api/version`), because the container's egress policy resets `fonts.googleapis.com` and
+  `cdn.caspio.com` and the builder's init never completes. Verified by probe, not inferred.
+  🔴 Do NOT convert those sleeps blind. The dangerous failure is not a poll that times out (that
+  fails loudly in CI) — it is a poll that resolves against an element already on screen, which
+  silently removes the wait and lets a save fire against unsettled pricing. That is the money
+  path asserting on stale dollars while staying green.
+  🔑 `money-path.spec.js:216`'s 3000ms is NOT a settle-wait at all — it is a negative-assertion
+  grace window proving a late POST never arrives after a blocked save. It must stay a real
+  duration whatever else changes.
+  ⏭️ Needs a machine that can run `npm run test:e2e` green first (Erik's, or CI with a debug
+  step). Local run needs Chromium r1228; this container ships r1194 at `/opt/pw-browsers`, so a
+  throwaway config with `launchOptions.executablePath` is required even to get that far.
 - ✅ **Resolved 2026-08-17:** four durable docs lived ONLY in machine-local auto-memory while
   CLAUDE.md and this index routed real work to them (`handbook-sync-workflow.md`,
   `policies-hub-update-playbook.md`, `nwca-policy-reconciliation-2026-08.md`,

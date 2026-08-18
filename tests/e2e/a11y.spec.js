@@ -35,7 +35,14 @@ for (const file of BUILDERS) {
     test(`${file}: no NEW serious/critical axe violations (rendered, contrast ON)`, async ({ page }) => {
         await page.goto(`/quote-builders/${file}`);
         await page.waitForLoadState('load');
-        await page.waitForTimeout(3500); // fonts/skins settle — contrast needs final paint
+        // Contrast needs the FINAL paint: webfonts swap in after first paint and
+        // change both rendered colour and metrics, so axe sampling too early reads
+        // fallback-font pixels. document.fonts.ready is that exact signal — the old
+        // fixed 3.5s was slower than necessary on a warm cache and a coin flip on a
+        // cold one. It settles on font FAILURE too, so a blocked font host cannot
+        // hang this. The rAF pair then lets the swap actually paint before axe runs.
+        await page.evaluate(() => document.fonts.ready);
+        await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
 
         const results = await new AxeBuilder({ page })
             .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
