@@ -695,6 +695,34 @@ git push origin develop
 
 `--ff-only` is safe because main just got the release-merge commit + changelog commit. Keeps develop's tip at the changelog commit.
 
+### Step 16a — Prune merged local branches (added 2026-08-18)
+
+A release is the moment feature branches become dead, so prune here. GitHub's "Automatically
+delete head branches" (enabled on this repo 2026-08-18) only removes the branch on `origin` when
+its PR merges — **it cannot touch your local branches**, and `git fetch --prune` clears the stale
+remote-tracking refs but not the local branch that pointed at them. Left alone they accumulate:
+by 2026-08-18 there were 8, the oldest 357 commits stale.
+
+```bash
+git branch --merged main | grep -vE '^\*|^\s*(main|develop)$' | while read -r B; do
+  git branch -d "$B" && echo "  pruned $B"
+done
+git fetch origin --prune          # drop remote-tracking refs GitHub already deleted
+```
+
+**`-d`, never `-D`.** Lowercase refuses any branch holding unmerged commits, so the worst case is
+a branch that stays. `-D` would silently discard work. The `--merged main` filter plus `-d` is
+belt-and-braces on purpose: this runs unattended on every deploy.
+
+⚠️ **Excluding `main`/`develop` in the grep is not optional** — `--merged main` lists `develop`
+too at this point (Step 16 just fast-forwarded it), and `git branch -d develop` would delete the
+branch you are standing on the next time someone deploys from `main`.
+
+⚠️ **Skip this in a shared or worktree checkout if another session may hold a branch.** A branch
+checked out in a `.claude/worktrees/*` worktree is protected by git (the delete fails harmlessly),
+but a branch another session merged and still intends to build on will vanish. It is recoverable
+via `git reflog` for ~90 days; still, prefer to let it fail than to explain the reflog.
+
 ### Step 17 — Success message
 
 ```
