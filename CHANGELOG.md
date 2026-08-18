@@ -1,3 +1,7 @@
+## v2026.08.17.10 (2026.08.17)
+
+- Memory: a repo grep cannot prove nothing links a file (policy bodies live in Caspio)
+
 ## v2026.08.17.9 (2026.08.17)
 
 - Memory: path gates must canonicalise, not string-match; archive one entry
