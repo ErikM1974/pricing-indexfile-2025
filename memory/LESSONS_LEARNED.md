@@ -39,9 +39,15 @@ pinned. Lint, typecheck, unit (125 suites) and DOM (10 suites) all green.
 - 🔴 **NEVER open a `NODE_ENV==='test'` hole in an auth gate to make tests pass.** Sign a real
   cookie the way a real browser would; a gate with a test-shaped hole is one env-var mistake
   away from being no gate at all.
-- 🔑 **"Deploy is green" is not "CI is green."** The deploy gate is a strict subset of CI. Check
-  the Actions tab after a release, or widen the deploy gate — a red job nobody reads is a job
-  that isn't protecting anything.
+- 🔑 **"Deploy is green" is not "CI is green."** The deploy gate was a strict subset of CI.
+  Widened 2026-08-18: `/deploy` step 0.6 now runs lint + typecheck + unit + dom + a11y (~23s,
+  measured), and step 0.7 reads CI's own verdict for the E2E job it can't reproduce.
+- 🔑 **A blind ratchet doesn't hold the line, it just stops reporting.** With the axe specs
+  scanning a 503 shell, a real contrast regression shipped and sat there: DTG's `.daf-sub` /
+  `.daf-note` were slate-400 `#94a3b8` on `#f8fafc` = **2.45:1** against a 4.5:1 requirement
+  (landed v2026.08.10.9, `shared_components/css/dtg-inline-form.css`). Fixed to slate-500
+  `#64748b` (4.55 / 4.51 on the two card backgrounds) — **never "fix" a ratchet by raising its
+  baseline**; the baseline only ever drops.
 
 ---
 

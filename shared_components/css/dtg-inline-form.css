@@ -2497,8 +2497,12 @@
     font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em;
     color: #475569; margin-bottom: 8px;
 }
+/* Muted secondary text. 🔴 Must clear 4.5:1 on BOTH card backgrounds — #f8fafc (rest)
+   and #f2fbf4 (.daf-active) — at 11px, which is normal-size text for WCAG. slate-400
+   (#94a3b8) was 2.45:1 and failed the rendered axe ratchet; slate-500 is 4.55/4.51.
+   Anything lighter than slate-500 fails here. */
 .dtg-art-fees .daf-sub {
-    font-size: 11px; font-weight: 500; text-transform: none; letter-spacing: 0; color: #94a3b8;
+    font-size: 11px; font-weight: 500; text-transform: none; letter-spacing: 0; color: #64748b;
 }
 .dtg-art-fees .daf-row {
     display: flex; align-items: center; justify-content: space-between;
@@ -2510,7 +2514,7 @@
 }
 .dtg-art-fees .daf-toggle-plain { cursor: default; }
 .dtg-art-fees .daf-toggle input[type="checkbox"] { width: 15px; height: 15px; accent-color: #2d5f3f; cursor: pointer; }
-.dtg-art-fees .daf-note { color: #94a3b8; font-size: 11.5px; }
+.dtg-art-fees .daf-note { color: #64748b; font-size: 11.5px; } /* slate-500 — see .daf-sub note */
 .dtg-art-fees .daf-code {
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 10.5px; font-weight: 700;
     color: #475569; background: #e2e8f0; border-radius: 4px; padding: 1px 6px; letter-spacing: .02em;
