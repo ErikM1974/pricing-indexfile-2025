@@ -5,6 +5,46 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## A security gate broke the E2E harness, and CI stayed red for two weeks (2026-08-18)
+
+**Problem.** Every CI run on `main` from 2026-08-05 to 2026-08-18 — 60+ consecutive runs — failed,
+and 10 releases shipped over the top of it. Three of four jobs were red: ESLint (1 error),
+`tsc checkJs` (15 errors), and Playwright E2E (10 failures, including every money-path spec and
+the DTF "zero locations must block save" guard).
+
+**Root cause.** Three unrelated breaks, none of which could block a deploy:
+- **E2E** — `fb2cb4a5` ("Security: gate /quote-builders") added `app.use('/quote-builders',
+  gateStaffHtml)` at `server.js:4905`. CI has no SAML config, so every builder page answered
+  `302 → /auth/saml/login → 503 "Staff SSO is not configured yet."` All 6 money specs died on
+  `waitForSelector('#product-search')` and the 4 axe specs scanned a 503 shell. **The gate was
+  right; the harness was what went stale.**
+- **ESLint** — `AbortController` was missing from the hand-maintained `globals` allowlist in
+  `eslint.config.mjs`, so `lib/product-seo.js` tripped `no-undef` from v2026.08.10.9.
+- **tsc** — five undeclared `window.*` bridges (`boxUrl`, `vendorLabel`, …) plus four loose
+  casts; all extraction debt that no gate was looking at.
+- 🔴 **Why nobody noticed for two weeks:** the `/deploy` skill's test gate runs `npm run test:unit`
+  ONLY. Lint, typecheck and E2E exist exclusively as CI jobs, and CI runs on `pull_request` +
+  push to develop/main — so a red `main` never blocked the next release. Green deploys, red CI,
+  no contradiction.
+
+**Fix.** `tests/e2e/staff-session.js` mints a real signed `nwca_staff` cookie with the same
+cookie-session/Keygrip primitives the server verifies with, under a secret pinned in
+`playwright.config.js`; specs run authenticated via `use.storageState`. `AbortController` added to
+the eslint globals; the five window bridges declared in `types/globals.d.ts`; the four casts
+pinned. Lint, typecheck, unit (125 suites) and DOM (10 suites) all green.
+
+**Prevention.**
+- 🔴 **A gate added to a page prefix breaks every headless caller of that prefix.** Grep
+  `tests/` for the path before shipping the gate — the E2E harness is a caller too.
+- 🔴 **NEVER open a `NODE_ENV==='test'` hole in an auth gate to make tests pass.** Sign a real
+  cookie the way a real browser would; a gate with a test-shaped hole is one env-var mistake
+  away from being no gate at all.
+- 🔑 **"Deploy is green" is not "CI is green."** The deploy gate is a strict subset of CI. Check
+  the Actions tab after a release, or widen the deploy gate — a red job nobody reads is a job
+  that isn't protecting anything.
+
+---
+
 ## A fillable PDF that opens BLANK, and a Caspio 502 that was really a length cap (2026-08-17)
 
 **Problem.** Adding the Business Credit Application (No Personal Guaranty) to the Forms Library
@@ -189,87 +229,3 @@ FEE not a `'1-7'` label, so a Caspio re-band keeps working.
   `HalfDollarCeil_Final`, so the catch never ran. Stub `global.fetch` per test; a slow unit test is
   the tell.
 - 🔑 Mutation-tested: reverting `getServicePrice` to the silent version fails 3 of 7 new tests.
-
----
-
-## The staff quote builders were on the open internet, and a review found it (2026-08-17)
-
-**Problem.** `https://www.teamnwca.com/quote-builders/embroidery-quote-builder.html` returned the
-fully working staff tool to anyone — customer search, pricing table, ShopWorks import/export.
-Separately, `admin/universal-records-admin.html` and the PUBLIC homepage (`catalog-search.js`)
-rendered untrusted data into `innerHTML` unescaped.
-
-**Root cause.** `app.use('/quote-builders', express.static(...))` sat between `/dashboards` and
-`/vendor-portals` — **both gated** — and was simply never given a gate. Nothing detects a *missing*
-`app.use`; the neighbours looked right, so review kept passing over it. `staff-auth-helper.js` made
-it *look* protected, but it is a sessionStorage rep-name autofill, not authentication. The XSS side
-had the same shape: `eslint.config.mjs` already enables `no-unsanitized` with `escapeHTML`
-registered as a sanitizer — it never fired because **ESLint cannot see inside an HTML file**, and
-the admin page keeps 60 KB of inline script.
-
-**Fix.** `app.use('/quote-builders', gateStaffHtml)` **above** the `/quote-builders/:page` route
-(not next to the static mount — Express matches in registration order, so a gate by the mount is
-bypassed by the earlier route). The four ROOT aliases (`/embroidery-quote-builder.html` etc.) are
-separate routes and needed their own `gateStaffPage`. Escaped every API-derived interpolation in
-both files and replaced all inline `onclick`/`onchange`/`onsubmit` carrying data with `data-*` +
-delegated listeners.
-
-**Prevention.**
-- 🔴 **A missing gate is invisible; only an inventory finds it.** Nothing greps for "the `app.use`
-  that isn't there." The durable fix is a jest manifest test asserting every route declares a
-  posture (`public` / `staff` / `page:x.html`), so a NEW route fails CI until classified. Reviewing
-  the gates that exist will never find the one that doesn't.
-- 🔴 **Escaping does NOT protect an inline event handler.** The HTML parser decodes entities BEFORE
-  the JS is parsed, so `onclick="f('&#39;')"` still breaks out. `catalog-search.js` had already
-  half-learned this — it escaped quotes *for the onclick* and left the HTML context open. Two
-  contexts, two different rules: use `data-*` + delegation and the second context disappears.
-- 🔴 **Escape BEFORE transforming, not after.** `Notes.replace(/\n/g,'<br>')` must be
-  `escapeHtml(Notes).replace(...)` — escaping afterwards would neutralise the `<br>` you just added,
-  and escaping first is the only order that is both safe and correct.
-- 🔑 **Assets are content-hashed — an unverified fix is an unshipped fix.** The first browser check
-  showed the payload STILL firing: `dist/` was serving the pre-edit file. `npm run build` is part of
-  verifying, not just deploying. The network log is the proof (a live `GET /x` from the injected
-  `<img src=x>` before, gone after).
-- 🔑 **Gating a page does not gate its data.** These builders write to the proxy DIRECTLY
-  (`APP_CONFIG.API.BASE_URL` is the proxy host), and proxy `quoteWriteOnly` is a rate limiter, not
-  auth. The page gate is step one of two.
-
----
-
-## We push part numbers our own importer cannot read (2026-08-16)
-
-**Problem.** Re-importing a ShopWorks order that OUR builder created misrouted its decoration
-lines. `DECG-FB` (every full back we push) and `AL-CAP` (every cap additional logo) classified as
-**`product`** — not a mispriced decoration but a GARMENT ROW whose style number was the literal
-string `"DECG-FB"`, carrying the decoration charge as its unit price, with no warning.
-
-**Root cause.** The parser knew only the LEGACY vocabulary — `FB`, `CB`, `CS`. The builder's push
-side moved on to `DECG-FB` / `AL-CAP` (the proxy's `KNOWN_FEE_PNS` even annotates `CB`/`CS` as
-"legacy/imported; new builder uses AL-CAP") and nothing kept the two vocabularies in step. Orders
-from the old system round-tripped; orders from the current one did not.
-
-**Fix.** Both spellings classify. `unitPrice` is now kept on `fb`/`cb`/`cs` too — only the `al`
-branch had it, so everything else hit the review modal with `shopWorksPrice 0`, which DISABLES its
-ShopWorks radio (`swAvail = swPrice > 0`) and removes the rep's option to bill what the customer
-was actually billed. Also fixed two defects that stopped the ">= $40 Back Logo is really a full
-back" rule ever firing: `parseFloat('$45.00')` is NaN → 0 (so the line missed its own threshold),
-and the guard tested `position === 'Back'` while `_parseALPosition` returns the more specific
-`'Full Back'` — the clearest spelling of a full back was the one the full-back detector could not
-see.
-
-**Prevention.**
-- 🔴 **Round-trip vocabulary is a CONTRACT, and nothing was checking it.** A test now
-  parameterises the whole `KNOWN_FEE_PNS` list, so the next fee part we invent and forget to teach
-  the parser fails there instead of appearing as a garment row named "GRT-75" in a customer quote.
-  Push-side and parse-side vocabularies must be asserted against each other, not maintained in
-  parallel by hand across two repos.
-- 🔴 **"It classified as something" is not "it classified correctly".** A wrong-but-valid
-  classification produces no error anywhere. Enumerate what a value SHOULD be, don't check that it
-  parsed.
-- 🔑 **A price a human can read must never parse to zero.** That zero wasn't cosmetic — it silently
-  changed routing, because a downstream guard compared it to a threshold.
-- 🔑 The fixture corpus (24 files / 100 orders) contains ZERO `FB`/`CB`/`CS` lines — the entire
-  legacy decoration path had no fixture coverage, only three string-level `classifyPartNumber`
-  assertions. Absence of a fixture is why none of this surfaced.
-
----
