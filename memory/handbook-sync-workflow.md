@@ -155,5 +155,5 @@ If you mint a new chapter, update:
 ## Related memory
 
 - [policies-hub-update-playbook.md](policies-hub-update-playbook.md) — how to insert/update/delete any policy from chat
-- [policies-hub-details.md](policies-hub-details.md) — architecture (auth, schema, TipTap setup)
-- [feedback_use_proxy_for_caspio_writes.md](feedback_use_proxy_for_caspio_writes.md) — always use proxy, never direct Caspio
+- `policies-hub-details.md` *(machine-local auto-memory, not this tree)* — architecture (auth, schema, TipTap setup)
+- `feedback_use_proxy_for_caspio_writes.md` *(machine-local auto-memory, not this tree)* — always use proxy, never direct Caspio

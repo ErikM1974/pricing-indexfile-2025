@@ -195,7 +195,10 @@ reconciling to the packet totals. Ask NW Regional Accounting for a CSV/Excel exp
 
 **Access control:** ✅ `Staff_Page_Access` row `payroll.html → admin` seeded 7/27 — **admin only, NOT
 accountant** (Erik 7/27; payroll is the most sensitive data in the account).
-→ [STAFF_AUTH_DESIGN.md](STAFF_AUTH_DESIGN.md)
+→ Staff RBAC rules: CLAUDE.md § Security Checklist + `lib/page-access.js` (jest-locked by
+`tests/unit/admin-page-access.test.js`). *(The old `STAFF_AUTH_DESIGN.md` did not survive the
+2026-07-28 memory reset — recover from `Downloads/repo-memory-backup-2026-07-28` if its design
+rationale is ever needed; the enforced rule now lives in code.)*
 
 ## 6. ✅ Payroll dashboard + API — BUILT 2026-07-27 (not yet deployed)
 

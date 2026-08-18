@@ -9,7 +9,8 @@ Automates Northwest Custom Apparel's deploy pipeline `develop` → `main` → He
 
 ## What This Skill Does
 
-1. **Pre-flight gates** (Step 0.1–0.6) refuse to deploy bad state
+1. **Pre-flight gates** (Step 0.1–0.7) refuse to deploy bad state — 0.6 runs every
+   browser-free CI check (lint, typecheck, unit, DOM, a11y), 0.7 reads CI's own verdict
 2. **Single-version cache-bust** — one `$DEPLOY_VERSION` applied to all `?v=` query strings
 3. **Precise staging** — `git add -u` + explicit HTML files, never `-A`
 4. **Release-marker merge** — `--no-ff` so `git log --first-parent main` is a clean release log
@@ -25,7 +26,7 @@ Automates Northwest Custom Apparel's deploy pipeline `develop` → `main` → He
 
 `/deploy` · "deploy to production" · "push to heroku" · "release to production" · "deploy changes" · "ship it" · "release changes"
 
-Flags: `--skip-tests` (emergency bypass for Step 0.6)
+Flags: `--skip-tests` (emergency bypass for Step 0.6 — skips lint, typecheck, unit, DOM and a11y)
 
 ## Implementation
 
@@ -90,31 +91,63 @@ fi
 
 Runs *before* deploy so a failure here doesn't strand state half-changed.
 
-### Step 0.6 — Smoke tests (skippable)
+### Step 0.6 — Deterministic gate (skippable)
 
-If `--skip-tests` was NOT specified:
+If `--skip-tests` was NOT specified, run every check CI runs that needs no browser
+and no network. Run them in cheapest-first order so a failure aborts fast:
 
 ```bash
-if [ -f package.json ] && node -e "process.exit(require('./package.json').scripts['test:unit']?0:1)" 2>/dev/null; then
-  npm run test:unit
-elif [ -f package.json ] && node -e "process.exit(require('./package.json').scripts['test:parser']?0:1)" 2>/dev/null; then
-  npm run test:parser   # fallback for a repo without the full unit script
+for S in lint typecheck test:unit test:dom test:a11y; do
+  node -e "process.exit(require('./package.json').scripts['$S']?0:1)" 2>/dev/null || continue
+  echo "── $S"
+  npm run "$S" || { echo "✗ $S failed — aborting deploy."; exit 1; }
+done
+```
+
+If any fail → abort. Tell user: "`<name>` failed. Fix or re-run with `/deploy --skip-tests`
+for emergencies."
+
+**Why the whole set and not just `test:unit` (widened 2026-08-18).** `test:unit` alone was a
+strict subset of CI, so three jobs could be — and were — red on `main` for **60+ consecutive
+runs (2026-08-05 → 2026-08-18) across 10 releases**, with every deploy reporting ✅. ESLint went
+red at v2026.08.10.9 on a missing `AbortController` global; `tsc checkJs` carried 15 errors;
+Playwright lost all 10 specs the moment `/quote-builders` went behind the SAML gate. Nothing in
+the deploy path looked at any of them, so "deploy is green" and "CI is green" quietly stopped
+meaning the same thing. Measured 2026-08-18: **lint 2.2s · typecheck 4.9s · test:unit 8.9s ·
+test:dom 3.1s · test:a11y 4.3s ≈ 23s total** — still cheaper than one Heroku build step.
+
+⚠️ `--skip-tests` now bypasses ALL of it — unit, DOM, a11y, lint and typecheck. Treat it as a
+genuine emergency lever (prod is down and the fix is verified another way), not a way past an
+inconvenient red check. A red ratchet, parity or guard suite is exactly what this gate exists
+to stop.
+
+### Step 0.7 — CI conclusion for this commit (advisory)
+
+The one CI job Step 0.6 cannot reproduce is **Playwright E2E**: it needs a browser download and
+it reads live Caspio through the proxy. Running it here would put a vendor outage directly in
+the deploy path — which this repo deliberately refuses to do (same reasoning as the diagnostic
+capture job in `.github/workflows/ci.yml`). So check what CI already concluded instead of
+re-running it:
+
+```bash
+if command -v gh >/dev/null 2>&1; then
+  CONC=$(gh run list --branch develop --workflow ci.yml --limit 1 --json conclusion \
+         --jq '.[0].conclusion' 2>/dev/null)
+  case "$CONC" in
+    success) echo "CI: ✅ green on develop" ;;
+    "")      echo "⚠ CI: no run found for develop (or gh not authenticated) — E2E unverified." ;;
+    *)       echo "⚠ CI: last develop run concluded '$CONC'. Step 0.6 covers everything EXCEPT"
+             echo "  Playwright E2E — open the Actions tab and confirm the failure is not the"
+             echo "  money path before shipping." ;;
+  esac
+else
+  echo "⚠ gh CLI not installed — skipping the CI conclusion check (E2E unverified)."
 fi
 ```
 
-**Why the WHOLE `tests/unit/` and not just `test:parser` (widened 2026-07-28).** This gate
-used to run `test:parser` — `tests/unit/parser` only — so anything else red in `tests/unit/`
-sailed straight through. It did: `builders-function-length.test.js` went red on 2026-07-19
-(DTG's `init()` grew to 155 lines against a 150 cap) and stayed red across several releases
-because no gate looked at it. `tests/unit/` is ~95 suites / ~1900 tests in **under 7 seconds**
-— cheaper than one Heroku build step, and it covers the pricing-parity, guard, and ratchet
-suites that actually encode the never-break rules.
-
-If tests fail → abort. Tell user: "Tests failed. Fix or re-run with `/deploy --skip-tests` for emergencies."
-
-⚠️ `--skip-tests` now bypasses considerably more. Treat it as a genuine emergency lever
-(prod is down and the fix is verified another way), not a way past an inconvenient red test —
-a red ratchet or parity suite is exactly what this gate exists to stop.
+**Advisory, never an abort.** E2E depends on a third party being up, and a Caspio wobble must
+not be able to block a release. A loud warning is enough: everything deterministic already had
+its own hard gate one step above, so the only thing this can be warning about is E2E.
 
 ### Step 1 — Compute single deploy version
 

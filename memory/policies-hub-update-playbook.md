@@ -9,7 +9,7 @@ metadata:
 
 # How to update Policies Hub from chat (playbook)
 
-When the user asks to add, edit, or delete a policy in the Policies Hub (`https://www.teamnwca.com/pages/policies-hub.html`), follow this playbook. For architecture (auth model, schema, TipTap setup) see [policies-hub-details.md](policies-hub-details.md). For the "always use the proxy" lesson see [feedback_use_proxy_for_caspio_writes.md](feedback_use_proxy_for_caspio_writes.md).
+When the user asks to add, edit, or delete a policy in the Policies Hub (`https://www.teamnwca.com/pages/policies-hub.html`), follow this playbook. For architecture (auth model, schema, TipTap setup) see `policies-hub-details.md` *(machine-local auto-memory, not this tree)*. For the "always use the proxy" lesson see `feedback_use_proxy_for_caspio_writes.md` *(machine-local auto-memory, not this tree)*.
 
 ## The three operations
 
@@ -124,7 +124,7 @@ Print `OK`/`FAIL` rather than ✓/✗ — Windows terminals mangle the Unicode m
 
 ## When NOT to use this playbook
 
-- Frontend bugs in the hub UI itself → edit `shared_components/js/policies/*.js` directly (see [policies-hub-details.md](policies-hub-details.md) for the file map)
+- Frontend bugs in the hub UI itself → edit `shared_components/js/policies/*.js` directly (see `policies-hub-details.md` *(machine-local auto-memory, not this tree)* for the file map)
 - Caspio schema changes (new fields) → coordinate with `caspio-pricing-proxy/src/routes/policies.js` and Caspio admin UI
 - Bulk migrations (>5 policies at once) → write a proper script with logging, not a `_tmp-` throwaway
 

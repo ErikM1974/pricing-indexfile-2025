@@ -342,6 +342,14 @@ interface Window {
     _isWholesale?: boolean;
     _taxExempt?: boolean;
     _lastShipEstimate?: any;
+    /* box-url.js (classic script → window global; builders reach it guarded) */
+    boxUrl?: (u: string) => string;
+    /* product-rows bridges, second wave — same strangler seam as the block above,
+       just never declared, so tsc checkJs went red on them from the extraction. */
+    openCustomerSuppliedDialog?: (...args: any[]) => any;
+    openManualItemDialog?: (...args: any[]) => any;
+    resolveNonSanmarPricingMode?: (product: any) => string;
+    vendorLabel?: (vendorCode: any) => string;
     /* shared error surfaces (builders/shared/errors.js, roadmap 1.15) */
     showErrorBanner?: (message: string, opts?: { id?: string }) => any;
     hideErrorBanner?: (id?: string) => void;
