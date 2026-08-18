@@ -5,6 +5,40 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## Dead placement chips: a chip row that never asked which methods were eligible (2026-08-18)
+
+**Problem.** On `product.html?style=CT103828` (Carhartt Duck Detroit Jacket) the customer
+configurator offered six placement chips, but three of them — Center front, Full front, Center
+back — could never return a price. Tapping one produced only "not available for this placement".
+Not a Carhartt edge case: it hit **every** product in the embroidery-only categories (Workwear,
+Outerwear, Woven Shirts, Bags, Accessories).
+
+**Root cause.** Two independent gates that never talked to each other. `getEligibility()` filters
+which METHODS render (Q3) from the Caspio-backed `/api/decoration-methods` rules; but
+`currentLocations()` returned the hardcoded `GARMENT_LOCATIONS` array wholesale, with no reference
+to `state.methods` or any method's `supports` map. `METHODS.emb.supports` has `fullFront: false`
+and omits `centerFront`/`centerBack` entirely (those are DTF-only keys) — so on an EMB-only
+product half the chip row was decorative. The dead-end state was well-built and visible, which is
+exactly why nobody noticed the chips should never have rendered at all.
+
+**Fix.** `currentLocations()` (`product/js/pdp-configurator.js:654`) now intersects the location
+list with the union of `supports` across the eligible methods, with a defensive fall-back to the
+full list if the intersection is ever empty. `init()` re-seats `state.loc` onto a surviving chip.
+Zero backend work — the data to compute this was already on the page. Same commit made the tier
+matrix render open by default (`state.matrixOpen`, `product.html:287`).
+
+**Prevention.**
+- 🔴 **When two gates narrow the same UI, one must consume the other's output.** Eligibility drove
+  the method chips but not the placement chips; nothing in the code linked them, so they drifted
+  the moment a method with narrower `supports` became the only eligible one.
+- 🔑 A well-built "not available" state can *mask* a bug. The empty/unavailable path being correct
+  and visible is not evidence the option should have been offered.
+- 🔑 `tests/dom/pdp-placement-chips.test.js` slices the fixture out of the REAL `product.html`, so
+  the markup's default state is locked too — a revert in the HTML alone fails the suite. Both
+  halves were mutation-tested (filter revert → 2 failures; matrix revert → 3).
+
+---
+
 ## A fillable PDF that opens BLANK, and a Caspio 502 that was really a length cap (2026-08-17)
 
 **Problem.** Adding the Business Credit Application (No Personal Guaranty) to the Forms Library
@@ -233,43 +267,5 @@ delegated listeners.
 - 🔑 **Gating a page does not gate its data.** These builders write to the proxy DIRECTLY
   (`APP_CONFIG.API.BASE_URL` is the proxy host), and proxy `quoteWriteOnly` is a rate limiter, not
   auth. The page gate is step one of two.
-
----
-
-## We push part numbers our own importer cannot read (2026-08-16)
-
-**Problem.** Re-importing a ShopWorks order that OUR builder created misrouted its decoration
-lines. `DECG-FB` (every full back we push) and `AL-CAP` (every cap additional logo) classified as
-**`product`** — not a mispriced decoration but a GARMENT ROW whose style number was the literal
-string `"DECG-FB"`, carrying the decoration charge as its unit price, with no warning.
-
-**Root cause.** The parser knew only the LEGACY vocabulary — `FB`, `CB`, `CS`. The builder's push
-side moved on to `DECG-FB` / `AL-CAP` (the proxy's `KNOWN_FEE_PNS` even annotates `CB`/`CS` as
-"legacy/imported; new builder uses AL-CAP") and nothing kept the two vocabularies in step. Orders
-from the old system round-tripped; orders from the current one did not.
-
-**Fix.** Both spellings classify. `unitPrice` is now kept on `fb`/`cb`/`cs` too — only the `al`
-branch had it, so everything else hit the review modal with `shopWorksPrice 0`, which DISABLES its
-ShopWorks radio (`swAvail = swPrice > 0`) and removes the rep's option to bill what the customer
-was actually billed. Also fixed two defects that stopped the ">= $40 Back Logo is really a full
-back" rule ever firing: `parseFloat('$45.00')` is NaN → 0 (so the line missed its own threshold),
-and the guard tested `position === 'Back'` while `_parseALPosition` returns the more specific
-`'Full Back'` — the clearest spelling of a full back was the one the full-back detector could not
-see.
-
-**Prevention.**
-- 🔴 **Round-trip vocabulary is a CONTRACT, and nothing was checking it.** A test now
-  parameterises the whole `KNOWN_FEE_PNS` list, so the next fee part we invent and forget to teach
-  the parser fails there instead of appearing as a garment row named "GRT-75" in a customer quote.
-  Push-side and parse-side vocabularies must be asserted against each other, not maintained in
-  parallel by hand across two repos.
-- 🔴 **"It classified as something" is not "it classified correctly".** A wrong-but-valid
-  classification produces no error anywhere. Enumerate what a value SHOULD be, don't check that it
-  parsed.
-- 🔑 **A price a human can read must never parse to zero.** That zero wasn't cosmetic — it silently
-  changed routing, because a downstream guard compared it to a threshold.
-- 🔑 The fixture corpus (24 files / 100 orders) contains ZERO `FB`/`CB`/`CS` lines — the entire
-  legacy decoration path had no fixture coverage, only three string-level `classifyPartNumber`
-  assertions. Absence of a fixture is why none of this surfaced.
 
 ---
