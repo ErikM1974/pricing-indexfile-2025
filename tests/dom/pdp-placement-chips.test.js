@@ -285,6 +285,11 @@ describe('small-order fee row', () => {
         const note = document.querySelector('#cfgMatrix .pdp-cfg-fee-note');
         expect(note).not.toBeNull();
         expect(note.textContent).toContain('Orders under 8 pieces add a one-time $50.00 small-order fee.');
+
+        // It frames the numbers, so it must come BEFORE the table, not after.
+        const table = document.querySelector('#cfgMatrix .table-wrap');
+        expect(note.compareDocumentPosition(table) & window.Node.DOCUMENT_POSITION_FOLLOWING)
+            .toBeTruthy();
         // 1-7 and 8-23 are both $177.50, so the identical-price clause applies.
         expect(note.textContent).toContain('At 1-7 and 8-23 the per-piece price is identical');
         expect(note.textContent).toContain('the fee is the whole difference');

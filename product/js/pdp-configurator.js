@@ -1201,9 +1201,11 @@
             }).join('') + '</tr>'
             : '';
 
-        // Spell out the threshold in words, and — only when it is literally
-        // true of THIS ladder — that the fee is the entire difference between
-        // the last fee tier and the first free one.
+        // Rendered ABOVE the table so it frames the numbers instead of
+        // explaining them after the fact. Spells out the threshold in words,
+        // and — only when it is literally true of THIS ladder — that the fee
+        // is the entire difference between the last fee tier and the first
+        // free one.
         let feeNote = '';
         if (feeTiers.length && firstFree) {
             const lastFee = feeTiers[feeTiers.length - 1];
@@ -1220,11 +1222,11 @@
         box.innerHTML =
             (model.approx ? '<p class="pdp-panel-note pdp-panel-note--warn" role="status">⚠ Live pricing is temporarily unavailable — this table is approximate. Your free proof confirms exact pricing.</p>' : '')
             + '<p class="pdp-panel-note">' + escapeHtml(model.note) + '</p>'
+            + feeNote
             + '<div class="table-wrap"><table class="data-table tier-table">'
             + '<thead><tr><th>Quantity</th>' + head + '</tr></thead>'
             + '<tbody><tr><td>Price per ' + (state.ctx.isCap ? 'cap' : 'piece') + '</td>' + priceRow + '</tr>' + feeRow + '</tbody>'
             + '</table></div>'
-            + feeNote
             + '<p class="pdp-panel-foot">'
             + (model.multiSize ? 'Prices shown for size ' + escapeHtml(model.stdSize) + ' — extended sizes carry a small upcharge. ' : '')
             + escapeHtml(model.foot || '')
