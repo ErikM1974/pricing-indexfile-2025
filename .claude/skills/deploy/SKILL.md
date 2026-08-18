@@ -221,13 +221,40 @@ its own hard gate one step above, so the only thing this can be warning about is
 ```bash
 SHORT_SHA=$(git rev-parse --short HEAD)
 TODAY=$(date +%Y.%m.%d)
-N=$(( $(git tag -l "v${TODAY}.*" | wc -l) + 1 ))
+TODAY_RE=${TODAY//./\\.}
+
+# Highest N already used today, read from BOTH places a version can be recorded.
+highest_n() { sed -nE "s/^.*${TODAY_RE}\.([0-9]+).*$/\1/p" | sort -n | tail -1; }
+TAG_MAX=$(git tag -l "v${TODAY}.*" | highest_n)
+REF_MAX=$(grep -rhoE "\?v=${TODAY_RE}\.[0-9]+" --include="*.html" --exclude-dir=.claude . 2>/dev/null | highest_n)
+
+N=$(( $(printf '%s\n%s\n0\n' "$TAG_MAX" "$REF_MAX" | grep -E '^[0-9]+$' | sort -n | tail -1) + 1 ))
 DEPLOY_TAG="v${TODAY}.${N}"
 DEPLOY_VERSION="${TODAY}.${N}"
-echo "Deploy tag: $DEPLOY_TAG"
+echo "Deploy tag: $DEPLOY_TAG  (highest today: tag=${TAG_MAX:-none} ref=${REF_MAX:-none})"
 ```
 
 ONE version per deploy applied uniformly. No per-file divergence.
+
+🔴 **Take the MAX already in use and add one — never count.** `N=$(git tag -l ... | wc -l)+1`
+assumes the day's versions are dense and that tags are the only record of them. Both assumptions
+broke in production on 2026-08-18, in opposite directions:
+
+| | State that day | `count+1` | Correct |
+|---|---|---|---|
+| v2026.08.18.4 | tag `.1`; `product.html` hand-bumped to `?v=2026.08.18.3` | `.2` — **regresses** the ref | `.4` |
+| v2026.08.18.5 | tags `.1` and `.4` (sparse — `.2`/`.3` skipped) | `.3` — **below** `.4` | `.5` |
+
+A count answers "how many releases happened", but the question is "what is the next unused
+version". Those differ the moment a number is skipped or claimed outside the tag list. Reading
+BOTH sources matters: **a hand-bumped `?v=` in HTML is a claimed version with no tag behind it**
+(the first row), and a skipped tag number leaves a hole a count silently reuses (the second).
+
+Consequences of getting it low, both silent: Step 2 rewrites a live `?v=` **backwards**, so
+browsers holding the newer value never refetch and reps run old pricing code against a new
+server; and `git tag` collides with the existing tag or lands out of order, so
+`git describe --tags` picks the wrong baseline and the NEXT release's CHANGELOG re-lists commits
+already shipped. Sparse tag numbers are normal and fine — dense ones are not a goal.
 
 ### Step 2 — Cache-bust auto-bump
 
