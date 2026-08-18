@@ -4,7 +4,7 @@ Repo `/memory/` is the CANONICAL tree (git-tracked). The machine-local auto-memo
 `~/.claude/projects/<slug>/memory/` holds `MEMORY.md` (the auto-loaded index) plus per-fact
 files; where a topic exists in both, **the repo copy wins** and auto-memory keeps a pointer.
 
-Last Updated: 2026-08-18 (branch/deploy audit: LESSONS_LEARNED trimmed 275→231 lines, 2 entries archived; all 6 dangling cross-doc links repaired — doc-freshness broken links 6→0, health 45→75)
+Last Updated: 2026-08-18 (branch/deploy audit: LESSONS_LEARNED trimmed 275→231 lines, 2 entries archived; all 6 dangling cross-doc links repaired — broken links 6→0, health 45→75. PDP placement branch: two duplicate backlog notes merged into one, PR #30 opened)
 
 | File | What it holds |
 |---|---|
@@ -51,13 +51,19 @@ Last Updated: 2026-08-18 (branch/deploy audit: LESSONS_LEARNED trimmed 275→231
   recovery source (`git show cc9a61e4^:memory/wa-sales-tax-rules.md`, also in the Downloads
   backup). ⏭️ **Restore it to THIS tree after a currency check against Caspio/DOR** — it predates
   2026-07-28 and nobody should quote a rate from it until verified.
-- ⏭️ **PDP placement work is SHIPPED to a branch but NOT merged or deployed** (2026-08-18,
-  `claude/catalog-pricing-placement-7aowwc`, 4 commits). Dead placement chips hidden, price
-  table open by default, small-order fee made legible. All suites green; no PR opened.
-  **Waiting on Erik:** (1) open a PR / deploy, or leave parked; (2) build the
-  `Placement_Rules` table or not — spec is `placement-rules-spec.md`; (3) four seeding calls
-  named in that spec's §3 (polos, scrubs, aprons, sweaters); (4) confirm the fail-OPEN posture
-  in its §6, which deliberately inverts the decoration-methods fail-closed rule.
+- ⏭️ **PDP placement work is IN PR #30 against `develop`** (2026-08-18,
+  `claude/catalog-pricing-placement-7aowwc`, 8 commits, ~800 lines). Dead placement chips
+  hidden, price table open by default, small-order fee made legible. All suites green;
+  mergeable, awaiting Erik's merge. Once it lands, the spec below is in-tree on develop and
+  this entry can collapse to the open decisions alone.
+  **Three decisions still travel with it:** (1) build the Caspio `Placement_Rules` deny-overlay
+  table or not — see [`placement-rules-spec.md`](placement-rules-spec.md); (2) the four seeding
+  calls in that spec's §3 (polos, scrubs, aprons, sweaters); (3) confirm its §6 **fail-OPEN**
+  posture, which deliberately inverts the fail-closed rule decoration methods use — worth a
+  conscious call even if the table is never built.
+  🔑 Superseded two earlier notes that both said "parked, no PR": Erik opened the PR on
+  2026-08-18. Deploying is still a separate, human `/deploy` step — merging to develop does
+  not touch the live site.
 - ✅ **Resolved 2026-08-17:** four durable docs lived ONLY in machine-local auto-memory while
   CLAUDE.md and this index routed real work to them (`handbook-sync-workflow.md`,
   `policies-hub-update-playbook.md`, `nwca-policy-reconciliation-2026-08.md`,
