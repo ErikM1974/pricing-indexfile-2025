@@ -5,6 +5,95 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## A dependency bump that passes all five gates and takes the whole site down (2026-08-18)
+
+**Problem.** Dependabot PR #27 (`marked` 12.0.2 → 18.0.9) sat open looking ordinary. Merging it
+would have produced **H10 on every page** — all customer storefronts and pricing pages, not a
+degraded blog — and every check in the repo says it is fine.
+
+**Root cause.** `marked` went **ESM-only at v13**. `lib/blog.js:17` is CommonJS
+(`const { marked } = require('marked')`), so v18 throws `ERR_REQUIRE_ESM` at require time. That
+is not contained to the blog: `server.js:4747` does `require('./lib/blog')` at module load, so
+the failure happens before the server listens and the process never starts.
+
+**Solution.** Closed the PR and added an `ignore` for `marked` majors in `.github/dependabot.yml`
+(`a4e84360`) naming the unblock condition, so it cannot be re-proposed until `lib/blog.js` moves
+to ESM or a dynamic `import()`. Minor/patch of v12 still flow.
+
+**Prevention.**
+- 🔴 **Measured with `marked@18` actually installed: lint ✅ typecheck ✅ test:unit (125 suites /
+  2613 tests) ✅ test:dom ✅ test:a11y ✅ — and the server does not boot.** No test loads
+  `lib/blog.js`. A green suite is evidence about the code the suite imports and nothing else.
+- 🔑 **The deploy skill's Step 3.6b boot probe is the only gate that caught it**, and only because
+  it actually starts the server rather than parsing it. `node --check` passes too — syntax is
+  fine, the failure is at require time. This is the second incident that gate has justified
+  (first: the 2026-07-19 `Cannot find module` outage). **Never route around it.**
+- 🔴 **A module required at server boot has no blast radius of its own** — it inherits the whole
+  app's. Before upgrading anything under `lib/`, check whether `server.js` requires it at load:
+  `grep -n "require('./lib/<name>')" server.js`. If yes, a bad bump is a total outage, not a
+  broken feature.
+- 🔑 **CJS→ESM is invisible to semver reasoning.** "It's only used in 3 places, all stable API"
+  was true here and completely irrelevant — the break was in how the package is *loaded*, not
+  what it exposes. For any major bump, `require()` the package once before reading changelogs.
+- ⚠️ **A dependabot PR's red checks may be about nothing.** #24–27 were based on a commit **178
+  behind develop**, from before CI was fixed on 2026-08-18, so their ESLint/tsc/E2E failures were
+  inherited from the two-week-red CI. Check `baseRefOid`'s date before believing — or dismissing —
+  a bot PR's status, in both directions: #27's checks were *falsely red*, and its unit tests were
+  *truthfully green* on a build that could not start.
+- 🔑 `sharp` was a direct dependency nothing imported (no `require`, no script, root-only in the
+  lockfile) — shipping native libvips binaries on every install and Heroku build. Removing a dead
+  dep beats upgrading it; check `grep -rl "require('<pkg>')"` before accepting any bump.
+
+---
+
+## A release that reached GitHub but never reached Heroku, and nothing noticed for 9 hours (2026-08-18)
+
+**Problem.** `develop`, `main`, `origin/develop` and `origin/main` were all clean and identical at
+`a30c4c10` (v2026.08.18.4) — every signal a human checks said "shipped". Production was serving
+`42039b7c` (v2026.08.18.1), nine hours stale. Customers were missing the whole PR #30 PDP change:
+unpriceable placement chips still rendering, price table still collapsed, small-order fee still a
+footnote instead of a charge.
+
+**Root cause.** A `/deploy` run stopped partway. Steps 8–9 (release merge, CHANGELOG) and Step 11's
+`git push origin main` all completed, so GitHub looked finished. **Step 10 (`git tag`) and Step 12
+(`git push heroku main`) never ran** — `v2026.08.18.4` did not exist as a tag anywhere, local or
+remote. There is no gate at the END of the skill that asserts the deploy actually landed, so a run
+that dies after the GitHub push is indistinguishable from a successful one by every branch-level check.
+
+**Solution.** Re-entered at the missing steps rather than re-running `/deploy`: created the absent
+tag from `v2026.08.18.1..main`, pushed it, `git push heroku main` → Heroku v1874, verified. Running
+the skill from the top would have minted an **empty** v2026.08.18.5 (0 commits `develop..main`) with
+a garbage CHANGELOG entry.
+
+**Prevention.**
+- 🔴 **`origin/main` being current is NOT evidence production is current.** They are separate pushes
+  to separate remotes and only one of them is the deploy. The authoritative check is one command:
+  `git rev-list --left-right --count heroku/main...origin/main` after `git fetch --all` — any
+  non-zero right-hand number means undeployed code sits on `main`. `heroku releases -n 1` names the
+  deployed SHA directly and agrees.
+- 🔴 **A missing tag is the cheapest tripwire for a half-finished deploy.** `git tag -l "v$(date
+  +%Y.%m.%d).*"` disagreeing with the newest `Release v…` commit subject on `main` means a run died
+  between Step 9 and Step 12. Worth a Step 0 pre-flight in the skill: refuse to start when the tip
+  of `main` is a `Release v…`/`Changelog v…` commit whose tag doesn't exist.
+- 🔑 **When a deploy is already partly done, resume it — do not restart it.** `/deploy` assumes
+  `develop` has unreleased work. With `develop == main` it produces an empty release: an empty
+  `--no-ff` merge, a CHANGELOG heading with no commits, and a version number burned for nothing.
+  Check `git rev-list --count main..develop` before invoking the skill; if it's 0 the only thing
+  missing is downstream of the merge.
+- 🔑 **Verify a frontend deploy on asset BYTES, not on the version string.** Assets are
+  content-hashed into `/dist/…<hash>.js`, so the `?v=` in the HTML source never appears in the
+  served page and the skill's Step 14b `?v=` check silently finds nothing. What works: pick an
+  identifier that exists only in the new code (here `pdp-cfg-fee-note`, `tier-fee-label`), curl the
+  live hashed bundle, and grep. It went 0 → 1 across the deploy, and the bundle hash moved
+  `a04fe3cc39` → `11582a8bd6`. ⚠️ Minification changes case and mangles locals — pick markers from
+  string literals and CSS class names, never from variable names.
+- ⚠️ This is the **second** deploy in two days to leave the repo mid-flight (see the archived
+  2026-08-17 entry: Step 16 never completed, leaving the checkout on `main` with `develop` behind).
+  The skill has no crash-recovery story; when one is interrupted, assume nothing after the failure
+  point ran and verify each remaining step by hand.
+
+---
+
 ## Dead placement chips: a chip row that never asked which methods were eligible (2026-08-18)
 
 **Problem.** On `product.html?style=CT103828` (Carhartt Duck Detroit Jacket) the customer
@@ -168,91 +257,5 @@ Live `v2026.08.17.8`, verified anonymously in prod across 5 URL shapes.
   **Credit Card SOP** linking it, on a hub page that is anonymously reachable. ⚠️ `/api/policies-public/search`
   and the tree's `Body_Plain` BOTH strip markup — `q=href` returns 0 — so neither can see a URL in an
   attribute. Before changing who can reach a file, grep the CMS, and sanity-check the search index first.
-
----
-
-## Two silent no-ops in the quote sync: '' IS NOT NULL, and a clock read in the wrong zone (2026-08-17)
-
-**Problem.** Both were found while fixing the Aug 10-17 sync outage, and neither had ever
-shown a symptom. ① The proxy's `syncCandidates=true` filter returned **9 of 9** non-cancelled
-rows, so the hourly cron synced a `Status='Web Quote Request'` quote with no WO# forever. ②
-`ShopWorks_Last_Synced` was **written UTC and read Pacific**, so a just-synced row parsed ~7-8 h
-in the FUTURE, `now - lastSynced` went NEGATIVE, and the 30-minute staleness test could not fire
-— the hourly re-sync was really running ~3x/day.
-
-**Root cause.** ① Caspio stores an unset column as an **EMPTY STRING**, and `'' IS NOT NULL`, so
-`(Status='Processed' OR PushedToShopWorks IS NOT NULL)` matched everything and the OR swallowed
-the Status test. Only 1 of the 9 rows had a real `PushedToShopWorks`. ② `nowPacificNaiveIso()`
-already existed in `server.js` and the sync handler simply didn't use it.
-
-**Solution.** ① `PushedToShopWorks<>''` **plus** `ShopWorks_Order_Number>0`; proxy `v2026.08.17.1`
-(Heroku v1088), verified live 9→8. ② `nowIso = nowPacificNaiveIso()`; app `v2026.08.17.5`
-(Heroku v1867), verified live: stored `05:55:52` vs Pacific-now `05:56:05`, exactly 7 h behind UTC.
-
-**Prevention.**
-- 🔴 **In Caspio, `IS NOT NULL` does NOT mean "has a value".** Unset text columns come back as
-  `''`. Any "was this ever stamped?" predicate needs `AND col<>''`, and a bare `IS NOT NULL`
-  inside an `OR` silently promotes the whole clause to `TRUE`. Check the other named filters
-  before trusting one.
-- 🔴 **Tightening an over-matching filter can silently DROP real work.** Two DTG rows sat at
-  `Status='Accepted'` with an empty `PushedToShopWorks` but a REAL WO# — they were being synced
-  *only because of the bug*. The obvious one-line fix would have stopped their deletion detection
-  and the ShipStation cancel-cascade with no error anywhere. **Before narrowing a predicate, dump
-  what it currently matches and account for EVERY row you are about to exclude.**
-- 🔑 **`toContain()` cannot see a MISSING conjunct.** The jest lock asserted
-  `toContain('PushedToShopWorks IS NOT NULL')`, which passes with or without the `<>''` half. A
-  substring assertion tests presence, never sufficiency — assert the part that carries the meaning.
-- 🔴 **A timestamp has no type.** Nothing failed, nothing logged; the only tell was a cadence
-  nobody was measuring. **When a column is written in one place and read in another, the writer
-  and reader must name the same zone out loud** — and the fix belongs in the WRITER when every
-  reader already agrees. The June "Purges in 31 days" patch fixed the *reader* on the dashboard;
-  the reader had been right all along.
-- 🔑 The regression test **parses both functions out of the shipped `server.js` and round-trips
-  them**, with a negative control that re-creates the old writer and asserts the skew is still
-  6.5-8.5 h. A source-grep for the call would pass whether or not the two agree.
-- ⚠️ **The proxy caches `quote_sessions` reads** — a verification GET without `&refresh=true`
-  returned the PRE-fix row and read as "not fixed". Always add `refresh=true` when checking a write.
-
----
-## Gating a proxy route breaks every caller that never sent the secret (2026-08-17)
-
-**Problem.** Slack fired `Quote→ShopWorks sync unhealthy / sync-errors+sync-noop` every hour.
-The cron was running fine; every row it touched failed — `errors == candidates`, `synced: 0`.
-ShopWorks snapshots had been frozen on EVERY quote for a week: not just the cron, but
-quote-management's "Sync all", quote-view's page-load auto-sync and manual refresh, and
-`pages/js/invoice.js`, which all call the same endpoint.
-
-**Root cause.** Proxy `191c906` (2026-08-10 09:35 PT, "Gate the ManageOrders PII reads") added
-`app.use('/api/manageorders/order', requireCrmApiSecret)`. That prefix covers `/order/:id/snapshot`,
-and the fetch in `sync-from-shopworks` (`server.js` ~12770) was **the one proxy call in the whole
-file sending no `X-CRM-API-Secret`**. Every sync 401'd; the handler turns that into a 502.
-
-**Solution.** Send the secret, guarded like every other proxy call in the file, and `console.warn`
-the non-OK response. Shipped `v2026.08.17.4` (Heroku v1866). Verified in prod: OF-0061/OF-0062 now
-return `synced:true, status:Imported` with real snapshots, health is `ok:true, reason:null`.
-
-**Prevention.**
-- 🔴 **A gate lands on a PREFIX; the blast radius is every caller of every route under it.** The
-  commit gated six prefixes and its message reasoned carefully about `/customers` (2 callers,
-  correctly deployed app-first). `/order` got one line and no caller audit — and it had a caller.
-  Before gating a prefix, grep all three repos for the prefix, not for the route you had in mind.
-- 🔑 **The odd one out is the bug.** `server.js` sends `X-CRM-API-Secret` on ~80 proxy calls and
-  omitted it on exactly one. `grep -c` the header against the count of `SYNC_PROXY_BASE`/
-  `CRM_API_BASE` fetches — a single unauthenticated straggler is findable in one command, and is
-  a live outage waiting for someone to gate its route.
-- 🔴 **A 502 return path that logs nothing hides the outage completely.** `grep bulk-sync` showed
-  only the summary line; there were ZERO `[sync-from-shopworks]` entries, so the logs looked like
-  the sync wasn't even reaching the handler. Erik's #1 rule applies to SERVER logs too, not just
-  customer-facing banners: every early `return res.status(5xx)` needs a `console.warn` naming the
-  quote and the upstream status.
-- 🔑 **Fast failure is a fingerprint.** 3 candidates in 3.2s with a 1s throttle each = ~0ms of real
-  work per row. A run whose elapsed time is exactly its own throttle never talked to upstream.
-- 🔑 The watchdog earned its keep — it caught a silent no-op within the hour and named it precisely
-  (`sync-errors+sync-noop`). What it could NOT do is say WHICH quote or WHY: `recordQuoteSyncRun()`
-  drops `errorDetails`. Worth carrying the first error string into the health payload.
-- ⚠️ **Deploy left the repo on `main` with `develop` 2 commits behind** (a prior run's Step 16
-  never completed), and a concurrent session moved the branch mid-diagnosis. In this shared
-  OneDrive checkout, re-read `git branch --show-current` immediately before staging — never trust
-  the branch you saw one command ago.
 
 ---

@@ -4,6 +4,93 @@ Resolved entries aged out of `LESSONS_LEARNED.md` (300-line cap). Newest first. 
 
 ---
 
+## Two silent no-ops in the quote sync: '' IS NOT NULL, and a clock read in the wrong zone (2026-08-17)
+
+**Problem.** Both were found while fixing the Aug 10-17 sync outage, and neither had ever
+shown a symptom. ① The proxy's `syncCandidates=true` filter returned **9 of 9** non-cancelled
+rows, so the hourly cron synced a `Status='Web Quote Request'` quote with no WO# forever. ②
+`ShopWorks_Last_Synced` was **written UTC and read Pacific**, so a just-synced row parsed ~7-8 h
+in the FUTURE, `now - lastSynced` went NEGATIVE, and the 30-minute staleness test could not fire
+— the hourly re-sync was really running ~3x/day.
+
+**Root cause.** ① Caspio stores an unset column as an **EMPTY STRING**, and `'' IS NOT NULL`, so
+`(Status='Processed' OR PushedToShopWorks IS NOT NULL)` matched everything and the OR swallowed
+the Status test. Only 1 of the 9 rows had a real `PushedToShopWorks`. ② `nowPacificNaiveIso()`
+already existed in `server.js` and the sync handler simply didn't use it.
+
+**Solution.** ① `PushedToShopWorks<>''` **plus** `ShopWorks_Order_Number>0`; proxy `v2026.08.17.1`
+(Heroku v1088), verified live 9→8. ② `nowIso = nowPacificNaiveIso()`; app `v2026.08.17.5`
+(Heroku v1867), verified live: stored `05:55:52` vs Pacific-now `05:56:05`, exactly 7 h behind UTC.
+
+**Prevention.**
+- 🔴 **In Caspio, `IS NOT NULL` does NOT mean "has a value".** Unset text columns come back as
+  `''`. Any "was this ever stamped?" predicate needs `AND col<>''`, and a bare `IS NOT NULL`
+  inside an `OR` silently promotes the whole clause to `TRUE`. Check the other named filters
+  before trusting one.
+- 🔴 **Tightening an over-matching filter can silently DROP real work.** Two DTG rows sat at
+  `Status='Accepted'` with an empty `PushedToShopWorks` but a REAL WO# — they were being synced
+  *only because of the bug*. The obvious one-line fix would have stopped their deletion detection
+  and the ShipStation cancel-cascade with no error anywhere. **Before narrowing a predicate, dump
+  what it currently matches and account for EVERY row you are about to exclude.**
+- 🔑 **`toContain()` cannot see a MISSING conjunct.** The jest lock asserted
+  `toContain('PushedToShopWorks IS NOT NULL')`, which passes with or without the `<>''` half. A
+  substring assertion tests presence, never sufficiency — assert the part that carries the meaning.
+- 🔴 **A timestamp has no type.** Nothing failed, nothing logged; the only tell was a cadence
+  nobody was measuring. **When a column is written in one place and read in another, the writer
+  and reader must name the same zone out loud** — and the fix belongs in the WRITER when every
+  reader already agrees. The June "Purges in 31 days" patch fixed the *reader* on the dashboard;
+  the reader had been right all along.
+- 🔑 The regression test **parses both functions out of the shipped `server.js` and round-trips
+  them**, with a negative control that re-creates the old writer and asserts the skew is still
+  6.5-8.5 h. A source-grep for the call would pass whether or not the two agree.
+- ⚠️ **The proxy caches `quote_sessions` reads** — a verification GET without `&refresh=true`
+  returned the PRE-fix row and read as "not fixed". Always add `refresh=true` when checking a write.
+
+---
+
+## Gating a proxy route breaks every caller that never sent the secret (2026-08-17)
+
+**Problem.** Slack fired `Quote→ShopWorks sync unhealthy / sync-errors+sync-noop` every hour.
+The cron was running fine; every row it touched failed — `errors == candidates`, `synced: 0`.
+ShopWorks snapshots had been frozen on EVERY quote for a week: not just the cron, but
+quote-management's "Sync all", quote-view's page-load auto-sync and manual refresh, and
+`pages/js/invoice.js`, which all call the same endpoint.
+
+**Root cause.** Proxy `191c906` (2026-08-10 09:35 PT, "Gate the ManageOrders PII reads") added
+`app.use('/api/manageorders/order', requireCrmApiSecret)`. That prefix covers `/order/:id/snapshot`,
+and the fetch in `sync-from-shopworks` (`server.js` ~12770) was **the one proxy call in the whole
+file sending no `X-CRM-API-Secret`**. Every sync 401'd; the handler turns that into a 502.
+
+**Solution.** Send the secret, guarded like every other proxy call in the file, and `console.warn`
+the non-OK response. Shipped `v2026.08.17.4` (Heroku v1866). Verified in prod: OF-0061/OF-0062 now
+return `synced:true, status:Imported` with real snapshots, health is `ok:true, reason:null`.
+
+**Prevention.**
+- 🔴 **A gate lands on a PREFIX; the blast radius is every caller of every route under it.** The
+  commit gated six prefixes and its message reasoned carefully about `/customers` (2 callers,
+  correctly deployed app-first). `/order` got one line and no caller audit — and it had a caller.
+  Before gating a prefix, grep all three repos for the prefix, not for the route you had in mind.
+- 🔑 **The odd one out is the bug.** `server.js` sends `X-CRM-API-Secret` on ~80 proxy calls and
+  omitted it on exactly one. `grep -c` the header against the count of `SYNC_PROXY_BASE`/
+  `CRM_API_BASE` fetches — a single unauthenticated straggler is findable in one command, and is
+  a live outage waiting for someone to gate its route.
+- 🔴 **A 502 return path that logs nothing hides the outage completely.** `grep bulk-sync` showed
+  only the summary line; there were ZERO `[sync-from-shopworks]` entries, so the logs looked like
+  the sync wasn't even reaching the handler. Erik's #1 rule applies to SERVER logs too, not just
+  customer-facing banners: every early `return res.status(5xx)` needs a `console.warn` naming the
+  quote and the upstream status.
+- 🔑 **Fast failure is a fingerprint.** 3 candidates in 3.2s with a 1s throttle each = ~0ms of real
+  work per row. A run whose elapsed time is exactly its own throttle never talked to upstream.
+- 🔑 The watchdog earned its keep — it caught a silent no-op within the hour and named it precisely
+  (`sync-errors+sync-noop`). What it could NOT do is say WHICH quote or WHY: `recordQuoteSyncRun()`
+  drops `errorDetails`. Worth carrying the first error string into the health payload.
+- ⚠️ **Deploy left the repo on `main` with `develop` 2 commits behind** (a prior run's Step 16
+  never completed), and a concurrent session moved the branch mid-diagnosis. In this shared
+  OneDrive checkout, re-read `git branch --show-current` immediately before staging — never trust
+  the branch you saw one command ago.
+
+---
+
 ## Four silent pricing fallbacks, and the one that was never read (2026-08-17)
 
 **Problem.** Four places substituted a hardcoded price with nothing on screen:
