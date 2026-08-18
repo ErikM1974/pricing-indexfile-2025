@@ -11,3 +11,20 @@ updates:
     groups:
       dev-tooling:
         dependency-type: development
+    ignore:
+      # marked v13+ is ESM-ONLY. `lib/blog.js` is CommonJS and does
+      # `const { marked } = require('marked')`, which throws ERR_REQUIRE_ESM on
+      # v13+. server.js:4747 requires lib/blog at module load, so the process
+      # never starts: H10 on EVERY page, not just the blog.
+      #
+      # 🔴 Nothing in CI catches this. Verified 2026-08-18 with marked@18
+      # installed: lint, typecheck, test:unit, test:dom and test:a11y ALL pass
+      # green — no test loads lib/blog.js. Only the deploy skill's Step 3.6b
+      # boot probe fails, and only because it actually starts the server.
+      #
+      # Unblock by converting lib/blog.js to ESM or to a dynamic import(), then
+      # delete this ignore. Minor/patch of v12 still flow through.
+      # ⚠️ This suppresses major-version security advisories for marked too —
+      # if one lands, do the ESM migration rather than waiting on dependabot.
+      - dependency-name: marked
+        update-types: ["version-update:semver-major"]
