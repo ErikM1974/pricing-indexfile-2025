@@ -1,3 +1,24 @@
+## v2026.08.18.4 (2026.08.18)
+
+- PDP: hide unpriceable placement chips, open the price table by default
+- PDP: make the small-order fee read as a charge, not a footnote
+- PDP: move the small-order fee note above the price table
+- Spec: Caspio Placement_Rules deny-overlay table
+- Memory: park the PDP placement branch + its 4 open decisions in the backlog
+- Merge develop into the PDP placement branch
+- Memory: archive the oldest lesson to stay under the soft cap
+- Memory: pointer the parked PDP placement branch into the mainline backlog
+- CLAUDE.md: write down the branch flow (develop -> main -> Heroku)
+- Merge develop: resolve the duplicate PDP backlog note in INDEX.md
+- gitignore the doc-freshness report artifact
+- Restore the 111 CRLF endings my last commit flattened in .gitignore
+- Merge remote-tracking branch 'origin/develop' into claude/catalog-pricing-placement-7aowwc
+- Re-trigger CI: the E2E runner hung in `playwright install`, not in a test
+- CI: cache the Playwright browser and bound the E2E job's runtime
+- Merge PR #30: PDP placement chips, default-open price table, legible small-order fee
+- E2E: replace the a11y font-settle sleeps with document.fonts.ready
+- Deploy v2026.08.18.4: cache-bust product.html for the PDP configurator + CSS changes
+
 ## v2026.08.18.1 (2026.08.18)
 
 - Get CI green again: E2E staff session, eslint global, tsc casts
