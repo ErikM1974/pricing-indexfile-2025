@@ -51,6 +51,13 @@ Last Updated: 2026-08-17 (`/memory-maintain`: 27/27 files indexed, 0 orphans, 0 
   recovery source (`git show cc9a61e4^:memory/wa-sales-tax-rules.md`, also in the Downloads
   backup). ⏭️ **Restore it to THIS tree after a currency check against Caspio/DOR** — it predates
   2026-07-28 and nobody should quote a rate from it until verified.
+- ⏭️ **PDP placement work is SHIPPED to a branch but NOT merged or deployed** (2026-08-18,
+  `claude/catalog-pricing-placement-7aowwc`, 4 commits). Dead placement chips hidden, price
+  table open by default, small-order fee made legible. All suites green; no PR opened.
+  **Waiting on Erik:** (1) open a PR / deploy, or leave parked; (2) build the
+  `Placement_Rules` table or not — spec is `placement-rules-spec.md`; (3) four seeding calls
+  named in that spec's §3 (polos, scrubs, aprons, sweaters); (4) confirm the fail-OPEN posture
+  in its §6, which deliberately inverts the decoration-methods fail-closed rule.
 - ✅ **Resolved 2026-08-17:** four durable docs lived ONLY in machine-local auto-memory while
   CLAUDE.md and this index routed real work to them (`handbook-sync-workflow.md`,
   `policies-hub-update-playbook.md`, `nwca-policy-reconciliation-2026-08.md`,
