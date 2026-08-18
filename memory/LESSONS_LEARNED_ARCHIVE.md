@@ -4,6 +4,49 @@ Resolved entries aged out of `LESSONS_LEARNED.md` (300-line cap). Newest first. 
 
 ---
 
+## Gating a proxy route breaks every caller that never sent the secret (2026-08-17)
+
+**Problem.** Slack fired `Quote→ShopWorks sync unhealthy / sync-errors+sync-noop` every hour.
+The cron was running fine; every row it touched failed — `errors == candidates`, `synced: 0`.
+ShopWorks snapshots had been frozen on EVERY quote for a week: not just the cron, but
+quote-management's "Sync all", quote-view's page-load auto-sync and manual refresh, and
+`pages/js/invoice.js`, which all call the same endpoint.
+
+**Root cause.** Proxy `191c906` (2026-08-10 09:35 PT, "Gate the ManageOrders PII reads") added
+`app.use('/api/manageorders/order', requireCrmApiSecret)`. That prefix covers `/order/:id/snapshot`,
+and the fetch in `sync-from-shopworks` (`server.js` ~12770) was **the one proxy call in the whole
+file sending no `X-CRM-API-Secret`**. Every sync 401'd; the handler turns that into a 502.
+
+**Solution.** Send the secret, guarded like every other proxy call in the file, and `console.warn`
+the non-OK response. Shipped `v2026.08.17.4` (Heroku v1866). Verified in prod: OF-0061/OF-0062 now
+return `synced:true, status:Imported` with real snapshots, health is `ok:true, reason:null`.
+
+**Prevention.**
+- 🔴 **A gate lands on a PREFIX; the blast radius is every caller of every route under it.** The
+  commit gated six prefixes and its message reasoned carefully about `/customers` (2 callers,
+  correctly deployed app-first). `/order` got one line and no caller audit — and it had a caller.
+  Before gating a prefix, grep all three repos for the prefix, not for the route you had in mind.
+- 🔑 **The odd one out is the bug.** `server.js` sends `X-CRM-API-Secret` on ~80 proxy calls and
+  omitted it on exactly one. `grep -c` the header against the count of `SYNC_PROXY_BASE`/
+  `CRM_API_BASE` fetches — a single unauthenticated straggler is findable in one command, and is
+  a live outage waiting for someone to gate its route.
+- 🔴 **A 502 return path that logs nothing hides the outage completely.** `grep bulk-sync` showed
+  only the summary line; there were ZERO `[sync-from-shopworks]` entries, so the logs looked like
+  the sync wasn't even reaching the handler. Erik's #1 rule applies to SERVER logs too, not just
+  customer-facing banners: every early `return res.status(5xx)` needs a `console.warn` naming the
+  quote and the upstream status.
+- 🔑 **Fast failure is a fingerprint.** 3 candidates in 3.2s with a 1s throttle each = ~0ms of real
+  work per row. A run whose elapsed time is exactly its own throttle never talked to upstream.
+- 🔑 The watchdog earned its keep — it caught a silent no-op within the hour and named it precisely
+  (`sync-errors+sync-noop`). What it could NOT do is say WHICH quote or WHY: `recordQuoteSyncRun()`
+  drops `errorDetails`. Worth carrying the first error string into the health payload.
+- ⚠️ **Deploy left the repo on `main` with `develop` 2 commits behind** (a prior run's Step 16
+  never completed), and a concurrent session moved the branch mid-diagnosis. In this shared
+  OneDrive checkout, re-read `git branch --show-current` immediately before staging — never trust
+  the branch you saw one command ago.
+
+---
+
 ## Four silent pricing fallbacks, and the one that was never read (2026-08-17)
 
 **Problem.** Four places substituted a hardcoded price with nothing on screen:
