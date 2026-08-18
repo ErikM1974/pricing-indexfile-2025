@@ -63,6 +63,12 @@ Live `v2026.08.17.8`, verified anonymously in prod across 5 URL shapes.
 - 🔑 **Probe the running server, don't reason about the router.** Whether Express normalises `..`
   before routing decided the whole design; one curl battery answered it in seconds, and it is what
   turned up `::$DATA`, which no amount of reading the code would have.
+- 🔴 **"Nothing links to it" from a REPO grep is not evidence — half this site's content lives in
+  Caspio.** I called `forms/policies/credit-card-authorization.pdf` orphaned on a repo grep and told Erik
+  so. Grepping `Body_HTML` across all 142 live policies (`/api/policies-public/<id>`, ~142 calls) found the
+  **Credit Card SOP** linking it, on a hub page that is anonymously reachable. ⚠️ `/api/policies-public/search`
+  and the tree's `Body_Plain` BOTH strip markup — `q=href` returns 0 — so neither can see a URL in an
+  attribute. Before changing who can reach a file, grep the CMS, and sanity-check the search index first.
 
 ---
 
