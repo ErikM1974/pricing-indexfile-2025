@@ -48,6 +48,14 @@ pinned. Lint, typecheck, unit (125 suites) and DOM (10 suites) all green.
   (landed v2026.08.10.9, `shared_components/css/dtg-inline-form.css`). Fixed to slate-500
   `#64748b` (4.55 / 4.51 on the two card backgrounds) — **never "fix" a ratchet by raising its
   baseline**; the baseline only ever drops.
+- 🔑 **A CSS block copied between builders drifts silently.** `dtg-inline-form.css` carries a
+  copy of the `.order-recap` / `.ship-to-card` shell (DTG doesn't load `quote-builder-common.css`).
+  The shared file darkened those four labels #94a3b8→#64748b on **2026-06-10** for WCAG AA; the
+  DTG copy never got it and shipped 2.56:1 text for two months. Swept 2026-08-18 across all
+  builder CSS (26 sites). ⚠️ Contrast is **background-specific**: slate-500 is 4.55 on #f8fafc
+  but only 4.34 on #f1f5f9 and 3.86 on #e2e8f0 — two selectors needed slate-600 instead.
+  Not swept, deliberately: borders, decorative backgrounds, `:disabled` controls (WCAG 1.4.3
+  exempts inactive components) and `@media print` blocks.
 
 ---
 
