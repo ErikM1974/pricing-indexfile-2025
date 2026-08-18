@@ -239,6 +239,45 @@
     margin: 12px 0 0;
 }
 
+/* Small-order fee row in the quantity price table.
+   On many styles the two cheapest tiers share the SAME per-piece price, so
+   this fee is the only thing that distinguishes them — it has to read as a
+   real charge, not a footnote. Styling stays on the cell CONTENTS (a pill and
+   an explicit "No fee") rather than the row background, so it never fights
+   .tier-table .is-active-tier for the column the customer is actually in. */
+.tier-table .tier-fee-label { font-weight: 700; }
+.tier-fee-yes {
+    display: inline-block;
+    background: #f7dcae;
+    border: 1px solid #dfb887;
+    color: #7a4208;
+    font-weight: 800;
+    border-radius: 999px;
+    padding: 2px 10px;
+    white-space: nowrap;
+}
+.tier-fee-unit {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: #92500f;
+    margin-top: 3px;
+}
+.tier-fee-no {
+    color: var(--green-700);
+    font-weight: 700;
+}
+.pdp-cfg-fee-note {
+    font-size: 13px;
+    font-weight: 600;
+    color: #7a4208;
+    background: #fdf4e6;
+    border-left: 3px solid #e0b877;
+    border-radius: 0 6px 6px 0;
+    padding: 8px 12px;
+    margin: 0 0 12px;
+}
+
 .pdp-cfg {
     background: var(--card);
     border: 1px solid var(--line);

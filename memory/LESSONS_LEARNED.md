@@ -5,6 +5,51 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## Dead placement chips: a chip row that never asked which methods were eligible (2026-08-18)
+
+**Problem.** On `product.html?style=CT103828` (Carhartt Duck Detroit Jacket) the customer
+configurator offered six placement chips, but three of them — Center front, Full front, Center
+back — could never return a price. Tapping one produced only "not available for this placement".
+Not a Carhartt edge case: it hit **every** product in the embroidery-only categories (Workwear,
+Outerwear, Woven Shirts, Bags, Accessories).
+
+**Root cause.** Two independent gates that never talked to each other. `getEligibility()` filters
+which METHODS render (Q3) from the Caspio-backed `/api/decoration-methods` rules; but
+`currentLocations()` returned the hardcoded `GARMENT_LOCATIONS` array wholesale, with no reference
+to `state.methods` or any method's `supports` map. `METHODS.emb.supports` has `fullFront: false`
+and omits `centerFront`/`centerBack` entirely (those are DTF-only keys) — so on an EMB-only
+product half the chip row was decorative. The dead-end state was well-built and visible, which is
+exactly why nobody noticed the chips should never have rendered at all.
+
+**Fix.** `currentLocations()` (`product/js/pdp-configurator.js:654`) now intersects the location
+list with the union of `supports` across the eligible methods, with a defensive fall-back to the
+full list if the intersection is ever empty. `init()` re-seats `state.loc` onto a surviving chip.
+Zero backend work — the data to compute this was already on the page. Same commit made the tier
+matrix render open by default (`state.matrixOpen`, `product.html:287`).
+
+**Follow-up (same day).** With the table now the first thing a customer reads, its two cheapest
+columns were indistinguishable: EMB `1-7` and `8-23` are BOTH $177.50 (same Caspio
+`EmbroideryCost` of $18.00), so the `$50` small-order fee was the entire difference — and it
+rendered as a plain row whose other cells were bare em dashes. Fixed by styling the cell
+CONTENTS (fee pill + explicit "No fee") rather than the row background, so it never fights
+`.tier-table .is-active-tier` for the column the customer is actually in, plus a note derived
+from the ladder itself that names the threshold and states the identical-price fact only when
+it is literally true of that ladder.
+
+**Prevention.**
+- 🔑 **An em dash reads as "no data", not "you don't pay this".** In any table where a row means
+  a charge, spell the absence out.
+- 🔴 **When two gates narrow the same UI, one must consume the other's output.** Eligibility drove
+  the method chips but not the placement chips; nothing in the code linked them, so they drifted
+  the moment a method with narrower `supports` became the only eligible one.
+- 🔑 A well-built "not available" state can *mask* a bug. The empty/unavailable path being correct
+  and visible is not evidence the option should have been offered.
+- 🔑 `tests/dom/pdp-placement-chips.test.js` slices the fixture out of the REAL `product.html`, so
+  the markup's default state is locked too — a revert in the HTML alone fails the suite. Both
+  halves were mutation-tested (filter revert → 2 failures; matrix revert → 3).
+
+---
+
 ## A security gate broke the E2E harness, and CI stayed red for two weeks (2026-08-18)
 
 **Problem.** Every CI run on `main` from 2026-08-05 to 2026-08-18 — 60+ consecutive runs — failed,
@@ -211,35 +256,3 @@ return `synced:true, status:Imported` with real snapshots, health is `ok:true, r
   the branch you saw one command ago.
 
 ---
-## Four silent pricing fallbacks, and the one that was never read (2026-08-17)
-
-**Problem.** Four places substituted a hardcoded price with nothing on screen:
-`getServicePrice()` returned its fallback silently when the Service_Codes map had loaded but the
-row was missing; `fetchRoundingRules()`'s catch set `CeilDollar`; the DTG engine synthesised a
-`24-47` tier with `LTM_Fee: 0`; and `calculators/embroidery-pricing.html` hardcoded `LTM_FEE = 50`.
-
-**Root cause.** Every one had a *warning mechanism already available* and simply wasn't wired to it
-— `warnIfServiceCodeMissing` existed and was called at ~4 of ~20 sites; `showFallbackPricingWarning`
-existed; the DTG tier even set `_fallback: true`, and **nothing in the repo has ever read that flag**.
-The gap was never "we didn't know how to warn", it was that the warning lived at the CALL SITE, so
-every new caller silently opted out.
-
-**Fix.** Warn INSIDE `getServicePrice` — one place, every caller covered by construction, including
-future ones. `_fallback` surfaced at the DTG consumer (the engine file is byte-locked to the proxy,
-so the fix belongs at the reader). Rounding flip sets a sticky `_roundingFallbackUsed`, toasted and
-returned. The calculator reads `LTM_Fee` off the tier row carrying a non-zero fee — matching on the
-FEE not a `'1-7'` label, so a Caspio re-band keeps working.
-
-**Prevention.**
-- 🔴 **Put the warning where the substitution happens, not where it's consumed.** A per-call-site
-  warning is a rule you have to remember; a warning inside the function is one you cannot forget.
-- 🔴 **A flag nobody reads is not a warning.** `_fallback: true` looked like diligence for months.
-  Grep for a READER before believing a flag protects anything.
-- 🔑 **`null` can be load-bearing.** `roundingMethod = null` MEANS half-dollar; the "harmless
-  default" in the catch was a whole-dollar flip worth $0.49/pc. Check what a default actually does
-  before calling a fallback safe.
-- 🔑 **Node 18 has native `fetch`, so `tests/setup.js`'s stub never installs.** Two new tests
-  silently hit the LIVE proxy (449 ms) and asserted the wrong thing — `/api/pricing-rules` answered
-  `HalfDollarCeil_Final`, so the catch never ran. Stub `global.fetch` per test; a slow unit test is
-  the tell.
-- 🔑 Mutation-tested: reverting `getServicePrice` to the silent version fails 3 of 7 new tests.
