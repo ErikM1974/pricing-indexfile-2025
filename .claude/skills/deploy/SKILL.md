@@ -1,6 +1,6 @@
 ---
 name: Deploy to Production
-description: Deploy current develop branch to production. Use when user says /deploy, "deploy to production", "push to heroku", "release to production", "deploy changes", "ship it", or "release changes". No interactive prompts — pre-flight gates (auth, freshness, tests, memory) guard the deploy. Single-version cache-bust, --no-ff release merge with changelog of actual commits, real release-status verification, auto-restart on stale slug, optional Slack notification.
+description: Deploy current develop branch to production. Use when user says /deploy, "deploy to production", "push to heroku", "release to production", "deploy changes", "ship it", or "release changes". No interactive prompts — pre-flight gates (auth, freshness, tests, memory, prior-deploy completion) guard the deploy. Single-version cache-bust, --no-ff release merge with changelog of actual commits, real release-status verification, auto-restart on stale slug, optional Slack notification. Also covers resuming a deploy that reached GitHub but never reached Heroku.
 ---
 
 # Deploy to Production Skill
@@ -11,14 +11,16 @@ Automates Northwest Custom Apparel's deploy pipeline `develop` → `main` → He
 
 1. **Pre-flight gates** (Step 0.1–0.7) refuse to deploy bad state — 0.6 runs every
    browser-free CI check (lint, typecheck, unit, DOM, a11y), 0.7 reads CI's own verdict
-2. **Single-version cache-bust** — one `$DEPLOY_VERSION` applied to all `?v=` query strings
-3. **Precise staging** — `git add -u` + explicit HTML files, never `-A`
-4. **Release-marker merge** — `--no-ff` so `git log --first-parent main` is a clean release log
-5. **CHANGELOG of actual commits** — captures develop's commits BEFORE the merge so the changelog isn't empty
-6. **Real Heroku release verification** via `heroku releases --json`, not blind sleep
-7. **Dynamic stale-slug detection** with `ps:restart` → `ps:scale` escalation
-8. **Optional Slack notification** (silent skip if webhook unset; no debug chatter)
-9. **Copy-pasteable rollback** procedure at end of skill
+2. **Prior-deploy completion check** (0.4a) — catches a previous run that reached GitHub but
+   never reached Heroku, the one failure every branch-level check reports as success
+3. **Single-version cache-bust** — one `$DEPLOY_VERSION` applied to all `?v=` query strings
+4. **Precise staging** — `git add -u` + explicit HTML files, never `-A`
+5. **Release-marker merge** — `--no-ff` so `git log --first-parent main` is a clean release log
+6. **CHANGELOG of actual commits** — captures develop's commits BEFORE the merge so the changelog isn't empty
+7. **Real Heroku release verification** via `heroku releases --json`, not blind sleep
+8. **Dynamic stale-slug detection** with `ps:restart` → `ps:scale` escalation
+9. **Optional Slack notification** (silent skip if webhook unset; no debug chatter)
+10. **Copy-pasteable resume + rollback** procedures at end of skill
 
 **Non-interactive by design.** Pre-flight gates are the only thing standing between "you typed /deploy" and "code is live on Heroku." No confirmation gate, no session-doc prompt — both proved to be friction without payoff in real runs.
 
@@ -72,6 +74,71 @@ If `auth:whoami` fails → abort: "Run `heroku login` first."
 If `git remote get-url heroku` fails → abort: "No heroku remote — run `heroku git:remote -a sanmar-inventory-app`."
 
 Refusing to start a deploy that would fail at Step 11 keeps `main` and Heroku in sync.
+
+### Step 0.4a — Prior-deploy completion check (added 2026-08-18)
+
+**Step 0.1 fetches `origin`. It never touches `heroku`** — they are separate remotes reached by
+separate pushes, and only one of them is the deploy. So every branch-level check can read "clean,
+in sync, shipped" while production serves week-old code. Ask Heroku directly what it has:
+
+```bash
+HEROKU_SHA=$(git ls-remote heroku refs/heads/main 2>/dev/null | awk '{print $1}')
+[ -z "$HEROKU_SHA" ] && { echo "✗ Could not read heroku/main — check auth (see Step 0.4)."; exit 1; }
+
+UNDEPLOYED=$(git rev-list --count "${HEROKU_SHA}..origin/main" 2>/dev/null || echo 0)
+NEW_WORK=$(git rev-list --count origin/main..origin/develop)
+
+# Missing-tag tripwire: main's tip is a release commit whose tag was never created
+TIP_SUBJECT=$(git log -1 --format=%s origin/main)
+MISSING_TAG=""
+case "$TIP_SUBJECT" in
+  "Release v"*|"Changelog v"*)
+    TIP_VER=$(printf '%s' "$TIP_SUBJECT" | sed -E 's/^(Release|Changelog) (v[0-9.]+).*/\2/')
+    git rev-parse -q --verify "refs/tags/${TIP_VER}" >/dev/null 2>&1 || MISSING_TAG="$TIP_VER"
+    ;;
+esac
+```
+
+Then branch on the two numbers:
+
+```bash
+if [ "$UNDEPLOYED" -gt 0 ] && [ "$NEW_WORK" -eq 0 ]; then
+  echo "✗ DEPLOY ABORTED — a prior deploy did not finish, and there is nothing new to release."
+  echo "    origin/main : $(git rev-parse --short origin/main)  ($UNDEPLOYED commits NOT on Heroku)"
+  echo "    heroku/main : ${HEROKU_SHA:0:8}"
+  [ -n "$MISSING_TAG" ] && echo "    tag $MISSING_TAG was never created — the run died between Step 9 and Step 12."
+  echo "  develop == main, so running this skill would mint an EMPTY release: an empty --no-ff"
+  echo "  merge, a CHANGELOG heading with no commits, and a version number burned for nothing."
+  echo "  RESUME the old deploy instead — see 'Resuming an interrupted deploy' below."
+  exit 1
+
+elif [ "$UNDEPLOYED" -gt 0 ]; then
+  echo "⚠ Heroku is $UNDEPLOYED commits behind origin/main — a prior deploy did not finish."
+  echo "  This deploy WILL ship them, but ${DEPLOY_TAG:-this release}'s CHANGELOG and tag cover"
+  echo "  only origin/main..develop, so these ride along unmentioned:"
+  git log "${HEROKU_SHA}..origin/main" --no-merges --pretty='    - %s'
+  [ -n "$MISSING_TAG" ] && echo "  Also: tag $MISSING_TAG is missing — create it before deploying."
+  echo "  Proceeding. Note them in the release summary."
+
+elif [ -n "$MISSING_TAG" ]; then
+  echo "⚠ Heroku is current, but tag $MISSING_TAG for main's tip was never created."
+  echo "  Create it now so release history stays contiguous:"
+  echo "    git tag -a $MISSING_TAG origin/main -m 'Release $MISSING_TAG' && git push origin $MISSING_TAG"
+fi
+```
+
+**Why this exists (2026-08-18).** A run completed Steps 8–9 (release merge, CHANGELOG) and Step
+11's `git push origin main`, then stopped. Step 10 (`git tag`) and Step 12 (`git push heroku
+main`) never ran. `develop`, `main`, `origin/develop` and `origin/main` were all clean and
+identical at `a30c4c10` — every signal a human checks said shipped — while production served a
+nine-hour-old slug missing the whole PR #30 PDP change. **Nothing in the skill asserts the deploy
+landed**, and a run that dies after the GitHub push is indistinguishable from a successful one.
+You cannot gate against your own crash from inside the run, so the catch has to be the *next*
+run's pre-flight. Cost: one `ls-remote`.
+
+⚠️ **The abort case is the important one.** It is exactly the state an interrupted deploy leaves
+behind, and it is the state where blindly re-running does the most damage — an empty release that
+burns a version number and writes a CHANGELOG entry with nothing under it.
 
 ### Step 0.5 — MEMORY.md size gate
 
@@ -538,6 +605,14 @@ If `/api/version` doesn't exist yet (404 or `unknown`), fall through to 14b.
 
 **14b. Frontend `?v=` check** (when assets were bumped):
 
+⚠️ **This check false-negatives on any content-hashed page.** Hashed assets are served as
+`/dist/…<hash>.js`, so the `?v=` written in the HTML source is not in the response and the perl
+match finds nothing — 14b then hands a genuinely-successful deploy to 14c, which restarts and
+scale-cycles a healthy dyno for ~2 minutes before reporting `STALE`. If `$LIVE_VERSION` comes
+back empty (as opposed to an *older* version), check whether the page serves `/dist/` first and
+verify on bytes instead — see "Verifying a content-hashed frontend deploy" below. An *older*
+`?v=` is a real stale slug; an *empty* one usually is not.
+
 ```bash
 FIRST_HTML=$(echo "$BUMPED_HTML" | tr ' ' '\n' | grep -v '^$' | head -1)
 ROUTE=$(echo "$FIRST_HTML" | sed -e 's|^pages/||' -e 's|^|/|' -e 's|\.html$||' -e 's|^/index$|/|')
@@ -671,6 +746,95 @@ Two things to know:
 
 ---
 
+## Resuming an interrupted deploy
+
+Step 0.4a aborted, or a run died partway. **Resume it — do not re-run `/deploy`.** With
+`develop == main` the skill has nothing to release and produces an empty version. Work out how
+far the old run got, then execute only what's left.
+
+### 1. Find the failure point
+
+```bash
+git fetch origin --prune --tags
+HEROKU_SHA=$(git ls-remote heroku refs/heads/main | awk '{print $1}')
+
+git log -1 --format='%h %s' origin/main                       # did Steps 8-9 run?
+git rev-list --count "${HEROKU_SHA}..origin/main"             # >0 → Step 12 never ran
+git tag -l "v$(date +%Y.%m.%d).*"                             # absent → Step 10 never ran
+git rev-list --count origin/main..origin/develop              # 0 → nothing new to release
+```
+
+Read the tip subject of `origin/main`:
+
+| Tip subject | How far it got | What's left |
+|---|---|---|
+| `Changelog v…` | through Step 9 | tag (10), push tag (11), Heroku (12), verify (13–14), resync (16) |
+| `Release v…` | through Step 8 | CHANGELOG (9) onward |
+| anything else | merge never happened | re-run `/deploy` normally — it is not interrupted |
+
+### 2. Run the gates anyway
+
+Resuming skips the skill, not the safety. Run Steps 0.5–0.7 and the Step 0.6 suite
+(`lint`, `typecheck`, `test:unit`, `test:dom`, `test:a11y`) against the commit you are about to
+ship, and confirm CI is green **on that exact SHA** — not merely on the branch:
+
+```bash
+gh run list --branch develop --workflow ci.yml --limit 3 --json conclusion,headSha \
+  --jq '.[] | "\(.conclusion) \(.headSha[0:8])"'
+```
+
+Also confirm the cache-bust from the interrupted run actually covers what changed — Step 2 runs
+before the merge, so it did happen, but verify rather than assume:
+
+```bash
+git diff --name-only "${HEROKU_SHA}" origin/main -- '*.js' '*.jsx' '*.css'
+grep -oE '(<asset>)\?v=[^"'"'"' >]+' <the HTML that references it>
+```
+
+### 3. Execute the remaining steps
+
+```bash
+LAST_TAG=$(git tag -l 'v*' --sort=-v:refname | sed -n 2p)     # tag BEFORE the one you're creating
+TIP_VER=$(git log -1 --format=%s origin/main | sed -E 's/^(Release|Changelog) (v[0-9.]+).*/\2/')
+RELEASE_COMMITS=$(git log "${LAST_TAG}..origin/main" --no-merges --pretty='- %s' --reverse)
+
+git tag -a "$TIP_VER" origin/main -m "Release $TIP_VER
+
+$RELEASE_COMMITS"
+git push origin "$TIP_VER"
+git push heroku main
+```
+
+Then Steps 13–14 as written (release polling, live verification), and Step 16 to resync `develop`.
+
+⚠️ **The pre-push hook allows this**: `main`'s tip is already a `Release v…`/`Changelog v…`
+commit, so no `--no-verify` is needed. If you find yourself reaching for `--no-verify` here,
+something else is wrong — re-read the tip subject.
+
+### Verifying a content-hashed frontend deploy
+
+**Step 14b's `?v=` check cannot work on this app** and returns a false negative every time.
+Assets are content-hashed into `/dist/…<hash>.js`, so the `?v=` written in the HTML source never
+appears in the served page. Verify on bytes instead — pick an identifier that exists only in the
+new code, then grep the live hashed bundle:
+
+```bash
+JS=$(curl -s -m 25 "https://sanmar-inventory-app-4cd7b252508d.herokuapp.com/product.html?style=PC54&_=$(date +%s)" \
+     | grep -oE '/dist/product/js/[a-z-]+\.[a-f0-9]+\.js')
+curl -s -m 25 "https://sanmar-inventory-app-4cd7b252508d.herokuapp.com${JS}" | grep -c '<marker>'
+```
+
+A marker that goes 0 → 1 across the push, plus a changed bundle hash, is proof the new code is
+live. ⚠️ **Pick markers from string literals or CSS class names, never from variable names** —
+minification mangles locals and changes case, so `smallOrderFee` vanishes while
+`"pdp-cfg-fee-note"` survives. Get the candidate list straight from the diff:
+
+```bash
+git diff "${HEROKU_SHA}" origin/main -- <asset> | grep '^+' | grep -oE '"[a-z][a-zA-Z-]{8,}"' | sort -u
+```
+
+---
+
 ## Rollback Procedure
 
 Two steps, in order. Step 1 stops the bleeding in seconds and touches no git; Step 2 is how the
@@ -757,6 +921,9 @@ Then run `/deploy` on the next real change so the tag and CHANGELOG stop lagging
 | Failure | Auto-action | Manual step needed |
 |---|---|---|
 | Not on develop | Abort | `git checkout develop` |
+| Heroku behind origin/main + nothing new to release (0.4a) | Abort — re-running would mint an empty release | Resume the interrupted deploy: tag, `git push heroku main`, verify. See "Resuming an interrupted deploy" |
+| Heroku behind origin/main + develop has new work (0.4a) | Warn, proceed | None — the deploy ships them; note the ride-along commits in the release summary |
+| Tag missing for main's tip release commit (0.4a) | Warn | `git tag -a <ver> origin/main -m 'Release <ver>' && git push origin <ver>` |
 | develop behind origin | Abort | `git pull --ff-only origin develop` |
 | Not heroku-authed | Abort | `heroku login` |
 | MEMORY.md > 180 lines | Abort | Condense to topic files |
@@ -899,3 +1066,33 @@ back: pass 2 only searches HTML in the asset's **own directory**, and its `(?<![
 lookbehind refuses to match a basename preceded by a path separator. Verified on fixtures — a
 sibling `shared.js?v=` bumps while `sub/shared.js?v=` in the same file and another app's own
 `shared.js?v=` both stay untouched.
+
+**Pass 5 (2026-08-18) — nothing checked that the deploy actually deployed:**
+
+| Old behavior | New behavior |
+|---|---|
+| Pre-flight looked only at `origin` | **Step 0.4a** reads `heroku/main` via `git ls-remote` and compares against `origin/main` |
+| An interrupted run was undetectable | Aborts when Heroku is behind AND `develop == main`; warns (with the ride-along commit list) when there is new work |
+| A skipped Step 10 left no trace | Missing-tag tripwire on `main`'s tip `Release v…`/`Changelog v…` subject |
+| No recovery path — the only option was re-running the whole skill | **"Resuming an interrupted deploy"** section: failure-point table, which gates to re-run, and the exact remaining commands |
+| Step 14b's `?v=` check treated as universal | Documented as a guaranteed false negative on content-hashed pages, with a byte-level marker check that does work |
+
+Prompted by v2026.08.18.4. A run completed the release merge, the CHANGELOG, and `git push origin
+main`, then stopped — Step 10 (tag) and Step 12 (Heroku push) never ran. `develop`, `main`,
+`origin/develop` and `origin/main` were all clean and identical at `a30c4c10`, so **every
+branch-level check reported success** while production served a nine-hour-old slug missing the
+whole PR #30 PDP change (unpriceable placement chips still rendering, price table still collapsed,
+small-order fee still a footnote). The tag `v2026.08.18.4` existed nowhere, local or remote.
+
+Two things made this invisible. `origin` and `heroku` are **separate remotes reached by separate
+pushes**, and only one of them is the deploy — so `origin/main` being current is not evidence
+production is current, and nothing in the skill had ever asked Heroku what it had. And a run
+cannot assert its own completion from inside itself, so the catch has to live in the *next* run's
+pre-flight. Cost: one `ls-remote`.
+
+The abort case earns its keep by refusing the *repair* that looks obvious: with `develop == main`,
+re-running `/deploy` mints an empty release — an empty `--no-ff` merge, a CHANGELOG heading with
+no commits under it, and a version number burned. The fix is to resume at Step 10, not restart at
+Step 1. This was the second interrupted run in two days (the 2026-08-17 outage diagnosis found a
+prior run's Step 16 had never completed either), so the recovery path is now written down rather
+than re-derived each time.
