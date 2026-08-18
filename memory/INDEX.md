@@ -30,6 +30,7 @@ Last Updated: 2026-08-17 (`/memory-maintain`: 27/27 files indexed, 0 orphans, 0 
 | [`handbook-sync-workflow.md`](handbook-sync-workflow.md) | Employee Handbook ↔ Caspio chapters ↔ handbook.html ↔ PDF sync + Canva-scan cadence — **routed to by CLAUDE.md** (promoted from auto-memory 2026-08-17) |
 | [`mockup-generator-retirement.md`](mockup-generator-retirement.md) | Mockup Generator + Pricing by Style retirement (302s, do-not-delete list) |
 | [`nwca-policy-reconciliation-2026-08.md`](nwca-policy-reconciliation-2026-08.md) | Rough Draft 3 vs all 138 live policies — 8 rulings pending from Erik (promoted 2026-08-17) |
+| [`placement-rules-spec.md`](placement-rules-spec.md) | **SPEC (not built)** Caspio `Placement_Rules` deny-overlay table + `/api/placement-rules` — hides placements a garment's construction rules out (zip/button front), on top of the shipped method-derived chip filter |
 | [`policies-hub-update-playbook.md`](policies-hub-update-playbook.md) | Insert/edit/delete Policies Hub policies via the proxy admin endpoints — **routed to by CLAUDE.md** (promoted from auto-memory 2026-08-17) |
 | [`policy-corpus-bulk-read.md`](policy-corpus-bulk-read.md) | Pull all 138 live policy bodies in one call — `/api/policies-public/tree` carries `Body_Plain` (promoted 2026-08-17) |
 | [`pricing-analysis-data.json`](pricing-analysis-data.json) | Data behind the GENERATED Pricing Analysis page (edit Python+JSON, never HTML) |
