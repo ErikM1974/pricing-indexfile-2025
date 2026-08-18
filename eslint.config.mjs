@@ -22,6 +22,12 @@ export default [
                 document: 'readonly',
                 navigator: 'readonly',
                 fetch: 'readonly',
+                // Standard in both Node 18+ and every browser we target — same
+                // category as fetch/setTimeout above. lib/product-seo.js times its
+                // proxy calls out with it (no-undef flagged it from v2026.08.10.9,
+                // red in CI ever since). Adding a real platform global is widening
+                // the config, not loosening a rule.
+                AbortController: 'readonly',
                 console: 'readonly',
                 URLSearchParams: 'readonly',
                 CustomEvent: 'readonly',

@@ -52,7 +52,7 @@ function rateFor(code, fallback, label, inUse) {
  * can read `.total` unconditionally.
  */
 export function artFeeTotals() {
-    const fees = (state && state.fees) || {};
+    const fees = /** @type {Record<string, any>} */ ((state && state.fees) || {});
     const rawQty = Number(fees.artSetupQty);
     const rawHours = Number(fees.designHours);
     const artSetupQty = Number.isFinite(rawQty) && rawQty > 0 ? Math.floor(rawQty) : 0;

@@ -66,7 +66,7 @@
     background: #fff; border: 1px solid #e2e8f0; border-radius: 8px;
     padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,.04);
 }
-.emb-builder #order-details-step.in-footer .flow-step-head { padding: 0 0 8px; cursor: default; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #94a3b8; gap: 6px; }
+.emb-builder #order-details-step.in-footer .flow-step-head { padding: 0 0 8px; cursor: default; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #64748b; gap: 6px; }
 .emb-builder #order-details-step.in-footer .flow-step-num { display: none; } /* the "2" step badge is a sidebar-flow leftover */
 .emb-builder #order-details-step.in-footer label { font-size: 11px; color: #64748b; }
 .emb-builder .footer-notes-row { width: 100%; margin: 10px 0 0; }
@@ -1510,7 +1510,7 @@ td.size-disabled input {
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: .04em;
-    color: #94a3b8;
+    color: #64748b;
     margin-bottom: 6px;
 }
 .push-readiness .pr-item { display: flex; align-items: center; gap: 8px; padding: 2px 0; }
@@ -1705,7 +1705,7 @@ td.size-disabled input {
 
 .design-order-count {
     font-size: 10px;
-    color: #94a3b8;
+    color: #64748b;
     margin-top: 2px;
 }
 
@@ -1739,7 +1739,7 @@ td.size-disabled input {
 
 .design-art-notes {
     font-size: 11px;
-    color: #94a3b8;
+    color: #64748b;
     font-style: italic;
     margin-top: 3px;
     overflow: hidden;
@@ -2262,7 +2262,7 @@ td.size-disabled input {
     grid-column: 1 / -1;
     text-align: center;
     padding: 32px 16px;
-    color: #94a3b8;
+    color: #64748b;
     font-size: 13px;
 }
 
@@ -2346,7 +2346,7 @@ td.size-disabled input {
 .customer-lookup-divider {
     text-align: center;
     font-size: 11px;
-    color: #94a3b8;
+    color: #64748b;
     margin: 8px 0;
     position: relative;
 }
@@ -2651,7 +2651,7 @@ td.size-disabled input {
 .spr-delta-warning i { color: #f59e0b; }
 .spr-decg-detail { font-size: 11px; color: #64748b; padding: 4px 10px 4px 28px; }
 .spr-decg-detail td { padding: 3px 8px; border-bottom: none; font-size: 11px; }
-.spr-decg-detail .detail-label { color: #94a3b8; }
+.spr-decg-detail .detail-label { color: #64748b; }
 .spr-stitch-input {
     width: 75px; padding: 5px 6px; border: 1px solid #cbd5e1;
     border-radius: 4px; font-size: 13px; text-align: right;
@@ -2669,7 +2669,7 @@ td.size-disabled input {
 .spr-custom-input:disabled { background: #f1f5f9; color: #94a3b8; }
 .spr-custom-input.spr-muted { background: #f1f5f9; color: #94a3b8; opacity: 0.6; }
 .spr-custom-input:focus { border-color: var(--pnw-forest, #2e5827); outline: none; box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2); }
-.spr-unavailable { font-size: 11px; color: #94a3b8; font-style: italic; }
+.spr-unavailable { font-size: 11px; color: #64748b; font-style: italic; }
 .spr-section-label {
     font-size: 11px; font-weight: 700; text-transform: uppercase;
     letter-spacing: 0.8px; color: #64748b;
@@ -2718,12 +2718,12 @@ td.size-disabled input {
 .import-summary-banner .banner-ns-item .ns-price-warn { color: #dc2626; }
 .import-summary-banner .btn-dismiss-banner {
     position: absolute; top: 8px; right: 12px; background: none;
-    border: none; color: #94a3b8; cursor: pointer; font-size: 12px;
+    border: none; color: #64748b; cursor: pointer; font-size: 12px;
     padding: 4px 8px; border-radius: 4px;
 }
 .import-summary-banner .btn-dismiss-banner:hover { background: rgba(0,0,0,0.05); color: #475569; }
 .ns-price-display { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; }
-.ns-price-display .fa-pencil-alt { font-size: 10px; color: #94a3b8; opacity: 0; transition: opacity 0.15s; }
+.ns-price-display .fa-pencil-alt { font-size: 10px; color: #64748b; opacity: 0; transition: opacity 0.15s; }
 .ns-price-display:hover .fa-pencil-alt { opacity: 1; color: #7c3aed; }
 .ns-price-zero { background: #fef2f2 !important; }
 .ns-price-zero .ns-price-display { color: #dc2626; font-weight: 600; }

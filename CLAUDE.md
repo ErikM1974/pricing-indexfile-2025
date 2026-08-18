@@ -40,7 +40,7 @@ Guidance for Claude Code when working in this repository.
 
 Memory updates are part of completing the task — not a separate ask-permission step. Route each fact per the table below, then notify Erik in one sentence (e.g. "Updated LESSONS_LEARNED.md and MEMORY.md").
 
-> ⚠️ **`/memory/` was reset to empty on 2026-07-28 (fresh start).** The routing below is the intended structure going forward — the target files (MEMORY.md, LESSONS_LEARNED.md, INDEX.md, topic files) no longer exist yet and are recreated on first write. A full backup lives in `Downloads/repo-memory-backup-2026-07-28` and in git history (commit before `cc9a61e4`) if anything needs restoring.
+> ℹ️ **`/memory/` was reset to empty on 2026-07-28 and has been rebuilt since — 27 files, indexed in [`memory/INDEX.md`](memory/INDEX.md).** The routing below is live, not aspirational: `LESSONS_LEARNED.md`, `LESSONS_LEARNED_ARCHIVE.md`, `INDEX.md` and the topic files all exist. `MEMORY.md` (the auto-loaded index) lives in machine-local auto-memory by design, NOT here — see `memory/MEMORY_SYSTEM.md`. A few pre-reset docs are still unrecovered (ManageOrders references, WA sales tax) — INDEX.md § Known backlog tracks them; the backup is `Downloads/repo-memory-backup-2026-07-28` and git history (commit before `cc9a61e4`).
 
 ### Where things go (one fact, one home — never restate a fact in a second file)
 
@@ -204,13 +204,17 @@ Bump the page's `?v=` on any HTML/CSS edit. The page's task table + `C:\NWCA\` f
 
 ## Documentation Entry Points
 
-> **The `/memory/` knowledge base was reset to empty on 2026-07-28.** The former entry-point docs (INDEX.md, LESSONS_LEARNED.md, CROSS_PROJECT_HUB.md, GLOSSARY.md, the Caspio/SanMar API references, etc.) no longer exist — recreate them as memory is re-established, and restore the pointer list here as topics come back. Full backup: `Downloads/repo-memory-backup-2026-07-28` and git history.
+**Start at [`memory/INDEX.md`](memory/INDEX.md)** — it lists all 27 memory files with a one-line
+summary each, plus a § Known backlog of docs still unrecovered from the 2026-07-28 reset
+(the ManageOrders references the routing table above points at, and the WA sales-tax rules).
+`memory/MEMORY_SYSTEM.md` explains the tree itself: where a new fact goes, which surface loads
+when, and why the repo copy beats machine-local auto-memory.
 
 For deep research, use the Task tool with `subagent_type='Explore'`.
 
 ---
 
 **When in doubt:**
-1. Check the Top 8 Never-Break Rules above.
+1. Check the Top 9 Never-Break Rules above.
 2. Check ACTIVE_FILES.md before creating anything new.
 3. Use the Explore agent to look up detailed docs.

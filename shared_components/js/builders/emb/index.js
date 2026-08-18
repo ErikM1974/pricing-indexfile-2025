@@ -319,7 +319,7 @@ new QuoteBuilderBase(embAdapter).init();
     const raw = new URLSearchParams(window.location.search).get('design');
     if (!raw || !/^\d{1,10}$/.test(raw)) return;
     const apply = () => {
-        const input = document.getElementById('garment-design-number');
+        const input = /** @type {HTMLInputElement} */ (document.getElementById('garment-design-number'));
         if (!input || input.value.trim()) return;
         input.value = raw;
         Promise.resolve(lookupDesignNumber('garment')).catch(() => { /* lookup surfaces its own error */ });
