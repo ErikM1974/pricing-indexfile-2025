@@ -1,3 +1,12 @@
+## v2026.08.18.5 (2026.08.18)
+
+- Memory: the v2026.08.18.4 release that reached GitHub but never reached Heroku
+- Deploy skill: catch a run that reached GitHub but never reached Heroku
+- Drop the unused sharp dependency, bump basic-ftp to 6.2.0
+- Deploy skill: prune merged local branches after each release
+- Dependabot: stop proposing marked majors until lib/blog.js is ESM
+- Memory: the marked bump that passes every gate and takes the site down
+
 ## v2026.08.18.4 (2026.08.18)
 
 - PDP: hide unpriceable placement chips, open the price table by default
