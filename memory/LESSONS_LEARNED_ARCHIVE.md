@@ -4,6 +4,50 @@ Resolved entries aged out of `LESSONS_LEARNED.md` (300-line cap). Newest first. 
 
 ---
 
+## The staff quote builders were on the open internet, and a review found it (2026-08-17)
+
+**Problem.** `https://www.teamnwca.com/quote-builders/embroidery-quote-builder.html` returned the
+fully working staff tool to anyone — customer search, pricing table, ShopWorks import/export.
+Separately, `admin/universal-records-admin.html` and the PUBLIC homepage (`catalog-search.js`)
+rendered untrusted data into `innerHTML` unescaped.
+
+**Root cause.** `app.use('/quote-builders', express.static(...))` sat between `/dashboards` and
+`/vendor-portals` — **both gated** — and was simply never given a gate. Nothing detects a *missing*
+`app.use`; the neighbours looked right, so review kept passing over it. `staff-auth-helper.js` made
+it *look* protected, but it is a sessionStorage rep-name autofill, not authentication. The XSS side
+had the same shape: `eslint.config.mjs` already enables `no-unsanitized` with `escapeHTML`
+registered as a sanitizer — it never fired because **ESLint cannot see inside an HTML file**, and
+the admin page keeps 60 KB of inline script.
+
+**Fix.** `app.use('/quote-builders', gateStaffHtml)` **above** the `/quote-builders/:page` route
+(not next to the static mount — Express matches in registration order, so a gate by the mount is
+bypassed by the earlier route). The four ROOT aliases (`/embroidery-quote-builder.html` etc.) are
+separate routes and needed their own `gateStaffPage`. Escaped every API-derived interpolation in
+both files and replaced all inline `onclick`/`onchange`/`onsubmit` carrying data with `data-*` +
+delegated listeners.
+
+**Prevention.**
+- 🔴 **A missing gate is invisible; only an inventory finds it.** Nothing greps for "the `app.use`
+  that isn't there." The durable fix is a jest manifest test asserting every route declares a
+  posture (`public` / `staff` / `page:x.html`), so a NEW route fails CI until classified. Reviewing
+  the gates that exist will never find the one that doesn't.
+- 🔴 **Escaping does NOT protect an inline event handler.** The HTML parser decodes entities BEFORE
+  the JS is parsed, so `onclick="f('&#39;')"` still breaks out. `catalog-search.js` had already
+  half-learned this — it escaped quotes *for the onclick* and left the HTML context open. Two
+  contexts, two different rules: use `data-*` + delegation and the second context disappears.
+- 🔴 **Escape BEFORE transforming, not after.** `Notes.replace(/\n/g,'<br>')` must be
+  `escapeHtml(Notes).replace(...)` — escaping afterwards would neutralise the `<br>` you just added,
+  and escaping first is the only order that is both safe and correct.
+- 🔑 **Assets are content-hashed — an unverified fix is an unshipped fix.** The first browser check
+  showed the payload STILL firing: `dist/` was serving the pre-edit file. `npm run build` is part of
+  verifying, not just deploying. The network log is the proof (a live `GET /x` from the injected
+  `<img src=x>` before, gone after).
+- 🔑 **Gating a page does not gate its data.** These builders write to the proxy DIRECTLY
+  (`APP_CONFIG.API.BASE_URL` is the proxy host), and proxy `quoteWriteOnly` is a rate limiter, not
+  auth. The page gate is step one of two.
+
+---
+
 ## We push part numbers our own importer cannot read (2026-08-16)
 
 **Problem.** Re-importing a ShopWorks order that OUR builder created misrouted its decoration
@@ -39,8 +83,6 @@ see.
 - 🔑 The fixture corpus (24 files / 100 orders) contains ZERO `FB`/`CB`/`CS` lines — the entire
   legacy decoration path had no fixture coverage, only three string-level `classifyPartNumber`
   assertions. Absence of a fixture is why none of this surfaced.
-
----
 
 ---
 

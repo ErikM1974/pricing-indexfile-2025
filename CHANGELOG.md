@@ -1,3 +1,12 @@
+## v2026.08.18.1 (2026.08.18)
+
+- Get CI green again: E2E staff session, eslint global, tsc casts
+- Widen the deploy gate; fix the DTG contrast the blind ratchet let through
+- Sweep the remaining #94a3b8 muted text to accessible slate
+- Restore CRLF endings the color sweep flattened
+- Merge PR #29: get CI green, widen the deploy gate, fix the blind-ratchet contrast
+- Deploy v2026.08.18.1: cache-bust 9 pages for the PR #29 CSS sweep
+
 ## v2026.08.17.10 (2026.08.17)
 
 - Memory: a repo grep cannot prove nothing links a file (policy bodies live in Caspio)

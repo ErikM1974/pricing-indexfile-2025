@@ -4,7 +4,7 @@ Repo `/memory/` is the CANONICAL tree (git-tracked). The machine-local auto-memo
 `~/.claude/projects/<slug>/memory/` holds `MEMORY.md` (the auto-loaded index) plus per-fact
 files; where a topic exists in both, **the repo copy wins** and auto-memory keeps a pointer.
 
-Last Updated: 2026-08-17 (`/memory-maintain`: 27/27 files indexed, 0 orphans, 0 untracked; 4 promoted out of machine-local auto-memory)
+Last Updated: 2026-08-18 (branch/deploy audit: LESSONS_LEARNED trimmed 275→231 lines, 2 entries archived; all 6 dangling cross-doc links repaired — doc-freshness broken links 6→0, health 45→75)
 
 | File | What it holds |
 |---|---|
@@ -64,6 +64,13 @@ Last Updated: 2026-08-17 (`/memory-maintain`: 27/27 files indexed, 0 orphans, 0 
   `policy-corpus-bulk-read.md`). Promoted into this tree; auto-memory keeps one-line pointers.
   🔑 Deliberately NOT promoted: `MEMORY.md` (the auto-loaded index belongs there by design),
   `caspio-schema.md`, and the `feedback_*` per-fact files (auto-memory's native format).
+- ⚠️ **Docs promoted out of auto-memory carry sibling links that only resolve over there.**
+  `handbook-sync-workflow.md` and `policies-hub-update-playbook.md` pointed at
+  `policies-hub-details.md` and `feedback_use_proxy_for_caspio_writes.md`, which stayed
+  machine-local by design. The links now say so in text instead of 404-ing (2026-08-18).
+  Promote those two if the detail is ever needed in-repo — do not just re-add the links.
+  Same class of break: `PAYROLL_CASPIO_2026-07.md` → `STAFF_AUTH_DESIGN.md` (a 2026-07-28
+  reset casualty), now repointed at CLAUDE.md § Security Checklist + `lib/page-access.js`.
 - Auto-memory `caspio-api-usage-audit-2026-07.md` (166 lines, waves 2–3: 18 + 26 Jul)
   overlaps `CASPIO_QUOTA_2026-07.md` (27 Jul–1 Aug) in SUBJECT but not in DATE RANGE.
   Not collapsed — folding it into the repo copy would drop the wave-2 record. Reconcile
