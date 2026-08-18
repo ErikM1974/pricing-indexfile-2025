@@ -34,6 +34,12 @@ jobs:
   e2e:
     name: Playwright E2E (money path + rendered axe ratchet)
     runs-on: ubuntu-latest
+    # 2026-08-18: `playwright install --with-deps` hung here for 31+ minutes with
+    # `npm run test:e2e` never starting. The job default is SIX HOURS, so the stall
+    # burned a runner and blocked a PR on a check that had not run a single test.
+    # This bounds it: a hung setup now fails in minutes and is obviously a re-run,
+    # not a mystery. The job itself takes ~2.5 min warm.
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -42,7 +48,28 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
-      - run: npx playwright install --with-deps chromium
+      # Key on the RESOLVED version in node_modules, never the ^range in
+      # package.json — a minor bump must invalidate the cache, or the run boots a
+      # stale browser against a newer client and fails in ways nobody can read.
+      - name: Resolve Playwright version
+        id: pw
+        run: echo "version=$(node -p "require('./node_modules/@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+      - name: Cache Playwright browsers
+        id: pw-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ steps.pw.outputs.version }}
+      - name: Install Chromium + OS deps (cache miss)
+        if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+      # Cache hit still needs the apt step: only ~/.cache/ms-playwright is cached,
+      # and Chromium's system libraries live outside it. So this removes the
+      # ~170MB browser download, NOT the apt round trip — `timeout-minutes` above
+      # is what actually bounds an apt stall.
+      - name: Install OS deps only (cache hit)
+        if: steps.pw-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
       # Boots server.js on :3400 (stripe/emailjs init lazily — no secrets needed);
       # pricing READS hit the live proxy, all WRITES are route-mocked in the specs.
       - run: npm run test:e2e

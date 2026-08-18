@@ -95,6 +95,21 @@ try {
 
 ## Critical Patterns
 
+### 🌿 Branch flow = `develop` → `main` → Heroku (Erik's rule, confirmed 2026-08-18)
+
+**Work directly on `develop`.** It is the integration branch and the everyday working branch —
+not a staging area you PR into. Feature branches and PRs are the exception (a second pair of
+eyes on something risky), never the default.
+
+- `develop` → `main` → Heroku is automated end-to-end by **`/deploy`** (`.claude/skills/deploy`),
+  which gates on tests, cuts the `--no-ff` release marker on `main`, cache-busts, and pushes.
+  Never hand-roll those steps.
+- 🔑 **Merging to `develop` does NOT touch the live site.** The only GitHub workflow is
+  `ci.yml`, and every job in it is a test job — nothing deploys on push. The site changes when
+  a human runs `/deploy`, and not before.
+- `/deploy` **aborts unless you are on `develop`** (Step 0.2), and its cache-bust baseline is
+  `origin/main` — what is LIVE — never `origin/develop`.
+
 ### 💵 Pricing = API, never hardcoded (Erik's rule, 2026-06-03) — ALL quote builders
 
 **Every price, fee, charge, upcharge, percentage, and config value in EVERY quote builder

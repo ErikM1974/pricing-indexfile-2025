@@ -7,15 +7,20 @@
  *   Q2  Where does it go?    placement chips (garments: Left chest / Full
  *                            front / Back / Front + back · caps: Front /
  *                            Front + back) + SCP ink-colors stepper (1-4,
- *                            asked once — applies to both placements)
+ *                            asked once — applies to both placements).
+ *                            Only placements at least ONE eligible method can
+ *                            price are rendered (currentLocations()), so an
+ *                            embroidery-only garment never shows a chip that
+ *                            dead-ends in "not available for this placement".
  *   Q3  Pick a look          one PRICED chip per eligible decoration method
  *
  * IRON RULE: every price comes from QuoteCartEngine.singleItemPreview()
  * (shared_components/js/quote-cart-engine.js) — the same authorities the
  * staff quote builders use. This module computes ZERO prices of its own.
- * The "See every quantity price" matrix uses the same shared pricing-service
- * ladders the old pricing tabs used (display-only, per the product page's
- * established convention).
+ * The full quantity price table is OPEN BY DEFAULT (state.matrixOpen) — the
+ * tier ladder is the answer to "what does this cost for my crew?", so it does
+ * not hide behind an accordion; the toggle only collapses it. It is probed
+ * from QuoteCartEngine itself, so it can never disagree with the headline.
  *
  * Two locations are priced exactly; anything fancier (sleeves, names,
  * 3rd logos, 3D puff, oversize stitches) is "add it in notes — rep prices
@@ -160,7 +165,7 @@
         scpStripeFee: 0,    // captured from the engine preview so the matrix uses the API fee, not a constant
         method: null,       // selected method id
         results: {},        // id -> { status:'loading'|'ok'|'unavailable'|'belowmin'|'error', preview, summary, message }
-        matrixOpen: false,
+        matrixOpen: true,   // full price table is visible by default (init() re-asserts it)
         seq: {},            // per-method reprice tokens (stale-result guard) — id -> counter
         qtyTimer: null,
         matrixCache: {},    // 'method|loc|ink' -> matrix model
@@ -646,8 +651,24 @@
     // ============================================================
     // RENDER — placement chips + ink stepper
     // ============================================================
+    /**
+     * Placement chips to render = only the ones at least ONE eligible method
+     * can actually price. The location list is method-agnostic, so without
+     * this filter an embroidery-only product (Workwear/Outerwear/Woven
+     * Shirts/Bags/Accessories per /api/decoration-methods) still rendered
+     * Center front / Full front / Center back — chips that can never return
+     * a price, only the "not available for this placement" dead end.
+     * Defensive fallback: if the intersection is somehow empty, show the full
+     * list rather than a placement-less configurator.
+     */
     function currentLocations() {
-        return state.ctx.isCap ? CAP_LOCATIONS : GARMENT_LOCATIONS;
+        const all = state.ctx.isCap ? CAP_LOCATIONS : GARMENT_LOCATIONS;
+        const live = all.filter(function (l) {
+            return state.methods.some(function (m) {
+                return METHODS[m.id] && METHODS[m.id].supports[l.key];
+            });
+        });
+        return live.length ? live : all;
     }
 
     function renderLocations() {
@@ -724,6 +745,16 @@
         }
     }
 
+    /** Toggle label + visibility follow state.matrixOpen (open by default). */
+    function syncMatrixToggle() {
+        const toggle = $('cfgMatrixToggle');
+        const box = $('cfgMatrix');
+        if (!toggle || !box) return;
+        toggle.setAttribute('aria-expanded', state.matrixOpen ? 'true' : 'false');
+        toggle.textContent = state.matrixOpen ? 'Hide the full price table ▴' : 'See every quantity price ▾';
+        box.hidden = !state.matrixOpen;
+    }
+
     function wireInputs() {
         $('cfgQtyMinus').addEventListener('click', function () { setQty(state.qty - 6, true); });
         $('cfgQtyPlus').addEventListener('click', function () { setQty(state.qty + 6, true); });
@@ -760,9 +791,7 @@
         const toggle = $('cfgMatrixToggle');
         toggle.addEventListener('click', function () {
             state.matrixOpen = !state.matrixOpen;
-            toggle.setAttribute('aria-expanded', state.matrixOpen ? 'true' : 'false');
-            toggle.textContent = state.matrixOpen ? 'Hide the full price table ▴' : 'See every quantity price ▾';
-            $('cfgMatrix').hidden = !state.matrixOpen;
+            syncMatrixToggle();
             renderMatrix();
         });
     }
@@ -1146,7 +1175,16 @@
             if (token !== matrixSeq) return;
         }
 
-        const showFeeRow = model.tiers.some(function (t) { return t.ltmFee > 0; });
+        // ── Small-order fee row ──────────────────────────────────────────
+        // On many styles the two cheapest tiers carry the SAME per-piece price
+        // (identical Caspio decoration cost — e.g. EMB 1-7 and 8-23 are both
+        // $177.50 on CT103828), so this fee is the ONLY thing separating them.
+        // It therefore gets a fee pill and an explicit "No fee", never a bare
+        // em dash — an em dash reads as "no data", not "you don't pay this".
+        const feeTiers = model.tiers.filter(function (t) { return t.ltmFee > 0; });
+        const firstFree = model.tiers.filter(function (t) { return !(t.ltmFee > 0); })[0];
+        const unit = state.ctx.isCap ? 'caps' : 'pieces';
+
         const head = model.tiers.map(function (t) {
             return '<th data-min="' + t.min + '" data-max="' + (t.max === Infinity ? '' : t.max) + '">'
                 + escapeHtml(t.label) + '</th>';
@@ -1154,13 +1192,37 @@
         const priceRow = model.tiers.map(function (t) {
             return '<td>' + formatPrice(t.price) + '</td>';
         }).join('');
-        const feeRow = showFeeRow ? '<tr><td>Small-order fee</td>' + model.tiers.map(function (t) {
-            return '<td>' + (t.ltmFee > 0 ? '+' + formatPrice(t.ltmFee) + ' per order' : '—') + '</td>';
-        }).join('') + '</tr>' : '';
+        const feeRow = feeTiers.length
+            ? '<tr><td class="tier-fee-label">Small-order fee</td>' + model.tiers.map(function (t) {
+                return '<td>' + (t.ltmFee > 0
+                    ? '<span class="tier-fee-yes">+' + formatPrice(t.ltmFee) + '</span>'
+                        + '<span class="tier-fee-unit">per order</span>'
+                    : '<span class="tier-fee-no">No fee</span>') + '</td>';
+            }).join('') + '</tr>'
+            : '';
+
+        // Rendered ABOVE the table so it frames the numbers instead of
+        // explaining them after the fact. Spells out the threshold in words,
+        // and — only when it is literally true of THIS ladder — that the fee
+        // is the entire difference between the last fee tier and the first
+        // free one.
+        let feeNote = '';
+        if (feeTiers.length && firstFree) {
+            const lastFee = feeTiers[feeTiers.length - 1];
+            feeNote = 'Orders under ' + firstFree.min + ' ' + unit + ' add a one-time '
+                + formatPrice(lastFee.ltmFee) + ' small-order fee.';
+            if (lastFee.price != null && firstFree.price != null && r2(lastFee.price) === r2(firstFree.price)) {
+                feeNote += ' At ' + escapeHtml(lastFee.label) + ' and ' + escapeHtml(firstFree.label)
+                    + ' the per-' + (state.ctx.isCap ? 'cap' : 'piece')
+                    + ' price is identical — the fee is the whole difference.';
+            }
+            feeNote = '<p class="pdp-cfg-fee-note">' + feeNote + '</p>';
+        }
 
         box.innerHTML =
             (model.approx ? '<p class="pdp-panel-note pdp-panel-note--warn" role="status">⚠ Live pricing is temporarily unavailable — this table is approximate. Your free proof confirms exact pricing.</p>' : '')
             + '<p class="pdp-panel-note">' + escapeHtml(model.note) + '</p>'
+            + feeNote
             + '<div class="table-wrap"><table class="data-table tier-table">'
             + '<thead><tr><th>Quantity</th>' + head + '</tr></thead>'
             + '<tbody><tr><td>Price per ' + (state.ctx.isCap ? 'cap' : 'piece') + '</td>' + priceRow + '</tr>' + feeRow + '</tbody>'
@@ -1235,6 +1297,7 @@
         state.loc = ctx.isCap ? 'front' : 'leftChest';
         state.results = {};
         state.matrixCache = {};
+        state.matrixOpen = true;
 
         if (ctx.isCap) {
             state.methods = [{ id: 'capemb' }];
@@ -1262,6 +1325,11 @@
         state.initialized = true;
         $('cfgQtyInput').value = state.qty;
         $('pdpConfigurator').hidden = false;
+        syncMatrixToggle();
+        // leftChest/front is supported by every method today, but never trust that:
+        // if the filtered list dropped the default, start on the first live chip.
+        const locs = currentLocations();
+        if (!locs.some(function (l) { return l.key === state.loc; })) state.loc = locs[0].key;
         renderLocations();
         renderInkRow();
         renderMethods();

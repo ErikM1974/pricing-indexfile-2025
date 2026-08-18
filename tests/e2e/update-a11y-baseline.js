@@ -27,7 +27,10 @@ const BUILDERS = [
     for (const file of BUILDERS) {
         await page.goto(`${BASE}/quote-builders/${file}`, { timeout: 60000 });
         await page.waitForLoadState('load');
-        await page.waitForTimeout(3500);
+        // Same signal the spec waits on — the baseline must be captured against
+        // the same final paint it will later be compared to, or the two drift.
+        await page.evaluate(() => document.fonts.ready);
+        await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
         const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
         const counts = {};
         for (const v of results.violations) {
