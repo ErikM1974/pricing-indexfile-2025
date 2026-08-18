@@ -5,6 +5,47 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## A dependency bump that passes all five gates and takes the whole site down (2026-08-18)
+
+**Problem.** Dependabot PR #27 (`marked` 12.0.2 → 18.0.9) sat open looking ordinary. Merging it
+would have produced **H10 on every page** — all customer storefronts and pricing pages, not a
+degraded blog — and every check in the repo says it is fine.
+
+**Root cause.** `marked` went **ESM-only at v13**. `lib/blog.js:17` is CommonJS
+(`const { marked } = require('marked')`), so v18 throws `ERR_REQUIRE_ESM` at require time. That
+is not contained to the blog: `server.js:4747` does `require('./lib/blog')` at module load, so
+the failure happens before the server listens and the process never starts.
+
+**Solution.** Closed the PR and added an `ignore` for `marked` majors in `.github/dependabot.yml`
+(`a4e84360`) naming the unblock condition, so it cannot be re-proposed until `lib/blog.js` moves
+to ESM or a dynamic `import()`. Minor/patch of v12 still flow.
+
+**Prevention.**
+- 🔴 **Measured with `marked@18` actually installed: lint ✅ typecheck ✅ test:unit (125 suites /
+  2613 tests) ✅ test:dom ✅ test:a11y ✅ — and the server does not boot.** No test loads
+  `lib/blog.js`. A green suite is evidence about the code the suite imports and nothing else.
+- 🔑 **The deploy skill's Step 3.6b boot probe is the only gate that caught it**, and only because
+  it actually starts the server rather than parsing it. `node --check` passes too — syntax is
+  fine, the failure is at require time. This is the second incident that gate has justified
+  (first: the 2026-07-19 `Cannot find module` outage). **Never route around it.**
+- 🔴 **A module required at server boot has no blast radius of its own** — it inherits the whole
+  app's. Before upgrading anything under `lib/`, check whether `server.js` requires it at load:
+  `grep -n "require('./lib/<name>')" server.js`. If yes, a bad bump is a total outage, not a
+  broken feature.
+- 🔑 **CJS→ESM is invisible to semver reasoning.** "It's only used in 3 places, all stable API"
+  was true here and completely irrelevant — the break was in how the package is *loaded*, not
+  what it exposes. For any major bump, `require()` the package once before reading changelogs.
+- ⚠️ **A dependabot PR's red checks may be about nothing.** #24–27 were based on a commit **178
+  behind develop**, from before CI was fixed on 2026-08-18, so their ESLint/tsc/E2E failures were
+  inherited from the two-week-red CI. Check `baseRefOid`'s date before believing — or dismissing —
+  a bot PR's status, in both directions: #27's checks were *falsely red*, and its unit tests were
+  *truthfully green* on a build that could not start.
+- 🔑 `sharp` was a direct dependency nothing imported (no `require`, no script, root-only in the
+  lockfile) — shipping native libvips binaries on every install and Heroku build. Removing a dead
+  dep beats upgrading it; check `grep -rl "require('<pkg>')"` before accepting any bump.
+
+---
+
 ## A release that reached GitHub but never reached Heroku, and nothing noticed for 9 hours (2026-08-18)
 
 **Problem.** `develop`, `main`, `origin/develop` and `origin/main` were all clean and identical at
@@ -216,49 +257,5 @@ Live `v2026.08.17.8`, verified anonymously in prod across 5 URL shapes.
   **Credit Card SOP** linking it, on a hub page that is anonymously reachable. ⚠️ `/api/policies-public/search`
   and the tree's `Body_Plain` BOTH strip markup — `q=href` returns 0 — so neither can see a URL in an
   attribute. Before changing who can reach a file, grep the CMS, and sanity-check the search index first.
-
----
-
-## Two silent no-ops in the quote sync: '' IS NOT NULL, and a clock read in the wrong zone (2026-08-17)
-
-**Problem.** Both were found while fixing the Aug 10-17 sync outage, and neither had ever
-shown a symptom. ① The proxy's `syncCandidates=true` filter returned **9 of 9** non-cancelled
-rows, so the hourly cron synced a `Status='Web Quote Request'` quote with no WO# forever. ②
-`ShopWorks_Last_Synced` was **written UTC and read Pacific**, so a just-synced row parsed ~7-8 h
-in the FUTURE, `now - lastSynced` went NEGATIVE, and the 30-minute staleness test could not fire
-— the hourly re-sync was really running ~3x/day.
-
-**Root cause.** ① Caspio stores an unset column as an **EMPTY STRING**, and `'' IS NOT NULL`, so
-`(Status='Processed' OR PushedToShopWorks IS NOT NULL)` matched everything and the OR swallowed
-the Status test. Only 1 of the 9 rows had a real `PushedToShopWorks`. ② `nowPacificNaiveIso()`
-already existed in `server.js` and the sync handler simply didn't use it.
-
-**Solution.** ① `PushedToShopWorks<>''` **plus** `ShopWorks_Order_Number>0`; proxy `v2026.08.17.1`
-(Heroku v1088), verified live 9→8. ② `nowIso = nowPacificNaiveIso()`; app `v2026.08.17.5`
-(Heroku v1867), verified live: stored `05:55:52` vs Pacific-now `05:56:05`, exactly 7 h behind UTC.
-
-**Prevention.**
-- 🔴 **In Caspio, `IS NOT NULL` does NOT mean "has a value".** Unset text columns come back as
-  `''`. Any "was this ever stamped?" predicate needs `AND col<>''`, and a bare `IS NOT NULL`
-  inside an `OR` silently promotes the whole clause to `TRUE`. Check the other named filters
-  before trusting one.
-- 🔴 **Tightening an over-matching filter can silently DROP real work.** Two DTG rows sat at
-  `Status='Accepted'` with an empty `PushedToShopWorks` but a REAL WO# — they were being synced
-  *only because of the bug*. The obvious one-line fix would have stopped their deletion detection
-  and the ShipStation cancel-cascade with no error anywhere. **Before narrowing a predicate, dump
-  what it currently matches and account for EVERY row you are about to exclude.**
-- 🔑 **`toContain()` cannot see a MISSING conjunct.** The jest lock asserted
-  `toContain('PushedToShopWorks IS NOT NULL')`, which passes with or without the `<>''` half. A
-  substring assertion tests presence, never sufficiency — assert the part that carries the meaning.
-- 🔴 **A timestamp has no type.** Nothing failed, nothing logged; the only tell was a cadence
-  nobody was measuring. **When a column is written in one place and read in another, the writer
-  and reader must name the same zone out loud** — and the fix belongs in the WRITER when every
-  reader already agrees. The June "Purges in 31 days" patch fixed the *reader* on the dashboard;
-  the reader had been right all along.
-- 🔑 The regression test **parses both functions out of the shipped `server.js` and round-trips
-  them**, with a negative control that re-creates the old writer and asserts the skew is still
-  6.5-8.5 h. A source-grep for the call would pass whether or not the two agree.
-- ⚠️ **The proxy caches `quote_sessions` reads** — a verification GET without `&refresh=true`
-  returned the PRE-fix row and read as "not fixed". Always add `refresh=true` when checking a write.
 
 ---
