@@ -23,6 +23,7 @@
  *
  * API (window.QuoteCartStore, also module.exports for jest):
  *   add(item) → stored item   updateQty(id, qty) → item|null
+ *   updateSizes(id, {SIZE:qty}) → item|null (matrix edit; qty = Σ sizes)
  *   remove(id) → boolean      clear()
  *   getItems() → deep copy    count() → item count
  *   totalPieces() → Σ qty     onChange(cb) → unsubscribe fn
@@ -177,6 +178,34 @@
         return deepCopy(item);
     }
 
+    /**
+     * Replace an item's size breakdown from the cart page's size matrix
+     * (2026-08-19 — sizes used to be add-time-only: the PDP put the whole
+     * qty on one standard size, so customers typed their real distribution
+     * into the notes box where nobody looked; WQ-2026-006). Zero/negative/
+     * junk quantities drop; at least one positive size is required (returns
+     * null and leaves the item untouched otherwise). qty mirrors the sum.
+     */
+    function updateSizes(id, sizes) {
+        var cleaned = {};
+        Object.keys(sizes || {}).forEach(function (k) {
+            var q = Math.round(Number(sizes[k]));
+            if (isFinite(q) && q > 0) { cleaned[String(k)] = Math.min(9999, q); }
+        });
+        if (Object.keys(cleaned).length === 0) { return null; }
+        var state = readState();
+        var item = null;
+        for (var i = 0; i < state.items.length; i++) {
+            if (state.items[i].id === id) { item = state.items[i]; break; }
+        }
+        if (!item) { return null; }
+        item.sizes = cleaned;
+        item.qty = sumSizes(cleaned);
+        writeState(state);
+        emit();
+        return deepCopy(item);
+    }
+
     /** Remove an item by id. Returns true when something was removed. */
     function remove(id) {
         var state = readState();
@@ -251,6 +280,7 @@
         TTL_MS: TTL_MS,
         add: add,
         updateQty: updateQty,
+        updateSizes: updateSizes,
         remove: remove,
         clear: clear,
         getItems: getItems,

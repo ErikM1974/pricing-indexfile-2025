@@ -169,6 +169,51 @@
 }
 .qc-step:hover { border-color: var(--green-700); color: var(--green-700); }
 .qc-line-price { text-align: right; }
+
+/* Per-line size matrix (2026-08-19) — full-width row under the line; filled
+   async once the style's real size list arrives. When it shows, it replaces
+   the stepper as the quantity editor (total becomes the read-only pill). */
+.qc-line-sizes {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 10px;
+    padding: 2px 0 4px;
+}
+.qc-line-sizes[hidden] { display: none; }
+.qc-size-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--ink-soft, #64748b);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+.qc-size-cell input {
+    width: 52px;
+    height: 34px;
+    text-align: center;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font: inherit;
+    font-weight: 600;
+    color: inherit;
+}
+.qc-size-cell input::-webkit-outer-spin-button,
+.qc-size-cell input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.qc-size-cell input:focus { outline: none; border-color: var(--green-700); }
+.qc-line-qty-total {
+    font-weight: 700;
+    font-size: 1rem;
+}
+.qc-line-qty-unit {
+    font-size: 0.75rem;
+    color: var(--ink-soft, #64748b);
+    margin-left: 4px;
+}
 .qc-line-each {
     display: block;
     font-size: 12.5px;

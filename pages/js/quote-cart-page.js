@@ -200,6 +200,99 @@
     }
 
     // ============================================================
+    // AVAILABLE SIZES (per style+color) — feeds the per-line size matrix
+    // (2026-08-19). The PDP adds the whole quantity on one standard size;
+    // this page is where the customer distributes it (WQ-2026-006: the real
+    // breakdown used to end up typed into the notes box). Same authority the
+    // staff builders use for size columns. Cached per style|color; a fetch
+    // failure just leaves that line on the plain qty stepper — sizes are
+    // structural here, never money.
+    // ============================================================
+    const sizesCache = {};
+
+    function apiBase() {
+        return (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
+            || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+    }
+
+    function fetchAvailableSizes(item) {
+        // CATALOG_COLOR for API queries (two color-field rule); display color
+        // only as a fallback for legacy items that never stored it.
+        const color = item.catalogColor || item.color || '';
+        const key = item.style + '|' + color;
+        if (!sizesCache[key]) {
+            sizesCache[key] = fetch(apiBase() + '/api/sizes-by-style-color?styleNumber='
+                + encodeURIComponent(item.style) + '&color=' + encodeURIComponent(color))
+                .then(function (r) { return r.ok ? r.json() : null; })
+                .then(function (data) {
+                    const sizes = data && (data.sizes || data.data);
+                    return (Array.isArray(sizes) && sizes.length) ? sizes : null;
+                })
+                .catch(function () { return null; });
+        }
+        return sizesCache[key];
+    }
+
+    /** Fill each garment line's size matrix after render. Async per line; a
+     *  line whose element is gone by resolve time (re-render raced) is skipped. */
+    function hydrateSizeMatrices() {
+        state.items.forEach(function (item) {
+            if (item.isCap) return;   // caps are OSFA — the stepper is right
+            fetchAvailableSizes(item).then(function (sizes) {
+                if (!sizes || sizes.length < 2) return;
+                const wrap = document.querySelector('[data-size-matrix][data-id="' + item.id + '"]');
+                if (!wrap) return;
+                // Re-read the item — quantities may have changed since render.
+                const cur = window.QuoteCartStore.getItems().filter(function (i) { return i.id === item.id; })[0];
+                if (!cur) return;
+                wrap.innerHTML = sizes.map(function (sz) {
+                    const q = Number(cur.sizes && cur.sizes[sz]) || 0;
+                    return '<label class="qc-size-cell"><span>' + escapeHtml(sz) + '</span>'
+                        + '<input type="number" inputmode="numeric" min="0" max="9999" step="1"'
+                        + ' value="' + (q > 0 ? q : '') + '" placeholder="0"'
+                        + ' data-act="size" data-id="' + escapeHtml(item.id) + '" data-size="' + escapeHtml(sz) + '"'
+                        + ' aria-label="Quantity, size ' + escapeHtml(sz) + ', ' + escapeHtml(item.style) + '"></label>';
+                }).join('');
+                wrap.hidden = false;
+                // The matrix is now the quantity editor — swap the stepper for
+                // a read-only total so two editors can't fight over item.sizes.
+                const line = wrap.closest('.qc-line');
+                const qtyBox = line && line.querySelector('.qc-line-qty');
+                if (qtyBox) {
+                    qtyBox.innerHTML = '<span class="qc-line-qty-total">' + (Number(cur.qty) || 0)
+                        + '</span><span class="qc-line-qty-unit">pcs</span>';
+                }
+            });
+        });
+    }
+
+    /** Commit a matrix edit: collect every size input for the item, write the
+     *  store (qty = Σ sizes) → onChange → debounced reprice. An all-zero edit
+     *  is rejected by the store; restore the inputs from the stored item. */
+    function commitSizeMatrix(wrap) {
+        const id = wrap.getAttribute('data-id');
+        const sizes = {};
+        let changed = false;
+        const stored = window.QuoteCartStore.getItems().filter(function (i) { return i.id === id; })[0];
+        if (!stored) return;
+        Array.prototype.forEach.call(wrap.querySelectorAll('input[data-act="size"]'), function (inp) {
+            const q = Math.round(parseFloat(inp.value));
+            const sz = inp.getAttribute('data-size');
+            if (isFinite(q) && q > 0) sizes[sz] = Math.min(9999, q);
+            if ((Number(stored.sizes && stored.sizes[sz]) || 0) !== (sizes[sz] || 0)) changed = true;
+        });
+        if (!changed) return;
+        const updated = window.QuoteCartStore.updateSizes(id, sizes);
+        if (!updated) {
+            // All zeroes — keep the last valid breakdown on screen.
+            Array.prototype.forEach.call(wrap.querySelectorAll('input[data-act="size"]'), function (inp) {
+                const q = Number(stored.sizes && stored.sizes[inp.getAttribute('data-size')]) || 0;
+                inp.value = q > 0 ? q : '';
+            });
+        }
+    }
+
+    // ============================================================
     // STATE + REPRICING
     // ============================================================
     const state = {
@@ -335,6 +428,7 @@
 
         renderTotals(cart, res);
         wireGroupEvents();
+        hydrateSizeMatrices();
     }
 
     function methodOf(gid, items) {
@@ -440,6 +534,10 @@
                 + '<span class="qc-line-total">' + (lines.length ? formatPrice(lineTotal) : '—') + '</span>'
                 + '</div>'
                 + '<button class="qc-remove" type="button" data-act="remove" data-id="' + escapeHtml(item.id) + '" aria-label="Remove ' + escapeHtml(item.style) + ' from quote">&times;</button>'
+                // Size matrix — filled async by hydrateSizeMatrices() once the
+                // style's real size list arrives; stays hidden (stepper rules)
+                // for caps, single-size styles, and lookup failures.
+                + '<div class="qc-line-sizes" data-size-matrix data-id="' + escapeHtml(item.id) + '" hidden></div>'
                 + '</div>';
         }).join('');
     }
@@ -1043,6 +1141,23 @@
 
         $('qcGroups').addEventListener('click', onGroupsClick);
         $('qcGroups').addEventListener('change', onGroupsChange);
+
+        // Size-matrix commits happen when focus LEAVES the matrix (not per
+        // input change): committing mid-edit re-renders the group and eats
+        // the keystrokes of the next size field the customer tabbed into.
+        $('qcGroups').addEventListener('focusout', function (e) {
+            const wrap = e.target.closest && e.target.closest('[data-size-matrix]');
+            if (!wrap) return;
+            if (e.relatedTarget && wrap.contains(e.relatedTarget)) return; // still inside the matrix
+            commitSizeMatrix(wrap);
+        });
+        // Enter in a size input = "done" — blur it so the focusout commit runs.
+        $('qcGroups').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' && e.target && e.target.matches && e.target.matches('input[data-act="size"]')) {
+                e.preventDefault();
+                e.target.blur();
+            }
+        });
 
         // Save panel (Phase 3) — the totals body re-renders on every reprice,
         // so the save button binds by delegation on the static aside.
