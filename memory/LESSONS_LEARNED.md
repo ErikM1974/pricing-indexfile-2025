@@ -5,6 +5,36 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## SAM quotes rendered "No items in this quote" — the samples channel opted out of the fix built for exactly this (2026-08-19)
+
+**Problem.** First real paid-sample order (SAM0819-8320, Peak Industrial, $100.73 via Stripe)
+showed an empty "Quote Details" on `/quote/:id` even though payment, ShopWorks push (WO 142865)
+and snapshot sync all worked.
+
+**Root cause.** `/quote` + `/invoice` render line items from the `quote_items` table.
+`storefront-quote-items.js` exists precisely because storefront carts once lived only in
+quote_sessions JSON blobs and those pages showed "No items" — but the samples launch (2026-07-06)
+deliberately skipped it (`colorConfigs: {}`, comment: "no junk quote_items rows"), because sample
+carts aren't colorConfigs-shaped. The ShopWorks snapshot couldn't save the page either:
+`_overlayQuoteFromShopWorks` only repaints rows that already exist — zero quote-side rows means
+the synced SW lines render nowhere.
+
+**Fix.** Samples branch in `buildStorefrontQuoteItems` (one row per `orderSettings.samples`
+entry, `EmbellishmentType: 'blank'`, free samples as $0 `FREE sample —` rows; jest-locked in
+`tests/unit/storefront-quote-items.test.js`). Backfilled SAM0819-8320's two rows via the proxy
+using the same builder — live page verified rendering both, matching the SW snapshot 1:1.
+
+**Prevention.**
+- 🔑 **"This channel doesn't need X" must name every READER of X, not just the writer's needs.**
+  The push reads OrderSettingsJSON, but /quote + /invoice read quote_items — the opt-out comment
+  only considered the push.
+- 🔑 The SW snapshot overlay is an OVERLAY, not a renderer — it can correct rows but never create
+  them. Any quote with zero quote_items rows stays visually empty no matter how good the sync is.
+- 🔑 Backfill through the SAME builder the code path now uses (require the module in a one-off
+  script), so the repaired row and future rows are identical by construction.
+
+---
+
 ## Heroku git push needs a `global`-scoped token — `write` fails as "repository not found" (2026-08-19)
 
 **Problem.** Replacing the rolling ~14-day CLI session token with a long-lived authorization so
@@ -19,7 +49,11 @@ work), so every check short of an actual git operation says the token is fine. T
 is reported as a missing repository and never mentions scope.
 
 **Solution.** Mint with the default (global) scope. Least privilege is not available here —
-`write` is not a narrower version of what git needs, it simply does not work.
+`write` is not a narrower version of what git needs, it simply does not work. Wired
+2026-08-19: authorization `NWCA git deploy (1yr)`, stored at `~/.heroku-deploy-token` (ACL
+owner-only), read directly by the `git.heroku.com` credential helper. ⏭️ **Renew before
+2027-08-19.** Full setup + recreate commands: `.claude/skills/deploy/SKILL.md` § Heroku CLI v11
+git auth.
 
 **Prevention.**
 - 🔑 **Verify any Heroku credential change with a no-op `git push heroku main`.** When main is

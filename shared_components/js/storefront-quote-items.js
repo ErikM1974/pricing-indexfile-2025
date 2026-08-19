@@ -7,6 +7,12 @@
 // /invoice show $0 tax). This module produces the line-item rows the readers
 // need, footing exactly to the order subtotal. Pure logic, no I/O.
 //
+// 2026-08-19: Sample Program carts (channel 'samples') added — their cart is
+// orderSettings.samples (one blank unit per style), not colorConfigs, and the
+// original samples launch deliberately skipped quote_items, re-opening the
+// exact "No items in this quote" gap this module exists to close (first live
+// hit: SAM0819-8320).
+//
 // Used by server.js save3DTQuoteSession (the shared storefront save path).
 // Dual-export so it loads as a browser global AND require()s in node/jest.
 (function (root, factory) {
@@ -44,6 +50,39 @@
     const locCode = settings.printLocationCode || '';
     const locName = settings.printLocationName || '';
     const stamp = new Date().toISOString().replace(/\.\d{3}Z$/, '');
+
+    // Sample Program: one row per sample from orderSettings.samples (the
+    // server-priced cart the webhook push reads). Free samples ride as $0
+    // rows — mirrors their $0 Stripe lines. Samples never carry colorConfigs,
+    // so the loop below is a no-op for this channel.
+    if (settings.channel === 'samples' && Array.isArray(settings.samples)) {
+      settings.samples.forEach((s) => {
+        if (!s || !s.style) return;
+        const paid = s.type === 'paid';
+        const price = paid ? r2(s.price || 0) : 0;
+        const size = String(s.size || '').trim();
+        items.push({
+          QuoteID: quoteID,
+          LineNumber: lineNumber++,
+          StyleNumber: String(s.style),
+          ProductName: (paid ? 'Sample — ' : 'FREE sample — ') + String(s.name || s.style),
+          Color: String(s.color || ''),           // COLOR_NAME (display)
+          ColorCode: String(s.catalogColor || s.color || ''),  // CATALOG_COLOR (inventory)
+          EmbellishmentType: 'blank',
+          PrintLocation: '',
+          PrintLocationName: '',
+          Quantity: 1,
+          HasLTM: 'No',
+          BaseUnitPrice: price,
+          LTMPerUnit: 0,
+          FinalUnitPrice: price,
+          LineTotal: price,
+          SizeBreakdown: size ? JSON.stringify({ [size]: 1 }) : '',
+          PricingTier: '',
+          AddedAt: stamp
+        });
+      });
+    }
 
     Object.keys(colorConfigs || {}).forEach((colorKey) => {
       const cfg = colorConfigs[colorKey] || {};

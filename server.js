@@ -8958,8 +8958,11 @@ app.post('/api/samples/create-checkout-session', async (req, res) => {
       `($${grandTotal.toFixed(2)}: ${priced.length} samples, ${priced.filter((p) => p.type === 'paid').length} paid, tax ${tax.rate})`);
 
     // Save to Caspio BEFORE Stripe (fail-closed: no save, no charge).
-    // colorConfigs {} is deliberate: buildStorefrontQuoteItems returns [] for
-    // it, so no junk quote_items rows — the samples live in OrderSettingsJSON.
+    // colorConfigs {} is deliberate (sample carts aren't color-config shaped);
+    // quote_items rows come from orderSettings.samples via the samples branch
+    // in buildStorefrontQuoteItems — without them /quote and /invoice render
+    // "No items in this quote" (SAM0819-8320, 2026-08-19). The webhook push
+    // still reads OrderSettingsJSON, not quote_items.
     try {
       await save3DTQuoteSession({
         quoteID,

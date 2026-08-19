@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Quote - Northwest Custom Apparel</title>
-    <link rel="stylesheet" href="/pages/css/quote-view.css?v=2026.07.06.1">
+    <link rel="stylesheet" href="/pages/css/quote-view.css?v=2026.08.19.4">
     <!-- Phase 11 (2026-05-14): QuickBooks-style invoice print stylesheet -->
     <link rel="stylesheet" href="/shared_components/css/quote-print.css?v=2026.07.07.7" media="print">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -333,6 +333,7 @@
                     <table class="sw-designs-table" id="sw-designs-table">
                         <thead>
                             <tr>
+                                <th class="sw-designs-th-thumb" aria-label="Design thumbnail"></th>
                                 <th>ID</th>
                                 <th>Name</th>
                                 <th>Type</th>
@@ -667,6 +668,8 @@
     <script src="/shared_components/js/staff-auth-helper.js?v=20260113"></script>
     <!-- Deposit money-math (dual-load with the server; preview-only in the browser) -->
     <script src="/shared_components/js/quote-deposit-math.js?v=2026.07.09.1"></script>
-    <script src="/pages/js/quote-view.js?v=2026.08.15.1"></script>
+    <!-- Same-origin rewrite for gated /api/box/* image URLs (design thumbnails) -->
+    <script src="/shared_components/js/box-url.js?v=2026.08.06.1"></script>
+    <script src="/pages/js/quote-view.js?v=2026.08.19.4"></script>
 </body>
 </html>

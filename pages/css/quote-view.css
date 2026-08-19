@@ -188,6 +188,12 @@ body {
     color: white;
 }
 
+/* Paid storefront orders (samples / tees / caps) — an order, not an open quote */
+.status-paid {
+    background: var(--success-color);
+    color: white;
+}
+
 /* Quote Meta Section (compact) */
 .quote-meta {
     display: grid;
@@ -1807,6 +1813,14 @@ body {
     font-weight: 600;
     color: #0f172a;
     width: 80px;
+}
+/* Design-library thumbnail column (filled async by _loadDesignPanelThumbnails) */
+.sw-designs-th-thumb,
+.sw-designs-thumb-cell {
+    width: 56px;
+}
+.sw-designs-thumb-cell .sw-designs-thumb {
+    display: none;   /* stays hidden until a thumbnail mounts */
 }
 .sw-designs-name {
     font-weight: 600;
