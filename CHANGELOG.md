@@ -1,3 +1,7 @@
+## v2026.08.19.1 (2026.08.19)
+
+- Deploy skill: take max-in-use + 1 for the version, never a count
+
 ## v2026.08.18.5 (2026.08.18)
 
 - Memory: the v2026.08.18.4 release that reached GitHub but never reached Heroku
