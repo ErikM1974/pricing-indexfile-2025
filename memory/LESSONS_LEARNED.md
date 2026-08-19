@@ -5,6 +5,33 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## A customer's real size request was captured, saved, and shown to nobody (2026-08-19)
+
+**Problem.** WQ-2026-006 (web quote-cart) showed 18500B "S × 17". The customer's actual request
+— A-M 8 / A-S 6 / XS 1 / L 2 — existed only in the notes box they typed at checkout, and no
+surface displayed it. Erik caught it because "17 smalls" looked wrong.
+
+**Root cause.** Two halves. (1) The quote-cart lets a customer add a line with one size + qty,
+so they dumped the total on the default size and typed the real distribution into notes. (2)
+quote-view's `renderNotes()` skipped ANY valid-JSON Notes as "structured config" — but the WQ
+channel stores the customer's typed text INSIDE that JSON (`customerNotes`), so the one
+free-text field a customer fills was invisible to reps by construction.
+
+**Solution.** `renderNotes()` now renders a "Customer notes (typed at checkout)" block
+(pre-wrap, text-only) when JSON Notes carries a non-empty `customerNotes`; structured config
+without customer text stays hidden. Verified against the live row. The quote itself still says
+S × 17 — sizes on a quote are the REP'S call after clarifying (here "A-" prefixed sizes look
+ADULT while 18500B is the YOUTH hoodie — repricing territory, never an auto-rewrite).
+
+**Prevention.**
+- 🔑 **"Skip it, it's structured JSON" needs a look INSIDE the JSON first** — channels tuck
+  human-typed text into structured blobs, and a skip on the container silently drops the one
+  field a human wrote.
+- 🔑 When a quote's numbers look odd, read the session row's `Notes`/`customerNotes` before
+  trusting the line items — the cart shape (one size per line) invites totals-on-one-size.
+
+---
+
 ## SAM quotes rendered "No items in this quote" — the samples channel opted out of the fix built for exactly this (2026-08-19)
 
 **Problem.** First real paid-sample order (SAM0819-8320, Peak Industrial, $100.73 via Stripe)
@@ -217,49 +244,3 @@ a garbage CHANGELOG entry.
   point ran and verify each remaining step by hand.
 
 ---
-
-## Dead placement chips: a chip row that never asked which methods were eligible (2026-08-18)
-
-**Problem.** On `product.html?style=CT103828` (Carhartt Duck Detroit Jacket) the customer
-configurator offered six placement chips, but three of them — Center front, Full front, Center
-back — could never return a price. Tapping one produced only "not available for this placement".
-Not a Carhartt edge case: it hit **every** product in the embroidery-only categories (Workwear,
-Outerwear, Woven Shirts, Bags, Accessories).
-
-**Root cause.** Two independent gates that never talked to each other. `getEligibility()` filters
-which METHODS render (Q3) from the Caspio-backed `/api/decoration-methods` rules; but
-`currentLocations()` returned the hardcoded `GARMENT_LOCATIONS` array wholesale, with no reference
-to `state.methods` or any method's `supports` map. `METHODS.emb.supports` has `fullFront: false`
-and omits `centerFront`/`centerBack` entirely (those are DTF-only keys) — so on an EMB-only
-product half the chip row was decorative. The dead-end state was well-built and visible, which is
-exactly why nobody noticed the chips should never have rendered at all.
-
-**Fix.** `currentLocations()` (`product/js/pdp-configurator.js:654`) now intersects the location
-list with the union of `supports` across the eligible methods, with a defensive fall-back to the
-full list if the intersection is ever empty. `init()` re-seats `state.loc` onto a surviving chip.
-Zero backend work — the data to compute this was already on the page. Same commit made the tier
-matrix render open by default (`state.matrixOpen`, `product.html:287`).
-
-**Follow-up (same day).** With the table now the first thing a customer reads, its two cheapest
-columns were indistinguishable: EMB `1-7` and `8-23` are BOTH $177.50 (same Caspio
-`EmbroideryCost` of $18.00), so the `$50` small-order fee was the entire difference — and it
-rendered as a plain row whose other cells were bare em dashes. Fixed by styling the cell
-CONTENTS (fee pill + explicit "No fee") rather than the row background, so it never fights
-`.tier-table .is-active-tier` for the column the customer is actually in, plus a note derived
-from the ladder itself that names the threshold and states the identical-price fact only when
-it is literally true of that ladder.
-
-**Prevention.**
-- 🔑 **An em dash reads as "no data", not "you don't pay this".** In any table where a row means
-  a charge, spell the absence out.
-- 🔴 **When two gates narrow the same UI, one must consume the other's output.** Eligibility drove
-  the method chips but not the placement chips; nothing in the code linked them, so they drifted
-  the moment a method with narrower `supports` became the only eligible one.
-- 🔑 A well-built "not available" state can *mask* a bug. The empty/unavailable path being correct
-  and visible is not evidence the option should have been offered.
-- 🔑 `tests/dom/pdp-placement-chips.test.js` slices the fixture out of the REAL `product.html`, so
-  the markup's default state is locked too — a revert in the HTML alone fails the suite. Both
-  halves were mutation-tested (filter revert → 2 failures; matrix revert → 3).
-
----
-
