@@ -1,3 +1,9 @@
+## v2026.08.19.3 (2026.08.19)
+
+- Memory: retract the contacts-sync waste finding -- it was wrong
+- Deploy skill: review what is actually in the release before merging
+- Memory: Heroku git push requires a global-scoped token
+
 ## v2026.08.19.2 (2026.08.19)
 
 - DTF pricing: drop the <script> tag for a file deleted 11 months ago
