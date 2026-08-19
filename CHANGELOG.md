@@ -1,3 +1,10 @@
+## v2026.08.19.5 (2026.08.19)
+
+- Quote view: surface the customer's typed checkout notes on web-cart quotes
+- Memory: customer notes invisible on WQ quotes; archive oldest lesson
+- Quote cart: per-line size matrix so customers distribute real sizes
+- Deploy v2026.08.19.5: 8 files (index.html,catalog.html,custom-banners.html...)
+
 ## v2026.08.19.4 (2026.08.19)
 
 - Heroku git auth: long-lived global-scoped token, wired git-only
