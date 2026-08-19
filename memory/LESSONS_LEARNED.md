@@ -5,6 +5,38 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## Heroku git push needs a `global`-scoped token — `write` fails as "repository not found" (2026-08-19)
+
+**Problem.** Replacing the rolling ~14-day CLI session token with a long-lived authorization so
+deploys survive a vacation. Minted it least-privilege (`-s write`) and pointed the
+`git.heroku.com` credential helper at it. Every git operation then died with
+`remote: ! Couldn't find that user.` → `fatal: repository '…/sanmar-inventory-app.git/' not
+found` — which reads like a deleted app or a wrong remote URL, not an auth problem.
+
+**Root cause.** Heroku's git endpoint accepts **only `global`-scope tokens**. A `write`-scoped
+token authenticates perfectly against the *API* (`heroku authorizations`, `releases`, `ps` all
+work), so every check short of an actual git operation says the token is fine. The git rejection
+is reported as a missing repository and never mentions scope.
+
+**Solution.** Mint with the default (global) scope. Least privilege is not available here —
+`write` is not a narrower version of what git needs, it simply does not work.
+
+**Prevention.**
+- 🔑 **Verify any Heroku credential change with a no-op `git push heroku main`.** When main is
+  already pushed it prints `Everything up-to-date` *after* completing the full auth handshake —
+  a zero-effect test of the exact path `/deploy` Step 12 uses. Catching this cost one no-op push
+  instead of a failed deploy at Step 12.
+- 🔑 **`Couldn't find that user` / `repository not found` from `git.heroku.com` means token
+  SCOPE**, not a bad remote. Confirm with `heroku authorizations --json` → `.scope`.
+- 🔑 **The CLI session token rolls forward on every heroku command** — `updated_at` refreshes and
+  the ~14-day window restarts, so routine deploys keep it alive indefinitely. The
+  `token will expire` warning is a *back-from-vacation* trap (14 idle days), not a countdown.
+  Read expiry from `.access_token.expires_in`; the top-level `expires_in` is always null and
+  makes every token look permanent.
+- ⚠️ A long-lived token belongs in the **git credential helper only**, not `HEROKU_API_KEY`.
+  The env var overrides the CLI session globally, so `heroku login`/`logout` stop controlling
+  auth — a second layer of exactly the confusion the v11 git-auth bug already cost 5 rounds on.
+
 ## A <script> tag pointing at a file deleted 11 months ago (2026-08-19)
 
 **Problem.** `calculators/dtf-pricing.html` loaded `/product-url-handler.js`, deleted in
@@ -197,54 +229,3 @@ it is literally true of that ladder.
 
 ---
 
-## A security gate broke the E2E harness, and CI stayed red for two weeks (2026-08-18)
-
-**Problem.** Every CI run on `main` from 2026-08-05 to 2026-08-18 — 60+ consecutive runs — failed,
-and 10 releases shipped over the top of it. Three of four jobs were red: ESLint (1 error),
-`tsc checkJs` (15 errors), and Playwright E2E (10 failures, including every money-path spec and
-the DTF "zero locations must block save" guard).
-
-**Root cause.** Three unrelated breaks, none of which could block a deploy:
-- **E2E** — `fb2cb4a5` ("Security: gate /quote-builders") added `app.use('/quote-builders',
-  gateStaffHtml)` at `server.js:4905`. CI has no SAML config, so every builder page answered
-  `302 → /auth/saml/login → 503 "Staff SSO is not configured yet."` All 6 money specs died on
-  `waitForSelector('#product-search')` and the 4 axe specs scanned a 503 shell. **The gate was
-  right; the harness was what went stale.**
-- **ESLint** — `AbortController` was missing from the hand-maintained `globals` allowlist in
-  `eslint.config.mjs`, so `lib/product-seo.js` tripped `no-undef` from v2026.08.10.9.
-- **tsc** — five undeclared `window.*` bridges (`boxUrl`, `vendorLabel`, …) plus four loose
-  casts; all extraction debt that no gate was looking at.
-- 🔴 **Why nobody noticed for two weeks:** the `/deploy` skill's test gate runs `npm run test:unit`
-  ONLY. Lint, typecheck and E2E exist exclusively as CI jobs, and CI runs on `pull_request` +
-  push to develop/main — so a red `main` never blocked the next release. Green deploys, red CI,
-  no contradiction.
-
-**Fix.** `tests/e2e/staff-session.js` mints a real signed `nwca_staff` cookie with the same
-cookie-session/Keygrip primitives the server verifies with, under a secret pinned in
-`playwright.config.js`; specs run authenticated via `use.storageState`. `AbortController` added to
-the eslint globals; the five window bridges declared in `types/globals.d.ts`; the four casts
-pinned. Lint, typecheck, unit (125 suites) and DOM (10 suites) all green.
-
-**Prevention.**
-- 🔴 **A gate added to a page prefix breaks every headless caller of that prefix.** Grep
-  `tests/` for the path before shipping the gate — the E2E harness is a caller too.
-- 🔴 **NEVER open a `NODE_ENV==='test'` hole in an auth gate to make tests pass.** Sign a real
-  cookie the way a real browser would; a gate with a test-shaped hole is one env-var mistake
-  away from being no gate at all.
-- 🔑 **"Deploy is green" is not "CI is green."** The deploy gate was a strict subset of CI.
-  Widened 2026-08-18: `/deploy` step 0.6 now runs lint + typecheck + unit + dom + a11y (~23s,
-  measured), and step 0.7 reads CI's own verdict for the E2E job it can't reproduce.
-- 🔑 **A blind ratchet doesn't hold the line, it just stops reporting.** With the axe specs
-  scanning a 503 shell, a real contrast regression shipped and sat there: DTG's `.daf-sub` /
-  `.daf-note` were slate-400 `#94a3b8` on `#f8fafc` = **2.45:1** against a 4.5:1 requirement
-  (landed v2026.08.10.9, `shared_components/css/dtg-inline-form.css`). Fixed to slate-500
-  `#64748b` (4.55 / 4.51 on the two card backgrounds) — **never "fix" a ratchet by raising its
-  baseline**; the baseline only ever drops.
-- 🔑 **A CSS block copied between builders drifts silently.** `dtg-inline-form.css` carries a
-  copy of the `.order-recap` / `.ship-to-card` shell (DTG doesn't load `quote-builder-common.css`).
-  The shared file darkened those four labels #94a3b8→#64748b on **2026-06-10** for WCAG AA; the
-  DTG copy never got it and shipped 2.56:1 text for two months. Swept 2026-08-18 across all
-  builder CSS (26 sites). ⚠️ Contrast is **background-specific**: slate-500 is 4.55 on #f8fafc
-  but only 4.34 on #f1f5f9 and 3.86 on #e2e8f0 — two selectors needed slate-600 instead.
-  Not swept, deliberately: borders, decorative backgrounds, `:disabled` controls (WCAG 1.4.3
-  exempts inactive components) and `@media print` blocks.
