@@ -5,6 +5,27 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## A <script> tag pointing at a file deleted 11 months ago (2026-08-19)
+
+**Problem.** `calculators/dtf-pricing.html` loaded `/product-url-handler.js`, deleted in
+`a2a4027f` on 2025-09-27. Every visit to the DTF pricing page 404'd on it for ~11 months.
+
+**Root cause.** The cleanup removed the file without grepping HTML for references, and nothing
+fails loudly: a missing `<script src>` is a 404 in the network tab and an empty console.
+
+**Solution.** Deleted the tag. The page never needed it — zero occurrences of
+`style-search-input` or `loadProductDetails` (all the handler touches), and it parses
+`StyleNumber`/`COLOR` itself in 8 places.
+
+**Prevention.**
+- 🔑 **`scripts/build.js` is the detector**: it prints `[build] missing on disk, tag left
+  untouched: <path>`. That line is the only signal and it scrolls past in Heroku build output —
+  grep the deploy's build log for `missing on disk`.
+- ⚠️ **CLAUDE.md already requires grepping for a filename on delete** — this is the cost of
+  skipping it: the reference outlived the file by 11 months.
+
+---
+
 ## A version counter that hands out numbers already in use (2026-08-18)
 
 **Problem.** `/deploy` Step 1 picked a version BELOW one already in use, twice in one day. On
