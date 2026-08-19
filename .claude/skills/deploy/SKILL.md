@@ -15,12 +15,14 @@ Automates Northwest Custom Apparel's deploy pipeline `develop` → `main` → He
    never reached Heroku, the one failure every branch-level check reports as success
 3. **Single-version cache-bust** — one `$DEPLOY_VERSION` applied to all `?v=` query strings
 4. **Precise staging** — `git add -u` + explicit HTML files, never `-A`
-5. **Release-marker merge** — `--no-ff` so `git log --first-parent main` is a clean release log
-6. **CHANGELOG of actual commits** — captures develop's commits BEFORE the merge so the changelog isn't empty
-7. **Real Heroku release verification** via `heroku releases --json`, not blind sleep
-8. **Dynamic stale-slug detection** with `ps:restart` → `ps:scale` escalation
-9. **Optional Slack notification** (silent skip if webhook unset; no debug chatter)
-10. **Copy-pasteable resume + rollback** procedures at end of skill
+5. **Release-contents review** (7.5) — prints the code half of `main..develop` with per-file
+   commit attribution, because a shared checkout ships every session's committed work, not just yours
+6. **Release-marker merge** — `--no-ff` so `git log --first-parent main` is a clean release log
+7. **CHANGELOG of actual commits** — captures develop's commits BEFORE the merge so the changelog isn't empty
+8. **Real Heroku release verification** via `heroku releases --json`, not blind sleep
+9. **Dynamic stale-slug detection** with `ps:restart` → `ps:scale` escalation
+10. **Optional Slack notification** (silent skip if webhook unset; no debug chatter)
+11. **Copy-pasteable resume + rollback** procedures at end of skill
 
 **Non-interactive by design.** Pre-flight gates are the only thing standing between "you typed /deploy" and "code is live on Heroku." No confirmation gate, no session-doc prompt — both proved to be friction without payoff in real runs.
 
@@ -507,6 +509,77 @@ echo "$RELEASE_COMMITS"
 
 **Critical**: this captures develop's commits BEFORE the merge muddies the topology. Used in both Step 9 (CHANGELOG) and Step 10 (tag). The `|| git rev-list --max-parents=0 HEAD` fallback handles the first-ever deploy in a repo (no prior tag).
 
+### Step 7.5 — Guard: review what is actually in this release (added 2026-08-19)
+
+Step 3.6a catches another session's **uncommitted** hunks that `git add -u` would sweep in.
+Nothing catches another session's **already-committed** work sitting on `develop` — and
+`/deploy` ships all of it, not just what this session touched. In a shared checkout that is
+the normal case rather than the exception — two consecutive releases measured while adding
+this step both carried memory-doc commits from other sessions that the deploying session had
+never seen.
+
+Docs can't break production; code can. So split the release and print the code half with
+per-file attribution, loudly, before the merge:
+
+```bash
+# Range is main..develop - literally what this merge will add. NOT
+# "$LAST_TAG"..develop: if a tag was ever missed (Step 0.4a warns about exactly
+# that) LAST_TAG sits behind main and the attribution over-reports by whole
+# releases. Measured: a stale tag turned a 3-file release into a 106-file wall
+# of output, which is the same as printing nothing.
+ALL_CHANGED=$(git diff --name-only main develop)
+DOC_RE='^(memory/|docs/)|\.md$|^CHANGELOG'
+CODE_FILES=$(printf '%s\n' "$ALL_CHANGED" | grep -Ev "$DOC_RE" || true)
+CODE_COUNT=$(printf '%s\n' "$CODE_FILES" | grep -c . || true)
+DOC_COUNT=$(printf '%s\n' "$ALL_CHANGED" | grep -Ec "$DOC_RE" || true)
+MAX_FILES=40
+
+echo "-- Release contents ----------------------------------"
+echo "  docs/memory: ${DOC_COUNT} file(s) - not production-affecting"
+echo "  CODE: ${CODE_COUNT} file(s)"
+printf '%s\n' "$CODE_FILES" | grep . | head -"$MAX_FILES" | while IFS= read -r F; do
+  echo "    $F"
+  git log main..develop --pretty="        %h  %s" -- "$F" | head -3
+  EXTRA=$(( $(git log main..develop --oneline -- "$F" | wc -l) - 3 ))
+  [ "$EXTRA" -gt 0 ] && echo "        ... and ${EXTRA} more commit(s) touching this file"
+done
+if [ "$CODE_COUNT" -gt "$MAX_FILES" ]; then
+  echo "  !! $(( CODE_COUNT - MAX_FILES )) MORE code file(s) not listed - a release this"
+  echo "     wide is unusual. Run: git diff --stat main develop"
+fi
+echo "------------------------------------------------------"
+```
+
+**Read that list before continuing.** If a code file isn't yours and you can't say what it
+is, stop and find out — `git show <sha>` on the commit printed beside it. Author name does
+NOT disambiguate: every session in this checkout commits as the same git user, so a foreign
+commit looks exactly like your own.
+
+The one machine-decidable case aborts on its own — a commit that has announced it isn't ready:
+
+```bash
+WIP=$(git log main..develop --pretty="%h %s" \
+      | grep -iE '(^|[[:space:]])(wip|do not deploy|dont deploy|do not merge|dont merge|temp commit|scratch commit)([[:space:]]|:|$)' || true)
+if [ -n "$WIP" ] && [ "${DEPLOY_ALLOW_WIP:-}" != "1" ]; then
+  echo "X DEPLOY ABORTED - release contains work-in-progress commit(s):"
+  printf '%s\n' "$WIP" | sed 's/^/    /'
+  echo "  These sit on develop and WILL ship. Confirm they're finished, or drop them."
+  echo "  Deliberate? Re-run with DEPLOY_ALLOW_WIP=1."
+  git checkout develop
+  exit 1
+fi
+```
+
+Nothing has merged at this point, so aborting here is clean: `main` is untouched and
+`develop` is already pushed, so no work is lost.
+
+⚠️ **Deliberately NOT a blanket "code changed → abort".** Every real release changes code, so
+that gate would fire on every deploy and get bypassed by reflex — the same way a red gate
+becomes no gate in Step 2's `CACHEBUST_ALLOW_MISS` note. The loud printout is the control;
+the hard abort is reserved for a commit that literally says it isn't ready. Keep the WIP
+pattern narrow for the same reason — `debug` and `hack` are excluded on purpose, since
+"remove debug logging" is a normal, shippable commit subject in this repo.
+
 ### Step 8 — Merge develop with `--no-ff`
 
 ```bash
@@ -985,6 +1058,8 @@ Then run `/deploy` on the next real change so the tag and CHANGELOG stop lagging
 | Tests fail (any suite in `tests/unit/`) | Abort | Fix the test — it's the never-break rules speaking. `--skip-tests` is for prod-is-down emergencies only |
 | Untracked asset referenced by HTML (Step 3.5) | Abort — would 404 in prod | `git add` the new file, re-deploy |
 | Dirty tree blocks `checkout main` (Step 6) | Abort — won't deploy wrong branch | Commit/stash stray changes, re-deploy |
+| WIP / "do not deploy" commit on develop (Step 7.5) | Abort before merging; returns to develop | Confirm the commit is finished or drop it. Deliberate? `DEPLOY_ALLOW_WIP=1` |
+| Unfamiliar CODE file in the release (Step 7.5) | None — printed, not blocked | Read the printout. `git show <sha>` on the commit beside it; author name never disambiguates in a shared checkout |
 | Merge conflict on main | Auto `merge --abort`, return to develop | Resolve manually, re-run |
 | `--ff-only` pull fails | Abort | Investigate divergent main |
 | Heroku release `failed` | Abort | `heroku releases:output` to see why |
@@ -1039,6 +1114,7 @@ broken one and makes the diagnosis harder.
 | Var | Required? | Purpose |
 |---|---|---|
 | `SLACK_DEPLOY_WEBHOOK_URL` | Optional | Posts deploy summary to a Slack channel. Skill skips silently if unset. Use same pattern as existing `SLACK_SUPACOLOR_HEALTH_WEBHOOK_URL`. |
+| `DEPLOY_ALLOW_WIP` | Optional | Set to `1` to proceed past Step 7.5's work-in-progress abort. Only after confirming the flagged commit really is finished — the subject said it wasn't. |
 | `CACHEBUST_ALLOW_MISS` | Optional | Set to `1` to proceed past Step 2's silent-no-op abort. **Only** after eyeballing the listed assets and confirming the `?v=` hit belongs to a *different* file that merely shares the basename. If the ref really is unbumped, fix it instead — that is the exact failure this abort exists to catch. |
 
 ## Known cosmetic noise
@@ -1151,3 +1227,29 @@ no commits under it, and a version number burned. The fix is to resume at Step 1
 Step 1. This was the second interrupted run in two days (the 2026-08-17 outage diagnosis found a
 prior run's Step 16 had never completed either), so the recovery path is now written down rather
 than re-derived each time.
+
+**Pass 6 (2026-08-19) — nothing showed you whose work you were shipping:**
+
+| Old behavior | New behavior |
+|---|---|
+| Step 3.6a checked staged **uncommitted** hunks for another session's work | Step 7.5 also reviews what is **already committed** on `develop` — the part `/deploy` actually ships |
+| The release contents were never printed before the merge | Code and docs are split and the code half is printed with per-file commit attribution |
+| A `WIP` / "do not deploy" commit on develop shipped silently | Hard abort before the merge, with `DEPLOY_ALLOW_WIP=1` as the deliberate override |
+
+`/deploy` releases everything on `develop`, not just the current session's work, and a shared
+OneDrive checkout means several sessions commit there concurrently. Step 3.6a already guarded the
+working tree; nothing guarded the commit log, so a half-finished change committed by another
+session would ride out to production under someone else's release tag.
+
+The gate is deliberately **loud rather than blocking**. A blanket "code changed → abort" fires on
+every real release and gets bypassed by reflex — the failure mode Step 2's `CACHEBUST_ALLOW_MISS`
+note already describes. Only the machine-decidable case aborts: a commit whose own subject says it
+is not ready. The WIP pattern was verified in both directions against 133 real commits from this
+repo — 5 synthetic WIP subjects all caught, **zero** false positives, with `debug` and `hack`
+deliberately excluded because "remove debug logging" is a normal shippable subject here.
+
+One sizing bug was caught while testing: attributing commits over `"$LAST_TAG"..develop` rather
+than `main..develop` over-reports by whole releases whenever a tag was missed (the exact condition
+Step 0.4a warns about) — it turned a 3-file release into 106 files and ~250 lines, which is the
+same as printing nothing. The range is `main..develop`, and the output is capped at 40 files and
+3 commits per file with an explicit count of what was withheld.
