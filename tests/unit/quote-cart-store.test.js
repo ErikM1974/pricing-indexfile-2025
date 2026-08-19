@@ -238,4 +238,40 @@ describe('QuoteCartStore', () => {
             spy.mockRestore();
         }
     });
+
+    // updateSizes — the cart page's size-matrix edit (2026-08-19, WQ-2026-006:
+    // the PDP puts the whole qty on one standard size; the matrix is where the
+    // customer distributes it).
+    describe('updateSizes', () => {
+        test('replaces the breakdown and mirrors qty to the sum', () => {
+            const store = freshStore();
+            const it = store.add(sampleItem({ qty: 17, sizes: { S: 17 } }));
+            const updated = store.updateSizes(it.id, { S: 6, M: 8, XS: 1, L: 2 });
+            expect(updated.sizes).toEqual({ S: 6, M: 8, XS: 1, L: 2 });
+            expect(updated.qty).toBe(17);
+            expect(store.getItems()[0].sizes).toEqual({ S: 6, M: 8, XS: 1, L: 2 });
+            expect(store.totalPieces()).toBe(17);
+        });
+
+        test('drops zero/negative/junk sizes; all-empty edit is rejected untouched', () => {
+            const store = freshStore();
+            const it = store.add(sampleItem({ qty: 10, sizes: { M: 10 } }));
+            const updated = store.updateSizes(it.id, { S: 3, M: 0, L: -2, XL: 'x' });
+            expect(updated.sizes).toEqual({ S: 3 });
+            expect(updated.qty).toBe(3);
+
+            expect(store.updateSizes(it.id, { S: 0, M: 0 })).toBeNull();
+            expect(store.getItems()[0].sizes).toEqual({ S: 3 });   // untouched
+            expect(store.updateSizes('nope', { S: 1 })).toBeNull();
+        });
+
+        test('fires onChange like every other mutation', () => {
+            const store = freshStore();
+            const it = store.add(sampleItem());
+            const seen = [];
+            store.onChange(function (n) { seen.push(n); });
+            store.updateSizes(it.id, { S: 4, L: 4 });
+            expect(seen.length).toBe(1);
+        });
+    });
 });

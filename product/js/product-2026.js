@@ -762,9 +762,12 @@
         });
         const n = window.QuoteCartStore.count();
         const unit = sel.isCap ? 'cap' : 'piece';
+        // Garments land on one standard size here — the cart's size matrix is
+        // where the customer distributes them (2026-08-19), so say so.
+        const cta = sel.isCap ? 'View quote' : 'Set sizes &amp; view quote';
         showToast('success', 'Added — ' + sel.qty + ' ' + unit + (sel.qty === 1 ? '' : 's')
             + ' · ' + escapeHtml(sel.methodLabel)
-            + ' &nbsp;<a href="/quote-cart">View quote (' + n + ')</a>');
+            + ' &nbsp;<a href="/quote-cart">' + cta + ' (' + n + ')</a>');
     }
 
     /** Core .toast primitive — html must already be escaped by the caller. */
