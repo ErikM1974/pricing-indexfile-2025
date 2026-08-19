@@ -19,7 +19,11 @@ work), so every check short of an actual git operation says the token is fine. T
 is reported as a missing repository and never mentions scope.
 
 **Solution.** Mint with the default (global) scope. Least privilege is not available here —
-`write` is not a narrower version of what git needs, it simply does not work.
+`write` is not a narrower version of what git needs, it simply does not work. Wired
+2026-08-19: authorization `NWCA git deploy (1yr)`, stored at `~/.heroku-deploy-token` (ACL
+owner-only), read directly by the `git.heroku.com` credential helper. ⏭️ **Renew before
+2027-08-19.** Full setup + recreate commands: `.claude/skills/deploy/SKILL.md` § Heroku CLI v11
+git auth.
 
 **Prevention.**
 - 🔑 **Verify any Heroku credential change with a no-op `git push heroku main`.** When main is

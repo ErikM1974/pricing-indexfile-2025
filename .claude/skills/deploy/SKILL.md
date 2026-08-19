@@ -1090,20 +1090,42 @@ never reads. Cost ~5 rounds of "I'm logged in" / "still unauthorized" before it 
 KEY='credential.https://git.heroku.com.helper'
 git config --global --unset-all "$KEY"
 git config --global --add "$KEY" ""
-git config --global --add "$KEY" '!f() { if [ "$1" = get ]; then echo username=heroku; echo "password=$(heroku auth:token)"; fi; }; f'
+git config --global --add "$KEY" '!f() { if [ "$1" = get ]; then echo username=heroku; echo "password=$(cat "$HOME/.heroku-deploy-token")"; fi; }; f'
 ```
 
 The empty value resets the inherited helper list **for that host only**, so Windows
 Credential Manager can't answer first with nothing usable; GitHub keeps using `manager`
-and is untouched. The helper shells out to `heroku auth:token` on every push, so it always
-uses whatever the CLI currently holds — meaning a plain `heroku login` DOES fix an expired
-token from here on.
+and is untouched.
 
-**Verify without pushing:** `git ls-remote heroku HEAD` — a SHA means auth works.
+**The helper reads a dedicated long-lived token from a file (changed 2026-08-19)** — it does
+NOT call `heroku auth:token`, so git auth is independent of the CLI session and `heroku
+login`/`logout` keep their normal meaning. Current token: authorization `NWCA git deploy
+(1yr)`, `global` scope, expires **2027-08-19**, stored at `~/.heroku-deploy-token` (ACL
+locked to the owner). Recreate it in **PowerShell** — `authorizations:create` hits a
+`'C:\Program' is not recognized` path bug under git-bash:
 
-⚠️ `heroku auth:token` warns the session token expires (~30 days). When deploys start
-failing again, `heroku login` is now genuinely sufficient. For a year-long token instead,
-use `heroku authorizations:create`.
+```powershell
+$t = (& heroku authorizations:create -d "NWCA git deploy (1yr)" -e 31536000 --short | Out-String).Trim()
+Set-Content "$env:USERPROFILE\.heroku-deploy-token" -Value $t -NoNewline -Encoding ascii
+icacls "$env:USERPROFILE\.heroku-deploy-token" /inheritance:r /grant:r "$($env:USERNAME):(R,W)"
+```
+
+🔴 **Omit `-s` — Heroku's git endpoint accepts ONLY `global`-scope tokens.** A `write`-scoped
+token works fine against the API (`authorizations`, `releases`, `ps`) but git rejects it as
+`remote: ! Couldn't find that user.` → `fatal: repository ... not found`, which reads like a
+deleted app, not a scope problem. Verified the hard way 2026-08-19.
+
+**Verify:** `git ls-remote heroku HEAD` gives a SHA, but the real test is a no-op
+`git push heroku main` — `Everything up-to-date` still completes the full auth handshake with
+zero effect, exercising the exact path Step 12 uses.
+
+⚠️ **Renew before 2027-08-19**, or git pushes start failing. The CLI's own session token
+(`heroku auth:token`, ~14 days) is no longer in the git path at all — but it still rolls
+forward on every heroku command, so `heroku login` remains the fix for CLI-side auth.
+
+⚠️ **Do not put the token in `HEROKU_API_KEY`.** The env var overrides the CLI session
+globally, so `heroku login`/`logout` stop controlling auth and a revoked token fails in a way
+indistinguishable from the v11 bug below.
 
 ⚠️ **Do not run `heroku logout` to "reset" a broken login.** It empties `_netrc`, which on
 an older CLI was the *last* thing still feeding git — that turns a working git push into a
