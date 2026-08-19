@@ -5,6 +5,43 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## A version counter that hands out numbers already in use (2026-08-18)
+
+**Problem.** `/deploy` Step 1 picked a version BELOW one already in use, twice in one day. On
+v2026.08.18.4 it proposed `.2` while `product.html` already carried `?v=2026.08.18.3`; on
+v2026.08.18.5 it proposed `.3` while tag `v2026.08.18.4` existed. Both were caught by hand
+mid-deploy; neither would have failed a gate.
+
+**Root cause.** `N=$(git tag -l "v${TODAY}.*" | wc -l) + 1` — a **count**, used to answer "what
+is the next unused version". A count is only equal to max+1 when the day's numbers are dense AND
+tags are the sole record of them. Neither holds: a hand-bumped `?v=` in HTML claims a version
+with no tag behind it, and a skipped/abandoned tag number leaves a hole the count silently
+reuses.
+
+**Solution.** Step 1 now takes `max(highest tag today, highest ?v= in HTML today) + 1`
+(`.claude/skills/deploy/SKILL.md` Step 1). Both incident states replayed against the new formula
+return `.4` and `.5` — the values chosen by hand — where `count+1` returns `.2` and `.3`.
+
+**Prevention.**
+- 🔴 **Next-id = max-in-use + 1, never count.** They diverge the instant a number is skipped or
+  claimed outside the list you're counting. This applies to any allocator, not just this one.
+- 🔑 **A version lives in two places, so read both.** Tags are the record of releases; `?v=` in
+  HTML is the record of what a browser was told to fetch. A hand-bump writes the second without
+  the first, so a tags-only read is blind to it.
+- ⚠️ **Both failures are silent by construction.** A low version makes Step 2 rewrite a live
+  `?v=` *backwards* — browsers holding the newer value never refetch, so reps run old pricing
+  code against a new server — and it puts `git tag` out of order, so the next release's
+  `git describe --tags` baseline is wrong and its CHANGELOG re-lists shipped commits. Nothing
+  errors. Sparse tag numbers are normal; dense ones were never a goal.
+- 🔑 **Step 2's cache-bust is a no-op on the ~125 pages in `lib/hashed-pages.js`** (all 4 quote
+  builders, index, product, catalog, every `custom-*`, all dashboards, all calculators).
+  `scripts/build.js` rewrites their refs to content-hashed `/dist/…<hash>.js` at build time, so
+  the `?v=` never reaches a browser. Verified 2026-08-18: all 25 `/dist/` refs on the live PDP
+  reproduce byte-identically from a local rebuild of `origin/main`. The `?v=` path still governs
+  every page NOT on that list.
+
+---
+
 ## A dependency bump that passes all five gates and takes the whole site down (2026-08-18)
 
 **Problem.** Dependabot PR #27 (`marked` 12.0.2 → 18.0.9) sat open looking ordinary. Merging it
@@ -190,72 +227,3 @@ pinned. Lint, typecheck, unit (125 suites) and DOM (10 suites) all green.
   but only 4.34 on #f1f5f9 and 3.86 on #e2e8f0 — two selectors needed slate-600 instead.
   Not swept, deliberately: borders, decorative backgrounds, `:disabled` controls (WCAG 1.4.3
   exempts inactive components) and `@media print` blocks.
-
----
-
-## A fillable PDF that opens BLANK, and a Caspio 502 that was really a length cap (2026-08-17)
-
-**Problem.** Adding the Business Credit Application (No Personal Guaranty) to the Forms Library
-turned up two traps. ① The source PDF's 34 AcroForm fields each had their own `/DA`, but the
-AcroForm carried **no `/NeedAppearances`** — so a viewer that doesn't regenerate appearance
-streams renders the stale EMPTY ones. The customer types, signs, emails it back, and the copy we
-open looks blank. ② `POST /api/forms-library` returned an opaque **502 "Forms library create
-failed"** — which reads like Caspio being down, or a bad secret.
-
-**Root cause.** ① `/NeedAppearances` is the flag that tells a viewer "regenerate the field
-appearance on edit"; without it the widget's pre-baked (empty) `/AP` is what gets drawn and saved.
-Nothing warns you — it looks perfect in the viewer you happen to test in. ② The `Description`
-column has a length cap. **284 chars → 502; 188 chars → 201.** The route wraps every Caspio error
-as one generic 502, so a field-length rejection is indistinguishable from an outage or an auth
-failure.
-
-**Fix.** ① Set `/NeedAppearances = true` (plus a form-level `/DA` fallback) on the copy committed
-to `/forms/` — `forms/business-credit-application-no-personal-guaranty.pdf`, shipped
-`v2026.08.17.7`. ② Shortened the Description to 188 chars; row created, live under Payments
-(Sort_Order 33).
-
-**Prevention.**
-- 🔴 **A fillable PDF is not verified until you check `/NeedAppearances`.** Any PDF landing in
-  `/forms/` that customers or staff TYPE INTO gets the flag set before commit. This is the same
-  shape as Erik's #1 rule: the failure is silent and looks like success — blank fields read as
-  "they forgot to fill it in", not "our PDF ate their answers".
-- 🔑 **Re-open the written copy and count the fields.** `PdfWriter` can silently drop the
-  AcroForm; assert pages + field-name set + editability against the source, then curl the SERVED
-  file and re-parse it (the byte count matching the file on disk is the cheap version).
-- 🔴 **`Forms_Library.Description` is capped — keep it ≤ 200 chars**, in line with the longest
-  existing row (203). Over-length surfaces as a generic 502, never as a validation message.
-- 🔑 **Order matters: deploy the PDF BEFORE adding the registry row.** The row goes live within
-  the route's 60 s cache, so a row added first puts a Download button pointing at a 404 in front of
-  every staff member. (Escape hatch if you can't deploy yet: create it `Is_Active = No` — the GET
-  filters to `Yes` — then PUT it to `Yes` after.)
-- ⚠️ **`io.open(path,'w')` TRUNCATES before it writes** — a `UnicodeEncodeError` mid-write left
-  ACTIVE_FILES.md at 0 bytes (recovered with `git checkout --`). Build the full string, write a
-  temp file, verify its size, then `os.replace`. Also: this repo's markdown is **CRLF**, and
-  LESSONS/MEMORY carry a **BOM** — an LF-only anchor match silently finds nothing.
-
-**Follow-up the same day — Erik asked for the form to be staff-only, and the first gate leaked.**
-`/forms` is a PUBLIC `express.static` mount, so gating one file meant a middleware above it.
-The obvious version compared `req.path` to the filename with string equality and looked right.
-It was measured serving the **complete PDF, 200 and anonymous**, to `/forms/<file>.pdf::$DATA` —
-Win32 opens a file's default NTFS data stream under that name, so serve-static returned all
-321,188 bytes while the gate saw a string it didn't recognise. Fix: canonicalise to a BARE
-FILENAME (basename → cut at `:` → strip trailing dots/spaces), never compare the raw path.
-Live `v2026.08.17.8`, verified anonymously in prod across 5 URL shapes.
-- 🔴 **A path gate must collapse every spelling that resolves to the same file.** serve-static
-  resolves the path its own way; anything the gate normalises differently is a bypass. Dot-segments
-  (`/forms/x/../f.pdf`) are the shape that applies on Linux, where prod runs — `::$DATA` is Win32-only
-  but defended anyway, because "it happens to hold on this OS" is not a security property.
-- 🔑 **Test the gate from BOTH sides.** Over-gating is a real failure here: the handbook and the
-  meal-period waiver are opened by signed-OUT employees, and bouncing them into staff SSO they can't
-  complete would be the same size of bug. `forms-staff-only.test.js` walks every PDF on disk.
-- 🔑 **Probe the running server, don't reason about the router.** Whether Express normalises `..`
-  before routing decided the whole design; one curl battery answered it in seconds, and it is what
-  turned up `::$DATA`, which no amount of reading the code would have.
-- 🔴 **"Nothing links to it" from a REPO grep is not evidence — half this site's content lives in
-  Caspio.** I called `forms/policies/credit-card-authorization.pdf` orphaned on a repo grep and told Erik
-  so. Grepping `Body_HTML` across all 142 live policies (`/api/policies-public/<id>`, ~142 calls) found the
-  **Credit Card SOP** linking it, on a hub page that is anonymously reachable. ⚠️ `/api/policies-public/search`
-  and the tree's `Body_Plain` BOTH strip markup — `q=href` returns 0 — so neither can see a URL in an
-  attribute. Before changing who can reach a file, grep the CMS, and sanity-check the search index first.
-
----
