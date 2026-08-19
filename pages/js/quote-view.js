@@ -710,12 +710,34 @@ class QuoteViewPage {
         const rawNotes = this.quoteData?.Notes;
         if (!rawNotes) return;
 
-        // Skip if Notes is valid JSON (structured config for DTG/DTF/SP)
-        try { JSON.parse(rawNotes); return; } catch (e) { /* plain text — render it */ }
-
         const section = document.getElementById('special-notes-section');
         const content = document.getElementById('special-notes-content');
         if (!section || !content) return;
+
+        // Notes is valid JSON on structured quotes (DTG/DTF/SP config, WQ
+        // web-cart). Web-cart JSON carries the CUSTOMER'S typed checkout notes
+        // in customerNotes — the one place a customer writes things like their
+        // real size breakdown. Skipping ALL JSON hid them from the rep
+        // (WQ-2026-006: "A-M 8 / A-S 6 / XS 1 / L 2" was invisible while the
+        // cart line said S×17). Surface customerNotes; keep skipping the rest
+        // of the structured config.
+        let parsed = null;
+        try { parsed = JSON.parse(rawNotes); } catch (e) { /* plain text — render below */ }
+        if (parsed) {
+            const cn = typeof parsed.customerNotes === 'string' ? parsed.customerNotes.trim() : '';
+            if (!cn) return;
+            const label = document.createElement('strong');
+            label.textContent = 'Customer notes (typed at checkout):';
+            const body = document.createElement('div');
+            body.style.whiteSpace = 'pre-wrap';   // keep the customer's line breaks/tabs
+            body.style.marginTop = '4px';
+            body.textContent = cn;
+            content.innerHTML = '';
+            content.appendChild(label);
+            content.appendChild(body);
+            section.style.display = 'block';
+            return;
+        }
 
         content.textContent = rawNotes;
         section.style.display = 'block';
