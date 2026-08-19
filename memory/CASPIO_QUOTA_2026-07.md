@@ -107,25 +107,34 @@ set up and verify than the calls save. This is a routing rule, not a ban on API 
   of a day's budget, split ~7,500 direct-to-Caspio + ~4,300 through the proxy. Day total
   **23,799** — the period's worst, effectively tying 27 Jul (23,959), the day that billed $358.
 
-## Known remaining waste — FOUND 2026-08-07, not fixed (no urgency at ~74%)
+## REFUTED 2026-08-19 — the contacts sync was never missing its dedupe
 
-**`upsertContact` PUTs every contact row on every run, with no content comparison**
-(`src/routes/shopworks-odbc-sync.js`, `upsertContact` — PUT with `q.where=ID_Contact=N`,
-then POST if `RecordsAffected` is 0). This is the exact pattern the 30 Jul row-hash dedupe
-removed from **`sync-orders.ps1`** and **`sync-purchase-orders.ps1`** (55% of a dyno window →
-`PUT: 2`). **I fixed two siblings and never checked for a third** — same miss as the
-"security fix landed on ONE route, six siblings sat open" lesson.
+Recorded 2026-08-07 as *"I fixed two siblings and never checked the third."* **That was
+wrong.** `sync-contacts.ps1` has content dedupe, and a BETTER one than orders/POs:
 
-- Measured 2026-08-11: `CompanyContactsMerge2026` was the **#1 table**, 749 calls over a
-  13.6 h dyno window, with `PUT: 1,144` of 3,653 calls (31% writes).
-- ⚠️ **Not cleanly trendable from dyno windows** — the sync is bursty, so a short window
-  may or may not catch a run. Size it from the bandit task cadence + row count, not from
-  a `/api/admin/metrics` snapshot.
-- 🔑 The argument for fixing it is **structural, not volume**: it scales with the CONTACT
-  COUNT, not with traffic, so it grows on its own regardless of how busy the business is.
-- ❌ Do NOT infer the state of this from `sync-contacts.ps1` — that script POSTs *batches*
-  to the proxy and has its own skip logic; the unconditional write is on the PROXY side.
-  Checking the PowerShell layer for `Get-RowHash` gives a false read (I made this mistake).
+    $pending = @($all | Where-Object { $k = [string]$_.ID_Contact
+                  -not $confirmed.ContainsKey($k) -or $confirmed[$k] -ne $newHash[$k] })
+
+It keeps a per-row content snapshot (`$SnapshotPath` JSON), sends only new/changed rows,
+heartbeats and exits when `$pending.Count -eq 0`, and **confirms a row only after a
+successful POST** so a failed send retries — which the orders dedupe does not do.
+`upsertContact`'s unconditional PUT is therefore CORRECT: its one and only caller is the
+`/sync-contacts` batch endpoint, which never receives an unchanged row.
+
+**Two reasoning errors, both worth not repeating:**
+
+1. **Judged a write layer without reading its caller.** An unconditional PUT is only waste
+   if nothing upstream filters first. Here it did.
+2. **Linked a table's call count to a dyno-wide PUT count.** "749 on
+   `CompanyContactsMerge2026`" and "PUT: 1,144 of 3,653" came from the same snapshot — but
+   the 749 was all methods on ONE table and the 1,144 was all methods across ALL tables.
+   Correlating them was invention. That table has ~8 legitimate readers (`ae-dashboard`,
+   `command-search`, `company-contacts*`, `embroidery-bonus`, `jotform`, `lead-conversion`),
+   so a high count there is unremarkable.
+
+🔑 **`/api/admin/metrics` reports per-table counts and per-method counts but does NOT
+cross-tab them.** You cannot attribute writes to a specific table from that endpoint —
+neither can I. Measure the job, not the snapshot.
 
 ## Killed by measurement — do NOT re-propose
 
