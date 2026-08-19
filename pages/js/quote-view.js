@@ -38,7 +38,8 @@ class QuoteViewPage {
             'PATCH': 'Embroidered Emblems',
             'STK': 'Die-Cut Stickers & Vinyl Banners',
             'OF':  'Order Form',  // A4 (2026-05-22): OF-NNNN was falling through to "Custom Quote"
-            'WQ':  'Web Quote Request'  // Phase 3 customer quote-cart (2026-06-11)
+            'WQ':  'Web Quote Request',  // Phase 3 customer quote-cart (2026-06-11)
+            'SAM': 'Sample Order — Blanks'  // paid Top Sellers samples (2026-08-19): was "Custom Quote"
         };
 
         // Method subhead labels for MIXED-method quotes (WQ web-cart quotes can
@@ -293,7 +294,9 @@ class QuoteViewPage {
 
         // Quote details
         document.getElementById('quote-type').textContent = this.getQuoteType();
-        document.getElementById('created-date').textContent = this.formatDate(this.quoteData.CreatedAt_Quote);
+        // Some session rows populate CreatedAt but not CreatedAt_Quote (storefront
+        // orders, imported/accepted DTG quotes) — same fallback the timeline uses.
+        document.getElementById('created-date').textContent = this.formatDate(this.quoteData.CreatedAt_Quote || this.quoteData.CreatedAt);
         document.getElementById('expires-date').textContent = this.formatDate(this.quoteData.ExpiresAt);
 
         // Sales Rep (if available)
@@ -457,8 +460,9 @@ class QuoteViewPage {
             }
         }
 
-        // Check expiration
-        if (this.isExpired()) {
+        // Check expiration — a paid storefront order is DONE, not expired,
+        // once its 30-day quote window lapses.
+        if (this.isExpired() && !this._storefrontPaidInfo()) {
             document.getElementById('expired-banner').style.display = 'flex';
             document.getElementById('accept-quote-btn').disabled = true;
             document.getElementById('accept-quote-btn').title = 'Quote has expired';
@@ -467,6 +471,14 @@ class QuoteViewPage {
         // Check if accepted
         if (this.quoteData.Status === 'Accepted') {
             this.showAcceptedState();
+        }
+
+        // Paid storefront order: nothing left to accept — hide the CTA so a
+        // customer opening the share link isn't offered "Accept Quote" on an
+        // order they already paid for at checkout.
+        if (this._storefrontPaidInfo()) {
+            const acceptBtn = document.getElementById('accept-quote-btn');
+            if (acceptBtn) acceptBtn.style.display = 'none';
         }
 
         // Render DTF specs section if applicable
@@ -496,12 +508,34 @@ class QuoteViewPage {
         document.getElementById('modal-expires').textContent = this.formatDate(this.quoteData.ExpiresAt);
     }
 
+    // Paid storefront orders (samples / custom-tees / custom-caps / 3DT) are
+    // ORDERS, not open quotes. These three statuses are written ONLY by the
+    // Stripe webhook fulfillment paths in server.js ('Payment Confirmed' →
+    // 'Processed', or '… - ShopWorks Failed' when the push needs manual entry
+    // — the money is real in all three). Returns { status, amount } or null.
+    _storefrontPaidInfo() {
+        const status = String(this.quoteData?.Status || '');
+        const PAID = ['Processed', 'Payment Confirmed', 'Payment Confirmed - ShopWorks Failed'];
+        if (!PAID.includes(status)) return null;
+        let amount = null;
+        try {
+            const totals = JSON.parse(this.quoteData.OrderTotalsJSON || '{}');
+            if (Number.isFinite(Number(totals.grandTotal))) amount = Number(totals.grandTotal);
+        } catch (e) { /* legacy rows — amount stays null */ }
+        return { status, amount };
+    }
+
     renderStatus() {
         const statusEl = document.getElementById('quote-status');
         let statusClass = 'status-open';
         let statusText = 'Open';
 
-        if (this.quoteData.Status === 'Accepted') {
+        // Paid check FIRST: a completed order must never show 'Expired' just
+        // because its 30-day quote window lapsed after the customer paid.
+        if (this._storefrontPaidInfo()) {
+            statusClass = 'status-paid';
+            statusText = 'Paid Order';
+        } else if (this.quoteData.Status === 'Accepted') {
             statusClass = 'status-accepted';
             statusText = 'Accepted';
         } else if (this.isExpired()) {
@@ -982,8 +1016,9 @@ class QuoteViewPage {
         // they are the product, not something applied to a garment. Without this
         // the block fell through to the `location || 'Left Chest'` default at the
         // bottom and told sticker customers their stickers go on the left chest
-        // (2026-07-24).
-        if (['STK', 'PATCH'].includes(prefix)) return '';
+        // (2026-07-24). SAM added 2026-08-19: blank samples ship undecorated,
+        // and the same fallback told a sample order "Location: Left Chest".
+        if (['STK', 'PATCH', 'SAM'].includes(prefix)) return '';
 
         // CEMB (Contract Embroidery, AI-drafted) added 2026-05-14 (Phase 5)
         // so the Location + Stitches detail row renders on CEMB quote views.
@@ -2970,7 +3005,7 @@ class QuoteViewPage {
                         const amtStr = '$' + amt.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
                         return `
                             <tr>
-                                <td>${this.escapeHtml(date ? this.formatDate(date) : '—')}</td>
+                                <td>${this.escapeHtml(date ? this.formatShopWorksDate(date) : '—')}</td>
                                 <td>${this.escapeHtml(method)}</td>
                                 <td class="sw-payments-ref">${this.escapeHtml(ref || '—')}</td>
                                 <td class="sw-payments-amount">${amtStr}</td>
@@ -3650,6 +3685,7 @@ class QuoteViewPage {
                 const designTypeLabel = this._resolveDesignTypeName(order.id_DesignType, methodFallback);
                 tbody.innerHTML = `
                     <tr>
+                        ${this._designThumbCell(idDesign)}
                         <td class="sw-designs-id">${this.escapeHtml(String(idDesign || '—'))}</td>
                         <td class="sw-designs-name">${this.escapeHtml(order.DesignName || '(no name)')}</td>
                         <td class="sw-designs-type">${this.escapeHtml(designTypeLabel)}</td>
@@ -3689,6 +3725,7 @@ class QuoteViewPage {
                         : (d?.DesignName || order.DesignName || '(no name)');
                     return `
                         <tr>
+                            ${this._designThumbCell(dispId)}
                             <td class="sw-designs-id">${this.escapeHtml(String(dispId))}</td>
                             <td class="sw-designs-name">${this.escapeHtml(dispName)}</td>
                             <td class="sw-designs-type">${this.escapeHtml(designTypeLabel)}</td>
@@ -3706,7 +3743,46 @@ class QuoteViewPage {
         const allLocations = allPushedDesigns.flatMap(d => d?.Locations || []);
         this._renderArtworkThumbnails(allLocations);
 
+        // Per-row design thumbnails from the synced ShopWorks design library
+        // (fire-and-forget — covers designs attached in ShopWorks AFTER the
+        // push, which have no pushed Locations[].ImageURL art).
+        this._loadDesignPanelThumbnails();
+
         section.style.display = 'block';
+    }
+
+    // One <td> per design row. ShopWorks design ids can carry a version
+    // suffix ('37278.01'); the thumbnail library keys on the integer design
+    // number, so the cell stores just the integer part. Non-numeric ids
+    // ('—', ExtDesignID strings) get an empty cell.
+    _designThumbCell(designId) {
+        const m = String(designId == null ? '' : designId).match(/^(\d+)/);
+        if (!m) return '<td class="sw-designs-thumb-cell"></td>';
+        return `<td class="sw-designs-thumb-cell"><span class="sw-designs-thumb" data-design-thumb="${m[1]}"></span></td>`;
+    }
+
+    // Fill the Designs-table thumb cells via /api/thumbnails/by-designs —
+    // the same endpoint the EMB-import garment/cap thumbs already use.
+    // Non-blocking; a miss just leaves the cell empty.
+    _loadDesignPanelThumbnails() {
+        const spans = Array.from(document.querySelectorAll('#sw-designs-tbody [data-design-thumb]'));
+        const ids = [...new Set(spans.map((s) => s.getAttribute('data-design-thumb')).filter(Boolean))];
+        if (ids.length === 0) return;
+        fetch(`${this.apiBaseUrl}/api/thumbnails/by-designs?ids=${ids.join(',')}`)
+            .then((resp) => {
+                if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                return resp.json();
+            })
+            .then((data) => {
+                const thumbs = data.thumbnails || {};
+                spans.forEach((span) => {
+                    const entry = thumbs[span.getAttribute('data-design-thumb')];
+                    if (entry && entry.found && entry.imageUrl) {
+                        this._mountThumbInSpan(span, entry.imageUrl, 44);
+                    }
+                });
+            })
+            .catch((err) => console.warn('[QuoteView] Designs panel thumbnails failed:', err.message));
     }
 
     _renderArtworkThumbnails(locations) {
@@ -4518,6 +4594,18 @@ class QuoteViewPage {
             form.style.display = 'none';
             return;
         }
+        // Storefront orders paid via Stripe hosted checkout (samples, tees,
+        // caps): the deposit-link tool has nothing to enable — show the
+        // payment instead of 'Waiting for customer acceptance'.
+        const sfPaid = this._storefrontPaidInfo();
+        if (sfPaid) {
+            state.textContent = sfPaid.amount != null
+                ? `Paid ${this.formatCurrency(sfPaid.amount)} online at checkout`
+                : 'Paid online at checkout';
+            state.className = 'qv-deposit-strip-state is-paid';
+            form.style.display = 'none';
+            return;
+        }
         if (this.quoteData.Status !== 'Accepted') {
             state.textContent = 'Waiting for customer acceptance';
             state.className = 'qv-deposit-strip-state';
@@ -4727,12 +4815,23 @@ class QuoteViewPage {
     _showQuoteViewThumb(spanId, imageUrl) {
         const span = document.getElementById(spanId);
         if (!span) return;
+        this._mountThumbInSpan(span, imageUrl, 60);
+    }
+
+    // Shared mount: sized square thumb with click-to-zoom overlay. Used by the
+    // EMB-import design refs (60px) and the Designs-panel rows (44px).
+    _mountThumbInSpan(span, imageUrl, size) {
+        // /api/thumbnails returns an ABSOLUTE proxy Box url, which 401s
+        // cross-origin since the Box surface was session-gated — rewrite to
+        // same-origin so the staff cookie rides along (shared box-url.js;
+        // same normalization the inbound sheet does at ingest).
+        if (typeof boxUrl === 'function') imageUrl = boxUrl(imageUrl);
         const img = document.createElement('img');
         img.src = imageUrl;
         img.alt = 'Design preview';
         img.className = 'quote-view-design-thumb';
-        img.style.width = '60px';
-        img.style.height = '60px';
+        img.style.width = `${size}px`;
+        img.style.height = `${size}px`;
         img.style.objectFit = 'cover';
         img.style.borderRadius = '6px';
         img.style.border = '1px solid #e5e7eb';
