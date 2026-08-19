@@ -1,3 +1,7 @@
+## v2026.08.19.2 (2026.08.19)
+
+- DTF pricing: drop the <script> tag for a file deleted 11 months ago
+
 ## v2026.08.19.1 (2026.08.19)
 
 - Deploy skill: take max-in-use + 1 for the version, never a count
