@@ -1,3 +1,10 @@
+## v2026.08.19.4 (2026.08.19)
+
+- Heroku git auth: long-lived global-scoped token, wired git-only
+- SAM quotes: write quote_items rows so /quote + /invoice show line items
+- Quote view: present paid storefront orders as orders + design thumbnails
+- Deploy v2026.08.19.4: 1 files (quote-view.html...)
+
 ## v2026.08.19.3 (2026.08.19)
 
 - Memory: retract the contacts-sync waste finding -- it was wrong
