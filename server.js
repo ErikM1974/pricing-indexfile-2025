@@ -5956,6 +5956,37 @@ app.get('/api/staff/payments/recent', requireStaff, async (req, res) => {
 // goes through this staff-session-gated same-origin forwarder. Sending the CRM
 // secret also skips the proxy's per-IP SanMar rate limit. Validates the dates and
 // enforces SanMar's ≤3-month window before forwarding.
+// ---------------------------------------------------------------------------
+// Drive Access Center — the NCA-FS01 drive map (Admin → Access & Policy).
+//
+// WHY THIS IS A ROUTE AND NOT A STATIC FILE (2026-08-24)
+// The obvious build puts the snapshot in /dashboards/js/drive-access.js. That would
+// publish it: the /dashboards gate returns next() for anything not ending in .html,
+// so its .js and .css are served to anyone, signed in or not (verified live — GET
+// /dashboards/js/past-due-orders.js is a 200 with no session). The payload is UNC
+// paths, share names and the npi_admin / nweadmin file-admin account names — exactly
+// the reconnaissance an attacker wants, and Erik asked for admins only.
+//
+// So the data lives in lib/ (never statically served) and comes through here behind
+// requirePageAccess('drive-access.html'): the same Caspio Staff_Page_Access row that
+// governs the page governs its data, per the house page/API-twin rule. The page is
+// also in ADMIN_DEFAULT_PAGES, so with no row at all it is admin-only, not any-staff.
+//
+// Read-only by design — nothing here writes a mapping, an ACL or an account. To
+// update the snapshot, re-verify the GPO / AD groups / folder ACLs, edit the JSON,
+// bump verifiedAt, and deploy.
+// ---------------------------------------------------------------------------
+app.get('/api/staff/drive-access', requirePageAccess('drive-access.html'), (req, res) => {
+  try {
+    const data = require('./lib/drive-access-data.json');
+    res.set('Cache-Control', 'no-store');
+    res.json(data);
+  } catch (e) {
+    console.error('[drive-access] snapshot unreadable:', e.message);
+    res.status(500).json({ error: 'snapshot_unavailable' });
+  }
+});
+
 // SECURITY (2026-07-28): the SanMar Payables data routes below were requireStaff —
 // any logged-in staffer could pull vendor invoice + payables dollars. They now share
 // ONE gate with the page they feed (Staff_Page_Access → sanmar-payables.html, which
