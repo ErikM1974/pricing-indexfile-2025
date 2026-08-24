@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Drive Access Center — Northwest Custom Apparel</title>
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <link href="/dashboards/css/drive-access.css" rel="stylesheet">
+</head>
+<body>
+  <div class="da-wrap">
+    <header class="da-header">
+      <div>
+        <h1>Drive Access Center</h1>
+        <p class="da-sub">What appears in File Explorer for each person, versus what they can actually change or read. Read-only reference — nothing here edits the server.</p>
+      </div>
+      <a class="da-back" href="/staff-dashboard.html">← Dashboard</a>
+    </header>
+
+    <div class="da-hero">
+      <div>
+        <p class="da-eyebrow">Admin · File access</p>
+        <p class="da-hero-title">NCA-FS01 drive map</p>
+        <p class="da-hero-sub">Mapped from the <strong>NCA Drive Maps</strong> group policy, Active Directory group membership and audited folder ACLs.</p>
+      </div>
+      <div class="da-hero-badge">
+        <span class="da-hero-badge-label">Default production login</span>
+        <strong id="da-default-login">—</strong>
+      </div>
+    </div>
+
+    <!-- Erik's #1 rule: a data failure is shown, never swallowed. An empty grid must
+         never be able to read as "nobody has access to anything". -->
+    <div id="da-status" class="da-status" role="status" aria-live="polite"></div>
+
+    <div id="da-alerts"></div>
+
+    <div class="da-stats" id="da-stats" aria-label="Access snapshot summary"></div>
+
+    <div class="da-toolbar">
+      <label class="da-visually-hidden" for="da-search">Search access</label>
+      <input class="da-search" id="da-search" type="search" placeholder="Search a person, drive letter, folder or purpose…" autocomplete="off" disabled>
+      <div class="da-tabs" role="group" aria-label="Choose access view">
+        <button class="da-tab" type="button" data-view="people" aria-pressed="true">By person</button>
+        <button class="da-tab" type="button" data-view="drives" aria-pressed="false">By drive</button>
+      </div>
+      <button class="da-action" type="button" data-print>Print</button>
+    </div>
+
+    <div class="da-meta">
+      <span><strong>Server:</strong> <span id="da-server">—</span></span>
+      <span><strong>Policy:</strong> <span id="da-policy">—</span></span>
+      <span><strong>Verified:</strong> <span id="da-verified">—</span></span>
+      <span id="da-count" aria-live="polite"></span>
+    </div>
+
+    <div class="da-grid" id="da-grid">
+      <div class="da-empty">Loading the access snapshot…</div>
+    </div>
+
+    <footer class="da-footer">
+      <span><strong>Mapped</strong> — the drive letter appears automatically.</span>
+      <span><strong>Modify</strong> — create, edit, move, delete.</span>
+      <span><strong>Read only</strong> — open and copy.</span>
+      <span><strong>Full control</strong> — file-administrator accounts.</span>
+    </footer>
+
+    <p class="da-fineprint">
+      A person can have folder access without the drive letter being mapped — Erik reaches
+      K, R and T through <code>Y:</code> or a UNC path even though they do not auto-map for him.
+      To update this page, re-verify the GPO, recursive AD group membership and folder ACLs,
+      then edit <code>lib/drive-access-data.json</code> (bump <code>verifiedAt</code>) and deploy.
+    </p>
+  </div>
+  <script src="/dashboards/js/drive-access.js"></script>
+</body>
+</html>

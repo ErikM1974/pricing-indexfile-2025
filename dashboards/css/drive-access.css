@@ -1,0 +1,223 @@
+/*
+ * Drive Access Center — admin-only reference for the file-server drive map.
+ * NWCA green theme, matching access-admin.css. No inline styles.
+ *
+ * Source layout came from the MCA Drive Access package (navy/blue); recoloured here to
+ * the house palette: #1a472a dark / #3a7c52 mid / #4cb354 light, page bg #f5f7f5.
+ */
+
+:root {
+  --da-green: #1a472a;
+  --da-green-mid: #3a7c52;
+  --da-green-light: #4cb354;
+  --da-ink: #1f2a24;
+  --da-muted: #5a665e;
+  --da-line: #e2e8e4;
+  --da-soft: #f5f7f5;
+  --da-green-soft: #e8f5e9;
+  --da-amber: #a85f00;
+  --da-amber-soft: #fff3df;
+  --da-teal: #0f6e7a;
+  --da-teal-soft: #e4f2f4;
+  --da-red: #b3261e;
+  --da-red-soft: #fdeceb;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+  background: var(--da-soft);
+  color: var(--da-ink);
+}
+
+.da-wrap { max-width: 1180px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
+
+.da-visually-hidden {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+}
+
+/* ---- Page header (same shape as access-admin) ---- */
+.da-header {
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
+  border-bottom: 3px solid var(--da-green); padding-bottom: 1rem; margin-bottom: 1.25rem;
+}
+.da-header h1 { color: var(--da-green); font-size: 1.6rem; margin: 0; }
+.da-sub { color: var(--da-muted); margin: .35rem 0 0; font-size: .92rem; max-width: 68ch; }
+.da-back { color: var(--da-green-mid); text-decoration: none; font-weight: 600; font-size: .9rem; white-space: nowrap; }
+.da-back:hover { color: var(--da-green); }
+
+/* ---- Hero ---- */
+.da-hero {
+  display: flex; justify-content: space-between; gap: 1.5rem; align-items: flex-start;
+  padding: 1.5rem 1.6rem; color: #fff; border-radius: 14px;
+  background:
+    radial-gradient(circle at 88% 18%, rgba(76, 179, 84, .35), transparent 42%),
+    linear-gradient(135deg, #1a472a, #2d6a41);
+}
+.da-eyebrow {
+  margin: 0 0 .45rem; font-size: .72rem; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase; color: #b9dcc4;
+}
+.da-hero-title { margin: 0; font-size: clamp(1.4rem, 3vw, 1.9rem); font-weight: 700; line-height: 1.15; }
+.da-hero-sub { max-width: 62ch; margin: .55rem 0 0; color: #d7ecdd; line-height: 1.5; font-size: .92rem; }
+.da-hero-sub strong { color: #fff; }
+.da-hero-badge {
+  flex: 0 0 210px; padding: .85rem 1rem; text-align: center; color: #fff;
+  background: rgba(255, 255, 255, .13); border: 1px solid rgba(255, 255, 255, .25); border-radius: 12px;
+}
+.da-hero-badge-label {
+  display: block; font-size: .7rem; font-weight: 700;
+  letter-spacing: .08em; text-transform: uppercase; color: #cfe8d6;
+}
+.da-hero-badge strong { display: block; margin-top: .25rem; font-size: 1.4rem; letter-spacing: .04em; }
+
+/* ---- Status line: a failed fetch has to be loud ---- */
+.da-status { min-height: 0; margin: 0; font-size: .92rem; font-weight: 500; }
+.da-status.is-error {
+  min-height: auto; margin: 1rem 0 0; padding: .8rem 1rem; color: var(--da-red);
+  background: var(--da-red-soft); border: 1px solid #f0c4c0; border-radius: 10px;
+}
+
+/* ---- Alert banner (retired accounts) ---- */
+.da-alert {
+  display: flex; gap: .75rem; align-items: flex-start; margin: 1rem 0 0;
+  padding: .9rem 1rem; background: var(--da-red-soft);
+  border: 1px solid #f0c4c0; border-radius: 10px;
+}
+.da-alert-mark {
+  display: grid; flex: 0 0 28px; height: 28px; place-items: center;
+  color: #fff; font-weight: 800; background: var(--da-red); border-radius: 50%;
+}
+.da-alert strong { color: var(--da-red); }
+.da-alert p { margin: .15rem 0 0; line-height: 1.45; font-size: .9rem; }
+
+/* ---- Stats ---- */
+.da-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .75rem; margin: 1.25rem 0 0; }
+.da-stat { padding: .85rem 1rem; background: #fff; border: 1px solid var(--da-line); border-radius: 11px; }
+.da-stat b { display: block; color: var(--da-green); font-size: 1.5rem; line-height: 1.2; }
+.da-stat span { color: var(--da-muted); font-size: .8rem; }
+
+/* ---- Toolbar ---- */
+.da-toolbar {
+  display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; justify-content: space-between;
+  margin: 1.25rem 0 0; padding: .75rem; background: #fff;
+  border: 1px solid var(--da-line); border-radius: 12px;
+}
+.da-search {
+  min-width: min(100%, 320px); flex: 1 1 320px; padding: .6rem .75rem; color: var(--da-ink);
+  background: #fff; border: 1px solid #cdd8d1; border-radius: 8px; font: inherit;
+}
+.da-search:disabled { background: #f2f5f2; color: #9aa79f; }
+.da-search:focus, .da-tab:focus-visible, .da-action:focus-visible {
+  outline: 2px solid var(--da-green-mid); outline-offset: 1px; border-color: var(--da-green-mid);
+}
+.da-tabs { display: flex; gap: .35rem; }
+.da-tab, .da-action {
+  min-height: 38px; padding: .45rem .9rem; color: var(--da-green); background: #fff;
+  border: 1px solid #cdd8d1; border-radius: 8px; font: inherit; font-weight: 600; cursor: pointer;
+}
+.da-tab:hover, .da-action:hover { border-color: var(--da-green-mid); }
+.da-tab[aria-pressed="true"] { color: #fff; background: var(--da-green); border-color: var(--da-green); }
+
+/* ---- Meta strip ---- */
+.da-meta {
+  display: flex; flex-wrap: wrap; gap: .5rem 1.25rem; align-items: center;
+  margin: .9rem .15rem; color: var(--da-muted); font-size: .84rem;
+}
+.da-meta strong { color: var(--da-ink); }
+
+/* ---- Cards ---- */
+.da-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .9rem; }
+.da-card {
+  min-width: 0; padding: 1.05rem; background: #fff;
+  border: 1px solid var(--da-line); border-radius: 12px;
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.da-card:hover { transform: translateY(-2px); border-color: #b6d4bf; box-shadow: 0 8px 24px rgba(26, 71, 42, .09); }
+.da-card--retired { background: var(--da-red-soft); border-color: #f0c4c0; }
+.da-card-head { display: flex; gap: .75rem; justify-content: space-between; align-items: flex-start; }
+.da-card h3 { margin: 0; color: var(--da-green); font-size: 1.02rem; line-height: 1.3; }
+.da-card--retired h3 { color: var(--da-red); }
+.da-purpose { margin: .2rem 0 0; color: var(--da-muted); font-size: .82rem; }
+
+.da-drive {
+  display: inline-grid; min-width: 34px; height: 26px; margin: 0 .3rem .35rem 0; padding: 0 .5rem;
+  place-items: center; color: var(--da-green-mid); background: var(--da-green-soft);
+  border: 1px solid #bcdcc2; border-radius: 6px; font-weight: 700; font-size: .85rem;
+}
+.da-drive--large {
+  min-width: 46px; height: 46px; margin: 0; color: #fff; background: var(--da-green);
+  border: 0; border-radius: 11px; font-size: 1.15rem;
+}
+.da-none {
+  display: inline-block; margin-bottom: .35rem; padding: .3rem .5rem; color: var(--da-muted);
+  background: var(--da-soft); border-radius: 6px; font-size: .75rem; font-weight: 600;
+}
+
+.da-section { margin-top: .9rem; }
+.da-section-title {
+  margin: 0 0 .4rem; color: var(--da-muted); font-size: .68rem;
+  font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+}
+.da-chips { display: flex; flex-wrap: wrap; gap: .35rem; }
+.da-chip { padding: .28rem .5rem; border-radius: 6px; font-size: .76rem; font-weight: 600; }
+.da-chip--modify { color: #1a7c3a; background: var(--da-green-soft); }
+.da-chip--read { color: var(--da-amber); background: var(--da-amber-soft); }
+.da-chip--full { color: var(--da-teal); background: var(--da-teal-soft); }
+
+/* Per-person breakdown, used when one profile group holds people with DIFFERENT rights
+   (Ruth = Modify, Embroidery = Read only on the same two drives). Rolling those up into
+   one card's chip list said both things at once and read as a contradiction. */
+.da-person { margin-top: .6rem; padding-left: .6rem; border-left: 2px solid var(--da-line); }
+.da-person-name { margin: 0 0 .3rem; font-size: .84rem; font-weight: 700; color: var(--da-ink); }
+
+.da-note {
+  margin: .85rem 0 0; padding-top: .7rem; color: var(--da-muted);
+  border-top: 1px solid var(--da-line); font-size: .8rem; line-height: 1.45;
+}
+.da-path {
+  overflow-wrap: anywhere; margin: .65rem 0 0; color: var(--da-muted);
+  font: .76rem/1.45 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.da-empty {
+  grid-column: 1 / -1; padding: 2rem; text-align: center; color: var(--da-muted);
+  background: #fff; border: 1px dashed var(--da-line); border-radius: 12px;
+}
+
+.da-footer {
+  display: flex; flex-wrap: wrap; gap: .6rem 1.25rem; justify-content: space-between; align-items: center;
+  margin-top: 1.25rem; padding: .85rem 1rem; color: var(--da-muted);
+  background: #fff; border: 1px solid var(--da-line); border-radius: 10px; font-size: .82rem;
+}
+.da-footer strong { color: var(--da-ink); }
+.da-fineprint { margin: 1rem .15rem 0; color: #8a968e; font-size: .78rem; line-height: 1.55; max-width: 90ch; }
+.da-fineprint code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .95em; }
+
+@media (max-width: 900px) {
+  .da-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .da-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 600px) {
+  .da-hero { flex-direction: column; }
+  .da-hero-badge { width: 100%; flex-basis: auto; }
+  .da-grid { grid-template-columns: 1fr; }
+  .da-toolbar { align-items: stretch; }
+  .da-tabs { width: 100%; }
+  .da-tab { flex: 1; }
+}
+
+@media print {
+  body { background: #fff; }
+  .da-toolbar, .da-action, .da-back { display: none !important; }
+  .da-wrap { max-width: none; padding: 0; }
+  .da-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .da-card { break-inside: avoid; box-shadow: none !important; transform: none !important; }
+  /* Colour carries meaning here (retired = red, modify vs read only), so keep it on
+     paper rather than letting it print as an indistinguishable grey smudge. */
+  .da-hero, .da-alert, .da-chip, .da-drive, .da-card--retired {
+    print-color-adjust: exact; -webkit-print-color-adjust: exact;
+  }
+}

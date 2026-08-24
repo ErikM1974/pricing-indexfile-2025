@@ -1,0 +1,107 @@
+{
+  "verifiedAt": "2026-08-24",
+  "server": "NCA-FS01",
+  "policy": "NCA Drive Maps",
+  "defaultProductionLogin": "Laser",
+  "profiles": [
+    {
+      "id": "production-art",
+      "names": ["Art", "Brian", "Laser"],
+      "purpose": "Production",
+      "drives": ["K", "R", "T"],
+      "modify": ["K", "R", "T"],
+      "readOnly": [],
+      "notes": "Laser is the default production login."
+    },
+    {
+      "id": "bradley",
+      "names": ["Bradley"],
+      "purpose": "Accounting",
+      "drives": ["B"],
+      "modify": [],
+      "readOnly": [],
+      "notes": "Folder permissions were not part of this audit."
+    },
+    {
+      "id": "jim",
+      "names": ["Jim"],
+      "purpose": "Simplified drives",
+      "drives": ["J", "W", "X"],
+      "modify": [],
+      "readOnly": ["W", "X"],
+      "notes": "Y is intentionally hidden."
+    },
+    {
+      "id": "design-library",
+      "names": ["Ruth", "Embroidery"],
+      "purpose": "Design library",
+      "drives": ["W", "X"],
+      "modify": ["W", "X"],
+      "readOnly": ["W", "X"],
+      "notes": "Ruth has Modify. Embroidery is Read Only. Y is intentionally hidden.",
+      "perPerson": {
+        "Ruth": { "modify": ["W", "X"], "readOnly": [] },
+        "Embroidery": { "modify": [], "readOnly": ["W", "X"] }
+      }
+    },
+    {
+      "id": "sales-front-office",
+      "names": ["Front Desk", "Nika", "Taneisha"],
+      "purpose": "Sales front office",
+      "drives": ["S"],
+      "modify": [],
+      "readOnly": [],
+      "notes": "Folder permissions were not part of this audit."
+    },
+    {
+      "id": "erik",
+      "names": ["Erik"],
+      "purpose": "General DATA and administration",
+      "drives": ["Y"],
+      "modify": ["K", "R", "T"],
+      "readOnly": ["W", "X"],
+      "notes": "K, R, and T do not auto-map, but Erik can reach those folders through Y or a UNC path."
+    },
+    {
+      "id": "file-admins",
+      "names": ["npi_admin", "nweadmin"],
+      "purpose": "File administration",
+      "drives": ["Y"],
+      "modify": [],
+      "readOnly": [],
+      "fullControl": ["K", "R", "T", "W", "X"],
+      "notes": "Full Control on all audited folders."
+    },
+    {
+      "id": "mikalah",
+      "names": ["Mikalah"],
+      "purpose": "No DATA drives",
+      "drives": [],
+      "modify": [],
+      "readOnly": [],
+      "notes": "Y is intentionally hidden."
+    },
+    {
+      "id": "ilke",
+      "names": ["Ilke"],
+      "purpose": "Retired login",
+      "drives": ["Y"],
+      "modify": [],
+      "readOnly": [],
+      "retired": true,
+      "notes": "Do not use. The account still technically receives Y and should be removed or disabled when approved."
+    }
+  ],
+  "drives": [
+    { "letter": "B", "label": "Bradley Accounting Files", "path": "\\\\NCA-FS01\\DATA\\Bradley", "mappedFor": ["Bradley"] },
+    { "letter": "J", "label": "Jim Files", "path": "\\\\NCA-FS01\\DATA\\Jim", "mappedFor": ["Jim"] },
+    { "letter": "K", "label": "Kornit Artwork", "path": "\\\\NCA-FS01\\DATA\\Kornit Art 2023", "mappedFor": ["Art", "Brian", "Laser"], "modify": ["Art", "Brian", "Erik", "Laser"] },
+    { "letter": "R", "label": "Roland Printer 2025", "path": "\\\\NCA-FS01\\DATA\\Trotec2025\\Roland Printer 2025", "mappedFor": ["Art", "Brian", "Laser"], "modify": ["Art", "Brian", "Erik", "Laser"] },
+    { "letter": "S", "label": "Sales Front Office", "path": "\\\\NCA-FS01\\DATA\\Sales Front Office", "mappedFor": ["Front Desk", "Nika", "Taneisha"] },
+    { "letter": "T", "label": "Trotec Files", "path": "\\\\NCA-FS01\\DATA\\Trotec2025", "mappedFor": ["Art", "Brian", "Laser"], "modify": ["Art", "Brian", "Erik", "Laser"] },
+    { "letter": "W", "label": "Old Digitized Designs", "path": "\\\\NCA-FS01\\DATA\\OLD Designs M.L.T.P", "mappedFor": ["Jim", "Ruth", "Embroidery"], "modify": ["Ruth"], "readOnly": ["Embroidery", "Erik", "Jim"] },
+    { "letter": "X", "label": "Current Digitized Designs", "path": "\\\\NCA-FS01\\DATA\\Digitizing 2015", "mappedFor": ["Jim", "Ruth", "Embroidery"], "modify": ["Ruth"], "readOnly": ["Embroidery", "Erik", "Jim"] },
+    { "letter": "Y", "label": "DATA", "path": "\\\\NCA-FS01\\DATA", "mappedFor": ["Erik", "npi_admin", "nweadmin", "Ilke"], "notes": "Ilke is retired and should not be used." }
+  ]
+}
+

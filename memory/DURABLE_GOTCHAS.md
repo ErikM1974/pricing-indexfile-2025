@@ -51,6 +51,7 @@ at `~/.claude/projects/C--Users-erik-OneDrive---Northwest-Custom-Apparel-2025-Pr
 - 🔑 **Ship the app forwarder FIRST and verify a REAL save through it before gating the proxy.** Prove a write gate with a *destructive* payload — an empty one gives 400 either way.
 - 🔑 **`app.get('/*.js')` → `sendFile`: `/*` matches slashes, so ANY depth** — served the entire 704 KB `server.js` in prod. **Removing a mount proves nothing until you re-probe with the files still on disk.**
 - 🔑 `guardReadsOnly` tested `=== 'GET'`, so **HEAD sailed past auth**. Anon-endpoint probe: POST + empty body → 401 gated, 400 open.
+- 🔑 **A staff page gate is `.html`-ONLY — its `.js`/`.css` are ANONYMOUS.** `gateStaffHtml` does `if (!p.endsWith('.html')) return next()` so non-HTML assets stay public on purpose (no redirect loop). Verified live: `GET /dashboards/js/past-due-orders.js` → 200, no session. So **data baked into a dashboard's own JS is published**, gated page or not — keep it in `lib/` (never statically served) behind `requirePageAccess('<page>.html')`. Watch the COMMENTS in those files too. Served root dirs: admin art-tools calculators config dashboards dist email-templates forms guides hr images mockups pages policies product quote-builders styles tools training vendor-portals. → drive-access (2026-08-24)
 - 🔑 **Registration ORDER is the access control** — the hashed-asset rewrite sits below every gate, above `express.static`; jest asserts it. → [proxy-security-2026-08.md](proxy-security-2026-08.md), [deploy-cachebust.md](deploy-cachebust.md)
 
 ## JS / DOM traps
