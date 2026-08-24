@@ -1,3 +1,9 @@
+## v2026.08.24.1 (2026.08.24)
+
+- Memory: weekday-only readings over-read the period rate
+- Drive Access Center: the NCA-FS01 drive map, admin-only
+- Memory: a staff page gate is .html-only, its JS and CSS are anonymous
+
 ## v2026.08.19.5 (2026.08.19)
 
 - Quote view: surface the customer's typed checkout notes on web-cart quotes
