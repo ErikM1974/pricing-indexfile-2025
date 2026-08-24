@@ -82,6 +82,13 @@ authority and is free to read.
   whole-period average, which stays anchored to how the period started and would have fired
   every day forever. Today is excluded (partial days read as false comfort).
 
+⚠️ **Never read the WEEKDAY series on its own — it over-reads the period rate.** Weekdays
+swing 8.7K–18.3K while the blended daily rate barely moves, because cheap weekends (~5-6K)
+absorb them. Measured 2026-08-24: 31 Jul–9 Aug ran **11,135/day**, 10–23 Aug ran
+**11,394/day** — +2%, noise — over a stretch where weekdays looked like they had climbed 60%.
+I called a false escalation from weekdays alone TWICE (10 Aug, 19 Aug) and recommended work
+off the second one. 🔑 **Judge pacing on a blended ≥7-day rate, never on consecutive weekdays.**
+
 ## ADOPTED 2026-08-06 — big table writes go through a CSV data import
 
 Erik's standing instruction after the 5 Aug spike. **Was** listed below as "shelved"; it is
