@@ -5,6 +5,32 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## curl from git-bash mangled em dashes into U+FFFD inside a Caspio row (2026-08-25)
+
+**Problem.** Creating the Forms_Library row for the embroidery-operator employment application
+via `curl -d '{...}'` in git-bash returned HTTP 201 — but the stored `Form_Name`/`Description`
+carried literal U+FFFD replacement characters where the em dashes were. The 201 looks like
+success; the corruption only shows when you read the row BACK and inspect the bytes.
+
+**Root cause.** git-bash on Windows handed curl the heredoc body in a non-UTF-8 encoding; the
+proxy/Caspio replaced the invalid bytes with U+FFFD, which then round-trips as "valid" text.
+Printing the GET response to the console ALSO renders "�" for unrelated console-encoding
+reasons, so eyeballing output can't distinguish stored corruption from display noise.
+
+**Solution.** Re-sent via `PUT /api/forms-library/:id` from Python with
+`json.dumps(..., ensure_ascii=True)` (escapes non-ASCII to `\uXXXX`, so the wire body is pure
+ASCII and immune to shell encoding), then verified the stored value with `ascii(field)` on a
+fresh GET — shows `—`, proving real em dashes.
+
+**Prevention.**
+- 🔑 **Any Caspio/proxy write containing non-ASCII (em dash, ×, ’, é) goes through Python with
+  `ensure_ascii=True` — never a curl body typed in git-bash.** JSON `\uXXXX` escapes are the
+  portable path on Windows shells.
+- 🔑 **Verify stored TEXT with `ascii()`/`repr()` on a re-read, not by eyeballing console
+  output** — the console lies about encoding in both directions.
+
+---
+
 ## A customer's real size request was captured, saved, and shown to nobody (2026-08-19)
 
 **Problem.** WQ-2026-006 (web quote-cart) showed 18500B "S × 17". The customer's actual request
