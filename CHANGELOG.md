@@ -1,3 +1,11 @@
+## v2026.08.25.2 (2026.08.25)
+
+- Memory: non-ASCII Caspio writes need Python ensure_ascii, not git-bash curl
+- polish(storefronts): E2E order-flow sweep fixes — tax stamp, file-size label, CSP img-src, env docs
+- fix(custom-caps): stamped OrderSettingsJSON flattened artwork refs to booleans — CAP orders reached ShopWorks with NO logo attached
+- fix(csp): img-src proxy host via CASPIO_PROXY_BASE, not a second literal — no-hardcoded-hosts lock caught it
+- Deploy v2026.08.25.2: 2 files (custom-caps.html, custom-tees.html...)
+
 ## v2026.08.25.1 (2026.08.25)
 
 - Embroidery Machine Operator employment application (fillable PDF + builder)
