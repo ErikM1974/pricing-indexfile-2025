@@ -563,6 +563,10 @@ const CSP_DIRECTIVES = {
     'https://*.boxcloud.com',
     'https://via.placeholder.com',
     'https://images.squarespace-cdn.com',
+    // Customer artwork/gallery thumbs served by the proxy's /api/files/{key}
+    // (custom-tees gallery extras, quote-view art) — caught by the report-only
+    // stream 2026-08-25; enforce day would blank them without this.
+    CASPIO_PROXY_BASE,
   ],
   connectSrc: [
     "'self'",
@@ -2109,6 +2113,9 @@ async function save3DTQuoteSession(data) {
 // rejects the checkout visibly — never charge a number we didn't derive.
 
 const TDT_PROXY = CASPIO_PROXY_BASE;
+// Stamped artwork refs must point at OUR files API — see sanitizeUploadedLogoRef.
+const { sanitizeUploadedLogoRef } = STOREFRONT_CHANNEL_CONFIG;
+const UPLOADED_ARTWORK_URL_PREFIX = `${CASPIO_PROXY_BASE}/api/files/`;
 const TDT_SIZES = ['S', 'M', 'L', 'XL', '2XL', '3XL'];
 let _tdtCfgCache = null;
 let _tdtCfgAt = 0;
@@ -2273,13 +2280,21 @@ const CHANNELS = {
     // are NEVER exposed (decision #2) — the 8K-included assumption lives in
     // the pricing module, not on the order. needsArtReview is forced ON
     // (proof-first, decision #11) regardless of what the client sent.
-    stampedOrderSettings: (priced, stockChecked) => ({
+    stampedOrderSettings: (priced, stockChecked, clientSettings) => ({
       channel: 'custom-caps',
       styleNumber: priced.style,
       styleName: priced.productName,
       rush: false,
-      frontLogo: true,
-      backLogo: priced.backLogo,
+      // {fileUrl,fileName} refs, sanitized to OUR files API — the ShopWorks
+      // push (designs + attachments), quote-view and the success page all
+      // read .fileUrl. Stamping booleans here shipped CAP orders with NO
+      // artwork attached (first caps E2E, 2026-08-25). backLogo rides ONLY
+      // when the reprice actually charged it — an uncharged file must never
+      // reach production.
+      frontLogo: sanitizeUploadedLogoRef(clientSettings && clientSettings.frontLogo, UPLOADED_ARTWORK_URL_PREFIX),
+      backLogo: priced.backLogo
+        ? sanitizeUploadedLogoRef(clientSettings && clientSettings.backLogo, UPLOADED_ARTWORK_URL_PREFIX)
+        : null,
       frontLocation: 'CF',                        // → 'Cap Front' via swLocationMap at push
       backLocation: priced.backLogo ? 'CB' : null, // → 'Cap Back'
       printLocationName: priced.backLogo ? 'Cap Front + Cap Back' : 'Cap Front',
@@ -8681,7 +8696,7 @@ app.post('/api/create-checkout-session', async (req, res) => {
       // Channel-stamped style facts (custom-tees: server-validated channel/
       // style/rush/locations/stockChecked become the order of record — the
       // push + success page read THESE; legacy 3DT stamps nothing).
-    }, chCfg.stampedOrderSettings(priced, stockChecked));
+    }, chCfg.stampedOrderSettings(priced, stockChecked, orderSettings || {}));
 
     // ── Unique QuoteID (random suffix used to collide same-day) ───────
     let quoteID = null;
@@ -9532,7 +9547,7 @@ TAX: ${taxPct ? `APPLY ${taxPartDescription}` : 'DO NOT APPLY - out-of-state shi
     const result = await response.json();
 
     if (response.ok && result.success) {
-      console.log('[3-Day Order] ✓ Order created in ShopWorks:', result.orderNumber);
+      console.log('[3-Day Order] ✓ Order created in ShopWorks:', result.orderNumber || tempOrderNumber);
       res.json({
         success: true,
         orderNumber: result.orderNumber || tempOrderNumber,

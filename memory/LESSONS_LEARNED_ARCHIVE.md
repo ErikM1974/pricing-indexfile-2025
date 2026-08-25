@@ -4,6 +4,56 @@ Resolved entries aged out of `LESSONS_LEARNED.md` (300-line cap). Newest first. 
 
 ---
 
+## A release that reached GitHub but never reached Heroku, and nothing noticed for 9 hours (2026-08-18)
+
+**Problem.** `develop`, `main`, `origin/develop` and `origin/main` were all clean and identical at
+`a30c4c10` (v2026.08.18.4) — every signal a human checks said "shipped". Production was serving
+`42039b7c` (v2026.08.18.1), nine hours stale. Customers were missing the whole PR #30 PDP change:
+unpriceable placement chips still rendering, price table still collapsed, small-order fee still a
+footnote instead of a charge.
+
+**Root cause.** A `/deploy` run stopped partway. Steps 8–9 (release merge, CHANGELOG) and Step 11's
+`git push origin main` all completed, so GitHub looked finished. **Step 10 (`git tag`) and Step 12
+(`git push heroku main`) never ran** — `v2026.08.18.4` did not exist as a tag anywhere, local or
+remote. There is no gate at the END of the skill that asserts the deploy actually landed, so a run
+that dies after the GitHub push is indistinguishable from a successful one by every branch-level check.
+
+**Solution.** Re-entered at the missing steps rather than re-running `/deploy`: created the absent
+tag from `v2026.08.18.1..main`, pushed it, `git push heroku main` → Heroku v1874, verified. Running
+the skill from the top would have minted an **empty** v2026.08.18.5 (0 commits `develop..main`) with
+a garbage CHANGELOG entry.
+
+**Prevention.**
+- 🔴 **`origin/main` being current is NOT evidence production is current.** They are separate pushes
+  to separate remotes and only one of them is the deploy. The authoritative check is one command:
+  `git rev-list --left-right --count heroku/main...origin/main` after `git fetch --all` — any
+  non-zero right-hand number means undeployed code sits on `main`. `heroku releases -n 1` names the
+  deployed SHA directly and agrees.
+- 🔴 **A missing tag is the cheapest tripwire for a half-finished deploy.** `git tag -l "v$(date
+  +%Y.%m.%d).*"` disagreeing with the newest `Release v…` commit subject on `main` means a run died
+  between Step 9 and Step 12. Worth a Step 0 pre-flight in the skill: refuse to start when the tip
+  of `main` is a `Release v…`/`Changelog v…` commit whose tag doesn't exist.
+- 🔑 **When a deploy is already partly done, resume it — do not restart it.** `/deploy` assumes
+  `develop` has unreleased work. With `develop == main` it produces an empty release: an empty
+  `--no-ff` merge, a CHANGELOG heading with no commits, and a version number burned for nothing.
+  Check `git rev-list --count main..develop` before invoking the skill; if it's 0 the only thing
+  missing is downstream of the merge.
+- 🔑 **Verify a frontend deploy on asset BYTES, not on the version string.** Assets are
+  content-hashed into `/dist/…<hash>.js`, so the `?v=` in the HTML source never appears in the
+  served page and the skill's Step 14b `?v=` check silently finds nothing. What works: pick an
+  identifier that exists only in the new code (here `pdp-cfg-fee-note`, `tier-fee-label`), curl the
+  live hashed bundle, and grep. It went 0 → 1 across the deploy, and the bundle hash moved
+  `a04fe3cc39` → `11582a8bd6`. ⚠️ Minification changes case and mangles locals — pick markers from
+  string literals and CSS class names, never from variable names.
+- ⚠️ This is the **second** deploy in two days to leave the repo mid-flight (see the archived
+  2026-08-17 entry: Step 16 never completed, leaving the checkout on `main` with `develop` behind).
+  The skill has no crash-recovery story; when one is interrupted, assume nothing after the failure
+  point ran and verify each remaining step by hand.
+
+---
+
+---
+
 ## Dead placement chips: a chip row that never asked which methods were eligible (2026-08-18)
 
 **Problem.** On `product.html?style=CT103828` (Carhartt Duck Detroit Jacket) the customer

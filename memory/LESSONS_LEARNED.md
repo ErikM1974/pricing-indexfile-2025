@@ -5,6 +5,59 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## First-ever caps order pushed to ShopWorks with NO artwork — the stamp had flattened the file ref to a boolean (2026-08-25)
+
+**Problem.** First exercise of the /custom-caps paid leg (Stripe TEST-mode E2E, CAP0825-4781):
+order reached OnSite with `designs: []` and `attachments: []` — production would get a proof-first
+embroidery order with no logo attached. Quote-view and custom-caps-success were ALSO silently
+artless for every future CAP order.
+
+**Root cause.** The caps channel's `stampedOrderSettings` (server.js) wrote `frontLogo: true` /
+`backLogo: <bool>` — server-authoritative *pricing flags* — into OrderSettingsJSON, clobbering the
+client's `{fileUrl, fileName}` objects (Object.assign stamp wins over client base). Three consumers
+(`submit-3day-order` push, quote-view.js:3481, custom-caps-success logoFig) all read `.fileUrl` and
+optional-chain to nothing. Tees never hit it: its stamp doesn't touch artwork keys.
+
+**Fix.** `sanitizeUploadedLogoRef(ref, allowedPrefix)` in config/storefront-channels.js (jest-locked);
+caps stamp now carries the sanitized `{fileUrl, fileName}` through — only `{proxy}/api/files/` URLs
+survive, and backLogo rides ONLY when the reprice charged it. Verified by rerun CAP0825-7724:
+`Built designs: 1`, `Built attachments: 1`, Processed.
+
+**Prevention.** A channel launched without ONE full test-mode E2E (create-session → signed webhook →
+push) is unverified no matter how much code it shares — the tees channel being production-proven
+proved nothing about the caps STAMP. `tests/3dt-fire-test-webhook.js` makes the full rehearsal a
+two-command job; run it for every NEW storefront channel before launch, and read the push payload
+log, not just the status flip.
+
+---
+
+
+## curl from git-bash mangled em dashes into U+FFFD inside a Caspio row (2026-08-25)
+
+**Problem.** Creating the Forms_Library row for the embroidery-operator employment application
+via `curl -d '{...}'` in git-bash returned HTTP 201 — but the stored `Form_Name`/`Description`
+carried literal U+FFFD replacement characters where the em dashes were. The 201 looks like
+success; the corruption only shows when you read the row BACK and inspect the bytes.
+
+**Root cause.** git-bash on Windows handed curl the heredoc body in a non-UTF-8 encoding; the
+proxy/Caspio replaced the invalid bytes with U+FFFD, which then round-trips as "valid" text.
+Printing the GET response to the console ALSO renders "�" for unrelated console-encoding
+reasons, so eyeballing output can't distinguish stored corruption from display noise.
+
+**Solution.** Re-sent via `PUT /api/forms-library/:id` from Python with
+`json.dumps(..., ensure_ascii=True)` (escapes non-ASCII to `\uXXXX`, so the wire body is pure
+ASCII and immune to shell encoding), then verified the stored value with `ascii(field)` on a
+fresh GET — shows `—`, proving real em dashes.
+
+**Prevention.**
+- 🔑 **Any Caspio/proxy write containing non-ASCII (em dash, ×, ’, é) goes through Python with
+  `ensure_ascii=True` — never a curl body typed in git-bash.** JSON `\uXXXX` escapes are the
+  portable path on Windows shells.
+- 🔑 **Verify stored TEXT with `ascii()`/`repr()` on a re-read, not by eyeballing console
+  output** — the console lies about encoding in both directions.
+
+---
+
 ## A customer's real size request was captured, saved, and shown to nobody (2026-08-19)
 
 **Problem.** WQ-2026-006 (web quote-cart) showed 18500B "S × 17". The customer's actual request
@@ -194,53 +247,5 @@ to ESM or a dynamic `import()`. Minor/patch of v12 still flow.
 - 🔑 `sharp` was a direct dependency nothing imported (no `require`, no script, root-only in the
   lockfile) — shipping native libvips binaries on every install and Heroku build. Removing a dead
   dep beats upgrading it; check `grep -rl "require('<pkg>')"` before accepting any bump.
-
----
-
-## A release that reached GitHub but never reached Heroku, and nothing noticed for 9 hours (2026-08-18)
-
-**Problem.** `develop`, `main`, `origin/develop` and `origin/main` were all clean and identical at
-`a30c4c10` (v2026.08.18.4) — every signal a human checks said "shipped". Production was serving
-`42039b7c` (v2026.08.18.1), nine hours stale. Customers were missing the whole PR #30 PDP change:
-unpriceable placement chips still rendering, price table still collapsed, small-order fee still a
-footnote instead of a charge.
-
-**Root cause.** A `/deploy` run stopped partway. Steps 8–9 (release merge, CHANGELOG) and Step 11's
-`git push origin main` all completed, so GitHub looked finished. **Step 10 (`git tag`) and Step 12
-(`git push heroku main`) never ran** — `v2026.08.18.4` did not exist as a tag anywhere, local or
-remote. There is no gate at the END of the skill that asserts the deploy actually landed, so a run
-that dies after the GitHub push is indistinguishable from a successful one by every branch-level check.
-
-**Solution.** Re-entered at the missing steps rather than re-running `/deploy`: created the absent
-tag from `v2026.08.18.1..main`, pushed it, `git push heroku main` → Heroku v1874, verified. Running
-the skill from the top would have minted an **empty** v2026.08.18.5 (0 commits `develop..main`) with
-a garbage CHANGELOG entry.
-
-**Prevention.**
-- 🔴 **`origin/main` being current is NOT evidence production is current.** They are separate pushes
-  to separate remotes and only one of them is the deploy. The authoritative check is one command:
-  `git rev-list --left-right --count heroku/main...origin/main` after `git fetch --all` — any
-  non-zero right-hand number means undeployed code sits on `main`. `heroku releases -n 1` names the
-  deployed SHA directly and agrees.
-- 🔴 **A missing tag is the cheapest tripwire for a half-finished deploy.** `git tag -l "v$(date
-  +%Y.%m.%d).*"` disagreeing with the newest `Release v…` commit subject on `main` means a run died
-  between Step 9 and Step 12. Worth a Step 0 pre-flight in the skill: refuse to start when the tip
-  of `main` is a `Release v…`/`Changelog v…` commit whose tag doesn't exist.
-- 🔑 **When a deploy is already partly done, resume it — do not restart it.** `/deploy` assumes
-  `develop` has unreleased work. With `develop == main` it produces an empty release: an empty
-  `--no-ff` merge, a CHANGELOG heading with no commits, and a version number burned for nothing.
-  Check `git rev-list --count main..develop` before invoking the skill; if it's 0 the only thing
-  missing is downstream of the merge.
-- 🔑 **Verify a frontend deploy on asset BYTES, not on the version string.** Assets are
-  content-hashed into `/dist/…<hash>.js`, so the `?v=` in the HTML source never appears in the
-  served page and the skill's Step 14b `?v=` check silently finds nothing. What works: pick an
-  identifier that exists only in the new code (here `pdp-cfg-fee-note`, `tier-fee-label`), curl the
-  live hashed bundle, and grep. It went 0 → 1 across the deploy, and the bundle hash moved
-  `a04fe3cc39` → `11582a8bd6`. ⚠️ Minification changes case and mangles locals — pick markers from
-  string literals and CSS class names, never from variable names.
-- ⚠️ This is the **second** deploy in two days to leave the repo mid-flight (see the archived
-  2026-08-17 entry: Step 16 never completed, leaving the checkout on `main` with `develop` behind).
-  The skill has no crash-recovery story; when one is interrupted, assume nothing after the failure
-  point ran and verify each remaining step by hand.
 
 ---

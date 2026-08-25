@@ -121,6 +121,10 @@
         return '$' + (n % 1 === 0 ? String(n) : n.toFixed(2));
     };
     const fmtInt = (n) => (Number(n) || 0).toLocaleString('en-US');
+    // Small logos round to "0.0 MB", which reads as a failed upload — show KB under 1 MB.
+    const fmtFileSize = (b) => b < 1048576
+        ? Math.max(1, Math.round(b / 1024)) + ' KB'
+        : (b / 1048576).toFixed(1) + ' MB';
     // 0.101 → "10.1", 0.1055 → "10.55" — never hide rate precision the
     // charge math actually uses.
     const ratePct = (r) => String(Math.round(r * 10000) / 100);
@@ -1278,7 +1282,7 @@
             $('art-drop').hidden = true;
             $('art-file').hidden = false;
             $('art-file-name').textContent = slot.fileName;
-            $('art-file-size').textContent = (slot.file ? (slot.file.size / 1024 / 1024).toFixed(1) + ' MB'
+            $('art-file-size').textContent = (slot.file ? fmtFileSize(slot.file.size)
                 : 'restored — re-attach to change');
             const thumb = $('art-file-thumb');
             if (slot.previewable && slot.bitmap && slot.bitmap.toDataURL) {
@@ -1740,8 +1744,12 @@
         const stamp = $('tax-stamp');
         if (S.delivery.method === 'pickup') { stamp.textContent = ''; return; }
         if (t.rate === null) { stamp.textContent = 'Sales tax is calculated from your ZIP.'; return; }
+        // Caspio tax accounts are NAMED by their rate ("10.20%") — echoing that
+        // after the % we already print reads as a glitch, so drop it then.
+        const acctLabel = (t.accountName && !/^[\d.\s]+%$/.test(t.accountName))
+            ? t.accountName : 'WA destination rate';
         stamp.textContent = t.rate > 0
-            ? `Sales tax: ${ratePct(t.rate)}% — ${t.accountName || 'WA destination rate'}`
+            ? `Sales tax: ${ratePct(t.rate)}% — ${acctLabel}`
             : 'No sales tax — shipping out of state.';
     }
 
