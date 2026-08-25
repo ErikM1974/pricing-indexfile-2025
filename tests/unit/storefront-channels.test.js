@@ -391,3 +391,43 @@ describe('custom-caps channel entry', () => {
     expect(CAPS.push.taxPartNumber(null)).toBe('Tax_0');
   });
 });
+
+// ── sanitizeUploadedLogoRef (added 2026-08-25) ────────────────────────────
+// First caps E2E found stamped OrderSettingsJSON carrying frontLogo:true
+// (boolean) — the ShopWorks push, quote-view and the success page all read
+// {fileUrl,fileName}, so CAP orders reached OnSite with NO artwork attached.
+// The stamp now passes client refs through THIS guard: our files API only.
+const { sanitizeUploadedLogoRef } = require('../../config/storefront-channels.js');
+
+describe('sanitizeUploadedLogoRef — stamped artwork refs reach the push intact, and only from our files API', () => {
+  const PREFIX = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/files/';
+  const GOOD = { fileUrl: PREFIX + 'abc-123', fileName: 'logo.png' };
+
+  test('a proxy-hosted {fileUrl,fileName} ref survives verbatim', () => {
+    expect(sanitizeUploadedLogoRef(GOOD, PREFIX)).toEqual({ fileUrl: PREFIX + 'abc-123', fileName: 'logo.png' });
+  });
+
+  test('the legacy boolean stamp (the 2026-08-25 bug shape) sanitizes to null, not a crash', () => {
+    expect(sanitizeUploadedLogoRef(true, PREFIX)).toBeNull();
+    expect(sanitizeUploadedLogoRef(false, PREFIX)).toBeNull();
+    expect(sanitizeUploadedLogoRef(null, PREFIX)).toBeNull();
+    expect(sanitizeUploadedLogoRef(undefined, PREFIX)).toBeNull();
+  });
+
+  test('a foreign-host or doctored fileUrl is dropped — production never gets a URL we do not control', () => {
+    expect(sanitizeUploadedLogoRef({ fileUrl: 'https://evil.example/x.png', fileName: 'x' }, PREFIX)).toBeNull();
+    expect(sanitizeUploadedLogoRef({ fileUrl: 'javascript:alert(1)', fileName: 'x' }, PREFIX)).toBeNull();
+    expect(sanitizeUploadedLogoRef({ fileName: 'no-url.png' }, PREFIX)).toBeNull();
+  });
+
+  test('fileName is optional, trimmed, and capped at 160 chars', () => {
+    expect(sanitizeUploadedLogoRef({ fileUrl: GOOD.fileUrl }, PREFIX)).toEqual({ fileUrl: GOOD.fileUrl, fileName: '' });
+    const long = sanitizeUploadedLogoRef({ fileUrl: GOOD.fileUrl, fileName: ' ' + 'a'.repeat(300) + ' ' }, PREFIX);
+    expect(long.fileName.length).toBe(160);
+  });
+
+  test('no allowedPrefix means nothing passes (never fail-open)', () => {
+    expect(sanitizeUploadedLogoRef(GOOD, '')).toBeNull();
+    expect(sanitizeUploadedLogoRef(GOOD, undefined)).toBeNull();
+  });
+});

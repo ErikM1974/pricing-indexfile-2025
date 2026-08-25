@@ -340,4 +340,17 @@ const CHANNELS = {
 // keep working for every historical Caspio row.
 const DEFAULT_CHANNEL = '3-day-tees';
 
-module.exports = { CHANNELS, DEFAULT_CHANNEL, buildDateRandQuoteId };
+// Uploaded-artwork ref guard for stamped OrderSettingsJSON: only files
+// uploaded through OUR files API may ride into OnSite as design/attachment
+// URLs (the push hands these straight to production, and quote-view/success
+// pages render them). Anything else — booleans, foreign hosts, doctored
+// strings — stamps as null. Pure so the jest lock can drive it.
+function sanitizeUploadedLogoRef(ref, allowedPrefix) {
+  if (!ref || typeof ref !== 'object') return null;
+  const fileUrl = typeof ref.fileUrl === 'string' ? ref.fileUrl.trim() : '';
+  if (!allowedPrefix || !fileUrl.startsWith(allowedPrefix)) return null;
+  const fileName = typeof ref.fileName === 'string' ? ref.fileName.trim().slice(0, 160) : '';
+  return { fileUrl, fileName };
+}
+
+module.exports = { CHANNELS, DEFAULT_CHANNEL, buildDateRandQuoteId, sanitizeUploadedLogoRef };
