@@ -1,3 +1,7 @@
+## v2026.08.25.1 (2026.08.25)
+
+- Embroidery Machine Operator employment application (fillable PDF + builder)
+
 ## v2026.08.24.1 (2026.08.24)
 
 - Memory: weekday-only readings over-read the period rate
