@@ -42,6 +42,7 @@ at `~/.claude/projects/C--Users-erik-OneDrive---Northwest-Custom-Apparel-2025-Pr
 - 🔑 **Pick the statistic before trusting vendor data** — SanMar `PIECE_WEIGHT` max would have re-weighed 284 variants; the **mode** matched the catalogue.
 - 🔑 **Check the clock before calling a gap a bug** (sync job runs 12:30 UTC; my audits ran before it).
 - 🔑 **A DOM shim can fabricate a failure** — verify controller results with browser semantics (textContent/innerHTML linked) before believing them.
+- 🔑 **In-app Browser pane's `read_network_requests` misses cross-origin fetches** — every proxy API call looked absent while firing fine (2026-08-25 storefront sweep); read `performance.getEntriesByType('resource')` in the page instead. Synthetic `blur` also never triggers `focusout` delegation (blur doesn't bubble) — dispatch `FocusEvent('focusout',{bubbles:true,relatedTarget:document.body})` before calling a commit-on-focus-leave UI broken.
 
 ## Auth / security
 
