@@ -566,7 +566,7 @@ const CSP_DIRECTIVES = {
     // Customer artwork/gallery thumbs served by the proxy's /api/files/{key}
     // (custom-tees gallery extras, quote-view art) — caught by the report-only
     // stream 2026-08-25; enforce day would blank them without this.
-    'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com',
+    CASPIO_PROXY_BASE,
   ],
   connectSrc: [
     "'self'",
