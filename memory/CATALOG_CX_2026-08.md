@@ -179,16 +179,31 @@ unpushed in either repo. Scoreboard of what's LIVE: search <1s (boot-warmed inde
 voice · all roads → /catalog · buy-online bridge (Option A) · featured landing · M-1 honest
 counts · trust band (4.9★ Google) · M-5 Quick-View "Price it & add to quote" CTA + swatch dots.
 
+## ✅ M-6 one chrome — BUILT 2026-08-26, app develop `84ea8fbd`, NOT deployed
+
+One chrome across ALL 6 customer pages (index/catalog/product/quote-cart/brands/laser-tumbler),
+locked by `tests/unit/chrome-drift.test.js` (exact 10-link nav sequence + 12-link drawer core +
+no retired destinations; 18/18). brands.html and the tumbler calc were REBUILT onto the 2026
+chrome (brands was 89 lines of main-redesign-era markup; the tumbler was a chrome-less dead end
+with a fixed 180px header — its old header/footer styles removed from `laser-tumbler-simple.css`,
+drawer/search wired in each page's own JS, quote badge added). `/pages/webstore-info.html` 301s
+to `/company-webstores` (server.js, ABOVE the /pages static mount — mount order beats later
+routes) + 22 pages' links rewritten. Homepage inline-results engine retired: masthead search
+NAVIGATES to `/catalog?q=`, legacy `/?q=`/`/?category=` URLs `location.replace` to /catalog,
+last 3 `/?q=` senders fixed. All gates green (lint/typecheck/unit 2674/dom 88/a11y 4);
+live-verified on local build: drawer scroll-lock, 46 brand tiles, tumbler calc intact
+(6 pricing rows/4 swatches), 301, search nav.
+🔑 brands.css carried `body { overflow: auto !important }` (a counter to main-redesign.css) that
+would have silently beaten the drawer's `body.drawer-open { overflow: hidden }` — removed.
+🔑 The chrome is STILL copy-pasted per page (build-time component = later refactor); the drift
+test is what keeps the 6 copies identical — edit one page's chrome = edit all 6 + the canon.
+
 **CONTINUATION PLAN (Erik-approved roadmap, in order):**
-1. **M-6 one chrome** — extract shared header/drawer/footer; apply to index/catalog/product/
-   quote-cart/brands + tumbler page; 301 `/pages/webstore-info.html` → `/company-webstores`;
-   retire the homepage inline-results engine (`catalog-search.js` renderer + `autocomplete-new.js`)
-   in favor of the /catalog renderer. Biggest remaining structural item (day-plus).
-2. **M-7 category tiles** — homepage tiles for Ladies (886)/Activewear/Woven Shirts; a category
+1. **M-7 category tiles** — homepage tiles for Ladies (886)/Activewear/Woven Shirts; a category
    tile row on unfiltered /catalog above the grid (15 facets w/ counts, collapses when filtered).
-3. **M-8 mobile filters** — sticky "Show N results" bar in the filter drawer, sticky results
+2. **M-8 mobile filters** — sticky "Show N results" bar in the filter drawer, sticky results
    toolbar ≤960px, one-line promo ≤560px.
-4. **Richardson data question** — most Richardson caps live in Non_SanMar_Products and don't
+3. **Richardson data question** — most Richardson caps live in Non_SanMar_Products and don't
    surface under /catalog?brand=Richardson (only 5 SanMar rows); needs a look at the NS table
    rows / brand mapping (data, not code).
 
