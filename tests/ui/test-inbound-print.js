@@ -11,7 +11,7 @@
   var MOCK = {
     date: '2026-07-22',
     note: 'Mock data — harness only.',
-    totals: { pos: 6, workOrders: 5, boxes: 7, piecesShipped: 101, cost: 646.32, received: 1, rush: 2, pastDue: 1 },
+    totals: { pos: 9, workOrders: 8, boxes: 10, piecesShipped: 149, cost: 1068.96, received: 1, rush: 2, pastDue: 1, dropship: 1 },
     orders: [
       {
         company: 'Absher Construction Company', method: 'Screen Print', workOrder: '142537', sanmarPO: '113747',
@@ -32,6 +32,55 @@
           items: [{ style: 'CT106676', title: 'Carhartt Duck Vest', color: 'Black', size: 'M', qty: 1, lineCost: 54.00 }] }],
         lines: [{ style: 'CT106676', title: 'Carhartt Duck Vest', color: 'Black', size: 'M', qtyOrdered: 1, qtyShipped: 1, status: 'Shipped', lineCost: 54.00 }],
         received: false, issue: null
+      },
+      // ── The three states added 2026-08-26. Each one previously printed as an ordinary
+      //    arriving row, which is the failure they exist to fix. ──
+      {
+        // DROP-SHIP. SanMar sent it straight to the customer, so it is NOT arriving at
+        // Freeman Road: it must never be tickable on receiving, and Ruthie must not
+        // schedule floor time for it. Backend has classified this since 2026-08-18; the
+        // sheets ignored the field entirely until now.
+        company: 'Inland Beef Company', method: 'Embroidery', workOrder: '142598', sanmarPO: '113977',
+        dueDate: '2026-07-25', designNumber: '31002', designName: 'Inland Beef left chest',
+        contactName: 'Dale Fenner', productionDays: 3, rush: false, pastDue: false, rushThreshold: 3,
+        salesRep: 'Ruthie Nhoung', customerPO: 'IB-4410', terms: 'Net 30', dateOrdered: '2026-07-20',
+        boxes: 1, piecesShipped: 12, piecesOrdered: 12, cost: 141.24,
+        tracking: '1Z61R84A0313967711', carrier: 'UPS', trackingUrl: '#', shipDate: '2026-07-21',
+        fromState: 'WA', arrival: '2026-07-22',
+        destination: 'dropship', destCity: 'Sequim', destState: 'WA',
+        boxDetailAvailable: true,
+        boxDetail: [{ boxNumber: 1, carrier: 'UPS', trackingNumber: '1Z61R84A0313967711', pieces: 12, cost: 141.24,
+          items: [{ style: 'PC61', title: 'Port & Company Essential Tee', color: 'Navy', size: 'L', qty: 12, lineCost: 141.24 }] }],
+        lines: [{ style: 'PC61', title: 'Port & Company Essential Tee', color: 'Navy', size: 'L', qtyOrdered: 12, qtyShipped: 12, status: 'Shipped', lineCost: 141.24 }],
+        received: false, issue: null
+      },
+      {
+        // URGENT — urgentResponseRequired. Parsed by the backend, carried to the browser,
+        // and read by NO consumer before this change.
+        company: 'Puget Systems', method: 'Embroidery', workOrder: '142601', sanmarPO: '113981',
+        dueDate: '2026-07-27', designNumber: '30887', designName: 'Puget cap logo',
+        contactName: 'Marina Hoyle', productionDays: 4, rush: false, pastDue: false, rushThreshold: 3,
+        salesRep: 'Nika Lao', customerPO: '', terms: 'Net 30', dateOrdered: '2026-07-20',
+        boxes: 1, piecesShipped: 6, piecesOrdered: 24, cost: 71.40,
+        tracking: '1Z61R84A0313967722', carrier: 'UPS', trackingUrl: '#', shipDate: '2026-07-21',
+        fromState: 'NV', arrival: '2026-07-22', destination: 'ours',
+        boxDetailAvailable: false, boxDetail: null,
+        lines: [{ style: 'C112', title: 'Port Authority Snapback Trucker', color: 'Navy/White', size: 'OSFA', qtyOrdered: 24, qtyShipped: 6, status: 'Partial', lineCost: 71.40 }],
+        received: false, issue: { urgent: true, label: 'Response required — confirm substitution' }
+      },
+      {
+        // A generic issue label with neither backorder nor hold set. deriveIssueFlags returns
+        // one; issueBadge used to return '' for it, so it printed nowhere at all.
+        company: 'Sound Retina', method: 'Screen Print', workOrder: '142604', sanmarPO: '113984',
+        dueDate: '2026-07-29', designNumber: '', designName: '', contactName: 'Elena Ruiz',
+        productionDays: 5, rush: false, pastDue: false, rushThreshold: 3,
+        salesRep: '', customerPO: 'SR-88', terms: 'Net 30', dateOrdered: '2026-07-19',
+        boxes: 1, piecesShipped: 30, piecesOrdered: 30, cost: 210.00,
+        tracking: '1Z61R84A0313967733', carrier: 'UPS', trackingUrl: '#', shipDate: '2026-07-21',
+        fromState: 'NV', arrival: '2026-07-22', destination: 'unknown',
+        boxDetailAvailable: false, boxDetail: null,
+        lines: [{ style: 'PC54', title: 'Port & Company Core Cotton Tee', color: 'White', size: 'M', qtyOrdered: 30, qtyShipped: 30, status: 'Shipped', lineCost: 210.00 }],
+        received: false, issue: { label: 'Colour discontinued for one line' }
       },
       {
         company: 'Better Builders LLC', method: 'Embroidery', workOrder: '142511', sanmarPO: '113740',
@@ -142,7 +191,10 @@
       totalInboundCalls++;
       if (forced) refreshCalls++;
       var payload = Object.assign({}, MOCK, {
-        generatedAt: forced ? new Date().toISOString() : STALE_GENERATED_AT
+        generatedAt: forced ? new Date().toISOString() : STALE_GENERATED_AT,
+        // The Pacific stamp the sheets print in their header (2026-08-26). Fixed string so
+        // the harness output is stable to eyeball; the real one is built server-side.
+        generatedAtLocal: forced ? 'Jul 22, 8:12 AM' : 'Jul 22, 3:56 AM'
       });
       return Promise.resolve({ ok: true, json: function () { return Promise.resolve(payload); } });
     }

@@ -68,13 +68,77 @@
   function methodChip(m) {
     return `<span class="sit-chip" style="background:${METHOD_COLORS[m] || '#9ca3af'}">${esc(m)}</span>`;
   }
-  // SanMar backorder/hold badge (from order-status issues); empty when there's no issue.
+  // SanMar backorder / hold / urgent, from deriveIssueFlags on the order-status feed.
+  //
+  // WIDENED 2026-08-26. It used to fire ONLY on backorder|hold, so two states the backend
+  // takes the trouble to derive were dropped on the floor: `issue.urgent`
+  // (urgentResponseRequired — SanMar is waiting on US) and the generic `issue.label`, which
+  // deriveIssueFlags returns for any other issue text. Both reached the browser and no
+  // consumer read them.
+  function issueKind(issue) {
+    if (!issue) return null;
+    if (issue.backorder) return { cls: 'bo', word: 'BACKORDER', soft: 'Backorder' };
+    if (issue.hold) return { cls: 'hold', word: 'HOLD', soft: 'Hold' };
+    if (issue.urgent) return { cls: 'urgent', word: 'URGENT', soft: 'Urgent' };
+    if (issue.label) return { cls: 'other', word: 'ISSUE', soft: 'Issue' };
+    return null;
+  }
   function issueBadge(issue) {
-    if (!issue || (!issue.backorder && !issue.hold)) return '';
-    const isBo = issue.backorder;
-    const label = isBo ? 'Backorder' : 'Hold';
-    const tip = `SanMar ${isBo ? 'BACKORDER' : 'HOLD'}${issue.label ? ' — ' + issue.label : ''}`;
-    return `<span class="sit-issue ${isBo ? 'sit-issue--bo' : 'sit-issue--hold'}" title="${esc(tip)}">⚠ ${label}</span>`;
+    const k = issueKind(issue);
+    if (!k) return '';
+    const tip = `SanMar ${k.word}${issue.label ? ' — ' + issue.label : ''}`;
+    return `<span class="sit-issue sit-issue--${k.cls}" title="${esc(tip)}">⚠ ${k.soft}</span>`;
+  }
+  // PAPER form of the same fact. These sheets go to the mono laser and get handed to
+  // Ruthie, Nika and Taneisha, so it is words in a black-filled token — never colour, never
+  // an emoji (a 42px glyph prints as a grey smudge; see the psLogo note below).
+  // `detail` is opt-IN, and only the prose-shaped sheets ask for it. SanMar's issue text
+  // runs to a sentence ("Response required — confirm substitution"), and inside a narrow
+  // table cell that wrapped to five lines and pushed the row taller than the rush rows —
+  // on a sheet whose whole job is to be scanned down a column. The WORD is the signal; the
+  // sentence belongs on the AE and full sheets, which have the width for it.
+  function issueTag(o, opts) {
+    const k = issueKind(o && o.issue);
+    if (!k) return '';
+    const detail = (opts && opts.detail && o.issue.label) ? ' — ' + o.issue.label : '';
+    return `<span class="sit-rt-flag">${k.word}${esc(detail)}</span>`;
+  }
+
+  // 🔴 DROP-SHIP — this PO is NOT coming to Freeman Road.
+  //
+  // The proxy has classified every carton's destination since 2026-08-18
+  // (classifyDestination, sanmar-orders.js) and returns destination/destCity/destState on
+  // every order, plus totals.dropship. Nothing here read any of it, so a PO shipped straight
+  // to the customer printed as ordinary arriving freight: Ruthie scheduled floor time for
+  // blanks that will never land, receiving had a line to tick that would never scan, and the
+  // rep told a customer "it's here" when it had gone to them. This is the one place the
+  // sheet stated something FALSE rather than merely incomplete.
+  //
+  // 'unknown' deliberately stays silent and keeps reading as arriving — the backend returns
+  // 'unknown' rather than 'dropship' when the destination is missing, precisely so a gap in
+  // the data can never quietly delete a real carton from the receiving sheet.
+  function isDropShip(o) { return o && o.destination === 'dropship'; }
+  function destWhere(o) {
+    const city = String((o && o.destCity) || '').trim();
+    const st = String((o && o.destState) || '').trim();
+    return [city, st].filter(Boolean).join(' ');
+  }
+  function destBadge(o) {
+    if (!isDropShip(o)) return '';
+    const where = destWhere(o);
+    const tip = `Shipped by SanMar straight to the customer${where ? ' in ' + where : ''} — these pieces are NOT arriving at Freeman Road and must not be scheduled or checked in.`;
+    return `<span class="sit-dropship" title="${esc(tip)}">→ Drop-ship${where ? ' · ' + esc(where) : ''}</span>`;
+  }
+  function destTag(o) {
+    if (!isDropShip(o)) return '';
+    const where = destWhere(o);
+    return `<span class="sit-rt-dropship">DROP-SHIP${where ? ' → ' + esc(where.toUpperCase()) : ''}</span>`;
+  }
+  // One line of plain words for the AE / full sheets, which are prose-shaped, not tabular.
+  function destLine(o) {
+    if (!isDropShip(o)) return '';
+    const where = destWhere(o);
+    return `DROP-SHIP — SanMar sent this straight to the customer${where ? ' in ' + where.toUpperCase() : ''}. NOT arriving at Freeman Road.`;
   }
 
   // RUSH wording lives in BoxLabelTemplate (shared with the repack station's labels) so a
@@ -246,6 +310,7 @@
               ${methodChip(o.method)}
               ${rushBadge(o)}
               ${issueBadge(o.issue)}
+              ${destBadge(o)}
               ${followOnBadge(o)}
             </div>
             <span class="sit-wo">WO ${wo}</span>
@@ -306,6 +371,15 @@
     if (!rush.length) return '';
     const past = rush.filter(o => o.pastDue).length;
     return ` &nbsp;·&nbsp; <b class="sit-ps-rushcount">⚡ ${rush.length} RUSH${past ? ` (${past} PAST DUE)` : ''}</b>`;
+  }
+  // Drop-ships are MARKED, never silently deducted from the totals -- the piece and box
+  // counts still reconcile against the SanMar manifest, which is what receiving checks
+  // against. But a bare "26 orders / 505 pieces" hides that some of it is not coming here,
+  // so the magnitude gets its own words next to the rush count.
+  function dropShipSummary(orders) {
+    const n = (orders || []).filter(isDropShip).length;
+    if (!n) return '';
+    return ` &nbsp;·&nbsp; <b class="sit-ps-dropcount">→ ${n} DROP-SHIP${n === 1 ? '' : 'S'} (not arriving here)</b>`;
   }
   function sumOrders(orders) {
     return (orders || []).reduce((a, o) => ({
@@ -374,6 +448,8 @@
             <span class="sit-ps-r">${fmtNum(o.boxes)} box(es) · ${fmtNum(o.piecesShipped)} pcs${showCost && o.cost ? ' · <b>' + fmtMoney(o.cost) + '</b>' : ''}${o.upsDelivery && o.upsDelivery.date ? ' · UPS ' + fmtShortDate(o.upsDelivery.date) + (o.upsDelivery.type === 'rescheduled' ? ' (resched)' : o.upsDelivery.type === 'delivered' ? ' (delivered)' : '') : ''}</span></div>
           ${psFields ? `<div class="sit-ps-fields">${psFields}</div>` : ''}
           ${rushText(o) ? `<div class="sit-ps-rush">⚡ ${esc(rushText(o))}</div>` : ''}
+          ${destLine(o) ? `<div class="sit-ps-dropship">${esc(destLine(o))}</div>` : ''}
+          ${issueTag(o, { detail: true }) ? `<div class="sit-ps-issue">${issueTag(o, { detail: true })}</div>` : ''}
           ${o.followOnShipment ? `<div class="sit-ps-followon">${esc(followOnText(o))}</div>` : ''}
         </div>
       </div>
@@ -414,6 +490,15 @@
 
   // ── Branded print header shared by every recipient profile.
   //    opts: {title, recipient, subLine (HTML ok), note}. ──
+  // When was this paper true? These sheets get printed once and carried round the shop all
+  // day, and a stale one is indistinguishable from a fresh one on paper. generatedAtLocal is
+  // the PACIFIC stamp the proxy now sends (it used to publish only a UTC generatedAt, which
+  // read as the wrong hour to everyone holding the sheet).
+  function asOfLine(data) {
+    const at = data && data.generatedAtLocal;
+    if (!at) return '';
+    return `<div class="sit-ps-asof">Data as of ${esc(at)} Pacific</div>`;
+  }
   function psHeader(data, opts) {
     opts = opts || {};
     return `<div class="sit-ps-head">
@@ -422,6 +507,7 @@
       ${opts.recipient ? `<div class="sit-ps-recipient">${esc(opts.recipient)}</div>` : ''}
       <div class="sit-ps-sub">Arriving ${esc(fmtDate(data.date))} &nbsp;·&nbsp; ${opts.subLine || ''}</div>
       ${opts.note ? `<div class="sit-ps-note">${esc(opts.note)}</div>` : ''}
+      ${asOfLine(data)}
     </div>`;
   }
 
@@ -433,7 +519,7 @@
     const orders = activeOrders(data).slice().sort(byCompany);
     return psHeader(data, {
       title: 'Daily Inbound Report — SanMar Blanks',
-      subLine: `${fmtNum(t.pos)} POs · ${fmtNum(t.workOrders)} work orders · ${fmtNum(t.boxes)} boxes · ${fmtNum(t.piecesShipped)} pieces · <b>${fmtMoney0(t.cost)} blanks cost</b>${rushSummary(orders)}`,
+      subLine: `${fmtNum(t.pos)} POs · ${fmtNum(t.workOrders)} work orders · ${fmtNum(t.boxes)} boxes · ${fmtNum(t.piecesShipped)} pieces · <b>${fmtMoney0(t.cost)} blanks cost</b>${rushSummary(orders)}${dropShipSummary(orders)}`,
       note: 'Full day, all reps. Arrival = SanMar ship date + ground-transit estimate to Milton, WA. Blank cost = SanMar wholesale (CASE_PRICE × qty).',
     }) + (orders.length ? orders.map(o => poBlockHtml(o, { showCost: true })).join('') : '<p>No shipments arriving this day.</p>');
   }
@@ -446,8 +532,9 @@
       <div class="sit-ps-brand">Northwest Custom Apparel</div>
       <div class="sit-ps-title">Your inbound — SanMar blanks</div>
       <div class="sit-ps-recipient">${esc(repName)}${initials(repName) ? ' (' + esc(initials(repName)) + ')' : ''}</div>
-      <div class="sit-ps-sub">Arriving ${esc(fmtDate(data.date))} &nbsp;·&nbsp; ${fmtNum(s.pos)} of your PO${s.pos === 1 ? '' : 's'} · ${fmtNum(s.boxes)} boxes · ${fmtNum(s.pieces)} pieces${rushSummary(orders)}</div>
-      <div class="sit-ps-note">Your customers' blanks landing today — a good moment to let them know their order is moving.</div>
+      <div class="sit-ps-sub">Arriving ${esc(fmtDate(data.date))} &nbsp;·&nbsp; ${fmtNum(s.pos)} of your PO${s.pos === 1 ? '' : 's'} · ${fmtNum(s.boxes)} boxes · ${fmtNum(s.pieces)} pieces${rushSummary(orders)}${dropShipSummary(orders)}</div>
+      <div class="sit-ps-note">Your customers' blanks landing today — a good moment to let them know their order is moving. A row marked DROP-SHIP went straight to the customer and is NOT arriving here.</div>
+      ${asOfLine(data)}
     </div>`;
     const body = orders.length
       ? orders.slice().sort(byDue).map(o => poBlockHtml(o, { showCost: false })).join('')
@@ -481,7 +568,7 @@
         : ((Number(o.boxes) || 1) > 1 ? `${fmtNum(o.boxes)} boxes` : '1 of 1');
       return `<tr>
         <td class="sit-rt-check"></td>
-        <td>${esc(o.company || 'Unmatched')}${rushText(o) ? `<span class="sit-rt-rush">⚡ ${esc(rushText(o))}</span>` : ''}${o.followOnShipment ? `<span class="sit-rt-followon">${esc(followOnText(o))}</span>` : ''}</td>
+        <td>${esc(o.company || 'Unmatched')}${destTag(o)}${issueTag(o)}${rushText(o) ? `<span class="sit-rt-rush">⚡ ${esc(rushText(o))}</span>` : ''}${o.followOnShipment ? `<span class="sit-rt-followon">${esc(followOnText(o))}</span>` : ''}</td>
         <td>${o.workOrder ? '#' + esc(o.workOrder) : '<span class="sit-rt-muted">no WO</span>'}</td>
         <td>${esc(o.sanmarPO)}</td>
         <td class="sit-rt-c">${boxCell}</td>
@@ -493,7 +580,7 @@
     return psHeader(data, {
       title: 'Receiving checklist — SanMar inbound',
       recipient: 'Receiving · Mikalah',
-      subLine: `${fmtNum(s.pos)} orders · ${fmtNum(s.boxes)} boxes · ${fmtNum(s.pieces)} pieces to check in${rushSummary(orders)}`,
+      subLine: `${fmtNum(s.pos)} orders · ${fmtNum(s.boxes)} boxes · ${fmtNum(s.pieces)} pieces to check in${rushSummary(orders)}${dropShipSummary(orders)}`,
       note: 'Tick each box as it is scanned in. The full size breakdown prints on each box’s receiving label.',
     }) + `<table class="sit-rt-tbl sit-rt-recv">
       <thead><tr><th class="sit-rt-check">✓</th><th>Company</th><th>WO</th><th>SanMar PO</th><th class="sit-rt-c">Box</th><th>Carrier / tracking</th><th class="sit-rt-c">Pcs</th><th>Type</th></tr></thead>
@@ -511,7 +598,7 @@
       const pcs = list.reduce((a, o) => a + (Number(o.piecesShipped) || 0), 0);
       const rows = list.map(o => `<tr>
         <td class="${o.rush ? 'sit-rt-rush-cell' : (isDueSoon(o.dueDate, data.date) ? 'sit-rt-due-soon' : '')}">${esc(fmtShortDate(o.dueDate)) || '—'}${o.rush ? ` <span class="sit-rt-rushtag">⚡${o.pastDue ? 'PAST DUE' : 'RUSH ' + o.productionDays + 'd'}</span>` : ''}</td>
-        <td>${esc(o.company || 'Unmatched')}</td>
+        <td>${esc(o.company || 'Unmatched')}${destTag(o)}${issueTag(o)}</td>
         <td>${o.workOrder ? '#' + esc(o.workOrder) : '<span class="sit-rt-muted">no WO</span>'}</td>
         <td>${esc(o.designNumber || '—')}${o.designName ? ' · ' + esc(o.designName) : ''}</td>
         <td class="sit-rt-c">${fmtNum(o.piecesShipped)}</td>
@@ -524,7 +611,7 @@
     return psHeader(data, {
       title: 'Production plan — SanMar inbound',
       recipient: 'Production · Ruthie',
-      subLine: `${fmtNum(s.pos)} orders · ${fmtNum(s.pieces)} pieces · grouped by method, soonest due first${rushSummary(orders)}`,
+      subLine: `${fmtNum(s.pos)} orders · ${fmtNum(s.pieces)} pieces · grouped by method, soonest due first${rushSummary(orders)}${dropShipSummary(orders)}`,
       note: 'Blanks arriving today, ready to schedule. Bold due dates land within a week.',
     }) + (sections || '<p>No shipments arriving this day.</p>');
   }
@@ -534,12 +621,14 @@
   function buildPurchasingInner(data) {
     const orders = activeOrders(data).slice().sort(byPO);
     const rows = orders.map(o => {
-      const flag = (o.issue && (o.issue.backorder || o.issue.hold)) ? `<span class="sit-rt-flag">${o.issue.backorder ? 'BACKORDER' : 'HOLD'}</span>` : '';
+      // issueTag() rather than the old inline backorder|hold test, so URGENT and the
+      // generic issue label reach Bradley's sheet too instead of being swallowed.
+      const flag = issueTag(o);
       const short = (Number(o.piecesShipped) || 0) !== (Number(o.piecesOrdered) || 0);
       return `<tr>
         <td>${esc(o.sanmarPO)}</td>
         <td>${o.workOrder ? '#' + esc(o.workOrder) : '<span class="sit-rt-muted">no WO</span>'}</td>
-        <td>${esc(o.company || 'Unmatched')} ${flag}${o.rush ? `<span class="sit-rt-rushtag">⚡${o.pastDue ? 'PAST DUE' : 'RUSH'}</span>` : ''}</td>
+        <td>${esc(o.company || 'Unmatched')} ${destTag(o)}${flag}${o.rush ? `<span class="sit-rt-rushtag">⚡${o.pastDue ? 'PAST DUE' : 'RUSH'}</span>` : ''}</td>
         <td>${esc(initials(o.salesRep))}</td>
         <td class="sit-rt-c">${fmtNum(o.piecesOrdered)}</td>
         <td class="sit-rt-c${short ? ' sit-rt-short' : ''}">${fmtNum(o.piecesShipped)}${short ? ' ✗' : ''}</td>
@@ -551,8 +640,8 @@
     return psHeader(data, {
       title: 'Purchasing — SanMar PO reconcile',
       recipient: 'Purchasing · Bradley',
-      subLine: `${fmtNum(s.pos)} POs · ${fmtNum(s.boxes)} boxes · ${fmtNum(s.pieces)} pieces · <b>${fmtMoney0(s.cost)} blanks cost</b>`,
-      note: 'Ordered vs shipped — ✗ marks a short ship (backorder/hold flagged in red). Cost = SanMar wholesale (CASE_PRICE × qty).',
+      subLine: `${fmtNum(s.pos)} POs · ${fmtNum(s.boxes)} boxes · ${fmtNum(s.pieces)} pieces · <b>${fmtMoney0(s.cost)} blanks cost</b>${rushSummary(orders)}${dropShipSummary(orders)}`,
+      note: 'Ordered vs shipped — ✗ marks a short ship. BACKORDER / HOLD / URGENT and DROP-SHIP are called out beside the company. Cost = SanMar wholesale (CASE_PRICE × qty).',
     }) + `<table class="sit-rt-tbl sit-rt-purch">
       <thead><tr><th>SanMar PO</th><th>WO</th><th>Company</th><th>Rep</th><th class="sit-rt-c">Ord</th><th class="sit-rt-c">Ship</th><th>Terms</th><th class="sit-rt-c">Cost</th></tr></thead>
       <tbody>${rows || '<tr><td colspan="8">No POs arriving this day.</td></tr>'}

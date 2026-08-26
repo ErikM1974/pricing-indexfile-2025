@@ -243,6 +243,14 @@
 .sit-issue { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; border: 1px solid; cursor: help; }
 .sit-issue--bo { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
 .sit-issue--hold { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
+.sit-issue--urgent { background: #fee2e2; color: #9a3412; border-color: #fdba74; }
+.sit-issue--other { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
+/* Drop-ship is a NEGATIVE fact -- this freight is not coming here -- so it reads as an
+   exclusion (slate, arrow) rather than as another warning competing with backorder. */
+.sit-dropship {
+    font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 10px;
+    background: #1f2937; color: #fff; border: 1px solid #111827; cursor: help;
+}
 .sit-card-meta { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 6px; font-size: 12px; color: #444; }
 .sit-card-meta a { color: #2f6fed; text-decoration: none; }
 .sit-card-meta a:hover { text-decoration: underline; }
@@ -350,6 +358,24 @@
 }
 .sit-rt-rush-cell { font-weight: 900; color: #7f1d1d; }
 .sit-ps-followon { font-size: 9.5px; font-weight: 800; color: #92400e; background: #fef3c7; border: 1px solid #fcd34d; border-radius: 3px; padding: 1px 5px; margin-top: 3px; display: inline-block; }
+/* DROP-SHIP on paper. Solid dark fill, reversed text, no emoji -- these sheets go to the
+   mono laser and get handed to Ruthie, Nika and Taneisha, so the one line that says
+   "this is NOT arriving" has to survive greyscale as strongly as RUSH does. */
+.sit-ps-dropship {
+    font-size: 11px; font-weight: 900; color: #fff; background: #111827;
+    border: 1.5px solid #111827; border-radius: 3px; padding: 2px 7px;
+    margin-top: 3px; display: inline-block; letter-spacing: .02em;
+}
+.sit-ps-issue { margin-top: 3px; }
+.sit-ps-dropcount { color: #111827; }
+/* Which printing is this? A sheet carried round the shop all day looks identical to a
+   fresh one without it. Small and grey on screen; forced black on paper (below). */
+.sit-ps-asof { font-size: 8.5px; color: #888; margin-top: 3px; }
+/* Table-row form of DROP-SHIP, for the receiving / production / purchasing sheets. */
+.sit-rt-dropship {
+    display: inline-block; font-size: 8px; font-weight: 900; color: #fff; background: #111827;
+    border-radius: 3px; padding: 0 4px; margin-left: 4px; vertical-align: middle;
+}
 .sit-ps-tbl { width: 100%; border-collapse: collapse; font-size: 10.5px; }
 .sit-ps-tbl th, .sit-ps-tbl td { border: 1px solid #e0e0e0; padding: 3px 6px; text-align: left; }
 .sit-ps-tbl th { background: #fafafa; font-weight: 600; }
@@ -375,6 +401,21 @@
         border-color: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;
     }
     .sit-rt-rush, .sit-rt-rush-cell, .sit-ps-rushcount { color: #000 !important; font-weight: 900; }
+    /* DROP-SHIP and BACKORDER/HOLD/URGENT carry the same weight as RUSH: each one tells the
+       reader NOT to do the obvious thing with this row. Black fill, reversed text, so they
+       survive the mono laser exactly as the rush tags do. Without this the drop-ship token
+       prints as a pale box and the sheet goes back to implying the freight is arriving. */
+    .sit-ps-dropship, .sit-rt-dropship {
+        background: #000 !important; color: #fff !important;
+        border-color: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;
+    }
+    .sit-rt-flag {
+        background: #000 !important; color: #fff !important;
+        border-color: #000 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact;
+    }
+    .sit-ps-dropcount { color: #000 !important; font-weight: 900; }
+    /* The as-of stamp must be legible on paper -- it is the whole point of printing it. */
+    .sit-ps-asof { color: #000 !important; }
     /* Browsers drop backgrounds when printing unless told otherwise, and BLANKS
        leans on its flat fill to read as "settled". Without this it would print as
        a plain box and lose the contrast with NO ART. */
