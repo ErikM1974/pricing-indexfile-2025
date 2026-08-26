@@ -1,3 +1,10 @@
+## v2026.08.26.7 (2026.08.26)
+
+- Memory: M-7 category tiles deployed live v2026.08.26.6
+- M-8 mobile filters: sticky Show-N-results bar in the filter drawer, sticky toolbar <=960px, one-line promo <=560px
+- LESSONS: inventorylevels field-projection fix — anonymous route contract is its field list
+- Deploy v2026.08.26.7: 1 files (catalog.html...)
+
 ## v2026.08.26.6 (2026.08.26)
 
 - Memory: M-6 one chrome deployed live v2026.08.26.5 + verification evidence
