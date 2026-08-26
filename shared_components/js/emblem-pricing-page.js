@@ -366,7 +366,7 @@ const AI_ENDPOINT = '/api/contract-emblem-ai/chat';
         if (aiState.quoteIDPromise) return aiState.quoteIDPromise;
         aiState.quoteIDPromise = (async () => {
             try {
-                const r = await fetch(API_BASE_URL + '/api/quote-sequence/' + QUOTE_PREFIX);
+                const r = await fetch('/api/quote-sequence/' + QUOTE_PREFIX);
                 if (!r.ok) throw new Error('quote-sequence ' + r.status);
                 const d = await r.json();
                 aiState.quoteID = `${d.prefix}-${d.year}-${String(d.sequence).padStart(3, '0')}`;
@@ -868,7 +868,7 @@ const AI_ENDPOINT = '/api/contract-emblem-ai/chat';
             // Retry-safe: only create the session row once. On a retry after a
             // partial line-item failure, skip straight to re-posting the items.
             if (!aiState.sessionSaved) {
-                const sessionRes = await fetch(API_BASE_URL + '/api/quote_sessions', {
+                const sessionRes = await fetch('/api/quote_sessions', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(sessionPayload),
@@ -936,7 +936,7 @@ const AI_ENDPOINT = '/api/contract-emblem-ai/chat';
             for (const it of items) {
                 if (aiState.savedItemLines.includes(it.LineNumber)) continue; // already persisted (retry)
                 try {
-                    const r = await fetch(API_BASE_URL + '/api/quote_items', {
+                    const r = await fetch('/api/quote_items', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(it),

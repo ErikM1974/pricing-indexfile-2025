@@ -115,7 +115,7 @@ async function loadQuotes() {
 
     try {
         // Fetch quotes from API
-        const response = await fetch(`${API_BASE}/api/quote_sessions`);
+        const response = await fetch('/api/quote_sessions', { credentials: 'same-origin' });
         if (!response.ok) {
             throw new Error(`API returned ${response.status}`);
         }
@@ -1140,7 +1140,7 @@ async function updateQuoteStatus(selectEl) {
     selectEl.className = selectEl.className.replace(/status-\w+/, `status-${newStatus.toLowerCase()}`);
 
     try {
-        const response = await fetch(`${API_BASE}/api/quote_sessions/${pkId}`, {
+        const response = await fetch(`/api/quote_sessions/${pkId}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ Status: newStatus })

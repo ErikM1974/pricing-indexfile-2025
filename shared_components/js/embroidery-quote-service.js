@@ -5,7 +5,10 @@
 
 class EmbroideryQuoteService {
     constructor() {
-        this.baseURL = window.APP_CONFIG.API.BASE_URL;
+        // Same-origin since the 2026-08-26 quote-plane lockdown: the SAML
+        // session cookie authenticates every call and the app relays to the
+        // proxy with the CRM secret. Never point this back at the proxy host.
+        this.baseURL = '';
         this.quotePrefix = 'EMB';
         
         // Staff directory

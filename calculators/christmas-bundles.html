@@ -4096,7 +4096,9 @@
         // Christmas Bundle Quote Service
         class ChristmasBundleQuoteService {
             constructor() {
-                this.apiBase = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+                // Same-origin since the 2026-08-26 quote-plane lockdown
+                // (rate-limited public relays; proxy is secret-gated).
+                this.apiBase = '';
             }
 
             generateQuoteID() {
@@ -7922,13 +7924,14 @@ You will receive a confirmation email shortly.`);
             console.log(`=== CHECKING DATABASE FOR ORDER ${quoteID} ===`);
 
             try {
-                // Query quote_sessions
-                const sessionResponse = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_sessions`);
+                // Query quote_sessions — scoped to the quoteID (anonymous
+                // unscoped list reads 401 since the 2026-08-26 lockdown)
+                const sessionResponse = await fetch(`/api/quote_sessions?quoteID=${encodeURIComponent(quoteID)}`);
                 const sessions = await sessionResponse.json();
-                const session = sessions.find(s => s.QuoteID === quoteID);
+                const session = (Array.isArray(sessions) ? sessions : []).find(s => s.QuoteID === quoteID);
 
                 // Query quote_items
-                const itemsResponse = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_items?quoteID=${encodeURIComponent(quoteID)}`);
+                const itemsResponse = await fetch(`/api/quote_items?quoteID=${encodeURIComponent(quoteID)}`);
                 const items = await itemsResponse.json();
 
                 console.log('=== DATABASE CHECK RESULTS ===');

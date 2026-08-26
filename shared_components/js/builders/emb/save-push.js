@@ -748,8 +748,7 @@ export async function openPushPreview() {
     }
 
     try {
-        const apiBase = window.APP_CONFIG.API.BASE_URL;
-        const resp = await fetch(`${apiBase}/api/embroidery-push/preview/${encodeURIComponent(embState._pushQuoteId)}`);
+        const resp = await fetch(`/api/embroidery-push/preview/${encodeURIComponent(embState._pushQuoteId)}`);
         const data = await resp.json();
         if (!resp.ok) throw new Error(data.error || data.details || `HTTP ${resp.status}`);
         renderPushPreview(data);
@@ -888,8 +887,7 @@ export async function confirmPushToShopWorks() {
     confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Pushing…';
 
     try {
-        const apiBase = window.APP_CONFIG.API.BASE_URL;
-        const response = await fetch(`${apiBase}/api/embroidery-push/push-quote`, {
+        const response = await fetch(`/api/embroidery-push/push-quote`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ quoteId: embState._pushQuoteId, isTest: false, force }),

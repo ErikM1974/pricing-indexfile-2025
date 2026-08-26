@@ -4,7 +4,7 @@
  */
 class ScreenPrintFastQuoteService {
     constructor() {
-        this.baseURL = window.APP_CONFIG?.API?.BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        this.baseURL = ''; // same-origin since the 2026-08-26 quote-plane lockdown (staff session auth)
         this.quotePrefix = 'SPC';  // Screen Print Contract
         this.emailjsServiceId = 'service_jgrave3';
         this.emailjsPublicKey = '4qSbDO-SQs19TbP80';

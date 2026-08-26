@@ -14,7 +14,10 @@
  *   timeline           → same-origin /api/crm-proxy/lead-activity*
  *   customer match     → public proxy /api/company-contacts/*
  *   customer intel     → public proxy /api/customer-history/:id (6h server cache)
- *   linked quote       → public proxy /api/quote_sessions?quoteID=
+ *   linked quote       → SAME-ORIGIN /api/quote_sessions?quoteID= (2026-08-26
+ *                        quote-plane lockdown — staff session cookie auth; the
+ *                        proxy route is secret-gated, so never DashPage.fetchJson
+ *                        these, it prefixes the proxy base)
  *   order history      → same-origin /api/crm-proxy/order-odbc*
  * Every rendered value passes esc() — lead/note content is untrusted.
  */
@@ -23,6 +26,14 @@
 
     var L = window.LeadsCommon;
     var esc = L.esc, fmtWhen = L.fmtWhen, fmtWhenTime = L.fmtWhenTime, fmtMoney = L.fmtMoney;
+
+    // Same-origin JSON read — the staff session cookie is the credential.
+    function sameOriginJson(url) {
+        return fetch(url, { credentials: 'same-origin' }).then(function (r) {
+            if (!r.ok) throw new Error('HTTP ' + r.status + ' on ' + url);
+            return r.json();
+        });
+    }
 
     var state = {
         lead: null,
@@ -857,7 +868,7 @@
         if (!box) return;
         if (!lead.Email) { box.innerHTML = '<span class="ld-muted">No email on this lead — link by Quote ID below.</span>'; return; }
         box.innerHTML = '<span class="ld-muted">Checking recent quotes…</span>';
-        DashPage.fetchJson('/api/quote_sessions?customerEmail=' + encodeURIComponent(lead.Email))
+        sameOriginJson('/api/quote_sessions?customerEmail=' + encodeURIComponent(lead.Email))
             .then(function (body) {
                 var rows = Array.isArray(body) ? body : (body.sessions || body.result || []);
                 var seen = {};
@@ -912,7 +923,7 @@
                 '</span></div>' +
                 '<div id="lw-quote-live" class="ld-muted">Loading quote…</div></div>';
             document.getElementById('lw-quote-unlink').addEventListener('click', function () { unlinkQuote(lead); });
-            DashPage.fetchJson('/api/quote_sessions?quoteID=' + encodeURIComponent(lead.Linked_Quote_ID))
+            sameOriginJson('/api/quote_sessions?quoteID=' + encodeURIComponent(lead.Linked_Quote_ID))
                 .then(function (body) {
                     var rows = Array.isArray(body) ? body : (body.sessions || body.result || []);
                     var q = rows[0];
@@ -962,7 +973,7 @@
             // way out (and could clobber Lead_Value from the wrong quote).
             var linkBtn = document.getElementById('lw-quote-link');
             linkBtn.disabled = true;
-            DashPage.fetchJson('/api/quote_sessions?quoteID=' + encodeURIComponent(id))
+            sameOriginJson('/api/quote_sessions?quoteID=' + encodeURIComponent(id))
                 .then(function (body) {
                     var rows = Array.isArray(body) ? body : (body.sessions || body.result || []);
                     var q = rows[0];

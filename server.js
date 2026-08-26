@@ -281,13 +281,23 @@ dotenv.config();
 //   L1959 CRUD /api/customers
 //   L1998 CRUD /api/orders
 //
-// QUOTE SYSTEM
-//   L2446 CRUD /api/quote_sessions
-//   L2589 CRUD /api/quote_items
-//   L2710 CRUD /api/quote_analytics
+// QUOTE SYSTEM (postures HARDENED 2026-08-26 — quote-plane lockdown; the proxy
+// side is secret-gated, these same-origin relays are the only browser path.
+// Drift-locked by tests/unit/quote-plane-postures.test.js.)
+//   CRUD /api/quote_sessions — GET list: staff or quoteID/sessionID-scoped ·
+//        GET :id / PUT: requireStaff · POST: quotePlaneWriteLimiter ·
+//        DELETE: owner/master session gate
+//   CRUD /api/quote_items    — GET list: staff or QuoteID-scoped (query now
+//        forwarded verbatim) · GET :id / PUT / DELETE: requireStaff ·
+//        POST: quotePlaneWriteLimiter
+//   CRUD /api/quote_analytics — reads/PUT/DELETE: requireStaff · POST (view
+//        beacon): quotePlaneWriteLimiter
+//   GET  /api/quote-sequence/:prefix — anonymous mint relay, quoteSequenceLimiter
+//   POST /api/{embroidery,dtf,scp}-push/push-quote + GET …/preview/:quoteId —
+//        requireStaff relays (builders + quote-view staff mode)
 //
 // PUBLIC QUOTE & DESIGN ROUTES
-//   L2772 GET  /api/quote_items/quote/:quoteId
+//   GET  /api/quote_items/quote/:quoteId (anonymous capability read)
 //   L2789 GET  /design/:designNumber (→ design-view.html)
 //   L2896 GET  /art-request/:designId (→ art-request-detail.html)
 //   L2798 GET  /quote/:quoteId (→ quote-view.html)
@@ -1025,9 +1035,21 @@ function alert3DT(text) {
 // the QuoteID — never rows[0] (the 2026-06-01 wrong-quote lesson). Throws on
 // a failed lookup (err.httpStatus carries the upstream code) so callers can
 // distinguish "no record" (resolves null) from "lookup unavailable" (throws).
+// Attach the CRM shared secret to a server→proxy request when configured.
+// (References CRM_API_SECRET, declared later in this file — safe: function
+// bodies run at request time, long after module load initializes the const.)
+// Every dyno-side call to the proxy's quote data plane must carry this header
+// BEFORE the proxy's quote-plane gate flips to enforce (2026-08 lockdown) —
+// the header is ignored while the proxy routes are still open, so shipping it
+// early is free, and a missing one is the exact bug that froze quote sync for
+// a week in 2026-08 (see the /api/mo gate lesson at the sync route below).
+function withProxySecret(headers = {}) {
+  return CRM_API_SECRET ? { ...headers, 'X-CRM-API-Secret': CRM_API_SECRET } : headers;
+}
+
 async function fetchQuoteSessionRow(quoteID) {
   const url = `${CASPIO_PROXY_BASE}/api/quote_sessions?quoteID=${encodeURIComponent(quoteID)}&refresh=true`;
-  const resp = await fetch(url);
+  const resp = await fetch(url, { headers: withProxySecret() });
   if (!resp.ok) {
     const err = new Error(`Quote lookup failed: HTTP ${resp.status}`);
     err.httpStatus = resp.status;
@@ -1658,7 +1680,7 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
         }
         const notesPut = await fetch(`${TDT_PROXY}/api/quote_sessions/${row.PK_ID}`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          headers: withProxySecret({ 'Content-Type': 'application/json' }),
           body: JSON.stringify({ Notes: JSON.stringify(notes) }),
         });
         if (!notesPut.ok) {
@@ -1762,7 +1784,7 @@ app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async
         const updateUrl = `${CASPIO_PROXY_BASE}/api/quote_sessions/${quoteSession.PK_ID}`;
         await fetch(updateUrl, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          headers: withProxySecret({ 'Content-Type': 'application/json' }),
           body: JSON.stringify(Object.assign({
             Status: 'Payment Confirmed',
             Notes: `${quoteSession.Notes}\nPayment Confirmed: ${new Date().toISOString()}\nStripe Payment Intent: ${session.payment_intent}\nAmount: $${(session.amount_total / 100).toFixed(2)}`
@@ -1925,7 +1947,7 @@ async function handleSamplesOrderPaid(session, quoteID, res) {
   // Idempotency marker BEFORE the push (a redelivery mid-push must not double-order)
   await fetch(`${TDT_PROXY}/api/quote_sessions/${row.PK_ID}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: withProxySecret({ 'Content-Type': 'application/json' }),
     body: JSON.stringify({
       Status: 'Payment Confirmed',
       Notes: `${row.Notes}\nPayment Confirmed: ${new Date().toISOString()}\nStripe Payment Intent: ${session.payment_intent}\nAmount: $${(session.amount_total / 100).toFixed(2)}`
@@ -1983,7 +2005,7 @@ async function handleSamplesOrderPaid(session, quoteID, res) {
     const extOrderId = pushResult.extOrderId || pushResult.orderNumber || quoteID;
     await fetch(`${TDT_PROXY}/api/quote_sessions/${row.PK_ID}`, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
+      headers: withProxySecret({ 'Content-Type': 'application/json' }),
       body: JSON.stringify({
         Status: 'Processed',
         Notes: `${row.Notes}\nShopWorks Order: ${extOrderId}\nProcessed: ${new Date().toISOString()}`
@@ -2013,7 +2035,7 @@ async function handleSamplesOrderPaid(session, quoteID, res) {
     try {
       await fetch(`${TDT_PROXY}/api/quote_sessions/${row.PK_ID}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: withProxySecret({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ Status: 'Payment Confirmed - ShopWorks Failed' })
       });
     } catch (statusErr) {
@@ -2072,7 +2094,7 @@ async function save3DTQuoteSession(data) {
   const apiUrl = `${CASPIO_PROXY_BASE}/api/quote_sessions`;
   const response = await fetch(apiUrl, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: withProxySecret({ 'Content-Type': 'application/json' }),
     body: JSON.stringify(sessionData)
   });
 
@@ -2093,7 +2115,7 @@ async function save3DTQuoteSession(data) {
     const results = await Promise.allSettled(lineItems.map((item) =>
       fetch(itemsUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: withProxySecret({ 'Content-Type': 'application/json' }),
         body: JSON.stringify(item)
       }).then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); })
     ));
@@ -8423,9 +8445,11 @@ async function makeApiRequest(endpoint, method = 'GET', body = null) {
   const url = `${API_BASE_URL}${endpoint}`;
   const options = {
     method,
-    headers: {
+    // CRM secret rides on every proxy call (quote-plane lockdown 2026-08) —
+    // ungated proxy routes ignore it; gated ones require it.
+    headers: withProxySecret({
       'Content-Type': 'application/json'
-    }
+    })
   };
   
   if (body && (method === 'POST' || method === 'PUT')) {
@@ -8761,7 +8785,7 @@ app.post('/api/create-checkout-session', async (req, res) => {
         // caches [] under this QuoteID for 5 min on the proxy, and the
         // webhook's post-payment lookup reads that poisoned [] → "payment
         // without record". (Found in live verification 2026-06-09.)
-        const check = await fetch(`${TDT_PROXY}/api/quote_sessions?quoteID=${encodeURIComponent(candidate)}&refresh=true`);
+        const check = await fetch(`${TDT_PROXY}/api/quote_sessions?quoteID=${encodeURIComponent(candidate)}&refresh=true`, { headers: withProxySecret() });
         const rows = check.ok ? await check.json() : [];
         const list = Array.isArray(rows) ? rows : (rows?.data || []);
         if (!list.some(s => s.QuoteID === candidate)) { quoteID = candidate; break; }
@@ -8875,13 +8899,13 @@ app.post('/api/create-checkout-session', async (req, res) => {
     // Bonus: this refresh=true read re-warms the lookup cache with the REAL
     // row, un-poisoning the pre-create [] entry for the webhook/success page.
     try {
-      const lookup = await fetch(`${TDT_PROXY}/api/quote_sessions?quoteID=${encodeURIComponent(quoteID)}&refresh=true`);
+      const lookup = await fetch(`${TDT_PROXY}/api/quote_sessions?quoteID=${encodeURIComponent(quoteID)}&refresh=true`, { headers: withProxySecret() });
       const rows = lookup.ok ? await lookup.json() : [];
       const row = (Array.isArray(rows) ? rows : (rows?.data || [])).find(s => s.QuoteID === quoteID);
       if (row && row.PK_ID) {
         await fetch(`${TDT_PROXY}/api/quote_sessions/${row.PK_ID}`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          headers: withProxySecret({ 'Content-Type': 'application/json' }),
           body: JSON.stringify({
             SessionID: `stripe_${session.id}`,
             Notes: `${chCfg.orderNoteLabel({ rush: priced.rush, styleNumber: priced.style })} | Stripe Session: ${session.id} | Status: Checkout Created`
@@ -9020,7 +9044,7 @@ app.post('/api/samples/create-checkout-session', async (req, res) => {
     for (let attempt = 0; attempt < 4; attempt++) {
       const candidate = chCfg.buildQuoteId();
       try {
-        const check = await fetch(`${TDT_PROXY}/api/quote_sessions?quoteID=${encodeURIComponent(candidate)}&refresh=true`);
+        const check = await fetch(`${TDT_PROXY}/api/quote_sessions?quoteID=${encodeURIComponent(candidate)}&refresh=true`, { headers: withProxySecret() });
         const rowsQ = check.ok ? await check.json() : [];
         const list = Array.isArray(rowsQ) ? rowsQ : (rowsQ?.data || []);
         if (!list.some((r) => r.QuoteID === candidate)) { quoteID = candidate; break; }
@@ -9131,13 +9155,13 @@ app.post('/api/samples/create-checkout-session', async (req, res) => {
     // Stamp the Stripe session id onto the Caspio row (PK_ID-routed PUT; the
     // refresh=true read also un-poisons the pre-create [] lookup cache).
     try {
-      const lookup = await fetch(`${TDT_PROXY}/api/quote_sessions?quoteID=${encodeURIComponent(quoteID)}&refresh=true`);
+      const lookup = await fetch(`${TDT_PROXY}/api/quote_sessions?quoteID=${encodeURIComponent(quoteID)}&refresh=true`, { headers: withProxySecret() });
       const rowsL = lookup.ok ? await lookup.json() : [];
       const row = (Array.isArray(rowsL) ? rowsL : (rowsL?.data || [])).find((r) => r.QuoteID === quoteID);
       if (row && row.PK_ID) {
         await fetch(`${TDT_PROXY}/api/quote_sessions/${row.PK_ID}`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+          headers: withProxySecret({ 'Content-Type': 'application/json' }),
           body: JSON.stringify({
             SessionID: `stripe_${session.id}`,
             Notes: `${chCfg.orderNoteLabel()} | Stripe Session: ${session.id} | Status: Checkout Created`
@@ -9997,7 +10021,7 @@ function buildArtNote({ info, files }) {
 // on Status=Processed will catch any accidental re-use. Revisit this if we actually hit it.
 async function generateOrderFormDraftId() {
   try {
-    const r = await fetch(`${CASPIO_PROXY_BASE}/api/quote-sequence/OF`);
+    const r = await fetch(`${CASPIO_PROXY_BASE}/api/quote-sequence/OF`, { headers: withProxySecret() });
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const j = await r.json();
     const n = Number(j && j.sequence);
@@ -10175,7 +10199,7 @@ app.post('/api/submit-order-form', async (req, res) => {
         };
         const createResp = await fetch(`${CASPIO_PROXY_BASE}/api/quote_sessions`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: withProxySecret({ 'Content-Type': 'application/json' }),
           body: JSON.stringify(sessionData)
         });
         if (createResp.ok) {
@@ -10970,7 +10994,7 @@ app.post('/api/submit-order-form', async (req, res) => {
               try {
                 await fetch(QUOTE_ITEMS_URL, {
                   method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
+                  headers: withProxySecret({ 'Content-Type': 'application/json' }),
                   body: JSON.stringify(item),
                 });
               } catch (_) { /* per-line failure is non-fatal */ }
@@ -11848,23 +11872,64 @@ app.get('/api/cart-integration.js', (req, res) => {
   res.sendFile(path.join(__dirname, 'cart-integration.js'));
 });
 
-// Quote API endpoints are now available on Caspio proxy
+// =============================================================================
+// QUOTE DATA PLANE RELAYS (hardened 2026-08-26 — quote-plane lockdown step 2)
+//
+// These same-origin routes are THE browser path to the proxy's Quote_Sessions /
+// Quote_Items / Quote_Analytics tables. They used to be anonymous passthroughs
+// (an ungated twin of the proxy's own routes); every browser caller has been
+// migrated onto them and the proxy side is being gated secret-only. Postures:
+//
+//   • Staff pages (builders, quote-management, bundle-orders, lead workspace,
+//     universal-records) → requireStaff on every unscoped read and EVERY
+//     mutation of existing rows (PUT/DELETE — the price-rewrite risk).
+//   • Public pages (quote-cart, calculators, checkout-success, quote-view)
+//     → CREATE (POST) stays anonymous behind quotePlaneWriteLimiter, and reads
+//     must be SCOPED to a quoteID/sessionID the caller already knows
+//     (capability-URL model) — an anonymous caller can never LIST the book.
+//
+// List reads forward the ORIGINAL query string verbatim: callers use both
+// `QuoteID=` and `quoteID=` spellings plus staff filters (customerEmail,
+// createdAfter, q.orderBy…) and the proxy validates/sanitizes all of them
+// server-side (named params only; raw q.where is 400-rejected upstream).
+// =============================================================================
 
-// Quote Sessions API - GET all sessions
-app.get('/api/quote_sessions', async (req, res) => {
+// Anonymous callers must scope the read to a quote/session they already know.
+function quoteScopedOrStaff(req, res, next) {
+  if (req.session && req.session.crmUser) return next();
+  const q = req.query || {};
+  if (q.quoteID || q.QuoteID || q.sessionID || q.SessionID) return next();
+  return res.status(401).json({
+    error: 'Sign in required',
+    message: 'Unscoped quote reads need a staff session; anonymous reads must pass a quoteID.',
+    loginUrl: '/auth/saml/login',
+  });
+}
+
+// Anonymous quote WRITES (create-only) share the proxy's historical budget
+// (120 writes / 15 min / IP). Staff sessions skip it — the whole office shares
+// one egress IP, and a builder save legitimately fires a dozen POSTs.
+const quotePlaneWriteLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 120,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => !!(req.session && req.session.crmUser),
+  message: { error: 'Too many quote saves from this address — try again in a few minutes.' },
+});
+
+// Forward the original query string byte-for-byte (both QuoteID spellings,
+// refresh=true, staff filters, q.orderBy…) — reconstructing from req.query
+// silently dropped params for years.
+function originalQueryString(req) {
+  const qi = req.originalUrl.indexOf('?');
+  return qi >= 0 ? req.originalUrl.slice(qi) : '';
+}
+
+// Quote Sessions API - GET sessions (staff: any filter/none; anonymous: scoped)
+app.get('/api/quote_sessions', quoteScopedOrStaff, async (req, res) => {
   try {
-    let endpoint = '/quote_sessions';
-    if (req.query.quoteID) {
-      // SECURITY: Sanitize input
-      const safeQuoteID = sanitizeFilterInput(req.query.quoteID);
-      endpoint += `?filter=QuoteID='${safeQuoteID}'`;
-    } else if (req.query.sessionID) {
-      // SECURITY: Sanitize input
-      const safeSessionID = sanitizeFilterInput(req.query.sessionID);
-      endpoint += `?filter=SessionID='${safeSessionID}'`;
-    }
-
-    const data = await makeApiRequest(endpoint);
+    const data = await makeApiRequest(`/quote_sessions${originalQueryString(req)}`);
     res.json(data);
   } catch (error) {
     console.error('Error fetching quote sessions:', error);
@@ -11872,8 +11937,8 @@ app.get('/api/quote_sessions', async (req, res) => {
   }
 });
 
-// GET single session by ID
-app.get('/api/quote_sessions/:id', async (req, res) => {
+// GET single session by PK — staff only (sequential PKs enumerate the book)
+app.get('/api/quote_sessions/:id', requireStaff, async (req, res) => {
   try {
     const data = await makeApiRequest(`/quote_sessions/${req.params.id}`);
     res.json(data);
@@ -11907,8 +11972,8 @@ app.get('/api/quote_sessions/quote/:quoteId', async (req, res) => {
   }
 });
 
-// CREATE new session
-app.post('/api/quote_sessions', async (req, res) => {
+// CREATE new session — anonymous allowed (public calculators/cart), rate-limited
+app.post('/api/quote_sessions', quotePlaneWriteLimiter, async (req, res) => {
   try {
     console.log('[QUOTE API] Creating quote session with QuoteID:', req.body.QuoteID);
     
@@ -11971,8 +12036,10 @@ app.post('/api/quote_sessions', async (req, res) => {
   }
 });
 
-// UPDATE session
-app.put('/api/quote_sessions/:id', async (req, res) => {
+// UPDATE session — staff only (every live browser mutator is a staff page;
+// the public accept/deposit flows do their PUTs through their own server-side
+// routes with server-side authority, never through this relay)
+app.put('/api/quote_sessions/:id', requireStaff, async (req, res) => {
   try {
     const data = await makeApiRequest(`/quote_sessions/${req.params.id}`, 'PUT', req.body);
     res.json(data);
@@ -12100,10 +12167,11 @@ app.delete('/api/quote_sessions/:id', async (req, res) => {
   }
 });
 
-// Quote Items API
-app.get('/api/quote_items', async (req, res) => {
+// Quote Items API — list (staff: any; anonymous: must scope to a QuoteID).
+// Forwards the query string (this relay used to DROP it, returning ALL items).
+app.get('/api/quote_items', quoteScopedOrStaff, async (req, res) => {
   try {
-    const data = await makeApiRequest('/quote_items');
+    const data = await makeApiRequest(`/quote_items${originalQueryString(req)}`);
     res.json(data);
   } catch (error) {
     console.error('Error fetching quote items:', error);
@@ -12111,7 +12179,7 @@ app.get('/api/quote_items', async (req, res) => {
   }
 });
 
-app.get('/api/quote_items/:id', async (req, res) => {
+app.get('/api/quote_items/:id', requireStaff, async (req, res) => {
   try {
     const data = await makeApiRequest(`/quote_items/${req.params.id}`);
     res.json(data);
@@ -12133,7 +12201,7 @@ app.get('/api/quote_items/session/:sessionId', async (req, res) => {
   }
 });
 
-app.post('/api/quote_items', async (req, res) => {
+app.post('/api/quote_items', quotePlaneWriteLimiter, async (req, res) => {
   try {
     console.log('[QUOTE ITEMS API] Creating quote item for QuoteID:', req.body.QuoteID);
     
@@ -12201,7 +12269,8 @@ app.post('/api/quote_items', async (req, res) => {
   }
 });
 
-app.put('/api/quote_items/:id', async (req, res) => {
+// Mutating an EXISTING line (the price-rewrite risk) — staff only.
+app.put('/api/quote_items/:id', requireStaff, async (req, res) => {
   try {
     const data = await makeApiRequest(`/quote_items/${req.params.id}`, 'PUT', req.body);
     res.json(data);
@@ -12211,7 +12280,7 @@ app.put('/api/quote_items/:id', async (req, res) => {
   }
 });
 
-app.delete('/api/quote_items/:id', async (req, res) => {
+app.delete('/api/quote_items/:id', requireStaff, async (req, res) => {
   try {
     await makeApiRequest(`/quote_items/${req.params.id}`, 'DELETE');
     res.json({ success: true });
@@ -12226,10 +12295,11 @@ app.delete('/api/quote_items/:id', async (req, res) => {
   }
 });
 
-// Quote Analytics API
-app.get('/api/quote_analytics', async (req, res) => {
+// Quote Analytics API — reads are staff-only (view telemetry names customers);
+// the CREATE beacon stays anonymous (quote-view fires it for customers).
+app.get('/api/quote_analytics', requireStaff, async (req, res) => {
   try {
-    const data = await makeApiRequest('/quote_analytics');
+    const data = await makeApiRequest(`/quote_analytics${originalQueryString(req)}`);
     res.json(data);
   } catch (error) {
     console.error('Error fetching quote analytics:', error);
@@ -12237,7 +12307,7 @@ app.get('/api/quote_analytics', async (req, res) => {
   }
 });
 
-app.get('/api/quote_analytics/:id', async (req, res) => {
+app.get('/api/quote_analytics/:id', requireStaff, async (req, res) => {
   try {
     const data = await makeApiRequest(`/quote_analytics/${req.params.id}`);
     res.json(data);
@@ -12247,7 +12317,7 @@ app.get('/api/quote_analytics/:id', async (req, res) => {
   }
 });
 
-app.get('/api/quote_analytics/session/:sessionId', async (req, res) => {
+app.get('/api/quote_analytics/session/:sessionId', requireStaff, async (req, res) => {
   try {
     // SECURITY: Sanitize input
     const safeSessionId = sanitizeFilterInput(req.params.sessionId);
@@ -12259,7 +12329,7 @@ app.get('/api/quote_analytics/session/:sessionId', async (req, res) => {
   }
 });
 
-app.post('/api/quote_analytics', async (req, res) => {
+app.post('/api/quote_analytics', quotePlaneWriteLimiter, async (req, res) => {
   try {
     const data = await makeApiRequest('/quote_analytics', 'POST', req.body);
     res.status(201).json(data);
@@ -12269,7 +12339,7 @@ app.post('/api/quote_analytics', async (req, res) => {
   }
 });
 
-app.put('/api/quote_analytics/:id', async (req, res) => {
+app.put('/api/quote_analytics/:id', requireStaff, async (req, res) => {
   try {
     const data = await makeApiRequest(`/quote_analytics/${req.params.id}`, 'PUT', req.body);
     res.json(data);
@@ -12279,7 +12349,7 @@ app.put('/api/quote_analytics/:id', async (req, res) => {
   }
 });
 
-app.delete('/api/quote_analytics/:id', async (req, res) => {
+app.delete('/api/quote_analytics/:id', requireStaff, async (req, res) => {
   try {
     await makeApiRequest(`/quote_analytics/${req.params.id}`, 'DELETE');
     res.json({ success: true });
@@ -12293,6 +12363,68 @@ app.delete('/api/quote_analytics/:id', async (req, res) => {
     res.status(500).json({ error: 'Failed to delete quote analytics' });
   }
 });
+
+// ── Quote-ID sequence mint relay (2026-08-26 lockdown) ──────────────────────
+// GET-that-writes on the proxy (atomic counter increment). Minters: staff
+// builders AND public calculators (dtg-contract / embroidery-contract), so it
+// stays anonymous — but rate-limited (mirror of the proxy's own 60/15min
+// budget, staff sessions skipped) and prefix-validated like the proxy.
+const quoteSequenceLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => !!(req.session && req.session.crmUser),
+  message: { error: 'Too many quote-number requests from this address — try again in a few minutes.' },
+});
+app.get('/api/quote-sequence/:prefix', quoteSequenceLimiter, async (req, res) => {
+  const prefix = String(req.params.prefix || '').toUpperCase();
+  if (!/^[A-Z0-9]{1,10}$/.test(prefix)) {
+    return res.status(400).json({ error: 'Invalid prefix' });
+  }
+  try {
+    const r = await fetch(`${CASPIO_PROXY_BASE}/api/quote-sequence/${prefix}`, {
+      headers: withProxySecret(), signal: AbortSignal.timeout(15000),
+    });
+    const body = await r.text();
+    res.status(r.status).type(r.headers.get('content-type') || 'application/json').send(body);
+  } catch (e) {
+    console.warn(`[quote-sequence relay] ${prefix} upstream failed:`, e.message);
+    res.status(502).json({ error: 'upstream_unavailable' });
+  }
+});
+
+// ── ShopWorks push relays (2026-08-26 lockdown) ─────────────────────────────
+// Push-to-ShopWorks is a STAFF action fired from the builder pages and
+// quote-view's staff mode; the proxy routes read full customer PII (the
+// preview dump) and create real OnSite orders, so requireStaff + secret.
+function quotePushForward(subPath) {
+  return async (req, res) => {
+    if (!CRM_API_SECRET) return res.status(503).json({ error: 'not_configured' });
+    try {
+      const opts = {
+        method: req.method,
+        headers: withProxySecret({ 'Content-Type': 'application/json' }),
+        signal: AbortSignal.timeout(120000), // OnSite order creation is slow
+      };
+      // Re-serialize the parsed body — the global bodyParser already consumed
+      // the request stream, so piping req would send an empty body.
+      if (req.method === 'POST') opts.body = JSON.stringify(req.body || {});
+      const r = await fetch(`${CASPIO_PROXY_BASE}/api/${subPath(req)}`, opts);
+      const body = await r.text();
+      res.status(r.status).type(r.headers.get('content-type') || 'application/json').send(body);
+    } catch (e) {
+      console.error('[quote-push relay]', req.originalUrl, e.message);
+      res.status(502).json({ error: 'upstream_unavailable' });
+    }
+  };
+}
+for (const method of ['embroidery', 'dtf', 'scp']) {
+  app.post(`/api/${method}-push/push-quote`, requireStaff,
+    quotePushForward(() => `${method}-push/push-quote`));
+  app.get(`/api/${method}-push/preview/:quoteId`, requireStaff,
+    quotePushForward((req) => `${method}-push/preview/${encodeURIComponent(req.params.quoteId)}`));
+}
 
 // =============================================================================
 // PUBLIC QUOTE VIEW API (No Authentication Required)
@@ -12532,7 +12664,7 @@ app.post('/api/public/sticker-quote', strictLimiter, express.json({ limit: '32kb
     const total = subtotal + setupFee;
 
     // 2. Mint the quote number only now that everything above validated.
-    const sr = await fetch(`${CASPIO_PROXY_BASE}/api/quote-sequence/STK`);
+    const sr = await fetch(`${CASPIO_PROXY_BASE}/api/quote-sequence/STK`, { headers: withProxySecret() });
     if (!sr.ok) throw new Error('sequence HTTP ' + sr.status);
     const sj = await sr.json();
     const seq = Number(sj && sj.sequence);

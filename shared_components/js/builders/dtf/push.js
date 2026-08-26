@@ -88,8 +88,7 @@ export async function openDtfPushPreview() {
     if (typeof openAccessibleModal === 'function') openAccessibleModal(modal, { label: 'Push to ShopWorks preview', onEsc: closeDtfPushPreview }); // 1.8
 
     try {
-        const apiBase = window.APP_CONFIG.API.BASE_URL;
-        const resp = await fetch(`${apiBase}/api/dtf-push/preview/${encodeURIComponent(dtfState._dtfPushQuoteId)}`);
+        const resp = await fetch(`/api/dtf-push/preview/${encodeURIComponent(dtfState._dtfPushQuoteId)}`);
         const data = await resp.json();
         if (!resp.ok) throw new Error(data.error || data.details || `HTTP ${resp.status}`);
         renderDtfPushPreview(data.orderJson || {});
@@ -182,8 +181,7 @@ export async function confirmDtfPush(directFallback) {
     };
 
     try {
-        const apiBase = window.APP_CONFIG.API.BASE_URL;
-        const response = await fetch(`${apiBase}/api/dtf-push/push-quote`, {
+        const response = await fetch(`/api/dtf-push/push-quote`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ quoteId: dtfState._dtfPushQuoteId, isTest: false, force: false }),

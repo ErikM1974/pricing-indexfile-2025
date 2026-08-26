@@ -5,7 +5,9 @@
 
 class ScreenPrintQuoteService {
     constructor() {
-        this.baseURL = window.APP_CONFIG?.API?.BASE_URL || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        // Same-origin since the 2026-08-26 quote-plane lockdown (SAML cookie
+        // auth; the app relays to the proxy with the CRM secret).
+        this.baseURL = '';
         this.quotePrefix = 'SP';
         this.taxRate = 0.102; // Milton WA 10.2% (2026-07-06) — fallback only when quoteData.taxRate is absent
         console.log('[ScreenPrintQuoteService] Initialized');
