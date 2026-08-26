@@ -1,3 +1,8 @@
+## v2026.08.26.8 (2026.08.26)
+
+- Memory: M-8 deployed live v2026.08.26.7; Richardson closed (SanMar-only per Erik) — catalog roadmap complete
+- Deploy v2026.08.26.8: delete legacy Box Label Management block (429 lines, zero callers)
+
 ## v2026.08.26.7 (2026.08.26)
 
 - Memory: M-7 category tiles deployed live v2026.08.26.6
