@@ -779,3 +779,16 @@ input, select, textarea { font-family: var(--font-body); font-size: 15px; }
     .success-card { padding: 26px 18px; }
     .success-card h1 { font-size: 22px; }
 }
+
+/* Real Google review beside the pay step (trust band, 2026-08-26) */
+.checkout-review {
+    margin: 14px 0 0; padding: 12px 14px;
+    background: var(--card); border: 1px solid var(--line);
+    border-left: 3px solid var(--green-700, #1e5b3c);
+    border-radius: var(--radius-sm);
+}
+.checkout-review p { margin: 0 0 6px; font-size: 13px; line-height: 1.55; color: var(--ink); }
+.checkout-review footer { font-size: 12px; color: var(--ink-soft); }
+.checkout-review footer a { color: inherit; font-weight: 600; text-decoration: none; }
+.checkout-review footer a:hover { text-decoration: underline; }
+

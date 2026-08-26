@@ -646,3 +646,26 @@
     .filters-bar-container { padding: 0 14px; }
     .compare-bar-content { padding: 10px 14px; }
 }
+
+/* ── Reviews band (trust band, 2026-08-26 — real Google reviews) ── */
+.reviews-band { padding-top: 34px; }
+.reviews-band-head { display: flex; justify-content: center; margin-bottom: 18px; }
+.reviews-badge {
+    display: inline-flex; align-items: baseline; gap: 10px;
+    background: var(--green-50); border: 1px solid var(--green-100);
+    border-radius: 999px; padding: 8px 18px; text-decoration: none;
+}
+.reviews-badge:hover { background: var(--green-100); }
+.reviews-stars { color: #e7a33b; font-size: 15px; letter-spacing: 2px; }
+.reviews-score { font-family: var(--font-display); font-weight: 800; font-size: 18px; color: var(--ink); }
+.reviews-count { font-size: 13.5px; font-weight: 600; color: var(--ink-soft); }
+.reviews-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+.review-quote {
+    margin: 0; background: var(--card, #fff); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 20px 22px;
+}
+.review-quote p { margin: 0 0 12px; font-size: 15px; line-height: 1.65; color: var(--ink); }
+.review-quote footer { font-size: 13px; color: var(--ink-soft); }
+.review-quote footer strong { color: var(--ink); }
+.review-src { color: var(--green-700); font-weight: 600; }
+
