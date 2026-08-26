@@ -216,7 +216,7 @@ no reload). Mobile ≤700px: one 46px horizontally-scrollable row, no page overf
 browser: 15 tiles → click Ladies → `?category=Ladies`, H1 Ladies, 48 cards, tiles hidden →
 clear-all → tiles back; `?q=` hides them. All gates green.
 
-## ✅ M-8 mobile filters — BUILT 2026-08-26, committed on develop, NOT deployed
+## ✅ M-8 mobile filters — DEPLOYED LIVE `v2026.08.26.7` (2026-08-26), byte-verified (filtersApply markup, "Show 0 results" in live js, filters-apply-bar/fall26-cta-label/masthead-h in live css)
 
 Three pieces, all ≤-breakpoint only (desktop byte-identical): (1) mobile filter drawer gets a
 sticky bottom apply bar — `#filtersApply` mirrors the live result count ("Show 3,408 results",
@@ -229,10 +229,11 @@ below masthead z-90/drawers z-240). (3) Fall promo ≤560px collapses to ONE 47p
 title + arrow; secondary copy + "Explore the collection" hidden — CTA text got a
 `.fall26-cta-label` wrapper to be hideable). Browser-verified at 375px + desktop 1280px.
 
-**CONTINUATION PLAN (Erik-approved roadmap, in order):**
-1. **Richardson data question** — most Richardson caps live in Non_SanMar_Products and don't
-   surface under /catalog?brand=Richardson (only 5 SanMar rows); needs a look at the NS table
-   rows / brand mapping (data, not code).
+## ✅ Richardson question CLOSED (Erik's ruling, 2026-08-26)
+
+"We just want the Richardson caps that SanMar offers, not the Richardson full line." The 5
+SanMar styles under /catalog?brand=Richardson are the intended catalog — no Non_SanMar_Products
+merge. Working as intended; roadmap COMPLETE (M-1..M-9 all shipped).
 
 **ERIK'S STANDING ERRANDS:** void OnSite test orders PO `CAP0825-4781` + `CAP0825-7724`
 ("ZZZ TEST - DO NOT PRODUCE") · set `SLACK_ORDER_ALERT_WEBHOOK_URL` on Heroku · Rule 9 rewording.
