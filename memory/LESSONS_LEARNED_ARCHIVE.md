@@ -2842,3 +2842,28 @@ using the same builder — live page verified rendering both, matching the SW sn
   script), so the repaired row and future rows are identical by construction.
 
 ---
+## First-ever caps order pushed to ShopWorks with NO artwork — the stamp had flattened the file ref to a boolean (2026-08-25)
+
+**Problem.** First exercise of the /custom-caps paid leg (Stripe TEST-mode E2E, CAP0825-4781):
+order reached OnSite with `designs: []` and `attachments: []` — production would get a proof-first
+embroidery order with no logo attached. Quote-view and custom-caps-success were ALSO silently
+artless for every future CAP order.
+
+**Root cause.** The caps channel's `stampedOrderSettings` (server.js) wrote `frontLogo: true` /
+`backLogo: <bool>` — server-authoritative *pricing flags* — into OrderSettingsJSON, clobbering the
+client's `{fileUrl, fileName}` objects (Object.assign stamp wins over client base). Three consumers
+(`submit-3day-order` push, quote-view.js:3481, custom-caps-success logoFig) all read `.fileUrl` and
+optional-chain to nothing. Tees never hit it: its stamp doesn't touch artwork keys.
+
+**Fix.** `sanitizeUploadedLogoRef(ref, allowedPrefix)` in config/storefront-channels.js (jest-locked);
+caps stamp now carries the sanitized `{fileUrl, fileName}` through — only `{proxy}/api/files/` URLs
+survive, and backLogo rides ONLY when the reprice charged it. Verified by rerun CAP0825-7724:
+`Built designs: 1`, `Built attachments: 1`, Processed.
+
+**Prevention.** A channel launched without ONE full test-mode E2E (create-session → signed webhook →
+push) is unverified no matter how much code it shares — the tees channel being production-proven
+proved nothing about the caps STAMP. `tests/3dt-fire-test-webhook.js` makes the full rehearsal a
+two-command job; run it for every NEW storefront channel before launch, and read the push payload
+log, not just the status flip.
+
+---
