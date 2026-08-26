@@ -4,7 +4,7 @@ Repo `/memory/` is the CANONICAL tree (git-tracked). The machine-local auto-memo
 `~/.claude/projects/<slug>/memory/` holds `MEMORY.md` (the auto-loaded index) plus per-fact
 files; where a topic exists in both, **the repo copy wins** and auto-memory keeps a pointer.
 
-Last Updated: 2026-08-18 (branch/deploy audit: LESSONS_LEARNED trimmed 275→231 lines, 2 entries archived; all 6 dangling cross-doc links repaired — broken links 6→0, health 45→75. PDP placement branch: two duplicate backlog notes merged into one, PR #30 opened)
+Last Updated: 2026-08-27 (/memory-maintain: MEMORY.md 18.5→~15 KB — stale statuses corrected (paginator verified NOT deployed via heroku/main ancestry; M-6 now live; quote-plane locked); LESSONS 263→209 (2 resolved 08-19 entries archived); missing staff-dashboard-hardening LESSONS entry written; q.limit truncation sub-fact added to DURABLE_GOTCHAS; cross-tree pointers verified intact)
 
 | File | What it holds |
 |---|---|

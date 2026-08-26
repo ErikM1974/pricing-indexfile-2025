@@ -77,6 +77,24 @@ blank fields only, so re-running is safe.
 ⚠️ Nothing stops this recurring: the two writers still only set these on INSERT. If a future
 change adds a destination field, expect the same gap and re-run this script.
 
+## 🔴 CLOSED BY DECISION: third-party contract POs stay off the board (Erik, 2026-08-26)
+
+8 of the 12 manifests on disk carry POs on somebody else's SanMar account — Custom Prints NW,
+Premium Products NW, Northwest Souvenirs, Donahue Graphics, In Graphic Detail, Armageddon
+Graphics. **Six of the seven are our own contract-decorating customers, all Ruthie's accounts**,
+they name us as decorator, and the freight really does arrive at Freeman Road. So it reads like
+a hole in the receiving sheet, and the next person to look will "discover" it too.
+
+**It is not being filled.** Ruthie gets the PSST manifest emailed every morning and reads it
+directly; the board covers OUR orders, as it always has.
+
+The API could not help anyway: our PromoStandards credentials are scoped to account 6920, so a
+PO on another account returns **zero** shipments — verified on PO 10646 (Custom Prints NW). The
+manifest CSV is the only source, and Ruthie already has it.
+
+`psst-audit.js` prints these as `(third-party) … expected absent, by decision` and carries the
+same note at the loop. **Do not build this without asking Erik — it has been raised and closed.**
+
 ## Ranked backlog for this report (adversarially verified 2026-08-26)
 
 Two independent multi-agent passes over the backend and sheets; 24 proposals → 10 survived. The

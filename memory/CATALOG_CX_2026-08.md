@@ -179,7 +179,13 @@ unpushed in either repo. Scoreboard of what's LIVE: search <1s (boot-warmed inde
 voice · all roads → /catalog · buy-online bridge (Option A) · featured landing · M-1 honest
 counts · trust band (4.9★ Google) · M-5 Quick-View "Price it & add to quote" CTA + swatch dots.
 
-## ✅ M-6 one chrome — BUILT 2026-08-26, app develop `84ea8fbd`, NOT deployed
+## ✅ M-6 one chrome — DEPLOYED LIVE `v2026.08.26.5` (Heroku v1889, 2026-08-26), live-verified
+
+Live checks: backend SHA `061a37f3` via /api/version · `/pages/webstore-info.html` 301 on prod ·
+brands + tumbler serve the new chrome (nav-bar-inner/sidebar/site-footer present, old
+`top-navigation`/`enhanced-pricing-header`/`page-footer` = 0) · dist bundles byte-verified
+(brands.js + tumbler js: `drawer-open` + `/catalog?q=` literals; catalog-search:
+`location.replace` + `"/catalog?"`; brands.css: overflow override gone).
 
 One chrome across ALL 6 customer pages (index/catalog/product/quote-cart/brands/laser-tumbler),
 locked by `tests/unit/chrome-drift.test.js` (exact 10-link nav sequence + 12-link drawer core +
@@ -198,12 +204,22 @@ would have silently beaten the drawer's `body.drawer-open { overflow: hidden }` 
 🔑 The chrome is STILL copy-pasted per page (build-time component = later refactor); the drift
 test is what keeps the 6 copies identical — edit one page's chrome = edit all 6 + the canon.
 
+## ✅ M-7 category tiles — BUILT 2026-08-26, committed on develop, NOT deployed
+
+Homepage: 3 tiles added (08 Ladies · 09 Activewear · 10 Woven Shirts → 11 tiles incl. the
+existing "All categories" tile). /catalog: `#catTiles` row above the grid, rendered by
+`renderCatTiles()` in `catalog-2026.js` from the SAME `lastFacets.categories` the rail uses
+(15 categories w/ live style counts, count-desc). Shown ONLY on the unfiltered un-searched
+browse (`!state.q && !activeFilterCount()`); any filter/search/error collapses it. Tiles are
+real `<a href>`s via `urlForPatch` (middle-click works) + delegated click → `navigate()` (SPA,
+no reload). Mobile ≤700px: one 46px horizontally-scrollable row, no page overflow. Verified in
+browser: 15 tiles → click Ladies → `?category=Ladies`, H1 Ladies, 48 cards, tiles hidden →
+clear-all → tiles back; `?q=` hides them. All gates green.
+
 **CONTINUATION PLAN (Erik-approved roadmap, in order):**
-1. **M-7 category tiles** — homepage tiles for Ladies (886)/Activewear/Woven Shirts; a category
-   tile row on unfiltered /catalog above the grid (15 facets w/ counts, collapses when filtered).
-2. **M-8 mobile filters** — sticky "Show N results" bar in the filter drawer, sticky results
+1. **M-8 mobile filters** — sticky "Show N results" bar in the filter drawer, sticky results
    toolbar ≤960px, one-line promo ≤560px.
-3. **Richardson data question** — most Richardson caps live in Non_SanMar_Products and don't
+2. **Richardson data question** — most Richardson caps live in Non_SanMar_Products and don't
    surface under /catalog?brand=Richardson (only 5 SanMar rows); needs a look at the NS table
    rows / brand mapping (data, not code).
 

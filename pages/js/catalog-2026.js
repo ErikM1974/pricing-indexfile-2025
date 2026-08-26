@@ -82,6 +82,7 @@
         sortSelect: byId('sortSelect'),
         chips: byId('activeChips'),
         alertSlot: byId('alertSlot'),
+        catTiles: byId('catTiles'),
         grid: byId('resultsGrid'),
         pager: byId('pager'),
         qvModal: byId('quickViewModal'),
@@ -382,6 +383,7 @@
         els.grid.setAttribute('aria-busy', 'false');
         els.grid.innerHTML = '';
         els.pager.innerHTML = '';
+        if (els.catTiles) { els.catTiles.hidden = true; }
         els.status.textContent = 'Catalog unavailable';
         els.alertSlot.innerHTML =
             '<div class="alert alert-error" role="alert">' +
@@ -564,6 +566,7 @@
         renderNotices(results);
         renderChips();
         renderFacets(lastFacets, products);
+        renderCatTiles();
 
         if (!products.length) {
             // Deep-paged past the end (filters narrowed under us): go back to
@@ -774,6 +777,28 @@
             rows += optionRow('method', 'radio', m, METHOD_LABELS[m], null, state.method === m, disabled);
         });
         return facetGroup('method', 'Decoration', rows, { note: note });
+    }
+
+    /* Category tile row — the browse landing's aisle signs (M-7). Shown only
+       on the unfiltered, un-searched view; any filter or search collapses it.
+       Counts are the API's style facets (same numbers as the rail). */
+    function renderCatTiles() {
+        if (!els.catTiles) return;
+        var cats = (lastFacets && lastFacets.categories) || [];
+        if (state.q || activeFilterCount() > 0 || !cats.length) {
+            els.catTiles.hidden = true;
+            els.catTiles.innerHTML = '';
+            return;
+        }
+        els.catTiles.innerHTML = cats.map(function (c) {
+            return '<a class="cat-tile-sm js-tile-cat" href="' +
+                escapeHtml(urlForPatch({ category: c.name, subcategory: '', page: 1 })) +
+                '" data-category="' + escapeHtml(c.name) + '">' +
+                '<span class="cat-tile-sm-name">' + escapeHtml(c.name) + '</span>' +
+                (c.count ? '<span class="cat-tile-sm-count">' + c.count + '</span>' : '') +
+                '</a>';
+        }).join('');
+        els.catTiles.hidden = false;
     }
 
     function renderFacets(facets, products) {
@@ -1456,6 +1481,17 @@
             more.textContent = railUI.expanded[key] ? 'Show fewer' : 'Show all';
         });
         els.clearAllFilters.addEventListener('click', clearAll);
+
+        // Category tiles (delegated; real links stay middle-clickable)
+        if (els.catTiles) {
+            els.catTiles.addEventListener('click', function (e) {
+                var tile = e.target.closest('.js-tile-cat');
+                if (!tile) return;
+                if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+                e.preventDefault();
+                navigate({ category: tile.getAttribute('data-category') || '', subcategory: '', page: 1 }, { scrollTop: true });
+            });
+        }
 
         // Chips + grid actions (delegated)
         els.chips.addEventListener('click', function (e) {
