@@ -58,3 +58,24 @@ easily and be moved to BUY. Done when finding + buying is easy.
 4. App-repo quick wins per synthesis: landing sort/curation, "from $" honesty, QV `Math.ceil`
    parity fix, count label. Then `/deploy` the app.
 5. Bigger layout decisions → present proposal to Erik.
+
+## ✅ 2026-08-26 continuation — quick wins IMPLEMENTED (both repos, committed + pushed, NOT deployed)
+
+Audit workflow finished on resume: 19 agents, 10 confirmed critical/high, 0 refuted.
+**App `b86320ef`** (all gates green, verified on built local server): server displayPriceLabel
+everywhere the legacy engine priced (client formula DELETED — was +31% inflated + shirt-margin
+caps) · cap QV rounding via API RoundingMethod + data-driven LTM notice · Richardson → PDP (no
+more dead-end calculator) · QV links carry color · mega-menu/brands/breadcrumbs → /catalog (Back
+button fixed) · style-token searches fall back to text results · no Discontinued suggestions ·
+express deep links `?style=&color=` in BOTH storefront apps · Custom Hats in nav on
+catalog/product/quote-cart · small card images + eager first row + runtime preconnect ·
+visible boot-failure error · touch Quick View.
+**Proxy `6353a32`+`a56902f`**: style-index warm-up at boot (verified: builds 4,513 styles, zero
+requests, first search <2s) · decorated-cap-prices uses applyRounding (112: $23→$22.50, matches
+PDP) · 'Newest' sort fixed (500'd every click — grouped orderBy needs MAX(Date_Updated) alias).
+
+⏭️ NEXT: deploy PROXY first (git push heroku from proxy repo), then /deploy app; re-run Rule-9
+parity checks after. ERIK DECISIONS pending: M-3 buy-online-bridge positioning (PDP two-lane),
+M-4 default sort top-sellers-first (changes what the store leads with). Medium roadmap M-1..M-10
++ layout proposal ("one store, two checkouts") in the audit synthesis — full text:
+session task file w3uc3z1aj.output; summarized in the CX plan artifact.
