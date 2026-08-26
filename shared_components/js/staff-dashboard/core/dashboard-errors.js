@@ -19,11 +19,12 @@ import { escapeHtml } from './dashboard-ui-utils.js';
 const ERROR_AREAS = {
     metrics:   { containerId: 'salesTeamList',         label: 'team performance' },
     revenue:   { containerId: 'ytdRevenue',            label: 'revenue' },
-    garment:   { containerId: 'garmentTrackerContent', label: 'garment tracker' },
-    ytdGoal:   { containerId: 'goalProgress',          label: 'YTD progress' },
-    gapReport: { containerId: 'gapReportBody',         label: 'gap report' },
-    production:{ containerId: 'production-predictor-grid', label: 'production turnaround' },
-    announcements: { containerId: 'announcementsList',  label: 'announcements' },
+    'embroidery-bonus': { containerId: 'embroideryBonusContent', label: 'Q3 embroidery bonus' },
+    // A showApiError() call with an area missing from this map silently no-ops
+    // (unknown-area guard below) — register the area HERE in the same commit
+    // that adds the controller call. Retired areas (garment tracker, gap report,
+    // announcements, ytdGoal) were removed 2026-08-26: their containers no
+    // longer exist in the v3 page, so an entry here only feigned coverage.
 };
 
 /**

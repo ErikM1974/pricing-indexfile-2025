@@ -249,3 +249,42 @@ to ESM or a dynamic `import()`. Minor/patch of v12 still flow.
   dep beats upgrading it; check `grep -rl "require('<pkg>')"` before accepting any bump.
 
 ---
+
+## Staff dashboard full review — 5 UTC/Pacific bugs on ONE page, and the error system silently failing itself (2026-08-26)
+
+**Problem.** Multi-agent review of every file the staff dashboard loads (30 files) confirmed 13
+defects. Worst: paid 3-Day Tees orders could NEVER appear in the Orders Inbox; the Money
+Collected "Today" tile showed $0 every evening; the Q3 bonus card's API-failure path rendered
+nothing (spinner forever); concurrent same-URL fetches crashed the second caller.
+
+**Root Cause.** Four families: (1) UTC-vs-Pacific in FIVE independent spots on one page —
+`toISOString().slice(0,10)` for calendar-day compares/windows, `new Date('YYYY-MM-DD')` then
+local getters (all 19 anniversaries a day early), a holiday check using the UTC day while the
+weekend check used local. (2) `showApiError('embroidery-bonus')` targeted an area never added to
+ERROR_AREAS — the unknown-area guard console-logs and returns, so THE ERROR RENDERER was the
+silent failure. (3) GET dedup handed every caller the SAME Response — second `.json()` throws
+"body stream already read", painting an error card for a request that succeeded. (4) The quote
+prefix regex `/^([A-Z]+)/` returns '' for digit-leading '3DT…' IDs, so the storefront filter
+dropped them; dead 'TDT'/'CTS' entries masked the gap.
+
+**Solution.** All fixed in one commit on develop (+ metricsCache split into per-service store
+slots, YoY failure now an amber badge, dead exports/areas/endpoints pruned, inline <style> moved
+into tokens.css). Verified: full unit suite (126 suites/2631), acorn parse of all 19 edited JS,
+jsdom import of all 25 v3 modules, regex/date spot-checks.
+
+**Prevention.**
+- 🔴 **Calendar-day math NEVER goes through `toISOString()`** and date-only strings NEVER through
+  `new Date('YYYY-MM-DD')` + local getters. Local parts out, split-parse in — or
+  `toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' })` for "today". The repo
+  "knows" this trap; it still appeared 5× on the flagship staff page.
+- 🔑 **An error-UI registry with a soft unknown-key guard turns typos into Rule-4 violations.**
+  Register the ERROR_AREAS entry in the SAME commit as the `showApiError()` call — a call site
+  with no registry entry renders nothing, forever.
+- 🔑 **Never hand one fetch Response to two consumers** — dedup must `.clone()` per caller (and
+  clean up with `.then(fn, fn)`, not a discarded `.finally()` chain, which fires a spurious
+  unhandledrejection per failure).
+- 🔑 **A prefix whitelist + extraction regex is two chances to be wrong.** '3DT' broke the
+  letters-only regex silently; nonexistent 'TDT'/'CTS' entries made the list look maintained.
+  Derive prefixes from config/storefront-channels.js shapes, and test the digit-leading one.
+
+---

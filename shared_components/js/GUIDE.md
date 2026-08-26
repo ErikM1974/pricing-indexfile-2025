@@ -207,8 +207,6 @@
 | `staff-dashboard/controllers/embroidery-bonus-controller.js` | Embroidery Bonus card (Q3 2026+) — activation bounties, growth ladder, $3M team kicker, dormant "who to call" list. Replaced `garment-tracker-controller.js`. Every rate/goal comes from the API, never a constant. |
 | `staff-dashboard/controllers/tool-grid-controller.js` | Quick Access housekeeping (2026-07-29). **Count badges are computed, so never hand-type a `.tool-category-count` again** — it counts unique `a.tool-btn[href]` per card, which is why a link repeated on purpose (Quick Quote, listed twice in the Quoting card) counts once and a disabled `<span>` placeholder counts zero. Also persists open/closed state for any `details[data-collapse-key]` into the `widgetCollapse` store slot — **add that one attribute to make a new collapsible widget remember itself**, no JS needed. |
 | `staff-dashboard/controllers/nav-access-controller.js` | Role-aware sidebar. Reveals `[data-requires-role="admin"]` blocks only when `/api/crm-session/me` reports the permission; **removes** the node otherwise so it also leaves the Ctrl+K registry (harvested from the DOM). Fails closed. **Add `data-requires-role` + `hidden` to gate a new nav block — but always add the matching server-side rule too; this is UX, not security** (real gate: `lib/page-access.js`). |
-| `staff-dashboard-announcements.js` | Priority announcements |
-| `staff-dashboard-employees.js` | Employee widget management |
 | `production-schedule-stats.js` | Precomputed turnaround stats |
 | `production-schedule-predictor.js` | Turnaround prediction engine |
 | `monogram-dashboard.js` | Monogram dashboard controller |

@@ -39,7 +39,25 @@
     closeBtn.addEventListener('click', close);
     backdrop.addEventListener('click', close);
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && !dialog.hidden) close();
+        if (dialog.hidden) return;
+        if (e.key === 'Escape') { close(); return; }
+        // Focus trap: aria-modal promises focus stays inside — wrap Tab
+        // between the dialog's first and last focusable controls.
+        if (e.key === 'Tab') {
+            const focusables = Array.from(dialog.querySelectorAll(
+                'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+            )).filter((el) => el.offsetParent !== null);
+            if (!focusables.length) return;
+            const first = focusables[0];
+            const last = focusables[focusables.length - 1];
+            if (e.shiftKey && (document.activeElement === first || !dialog.contains(document.activeElement))) {
+                e.preventDefault();
+                last.focus();
+            } else if (!e.shiftKey && (document.activeElement === last || !dialog.contains(document.activeElement))) {
+                e.preventDefault();
+                first.focus();
+            }
+        }
     });
 
     // Remember the picked method so next visit offers "Continue in X →"

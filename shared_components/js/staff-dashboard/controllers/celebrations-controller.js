@@ -8,6 +8,10 @@ import { register } from '../core/dashboard-events.js';
 import { employeesService } from '../services/employees-service.js';
 import { escapeHtml } from '../core/dashboard-ui-utils.js';
 
+// Set when the roster fetch fails — every render branch shows a visible
+// "unavailable" state instead of quietly empty widgets (Rule #4).
+let rosterError = null;
+
 const els = {
     teamBtn:      () => document.getElementById('teamBtn'),
     teamCount:    () => document.getElementById('teamActiveCount'),
@@ -25,6 +29,17 @@ const els = {
 let currentFilter = 'all';
 
 function renderHeaderCounts() {
+    if (rosterError) {
+        if (els.teamCount()) els.teamCount().textContent = '!';
+        if (els.bdayCount()) els.bdayCount().textContent = '–';
+        if (els.annivCount()) els.annivCount().textContent = '–';
+        const btn = els.teamBtn();
+        if (btn) {
+            btn.setAttribute('aria-label', 'Team: staff roster unavailable right now');
+            btn.title = 'Staff roster unavailable right now — reload to retry';
+        }
+        return;
+    }
     const active = employeesService.active().length;
     const bdays = employeesService.upcomingBirthdays(30).length;
     const annivs = employeesService.upcomingAnniversaries(30).length;
@@ -47,6 +62,12 @@ function renderHeaderCounts() {
 function renderDropdown() {
     const bdayTarget = els.bdayList();
     const annivTarget = els.annivList();
+    if (rosterError) {
+        const failRow = '<li class="celebration-empty">Staff roster unavailable right now — reload to retry.</li>';
+        if (bdayTarget) bdayTarget.innerHTML = failRow;
+        if (annivTarget) annivTarget.innerHTML = failRow;
+        return;
+    }
     if (bdayTarget) {
         const bdays = employeesService.upcomingBirthdays(30);
         bdayTarget.innerHTML = bdays.length === 0
@@ -117,6 +138,10 @@ function getFilteredEmployees() {
 function renderDirectoryTable() {
     const tbody = els.modalTbody();
     if (!tbody) return;
+    if (rosterError) {
+        tbody.innerHTML = `<tr><td colspan="6" class="staff-table__empty">Couldn’t load the staff roster — reload the page to retry.</td></tr>`;
+        return;
+    }
     const list = getFilteredEmployees();
     if (list.length === 0) {
         tbody.innerHTML = `<tr><td colspan="6" class="staff-table__empty">No staff match.</td></tr>`;
@@ -157,10 +182,8 @@ function openDirectory(filter = 'all') {
    Init + event registration
    ===================================================== */
 
-export function initCelebrations() {
-    renderHeaderCounts();
-
-    // Search input
+export async function initCelebrations() {
+    // Listeners first — they don't depend on data.
     const search = els.modalSearch();
     if (search) {
         search.addEventListener('input', renderDirectoryTable);
@@ -171,6 +194,17 @@ export function initCelebrations() {
         if (e.target.closest('#teamBtn') || e.target.closest('#teamDropdown')) return;
         closeDropdown();
     });
+
+    // Roster comes from the staff-gated API (one fetch, then everything is
+    // synchronous). A failure renders visibly everywhere the data would show.
+    try {
+        await employeesService.load();
+        rosterError = null;
+    } catch (err) {
+        rosterError = err;
+        console.error('[celebrations] roster load failed:', err);
+    }
+    renderHeaderCounts();
 }
 
 register('team:toggle-dropdown', () => toggleDropdown());

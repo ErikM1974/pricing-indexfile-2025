@@ -14,14 +14,19 @@ const KEYS = {
     tweaks:                 { storage: 'local',   key: 'nwca-dash:tweaks',         version: STORE_VERSION },
     sidebarSections:        { storage: 'local',   key: 'nwca-dash:sidebar',        version: STORE_VERSION },
     widgetCollapse:         { storage: 'local',   key: 'nwca-dash:widgets',        version: STORE_VERSION },
-    pinnedTools:            { storage: 'local',   key: 'nwca-dash:pinned',         version: STORE_VERSION },
-    recentTools:            { storage: 'local',   key: 'nwca-dash:recent',         version: STORE_VERSION, ttlMs: 14 * 24 * 60 * 60 * 1000 }, // 14 days
+    // (pinnedTools/recentTools removed 2026-08-26 — My Stuff pins/recents live in
+    // my-stuff-controller's own 'nwca-mystuff-v1' key; these entries never had a reader.)
     dismissedAnnouncements: { storage: 'local',   key: 'nwca-dash:dismissed-ann',  version: STORE_VERSION, ttlMs: 30 * 24 * 60 * 60 * 1000 }, // 30 days
     policiesCollapsed:      { storage: 'local',   key: 'nwca-dash:policies',       version: STORE_VERSION },
 
     // sessionStorage (transient, per-tab)
     user:                   { storage: 'session', key: 'nwca-dash:user',           version: STORE_VERSION },
-    metricsCache:           { storage: 'session', key: 'nwca-dash:metrics-cache',  version: STORE_VERSION, ttlMs: 5 * 60 * 1000 },  // 5 min
+    // TTL deliberately UNDER dashboard-app's 5-min refresh interval so each
+    // periodic tick misses this client cache and re-asks the proxy (whose own
+    // 5-min cache still governs Caspio quota). At exactly 5 min the tick
+    // usually landed a few seconds inside the TTL and re-served stale data.
+    metricsCache:           { storage: 'session', key: 'nwca-dash:metrics-cache',  version: STORE_VERSION, ttlMs: 4 * 60 * 1000 },  // 4 min
+    ytdArchiveCache:        { storage: 'session', key: 'nwca-dash:ytd-archive',    version: STORE_VERSION, ttlMs: 5 * 60 * 1000 },  // 5 min
     garmentTrackerCache:    { storage: 'session', key: 'nwca-dash:garment-cache',  version: STORE_VERSION, ttlMs: 30 * 60 * 1000 }, // 30 min
 };
 

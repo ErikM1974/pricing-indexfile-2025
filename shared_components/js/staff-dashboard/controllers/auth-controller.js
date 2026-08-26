@@ -1,48 +1,19 @@
 /* =====================================================
    STAFF DASHBOARD v3 — AUTH CONTROLLER
-   Lifts the inline auth code out of staff-dashboard.html (Rule #3).
 
-   The hidden Caspio DataPage at #caspio-auth populates four fields
-   via the `[@authfield:...]` placeholder pattern. Once the DataPage
-   fires its `DataPageReady` event, those fields contain the user's
-   First_Name / Last_Name / Email / Role. We poll briefly with a
-   timeout fallback because some Caspio loads race the DOMContentLoaded.
+   Identity comes from GET /api/crm-session/me — the same first-party,
+   SAML-session-backed endpoint nav-access-controller already uses.
+
+   Until 2026-08-27 this polled a hidden third-party Caspio DataPage
+   embed ([@authfield:…] placeholders + window.caspioUser) for up to
+   8 seconds. That embed needed a live c3eku948.caspio.com session
+   (not guaranteed — the page gate is SAML), silently failed in
+   browsers blocking third-party cookies, and its runtime CSS
+   injection forced the caspio-isolation.js MutationObserver hack.
+   All three are retired together.
    ===================================================== */
 
 import { store } from '../core/dashboard-store.js';
-
-const POLL_INTERVAL = 500;
-const POLL_TIMEOUT_MS = 8000;
-const AUTH_FIELDS = ['firstname', 'lastname', 'email', 'role'];
-
-function readAuthFields() {
-    // Path 1: window.caspioUser — set by Caspio's embed JS when the DataPage
-    // authenticates the user. This is what v2 used as its primary path and
-    // what Caspio currently populates on teamnwca.com (verified via console
-    // log "[CASPIO] User authenticated: Erik" 2026-05-13). Note Caspio uses
-    // camelCase keys (firstName); normalize to our lowercase field names.
-    if (typeof window !== 'undefined' && window.caspioUser && window.caspioUser.firstName) {
-        return {
-            firstname: window.caspioUser.firstName,
-            lastname:  window.caspioUser.lastName  || '',
-            email:     window.caspioUser.email     || '',
-            role:      window.caspioUser.role      || '',
-        };
-    }
-
-    // Path 2: DOM placeholders — some Caspio configurations populate
-    // [@authfield:First_Name] text in the hidden #caspio-auth div instead.
-    // Kept as a fallback so we work in both modes.
-    const result = {};
-    for (const field of AUTH_FIELDS) {
-        const el = document.getElementById(`auth-${field}`);
-        const text = el?.textContent?.trim() || '';
-        // Caspio leaves the placeholder text if the field hasn't been resolved yet
-        if (!text || text.startsWith('[@authfield:')) return null;
-        result[field] = text;
-    }
-    return result;
-}
 
 function applyUserToUI(user) {
     // Welcome message
@@ -57,6 +28,7 @@ function applyUserToUI(user) {
     store.set('user', user);
 
     // Mirror to legacy sessionStorage keys some downstream pages still read
+    // (quote-management, art-request-detail, mockup-detail, invoice, …).
     try {
         sessionStorage.setItem('nwca_user_name', `${user.firstname || ''} ${user.lastname || ''}`.trim());
         sessionStorage.setItem('nwca_user_email', user.email || '');
@@ -64,7 +36,8 @@ function applyUserToUI(user) {
         sessionStorage.setItem('caspioUser', JSON.stringify(user));
     } catch { /* ignore quota/private-mode failures */ }
 
-    // Fire a custom event so any late-loaded module can react
+    // Fire a custom event so any late-loaded module can react. The event name
+    // is kept from the Caspio era — listeners don't care where identity came from.
     document.dispatchEvent(new CustomEvent('caspioUserReady', { detail: user }));
 }
 
@@ -73,62 +46,42 @@ function hideLoadingOverlay() {
     if (overlay) overlay.classList.add('is-hidden');
 }
 
-/**
- * Wait for Caspio auth fields to populate.
- * Returns the user object, or null if it never resolves.
- */
-function waitForAuth() {
-    return new Promise((resolve) => {
-        // Try immediately
-        const immediate = readAuthFields();
-        if (immediate) return resolve(immediate);
-
-        const start = Date.now();
-        const interval = setInterval(() => {
-            const user = readAuthFields();
-            if (user) {
-                clearInterval(interval);
-                clearTimeout(timeout);
-                resolve(user);
-            }
-        }, POLL_INTERVAL);
-
-        const timeout = setTimeout(() => {
-            clearInterval(interval);
-            console.warn(`[auth] Caspio auth didn't resolve within ${POLL_TIMEOUT_MS}ms — proceeding without user.`);
-            resolve(null);
-        }, POLL_TIMEOUT_MS);
-
-        // Caspio fires this when it's done injecting field values
-        document.addEventListener('DataPageReady', () => {
-            const user = readAuthFields();
-            if (user) {
-                clearInterval(interval);
-                clearTimeout(timeout);
-                resolve(user);
-            }
-        }, { once: true });
-    });
-}
-
 export async function initAuth() {
-    console.info('[auth] Waiting for Caspio user…');
-    const user = await waitForAuth();
+    let user = null;
+    try {
+        const res = await fetch('/api/crm-session/me', { credentials: 'same-origin' });
+        if (res.ok) {
+            const me = await res.json();
+            if (me.authenticated && me.firstName) {
+                const fullName = String(me.name || me.firstName);
+                const lastname = fullName.startsWith(me.firstName)
+                    ? fullName.slice(me.firstName.length).trim()
+                    : '';
+                user = {
+                    firstname: me.firstName,
+                    lastname,
+                    email: me.email || '',
+                    role: me.role || '',
+                };
+            }
+        } else {
+            console.warn('[auth] /api/crm-session/me HTTP', res.status);
+        }
+    } catch (err) {
+        console.warn('[auth] identity fetch failed:', err.message);
+    }
+
     if (user) {
         // Log just enough to confirm the welcome chip should light up —
         // never log the full user object (PII / email).
-        console.info('[auth] Caspio user resolved:', {
+        console.info('[auth] session user resolved:', {
             firstname: user.firstname,
             hasEmail: !!user.email,
             role: user.role,
         });
         applyUserToUI(user);
     } else {
-        console.warn(
-            '[auth] No Caspio user after 8s — Welcome chip will stay hidden. ' +
-            'Check that the hidden #caspio-auth div exists in the DOM and that ' +
-            'the user has an active Caspio session at c3eku948.caspio.com.'
-        );
+        console.warn('[auth] no authenticated session user — Welcome chip stays hidden.');
     }
     hideLoadingOverlay();
     return user;

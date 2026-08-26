@@ -111,3 +111,33 @@ top-sellers-first landing approved. Built + locally verified end-to-end:
   safely to old order — no breakage window). 🔑 products/search has TWO sort points: Caspio
   orderBy AND a post-hydration array sort — a new sort value must teach BOTH.
 
+## 🚀 2026-08-25 (final) — BRIDGE + FEATURED LANDING DEPLOYED AND LIVE-VERIFIED
+
+Proxy `v2026.08.25.2` (jest 1,571/1,571; featured sort live: page-1 = BC3001 + Carhartt
+best-sellers) · App `v2026.08.25.4` (SHA 5b474ae via /api/version). LIVE checks: /catalog first
+screen = featured order with sort=featured sent; buy-online badges rendering (BC3001→
+/custom-tees, 258→/custom-caps); PDP PC54 lane visible with color-carrying deep link. Phase 2
+of the CX overhaul is fully shipped. ⏭️ NEXT: M-1 honest counts (top item), trust band blocked
+on Erik's Google rating + 2-3 named customer quotes, then M-5/M-6/M-7 per the roadmap.
+
+## 📊 2026-08-25 (later still) — M-1 HONEST COUNTS BUILT (proxy `dbc8be4`, committed+pushed, NOT deployed)
+
+One dedupe (one row per STYLE for EVERY request) fixed the family: totals/pagination/facets now
+count styles (bare catalog 3,408 was "12,413"; T-Shirts 388 was "1,537"; Top Sellers 67 was 379;
+category pages fill all 48 slots); product order = Phase-1 DB order (post-hydration re-sort
+retired); price sorts decided in JS on real min/max splits, $0/NULL junk last (CTK87 has a
+priceless Active row); Phase-2 variants carry the status filter (Discontinued-variant leakage);
+/stylesearch status-filtered + deduped (LPC54 ×2). Full suite 1,576/1,576; verified on live data.
+🔑 Accepted residue: blank-category rows (5280) make displayed from-price wobble vs in-category
+sort key — sort scope = filter scope. ⏭️ BACKLOG: "Caps+Richardson" totals only 5 — most
+Richardson caps live in Non_SanMar_Products and don't surface under the brand filter; data
+question, not counts. ⏭️ Deploy proxy when Erik says go (app needs nothing).
+
+## 🚀 2026-08-26 — M-1 HONEST COUNTS DEPLOYED (proxy `v2026.08.26.1`) + LIVE-VERIFIED
+
+T-Shirts 48 full cards / total 388 / facet 388 · bare catalog total 3,408 (was "12,413") ·
+Top Sellers 67 · price_desc monotone · stylesearch deduped, no Discontinued. Suite 1,576/1,576.
+CX overhaul phases 1-3 all LIVE. ⏭️ REMAINING (roadmap): trust band (BLOCKED on Erik: Google
+rating + 2-3 named quotes) · M-5 QV-to-quote CTA · M-6 one chrome · M-7 category tiles ·
+M-8 mobile filters · Richardson/Non-SanMar brand-filter data question.
+

@@ -17,14 +17,13 @@
    ===================================================== */
 
 import { register } from '../core/dashboard-events.js';
+import { dashboardFetchJson } from '../core/dashboard-fetch.js';
 import { showApiError, clearApiError } from '../core/dashboard-errors.js';
-import { escapeHtml } from '../core/dashboard-ui-utils.js';
+import { escapeHtml, formatMoney as money } from '../core/dashboard-ui-utils.js';
 import { endpoints } from '../core/dashboard-endpoints.js';
 
 const CONTAINER_ID  = 'embroideryBonusContent';
 const DATE_RANGE_ID = 'embroideryBonusDateRange';
-
-const money = (n) => '$' + Math.round(Number(n) || 0).toLocaleString('en-US');
 
 function renderLoading(label = 'Loading Q3 team goal…') {
     const c = document.getElementById(CONTAINER_ID);
@@ -117,9 +116,9 @@ export async function loadEmbroideryBonus(refresh = false) {
     clearApiError('embroidery-bonus');
     if (!refresh) renderLoading();
     try {
-        const resp = await fetch(endpoints.embroideryBonusTeam(), { credentials: 'same-origin' });
-        if (!resp.ok) throw new Error(`Q3 team goal failed: ${resp.status}`);
-        const data = await resp.json();
+        // Core wrapper (not raw fetch): 30s timeout, 429 retry, GET dedup —
+        // a hung forwarder otherwise left this spinner up forever.
+        const data = await dashboardFetchJson(endpoints.embroideryBonusTeam());
         if (data.success === false) throw new Error(data.error || 'Q3 team goal unavailable');
         renderStrip(data);
     } catch (err) {

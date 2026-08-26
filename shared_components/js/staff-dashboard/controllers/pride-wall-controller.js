@@ -24,6 +24,7 @@
    ===================================================== */
 
 import { escapeHtml } from '../core/dashboard-ui-utils.js';
+import { dashboardFetchJson } from '../core/dashboard-fetch.js';
 
 const TILE_COUNT = 6;
 const FETCH_LIMIT = 200;
@@ -102,9 +103,10 @@ async function load() {
 
     let data;
     try {
-        const res = await fetch(`/api/staff/finished-photos/library?limit=${FETCH_LIMIT}`, { credentials: 'same-origin' });
-        data = await res.json().catch(() => ({}));
-        if (!res.ok || data.success === false) throw new Error(data.error || `HTTP ${res.status}`);
+        // Core wrapper (not raw fetch): 30s timeout, 429 retry, GET dedup —
+        // a stalled upstream otherwise left the widget in limbo with no bound.
+        data = await dashboardFetchJson(`/api/staff/finished-photos/library?limit=${FETCH_LIMIT}`);
+        if (data.success === false) throw new Error(data.error || 'library returned success:false');
     } catch (err) {
         console.warn('[PrideWall] library unavailable:', err.message);
         strip.hidden = false;

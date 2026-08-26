@@ -1,18 +1,10 @@
 /* =====================================================
    STAFF DASHBOARD v3 — API ENDPOINT REGISTRY
-   Single source of truth for every URL the dashboard hits.
-   Reads BASE from window.APP_CONFIG.API.BASE_URL — never
-   hardcoded (Rule #7).
+   Every dashboard read is a SAME-ORIGIN path since 2026-08-27:
+   the SAML session cookie authenticates each request and the
+   server forwards to the proxy with the CRM secret. No module
+   here should ever hit the proxy base directly again.
    ===================================================== */
-
-const BASE = (typeof window !== 'undefined') ? window.APP_CONFIG?.API?.BASE_URL : null;
-
-if (!BASE) {
-    throw new Error(
-        '[dashboard] APP_CONFIG.API.BASE_URL is required. ' +
-        'Make sure /shared_components/js/app-config.js loads before any dashboard module.'
-    );
-}
 
 /* =====================================================
    Endpoint factories — call as functions so future
@@ -23,13 +15,6 @@ export const endpoints = {
     // /api/mo/* forwarder (same-origin, sends the session cookie) instead of the
     // proxy directly, so the proxy's PII gate can be tightened to secret-only.
     manageOrders:          () => `/api/mo/orders`,
-    lineItems:        (id) => `/api/mo/lineitems/${encodeURIComponent(id)}`,
-
-    // Garment tracker (Caspio cache) — SUPERSEDED for Q3 2026+ by the embroidery bonus
-    // below. Kept so the Q2 2026 archive stays reachable; not used by any live card.
-    garmentTracker:        () => `${BASE}/garment-tracker`,
-    garmentTrackerCfg:     () => `${BASE}/garment-tracker/config`,
-    garmentTrackerArchive: () => `${BASE}/garment-tracker/archive-from-live`,
 
     // Q3 2026 Embroidery Bonus. Routed through the main app's SAML-authed
     // /api/crm-proxy/* forwarder (same-origin, sends the session cookie) — the proxy
@@ -37,17 +22,16 @@ export const endpoints = {
     // 🔒 The SHARED staff dashboard uses ONLY the /team feed — company revenue and targets,
     // never a rep's earnings. Compensation belongs on each rep's own Mission Control page.
     embroideryBonusTeam:    () => `/api/crm-proxy/embroidery-bonus/team`,
-    embroideryBonus:        () => `/api/crm-proxy/embroidery-bonus`,
-    embroideryBonusCfg:     () => `/api/crm-proxy/embroidery-bonus/config`,
-    embroideryBonusDormant: () => `/api/crm-proxy/embroidery-bonus/dormant`,
 
-    // Caspio archived per-rep daily sales
-    dailySalesByRep:       () => `${BASE}/caspio/daily-sales-by-rep`,
-    dailySalesByRepYTD: (year) => `${BASE}/caspio/daily-sales-by-rep/ytd?year=${encodeURIComponent(year)}`,
+    // Caspio archived per-rep daily sales — requireStaff relay to the proxy's
+    // /api/caspio/daily-sales-by-rep/ytd (per-rep company revenue is not public data)
+    dailySalesByRepYTD: (year) => `/api/staff/daily-sales-by-rep-ytd?year=${encodeURIComponent(year)}`,
 
-    // CRM session + gap reports (proxy on same Express app, not Caspio proxy)
-    crmSession:            () => `/api/crm-session`,
-    crmGapReport: (rep, dir) => `/api/crm-proxy/${encodeURIComponent(rep)}-accounts/${dir === 'inbound' ? 'reverse-' : ''}gap-report`,
+    // Unreferenced factories pruned 2026-08-26 (garment-tracker trio pointed at
+    // unmounted routes; lineItems/dailySalesByRep/crmSession/crmGapReport/
+    // embroideryBonus{,Cfg,Dormant} had zero call sites). NOTE some widgets
+    // still build same-origin URLs inline (/api/staff/payments/recent,
+    // /api/staff/finished-photos/library, /api/staff/command-search,
+    // /api/staff/quote-sessions) — this registry covers the forwarder URLs
+    // the services share, not literally every URL.
 };
-
-export const apiBaseUrl = BASE;

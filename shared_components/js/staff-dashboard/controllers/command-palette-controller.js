@@ -29,10 +29,10 @@ const state = {
     q: '',
     registry: null,       // [{label, href, icon, category}]
     local: [],
-    backend: null,        // null | 'loading' | 'unavailable' | {customers,orders,quotes,designs,errors}
+    backend: null,        // null | 'loading' | 'unavailable' (route not deployed)
+                          //      | 'error' (deployed but failing) | {customers,orders,quotes,designs,errors}
     flat: [],             // rendered items in order, for keyboard nav
     sel: 0,
-    lastQueried: '',
 };
 
 /* ── tool registry (harvested from the page itself) ── */
@@ -80,21 +80,24 @@ function searchLocal(q) {
 /* ── backend search ── */
 
 const fetchBackend = debounce(async (q) => {
-    state.lastQueried = q;
     try {
         const res = await fetch(`/api/staff/command-search?q=${encodeURIComponent(q)}`, { credentials: 'same-origin' });
         if (state.q !== q) return; // stale response — user kept typing
-        if (res.status === 404 || res.status === 502 || res.status === 503) {
+        if (res.status === 404) {
+            // Route genuinely not there — the only case the calm
+            // "lights up after the next backend deploy" wording is true for.
             state.backend = 'unavailable';
         } else if (!res.ok) {
-            state.backend = 'unavailable';
+            // Deployed but FAILING (500 from Caspio, 502/503 outage, auth
+            // regression…) — say so, or nobody ever reports the outage.
+            state.backend = 'error';
             console.warn('[palette] backend search HTTP', res.status);
         } else {
             state.backend = await res.json();
         }
     } catch (err) {
         if (state.q !== q) return;
-        state.backend = 'unavailable';
+        state.backend = 'error';
         console.warn('[palette] backend search failed:', err.message);
     }
     render();
@@ -226,6 +229,8 @@ function render() {
         status.textContent = 'Searching customers, orders, quotes & designs…';
     } else if (state.backend === 'unavailable') {
         status.textContent = 'Tool search works now — customer/order/quote/design search lights up after the next backend deploy.';
+    } else if (state.backend === 'error') {
+        status.textContent = 'Customer/order/quote/design search failed just now — tools are still searchable. Retry in a moment.';
     } else if (state.backend && typeof state.backend === 'object') {
         const errs = Object.keys(state.backend.errors || {});
         status.textContent = errs.length

@@ -1,117 +1,98 @@
 /* =====================================================
-   STAFF DASHBOARD v3 — SALES GOAL CONTROLLER (Phase 4.1)
-   Compressed 56px pill with pace + days remaining + projected EOY.
-   Reads YTD total from a setter (called by metrics-controller after
-   the YTD fetch lands).
+   STAFF DASHBOARD v3 — SALES GOAL CONTROLLER
+   Drives the compact header goal chip: progress fill, % and
+   "$X / $3M". Reads YTD total from a setter (called by
+   team-performance-controller after the Caspio archive lands).
+
+   2026-08-27: the pace badge / days-left countdown / projected-EOY
+   code was REMOVED — the 2026-07-20 compact chip deliberately kept
+   only #goalProgress/#goalCurrent/#goalPercent, so those branches
+   targeted DOM ids that no longer exist anywhere and silently
+   no-oped. If the pace UI ever comes back, restore the markup and
+   logic together (git: this file before 2026-08-27).
    ===================================================== */
 
-import { formatMoney, daysRemainingInYear, dayOfYear, ANNUAL_GOAL } from '../core/dashboard-ui-utils.js';
+import { formatMoney, ANNUAL_GOAL } from '../core/dashboard-ui-utils.js';
 
 const els = {
-    progress:    () => document.getElementById('goalProgress'),
-    current:     () => document.getElementById('goalCurrent'),
-    percent:     () => document.getElementById('goalPercent'),
-    pace:        () => document.getElementById('goalPace'),
-    daysLeft:    () => document.getElementById('goalDaysLeft'),
-    projectedEoy:() => document.getElementById('goalProjectedEoy'),
+    progress: () => document.getElementById('goalProgress'),
+    current:  () => document.getElementById('goalCurrent'),
+    percent:  () => document.getElementById('goalPercent'),
+    goalOf:   () => document.getElementById('goalOf'),
 };
 
-// null = no YTD data yet (show "—" placeholders, NOT $0 + bogus pace).
+// The chip's [role=progressbar] track wrapping the #goalProgress fill.
+function progressbarEl() {
+    return els.progress()?.closest('[role="progressbar"]') || null;
+}
+
+// "$3M" — compact goal for the chip label, derived from ANNUAL_GOAL so the
+// label can never disagree with the percentage math (one number, one home).
+function formatGoalCompact(goal) {
+    if (goal >= 1_000_000 && goal % 100_000 === 0) {
+        const m = goal / 1_000_000;
+        return '$' + (Number.isInteger(m) ? m : m.toFixed(1)) + 'M';
+    }
+    return formatMoney(goal);
+}
+
+// null = no YTD data yet (show the loading state, NOT $0).
 // Set via setYtdTotal() — currently fed by team-performance-controller from the
 // Caspio archive. Slightly stale (lags live by a few days) but real.
 let lastYtd = null;
-let lastYtdMeta = null; // { source, archivedThrough }
 
 /**
- * Update the banner with a YTD total.
+ * Update the chip with a YTD total.
  * Called by team-performance-controller once the Caspio archive lands.
  * @param {number} ytdAmount - dollars year-to-date
- * @param {object} [meta]
- * @param {string} [meta.source] - "archive" | "hybrid" | "live"
- * @param {string} [meta.archivedThrough] - YYYY-MM-DD if from archive
+ * @param {object} [meta] - accepted for caller compatibility; the compact
+ *   chip renders no source/staleness detail (the projected-EOY line that
+ *   used it was removed with the big banner).
  */
-export function setYtdTotal(ytdAmount, meta = {}) {
+export function setYtdTotal(ytdAmount, meta = {}) { // eslint-disable-line no-unused-vars
     lastYtd = Number(ytdAmount) || 0;
-    lastYtdMeta = meta;
     render();
 }
 
 function render() {
     const goal = ANNUAL_GOAL;
-    const daysLeft = daysRemainingInYear();
     const banner = document.querySelector('.sales-goal-banner');
 
-    // Days-left countdown is data-independent — always render.
-    const daysEl = els.daysLeft();
-    if (daysEl) daysEl.textContent = `${daysLeft} day${daysLeft === 1 ? '' : 's'} left`;
+    const goalOfEl = els.goalOf();
+    if (goalOfEl) goalOfEl.textContent = formatGoalCompact(goal);
 
     if (lastYtd == null) {
-        // No real YTD data yet — show a friendly loading state instead of
-        // "—" + "(—%)" which reads as broken when the YTD fetch fails or is
-        // in-flight. The .is-loading class on .sales-goal-banner hides the
-        // .sales-goal-percent paren entirely (CSS in dashboard-v3-patch-2.css)
-        // and italicizes .sales-goal-current to carry the "Loading…" copy.
+        // No real YTD data yet — friendly loading state. The .is-loading class
+        // on .sales-goal-banner hides the percent paren (dashboard-v3-patch-2.css)
+        // and italicizes the current-value span to carry the "Loading…" copy.
         if (banner) banner.classList.add('is-loading');
         const progress = els.progress();
         if (progress) progress.style.width = '0%';
+        // An aria-valuenow-less progressbar announces as indeterminate — the
+        // truthful state while loading.
+        progressbarEl()?.removeAttribute('aria-valuenow');
         const current = els.current();
         if (current) current.textContent = 'Loading YTD…';
-        const paceEl = els.pace();
-        if (paceEl) {
-            paceEl.className = 'sales-goal-pace';
-            paceEl.innerHTML = '<span aria-hidden="true">⏳</span> Loading YTD…';
-        }
-        const projEl = els.projectedEoy();
-        if (projEl) projEl.textContent = 'Projected EOY —';
         return;
     }
 
     // Data has landed — drop the loading-state styling.
     if (banner) banner.classList.remove('is-loading');
 
-    const ytd = lastYtd;
-    const pct = ytd / goal;
+    const pct = lastYtd / goal;
     const cappedPct = Math.min(pct, 1);
-
-    const elapsed = dayOfYear();
-    const totalDays = isLeapYear(new Date().getFullYear()) ? 366 : 365;
-    const expectedToday = (elapsed / totalDays) * goal;
-    const paceRatio = expectedToday > 0 ? ytd / expectedToday : 0;
-    const projected = elapsed > 0 ? (ytd / elapsed) * totalDays : 0;
 
     const progress = els.progress();
     if (progress) progress.style.width = (cappedPct * 100).toFixed(1) + '%';
+    progressbarEl()?.setAttribute('aria-valuenow', String(Math.round(cappedPct * 100)));
 
     const current = els.current();
-    if (current) current.textContent = formatMoney(ytd);
+    if (current) current.textContent = formatMoney(lastYtd);
     const percent = els.percent();
     if (percent) percent.textContent = (pct * 100).toFixed(0);
-
-    const paceEl = els.pace();
-    if (paceEl) {
-        const pacePct = (paceRatio - 1) * 100;
-        const behindPct = Math.abs(pacePct).toFixed(0);
-        let cls, icon, label;
-        if (paceRatio >= 1) { cls = 'is-ahead'; icon = '✅'; label = `+${pacePct.toFixed(0)}% ahead`; }
-        else if (paceRatio >= 0.9) { cls = 'is-warning'; icon = '⚠️'; label = `${behindPct}% behind`; }
-        else { cls = 'is-behind'; icon = '🔻'; label = `${behindPct}% behind`; }
-        paceEl.className = `sales-goal-pace ${cls}`;
-        paceEl.innerHTML = `<span aria-hidden="true">${icon}</span> ${label}`;
-    }
-
-    const projEl = els.projectedEoy();
-    if (projEl) {
-        const stale = lastYtdMeta?.source === 'archive' && lastYtdMeta?.archivedThrough
-            ? ` · archive thru ${lastYtdMeta.archivedThrough}` : '';
-        projEl.textContent = `Projected EOY ${formatMoney(projected)}${stale}`;
-    }
-}
-
-function isLeapYear(year) {
-    return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
 }
 
 export function initSalesGoal() {
-    // Initial render with whatever lastYtd is (0 until metrics arrive)
+    // Initial render with whatever lastYtd is (loading state until metrics arrive)
     render();
 }

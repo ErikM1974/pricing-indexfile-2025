@@ -24,7 +24,7 @@ const HOST_RE = /caspio-pricing-proxy-ab30a049961a/g;
 const EMAILJS_RE = /service_jgrave3|4qSbDO-SQs19TbP80/g;
 
 // Frozen 2026-07-07 (task 0.3 sweep complete). Only lower these.
-const HOST_BASELINE = 224; // 225 -> 224: pages/js/design-view.js lost its fallback literal (Design Vault)
+const HOST_BASELINE = 222; // 224 -> 223: art-aging-widget.js lost its fallback literal; -> 222: staff-dashboard-v3/config.js retired (dashboard reads are all same-origin relays)
 const EMAILJS_BASELINE = 69;
 
 const SKIP_DIRS = new Set(['node_modules', '.claude', '.git', 'dist', 'tests', 'memory', 'docs', 'migrations', 'workflows']);

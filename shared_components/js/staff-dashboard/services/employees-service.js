@@ -1,35 +1,34 @@
 /* =====================================================
    STAFF DASHBOARD v3 — EMPLOYEES SERVICE
-   Wraps the hardcoded roster from staff-dashboard-employees.js.
-   Per Erik's plan-mode answer #2, data stays hardcoded for now.
-   This module gives the controllers a clean API to query the data.
+   Roster comes from GET /api/staff/employees (requireStaff-gated,
+   data in lib/staff-roster.js). It was hardcoded here until
+   2026-08-27 — but everything under /shared_components/ is served
+   ANONYMOUSLY (the staff gate covers only .html), which published
+   every employee's name, birthday, hire date and termination date
+   to the internet.
+
+   Usage contract: call `await employeesService.load()` once (the
+   celebrations controller does this in init); every other method is
+   synchronous over the loaded data and returns [] before load.
    ===================================================== */
 
-// Hardcoded roster — preserved verbatim from staff-dashboard-employees.js
-// Source of truth until backend migration (out of scope for this refactor).
-const EMPLOYEES = [
-    { firstName: "Jim",          lastName: "Mickelson",  startDate: "1977-10-31", birthday: "03-25", position: "CEO" },
-    { firstName: "Erik",         lastName: "Mickelson",  startDate: "1996-12-16", birthday: "02-14", position: "Operations Manager" },
-    { firstName: "Ruthie",       lastName: "Nhoung",     startDate: "1998-08-05", birthday: "01-19", position: "Production Manager" },
-    { firstName: "Savy",         lastName: "Som",        startDate: "2008-04-21", birthday: "09-08", position: "Embroidery Machine Operator" },
-    { firstName: "Sorphorn",     lastName: "Sorm",       startDate: "2011-04-11", birthday: "07-10", position: "Embroidery Machine Operator" },
-    { firstName: "Nika",         lastName: "Lao",        startDate: "2012-07-31", birthday: "06-29", position: "Account Executive" },
-    { firstName: "Taylar",       lastName: "Hanson",     startDate: "2015-04-20", birthday: "06-30", position: "Account Executive", endDate: "2025-08-29" },
-    { firstName: "Bunsereytheavy", lastName: "Hoeu",     startDate: "2015-05-19", birthday: "01-01", position: "Embroidery Machine Operator" },
-    { firstName: "Bradley",      lastName: "Wright",     startDate: "2017-08-10", birthday: "01-09", position: "Accounting/Purchasing/Webstores" },
-    { firstName: "Steve",        lastName: "Deland",     startDate: "2017-09-28", birthday: "06-30", position: "Graphic Artist" },
-    { firstName: "Kanha",        lastName: "Chhorn",     startDate: "2018-02-21", birthday: "06-11", position: "Embroidery Supervisor & Machine Operator" },
-    { firstName: "Brian",        lastName: "Beardsley",  startDate: "2018-08-13", birthday: "06-29", position: "DTG Supervisor" },
-    { firstName: "Sreynai",      lastName: "Meang",      startDate: "2019-12-09", birthday: "09-02", position: "Embroidery Machine Operator" },
-    { firstName: "Sothea",       lastName: "Tann",       startDate: "2022-09-22", birthday: "04-23", position: "Embroidery Machine Operator" },
-    { firstName: "Joseph",       lastName: "Hallowell",  startDate: "2023-04-03", birthday: "08-14", position: "DTG Operator" },
-    { firstName: "Sothida",      lastName: "Khiev",      startDate: "2024-03-01", birthday: "06-29", position: "Embroidery Machine Operator" },
-    { firstName: "Mikalah",      lastName: "Hede",       startDate: "2024-10-03", birthday: "04-21", position: "Shipping/Receiving Clerk" },
-    { firstName: "Adriyella",    lastName: "Trujillo",   startDate: "2025-02-17", birthday: "02-10", position: "Office Assistant", endDate: "2025-11-15" },
-    { firstName: "Taneisha",     lastName: "Clark",      startDate: "2025-08-12", birthday: "12-25", position: "Sales Coordinator" },
-];
+import { dashboardFetchJson } from '../core/dashboard-fetch.js';
+
+let _roster = [];        // raw rows once loaded
+let _loadPromise = null; // in-flight/settled load (cleared on failure → retryable)
 
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+// Parse a date-only 'YYYY-MM-DD' into LOCAL components. `new Date('2011-04-11')`
+// parses as UTC midnight, which local Pacific getters read back as the PREVIOUS
+// day — every anniversary/start-date/years-of-service shifted a day early.
+function parseLocalDate(ymd) {
+    if (!ymd) return null;
+    const [y, m, d] = String(ymd).split('-').map(Number);
+    if (!y || !m || !d) return null;
+    const date = new Date(y, m - 1, d);
+    return isNaN(date.getTime()) ? null : date;
+}
 
 /**
  * Days from today until a date occurring this year (or next, if already passed).
@@ -44,8 +43,8 @@ function daysUntilMonthDay(monthDay) {
 }
 
 function daysUntilAnniversary(startDate) {
-    const start = new Date(startDate);
-    if (isNaN(start.getTime())) return null;
+    const start = parseLocalDate(startDate);
+    if (!start) return null;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     let target = new Date(today.getFullYear(), start.getMonth(), start.getDate());
@@ -54,7 +53,8 @@ function daysUntilAnniversary(startDate) {
 }
 
 function yearsOfService(startDate, asOf = new Date()) {
-    const start = new Date(startDate);
+    const start = parseLocalDate(startDate);
+    if (!start) return 0;
     let years = asOf.getFullYear() - start.getFullYear();
     const monthDiff = asOf.getMonth() - start.getMonth();
     if (monthDiff < 0 || (monthDiff === 0 && asOf.getDate() < start.getDate())) years--;
@@ -67,15 +67,18 @@ function formatBirthday(monthDay) {
 }
 
 function formatStartDate(startDate) {
-    const d = new Date(startDate);
-    if (isNaN(d.getTime())) return '';
+    const d = parseLocalDate(startDate);
+    if (!d) return '';
     return `${MONTH_NAMES[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
 }
 
 function status(employee, asOf = new Date()) {
     if (!employee.endDate) return 'active';
-    const end = new Date(employee.endDate);
-    if (isNaN(end.getTime())) return 'active';
+    const end = parseLocalDate(employee.endDate);
+    if (!end) return 'active';
+    // The end DATE is their last day — treat them as current through that
+    // whole local day.
+    end.setHours(23, 59, 59, 999);
     if (end < asOf) return 'former';
     return 'leaving';
 }
@@ -86,11 +89,33 @@ function status(employee, asOf = new Date()) {
 
 export const employeesService = {
     /**
+     * Fetch the roster once (subsequent calls reuse the same promise).
+     * Throws on failure — callers must surface a visible error (Rule #4).
+     * A failed load clears the promise so a retry can succeed.
+     */
+    load() {
+        if (!_loadPromise) {
+            _loadPromise = dashboardFetchJson('/api/staff/employees')
+                .then((rows) => {
+                    if (!Array.isArray(rows)) throw new Error('unexpected roster payload');
+                    _roster = rows;
+                    return rows;
+                })
+                .catch((err) => {
+                    _loadPromise = null;
+                    throw err;
+                });
+        }
+        return _loadPromise;
+    },
+
+    /**
      * Full roster, decorated with computed fields.
+     * Empty until load() has resolved.
      */
     all() {
         const today = new Date();
-        return EMPLOYEES.map((e) => ({
+        return _roster.map((e) => ({
             ...e,
             fullName: `${e.firstName} ${e.lastName}`,
             yearsOfService: yearsOfService(e.startDate, today),

@@ -41,8 +41,6 @@ import '../widgets/dashboard-modal.js';
 const REFRESH_INTERVAL_MS = 5 * 60 * 1000;
 
 async function bootstrap() {
-    console.log('[staff-dashboard v3] booting…');
-
     // Tweaks first — applies data-theme/data-accent/data-density to <body>
     // before any layout paints, avoiding theme flicker.
     initTweaks();
@@ -76,16 +74,15 @@ async function bootstrap() {
 
     await Promise.all([authPromise, navAccessPromise]);
 
-    // Periodic refresh of revenue (5 min) — re-fetches from ShopWorks proxy.
+    // Periodic refresh of revenue (5 min). The client metricsCache TTL is
+    // deliberately shorter than this interval (dashboard-store.js) so each
+    // tick actually re-asks the proxy; the proxy's own cache governs quota.
+    // initMetrics is async — a synchronous try/catch can't see its failures.
     setInterval(() => {
-        try {
-            initMetrics();
-        } catch (err) {
+        initMetrics().catch((err) => {
             console.warn('[staff-dashboard v3] periodic refresh failed:', err);
-        }
+        });
     }, REFRESH_INTERVAL_MS);
-
-    console.log('[staff-dashboard v3] booted.');
 }
 
 if (document.readyState === 'loading') {
