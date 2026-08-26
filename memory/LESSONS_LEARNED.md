@@ -5,6 +5,41 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## An audit that reported a clean manifest as 26 missing POs — three ways to confuse "not there" with "never looked" (2026-08-26)
+
+**Problem.** `scripts/psst-audit.js` reconciles SanMar's daily freight manifest against our
+inbound board. Run against the 2026-08-26 manifest (26 POs / 505 pcs / 32 cartons) it reported
+EVERY PO as `NOT FOUND`. The manifest was perfect — verified afterwards, ISSUES: 0.
+
+**Root cause — three independent defects, each alone producing the same false alarm.**
+1. **Refreshed the wrong dates.** `i < REFRESH_NEAR_DAYS` took the first three entries of the
+   date window, but the window starts BAND business days BEFORE the earliest arrival, so those
+   three are the OLDEST days. The arrival dates always sat past them and came from the 600 s
+   cache. It refreshed 08-21/24/25 and read 08-26 and 08-27 — the only two that mattered —
+   stale, labelling them `(cached)` in output nobody reads closely.
+2. **A stale mirror looked like missing freight.** The board is a once-a-day copy of SanMar
+   (~05:31 PT). The audit ran at 05:25 PT. Nothing in the output said the mirror predated the
+   manifest, so a sync-timing artifact presented as 26 lost cartons.
+3. **A failed fetch counted as a discrepancy.** Caspio rate-limits hardest right after the
+   morning sync; both arrival dates returned "rate limit exceeded" and the script still listed
+   26 POs as "not on the board" — while its own header comment had promised since the day it
+   was written that a failed date is "NEVER counted as nothing arriving."
+
+**Solution.** Refresh set = the arrival span `[lo, hi]` itself, capped by `REFRESH_MAX` (costs
+no extra calls — the padding band is for early/late arrivals synced days ago). Probe
+`/status-summary` for `lastSync` and compare `<=` the manifest ship date, NOT `<`: SanMar
+publishes a day's shipments AFTER our sync runs, which is why the manifest arrives by email the
+next morning, so a sync stamped the same day ran before those cartons existed. A failed date
+inside the arrival span marks the run INCONCLUSIVE and its POs UNKNOWN, never missing.
+
+**Prevention.** 🔴 **A check must distinguish "I looked and it isn't there" from "I never
+looked" — and must SAY WHICH.** Every one of these three failures collapsed those two states
+into one confident negative. Same shape as the 2026-08-20 window bug in the same script, and as
+the ghost-order near-miss where three numeric guards passed on unread data. When a verifier
+reports absence, make it state its own coverage: which dates it read, how fresh the source was,
+and what it could not fetch. Prose promises in a header comment are not enforcement — this
+file's own comment made exactly this promise and the code did the opposite for weeks.
+
 ## First-ever caps order pushed to ShopWorks with NO artwork — the stamp had flattened the file ref to a boolean (2026-08-25)
 
 **Problem.** First exercise of the /custom-caps paid leg (Stripe TEST-mode E2E, CAP0825-4781):
@@ -115,141 +150,6 @@ using the same builder — live page verified rendering both, matching the SW sn
 
 ---
 
-## Heroku git push needs a `global`-scoped token — `write` fails as "repository not found" (2026-08-19)
-
-**Problem.** Replacing the rolling ~14-day CLI session token with a long-lived authorization so
-deploys survive a vacation. Minted it least-privilege (`-s write`) and pointed the
-`git.heroku.com` credential helper at it. Every git operation then died with
-`remote: ! Couldn't find that user.` → `fatal: repository '…/sanmar-inventory-app.git/' not
-found` — which reads like a deleted app or a wrong remote URL, not an auth problem.
-
-**Root cause.** Heroku's git endpoint accepts **only `global`-scope tokens**. A `write`-scoped
-token authenticates perfectly against the *API* (`heroku authorizations`, `releases`, `ps` all
-work), so every check short of an actual git operation says the token is fine. The git rejection
-is reported as a missing repository and never mentions scope.
-
-**Solution.** Mint with the default (global) scope. Least privilege is not available here —
-`write` is not a narrower version of what git needs, it simply does not work. Wired
-2026-08-19: authorization `NWCA git deploy (1yr)`, stored at `~/.heroku-deploy-token` (ACL
-owner-only), read directly by the `git.heroku.com` credential helper. ⏭️ **Renew before
-2027-08-19.** Full setup + recreate commands: `.claude/skills/deploy/SKILL.md` § Heroku CLI v11
-git auth.
-
-**Prevention.**
-- 🔑 **Verify any Heroku credential change with a no-op `git push heroku main`.** When main is
-  already pushed it prints `Everything up-to-date` *after* completing the full auth handshake —
-  a zero-effect test of the exact path `/deploy` Step 12 uses. Catching this cost one no-op push
-  instead of a failed deploy at Step 12.
-- 🔑 **`Couldn't find that user` / `repository not found` from `git.heroku.com` means token
-  SCOPE**, not a bad remote. Confirm with `heroku authorizations --json` → `.scope`.
-- 🔑 **The CLI session token rolls forward on every heroku command** — `updated_at` refreshes and
-  the ~14-day window restarts, so routine deploys keep it alive indefinitely. The
-  `token will expire` warning is a *back-from-vacation* trap (14 idle days), not a countdown.
-  Read expiry from `.access_token.expires_in`; the top-level `expires_in` is always null and
-  makes every token look permanent.
-- ⚠️ A long-lived token belongs in the **git credential helper only**, not `HEROKU_API_KEY`.
-  The env var overrides the CLI session globally, so `heroku login`/`logout` stop controlling
-  auth — a second layer of exactly the confusion the v11 git-auth bug already cost 5 rounds on.
-
-## A <script> tag pointing at a file deleted 11 months ago (2026-08-19)
-
-**Problem.** `calculators/dtf-pricing.html` loaded `/product-url-handler.js`, deleted in
-`a2a4027f` on 2025-09-27. Every visit to the DTF pricing page 404'd on it for ~11 months.
-
-**Root cause.** The cleanup removed the file without grepping HTML for references, and nothing
-fails loudly: a missing `<script src>` is a 404 in the network tab and an empty console.
-
-**Solution.** Deleted the tag. The page never needed it — zero occurrences of
-`style-search-input` or `loadProductDetails` (all the handler touches), and it parses
-`StyleNumber`/`COLOR` itself in 8 places.
-
-**Prevention.**
-- 🔑 **`scripts/build.js` is the detector**: it prints `[build] missing on disk, tag left
-  untouched: <path>`. That line is the only signal and it scrolls past in Heroku build output —
-  grep the deploy's build log for `missing on disk`.
-- ⚠️ **CLAUDE.md already requires grepping for a filename on delete** — this is the cost of
-  skipping it: the reference outlived the file by 11 months.
-
----
-
-## A version counter that hands out numbers already in use (2026-08-18)
-
-**Problem.** `/deploy` Step 1 picked a version BELOW one already in use, twice in one day. On
-v2026.08.18.4 it proposed `.2` while `product.html` already carried `?v=2026.08.18.3`; on
-v2026.08.18.5 it proposed `.3` while tag `v2026.08.18.4` existed. Both were caught by hand
-mid-deploy; neither would have failed a gate.
-
-**Root cause.** `N=$(git tag -l "v${TODAY}.*" | wc -l) + 1` — a **count**, used to answer "what
-is the next unused version". A count is only equal to max+1 when the day's numbers are dense AND
-tags are the sole record of them. Neither holds: a hand-bumped `?v=` in HTML claims a version
-with no tag behind it, and a skipped/abandoned tag number leaves a hole the count silently
-reuses.
-
-**Solution.** Step 1 now takes `max(highest tag today, highest ?v= in HTML today) + 1`
-(`.claude/skills/deploy/SKILL.md` Step 1). Both incident states replayed against the new formula
-return `.4` and `.5` — the values chosen by hand — where `count+1` returns `.2` and `.3`.
-
-**Prevention.**
-- 🔴 **Next-id = max-in-use + 1, never count.** They diverge the instant a number is skipped or
-  claimed outside the list you're counting. This applies to any allocator, not just this one.
-- 🔑 **A version lives in two places, so read both.** Tags are the record of releases; `?v=` in
-  HTML is the record of what a browser was told to fetch. A hand-bump writes the second without
-  the first, so a tags-only read is blind to it.
-- ⚠️ **Both failures are silent by construction.** A low version makes Step 2 rewrite a live
-  `?v=` *backwards* — browsers holding the newer value never refetch, so reps run old pricing
-  code against a new server — and it puts `git tag` out of order, so the next release's
-  `git describe --tags` baseline is wrong and its CHANGELOG re-lists shipped commits. Nothing
-  errors. Sparse tag numbers are normal; dense ones were never a goal.
-- 🔑 **Step 2's cache-bust is a no-op on the ~125 pages in `lib/hashed-pages.js`** (all 4 quote
-  builders, index, product, catalog, every `custom-*`, all dashboards, all calculators).
-  `scripts/build.js` rewrites their refs to content-hashed `/dist/…<hash>.js` at build time, so
-  the `?v=` never reaches a browser. Verified 2026-08-18: all 25 `/dist/` refs on the live PDP
-  reproduce byte-identically from a local rebuild of `origin/main`. The `?v=` path still governs
-  every page NOT on that list.
-
----
-
-## A dependency bump that passes all five gates and takes the whole site down (2026-08-18)
-
-**Problem.** Dependabot PR #27 (`marked` 12.0.2 → 18.0.9) sat open looking ordinary. Merging it
-would have produced **H10 on every page** — all customer storefronts and pricing pages, not a
-degraded blog — and every check in the repo says it is fine.
-
-**Root cause.** `marked` went **ESM-only at v13**. `lib/blog.js:17` is CommonJS
-(`const { marked } = require('marked')`), so v18 throws `ERR_REQUIRE_ESM` at require time. That
-is not contained to the blog: `server.js:4747` does `require('./lib/blog')` at module load, so
-the failure happens before the server listens and the process never starts.
-
-**Solution.** Closed the PR and added an `ignore` for `marked` majors in `.github/dependabot.yml`
-(`a4e84360`) naming the unblock condition, so it cannot be re-proposed until `lib/blog.js` moves
-to ESM or a dynamic `import()`. Minor/patch of v12 still flow.
-
-**Prevention.**
-- 🔴 **Measured with `marked@18` actually installed: lint ✅ typecheck ✅ test:unit (125 suites /
-  2613 tests) ✅ test:dom ✅ test:a11y ✅ — and the server does not boot.** No test loads
-  `lib/blog.js`. A green suite is evidence about the code the suite imports and nothing else.
-- 🔑 **The deploy skill's Step 3.6b boot probe is the only gate that caught it**, and only because
-  it actually starts the server rather than parsing it. `node --check` passes too — syntax is
-  fine, the failure is at require time. This is the second incident that gate has justified
-  (first: the 2026-07-19 `Cannot find module` outage). **Never route around it.**
-- 🔴 **A module required at server boot has no blast radius of its own** — it inherits the whole
-  app's. Before upgrading anything under `lib/`, check whether `server.js` requires it at load:
-  `grep -n "require('./lib/<name>')" server.js`. If yes, a bad bump is a total outage, not a
-  broken feature.
-- 🔑 **CJS→ESM is invisible to semver reasoning.** "It's only used in 3 places, all stable API"
-  was true here and completely irrelevant — the break was in how the package is *loaded*, not
-  what it exposes. For any major bump, `require()` the package once before reading changelogs.
-- ⚠️ **A dependabot PR's red checks may be about nothing.** #24–27 were based on a commit **178
-  behind develop**, from before CI was fixed on 2026-08-18, so their ESLint/tsc/E2E failures were
-  inherited from the two-week-red CI. Check `baseRefOid`'s date before believing — or dismissing —
-  a bot PR's status, in both directions: #27's checks were *falsely red*, and its unit tests were
-  *truthfully green* on a build that could not start.
-- 🔑 `sharp` was a direct dependency nothing imported (no `require`, no script, root-only in the
-  lockfile) — shipping native libvips binaries on every install and Heroku build. Removing a dead
-  dep beats upgrading it; check `grep -rl "require('<pkg>')"` before accepting any bump.
-
----
-
 ## Staff dashboard full review — 5 UTC/Pacific bugs on ONE page, and the error system silently failing itself (2026-08-26)
 
 **Problem.** Multi-agent review of every file the staff dashboard loads (30 files) confirmed 13
@@ -286,5 +186,47 @@ jsdom import of all 25 v3 modules, regex/date spot-checks.
 - 🔑 **A prefix whitelist + extraction regex is two chances to be wrong.** '3DT' broke the
   letters-only regex silently; nonexistent 'TDT'/'CTS' entries made the list look maintained.
   Derive prefixes from config/storefront-channels.js shapes, and test the digit-leading one.
+
+---
+
+## Quote data plane locked down — 44 caller files, 2 repos, one gate flip left (2026-08-26)
+
+**Problem.** Step 2 of the 2026-08-17 review: the proxy's quote surface was anonymous.
+GET /api/quote_sessions with no filter dumped the ENTIRE customer book (no limiter, no
+auth — MEMORY's "rate limiter" claim was generous); quote_change_log and dtf/scp-push had
+NOTHING; push preview routes dumped full customer PII per quoteId; PUT quote_items let
+anyone rewrite prices on a live quote link.
+
+**Root Cause.** Browser call sites (~90 across 44 files) hit the proxy base directly, so
+the proxy could never require auth without breaking every page. The app ALSO exposed its
+own anonymous CRUD twin (/api/quote_sessions* etc.) that dropped query strings and sent
+no secret upstream.
+
+**Solution.** App `v2026.08.26.3` + proxy `v2026.08.26.2`, deployed app-first:
+app relays hardened (PUT/DELETE staff-only; POST anonymous behind quotePlaneWriteLimiter
+with staff skip; list reads staff-or-quoteID-scoped, query forwarded verbatim; NEW
+quote-sequence + 3×push relays), 19 live browser files migrated same-origin,
+withProxySecret() on every dyno→proxy quote call, e2e harnesses read the secret from env.
+Proxy: quotePlaneGate on all 8 prefixes, mode via QUOTE_PLANE_GATE config var
+(off→log→enforce, no deploy to flip). NOW IN LOG MODE — flip to enforce after the
+WOULD-BLOCK log goes quiet: `heroku config:set QUOTE_PLANE_GATE=enforce --app caspio-pricing-proxy`.
+
+**Prevention.**
+- 🔑 **A gate you can't flip without a deploy is a gate you'll ship scared.** Mode-switch
+  by config var: deploy dormant, watch in log mode, enforce when the log proves coverage.
+- 🔑 **Migrate by ENDPOINT grep, never by config swap** — 141 files hardcode the proxy
+  host, and 4 of the migrated files used their base for NON-quote endpoints too
+  (dtg top-sellers, quote-view thumbnails, /api/files uploads, sanmar-orders) — a blanket
+  base swap would have broken them. Audit EVERY use of a base const before flipping it.
+- 🔑 **The app's own passthrough routes silently dropped query strings** (GET
+  /api/quote_items forwarded bare for years — callers got ALL items). When hardening a
+  relay, forward `req.originalUrl`'s query verbatim; the upstream validates.
+- 🔴 **Postures are jest-locked in BOTH repos** (`tests/unit/quote-plane-postures.test.js`
+  app, `tests/jest/quote-plane-gate.test.js` proxy) — source-parsed mounts + behavioral
+  mode tests, so a refactor can't silently reopen the plane or unmount the gate.
+- 🔑 Shared-checkout deploys: THREE concurrent-session collisions in one day (trust band
+  committed onto main mid-deploy; sanmar css bumped into my release; proxy inbound commit
+  riding my proxy release). `git add -u` is never safe here — stage explicit file lists,
+  read `main..develop` before every merge.
 
 ---
