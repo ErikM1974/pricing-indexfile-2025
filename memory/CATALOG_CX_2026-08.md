@@ -204,7 +204,7 @@ would have silently beaten the drawer's `body.drawer-open { overflow: hidden }` 
 🔑 The chrome is STILL copy-pasted per page (build-time component = later refactor); the drift
 test is what keeps the 6 copies identical — edit one page's chrome = edit all 6 + the canon.
 
-## ✅ M-7 category tiles — BUILT 2026-08-26, committed on develop, NOT deployed
+## ✅ M-7 category tiles — DEPLOYED LIVE `v2026.08.26.6` (2026-08-26), byte-verified (homepage 3 new tile hrefs, #catTiles container, cat-tile-sm in live js+css bundles)
 
 Homepage: 3 tiles added (08 Ladies · 09 Activewear · 10 Woven Shirts → 11 tiles incl. the
 existing "All categories" tile). /catalog: `#catTiles` row above the grid, rendered by
