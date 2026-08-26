@@ -23,6 +23,7 @@ Last Updated: 2026-08-18 (branch/deploy audit: LESSONS_LEARNED trimmed 275→231
 | [`LESSONS_LEARNED_ARCHIVE.md`](LESSONS_LEARNED_ARCHIVE.md) | Aged-out lessons (unbounded) |
 | [`MEMORY_SYSTEM.md`](MEMORY_SYSTEM.md) | **How the memory system works** (not what is in it) — where a new fact goes, the 6 surfaces and when each loads, size budgets, which tree is canonical |
 | [`PAYROLL_CASPIO_2026-07.md`](PAYROLL_CASPIO_2026-07.md) | Payroll/Caspio — leave upload, entitlement traps, slip generation |
+| [`SANMAR_INBOUND_2026-08.md`](SANMAR_INBOUND_2026-08.md) | SanMar PSST inbound board + print sheets — what shipped, the drop-ship coverage gap, ranked backlog |
 | [`SHOPWORKS_ODBC_INTEGRATION.md`](SHOPWORKS_ODBC_INTEGRATION.md) | ShopWorks ODBC + bandit sync cluster, thumbnails, ORDER_ODBC reconcile |
 | [`contract-embroidery-dst.md`](contract-embroidery-dst.md) | Contract embroidery .DST quoting |
 | [`deploy-cachebust.md`](deploy-cachebust.md) | Content-hashed assets + the ?v= cache-bust rules |
