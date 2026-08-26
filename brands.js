@@ -360,16 +360,35 @@ class BrandsPage {
         return div.innerHTML;
     }
 
+    // Standard 2026 chrome: drawer + masthead search (same pattern as product-2026.js)
     setupMobileMenu() {
-        const mobileBtn = document.getElementById('mobileMenuBtn');
-        if (!mobileBtn) return;
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        const openBtn = document.getElementById('mobileMenuBtn');
+        const closeBtn = document.getElementById('drawerClose');
 
-        mobileBtn.addEventListener('click', () => {
-            // Toggle mobile menu if it exists
-            const nav = document.querySelector('.top-navigation');
-            if (nav) {
-                nav.classList.toggle('active');
-            }
+        function setDrawer(open) {
+            if (!sidebar || !overlay) return;
+            sidebar.classList.toggle('show', open);
+            overlay.classList.toggle('show', open);
+            document.body.classList.toggle('drawer-open', open);
+        }
+        if (openBtn) openBtn.addEventListener('click', () => setDrawer(true));
+        if (closeBtn) closeBtn.addEventListener('click', () => setDrawer(false));
+        if (overlay) overlay.addEventListener('click', () => setDrawer(false));
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') setDrawer(false);
+        });
+
+        const input = document.getElementById('navSearchInput');
+        const btn = document.getElementById('navSearchBtn');
+        function goSearch() {
+            const term = (input && input.value || '').trim();
+            if (term) window.location.href = '/catalog?q=' + encodeURIComponent(term);
+        }
+        if (btn) btn.addEventListener('click', goSearch);
+        if (input) input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') goSearch();
         });
     }
 }

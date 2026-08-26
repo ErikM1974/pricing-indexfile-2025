@@ -5,136 +5,13 @@
 
 /* ===== Page Layout ===== */
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    margin: 0;
-    padding: 0;
-    padding-top: 180px; /* Space for fixed header */
     background: #f5f5f5;
-    color: #333;
 }
 
 .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
-}
-
-/* ===== Enhanced Pricing Header ===== */
-.enhanced-pricing-header {
-    background: white;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
-}
-
-/* Contact Bar */
-.header-contact-bar {
-    background: #2d5f3f;
-    color: white;
-    padding: 10px 0;
-    font-size: 14px;
-}
-
-.contact-bar-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.contact-info {
-    display: flex;
-    gap: 30px;
-}
-
-.contact-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.contact-item i {
-    font-size: 14px;
-}
-
-.business-hours {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.business-hours i {
-    font-size: 14px;
-}
-
-/* Main Navigation */
-.header-nav {
-    padding: 15px 0;
-}
-
-.nav-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-.logo-section {
-    display: flex;
-    align-items: center;
-}
-
-.logo-link {
-    display: inline-block;
-}
-
-.logo-image {
-    max-width: 250px;
-    height: auto;
-}
-
-/* Pricing Context Bar */
-.pricing-context-bar {
-    background: #f8f9fa;
-    border-top: 1px solid #e0e0e0;
-    padding: 12px 0;
-}
-
-.context-bar-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-.breadcrumb {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 14px;
-}
-
-.breadcrumb a {
-    color: #2d5f3f;
-    text-decoration: none;
-    transition: color 0.2s;
-}
-
-.breadcrumb a:hover {
-    color: #1a4029;
-    text-decoration: underline;
-}
-
-.breadcrumb-separator {
-    color: #666;
-}
-
-.breadcrumb-current {
-    color: #666;
-    font-weight: 500;
 }
 
 /* ===== Hero Section ===== */
@@ -851,44 +728,8 @@ body {
     font-size: 16px;
 }
 
-/* ===== Footer ===== */
-.page-footer {
-    text-align: center;
-    padding: 40px 20px;
-    color: #666;
-    font-size: 14px;
-    background: white;
-    border-top: 1px solid #e0e0e0;
-    margin-top: 60px;
-}
-
-.page-footer p {
-    margin: 5px 0;
-}
-
 /* ===== Responsive Design ===== */
 @media (max-width: 768px) {
-    /* Header Responsive Styles */
-    .contact-bar-content {
-        flex-direction: column;
-        gap: 10px;
-        text-align: center;
-    }
-
-    .contact-info {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .breadcrumb {
-        font-size: 12px;
-        flex-wrap: wrap;
-    }
-
-    .logo-image {
-        max-width: 200px;
-    }
-
     /* Color Selector Responsive */
     .color-grid {
         grid-template-columns: repeat(4, 1fr);

@@ -93,7 +93,7 @@
         const btn = $('navSearchBtn');
         function goSearch() {
             const term = (input && input.value || '').trim();
-            if (term) window.location.href = '/?q=' + encodeURIComponent(term);
+            if (term) window.location.href = '/catalog?q=' + encodeURIComponent(term);
         }
         if (btn) btn.addEventListener('click', goSearch);
         if (input) input.addEventListener('keydown', function (e) {

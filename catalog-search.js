@@ -111,8 +111,21 @@ class CatalogSearch {
             hasFilters = true;
         }
 
-        // If any filters were found in URL, trigger search
+        // Legacy homepage result URLs (/?q=, /?category=) — old bookmarks and
+        // stray links — land on /catalog with the same params instead of the
+        // retired inline renderer (M-6: the homepage is a launchpad).
         if (hasFilters) {
+            if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
+                const fwd = new URLSearchParams();
+                if (this.currentFilters.q) fwd.set('q', this.currentFilters.q);
+                if (this.currentFilters.category) fwd.set('category', this.currentFilters.category);
+                if (this.currentFilters.subcategory) fwd.set('subcategory', this.currentFilters.subcategory);
+                if (Array.isArray(this.currentFilters.brand) && this.currentFilters.brand[0]) {
+                    fwd.set('brand', this.currentFilters.brand[0]);
+                }
+                window.location.replace('/catalog?' + fwd.toString());
+                return;
+            }
             console.log('[CatalogSearch] Filters found in URL, performing search:', this.currentFilters);
             this.performSearch();
         }
@@ -155,20 +168,18 @@ class CatalogSearch {
             // User must press Enter or click search button to see full results
         });
         
-        // Search button
-        if (searchBtn) {
-            searchBtn.addEventListener('click', () => {
-                if (searchInput.value.trim()) {
-                    this.performSearch();
-                }
-            });
-        }
-        
-        // Enter key to search
+        // Submitting a search NAVIGATES to /catalog — the real store with
+        // facets, server price labels, and shareable URLs. The old inline
+        // homepage results ran their own price math and broke Back (M-6).
+        const goCatalog = () => {
+            const term = searchInput.value.trim();
+            if (term) window.location.assign('/catalog?q=' + encodeURIComponent(term));
+        };
+        if (searchBtn) searchBtn.addEventListener('click', goCatalog);
         searchInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && searchInput.value.trim()) {
                 e.preventDefault();
-                this.performSearch();
+                goCatalog();
             }
         });
     }

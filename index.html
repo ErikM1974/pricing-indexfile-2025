@@ -73,8 +73,8 @@
             </a>
 
             <ul class="nav-menu">
-                <li class="nav-item">
-                    <a href="#" class="nav-link nav-products" aria-haspopup="true" aria-expanded="false">
+<li class="nav-item">
+                    <a href="/catalog" class="nav-link nav-products" aria-haspopup="true" aria-expanded="false">
                         Products
                         <svg class="nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
                     </a>
@@ -87,7 +87,7 @@
                         </div>
                     </div>
                 </li>
-                <li class="nav-item brands-nav-item" data-dropdown="brands">
+<li class="nav-item brands-nav-item" data-dropdown="brands">
                     <a href="/brands.html" class="nav-link nav-brands" aria-haspopup="true" aria-expanded="false">
                         Brands
                         <svg class="nav-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -103,18 +103,17 @@
                         </div>
                     </div>
                 </li>
-                <!-- --p1/--p2/--p3 = demotion tiers (nwca-2026-core.css): lowest-priority
-                     links leave the bar first as the viewport narrows so the search box
-                     keeps a typeable width. Everything demoted stays in the drawer. -->
                 <li class="nav-item nav-item--p1">
                     <a href="/catalog?topSellers=1" class="nav-link">Top Sellers</a>
                 </li>
-                <!-- Seasonal slot (2026-07-24): Fall Catalog '26 replaced Express Order —
-                     that link was only a same-page anchor (/#express-order); the section
-                     itself is one scroll below the hero and stays reachable via the hero
-                     CTA, Products dropdown, and drawer. Rotate this slot ~late Oct. -->
                 <li class="nav-item nav-item--p1">
                     <a href="/pages/fall-catalog-2026.html" class="nav-link">Fall Catalog '26 <span class="flag-new">New</span></a>
+                </li>
+                <li class="nav-item nav-item--p1">
+                    <a href="/custom-tees" class="nav-link">Custom Tees <span class="flag-new">New</span></a>
+                </li>
+                <li class="nav-item nav-item--p1">
+                    <a href="/custom-caps" class="nav-link">Custom Hats <span class="flag-new">New</span></a>
                 </li>
                 <li class="nav-item nav-item--p2">
                     <a href="/company-webstores" class="nav-link">Webstores</a>
@@ -122,14 +121,12 @@
                 <li class="nav-item nav-item--p2">
                     <a href="/blog" class="nav-link">Blog</a>
                 </li>
-                <li class="nav-item nav-item--p1">
+                <li class="nav-item nav-item--p2">
                     <a href="/custom-stickers" class="nav-link">Stickers</a>
                 </li>
                 <li class="nav-item">
                     <a href="/pages/request-a-quote.html" class="nav-link">Get a Quote</a>
                 </li>
-                <!-- Corporate site link lives in the util-strip (meta-nav) — the main
-                     bar is width-capped at --wrap and 8 items crushed the search box. -->
             </ul>
 
             <div class="nav-search" role="search">
@@ -206,6 +203,8 @@
             <a href="/blog">Blog</a>
             <a href="/pages/request-a-quote.html">Get a Quote</a>
             <a href="https://nwcustomapparel.net/" target="_blank" rel="noopener">Corporate site ↗</a>
+        
+            <a href="/catalog">Catalog</a>
         </nav>
         <h3 class="drawer-subhead">Shop by category</h3>
         <ul class="category-list" id="categoryList">

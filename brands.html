@@ -11,43 +11,154 @@
     <!-- Preconnect to SanMar CDN for faster brand logo loading -->
     <link rel="preconnect" href="https://cdnm.sanmar.com" crossorigin="anonymous">
     <link rel="dns-prefetch" href="https://cdnm.sanmar.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
     <!-- Styles -->
-    <link rel="stylesheet" href="/main-redesign.css?v=10">
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/shared_components/css/nwca-2026-core.css?v=2026.08.25.4">
     <link rel="stylesheet" href="/brands.css?v=4">
 </head>
 <body>
-    <header class="header">
-        <div class="header-content">
-            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle mobile menu">☰</button>
-            <a href="/" class="logo-link" title="Return to Home">
-                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20White%20Text.png?ver=1" alt="Northwest Custom Apparel" class="logo">
-            </a>
-            <div class="header-info">
-                <h1 class="header-title">Shop by Brand</h1>
-                <p class="header-services">Browse All Brands</p>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <!-- Utility strip -->
+    <div class="util-strip">
+        <div class="util-inner">
+            <p class="util-fam"><strong>Northwest Custom Apparel</strong> — family-owned in Milton, WA since 1977</p>
+            <div class="util-contact">
+                <span class="util-hours">Mon–Fri 8:30–5:00 PT</span>
+                <a href="tel:253-922-5793">253-922-5793</a>
+                <a class="util-mail" href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a>
+                <a href="/staff-dashboard.html" title="Staff Portal">Staff</a>
             </div>
+        </div>
+    </div>
+
+    <!-- Masthead -->
+    <header class="nav-bar">
+        <div class="nav-bar-inner">
+            <button class="mobile-menu-btn" id="mobileMenuBtn" type="button" aria-label="Open menu" aria-controls="sidebar">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <line x1="3" y1="12" x2="21" y2="12"></line>
+                    <line x1="3" y1="18" x2="21" y2="18"></line>
+                </svg>
+            </button>
+
+            <a href="/" class="brand" title="Northwest Custom Apparel — Home">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                     alt="Northwest Custom Apparel" class="brand-logo" width="160" height="46">
+            </a>
+
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="/catalog" class="nav-link">Products</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/brands.html" class="nav-link" aria-current="page">Brands</a>
+                </li>
+                <li class="nav-item nav-item--p1">
+                    <a href="/catalog?topSellers=1" class="nav-link">Top Sellers</a>
+                </li>
+                <li class="nav-item nav-item--p1">
+                    <a href="/pages/fall-catalog-2026.html" class="nav-link">Fall Catalog '26 <span class="flag-new">New</span></a>
+                </li>
+                <li class="nav-item nav-item--p1">
+                    <a href="/custom-tees" class="nav-link">Custom Tees <span class="flag-new">New</span></a>
+                </li>
+                <li class="nav-item nav-item--p1">
+                    <a href="/custom-caps" class="nav-link">Custom Hats <span class="flag-new">New</span></a>
+                </li>
+                <li class="nav-item nav-item--p2">
+                    <a href="/company-webstores" class="nav-link">Webstores</a>
+                </li>
+                <li class="nav-item nav-item--p2">
+                    <a href="/blog" class="nav-link">Blog</a>
+                </li>
+                <li class="nav-item nav-item--p2">
+                    <a href="/custom-stickers" class="nav-link">Stickers</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/pages/request-a-quote.html" class="nav-link">Get a Quote</a>
+                </li>
+            </ul>
+
+            <div class="nav-search" role="search">
+                <input type="text"
+                       id="navSearchInput"
+                       class="nav-search-input"
+                       placeholder="Search styles — PC61, hoodies, caps…"
+                       autocomplete="off"
+                       aria-label="Search products">
+                <button id="navSearchBtn" class="nav-search-btn" type="button" aria-label="Search">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Quote-cart badge (count wired by quote-cart-store.js; hidden at 0) -->
+            <a class="quote-badge" href="/quote-cart" data-quote-badge hidden>
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"></path>
+                    <rect x="9" y="3" width="6" height="4" rx="1"></rect>
+                    <path d="M9 12h6"></path><path d="M9 16h6"></path>
+                </svg>
+                <span class="quote-badge-label">Quote</span>
+                <span class="quote-badge-count" data-quote-badge-count>0</span>
+            </a>
         </div>
     </header>
 
-    <nav class="top-navigation">
-        <div class="nav-container">
-            <ul class="nav-menu">
-                <li class="nav-item">
-                    <a href="/" class="nav-link">← Back to Catalog</a>
-                </li>
-                <li class="nav-item">
-                    <a href="/catalog?topSellers=1" class="nav-link">Top Sellers</a>
-                </li>
-                <li class="nav-item">
-                    <a href="/resources.html" class="nav-link">Resources</a>
-                </li>
-            </ul>
+    <!-- Drawer (mobile menu + category browse) -->
+    <aside class="sidebar" id="sidebar" aria-label="Browse menu">
+        <div class="drawer-head">
+            <span class="drawer-head-title">Browse NWCA</span>
+            <button class="drawer-close" id="drawerClose" type="button" aria-label="Close menu">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
         </div>
-    </nav>
+        <nav class="drawer-links" aria-label="Quick links">
+            <a href="/">Home</a>
+            <a href="/custom-tees">Custom T-Shirts <span class="flag-new">New</span></a>
+            <a href="/custom-caps">Custom Hats <span class="flag-new">New</span></a>
+            <a href="/catalog?topSellers=1">Top Sellers &amp; Free Samples</a>
+            <a href="/brands.html">Brands</a>
+            <a href="/company-webstores">Custom Webstores</a>
+            <a href="/catalog">Catalog</a>
+            <a href="/pages/fall-catalog-2026.html">Fall Catalog '26</a>
+            <a href="/custom-stickers">Custom Stickers</a>
+            <a href="/custom-banners">Vinyl Banners</a>
+            <a href="/blog">Blog</a>
+            <a href="/pages/request-a-quote.html">Get a Quote</a>
+        </nav>
+        <h3 class="drawer-subhead">Shop by category</h3>
+        <ul class="category-list">
+            <li class="category-item"><a class="category-link" href="/catalog?category=T-Shirts">T-Shirts</a></li>
+            <li class="category-item"><a class="category-link" href="/catalog?category=Polos%2FKnits">Polos &amp; Knits</a></li>
+            <li class="category-item"><a class="category-link" href="/catalog?category=Sweatshirts%2FFleece">Sweatshirts &amp; Fleece</a></li>
+            <li class="category-item"><a class="category-link" href="/catalog?category=Caps">Caps</a></li>
+            <li class="category-item"><a class="category-link" href="/catalog?category=Outerwear">Outerwear</a></li>
+            <li class="category-item"><a class="category-link" href="/catalog?category=Workwear">Workwear</a></li>
+            <li class="category-item"><a class="category-link" href="/catalog?category=Bags">Bags</a></li>
+        </ul>
+        <div class="drawer-contact">
+            Questions? A human answers.<br>
+            <a href="tel:253-922-5793">253-922-5793</a><br>
+            <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a><br>
+            2025 Freeman Rd E, Milton, WA 98354
+        </div>
+    </aside>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
+    <main id="main">
     <div class="brands-page-container">
-        <main class="brands-content">
+        <div class="brands-content">
             <!-- Page Header -->
             <div class="brands-header">
                 <h1 class="brands-title">Shop by Brand</h1>
@@ -79,11 +190,60 @@
             <div id="brandsContainer" class="brands-container" style="display: none;">
                 <!-- Brands will be dynamically inserted by brands.js -->
             </div>
-        </main>
+        </div>
     </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20White%20Text.png?ver=1" alt="Northwest Custom Apparel" width="180" height="52" loading="lazy">
+                <p>Family-owned custom apparel decorator in Milton, Washington. Embroidery, screen printing, DTG, and DTF — done in-house since 1977.</p>
+                <span class="footer-est">Est. 1977 · Milton, WA</span>
+            </div>
+            <div class="footer-col">
+                <h3>Shop</h3>
+                <ul>
+                    <li><a href="/catalog?topSellers=1">Top Sellers</a></li>
+                    <li><a href="/brands.html">Brands</a></li>
+                    <li><a href="/custom-tees">Custom T-Shirts</a></li>
+                    <li><a href="/custom-caps">Custom Hats</a></li>
+                    <li><a href="/catalog?topSellers=1">Free Sample Program</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Services</h3>
+                <ul>
+                    <li><a href="/golf-tournament-apparel?utm_source=brands&amp;utm_campaign=golf-2026-q2&amp;utm_medium=footer">Tournament Packages</a></li>
+                    <li><a href="/company-webstores">Custom Webstores</a></li>
+                    <li><a href="/calculators/laser-tumbler-polarcamel.html">Laser-Engraved Tumblers</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Contact</h3>
+                <address>
+                    2025 Freeman Rd E<br>
+                    Milton, WA 98354<br>
+                    <a href="tel:253-922-5793">253-922-5793</a><br>
+                    <a href="mailto:sales@nwcustomapparel.com">sales@nwcustomapparel.com</a><br>
+                    Mon–Fri 8:30–5:00 PT
+                </address>
+                <ul>
+                    <li><a href="/staff-dashboard.html">Staff Portal</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="footer-bottom-inner">
+                <span>© 2026 Northwest Custom Apparel</span>
+                <span>Family-owned &amp; operated since 1977</span>
+            </div>
+        </div>
+    </footer>
 
     <!-- Scripts -->
     <script src="/shared_components/js/brands-registry.js?v=2026.07.25.3"></script>
     <script src="/brands.js?v=2026.08.25.3"></script>
+    <script src="/shared_components/js/quote-cart-store.js?v=2026.08.19.5" defer></script>
 </body>
 </html>

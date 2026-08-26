@@ -723,8 +723,41 @@ class LaserTumblerPage {
     }
 }
 
+// Standard 2026 chrome: drawer + masthead search (same pattern as product-2026.js)
+function wireChrome() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const openBtn = document.getElementById('mobileMenuBtn');
+    const closeBtn = document.getElementById('drawerClose');
+
+    function setDrawer(open) {
+        if (!sidebar || !overlay) return;
+        sidebar.classList.toggle('show', open);
+        overlay.classList.toggle('show', open);
+        document.body.classList.toggle('drawer-open', open);
+    }
+    if (openBtn) openBtn.addEventListener('click', function () { setDrawer(true); });
+    if (closeBtn) closeBtn.addEventListener('click', function () { setDrawer(false); });
+    if (overlay) overlay.addEventListener('click', function () { setDrawer(false); });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') setDrawer(false);
+    });
+
+    const input = document.getElementById('navSearchInput');
+    const btn = document.getElementById('navSearchBtn');
+    function goSearch() {
+        const term = (input && input.value || '').trim();
+        if (term) window.location.href = '/catalog?q=' + encodeURIComponent(term);
+    }
+    if (btn) btn.addEventListener('click', goSearch);
+    if (input) input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') goSearch();
+    });
+}
+
 // Initialize page when DOM is ready
 document.addEventListener('DOMContentLoaded', function() {
+    wireChrome();
     window.laserTumblerPage = new LaserTumblerPage();
     window.laserTumblerPage.init();
 });
