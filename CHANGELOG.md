@@ -1,3 +1,10 @@
+## v2026.08.26.3 (2026.08.26)
+
+- Memory: M-5 deployed + live-verified (v2026.08.26.2); minified-bundle marker scare noted
+- Memory: stopping point — CX through M-5 deployed; continuation plan M-6/M-7/M-8 + shared-checkout state
+- Quote-plane lockdown, app side: relays hardened, all callers same-origin
+- Deploy v2026.08.26.3: cache-bust 21 pages (quote-plane lockdown callers)
+
 ## v2026.08.26.2 (2026.08.26)
 
 - Memory: trust band live (rode along in v2026.08.26.1) + shared-checkout mid-deploy gotcha
