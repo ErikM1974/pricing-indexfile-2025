@@ -223,7 +223,7 @@
         const crumbCat = $('crumbCategory');
         if (p.category) {
             crumbCat.textContent = p.category;
-            crumbCat.href = '/?category=' + encodeURIComponent(p.category);
+            crumbCat.href = '/catalog?category=' + encodeURIComponent(p.category);
         }
         $('crumbStyle').textContent = state.style;
 

@@ -400,9 +400,14 @@
     }
 
     function buildCard(product) {
+        buildCard._n = (buildCard._n || 0) + 1;
         var style = product.styleNumber || '';
         var images = product.images || {};
-        var imageUrl = images.display || images.main || images.thumbnail || '';
+        // Grid thumbs use the SMALL shot (images.main ~300x450, ~12 KB) —
+        // images.display is the 1200x1800 model photo (~250 KB) that was
+        // being decoded into 137px boxes, ~7-10 MB per mobile page
+        // (2026-08-26 audit). The big shot stays for Quick View / PDP.
+        var imageUrl = images.main || images.thumbnail || images.display || '';
         var colorCount = Array.isArray(product.colors) ? product.colors.length : 0;
         var productUrl = '/product.html?style=' + encodeURIComponent(style);
         // In the Top Sellers view every card is a top seller — skip the flag noise
@@ -412,7 +417,7 @@
             '<div class="pcard-media' + (imageUrl ? '' : ' no-img') + '">' +
             (isTop ? '<span class="pcard-flag">Best seller</span>' : '') +
             '<a class="pcard-media-link" href="' + escapeHtml(productUrl) + '" tabindex="-1" aria-hidden="true">' +
-            (imageUrl ? '<img src="' + escapeHtml(imageUrl) + '" alt="" loading="lazy">' : '') +
+            (imageUrl ? '<img src="' + escapeHtml(imageUrl) + '" alt="" loading="' + (buildCard._n < 6 ? 'eager" fetchpriority="high' : 'lazy') + '">' : '') +
             '</a>' +
             '<button class="pcard-quick" type="button" data-style="' + escapeHtml(style) + '">' +
             '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>' +
@@ -515,12 +520,16 @@
         renderFacets(lastFacets, products);
 
         if (!products.length) {
+            // Deep-paged past the end (filters narrowed under us): go back to
+            // page 1 instead of stranding the customer on an empty grid.
+            if (state.page > 1 && total > 0) { navigate({ page: 1 }); return; }
             els.grid.innerHTML = emptyStateHtml();
             els.pager.innerHTML = '';
             els.status.textContent = '0 products';
             return;
         }
 
+        buildCard._n = 0;   // first ~6 cards of each render load eager
         els.grid.innerHTML = products.map(buildCard).join('');
         renderPager(pagination);
 
@@ -613,7 +622,7 @@
 
     function removeChip(type, value) {
         switch (type) {
-            case 'q': navigate({ q: '' }); break;
+            case 'q': els.searchInput.value = ''; navigate({ q: '' }); break;
             case 'category': navigate({ category: '', subcategory: '' }); break;
             case 'subcategory': navigate({ subcategory: '' }); break;
             case 'brand': navigate({ brand: state.brand.filter(function (v) { return v !== value; }) }); break;
@@ -1175,7 +1184,10 @@
                 .then(function (r) { return r.ok ? r.json() : []; })
                 .catch(function () { return []; })
             : Promise.resolve([]);
-        var productPromise = service.searchProducts({ q: query, limit: 10, status: '' })
+        // No status override — the backend default hides Discontinued, the
+        // same rule the grid applies (suggestions used to offer products the
+        // results page then refused to show).
+        var productPromise = service.searchProducts({ q: query, limit: 10 })
             .catch(function () { return null; });
 
         var settled = await Promise.all([stylePromise, productPromise]);
@@ -1206,7 +1218,7 @@
         productHits.forEach(function (p) {
             if (!p || !p.styleNumber) return;
             var upper = String(p.styleNumber).toUpperCase();
-            var thumb = (p.images && (p.images.thumbnail || p.images.display || p.images.main)) ||
+            var thumb = (p.images && (p.images.main || p.images.thumbnail || p.images.display)) ||
                 (p.colors && p.colors[0] && p.colors[0].productImageThumbnail) || '';
             if (byStyle[upper]) {
                 byStyle[upper].thumb = byStyle[upper].thumb || thumb;
@@ -1485,8 +1497,23 @@
     function init() {
         if (!window.ProductSearchService) {
             console.error('[Catalog] ProductSearchService missing — cannot start');
+            var bootGrid = document.getElementById('resultsGrid');
+            if (bootGrid) {
+                bootGrid.innerHTML = '<div class="cat-error"><h2>We couldn’t load the catalog</h2>' +
+                    '<p>Please refresh the page — or call <a href="tel:253-922-5793">253-922-5793</a> and we’ll help you directly.</p></div>';
+            }
             return;
         }
+        // Preconnect to the API origin the search service actually uses (no
+        // APP_CONFIG on this page; the ratchet forbids a static <link>) —
+        // saves the cold DNS+TLS handshake before the first proxy search.
+        try {
+            var pre = document.createElement('link');
+            pre.rel = 'preconnect';
+            pre.href = new URL(service.baseURL).origin;
+            pre.crossOrigin = '';
+            document.head.appendChild(pre);
+        } catch (e) { /* resource hint only — never block boot */ }
         state = stateFromUrl();
         syncControls();
         wirePage();

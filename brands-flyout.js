@@ -405,7 +405,7 @@ class BrandsFlyout {
         // the catalog filter on the homepage (verified: sets the brand checkbox,
         // shows a chip and renders matching products).
         const landingPage = (typeof brand === 'object' && brand.href) || BRAND_LANDING_PAGES[brandName];
-        const href = landingPage || `/?brand=${encodeURIComponent(brandName)}`;
+        const href = landingPage || `/catalog?brand=${encodeURIComponent(brandName)}`;
 
         return `
             <a href="${href}" class="brand-link">

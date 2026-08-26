@@ -367,9 +367,18 @@
                 toast('Your order is saved — ready when you are.', 'success');
             }
 
+            // Deep link from the catalog/PDP: /custom-tees?style=PC54&color=Jet+Black
+            // opens straight on the product step when the style is in the
+            // curated gallery — silent fallback to the gallery otherwise.
+            const deepLink = new URLSearchParams(location.search);
+            const deepStyle = (deepLink.get('style') || '').trim().toUpperCase();
+            const deepColor = (deepLink.get('color') || '').trim();
+
             // Resume a saved session (same style must still be in the catalog)
             const snap = readSnapshot();
-            if (snap && snap.styleNumber && S.gallery.items.some((g) => g.style === snap.styleNumber)) {
+            if (deepStyle && S.gallery.items.some((g) => g.style === deepStyle)) {
+                await selectProduct(deepStyle, deepColor || undefined);
+            } else if (snap && snap.styleNumber && S.gallery.items.some((g) => g.style === snap.styleNumber)) {
                 await loadProduct(snap.styleNumber, snap.design && snap.design.previewColor);
                 restoreSession(snap);
                 enterStudio({ scroll: false });
@@ -977,7 +986,11 @@
             onTapEmptyArea() { $('art-input').click(); },
             onError(msg) { showCanvasNote(msg); },
         });
+        // Match on CATALOG_COLOR first (internal callers), then COLOR_NAME —
+        // catalog/PDP deep links (?color=Jet+Black) carry the display name.
+        const prefLower = (preferColor || '').toLowerCase();
         const pick = (preferColor && S.product.colors.find((c) => c.catalogColor === preferColor))
+            || (prefLower && S.product.colors.find((c) => (c.colorName || '').toLowerCase() === prefLower))
             || S.product.colors[0];
         S.design.previewColor = pick.catalogColor;
         designer.setColor(pick);

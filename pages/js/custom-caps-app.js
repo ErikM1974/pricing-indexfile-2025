@@ -237,9 +237,16 @@
                 toast('Your order is saved — ready when you are.', 'success');
             }
 
+            // Deep link from the catalog/PDP: /custom-caps?style=112 opens
+            // straight on that cap when it's in the storefront lineup —
+            // silent fallback to the gallery otherwise.
+            const deepStyle = (new URLSearchParams(location.search).get('style') || '').trim().toUpperCase();
+
             // Resume a saved session (style must still be in the catalog)
             const snap = readSnapshot();
-            if (snap && snap.styleNumber && S.gallery.items.some((g) => g.style === snap.styleNumber)) {
+            if (deepStyle && S.gallery.items.some((g) => g.style === deepStyle)) {
+                await selectProduct(deepStyle);
+            } else if (snap && snap.styleNumber && S.gallery.items.some((g) => g.style === snap.styleNumber)) {
                 await loadProduct(snap.styleNumber, snap.logos && snap.logos.previewColor);
                 restoreSession(snap);
                 enterStudio({ scroll: false });
