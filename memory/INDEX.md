@@ -12,6 +12,7 @@ Last Updated: 2026-08-18 (branch/deploy audit: LESSONS_LEARNED trimmed 275→231
 | [`253gear-publisher.md`](253gear-publisher.md) | 253Gear design publisher — built + deployed, awaiting first real design |
 | [`253gear-store-metrics.md`](253gear-store-metrics.md) | 253gear Shopify store metrics, catalogue fixes, ShopifyQL gotchas |
 | [`CAP_PRICING_ANALYSIS.md`](CAP_PRICING_ANALYSIS.md) | Cap pricing — the composition artifact, why order-type series are wrong |
+| [`CATALOG_CX_2026-08.md`](CATALOG_CX_2026-08.md) | Catalog CX overhaul in flight — search-index fix (proxy ddbf2e6, undeployed), live findings, audit-workflow resume, next steps |
 | [`CASPIO_QUOTA_2026-07.md`](CASPIO_QUOTA_2026-07.md) | CANONICAL: Caspio Integrations quota, the $358 overage week (27 Jul–1 Aug) |
 | [`CASPIO_SYNC_CLUSTER_COST.md`](CASPIO_SYNC_CLUSTER_COST.md) | Per-job Caspio call attribution for the sync cluster |
 | [`COST_ALLOCATION_MODEL.md`](COST_ALLOCATION_MODEL.md) | Production-hour + order-pool cost model ($30.09/hr, art included) |
