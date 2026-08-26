@@ -1,3 +1,10 @@
+## v2026.08.26.2 (2026.08.26)
+
+- Memory: trust band live (rode along in v2026.08.26.1) + shared-checkout mid-deploy gotcha
+- feat(quick-view): CTA becomes a conversion step — 'Price it & add to quote' lands ON the configurator; swatch dots on cards (M-5)
+- Memory: M-5 quick-view CTA built (0663f2b9), pending deploy
+- Deploy v2026.08.26.2: 3 files (index.html, catalog.html, product.html...)
+
 ## v2026.08.26.1 (2026.08.26)
 
 - Memory: bridge + featured landing deployed and live-verified (proxy v2026.08.25.2, app v2026.08.25.4)
