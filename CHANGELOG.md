@@ -1,3 +1,9 @@
+## v2026.08.26.9 (2026.08.26)
+
+- LESSONS: box-labels outage — multi-pathspec git add aborts wholesale; boot probes must run against the commit
+- fix(catalog): Top Sellers blank-image flicker — eager first screen, viewport-batched sample checks, stable slots
+- Deploy v2026.08.26.9: 1 files (catalog.html...)
+
 ## v2026.08.26.8 (2026.08.26)
 
 - Memory: M-8 deployed live v2026.08.26.7; Richardson closed (SanMar-only per Erik) — catalog roadmap complete
