@@ -24,16 +24,27 @@ import { escapeHtml, formatMoney, formatShortDate, formatRelativeTime } from '..
 
 /* ── Shared helpers ─────────────────────────────────── */
 
-const STOREFRONT_PREFIXES = ['SAM', 'CAP', 'DTG', '3DT', 'TDT', 'CTS'];
+// The four live storefront prefixes (config/storefront-channels.js
+// quoteIdPrefix values). Quote-ID shape is '{prefix}{MMDD}-{rand4}'.
+const STOREFRONT_PREFIXES = ['SAM', 'CAP', 'DTG', '3DT'];
 
+// Local (Pacific) calendar day, N days back. NEVER toISOString() here: that
+// emits the UTC date, which after 4/5pm Pacific is TOMORROW — every date
+// window on this dashboard compares against Caspio/ShopWorks Pacific days.
 function ymdDaysAgo(days) {
     const d = new Date();
     d.setDate(d.getDate() - days);
-    return d.toISOString().slice(0, 10);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
 }
 
 function prefixOf(quoteID) {
-    const m = String(quoteID || '').match(/^([A-Z]+)/);
+    // \d? admits the digit-leading '3DT' storefront prefix — a pure
+    // letters-only match returned '' for 3DT and silently dropped every
+    // paid 3-Day Tees order from the inbox.
+    const m = String(quoteID || '').match(/^(\d?[A-Z]+)/);
     return m ? m[1] : '';
 }
 
@@ -193,7 +204,11 @@ async function loadMoneyCollected() {
 
     const now = new Date();
     const startOf = (daysBack) => { const d = new Date(now); d.setDate(d.getDate() - daysBack); return d; };
-    const todayYmd = now.toISOString().slice(0, 10);
+    // Pacific day vs Pacific day. Comparing toISOString()'s UTC day against
+    // Caspio's Pacific timestamps made the "Today" tile show $0 every evening
+    // after 4/5pm Pacific (UTC had already rolled to tomorrow).
+    const PT = 'America/Los_Angeles';
+    const todayYmd = now.toLocaleDateString('en-CA', { timeZone: PT });
     let today = 0, week = 0, month = 0;
     for (const e of entries) {
         const amount = parseFloat(entryVal(e, 'amount', 'Amount')) || 0;
@@ -202,7 +217,7 @@ async function loadMoneyCollected() {
         if (!created || isNaN(created)) continue;
         if (created >= startOf(30)) month += amount;
         if (created >= startOf(7)) week += amount;
-        if (created.toISOString ? createdRaw.slice(0, 10) === todayYmd : false) today += amount;
+        if (created.toLocaleDateString('en-CA', { timeZone: PT }) === todayYmd) today += amount;
     }
     const put = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = formatMoney(v); };
     put('payToday', today);
@@ -240,8 +255,11 @@ function orderPo(o) {
 }
 
 function isSampleOrder(o) {
+    // SAMPLE- = free samples; SAM{digit} = the SAM storefront's paid quote-ID
+    // shape ('SAM0825-1234'). A bare startsWith('SAM') also matched real
+    // customer POs like 'SAMMAMISH HS 4471' and put them on the call list.
     const po = orderPo(o);
-    return po.startsWith('SAMPLE-') || po.startsWith('SAM');
+    return po.startsWith('SAMPLE-') || /^SAM\d/.test(po);
 }
 
 function customerKey(o) {
@@ -256,7 +274,7 @@ async function loadSamplePipeline() {
     try {
         const url = new URL(endpoints.manageOrders(), window.location.origin);
         url.searchParams.set('date_Invoiced_start', ymdDaysAgo(60));
-        url.searchParams.set('date_Invoiced_end', new Date().toISOString().slice(0, 10));
+        url.searchParams.set('date_Invoiced_end', ymdDaysAgo(0));
         const data = await dashboardFetchJson(url.toString());
         orders = data.result || [];
     } catch (err) {

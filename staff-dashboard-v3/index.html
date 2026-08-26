@@ -4,11 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <!-- Force fresh fetch on every page load while v3 is in heavy iteration.
-         Remove these 3 lines once the design stabilizes. -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
+    <!-- HTML freshness comes from the server's Cache-Control response headers
+         (server.js sends no-cache/no-store for HTML) — meta http-equiv cache
+         tags are ignored by modern browsers and were removed 2026-08-26. -->
     <title>Staff Dashboard v3 — Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
 
@@ -21,9 +19,10 @@
     <!--
         v3 CSS — 4 files, no legacy. Loaded into @layer:
         reset (browser default) → tokens → base → components → utilities → overrides.
-        Cascade order is enforced by @layer, not source order.
+        Cascade order is enforced by @layer, not source order — the layer-order
+        statement lives at the top of tokens.css (first stylesheet loaded), so
+        this HTML carries no inline <style> (project Rule: no inline code).
     -->
-    <style>@layer reset, tokens, base, components, utilities, overrides;</style>
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/tokens.css?v=20260514-ai-phase1">
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/base.css?v=2026.07.06.11">
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css?v=2026.07.29.1">
@@ -389,10 +388,10 @@
                     <a href="/staff-dashboard.html" class="goal-chip sales-goal-banner is-loading" title="2026 sales goal — click to refresh" aria-label="2026 sales goal">
                         <i class="fas fa-bullseye goal-chip__icon" aria-hidden="true"></i>
                         <span class="goal-chip__pct"><span id="goalPercent">0</span>%</span>
-                        <span class="goal-chip__track" role="progressbar" aria-label="Progress to annual goal" aria-valuemin="0" aria-valuemax="100">
+                        <span class="goal-chip__track" role="progressbar" aria-label="Progress to annual goal" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
                             <span class="goal-chip__fill" id="goalProgress" style="width: 0%"></span>
                         </span>
-                        <span class="goal-chip__amt"><span id="goalCurrent">Loading…</span> <span class="goal-chip__of">/ $3M</span></span>
+                        <span class="goal-chip__amt"><span id="goalCurrent">Loading…</span> <span class="goal-chip__of">/ <span id="goalOf">$3M</span></span></span>
                     </a>
 
                     <!-- Phase 4.5: Combined Team widget (replaces 3-pill cluster) -->
@@ -429,9 +428,6 @@
                     </a>
                 </div>
             </header>
-
-            <!-- Partial Data Warning placeholder -->
-            <div id="partialDataWarning" class="partial-data-warning is-hidden"></div>
 
             <!-- ===================================================
                  HERO SEARCH — the "Everything Bar" (2026-07-20)

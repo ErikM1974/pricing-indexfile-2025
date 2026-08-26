@@ -11,10 +11,26 @@ const els = {
     progress:    () => document.getElementById('goalProgress'),
     current:     () => document.getElementById('goalCurrent'),
     percent:     () => document.getElementById('goalPercent'),
+    goalOf:      () => document.getElementById('goalOf'),
     pace:        () => document.getElementById('goalPace'),
     daysLeft:    () => document.getElementById('goalDaysLeft'),
     projectedEoy:() => document.getElementById('goalProjectedEoy'),
 };
+
+// The chip's [role=progressbar] track wrapping the #goalProgress fill.
+function progressbarEl() {
+    return els.progress()?.closest('[role="progressbar"]') || null;
+}
+
+// "$3M" — compact goal for the chip label, derived from ANNUAL_GOAL so the
+// label can never disagree with the percentage math (one number, one home).
+function formatGoalCompact(goal) {
+    if (goal >= 1_000_000 && goal % 100_000 === 0) {
+        const m = goal / 1_000_000;
+        return '$' + (Number.isInteger(m) ? m : m.toFixed(1)) + 'M';
+    }
+    return formatMoney(goal);
+}
 
 // null = no YTD data yet (show "—" placeholders, NOT $0 + bogus pace).
 // Set via setYtdTotal() — currently fed by team-performance-controller from the
@@ -41,6 +57,9 @@ function render() {
     const daysLeft = daysRemainingInYear();
     const banner = document.querySelector('.sales-goal-banner');
 
+    const goalOfEl = els.goalOf();
+    if (goalOfEl) goalOfEl.textContent = formatGoalCompact(goal);
+
     // Days-left countdown is data-independent — always render.
     const daysEl = els.daysLeft();
     if (daysEl) daysEl.textContent = `${daysLeft} day${daysLeft === 1 ? '' : 's'} left`;
@@ -54,6 +73,9 @@ function render() {
         if (banner) banner.classList.add('is-loading');
         const progress = els.progress();
         if (progress) progress.style.width = '0%';
+        // No data yet — an aria-valuenow-less progressbar announces as
+        // indeterminate, which is the truthful state while loading.
+        progressbarEl()?.removeAttribute('aria-valuenow');
         const current = els.current();
         if (current) current.textContent = 'Loading YTD…';
         const paceEl = els.pace();
@@ -81,6 +103,7 @@ function render() {
 
     const progress = els.progress();
     if (progress) progress.style.width = (cappedPct * 100).toFixed(1) + '%';
+    progressbarEl()?.setAttribute('aria-valuenow', String(Math.round(cappedPct * 100)));
 
     const current = els.current();
     if (current) current.textContent = formatMoney(ytd);

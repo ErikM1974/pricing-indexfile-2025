@@ -527,6 +527,13 @@ details.tool-category > summary::-webkit-details-marker { display: none; }
     background: var(--bad);
     border-color: var(--bad);
 }
+/* YoY comparison fetch FAILED (distinct from "no last-year data", which stays
+   the neutral "--" badge) — amber per Erik's no-silent-failure rule. */
+.metrics-comparison-badge.warning {
+    color: #ffffff;
+    background: var(--warn);
+    border-color: var(--warn);
+}
 .metrics-comparison-label {
     color: #ffffff;
     font-size: var(--font-size-sm);

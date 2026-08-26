@@ -47,6 +47,13 @@ class DashboardModal extends HTMLElement {
         if (this.hasAttribute('labelled-by')) {
             this.setAttribute('aria-labelledby', this.getAttribute('labelled-by'));
         }
+        // Host must be focusable for the this.focus() fallback in _onOpen —
+        // without it, a modal with no focusable children strands keyboard
+        // focus BEHIND the dialog while the Tab trap eats every keypress.
+        // tabindex="-1" is excluded from FOCUSABLE, so the trap is unaffected.
+        if (!this.hasAttribute('tabindex')) {
+            this.setAttribute('tabindex', '-1');
+        }
 
         // Click handlers
         this.addEventListener('click', this._handleBackdropClick);

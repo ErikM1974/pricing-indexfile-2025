@@ -45,9 +45,12 @@ export async function dashboardFetch(url, opts = {}) {
         headers = {},
     } = opts;
 
-    // Dedup GETs only — POST/PUT/DELETE always re-issue
+    // Dedup GETs only — POST/PUT/DELETE always re-issue.
+    // Every caller (the first included) receives a CLONE of the Response:
+    // two consumers of one shared Response would race on the body stream
+    // (the second .json() throws "body stream already read").
     if (method === 'GET' && inflight.has(url)) {
-        return inflight.get(url);
+        return inflight.get(url).then((res) => res.clone());
     }
 
     const promise = (async () => {
@@ -59,7 +62,9 @@ export async function dashboardFetch(url, opts = {}) {
                 const res = await fetch(url, {
                     method,
                     body,
-                    headers: { 'Content-Type': 'application/json', ...headers },
+                    // Content-Type only when there's a body: a non-simple header
+                    // on a cross-origin GET forces a CORS preflight per request.
+                    headers: { ...(body != null ? { 'Content-Type': 'application/json' } : {}), ...headers },
                     signal: ctrl.signal,
                 });
                 clearTimeout(timer);
@@ -100,7 +105,11 @@ export async function dashboardFetch(url, opts = {}) {
 
     if (method === 'GET') {
         inflight.set(url, promise);
-        promise.finally(() => inflight.delete(url));
+        // .then(fn, fn) instead of .finally(): .finally() forks a new promise
+        // that re-rejects with nobody attached — an unhandledrejection per
+        // failed GET even when the caller handles the error.
+        promise.then(() => inflight.delete(url), () => inflight.delete(url));
+        return promise.then((res) => res.clone());
     }
     return promise;
 }

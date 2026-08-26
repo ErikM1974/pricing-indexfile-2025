@@ -3,10 +3,15 @@
    Single source of truth for color, type, space, motion,
    z-index, focus, density. Built on oklch + NW green.
 
-   Loaded into @layer tokens by index.html so every other
-   layer (base, components, utilities, overrides) wins
-   over plain unscoped resets but loses to explicit overrides.
+   The @layer ORDER statement below is authoritative for the whole
+   dashboard cascade (reset → tokens → base → components → utilities →
+   overrides). It lives here — the first stylesheet the page loads —
+   instead of an inline <style> in index.html (no-inline-code rule);
+   first declaration encountered wins, so order is established before
+   any layered rules parse.
    ===================================================== */
+
+@layer reset, tokens, base, components, utilities, overrides;
 
 @layer tokens {
 

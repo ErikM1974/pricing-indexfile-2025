@@ -36,21 +36,27 @@
         // Check weekend (0 = Sunday, 6 = Saturday)
         if (day === 0 || day === 6) return true;
 
-        // Check holidays (requires PRODUCTION_HOLIDAYS from production-schedule-stats.js)
+        // Check holidays (requires PRODUCTION_HOLIDAYS from production-schedule-stats.js).
+        // Build the string from LOCAL date parts to match getDay() above —
+        // toISOString() is the UTC calendar day, which after 4/5pm Pacific is
+        // tomorrow, so the two checks disagreed around holidays.
         if (typeof PRODUCTION_HOLIDAYS !== 'undefined') {
-            const dateStr = date.toISOString().split('T')[0];
+            const dateStr = date.getFullYear() + '-' +
+                String(date.getMonth() + 1).padStart(2, '0') + '-' +
+                String(date.getDate()).padStart(2, '0');
             return PRODUCTION_HOLIDAYS.includes(dateStr);
         }
         return false;
     }
 
     /**
-     * Calculate due date from today + days, adjusted for weekends/holidays
-     * @param {number} days - Calendar days from today
+     * Calculate due date from a start date + days, adjusted for weekends/holidays
+     * @param {number} days - Calendar days from the start date
+     * @param {Date} [startDate] - Start date (defaults to today)
      * @returns {Date} Adjusted due date (never falls on weekend/holiday)
      */
-    function calculateDueDate(days) {
-        const dueDate = new Date();
+    function calculateDueDate(days, startDate) {
+        const dueDate = startDate ? new Date(startDate.getTime()) : new Date();
         dueDate.setDate(dueDate.getDate() + days);
 
         // Push forward if lands on weekend or holiday
@@ -105,9 +111,11 @@
         // Use month-specific data if available, otherwise overall
         const source = (monthStats && monthStats.samples > 10) ? monthStats : overallStats;
 
-        // Calculate due date adjusted for weekends/holidays
+        // Calculate due date adjusted for weekends/holidays — counted from the
+        // requested target date, not "now" (they differ when a caller passes
+        // a future date to predict for).
         const days = Math.round(source.avg);
-        const dueDate = calculateDueDate(days);
+        const dueDate = calculateDueDate(days, targetDate);
 
         return {
             days: days,
@@ -167,10 +175,12 @@
             return { status: 'wide-open', wideOpen: 100, moderate: 0, soldOut: 0 };
         }
 
+        // Same boundaries as the season badge — SEASON_THRESHOLDS is the one
+        // home for these numbers (they were duplicated as literals here).
         let status = 'wide-open';
-        if (capacity.wideOpen < 50) {
+        if (capacity.wideOpen < SEASON_THRESHOLDS.busy) {
             status = 'busy';
-        } else if (capacity.wideOpen < 80) {
+        } else if (capacity.wideOpen < SEASON_THRESHOLDS.slow) {
             status = 'moderate';
         }
 
@@ -235,7 +245,14 @@
         if (!stats || !stats.metadata) {
             return { totalRecords: 0, dateRange: { start: null, end: null } };
         }
-        return stats.metadata;
+        // The stats generator writes per-service counts (dtgRecords,
+        // embroideryRecords, …) but no totalRecords — derive it here so the
+        // "Based on N historical completions" line tracks the real data
+        // instead of a hardcoded HTML number.
+        const totalRecords = Object.keys(stats.metadata)
+            .filter((k) => k.endsWith('Records'))
+            .reduce((sum, k) => sum + (Number(stats.metadata[k]) || 0), 0);
+        return { ...stats.metadata, totalRecords };
     }
 
     // Export as ProductionPredictor

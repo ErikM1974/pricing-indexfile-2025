@@ -27,11 +27,12 @@
 (function () {
     'use strict';
 
-    // APP_CONFIG.API.BASE_URL already ends in '/api' — the fallback must too, so
-    // callers below append '/artrequests' (NOT '/api/artrequests', which would
-    // double up to '/api/api/...' → 404).
-    var API_BASE = (window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
-        || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api';
+    // APP_CONFIG.API.BASE_URL already ends in '/api', so callers below append
+    // '/artrequests' (NOT '/api/artrequests' → '/api/api/…' 404). No literal
+    // fallback host: config.js is the ONE home for the proxy URL (Rule 6), and
+    // it loads synchronously in <head> before this deferred script runs — a
+    // missing config is a real failure and load() surfaces it visibly.
+    var API_BASE = window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL;
 
     // Same "new status system" cutoff the Steve gallery/kanban use — pre-cutoff
     // records are on the legacy status vocabulary and would flood the red bucket.
@@ -140,7 +141,7 @@
         var attention = red.concat(yellow).sort(function (a, b) { return b.days - a.days; });
 
         var html = '<div style="display:flex;gap:8px;margin-bottom:12px;">' +
-            chipHtml(red.length, '&gt; 7 days', '#ef4444') +
+            chipHtml(red.length, '> 7 days', '#ef4444') +
             chipHtml(yellow.length, '3–7 days', '#f59e0b') +
             chipHtml(fresh, 'Under 3 days', '#22c55e') +
         '</div>';
@@ -195,6 +196,10 @@
         if (loading) return;
         var el = bodyEl();
         if (!el) return; // card not on this page — do nothing
+        if (!API_BASE) {
+            renderError('APP_CONFIG missing');
+            return;
+        }
         loading = true;
         el.innerHTML = '<div class="metrics-date-range">Loading art requests…</div>';
 

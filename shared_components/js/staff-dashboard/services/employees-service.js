@@ -31,6 +31,17 @@ const EMPLOYEES = [
 
 const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
+// Parse a date-only 'YYYY-MM-DD' into LOCAL components. `new Date('2011-04-11')`
+// parses as UTC midnight, which local Pacific getters read back as the PREVIOUS
+// day — every anniversary/start-date/years-of-service shifted a day early.
+function parseLocalDate(ymd) {
+    if (!ymd) return null;
+    const [y, m, d] = String(ymd).split('-').map(Number);
+    if (!y || !m || !d) return null;
+    const date = new Date(y, m - 1, d);
+    return isNaN(date.getTime()) ? null : date;
+}
+
 /**
  * Days from today until a date occurring this year (or next, if already passed).
  */
@@ -44,8 +55,8 @@ function daysUntilMonthDay(monthDay) {
 }
 
 function daysUntilAnniversary(startDate) {
-    const start = new Date(startDate);
-    if (isNaN(start.getTime())) return null;
+    const start = parseLocalDate(startDate);
+    if (!start) return null;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     let target = new Date(today.getFullYear(), start.getMonth(), start.getDate());
@@ -54,7 +65,8 @@ function daysUntilAnniversary(startDate) {
 }
 
 function yearsOfService(startDate, asOf = new Date()) {
-    const start = new Date(startDate);
+    const start = parseLocalDate(startDate);
+    if (!start) return 0;
     let years = asOf.getFullYear() - start.getFullYear();
     const monthDiff = asOf.getMonth() - start.getMonth();
     if (monthDiff < 0 || (monthDiff === 0 && asOf.getDate() < start.getDate())) years--;
@@ -67,15 +79,18 @@ function formatBirthday(monthDay) {
 }
 
 function formatStartDate(startDate) {
-    const d = new Date(startDate);
-    if (isNaN(d.getTime())) return '';
+    const d = parseLocalDate(startDate);
+    if (!d) return '';
     return `${MONTH_NAMES[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
 }
 
 function status(employee, asOf = new Date()) {
     if (!employee.endDate) return 'active';
-    const end = new Date(employee.endDate);
-    if (isNaN(end.getTime())) return 'active';
+    const end = parseLocalDate(employee.endDate);
+    if (!end) return 'active';
+    // The end DATE is their last day — treat them as current through that
+    // whole local day.
+    end.setHours(23, 59, 59, 999);
     if (end < asOf) return 'former';
     return 'leaving';
 }

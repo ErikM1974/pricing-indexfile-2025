@@ -47,10 +47,6 @@ function getLastYearRangeForDays(days) {
     return { start: formatYmd(lyStart), end: formatYmd(lyEnd) };
 }
 
-function getYTDRange(year = new Date().getFullYear()) {
-    return { start: `${year}-01-01`, end: formatYmd(new Date()) };
-}
-
 /* =====================================================
    Order normalization
    ===================================================== */
@@ -137,17 +133,21 @@ export async function loadRevenueWindow(days = 7, { refresh = false } = {}) {
 
 /**
  * Load year-over-year comparison.
- * Returns null lastYear if comparison fetch fails (logged).
+ * On a failed comparison fetch, lastYear is null AND lastYearError carries the
+ * error so the UI can render a visible warning — a swallowed failure looked
+ * identical to "no data last year" (Rule #4).
  */
 export async function loadYearOverYear(days = 7, { refresh = false } = {}) {
     const cur = await loadRevenueWindow(days, { refresh });
     const lastYearRange = getLastYearRangeForDays(days);
 
     let lastYearTotals = null;
+    let lastYearError = null;
     try {
         const lastYearOrders = await fetchOrders(lastYearRange.start, lastYearRange.end);
         lastYearTotals = totalsFromOrders(lastYearOrders);
     } catch (err) {
+        lastYearError = err;
         console.warn('[shopworks] YoY fetch failed:', err.message);
     }
 
@@ -160,25 +160,16 @@ export async function loadYearOverYear(days = 7, { refresh = false } = {}) {
         current: cur,
         lastYear: lastYearTotals ? { range: lastYearRange, totals: lastYearTotals } : null,
         revenueGrowth,
+        lastYearError,
     };
 }
 
-/**
- * Load YTD total for the sales-goal banner.
- * Capped at 60-day window (legacy behavior — full YTD requires
- * caspio-archive-service which lands in a follow-up phase).
- */
-export async function loadYtdSubset(days = 60) {
-    const range = getDateRange(days);
-    const orders = await fetchOrders(range.start, range.end);
-    return totalsFromOrders(orders);
-}
+// (loadYtdSubset/getYTDRange removed 2026-08-26 — zero callers; the sales-goal
+// YTD path they were built for is served by caspio-archive-service instead.)
 
 export const shopworksService = {
     fetchOrders,
     loadRevenueWindow,
     loadYearOverYear,
-    loadYtdSubset,
     getDateRange,
-    getYTDRange,
 };

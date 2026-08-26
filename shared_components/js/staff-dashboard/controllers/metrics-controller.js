@@ -76,19 +76,27 @@ function renderRevenue(payload, yoy) {
         `;
     }
 
-    // YoY badge
+    // YoY badge. A FAILED comparison fetch renders a visible amber warning —
+    // the neutral "--" is reserved for genuinely having no last-year data.
     const growth = yoy?.revenueGrowth;
     const badge = els.growthBadge();
     const compEl = els.comparison();
     if (badge) {
-        if (growth == null) {
+        if (yoy?.lastYearError) {
+            badge.className = 'metrics-comparison-badge warning';
+            badge.title = `Last-year comparison unavailable: ${yoy.lastYearError.message}`;
+            badge.innerHTML = `<i class="fas fa-triangle-exclamation"></i> YoY unavailable`;
+        } else if (growth == null) {
             badge.className = 'metrics-comparison-badge';
+            badge.removeAttribute('title');
             badge.innerHTML = `<i class="fas fa-minus"></i> --`;
         } else if (growth >= 0) {
             badge.className = 'metrics-comparison-badge positive';
+            badge.removeAttribute('title');
             badge.innerHTML = `<i class="fas fa-arrow-up"></i> ${growth.toFixed(1)}%`;
         } else {
             badge.className = 'metrics-comparison-badge negative';
+            badge.removeAttribute('title');
             badge.innerHTML = `<i class="fas fa-arrow-down"></i> ${Math.abs(growth).toFixed(1)}%`;
         }
     }

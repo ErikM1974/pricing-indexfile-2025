@@ -139,9 +139,13 @@ export function daysRemainingInYear() {
  * Days elapsed in current calendar year (1 on Jan 1).
  */
 export function dayOfYear() {
+    // Normalize to local midnight and round: a raw ms-span Math.floor is one
+    // day short for the first hour of every day while DST is in effect (the
+    // span since Jan 0 midnight PST is 1h shy of a whole-day multiple).
     const now = new Date();
+    now.setHours(0, 0, 0, 0);
     const start = new Date(now.getFullYear(), 0, 0);
-    return Math.floor((now - start) / 86_400_000);
+    return Math.round((now - start) / 86_400_000);
 }
 
 /**
@@ -195,17 +199,6 @@ export function debounce(fn, wait = 200) {
  */
 export function skeleton(extraClass = '') {
     return `<span class="skeleton ${extraClass}"></span>`;
-}
-
-/**
- * Create a DOM element from an HTML string. Safer than innerHTML for one-off
- * inserts because it scopes parsing to a template.
- */
-export function html(strings, ...values) {
-    const raw = String.raw({ raw: strings }, ...values);
-    const tpl = document.createElement('template');
-    tpl.innerHTML = raw.trim();
-    return tpl.content.firstElementChild;
 }
 
 /**
