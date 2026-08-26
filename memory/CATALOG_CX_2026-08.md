@@ -179,7 +179,13 @@ unpushed in either repo. Scoreboard of what's LIVE: search <1s (boot-warmed inde
 voice · all roads → /catalog · buy-online bridge (Option A) · featured landing · M-1 honest
 counts · trust band (4.9★ Google) · M-5 Quick-View "Price it & add to quote" CTA + swatch dots.
 
-## ✅ M-6 one chrome — BUILT 2026-08-26, app develop `84ea8fbd`, NOT deployed
+## ✅ M-6 one chrome — DEPLOYED LIVE `v2026.08.26.5` (Heroku v1889, 2026-08-26), live-verified
+
+Live checks: backend SHA `061a37f3` via /api/version · `/pages/webstore-info.html` 301 on prod ·
+brands + tumbler serve the new chrome (nav-bar-inner/sidebar/site-footer present, old
+`top-navigation`/`enhanced-pricing-header`/`page-footer` = 0) · dist bundles byte-verified
+(brands.js + tumbler js: `drawer-open` + `/catalog?q=` literals; catalog-search:
+`location.replace` + `"/catalog?"`; brands.css: overflow override gone).
 
 One chrome across ALL 6 customer pages (index/catalog/product/quote-cart/brands/laser-tumbler),
 locked by `tests/unit/chrome-drift.test.js` (exact 10-link nav sequence + 12-link drawer core +
