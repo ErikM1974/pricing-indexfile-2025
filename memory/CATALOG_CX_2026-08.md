@@ -111,3 +111,12 @@ top-sellers-first landing approved. Built + locally verified end-to-end:
   safely to old order — no breakage window). 🔑 products/search has TWO sort points: Caspio
   orderBy AND a post-hydration array sort — a new sort value must teach BOTH.
 
+## 🚀 2026-08-25 (final) — BRIDGE + FEATURED LANDING DEPLOYED AND LIVE-VERIFIED
+
+Proxy `v2026.08.25.2` (jest 1,571/1,571; featured sort live: page-1 = BC3001 + Carhartt
+best-sellers) · App `v2026.08.25.4` (SHA 5b474ae via /api/version). LIVE checks: /catalog first
+screen = featured order with sort=featured sent; buy-online badges rendering (BC3001→
+/custom-tees, 258→/custom-caps); PDP PC54 lane visible with color-carrying deep link. Phase 2
+of the CX overhaul is fully shipped. ⏭️ NEXT: M-1 honest counts (top item), trust band blocked
+on Erik's Google rating + 2-3 named customer quotes, then M-5/M-6/M-7 per the roadmap.
+
