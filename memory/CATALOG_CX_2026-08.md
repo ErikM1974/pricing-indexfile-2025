@@ -95,3 +95,19 @@ session task file w3uc3z1aj.output; summarized in the CX plan artifact.
 - Observed live, feeds M-1: /catalog?category=Caps&brand=Richardson page 1 shows only 5 cards
   (price-split pagination) — the "honest counts" backend fix is now the top medium item.
 
+## 🌉 2026-08-25 (later) — BUY-ONLINE BRIDGE + FEATURED LANDING BUILT (committed, NOT deployed)
+
+Erik decided: **Option A** — quote primary for crews, express as the small/fast lane; and
+top-sellers-first landing approved. Built + locally verified end-to-end:
+- App `cebfe7dc`: new `shared_components/js/express-eligibility.js` (eligibility from the
+  storefronts' OWN whitelists; enhancement-only; jest ×5) · catalog card badges · QV lane ·
+  PDP two-lane (color-carrying, follows swatch changes) · homepage shelf links (PC61/PC90H) ·
+  /catalog browse default sort=featured.
+- Proxy `e24718e`: sort=featured (IsTopSeller in groupBy — MAX() invalid on bit; POST-HYDRATION
+  sort's default branch was re-alphabetizing and burying top sellers — taught it 'featured').
+- Verified: PDP lane → /custom-tees?style=PC54&color=Jet+Black opens the studio ON PC54 JET
+  BLACK; caps badge → CT105298 studio; featured page 1 = Bella+Canvas/Carhartt wall of best
+  sellers. ⏭️ Deploy PROXY first, then /deploy app (prod proxy without featured falls back
+  safely to old order — no breakage window). 🔑 products/search has TWO sort points: Caspio
+  orderBy AND a post-hydration array sort — a new sort value must teach BOTH.
+
