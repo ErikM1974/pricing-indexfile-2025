@@ -754,3 +754,9 @@
   font-weight: 600;
   color: var(--green-700, #2f7d3b);
 }
+
+/* Buy-online lane inside the CTA card (bridge, 2026-08-25) */
+.pdp-express-note {
+    margin: 12px 0 0; font-size: 13px; line-height: 1.5; color: var(--ink-soft);
+}
+

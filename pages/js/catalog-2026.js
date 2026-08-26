@@ -284,7 +284,13 @@
         if (state.size.length) params.size = state.size.slice();
         if (state.minPrice !== '') params.minPrice = state.minPrice;
         if (state.maxPrice !== '') params.maxPrice = state.maxPrice;
-        if (state.sort) params.sort = state.sort;
+        if (state.sort) {
+            params.sort = state.sort;
+        } else if (!state.q) {
+            // Browse default (Erik, 2026-08-25): proven sellers first, never
+            // the brand-alphabetical wall. Text searches keep their own order.
+            params.sort = 'featured';
+        }
         // Server-side flag filter (Caspio IsTopSeller via /api/products/search)
         if (state.topSellers) params.isTopSeller = 'true';
         return params;
@@ -434,6 +440,27 @@
             '</div></article>';
     }
 
+    /** Buy-online badges on eligible cards (enhancement: no badge on any
+     *  failure). Cards carry data-style; badge appended to the card body. */
+    function decorateExpressCards() {
+        if (!window.ExpressEligibility) return;
+        window.ExpressEligibility.get().then(function (elig) {
+            els.grid.querySelectorAll('.pcard[data-style]').forEach(function (card) {
+                if (card.querySelector('.pcard-buy')) return;
+                var link = elig.linkFor(card.getAttribute('data-style'), null);
+                if (!link) return;
+                var body = card.querySelector('.pcard-body');
+                if (!body) return;
+                var a = document.createElement('a');
+                a.className = 'pcard-buy';
+                a.href = link.url;
+                a.textContent = 'Buy online →';
+                a.setAttribute('aria-label', link.label);
+                body.appendChild(a);
+            });
+        });
+    }
+
     function emptyStateHtml() {
         var actions = '';
         if (activeFilterCount() > 0 || state.q) {
@@ -531,6 +558,7 @@
 
         buildCard._n = 0;   // first ~6 cards of each render load eager
         els.grid.innerHTML = products.map(buildCard).join('');
+        decorateExpressCards();
         renderPager(pagination);
 
         // Sample-program decoration (top-sellers view) — optional module; the
@@ -1059,7 +1087,20 @@
             '<div class="qv-actions">' +
             '<a class="btn btn-primary" id="qvDetailsLink" href="' + escapeHtml(qvProductUrl(product, selected && selected.name)) + '">View full product details</a>' +
             '</div>' +
+            '<div id="qvExpressLane"></div>' +
             '</div></div>';
+
+        // Buy-online lane (enhancement — absent when the style isn't in an
+        // express storefront, or eligibility can't load)
+        if (window.ExpressEligibility) {
+            window.ExpressEligibility.get().then(function (elig) {
+                var lane = byId('qvExpressLane');
+                var link = elig.linkFor(product.styleNumber, selected && selected.name);
+                if (!lane || !link) return;
+                lane.innerHTML = '<a class="express-lane-link" href="' + escapeHtml(link.url) + '">' +
+                    escapeHtml(link.label) + ' →</a>';
+            });
+        }
 
         var swatchWrap = byId('qvSwatches');
         if (swatchWrap) {

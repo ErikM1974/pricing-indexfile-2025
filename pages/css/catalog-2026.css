@@ -411,3 +411,15 @@
     .fall26-promo-copy span { font-size: 12px; }
     .fall26-promo-cta { margin-left: 0; width: 100%; }
 }
+
+/* Buy-online badge on eligible cards (buy-online bridge, 2026-08-25) */
+.pcard-buy {
+    align-self: flex-start; margin-top: 6px;
+    font-size: 12.5px; font-weight: 700; color: var(--green-700);
+    background: var(--green-50); border: 1px solid var(--green-100);
+    border-radius: 999px; padding: 4px 11px; min-height: 28px;
+    display: inline-flex; align-items: center;
+    position: relative; z-index: 3; /* above the stretched card link */
+}
+.pcard-buy:hover { background: var(--green-100); color: var(--green-900); text-decoration: none; }
+
