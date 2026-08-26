@@ -79,6 +79,8 @@ at `~/.claude/projects/C--Users-erik-OneDrive---Northwest-Custom-Apparel-2025-Pr
 
 ## Architecture / API
 
+- 🔴 **`fetchAllCaspioPages` LOSES ROWS past 1,000.** It pulls page 1 with `q.limit` then continues with `q.pageSize`+`q.pageNumber=2` — two paging models that disagree on what the first 1,000 rows are. Measured on `SanMar_Shipments` 2026-08-26: `q.limit=1000` → PK 1119..1271 (unordered), `pageNumber=1` → PK 6..1005, `pageNumber=2` → PK 1006..1631. Page 2 continues from a baseline page 1 never delivered → **1,626 rows returned, 326 DUPLICATES, 326 real rows never returned.** Bites ONLY result sets >1,000 (ORDER_ODBC/30d = 362, so past-due is safe; `SanMar_Shipments` 1,626 and `SanMar_Orders` 1,741 are not). Workaround: page with pageSize+pageNumber yourself and assert distinct PKs. 536 call sites — NOT yet patched.
+
 - 🔑 **THE WHOLE PROXY API was once capped at 30 req/min per IP** — `app.use('/api', limiter, router)` runs for EVERY /api request. **Any new limiter mounted on `/api` MUST carry a path-scoped `skip` — jest greps every such mount.**
 - 🔑 **`/api/pricing-bundle` returned HTTP 200 with EMPTY arrays when Caspio rate-limits** (now throws).
 - 🔑 **Proxy WHITELISTS `calcContext` — a new frontend field is a TWO-repo change, proxy first.**
