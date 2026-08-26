@@ -11,14 +11,8 @@ class ProductSearchService {
         this.cacheTimeout = 5 * 60 * 1000; // 5 minutes
         this.requestCache = new Map(); // Prevent duplicate concurrent requests
 
-        // Display-price inputs come from Caspio — margin from Pricing_Tiers (via
-        // /api/pricing-bundle?method=BLANK), embroidery-estimate adder from Service_Codes
-        // CATALOG-EMB-EST (via /api/service-codes). No hardcoded fallback — if either
-        // can't load, products show "QUOTE" instead of a wrong price.
-        this.MARGIN = null;
-        this._marginPromise = null;
-        this.EMB_ADDER = null;
-        this._adderPromise = null;
+        // Display prices come from the SERVER's displayPriceLabel on each
+        // search row (see processProducts) — no client-side price math here.
 
         // Smart search - Brand name detection dictionary.
         //
@@ -181,66 +175,10 @@ class ProductSearchService {
     }
 
     /**
-     * Load the display-price margin denominator from Caspio (cached for the page life).
-     * Resolves to a number or null — never throws; a null margin renders "QUOTE".
-     */
-    async ensureMargin() {
-        if (this.MARGIN) return this.MARGIN;
-        if (!this._marginPromise) {
-            this._marginPromise = (async () => {
-                try {
-                    const response = await fetch(`${this.baseURL}/pricing-bundle?method=BLANK&styleNumber=PC54`);
-                    if (!response.ok) throw new Error(`pricing-bundle ${response.status}`);
-                    const bundle = await response.json();
-                    const margin = parseFloat(bundle?.tiersR?.[0]?.MarginDenominator);
-                    if (!margin || margin <= 0) throw new Error('missing MarginDenominator');
-                    this.MARGIN = margin;
-                    return margin;
-                } catch (error) {
-                    console.warn('[ProductSearch] Display margin unavailable — prices will show QUOTE:', error.message);
-                    this._marginPromise = null; // allow retry on next search
-                    return null;
-                }
-            })();
-        }
-        return this._marginPromise;
-    }
-
-    /**
-     * Load the basic-embroidery estimate adder from Caspio Service_Codes (CATALOG-EMB-EST).
-     * Resolves to a number or null — never throws; a null adder renders "QUOTE".
-     */
-    async ensureEmbAdder() {
-        if (this.EMB_ADDER != null) return this.EMB_ADDER;
-        if (!this._adderPromise) {
-            this._adderPromise = (async () => {
-                try {
-                    const response = await fetch(`${this.baseURL}/service-codes?code=CATALOG-EMB-EST`);
-                    if (!response.ok) throw new Error(`service-codes ${response.status}`);
-                    const json = await response.json();
-                    const row = json?.data?.[0];
-                    const adder = parseFloat(row?.SellPrice);
-                    if (!row || row.IsActive === false || !Number.isFinite(adder) || adder < 0) {
-                        throw new Error('missing/inactive CATALOG-EMB-EST');
-                    }
-                    this.EMB_ADDER = adder;
-                    return adder;
-                } catch (error) {
-                    console.warn('[ProductSearch] Embroidery-estimate adder unavailable — prices will show QUOTE:', error.message);
-                    this._adderPromise = null; // allow retry on next search
-                    return null;
-                }
-            })();
-        }
-        return this._adderPromise;
-    }
-
-    /**
      * Perform the actual API search
      */
     async performSearch(params) {
         try {
-            await Promise.all([this.ensureMargin(), this.ensureEmbAdder()]);
             // Default parameters - increased to 48 for better initial display
             // Omit status to let backend default to 'Active' (hides Discontinued)
             const defaultParams = {
@@ -279,28 +217,19 @@ class ProductSearchService {
     }
 
     /**
-     * Process products to add calculated display prices
+     * Display price = the SERVER's displayPriceLabel, verbatim — the same
+     * label /catalog renders (Erik's iron rule: one price voice). The old
+     * client formula (blank cost / PC54 shirt margin + emb adder) quoted
+     * PC54C at $28.19+ while every other surface said $21.50, and priced
+     * caps with a SHIRT margin (2026-08-26 CX audit). Never a client guess.
      */
     processProducts(products) {
-        return products.map(product => {
-            // Calculate display price using the formula
-            let displayPrice = null;
-            
-            if (product.pricing && this.MARGIN && this.EMB_ADDER != null) {
-                // Use the current price if available
-                const basePrice = product.pricing.current || product.pricing.minPrice;
-
-                if (basePrice && basePrice > 0) {
-                    // (blank cost / Caspio margin denominator) + Caspio embroidery-estimate adder
-                    displayPrice = (basePrice / this.MARGIN) + this.EMB_ADDER;
-                }
-            }
-            
-            return {
-                ...product,
-                displayPrice: displayPrice ? `$${displayPrice.toFixed(2)}+` : 'QUOTE'
-            };
-        });
+        return products.map(product => ({
+            ...product,
+            displayPrice: (typeof product.displayPriceLabel === 'string' && product.displayPriceLabel)
+                ? product.displayPriceLabel
+                : 'See pricing →'
+        }));
     }
 
     /**
@@ -549,6 +478,15 @@ class ProductSearchService {
                 });
 
                 console.log(`[ProductSearch] Filtered ${results.products.length} results to ${exactMatches.length} exact matches`);
+
+                // Style-shaped tokens that aren't styles ("2XL", "5oz") used
+                // to return an honest-looking ZERO here while the text search
+                // held thousands of real matches — fall back to those instead
+                // (same drift-guard philosophy as the category retry above).
+                if (exactMatches.length === 0) {
+                    console.warn(`[ProductSearch] "${searchQuery}" matched no style numbers — showing text-search results instead`);
+                    return { ...results, smartFilters: parsed.appliedFilters };
+                }
 
                 return {
                     products: exactMatches,

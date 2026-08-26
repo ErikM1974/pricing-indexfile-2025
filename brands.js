@@ -348,7 +348,7 @@ class BrandsPage {
         // Brands with a dedicated landing page go there — it's the page built to
         // sell that brand. Everything else falls back to the catalog filter.
         const landingPage = window.NWCA_BRANDS && window.NWCA_BRANDS.landingPageFor(brandName);
-        window.location.href = landingPage || `/?brand=${encodeURIComponent(brandName)}`;
+        window.location.href = landingPage || `/catalog?brand=${encodeURIComponent(brandName)}`;
     }
 
     /**

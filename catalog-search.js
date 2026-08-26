@@ -174,6 +174,19 @@ class CatalogSearch {
     }
 
     /**
+     * Category/subcategory clicks NAVIGATE to /catalog — the real store with
+     * facets, server price labels, and shareable URLs. The old inline render
+     * + pushState('', path) wiped the URL with no popstate handler (broken
+     * Back button) and priced with the legacy client math (2026-08-26 audit).
+     */
+    navigateToCatalog(category, subcategory) {
+        const params = new URLSearchParams();
+        if (category) params.set('category', category);
+        if (subcategory) params.set('subcategory', subcategory);
+        window.location.assign('/catalog' + (params.toString() ? '?' + params.toString() : ''));
+    }
+
+    /**
      * Set up category menu handlers
      */
     setupCategoryMenu() {
@@ -181,30 +194,7 @@ class CatalogSearch {
         document.querySelectorAll('.category-link').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
-                const category = link.dataset.category;
-
-                // Reset ALL filters for fresh category search
-                this.currentFilters = {
-                    q: '',
-                    category: category,
-                    subcategory: null,
-                    brand: [],
-                    color: [],
-                    size: [],
-                    minPrice: null,
-                    maxPrice: null,
-                    sort: null,
-                    page: 1
-                };
-
-                // Clear URL parameters for clean navigation
-                window.history.pushState({}, '', window.location.pathname);
-
-                // Update UI
-                this.setActiveCategory(link);
-
-                // Perform search
-                this.performSearch();
+                this.navigateToCatalog(link.dataset.category, null);
             });
         });
         
@@ -216,27 +206,7 @@ class CatalogSearch {
                 // Get the actual link element (in case <strong> was clicked)
                 const link = e.target.classList.contains('flyout-item') ? e.target : e.target.closest('.flyout-item');
 
-                const category = link.dataset.category;
-                const subcategory = link.dataset.subcategory; // Will be undefined for "View All"
-
-                // Reset ALL filters for fresh category/subcategory search
-                this.currentFilters = {
-                    q: '',
-                    category: category,
-                    subcategory: subcategory || null, // null if "View All" (no subcategory)
-                    brand: [],
-                    color: [],
-                    size: [],
-                    minPrice: null,
-                    maxPrice: null,
-                    sort: null,
-                    page: 1
-                };
-
-                // Clear URL parameters
-                window.history.pushState({}, '', window.location.pathname);
-
-                this.performSearch();
+                this.navigateToCatalog(link.dataset.category, link.dataset.subcategory || null);
             }
         });
         
@@ -244,38 +214,7 @@ class CatalogSearch {
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('nav-subcategory-link')) {
                 e.preventDefault();
-                const category = e.target.dataset.category;
-                const subcategory = e.target.dataset.subcategory;
-
-                // Reset ALL filters for fresh subcategory search
-                this.currentFilters = {
-                    q: '',
-                    category: category,
-                    subcategory: subcategory,
-                    brand: [],
-                    color: [],
-                    size: [],
-                    minPrice: null,
-                    maxPrice: null,
-                    sort: null,
-                    page: 1
-                };
-
-                // Clear URL parameters
-                window.history.pushState({}, '', window.location.pathname);
-
-                // Close dropdown smoothly
-                const dropdown = e.target.closest('.nav-dropdown');
-                const navLink = document.querySelector('.nav-products');
-                if (dropdown && navLink) {
-                    navLink.setAttribute('aria-expanded', 'false');
-                    dropdown.style.opacity = '0';
-                    dropdown.style.visibility = 'hidden';
-                    dropdown.style.transform = 'translateY(-10px)';
-                    dropdown.style.pointerEvents = 'none';
-                }
-
-                this.performSearch();
+                this.navigateToCatalog(e.target.dataset.category, e.target.dataset.subcategory);
             }
         });
     }
@@ -609,19 +548,21 @@ class CatalogSearch {
         const isFeaturedProduct = ['112', '112FP', '112PFP'].includes(product.styleNumber);
         const showBestSellerBadge = product.features?.isTopSeller || isFeaturedProduct;
 
-        // For Richardson caps, show decorated price from cached API response
+        // displayPrice is the SERVER's displayPriceLabel (one price voice).
+        // Richardson fallback only when the server label is absent — and the
+        // decorated-cap price is no longer a whole dollar (HalfDollarUp), so
+        // format it, never append a hardcoded ".00".
         let displayPrice = product.displayPrice;
-        if (product.brand === 'Richardson' && this.richardsonPrices?.prices?.[product.styleNumber]) {
+        if ((!product.displayPriceLabel) && product.brand === 'Richardson'
+            && this.richardsonPrices?.prices?.[product.styleNumber]) {
             const price = this.richardsonPrices.prices[product.styleNumber];
-            displayPrice = `<span class="as-low-as">As low as:</span> $${price}.00`;
+            displayPrice = `<span class="as-low-as">As low as:</span> $${Number(price).toFixed(2)}`;
         }
 
         return `
             <div class="product-card ${isFeaturedProduct ? 'featured-product' : ''}" data-style="${product.styleNumber}">
                 <div class="product-image-container">
-                    <a href="${product.brand === 'Richardson' && this.richardsonPrices?.prices?.[product.styleNumber]
-                        ? `/pricing/cap-embroidery?StyleNumber=${product.styleNumber}`
-                        : `/product.html?style=${product.styleNumber}`}" class="product-link">
+                    <a href="/product.html?style=${product.styleNumber}" class="product-link">
                         <div class="product-image">
                             ${showBestSellerBadge ? '<div class="top-seller-badge">BEST SELLER</div>' : ''}
                             <img src="${imageUrl}" 
@@ -1729,7 +1670,7 @@ class CatalogSearch {
      * MarginDenominator comes from API tiersR ONLY — a missing tier hides the
      * price (returns null) rather than pricing with a stale hardcoded margin.
      */
-    calculateCapPrice(basePrice, tierLabel, embroideryCosts, tiersR = []) {
+    calculateCapPrice(basePrice, tierLabel, embroideryCosts, tiersR = [], roundingMethod = null) {
         const embCost = embroideryCosts.find(e => e.TierLabel === tierLabel && e.StitchCount === 8000);
         if (!embCost) return null;
 
@@ -1741,7 +1682,13 @@ class CatalogSearch {
         }
 
         const decorated = (basePrice / marginDenominator) + embCost.EmbroideryCost;
-        return Math.ceil(decorated);
+        // Round with the API's method, matching the PDP/quote engine's
+        // roundCapPrice — a hardcoded Math.ceil here showed $25.00 in Quick
+        // View for a cap the PDP priced at $24.50 (Rule 9: one engine).
+        if (roundingMethod === 'CeilDollar') return Math.ceil(decorated);
+        // Default HalfDollarUp — round UP to nearest $0.50
+        if (decorated % 0.5 === 0) return decorated;
+        return Math.ceil(decorated * 2) / 2;
     }
 
     /**
@@ -1756,22 +1703,30 @@ class CatalogSearch {
         const basePrice = pricingData.sizes[0]?.price || 0;
         const sizeName = pricingData.sizes[0]?.size || 'OSFA';
 
-        // Calculate prices for each tier (using API margin from tiersR)
+        // Calculate prices for each tier (using API margin from tiersR and
+        // the API rounding method — parity with the PDP, never Math.ceil)
         const tiersR = pricingData.tiersR || [];
-        const price24 = this.calculateCapPrice(basePrice, '24-47', pricingData.allEmbroideryCostsR, tiersR);
-        const price48 = this.calculateCapPrice(basePrice, '48-71', pricingData.allEmbroideryCostsR, tiersR);
-        const price72 = this.calculateCapPrice(basePrice, '72+', pricingData.allEmbroideryCostsR, tiersR);
+        const rounding = pricingData.rulesR?.RoundingMethod || null;
+        const price24 = this.calculateCapPrice(basePrice, '24-47', pricingData.allEmbroideryCostsR, tiersR, rounding);
+        const price48 = this.calculateCapPrice(basePrice, '48-71', pricingData.allEmbroideryCostsR, tiersR, rounding);
+        const price72 = this.calculateCapPrice(basePrice, '72+', pricingData.allEmbroideryCostsR, tiersR, rounding);
 
         if (!price24 || !price48 || !price72) return '';
+
+        // Small-order fee notice from the API tiers, never hardcoded — the old
+        // static "under 24 pieces: +$50 LTM" told 8-23-cap buyers about a fee
+        // that doesn't exist (LTM_Fee is on the 1-7 tier only, per Caspio).
+        const ltmTiers = tiersR.filter(t => parseFloat(t.LTM_Fee) > 0 && Number.isFinite(parseInt(t.MaxQuantity)));
+        const ltmNoticeHTML = ltmTiers.length ? `
+                <div class="ltm-notice">
+                    <span class="ltm-icon">⚠️</span>
+                    Orders of ${Math.max(...ltmTiers.map(t => parseInt(t.MaxQuantity)))} caps or fewer add a one-time $${parseFloat(ltmTiers[0].LTM_Fee).toFixed(2)} small-order fee
+                </div>` : '';
 
         return `
             <div class="quick-view-pricing">
                 <h3 class="pricing-header">Cap Embroidery Pricing</h3>
-                <p class="pricing-subtitle">Includes one front logo at 10,000 stitches</p>
-                <div class="ltm-notice">
-                    <span class="ltm-icon">⚠️</span>
-                    Orders under 24 pieces: +$50.00 LTM fee
-                </div>
+                <p class="pricing-subtitle">Includes one front logo at 10,000 stitches</p>${ltmNoticeHTML}
                 <table class="quick-view-pricing-table">
                     <thead>
                         <tr>
@@ -1784,14 +1739,14 @@ class CatalogSearch {
                     <tbody>
                         <tr>
                             <td>${sizeName}</td>
-                            <td class="price-cell">$${price24}.00</td>
-                            <td class="price-cell">$${price48}.00</td>
-                            <td class="price-cell highlight">$${price72}.00</td>
+                            <td class="price-cell">$${price24.toFixed(2)}</td>
+                            <td class="price-cell">$${price48.toFixed(2)}</td>
+                            <td class="price-cell highlight">$${price72.toFixed(2)}</td>
                         </tr>
                     </tbody>
                 </table>
-                <a href="/pricing/cap-embroidery?StyleNumber=${styleNumber}" class="pricing-calculator-link">
-                    Open Full Pricing Calculator →
+                <a href="/product.html?style=${styleNumber}#pricingHeading" class="pricing-calculator-link">
+                    Price it &amp; add to quote →
                 </a>
             </div>
         `;
@@ -1834,10 +1789,11 @@ class CatalogSearch {
                     pricingData.sizes[0]?.price || 0,
                     '72+',
                     pricingData.allEmbroideryCostsR,
-                    pricingData.tiersR || []
+                    pricingData.tiersR || [],
+                    pricingData.rulesR?.RoundingMethod || null
                 );
                 if (bestPrice) {
-                    decoratedPriceHTML = `<span class="as-low-as">As low as:</span> $${bestPrice}.00`;
+                    decoratedPriceHTML = `<span class="as-low-as">As low as:</span> $${bestPrice.toFixed(2)}`;
                 }
             }
         }
@@ -1861,9 +1817,7 @@ class CatalogSearch {
                 </div>
                 <div class="quick-view-body">
                     <div class="quick-view-images">
-                        <a href="${productData.brand === 'Richardson'
-                            ? `/pricing/cap-embroidery?StyleNumber=${productData.styleNumber}&COLOR=${encodeURIComponent(selectedColor?.name || '')}`
-                            : `/product.html?style=${productData.styleNumber}`}"
+                        <a href="/product.html?style=${productData.styleNumber}${selectedColor?.name ? `&color=${encodeURIComponent(selectedColor.name)}` : ''}"
                            id="quickViewImageLink"
                            class="quick-view-image-link">
                             <img id="quickViewMainImage"
@@ -1918,10 +1872,9 @@ class CatalogSearch {
                                     class="btn-add-compare ${this.compareList.has(productData.styleNumber) ? 'active' : ''}">
                                 ${this.compareList.has(productData.styleNumber) ? '✓ Added to Compare' : 'Add To Compare'}
                             </button>
-                            <a href="${productData.brand === 'Richardson'
-                                ? `/pricing/cap-embroidery?StyleNumber=${productData.styleNumber}&COLOR=${encodeURIComponent(selectedColor?.name || '')}`
-                                : `/product.html?style=${productData.styleNumber}`}" class="btn-full-details">
-                                ${productData.brand === 'Richardson' ? 'Get Pricing Quote' : 'View full Product Details'}
+                            <a href="/product.html?style=${productData.styleNumber}${selectedColor?.name ? `&color=${encodeURIComponent(selectedColor.name)}` : ''}"
+                               id="quickViewDetailsLink" class="btn-full-details">
+                                View full Product Details
                             </a>
                         </div>
                     </div>
@@ -1966,11 +1919,14 @@ class CatalogSearch {
         });
         
         // Update the product link to include the selected color
-        const imageLink = document.getElementById('quickViewImageLink');
-        if (imageLink && this.currentQuickViewProduct) {
-            imageLink.href = this.currentQuickViewProduct.brand === 'Richardson'
-                ? `/pricing/cap-embroidery?StyleNumber=${this.currentQuickViewProduct.styleNumber}&COLOR=${encodeURIComponent(color.name)}`
-                : `/product.html?style=${this.currentQuickViewProduct.styleNumber}&color=${encodeURIComponent(color.name)}`;
+        if (this.currentQuickViewProduct) {
+            const pdpHref = `/product.html?style=${this.currentQuickViewProduct.styleNumber}&color=${encodeURIComponent(color.name)}`;
+            const imageLink = document.getElementById('quickViewImageLink');
+            if (imageLink) imageLink.href = pdpHref;
+            // Main CTA must carry the chosen color too — customers picked
+            // their team color and used to land on the default (QW-9).
+            const detailsLink = document.getElementById('quickViewDetailsLink');
+            if (detailsLink) detailsLink.href = pdpHref;
         }
     }
 

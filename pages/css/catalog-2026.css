@@ -219,6 +219,9 @@
 }
 .pcard:hover .pcard-quick, .pcard-quick:focus-visible { opacity: 1; }
 .pcard-quick:hover { background: var(--green-700); }
+/* No hover on touch devices — the button was invisible-but-tappable on
+   tablets (561-960px show the desktop grid but never fire :hover). */
+@media (hover: none) { .pcard-quick { opacity: 1; } }
 
 .pcard-body { padding: 13px 15px 15px; display: flex; flex-direction: column; gap: 3px; flex: 1; }
 .pcard-brand { font-size: 12px; font-weight: 600; color: var(--ink-soft); }
