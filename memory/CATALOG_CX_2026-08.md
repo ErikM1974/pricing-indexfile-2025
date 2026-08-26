@@ -162,3 +162,13 @@ anchor AFTER async render (native anchor scroll fires against skeleton layout; b
 Verified on built local server (48/48 cards, arrival rect.top=1). Remaining roadmap:
 M-6 one chrome · M-7 category tiles · M-8 mobile filters · Richardson Non-SanMar data question.
 
+## 🚀 2026-08-26 — M-5 DEPLOYED (app `v2026.08.26.2`, SHA 5876fdf) + LIVE-VERIFIED
+
+QV CTA string, pcard-swatches/pcard-swatch-more class literals, catalog-search #pricingHeading ×3,
+and the PDP "#pricingHeading" handler all byte-verified in the live minified bundles. ⚠️ Self-inflicted
+verification scare: dist bundles ARE minified — grep for function names (buildSwatchRow) and comments
+returned 0 and looked like a failed deploy; class/string literals are the only valid markers (the
+DURABLE_GOTCHAS marker rule, walked into anyway). Also: another session's UNCOMMITTED server.js edit
+is sitting in the shared working tree — left untouched, shipped nowhere.
+Remaining roadmap: M-6 one chrome · M-7 category tiles · M-8 mobile filters · Richardson data question.
+
