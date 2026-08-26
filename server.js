@@ -5326,6 +5326,13 @@ app.get([
   '/pages/transfer-detail.html',
 ], gateStaffHtml);
 
+// Legacy webstore info page under /pages — same consolidation as the root
+// /webstore-info.html 301 below, but it MUST sit above this static mount or
+// the file answers first (M-6: two different "Webstores" pages were live).
+app.get('/pages/webstore-info.html', (req, res) => {
+  res.redirect(301, '/company-webstores');
+});
+
 app.use('/pages', express.static(path.join(__dirname, 'pages'), staticOptions));
 
 // APP_CONFIG lives here (config/app.config.js) and is loaded by ~77 pages.

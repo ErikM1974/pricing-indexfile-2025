@@ -11,21 +11,11 @@ the print sheets Erik runs each morning and hands to **Ruthie (production), Nika
 
 ---
 
-## ⏭️ STOPPING POINT — pick up here
+## ✅ SHIPPED — all of it is live
 
-**One thing left: deploy the APP.** The proxy half is already live; the app half is committed
-and pushed to `develop` but NOT deployed.
-
-```
-cd "Pricing Index File 2025" && /deploy
-```
-
-That release will carry **2 commits**: `29f9db10` (the inbound-sheet work) and `fad909e0`
-(another session's memory doc). Nothing risky. Heroku and `origin/main` were in sync at
-`d842a718` when this was written — no interrupted deploy to resume.
-
-After deploying, verify on a real morning sheet: open AE Mission Control → SanMar Inbound →
-Print, and confirm every profile footer reads **“Data as of … Pacific”**.
+App `v2026.08.26.4` (drop-ship marking, backorder/hold/urgent on every sheet, "Data as of …
+Pacific"); proxy `04833cd` (Pacific day anchor + `generatedAtLocal`); and the Ship_To backfill
+below. Nothing is waiting to deploy.
 
 ---
 
@@ -67,19 +57,25 @@ is not a signal. Verified by reading the parsed `@media print` block, not by tru
 
 ---
 
-## 🔴 Known gap: drop-ship detection has ~53% coverage
+## ✅ Ship_To backfill — detection is now 100% (2026-08-26)
 
-Measured on the live 2026-08-26 board: of 32 orders, **17 classify as `ours`, 15 come back
-`unknown`** with no ship-to at all. Not an age effect — both groups span the same ship dates and
-both have box detail. The `Ship_To_*` columns are simply absent on many carton rows.
+`scripts/backfill-ship-to.js` (dry run by DEFAULT; `--apply` to write; `--limit N` to slice).
 
-`unknown` stays deliberately silent and keeps reading as arriving; the backend returns `unknown`
-rather than `dropship` when ship-to is missing, precisely so a data gap can never quietly delete
-a real carton from the receiving sheet. **So the marker catches drop-ships where the data exists
-and is silent where it does not.** Closing it is the `Ship_To_*` backfill (~83 blank carton rows,
-already on the backlog) — that is the next thing to do here.
+Both writers set `Ship_To_*` on INSERT only, never on update, so carton rows written before
+the fields existed had nothing to classify on. 165 rows across 130 POs (Jan–Aug 2026) were
+blank on zip AND city AND address. All 165 written, 0 failures, 0 blanks left.
 
----
+**Verified on the live board:** 08-26 went `17 ours / 15 unknown` → **`32 ours / 0 unknown`**;
+08-27 → 11/0. **PO 113891 (Milgard Manufacturing) now classifies `dropship` → Tacoma WA on
+08-06**, `totals.dropship: 1` — a real drop-ship that had been printing as arriving freight.
+The other one surfaced was 112261 → Sumner WA (Mar 23).
+
+🔑 The script matches SanMar cartons to our rows on **tracking number, never position** — one
+PO can ship to several destinations, and a wrong ZIP is worse than the honest blank. It fills
+blank fields only, so re-running is safe.
+
+⚠️ Nothing stops this recurring: the two writers still only set these on INSERT. If a future
+change adds a destination field, expect the same gap and re-run this script.
 
 ## Ranked backlog for this report (adversarially verified 2026-08-26)
 
