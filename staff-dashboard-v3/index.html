@@ -23,12 +23,12 @@
         statement lives at the top of tokens.css (first stylesheet loaded), so
         this HTML carries no inline <style> (project Rule: no inline code).
     -->
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/tokens.css?v=20260514-ai-phase1">
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/base.css?v=2026.07.06.11">
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css?v=2026.07.29.1">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/tokens.css?v=2026.08.26.1">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/base.css?v=2026.08.26.1">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css?v=2026.08.26.1">
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/utilities.css?v=20260514-ai-phase1">
     <!-- Claude Design handoff theme (2026-05-13) — unlayered variant, wins all cascade fights. -->
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=2026.08.10.6">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=2026.08.26.1">
     <!-- Claude Design PATCH 2 (spacing) — hide empty announcements, compress pinned row, tighten zones.
          PATCH 3 and PATCH 4 were REMOVED per PATCH-5-CLEANUP: their broad
          [class*="..."] selectors were over-matching and damaging styles that
@@ -1038,7 +1038,7 @@
             <a href="/calculators/quick-quote/"><i class="fas fa-bolt" aria-hidden="true"></i> <strong>Quick Quote line sheet</strong>&nbsp;— several styles, price sheet to email</a>
         </div>
     </div>
-    <script src="/staff-dashboard-v3/quote-launcher.js?v=2026.07.07.4" defer></script>
+    <script src="/staff-dashboard-v3/quote-launcher.js?v=2026.08.26.1" defer></script>
     <!-- Live past-due count on the sidebar link. Shows a red count when something is
          late, a green "All clear" on a CONFIRMED zero, and nothing at all if the count
          can't be fetched — an all-clear we haven't verified is worse than no badge. -->
@@ -1052,7 +1052,7 @@
          Ported as plain script tags before the v3 module so production-controller.js
          can read window.ProductionPredictor + PRODUCTION_STATS at init time.) -->
     <script src="/shared_components/js/production-schedule-stats.js?v=20260512h"></script>
-    <script src="/shared_components/js/production-schedule-predictor.js?v=20260512h"></script>
+    <script src="/shared_components/js/production-schedule-predictor.js?v=2026.08.26.1"></script>
 
     <!-- Legacy staff-dashboard-service.js UNMOUNTED 2026-07-25. It existed solely as the
          garment-tracker bridge; the Embroidery Bonus card that replaced that tracker talks
@@ -1065,7 +1065,7 @@
     <script src="/shared_components/js/caspio-date-utils.js?v=2026.07.05.4"></script>
     <!-- Art Requests Needing Attention widget — self-contained, lazy (idle-time
          fetch after DOMContentLoaded), GET-only, visible retry state on failure. -->
-    <script src="/staff-dashboard-v3/art-aging-widget.js?v=2026.07.05.4" defer></script>
+    <script src="/staff-dashboard-v3/art-aging-widget.js?v=2026.08.26.1" defer></script>
 
     <!-- Box url normaliser — the Pride Wall renders Finished_Photos rows whose stored
          Image_URL is an absolute proxy url that 401s cross-origin. Classic (non-module)
@@ -1076,6 +1076,6 @@
     <!-- ===================================================
          APP ENTRY (ES module)
          =================================================== -->
-    <script type="module" src="/shared_components/js/staff-dashboard/core/dashboard-app.js?v=2026.07.29.1"></script>
+    <script type="module" src="/shared_components/js/staff-dashboard/core/dashboard-app.js?v=2026.08.26.1"></script>
 </body>
 </html>
