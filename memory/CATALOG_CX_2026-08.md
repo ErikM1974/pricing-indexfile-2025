@@ -172,3 +172,32 @@ DURABLE_GOTCHAS marker rule, walked into anyway). Also: another session's UNCOMM
 is sitting in the shared working tree — left untouched, shipped nowhere.
 Remaining roadmap: M-6 one chrome · M-7 category tiles · M-8 mobile filters · Richardson data question.
 
+## 🛑 STOPPING POINT 2026-08-26 (~06:00) — laptop shutdown; PICK UP HERE
+
+**Everything through M-5 is DEPLOYED and live-verified.** Nothing of mine is uncommitted or
+unpushed in either repo. Scoreboard of what's LIVE: search <1s (boot-warmed index) · one price
+voice · all roads → /catalog · buy-online bridge (Option A) · featured landing · M-1 honest
+counts · trust band (4.9★ Google) · M-5 Quick-View "Price it & add to quote" CTA + swatch dots.
+
+**CONTINUATION PLAN (Erik-approved roadmap, in order):**
+1. **M-6 one chrome** — extract shared header/drawer/footer; apply to index/catalog/product/
+   quote-cart/brands + tumbler page; 301 `/pages/webstore-info.html` → `/company-webstores`;
+   retire the homepage inline-results engine (`catalog-search.js` renderer + `autocomplete-new.js`)
+   in favor of the /catalog renderer. Biggest remaining structural item (day-plus).
+2. **M-7 category tiles** — homepage tiles for Ladies (886)/Activewear/Woven Shirts; a category
+   tile row on unfiltered /catalog above the grid (15 facets w/ counts, collapses when filtered).
+3. **M-8 mobile filters** — sticky "Show N results" bar in the filter drawer, sticky results
+   toolbar ≤960px, one-line promo ≤560px.
+4. **Richardson data question** — most Richardson caps live in Non_SanMar_Products and don't
+   surface under /catalog?brand=Richardson (only 5 SanMar rows); needs a look at the NS table
+   rows / brand mapping (data, not code).
+
+**ERIK'S STANDING ERRANDS:** void OnSite test orders PO `CAP0825-4781` + `CAP0825-7724`
+("ZZZ TEST - DO NOT PRODUCE") · set `SLACK_ORDER_ALERT_WEBHOOK_URL` on Heroku · Rule 9 rewording.
+
+**SHARED-CHECKOUT AWARENESS AT SHUTDOWN:** another session was actively editing (uncommitted:
+app `server.js` + several `shared_components/js/*-quote-service/page.js` — looks like the
+quote-data-plane relay work) and has an unpushed proxy commit `5a54396` (psst-audit). None of it
+is mine; do NOT stage with `git add -u` until it's resolved — stage explicit paths only, and
+check `git branch --show-current` + fresh Release commits before ANY commit (mid-deploy gotcha).
+
