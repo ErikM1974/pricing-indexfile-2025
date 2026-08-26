@@ -64,6 +64,7 @@ at `~/.claude/projects/C--Users-erik-OneDrive---Northwest-Custom-Apparel-2025-Pr
 - 🔑 `.onclick =` beats `cloneNode` for re-openable modals (clone copies `disabled`+innerHTML → reopens dead).
 
 ## Repo / deploy
+- 🔴 **A shared checkout mid-`/deploy` swallows your commit into THEIR release.** Another session's deploy switched this checkout to `main` between its steps; my `git commit` landed on main under their release merge and shipped inside their version, unmentioned by their changelog (2026-08-26, trust band rode along in v2026.08.26.1 — content was fully gated, so it was let ride; NEVER do git surgery on a live deploy). **Check `git branch --show-current` immediately before every commit** — `main` + fresh `Release v…` commits = a deploy is running; wait for its Step 16.
 
 - ⚠️ **In a shared checkout a WIP commit on develop is a deploy candidate for EVERY session.** Use a feature branch; re-check `git branch --show-current` before committing. **Concurrent sessions deploy over each other — re-check `origin/main` right before you cut** (a cache-bust reporting ZERO changed assets usually means your work already shipped; confirm with `git merge-base --is-ancestor <sha> origin/main`).
 - 🔑 **Releasing a shared checkout:** cut at YOUR sha, `git checkout HEAD -- <foreign file>` before committing the merge — then RESTORE it on sync-back or you delete the other session's WIP. A dirty tree blocks `git checkout main` → release from a `git worktree` at a SHORT path (Windows MAX_PATH).

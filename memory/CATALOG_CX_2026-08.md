@@ -141,3 +141,15 @@ CX overhaul phases 1-3 all LIVE. ⏭️ REMAINING (roadmap): trust band (BLOCKED
 rating + 2-3 named quotes) · M-5 QV-to-quote CTA · M-6 one chrome · M-7 category tiles ·
 M-8 mobile filters · Richardson/Non-SanMar brand-filter data question.
 
+## ⭐ 2026-08-26 — TRUST BAND LIVE (rode along in app `v2026.08.26.1`)
+
+Erik picked the reviews (4.9★/187 on Google), approved silent typo fixes + full names. Shipped:
+homepage reviews band (4.9 badge → maps cid link, "185+" so it stays true; Dave Lambing —
+Tacoma Fire Buff Battalion + Wyatt Smith) · PDP CTA card quote (Jed Rains, names Taneisha) ·
+express checkouts beside Pay (Robyn Readwin tees / Jeremy Hanson caps). NOTE: shipped inside
+ANOTHER session's v2026.08.26.1 release (staff-dashboard hardening) — the shared checkout was
+on main mid-their-deploy when the trust commit landed; content was fully gated, let ride,
+live-verified on all 4 surfaces (grep Dave/Jed/Robyn/Jeremy + badge + cid link = 1 each).
+M-9 trust band = DONE. Remaining roadmap: M-5 QV CTA · M-6 one chrome · M-7 category tiles ·
+M-8 mobile filters · Richardson Non-SanMar brand-filter data question.
+
