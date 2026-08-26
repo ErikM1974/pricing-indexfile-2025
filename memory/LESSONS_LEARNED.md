@@ -40,33 +40,6 @@ reports absence, make it state its own coverage: which dates it read, how fresh 
 and what it could not fetch. Prose promises in a header comment are not enforcement — this
 file's own comment made exactly this promise and the code did the opposite for weeks.
 
-## First-ever caps order pushed to ShopWorks with NO artwork — the stamp had flattened the file ref to a boolean (2026-08-25)
-
-**Problem.** First exercise of the /custom-caps paid leg (Stripe TEST-mode E2E, CAP0825-4781):
-order reached OnSite with `designs: []` and `attachments: []` — production would get a proof-first
-embroidery order with no logo attached. Quote-view and custom-caps-success were ALSO silently
-artless for every future CAP order.
-
-**Root cause.** The caps channel's `stampedOrderSettings` (server.js) wrote `frontLogo: true` /
-`backLogo: <bool>` — server-authoritative *pricing flags* — into OrderSettingsJSON, clobbering the
-client's `{fileUrl, fileName}` objects (Object.assign stamp wins over client base). Three consumers
-(`submit-3day-order` push, quote-view.js:3481, custom-caps-success logoFig) all read `.fileUrl` and
-optional-chain to nothing. Tees never hit it: its stamp doesn't touch artwork keys.
-
-**Fix.** `sanitizeUploadedLogoRef(ref, allowedPrefix)` in config/storefront-channels.js (jest-locked);
-caps stamp now carries the sanitized `{fileUrl, fileName}` through — only `{proxy}/api/files/` URLs
-survive, and backLogo rides ONLY when the reprice charged it. Verified by rerun CAP0825-7724:
-`Built designs: 1`, `Built attachments: 1`, Processed.
-
-**Prevention.** A channel launched without ONE full test-mode E2E (create-session → signed webhook →
-push) is unverified no matter how much code it shares — the tees channel being production-proven
-proved nothing about the caps STAMP. `tests/3dt-fire-test-webhook.js` makes the full rehearsal a
-two-command job; run it for every NEW storefront channel before launch, and read the push payload
-log, not just the status flip.
-
----
-
-
 ## curl from git-bash mangled em dashes into U+FFFD inside a Caspio row (2026-08-25)
 
 **Problem.** Creating the Forms_Library row for the embroidery-operator employment application
@@ -233,3 +206,57 @@ PartNumber/SKU/Color/Size01-06 (its `vendorName` passthrough is never rendered).
   whitelisted keys.
 - 🔑 **Prove a new lock goes RED**: `git stash` the fix, run the test (fails), pop, run again
   (14/14 green). A lock that has never failed proves nothing (DURABLE_GOTCHAS § Verification).
+
+## 2-minute proxy outage: the commit shipped half the change, and the boot probe tested the other half (2026-08-27)
+
+**Problem.** Deleting the legacy box-labels routes crashed the proxy dyno on deploy (H10 on
+customer pricing calls, ~2 min until `heroku releases:rollback`). The slug had the route FILE
+deleted but `server.js` still `require`d it — `Cannot find module` on boot.
+
+**Root Cause.** Two failures stacked: (1) `git add <deleted-file> <edited-files>` — the first
+pathspec matched nothing (the file was already staged by `git rm`), and **git add ABORTS the
+whole command on a bad pathspec, staging NONE of the later files**; the commit went out with
+only the `git rm`. (2) The local boot probe passed because it ran against the WORKING TREE
+(which had the server.js edit), not against what was committed — the exact gap between "my
+checkout works" and "the commit works".
+
+**Solution.** Rollback restored production in seconds; the missing edit was committed with the
+staged diff INSPECTED (`git diff --cached` shows the require removal), boot-probed with
+`tree == HEAD` asserted first, and redeployed clean (proxy `v2026.08.26.6`). Legacy routes now
+404 live; the repack station's `/api/sanmar-orders/label-data` unaffected.
+
+**Prevention.**
+- 🔴 **Never combine pathspecs in one `git add` during a delete+edit change.** One `git add`
+  per file, then `git diff --cached --stat` MUST list every file you meant to ship — read it
+  before committing. An already-`git rm`'d path in the list is the trap that aborts the rest.
+- 🔴 **A boot probe is only honest when `git status --porcelain` shows no tracked dirt** —
+  otherwise it verifies the working tree, not the commit that deploys. Assert clean, THEN probe.
+- 🔑 **Delete a module and its require in the SAME commit, verified in the same staged diff.**
+  The app-side twin of this change survived because its deletion was a single-file block edit.
+- 🔑 The rollback playbook worked exactly as written: slug rollback in seconds, fix landed
+  forward through the normal gated path — no hand-pushes, no `--no-verify`.
+
+## Top Sellers "flickers blank, refresh fixes it" — a cold query the cache was hiding (2026-08-26)
+
+**Problem:** Erik: clicking the header's Top Sellers link, products "try to load", images flicker
+blank, and only a refresh loads them properly.
+**Root cause (three stacked):** (1) the topSellers listing query took 10-18s COLD on the proxy —
+`IsTopSeller=1` alone forces Caspio to scan the 181k-row table, and phase-2 hydration pulled ~10k
+variant rows (top sellers are the MOST-varianted styles) as 10 SEQUENTIAL 1,000-row pages. The
+5-min response cache made the NEXT load instant, so a refresh "fixed" it — the classic
+cold-query-behind-a-cache signature. (2) Only the first 5 of 48 card images were
+`loading=eager`; a desktop first screen shows ~12-20, so most visible images lazy-popped late.
+(3) All 48 sample-eligibility checks (~2 proxy calls each) fired the instant the grid rendered,
+competing with the page's own images, and the "Checking availability" → button swap had no
+reserved height.
+**Solution:** proxy `7424e77` — style index carries IsTopSeller so the WHERE narrows to
+`STYLE IN (...)` (Rule 4 intact: every row still verified live; membership lags a flip ≤30 min),
+and phase-2 hydration partitions styles into 12-style chunks fetched in PARALLEL (identical rows,
+same Caspio call count, ~1/4 wall clock). Measured: 18s → 6.3s cold, 0.01s warm. App: eager
+first 12 images + `decoding=async`, sample slots decorate via IntersectionObserver (600px
+lookahead, 8s catch-all sweep), placeholder holds the button's 38px.
+**Prevention:** 🔑 "Works after refresh" = a cold path behind a response cache — time the
+UNCACHED query before blaming the frontend. 🔑 A `limit=48` page can hydrate 10k+ rows when its
+styles are variant-heavy; disjoint STYLE IN partitions parallelize for free (quota-neutral).
+🔑 `?isTopSeller=1` is silently IGNORED by the route (`=== 'true'`) — a wrong-param probe times
+the WRONG query and returns the whole catalog; validate the response set before trusting a timing.

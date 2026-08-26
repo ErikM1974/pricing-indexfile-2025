@@ -446,7 +446,12 @@
             '<div class="pcard-media' + (imageUrl ? '' : ' no-img') + '">' +
             (isTop ? '<span class="pcard-flag">Best seller</span>' : '') +
             '<a class="pcard-media-link" href="' + escapeHtml(productUrl) + '" tabindex="-1" aria-hidden="true">' +
-            (imageUrl ? '<img src="' + escapeHtml(imageUrl) + '" alt="" loading="' + (buildCard._n < 6 ? 'eager" fetchpriority="high' : 'lazy') + '">' : '') +
+            (imageUrl ? '<img src="' + escapeHtml(imageUrl) + '" alt="" decoding="async" loading="' +
+                // First ~12 cards cover a desktop first screen (4-5/row × 3
+                // rows) — lazy there pops in late and reads as blank flicker
+                // on a cold visit (Erik, 2026-08-26, Top Sellers landing).
+                // fetchpriority stays on the first row only to protect LCP.
+                (buildCard._n < 6 ? 'eager" fetchpriority="high' : (buildCard._n < 13 ? 'eager' : 'lazy')) + '">' : '') +
             '</a>' +
             '<button class="pcard-quick" type="button" data-style="' + escapeHtml(style) + '">' +
             '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>' +

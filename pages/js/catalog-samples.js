@@ -49,19 +49,19 @@
             escapeHtml(label.text) + '</button>';
     }
 
-    /** Decorate the current grid's sample slots (called per render). */
-    async function decorate() {
-        var seq = ++renderSeq;
+    /** Decorate the current grid's sample slots (called per render).
+     *
+     * Eligibility checks fire only as a card nears the viewport
+     * (IntersectionObserver, 600px lookahead). The old decorate-all pass
+     * launched ~2 proxy calls per card × 48 cards the instant the grid
+     * rendered — on a cold Top Sellers landing that burst competed with the
+     * page's own images and read as blank/flickering cards (Erik,
+     * 2026-08-26). No IO support → decorate everything, as before. */
+    var io = null;
+
+    async function decorateSlots(slots, seq) {
         var c = cart();
         if (!c) return;
-        var slots = Array.prototype.slice.call(document.querySelectorAll('.pcard-sample-slot'));
-        if (!slots.length) return;
-
-        slots.forEach(function (slot) {
-            slot.innerHTML = '<span class="pcard-sample-loading">Checking sample availability…</span>';
-        });
-
-        // Small worker pool over the slots
         var queue = slots.slice();
         async function worker() {
             while (queue.length) {
@@ -81,6 +81,54 @@
         var workers = [];
         for (var i = 0; i < CONCURRENCY; i++) workers.push(worker());
         await Promise.all(workers);
+    }
+
+    function decorate() {
+        var seq = ++renderSeq;
+        if (!cart()) return;
+        var slots = Array.prototype.slice.call(document.querySelectorAll('.pcard-sample-slot'));
+        if (!slots.length) return;
+
+        slots.forEach(function (slot) {
+            slot.innerHTML = '<span class="pcard-sample-loading">Checking sample availability…</span>';
+        });
+
+        if (typeof IntersectionObserver !== 'function') {
+            decorateSlots(slots, seq);
+            return;
+        }
+
+        if (io) io.disconnect();
+        var pending = [];
+        var flushTimer = null;
+        io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (entry) {
+                if (!entry.isIntersecting) return;
+                io.unobserve(entry.target);
+                pending.push(entry.target);
+            });
+            // Batch the slots revealed in one scroll frame into one pool pass
+            if (pending.length && !flushTimer) {
+                flushTimer = setTimeout(function () {
+                    flushTimer = null;
+                    var batch = pending.splice(0);
+                    decorateSlots(batch, seq);
+                }, 50);
+            }
+        }, { rootMargin: '600px 0px' });
+        slots.forEach(function (slot) { io.observe(slot); });
+
+        // Safety net: browsers/tabs where IO never fires (background tab,
+        // non-compositing view) still resolve every slot after a beat —
+        // the burst is merely deferred past the page's own image loading.
+        setTimeout(function () {
+            if (seq !== renderSeq) return;
+            var remaining = slots.filter(function (slot) {
+                return document.contains(slot) && slot.querySelector('.pcard-sample-loading');
+            });
+            remaining.forEach(function (slot) { io.unobserve(slot); });
+            if (remaining.length) decorateSlots(remaining, seq);
+        }, 8000);
     }
 
     function onResults(products, topSellersMode) {
