@@ -233,3 +233,32 @@ PartNumber/SKU/Color/Size01-06 (its `vendorName` passthrough is never rendered).
   whitelisted keys.
 - 🔑 **Prove a new lock goes RED**: `git stash` the fix, run the test (fails), pop, run again
   (14/14 green). A lock that has never failed proves nothing (DURABLE_GOTCHAS § Verification).
+
+## 2-minute proxy outage: the commit shipped half the change, and the boot probe tested the other half (2026-08-27)
+
+**Problem.** Deleting the legacy box-labels routes crashed the proxy dyno on deploy (H10 on
+customer pricing calls, ~2 min until `heroku releases:rollback`). The slug had the route FILE
+deleted but `server.js` still `require`d it — `Cannot find module` on boot.
+
+**Root Cause.** Two failures stacked: (1) `git add <deleted-file> <edited-files>` — the first
+pathspec matched nothing (the file was already staged by `git rm`), and **git add ABORTS the
+whole command on a bad pathspec, staging NONE of the later files**; the commit went out with
+only the `git rm`. (2) The local boot probe passed because it ran against the WORKING TREE
+(which had the server.js edit), not against what was committed — the exact gap between "my
+checkout works" and "the commit works".
+
+**Solution.** Rollback restored production in seconds; the missing edit was committed with the
+staged diff INSPECTED (`git diff --cached` shows the require removal), boot-probed with
+`tree == HEAD` asserted first, and redeployed clean (proxy `v2026.08.26.6`). Legacy routes now
+404 live; the repack station's `/api/sanmar-orders/label-data` unaffected.
+
+**Prevention.**
+- 🔴 **Never combine pathspecs in one `git add` during a delete+edit change.** One `git add`
+  per file, then `git diff --cached --stat` MUST list every file you meant to ship — read it
+  before committing. An already-`git rm`'d path in the list is the trap that aborts the rest.
+- 🔴 **A boot probe is only honest when `git status --porcelain` shows no tracked dirt** —
+  otherwise it verifies the working tree, not the commit that deploys. Assert clean, THEN probe.
+- 🔑 **Delete a module and its require in the SAME commit, verified in the same staged diff.**
+  The app-side twin of this change survived because its deletion was a single-file block edit.
+- 🔑 The rollback playbook worked exactly as written: slug rollback in seconds, fix landed
+  forward through the normal gated path — no hand-pushes, no `--no-verify`.
