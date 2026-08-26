@@ -93,62 +93,8 @@ fresh GET — shows `—`, proving real em dashes.
 
 ---
 
-## A customer's real size request was captured, saved, and shown to nobody (2026-08-19)
-
-**Problem.** WQ-2026-006 (web quote-cart) showed 18500B "S × 17". The customer's actual request
-— A-M 8 / A-S 6 / XS 1 / L 2 — existed only in the notes box they typed at checkout, and no
-surface displayed it. Erik caught it because "17 smalls" looked wrong.
-
-**Root cause.** Two halves. (1) The quote-cart lets a customer add a line with one size + qty,
-so they dumped the total on the default size and typed the real distribution into notes. (2)
-quote-view's `renderNotes()` skipped ANY valid-JSON Notes as "structured config" — but the WQ
-channel stores the customer's typed text INSIDE that JSON (`customerNotes`), so the one
-free-text field a customer fills was invisible to reps by construction.
-
-**Solution.** `renderNotes()` now renders a "Customer notes (typed at checkout)" block
-(pre-wrap, text-only) when JSON Notes carries a non-empty `customerNotes`; structured config
-without customer text stays hidden. Verified against the live row. The quote itself still says
-S × 17 — sizes on a quote are the REP'S call after clarifying (here "A-" prefixed sizes look
-ADULT while 18500B is the YOUTH hoodie — repricing territory, never an auto-rewrite).
-
-**Prevention.**
-- 🔑 **"Skip it, it's structured JSON" needs a look INSIDE the JSON first** — channels tuck
-  human-typed text into structured blobs, and a skip on the container silently drops the one
-  field a human wrote.
-- 🔑 When a quote's numbers look odd, read the session row's `Notes`/`customerNotes` before
-  trusting the line items — the cart shape (one size per line) invites totals-on-one-size.
-
----
-
-## SAM quotes rendered "No items in this quote" — the samples channel opted out of the fix built for exactly this (2026-08-19)
-
-**Problem.** First real paid-sample order (SAM0819-8320, Peak Industrial, $100.73 via Stripe)
-showed an empty "Quote Details" on `/quote/:id` even though payment, ShopWorks push (WO 142865)
-and snapshot sync all worked.
-
-**Root cause.** `/quote` + `/invoice` render line items from the `quote_items` table.
-`storefront-quote-items.js` exists precisely because storefront carts once lived only in
-quote_sessions JSON blobs and those pages showed "No items" — but the samples launch (2026-07-06)
-deliberately skipped it (`colorConfigs: {}`, comment: "no junk quote_items rows"), because sample
-carts aren't colorConfigs-shaped. The ShopWorks snapshot couldn't save the page either:
-`_overlayQuoteFromShopWorks` only repaints rows that already exist — zero quote-side rows means
-the synced SW lines render nowhere.
-
-**Fix.** Samples branch in `buildStorefrontQuoteItems` (one row per `orderSettings.samples`
-entry, `EmbellishmentType: 'blank'`, free samples as $0 `FREE sample —` rows; jest-locked in
-`tests/unit/storefront-quote-items.test.js`). Backfilled SAM0819-8320's two rows via the proxy
-using the same builder — live page verified rendering both, matching the SW snapshot 1:1.
-
-**Prevention.**
-- 🔑 **"This channel doesn't need X" must name every READER of X, not just the writer's needs.**
-  The push reads OrderSettingsJSON, but /quote + /invoice read quote_items — the opt-out comment
-  only considered the push.
-- 🔑 The SW snapshot overlay is an OVERLAY, not a renderer — it can correct rows but never create
-  them. Any quote with zero quote_items rows stays visually empty no matter how good the sync is.
-- 🔑 Backfill through the SAME builder the code path now uses (require the module in a one-off
-  script), so the repaired row and future rows are identical by construction.
-
----
+### A customer's real size request was shown to nobody (2026-08-19, ARCHIVED 2026-08-27): render every field you persist — a saved-but-unshown field is data loss with extra steps. Full entry in archive.
+### SAM quotes rendered “No items” (2026-08-19, ARCHIVED 2026-08-27): a channel that opts out of a shared fix re-inherits the bug it fixed; SW-snapshot overlay repaints EXISTING rows only. Full entry in archive.
 
 ## Staff dashboard full review — 5 UTC/Pacific bugs on ONE page, and the error system silently failing itself (2026-08-26)
 
@@ -230,3 +176,34 @@ WOULD-BLOCK log goes quiet: `heroku config:set QUOTE_PLANE_GATE=enforce --app ca
   read `main..develop` before every merge.
 
 ---
+
+## Staff-dashboard hardening: PII roster, proxy-direct reads, third-party auth embed (2026-08-26)
+
+**Problem.** Three structural exposures on the staff dashboard, found by the same review that
+fixed its 13 defects: (1) the full employee roster — names, birthdays, hire dates, TERMINATION
+dates — hardcoded in TWO anonymously-served JS files; (2) three reads (quote book, per-rep YTD
+revenue, art requests) hitting the public proxy base directly, relying on obscurity; (3) the
+welcome chip fed by a hidden third-party Caspio DataPage embed that needed its own caspio.com
+session, silently failed under third-party-cookie blocking, and forced the caspio-isolation.js
+MutationObserver hack.
+
+**Root Cause.** The staff gate covers only `.html` — every `.js` under the static mounts serves
+anonymously — and the dashboard predated the same-origin forwarder pattern.
+
+**Solution.** Roster → `lib/staff-roster.js` (never statically served) behind requireStaff
+`GET /api/staff/employees`; employees-service became fetch-once async with a visible roster-error
+state; legacy roster file deleted. The three reads → `/api/staff/{quote-sessions,
+daily-sales-by-rep-ytd,artrequests}` relays (staffProxyForward). Auth embed + caspio-isolation.js
+DELETED — identity now `/api/crm-session/me` (which gained `role`). Shipped `v2026.08.26.3`;
+the proxy side of the reads was locked by the quote-plane gate (entry above).
+
+**Prevention.**
+- 🔴 **Data a staff page needs is either in `lib/` behind a route, or it is PUBLIC** — there is
+  no third state. The drive-access pattern is the template; grep the static mounts before
+  hardcoding anything person-shaped in JS.
+- 🔑 **A second copy of retired data is a second leak** — the live service had been "migrated"
+  once already, but the legacy file it was copied from kept serving the identical roster.
+  Deleting the consumer without deleting the source fixes nothing.
+- 🔑 **Same-origin identity (`/api/crm-session/me`) beats a third-party auth embed** everywhere:
+  no cross-site cookies, no injected CSS to quarantine, one auth source. If a page still embeds
+  a Caspio DataPage just to display who is signed in, that is the replacement.
