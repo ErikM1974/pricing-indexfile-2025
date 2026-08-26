@@ -153,3 +153,12 @@ live-verified on all 4 surfaces (grep Dave/Jed/Robyn/Jeremy + badge + cid link =
 M-9 trust band = DONE. Remaining roadmap: M-5 QV CTA · M-6 one chrome · M-7 category tiles ·
 M-8 mobile filters · Richardson Non-SanMar brand-filter data question.
 
+## 🖱️ 2026-08-26 — M-5 QUICK-VIEW CTA BUILT (app `0663f2b9`, committed+pushed, NOT deployed)
+
+Both QVs: primary CTA "Price it & add to quote" → `/product.html?style&color#pricingHeading`
+(color follows swatch switches; quiet "View full details" secondary). PDP re-scrolls to the
+anchor AFTER async render (native anchor scroll fires against skeleton layout; behavior:'instant'
+— smooth never completes in non-compositing tabs). /catalog cards: 5 swatch dots + "+N".
+Verified on built local server (48/48 cards, arrival rect.top=1). Remaining roadmap:
+M-6 one chrome · M-7 category tiles · M-8 mobile filters · Richardson Non-SanMar data question.
+
