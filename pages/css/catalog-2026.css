@@ -116,6 +116,9 @@
 
 .filters-clear-btn { width: 100%; margin-top: 14px; }
 
+/* Sticky apply bar — mobile drawer only (M-8); desktop rail hides it */
+.filters-apply-bar { display: none; }
+
 /* ── 3. Results toolbar + chips ──────────────────────────────────── */
 .results-toolbar {
     display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
@@ -355,11 +358,33 @@
         border-radius: 0; border: none; border-right: 1px solid var(--line);
         transform: translateX(-103%); transition: transform 0.22s ease;
         box-shadow: var(--shadow-pop);
-        padding: 14px 16px 24px;
+        padding: 14px 16px 0; /* bottom padding would hold the apply bar 24px off the edge */
     }
     .filters-rail.show { transform: translateX(0); }
     .filters-rail-close { display: inline-flex; }
     .filters-open-btn { display: inline-flex; }
+
+    /* Drawer's sticky apply bar: live "Show N results", pinned to the bottom
+       of the scrolling drawer so it's reachable however deep the filters go */
+    .filters-rail { display: flex; flex-direction: column; }
+    .filters-rail > #filterGroups { flex: 1 1 auto; }
+    .filters-apply-bar {
+        display: block;
+        position: sticky; bottom: 0; z-index: 1;
+        margin: 14px -16px 0; padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+        background: var(--card); border-top: 1px solid var(--line-strong);
+        box-shadow: 0 -6px 16px -12px rgba(24, 34, 25, 0.35);
+    }
+    .filters-apply-btn { width: 100%; min-height: 46px; font-size: 14.5px; }
+
+    /* Results toolbar sticks under the masthead so Filters + Sort stay
+       reachable while scrolling the grid (M-8) */
+    .results-toolbar {
+        position: sticky; top: var(--masthead-h, 64px); z-index: 50;
+        background: var(--paper);
+        margin-bottom: 12px; padding-top: 10px;
+        border-bottom: 1px dashed var(--line-strong);
+    }
 
     .qv-grid { grid-template-columns: 1fr; }
 }
@@ -430,6 +455,18 @@
     .fall26-promo { flex-wrap: wrap; gap: 10px; }
     .fall26-promo-copy span { font-size: 12px; }
     .fall26-promo-cta { margin-left: 0; width: 100%; }
+}
+/* One-line promo on phones (M-8): badge + title + arrow, nothing wraps */
+@media (max-width: 560px) {
+    .fall26-promo { flex-wrap: nowrap; gap: 10px; padding: 10px 14px; margin-top: 12px; }
+    .fall26-promo-copy { flex: 1 1 auto; }
+    .fall26-promo-copy span { display: none; }
+    .fall26-promo-copy strong {
+        font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        display: block;
+    }
+    .fall26-promo-cta { margin-left: 0; width: auto; flex: 0 0 auto; }
+    .fall26-cta-label { display: none; }
 }
 
 /* Buy-online badge on eligible cards (buy-online bridge, 2026-08-25) */
