@@ -31,7 +31,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/catalog-search.css?v=4">
     <link rel="stylesheet" href="/shared_components/css/nwca-2026-core.css?v=2026.08.25.4">
-    <link rel="stylesheet" href="/shared_components/css/nwca-2026.css?v=2026.07.23.4">
+    <link rel="stylesheet" href="/shared_components/css/nwca-2026.css?v=2026.08.26.10">
     <link rel="stylesheet" href="/shared_components/css/blog.css?v=2026.07.12.4">
 
     <!-- Entity stitching (2026-07-12): sameAs ties this domain and
@@ -448,24 +448,117 @@
                 </div>
             </section>
 
-            <section class="band">
+            <!-- The catalog — one door (2026-08-27 redesign, "Option D + search").
+                 Replaces the separate best-sellers + category-tiles bands. Brand values
+                 and cut-chip searches are validated against /api/products/search facets
+                 (every chip lands on >0 results). Keeps #shop-categories: brand landing
+                 pages deep-link to /#shop-categories. -->
+            <section class="band" id="shop-categories">
                 <div class="wrap">
                     <div class="band-head band-head-row">
                         <div>
-                            <p class="band-eyebrow">Crowd favorites</p>
-                            <h2>2026 best sellers</h2>
-                            <p class="band-sub">What 500+ Northwest businesses order most — every one available as a free or low-cost sample.</p>
+                            <p class="band-eyebrow">The catalog</p>
+                            <h2>Every brand, every cut</h2>
+                            <p class="band-sub">The same supplier catalog the pros buy from — decorated in Milton. Start from a brand, a category, or the exact cut you need.</p>
                         </div>
-                        <a class="band-more" href="/catalog?topSellers=1">Browse all 60 →</a>
+                        <a class="band-more" href="/catalog">Open the full catalog →</a>
+                    </div>
+
+                    <form class="catd-search" action="/catalog" method="get" role="search">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.8-4.8"/></svg>
+                        <input type="search" name="q" placeholder="Search styles, brands, or product codes — &#8220;PC61&#8221;, &#8220;Carhartt&#8221;, &#8220;hi-vis hoodie&#8221;&#8230;" aria-label="Search the catalog">
+                        <button type="submit">Search</button>
+                    </form>
+
+                    <div class="catd-grid">
+                        <aside class="catd-brands" aria-label="Shop by brand">
+                            <h3>Shop by brand</h3>
+                            <a href="/catalog?brand=Port%20%26%20Co">Port &amp; Co<span aria-hidden="true">→</span></a>
+                            <a href="/catalog?brand=Port%20Authority">Port Authority<span aria-hidden="true">→</span></a>
+                            <a href="/catalog?brand=Carhartt">Carhartt<span aria-hidden="true">→</span></a>
+                            <a href="/catalog?brand=Nike">Nike<span aria-hidden="true">→</span></a>
+                            <a href="/catalog?brand=Richardson">Richardson<span aria-hidden="true">→</span></a>
+                            <a href="/catalog?brand=New%20Era">New Era<span aria-hidden="true">→</span></a>
+                            <a href="/catalog?brand=District">District<span aria-hidden="true">→</span></a>
+                            <a href="/catalog?brand=Sport-Tek">Sport-Tek<span aria-hidden="true">→</span></a>
+                            <a class="catd-brands-all" href="/catalog">All brands →</a>
+                        </aside>
+
+                        <div class="catd-rows">
+                            <div class="catd-row">
+                                <a class="catd-row-main" href="/catalog?category=T-Shirts"><span class="cat-num">01</span><span class="catd-row-name">T-Shirts</span></a>
+                                <span class="catd-cuts">
+                                    <a href="/catalog?category=T-Shirts&amp;q=cotton">Cotton</a>
+                                    <a href="/catalog?category=T-Shirts&amp;q=performance">Performance</a>
+                                    <a href="/catalog?category=T-Shirts&amp;q=long%20sleeve">Long Sleeve</a>
+                                    <a href="/catalog?category=T-Shirts&amp;q=ladies">Ladies</a>
+                                    <a href="/catalog?category=T-Shirts&amp;q=youth">Youth</a>
+                                </span>
+                                <a class="catd-row-go" href="/catalog?category=T-Shirts" aria-hidden="true" tabindex="-1">→</a>
+                            </div>
+                            <div class="catd-row">
+                                <a class="catd-row-main" href="/catalog?category=Sweatshirts%2FFleece"><span class="cat-num">02</span><span class="catd-row-name">Sweatshirts &amp; Fleece</span></a>
+                                <span class="catd-cuts">
+                                    <a href="/catalog?category=Sweatshirts%2FFleece&amp;q=hoodie">Hoodies</a>
+                                    <a href="/catalog?category=Sweatshirts%2FFleece&amp;q=crewneck">Crewnecks</a>
+                                    <a href="/catalog?category=Sweatshirts%2FFleece&amp;q=full%20zip">Full Zip</a>
+                                    <a href="/catalog?category=Sweatshirts%2FFleece&amp;q=heavyweight">Heavyweight</a>
+                                </span>
+                                <a class="catd-row-go" href="/catalog?category=Sweatshirts%2FFleece" aria-hidden="true" tabindex="-1">→</a>
+                            </div>
+                            <div class="catd-row">
+                                <a class="catd-row-main" href="/catalog?category=Caps"><span class="cat-num">03</span><span class="catd-row-name">Caps</span></a>
+                                <span class="catd-cuts">
+                                    <a href="/catalog?category=Caps&amp;q=trucker">Trucker</a>
+                                    <a href="/catalog?category=Caps&amp;q=mesh">Mesh Back</a>
+                                    <a href="/catalog?category=Caps&amp;q=flexfit">Flexfit</a>
+                                    <a href="/catalog?category=Caps&amp;q=beanie">Beanies</a>
+                                </span>
+                                <a class="catd-row-go" href="/catalog?category=Caps" aria-hidden="true" tabindex="-1">→</a>
+                            </div>
+                            <div class="catd-row">
+                                <a class="catd-row-main" href="/catalog?category=Workwear"><span class="cat-num">04</span><span class="catd-row-name">Workwear</span></a>
+                                <span class="catd-cuts">
+                                    <a href="/catalog?category=Workwear&amp;q=safety">Safety</a>
+                                    <a href="/catalog?category=Workwear&amp;q=work%20shirt">Work Shirts</a>
+                                    <a href="/catalog?category=Workwear&amp;q=jacket">Jackets</a>
+                                    <a href="/catalog?category=Workwear&amp;q=apron">Aprons</a>
+                                </span>
+                                <a class="catd-row-go" href="/catalog?category=Workwear" aria-hidden="true" tabindex="-1">→</a>
+                            </div>
+                            <div class="catd-row">
+                                <a class="catd-row-main" href="/catalog?category=Outerwear"><span class="cat-num">05</span><span class="catd-row-name">Outerwear</span></a>
+                                <span class="catd-cuts">
+                                    <a href="/catalog?category=Outerwear&amp;q=soft%20shell">Soft Shells</a>
+                                    <a href="/catalog?category=Outerwear&amp;q=rain">Rainwear</a>
+                                    <a href="/catalog?category=Outerwear&amp;q=insulated">Insulated</a>
+                                    <a href="/catalog?category=Outerwear&amp;q=vest">Vests</a>
+                                </span>
+                                <a class="catd-row-go" href="/catalog?category=Outerwear" aria-hidden="true" tabindex="-1">→</a>
+                            </div>
+                            <div class="catd-row catd-row-rest">
+                                <a href="/catalog?category=Polos%2FKnits">Polos &amp; Knits</a>
+                                <a href="/catalog?category=Bags">Bags</a>
+                                <a href="/catalog?category=Ladies">Ladies</a>
+                                <a href="/catalog?category=Activewear">Activewear</a>
+                                <a href="/catalog?category=Woven%20Shirts">Woven Shirts</a>
+                                <a class="catd-rest-all" href="/catalog" id="allCategoriesTile">All categories →</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="catd-bs-head">
+                        <h3>2026 best sellers</h3>
+                        <p>What 500+ Northwest businesses order most — every one available as a free or low-cost sample. <a href="/catalog?topSellers=1">Browse all 60 →</a></p>
                     </div>
                     <div class="shelf-grid">
                         <article class="shelf-card">
                             <div class="shelf-photo">
+                                <span class="shelf-flag">Top seller</span>
                                 <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9148464" alt="PC61 cotton t-shirt" loading="lazy" width="280" height="230">
                             </div>
                             <div class="shelf-body">
-                                <span class="shelf-brand"><img src="https://cdnm.sanmar.com/catalog/images/portandcompanyheader.jpg" alt="Port & Company" loading="lazy"></span>
-                                <span class="shelf-style">PC61</span>
+                                <span class="shelf-id"><span class="shelf-code">PC61</span><span class="shelf-brand"><img src="https://cdnm.sanmar.com/catalog/images/portandcompanyheader.jpg" alt="Port &amp; Company" loading="lazy"></span></span>
                                 <h3 class="shelf-name">Essential Cotton T-Shirt</h3>
                                 <p class="shelf-desc">Classic 100% cotton tee — the workhorse for screen print, DTG, and everyday wear.</p>
                                 <a class="shelf-link" href="/product.html?style=PC61&amp;color=Jet+Black">View product →</a>
@@ -473,11 +566,11 @@
                         </article>
                         <article class="shelf-card">
                             <div class="shelf-photo">
+                                <span class="shelf-flag">Top seller</span>
                                 <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9171981" alt="Polar Camel 16 oz pint" loading="lazy" width="280" height="230">
                             </div>
                             <div class="shelf-body">
-                                <span class="shelf-brand"><img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9173436" alt="Polar Camel" loading="lazy"></span>
-                                <span class="shelf-style">LTM752</span>
+                                <span class="shelf-id"><span class="shelf-code">LTM752</span><span class="shelf-brand"><img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9173436" alt="Polar Camel" loading="lazy"></span></span>
                                 <h3 class="shelf-name">Polar Camel 16 oz Pint</h3>
                                 <p class="shelf-desc">Vacuum-insulated stainless pint, laser-engraved with your logo. Hot or cold.</p>
                                 <a class="shelf-link" href="/calculators/laser-tumbler-polarcamel.html">View product →</a>
@@ -485,11 +578,11 @@
                         </article>
                         <article class="shelf-card">
                             <div class="shelf-photo">
+                                <span class="shelf-flag">Top seller</span>
                                 <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9148462" alt="PC90H fleece hoodie" loading="lazy" width="280" height="230">
                             </div>
                             <div class="shelf-body">
-                                <span class="shelf-brand"><img src="https://cdnm.sanmar.com/catalog/images/portandcompanyheader.jpg" alt="Port & Company" loading="lazy"></span>
-                                <span class="shelf-style">PC90H</span>
+                                <span class="shelf-id"><span class="shelf-code">PC90H</span><span class="shelf-brand"><img src="https://cdnm.sanmar.com/catalog/images/portandcompanyheader.jpg" alt="Port &amp; Company" loading="lazy"></span></span>
                                 <h3 class="shelf-name">Ultimate Fleece Hoodie</h3>
                                 <p class="shelf-desc">Heavyweight pullover hoodie with serious warmth. Great for crews and crews' families.</p>
                                 <a class="shelf-link" href="/product.html?style=PC90H&amp;color=Royal">View product →</a>
@@ -497,39 +590,16 @@
                         </article>
                         <article class="shelf-card">
                             <div class="shelf-photo">
+                                <span class="shelf-flag">Top seller</span>
                                 <img src="https://c3eku948.caspio.com/dp/a0e150004df4984fb1ef4d30b01a/files/9148461" alt="Carhartt Detroit duck jacket" loading="lazy" width="280" height="230">
                             </div>
                             <div class="shelf-body">
-                                <span class="shelf-brand"><img src="https://cdnm.sanmar.com/catalog/images/Carharttheader.jpg" alt="Carhartt" loading="lazy"></span>
-                                <span class="shelf-style">CT103828</span>
+                                <span class="shelf-id"><span class="shelf-code">CT103828</span><span class="shelf-brand"><img src="https://cdnm.sanmar.com/catalog/images/Carharttheader.jpg" alt="Carhartt" loading="lazy"></span></span>
                                 <h3 class="shelf-name">Detroit Duck Jacket</h3>
                                 <p class="shelf-desc">Iconic blanket-lined workwear jacket — built for embroidered company logos.</p>
                                 <a class="shelf-link" href="/product.html?style=CT103828&amp;color=Carhartt+Brown">View product →</a>
                             </div>
                         </article>
-                    </div>
-                </div>
-            </section>
-
-            <section class="band" id="shop-categories">
-                <div class="wrap">
-                    <div class="band-head">
-                        <p class="band-eyebrow">The catalog</p>
-                        <h2>Shop by category</h2>
-                        <p class="band-sub">Thousands of styles, live from our supplier catalog — filter by brand, color, and price once you're in.</p>
-                    </div>
-                    <div class="cat-grid">
-                        <a class="cat-tile" href="/catalog?category=T-Shirts"><span class="cat-num">01</span><span class="cat-tile-name">T-Shirts</span><span class="cat-tile-go" aria-hidden="true">→</span></a>
-                        <a class="cat-tile" href="/catalog?category=Polos%2FKnits"><span class="cat-num">02</span><span class="cat-tile-name">Polos &amp; Knits</span><span class="cat-tile-go" aria-hidden="true">→</span></a>
-                        <a class="cat-tile" href="/catalog?category=Sweatshirts%2FFleece"><span class="cat-num">03</span><span class="cat-tile-name">Sweatshirts &amp; Fleece</span><span class="cat-tile-go" aria-hidden="true">→</span></a>
-                        <a class="cat-tile" href="/catalog?category=Caps"><span class="cat-num">04</span><span class="cat-tile-name">Caps</span><span class="cat-tile-go" aria-hidden="true">→</span></a>
-                        <a class="cat-tile" href="/catalog?category=Outerwear"><span class="cat-num">05</span><span class="cat-tile-name">Outerwear</span><span class="cat-tile-go" aria-hidden="true">→</span></a>
-                        <a class="cat-tile" href="/catalog?category=Workwear"><span class="cat-num">06</span><span class="cat-tile-name">Workwear</span><span class="cat-tile-go" aria-hidden="true">→</span></a>
-                        <a class="cat-tile" href="/catalog?category=Bags"><span class="cat-num">07</span><span class="cat-tile-name">Bags</span><span class="cat-tile-go" aria-hidden="true">→</span></a>
-                        <a class="cat-tile" href="/catalog?category=Ladies"><span class="cat-num">08</span><span class="cat-tile-name">Ladies</span><span class="cat-tile-go" aria-hidden="true">→</span></a>
-                        <a class="cat-tile" href="/catalog?category=Activewear"><span class="cat-num">09</span><span class="cat-tile-name">Activewear</span><span class="cat-tile-go" aria-hidden="true">→</span></a>
-                        <a class="cat-tile" href="/catalog?category=Woven%20Shirts"><span class="cat-num">10</span><span class="cat-tile-name">Woven Shirts</span><span class="cat-tile-go" aria-hidden="true">→</span></a>
-                        <a class="cat-tile cat-all" href="/catalog" id="allCategoriesTile">All categories →</a>
                     </div>
                 </div>
             </section>
