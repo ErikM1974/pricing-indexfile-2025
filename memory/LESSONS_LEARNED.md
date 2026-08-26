@@ -288,3 +288,45 @@ jsdom import of all 25 v3 modules, regex/date spot-checks.
   Derive prefixes from config/storefront-channels.js shapes, and test the digit-leading one.
 
 ---
+
+## Quote data plane locked down — 44 caller files, 2 repos, one gate flip left (2026-08-26)
+
+**Problem.** Step 2 of the 2026-08-17 review: the proxy's quote surface was anonymous.
+GET /api/quote_sessions with no filter dumped the ENTIRE customer book (no limiter, no
+auth — MEMORY's "rate limiter" claim was generous); quote_change_log and dtf/scp-push had
+NOTHING; push preview routes dumped full customer PII per quoteId; PUT quote_items let
+anyone rewrite prices on a live quote link.
+
+**Root Cause.** Browser call sites (~90 across 44 files) hit the proxy base directly, so
+the proxy could never require auth without breaking every page. The app ALSO exposed its
+own anonymous CRUD twin (/api/quote_sessions* etc.) that dropped query strings and sent
+no secret upstream.
+
+**Solution.** App `v2026.08.26.3` + proxy `v2026.08.26.2`, deployed app-first:
+app relays hardened (PUT/DELETE staff-only; POST anonymous behind quotePlaneWriteLimiter
+with staff skip; list reads staff-or-quoteID-scoped, query forwarded verbatim; NEW
+quote-sequence + 3×push relays), 19 live browser files migrated same-origin,
+withProxySecret() on every dyno→proxy quote call, e2e harnesses read the secret from env.
+Proxy: quotePlaneGate on all 8 prefixes, mode via QUOTE_PLANE_GATE config var
+(off→log→enforce, no deploy to flip). NOW IN LOG MODE — flip to enforce after the
+WOULD-BLOCK log goes quiet: `heroku config:set QUOTE_PLANE_GATE=enforce --app caspio-pricing-proxy`.
+
+**Prevention.**
+- 🔑 **A gate you can't flip without a deploy is a gate you'll ship scared.** Mode-switch
+  by config var: deploy dormant, watch in log mode, enforce when the log proves coverage.
+- 🔑 **Migrate by ENDPOINT grep, never by config swap** — 141 files hardcode the proxy
+  host, and 4 of the migrated files used their base for NON-quote endpoints too
+  (dtg top-sellers, quote-view thumbnails, /api/files uploads, sanmar-orders) — a blanket
+  base swap would have broken them. Audit EVERY use of a base const before flipping it.
+- 🔑 **The app's own passthrough routes silently dropped query strings** (GET
+  /api/quote_items forwarded bare for years — callers got ALL items). When hardening a
+  relay, forward `req.originalUrl`'s query verbatim; the upstream validates.
+- 🔴 **Postures are jest-locked in BOTH repos** (`tests/unit/quote-plane-postures.test.js`
+  app, `tests/jest/quote-plane-gate.test.js` proxy) — source-parsed mounts + behavioral
+  mode tests, so a refactor can't silently reopen the plane or unmount the gate.
+- 🔑 Shared-checkout deploys: THREE concurrent-session collisions in one day (trust band
+  committed onto main mid-deploy; sanmar css bumped into my release; proxy inbound commit
+  riding my proxy release). `git add -u` is never safe here — stage explicit file lists,
+  read `main..develop` before every merge.
+
+---
