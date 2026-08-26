@@ -952,6 +952,17 @@
         // it calls onChange → updateCtas as prices land.
         await initConfigurator();
         updateCtas();
+
+        // Honor a #pricingHeading deep link (Quick View's "Price it & add to
+        // quote", M-5): the browser's native anchor scroll fires before the
+        // async content above it renders, so the heading ends up ~1300px
+        // below the viewport — re-scroll once the page has real layout.
+        if (window.location.hash === '#pricingHeading') {
+            const target = $('pricingHeading');
+            // 'instant' overrides the page's smooth scroll-behavior — an
+            // arrival jump should not animate 1300px past the gallery.
+            if (target) target.scrollIntoView({ behavior: 'instant', block: 'start' });
+        }
     }
 
     function init() {
