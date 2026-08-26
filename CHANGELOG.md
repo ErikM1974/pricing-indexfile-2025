@@ -1,3 +1,11 @@
+## v2026.08.26.6 (2026.08.26)
+
+- Memory: M-6 one chrome deployed live v2026.08.26.5 + verification evidence
+- Memory: /memory-maintain — index 18.5->14.1KB, LESSONS 263->209 (2 archived), hardening entry backfilled, gotcha sub-fact preserved
+- Memory: third-party contract POs stay off the inbound board (Erik's call)
+- M-7 category tiles: homepage Ladies/Activewear/Woven Shirts + /catalog tile row on unfiltered browse
+- Deploy v2026.08.26.6: 1 files (catalog.html...)
+
 ## v2026.08.26.5 (2026.08.26)
 
 - M-6 one chrome: canonical nav/drawer on all 6 customer pages, brands + tumbler rechromed, webstore-info 301, homepage engine retired
