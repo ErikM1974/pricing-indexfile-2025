@@ -23,7 +23,7 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/shared_components/css/nwca-2026-core.css?v=2026.08.25.4">
-    <link rel="stylesheet" href="/pages/css/catalog-2026.css?v=2026.08.26.6">
+    <link rel="stylesheet" href="/pages/css/catalog-2026.css?v=2026.08.26.7">
     <link rel="stylesheet" href="/shared_components/css/cart-drawer.css?v=2026.07.06.7">
 </head>
 <body>
@@ -223,7 +223,7 @@
                 <strong>Fall Catalog '26 is here</strong>
                 <span>170+ new styles — MiiR, The North Face, Carhartt, Nike, Port Authority &amp; more</span>
             </span>
-            <span class="fall26-promo-cta">Explore the collection
+            <span class="fall26-promo-cta"><span class="fall26-cta-label">Explore the collection</span>
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="9 18 15 12 9 6"></polyline></svg>
             </span>
         </a>
@@ -250,6 +250,10 @@
                     </div>
                 </div>
                 <button class="btn btn-ghost filters-clear-btn" id="clearAllFilters" type="button" hidden>Clear all filters</button>
+                <!-- Mobile drawer only: sticky apply bar with the live result count -->
+                <div class="filters-apply-bar">
+                    <button class="btn btn-primary filters-apply-btn" id="filtersApply" type="button">Show results</button>
+                </div>
             </aside>
             <div class="filters-overlay" id="filtersOverlay"></div>
 
@@ -367,6 +371,6 @@
     <script src="/shared_components/js/cart-drawer.js?v=2026.07.06.7" defer></script>
     <script src="/pages/js/catalog-samples.js?v=2026.07.06.7" defer></script>
     <script src="/shared_components/js/express-eligibility.js?v=2026.08.25.4" defer></script>
-    <script src="/pages/js/catalog-2026.js?v=2026.08.26.6" defer></script>
+    <script src="/pages/js/catalog-2026.js?v=2026.08.26.7" defer></script>
 </body>
 </html>

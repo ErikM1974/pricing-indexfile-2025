@@ -204,7 +204,7 @@ would have silently beaten the drawer's `body.drawer-open { overflow: hidden }` 
 🔑 The chrome is STILL copy-pasted per page (build-time component = later refactor); the drift
 test is what keeps the 6 copies identical — edit one page's chrome = edit all 6 + the canon.
 
-## ✅ M-7 category tiles — BUILT 2026-08-26, committed on develop, NOT deployed
+## ✅ M-7 category tiles — DEPLOYED LIVE `v2026.08.26.6` (2026-08-26), byte-verified (homepage 3 new tile hrefs, #catTiles container, cat-tile-sm in live js+css bundles)
 
 Homepage: 3 tiles added (08 Ladies · 09 Activewear · 10 Woven Shirts → 11 tiles incl. the
 existing "All categories" tile). /catalog: `#catTiles` row above the grid, rendered by
@@ -216,10 +216,21 @@ no reload). Mobile ≤700px: one 46px horizontally-scrollable row, no page overf
 browser: 15 tiles → click Ladies → `?category=Ladies`, H1 Ladies, 48 cards, tiles hidden →
 clear-all → tiles back; `?q=` hides them. All gates green.
 
+## ✅ M-8 mobile filters — BUILT 2026-08-26, committed on develop, NOT deployed
+
+Three pieces, all ≤-breakpoint only (desktop byte-identical): (1) mobile filter drawer gets a
+sticky bottom apply bar — `#filtersApply` mirrors the live result count ("Show 3,408 results",
+updates as filters toggle behind the drawer, "Show 0 results" on empty, "Close" on error) and
+closes the drawer; pinned flush via `position: sticky; bottom: 0` INSIDE the scrolling rail.
+🔑 The rail's 24px bottom padding held the bar off the edge — sticky bottom pins at the
+scrollport edge, padding stays visible below; fix = drawer-mode `padding-bottom: 0`.
+(2) `.results-toolbar` sticky at 64px under the 63px masthead ≤960px (opaque --paper bg, z-50,
+below masthead z-90/drawers z-240). (3) Fall promo ≤560px collapses to ONE 47px line (badge +
+title + arrow; secondary copy + "Explore the collection" hidden — CTA text got a
+`.fall26-cta-label` wrapper to be hideable). Browser-verified at 375px + desktop 1280px.
+
 **CONTINUATION PLAN (Erik-approved roadmap, in order):**
-1. **M-8 mobile filters** — sticky "Show N results" bar in the filter drawer, sticky results
-   toolbar ≤960px, one-line promo ≤560px.
-2. **Richardson data question** — most Richardson caps live in Non_SanMar_Products and don't
+1. **Richardson data question** — most Richardson caps live in Non_SanMar_Products and don't
    surface under /catalog?brand=Richardson (only 5 SanMar rows); needs a look at the NS table
    rows / brand mapping (data, not code).
 

@@ -207,3 +207,29 @@ the proxy side of the reads was locked by the quote-plane gate (entry above).
 - 🔑 **Same-origin identity (`/api/crm-session/me`) beats a third-party auth embed** everywhere:
   no cross-site cookies, no injected CSS to quarantine, one auth source. If a page still embeds
   a Caspio DataPage just to display who is signed in, that is the replacement.
+
+## /inventorylevels served our wholesale costs and supplier to the internet — fixed with a projection, not a gate (2026-08-27)
+
+**Problem.** `GET /api/manageorders/inventorylevels` (proxy) is deliberately anonymous — its one
+live caller is the customer-facing laser-tumbler calculator — but it returned raw ManageOrders
+rows: `UnitCost`, `TotalCost`, `VendorName` (our supplier, "JDS Industries"), plus internal
+accounting fields (`GLAccount`, `FindCode`, `id_Vendor`, `ID_InvLevel`).
+
+**Root Cause.** The route forwarded upstream rows verbatim; "customer-facing" was decided at the
+ROUTE level with no thought to the FIELD level.
+
+**Solution.** Whitelist projection at the response boundary (`INVENTORY_PUBLIC_FIELDS` +
+`projectInventoryRows` in proxy `src/utils/manageorders.js`), applied on both the cache-hit and
+fresh-fetch paths. Caller inventory first proved the calculator reads only
+PartNumber/SKU/Color/Size01-06 (its `vendorName` passthrough is never rendered). Shipped proxy
+`v2026.08.26.4`; live-verified before/after — the leak fields are gone, sizes intact.
+
+**Prevention.**
+- 🔑 **An anonymous route's contract is its FIELD LIST, not its path.** Before leaving any route
+  open, print `sorted(rows[0].keys())` from the live response and justify every field. The gate
+  question ("who may call this?") and the projection question ("what may it say?") are separate.
+- 🔑 **Whitelist, never blacklist** — unknown upstream fields (ManageOrders can add columns any
+  time) must default to STRIPPED, and a no-drift test asserts projected rows carry only
+  whitelisted keys.
+- 🔑 **Prove a new lock goes RED**: `git stash` the fix, run the test (fails), pop, run again
+  (14/14 green). A lock that has never failed proves nothing (DURABLE_GOTCHAS § Verification).

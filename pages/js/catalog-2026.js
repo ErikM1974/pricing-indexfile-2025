@@ -75,6 +75,7 @@
         filtersOverlay: byId('filtersOverlay'),
         filterGroups: byId('filterGroups'),
         clearAllFilters: byId('clearAllFilters'),
+        filtersApply: byId('filtersApply'),
         crumbs: byId('catalogCrumbs'),
         title: byId('catalogTitle'),
         sub: byId('catalogSub'),
@@ -385,6 +386,7 @@
         els.pager.innerHTML = '';
         if (els.catTiles) { els.catTiles.hidden = true; }
         els.status.textContent = 'Catalog unavailable';
+        setApplyLabel('Close');
         els.alertSlot.innerHTML =
             '<div class="alert alert-error" role="alert">' +
             '<svg class="alert-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M10 1 1 18h18L10 1zm1 13h-2v2h2v-2zm0-7h-2v5h2V7z"/></svg>' +
@@ -575,6 +577,7 @@
             els.grid.innerHTML = emptyStateHtml();
             els.pager.innerHTML = '';
             els.status.textContent = '0 products';
+            setApplyLabel('Show 0 results');
             return;
         }
 
@@ -596,6 +599,13 @@
         els.status.textContent = total > rawProducts.length
             ? 'Showing ' + formatCount(start) + '–' + formatCount(end) + ' of ' + formatCount(total) + ' products'
             : formatCount(total) + ' product' + (total === 1 ? '' : 's');
+        setApplyLabel('Show ' + formatCount(total) + ' result' + (total === 1 ? '' : 's'));
+    }
+
+    /* Mobile filter drawer's sticky apply bar — mirrors the live result count
+       so a customer filtering behind the drawer knows what closing it shows. */
+    function setApplyLabel(text) {
+        if (els.filtersApply) els.filtersApply.textContent = text;
     }
 
     /* ── Pagination ──────────────────────────────────────────────── */
@@ -1540,6 +1550,7 @@
         els.filtersOpen.addEventListener('click', openFilters);
         els.filtersClose.addEventListener('click', closeFilters);
         els.filtersOverlay.addEventListener('click', closeFilters);
+        if (els.filtersApply) els.filtersApply.addEventListener('click', closeFilters);
 
         // Browse drawer close (open + overlay-close handled by app-modern.js)
         els.drawerClose.addEventListener('click', closeBrowseDrawer);
