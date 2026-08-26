@@ -1,3 +1,10 @@
+## v2026.08.25.4 (2026.08.25)
+
+- Memory: catalog CX deploys shipped + live-verified (proxy v2026.08.25.1, app v2026.08.25.3)
+- feat(bridge): buy-online lane on every surface — Erik's Option A (quote primary, express fast lane) + top-sellers-first landing
+- Memory: buy-online bridge + featured landing built (app cebfe7dc, proxy e24718e), pending deploy
+- Deploy v2026.08.25.4: 23 files (index.html, catalog.html, product.html...)
+
 ## v2026.08.25.3 (2026.08.25)
 
 - Memory: catalog CX overhaul stopping point — search-index fix state, live findings, pickup steps
