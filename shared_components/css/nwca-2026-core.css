@@ -878,3 +878,16 @@ img { max-width: 100%; }
     .nav-signin span { display: none; }
     .nav-signin { padding: 8px 10px; margin-left: 8px; }
 }
+
+/* ── Express buy-online lane (buy-online bridge, 2026-08-25) ─────────────
+   Quote stays the primary CTA; this is the clearly-signed small/fast lane
+   (quick view, PDP CTA card, homepage best-seller band). */
+.express-lane-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 10px; padding: 9px 14px; min-height: 40px;
+    font-size: 13.5px; font-weight: 700;
+    color: var(--green-900); background: var(--green-50);
+    border: 1.5px solid var(--green-100); border-radius: var(--radius-sm);
+}
+.express-lane-link:hover { background: var(--green-100); text-decoration: none; }
+

@@ -227,6 +227,25 @@
         }
         $('crumbStyle').textContent = state.style;
 
+        // Buy-online lane (bridge, 2026-08-25 — Erik's Option A): quote stays
+        // the primary CTA; eligible styles get the clearly-signed fast lane.
+        // Enhancement: any failure leaves the lane hidden, never an error.
+        if (window.ExpressEligibility) {
+            window.ExpressEligibility.get().then(function (elig) {
+                const sel = state.selected;
+                const link = elig.linkFor(state.style, sel && sel.name);
+                const lane = $('expressLane');
+                if (!lane || !link) return;
+                $('expressLaneNote').textContent = link.kind === 'caps'
+                    ? 'Just need caps, fast? Embroidered and paid online — 8-cap minimum, free setup.'
+                    : 'Need fewer than 24, fast? Full-color print, no minimum — checkout in minutes.';
+                const laneLink = $('expressLaneLink');
+                laneLink.href = link.url;
+                laneLink.textContent = 'Buy online now →';
+                lane.hidden = false;
+            }).catch(function () { /* lane stays hidden */ });
+        }
+
         // SEO — the server (lib/product-seo.js) injects a per-product head with
         // decoration-METHOD-aware titles, NWCA copy in the meta, and Product
         // JSON-LD. When that ran (title is no longer the static placeholder),
@@ -396,6 +415,13 @@
     function selectColor(color) {
         if (!color || (state.selected && color.catalog === state.selected.catalog)) return;
         state.selected = color;
+
+        // Keep the buy-online deep link on the customer's chosen color
+        const laneLink = $('expressLaneLink');
+        if (laneLink && laneLink.href && laneLink.href.indexOf('/custom-tees') !== -1) {
+            laneLink.href = '/custom-tees?style=' + encodeURIComponent(state.style)
+                + '&color=' + encodeURIComponent(color.name || '');
+        }
 
         Array.prototype.forEach.call($('swatchGrid').querySelectorAll('.pdp-swatch'), function (btn) {
             const c = state.colors[parseInt(btn.dataset.idx, 10)];

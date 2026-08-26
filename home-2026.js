@@ -115,4 +115,28 @@
             imgs[current].classList.add('is-active');
         }, 4500);
     });
+
+    // Buy-online links on the best-seller shelf (bridge, 2026-08-25).
+    // Eligibility comes from the express storefronts' own whitelists via
+    // ExpressEligibility; a card whose style isn't sellable online (or any
+    // load failure) simply keeps its single "View product" link.
+    ready(function () {
+        if (!window.ExpressEligibility) return;
+        window.ExpressEligibility.get().then(function (elig) {
+            document.querySelectorAll('.shelf-card .shelf-link[href*="/product.html?style="]').forEach(function (a) {
+                try {
+                    var style = new URL(a.href, window.location.origin).searchParams.get('style');
+                    var color = new URL(a.href, window.location.origin).searchParams.get('color');
+                    var link = elig.linkFor(style, color);
+                    if (!link || a.parentElement.querySelector('.express-lane-link')) return;
+                    var buy = document.createElement('a');
+                    buy.className = 'express-lane-link';
+                    buy.href = link.url;
+                    buy.textContent = 'Buy online →';
+                    buy.setAttribute('aria-label', link.label);
+                    a.parentElement.appendChild(buy);
+                } catch (e) { /* enhancement only */ }
+            });
+        });
+    });
 })();

@@ -79,3 +79,35 @@ parity checks after. ERIK DECISIONS pending: M-3 buy-online-bridge positioning (
 M-4 default sort top-sellers-first (changes what the store leads with). Medium roadmap M-1..M-10
 + layout proposal ("one store, two checkouts") in the audit synthesis — full text:
 session task file w3uc3z1aj.output; summarized in the CX plan artifact.
+
+## 🚀 2026-08-25 (late) — BOTH DEPLOYS SHIPPED AND VERIFIED LIVE
+
+- **Proxy `v2026.08.25.1`** (heroku release succeeded): boot warm-up ran on the production dyno
+  (log: "built: 4513 styles from 5039 grouped rows" with ZERO requests); never-seen searches on
+  LIVE: 0.42s / 0.42s / 0.74s (were 10-22s); decorated-cap 112 = $22.50 (was $23); Newest sort
+  200 (was 500); money-path smoke green (pricing-bundle, service-codes, quote_sessions).
+- **App `v2026.08.25.3`** (backend SHA bf8e007 verified via /api/version): all three rebuilt
+  bundles byte-verified live — catalog-2026 (fetchpriority), catalog-search (navigateToCatalog,
+  old LTM copy + /pricing/cap-embroidery route = 0), product-search-service ('See pricing'
+  present, ensureMargin = 0). Server price labels rendering on live /catalog cards.
+- Proxy jest 1,569/1,569 (one harness fix: products-search-route mocks now skip the index-build
+  fetch + reset the index cache per test). App gates all green; CI green.
+- Observed live, feeds M-1: /catalog?category=Caps&brand=Richardson page 1 shows only 5 cards
+  (price-split pagination) — the "honest counts" backend fix is now the top medium item.
+
+## 🌉 2026-08-25 (later) — BUY-ONLINE BRIDGE + FEATURED LANDING BUILT (committed, NOT deployed)
+
+Erik decided: **Option A** — quote primary for crews, express as the small/fast lane; and
+top-sellers-first landing approved. Built + locally verified end-to-end:
+- App `cebfe7dc`: new `shared_components/js/express-eligibility.js` (eligibility from the
+  storefronts' OWN whitelists; enhancement-only; jest ×5) · catalog card badges · QV lane ·
+  PDP two-lane (color-carrying, follows swatch changes) · homepage shelf links (PC61/PC90H) ·
+  /catalog browse default sort=featured.
+- Proxy `e24718e`: sort=featured (IsTopSeller in groupBy — MAX() invalid on bit; POST-HYDRATION
+  sort's default branch was re-alphabetizing and burying top sellers — taught it 'featured').
+- Verified: PDP lane → /custom-tees?style=PC54&color=Jet+Black opens the studio ON PC54 JET
+  BLACK; caps badge → CT105298 studio; featured page 1 = Bella+Canvas/Carhartt wall of best
+  sellers. ⏭️ Deploy PROXY first, then /deploy app (prod proxy without featured falls back
+  safely to old order — no breakage window). 🔑 products/search has TWO sort points: Caspio
+  orderBy AND a post-hydration array sort — a new sort value must teach BOTH.
+
