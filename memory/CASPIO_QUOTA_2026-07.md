@@ -18,6 +18,23 @@ the scattered one-liners; `CASPIO_SYNC_CLUSTER_COST.md` holds the per-job cluste
 The first four days are **25% of the whole period's calls from 13% of its days** — the
 expensive part is sunk, and breaching 500K would now take a sustained 15,400/day regression.
 
+## ✅ OUTCOME — the period closed 26 Aug 2026 at ~395,000 of 500,000 (79%)
+
+**~105,000 under the cap. No overage. $0 billed.**
+
+| Period | Used | vs 500K cap | Billed |
+|---|---:|---:|---:|
+| 27 Jun – 26 Jul | 689,800 | **178,874 OVER** | **$358** |
+| 27 Jul – 26 Aug | ~395,000 | 105,000 under | **$0** |
+
+A ~295K swing in one period, and the recurring ~$320/month is gone. Blended post-fix rate
+settled at **~11,300/day** against a 16,129 budget — 30% under, sustained for 27 days.
+
+🔑 **The four pre-fix days (27-30 Jul) were 84K — 21% of the whole period from 13% of its
+days.** Everything after them ran clean. That is the shape to expect from a fix landing
+mid-period, and it is why the first week of any period is where a regression is cheapest
+to catch.
+
 ⚠️ **ALWAYS DERIVE the budget** — the period is the 27th→26th and its LENGTH VARIES 28-31 days.
 
 ## What actually fixed it — measured before/after, not estimated
