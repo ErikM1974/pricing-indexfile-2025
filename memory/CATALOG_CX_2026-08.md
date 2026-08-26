@@ -79,3 +79,19 @@ parity checks after. ERIK DECISIONS pending: M-3 buy-online-bridge positioning (
 M-4 default sort top-sellers-first (changes what the store leads with). Medium roadmap M-1..M-10
 + layout proposal ("one store, two checkouts") in the audit synthesis — full text:
 session task file w3uc3z1aj.output; summarized in the CX plan artifact.
+
+## 🚀 2026-08-25 (late) — BOTH DEPLOYS SHIPPED AND VERIFIED LIVE
+
+- **Proxy `v2026.08.25.1`** (heroku release succeeded): boot warm-up ran on the production dyno
+  (log: "built: 4513 styles from 5039 grouped rows" with ZERO requests); never-seen searches on
+  LIVE: 0.42s / 0.42s / 0.74s (were 10-22s); decorated-cap 112 = $22.50 (was $23); Newest sort
+  200 (was 500); money-path smoke green (pricing-bundle, service-codes, quote_sessions).
+- **App `v2026.08.25.3`** (backend SHA bf8e007 verified via /api/version): all three rebuilt
+  bundles byte-verified live — catalog-2026 (fetchpriority), catalog-search (navigateToCatalog,
+  old LTM copy + /pricing/cap-embroidery route = 0), product-search-service ('See pricing'
+  present, ensureMargin = 0). Server price labels rendering on live /catalog cards.
+- Proxy jest 1,569/1,569 (one harness fix: products-search-route mocks now skip the index-build
+  fetch + reset the index cache per test). App gates all green; CI green.
+- Observed live, feeds M-1: /catalog?category=Caps&brand=Richardson page 1 shows only 5 cards
+  (price-split pagination) — the "honest counts" backend fix is now the top medium item.
+
