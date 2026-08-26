@@ -423,3 +423,18 @@
 }
 .pcard-buy:hover { background: var(--green-100); color: var(--green-900); text-decoration: none; }
 
+/* Swatch dots + quiet full-details link (Quick View CTA, M-5, 2026-08-26) */
+.pcard-swatches {
+    display: flex; align-items: center; gap: 4px; min-height: 20px; margin: 2px 0 0;
+}
+.pcard-swatch {
+    width: 14px; height: 14px; border-radius: 50%;
+    border: 1px solid var(--line-strong); object-fit: cover; flex: none;
+}
+.pcard-swatch-more { font-size: 11.5px; font-weight: 600; color: var(--ink-soft); margin-left: 2px; }
+.qv-details-alt {
+    display: inline-block; margin-top: 10px;
+    font-size: 13px; font-weight: 600; color: var(--ink-soft); text-decoration: underline;
+}
+.qv-details-alt:hover { color: var(--green-900); }
+

@@ -405,6 +405,25 @@
         return '<a class="pcard-price-link" href="' + escapeHtml(href) + '">See pricing →</a>';
     }
 
+    /** Up to 5 real swatch dots + the color count — decide-at-a-glance
+     *  (M-5, 2026-08-26). Colors lacking a swatch image are skipped; if none
+     *  have one, fall back to the plain "N colors" text. */
+    function buildSwatchRow(product, colorCount) {
+        var colors = Array.isArray(product.colors) ? product.colors : [];
+        var dots = '';
+        var shown = 0;
+        for (var i = 0; i < colors.length && shown < 5; i++) {
+            var c = colors[i];
+            if (!c || !c.swatchUrl) continue;
+            dots += '<img class="pcard-swatch" src="' + escapeHtml(c.swatchUrl) + '" alt="" loading="lazy" title="' + escapeHtml(c.name || '') + '">';
+            shown++;
+        }
+        var label = colorCount > 1 ? formatCount(colorCount) + ' colors' : '';
+        if (!shown) return '<p class="pcard-colors">' + (label || ' ') + '</p>';
+        var extra = colorCount > shown ? '<span class="pcard-swatch-more">+' + formatCount(colorCount - shown) + '</span>' : '';
+        return '<div class="pcard-swatches" aria-label="' + escapeHtml(label || 'colors') + '">' + dots + extra + '</div>';
+    }
+
     function buildCard(product) {
         buildCard._n = (buildCard._n || 0) + 1;
         var style = product.styleNumber || '';
@@ -433,7 +452,7 @@
             (product.brand ? '<span class="pcard-brand">' + escapeHtml(product.brand) + '</span>' : '') +
             '<span class="pcard-style">' + escapeHtml(style) + '</span>' +
             '<h3 class="pcard-name"><a href="' + escapeHtml(productUrl) + '">' + escapeHtml(product.productName || style) + '</a></h3>' +
-            '<p class="pcard-colors">' + (colorCount > 1 ? formatCount(colorCount) + ' colors' : ' ') + '</p>' +
+            buildSwatchRow(product, colorCount) +
             priceHtml(product) +
             // Sample-program slot (top-sellers view only) — filled by catalog-samples.js
             (state.topSellers ? '<div class="pcard-sample-slot" data-style="' + escapeHtml(style) + '"></div>' : '') +
@@ -1042,9 +1061,14 @@
         renderQuickView(product);
     }
 
-    function qvProductUrl(product, colorName) {
+    function qvProductUrl(product, colorName, anchor) {
         var url = '/product.html?style=' + encodeURIComponent(product.styleNumber || '');
         if (colorName) url += '&color=' + encodeURIComponent(colorName);
+        // '#pricingHeading' lands on the PDP's live configurator — the quick
+        // view already showed price/colors/sizes, so the primary CTA takes
+        // the customer to PRICING, not back to the top of a page they've
+        // effectively seen (M-5, 2026-08-26).
+        if (anchor) url += anchor;
         return url;
     }
 
@@ -1085,7 +1109,8 @@
                 ? '<div class="qv-section"><h3>Description</h3><p class="qv-desc">' + escapeHtml(product.description) + '</p></div>'
                 : '') +
             '<div class="qv-actions">' +
-            '<a class="btn btn-primary" id="qvDetailsLink" href="' + escapeHtml(qvProductUrl(product, selected && selected.name)) + '">View full product details</a>' +
+            '<a class="btn btn-primary" id="qvDetailsLink" href="' + escapeHtml(qvProductUrl(product, selected && selected.name, '#pricingHeading')) + '">Price it &amp; add to quote</a>' +
+            '<a class="qv-details-alt" id="qvDetailsAlt" href="' + escapeHtml(qvProductUrl(product, selected && selected.name)) + '">View full details</a>' +
             '</div>' +
             '<div id="qvExpressLane"></div>' +
             '</div></div>';
@@ -1124,7 +1149,9 @@
         if (img && color.productImageUrl) img.src = color.productImageUrl;
 
         var details = byId('qvDetailsLink');
-        if (details) details.href = qvProductUrl(qvProduct, color.name);
+        if (details) details.href = qvProductUrl(qvProduct, color.name, '#pricingHeading');
+        var detailsAlt = byId('qvDetailsAlt');
+        if (detailsAlt) detailsAlt.href = qvProductUrl(qvProduct, color.name);
         var pricing = byId('qvPricingLink');
         if (pricing) pricing.href = qvProductUrl(qvProduct, color.name);
 

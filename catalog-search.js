@@ -1872,9 +1872,9 @@ class CatalogSearch {
                                     class="btn-add-compare ${this.compareList.has(productData.styleNumber) ? 'active' : ''}">
                                 ${this.compareList.has(productData.styleNumber) ? '✓ Added to Compare' : 'Add To Compare'}
                             </button>
-                            <a href="/product.html?style=${productData.styleNumber}${selectedColor?.name ? `&color=${encodeURIComponent(selectedColor.name)}` : ''}"
+                            <a href="/product.html?style=${productData.styleNumber}${selectedColor?.name ? `&color=${encodeURIComponent(selectedColor.name)}` : ''}#pricingHeading"
                                id="quickViewDetailsLink" class="btn-full-details">
-                                View full Product Details
+                                Price it &amp; add to quote
                             </a>
                         </div>
                     </div>
@@ -1925,8 +1925,9 @@ class CatalogSearch {
             if (imageLink) imageLink.href = pdpHref;
             // Main CTA must carry the chosen color too — customers picked
             // their team color and used to land on the default (QW-9).
+            // '#pricingHeading' lands on the configurator (M-5).
             const detailsLink = document.getElementById('quickViewDetailsLink');
-            if (detailsLink) detailsLink.href = pdpHref;
+            if (detailsLink) detailsLink.href = pdpHref + '#pricingHeading';
         }
     }
 
