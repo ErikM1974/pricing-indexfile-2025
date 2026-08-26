@@ -1,18 +1,10 @@
 /* =====================================================
    STAFF DASHBOARD v3 — API ENDPOINT REGISTRY
-   Single source of truth for every URL the dashboard hits.
-   Reads BASE from window.APP_CONFIG.API.BASE_URL — never
-   hardcoded (Rule #7).
+   Every dashboard read is a SAME-ORIGIN path since 2026-08-27:
+   the SAML session cookie authenticates each request and the
+   server forwards to the proxy with the CRM secret. No module
+   here should ever hit the proxy base directly again.
    ===================================================== */
-
-const BASE = (typeof window !== 'undefined') ? window.APP_CONFIG?.API?.BASE_URL : null;
-
-if (!BASE) {
-    throw new Error(
-        '[dashboard] APP_CONFIG.API.BASE_URL is required. ' +
-        'Make sure /shared_components/js/app-config.js loads before any dashboard module.'
-    );
-}
 
 /* =====================================================
    Endpoint factories — call as functions so future
@@ -31,16 +23,15 @@ export const endpoints = {
     // never a rep's earnings. Compensation belongs on each rep's own Mission Control page.
     embroideryBonusTeam:    () => `/api/crm-proxy/embroidery-bonus/team`,
 
-    // Caspio archived per-rep daily sales
-    dailySalesByRepYTD: (year) => `${BASE}/caspio/daily-sales-by-rep/ytd?year=${encodeURIComponent(year)}`,
+    // Caspio archived per-rep daily sales — requireStaff relay to the proxy's
+    // /api/caspio/daily-sales-by-rep/ytd (per-rep company revenue is not public data)
+    dailySalesByRepYTD: (year) => `/api/staff/daily-sales-by-rep-ytd?year=${encodeURIComponent(year)}`,
 
     // Unreferenced factories pruned 2026-08-26 (garment-tracker trio pointed at
     // unmounted routes; lineItems/dailySalesByRep/crmSession/crmGapReport/
     // embroideryBonus{,Cfg,Dormant} had zero call sites). NOTE some widgets
     // still build same-origin URLs inline (/api/staff/payments/recent,
     // /api/staff/finished-photos/library, /api/staff/command-search,
-    // quote_sessions on the proxy base) — this registry covers the proxy-base
-    // and forwarder URLs the services share, not literally every URL.
+    // /api/staff/quote-sessions) — this registry covers the forwarder URLs
+    // the services share, not literally every URL.
 };
-
-export const apiBaseUrl = BASE;

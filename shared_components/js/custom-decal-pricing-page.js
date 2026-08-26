@@ -24,11 +24,11 @@
 
     // typeof-guarded so the unit test can require() this file outside a browser.
     //
-    // ⚠️ APP_CONFIG.API.BASE_URL means two different things in this repo:
-    // /config/app.config.js sets it WITHOUT a trailing /api, while
-    // staff-dashboard-v3/config.js sets it WITH one. This page loads the former,
-    // but normalize anyway — if the wrong config ever loads first, the request
-    // would silently become /api/api/... and 404 instead of failing loudly.
+    // ⚠️ APP_CONFIG.API.BASE_URL has been set both WITH and WITHOUT a trailing
+    // /api by different config bootstraps over time (/config/app.config.js is
+    // WITHOUT; the retired staff-dashboard-v3/config.js was WITH). Normalize —
+    // if a with-/api config ever loads first, the request would silently become
+    // /api/api/... and 404 instead of failing loudly.
     const RAW_BASE = (typeof window !== 'undefined' && window.APP_CONFIG
         && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL)
         || 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';

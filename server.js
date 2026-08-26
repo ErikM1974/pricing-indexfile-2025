@@ -106,6 +106,10 @@ dotenv.config();
 // STAFF DASHBOARD FORWARDERS (SAML-gated same-origin reads of secret-gated proxy data)
 //   GET /api/mo/orders[...]              — ManageOrders reads (PII airtight path, 2026-07-05)
 //   GET /api/staff/payments/recent       — Order_Payments ledger for the Money Collected widget (2026-07-06)
+//   GET /api/staff/quote-sessions        — Orders Inbox quote_sessions read (any staff; 2026-08-27)
+//   GET /api/staff/daily-sales-by-rep-ytd — Caspio archive per-rep YTD for team performance (any staff; 2026-08-27)
+//   GET /api/staff/artrequests           — Art Aging widget ArtRequests read (any staff; 2026-08-27)
+//   GET /api/staff/employees             — staff roster from lib/staff-roster.js (any staff; 2026-08-27 — was hardcoded in anonymously-served JS)
 //   GET /api/staff/finished-photos/library — company-wide finished-photo library w/ rep names (any staff; ~L4356, 2026-07-19)
 //   GET /api/staff/command-search        — Ctrl+K Everything Bar: proxy fan-out search across customers/orders/quotes/designs (any staff; 2026-07-20)
 //   ALL /api/crm-proxy/form-submissions* — Forms Inbox reads/updates (any staff; ~L3230, 2026-07-11)
@@ -3174,6 +3178,7 @@ app.get('/api/crm-session/me', (req, res) => {
     name: u.name,
     firstName: u.firstName,
     email: u.email || '',
+    role: u.role || '',
     permissions: u.permissions || []
   });
 });
@@ -5398,8 +5403,11 @@ app.get('/staff-dashboard-v3/index.html', requireStaff, (req, res) => {
   noCacheHeaders(res);
   res.sendFile(path.join(__dirname, 'staff-dashboard-v3', 'index.html'));
 });
-// Static assets under /staff-dashboard-v3/ (config.js, announcements-bootstrap.js,
-// caspio-isolation.js). Reuse staticOptions so these also send no-cache headers.
+// Static assets under /staff-dashboard-v3/ (config.js, quote-launcher.js,
+// past-due-badge.js, art-aging-widget.js). Reuse staticOptions so these also
+// send no-cache headers. ⚠️ Everything this mount serves is ANONYMOUS — the
+// requireStaff gates above cover only the .html; never put internal-only data
+// in these files (roster went to lib/ + /api/staff/employees for this reason).
 app.use('/staff-dashboard-v3', express.static(path.join(__dirname, 'staff-dashboard-v3'), staticOptions));
 
 app.get('/bundle-orders-dashboard.html', gateStaffPage, (req, res) => {
@@ -5962,6 +5970,52 @@ app.get('/api/staff/payments/recent', requireStaff, async (req, res) => {
   } catch (e) {
     console.error('[payments-forward]', e.message);
     res.status(502).json({ error: 'upstream_unavailable' });
+  }
+});
+
+// ── Staff-dashboard reads that used to hit the proxy base DIRECTLY (2026-08-27) ──
+// The dashboard's quote-book, per-rep-YTD and art-request reads bypassed the
+// same-origin forwarder pattern and called the public Heroku proxy, where those
+// routes are rate-limited but NOT authed. These three requireStaff relays move
+// the dashboard onto the airtight path (same shape as /api/mo/*), so the proxy
+// side can later be tightened to secret-only WITHOUT breaking this page.
+// ⚠️ That proxy lock is a separate staged migration (other public pages still
+// read these routes directly) — deploy relays everywhere FIRST, proxy gate LAST.
+function staffProxyForward(buildApiPath) {
+  return async (req, res) => {
+    if (!CRM_API_SECRET) return res.status(503).json({ error: 'not_configured' });
+    try {
+      const qi = req.originalUrl.indexOf('?');
+      const qs = qi >= 0 ? req.originalUrl.slice(qi) : '';
+      const url = `${CRM_API_BASE}/api/${buildApiPath(req)}${qs}`;
+      const r = await fetch(url, { headers: { 'X-CRM-API-Secret': CRM_API_SECRET }, signal: AbortSignal.timeout(15000) });
+      const body = await r.text();
+      res.status(r.status).type(r.headers.get('content-type') || 'application/json').send(body);
+    } catch (e) {
+      console.error('[staff-forward]', req.originalUrl, e.message);
+      res.status(502).json({ error: 'upstream_unavailable' });
+    }
+  };
+}
+app.get('/api/staff/quote-sessions', requireStaff, staffProxyForward(() => 'quote_sessions'));
+app.get('/api/staff/daily-sales-by-rep-ytd', requireStaff, staffProxyForward(() => 'caspio/daily-sales-by-rep/ytd'));
+app.get('/api/staff/artrequests', requireStaff, staffProxyForward(() => 'artrequests'));
+
+// Staff roster for the dashboard's Team widget + staff directory (2026-08-27).
+// The roster used to be hardcoded in shared_components/js/.../employees-service.js
+// (plus a dead legacy copy), both served ANONYMOUSLY by the static mounts — names,
+// birthdays, hire dates and termination dates readable by anyone. Same fix as
+// drive-access: data in lib/ (never statically served), read through a gated
+// route. requireStaff (not requirePageAccess) — this feeds the any-staff
+// dashboard home. To update the roster, edit lib/staff-roster.js and deploy.
+app.get('/api/staff/employees', requireStaff, (req, res) => {
+  try {
+    const roster = require('./lib/staff-roster');
+    res.set('Cache-Control', 'no-store');
+    res.json(roster);
+  } catch (e) {
+    console.error('[staff-roster] unreadable:', e.message);
+    res.status(500).json({ error: 'roster_unavailable' });
   }
 });
 

@@ -27,12 +27,11 @@
 (function () {
     'use strict';
 
-    // APP_CONFIG.API.BASE_URL already ends in '/api', so callers below append
-    // '/artrequests' (NOT '/api/artrequests' → '/api/api/…' 404). No literal
-    // fallback host: config.js is the ONE home for the proxy URL (Rule 6), and
-    // it loads synchronously in <head> before this deferred script runs — a
-    // missing config is a real failure and load() surfaces it visibly.
-    var API_BASE = window.APP_CONFIG && window.APP_CONFIG.API && window.APP_CONFIG.API.BASE_URL;
+    // Same-origin requireStaff relay (2026-08-27) — the SAML session cookie
+    // authenticates the request; the server forwards to the proxy's
+    // /api/artrequests with the CRM secret. This widget used to call the
+    // public proxy base directly (obscurity, not auth).
+    var API_BASE = '/api/staff';
 
     // Same "new status system" cutoff the Steve gallery/kanban use — pre-cutoff
     // records are on the legacy status vocabulary and would flood the red bucket.
@@ -196,10 +195,6 @@
         if (loading) return;
         var el = bodyEl();
         if (!el) return; // card not on this page — do nothing
-        if (!API_BASE) {
-            renderError('APP_CONFIG missing');
-            return;
-        }
         loading = true;
         el.innerHTML = '<div class="metrics-date-range">Loading art requests…</div>';
 

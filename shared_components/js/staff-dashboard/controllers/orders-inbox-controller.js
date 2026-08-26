@@ -17,7 +17,7 @@
      ordered something else since → a rep call list.
    ===================================================== */
 
-import { endpoints, apiBaseUrl } from '../core/dashboard-endpoints.js';
+import { endpoints } from '../core/dashboard-endpoints.js';
 import { dashboardFetchJson } from '../core/dashboard-fetch.js';
 import { events } from '../core/dashboard-events.js';
 import { escapeHtml, formatMoney, formatShortDate, formatRelativeTime } from '../core/dashboard-ui-utils.js';
@@ -90,8 +90,10 @@ async function loadOrdersInbox(forceRefresh = false) {
         // skipped the proxy's 5-minute cache and forced a fresh multi-page
         // Quote_Sessions read. It is now opt-in, and only the explicit refresh
         // action passes it. (2026-07-26 Caspio quota reduction)
+        // Same-origin requireStaff relay (2026-08-27) — this read used to hit
+        // the public proxy base directly, relying on obscurity instead of auth.
         rows = await dashboardFetchJson(
-            `${apiBaseUrl}/quote_sessions?createdAfter=${ymdDaysAgo(30)}` +
+            `/api/staff/quote-sessions?createdAfter=${ymdDaysAgo(30)}` +
             (forceRefresh ? '&refresh=true' : ''));
     } catch (err) {
         console.error('[OrdersInbox] load failed:', err);

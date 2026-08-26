@@ -40,14 +40,9 @@
     <!-- Phase 2 (2026-07-20): Ctrl+K command palette — the Everything Bar. -->
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/command-palette.css?v=2026.07.20.7">
 
-    <!-- Caspio CSS isolation (must load BEFORE the Caspio embed script in body).
-         Sets up a MutationObserver that disables any stylesheets Caspio's embed
-         injects into <head> at runtime (semantic.css, responsive576.css, etc).
-         Without this, Caspio's CSS overrides our dashboard colors ~500ms after
-         page load, producing a "flashes correct then reverts dim" bug. -->
-    <script src="/staff-dashboard-v3/caspio-isolation.js?v=20260514-ai-phase1"></script>
-    <!-- Config bootstrap (must load BEFORE the module) -->
-    <script src="/staff-dashboard-v3/config.js?v=20260512h"></script>
+    <!-- No config bootstrap: every dashboard read is a same-origin
+         /api/staff/* or /api/mo/* or /api/crm-proxy/* path since 2026-08-27,
+         so nothing on this page needs the proxy base URL. -->
 </head>
 <body>
 
@@ -57,14 +52,9 @@
         <div class="loading-text">Loading dashboard…</div>
     </div>
 
-    <!-- Hidden Caspio Authentication Container -->
-    <div class="caspio-auth" hidden>
-        <div id="auth-firstname">[@authfield:First_Name]</div>
-        <div id="auth-lastname">[@authfield:Last_Name]</div>
-        <div id="auth-email">[@authfield:Email]</div>
-        <div id="auth-role">[@authfield:Role]</div>
-        <script type="text/javascript" src="https://c3eku948.caspio.com/dp/a0e15000a0bb470ed2be4ec5943e/emb"></script>
-    </div>
+    <!-- Identity comes from /api/crm-session/me (auth-controller.js). The hidden
+         third-party Caspio auth DataPage embed that used to live here — and the
+         caspio-isolation.js CSS-blocking hack it required — were retired 2026-08-27. -->
 
     <div class="dashboard-container">
 
