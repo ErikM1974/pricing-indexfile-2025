@@ -1,3 +1,11 @@
+## v2026.08.26.5 (2026.08.26)
+
+- M-6 one chrome: canonical nav/drawer on all 6 customer pages, brands + tumbler rechromed, webstore-info 301, homepage engine retired
+- Memory: M-6 one chrome built (84ea8fbd, not deployed) — roadmap now M-7/M-8
+- Memory: Ship_To backfill done (100% drop-ship detection) + the Caspio paginator row-loss bug
+- Memory: Caspio paginator fixed — the traps to know if it is ever touched again
+- Deploy v2026.08.26.5: 20 files (brands.html,laser-tumbler-polarcamel.html,index.html...)
+
 ## v2026.08.26.4 (2026.08.26)
 
 - Inbound sheets: mark drop-ships, carry backorder/hold to every reader, stamp the page
