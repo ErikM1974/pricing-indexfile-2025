@@ -1,3 +1,10 @@
+## v2026.08.26.4 (2026.08.26)
+
+- Inbound sheets: mark drop-ships, carry backorder/hold to every reader, stamp the page
+- Memory: quote-plane lockdown shipped (app v2026.08.26.3 + proxy v2026.08.26.2, gate in log mode)
+- Memory: SanMar inbound stopping point + the psst-audit lesson
+- Deploy v2026.08.26.4: 4 files (ae-mission-control.html,quote-management.html,test-ae-mission-control.html,...)
+
 ## v2026.08.26.3 (2026.08.26)
 
 - Memory: M-5 deployed + live-verified (v2026.08.26.2); minified-bundle marker scare noted
