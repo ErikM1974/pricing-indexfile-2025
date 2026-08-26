@@ -133,3 +133,11 @@ sort key — sort scope = filter scope. ⏭️ BACKLOG: "Caps+Richardson" totals
 Richardson caps live in Non_SanMar_Products and don't surface under the brand filter; data
 question, not counts. ⏭️ Deploy proxy when Erik says go (app needs nothing).
 
+## 🚀 2026-08-26 — M-1 HONEST COUNTS DEPLOYED (proxy `v2026.08.26.1`) + LIVE-VERIFIED
+
+T-Shirts 48 full cards / total 388 / facet 388 · bare catalog total 3,408 (was "12,413") ·
+Top Sellers 67 · price_desc monotone · stylesearch deduped, no Discontinued. Suite 1,576/1,576.
+CX overhaul phases 1-3 all LIVE. ⏭️ REMAINING (roadmap): trust band (BLOCKED on Erik: Google
+rating + 2-3 named quotes) · M-5 QV-to-quote CTA · M-6 one chrome · M-7 category tiles ·
+M-8 mobile filters · Richardson/Non-SanMar brand-filter data question.
+
