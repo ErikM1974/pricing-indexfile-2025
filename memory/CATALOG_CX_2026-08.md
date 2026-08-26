@@ -120,3 +120,16 @@ screen = featured order with sort=featured sent; buy-online badges rendering (BC
 of the CX overhaul is fully shipped. ⏭️ NEXT: M-1 honest counts (top item), trust band blocked
 on Erik's Google rating + 2-3 named customer quotes, then M-5/M-6/M-7 per the roadmap.
 
+## 📊 2026-08-25 (later still) — M-1 HONEST COUNTS BUILT (proxy `dbc8be4`, committed+pushed, NOT deployed)
+
+One dedupe (one row per STYLE for EVERY request) fixed the family: totals/pagination/facets now
+count styles (bare catalog 3,408 was "12,413"; T-Shirts 388 was "1,537"; Top Sellers 67 was 379;
+category pages fill all 48 slots); product order = Phase-1 DB order (post-hydration re-sort
+retired); price sorts decided in JS on real min/max splits, $0/NULL junk last (CTK87 has a
+priceless Active row); Phase-2 variants carry the status filter (Discontinued-variant leakage);
+/stylesearch status-filtered + deduped (LPC54 ×2). Full suite 1,576/1,576; verified on live data.
+🔑 Accepted residue: blank-category rows (5280) make displayed from-price wobble vs in-category
+sort key — sort scope = filter scope. ⏭️ BACKLOG: "Caps+Richardson" totals only 5 — most
+Richardson caps live in Non_SanMar_Products and don't surface under the brand filter; data
+question, not counts. ⏭️ Deploy proxy when Erik says go (app needs nothing).
+
