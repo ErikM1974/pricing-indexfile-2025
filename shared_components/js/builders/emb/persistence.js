@@ -24,7 +24,7 @@ import { collectProductsFromTable, onShipMethodChange, recalculatePricing, updat
 import { updateAdditionalCharges, updateDiscountType } from './quote-lifecycle.js';
 import { _syncALArrays, handleCapEmbellishmentChange, mapStitchCountToTierValue, updateNotesBadge } from './logo-config.js';
 import { addManualServiceRow, addNewRow, createChildRow, createServiceProductRow, dateFromInputValue, dateToInputValue, onSizeChange, onStyleChange, selectColor, updateCapLogoSectionVisibility, updateGarmentLogoSectionVisibility, updateLogoCardHeader } from './product-rows.js';
-import { embState, EMB_DEFAULTS, SIZE06_EXTENDED_SIZES, API_BASE } from './state.js';
+import { embState, EMB_DEFAULTS, SIZE06_EXTENDED_SIZES } from './state.js';
 
 // Module state — was window._* flags (Batch 3.4, 2026-07-09); nothing outside this file reads them.
 let _pendingLtmState = null;    // LTM panel state parked until the panel exists during restore
@@ -664,7 +664,7 @@ export async function loadQuoteForEditing(quoteId, opts = {}) {
         // Fire-and-forget; silence on failure (telemetry, not pricing).
         (async () => {
             try {
-                const resp = await fetch(`${API_BASE}/api/quote_analytics?quoteID=${encodeURIComponent(quoteId)}&eventType=customer_view`);
+                const resp = await fetch(`/api/quote_analytics?quoteID=${encodeURIComponent(quoteId)}&eventType=customer_view`);
                 if (!resp.ok) return;
                 const events = await resp.json();
                 if (!Array.isArray(events) || events.length === 0) return;

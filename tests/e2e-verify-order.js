@@ -55,6 +55,19 @@ if (typeof document === 'undefined') {
 
 const BASE_URL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 
+// Quote-plane lockdown (2026-08): the proxy's quote routes are secret-gated.
+// Wrap fetch ONCE so every proxy call in this harness carries the CRM secret
+// when the env provides it (set CRM_API_SECRET in .env or the shell).
+{
+  const _fetch = global.fetch;
+  global.fetch = (url, opts = {}) => {
+    if (String(url).startsWith(BASE_URL) && process.env.CRM_API_SECRET) {
+      opts = { ...opts, headers: { ...(opts.headers || {}), 'X-CRM-API-Secret': process.env.CRM_API_SECRET } };
+    }
+    return _fetch(url, opts);
+  };
+}
+
 const ShopWorksImportParser = require('../shared_components/js/shopworks-import-parser');
 const EmbroideryPricingCalculator = require('../shared_components/js/embroidery-quote-pricing');
 

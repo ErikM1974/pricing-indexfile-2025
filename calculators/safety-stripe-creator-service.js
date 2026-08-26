@@ -5,7 +5,7 @@
 
 class SafetyStripeQuoteService {
     constructor() {
-        this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        this.baseURL = ''; // same-origin since the 2026-08-26 quote-plane lockdown (rate-limited public relays)
         this.quotePrefix = 'SSC'; // Safety Stripe Creator
     }
 

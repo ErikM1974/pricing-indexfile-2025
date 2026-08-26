@@ -57,7 +57,7 @@
     async function fetchSession() {
         // refresh=true: the proxy caches lookups for 5 min — without it this
         // poll would never see the webhook flip the status to Processed.
-        const res = await fetch(`${API_BASE}/api/quote_sessions?quoteID=${encodeURIComponent(quoteID)}&refresh=true`);
+        const res = await fetch(`/api/quote_sessions?quoteID=${encodeURIComponent(quoteID)}&refresh=true`);
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const rows = await res.json();
         const list = Array.isArray(rows) ? rows : (rows.data || []);

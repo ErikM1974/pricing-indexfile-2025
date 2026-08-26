@@ -91,8 +91,7 @@ export async function openScpPushPreview() {
     if (typeof openAccessibleModal === 'function') openAccessibleModal(modal, { label: 'Push to ShopWorks preview', onEsc: closeScpPushPreview }); // 1.8
 
     try {
-        const apiBase = window.APP_CONFIG.API.BASE_URL;
-        const resp = await fetch(`${apiBase}/api/scp-push/preview/${encodeURIComponent(scpState._scpPushQuoteId)}`);
+        const resp = await fetch(`/api/scp-push/preview/${encodeURIComponent(scpState._scpPushQuoteId)}`);
         const data = await resp.json();
         if (!resp.ok) throw new Error(data.error || data.details || `HTTP ${resp.status}`);
         renderScpPushPreview(data.orderJson || {});
@@ -174,8 +173,7 @@ export async function confirmScpPush(directFallback) {
     }
 
     try {
-        const apiBase = window.APP_CONFIG.API.BASE_URL;
-        const response = await fetch(`${apiBase}/api/scp-push/push-quote`, {
+        const response = await fetch(`/api/scp-push/push-quote`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ quoteId: scpState._scpPushQuoteId, isTest: false, force: false }),

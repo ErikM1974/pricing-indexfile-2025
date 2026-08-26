@@ -7,7 +7,7 @@
 class BaseQuoteService {
     constructor(config = {}) {
         // Common configuration
-        this.baseURL = 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
+        this.baseURL = ''; // same-origin since the 2026-08-26 quote-plane lockdown (rate-limited public relays)
         
         // Calculator-specific configuration
         this.prefix = config.prefix || 'QUOTE';  // e.g., 'DTG', 'EMB', 'RICH'

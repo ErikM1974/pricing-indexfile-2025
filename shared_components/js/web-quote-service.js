@@ -174,7 +174,7 @@
      */
     WebQuoteService.prototype.generateQuoteID = async function () {
         try {
-            var resp = await this.fetch(this.apiBase + '/api/quote-sequence/' + QUOTE_PREFIX);
+            var resp = await this.fetch('/api/quote-sequence/' + QUOTE_PREFIX);
             if (!resp.ok) throw new Error('API returned ' + resp.status);
             var data = await resp.json();
             return {
@@ -548,7 +548,7 @@
         // 5. POST session, then items ---------------------------------------
         var sessionResp;
         try {
-            sessionResp = await this._fetchWithRetry(this.apiBase + '/api/quote_sessions', {
+            sessionResp = await this._fetchWithRetry('/api/quote_sessions', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payloads.session)
@@ -565,7 +565,7 @@
         var failedItems = 0;
         for (var i = 0; i < payloads.items.length; i++) {
             try {
-                var itemResp = await this._fetchWithRetry(this.apiBase + '/api/quote_items', {
+                var itemResp = await this._fetchWithRetry('/api/quote_items', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payloads.items[i])

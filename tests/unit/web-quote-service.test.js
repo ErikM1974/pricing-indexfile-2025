@@ -183,7 +183,9 @@ describe('QuoteID minting (WQ prefix)', () => {
         const id = await svc.generateQuoteID();
         expect(id.quoteId).toBe('WQ-2026-042');
         expect(id.usedFallback).toBe(false);
-        expect(mocks.fetchMock).toHaveBeenCalledWith('https://api.test/api/quote-sequence/WQ');
+        // Same-origin since the 2026-08-26 quote-plane lockdown — the mint
+        // goes through the app's rate-limited relay, never the proxy base.
+        expect(mocks.fetchMock).toHaveBeenCalledWith('/api/quote-sequence/WQ');
     });
 
     test('sequence API down → WQmmdd-nnnn fallback flagged for a visible warning', async () => {

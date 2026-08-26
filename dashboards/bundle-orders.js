@@ -129,7 +129,7 @@ function viewLogoFullSize(externalKey) {
 async function loadSampleRequests() {
     try {
         // Get all sample request sessions
-        const response = await fetch('https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_sessions');
+        const response = await fetch('/api/quote_sessions');
 
         if (!response.ok) {
             throw new Error('Failed to fetch sample requests');
@@ -147,7 +147,7 @@ async function loadSampleRequests() {
             // For Christmas and BCA bundles, fetch items to get delivery method
             if (request.QuoteID && (request.QuoteID.startsWith('XMAS') || request.QuoteID.startsWith('BCA'))) {
                 try {
-                    const itemsResponse = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_items?quoteID=${encodeURIComponent(request.QuoteID)}`);
+                    const itemsResponse = await fetch(`/api/quote_items?quoteID=${encodeURIComponent(request.QuoteID)}`);
                     if (itemsResponse.ok) {
                         const items = await itemsResponse.json();
                         if (items && items.length > 0 && items[0].DeliveryMethod) {
@@ -291,7 +291,7 @@ async function viewSampleDetails(quoteID) {
         if (!request) throw new Error('Request not found');
 
         // Fetch the items using QuoteID (now unique with timestamp+random generation)
-        const itemsResponse = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_items?quoteID=${encodeURIComponent(quoteID)}`);
+        const itemsResponse = await fetch(`/api/quote_items?quoteID=${encodeURIComponent(quoteID)}`);
         const items = await itemsResponse.json();
 
         // For Christmas bundles, fetch size upcharges for pricing calculation
@@ -1658,7 +1658,7 @@ async function downloadOrderPDF() {
         }
 
         // Fetch the items
-        const itemsResponse = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_items?quoteID=${encodeURIComponent(currentRequestID)}`);
+        const itemsResponse = await fetch(`/api/quote_items?quoteID=${encodeURIComponent(currentRequestID)}`);
         const items = await itemsResponse.json();
 
         let doc;
@@ -1733,7 +1733,7 @@ async function updateSalesRep(quoteID, salesRep) {
         }
 
         // Update via API
-        const sessionResponse = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_sessions/${request.PK_ID}`, {
+        const sessionResponse = await fetch(`/api/quote_sessions/${request.PK_ID}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -1779,7 +1779,7 @@ async function markAsProcessed() {
             throw new Error('Request ID not found');
         }
 
-        const response = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_sessions/${request.PK_ID}`, {
+        const response = await fetch(`/api/quote_sessions/${request.PK_ID}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -1817,7 +1817,7 @@ async function archiveRequest() {
             throw new Error('Request ID not found');
         }
 
-        const response = await fetch(`https://caspio-pricing-proxy-ab30a049961a.herokuapp.com/api/quote_sessions/${request.PK_ID}`, {
+        const response = await fetch(`/api/quote_sessions/${request.PK_ID}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'

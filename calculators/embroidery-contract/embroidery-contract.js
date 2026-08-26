@@ -1699,7 +1699,7 @@ var AI_ENDPOINT = '/api/contract-embroidery-ai/chat';
         if (aiState.quoteIDPromise) return aiState.quoteIDPromise;
         aiState.quoteIDPromise = (async function () {
             try {
-                var r = await fetch(API_BASE_URL + '/api/quote-sequence/CEMB');
+                var r = await fetch('/api/quote-sequence/CEMB');
                 if (!r.ok) throw new Error('quote-sequence returned ' + r.status);
                 var d = await r.json();
                 aiState.quoteID = d.prefix + '-' + d.year + '-' + String(d.sequence).padStart(3, '0');
@@ -1825,7 +1825,7 @@ var AI_ENDPOINT = '/api/contract-embroidery-ai/chat';
         var cfBundle = opts.cfBundle || null;  // Phase 7: shipping + tax info
         if (!calcContext) throw new Error('calcContext required');
 
-        var proxyBase = API_BASE_URL;
+        var proxyBase = ''; // same-origin since the 2026-08-26 quote-plane lockdown
 
         // 1. Reuse the pre-generated CEMB ID when available; otherwise burn
         // a fresh one (legacy save path / panel where ensureQuoteID failed).

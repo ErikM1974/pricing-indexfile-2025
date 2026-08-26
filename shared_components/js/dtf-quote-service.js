@@ -13,7 +13,10 @@
 
 class DTFQuoteService {
     constructor() {
-        this.baseURL = `${window.APP_CONFIG.API.BASE_URL}/api`;
+        // Same-origin since the 2026-08-26 quote-plane lockdown. NOTE this
+        // service writes URLs WITHOUT '/api' (the base carries it) — keep the
+        // '/api' suffix here or every call 404s.
+        this.baseURL = '/api';
         this.quotePrefix = 'DTF';
 
         // Initialize EmailJS

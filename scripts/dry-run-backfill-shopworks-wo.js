@@ -45,8 +45,11 @@ function isoDaysAgo(n) { const d = new Date(); d.setDate(d.getDate() - n); retur
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
 async function getJSON(url, { retries = 2 } = {}) {
+  // Quote-plane lockdown (2026-08): proxy quote routes are secret-gated —
+  // set CRM_API_SECRET in the env to read them.
+  const headers = process.env.CRM_API_SECRET ? { 'X-CRM-API-Secret': process.env.CRM_API_SECRET } : {};
   for (let attempt = 0; attempt <= retries; attempt++) {
-    const r = await fetch(url);
+    const r = await fetch(url, { headers });
     if (r.status === 429 && attempt < retries) {
       console.log(`  …429 rate-limited, waiting 60s (attempt ${attempt + 1})`);
       await sleep(61000);

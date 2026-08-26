@@ -123,7 +123,9 @@ class QuoteViewPage {
             let staffBrowser = false;
             try { staffBrowser = !!localStorage.getItem('nwca_staff'); } catch (_) {}
             if (this.quoteData && !this.isStaff && !staffBrowser) {
-                fetch(`${this.apiBaseUrl}/api/quote_analytics`, {
+                // Same-origin (2026-08-26 lockdown) — the app relays the beacon
+                // to the secret-gated proxy behind a rate limiter.
+                fetch(`/api/quote_analytics`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -2588,7 +2590,7 @@ class QuoteViewPage {
         this._timelineViews = null;
         if (this.isStaff) {
             try {
-                const resp = await fetch(`${this.apiBaseUrl}/api/quote_analytics?quoteID=${encodeURIComponent(this.quoteId)}&eventType=customer_view`);
+                const resp = await fetch(`/api/quote_analytics?quoteID=${encodeURIComponent(this.quoteId)}&eventType=customer_view`, { credentials: 'same-origin' });
                 if (resp.ok) {
                     const events = await resp.json();
                     if (Array.isArray(events) && events.length > 0) {
@@ -5163,8 +5165,11 @@ class QuoteViewPage {
         btn.style.opacity = '0.6';
 
         try {
-            const response = await fetch(`${this.apiBaseUrl}${route.api}`, {
+            // Same-origin (2026-08-26 lockdown) — push is a STAFF action; the
+            // app's requireStaff relay forwards to the proxy with the secret.
+            const response = await fetch(`${route.api}`, {
                 method: 'POST',
+                credentials: 'same-origin',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     quoteId: this.quoteId,

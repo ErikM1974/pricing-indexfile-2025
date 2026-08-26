@@ -316,7 +316,7 @@ const AI_ENDPOINT = '/api/dtg-quote-ai/chat';
         if (aiState.quoteIDPromise) return aiState.quoteIDPromise;
         aiState.quoteIDPromise = (async () => {
             try {
-                const r = await fetch(API_BASE_URL + '/api/quote-sequence/' + QUOTE_PREFIX);
+                const r = await fetch('/api/quote-sequence/' + QUOTE_PREFIX);
                 if (!r.ok) throw new Error('quote-sequence ' + r.status);
                 const d = await r.json();
                 aiState.quoteID = `${d.prefix}-${d.year}-${String(d.sequence).padStart(3, '0')}`;
@@ -1557,7 +1557,7 @@ const AI_ENDPOINT = '/api/dtg-quote-ai/chat';
 
             if (isEditMode) {
                 // PUT existing session by PK_ID (Caspio update)
-                const putRes = await fetch(`${API_BASE_URL}/api/quote_sessions/${window._dtgEditingPK_ID}`, {
+                const putRes = await fetch(`/api/quote_sessions/${window._dtgEditingPK_ID}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(sessionPayload),
@@ -1573,7 +1573,7 @@ const AI_ENDPOINT = '/api/dtg-quote-ai/chat';
                 // dupes in quote-view but the latest revision wins on amount).
                 try {
                     const existingRes = await fetch(
-                        `${API_BASE_URL}/api/quote_items?QuoteID=${encodeURIComponent(effectiveQuoteID)}`
+                        `/api/quote_items?QuoteID=${encodeURIComponent(effectiveQuoteID)}`
                     );
                     if (existingRes.ok) {
                         const existing = await existingRes.json();
@@ -1582,7 +1582,7 @@ const AI_ENDPOINT = '/api/dtg-quote-ai/chat';
                             if (!oi || !oi.PK_ID) continue;
                             try {
                                 const delRes = await fetch(
-                                    `${API_BASE_URL}/api/quote_items/${oi.PK_ID}`,
+                                    `/api/quote_items/${oi.PK_ID}`,
                                     { method: 'DELETE' }
                                 );
                                 if (!delRes.ok) {
@@ -1598,7 +1598,7 @@ const AI_ENDPOINT = '/api/dtg-quote-ai/chat';
                 }
             } else {
                 // CREATE — original flow
-                const sessionRes = await fetch(API_BASE_URL + '/api/quote_sessions', {
+                const sessionRes = await fetch('/api/quote_sessions', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(sessionPayload),
@@ -1650,7 +1650,7 @@ const AI_ENDPOINT = '/api/dtg-quote-ai/chat';
                 });
             }
             for (const it of items) {
-                const r = await fetch(API_BASE_URL + '/api/quote_items', {
+                const r = await fetch('/api/quote_items', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(it),
