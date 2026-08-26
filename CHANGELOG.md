@@ -1,3 +1,10 @@
+## v2026.08.25.3 (2026.08.25)
+
+- Memory: catalog CX overhaul stopping point — search-index fix state, live findings, pickup steps
+- feat(catalog-cx): quick-win batch from the 19-agent CX audit — one price voice, real store everywhere, express bridge plumbing
+- Memory: catalog CX quick wins implemented — status + deploy order + pending Erik decisions
+- Deploy v2026.08.25.3: 9 files (brands.html, index.html, catalog.html...)
+
 ## v2026.08.25.2 (2026.08.25)
 
 - Memory: non-ASCII Caspio writes need Python ensure_ascii, not git-bash curl
