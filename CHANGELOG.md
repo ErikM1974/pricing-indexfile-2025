@@ -1,3 +1,14 @@
+## v2026.08.26.1 (2026.08.26)
+
+- Memory: bridge + featured landing deployed and live-verified (proxy v2026.08.25.2, app v2026.08.25.4)
+- Memory: M-1 honest counts built (proxy dbc8be4), pending deploy
+- Memory: M-1 deployed live (proxy v2026.08.26.1) — CX phases 1-3 all shipped
+- Staff dashboard review: fix 13 confirmed defects across 23 files
+- Memory: record the period outcome -- ~395K of 500K, no overage
+- Staff dashboard hardening: gate the roster, relay proxy reads, retire the Caspio embed
+- Deploy v2026.08.26.1: 3 files (custom-decal-pricing.html, index.html, test-embroidery-bonus.html...)
+- feat(trust): real Google reviews at every decision point — 4.9★ badge + named quotes (M-9, Erik-approved picks) [committed to main mid-release by a concurrent session; ships in this release]
+
 ## v2026.08.25.4 (2026.08.25)
 
 - Memory: catalog CX deploys shipped + live-verified (proxy v2026.08.25.1, app v2026.08.25.3)
