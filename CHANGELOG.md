@@ -1,3 +1,7 @@
+## v2026.08.26.11 (2026.08.26)
+
+- Revert "Deploy v2026.08.26.10: homepage catalog redesign — one door (Option D + search): brand rail, category cut-rows, code-forward best sellers"
+
 ## v2026.08.26.10 (2026.08.26)
 
 - Deploy v2026.08.26.10: homepage catalog redesign — one door (Option D + search): brand rail, category cut-rows, code-forward best sellers
