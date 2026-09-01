@@ -1,6 +1,6 @@
 ﻿# Active Files Registry
-**Last Updated:** 2026-07-24
-**Total Active Files:** 598 (HTML+JS+CSS, excludes `node_modules/`, `.git/`, `tests/`, `.claude/`, `archive-working-files/`)
+**Last Updated:** 2026-09-01
+**Total Active Files:** 1063 (HTML+JS+CSS, excludes `node_modules/`, `.git/`, `tests/`, `.claude/`, `archive-working-files/`)
 **Purpose:** Track all active files to prevent orphaned code accumulation
 **Audit cadence:** Quarterly. Bump the timestamp on every file create/delete/move (CLAUDE.md Top 8 Rule #5).
 
@@ -934,7 +934,7 @@
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
 | ~~`/shared_components/js/dtf-quote-adapter.js`~~ | **DELETED 2026-06-09** — orphaned DTF quote adapter carrying a full hardcoded DTF price grid (re-wire trap). Zero script refs. | — | ❌ Deleted |
-| `/shared_components/js/dtf-quote-page.js` | DTF quote page initialization | — | ✅ Active |
+| ~~`/shared_components/js/dtf-quote-page.js`~~ | ~~DELETED~~ DTF quote page initialization — migrated into `builders/dtf/page-ui.js` (2026-07-09 Batch 4.3) | — | ❌ Deleted |
 
 ### Embroidery Extended Services
 | File | Purpose | Dependencies | Status |
@@ -1043,6 +1043,12 @@
 | `/shared_components/js/laser-tumbler-simple.js` | Simple laser tumbler quote flow | jds-api-service.js | ✅ Active |
 | `/shared_components/js/laser-tumbler-mockup.js` | Customer logo mockup + instant quote on the laser tumbler page — page's 4 colors only, logo upload w/ artwork warnings, drag/size canvas preview, PNG download, qty→price via formula pricing | jds-tumbler-template.js, jds-api-service.js, laser-tumbler-simple.js, /api/jds-catalog | ✅ Active |
 | `/shared_components/js/dp5-helper.js` | Embroidery pricing UI helper — bridges hidden Caspio matrix to custom UI | Caspio datapage | ✅ Active |
+| `/shared_components/js/nwca-date-utils.js` | **NEW** Generic date helpers (non-Caspio-specific) — use `caspio-date-utils.js` for Caspio timestamp parsing; this covers general formatting/arithmetic utilities | — | ✅ Active |
+| `/shared_components/js/company-contact-picker.js` | **NEW** Hybrid grouped Company + Contact autocomplete for AE intake forms — replaces wall-of-duplicates pattern; groups contacts under their company so "Northwest Custom Apparel" appears once, not once per contact | /api/company-contacts-2026/search | ✅ Active |
+| `/shared_components/js/design-name-picker.js` | **NEW** Customer-scoped design autocomplete for AE intake forms — queries `/api/digitized-designs/search-all` (Caspio Design_Lookup_2026, synced daily from ShopWorks) | /api/digitized-designs/search-all | ✅ Active |
+| `/shared_components/js/work-order-picker.js` | **NEW** Browse-on-focus picker for ShopWorks Work Order # on AE intake forms — mirrors DesignNamePicker UX, sources data from ManageOrders rather than Caspio | ManageOrders API | ✅ Active |
+| `/shared_components/js/jds-catalog-service.js` | **NEW** Frontend wrapper for `/api/jds-catalog` endpoints — curated NWCA-side product metadata for the AE JDS intake picker | /api/jds-catalog, /api/jds/products/:sku | ✅ Active |
+| `/shared_components/js/jds-submit-form.js` | **NEW** AE JDS vendor product art request submit form — custom form for AEs to submit JDS Industries product art requests (laser tumblers, mugs, awards, plaques, pens, leather patches) to Steve | jds-catalog-service.js, ae-dashboard.html | ✅ Active |
 
 ### Staff Auth & Misc Dashboards
 | File | Purpose | Dependencies | Status |
@@ -1145,6 +1151,7 @@
 | `/shared_components/css/mockup-submit-form.css` | Mockup submit form styles | mockup-submit-form | ✅ Active |
 | `/shared_components/css/sticker-banner-submit-form.css` | **NEW** Sticker/Banner intake form + Item-Type pill bar styles (ae-dashboard Submit Artwork tab) | ae-dashboard.html | ✅ Active |
 | `/shared_components/css/garment-submit-form.css` | **NEW (2026-06-17)** Garment art-request form styles (.gsf-* — sections, garment rows, location rows, AE checklist, style autocomplete) | ae-dashboard.html | ✅ Active |
+| `/shared_components/css/jds-submit-form.css` | **NEW** JDS vendor-product intake form styles (.jds-* prefix) — styling for the AE JDS art-request form (Submit Artwork to Steve tab, 4th pill on ae-dashboard) | ae-dashboard.html, jds-submit-form.js | ✅ Active |
 | `/shared_components/css/sticker-pricing-page.css` | **NEW (2026-05-15)** NWCA green theme, right-side drawer chat panel, row-highlight animation on AI-quoted SKU, dark-blue banner rate-card grid + live banner-quote card, and all `.decal-*` rules. ⚠️ **The name is stale** — its original page was retired 2026-07-29 and it is now shared by 6 others (emblem, webstores, DTG + EMB builders, embroidery-chat's `.ai-chat-*` classes, custom-decal-pricing). **Do not delete or rename without touching all six**, and never load it alongside `instant-quote.css` — both redefine core tokens. | custom-decal-pricing.html, embroidered-emblem, webstores, dtg/emb quote builders, embroidery-chat.js | ✅ Active |
 | `/shared_components/css/ae-nav-v2.css` | **NEW** AE Dashboard two-tier navigation (Tier 1: Steve/Ruth/Transfers/Personalization sections; Tier 2: sub-tabs) | ae-dashboard.html | ✅ Active |
 | `/shared_components/css/transfer-actions.css` | Transfer action button styles | bradley-transfers + transfer-detail | ✅ Active |
@@ -1155,6 +1162,19 @@
 | `/shared_components/css/old-designs.css` | Old designs archive styles | old-designs.html | ✅ Active |
 | `/shared_components/css/customer-lookup.css` | Customer lookup autocomplete styles | All quote builders | ✅ Active |
 | `/shared_components/css/shopworks-import.css` | ShopWorks import modal styles | Embroidery quote builder | ✅ Active |
+
+### Vendor Libraries (`/shared_components/vendor/`)
+
+Self-hosted copies of third-party libraries — pinned versions, no CDN dependency.
+
+| File | Purpose | Used By | Status |
+|------|---------|---------|--------|
+| `/shared_components/vendor/bootstrap/css/bootstrap.min.css` | Bootstrap CSS (self-hosted) | Various pages | ✅ Active |
+| `/shared_components/vendor/bootstrap/js/bootstrap.bundle.min.js` | Bootstrap JS bundle (incl. Popper, self-hosted) | Various pages | ✅ Active |
+| `/shared_components/vendor/dompurify/purify.min.js` | DOMPurify — HTML sanitization (XSS prevention) | Pages rendering user/external HTML | ✅ Active |
+| `/shared_components/vendor/emailjs/email.min.js` | EmailJS client SDK (self-hosted) | Email-sending pages/forms | ✅ Active |
+| `/shared_components/vendor/fontawesome/css/all.min.css` | Font Awesome icon CSS (self-hosted) | Multiple pages | ✅ Active |
+| `/shared_components/vendor/sentry/bundle.min.js` | Sentry browser SDK bundle (self-hosted) — loaded by `shared_components/js/observability.js` | 4 quote builders | ✅ Active |
 
 ### 🧮 Manual Calculator CSS Architecture
 
@@ -1537,6 +1557,8 @@ Polish + code-quality pass. Plan: `~/.claude/plans/this-is-a-big-parsed-unicorn.
 | `/shared_components/css/staff-dashboard/tokens.css` | **NEW (v3)** Design tokens — oklch + NW green, space/motion/z-index/font-size/focus-ring scales, semantic alias layer. Wrapped in `@layer tokens`. | — | 🚧 In dev |
 | `/shared_components/css/staff-dashboard/phase1-widgets.css` | **Phase 1 widgets (2026-07-20)** Pride Wall (`.pw-`) · My Stuff (`.ms-`) · **2026 Goal chip** (`.goal-chip`, header-scoped to out-specify the big `.sales-goal-banner` rules; keeps #goal* IDs + is-loading so sales-goal-controller drives it unchanged). Loaded UNLAYERED after dashboard-v3-theme.css; all values from tokens. Reduced-motion + responsive. **Win Bell (`.wb-`) removed 2026-07-23.** | tokens.css | ✅ Active |
 | `/shared_components/css/staff-dashboard/command-palette.css` | **Phase 2 (2026-07-20; re-anchored same day)** Hero search bar (`.hero-search__*`, 52px, focus-within accent ring) + anchored results panel (`.cp-panel` absolute under the bar, drops downward) + grouped results/status + fixed bottom-center copy toast. Unlayered, token-driven. | tokens.css | ✅ Active |
+| `/shared_components/css/staff-dashboard/dashboard-v3-theme.css` | **NEW** V3 dashboard theme CSS (unlayered variant) — same rules as the @layer theme with the `@layer overrides {}` wrapper removed, for use alongside existing CSS files whose unlayered rules would otherwise lose the cascade. Load LAST. | tokens.css | ✅ Active |
+| `/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css` | **NEW** V3 patch 2 — append-only fixes for dashboard-v3-theme.css (or its unlayered variant); placed at the very bottom after all existing rules | tokens.css, dashboard-v3-theme.css | ✅ Active |
 | `/shared_components/js/staff-dashboard/core/dashboard-endpoints.js` | **NEW (v3)** Endpoint registry — single source of truth for every URL the dashboard hits. Reads BASE from `window.APP_CONFIG.API.BASE_URL` (Rule #7). | window.APP_CONFIG | 🚧 In dev |
 | `/shared_components/js/staff-dashboard/core/dashboard-fetch.js` | **NEW (v3)** Uniform fetch wrapper. Always throws on error (Rule #4 — no silent fallbacks), GET dedup, 30s timeout, 429 jittered retry. Exports `dashboardFetch`, `dashboardFetchJson`, `DashboardApiError`. | — | 🚧 In dev |
 | `/shared_components/js/staff-dashboard/core/dashboard-store.js` | **NEW (v3)** Versioned state store — namespaced `nwca-dash:*` keys, per-key TTL + version stamping, safe corrupt-entry recovery. Replaces 10 scattered localStorage/sessionStorage keys. | — | 🚧 In dev |
@@ -1635,25 +1657,19 @@ Polish + code-quality pass. Plan: `~/.claude/plans/this-is-a-big-parsed-unicorn.
 
 ## 📊 Statistics
 
-**As of 2026-04-29 audit (filesystem totals — see header for scope):**
-- Active code files: **575** (296 HTML, 269 JS, 195 CSS — `tests/` excluded)
-- Per directory:
-  - `shared_components/js/`: 146 files (largest single dir)
-  - `calculators/` (incl. archive): 84 files
-  - `pages/` (incl. js/, css/, services/, utils/; order-form/ removed 2026-07-11): 43 files
-  - `shared_components/css/`: 61 files
-  - `dashboards/` (incl. js/, css/, reports/): 39 files
-  - `training/`: 44 files (+ `images/sanmar-purchasing/`, 8 screenshots)
-  - Root (HTML/JS/CSS only): 34 files
-  - `product/` (incl. components/, services/, styles/, js/): 20 files
-  - `scripts/` (incl. safety-tools/): 20 files
-  - `mockups/`: 11 files
-  - `policies/`: 8 files
-  - `email-templates/`: 7 files
-  - `quote-builders/`: 6 files
-  - `tools/`, `templates/`: 5 each
-  - `admin/`, `art-tools/`, `vendor-portals/`: 3-4 each
-  - `employee-bundles/`, `richardson-caps/`: 2 each
+**As of 2026-09-01 audit (filesystem totals — see header for scope):**
+- Active code files: **1063** (HTML+JS+CSS — `tests/`, `node_modules/`, `.git/`, `.claude/`, `archive-working-files/` excluded)
+- Per directory (approximate):
+  - `shared_components/js/`: largest single dir
+  - `calculators/` (incl. archive): many files
+  - `pages/` (incl. js/, css/): 40+ files
+  - `shared_components/css/`: 60+ files
+  - `dashboards/` (incl. js/, css/): 40+ files
+  - `training/`: 30+ files
+  - Root (HTML/JS/CSS only): 30+ files
+  - `scripts/` (incl. safety-tools/): 31 files (24 + 7)
+  - `tools/`: 7 files
+  - `vendor-portals/`: 3 files
 
 
 ### File Count by Type
@@ -1690,7 +1706,7 @@ Operational guides, training modules, and Adriyella's daily-task tooling. Most a
 | `/training/training-center.js` | Training Center controller — curated role tracks + live hub Training-category list | ✅ Active |
 | `/training/training-center.css` | Training Center styles (2026 tokens, dash-shell) | ✅ Active |
 | `/training/garment-art-request-guide.md` | **NEW (2026-06-17)** AE field guide for the rebuilt Garment art-request form — each field, what's required, what "approved" means, repeat/revision how-tos, short-notes rule | ✅ Active |
-| `/training/api-test-runner.html` | API test runner harness | ✅ Active |
+| ~~`/training/api-test-runner.html`~~ | ~~DELETED~~ API test runner harness — removed (not found on disk, no git history) | ❌ Deleted |
 | `/training/art-approval-guide.html` | Art approval workflow guide | ✅ Active |
 | `/training/bonus-policy.html` | Bonus policy reference | ✅ Active |
 | `/training/cap-training.html` | Cap embroidery training | ✅ Active |
@@ -1725,8 +1741,8 @@ Operational guides, training modules, and Adriyella's daily-task tooling. Most a
 | `/training/thank-you-card-guide.html` | Thank-you card guide | ✅ Active |
 | `/training/training-engine-base.js` | Training engine base class | ✅ Active |
 | `/training/training-games-hub.html` | Training games hub | ✅ Active |
-| `/training/server.js` | Local training server (dev only) | ⚙️ Tooling |
-| `/training/simple-server.js` | Simple training server (dev only) | ⚙️ Tooling |
+| ~~`/training/server.js`~~ | ~~DELETED~~ Local training server (dev only) — removed (not found on disk) | ❌ Deleted |
+| ~~`/training/simple-server.js`~~ | ~~DELETED~~ Simple training server (dev only) — removed (not found on disk) | ❌ Deleted |
 
 ### Mockups & Prototypes (`/mockups/` — 11 files)
 
@@ -1758,13 +1774,14 @@ These directories contain code but aren't enumerated at file level — list grow
 | `/employee-bundles/` | 2 HTML | streich-bros-bundle, wcttr-bundle |
 | `/policies/` (root-level) | 8 HTML | Bundle kitting xmas, customer notification SOP, DTG artwork checklist, LTM fee policy, LTM order decision algorithm, payment terms, retail-vs-wholesale policy, sales office procedures |
 | `/richardson-caps/` | 1 HTML + 1 JS | view-combination-caps.html, scripts/richardson-combination-caps-manual.js |
-| `/scripts/` | 14 JS | Backfill, validation, prevention, cleanup, doc-freshness, generate-new-products, parse-production-schedule, etc. |
+| `/scripts/` | 24 JS | Backfill, validation, prevention, cleanup, doc-freshness, generate-new-products, parse-production-schedule, quarterly-cleanup, verify-new-products, check-with-increased-limit, match-marketing-pos, update-new-products-flags, validate-memory-docs, verify-all-60-products, etc. |
 | `/scripts/safety-tools/` | 7 JS | auto-recovery, comprehensive-test-suite, dependency-mapper, error-monitor, file-access-monitor, safe-delete, validate-critical-paths |
 | `/templates/` | 4 HTML + 1 JS | Calculator template, email template, emblem email template, laser tumbler EmailJS template, quote service template |
-| `/tools/` | 5 HTML | Cap layout mockup, CSS diagnostic, decoration selector mockup, diagnose-css-override, diagnose-search-issue |
+| `/tools/` | 7 HTML | Cap layout mockup, CSS diagnostic, decoration selector mockup, diagnose-css-override, diagnose-search-issue, art-search, custom-tees-calibrate |
 | `/vendor-portals/` | 3 HTML | sanmar-credits, sanmar-invoices, sanmar-vendor-portal |
 | `/config/` | 1 JS | app.config.js (central configuration) |
 | `/temp/` | 1 JS | verify-dtg-pricing.js (likely cruft — verify and remove) |
+| `/reference/` | 4 HTML | SEO/site-architecture reference docs: net-seo-recovery-roadmap, net-local-page-playbook, net-local-landing-page-template, two-site-seo-coordination-guide (nwcustomapparel.net + teamnwca.com two-site strategy) |
 
 ### Support & Documentation
 | Directory | Purpose | Status | Notes |
