@@ -418,6 +418,7 @@
     document.getElementById('cpa-rw-type').value = 'grant';
     document.getElementById('cpa-rw-error').textContent = '';
     document.getElementById('cpa-rw-ledger').innerHTML = 'Loading…';
+    resetAccrualBox();
     document.getElementById('cpa-rewards-modal').style.display = 'flex';
     loadRewardLedger();
   }
@@ -465,6 +466,66 @@
     } finally { saveBtn.disabled = false; }
   }
 
+  // ═══ Earned rewards — accrual calculator (Erik 2026-09-01) ═══
+  // Reward $ from GARMENT lines on invoiced + paid orders inside the program window, rated by
+  // SanMar piece-cost band. The server does every calculation; this only renders the breakdown
+  // and asks the server to post the pending grants (one ledger entry per order, Order_Ref = #).
+  var REWARDS_ACCRUAL_API = '/api/portal-admin/rewards/accrual';
+  var rwAccrual = null;
+  var ACCRUAL_IDLE_HTML = '<button class="cpa-btn cpa-btn-ghost cpa-btn-sm" id="cpa-rw-calc" type="button"><i class="fas fa-calculator"></i> Calculate earned rewards</button>' +
+    '<div class="cpa-rw-meta cpa-rw-acc-hint">Garment lines on invoiced <em>and</em> paid orders in the program window, rated by SanMar piece-cost band. Rates live in Caspio &rarr; Service_Codes (ServiceType <code>REWARD</code>, code <code>RWD-EARN</code>).</div>';
+  function resetAccrualBox() {
+    rwAccrual = null;
+    var box = document.getElementById('cpa-rw-accrual'); if (box) box.innerHTML = ACCRUAL_IDLE_HTML;
+    var w = document.getElementById('cpa-rw-acc-window'); if (w) w.textContent = '';
+  }
+  async function calcAccrual() {
+    if (!rwCustomer) return;
+    var box = document.getElementById('cpa-rw-accrual');
+    box.innerHTML = '<div class="cpa-rw-empty"><i class="fas fa-spinner fa-spin"></i> Calculating from ManageOrders + catalog costs…</div>';
+    try {
+      rwAccrual = await api(REWARDS_ACCRUAL_API + '/' + encodeURIComponent(rwCustomer.id));
+      renderAccrual();
+    } catch (err) {
+      if (err.message !== 'auth') box.innerHTML = '<div class="cpa-rw-empty">Could not calculate: ' + esc(err.message) + '</div><button class="cpa-btn cpa-btn-ghost cpa-btn-sm" id="cpa-rw-calc" type="button">Try again</button>';
+    }
+  }
+  function renderAccrual() {
+    var a = rwAccrual, box = document.getElementById('cpa-rw-accrual');
+    document.getElementById('cpa-rw-acc-window').textContent = a.window ? '(' + a.window.from + ' → ' + a.window.to + ')' : '';
+    if (!a.program || !a.program.configured) {
+      box.innerHTML = '<div class="cpa-rw-notconf"><strong>Reward program not configured.</strong> Add rows to Caspio &rarr; <code>Service_Codes</code>: ServiceType <code>REWARD</code>, ServiceCode <code>RWD-EARN</code>, PricingMethod <code>TIERED</code>, IsActive Yes, Visible No — one row per SanMar piece-cost band with TierLabel like <code>0-39.99</code> and <code>40+</code> and SellPrice = the % back. Optional <code>RWD-WINDOW</code> row with UnitCost = months (default 12). Nothing is granted until this exists.</div>' +
+        '<div class="cpa-rw-acc-actions"><button class="cpa-btn cpa-btn-ghost cpa-btn-sm" id="cpa-rw-calc" type="button">Recalculate</button></div>';
+      return;
+    }
+    var t = a.totals;
+    var html = '<div class="cpa-rw-acc-sum">Earned <strong>' + money2(t.earned) + '</strong> on ' + money2(t.eligibleRevenue) + ' of eligible garments &middot; granted ' + money2(t.granted) + ' &middot; <strong class="' + (t.pending > 0 ? 'pos' : '') + '">pending ' + money2(t.pending) + '</strong>' +
+      '<div class="cpa-rw-meta">Bands: ' + a.program.tiers.map(function (x) { return esc(x.label) + ' &rarr; ' + esc(String(x.ratePct)) + '%'; }).join(' &middot; ') + ' &middot; ' + esc(String(a.program.months)) + '-month window' + (a.unavailable && a.unavailable.length ? ' &middot; <span class="neg">' + a.unavailable.length + ' order(s) had no line items — recalculate</span>' : '') + '</div></div>';
+    if (!a.orders.length) html += '<div class="cpa-rw-empty">No invoiced + paid orders in the window.</div>';
+    else html += '<table class="cpa-rw-acc-table"><thead><tr><th>Order</th><th>Invoiced</th><th class="num">Eligible</th><th class="num">Reward</th><th class="num">Granted</th><th class="num">Pending</th></tr></thead><tbody>' + a.orders.map(function (o) {
+      var lines = (o.lines || []).map(function (l) {
+        return esc(l.style) + ' ' + esc(l.color) + ' &times;' + esc(String(l.qty)) + ' @ ' + money2(l.unitPrice) + (l.cost != null ? ' &middot; cost ' + money2(l.cost) : '') + (l.tier ? ' &middot; ' + esc(l.tier) + ' ' + esc(String(l.ratePct)) + '% = <strong>' + money2(l.reward) + '</strong>' : ' &middot; ' + esc(l.note || 'no reward'));
+      }).join('<br>');
+      return '<tr><td><details><summary>#' + esc(o.orderNumber) + (o.designName ? ' <span class="cpa-rw-meta">' + esc(o.designName) + '</span>' : '') + '</summary><div class="cpa-rw-acc-lines">' + (o.linesUnavailable ? 'Line items unavailable — recalculate.' : (lines || 'No garment lines (decoration / fees only).')) + '</div></details></td>' +
+        '<td>' + esc(String(o.invoiceDate || '').slice(0, 10)) + '</td><td class="num">' + money2(o.eligibleRevenue) + '</td><td class="num">' + money2(o.reward) + '</td><td class="num">' + money2(o.granted) + '</td><td class="num' + (o.pending > 0 ? ' pos' : '') + '">' + money2(o.pending) + '</td></tr>';
+    }).join('') + '</tbody></table>';
+    var n = a.orders.filter(function (o) { return o.pending > 0 && !o.linesUnavailable; }).length;
+    html += '<div class="cpa-rw-acc-actions">' +
+      (n ? '<button class="cpa-btn cpa-btn-primary cpa-btn-sm" id="cpa-rw-post" type="button"><i class="fas fa-coins"></i> Post ' + money2(t.pending) + ' as ' + n + ' grant' + (n === 1 ? '' : 's') + '</button>' : '<span class="cpa-rw-meta">Nothing pending — every eligible order is already granted.</span>') +
+      ' <button class="cpa-btn cpa-btn-ghost cpa-btn-sm" id="cpa-rw-calc" type="button">Recalculate</button></div>';
+    box.innerHTML = html;
+  }
+  async function postAccrual() {
+    if (!rwCustomer || !rwAccrual) return;
+    var btn = document.getElementById('cpa-rw-post'); if (btn) { btn.disabled = true; btn.textContent = 'Posting…'; }
+    try {
+      var res = await api(REWARDS_ACCRUAL_API + '/' + encodeURIComponent(rwCustomer.id) + '/post', { method: 'POST', body: JSON.stringify({ company_name: rwCustomer.company }) });
+      toast('Posted ' + money2(res.total) + ' across ' + res.posted.length + ' order' + (res.posted.length === 1 ? '' : 's') + (res.failed && res.failed.length ? ' — ' + res.failed.length + ' failed' : ''), !!(res.failed && res.failed.length));
+      await loadRewardLedger();
+      await calcAccrual();
+    } catch (e) { if (e.message !== 'auth') toast(e.message, true); if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-coins"></i> Post pending grants'; } }
+  }
+
   // ---- wire up ----
   document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('content-root').addEventListener('click', onTableClick);
@@ -494,6 +555,10 @@
     document.getElementById('cpa-rw-close').addEventListener('click', closeRewardsModal);
     document.getElementById('cpa-rewards-modal').addEventListener('click', function (e) { if (e.target === this) closeRewardsModal(); });
     document.getElementById('cpa-rw-save').addEventListener('click', submitRewardEntry);
+    document.getElementById('cpa-rw-accrual').addEventListener('click', function (e) {
+      if (e.target.closest('#cpa-rw-calc')) calcAccrual();
+      else if (e.target.closest('#cpa-rw-post')) postAccrual();
+    });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
     loadMe();
     loadInvites();

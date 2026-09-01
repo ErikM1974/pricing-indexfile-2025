@@ -98,45 +98,7 @@ file's own comment made exactly this promise and the code did the opposite for w
 ### A customer's real size request was shown to nobody (2026-08-19, ARCHIVED 2026-08-27): render every field you persist — a saved-but-unshown field is data loss with extra steps. Full entry in archive.
 ### SAM quotes rendered “No items” (2026-08-19, ARCHIVED 2026-08-27): a channel that opts out of a shared fix re-inherits the bug it fixed; SW-snapshot overlay repaints EXISTING rows only. Full entry in archive.
 
-## Staff dashboard full review — 5 UTC/Pacific bugs on ONE page, and the error system silently failing itself (2026-08-26)
-
-**Problem.** Multi-agent review of every file the staff dashboard loads (30 files) confirmed 13
-defects. Worst: paid 3-Day Tees orders could NEVER appear in the Orders Inbox; the Money
-Collected "Today" tile showed $0 every evening; the Q3 bonus card's API-failure path rendered
-nothing (spinner forever); concurrent same-URL fetches crashed the second caller.
-
-**Root Cause.** Four families: (1) UTC-vs-Pacific in FIVE independent spots on one page —
-`toISOString().slice(0,10)` for calendar-day compares/windows, `new Date('YYYY-MM-DD')` then
-local getters (all 19 anniversaries a day early), a holiday check using the UTC day while the
-weekend check used local. (2) `showApiError('embroidery-bonus')` targeted an area never added to
-ERROR_AREAS — the unknown-area guard console-logs and returns, so THE ERROR RENDERER was the
-silent failure. (3) GET dedup handed every caller the SAME Response — second `.json()` throws
-"body stream already read", painting an error card for a request that succeeded. (4) The quote
-prefix regex `/^([A-Z]+)/` returns '' for digit-leading '3DT…' IDs, so the storefront filter
-dropped them; dead 'TDT'/'CTS' entries masked the gap.
-
-**Solution.** All fixed in one commit on develop (+ metricsCache split into per-service store
-slots, YoY failure now an amber badge, dead exports/areas/endpoints pruned, inline <style> moved
-into tokens.css). Verified: full unit suite (126 suites/2631), acorn parse of all 19 edited JS,
-jsdom import of all 25 v3 modules, regex/date spot-checks.
-
-**Prevention.**
-- 🔴 **Calendar-day math NEVER goes through `toISOString()`** and date-only strings NEVER through
-  `new Date('YYYY-MM-DD')` + local getters. Local parts out, split-parse in — or
-  `toLocaleDateString('en-CA', { timeZone: 'America/Los_Angeles' })` for "today". The repo
-  "knows" this trap; it still appeared 5× on the flagship staff page.
-- 🔑 **An error-UI registry with a soft unknown-key guard turns typos into Rule-4 violations.**
-  Register the ERROR_AREAS entry in the SAME commit as the `showApiError()` call — a call site
-  with no registry entry renders nothing, forever.
-- 🔑 **Never hand one fetch Response to two consumers** — dedup must `.clone()` per caller (and
-  clean up with `.then(fn, fn)`, not a discarded `.finally()` chain, which fires a spurious
-  unhandledrejection per failure).
-- 🔑 **A prefix whitelist + extraction regex is two chances to be wrong.** '3DT' broke the
-  letters-only regex silently; nonexistent 'TDT'/'CTS' entries made the list look maintained.
-  Derive prefixes from config/storefront-channels.js shapes, and test the digit-leading one.
-
----
-
+### Staff dashboard full review — 5 UTC/Pacific bugs on ONE page + the error renderer silently no-oping (2026-08-26, ARCHIVED 2026-09-01): calendar-day math never via toISOString()/new Date("YYYY-MM-DD")+local getters; register the ERROR_AREAS entry in the same commit as showApiError(); clone a deduped fetch Response per caller; derive quote prefixes from config, never a hand list. Full entry in archive.
 ## Quote data plane locked down — 44 caller files, 2 repos, one gate flip left (2026-08-26)
 
 **Problem.** Step 2 of the 2026-08-17 review: the proxy's quote surface was anonymous.
@@ -289,3 +251,39 @@ UNCACHED query before blaming the frontend. 🔑 A `limit=48` page can hydrate 1
 styles are variant-heavy; disjoint STYLE IN partitions parallelize for free (quota-neutral).
 🔑 `?isTopSeller=1` is silently IGNORED by the route (`=== 'true'`) — a wrong-param probe times
 the WRONG query and returns the whole catalog; validate the response set before trusting a timing.
+
+
+## Customer portal redesign + reward-dollar accrual — the self-service portal, and money that must never be computed silently (2026-09-01)
+
+**Problem.** The portal was four tabs on one scroll: logos/invoices/orders existed but a customer
+could not approve a proof, download a logo, see tracking, print a statement, ask for a quote, or
+see their quotes without emailing the rep. Reward dollars were hand-granted with no rule.
+
+**Solution.** App-shell redesign (sidebar spine + attention list + order drawer + statement +
+quotes + account) on the SAME allowlist endpoints, plus `/api/portal/me`, `/quotes`,
+`/order/:no/tracking`, `POST /api/portal/request` (general requests into the existing rep queue),
+and a reward ACCRUAL: garment lines on invoiced+paid orders in a 12-month window × a rate per
+SanMar piece-cost band, bands Erik-editable in Service_Codes (`REWARD`/`RWD-EARN`), posted from
+the admin console one grant per order keyed by Order_Ref. Detail → `memory/CUSTOMER_PORTAL_2026-09.md`.
+
+**Prevention / lessons.**
+- 🔴 **Credit that a customer can redeem is money: no default rate, ever.** With no config rows the
+  calculator returns configured:false and $0 with every line annotated — the ONE fallback that
+  must be a visible refusal, not a "reasonable" 1%. Locked by `portal-reward-accrual.test.js`.
+- 🔴 **"Paid" needs a known balance.** `cur_Balance` can be null in ManageOrders; null ≠ 0. Paid =
+  `sts_Paid==='1'` OR a KNOWN zero balance on a non-zero invoice; `cur_TotalInvoice=0` rows
+  (`sts_Paid='8'`) never earn.
+- 🔑 **Idempotency by Order_Ref, recompute on post.** The console shows a breakdown, but the POST
+  recomputes server-side and grants only `reward − already granted` per order — a stale tab or a
+  double-click cannot double-pay, and client amounts are never trusted.
+- 🔑 **Verify a money calculation against LIVE data with the program INJECTED** before any config
+  exists: lift the block out of server.js, stub its four helpers, run it for one customer, read
+  every line. That turned "looks right" into $58.08 with the cost and band on each line.
+- 🔑 **A page that shares a stylesheet is a hidden consumer.** `customer-product.html` links
+  `customer-portal.css`; a full rewrite still had to keep every legacy `--cp-*` token as an
+  alias and the .cp-header/.cp-swatch/.cp-size/.cp-btn blocks. Grep the class list before rewriting.
+- 🔑 **Screenshots of an emulated phone can be a cropped 3× render** — measure
+  `scrollWidth`/`getBoundingClientRect` before "fixing" an overflow that isn't there.
+- 🔑 **Locally, a staff session is a cookie-session cookie signed by keygrip over `name=value`**
+  and a customer session is `lib/customer-magic-link.mintSession()` — both mintable from .env
+  secrets, so gated routes and the preview console can be exercised without SAML.

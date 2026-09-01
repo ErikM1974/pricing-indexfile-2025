@@ -16,7 +16,7 @@
     <!-- 2026 design tokens (must load before dash-shell.css) -->
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/customer-portal-admin.css?v=2026.06.30.5">
+    <link rel="stylesheet" href="/dashboards/css/customer-portal-admin.css?v=2026.09.01.1">
 </head>
 <body>
     <div class="dash-shell">
@@ -209,6 +209,8 @@
                 <button class="cpa-btn cpa-btn-primary cpa-rw-save-btn" id="cpa-rw-save"><i class="fas fa-plus"></i> Add ledger entry</button>
                 <div class="cpa-rw-ledger-head">Recent activity</div>
                 <div class="cpa-rw-ledger" id="cpa-rw-ledger">—</div>
+                <div class="cpa-rw-ledger-head">Earned on paid orders <span class="cpa-rw-acc-window" id="cpa-rw-acc-window"></span></div>
+                <div class="cpa-rw-accrual" id="cpa-rw-accrual"></div>
             </div>
         </div>
     </div>
@@ -220,6 +222,6 @@
     <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/dash-page-helpers.js"></script>
-    <script src="/dashboards/js/customer-portal-admin.js?v=2026.07.04.4"></script>
+    <script src="/dashboards/js/customer-portal-admin.js?v=2026.09.01.1"></script>
 </body>
 </html>
