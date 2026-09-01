@@ -55,11 +55,15 @@
     return '$' + v.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
 
-  // Bare 'YYYY-MM-DD' strings are spec-parsed as UTC midnight, so
-  // toLocaleDateString renders them a day early anywhere west of Greenwich.
-  // Build date-only values from parts (local time) instead.
+  // Date-only values must not shift a day west of Greenwich. Two shapes:
+  //   - bare 'YYYY-MM-DD' — spec-parsed as UTC midnight;
+  //   - ManageOrders date fields — ShopWorks stores date-only, MO serializes
+  //     them as 'YYYY-MM-DDT00:00:00.000Z' (exact UTC midnight), so a
+  //     requested-ship of Sep 4 rendered as Sep 3 in Pacific (WO 142999).
+  // Both mean "this calendar day" — build them from parts (local time).
   function parseDateSafe(s) {
-    const m = typeof s === 'string' && s.trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    const m = typeof s === 'string' &&
+      s.trim().match(/^(\d{4})-(\d{2})-(\d{2})(?:T00:00:00(?:\.000)?Z)?$/);
     if (m) return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
     return new Date(s);
   }
@@ -321,8 +325,19 @@
     renderBillTo(data, order, orig) {
       const billing = data.billingContact || null;
 
-      // Customer / company — three-tier priority
+      // Storefront orders (custom-tees/caps/samples — the only writers of
+      // CustomerDataJSON) land on the webstore CATCH-ALL customer, so once
+      // imported, order.CustomerName and the CompanyContactsMerge2026 record
+      // are OUR OWN store — not the buyer. The person who checked out IS the
+      // bill-to: prefer their identity + billing address whenever the session
+      // carries the storefront blob. (Erik 2026-09-01, seen on WO 142999.)
+      const sfCd = this.storefrontCustomerData() || {};
+      const isStorefront = !!this.storefrontCustomerData();
+      const sfName = [sfCd.firstName, sfCd.lastName].filter(Boolean).join(' ');
+
+      // Customer / company — three-tier priority (storefront buyer first)
       const customer =
+        (isStorefront ? (sfCd.company || sfName || data.sessionRaw?.CustomerName) : '') ||
         order?.CustomerName ||
         billing?.companyName ||
         orig?.info?.company ||
@@ -336,6 +351,7 @@
       const last  = order?.ContactLastName  || '';
       const swContact = [first, last].filter(Boolean).join(' ').trim();
       const contact =
+        (isStorefront ? sfName : '') ||
         swContact ||
         billing?.contactName ||
         orig?.info?.name ||
@@ -345,25 +361,35 @@
         $('bill-contact-name').textContent = contact;
       }
 
-      // Billing street address — pull from CompanyContactsMerge2026 first
-      // (authoritative), then whatever the rep typed at submit, then the
-      // storefront checkout's CustomerDataJSON (same per-field billing||shipping
-      // fallback the ShopWorks push uses, so this matches what OnSite gets).
-      const sfCd = this.storefrontCustomerData() || {};
+      // Billing street address. Storefront: the checkout's billing block
+      // (same per-field billing||shipping fallback the ShopWorks push uses,
+      // so this matches what OnSite got; samples uses snake_case billing_*).
+      // Builders: CompanyContactsMerge2026 first (authoritative), then
+      // whatever the rep typed at submit.
+      const sfBillA1 = isStorefront
+        ? (sfCd.billingAddress1 || sfCd.billing_address1 || sfCd.address1 || sfCd.address || '')
+        : '';
+      // Storefront billing blocks never carry an address2 of their own — only
+      // borrow the shipping address2 when the shipping address is standing in
+      // for billing (no separate billing street was given).
+      const sfBillA2 = isStorefront && !(sfCd.billingAddress1 || sfCd.billing_address1)
+        ? (sfCd.address2 || sfCd.billing_address2 || '')
+        : (sfCd.billing_address2 || '');
       const billAddr1 =
+        sfBillA1 ||
         billing?.address1 ||
         orig?.info?.address ||
         orig?.info?.address1 ||
         orig?.info?.billingAddress ||
-        sfCd.billingAddress1 || sfCd.address1 || sfCd.address ||
         '';
       const billAddr2 =
+        (isStorefront ? sfBillA2 : '') ||
         billing?.address2 ||
         orig?.info?.address2 ||
         '';
-      const billCity  = billing?.city  || orig?.info?.city  || sfCd.billingCity  || sfCd.city  || '';
-      const billState = billing?.state || orig?.info?.state || sfCd.billingState || sfCd.state || '';
-      const billZip   = billing?.zip   || orig?.info?.zip   || sfCd.billingZip   || sfCd.zip   || sfCd.zipCode || '';
+      const billCity  = (isStorefront ? (sfCd.billingCity  || sfCd.billing_city  || sfCd.city  || '') : '') || billing?.city  || orig?.info?.city  || '';
+      const billState = (isStorefront ? (sfCd.billingState || sfCd.billing_state || sfCd.state || '') : '') || billing?.state || orig?.info?.state || '';
+      const billZip   = (isStorefront ? (sfCd.billingZip   || sfCd.billing_zip   || sfCd.zip || sfCd.zipCode || '') : '') || billing?.zip || orig?.info?.zip || '';
       const billCityState =
         [billCity, billState].filter(Boolean).join(', ') +
         (billZip ? ' ' + billZip : '');
@@ -430,12 +456,13 @@
         if (cd) {
           ship = {
             // Mirrors the push (server.js shipping.method): pickup or UPS Ground.
-            method:   cd.deliveryMethod === 'pickup' ? 'Customer Pickup' : 'UPS Ground',
-            address1: cd.address1 || cd.address || '',
-            address2: cd.address2 || '',
-            city:     cd.city || '',
-            state:    cd.state || '',
-            zip:      cd.zip || cd.zipCode || '',
+            // Samples-channel blobs use snake_case shipping_* field names.
+            method:   cd.deliveryMethod === 'pickup' ? 'Customer Pickup' : (cd.shippingMethod || 'UPS Ground'),
+            address1: cd.address1 || cd.address || cd.shipping_address1 || '',
+            address2: cd.address2 || cd.shipping_address2 || '',
+            city:     cd.city || cd.shipping_city || '',
+            state:    cd.state || cd.shipping_state || '',
+            zip:      cd.zip || cd.zipCode || cd.shipping_zip || '',
             company:  cd.company || '',
             name:     [cd.firstName, cd.lastName].filter(Boolean).join(' '),
           };
