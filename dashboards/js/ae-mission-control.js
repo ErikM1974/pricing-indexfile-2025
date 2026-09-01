@@ -2054,7 +2054,7 @@
         var pctExact = Number(l.pctOfBaseline) || 0;
         var pctDraw = Math.max(0, Math.min(pctExact, 100));
 
-        var CIRC = 452.39;                       // 2πr at r=72
+        var CIRC = 326.73;                       // 2πr at r=52
         var arc = el('aemc-bh-dial-arc');
         var tick = el('aemc-bh-dial-tick');
         if (arc) {
@@ -2072,8 +2072,12 @@
                 tick.setAttribute('hidden', '');
             }
         }
+        // The ring's centre carries the bare percentage; "OF GOAL" is the static caption under
+        // it. Both blank together when there is no baseline, so the ring never captions nothing.
         var dialPct = el('aemc-bh-dial-pct');
-        if (dialPct) dialPct.textContent = l.baseline ? pctExact.toFixed(1) + '% of goal' : '';
+        if (dialPct) dialPct.textContent = l.baseline ? pctExact.toFixed(1) + '%' : '';
+        var dialCap = el('aemc-bh-dial-cap');
+        if (dialCap) dialCap.textContent = l.baseline ? 'OF GOAL' : '';
 
         el('aemc-bh-fill').style.width = pctDraw.toFixed(1) + '%';
         el('aemc-bh-goal').innerHTML = l.baseline

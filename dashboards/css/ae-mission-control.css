@@ -97,34 +97,62 @@
 }
 .aemc-bh-fallback i { color: var(--state-warning); }
 
-/* ── DIAL ── percent-of-goal ring. Both the arc and the 85% tick are set from ONE axis in
- * renderBonusSpine; nothing here encodes a percentage. */
-.aemc-bh-dial { flex: 0 0 176px; display: flex; justify-content: center; }
-.aemc-bh-dial svg { width: 176px; height: 176px; }
-.aemc-bh-dial-track { fill: none; stroke: rgba(0, 0, 0, 0.28); stroke-width: 15; }
-.aemc-bh-dial-tick  { fill: none; stroke: #ffb703; stroke-width: 15; }
+/* ── DIAL ── percent-of-goal ring + the earned figure beside it. The ring holds ONLY the
+ * percentage (which always fits); the dollar amount is HTML text next to it, free to be any
+ * width — the old design drew the amount INSIDE a 176px ring, and "$1,050.00" at 34px
+ * monospace (~184px) is wider than the ring's ~129px clear centre, so the number painted
+ * over the arc (redesign Option B, 2026-09-01). Both the arc and the 85% tick are set from
+ * ONE axis in renderBonusSpine; nothing here encodes a percentage. */
+.aemc-bh-dial {
+    flex: 0 0 288px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-right: var(--space-6);
+    border-right: 1px solid rgba(255, 255, 255, 0.22);
+}
+.aemc-bh-dial svg { width: 112px; height: 112px; flex: 0 0 auto; }
+.aemc-bh-dial-track { fill: none; stroke: rgba(0, 0, 0, 0.28); stroke-width: 11; }
+.aemc-bh-dial-tick  { fill: none; stroke: #ffb703; stroke-width: 11; }
 .aemc-bh-dial-arc {
     fill: none;
     stroke: #fff;
-    stroke-width: 15;
+    stroke-width: 11;
     stroke-linecap: round;
     transition: stroke-dasharray 420ms var(--ease-out, cubic-bezier(.2,.8,.2,1));
 }
-.aemc-bh-dial-amount {
+/* Viewbox is 128 but the svg renders at 112, so these px sizes are set for the 0.875 scale. */
+.aemc-bh-dial-pct {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 34px;
+    font-size: 24px;
     font-weight: 700;
     fill: #fff;
     font-variant-numeric: tabular-nums;
 }
 .aemc-bh-dial-cap {
-    font-size: 11px; font-weight: 700; letter-spacing: 1px;
-    fill: rgba(255, 255, 255, 0.85);
+    font-size: 9.5px; font-weight: 700; letter-spacing: 1px;
+    fill: rgba(255, 255, 255, 0.75);
 }
-.aemc-bh-dial-pct { font-size: 10px; font-weight: 500; fill: rgba(255, 255, 255, 0.7); }
+.aemc-bh-earned { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.aemc-bh-earned-cap {
+    font-size: 11px; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; color: rgba(255, 255, 255, 0.85);
+}
+.aemc-bh-earned-amt {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
+}
 
-/* ── LADDER ── */
-.aemc-bh-ladder { flex: 1 1 auto; min-width: 0; }
+/* ── LADDER ── flex-basis 0, NOT auto: with basis auto a wrapping flex container places
+ * items on lines by their MAX-CONTENT width, and the headline sentence measures ~1100px
+ * unwrapped — which shoved the 208px CTA column onto its own row at every desktop width
+ * (the "empty green corner"). Basis 0 keeps dial | ladder | CTA on one band; the explainer
+ * still wraps because its basis is 100%. */
+.aemc-bh-ladder { flex: 1 1 0; min-width: 0; }
 .aemc-bh-eyebrow {
     font-size: 0.7rem;
     font-weight: 700;
@@ -338,7 +366,8 @@
 }
 @media (max-width: 640px) {
     .aemc-bonus-hero { padding: var(--space-4); gap: var(--space-3); }
-    .aemc-bh-dial { flex: 1 1 100%; }
+    /* Full-width row at phone widths; the divider only makes sense in the desktop band. */
+    .aemc-bh-dial { flex: 1 1 100%; border-right: 0; padding-right: 0; justify-content: center; }
     .aemc-bh-ladder { flex: 1 1 100%; }
     .aemc-bh-next { font-size: 1.15rem; }
     .aemc-bh-scenarios { gap: 7px; }

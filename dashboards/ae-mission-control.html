@@ -84,22 +84,27 @@
                      next milestone framed as a concrete, reachable ask. Hidden until loaded so it
                      never flashes a $0. -->
                 <section class="aemc-bonus-hero" id="aemc-bonus-hero" hidden aria-labelledby="aemc-bh-eyebrow">
-                    <!-- DIAL. Percent-of-GOAL axis, and the 85% tick is drawn on that same axis —
-                         the arc and the tick MUST share a denominator. An earlier draft drew the arc
-                         from percent-of-goal and the tick from the 130% display ceiling, which put
-                         the 85% marker at 65% of the ring. r=72 → circumference 452.39. -->
+                    <!-- DIAL. The ring holds ONLY the percentage — the dollar figure is HTML text
+                         beside it. The old design drew the amount inside the ring, and "$1,050.00"
+                         at 34px monospace (~184px) is wider than the ring's ~129px clear centre, so
+                         the number painted over the arc (redesign Option B, 2026-09-01).
+                         Percent-of-GOAL axis, and the 85% tick is drawn on that same axis —
+                         the arc and the tick MUST share a denominator. r=52 → circumference 326.73. -->
                     <div class="aemc-bh-dial">
-                        <svg viewBox="0 0 176 176" role="img" aria-labelledby="aemc-bh-dial-label">
-                            <title id="aemc-bh-dial-label">Bonus earned so far this quarter</title>
-                            <circle class="aemc-bh-dial-track" cx="88" cy="88" r="72"></circle>
-                            <circle class="aemc-bh-dial-tick" id="aemc-bh-dial-tick" cx="88" cy="88" r="72"
-                                    transform="rotate(-90 88 88)"></circle>
-                            <circle class="aemc-bh-dial-arc" id="aemc-bh-dial-arc" cx="88" cy="88" r="72"
-                                    transform="rotate(-90 88 88)"></circle>
-                            <text class="aemc-bh-dial-amount" id="aemc-bh-amount" x="88" y="80" text-anchor="middle">$0</text>
-                            <text class="aemc-bh-dial-cap" id="aemc-bh-dial-cap" x="88" y="100" text-anchor="middle">EARNED · Q3</text>
-                            <text class="aemc-bh-dial-pct" id="aemc-bh-dial-pct" x="88" y="118" text-anchor="middle"></text>
+                        <svg viewBox="0 0 128 128" role="img" aria-labelledby="aemc-bh-dial-label">
+                            <title id="aemc-bh-dial-label">Percent of your quarterly embroidery goal</title>
+                            <circle class="aemc-bh-dial-track" cx="64" cy="64" r="52"></circle>
+                            <circle class="aemc-bh-dial-tick" id="aemc-bh-dial-tick" cx="64" cy="64" r="52"
+                                    transform="rotate(-90 64 64)"></circle>
+                            <circle class="aemc-bh-dial-arc" id="aemc-bh-dial-arc" cx="64" cy="64" r="52"
+                                    transform="rotate(-90 64 64)"></circle>
+                            <text class="aemc-bh-dial-pct" id="aemc-bh-dial-pct" x="64" y="64" text-anchor="middle"></text>
+                            <text class="aemc-bh-dial-cap" id="aemc-bh-dial-cap" x="64" y="81" text-anchor="middle">OF GOAL</text>
                         </svg>
+                        <div class="aemc-bh-earned">
+                            <div class="aemc-bh-earned-cap">Earned · Q3</div>
+                            <div class="aemc-bh-earned-amt" id="aemc-bh-amount">$0</div>
+                        </div>
                     </div>
 
                     <div class="aemc-bh-ladder">

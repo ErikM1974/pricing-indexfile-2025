@@ -5,6 +5,33 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## Bonus hero dial: money inside a fixed ring, and a CTA column that wrapped at every width (2026-09-01)
+
+**Problem.** Erik: the Mission Control bonus meter circle "looks off." Two defects: the earned
+amount ("$1,050.00" at 34px JetBrains Mono ≈ 184px) painted over the 176px ring's arc — its
+clear centre is only ~129px — and the 208px CTA column wrapped below the dial at EVERY desktop
+width, leaving an empty green corner bottom-right.
+
+**Root cause.** (1) Variable-width money can't live inside a fixed-diameter ring; anything over
+six characters collides. (2) A `flex-wrap` container places items on lines by their MAX-CONTENT
+width (`flex-basis: auto`), and the unwrapped headline sentence measures ~1100px — the ladder
+claimed the whole line and pushed the CTA down, so the ≤1100px media query never even mattered.
+
+**Solution.** Redesign Option B (canvas artifact 2d3ed8c4, picked by Erik): the ring (r=52,
+CIRC 326.73) holds only the percentage with the 85% tick; the dollars are HTML text beside it
+(`.aemc-bh-earned`); `.aemc-bh-ladder` moved to `flex: 1 1 0` so the band stays
+dial | ladder | CTA. Harness re-synced; verified at 1280px and mobile with worst-case strings
+("$1,050.00", "118.4%").
+
+**Prevention.**
+- 🔑 **Never put a variable-width figure inside a fixed-size ring** — the ratio gets the meter,
+  the number gets a free-standing hero figure beside it.
+- 🔑 **In a `flex-wrap` container, line-breaking uses MAX-CONTENT width, not post-shrink
+  width** — a long sentence in a `flex: 1 1 auto` sibling silently shoves later columns onto a
+  new row; `flex-basis: 0` is the fix (keep `min-width: 0`).
+- 🔑 The hero markup is drift-locked: run `node scripts/sync-test-harness.js` after ANY change
+  inside `#aemc-bonus-hero`.
+
 ## First real custom-tees order: proforma hid data the session already had; ShopWorks dates were UTC days (2026-09-01)
 
 **Problem.** Real paid order DTG0831-2727 ($68.99 CC, ship Eugene OR): the pre-import
@@ -67,32 +94,7 @@ reports absence, make it state its own coverage: which dates it read, how fresh 
 and what it could not fetch. Prose promises in a header comment are not enforcement — this
 file's own comment made exactly this promise and the code did the opposite for weeks.
 
-## curl from git-bash mangled em dashes into U+FFFD inside a Caspio row (2026-08-25)
-
-**Problem.** Creating the Forms_Library row for the embroidery-operator employment application
-via `curl -d '{...}'` in git-bash returned HTTP 201 — but the stored `Form_Name`/`Description`
-carried literal U+FFFD replacement characters where the em dashes were. The 201 looks like
-success; the corruption only shows when you read the row BACK and inspect the bytes.
-
-**Root cause.** git-bash on Windows handed curl the heredoc body in a non-UTF-8 encoding; the
-proxy/Caspio replaced the invalid bytes with U+FFFD, which then round-trips as "valid" text.
-Printing the GET response to the console ALSO renders "�" for unrelated console-encoding
-reasons, so eyeballing output can't distinguish stored corruption from display noise.
-
-**Solution.** Re-sent via `PUT /api/forms-library/:id` from Python with
-`json.dumps(..., ensure_ascii=True)` (escapes non-ASCII to `\uXXXX`, so the wire body is pure
-ASCII and immune to shell encoding), then verified the stored value with `ascii(field)` on a
-fresh GET — shows `—`, proving real em dashes.
-
-**Prevention.**
-- 🔑 **Any Caspio/proxy write containing non-ASCII (em dash, ×, ’, é) goes through Python with
-  `ensure_ascii=True` — never a curl body typed in git-bash.** JSON `\uXXXX` escapes are the
-  portable path on Windows shells.
-- 🔑 **Verify stored TEXT with `ascii()`/`repr()` on a re-read, not by eyeballing console
-  output** — the console lies about encoding in both directions.
-
----
-
+### curl from git-bash mangled em dashes into U+FFFD (2026-08-25, ARCHIVED 2026-09-01): non-ASCII Caspio writes go through Python `ensure_ascii=True`, never a git-bash curl body; verify stored text with `ascii()` on a re-read. Full entry in archive.
 ### A customer's real size request was shown to nobody (2026-08-19, ARCHIVED 2026-08-27): render every field you persist — a saved-but-unshown field is data loss with extra steps. Full entry in archive.
 ### SAM quotes rendered “No items” (2026-08-19, ARCHIVED 2026-08-27): a channel that opts out of a shared fix re-inherits the bug it fixed; SW-snapshot overlay repaints EXISTING rows only. Full entry in archive.
 
