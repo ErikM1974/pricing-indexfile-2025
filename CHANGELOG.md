@@ -1,3 +1,8 @@
+## v2026.09.01.4 (2026.09.01)
+
+- Invoice: bill to the storefront buyer, not the catch-all customer; MO dates render on the right day
+- Deploy v2026.09.01.4: 1 files (invoice.html...)
+
 ## v2026.09.01.2 (2026.09.01)
 
 - Fix pre-import proforma gaps + ShopWorks UTC dates (DTG0831-2727 review)
