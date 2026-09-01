@@ -1,3 +1,8 @@
+## v2026.09.01.2 (2026.09.01)
+
+- Fix pre-import proforma gaps + ShopWorks UTC dates (DTG0831-2727 review)
+- Deploy v2026.09.01.2: 1 files (invoice.html...)
+
 ## v2026.08.26.11 (2026.08.26)
 
 - Revert "Deploy v2026.08.26.10: homepage catalog redesign — one door (Option D + search): brand rail, category cut-rows, code-forward best sellers"
