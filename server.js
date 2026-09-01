@@ -1990,7 +1990,11 @@ async function handleSamplesOrderPaid(session, quoteID, res) {
       },
       stripeSessionId: session.id,
       paymentAmount: session.amount_total,
-      serviceBanner: chCfg.push.serviceBanner(false)
+      serviceBanner: chCfg.push.serviceBanner(false),
+      // Pacific day for both ShopWorks dates — the UTC-day defaults stamp
+      // evening orders (after ~5pm PT) with tomorrow's date. (2026-09-01)
+      orderDate: nowPacificNaiveIso().split('T')[0],
+      paymentDate: nowPacificNaiveIso().split('T')[0]
     });
     const pushResp = await fetch(`${CASPIO_PROXY_BASE}/api/manageorders/orders/create`, {
       method: 'POST',
@@ -9406,7 +9410,8 @@ app.post('/api/submit-3day-order', async (req, res) => {
           code: `${tempOrderNumber}-FRONT`,
           imageUrl: frontLogo,
           customField01: frontLogo,  // Copyable URL for staff (OnSite doesn't show ImageURL thumbnails)
-          notes: 'Customer uploaded artwork' + (frontCode === 'JF' ? ' — JUMBO FRONT 16×20″ (see placement spec)' : ''),
+          // No ″ (U+2033): ManageOrders stores cp1252, anything outside it becomes "?"
+          notes: 'Customer uploaded artwork' + (frontCode === 'JF' ? ' — JUMBO FRONT 16×20 in (see placement spec)' : ''),
           details: pushC.designDetails()
         });
       }
@@ -9420,7 +9425,7 @@ app.post('/api/submit-3day-order', async (req, res) => {
           code: `${tempOrderNumber}-BACK`,
           imageUrl: backLogo,
           customField01: backLogo,  // Copyable URL for staff (OnSite doesn't show ImageURL thumbnails)
-          notes: 'Customer uploaded artwork (back) - See Attachments tab for image' + (stampedBack === 'JB' ? ' — JUMBO BACK 16×20″ (see placement spec)' : ''),
+          notes: 'Customer uploaded artwork (back) - See Attachments tab for image' + (stampedBack === 'JB' ? ' — JUMBO BACK 16×20 in (see placement spec)' : ''),
           details: pushC.designDetails()
         });
       }
@@ -9580,6 +9585,15 @@ TAX: ${taxPct ? `APPLY ${taxPartDescription}` : 'DO NOT APPLY - out-of-state shi
       // pre-2026-06-12 storefront payload, so this is a caps-only change. The
       // proxy reads root-level `idOrderType` (same as the Order Form push).
       ...(pushC.idOrderType ? { idOrderType: pushC.idOrderType } : {}),
+      // Order date = the PACIFIC day. Left absent, the proxy defaults to the
+      // UTC day, which stamps evening orders (after ~5pm PT) with TOMORROW's
+      // date in ShopWorks — DTG0831-2727 paid Sun 8/30 7:38pm PT showed
+      // date_OrderPlaced 08/31. (2026-09-01)
+      orderDate: nowPacificNaiveIso().split('T')[0],
+      // Binding promised ship date (stamped at checkout, shipPromise.iso) →
+      // ShopWorks date_OrderRequestedToShip, so production sees a real date
+      // field instead of only the PROMISED SHIP DATE note line. (2026-09-01)
+      ...(orderSettings?.shipPromise?.iso ? { requestedShipDate: orderSettings.shipPromise.iso } : {}),
       // Channel-aware (registry): Custom-Tees standard orders are NOT rush
       // (legacy 3DT always is)
       rushOrder: pushC.rushOrderFlag(orderSettings),
@@ -9601,7 +9615,9 @@ TAX: ${taxPct ? `APPLY ${taxPartDescription}` : 'DO NOT APPLY - out-of-state shi
       },
       // Payment information from Stripe
       payments: paymentConfirmed ? [{
-        date: new Date().toISOString().split('T')[0],  // YYYY-MM-DD format
+        // PACIFIC day (YYYY-MM-DD) — UTC day dated evening payments +1 in
+        // ShopWorks (same off-by-one as orderDate above). (2026-09-01)
+        date: nowPacificNaiveIso().split('T')[0],
         amount: parseFloat((paymentAmount ? paymentAmount / 100 : orderTotals?.grandTotal || 0).toFixed(2)),  // Round to 2 decimals
         status: 'success',
         gateway: 'Stripe',

@@ -55,16 +55,25 @@
     return '$' + v.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   }
 
+  // Bare 'YYYY-MM-DD' strings are spec-parsed as UTC midnight, so
+  // toLocaleDateString renders them a day early anywhere west of Greenwich.
+  // Build date-only values from parts (local time) instead.
+  function parseDateSafe(s) {
+    const m = typeof s === 'string' && s.trim().match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (m) return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+    return new Date(s);
+  }
+
   function fmtDate(s) {
     if (!s) return '';
-    const d = new Date(s);
+    const d = parseDateSafe(s);
     if (isNaN(d.getTime())) return '';
     return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
   }
 
   function fmtDateShort(s) {
     if (!s) return '';
-    const d = new Date(s);
+    const d = parseDateSafe(s);
     if (isNaN(d.getTime())) return '';
     return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
   }
@@ -190,6 +199,23 @@
       // Pre-import: show the quote ID instead
       return this.quoteId;
     }
+
+    // Storefront orders (custom-tees / custom-caps / samples) don't write the
+    // Notes-JSON originalSubmission the quote builders do — their checkout
+    // blobs live in flat session columns. Parse lazily, cache on the instance.
+    storefrontBlob(column, cacheKey) {
+      if (this[cacheKey] !== undefined) return this[cacheKey];
+      let parsed = null;
+      const raw = this.fullData?.sessionRaw?.[column];
+      if (raw) {
+        try { parsed = JSON.parse(raw); }
+        catch (_) { /* not a storefront order */ }
+      }
+      this[cacheKey] = parsed;
+      return parsed;
+    }
+    storefrontCustomerData()  { return this.storefrontBlob('CustomerDataJSON', '_sfCustomer'); }
+    storefrontOrderSettings() { return this.storefrontBlob('OrderSettingsJSON', '_sfSettings'); }
 
     // ---------- render orchestration ----------
 
@@ -320,20 +346,24 @@
       }
 
       // Billing street address — pull from CompanyContactsMerge2026 first
-      // (authoritative), then fall back to whatever the rep typed at submit.
+      // (authoritative), then whatever the rep typed at submit, then the
+      // storefront checkout's CustomerDataJSON (same per-field billing||shipping
+      // fallback the ShopWorks push uses, so this matches what OnSite gets).
+      const sfCd = this.storefrontCustomerData() || {};
       const billAddr1 =
         billing?.address1 ||
         orig?.info?.address ||
         orig?.info?.address1 ||
         orig?.info?.billingAddress ||
+        sfCd.billingAddress1 || sfCd.address1 || sfCd.address ||
         '';
       const billAddr2 =
         billing?.address2 ||
         orig?.info?.address2 ||
         '';
-      const billCity  = billing?.city  || orig?.info?.city  || '';
-      const billState = billing?.state || orig?.info?.state || '';
-      const billZip   = billing?.zip   || orig?.info?.zip   || '';
+      const billCity  = billing?.city  || orig?.info?.city  || sfCd.billingCity  || sfCd.city  || '';
+      const billState = billing?.state || orig?.info?.state || sfCd.billingState || sfCd.state || '';
+      const billZip   = billing?.zip   || orig?.info?.zip   || sfCd.billingZip   || sfCd.zip   || sfCd.zipCode || '';
       const billCityState =
         [billCity, billState].filter(Boolean).join(', ') +
         (billZip ? ' ' + billZip : '');
@@ -380,7 +410,7 @@
       // ShopWorks /v1/orders doesn't expose ShippingAddresses;
       // the order-pull snapshot does (pushed.ShippingAddresses[0]).
       const pushedShip = (pushed?.ShippingAddresses || [])[0];
-      const ship = pushedShip ? {
+      let ship = pushedShip ? {
         method:    pushedShip.ShipMethod || '',
         address1:  pushedShip.ShipAddress01 || '',
         address2:  pushedShip.ShipAddress02 || '',
@@ -390,6 +420,27 @@
         company:   pushedShip.ShipCompany || '',
         name:      pushedShip.ShipName || '',
       } : (orig?.ship || {});
+
+      // Storefront fallback (pre-import): custom-tees/caps/samples orders have
+      // no originalSubmission.ship — the address the customer typed at checkout
+      // lives in the session's CustomerDataJSON column. Without this, Ship To
+      // rendered "—" until ShopWorks imported + synced (DTG0831-2727).
+      if (!ship.address1 && !ship.address && !ship.method && ship.isPickup !== true) {
+        const cd = this.storefrontCustomerData();
+        if (cd) {
+          ship = {
+            // Mirrors the push (server.js shipping.method): pickup or UPS Ground.
+            method:   cd.deliveryMethod === 'pickup' ? 'Customer Pickup' : 'UPS Ground',
+            address1: cd.address1 || cd.address || '',
+            address2: cd.address2 || '',
+            city:     cd.city || '',
+            state:    cd.state || '',
+            zip:      cd.zip || cd.zipCode || '',
+            company:  cd.company || '',
+            name:     [cd.firstName, cd.lastName].filter(Boolean).join(' '),
+          };
+        }
+      }
 
       const method = (ship.method || ship.methodLabel || '').toString();
       const isPickup =
@@ -405,7 +456,7 @@
         line2     = '2025 Freeman Road East';
         cityState = 'Milton, WA 98354';
       } else {
-        recipient = ship.company || ship.name || data.sessionRaw?.CompanyName || orig?.info?.company || '—';
+        recipient = ship.company || ship.name || data.sessionRaw?.CompanyName || orig?.info?.company || data.sessionRaw?.CustomerName || '—';
         line1     = ship.address1 || ship.address || '';
         line2     = ship.address2 || '';
         const city = ship.city || '';
@@ -443,11 +494,13 @@
         '';
       $('detail-rep').textContent = rep || '—';
 
-      // Req Ship Date
+      // Req Ship Date — storefront orders stamp the binding ship promise in
+      // OrderSettingsJSON at checkout (shipPromise.iso = end of the window).
       const reqShip =
         order?.date_RequestedToShip ||
         orig?.info?.requestedShipDate ||
         data.sessionRaw?.RequestedShipDate ||
+        this.storefrontOrderSettings()?.shipPromise?.iso ||
         '';
       $('detail-ship-date').textContent = fmtDateShort(reqShip) || '—';
 
@@ -661,12 +714,30 @@
           !(String(it.EmbellishmentType || '').toLowerCase() === 'fee' && ORDER_LEVEL.has(it.StyleNumber))
       ).map(it => {
         const qty   = Number(it.Quantity) || Number(it.TotalQuantity) || 0;
-        const unit  = Number(it.UnitPrice) || Number(it.FinalUnitPrice) || 0;
+        let unit    = Number(it.UnitPrice) || Number(it.FinalUnitPrice) || 0;
         const total = Number(it.LineTotal) || Number(it.TotalAmount) || (unit * qty);
+        // Storefront rows store the BASE size price in FinalUnitPrice with
+        // extended-size upcharges only in LineTotal — rendered literally that
+        // read "2 @ $29.50 = $61.00" (DTG0831-2727). Show the blended
+        // per-piece price so unit × qty foots to the line total.
+        if (qty > 0 && total > 0 && Math.abs(unit * qty - total) > 0.009) {
+          unit = Math.round((total / qty) * 100) / 100;
+        }
+        // Size breakdown (stored as JSON on storefront rows) → description,
+        // same "… — XL: 1, 2XL: 1" shape the post-import ShopWorks path renders.
+        let sizeStr = '';
+        if (it.SizeBreakdown) {
+          try {
+            const sb = JSON.parse(it.SizeBreakdown);
+            sizeStr = Object.keys(sb)
+              .filter(k => Number(sb[k]) > 0)
+              .map(k => `${k}: ${sb[k]}`).join(', ');
+          } catch (_) { /* legacy/plain-text rows */ }
+        }
         return {
           style: it.StyleNumber || it.ProductName || '—',
           color: it.Color || it.ColorName || '',
-          desc:  it.ProductName || it.Description || '',
+          desc:  [it.ProductName || it.Description || '', sizeStr].filter(Boolean).join(' — '),
           locations: it.PrintLocation || '',
           qty, unit, total,
         };

@@ -5,6 +5,33 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 
 ---
 
+## First real custom-tees order: proforma hid data the session already had; ShopWorks dates were UTC days (2026-09-01)
+
+**Problem.** Real paid order DTG0831-2727 ($68.99 CC, ship Eugene OR): the pre-import
+proforma (`/invoice/:id`) showed Ship To "—", REQ SHIP DATE "—", Bill To with no street,
+and "2 @ $29.50 = $61.00" (doesn't foot). ShopWorks also recorded the order/payment as
+08/31 though the customer paid Sun 8/30 7:38 PM Pacific.
+
+**Root cause.** (1) invoice.js only read `pushed.ShippingAddresses` (exists post-import)
+or `originalSubmission.ship` (quote-builders only) — storefront orders keep the address in
+the flat `CustomerDataJSON`/`OrderSettingsJSON` session columns it never parsed. (2)
+Storefront quote_items store the BASE-size price in `FinalUnitPrice` with extended-size
+upcharges only in `LineTotal`, and `SizeBreakdown` was never rendered. (3) The push stamped
+`new Date().toISOString()` = the UTC day — every order after ~5 PM PT dates +1 in ShopWorks.
+Also: `″` (U+2033) in push notes → "?" (ManageOrders is cp1252); `requestedShipDate` was
+never sent though the proxy supports it and `shipPromise.iso` is stamped at checkout.
+
+**Solution.** invoice.js: lazy `storefrontCustomerData()/storefrontOrderSettings()` blob
+parsers feeding Ship-To/Bill-To/req-ship-date fallbacks; blended unit price when
+unit×qty ≠ LineTotal + render SizeBreakdown; `parseDateSafe()` so bare `YYYY-MM-DD` renders
+local, not UTC-shifted a day early. server.js push: `orderDate`/payment `date`/samples dates
+= `nowPacificNaiveIso().split('T')[0]`; send `requestedShipDate: shipPromise.iso`; `″`→" in".
+
+**Prevention.** A "blank" field on a pre-import surface is usually a READER gap, not missing
+data — check the session's JSON blob columns before touching the push. Any date written to
+ShopWorks/Caspio must be the PACIFIC day (`nowPacificNaiveIso()`), and any bare date STRING
+rendered in the browser must not go through `new Date('YYYY-MM-DD')`. Push text stays cp1252.
+
 ## An audit that reported a clean manifest as 26 missing POs — three ways to confuse "not there" with "never looked" (2026-08-26)
 
 **Problem.** `scripts/psst-audit.js` reconciles SanMar's daily freight manifest against our
