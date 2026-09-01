@@ -130,6 +130,10 @@
             '\nTAX: ' + (taxPct ? 'APPLY ' + taxPartDescription : 'DO NOT APPLY - out-of-state shipment')
         }
       ].filter(Boolean),
+      // Pacific day from the caller — when absent the proxy defaults
+      // date_OrderPlaced to the UTC day (evening orders date +1 in ShopWorks).
+      // undefined is dropped by JSON.stringify, so legacy callers are unchanged.
+      orderDate: o.orderDate || undefined,
       taxTotal: r2(totals.salesTax || 0),
       taxPartNumber: taxPartNumber,
       taxPartDescription: taxPartDescription,
