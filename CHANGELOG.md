@@ -1,3 +1,8 @@
+## v2026.09.01.5 (2026.09.01)
+
+- Bonus hero: ring holds only the %, dollars beside it; CTA wrap fixed
+- Deploy v2026.09.01.5: 2 files (ae-mission-control.html, test-ae-mission-control.html...)
+
 ## v2026.09.01.4 (2026.09.01)
 
 - Invoice: bill to the storefront buyer, not the catch-all customer; MO dates render on the right day
