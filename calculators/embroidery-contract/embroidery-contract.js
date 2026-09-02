@@ -435,8 +435,21 @@
         document.getElementById('cardTitle').textContent = p.title;
         document.getElementById('cardSubtitle').textContent = p.subtitle;
         document.getElementById('cardCode').textContent = p.code;
-        var minsHtml = '<span>Min stitches <b>' + (p.minStitches / 1000) + 'K</b></span>';
-        if (p.minCharge) minsHtml = '<span style="margin-right:14px">Min charge <b>$' + p.minCharge.toFixed(2) + '</b></span>' + minsHtml;
+        // Terms line for THIS product, every value from the API (2026-09-02): the fee and
+        // its band differ between garments/caps and full back, and the order minimum is
+        // one Caspio row — so the table states them beside the numbers it prices.
+        var feeAmt = ltmFeeForProduct(state.tableProduct);
+        var feeBand = ltmThresholdForProduct(state.tableProduct);
+        var minsHtml = '<span>Min stitches <b>' + (minStitchesFor(state.tableProduct) / 1000) + 'K</b></span>';
+        if (feeAmt > 0 && feeBand > 0) {
+            minsHtml += '<span>Small-order fee <b>$' + fmtMoney(feeAmt) + '</b> on 1–' + feeBand + ' pcs, rolled into the price</span>';
+        }
+        if (orderMinimumState === 'ok' && orderMinimum > 0) {
+            minsHtml += '<span>Order minimum <b>$' + fmtMoney(orderMinimum) + '</b></span>';
+        } else if (orderMinimumState === 'error') {
+            minsHtml += '<span>⚠ order minimum not loaded</span>';
+        }
+        if (p.minCharge) minsHtml = '<span>Min charge <b>$' + p.minCharge.toFixed(2) + '</b></span>' + minsHtml;
         document.getElementById('cardMins').innerHTML = minsHtml;
 
         if (!rates) {

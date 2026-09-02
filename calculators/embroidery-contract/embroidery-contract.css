@@ -584,3 +584,10 @@ table.price tfoot td.cell-hi {
 /* Terms line under the hero lede (2026-09-02): order minimum + small-order fee, values filled from Caspio by embroidery-contract.js */
 .hero .lede-terms { margin-top: .6rem; font-size: .95em; }
 .hero .lede-terms strong { color: var(--text-strong, inherit); }
+
+/* Table-card terms line (2026-09-02): min stitches, small-order fee + band, order minimum, all from the API */
+#cardMins { display: flex; flex-wrap: wrap; gap: 6px 16px; justify-content: flex-end; }
+.tables-head .print-list { margin-left: auto; }
+
+.price-foot .print-list-link { flex-basis: 100%; text-align: right; font-size: .85em; font-weight: 600; text-decoration: none; margin-top: 6px; }
+.price-foot .print-list-link:hover { text-decoration: underline; }
