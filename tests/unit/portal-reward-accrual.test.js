@@ -141,3 +141,30 @@ describe('reward accrual — posting stays staff-only and idempotent (source loc
         expect(proj).toMatch(/premiumRatePct/);
     });
 });
+
+describe('reward accrual — scope and Heroku-safe pacing (source lock)', () => {
+    const reMatch = src.match(/const REWARD_WEBSTORE_TYPES = (\/.+?\/i);/);
+    const RE = reMatch ? new Function('return ' + reMatch[1])() : null;
+    test('web-store order types are excluded by default (622 Inksoft orders on one GOLD account)', () => {
+        expect(RE).toBeTruthy();
+        expect(RE.test('Inksoft')).toBe(true);
+        expect(RE.test('Shopify')).toBe(true);
+        expect(RE.test('Custom Embroidery')).toBe(false);
+        expect(RE.test('Digital Printing')).toBe(false);
+        expect(RE.test('Transfers')).toBe(false);
+        // …and only an explicit RWD-WEBSTORE row turns them on
+        expect(src).toMatch(/RWD-WEBSTORE/);
+    });
+    test('order types come from ORDER_ODBC and a failed lookup refuses rather than including everything', () => {
+        expect(src).toMatch(/throw new Error\('order types unavailable'\)/);
+    });
+    test('one calculation fetches a bounded number of uncached orders and reports partial progress', () => {
+        expect(src).toMatch(/const MO_MAX_FETCHES = \d+;/);
+        const cap = Number(src.match(/const MO_MAX_FETCHES = (\d+);/)[1]);
+        expect(cap).toBeLessThanOrEqual(10);   // ~2.2 s apart under the 30/min limiter, inside Heroku's 30 s
+        expect(src).toMatch(/partial: unavailable\.length > 0/);
+    });
+    test('grants are never posted from a partial calculation', () => {
+        expect(src).toMatch(/if \(acc\.partial\) return res\.status\(409\)/);
+    });
+});

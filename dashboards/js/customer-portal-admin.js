@@ -484,7 +484,13 @@
     var box = document.getElementById('cpa-rw-accrual');
     box.innerHTML = '<div class="cpa-rw-empty"><i class="fas fa-spinner fa-spin"></i> Calculating from ManageOrders + catalog costs…</div>';
     try {
-      rwAccrual = await api(REWARDS_ACCRUAL_API + '/' + encodeURIComponent(rwCustomer.id));
+      // Each call fetches at most ~9 uncached orders (Heroku's 30 s limit) and says partial:true;
+      // loop until complete, showing progress. The server caches what it fetched.
+      var rounds = 0;
+      do {
+        rwAccrual = await api(REWARDS_ACCRUAL_API + '/' + encodeURIComponent(rwCustomer.id));
+        if (rwAccrual.partial) box.innerHTML = '<div class="cpa-rw-empty"><i class="fas fa-spinner fa-spin"></i> Fetching order details… ' + esc(String(rwAccrual.progress.fetched)) + ' of ' + esc(String(rwAccrual.progress.total)) + ' orders</div>';
+      } while (rwAccrual.partial && ++rounds < 40);
       renderAccrual();
     } catch (err) {
       if (err.message !== 'auth') box.innerHTML = '<div class="cpa-rw-empty">Could not calculate: ' + esc(err.message) + '</div><button class="cpa-btn cpa-btn-ghost cpa-btn-sm" id="cpa-rw-calc" type="button">Try again</button>';
@@ -500,7 +506,8 @@
     }
     var t = a.totals;
     var html = '<div class="cpa-rw-acc-sum">Earned <strong>' + money2(t.earned) + '</strong> on ' + money2(t.eligibleRevenue) + ' of eligible garments &middot; granted ' + money2(t.granted) + ' &middot; <strong class="' + (t.pending > 0 ? 'pos' : '') + '">pending ' + money2(t.pending) + '</strong>' +
-      '<div class="cpa-rw-meta">Bands: ' + a.program.tiers.map(function (x) { return esc(x.label) + ' &rarr; ' + esc(String(x.ratePct)) + '%'; }).join(' &middot; ') + ' &middot; ' + esc(String(a.program.months)) + '-month window' + (a.unavailable && a.unavailable.length ? ' &middot; <span class="neg">' + a.unavailable.length + ' order(s) had no line items — recalculate</span>' : '') + '</div></div>';
+      '<div class="cpa-rw-meta">Bands: ' + a.program.tiers.map(function (x) { return esc(x.label) + ' &rarr; ' + esc(String(x.ratePct)) + '%'; }).join(' &middot; ') + ' &middot; ' + esc(String(a.program.months)) + '-month window' + (a.unavailable && a.unavailable.length ? ' &middot; <span class="neg">' + a.unavailable.length + ' order(s) still missing line items — recalculate</span>' : '') +
+      (a.excludedWebstore && a.excludedWebstore.count ? ' &middot; ' + esc(String(a.excludedWebstore.count)) + ' web-store order(s) (' + money2(a.excludedWebstore.revenue) + ') excluded' : '') + '</div></div>';
     if (!a.orders.length) html += '<div class="cpa-rw-empty">No invoiced + paid orders in the window.</div>';
     else html += '<table class="cpa-rw-acc-table"><thead><tr><th>Order</th><th>Invoiced</th><th class="num">Eligible</th><th class="num">Reward</th><th class="num">Granted</th><th class="num">Pending</th></tr></thead><tbody>' + a.orders.map(function (o) {
       var lines = (o.lines || []).map(function (l) {

@@ -8458,7 +8458,13 @@ async function loadRewardProgram() {
     .sort((a, b) => a.min - b.min);
   const win = rows.find((x) => String(x.ServiceCode || '').toUpperCase() === 'RWD-WINDOW');
   const months = win && Number(win.UnitCost) > 0 ? Math.round(Number(win.UnitCost)) : REWARD_WINDOW_MONTHS_DEFAULT;
-  const program = { configured: tiers.length > 0, tiers, months };
+  // Web-store orders (Inksoft / Shopify company stores) are EXCLUDED by default: they are automatic
+  // employee purchases, not rep-handled company orders, and one GOLD account had 622 of them in a
+  // year (measured 2026-09-01) — the program is for the company's own reorders. An optional
+  // Service_Codes row RWD-WEBSTORE with SellPrice=1 turns them on.
+  const web = rows.find((x) => String(x.ServiceCode || '').toUpperCase() === 'RWD-WEBSTORE');
+  const includeWebstore = !!(web && Number(web.SellPrice) > 0);
+  const program = { configured: tiers.length > 0, tiers, months, includeWebstore };
   _rewardProgramCache = { t: Date.now(), program };
   return program;
 }
@@ -8482,6 +8488,36 @@ function moOrderPaid(o) {
   return balKnown && (Number(o.cur_Balance) || 0) <= 0.005;
 }
 const rewardRound = (n) => Math.round((Number(n) || 0) * 100) / 100;
+const REWARD_WEBSTORE_TYPES = /inksoft|shopify|web ?store|storefront/i;   // ShopWorks ORDER_TYPE names
+// Line items of an INVOICED + PAID order never change → memoise for a day. And the proxy's
+// ManageOrders limiter is ONE 30-requests/minute bucket shared by every caller behind the same
+// IP (the whole dyno), so fetching a 25-order customer in parallel trips it and the missing
+// orders would silently read as "no reward" (measured 2026-09-01: 25 of 25 line-item calls
+// 429'd). Fetch sequentially — a short burst, then ~2.2 s apart — and retry once after a pause.
+const _moLineCache = new Map();   // id_Order → { t, result }
+const MO_LINE_CACHE_MS = 24 * 60 * 60 * 1000;
+const MO_PACE_MS = 2200;
+// Heroku kills any request past 30 s (H12), so one calculation fetches at most MO_MAX_FETCHES
+// uncached orders (~20 s), returns partial:true, and the console calls again — the cache carries
+// the progress. A 25-order account completes in three rounds; the 600-order web stores are
+// excluded above rather than crawled.
+const MO_MAX_FETCHES = 9;
+async function portalPacedLineItems(orderNos, hdrs) {
+  const out = []; let calls = 0; let fetched = 0;
+  for (const no of orderNos) {
+    const hit = _moLineCache.get(String(no));
+    if (hit && (Date.now() - hit.t) < MO_LINE_CACHE_MS) { out.push(hit.result); continue; }
+    if (fetched >= MO_MAX_FETCHES) { out.push(null); continue; }   // left for the next round
+    fetched++;
+    if (calls >= 3) await new Promise((r) => setTimeout(r, MO_PACE_MS));
+    const url = `${CRM_API_BASE}/api/manageorders/lineitems/${encodeURIComponent(no)}`;
+    let j = await portalFetchJson(url, hdrs, 8000); calls++;
+    if (!j) { await new Promise((r) => setTimeout(r, 3500)); j = await portalFetchJson(url, hdrs, 8000); calls++; }
+    if (j && Array.isArray(j.result)) _moLineCache.set(String(no), { t: Date.now(), result: j });
+    out.push(j);
+  }
+  return out;
+}
 async function computeRewardAccrual(cid) {
   const program = await loadRewardProgram();
   const hdrs = CRM_API_SECRET ? { 'X-CRM-API-Secret': CRM_API_SECRET } : {};
@@ -8491,13 +8527,25 @@ async function computeRewardAccrual(cid) {
   const sd = new Date(today); sd.setFullYear(today.getFullYear() - 3);   // MO list window (invoice date filters below)
   const ordersJson = await portalFetchJson(`${CRM_API_BASE}/api/manageorders/orders?id_Customer=${encodeURIComponent(cid)}&date_Ordered_start=${sd.toISOString().slice(0, 10)}&date_Ordered_end=${end}`, hdrs, 10000);
   if (!ordersJson) throw new Error('orders unavailable');
-  const eligible = (ordersJson.result || []).filter((o) => {
+  const paidInWindow = (ordersJson.result || []).filter((o) => {
     if (!o.id_Order || !o.date_Invoiced || !moOrderPaid(o)) return false;
     const inv = new Date(String(o.date_Invoiced).slice(0, 10) + 'T00:00:00Z');
     return !isNaN(inv.getTime()) && inv >= windowStart;
   }).sort((a, b) => String(b.date_Invoiced).localeCompare(String(a.date_Invoiced)));
+  // Order TYPE comes from the ShopWorks ODBC mirror (ORDER_ODBC) — ManageOrders only has a numeric
+  // id_OrderType. Refusing to classify is safer than silently crawling (or rewarding) 600 web orders.
+  let typeByOrder = new Map();
+  if (!program.includeWebstore && paidInWindow.length) {
+    const where = `id_Customer=${cid} AND date_OrderInvoiced>='${windowStart.toISOString().slice(0, 10)}'`;
+    const odbc = await portalFetchJson(`${CRM_API_BASE}/api/order-odbc?q.where=${encodeURIComponent(where)}&q.limit=1000`, hdrs, 8000);
+    if (!Array.isArray(odbc)) throw new Error('order types unavailable');
+    odbc.forEach((r) => { if (r.ID_Order != null) typeByOrder.set(String(r.ID_Order), String(r.ORDER_TYPE || '')); });
+  }
+  const isWebstore = (o) => REWARD_WEBSTORE_TYPES.test(typeByOrder.get(String(o.id_Order)) || '');
+  const excludedWeb = program.includeWebstore ? [] : paidInWindow.filter(isWebstore);
+  const eligible = program.includeWebstore ? paidInWindow : paidInWindow.filter((o) => !isWebstore(o));
   const [lineJsons, ledgerJson] = await Promise.all([
-    Promise.all(eligible.map((o) => portalFetchJson(`${CRM_API_BASE}/api/manageorders/lineitems/${encodeURIComponent(o.id_Order)}`, hdrs, 8000))),
+    portalPacedLineItems(eligible.map((o) => o.id_Order), hdrs),
     portalFetchJson(`${CRM_API_BASE}/api/customer-rewards/ledger/${encodeURIComponent(cid)}`, hdrs, 8000),
   ]);
   if (!ledgerJson) throw new Error('ledger unavailable');   // without it "pending" would double-grant
@@ -8546,9 +8594,13 @@ async function computeRewardAccrual(cid) {
     eligibleRevenue: rewardRound(t.eligibleRevenue + o.eligibleRevenue), earned: rewardRound(t.earned + o.reward),
     granted: rewardRound(t.granted + o.granted), pending: rewardRound(t.pending + o.pending),
   }), { eligibleRevenue: 0, earned: 0, granted: 0, pending: 0 });
+  const unavailable = orders.filter((o) => o.linesUnavailable).map((o) => o.orderNumber);
   return {
     program, window: { from: windowStart.toISOString().slice(0, 10), to: end }, orders, totals,
-    unavailable: orders.filter((o) => o.linesUnavailable).map((o) => o.orderNumber),
+    unavailable,
+    partial: unavailable.length > 0,
+    progress: { fetched: orders.length - unavailable.length, total: orders.length },
+    excludedWebstore: { count: excludedWeb.length, revenue: rewardRound(excludedWeb.reduce((s, o) => s + (Number(o.cur_TotalInvoice) || 0), 0)) },
     generatedAt: new Date().toISOString(),
   };
 }
@@ -8568,6 +8620,7 @@ app.post('/api/portal-admin/rewards/accrual/:id/post', requireCrmRole(PORTAL_ADM
   try {
     const acc = await computeRewardAccrual(cid);
     if (!acc.program.configured) return res.status(409).json({ error: 'Reward program is not configured (no RWD-EARN rows in Service_Codes).' });
+    if (acc.partial) return res.status(409).json({ error: `Still fetching order details (${acc.progress.fetched} of ${acc.progress.total}) — calculate again, then post.` });
     const only = Array.isArray(req.body && req.body.orders) ? new Set(req.body.orders.map(String)) : null;
     const todo = acc.orders.filter((o) => o.pending > 0 && !o.linesUnavailable && (!only || only.has(String(o.orderNumber))));
     const staff = (req.session.crmUser && req.session.crmUser.email) || 'staff';
