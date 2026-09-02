@@ -503,7 +503,7 @@
   }
   function renderAccrual() {
     var a = rwAccrual, box = document.getElementById('cpa-rw-accrual');
-    document.getElementById('cpa-rw-acc-window').textContent = a.window ? '(' + a.window.from + ' → ' + a.window.to + ')' : '';
+    document.getElementById('cpa-rw-acc-window').textContent = a.window ? ((a.program && a.program.name ? a.program.name + ' · ' : '') + a.window.from + ' → ' + a.window.to + (a.program && a.program.spend ? ' · spend ' + a.program.spend.from + ' → ' + a.program.spend.to : '')) : '';
     if (!a.program || !a.program.configured) {
       box.innerHTML = '<div class="cpa-rw-notconf"><strong>Reward program not configured.</strong> Add rows to Caspio &rarr; <code>Service_Codes</code>: ServiceType <code>REWARD</code>, ServiceCode <code>RWD-EARN</code>, PricingMethod <code>TIERED</code>, IsActive Yes, Visible No — one row per SanMar piece-cost band with TierLabel like <code>0-39.99</code> and <code>40+</code> and SellPrice = the % back. Optional <code>RWD-WINDOW</code> row with UnitCost = months (default 12). Nothing is granted until this exists.</div>' +
         '<div class="cpa-rw-acc-actions"><button class="cpa-btn cpa-btn-ghost cpa-btn-sm" id="cpa-rw-calc" type="button">Recalculate</button></div>';
@@ -529,8 +529,20 @@
     var nr = a.orders.filter(function (o) { return o.redemption && o.redemption.pending > 0 && !o.linesUnavailable; }).length;
     html += '<div class="cpa-rw-acc-actions">' +
       ((n || nr) ? '<button class="cpa-btn cpa-btn-primary cpa-btn-sm" id="cpa-rw-post" type="button"><i class="fas fa-coins"></i> Post ' + (n ? money2(t.pending) + ' as ' + n + ' grant' + (n === 1 ? '' : 's') : '') + (n && nr ? ' + ' : '') + (nr ? nr + ' redemption' + (nr === 1 ? '' : 's') + ' (' + money2(t.redeemPending) + ')' : '') + '</button>' : '<span class="cpa-rw-meta">Nothing pending — grants and redemptions are all in the ledger.</span>') +
-      ' <button class="cpa-btn cpa-btn-ghost cpa-btn-sm" id="cpa-rw-calc" type="button">Recalculate</button></div>';
+      ' <button class="cpa-btn cpa-btn-ghost cpa-btn-sm" id="cpa-rw-calc" type="button">Recalculate</button>' +
+      (a.program && a.program.spend && new Date().toISOString().slice(0, 10) > a.program.spend.to && t.ledgerBalance > 0.005
+        ? ' <button class="cpa-btn cpa-btn-ghost cpa-btn-sm" id="cpa-rw-expire" type="button" title="Spend window closed ' + esc(a.program.spend.to) + '"><i class="fas fa-hourglass-end"></i> Expire unused ' + money2(t.ledgerBalance) + '</button>'
+        : '') + '</div>';
     box.innerHTML = html;
+  }
+  async function expireAccrual() {
+    if (!rwCustomer || !rwAccrual || !rwAccrual.program) return;
+    if (!window.confirm('Remove the unused ' + money2(rwAccrual.totals.ledgerBalance) + ' balance for ' + (rwCustomer.company || '#' + rwCustomer.id) + '? (' + rwAccrual.program.name + ' expired ' + rwAccrual.program.spend.to + ')')) return;
+    try {
+      var res = await api(REWARDS_ACCRUAL_API.replace('/accrual', '/expire') + '/' + encodeURIComponent(rwCustomer.id), { method: 'POST', body: JSON.stringify({ company_name: rwCustomer.company }) });
+      toast('Expired ' + money2(res.expired) + ' — balance now ' + money2(res.balance));
+      await loadRewardLedger(); await calcAccrual();
+    } catch (e) { if (e.message !== 'auth') toast(e.message, true); }
   }
   async function postAccrual() {
     if (!rwCustomer || !rwAccrual) return;
@@ -575,6 +587,7 @@
     document.getElementById('cpa-rw-accrual').addEventListener('click', function (e) {
       if (e.target.closest('#cpa-rw-calc')) calcAccrual();
       else if (e.target.closest('#cpa-rw-post')) postAccrual();
+      else if (e.target.closest('#cpa-rw-expire')) expireAccrual();
     });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
     loadMe();

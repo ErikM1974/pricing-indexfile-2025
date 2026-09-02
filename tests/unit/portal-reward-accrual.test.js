@@ -172,3 +172,24 @@ describe('reward accrual — scope and Heroku-safe pacing (source lock)', () => 
         expect(src).toMatch(/if \(acc\.partial\) return res\.status\(409\)/);
     });
 });
+
+describe('reward accrual — 2026 Rewards program year (Erik 2026-09-02)', () => {
+    const parseRewardWindow = new Function(liftFunction('parseRewardWindow') + '\nreturn parseRewardWindow;')();
+    test('RWD-WINDOW / RWD-SPEND / RWD-BOOST labels parse as date ranges', () => {
+        expect(parseRewardWindow('2026-01-01..2026-08-31')).toEqual({ from: '2026-01-01', to: '2026-08-31' });
+        expect(parseRewardWindow('2026-10-01 to 2026-12-31')).toEqual({ from: '2026-10-01', to: '2026-12-31' });
+        expect(parseRewardWindow('12')).toBeNull();
+    });
+    test('the earning window is the configured date range (both ends) when RWD-WINDOW carries one', () => {
+        expect(src).toMatch(/inv >= windowStart && inv <= windowEnd/);
+        expect(src).toMatch(/program\.earn \? new Date\(program\.earn\.from/);
+    });
+    test('a redemption is the WHOLE balance, inside the spend window', () => {
+        expect(src).toMatch(/Math\.abs\(amt - bal\) > 0\.01\) return res\.status\(400\)/);
+        expect(src).toMatch(/day > prog\.spend\.to\) return res\.status\(400\)/);
+    });
+    test('expiry is staff-only, refuses before the spend window closes, and never touches order refs', () => {
+        expect(src).toMatch(/app\.post\('\/api\/portal-admin\/rewards\/expire\/:id', requireCrmRole\(PORTAL_ADMIN_ROLES\)/);
+        expect(src).toMatch(/if \(day <= prog\.spend\.to\) return res\.status\(409\)/);
+    });
+});

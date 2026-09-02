@@ -119,7 +119,7 @@
                         </div>
                         <div class="cp-rewards" id="cp-rewards">
                             <div>
-                                <div class="cp-rewards-label"><span class="cp-rewards-star">&#9733;</span> Your reward dollars</div>
+                                <div class="cp-rewards-label"><span class="cp-rewards-star">&#9733;</span> <span id="cp-rewards-name">Your reward dollars</span></div>
                                 <div class="cp-rewards-balance" id="cp-rewards-balance"><span class="cp-skel">$0.00</span></div>
                                 <div class="cp-rewards-sub" id="cp-rewards-sub">Earn reward dollars on premium picks &mdash; look for the &#9733; tag under Recommended for You.</div>
                             </div>
@@ -521,10 +521,8 @@
                     <div class="cp-req-prod-title">You have <span id="cp-redeem-avail">$0.00</span> in reward dollars</div>
                     <div class="cp-req-prod-sub">Tell us how much to apply. Your rep adds it to your next order as a credit line, so you&rsquo;ll see it right on the invoice.</div>
                 </div>
-                <label class="cp-field">
-                    <span class="cp-field-label">Amount to redeem</span>
-                    <input type="text" id="cp-redeem-amt" inputmode="decimal" placeholder="e.g. 25" autocomplete="off">
-                </label>
+                <input type="hidden" id="cp-redeem-amt">
+                <p class="cp-modal-intro" id="cp-redeem-rule">Reward dollars are applied all at once, so your whole balance goes on one order.</p>
                 <div class="cp-req-error" id="cp-redeem-error"></div>
                 <div class="cp-redeem-history" id="cp-redeem-history" hidden>
                     <span class="cp-field-label">Recent activity</span>
@@ -533,7 +531,7 @@
             </div>
             <div class="cp-modal-foot">
                 <button class="cp-btn-ghost" id="cp-redeem-cancel" type="button">Cancel</button>
-                <button class="cp-btn-primary" id="cp-redeem-submit" type="button">Send request to my rep</button>
+                <button class="cp-btn-primary" id="cp-redeem-submit" type="button">Apply my full balance to my next order</button>
             </div>
         </div>
     </div>
@@ -576,6 +574,6 @@
 
     <script src="/shared_components/js/app-config.js"></script>
     <script src="/pages/js/portal-reorder-list.js?v=2026.07.04.4"></script>
-    <script src="/pages/js/customer-portal.js?v=2026.09.01.6"></script>
+    <script src="/pages/js/customer-portal.js?v=2026.09.02.1"></script>
 </body>
 </html>

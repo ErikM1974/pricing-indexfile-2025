@@ -131,9 +131,16 @@ at ~42% net, so the program pays if it lifts spend by ~5.5%. Alternatives modell
 balance; reps mention it on every touch; redemptions go on the order as the `RWD-REDEEM` line.
 
 ## Open items / next
-- ⏭️ Erik: add the `RWD-EARN` rows in Service_Codes (and decide the rates) — the mechanism is live
-  the moment they exist. Then post the first grants from the console and check the customer sees
-  "Earned in the last 12 months: $X" on their rewards card.
+- ✅ **LIVE v2026.09.01.6** (Heroku v1899, SHA 9f2ce98 verified; new routes answer 401 + `no-store`
+  anonymously; `/portal` still 302s to login). Rows written; Aaberg's $97 posted and visible.
+- ⏭️ Erik: create the **`RWD-REDEEM` part in OnSite** (or put the existing gift-certificate part code
+  in the Service_Codes `RWD-REDEEM` row's TierLabel) so reps can add the redemption line.
+- ⏭️ Staff: post the 12-month catch-up per GOLD/SILVER account from the console (Calculate → Post;
+  ~$9.9k of credit across 37 accounts) so every good customer enters Q4 with a balance.
+- ⏭️ Watch the first real redemption: rep adds the negative line at order entry + logs it with the
+  order # (or the engine reconciles it once the order is paid). Balance must drop exactly once.
+- 🔴 Not exercised live: the redemption reconcile path (no order carries an RWD-REDEEM line yet) —
+  unit-locked, same proxy entry route the console already uses.
 - ⏭️ First real customer through the new portal: watch the general-request rows (Style QUOTE /
   NEWLOGO / LOGOCHG / ACCOUNT) land in the rep queue with a readable Product_Title.
 - The `Source` column of those rows says `reorder` (the proxy only knows reorder|recommendation).
