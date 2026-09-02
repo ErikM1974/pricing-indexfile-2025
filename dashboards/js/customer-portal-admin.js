@@ -11,6 +11,28 @@
   'use strict';
 
   var ACCESS_API = '/api/crm-proxy/customer-portal-access';
+  // Reward-dollar balances for the Rewards column — ONE call for every customer (proxy sums the
+  // ledger), refreshed after any posting from the rewards modal. Sort by clicking the column head.
+  var BALANCES_API = '/api/crm-proxy/customer-rewards/balances';
+  var balances = {};          // id_Customer → balance
+  var balancesLoaded = false;
+  var sortByRewards = false;  // false = company A→Z (default), true = balance high→low
+  function balanceOf(id) { var b = balances[String(id)]; return typeof b === 'number' ? b : 0; }
+  function fmtMoney(n) { return '$' + (Math.round(n * 100) / 100).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+  async function loadRewardBalances() {
+    try {
+      var data = await api(BALANCES_API);
+      balances = (data && data.balances) || {};
+      balancesLoaded = true;
+    } catch (err) {
+      if (err.message === 'auth') return;
+      balances = {}; balancesLoaded = false;
+      console.error('[portal-admin] reward balances failed:', err);
+      toast('Reward balances unavailable: ' + err.message, true);   // never a silent $0 (Erik #1 rule)
+    }
+    renderStats();
+    renderTable();
+  }
   var SEARCH_API = '/api/crm-proxy/company-contacts/search';
   var SENDLINK_API = '/api/portal-admin/send-link';
 
@@ -85,6 +107,7 @@
       invites.sort(function (a, b) { return String(a.company_name || '').localeCompare(String(b.company_name || '')); });
       renderStats();
       renderTable();
+      loadRewardBalances();
     } catch (err) {
       if (err.message === 'auth') return;
       console.error('[portal-admin] load failed:', err);
@@ -101,6 +124,11 @@
     document.getElementById('stat-enabled').textContent = enabled;
     document.getElementById('stat-disabled').textContent = invites.length - enabled;
     document.getElementById('stat-loggedin').textContent = loggedin;
+    var rw = document.getElementById('stat-rewards');
+    if (rw) {
+      if (!balancesLoaded) rw.textContent = '—';
+      else rw.textContent = fmtMoney(invites.reduce(function (s, r) { return s + balanceOf(r.id_Customer); }, 0));
+    }
   }
 
   function filtered() {
@@ -116,6 +144,11 @@
                String(r.email || '').toLowerCase().indexOf(t) >= 0 ||
                String(r.account_rep || '').toLowerCase().indexOf(t) >= 0 ||
                String(r.id_Customer || '').indexOf(t) >= 0;
+      });
+    }
+    if (sortByRewards) {
+      list = list.slice().sort(function (a, b) {
+        return (balanceOf(b.id_Customer) - balanceOf(a.id_Customer)) || String(a.company_name || '').localeCompare(String(b.company_name || ''));
       });
     }
     return list;
@@ -147,6 +180,13 @@
         '<td class="cpa-hide-sm cpa-rep">' + (r.account_rep ? esc(r.account_rep) : '<span class="cpa-rep-none">—</span>') + '</td>' +
         '<td><div class="cpa-email">' + esc(r.email) + '</div></td>' +
         '<td class="cpa-hide-sm"><span class="cpa-cid">' + esc(r.id_Customer) + '</span></td>' +
+        '<td class="cpa-rw-cell">' + (function () {
+          if (!balancesLoaded) return '<span class="cpa-rep-none">…</span>';
+          var b = balanceOf(r.id_Customer);
+          return b > 0.005
+            ? '<button class="cpa-rw-chip" data-action="rewards" data-id="' + esc(r.id_Customer) + '" data-company="' + esc(r.company_name) + '" title="Open reward dollars">' + fmtMoney(b) + '</button>'
+            : '<span class="cpa-rep-none">—</span>';
+        })() + '</td>' +
         '<td>' + badge + '</td>' +
         '<td class="cpa-hide-sm">' + fmtLastLogin(r.last_login) + '</td>' +
         '<td><div class="cpa-actions">' +
@@ -161,13 +201,15 @@
 
     root.innerHTML =
       '<div style="overflow-x:auto"><table class="cpa-table"><thead><tr>' +
-      '<th>Company</th><th class="cpa-hide-sm">Account Rep</th><th>Email</th><th class="cpa-hide-sm">Customer #</th><th>Status</th>' +
+      '<th>Company</th><th class="cpa-hide-sm">Account Rep</th><th>Email</th><th class="cpa-hide-sm">Customer #</th>' +
+      '<th><button type="button" class="cpa-th-sort' + (sortByRewards ? ' cpa-th-sort--on' : '') + '" id="cpa-sort-rewards" title="Sort by reward balance">Rewards <i class="fas ' + (sortByRewards ? 'fa-arrow-down-wide-short' : 'fa-sort') + '"></i></button></th><th>Status</th>' +
       '<th class="cpa-hide-sm">Last Sign-In</th><th style="text-align:right">Actions</th>' +
       '</tr></thead><tbody>' + body + '</tbody></table></div>';
   }
 
   // ---- row actions (event delegation) ----
   async function onTableClick(e) {
+    if (e.target.closest('#cpa-sort-rewards')) { sortByRewards = !sortByRewards; renderTable(); return; }
     var btn = e.target.closest('button[data-action]');
     if (!btn) return;
     var action = btn.getAttribute('data-action');
@@ -426,6 +468,7 @@
   function closeRewardsModal() { document.getElementById('cpa-rewards-modal').style.display = 'none'; }
 
   async function loadRewardLedger() {
+    loadRewardBalances();
     if (!rwCustomer) return;
     try {
       var data = await api(REWARDS_LEDGER_API + '/' + encodeURIComponent(rwCustomer.id));
