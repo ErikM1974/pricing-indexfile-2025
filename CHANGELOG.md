@@ -1,3 +1,8 @@
+## v2026.09.02.9 (2026.09.02)
+
+- Memory: quick actions verified, portal request notifications (Slack DM + sales@ email), EmailJS template todo
+- Deploy v2026.09.02.9: 5 files (ACTIVE_FILES.md, volume-quote.js, volume-quote.html...)
+
 ## v2026.09.02.8 (2026.09.02)
 
 - Memory: Volume Quote LIVE v2026.09.02.7
