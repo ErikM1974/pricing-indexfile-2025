@@ -43,8 +43,15 @@ Taneisha's Braun Northwest request (500 pcs, left chest, design 40514, 4,729 sti
   tier value; max = `VOL-DENOM-FLOOR`).
 - Output: standard vs one-time per size, garment $ margin/pc, GM %, order $ both ways,
   "given up", and an **approval memo** (copy/print) with numbered reasons + terms.
-- **Nothing persisted in v1** — memo is attached to the quote by hand. Next step if Erik wants
-  a record: a `VQ` prefix in `quote_sessions` (needs the quote-plane gate list in the proxy).
+- **Saved as a real quote (added same day, Erik: "is the quote saved?")** — `VQ-YYYY-NNN` minted by
+  `/api/quote-sequence/VQ`; `quote_sessions` (customer-safe Notes with the hold-qty/valid-until terms)
+  + one `quote_items` row per style at the one-time S-XL price (`PricingTier` "Volume (one-time)",
+  2XL/3XL + standard price in `SizeBreakdown`). Internal levers/hours/GM go in item 1 `LogoSpecs`
+  JSON — 🔴 never in Notes, which can surface on customer-facing quote views. Quote Mgmt opens VQ
+  read-only (`quote-management.js` STK/PATCH branch); prefix registered in `config/app.config.js`
+  PREFIXES, `quote-formatter.js`, CLAUDE.md.
+- **Customer PDF**: section 6 renders a prices-and-terms sheet (no cost/margin/levers); "Print /
+  save as PDF" prints only that card (`body.vq-mode-customer`), the memo prints via `vq-mode-memo`.
 - Price math mirrors `embroidery-pricing-service.js` (case ÷ denom + emb, half-dollar ceil,
   relative upcharge) — verified identical to the earlier hand calc on all 3 styles.
 

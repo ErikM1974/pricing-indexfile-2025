@@ -1,0 +1,132 @@
+/* ==========================================================================
+   volume-quote.css — page-specific styles for dashboards/volume-quote.html
+
+   Shell classes (.dash-header, .dash-back-link, .dash-stat-card, etc.) come
+   from shared_components/css/dash-shell.css. Design tokens (--surface-*,
+   --gray-*, --shadow-*, --radius-*, --state-*) come from
+   shared_components/css/art-hub.css.
+
+   Only page-specific styles here. NEVER redefine tokens. NEVER hardcode
+   colors/shadows/radii — use var(--token-name).
+   ========================================================================== */
+
+.vq-intro { color: var(--gray-600); margin: 0 0 1rem; max-width: 70ch; }
+
+.vq-step {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 1.6em; height: 1.6em; margin-right: .4em;
+    border-radius: var(--radius-pill); background: var(--gray-800); color: var(--surface-card);
+    font-size: .8em; font-weight: 600;
+}
+
+/* ── form ─────────────────────────────────────────────────────────────── */
+.vq-form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: .9rem; }
+.vq-field { display: flex; flex-direction: column; gap: .3rem; font-size: .85rem; color: var(--gray-600); }
+.vq-field input, .vq-field select, .vq-lever input[type="number"], .vq-line input {
+    font: inherit; padding: .5rem .6rem; border: 1px solid var(--gray-300);
+    border-radius: var(--radius-md); background: var(--surface-card); color: var(--gray-900);
+}
+.vq-field input:focus, .vq-field select:focus, .vq-line input:focus, .vq-lever input:focus { outline: 2px solid var(--state-info); outline-offset: 1px; }
+.vq-field--check { flex-direction: row; align-items: center; gap: .5rem; align-self: end; padding-bottom: .5rem; }
+.vq-field--check input { width: 1.1rem; height: 1.1rem; }
+
+/* ── garment lines ─────────────────────────────────────────────────────── */
+.vq-lines-head, .vq-line {
+    display: grid; grid-template-columns: 120px 90px 1.6fr 1.2fr 1fr 40px;
+    gap: .6rem; align-items: center;
+}
+.vq-lines-head { font-size: .75rem; text-transform: uppercase; letter-spacing: .04em; color: var(--gray-500); padding: 0 0 .4rem; border-bottom: 1px solid var(--gray-200); }
+.vq-line { padding: .5rem 0; border-bottom: 1px solid var(--gray-100); font-size: .9rem; }
+.vq-line-title { color: var(--gray-800); }
+.vq-line-title small { display: block; color: var(--gray-500); }
+.vq-line-cost { font-family: 'JetBrains Mono', monospace; font-size: .85rem; }
+.vq-line-cost small { color: var(--gray-500); }
+.vq-line-stock { font-size: .8rem; color: var(--gray-600); }
+.vq-line-status { font-size: .8rem; color: var(--gray-500); }
+.vq-line-status--error { color: var(--state-danger); }
+.vq-line-remove { border: 0; background: transparent; color: var(--gray-400); cursor: pointer; font-size: 1rem; }
+.vq-line-remove:hover { color: var(--state-danger); }
+.vq-hint { font-size: .8rem; color: var(--gray-500); margin: .8rem 0 0; max-width: 80ch; }
+
+/* ── levers ────────────────────────────────────────────────────────────── */
+.vq-levers { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; }
+.vq-lever label { display: block; font-size: .85rem; color: var(--gray-600); margin-bottom: .35rem; }
+.vq-lever-row { display: flex; align-items: center; gap: .75rem; }
+.vq-lever input[type="number"] { width: 110px; font-family: 'JetBrains Mono', monospace; }
+.vq-lever input[type="range"] { flex: 1 1 140px; }
+.vq-lever output { font-family: 'JetBrains Mono', monospace; font-weight: 600; min-width: 3ch; }
+.vq-lever-note { font-size: .8rem; color: var(--gray-500); }
+
+/* ── result ────────────────────────────────────────────────────────────── */
+.vq-stats { margin-bottom: 1rem; }
+.vq-warnings:empty { display: none; }
+.vq-warning {
+    padding: .6rem .8rem; margin-bottom: .6rem; border-radius: var(--radius-md);
+    background: var(--state-warning-bg); color: var(--state-warning); font-size: .85rem;
+}
+.vq-warning--danger { background: var(--state-danger-bg); color: var(--state-danger); }
+.vq-table-wrap { overflow-x: auto; }
+.vq-table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+.vq-table th, .vq-table td { padding: .55rem .6rem; text-align: right; border-bottom: 1px solid var(--gray-200); white-space: nowrap; }
+.vq-table th:first-child, .vq-table td:first-child { text-align: left; }
+.vq-table th { font-weight: 600; color: var(--gray-600); background: var(--surface-inset); }
+.vq-table th small { font-weight: 400; color: var(--gray-500); }
+.vq-table td.vq-num { font-family: 'JetBrains Mono', monospace; }
+.vq-table td.vq-vol { font-weight: 600; color: var(--gray-900); }
+.vq-table tfoot td { font-weight: 600; background: var(--surface-inset); }
+.vq-gm-low { color: var(--state-danger); }
+
+/* ── memo ──────────────────────────────────────────────────────────────── */
+.vq-memo-actions { display: flex; gap: .5rem; }
+.vq-memo {
+    white-space: pre-wrap; font-family: 'JetBrains Mono', monospace; font-size: .82rem; line-height: 1.5;
+    background: var(--surface-inset); border: 1px solid var(--gray-200); border-radius: var(--radius-md);
+    padding: 1rem; margin: 0; color: var(--gray-800);
+}
+
+@media (max-width: 720px) {
+    .vq-lines-head { display: none; }
+    .vq-line { grid-template-columns: 1fr 1fr; }
+}
+
+/* ── customer quote sheet ──────────────────────────────────────────────── */
+.vq-save-status { font-size: .8rem; color: var(--gray-600); align-self: center; }
+.vq-save-status--ok { color: var(--state-success); }
+.vq-save-status--error { color: var(--state-danger); }
+.vq-cq {
+    background: var(--surface-card); border: 1px solid var(--gray-200); border-radius: var(--radius-md);
+    padding: 1.5rem 1.75rem; margin-top: .75rem; color: var(--gray-900); font-size: .9rem; max-width: 860px;
+}
+.vq-cq-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; border-bottom: 3px solid var(--nwca-green, #1a472a); padding-bottom: .9rem; margin-bottom: 1rem; }
+.vq-cq-logo { height: 52px; width: auto; }
+.vq-cq-title { text-align: right; }
+.vq-cq-title h3 { margin: 0 0 .25rem; font-size: 1.25rem; color: var(--nwca-green, #1a472a); letter-spacing: .02em; }
+.vq-cq-meta { font-size: .8rem; color: var(--gray-600); line-height: 1.5; }
+.vq-cq-meta strong { color: var(--gray-900); font-family: 'JetBrains Mono', monospace; }
+.vq-cq-parties { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; font-size: .85rem; }
+.vq-cq-parties h4, .vq-cq-block h4 { margin: 0 0 .25rem; font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--gray-500); }
+.vq-cq-table { width: 100%; border-collapse: collapse; margin: .5rem 0 1rem; font-size: .85rem; }
+.vq-cq-table th, .vq-cq-table td { padding: .5rem .55rem; border-bottom: 1px solid var(--gray-200); text-align: right; }
+.vq-cq-table th:nth-child(-n+2), .vq-cq-table td:nth-child(-n+2) { text-align: left; }
+.vq-cq-table th { background: var(--surface-inset); color: var(--gray-700); font-weight: 600; }
+.vq-cq-table td.vq-num { font-family: 'JetBrains Mono', monospace; }
+.vq-cq-table tfoot td { font-weight: 600; background: var(--surface-inset); }
+.vq-cq-table td small { color: var(--gray-500); }
+.vq-cq-block { margin: .75rem 0; font-size: .85rem; }
+.vq-cq-block ul { margin: .25rem 0 0; padding-left: 1.1rem; }
+.vq-cq-block li { margin-bottom: .2rem; }
+.vq-cq-foot { margin-top: 1.25rem; padding-top: .75rem; border-top: 1px solid var(--gray-200); font-size: .75rem; color: var(--gray-500); text-align: center; }
+.vq-cq-empty { color: var(--gray-500); font-style: italic; }
+
+@media print {
+    .dash-header, .vq-intro, .dash-error-banner, .vq-memo-actions, .vq-cq-hint, .dash-card-header { display: none !important; }
+    .dash-shell, .dash-content { padding: 0; margin: 0; }
+    /* Two print modes, set on <body> by the button that was clicked. */
+    body.vq-mode-memo .dash-card:not(.vq-print-keep) { display: none !important; }
+    body.vq-mode-customer .dash-card:not(.vq-print-customer-keep) { display: none !important; }
+    .dash-card { border: 0; box-shadow: none; padding: 0; }
+    .vq-memo { border: 0; background: transparent; padding: 0; font-size: 11pt; }
+    .vq-cq { border: 0; margin: 0; padding: 0; max-width: none; font-size: 11pt; }
+    .vq-cq-head { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .vq-cq-table th, .vq-cq-table tfoot td { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

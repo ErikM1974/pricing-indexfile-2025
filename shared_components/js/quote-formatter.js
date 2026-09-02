@@ -627,6 +627,7 @@ class QuoteFormatter {
             'PATCH': 'Embroidered Emblems',
             'SPC': 'Customer Screen Print',
             'SSC': 'Safety Stripe Creator',
+            'VQ': 'Volume Quote',
             'WEB': 'Webstore Setup',
             'SP': 'Screen Print'
         };

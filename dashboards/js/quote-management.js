@@ -1257,12 +1257,14 @@ function editQuote(quoteId) {
         // read-only view instead (same treatment as CAP rows).
         viewQuote(quoteId);
         return;
-    } else if (prefix === 'STK' || prefix === 'PATCH') {
+    } else if (prefix === 'STK' || prefix === 'PATCH' || prefix === 'VQ') {
         // Sticker / banner (STK) and embroidered-emblem (PATCH) quotes come from
         // the AI drawer on their calculator pages and from the public
         // /custom-stickers configurator — there is no builder to reopen them in.
         // Without this branch they fell through the default below and opened the
         // EMBROIDERY builder with ?edit=STK-2026-001, which is nonsense (2026-07-24).
+        // VQ = admin Volume Quote (dashboards/volume-quote.html, 2026-09-02): the page
+        // rebuilds from live Caspio, not from the saved row, so it is view-only here too.
         viewQuote(quoteId);
         return;
     }

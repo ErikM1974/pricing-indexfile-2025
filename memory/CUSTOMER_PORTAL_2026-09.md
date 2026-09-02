@@ -263,10 +263,23 @@ condition in the reverse route + a nightly caller.
 - **Redemption part**: Erik's OnSite part is exactly `RWD-REDEEM` (the earlier "RWD-REDEEMm2" was a
   typo); Service_Codes row 264 TierLabel = `RWD-REDEEM` only.
 
+## Erik's 2026-09-02 portal rulings (after seeing Absher's preview)
+
+- **"Recommended for you" REMOVED** (both the Overview strip and the Your-products section, plus the
+  `/recommendations` fetch) — "it clutters it for customers". App v2026.09.02.6. The $0 reward
+  button now nudges to Your products. The re-order modal still accepts `kind:'rec'` (dead path).
+- **What "Logos & proofs" shows** (Erik asked whether ShopWorks design images are included — YES):
+  *Approved logos* = the customer's FULL ShopWorks design history via `/api/designs/by-customer/:id`
+  (Designs2026.ID_Customer → Shopworks_Thumbnail_Report, the bandit thumbnail sync), every
+  decoration method, not date-gated, cap 200, **only designs that have a thumbnail file** (the ODBC
+  Thumbnails table is 74% metadata-only shells, so a design with no image in ShopWorks is absent).
+  *Proofs & mockups* = art requests / mockups with images, 2026+. *Finished photos* = factory photos a
+  staffer approved for the customer. Absher: 26 approved logos, 1 proof, 0 photos.
+
 ## Open items / next
 - ✅ **LIVE v2026.09.01.6** (Heroku v1899, SHA 9f2ce98 verified; new routes answer 401 + `no-store`
   anonymously; `/portal` still 302s to login). Rows written; Aaberg's $97 posted and visible.
-- ✅ Catch-up posted 2026-09-02 ($6,737.32 / 36 accounts) — see section above. ⏭️ BRONZE / HOUSE / untiered portal customers were NOT posted (Erik scoped it to GOLD/SILVER); the console Calculate → Post works for any of them.
+- ✅ Catch-up posted 2026-09-02 for **every portal account (141)**: **$9693.58** today (GOLD $5597.69/25 · SILVER $1139.63/17 · UNTIERED $1585.82/62 · BRONZE $577.41/10 · HOUSE-2026 $782.92/24 · WIN $10.11/3; 26 earned $0) + Aaberg $97 earlier. Untiered + Win Back were added on Erik's say-so the same afternoon (WIN = Taneisha's "Win Back '26" list: Edgewood / Aversanos / Innovative Hardwood). Table: `Downloads\2026-Rewards-catchup-ALL-accounts-2026-09-02.csv`. 🔑 ~15% of accounts 503 "orders unavailable" on a first pass (ManageOrders hiccups) and post clean on the resumable re-run — never mark an errored account done. 🔑 Live SESSION_SECRET ≠ .env, so the runner drives a LOCAL app (`PORT=3114 node server.js`) that writes to the live ledger through the proxy.
 - ⏭️ Watch the first real redemption: rep adds the negative line at order entry + logs it with the
   order # (or the engine reconciles it once the order is paid). Balance must drop exactly once.
 - 🔴 Not exercised live: the Reverse button (no over-granted order exists yet) and sync Step 4 (first run = 5:00 AM PT 2026-09-03 — read the Heroku Scheduler log line "Step 4: reopened older orders — N mismatch(es)"; a large N on day one means the archive had drifted, not that ShopWorks reopened N orders).
