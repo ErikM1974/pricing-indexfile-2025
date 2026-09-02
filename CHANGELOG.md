@@ -1,3 +1,12 @@
+## v2026.09.02.5 (2026.09.02)
+
+- Memory: re-invoice rulings (no auto clawback, staff Reverse, sync Step 4, engine staleness guard)
+- Memory: enriched ManageOrders_LineItems CSV counts + Is_Garment boolean fix
+- Memory: ManageOrders_LineItems imported, Line_Key unique, Is_Garment is Integer
+- Memory: order-lines mirror returns the extended columns (proxy v2026.09.02.6)
+- Memory: RWD-REDEEMm2 part named in OnSite; Service_Codes TierLabel updated
+- Portal admin: Rewards column (balance chip, sort by balance) + Reward $ Outstanding stat
+
 ## v2026.09.02.4 (2026.09.02)
 
 - Rewards: staff reversal of over-grants after a re-invoice (never automatic, capped at unspent balance)
