@@ -1,3 +1,12 @@
+## v2026.09.02.2 (2026.09.02)
+
+- Memory: 2026 Rewards program rulings, line-items table plan
+- Reward accrual: read line items from the Caspio ORDER_LINES mirror first, ManageOrders only for orders it lacks
+- Memory: ORDER_LINES mirror — route, engine switch, Erik's import steps
+- Reward accrual: mirror = ManageOrders_LineItems archive, looked up by order id
+- Memory: mirror is the existing ManageOrders_LineItems archive (Erik), coverage check + backfill note
+- Deploy v2026.09.02.2: 1 files (customer-portal-admin.html,...)
+
 ## v2026.09.02.1 (2026.09.02)
 
 - Memory: portal + reward program live state, next steps
