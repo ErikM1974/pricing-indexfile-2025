@@ -1,3 +1,15 @@
+## v2026.09.02.4 (2026.09.02)
+
+- Rewards: staff reversal of over-grants after a re-invoice (never automatic, capped at unspent balance)
+
+## v2026.09.02.3 (2026.09.02)
+
+- Memory: mirror live (proxy v2026.09.02.1 / app v2026.09.02.2), coverage numbers, ask-what-syncs lesson
+- Memory: ManageOrders_LineItems extended columns + unique key sequence
+- Memory: LINEITEMS_EXTENDED on, Heroku CLI expiry lesson
+- Memory: archive the 2026-08-26 PSST audit lesson (LESSONS back under the 300-line cap)
+- Reward accrual: refuse archived lines whose total disagrees with the live subtotal (reopened/repriced orders)
+
 ## v2026.09.02.2 (2026.09.02)
 
 - Memory: 2026 Rewards program rulings, line-items table plan
