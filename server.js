@@ -223,6 +223,7 @@ dotenv.config();
 //   ~L8100 /api/portal-admin/* + /portal-admin/preview/:id/* — staff READ-ONLY mirrors of everything above
 //          GET  /api/portal-admin/rewards/accrual/:id — EARNED reward $ from paid+invoiced garment lines (12-mo window,
 //               SanMar piece-cost bands from Service_Codes REWARD/RWD-EARN) · POST …/accrual/:id/post — grant per order (Order_Ref)
+//               · POST …/accrual/:id/reverse — staff reverses an over-grant after a re-invoice (capped at the unspent balance)
 //
 // PRODUCT SEO (2026-07-12): /product[.html]?style= = hybrid-SSR head injection
 //   (per-product title/meta/canonical/OG/JSON-LD, fail-open) ~L2882;
@@ -8659,12 +8660,15 @@ async function computeRewardAccrual(cid) {
     portalFetchJson(`${CRM_API_BASE}/api/customer-rewards/ledger/${encodeURIComponent(cid)}`, hdrs, 8000),
   ]);
   if (!ledgerJson) throw new Error('ledger unavailable');   // without it "pending" would double-grant
+  // Per order: grants (+) and 'adjust' entries carrying the order ref (a reversal after a
+  // re-invoice, −) NET together as "granted"; 'redeem' entries are what the customer spent on it.
   const grantedByOrder = new Map(); const redeemedByOrder = new Map();
   (ledgerJson.entries || []).forEach((e) => {
     const ref = String(e.orderRef || '').trim(); const amt = Number(e.amount) || 0;
     if (!ref || !amt) return;
-    if (amt > 0) grantedByOrder.set(ref, rewardRound((grantedByOrder.get(ref) || 0) + amt));
-    else redeemedByOrder.set(ref, rewardRound((redeemedByOrder.get(ref) || 0) + Math.abs(amt)));
+    const type = String(e.type || '').toLowerCase();
+    if (type === 'redeem' || (amt < 0 && type !== 'adjust')) redeemedByOrder.set(ref, rewardRound((redeemedByOrder.get(ref) || 0) + Math.abs(amt)));
+    else grantedByOrder.set(ref, rewardRound((grantedByOrder.get(ref) || 0) + amt));
   });
   const ledgerBalance = rewardRound(Number(ledgerJson.balance) || 0);
   // (Mirror rows were seeded into the line cache above, so any order the mirror holds never hit MO.)
@@ -8707,6 +8711,9 @@ async function computeRewardAccrual(cid) {
       total: Number(o.cur_TotalInvoice) || 0,
       eligibleRevenue: rewardRound(lines.reduce((s, l) => s + l.revenue, 0)),
       reward, granted, pending: rewardRound(Math.max(0, reward - granted)),
+      // Granted more than the order now earns (re-invoiced lower, credited, zeroed). Never
+      // clawed back automatically (Erik 2026-09-02) — surfaced for a staff "Reverse" decision.
+      overGranted: items ? rewardRound(Math.max(0, granted - reward)) : 0,
       boost: boost ? { label: boost.label, multiplier: boost.multiplier, name: boost.name } : null,
       // Redemption found on the order (RWD-REDEEM line) vs what the ledger already holds for it.
       redemption: redeemedOnOrder || redeemPosted ? { onOrder: redeemedOnOrder, posted: redeemPosted, pending: rewardRound(Math.max(0, redeemedOnOrder - redeemPosted)) } : null,
@@ -8716,9 +8723,10 @@ async function computeRewardAccrual(cid) {
   const totals = orders.reduce((t, o) => ({
     eligibleRevenue: rewardRound(t.eligibleRevenue + o.eligibleRevenue), earned: rewardRound(t.earned + o.reward),
     granted: rewardRound(t.granted + o.granted), pending: rewardRound(t.pending + o.pending),
+    overGranted: rewardRound(t.overGranted + o.overGranted),
     redeemedOnOrders: rewardRound(t.redeemedOnOrders + (o.redemption ? o.redemption.onOrder : 0)),
     redeemPending: rewardRound(t.redeemPending + (o.redemption ? o.redemption.pending : 0)),
-  }), { eligibleRevenue: 0, earned: 0, granted: 0, pending: 0, redeemedOnOrders: 0, redeemPending: 0 });
+  }), { eligibleRevenue: 0, earned: 0, granted: 0, pending: 0, overGranted: 0, redeemedOnOrders: 0, redeemPending: 0 });
   totals.ledgerBalance = ledgerBalance;
   const unavailable = orders.filter((o) => o.linesUnavailable).map((o) => o.orderNumber);
   return {
@@ -8789,6 +8797,39 @@ app.post('/api/portal-admin/rewards/accrual/:id/post', requireCrmRole(PORTAL_ADM
     console.log(`[portal-admin] ${staff} posted ${posted.length} grant(s) $${total.toFixed(2)} + ${redeemed.length} redemption(s) $${redeemTotal.toFixed(2)} for customer ${cid}${failed.length ? ` (${failed.length} failed)` : ''}`);
     res.json({ ok: failed.length === 0, posted, redeemed, failed, total, redeemTotal });
   } catch (err) { console.error('[portal-admin] accrual post failed:', err.message); res.status(503).json({ error: 'Could not post reward grants right now.' }); }
+});
+
+// POST /api/portal-admin/rewards/accrual/:id/reverse { orderNumber, company_name? } — an order that
+// was re-invoiced LOWER after its grant (customer rejected the goods, order credited or zeroed)
+// keeps its reward unless a staff member reverses it here: ONE 'adjust' entry of −min(over-grant,
+// unspent balance), Order_Ref = the order, so the accrual nets it against the grant. Never
+// automatic, never below zero — dollars already redeemed stay redeemed (Erik 2026-09-02).
+app.post('/api/portal-admin/rewards/accrual/:id/reverse', requireCrmRole(PORTAL_ADMIN_ROLES), express.json(), async (req, res) => {
+  const cid = String(req.params.id || '');
+  const orderNo = String((req.body && req.body.orderNumber) || '').trim();
+  if (!/^\d+$/.test(cid) || !/^\d+$/.test(orderNo)) return res.status(400).json({ error: 'numeric customer id and orderNumber required' });
+  try {
+    const acc = await computeRewardAccrual(cid);
+    if (acc.partial) return res.status(409).json({ error: `Still fetching order details (${acc.progress.fetched} of ${acc.progress.total}) — calculate again, then reverse.` });
+    const o = acc.orders.find((x) => String(x.orderNumber) === orderNo);
+    if (!o) return res.status(404).json({ error: `Order #${orderNo} is not in this customer's eligible orders.` });
+    if (!(o.overGranted > 0.005)) return res.status(409).json({ error: `Order #${orderNo} is not over-granted (granted ${o.granted.toFixed(2)}, earns ${o.reward.toFixed(2)}).` });
+    const bal = rewardRound(Number(acc.totals.ledgerBalance) || 0);
+    const amount = rewardRound(Math.min(o.overGranted, bal));
+    if (amount <= 0.005) return res.status(409).json({ error: `Nothing left to reverse — the balance is ${bal.toFixed(2)} (already redeemed).` });
+    const staff = (req.session.crmUser && req.session.crmUser.email) || 'staff';
+    const body = {
+      id_Customer: cid, company_name: String((req.body && req.body.company_name) || '').slice(0, 255),
+      amount: -amount, type: 'adjust',
+      reason: (`Order #${orderNo} re-invoiced — reward reduced from ${o.granted.toFixed(2)} to ${o.reward.toFixed(2)}` + (amount < o.overGranted ? ` (${(o.overGranted - amount).toFixed(2)} already redeemed, not recovered)` : '')).slice(0, 255),
+      order_ref: orderNo, created_by: staff,
+    };
+    const r = await fetch(`${CRM_API_BASE}/api/customer-rewards/entry`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CRM-API-Secret': CRM_API_SECRET }, body: JSON.stringify(body) });
+    const j = await r.json();
+    if (!r.ok || !j.success) throw new Error((j && j.error) || ('proxy ' + r.status));
+    console.log(`[portal-admin] ${staff} reversed $${amount.toFixed(2)} on order #${orderNo} for customer ${cid}`);
+    res.json({ ok: true, orderNumber: orderNo, reversed: amount, overGranted: o.overGranted, balance: Number(j.balance) || 0 });
+  } catch (err) { console.error('[portal-admin] accrual reverse failed:', err.message); res.status(503).json({ error: 'Could not reverse the grant right now.' }); }
 });
 
 // POST /api/portal-admin/rewards/expire/:id — after the spend window closes, zero what is left:

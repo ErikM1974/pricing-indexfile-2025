@@ -512,6 +512,7 @@
     var t = a.totals;
     var html = '<div class="cpa-rw-acc-sum">Earned <strong>' + money2(t.earned) + '</strong> on ' + money2(t.eligibleRevenue) + ' of eligible garments &middot; granted ' + money2(t.granted) + ' &middot; <strong class="' + (t.pending > 0 ? 'pos' : '') + '">pending ' + money2(t.pending) + '</strong>' +
       (t.redeemedOnOrders ? ' &middot; redeemed on orders ' + money2(t.redeemedOnOrders) + (t.redeemPending ? ' (<strong class="neg">' + money2(t.redeemPending) + ' not in ledger yet</strong>)' : '') : '') +
+      (t.overGranted > 0.005 ? ' &middot; <strong class="neg">granted ' + money2(t.overGranted) + ' more than now earned</strong> (re-invoiced lower — reverse per order below, or leave it)' : '') +
       (a.program.boosts && a.program.boosts.length ? '<div class="cpa-rw-meta">Boost: ' + a.program.boosts.map(function (b) { return esc(b.label) + ' &times;' + esc(String(b.multiplier)); }).join(' &middot; ') + '</div>' : '') +
       '<div class="cpa-rw-meta">Bands: ' + a.program.tiers.map(function (x) { return esc(x.label) + ' &rarr; ' + esc(String(x.ratePct)) + '%'; }).join(' &middot; ') + ' &middot; ' + esc(String(a.program.months)) + '-month window' + (a.unavailable && a.unavailable.length ? ' &middot; <span class="neg">' + a.unavailable.length + ' order(s) still missing line items — recalculate</span>' : '') +
       (a.excludedWebstore && a.excludedWebstore.count ? ' &middot; ' + esc(String(a.excludedWebstore.count)) + ' web-store order(s) (' + money2(a.excludedWebstore.revenue) + ') excluded' : '') +
@@ -524,7 +525,9 @@
       var extra = (o.boost ? ' <span class="cpa-rw-meta">&times;' + esc(String(o.boost.multiplier)) + ' boost</span>' : '') +
         (o.redemption ? ' <span class="cpa-rw-meta neg">redeemed ' + money2(o.redemption.onOrder) + (o.redemption.pending ? ' (unposted)' : '') + '</span>' : '');
       return '<tr><td><details><summary>#' + esc(o.orderNumber) + (o.designName ? ' <span class="cpa-rw-meta">' + esc(o.designName) + '</span>' : '') + extra + '</summary><div class="cpa-rw-acc-lines">' + (o.linesUnavailable ? 'Line items unavailable — recalculate.' : (lines || 'No garment lines (decoration / fees only).')) + '</div></details></td>' +
-        '<td>' + esc(String(o.invoiceDate || '').slice(0, 10)) + '</td><td class="num">' + money2(o.eligibleRevenue) + '</td><td class="num">' + money2(o.reward) + '</td><td class="num">' + money2(o.granted) + '</td><td class="num' + (o.pending > 0 ? ' pos' : '') + '">' + money2(o.pending) + '</td></tr>';
+        '<td>' + esc(String(o.invoiceDate || '').slice(0, 10)) + '</td><td class="num">' + money2(o.eligibleRevenue) + '</td><td class="num">' + money2(o.reward) + '</td><td class="num">' + money2(o.granted) + '</td><td class="num' + (o.pending > 0 ? ' pos' : '') + '">' + money2(o.pending) +
+        (o.overGranted > 0.005 ? '<div class="cpa-rw-meta neg">over by ' + money2(o.overGranted) + '</div><button class="cpa-btn cpa-btn-ghost cpa-btn-sm cpa-rw-reverse" type="button" data-order="' + esc(String(o.orderNumber)) + '" data-amount="' + esc(String(o.overGranted)) + '" title="Post an adjustment of up to −' + money2(o.overGranted) + ' (never below the unspent balance)"><i class="fas fa-undo"></i> Reverse</button>' : '') +
+        '</td></tr>';
     }).join('') + '</tbody></table>';
     var n = a.orders.filter(function (o) { return o.pending > 0 && !o.linesUnavailable; }).length;
     var nr = a.orders.filter(function (o) { return o.redemption && o.redemption.pending > 0 && !o.linesUnavailable; }).length;
@@ -542,6 +545,15 @@
     try {
       var res = await api(REWARDS_ACCRUAL_API.replace('/accrual', '/expire') + '/' + encodeURIComponent(rwCustomer.id), { method: 'POST', body: JSON.stringify({ company_name: rwCustomer.company }) });
       toast('Expired ' + money2(res.expired) + ' — balance now ' + money2(res.balance));
+      await loadRewardLedger(); await calcAccrual();
+    } catch (e) { if (e.message !== 'auth') toast(e.message, true); }
+  }
+  async function reverseAccrual(orderNo, over) {
+    if (!rwCustomer || !rwAccrual) return;
+    if (!window.confirm('Reverse up to ' + money2(over) + ' granted on order #' + orderNo + ' for ' + (rwCustomer.company || '#' + rwCustomer.id) + '?\n\nThe order now earns less than it was granted (re-invoiced lower). Only the unspent balance can be taken back; dollars already redeemed stay redeemed.')) return;
+    try {
+      var res = await api(REWARDS_ACCRUAL_API + '/' + encodeURIComponent(rwCustomer.id) + '/reverse', { method: 'POST', body: JSON.stringify({ orderNumber: orderNo, company_name: rwCustomer.company }) });
+      toast('Reversed ' + money2(res.reversed) + ' on #' + orderNo + (res.reversed + 0.005 < res.overGranted ? ' (' + money2(res.overGranted - res.reversed) + ' was already redeemed)' : '') + ' — balance now ' + money2(res.balance));
       await loadRewardLedger(); await calcAccrual();
     } catch (e) { if (e.message !== 'auth') toast(e.message, true); }
   }
@@ -589,6 +601,7 @@
       if (e.target.closest('#cpa-rw-calc')) calcAccrual();
       else if (e.target.closest('#cpa-rw-post')) postAccrual();
       else if (e.target.closest('#cpa-rw-expire')) expireAccrual();
+      else if (e.target.closest('.cpa-rw-reverse')) { var rb = e.target.closest('.cpa-rw-reverse'); reverseAccrual(rb.getAttribute('data-order'), Number(rb.getAttribute('data-amount')) || 0); }
     });
     document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeModal(); });
     loadMe();
