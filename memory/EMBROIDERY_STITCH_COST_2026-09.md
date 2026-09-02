@@ -81,8 +81,8 @@ the $250 minimum ÷ qty). Thread = new `VOL-THREAD-PER-1K` 0.02. ⚠️ Garments
 SAME cost because there is one handling row (1.0 min) — the page warns until `VOL-HANDLING-MIN`
 is raised; a cap-specific handling row would need a new code + page change.
 
-## Recommended Caspio changes (NOT applied — Erik decides)
-- `VOL-HANDLING-MIN` 1.0 → **2.4** (raises Braun worst case $2.87 → $3.84/pc; matches p90).
+## Caspio changes
+- ✅ `VOL-HANDLING-MIN` 1.0 → **2.4** APPLIED 2026-09-02 (Erik). Braun worst case $2.87 → $3.84/pc; Break-Even page warning clears.
 - `VOL-SETUP-MIN` 77 → 90 (immaterial at volume). Keep `VOL-HOUR-RATE` 30.09 (Erik 2026-09-02).
 
 ## 2025 embroidery volume (Orders, invoiced 2025)
