@@ -221,7 +221,7 @@ original columns only — unaffected. The sync's delete-then-insert per order ne
 `Line_Key` unique 11,882 / 0 duplicates / 0 empty · 9,087 garment lines, 8,955 with `SanMar_PieceCost`
 (419 styles looked up) · 55 rows with no ORDER_ODBC header (id_Customer/id_OrderType blank — the sync
 fills them when those orders are next touched). `Is_Garment` is 1/0 in the CSV (Caspio import maps it);
-the column is INTEGER, so the sync writes 1/0 (proxy v2026.09.02.5). ✅ Erik imported it and flipped `Line_Key` Unique 2026-09-02 ~08:30.
+the column is INTEGER, so the sync writes 1/0 (proxy v2026.09.02.5). ✅ Erik imported it and flipped `Line_Key` Unique 2026-09-02 ~08:30. `/api/order-lines` returns the six columns since proxy v2026.09.02.6 (its q.select had to stay at the 13 old columns until they existed — a q.select naming a missing column 400s); live-verified on 142999: Style PC54, Is_Garment 1, SanMar_PieceCost 4.
 
 ## Re-invoiced orders (Erik's rulings 2026-09-02, LIVE app v2026.09.02.3/.4 · proxy v2026.09.02.3)
 
