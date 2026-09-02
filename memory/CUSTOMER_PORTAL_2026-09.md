@@ -130,6 +130,34 @@ at ~42% net, so the program pays if it lifts spend by ~5.5%. Alternatives modell
 (Calculate → Post; ~$9.9k of credit across 37 accounts) so every good customer enters Q4 with a
 balance; reps mention it on every touch; redemptions go on the order as the `RWD-REDEEM` line.
 
+## "2026 Rewards" — the program year (Erik's rulings 2026-09-02, LIVE v2026.09.02.1 / Heroku v1900)
+
+1. **Earning window = a date range, not rolling months.** `RWD-WINDOW` TierLabel `2026-01-01..2026-08-31`
+   (invoices paid in it). Next year set it to `2026-09-01..2027-08-31` → "2027 Rewards".
+2. **Spend window / expiry.** `RWD-SPEND` TierLabel `2026-10-01..2026-12-31`. The portal refuses a
+   redemption outside it and shows "use by Dec 31, 2026"; after it, the console shows **Expire unused**
+   (POST `/api/portal-admin/rewards/expire/:id` → one `adjust` −balance, refuses before the date).
+3. **Full balance only.** One redemption = the whole balance (server rejects anything else); the portal
+   redeem modal is a single button "Apply my full $X to my next order". One credit line per customer.
+4. **Q4 boost pays into NEXT year.** `RWD-BOOST` (×1.5, Oct 1–Dec 31 2026) stays; those orders fall in
+   the 2027 earning window, so customers spend 2026 dollars in Q4 AND stack boosted 2027 dollars.
+5. **Redemption line = gift-certificate style.** Part `RWD-REDEEM` (or the gift-cert part named in the
+   `RWD-REDEEM` row's TierLabel), qty 1, negative price. No per-customer code — the order # is the key.
+   ⏭️ Erik still has to name the ShopWorks part (create `RWD-REDEEM` in OnSite or put the existing
+   gift-certificate part code in that TierLabel).
+
+**Service_Codes REWARD rows now (8):** `RWD-EARN` ×4 (0-9.99→1, 10-19.99→2, 20-39.99→3, 40+→5) ·
+`RWD-BOOST` · `RWD-REDEEM` · `RWD-WINDOW` · `RWD-SPEND`. All Visible=No.
+
+## Line-items table (Erik's ruling 5 — in progress)
+Goal: the engine reads a Caspio table instead of ManageOrders (30/min limiter, H12). Export script
+`scratchpad/export-order-lines-2026.js` → `Downloads/Order_Lines_2026.csv` (headers from ORDER_ODBC,
+lines from MO paced 2.3 s/order, SanMar piece cost + line gross per line; 3,215 orders ≈ 2 h;
+resumable via `order-lines-2026.progress.json`). Table `ORDER_LINES_2026`, upsert key `Line_Key` =
+`ID_Order-SortOrder`. `sts_Paid`/`cur_Balance` are left blank on purpose — paid status stays LIVE
+from MO (one orders call per customer). Then: proxy read route `/api/order-lines` + engine switch
+(Caspio lines when present, MO fallback) + a bandit LinesOE delta agent for the durable path.
+
 ## Open items / next
 - ✅ **LIVE v2026.09.01.6** (Heroku v1899, SHA 9f2ce98 verified; new routes answer 401 + `no-store`
   anonymously; `/portal` still 302s to login). Rows written; Aaberg's $97 posted and visible.
