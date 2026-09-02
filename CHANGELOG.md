@@ -1,3 +1,7 @@
+## v2026.09.02.13 (2026.09.02)
+
+- Deploy v2026.09.02.13: 1 file (embroidery-contract-pricing.html) — printable price list footer dated 2026-09-02
+
 ## v2026.09.02.12 (2026.09.02)
 
 - Deploy v2026.09.02.12: 7 files (embroidery-contract.js, index.html, EMBROIDERY_STITCH_COST_2026-09.md...)
