@@ -201,10 +201,16 @@
                         </select>
                     </label>
                 </div>
-                <label class="cpa-field">
-                    <span class="cpa-field-label">Reason <small>(shows in the audit trail)</small></span>
-                    <input type="text" id="cpa-rw-reason" placeholder="e.g. Loyalty bonus, applied to order #…" autocomplete="off">
-                </label>
+                <div class="cpa-field-row">
+                    <label class="cpa-field">
+                        <span class="cpa-field-label">Reason <small>(shows in the audit trail)</small></span>
+                        <input type="text" id="cpa-rw-reason" placeholder="e.g. Loyalty bonus, applied to order #…" autocomplete="off">
+                    </label>
+                    <label class="cpa-field">
+                        <span class="cpa-field-label">ShopWorks order # <small>(ties a redemption to its order)</small></span>
+                        <input type="text" id="cpa-rw-order" inputmode="numeric" placeholder="e.g. 141467" autocomplete="off">
+                    </label>
+                </div>
                 <div class="cpa-modal-error" id="cpa-rw-error"></div>
                 <button class="cpa-btn cpa-btn-primary cpa-rw-save-btn" id="cpa-rw-save"><i class="fas fa-plus"></i> Add ledger entry</button>
                 <div class="cpa-rw-ledger-head">Recent activity</div>

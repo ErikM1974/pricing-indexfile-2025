@@ -1613,6 +1613,7 @@
         list.innerHTML = rows.map(function (e) {
             var amt = Number(e.amount) || 0;
             var label = e.reason || (e.type === 'redeem' ? 'Redeemed' : e.type === 'grant' ? 'Reward earned' : 'Adjustment');
+            if (e.orderRef && label.indexOf(String(e.orderRef)) === -1) label += ' · order #' + e.orderRef;
             return '<div class="cp-rh-row"><span class="cp-rh-amt ' + (amt < 0 ? 'is-neg' : 'is-pos') + '">' + (amt < 0 ? '−' : '+') + money(Math.abs(amt)) + '</span>' +
                 '<span class="cp-rh-label">' + escapeHtml(label) + '</span>' + (e.created ? '<span class="cp-rh-date">' + escapeHtml(formatDate(e.created)) + '</span>' : '') + '</div>';
         }).join('');

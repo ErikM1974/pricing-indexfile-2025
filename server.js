@@ -8464,9 +8464,31 @@ async function loadRewardProgram() {
   // Service_Codes row RWD-WEBSTORE with SellPrice=1 turns them on.
   const web = rows.find((x) => String(x.ServiceCode || '').toUpperCase() === 'RWD-WEBSTORE');
   const includeWebstore = !!(web && Number(web.SellPrice) > 0);
-  const program = { configured: tiers.length > 0, tiers, months, includeWebstore };
+  // Promotional boosts: ServiceCode RWD-BOOST, TierLabel "2026-10-01..2026-12-31", SellPrice = multiplier
+  // (2 = double rewards). Applies to orders INVOICED inside the window; overlapping windows take the max.
+  const boosts = rows
+    .filter((x) => String(x.ServiceCode || '').toUpperCase() === 'RWD-BOOST')
+    .map((x) => Object.assign({ label: String(x.TierLabel || ''), multiplier: Number(x.SellPrice) || 0, name: x.DisplayName || '' }, parseRewardWindow(x.TierLabel) || {}))
+    .filter((b) => b.from && b.to && b.multiplier > 0);
+  // Which ShopWorks part number(s) mark a redemption line: Service_Codes row RWD-REDEEM, TierLabel =
+  // comma-separated part codes (e.g. "GIFT CERT, RWD-REDEEM") — so the same part reps already use for
+  // gift-certificate credits can be the reward line. Default: RWD-REDEEM / REWARD-REDEEM.
+  const redeemRow = rows.find((x) => String(x.ServiceCode || '').toUpperCase() === 'RWD-REDEEM');
+  const redeemParts = redeemRow ? String(redeemRow.TierLabel || '').split(',').map((p) => p.trim().toUpperCase()).filter(Boolean) : [];
+  const program = { configured: tiers.length > 0, tiers, months, includeWebstore, boosts, redeemParts };
   _rewardProgramCache = { t: Date.now(), program };
   return program;
+}
+function parseRewardWindow(label) {
+  const m = String(label || '').trim().match(/^(\d{4}-\d{2}-\d{2})\s*(?:\.\.|to|-|–)\s*(\d{4}-\d{2}-\d{2})$/i);
+  return m ? { from: m[1], to: m[2] } : null;
+}
+function rewardBoostFor(program, invoiceDate) {
+  const day = String(invoiceDate || '').slice(0, 10);
+  if (!day || !program || !program.boosts) return null;
+  let best = null;
+  program.boosts.forEach((b) => { if (day >= b.from && day <= b.to && (!best || b.multiplier > best.multiplier)) best = b; });
+  return best;
 }
 function rewardTierForCost(program, cost) {
   if (cost == null || !program || !program.configured) return null;
@@ -8489,6 +8511,15 @@ function moOrderPaid(o) {
 }
 const rewardRound = (n) => Math.round((Number(n) || 0) * 100) / 100;
 const REWARD_WEBSTORE_TYPES = /inksoft|shopify|web ?store|storefront/i;   // ShopWorks ORDER_TYPE names
+// A redemption is a ShopWorks line with this part number and a NEGATIVE unit price (qty 1, e.g. -50).
+// Reps add it at order entry; the engine finds it on the paid order and reconciles it into the ledger.
+const REWARD_REDEEM_PART = /^RWD-REDEEM\b|^REWARD-?REDEEM\b/i;
+function isRewardRedeemLine(program, li) {
+  const pn = String(li.PartNumber || '').trim();
+  if (!pn) return false;
+  if (program && program.redeemParts && program.redeemParts.length) return program.redeemParts.includes(pn.toUpperCase());
+  return REWARD_REDEEM_PART.test(pn);
+}
 // Line items of an INVOICED + PAID order never change → memoise for a day. And the proxy's
 // ManageOrders limiter is ONE 30-requests/minute bucket shared by every caller behind the same
 // IP (the whole dyno), so fetching a 25-order customer in parallel trips it and the missing
@@ -8549,12 +8580,14 @@ async function computeRewardAccrual(cid) {
     portalFetchJson(`${CRM_API_BASE}/api/customer-rewards/ledger/${encodeURIComponent(cid)}`, hdrs, 8000),
   ]);
   if (!ledgerJson) throw new Error('ledger unavailable');   // without it "pending" would double-grant
-  const grantedByOrder = new Map();
+  const grantedByOrder = new Map(); const redeemedByOrder = new Map();
   (ledgerJson.entries || []).forEach((e) => {
-    const ref = String(e.orderRef || '').trim();
-    if (!ref || !((Number(e.amount) || 0) > 0)) return;
-    grantedByOrder.set(ref, rewardRound((grantedByOrder.get(ref) || 0) + Number(e.amount)));
+    const ref = String(e.orderRef || '').trim(); const amt = Number(e.amount) || 0;
+    if (!ref || !amt) return;
+    if (amt > 0) grantedByOrder.set(ref, rewardRound((grantedByOrder.get(ref) || 0) + amt));
+    else redeemedByOrder.set(ref, rewardRound((redeemedByOrder.get(ref) || 0) + Math.abs(amt)));
   });
+  const ledgerBalance = rewardRound(Number(ledgerJson.balance) || 0);
   // Catalog rows per unique style, in parallel (portalStyleRows memoises 30 min).
   const styles = new Set();
   eligible.forEach((o, i) => (((lineJsons[i] && lineJsons[i].result) || [])).forEach((li) => { const n = portalNormalizePart(li); if (n) styles.add(n.style.toUpperCase()); }));
@@ -8563,7 +8596,13 @@ async function computeRewardAccrual(cid) {
   const orders = eligible.map((o, i) => {
     const items = lineJsons[i] && lineJsons[i].result;
     const lines = [];
+    const boost = rewardBoostFor(program, o.date_Invoiced);
+    let redeemedOnOrder = 0;
     (items || []).forEach((li) => {
+      if (isRewardRedeemLine(program, li)) {
+        redeemedOnOrder = rewardRound(redeemedOnOrder + Math.abs((Number(li.LineQuantity) || 1) * (Number(li.LineUnitPrice) || 0)));
+        return;
+      }
       const norm = portalNormalizePart(li);
       if (!norm) return;
       const qty = Number(li.LineQuantity) || portalSumSizes(li);
@@ -8576,24 +8615,31 @@ async function computeRewardAccrual(cid) {
         partNumber: li.PartNumber || '', style: norm.style, color: norm.color, description: li.PartDescription || '',
         qty, unitPrice: unit, revenue, cost,
         tier: tier ? tier.label : null, ratePct: tier ? tier.ratePct : 0,
-        reward: tier ? rewardRound(revenue * tier.ratePct / 100) : 0,
+        reward: tier ? rewardRound(revenue * tier.ratePct / 100 * (boost ? boost.multiplier : 1)) : 0,
         note: cost == null ? 'cost unknown (style not in catalog)' : (tier ? '' : 'no band covers this cost'),
       });
     });
     const reward = rewardRound(lines.reduce((s, l) => s + l.reward, 0));
     const granted = grantedByOrder.get(String(o.id_Order)) || 0;
+    const redeemPosted = redeemedByOrder.get(String(o.id_Order)) || 0;
     return {
       orderNumber: o.id_Order, invoiceDate: o.date_Invoiced, orderDate: o.date_Ordered, designName: o.DesignName || '',
       total: Number(o.cur_TotalInvoice) || 0,
       eligibleRevenue: rewardRound(lines.reduce((s, l) => s + l.revenue, 0)),
       reward, granted, pending: rewardRound(Math.max(0, reward - granted)),
+      boost: boost ? { label: boost.label, multiplier: boost.multiplier, name: boost.name } : null,
+      // Redemption found on the order (RWD-REDEEM line) vs what the ledger already holds for it.
+      redemption: redeemedOnOrder || redeemPosted ? { onOrder: redeemedOnOrder, posted: redeemPosted, pending: rewardRound(Math.max(0, redeemedOnOrder - redeemPosted)) } : null,
       linesUnavailable: !items, lines,
     };
   });
   const totals = orders.reduce((t, o) => ({
     eligibleRevenue: rewardRound(t.eligibleRevenue + o.eligibleRevenue), earned: rewardRound(t.earned + o.reward),
     granted: rewardRound(t.granted + o.granted), pending: rewardRound(t.pending + o.pending),
-  }), { eligibleRevenue: 0, earned: 0, granted: 0, pending: 0 });
+    redeemedOnOrders: rewardRound(t.redeemedOnOrders + (o.redemption ? o.redemption.onOrder : 0)),
+    redeemPending: rewardRound(t.redeemPending + (o.redemption ? o.redemption.pending : 0)),
+  }), { eligibleRevenue: 0, earned: 0, granted: 0, pending: 0, redeemedOnOrders: 0, redeemPending: 0 });
+  totals.ledgerBalance = ledgerBalance;
   const unavailable = orders.filter((o) => o.linesUnavailable).map((o) => o.orderNumber);
   return {
     program, window: { from: windowStart.toISOString().slice(0, 10), to: end }, orders, totals,
@@ -8640,9 +8686,27 @@ app.post('/api/portal-admin/rewards/accrual/:id/post', requireCrmRole(PORTAL_ADM
         posted.push({ orderNumber: o.orderNumber, amount: o.pending });
       } catch (e) { failed.push({ orderNumber: o.orderNumber, error: e.message }); }
     }
+    // Redemptions found on orders (RWD-REDEEM lines) that the ledger does not hold yet.
+    const redeemTodo = acc.orders.filter((o) => o.redemption && o.redemption.pending > 0 && !o.linesUnavailable && (!only || only.has(String(o.orderNumber))));
+    const redeemed = [];
+    for (const o of redeemTodo) {
+      const body = {
+        id_Customer: cid, company_name: String((req.body && req.body.company_name) || '').slice(0, 255),
+        amount: o.redemption.pending, type: 'redeem',
+        reason: (`Redeemed on order #${o.orderNumber} (RWD-REDEEM line on the ShopWorks order)`).slice(0, 255),
+        order_ref: String(o.orderNumber), created_by: staff,
+      };
+      try {
+        const r = await fetch(`${CRM_API_BASE}/api/customer-rewards/entry`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CRM-API-Secret': CRM_API_SECRET }, body: JSON.stringify(body) });
+        const j = await r.json();
+        if (!r.ok || !j.success) throw new Error((j && j.error) || ('proxy ' + r.status));
+        redeemed.push({ orderNumber: o.orderNumber, amount: o.redemption.pending });
+      } catch (e) { failed.push({ orderNumber: o.orderNumber, error: 'redeem: ' + e.message }); }
+    }
     const total = rewardRound(posted.reduce((s, p) => s + p.amount, 0));
-    console.log(`[portal-admin] ${staff} posted ${posted.length} reward grant(s) for customer ${cid}: $${total.toFixed(2)}${failed.length ? ` (${failed.length} failed)` : ''}`);
-    res.json({ ok: failed.length === 0, posted, failed, total });
+    const redeemTotal = rewardRound(redeemed.reduce((s, p) => s + p.amount, 0));
+    console.log(`[portal-admin] ${staff} posted ${posted.length} grant(s) $${total.toFixed(2)} + ${redeemed.length} redemption(s) $${redeemTotal.toFixed(2)} for customer ${cid}${failed.length ? ` (${failed.length} failed)` : ''}`);
+    res.json({ ok: failed.length === 0, posted, redeemed, failed, total, redeemTotal });
   } catch (err) { console.error('[portal-admin] accrual post failed:', err.message); res.status(503).json({ error: 'Could not post reward grants right now.' }); }
 });
 
