@@ -20,6 +20,7 @@ Last Updated: 2026-08-27 (/memory-maintain: MEMORY.md 18.5→~15 KB — stale st
 | [`CUSTOMER_ORDER_BEHAVIOUR.md`](CUSTOMER_ORDER_BEHAVIOUR.md) | Reorder behaviour — the 2nd order beats the 1st order’s size as a predictor |
 | [`DURABLE_GOTCHAS.md`](DURABLE_GOTCHAS.md) | The expensive traps, by trigger (verification / auth / JS / deploy / API) — moved out of the auto-loaded index 2026-08-12 |
 | [`EMBROIDERY_PRICING_REALIZATION.md`](EMBROIDERY_PRICING_REALIZATION.md) | 85% realization, the $442K gap — pricing is sound, it is not being charged |
+| [`EMBROIDERY_STITCH_COST_2026-09.md`](EMBROIDERY_STITCH_COST_2026-09.md) | Cost per 1,000 stitches, 5K vs 8K logo, handling/setup fit from logs, worst-case multiplier, full absorption |
 | [`LESSONS_LEARNED.md`](LESSONS_LEARNED.md) | Active bug log — problem/root cause/fix/prevention (cap 300 lines) |
 | [`LESSONS_LEARNED_ARCHIVE.md`](LESSONS_LEARNED_ARCHIVE.md) | Aged-out lessons (unbounded) |
 | [`MEMORY_SYSTEM.md`](MEMORY_SYSTEM.md) | **How the memory system works** (not what is in it) — where a new fact goes, the 6 surfaces and when each loads, size budgets, which tree is canonical |

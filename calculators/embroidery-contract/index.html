@@ -16,7 +16,7 @@
          buttons, table base, contact, AI chat panel) — must load BEFORE the page CSS. -->
     <link rel="stylesheet" href="/shared_components/css/contract-pricing-2026.css?v=2026.05.29.3">
     <!-- Page-specific styles (segmented item-type picker, table tabs, divider) -->
-    <link rel="stylesheet" href="/calculators/embroidery-contract/embroidery-contract.css?v=2026.08.05.11">
+    <link rel="stylesheet" href="/calculators/embroidery-contract/embroidery-contract.css?v=2026.09.02.10">
 </head>
 <body>
 
@@ -50,6 +50,11 @@
                     ASI distributors who supply their own blanks. Single price tier, no segment tabs,
                     same full-back rate as Corporate.
                 </p>
+                <p class="lede lede-terms">
+                    <strong>Every contract order has a <span id="ledeOrderMin">$150.00</span> minimum.</strong>
+                    Orders under 24 pieces also carry a <span id="ledeLtmFee">$100.00</span> small-order fee,
+                    rolled into the per-piece price. Rates and fees updated <strong>September 2, 2026</strong>.
+                </p>
             </div>
             <aside class="hero-aside">
                 <div class="fact">
@@ -59,15 +64,22 @@
                 <div class="fact">
                     <span class="k">LTM Fee</span>
                     <span class="v">
-                        <strong>$50</strong> on orders 1–23 pcs
+                        <strong id="factLtmFee">—</strong> on orders <span id="factLtmBand">1–23</span> pcs
                         <span class="pill">CTR-Garmt / CTR-Cap</span>
                     </span>
                 </div>
                 <div class="fact">
                     <span class="k">Full Back LTM</span>
                     <span class="v">
-                        <strong>$100</strong> on orders 1–23 pcs
+                        <strong id="factFbLtm">—</strong> on orders <span id="factFbBand">1–7</span> pcs
                         <span class="pill">DECG-FB</span>
+                    </span>
+                </div>
+                <div class="fact">
+                    <span class="k">Order minimum</span>
+                    <span class="v">
+                        <strong id="factOrderMin">—</strong> per contract order
+                        <span class="pill">CTR-MIN-ORDER</span>
                     </span>
                 </div>
             </aside>
@@ -402,7 +414,7 @@
 
         <div class="footnote">
             Estimates based on standard contract rates. Final quotes may vary by artwork complexity &amp; production schedule.<br>
-            For an official contract quote, contact Ruthie directly. · Northwest Custom Apparel · 2026 rates
+            For an official contract quote, contact Ruthie directly. · Northwest Custom Apparel · 2026 rates, updated September 2, 2026
         </div>
     </main>
 
@@ -456,6 +468,6 @@
     <!-- Risk assessment, machine-time and multi-location combination (pure,
          jest-locked). Must load before the page JS. -->
     <script src="/shared_components/js/dst-quote-math.js?v=2026.08.15.1"></script>
-    <script src="/calculators/embroidery-contract/embroidery-contract.js?v=2026.08.26.3"></script>
+    <script src="/calculators/embroidery-contract/embroidery-contract.js?v=2026.09.02.10"></script>
 </body>
 </html>

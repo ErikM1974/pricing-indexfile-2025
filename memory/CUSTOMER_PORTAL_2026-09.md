@@ -294,8 +294,10 @@ condition in the reverse route + a nightly caller.
   2. **Email to sales@nwcustomapparel.com** (`PORTAL_REQUEST_EMAIL`) via EmailJS, gated on
      **`EMAILJS_TEMPLATE_PORTAL_REQUEST`** — ⏭️ **Erik: create the EmailJS template** with params
      `to_email, subject, kind, company_name, customer_number, request_num, summary, note, rep,
-     customer_email, queue_link`, then set the config var on the proxy. Until then the log says
-     "email skipped — EMAILJS_TEMPLATE_PORTAL_REQUEST not configured".
+     customer_email, queue_link`, then set the config var on the proxy. ✅ DONE 2026-09-02: template **`template_portal_request`** ("Portal Request → sales@", EmailJS id qi4af7q) built
+     in Erik's EmailJS via Claude-in-Chrome, config var set, live-proven `[portal-reorder] emailed sales@… RR-20260902-222005`.
+     🔑 EmailJS content editor = CodeMirror 6 with no exposed view; fill it with focus + execCommand(insertText).
+     🔑 An extension frame (1Password) in a tab breaks the Chrome tool's clicks/JS ("Cannot access a chrome-extension:// URL") — open a fresh tab.
   3. Optional channel webhook `SLACK_PORTAL_REQUESTS_WEBHOOK_URL` / `SLACK_SALES_WEBHOOK_URL` (unset).
   Locked by `tests/jest/portal-request-notify.test.js` (proxy tests live under tests/jest — testMatch).
 - 🔑 Local **MAGIC_LINK_SECRET is not in .env** (verify route 503s locally); mint the SESSION cookie
@@ -311,7 +313,6 @@ condition in the reverse route + a nightly caller.
 - 🔴 Not exercised live: the redemption reconcile path (no order carries an RWD-REDEEM line yet) —
   unit-locked, same proxy entry route the console already uses.
 - ⏭️ First real customer through the new portal: watch the general-request rows land in the rep queue AND the rep's Slack DM arrive (now wired — see Quick actions section).
-- ⏭️ Erik: EmailJS template `EMAILJS_TEMPLATE_PORTAL_REQUEST` so sales@ gets a copy of every portal request.
 - The `Source` column of those rows says `reorder` (the proxy only knows reorder|recommendation).
   A proxy tweak could add `portal-request`; the Style column already distinguishes them.
 - `/api/portal/quotes` is email-scoped by design; a contact who quotes under a second address

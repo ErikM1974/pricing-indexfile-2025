@@ -210,12 +210,65 @@
                     fullBack: {
                         perThousandRates: data.fullBack.perThousandRates,
                         minStitches: data.fullBack.minStitches || 25000,
-                        minStitches: data.fullBack.minStitches || 25000
+                        // The fee and its band come from the DECG-FB ladder (Embroidery_Costs.LTM
+                        // on the 1-7 row). Until 2026-09-02 this mapping silently dropped both,
+                        // so ltmFeeForProduct('fullback') always returned 0 — a full-back order
+                        // of 4 pieces was quoted with NO small-order fee.
+                        ltmFee: Number(data.fullBack.ltmFee) || 0,
+                        ltmThreshold: Number(data.fullBack.ltmThreshold) || 0
                     },
-                    ltmFee: data.ltmFee || 50,
-                    ltmThreshold: data.ltmThreshold || 23
+                    // The fee is per product in the payload (garments.ltmFee / caps.ltmFee,
+                    // from Embroidery_Costs.LTM). Until 2026-09-02 this read a top-level
+                    // `data.ltmFee` that the proxy never sends, so the calculator charged a
+                    // hardcoded $50 no matter what Caspio said. ltmFeeForProduct() reads the
+                    // per-product values; this top-level copy is the garment fee for the
+                    // callers that still ask for one number.
+                    ltmFee: (data.garments && Number(data.garments.ltmFee)) || data.ltmFee || 50,
+                    ltmThreshold: (data.garments && Number(data.garments.ltmThreshold)) || data.ltmThreshold || 23
                 };
             });
+    }
+
+    /* ---------------------- Order minimum ---------------------- */
+    // Contract orders carry a $150 invoice minimum (Erik, 2026-09-02): at the card plus the
+    // small-order fee a 4-piece order still misses its cost. The amount is Service_Codes
+    // CTR-MIN-ORDER (Erik-editable, no deploy). It is applied ONCE, in priceAllLines(), to
+    // the combined order — so the hero, the total card, the copied quote text and the AI
+    // email all see the same number. Rule #4: if the row cannot be read the page says so
+    // instead of quietly pricing without it.
+    var orderMinimum = 0;
+    var orderMinimumState = 'loading';   // 'loading' | 'ok' | 'error'
+
+    function fetchOrderMinimum() {
+        return fetch(API_BASE_URL + '/api/service-codes?code=CTR-MIN-ORDER')
+            .then(function (r) {
+                if (!r.ok) throw new Error('Service code API error: ' + r.status);
+                return r.json();
+            })
+            .then(function (res) {
+                var rows = Array.isArray(res) ? res : (res && res.data) || [];
+                var row = rows.find(function (x) { return x && x.IsActive !== false; }) || rows[0];
+                var v = row ? Number(row.SellPrice) : NaN;
+                if (!isFinite(v) || v < 0) throw new Error('CTR-MIN-ORDER row missing or not a number');
+                orderMinimum = v;
+                orderMinimumState = 'ok';
+            })
+            .catch(function (err) {
+                console.error('[contract-embroidery] Order minimum failed to load:', err);
+                orderMinimum = 0;
+                orderMinimumState = 'error';
+            });
+    }
+
+    function applyOrderMinimum(combo) {
+        if (!combo || !(orderMinimum > 0) || !(state.qty > 0)) return combo;
+        if (combo.orderTotal < orderMinimum) {
+            combo.orderTotalBeforeMinimum = combo.orderTotal;
+            combo.orderTotal = orderMinimum;
+            combo.finalUnit = orderMinimum / state.qty;
+            combo.minimumApplied = true;
+        }
+        return combo;
     }
 
     /* ---------------------- Calculator render ---------------------- */
@@ -251,6 +304,9 @@
                 subText += ' · incl. $' + fmtMoney(combo.ltmFee) + ' LTM ÷ ' + state.qty +
                     ' = <b>+$' + fmtMoney(combo.ltmPerPiece) + '/pc</b>';
             }
+            if (combo.minimumApplied) {
+                subText += ' · <b>$' + fmtMoney(orderMinimum) + ' order minimum</b> applied';
+            }
             document.getElementById('unitSub').innerHTML = subText;
         } else {
             document.getElementById('resTier').textContent = '—';
@@ -265,9 +321,17 @@
         document.getElementById('orderTotal').textContent = '$' + fmtMoney(orderTotal);
         var orderTotalNote = document.getElementById('orderTotalNote');
         if (orderTotalNote) {
-            orderTotalNote.textContent = combo
-                ? fmtInt(state.qty) + ' × $' + fmtMoney(combo.finalUnit)
-                : '';
+            var note = '';
+            if (combo && combo.minimumApplied) {
+                note = 'Order minimum $' + fmtMoney(orderMinimum) + ' (priced at $' +
+                    fmtMoney(combo.orderTotalBeforeMinimum) + ')';
+            } else if (combo) {
+                note = fmtInt(state.qty) + ' × $' + fmtMoney(combo.finalUnit);
+            }
+            if (orderMinimumState === 'error') {
+                note += (note ? ' · ' : '') + '⚠ order minimum not loaded — check the CTR-MIN-ORDER policy before quoting';
+            }
+            orderTotalNote.textContent = note;
         }
 
         // LTM helper chip — REMOVED in Round 9 (2026-05-14). The table's
@@ -536,7 +600,8 @@
                 ' pcs · ' + fmtK(state.stitches) + ' stitches');
         }
         lines.push('Unit: $' + fmtMoney(combo.finalUnit) + ' / piece' + ltmNote +
-            '  •  Total: $' + fmtMoney(combo.orderTotal));
+            '  •  Total: $' + fmtMoney(combo.orderTotal) +
+            (combo.minimumApplied ? ' (order minimum)' : ''));
         copyToClipboard(lines.join('\n'))
             .then(function () { showToast('Quote text copied'); })
             .catch(function () { showToast('Couldn\'t copy — try again'); });
@@ -653,7 +718,9 @@
             threshold: pricing ? pricing.ltmThreshold : 23,
             feeFor: ltmFeeForProduct
         });
-        return { priced: priced, combo: combo };
+        // The order minimum sits on the ONE pricing path, after the lines are combined,
+        // so every consumer of `combo` (hero, total, copy text, AI email) agrees.
+        return { priced: priced, combo: applyOrderMinimum(combo) };
     }
 
     /**
@@ -674,6 +741,14 @@
             // qty omitted (matrix header asks "what IS the fee") → don't gate.
             if (band > 0 && Number(qty) > band) return 0;
             return Number(fb.ltmFee) || 0;
+        }
+        // Garments and caps each carry their own fee in the payload (Embroidery_Costs.LTM
+        // on the CTR-Garmt / CTR-Cap small-tier rows). Fall back to the garment figure.
+        if (product === 'cap' && pricing && pricing.caps && Number(pricing.caps.ltmFee) > 0) {
+            return Number(pricing.caps.ltmFee);
+        }
+        if (pricing && pricing.garments && Number(pricing.garments.ltmFee) > 0) {
+            return Number(pricing.garments.ltmFee);
         }
         return pricing ? pricing.ltmFee : 50;
     }
@@ -2680,6 +2755,19 @@ var AI_ENDPOINT = '/api/contract-embroidery-ai/chat';
 
     /* ---------------------- Init ---------------------- */
 
+    // The "facts" strip at the top of the page used to hardcode "$50" — it now says what
+    // Caspio says, so a fee change never leaves stale copy on the page.
+    function renderPricingFacts() {
+        var set = function (id, text) { var el = document.getElementById(id); if (el) el.textContent = text; };
+        set('factLtmFee', '$' + fmtMoney(ltmFeeForProduct('garment')));
+        set('factLtmBand', '1–' + (pricing ? pricing.ltmThreshold : 23));
+        set('factFbLtm', '$' + fmtMoney(ltmFeeForProduct('fullback')));
+        set('factFbBand', '1–' + ltmThresholdForProduct('fullback'));
+        set('factOrderMin', orderMinimumState === 'ok' ? '$' + fmtMoney(orderMinimum) : 'not loaded');
+        set('ledeOrderMin', orderMinimumState === 'ok' ? '$' + fmtMoney(orderMinimum) : '(minimum not loaded)');
+        set('ledeLtmFee', '$' + fmtMoney(ltmFeeForProduct('garment')));
+    }
+
     function init() {
         readUrlParams();
 
@@ -2689,11 +2777,13 @@ var AI_ENDPOINT = '/api/contract-embroidery-ai/chat';
         renderStitchPresets();
         renderSegmentedActiveStates();
 
-        // Fetch live pricing
-        fetchContractPricing()
-            .then(function (data) {
-                pricing = data;
+        // Fetch live pricing (rates + fees) and the order minimum together; the minimum's
+        // own failure is reported inside the total card, never fatal to the prices.
+        Promise.all([fetchContractPricing(), fetchOrderMinimum()])
+            .then(function (results) {
+                pricing = results[0];
                 document.getElementById('pricingError').hidden = true;
+                renderPricingFacts();
                 renderCalculator();
                 renderPriceTable();
             })
