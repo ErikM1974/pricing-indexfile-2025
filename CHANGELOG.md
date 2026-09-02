@@ -1,3 +1,14 @@
+## v2026.09.01.6 (2026.09.01)
+
+- Customer portal redesign + reward-dollar accrual program
+- Portal: statement table scrolls inside its card on narrow screens
+- Reward accrual: exclude web-store orders, pace line-item fetches, resumable under Heroku's 30s limit
+- Reward accrual: redemptions as ShopWorks line items (configurable part), Q4 boost windows, order # on ledger entries
+- Reward accrual: non-SanMar garments earn the base band; memory notes for scope, pacing, redemptions, boost
+- Portal: reward dollars panel on Account, redeem modal explains the invoice credit line
+- Portal API: Cache-Control no-store on every /api/portal* route (stale ETag showed a pre-grant balance); reward program rates + lessons documented
+- Deploy v2026.09.01.6: 3 files (customer-portal-admin.html,customer-portal.html,customer-product.html,...)
+
 ## v2026.09.01.5 (2026.09.01)
 
 - Bonus hero: ring holds only the %, dollars beside it; CTA wrap fixed
