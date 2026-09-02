@@ -30,7 +30,15 @@
         minPerPc:   'VOL-MIN-PER-PC',  // minutes per piece at StitchBase stitches
         minGm:      'VOL-MIN-GM',      // % gross margin floor — the tool warns below it
         minQty:     'VOL-MIN-QTY',     // pieces before a one-time price is even considered
-        denomFloor: 'VOL-DENOM-FLOOR'  // largest garment denominator Erik allows (lowest margin)
+        denomFloor: 'VOL-DENOM-FLOOR', // largest garment denominator Erik allows (lowest margin)
+        // Worst-case production model (Erik 2026-09-02: "include slack time and worst production
+        // case scenarios"). Sewing time = stitches / (SPM × heads) on the SMALLEST machine the
+        // job could land on, plus handling per piece, all inflated by the slack percentage.
+        // The cost shown is max(fitted model, worst case) — never the optimistic one.
+        spm:        'VOL-SPM',          // stitches per minute while sewing (ShopWorks Machines: 500)
+        headsWorst: 'VOL-HEADS-WORST',  // heads on the worst-case machine (the 4-head)
+        handling:   'VOL-HANDLING-MIN', // hoop / unhoop / trim / inspect, minutes per piece
+        slackPct:   'VOL-SLACK'         // % added for thread breaks, bobbins, rehoops, downtime
     };
 
     const state = {
@@ -84,7 +92,11 @@
                 stitchBase: Number(need('minPerPc').StitchBase) || 8000,
                 minGm:      Number(need('minGm').SellPrice) / 100,
                 minQty:     Number(need('minQty').SellPrice),
-                denomFloor: Number(need('denomFloor').SellPrice)
+                denomFloor: Number(need('denomFloor').SellPrice),
+                spm:        Number(need('spm').SellPrice),
+                headsWorst: Number(need('headsWorst').SellPrice),
+                handling:   Number(need('handling').SellPrice),
+                slackPct:   Number(need('slackPct').SellPrice)
             };
             Object.keys(cfg).forEach((k) => { if (!isFinite(cfg[k]) || cfg[k] <= 0) throw new Error('Service_Codes VOL value for ' + k + ' is not a positive number'); });
             state.config = cfg;
@@ -368,11 +380,25 @@
         let cost = null;
         if (state.config && qty > 0) {
             const c = state.config;
-            // Run time scales with the logo; hooping/trimming keeps a floor at half the base minutes.
+            // Typical: the fitted production-log model, run time scaled by the logo; handling keeps
+            // a floor at half the base minutes.
             const stitchFactor = Math.max(0.5, stitches / c.stitchBase);
-            const hours = (c.setupMin + c.minPerPc * stitchFactor * qty) / 60;
+            const minTypical = c.minPerPc * stitchFactor;
+            const hoursTypical = (c.setupMin + minTypical * qty) / 60;
+            // Worst case: smallest machine, real sewing speed, handling, and slack on everything.
+            const slack = 1 + c.slackPct / 100;
+            const minWorst = (stitches / (c.spm * c.headsWorst) + c.handling) * slack;
+            const hoursWorst = (c.setupMin * slack + minWorst * qty) / 60;
+            // The number the page prices against is whichever is worse.
+            const minUsed = Math.max(minTypical, minWorst);
+            const hours = Math.max(hoursTypical, hoursWorst);
             const total = hours * c.hourRate + c.orderCost;
-            cost = { hours, total, perPc: total / qty, stitchFactor, minPerPcActual: c.minPerPc * stitchFactor };
+            const totalTypical = hoursTypical * c.hourRate + c.orderCost;
+            cost = {
+                hours, total, perPc: total / qty, stitchFactor,
+                minPerPcActual: minUsed, minTypical, minWorst, hoursTypical, hoursWorst,
+                perPcTypical: totalTypical / qty, slack
+            };
         }
         const decoPerPc = cost ? cost.perPc : 0;
 
@@ -474,10 +500,12 @@
             '<td class="vq-num">' + (r.gmTotal === null ? 'n/a' : pct(r.gmTotal)) + '</td><td class="vq-num">' + money0(r.orderStd) + ' / ' + money0(r.orderVol) + '</td></tr>' : '';
 
         $('vq-model-note').textContent = c
-            ? 'Cost model (Service_Codes VOL-*): $' + c.hourRate.toFixed(2) + '/machine hour, $' + c.orderCost.toFixed(0) + ' per order, ' +
-              c.setupMin.toFixed(0) + ' min setup + ' + c.minPerPc.toFixed(2) + ' min/pc at ' + c.stitchBase.toLocaleString() + ' stitches' +
-              (r.cost ? ' (this logo: ' + r.cost.minPerPcActual.toFixed(2) + ' min/pc). ' : '. ') +
-              'GM % = (price − case cost − decoration cost/pc) ÷ price. Setup fee, tax and freight are not included.'
+            ? 'Cost model (Service_Codes VOL-*): $' + c.hourRate.toFixed(2) + '/machine hour, $' + c.orderCost.toFixed(0) + ' per order. ' +
+              'WORST CASE = ' + c.headsWorst + '-head machine at ' + c.spm + ' spm + ' + c.handling.toFixed(1) + ' min handling/pc, everything +' + c.slackPct + '% slack' +
+              (r.cost ? ' → ' + r.cost.minWorst.toFixed(2) + ' min/pc, ' + r.cost.hoursWorst.toFixed(1) + ' h, ' + money(r.cost.perPc) + '/pc' : '') +
+              '. Typical (fitted from production logs) = ' + c.minPerPc.toFixed(2) + ' min/pc at ' + c.stitchBase.toLocaleString() + ' stitches' +
+              (r.cost ? ' → ' + r.cost.minTypical.toFixed(2) + ' min/pc, ' + r.cost.hoursTypical.toFixed(1) + ' h, ' + money(r.cost.perPcTypical) + '/pc' : '') +
+              '. Margins use the worse of the two. GM % = (price − case cost − decoration cost/pc) ÷ price. Setup fee, tax and freight are not included.'
             : 'Cost model unavailable: ' + (state.configError || 'loading');
 
         $('vq-memo').textContent = buildMemo(r);
@@ -564,10 +592,13 @@
         L.push('1. Quantity. ' + r.qty.toLocaleString() + ' pieces on a single PO is ' + (r.qty / topMin).toFixed(1) + 'x the top published tier (' +
                topTier + '). One setup, one thread change, one continuous run.');
         L.push('2. Logo size. ' + r.stitches.toLocaleString() + ' stitches is ' + share + '% of the ' + base.toLocaleString() + '-stitch base our embroidery charge is built on' +
-               (r.cost ? ', so machine time is about ' + r.cost.minPerPcActual.toFixed(1) + ' minutes per piece instead of ' + c.minPerPc.toFixed(1) + '.' : '.'));
+               (r.cost ? '. At ' + c.spm + ' stitches/min that is ' + (r.stitches / c.spm).toFixed(1) + ' minutes of sewing per head.' : '.'));
         if (r.cost) {
-            L.push('3. Production cost. About ' + r.cost.hours.toFixed(1) + ' machine hours for the whole order; decoration costs about ' + money(r.cost.perPc) +
-                   ' per piece against ' + money(r.embVol) + ' charged. Gross margin on the order stays at ' + pct(r.gmTotal) + '.');
+            L.push('3. Production cost, WORST CASE. Priced as if the job runs on the ' + c.headsWorst + '-head machine with ' + c.handling.toFixed(1) +
+                   ' min handling per piece and ' + c.slackPct + '% slack for thread breaks, rehoops and downtime: ' + r.cost.minWorst.toFixed(1) + ' min/pc, ' +
+                   r.cost.hoursWorst.toFixed(1) + ' machine hours, decoration cost about ' + money(r.cost.perPc) + ' per piece against ' + money(r.embVol) +
+                   ' charged. Typical run from our production logs would be ' + r.cost.minTypical.toFixed(1) + ' min/pc (' + money(r.cost.perPcTypical) +
+                   '/pc). Gross margin on the order at the worst case: ' + pct(r.gmTotal) + '.');
         }
         L.push((r.cost ? '4' : '3') + '. Setup. ' + (digitized ? 'Logo is already digitized; no setup fee.' : 'Digitizing/setup is billed separately at the standard rate.'));
         L.push('');
