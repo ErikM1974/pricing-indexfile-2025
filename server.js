@@ -209,6 +209,21 @@ dotenv.config();
 //          GET  /api/vendor-admin/access-link?email= — staff-only (portal-admin roles): mint a vendor's permanent link
 //          Invite registry: proxy Vendor_Portal_Access (secret-gated /api/vendor-portal-access)
 //
+// CUSTOMER PORTAL (magic-link; nwca_customer cookie via lib/customer-magic-link) — pages/customer-portal.html
+//   ~L5495 GET  /portal · /portal/invoice/:orderNo · /portal/product/:style — session-gated pages (requireCustomer)
+//   ~L7230 GET  /api/portal — aggregate (company + mockups + art + logo library + finished photos, allowlist-projected)
+//          GET  /api/portal/orders · /api/portal/invoice/:orderNo — ManageOrders orders/balances (ownership-checked)
+//          GET  /api/portal/my-products · /recommendations · /product-colors/:style · /product/:style[/availability]
+//          POST /api/portal/reorder-request · /reorder-batch — rep-queue requests (Portal_Reorder_Requests, no price)
+//          GET  /api/portal/rewards · POST /api/portal/rewards/redeem-request
+//   ~L8072 GET  /api/portal/me — sign-in identity (2026-09-01 redesign)
+//          GET  /api/portal/quotes — quote sessions for the sign-in email (customer-safe status ladder)
+//          GET  /api/portal/order/:orderNo/tracking — ManageOrders /tracking for ONE owned order (drawer, lazy)
+//          POST /api/portal/request — general request (quote / new logo / logo change / account update) → rep queue
+//   ~L8100 /api/portal-admin/* + /portal-admin/preview/:id/* — staff READ-ONLY mirrors of everything above
+//          GET  /api/portal-admin/rewards/accrual/:id — EARNED reward $ from paid+invoiced garment lines (12-mo window,
+//               SanMar piece-cost bands from Service_Codes REWARD/RWD-EARN) · POST …/accrual/:id/post — grant per order (Order_Ref)
+//
 // PRODUCT SEO (2026-07-12): /product[.html]?style= = hybrid-SSR head injection
 //   (per-product title/meta/canonical/OG/JSON-LD, fail-open) ~L2882;
 //   GET /sitemap-products.xml — one URL per unique style (proxy /api/all-styles)
@@ -7020,9 +7035,15 @@ app.get('/api/order-status/:quoteId', orderStatusLimiter, async (req, res) => {
 const PORTAL_PROXY = TDT_PROXY; // same caspio-pricing-proxy base
 const PORTAL_DATE_CUTOFF = '2026-01-01T00:00:00'; // pre-2026 lacked consistent images
 
+// Per-customer money/PII JSON must never be served from a browser or shared cache. Express's
+// default weak ETag let Chrome answer a portal load from its own copy (304) and show a customer
+// their PRE-grant $0 balance after the grant had posted (2026-09-01). no-store on every portal
+// route: the customer ones AND the staff preview/admin mirrors.
+app.use(['/api/portal', '/api/portal-admin'], (req, res, next) => { res.set('Cache-Control', 'no-store'); next(); });
+
 const portalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 60,
+  max: 120, // 2026-09-01: portal home = 7 reads/load + per-order drawer reads; 60 tripped inside ~8 page views
   message: { error: 'Too many requests, please try again shortly' },
 });
 
@@ -8010,17 +8031,33 @@ app.post('/api/portal/reorder-batch', reorderRequestLimiter, requireCustomer, ex
 
 // Customer-safe projection of a reward-ledger feed: keep the math + story, drop the staff
 // audit trail (entries[].by = the granting staffer's email — internal, never customer-facing).
-function projectPortalRewards(raw) {
+function projectPortalRewards(raw, program) {
   const entries = Array.isArray(raw && raw.entries) ? raw.entries : [];
+  const months = (program && program.months) || REWARD_WINDOW_MONTHS_DEFAULT;
+  const since = new Date(); since.setMonth(since.getMonth() - months);
+  // "Earned in the window" = POSTED grants (positive entries) dated inside it. Only posted
+  // credit is ever shown to a customer — the accrual calculator's un-posted estimate is staff-only.
+  const earnedInWindow = Math.round(entries
+    .filter((e) => (Number(e.amount) || 0) > 0 && e.created && new Date(e.created) >= since)
+    .reduce((s, e) => s + (Number(e.amount) || 0), 0) * 100) / 100;
+  const tiers = (program && program.tiers) || [];
   return {
     balance: Number(raw && raw.balance) || 0,
-    entries: entries.map((e) => ({
+    entries: entries.slice(0, 20).map((e) => ({
       amount: Number(e.amount) || 0,
       type: e.type || '',
       reason: e.reason || '',
       orderRef: e.orderRef || '',
       created: e.created || '',
     })),
+    earnedInWindow,
+    // Rates only — the SanMar cost thresholds that define "premium" stay internal.
+    program: {
+      configured: !!(program && program.configured),
+      months,
+      baseRatePct: tiers.length ? tiers[0].ratePct : 0,
+      premiumRatePct: tiers.length ? tiers[tiers.length - 1].ratePct : 0,
+    },
   };
 }
 
@@ -8028,9 +8065,12 @@ function projectPortalRewards(raw) {
 app.get('/api/portal/rewards', portalLimiter, requireCustomer, async (req, res) => {
   try {
     const cid = String(req.customerSession.portalCustomer.idCustomer);
-    const r = await fetch(`${CRM_API_BASE}/api/customer-rewards/balance/${encodeURIComponent(cid)}`, { headers: { 'X-CRM-API-Secret': CRM_API_SECRET }, signal: AbortSignal.timeout(PORTAL_FETCH_TIMEOUT_MS) });
+    const [r, program] = await Promise.all([
+      fetch(`${CRM_API_BASE}/api/customer-rewards/ledger/${encodeURIComponent(cid)}`, { headers: { 'X-CRM-API-Secret': CRM_API_SECRET }, signal: AbortSignal.timeout(PORTAL_FETCH_TIMEOUT_MS) }),
+      loadRewardProgram().catch(() => null),   // program copy is decorative; the BALANCE is what must never be wrong
+    ]);
     if (!r.ok) throw new Error('rewards ' + r.status);
-    res.json(projectPortalRewards(await r.json()));
+    res.json(projectPortalRewards(await r.json(), program));
   } catch (err) {
     // Erik's #1 rule: never report a silent "$0" balance on failure — a customer
     // with reward $ would see their card vanish. Surface a 503 so the FE shows
@@ -8066,6 +8106,149 @@ app.post('/api/portal/rewards/redeem-request', reorderRequestLimiter, requireCus
   } catch (err) {
     console.error('[Portal] redeem-request failed:', err.message);
     res.status(502).json({ error: 'Could not send your redemption request. Please try again.' });
+  }
+});
+
+// ── Customer portal 2026-09-01 redesign: identity, quotes, per-order tracking, general requests ──
+
+// GET /api/portal/me — who is signed in. Feeds the Account panel (sign-in email, company,
+// customer #). Everything here is already in the customer's own cookie; nothing new leaks.
+app.get('/api/portal/me', portalLimiter, requireCustomer, (req, res) => {
+  const s = req.customerSession.portalCustomer;
+  res.json({ customerId: String(s.idCustomer), email: s.email || '', companyName: s.companyName || '' });
+});
+
+// Quote sessions → customer-safe projection. Scoped to the SIGN-IN EMAIL (exact match on
+// quote_sessions.CustomerEmail) — never the company name, so one contact never sees another's
+// quote. Status is a customer-facing ladder derived from the row (internal Status strings,
+// ShopWorks refs and ShipStation state never reach the browser):
+//   TrackingNumber/ShippedAt → Shipped · ShopWorks order/DateOrderPlaced → Ordered ·
+//   cancelled → Cancelled · ExpiresAt in the past / expired → Expired · else Open.
+const PORTAL_QUOTE_ID_RE = /^[A-Z]{2,5}[-\d]+-?\d*$/;  // the shape GET /quote/:quoteId accepts
+function projectPortalQuote(q) {
+  const quoteId = String(q.QuoteID || '');
+  const shipped = !!(q.TrackingNumber || q.ShippedAt);
+  const ordered = !!(q.ShopWorks_Order_Number || q.OrderNumber || q.PushedToShopWorks || q.DateOrderPlaced);
+  const st = String(q.Status || '').toLowerCase();
+  const exp = q.ExpiresAt ? new Date(q.ExpiresAt) : null;
+  let status = 'Open';
+  if (shipped) status = 'Shipped';
+  else if (ordered || /complete|converted|won/.test(st)) status = 'Ordered';
+  else if (/cancel|void|declin/.test(st)) status = 'Cancelled';
+  else if (/expired|abandon/.test(st) || (exp && !isNaN(exp.getTime()) && exp < new Date())) status = 'Expired';
+  return {
+    quoteId,
+    created: q.CreatedAt_Quote || q.CreatedAt || null,
+    expires: q.ExpiresAt || null,
+    projectName: q.ProjectName || '',
+    total: Number(q.TotalAmount) || 0,
+    quantity: Number(q.TotalQuantity) || 0,
+    status,
+    rep: q.SalesRepName || '',
+    tracking: shipped ? {
+      number: q.TrackingNumber || '',
+      carrier: q.TrackingCarrier || q.Carrier || '',
+      url: /^https?:\/\//i.test(String(q.TrackingURL || '')) ? q.TrackingURL : '',
+      shippedAt: q.ShippedAt || null,
+    } : null,
+    viewUrl: PORTAL_QUOTE_ID_RE.test(quoteId) ? ('/quote/' + quoteId) : null,
+  };
+}
+async function buildPortalQuotes(email) {
+  const key = String(email || '').toLowerCase().trim();
+  if (!key) return [];
+  const r = await fetch(`${CRM_API_BASE}/api/quote_sessions?customerEmail=${encodeURIComponent(key)}`,
+    { headers: { 'X-CRM-API-Secret': CRM_API_SECRET }, signal: AbortSignal.timeout(PORTAL_FETCH_TIMEOUT_MS) });
+  if (!r.ok) throw new Error('quotes ' + r.status);
+  const j = await r.json();
+  const rows = Array.isArray(j) ? j : ((j && (j.sessions || j.result || j.data || j.records)) || []);
+  return rows
+    .filter((q) => q && q.QuoteID && !/^OF/.test(String(q.QuoteID)))   // OF = retired Order Form, internal only
+    .map(projectPortalQuote)
+    .sort((a, b) => String(b.created || '').localeCompare(String(a.created || '')));
+}
+// GET /api/portal/quotes — the signed-in contact's quotes. 503 on failure (never a false "no quotes").
+app.get('/api/portal/quotes', portalLimiter, requireCustomer, async (req, res) => {
+  try { res.json({ quotes: await buildPortalQuotes(req.customerSession.portalCustomer.email) }); }
+  catch (err) { console.error('[Portal] quotes failed:', err.message); res.status(503).json({ error: 'Quotes temporarily unavailable' }); }
+});
+
+// Per-order shipment tracking (ManageOrders /tracking/:orderNo). Ownership is re-verified
+// against the order header — the drawer's invoice call already did that, but this route must
+// stand on its own. Rows are projected to carrier + number + date; the carrier link is built
+// client-side from the carrier name (no upstream URL is trusted).
+function projectPortalTracking(t) {
+  return {
+    trackingNumber: String(t.TrackingNumber || t.tracking_number || '').trim(),
+    carrier: String(t.ShippingCarrier || t.Carrier || t.ship_carrier || t.ShipMethod || '').trim(),
+    shipDate: t.date_Shipped || t.ShipDate || null,
+    boxNumber: t.BoxNumber != null ? t.BoxNumber : null,
+  };
+}
+async function portalOrderTracking(cid, orderNo) {
+  const hdrs = CRM_API_SECRET ? { 'X-CRM-API-Secret': CRM_API_SECRET } : {};
+  const oR = await fetch(`${CRM_API_BASE}/api/manageorders/orders/${encodeURIComponent(orderNo)}`, { headers: hdrs, signal: AbortSignal.timeout(PORTAL_FETCH_TIMEOUT_MS) });
+  if (!oR.ok) throw new Error('order ' + oR.status);
+  const oJ = await oR.json();
+  const o = Array.isArray(oJ.result) ? oJ.result[0] : (oJ.result || oJ);
+  if (!o || String(o.id_Customer) !== String(cid)) return null;   // not theirs → generic 404
+  const tR = await fetch(`${CRM_API_BASE}/api/manageorders/tracking/${encodeURIComponent(orderNo)}`, { headers: hdrs, signal: AbortSignal.timeout(PORTAL_FETCH_TIMEOUT_MS) });
+  if (!tR.ok) throw new Error('tracking ' + tR.status);
+  const rows = ((await tR.json()).result) || [];
+  return rows.map(projectPortalTracking).filter((t) => t.trackingNumber);
+}
+app.get('/api/portal/order/:orderNo/tracking', portalLimiter, requireCustomer, async (req, res) => {
+  const orderNo = String(req.params.orderNo || '');
+  if (!/^\d+$/.test(orderNo)) return res.status(404).json({ error: 'Not found' });
+  try {
+    const rows = await portalOrderTracking(String(req.customerSession.portalCustomer.idCustomer), orderNo);
+    if (!rows) return res.status(404).json({ error: 'Not found' });
+    res.json({ tracking: rows });
+  } catch (err) { console.error('[Portal] tracking failed:', err.message); res.status(503).json({ error: 'Tracking temporarily unavailable' }); }
+});
+
+// POST /api/portal/request — a general request that is NOT a product re-order: a fresh quote,
+// a new logo to set up, a change to an existing logo, or an account-details update. Lands in
+// the SAME rep queue (Portal_Reorder_Requests) so nothing new has to be watched; the Style
+// column carries the request type and Product_Title starts with a readable label. Identity
+// comes from the verified session. No price, no payment.
+const PORTAL_REQUEST_TYPES = {
+  'quote':       { style: 'QUOTE',   label: 'Quote request' },
+  'logo':        { style: 'NEWLOGO', label: 'New logo / artwork' },
+  'logo-change': { style: 'LOGOCHG', label: 'Logo change request' },
+  'account':     { style: 'ACCOUNT', label: 'Account details update' },
+};
+app.post('/api/portal/request', reorderRequestLimiter, requireCustomer, express.json(), async (req, res) => {
+  try {
+    const sess = req.customerSession.portalCustomer;
+    const b = req.body || {};
+    const type = PORTAL_REQUEST_TYPES[String(b.type || '')];
+    if (!type) return res.status(400).json({ error: 'Unknown request type.' });
+    const description = String(b.description || '').trim();
+    if (description.length < 3) return res.status(400).json({ error: 'Tell us a little about what you need.' });
+    const payload = {
+      id_Customer: String(sess.idCustomer),
+      company_name: sess.companyName || '',
+      email: sess.email || '',
+      style: type.style,
+      color: '',
+      product_title: (type.label + ': ' + description).slice(0, 255),
+      design_number: String(b.design_number || '').slice(0, 50),
+      design_name: String(b.design_name || '').slice(0, 255),
+      qty: String(b.qty || '').slice(0, 30),
+      method: String(b.method || '').slice(0, 30),
+      note: String(b.note || '').slice(0, 255),
+      source: 'reorder',   // the proxy only knows reorder|recommendation; the Style column carries the type
+    };
+    const r = await fetch(`${CRM_API_BASE}/api/portal-reorder/request`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CRM-API-Secret': CRM_API_SECRET }, body: JSON.stringify(payload),
+    });
+    const j = await r.json();
+    if (!r.ok || !j.success) throw new Error((j && j.error) || ('proxy ' + r.status));
+    res.json({ ok: true, requestNum: j.request && j.request.Request_Num, rep: j.request && j.request.Rep });
+  } catch (err) {
+    console.error('[Portal] request failed:', err.message);
+    res.status(502).json({ error: 'Could not send your request. Please try again or call (253) 922-5793.' });
   }
 });
 
@@ -8223,9 +8406,12 @@ app.get('/api/portal-admin/preview/:id/rewards', requireCrmRole(PORTAL_ADMIN_ROL
   const cid = String(req.params.id || '');
   if (!/^\d+$/.test(cid)) return res.status(400).json({ error: 'numeric customer id required' });
   try {
-    const r = await fetch(`${CRM_API_BASE}/api/customer-rewards/balance/${encodeURIComponent(cid)}`, { headers: { 'X-CRM-API-Secret': CRM_API_SECRET }, signal: AbortSignal.timeout(PORTAL_FETCH_TIMEOUT_MS) });
+    const [r, program] = await Promise.all([
+      fetch(`${CRM_API_BASE}/api/customer-rewards/ledger/${encodeURIComponent(cid)}`, { headers: { 'X-CRM-API-Secret': CRM_API_SECRET }, signal: AbortSignal.timeout(PORTAL_FETCH_TIMEOUT_MS) }),
+      loadRewardProgram().catch(() => null),
+    ]);
     // Same customer-safe projection as /api/portal/rewards — the preview mirrors what the customer sees.
-    res.json(r.ok ? projectPortalRewards(await r.json()) : { balance: 0, entries: [] });
+    res.json(r.ok ? projectPortalRewards(await r.json(), program) : { balance: 0, entries: [] });
   } catch (err) { res.json({ balance: 0, entries: [] }); }
 });
 // POST /api/portal-admin/rewards/entry — staff grant/adjust/redeem a reward entry. Stamps the
@@ -8236,6 +8422,305 @@ app.post('/api/portal-admin/rewards/entry', requireCrmRole(PORTAL_ADMIN_ROLES), 
     const r = await fetch(`${CRM_API_BASE}/api/customer-rewards/entry`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CRM-API-Secret': CRM_API_SECRET }, body: JSON.stringify(body) });
     res.status(r.status).json(await r.json());
   } catch (err) { console.error('[portal-admin] rewards entry failed:', err.message); res.status(502).json({ error: 'Could not save the reward entry.' }); }
+});
+
+// ── Reward ACCRUAL (Erik 2026-09-01): "earn reward dollars on what you actually paid for" ──
+// Earned $ = Σ over GARMENT lines of INVOICED + PAID orders whose invoice date falls inside the
+// program window (default 12 months) of: line revenue × the rate for the garment's SanMar
+// piece-cost band. Higher-cost garments carry more margin, so they earn a higher rate.
+//
+// Rates + bands are Erik-editable in Caspio → Service_Codes (no deploy):
+//   ServiceType=REWARD · ServiceCode=RWD-EARN · PricingMethod=TIERED · IsActive=Yes · Visible=No
+//   one row per band: TierLabel = SanMar PIECE_PRICE band ("0-39.99", "40+") · SellPrice = % back
+//   optional: ServiceCode=RWD-WINDOW with UnitCost = months (default 12)
+// No rows → "not configured" (visible in the console), never a default rate: this mints
+// money-like credit, so a silent fallback is the one thing it must not do.
+//
+// Rules: decoration / fee / setup lines never earn (portalNormalizePart drops them). Cost = the
+// LOWEST PIECE_PRICE across the ordered color's catalog rows (base-size cost = what the garment
+// "is"; extended sizes cost more but don't change the band). "Paid" = ManageOrders sts_Paid=1,
+// or a known cur_Balance of 0 on a non-zero invoice. Posting to the ledger stays STAFF-initiated
+// (admin console → /accrual/:id/post), ONE grant per order keyed by Order_Ref = order number,
+// so re-running can never double-grant; the customer only ever sees POSTED credit.
+const REWARD_WINDOW_MONTHS_DEFAULT = 12;
+let _rewardProgramCache = { t: 0, program: null };
+function parseRewardBand(label) {
+  const s = String(label || '').trim().replace(/\$/g, '');
+  let m;
+  if ((m = s.match(/^(\d+(?:\.\d+)?)\s*\+$/))) return { min: Number(m[1]), max: Infinity };
+  if ((m = s.match(/^(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)$/))) return { min: Number(m[1]), max: Number(m[2]) };
+  if ((m = s.match(/^<\s*(\d+(?:\.\d+)?)$/))) return { min: 0, max: Number(m[1]) - 0.005 };
+  return null;
+}
+async function loadRewardProgram() {
+  if (_rewardProgramCache.program && (Date.now() - _rewardProgramCache.t) < 5 * 60 * 1000) return _rewardProgramCache.program;
+  const r = await fetch(`${CRM_API_BASE}/api/service-codes?type=REWARD`, { headers: CRM_API_SECRET ? { 'X-CRM-API-Secret': CRM_API_SECRET } : {}, signal: AbortSignal.timeout(PORTAL_FETCH_TIMEOUT_MS) });
+  if (!r.ok) throw new Error('service-codes ' + r.status);
+  const rows = (((await r.json()) || {}).data || []).filter((x) => x.IsActive !== false);
+  const tiers = rows
+    .filter((x) => String(x.ServiceCode || '').toUpperCase() === 'RWD-EARN')
+    .map((x) => Object.assign({ label: String(x.TierLabel || ''), ratePct: Number(x.SellPrice) || 0, name: x.DisplayName || '' }, parseRewardBand(x.TierLabel) || {}))
+    .filter((t) => t.min != null && t.ratePct > 0)
+    .sort((a, b) => a.min - b.min);
+  const win = rows.find((x) => String(x.ServiceCode || '').toUpperCase() === 'RWD-WINDOW');
+  const months = win && Number(win.UnitCost) > 0 ? Math.round(Number(win.UnitCost)) : REWARD_WINDOW_MONTHS_DEFAULT;
+  // Web-store orders (Inksoft / Shopify company stores) are EXCLUDED by default: they are automatic
+  // employee purchases, not rep-handled company orders, and one GOLD account had 622 of them in a
+  // year (measured 2026-09-01) — the program is for the company's own reorders. An optional
+  // Service_Codes row RWD-WEBSTORE with SellPrice=1 turns them on.
+  const web = rows.find((x) => String(x.ServiceCode || '').toUpperCase() === 'RWD-WEBSTORE');
+  const includeWebstore = !!(web && Number(web.SellPrice) > 0);
+  // Promotional boosts: ServiceCode RWD-BOOST, TierLabel "2026-10-01..2026-12-31", SellPrice = multiplier
+  // (2 = double rewards). Applies to orders INVOICED inside the window; overlapping windows take the max.
+  const boosts = rows
+    .filter((x) => String(x.ServiceCode || '').toUpperCase() === 'RWD-BOOST')
+    .map((x) => Object.assign({ label: String(x.TierLabel || ''), multiplier: Number(x.SellPrice) || 0, name: x.DisplayName || '' }, parseRewardWindow(x.TierLabel) || {}))
+    .filter((b) => b.from && b.to && b.multiplier > 0);
+  // Which ShopWorks part number(s) mark a redemption line: Service_Codes row RWD-REDEEM, TierLabel =
+  // comma-separated part codes (e.g. "GIFT CERT, RWD-REDEEM") — so the same part reps already use for
+  // gift-certificate credits can be the reward line. Default: RWD-REDEEM / REWARD-REDEEM.
+  const redeemRow = rows.find((x) => String(x.ServiceCode || '').toUpperCase() === 'RWD-REDEEM');
+  const redeemParts = redeemRow ? String(redeemRow.TierLabel || '').split(',').map((p) => p.trim().toUpperCase()).filter(Boolean) : [];
+  const program = { configured: tiers.length > 0, tiers, months, includeWebstore, boosts, redeemParts };
+  _rewardProgramCache = { t: Date.now(), program };
+  return program;
+}
+function parseRewardWindow(label) {
+  const m = String(label || '').trim().match(/^(\d{4}-\d{2}-\d{2})\s*(?:\.\.|to|-|–)\s*(\d{4}-\d{2}-\d{2})$/i);
+  return m ? { from: m[1], to: m[2] } : null;
+}
+function rewardBoostFor(program, invoiceDate) {
+  const day = String(invoiceDate || '').slice(0, 10);
+  if (!day || !program || !program.boosts) return null;
+  let best = null;
+  program.boosts.forEach((b) => { if (day >= b.from && day <= b.to && (!best || b.multiplier > best.multiplier)) best = b; });
+  return best;
+}
+function rewardTierForCost(program, cost) {
+  if (cost == null || !program || !program.configured) return null;
+  return program.tiers.find((t) => cost >= t.min && cost <= t.max) || null;
+}
+// A garment we cannot cost (non-SanMar vendor, customer-supplied, retired style — 12% of GOLD
+// revenue measured 2026-09-01) still earns, at the LOWEST band's rate, so a customer is never
+// penalised for what we bought from S&S. The line is annotated so staff can see why.
+function rewardTierForUnknownCost(program) {
+  if (!program || !program.configured || !program.tiers.length) return null;
+  return program.tiers[0];
+}
+function rewardGarmentCost(rows, color) {
+  if (!rows || !rows.length) return null;
+  const m = portalMatchColor(rows, color);
+  const pool = m ? rows.filter((x) => x.COLOR_NAME === m.COLOR_NAME) : rows;
+  const costs = pool.map((x) => Number(x.PIECE_PRICE)).filter((n) => n > 0);
+  return costs.length ? Math.min.apply(null, costs) : null;
+}
+function moOrderPaid(o) {
+  const total = Number(o.cur_TotalInvoice) || 0;
+  if (total <= 0) return false;
+  const sp = String(o.sts_Paid == null ? '' : o.sts_Paid).trim().toLowerCase();
+  if (sp === '1' || sp === 'true') return true;
+  const balKnown = o.cur_Balance !== null && o.cur_Balance !== undefined && o.cur_Balance !== '';
+  return balKnown && (Number(o.cur_Balance) || 0) <= 0.005;
+}
+const rewardRound = (n) => Math.round((Number(n) || 0) * 100) / 100;
+const REWARD_WEBSTORE_TYPES = /inksoft|shopify|web ?store|storefront/i;   // ShopWorks ORDER_TYPE names
+// A redemption is a ShopWorks line with this part number and a NEGATIVE unit price (qty 1, e.g. -50).
+// Reps add it at order entry; the engine finds it on the paid order and reconciles it into the ledger.
+const REWARD_REDEEM_PART = /^RWD-REDEEM\b|^REWARD-?REDEEM\b/i;
+function isRewardRedeemLine(program, li) {
+  const pn = String(li.PartNumber || '').trim();
+  if (!pn) return false;
+  if (program && program.redeemParts && program.redeemParts.length) return program.redeemParts.includes(pn.toUpperCase());
+  return REWARD_REDEEM_PART.test(pn);
+}
+// Line items of an INVOICED + PAID order never change → memoise for a day. And the proxy's
+// ManageOrders limiter is ONE 30-requests/minute bucket shared by every caller behind the same
+// IP (the whole dyno), so fetching a 25-order customer in parallel trips it and the missing
+// orders would silently read as "no reward" (measured 2026-09-01: 25 of 25 line-item calls
+// 429'd). Fetch sequentially — a short burst, then ~2.2 s apart — and retry once after a pause.
+const _moLineCache = new Map();   // id_Order → { t, result }
+const MO_LINE_CACHE_MS = 24 * 60 * 60 * 1000;
+const MO_PACE_MS = 2200;
+// Heroku kills any request past 30 s (H12), so one calculation fetches at most MO_MAX_FETCHES
+// uncached orders (~20 s), returns partial:true, and the console calls again — the cache carries
+// the progress. A 25-order account completes in three rounds; the 600-order web stores are
+// excluded above rather than crawled.
+const MO_MAX_FETCHES = 9;
+async function portalPacedLineItems(orderNos, hdrs) {
+  const out = []; let calls = 0; let fetched = 0;
+  for (const no of orderNos) {
+    const hit = _moLineCache.get(String(no));
+    if (hit && (Date.now() - hit.t) < MO_LINE_CACHE_MS) { out.push(hit.result); continue; }
+    if (fetched >= MO_MAX_FETCHES) { out.push(null); continue; }   // left for the next round
+    fetched++;
+    if (calls >= 3) await new Promise((r) => setTimeout(r, MO_PACE_MS));
+    const url = `${CRM_API_BASE}/api/manageorders/lineitems/${encodeURIComponent(no)}`;
+    let j = await portalFetchJson(url, hdrs, 8000); calls++;
+    if (!j) { await new Promise((r) => setTimeout(r, 3500)); j = await portalFetchJson(url, hdrs, 8000); calls++; }
+    if (j && Array.isArray(j.result)) _moLineCache.set(String(no), { t: Date.now(), result: j });
+    out.push(j);
+  }
+  return out;
+}
+async function computeRewardAccrual(cid) {
+  const program = await loadRewardProgram();
+  const hdrs = CRM_API_SECRET ? { 'X-CRM-API-Secret': CRM_API_SECRET } : {};
+  const today = new Date();
+  const end = today.toISOString().slice(0, 10);
+  const windowStart = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth() - program.months, today.getUTCDate()));
+  const sd = new Date(today); sd.setFullYear(today.getFullYear() - 3);   // MO list window (invoice date filters below)
+  const ordersJson = await portalFetchJson(`${CRM_API_BASE}/api/manageorders/orders?id_Customer=${encodeURIComponent(cid)}&date_Ordered_start=${sd.toISOString().slice(0, 10)}&date_Ordered_end=${end}`, hdrs, 10000);
+  if (!ordersJson) throw new Error('orders unavailable');
+  const paidInWindow = (ordersJson.result || []).filter((o) => {
+    if (!o.id_Order || !o.date_Invoiced || !moOrderPaid(o)) return false;
+    const inv = new Date(String(o.date_Invoiced).slice(0, 10) + 'T00:00:00Z');
+    return !isNaN(inv.getTime()) && inv >= windowStart;
+  }).sort((a, b) => String(b.date_Invoiced).localeCompare(String(a.date_Invoiced)));
+  // Order TYPE comes from the ShopWorks ODBC mirror (ORDER_ODBC) — ManageOrders only has a numeric
+  // id_OrderType. Refusing to classify is safer than silently crawling (or rewarding) 600 web orders.
+  let typeByOrder = new Map();
+  if (!program.includeWebstore && paidInWindow.length) {
+    const where = `id_Customer=${cid} AND date_OrderInvoiced>='${windowStart.toISOString().slice(0, 10)}'`;
+    const odbc = await portalFetchJson(`${CRM_API_BASE}/api/order-odbc?q.where=${encodeURIComponent(where)}&q.limit=1000`, hdrs, 8000);
+    if (!Array.isArray(odbc)) throw new Error('order types unavailable');
+    odbc.forEach((r) => { if (r.ID_Order != null) typeByOrder.set(String(r.ID_Order), String(r.ORDER_TYPE || '')); });
+  }
+  const isWebstore = (o) => REWARD_WEBSTORE_TYPES.test(typeByOrder.get(String(o.id_Order)) || '');
+  const excludedWeb = program.includeWebstore ? [] : paidInWindow.filter(isWebstore);
+  const eligible = program.includeWebstore ? paidInWindow : paidInWindow.filter((o) => !isWebstore(o));
+  const [lineJsons, ledgerJson] = await Promise.all([
+    portalPacedLineItems(eligible.map((o) => o.id_Order), hdrs),
+    portalFetchJson(`${CRM_API_BASE}/api/customer-rewards/ledger/${encodeURIComponent(cid)}`, hdrs, 8000),
+  ]);
+  if (!ledgerJson) throw new Error('ledger unavailable');   // without it "pending" would double-grant
+  const grantedByOrder = new Map(); const redeemedByOrder = new Map();
+  (ledgerJson.entries || []).forEach((e) => {
+    const ref = String(e.orderRef || '').trim(); const amt = Number(e.amount) || 0;
+    if (!ref || !amt) return;
+    if (amt > 0) grantedByOrder.set(ref, rewardRound((grantedByOrder.get(ref) || 0) + amt));
+    else redeemedByOrder.set(ref, rewardRound((redeemedByOrder.get(ref) || 0) + Math.abs(amt)));
+  });
+  const ledgerBalance = rewardRound(Number(ledgerJson.balance) || 0);
+  // Catalog rows per unique style, in parallel (portalStyleRows memoises 30 min).
+  const styles = new Set();
+  eligible.forEach((o, i) => (((lineJsons[i] && lineJsons[i].result) || [])).forEach((li) => { const n = portalNormalizePart(li); if (n) styles.add(n.style.toUpperCase()); }));
+  const rowsByStyle = new Map();
+  await Promise.all([...styles].map(async (s) => rowsByStyle.set(s, await portalStyleRows(s))));
+  const orders = eligible.map((o, i) => {
+    const items = lineJsons[i] && lineJsons[i].result;
+    const lines = [];
+    const boost = rewardBoostFor(program, o.date_Invoiced);
+    let redeemedOnOrder = 0;
+    (items || []).forEach((li) => {
+      if (isRewardRedeemLine(program, li)) {
+        redeemedOnOrder = rewardRound(redeemedOnOrder + Math.abs((Number(li.LineQuantity) || 1) * (Number(li.LineUnitPrice) || 0)));
+        return;
+      }
+      const norm = portalNormalizePart(li);
+      if (!norm) return;
+      const qty = Number(li.LineQuantity) || portalSumSizes(li);
+      const unit = Number(li.LineUnitPrice) || 0;
+      if (qty <= 0 || unit <= 0) return;
+      const cost = rewardGarmentCost(rowsByStyle.get(norm.style.toUpperCase()), norm.color);
+      const tier = cost == null ? rewardTierForUnknownCost(program) : rewardTierForCost(program, cost);
+      const revenue = rewardRound(qty * unit);
+      lines.push({
+        partNumber: li.PartNumber || '', style: norm.style, color: norm.color, description: li.PartDescription || '',
+        qty, unitPrice: unit, revenue, cost,
+        tier: tier ? tier.label : null, ratePct: tier ? tier.ratePct : 0,
+        reward: tier ? rewardRound(revenue * tier.ratePct / 100 * (boost ? boost.multiplier : 1)) : 0,
+        note: cost == null ? 'cost unknown (not a SanMar catalog style) — base rate' : (tier ? '' : 'no band covers this cost'),
+      });
+    });
+    const reward = rewardRound(lines.reduce((s, l) => s + l.reward, 0));
+    const granted = grantedByOrder.get(String(o.id_Order)) || 0;
+    const redeemPosted = redeemedByOrder.get(String(o.id_Order)) || 0;
+    return {
+      orderNumber: o.id_Order, invoiceDate: o.date_Invoiced, orderDate: o.date_Ordered, designName: o.DesignName || '',
+      total: Number(o.cur_TotalInvoice) || 0,
+      eligibleRevenue: rewardRound(lines.reduce((s, l) => s + l.revenue, 0)),
+      reward, granted, pending: rewardRound(Math.max(0, reward - granted)),
+      boost: boost ? { label: boost.label, multiplier: boost.multiplier, name: boost.name } : null,
+      // Redemption found on the order (RWD-REDEEM line) vs what the ledger already holds for it.
+      redemption: redeemedOnOrder || redeemPosted ? { onOrder: redeemedOnOrder, posted: redeemPosted, pending: rewardRound(Math.max(0, redeemedOnOrder - redeemPosted)) } : null,
+      linesUnavailable: !items, lines,
+    };
+  });
+  const totals = orders.reduce((t, o) => ({
+    eligibleRevenue: rewardRound(t.eligibleRevenue + o.eligibleRevenue), earned: rewardRound(t.earned + o.reward),
+    granted: rewardRound(t.granted + o.granted), pending: rewardRound(t.pending + o.pending),
+    redeemedOnOrders: rewardRound(t.redeemedOnOrders + (o.redemption ? o.redemption.onOrder : 0)),
+    redeemPending: rewardRound(t.redeemPending + (o.redemption ? o.redemption.pending : 0)),
+  }), { eligibleRevenue: 0, earned: 0, granted: 0, pending: 0, redeemedOnOrders: 0, redeemPending: 0 });
+  totals.ledgerBalance = ledgerBalance;
+  const unavailable = orders.filter((o) => o.linesUnavailable).map((o) => o.orderNumber);
+  return {
+    program, window: { from: windowStart.toISOString().slice(0, 10), to: end }, orders, totals,
+    unavailable,
+    partial: unavailable.length > 0,
+    progress: { fetched: orders.length - unavailable.length, total: orders.length },
+    excludedWebstore: { count: excludedWeb.length, revenue: rewardRound(excludedWeb.reduce((s, o) => s + (Number(o.cur_TotalInvoice) || 0), 0)) },
+    generatedAt: new Date().toISOString(),
+  };
+}
+// GET /api/portal-admin/rewards/accrual/:id — the breakdown (staff only; nothing is written).
+app.get('/api/portal-admin/rewards/accrual/:id', requireCrmRole(PORTAL_ADMIN_ROLES), async (req, res) => {
+  const cid = String(req.params.id || '');
+  if (!/^\d+$/.test(cid)) return res.status(400).json({ error: 'numeric customer id required' });
+  try { res.json(await computeRewardAccrual(cid)); }
+  catch (err) { console.error('[portal-admin] accrual failed:', err.message); res.status(503).json({ error: 'Could not calculate earned rewards right now (' + err.message + ').' }); }
+});
+// POST /api/portal-admin/rewards/accrual/:id/post { orders?: [orderNo], company_name? } — recomputes
+// SERVER-SIDE (client amounts are never trusted) and posts one grant per order that still has a
+// pending amount. Idempotent by Order_Ref; the staff email is stamped as Created_By.
+app.post('/api/portal-admin/rewards/accrual/:id/post', requireCrmRole(PORTAL_ADMIN_ROLES), express.json(), async (req, res) => {
+  const cid = String(req.params.id || '');
+  if (!/^\d+$/.test(cid)) return res.status(400).json({ error: 'numeric customer id required' });
+  try {
+    const acc = await computeRewardAccrual(cid);
+    if (!acc.program.configured) return res.status(409).json({ error: 'Reward program is not configured (no RWD-EARN rows in Service_Codes).' });
+    if (acc.partial) return res.status(409).json({ error: `Still fetching order details (${acc.progress.fetched} of ${acc.progress.total}) — calculate again, then post.` });
+    const only = Array.isArray(req.body && req.body.orders) ? new Set(req.body.orders.map(String)) : null;
+    const todo = acc.orders.filter((o) => o.pending > 0 && !o.linesUnavailable && (!only || only.has(String(o.orderNumber))));
+    const staff = (req.session.crmUser && req.session.crmUser.email) || 'staff';
+    const posted = []; const failed = [];
+    for (const o of todo) {
+      const bands = [...new Set(o.lines.filter((l) => l.reward > 0).map((l) => l.tier))].join(', ');
+      const body = {
+        id_Customer: cid, company_name: String((req.body && req.body.company_name) || '').slice(0, 255),
+        amount: o.pending, type: 'grant',
+        reason: (`Earned on paid order #${o.orderNumber} (${acc.program.months}-mo program · band ${bands})`).slice(0, 255),
+        order_ref: String(o.orderNumber), created_by: staff,
+      };
+      try {
+        const r = await fetch(`${CRM_API_BASE}/api/customer-rewards/entry`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CRM-API-Secret': CRM_API_SECRET }, body: JSON.stringify(body) });
+        const j = await r.json();
+        if (!r.ok || !j.success) throw new Error((j && j.error) || ('proxy ' + r.status));
+        posted.push({ orderNumber: o.orderNumber, amount: o.pending });
+      } catch (e) { failed.push({ orderNumber: o.orderNumber, error: e.message }); }
+    }
+    // Redemptions found on orders (RWD-REDEEM lines) that the ledger does not hold yet.
+    const redeemTodo = acc.orders.filter((o) => o.redemption && o.redemption.pending > 0 && !o.linesUnavailable && (!only || only.has(String(o.orderNumber))));
+    const redeemed = [];
+    for (const o of redeemTodo) {
+      const body = {
+        id_Customer: cid, company_name: String((req.body && req.body.company_name) || '').slice(0, 255),
+        amount: o.redemption.pending, type: 'redeem',
+        reason: (`Redeemed on order #${o.orderNumber} (RWD-REDEEM line on the ShopWorks order)`).slice(0, 255),
+        order_ref: String(o.orderNumber), created_by: staff,
+      };
+      try {
+        const r = await fetch(`${CRM_API_BASE}/api/customer-rewards/entry`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CRM-API-Secret': CRM_API_SECRET }, body: JSON.stringify(body) });
+        const j = await r.json();
+        if (!r.ok || !j.success) throw new Error((j && j.error) || ('proxy ' + r.status));
+        redeemed.push({ orderNumber: o.orderNumber, amount: o.redemption.pending });
+      } catch (e) { failed.push({ orderNumber: o.orderNumber, error: 'redeem: ' + e.message }); }
+    }
+    const total = rewardRound(posted.reduce((s, p) => s + p.amount, 0));
+    const redeemTotal = rewardRound(redeemed.reduce((s, p) => s + p.amount, 0));
+    console.log(`[portal-admin] ${staff} posted ${posted.length} grant(s) $${total.toFixed(2)} + ${redeemed.length} redemption(s) $${redeemTotal.toFixed(2)} for customer ${cid}${failed.length ? ` (${failed.length} failed)` : ''}`);
+    res.json({ ok: failed.length === 0, posted, redeemed, failed, total, redeemTotal });
+  } catch (err) { console.error('[portal-admin] accrual post failed:', err.message); res.status(503).json({ error: 'Could not post reward grants right now.' }); }
 });
 
 // GET /api/portal-admin/preview/:id/invoice/:orderNo — one invoice, ownership-checked
@@ -8259,6 +8744,49 @@ app.get('/api/portal-admin/preview/:id/invoice/:orderNo', requireCrmRole(PORTAL_
     console.error('[portal-admin] preview invoice failed:', err.message);
     res.status(503).json({ error: 'Invoice preview temporarily unavailable' });
   }
+});
+
+// Staff preview of the 2026-09-01 additions. The customer routes read the sign-in email
+// from the SESSION; a preview has no customer session, so the email comes from the invite
+// registry (Customer_Portal_Access rows for that id — the same list the admin console shows).
+let _portalAccessListCache = { t: 0, rows: [] };
+async function portalAccessRowsForCustomer(cid) {
+  if (Date.now() - _portalAccessListCache.t > 5 * 60 * 1000) {
+    const r = await fetch(`${CRM_API_BASE}/api/customer-portal-access/`, { headers: { 'X-CRM-API-Secret': CRM_API_SECRET }, signal: AbortSignal.timeout(PORTAL_FETCH_TIMEOUT_MS) });
+    if (r.ok) _portalAccessListCache = { t: Date.now(), rows: ((await r.json()).rows || []) };
+  }
+  return _portalAccessListCache.rows.filter((x) => String(x.id_Customer) === String(cid));
+}
+app.get('/api/portal-admin/preview/:id/me', requireCrmRole(PORTAL_ADMIN_ROLES), async (req, res) => {
+  const cid = String(req.params.id || '');
+  if (!/^\d+$/.test(cid)) return res.status(400).json({ error: 'numeric customer id required' });
+  try {
+    const rows = await portalAccessRowsForCustomer(cid);
+    const first = rows.find((x) => x.enabled) || rows[0] || null;
+    res.json({ customerId: cid, staffPreview: true, email: first ? (first.email || '') : '', companyName: first ? (first.company_name || '') : '',
+      emails: rows.map((x) => x.email).filter(Boolean) });
+  } catch (err) { console.error('[portal-admin] preview me failed:', err.message); res.status(503).json({ error: 'Preview temporarily unavailable' }); }
+});
+app.get('/api/portal-admin/preview/:id/quotes', requireCrmRole(PORTAL_ADMIN_ROLES), async (req, res) => {
+  const cid = String(req.params.id || '');
+  if (!/^\d+$/.test(cid)) return res.status(400).json({ error: 'numeric customer id required' });
+  try {
+    const emails = (await portalAccessRowsForCustomer(cid)).map((x) => String(x.email || '').toLowerCase()).filter(Boolean);
+    const lists = await Promise.all([...new Set(emails)].map((e) => buildPortalQuotes(e)));
+    const seen = new Set(); const quotes = [];
+    lists.flat().forEach((q) => { if (!seen.has(q.quoteId)) { seen.add(q.quoteId); quotes.push(q); } });
+    quotes.sort((a, b) => String(b.created || '').localeCompare(String(a.created || '')));
+    res.json({ quotes });
+  } catch (err) { console.error('[portal-admin] preview quotes failed:', err.message); res.status(503).json({ error: 'Quotes preview temporarily unavailable' }); }
+});
+app.get('/api/portal-admin/preview/:id/order/:orderNo/tracking', requireCrmRole(PORTAL_ADMIN_ROLES), async (req, res) => {
+  const cid = String(req.params.id || ''); const orderNo = String(req.params.orderNo || '');
+  if (!/^\d+$/.test(cid) || !/^\d+$/.test(orderNo)) return res.status(400).json({ error: 'numeric ids required' });
+  try {
+    const rows = await portalOrderTracking(cid, orderNo);
+    if (!rows) return res.status(404).json({ error: 'Not found' });
+    res.json({ tracking: rows });
+  } catch (err) { console.error('[portal-admin] preview tracking failed:', err.message); res.status(503).json({ error: 'Tracking preview temporarily unavailable' }); }
 });
 
 // Preview PAGES (staff-gated) — reuse the customer portal HTML, which detects the

@@ -297,3 +297,21 @@
 .cpa-rw-meta { font-size: .76rem; color: var(--gray-400); margin-top: 1px; }
 .cpa-rw-when { font-size: .78rem; color: var(--gray-400); white-space: nowrap; }
 .cpa-rw-empty { color: var(--gray-400); font-size: .85rem; padding: 12px 2px; }
+/* Earned-rewards accrual (2026-09-01) */
+.cpa-rw-accrual { font-size: .86rem; }
+.cpa-rw-acc-hint { margin-top: 8px; line-height: 1.5; }
+.cpa-rw-acc-hint code, .cpa-rw-notconf code { background: rgba(0, 0, 0, .06); padding: 0 4px; border-radius: 3px; font-size: .95em; }
+.cpa-rw-acc-window { font-weight: 400; text-transform: none; letter-spacing: 0; color: var(--gray-400); }
+.cpa-rw-acc-sum { padding: 10px 12px; background: var(--cpa-green-soft); border-radius: var(--radius-md); margin-bottom: 10px; color: var(--gray-700); line-height: 1.5; }
+.cpa-rw-acc-sum .pos { color: var(--cpa-green-dark); }
+.cpa-rw-acc-sum .neg { color: #b3261e; }
+.cpa-rw-acc-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+.cpa-rw-acc-table th { text-align: left; font-weight: 600; color: var(--gray-500); padding: 6px; border-bottom: 1px solid var(--gray-200); font-size: .72rem; text-transform: uppercase; letter-spacing: .04em; }
+.cpa-rw-acc-table td { padding: 6px; border-bottom: 1px solid var(--gray-100); vertical-align: top; }
+.cpa-rw-acc-table .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cpa-rw-acc-table td.pos { color: var(--cpa-green-dark); font-weight: 700; }
+.cpa-rw-acc-table summary { cursor: pointer; list-style: none; font-weight: 600; }
+.cpa-rw-acc-table summary::-webkit-details-marker { display: none; }
+.cpa-rw-acc-lines { margin-top: 4px; font-size: .76rem; color: var(--gray-500); line-height: 1.5; font-weight: 400; }
+.cpa-rw-acc-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 10px; }
+.cpa-rw-notconf { padding: 10px 12px; background: #fff7e0; border: 1px solid #f0d79a; border-radius: var(--radius-md); color: #6b4e00; line-height: 1.55; }
