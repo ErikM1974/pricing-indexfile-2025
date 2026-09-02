@@ -173,7 +173,11 @@ describe('reward accrual — scope and Heroku-safe pacing (source lock)', () => 
     });
 });
 
-describe('reward accrual — Caspio ORDER_LINES mirror (Erik ruling 5, 2026-09-02)', () => {
+describe('reward accrual — Caspio ManageOrders_LineItems mirror (Erik ruling 5, 2026-09-02)', () => {
+    test('the mirror is looked up by the order ids the engine already holds (the archive has no customer column)', () => {
+        expect(src).toMatch(/portalMirroredLineItems\(eligible\.map\(\(o\) => o\.id_Order\)\)/);
+        expect(src).toMatch(/\/api\/order-lines\?orders=/);
+    });
     test('mirror rows are seeded into the line cache BEFORE the paced ManageOrders crawl', () => {
         const seed = src.indexOf('mirroredEarly.forEach((j, id) => { if (!_moLineCache.has(id)) _moLineCache.set(id');
         const crawl = src.indexOf('portalPacedLineItems(eligible.map((o) => o.id_Order), hdrs)');

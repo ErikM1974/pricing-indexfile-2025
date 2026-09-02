@@ -8584,30 +8584,33 @@ async function portalPacedLineItems(orderNos, hdrs) {
   }
   return out;
 }
-// Caspio ORDER_LINES mirror → Map(id_Order → MO-shaped { result: [line…] }). Rows carry the
-// SanMar piece cost the exporter already resolved, so the engine can skip the catalog lookup.
-// Any failure → empty map (the caller falls back to ManageOrders); never a throw.
-const _mirrorCache = new Map();   // cid|from|to → { t, map }
-async function portalMirroredLineItems(cid, from, to) {
-  const key = `${cid}|${from}|${to}`;
-  const hit = _mirrorCache.get(key);
-  if (hit && (Date.now() - hit.t) < 10 * 60 * 1000) return hit.map;
-  const map = new Map();
-  try {
-    const j = await portalFetchJson(`${CRM_API_BASE}/api/order-lines?id_Customer=${encodeURIComponent(cid)}&from=${from}&to=${to}`, CRM_API_SECRET ? { 'X-CRM-API-Secret': CRM_API_SECRET } : {}, 8000);
-    (j && Array.isArray(j.rows) ? j.rows : []).forEach((r) => {
-      const id = String(r.ID_Order || '');
-      if (!id) return;
-      if (!map.has(id)) map.set(id, { result: [], mirrored: true });
-      map.get(id).result.push({
-        PartNumber: r.PartNumber || '', PartColor: r.PartColor || '', PartDescription: r.PartDescription || '',
-        LineQuantity: Number(r.LineQuantity) || 0, LineUnitPrice: Number(r.LineUnitPrice) || 0, SortOrder: Number(r.SortOrder) || 0,
-        Size01: r.Size01, Size02: r.Size02, Size03: r.Size03, Size04: r.Size04, Size05: r.Size05, Size06: r.Size06,
-        _pieceCost: r.SanMar_PieceCost === '' || r.SanMar_PieceCost == null ? null : Number(r.SanMar_PieceCost),
+// Caspio archive ManageOrders_LineItems (kept by the proxy's daily sync-manageorders job) →
+// Map(id_Order → MO-shaped { result: [line…], mirrored: true }) for the orders asked for. The
+// archive has no customer column, so it is keyed by the order ids the engine already holds.
+// Only orders with ≥1 archived line are returned; the rest fall through to the paced MO crawl.
+// Any failure → empty map (plain MO path); never a throw.
+const _mirrorCache = new Map();   // id_Order → { t, entry }
+async function portalMirroredLineItems(orderNos) {
+  const map = new Map(); const want = [];
+  orderNos.map(String).forEach((id) => { const hit = _mirrorCache.get(id); if (hit && (Date.now() - hit.t) < 10 * 60 * 1000) map.set(id, hit.entry); else want.push(id); });
+  const hdrs = CRM_API_SECRET ? { 'X-CRM-API-Secret': CRM_API_SECRET } : {};
+  for (let i = 0; i < want.length; i += 100) {
+    try {
+      const j = await portalFetchJson(`${CRM_API_BASE}/api/order-lines?orders=${want.slice(i, i + 100).join(',')}`, hdrs, 8000);
+      (j && Array.isArray(j.rows) ? j.rows : []).forEach((r) => {
+        const id = String(r.id_Order || '');
+        if (!id) return;
+        if (!map.has(id)) map.set(id, { result: [], mirrored: true });
+        map.get(id).result.push({
+          PartNumber: r.PartNumber || '', PartColor: r.PartColor || '', PartDescription: r.PartDescription || '',
+          LineQuantity: Number(r.LineQuantity) || 0, LineUnitPrice: Number(r.LineUnitPrice) || 0, SortOrder: Number(r.SortOrder) || 0,
+          Size01: r.Size01, Size02: r.Size02, Size03: r.Size03, Size04: r.Size04, Size05: r.Size05, Size06: r.Size06,
+          _pieceCost: r.SanMar_PieceCost === '' || r.SanMar_PieceCost == null ? null : Number(r.SanMar_PieceCost),
+        });
       });
-    });
-  } catch (_) { /* mirror unavailable → MO path */ }
-  _mirrorCache.set(key, { t: Date.now(), map });
+    } catch (_) { /* mirror unavailable → MO path */ }
+  }
+  map.forEach((entry, id) => { if (!_mirrorCache.has(id)) _mirrorCache.set(id, { t: Date.now(), entry }); });
   return map;
 }
 async function computeRewardAccrual(cid) {
@@ -8639,7 +8642,7 @@ async function computeRewardAccrual(cid) {
   const excludedWeb = program.includeWebstore ? [] : paidInWindow.filter(isWebstore);
   const eligible = program.includeWebstore ? paidInWindow : paidInWindow.filter((o) => !isWebstore(o));
   // Mirror first so the paced MO crawl only touches orders the mirror lacks (see below).
-  const mirroredEarly = await portalMirroredLineItems(cid, windowStart.toISOString().slice(0, 10), windowEnd.toISOString().slice(0, 10));
+  const mirroredEarly = await portalMirroredLineItems(eligible.map((o) => o.id_Order));
   mirroredEarly.forEach((j, id) => { if (!_moLineCache.has(id)) _moLineCache.set(id, { t: Date.now(), result: j }); });
   const [lineJsons, ledgerJson] = await Promise.all([
     portalPacedLineItems(eligible.map((o) => o.id_Order), hdrs),
