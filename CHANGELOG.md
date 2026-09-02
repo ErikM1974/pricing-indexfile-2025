@@ -1,3 +1,7 @@
+## v2026.09.02.14 (2026.09.02)
+
+- Deploy v2026.09.02.14: 7 files — Contract Break-Even admin page (contract grid at cost, typical/worst, profit at the card)
+
 ## v2026.09.02.13 (2026.09.02)
 
 - Deploy v2026.09.02.13: 1 file (embroidery-contract-pricing.html) — printable price list footer dated 2026-09-02
