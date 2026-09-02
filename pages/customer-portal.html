@@ -353,6 +353,17 @@
                                     </dl>
                                 </div>
                             </div>
+                            <div class="cp-card cp-mt" id="cp-acct-rewards">
+                                <div class="cp-card-head"><h3>Reward dollars</h3><button class="cp-btn cp-btn--link cp-btn--sm" type="button" id="cp-acct-redeem">Redeem &rarr;</button></div>
+                                <div class="cp-card-body">
+                                    <div class="cp-rw-stats">
+                                        <div><div class="cp-summary-label">Available</div><div class="cp-summary-val" id="cp-acct-rw-balance">&mdash;</div></div>
+                                        <div><div class="cp-summary-label" id="cp-acct-rw-earned-label">Earned, last 12 months</div><div class="cp-summary-val" id="cp-acct-rw-earned">&mdash;</div></div>
+                                    </div>
+                                    <p class="cp-modal-intro" id="cp-acct-rw-how">Every order you pay in full earns reward dollars. Premium garments earn a higher rate.</p>
+                                    <div class="cp-rw-history" id="cp-acct-rw-history"></div>
+                                </div>
+                            </div>
                             <div class="cp-card cp-mt">
                                 <div class="cp-card-head"><h3>Update your details</h3></div>
                                 <form class="cp-card-body" id="cp-acct-form" novalidate>
@@ -375,7 +386,7 @@
                                     <details><summary><svg class="cp-icon"><use href="#i-refresh"/></svg>Re-ordering</summary><div class="cp-help-body">Go to <strong>Your products</strong>, open a product, pick the color and sizes, and send it to your rep. Or use <em>Re-order</em> on any past order to start from exactly what you bought. Nothing is charged until you approve a quote.</div></details>
                                     <details><summary><svg class="cp-icon"><use href="#i-clock"/></svg>Turnaround &amp; rush</summary><div class="cp-help-body">Standard production is about 7&ndash;10 business days after proof approval and garment arrival. Need it sooner? Say so in your request &mdash; rush options depend on the job.</div></details>
                                     <details><summary><svg class="cp-icon"><use href="#i-receipt"/></svg>Invoices &amp; payment</summary><div class="cp-help-body">Every invoice is under <strong>Invoices</strong> with a downloadable PDF. Balances reflect payments posted in our system. To pay or ask about terms, contact <a href="mailto:accounting@nwcustomapparel.com">accounting@nwcustomapparel.com</a> or call (253) 922-5793.</div></details>
-                                    <details><summary><svg class="cp-icon"><use href="#i-star"/></svg>Reward dollars</summary><div class="cp-help-body">Every order you pay in full earns reward dollars &mdash; premium garments earn a higher rate, and &#9733;-tagged picks under Recommended for You earn the most. Rewards post after the invoice is paid; your balance is on the Overview. Redeem it against your next order and your rep applies it.</div></details>
+                                    <details><summary><svg class="cp-icon"><use href="#i-star"/></svg>Reward dollars</summary><div class="cp-help-body">Every order you pay in full earns reward dollars &mdash; premium garments earn a higher rate, and seasonal bonuses can multiply it. Rewards post after the invoice is paid; your balance is on the Overview and under Account. To redeem, click <em>Redeem on your next order</em> and tell us the amount: your rep adds it to that order as a credit line, so it shows right on the invoice. Reward dollars never expire while your account stays active.</div></details>
                                     <details><summary><svg class="cp-icon"><use href="#i-image"/></svg>Logo files &amp; new artwork</summary><div class="cp-help-body">Download any approved logo from <strong>Logos &amp; proofs</strong>. For new artwork, use <em>Send a new logo</em> &mdash; your rep replies with where to send the file. Vector (AI, EPS, PDF) or high-resolution PNG works best.</div></details>
                                 </div>
                             </div>
@@ -507,8 +518,8 @@
             </div>
             <div class="cp-modal-body">
                 <div class="cp-req-product">
-                    <div class="cp-req-prod-title">You have <span id="cp-redeem-avail">$0.00</span> in rewards</div>
-                    <div class="cp-req-prod-sub">Tell us how much to apply to your next order — your rep takes it from there.</div>
+                    <div class="cp-req-prod-title">You have <span id="cp-redeem-avail">$0.00</span> in reward dollars</div>
+                    <div class="cp-req-prod-sub">Tell us how much to apply. Your rep adds it to your next order as a credit line, so you&rsquo;ll see it right on the invoice.</div>
                 </div>
                 <label class="cp-field">
                     <span class="cp-field-label">Amount to redeem</span>

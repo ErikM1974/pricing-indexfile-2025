@@ -1594,6 +1594,7 @@
                 S.rewardEarned = Number(d && d.earnedInWindow) || 0;
                 S.rewardsLoaded = true;
                 renderRewardsCard();
+                renderAccountRewards();
             })
             .catch(function (err) {
                 // A blip must not silently hide a real balance — say "unavailable", never a false $0.
@@ -1604,6 +1605,29 @@
                     var card = byId('cp-rewards'); if (card) card.classList.add('cp-rewards--zero');
                 }
             });
+    }
+    // Account tab panel — balance, earned-in-window, the program copy (rates from the API) and the
+    // last few ledger lines with their order numbers.
+    function renderAccountRewards() {
+        var prog = S.rewardProgram || {};
+        setText('cp-acct-rw-balance', money(S.rewardBalance));
+        setText('cp-acct-rw-earned', money(S.rewardEarned));
+        setText('cp-acct-rw-earned-label', 'Earned, last ' + (prog.months || 12) + ' months');
+        var how = byId('cp-acct-rw-how');
+        if (how) how.textContent = (prog.configured && prog.baseRatePct > 0)
+            ? ('You earn ' + prog.baseRatePct + '% back on every paid order' + (prog.premiumRatePct > prog.baseRatePct ? ', up to ' + prog.premiumRatePct + '% on premium garments' : '') + '. Redeem any amount against your next order and it appears as a credit line on that invoice.')
+            : 'Every order you pay in full earns reward dollars. Premium garments earn a higher rate. Redeem any amount against your next order.';
+        var hist = byId('cp-acct-rw-history');
+        if (!hist) return;
+        var rows = (S.rewardEntries || []).slice(0, 8);
+        if (!rows.length) { hist.innerHTML = '<div class="cp-rw-history-empty">No reward activity yet — it starts with your next paid order.</div>'; return; }
+        hist.innerHTML = rows.map(function (e) {
+            var amt = Number(e.amount) || 0;
+            var label = e.reason || (e.type === 'redeem' ? 'Redeemed' : e.type === 'grant' ? 'Reward earned' : 'Adjustment');
+            if (e.orderRef && label.indexOf(String(e.orderRef)) === -1) label += ' · order #' + e.orderRef;
+            return '<div class="cp-rh-row"><span class="cp-rh-amt ' + (amt < 0 ? 'is-neg' : 'is-pos') + '">' + (amt < 0 ? '−' : '+') + money(Math.abs(amt)) + '</span>' +
+                '<span class="cp-rh-label">' + escapeHtml(label) + '</span>' + (e.created ? '<span class="cp-rh-date">' + escapeHtml(formatDate(e.created)) + '</span>' : '') + '</div>';
+        }).join('');
     }
     function renderRewardHistory() {
         var wrap = byId('cp-redeem-history'), list = byId('cp-redeem-history-list');
@@ -1655,6 +1679,7 @@
     }
     (function wireRedeem() {
         var b = byId('cp-redeem-btn'); if (b) b.addEventListener('click', openRedeem);
+        var b2 = byId('cp-acct-redeem'); if (b2) b2.addEventListener('click', openRedeem);
         var c = byId('cp-redeem-close'); if (c) c.addEventListener('click', closeRedeem);
         var ca = byId('cp-redeem-cancel'); if (ca) ca.addEventListener('click', closeRedeem);
         var s = byId('cp-redeem-submit'); if (s) s.addEventListener('click', submitRedeem);

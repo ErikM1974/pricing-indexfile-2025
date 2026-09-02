@@ -801,6 +801,11 @@ img { max-width: 100%; }
    ══════════════════════════════════════════════════════════════════════════ */
 .cp-acct-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; }
 .cp-kv { display: grid; grid-template-columns: 130px 1fr; gap: 8px 12px; font-size: 14px; }
+.cp-rw-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.cp-rw-stats > div { padding: 12px 14px; background: var(--cp-gold-50); border: 1px solid var(--cp-gold-200); border-radius: 12px; }
+.cp-rw-history { display: flex; flex-direction: column; }
+.cp-rw-history .cp-rh-row { padding: 8px 2px; }
+.cp-rw-history-empty { color: var(--cp-ink-3); font-size: 13px; }
 .cp-kv dt { color: var(--cp-ink-3); font-size: 12.5px; font-weight: 600; letter-spacing: .02em; }
 .cp-kv dd { margin: 0; font-weight: 500; min-width: 0; overflow-wrap: anywhere; }
 .cp-help { display: flex; flex-direction: column; }
