@@ -157,20 +157,26 @@ resumable via `order-lines-2026.progress.json`). Table `ORDER_LINES_2026`, upser
 `ID_Order-SortOrder`. `sts_Paid`/`cur_Balance` are left blank on purpose — paid status stays LIVE
 from MO (one orders call per customer).
 
-**Built 2026-09-02 (proxy `fdf0b78`, app `b273b022`):** proxy `GET /api/order-lines?id_Customer=&from=&to=`
-(+ `/coverage`), secret-gated, over Caspio table **`ORDER_LINES`** (env `ORDER_LINES_TABLE` overrides);
-a missing table answers 404. App engine: `portalMirroredLineItems()` seeds the line cache from the
-mirror (10-min memo) BEFORE the paced MO crawl, uses the row's `SanMar_PieceCost` (skips the catalog
-lookup), and crawls MO only for orders the mirror lacks; the console shows "lines from Caspio mirror N,
-ManageOrders M". Unavailable mirror = the old MO path, never a throw.
+**🔑 Erik's steer 2026-09-02: the mirror ALREADY EXISTS — `ManageOrders_LineItems` (+ `ManageOrders_Orders`),
+the Caspio archive the rep bonuses use, kept current by proxy `scripts/sync-manageorders.js` (Heroku
+Scheduler daily 12:00 UTC: last 60 days of orders, line items for new/changed orders, history preserved
+— 141 Caspio calls/day after the 2026-07 fix).** No new table, no CSV import. Columns: `id_Order,
+PartNumber, PartDescription, PartColor, LineQuantity, LineUnitPrice, SortOrder, Size01..06` — NO customer
+column, so it is read by order id.
 
-**Erik's import (one-time):** Caspio → Tables → Import → `Downloads/Order_Lines_2026.csv` → new table
-named **`ORDER_LINES`**, all columns as Text(255) except LineQuantity/Size01-06/id_Customer/ID_Order/
-SortOrder/id_OrderType/Is_Garment = Integer, LineUnitPrice/LineTotal/SanMar_PieceCost/Line_BlankCost/
-Line_Gross/cur_TotalInvoice = Number, date_* = Text (YYYY-MM-DD; the route compares as text). Set
-**`Line_Key` UNIQUE** (it is the Add+Update key for re-imports). Later re-exports: import as
-Add+Update on `Line_Key`. Durable path (not built): bandit `sync-order-lines.ps1` from ODBC `LinesOE`
-+ a proxy upsert route, mirroring the ORDER_ODBC agent.
+**Built (proxy `8db7651`, app `91b80fd5`):** proxy `GET /api/order-lines?orders=140567,…` (≤200 ids,
+chunked `IN` clauses; env `ORDER_LINES_TABLE` overrides) + `GET /api/order-lines/coverage?id_Customer=
+[&from&to]` (orders in `ManageOrders_Orders` for the window vs. which have archived lines → `missingOrders`).
+App engine: `portalMirroredLineItems(orderIds)` seeds the line cache from the archive (10-min memo per order)
+BEFORE the paced MO crawl; MO is hit only for orders the archive lacks (the newest, until the next daily
+sync); paid status stays LIVE from MO. Console shows "lines from Caspio mirror N, ManageOrders M".
+Unavailable archive/route = the old MO path, never a throw. ⏭️ After deploy: check `/coverage` for a few
+GOLD accounts over 2026-01-01..2026-08-31 — if `missingOrders` is non-empty (sync began mid-year?), the
+`Order_Lines_2026.csv` export (still produced by `scratchpad/export-order-lines-2026.js`) can backfill
+`ManageOrders_LineItems` via Caspio import (columns id_Order, PartNumber, PartDescription, PartColor,
+LineQuantity, LineUnitPrice, SortOrder, Size01..06 — drop the extras; no unique key on that table, so
+import ONLY the missing orders' rows to avoid duplicates). Optional later: add a `SanMar_PieceCost`
+column to the archive and have sync-manageorders fill it (the engine already prefers it when present).
 
 ## Open items / next
 - ✅ **LIVE v2026.09.01.6** (Heroku v1899, SHA 9f2ce98 verified; new routes answer 401 + `no-store`
