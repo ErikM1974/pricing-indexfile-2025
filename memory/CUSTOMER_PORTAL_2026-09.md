@@ -143,8 +143,9 @@ balance; reps mention it on every touch; redemptions go on the order as the `RWD
    the 2027 earning window, so customers spend 2026 dollars in Q4 AND stack boosted 2027 dollars.
 5. **Redemption line = gift-certificate style.** Part `RWD-REDEEM` (or the gift-cert part named in the
    `RWD-REDEEM` row's TierLabel), qty 1, negative price. No per-customer code — the order # is the key.
-   ⏭️ Erik still has to name the ShopWorks part (create `RWD-REDEEM` in OnSite or put the existing
-   gift-certificate part code in that TierLabel).
+   ✅ 2026-09-02 Erik created the OnSite part **`RWD-REDEEMm2`** (his spelling); the Service_Codes
+   `RWD-REDEEM` TierLabel is now `RWD-REDEEM,RWD-REDEEMm2` (PK_ID 264; match is exact, case-insensitive,
+   comma list). Reps add that part, qty 1, price = −balance.
 
 **Service_Codes REWARD rows now (8):** `RWD-EARN` ×4 (0-9.99→1, 10-19.99→2, 20-39.99→3, 40+→5) ·
 `RWD-BOOST` · `RWD-REDEEM` · `RWD-WINDOW` · `RWD-SPEND`. All Visible=No.
@@ -245,8 +246,6 @@ condition in the reverse route + a nightly caller.
 ## Open items / next
 - ✅ **LIVE v2026.09.01.6** (Heroku v1899, SHA 9f2ce98 verified; new routes answer 401 + `no-store`
   anonymously; `/portal` still 302s to login). Rows written; Aaberg's $97 posted and visible.
-- ⏭️ Erik: create the **`RWD-REDEEM` part in OnSite** (or put the existing gift-certificate part code
-  in the Service_Codes `RWD-REDEEM` row's TierLabel) so reps can add the redemption line.
 - ⏭️ Staff: post the 12-month catch-up per GOLD/SILVER account from the console (Calculate → Post;
   ~$9.9k of credit across 37 accounts) so every good customer enters Q4 with a balance.
 - ⏭️ Watch the first real redemption: rep adds the negative line at order entry + logs it with the
