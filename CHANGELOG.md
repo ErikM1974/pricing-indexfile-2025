@@ -1,3 +1,9 @@
+## v2026.09.02.6 (2026.09.02)
+
+- Memory: catch-up grants posted, Rewards column for reps, RWD-REDEEM part
+- Memory: Volume Quote tool + Braun NW large-order pricing analysis; archive 2 resolved lessons
+- Customer portal: remove "Recommended for you" (Erik: clutter for customers)
+
 ## v2026.09.02.5 (2026.09.02)
 
 - Memory: re-invoice rulings (no auto clawback, staff Reverse, sync Step 4, engine staleness guard)
