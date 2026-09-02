@@ -155,8 +155,22 @@ Goal: the engine reads a Caspio table instead of ManageOrders (30/min limiter, H
 lines from MO paced 2.3 s/order, SanMar piece cost + line gross per line; 3,215 orders ≈ 2 h;
 resumable via `order-lines-2026.progress.json`). Table `ORDER_LINES_2026`, upsert key `Line_Key` =
 `ID_Order-SortOrder`. `sts_Paid`/`cur_Balance` are left blank on purpose — paid status stays LIVE
-from MO (one orders call per customer). Then: proxy read route `/api/order-lines` + engine switch
-(Caspio lines when present, MO fallback) + a bandit LinesOE delta agent for the durable path.
+from MO (one orders call per customer).
+
+**Built 2026-09-02 (proxy `fdf0b78`, app `b273b022`):** proxy `GET /api/order-lines?id_Customer=&from=&to=`
+(+ `/coverage`), secret-gated, over Caspio table **`ORDER_LINES`** (env `ORDER_LINES_TABLE` overrides);
+a missing table answers 404. App engine: `portalMirroredLineItems()` seeds the line cache from the
+mirror (10-min memo) BEFORE the paced MO crawl, uses the row's `SanMar_PieceCost` (skips the catalog
+lookup), and crawls MO only for orders the mirror lacks; the console shows "lines from Caspio mirror N,
+ManageOrders M". Unavailable mirror = the old MO path, never a throw.
+
+**Erik's import (one-time):** Caspio → Tables → Import → `Downloads/Order_Lines_2026.csv` → new table
+named **`ORDER_LINES`**, all columns as Text(255) except LineQuantity/Size01-06/id_Customer/ID_Order/
+SortOrder/id_OrderType/Is_Garment = Integer, LineUnitPrice/LineTotal/SanMar_PieceCost/Line_BlankCost/
+Line_Gross/cur_TotalInvoice = Number, date_* = Text (YYYY-MM-DD; the route compares as text). Set
+**`Line_Key` UNIQUE** (it is the Add+Update key for re-imports). Later re-exports: import as
+Add+Update on `Line_Key`. Durable path (not built): bandit `sync-order-lines.ps1` from ODBC `LinesOE`
++ a proxy upsert route, mirroring the ORDER_ODBC agent.
 
 ## Open items / next
 - ✅ **LIVE v2026.09.01.6** (Heroku v1899, SHA 9f2ce98 verified; new routes answer 401 + `no-store`
