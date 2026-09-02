@@ -8584,6 +8584,35 @@ async function portalPacedLineItems(orderNos, hdrs) {
   }
   return out;
 }
+// Caspio archive ManageOrders_LineItems (kept by the proxy's daily sync-manageorders job) →
+// Map(id_Order → MO-shaped { result: [line…], mirrored: true }) for the orders asked for. The
+// archive has no customer column, so it is keyed by the order ids the engine already holds.
+// Only orders with ≥1 archived line are returned; the rest fall through to the paced MO crawl.
+// Any failure → empty map (plain MO path); never a throw.
+const _mirrorCache = new Map();   // id_Order → { t, entry }
+async function portalMirroredLineItems(orderNos) {
+  const map = new Map(); const want = [];
+  orderNos.map(String).forEach((id) => { const hit = _mirrorCache.get(id); if (hit && (Date.now() - hit.t) < 10 * 60 * 1000) map.set(id, hit.entry); else want.push(id); });
+  const hdrs = CRM_API_SECRET ? { 'X-CRM-API-Secret': CRM_API_SECRET } : {};
+  for (let i = 0; i < want.length; i += 100) {
+    try {
+      const j = await portalFetchJson(`${CRM_API_BASE}/api/order-lines?orders=${want.slice(i, i + 100).join(',')}`, hdrs, 8000);
+      (j && Array.isArray(j.rows) ? j.rows : []).forEach((r) => {
+        const id = String(r.id_Order || '');
+        if (!id) return;
+        if (!map.has(id)) map.set(id, { result: [], mirrored: true });
+        map.get(id).result.push({
+          PartNumber: r.PartNumber || '', PartColor: r.PartColor || '', PartDescription: r.PartDescription || '',
+          LineQuantity: Number(r.LineQuantity) || 0, LineUnitPrice: Number(r.LineUnitPrice) || 0, SortOrder: Number(r.SortOrder) || 0,
+          Size01: r.Size01, Size02: r.Size02, Size03: r.Size03, Size04: r.Size04, Size05: r.Size05, Size06: r.Size06,
+          _pieceCost: r.SanMar_PieceCost === '' || r.SanMar_PieceCost == null ? null : Number(r.SanMar_PieceCost),
+        });
+      });
+    } catch (_) { /* mirror unavailable → MO path */ }
+  }
+  map.forEach((entry, id) => { if (!_mirrorCache.has(id)) _mirrorCache.set(id, { t: Date.now(), entry }); });
+  return map;
+}
 async function computeRewardAccrual(cid) {
   const program = await loadRewardProgram();
   const hdrs = CRM_API_SECRET ? { 'X-CRM-API-Secret': CRM_API_SECRET } : {};
@@ -8612,6 +8641,9 @@ async function computeRewardAccrual(cid) {
   const isWebstore = (o) => REWARD_WEBSTORE_TYPES.test(typeByOrder.get(String(o.id_Order)) || '');
   const excludedWeb = program.includeWebstore ? [] : paidInWindow.filter(isWebstore);
   const eligible = program.includeWebstore ? paidInWindow : paidInWindow.filter((o) => !isWebstore(o));
+  // Mirror first so the paced MO crawl only touches orders the mirror lacks (see below).
+  const mirroredEarly = await portalMirroredLineItems(eligible.map((o) => o.id_Order));
+  mirroredEarly.forEach((j, id) => { if (!_moLineCache.has(id)) _moLineCache.set(id, { t: Date.now(), result: j }); });
   const [lineJsons, ledgerJson] = await Promise.all([
     portalPacedLineItems(eligible.map((o) => o.id_Order), hdrs),
     portalFetchJson(`${CRM_API_BASE}/api/customer-rewards/ledger/${encodeURIComponent(cid)}`, hdrs, 8000),
@@ -8625,9 +8657,10 @@ async function computeRewardAccrual(cid) {
     else redeemedByOrder.set(ref, rewardRound((redeemedByOrder.get(ref) || 0) + Math.abs(amt)));
   });
   const ledgerBalance = rewardRound(Number(ledgerJson.balance) || 0);
+  // (Mirror rows were seeded into the line cache above, so any order the mirror holds never hit MO.)
   // Catalog rows per unique style, in parallel (portalStyleRows memoises 30 min).
   const styles = new Set();
-  eligible.forEach((o, i) => (((lineJsons[i] && lineJsons[i].result) || [])).forEach((li) => { const n = portalNormalizePart(li); if (n) styles.add(n.style.toUpperCase()); }));
+  eligible.forEach((o, i) => (((lineJsons[i] && lineJsons[i].result) || [])).forEach((li) => { const n = portalNormalizePart(li); if (n && !(li._pieceCost != null && li._pieceCost > 0)) styles.add(n.style.toUpperCase()); }));
   const rowsByStyle = new Map();
   await Promise.all([...styles].map(async (s) => rowsByStyle.set(s, await portalStyleRows(s))));
   const orders = eligible.map((o, i) => {
@@ -8645,7 +8678,7 @@ async function computeRewardAccrual(cid) {
       const qty = Number(li.LineQuantity) || portalSumSizes(li);
       const unit = Number(li.LineUnitPrice) || 0;
       if (qty <= 0 || unit <= 0) return;
-      const cost = rewardGarmentCost(rowsByStyle.get(norm.style.toUpperCase()), norm.color);
+      const cost = (li._pieceCost != null && li._pieceCost > 0) ? li._pieceCost : rewardGarmentCost(rowsByStyle.get(norm.style.toUpperCase()), norm.color);
       const tier = cost == null ? rewardTierForUnknownCost(program) : rewardTierForCost(program, cost);
       const revenue = rewardRound(qty * unit);
       lines.push({
@@ -8684,6 +8717,7 @@ async function computeRewardAccrual(cid) {
     partial: unavailable.length > 0,
     progress: { fetched: orders.length - unavailable.length, total: orders.length },
     excludedWebstore: { count: excludedWeb.length, revenue: rewardRound(excludedWeb.reduce((s, o) => s + (Number(o.cur_TotalInvoice) || 0), 0)) },
+    source: { mirrored: eligible.filter((o, i) => lineJsons[i] && lineJsons[i].mirrored).length, manageOrders: eligible.filter((o, i) => lineJsons[i] && !lineJsons[i].mirrored).length },
     generatedAt: new Date().toISOString(),
   };
 }

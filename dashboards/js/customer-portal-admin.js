@@ -514,7 +514,8 @@
       (t.redeemedOnOrders ? ' &middot; redeemed on orders ' + money2(t.redeemedOnOrders) + (t.redeemPending ? ' (<strong class="neg">' + money2(t.redeemPending) + ' not in ledger yet</strong>)' : '') : '') +
       (a.program.boosts && a.program.boosts.length ? '<div class="cpa-rw-meta">Boost: ' + a.program.boosts.map(function (b) { return esc(b.label) + ' &times;' + esc(String(b.multiplier)); }).join(' &middot; ') + '</div>' : '') +
       '<div class="cpa-rw-meta">Bands: ' + a.program.tiers.map(function (x) { return esc(x.label) + ' &rarr; ' + esc(String(x.ratePct)) + '%'; }).join(' &middot; ') + ' &middot; ' + esc(String(a.program.months)) + '-month window' + (a.unavailable && a.unavailable.length ? ' &middot; <span class="neg">' + a.unavailable.length + ' order(s) still missing line items — recalculate</span>' : '') +
-      (a.excludedWebstore && a.excludedWebstore.count ? ' &middot; ' + esc(String(a.excludedWebstore.count)) + ' web-store order(s) (' + money2(a.excludedWebstore.revenue) + ') excluded' : '') + '</div></div>';
+      (a.excludedWebstore && a.excludedWebstore.count ? ' &middot; ' + esc(String(a.excludedWebstore.count)) + ' web-store order(s) (' + money2(a.excludedWebstore.revenue) + ') excluded' : '') +
+      (a.source ? ' &middot; lines from Caspio mirror ' + esc(String(a.source.mirrored)) + ', ManageOrders ' + esc(String(a.source.manageOrders)) : '') + '</div></div>';
     if (!a.orders.length) html += '<div class="cpa-rw-empty">No invoiced + paid orders in the window.</div>';
     else html += '<table class="cpa-rw-acc-table"><thead><tr><th>Order</th><th>Invoiced</th><th class="num">Eligible</th><th class="num">Reward</th><th class="num">Granted</th><th class="num">Pending</th></tr></thead><tbody>' + a.orders.map(function (o) {
       var lines = (o.lines || []).map(function (l) {
