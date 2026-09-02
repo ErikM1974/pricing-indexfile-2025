@@ -225,3 +225,23 @@ describe('reward accrual — 2026 Rewards program year (Erik 2026-09-02)', () =>
         expect(src).toMatch(/if \(day <= prog\.spend\.to\) return res\.status\(409\)/);
     });
 });
+
+describe('reward accrual — re-invoiced orders (Erik 2026-09-02: never claw back automatically)', () => {
+    const fn = liftFunction('computeRewardAccrual', 'async function');
+    test('a per-order adjust entry nets against the grant; a redeem entry never does', () => {
+        expect(fn).toMatch(/if \(type === 'redeem' \|\| \(amt < 0 && type !== 'adjust'\)\) redeemedByOrder\.set/);
+        expect(fn).toMatch(/else grantedByOrder\.set\(ref, rewardRound\(\(grantedByOrder\.get\(ref\) \|\| 0\) \+ amt\)\)/);
+    });
+    test('an order granted more than it now earns is reported as overGranted, never as a negative pending', () => {
+        expect(fn).toMatch(/pending: rewardRound\(Math\.max\(0, reward - granted\)\)/);
+        expect(fn).toMatch(/overGranted: items \? rewardRound\(Math\.max\(0, granted - reward\)\) : 0/);
+        expect(fn).toMatch(/overGranted: rewardRound\(t\.overGranted \+ o\.overGranted\)/);
+    });
+    test('reversal is a staff route, capped at the unspent balance, one adjust entry keyed by the order', () => {
+        expect(src).toMatch(/app\.post\('\/api\/portal-admin\/rewards\/accrual\/:id\/reverse', requireCrmRole\(PORTAL_ADMIN_ROLES\)/);
+        expect(src).toMatch(/const amount = rewardRound\(Math\.min\(o\.overGranted, bal\)\)/);
+        expect(src).toMatch(/amount: -amount, type: 'adjust',[\s\S]{0,400}order_ref: orderNo/);
+        // The engine itself never posts a negative entry.
+        expect(fn).not.toMatch(/customer-rewards\/entry/);
+    });
+});
