@@ -1,3 +1,7 @@
+## v2026.09.02.12 (2026.09.02)
+
+- Deploy v2026.09.02.12: 7 files (embroidery-contract.js, index.html, EMBROIDERY_STITCH_COST_2026-09.md...)
+
 ## v2026.09.02.11 (2026.09.02)
 
 - Deploy v2026.09.02.11: 7 files (ACTIVE_FILES.md, embroidery-contract.css, embroidery-contract.js...)
