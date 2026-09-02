@@ -173,6 +173,28 @@ describe('reward accrual — scope and Heroku-safe pacing (source lock)', () => 
     });
 });
 
+describe('reward accrual — Caspio ORDER_LINES mirror (Erik ruling 5, 2026-09-02)', () => {
+    test('mirror rows are seeded into the line cache BEFORE the paced ManageOrders crawl', () => {
+        const seed = src.indexOf('mirroredEarly.forEach((j, id) => { if (!_moLineCache.has(id)) _moLineCache.set(id');
+        const crawl = src.indexOf('portalPacedLineItems(eligible.map((o) => o.id_Order), hdrs)');
+        expect(seed).toBeGreaterThan(0);
+        expect(crawl).toBeGreaterThan(seed);
+    });
+    test('an unavailable mirror is an empty map, never a throw (MO fallback)', () => {
+        const fn = liftFunction('portalMirroredLineItems', 'async function');
+        expect(fn).toMatch(/catch \(_\) \{ \/\* mirror unavailable/);
+        expect(fn).toMatch(/return map;/);
+    });
+    test('a mirrored SanMar piece cost is used, and only uncosted styles hit the catalog', () => {
+        expect(src).toMatch(/li\._pieceCost != null && li\._pieceCost > 0\) \? li\._pieceCost : rewardGarmentCost/);
+        expect(src).toMatch(/if \(n && !\(li\._pieceCost != null && li\._pieceCost > 0\)\) styles\.add/);
+    });
+    test('paid status never comes from the mirror (its sts_Paid is a stale snapshot)', () => {
+        const fn = liftFunction('portalMirroredLineItems', 'async function');
+        expect(fn).not.toMatch(/sts_Paid|cur_Balance/);
+    });
+});
+
 describe('reward accrual — 2026 Rewards program year (Erik 2026-09-02)', () => {
     const parseRewardWindow = new Function(liftFunction('parseRewardWindow') + '\nreturn parseRewardWindow;')();
     test('RWD-WINDOW / RWD-SPEND / RWD-BOOST labels parse as date ranges', () => {
