@@ -143,9 +143,8 @@ balance; reps mention it on every touch; redemptions go on the order as the `RWD
    the 2027 earning window, so customers spend 2026 dollars in Q4 AND stack boosted 2027 dollars.
 5. **Redemption line = gift-certificate style.** Part `RWD-REDEEM` (or the gift-cert part named in the
    `RWD-REDEEM` row's TierLabel), qty 1, negative price. No per-customer code — the order # is the key.
-   ✅ 2026-09-02 Erik created the OnSite part **`RWD-REDEEMm2`** (his spelling); the Service_Codes
-   `RWD-REDEEM` TierLabel is now `RWD-REDEEM,RWD-REDEEMm2` (PK_ID 264; match is exact, case-insensitive,
-   comma list). Reps add that part, qty 1, price = −balance.
+   ✅ 2026-09-02 Erik created the OnSite part **`RWD-REDEEM`** (Service_Codes row 264 TierLabel =
+   `RWD-REDEEM`; match is exact, case-insensitive, comma list allowed). Reps add it, qty 1, price = −balance.
 
 **Service_Codes REWARD rows now (8):** `RWD-EARN` ×4 (0-9.99→1, 10-19.99→2, 20-39.99→3, 40+→5) ·
 `RWD-BOOST` · `RWD-REDEEM` · `RWD-WINDOW` · `RWD-SPEND`. All Visible=No.
@@ -243,11 +242,31 @@ Not built: automatic reversal on a zeroed order. If Erik wants it, the rule woul
 automatically when reward drops to $0 (order credited), flag when it merely drops" — one
 condition in the reverse route + a nightly caller.
 
+## Catch-up grants POSTED 2026-09-02 (Erik: "run option 2") + Rewards column for reps
+
+- **$6,737.32 posted across 36 of the 42 GOLD/SILVER portal accounts** (Aaberg's $97 was already in;
+  6 accounts earned $0: Takehara / Hinshaw's Acura / Roto-Rooter had no invoiced+paid orders Jan–Aug
+  2026; Manke / Orion Marine / NW Utility had paid orders but no garment lines — decoration or
+  customer-supplied only). Zero errors. Per-account table: `Downloads\2026-Rewards-catchup-2026-09-02.csv`.
+  Largest: Scarsella $656 · Patriot Fire $577 · Binford $515 · Braun NW $513 · West Coast Truck $500.
+- **How it ran**: `scratchpad/post-catchup.js` — mints a staff `nwca_staff` cookie (keygrip over
+  `nwca_staff=<b64 json>` with SESSION_SECRET) and drives the app's OWN `/api/portal-admin/rewards/
+  accrual/:id` (loop while partial) → `/post` per account. 🔑 **Live SESSION_SECRET ≠ .env** (probe
+  returned 401), so it ran against a LOCAL app (`PORT=3114 node server.js`) that writes to the live
+  ledger via the proxy. With the mirror live every account took ~1 s (no ManageOrders crawl).
+- **Where reps see it (Erik's question, answered: the Portal Access list, not the mockup directory)**:
+  `dashboards/customer-portal-admin.html` now has a **Rewards** column (balance chip → opens the rewards
+  modal; click the header to sort high→low) + a **Reward $ Outstanding** stat card. Data = ONE call to
+  proxy `GET /api/customer-rewards/balances` (sums the whole ledger, secret-gated, proxy v2026.09.02.7)
+  relayed through `/api/crm-proxy/customer-rewards/*`. App v2026.09.02.5 (Heroku v1905). Balances
+  refresh whenever the modal reloads its ledger (post / expire / reverse).
+- **Redemption part**: Erik's OnSite part is exactly `RWD-REDEEM` (the earlier "RWD-REDEEMm2" was a
+  typo); Service_Codes row 264 TierLabel = `RWD-REDEEM` only.
+
 ## Open items / next
 - ✅ **LIVE v2026.09.01.6** (Heroku v1899, SHA 9f2ce98 verified; new routes answer 401 + `no-store`
   anonymously; `/portal` still 302s to login). Rows written; Aaberg's $97 posted and visible.
-- ⏭️ Staff: post the 12-month catch-up per GOLD/SILVER account from the console (Calculate → Post;
-  ~$9.9k of credit across 37 accounts) so every good customer enters Q4 with a balance.
+- ✅ Catch-up posted 2026-09-02 ($6,737.32 / 36 accounts) — see section above. ⏭️ BRONZE / HOUSE / untiered portal customers were NOT posted (Erik scoped it to GOLD/SILVER); the console Calculate → Post works for any of them.
 - ⏭️ Watch the first real redemption: rep adds the negative line at order entry + logs it with the
   order # (or the engine reconciles it once the order is paid). Balance must drop exactly once.
 - 🔴 Not exercised live: the Reverse button (no over-granted order exists yet) and sync Step 4 (first run = 5:00 AM PT 2026-09-03 — read the Heroku Scheduler log line "Step 4: reopened older orders — N mismatch(es)"; a large N on day one means the archive had drifted, not that ShopWorks reopened N orders).
