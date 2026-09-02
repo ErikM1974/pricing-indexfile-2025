@@ -1,3 +1,8 @@
+## v2026.09.02.8 (2026.09.02)
+
+- Memory: Volume Quote LIVE v2026.09.02.7
+- Customer portal: purpose-built quick-action icons (re-order box, price tag, upload, receipt) on soft tiles
+
 ## v2026.09.02.7 (2026.09.02)
 
 - Memory: VOL-* Service_Codes rows created for Volume Quote
