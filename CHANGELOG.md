@@ -1,3 +1,9 @@
+## v2026.09.02.1 (2026.09.02)
+
+- Memory: portal + reward program live state, next steps
+- 2026 Rewards: earning window as a date range, spend window + expiry, full-balance redemption
+- Deploy v2026.09.02.1: 2 files (customer-portal-admin.html,customer-portal.html,...)
+
 ## v2026.09.01.6 (2026.09.01)
 
 - Customer portal redesign + reward-dollar accrual program
