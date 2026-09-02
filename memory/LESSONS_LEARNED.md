@@ -298,6 +298,10 @@ the admin console one grant per order keyed by Order_Ref. Detail → `memory/CUS
   accrual tractable AND correct; a config row (`RWD-WEBSTORE`) can bring them back deliberately.
 - 🔑 **Caspio `Service_Codes.Notes` is Text-255** — a longer note 400s as "doesn't match the data
   type", which reads like a schema error, not a length error.
+- 🔑 **Before building a new mirror table, ask what already syncs.** I built an `ORDER_LINES` route +
+  CSV export before Erik pointed at `ManageOrders_LineItems` — the daily `sync-manageorders` archive
+  the rep bonuses already read. Same data, zero new plumbing. `grep -rn <TableName> ../caspio-pricing-proxy/scripts`
+  (and ask) is a two-minute check that saved nothing here because it ran too late.
 - 🔴 **Per-customer money JSON needs `Cache-Control: no-store`.** Express's default weak ETag let
   Chrome answer a fresh portal load from its own copy and show a customer their PRE-grant $0
   balance minutes after $97 had posted — the API returned 97 to curl the whole time. Any route

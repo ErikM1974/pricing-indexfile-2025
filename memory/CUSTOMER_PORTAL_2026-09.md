@@ -170,8 +170,16 @@ chunked `IN` clauses; env `ORDER_LINES_TABLE` overrides) + `GET /api/order-lines
 App engine: `portalMirroredLineItems(orderIds)` seeds the line cache from the archive (10-min memo per order)
 BEFORE the paced MO crawl; MO is hit only for orders the archive lacks (the newest, until the next daily
 sync); paid status stays LIVE from MO. Console shows "lines from Caspio mirror N, ManageOrders M".
-Unavailable archive/route = the old MO path, never a throw. ⏭️ After deploy: check `/coverage` for a few
-GOLD accounts over 2026-01-01..2026-08-31 — if `missingOrders` is non-empty (sync began mid-year?), the
+Unavailable archive/route = the old MO path, never a throw.
+✅ **LIVE 2026-09-02: proxy v2026.09.02.1 (`4937e66`), app v2026.09.02.2 (Heroku v1901, `7f928e2`).**
+Coverage measured live over 2026-01-01..08-31: 10181 19/20 orders with lines · 11392 7/11 · 13542
+16/20 · 4461 8/9 · 9886 25/27 · 7273 5/5 · 1276 2/2 — the archive spans Jan–Aug, but a few orders per
+account have NO lines (sync gaps, e.g. 139158, 140069, 140317); the engine crawls MO just for those.
+⏭️ Optional backfill of those gaps from `Order_Lines_2026.csv` (export still running at write time; lands
+in Downloads) via a `heroku run` script that POSTs only the missing orders' lines — the table has no
+unique key, so never bulk-import the whole CSV. Root-cause follow-up: why `sync-manageorders` leaves
+some orders without lines (line fetch failed + never retried?). Earlier plan text kept below for context:
+if `missingOrders` is non-empty (sync began mid-year?), the
 `Order_Lines_2026.csv` export (still produced by `scratchpad/export-order-lines-2026.js`) can backfill
 `ManageOrders_LineItems` via Caspio import (columns id_Order, PartNumber, PartDescription, PartColor,
 LineQuantity, LineUnitPrice, SortOrder, Size01..06 — drop the extras; no unique key on that table, so
