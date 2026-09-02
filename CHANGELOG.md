@@ -1,3 +1,12 @@
+## v2026.09.02.10 (2026.09.02)
+
+- Memory: portal-request email template live (template_portal_request)
+- Memory: embroidery stitch-cost study (cost per 1K stitches, 5K vs 8K, worst case)
+- Memory: contract embroidery rate card vs cost, caps vs garments speed, 2025 realization
+- Memory: contract card verdict + recommended card, direct embroidery profitability
+- Memory: contract card change 2026-09-02, hardcoded-fee lesson
+- Deploy v2026.09.02.10: 5 files (ACTIVE_FILES.md, embroidery-contract.css, embroidery-contract.js...)
+
 ## v2026.09.02.9 (2026.09.02)
 
 - Memory: quick actions verified, portal request notifications (Slack DM + sales@ email), EmailJS template todo
