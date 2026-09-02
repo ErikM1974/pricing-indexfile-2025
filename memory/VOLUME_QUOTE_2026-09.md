@@ -33,7 +33,7 @@ Taneisha's Braun Northwest request (500 pcs, left chest, design 40514, 4,729 sti
   WO 141973) billed $45 vs $52 list. Samples on WO 142964 were billed at PIECE cost — do not
   anchor on them. Stock: 1580 True Navy only 3,558 nationally, Seattle 0 in every navy.
 
-## The tool — `/dashboards/volume-quote.html` (Admin → Money & Payroll, admin-only)
+## The tool — `/dashboards/volume-quote.html` (Admin → Money & Payroll, admin-only) — LIVE `v2026.09.02.7` (Heroku v1907, SHA 39f4847, verified 2026-09-02)
 
 - Inputs: customer, rep, location, stitch count, design #, digitized?, valid-until, hold-qty;
   N garment lines (style + qty). Per style it loads `/api/pricing-bundle?method=EMB`
