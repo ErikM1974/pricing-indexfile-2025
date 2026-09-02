@@ -65,5 +65,4 @@ compute, cost/margin show n/a. Values from `COST_ALLOCATION_MODEL.md` (settled 2
 | `VOL-DENOM-FLOOR` | 0.60 | — | largest garment denominator allowed (40% garment margin) |
 
 Category `Volume Quote`, PricingMethod `FLAT`, PerUnit descriptive, `Visible` false,
-`IsActive` true. ⚠️ Creation via `POST /api/service-codes` was blocked by the session
-permission classifier on 2026-09-02 — rows must be created by Erik (Caspio UI or approved POST).
+`IsActive` true. ✅ Rows created 2026-09-02 via `POST /api/service-codes` (Erik approved). Edit values in Caspio; the page reads them with `?type=VOLUME` on every load, no deploy.
