@@ -8034,7 +8034,8 @@ app.post('/api/portal/reorder-batch', reorderRequestLimiter, requireCustomer, ex
 function projectPortalRewards(raw, program) {
   const entries = Array.isArray(raw && raw.entries) ? raw.entries : [];
   const months = (program && program.months) || REWARD_WINDOW_MONTHS_DEFAULT;
-  const since = new Date(); since.setMonth(since.getMonth() - months);
+  const since = new Date();
+  if (program && program.earn) since.setTime(new Date(program.earn.from + 'T00:00:00Z').getTime()); else since.setMonth(since.getMonth() - months);
   // "Earned in the window" = POSTED grants (positive entries) dated inside it. Only posted
   // credit is ever shown to a customer — the accrual calculator's un-posted estimate is staff-only.
   const earnedInWindow = Math.round(entries
@@ -8054,7 +8055,13 @@ function projectPortalRewards(raw, program) {
     // Rates only — the SanMar cost thresholds that define "premium" stay internal.
     program: {
       configured: !!(program && program.configured),
+      name: (program && program.name) || 'Reward dollars',
       months,
+      earnFrom: program && program.earn ? program.earn.from : null,
+      earnTo: program && program.earn ? program.earn.to : null,
+      spendFrom: program && program.spend ? program.spend.from : null,
+      spendBy: program && program.spend ? program.spend.to : null,
+      fullRedeemOnly: true,   // Erik 2026-09-02: one redemption for the whole balance keeps accounting simple
       baseRatePct: tiers.length ? tiers[0].ratePct : 0,
       premiumRatePct: tiers.length ? tiers[tiers.length - 1].ratePct : 0,
     },
@@ -8093,6 +8100,14 @@ app.post('/api/portal/rewards/redeem-request', reorderRequestLimiter, requireCus
     const bR = await fetch(`${CRM_API_BASE}/api/customer-rewards/balance/${encodeURIComponent(cid)}`, { headers: { 'X-CRM-API-Secret': CRM_API_SECRET } });
     const bal = bR.ok ? (Number((await bR.json()).balance) || 0) : 0;
     if (amt > bal + 0.001) return res.status(400).json({ error: `You have $${bal.toFixed(2)} available.` });
+    // Whole balance only (Erik 2026-09-02) — one credit line per customer per program.
+    if (Math.abs(amt - bal) > 0.01) return res.status(400).json({ error: `Reward dollars are redeemed all at once — your full $${bal.toFixed(2)}.` });
+    const prog = await loadRewardProgram().catch(() => null);
+    if (prog && prog.spend) {
+      const day = new Date().toISOString().slice(0, 10);
+      if (day < prog.spend.from) return res.status(400).json({ error: `${prog.name} can be redeemed starting ${prog.spend.from}.` });
+      if (day > prog.spend.to) return res.status(400).json({ error: `${prog.name} expired on ${prog.spend.to}.` });
+    }
     const payload = {
       id_Customer: cid, company_name: sess.companyName || '', email: sess.email || '',
       style: 'REWARD', color: '', product_title: 'Redeem reward dollars', qty: '',
@@ -8462,8 +8477,15 @@ async function loadRewardProgram() {
     .map((x) => Object.assign({ label: String(x.TierLabel || ''), ratePct: Number(x.SellPrice) || 0, name: x.DisplayName || '' }, parseRewardBand(x.TierLabel) || {}))
     .filter((t) => t.min != null && t.ratePct > 0)
     .sort((a, b) => a.min - b.min);
+  // Earning window. Preferred: RWD-WINDOW TierLabel as a date range ("2026-01-01..2026-08-31" =
+  // the 2026 Rewards program, Erik 2026-09-02). Fallback: UnitCost = rolling months (default 12).
   const win = rows.find((x) => String(x.ServiceCode || '').toUpperCase() === 'RWD-WINDOW');
+  const earn = win ? parseRewardWindow(win.TierLabel) : null;
   const months = win && Number(win.UnitCost) > 0 ? Math.round(Number(win.UnitCost)) : REWARD_WINDOW_MONTHS_DEFAULT;
+  // Spend window: RWD-SPEND TierLabel date range; its end date is the expiry the customer sees.
+  const spendRow = rows.find((x) => String(x.ServiceCode || '').toUpperCase() === 'RWD-SPEND');
+  const spend = spendRow ? parseRewardWindow(spendRow.TierLabel) : null;
+  const name = earn ? (earn.to.slice(0, 4) + ' Rewards') : 'Reward dollars';
   // Web-store orders (Inksoft / Shopify company stores) are EXCLUDED by default: they are automatic
   // employee purchases, not rep-handled company orders, and one GOLD account had 622 of them in a
   // year (measured 2026-09-01) — the program is for the company's own reorders. An optional
@@ -8481,7 +8503,7 @@ async function loadRewardProgram() {
   // gift-certificate credits can be the reward line. Default: RWD-REDEEM / REWARD-REDEEM.
   const redeemRow = rows.find((x) => String(x.ServiceCode || '').toUpperCase() === 'RWD-REDEEM');
   const redeemParts = redeemRow ? String(redeemRow.TierLabel || '').split(',').map((p) => p.trim().toUpperCase()).filter(Boolean) : [];
-  const program = { configured: tiers.length > 0, tiers, months, includeWebstore, boosts, redeemParts };
+  const program = { configured: tiers.length > 0, tiers, months, earn, spend, name, includeWebstore, boosts, redeemParts };
   _rewardProgramCache = { t: Date.now(), program };
   return program;
 }
@@ -8567,14 +8589,16 @@ async function computeRewardAccrual(cid) {
   const hdrs = CRM_API_SECRET ? { 'X-CRM-API-Secret': CRM_API_SECRET } : {};
   const today = new Date();
   const end = today.toISOString().slice(0, 10);
-  const windowStart = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth() - program.months, today.getUTCDate()));
+  // Earning window: the program's date range when configured, else rolling months back from today.
+  const windowStart = program.earn ? new Date(program.earn.from + 'T00:00:00Z') : new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth() - program.months, today.getUTCDate()));
+  const windowEnd = program.earn ? new Date(program.earn.to + 'T23:59:59Z') : today;
   const sd = new Date(today); sd.setFullYear(today.getFullYear() - 3);   // MO list window (invoice date filters below)
   const ordersJson = await portalFetchJson(`${CRM_API_BASE}/api/manageorders/orders?id_Customer=${encodeURIComponent(cid)}&date_Ordered_start=${sd.toISOString().slice(0, 10)}&date_Ordered_end=${end}`, hdrs, 10000);
   if (!ordersJson) throw new Error('orders unavailable');
   const paidInWindow = (ordersJson.result || []).filter((o) => {
     if (!o.id_Order || !o.date_Invoiced || !moOrderPaid(o)) return false;
     const inv = new Date(String(o.date_Invoiced).slice(0, 10) + 'T00:00:00Z');
-    return !isNaN(inv.getTime()) && inv >= windowStart;
+    return !isNaN(inv.getTime()) && inv >= windowStart && inv <= windowEnd;
   }).sort((a, b) => String(b.date_Invoiced).localeCompare(String(a.date_Invoiced)));
   // Order TYPE comes from the ShopWorks ODBC mirror (ORDER_ODBC) — ManageOrders only has a numeric
   // id_OrderType. Refusing to classify is safer than silently crawling (or rewarding) 600 web orders.
@@ -8655,7 +8679,7 @@ async function computeRewardAccrual(cid) {
   totals.ledgerBalance = ledgerBalance;
   const unavailable = orders.filter((o) => o.linesUnavailable).map((o) => o.orderNumber);
   return {
-    program, window: { from: windowStart.toISOString().slice(0, 10), to: end }, orders, totals,
+    program, window: { from: windowStart.toISOString().slice(0, 10), to: program.earn ? program.earn.to : end }, orders, totals,
     unavailable,
     partial: unavailable.length > 0,
     progress: { fetched: orders.length - unavailable.length, total: orders.length },
@@ -8721,6 +8745,29 @@ app.post('/api/portal-admin/rewards/accrual/:id/post', requireCrmRole(PORTAL_ADM
     console.log(`[portal-admin] ${staff} posted ${posted.length} grant(s) $${total.toFixed(2)} + ${redeemed.length} redemption(s) $${redeemTotal.toFixed(2)} for customer ${cid}${failed.length ? ` (${failed.length} failed)` : ''}`);
     res.json({ ok: failed.length === 0, posted, redeemed, failed, total, redeemTotal });
   } catch (err) { console.error('[portal-admin] accrual post failed:', err.message); res.status(503).json({ error: 'Could not post reward grants right now.' }); }
+});
+
+// POST /api/portal-admin/rewards/expire/:id — after the spend window closes, zero what is left:
+// one 'adjust' entry of −balance, reason "<program> expired <date>". Refuses before the date.
+app.post('/api/portal-admin/rewards/expire/:id', requireCrmRole(PORTAL_ADMIN_ROLES), express.json(), async (req, res) => {
+  const cid = String(req.params.id || '');
+  if (!/^\d+$/.test(cid)) return res.status(400).json({ error: 'numeric customer id required' });
+  try {
+    const prog = await loadRewardProgram();
+    if (!prog.spend) return res.status(409).json({ error: 'No spend window (RWD-SPEND) is configured, so nothing expires.' });
+    const day = new Date().toISOString().slice(0, 10);
+    if (day <= prog.spend.to) return res.status(409).json({ error: `${prog.name} can still be redeemed until ${prog.spend.to}.` });
+    const bR = await fetch(`${CRM_API_BASE}/api/customer-rewards/balance/${encodeURIComponent(cid)}`, { headers: { 'X-CRM-API-Secret': CRM_API_SECRET } });
+    const bal = bR.ok ? (Number((await bR.json()).balance) || 0) : 0;
+    if (bal <= 0.005) return res.json({ ok: true, expired: 0, balance: bal });
+    const staff = (req.session.crmUser && req.session.crmUser.email) || 'staff';
+    const body = { id_Customer: cid, company_name: String((req.body && req.body.company_name) || '').slice(0, 255), amount: -bal, type: 'adjust', reason: `${prog.name} expired ${prog.spend.to} — unused balance removed`, order_ref: '', created_by: staff };
+    const r = await fetch(`${CRM_API_BASE}/api/customer-rewards/entry`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CRM-API-Secret': CRM_API_SECRET }, body: JSON.stringify(body) });
+    const j = await r.json();
+    if (!r.ok || !j.success) throw new Error((j && j.error) || ('proxy ' + r.status));
+    console.log(`[portal-admin] ${staff} expired $${bal.toFixed(2)} of ${prog.name} for customer ${cid}`);
+    res.json({ ok: true, expired: bal, balance: Number(j.balance) || 0 });
+  } catch (err) { console.error('[portal-admin] expire failed:', err.message); res.status(503).json({ error: 'Could not expire the balance right now.' }); }
 });
 
 // GET /api/portal-admin/preview/:id/invoice/:orderNo — one invoice, ownership-checked

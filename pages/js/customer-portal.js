@@ -1578,10 +1578,12 @@
         var earnLine = (prog && prog.configured && prog.baseRatePct > 0)
             ? ('You earn ' + prog.baseRatePct + '% back on every paid order' + (prog.premiumRatePct > prog.baseRatePct ? ' — ' + prog.premiumRatePct + '% on premium garments' : '') + '.')
             : 'Earn reward dollars on premium picks — look for the ★ tag under Recommended for You.';
-        var earnedTxt = S.rewardEarned > 0 ? ' Earned in the last ' + ((prog && prog.months) || 12) + ' months: ' + money(S.rewardEarned) + '.' : '';
+        var useBy = prog && prog.spendBy ? ' Use them by ' + formatDate(prog.spendBy) + '.' : '';
+        var earnedTxt = S.rewardEarned > 0 ? ' Earned ' + money(S.rewardEarned) + (prog && prog.earnFrom ? ' on invoices paid ' + formatDateShort(prog.earnFrom) + ' – ' + formatDateShort(prog.earnTo) : '') + '.' : '';
+        setText('cp-rewards-name', prog && prog.name ? 'Your ' + prog.name : 'Your reward dollars');
         if (subEl) subEl.textContent = zero
             ? (earnLine + earnedTxt)
-            : ('Apply them to your next order — your rep takes it from there.' + earnedTxt);
+            : ('Apply your full balance to your next order — your rep adds it as a credit line on the invoice.' + useBy + earnedTxt);
         if (btn) btn.textContent = zero ? 'See ways to earn ★' : 'Redeem on your next order';
     }
     function loadRewards() {
@@ -1612,10 +1614,10 @@
         var prog = S.rewardProgram || {};
         setText('cp-acct-rw-balance', money(S.rewardBalance));
         setText('cp-acct-rw-earned', money(S.rewardEarned));
-        setText('cp-acct-rw-earned-label', 'Earned, last ' + (prog.months || 12) + ' months');
+        setText('cp-acct-rw-earned-label', prog.earnFrom ? ('Earned, ' + prog.name) : ('Earned, last ' + (prog.months || 12) + ' months'));
         var how = byId('cp-acct-rw-how');
         if (how) how.textContent = (prog.configured && prog.baseRatePct > 0)
-            ? ('You earn ' + prog.baseRatePct + '% back on every paid order' + (prog.premiumRatePct > prog.baseRatePct ? ', up to ' + prog.premiumRatePct + '% on premium garments' : '') + '. Redeem any amount against your next order and it appears as a credit line on that invoice.')
+            ? ('You earn ' + prog.baseRatePct + '% back on every paid order' + (prog.premiumRatePct > prog.baseRatePct ? ', up to ' + prog.premiumRatePct + '% on premium garments' : '') + '. Your full balance is applied to one order as a credit line on the invoice' + (prog.spendBy ? ' — use it by ' + formatDate(prog.spendBy) : '') + '.')
             : 'Every order you pay in full earns reward dollars. Premium garments earn a higher rate. Redeem any amount against your next order.';
         var hist = byId('cp-acct-rw-history');
         if (!hist) return;
@@ -1653,8 +1655,14 @@
             return;
         }
         if (PREVIEW) { showToast('Staff preview — the customer would redeem their rewards here.'); return; }
+        var progR = S.rewardProgram || {};
+        var todayIso = new Date().toISOString().slice(0, 10);
+        if (progR.spendFrom && todayIso < progR.spendFrom) { showToast(escapeHtml(progR.name || 'Reward dollars') + ' can be redeemed starting ' + escapeHtml(formatDate(progR.spendFrom)) + '.'); return; }
+        if (progR.spendBy && todayIso > progR.spendBy) { showToast(escapeHtml(progR.name || 'Reward dollars') + ' expired on ' + escapeHtml(formatDate(progR.spendBy)) + '.'); return; }
         setText('cp-redeem-avail', money(S.rewardBalance));
-        byId('cp-redeem-amt').value = '';
+        byId('cp-redeem-amt').value = String(S.rewardBalance);
+        setText('cp-redeem-rule', 'Reward dollars are applied all at once, so your whole ' + money(S.rewardBalance) + ' goes on one order' + (progR.spendBy ? ' — use it by ' + formatDate(progR.spendBy) : '') + '.');
+        var sb = byId('cp-redeem-submit'); if (sb) sb.textContent = 'Apply my full ' + money(S.rewardBalance) + ' to my next order';
         setText('cp-redeem-error', '');
         renderRewardHistory();
         byId('cp-redeem-modal').hidden = false;
@@ -1670,12 +1678,12 @@
         fetch('/api/portal/rewards/redeem-request', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ amount: amt }) })
             .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
             .then(function (x) {
-                btn.disabled = false; btn.textContent = 'Send request to my rep';
+                btn.disabled = false; btn.textContent = 'Apply my full ' + money(S.rewardBalance) + ' to my next order';
                 if (!x.ok || !x.j.ok) { err.textContent = (x.j && x.j.error) || 'Could not send. Please try again.'; return; }
                 closeRedeem();
                 showToast('Redemption request sent! ' + (x.j.rep ? escapeHtml(x.j.rep) + ' will' : "We'll") + ' apply it to your next order.');
             })
-            .catch(function () { btn.disabled = false; btn.textContent = 'Send request to my rep'; err.textContent = 'Could not send. Please try again.'; });
+            .catch(function () { btn.disabled = false; btn.textContent = 'Apply my full ' + money(S.rewardBalance) + ' to my next order'; err.textContent = 'Could not send. Please try again.'; });
     }
     (function wireRedeem() {
         var b = byId('cp-redeem-btn'); if (b) b.addEventListener('click', openRedeem);
