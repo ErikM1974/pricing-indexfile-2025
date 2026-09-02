@@ -31,6 +31,23 @@ it does not — that is what the $50 fee is for.
 $10.31 → the $8 line is $2.31 short on FULL absorption; the garment margin ($15.76–34.58/pc)
 carries it, order GM 49%. The "smaller logo" reason is worth $0.50–1.00/pc, not $4.
 
+## Contract embroidery (added same day — "do we embroider caps faster? does contract make money?")
+
+- **Caps are ~20% faster than garments at every tier** (logs 2023-26, 24+ pcs, comparable stitch
+  counts): 144+ pcs caps 3.52 min/pc vs garments 4.46; 72-143 3.80 vs 5.00. Fit: cap sewing
+  0.035 min/1K vs garment 0.090; handling similar (2.70 vs 2.61). Contract garments 6.3 min/pc
+  at median 29 pcs; contract caps 3.65 at median 48.
+- **Rate card** (contract calculator, 8K min): garments $1.10/1.00/0.90/0.85/0.80 per 1K by
+  tier, caps $1.00/0.90/0.80/0.75/0.70. At 8K: 24+ makes $2.80–3.73/pc typical, $0.41–1.51
+  worst; **1-7 and 8-23 lose money without the $50 small-order fee** (1-7: −$4.47 typical
+  before fee). Caps = better contract product (cheaper to sew, priced only 10-12% lower).
+- **2025 actual (Orders types 22/42)**: garments 207 orders / 12,711 pcs / $78,541 = $6.18/pc =
+  **$0.50 per 1K BILLABLE vs card $0.80–1.10**; caps 71 / 7,046 / $36,054 = $5.12/pc = $0.46 vs
+  $0.70–1.00. Direct contribution typical $50K (46% / 39%), ≈ break-even after $100/order
+  (+$15.2K / +$7.1K), −$74K on full $6.27/pc absorption (overstated for contract — no garment
+  purchasing/receiving). 🔴 **Realization is the problem, not the card**: card value of 2025
+  contract work ≈ $150–190K vs $114.6K invoiced.
+
 ## Recommended Caspio changes (NOT applied — Erik decides)
 - `VOL-HANDLING-MIN` 1.0 → **2.4** (raises Braun worst case $2.87 → $3.84/pc; matches p90).
 - `VOL-SETUP-MIN` 77 → 90 (immaterial at volume). Keep `VOL-HOUR-RATE` 30.09 (Erik 2026-09-02).
