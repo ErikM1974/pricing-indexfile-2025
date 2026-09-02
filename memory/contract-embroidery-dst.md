@@ -39,11 +39,14 @@ impossible to type ("26000" dies at "2").
 ## Business rules
 
 - **Rate card + fees changed 2026-09-02** (Erik, from `EMBROIDERY_STITCH_COST_2026-09.md`): garments
-  $1.25 / 1.10 / 1.00 / 0.90 / 0.85 per 1K, caps $1.10 / 1.00 / 0.90 / 0.80 / 0.75, small-order fee
-  **$100** under 24 pcs (Embroidery_Costs.LTM on the CTR 1-7 AND 8-23 rows), full back fee $100 on
-  the DECG-FB 1-7 row (band stays 1-7), and a **$150 order minimum** = Service_Codes `CTR-MIN-ORDER`
-  applied once in `priceAllLines()` after `combineLines` (unit price becomes minimum ÷ qty; every
-  surface reads the mutated combo). Script: proxy `scripts/update-contract-card-2026-09.js`
+  $1.25 / 1.10 / 1.00 / 0.90 / 0.85 per 1K, caps $1.10 / 1.00 / 0.90 / 0.80 / 0.75, **NO small-order fee**
+  (Embroidery_Costs.LTM = 0 on every CTR row; proxy `/contract-pricing` default fee is 0 since
+  v2026.09.02.10), and a **$250 order minimum** = Service_Codes `CTR-MIN-ORDER`, applied once in
+  `priceAllLines()` after `combineLines` (unit price becomes minimum ÷ qty; every surface reads the
+  mutated combo; the AI email gets `orderMinimum` + `minimumApplied`). Erik's same-day revision from
+  "$100 fee + $150 min": two rules were confusing and made 23 pcs cost MORE than 24. 🔑 Contract full
+  back follows the CONTRACT fee (0), not the DECG-FB ladder fee — that ladder ($100 on 1-7) still
+  serves the CUSTOM builder. Script: proxy `scripts/update-contract-card-2026-09.js`
   (dry-run default, `--live`). ⚠️ Laser-patch price on the reference page = cap 8K rate × 8 + $5,
   so it rose $0.80 with the cap rate.
 - **Printable price list = `pages/embroidery-contract-pricing.html`** (garments + caps 8K–20K, full-back line,
