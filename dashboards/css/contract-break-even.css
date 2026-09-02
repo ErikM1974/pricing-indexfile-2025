@@ -1,0 +1,51 @@
+/* ==========================================================================
+   contract-break-even.css — page-specific styles for dashboards/contract-break-even.html
+
+   Shell classes come from shared_components/css/dash-shell.css; tokens from
+   shared_components/css/art-hub.css. Only page-specific styles here — never
+   redefine tokens, never hardcode colors/shadows/radii.
+   ========================================================================== */
+
+.cbe-intro { color: var(--gray-600); max-width: 78ch; margin: 0 0 1rem; }
+.cbe-intro strong { color: var(--gray-900); }
+
+.cbe-controls { display: flex; flex-wrap: wrap; gap: 1rem 1.5rem; align-items: center; }
+.cbe-toggle { display: inline-flex; gap: .4rem; }
+.cbe-actions { margin-left: auto; }
+
+.cbe-assumptions { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: .6rem 1rem; font-size: .85rem; }
+.cbe-assumptions div { padding: .5rem .7rem; background: var(--surface-inset); border-radius: var(--radius-md); }
+.cbe-assumptions b { font-family: 'JetBrains Mono', monospace; color: var(--gray-900); }
+.cbe-assumptions small { display: block; color: var(--gray-500); }
+.cbe-note { font-size: .82rem; color: var(--gray-500); margin: .8rem 0 0; max-width: 80ch; }
+.cbe-warn { color: var(--state-warning); }
+
+.cbe-product { margin-top: 1rem; }
+.cbe-product .dash-card-header { align-items: baseline; }
+.cbe-sub { font-size: .8rem; color: var(--gray-500); }
+.cbe-table-wrap { overflow-x: auto; }
+.cbe-table { width: 100%; border-collapse: collapse; font-size: .86rem; }
+.cbe-table th, .cbe-table td { padding: .45rem .6rem; text-align: right; border-bottom: 1px solid var(--gray-200); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.cbe-table th { font-weight: 600; color: var(--gray-600); background: var(--surface-inset); font-size: .76rem; letter-spacing: .03em; text-transform: uppercase; }
+.cbe-table th:first-child, .cbe-table td:first-child { text-align: left; font-weight: 600; color: var(--gray-800); }
+.cbe-table td.num { font-family: 'JetBrains Mono', monospace; }
+.cbe-table td.loss { color: var(--state-danger); background: var(--state-danger-bg); }
+.cbe-table td.thin { color: var(--state-warning); background: var(--state-warning-bg); }
+.cbe-table td.card { color: var(--gray-500); font-size: .78rem; }
+.cbe-table tfoot td { font-weight: 600; background: var(--surface-inset); }
+.cbe-legend { display: flex; gap: 1.2rem; font-size: .78rem; color: var(--gray-500); margin-top: .6rem; }
+.cbe-legend .sw { display: inline-block; width: .9em; height: .9em; border-radius: 3px; vertical-align: -1px; margin-right: .3em; }
+.cbe-legend .sw.loss { background: var(--state-danger-bg); border: 1px solid var(--state-danger); }
+.cbe-legend .sw.thin { background: var(--state-warning-bg); border: 1px solid var(--state-warning); }
+
+.cbe-howto { font-size: .85rem; color: var(--gray-700); max-width: 90ch; padding-left: 1.2rem; }
+.cbe-howto li { margin-bottom: .45rem; }
+.cbe-howto code { font-family: 'JetBrains Mono', monospace; font-size: .85em; }
+
+@media print {
+    .dash-header, .cbe-controls, .dash-error-banner { display: none !important; }
+    .dash-shell, .dash-content { padding: 0; margin: 0; }
+    .dash-card { border: 0; box-shadow: none; padding: 0 0 .6rem; break-inside: avoid; }
+    .cbe-table td.loss, .cbe-table td.thin, .cbe-table th, .cbe-table tfoot td { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .cbe-table { font-size: .78rem; }
+}

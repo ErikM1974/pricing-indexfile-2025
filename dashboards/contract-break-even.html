@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Contract Break-Even - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- 2026 design tokens (must load before dash-shell.css) -->
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css">
+    <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
+    <link rel="stylesheet" href="/dashboards/css/contract-break-even.css">
+</head>
+<body>
+    <div class="dash-shell">
+        <header class="dash-header">
+            <div class="dash-header-left">
+                <a href="/staff-dashboard.html" title="Back to Staff Dashboard">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                         alt="Northwest Custom Apparel" class="dash-header-logo">
+                </a>
+                <h1 class="dash-header-title">Contract Break-Even</h1>
+            </div>
+            <div class="dash-header-right">
+                <a href="/staff-dashboard.html" class="dash-back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    Dashboard
+                </a>
+            </div>
+        </header>
+
+        <main class="dash-content">
+            <div class="dash-error-banner" role="alert">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span class="dash-error-banner-message"></span>
+                <button class="dash-error-banner-close" aria-label="Dismiss">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <p class="cbe-intro">
+                The contract price list, but every cell is what the job <strong>costs</strong> us: machine setup,
+                hooping and handling, sewing at the shop's stitch speed, thread, and the order-level admin cost,
+                divided by the pieces in the order. A price at or above the cell breaks even. Internal only:
+                nothing on this page goes to a customer.
+            </p>
+
+            <section class="dash-card cbe-controls">
+                <div class="cbe-toggle" role="group" aria-label="Production case">
+                    <button type="button" class="dash-btn dash-btn--primary" data-case="typical" aria-pressed="true">Typical run</button>
+                    <button type="button" class="dash-btn" data-case="worst" aria-pressed="false">Worst case</button>
+                </div>
+                <div class="cbe-toggle" role="group" aria-label="What the cells show">
+                    <button type="button" class="dash-btn dash-btn--primary" data-view="cost" aria-pressed="true">Break-even cost / pc</button>
+                    <button type="button" class="dash-btn" data-view="profit" aria-pressed="false">Profit / pc at the card</button>
+                </div>
+                <div class="cbe-actions">
+                    <button type="button" class="dash-btn" id="cbe-print"><i class="fas fa-print"></i> Print</button>
+                </div>
+            </section>
+
+            <section class="dash-card">
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title">Assumptions (live from Caspio)</h2>
+                </div>
+                <div class="cbe-assumptions" id="cbe-assumptions">Loading…</div>
+                <p class="cbe-note" id="cbe-case-note"></p>
+            </section>
+
+            <div id="cbe-tables"></div>
+
+            <section class="dash-card">
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title">How to read it</h2>
+                </div>
+                <ul class="cbe-howto">
+                    <li><strong>Break-even cost / pc</strong> = (setup + handling × qty + sewing × qty) × hour rate + thread + order cost, all divided by qty. Tier quantities used: 4, 12, 36, 60, 144. A small order carries the setup and order cost on few pieces, which is why the left columns are high.</li>
+                    <li><strong>Typical</strong> sews on the 8-head machines with no slack. <strong>Worst case</strong> sews on the smallest machine with the slack percentage on everything, the same model the Volume Quote page uses.</li>
+                    <li><strong>Profit / pc at the card</strong> = what the customer pays per piece (the card rate × stitches, or the order minimum ÷ qty when the minimum is higher) minus the break-even cost. Red cells lose money.</li>
+                    <li>Overhead beyond the order cost (executive, occupancy, card fees) is deliberately <strong>not</strong> in these cells, matching the July cost model. Change any assumption in Caspio <code>Service_Codes</code> (VOL-* rows) and this page follows on the next load.</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <!-- Load order matters: APP_CONFIG -> fetch-timeout -> DashPage -> page controller -->
+    <script src="/config/app.config.js"></script>
+    <script src="/shared_components/js/fetch-timeout.js"></script>
+    <script src="/shared_components/js/dash-page-helpers.js"></script>
+    <script src="/dashboards/js/contract-break-even.js"></script>
+</body>
+</html>
