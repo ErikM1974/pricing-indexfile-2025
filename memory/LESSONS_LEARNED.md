@@ -279,3 +279,19 @@ the admin console one grant per order keyed by Order_Ref. Detail → `memory/CUS
   balance minutes after $97 had posted — the API returned 97 to curl the whole time. Any route
   whose body changes because of a write elsewhere (balances, ledgers, statuses) sets no-store;
   now done for every `/api/portal*` route in one middleware.
+- 🔑 **A mirror pulled by ORDER DATE goes stale for anything reopened later.** The 60-day
+  ManageOrders pull never revisits a March order re-invoiced in September. Two guards, both cheap:
+  the engine compares archived Σ(qty×price) to the LIVE `cur_SubTotal` it already holds and refetches
+  on a mismatch; the sync compares the archive to `ORDER_ODBC` (delta-synced by modification stamp,
+  any age) and re-pulls mismatches. Neither needs a modification column the archive does not have.
+- 🔑 **Money that was granted is a policy question, not a math one.** Erik: never claw back
+  automatically — but a zeroed $4,000 order must not keep its reward. Engine reports `overGranted`
+  (never a negative pending); a staff **Reverse** posts −min(over-grant, unspent balance). Per-order
+  `adjust` entries net against grants; only `redeem` counts as spent.
+- 🔴 **The proxy pre-push hook only lets `Release v…` / `Changelog v…` subjects onto main.** A
+  hand-typed "Release: …" merge was refused 4× and the force-push to undo it was (rightly) blocked —
+  follow `.claude/skills/deploy/SKILL.md` Steps 6-11 verbatim (commits captured BEFORE the merge,
+  `Release vTAG`, CHANGELOG commit, tag, push) even when hand-rolling.
+- 🔴 **Never put a multi-line text with backticks inside a double-quoted `node -e "…"` in bash** —
+  every `` `word` `` runs as a command and vanishes from the text (this entry was written twice).
+  Write the script to a file, or use a single-quoted heredoc.

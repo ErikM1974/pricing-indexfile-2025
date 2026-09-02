@@ -216,6 +216,25 @@ no PK_ID column, 0 duplicate id_Order+SortOrder keys.**
 Other readers of the table (sanmar-orders label index, industry-lookalikes, check-zero-billing) use the
 original columns only — unaffected. The sync's delete-then-insert per order never collides with the key.
 
+## Re-invoiced orders (Erik's rulings 2026-09-02, LIVE app v2026.09.02.3/.4 · proxy v2026.09.02.3)
+
+**Ruling: never claw back automatically.** A grant already posted stays when an order is later
+re-invoiced LOWER (price tweak) — but a $4,000 order the customer rejects 30 days after invoicing
+and we zero out must not leave $200 of reward behind. So it is a STAFF decision, never the engine's:
+
+| Layer | What happens on a reopen / re-invoice |
+|---|---|
+| **Archive within 60 days of order date** | `sync-manageorders` Step 3 sees a CHANGE_FIELD (`cur_SubTotal`, `date_Invoiced`, `sts_Paid`…) and rewrites the lines. Always did. |
+| **Archive, older order** | NEW Step 4: `ORDER_ODBC` (bandit delta by `timestamp_Modification` every 15 min, any age) vs archive — subtotal off by > $0.50 or invoice date moved → header re-pulled from MO with `refresh=true`, lines rewritten. 13-month lookback, max 25/run. |
+| **Engine (reward math)** | Staleness guard: archived lines whose Σ(qty×price) disagrees with the LIVE `cur_SubTotal` by > $0.50 are refused and that order is fetched fresh (`source.staleMirror`). Paid status is always live. |
+| **Grant went UP** | Calculate shows the difference as pending; Post adds it (idempotent by Order_Ref). |
+| **Grant went DOWN / order zeroed** | Order shows `overGranted` = granted − now-earned (never a negative pending). Console: "over by $X" + **Reverse** button → `POST /api/portal-admin/rewards/accrual/:id/reverse {orderNumber}` posts ONE `adjust` entry of −min(over-grant, unspent balance), Order_Ref = the order. Dollars already redeemed stay redeemed (the proxy's overdraw guard also refuses below zero). |
+| **Ledger netting** | `adjust` entries carrying an order ref net against that order's grants ("granted" = net); only `redeem` entries count as spent on an order. |
+
+Not built: automatic reversal on a zeroed order. If Erik wants it, the rule would be "reverse
+automatically when reward drops to $0 (order credited), flag when it merely drops" — one
+condition in the reverse route + a nightly caller.
+
 ## Open items / next
 - ✅ **LIVE v2026.09.01.6** (Heroku v1899, SHA 9f2ce98 verified; new routes answer 401 + `no-store`
   anonymously; `/portal` still 302s to login). Rows written; Aaberg's $97 posted and visible.
@@ -225,6 +244,7 @@ original columns only — unaffected. The sync's delete-then-insert per order ne
   ~$9.9k of credit across 37 accounts) so every good customer enters Q4 with a balance.
 - ⏭️ Watch the first real redemption: rep adds the negative line at order entry + logs it with the
   order # (or the engine reconciles it once the order is paid). Balance must drop exactly once.
+- 🔴 Not exercised live: the Reverse button (no over-granted order exists yet) and sync Step 4 (first run = 5:00 AM PT 2026-09-03 — read the Heroku Scheduler log line "Step 4: reopened older orders — N mismatch(es)"; a large N on day one means the archive had drifted, not that ShopWorks reopened N orders).
 - 🔴 Not exercised live: the redemption reconcile path (no order carries an RWD-REDEEM line yet) —
   unit-locked, same proxy entry route the console already uses.
 - ⏭️ First real customer through the new portal: watch the general-request rows (Style QUOTE /
