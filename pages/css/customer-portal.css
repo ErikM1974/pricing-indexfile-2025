@@ -469,7 +469,9 @@ img { max-width: 100%; }
 }
 .cp-action:hover { background: var(--cp-green-50); border-color: var(--cp-green-200); transform: translateY(-1px); }
 .cp-action:focus-visible { outline: 2px solid var(--cp-green-700); outline-offset: 2px; }
-.cp-action-ico { width: 34px; height: 34px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; background: var(--cp-green-700); color: #fff; }
+.cp-action-ico { width: 42px; height: 42px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; background: var(--cp-green-50); color: var(--cp-green-700); border: 1px solid var(--cp-green-200); transition: background .12s ease, color .12s ease, border-color .12s ease; }
+.cp-action-ico .cp-icon { width: 22px; height: 22px; stroke-width: 1.7; }
+.cp-action:hover .cp-action-ico { background: var(--cp-green-700); color: #fff; border-color: var(--cp-green-700); }
 .cp-action strong { font-size: 13.5px; font-weight: 600; display: block; }
 .cp-action span { font-size: 12px; color: var(--cp-ink-3); display: block; margin-top: 2px; }
 
