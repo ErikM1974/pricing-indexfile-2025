@@ -48,6 +48,30 @@ carries it, order GM 49%. The "smaller logo" reason is worth $0.50–1.00/pc, no
   purchasing/receiving). 🔴 **Realization is the problem, not the card**: card value of 2025
   contract work ≈ $150–190K vs $114.6K invoiced.
 
+## Contract card verdict + recommendation (per ORDER incl. $100 order cost, 8K min)
+
+- Current card + $50 fee, typical run: **1-7 −$68 / 8-23 −$26 per order (garments), caps −$66 / −$31**;
+  24-47 +$30 / +$2; 48-71 +$122 / +$71; 72+ +$437 / +$306. Worst case: only 72+ positive.
+  Break-even $/1K typical: 3.22 / 1.27 / 0.79 / 0.60 / 0.42 (garments); worst 4.23 / 1.82 / 1.20 / 0.97 / 0.77.
+- 🔴 **The $50 fee cannot make small contract orders profitable** — needs $118–150 (1-7) or
+  $76–129 (8-23); 93 of 207 contract garment orders in 2025 were < 24 pcs. No garment margin to absorb it.
+- **Recommended**: garments $1.25 / 1.10 / 1.00 / 0.90 / 0.85, caps $1.10 / 1.00 / 0.90 / 0.80 / 0.75,
+  fee $100 under 24, **$150 order minimum**. Typical per-order: 1-7 ≈ break-even, 8-23 +$34/+$28,
+  24-47 +$59/+$31, 48-71 +$146/+$95, 72+ +$495/+$364. Worst case still negative at 24-71 @8K —
+  priced for a normal run deliberately (worst-case break-even $1.20 would price us out).
+- 🔑 **2025 contract work: invoiced $114.6K · at current card $191.8K (58% garments / 64% caps
+  realization) · at recommended card $203.9K.** Collect the card first (+$77K), raise it second (+$12K).
+
+## Direct (custom) embroidery verdict — LC 8K, garment ÷ 0.53 + $18/18/14/13/12, $50 LTM at 1-7
+
+- Profit/pc typical: $4 tee $8.73 (1-7) → $13–16 (8+); $21 sweatshirt $23–31; $39 Carhartt $40–47.
+  GM 34–67%. Worst case still $11+/pc on a $4 tee at 24+.
+- **Only losing cell: 4 cheap tees at 1-7 → −$15 typical / −$47 worst per order after $100 order
+  cost, even with the $50 fee** (= July's "1-7 flats break-even"). Everything else positive; a
+  $21 sweatshirt at 1-7 still +$43.
+- 🔑 The garment margin (47%) is the profit engine, not the $12 — why a $4 concession on Braun was
+  affordable and the same on a contract job never would be.
+
 ## Recommended Caspio changes (NOT applied — Erik decides)
 - `VOL-HANDLING-MIN` 1.0 → **2.4** (raises Braun worst case $2.87 → $3.84/pc; matches p90).
 - `VOL-SETUP-MIN` 77 → 90 (immaterial at volume). Keep `VOL-HOUR-RATE` 30.09 (Erik 2026-09-02).
