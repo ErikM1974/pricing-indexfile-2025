@@ -38,6 +38,18 @@ impossible to type ("26000" dies at "2").
 
 ## Business rules
 
+- **Rate card + fees changed 2026-09-02** (Erik, from `EMBROIDERY_STITCH_COST_2026-09.md`): garments
+  $1.25 / 1.10 / 1.00 / 0.90 / 0.85 per 1K, caps $1.10 / 1.00 / 0.90 / 0.80 / 0.75, small-order fee
+  **$100** under 24 pcs (Embroidery_Costs.LTM on the CTR 1-7 AND 8-23 rows), full back fee $100 on
+  the DECG-FB 1-7 row (band stays 1-7), and a **$150 order minimum** = Service_Codes `CTR-MIN-ORDER`
+  applied once in `priceAllLines()` after `combineLines` (unit price becomes minimum ÷ qty; every
+  surface reads the mutated combo). Script: proxy `scripts/update-contract-card-2026-09.js`
+  (dry-run default, `--live`). ⚠️ Laser-patch price on the reference page = cap 8K rate × 8 + $5,
+  so it rose $0.80 with the cap rate.
+- 🔴 Until 2026-09-02 the calculator read `data.ltmFee || 50` — a top-level field the proxy never
+  sends — so the garment/cap fee was a hardcoded $50 regardless of Caspio. Now per product from
+  `garments.ltmFee` / `caps.ltmFee`.
+
 - **LTM is ONE fee per ORDER at the HIGHEST applicable rate** (Erik, 2026-08-04). A left-chest
   + full-back combo under 24 pcs is **$100**, never $150, never $50.
 - **Turnaround is single-head MACHINE-HOURS only** (Erik, 2026-08-04) — no head-count

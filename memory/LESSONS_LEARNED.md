@@ -244,3 +244,22 @@ list from state — patch the cells that changed. 🔑 The first-render bug besi
 without a render) was invisible because the add BUTTON rendered; test the initial state, not only
 the interaction. 🔑 Cost-model constants for a staff page live in Caspio (`Service_Codes`
 `VOL-*`), never in the page's `.js` — `/dashboards` gates `.html` only, the `.js` is public.
+
+## Contract fee was "Caspio-driven" on paper and hardcoded in practice (2026-09-02)
+
+**Problem.** Raising the contract small-order fee in Caspio (Embroidery_Costs.LTM 50 → 100) would
+have changed nothing on the calculator; and the full-back fee read $50 in the API, $100 on the page
+and $100 in the AI prompt at the same time.
+**Root cause.** `fetchContractPricing()` mapped `ltmFee: data.ltmFee || 50` — the proxy sends the
+fee nested per product (`garments.ltmFee`), never top-level, so the fallback ALWAYS won. Its
+`fullBack` mapping copied only the rates and `minStitches`, dropping `ltmFee`/`ltmThreshold`, so
+`ltmFeeForProduct('fullback')` returned 0 — 4-piece full-back orders were quoted with NO fee. The page
+"facts" strip and the AI prompt carried the same numbers as static text.
+**Solution.** Per-product fee from the payload; page facts, hero terms and the order minimum are
+filled from the API; prompt told to trust CALC_CONTEXT only; the $150 minimum applied once on the
+single pricing path (`applyOrderMinimum` after `combineLines`) so hero/total/copy/AI agree.
+**Prevention.** 🔑 `x || DEFAULT` on a field the API does not send is a hardcoded price with extra
+steps — grep the payload shape before trusting a fallback. 🔑 A number that appears in copy, a
+prompt and an API is three prices; only the API may hold it. 🔑 Test a Caspio-driven value by
+CHANGING it in Caspio and watching the page, not by reading the code.
+
