@@ -781,7 +781,10 @@ img { max-width: 100%; }
 .cp-stmt-head img { height: 44px; }
 .cp-stmt-title { font-family: var(--cp-font-display); font-size: 22px; font-weight: 600; text-align: right; }
 .cp-stmt-meta { font-size: 12px; color: var(--cp-ink-2); text-align: right; }
-.cp-stmt table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+.cp-stmt-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.cp-stmt table { width: 100%; min-width: 640px; border-collapse: collapse; margin-top: 8px; }
+.cp-stmt td, .cp-stmt th { white-space: nowrap; }
+.cp-stmt td:nth-child(2) { white-space: normal; min-width: 160px; }
 .cp-stmt th { text-align: left; font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--cp-ink-3); padding: 6px 8px; border-bottom: 1px solid var(--cp-line); }
 .cp-stmt td { padding: 7px 8px; border-bottom: 1px solid var(--cp-line-2); }
 .cp-stmt .num { text-align: right; font-variant-numeric: tabular-nums; }
@@ -919,6 +922,8 @@ body.cp-has-ribbon .cp-header { border-top: 0; }
     .cp-modal-overlay[hidden] { display: none !important; }
     .cp-modal { box-shadow: none; max-width: 100%; border-radius: 0; animation: none; }
     .cp-modal-head, .cp-modal-foot { display: none !important; }
+    .cp-stmt-scroll { overflow: visible; }
+    .cp-stmt table { min-width: 0; }
     body { background: #fff; }
 }
 

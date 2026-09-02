@@ -1152,8 +1152,8 @@
             '<div class="cp-stmt-head"><div><img src="/images/nwca-logo.png" alt="Northwest Custom Apparel"><div class="cp-muted" style="font-size:11.5px;margin-top:4px">2025 Freeman Rd E, Milton, WA 98354 &middot; (253) 922-5793 &middot; accounting@nwcustomapparel.com</div></div>' +
             '<div><div class="cp-stmt-title">Statement of account</div><div class="cp-stmt-meta"><strong>' + escapeHtml(S.companyName || 'Your account') + '</strong>' + (S.custId ? ' &middot; Customer #' + escapeHtml(S.custId) : '') + '<br>As of ' + escapeHtml(new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })) + '</div></div></div>' +
             (open.length
-                ? '<table><thead><tr><th>Invoice</th><th>Description</th><th>Invoiced</th><th>Due</th><th>Aging</th><th class="num">Total</th><th class="num">Paid</th><th class="num">Balance</th></tr></thead><tbody>' + rows + '</tbody>' +
-                  '<tfoot><tr><td colspan="7">Total balance due</td><td class="num">' + money(total) + '</td></tr></tfoot></table>' +
+                ? '<div class="cp-stmt-scroll"><table><thead><tr><th>Invoice</th><th>Description</th><th>Invoiced</th><th>Due</th><th>Aging</th><th class="num">Total</th><th class="num">Paid</th><th class="num">Balance</th></tr></thead><tbody>' + rows + '</tbody>' +
+                  '<tfoot><tr><td colspan="7">Total balance due</td><td class="num">' + money(total) + '</td></tr></tfoot></table></div>' +
                   '<div class="cp-stmt-aging">' +
                     '<div><div class="k">Current</div><div class="v">' + money(buckets.current) + '</div></div>' +
                     '<div><div class="k">1–30 days</div><div class="v' + (buckets.d30 ? ' v--due' : '') + '">' + money(buckets.d30) + '</div></div>' +
