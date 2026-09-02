@@ -1,3 +1,11 @@
+## v2026.09.02.7 (2026.09.02)
+
+- Memory: VOL-* Service_Codes rows created for Volume Quote
+- Memory: all-tier catch-up posted, Recommended removed, logos source answer
+- Memory: Volume Quote saves as VQ quote + customer PDF sheet
+- Memory: catch-up grants posted for every portal account (all tiers + untiered + Win Back)
+- Deploy v2026.09.02.7: 23 files (ACTIVE_FILES.md, CLAUDE.md, custom-decal-pricing.html...)
+
 ## v2026.09.02.6 (2026.09.02)
 
 - Memory: catch-up grants posted, Rewards column for reps, RWD-REDEEM part
