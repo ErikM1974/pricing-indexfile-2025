@@ -23,7 +23,6 @@
     var AGG_URL = API;
     var ORDERS_URL = API + '/orders';
     var MYPRODUCTS_URL = API + '/my-products';
-    var RECS_URL = API + '/recommendations';
     var REWARDS_URL = API + '/rewards';
     var ME_URL = API + '/me';
     var QUOTES_URL = API + '/quotes';
@@ -129,7 +128,6 @@
         rep: null,
         orders: [], ordersLoaded: false, ordersFailed: false,
         products: [], productsLoaded: false,
-        recs: [],
         quotes: [], quotesLoaded: false, quotesFailed: false,
         logos: { approved: [], mockups: [], finished: [] }, logosLoaded: false, logosFailed: false,
         awaiting: [],          // proofs waiting on the customer: { name, design, date, approveUrl, kind }
@@ -340,7 +338,6 @@
     loadPortalData();
     loadOrders();
     loadProducts();
-    loadRecs();
     loadRewards();
     loadMe();
     loadQuotes();
@@ -448,20 +445,6 @@
                 byId('cp-products-grid').innerHTML = '';
                 renderLoadError('cp-products-grid', 'cp-products-empty', 'cp-products-count', 'products', "We couldn't load your products");
             });
-    }
-
-    function loadRecs() {
-        fetch(RECS_URL, { credentials: 'same-origin' })
-            .then(function (r) { return r.ok ? r.json() : { recommendations: [] }; })
-            .then(function (d) {
-                S.recs = (d && d.recommendations) || [];
-                if (!S.recs.length) return;
-                var html = S.recs.map(function (p) { return productCardHtml(p, 'rec'); }).join('');
-                ['cp-recs-grid', 'cp-ov-recs-grid'].forEach(function (id) { var g = byId(id); if (g) g.innerHTML = html; });
-                show(byId('cp-section-recs'), true);
-                show(byId('cp-ov-recs-section'), true);
-            })
-            .catch(function () { });
     }
 
     function loadQuotes() {
@@ -1647,11 +1630,9 @@
     }
     function openRedeem() {
         if (!(S.rewardBalance > 0)) {
-            // $0 — the button is an earn-nudge: jump to the ★-tagged Recommended picks.
-            var target = byId('cp-ov-recs-section');
-            if (target && !target.hidden) { switchTab('overview', { scroll: false }); setTimeout(function () { try { target.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { target.scrollIntoView(); } }, 60); }
-            else switchTab('products');
-            showToast('&#9733; Premium picks with the gold tag earn reward dollars — ask your rep for details.');
+            // $0 — the button is an earn-nudge ("Recommended for you" was removed 2026-09-02).
+            switchTab('products');
+            showToast('Every paid order earns reward dollars &mdash; re-order a favorite or ask your rep for a quote.');
             return;
         }
         if (PREVIEW) { showToast('Staff preview — the customer would redeem their rewards here.'); return; }
