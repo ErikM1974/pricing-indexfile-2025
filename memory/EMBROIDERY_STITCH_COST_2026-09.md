@@ -74,6 +74,13 @@ carries it, order GM 49%. The "smaller logo" reason is worth $0.50–1.00/pc, no
 - 🔑 The garment margin (47%) is the profit engine, not the $12 — why a $4 concession on Braun was
   affordable and the same on a contract job never would be.
 
+## Contract Break-Even page (Admin → Analysis, 2026-09-02)
+`/dashboards/contract-break-even.html` — the contract price grid re-costed from the VOL-* rows
+(typical 8-head / worst VOL-HEADS-WORST + VOL-SLACK; cost view / profit-at-the-card view using
+the $250 minimum ÷ qty). Thread = new `VOL-THREAD-PER-1K` 0.02. ⚠️ Garments and caps show the
+SAME cost because there is one handling row (1.0 min) — the page warns until `VOL-HANDLING-MIN`
+is raised; a cap-specific handling row would need a new code + page change.
+
 ## Recommended Caspio changes (NOT applied — Erik decides)
 - `VOL-HANDLING-MIN` 1.0 → **2.4** (raises Braun worst case $2.87 → $3.84/pc; matches p90).
 - `VOL-SETUP-MIN` 77 → 90 (immaterial at volume). Keep `VOL-HOUR-RATE` 30.09 (Erik 2026-09-02).
