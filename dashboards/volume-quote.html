@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Volume Quote - Northwest Custom Apparel</title>
+    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- 2026 design tokens (must load before dash-shell.css) -->
+    <link rel="stylesheet" href="/shared_components/css/art-hub.css">
+    <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
+    <link rel="stylesheet" href="/dashboards/css/volume-quote.css">
+</head>
+<body>
+    <div class="dash-shell">
+        <header class="dash-header">
+            <div class="dash-header-left">
+                <a href="/staff-dashboard.html" title="Back to Staff Dashboard">
+                    <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1"
+                         alt="Northwest Custom Apparel" class="dash-header-logo">
+                </a>
+                <h1 class="dash-header-title">Volume Quote</h1>
+            </div>
+            <div class="dash-header-right">
+                <a href="/staff-dashboard.html" class="dash-back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    Dashboard
+                </a>
+            </div>
+        </header>
+
+        <main class="dash-content">
+            <div class="dash-error-banner" role="alert">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span class="dash-error-banner-message"></span>
+                <button class="dash-error-banner-close" aria-label="Dismiss">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <p class="vq-intro">
+                One-time price for a large embroidery order. Standard prices, garment case cost and the
+                cost-model assumptions all load live from Caspio. Nothing here changes a price list:
+                the output is an approval memo the rep attaches to the quote.
+            </p>
+
+            <!-- 1. Order -->
+            <section class="dash-card">
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title"><span class="vq-step">1</span> Order</h2>
+                </div>
+                <div class="vq-form-grid">
+                    <label class="vq-field">
+                        <span>Customer</span>
+                        <input type="text" id="vq-customer" placeholder="Braun Northwest Inc." autocomplete="off">
+                    </label>
+                    <label class="vq-field">
+                        <span>Sales rep</span>
+                        <input type="text" id="vq-rep" list="vq-rep-list" placeholder="Taneisha Clark" autocomplete="off">
+                        <datalist id="vq-rep-list"></datalist>
+                    </label>
+                    <label class="vq-field">
+                        <span>Location</span>
+                        <select id="vq-location"></select>
+                    </label>
+                    <label class="vq-field">
+                        <span>Stitch count</span>
+                        <input type="number" id="vq-stitches" min="100" step="1" value="8000">
+                    </label>
+                    <label class="vq-field">
+                        <span>Design # (optional)</span>
+                        <input type="text" id="vq-design" placeholder="40514" autocomplete="off">
+                    </label>
+                    <label class="vq-field vq-field--check">
+                        <input type="checkbox" id="vq-digitized" checked>
+                        <span>Logo already digitized (no setup fee)</span>
+                    </label>
+                    <label class="vq-field">
+                        <span>Price valid until</span>
+                        <input type="date" id="vq-valid-until">
+                    </label>
+                    <label class="vq-field">
+                        <span>Price holds at or above (pcs, one PO)</span>
+                        <input type="number" id="vq-hold-qty" min="1" step="1" placeholder="defaults to the order quantity">
+                    </label>
+                </div>
+            </section>
+
+            <!-- 2. Garments -->
+            <section class="dash-card">
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title"><span class="vq-step">2</span> Garments</h2>
+                    <button type="button" class="dash-btn" id="vq-add-line"><i class="fas fa-plus"></i> Add style</button>
+                </div>
+                <div class="vq-lines-head">
+                    <span>Style #</span><span>Qty</span><span>Garment</span><span>SanMar cost (case / piece)</span><span>Stock (all DCs)</span><span></span>
+                </div>
+                <div id="vq-lines" class="vq-lines"></div>
+                <p class="vq-hint">
+                    Garment cost is the SanMar <strong>case price</strong> for the base size, the same figure the
+                    quote builders mark up. Piece price is shown beside it so nobody anchors on a sample invoice.
+                    Quantities are totals; 2XL and 3XL carry the standard upcharges shown in the result table.
+                </p>
+            </section>
+
+            <!-- 3. Levers -->
+            <section class="dash-card">
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title"><span class="vq-step">3</span> Levers</h2>
+                </div>
+                <div class="vq-levers">
+                    <div class="vq-lever">
+                        <label for="vq-emb-price">Embroidery charge per piece</label>
+                        <div class="vq-lever-row">
+                            <input type="number" id="vq-emb-price" min="0" step="0.25">
+                            <span class="vq-lever-note" id="vq-emb-note">Standard 72+: loading</span>
+                        </div>
+                    </div>
+                    <div class="vq-lever">
+                        <label for="vq-denom">Garment margin denominator</label>
+                        <div class="vq-lever-row">
+                            <input type="range" id="vq-denom" min="0.50" max="0.65" step="0.01">
+                            <output id="vq-denom-out">0.53</output>
+                            <span class="vq-lever-note" id="vq-denom-note">Standard: loading</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. Result -->
+            <section class="dash-card">
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title"><span class="vq-step">4</span> Standard vs one-time price</h2>
+                </div>
+                <div class="dash-stat-grid vq-stats">
+                    <div class="dash-stat-card"><div class="dash-stat-value" id="st-qty">0</div><div class="dash-stat-label">Pieces</div></div>
+                    <div class="dash-stat-card"><div class="dash-stat-value" id="st-hours">0</div><div class="dash-stat-label">Machine hours</div></div>
+                    <div class="dash-stat-card"><div class="dash-stat-value" id="st-deco-cost">$0</div><div class="dash-stat-label">Decoration cost / pc</div></div>
+                    <div class="dash-stat-card"><div class="dash-stat-value" id="st-order-list">$0</div><div class="dash-stat-label">Order at standard</div></div>
+                    <div class="dash-stat-card dash-stat-card--accent"><div class="dash-stat-value" id="st-order-vol">$0</div><div class="dash-stat-label">Order at one-time price</div></div>
+                    <div class="dash-stat-card"><div class="dash-stat-value" id="st-given">$0</div><div class="dash-stat-label">Given up vs standard</div></div>
+                    <div class="dash-stat-card"><div class="dash-stat-value" id="st-gm">0%</div><div class="dash-stat-label">Gross margin at one-time price</div></div>
+                </div>
+                <div id="vq-warnings" class="vq-warnings"></div>
+                <div class="vq-table-wrap">
+                    <table class="vq-table" id="vq-result">
+                        <thead>
+                            <tr>
+                                <th>Style</th><th>Qty</th><th>Case cost</th>
+                                <th>Standard 72+<br><small>S-XL / 2XL / 3XL</small></th>
+                                <th>One-time<br><small>S-XL / 2XL / 3XL</small></th>
+                                <th>Garment $ margin / pc</th><th>GM %</th><th>Order $ standard / one-time</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                        <tfoot></tfoot>
+                    </table>
+                </div>
+                <p class="vq-hint" id="vq-model-note"></p>
+            </section>
+
+            <!-- 5. Memo -->
+            <section class="dash-card vq-print-keep">
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title"><span class="vq-step">5</span> Approval memo</h2>
+                    <div class="vq-memo-actions">
+                        <button type="button" class="dash-btn" id="vq-copy"><i class="fas fa-copy"></i> Copy</button>
+                        <button type="button" class="dash-btn" id="vq-print"><i class="fas fa-print"></i> Print memo (internal)</button>
+                    </div>
+                </div>
+                <pre id="vq-memo" class="vq-memo">Add a style and a quantity to build the memo.</pre>
+            </section>
+
+            <!-- 6. Customer quote — the only thing that leaves the building. No cost, no margin, no levers. -->
+            <section class="dash-card vq-print-customer-keep">
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title"><span class="vq-step">6</span> Customer quote</h2>
+                    <div class="vq-memo-actions">
+                        <span class="vq-save-status" id="vq-save-status"></span>
+                        <button type="button" class="dash-btn" id="vq-save"><i class="fas fa-save"></i> Save quote</button>
+                        <button type="button" class="dash-btn dash-btn--primary" id="vq-print-customer"><i class="fas fa-file-pdf"></i> Print / save as PDF</button>
+                    </div>
+                </div>
+                <p class="vq-hint vq-cq-hint">
+                    Prints only the sheet below. In the print dialog choose "Save as PDF" and forward it to the rep;
+                    they send it to the customer. Internal figures never appear here.
+                </p>
+                <div id="vq-cq" class="vq-cq">
+                    <header class="vq-cq-head">
+                        <img src="https://cdn.caspio.com/A0E15000/Safety%20Stripes/web%20northwest%20custom%20apparel%20logo.png?ver=1" alt="Northwest Custom Apparel" class="vq-cq-logo">
+                        <div class="vq-cq-title">
+                            <h3>Volume Pricing Quote</h3>
+                            <div class="vq-cq-meta" id="vq-cq-meta"></div>
+                        </div>
+                    </header>
+                    <div class="vq-cq-parties" id="vq-cq-parties"></div>
+                    <table class="vq-cq-table">
+                        <thead>
+                            <tr><th>Style</th><th>Description</th><th>Qty</th><th>S–XL</th><th>2XL</th><th>3XL</th><th>Est. total</th></tr>
+                        </thead>
+                        <tbody id="vq-cq-rows"></tbody>
+                        <tfoot id="vq-cq-foot"></tfoot>
+                    </table>
+                    <div class="vq-cq-block" id="vq-cq-decoration"></div>
+                    <div class="vq-cq-block">
+                        <h4>Terms</h4>
+                        <ul id="vq-cq-terms"></ul>
+                    </div>
+                    <footer class="vq-cq-foot">
+                        Northwest Custom Apparel · 2025 Freeman Road East, Milton, WA 98354 · 253-922-5793 · nwcustomapparel.com
+                    </footer>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Load order matters: APP_CONFIG -> fetch-timeout -> DashPage -> page controller -->
+    <script src="/config/app.config.js"></script>
+    <script src="/shared_components/js/fetch-timeout.js"></script>
+    <script src="/shared_components/js/dash-page-helpers.js"></script>
+    <script src="/dashboards/js/volume-quote.js"></script>
+</body>
+</html>
