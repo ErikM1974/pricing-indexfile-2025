@@ -216,6 +216,13 @@ no PK_ID column, 0 duplicate id_Order+SortOrder keys.**
 Other readers of the table (sanmar-orders label index, industry-lookalikes, check-zero-billing) use the
 original columns only — unaffected. The sync's delete-then-insert per order never collides with the key.
 
+**✅ Enriched CSV built 2026-09-02 08:02** → `Downloads\ManageOrders_LineItems_ENRICHED.csv`: **11,882 rows**
+(8,942 from Erik's 05:09 table export + 2,940 lines from 1,016 invoiced-2026 orders the table lacked),
+`Line_Key` unique 11,882 / 0 duplicates / 0 empty · 9,087 garment lines, 8,955 with `SanMar_PieceCost`
+(419 styles looked up) · 55 rows with no ORDER_ODBC header (id_Customer/id_OrderType blank — the sync
+fills them when those orders are next touched). `Is_Garment` is 1/0 in the CSV (Caspio import maps it);
+the sync writes it as a boolean (proxy v2026.09.02.4 — a 'Yes' string can 400 the line POST).
+
 ## Re-invoiced orders (Erik's rulings 2026-09-02, LIVE app v2026.09.02.3/.4 · proxy v2026.09.02.3)
 
 **Ruling: never claw back automatically.** A grant already posted stays when an order is later
