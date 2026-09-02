@@ -46,6 +46,9 @@ impossible to type ("26000" dies at "2").
   surface reads the mutated combo). Script: proxy `scripts/update-contract-card-2026-09.js`
   (dry-run default, `--live`). ⚠️ Laser-patch price on the reference page = cap 8K rate × 8 + $5,
   so it rose $0.80 with the cap rate.
+- **Printable price list = `pages/embroidery-contract-pricing.html`** (garments + caps 8K–20K, full-back line,
+  terms strip, laser patches; landscape print → Save as PDF). Linked from the calculator's table card
+  ("Print price list (PDF)"). Each calculator table tab also states min stitches · fee + band · $150.
 - 🔴 Until 2026-09-02 the calculator read `data.ltmFee || 50` — a top-level field the proxy never
   sends — so the garment/cap fee was a hardcoded $50 regardless of Caspio. Now per product from
   `garments.ltmFee` / `caps.ltmFee`.

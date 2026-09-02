@@ -35,6 +35,7 @@
                 <div class="title-section">
                     <h1 class="company-name">Northwest Custom Apparel</h1>
                     <h2 class="page-title">Contract Embroidery Pricing — 2026</h2>
+                    <p class="company-address" id="effectiveDate">Rates effective September 2, 2026</p>
                     <p class="company-address">2025 Freeman Road East, Milton, Washington 98354 | 253-922-5793</p>
                 </div>
                 <div class="contact-section">
@@ -73,7 +74,7 @@
 
                 <!-- Caps Table -->
                 <div class="table-section">
-                    <h3>Contract Cap Fronts <span class="part-number">CTR-Cap</span></h3>
+                    <h3>Contract Caps — any single panel <span class="part-number">CTR-Cap</span></h3>
                     <table class="pricing-table">
                         <thead>
                             <tr>
@@ -93,8 +94,11 @@
             </div>
 
             <!-- LTM Note -->
-            <div class="ltm-note">
-                <strong>* Columns 1-7 and 8-23:</strong> a $100 small-order (LTM) fee applies to orders under 24 pieces, and every contract order carries a <strong>$150.00 minimum</strong>. Rates and fees updated September 2, 2026.
+            <div class="ltm-note" id="termsNote">
+                <strong>Every contract order has a $150.00 minimum.</strong> <strong>* Columns 1-7 and 8-23:</strong> a $100.00 small-order fee applies once per order under 24 pieces and is rolled into the per-piece price. Garments and caps bill a minimum of 8K stitches. Rates and fees effective September 2, 2026.
+            </div>
+            <div class="ltm-note" id="fullBackTerms">
+                <strong>Full back (DECG-FB)</strong> — priced per 1,000 stitches on its own ladder; 25K stitch minimum; $100.00 small-order fee on orders of 1-7 pieces; $150.00 order minimum.
             </div>
 
             <!-- Laser Patch Section -->
@@ -112,7 +116,7 @@
                     </tbody>
                 </table>
                 <ul class="laser-notes">
-                    <li>Orders of 1-23 pieces include the $100 LTM fee · $150 order minimum on every contract order (updated 9/2/2026)</li>
+                    <li id="laserLtmText">Orders of 1-23 pieces include the $100.00 small-order fee · $150.00 order minimum on every contract order</li>
                     <li>Laser Patch: $50 one-time design setup fee (GRT-50)</li>
                     <li>$100 digitizing for new embroidery logos</li>
                 </ul>
@@ -125,6 +129,7 @@
         </div>
     </div>
 
-    <script src="/pages/embroidery-contract-pricing.js"></script>
+    <script src="/config/app.config.js"></script>
+    <script src="/pages/embroidery-contract-pricing.js?v=2026.09.02.11"></script>
 </body>
 </html>
