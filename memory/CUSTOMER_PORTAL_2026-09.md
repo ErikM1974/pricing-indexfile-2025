@@ -76,6 +76,25 @@ REWARD rows the same call returns configured:false and $0 with every line noted 
 this cost". Harness: `scratchpad/accrual-harness.js` pattern (extract the block from server.js,
 inject `loadRewardProgram`) — the unit test `portal-reward-accrual.test.js` locks the rules.
 
+**Scope + pacing (added later on 2026-09-01, `9e915f50` + `1983b7e3`):**
+- 🔴 **Web-store orders are EXCLUDED by default** (ShopWorks ORDER_TYPE Inksoft / Shopify / web store,
+  classified via one `ORDER_ODBC` Caspio query; a failed lookup REFUSES rather than including them).
+  Measured: Absher (GOLD) had 622 Inksoft orders in the window — automatic employee purchases, not
+  company reorders. Service_Codes row `RWD-WEBSTORE` SellPrice=1 turns them on.
+- 🔴 **The proxy's ManageOrders limiter is ONE 30-requests/minute bucket per IP** (the whole dyno).
+  Line items are fetched one at a time ~2.2 s apart, memoised 24 h, at most 9 uncached per request
+  (Heroku H12 = 30 s); the response says `partial:true` + `progress` and the console keeps calling.
+  Posting refuses a partial calculation. ⚠️ `buildMyProducts` still fires 25 line-item calls in
+  parallel — same latent 429 risk, not touched here.
+- **Redemptions = a ShopWorks LINE ITEM, like a gift certificate** (Erik's call): part `RWD-REDEEM`
+  (or the part(s) named in a Service_Codes `RWD-REDEEM` row's TierLabel, comma-separated — so the
+  existing gift-certificate part can be reused), qty 1, NEGATIVE unit price. The engine finds it on
+  the paid order and posts a `redeem` ledger entry keyed by Order_Ref (idempotent); reps can also log
+  it at order entry from the console (order # now required on a redemption). Grants post before
+  redemptions in one run so nothing overdraws.
+- **Q4 / promo boost**: Service_Codes `RWD-BOOST`, TierLabel `2026-10-01..2026-12-31`, SellPrice =
+  multiplier — applies to orders INVOICED in the window; overlapping windows take the max.
+
 **Not built (deliberate):** automatic nightly posting. Erik's existing design keeps every ledger
 write staff-initiated; a cron would need a per-customer serialisation lock (the proxy's own
 TOCTOU note) and a quota review (one accrual ≈ 1 MO orders call + N line-item calls + 1 Caspio

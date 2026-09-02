@@ -8494,6 +8494,13 @@ function rewardTierForCost(program, cost) {
   if (cost == null || !program || !program.configured) return null;
   return program.tiers.find((t) => cost >= t.min && cost <= t.max) || null;
 }
+// A garment we cannot cost (non-SanMar vendor, customer-supplied, retired style — 12% of GOLD
+// revenue measured 2026-09-01) still earns, at the LOWEST band's rate, so a customer is never
+// penalised for what we bought from S&S. The line is annotated so staff can see why.
+function rewardTierForUnknownCost(program) {
+  if (!program || !program.configured || !program.tiers.length) return null;
+  return program.tiers[0];
+}
 function rewardGarmentCost(rows, color) {
   if (!rows || !rows.length) return null;
   const m = portalMatchColor(rows, color);
@@ -8609,14 +8616,14 @@ async function computeRewardAccrual(cid) {
       const unit = Number(li.LineUnitPrice) || 0;
       if (qty <= 0 || unit <= 0) return;
       const cost = rewardGarmentCost(rowsByStyle.get(norm.style.toUpperCase()), norm.color);
-      const tier = rewardTierForCost(program, cost);
+      const tier = cost == null ? rewardTierForUnknownCost(program) : rewardTierForCost(program, cost);
       const revenue = rewardRound(qty * unit);
       lines.push({
         partNumber: li.PartNumber || '', style: norm.style, color: norm.color, description: li.PartDescription || '',
         qty, unitPrice: unit, revenue, cost,
         tier: tier ? tier.label : null, ratePct: tier ? tier.ratePct : 0,
         reward: tier ? rewardRound(revenue * tier.ratePct / 100 * (boost ? boost.multiplier : 1)) : 0,
-        note: cost == null ? 'cost unknown (style not in catalog)' : (tier ? '' : 'no band covers this cost'),
+        note: cost == null ? 'cost unknown (not a SanMar catalog style) — base rate' : (tier ? '' : 'no band covers this cost'),
       });
     });
     const reward = rewardRound(lines.reduce((s, l) => s + l.reward, 0));

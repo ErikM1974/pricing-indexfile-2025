@@ -30,6 +30,7 @@ function liftFunction(name, kind) {
 const lifted = [
     liftFunction('parseRewardBand'),
     liftFunction('rewardTierForCost'),
+    liftFunction('rewardTierForUnknownCost'),
     liftFunction('rewardGarmentCost'),
     liftFunction('moOrderPaid'),
 ].join('\n');
@@ -37,7 +38,7 @@ const lifted = [
 // rewardGarmentCost depends on portalMatchColor — lift that too.
 const helpers = liftFunction('portalMatchColor');
 
-const api = new Function(helpers + '\n' + lifted + '\nreturn { parseRewardBand, rewardTierForCost, rewardGarmentCost, moOrderPaid };')();
+const api = new Function(helpers + '\n' + lifted + '\nreturn { parseRewardBand, rewardTierForCost, rewardTierForUnknownCost, rewardGarmentCost, moOrderPaid };')();
 
 describe('reward accrual — band parsing (Service_Codes TierLabel)', () => {
     test('"40+" is an open-ended premium band', () => {
@@ -76,8 +77,11 @@ describe('reward accrual — tier selection', () => {
         expect(api.rewardTierForCost(program, 53.44).ratePct).toBe(3);
         expect(api.rewardTierForCost(program, 40).ratePct).toBe(3);   // boundary belongs to premium
     });
-    test('unknown cost → no tier → no reward', () => {
+    test('unknown cost → no band by cost, but the engine falls back to the LOWEST band (non-SanMar garments still earn)', () => {
         expect(api.rewardTierForCost(program, null)).toBeNull();
+        expect(api.rewardTierForUnknownCost(program).ratePct).toBe(1);
+        expect(api.rewardTierForUnknownCost({ configured: false, tiers: [] })).toBeNull();
+        expect(src).toMatch(/cost == null \? rewardTierForUnknownCost\(program\)/);
     });
     test('NO CONFIGURED PROGRAM → nothing earns (never a silent default rate)', () => {
         expect(api.rewardTierForCost({ configured: false, tiers: [] }, 50)).toBeNull();
