@@ -74,18 +74,26 @@ function buildTerms() {
     const fb = CONTRACT_PRICING?.fullBack || {};
     const fee = Number(g.ltmFee) || 0;
     const band = Number(g.ltmThreshold) || 23;
-    const fbFee = Number(fb.ltmFee) || 0;
-    const fbBand = Number(fb.ltmThreshold) || 0;
+    // Contract full back follows the CONTRACT fee (0 since 2026-09-02), not the shared
+    // DECG-FB ladder's fee, which still serves the custom quote builder.
+    const fbFee = fee;
+    const fbBand = band;
     const minText = ORDER_MINIMUM ? formatPrice(ORDER_MINIMUM) : 'not loaded — confirm before quoting';
+    const minSentence = ORDER_MINIMUM
+        ? `<strong>Every contract order has a ${formatPrice(ORDER_MINIMUM)} minimum</strong> — garments, caps and full back. Below that the minimum is the price; above it the per-piece rates apply.`
+        : '<strong>Order minimum not loaded — confirm before quoting.</strong>';
 
     const terms = document.getElementById('termsNote');
     if (terms) {
-        terms.innerHTML =
-            `<strong>Every contract order has a ${ORDER_MINIMUM ? formatPrice(ORDER_MINIMUM) : '(minimum not loaded)'} minimum.</strong> ` +
-            `<strong>* Columns 1-7 and 8-23:</strong> a ${formatPrice(fee)} small-order fee applies once per order under ${band + 1} pieces ` +
-            `and is rolled into the per-piece price. Garments and caps bill a minimum of ${(STITCH_COUNTS[0] / 1000)}K stitches. ` +
-            `Rates and fees effective ${RATES_EFFECTIVE}.`;
+        terms.innerHTML = minSentence + ' ' +
+            (fee > 0
+                ? `<strong>* Columns 1-7 and 8-23:</strong> a ${formatPrice(fee)} small-order fee applies once per order under ${band + 1} pieces and is rolled into the per-piece price. `
+                : 'No other small-order fee. ') +
+            `Garments and caps bill a minimum of ${(STITCH_COUNTS[0] / 1000)}K stitches. ` +
+            `Rates effective ${RATES_EFFECTIVE}.`;
     }
+    // The yellow "fee applies" column shading only means something when a fee exists.
+    if (fee <= 0) document.querySelectorAll('.ltm-col').forEach(el => el.classList.remove('ltm-col'));
     const fbEl = document.getElementById('fullBackTerms');
     if (fbEl) {
         const rates = fb.perThousandRates || {};
@@ -97,7 +105,7 @@ function buildTerms() {
             `; ${minText === 'not loaded — confirm before quoting' ? 'order minimum ' + minText : formatPrice(ORDER_MINIMUM) + ' order minimum'}.`;
     }
     const laserFee = document.getElementById('laserLtmText');
-    if (laserFee) laserFee.textContent = `Orders of 1-${band} pieces include the ${formatPrice(fee)} small-order fee · ${ORDER_MINIMUM ? formatPrice(ORDER_MINIMUM) : '(not loaded)'} order minimum on every contract order`;
+    if (laserFee) laserFee.textContent = (fee > 0 ? `Orders of 1-${band} pieces include the ${formatPrice(fee)} small-order fee · ` : '') + `${ORDER_MINIMUM ? formatPrice(ORDER_MINIMUM) : '(not loaded)'} order minimum on every contract order`;
     const eff = document.getElementById('effectiveDate');
     if (eff) eff.textContent = `Rates effective ${RATES_EFFECTIVE}`;
 }

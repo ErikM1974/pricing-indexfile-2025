@@ -261,5 +261,7 @@ single pricing path (`applyOrderMinimum` after `combineLines`) so hero/total/cop
 **Prevention.** 🔑 `x || DEFAULT` on a field the API does not send is a hardcoded price with extra
 steps — grep the payload shape before trusting a fallback. 🔑 A number that appears in copy, a
 prompt and an API is three prices; only the API may hold it. 🔑 Test a Caspio-driven value by
-CHANGING it in Caspio and watching the page, not by reading the code.
+CHANGING it in Caspio and watching the page, not by reading the code. 🔑 One rule beats two: a
+fee PLUS a minimum produced a price cliff (23 pcs $302, 24 pcs $192) — a single order minimum is
+monotonic and explainable; reach for the minimum first.
 

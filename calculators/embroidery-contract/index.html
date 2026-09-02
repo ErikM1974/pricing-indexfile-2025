@@ -51,9 +51,11 @@
                     same full-back rate as Corporate.
                 </p>
                 <p class="lede lede-terms">
-                    <strong>Every contract order has a <span id="ledeOrderMin">$150.00</span> minimum.</strong>
-                    Orders under 24 pieces also carry a <span id="ledeLtmFee">$100.00</span> small-order fee,
-                    rolled into the per-piece price. Rates and fees updated <strong>September 2, 2026</strong>.
+                    <strong>Every contract order has a <span id="ledeOrderMin">$250.00</span> minimum</strong> &mdash;
+                    garments, caps and full back. Below that, the minimum is the price; above it, the per-piece
+                    rates apply. No other small-order fee.<span id="ledeFee" hidden> Orders under 24 pieces also carry a
+                    <span id="ledeLtmFee">$0.00</span> small-order fee, rolled into the per-piece price.</span>
+                    Rates updated <strong>September 2, 2026</strong>.
                 </p>
             </div>
             <aside class="hero-aside">
@@ -62,24 +64,28 @@
                     <span class="v">5 quantity tiers · 1 → 72+ pcs</span>
                 </div>
                 <div class="fact">
+                    <span class="k">Order minimum</span>
+                    <span class="v">
+                        <strong id="factOrderMin">—</strong> per contract order, any product
+                        <span class="pill">CTR-MIN-ORDER</span>
+                    </span>
+                </div>
+                <div class="fact" id="factNoFee">
+                    <span class="k">Small-order fee</span>
+                    <span class="v">None &mdash; the order minimum covers small runs</span>
+                </div>
+                <div class="fact" id="factLtm" hidden>
                     <span class="k">LTM Fee</span>
                     <span class="v">
                         <strong id="factLtmFee">—</strong> on orders <span id="factLtmBand">1–23</span> pcs
                         <span class="pill">CTR-Garmt / CTR-Cap</span>
                     </span>
                 </div>
-                <div class="fact">
+                <div class="fact" id="factFb" hidden>
                     <span class="k">Full Back LTM</span>
                     <span class="v">
                         <strong id="factFbLtm">—</strong> on orders <span id="factFbBand">1–7</span> pcs
                         <span class="pill">DECG-FB</span>
-                    </span>
-                </div>
-                <div class="fact">
-                    <span class="k">Order minimum</span>
-                    <span class="v">
-                        <strong id="factOrderMin">—</strong> per contract order
-                        <span class="pill">CTR-MIN-ORDER</span>
                     </span>
                 </div>
             </aside>
@@ -469,6 +475,6 @@
     <!-- Risk assessment, machine-time and multi-location combination (pure,
          jest-locked). Must load before the page JS. -->
     <script src="/shared_components/js/dst-quote-math.js?v=2026.08.15.1"></script>
-    <script src="/calculators/embroidery-contract/embroidery-contract.js?v=2026.09.02.11"></script>
+    <script src="/calculators/embroidery-contract/embroidery-contract.js?v=2026.09.02.12"></script>
 </body>
 </html>

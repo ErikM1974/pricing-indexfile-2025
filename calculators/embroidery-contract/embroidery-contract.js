@@ -223,7 +223,12 @@
                     // hardcoded $50 no matter what Caspio said. ltmFeeForProduct() reads the
                     // per-product values; this top-level copy is the garment fee for the
                     // callers that still ask for one number.
-                    ltmFee: (data.garments && Number(data.garments.ltmFee)) || data.ltmFee || 50,
+                    // ZERO is a real answer (no contract fee since 2026-09-02), so never `|| 50`:
+                    // a falsy-check fallback turned "no fee" back into a $50 fee. Only an
+                    // absent/non-numeric value falls through, and it falls through to 0.
+                    ltmFee: (data.garments && Number.isFinite(Number(data.garments.ltmFee)))
+                        ? Number(data.garments.ltmFee)
+                        : (Number(data.ltmFee) || 0),
                     ltmThreshold: (data.garments && Number(data.garments.ltmThreshold)) || data.ltmThreshold || 23
                 };
             });
@@ -443,6 +448,8 @@
         var minsHtml = '<span>Min stitches <b>' + (minStitchesFor(state.tableProduct) / 1000) + 'K</b></span>';
         if (feeAmt > 0 && feeBand > 0) {
             minsHtml += '<span>Small-order fee <b>$' + fmtMoney(feeAmt) + '</b> on 1–' + feeBand + ' pcs, rolled into the price</span>';
+        } else {
+            minsHtml += '<span>No small-order fee</span>';
         }
         if (orderMinimumState === 'ok' && orderMinimum > 0) {
             minsHtml += '<span>Order minimum <b>$' + fmtMoney(orderMinimum) + '</b></span>';
@@ -748,30 +755,29 @@
      * 50 and the builder charged 0 — all three live at once.)
      */
     function ltmFeeForProduct(product, qty) {
+        // 2026-09-02 (Erik): contract has NO small-order fee on any product — the $250 order
+        // minimum (CTR-MIN-ORDER) replaces it. The shared DECG-FB ladder still carries its
+        // fee for the CUSTOM quote builder, so full back here deliberately follows the
+        // contract fee (Embroidery_Costs.LTM on the CTR rows, 0 today) instead of the ladder.
+        var num = function (v) { var n = Number(v); return Number.isFinite(n) ? n : null; };
+        var garmentFee = pricing && pricing.garments ? num(pricing.garments.ltmFee) : null;
+        var capFee = pricing && pricing.caps ? num(pricing.caps.ltmFee) : null;
         if (product === 'fullback') {
-            var fb = (pricing && pricing.fullBack) || {};
             var band = ltmThresholdForProduct('fullback');
-            // qty omitted (matrix header asks "what IS the fee") → don't gate.
             if (band > 0 && Number(qty) > band) return 0;
-            return Number(fb.ltmFee) || 0;
+            return garmentFee !== null ? garmentFee : 0;
         }
         // Garments and caps each carry their own fee in the payload (Embroidery_Costs.LTM
-        // on the CTR-Garmt / CTR-Cap small-tier rows). Fall back to the garment figure.
-        if (product === 'cap' && pricing && pricing.caps && Number(pricing.caps.ltmFee) > 0) {
-            return Number(pricing.caps.ltmFee);
-        }
-        if (pricing && pricing.garments && Number(pricing.garments.ltmFee) > 0) {
-            return Number(pricing.garments.ltmFee);
-        }
-        return pricing ? pricing.ltmFee : 50;
+        // on the CTR rows). Zero is a valid fee; only a missing value falls back — to 0,
+        // never to a number invented here.
+        if (product === 'cap' && capFee !== null) return capFee;
+        if (garmentFee !== null) return garmentFee;
+        return pricing && num(pricing.ltmFee) !== null ? num(pricing.ltmFee) : 0;
     }
 
     /** Small-batch BAND for a product — see ltmFeeForProduct for why they differ. */
     function ltmThresholdForProduct(product) {
-        if (product === 'fullback') {
-            var band = pricing && pricing.fullBack && Number(pricing.fullBack.ltmThreshold);
-            if (band > 0) return band;
-        }
+        // Contract: one band for every product (the CTR threshold); see ltmFeeForProduct.
         return pricing ? pricing.ltmThreshold : 23;
     }
 
@@ -2325,6 +2331,10 @@ var AI_ENDPOINT = '/api/contract-embroidery-ai/chat';
             baseUnit: Number(combo.baseUnit.toFixed(2)),
             finalUnit: Number(combo.finalUnit.toFixed(2)),
             ltmFee: combo.ltmFee,
+            // 2026-09-02: the $250 contract order minimum — already applied inside combo, these
+            // let the email say so (whitelisted on the proxy in contract-embroidery-ai.js).
+            orderMinimum: orderMinimumState === 'ok' ? orderMinimum : 0,
+            minimumApplied: combo.minimumApplied === true,
             // Phase 4: include the pre-generated CEMB quote ID so the AI can
             // reference it in the subject + intro. May be null if first
             // message hasn't fired yet OR ensureQuoteID() failed — the AI
@@ -2772,13 +2782,20 @@ var AI_ENDPOINT = '/api/contract-embroidery-ai/chat';
     // Caspio says, so a fee change never leaves stale copy on the page.
     function renderPricingFacts() {
         var set = function (id, text) { var el = document.getElementById(id); if (el) el.textContent = text; };
-        set('factLtmFee', '$' + fmtMoney(ltmFeeForProduct('garment')));
+        var fee = ltmFeeForProduct('garment');
+        var fbFee = ltmFeeForProduct('fullback');
+        var show = function (id, on) { var el = document.getElementById(id); if (el) el.hidden = !on; };
+        set('factLtmFee', '$' + fmtMoney(fee));
         set('factLtmBand', '1–' + (pricing ? pricing.ltmThreshold : 23));
-        set('factFbLtm', '$' + fmtMoney(ltmFeeForProduct('fullback')));
+        set('factFbLtm', '$' + fmtMoney(fbFee));
         set('factFbBand', '1–' + ltmThresholdForProduct('fullback'));
+        show('factLtm', fee > 0);
+        show('factFb', fbFee > 0);
+        show('factNoFee', fee <= 0 && fbFee <= 0);
         set('factOrderMin', orderMinimumState === 'ok' ? '$' + fmtMoney(orderMinimum) : 'not loaded');
         set('ledeOrderMin', orderMinimumState === 'ok' ? '$' + fmtMoney(orderMinimum) : '(minimum not loaded)');
-        set('ledeLtmFee', '$' + fmtMoney(ltmFeeForProduct('garment')));
+        set('ledeLtmFee', '$' + fmtMoney(fee));
+        show('ledeFee', fee > 0);
     }
 
     function init() {
