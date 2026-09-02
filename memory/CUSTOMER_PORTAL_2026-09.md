@@ -276,6 +276,31 @@ condition in the reverse route + a nightly caller.
   *Proofs & mockups* = art requests / mockups with images, 2026+. *Finished photos* = factory photos a
   staffer approved for the customer. Absher: 26 approved logos, 1 proof, 0 photos.
 
+## Quick actions — verified end to end + how staff are notified (2026-09-02, Erik's 3 questions)
+
+- **Icons redone** (app v2026.09.02.8): sprite symbols `i-qa-reorder` (box + return arrow) · `i-qa-quote`
+  (price tag) · `i-qa-upload` · `i-qa-receipt`; 42px green-50 tiles that invert on hover.
+- **Every action works** (walked in a LOCAL app as AutoShield #13629 with a minted `nwca_customer` cookie
+  set via `document.cookie` — the server reads it by name, httpOnly only hides it from JS):
+  Re-order → Your products (per-product Re-order buttons) · Request a quote / Send a new logo → modal →
+  `POST /api/portal/request` → proxy `/api/portal-reorder/request` → `Portal_Reorder_Requests` row
+  (Style QUOTE / NEWLOGO / LOGOCHG / ACCOUNT) · Print statement → aging statement modal with Print/save PDF.
+  Test row RR-20260902-213709 created and deleted (PUT /requests/:pk sets status; DELETE removes).
+- **Notification path (proxy v2026.09.02.8)** — BEFORE: only a Slack webhook that was never configured,
+  so requests sat silently in the console's Re-order Requests tab. NOW, fire-and-forget after the row saves:
+  1. **Slack DM to the customer's rep** via `sendSlackDM` (bot token; `REP_EMAIL_MAP` full name → first
+     name); live-proven `[SLACK_DM_OK] taneisha@… U099VV5A52T`. Rep unassigned / unreachable → DM Erik
+     (`PORTAL_REQUEST_FALLBACK_EMAIL`).
+  2. **Email to sales@nwcustomapparel.com** (`PORTAL_REQUEST_EMAIL`) via EmailJS, gated on
+     **`EMAILJS_TEMPLATE_PORTAL_REQUEST`** — ⏭️ **Erik: create the EmailJS template** with params
+     `to_email, subject, kind, company_name, customer_number, request_num, summary, note, rep,
+     customer_email, queue_link`, then set the config var on the proxy. Until then the log says
+     "email skipped — EMAILJS_TEMPLATE_PORTAL_REQUEST not configured".
+  3. Optional channel webhook `SLACK_PORTAL_REQUESTS_WEBHOOK_URL` / `SLACK_SALES_WEBHOOK_URL` (unset).
+  Locked by `tests/jest/portal-request-notify.test.js` (proxy tests live under tests/jest — testMatch).
+- 🔑 Local **MAGIC_LINK_SECRET is not in .env** (verify route 503s locally); mint the SESSION cookie
+  instead (`lib/customer-magic-link.mintSession`, SESSION_SECRET only).
+
 ## Open items / next
 - ✅ **LIVE v2026.09.01.6** (Heroku v1899, SHA 9f2ce98 verified; new routes answer 401 + `no-store`
   anonymously; `/portal` still 302s to login). Rows written; Aaberg's $97 posted and visible.
@@ -285,8 +310,8 @@ condition in the reverse route + a nightly caller.
 - 🔴 Not exercised live: the Reverse button (no over-granted order exists yet) and sync Step 4 (first run = 5:00 AM PT 2026-09-03 — read the Heroku Scheduler log line "Step 4: reopened older orders — N mismatch(es)"; a large N on day one means the archive had drifted, not that ShopWorks reopened N orders).
 - 🔴 Not exercised live: the redemption reconcile path (no order carries an RWD-REDEEM line yet) —
   unit-locked, same proxy entry route the console already uses.
-- ⏭️ First real customer through the new portal: watch the general-request rows (Style QUOTE /
-  NEWLOGO / LOGOCHG / ACCOUNT) land in the rep queue with a readable Product_Title.
+- ⏭️ First real customer through the new portal: watch the general-request rows land in the rep queue AND the rep's Slack DM arrive (now wired — see Quick actions section).
+- ⏭️ Erik: EmailJS template `EMAILJS_TEMPLATE_PORTAL_REQUEST` so sales@ gets a copy of every portal request.
 - The `Source` column of those rows says `reorder` (the proxy only knows reorder|recommendation).
   A proxy tweak could add `portal-request`; the Style column already distinguishes them.
 - `/api/portal/quotes` is email-scoped by design; a contact who quotes under a second address

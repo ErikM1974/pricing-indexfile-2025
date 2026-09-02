@@ -22,7 +22,7 @@ exposed**; restore it from `Downloads/repo-memory-backup-2026-07-28` (the 7/28 r
 | Table | What it actually holds |
 |---|---|
 | `ProductionLogDetails` | the real production log: `id_Order`, `id_Machine`, `id_Employee`, `date_Log`, `Qty`, `cn_Hours_Calculated`, `cur_LaborRate`, `cnCur_RevenuePerHour` |
-| `Machines` | `MachineName`, **`NumberOfHeads`**, **`StitchesPerMinute`**, `UnitsPerHour`, `cur_MachineRate` |
+| `Machines` | `MachineName`, **`NumberOfHeads`**, **`StitchesPerMinute`**, `UnitsPerHour`, `cur_MachineRate`. **Fleet (read 2026-09-02): #1 4-head · #4 6-head · #2/#3/#5/#6 8-head garment · #7/#8/#9 8-head cap · "Cap Back" 8-head — ALL 500 spm, `cur_MachineRate` $50 (caps $40); Kornit 1/2 = DTG 30 units/h $25.** Log volume by `id_Machine`: #3 1,897 · #2 1,264 · #5 796 · #6 678 rows (2024-26). |
 | `Orders` | `cn_StitchCount`, `cn_TotalProductQty_Act`, `cn_TotalProductQty_Imprints` |
 | `LinesOE` | 494 cols: `PartNumber`, `Size01..06_Act`, `cur_UnitCost`, `cnCur_UnitPriceCalculated`, `cur_UnitPriceUserEntered`, `cnCur_UnitPriceUsed` |
 | `PO` | `id_Order`, `cur_Subtotal`, `cur_Shipping`, `cnCur_PayablesDifference` |

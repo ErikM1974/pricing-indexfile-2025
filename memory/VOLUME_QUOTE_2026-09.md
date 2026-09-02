@@ -70,6 +70,19 @@ compute, cost/margin show n/a. Values from `COST_ALLOCATION_MODEL.md` (settled 2
 | `VOL-MIN-GM` | 45 | — | % gross-margin floor — page warns red below it |
 | `VOL-MIN-QTY` | 144 | — | pieces on one PO before a one-time price is considered |
 | `VOL-DENOM-FLOOR` | 0.60 | — | largest garment denominator allowed (40% garment margin) |
+| `VOL-SPM` | 500 | — | sewing speed (ShopWorks `Machines`: every head 500 spm; Erik 2026-09-02) |
+| `VOL-HEADS-WORST` | 4 | — | heads on the worst machine the job could land on (the 4-head #1) |
+| `VOL-HANDLING-MIN` | 1.0 | — | hoop/unhoop/trim/inspect minutes per piece |
+| `VOL-SLACK` | 50 | — | % added to sewing + handling + setup for breaks/rehoops/downtime |
+
+**Worst case (added 2026-09-02, Erik: "include slack time and worst production case scenarios")**:
+`minWorst = (stitches ÷ (SPM × heads) + handling) × (1 + slack)`; the page prices against
+`max(fitted, worst)` and the memo states both. Braun 4,800 st: worst 5.1 min/pc → 44 h → $2.87/pc
+vs typical 2.4 min/pc → $1.47/pc. Evidence from `ProductionLogDetails` 2024-01→2026-09 (3,688 logged
+orders, min/pc = Σhours×60 ÷ Σqty): **144+ pcs p50 3.50 · p75 4.67 · p90 5.99 · p95 6.65**; 72-143 p50
+4.20 / p90 7.12; 1-7 p50 11.7. So worst-case ≈ p90 of real large orders. 🔑 Logging RESUMED Aug 2026
+(118 rows) after the May gap. Pay 17 cross-check: production wages $21.48/h, loaded $23.42 (8 emb
+staff), $25.23 incl. digital print + art — $30.09 stays (adds factory expense, per clocked hour).
 
 Category `Volume Quote`, PricingMethod `FLAT`, PerUnit descriptive, `Visible` false,
 `IsActive` true. ✅ Rows created 2026-09-02 via `POST /api/service-codes` (Erik approved). Edit values in Caspio; the page reads them with `?type=VOLUME` on every load, no deploy.
