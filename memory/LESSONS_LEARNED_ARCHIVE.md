@@ -4,6 +4,75 @@ Resolved entries aged out of `LESSONS_LEARNED.md` (300-line cap). Newest first. 
 
 ---
 
+## Quote data plane locked down — 44 caller files, 2 repos, one gate flip left (2026-08-26)
+
+**Problem.** Step 2 of the 2026-08-17 review: the proxy's quote surface was anonymous.
+GET /api/quote_sessions with no filter dumped the ENTIRE customer book (no limiter, no
+auth — MEMORY's "rate limiter" claim was generous); quote_change_log and dtf/scp-push had
+NOTHING; push preview routes dumped full customer PII per quoteId; PUT quote_items let
+anyone rewrite prices on a live quote link.
+
+**Root Cause.** Browser call sites (~90 across 44 files) hit the proxy base directly, so
+the proxy could never require auth without breaking every page. The app ALSO exposed its
+own anonymous CRUD twin (/api/quote_sessions* etc.) that dropped query strings and sent
+no secret upstream.
+
+**Solution.** App `v2026.08.26.3` + proxy `v2026.08.26.2`, deployed app-first:
+app relays hardened (PUT/DELETE staff-only; POST anonymous behind quotePlaneWriteLimiter
+with staff skip; list reads staff-or-quoteID-scoped, query forwarded verbatim; NEW
+quote-sequence + 3×push relays), 19 live browser files migrated same-origin,
+withProxySecret() on every dyno→proxy quote call, e2e harnesses read the secret from env.
+Proxy: quotePlaneGate on all 8 prefixes, mode via QUOTE_PLANE_GATE config var
+(off→log→enforce, no deploy to flip). NOW IN LOG MODE — flip to enforce after the
+WOULD-BLOCK log goes quiet: `heroku config:set QUOTE_PLANE_GATE=enforce --app caspio-pricing-proxy`.
+
+**Prevention.**
+- 🔑 **A gate you can't flip without a deploy is a gate you'll ship scared.** Mode-switch
+  by config var: deploy dormant, watch in log mode, enforce when the log proves coverage.
+- 🔑 **Migrate by ENDPOINT grep, never by config swap** — 141 files hardcode the proxy
+  host, and 4 of the migrated files used their base for NON-quote endpoints too
+  (dtg top-sellers, quote-view thumbnails, /api/files uploads, sanmar-orders) — a blanket
+  base swap would have broken them. Audit EVERY use of a base const before flipping it.
+- 🔑 **The app's own passthrough routes silently dropped query strings** (GET
+  /api/quote_items forwarded bare for years — callers got ALL items). When hardening a
+  relay, forward `req.originalUrl`'s query verbatim; the upstream validates.
+- 🔴 **Postures are jest-locked in BOTH repos** (`tests/unit/quote-plane-postures.test.js`
+  app, `tests/jest/quote-plane-gate.test.js` proxy) — source-parsed mounts + behavioral
+  mode tests, so a refactor can't silently reopen the plane or unmount the gate.
+- 🔑 Shared-checkout deploys: THREE concurrent-session collisions in one day (trust band
+  committed onto main mid-deploy; sanmar css bumped into my release; proxy inbound commit
+  riding my proxy release). `git add -u` is never safe here — stage explicit file lists,
+  read `main..develop` before every merge.
+
+---
+
+## Top Sellers "flickers blank, refresh fixes it" — a cold query the cache was hiding (2026-08-26)
+
+**Problem:** Erik: clicking the header's Top Sellers link, products "try to load", images flicker
+blank, and only a refresh loads them properly.
+**Root cause (three stacked):** (1) the topSellers listing query took 10-18s COLD on the proxy —
+`IsTopSeller=1` alone forces Caspio to scan the 181k-row table, and phase-2 hydration pulled ~10k
+variant rows (top sellers are the MOST-varianted styles) as 10 SEQUENTIAL 1,000-row pages. The
+5-min response cache made the NEXT load instant, so a refresh "fixed" it — the classic
+cold-query-behind-a-cache signature. (2) Only the first 5 of 48 card images were
+`loading=eager`; a desktop first screen shows ~12-20, so most visible images lazy-popped late.
+(3) All 48 sample-eligibility checks (~2 proxy calls each) fired the instant the grid rendered,
+competing with the page's own images, and the "Checking availability" → button swap had no
+reserved height.
+**Solution:** proxy `7424e77` — style index carries IsTopSeller so the WHERE narrows to
+`STYLE IN (...)` (Rule 4 intact: every row still verified live; membership lags a flip ≤30 min),
+and phase-2 hydration partitions styles into 12-style chunks fetched in PARALLEL (identical rows,
+same Caspio call count, ~1/4 wall clock). Measured: 18s → 6.3s cold, 0.01s warm. App: eager
+first 12 images + `decoding=async`, sample slots decorate via IntersectionObserver (600px
+lookahead, 8s catch-all sweep), placeholder holds the button's 38px.
+**Prevention:** 🔑 "Works after refresh" = a cold path behind a response cache — time the
+UNCACHED query before blaming the frontend. 🔑 A `limit=48` page can hydrate 10k+ rows when its
+styles are variant-heavy; disjoint STYLE IN partitions parallelize for free (quota-neutral).
+🔑 `?isTopSeller=1` is silently IGNORED by the route (`=== 'true'`) — a wrong-param probe times
+the WRONG query and returns the whole catalog; validate the response set before trusting a timing.
+
+---
+
 ## A release that reached GitHub but never reached Heroku, and nothing noticed for 9 hours (2026-08-18)
 
 **Problem.** `develop`, `main`, `origin/develop` and `origin/main` were all clean and identical at

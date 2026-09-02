@@ -65,48 +65,7 @@ rendered in the browser must not go through `new Date('YYYY-MM-DD')`. Push text 
 ### SAM quotes rendered “No items” (2026-08-19, ARCHIVED 2026-08-27): a channel that opts out of a shared fix re-inherits the bug it fixed; SW-snapshot overlay repaints EXISTING rows only. Full entry in archive.
 
 ### Staff dashboard full review — 5 UTC/Pacific bugs on ONE page + the error renderer silently no-oping (2026-08-26, ARCHIVED 2026-09-01): calendar-day math never via toISOString()/new Date("YYYY-MM-DD")+local getters; register the ERROR_AREAS entry in the same commit as showApiError(); clone a deduped fetch Response per caller; derive quote prefixes from config, never a hand list. Full entry in archive.
-## Quote data plane locked down — 44 caller files, 2 repos, one gate flip left (2026-08-26)
-
-**Problem.** Step 2 of the 2026-08-17 review: the proxy's quote surface was anonymous.
-GET /api/quote_sessions with no filter dumped the ENTIRE customer book (no limiter, no
-auth — MEMORY's "rate limiter" claim was generous); quote_change_log and dtf/scp-push had
-NOTHING; push preview routes dumped full customer PII per quoteId; PUT quote_items let
-anyone rewrite prices on a live quote link.
-
-**Root Cause.** Browser call sites (~90 across 44 files) hit the proxy base directly, so
-the proxy could never require auth without breaking every page. The app ALSO exposed its
-own anonymous CRUD twin (/api/quote_sessions* etc.) that dropped query strings and sent
-no secret upstream.
-
-**Solution.** App `v2026.08.26.3` + proxy `v2026.08.26.2`, deployed app-first:
-app relays hardened (PUT/DELETE staff-only; POST anonymous behind quotePlaneWriteLimiter
-with staff skip; list reads staff-or-quoteID-scoped, query forwarded verbatim; NEW
-quote-sequence + 3×push relays), 19 live browser files migrated same-origin,
-withProxySecret() on every dyno→proxy quote call, e2e harnesses read the secret from env.
-Proxy: quotePlaneGate on all 8 prefixes, mode via QUOTE_PLANE_GATE config var
-(off→log→enforce, no deploy to flip). NOW IN LOG MODE — flip to enforce after the
-WOULD-BLOCK log goes quiet: `heroku config:set QUOTE_PLANE_GATE=enforce --app caspio-pricing-proxy`.
-
-**Prevention.**
-- 🔑 **A gate you can't flip without a deploy is a gate you'll ship scared.** Mode-switch
-  by config var: deploy dormant, watch in log mode, enforce when the log proves coverage.
-- 🔑 **Migrate by ENDPOINT grep, never by config swap** — 141 files hardcode the proxy
-  host, and 4 of the migrated files used their base for NON-quote endpoints too
-  (dtg top-sellers, quote-view thumbnails, /api/files uploads, sanmar-orders) — a blanket
-  base swap would have broken them. Audit EVERY use of a base const before flipping it.
-- 🔑 **The app's own passthrough routes silently dropped query strings** (GET
-  /api/quote_items forwarded bare for years — callers got ALL items). When hardening a
-  relay, forward `req.originalUrl`'s query verbatim; the upstream validates.
-- 🔴 **Postures are jest-locked in BOTH repos** (`tests/unit/quote-plane-postures.test.js`
-  app, `tests/jest/quote-plane-gate.test.js` proxy) — source-parsed mounts + behavioral
-  mode tests, so a refactor can't silently reopen the plane or unmount the gate.
-- 🔑 Shared-checkout deploys: THREE concurrent-session collisions in one day (trust band
-  committed onto main mid-deploy; sanmar css bumped into my release; proxy inbound commit
-  riding my proxy release). `git add -u` is never safe here — stage explicit file lists,
-  read `main..develop` before every merge.
-
----
-
+### Quote data plane locked down — 44 caller files, 2 repos (2026-08-26, ARCHIVED 2026-09-02): a gate you cannot flip without a deploy ships scared — mode-switch by config var (off→log→enforce); migrate by ENDPOINT grep never a base swap; a relay must forward the query string verbatim; postures jest-locked in both repos; stage explicit file lists, never `git add -u`, on a shared checkout. Full entry in archive.
 ## Staff-dashboard hardening: PII roster, proxy-direct reads, third-party auth embed (2026-08-26)
 
 **Problem.** Three structural exposures on the staff dashboard, found by the same review that
@@ -193,32 +152,7 @@ staged diff INSPECTED (`git diff --cached` shows the require removal), boot-prob
 - 🔑 The rollback playbook worked exactly as written: slug rollback in seconds, fix landed
   forward through the normal gated path — no hand-pushes, no `--no-verify`.
 
-## Top Sellers "flickers blank, refresh fixes it" — a cold query the cache was hiding (2026-08-26)
-
-**Problem:** Erik: clicking the header's Top Sellers link, products "try to load", images flicker
-blank, and only a refresh loads them properly.
-**Root cause (three stacked):** (1) the topSellers listing query took 10-18s COLD on the proxy —
-`IsTopSeller=1` alone forces Caspio to scan the 181k-row table, and phase-2 hydration pulled ~10k
-variant rows (top sellers are the MOST-varianted styles) as 10 SEQUENTIAL 1,000-row pages. The
-5-min response cache made the NEXT load instant, so a refresh "fixed" it — the classic
-cold-query-behind-a-cache signature. (2) Only the first 5 of 48 card images were
-`loading=eager`; a desktop first screen shows ~12-20, so most visible images lazy-popped late.
-(3) All 48 sample-eligibility checks (~2 proxy calls each) fired the instant the grid rendered,
-competing with the page's own images, and the "Checking availability" → button swap had no
-reserved height.
-**Solution:** proxy `7424e77` — style index carries IsTopSeller so the WHERE narrows to
-`STYLE IN (...)` (Rule 4 intact: every row still verified live; membership lags a flip ≤30 min),
-and phase-2 hydration partitions styles into 12-style chunks fetched in PARALLEL (identical rows,
-same Caspio call count, ~1/4 wall clock). Measured: 18s → 6.3s cold, 0.01s warm. App: eager
-first 12 images + `decoding=async`, sample slots decorate via IntersectionObserver (600px
-lookahead, 8s catch-all sweep), placeholder holds the button's 38px.
-**Prevention:** 🔑 "Works after refresh" = a cold path behind a response cache — time the
-UNCACHED query before blaming the frontend. 🔑 A `limit=48` page can hydrate 10k+ rows when its
-styles are variant-heavy; disjoint STYLE IN partitions parallelize for free (quota-neutral).
-🔑 `?isTopSeller=1` is silently IGNORED by the route (`=== 'true'`) — a wrong-param probe times
-the WRONG query and returns the whole catalog; validate the response set before trusting a timing.
-
-
+### Top Sellers "flickers blank, refresh fixes it" (2026-08-26, ARCHIVED 2026-09-02): "works after refresh" = a cold query behind a response cache — time the UNCACHED path first; variant-heavy `limit=48` pages hydrate 10k rows, so partition STYLE IN chunks in parallel; `?isTopSeller=1` is silently ignored (route wants `true`) — validate the result set before trusting a timing. Full entry in archive.
 ## Customer portal redesign + reward-dollar accrual — the self-service portal, and money that must never be computed silently (2026-09-01)
 
 **Problem.** The portal was four tabs on one scroll: logos/invoices/orders existed but a customer
@@ -295,3 +229,18 @@ the admin console one grant per order keyed by Order_Ref. Detail → `memory/CUS
 - 🔴 **Never put a multi-line text with backticks inside a double-quoted `node -e "…"` in bash** —
   every `` `word` `` runs as a command and vanishes from the text (this entry was written twice).
   Write the script to a file, or use a single-quoted heredoc.
+
+## Volume Quote page: re-rendering a list wiped what the user was typing in another row (2026-09-02)
+
+**Problem.** Building `/dashboards/volume-quote.html`: entering three styles in a row only ever
+produced ONE loaded garment line.
+**Root cause.** `renderLines()` rebuilt every row's `innerHTML` whenever ANY row changed state
+(loading → loaded → stock checked). The rows whose inputs the user was still typing in were
+replaced by fresh elements, so their values and pending events went to detached nodes.
+**Solution.** Rows are created once and updated in place: find the row by `data-id`, refresh only
+the three info cells, remove rows no longer in state. Inputs are never re-created.
+**Prevention.** 🔑 In a list where the user types while async loads land, never rebuild the whole
+list from state — patch the cells that changed. 🔑 The first-render bug beside it (`addLine()`
+without a render) was invisible because the add BUTTON rendered; test the initial state, not only
+the interaction. 🔑 Cost-model constants for a staff page live in Caspio (`Service_Codes`
+`VOL-*`), never in the page's `.js` — `/dashboards` gates `.html` only, the `.js` is public.
