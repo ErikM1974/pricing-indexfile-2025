@@ -287,3 +287,19 @@ the admin console one grant per order keyed by Order_Ref. Detail → `memory/CUS
 - 🔑 **Locally, a staff session is a cookie-session cookie signed by keygrip over `name=value`**
   and a customer session is `lib/customer-magic-link.mintSession()` — both mintable from .env
   secrets, so gated routes and the preview console can be exercised without SAML.
+- 🔴 **The proxy's ManageOrders limiter is ONE 30-requests/minute bucket per IP — the whole
+  dyno shares it.** `Promise.all` over 25 line-item calls trips it and `portalFetchJson` returns
+  null, which downstream reads as "no lines" (a 630-order web-store account lost every line).
+  Pace ManageOrders fan-outs (~2.2 s apart), cache immutable results (invoiced+paid line items),
+  bound each request under Heroku's 30 s H12 and return `partial` + progress. ⚠️ `buildMyProducts`
+  still fans out 25 in parallel — same latent bug.
+- 🔑 **Scope a money program to the orders it is FOR.** GOLD accounts looked like 600 orders/yr
+  until ORDER_ODBC showed 95% were Inksoft web-store purchases by employees. Excluding them made the
+  accrual tractable AND correct; a config row (`RWD-WEBSTORE`) can bring them back deliberately.
+- 🔑 **Caspio `Service_Codes.Notes` is Text-255** — a longer note 400s as "doesn't match the data
+  type", which reads like a schema error, not a length error.
+- 🔴 **Per-customer money JSON needs `Cache-Control: no-store`.** Express's default weak ETag let
+  Chrome answer a fresh portal load from its own copy and show a customer their PRE-grant $0
+  balance minutes after $97 had posted — the API returned 97 to curl the whole time. Any route
+  whose body changes because of a write elsewhere (balances, ledgers, statuses) sets no-store;
+  now done for every `/api/portal*` route in one middleware.

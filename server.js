@@ -7035,6 +7035,12 @@ app.get('/api/order-status/:quoteId', orderStatusLimiter, async (req, res) => {
 const PORTAL_PROXY = TDT_PROXY; // same caspio-pricing-proxy base
 const PORTAL_DATE_CUTOFF = '2026-01-01T00:00:00'; // pre-2026 lacked consistent images
 
+// Per-customer money/PII JSON must never be served from a browser or shared cache. Express's
+// default weak ETag let Chrome answer a portal load from its own copy (304) and show a customer
+// their PRE-grant $0 balance after the grant had posted (2026-09-01). no-store on every portal
+// route: the customer ones AND the staff preview/admin mirrors.
+app.use(['/api/portal', '/api/portal-admin'], (req, res, next) => { res.set('Cache-Control', 'no-store'); next(); });
+
 const portalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 120, // 2026-09-01: portal home = 7 reads/load + per-order drawer reads; 60 tripped inside ~8 page views

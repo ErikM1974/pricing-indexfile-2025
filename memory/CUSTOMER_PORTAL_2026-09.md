@@ -100,6 +100,36 @@ write staff-initiated; a cron would need a per-customer serialisation lock (the 
 TOCTOU note) and a quota review (one accrual ≈ 1 MO orders call + N line-item calls + 1 Caspio
 call per distinct style, memoised 30 min). Add it only after a few manual months prove the bands.
 
+## THE RATES — sized from a live audit, written to Caspio 2026-09-01 (Erik: "go for it")
+
+Audit = every paid, invoiced, rep-handled garment line in the last 12 months for the 25 GOLD +
+17 SILVER portal accounts (web-store orders excluded; 37 had eligible orders): **$428,721 garment
+revenue · 14,404 pcs · blank cost $183,456 · gross 57% before decoration (~42% after ~$4.50/pc)**.
+Gross margin PERCENT falls with cost (tees 68% → $60+ 40%) but gross DOLLARS per piece climb
+$13.57 → $55.18 for the same decoration time — that is the case for rates that rise with cost.
+
+| SanMar piece cost | share of rev | GM% | gross/pc | **rate** | reward as % of gross |
+|---|---|---|---|---|---|
+| $0–9.99 | 42% | 68% | $13.57 | **1%** | 1.5% |
+| $10–19.99 | 24% | 55% | $17.34 | **2%** | 3.6% |
+| $20–39.99 | 14% | 48% | $23.8 | **3%** | 6.2% |
+| $40+ | 19% | 42% | $45 | **5%** | 12% |
+
+**Program cost = 2.31% of garment revenue = 4.0% of gross = 5.5% of net contribution ≈ $267 per
+account per year (~$9.9k/yr across the 37).** Break-even: a redeemed dollar rides on a next order
+at ~42% net, so the program pays if it lifts spend by ~5.5%. Alternatives modelled: flat 2% =
+2.0%/rev; Erik's 2-band 1/3 = 1.38%; lean 1/1.5/2/3 = 1.65%; rich 2/3/4/6 = 3.31%.
+**Q4 2026 boost ×1.5 (orders invoiced 2026-10-01..12-31)** → rates 1.5/3/4.5/7.5 in Q4, adds
+~$1.5k if Q4 is ~30% of the year. Rows: `RWD-EARN` ×4, `RWD-BOOST`, `RWD-REDEEM` (TierLabel
+`RWD-REDEEM` — add the gift-certificate part code there to reuse it). Window default 12.
+🔑 The app caches the program 5 min (`_rewardProgramCache`) — a row edit shows within 5 min.
+🔑 Service_Codes `Notes` is Text-255: longer notes 400 with "doesn't match the data type".
+**First real grants posted 2026-09-01: Aaberg's Rentals #1276, $97.00 (orders 140567 $5 + 140568 $92).**
+
+**Q4 launch plan:** staff post the 12-month catch-up for each GOLD/SILVER account from the console
+(Calculate → Post; ~$9.9k of credit across 37 accounts) so every good customer enters Q4 with a
+balance; reps mention it on every touch; redemptions go on the order as the `RWD-REDEEM` line.
+
 ## Open items / next
 - ⏭️ Erik: add the `RWD-EARN` rows in Service_Codes (and decide the rates) — the mechanism is live
   the moment they exist. Then post the first grants from the console and check the customer sees
