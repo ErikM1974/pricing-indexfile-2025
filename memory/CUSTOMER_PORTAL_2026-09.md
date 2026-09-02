@@ -208,8 +208,11 @@ no PK_ID column, 0 duplicate id_Order+SortOrder keys.**
 3. Erik: add the six columns → EMPTY the table → import the enriched CSV as **Add** (outside the
    5:00 AM PT sync and label-station hours; readers see an empty table for a few minutes) → set
    `Line_Key` UNIQUE.
-4. Then `heroku config:set LINEITEMS_EXTENDED=1 -a caspio-pricing-proxy`. Next daily run carries
-   the columns; the reward engine already prefers `SanMar_PieceCost` when present.
+4. ✅ DONE 2026-09-02 05:24 PT — Erik added the six columns (screenshot-verified) and
+   `LINEITEMS_EXTENDED=1` is set on caspio-pricing-proxy (via the Platform API with the deploy token;
+   the CLI session had expired). Next daily run (5:00 AM PT) carries the columns; the reward engine
+   already prefers `SanMar_PieceCost` when present. `Line_Key` UNIQUE = flip AFTER the re-import
+   (existing rows have blank keys until then).
 Other readers of the table (sanmar-orders label index, industry-lookalikes, check-zero-billing) use the
 original columns only — unaffected. The sync's delete-then-insert per order never collides with the key.
 

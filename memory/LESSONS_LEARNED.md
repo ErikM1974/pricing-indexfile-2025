@@ -298,6 +298,12 @@ the admin console one grant per order keyed by Order_Ref. Detail → `memory/CUS
   accrual tractable AND correct; a config row (`RWD-WEBSTORE`) can bring them back deliberately.
 - 🔑 **Caspio `Service_Codes.Notes` is Text-255** — a longer note 400s as "doesn't match the data
   type", which reads like a schema error, not a length error.
+- 🔑 **The Heroku CLI session can expire mid-session while git pushes keep working** (git uses the
+  long-lived deploy token, the CLI uses its own ~14-day token). Symptoms: `heroku releases --json`
+  returns EMPTY (my poll loop parsed nothing 40 times) and `config:set` asks for a browser login with
+  `setRawMode is not a function`. Verify a release with the app's `/api/version` (or the proxy's
+  `/api/health` + a live probe of the new route), and set config vars through the Platform API:
+  `curl -X PATCH https://api.heroku.com/apps/<app>/config-vars -H "Authorization: Bearer $(cat ~/.heroku-deploy-token)" -H "Accept: application/vnd.heroku+json; version=3" -d '{"VAR":"1"}'`.
 - 🔑 **Before building a new mirror table, ask what already syncs.** I built an `ORDER_LINES` route +
   CSV export before Erik pointed at `ManageOrders_LineItems` — the daily `sync-manageorders` archive
   the rep bonuses already read. Same data, zero new plumbing. `grep -rn <TableName> ../caspio-pricing-proxy/scripts`
