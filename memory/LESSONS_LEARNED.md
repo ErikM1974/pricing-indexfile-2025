@@ -59,41 +59,7 @@ data — check the session's JSON blob columns before touching the push. Any dat
 ShopWorks/Caspio must be the PACIFIC day (`nowPacificNaiveIso()`), and any bare date STRING
 rendered in the browser must not go through `new Date('YYYY-MM-DD')`. Push text stays cp1252.
 
-## An audit that reported a clean manifest as 26 missing POs — three ways to confuse "not there" with "never looked" (2026-08-26)
-
-**Problem.** `scripts/psst-audit.js` reconciles SanMar's daily freight manifest against our
-inbound board. Run against the 2026-08-26 manifest (26 POs / 505 pcs / 32 cartons) it reported
-EVERY PO as `NOT FOUND`. The manifest was perfect — verified afterwards, ISSUES: 0.
-
-**Root cause — three independent defects, each alone producing the same false alarm.**
-1. **Refreshed the wrong dates.** `i < REFRESH_NEAR_DAYS` took the first three entries of the
-   date window, but the window starts BAND business days BEFORE the earliest arrival, so those
-   three are the OLDEST days. The arrival dates always sat past them and came from the 600 s
-   cache. It refreshed 08-21/24/25 and read 08-26 and 08-27 — the only two that mattered —
-   stale, labelling them `(cached)` in output nobody reads closely.
-2. **A stale mirror looked like missing freight.** The board is a once-a-day copy of SanMar
-   (~05:31 PT). The audit ran at 05:25 PT. Nothing in the output said the mirror predated the
-   manifest, so a sync-timing artifact presented as 26 lost cartons.
-3. **A failed fetch counted as a discrepancy.** Caspio rate-limits hardest right after the
-   morning sync; both arrival dates returned "rate limit exceeded" and the script still listed
-   26 POs as "not on the board" — while its own header comment had promised since the day it
-   was written that a failed date is "NEVER counted as nothing arriving."
-
-**Solution.** Refresh set = the arrival span `[lo, hi]` itself, capped by `REFRESH_MAX` (costs
-no extra calls — the padding band is for early/late arrivals synced days ago). Probe
-`/status-summary` for `lastSync` and compare `<=` the manifest ship date, NOT `<`: SanMar
-publishes a day's shipments AFTER our sync runs, which is why the manifest arrives by email the
-next morning, so a sync stamped the same day ran before those cartons existed. A failed date
-inside the arrival span marks the run INCONCLUSIVE and its POs UNKNOWN, never missing.
-
-**Prevention.** 🔴 **A check must distinguish "I looked and it isn't there" from "I never
-looked" — and must SAY WHICH.** Every one of these three failures collapsed those two states
-into one confident negative. Same shape as the 2026-08-20 window bug in the same script, and as
-the ghost-order near-miss where three numeric guards passed on unread data. When a verifier
-reports absence, make it state its own coverage: which dates it read, how fresh the source was,
-and what it could not fetch. Prose promises in a header comment are not enforcement — this
-file's own comment made exactly this promise and the code did the opposite for weeks.
-
+### An audit reported a clean manifest as 26 missing POs (2026-08-26, ARCHIVED 2026-09-02): a check must distinguish "I looked and it isn't there" from "I never looked" and SAY WHICH — refresh the arrival span itself, compare mirror lastSync <= manifest date, and a failed fetch marks the run INCONCLUSIVE, never missing. Full entry in archive.
 ### curl from git-bash mangled em dashes into U+FFFD (2026-08-25, ARCHIVED 2026-09-01): non-ASCII Caspio writes go through Python `ensure_ascii=True`, never a git-bash curl body; verify stored text with `ascii()` on a re-read. Full entry in archive.
 ### A customer's real size request was shown to nobody (2026-08-19, ARCHIVED 2026-08-27): render every field you persist — a saved-but-unshown field is data loss with extra steps. Full entry in archive.
 ### SAM quotes rendered “No items” (2026-08-19, ARCHIVED 2026-08-27): a channel that opts out of a shared fix re-inherits the bug it fixed; SW-snapshot overlay repaints EXISTING rows only. Full entry in archive.
@@ -298,6 +264,16 @@ the admin console one grant per order keyed by Order_Ref. Detail → `memory/CUS
   accrual tractable AND correct; a config row (`RWD-WEBSTORE`) can bring them back deliberately.
 - 🔑 **Caspio `Service_Codes.Notes` is Text-255** — a longer note 400s as "doesn't match the data
   type", which reads like a schema error, not a length error.
+- 🔑 **The Heroku CLI session can expire mid-session while git pushes keep working** (git uses the
+  long-lived deploy token, the CLI uses its own ~14-day token). Symptoms: `heroku releases --json`
+  returns EMPTY (my poll loop parsed nothing 40 times) and `config:set` asks for a browser login with
+  `setRawMode is not a function`. Verify a release with the app's `/api/version` (or the proxy's
+  `/api/health` + a live probe of the new route), and set config vars through the Platform API:
+  `curl -X PATCH https://api.heroku.com/apps/<app>/config-vars -H "Authorization: Bearer $(cat ~/.heroku-deploy-token)" -H "Accept: application/vnd.heroku+json; version=3" -d '{"VAR":"1"}'`.
+- 🔑 **Before building a new mirror table, ask what already syncs.** I built an `ORDER_LINES` route +
+  CSV export before Erik pointed at `ManageOrders_LineItems` — the daily `sync-manageorders` archive
+  the rep bonuses already read. Same data, zero new plumbing. `grep -rn <TableName> ../caspio-pricing-proxy/scripts`
+  (and ask) is a two-minute check that saved nothing here because it ran too late.
 - 🔴 **Per-customer money JSON needs `Cache-Control: no-store`.** Express's default weak ETag let
   Chrome answer a fresh portal load from its own copy and show a customer their PRE-grant $0
   balance minutes after $97 had posted — the API returned 97 to curl the whole time. Any route

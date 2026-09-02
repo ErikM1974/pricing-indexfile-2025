@@ -2933,3 +2933,39 @@ jsdom import of all 25 v3 modules, regex/date spot-checks.
   Derive prefixes from config/storefront-channels.js shapes, and test the digit-leading one.
 
 ---
+
+<!-- archived 2026-09-02 from LESSONS_LEARNED.md -->
+## An audit that reported a clean manifest as 26 missing POs — three ways to confuse "not there" with "never looked" (2026-08-26)
+
+**Problem.** `scripts/psst-audit.js` reconciles SanMar's daily freight manifest against our
+inbound board. Run against the 2026-08-26 manifest (26 POs / 505 pcs / 32 cartons) it reported
+EVERY PO as `NOT FOUND`. The manifest was perfect — verified afterwards, ISSUES: 0.
+
+**Root cause — three independent defects, each alone producing the same false alarm.**
+1. **Refreshed the wrong dates.** `i < REFRESH_NEAR_DAYS` took the first three entries of the
+   date window, but the window starts BAND business days BEFORE the earliest arrival, so those
+   three are the OLDEST days. The arrival dates always sat past them and came from the 600 s
+   cache. It refreshed 08-21/24/25 and read 08-26 and 08-27 — the only two that mattered —
+   stale, labelling them `(cached)` in output nobody reads closely.
+2. **A stale mirror looked like missing freight.** The board is a once-a-day copy of SanMar
+   (~05:31 PT). The audit ran at 05:25 PT. Nothing in the output said the mirror predated the
+   manifest, so a sync-timing artifact presented as 26 lost cartons.
+3. **A failed fetch counted as a discrepancy.** Caspio rate-limits hardest right after the
+   morning sync; both arrival dates returned "rate limit exceeded" and the script still listed
+   26 POs as "not on the board" — while its own header comment had promised since the day it
+   was written that a failed date is "NEVER counted as nothing arriving."
+
+**Solution.** Refresh set = the arrival span `[lo, hi]` itself, capped by `REFRESH_MAX` (costs
+no extra calls — the padding band is for early/late arrivals synced days ago). Probe
+`/status-summary` for `lastSync` and compare `<=` the manifest ship date, NOT `<`: SanMar
+publishes a day's shipments AFTER our sync runs, which is why the manifest arrives by email the
+next morning, so a sync stamped the same day ran before those cartons existed. A failed date
+inside the arrival span marks the run INCONCLUSIVE and its POs UNKNOWN, never missing.
+
+**Prevention.** 🔴 **A check must distinguish "I looked and it isn't there" from "I never
+looked" — and must SAY WHICH.** Every one of these three failures collapsed those two states
+into one confident negative. Same shape as the 2026-08-20 window bug in the same script, and as
+the ghost-order near-miss where three numeric guards passed on unread data. When a verifier
+reports absence, make it state its own coverage: which dates it read, how fresh the source was,
+and what it could not fetch. Prose promises in a header comment are not enforcement — this
+file's own comment made exactly this promise and the code did the opposite for weeks.

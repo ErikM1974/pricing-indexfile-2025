@@ -170,13 +170,51 @@ chunked `IN` clauses; env `ORDER_LINES_TABLE` overrides) + `GET /api/order-lines
 App engine: `portalMirroredLineItems(orderIds)` seeds the line cache from the archive (10-min memo per order)
 BEFORE the paced MO crawl; MO is hit only for orders the archive lacks (the newest, until the next daily
 sync); paid status stays LIVE from MO. Console shows "lines from Caspio mirror N, ManageOrders M".
-Unavailable archive/route = the old MO path, never a throw. ⏭️ After deploy: check `/coverage` for a few
-GOLD accounts over 2026-01-01..2026-08-31 — if `missingOrders` is non-empty (sync began mid-year?), the
+Unavailable archive/route = the old MO path, never a throw.
+✅ **LIVE 2026-09-02: proxy v2026.09.02.1 (`4937e66`), app v2026.09.02.2 (Heroku v1901, `7f928e2`).**
+Coverage measured live over 2026-01-01..08-31: 10181 19/20 orders with lines · 11392 7/11 · 13542
+16/20 · 4461 8/9 · 9886 25/27 · 7273 5/5 · 1276 2/2 — the archive spans Jan–Aug, but a few orders per
+account have NO lines (sync gaps, e.g. 139158, 140069, 140317); the engine crawls MO just for those.
+⏭️ Optional backfill of those gaps from `Order_Lines_2026.csv` (export still running at write time; lands
+in Downloads) via a `heroku run` script that POSTs only the missing orders' lines — the table has no
+unique key, so never bulk-import the whole CSV. Root-cause follow-up: why `sync-manageorders` leaves
+some orders without lines (line fetch failed + never retried?). Earlier plan text kept below for context:
+if `missingOrders` is non-empty (sync began mid-year?), the
 `Order_Lines_2026.csv` export (still produced by `scratchpad/export-order-lines-2026.js`) can backfill
 `ManageOrders_LineItems` via Caspio import (columns id_Order, PartNumber, PartDescription, PartColor,
 LineQuantity, LineUnitPrice, SortOrder, Size01..06 — drop the extras; no unique key on that table, so
 import ONLY the missing orders' rows to avoid duplicates). Optional later: add a `SanMar_PieceCost`
 column to the archive and have sync-manageorders fill it (the engine already prefers it when present).
+
+## ManageOrders_LineItems — extended columns + unique key (Erik's ask 2026-09-02, in flight)
+
+Erik's export of the table (`Downloads/ManageOrders_LineItems_2026-Sep-02_0509.csv`): **8,942 lines,
+2,455 orders, id_Order 139304→143041 (≈Feb 2026 onward — January 2026 is not in the archive at all),
+no PK_ID column, 0 duplicate id_Order+SortOrder keys.**
+
+**Six new columns** (add in Caspio table design BEFORE the import): `Line_Key` Text(40) ·
+`id_Customer` Integer · `id_OrderType` Integer · `Style` Text(50) · `Is_Garment` Yes/No ·
+`SanMar_PieceCost` Number. Skipped on purpose: date_Invoiced on lines (drifts), LineTotal/Line_Gross
+(Caspio formula fields if wanted).
+
+**Sequence (order matters):**
+1. Proxy `fd66d0a` (LIVE v2026.09.02.2): `sync-manageorders.js` writes the six columns on every new
+   line **only when Heroku config `LINEITEMS_EXTENDED=1`** (a POST naming a missing column is a 400),
+   and REPAIRS archived orders that have zero lines (≤25/run) — the cause of the per-account gaps.
+2. `scratchpad/enrich-lineitems.js` → `Downloads/ManageOrders_LineItems_ENRICHED.csv` = Erik's rows +
+   `Order_Lines_2026.csv` rows for orders the table lacks entirely (January + gaps) + the six columns
+   (customer/type from ORDER_ODBC by ID_Order, cost from the export or one product-details lookup per
+   style). Run AFTER the export finishes (it is ordered by invoice date; needs all of Jan–Aug).
+3. Erik: add the six columns → EMPTY the table → import the enriched CSV as **Add** (outside the
+   5:00 AM PT sync and label-station hours; readers see an empty table for a few minutes) → set
+   `Line_Key` UNIQUE.
+4. ✅ DONE 2026-09-02 05:24 PT — Erik added the six columns (screenshot-verified) and
+   `LINEITEMS_EXTENDED=1` is set on caspio-pricing-proxy (via the Platform API with the deploy token;
+   the CLI session had expired). Next daily run (5:00 AM PT) carries the columns; the reward engine
+   already prefers `SanMar_PieceCost` when present. `Line_Key` UNIQUE = flip AFTER the re-import
+   (existing rows have blank keys until then).
+Other readers of the table (sanmar-orders label index, industry-lookalikes, check-zero-billing) use the
+original columns only — unaffected. The sync's delete-then-insert per order never collides with the key.
 
 ## Open items / next
 - ✅ **LIVE v2026.09.01.6** (Heroku v1899, SHA 9f2ce98 verified; new routes answer 401 + `no-store`

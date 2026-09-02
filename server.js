@@ -8643,7 +8643,17 @@ async function computeRewardAccrual(cid) {
   const eligible = program.includeWebstore ? paidInWindow : paidInWindow.filter((o) => !isWebstore(o));
   // Mirror first so the paced MO crawl only touches orders the mirror lacks (see below).
   const mirroredEarly = await portalMirroredLineItems(eligible.map((o) => o.id_Order));
-  mirroredEarly.forEach((j, id) => { if (!_moLineCache.has(id)) _moLineCache.set(id, { t: Date.now(), result: j }); });
+  // Staleness guard (Erik 2026-09-02): an order REOPENED and repriced after the sync's 60-day window
+  // keeps its old lines in the archive forever. The live header is in hand, so refuse archived lines
+  // whose total disagrees with ManageOrders' cur_SubTotal and fetch that order fresh instead.
+  const subtotalByOrder = new Map(eligible.map((o) => [String(o.id_Order), Number(o.cur_SubTotal)]));
+  let staleMirror = 0;
+  mirroredEarly.forEach((j, id) => {
+    const live = subtotalByOrder.get(id);
+    const archived = rewardRound((j.result || []).reduce((s, li) => s + (Number(li.LineQuantity) || 0) * (Number(li.LineUnitPrice) || 0), 0));
+    if (Number.isFinite(live) && live > 0 && Math.abs(live - archived) > 0.5) { staleMirror++; _mirrorCache.delete(id); _moLineCache.delete(id); return; }
+    if (!_moLineCache.has(id)) _moLineCache.set(id, { t: Date.now(), result: j });
+  });
   const [lineJsons, ledgerJson] = await Promise.all([
     portalPacedLineItems(eligible.map((o) => o.id_Order), hdrs),
     portalFetchJson(`${CRM_API_BASE}/api/customer-rewards/ledger/${encodeURIComponent(cid)}`, hdrs, 8000),
@@ -8717,7 +8727,7 @@ async function computeRewardAccrual(cid) {
     partial: unavailable.length > 0,
     progress: { fetched: orders.length - unavailable.length, total: orders.length },
     excludedWebstore: { count: excludedWeb.length, revenue: rewardRound(excludedWeb.reduce((s, o) => s + (Number(o.cur_TotalInvoice) || 0), 0)) },
-    source: { mirrored: eligible.filter((o, i) => lineJsons[i] && lineJsons[i].mirrored).length, manageOrders: eligible.filter((o, i) => lineJsons[i] && !lineJsons[i].mirrored).length },
+    source: { mirrored: eligible.filter((o, i) => lineJsons[i] && lineJsons[i].mirrored).length, manageOrders: eligible.filter((o, i) => lineJsons[i] && !lineJsons[i].mirrored).length, staleMirror },
     generatedAt: new Date().toISOString(),
   };
 }

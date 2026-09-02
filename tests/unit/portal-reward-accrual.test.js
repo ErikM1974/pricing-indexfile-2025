@@ -179,10 +179,16 @@ describe('reward accrual — Caspio ManageOrders_LineItems mirror (Erik ruling 5
         expect(src).toMatch(/\/api\/order-lines\?orders=/);
     });
     test('mirror rows are seeded into the line cache BEFORE the paced ManageOrders crawl', () => {
-        const seed = src.indexOf('mirroredEarly.forEach((j, id) => { if (!_moLineCache.has(id)) _moLineCache.set(id');
+        const seed = src.indexOf('if (!_moLineCache.has(id)) _moLineCache.set(id, { t: Date.now(), result: j });');
         const crawl = src.indexOf('portalPacedLineItems(eligible.map((o) => o.id_Order), hdrs)');
         expect(seed).toBeGreaterThan(0);
         expect(crawl).toBeGreaterThan(seed);
+    });
+    test('archived lines whose total disagrees with the LIVE subtotal are refused (reopened + repriced orders)', () => {
+        // The archive only re-syncs orders placed in the last 60 days; an older order reopened and
+        // repriced keeps stale lines forever unless the engine checks them against ManageOrders.
+        expect(src).toMatch(/Math\.abs\(live - archived\) > 0\.5\) \{ staleMirror\+\+; _mirrorCache\.delete\(id\); _moLineCache\.delete\(id\); return; \}/);
+        expect(src).toMatch(/staleMirror \},/);
     });
     test('an unavailable mirror is an empty map, never a throw (MO fallback)', () => {
         const fn = liftFunction('portalMirroredLineItems', 'async function');
