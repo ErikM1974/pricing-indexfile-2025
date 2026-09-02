@@ -193,7 +193,7 @@ Erik's export of the table (`Downloads/ManageOrders_LineItems_2026-Sep-02_0509.c
 no PK_ID column, 0 duplicate id_Order+SortOrder keys.**
 
 **Six new columns** (add in Caspio table design BEFORE the import): `Line_Key` Text(40) ·
-`id_Customer` Integer · `id_OrderType` Integer · `Style` Text(50) · `Is_Garment` Yes/No ·
+`id_Customer` Integer · `id_OrderType` Integer · `Style` Text(255) · `Is_Garment` **INTEGER 1/0** (Erik built it as Integer, not Yes/No — the sync writes 1/0, proxy v2026.09.02.5; a boolean or "Yes" 400s) ·
 `SanMar_PieceCost` Number. Skipped on purpose: date_Invoiced on lines (drifts), LineTotal/Line_Gross
 (Caspio formula fields if wanted).
 
@@ -221,7 +221,7 @@ original columns only — unaffected. The sync's delete-then-insert per order ne
 `Line_Key` unique 11,882 / 0 duplicates / 0 empty · 9,087 garment lines, 8,955 with `SanMar_PieceCost`
 (419 styles looked up) · 55 rows with no ORDER_ODBC header (id_Customer/id_OrderType blank — the sync
 fills them when those orders are next touched). `Is_Garment` is 1/0 in the CSV (Caspio import maps it);
-the sync writes it as a boolean (proxy v2026.09.02.4 — a 'Yes' string can 400 the line POST).
+the column is INTEGER, so the sync writes 1/0 (proxy v2026.09.02.5). ✅ Erik imported it and flipped `Line_Key` Unique 2026-09-02 ~08:30.
 
 ## Re-invoiced orders (Erik's rulings 2026-09-02, LIVE app v2026.09.02.3/.4 · proxy v2026.09.02.3)
 
