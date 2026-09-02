@@ -186,6 +186,33 @@ LineQuantity, LineUnitPrice, SortOrder, Size01..06 — drop the extras; no uniqu
 import ONLY the missing orders' rows to avoid duplicates). Optional later: add a `SanMar_PieceCost`
 column to the archive and have sync-manageorders fill it (the engine already prefers it when present).
 
+## ManageOrders_LineItems — extended columns + unique key (Erik's ask 2026-09-02, in flight)
+
+Erik's export of the table (`Downloads/ManageOrders_LineItems_2026-Sep-02_0509.csv`): **8,942 lines,
+2,455 orders, id_Order 139304→143041 (≈Feb 2026 onward — January 2026 is not in the archive at all),
+no PK_ID column, 0 duplicate id_Order+SortOrder keys.**
+
+**Six new columns** (add in Caspio table design BEFORE the import): `Line_Key` Text(40) ·
+`id_Customer` Integer · `id_OrderType` Integer · `Style` Text(50) · `Is_Garment` Yes/No ·
+`SanMar_PieceCost` Number. Skipped on purpose: date_Invoiced on lines (drifts), LineTotal/Line_Gross
+(Caspio formula fields if wanted).
+
+**Sequence (order matters):**
+1. Proxy `fd66d0a` (LIVE v2026.09.02.2): `sync-manageorders.js` writes the six columns on every new
+   line **only when Heroku config `LINEITEMS_EXTENDED=1`** (a POST naming a missing column is a 400),
+   and REPAIRS archived orders that have zero lines (≤25/run) — the cause of the per-account gaps.
+2. `scratchpad/enrich-lineitems.js` → `Downloads/ManageOrders_LineItems_ENRICHED.csv` = Erik's rows +
+   `Order_Lines_2026.csv` rows for orders the table lacks entirely (January + gaps) + the six columns
+   (customer/type from ORDER_ODBC by ID_Order, cost from the export or one product-details lookup per
+   style). Run AFTER the export finishes (it is ordered by invoice date; needs all of Jan–Aug).
+3. Erik: add the six columns → EMPTY the table → import the enriched CSV as **Add** (outside the
+   5:00 AM PT sync and label-station hours; readers see an empty table for a few minutes) → set
+   `Line_Key` UNIQUE.
+4. Then `heroku config:set LINEITEMS_EXTENDED=1 -a caspio-pricing-proxy`. Next daily run carries
+   the columns; the reward engine already prefers `SanMar_PieceCost` when present.
+Other readers of the table (sanmar-orders label index, industry-lookalikes, check-zero-billing) use the
+original columns only — unaffected. The sync's delete-then-insert per order never collides with the key.
+
 ## Open items / next
 - ✅ **LIVE v2026.09.01.6** (Heroku v1899, SHA 9f2ce98 verified; new routes answer 401 + `no-store`
   anonymously; `/portal` still 302s to login). Rows written; Aaberg's $97 posted and visible.
