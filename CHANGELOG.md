@@ -1,3 +1,7 @@
+## v2026.09.03.7 (2026.09.03)
+
+- Deploy v2026.09.03.7: Shop Menu customer-copy revision — $90 minimum, one sample price, supplies at margin, trimmed items, puff as add-on note, customer/rep print buttons
+
 ## v2026.09.03.6 (2026.09.03)
 
 - Deploy v2026.09.03.6: staff dashboard — Service Prices button restyled as the Shop Menu card
