@@ -27,6 +27,7 @@ Last Updated: 2026-08-27 (/memory-maintain: MEMORY.md 18.5→~15 KB — stale st
 | [`PAYROLL_CASPIO_2026-07.md`](PAYROLL_CASPIO_2026-07.md) | Payroll/Caspio — leave upload, entitlement traps, slip generation |
 | [`SANMAR_INBOUND_2026-08.md`](SANMAR_INBOUND_2026-08.md) | SanMar PSST inbound board + print sheets — what shipped, the drop-ship coverage gap, ranked backlog |
 | [`SHOPWORKS_ODBC_INTEGRATION.md`](SHOPWORKS_ODBC_INTEGRATION.md) | ShopWorks ODBC + bandit sync cluster, thumbnails, ORDER_ODBC reconcile |
+| [`SHOP_HOURLY_RATE_2026-09.md`](SHOP_HOURLY_RATE_2026-09.md) | Garage-style shop rate: $67 production / $91 shop / $120 company per billable machine-hour, $150 posted; cards per hour; VOL-HOUR-RATE is per PAID hour |
 | [`VOLUME_QUOTE_2026-09.md`](VOLUME_QUOTE_2026-09.md) | Volume Quote admin tool — one-time price for 72+ orders, Braun NW numbers, Service_Codes VOL-* cost-model rows |
 | [`contract-embroidery-dst.md`](contract-embroidery-dst.md) | Contract embroidery .DST quoting |
 | [`deploy-cachebust.md`](deploy-cachebust.md) | Content-hashed assets + the ?v= cache-bust rules |

@@ -39,7 +39,8 @@ impossible to type ("26000" dies at "2").
 ## Business rules
 
 - **Rate card + fees changed 2026-09-02** (Erik, from `EMBROIDERY_STITCH_COST_2026-09.md`): garments
-  $1.25 / 1.10 / 1.00 / 0.90 / 0.85 per 1K, caps $1.10 / 1.00 / 0.90 / 0.80 / 0.75, **NO small-order fee**
+  $1.25 / 1.10 / **1.10 / 0.95** / 0.85 per 1K (24-47 and 48-71 raised a second time the same day to close
+  the mid-tier dip the Break-Even grid showed), caps $1.10 / 1.00 / **1.00 / 0.85** / 0.75 (mid tiers raised the same way), **NO small-order fee**
   (Embroidery_Costs.LTM = 0 on every CTR row; proxy `/contract-pricing` default fee is 0 since
   v2026.09.02.10), and a **$250 order minimum** = Service_Codes `CTR-MIN-ORDER`, applied once in
   `priceAllLines()` after `combineLines` (unit price becomes minimum ÷ qty; every surface reads the

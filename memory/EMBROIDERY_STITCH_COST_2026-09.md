@@ -55,8 +55,9 @@ carries it, order GM 49%. The "smaller logo" reason is worth $0.50–1.00/pc, no
   Break-even $/1K typical: 3.22 / 1.27 / 0.79 / 0.60 / 0.42 (garments); worst 4.23 / 1.82 / 1.20 / 0.97 / 0.77.
 - 🔴 **The $50 fee cannot make small contract orders profitable** — needs $118–150 (1-7) or
   $76–129 (8-23); 93 of 207 contract garment orders in 2025 were < 24 pcs. No garment margin to absorb it.
-- **APPLIED 2026-09-02 (final form)**: garments $1.25 / 1.10 / 1.00 / 0.90 / 0.85, caps $1.10 / 1.00 / 0.90 /
-  0.80 / 0.75, **no fee, single $250 order minimum** (Erik: fee + minimum = two rules + a cliff at 24).
+- **APPLIED 2026-09-02 (final form)**: garments $1.25 / 1.10 / **1.10 / 0.95** / 0.85 (mid tiers raised after the
+  Break-Even grid showed 24-47 as the least profitable tier: 8K 36 pcs +$93/order typical, worst −$20 → ≈ break-even), caps $1.10 / 1.00 / **1.00 /
+  0.85** / 0.75 (mid tiers raised too), **no fee, single $250 order minimum** (Erik: fee + minimum = two rules + a cliff at 24).
   $250 covers the worst case to ~18 pcs and the normal run to ~30; 4 pcs +$97, 12 pcs +$78, 24 pcs +$46.
   Earlier draft was fee $100 + $150 minimum. Typical per-order: 1-7 ≈ break-even, 8-23 +$34/+$28,
   24-47 +$59/+$31, 48-71 +$146/+$95, 72+ +$495/+$364. Worst case still negative at 24-71 @8K —
@@ -81,8 +82,8 @@ the $250 minimum ÷ qty). Thread = new `VOL-THREAD-PER-1K` 0.02. ⚠️ Garments
 SAME cost because there is one handling row (1.0 min) — the page warns until `VOL-HANDLING-MIN`
 is raised; a cap-specific handling row would need a new code + page change.
 
-## Recommended Caspio changes (NOT applied — Erik decides)
-- `VOL-HANDLING-MIN` 1.0 → **2.4** (raises Braun worst case $2.87 → $3.84/pc; matches p90).
+## Caspio changes
+- ✅ `VOL-HANDLING-MIN` 1.0 → **2.4** APPLIED 2026-09-02 (Erik). Braun worst case $2.87 → $3.84/pc; Break-Even page warning clears.
 - `VOL-SETUP-MIN` 77 → 90 (immaterial at volume). Keep `VOL-HOUR-RATE` 30.09 (Erik 2026-09-02).
 
 ## 2025 embroidery volume (Orders, invoiced 2025)
@@ -104,3 +105,30 @@ pcs / 254.6M st, $2.14 per 1K.
 - TimeClick `Hours Timeclick 2018.csv` double-counts salaried staff (Total rows + awarded rows
   → 4,144 h); use the July model's 19,936 production hours, don't re-sum naively.
 - Logging RESUMED Aug 2026 (118 rows) after the May 20 stop.
+
+## ⏭️ NEXT SESSION (Erik, 2026-09-02 end of day): compute the SHOP HOURLY RATE
+
+Erik: "calculate our hourly shop rate — like an auto repair garage or a lawyer — an hourly rate for
+factory work." Deliver a billable-hour rate for embroidery (and DTG) the way a garage sets a labor
+rate: fully-loaded cost per PRODUCTIVE hour + target margin, plus the equivalent at 45/50/55% GM.
+
+Inputs already in hand (no new exports needed):
+- GL: `Downloads/General Journal 2023 to Sept 2 2026.csv` (233,160 rows, reconciles to the dollar
+  with `Downloads/Tax-Finance/General Ledger since 2022.csv`; debit-positive, revenue negative).
+  2025 pools: production wages 5220 $338,723 · DP 5231 $85,460 · art 6150 $73,595 · utilities 5085
+  $48,313 · factory 5119 $46,073 · payroll tax 6472-6478 $105,784 · admin 6149 $275,769 · exec 6155
+  $234,000 · total opex excl. purchases/materials/freight $1,445,432 · revenue $2,904,650.
+- Hours: TimeClick `Downloads/Tax-Finance/Hours Timeclick 2018.csv` (⚠ salaried rows double-count —
+  use the July model's 19,936 production hours for 2025, 15,831 embroidery-only); logs say only
+  ~31% of paid embroidery hours are productive machine time (`EMBROIDERY_PRICING_REALIZATION.md`).
+- Machines: 9 embroidery machines (1×4H, 1×6H, 4×8H garment, 3×8H cap) @ 500 spm, 2 Kornits.
+- Pay 17 loaded wage: production $23.42/h, +DP $23.89, +art $25.23.
+
+Method to use (garage analogy): rate = (direct labor + burden + factory overhead [+ admin, + exec by
+choice]) ÷ BILLABLE hours (productive, not paid) → three rates: production-only, shop (adds admin),
+company (adds exec + selling). Then per machine-hour (÷ 9 heads-machines) and per head-hour, and
+show what the current cards imply per hour (72+ garment 8K: $6.80 ÷ 3.6 min = $113/h typical;
+contract-pricing route comment targets $128/h garments, $112/h caps). Compare to garage rates
+($120-180/h) and to the 2026 YTD pools (production annualizes $581K). Present as an artifact +
+memory file; do NOT change any Caspio rate without Erik.
+

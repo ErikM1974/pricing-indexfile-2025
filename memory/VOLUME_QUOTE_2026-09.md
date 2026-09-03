@@ -72,7 +72,7 @@ compute, cost/margin show n/a. Values from `COST_ALLOCATION_MODEL.md` (settled 2
 | `VOL-DENOM-FLOOR` | 0.60 | — | largest garment denominator allowed (40% garment margin) |
 | `VOL-SPM` | 500 | — | sewing speed (ShopWorks `Machines`: every head 500 spm; Erik 2026-09-02) |
 | `VOL-HEADS-WORST` | 4 | — | heads on the worst machine the job could land on (the 4-head #1) |
-| `VOL-HANDLING-MIN` | 1.0 | — | hoop/unhoop/trim/inspect minutes per piece |
+| `VOL-HANDLING-MIN` | **2.4** (was 1.0; Erik 2026-09-02) | — | hoop/unhoop/trim/inspect minutes per piece (log fit) |
 | `VOL-SLACK` | 50 | — | % added to sewing + handling + setup for breaks/rehoops/downtime |
 
 **Worst case (added 2026-09-02, Erik: "include slack time and worst production case scenarios")**:
