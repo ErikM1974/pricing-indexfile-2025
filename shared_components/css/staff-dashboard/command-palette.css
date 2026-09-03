@@ -199,3 +199,9 @@
     .hero-search,
     .cp-toast { transition: none; }
 }
+
+/* 2026-09-03: [hidden] must WIN. The rules above set display on .cp-panel /
+   .cp-backdrop, and an author display beats the UA [hidden] style, so the
+   closed panel still rendered its empty .cp-status strip as a bare 34px bar
+   under the search box on every load. */
+.cp-panel[hidden], .cp-backdrop[hidden] { display: none !important; }

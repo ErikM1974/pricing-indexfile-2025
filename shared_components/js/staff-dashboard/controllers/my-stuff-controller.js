@@ -80,10 +80,40 @@ function chipHtml(tool, pinned) {
         </span>`;
 }
 
+/* Stored chips carry the label as it was recorded. Before 2026-09-03 that was the
+   link's whole textContent — "Shop MenuEst. 1977 · every service price" — and a
+   pin is forever, so those labels would never heal on their own. On every render,
+   re-derive the label (and icon) from the live link with the same href when one is
+   on the page; a chip whose page is no longer linked keeps what it has. */
+function refreshFromDom(s) {
+    let changed = false;
+    const fix = (t) => {
+        const a = document.querySelector(`.ws-panel a.ws-link[href="${CSS.escape(t.href)}"]`);
+        if (!a) return t;
+        const fresh = toolFromLink(a);
+        if (!fresh || (fresh.label === t.label && fresh.icon === t.icon)) return t;
+        changed = true;
+        return { ...t, label: fresh.label, icon: fresh.icon };
+    };
+    // Recents are learned from clicks on THIS page, so one whose page is no longer
+    // linked anywhere here was retired or renamed — drop it rather than keep
+    // offering a dead tool (the retired Shop Services calculator sat in Erik's
+    // recents for a day). Pins are deliberate and are never dropped.
+    // Only on a page that actually has workspace panels — a harness or a page
+    // with no panels must not wipe recents it just recorded.
+    const hasPanels = !!document.querySelector('.ws-panel a.ws-link');
+    const onPage = (t) => !!document.querySelector(`.ws-panel a.ws-link[href="${CSS.escape(t.href)}"]`);
+    const recents = hasPanels ? s.recents.filter(onPage) : s.recents;
+    if (recents.length !== s.recents.length) changed = true;
+    const next = { pins: s.pins.map(fix), recents: recents.map(fix) };
+    if (changed) writeStore(next);
+    return next;
+}
+
 function render() {
     const list = document.getElementById('myStuffList');
     if (!list) return;
-    const { pins, recents } = readStore();
+    const { pins, recents } = refreshFromDom(readStore());
     const pinnedHrefs = new Set(pins.map((p) => p.href));
     const shownRecents = recents.filter((r) => !pinnedHrefs.has(r.href)).slice(0, RECENTS_SHOW);
 
