@@ -149,7 +149,7 @@ function isGatedHidden(el) {
 
 /**
  * Walk every non-Everything panel, collect its tools (deduped by href),
- * group by the owning card's data-cat, and render the list + filter.
+ * group by the link's own data-cat if set, else the owning card's, and render the list + filter.
  * Rebuilt whenever it is shown after the gated panels resolved, so an admin
  * sees the Admin links here and nobody else does.
  */
@@ -169,7 +169,7 @@ export function buildEverything({ force = false } = {}) {
         const label = toolLabel(a);
         if (!label) return;
         seen.add(href);
-        const cat = a.closest('.ws-card')?.dataset.cat
+        const cat = a.dataset.cat || a.closest('.ws-card')?.dataset.cat
             || a.closest('.ws-panel')?.querySelector('.ws-head h2')?.textContent?.trim()
             || 'Tools';
         if (!groups.has(cat)) groups.set(cat, []);
@@ -217,6 +217,18 @@ function applyFilter(raw) {
 
 /* ── init ───────────────────────────────────────────────────────────── */
 
+// The tab strip is position:sticky under the sticky .top-header (workspaces.css).
+// The header's height is not a constant — it wraps on narrow screens — so its
+// measured height is published as --ws-sticky-top and kept current on resize.
+function syncStickyTop() {
+    const header = document.querySelector('.top-header');
+    if (!header) return;
+    const apply = () => document.documentElement.style.setProperty('--ws-sticky-top', `${Math.round(header.getBoundingClientRect().height)}px`);
+    apply();
+    if (typeof ResizeObserver === 'function') new ResizeObserver(apply).observe(header);
+    else window.addEventListener('resize', apply);
+}
+
 function wireTabs() {
     state.tabs.forEach((tab, i) => {
         tab.addEventListener('click', () => showWorkspace(tab.dataset.ws));
@@ -263,6 +275,7 @@ export async function initWorkspaces({ permissionsPromise, authPromise } = {}) {
     if (!state.tabs.length || !state.panels.length) return null;
 
     wireTabs();
+    syncStickyTop();
 
     // 1. Paint immediately: hash, else what this browser last used, else the
     //    fallback. No flash of the wrong tab while identity is still loading.

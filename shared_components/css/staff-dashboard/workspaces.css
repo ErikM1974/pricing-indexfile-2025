@@ -98,6 +98,12 @@
     padding: 4px; margin: 0 0 14px;
     background: var(--bg-elev); border: 1px solid var(--line-soft); border-radius: var(--radius-lg);
     overflow-x: auto; scrollbar-width: none;
+    /* Sticky (Erik, 2026-09-03): pins just under the sticky .top-header while you
+       scroll. --ws-sticky-top is the header's measured height, set by
+       workspace-controller (it wraps taller on narrow screens). z-index sits
+       under the header's --z-sticky (100) and over the content. */
+    position: sticky; top: var(--ws-sticky-top, 66px); z-index: 90;
+    box-shadow: 0 10px 24px -14px rgba(0, 0, 0, 0.7);
 }
 .ws-tabs::-webkit-scrollbar { display: none; }
 .ws-tab {
@@ -234,6 +240,12 @@ details.ws-more > summary .ws-n { margin-left: auto; font-family: var(--font-mon
 .ws-flow .ws-tile { margin: 0; }
 .ws-flow__arr { color: var(--text-dim); }
 
+/* Most-used pair (2026-09-03): a full-width card whose two tiles sit side by side. */
+.ws-card--full { grid-column: 1 / -1; }
+.ws-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.ws-pair .ws-tile { margin: 0; }
+.ws-card-h .ws-note { font-size: 12px; color: var(--text-3); }
+
 /* ── Bespoke tiles: the tile looks like the page ───────────────────── */
 /* Shop Menu — paper, wine, Bodoni, Est. 1977 (mirrors service-price-cheat-sheet.css) */
 .ws-tile.bs-menu {
@@ -332,6 +344,7 @@ details.ws-more > summary .ws-n { margin-left: auto; font-family: var(--font-mon
     .ws-tab__cue { display: none; }
     .ws-tab--admin { margin-left: 0; }
     .ws-flow { grid-template-columns: 1fr; }
+    .ws-pair { grid-template-columns: 1fr; }
     .ws-flow__arr { display: none; }
     .ws-legend { display: none; }
 }
