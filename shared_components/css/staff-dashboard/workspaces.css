@@ -90,22 +90,31 @@
 .pw-strip .pw-track { gap: 8px; }
 
 /* ── Tab strip ─────────────────────────────────────────────────────── */
+/* 2026-09-03 (Erik: "should look like tabs, not static text"): a segmented
+   control — a recessed strip holding pill buttons; the active one is filled
+   green-tinted with a green top edge, the rest lift on hover. */
 .ws-tabs {
-    display: flex; align-items: flex-end; gap: 2px;
-    border-bottom: 1px solid var(--line-soft);
-    margin: 0 0 14px; overflow-x: auto; scrollbar-width: none;
+    display: flex; align-items: center; gap: 4px;
+    padding: 4px; margin: 0 0 14px;
+    background: var(--bg-elev); border: 1px solid var(--line-soft); border-radius: var(--radius-lg);
+    overflow-x: auto; scrollbar-width: none;
 }
 .ws-tabs::-webkit-scrollbar { display: none; }
 .ws-tab {
     position: relative; display: inline-flex; align-items: center; gap: 8px;
-    height: 42px; padding: 0 14px; margin-bottom: -1px;
-    background: none; border: 0; border-bottom: 2px solid transparent;
-    color: var(--text-3); font: inherit; font-weight: 500; font-size: 14px;
+    height: 36px; padding: 0 16px;
+    background: transparent; border: 1px solid transparent; border-radius: var(--radius-md);
+    color: var(--text-2); font: inherit; font-weight: 500; font-size: 14px;
     white-space: nowrap; cursor: pointer;
+    transition: background var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out);
 }
-.ws-tab:hover { color: var(--text); }
-.ws-tab[aria-selected="true"] { color: var(--text); border-bottom-color: var(--accent); }
-.ws-tab:focus-visible { outline: none; box-shadow: var(--focus-ring); border-radius: var(--radius-sm); }
+.ws-tab:hover { background: var(--bg-card-2); color: var(--text); }
+.ws-tab[aria-selected="true"] {
+    background: var(--accent-bg); border-color: color-mix(in oklch, var(--accent) 45%, transparent);
+    color: var(--text); font-weight: 600;
+    box-shadow: 0 -2px 0 0 var(--accent) inset;
+}
+.ws-tab:focus-visible { outline: none; box-shadow: var(--focus-ring); }
 .ws-tab__you { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); display: none; }
 .ws-tab.is-you .ws-tab__you { display: inline-block; }
 /* Everything — the safety net gets a cue so nobody hunts through tabs. */
@@ -117,11 +126,11 @@
     background: var(--accent-bg); color: var(--accent-2); border: 1px solid color-mix(in oklch, var(--accent) 35%, transparent);
 }
 .ws-tab--everything[aria-selected="true"] .ws-tab__cue { background: var(--accent); color: #06210f; border-color: var(--accent); }
-.ws-tab--admin { margin-left: auto; color: var(--text-dim); }
+.ws-tab--admin { margin-left: auto; color: var(--text-3); }
 .ws-tab--admin[aria-selected="true"] { color: var(--text); }
 .ws-tab--admin::before { content: ""; width: 1px; height: 18px; background: var(--line); margin-right: 10px; }
 .ws-tab--admin[hidden] { display: none; }
-.ws-tabs__hint { padding: 0 6px 12px 12px; font-size: 12px; color: var(--text-dim); white-space: nowrap; }
+.ws-tabs__hint { padding: 0 10px; font-size: 12px; color: var(--text-dim); white-space: nowrap; }
 .ws-tabs__hint kbd {
     font-family: var(--font-mono); font-size: 11px; padding: 1px 5px;
     border: 1px solid var(--line); border-radius: 4px; color: var(--text-3);
@@ -328,6 +337,7 @@ details.ws-more > summary .ws-n { margin-left: auto; font-family: var(--font-mon
 }
 @media (prefers-reduced-motion: reduce) {
     details.ws-more > summary i.fa-chevron-right { transition: none; }
+    .ws-tab { transition: none; }
 }
 
 /* The Staff Directory row is a <button> (opens the modal) — same look as the links. */
