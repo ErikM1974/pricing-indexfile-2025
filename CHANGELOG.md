@@ -1,3 +1,7 @@
+## v2026.09.03.6 (2026.09.03)
+
+- Deploy v2026.09.03.6: staff dashboard — Service Prices button restyled as the Shop Menu card
+
 ## v2026.09.03.5 (2026.09.03)
 
 - Memory: press-only on customer transfers is machine time, $8.50
