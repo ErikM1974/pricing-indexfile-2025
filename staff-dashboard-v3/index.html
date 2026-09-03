@@ -147,27 +147,31 @@
             </header>
 
             <!-- ===================================================
-                 HERO SEARCH — the "Everything Bar" (2026-07-20)
+                 TOOL SEARCH — the hero bar (2026-07-20; tools-only since 2026-09-03)
                  The results panel is ANCHORED here and drops DOWNWARD. #cpInput is
-                 the input the command-palette controller drives; Ctrl+K focuses it.
-                 The palette harvests every a.ws-link on the page, hidden tabs
-                 included — so a tool on another tab is one keystroke away.
+                 the input command-palette-controller drives; Ctrl+K focuses it.
+                 It harvests every a.ws-link on the page, hidden tabs included — so a
+                 tool on another tab is one keystroke away. Customers, quotes, orders
+                 and designs are NOT searched here (Erik, 2026-09-03): each has its
+                 own page with a better search. No dimming backdrop — an outside click
+                 closes the panel AND lands where it was aimed.
                  =================================================== -->
-            <div class="cp-backdrop" id="cp-backdrop" hidden></div>
-            <section class="hero-search-wrap" aria-label="Search anything">
+            <section class="hero-search-wrap" aria-label="Search the Staff Dashboard">
                 <div class="hero-search" id="heroSearch">
                     <i class="fas fa-magnifying-glass hero-search__icon" aria-hidden="true"></i>
                     <input type="text" id="cpInput" class="hero-search__input"
-                           placeholder="Search a customer, order #, quote, design #, or any tool — on any tab"
-                           autocomplete="off" spellcheck="false" aria-label="Search anything"
+                           placeholder="Search the Staff Dashboard — any tool or page, on any tab"
+                           autocomplete="off" spellcheck="false" aria-label="Search the Staff Dashboard for a tool or page"
                            role="combobox" aria-expanded="false" aria-controls="cpResults">
+                    <button type="button" class="hero-search__clear" id="cpClear" data-action="palette:close" aria-label="Clear and close search" hidden>
+                        <i class="fas fa-xmark" aria-hidden="true"></i>
+                    </button>
                     <kbd class="hero-search__kbd">Ctrl K</kbd>
                 </div>
                 <div class="cp-panel" id="cpPanel" hidden>
                     <div class="cp-results" id="cpResults" role="listbox" aria-label="Search results"></div>
                     <div class="cp-status" id="cpStatus"></div>
                 </div>
-                <div class="cp-toast" id="cpToast" role="status"></div>
             </section>
 
             <!-- Pride Wall (2026-07-20 Phase 1) — ambient rotation of recent finished-product
@@ -194,7 +198,9 @@
                 <button type="button" class="ws-tab" role="tab" data-ws="art" id="ws-tab-art" aria-selected="false" aria-controls="ws-art"><span class="ws-tab__you" aria-hidden="true"></span>Art</button>
                 <button type="button" class="ws-tab" role="tab" data-ws="office" id="ws-tab-office" aria-selected="false" aria-controls="ws-office"><span class="ws-tab__you" aria-hidden="true"></span>Office</button>
                 <button type="button" class="ws-tab" role="tab" data-ws="company" id="ws-tab-company" aria-selected="false" aria-controls="ws-company"><span class="ws-tab__you" aria-hidden="true"></span>Company</button>
-                <button type="button" class="ws-tab" role="tab" data-ws="everything" id="ws-tab-everything" aria-selected="false" aria-controls="ws-everything"><span class="ws-tab__you" aria-hidden="true"></span>Everything</button>
+                <!-- Everything is the safety net (Erik, 2026-09-03): it lists every tool on the
+                     page in one place, so it carries a visible cue and a fuller tooltip. -->
+                <button type="button" class="ws-tab ws-tab--everything" role="tab" data-ws="everything" id="ws-tab-everything" aria-selected="false" aria-controls="ws-everything" title="Every tool and page on the dashboard in one list, with a filter box. If it isn't on a tab, it's here."><span class="ws-tab__you" aria-hidden="true"></span><i class="fas fa-layer-group" aria-hidden="true"></i> Everything <span class="ws-tab__cue">can't find it? it's here</span></button>
                 <button type="button" class="ws-tab ws-tab--admin" role="tab" data-ws="admin" id="ws-tab-admin" aria-selected="false" aria-controls="ws-admin" data-requires-role="admin" hidden>Admin</button>
                 <span class="ws-tabs__hint"><kbd>Ctrl K</kbd> finds any tool from any tab · green dot = your tab</span>
             </div>
@@ -322,11 +328,12 @@
 
                     <div class="ws-card" data-cat="Art &amp; Design">
                         <div class="ws-card-h"><h3>Show the customer</h3></div>
+                        <!-- AE Art Request leads this card (Erik, 2026-09-03): the reps live in it. -->
+                        <a class="ws-link ws-tile f-artreq" href="/ae-dashboard.html"><span class="ws-chip-mk"><i class="fas fa-palette" aria-hidden="true"></i></span><span class="ws-tile__tx"><b>AE Art Request</b><span class="ws-d">send art to Steve, approve the proofs that come back</span></span><i class="fas fa-arrow-right ws-tile__go" aria-hidden="true"></i></a>
                         <a class="ws-link ws-tile bs-vault" href="/dashboards/design-gallery.html" title="Search all 37,600+ designs in one place — digitized designs, ShopWorks thumbnails, Steve's art, Ruth's mockups and finished photos. Enter a Customer # for their whole history."><span class="ws-chip-mk"><i class="fas fa-vault" aria-hidden="true"></i></span><span class="ws-tile__tx"><b>Design Vault <span class="qs-new-badge">New · Aug 5</span></b><span class="ws-d">every design we've ever made — search by name, number or customer</span></span><i class="fas fa-arrow-right ws-tile__go" aria-hidden="true"></i></a>
                         <div class="ws-tools">
                             <a class="ws-link ws-row f-store" href="/pages/garment-designer.html" title="Rebuilt Aug 5 — one-step start, smoother 360° spin, and you can now remove an uploaded file."><i class="ws-mk" aria-hidden="true"></i><span class="ws-nm">Shirt Designer</span><span class="qs-new-badge">Updated · Aug 5</span><span class="ws-d">put a logo on a shirt, send for approval</span></a>
                             <a class="ws-link ws-row f-photo" href="/dashboards/finished-photos-library.html"><i class="ws-mk" aria-hidden="true"></i><span class="ws-nm">Photo Library</span><span class="ws-d">every finished-job photo; choose what customers see</span></a>
-                            <a class="ws-link ws-row f-artreq" href="/ae-dashboard.html"><i class="ws-mk" aria-hidden="true"></i><span class="ws-nm">Art Requests</span><span class="ws-d">send art to Steve, approve the proofs</span></a>
                             <a class="ws-link ws-row f-ox" href="/pages/jds-mockup-creator.html"><i class="ws-mk" aria-hidden="true"></i><span class="ws-nm">Tumbler Mockup</span><span class="ws-d">logo on a Polar Camel, download approval</span></a>
                             <a class="ws-link ws-row f-mock" href="/pages/mockup-library.html"><i class="ws-mk" aria-hidden="true"></i><span class="ws-nm">Saved Mockups</span><span class="ws-d">mockups you've built and sent</span></a>
                             <a class="ws-link ws-row f-store" href="/catalog?topSellers=1"><i class="ws-mk" aria-hidden="true"></i><span class="ws-nm">Top Sellers</span><span class="ws-d">best-selling styles, most with a free sample</span></a>
@@ -419,7 +426,7 @@
                         <a class="ws-link ws-tile f-mock" href="/dashboards/art-hub-ruth.html"><span class="ws-chip-mk"><i class="fas fa-shirt" aria-hidden="true"></i></span><span class="ws-tile__tx"><b>Mockup Queue <span class="ws-who">· Ruthie</span></b><span class="ws-d">mockup requests in progress, completed, and on hold</span></span><i class="fas fa-arrow-right ws-tile__go" aria-hidden="true"></i></a>
                         <div class="ws-sub">Also here</div>
                         <div class="ws-tools">
-                            <a class="ws-link ws-row f-artreq" href="/ae-dashboard.html"><i class="ws-mk" aria-hidden="true"></i><span class="ws-nm">Art Requests</span><span class="ws-d">what the reps submit and approve</span></a>
+                            <a class="ws-link ws-row f-artreq" href="/ae-dashboard.html"><i class="ws-mk" aria-hidden="true"></i><span class="ws-nm">AE Art Request</span><span class="ws-d">what the reps submit and approve</span></a>
                             <a class="ws-link ws-row f-artreq" href="/dashboards/design-queue.html"><i class="ws-mk" aria-hidden="true"></i><span class="ws-nm">Design Queue</span><span class="ws-d">designs waiting on a decision</span></a>
                             <a class="ws-link ws-row f-store" href="/dashboards/gear-publisher.html"><i class="ws-mk" aria-hidden="true"></i><span class="ws-nm">253gear Publisher</span><span class="ws-d">push a design to the 253gear store</span></a>
                             <a class="ws-link ws-row f-ref" href="/dashboards/past-due-orders.html"><i class="ws-mk" aria-hidden="true"></i><span class="ws-nm">Past Due Orders</span></a>

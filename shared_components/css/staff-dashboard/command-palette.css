@@ -1,6 +1,7 @@
 /* =====================================================
    STAFF DASHBOARD v3 — HERO SEARCH + COMMAND PALETTE
-   (Ctrl+K "Everything Bar", 2026-07-20; re-anchored 2026-07-20)
+   (Ctrl+K "Everything Bar", 2026-07-20; re-anchored 2026-07-20;
+    tools-only + click-through close, no backdrop, 2026-09-03)
 
    The search input is a PERSISTENT hero bar near the top of the
    dashboard (where the sales-goal banner used to be). Its results
@@ -70,12 +71,6 @@
 
 /* ── RESULTS PANEL (drops down, anchored to the bar) ──── */
 
-.cp-backdrop {
-    position: fixed;
-    inset: 0;
-    background: rgba(6, 10, 8, 0.45);
-    z-index: 1200;
-}
 
 .cp-panel {
     position: absolute;
@@ -168,27 +163,7 @@
 
 /* ── COPY TOAST (fixed, bottom-center — never fights the panel) ── */
 
-.cp-toast {
-    position: fixed;
-    left: 50%;
-    bottom: 28px;
-    transform: translateX(-50%) translateY(8px);
-    z-index: 1300;
-    background: var(--accent-bg, rgba(74, 222, 128, 0.14));
-    color: var(--accent);
-    font-size: var(--font-size-xs);
-    border: 1px solid var(--accent);
-    border-radius: var(--radius-pill);
-    padding: 6px 16px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s ease, transform 0.2s ease;
-}
 
-.cp-toast--show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-}
 
 @media (max-width: 640px) {
     .hero-search__kbd { display: none; }
@@ -197,11 +172,30 @@
 
 @media (prefers-reduced-motion: reduce) {
     .hero-search,
-    .cp-toast { transition: none; }
 }
 
 /* 2026-09-03: [hidden] must WIN. The rules above set display on .cp-panel /
    .cp-backdrop, and an author display beats the UA [hidden] style, so the
    closed panel still rendered its empty .cp-status strip as a bare 34px bar
    under the search box on every load. */
-.cp-panel[hidden], .cp-backdrop[hidden] { display: none !important; }
+.cp-panel[hidden] { display: none !important; }
+
+/* ── × in the bar (2026-09-03) — shown while the panel is open or the box has text;
+   data-action="palette:close" clears and closes. ── */
+.hero-search__clear {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 50%;
+    background: var(--surface-card-2, var(--bg-card-2));
+    color: var(--text-muted);
+    font-size: 13px;
+    cursor: pointer;
+}
+.hero-search__clear:hover { color: var(--text); background: var(--border-base); }
+.hero-search__clear:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.hero-search__clear[hidden] { display: none; }

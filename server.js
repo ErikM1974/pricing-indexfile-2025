@@ -112,7 +112,7 @@ dotenv.config();
 //   GET /api/staff/artrequests           — Art Aging widget ArtRequests read (any staff; 2026-08-27)
 //   GET /api/staff/employees             — staff roster from lib/staff-roster.js (any staff; 2026-08-27 — was hardcoded in anonymously-served JS)
 //   GET /api/staff/finished-photos/library — company-wide finished-photo library w/ rep names (any staff; ~L4356, 2026-07-19)
-//   GET /api/staff/command-search        — Ctrl+K Everything Bar: proxy fan-out search across customers/orders/quotes/designs (any staff; 2026-07-20)
+//   GET /api/staff/command-search        — proxy fan-out search across customers/orders/quotes/designs (any staff; 2026-07-20). UNUSED by the dashboard since 2026-09-03 (its search is tools-only); kept for any other caller
 //   ALL /api/crm-proxy/form-submissions* — Forms Inbox reads/updates (any staff; ~L3230, 2026-07-11)
 //   ALL /api/crm-proxy/order-odbc*       — ORDER_ODBC order history for the Leads board (any staff; 2026-07-18)
 //   ALL /api/crm-proxy/lead-activity*    — Leads CRM timeline reads/appends (any staff; 2026-07-18)
