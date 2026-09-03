@@ -1,3 +1,8 @@
+## v2026.09.03.15 (2026.09.03)
+
+- Staff dashboard search: tools-only, click-through close, AE Art Request tile, Everything cue
+- Deploy v2026.09.03.15: 1 files (index.html...)
+
 ## v2026.09.03.14 (2026.09.03)
 
 - Staff dashboard: heal My Stuff labels, drop retired recents, hide the closed search panel
