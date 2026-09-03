@@ -1,3 +1,8 @@
+## v2026.09.03.16 (2026.09.03)
+
+- Staff dashboard: search box that stands off the page, tabs that look like tabs
+- Deploy v2026.09.03.16: 1 files (index.html...)
+
 ## v2026.09.03.15 (2026.09.03)
 
 - Staff dashboard search: tools-only, click-through close, AE Art Request tile, Everything cue
