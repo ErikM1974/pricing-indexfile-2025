@@ -66,6 +66,30 @@ $13 · 72+ 4.33 → $10.83 vs $12. Contract garments 72+ = 63% of book, caps 81%
 - ⚠️ Machines 4 and 15 log absurd units/hour (552, 185) — Qty field misuse; don't trust per-machine
   units/h from `ProductionLogDetails`.
 
+## Oddball price list (from real LinesOE history 2023→2026-09-03; Erik-approved rates $150 machine / $90 bench)
+
+History (6,503 service-like lines): **names/monograms/numbers 539 orders, 5,247 pcs, $54K, always $12.50**
+(= 5 min × $150 ✓) · sew patches on caps 15 orders / 2,529 pcs, $5.00–6.00 · patches on garments/vests
+32 orders / 716 pcs, $5–12.50 (median $8) · heat-press customer transfer 27 orders, median $15 (incl.
+Supacolor), press-only ~$8.50 · bag & label $0.75 (1,156 pcs) · laser run $1.15–1.25/side + $65 setup ·
+patch-during-run upcharge $5 · puff $5 · velcro $5 · samples $30–75 · **label removal / relabel / hem /
+re-run: NO history — given away or folded into garment price.** Stable fee catalogue unchanged: DD $100,
+GRT-50 $50, GRT-75 $75/h, SPSU $30, SPRESET $25, RUSH 25%, AL, webstore $300, laser setup $65.
+
+**List (book min → price):** name/monogram 5 min → $12.50 · patch on cap 3.5 → $5.50 · patch on
+garment/vest 5 → $7.50 · patch on bag/backpack 6 → $9.00 · velcro 3.5 → $5.25 · heat-press press-only
+3 → $4.50 (+transfer cost ×1.3) · patch-during-run $5 · puff $5 · laser $1.25/side + $65 · bag & label
+$0.75 (fold+bag+tag $1.50) · label removal 3 → $4.50 · sew-in label 4 → $6.00 · hem/tack 8 → $12.00 ·
+single-head sample 20 min → $50 (8K) / $75 / $100 · re-run 6 min machine → $15 · **job setup $22.50 on
+every oddball job, $75 job minimum; $250 contract minimum still governs customer-supplied embroidery;
+shop-supplied materials cost +30%; bill in quarter hours.** ⏭️ Erik to approve → then Service_Codes
+rows (SHOP-MACHINE-RATE 150, SHOP-BENCH-RATE 90, SHOP-JOB-SETUP 22.50, SHOP-JOB-MIN 75, SHOP-MATERIAL-
+MARKUP 30) + a `Book_Rates` table; stopwatch the no-history items (5 each) first.
+- Pull recipe: bandit by IP `192.168.10.219` (hostname does not resolve over VPN); LinesOE has
+  `date_Creation`, `PartDescription`, `id_ProductClass`, `cn_LineQuantity_ToPrice`, `cnCur_UnitPriceUsed`,
+  `cnCur_LinePrice_Act`. Keyword LIKE on PartDescription; drop class 1/'' rows whose PartNumber looks
+  like a SKU (Sport-Tek "PosiCharge" matches "charge"; Richardson "…Patch" caps match "patch").
+
 ## Method / gotchas
 - Allocation: emb revenue share (4050+4150+4303)/total = 51.9%; burden 105,784/1,007,547 = 10.5%.
 - Hours model: setup 87 min (caps 75) + (2.4 handling [2.7 caps] + 0.25 min/1K) per pc; worst ×1.5
