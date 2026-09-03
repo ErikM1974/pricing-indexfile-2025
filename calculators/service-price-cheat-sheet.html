@@ -28,8 +28,9 @@
                     </div>
                 </div>
                 <div class="header-right">
+                    <a class="btn-print btn-print--link" href="/calculators/shop-services/" title="Price a job on customer-supplied goods and save it as an SHP quote"><i class="fas fa-toolbox"></i> Shop Services calculator</a>
                     <button class="btn-print" onclick="window.print()">
-                        <i class="fas fa-print"></i> Print
+                        <i class="fas fa-print"></i> Print / Save PDF
                     </button>
                 </div>
             </div>
@@ -39,12 +40,41 @@
         <div class="page-title">
             <i class="fas fa-tags"></i> Service Price Reference 2026
         </div>
-        <p class="page-subtitle">Quick reference for all service prices. All prices API-driven from current database.</p>
+        <p class="page-subtitle">Every service price with the ShopWorks part number to bill it on. Prices load from Caspio; change them there and this page, the customer card and the calculator all follow.</p>
+
+        <!-- Section 0: how to price work on customer goods (2026-09-03) -->
+        <div class="rules-strip" id="rules-strip">
+            <div class="rule"><span class="rule-k">Customer brings the goods?</span><span class="rule-v">Price per piece &times; quantity from the table below. <strong>$<span id="rule-min">75</span> minimum per job</strong> &mdash; bill the difference on <code>LTM</code>.</span></div>
+            <div class="rule"><span class="rule-k">Not in the table?</span><span class="rule-v">Bill time on <code>DECG</code> (garments), <code>DECC</code> (caps) or <code>Laser</code>: <strong>$<span id="rule-bench">25</span></strong> per &frac14; hour bench, <strong>$<span id="rule-machine">37.50</span></strong> per &frac14; hour machine. Erik or Ruthie approves the estimate.</span></div>
+            <div class="rule"><span class="rule-k">We supply the garment?</span><span class="rule-v">Use the quote builder. Names, patches and puff are add-ons there at the same prices. Materials we supply on any job: cost + <span id="rule-markup">30</span>%.</span></div>
+        </div>
+
+        <div class="ref-card" id="shop-services-card">
+            <div class="ref-card-header">
+                <h2><i class="fas fa-toolbox"></i> Shop Services on Customer Goods</h2>
+                <span class="source-badge" id="shop-source"></span>
+            </div>
+            <div class="ref-card-body">
+                <table class="ref-table" id="shop-services-table">
+                    <thead>
+                        <tr>
+                            <th>Service</th>
+                            <th>ShopWorks part</th>
+                            <th class="price-col">Price</th>
+                            <th>Book time / notes</th>
+                        </tr>
+                    </thead>
+                    <tbody id="shop-services-tbody">
+                        <tr><td colspan="4" class="loading-cell"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
         <!-- Section 1: Fixed-Price Services -->
         <div class="ref-card" id="fixed-services-card">
             <div class="ref-card-header">
-                <h2><i class="fas fa-dollar-sign"></i> Fixed-Price Services</h2>
+                <h2><i class="fas fa-dollar-sign"></i> Setup, Art &amp; Order Fees</h2>
                 <span class="source-badge" id="fixed-source"></span>
             </div>
             <div class="ref-card-body">

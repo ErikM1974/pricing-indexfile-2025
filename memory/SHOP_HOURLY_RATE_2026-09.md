@@ -91,6 +91,18 @@ lines + quarter-hour time + materials, job minimum, Save → `SHP-YYYY-NNN`, rea
 Staff dashboard → Calculators next to Contract Embroidery). Erik simplified the structure: NO $22.50
 setup line — setup is inside the $75 minimum. Laser on customer items: $65 setup + $10/tumbler (rotary,
 ~4 min) or $7.50/flat item; 5 tumblers = $115. ⚠️ SHP save path not yet exercised with a real quote.
+
+**MERGE 2026-09-03 (Erik: paid prices, reuse existing parts, one page):** SECC $10→**$5.50**, SEG $10→**$8.00**
+(paid numbers; the $10 card was never collected). Every SHOP menu row now names its ShopWorks part in
+`AliasFor`: Monogram · Name/Number ($15, new menu row) · SECC · SEG (garments + vests + bags + backpacks +
+velcro, one price) · DT (samples $50/75/100) · 3D-EMB · Laser Patch · Transfer (press-only $4.50) · DECG
+(labels, hems, bag & label, fold/bag/tag, re-runs, off-card time; DECC for caps) · Laser + Setup (customer
+items) · LTM (= the $75 top-up). Retired: SHOP-PATCH-BAG, SHOP-VELCRO (→SEG), SHOP-LASER-SIDE (JDS calc).
+🔑 **The SHOP menu row is the price of record; AliasFor is only the billing code** — a first pass let
+the part's flat price win and the $75 minimum became $50 (LTM) and the bigger samples $50 (DT). The
+cheat sheet (`/calculators/service-price-cheat-sheet.html`) is now the ONE rep page: rules strip +
+shop-services section with part numbers + fees; the customer card and calculator read the same rows.
+Calculator saves StyleNumber = part number, minimum top-up as an `LTM` line.
 Stopwatch the no-history items (labels, hems, re-runs, backpacks) before printing the card widely.
 - Pull recipe: bandit by IP `192.168.10.219` (hostname does not resolve over VPN); LinesOE has
   `date_Creation`, `PartDescription`, `id_ProductClass`, `cn_LineQuantity_ToPrice`, `cnCur_UnitPriceUsed`,

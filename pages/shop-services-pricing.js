@@ -23,10 +23,18 @@
     document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('printBtn').addEventListener('click', () => window.print());
         try {
-            const resp = await fetch(`${API_BASE_URL}/api/service-codes?type=SHOP`);
+            // Whole catalogue in one read (the SHOP menu rows; the part rows are read for the
+            // rep pages, which show the ShopWorks part beside each line).
+            const resp = await fetch(`${API_BASE_URL}/api/service-codes`);
             if (!resp.ok) throw new Error('API ' + resp.status);
             const json = await resp.json();
-            const rows = (Array.isArray(json) ? json : (json.data || [])).filter((r) => r.IsActive !== false);
+            const all = (Array.isArray(json) ? json : (json.data || [])).filter((r) => r.IsActive !== false);
+            const parts = {};
+            all.forEach((r) => { if (r.ServiceType !== 'SHOP' && r.ServiceCode && !(r.ServiceCode in parts)) parts[r.ServiceCode] = r; });
+            // The SHOP menu row is the price of record; AliasFor is only the ShopWorks part
+            // (several lines share DT or DECG at different prices, so the part cannot price).
+            void parts;
+            const rows = all.filter((r) => r.ServiceType === 'SHOP').map((r) => Object.assign({}, r, { SellPrice: Number(r.SellPrice) }));
             if (!rows.length) throw new Error('no SHOP rows');
             render(rows);
             document.getElementById('loadingState').hidden = true;
