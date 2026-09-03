@@ -4,7 +4,7 @@ Repo `/memory/` is the CANONICAL tree (git-tracked). The machine-local auto-memo
 `~/.claude/projects/<slug>/memory/` holds `MEMORY.md` (the auto-loaded index) plus per-fact
 files; where a topic exists in both, **the repo copy wins** and auto-memory keeps a pointer.
 
-Last Updated: 2026-08-27 (/memory-maintain: MEMORY.md 18.5→~15 KB — stale statuses corrected (paginator verified NOT deployed via heroku/main ancestry; M-6 now live; quote-plane locked); LESSONS 263→209 (2 resolved 08-19 entries archived); missing staff-dashboard-hardening LESSONS entry written; q.limit truncation sub-fact added to DURABLE_GOTCHAS; cross-tree pointers verified intact)
+Last Updated: 2026-09-03 (/memory-maintain: MEMORY.md 24.0→~19 KB — Sept shipped-log compressed to one-liners, detail verified in SHOP_HOURLY_RATE / CUSTOMER_PORTAL / EMBROIDERY_STITCH_COST / VOLUME_QUOTE topic files; homepage-revert gotchas + VQ sequence note + DTG0831 post-import facts moved into their topic files before deletion; LESSONS 267→~200 (bonus-dial, staff-dashboard-hardening, inventorylevels archived); cross-tree copies verified as pointers)
 
 | File | What it holds |
 |---|---|

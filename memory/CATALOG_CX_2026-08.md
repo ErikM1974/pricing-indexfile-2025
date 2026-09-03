@@ -244,3 +244,9 @@ quote-data-plane relay work) and has an unpushed proxy commit `5a54396` (psst-au
 is mine; do NOT stage with `git add -u` until it's resolved — stage explicit paths only, and
 check `git branch --show-current` + fresh Release commits before ANY commit (mid-deploy gotcha).
 
+## Homepage "one door" redesign — SHIPPED then REVERTED same day (2026-08-26)
+
+Shipped `v2026.08.26.10`, reverted `v2026.08.26.11`: Erik saw the single-band catalog door live and did not like it; the original two-band layout is back (live-verified). Keep for any future pass:
+- Catalog **subcategory facets are EMPTY** — never link them. Cut chips = `?category=X&q=term`, each validated to return > 0 results before shipping.
+- **Brand facet values are exact** (`Port & Co`, NOT `Port & Company`).
+- The design canvas with all four explored directions stays at claude.ai/code/artifact/8c4d6c63-e823-4936-ba19-5e4dfb41dacf.
