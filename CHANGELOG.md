@@ -1,3 +1,7 @@
+## v2026.09.03.11 (2026.09.03)
+
+- Deploy v2026.09.03.11: retire the Shop Services calculator + SHP prefix; Shop Menu drops the screen-print course (rep copy now one page) and adds the supplies cost÷0.53 line
+
 ## v2026.09.03.10 (2026.09.03)
 
 - Deploy v2026.09.03.10: Shop Menu print-review edits — LTM fee rep-only, sample/laser notes, rush wording, art label, patch line, DTF in subtitle, price-unit spacing
