@@ -1,3 +1,7 @@
+## v2026.09.03.2 (2026.09.03)
+
+- Deploy v2026.09.03.2: 23 files — Shop Services rep calculator (SHP quotes), dashboard link, prefix registration
+
 ## v2026.09.03.1 (2026.09.03)
 
 - Memory: VOL-HANDLING-MIN set to 2.4
