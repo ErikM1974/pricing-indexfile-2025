@@ -188,6 +188,14 @@ body.view-rep .customer-only { display: none !important; }
     .item-price .unit { font-size: 9px; margin-left: 6px; }
     .item-meta, .item-desc { font-size: 9px; margin-top: -1px; }
     .colophon { margin-top: 8px; padding-top: 5px; font-size: 8.5px; }
+    /* Rep copy carries a code + book-time line under every item; pull those lines in so it also lands on one page (2026-09-03). */
+    body.view-rep .menu { padding-top: 0.3in; padding-bottom: 0.2in; }
+    body.view-rep .masthead { margin-bottom: 6px; }
+    body.view-rep .house-rules { margin-bottom: 8px; padding-bottom: 5px; }
+    body.view-rep .courses { row-gap: 4px; }
+    body.view-rep .item-meta { font-size: 8.5px; line-height: 1.15; margin-top: -3px; }
+    body.view-rep .item { padding: 0.5px 0; }
+    body.view-rep .colophon { margin-top: 3px; padding-top: 3px; }
 }
 
 /* Rep-only course (screen print & pass-through) and add-on footnotes (2026-09-03) */
