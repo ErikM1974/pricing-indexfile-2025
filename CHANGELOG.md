@@ -1,3 +1,14 @@
+## v2026.09.03.1 (2026.09.03)
+
+- Memory: VOL-HANDLING-MIN set to 2.4
+- Memory: contract garments 24-47 $1.10, 48-71 $0.95
+- Memory: contract caps 24-47 $1.00, 48-71 $0.85
+- Memory: stopping point — next session computes the shop hourly rate
+- Memory: shop hourly rate study (billable-hour rates, cards per hour)
+- Memory: shop rate four-year check, bench rate, book-rate manual, operator efficiency
+- Memory: oddball price list from ShopWorks history, bench/machine rates
+- Deploy v2026.09.03.1: 4 files — Shop Services customer price card (Caspio SHOP rows, printable)
+
 ## v2026.09.02.14 (2026.09.02)
 
 - Deploy v2026.09.02.14: 7 files — Contract Break-Even admin page (contract grid at cost, typical/worst, profit at the card)
