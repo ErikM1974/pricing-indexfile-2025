@@ -191,7 +191,6 @@ body.view-rep .customer-only { display: none !important; }
 }
 
 /* Rep-only course (screen print & pass-through) and add-on footnotes (2026-09-03) */
-body.view-customer .course--internal { display: none !important; }
 .course-addon { margin: 8px 0 0; padding: 6px 10px; font-size: 12.5px; color: var(--ink-2); border-left: 2px solid var(--wine); background: rgba(122,31,43,.05); }
 .course-addon strong { color: var(--wine); }
 .course-addon .item-meta { display: inline-flex; margin-left: 6px; }

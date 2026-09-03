@@ -628,7 +628,6 @@ class QuoteFormatter {
             'SPC': 'Customer Screen Print',
             'SSC': 'Safety Stripe Creator',
             'VQ': 'Volume Quote',
-            'SHP': 'Shop Services',
             'WEB': 'Webstore Setup',
             'SP': 'Screen Print'
         };

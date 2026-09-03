@@ -31,16 +31,6 @@
         { code: 'LTM',    name: 'Small-order fee on orders where we supply the garments', fallback: 50, unit: 'per order', desc: 'Orders of 7 pieces or fewer, spread across the pieces. Not a shop-services charge.', repOnly: true },
         { code: 'RUSH',   name: 'Rush',                           fallback: null, unit: '25% of the order', text: '25% of the order' },
     ];
-    const OTHER_COURSE = [
-        { code: 'Art',       name: 'Art charges',                    fallback: 75, unit: 'per hour' },
-        { code: 'SPSU',      name: 'Screen setup, new screen',       fallback: 30, unit: 'per screen / color' },
-        { code: 'SPRESET',   name: 'Screen setup, reorder',          fallback: 30, unit: 'per reset' },
-        { code: 'Vellum',    name: 'Vellum print',                   fallback: 10, unit: 'per print' },
-        { code: 'Color Chg', name: 'Color change on press',          fallback: 15, unit: 'per change' },
-        { code: 'HW-SURCHG', name: 'Heavyweight garment surcharge',  fallback: 10, unit: 'per garment' },
-        { code: 'Freight',   name: 'Freight',                        fallback: null, text: 'at cost' },
-        { code: 'Discount',  name: 'Customer discount',              fallback: null, text: 'varies' },
-    ];
     // Shop-services categories → course titles and the order they appear.
     const COURSES = [
         { cat: 'Sewing',                        title: 'From the Sewing Bench',     note: 'Your patches, emblems and labels, sewn on by hand.' },
@@ -126,8 +116,8 @@
             '</div>';
     }
 
-    function courseHtml(title, note, itemsHtml, wide, internal) {
-        return '<section class="course' + (wide ? ' course--wide' : '') + (internal ? ' course--internal' : '') + '"><h2 class="course-title">' + esc(title) + '</h2>' +
+    function courseHtml(title, note, itemsHtml, wide) {
+        return '<section class="course' + (wide ? ' course--wide' : '') + '"><h2 class="course-title">' + esc(title) + '</h2>' +
             (note ? '<p class="course-note">' + esc(note) + '</p>' : '') + itemsHtml + '</section>';
     }
 
@@ -139,7 +129,7 @@
             (meta.length ? ' <span class="item-meta rep-only">' + meta.join('') + '</span>' : '') + '</p>';
     }
 
-    function feeCourse(list, scMap, title, note, apiOk, internal) {
+    function feeCourse(list, scMap, title, note, apiOk) {
         const html = list.map((f) => {
             const rec = scMap[f.code];
             const live = rec ? Number(rec.SellPrice) : NaN;
@@ -147,7 +137,7 @@
             return itemHtml({ name: f.name, code: f.code, unit: f.unit, desc: f.desc, price, repOnly: !!f.repOnly, text: f.text || (price == null ? 'varies' : null) },
                 { fallback: !apiOk && f.fallback != null });
         }).join('');
-        return courseHtml(title, note, html, false, internal);
+        return courseHtml(title, note, html, false);
     }
 
     function render(rows) {
@@ -170,8 +160,6 @@
         const extra = shop.items.filter((it) => !known.has(it.cat));
         if (extra.length) html += courseHtml('Also on the menu', '', courseBody(extra), false);
         html += feeCourse(FEE_COURSE, shop.scMap, 'Setup & Art', 'Once per design or per order, on any kind of job.', true);
-        // Screen-print and pass-through lines are for the reps; the customer copy hides them.
-        html += feeCourse(OTHER_COURSE, shop.scMap, 'Screen Print & Other', 'Rep reference — not on the customer copy.', true, true);
         document.getElementById('courses').innerHTML = html;
     }
 
@@ -181,7 +169,6 @@
         b.classList.add('show');
         let html = courseHtml('Shop services on customer goods', 'Unavailable until Caspio answers.', '<p class="course-note">No prices shown.</p>', true);
         html += feeCourse(FEE_COURSE, {}, 'Setup & Art', 'Documented prices — badged as fallback until Caspio answers.', false);
-        html += feeCourse(OTHER_COURSE, {}, 'Screen Print & Other', '', false, true);
         document.getElementById('courses').innerHTML = html;
     }
 
