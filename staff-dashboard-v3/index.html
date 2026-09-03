@@ -212,26 +212,23 @@
                 <div class="pinned-row__list" id="myStuffList"></div>
             </div>
 
-            <!-- What the colors mean. Each family color is the destination page's own
-                 header color, so a tile looks like where it takes you. -->
-            <div class="ws-legend" aria-label="What the colors mean">
-                <span class="f-money"><i></i>quoting &amp; money</span>
-                <span class="f-crm ws-legend__crm"><i></i>customers</span>
-                <span class="f-purch"><i></i>purchasing</span>
-                <span class="f-mock"><i></i>mockups</span>
-                <span class="f-artreq"><i></i>art requests</span>
-                <span class="f-floor"><i></i>shop floor</span>
-                <span class="f-photo"><i></i>photos</span>
-                <span class="f-arch"><i></i>archive</span>
-                <span class="f-ref"><i></i>reference</span>
-            </div>
-
             <!-- ===================================================
                  SALES — Nika, Taneisha (and admins land here)
                  =================================================== -->
             <section class="ws-panel" id="ws-sales" data-ws="sales" role="tabpanel" aria-labelledby="ws-tab-sales">
                 <div class="ws-head"><h2>Sales</h2><p>Quote it, price it, follow up. What Nika and Taneisha open all day.</p></div>
                 <div class="ws-grid">
+
+                    <!-- Most used (Erik, 2026-09-03): the two pages Nika and Taneisha open first
+                         every day, side by side at the top of their tab. Each link carries its
+                         own data-cat so the Everything tab still files it under its real group. -->
+                    <div class="ws-card ws-card--full" data-cat="Most used">
+                        <div class="ws-card-h"><h3>Most used</h3><span class="ws-note">the two pages the reps open every day</span></div>
+                        <div class="ws-pair">
+                            <a class="ws-link ws-tile f-artreq" href="/ae-dashboard.html" data-cat="Art &amp; Design"><span class="ws-chip-mk"><i class="fas fa-palette" aria-hidden="true"></i></span><span class="ws-tile__tx"><b>AE Art Request</b><span class="ws-d">send art to Steve, approve the proofs that come back</span></span><i class="fas fa-arrow-right ws-tile__go" aria-hidden="true"></i></a>
+                            <a class="ws-link ws-tile f-purch" href="/calculators/purchasingform.html" data-cat="Purchasing" title="The purchase-request form: tell Bradley which blanks or supplies to buy for a work order. Follow it afterwards in Purchase Tracking."><span class="ws-chip-mk"><i class="fas fa-cart-plus" aria-hidden="true"></i></span><span class="ws-tile__tx"><b>Purchase Request <span class="ws-who">· Bradley</span></b><span class="ws-d">ask Bradley to buy blanks or supplies for a work order</span></span><i class="fas fa-arrow-right ws-tile__go" aria-hidden="true"></i></a>
+                        </div>
+                    </div>
 
                     <div class="ws-card" data-cat="Quoting">
                         <div class="ws-card-h"><h3>Quote</h3></div>
@@ -241,7 +238,7 @@
                         <button type="button" class="quote-start-btn" id="quote-start-btn" aria-haspopup="dialog" aria-controls="quote-launcher">
                             <span class="qs-icon"><i class="fas fa-plus" aria-hidden="true"></i></span>
                             <span class="qs-txt">
-                                <span class="qs-title">New Quote <span class="qs-new-badge">New · Jul 7</span></span>
+                                <span class="qs-title">New Quote</span>
                                 <span class="qs-sub">pick the decoration, price it, send it</span>
                             </span>
                             <i class="fas fa-arrow-right qs-arrow" aria-hidden="true"></i>
@@ -328,11 +325,9 @@
 
                     <div class="ws-card" data-cat="Art &amp; Design">
                         <div class="ws-card-h"><h3>Show the customer</h3></div>
-                        <!-- AE Art Request leads this card (Erik, 2026-09-03): the reps live in it. -->
-                        <a class="ws-link ws-tile f-artreq" href="/ae-dashboard.html"><span class="ws-chip-mk"><i class="fas fa-palette" aria-hidden="true"></i></span><span class="ws-tile__tx"><b>AE Art Request</b><span class="ws-d">send art to Steve, approve the proofs that come back</span></span><i class="fas fa-arrow-right ws-tile__go" aria-hidden="true"></i></a>
-                        <a class="ws-link ws-tile bs-vault" href="/dashboards/design-gallery.html" title="Search all 37,600+ designs in one place — digitized designs, ShopWorks thumbnails, Steve's art, Ruth's mockups and finished photos. Enter a Customer # for their whole history."><span class="ws-chip-mk"><i class="fas fa-vault" aria-hidden="true"></i></span><span class="ws-tile__tx"><b>Design Vault <span class="qs-new-badge">New · Aug 5</span></b><span class="ws-d">every design we've ever made — search by name, number or customer</span></span><i class="fas fa-arrow-right ws-tile__go" aria-hidden="true"></i></a>
+                        <a class="ws-link ws-tile bs-vault" href="/dashboards/design-gallery.html" title="Search all 37,600+ designs in one place — digitized designs, ShopWorks thumbnails, Steve's art, Ruth's mockups and finished photos. Enter a Customer # for their whole history."><span class="ws-chip-mk"><i class="fas fa-vault" aria-hidden="true"></i></span><span class="ws-tile__tx"><b>Design Vault</b><span class="ws-d">every design we've ever made — search by name, number or customer</span></span><i class="fas fa-arrow-right ws-tile__go" aria-hidden="true"></i></a>
                         <div class="ws-tools">
-                            <a class="ws-link ws-row f-store" href="/pages/garment-designer.html" title="Rebuilt Aug 5 — one-step start, smoother 360° spin, and you can now remove an uploaded file."><i class="ws-mk" aria-hidden="true"></i><span class="ws-nm">Shirt Designer</span><span class="qs-new-badge">Updated · Aug 5</span><span class="ws-d">put a logo on a shirt, send for approval</span></a>
+                            <a class="ws-link ws-row f-store" href="/pages/garment-designer.html" title="Rebuilt Aug 5 — one-step start, smoother 360° spin, and you can now remove an uploaded file."><i class="ws-mk" aria-hidden="true"></i><span class="ws-nm">Shirt Designer</span><span class="ws-d">put a logo on a shirt, send for approval</span></a>
                             <a class="ws-link ws-row f-photo" href="/dashboards/finished-photos-library.html"><i class="ws-mk" aria-hidden="true"></i><span class="ws-nm">Photo Library</span><span class="ws-d">every finished-job photo; choose what customers see</span></a>
                             <a class="ws-link ws-row f-ox" href="/pages/jds-mockup-creator.html"><i class="ws-mk" aria-hidden="true"></i><span class="ws-nm">Tumbler Mockup</span><span class="ws-d">logo on a Polar Camel, download approval</span></a>
                             <a class="ws-link ws-row f-mock" href="/pages/mockup-library.html"><i class="ws-mk" aria-hidden="true"></i><span class="ws-nm">Saved Mockups</span><span class="ws-d">mockups you've built and sent</span></a>
@@ -379,7 +374,7 @@
                         <div class="ws-tools">
                             <a class="ws-link ws-row f-floor" href="/pages/box-labels.html"><i class="ws-mk" aria-hidden="true"></i><span class="ws-nm">Box Labels</span><span class="ws-d">look up a PO, sort into boxes, print</span></a>
                             <a class="ws-link ws-row f-purch" href="/dashboards/purchasing-portal.html" title="Every blanks-purchase request sent to Bradley (last 60 days) with who requested it and where it stands: Sent → Ordered → Received → Shipped."><i class="ws-mk" aria-hidden="true"></i><span class="ws-nm">Purchase Tracking</span><span class="ws-d">where every blanks request stands</span></a>
-                            <a class="ws-link ws-row f-purch" href="/calculators/purchasingform.html"><i class="ws-mk" aria-hidden="true"></i><span class="ws-nm">Request Blanks</span><span class="ws-d">ask Bradley to buy blanks or supplies</span></a>
+                            <a class="ws-link ws-row f-purch" href="/calculators/purchasingform.html"><i class="ws-mk" aria-hidden="true"></i><span class="ws-nm">Purchase Request</span><span class="ws-who">· Bradley</span><span class="ws-d">the form that asks Bradley to buy blanks or supplies for a WO</span></a>
                             <a class="ws-link ws-row f-ref" href="/dashboards/roland-printer-supplies.html"><i class="ws-mk" aria-hidden="true"></i><span class="ws-nm">Roland Supplies</span><span class="ws-d">ink and parts for the Roland — goes to Erik</span></a>
                         </div>
                     </div>
@@ -435,10 +430,10 @@
                     <div class="ws-card" data-cat="Art &amp; Design">
                         <div class="ws-card-h"><h3>Design tools</h3></div>
                         <a class="ws-link ws-tile bs-dst" href="/pages/dst-viewer.html"><span class="ws-chip-mk"><i class="fas fa-braille" aria-hidden="true"></i></span><span class="ws-tile__tx"><b>DST Studio <span class="qs-new-badge">Updated · Aug 5</span></b><span class="ws-d">stitch viewer · true-scale mockup · approval sheet</span></span><i class="fas fa-arrow-right ws-tile__go" aria-hidden="true"></i></a>
-                        <a class="ws-link ws-tile bs-vault" href="/dashboards/design-gallery.html"><span class="ws-chip-mk"><i class="fas fa-vault" aria-hidden="true"></i></span><span class="ws-tile__tx"><b>Design Vault <span class="qs-new-badge">New · Aug 5</span></b><span class="ws-d">every design we've ever made, one search</span></span><i class="fas fa-arrow-right ws-tile__go" aria-hidden="true"></i></a>
+                        <a class="ws-link ws-tile bs-vault" href="/dashboards/design-gallery.html"><span class="ws-chip-mk"><i class="fas fa-vault" aria-hidden="true"></i></span><span class="ws-tile__tx"><b>Design Vault</b><span class="ws-d">every design we've ever made, one search</span></span><i class="fas fa-arrow-right ws-tile__go" aria-hidden="true"></i></a>
                         <div class="ws-sub">Also here</div>
                         <div class="ws-tools">
-                            <a class="ws-link ws-row f-store" href="/pages/garment-designer.html"><i class="ws-mk" aria-hidden="true"></i><span class="ws-nm">Shirt Designer</span><span class="qs-new-badge">Updated · Aug 5</span><span class="ws-d">logo on a shirt, front/back, spin, proof</span></a>
+                            <a class="ws-link ws-row f-store" href="/pages/garment-designer.html"><i class="ws-mk" aria-hidden="true"></i><span class="ws-nm">Shirt Designer</span><span class="ws-d">logo on a shirt, front/back, spin, proof</span></a>
                             <a class="ws-link ws-row f-ox" href="/pages/jds-mockup-creator.html"><i class="ws-mk" aria-hidden="true"></i><span class="ws-nm">Tumbler Mockup</span><span class="ws-d">Polar Camel color + logo, approval image</span></a>
                             <a class="ws-link ws-row f-mock" href="/pages/mockup-library.html"><i class="ws-mk" aria-hidden="true"></i><span class="ws-nm">Saved Mockups</span></a>
                             <a class="ws-link ws-row f-ref" href="/dashboards/digitized-designs.html"><i class="ws-mk" aria-hidden="true"></i><span class="ws-nm">Digitized Designs</span><span class="ws-d">master list, with extra-logo prices</span></a>
@@ -479,7 +474,7 @@
                         <a class="ws-link ws-tile f-purch" href="/dashboards/quote-management.html?open=inbound-today"><span class="ws-chip-mk"><i class="fas fa-calendar-days" aria-hidden="true"></i></span><span class="ws-tile__tx"><b>SanMar Inbound Calendar</b><span class="ws-d">incoming boxes by day, box labels, PDF</span></span><i class="fas fa-arrow-right ws-tile__go" aria-hidden="true"></i></a>
                         <div class="ws-sub">Also here</div>
                         <div class="ws-tools">
-                            <a class="ws-link ws-row f-purch" href="/calculators/purchasingform.html"><i class="ws-mk" aria-hidden="true"></i><span class="ws-nm">Request Blanks</span><span class="ws-d">the request form reps fill in</span></a>
+                            <a class="ws-link ws-row f-purch" href="/calculators/purchasingform.html"><i class="ws-mk" aria-hidden="true"></i><span class="ws-nm">Purchase Request</span><span class="ws-who">· Bradley</span><span class="ws-d">the form reps fill in to ask Bradley for blanks</span></a>
                             <a class="ws-link ws-row f-ref" href="/dashboards/roland-printer-supplies.html"><i class="ws-mk" aria-hidden="true"></i><span class="ws-nm">Roland Supplies</span></a>
                             <a class="ws-link ws-row f-floor" href="/pages/box-labels.html"><i class="ws-mk" aria-hidden="true"></i><span class="ws-nm">Box Labels</span></a>
                             <a class="ws-link ws-row f-ref" href="/dashboards/product-manager.html"><i class="ws-mk" aria-hidden="true"></i><span class="ws-nm">Non-SanMar Items</span><span class="ws-d">catalog products we don't buy from SanMar</span></a>
