@@ -13,7 +13,7 @@
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Bodoni+Moda:opsz,wght@6..96,600;6..96,700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
     <!--
@@ -28,7 +28,7 @@
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css?v=2026.08.26.1">
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/utilities.css?v=20260514-ai-phase1">
     <!-- Claude Design handoff theme (2026-05-13) — unlayered variant, wins all cascade fights. -->
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=2026.08.26.1">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=2026.09.03.6">
     <!-- Claude Design PATCH 2 (spacing) — hide empty announcements, compress pinned row, tighten zones.
          PATCH 3 and PATCH 4 were REMOVED per PATCH-5-CLEANUP: their broad
          [class*="..."] selectors were over-matching and damaging styles that
@@ -605,7 +605,8 @@
                             <div class="tool-buttons">
                                 <div class="tool-subhead">Everyday pricing</div>
                                 <a href="/calculators/manual-pricing.html" class="tool-btn"><i class="fas fa-calculator" aria-hidden="true"></i> Manual Pricing 2026</a>
-                                <a href="/calculators/service-price-cheat-sheet.html" class="tool-btn"><i class="fas fa-clipboard-list" aria-hidden="true"></i> Service Prices</a>
+                                <!-- The Shop Menu (2026-09-03): styled like the menu page itself so reps recognise it. -->
+                                <a href="/calculators/service-price-cheat-sheet.html" class="tool-btn tool-btn--menu" title="The Shop Menu — every service price with its ShopWorks part; rep and customer views, prints to one page"><span class="menu-btn-mark" aria-hidden="true"><i class="fas fa-utensils"></i></span><span class="menu-btn-text"><span class="menu-btn-title">Shop Menu</span><span class="menu-btn-sub">Est. 1977 &middot; every service price</span></span></a>
                                 <!-- Pricing by Style (compare-pricing) retired 2026-08-05 — Quick Quote is what sales actually uses.
                                      The page priced correctly (same 5 pricing services, verified against the locked PC54 baselines)
                                      but was the only pricing surface with no parity test, so it could drift silently.
