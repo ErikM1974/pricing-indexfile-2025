@@ -1,3 +1,8 @@
+## v2026.09.03.14 (2026.09.03)
+
+- Staff dashboard: heal My Stuff labels, drop retired recents, hide the closed search panel
+- Deploy v2026.09.03.14: 1 files (index.html...)
+
 ## v2026.09.03.13 (2026.09.03)
 
 - Staff dashboard Workspaces: role-based tabs, audited names, reports off the front page
