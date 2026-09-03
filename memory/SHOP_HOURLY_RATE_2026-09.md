@@ -104,6 +104,14 @@ cheat sheet (`/calculators/service-price-cheat-sheet.html`) is now the ONE rep p
 shop-services section with part numbers + fees; the customer card and calculator read the same rows.
 Calculator saves StyleNumber = part number, minimum top-up as an `LTM` line.
 
+**Customer-copy revision (Erik's 10 points, 2026-09-03 PM, plan-mode agreed):** minimum **$90** ("one hour of shop
+time"); ONE sample price **$50**; supplies we provide priced like garments **cost ÷ 0.53** (`SHOP-MATERIAL-DENOM`;
+markup row retired — Erik: we work on MARGIN, 30% markup was only 23% margin); removed from the menu: Name/Number
+(DTG/transfers), Re-run, Patch-during-run (SECC/SEG cover it), Laser Patch; 3D puff = a footnote "add $5 per piece
+to any embroidery price", not a line; customer print = shop courses + Setup & Art only (Screen Print & Other is
+rep-only); two print buttons ("Print customer menu" forces the customer view). Bench $90/h ≠ the minimum: the rate
+only shows as $25/¼h. 🔴 Erik printed the REP view by mistake the first time — hence the dedicated button.
+
 **SHOP MENU (2026-09-03, Erik's "restaurant menu" idea):** `/calculators/service-price-cheat-sheet.html` rebuilt
 as the NWCA Shop Menu — Bodoni Moda masthead "Shop Menu · Est. 1977", House Rules, courses (Sewing Bench /
 Embroidery Heads / Finishing / Laser Bar / Setup & Art / Screen Print & Other), dot leaders. **Two views,

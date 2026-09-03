@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,600;0,6..96,700;1,6..96,400&family=Libre+Franklin:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Page styles -->
-    <link rel="stylesheet" href="/calculators/service-price-cheat-sheet.css">
+    <link rel="stylesheet" href="/calculators/service-price-cheat-sheet.css?v=2026.09.03.7">
 </head>
 <body class="view-rep">
     <!-- Staff bar: never prints -->
@@ -24,7 +24,8 @@
             <button type="button" class="view-btn" data-view="customer" aria-pressed="false">Customer view <small>prices only</small></button>
         </div>
         <a href="/calculators/shop-services/" class="topbar-link topbar-link--solid" title="Price a job on customer-supplied goods and save it as an SHP quote"><i class="fas fa-toolbox"></i> Price a job</a>
-        <button type="button" class="topbar-link topbar-link--solid" id="printBtn"><i class="fas fa-print"></i> Print / Save PDF</button>
+        <button type="button" class="topbar-link topbar-link--solid" id="printCustomerBtn" title="Prints the customer copy: prices only, no codes or book times"><i class="fas fa-print"></i> Print customer menu</button>
+        <button type="button" class="topbar-link" id="printRepBtn" title="Prints the rep copy with ShopWorks codes and book times"><i class="fas fa-print"></i> Print rep copy</button>
     </header>
 
     <div id="errorBanner" class="error-banner" role="alert"></div>
@@ -38,7 +39,7 @@
             <div class="masthead-rule"></div>
             <div class="minimum-stamp" role="note" aria-label="Job minimum">
                 <span class="minimum-amount">$<span data-rule="min">75</span></span>
-                <span class="minimum-text"><strong>minimum per job</strong><br>any service on this menu, one minimum per ticket<span class="rep-only"> &middot; bill the difference on <code>LTM</code></span></span>
+                <span class="minimum-text"><strong>minimum per job</strong><br>one hour of shop time &mdash; any service on this menu, one minimum per ticket<span class="rep-only"> &middot; bill the difference on <code>LTM</code></span></span>
             </div>
         </header>
 
@@ -47,7 +48,7 @@
             <ol class="house-rules-list">
                 <li><strong>Bring us your goods, we price by the piece.</strong> Price &times; quantity, with a <strong>$<span data-rule="min">75</span> minimum per job</strong><span class="rep-only"> &mdash; bill the difference on <code>LTM</code></span>.</li>
                 <li><strong>Not on the menu?</strong> We quote the time: <strong>$<span data-rule="bench">25</span></strong> per quarter hour at the bench, <strong>$<span data-rule="machine">37.50</span></strong> per quarter hour on a machine<span class="rep-only"> &mdash; on <code>DECG</code>, <code>DECC</code> or <code>Laser</code>; Erik or Ruthie approves the estimate</span>.</li>
-                <li><strong>We supply the garment?</strong> <span class="rep-only">Use the quote builder; names, patches and puff are add-ons there at the same prices. </span>Materials we supply on any job are cost + <span data-rule="markup">30</span>%. Goods you supply are worked at your risk.</li>
+                <li><strong>Supplies we provide</strong> (transfers, labels, bags, special thread) are priced the same way as our garments<span class="rep-only"> &mdash; cost &divide; <span data-rule="denom">0.53</span>, never a garment</span>. Goods you supply are worked at your risk.<span class="rep-only"> <strong>We supply the garment?</strong> Use the quote builder; names, patches and puff are add-ons there at the same prices.</span></li>
             </ol>
         </section>
 
@@ -63,6 +64,6 @@
     </main>
 
     <script src="/shared_components/js/app-config.js"></script>
-    <script src="/calculators/service-price-cheat-sheet.js"></script>
+    <script src="/calculators/service-price-cheat-sheet.js?v=2026.09.03.7"></script>
 </body>
 </html>

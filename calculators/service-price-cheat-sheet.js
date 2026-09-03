@@ -90,6 +90,8 @@
             return {
                 cat: r.Category || 'Other', name: r.DisplayName, code: r.AliasFor || '',
                 price: Number(r.SellPrice), unit: r.PerUnit || 'each',
+                // "add-on" rows (3D puff) are footnotes under their course, not priced lines.
+                addon: /add-?on/i.test(r.PerUnit || ''),
                 book: Number(r.UnitCost) > 0 ? Number(r.UnitCost) + ' min ' + (String(r.Position || '').toUpperCase() === 'MACHINE' ? 'machine' : 'bench') : '',
                 mismatch: isFinite(pp) && pp > 0 && Math.abs(pp - Number(r.SellPrice)) > 0.001 ? pp : null
             };
@@ -116,12 +118,20 @@
             '</div>';
     }
 
-    function courseHtml(title, note, itemsHtml, wide) {
-        return '<section class="course' + (wide ? ' course--wide' : '') + '"><h2 class="course-title">' + esc(title) + '</h2>' +
+    function courseHtml(title, note, itemsHtml, wide, internal) {
+        return '<section class="course' + (wide ? ' course--wide' : '') + (internal ? ' course--internal' : '') + '"><h2 class="course-title">' + esc(title) + '</h2>' +
             (note ? '<p class="course-note">' + esc(note) + '</p>' : '') + itemsHtml + '</section>';
     }
 
-    function feeCourse(list, scMap, title, note, apiOk) {
+    function addonHtml(it) {
+        const meta = [];
+        if (it.code) meta.push('<code>' + esc(it.code) + '</code>');
+        if (it.book) meta.push('<span class="book">book ' + esc(it.book) + '</span>');
+        return '<p class="course-addon"><strong>' + esc(it.name) + ':</strong> add ' + currency(it.price) + ' per piece to any cap or garment embroidery price.' +
+            (meta.length ? ' <span class="item-meta rep-only">' + meta.join('') + '</span>' : '') + '</p>';
+    }
+
+    function feeCourse(list, scMap, title, note, apiOk, internal) {
         const html = list.map((f) => {
             const rec = scMap[f.code];
             const live = rec ? Number(rec.SellPrice) : NaN;
@@ -129,7 +139,7 @@
             return itemHtml({ name: f.name, code: f.code, unit: f.unit, desc: f.desc, price, text: f.text || (price == null ? 'varies' : null) },
                 { fallback: !apiOk && f.fallback != null });
         }).join('');
-        return courseHtml(title, note, html, false);
+        return courseHtml(title, note, html, false, internal);
     }
 
     function render(rows) {
@@ -138,19 +148,22 @@
         if (shop.rules['SHOP-JOB-MIN'] != null) set('min', Number(shop.rules['SHOP-JOB-MIN']).toFixed(0));
         if (shop.rules['SHOP-BENCH-QH'] != null) set('bench', Number(shop.rules['SHOP-BENCH-QH']).toFixed(2).replace(/\.00$/, ''));
         if (shop.rules['SHOP-MACHINE-QH'] != null) set('machine', Number(shop.rules['SHOP-MACHINE-QH']).toFixed(2));
-        if (shop.rules['SHOP-MATERIAL-MARKUP'] != null) set('markup', Number(shop.rules['SHOP-MATERIAL-MARKUP']).toFixed(0));
+        if (shop.rules['SHOP-MATERIAL-DENOM'] != null) set('denom', Number(shop.rules['SHOP-MATERIAL-DENOM']).toFixed(2));
 
+        const courseBody = (items) => items.filter((it) => !it.addon).map((it) => itemHtml(it)).join('') +
+            items.filter((it) => it.addon).map((it) => addonHtml(it)).join('');
         let html = '';
         COURSES.forEach((c) => {
             const items = shop.items.filter((it) => it.cat === c.cat);
-            if (items.length) html += courseHtml(c.title, c.note, items.map((it) => itemHtml(it)).join(''), false);
+            if (items.length) html += courseHtml(c.title, c.note, courseBody(items), false);
         });
         // Any SHOP category not in the fixed list still shows, at the end.
         const known = new Set(COURSES.map((c) => c.cat));
         const extra = shop.items.filter((it) => !known.has(it.cat));
-        if (extra.length) html += courseHtml('Also on the menu', '', extra.map((it) => itemHtml(it)).join(''), false);
+        if (extra.length) html += courseHtml('Also on the menu', '', courseBody(extra), false);
         html += feeCourse(FEE_COURSE, shop.scMap, 'Setup & Art', 'Once per design or per order, on any kind of job.', true);
-        html += feeCourse(OTHER_COURSE, shop.scMap, 'Screen Print & Other', '', true);
+        // Screen-print and pass-through lines are for the reps; the customer copy hides them.
+        html += feeCourse(OTHER_COURSE, shop.scMap, 'Screen Print & Other', 'Rep reference — not on the customer copy.', true, true);
         document.getElementById('courses').innerHTML = html;
     }
 
@@ -160,14 +173,24 @@
         b.classList.add('show');
         let html = courseHtml('Shop services on customer goods', 'Unavailable until Caspio answers.', '<p class="course-note">No prices shown.</p>', true);
         html += feeCourse(FEE_COURSE, {}, 'Setup & Art', 'Documented prices — badged as fallback until Caspio answers.', false);
-        html += feeCourse(OTHER_COURSE, {}, 'Screen Print & Other', '', false);
+        html += feeCourse(OTHER_COURSE, {}, 'Screen Print & Other', '', false, true);
         document.getElementById('courses').innerHTML = html;
     }
 
     // ── init ───────────────────────────────────────────────────────────────────
     async function init() {
         document.querySelectorAll('.view-btn').forEach((b) => b.addEventListener('click', () => setView(b.dataset.view)));
-        document.getElementById('printBtn').addEventListener('click', () => window.print());
+        // Two print buttons so the customer copy can never go out with codes and book times on it:
+        // each one forces its view, prints, and puts the view back.
+        const printAs = (view) => {
+            const before = document.body.classList.contains('view-customer') ? 'customer' : 'rep';
+            setView(view);
+            const restore = () => { setView(before); window.removeEventListener('afterprint', restore); };
+            window.addEventListener('afterprint', restore);
+            setTimeout(() => window.print(), 50);
+        };
+        document.getElementById('printCustomerBtn').addEventListener('click', () => printAs('customer'));
+        document.getElementById('printRepBtn').addEventListener('click', () => printAs('rep'));
         let saved = 'rep';
         try { saved = localStorage.getItem('nwca-menu-view') || 'rep'; } catch (e) { /* fine */ }
         setView(saved === 'customer' ? 'customer' : 'rep');

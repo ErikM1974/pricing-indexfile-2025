@@ -51,9 +51,11 @@
         const byCode = {};
         rows.forEach((r) => { byCode[String(r.ServiceCode || '').toUpperCase()] = r; });
         const need = (c) => { if (!byCode[c] || !isFinite(Number(byCode[c].Price))) throw new Error('row ' + c + ' missing'); return Number(byCode[c].Price); };
-        state.rules = { min: need('SHOP-JOB-MIN'), benchQH: need('SHOP-BENCH-QH'), machineQH: need('SHOP-MACHINE-QH'), markupPct: need('SHOP-MATERIAL-MARKUP') };
-        $('ss-rules-note').textContent = 'Job minimum ' + money(state.rules.min) + ' · off-card time ' + money(state.rules.benchQH) + ' per quarter hour bench, ' +
-            money(state.rules.machineQH) + ' per quarter hour machine · materials we supply at cost + ' + state.rules.markupPct + '%. Customer-supplied goods are worked at the customer\'s risk.';
+        // Supplies we provide are priced like garments: cost ÷ SHOP-MATERIAL-DENOM (0.53 = 47% margin).
+        state.rules = { min: need('SHOP-JOB-MIN'), benchQH: need('SHOP-BENCH-QH'), machineQH: need('SHOP-MACHINE-QH'), denom: need('SHOP-MATERIAL-DENOM') };
+        if (!(state.rules.denom > 0 && state.rules.denom <= 1)) throw new Error('SHOP-MATERIAL-DENOM must be a margin denominator between 0 and 1');
+        $('ss-rules-note').textContent = 'Job minimum ' + money(state.rules.min) + ' (one hour of shop time) · off-card time ' + money(state.rules.benchQH) + ' per quarter hour bench, ' +
+            money(state.rules.machineQH) + ' per quarter hour machine · supplies we provide priced like garments (cost ÷ ' + state.rules.denom.toFixed(2) + '). Customer-supplied goods are worked at the customer\'s risk.';
     }
 
     function services() {
@@ -80,8 +82,8 @@
             const unit = l.mode === 'machine' ? state.rules.machineQH : state.rules.benchQH;
             return { label: (l.desc || 'Shop time') + ' (' + (l.mode === 'machine' ? 'machine' : 'bench') + ')', part: 'DECG', unitText: 'per ¼ hour', unit, qty: l.quarters, total: unit * l.quarters };
         }
-        const unit = ceil2(l.cost * (1 + state.rules.markupPct / 100));
-        return { label: (l.desc || 'Material') + ' (we supply)', part: '', unitText: 'each', unit, qty: l.qty, total: unit * l.qty };
+        const unit = ceil2(l.cost / state.rules.denom);
+        return { label: (l.desc || 'Supplies') + ' (we provide)', part: '', unitText: 'each', unit, qty: l.qty, total: unit * l.qty };
     }
 
     function compute() {
@@ -108,7 +110,7 @@
                     '<label><input type="radio" name="mode' + line.id + '" data-f="mode" value="bench"' + (line.mode === 'bench' ? ' checked' : '') + '> bench</label> &nbsp; ' +
                     '<label><input type="radio" name="mode' + line.id + '" data-f="mode" value="machine"' + (line.mode === 'machine' ? ' checked' : '') + '> machine</label> &nbsp; quarter hours → &nbsp; ShopWorks part: <b>DECG</b> (caps DECC, laser items Laser)</small>';
             } else {
-                main = '<input type="text" data-f="desc" value="' + esc(line.desc) + '" placeholder="Material (transfer, labels, bags…)"><small>Our cost each: $<input type="number" data-f="cost" min="0" step="0.01" value="' + line.cost + '" class="ss-cost"> → price = cost + ' + state.rules.markupPct + '%</small>';
+                main = '<input type="text" data-f="desc" value="' + esc(line.desc) + '" placeholder="Supplies we provide (transfer, labels, bags…)"><small>Our cost each: $<input type="number" data-f="cost" min="0" step="0.01" value="' + line.cost + '" class="ss-cost"> → price = cost ÷ ' + state.rules.denom.toFixed(2) + ' (same margin as garments)</small>';
             }
             const qtyField = line.kind === 'time' ? 'quarters' : 'qty';
             return '<div class="ss-line" data-id="' + line.id + '">' +
