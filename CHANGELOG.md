@@ -1,3 +1,7 @@
+## v2026.09.03.4 (2026.09.03)
+
+- Deploy v2026.09.03.4: 9 files — the Shop Menu: rep price page restyled as a restaurant menu with rep/customer views and one-page print; separate customer card removed
+
 ## v2026.09.03.3 (2026.09.03)
 
 - Deploy v2026.09.03.3: 7 files — one rep price page: cheat sheet gains shop-services section with ShopWorks parts; card + calculator on the merged Caspio rows
