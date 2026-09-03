@@ -82,6 +82,17 @@ body {
 .masthead-sub { margin: 8px 0 14px; font-size: 12.5px; color: var(--ink-2); font-style: italic; }
 .masthead-sub .est { font-style: normal; font-family: var(--display); letter-spacing: .06em; color: var(--wine); }
 
+/* The cover charge: the job minimum, stamped under the masthead on both views */
+.minimum-stamp {
+    display: inline-flex; align-items: center; gap: 14px; margin: 16px auto 4px; padding: 8px 18px 8px 12px;
+    border: 2px solid var(--wine); border-radius: 4px; background: rgba(122,31,43,.06);
+    transform: rotate(-1.2deg); text-align: left;
+}
+.minimum-amount { font-family: var(--display); font-weight: 700; font-size: 38px; line-height: 1; color: var(--wine); letter-spacing: -.01em; }
+.minimum-text { font-size: 12.5px; line-height: 1.3; color: var(--ink-2); }
+.minimum-text strong { display: block; font-size: 14px; letter-spacing: .12em; text-transform: uppercase; color: var(--wine); }
+.minimum-text code { font: 500 11px var(--text); background: rgba(28,23,18,.06); border: 1px solid var(--rule); border-radius: 3px; padding: 0 4px; color: var(--ink); }
+
 /* House rules */
 .house-rules {
     border: 1px solid var(--ink); padding: 14px 18px 12px; margin: 0 auto 26px; max-width: 760px; position: relative;
@@ -156,6 +167,10 @@ body.view-rep .customer-only { display: none !important; }
     .masthead { margin-bottom: 12px; }
     .masthead-title { font-size: 40px; }
     .masthead-eyebrow { margin-top: 8px; }
+    .minimum-stamp { margin: 8px auto 2px; padding: 5px 12px 5px 9px; gap: 10px; }
+    .minimum-amount { font-size: 26px; }
+    .minimum-text { font-size: 10px; }
+    .minimum-text strong { font-size: 11px; }
     .house-rules { margin-bottom: 14px; padding: 10px 14px 8px; }
     .house-rules-list { font-size: 11px; gap: 2px; }
     .house-rules-title { background: #fff; font-size: 12px; }

@@ -95,7 +95,7 @@ setup line — setup is inside the $75 minimum. Laser on customer items: $65 set
 **MERGE 2026-09-03 (Erik: paid prices, reuse existing parts, one page):** SECC $10→**$5.50**, SEG $10→**$8.00**
 (paid numbers; the $10 card was never collected). Every SHOP menu row now names its ShopWorks part in
 `AliasFor`: Monogram · Name/Number ($15, new menu row) · SECC · SEG (garments + vests + bags + backpacks +
-velcro, one price) · DT (samples $50/75/100) · 3D-EMB · Laser Patch · Transfer (press-only $4.50) · DECG
+velcro, one price) · DT (samples $50/75/100) · 3D-EMB · Laser Patch · Transfer (press-only **$8.50** — a heat press is MACHINE time, 3 min = $7.50 basis; $4.50 bench figure was wrong, Erik 2026-09-03) · DECG
 (labels, hems, bag & label, fold/bag/tag, re-runs, off-card time; DECC for caps) · Laser + Setup (customer
 items) · LTM (= the $75 top-up). Retired: SHOP-PATCH-BAG, SHOP-VELCRO (→SEG), SHOP-LASER-SIDE (JDS calc).
 🔑 **The SHOP menu row is the price of record; AliasFor is only the billing code** — a first pass let
