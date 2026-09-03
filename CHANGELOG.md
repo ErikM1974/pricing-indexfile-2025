@@ -1,3 +1,7 @@
+## v2026.09.03.8 (2026.09.03)
+
+- Deploy v2026.09.03.8: Shop Menu — DTF course (press-only + names & numbers, 10 minimum), one-page customer print without browser header/footer
+
 ## v2026.09.03.7 (2026.09.03)
 
 - Deploy v2026.09.03.7: Shop Menu customer-copy revision — $90 minimum, one sample price, supplies at margin, trimmed items, puff as add-on note, customer/rep print buttons
