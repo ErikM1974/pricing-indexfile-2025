@@ -32,6 +32,40 @@ the floor but not the office (deliberate market position; the $250 minimum fixes
 🔑 Utilization is the lever pricing can't reach: at 43% of one shift, extra billable hours cost
 only the production rate.
 
+## Four-year check (Erik: "look at all the transactions", 232K journal lines 2023→2026-09-02)
+
+| year | emb share | production/h | shop/h | company/h | posted (20%) |
+|---|---|---|---|---|---|
+| 2023 | 54.2% | $74 | $99 | $129 | $161 |
+| 2024 | 56.1% | $64 | $88 | $116 | $145 |
+| 2025 | 51.9% | $67 | $91 | $120 | $150 |
+| **2023-25 weighted** | 54.0% | **$68** | **$92** | **$121** | **$152** |
+
+🔑 **$150 holds across three full years.** Materials 40–42% of revenue every year; net $92K / −$18K /
+$164K. 2024 carries the $308K water-damage repair (facility) — excluded as a one-off. ⚠️ 2026 YTD
+computes to $273 only because `orders.csv` holds $542K of the $876K embroidery the GL invoiced in
+2026 — hours understated; redo the order pull before quoting a 2026 rate.
+
+🔑 **The custom card IS $150/h × median logged minutes** (6-10K garments): 1-7 12.0 min → $30.00
+vs card $30.50 · 8-23 6.58 → $16.45 vs $18 · 24-47 5.31 → $13.28 vs $14 · 48-71 5.22 → $13.05 vs
+$13 · 72+ 4.33 → $10.83 vs $12. Contract garments 72+ = 63% of book, caps 81%.
+
+## Bench rate + book-rate manual (Erik's garage idea)
+- **Two posted rates: machine time $150/h; bench (hand work) $90/h**, quarter hours, $22.50 min,
+  materials cost +30%. Bench basis: prod wages+burden $23.64/paid h ÷ 75% productive = $31.50 →
+  +office $47.60 → +company $66.40 → $83 (20%) / $95 (30%).
+- Book seeds: logged medians by product × qty band × stitch band (in the study script output —
+  garment 72+ 6-10K 4.33 min; 24-47 5.31; 8-23 6.58; 1-7 12.0; cap 72+ <6K 2.95; full back 15K+
+  24-47 8.75, 72+ 6.02). ShopWorks `Machines`: Sewing Patches 35/h, Transfer 35/h, Kornit 30/h →
+  patch/transfer 1.7 min = $2.57 at bench. Estimates (need stopwatching): label removal 3 min,
+  sew-in label 3, hem/tack 8, fold+bag 1, rehoop/rerun 6 (machine).
+- ⏭️ Optional build: Caspio `Book_Rates` table + calculator, like the VOL-* rows.
+- **Operator efficiency** (2025-26, single-operator orders, book = mean model): emp 151 120%, 136
+  162%, 200 148%, 257 181% → the mean-model book is too loose for solo orders AND logs undercount;
+  reset book to medians after logging is complete, then post a monthly scoreboard.
+- ⚠️ Machines 4 and 15 log absurd units/hour (552, 185) — Qty field misuse; don't trust per-machine
+  units/h from `ProductionLogDetails`.
+
 ## Method / gotchas
 - Allocation: emb revenue share (4050+4150+4303)/total = 51.9%; burden 105,784/1,007,547 = 10.5%.
 - Hours model: setup 87 min (caps 75) + (2.4 handling [2.7 caps] + 0.25 min/1K) per pc; worst ×1.5
