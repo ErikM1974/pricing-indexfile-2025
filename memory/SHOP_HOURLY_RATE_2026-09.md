@@ -82,9 +82,16 @@ garment/vest 5 → $7.50 · patch on bag/backpack 6 → $9.00 · velcro 3.5 → 
 $0.75 (fold+bag+tag $1.50) · label removal 3 → $4.50 · sew-in label 4 → $6.00 · hem/tack 8 → $12.00 ·
 single-head sample 20 min → $50 (8K) / $75 / $100 · re-run 6 min machine → $15 · **job setup $22.50 on
 every oddball job, $75 job minimum; $250 contract minimum still governs customer-supplied embroidery;
-shop-supplied materials cost +30%; bill in quarter hours.** ⏭️ Erik to approve → then Service_Codes
-rows (SHOP-MACHINE-RATE 150, SHOP-BENCH-RATE 90, SHOP-JOB-SETUP 22.50, SHOP-JOB-MIN 75, SHOP-MATERIAL-
-MARKUP 30) + a `Book_Rates` table; stopwatch the no-history items (5 each) first.
+shop-supplied materials cost +30%; bill in quarter hours.** ✅ BUILT 2026-09-03 (Erik: "build all three"):
+(1) customer card `/pages/shop-services-pricing.html` (printable, LIVE v2026.09.03.1); (2) **25 Caspio
+`Service_Codes` rows, ServiceType `SHOP`** = the price list (Position RULE rows: SHOP-JOB-MIN 75,
+SHOP-BENCH-QH 25, SHOP-MACHINE-QH 37.50, SHOP-MATERIAL-MARKUP 30; SHOP-LASER-SETUP 65; UnitCost = book
+minutes) — edit prices in Caspio, no deploy; (3) rep calculator `/calculators/shop-services/` (card
+lines + quarter-hour time + materials, job minimum, Save → `SHP-YYYY-NNN`, read-only in Quote Mgmt;
+Staff dashboard → Calculators next to Contract Embroidery). Erik simplified the structure: NO $22.50
+setup line — setup is inside the $75 minimum. Laser on customer items: $65 setup + $10/tumbler (rotary,
+~4 min) or $7.50/flat item; 5 tumblers = $115. ⚠️ SHP save path not yet exercised with a real quote.
+Stopwatch the no-history items (labels, hems, re-runs, backpacks) before printing the card widely.
 - Pull recipe: bandit by IP `192.168.10.219` (hostname does not resolve over VPN); LinesOE has
   `date_Creation`, `PartDescription`, `id_ProductClass`, `cn_LineQuantity_ToPrice`, `cnCur_UnitPriceUsed`,
   `cnCur_LinePrice_Act`. Keyword LIKE on PartDescription; drop class 1/'' rows whose PartNumber looks
