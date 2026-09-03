@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-accent="green" data-density="comfy" class="qa-no-motion">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>QA — Staff dashboard Workspaces (tabs, role default, gating)</title>
+
+    <!--
+        Harness for the 2026-09-03 Workspaces restructure (sidebar + tool grid →
+        role-based tabs). Replaces test-admin-nav.html and test-quick-access-layout.html.
+
+        It pulls the REAL tab strip + panels out of staff-dashboard-v3/index.html at
+        runtime (DOMParser — nothing in the page executes) and drives them with the
+        REAL nav-access + workspace controllers over a stubbed /api/crm-session/me.
+        Nothing here is a copy, so it can't drift from what ships.
+
+        Serve the repo root (npm start) and open /tests/ui/test-workspaces.html.
+        If the assertion count looks stale, add ?bust=<anything> — see the boot shim.
+    -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/tokens.css">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/base.css">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/utilities.css">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/phase1-widgets.css">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/workspaces.css">
+    <link rel="stylesheet" href="/tests/ui/test-workspaces.css">
+</head>
+<body>
+    <div class="qa-wrap">
+        <header class="qa-head">
+            <h1>Workspaces — tabs, role default, gating</h1>
+            <div class="qa-controls">
+                <label for="qaRole">Simulated session</label>
+                <select id="qaRole">
+                    <option value="admin">admin (Erik)</option>
+                    <option value="nika">sales — Nika</option>
+                    <option value="taneisha">sales — Taneisha</option>
+                    <option value="art">art (Steve)</option>
+                    <option value="ruth">art — Ruthie</option>
+                    <option value="production">production (Brian)</option>
+                    <option value="shipping">shipping (Mikalah)</option>
+                    <option value="accountant">accountant (Bradley)</option>
+                    <option value="staff">staff (no role)</option>
+                    <option value="anon">not authenticated</option>
+                    <option value="error">/api/crm-session/me FAILS</option>
+                </select>
+                <button type="button" id="qaReload">Re-run</button>
+            </div>
+        </header>
+
+        <section class="qa-results">
+            <h2>Assertions</h2>
+            <ul id="qaAssertions"><li>Loading…</li></ul>
+            <h2>Measured</h2>
+            <dl id="qaMetrics"></dl>
+        </section>
+
+        <div class="qa-stage dashboard-container ws-shell">
+            <main class="main-content" id="qaMount"></main>
+        </div>
+    </div>
+
+    <!-- Loads the harness through a cache-busting shim — see test-workspaces-boot.js. -->
+    <script type="module" src="/tests/ui/test-workspaces-boot.js"></script>
+</body>
+</html>

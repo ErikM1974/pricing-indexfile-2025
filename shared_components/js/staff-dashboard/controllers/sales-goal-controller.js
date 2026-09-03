@@ -40,6 +40,7 @@ function formatGoalCompact(goal) {
 // Set via setYtdTotal() — currently fed by team-performance-controller from the
 // Caspio archive. Slightly stale (lags live by a few days) but real.
 let lastYtd = null;
+let ytdFailed = false;
 
 /**
  * Update the chip with a YTD total.
@@ -51,6 +52,19 @@ let lastYtd = null;
  */
 export function setYtdTotal(ytdAmount, meta = {}) { // eslint-disable-line no-unused-vars
     lastYtd = Number(ytdAmount) || 0;
+    ytdFailed = false;
+    render();
+}
+
+/**
+ * The YTD fetch failed. Say so on the chip instead of sitting on the loading
+ * copy forever (Rule 4: a visible failure, never a silent stale/blank number).
+ * Since 2026-09-03 the dashboard has no team card to carry the error state,
+ * so team-performance-controller reports it here from its catch.
+ */
+export function setYtdUnavailable() {
+    lastYtd = null;
+    ytdFailed = true;
     render();
 }
 
@@ -60,6 +74,17 @@ function render() {
 
     const goalOfEl = els.goalOf();
     if (goalOfEl) goalOfEl.textContent = formatGoalCompact(goal);
+
+    if (lastYtd == null && ytdFailed) {
+        if (banner) { banner.classList.remove('is-loading'); banner.classList.add('is-unavailable'); }
+        const progress = els.progress();
+        if (progress) progress.style.width = '0%';
+        progressbarEl()?.removeAttribute('aria-valuenow');
+        const current = els.current();
+        if (current) current.textContent = 'YTD unavailable';
+        return;
+    }
+    if (banner) banner.classList.remove('is-unavailable');
 
     if (lastYtd == null) {
         // No real YTD data yet — friendly loading state. The .is-loading class

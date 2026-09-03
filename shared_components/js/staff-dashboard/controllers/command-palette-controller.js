@@ -3,7 +3,7 @@
 
    Ctrl+K anywhere on the dashboard → one box that finds ANYTHING:
    • Tools & pages — harvested live from the dashboard's own DOM
-     (every .tool-btn + sidebar link), so the registry can never
+     (every a.ws-link on every workspace tab + My Stuff), so the registry can never
      drift from the real grid. Instant, no network.
    • Customers / Orders / Quotes / Designs — debounced backend
      search via GET /api/staff/command-search (SAML forwarder →
@@ -40,21 +40,34 @@ const state = {
 function harvestRegistry() {
     const seen = new Set();
     const out = [];
-    const links = document.querySelectorAll(
-        '.quick-access-grid a.tool-btn, .pinned-row a.tool-btn, ' +
-        '.sidebar-nav a.nav-link, .sidebar-nav a.nav-section-header-link, .tool-workflow a.tool-btn');
+    // Workspaces (2026-09-03): every tool on every tab, visible or not — a hidden
+    // tab is still one keystroke away. Gated nodes that nav-access has not yet
+    // resolved (or has removed) are skipped; the generated Everything list is
+    // skipped because it repeats the same hrefs.
+    const links = document.querySelectorAll('.ws-panel a.ws-link[href], .pinned-row a.tool-btn[href]');
     for (const a of links) {
+        if (a.hidden || a.closest('[data-requires-role][hidden]') || a.closest('#wsEveryTools')) continue;
         const href = a.getAttribute('href') || '';
         if (!href || href.startsWith('#')) continue;
-        const label = (a.textContent || '').replace(/\s+/g, ' ').trim().split(' — ')[0].slice(0, 48);
+        if (seen.has(href)) continue;   // one tool, one result — even when it sits on two tabs
+        const nm = a.querySelector('.ws-nm') || a.querySelector('.ws-tile__tx b');
+        let label;
+        if (nm) {
+            const c = nm.cloneNode(true);
+            c.querySelectorAll('.ws-who, .qs-new-badge, em').forEach((n) => n.remove());
+            label = c.textContent;
+        } else {
+            label = a.textContent;
+        }
+        label = (label || '').replace(/\s+/g, ' ').trim().split(' — ')[0].slice(0, 48);
         if (!label) continue;
-        const key = `${href}|${label.toLowerCase()}`;
-        if (seen.has(key)) continue;
-        seen.add(key);
-        const cat = a.closest('.tool-category')?.querySelector('.tool-category-title')?.textContent?.trim()
-            || a.closest('.nav-section')?.querySelector('.nav-section-title span:last-child')?.textContent?.trim()
+        seen.add(href);
+        const cat = a.closest('.ws-card')?.dataset.cat
+            || a.closest('.ws-panel')?.querySelector('.ws-head h2')?.textContent?.trim()
             || 'Tools';
-        out.push({ label, href, icon: a.querySelector('i')?.className || 'fas fa-toolbox', category: cat });
+        const iconEl = a.querySelector('i[class*="fa-"]');
+        const icon = iconEl ? iconEl.className.replace(/\bws-[a-z_-]+\b/g, '').trim() : 'fas fa-toolbox';
+        out.push({ label, href, icon: icon || 'fas fa-toolbox', category: cat });
     }
     // Actions that aren't plain links
     out.push({ label: 'New Quote', href: null, run: () => document.getElementById('quote-start-btn')?.click(), icon: 'fas fa-plus', category: 'Actions' });

@@ -2,7 +2,10 @@
  * Page-specific styles only; tokens from art-hub.css, shell from dash-shell.css.
  * Prefix: pp-. Status chips mirror the Mission Control aemc-purch palette. */
 
-:root { --art-theme: #4cb354; }
+/* Page theme (2026-09-03, dashboard Workspaces): the purchasing family's slate blue —
+   the same #4a6fa5 Transfer Queue and Supacolor Jobs carry, so Bradley's pages read
+   as one family from the dashboard tiles. */
+:root { --art-theme: #4a6fa5; --dash-theme: #4a6fa5; --dash-theme-dark: #33537d; --dash-theme-bg: #eaf0f9; }
 
 .pp-toolbar { flex-wrap: wrap; gap: var(--space-2); }
 .pp-updated { font-size: 0.78rem; color: var(--gray-500); }

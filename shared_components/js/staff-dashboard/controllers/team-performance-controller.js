@@ -15,7 +15,7 @@ import { register } from '../core/dashboard-events.js';
 import { showApiError, clearApiError } from '../core/dashboard-errors.js';
 import { escapeHtml, formatMoney, ANNUAL_GOAL } from '../core/dashboard-ui-utils.js';
 import { caspioArchiveService } from '../services/caspio-archive-service.js';
-import { setYtdTotal } from './sales-goal-controller.js';
+import { setYtdTotal, setYtdUnavailable } from './sales-goal-controller.js';
 
 const REP_NAME_ALIASES = {
     'ruth nhoung': 'Ruthie Nhoung',
@@ -138,6 +138,9 @@ async function loadTeam(refresh = false) {
             onRetry: () => loadTeam(true),
             detail: 'YTD per-rep archive is unreachable. The daily archive cron may have stalled.',
         });
+        // The dashboard has no team card since 2026-09-03 — the goal chip is the only
+        // place this failure can show, so tell it.
+        setYtdUnavailable();
         return null;
     }
 }

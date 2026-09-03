@@ -96,6 +96,7 @@ dotenv.config();
 // 3-DAY TEES (studio rebuild 2026-06-09 — helpers ~L770: getTdtPricingConfig/resolveTdtTax/rebuildTdtQuote)
 //   L1860 POST /api/submit-3day-order       — ManageOrders push: placement spec + mockups + dynamic tax labels (channel/rush-aware 2026-06-10)
 //   3DT entry URLs (/pages/3-day-tees.html, /3-day-tees[.html]) → 301 /custom-tees (cutover 2026-06-10, registered BEFORE /pages static; success page NOT redirected)
+//   GET /pages/{box-labels,jds-mockup-creator,dst-viewer,garment-designer,mockup-library}.html — staff-gated (2026-09-03), registered BEFORE the /pages static mount (~L5343)
 //
 // CATALOG (customer redesign P2, 2026-06-11)
 //   GET /catalog[.html]                     — URL-driven product discovery page (pages/catalog.html)
@@ -5344,6 +5345,13 @@ app.get([
   '/pages/art-request-detail.html',
   '/pages/mockup-detail.html',
   '/pages/transfer-detail.html',
+  // 2026-09-03 (dashboard Workspaces audit): five more staff tools that only ever
+  // hung off the staff dashboard but sat on the anonymous /pages static mount.
+  '/pages/box-labels.html',
+  '/pages/jds-mockup-creator.html',
+  '/pages/dst-viewer.html',
+  '/pages/garment-designer.html',
+  '/pages/mockup-library.html',
 ], gateStaffHtml);
 
 // Legacy webstore info page under /pages — same consolidation as the root

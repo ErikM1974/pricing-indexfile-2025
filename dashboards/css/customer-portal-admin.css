@@ -323,3 +323,7 @@
 .cpa-th-sort { font: inherit; font-weight: inherit; text-transform: inherit; letter-spacing: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
 .cpa-th-sort i { opacity: .45; font-size: .85em; }
 .cpa-th-sort--on, .cpa-th-sort--on i { color: var(--cpa-green-dark); opacity: 1; }
+
+/* Page theme (2026-09-03, dashboard Workspaces): the customer family's navy, matching
+   Leads, My Accounts and Customer Portals. Only the dash-shell theme hooks. */
+:root { --dash-theme: #1a2332; --dash-theme-dark: #141c27; --dash-theme-bg: #eef1f5; }
