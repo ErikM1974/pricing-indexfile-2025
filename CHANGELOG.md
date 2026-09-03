@@ -1,3 +1,7 @@
+## v2026.09.03.9 (2026.09.03)
+
+- Deploy v2026.09.03.9: Shop Menu — $100 minimum = one bench hour; rule spells out bench vs machine
+
 ## v2026.09.03.8 (2026.09.03)
 
 - Deploy v2026.09.03.8: Shop Menu — DTF course (press-only + names & numbers, 10 minimum), one-page customer print without browser header/footer
