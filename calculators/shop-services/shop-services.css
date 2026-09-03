@@ -1,0 +1,46 @@
+/* shop-services.css — rep calculator for work on customer-supplied goods (2026-09-03).
+   Shell from dash-shell.css, tokens from art-hub.css. Page-specific only. */
+
+.ss-intro { color: var(--gray-600); max-width: 78ch; margin: 0 0 1rem; }
+.ss-intro strong { color: var(--gray-900); }
+
+.ss-form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: .8rem; }
+.ss-field { display: flex; flex-direction: column; gap: .3rem; font-size: .85rem; color: var(--gray-600); }
+.ss-field--wide { grid-column: 1 / -1; }
+.ss-field input, .ss-line input, .ss-line select {
+    font: inherit; padding: .5rem .6rem; border: 1px solid var(--gray-300); border-radius: var(--radius-md);
+    background: var(--surface-card); color: var(--gray-900);
+}
+.ss-field input:focus, .ss-line input:focus, .ss-line select:focus { outline: 2px solid var(--state-info); outline-offset: 1px; }
+
+.ss-actions { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
+.ss-lines-head, .ss-line { display: grid; grid-template-columns: 1fr 90px 110px 110px 36px; gap: .6rem; align-items: center; }
+.ss-lines-head { font-size: .72rem; text-transform: uppercase; letter-spacing: .04em; color: var(--gray-500); padding-bottom: .4rem; border-bottom: 1px solid var(--gray-200); }
+.ss-line { padding: .5rem 0; border-bottom: 1px solid var(--gray-100); font-size: .9rem; }
+.ss-line .ss-line-main { display: flex; flex-direction: column; gap: .3rem; }
+.ss-line .ss-line-main small { color: var(--gray-500); font-size: .78rem; }
+.ss-line .num { font-family: 'JetBrains Mono', monospace; text-align: right; }
+.ss-line-remove { border: 0; background: transparent; color: var(--gray-400); cursor: pointer; font-size: 1rem; }
+.ss-line-remove:hover { color: var(--state-danger); }
+.ss-empty { color: var(--gray-500); font-style: italic; padding: .8rem 0; }
+
+.ss-totals { display: flex; flex-direction: column; align-items: flex-end; gap: .25rem; margin-top: .8rem; font-size: .95rem; }
+.ss-totals div { display: flex; gap: 1.5rem; }
+.ss-totals span { color: var(--gray-600); }
+.ss-totals b { font-family: 'JetBrains Mono', monospace; min-width: 8ch; text-align: right; }
+.ss-totals .ss-total { font-size: 1.2rem; padding-top: .3rem; border-top: 1px solid var(--gray-200); }
+.ss-totals .ss-total b { color: var(--state-success); }
+.ss-hint { font-size: .8rem; color: var(--gray-500); margin: .8rem 0 0; max-width: 90ch; }
+
+.ss-save-status { font-size: .8rem; color: var(--gray-600); }
+.ss-save-status--ok { color: var(--state-success); }
+.ss-save-status--error { color: var(--state-danger); }
+.ss-summary {
+    white-space: pre-wrap; font-family: 'JetBrains Mono', monospace; font-size: .82rem; line-height: 1.5;
+    background: var(--surface-inset); border: 1px solid var(--gray-200); border-radius: var(--radius-md); padding: 1rem; margin: 0; color: var(--gray-800);
+}
+
+@media (max-width: 720px) {
+    .ss-lines-head { display: none; }
+    .ss-line { grid-template-columns: 1fr 1fr; }
+}

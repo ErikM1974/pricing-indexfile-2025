@@ -177,7 +177,7 @@ Detailed sync manifest lives in **[.claude/rules/quote-builders.md](.claude/rule
 ## Quick Reference
 
 - **API Proxy**: `https://caspio-pricing-proxy-ab30a049961a.herokuapp.com`
-- **Quote Prefixes**: `DTG · RICH · EMB · EMBC · CEMB · LT · PATCH · SPC · SSC · WEB · OF · CAP · SAM · STK · VQ` (CAP = Custom Hats storefront, SAM = paid sample orders, OF = retired Order Form 2026-07-11 — all three read-only in Quote Mgmt, never builder-editable. STK = stickers; since 2026-07-29 it is minted ONLY by the public `/custom-stickers` page via `POST /api/public/sticker-quote`, so STK quotes carry no sales rep — the staff sticker tool that used to mint them was retired. VQ = admin Volume Quote, one-time price for large orders, saved read-only from `/dashboards/volume-quote.html`.)
+- **Quote Prefixes**: `DTG · RICH · EMB · EMBC · CEMB · LT · PATCH · SPC · SSC · WEB · OF · CAP · SAM · STK · VQ · SHP` (CAP = Custom Hats storefront, SAM = paid sample orders, OF = retired Order Form 2026-07-11 — all three read-only in Quote Mgmt, never builder-editable. STK = stickers; since 2026-07-29 it is minted ONLY by the public `/custom-stickers` page via `POST /api/public/sticker-quote`, so STK quotes carry no sales rep — the staff sticker tool that used to mint them was retired. VQ = admin Volume Quote, one-time price for large orders, saved read-only from `/dashboards/volume-quote.html`. SHP = Shop Services quote for work on customer-supplied goods, saved from `/calculators/shop-services/`, read-only in Quote Mgmt.)
 - **Dev**: `npm start` (port 3000)
 
 ## Security Checklist
