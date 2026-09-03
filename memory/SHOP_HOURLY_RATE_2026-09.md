@@ -112,6 +112,8 @@ to any embroidery price", not a line; customer print = shop courses + Setup & Ar
 rep-only); two print buttons ("Print customer menu" forces the customer view). Bench $90/h ≠ the minimum: the rate
 only shows as $25/¼h. 🔴 Erik printed the REP view by mistake the first time — hence the dedicated button.
 
+**DTF course (2026-09-03):** new Menu course "DTF (Direct-to-Film)" — press-only $8.50 moved there from Finishing; `SHOP-NAME-NUMBER` re-activated as "Names and numbers in DTF, transfers included" **$15 each, 10 minimum** (Supacolor LA vendor minimum; course note says so). Print: `@page{margin:0}` + sheet padding removes the browser URL/date header-footer; tighter print sizes so the customer copy fits ONE letter page (rep copy may run two).
+
 **SHOP MENU (2026-09-03, Erik's "restaurant menu" idea):** `/calculators/service-price-cheat-sheet.html` rebuilt
 as the NWCA Shop Menu — Bodoni Moda masthead "Shop Menu · Est. 1977", House Rules, courses (Sewing Bench /
 Embroidery Heads / Finishing / Laser Bar / Setup & Art / Screen Print & Other), dot leaders. **Two views,

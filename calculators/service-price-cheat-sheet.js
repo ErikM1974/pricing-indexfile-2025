@@ -45,7 +45,8 @@
     const COURSES = [
         { cat: 'Sewing',                        title: 'From the Sewing Bench',     note: 'Your patches, emblems and labels, sewn on by hand.' },
         { cat: 'Embroidery on your goods',      title: 'From the Embroidery Heads', note: 'Names, samples and extras on garments you bring us.' },
-        { cat: 'Finishing',                     title: 'Finishing',                 note: 'Pressed, bagged, tagged and ready to hand out.' },
+        { cat: 'DTF (Direct-to-Film)',          title: 'DTF (Direct-to-Film)',      note: 'Pressed on our heat press. Transfers we supply come from our Supacolor partner in Los Angeles, whose minimum is 10 per design.' },
+        { cat: 'Finishing',                     title: 'Finishing',                 note: 'Bagged, tagged and ready to hand out.' },
         { cat: 'Laser engraving on your items', title: 'The Laser Bar',             note: 'Tumblers, boards, plaques and cases you supply.' },
     ];
 
