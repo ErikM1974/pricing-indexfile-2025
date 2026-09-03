@@ -1,3 +1,8 @@
+## v2026.09.03.5 (2026.09.03)
+
+- Memory: press-only on customer transfers is machine time, $8.50
+- Deploy v2026.09.03.5: Shop Menu — $75 job minimum stamped under the masthead (screen + print)
+
 ## v2026.09.03.4 (2026.09.03)
 
 - Deploy v2026.09.03.4: 9 files — the Shop Menu: rep price page restyled as a restaurant menu with rep/customer views and one-page print; separate customer card removed
