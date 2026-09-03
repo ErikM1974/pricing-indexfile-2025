@@ -1,3 +1,7 @@
+## v2026.09.03.10 (2026.09.03)
+
+- Deploy v2026.09.03.10: Shop Menu print-review edits — LTM fee rep-only, sample/laser notes, rush wording, art label, patch line, DTF in subtitle, price-unit spacing
+
 ## v2026.09.03.9 (2026.09.03)
 
 - Deploy v2026.09.03.9: Shop Menu — $100 minimum = one bench hour; rule spells out bench vs machine
