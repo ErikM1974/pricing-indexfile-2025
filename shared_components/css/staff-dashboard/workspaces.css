@@ -1,0 +1,327 @@
+/* =====================================================================
+   STAFF DASHBOARD v3 — WORKSPACES (2026-09-03)
+
+   The role-based tab layout that replaced the sidebar + single tool grid.
+   Loaded LAST and deliberately UNLAYERED: dashboard-v3-theme.css and
+   dashboard-v3-patch-2.css are unlayered too, and unlayered rules beat every
+   @layer rule regardless of specificity — so this is the only place a new
+   layout rule is guaranteed to win (LESSONS 2026-07-29, "three stylesheets
+   declared the same grid"). Everything here is prefixed `ws-` so the broad
+   [class*=…] over-matching that killed PATCH 3/4 cannot recur.
+
+   Every color is a tokens.css variable or a JOB-FAMILY color declared once
+   below. Family colors are the same hexes the destination pages carry in
+   their own headers (--dash-theme / --art-theme), so a tile looks like where
+   it takes you:
+     money/quoting  NW green (tokens --accent)
+     CRM            navy #1a2332 + gold #f59e0b  (rep CRM tier cards)
+     purchasing     slate blue #4a6fa5           (transfer queue, Supacolor)
+     mockups        purple #6B46C1               (Ruth's mockup queue)
+     art requests   crimson #981e32              (AE art dashboard, Steve)
+     shop floor     blue #2563eb                 (box labels, names & numbers)
+     photos         deep green #14351c           (Photo Capture app)
+     archive        amber #d97706                (old designs)
+     drinkware      oxblood #7f1d1d              (tumbler mockup)
+     vault          forest #2e5827               (Design Vault)
+     storefront     cream + #2f7d3b              (customer price pages)
+     menu           wine #7a1f2b on paper        (Shop Menu)
+   ===================================================================== */
+
+:root {
+    --f-money: var(--accent, #22c55e);   --f-money-fg: #06210f;
+    --f-steel: #2e4a62;                  --f-steel-fg: #dbe7f3;
+    --f-crm:   #1a2332;                  --f-crm-fg: #f59e0b;   --f-crm-ring: #f59e0b;
+    --f-purch: #4a6fa5;                  --f-purch-fg: #ffffff;
+    --f-mock:  #6B46C1;                  --f-mock-fg: #ffffff;
+    --f-artreq:#981e32;                  --f-artreq-fg: #ffffff;
+    --f-floor: #2563eb;                  --f-floor-fg: #ffffff;
+    --f-photo: #14351c;                  --f-photo-fg: #4ade80; --f-photo-ring: #2f7d38;
+    --f-arch:  #d97706;                  --f-arch-fg: #ffffff;
+    --f-ox:    #7f1d1d;                  --f-ox-fg: #fecaca;
+    --f-vault: #2e5827;                  --f-vault-fg: #bbf7d0;
+    --f-ref:   var(--line, #3a4452);     --f-ref-fg: var(--text, #e6edf3);
+    --f-store: #2f7d3b;                  --f-store-fg: #faf8f3;
+    --f-menu:  #7a1f2b;                  --f-menu-fg: #f6efe1;
+}
+
+/* Family classes: set --fam/--fam-fg for whatever they sit on. */
+.f-money  { --fam: var(--f-money);  --fam-fg: var(--f-money-fg); }
+.f-steel  { --fam: var(--f-steel);  --fam-fg: var(--f-steel-fg); }
+.f-crm    { --fam: var(--f-crm);    --fam-fg: var(--f-crm-fg);   --fam-ring: var(--f-crm-ring); }
+.f-purch  { --fam: var(--f-purch);  --fam-fg: var(--f-purch-fg); }
+.f-mock   { --fam: var(--f-mock);   --fam-fg: var(--f-mock-fg); }
+.f-artreq { --fam: var(--f-artreq); --fam-fg: var(--f-artreq-fg); }
+.f-floor  { --fam: var(--f-floor);  --fam-fg: var(--f-floor-fg); }
+.f-photo  { --fam: var(--f-photo);  --fam-fg: var(--f-photo-fg); --fam-ring: var(--f-photo-ring); --fam-mark: #2f7d38; }
+.f-arch   { --fam: var(--f-arch);   --fam-fg: var(--f-arch-fg); }
+.f-ox     { --fam: var(--f-ox);     --fam-fg: var(--f-ox-fg); }
+.f-vault  { --fam: var(--f-vault);  --fam-fg: var(--f-vault-fg); }
+.f-ref    { --fam: var(--f-ref);    --fam-fg: var(--f-ref-fg); }
+.f-store  { --fam: var(--f-store);  --fam-fg: var(--f-store-fg); }
+.f-menu   { --fam: var(--f-menu);   --fam-fg: var(--f-menu-fg); }
+.f-client-red  { --fam: #dc2626; --fam-fg: #ffffff; }
+.f-client-navy { --fam: #2C2997; --fam-fg: #ffffff; }
+.f-client-char { --fam: #1f2937; --fam-fg: #fca5a5; }
+.f-mint        { --fam: #e8f5e9; --fam-fg: #1b5e20; }
+
+/* ── Shell: one column, no sidebar ─────────────────────────────────── */
+.dashboard-container.ws-shell { grid-template-columns: 1fr; }
+.ws-shell > .main-content { width: 100%; max-width: 1360px; margin: 0 auto; }
+
+/* ── Header additions ──────────────────────────────────────────────── */
+.ws-brand { display: inline-flex; align-items: center; }
+.ws-brand__img { height: 26px; width: auto; filter: brightness(0) invert(1); opacity: .9; }
+.ws-brand:hover .ws-brand__img { opacity: 1; }
+
+/* Past-due chip. past-due-badge.js paints #nav-pd-badge inside it and sets
+   data-pastdue on the chip; the badge classes come from dashboard-v3-theme.css. */
+.ws-pd {
+    display: inline-flex; align-items: center; gap: 8px;
+    height: 30px; padding: 0 11px; border-radius: var(--radius-pill);
+    border: 1px solid var(--line-soft); background: var(--bg-card);
+    color: var(--text-2); font-size: 12.5px; white-space: nowrap; text-decoration: none;
+}
+.ws-pd:hover { background: var(--bg-card-2); color: var(--text); }
+.ws-pd[data-pastdue="alert"] { border-color: color-mix(in oklch, var(--bad) 45%, transparent); }
+.ws-pd .nav-pd-badge { margin: 0; }
+
+/* ── Pride Wall, compact: 6 tiles, half the old height ─────────────── */
+.pw-strip .pw-tile { aspect-ratio: 2 / 1; }
+.pw-strip .pw-track { gap: 8px; }
+
+/* ── Tab strip ─────────────────────────────────────────────────────── */
+.ws-tabs {
+    display: flex; align-items: flex-end; gap: 2px;
+    border-bottom: 1px solid var(--line-soft);
+    margin: 0 0 14px; overflow-x: auto; scrollbar-width: none;
+}
+.ws-tabs::-webkit-scrollbar { display: none; }
+.ws-tab {
+    position: relative; display: inline-flex; align-items: center; gap: 8px;
+    height: 42px; padding: 0 14px; margin-bottom: -1px;
+    background: none; border: 0; border-bottom: 2px solid transparent;
+    color: var(--text-3); font: inherit; font-weight: 500; font-size: 14px;
+    white-space: nowrap; cursor: pointer;
+}
+.ws-tab:hover { color: var(--text); }
+.ws-tab[aria-selected="true"] { color: var(--text); border-bottom-color: var(--accent); }
+.ws-tab:focus-visible { outline: none; box-shadow: var(--focus-ring); border-radius: var(--radius-sm); }
+.ws-tab__you { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); display: none; }
+.ws-tab.is-you .ws-tab__you { display: inline-block; }
+.ws-tab--admin { margin-left: auto; color: var(--text-dim); }
+.ws-tab--admin[aria-selected="true"] { color: var(--text); }
+.ws-tab--admin::before { content: ""; width: 1px; height: 18px; background: var(--line); margin-right: 10px; }
+.ws-tab--admin[hidden] { display: none; }
+.ws-tabs__hint { padding: 0 6px 12px 12px; font-size: 12px; color: var(--text-dim); white-space: nowrap; }
+.ws-tabs__hint kbd {
+    font-family: var(--font-mono); font-size: 11px; padding: 1px 5px;
+    border: 1px solid var(--line); border-radius: 4px; color: var(--text-3);
+}
+
+/* ── Legend ────────────────────────────────────────────────────────── */
+.ws-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 11.5px; color: var(--text-3); margin: -2px 0 18px; }
+.ws-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.ws-legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; background: var(--fam-mark, var(--fam)); }
+
+/* ── Panels + cards ────────────────────────────────────────────────── */
+/* Panels are off until workspace-controller marks the active one `is-on`, so
+   nothing flashes before the module runs. [hidden] = gated and not (yet)
+   allowed — set only by nav-access-controller — and always wins. */
+.ws-panel { display: none; }
+.ws-panel.is-on { display: block; }
+.ws-panel[hidden] { display: none !important; }
+.ws-head { display: flex; align-items: baseline; gap: 12px; margin: 0 0 14px; flex-wrap: wrap; }
+.ws-head h2 { font-size: 16px; font-weight: 600; margin: 0; color: var(--text); }
+.ws-head p { margin: 0; color: var(--text-3); font-size: 13px; }
+
+.ws-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; align-items: start; margin-bottom: 22px; }
+.ws-card {
+    background: var(--bg-card); border: 1px solid var(--line-soft); border-radius: var(--radius-lg);
+    padding: 14px 14px 10px; display: flex; flex-direction: column; min-width: 0;
+}
+.ws-card--wide { grid-column: span 2; }
+.ws-card-h { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 0 4px 10px; }
+.ws-card-h h3 { font-size: 14px; font-weight: 600; margin: 0; color: var(--text); }
+.ws-card-h .ws-n { font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); }
+.ws-sub {
+    padding: 10px 4px 4px; font-size: 11px; font-weight: 600; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--text-3);
+}
+.ws-sub small { font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--text-dim); margin-left: 6px; }
+.ws-tools { display: flex; flex-direction: column; }
+.ws-tools--cols { display: grid; grid-template-columns: 1fr 1fr; column-gap: 14px; }
+.ws-note { font-size: 12px; color: var(--text-dim); padding: 6px 8px 4px; }
+
+/* Rows: family mark + name + who + description */
+.ws-row {
+    display: flex; align-items: center; gap: 9px; min-height: 36px; padding: 0 8px;
+    border-radius: var(--radius-sm); color: var(--text); font-size: 13.5px; min-width: 0;
+    text-decoration: none;
+}
+.ws-row:hover { background: var(--bg-card-2); }
+.ws-row:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.ws-mk {
+    width: 10px; height: 10px; border-radius: 3px; flex: none;
+    background: var(--fam-mark, var(--fam, var(--line)));
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08);
+}
+.ws-nm { white-space: nowrap; }
+.ws-who { color: var(--text-3); font-size: 12px; white-space: nowrap; }
+.ws-d {
+    margin-left: auto; font-size: 12px; color: var(--text-dim); text-align: right;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0;
+}
+.ws-row .qs-new-badge, .ws-tile .qs-new-badge { flex: none; }
+.ws-lock { font-size: 11px; color: var(--text-dim); flex: none; }
+.ws-ext { color: var(--text-dim); font-size: 12px; }
+
+/* "More" folds — tool-grid-controller remembers any [data-collapse-key] */
+details.ws-more > summary {
+    list-style: none; cursor: pointer; display: flex; align-items: center; gap: 8px;
+    padding: 8px; font-size: 12.5px; color: var(--text-3); border-radius: var(--radius-sm);
+}
+details.ws-more > summary::-webkit-details-marker { display: none; }
+details.ws-more > summary:hover { color: var(--text); background: var(--bg-card-2); }
+details.ws-more > summary i.fa-chevron-right { font-size: 10px; transition: transform var(--motion-fast) var(--ease-out); }
+details.ws-more[open] > summary i.fa-chevron-right { transform: rotate(90deg); }
+details.ws-more > summary .ws-n { margin-left: auto; font-family: var(--font-mono); font-size: 11px; color: var(--text-dim); }
+
+/* Tiles: the big ones */
+.ws-tile {
+    display: flex; align-items: center; gap: 12px; padding: 10px 12px; margin: 0 0 6px;
+    border-radius: var(--radius-md); border: 1px solid var(--line); background: var(--bg-card-2);
+    color: var(--text); text-decoration: none; min-width: 0;
+}
+.ws-tile:hover { border-color: var(--fam, var(--accent)); }
+.ws-tile:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.ws-chip-mk {
+    width: 34px; height: 34px; border-radius: 9px; flex: none;
+    background: var(--fam, var(--line)); color: var(--fam-fg, #fff);
+    display: grid; place-items: center; font-family: var(--font-mono); font-weight: 600; font-size: 15px;
+    box-shadow: 0 0 0 1px var(--fam-ring, transparent) inset;
+}
+.ws-chip-mk i { font-size: 15px; }
+.ws-chip-mk img { display: block; }
+.ws-tile__tx { min-width: 0; flex: 1; }
+.ws-tile__tx b { display: block; font-size: 13.5px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ws-tile__tx b .ws-who { font-weight: 400; }
+.ws-tile__tx .ws-d { display: block; margin: 0; text-align: left; color: var(--text-3); }
+.ws-tile__go { margin-left: auto; color: var(--text-dim); flex: none; font-size: 13px; }
+.ws-tile:hover .ws-tile__go { color: var(--accent-2); }
+.ws-tile--sm { padding: 8px 10px; }
+.ws-tile--sm .ws-chip-mk { width: 28px; height: 28px; border-radius: 7px; font-size: 13px; }
+.ws-tile--sm .ws-chip-mk i { font-size: 13px; }
+.ws-tile--sm .ws-tile__tx b { font-size: 13px; }
+.ws-flow { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 6px; margin-bottom: 6px; }
+.ws-flow .ws-tile { margin: 0; }
+.ws-flow__arr { color: var(--text-dim); }
+
+/* ── Bespoke tiles: the tile looks like the page ───────────────────── */
+/* Shop Menu — paper, wine, Bodoni, Est. 1977 (mirrors service-price-cheat-sheet.css) */
+.ws-tile.bs-menu {
+    background: #f6efe1;
+    background-image: radial-gradient(ellipse at 15% 0%, rgba(255, 255, 255, .7), transparent 55%);
+    border: 2px solid #7a1f2b; color: #1c1712;
+}
+.ws-tile.bs-menu .ws-chip-mk {
+    background: rgba(122, 31, 43, .06); border: 1px solid #7a1f2b; color: #7a1f2b; border-radius: 50%;
+    box-shadow: none; font-family: 'Bodoni Moda', 'Didot', 'Times New Roman', serif;
+}
+.ws-tile.bs-menu .ws-tile__tx b { font-family: 'Bodoni Moda', 'Didot', 'Times New Roman', serif; font-weight: 700; font-size: 17px; color: #1c1712; }
+.ws-tile.bs-menu .ws-tile__tx .ws-d { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: #7a1f2b; }
+.ws-tile.bs-menu .ws-tile__go, .ws-tile.bs-menu:hover .ws-tile__go { color: #7a1f2b; }
+.ws-tile.bs-menu:hover { box-shadow: inset 0 0 0 1px #c9b99c, 0 6px 14px rgba(122, 31, 43, .35); }
+
+/* Supacolor Jobs — the vendor's own mark on the dark chip its page uses */
+.ws-tile.bs-supa { background: #1e293b; border-color: #334155; }
+.ws-tile.bs-supa .ws-chip-mk { width: auto; min-width: 34px; padding: 0 6px; background: #0f172a; box-shadow: none; }
+.ws-tile.bs-supa .ws-chip-mk img { height: 18px; width: auto; }
+.ws-tile.bs-supa .ws-tile__tx .ws-d { color: #94a3b8; }
+.ws-tile.bs-supa:hover { border-color: #64748b; }
+
+/* DST Studio — "digitizer's bench": near-black, thread-teal, mono numbers */
+.ws-tile.bs-dst { background: #0b0d11; border-color: #1f2530; }
+.ws-tile.bs-dst .ws-chip-mk { background: #12151b; color: #45d6c5; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .07); }
+.ws-tile.bs-dst .ws-tile__tx b { color: #e8edf2; letter-spacing: .01em; }
+.ws-tile.bs-dst .ws-tile__tx .ws-d { color: #45d6c5; font-family: var(--font-mono); font-size: 11px; }
+.ws-tile.bs-dst:hover { border-color: #45d6c5; }
+
+/* Contract Embroidery / DTG — pink, Fraunces italic "2026." (contract-pricing-2026.css) */
+.ws-tile.bs-contract { background: #FBF8FA; border-color: #e9cfd9; color: #1A1318; }
+.ws-tile.bs-contract .ws-chip-mk { background: #B91C5C; color: #fff; font-family: 'Fraunces', Georgia, serif; font-style: italic; font-size: 15px; box-shadow: none; }
+.ws-tile.bs-contract .ws-tile__tx b { color: #1A1318; font-family: 'Fraunces', Georgia, serif; font-weight: 600; font-size: 15px; }
+.ws-tile.bs-contract .ws-tile__tx b em { font-style: italic; color: #B91C5C; }
+.ws-tile.bs-contract .ws-tile__tx .ws-d { color: #8E1147; }
+.ws-tile.bs-contract .ws-tile__go, .ws-tile.bs-contract:hover .ws-tile__go { color: #B91C5C; }
+.ws-tile.bs-contract:hover { border-color: #B91C5C; }
+
+/* Customer storefront pages — cream paper, Bricolage, NWCA storefront green */
+.ws-tile.bs-store { background: #faf8f3; border-color: #e6e1d6; color: #1f2a1f; }
+.ws-tile.bs-store .ws-chip-mk { background: #2f7d3b; color: #faf8f3; box-shadow: none; }
+.ws-tile.bs-store .ws-tile__tx b { color: #1f2a1f; font-family: 'Bricolage Grotesque', var(--font-sans); font-weight: 700; font-size: 14.5px; }
+.ws-tile.bs-store .ws-tile__tx .ws-d { color: #4b5a4b; }
+.ws-tile.bs-store .ws-tile__go, .ws-tile.bs-store:hover .ws-tile__go { color: #2f7d3b; }
+.ws-tile.bs-store:hover { border-color: #2f7d3b; }
+
+/* My Accounts — the rep CRM's navy with its gold / silver / bronze tiers */
+.ws-tile.bs-acct { background: #1a2332; border-color: #2d4a5e; }
+.ws-tile.bs-acct .ws-chip-mk { background: #243447; box-shadow: none; display: flex; flex-direction: column; gap: 3px; align-items: center; justify-content: center; }
+.ws-tile.bs-acct .ws-chip-mk i { display: block; width: 16px; height: 4px; border-radius: 2px; }
+.ws-tile.bs-acct .ws-chip-mk i:nth-child(1) { background: #f59e0b; }
+.ws-tile.bs-acct .ws-chip-mk i:nth-child(2) { background: #94a3b8; }
+.ws-tile.bs-acct .ws-chip-mk i:nth-child(3) { background: #cd7f32; }
+.ws-tile.bs-acct .ws-tile__tx .ws-d { color: #9fb3c8; }
+.ws-tile.bs-acct:hover { border-color: #f59e0b; }
+
+/* Design Vault — forest green with the vault door */
+.ws-tile.bs-vault { background: #0f1a10; border-color: #2e5827; }
+.ws-tile.bs-vault .ws-chip-mk { background: #2e5827; color: #bbf7d0; border-radius: 50%; box-shadow: none; }
+.ws-tile.bs-vault .ws-tile__tx .ws-d { color: #86c99a; }
+.ws-tile.bs-vault:hover { border-color: #4ade80; }
+
+/* Photo Capture — the installable app's own icon */
+.ws-tile.bs-capture { background: #14351c; border-color: #1f5a2c; }
+.ws-tile.bs-capture .ws-chip-mk { background: transparent; box-shadow: none; padding: 0; }
+.ws-tile.bs-capture .ws-chip-mk img { width: 34px; height: 34px; border-radius: 9px; }
+.ws-tile.bs-capture .ws-tile__tx .ws-d { color: #8fd19f; }
+.ws-tile.bs-capture:hover { border-color: #4ade80; }
+
+/* ── Everything (generated) ────────────────────────────────────────── */
+.ws-filter {
+    display: flex; align-items: center; gap: 10px; height: 40px; padding: 0 12px; max-width: 480px;
+    border-radius: var(--radius-md); background: var(--bg-input); border: 1px solid var(--line); margin-bottom: 16px;
+}
+.ws-filter i { color: var(--text-3); }
+.ws-filter input { flex: 1; background: none; border: 0; color: var(--text); font: inherit; outline: none; }
+.ws-filter input::placeholder { color: var(--text-dim); }
+.ws-filter__count { font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); }
+.ws-every { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 24px; }
+.ws-every__grp[hidden] { display: none; }
+
+/* ── Responsive ────────────────────────────────────────────────────── */
+@media (max-width: 1100px) {
+    .ws-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .ws-card--wide { grid-column: span 2; }
+    .ws-every { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .ws-d { display: none; }
+    .ws-tile__tx .ws-d { display: block; }
+}
+@media (max-width: 768px) {
+    .ws-grid, .ws-every { grid-template-columns: 1fr; }
+    .ws-card--wide { grid-column: auto; }
+    .ws-tools--cols { grid-template-columns: 1fr; }
+    .ws-tabs__hint { display: none; }
+    .ws-tab--admin { margin-left: 0; }
+    .ws-flow { grid-template-columns: 1fr; }
+    .ws-flow__arr { display: none; }
+    .ws-legend { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+    details.ws-more > summary i.fa-chevron-right { transition: none; }
+}
+
+/* The Staff Directory row is a <button> (opens the modal) — same look as the links. */
+button.ws-row { background: none; border: 0; font: inherit; text-align: left; width: 100%; cursor: pointer; }
+
+/* The customer family is navy with a gold mark; the legend swatch shows the gold. */
+.ws-legend .ws-legend__crm i { background: var(--f-crm-fg); }

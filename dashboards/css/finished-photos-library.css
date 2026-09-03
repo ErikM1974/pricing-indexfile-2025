@@ -254,3 +254,7 @@
     .fpl-toolbar-right { width: 100%; }
     .fpl-search { flex: 1; min-width: 0; }
 }
+
+/* Page theme (2026-09-03, dashboard Workspaces): the photos family — the Photo Capture
+   app's own greens (--fp-green / --fp-green-deep), so Library and Capture match. */
+:root { --dash-theme: #2e7d32; --dash-theme-dark: #14351c; --dash-theme-bg: #f1f8e9; }

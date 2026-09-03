@@ -14,6 +14,12 @@ const KEYS = {
     tweaks:                 { storage: 'local',   key: 'nwca-dash:tweaks',         version: STORE_VERSION },
     sidebarSections:        { storage: 'local',   key: 'nwca-dash:sidebar',        version: STORE_VERSION },
     widgetCollapse:         { storage: 'local',   key: 'nwca-dash:widgets',        version: STORE_VERSION },
+    // Workspaces (2026-09-03): { last, byEmail: { email: ws } } — the tab this browser
+    // (and this person, on a shared machine) last used. workspace-controller.js.
+    workspace:              { storage: 'local',   key: 'nwca-dash:workspace',      version: STORE_VERSION },
+    // Workspaces (2026-09-03): { last, byEmail: { email: ws } } — the tab this browser
+    // (and this person, on a shared machine) last used. workspace-controller.js.
+    workspace:              { storage: 'local',   key: 'nwca-dash:workspace',      version: STORE_VERSION },
     // (pinnedTools/recentTools removed 2026-08-26 — My Stuff pins/recents live in
     // my-stuff-controller's own 'nwca-mystuff-v1' key; these entries never had a reader.)
     dismissedAnnouncements: { storage: 'local',   key: 'nwca-dash:dismissed-ann',  version: STORE_VERSION, ttlMs: 30 * 24 * 60 * 60 * 1000 }, // 30 days

@@ -996,3 +996,9 @@ a.inbound-pill:hover { filter: brightness(0.95); }
     border: 1px solid #86efac;
 }
 .status-badge.deposit-chip i { font-size: 11px; }
+
+/* Page theme (2026-09-03, dashboard Workspaces): Saved Quotes gets its own steel
+   blue-grey instead of the quote-builder shell's forest green, so it stops looking
+   like every other green page. Overrides the --pnw-forest hooks this page's header
+   gradient reads (quote-builder-shell.css loads first). */
+:root { --pnw-forest: #2e4a62; --pnw-forest-deep: #1a2f42; --pnw-forest-mid: #3d6584; }

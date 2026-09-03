@@ -5,31 +5,30 @@
 
    Note: dashboard-events.js auto-installs its delegator on import,
    so the order here is just controller-init.
+
+   2026-09-03 (Workspaces): the sidebar controller and the eight
+   live-report controllers left this page. The reports now live on
+   /dashboards/company-numbers.html (entry: dashboards/js/company-numbers.js),
+   which the header goal chip opens. Team performance is still fetched
+   here — not to render a card, but because it is what feeds the goal
+   chip's YTD figure.
    ===================================================== */
 
 import './dashboard-events.js';   // installs document click delegator
 
 import { initTweaks }          from '../widgets/tweaks-fab.js';
 import { initAuth }            from '../controllers/auth-controller.js';
-import { initSidebar }         from '../controllers/sidebar-controller.js';
-// Quick Access housekeeping (2026-07-29): derives the category count badges
-// from the DOM and remembers which <details> widgets you left collapsed.
+// Collapse memory for any details[data-collapse-key] (Pride Wall, the "More" folds).
 import { initToolGrid }        from '../controllers/tool-grid-controller.js';
-// Role-gated nav (2026-07-28): strips [data-requires-role] blocks the signed-in
-// staffer doesn't qualify for — today, the whole Administration section.
+// Role-gated nodes (2026-07-28): strips [data-requires-role] blocks the signed-in
+// staffer doesn't qualify for — the Admin tab + panel, the per-rep account tiles.
 import { initNavAccess }       from '../controllers/nav-access-controller.js';
-// announcements retired 2026-07-06 (Erik) — zone replaced by Orders Inbox + money widgets
-import { initOrdersInbox, initMoneyCollected, initSamplePipeline } from '../controllers/orders-inbox-controller.js';
+// Workspaces (2026-09-03): the role-based tabs.
+import { initWorkspaces }      from '../controllers/workspace-controller.js';
 import { initSalesGoal }       from '../controllers/sales-goal-controller.js';
 import { initCelebrations }    from '../controllers/celebrations-controller.js';
-import { initMetrics }         from '../controllers/metrics-controller.js';
 import { initTeamPerformance } from '../controllers/team-performance-controller.js';
-import { initProduction }      from '../controllers/production-controller.js';
-// Garment Tracker retired 2026-07-25 — superseded by the Q3 2026 Embroidery Bonus.
-// Q2 data stays readable in GarmentTrackerArchive; the controller/route are unmounted.
-import { initEmbroideryBonus } from '../controllers/embroidery-bonus-controller.js';
-// Phase 1 "alive + personal" widgets (2026-07-20). Win Bell removed 2026-07-23
-// (Erik: its first-run placeholder cluttered the top of the page).
+// Phase 1 "alive + personal" widgets (2026-07-20). Win Bell removed 2026-07-23.
 import { initPrideWall }       from '../controllers/pride-wall-controller.js';
 import { initMyStuff }         from '../controllers/my-stuff-controller.js';
 // Phase 2 "effortless" layer (2026-07-20): Ctrl+K Everything Bar
@@ -38,51 +37,34 @@ import { initCommandPalette }  from '../controllers/command-palette-controller.j
 // Load custom elements (registers themselves on import)
 import '../widgets/dashboard-modal.js';
 
-const REFRESH_INTERVAL_MS = 5 * 60 * 1000;
-
 async function bootstrap() {
-    // Tweaks first — applies data-theme/data-accent/data-density to <body>
+    // Tweaks first — applies data-theme/data-accent/data-density to <html>
     // before any layout paints, avoiding theme flicker.
     initTweaks();
 
     // Auth runs in parallel with the rest — most controllers don't depend on it.
     const authPromise = initAuth();
 
-    // Role-gated nav — kicked off first so the Administration section resolves
-    // (revealed or removed) as early as possible. Not awaited: it's independent
-    // of every other controller, and the command palette re-harvests its
-    // registry on each open, so it picks up the result whenever it lands.
+    // Role-gated nodes — kicked off first so the Admin tab and the per-rep tiles
+    // resolve (revealed or removed) as early as possible. Not awaited here: the
+    // workspace controller awaits it to pick the role's default tab, and the
+    // command palette re-harvests its registry on each open.
     const navAccessPromise = initNavAccess();
 
     // Synchronous controller init (fast, no network)
-    initSidebar();
-    initToolGrid();          // count badges + <details> collapse memory
+    initToolGrid();          // <details> collapse memory
     initSalesGoal();
     initCelebrations();
-    initProduction();        // renders from static stats — no network
     initMyStuff();           // localStorage only — no network
     initCommandPalette();    // Ctrl+K — registry harvested from DOM; backend on demand
 
-    // Async controllers — fetches from caspio-pricing-proxy
-    initOrdersInbox();       // quote_sessions last 7 days (paid web orders / accepted / push failures)
-    initMoneyCollected();    // Order_Payments ledger totals + recent list
-    initSamplePipeline();    // sample orders w/o a later order — rep call list
-    initMetrics();           // ManageOrders revenue + sparkline + YoY
-    initTeamPerformance();   // Caspio archive YTD per-rep
-    initEmbroideryBonus();   // Q3 2026 bonus — live from ORDER_ODBC via the CRM forwarder
+    // Async fetches. Team performance renders nothing here (no #salesTeamList on
+    // this page) but its YTD total is what fills the header goal chip.
+    initTeamPerformance();
     initPrideWall();         // finished-photos library → ambient photo strip
 
-    await Promise.all([authPromise, navAccessPromise]);
-
-    // Periodic refresh of revenue (5 min). The client metricsCache TTL is
-    // deliberately shorter than this interval (dashboard-store.js) so each
-    // tick actually re-asks the proxy; the proxy's own cache governs quota.
-    // initMetrics is async — a synchronous try/catch can't see its failures.
-    setInterval(() => {
-        initMetrics().catch((err) => {
-            console.warn('[staff-dashboard v3] periodic refresh failed:', err);
-        });
-    }, REFRESH_INTERVAL_MS);
+    // Tabs: paints immediately, then re-targets once identity lands.
+    await initWorkspaces({ permissionsPromise: navAccessPromise, authPromise });
 }
 
 if (document.readyState === 'loading') {

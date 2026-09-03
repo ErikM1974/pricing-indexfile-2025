@@ -193,3 +193,25 @@ CHANGING it in Caspio and watching the page, not by reading the code. 🔑 One r
 fee PLUS a minimum produced a price cliff (23 pcs $302, 24 pcs $192) — a single order minimum is
 monotonic and explainable; reach for the minimum first.
 
+## 2026-09-03 — Staff dashboard Workspaces: three traps the harness caught before anyone did
+
+**Problem.** The role-based tab layout (`workspace-controller.js`) landed Erik on the Office tab
+and its generated Everything tab silently dropped every Admin tool whenever the Admin tab was
+not the active one. Both passed the unit test and failed only in `tests/ui/test-workspaces.html`.
+**Root cause.** (1) `permissionsFromRole('admin')` fans out to `accountant`, `house`, `taneisha`,
+`nika` — a role→default map that checks `accountant` before `admin` sends every admin to Office.
+(2) The tab code hid inactive panels with the `hidden` ATTRIBUTE, but `hidden` on a
+`[data-requires-role]` node is nav-access-controller's gate signal ("not allowed / not yet
+resolved"), and the palette, My Stuff and the Everything builder all skip such nodes — so an
+inactive Admin tab looked "not allowed". (3) The repo's files are CRLF: a node edit script with
+`\n` in multi-line search strings matched nothing (single-line edits worked, which hid it), and a
+re-run then appended duplicate CSS blocks; the Bash tool's heredoc also breaks on 4-byte emoji.
+**Solution.** Check `admin` FIRST in the role map; panels switch with an `is-on` class and never
+touch `hidden`; the edit script is CRLF-aware and idempotent, written to a file and run with node.
+**Prevention.** 🔑 Any role→default mapping must treat the admin fan-out as a superset: match
+`admin` first. 🔑 One attribute, one owner: `hidden` on the dashboard belongs to nav-access; tab
+and fold visibility use classes. 🔑 A harness that lifts the REAL markup and drives the REAL
+controllers over a stubbed session finds what a structural unit test cannot — keep both.
+🔑 Multi-line string edits against this repo need `\r\n`; assert the match count and make the
+script idempotent before running it twice.
+

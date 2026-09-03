@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark" data-accent="green" data-density="comfy">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Company Numbers — Northwest Custom Apparel</title>
+    <link rel="icon" href="/favicon.png" type="image/png">
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!--
+        Company Numbers (2026-09-03). The eight live report widgets that used to
+        sit under the staff dashboard's tool grid, moved here UNCHANGED — same
+        markup, same controllers, same stylesheet chain — because nobody used
+        them on the front page. Opened from the dashboard's goal chip and from
+        Admin → Analysis. Admin-only by default (ADMIN_DEFAULT_PAGES in
+        lib/page-access.js); widen with a Staff_Page_Access row, no deploy.
+
+        The stylesheet chain is the dashboard's own (@layer tokens → base →
+        components → utilities, then the unlayered theme + patch), NOT the
+        art-hub/dash-shell chain the other /dashboards pages use — the widgets
+        are styled for the dark dashboard and would need a redesign on a light
+        shell. company-numbers.css only strips the sidebar column and adds the
+        back link.
+    -->
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/tokens.css?v=2026.08.26.1">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/base.css?v=2026.08.26.1">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css?v=2026.08.26.1">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/utilities.css?v=20260514-ai-phase1">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=2026.09.03.6">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=2026.09.03.13">
+    <link rel="stylesheet" href="/dashboards/css/company-numbers.css?v=2026.09.03.13">
+</head>
+<body>
+    <div class="dashboard-container cn-shell">
+        <main class="main-content">
+
+            <header class="top-header">
+                <div class="header-left">
+                    <a href="/staff-dashboard.html" class="cn-back" title="Back to the Staff Dashboard">
+                        <i class="fas fa-arrow-left" aria-hidden="true"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <h1 class="page-title">Company Numbers</h1>
+                </div>
+                <div class="header-right">
+                    <span class="cn-meta">Live from ShopWorks, Stripe and the Caspio archive · refreshes every 5 minutes</span>
+                </div>
+            </header>
+
+            <div class="dashboard-zones">
+
+                <!-- Orders Inbox (2026-07-06) — what came in + what needs a human -->
+                <section class="zone-orders-inbox" aria-labelledby="zoneOrdersInboxTitle">
+                    <header class="zone-header">
+                        <h2 id="zoneOrdersInboxTitle" class="zone-title">
+                            <i class="fas fa-inbox" aria-hidden="true"></i> Orders Inbox
+                        </h2>
+                        <span class="zone-subtitle">Web orders &amp; quote activity, last 7 days</span>
+                        <button type="button" class="zone-refresh" data-action="orders-inbox:refresh" aria-label="Refresh orders inbox">
+                            <i class="fas fa-rotate" aria-hidden="true"></i>
+                        </button>
+                    </header>
+                    <div id="ordersInboxAlerts"></div>
+                    <div class="inbox-columns">
+                        <div class="inbox-col" id="inboxPaidOrders">
+                            <h3 class="inbox-col-title"><i class="fas fa-circle-check" aria-hidden="true"></i> Paid web orders</h3>
+                            <ul class="inbox-list" id="inboxPaidList" aria-busy="true"></ul>
+                        </div>
+                        <div class="inbox-col" id="inboxAccepted">
+                            <h3 class="inbox-col-title"><i class="fas fa-file-signature" aria-hidden="true"></i> Accepted quotes — unpaid</h3>
+                            <ul class="inbox-list" id="inboxAcceptedList" aria-busy="true"></ul>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Money row — payments collected + sample pipeline (2026-07-06) -->
+                <div class="zone-money-row">
+                    <section class="zone-payments" aria-labelledby="zonePaymentsTitle">
+                        <header class="zone-header">
+                            <h2 id="zonePaymentsTitle" class="zone-title">
+                                <i class="fas fa-money-bill-wave" aria-hidden="true"></i> Money Collected
+                            </h2>
+                            <span class="zone-subtitle">Stripe payments — quotes, storefronts, samples</span>
+                        </header>
+                        <div class="pay-totals">
+                            <div class="pay-total"><div class="pay-total-label">Today</div><div class="pay-total-value" id="payToday">—</div></div>
+                            <div class="pay-total"><div class="pay-total-label">Last 7 days</div><div class="pay-total-value" id="payWeek">—</div></div>
+                            <div class="pay-total"><div class="pay-total-label">Last 30 days</div><div class="pay-total-value" id="payMonth">—</div></div>
+                        </div>
+                        <ul class="pay-list" id="payRecentList" aria-busy="true"></ul>
+                    </section>
+
+                    <section class="zone-sample-pipeline" aria-labelledby="zoneSamplesTitle">
+                        <header class="zone-header">
+                            <h2 id="zoneSamplesTitle" class="zone-title">
+                                <i class="fas fa-box-open" aria-hidden="true"></i> Sample Follow-ups
+                            </h2>
+                            <span class="zone-subtitle">Samples sent, no order yet — call these</span>
+                        </header>
+                        <div id="samplePipelineAlerts"></div>
+                        <ul class="pipeline-list" id="samplePipelineList" aria-busy="true"></ul>
+                    </section>
+                </div>
+
+                <!-- Sales Metrics -->
+                <section class="zone-metrics" aria-labelledby="zoneMetricsTitle">
+                    <h2 id="zoneMetricsTitle" class="visually-hidden">Sales Metrics</h2>
+
+                    <!-- Revenue card -->
+                    <article class="metrics-card metrics-revenue-card">
+                        <header class="metrics-revenue-header">
+                            <h3 class="metrics-revenue-title" id="revenueTitle">
+                                <i class="fas fa-dollar-sign" aria-hidden="true"></i> Revenue: Last 7 Days
+                            </h3>
+                            <div class="date-range-toggle" role="group" aria-label="Revenue period">
+                                <button type="button" class="date-range-btn active" data-action="metrics:set-range" data-days="7"  aria-pressed="true">7D</button>
+                                <button type="button" class="date-range-btn"        data-action="metrics:set-range" data-days="30" aria-pressed="false">30D</button>
+                                <button type="button" class="date-range-btn"        data-action="metrics:set-range" data-days="60" aria-pressed="false">60D</button>
+                                <button type="button" class="date-range-btn"        data-action="metrics:set-range" data-days="90" aria-pressed="false">90D</button>
+                            </div>
+                        </header>
+                        <div class="metrics-revenue-value" id="ytdRevenue">
+                            <span class="skeleton skeleton-value"></span>
+                        </div>
+                        <div class="metrics-revenue-sparkline" id="revenueSparkline"></div>
+                        <div class="metrics-date-range" id="dateRangeDisplay"></div>
+                        <div class="metrics-revenue-comparison">
+                            <span class="metrics-comparison-badge" id="ytdGrowth"><i class="fas fa-minus" aria-hidden="true"></i> --</span>
+                            <span class="metrics-comparison-label" id="comparisonLabel">vs. last year</span>
+                        </div>
+                        <div class="metrics-revenue-stats" id="revenueStats" aria-live="polite"></div>
+                    </article>
+
+                    <!-- Team Performance card -->
+                    <article class="metrics-card metrics-team-card">
+                        <header class="metrics-team-header">
+                            <div class="metrics-team-title-group">
+                                <h3 class="metrics-team-title" id="teamPerformanceTitle">
+                                    <i class="fas fa-users" aria-hidden="true"></i> Team Performance: 2026 YTD
+                                </h3>
+                                <div class="metrics-date-range" id="teamDateRange">Year-to-date</div>
+                            </div>
+                            <button type="button" class="refresh-btn" data-action="team-performance:refresh" aria-label="Refresh team performance" title="Refresh">
+                                <i class="fas fa-sync-alt" aria-hidden="true"></i>
+                            </button>
+                        </header>
+                        <div class="rep-list" id="salesTeamList">
+                            <!-- Populated by team-performance-controller -->
+                        </div>
+                    </article>
+
+                    <!-- Art Requests Needing Attention (aging widget, 2026-07-05).
+                         Rendered entirely by /staff-dashboard-v3/art-aging-widget.js —
+                         lazy-loads after DOMContentLoaded on idle time, GET-only,
+                         self-contained failure state (retry button). -->
+                    <article class="metrics-card col-span-full" id="artAgingCard" aria-labelledby="artAgingTitle">
+                        <header class="metrics-team-header">
+                            <div class="metrics-team-title-group">
+                                <h3 class="metrics-team-title" id="artAgingTitle">
+                                    <i class="fas fa-hourglass-half" aria-hidden="true"></i> Art Requests Needing Attention
+                                </h3>
+                                <div class="metrics-date-range">Open requests by time sitting in current status</div>
+                            </div>
+                            <button type="button" class="refresh-btn" id="artAgingRefresh" aria-label="Refresh art requests" title="Refresh">
+                                <i class="fas fa-sync-alt" aria-hidden="true"></i>
+                            </button>
+                        </header>
+                        <div id="artAgingBody">
+                            <div class="metrics-date-range">Loading art requests…</div>
+                        </div>
+                    </article>
+
+                    <!-- Production Schedule Predictor. An ESTIMATE from historical completion
+                         stats bundled in production-schedule-stats.js — not live production data.
+                         Labelled as such (Erik, 2026-09-03) until real completion data exists. -->
+                    <article class="production-widget-card col-span-full" data-widget="production">
+                        <header class="production-header">
+                            <h3 class="production-title">
+                                <i class="fas fa-chart-line" aria-hidden="true"></i> Production Turnaround
+                            </h3>
+                            <span id="production-season-badge" class="season-badge"></span>
+                            <span class="cn-estimate">Estimate from historical completions — not live production data</span>
+                            <button type="button" class="refresh-btn ml-2" data-action="production:refresh" aria-label="Refresh production" title="Refresh">
+                                <i class="fas fa-sync-alt" aria-hidden="true"></i>
+                            </button>
+                        </header>
+                        <div id="production-predictor-grid" class="production-predictor-grid">
+                            <div class="production-empty">Loading predictions…</div>
+                        </div>
+                        <div class="production-footer">
+                            <i class="fas fa-database" aria-hidden="true"></i>
+                            Based on <span id="production-record-count" class="num">4,631</span> historical completions
+                        </div>
+                    </article>
+
+                    <!-- Q3 Team Push. 🔒 NO COMPENSATION ON THIS CARD — per-rep bonus dollars
+                         live on each rep's own Mission Control; this shows the company Q3 number
+                         and the shared targets only (the /team endpoint forces that scope). -->
+                    <article class="embroidery-bonus-card col-span-full">
+                        <header class="metrics-team-header mb-3">
+                            <div class="metrics-team-title-group">
+                                <h3 class="metrics-team-title">
+                                    <i class="fas fa-bullseye" aria-hidden="true"></i> Q3 Team Push
+                                </h3>
+                                <div class="metrics-date-range" id="embroideryBonusDateRange">Loading…</div>
+                            </div>
+                            <div class="embroidery-bonus-controls">
+                                <span class="sync-status num" id="embroideryBonusStatus"></span>
+                                <button type="button" class="refresh-btn" data-action="embroidery-bonus:refresh" aria-label="Refresh embroidery bonus" title="Refresh">
+                                    <i class="fas fa-sync-alt" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </header>
+                        <div id="embroideryBonusContent">
+                            <div class="embroidery-bonus-loading"><div class="loading-spinner"></div><span>Loading embroidery bonus…</span></div>
+                        </div>
+                    </article>
+
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Legacy production-schedule modules (no API calls, just static stats + predictor).
+         Plain script tags before the module entry so production-controller.js can read
+         window.ProductionPredictor + PRODUCTION_STATS at init time. -->
+    <script src="/shared_components/js/production-schedule-stats.js?v=20260512h"></script>
+    <script src="/shared_components/js/production-schedule-predictor.js?v=2026.08.26.1"></script>
+
+    <!-- Caspio timestamp parser (naive Pacific wall-clock → correct Date).
+         Needed by the art-aging widget below. -->
+    <script src="/shared_components/js/caspio-date-utils.js?v=2026.07.05.4"></script>
+    <!-- Art Requests Needing Attention widget — self-contained, lazy (idle-time
+         fetch after DOMContentLoaded), GET-only, visible retry state on failure. -->
+    <script src="/staff-dashboard-v3/art-aging-widget.js?v=2026.08.26.1" defer></script>
+
+    <!-- APP ENTRY (ES module). Absolute imports on purpose: /dashboards pages are
+         content-hashed by scripts/build.js, and a hashed copy of this file lives
+         under /dist — relative imports would resolve there and 404. -->
+    <script type="module" src="/dashboards/js/company-numbers.js?v=2026.09.03.13"></script>
+</body>
+</html>

@@ -100,13 +100,19 @@ describe('no page in the admin set is reachable without a permission', () => {
 
 describe('drift lock — the list mirrors the Administration menu', () => {
     // The menu and the gate are edited in different files; this is what stops a new
-    // admin page from landing in the sidebar with no access rule behind it.
+    // admin page from landing on the Admin tab with no access rule behind it.
     const html = fs.readFileSync(
         path.join(__dirname, '..', '..', 'staff-dashboard-v3', 'index.html'), 'utf8');
 
-    const adminSection = html.slice(
-        html.indexOf('data-section="admin"'),
-        html.indexOf('</aside>'));
+    // Workspaces (2026-09-03): the Administration menu became the Admin tab panel.
+    // It still starts at data-section="admin" and now ends at an explicit sentinel
+    // comment, because the sidebar (and its </aside>) no longer exists.
+    const adminStart = html.indexOf('data-section="admin"');
+    const adminEnd = html.indexOf('<!-- END ADMIN');
+    if (adminStart < 0 || adminEnd < adminStart) {
+        throw new Error('Admin panel markers not found: need data-section="admin" followed by <!-- END ADMIN -->');
+    }
+    const adminSection = html.slice(adminStart, adminEnd);
 
     const menuPages = [...adminSection.matchAll(/href="([^"]+\.html)"/g)]
         .map((m) => m[1].split('/').pop().toLowerCase());

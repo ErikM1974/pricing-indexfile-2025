@@ -44,9 +44,22 @@ function toolFromLink(a) {
     const href = a.getAttribute('href') || '';
     // Internal destinations only — skip modals, hash-only, external links
     if (!href || href.startsWith('#') || /^https?:\/\//i.test(href)) return null;
-    const icon = a.querySelector('i')?.className || '';
-    const label = (a.textContent || '').replace(/\s+/g, ' ').trim()
-        // Drop trailing " — description" halves from sidebar links
+    // Workspaces (2026-09-03): a row's label is its .ws-nm (a tile's <b>), never the
+    // whole textContent — that used to sweep in the "Updated · Aug 5" chip and the
+    // Shop Menu's "Est. 1977" subtitle ("Shop MenuEst. 1977 · every service price").
+    const nm = a.querySelector('.ws-nm') || a.querySelector('.ws-tile__tx b');
+    let raw;
+    if (nm) {
+        const c = nm.cloneNode(true);
+        c.querySelectorAll('.ws-who, .qs-new-badge, em').forEach((n) => n.remove());
+        raw = c.textContent;
+    } else {
+        raw = a.textContent;
+    }
+    const iconEl = a.querySelector('i[class*="fa-"]');
+    const icon = iconEl ? iconEl.className.replace(/\bws-[a-z_-]+\b/g, '').trim() : '';
+    const label = (raw || '').replace(/\s+/g, ' ').trim()
+        // Drop trailing " — description" halves from legacy links
         .split(' — ')[0].slice(0, 40);
     if (!label) return null;
     return { href, label, icon: safeIcon(icon) };
@@ -118,7 +131,7 @@ export function initMyStuff() {
     // Delegated capture of tool usage — one listener, survives re-renders.
     // Capture phase so we record even though navigation follows immediately.
     document.addEventListener('click', (e) => {
-        const a = e.target.closest('a.tool-btn, a.nav-link, a.nav-section-header-link');
+        const a = e.target.closest('a.ws-link, a.tool-btn, a.nav-link, a.nav-section-header-link');
         if (!a || a.closest('#myStuffList')) return; // don't self-record
         const tool = toolFromLink(a);
         if (tool) recordVisit(tool);

@@ -481,3 +481,8 @@
     .ld-search { flex: none; min-width: 0; }
     .ld-kv { grid-template-columns: 1fr; }
 }
+
+/* Page theme (2026-09-03, dashboard Workspaces): the customer family's navy, so the
+   Leads tile on the staff dashboard and this header are the same color. Only the
+   dash-shell theme hooks — nothing else redefined. */
+:root { --dash-theme: #1a2332; --dash-theme-dark: #141c27; --dash-theme-bg: #eef1f5; }

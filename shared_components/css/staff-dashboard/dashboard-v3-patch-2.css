@@ -131,22 +131,9 @@
    868px at minmax(280px)+14px gap) so nothing reflows at a width where
    it didn't before. The container is .zone-quick-access, which sets
    container-type: inline-size in components.css. */
-.quick-access-grid {
-  display: grid !important;
-  grid-template-columns: minmax(0, 1fr) !important;
-  gap: 14px !important;
-}
-@container (min-width: 580px) {
-  .quick-access-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
-}
-@container (min-width: 880px) {
-  .quick-access-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
-  /* span 2 is declared ONLY inside the 3-track query — at 1 or 2 tracks it
-     would create an implicit extra column and break the layout. */
-  .tool-category--pricing { grid-column: span 2 !important; }
-}
-/* Reference is a footer, not a card-shaped hole-filler. */
-.tool-category--reference { grid-column: 1 / -1 !important; }
+/* The tool-grid column rules (section 7) were removed 2026-09-03 with the grid they
+   styled — see workspaces.css. */
+
 
 /* ── 8. Metrics zone grid ──────────────────────────────────────────── */
 .zone-metrics {
@@ -720,25 +707,7 @@
    way. Two internal columns only when the card is actually wide (it
    spans 2 tracks at ≥880px); below that it falls back to the theme's
    single flex column. */
-@container (min-width: 880px) {
-  .tool-category--pricing .tool-buttons {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 6px 10px;
-    align-content: start;
-  }
-  .tool-category--pricing .tool-subhead,
-  .tool-category--pricing .tool-subhead-note {
-    grid-column: 1 / -1;
-  }
-  /* .tool-btn is white-space: nowrap in components.css — in a half-width
-     column that overflows the card on the long labels (Richardson
-     Non-Sanmar, Additional Stitches). Let them wrap instead. */
-  .tool-category--pricing .tool-btn {
-    white-space: normal;
-    min-width: 0;
-  }
-}
+/* Pricing-card two-column rules removed 2026-09-03 (grid retired). */
 
 /* ── "Updated" chip inside a tool button (2026-08-05) ──────────────────────
    Art & Design → Shirt Designer reuses the amber .qs-new-badge from the New

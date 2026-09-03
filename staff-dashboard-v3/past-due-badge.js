@@ -1,5 +1,5 @@
 /**
- * past-due-badge.js — live count on the sidebar's "Past Due Orders" link.
+ * past-due-badge.js — live count on the header's "Past due" chip (was the sidebar link until 2026-09-03).
  *
  * Three states, and the distinction between the last two is the whole point:
  *   alert   — one or more orders past due. Red pill with the count; the section's clock
@@ -37,7 +37,9 @@
 
     async function update() {
         var badge = document.getElementById('nav-pd-badge');
-        var section = document.querySelector('.nav-section[data-section="past-due-orders"]');
+        // 2026-09-03: the link is a header chip (.ws-pd), no longer a sidebar section —
+        // anything carrying data-section="past-due-orders" is the host.
+        var section = document.querySelector('[data-section="past-due-orders"]');
         if (!badge || !section) return;
         try {
             var resp = await fetch(ENDPOINT, { credentials: 'same-origin' });
