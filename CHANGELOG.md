@@ -1,3 +1,7 @@
+## v2026.09.03.3 (2026.09.03)
+
+- Deploy v2026.09.03.3: 7 files — one rep price page: cheat sheet gains shop-services section with ShopWorks parts; card + calculator on the merged Caspio rows
+
 ## v2026.09.03.2 (2026.09.03)
 
 - Deploy v2026.09.03.2: 23 files — Shop Services rep calculator (SHP quotes), dashboard link, prefix registration
