@@ -103,6 +103,14 @@ the part's flat price win and the $75 minimum became $50 (LTM) and the bigger sa
 cheat sheet (`/calculators/service-price-cheat-sheet.html`) is now the ONE rep page: rules strip +
 shop-services section with part numbers + fees; the customer card and calculator read the same rows.
 Calculator saves StyleNumber = part number, minimum top-up as an `LTM` line.
+
+**SHOP MENU (2026-09-03, Erik's "restaurant menu" idea):** `/calculators/service-price-cheat-sheet.html` rebuilt
+as the NWCA Shop Menu — Bodoni Moda masthead "Shop Menu · Est. 1977", House Rules, courses (Sewing Bench /
+Embroidery Heads / Finishing / Laser Bar / Setup & Art / Screen Print & Other), dot leaders. **Two views,
+one page**: Rep (ShopWorks code + book time under each item) / Customer (prices only), localStorage-remembered;
+Print / Save PDF = the current view on one letter page. The separate customer card
+`/pages/shop-services-pricing.*` was DELETED (one-page rule); the calculator links to the Menu. Fee courses
+fall back to documented prices ONLY when Caspio is down and are badged; shop courses show nothing.
 Stopwatch the no-history items (labels, hems, re-runs, backpacks) before printing the card widely.
 - Pull recipe: bandit by IP `192.168.10.219` (hostname does not resolve over VPN); LinesOE has
   `date_Creation`, `PartDescription`, `id_ProductClass`, `cn_LineQuantity_ToPrice`, `cnCur_UnitPriceUsed`,

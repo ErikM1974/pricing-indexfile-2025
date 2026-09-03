@@ -4,125 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>Service Price Reference 2026 | Northwest Custom Apparel</title>
+    <title>Shop Menu | Northwest Custom Apparel</title>
     <link rel="icon" href="/favicon.png" type="image/png">
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
+    <!-- Menu typography: Bodoni Moda for the masthead and course titles, Libre Franklin for items and codes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,600;0,6..96,700;1,6..96,400&family=Libre+Franklin:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Page styles -->
     <link rel="stylesheet" href="/calculators/service-price-cheat-sheet.css">
 </head>
-<body>
-    <div class="main-container">
-        <!-- Header -->
-        <header class="header">
-            <div class="header-container">
-                <div class="header-left">
-                    <div class="breadcrumb">
-                        <a href="/staff-dashboard.html">Staff Dashboard</a>
-                        <span>/</span>
-                        <span>Service Price Reference</span>
-                    </div>
-                </div>
-                <div class="header-right">
-                    <a class="btn-print btn-print--link" href="/calculators/shop-services/" title="Price a job on customer-supplied goods and save it as an SHP quote"><i class="fas fa-toolbox"></i> Shop Services calculator</a>
-                    <button class="btn-print" onclick="window.print()">
-                        <i class="fas fa-print"></i> Print / Save PDF
-                    </button>
-                </div>
-            </div>
+<body class="view-rep">
+    <!-- Staff bar: never prints -->
+    <header class="topbar">
+        <a href="/staff-dashboard.html" class="topbar-link"><i class="fas fa-arrow-left"></i> Staff Dashboard</a>
+        <div class="topbar-spacer"></div>
+        <div class="view-toggle" role="group" aria-label="Menu view">
+            <button type="button" class="view-btn is-active" data-view="rep" aria-pressed="true">Rep view <small>codes &amp; book times</small></button>
+            <button type="button" class="view-btn" data-view="customer" aria-pressed="false">Customer view <small>prices only</small></button>
+        </div>
+        <a href="/calculators/shop-services/" class="topbar-link topbar-link--solid" title="Price a job on customer-supplied goods and save it as an SHP quote"><i class="fas fa-toolbox"></i> Price a job</a>
+        <button type="button" class="topbar-link topbar-link--solid" id="printBtn"><i class="fas fa-print"></i> Print / Save PDF</button>
+    </header>
+
+    <div id="errorBanner" class="error-banner" role="alert"></div>
+
+    <main class="menu" id="menu">
+        <header class="masthead">
+            <div class="masthead-rule"></div>
+            <p class="masthead-eyebrow">Northwest Custom Apparel &middot; Milton, Washington</p>
+            <h1 class="masthead-title">Shop Menu</h1>
+            <p class="masthead-sub"><span class="est">Est. 1977</span> &middot; embroidery, sewing, finishing &amp; laser, priced by the piece &middot; <span id="menuDate">2026</span></p>
+            <div class="masthead-rule"></div>
         </header>
 
-        <!-- Page Title -->
-        <div class="page-title">
-            <i class="fas fa-tags"></i> Service Price Reference 2026
-        </div>
-        <p class="page-subtitle">Every service price with the ShopWorks part number to bill it on. Prices load from Caspio; change them there and this page, the customer card and the calculator all follow.</p>
+        <section class="house-rules" aria-label="House rules">
+            <h2 class="house-rules-title">House Rules</h2>
+            <ol class="house-rules-list">
+                <li><strong>Bring us your goods, we price by the piece.</strong> Price &times; quantity, with a <strong>$<span data-rule="min">75</span> minimum per job</strong><span class="rep-only"> &mdash; bill the difference on <code>LTM</code></span>.</li>
+                <li><strong>Not on the menu?</strong> We quote the time: <strong>$<span data-rule="bench">25</span></strong> per quarter hour at the bench, <strong>$<span data-rule="machine">37.50</span></strong> per quarter hour on a machine<span class="rep-only"> &mdash; on <code>DECG</code>, <code>DECC</code> or <code>Laser</code>; Erik or Ruthie approves the estimate</span>.</li>
+                <li><strong>We supply the garment?</strong> <span class="rep-only">Use the quote builder; names, patches and puff are add-ons there at the same prices. </span>Materials we supply on any job are cost + <span data-rule="markup">30</span>%. Goods you supply are worked at your risk.</li>
+            </ol>
+        </section>
 
-        <!-- Section 0: how to price work on customer goods (2026-09-03) -->
-        <div class="rules-strip" id="rules-strip">
-            <div class="rule"><span class="rule-k">Customer brings the goods?</span><span class="rule-v">Price per piece &times; quantity from the table below. <strong>$<span id="rule-min">75</span> minimum per job</strong> &mdash; bill the difference on <code>LTM</code>.</span></div>
-            <div class="rule"><span class="rule-k">Not in the table?</span><span class="rule-v">Bill time on <code>DECG</code> (garments), <code>DECC</code> (caps) or <code>Laser</code>: <strong>$<span id="rule-bench">25</span></strong> per &frac14; hour bench, <strong>$<span id="rule-machine">37.50</span></strong> per &frac14; hour machine. Erik or Ruthie approves the estimate.</span></div>
-            <div class="rule"><span class="rule-k">We supply the garment?</span><span class="rule-v">Use the quote builder. Names, patches and puff are add-ons there at the same prices. Materials we supply on any job: cost + <span id="rule-markup">30</span>%.</span></div>
-        </div>
-
-        <div class="ref-card" id="shop-services-card">
-            <div class="ref-card-header">
-                <h2><i class="fas fa-toolbox"></i> Shop Services on Customer Goods</h2>
-                <span class="source-badge" id="shop-source"></span>
-            </div>
-            <div class="ref-card-body">
-                <table class="ref-table" id="shop-services-table">
-                    <thead>
-                        <tr>
-                            <th>Service</th>
-                            <th>ShopWorks part</th>
-                            <th class="price-col">Price</th>
-                            <th>Book time / notes</th>
-                        </tr>
-                    </thead>
-                    <tbody id="shop-services-tbody">
-                        <tr><td colspan="4" class="loading-cell"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>
-                    </tbody>
-                </table>
-            </div>
+        <div class="courses" id="courses">
+            <p class="loading"><i class="fas fa-spinner fa-spin"></i> Setting the table&hellip;</p>
         </div>
 
-        <!-- Section 1: Fixed-Price Services -->
-        <div class="ref-card" id="fixed-services-card">
-            <div class="ref-card-header">
-                <h2><i class="fas fa-dollar-sign"></i> Setup, Art &amp; Order Fees</h2>
-                <span class="source-badge" id="fixed-source"></span>
-            </div>
-            <div class="ref-card-body">
-                <table class="ref-table" id="fixed-services-table">
-                    <thead>
-                        <tr>
-                            <th>Service</th>
-                            <th>Part Number(s)</th>
-                            <th class="price-col">Price</th>
-                            <th>Notes</th>
-                        </tr>
-                    </thead>
-                    <tbody id="fixed-services-tbody">
-                        <tr><td colspan="4" class="loading-cell"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
+        <footer class="colophon">
+            <p>2025 Freeman Road East, Milton, WA 98354 &middot; 253-922-5793 &middot; sales@nwcustomapparel.com</p>
+            <p class="rep-only">Every price loads from Caspio <code>Service_Codes</code> &mdash; change it there and this menu, the customer print and the job calculator follow. Loaded <span id="loadTimestamp">&mdash;</span>. Prices subject to change; sales tax extra.</p>
+            <p class="customer-only">Prices subject to change without notice. Sales tax extra.</p>
+        </footer>
+    </main>
 
-        <!-- Section 2: Other Services -->
-        <div class="ref-card" id="other-services-card">
-            <div class="ref-card-header">
-                <h2><i class="fas fa-cogs"></i> Other Services</h2>
-            </div>
-            <div class="ref-card-body">
-                <table class="ref-table" id="other-services-table">
-                    <thead>
-                        <tr>
-                            <th>Service</th>
-                            <th>Part Number(s)</th>
-                            <th class="price-col">Price</th>
-                            <th>Notes</th>
-                        </tr>
-                    </thead>
-                    <tbody id="other-services-tbody">
-                        <tr><td colspan="4" class="loading-cell"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="page-footer">
-            <p>Prices updated from API on page load. Last loaded: <span id="load-timestamp">—</span></p>
-        </div>
-    </div>
-
-    <!-- Scripts -->
     <script src="/shared_components/js/app-config.js"></script>
     <script src="/calculators/service-price-cheat-sheet.js"></script>
 </body>

@@ -1,219 +1,184 @@
 /**
- * Service Price Cheat Sheet — API-driven reference page
- * Shows fixed-price services and other services from the Service_Codes table.
+ * service-price-cheat-sheet.js — the NWCA Shop Menu (rewritten 2026-09-03)
+ *
+ * THE one rep price page (Erik). Every course on the menu comes from Caspio Service_Codes:
+ *   - Shop services on customer goods: rows with ServiceType 'SHOP'. The menu row is the
+ *     PRICE OF RECORD; its AliasFor names the existing ShopWorks part the rep bills on
+ *     (Monogram, SECC, SEG, DT, DECG, Transfer, Laser, Setup, LTM…). Position 'RULE' rows
+ *     feed the House Rules ($75 minimum, quarter-hour rates, materials markup).
+ *   - Setup & art fees and screen-print/other services: the part rows themselves (DD, DDE,
+ *     DDT, GRT-50, GRT-75, LTM, RUSH, Art, SPSU…), same codes the old cheat sheet showed.
+ * Two views on one page: rep (codes + book times) and customer (prices only). Print prints
+ * the current view. Rule #4: if Caspio cannot be read, the menu says so and shows no prices
+ * for the shop-services courses; the fee courses fall back to the documented list but are
+ * badged as such.
  */
-
 (function () {
+    'use strict';
+
     const BASE_URL = (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.API && APP_CONFIG.API.BASE_URL)
         ? APP_CONFIG.API.BASE_URL
         : 'https://caspio-pricing-proxy-ab30a049961a.herokuapp.com';
 
-    // ── Fallback data (used when API is unavailable) ────────────────────────
-    const FALLBACK_FIXED = [
-        { service: 'Digitizing (New)',    pns: 'DD',                price: 100.00, notes: 'New design setup' },
-        { service: 'Digitizing (Edit)',   pns: 'DDE',               price: 50.00,  notes: 'Design revision' },
-        { service: 'Digitizing (Text)',   pns: 'DDT',               price: 50.00,  notes: 'Text-only design' },
-        { service: 'Patch Setup',        pns: 'GRT-50',            price: 50.00,  notes: 'One-time fee' },
-        { service: 'Graphic Design',     pns: 'GRT-75',            price: 75.00,  notes: 'One-time fee' },
-        { service: 'LTM Fee',            pns: 'LTM',               price: 50.00,  notes: 'Qty \u22647, divided across pcs' },
-        { service: 'Rush',               pns: 'RUSH',              price: null,   notes: '25% of subtotal' },
+    // Fee courses: what to show and in what order. Prices come from Caspio by code; the
+    // fallback price is used only when the API is down and is badged "fallback".
+    const FEE_COURSE = [
+        { code: 'DD',     name: 'Digitizing, new logo',           fallback: 100,  unit: 'per design', desc: 'Sets up your logo for the embroidery machines. Yours to keep.' },
+        { code: 'DDE',    name: 'Digitizing, edit an existing design', fallback: 50, unit: 'per design' },
+        { code: 'DDT',    name: 'Digitizing, text only',          fallback: 50,   unit: 'per design' },
+        { code: 'GRT-50', name: 'Logo mockup & print review',      fallback: 50,   unit: 'per order' },
+        { code: 'GRT-75', name: 'Graphic design',                 fallback: 75,   unit: 'per hour', desc: 'Billed in quarter hours.' },
+        { code: 'LTM',    name: 'Small-order fee, embroidery orders', fallback: 50, unit: 'per order', desc: 'Orders of 7 pieces or fewer, spread across the pieces.' },
+        { code: 'RUSH',   name: 'Rush',                           fallback: null, unit: '25% of subtotal', text: '25%' },
+    ];
+    const OTHER_COURSE = [
+        { code: 'Art',       name: 'Art charges',                    fallback: 75, unit: 'per hour' },
+        { code: 'SPSU',      name: 'Screen setup, new screen',       fallback: 30, unit: 'per screen / color' },
+        { code: 'SPRESET',   name: 'Screen setup, reorder',          fallback: 30, unit: 'per reset' },
+        { code: 'Vellum',    name: 'Vellum print',                   fallback: 10, unit: 'per print' },
+        { code: 'Color Chg', name: 'Color change on press',          fallback: 15, unit: 'per change' },
+        { code: 'HW-SURCHG', name: 'Heavyweight garment surcharge',  fallback: 10, unit: 'per garment' },
+        { code: 'Freight',   name: 'Freight',                        fallback: null, text: 'at cost' },
+        { code: 'Discount',  name: 'Customer discount',              fallback: null, text: 'varies' },
+    ];
+    // Shop-services categories → course titles and the order they appear.
+    const COURSES = [
+        { cat: 'Sewing',                        title: 'From the Sewing Bench',     note: 'Your patches, emblems and labels, sewn on by hand.' },
+        { cat: 'Embroidery on your goods',      title: 'From the Embroidery Heads', note: 'Names, samples and extras on garments you bring us.' },
+        { cat: 'Finishing',                     title: 'Finishing',                 note: 'Pressed, bagged, tagged and ready to hand out.' },
+        { cat: 'Laser engraving on your items', title: 'The Laser Bar',             note: 'Tumblers, boards, plaques and cases you supply.' },
     ];
 
-    const FALLBACK_OTHER_SERVICES = [
-        { service: 'Art Charges',           pns: 'Art',           price: 75.00, notes: 'Hourly rate (same as GRT-75)' },
-        { service: 'Freight',               pns: 'Freight',       price: null, notes: 'Pass-through actual cost' },
-        { service: 'Screen Print Set Up Charge', pns: 'SPSU',        price: 30.00, notes: 'New screen — per screen/color' },
-        { service: 'Re-Order Screenprint Setup', pns: 'SPRESET',     price: 30.00, notes: 'Reorder — screens on file' },
-        { service: 'Vellum Print',          pns: 'Vellum',        price: 10.00, notes: 'Film positive output' },
-        { service: 'Color Change',          pns: 'Color Chg',     price: 15.00, notes: 'Press-run color change' },
-        { service: 'Heavyweight Surcharge', pns: 'HW-SURCHG',     price: 10.00, notes: 'Per heavyweight garment' },
-        { service: 'Digital Print (DTG)',    pns: 'CDP',           price: null, notes: 'Pass-through' },
-        { service: 'Pallet Change',         pns: 'Pallet',        price: null, notes: 'Pass-through' },
-        { service: 'Discount',              pns: 'Discount',      price: null, notes: 'Variable customer discount' },
-    ];
+    const currency = (v) => '$' + Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-    // ── Helpers ────────────────────────────────────────────────────────────
-    async function fetchAPI(endpoint) {
-        const resp = await fetch(`${BASE_URL}${endpoint}`);
+    // ── views ──────────────────────────────────────────────────────────────────
+    function setView(view) {
+        document.body.classList.toggle('view-rep', view === 'rep');
+        document.body.classList.toggle('view-customer', view === 'customer');
+        document.querySelectorAll('.view-btn').forEach((b) => {
+            const on = b.dataset.view === view;
+            b.classList.toggle('is-active', on); b.setAttribute('aria-pressed', on);
+        });
+        try { localStorage.setItem('nwca-menu-view', view); } catch (e) { /* fine */ }
+    }
+
+    // ── data ───────────────────────────────────────────────────────────────────
+    async function loadCatalogue() {
+        const resp = await fetch(`${BASE_URL}/api/service-codes`);
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-        return resp.json();
+        const json = await resp.json();
+        const rows = (Array.isArray(json) ? json : (json.data || [])).filter((r) => r.IsActive !== false);
+        if (!rows.length) throw new Error('empty catalogue');
+        return rows;
     }
 
-    function currency(val) {
-        if (val == null) return '\u2014';
-        return '$' + Number(val).toFixed(2);
-    }
-
-    function escapeHtml(str) {
-        const div = document.createElement('div');
-        div.textContent = str;
-        return div.innerHTML;
-    }
-
-    // ── Render functions ────────────────────────────────────────────────────
-    function renderFixedServices(data, source) {
-        const tbody = document.getElementById('fixed-services-tbody');
-        const badge = document.getElementById('fixed-source');
-        badge.textContent = source;
-        badge.className = 'source-badge ' + (source === 'API' ? 'source-api' : 'source-fallback');
-
-        let html = '';
-        for (const row of data) {
-            html += `<tr>
-                <td class="service-name">${escapeHtml(row.service)}</td>
-                <td class="pn-cell"><code>${escapeHtml(row.pns)}</code></td>
-                <td class="price-col">${row.price != null ? currency(row.price) : '<em>Variable</em>'}</td>
-                <td class="notes-cell">${escapeHtml(row.notes)}</td>
-            </tr>`;
-        }
-        tbody.innerHTML = html;
-    }
-
-    function renderOtherServices(data) {
-        const tbody = document.getElementById('other-services-tbody');
-        let html = '';
-        for (const row of data) {
-            html += `<tr>
-                <td class="service-name">${escapeHtml(row.service)}</td>
-                <td class="pn-cell"><code>${escapeHtml(row.pns)}</code></td>
-                <td class="price-col">${row.price != null ? currency(row.price) : '<em>Pass-through</em>'}</td>
-                <td class="notes-cell">${escapeHtml(row.notes)}</td>
-            </tr>`;
-        }
-        tbody.innerHTML = html;
-    }
-
-    // ── Build from API ────────────────────────────────────────────────────
-    function buildFixedFromAPI(scMap) {
-        const lookup = (code) => {
-            const rec = scMap[code];
-            return rec ? parseFloat(rec.SellPrice) : null;
-        };
-
-        return [
-            { service: 'Digitizing (New)',    pns: 'DD',                price: lookup('DD') ?? 100, notes: 'New design setup' },
-            { service: 'Digitizing (Edit)',   pns: 'DDE',               price: lookup('DDE') ?? 50, notes: 'Design revision' },
-            { service: 'Digitizing (Text)',   pns: 'DDT',               price: lookup('DDT') ?? 50, notes: 'Text-only design' },
-            { service: 'Patch Setup',        pns: 'GRT-50',            price: lookup('GRT-50') ?? 50.00, notes: 'One-time fee' },
-            { service: 'Graphic Design',     pns: 'GRT-75',            price: lookup('GRT-75') ?? 75.00, notes: 'One-time fee' },
-            { service: 'LTM Fee (embroidery orders)', pns: 'LTM',        price: lookup('LTM') ?? 50.00, notes: 'Qty \u22647 on an embroidery order, divided across pcs. Shop-services jobs use LTM for the $75 minimum top-up instead.' },
-            { service: 'Rush',               pns: 'RUSH',              price: null, notes: '25% of subtotal' },
-        ];
-    }
-
-    function buildOtherServicesFromAPI(scMap) {
-        const lookup = (code) => {
-            const rec = scMap[code];
-            return rec ? parseFloat(rec.SellPrice) : null;
-        };
-
-        return [
-            { service: 'Art Charges',           pns: 'Art',           price: lookup('Art') ?? 75.00, notes: 'Hourly rate (same as GRT-75)' },
-            { service: 'Freight',               pns: 'Freight',       price: null, notes: 'Pass-through actual cost' },
-            { service: 'Screen Print Set Up Charge', pns: 'SPSU',        price: lookup('SPSU') ?? 30.00, notes: 'New screen — per screen/color' },
-            { service: 'Re-Order Screenprint Setup', pns: 'SPRESET',     price: lookup('SPRESET') ?? 30.00, notes: 'Reorder — screens on file' },
-            { service: 'Vellum Print',          pns: 'Vellum',        price: lookup('Vellum') ?? 10.00, notes: 'Film positive output' },
-            { service: 'Color Change',          pns: 'Color Chg',     price: lookup('Color Chg') ?? 15.00, notes: 'Press-run color change' },
-            { service: 'Heavyweight Surcharge', pns: 'HW-SURCHG',     price: lookup('HW-SURCHG') ?? lookup('HEAVYWEIGHT-SURCHARGE') ?? 10.00, notes: 'Per heavyweight garment' },
-            { service: 'Digital Print (DTG)',    pns: 'CDP',           price: null, notes: 'Pass-through' },
-            { service: 'Pallet Change',         pns: 'Pallet',        price: null, notes: 'Pass-through' },
-            { service: 'Discount',              pns: 'Discount',      price: null, notes: 'Variable customer discount' },
-        ];
-    }
-
-    // ── Shop services on customer goods (2026-09-03) ───────────────────────
-    // Menu = Service_Codes rows with ServiceType SHOP; each names its ShopWorks part in
-    // AliasFor. Price of record = the part row when it carries a flat price (Monogram,
-    // SECC, SEG, DT, 3D-EMB, Laser Patch…), else the menu row. Same rule as the customer
-    // card (/pages/shop-services-pricing) and the calculator (/calculators/shop-services).
-    function buildShopServicesFromAPI(allRows, scMap) {
-        const menu = allRows.filter(r => r.ServiceType === 'SHOP' && r.IsActive !== false)
-            .sort((a, b) => (Number(a.SortOrder) || 0) - (Number(b.SortOrder) || 0));
-        // The SHOP menu row is the price of record; AliasFor is only the ShopWorks part to
-        // bill on (several menu lines share one part — DT, DECG — at different prices). If a
-        // part row carries its own flat price that disagrees, flag it here so it gets fixed.
-        const priceOf = (r) => Number(r.SellPrice);
-        // Only meaningful when a part backs exactly ONE menu line (Monogram, SECC, SEG…);
-        // DT and DECG carry several lines at different typed prices by design.
-        const partUse = {};
-        menu.forEach(r => { if (r.AliasFor) partUse[r.AliasFor] = (partUse[r.AliasFor] || 0) + 1; });
-        const partMismatch = (r) => {
-            if (!r.AliasFor || partUse[r.AliasFor] !== 1) return null;
-            const part = scMap[r.AliasFor];
-            const pp = part && String(part.PricingMethod || '').toUpperCase() !== 'TIERED' ? Number(part.SellPrice) : NaN;
-            return isFinite(pp) && pp > 0 && Math.abs(pp - Number(r.SellPrice)) > 0.001 ? pp : null;
-        };
+    function buildShop(rows) {
+        const scMap = {};
+        rows.forEach((r) => { if (r.ServiceType !== 'SHOP' && r.ServiceCode && !(r.ServiceCode in scMap)) scMap[r.ServiceCode] = r; });
+        const menu = rows.filter((r) => r.ServiceType === 'SHOP').sort((a, b) => (Number(a.SortOrder) || 0) - (Number(b.SortOrder) || 0));
+        const isRule = (r) => String(r.Position || '').toUpperCase() === 'RULE' && !/LASER-SETUP/i.test(r.ServiceCode);
         const rules = {};
-        menu.filter(r => String(r.Position || '').toUpperCase() === 'RULE').forEach(r => { rules[r.ServiceCode] = priceOf(r); });
-        const lines = menu.filter(r => String(r.Position || '').toUpperCase() !== 'RULE' || /LASER-SETUP/i.test(r.ServiceCode)).map(r => ({
-            category: r.Category || 'Other',
-            service: r.DisplayName,
-            pns: r.AliasFor || '\u2014',
-            price: priceOf(r),
-            unit: r.PerUnit || 'each',
-            notes: (Number(r.UnitCost) > 0 ? 'Book ' + Number(r.UnitCost) + ' min ' + (String(r.Position || '').toUpperCase() === 'MACHINE' ? 'machine' : 'bench') : '') +
-                   (/upcharge/i.test(r.PerUnit || '') ? ' \u00b7 upcharge on the embroidery price' : '') +
-                   (partMismatch(r) != null ? ' \u26a0 part ' + r.AliasFor + ' row says ' + currency(partMismatch(r)) + ' \u2014 align it in Caspio' : '')
-        }));
-        return { rules, lines };
+        menu.filter(isRule).forEach((r) => { rules[r.ServiceCode] = Number(r.SellPrice); });
+        // A part backing exactly one menu line should agree with it; DT/DECG back several at
+        // different prices by design, so they are never flagged.
+        const partUse = {};
+        menu.forEach((r) => { if (r.AliasFor) partUse[r.AliasFor] = (partUse[r.AliasFor] || 0) + 1; });
+        const items = menu.filter((r) => !isRule(r)).map((r) => {
+            const part = r.AliasFor ? scMap[r.AliasFor] : null;
+            const pp = part && partUse[r.AliasFor] === 1 && String(part.PricingMethod || '').toUpperCase() !== 'TIERED' ? Number(part.SellPrice) : NaN;
+            return {
+                cat: r.Category || 'Other', name: r.DisplayName, code: r.AliasFor || '',
+                price: Number(r.SellPrice), unit: r.PerUnit || 'each',
+                book: Number(r.UnitCost) > 0 ? Number(r.UnitCost) + ' min ' + (String(r.Position || '').toUpperCase() === 'MACHINE' ? 'machine' : 'bench') : '',
+                mismatch: isFinite(pp) && pp > 0 && Math.abs(pp - Number(r.SellPrice)) > 0.001 ? pp : null
+            };
+        });
+        return { rules, items, scMap };
     }
 
-    // Rule #4: no fallback prices for shop services — say it is unavailable instead.
-    function shopServicesUnavailable() {
-        const tbody = document.getElementById('shop-services-tbody');
-        if (tbody) tbody.innerHTML = '<tr><td colspan="4" class="loading-cell">Shop services pricing unavailable \u2014 refresh the page. Do not quote from memory.</td></tr>';
-        const badge = document.getElementById('shop-source');
-        if (badge) badge.textContent = 'Unavailable';
+    // ── render ─────────────────────────────────────────────────────────────────
+    function itemHtml(it, opts) {
+        const isUp = /upcharge/i.test(it.unit || '');
+        const unitText = (it.unit || '').replace(/^upcharge\s*/i, '');
+        const priceHtml = it.text
+            ? '<span class="item-price">' + esc(it.text) + '</span>'
+            : '<span class="item-price">' + (isUp ? '<span class="plus">+</span>' : '') + currency(it.price) + '<span class="unit">' + esc(unitText) + '</span></span>';
+        const meta = [];
+        if (it.code) meta.push('<code>' + esc(it.code) + '</code>');
+        if (it.book) meta.push('<span class="book">book ' + esc(it.book) + '</span>');
+        if (it.mismatch != null) meta.push('<span class="warn">⚠ part row says ' + currency(it.mismatch) + ' — align it in Caspio</span>');
+        if (opts && opts.fallback) meta.push('<span class="warn">fallback price — Caspio unreachable</span>');
+        return '<div class="item">' +
+            '<span class="item-name"><span class="txt">' + esc(it.name) + '</span><span class="leader"></span></span>' + priceHtml +
+            (it.desc ? '<span class="item-desc">' + esc(it.desc) + '</span>' : '') +
+            (meta.length ? '<span class="item-meta rep-only">' + meta.join('') + '</span>' : '') +
+            '</div>';
     }
 
-    function renderShopServices(model, source) {
-        const tbody = document.getElementById('shop-services-tbody');
-        if (!tbody) return;
-        const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-        if (model.rules['SHOP-JOB-MIN'] != null) set('rule-min', Number(model.rules['SHOP-JOB-MIN']).toFixed(0));
-        if (model.rules['SHOP-BENCH-QH'] != null) set('rule-bench', Number(model.rules['SHOP-BENCH-QH']).toFixed(2).replace(/\.00$/, ''));
-        if (model.rules['SHOP-MACHINE-QH'] != null) set('rule-machine', Number(model.rules['SHOP-MACHINE-QH']).toFixed(2));
-        if (model.rules['SHOP-MATERIAL-MARKUP'] != null) set('rule-markup', Number(model.rules['SHOP-MATERIAL-MARKUP']).toFixed(0));
-        let html = '', lastCat = null;
-        for (const row of model.lines) {
-            if (row.category !== lastCat) { html += `<tr class="cat-row"><td colspan="4">${escapeHtml(row.category)}</td></tr>`; lastCat = row.category; }
-            html += `<tr>
-                <td class="service-name">${escapeHtml(row.service)}</td>
-                <td class="pn-cell"><code>${escapeHtml(row.pns)}</code></td>
-                <td class="price-col">${currency(row.price)} <span class="notes-cell">${escapeHtml(row.unit)}</span></td>
-                <td class="notes-cell">${escapeHtml(row.notes)}</td>
-            </tr>`;
-        }
-        tbody.innerHTML = html || '<tr><td colspan="4" class="loading-cell">No shop-services rows in Caspio.</td></tr>';
-        const badge = document.getElementById('shop-source');
-        if (badge) badge.textContent = source;
+    function courseHtml(title, note, itemsHtml, wide) {
+        return '<section class="course' + (wide ? ' course--wide' : '') + '"><h2 class="course-title">' + esc(title) + '</h2>' +
+            (note ? '<p class="course-note">' + esc(note) + '</p>' : '') + itemsHtml + '</section>';
     }
 
-    // ── Main load ───────────────────────────────────────────────────────────
+    function feeCourse(list, scMap, title, note, apiOk) {
+        const html = list.map((f) => {
+            const rec = scMap[f.code];
+            const live = rec ? Number(rec.SellPrice) : NaN;
+            const price = isFinite(live) && live > 0 ? live : f.fallback;
+            return itemHtml({ name: f.name, code: f.code, unit: f.unit, desc: f.desc, price, text: f.text || (price == null ? 'varies' : null) },
+                { fallback: !apiOk && f.fallback != null });
+        }).join('');
+        return courseHtml(title, note, html, false);
+    }
+
+    function render(rows) {
+        const shop = buildShop(rows);
+        const set = (k, v) => document.querySelectorAll('[data-rule="' + k + '"]').forEach((el) => { el.textContent = v; });
+        if (shop.rules['SHOP-JOB-MIN'] != null) set('min', Number(shop.rules['SHOP-JOB-MIN']).toFixed(0));
+        if (shop.rules['SHOP-BENCH-QH'] != null) set('bench', Number(shop.rules['SHOP-BENCH-QH']).toFixed(2).replace(/\.00$/, ''));
+        if (shop.rules['SHOP-MACHINE-QH'] != null) set('machine', Number(shop.rules['SHOP-MACHINE-QH']).toFixed(2));
+        if (shop.rules['SHOP-MATERIAL-MARKUP'] != null) set('markup', Number(shop.rules['SHOP-MATERIAL-MARKUP']).toFixed(0));
+
+        let html = '';
+        COURSES.forEach((c) => {
+            const items = shop.items.filter((it) => it.cat === c.cat);
+            if (items.length) html += courseHtml(c.title, c.note, items.map((it) => itemHtml(it)).join(''), false);
+        });
+        // Any SHOP category not in the fixed list still shows, at the end.
+        const known = new Set(COURSES.map((c) => c.cat));
+        const extra = shop.items.filter((it) => !known.has(it.cat));
+        if (extra.length) html += courseHtml('Also on the menu', '', extra.map((it) => itemHtml(it)).join(''), false);
+        html += feeCourse(FEE_COURSE, shop.scMap, 'Setup & Art', 'Once per design or per order, on any kind of job.', true);
+        html += feeCourse(OTHER_COURSE, shop.scMap, 'Screen Print & Other', '', true);
+        document.getElementById('courses').innerHTML = html;
+    }
+
+    function renderUnavailable(err) {
+        const b = document.getElementById('errorBanner');
+        b.textContent = 'Could not load prices from Caspio (' + err.message + '). Shop-services prices are not shown; do not quote from memory. Refresh to try again.';
+        b.classList.add('show');
+        let html = courseHtml('Shop services on customer goods', 'Unavailable until Caspio answers.', '<p class="course-note">No prices shown.</p>', true);
+        html += feeCourse(FEE_COURSE, {}, 'Setup & Art', 'Documented prices — badged as fallback until Caspio answers.', false);
+        html += feeCourse(OTHER_COURSE, {}, 'Screen Print & Other', '', false);
+        document.getElementById('courses').innerHTML = html;
+    }
+
+    // ── init ───────────────────────────────────────────────────────────────────
     async function init() {
+        document.querySelectorAll('.view-btn').forEach((b) => b.addEventListener('click', () => setView(b.dataset.view)));
+        document.getElementById('printBtn').addEventListener('click', () => window.print());
+        let saved = 'rep';
+        try { saved = localStorage.getItem('nwca-menu-view') || 'rep'; } catch (e) { /* fine */ }
+        setView(saved === 'customer' ? 'customer' : 'rep');
+        document.getElementById('menuDate').textContent = new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
         try {
-            const result = await fetchAPI('/api/service-codes');
-            if (result.success) {
-                const scMap = {};
-                for (const sc of result.data) {
-                    if (sc.ServiceCode) scMap[sc.ServiceCode] = sc;
-                }
-                renderFixedServices(buildFixedFromAPI(scMap), 'API');
-                renderOtherServices(buildOtherServicesFromAPI(scMap));
-                renderShopServices(buildShopServicesFromAPI(result.data, scMap), 'API');
-            } else {
-                renderFixedServices(FALLBACK_FIXED, 'Fallback');
-                renderOtherServices(FALLBACK_OTHER_SERVICES);
-                shopServicesUnavailable();
-            }
+            render(await loadCatalogue());
         } catch (err) {
-            console.error('Service codes API failed:', err);
-            renderFixedServices(FALLBACK_FIXED, 'Fallback');
-            renderOtherServices(FALLBACK_OTHER_SERVICES);
-            shopServicesUnavailable();
+            console.error('[shop-menu] Service codes API failed:', err);
+            renderUnavailable(err);
         }
-
-        document.getElementById('load-timestamp').textContent = new Date().toLocaleString();
+        document.getElementById('loadTimestamp').textContent = new Date().toLocaleString();
     }
 
     init();
