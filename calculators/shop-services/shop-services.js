@@ -32,14 +32,25 @@
     });
 
     async function load() {
-        const res = await DashPage.fetchJson('/api/service-codes?type=SHOP');
-        const rows = (Array.isArray(res) ? res : (res.data || [])).filter((r) => r.IsActive !== false);
+        // One read of the whole catalogue: the SHOP menu rows (price of record) and the
+        // ShopWorks part rows they name in AliasFor (billing code shown to the rep).
+        const res = await DashPage.fetchJson('/api/service-codes');
+        const all = (Array.isArray(res) ? res : (res.data || [])).filter((r) => r.IsActive !== false);
+        const parts = {};
+        all.forEach((r) => { if (r.ServiceType !== 'SHOP' && r.ServiceCode && !(r.ServiceCode in parts)) parts[r.ServiceCode] = r; });
+        // The SHOP menu row is the price of record; AliasFor is only the ShopWorks part the rep
+        // bills on (several lines share DT or DECG at different prices, so the part cannot price).
+        void parts;
+        const rows = all.filter((r) => r.ServiceType === 'SHOP').map((r) => Object.assign({}, r, {
+            PartNumber: r.AliasFor || '',
+            Price: Number(r.SellPrice)
+        }));
         if (!rows.length) throw new Error('no SHOP rows');
         rows.sort((a, b) => (Number(a.SortOrder) || 0) - (Number(b.SortOrder) || 0));
         state.rows = rows;
         const byCode = {};
         rows.forEach((r) => { byCode[String(r.ServiceCode || '').toUpperCase()] = r; });
-        const need = (c) => { if (!byCode[c] || !isFinite(Number(byCode[c].SellPrice))) throw new Error('row ' + c + ' missing'); return Number(byCode[c].SellPrice); };
+        const need = (c) => { if (!byCode[c] || !isFinite(Number(byCode[c].Price))) throw new Error('row ' + c + ' missing'); return Number(byCode[c].Price); };
         state.rules = { min: need('SHOP-JOB-MIN'), benchQH: need('SHOP-BENCH-QH'), machineQH: need('SHOP-MACHINE-QH'), markupPct: need('SHOP-MATERIAL-MARKUP') };
         $('ss-rules-note').textContent = 'Job minimum ' + money(state.rules.min) + ' · off-card time ' + money(state.rules.benchQH) + ' per quarter hour bench, ' +
             money(state.rules.machineQH) + ' per quarter hour machine · materials we supply at cost + ' + state.rules.markupPct + '%. Customer-supplied goods are worked at the customer\'s risk.';
@@ -62,15 +73,15 @@
     function priceLine(l) {
         if (l.kind === 'service') {
             const r = state.rows.find((x) => x.ServiceCode === l.code);
-            const unit = r ? Number(r.SellPrice) : 0;
-            return { label: r ? r.DisplayName : l.code, unitText: r ? (r.PerUnit || 'each') : '', unit, qty: l.qty, total: unit * l.qty };
+            const unit = r ? Number(r.Price) : 0;
+            return { label: r ? r.DisplayName : l.code, part: r ? r.PartNumber : '', unitText: r ? (r.PerUnit || 'each') : '', unit, qty: l.qty, total: unit * l.qty };
         }
         if (l.kind === 'time') {
             const unit = l.mode === 'machine' ? state.rules.machineQH : state.rules.benchQH;
-            return { label: (l.desc || 'Time') + ' (' + (l.mode === 'machine' ? 'machine' : 'bench') + ')', unitText: 'per ¼ hour', unit, qty: l.quarters, total: unit * l.quarters };
+            return { label: (l.desc || 'Shop time') + ' (' + (l.mode === 'machine' ? 'machine' : 'bench') + ')', part: 'DECG', unitText: 'per ¼ hour', unit, qty: l.quarters, total: unit * l.quarters };
         }
         const unit = ceil2(l.cost * (1 + state.rules.markupPct / 100));
-        return { label: (l.desc || 'Material') + ' (we supply)', unitText: 'each', unit, qty: l.qty, total: unit * l.qty };
+        return { label: (l.desc || 'Material') + ' (we supply)', part: '', unitText: 'each', unit, qty: l.qty, total: unit * l.qty };
     }
 
     function compute() {
@@ -85,16 +96,17 @@
     function render() {
         if (!state.rows.length) return;
         const root = $('ss-lines');
-        const opts = services().map((r) => '<option value="' + esc(r.ServiceCode) + '">' + esc(r.Category) + ' — ' + esc(r.DisplayName) + ' · ' + money(r.SellPrice) + ' ' + esc(r.PerUnit || '') + '</option>').join('');
+        const opts = services().map((r) => '<option value="' + esc(r.ServiceCode) + '">' + esc(r.Category) + ' — ' + esc(r.DisplayName) + ' · ' + money(r.Price) + ' ' + esc(r.PerUnit || '') + (r.PartNumber ? ' · ShopWorks ' + esc(r.PartNumber) : '') + '</option>').join('');
         const c = compute();
         root.innerHTML = c.priced.length ? c.priced.map(({ line, p }) => {
             let main = '';
             if (line.kind === 'service') {
-                main = '<select data-f="code">' + opts.replace('value="' + esc(line.code) + '"', 'value="' + esc(line.code) + '" selected') + '</select>';
+                main = '<select data-f="code">' + opts.replace('value="' + esc(line.code) + '"', 'value="' + esc(line.code) + '" selected') + '</select>' +
+                    (p.part ? '<small>ShopWorks part: <b>' + esc(p.part) + '</b></small>' : '');
             } else if (line.kind === 'time') {
                 main = '<input type="text" data-f="desc" value="' + esc(line.desc) + '" placeholder="What the time is for"><small>' +
                     '<label><input type="radio" name="mode' + line.id + '" data-f="mode" value="bench"' + (line.mode === 'bench' ? ' checked' : '') + '> bench</label> &nbsp; ' +
-                    '<label><input type="radio" name="mode' + line.id + '" data-f="mode" value="machine"' + (line.mode === 'machine' ? ' checked' : '') + '> machine</label> &nbsp; quarter hours →</small>';
+                    '<label><input type="radio" name="mode' + line.id + '" data-f="mode" value="machine"' + (line.mode === 'machine' ? ' checked' : '') + '> machine</label> &nbsp; quarter hours → &nbsp; ShopWorks part: <b>DECG</b> (caps DECC, laser items Laser)</small>';
             } else {
                 main = '<input type="text" data-f="desc" value="' + esc(line.desc) + '" placeholder="Material (transfer, labels, bags…)"><small>Our cost each: $<input type="number" data-f="cost" min="0" step="0.01" value="' + line.cost + '" class="ss-cost"> → price = cost + ' + state.rules.markupPct + '%</small>';
             }
@@ -120,6 +132,9 @@
         L.push('');
         c.priced.forEach(({ p }) => L.push('  ' + p.label + ' — ' + p.qty + ' × ' + money(p.unit) + ' = ' + money(p.total)));
         if (c.minimumApplied) L.push('  Job minimum ' + money(state.rules.min) + ' applies (lines total ' + money(c.subtotal) + ')');
+        L.push('');
+        L.push('ShopWorks lines: ' + c.priced.map(({ p }) => (p.part || 'material part') + ' ' + p.qty + ' @ ' + money(p.unit)).join(' · ') +
+            (c.minimumApplied ? ' · LTM 1 @ ' + money(c.total - c.subtotal) : ''));
         L.push('');
         L.push('Total: ' + money(c.total) + (c.priced.length && c.priced[0].p.qty ? '' : ''));
         L.push('Goods you supply are worked at your risk; please include a spare for a test where possible. Sales tax extra.');
@@ -207,14 +222,15 @@
             let n = 0, failed = 0;
             const items = c.priced.map(({ line, p }) => ({
                 QuoteID: quoteId, LineNumber: ++n,
-                StyleNumber: line.kind === 'service' ? line.code : (line.kind === 'time' ? 'SHOP-TIME' : 'SHOP-MATERIAL'),
-                ProductName: p.label, Color: '', ColorCode: '', EmbellishmentType: 'shop-service',
+                // StyleNumber = the ShopWorks part the rep will type (Monogram, SECC, SEG, DECG, DT…).
+                StyleNumber: p.part || (line.kind === 'material' ? 'MATERIAL' : line.code),
+                ProductName: p.label + (line.kind === 'service' ? ' [' + line.code + ']' : ''), Color: '', ColorCode: '', EmbellishmentType: 'shop-service',
                 PrintLocation: '', PrintLocationName: '', Quantity: p.qty, HasLTM: 'No',
                 BaseUnitPrice: ceil2(p.unit), LTMPerUnit: 0, FinalUnitPrice: ceil2(p.unit), LineTotal: ceil2(p.total),
                 SizeBreakdown: '{}', PricingTier: line.kind === 'time' ? (line.mode + ' ¼h') : 'Shop services', ImageURL: '', AddedAt: now, LogoSpecs: ''
             }));
             if (c.minimumApplied) items.push({
-                QuoteID: quoteId, LineNumber: ++n, StyleNumber: 'SHOP-JOB-MIN', ProductName: 'Job minimum adjustment', Color: '', ColorCode: '',
+                QuoteID: quoteId, LineNumber: ++n, StyleNumber: 'LTM', ProductName: 'Job minimum top-up to ' + money(state.rules.min), Color: '', ColorCode: '',
                 EmbellishmentType: 'shop-service', PrintLocation: '', PrintLocationName: '', Quantity: 1, HasLTM: 'Yes',
                 BaseUnitPrice: ceil2(c.total - c.subtotal), LTMPerUnit: 0, FinalUnitPrice: ceil2(c.total - c.subtotal), LineTotal: ceil2(c.total - c.subtotal),
                 SizeBreakdown: '{}', PricingTier: 'Shop services', ImageURL: '', AddedAt: now, LogoSpecs: ''

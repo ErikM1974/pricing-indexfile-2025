@@ -517,7 +517,7 @@
 ### Service Price Cheat Sheet
 | File | Purpose | Dependencies | Status |
 |------|---------|--------------|--------|
-| `/calculators/service-price-cheat-sheet.html` | Printable service price reference — all embroidery service prices | service-price-cheat-sheet.js, .css, app-config.js | ✅ Active |
+| `/calculators/service-price-cheat-sheet.html` | Printable service price reference — all embroidery service prices | service-price-cheat-sheet.js, .css, app-config.js **2026-09-03 = THE ONE REP PRICE PAGE**: rules strip (customer goods → per piece × qty, $75 min on `LTM`; off-card time on DECG/DECC/Laser per ¼ h; we supply the garment → builder) + "Shop Services on Customer Goods" section from the Caspio `SHOP` rows with the ShopWorks part (AliasFor) beside every price; the six service rows that used to sit in Fixed-Price (Monogram, Name/Number, SEG, SECC, DT, 3D-EMB, Laser Patch) moved there; Fixed-Price renamed "Setup, Art & Order Fees"; warns when a 1:1 part row disagrees with its menu price; Print / Save PDF; link to the Shop Services calculator. | ✅ Active |
 | `/calculators/service-price-cheat-sheet.js` | API-driven price fetching and rendering | /api/service-codes, /api/decg-pricing, /api/al-pricing | ✅ Active |
 | `/calculators/service-price-cheat-sheet.css` | Page styles with print-friendly layout | — | ✅ Active |
 

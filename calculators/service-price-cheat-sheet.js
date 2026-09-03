@@ -13,13 +13,6 @@
         { service: 'Digitizing (New)',    pns: 'DD',                price: 100.00, notes: 'New design setup' },
         { service: 'Digitizing (Edit)',   pns: 'DDE',               price: 50.00,  notes: 'Design revision' },
         { service: 'Digitizing (Text)',   pns: 'DDT',               price: 50.00,  notes: 'Text-only design' },
-        { service: 'Monogram',            pns: 'Monogram',          price: 12.50,  notes: 'Per piece' },
-        { service: 'Name & Number',      pns: 'Name/Number',       price: 15.00,  notes: 'Per piece' },
-        { service: 'Sewing (Garment)',    pns: 'SEG',               price: 10.00,  notes: 'Per piece' },
-        { service: 'Sewing (Cap)',        pns: 'SECC',              price: 10.00,  notes: 'Per piece' },
-        { service: 'Design Transfer',     pns: 'DT',                price: 50.00,  notes: 'One-time fee' },
-        { service: '3D Puff',            pns: '3D-EMB',            price: 5.00,   notes: 'Per cap upcharge' },
-        { service: 'Laser Patch',        pns: 'Laser Patch',       price: 5.00,   notes: 'Per cap upcharge' },
         { service: 'Patch Setup',        pns: 'GRT-50',            price: 50.00,  notes: 'One-time fee' },
         { service: 'Graphic Design',     pns: 'GRT-75',            price: 75.00,  notes: 'One-time fee' },
         { service: 'LTM Fee',            pns: 'LTM',               price: 50.00,  notes: 'Qty \u22647, divided across pcs' },
@@ -101,16 +94,9 @@
             { service: 'Digitizing (New)',    pns: 'DD',                price: lookup('DD') ?? 100, notes: 'New design setup' },
             { service: 'Digitizing (Edit)',   pns: 'DDE',               price: lookup('DDE') ?? 50, notes: 'Design revision' },
             { service: 'Digitizing (Text)',   pns: 'DDT',               price: lookup('DDT') ?? 50, notes: 'Text-only design' },
-            { service: 'Monogram',            pns: 'Monogram',          price: lookup('Monogram') ?? 12.50, notes: 'Per piece' },
-            { service: 'Name & Number',      pns: 'Name/Number',       price: lookup('Name/Number') ?? 15.00, notes: 'Per piece' },
-            { service: 'Sewing (Garment)',    pns: 'SEG',               price: lookup('SEG') ?? 10.00, notes: 'Per piece' },
-            { service: 'Sewing (Cap)',        pns: 'SECC',              price: lookup('SECC') ?? 10.00, notes: 'Per piece' },
-            { service: 'Design Transfer',     pns: 'DT',                price: lookup('DT') ?? 50.00, notes: 'One-time fee' },
-            { service: '3D Puff',            pns: '3D-EMB',            price: lookup('3D-EMB') ?? 5.00, notes: 'Per cap upcharge' },
-            { service: 'Laser Patch',        pns: 'Laser Patch',       price: lookup('Laser Patch') ?? 5.00, notes: 'Per cap upcharge' },
             { service: 'Patch Setup',        pns: 'GRT-50',            price: lookup('GRT-50') ?? 50.00, notes: 'One-time fee' },
             { service: 'Graphic Design',     pns: 'GRT-75',            price: lookup('GRT-75') ?? 75.00, notes: 'One-time fee' },
-            { service: 'LTM Fee',            pns: 'LTM',               price: 50.00, notes: 'Qty \u22647, divided across pcs' },
+            { service: 'LTM Fee (embroidery orders)', pns: 'LTM',        price: lookup('LTM') ?? 50.00, notes: 'Qty \u22647 on an embroidery order, divided across pcs. Shop-services jobs use LTM for the $75 minimum top-up instead.' },
             { service: 'Rush',               pns: 'RUSH',              price: null, notes: '25% of subtotal' },
         ];
     }
@@ -135,6 +121,74 @@
         ];
     }
 
+    // ── Shop services on customer goods (2026-09-03) ───────────────────────
+    // Menu = Service_Codes rows with ServiceType SHOP; each names its ShopWorks part in
+    // AliasFor. Price of record = the part row when it carries a flat price (Monogram,
+    // SECC, SEG, DT, 3D-EMB, Laser Patch…), else the menu row. Same rule as the customer
+    // card (/pages/shop-services-pricing) and the calculator (/calculators/shop-services).
+    function buildShopServicesFromAPI(allRows, scMap) {
+        const menu = allRows.filter(r => r.ServiceType === 'SHOP' && r.IsActive !== false)
+            .sort((a, b) => (Number(a.SortOrder) || 0) - (Number(b.SortOrder) || 0));
+        // The SHOP menu row is the price of record; AliasFor is only the ShopWorks part to
+        // bill on (several menu lines share one part — DT, DECG — at different prices). If a
+        // part row carries its own flat price that disagrees, flag it here so it gets fixed.
+        const priceOf = (r) => Number(r.SellPrice);
+        // Only meaningful when a part backs exactly ONE menu line (Monogram, SECC, SEG…);
+        // DT and DECG carry several lines at different typed prices by design.
+        const partUse = {};
+        menu.forEach(r => { if (r.AliasFor) partUse[r.AliasFor] = (partUse[r.AliasFor] || 0) + 1; });
+        const partMismatch = (r) => {
+            if (!r.AliasFor || partUse[r.AliasFor] !== 1) return null;
+            const part = scMap[r.AliasFor];
+            const pp = part && String(part.PricingMethod || '').toUpperCase() !== 'TIERED' ? Number(part.SellPrice) : NaN;
+            return isFinite(pp) && pp > 0 && Math.abs(pp - Number(r.SellPrice)) > 0.001 ? pp : null;
+        };
+        const rules = {};
+        menu.filter(r => String(r.Position || '').toUpperCase() === 'RULE').forEach(r => { rules[r.ServiceCode] = priceOf(r); });
+        const lines = menu.filter(r => String(r.Position || '').toUpperCase() !== 'RULE' || /LASER-SETUP/i.test(r.ServiceCode)).map(r => ({
+            category: r.Category || 'Other',
+            service: r.DisplayName,
+            pns: r.AliasFor || '\u2014',
+            price: priceOf(r),
+            unit: r.PerUnit || 'each',
+            notes: (Number(r.UnitCost) > 0 ? 'Book ' + Number(r.UnitCost) + ' min ' + (String(r.Position || '').toUpperCase() === 'MACHINE' ? 'machine' : 'bench') : '') +
+                   (/upcharge/i.test(r.PerUnit || '') ? ' \u00b7 upcharge on the embroidery price' : '') +
+                   (partMismatch(r) != null ? ' \u26a0 part ' + r.AliasFor + ' row says ' + currency(partMismatch(r)) + ' \u2014 align it in Caspio' : '')
+        }));
+        return { rules, lines };
+    }
+
+    // Rule #4: no fallback prices for shop services — say it is unavailable instead.
+    function shopServicesUnavailable() {
+        const tbody = document.getElementById('shop-services-tbody');
+        if (tbody) tbody.innerHTML = '<tr><td colspan="4" class="loading-cell">Shop services pricing unavailable \u2014 refresh the page. Do not quote from memory.</td></tr>';
+        const badge = document.getElementById('shop-source');
+        if (badge) badge.textContent = 'Unavailable';
+    }
+
+    function renderShopServices(model, source) {
+        const tbody = document.getElementById('shop-services-tbody');
+        if (!tbody) return;
+        const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+        if (model.rules['SHOP-JOB-MIN'] != null) set('rule-min', Number(model.rules['SHOP-JOB-MIN']).toFixed(0));
+        if (model.rules['SHOP-BENCH-QH'] != null) set('rule-bench', Number(model.rules['SHOP-BENCH-QH']).toFixed(2).replace(/\.00$/, ''));
+        if (model.rules['SHOP-MACHINE-QH'] != null) set('rule-machine', Number(model.rules['SHOP-MACHINE-QH']).toFixed(2));
+        if (model.rules['SHOP-MATERIAL-MARKUP'] != null) set('rule-markup', Number(model.rules['SHOP-MATERIAL-MARKUP']).toFixed(0));
+        let html = '', lastCat = null;
+        for (const row of model.lines) {
+            if (row.category !== lastCat) { html += `<tr class="cat-row"><td colspan="4">${escapeHtml(row.category)}</td></tr>`; lastCat = row.category; }
+            html += `<tr>
+                <td class="service-name">${escapeHtml(row.service)}</td>
+                <td class="pn-cell"><code>${escapeHtml(row.pns)}</code></td>
+                <td class="price-col">${currency(row.price)} <span class="notes-cell">${escapeHtml(row.unit)}</span></td>
+                <td class="notes-cell">${escapeHtml(row.notes)}</td>
+            </tr>`;
+        }
+        tbody.innerHTML = html || '<tr><td colspan="4" class="loading-cell">No shop-services rows in Caspio.</td></tr>';
+        const badge = document.getElementById('shop-source');
+        if (badge) badge.textContent = source;
+    }
+
     // ── Main load ───────────────────────────────────────────────────────────
     async function init() {
         try {
@@ -146,14 +200,17 @@
                 }
                 renderFixedServices(buildFixedFromAPI(scMap), 'API');
                 renderOtherServices(buildOtherServicesFromAPI(scMap));
+                renderShopServices(buildShopServicesFromAPI(result.data, scMap), 'API');
             } else {
                 renderFixedServices(FALLBACK_FIXED, 'Fallback');
                 renderOtherServices(FALLBACK_OTHER_SERVICES);
+                shopServicesUnavailable();
             }
         } catch (err) {
             console.error('Service codes API failed:', err);
             renderFixedServices(FALLBACK_FIXED, 'Fallback');
             renderOtherServices(FALLBACK_OTHER_SERVICES);
+            shopServicesUnavailable();
         }
 
         document.getElementById('load-timestamp').textContent = new Date().toLocaleString();

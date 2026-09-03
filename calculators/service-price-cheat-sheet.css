@@ -246,3 +246,20 @@ body {
     }
     .header-container { flex-direction: column; gap: 8px; }
 }
+
+/* ── Shop services on customer goods (2026-09-03) ─────────────────────────── */
+.btn-print--link { text-decoration: none; margin-right: 8px; }
+.rules-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px; margin: 0 0 16px; }
+.rules-strip .rule { background: #eef4ef; border: 1px solid #d5e3d8; border-radius: 8px; padding: 10px 14px; display: flex; flex-direction: column; gap: 3px; }
+.rules-strip .rule-k { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--primary-green); font-weight: 700; }
+.rules-strip .rule-v { font-size: 13px; color: var(--text-primary); line-height: 1.45; }
+.rules-strip code { background: #fff; border: 1px solid var(--border-color); border-radius: 4px; padding: 0 4px; font-size: 12px; }
+.ref-table tr.cat-row td { background: #f1f5f2; color: var(--primary-green); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; padding: 6px 12px; }
+.ref-table td.pn-cell code { font-size: 12px; }
+@media print {
+    .rules-strip { grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 8px; }
+    .rules-strip .rule { padding: 6px 8px; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .ref-card { break-inside: avoid; box-shadow: none; }
+    .ref-table tr.cat-row td { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .btn-print--link { display: none; }
+}
