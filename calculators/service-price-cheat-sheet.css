@@ -158,31 +158,36 @@ body.view-rep .customer-only { display: none !important; }
 
 /* ── Print: one letter page ─────────────────────────────────────────────────── */
 @media print {
-    @page { size: letter portrait; margin: 0.45in; }
+    /* margin: 0 suppresses the browser's own header/footer (date, title, URL, page x/y);
+       the page margin is re-created as padding on the sheet. One letter page. */
+    @page { size: letter portrait; margin: 0; }
     * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
     html, body { background: #fff; }
     .topbar, .error-banner { display: none !important; }
-    .menu { max-width: none; margin: 0; padding: 18px 22px 12px; box-shadow: none; border: 1px solid #bbb; background: #fff; }
-    .menu::before { inset: 6px; }
-    .masthead { margin-bottom: 12px; }
-    .masthead-title { font-size: 40px; }
-    .masthead-eyebrow { margin-top: 8px; }
+    .menu { max-width: none; margin: 0; padding: 0.42in 0.5in 0.3in; box-shadow: none; border: 0; background: #fff; }
+    .menu::before { inset: 0.28in 0.34in; }
+    .masthead { margin-bottom: 8px; }
+    .masthead-title { font-size: 34px; }
+    .masthead-eyebrow { margin-top: 6px; font-size: 9.5px; }
+    .masthead-sub { margin: 4px 0 8px; font-size: 10.5px; }
     .minimum-stamp { margin: 8px auto 2px; padding: 5px 12px 5px 9px; gap: 10px; }
     .minimum-amount { font-size: 26px; }
     .minimum-text { font-size: 10px; }
     .minimum-text strong { font-size: 11px; }
-    .house-rules { margin-bottom: 14px; padding: 10px 14px 8px; }
-    .house-rules-list { font-size: 11px; gap: 2px; }
-    .house-rules-title { background: #fff; font-size: 12px; }
-    .courses { column-gap: 26px; row-gap: 12px; }
+    .house-rules { margin-bottom: 10px; padding: 8px 12px 6px; }
+    .house-rules-list { font-size: 10px; gap: 1px; }
+    .house-rules-title { background: #fff; font-size: 11px; top: -9px; }
+    .courses { column-gap: 22px; row-gap: 8px; }
     .course { animation: none !important; }
-    .course-title { font-size: 16px; }
-    .course-note { font-size: 10px; margin-bottom: 4px; }
-    .item { padding: 2px 0; }
-    .item-name { font-size: 11.5px; }
-    .item-price { font-size: 13px; }
-    .item-meta, .item-desc { font-size: 9.5px; }
-    .colophon { margin-top: 12px; padding-top: 6px; font-size: 9px; }
+    .course-title { font-size: 14.5px; }
+    .course-note { font-size: 9.5px; margin-bottom: 2px; }
+    .course-addon { font-size: 9.5px; padding: 2px 8px; margin-top: 4px; }
+    .item { padding: 1px 0; }
+    .item-name { font-size: 11px; }
+    .item-price { font-size: 12px; }
+    .item-price .unit { font-size: 9px; }
+    .item-meta, .item-desc { font-size: 9px; margin-top: -1px; }
+    .colophon { margin-top: 8px; padding-top: 5px; font-size: 8.5px; }
 }
 
 /* Rep-only course (screen print & pass-through) and add-on footnotes (2026-09-03) */
@@ -190,4 +195,3 @@ body.view-customer .course--internal { display: none !important; }
 .course-addon { margin: 8px 0 0; padding: 6px 10px; font-size: 12.5px; color: var(--ink-2); border-left: 2px solid var(--wine); background: rgba(122,31,43,.05); }
 .course-addon strong { color: var(--wine); }
 .course-addon .item-meta { display: inline-flex; margin-left: 6px; }
-@media print { .course-addon { font-size: 10px; padding: 3px 8px; } }
