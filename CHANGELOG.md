@@ -1,3 +1,8 @@
+## v2026.09.03.13 (2026.09.03)
+
+- Staff dashboard Workspaces: role-based tabs, audited names, reports off the front page
+- Deploy v2026.09.03.13: 13 files (company-numbers.html, customer-portal-admin.html, finished-photos-library.html...)
+
 ## v2026.09.03.12 (2026.09.03)
 
 - Memory: /memory-maintain 2026-09-03 — LESSONS 267→195 (3 entries archived), VQ sequence + homepage-revert + DTG0831 post-import facts moved into topic files, INDEX stamped
