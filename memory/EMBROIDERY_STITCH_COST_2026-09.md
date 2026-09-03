@@ -55,7 +55,8 @@ carries it, order GM 49%. The "smaller logo" reason is worth $0.50–1.00/pc, no
   Break-even $/1K typical: 3.22 / 1.27 / 0.79 / 0.60 / 0.42 (garments); worst 4.23 / 1.82 / 1.20 / 0.97 / 0.77.
 - 🔴 **The $50 fee cannot make small contract orders profitable** — needs $118–150 (1-7) or
   $76–129 (8-23); 93 of 207 contract garment orders in 2025 were < 24 pcs. No garment margin to absorb it.
-- **APPLIED 2026-09-02 (final form)**: garments $1.25 / 1.10 / 1.00 / 0.90 / 0.85, caps $1.10 / 1.00 / 0.90 /
+- **APPLIED 2026-09-02 (final form)**: garments $1.25 / 1.10 / **1.10 / 0.95** / 0.85 (mid tiers raised after the
+  Break-Even grid showed 24-47 as the least profitable tier: 8K 36 pcs +$93/order typical, worst −$20 → ≈ break-even), caps $1.10 / 1.00 / 0.90 /
   0.80 / 0.75, **no fee, single $250 order minimum** (Erik: fee + minimum = two rules + a cliff at 24).
   $250 covers the worst case to ~18 pcs and the normal run to ~30; 4 pcs +$97, 12 pcs +$78, 24 pcs +$46.
   Earlier draft was fee $100 + $150 minimum. Typical per-order: 1-7 ≈ break-even, 8-23 +$34/+$28,
