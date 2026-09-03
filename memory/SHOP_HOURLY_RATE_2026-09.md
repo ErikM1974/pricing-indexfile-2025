@@ -104,8 +104,10 @@ cheat sheet (`/calculators/service-price-cheat-sheet.html`) is now the ONE rep p
 shop-services section with part numbers + fees; the customer card and calculator read the same rows.
 Calculator saves StyleNumber = part number, minimum top-up as an `LTM` line.
 
-**Customer-copy revision (Erik's 10 points, 2026-09-03 PM, plan-mode agreed):** minimum **$90** ("one hour of shop
-time"); ONE sample price **$50**; supplies we provide priced like garments **cost ÷ 0.53** (`SHOP-MATERIAL-DENOM`;
+**Customer-copy revision (Erik's 10 points, 2026-09-03 PM, plan-mode agreed):** minimum **$100** ("one hour of bench
+time"; was $90 → $100 same day when Erik noticed $25/¼h = $100/h, so the BENCH RATE IS NOW $100/h for easy math;
+bench = sewing/finishing/hand work, machine = heads/heat press/laser/DTG at $150/h; per-piece prices unchanged — they
+are paid numbers ~8% under the $100 book and ~30% over cost); ONE sample price **$50**; supplies we provide priced like garments **cost ÷ 0.53** (`SHOP-MATERIAL-DENOM`;
 markup row retired — Erik: we work on MARGIN, 30% markup was only 23% margin); removed from the menu: Name/Number
 (DTG/transfers), Re-run, Patch-during-run (SECC/SEG cover it), Laser Patch; 3D puff = a footnote "add $5 per piece
 to any embroidery price", not a line; customer print = shop courses + Setup & Art only (Screen Print & Other is
