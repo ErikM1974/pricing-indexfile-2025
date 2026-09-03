@@ -1,3 +1,7 @@
+## v2026.09.03.18 (2026.09.03)
+
+- Staff Dashboard: drop the last New/Updated chips (DST Studio, Monogram Orders)
+
 ## v2026.09.03.17 (2026.09.03)
 
 - Staff Dashboard: sticky tabs, Most-used pair on Sales, Purchase Request rename, chips + legend removed
