@@ -134,8 +134,7 @@
                 SSC: 'Safety Stripe Creator',
                 WEB: 'Webstore Setup',
                 ART: 'Art Invoice',
-                VQ: 'Volume Quote',     // admin one-time price for large orders (dashboards/volume-quote.html, 2026-09-02)
-                SHP: 'Shop Services'    // work on customer-supplied goods (calculators/shop-services, 2026-09-03)
+                VQ: 'Volume Quote'      // admin one-time price for large orders (dashboards/volume-quote.html, 2026-09-02)
             },
             ID_PATTERN: '[PREFIX][MMDD]-[sequence]',
             get DEFAULT_TAX_RATE() { return window.TENANT.tax.defaultRateDisplay; }, // display default ONLY; real rates via POST /api/tax-rates/lookup
