@@ -27,9 +27,9 @@
         { code: 'DDE',    name: 'Digitizing, edit an existing design', fallback: 50, unit: 'per design' },
         { code: 'DDT',    name: 'Digitizing, text only',          fallback: 50,   unit: 'per design' },
         { code: 'GRT-50', name: 'Logo mockup & print review',      fallback: 50,   unit: 'per order' },
-        { code: 'GRT-75', name: 'Graphic design',                 fallback: 75,   unit: 'per hour', desc: 'Billed in quarter hours.' },
-        { code: 'LTM',    name: 'Small-order fee, embroidery orders', fallback: 50, unit: 'per order', desc: 'Orders of 7 pieces or fewer, spread across the pieces.' },
-        { code: 'RUSH',   name: 'Rush',                           fallback: null, unit: '25% of subtotal', text: '25%' },
+        { code: 'GRT-75', name: 'Art and graphic design (Steve)', fallback: 75,   unit: 'per hour', desc: 'Billed in quarter hours.' },
+        { code: 'LTM',    name: 'Small-order fee on orders where we supply the garments', fallback: 50, unit: 'per order', desc: 'Orders of 7 pieces or fewer, spread across the pieces. Not a shop-services charge.', repOnly: true },
+        { code: 'RUSH',   name: 'Rush',                           fallback: null, unit: '25% of the order', text: '25% of the order' },
     ];
     const OTHER_COURSE = [
         { code: 'Art',       name: 'Art charges',                    fallback: 75, unit: 'per hour' },
@@ -49,6 +49,12 @@
         { cat: 'Finishing',                     title: 'Finishing',                 note: 'Bagged, tagged and ready to hand out.' },
         { cat: 'Laser engraving on your items', title: 'The Laser Bar',             note: 'Tumblers, boards, plaques and cases you supply.' },
     ];
+
+    // Customer-facing one-liners for menu rows that need a word of explanation (copy only; prices stay in Caspio).
+    const NOTES = {
+        'SHOP-SAMPLE-8K': 'Requires a digitized design (see Setup & Art).',
+        'SHOP-LASER-SETUP': 'Counts toward the job minimum.'
+    };
 
     const currency = (v) => '$' + Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -90,6 +96,7 @@
             const pp = part && partUse[r.AliasFor] === 1 && String(part.PricingMethod || '').toUpperCase() !== 'TIERED' ? Number(part.SellPrice) : NaN;
             return {
                 cat: r.Category || 'Other', name: r.DisplayName, code: r.AliasFor || '',
+                desc: NOTES[String(r.ServiceCode || '').toUpperCase()] || '',
                 price: Number(r.SellPrice), unit: r.PerUnit || 'each',
                 // "add-on" rows (3D puff) are footnotes under their course, not priced lines.
                 addon: /add-?on/i.test(r.PerUnit || ''),
@@ -112,7 +119,7 @@
         if (it.book) meta.push('<span class="book">book ' + esc(it.book) + '</span>');
         if (it.mismatch != null) meta.push('<span class="warn">⚠ part row says ' + currency(it.mismatch) + ' — align it in Caspio</span>');
         if (opts && opts.fallback) meta.push('<span class="warn">fallback price — Caspio unreachable</span>');
-        return '<div class="item">' +
+        return '<div class="item' + (it.repOnly ? ' rep-only' : '') + '">' +
             '<span class="item-name"><span class="txt">' + esc(it.name) + '</span><span class="leader"></span></span>' + priceHtml +
             (it.desc ? '<span class="item-desc">' + esc(it.desc) + '</span>' : '') +
             (meta.length ? '<span class="item-meta rep-only">' + meta.join('') + '</span>' : '') +
@@ -137,7 +144,7 @@
             const rec = scMap[f.code];
             const live = rec ? Number(rec.SellPrice) : NaN;
             const price = isFinite(live) && live > 0 ? live : f.fallback;
-            return itemHtml({ name: f.name, code: f.code, unit: f.unit, desc: f.desc, price, text: f.text || (price == null ? 'varies' : null) },
+            return itemHtml({ name: f.name, code: f.code, unit: f.unit, desc: f.desc, price, repOnly: !!f.repOnly, text: f.text || (price == null ? 'varies' : null) },
                 { fallback: !apiOk && f.fallback != null });
         }).join('');
         return courseHtml(title, note, html, false, internal);

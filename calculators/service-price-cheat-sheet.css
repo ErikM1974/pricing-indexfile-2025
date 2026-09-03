@@ -123,7 +123,7 @@ body {
 .item-name .txt { flex: 0 1 auto; }
 .item-name .leader { flex: 1 1 12px; border-bottom: 1px dotted var(--ink-3); transform: translateY(-4px); min-width: 12px; }
 .item-price { font-family: var(--display); font-size: 17px; font-weight: 600; color: var(--ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
-.item-price .unit { font: italic 400 11px var(--text); color: var(--ink-3); margin-left: 4px; }
+.item-price .unit { font: italic 400 11px var(--text); color: var(--ink-3); margin-left: 7px; }
 .item-price .plus { color: var(--wine); }
 .item-meta { grid-column: 1 / -1; font-size: 11.5px; color: var(--ink-3); display: flex; gap: 10px; align-items: center; margin-top: -2px; }
 .item-meta code { font: 500 11px var(--text); background: rgba(122,31,43,.08); color: var(--wine); border: 1px solid rgba(122,31,43,.25); border-radius: 3px; padding: 0 5px; letter-spacing: .02em; }
@@ -185,7 +185,7 @@ body.view-rep .customer-only { display: none !important; }
     .item { padding: 1px 0; }
     .item-name { font-size: 11px; }
     .item-price { font-size: 12px; }
-    .item-price .unit { font-size: 9px; }
+    .item-price .unit { font-size: 9px; margin-left: 6px; }
     .item-meta, .item-desc { font-size: 9px; margin-top: -1px; }
     .colophon { margin-top: 8px; padding-top: 5px; font-size: 8.5px; }
 }

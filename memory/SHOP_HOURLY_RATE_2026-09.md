@@ -114,6 +114,8 @@ to any embroidery price", not a line; customer print = shop courses + Setup & Ar
 rep-only); two print buttons ("Print customer menu" forces the customer view). Bench $90/h ≠ the minimum: the rate
 only shows as $25/¼h. 🔴 Erik printed the REP view by mistake the first time — hence the dedicated button.
 
+**Print review edits (2026-09-03, Erik: "make the edits"):** LTM small-order fee is REP-ONLY on the Menu (it belongs to orders we supply garments for — a second minimum confused the customer copy); sample line notes "requires a digitized design"; laser setup notes "counts toward the job minimum"; Rush reads "25% of the order"; GRT-75 labelled "Art and graphic design (Steve)"; SEG line renamed "Patch, emblem or velcro sewn on a garment, vest or bag"; subtitle lists DTF; price↔unit gap widened. Customer copy verified ONE page, no browser URL footer.
+
 **DTF course (2026-09-03):** new Menu course "DTF (Direct-to-Film)" — press-only $8.50 moved there from Finishing; `SHOP-NAME-NUMBER` re-activated as "Names and numbers in DTF, transfers included" **$15 each, 10 minimum** (Supacolor LA vendor minimum; course note says so). Print: `@page{margin:0}` + sheet padding removes the browser URL/date header-footer; tighter print sizes so the customer copy fits ONE letter page (rep copy may run two).
 
 **SHOP MENU (2026-09-03, Erik's "restaurant menu" idea):** `/calculators/service-price-cheat-sheet.html` rebuilt
