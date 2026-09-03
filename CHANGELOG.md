@@ -1,3 +1,8 @@
+## v2026.09.03.12 (2026.09.03)
+
+- Memory: /memory-maintain 2026-09-03 — LESSONS 267→195 (3 entries archived), VQ sequence + homepage-revert + DTG0831 post-import facts moved into topic files, INDEX stamped
+- Deploy v2026.09.03.12: Shop Menu rep copy prints on one page (rep-view print spacing + shorter colophon)
+
 ## v2026.09.03.11 (2026.09.03)
 
 - Deploy v2026.09.03.11: retire the Shop Services calculator + SHP prefix; Shop Menu drops the screen-print course (rep copy now one page) and adds the supplies cost÷0.53 line
