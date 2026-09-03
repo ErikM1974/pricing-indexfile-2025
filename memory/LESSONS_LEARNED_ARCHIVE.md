@@ -4,6 +4,92 @@ Resolved entries aged out of `LESSONS_LEARNED.md` (300-line cap). Newest first. 
 
 ---
 
+## Archived 2026-09-03
+
+## Bonus hero dial: money inside a fixed ring, and a CTA column that wrapped at every width (2026-09-01)
+
+**Problem.** Erik: the Mission Control bonus meter circle "looks off." Two defects: the earned
+amount ("$1,050.00" at 34px JetBrains Mono ≈ 184px) painted over the 176px ring's arc — its
+clear centre is only ~129px — and the 208px CTA column wrapped below the dial at EVERY desktop
+width, leaving an empty green corner bottom-right.
+
+**Root cause.** (1) Variable-width money can't live inside a fixed-diameter ring; anything over
+six characters collides. (2) A `flex-wrap` container places items on lines by their MAX-CONTENT
+width (`flex-basis: auto`), and the unwrapped headline sentence measures ~1100px — the ladder
+claimed the whole line and pushed the CTA down, so the ≤1100px media query never even mattered.
+
+**Solution.** Redesign Option B (canvas artifact 2d3ed8c4, picked by Erik): the ring (r=52,
+CIRC 326.73) holds only the percentage with the 85% tick; the dollars are HTML text beside it
+(`.aemc-bh-earned`); `.aemc-bh-ladder` moved to `flex: 1 1 0` so the band stays
+dial | ladder | CTA. Harness re-synced; verified at 1280px and mobile with worst-case strings
+("$1,050.00", "118.4%").
+
+**Prevention.**
+- 🔑 **Never put a variable-width figure inside a fixed-size ring** — the ratio gets the meter,
+  the number gets a free-standing hero figure beside it.
+- 🔑 **In a `flex-wrap` container, line-breaking uses MAX-CONTENT width, not post-shrink
+  width** — a long sentence in a `flex: 1 1 auto` sibling silently shoves later columns onto a
+  new row; `flex-basis: 0` is the fix (keep `min-width: 0`).
+- 🔑 The hero markup is drift-locked: run `node scripts/sync-test-harness.js` after ANY change
+  inside `#aemc-bonus-hero`.
+
+## Staff-dashboard hardening: PII roster, proxy-direct reads, third-party auth embed (2026-08-26)
+
+**Problem.** Three structural exposures on the staff dashboard, found by the same review that
+fixed its 13 defects: (1) the full employee roster — names, birthdays, hire dates, TERMINATION
+dates — hardcoded in TWO anonymously-served JS files; (2) three reads (quote book, per-rep YTD
+revenue, art requests) hitting the public proxy base directly, relying on obscurity; (3) the
+welcome chip fed by a hidden third-party Caspio DataPage embed that needed its own caspio.com
+session, silently failed under third-party-cookie blocking, and forced the caspio-isolation.js
+MutationObserver hack.
+
+**Root Cause.** The staff gate covers only `.html` — every `.js` under the static mounts serves
+anonymously — and the dashboard predated the same-origin forwarder pattern.
+
+**Solution.** Roster → `lib/staff-roster.js` (never statically served) behind requireStaff
+`GET /api/staff/employees`; employees-service became fetch-once async with a visible roster-error
+state; legacy roster file deleted. The three reads → `/api/staff/{quote-sessions,
+daily-sales-by-rep-ytd,artrequests}` relays (staffProxyForward). Auth embed + caspio-isolation.js
+DELETED — identity now `/api/crm-session/me` (which gained `role`). Shipped `v2026.08.26.3`;
+the proxy side of the reads was locked by the quote-plane gate (entry above).
+
+**Prevention.**
+- 🔴 **Data a staff page needs is either in `lib/` behind a route, or it is PUBLIC** — there is
+  no third state. The drive-access pattern is the template; grep the static mounts before
+  hardcoding anything person-shaped in JS.
+- 🔑 **A second copy of retired data is a second leak** — the live service had been "migrated"
+  once already, but the legacy file it was copied from kept serving the identical roster.
+  Deleting the consumer without deleting the source fixes nothing.
+- 🔑 **Same-origin identity (`/api/crm-session/me`) beats a third-party auth embed** everywhere:
+  no cross-site cookies, no injected CSS to quarantine, one auth source. If a page still embeds
+  a Caspio DataPage just to display who is signed in, that is the replacement.
+
+## /inventorylevels served our wholesale costs and supplier to the internet — fixed with a projection, not a gate (2026-08-27)
+
+**Problem.** `GET /api/manageorders/inventorylevels` (proxy) is deliberately anonymous — its one
+live caller is the customer-facing laser-tumbler calculator — but it returned raw ManageOrders
+rows: `UnitCost`, `TotalCost`, `VendorName` (our supplier, "JDS Industries"), plus internal
+accounting fields (`GLAccount`, `FindCode`, `id_Vendor`, `ID_InvLevel`).
+
+**Root Cause.** The route forwarded upstream rows verbatim; "customer-facing" was decided at the
+ROUTE level with no thought to the FIELD level.
+
+**Solution.** Whitelist projection at the response boundary (`INVENTORY_PUBLIC_FIELDS` +
+`projectInventoryRows` in proxy `src/utils/manageorders.js`), applied on both the cache-hit and
+fresh-fetch paths. Caller inventory first proved the calculator reads only
+PartNumber/SKU/Color/Size01-06 (its `vendorName` passthrough is never rendered). Shipped proxy
+`v2026.08.26.4`; live-verified before/after — the leak fields are gone, sizes intact.
+
+**Prevention.**
+- 🔑 **An anonymous route's contract is its FIELD LIST, not its path.** Before leaving any route
+  open, print `sorted(rows[0].keys())` from the live response and justify every field. The gate
+  question ("who may call this?") and the projection question ("what may it say?") are separate.
+- 🔑 **Whitelist, never blacklist** — unknown upstream fields (ManageOrders can add columns any
+  time) must default to STRIPPED, and a no-drift test asserts projected rows carry only
+  whitelisted keys.
+- 🔑 **Prove a new lock goes RED**: `git stash` the fix, run the test (fails), pop, run again
+  (14/14 green). A lock that has never failed proves nothing (DURABLE_GOTCHAS § Verification).
+
 ## Quote data plane locked down — 44 caller files, 2 repos, one gate flip left (2026-08-26)
 
 **Problem.** Step 2 of the 2026-08-17 review: the proxy's quote surface was anonymous.

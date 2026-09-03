@@ -86,3 +86,5 @@ staff), $25.23 incl. digital print + art — $30.09 stays (adds factory expense,
 
 Category `Volume Quote`, PricingMethod `FLAT`, PerUnit descriptive, `Visible` false,
 `IsActive` true. ✅ Rows created 2026-09-02 via `POST /api/service-codes` (Erik approved). Edit values in Caspio; the page reads them with `?type=VOLUME` on every load, no deploy.
+
+**Sequence note (2026-09-02):** `VQ-2026-001` was consumed by the save smoke test, so the first REAL volume quote is `VQ-2026-002` — expected to be Braun NW 500 pcs (1566 $51.50 · 1580 $61 · CTC86912 $86 standard; emb $10 = −$1,000 over 500 pcs).
