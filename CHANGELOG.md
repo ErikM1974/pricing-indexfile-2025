@@ -1,3 +1,8 @@
+## v2026.09.03.17 (2026.09.03)
+
+- Staff Dashboard: sticky tabs, Most-used pair on Sales, Purchase Request rename, chips + legend removed
+- Deploy v2026.09.03.17: 1 files (index.html...)
+
 ## v2026.09.03.16 (2026.09.03)
 
 - Staff dashboard: search box that stands off the page, tabs that look like tabs
