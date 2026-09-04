@@ -2,7 +2,9 @@
    Mockup Detail Page — Digitizing Mockup Detail
    Used by: pages/mockup-detail.html
    Prefix: pmd- (Mockup Detail)
-   Theme colors via CSS variables. Defaults to purple; AE view overrides with maroon.
+   Theme colors via CSS variables. Ruth's PURPLE in every view (the AE-view
+   maroon override was retired 2026-09-04 — person colour-coding: Steve green,
+   Ruth purple); the customer view swaps to NWCA green in mockup-detail.js.
    ========================================================================== */
 
 :root {
@@ -2796,8 +2798,8 @@ body {
 
 .pmd-send-input:focus {
     outline: none;
-    border-color: var(--art-theme, #981e32);
-    box-shadow: 0 0 0 2px rgba(152,30,50,0.15);
+    border-color: var(--art-theme, #6B46C1);
+    box-shadow: 0 0 0 2px var(--art-theme-rgba-15, rgba(107,70,193,0.15));
 }
 
 .pmd-send-required {
