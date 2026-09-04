@@ -1154,7 +1154,7 @@
 | `/shared_components/css/transfer-actions.css` | Transfer action button styles | bradley-transfers + transfer-detail | ✅ Active |
 | `/shared_components/css/force-green-theme.css` | Force NWCA green theme override | Multiple pages | ✅ Active |
 | `/shared_components/css/modern-enhancements.css` | Modern UI enhancement overlays | Multiple pages | ✅ Active |
-| `/shared_components/css/names-numbers.css` | Names & Numbers roster manager styles | names-numbers.html + dashboard | ✅ Active |
+| `/shared_components/css/names-numbers.css` | Names & Numbers roster manager styles. **2026-09-04**: shop-floor BLUE identity above the fold — blue top strip on `.header`, `.page-header` is a blue gradient band with white title (both the dashboard and the roster form page share it; see `memory/DESIGN_COLOUR_CODE.md`) | names-numbers.html + dashboard | ✅ Active |
 | `/shared_components/css/monogram-form.css` | Monogram form styles | monogram-form.html | ✅ Active |
 | `/shared_components/css/old-designs.css` | Old designs archive styles | old-designs.html | ✅ Active |
 | `/shared_components/css/customer-lookup.css` | Customer lookup autocomplete styles | All quote builders | ✅ Active |
@@ -1474,7 +1474,7 @@ cap-embroidery-fix.css
 | `/shared_components/js/names-numbers-controller.js` | Roster form UI controller (tabs, groups, table, OCR, import) | names-numbers-service.js | ✅ Active |
 | `/shared_components/js/names-numbers-service.js` | Roster API service (CRUD, Excel parse, OCR) | APP_CONFIG | ✅ Active |
 | `/shared_components/js/names-numbers-dashboard.js` | Roster dashboard logic (search, filter, KPIs) | names-numbers-service.js | ✅ Active |
-| `/shared_components/css/names-numbers.css` | Names & Numbers shared styles (blue theme) | CSS variables | ✅ Active |
+| `/shared_components/css/names-numbers.css` | Names & Numbers shared styles (shop-floor blue theme `--nn-primary #2563eb`; blue page band since 2026-09-04) | CSS variables | ✅ Active |
 | `/dashboards/staff-login.html` | Staff authentication login page | — | ✅ Active |
 | `/dashboards/staff-portal-simple.html` | Simplified staff portal | — | ✅ Active |
 | `/dashboards/staff-portal-final.html` | Final staff portal layout | — | ✅ Active |

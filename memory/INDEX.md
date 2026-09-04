@@ -18,6 +18,7 @@ Last Updated: 2026-09-03 (/memory-maintain: MEMORY.md 24.0→~19 KB — Sept shi
 | [`CASPIO_SYNC_CLUSTER_COST.md`](CASPIO_SYNC_CLUSTER_COST.md) | Per-job Caspio call attribution for the sync cluster |
 | [`COST_ALLOCATION_MODEL.md`](COST_ALLOCATION_MODEL.md) | Production-hour + order-pool cost model ($30.09/hr, art included) |
 | [`CUSTOMER_ORDER_BEHAVIOUR.md`](CUSTOMER_ORDER_BEHAVIOUR.md) | Reorder behaviour — the 2nd order beats the 1st order’s size as a predictor |
+| [`DESIGN_COLOUR_CODE.md`](DESIGN_COLOUR_CODE.md) | **Colour = person/department** (Erik 2026-09-04): Steve green, Ruth purple, Bradley slate blue, personalization shop blue, AE chrome maroon — hex families, where each is defined, the checklist for colour-coding a NEW page, proposals not yet adopted |
 | [`DURABLE_GOTCHAS.md`](DURABLE_GOTCHAS.md) | The expensive traps, by trigger (verification / auth / JS / deploy / API) — moved out of the auto-loaded index 2026-08-12 |
 | [`EMBROIDERY_PRICING_REALIZATION.md`](EMBROIDERY_PRICING_REALIZATION.md) | 85% realization, the $442K gap — pricing is sound, it is not being charged |
 | [`EMBROIDERY_STITCH_COST_2026-09.md`](EMBROIDERY_STITCH_COST_2026-09.md) | Cost per 1,000 stitches, 5K vs 8K logo, handling/setup fit from logs, worst-case multiplier, full absorption |
