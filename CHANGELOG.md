@@ -1,3 +1,8 @@
+## v2026.09.04.4 (2026.09.04)
+
+- Person colour-coding: Ruth's mockup detail stays purple, Steve's tiles + Art Hub go green
+- Deploy v2026.09.04.4: 2 files (mockup-detail.html, index.html...)
+
 ## v2026.09.04.3 (2026.09.04)
 
 - Art Request Detail: AE view keeps Steve's green (retire the maroon override)
