@@ -178,6 +178,11 @@ var GarmentSubmitForm = (function () {
         }
         renderForm();
         if (pf) applyPrefill(pf);
+        // A quote hand-off (prefill) is authoritative; otherwise offer the rep's
+        // unsent draft from a previous visit (survives a refresh / lost session).
+        submitted = false;
+        dirty = false;
+        if (!pf) initDraft();
     }
 
     // Seed DOM-level fields after the form is rendered (selects, checkboxes,
@@ -245,6 +250,13 @@ var GarmentSubmitForm = (function () {
         applyApprovalAdaptive();
         applyPatchVisibility();
         applyPatchMaterialOther();
+        // 2026-09-04 review: programmatic labels, live art fees, the sticky
+        // progress bar, and dirty-tracking for the leave-page guard + draft.
+        wireLabels();
+        loadArtFeeOptions();
+        initProgress();
+        initDirtyTracking();
+        updateProgress();
     }
 
     // ── Build Form HTML ────────────────────────────────────────────────────
@@ -274,6 +286,7 @@ var GarmentSubmitForm = (function () {
             + buildSubmitSection()
             + '  </div>'
             + '</div>'
+            + buildProgressHtml()
             + '</div>';
     }
 
@@ -346,14 +359,13 @@ var GarmentSubmitForm = (function () {
             + '<div class="gsf-row">'
             + '  <div class="gsf-field">'
             + '    <label class="gsf-label">Art Estimate from AE</label>'
-            + '    <select class="gsf-select" id="gsf-prelim">'
-            + '      <option value="">- select -</option>'
-            + '      <option value="25">GRT-25 Quick Review</option>'
-            + '      <option value="50">GRT-50 Logo Mockup</option>'
-            + '      <option value="75">GRT-75 Custom Design</option>'
-            + '      <option value="100">GRT-100 Extended Design</option>'
-            + '      <option value="150">GRT-150 Complex Project</option>'
+            // Options are the live GRT-* rows of Caspio Service_Codes (loadArtFeeOptions) —
+            // never a typed list. A load failure says so, visibly (Erik's #1 rule).
+            + '    <select class="gsf-select" id="gsf-prelim" disabled>'
+            + '      <option value="">Loading art fees…</option>'
             + '    </select>'
+            + '    <span class="gsf-hint">The GRT part numbers Steve bills, straight from ShopWorks / Caspio.</span>'
+            + '    <span class="gsf-err gsf-warn" id="gsf-prelim-warning"></span>'
             + '  </div>'
             + '  <div class="gsf-field gsf-rush-field">'
             + '    <label class="gsf-label">Priority</label>'
@@ -507,7 +519,7 @@ var GarmentSubmitForm = (function () {
     function buildTextSection() {
         return sectionHeader('7', 'Exact Text in Artwork', 'Type the exact wording, spelling, dates, names, and phone numbers that should appear.')
             + '<div class="gsf-field">'
-            + '  <textarea class="gsf-textarea" id="gsf-exact-text" placeholder="Enter the exact wording. Check spelling, capitalization, dates, and phone numbers."></textarea>'
+            + '  <textarea class="gsf-textarea" id="gsf-exact-text" aria-label="Exact text in artwork" placeholder="Enter the exact wording. Check spelling, capitalization, dates, and phone numbers."></textarea>'
             + '  <label class="gsf-check gsf-notext"><input type="checkbox" id="gsf-no-text"> This design has no text (graphic / logo only)</label>'
             + '  <span class="gsf-err" id="gsf-exact-text-error">Enter the exact text, or tick "no text"</span>'
             + '</div>'
@@ -551,7 +563,7 @@ var GarmentSubmitForm = (function () {
             + '</div>'
             + '<div class="gsf-field">'
             + '  <label class="gsf-label">Upload Files</label>'
-            + '  <div class="gsf-file-drop" id="gsf-file-drop">'
+            + '  <div class="gsf-file-drop" id="gsf-file-drop" role="button" tabindex="0" aria-label="Upload artwork files — drop them here, or press Enter to browse">'
             + '    <svg class="gsf-file-drop-icon" viewBox="0 0 36 32" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">'
             + '      <rect x="2" y="6" width="20" height="24" rx="2" fill="#e5e7eb"></rect>'
             + '      <rect x="8" y="4" width="20" height="24" rx="2" fill="#f3f4f6"></rect>'
@@ -575,7 +587,7 @@ var GarmentSubmitForm = (function () {
     function buildNotesSection() {
         return sectionHeader('10', 'Additional Art Notes', 'Short bullet points only. Do NOT use this for size, placement, color, wording, or approval — those have their own fields above.')
             + '<div class="gsf-field">'
-            + '  <textarea class="gsf-textarea" id="gsf-notes" placeholder="• Anything else Steve should know\n• Keep it short — bullets only"></textarea>'
+            + '  <textarea class="gsf-textarea" id="gsf-notes" aria-label="Additional art notes" placeholder="• Anything else Steve should know\n• Keep it short — bullets only"></textarea>'
             + '</div>'
             + '</div>';
     }
@@ -625,15 +637,15 @@ var GarmentSubmitForm = (function () {
                 + ' <button type="button" class="gsf-color-retry" data-idx="' + idx + '">Retry</button>'
                 + '</div>';
         } else if (row.custom) {
-            colorControl = '<input type="text" class="gsf-input gsf-garment-color-text" id="gsf-color-' + idx + '" placeholder="Type color..." value="' + escapeAttr(row.colorName) + '">';
+            colorControl = '<input type="text" class="gsf-input gsf-garment-color-text" id="gsf-color-' + idx + '" placeholder="Type color..." aria-label="Garment ' + num + ' color" value="' + escapeAttr(row.colorName) + '">';
         } else if (row.colors && row.colors.length) {
             var opts = '<option value="">- color -</option>';
             row.colors.forEach(function (c) {
                 opts += '<option value="' + escapeAttr(c.name) + '"' + (c.name === row.colorName ? ' selected' : '') + '>' + escapeHtml(c.name) + '</option>';
             });
-            colorControl = '<select class="gsf-select gsf-garment-color" id="gsf-color-' + idx + '">' + opts + '</select>';
+            colorControl = '<select class="gsf-select gsf-garment-color" id="gsf-color-' + idx + '" aria-label="Garment ' + num + ' color">' + opts + '</select>';
         } else {
-            colorControl = '<select class="gsf-select gsf-garment-color" id="gsf-color-' + idx + '" disabled><option value="">- enter style first -</option></select>';
+            colorControl = '<select class="gsf-select gsf-garment-color" id="gsf-color-' + idx + '" aria-label="Garment ' + num + ' color" disabled><option value="">- enter style first -</option></select>';
         }
         var swatch = row.swatch
             ? '<img class="gsf-swatch" src="' + escapeAttr(row.swatch) + '" alt="swatch" onerror="this.style.display=\'none\'">'
@@ -643,7 +655,7 @@ var GarmentSubmitForm = (function () {
             : '';
         return '<span class="gsf-row-badge">' + num + '</span>'
             + '<div class="gsf-field gsf-garment-style-field">'
-            + '  <input type="text" class="gsf-input gsf-garment-style" id="gsf-style-' + idx + '" placeholder="Style # (e.g. PC54)" value="' + escapeAttr(row.style) + '" autocomplete="off">'
+            + '  <input type="text" class="gsf-input gsf-garment-style" id="gsf-style-' + idx + '" placeholder="Style # (e.g. PC54)" aria-label="Garment ' + num + ' style number" value="' + escapeAttr(row.style) + '" autocomplete="off">'
             + '  <div class="gsf-style-suggest" id="gsf-style-suggest-' + idx + '"></div>'
             + '</div>'
             + '<div class="gsf-field gsf-garment-color-field">' + colorControl + '</div>'
@@ -812,6 +824,7 @@ var GarmentSubmitForm = (function () {
         });
         var addBtn = document.getElementById('gsf-add-location');
         if (addBtn) addBtn.style.display = artworkLocations.length >= MAX_LOCATIONS ? 'none' : '';
+        wireLabels(); // the mini-labels inside each new location row
     }
 
     function buildLocationHtml(loc, idx) {
@@ -902,6 +915,10 @@ var GarmentSubmitForm = (function () {
         var fileInput = document.getElementById('gsf-file-input');
         if (fileDrop && fileInput) {
             fileDrop.addEventListener('click', function () { fileInput.click(); });
+            // Keyboard: the drop zone is a focusable button — Enter / Space browse.
+            fileDrop.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
+            });
             fileInput.addEventListener('change', function () {
                 if (fileInput.files.length > 0) addReferenceFiles(fileInput.files);
             });
@@ -1770,6 +1787,10 @@ var GarmentSubmitForm = (function () {
 
     // ── Success ────────────────────────────────────────────────────────────
     function showSuccess(designId, companyName) {
+        submitted = true;          // the leave-page guard stands down
+        dirty = false;
+        clearDraft();              // the request is in Caspio now — no draft to restore
+        setProgressVisible(false);
         var body = document.getElementById('gsf-form-body');
         body.innerHTML = '<div class="gsf-success">'
             + '<div class="gsf-success-icon">✅</div>'
@@ -1788,9 +1809,325 @@ var GarmentSubmitForm = (function () {
         selectedContact = null;
         selectedDesign = null;
         isRush = false;
+        submitted = false;
+        dirty = false;
+        draftPrelim = '';
+        clearDraft();
         garmentRows = [newGarmentRow()];
         artworkLocations = [newLocation()];
         renderForm();
+    }
+
+    // ── 2026-09-04 review additions ────────────────────────────────────────
+
+    /* (a) Programmatic labels. The visual labels never carried `for`, so a screen
+       reader announced 35 of the 58 controls as "edit text". Pair each field's
+       label with the first control that has an id. Runs after every render,
+       including the location rows. */
+    function wireLabels() {
+        var root = document.getElementById(containerId);
+        if (!root) return;
+        root.querySelectorAll('.gsf-field').forEach(function (field) {
+            var label = field.querySelector('.gsf-label, .gsf-mini-label');
+            if (!label || label.htmlFor) return;
+            var ctrl = field.querySelector('input[id]:not([type="hidden"]):not([type="file"]), select[id], textarea[id]');
+            if (ctrl) label.htmlFor = ctrl.id;
+        });
+    }
+
+    /* (b) Art fee options from Caspio Service_Codes — the GRT-* rows Steve
+       actually bills. The typed list this replaced offered GRT-25/100/150, parts
+       that do not exist. Option value = SellPrice, which is what Prelim_Charges
+       stores. On failure the select says so; it is optional, so the request
+       still goes through and Steve sets the fee. */
+    var draftPrelim = '';
+    function loadArtFeeOptions() {
+        var sel = document.getElementById('gsf-prelim');
+        var warn = document.getElementById('gsf-prelim-warning');
+        if (!sel) return;
+        fetch(API_BASE + '/api/service-codes')
+            .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+            .then(function (d) {
+                var rows = (d && (d.data || d.Result)) || (Array.isArray(d) ? d : []);
+                var fees = rows.filter(function (r) {
+                    return /^GRT-/i.test(String(r.ServiceCode || '')) && r.IsActive !== false && r.SellPrice != null;
+                }).sort(function (a, b) { return Number(a.SellPrice) - Number(b.SellPrice); });
+                if (!fees.length) throw new Error('no GRT-* rows in Service_Codes');
+                var html = '<option value="">- select -</option>';
+                fees.forEach(function (f) {
+                    var per = /hour/i.test(String(f.PerUnit || '')) ? '/hr' : '';
+                    html += '<option value="' + escapeAttr(String(f.SellPrice)) + '">'
+                        + escapeHtml(f.ServiceCode + ' · ' + (f.DisplayName || '') + ' — $' + Number(f.SellPrice).toFixed(0) + per)
+                        + '</option>';
+                });
+                sel.innerHTML = html;
+                sel.disabled = false;
+                if (draftPrelim) { sel.value = draftPrelim; draftPrelim = ''; }
+                if (warn) { warn.textContent = ''; warn.style.display = 'none'; }
+            })
+            .catch(function (err) {
+                console.error('[GarmentSubmitForm] art fee list failed to load:', err);
+                sel.innerHTML = '<option value="">- art fees unavailable -</option>';
+                sel.disabled = true;
+                if (warn) {
+                    warn.textContent = 'Could not load the art fee list from Caspio (' + err.message + '). Leave this blank — Steve will set the fee — or refresh to retry.';
+                    warn.style.display = 'block';
+                }
+            });
+    }
+
+    /* (c) Sticky progress bar. The form is ~11,000px tall; this tells the rep
+       where they are and what is still required, and carries a Submit button
+       so the real one is never a long scroll away. Hidden while the real submit
+       row is on screen, and after a successful submit. */
+    var SECTION_TOTAL = 11;
+    var progressVisibleOk = false;   // form card in view
+    var submitRowInView = false;
+    function buildProgressHtml() {
+        return '<div class="gsf-progress" id="gsf-progress" hidden>'
+            + '<div class="gsf-progress__text">'
+            + '<b id="gsf-progress-where">Section 1 of ' + SECTION_TOTAL + '</b>'
+            + '<button type="button" class="gsf-progress__left" id="gsf-progress-left" title="Jump to the next required field"></button>'
+            + '</div>'
+            + '<button type="button" class="gsf-progress__btn" id="gsf-progress-submit">Submit Art Request</button>'
+            + '</div>';
+    }
+    function setProgressVisible(on) {
+        var bar = document.getElementById('gsf-progress');
+        if (bar) bar.hidden = !on;
+    }
+    function syncProgressVisibility() {
+        setProgressVisible(progressVisibleOk && !submitRowInView && !submitted);
+    }
+    function initProgress() {
+        var card = document.querySelector('#' + containerId + ' .gsf-form-card');
+        var submitRow = document.querySelector('#' + containerId + ' .gsf-submit-row');
+        var bar = document.getElementById('gsf-progress');
+        if (!card || !bar) return;
+        progressVisibleOk = false; submitRowInView = false;
+        if (typeof IntersectionObserver === 'function') {
+            new IntersectionObserver(function (entries) {
+                entries.forEach(function (en) { progressVisibleOk = en.isIntersecting; });
+                syncProgressVisibility();
+            }, { rootMargin: '-120px 0px 0px 0px' }).observe(card);
+            if (submitRow) {
+                new IntersectionObserver(function (entries) {
+                    entries.forEach(function (en) { submitRowInView = en.isIntersecting; });
+                    syncProgressVisibility();
+                }).observe(submitRow);
+            }
+        } else {
+            progressVisibleOk = true;
+            syncProgressVisibility();
+        }
+        var go = document.getElementById('gsf-progress-submit');
+        if (go) go.addEventListener('click', handleSubmit);
+        var left = document.getElementById('gsf-progress-left');
+        if (left) left.addEventListener('click', function () {
+            var m = countMissing();
+            if (!m.length) return;
+            var el = document.getElementById(m[0].id);
+            if (!el) return;
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            if (typeof el.focus === 'function') setTimeout(function () { el.focus({ preventScroll: true }); }, 400);
+        });
+        // "Section N of 11" — the numbered section nearest the top of the viewport.
+        var sections = [].slice.call(document.querySelectorAll('#' + containerId + ' .gsf-section')).filter(function (s) { return s.querySelector('.gsf-section-num'); });
+        var ticking = false;
+        function whereAmI() {
+            ticking = false;
+            var where = document.getElementById('gsf-progress-where');
+            if (!where) return;
+            var line = 140, n = 1;
+            sections.forEach(function (s, i) { if (s.getBoundingClientRect().top <= line) n = i + 1; });
+            where.textContent = 'Section ' + n + ' of ' + sections.length;
+        }
+        window.addEventListener('scroll', function () {
+            if (!ticking) { ticking = true; requestAnimationFrame(whereAmI); }
+        }, { passive: true });
+        whereAmI();
+    }
+    /* Same rules as validate(), without touching the error states. */
+    function countMissing() {
+        var missing = [];
+        function need(id, ok, label) { if (!ok) missing.push({ id: id, label: label }); }
+        need('gsf-company', !!getVal('gsf-company'), 'Company');
+        need('gsf-contact-name', !!getVal('gsf-contact-name'), 'Contact name');
+        need('gsf-due-date', !!getVal('gsf-due-date'), 'Due date');
+        need('gsf-design-num', !!getVal('gsf-design-num'), 'Design #');
+        need('gsf-order-num', !!getVal('gsf-order-num'), 'Order #');
+        need('gsf-artwork-status', !!getVal('gsf-artwork-status'), 'Artwork status');
+        need('gsf-approval-status', !!getVal('gsf-approval-status'), 'Approval status');
+        need('gsf-decoration-error', document.querySelectorAll('.gsf-decoration:checked').length > 0, 'Decoration method');
+        if (isPatchSelected()) {
+            need('gsf-patch-material', !!getVal('gsf-patch-material'), 'Leatherette color');
+            if (getVal('gsf-patch-material') === PATCH_MATERIAL_OTHER) need('gsf-patch-material-other', !!getVal('gsf-patch-material-other'), 'Patch material');
+            need('gsf-patch-shape', !!getVal('gsf-patch-shape'), 'Patch shape');
+            need('gsf-patch-width', !!getVal('gsf-patch-width'), 'Patch width');
+            need('gsf-patch-attach', !!getVal('gsf-patch-attach'), 'Patch attachment');
+        }
+        syncLocationsFromDom();
+        need('gsf-loc-place-0', artworkLocations.some(function (l) { return l.placement && l.width; }), 'Artwork placement + width');
+        need('gsf-color-mode', !!getVal('gsf-color-mode'), 'Color direction');
+        var noText = document.getElementById('gsf-no-text');
+        need('gsf-exact-text', !!getVal('gsf-exact-text') || !!(noText && noText.checked), 'Exact text');
+        if (isRepeatOrRevision()) {
+            need('gsf-prev-order', !!getVal('gsf-prev-order'), 'Previous order #');
+            need('gsf-prev-design', !!getVal('gsf-prev-design'), 'Previous design #');
+            if (currentArtworkStatus() === 'Revision to existing proof') need('gsf-change', !!getVal('gsf-change'), 'What should change');
+        }
+        var fileType = getVal('gsf-file-type');
+        var hasSource = referenceFiles.length > 0 || prefilledUploads.length > 0 || !!getVal('gsf-prev-design') || fileType === FILE_TYPES[4] || fileType === FILE_TYPES[3];
+        need('gsf-file-type', !!fileType && hasSource, 'File type / artwork');
+        var total = document.querySelectorAll('.gsf-checklist').length;
+        var checked = document.querySelectorAll('.gsf-checklist:checked').length;
+        need('gsf-check-all', total > 0 && checked === total, 'Final checklist');
+        return missing;
+    }
+    function updateProgress() {
+        var left = document.getElementById('gsf-progress-left');
+        var bar = document.getElementById('gsf-progress');
+        if (!left || !bar) return;
+        var m = countMissing();
+        if (!m.length) {
+            left.textContent = 'Everything required is filled in';
+            bar.classList.add('gsf-progress--ready');
+        } else {
+            left.textContent = m.length + ' required left · next: ' + m[0].label;
+            bar.classList.remove('gsf-progress--ready');
+        }
+    }
+
+    /* (d) Leave-page guard + per-rep draft. Any edit marks the form dirty; leaving
+       with unsent edits asks first. Every edit also saves a draft (debounced) that
+       init() restores on the next visit — fields, checkboxes, garment rows,
+       locations and the rush flag. Files cannot be drafted; the notice says so. */
+    var dirty = false;
+    var submitted = false;
+    var draftTimer = null;
+    var DRAFT_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+    function draftOwner() {
+        try {
+            if (typeof StaffAuthHelper !== 'undefined' && StaffAuthHelper.getLoggedInStaffEmail) {
+                var e = StaffAuthHelper.getLoggedInStaffEmail();
+                if (e) return String(e).toLowerCase();
+            }
+        } catch (x) { /* fall through */ }
+        try { return (localStorage.getItem('userEmail') || 'anon').toLowerCase(); } catch (x) { return 'anon'; }
+    }
+    function draftKey() { return 'nwca-gsf-draft:' + draftOwner(); }
+    function initDirtyTracking() {
+        var body = document.getElementById('gsf-form-body');
+        if (!body) return;
+        ['input', 'change'].forEach(function (ev) {
+            body.addEventListener(ev, function () {
+                dirty = true;
+                clearTimeout(draftTimer);
+                draftTimer = setTimeout(saveDraft, 600);
+                updateProgress();
+            });
+        });
+        if (!window.__gsfUnloadGuard) {
+            window.__gsfUnloadGuard = true;
+            window.addEventListener('beforeunload', function (e) {
+                if (dirty && !submitted) { e.preventDefault(); e.returnValue = ''; }
+            });
+        }
+    }
+    function checkboxKey(cb) {
+        if (cb.id) return cb.id;
+        if (cb.dataset && cb.dataset.key) return 'chk:' + cb.dataset.key;
+        return 'deco:' + cb.value;
+    }
+    function collectDraft() {
+        var fields = {}, checks = {};
+        document.querySelectorAll('#gsf-form-body input[id], #gsf-form-body select[id], #gsf-form-body textarea[id]').forEach(function (el) {
+            if (el.type === 'file' || el.type === 'checkbox') return;
+            if (/^gsf-(style|color|loc)-/.test(el.id)) return;   // rows are stored structurally
+            fields[el.id] = el.value;
+        });
+        document.querySelectorAll('#gsf-form-body input[type="checkbox"]').forEach(function (cb) { checks[checkboxKey(cb)] = cb.checked; });
+        syncGarmentColorsFromDom();
+        syncLocationsFromDom();
+        return {
+            v: 1, savedAt: Date.now(), fields: fields, checks: checks, isRush: isRush,
+            garments: garmentRows.map(function (r) { return { style: r.style, colorName: r.colorName, catalogColor: r.catalogColor, swatch: r.swatch, image: r.image, custom: !!r.custom }; }),
+            locations: artworkLocations.map(function (l) { return { placement: l.placement, width: l.width, height: l.height, notes: l.notes }; })
+        };
+    }
+    function saveDraft() {
+        if (submitted) return;
+        try {
+            var d = collectDraft();
+            var meaningful = Object.keys(d.fields).some(function (k) {
+                return d.fields[k] && k !== 'gsf-sales-rep' && k !== 'gsf-due-date' && k !== 'gsf-customer-id';
+            }) || d.garments.some(function (g) { return g.style; });
+            if (!meaningful) { localStorage.removeItem(draftKey()); return; }
+            localStorage.setItem(draftKey(), JSON.stringify(d));
+        } catch (e) { /* quota / private mode — drafts are best-effort */ }
+    }
+    function clearDraft() { try { localStorage.removeItem(draftKey()); } catch (e) { /* ignore */ } }
+    function readDraft() {
+        try {
+            var raw = localStorage.getItem(draftKey());
+            if (!raw) return null;
+            var d = JSON.parse(raw);
+            if (!d || d.v !== 1 || (Date.now() - d.savedAt) > DRAFT_TTL_MS) return null;
+            return d;
+        } catch (e) { return null; }
+    }
+    function restoreDraft(d) {
+        Object.keys(d.fields || {}).forEach(function (id) {
+            var el = document.getElementById(id);
+            if (el && d.fields[id]) el.value = d.fields[id];
+        });
+        draftPrelim = (d.fields && d.fields['gsf-prelim']) || '';
+        document.querySelectorAll('#gsf-form-body input[type="checkbox"]').forEach(function (cb) {
+            var key = checkboxKey(cb);
+            if (d.checks && key in d.checks) cb.checked = !!d.checks[key];
+        });
+        if (Array.isArray(d.garments) && d.garments.length) {
+            garmentRows = d.garments.map(function (g) {
+                var r = newGarmentRow();
+                r.style = g.style || ''; r.colorName = g.colorName || ''; r.catalogColor = g.catalogColor || '';
+                r.swatch = g.swatch || ''; r.image = g.image || ''; r.custom = !!g.custom;
+                return r;
+            });
+            renderGarmentRows();
+            garmentRows.forEach(function (r, i) { if (r.style && !r.custom) loadColorsForRow(i, r.style); });
+        }
+        if (Array.isArray(d.locations) && d.locations.length) {
+            artworkLocations = d.locations.map(function (l) { return { placement: l.placement || '', width: l.width || '', height: l.height || '', notes: l.notes || '' }; });
+            renderLocations();
+        }
+        if (d.isRush) {
+            isRush = true;
+            var rb = document.getElementById('gsf-rush-toggle');
+            if (rb) { rb.classList.add('gsf-rush-toggle--active'); rb.setAttribute('aria-pressed', 'true'); }
+        }
+        var noText = document.getElementById('gsf-no-text'), ta = document.getElementById('gsf-exact-text');
+        if (noText && ta && noText.checked) ta.disabled = true;
+        try { applyArtworkStatusAdaptive(); applyApprovalAdaptive(); applyPatchVisibility(); applyPatchMaterialOther(); } catch (e) { /* non-fatal */ }
+        dirty = true;
+        updateProgress();
+    }
+    function initDraft() {
+        var d = readDraft();
+        if (!d) return;
+        restoreDraft(d);
+        var card = document.querySelector('#' + containerId + ' .gsf-form-card');
+        if (!card || document.getElementById('gsf-draft-note')) return;
+        var when = new Date(d.savedAt);
+        var note = document.createElement('div');
+        note.className = 'gsf-draft-note';
+        note.id = 'gsf-draft-note';
+        note.innerHTML = '<span>Restored your unsent request from <b>' + escapeHtml(when.toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })) + '</b>. Files need re-attaching.</span>'
+            + '<button type="button" class="gsf-draft-note__discard" id="gsf-draft-discard">Discard draft</button>';
+        card.parentNode.insertBefore(note, card);
+        document.getElementById('gsf-draft-discard').addEventListener('click', function () {
+            clearDraft();
+            resetForm();
+        });
     }
 
     // ── Helpers ────────────────────────────────────────────────────────────

@@ -27,9 +27,11 @@
         if (dropdown.classList.contains('show')) {
             dropdown.classList.remove('show');
             button.classList.remove('open');
+            button.setAttribute('aria-expanded', 'false');
         } else {
             dropdown.classList.add('show');
             button.classList.add('open');
+            button.setAttribute('aria-expanded', 'true');
         }
     };
 
@@ -38,6 +40,7 @@
         var button = document.getElementById('moreButton');
         dropdown.classList.remove('show');
         button.classList.remove('open');
+        button.setAttribute('aria-expanded', 'false');
     };
 
     // Close dropdown when clicking outside
@@ -170,6 +173,8 @@
         });
         var activePageId = (opts && opts.activePageId) || null;
         renderAeNavSub(activePageId);
+        syncRovingTabindex(document.getElementById('aeNavSections'), '.ae-nav__section');
+        syncRovingTabindex(document.getElementById('aeNavSub'), '.ae-nav__sub-tab');
     }
 
     window.showTab = function (tabName) {
@@ -212,7 +217,43 @@
     };
 
     // ── AeNav: wire section + sub-tab clicks ───────────────────────
+    // role="tab" promises arrow-key movement (WAI-ARIA tabs). Roving tabindex:
+    // the active tab is the only one in the Tab order; arrows move between them.
+    function rovingTabs(container, selector, onMove) {
+        if (!container) return;
+        function live() {
+            return [].slice.call(container.querySelectorAll(selector)).filter(function (t) { return !t.hidden; });
+        }
+        container.addEventListener('keydown', function (e) {
+            var tabs = live();
+            var idx = tabs.indexOf(document.activeElement);
+            if (idx < 0) return;
+            var next = -1;
+            if (e.key === 'ArrowRight') next = (idx + 1) % tabs.length;
+            else if (e.key === 'ArrowLeft') next = (idx - 1 + tabs.length) % tabs.length;
+            else if (e.key === 'Home') next = 0;
+            else if (e.key === 'End') next = tabs.length - 1;
+            if (next < 0) return;
+            e.preventDefault();
+            tabs[next].focus();
+            if (onMove) onMove(tabs[next]);
+        });
+    }
+    function syncRovingTabindex(container, selector) {
+        if (!container) return;
+        var tabs = [].slice.call(container.querySelectorAll(selector));
+        var active = tabs.filter(function (t) { return t.classList.contains('is-active'); })[0] || tabs[0];
+        tabs.forEach(function (t) { t.tabIndex = (t === active) ? 0 : -1; });
+    }
+
     function initAeNav() {
+        rovingTabs(document.getElementById('aeNavSections'), '.ae-nav__section', function (tab) {
+            if (tab.tagName === 'BUTTON') tab.click();   // links just take focus; Enter follows them
+        });
+        rovingTabs(document.getElementById('aeNavSub'), '.ae-nav__sub-tab', function (tab) {
+            if (tab.tagName === 'BUTTON') tab.click();
+        });
+
         // Tier 1: section tabs
         document.querySelectorAll('.ae-nav__section').forEach(function (btn) {
             btn.addEventListener('click', function () {
@@ -272,54 +313,9 @@
         showTab(savedTab);
     });
 
-    // ── Note Modals ────────────────────────────────────────────────
-
-    var noteWasSubmitted = false;
-
-    window.viewNotesModal = function (designId) {
-        document.getElementById('viewNotesRequestId').textContent = designId;
-        document.getElementById('viewNotesFrame').src =
-            'https://c3eku948.caspio.com/dp/a0e15000d8d96d34814b43498414?ID_Design=' + designId;
-        document.getElementById('viewNotesModal').style.display = 'block';
-    };
-
-    window.closeViewNotesModal = function () {
-        document.getElementById('viewNotesModal').style.display = 'none';
-        document.getElementById('viewNotesFrame').src = '';
-    };
-
-    window.openNoteModal = function (designId) {
-        noteWasSubmitted = false;
-        document.getElementById('requestId').textContent = designId;
-        document.getElementById('noteFrame').src =
-            'https://c3eku948.caspio.com/dp/a0e15000bc57622bf42c450cb7a5?ID_Design=' + designId;
-        document.getElementById('noteModal').style.display = 'block';
-    };
-
-    window.closeNoteModal = function () {
-        document.getElementById('noteModal').style.display = 'none';
-        document.getElementById('noteFrame').src = '';
-        if (noteWasSubmitted) {
-            window.location.reload();
-            noteWasSubmitted = false;
-        }
-    };
-
-    // Close modals when clicking outside
-    window.addEventListener('click', function (event) {
-        var noteModal = document.getElementById('noteModal');
-        var viewNotesModal = document.getElementById('viewNotesModal');
-        if (event.target === noteModal) window.closeNoteModal();
-        else if (event.target === viewNotesModal) window.closeViewNotesModal();
-    });
-
-    // Listen for messages from Caspio iframes
-    window.addEventListener('message', function (event) {
-        if (event.data === 'closeModal' || event.data === 'formSubmitted') {
-            noteWasSubmitted = true;
-            window.closeNoteModal();
-        }
-    });
+    // (The Caspio note-iframe modals — viewNotesModal / openNoteModal — were removed
+    // 2026-09-04: nothing on the page had called them since the galleries became
+    // API-driven; notes live on the Art Request Detail page.)
 
     // ── Real-Time Notification Polling (toast for Steve's actions) ──
 
@@ -354,7 +350,7 @@
                 data.notifications.forEach(function (n) { showAeNotificationToast(n); });
                 lastNotificationTime = data.serverTime || Date.now();
                 sessionStorage.setItem('aeNotifLastSeen', String(lastNotificationTime));
-                updateTabBadges(); // Refresh counts when notifications arrive
+                refreshGalleries(); // re-fetch → the galleries re-publish their counts
             }
         } catch (err) {
             // Silent failure — polling is best-effort
@@ -499,14 +495,14 @@
         };
         img.src = largeUrl;
         document.getElementById('ae-lightbox-label').textContent = label || '';
-        lb.style.display = 'flex';
+        lb.hidden = false;   // art-hub.css gives it display:flex; [hidden] wins while closed
         document.body.style.overflow = 'hidden';
     }
 
     function closeAELightbox() {
         var lb = document.getElementById('ae-lightbox');
         if (!lb) return;
-        lb.style.display = 'none';
+        lb.hidden = true;
         document.getElementById('ae-lightbox-img').src = '';
         document.body.style.overflow = '';
     }
@@ -519,38 +515,50 @@
         if (e.key === 'Escape') closeAELightbox();
     });
 
-    // ── Tab Count Badges ───────────────────────────────────────────
-    function updateTabBadges() {
-        fetch(API_BASE + '/api/artrequests?status=Awaiting%20Approval&select=ID_Design&limit=100')
-            .then(function (resp) { return resp.ok ? resp.json() : []; })
-            .then(function (data) {
-                var items = data.Result || data || [];
-                var count = items.length;
-                // Find the Review Mockups button (visible tab or dropdown item)
-                var tabs = document.querySelectorAll('.tab-button, .dropdown-item');
-                tabs.forEach(function (tab) {
-                    if (tab.textContent.indexOf('Review') !== -1) {
-                        var badge = tab.querySelector('.ae-tab-badge');
-                        if (count > 0) {
-                            if (!badge) {
-                                badge = document.createElement('span');
-                                badge.className = 'ae-tab-badge';
-                                tab.appendChild(badge);
-                            }
-                            badge.textContent = count;
-                        } else if (badge) {
-                            badge.remove();
-                        }
-                    }
-                });
-            })
-            .catch(function () { /* silent */ });
+    // ── Count badges (2026-09-04) ──────────────────────────────────
+    // ONE definition of "needs your review", published by the galleries
+    // (art-ae.js / mockup-ae.js dispatch `ae:counts` after every render):
+    // current requests, not on hold, status Awaiting Approval. The department
+    // tab badge, the More-menu badge and the Review tab all read the same
+    // number. The old badge fetched every Awaiting-Approval row ever (94) while
+    // the gallery said 8 — two numbers for one queue.
+    function setCountBadge(section, count) {
+        var badge = document.querySelector('.ae-nav__section[data-section="' + section + '"] [data-count="' + section + '"]');
+        if (!badge) return;
+        badge.textContent = String(count);
+        var wrap = badge.closest('.ae-nav__section-badge');
+        if (wrap) wrap.hidden = !(count > 0);
+        var tab = badge.closest('.ae-nav__section');
+        if (tab) tab.setAttribute('title', count > 0 ? count + ' waiting on you' : '');
     }
-
-    // Run badge update after page load + after each notification poll
-    document.addEventListener('DOMContentLoaded', function () {
-        setTimeout(updateTabBadges, 3000);
+    function setReviewMenuBadge(count) {
+        var item = document.querySelector('.dropdown-item[data-tab="review"]');
+        if (!item) return;
+        var badge = item.querySelector('.ae-tab-badge');
+        if (count > 0) {
+            if (!badge) {
+                badge = document.createElement('span');
+                badge.className = 'ae-tab-badge';
+                item.appendChild(badge);
+            }
+            badge.textContent = String(count);
+        } else if (badge) {
+            badge.remove();
+        }
+    }
+    document.addEventListener('ae:counts', function (e) {
+        var d = e.detail || {};
+        if (d.section === 'steve') {
+            setCountBadge('steve', d.needsReview || 0);
+            setReviewMenuBadge(d.needsReview || 0);
+        } else if (d.section === 'ruth') {
+            setCountBadge('ruth', d.needsReview || 0);
+        }
     });
+    function refreshGalleries() {
+        try { if (typeof ArtAeGallery !== 'undefined' && ArtAeGallery.refresh) ArtAeGallery.refresh(); } catch (e) { /* non-fatal */ }
+        try { if (typeof MockupAeGallery !== 'undefined' && MockupAeGallery.refresh) MockupAeGallery.refresh(); } catch (e) { /* non-fatal */ }
+    }
 
     // ── Helpers ────────────────────────────────────────────────────
     function timeAgo(dateStr) {
@@ -572,6 +580,31 @@
     }
 
     // ── Review Mockups Tab ──────────────────────────────────────────
+    // Same rows the Steve Mockups tab calls "Needs Your Review" (2026-09-04):
+    // taken straight from the gallery when it has loaded, so the two can never
+    // disagree; otherwise fetched with the gallery's own rule (its date cutoff,
+    // not on hold, Awaiting Approval).
+    function reviewRows() {
+        if (typeof ArtAeGallery !== 'undefined' && ArtAeGallery.isLoaded && ArtAeGallery.isLoaded()) {
+            return Promise.resolve(ArtAeGallery.getNeedsReview());
+        }
+        var cutoff = (typeof ArtAeGallery !== 'undefined' && ArtAeGallery.dateCutoff) || '2026-03-15';
+        var reviewBase = 'ID_Design,CompanyName,Box_File_Mockup,BoxFileLink,Company_Mockup,Mockup_4,Mockup_5,Mockup_6,File_Upload,Due_Date,Status,Design_Num_SW,Revision_Count,Approval_Sent_Date,NOTES,Is_On_Hold';
+        var reviewTail = '&dateCreatedFrom=' + cutoff + '&orderBy=Date_Created%20DESC&limit=200';
+        var url = API_BASE + '/api/artrequests?status=Awaiting%20Approval&select=' + reviewBase + ',Approval_Status' + reviewTail;
+        var urlFallback = API_BASE + '/api/artrequests?status=Awaiting%20Approval&select=' + reviewBase + reviewTail;
+        return fetch(url)
+            .then(function (resp) { return resp.status === 500 ? fetch(urlFallback) : resp; })
+            .then(function (resp) {
+                if (!resp.ok) throw new Error('Failed to fetch: ' + resp.status);
+                return resp.json();
+            })
+            .then(function (data) {
+                var items = data.Result || data || [];
+                return items.filter(function (r) { return !r.Is_On_Hold; });
+            });
+    }
+
     function loadReviewTab() {
         var container = document.getElementById('review-cards-container');
         var loading = document.getElementById('review-loading');
@@ -579,30 +612,14 @@
         if (!container) return;
 
         container.innerHTML = '';
-        if (emptyState) emptyState.style.display = 'none';
-        if (loading) loading.style.display = '';
+        if (emptyState) emptyState.hidden = true;
+        if (loading) loading.hidden = false;
 
-        // Approval_Status is in the primary select only; if the column doesn't
-        // exist yet (pre-migration) the request 500s and we retry without it.
-        var reviewBase = 'ID_Design,CompanyName,Box_File_Mockup,BoxFileLink,Company_Mockup,Mockup_4,Mockup_5,Mockup_6,File_Upload,Due_Date,Status,Design_Number,Revision_Count,Date_Modified,NOTES';
-        var reviewTail = '&orderBy=Date_Created%20DESC&limit=50';
-        var url = API_BASE + '/api/artrequests?status=Awaiting%20Approval&select=' + reviewBase + ',Approval_Status' + reviewTail;
-        var urlFallback = API_BASE + '/api/artrequests?status=Awaiting%20Approval&select=' + reviewBase + reviewTail;
-
-        fetch(url)
-            .then(function (resp) {
-                if (resp.status === 500) return fetch(urlFallback);
-                return resp;
-            })
-            .then(function (resp) {
-                if (!resp.ok) throw new Error('Failed to fetch: ' + resp.status);
-                return resp.json();
-            })
-            .then(function (data) {
-                if (loading) loading.style.display = 'none';
-                var items = data.Result || data || [];
+        reviewRows()
+            .then(function (items) {
+                if (loading) loading.hidden = true;
                 if (!items.length) {
-                    if (emptyState) emptyState.style.display = '';
+                    if (emptyState) emptyState.hidden = false;
                     return;
                 }
 
@@ -612,11 +629,11 @@
                 items.forEach(function (req) {
                     var idDesign = String(req.ID_Design || '');
                     var company = req.CompanyName || '';
-                    var designNum = req.Design_Number || '';
+                    var designNum = req.Design_Number || req.Design_Num_SW || '';
                     var dueDate = req.Due_Date || '';
                     var status = req.Status || 'Awaiting Approval';
                     var revCount = parseInt(req.Revision_Count) || 0;
-                    var dateModified = req.Date_Modified || '';
+                    var dateModified = req.Date_Modified || req.Approval_Sent_Date || '';
                     var notes = req.NOTES || '';
                     var approvalStatus = (req.Approval_Status || '').trim();
 
@@ -690,10 +707,11 @@
                 container.appendChild(grid);
             })
             .catch(function (err) {
-                if (loading) loading.style.display = 'none';
-                container.innerHTML = '<div style="text-align:center;padding:40px;color:#dc3545;">' +
-                    '<p>Unable to load mockups for review.</p>' +
-                    '<p style="font-size:13px;color:#999;">' + escapeHtml(err.message) + '</p></div>';
+                console.error('[ae-dashboard] review tab failed:', err);
+                if (loading) loading.hidden = true;
+                container.innerHTML = '<div class="ae-review-error">' +
+                    '<p class="ae-review-error__title">Couldn\'t load the mockups waiting on you.</p>' +
+                    '<p class="ae-review-error__sub">The server said: ' + escapeHtml(err.message) + '. Open the More menu and pick Review Mockups again to retry.</p></div>';
             });
     }
 
