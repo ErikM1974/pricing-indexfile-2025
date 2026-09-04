@@ -1,3 +1,9 @@
+## v2026.09.04.10 (2026.09.04)
+
+- Memory: record the 2026-09-04 staff + AE dashboard reviews in one topic file
+- Company Numbers review: 15 items — honest freshness, goal from Caspio, date fix, bundled entry
+- Deploy v2026.09.04.10: 2 files (company-numbers.html,index.html,...)
+
 ## v2026.09.04.9 (2026.09.04)
 
 - AE Dashboard review: 15 improvements
