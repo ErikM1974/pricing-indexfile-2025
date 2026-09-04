@@ -33,8 +33,8 @@
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css?v=2026.08.26.1">
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/utilities.css?v=20260514-ai-phase1">
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=2026.09.03.6">
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=2026.09.03.13">
-    <link rel="stylesheet" href="/dashboards/css/company-numbers.css?v=2026.09.03.13">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=2026.09.04.10">
+    <link rel="stylesheet" href="/dashboards/css/company-numbers.css?v=2026.09.04.10">
 </head>
 <body>
     <div class="dashboard-container cn-shell">
@@ -241,7 +241,7 @@
     <!-- Legacy production-schedule modules (no API calls, just static stats + predictor).
          Plain script tags before the module entry so production-controller.js can read
          window.ProductionPredictor + PRODUCTION_STATS at init time. -->
-    <script src="/shared_components/js/production-schedule-stats.js?v=20260512h"></script>
+    <script src="/shared_components/js/production-schedule-stats.js?v=2026.09.04.10"></script>
     <script src="/shared_components/js/production-schedule-predictor.js?v=2026.08.26.1"></script>
 
     <!-- Caspio timestamp parser (naive Pacific wall-clock → correct Date).
@@ -249,11 +249,11 @@
     <script src="/shared_components/js/caspio-date-utils.js?v=2026.07.05.4"></script>
     <!-- Art Requests Needing Attention widget — self-contained, lazy (idle-time
          fetch after DOMContentLoaded), GET-only, visible retry state on failure. -->
-    <script src="/staff-dashboard-v3/art-aging-widget.js?v=2026.08.26.1" defer></script>
+    <script src="/staff-dashboard-v3/art-aging-widget.js?v=2026.09.04.10" defer></script>
 
     <!-- APP ENTRY (ES module). Bundled by scripts/build.js (ENTRY_BUNDLES) into one
          hashed file with its whole module graph, so production makes ONE cached
          request instead of the entry + 20 no-store source modules (2026-09-04). -->
-    <script type="module" src="/dashboards/js/company-numbers.js?v=2026.09.03.13"></script>
+    <script type="module" src="/dashboards/js/company-numbers.js?v=2026.09.04.10"></script>
 </body>
 </html>
