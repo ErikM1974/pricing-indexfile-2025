@@ -25,6 +25,11 @@
     --ae-purple-light: #8b5cf6;
     --ae-purple-tint:  #f5f3ff;
     --ae-purple-ring:  rgba(107, 70, 193, .16);
+    --ae-green:        #0a8a1f;
+    --ae-green-deep:   #006600;
+    --ae-green-light:  #33bb33;
+    --ae-green-tint:   #ecfdf0;
+    --ae-green-ring:   rgba(10, 138, 31, .16);
     --ae-ink:   #111827;
     --ae-ink-2: #374151;
     --ae-ink-3: #6b7280;
@@ -45,6 +50,15 @@
     border-radius: 18px;
     box-shadow: var(--shadow-lg, 0 8px 24px -8px rgba(15,23,42,.18), 0 4px 10px -4px rgba(15,23,42,.08));
     margin-bottom: 18px;
+}
+/* Person colour-coding (Erik, 2026-09-04): Steve = GREEN (his Art Request
+   Detail page green), Ruth = PURPLE. Transfers / Personalization keep the
+   page maroon. */
+.ae-nav[data-section="steve"] {
+    --ae-accent:      var(--ae-green);
+    --ae-accent-deep: var(--ae-green-deep);
+    --ae-accent-tint: var(--ae-green-tint);
+    --ae-accent-ring: var(--ae-green-ring);
 }
 .ae-nav[data-section="ruth"] {
     --ae-accent:      var(--ae-purple);
@@ -99,6 +113,11 @@
     color: #fff;
     background: linear-gradient(135deg, var(--ae-maroon-deep) 0%, var(--ae-maroon) 60%, var(--ae-maroon-light) 100%);
     box-shadow: 0 10px 20px -10px rgba(152, 30, 50, .65), inset 0 1px 0 rgba(255, 255, 255, .18);
+}
+.ae-nav__section[data-section="steve"].is-active,
+.ae-nav__section[data-section="steve"].is-active:hover {
+    background: linear-gradient(135deg, var(--ae-green-deep) 0%, #008a12 60%, var(--ae-green-light) 100%);
+    box-shadow: 0 10px 20px -10px rgba(0, 102, 0, .65), inset 0 1px 0 rgba(255, 255, 255, .18);
 }
 .ae-nav__section[data-section="ruth"].is-active,
 .ae-nav__section[data-section="ruth"].is-active:hover {

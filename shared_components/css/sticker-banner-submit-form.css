@@ -6,8 +6,8 @@
  *   .ae-item-pill*   item-type control (Garment / Sticker / Banner / JDS)
  *   .sbf-*           sticker/banner form (StickerBannerSubmitForm)
  * 
- * Sticker = red accent, Banner = blue accent — the whole form recolours via
- * .sbf-container:has(.sbf-banner--banner). Shared blocks mirror
+ * Steve = GREEN for both Sticker and Banner (person colour-coding: Steve green,
+ * Ruth purple). Shared blocks mirror
  * garment-/jds-/mockup-submit-form.css exactly; keep them in step.
  */
 
@@ -16,12 +16,12 @@
    edit. --fx-* names are shared by all four intake forms (gsf/sbf/jds/msf);
    only the values differ per form. */
 .sbf-container {
-    --fx-accent:       #b91c1c;
-    --fx-accent-dark:  #7f1d1d;
-    --fx-accent-light: #ef4444;
-    --fx-tint:         #fef2f2;
-    --fx-tint-2:       #fee2e2;
-    --fx-ring:         rgba(185,28,28,.16);
+    --fx-accent:       #0a8a1f;
+    --fx-accent-dark:  #006600;
+    --fx-accent-light: #33bb33;
+    --fx-tint:         #ecfdf0;
+    --fx-tint-2:       #cdf3d6;
+    --fx-ring:         rgba(10,138,31,.16);
     --fx-grad:         linear-gradient(135deg, var(--fx-accent-dark) 0%, var(--fx-accent) 55%, var(--fx-accent-light) 100%);
     max-width: 1020px;
     margin: 0 auto;
@@ -342,7 +342,7 @@
     width: 32px;
     height: 32px;
     border-radius: 9px;
-    background: var(--fx-tint) url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23b91c1c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/%3E%3Cpolyline points='14 2 14 8 20 8'/%3E%3C/svg%3E") center / 16px no-repeat;
+    background: var(--fx-tint) url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%230a8a1f' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/%3E%3Cpolyline points='14 2 14 8 20 8'/%3E%3C/svg%3E") center / 16px no-repeat;
 }
 .sbf-file-name {
     flex: 1;
@@ -579,7 +579,7 @@
     text-align: center;
 }
 .sbf-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-.sbf-toast--info    { background: #1f2937; border-left-color: #b91c1c; }
+.sbf-toast--info    { background: #1f2937; border-left-color: #0a8a1f; }
 .sbf-toast--error   { background: #dc2626; border-left-color: #7f1d1d; }
 .sbf-toast--success { background: #059669; border-left-color: #064e3b; }
 
@@ -630,15 +630,8 @@
 .ae-item-pill-icon { font-size: 17px; line-height: 1; }
 .ae-item-pill-label { line-height: 1; }
 
-/* ── Banner form variant: the whole form turns blue ─────────────────── */
-.sbf-container:has(.sbf-banner--banner) {
-    --fx-accent:       #1d4ed8;
-    --fx-accent-dark:  #1e3a8a;
-    --fx-accent-light: #3b82f6;
-    --fx-tint:         #eff6ff;
-    --fx-tint-2:       #dbeafe;
-    --fx-ring:         rgba(29,78,216,.16);
-}
+/* Steve is GREEN for every item type (garment / sticker / banner / JDS) so a
+   rep always knows who the request goes to; the eyebrow names the item type. */
 .sbf-banner--banner .sbf-banner-text::before { content: 'Steve · Banners'; }
 
 /* ── Section eyebrow (Sticker Specs / Banner Specs) ─────────────────── */
