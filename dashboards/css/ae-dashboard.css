@@ -18,7 +18,40 @@
     --art-theme-rgba-15:     rgba(152, 30, 50, .15);
     --art-theme-rgba-10:     rgba(152, 30, 50, .10);
     --art-theme-hover:       #981e32;
-    --ae-ruth:               #6b46c1;
+}
+
+/* ---------- Person colour-coding (Erik, 2026-09-04) ----------
+ * Steve = GREEN (his Art Request Detail page green), Ruth = PURPLE, the page
+ * itself stays maroon. Everything inside a pane — gallery card headers, status
+ * chips, links, the Grid/Board toggle, the item-type control, title accents —
+ * reads --art-theme, so scoping the family per pane recolours it all. The glow
+ * token is re-declared because :root computes it from :root's maroon. */
+#submit-tab,
+#view-tab,
+#review-tab {
+    --art-theme:             #0a8a1f;
+    --art-theme-dark:        #006600;
+    --art-theme-light:       #33bb33;
+    --art-theme-bg:          #ecfdf0;
+    --art-theme-bg-hover:    #d9f7e0;
+    --art-theme-bg-selected: #cdf3d6;
+    --art-theme-rgba-15:     rgba(10, 138, 31, .15);
+    --art-theme-rgba-10:     rgba(10, 138, 31, .10);
+    --art-theme-hover:       #006600;
+    --shadow-glow-theme:     0 0 0 4px rgba(10, 138, 31, .14);
+}
+#mockup-ruth-tab,
+#digitizing-tab {
+    --art-theme:             #6b46c1;
+    --art-theme-dark:        #4c3391;
+    --art-theme-light:       #8b5cf6;
+    --art-theme-bg:          #f5f3ff;
+    --art-theme-bg-hover:    #ede9fe;
+    --art-theme-bg-selected: #ddd6fe;
+    --art-theme-rgba-15:     rgba(107, 70, 193, .15);
+    --art-theme-rgba-10:     rgba(107, 70, 193, .10);
+    --art-theme-hover:       #4c3391;
+    --shadow-glow-theme:     0 0 0 4px rgba(107, 70, 193, .14);
 }
 
 /* ---------- [hidden] guard — REQUIRED, do not remove ----------
@@ -112,10 +145,6 @@ body {
     border-radius: 2px;
     background: var(--art-theme);
 }
-/* Ruth's tabs carry her purple accent */
-#mockup-ruth-tab .tab-title::after,
-#digitizing-tab .tab-title::after,
-#digitizing-tab .ae-tab-head::after { background: var(--ae-ruth); }
 
 /* Title row with a control on the right (Steve Mockups / Ruth Mockups) */
 .ae-tab-head {
@@ -164,7 +193,6 @@ body {
     color: var(--art-theme);
     box-shadow: var(--shadow-sm, 0 1px 2px rgba(15,23,42,.04), 0 1px 1px rgba(15,23,42,.03));
 }
-#ruth-ae-view-toggle .view-toggle-btn.active { color: var(--ae-ruth); }
 
 /* ---------- Review Mockups tab ---------- */
 .ae-review-sub {

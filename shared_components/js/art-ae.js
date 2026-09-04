@@ -70,7 +70,7 @@ var ArtAeGallery = (function () {
         if (!container) return;
 
         container.innerHTML = '<div style="text-align:center;padding:40px;color:#888;">'
-            + '<div style="width:30px;height:30px;border:3px solid #e5e7eb;border-top-color:#981e32;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;"></div>'
+            + '<div style="width:30px;height:30px;border:3px solid #e5e7eb;border-top-color:var(--art-theme, #981e32);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;"></div>'
             + 'Loading art requests...</div>';
 
         activeFilter = null;
@@ -113,7 +113,7 @@ var ArtAeGallery = (function () {
                     container.innerHTML = '<div style="text-align:center;padding:40px;color:#dc2626;">'
                         + '<strong>Error:</strong> ' + escapeHtml(err.message)
                         + '<br><button onclick="ArtAeGallery.init(\'' + containerId + '\')" '
-                        + 'style="margin-top:10px;padding:8px 16px;border:none;border-radius:4px;background:#981e32;color:white;cursor:pointer;">Retry</button>'
+                        + 'style="margin-top:10px;padding:8px 16px;border:none;border-radius:4px;background:var(--art-theme, #981e32);color:white;cursor:pointer;">Retry</button>'
                         + '</div>';
                 }
             });
@@ -236,7 +236,7 @@ var ArtAeGallery = (function () {
         if (showArchive) {
             html += '<span style="font-size:13px;color:#6b7280;">Showing all requests including archive (' + allRequests.length + ')</span>'
                 + '<button onclick="ArtAeGallery.toggleArchive()" '
-                + 'style="padding:4px 12px;border:1px solid #981e32;border-radius:4px;background:#fef2f2;cursor:pointer;font-size:13px;font-family:inherit;color:#981e32;font-weight:600;">'
+                + 'style="padding:4px 12px;border:1px solid var(--art-theme, #981e32);border-radius:4px;background:var(--art-theme-bg, #fef2f2);cursor:pointer;font-size:13px;font-family:inherit;color:var(--art-theme, #981e32);font-weight:600;">'
                 + 'Hide Archive</button>';
         } else {
             html += '<span style="font-size:13px;color:#6b7280;">Showing current requests (' + allRequests.length + ')</span>'
@@ -377,7 +377,7 @@ var ArtAeGallery = (function () {
         var container = document.getElementById(containerId);
         if (container) {
             container.innerHTML = '<div style="text-align:center;padding:40px;color:#888;">'
-                + '<div style="width:30px;height:30px;border:3px solid #e5e7eb;border-top-color:#981e32;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;"></div>'
+                + '<div style="width:30px;height:30px;border:3px solid #e5e7eb;border-top-color:var(--art-theme, #981e32);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;"></div>'
                 + 'Loading art requests...</div>';
         }
         fetchRequests();
