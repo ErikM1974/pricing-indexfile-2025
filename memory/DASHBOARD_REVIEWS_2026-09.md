@@ -54,6 +54,28 @@ Releases `v2026.09.04.1 → .9`. Detail here; MEMORY.md carries one line each.
 - Locks: `tests/unit/staff-dashboard-workspaces.test.js` "2026-09-04 review" block,
   `tests/unit/build/hashed-pages.test.js`.
 
+## Company Numbers — review, 15 items (2026-09-04, `v2026.09.04.10`)
+
+- **Freshness is printed, not promised.** One 5-minute tick (`dashboards/js/company-numbers.js`
+  CARDS registry) re-reads every live card ONLY while the tab is visible, catch-up on return;
+  each card header has `.cn-stamp[data-stamp]` → "Updated h:mm" / "Failed h:mm"; the header
+  shows the last tick. Controllers expose `refresh*()`; the art widget exposes
+  `window.ArtAgingWidget.load()` + `.last` (its first load beats the module entry's listener).
+- **The annual goal is a Caspio row**: Service_Codes `CO-ANNUAL-GOAL` (SellPrice = dollars),
+  read via `company-goal-service.js` → `/api/staff/service-codes`. `ANNUAL_GOAL` constant gone.
+  Fallback $3M is used ONLY with a visible ⚠ (goal chip `.is-goal-fallback`, team card
+  `.rep-goal-note`). ⏭️ **Erik must create the row** — the proxy POST needs the CRM secret and
+  auto mode blocked the shell that read it. Until then both surfaces show the ⚠ honestly.
+- **Date bug**: `formatDateRange` parsed `YYYY-MM-DD` as UTC → a day early in Pacific. Fixed by
+  `toLocalDate()`; "Last N days" is now N days inclusive (was N+1).
+- Team card: bar + text = share of team, goal share in the tooltip; DEAD → House; full names.
+  Team-push title from the API quarter. Production: no refresh button, footer prints
+  `metadata.dataThrough` + `updatedAt` (stats file is static, compiled 2026-01-10, data
+  through Nov 2025). "Money Collected" → "Online Payments (Stripe)". Sample rows: tel:/mailto:
+  from ManageOrders `ContactPhone/ContactEmail`. Art widget on `.aa-*` classes. Entry bundled
+  (ENTRY_BUNDLES, relative imports). Phone header stacks; uppercase titles `nowrap`.
+- Lock: `tests/unit/company-numbers-page.test.js` (vm-sandbox loads the ESM utils).
+
 ## Verification gotchas learned today
 
 - Browser pane (`mcp__Claude_Browser`): screenshots of a SCROLLED page come back blank on

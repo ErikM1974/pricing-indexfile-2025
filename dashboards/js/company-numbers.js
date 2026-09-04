@@ -1,44 +1,129 @@
 /* =====================================================
-   COMPANY NUMBERS — page entry (2026-09-03)
+   COMPANY NUMBERS — page entry (2026-09-03, reworked 2026-09-04)
 
-   Boots the eight live report widgets that moved here from the staff
-   dashboard, using the SAME controllers. Nothing here is new logic —
-   every controller renders into the ids it always did.
+   Boots the eight report widgets that moved here from the staff dashboard,
+   using the SAME controllers, and keeps them current:
 
-   ⚠ Absolute import paths on purpose. /dashboards pages are content-hashed
-   by scripts/build.js and this entry is served from /dist/dashboards/js/…
-   in production; a relative "../../shared_components/…" would resolve
-   under /dist and 404. Absolute paths resolve to the un-hashed source
-   modules, which the server sends with no-store headers.
+   • Every live card re-reads on a 5-minute tick WHILE THIS TAB IS VISIBLE
+     (a hidden tab does not spend Caspio calls; it refreshes when you come
+     back if the numbers are older than the interval). Before 2026-09-04 only
+     Revenue refreshed, while the header claimed the whole page did.
+   • Each card carries an "Updated h:mm" stamp (or "Failed h:mm") so the age
+     of every number is visible; the header shows the last full tick.
+   • Production Turnaround is a static estimate — no tick, no stamp; its
+     footer prints how old the data is instead.
+
+   Relative imports: scripts/build.js bundles this entry with its module graph
+   into ONE hashed file (ENTRY_BUNDLES), so production makes one cached
+   request instead of the entry + 20 no-store source modules. Unbundled (dev
+   without a build) the relative paths resolve from /dashboards/js/ to source.
    ===================================================== */
 
-import '/shared_components/js/staff-dashboard/core/dashboard-events.js';   // installs the data-action click delegator
+import '../../shared_components/js/staff-dashboard/core/dashboard-events.js';   // installs the data-action click delegator
 
-import { initOrdersInbox, initMoneyCollected, initSamplePipeline } from '/shared_components/js/staff-dashboard/controllers/orders-inbox-controller.js';
-import { initMetrics }         from '/shared_components/js/staff-dashboard/controllers/metrics-controller.js';
-import { initTeamPerformance } from '/shared_components/js/staff-dashboard/controllers/team-performance-controller.js';
-import { initProduction }      from '/shared_components/js/staff-dashboard/controllers/production-controller.js';
-import { initEmbroideryBonus } from '/shared_components/js/staff-dashboard/controllers/embroidery-bonus-controller.js';
+import {
+    initOrdersInbox, initMoneyCollected, initSamplePipeline,
+    refreshOrdersInbox, refreshMoneyCollected, refreshSamplePipeline,
+} from '../../shared_components/js/staff-dashboard/controllers/orders-inbox-controller.js';
+import { initMetrics, refreshMetrics }                     from '../../shared_components/js/staff-dashboard/controllers/metrics-controller.js';
+import { initTeamPerformance, refreshTeamPerformance }     from '../../shared_components/js/staff-dashboard/controllers/team-performance-controller.js';
+import { initProduction }                                  from '../../shared_components/js/staff-dashboard/controllers/production-controller.js';
+import { initEmbroideryBonus, loadEmbroideryBonus }        from '../../shared_components/js/staff-dashboard/controllers/embroidery-bonus-controller.js';
 
-const REFRESH_INTERVAL_MS = 5 * 60 * 1000;
+export const REFRESH_INTERVAL_MS = 5 * 60 * 1000;
+
+// The live cards. `key` matches the [data-stamp] span in the card header.
+// Refreshers are cache-honouring: the client caches (4–5 min TTL, under the
+// interval) and the proxy's own caches govern Caspio quota, not this file.
+const CARDS = [
+    { key: 'inbox',    init: initOrdersInbox,      refresh: refreshOrdersInbox },
+    { key: 'payments', init: initMoneyCollected,   refresh: refreshMoneyCollected },
+    { key: 'samples',  init: initSamplePipeline,   refresh: refreshSamplePipeline },
+    { key: 'revenue',  init: initMetrics,          refresh: refreshMetrics },
+    { key: 'team',     init: initTeamPerformance,  refresh: refreshTeamPerformance },
+    { key: 'bonus',    init: initEmbroideryBonus,  refresh: () => loadEmbroideryBonus(false) },
+    // Art aging is a classic script that schedules its own first load and
+    // announces the result (art-aging:loaded); the tick calls it directly.
+    { key: 'art',      init: null,                 refresh: () => (window.ArtAgingWidget ? window.ArtAgingWidget.load() : Promise.resolve(false)) },
+];
+
+let lastTickAt = 0;
+let ticking = false;
+
+function clock(at = Date.now()) {
+    return new Date(at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+}
+
+/** Per-card freshness stamp. ok=false → "Failed h:mm" in the warning tone. */
+export function stamp(key, ok, at = Date.now()) {
+    const el = document.querySelector(`.cn-stamp[data-stamp="${key}"]`);
+    if (!el) return;
+    el.textContent = `${ok ? 'Updated' : 'Failed'} ${clock(at)}`;
+    el.classList.toggle('is-failed', !ok);
+    el.setAttribute('title', ok
+        ? `This card last re-read its data at ${clock(at)}.`
+        : `The last read at ${clock(at)} failed — the card shows its error. It retries on the next 5-minute tick.`);
+}
+
+function setHeader(text) {
+    const el = document.getElementById('cn-updated');
+    if (el) el.textContent = text;
+}
+
+// A controller resolves after it has rendered EITHER its data or its visible
+// error (showApiError / errorCard). The stamp reads "Failed" only when the
+// promise rejects or resolves to false.
+async function run(card, fn) {
+    try {
+        const result = await fn();
+        stamp(card.key, result !== false);
+        return true;
+    } catch (err) {
+        console.error(`[company-numbers] ${card.key} failed:`, err);
+        stamp(card.key, false);
+        return false;
+    }
+}
+
+async function tick(reason) {
+    if (ticking) return;
+    ticking = true;
+    setHeader('refreshing…');
+    const started = Date.now();
+    await Promise.allSettled(CARDS.map((c) => run(c, c.refresh)));
+    lastTickAt = started;
+    ticking = false;
+    setHeader(`updated ${clock(started)} · refreshes every 5 min while this tab is open`);
+    if (reason) console.debug('[company-numbers] tick:', reason);
+}
 
 function bootstrap() {
-    initProduction();        // renders from static stats — no network
-    initOrdersInbox();       // quote_sessions last 7 days (paid web orders / accepted / push failures)
-    initMoneyCollected();    // Order_Payments ledger totals + recent list
-    initSamplePipeline();    // sample orders w/o a later order — rep call list
-    initMetrics();           // ManageOrders revenue + sparkline + YoY
-    initTeamPerformance();   // Caspio archive YTD per-rep
-    initEmbroideryBonus();   // Q3 2026 bonus — live from ORDER_ODBC via the CRM forwarder
+    initProduction();        // static stats — renders once, no network, no stamp
 
-    // Periodic refresh of revenue (5 min). The client metricsCache TTL is
-    // deliberately shorter than this interval (dashboard-store.js) so each
-    // tick actually re-asks the proxy; the proxy's own cache governs quota.
+    // Art aging stamps itself through this event (first load + manual Retry). Its
+    // classic script usually finishes the first load before this module (still
+    // fetching imports) is listening, so also read the result it left behind.
+    document.addEventListener('art-aging:loaded', (e) => stamp('art', !!e.detail?.ok, e.detail?.at));
+    const last = window.ArtAgingWidget?.last;
+    if (last) stamp('art', !!last.ok, last.at);
+
+    const started = Date.now();
+    Promise.allSettled(CARDS.filter((c) => c.init).map((c) => run(c, c.init))).then(() => {
+        lastTickAt = started;
+        setHeader(`updated ${clock(started)} · refreshes every 5 min while this tab is open`);
+    });
+
+    // The tick only spends calls while somebody is looking.
     setInterval(() => {
-        initMetrics().catch((err) => {
-            console.warn('[company-numbers] periodic refresh failed:', err);
-        });
+        if (document.visibilityState === 'visible') tick('interval');
     }, REFRESH_INTERVAL_MS);
+
+    // Came back to a tab that sat hidden past the interval → catch up now.
+    document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && Date.now() - lastTickAt >= REFRESH_INTERVAL_MS) {
+            tick('visible again');
+        }
+    });
 }
 
 if (document.readyState === 'loading') {

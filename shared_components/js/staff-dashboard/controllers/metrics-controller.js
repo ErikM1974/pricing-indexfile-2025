@@ -144,6 +144,11 @@ export async function initMetrics() {
     await loadRevenue(false);
 }
 
+/** Periodic re-read (Company Numbers 5-minute tick) — honours the 4-min client cache. */
+export function refreshMetrics() {
+    return loadRevenue(false);
+}
+
 // Event handlers
 register('metrics:set-range', (el) => {
     const days = Number(el.dataset.days);

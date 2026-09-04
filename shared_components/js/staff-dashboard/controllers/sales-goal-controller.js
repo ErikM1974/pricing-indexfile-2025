@@ -12,7 +12,8 @@
    logic together (git: this file before 2026-08-27).
    ===================================================== */
 
-import { formatMoney, ANNUAL_GOAL } from '../core/dashboard-ui-utils.js';
+import { formatMoney } from '../core/dashboard-ui-utils.js';
+import { fetchAnnualGoal, formatGoalCompact, fallbackWarning } from '../services/company-goal-service.js';
 
 const els = {
     progress: () => document.getElementById('goalProgress'),
@@ -26,15 +27,12 @@ function progressbarEl() {
     return els.progress()?.closest('[role="progressbar"]') || null;
 }
 
-// "$3M" — compact goal for the chip label, derived from ANNUAL_GOAL so the
-// label can never disagree with the percentage math (one number, one home).
-function formatGoalCompact(goal) {
-    if (goal >= 1_000_000 && goal % 100_000 === 0) {
-        const m = goal / 1_000_000;
-        return '$' + (Number.isInteger(m) ? m : m.toFixed(1)) + 'M';
-    }
-    return formatMoney(goal);
-}
+// The annual goal — a Caspio Service_Codes row (CO-ANNUAL-GOAL), read once per
+// page by company-goal-service. null while loading. goalFallback = the row
+// could not be read and the built-in default is in use — the chip then carries
+// a visible warning (never a silent stale number).
+let goal = null;
+let goalFallback = false;
 
 // null = no YTD data yet (show the loading state, NOT $0).
 // Set via setYtdTotal() — currently fed by team-performance-controller from the
@@ -69,11 +67,20 @@ export function setYtdUnavailable() {
 }
 
 function render() {
-    const goal = ANNUAL_GOAL;
     const banner = document.querySelector('.sales-goal-banner');
 
     const goalOfEl = els.goalOf();
-    if (goalOfEl) goalOfEl.textContent = formatGoalCompact(goal);
+    if (goalOfEl) {
+        // "$3M" from Caspio; "$3M ⚠" when the built-in default is in use.
+        goalOfEl.textContent = goal ? formatGoalCompact(goal) + (goalFallback ? ' ⚠' : '') : '…';
+    }
+    if (banner) {
+        banner.classList.toggle('is-goal-fallback', goalFallback);
+        // Keep the chip's own tooltip; append the warning while the fallback is in use.
+        if (!banner.dataset.titleOrig) banner.dataset.titleOrig = banner.getAttribute('title') || '';
+        const orig = banner.dataset.titleOrig;
+        banner.setAttribute('title', goalFallback ? `${orig ? orig + ' — ' : ''}${fallbackWarning()}` : orig);
+    }
 
     if (lastYtd == null && ytdFailed) {
         if (banner) { banner.classList.remove('is-loading'); banner.classList.add('is-unavailable'); }
@@ -86,8 +93,9 @@ function render() {
     }
     if (banner) banner.classList.remove('is-unavailable');
 
-    if (lastYtd == null) {
-        // No real YTD data yet — friendly loading state. The .is-loading class
+    if (lastYtd == null || goal == null) {
+        // No real YTD data yet (or the goal row is still loading) — friendly
+        // loading state. The .is-loading class
         // on .sales-goal-banner hides the percent paren (dashboard-v3-patch-2.css)
         // and italicizes the current-value span to carry the "Loading…" copy.
         if (banner) banner.classList.add('is-loading');
@@ -120,4 +128,9 @@ function render() {
 export function initSalesGoal() {
     // Initial render with whatever lastYtd is (loading state until metrics arrive)
     render();
+    return fetchAnnualGoal().then((res) => {
+        goal = res.goal;
+        goalFallback = res.source === 'fallback';
+        render();
+    });
 }

@@ -24,8 +24,9 @@ import { endpoints } from '../core/dashboard-endpoints.js';
 
 const CONTAINER_ID  = 'embroideryBonusContent';
 const DATE_RANGE_ID = 'embroideryBonusDateRange';
+const TITLE_ID      = 'embroideryBonusTitle';
 
-function renderLoading(label = 'Loading Q3 team goal…') {
+function renderLoading(label = 'Loading team goal…') {
     const c = document.getElementById(CONTAINER_ID);
     if (!c) return;
     c.innerHTML = `
@@ -37,6 +38,12 @@ function renderLoading(label = 'Loading Q3 team goal…') {
 }
 
 function renderDateRange(data) {
+    // The card title follows the API's quarter — the HTML used to say "Q3 Team
+    // Push" and would have kept saying it on Oct 1 (2026-09-04 review).
+    const titleEl = document.getElementById(TITLE_ID);
+    if (titleEl && data?.quarter) {
+        titleEl.innerHTML = `<i class="fas fa-bullseye" aria-hidden="true"></i> ${escapeHtml(data.quarter)} Team Push`;
+    }
     const el = document.getElementById(DATE_RANGE_ID);
     if (!el || !data?.dateRange) return;
     const fmt = (d) => new Date(d + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -50,8 +57,9 @@ function renderStrip(data) {
 
     const k = data.teamKicker || {};
     const tiers = (k.tiers || []).slice().sort((a, b) => a.target - b.target);
+    const quarter = escapeHtml(data.quarter || 'This quarter');
     if (!tiers.length) {
-        container.innerHTML = '<div class="embroidery-bonus-loading"><span>No Q3 target configured yet.</span></div>';
+        container.innerHTML = `<div class="embroidery-bonus-loading"><span>No ${quarter} target configured yet.</span></div>`;
         return;
     }
     const top = tiers[tiers.length - 1];
@@ -64,7 +72,7 @@ function renderStrip(data) {
     const warn = data.configSource === 'fallback'
         ? `<div class="eb-warning" role="alert">
                <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
-               <span>Q3 targets could not be read from Caspio — showing built-in defaults,
+               <span>${quarter} targets could not be read from Caspio — showing built-in defaults,
                which may not match the current plan.</span>
            </div>`
         : '';
@@ -104,9 +112,9 @@ function renderStrip(data) {
 
             <p class="eb-team-note">
                 Every embroidery order counts &mdash; every account, every person, webstores
-                included. Embroidery is our biggest line at 46% of everything we sell, so
-                clearing <strong>${money(top.target)}</strong> this quarter is the clearest
-                push toward a $3M year.
+                included. Embroidery is our biggest line, so clearing
+                <strong>${money(top.target)}</strong> this quarter is the clearest push
+                toward the year's goal.
             </p>
         </div>
     `;

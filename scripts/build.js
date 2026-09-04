@@ -67,10 +67,16 @@ const ENTRY_BUNDLES = [
     {
         // Staff Dashboard (2026-09-04): its ~25-file module graph becomes ONE hashed
         // file. IIFE inside a <script type="module"> tag is fine — nothing imports
-        // the entry. company-numbers.js still imports the same controllers from
-        // source by absolute path, untouched.
+        // the entry.
         outbase: 'shared_components/js/staff-dashboard/core',
         entries: ['shared_components/js/staff-dashboard/core/dashboard-app.js'],
+    },
+    {
+        // Company Numbers (2026-09-04 review): same treatment. Its entry used to be
+        // hashed on its own while importing 20 source modules one request at a time
+        // (no-store). Bundled, the page makes one cached request for all of it.
+        outbase: 'dashboards/js',
+        entries: ['dashboards/js/company-numbers.js'],
     },
 ];
 const ENTRY_POINTS = ENTRY_BUNDLES.flatMap((g) => g.entries);

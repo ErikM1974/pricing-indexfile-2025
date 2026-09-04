@@ -222,11 +222,15 @@ describe('the report widgets moved to Company Numbers', () => {
         expect(dash.querySelector('.ws-panel[data-ws="admin"] a[href="/dashboards/company-numbers.html"]')).not.toBeNull();
     });
 
-    test('the Company Numbers entry uses absolute imports (it is served content-hashed from /dist)', () => {
+    test('the Company Numbers entry is BUNDLED (relative imports + an ENTRY_BUNDLES group)', () => {
+        // 2026-09-04: the entry used to be hashed alone with absolute imports, which
+        // made the browser fetch 20 no-store source modules one by one. Now esbuild
+        // bundles it like the staff dashboard, so the imports are relative.
         const entry = readRepo('dashboards/js/company-numbers.js');
         const imports = [...entry.matchAll(/from\s+'([^']+)'|import\s+'([^']+)'/g)].map((m) => m[1] || m[2]);
         expect(imports.length).toBeGreaterThan(3);
-        for (const spec of imports) expect(spec.startsWith('/shared_components/')).toBe(true);
+        for (const spec of imports) expect(spec.startsWith('../../shared_components/')).toBe(true);
+        expect(readRepo('scripts/build.js')).toContain("entries: ['dashboards/js/company-numbers.js']");
     });
 
     test('the goal chip still has what sales-goal-controller drives', () => {

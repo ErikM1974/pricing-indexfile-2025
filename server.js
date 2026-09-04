@@ -110,6 +110,7 @@ dotenv.config();
 //   GET /api/staff/quote-sessions        — Orders Inbox quote_sessions read (any staff; 2026-08-27)
 //   GET /api/staff/daily-sales-by-rep-ytd — Caspio archive per-rep YTD for team performance (any staff; 2026-08-27)
 //   GET /api/staff/artrequests           — Art Aging widget ArtRequests read (any staff; 2026-08-27)
+//   GET /api/staff/service-codes         — Service_Codes read (CO-ANNUAL-GOAL for the goal chip / Company Numbers; any staff; 2026-09-04)
 //   GET /api/staff/employees             — staff roster from lib/staff-roster.js (any staff; 2026-08-27 — was hardcoded in anonymously-served JS)
 //   GET /api/staff/finished-photos/library — company-wide finished-photo library w/ rep names (any staff; ~L4356, 2026-07-19)
 //   GET /api/staff/command-search        — proxy fan-out search across customers/orders/quotes/designs (any staff; 2026-07-20). UNUSED by the dashboard since 2026-09-03 (its search is tools-only); kept for any other caller
@@ -6061,6 +6062,10 @@ function staffProxyForward(buildApiPath) {
 app.get('/api/staff/quote-sessions', requireStaff, staffProxyForward(() => 'quote_sessions'));
 app.get('/api/staff/daily-sales-by-rep-ytd', requireStaff, staffProxyForward(() => 'caspio/daily-sales-by-rep/ytd'));
 app.get('/api/staff/artrequests', requireStaff, staffProxyForward(() => 'artrequests'));
+// Service_Codes reads for staff pages (2026-09-04): the company annual goal row
+// CO-ANNUAL-GOAL feeds the dashboard goal chip + Company Numbers "% of goal".
+// Read-only; the proxy route is public anyway — this keeps the browser same-origin.
+app.get('/api/staff/service-codes', requireStaff, staffProxyForward(() => 'service-codes'));
 
 // Staff roster for the dashboard's Team widget + staff directory (2026-08-27).
 // The roster used to be hardcoded in shared_components/js/.../employees-service.js

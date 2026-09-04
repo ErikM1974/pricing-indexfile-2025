@@ -168,11 +168,21 @@ async function loadOrdersInbox(forceRefresh = false) {
     acceptedList.setAttribute('aria-busy', 'false');
 }
 
+let inboxRegistered = false;
 export function initOrdersInbox() {
     // Explicit user refresh bypasses the cache; the initial load does not.
-    events.register('orders-inbox:refresh', () => loadOrdersInbox(true));
-    loadOrdersInbox();
+    if (!inboxRegistered) {
+        events.register('orders-inbox:refresh', () => loadOrdersInbox(true));
+        inboxRegistered = true;
+    }
+    return loadOrdersInbox();
 }
+
+// Periodic re-reads for the Company Numbers 5-minute tick. Cache-honouring
+// (forceRefresh=false) — the proxy's own 5-min cache governs Caspio quota.
+export function refreshOrdersInbox()    { return loadOrdersInbox(false); }
+export function refreshMoneyCollected() { return loadMoneyCollected(); }
+export function refreshSamplePipeline() { return loadSamplePipeline(); }
 
 /* ── Money Collected ────────────────────────────────── */
 
@@ -247,7 +257,7 @@ async function loadMoneyCollected() {
 }
 
 export function initMoneyCollected() {
-    loadMoneyCollected();
+    return loadMoneyCollected();
 }
 
 /* ── Sample Follow-ups ──────────────────────────────── */
@@ -309,22 +319,44 @@ async function loadSamplePipeline() {
         return !(laterOrder && laterOrder >= sampleDay);
     }).sort((a, b) => String(b.date_Invoiced).localeCompare(String(a.date_Invoiced)));
 
+    // A call list needs something to call: ManageOrders carries the contact's
+    // name, phone and email on every order, so each row gets tel:/mailto:
+    // actions (2026-09-04 review — rows were plain text before).
+    const contactActions = (s) => {
+        const phone = String(s.ContactPhone || '').trim();
+        const email = String(s.ContactEmail || '').trim();
+        const who = escapeHtml([s.ContactFirstName, s.ContactLastName].filter(Boolean).join(' ') || s.CustomerName || 'contact');
+        const tel = phone
+            ? `<a class="pipeline-act" href="tel:${escapeHtml(phone.replace(/[^\d+]/g, ''))}" title="Call ${who} · ${escapeHtml(phone)}" aria-label="Call ${who} at ${escapeHtml(phone)}"><i class="fas fa-phone" aria-hidden="true"></i></a>`
+            : '';
+        const mail = email
+            ? `<a class="pipeline-act" href="mailto:${escapeHtml(email)}" title="Email ${who} · ${escapeHtml(email)}" aria-label="Email ${who} at ${escapeHtml(email)}"><i class="fas fa-envelope" aria-hidden="true"></i></a>`
+            : '';
+        return tel || mail
+            ? `<span class="pipeline-actions">${tel}${mail}</span>`
+            : '<span class="pipeline-actions pipeline-actions--none" title="No phone or email on the ShopWorks order">no contact</span>';
+    };
     list.innerHTML = followUps.length
-        ? followUps.slice(0, 10).map((s) => `
+        ? followUps.slice(0, 10).map((s) => {
+            const contact = [s.ContactFirstName, s.ContactLastName].filter(Boolean).join(' ') || s.Contact_Name || '';
+            const phone = String(s.ContactPhone || '').trim();
+            return `
             <li class="pipeline-row">
                 <span class="inbox-chip ${orderPo(s).startsWith('SAM') && !orderPo(s).startsWith('SAMPLE-') ? 'inbox-chip--pay' : 'inbox-chip--free'}">
                     ${orderPo(s).startsWith('SAMPLE-') ? 'FREE' : 'PAID'}
                 </span>
                 <span class="inbox-row-main">
-                    <span class="inbox-row-title">${escapeHtml(s.CustomerName || s.Contact_Name || 'Unknown customer')}</span>
-                    <span class="inbox-row-sub">${escapeHtml(s.Contact_Name || '')} · sampled ${escapeHtml(formatShortDate(s.date_Invoiced))} · ${escapeHtml(s.CustomerServiceRep || 'House')}</span>
+                    <span class="inbox-row-title">${escapeHtml(s.CustomerName || contact || 'Unknown customer')}</span>
+                    <span class="inbox-row-sub">${escapeHtml([contact, phone].filter(Boolean).join(' · '))}${contact || phone ? ' · ' : ''}sampled ${escapeHtml(formatShortDate(s.date_Invoiced))} · ${escapeHtml(s.CustomerServiceRep || 'House')}</span>
                 </span>
+                ${contactActions(s)}
                 <span class="inbox-row-amount">${formatMoney(parseFloat(s.cur_SubTotal) || 0)}</span>
-            </li>`).join('')
+            </li>`;
+        }).join('')
         : emptyRow('Nobody waiting — every sampled customer has since ordered (or no samples in 30 days).');
     list.setAttribute('aria-busy', 'false');
 }
 
 export function initSamplePipeline() {
-    loadSamplePipeline();
+    return loadSamplePipeline();
 }

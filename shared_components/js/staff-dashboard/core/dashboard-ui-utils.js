@@ -3,12 +3,9 @@
    Pure functions used by controllers + components.
    ===================================================== */
 
-/**
- * Annual revenue goal — single source of truth.
- * Used by sales-goal-controller (pace/projection math) and
- * team-performance-controller (per-rep goal share).
- */
-export const ANNUAL_GOAL = 3_000_000;
+// ANNUAL_GOAL (3_000_000) was removed 2026-09-04. The goal now comes from
+// Caspio Service_Codes `CO-ANNUAL-GOAL` via services/company-goal-service.js
+// so a new year's goal is a data edit, not a deploy.
 
 /**
  * Escape HTML for safe innerHTML insertion.
@@ -70,12 +67,25 @@ export function formatLongDate(date) {
 }
 
 /**
+ * A bare "YYYY-MM-DD" is a CALENDAR day, not an instant. `new Date('2026-09-04')`
+ * parses it as UTC midnight, which is the evening of Sep 3 in Pacific — so the
+ * revenue card showed every window a day early ("Jun 5 - Sep 3" for a fetch
+ * that ran Jun 6 → Sep 4). Build such strings as local dates instead.
+ */
+export function toLocalDate(value) {
+    if (value instanceof Date) return value;
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(value || '').trim());
+    if (m) return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+    return new Date(value);
+}
+
+/**
  * Format a date range: "Jan 1 - Jan 31, 2026"
  */
 export function formatDateRange(start, end) {
     if (!start || !end) return '';
-    const s = (start instanceof Date) ? start : new Date(start);
-    const e = (end instanceof Date) ? end : new Date(end);
+    const s = toLocalDate(start);
+    const e = toLocalDate(end);
     if (isNaN(s.getTime()) || isNaN(e.getTime())) return '';
 
     const sameYear = s.getFullYear() === e.getFullYear();
