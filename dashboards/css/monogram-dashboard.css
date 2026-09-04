@@ -8,14 +8,15 @@
    CSS Variables - NWCA Green Theme
    ============================================ */
 :root {
-    /* Primary Colors - NWCA Green */
-    --nwca-green: #2d5f3f;
-    --nwca-green-dark: #234a31;
-    --nwca-green-light: #3a7c52;
-    --nwca-green-hover: #2f661e;
+    /* Primary colours — shop-floor BLUE (2026-09-04, Erik: personalization = the
+       same blue as Names & Numbers + the staff-dashboard f-floor tiles; was NWCA green) */
+    --mono-theme: #2563eb;
+    --mono-theme-dark: #1d4ed8;
+    --mono-theme-light: #3b82f6;
+    --mono-theme-hover: #1e40af;
 
     /* Neutral Colors */
-    --bg-light: #f9fbf8;
+    --bg-light: #f5f7fa;
     --bg-white: #ffffff;
     --bg-gray: #f9fafb;
     --border-light: #e5e7eb;
@@ -78,7 +79,7 @@ body {
 
 /* Contact Bar */
 .header-contact-bar {
-    background: var(--nwca-green);
+    background: var(--mono-theme);
     color: white;
     padding: 8px 0;
     font-size: 14px;
@@ -139,12 +140,12 @@ body {
 }
 
 .main-nav-links a:hover {
-    color: var(--nwca-green-hover);
+    color: var(--mono-theme-hover);
 }
 
 /* Context Bar */
 .context-bar {
-    background: linear-gradient(135deg, var(--nwca-green), var(--nwca-green-dark));
+    background: linear-gradient(135deg, var(--mono-theme), var(--mono-theme-dark));
     color: white;
     padding: 20px 0;
 }
@@ -206,7 +207,7 @@ body {
 
 .quick-btn-primary {
     background: var(--bg-white);
-    color: var(--nwca-green);
+    color: var(--mono-theme);
     border: none;
 }
 
@@ -282,7 +283,7 @@ body {
 .filter-input:focus,
 .filter-select:focus {
     outline: none;
-    border-color: var(--nwca-green);
+    border-color: var(--mono-theme);
     box-shadow: 0 0 0 3px rgba(45, 95, 63, 0.1);
 }
 
@@ -300,12 +301,12 @@ body {
 }
 
 .btn-primary {
-    background: var(--nwca-green);
+    background: var(--mono-theme);
     color: white;
 }
 
 .btn-primary:hover {
-    background: var(--nwca-green-dark);
+    background: var(--mono-theme-dark);
 }
 
 .btn-outline {
@@ -355,14 +356,14 @@ body {
 }
 
 .order-link {
-    color: var(--nwca-green);
+    color: var(--mono-theme);
     text-decoration: none;
     font-weight: 500;
 }
 
 .order-link:hover {
     text-decoration: underline;
-    color: var(--nwca-green-dark);
+    color: var(--mono-theme-dark);
 }
 
 /* ============================================
@@ -418,7 +419,7 @@ body {
 }
 
 .action-btn.edit:hover {
-    color: var(--nwca-green);
+    color: var(--mono-theme);
 }
 
 .action-btn.print:hover {
@@ -430,7 +431,7 @@ body {
 }
 
 .action-btn.proof:hover {
-    color: var(--primary-dark, #2d5f3f);
+    color: var(--mono-theme-dark, #1d4ed8);
 }
 
 .action-btn.delete:hover {

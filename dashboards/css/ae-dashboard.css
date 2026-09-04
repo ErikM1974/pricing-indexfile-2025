@@ -54,6 +54,20 @@
     --art-theme-hover:       #33537d;
     --shadow-glow-theme:     0 0 0 4px rgba(74, 111, 165, .14);
 }
+/* Personalization (Names & Numbers, Monogram) = the shop-floor blue those
+   tools carry on the staff dashboard (workspaces.css --f-floor). */
+#personalization-tab {
+    --art-theme:             #2563eb;
+    --art-theme-dark:        #1d4ed8;
+    --art-theme-light:       #60a5fa;
+    --art-theme-bg:          #eff6ff;
+    --art-theme-bg-hover:    #dbeafe;
+    --art-theme-bg-selected: #bfdbfe;
+    --art-theme-rgba-15:     rgba(37, 99, 235, .15);
+    --art-theme-rgba-10:     rgba(37, 99, 235, .10);
+    --art-theme-hover:       #1d4ed8;
+    --shadow-glow-theme:     0 0 0 4px rgba(37, 99, 235, .14);
+}
 #mockup-ruth-tab,
 #digitizing-tab {
     --art-theme:             #6b46c1;

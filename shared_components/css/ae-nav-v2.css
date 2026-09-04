@@ -35,6 +35,11 @@
     --ae-blue-light:   #6b8fc4;
     --ae-blue-tint:    #f4f7fb;
     --ae-blue-ring:    rgba(74, 111, 165, .16);
+    --ae-floor:        #2563eb;
+    --ae-floor-deep:   #1d4ed8;
+    --ae-floor-light:  #60a5fa;
+    --ae-floor-tint:   #eff6ff;
+    --ae-floor-ring:   rgba(37, 99, 235, .16);
     --ae-ink:   #111827;
     --ae-ink-2: #374151;
     --ae-ink-3: #6b7280;
@@ -58,8 +63,15 @@
 }
 /* Person colour-coding (Erik, 2026-09-04): Steve = GREEN (his Art Request
    Detail page green), Ruth = PURPLE, Bradley / purchasing / transfers = the
-   slate BLUE of his transfer queue + the Supacolor page. Personalization
-   keeps the page maroon. */
+   slate BLUE of his transfer queue + the Supacolor page, Personalization
+   (Names & Numbers, Monogram) = the shop-floor BLUE those tools carry on the
+   staff dashboard. Only the page chrome stays maroon. */
+.ae-nav[data-section="personalization"] {
+    --ae-accent:      var(--ae-floor);
+    --ae-accent-deep: var(--ae-floor-deep);
+    --ae-accent-tint: var(--ae-floor-tint);
+    --ae-accent-ring: var(--ae-floor-ring);
+}
 .ae-nav[data-section="transfers"] {
     --ae-accent:      var(--ae-blue);
     --ae-accent-deep: var(--ae-blue-deep);
@@ -130,6 +142,11 @@
 .ae-nav__section[data-section="steve"].is-active:hover {
     background: linear-gradient(135deg, var(--ae-green-deep) 0%, #008a12 60%, var(--ae-green-light) 100%);
     box-shadow: 0 10px 20px -10px rgba(0, 102, 0, .65), inset 0 1px 0 rgba(255, 255, 255, .18);
+}
+.ae-nav__section[data-section="personalization"].is-active,
+.ae-nav__section[data-section="personalization"].is-active:hover {
+    background: linear-gradient(135deg, var(--ae-floor-deep) 0%, var(--ae-floor) 60%, var(--ae-floor-light) 100%);
+    box-shadow: 0 10px 20px -10px rgba(29, 78, 216, .65), inset 0 1px 0 rgba(255, 255, 255, .18);
 }
 .ae-nav__section[data-section="transfers"].is-active,
 .ae-nav__section[data-section="transfers"].is-active:hover {
