@@ -1,3 +1,8 @@
+## v2026.09.04.1 (2026.09.04)
+
+- AE Dashboard: unified visual redesign across nav + all intake forms
+- Deploy v2026.09.04.1: 2 files (ae-dashboard.html, garment-designer.html...)
+
 ## v2026.09.03.18 (2026.09.03)
 
 - Staff Dashboard: drop the last New/Updated chips (DST Studio, Monogram Orders)
