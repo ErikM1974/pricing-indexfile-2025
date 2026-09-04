@@ -1,3 +1,8 @@
+## v2026.09.04.3 (2026.09.04)
+
+- Art Request Detail: AE view keeps Steve's green (retire the maroon override)
+- Deploy v2026.09.04.3: 1 files (art-request-detail.html...)
+
 ## v2026.09.04.2 (2026.09.04)
 
 - AE Dashboard: person colour-coding — Steve green, Ruth purple
