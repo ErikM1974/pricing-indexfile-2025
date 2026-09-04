@@ -2020,22 +2020,11 @@ body {
 .ard-action-supacolor { background: #4a6fa5; }
 .ard-action-supacolor:hover { background: #33537d; }
 
-/* ── AE View (?view=ae) — maroon theme matching AE Dashboard ── */
-body.ae-view .ard-header {
-    background: linear-gradient(135deg, #981e32, #7a1828);
-}
-body.ae-view .ard-card-header {
-    background: #981e32;
-}
-body.ae-view .ard-card-header--green {
-    background: #981e32;
-}
-body.ae-view .ard-status-step.active .ard-status-dot {
-    background: #981e32;
-}
-body.ae-view .ard-status-step.active .ard-status-label {
-    color: #981e32;
-}
+/* ── AE View (?view=ae) ──
+   Used to recolour the page maroon "to match the AE Dashboard". Retired
+   2026-09-04: the dashboard now colour-codes by PERSON (Steve = green, Ruth =
+   purple), so an AE opening one of Steve's requests should see Steve's green —
+   the page default. body.ae-view still drives the AE status bar / copy. */
 
 /* ── AE Navigation Bar (prev/next) ────────────────────── */
 .ard-nav-bar {
@@ -3933,8 +3922,8 @@ body.ard-customer-view .ard-footer {
 /* ── Printable one-page Art Job Sheet (2026-06-17) ─────────────────────── */
 .ard-print-btn {
     background: #fff;
-    border: 1.5px solid var(--art-theme, #981e32);
-    color: var(--art-theme, #981e32);
+    border: 1.5px solid var(--art-theme, #0a8a1f);
+    color: var(--art-theme, #0a8a1f);
     border-radius: 8px;
     padding: 5px 12px;
     font-size: 12px;
@@ -3944,7 +3933,7 @@ body.ard-customer-view .ard-footer {
     margin-left: 8px;
     white-space: nowrap;
 }
-.ard-print-btn:hover { background: var(--art-theme, #981e32); color: #fff; }
+.ard-print-btn:hover { background: var(--art-theme, #0a8a1f); color: #fff; }
 
 /* "Build Mockup" → Shirt Designer (green, to stand out vs the maroon theme) */
 .ard-build-mockup-btn {
