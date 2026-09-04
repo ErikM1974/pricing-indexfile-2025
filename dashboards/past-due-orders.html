@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>Past Due Orders - Northwest Custom Apparel</title>
-    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link rel="icon" href="/favicon.png" type="image/png">
 
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,7 +16,7 @@
     <!-- 2026 design tokens (must load before dash-shell.css) -->
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
-    <link rel="stylesheet" href="/dashboards/css/past-due-orders.css?v=2026.08.13.2">
+    <link rel="stylesheet" href="/dashboards/css/past-due-orders.css?v=2026.09.04.12">
 </head>
 <body>
     <div class="dash-shell">
@@ -65,29 +65,36 @@
                 </button>
             </div>
 
+            <!-- Each tile carries the dollar value under the count (2026-09-04) — a $63
+                 employee order and a $5,000 customer order used to look the same. The
+                 on-track tile has no value line: upstream sends only its count. -->
             <div class="dash-stat-grid">
                 <div class="dash-stat-card dash-stat-card--accent">
                     <div class="dash-stat-value" id="stat-late">—</div>
                     <div class="dash-stat-label">Past due</div>
+                    <div class="pdo-stat-sub" id="stat-late-val"></div>
                 </div>
                 <div class="dash-stat-card">
                     <div class="dash-stat-value" id="stat-risk">—</div>
                     <div class="dash-stat-label">At risk &middot; due within 7 days, blanks not in house</div>
+                    <div class="pdo-stat-sub" id="stat-risk-val"></div>
                 </div>
                 <div class="dash-stat-card">
                     <div class="dash-stat-value" id="stat-nopo">—</div>
-                    <div class="dash-stat-label">No purchase order raised yet</div>
+                    <div class="dash-stat-label">Past due, no PO raised</div>
+                    <div class="pdo-stat-sub" id="stat-nopo-val"></div>
                 </div>
                 <div class="dash-stat-card">
                     <div class="dash-stat-value" id="stat-ontrack">—</div>
-                    <div class="dash-stat-label">Due soon, on track</div>
+                    <div class="dash-stat-label">Due within 7 days, on track</div>
+                    <div class="pdo-stat-sub" id="stat-ontrack-val"></div>
                 </div>
             </div>
 
             <div class="dash-card">
                 <div class="dash-card-header">
                     <h2 class="dash-card-title">Past due &mdash; every rep, every vendor</h2>
-                    <span class="pdo-asof" id="pdo-asof"></span>
+                    <span class="pdo-asof"><span id="pdo-summary"></span><span id="pdo-asof"></span></span>
                 </div>
                 <div id="content-root" class="dash-loading">Loading…</div>
             </div>
@@ -98,6 +105,6 @@
     <script src="/config/app.config.js"></script>
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/dash-page-helpers.js"></script>
-    <script src="/dashboards/js/past-due-orders.js?v=2026.08.13.1"></script>
+    <script src="/dashboards/js/past-due-orders.js?v=2026.09.04.12"></script>
 </body>
 </html>

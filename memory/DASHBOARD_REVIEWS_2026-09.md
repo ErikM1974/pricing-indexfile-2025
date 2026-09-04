@@ -91,6 +91,20 @@ Releases `v2026.09.04.1 → .9`. Detail here; MEMORY.md carries one line each.
   four per-card buttons are gone. `@media print` light single-column sheet. 1600px content,
   three-up metrics row (revenue | team | art) from 1500px.
 
+## Past Due Orders — review, 10 items (2026-09-04, `v2026.09.04.12`)
+
+- Page was already honest (failed load empties the board; print re-pulls; Ctrl+P guard) —
+  the work was making it ACTIONABLE and fixing one phone bug (header controls 781px wide
+  at 375px → wrap ≤760px in `past-due-orders.css`).
+- Rep headings → account pages (`REP_PAGES`, same map as Company Numbers). "no PO raised"
+  → `/calculators/purchasingform.html` — 🔑 that form is a **JotForm embed**, it cannot
+  prefill the WO from the URL; the link title carries the WO. Vendor under the blanks
+  status on screen (print always had it). Column "Late · Due in". Zero value → "—".
+- $ under each stat tile (late / at risk / no-PO; on-track is count-only upstream), per-rep
+  totals, summary "N orders on the board · R reps", "loaded h:mm" (client clock — the
+  payload's `today` is a date), 5-min visible-tab refresh. Site favicon.
+- Lock: `tests/unit/past-due-orders-page.test.js`.
+
 ## Verification gotchas learned today
 
 - Browser pane (`mcp__Claude_Browser`): screenshots of a SCROLLED page come back blank on

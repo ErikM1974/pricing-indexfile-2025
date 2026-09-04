@@ -34,6 +34,24 @@
     // sanmar-inbound-today.js uses for the same reason.
     var PRINT_FRESH_MS = 120000;
 
+    // Where a rep heading goes when clicked (2026-09-04) — the rep's own account page,
+    // the same map Company Numbers' team card uses. Reps without a page stay plain text.
+    var REP_PAGES = {
+        'Nika Lao':       '/dashboards/nika-crm.html',
+        'Taneisha Clark': '/dashboards/taneisha-crm.html',
+        'House':          '/dashboards/house-accounts.html'
+    };
+
+    // "No PO raised" is the one row whose next step is a page on this site: the Purchase
+    // Request form that asks Bradley to buy the blanks. The form is a JotForm embed and
+    // cannot be prefilled from the URL, so the row link carries the WO in its title.
+    var PURCHASE_REQUEST_URL = '/calculators/purchasingform.html';
+
+    // Re-read while the tab is visible (2026-09-04). Erik opens this at 8am from a tab
+    // that may have sat since yesterday; the print path already re-pulls, the board did
+    // not. Cache-honouring load(false): the upstream 10-minute cache governs quota.
+    var REFRESH_INTERVAL_MS = 5 * 60 * 1000;
+
     document.addEventListener('DOMContentLoaded', function () {
         var days = document.getElementById('pdo-days');
         var refresh = document.getElementById('pdo-refresh');
@@ -42,6 +60,14 @@
         if (refresh) refresh.addEventListener('click', function () { load(true); });
         if (print) print.addEventListener('click', doPrint);
         load(false);
+
+        setInterval(function () {
+            if (document.visibilityState === 'visible' && !loading) load(false);
+        }, REFRESH_INTERVAL_MS);
+        document.addEventListener('visibilitychange', function () {
+            if (document.visibilityState === 'visible' && !loading
+                && Date.now() - lastLoadedAt >= REFRESH_INTERVAL_MS) load(false);
+        });
     });
 
     function selectedDays() {
@@ -92,12 +118,23 @@
         }
     }
 
+    function sumValue(rows) {
+        return (rows || []).reduce(function (s, o) { return s + (Number(o.subtotal) || 0); }, 0);
+    }
+
     function setStats(d) {
-        var noPO = d ? (d.late || []).filter(function (o) { return o.blanks === 'none'; }).length : null;
+        var late = d ? (d.late || []) : [];
+        var risk = d ? (d.atRisk || []) : [];
+        var noPO = late.filter(function (o) { return o.blanks === 'none'; });
         put('stat-late', d ? d.counts.late : '—');
         put('stat-risk', d ? d.counts.atRisk : '—');
-        put('stat-nopo', d ? noPO : '—');
+        put('stat-nopo', d ? noPO.length : '—');
         put('stat-ontrack', d ? d.counts.dueSoonOnTrack : '—');
+        // Dollar value under each count. On-track orders are a count only upstream.
+        put('stat-late-val', d ? (late.length ? money(sumValue(late)) + ' of work' : '') : '');
+        put('stat-risk-val', d ? (risk.length ? money(sumValue(risk)) + ' of work' : '') : '');
+        put('stat-nopo-val', d ? (noPO.length ? money(sumValue(noPO)) + ' waiting on a PO' : '') : '');
+        put('stat-ontrack-val', d ? 'blanks in house' : '');
     }
 
     function put(id, v) {
@@ -107,17 +144,28 @@
 
     function render(d) {
         setStats(d);
+        var reps = activeReps(d);
+        var onBoard = (d.late || []).length + (d.atRisk || []).length;
+
+        // Freshness is a TIME as well as a date: the upstream cache is ten minutes and this
+        // tab may have been open since yesterday. "loaded 4:22 PM" is the client clock —
+        // it answers "how old is what I am looking at", which the payload cannot.
         var asOf = document.getElementById('pdo-asof');
         if (asOf) {
             asOf.textContent = 'as of ' + d.today + ' · ' + d.lookbackDays + '-day window · '
-                + d.ordersScanned + ' orders scanned';
+                + d.ordersScanned + ' orders scanned · loaded ' + clockTime();
+        }
+        var summary = document.getElementById('pdo-summary');
+        if (summary) {
+            summary.textContent = onBoard
+                ? onBoard + ' order' + (onBoard === 1 ? '' : 's') + ' on the board · '
+                  + reps.length + ' rep' + (reps.length === 1 ? '' : 's') + ' · '
+                : '';
         }
 
         var root = document.getElementById('content-root');
         if (!root) return;
         root.className = '';
-
-        var reps = activeReps(d);
 
         if (!reps.length) {
             root.innerHTML = '<p class="pdo-none"><i class="fas fa-check-circle"></i> '
@@ -137,9 +185,17 @@
             var counts = [];
             if (g.late.length) counts.push(g.late.length + ' past due');
             if (g.atRisk.length) counts.push(g.atRisk.length + ' at risk');
+            var total = sumValue(g.late) + sumValue(g.atRisk);
+            var page = REP_PAGES[rep];
+            var name = page
+                ? '<a class="pdo-rep-link" href="' + esc(page) + '" title="Open ' + esc(rep) + '’s accounts">'
+                  + esc(rep) + ' <i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i></a>'
+                : esc(rep);
             html += '<section class="pdo-rep">'
-                + '<h3 class="pdo-rep-name">' + esc(rep)
-                + '<span class="pdo-rep-count">' + esc(counts.join(' · ')) + '</span></h3>'
+                + '<h3 class="pdo-rep-name">' + name
+                + '<span class="pdo-rep-count">' + esc(counts.join(' · ')) + '</span>'
+                + (total ? '<span class="pdo-rep-total">' + money(total) + '</span>' : '')
+                + '</h3>'
                 + table(g.late.concat(g.atRisk))
                 + '</section>';
         });
@@ -148,25 +204,47 @@
 
     function table(rows) {
         if (!rows.length) return '';
+        // "Late · Due in": half the rows are at-risk and read "in 4d" — under a header that
+        // said only LATE that looked wrong (2026-09-04).
         var h = '<div class="pdo-scroll"><table class="pdo-table"><thead><tr>'
-            + '<th>WO</th><th>Customer</th><th>Due</th><th class="pdo-num">Late</th>'
+            + '<th>WO</th><th>Customer</th><th>Due</th><th class="pdo-num">Late · Due in</th>'
             + '<th class="pdo-num">Value</th><th>Blanks</th><th>Type</th></tr></thead><tbody>';
         rows.sort(function (a, b) { return a.daysUntilDue - b.daysUntilDue; });
         rows.forEach(function (o) {
             var late = o.daysUntilDue < 0;
             h += '<tr class="' + (late ? 'pdo-late' : 'pdo-risk') + '">'
                 + '<td class="pdo-wo">' + esc(o.idOrder) + '</td>'
-                + '<td>' + esc(o.company) + '</td>'
-                + '<td>' + esc(o.dueDate) + '</td>'
+                + '<td>' + esc(o.company) + (o.partiallyShipped ? ' <span class="pdo-partial">partially shipped</span>' : '') + '</td>'
+                + '<td class="pdo-num">' + esc(o.dueDate) + '</td>'
                 + '<td class="pdo-num">' + (late
                     ? '<span class="pdo-badge">' + Math.abs(o.daysUntilDue) + 'd late</span>'
                     : (o.daysUntilDue === 0 ? 'today' : 'in ' + o.daysUntilDue + 'd')) + '</td>'
-                + '<td class="pdo-num">' + money(o.subtotal) + '</td>'
-                + '<td class="' + (o.blanks === 'none' ? 'pdo-nopo' : '') + '">' + blanks(o.blanks) + '</td>'
+                + '<td class="pdo-num">' + moneyCell(o.subtotal) + '</td>'
+                + '<td class="' + (o.blanks === 'none' ? 'pdo-nopo' : '') + '">' + blanksCell(o) + '</td>'
                 + '<td>' + esc(o.orderType || '') + '</td>'
                 + '</tr>';
         });
         return h + '</tbody></table></div>';
+    }
+
+    // The blanks cell is the actionable one. "no PO raised" links to the Purchase Request
+    // form (the next step); any other state names the vendor to chase — the printed sheet
+    // always had the vendor, the screen used to hide it.
+    function blanksCell(o) {
+        if (o.blanks === 'none') {
+            return '<a class="pdo-nopo-link" href="' + PURCHASE_REQUEST_URL + '"'
+                + ' title="Raise a purchase request for WO ' + esc(o.idOrder) + ' (' + esc(o.company) + ')">'
+                + 'no PO raised <i class="fas fa-cart-plus" aria-hidden="true"></i></a>';
+        }
+        var v = (o.vendors || []).filter(Boolean);
+        return blanks(o.blanks)
+            + (v.length && o.blanks !== 'received' ? '<span class="pdo-vendor">' + esc(v.join(', ')) + '</span>' : '');
+    }
+
+    // A zero subtotal renders as a dash, not an empty cell that reads like a fault.
+    function moneyCell(n) {
+        var m = money(n);
+        return m || '<span class="pdo-dash">—</span>';
     }
 
     function blanks(b) {
