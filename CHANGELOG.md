@@ -1,3 +1,8 @@
+## v2026.09.04.6 (2026.09.04)
+
+- Colour-coding: Personalization + Monogram dashboard = shop-floor blue
+- Deploy v2026.09.04.6: 2 files (ae-dashboard.html, monogram-dashboard.html...)
+
 ## v2026.09.04.5 (2026.09.04)
 
 - Colour-coding: AE Art Request tile green; Bradley / purchasing / transfers blue
