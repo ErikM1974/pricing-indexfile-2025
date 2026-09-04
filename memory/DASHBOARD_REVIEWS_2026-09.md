@@ -1,0 +1,70 @@
+# Staff Dashboard + AE Dashboard reviews — 2026-09-04 (what shipped, what to know)
+
+Two full page reviews Erik asked for ("100% satisfied"), all items shipped the same day.
+Releases `v2026.09.04.1 → .9`. Detail here; MEMORY.md carries one line each.
+
+## AE Dashboard — redesign + colour-coding (`.1 → .7`)
+
+- All six surfaces (garment / sticker / banner / JDS / Ruth forms + nav + galleries) on ONE
+  design language. The four form CSS files share identical field / drop / rush / submit /
+  success / toast blocks — only the `--fx-*` accent tokens differ; **keep them in step**.
+- **Colour = person/department** (Erik's rule): `memory/DESIGN_COLOUR_CODE.md` is the key.
+  Done by re-scoping the `--art-theme*` family per pane in `dashboards/css/ae-dashboard.css`
+  (Steve panes green, Ruth panes purple, Transfers slate blue, Personalization shop blue) and
+  `--fx-*` per form. **`ae-dashboard.css` MUST stay the last stylesheet** — it owns the theme.
+- Transfers / Personalization show launcher cards rendered from `SECTIONS` in ae-dashboard.js.
+- Art Request Detail + mockup-detail: the "AE view = maroon" overrides were retired (Steve green
+  / Ruth purple in every view).
+
+## AE Dashboard — review, 15 items (`.9`)
+
+- **ONE "needs your review" number.** `art-ae.js` / `mockup-ae.js` dispatch `ae:counts`
+  after every render (current, not on hold, Awaiting Approval); ae-dashboard.js paints the
+  Steve/Ruth nav badges + the More-menu Review badge, and the Review tab renders
+  `ArtAeGallery.getNeedsReview()`. The old badge fetched every Awaiting-Approval row ever
+  (94 vs the gallery's 8).
+- **Art fees = Service_Codes.** Garment form `loadArtFeeOptions()` lists the live `GRT-*`
+  rows (value = SellPrice → `Prelim_Charges`); the typed GRT-25/100/150 never existed in
+  Caspio. Requirements tab figures come from `data-fee-price/rate/frac/name` hooks filled by
+  `dashboards/js/ae-dashboard-init.js`; failure → "—" + visible warning, never a typed price.
+- Garment form: sticky progress bar (`countMissing()` mirrors `validate()`), per-rep draft
+  `nwca-gsf-draft:<email>` (7-day TTL, restored on init unless a prefill is passed, Discard
+  bar, cleared on success), beforeunload guard. All 4 forms: `wireLabels`/`wireA11y` pair
+  labels with controls, drop zones are keyboard buttons, leave-page guard.
+- Rule 3 clean: 167 inline styles, the 69-line inline script and every `onclick` are gone —
+  bootstrap + `data-action` delegation in `ae-dashboard-init.js`; Requirements tab on
+  `.req-*` classes. Dead Caspio note-iframe modals removed. JDS Mockup listed once. SVG
+  item-type icons. Both nav tiers + pills = WAI-ARIA tabs (roving tabindex, arrows).
+- Lock: `tests/unit/ae-dashboard-page.test.js`.
+
+## Staff Dashboard — review, 13 items (`.8`)
+
+- Row descriptions wrap under the name ≤1100px (were `display:none`). Ctrl+K + the
+  Everything filter search descriptions / tooltips / per-row `data-keywords` (38 tools),
+  word-start matched, curated keywords ranked first. Everything rows show descriptions.
+- Past Due = header chip + ONE row (Production). Production grid hole fixed (`ws-card--full`).
+  Bundle rows use `f-store` (per-client colours retired). Phone: header 128→87px, Pride Wall
+  closed by default on phones (`tool-grid-controller`), tab-strip fade. Tweaks FAB +
+  `sidebar-controller.js` DELETED. `staff` role → Office.
+- **The dashboard is a HASHED page**: `lib/hashed-pages.js` `DASHBOARD_PAGES` tranche;
+  `scripts/build.js` `ENTRY_BUNDLES` bundles its ~25-file module graph into ONE file; all
+  three routes (`/staff-dashboard.html`, `/staff-dashboard-v3/`, `…/index.html`) call
+  `sendHashedHtml` after `requireStaff`. Company Numbers still imports the same controllers
+  from source by absolute path.
+- Locks: `tests/unit/staff-dashboard-workspaces.test.js` "2026-09-04 review" block,
+  `tests/unit/build/hashed-pages.test.js`.
+
+## Verification gotchas learned today
+
+- Browser pane (`mcp__Claude_Browser`): screenshots of a SCROLLED page come back blank on
+  these pages — shift `body.style.marginTop` instead; screenshots ≥0.6 scale time out
+  intermittently, 0.5 works; the desktop viewport reports `innerHeight 0`, so
+  IntersectionObserver-driven UI (the garment progress bar) never shows — verify under the
+  **mobile preset** (real viewport). A bare-path ES module is cached by Chrome on the static
+  server — `fetch(url,{cache:'reload'})` each changed file before `location.reload()`.
+- Deploy skill: the 15s boot probe is too short for this server.js (~20s to `app.listen`);
+  a 0-byte probe log means "too slow", not "crashed" — probe at 45s. A `for` loop whose last
+  statement is `[ $R -ne 0 ] && …` exits 1 on success and silently skips the `&& git commit`
+  after it.
+- Local esbuild hashes differ from Heroku's for CRLF working copies — read the LIVE
+  `/dist/asset-manifest.json` for the real names when verifying.
