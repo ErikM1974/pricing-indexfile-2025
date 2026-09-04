@@ -40,6 +40,20 @@
     --art-theme-hover:       #006600;
     --shadow-glow-theme:     0 0 0 4px rgba(10, 138, 31, .14);
 }
+/* Bradley / purchasing / transfers = the slate blue of his transfer queue and
+   the Supacolor orders page (bradley-transfers.css --bt-theme). */
+#transfers-tab {
+    --art-theme:             #4a6fa5;
+    --art-theme-dark:        #33537d;
+    --art-theme-light:       #6b8fc4;
+    --art-theme-bg:          #f4f7fb;
+    --art-theme-bg-hover:    #eaf0f9;
+    --art-theme-bg-selected: #dbe5f1;
+    --art-theme-rgba-15:     rgba(74, 111, 165, .15);
+    --art-theme-rgba-10:     rgba(74, 111, 165, .10);
+    --art-theme-hover:       #33537d;
+    --shadow-glow-theme:     0 0 0 4px rgba(74, 111, 165, .14);
+}
 #mockup-ruth-tab,
 #digitizing-tab {
     --art-theme:             #6b46c1;

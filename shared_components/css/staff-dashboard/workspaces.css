@@ -17,10 +17,12 @@
      CRM            navy #1a2332 + gold #f59e0b  (rep CRM tier cards)
      purchasing     slate blue #4a6fa5           (transfer queue, Supacolor)
      mockups        purple #6B46C1               (Ruth — her mockup queue, her pages)
-     steve          green #0a8a1f                (Steve — Art Queue, Design Queue, his pages)
-     art requests   crimson #981e32              (AE art dashboard — the reps' page)
-       ↑ person colour-coding, Erik 2026-09-04: Steve = green, Ruth = purple;
-         the AE dashboard itself stays maroon and carries both inside it.
+     steve          green #0a8a1f                (Steve — Art Queue, Design Queue, AE Art Request)
+     art requests   crimson #981e32              (unused since 2026-09-04 — kept for the
+                                                  AE dashboard's own maroon chrome)
+       ↑ person colour-coding, Erik 2026-09-04: Steve = green, Ruth = purple,
+         Bradley / purchasing / transfers = slate blue (f-purch). The AE Art
+         Request tile is green because the reps are sending Steve work.
      shop floor     blue #2563eb                 (box labels, names & numbers)
      photos         deep green #14351c           (Photo Capture app)
      archive        amber #d97706                (old designs)

@@ -30,6 +30,11 @@
     --ae-green-light:  #33bb33;
     --ae-green-tint:   #ecfdf0;
     --ae-green-ring:   rgba(10, 138, 31, .16);
+    --ae-blue:         #4a6fa5;
+    --ae-blue-deep:    #33537d;
+    --ae-blue-light:   #6b8fc4;
+    --ae-blue-tint:    #f4f7fb;
+    --ae-blue-ring:    rgba(74, 111, 165, .16);
     --ae-ink:   #111827;
     --ae-ink-2: #374151;
     --ae-ink-3: #6b7280;
@@ -52,8 +57,15 @@
     margin-bottom: 18px;
 }
 /* Person colour-coding (Erik, 2026-09-04): Steve = GREEN (his Art Request
-   Detail page green), Ruth = PURPLE. Transfers / Personalization keep the
-   page maroon. */
+   Detail page green), Ruth = PURPLE, Bradley / purchasing / transfers = the
+   slate BLUE of his transfer queue + the Supacolor page. Personalization
+   keeps the page maroon. */
+.ae-nav[data-section="transfers"] {
+    --ae-accent:      var(--ae-blue);
+    --ae-accent-deep: var(--ae-blue-deep);
+    --ae-accent-tint: var(--ae-blue-tint);
+    --ae-accent-ring: var(--ae-blue-ring);
+}
 .ae-nav[data-section="steve"] {
     --ae-accent:      var(--ae-green);
     --ae-accent-deep: var(--ae-green-deep);
@@ -118,6 +130,11 @@
 .ae-nav__section[data-section="steve"].is-active:hover {
     background: linear-gradient(135deg, var(--ae-green-deep) 0%, #008a12 60%, var(--ae-green-light) 100%);
     box-shadow: 0 10px 20px -10px rgba(0, 102, 0, .65), inset 0 1px 0 rgba(255, 255, 255, .18);
+}
+.ae-nav__section[data-section="transfers"].is-active,
+.ae-nav__section[data-section="transfers"].is-active:hover {
+    background: linear-gradient(135deg, var(--ae-blue-deep) 0%, var(--ae-blue) 60%, var(--ae-blue-light) 100%);
+    box-shadow: 0 10px 20px -10px rgba(51, 83, 125, .65), inset 0 1px 0 rgba(255, 255, 255, .18);
 }
 .ae-nav__section[data-section="ruth"].is-active,
 .ae-nav__section[data-section="ruth"].is-active:hover {
