@@ -144,9 +144,9 @@ export async function initMetrics() {
     await loadRevenue(false);
 }
 
-/** Periodic re-read (Company Numbers 5-minute tick) — honours the 4-min client cache. */
-export function refreshMetrics() {
-    return loadRevenue(false);
+/** Periodic re-read (Company Numbers 5-minute tick) — honours the 4-min client cache; force = header Refresh. */
+export function refreshMetrics(force = false) {
+    return loadRevenue(!!force);
 }
 
 // Event handlers

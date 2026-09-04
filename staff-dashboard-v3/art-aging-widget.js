@@ -38,6 +38,7 @@
     var DATE_CUTOFF = '2026-03-15';
     var RED_DAYS = 7;      // strictly more than this = red
     var YELLOW_DAYS = 3;   // this or more (up to RED_DAYS) = yellow
+    var STALE_DAYS = 30;   // strictly more than this = a zombie: close it or revive it (2026-09-04)
     var LIST_MAX = 5;
 
     var loading = false;
@@ -153,8 +154,13 @@
         });
 
         var attention = red.concat(yellow).sort(function (a, b) { return b.days - a.days; });
+        // Zombies: open requests nobody has touched in a month. They sit inside the
+        // red bucket but need a different action (close or revive), so they get
+        // their own count and lead the list (oldest first).
+        var stale = red.filter(function (it) { return it.days > STALE_DAYS; });
 
         var html = '<div class="aa-chips">' +
+            chipHtml(stale.length, '> 30 days — close or revive', 'stale') +
             chipHtml(red.length, '> 7 days', 'red') +
             chipHtml(yellow.length, '3–7 days', 'amber') +
             chipHtml(fresh, 'Under 3 days', 'green') +
@@ -166,7 +172,7 @@
         } else {
             html += '<div class="aa-list">';
             attention.slice(0, LIST_MAX).forEach(function (it) {
-                var tone = it.days > RED_DAYS ? 'red' : 'amber';
+                var tone = it.days > STALE_DAYS ? 'stale' : (it.days > RED_DAYS ? 'red' : 'amber');
                 html += '<a class="aa-row aa-row--' + tone + '" href="/art-request/' + encodeURIComponent(it.id) + '" target="_blank" rel="noopener"' +
                     ' title="Open art request #' + escapeHtml(it.id) + '">' +
                     '<span class="aa-company">' + escapeHtml(it.company) + '</span>' +

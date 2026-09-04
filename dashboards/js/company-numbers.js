@@ -27,24 +27,26 @@ import {
 } from '../../shared_components/js/staff-dashboard/controllers/orders-inbox-controller.js';
 import { initMetrics, refreshMetrics }                     from '../../shared_components/js/staff-dashboard/controllers/metrics-controller.js';
 import { initTeamPerformance, refreshTeamPerformance }     from '../../shared_components/js/staff-dashboard/controllers/team-performance-controller.js';
-import { initProduction }                                  from '../../shared_components/js/staff-dashboard/controllers/production-controller.js';
+import { initProduction, refreshProduction }               from '../../shared_components/js/staff-dashboard/controllers/production-controller.js';
 import { initEmbroideryBonus, loadEmbroideryBonus }        from '../../shared_components/js/staff-dashboard/controllers/embroidery-bonus-controller.js';
 
 export const REFRESH_INTERVAL_MS = 5 * 60 * 1000;
 
 // The live cards. `key` matches the [data-stamp] span in the card header.
-// Refreshers are cache-honouring: the client caches (4–5 min TTL, under the
-// interval) and the proxy's own caches govern Caspio quota, not this file.
+// refresh(force): the timer passes false (cache-honouring — the client caches'
+// 4–5 min TTL sits under the interval and the proxy's own caches govern Caspio
+// quota); the header "Refresh now" passes true and bypasses them.
 const CARDS = [
-    { key: 'inbox',    init: initOrdersInbox,      refresh: refreshOrdersInbox },
-    { key: 'payments', init: initMoneyCollected,   refresh: refreshMoneyCollected },
-    { key: 'samples',  init: initSamplePipeline,   refresh: refreshSamplePipeline },
-    { key: 'revenue',  init: initMetrics,          refresh: refreshMetrics },
-    { key: 'team',     init: initTeamPerformance,  refresh: refreshTeamPerformance },
-    { key: 'bonus',    init: initEmbroideryBonus,  refresh: () => loadEmbroideryBonus(false) },
+    { key: 'inbox',      init: initOrdersInbox,      refresh: (f) => refreshOrdersInbox(f) },
+    { key: 'payments',   init: initMoneyCollected,   refresh: () => refreshMoneyCollected() },
+    { key: 'samples',    init: initSamplePipeline,   refresh: () => refreshSamplePipeline() },
+    { key: 'revenue',    init: initMetrics,          refresh: (f) => refreshMetrics(f) },
+    { key: 'team',       init: initTeamPerformance,  refresh: (f) => refreshTeamPerformance(f) },
+    { key: 'production', init: initProduction,       refresh: (f) => refreshProduction(f) },
+    { key: 'bonus',      init: initEmbroideryBonus,  refresh: (f) => loadEmbroideryBonus(!!f) },
     // Art aging is a classic script that schedules its own first load and
     // announces the result (art-aging:loaded); the tick calls it directly.
-    { key: 'art',      init: null,                 refresh: () => (window.ArtAgingWidget ? window.ArtAgingWidget.load() : Promise.resolve(false)) },
+    { key: 'art',        init: null,                 refresh: () => (window.ArtAgingWidget ? window.ArtAgingWidget.load() : Promise.resolve(false)) },
 ];
 
 let lastTickAt = 0;
@@ -85,20 +87,24 @@ async function run(card, fn) {
     }
 }
 
-async function tick(reason) {
+async function tick(reason, force = false) {
     if (ticking) return;
     ticking = true;
+    const btn = document.getElementById('cn-refresh-all');
+    if (btn) { btn.disabled = true; btn.classList.add('is-busy'); }
     setHeader('refreshing…');
     const started = Date.now();
-    await Promise.allSettled(CARDS.map((c) => run(c, c.refresh)));
+    await Promise.allSettled(CARDS.map((c) => run(c, () => c.refresh(force))));
     lastTickAt = started;
     ticking = false;
+    if (btn) { btn.disabled = false; btn.classList.remove('is-busy'); }
     setHeader(`updated ${clock(started)} · refreshes every 5 min while this tab is open`);
     if (reason) console.debug('[company-numbers] tick:', reason);
 }
 
 function bootstrap() {
-    initProduction();        // static stats — renders once, no network, no stamp
+    // ONE refresh control for the page (replaced four per-card buttons, 2026-09-04).
+    document.getElementById('cn-refresh-all')?.addEventListener('click', () => tick('manual', true));
 
     // Art aging stamps itself through this event (first load + manual Retry). Its
     // classic script usually finishes the first load before this module (still

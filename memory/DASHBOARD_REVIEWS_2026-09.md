@@ -76,6 +76,21 @@ Releases `v2026.09.04.1 → .9`. Detail here; MEMORY.md carries one line each.
   (ENTRY_BUNDLES, relative imports). Phone header stacks; uppercase titles `nowrap`.
 - Lock: `tests/unit/company-numbers-page.test.js` (vm-sandbox loads the ESM utils).
 
+### Second pass (`v2026.09.04.11`, 7 items)
+
+- **Production Turnaround RETIRED → "Production Due" (live)**: reads the Past Due report's
+  forwarder `/api/crm-proxy/ae-dashboard/due-dates-all?days=30` (ORDER_ODBC + PurchaseOrders);
+  tiles past due / at risk / past due with no PO / due this week on track, 6 most urgent rows,
+  link to the full report. `production-schedule-stats.js` + `-predictor.js` DELETED (completions
+  through Nov 2025; production logging stopped 2026-05-20 — they could never go live).
+- Team rows are links (`REP_PAGES`: Nika → nika-crm, Taneisha → taneisha-crm, House →
+  house-accounts; Ruthie has no page → plain card). Revenue card gets the archive YTD chip
+  (`#revenueYtd`, filled by team-performance-controller) so Revenue/Team/goal chip share ONE
+  number. Art widget: `STALE_DAYS = 30` bucket ("close or revive") leads the list.
+  ONE header "Refresh now" (`#cn-refresh-all` → `tick('manual', true)`, bypasses caches); the
+  four per-card buttons are gone. `@media print` light single-column sheet. 1600px content,
+  three-up metrics row (revenue | team | art) from 1500px.
+
 ## Verification gotchas learned today
 
 - Browser pane (`mcp__Claude_Browser`): screenshots of a SCROLLED page come back blank on

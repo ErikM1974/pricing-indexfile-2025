@@ -127,3 +127,108 @@
     .cn-shell .zone-header { flex-wrap: wrap; row-gap: 4px; }
     .cn-shell .rep-card { grid-template-columns: minmax(0, 1.4fr) 1fr auto; }
 }
+
+/* ── Header "Refresh now" (the one refresh control, 2026-09-04) ───────── */
+.cn-shell .header-right { display: flex; align-items: center; gap: 12px; }
+.cn-refresh {
+    display: inline-flex; align-items: center; gap: 7px;
+    height: 30px; padding: 0 12px; border-radius: var(--radius-pill);
+    border: 1px solid var(--line-soft); background: var(--bg-card);
+    color: var(--text-2); font-size: 12.5px; cursor: pointer; white-space: nowrap;
+}
+.cn-refresh:hover { background: var(--bg-card-2); color: var(--text); }
+.cn-refresh:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+.cn-refresh:disabled { opacity: .6; cursor: progress; }
+.cn-refresh.is-busy i { animation: cn-spin 1s linear infinite; }
+@keyframes cn-spin { to { transform: rotate(360deg); } }
+
+/* ── Revenue card: YTD chip shared with the Team card + goal chip ─────── */
+.metrics-ytd {
+    display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+    margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line-soft);
+}
+.metrics-ytd-label { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); }
+.metrics-ytd-value { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: #fff; }
+.metrics-ytd-note  { font-size: 11px; color: var(--text-dim); }
+
+/* ── Team card rows that open the rep's account page ─────────────────── */
+a.rep-card { text-decoration: none; color: inherit; cursor: pointer; }
+a.rep-card:focus-visible { outline: none; box-shadow: var(--focus-ring); }
+
+/* ── Production Due (live, replaced the static predictor) ─────────────── */
+.cn-sub { font-size: 12px; color: var(--text-3); }
+.cn-due-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 6px 0 12px; }
+.cn-due-tile {
+    padding: 10px 12px; border-radius: 10px;
+    background: rgba(127, 127, 127, .08); border: 1px solid var(--line-soft);
+}
+.cn-due-num { font-size: 1.6rem; font-weight: 700; line-height: 1.1; }
+.cn-due-label { font-size: .72rem; color: var(--text-3); margin-top: 2px; }
+.cn-due-tile--late { border-color: rgba(239, 68, 68, .35); }   .cn-due-tile--late .cn-due-num { color: #ef4444; }
+.cn-due-tile--risk { border-color: rgba(245, 158, 11, .35); }  .cn-due-tile--risk .cn-due-num { color: #f59e0b; }
+.cn-due-tile--nopo { border-color: rgba(239, 68, 68, .35); }   .cn-due-tile--nopo .cn-due-num { color: #f87171; }
+.cn-due-tile--ok   { border-color: color-mix(in oklch, var(--accent) 35%, transparent); } .cn-due-tile--ok .cn-due-num { color: var(--accent); }
+.cn-due-list { display: flex; flex-direction: column; gap: 6px; }
+.cn-due-row {
+    display: grid; grid-template-columns: 84px minmax(0, 1fr) auto auto 80px; gap: 10px; align-items: center;
+    padding: 7px 10px; border-radius: 8px; background: rgba(127, 127, 127, .08);
+    border-left: 3px solid var(--text-dim); font-size: .85rem;
+}
+.cn-due-row--late { border-left-color: #ef4444; }
+.cn-due-row--risk { border-left-color: #f59e0b; }
+.cn-due-wo { font-size: .78rem; color: var(--text-3); white-space: nowrap; }
+.cn-due-main { display: flex; flex-direction: column; min-width: 0; }
+.cn-due-company { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cn-due-sub { font-size: .72rem; color: var(--text-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cn-due-blanks { font-size: .72rem; color: var(--text-3); white-space: nowrap; }
+.cn-due-blanks--nopo { color: #f87171; font-weight: 600; }
+.cn-due-when { font-size: .78rem; font-weight: 700; white-space: nowrap; }
+.cn-due-row--late .cn-due-when { color: #ef4444; }
+.cn-due-row--risk .cn-due-when { color: #f59e0b; }
+.cn-due-value { text-align: right; font-size: .8rem; color: var(--text-2); white-space: nowrap; }
+.cn-due-more { font-size: 12px; color: var(--text-3); margin-top: 6px; }
+.cn-due-more a, .production-footer a { color: inherit; }
+@media (max-width: 900px) {
+    .cn-due-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .cn-due-row { grid-template-columns: 74px minmax(0, 1fr) auto; }
+    .cn-due-blanks, .cn-due-value { display: none; }
+}
+
+/* ── Art Requests: zombies (> 30 days) ───────────────────────────────── */
+.aa-chip--stale { background: rgba(239, 68, 68, .16); border-color: rgba(239, 68, 68, .5); }
+.aa-chip--stale .aa-chip-num { color: #fca5a5; }
+.aa-row--stale { border-left-color: #b91c1c; background: rgba(239, 68, 68, .08); }
+.aa-row--stale .aa-days { color: #fca5a5; }
+
+/* ── Wide screens: use the monitor (1360 → 1600, three-up metrics) ─────── */
+.cn-shell > .main-content { max-width: 1600px; }
+@media (min-width: 1500px) {
+    .cn-shell .zone-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+    .cn-shell #artAgingCard { grid-column: auto !important; }   /* revenue | team | art on one row */
+}
+
+/* ── Print: a light, single-column sheet for the Monday meeting ──────── */
+@media print {
+    :root { color-scheme: light; }
+    body, .dashboard-container, .main-content { background: #fff !important; color: #111 !important; }
+    .cn-shell > .main-content { max-width: none; padding: 0; }
+    .cn-back, .cn-refresh, .date-range-toggle, .zone-refresh, .refresh-btn, .pipeline-actions,
+    .cn-due-more, .aa-more, .production-footer a { display: none !important; }
+    .cn-meta { display: inline !important; color: #555 !important; }
+    .zone-metrics, .zone-money-row, .inbox-columns { display: block !important; }
+    .zone-metrics > *, .zone-money-row > *, .inbox-col { margin-bottom: 14px; break-inside: avoid; }
+    .zone-orders-inbox, .zone-payments, .zone-sample-pipeline, .metrics-card,
+    .production-widget-card, .embroidery-bonus-card, .rep-card, .inbox-row, .pipeline-row,
+    .aa-row, .cn-due-row, .aa-chip, .cn-due-tile, .pay-total {
+        background: #fff !important; color: #111 !important;
+        border: 1px solid #cfd4da !important; box-shadow: none !important;
+    }
+    .zone-title, .metrics-revenue-title, .metrics-team-title, .production-title, .inbox-col-title,
+    .rep-name, .rep-revenue, .metrics-revenue-value, .pay-total-value, .inbox-row-title,
+    .aa-company, .cn-due-company, .metrics-ytd-value, .eb-team-value { color: #111 !important; }
+    .zone-subtitle, .metrics-date-range, .cn-stamp, .cn-sub, .inbox-row-sub, .aa-status,
+    .cn-due-sub, .cn-due-blanks, .rep-orders, .metrics-ytd-note { color: #555 !important; }
+    .rep-progress { background: #e5e7eb !important; }
+    .rep-progress-bar, .eb-ladder-fill { background: #0a8a1f !important; }
+    a { text-decoration: none; }
+}
