@@ -20,6 +20,10 @@ the source of truth): money/quoting = NW green `--accent`; CRM = navy `#1a2332` 
 oxblood `#7f1d1d`; Design Vault = forest `#2e5827`; storefront = cream + `#2f7d3b`; Shop
 Menu = wine `#7a1f2b` on paper; reference/training = neutral `--f-ref`.
 
+Customer-facing order pages (the employee-bundle pages: Drain-Pro, Streich, WCTTR,
+Christmas boxes) carry the **storefront** family (`f-store`), not the client's own brand
+colour — the four per-client families were retired 2026-09-04.
+
 ⚠️ Two greens and two blues coexist on purpose. Steve `#0a8a1f` ≠ NW brand green
 `--accent`/`#22c55e` ≠ photo deep green. Bradley slate `#4a6fa5` ≠ shop-floor `#2563eb`.
 Never "tidy" them into one — each pairing was chosen so the tile matches its page.

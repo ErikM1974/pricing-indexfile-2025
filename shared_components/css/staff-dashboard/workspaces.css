@@ -66,10 +66,9 @@
 .f-ref    { --fam: var(--f-ref);    --fam-fg: var(--f-ref-fg); }
 .f-store  { --fam: var(--f-store);  --fam-fg: var(--f-store-fg); }
 .f-menu   { --fam: var(--f-menu);   --fam-fg: var(--f-menu-fg); }
-.f-client-red  { --fam: #dc2626; --fam-fg: #ffffff; }
-.f-client-navy { --fam: #2C2997; --fam-fg: #ffffff; }
-.f-client-char { --fam: #1f2937; --fam-fg: #fca5a5; }
-.f-mint        { --fam: #e8f5e9; --fam-fg: #1b5e20; }
+/* (The per-client bundle colours — Drain-Pro red, Streich navy, WCTTR charcoal,
+   Christmas mint — were retired 2026-09-04: colour means a person or department
+   here, and those pages are customer-facing order pages, so they carry f-store.) */
 
 /* ── Shell: one column, no sidebar ─────────────────────────────────── */
 .dashboard-container.ws-shell { grid-template-columns: 1fr; }
@@ -148,11 +147,6 @@
     font-family: var(--font-mono); font-size: 11px; padding: 1px 5px;
     border: 1px solid var(--line); border-radius: 4px; color: var(--text-3);
 }
-
-/* ── Legend ────────────────────────────────────────────────────────── */
-.ws-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 11.5px; color: var(--text-3); margin: -2px 0 18px; }
-.ws-legend span { display: inline-flex; align-items: center; gap: 6px; }
-.ws-legend i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; background: var(--fam-mark, var(--fam)); }
 
 /* ── Panels + cards ────────────────────────────────────────────────── */
 /* Panels are off until workspace-controller marks the active one `is-on`, so
@@ -334,14 +328,25 @@ details.ws-more > summary .ws-n { margin-left: auto; font-family: var(--font-mon
 .ws-filter__count { font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); }
 .ws-every { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 24px; }
 .ws-every__grp[hidden] { display: none; }
+/* Everything rows carry the tool's description under its name (2026-09-04) — it
+   is the safety net, so it has to say what each thing IS, not just its name. */
+.ws-every .ws-row { flex-wrap: wrap; min-height: 0; padding: 5px 8px; }
+.ws-every .ws-row .ws-d {
+    flex-basis: 100%; margin: 1px 0 0 19px; text-align: left; white-space: normal; line-height: 1.35;
+}
 
 /* ── Responsive ────────────────────────────────────────────────────── */
 @media (max-width: 1100px) {
     .ws-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .ws-card--wide { grid-column: span 2; }
     .ws-every { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .ws-d { display: none; }
-    .ws-tile__tx .ws-d { display: block; }
+    /* Row descriptions WRAP under the name instead of disappearing (2026-09-04).
+       They used to be display:none from 1100px down, which left every row on a
+       1024-1100px laptop as a bare name. */
+    .ws-row { flex-wrap: wrap; min-height: 0; padding: 6px 8px; }
+    .ws-row .ws-d {
+        flex-basis: 100%; margin: 1px 0 0 19px; text-align: left; white-space: normal; line-height: 1.35;
+    }
 }
 @media (max-width: 768px) {
     .ws-grid, .ws-every { grid-template-columns: 1fr; }
@@ -353,7 +358,28 @@ details.ws-more > summary .ws-n { margin-left: auto; font-family: var(--font-mon
     .ws-flow { grid-template-columns: 1fr; }
     .ws-pair { grid-template-columns: 1fr; }
     .ws-flow__arr { display: none; }
-    .ws-legend { display: none; }
+
+    /* Phone header (2026-09-04): the logo already says where you are, so the
+       "Staff Dashboard" title goes, the chips tighten, and the goal amount hides —
+       header drops from ~115px to one row. patch-2 sets these with !important, so
+       the overrides need it too (same weight → later source wins). */
+    .page-title { display: none; }
+    .top-header { padding: 8px 0 10px !important; margin-bottom: 8px !important; gap: 6px !important; }
+    .header-right { gap: 6px; flex-wrap: wrap; }
+    .goal-chip__amt { display: none; }
+    .header-right .goal-chip__track { width: 56px; }
+    /* Team keeps its name; the birthday / anniversary pills live in its dropdown anyway. */
+    .team-btn__pill, .team-btn__divider { display: none; }
+    .ws-head p { display: none; }
+
+    /* The tab strip scrolls sideways on a phone: tighter tabs, plus a fade at the
+       right edge so the off-screen tabs (Company, Everything) announce themselves. */
+    .ws-tab { height: 34px; padding: 0 12px; font-size: 13.5px; }
+    .ws-tabs::after {
+        content: ""; position: sticky; right: 0; flex: none; align-self: stretch;
+        width: 34px; margin-left: -34px; pointer-events: none;
+        background: linear-gradient(90deg, transparent, var(--bg-elev) 80%);
+    }
 }
 @media (prefers-reduced-motion: reduce) {
     details.ws-more > summary i.fa-chevron-right { transition: none; }
@@ -362,6 +388,3 @@ details.ws-more > summary .ws-n { margin-left: auto; font-family: var(--font-mon
 
 /* The Staff Directory row is a <button> (opens the modal) — same look as the links. */
 button.ws-row { background: none; border: 0; font: inherit; text-align: left; width: 100%; cursor: pointer; }
-
-/* The customer family is navy with a gold mark; the legend swatch shows the gold. */
-.ws-legend .ws-legend__crm i { background: var(--f-crm-fg); }

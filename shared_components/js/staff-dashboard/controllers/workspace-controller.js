@@ -36,6 +36,10 @@ const ROLE_DEFAULT = Object.freeze({
     production: 'production',
     shipping: 'production',
     accountant: 'office',
+    // 2026-09-04: the plain `staff` role (Jim) landed on Everything every visit while
+    // the Office tab called itself "Bradley's and Jim's tab". Office is the closest
+    // home for a generic staffer; Everything stays the fallback for NO role.
+    staff: 'office',
 });
 const FALLBACK_WS = 'everything';
 const HASH_RE = /(?:^|[#&])ws=([a-z-]+)/;
@@ -85,7 +89,7 @@ export function defaultWorkspaceFor(permissions) {
     // Admin FIRST: permissionsFromRole fans an admin out to accountant/house/
     // taneisha/nika too, and Erik lands on Sales (decided 2026-09-03), not on
     // whichever fanned-out role happens to be checked earlier.
-    for (const role of ['admin', 'sales', 'art', 'production', 'shipping', 'accountant']) {
+    for (const role of ['admin', 'sales', 'art', 'production', 'shipping', 'accountant', 'staff']) {
         if (perms.includes(role)) return ROLE_DEFAULT[role];
     }
     return FALLBACK_WS;
@@ -172,8 +176,13 @@ export function buildEverything({ force = false } = {}) {
         const cat = a.dataset.cat || a.closest('.ws-card')?.dataset.cat
             || a.closest('.ws-panel')?.querySelector('.ws-head h2')?.textContent?.trim()
             || 'Tools';
+        // 2026-09-04: carry the description (shown under the name) and the
+        // data-keywords (filter-only) so the safety net says what each tool IS.
+        const descEl = a.querySelector('.ws-d');
+        const desc = descEl ? (descEl.textContent || '').replace(/\s+/g, ' ').trim() : '';
+        const keywords = a.dataset.keywords || '';
         if (!groups.has(cat)) groups.set(cat, []);
-        groups.get(cat).push({ label, href, fam: familyClass(a) });
+        groups.get(cat).push({ label, href, fam: familyClass(a), desc, keywords });
     });
 
     let total = 0;
@@ -181,8 +190,10 @@ export function buildEverything({ force = false } = {}) {
         tools.sort((x, y) => x.label.localeCompare(y.label));
         total += tools.length;
         const rows = tools.map((t) =>
-            `<a class="ws-link ws-row ${escapeHtml(t.fam)}" href="${escapeHtml(t.href)}" data-q="${escapeHtml(t.label.toLowerCase())}">` +
-            `<i class="ws-mk" aria-hidden="true"></i><span class="ws-nm">${escapeHtml(t.label)}</span></a>`
+            `<a class="ws-link ws-row ${escapeHtml(t.fam)}" href="${escapeHtml(t.href)}" data-q="${escapeHtml((t.label + ' ' + t.desc + ' ' + t.keywords).toLowerCase())}">` +
+            `<i class="ws-mk" aria-hidden="true"></i><span class="ws-nm">${escapeHtml(t.label)}</span>` +
+            (t.desc ? `<span class="ws-d">${escapeHtml(t.desc)}</span>` : '') +
+            `</a>`
         ).join('');
         return `<div class="ws-every__grp"><div class="ws-sub">${escapeHtml(cat)} · ${tools.length}</div><div class="ws-tools">${rows}</div></div>`;
     }).join('');

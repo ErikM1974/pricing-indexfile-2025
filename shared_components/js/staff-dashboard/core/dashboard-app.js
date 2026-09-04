@@ -16,7 +16,6 @@
 
 import './dashboard-events.js';   // installs document click delegator
 
-import { initTweaks }          from '../widgets/tweaks-fab.js';
 import { initAuth }            from '../controllers/auth-controller.js';
 // Collapse memory for any details[data-collapse-key] (Pride Wall, the "More" folds).
 import { initToolGrid }        from '../controllers/tool-grid-controller.js';
@@ -38,9 +37,9 @@ import { initCommandPalette }  from '../controllers/command-palette-controller.j
 import '../widgets/dashboard-modal.js';
 
 async function bootstrap() {
-    // Tweaks first — applies data-theme/data-accent/data-density to <html>
-    // before any layout paints, avoiding theme flicker.
-    initTweaks();
+    // (The Tweaks floating button — density + a "default revenue period" for
+    // reports that no longer live on this page — was retired 2026-09-04. The
+    // theme is fixed in the <html> attributes: dark, green, comfy.)
 
     // Auth runs in parallel with the rest — most controllers don't depend on it.
     const authPromise = initAuth();

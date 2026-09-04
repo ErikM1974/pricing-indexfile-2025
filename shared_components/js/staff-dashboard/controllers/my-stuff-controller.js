@@ -161,7 +161,8 @@ export function initMyStuff() {
     // Delegated capture of tool usage — one listener, survives re-renders.
     // Capture phase so we record even though navigation follows immediately.
     document.addEventListener('click', (e) => {
-        const a = e.target.closest('a.ws-link, a.tool-btn, a.nav-link, a.nav-section-header-link');
+        // a.tool-btn = the Ctrl+K palette's own result rows; the sidebar selectors left with the sidebar.
+        const a = e.target.closest('a.ws-link, a.tool-btn');
         if (!a || a.closest('#myStuffList')) return; // don't self-record
         const tool = toolFromLink(a);
         if (tool) recordVisit(tool);
