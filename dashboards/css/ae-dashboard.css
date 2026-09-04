@@ -1,0 +1,302 @@
+/* ae-dashboard.css — AE Dashboard page shell (dashboards/ae-dashboard.html)
+ * Page-specific styles only. Tokens come from art-hub.css, the two-tier nav
+ * from ae-nav-v2.css, the four intake forms from *-submit-form.css, the
+ * mockup galleries from mockup-ruth.css / kanban.css. Prefix: ae- (page).
+ *
+ * Load order matters: this sheet is linked LAST so its :root theme wins over
+ * anything an earlier sheet declares. */
+
+/* AE dashboard theme — maroon. Was an inline <style> in the page head
+   (Rule 3: no inline code); moved here 2026-09-03. */
+:root {
+    --art-theme:             #981e32;
+    --art-theme-dark:        #7a1828;
+    --art-theme-light:       #b92c43;
+    --art-theme-bg:          #fdf2f4;
+    --art-theme-bg-hover:    #fbe4e8;
+    --art-theme-bg-selected: #f8d7dd;
+    --art-theme-rgba-15:     rgba(152, 30, 50, .15);
+    --art-theme-rgba-10:     rgba(152, 30, 50, .10);
+    --art-theme-hover:       #981e32;
+    --ae-ruth:               #6b46c1;
+}
+
+/* ---------- [hidden] guard — REQUIRED, do not remove ----------
+ * The item-type form containers, the JDS search/category panes and the nav
+ * badges all toggle with the hidden attribute. An author display rule beats
+ * the UA sheet's [hidden]{display:none}, so any element with its own display
+ * value would silently never hide (LESSONS_LEARNED 2026-07-19, recurrence #5). */
+[hidden] { display: none !important; }
+
+/* ---------- Page canvas: a maroon band the cards float over ---------- */
+body {
+    background:
+        radial-gradient(900px 260px at 12% -40px, rgba(255, 255, 255, .14), transparent 60%) top left / 100% 250px no-repeat,
+        linear-gradient(180deg, #6e1424 0%, #981e32 100%) top center / 100% 250px no-repeat,
+        var(--surface-page, #f7f8fa);
+}
+
+.minimal-header {
+    background: transparent;
+    box-shadow: none;
+    padding: 14px 28px;
+    border-bottom: 1px solid rgba(255, 255, 255, .12);
+}
+.minimal-header .logo { height: 38px; }
+.bt-breadcrumb-current { background: rgba(255, 255, 255, .18); }
+
+/* Intro line on the band, above the nav card */
+.ae-page-intro {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    padding: 22px 4px 18px;
+    color: #fff;
+}
+.ae-page-kicker {
+    margin: 0 0 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, .7);
+}
+.ae-page-title {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: -.025em;
+    line-height: 1.15;
+}
+.ae-page-sub {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: rgba(255, 255, 255, .78);
+    max-width: 560px;
+}
+
+/* ---------- Layout ---------- */
+.tab-container {
+    max-width: 1240px;
+    margin: 0 auto 48px;
+    padding: 0 24px;
+}
+.tab-content {
+    background: #fff;
+    border: 1px solid var(--gray-200, #e5e7eb);
+    border-radius: 18px;
+    box-shadow: var(--shadow-md, 0 2px 4px rgba(15,23,42,.04), 0 4px 12px rgba(15,23,42,.06));
+    padding: 28px 32px 36px;
+}
+
+.tab-title {
+    position: relative;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -.02em;
+    color: var(--gray-900, #111827);
+    margin: 0 0 24px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--gray-200, #e5e7eb);
+}
+.tab-title::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    width: 56px;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--art-theme);
+}
+/* Ruth's tabs carry her purple accent */
+#mockup-ruth-tab .tab-title::after,
+#digitizing-tab .tab-title::after,
+#digitizing-tab .ae-tab-head::after { background: var(--ae-ruth); }
+
+/* Title row with a control on the right (Steve Mockups / Ruth Mockups) */
+.ae-tab-head {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 22px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--gray-200, #e5e7eb);
+}
+.ae-tab-head::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -1px;
+    width: 56px;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--art-theme);
+}
+.ae-tab-head .tab-title { margin: 0; padding: 0; border: 0; }
+.ae-tab-head .tab-title::after { display: none; }
+
+/* Grid / Board toggle → segmented control */
+.view-toggle {
+    border: none;
+    background: var(--gray-100, #f3f4f6);
+    padding: 4px;
+    border-radius: 12px;
+    gap: 2px;
+    margin-left: 0;
+}
+.view-toggle-btn {
+    border-radius: 9px;
+    background: transparent;
+    color: var(--gray-600, #4b5563);
+    padding: 7px 14px;
+}
+.view-toggle-btn:not(:last-child) { border-right: 0; }
+.view-toggle-btn:hover { background: rgba(255, 255, 255, .7); }
+.view-toggle-btn.active {
+    background: #fff;
+    color: var(--art-theme);
+    box-shadow: var(--shadow-sm, 0 1px 2px rgba(15,23,42,.04), 0 1px 1px rgba(15,23,42,.03));
+}
+#ruth-ae-view-toggle .view-toggle-btn.active { color: var(--ae-ruth); }
+
+/* ---------- Review Mockups tab ---------- */
+.ae-review-sub {
+    margin: -14px 0 20px;
+    font-size: 14px;
+    color: var(--gray-500, #6b7280);
+}
+.ae-review-loading {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--gray-500, #6b7280);
+}
+.ae-review-spinner {
+    width: 34px;
+    height: 34px;
+    margin: 0 auto 12px;
+    border: 3px solid var(--gray-200, #e5e7eb);
+    border-top-color: var(--art-theme);
+    border-radius: 50%;
+    animation: ae-spin .8s linear infinite;
+}
+@keyframes ae-spin { to { transform: rotate(360deg); } }
+.ae-review-empty {
+    text-align: center;
+    padding: 64px 20px;
+    color: var(--gray-500, #6b7280);
+}
+.ae-review-empty svg { margin-bottom: 12px; }
+.ae-review-empty-title {
+    margin: 0 0 4px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--gray-700, #374151);
+}
+.ae-review-empty-sub { margin: 0; font-size: 13px; }
+
+/* ---------- Launcher panes (Transfers / Personalization) ----------
+ * Rendered by ae-dashboard.js from the SECTIONS registry — one card per tool. */
+.ae-launcher-intro {
+    margin: -10px 0 20px;
+    font-size: 14.5px;
+    line-height: 1.55;
+    color: var(--gray-600, #4b5563);
+    max-width: 720px;
+}
+.ae-launcher {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+}
+.ae-launch-card {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 22px;
+    background: #fff;
+    border: 1px solid var(--gray-200, #e5e7eb);
+    border-radius: 16px;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: var(--shadow-sm, 0 1px 2px rgba(15,23,42,.04), 0 1px 1px rgba(15,23,42,.03));
+    transition: transform .2s var(--ease-out, cubic-bezier(.2,.8,.2,1)), box-shadow .2s ease, border-color .2s ease;
+}
+.ae-launch-card::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--art-theme-dark), var(--art-theme-light));
+    opacity: 0;
+    transition: opacity .2s ease;
+}
+.ae-launch-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--art-theme-light);
+    box-shadow: var(--shadow-lg, 0 8px 24px -8px rgba(15,23,42,.18), 0 4px 10px -4px rgba(15,23,42,.08));
+}
+.ae-launch-card:hover::before { opacity: 1; }
+.ae-launch-card:focus-visible { outline: none; box-shadow: 0 0 0 4px var(--art-theme-rgba-15); }
+.ae-launch-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    line-height: 1;
+    background: var(--art-theme-bg);
+    border: 1px solid var(--art-theme-bg-selected);
+}
+.ae-launch-title {
+    margin: 0 0 4px;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -.01em;
+    color: var(--gray-900, #111827);
+}
+.ae-launch-desc {
+    margin: 0;
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--gray-600, #4b5563);
+}
+.ae-launch-cta {
+    margin-top: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--art-theme);
+}
+.ae-launch-cta::after {
+    content: '→';
+    transition: transform .2s ease;
+}
+.ae-launch-card:hover .ae-launch-cta::after { transform: translateX(3px); }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 760px) {
+    body {
+        background:
+            linear-gradient(180deg, #6e1424 0%, #981e32 100%) top center / 100% 230px no-repeat,
+            var(--surface-page, #f7f8fa);
+    }
+    .minimal-header { padding: 12px 16px; }
+    .tab-container { padding: 0 12px; }
+    .tab-content { padding: 20px 16px 28px; border-radius: 14px; }
+    .ae-page-intro { padding: 16px 4px 14px; }
+    .ae-page-title { font-size: 22px; }
+    .tab-title { font-size: 20px; }
+}

@@ -82,17 +82,37 @@
         transfers: {
             label: 'Transfers', sub: 'Supacolor',
             pages: [
-                { id: 'supacolor-link', label: 'Supacolor API Orders', href: '/dashboards/supacolor-orders.html' }
+                { id: 'supacolor-link', label: 'Supacolor API Orders', href: '/dashboards/supacolor-orders.html',
+                  icon: '\u{1F3A8}', desc: 'Every Supacolor transfer job placed through the API — status, shipments and the artwork that went out.' }
             ]
         },
         personalization: {
             label: 'Personalization', sub: 'Names · Numbers · Monogram',
             pages: [
-                { id: 'names-link',    label: 'Names & Numbers',     href: '/dashboards/names-numbers-dashboard.html' },
-                { id: 'monogram-link', label: 'Monogram Dashboard',  href: '/dashboards/monogram-dashboard.html' }
+                { id: 'names-link',    label: 'Names & Numbers',     href: '/dashboards/names-numbers-dashboard.html',
+                  icon: '\u{1F520}', desc: 'Roster-style orders: player names, numbers and sizes, ready for production.' },
+                { id: 'monogram-link', label: 'Monogram Dashboard',  href: '/dashboards/monogram-dashboard.html',
+                  icon: '\u{1F58B}️', desc: 'Monogram requests with thread colour, font and placement, plus the stitch proof.' }
             ]
         }
     };
+
+    // Launcher panes (Transfers / Personalization): one card per external page,
+    // rendered from SECTIONS so the sub-tab links and the cards can never drift.
+    function renderLaunchers() {
+        document.querySelectorAll('.ae-launcher[data-launcher]').forEach(function (host) {
+            var sec = SECTIONS[host.dataset.launcher];
+            if (!sec) return;
+            host.innerHTML = sec.pages.filter(function (p) { return p.href; }).map(function (p) {
+                return '<a class="ae-launch-card" href="' + escapeHtmlSafe(p.href) + '">' +
+                    '<span class="ae-launch-icon" aria-hidden="true">' + (p.icon || '↗') + '</span>' +
+                    '<div><h3 class="ae-launch-title">' + escapeHtmlSafe(p.label) + '</h3>' +
+                    '<p class="ae-launch-desc">' + escapeHtmlSafe(p.desc || '') + '</p></div>' +
+                    '<span class="ae-launch-cta">Open ' + escapeHtmlSafe(p.label) + '</span>' +
+                '</a>';
+            }).join('');
+        });
+    }
 
     var IN_PAGE_TAB_TO_SECTION = {
         'submit': 'steve',
@@ -139,6 +159,9 @@
     function setActiveSection(sectionId, opts) {
         if (!SECTIONS[sectionId]) return;
         aeNavState.section = sectionId;
+        // Tier-2 accent follows the department (ae-nav-v2.css: Ruth = purple)
+        var nav = document.querySelector('.ae-nav');
+        if (nav) nav.setAttribute('data-section', sectionId);
         document.querySelectorAll('.ae-nav__section').forEach(function (btn) {
             var match = btn.dataset.section === sectionId;
             btn.classList.toggle('is-active', match);
@@ -197,13 +220,16 @@
                 if (!SECTIONS[sectionId]) return;
                 var firstPage = SECTIONS[sectionId].pages[0];
                 if (firstPage.href) {
-                    // External-link section (Transfers / Personalization with single page)
+                    // External-link section (Transfers / Personalization). Don't
+                    // navigate yet — show the section's launcher pane (one card per
+                    // tool) and let the user pick a sub-tab or a card.
                     setActiveSection(sectionId, { activePageId: null });
-                    // Don't navigate yet — let user click the sub-tab. Just clear pane state.
                     document.querySelectorAll('.tab-pane').forEach(function (pane) { pane.classList.remove('active'); });
                     document.querySelectorAll('.dropdown-item').forEach(function (item) { item.classList.remove('active'); });
                     var moreBtn = document.getElementById('moreButton');
                     if (moreBtn) moreBtn.classList.remove('active');
+                    var launcherPane = document.getElementById(sectionId + '-tab');
+                    if (launcherPane) launcherPane.classList.add('active');
                 } else {
                     showTab(firstPage.id);
                 }
@@ -231,6 +257,7 @@
     // Restore saved tab on load
     document.addEventListener('DOMContentLoaded', function () {
         initAeNav();
+        renderLaunchers();
 
         // A shared/bookmarked #hash link wins over the local last-tab memory so
         // teammates land on the tab the sender intended, not their own last tab.

@@ -1,173 +1,232 @@
 /**
  * ae-nav-v2.css — AE Dashboard two-tier navigation
  *
- * Tier 1: Section tabs (Steve / Ruth / Transfers / Personalization)
- * Tier 2: Sub-tabs for the active section (renders in-page tabs or links)
+ * Tier 1: department tabs (Steve / Ruth / Transfers / Personalization) plus the
+ *         external tool links (JDS Mockup / Shirt Designer / Saved Mockups),
+ *         which sit to the right behind a hairline divider.
+ * Tier 2: sub-tabs for the active section + the preserved More dropdown.
  *
- * Scoped under .ae-nav so it does not collide with legacy .tab-button rules
- * in art-hub.css (still used by art-hub-steve.html / art-hub-ruth.html).
+ * Scoped under .ae-nav so it does not collide with legacy .tab-button rules in
+ * art-hub.css (still used by art-hub-steve.html / art-hub-ruth.html).
+ *
+ * Identity: the page is maroon; Ruth's section is purple. ae-dashboard.js sets
+ * data-section on .ae-nav so the Tier-2 accent follows the active department.
  */
 
 .ae-nav {
-    --ae-maroon: #981e32;
-    --ae-maroon-deep: #7a1828;
-    --ae-maroon-soft: #f4e4e7;
-    --ae-maroon-tint: #fbf3f4;
-    --ae-ink: #1a1414;
-    --ae-ink-2: #4a4244;
-    --ae-ink-3: #756a6c;
-    --ae-line: #e6dedf;
-    --ae-line-2: #f0eaeb;
+    --ae-maroon:       #981e32;
+    --ae-maroon-deep:  #7a1828;
+    --ae-maroon-light: #b92c43;
+    --ae-maroon-tint:  #fdf2f4;
+    --ae-maroon-soft:  #fbe4e8;
+    --ae-maroon-ring:  rgba(152, 30, 50, .16);
+    --ae-purple:       #6b46c1;
+    --ae-purple-deep:  #4c3391;
+    --ae-purple-light: #8b5cf6;
+    --ae-purple-tint:  #f5f3ff;
+    --ae-purple-ring:  rgba(107, 70, 193, .16);
+    --ae-ink:   #111827;
+    --ae-ink-2: #374151;
+    --ae-ink-3: #6b7280;
+    --ae-line:   #e5e7eb;
+    --ae-line-2: #f3f4f6;
+
+    /* Accent follows the active department (maroon default, purple for Ruth) */
+    --ae-accent:      var(--ae-maroon);
+    --ae-accent-deep: var(--ae-maroon-deep);
+    --ae-accent-tint: var(--ae-maroon-tint);
+    --ae-accent-ring: var(--ae-maroon-ring);
 
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    background: white;
-    border-radius: 8px 8px 0 0;
-    overflow: hidden;
+    position: relative;
+    z-index: 20;
+    background: #fff;
+    border: 1px solid var(--ae-line);
+    border-radius: 18px;
+    box-shadow: var(--shadow-lg, 0 8px 24px -8px rgba(15,23,42,.18), 0 4px 10px -4px rgba(15,23,42,.08));
+    margin-bottom: 18px;
+}
+.ae-nav[data-section="ruth"] {
+    --ae-accent:      var(--ae-purple);
+    --ae-accent-deep: var(--ae-purple-deep);
+    --ae-accent-tint: var(--ae-purple-tint);
+    --ae-accent-ring: var(--ae-purple-ring);
 }
 
-/* ── TIER 1: Section tabs ───────────────────────────────────────────── */
+/* ── TIER 1: department tabs ─────────────────────────────────────────── */
 
 .ae-nav__sections {
     display: flex;
+    align-items: stretch;
     gap: 4px;
-    padding: 0 16px;
-    background: var(--ae-maroon-tint);
+    padding: 10px 12px;
     border-bottom: 1px solid var(--ae-line);
+    overflow-x: auto;
+    scrollbar-width: none;
 }
+.ae-nav__sections::-webkit-scrollbar { display: none; }
 
 .ae-nav__section {
     appearance: none;
-    border: none;
+    border: 1px solid transparent;
     cursor: pointer;
     background: transparent;
-    padding: 14px 20px 12px;
+    padding: 11px 16px 10px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 2px;
+    justify-content: center;
+    gap: 3px;
     position: relative;
     color: var(--ae-ink-3);
-    border-bottom: 3px solid transparent;
+    border-radius: 12px;
     font-family: inherit;
-    transition: background 120ms ease, color 120ms ease;
+    text-decoration: none;
+    flex: 0 0 auto;
     min-width: 0;
+    transition: background 150ms ease, color 150ms ease, box-shadow 150ms ease;
 }
-
 .ae-nav__section:hover {
     color: var(--ae-ink);
-    background: rgba(255, 255, 255, 0.6);
+    background: var(--ae-line-2);
 }
-
-.ae-nav__section.is-active {
-    color: var(--ae-maroon);
-    border-bottom-color: var(--ae-maroon);
-    background: white;
+.ae-nav__section:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--ae-maroon-ring);
+}
+.ae-nav__section.is-active,
+.ae-nav__section.is-active:hover {
+    color: #fff;
+    background: linear-gradient(135deg, var(--ae-maroon-deep) 0%, var(--ae-maroon) 60%, var(--ae-maroon-light) 100%);
+    box-shadow: 0 10px 20px -10px rgba(152, 30, 50, .65), inset 0 1px 0 rgba(255, 255, 255, .18);
+}
+.ae-nav__section[data-section="ruth"].is-active,
+.ae-nav__section[data-section="ruth"].is-active:hover {
+    background: linear-gradient(135deg, var(--ae-purple-deep) 0%, var(--ae-purple) 60%, var(--ae-purple-light) 100%);
+    box-shadow: 0 10px 20px -10px rgba(107, 70, 193, .65), inset 0 1px 0 rgba(255, 255, 255, .18);
 }
 
 .ae-nav__section-label {
     font-size: 15px;
     font-weight: 700;
-    letter-spacing: -0.2px;
+    letter-spacing: -.01em;
     line-height: 1.2;
 }
-
 .ae-nav__section-sub {
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.3px;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: .07em;
     text-transform: uppercase;
-    opacity: 0.85;
     line-height: 1.2;
+    opacity: .72;
 }
+.ae-nav__section.is-active .ae-nav__section-sub { opacity: .88; }
 
 .ae-nav__section-badge {
     position: absolute;
-    top: 8px;
-    right: 8px;
+    top: 6px;
+    right: 6px;
 }
 
-/* External-link variant — looks like a section button but navigates to a
-   separate page instead of toggling an in-page tab pane. Used for the JDS
-   Mockup Creator entry. Adds a subtle ↗ arrow indicator and disables the
-   active treatment (the link never becomes the "selected" section). */
-.ae-nav__section--link {
-    text-decoration: none;
-}
-.ae-nav__section--link::after {
-    content: "\2197"; /* ↗ */
+/* External-link variant — looks like a section tab but navigates to another
+   page. Never takes the "selected" treatment. The first link is pushed right
+   behind a hairline so departments (left) read apart from tools (right). */
+.ae-nav__section--link { color: var(--ae-ink-3); }
+a.ae-nav__section--link:first-of-type { margin-left: auto; }
+a.ae-nav__section--link:first-of-type::before {
+    content: '';
     position: absolute;
+    left: -4px;
     top: 10px;
-    right: 10px;
+    bottom: 10px;
+    width: 1px;
+    background: var(--ae-line);
+}
+.ae-nav__section--link .ae-nav__section-label::after {
+    content: "↗";
+    display: inline-block;
+    margin-left: 6px;
     font-size: 11px;
-    opacity: 0.45;
-    transition: opacity 120ms ease;
+    font-weight: 600;
+    opacity: .45;
+    transition: opacity 150ms ease, transform 150ms ease;
 }
-.ae-nav__section--link:hover::after {
-    opacity: 0.9;
+.ae-nav__section--link:hover .ae-nav__section-label::after {
+    opacity: .9;
+    transform: translate(1px, -1px);
 }
-.ae-nav__section--link.is-active {
+.ae-nav__section--link.is-active,
+.ae-nav__section--link.is-active:hover {
     color: var(--ae-ink-3);
-    border-bottom-color: transparent;
     background: transparent;
+    box-shadow: none;
 }
 
-/* ── TIER 2: Sub-tabs ───────────────────────────────────────────────── */
+/* ── TIER 2: sub-tabs ────────────────────────────────────────────────── */
 
 .ae-nav__sub {
     display: flex;
     align-items: center;
-    gap: 2px;
-    padding: 0 16px;
-    background: white;
-    border-bottom: 1px solid var(--ae-line);
-    height: 44px;
+    gap: 4px;
+    padding: 7px 12px;
+    min-height: 52px;
+    box-sizing: border-box;
+    background: var(--gray-50, #f9fafb);
+    border-radius: 0 0 18px 18px;
     position: relative;
 }
 
 .ae-nav__sub-tab {
     appearance: none;
-    border: none;
+    border: 1px solid transparent;
     cursor: pointer;
     background: transparent;
-    padding: 0 14px;
-    height: 44px;
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--ae-ink-2);
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ae-ink-3);
     font-family: inherit;
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
-    transition: color 120ms ease, background 120ms ease;
     text-decoration: none;
     white-space: nowrap;
+    transition: color 150ms ease, background 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
 }
-
 .ae-nav__sub-tab:hover {
     color: var(--ae-ink);
-    background: var(--ae-maroon-tint);
+    background: #fff;
+    border-color: var(--ae-line);
 }
-
+.ae-nav__sub-tab:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px var(--ae-accent-ring);
+}
 .ae-nav__sub-tab.is-active {
-    color: var(--ae-maroon);
-    font-weight: 600;
-    border-bottom-color: var(--ae-maroon);
+    color: var(--ae-accent);
+    background: #fff;
+    border-color: var(--ae-line);
+    box-shadow: var(--shadow-sm, 0 1px 2px rgba(15,23,42,.04), 0 1px 1px rgba(15,23,42,.03));
 }
-
+.ae-nav__sub-tab.is-active::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--ae-accent);
+    box-shadow: 0 0 0 3px var(--ae-accent-ring);
+}
 .ae-nav__sub-tab--external::after {
     content: "↗";
     font-size: 11px;
-    opacity: 0.6;
-    margin-left: 2px;
+    opacity: .55;
+    margin-left: -2px;
 }
 
-.ae-nav__sub-spacer {
-    flex: 1;
-}
+.ae-nav__sub-spacer { flex: 1; }
 
-/* ── Badges (counts) ────────────────────────────────────────────────── */
+/* ── Badges (counts) ─────────────────────────────────────────────────── */
 
 .ae-nav .ae-badge {
     display: inline-flex;
@@ -181,91 +240,104 @@
     min-width: 16px;
     height: 16px;
 }
-
-.ae-nav .ae-badge--maroon {
-    background: var(--ae-maroon);
-    color: white;
-}
-
-.ae-nav .ae-badge--soft {
-    background: var(--ae-maroon-soft);
-    color: var(--ae-maroon);
-}
+.ae-nav .ae-badge--maroon { background: var(--ae-maroon); color: #fff; }
+.ae-nav .ae-badge--soft   { background: var(--ae-maroon-soft); color: var(--ae-maroon); }
+.ae-nav__section.is-active .ae-badge--maroon,
+.ae-nav__section.is-active .ae-badge--soft { background: #fff; color: var(--ae-maroon); }
 
 /* Badges hidden by default in V1 — counts will be wired up in a follow-up */
 .ae-nav__section-badge[hidden],
-.ae-nav__sub-tab .ae-badge[hidden] {
-    display: none !important;
-}
+.ae-nav__sub-tab .ae-badge[hidden] { display: none !important; }
 
-/* ── More dropdown — preserved on the right of the sub-tab row ──────── */
+/* ── More dropdown — right of the sub-tab row ────────────────────────── */
 
 .ae-nav__sub .more-dropdown {
     margin-left: auto;
     position: relative;
 }
-
 .ae-nav__sub .more-button {
     appearance: none;
     border: 1px solid var(--ae-line);
-    background: white;
+    background: #fff;
     cursor: pointer;
-    padding: 0 14px;
-    height: 32px;
+    padding: 0 12px 0 14px;
+    height: 34px;
     font-size: 13px;
-    font-weight: 500;
+    font-weight: 600;
     color: var(--ae-ink-2);
     font-family: inherit;
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    border-radius: 6px;
-    transition: background 120ms ease, color 120ms ease, border-color 120ms ease;
+    border-radius: 10px;
+    box-shadow: var(--shadow-sm, 0 1px 2px rgba(15,23,42,.04), 0 1px 1px rgba(15,23,42,.03));
+    transition: background 150ms ease, color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
 }
-
 .ae-nav__sub .more-button:hover {
-    background: var(--ae-maroon-tint);
+    border-color: var(--gray-300, #d1d5db);
     color: var(--ae-ink);
-    border-color: var(--ae-maroon-soft);
 }
-
 .ae-nav__sub .more-button.open,
 .ae-nav__sub .more-button.active {
-    background: var(--ae-maroon);
-    color: white;
-    border-color: var(--ae-maroon);
+    background: var(--ae-accent);
+    color: #fff;
+    border-color: var(--ae-accent);
+    box-shadow: 0 0 0 3px var(--ae-accent-ring);
 }
+.ae-nav__sub .more-button svg { transition: transform 150ms ease; }
+.ae-nav__sub .more-button.open svg { transform: rotate(180deg); }
 
-.ae-nav__sub .more-button svg {
-    transition: transform 150ms ease;
+.ae-nav .dropdown-menu {
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 250px;
+    padding: 6px;
+    border: 1px solid var(--ae-line);
+    border-radius: 14px;
+    box-shadow: var(--shadow-lg, 0 8px 24px -8px rgba(15,23,42,.18), 0 4px 10px -4px rgba(15,23,42,.08));
 }
-
-.ae-nav__sub .more-button.open svg {
-    transform: rotate(180deg);
+.ae-nav .dropdown-category {
+    padding: 8px 12px 6px;
+    font-size: 10.5px;
+    letter-spacing: .08em;
+    color: var(--ae-ink-3);
+    background: transparent;
+    border-bottom: none;
 }
+.ae-nav .dropdown-item {
+    padding: 10px 12px;
+    border-radius: 9px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ae-ink-2);
+    transition: background 120ms ease, color 120ms ease;
+}
+.ae-nav .dropdown-item:hover {
+    background: var(--ae-line-2);
+    color: var(--ae-ink);
+}
+.ae-nav .dropdown-item.active {
+    background: var(--ae-maroon-tint);
+    color: var(--ae-maroon);
+    font-weight: 600;
+}
+.ae-nav .dropdown-item svg { opacity: .7; }
 
-/* ── Responsive: stack tighter on narrow screens ────────────────────── */
+/* ── Responsive: tighter on narrow screens ───────────────────────────── */
 
 @media (max-width: 720px) {
-    .ae-nav__sections {
-        padding: 0 8px;
-        overflow-x: auto;
-    }
-
-    .ae-nav__section {
-        padding: 12px 14px 10px;
-    }
-
-    .ae-nav__section-label {
-        font-size: 14px;
-    }
-
-    .ae-nav__section-sub {
-        font-size: 10px;
-    }
-
+    .ae-nav { border-radius: 14px; }
+    .ae-nav__sections { padding: 8px; }
+    .ae-nav__section { padding: 9px 12px 8px; border-radius: 10px; }
+    .ae-nav__section-label { font-size: 14px; }
+    .ae-nav__section-sub { font-size: 10px; }
+    a.ae-nav__section--link:first-of-type { margin-left: 4px; }
     .ae-nav__sub {
-        padding: 0 8px;
+        padding: 6px 8px;
         overflow-x: auto;
+        scrollbar-width: none;
+        border-radius: 0 0 14px 14px;
     }
+    .ae-nav__sub::-webkit-scrollbar { display: none; }
+    .ae-nav__sub-tab { padding: 7px 11px; font-size: 13px; }
 }

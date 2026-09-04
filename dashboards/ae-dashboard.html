@@ -8,16 +8,17 @@
     <link rel="icon" href="/favicon.png" type="image/png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
     <link rel="stylesheet" href="/shared_components/css/art-hub.css?v=2026.08.03.1">
     <link rel="stylesheet" href="/shared_components/css/mockup-ruth.css?v=2026.06.17.5">
     <link rel="stylesheet" href="/shared_components/css/kanban.css?v=2026.06.17.5">
-    <link rel="stylesheet" href="/shared_components/css/mockup-submit-form.css?v=4">
-    <link rel="stylesheet" href="/shared_components/css/sticker-banner-submit-form.css?v=1">
-    <link rel="stylesheet" href="/shared_components/css/garment-submit-form.css?v=2026.07.04.1">
-    <link rel="stylesheet" href="/shared_components/css/jds-submit-form.css?v=2">
-    <link rel="stylesheet" href="/shared_components/css/ae-nav-v2.css?v=1">
-    <style>:root { --art-theme: #981e32; --art-theme-dark: #7a1828; --art-theme-light: #b92c43; --art-theme-bg: #fff5f5; --art-theme-bg-hover: #fce8ec; --art-theme-bg-selected: #fde2e8; --art-theme-rgba-15: rgba(152,30,50,0.15); --art-theme-rgba-10: rgba(152,30,50,0.1); --art-theme-hover: #981e32; }</style>
+    <link rel="stylesheet" href="/shared_components/css/mockup-submit-form.css?v=2026.09.04.1">
+    <link rel="stylesheet" href="/shared_components/css/sticker-banner-submit-form.css?v=2026.09.04.1">
+    <link rel="stylesheet" href="/shared_components/css/garment-submit-form.css?v=2026.09.04.1">
+    <link rel="stylesheet" href="/shared_components/css/jds-submit-form.css?v=2026.09.04.1">
+    <link rel="stylesheet" href="/shared_components/css/ae-nav-v2.css?v=2026.09.04.1">
+    <!-- Page shell (theme, canvas, launcher panes). Must stay LAST — it owns the :root theme. -->
+    <link rel="stylesheet" href="/dashboards/css/ae-dashboard.css?v=2026.09.04.1">
 </head>
 <body>
     <div class="minimal-header">
@@ -32,8 +33,17 @@
     
     <!-- Tab Container -->
     <div class="tab-container">
+        <!-- Page intro — sits on the maroon band above the floating nav card -->
+        <div class="ae-page-intro">
+            <div>
+                <p class="ae-page-kicker">Account Executives</p>
+                <h1 class="ae-page-title">Art Request Center</h1>
+            </div>
+            <p class="ae-page-sub">Send work to Steve and Ruth, track every mockup, and jump to transfers and personalization from one place.</p>
+        </div>
+
         <!-- Two-Tier Navigation (V1) -->
-        <nav class="ae-nav" aria-label="AE Dashboard navigation">
+        <nav class="ae-nav" aria-label="AE Dashboard navigation" data-section="steve">
 
             <!-- TIER 1 — Sections -->
             <div class="ae-nav__sections" role="tablist" id="aeNavSections">
@@ -520,8 +530,8 @@
             
             <!-- Steve Mockups Tab — Custom API-driven gallery (replaces Caspio DataPage) -->
             <div id="view-tab" class="tab-pane">
-                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
-                    <h2 class="tab-title" style="margin-bottom:0;">Steve Mockups</h2>
+                <div class="ae-tab-head">
+                    <h2 class="tab-title">Steve Mockups</h2>
                     <div class="view-toggle" id="ae-view-toggle">
                         <button class="view-toggle-btn active" data-view="grid" onclick="window.toggleAeKanbanView('grid')">
                             <span class="view-toggle-icon">&#9638;</span> Grid
@@ -537,8 +547,8 @@
 
             <!-- Ruth Mockups Tab — Ruth's Digitizing Mockup Gallery (JS-driven) -->
             <div id="digitizing-tab" class="tab-pane">
-                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
-                    <h2 class="tab-title" style="margin-bottom:0;">Ruth Mockups</h2>
+                <div class="ae-tab-head">
+                    <h2 class="tab-title">Ruth Mockups</h2>
                     <div class="view-toggle" id="ruth-ae-view-toggle">
                         <button class="view-toggle-btn active" data-view="grid" onclick="window.toggleRuthAeKanbanView('grid')">
                             <span class="view-toggle-icon">&#9638;</span> Grid
@@ -555,20 +565,34 @@
             <!-- Review Mockups Tab -->
             <div id="review-tab" class="tab-pane">
                 <h2 class="tab-title">Review Mockups</h2>
-                <p class="review-tab-subtitle" style="color:#666; margin:-8px 0 16px; font-size:14px;">Art requests awaiting your approval</p>
-                <div id="review-loading" style="text-align:center; padding:40px; display:none;">
-                    <div class="loading-spinner" style="width:32px;height:32px;border:3px solid #e9ecef;border-top-color:#981e32;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;"></div>
-                    <p style="color:#666;">Loading mockups...</p>
+                <p class="ae-review-sub">Art requests awaiting your approval</p>
+                <div id="review-loading" class="ae-review-loading" style="display:none;">
+                    <div class="ae-review-spinner"></div>
+                    <p>Loading mockups...</p>
                 </div>
                 <div id="review-cards-container"></div>
-                <div id="review-empty-state" style="display:none; text-align:center; padding:60px 20px; color:#999;">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5" style="margin-bottom:12px;">
+                <div id="review-empty-state" class="ae-review-empty" style="display:none;">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#d1d5db" stroke-width="1.5">
                         <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
                         <polyline points="22 4 12 14.01 9 11.01"></polyline>
                     </svg>
-                    <p style="font-size:16px; font-weight:500;">No mockups waiting for review</p>
-                    <p style="font-size:13px;">When Steve sends mockups for approval, they'll appear here.</p>
+                    <p class="ae-review-empty-title">No mockups waiting for review</p>
+                    <p class="ae-review-empty-sub">When Steve sends mockups for approval, they'll appear here.</p>
                 </div>
+            </div>
+
+            <!-- Transfers / Personalization — launcher panes. The tool cards are
+                 rendered by ae-dashboard.js from its SECTIONS registry (single
+                 source of truth for the sub-tab links too). -->
+            <div id="transfers-tab" class="tab-pane">
+                <h2 class="tab-title">Transfers</h2>
+                <p class="ae-launcher-intro">Supacolor heat-transfer orders placed through the API — check job status, shipments and artwork without leaving the AE workspace.</p>
+                <div class="ae-launcher" data-launcher="transfers"></div>
+            </div>
+            <div id="personalization-tab" class="tab-pane">
+                <h2 class="tab-title">Personalization</h2>
+                <p class="ae-launcher-intro">Names, numbers and monograms run on their own boards. Pick the one you need and it opens right here.</p>
+                <div class="ae-launcher" data-launcher="personalization"></div>
             </div>
 
         </div>
@@ -621,7 +645,7 @@
     <script src="/shared_components/js/staff-auth-helper.js"></script>
     <script src="/shared_components/js/box-url.js?v=2026.08.05.23"></script>
     <script src="/shared_components/js/art-actions-shared.js?v=2026.08.05.23"></script>
-    <script src="/shared_components/js/ae-dashboard.js?v=2026.08.05.23"></script>
+    <script src="/shared_components/js/ae-dashboard.js?v=2026.09.04.1"></script>
     <script src="/shared_components/js/art-hub-ae.js?v=2026.08.11.1"></script>
     <script src="/shared_components/js/caspio-date-utils.js?v=1"></script>
     <script src="/shared_components/js/elapsed-time-utils.js?v=2"></script>
