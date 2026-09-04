@@ -1,3 +1,8 @@
+## v2026.09.04.9 (2026.09.04)
+
+- AE Dashboard review: 15 improvements
+- Deploy v2026.09.04.9: 2 files (ae-dashboard.html, garment-designer.html...)
+
 ## v2026.09.04.8 (2026.09.04)
 
 - Staff Dashboard review: 13 improvements
