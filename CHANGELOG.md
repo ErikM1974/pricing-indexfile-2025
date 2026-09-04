@@ -1,3 +1,8 @@
+## v2026.09.04.8 (2026.09.04)
+
+- Staff Dashboard review: 13 improvements
+- Deploy v2026.09.04.8: 1 files (index.html...)
+
 ## v2026.09.04.7 (2026.09.04)
 
 - Names & Numbers = shop-floor blue above the fold; document the colour code
