@@ -729,3 +729,8 @@
      name is the function, so the name wins. */
   .tool-btn .qs-new-badge { display: none; }
 }
+
+/* Goal chip: the annual goal is a Caspio row (CO-ANNUAL-GOAL). When it cannot be
+   read the controller uses the built-in default AND marks the chip — the amount
+   goes amber and the label carries "⚠" + a tooltip (2026-09-04, Rule 4). */
+.sales-goal-banner.is-goal-fallback #goalOf { color: #f59e0b; font-weight: 700; }

@@ -5,10 +5,12 @@
  * Embroidery: 1,789 actual completion records (Jan 2024 - Sep 2025)
  * Cap Embroidery: 1,454 actual completion records (Jan 2020 - Nov 2025)
  * Screenprint: 805 actual completion records (Jan 2019 - Sep 2025)
- * Updated: 2026-01-10
+ * Updated: 2026-01-10 (metadata.updatedAt) — completions through Nov 2025 (metadata.dataThrough)
  *
  * This file contains precomputed turnaround time statistics
- * used by the staff dashboard production predictor widget.
+ * used by the Company Numbers "Production Turnaround" card. The card prints
+ * metadata.dataThrough + updatedAt so nobody mistakes this for live data —
+ * keep both current when regenerating (scripts/parse-production-schedule.js).
  */
 
 const PRODUCTION_STATS = {
@@ -667,7 +669,8 @@ const PRODUCTION_STATS = {
     "capEmbroiderySource": "Actual completion data (Jan 2020 - Nov 2025)",
     "screenprintRecords": 805,
     "screenprintSource": "Actual completion data (Jan 2019 - Sep 2025)",
-    "updatedAt": "2026-01-10"
+    "updatedAt": "2026-01-10",
+    "dataThrough": "2025-11"
   }
 };
 

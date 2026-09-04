@@ -33,8 +33,8 @@
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/components.css?v=2026.08.26.1">
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/utilities.css?v=20260514-ai-phase1">
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=2026.09.03.6">
-    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=2026.09.03.13">
-    <link rel="stylesheet" href="/dashboards/css/company-numbers.css?v=2026.09.03.13">
+    <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=2026.09.04.10">
+    <link rel="stylesheet" href="/dashboards/css/company-numbers.css?v=2026.09.04.10">
 </head>
 <body>
     <div class="dashboard-container cn-shell">
@@ -49,7 +49,7 @@
                     <h1 class="page-title">Company Numbers</h1>
                 </div>
                 <div class="header-right">
-                    <span class="cn-meta">Live from ShopWorks, Stripe and the Caspio archive · refreshes every 5 minutes</span>
+                    <span class="cn-meta">Live from ShopWorks, Stripe and the Caspio archive · <span id="cn-updated" role="status">loading…</span></span>
                 </div>
             </header>
 
@@ -62,6 +62,7 @@
                             <i class="fas fa-inbox" aria-hidden="true"></i> Orders Inbox
                         </h2>
                         <span class="zone-subtitle">Web orders &amp; quote activity, last 7 days</span>
+                        <span class="cn-stamp" data-stamp="inbox"></span>
                         <button type="button" class="zone-refresh" data-action="orders-inbox:refresh" aria-label="Refresh orders inbox">
                             <i class="fas fa-rotate" aria-hidden="true"></i>
                         </button>
@@ -73,20 +74,24 @@
                             <ul class="inbox-list" id="inboxPaidList" aria-busy="true"></ul>
                         </div>
                         <div class="inbox-col" id="inboxAccepted">
-                            <h3 class="inbox-col-title"><i class="fas fa-file-signature" aria-hidden="true"></i> Accepted quotes — unpaid</h3>
+                            <h3 class="inbox-col-title"><i class="fas fa-file-signature" aria-hidden="true"></i> Accepted quotes — unpaid <span class="cn-win">last 30 days</span></h3>
                             <ul class="inbox-list" id="inboxAcceptedList" aria-busy="true"></ul>
                         </div>
                     </div>
                 </section>
 
-                <!-- Money row — payments collected + sample pipeline (2026-07-06) -->
+                <!-- Money row — online payments + sample pipeline (2026-07-06).
+                     "Money Collected" → "Online Payments (Stripe)" 2026-09-04: this is
+                     the Stripe ledger only (quote deposits/balances, storefronts, samples),
+                     not company cash — the old name read like the latter. -->
                 <div class="zone-money-row">
                     <section class="zone-payments" aria-labelledby="zonePaymentsTitle">
                         <header class="zone-header">
                             <h2 id="zonePaymentsTitle" class="zone-title">
-                                <i class="fas fa-money-bill-wave" aria-hidden="true"></i> Money Collected
+                                <i class="fas fa-money-bill-wave" aria-hidden="true"></i> Online Payments (Stripe)
                             </h2>
-                            <span class="zone-subtitle">Stripe payments — quotes, storefronts, samples</span>
+                            <span class="zone-subtitle">Quote deposits &amp; balances, storefronts, samples — not ShopWorks invoicing</span>
+                            <span class="cn-stamp" data-stamp="payments"></span>
                         </header>
                         <div class="pay-totals">
                             <div class="pay-total"><div class="pay-total-label">Today</div><div class="pay-total-value" id="payToday">—</div></div>
@@ -102,6 +107,7 @@
                                 <i class="fas fa-box-open" aria-hidden="true"></i> Sample Follow-ups
                             </h2>
                             <span class="zone-subtitle">Samples sent, no order yet — call these</span>
+                            <span class="cn-stamp" data-stamp="samples"></span>
                         </header>
                         <div id="samplePipelineAlerts"></div>
                         <ul class="pipeline-list" id="samplePipelineList" aria-busy="true"></ul>
@@ -124,6 +130,7 @@
                                 <button type="button" class="date-range-btn"        data-action="metrics:set-range" data-days="60" aria-pressed="false">60D</button>
                                 <button type="button" class="date-range-btn"        data-action="metrics:set-range" data-days="90" aria-pressed="false">90D</button>
                             </div>
+                            <span class="cn-stamp" data-stamp="revenue"></span>
                         </header>
                         <div class="metrics-revenue-value" id="ytdRevenue">
                             <span class="skeleton skeleton-value"></span>
@@ -146,6 +153,7 @@
                                 </h3>
                                 <div class="metrics-date-range" id="teamDateRange">Year-to-date</div>
                             </div>
+                            <span class="cn-stamp" data-stamp="team"></span>
                             <button type="button" class="refresh-btn" data-action="team-performance:refresh" aria-label="Refresh team performance" title="Refresh">
                                 <i class="fas fa-sync-alt" aria-hidden="true"></i>
                             </button>
@@ -167,6 +175,7 @@
                                 </h3>
                                 <div class="metrics-date-range">Open requests by time sitting in current status</div>
                             </div>
+                            <span class="cn-stamp" data-stamp="art"></span>
                             <button type="button" class="refresh-btn" id="artAgingRefresh" aria-label="Refresh art requests" title="Refresh">
                                 <i class="fas fa-sync-alt" aria-hidden="true"></i>
                             </button>
@@ -178,7 +187,9 @@
 
                     <!-- Production Schedule Predictor. An ESTIMATE from historical completion
                          stats bundled in production-schedule-stats.js — not live production data.
-                         Labelled as such (Erik, 2026-09-03) until real completion data exists. -->
+                         Labelled as such (Erik, 2026-09-03) until real completion data exists.
+                         2026-09-04: no refresh button (it re-rendered the same static file) and
+                         the footer prints how old the data is (metadata.dataThrough/updatedAt). -->
                     <article class="production-widget-card col-span-full" data-widget="production">
                         <header class="production-header">
                             <h3 class="production-title">
@@ -186,31 +197,31 @@
                             </h3>
                             <span id="production-season-badge" class="season-badge"></span>
                             <span class="cn-estimate">Estimate from historical completions — not live production data</span>
-                            <button type="button" class="refresh-btn ml-2" data-action="production:refresh" aria-label="Refresh production" title="Refresh">
-                                <i class="fas fa-sync-alt" aria-hidden="true"></i>
-                            </button>
                         </header>
                         <div id="production-predictor-grid" class="production-predictor-grid">
                             <div class="production-empty">Loading predictions…</div>
                         </div>
                         <div class="production-footer">
                             <i class="fas fa-database" aria-hidden="true"></i>
-                            Based on <span id="production-record-count" class="num">4,631</span> historical completions
+                            Based on <span id="production-record-count" class="num">—</span> historical completions<span id="production-data-through"></span>
                         </div>
                     </article>
 
-                    <!-- Q3 Team Push. 🔒 NO COMPENSATION ON THIS CARD — per-rep bonus dollars
-                         live on each rep's own Mission Control; this shows the company Q3 number
-                         and the shared targets only (the /team endpoint forces that scope). -->
+                    <!-- Quarterly Team Push. 🔒 NO COMPENSATION ON THIS CARD — per-rep bonus
+                         dollars live on each rep's own Mission Control; this shows the company
+                         quarter number and the shared targets only (the /team endpoint forces
+                         that scope). The title's quarter comes from the API (embroidery-bonus-
+                         controller renderDateRange) — never typed here (2026-09-04). -->
                     <article class="embroidery-bonus-card col-span-full">
                         <header class="metrics-team-header mb-3">
                             <div class="metrics-team-title-group">
-                                <h3 class="metrics-team-title">
-                                    <i class="fas fa-bullseye" aria-hidden="true"></i> Q3 Team Push
+                                <h3 class="metrics-team-title" id="embroideryBonusTitle">
+                                    <i class="fas fa-bullseye" aria-hidden="true"></i> Team Push
                                 </h3>
                                 <div class="metrics-date-range" id="embroideryBonusDateRange">Loading…</div>
                             </div>
                             <div class="embroidery-bonus-controls">
+                                <span class="cn-stamp" data-stamp="bonus"></span>
                                 <span class="sync-status num" id="embroideryBonusStatus"></span>
                                 <button type="button" class="refresh-btn" data-action="embroidery-bonus:refresh" aria-label="Refresh embroidery bonus" title="Refresh">
                                     <i class="fas fa-sync-alt" aria-hidden="true"></i>
@@ -230,7 +241,7 @@
     <!-- Legacy production-schedule modules (no API calls, just static stats + predictor).
          Plain script tags before the module entry so production-controller.js can read
          window.ProductionPredictor + PRODUCTION_STATS at init time. -->
-    <script src="/shared_components/js/production-schedule-stats.js?v=20260512h"></script>
+    <script src="/shared_components/js/production-schedule-stats.js?v=2026.09.04.10"></script>
     <script src="/shared_components/js/production-schedule-predictor.js?v=2026.08.26.1"></script>
 
     <!-- Caspio timestamp parser (naive Pacific wall-clock → correct Date).
@@ -238,11 +249,11 @@
     <script src="/shared_components/js/caspio-date-utils.js?v=2026.07.05.4"></script>
     <!-- Art Requests Needing Attention widget — self-contained, lazy (idle-time
          fetch after DOMContentLoaded), GET-only, visible retry state on failure. -->
-    <script src="/staff-dashboard-v3/art-aging-widget.js?v=2026.08.26.1" defer></script>
+    <script src="/staff-dashboard-v3/art-aging-widget.js?v=2026.09.04.10" defer></script>
 
-    <!-- APP ENTRY (ES module). Absolute imports on purpose: /dashboards pages are
-         content-hashed by scripts/build.js, and a hashed copy of this file lives
-         under /dist — relative imports would resolve there and 404. -->
-    <script type="module" src="/dashboards/js/company-numbers.js?v=2026.09.03.13"></script>
+    <!-- APP ENTRY (ES module). Bundled by scripts/build.js (ENTRY_BUNDLES) into one
+         hashed file with its whole module graph, so production makes ONE cached
+         request instead of the entry + 20 no-store source modules (2026-09-04). -->
+    <script type="module" src="/dashboards/js/company-numbers.js?v=2026.09.04.10"></script>
 </body>
 </html>

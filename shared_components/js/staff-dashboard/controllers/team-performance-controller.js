@@ -13,8 +13,9 @@
 
 import { register } from '../core/dashboard-events.js';
 import { showApiError, clearApiError } from '../core/dashboard-errors.js';
-import { escapeHtml, formatMoney, ANNUAL_GOAL } from '../core/dashboard-ui-utils.js';
+import { escapeHtml, formatMoney } from '../core/dashboard-ui-utils.js';
 import { caspioArchiveService } from '../services/caspio-archive-service.js';
+import { fetchAnnualGoal, formatGoalCompact, fallbackWarning } from '../services/company-goal-service.js';
 import { setYtdTotal, setYtdUnavailable } from './sales-goal-controller.js';
 
 const REP_NAME_ALIASES = {
@@ -30,6 +31,7 @@ const REP_NAME_ALIASES = {
 const HOUSE_REPS = new Set([
     'jim mickelson', 'dyonii quitugua', 'erik mickelson', 'adriyella trujillo',
     'house-legacy', 'house legacy', // consolidate stale archive aliases
+    'dead',                          // ShopWorks placeholder rep for dead accounts — not a person (2026-09-04)
 ]);
 
 function normalizeRepName(name) {
@@ -65,7 +67,14 @@ function consolidateReps(rawReps) {
     return [...map.values()].sort((a, b) => b.revenue - a.revenue);
 }
 
-function renderTeam(payload) {
+/**
+ * @param {object} payload — archive response
+ * @param {{goal:number, source:string}} goalRes — from company-goal-service;
+ *   source 'fallback' means the Caspio row could not be read and the built-in
+ *   default is in use, which the card says out loud.
+ */
+function renderTeam(payload, goalRes) {
+    const goal = goalRes?.goal || null;
     const container = document.getElementById('salesTeamList');
     const dateRangeEl = document.getElementById('teamDateRange');
     if (!container) return;
@@ -90,14 +99,19 @@ function renderTeam(payload) {
         dateRangeEl.textContent = archived;
     }
 
+    // ONE denominator per row: the bar AND the text are share of the team total.
+    // The company-goal share moved to the tooltip (it was on the text while the
+    // bar showed team share — two denominators on one row, 2026-09-04 review).
     container.innerHTML = reps.map((r) => {
         const pct = (r.revenue / total) * 100;
-        const goalShare = (r.revenue / ANNUAL_GOAL) * 100;
+        const goalTip = goal
+            ? ` · ${((r.revenue / goal) * 100).toFixed(1)}% of the ${formatGoalCompact(goal)} company goal`
+            : '';
         const houseSubtitle = r.name === 'House' && r.sources.length
             ? `<div class="rep-subtitle">${escapeHtml(r.sources.slice(0, 4).join(', '))}</div>`
             : '';
         return `
-            <div class="rep-card">
+            <div class="rep-card" title="${pct.toFixed(1)}% of team total${escapeHtml(goalTip)}">
                 <div class="rep-info">
                     <div class="rep-avatar">${escapeHtml(getInitials(r.name))}</div>
                     <div class="rep-name-group">
@@ -105,16 +119,21 @@ function renderTeam(payload) {
                         ${houseSubtitle}
                     </div>
                 </div>
-                <div class="rep-progress" title="${pct.toFixed(1)}% of team total">
+                <div class="rep-progress">
                     <div class="rep-progress-bar" style="width: ${pct.toFixed(1)}%"></div>
                 </div>
                 <div class="rep-stats">
                     <div class="rep-revenue">${escapeHtml(formatMoney(r.revenue))}</div>
-                    <div class="rep-orders num">${r.orders.toLocaleString('en-US')} orders · ${goalShare.toFixed(1)}% of goal</div>
+                    <div class="rep-orders num">${r.orders.toLocaleString('en-US')} orders · ${pct.toFixed(1)}% of team</div>
                 </div>
             </div>
         `;
     }).join('');
+
+    if (goalRes?.source === 'fallback') {
+        container.insertAdjacentHTML('beforeend',
+            `<div class="rep-goal-note" role="status"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> ${escapeHtml(fallbackWarning())}</div>`);
+    }
 }
 
 async function loadTeam(refresh = false) {
@@ -124,8 +143,14 @@ async function loadTeam(refresh = false) {
         container.innerHTML = '<div class="rep-loading"><div class="loading-spinner"></div><span>Loading team performance…</span></div>';
     }
     try {
-        const payload = await caspioArchiveService.fetchYtdPerRep(new Date().getFullYear(), { refresh });
-        renderTeam(payload);
+        // The goal is a Caspio row; the service never throws — a failed read
+        // comes back as the built-in default with source 'fallback', which the
+        // card announces (never a silent constant).
+        const [payload, goalRes] = await Promise.all([
+            caspioArchiveService.fetchYtdPerRep(new Date().getFullYear(), { refresh }),
+            fetchAnnualGoal(),
+        ]);
+        renderTeam(payload, goalRes);
         // Push the archive's total revenue to the sales-goal banner — this is real
         // YTD (archive runs daily). It's slightly stale (live last few days not yet
         // archived), but vastly better than the "—" placeholder.
@@ -146,6 +171,11 @@ async function loadTeam(refresh = false) {
 }
 
 export async function initTeamPerformance() {
+    return loadTeam(false);
+}
+
+/** Periodic re-read (Company Numbers 5-minute tick). Same cache rules as init. */
+export function refreshTeamPerformance() {
     return loadTeam(false);
 }
 

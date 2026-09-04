@@ -35,10 +35,23 @@ function renderEmpty(msg) {
     if (container) container.innerHTML = `<div class="production-empty">${escapeHtml(msg)}</div>`;
 }
 
+// "Nov 2025" from "2025-11" / "2025-11-30"; "Jan 10, 2026" from a full date.
+function fmtMonth(ymd) {
+    const m = /^(\d{4})-(\d{2})/.exec(String(ymd || ''));
+    if (!m) return '';
+    return new Date(Number(m[1]), Number(m[2]) - 1, 1).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+}
+function fmtDay(ymd) {
+    const m = /^(\d{4})-(\d{2})-(\d{2})/.exec(String(ymd || ''));
+    if (!m) return '';
+    return new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
 export function renderProduction() {
     const container = document.getElementById('production-predictor-grid');
     const seasonBadge = document.getElementById('production-season-badge');
     const recordCount = document.getElementById('production-record-count');
+    const dataThrough = document.getElementById('production-data-through');
     if (!container) return;
 
     if (typeof window.ProductionPredictor === 'undefined') {
@@ -52,6 +65,16 @@ export function renderProduction() {
     if (recordCount && metadata?.totalRecords) {
         recordCount.textContent = metadata.totalRecords.toLocaleString('en-US');
     }
+    // Say how old the estimate is. The stats file is static (compiled from
+    // completions through `dataThrough`, on `updatedAt`); without this line the
+    // footer read like live data (2026-09-04 review).
+    if (dataThrough) {
+        const through = fmtMonth(metadata?.dataThrough);
+        const compiled = fmtDay(metadata?.updatedAt);
+        dataThrough.textContent = through
+            ? ` through ${through}${compiled ? ` · compiled ${compiled}` : ''}`
+            : (compiled ? ` · compiled ${compiled}` : '');
+    }
 
     if (seasonBadge) {
         const seasonText = window.ProductionPredictor.getSeasonText(predictions.season);
@@ -64,8 +87,9 @@ export function renderProduction() {
         if (!pred) return '';
         const name = window.ProductionPredictor.getServiceName(svc.key);
         const cap = capacityClass(predictions.capacity?.status);
+        // No tooltip: "Typically 4-171 days (78 samples)" was noise, not guidance.
         return `
-            <div class="production-card" title="Typically ${escapeHtml(pred.range)} days (${pred.samples} samples)">
+            <div class="production-card">
                 <div class="production-card-header">
                     <i class="fas ${svc.icon}" aria-hidden="true"></i>
                     <span class="production-service-name">${escapeHtml(name)}</span>
@@ -87,4 +111,6 @@ export function initProduction() {
     renderProduction();
 }
 
-register('production:refresh', () => renderProduction());
+// No 'production:refresh' handler: the card renders a STATIC stats file, so a
+// refresh button only pretended to fetch something. Removed 2026-09-04 with the
+// button; the honest freshness line in the footer replaces it.

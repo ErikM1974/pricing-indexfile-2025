@@ -117,11 +117,26 @@
     // ── Render ─────────────────────────────────────────────────────────────
     function bodyEl() { return document.getElementById('artAgingBody'); }
 
-    function chipHtml(count, label, color) {
-        return '<div style="flex:1;min-width:90px;text-align:center;padding:10px 8px;border-radius:8px;background:' + color + '1a;border:1px solid ' + color + '55;">' +
-            '<div class="num" style="font-size:1.5rem;font-weight:700;color:' + color + ';">' + count + '</div>' +
-            '<div style="font-size:.72rem;opacity:.8;">' + escapeHtml(label) + '</div>' +
+    // Styling lives in dashboards/css/company-numbers.css (.aa-*) — this widget
+    // used to build inline styles with hardcoded hex colours (Rule 3 in spirit,
+    // and it ignored the theme tokens). tone = 'red' | 'amber' | 'green'.
+    function chipHtml(count, label, tone) {
+        return '<div class="aa-chip aa-chip--' + tone + '">' +
+            '<div class="aa-chip-num num">' + count + '</div>' +
+            '<div class="aa-chip-label">' + escapeHtml(label) + '</div>' +
         '</div>';
+    }
+
+    // Tell the page (Company Numbers stamps) how the load went. The result is
+    // also kept on window.ArtAgingWidget.last because this classic script often
+    // finishes its first load BEFORE the page's module entry (still fetching its
+    // import graph) has registered the listener.
+    function announce(ok) {
+        var detail = { ok: !!ok, at: Date.now() };
+        if (window.ArtAgingWidget) window.ArtAgingWidget.last = detail;
+        try {
+            document.dispatchEvent(new CustomEvent('art-aging:loaded', { detail: detail }));
+        } catch (e) { /* ancient browsers — the card still rendered */ }
     }
 
     function render(items) {
@@ -139,31 +154,30 @@
 
         var attention = red.concat(yellow).sort(function (a, b) { return b.days - a.days; });
 
-        var html = '<div style="display:flex;gap:8px;margin-bottom:12px;">' +
-            chipHtml(red.length, '> 7 days', '#ef4444') +
-            chipHtml(yellow.length, '3–7 days', '#f59e0b') +
-            chipHtml(fresh, 'Under 3 days', '#22c55e') +
+        var html = '<div class="aa-chips">' +
+            chipHtml(red.length, '> 7 days', 'red') +
+            chipHtml(yellow.length, '3–7 days', 'amber') +
+            chipHtml(fresh, 'Under 3 days', 'green') +
         '</div>';
 
         if (attention.length === 0) {
-            html += '<div class="metrics-date-range" style="text-align:center;padding:8px 0;">' +
+            html += '<div class="metrics-date-range aa-clear">' +
                 '✅ All caught up — no open request has sat more than ' + YELLOW_DAYS + ' days.</div>';
         } else {
-            html += '<div style="display:flex;flex-direction:column;gap:6px;">';
+            html += '<div class="aa-list">';
             attention.slice(0, LIST_MAX).forEach(function (it) {
-                var color = it.days > RED_DAYS ? '#ef4444' : '#f59e0b';
-                html += '<a href="/art-request/' + encodeURIComponent(it.id) + '" target="_blank" rel="noopener"' +
-                    ' style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;text-decoration:none;color:inherit;background:rgba(127,127,127,.08);border-left:3px solid ' + color + ';"' +
+                var tone = it.days > RED_DAYS ? 'red' : 'amber';
+                html += '<a class="aa-row aa-row--' + tone + '" href="/art-request/' + encodeURIComponent(it.id) + '" target="_blank" rel="noopener"' +
                     ' title="Open art request #' + escapeHtml(it.id) + '">' +
-                    '<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;font-size:.85rem;">' + escapeHtml(it.company) + '</span>' +
-                    '<span style="font-size:.72rem;opacity:.75;white-space:nowrap;">' + escapeHtml(it.status) + '</span>' +
-                    '<span class="num" style="font-size:.78rem;font-weight:700;color:' + color + ';white-space:nowrap;">' + it.days + 'd</span>' +
+                    '<span class="aa-company">' + escapeHtml(it.company) + '</span>' +
+                    '<span class="aa-status">' + escapeHtml(it.status) + '</span>' +
+                    '<span class="aa-days num">' + it.days + 'd</span>' +
                 '</a>';
             });
             html += '</div>';
             if (attention.length > LIST_MAX) {
-                html += '<div class="metrics-date-range" style="margin-top:8px;">+ ' + (attention.length - LIST_MAX) +
-                    ' more — see <a href="/dashboards/art-hub-steve.html" style="color:inherit;">Steve’s Queue</a></div>';
+                html += '<div class="metrics-date-range aa-more">+ ' + (attention.length - LIST_MAX) +
+                    ' more — see <a href="/dashboards/art-hub-steve.html">Steve’s Queue</a></div>';
             }
         }
 
@@ -175,15 +189,14 @@
         if (!el) return;
         el.innerHTML = '';
         var wrap = document.createElement('div');
-        wrap.style.cssText = 'text-align:center;padding:10px 0;';
+        wrap.className = 'aa-error';
         var msg = document.createElement('div');
-        msg.style.cssText = 'font-size:.82rem;color:#ef4444;margin-bottom:8px;';
+        msg.className = 'aa-error-msg';
         msg.textContent = '⚠ Couldn’t load art requests' + (message ? ' (' + message + ')' : '') + '.';
         var retry = document.createElement('button');
         retry.type = 'button';
-        retry.className = 'refresh-btn';
+        retry.className = 'refresh-btn aa-retry';
         retry.textContent = 'Retry';
-        retry.style.cssText = 'width:auto;padding:4px 14px;font-size:.8rem;';
         retry.addEventListener('click', load);
         wrap.appendChild(msg);
         wrap.appendChild(retry);
@@ -191,14 +204,15 @@
     }
 
     // ── Load ───────────────────────────────────────────────────────────────
+    // Returns a promise (resolves true/false) so the page's 5-minute tick can
+    // stamp the card; the widget still schedules its own first load.
     function load() {
-        if (loading) return;
         var el = bodyEl();
-        if (!el) return; // card not on this page — do nothing
+        if (loading || !el) return Promise.resolve(false); // in flight, or card not on this page
         loading = true;
         el.innerHTML = '<div class="metrics-date-range">Loading art requests…</div>';
 
-        fetchOpenRequests()
+        return fetchOpenRequests()
             .then(function (data) {
                 loading = false;
                 var rows = Array.isArray(data) ? data : [];
@@ -216,13 +230,20 @@
                     });
                 });
                 render(items);
+                announce(true);
+                return true;
             })
             .catch(function (err) {
                 loading = false;
                 console.error('[ArtAgingWidget] load failed:', err);
                 renderError(err && err.message);
+                announce(false);
+                return false;
             });
     }
+
+    // Company Numbers calls load() on its 5-minute tick and reads `last` at boot.
+    window.ArtAgingWidget = { load: load, last: null };
 
     function scheduleLoad() {
         // Defer to idle so the hub's own zones always render/fetch first.

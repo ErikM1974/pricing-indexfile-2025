@@ -28,10 +28,12 @@ function formatYmd(date) {
     return `${y}-${m}-${day}`;
 }
 
+// "Last N days" = today and the N-1 days before it (N calendar days inclusive).
+// Until 2026-09-04 the start was today-N, so "Last 90 Days" covered 91.
 function getDateRange(days) {
     const end = new Date();
     const start = new Date();
-    start.setDate(start.getDate() - days);
+    start.setDate(start.getDate() - (days - 1));
     return { start: formatYmd(start), end: formatYmd(end) };
 }
 
@@ -39,7 +41,7 @@ function getLastYearRangeForDays(days) {
     const now = new Date();
     const currentEnd = new Date(now);
     const currentStart = new Date(now);
-    currentStart.setDate(currentStart.getDate() - days);
+    currentStart.setDate(currentStart.getDate() - (days - 1));
     const lyStart = new Date(currentStart);
     lyStart.setFullYear(lyStart.getFullYear() - 1);
     const lyEnd = new Date(currentEnd);
