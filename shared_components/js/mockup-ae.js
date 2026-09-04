@@ -77,16 +77,28 @@ var MockupAeGallery = (function () {
                 render();
             })
             .catch(function (err) {
+                console.error('[MockupAeGallery] load failed:', err);
                 var container = document.getElementById(containerId);
                 if (container) {
-                    container.innerHTML = '<div style="text-align:center;padding:40px;color:#dc2626;">'
-                        + '<strong>Error:</strong> ' + escapeHtml(err.message)
-                        + '<br><button onclick="MockupAeGallery.init(\'' + containerId + '\')" '
-                        + 'style="margin-top:10px;padding:8px 16px;border:none;border-radius:4px;background:#6B46C1;color:white;cursor:pointer;">Retry</button>'
+                    container.innerHTML = '<div style="text-align:center;padding:40px;color:#b91c1c;">'
+                        + '<div style="font-size:15px;font-weight:600;">Couldn\'t load Ruth\'s mockups.</div>'
+                        + '<div style="font-size:13px;color:#6b7280;margin:6px 0 12px;">The server said: ' + escapeHtml(err.message) + '. Nothing is lost — try again in a moment.</div>'
+                        + '<button onclick="MockupAeGallery.init(\'' + containerId + '\')" '
+                        + 'style="padding:9px 18px;border:none;border-radius:8px;background:var(--art-theme, #6B46C1);color:white;cursor:pointer;font-weight:600;font-family:inherit;">Try again</button>'
                         + '</div>';
                 }
             });
     }
+
+    /* Publish the bucket counts (2026-09-04) so the AE nav badge on Ruth's tab
+       shows "Needs Your Review" without opening the tab. Same definition as the
+       chips: not on hold, status Awaiting Approval. */
+    function publishCounts(counts) {
+        try {
+            document.dispatchEvent(new CustomEvent('ae:counts', { detail: { section: 'ruth', needsReview: counts.needsReview, all: counts.all } }));
+        } catch (e) { /* CustomEvent unsupported — badge just stays hidden */ }
+    }
+    function refresh() { fetchMockups(); }
 
     function render() {
         var container = document.getElementById(containerId);
@@ -97,12 +109,14 @@ var MockupAeGallery = (function () {
                 + '<div style="font-size:48px;margin-bottom:12px;">&#128194;</div>'
                 + '<div style="font-size:16px;font-weight:500;">No mockup requests yet</div>'
                 + '</div>';
+            publishCounts({ needsReview: 0, all: 0 });
             return;
         }
 
         // Bucket counts. normalizeStatus() maps null/blank/typos → 'Submitted'
         // so they fall into 'with-ruth' (the catch-all bucket) and never vanish.
         var counts = countByBucket(allMockups);
+        publishCounts(counts);
 
         // First render: pick the default. If the AE has nothing to review,
         // open on All so they see their full pipeline instead of an empty state.
@@ -727,6 +741,7 @@ var MockupAeGallery = (function () {
 
     return {
         init: init,
+        refresh: refresh,
         filterByStatus: filterByStatus
     };
 

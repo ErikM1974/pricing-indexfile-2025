@@ -55,6 +55,8 @@ var StickerBannerSubmitForm = (function () {
         var container = document.getElementById(containerId);
         if (!container) return;
         container.innerHTML = buildFormHtml();
+        wireA11y();
+        initDirtyTracking();
         wireEvents();
         initCompanyAutocomplete();
         initDesignNameAutocomplete();
@@ -180,7 +182,7 @@ var StickerBannerSubmitForm = (function () {
             // (5) dynamic CTA text via updateFileDropState().
             + '    <div class="sbf-field">'
             + '      <label class="sbf-field-label">Reference Files (logo, sketches, photos)</label>'
-            + '      <div class="sbf-file-drop" id="sbf-file-drop">'
+            + '      <div class="sbf-file-drop" id="sbf-file-drop" role="button" tabindex="0" aria-label="Upload files — drop them here, or press Enter to browse">'
             + '        <svg class="sbf-file-drop-icon" viewBox="0 0 36 32" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">'
             + '          <rect x="2" y="6" width="20" height="24" rx="2" fill="#e5e7eb"></rect>'
             + '          <rect x="8" y="4" width="20" height="24" rx="2" fill="#f3f4f6"></rect>'
@@ -1121,6 +1123,8 @@ var StickerBannerSubmitForm = (function () {
 
     // ── Success State ──────────────────────────────────────────────────────
     function showSuccess(designId, companyName) {
+        submitted = true;
+        dirty = false;
         var body = document.getElementById('sbf-form-body');
         var typeLabel = currentItemType;
         body.innerHTML = '<div class="sbf-success">'
@@ -1144,6 +1148,47 @@ var StickerBannerSubmitForm = (function () {
     }
 
     // ── Helpers ─────────────────────────────────────────────────────────────
+
+    // ── 2026-09-04 review: programmatic labels, keyboard drop zone, leave-page guard ──
+    /* The visual labels never carried `for`, so screen readers announced the
+       controls as "edit text". Pair each field's label with its control after
+       every render. The drop zone is a real button for the keyboard. */
+    function wireA11y() {
+        var root = document.getElementById(containerId);
+        if (!root) return;
+        root.querySelectorAll('.sbf-field').forEach(function (field) {
+            var lbl = field.querySelector('.sbf-field-label');
+            if (!lbl || lbl.htmlFor) return;
+            var ctrl = field.querySelector('input[id]:not([type="hidden"]):not([type="file"]), select[id], textarea[id]');
+            if (ctrl) lbl.htmlFor = ctrl.id;
+        });
+        var drop = document.getElementById('sbf-file-drop');
+        var input = document.getElementById('sbf-file-input');
+        if (drop && input && !drop.dataset.kb) {
+            drop.dataset.kb = '1';
+            drop.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); input.click(); }
+            });
+        }
+    }
+    /* Leaving with unsent edits asks first; a successful submit stands the guard down. */
+    var dirty = false;
+    var submitted = false;
+    function initDirtyTracking() {
+        dirty = false;
+        submitted = false;
+        var body = document.getElementById('sbf-form-body');
+        if (!body) return;
+        ['input', 'change'].forEach(function (ev) {
+            body.addEventListener(ev, function () { dirty = true; });
+        });
+        if (!window.__sbfUnloadGuard) {
+            window.__sbfUnloadGuard = true;
+            window.addEventListener('beforeunload', function (e) {
+                if (dirty && !submitted) { e.preventDefault(); e.returnValue = ''; }
+            });
+        }
+    }
     function escapeHtml(str) {
         if (!str) return '';
         var div = document.createElement('div');

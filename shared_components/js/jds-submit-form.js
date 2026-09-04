@@ -749,7 +749,7 @@ var JDSSubmitForm = (function () {
             //   updateFileDropState() in the JS keeps subtext, dots, and CTA in sync.
             + '      <div class="jds-field">'
             + '        <label class="jds-field-label">Reference Files (logo, sketches, photos)</label>'
-            + '        <div class="jds-file-drop" id="jds-file-drop">'
+            + '        <div class="jds-file-drop" id="jds-file-drop" role="button" tabindex="0" aria-label="Upload files — drop them here, or press Enter to browse">'
             + '          <svg class="jds-file-drop-icon" viewBox="0 0 36 32" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">'
             + '            <rect x="2" y="6" width="20" height="24" rx="2" fill="#e5e7eb"></rect>'
             + '            <rect x="8" y="4" width="20" height="24" rx="2" fill="#f3f4f6"></rect>'
@@ -787,6 +787,8 @@ var JDSSubmitForm = (function () {
             + '</div>';
 
         wireFormEvents();
+        wireA11y();
+        initDirtyTracking();
         initCompanyAutocomplete();
         initDesignNameAutocomplete();
         initWorkOrderAutocomplete();
@@ -1540,6 +1542,8 @@ var JDSSubmitForm = (function () {
     }
 
     function showSuccess(designId, companyName) {
+        submitted = true;
+        dirty = false;
         var body = document.getElementById('jds-form-body');
         if (!body) return;
         body.innerHTML = '<div class="jds-success">'
@@ -1569,6 +1573,47 @@ var JDSSubmitForm = (function () {
     }
 
     // ── Helpers ────────────────────────────────────────────────────────────
+
+    // ── 2026-09-04 review: programmatic labels, keyboard drop zone, leave-page guard ──
+    /* The visual labels never carried `for`, so screen readers announced the
+       controls as "edit text". Pair each field's label with its control after
+       every render. The drop zone is a real button for the keyboard. */
+    function wireA11y() {
+        var root = document.getElementById(containerId);
+        if (!root) return;
+        root.querySelectorAll('.jds-field').forEach(function (field) {
+            var lbl = field.querySelector('.jds-field-label');
+            if (!lbl || lbl.htmlFor) return;
+            var ctrl = field.querySelector('input[id]:not([type="hidden"]):not([type="file"]), select[id], textarea[id]');
+            if (ctrl) lbl.htmlFor = ctrl.id;
+        });
+        var drop = document.getElementById('jds-file-drop');
+        var input = document.getElementById('jds-file-input');
+        if (drop && input && !drop.dataset.kb) {
+            drop.dataset.kb = '1';
+            drop.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); input.click(); }
+            });
+        }
+    }
+    /* Leaving with unsent edits asks first; a successful submit stands the guard down. */
+    var dirty = false;
+    var submitted = false;
+    function initDirtyTracking() {
+        dirty = false;
+        submitted = false;
+        var body = document.getElementById('jds-form-body');
+        if (!body) return;
+        ['input', 'change'].forEach(function (ev) {
+            body.addEventListener(ev, function () { dirty = true; });
+        });
+        if (!window.__jdsUnloadGuard) {
+            window.__jdsUnloadGuard = true;
+            window.addEventListener('beforeunload', function (e) {
+                if (dirty && !submitted) { e.preventDefault(); e.returnValue = ''; }
+            });
+        }
+    }
     function escapeHtml(str) {
         if (str == null) return '';
         var div = document.createElement('div');

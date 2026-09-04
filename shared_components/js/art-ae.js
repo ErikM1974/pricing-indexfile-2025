@@ -108,16 +108,38 @@ var ArtAeGallery = (function () {
                 render();
             })
             .catch(function (err) {
+                console.error('[ArtAeGallery] load failed:', err);
                 var container = document.getElementById(containerId);
                 if (container) {
-                    container.innerHTML = '<div style="text-align:center;padding:40px;color:#dc2626;">'
-                        + '<strong>Error:</strong> ' + escapeHtml(err.message)
-                        + '<br><button onclick="ArtAeGallery.init(\'' + containerId + '\')" '
-                        + 'style="margin-top:10px;padding:8px 16px;border:none;border-radius:4px;background:var(--art-theme, #981e32);color:white;cursor:pointer;">Retry</button>'
+                    container.innerHTML = '<div style="text-align:center;padding:40px;color:#b91c1c;">'
+                        + '<div style="font-size:15px;font-weight:600;">Couldn\'t load Steve\'s art requests.</div>'
+                        + '<div style="font-size:13px;color:#6b7280;margin:6px 0 12px;">The server said: ' + escapeHtml(err.message) + '. Nothing is lost — try again in a moment.</div>'
+                        + '<button onclick="ArtAeGallery.init(\'' + containerId + '\')" '
+                        + 'style="padding:9px 18px;border:none;border-radius:8px;background:var(--art-theme, #981e32);color:white;cursor:pointer;font-weight:600;font-family:inherit;">Try again</button>'
                         + '</div>';
                 }
             });
     }
+
+    /* Re-fetch without resetting the rep's filters — the notification poll calls
+       this when Steve touches a request, so the counts and cards stay current. */
+    function refresh() { fetchRequests(); }
+
+    /* Publish the bucket counts (2026-09-04) so the AE nav badge, the More-menu
+       badge and the Review tab all share ONE definition of "needs your review":
+       current requests (not archive), not on hold, status Awaiting Approval. */
+    function publishCounts(counts) {
+        if (showArchive) return;   // archive view is not the working backlog
+        try {
+            document.dispatchEvent(new CustomEvent('ae:counts', { detail: { section: 'steve', needsReview: counts.needsReview, all: counts.all } }));
+        } catch (e) { /* CustomEvent unsupported — badges just stay hidden */ }
+    }
+
+    /* The exact rows behind "Needs Your Review", for the Review Mockups tab. */
+    function getNeedsReview() {
+        return allRequests.filter(function (r) { return !r.Is_On_Hold && bucketFor(r.Status) === 'needs-review'; });
+    }
+    function isLoaded() { return allRequests.length > 0; }
 
     // Map a Caspio status to its display bucket. Fallthrough → 'with-steve'
     // is the safety net: null/blank/typo'd statuses still appear in a chip
@@ -216,12 +238,14 @@ var ArtAeGallery = (function () {
                 + '<div style="font-size:48px;margin-bottom:12px;">&#127912;</div>'
                 + '<div style="font-size:16px;font-weight:500;">No art requests found</div>'
                 + '</div>';
+            publishCounts({ needsReview: 0, all: 0 });
             return;
         }
 
         // Bucket counts. normalizeStatus() maps null/blank/typos → 'Submitted'
         // so they fall into 'with-steve' (the catch-all bucket) and never vanish.
         var counts = countByBucket(allRequests);
+        publishCounts(counts);
 
         // First render: pick the default. If the AE has nothing to review,
         // open on All so they see their full pipeline instead of an empty state.
@@ -828,6 +852,10 @@ var ArtAeGallery = (function () {
 
     return {
         init: init,
+        refresh: refresh,
+        getNeedsReview: getNeedsReview,
+        isLoaded: isLoaded,
+        dateCutoff: DATE_CUTOFF,
         filterByStatus: filterByStatus,
         clearFilter: clearFilter,
         toggleDateRange: toggleDateRange,
