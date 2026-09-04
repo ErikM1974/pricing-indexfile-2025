@@ -340,16 +340,10 @@
             backLink.textContent = 'Back to AE Dashboard';
             backLink.href = '/ae-dashboard.html';
         }
-        // Set maroon theme CSS variables for AE view
-        var root = document.documentElement;
-        root.style.setProperty('--art-theme', '#981e32');
-        root.style.setProperty('--art-theme-dark', '#7a1828');
-        root.style.setProperty('--art-theme-light', '#b92c43');
-        root.style.setProperty('--art-theme-bg', '#fff5f5');
-        root.style.setProperty('--art-theme-bg-hover', '#fce8ec');
-        root.style.setProperty('--art-theme-bg-selected', '#fde2e8');
-        root.style.setProperty('--art-theme-rgba-15', 'rgba(152,30,50,0.15)');
-        root.style.setProperty('--art-theme-rgba-10', 'rgba(152,30,50,0.1)');
+        // Theme stays Ruth's PURPLE (the page default). The AE view used to
+        // recolour itself maroon "to match the AE Dashboard"; retired 2026-09-04
+        // — the dashboard now colour-codes by person (Steve green, Ruth purple),
+        // so a rep reviewing one of Ruth's mockups should see Ruth's purple.
         // Init prev/next navigation for AE view
         initMockupNavigation();
     }

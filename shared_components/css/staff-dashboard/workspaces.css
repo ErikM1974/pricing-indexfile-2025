@@ -16,8 +16,11 @@
      money/quoting  NW green (tokens --accent)
      CRM            navy #1a2332 + gold #f59e0b  (rep CRM tier cards)
      purchasing     slate blue #4a6fa5           (transfer queue, Supacolor)
-     mockups        purple #6B46C1               (Ruth's mockup queue)
-     art requests   crimson #981e32              (AE art dashboard, Steve)
+     mockups        purple #6B46C1               (Ruth — her mockup queue, her pages)
+     steve          green #0a8a1f                (Steve — Art Queue, Design Queue, his pages)
+     art requests   crimson #981e32              (AE art dashboard — the reps' page)
+       ↑ person colour-coding, Erik 2026-09-04: Steve = green, Ruth = purple;
+         the AE dashboard itself stays maroon and carries both inside it.
      shop floor     blue #2563eb                 (box labels, names & numbers)
      photos         deep green #14351c           (Photo Capture app)
      archive        amber #d97706                (old designs)
@@ -34,6 +37,7 @@
     --f-purch: #4a6fa5;                  --f-purch-fg: #ffffff;
     --f-mock:  #6B46C1;                  --f-mock-fg: #ffffff;
     --f-artreq:#981e32;                  --f-artreq-fg: #ffffff;
+    --f-steve: #0a8a1f;                  --f-steve-fg: #ffffff;
     --f-floor: #2563eb;                  --f-floor-fg: #ffffff;
     --f-photo: #14351c;                  --f-photo-fg: #4ade80; --f-photo-ring: #2f7d38;
     --f-arch:  #d97706;                  --f-arch-fg: #ffffff;
@@ -51,6 +55,7 @@
 .f-purch  { --fam: var(--f-purch);  --fam-fg: var(--f-purch-fg); }
 .f-mock   { --fam: var(--f-mock);   --fam-fg: var(--f-mock-fg); }
 .f-artreq { --fam: var(--f-artreq); --fam-fg: var(--f-artreq-fg); }
+.f-steve  { --fam: var(--f-steve);  --fam-fg: var(--f-steve-fg); }
 .f-floor  { --fam: var(--f-floor);  --fam-fg: var(--f-floor-fg); }
 .f-photo  { --fam: var(--f-photo);  --fam-fg: var(--f-photo-fg); --fam-ring: var(--f-photo-ring); --fam-mark: #2f7d38; }
 .f-arch   { --fam: var(--f-arch);   --fam-fg: var(--f-arch-fg); }
