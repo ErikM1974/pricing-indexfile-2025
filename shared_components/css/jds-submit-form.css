@@ -1,867 +1,900 @@
 /* jds-submit-form.css
- * Styling for the JDS vendor-product intake form on the AE dashboard
- * (Submit Artwork to Steve tab, 4th pill).
- *
- * Class prefix: .jds-*
- * Theme: warm amber/brown to read as "engraving / decoration vendor".
+ * JDS vendor-product intake (catalog browse → product → art request) on
+ * dashboards/ae-dashboard.html (Submit Artwork to Steve → JDS Product).
+ * Class prefix: .jds-*  ·  Accent: warm amber (engraving vendor).
+ * 
+ * Shared blocks mirror garment-/sticker-banner-/mockup-submit-form.css
+ * exactly; keep them in step.
  */
 
-/* ── Container ───────────────────────────────────────────────────────── */
-
+/* ── Scoped design tokens ───────────────────────────────────────────────
+   Every visual constant the form uses lives here so a colour change is one
+   edit. --fx-* names are shared by all four intake forms (gsf/sbf/jds/msf);
+   only the values differ per form. */
 .jds-container {
-    max-width: 980px;
+    --fx-accent:       #b45309;
+    --fx-accent-dark:  #78350f;
+    --fx-accent-light: #d97706;
+    --fx-tint:         #fffbeb;
+    --fx-tint-2:       #fef3c7;
+    --fx-ring:         rgba(180,83,9,.16);
+    --fx-grad:         linear-gradient(135deg, var(--fx-accent-dark) 0%, var(--fx-accent) 55%, var(--fx-accent-light) 100%);
+    max-width: 1020px;
     margin: 0 auto;
     font-family: inherit;
+    color: var(--gray-800, #1f2937);
 }
 
-/* Header banner */
+/* ── Hero banner ────────────────────────────────────────────────────── */
 .jds-banner {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
     display: flex;
     align-items: center;
-    gap: 18px;
-    padding: 18px 22px;
-    border-radius: 12px;
-    margin-bottom: 18px;
+    gap: 20px;
+    padding: 24px 28px;
+    border-radius: 18px;
+    margin-bottom: 20px;
     color: #fff;
-    background: linear-gradient(135deg, #92400e 0%, #5a2a07 100%);
+    background: var(--fx-grad);
+    box-shadow: 0 18px 40px -18px color-mix(in srgb, var(--fx-accent) 75%, transparent),
+                0 2px 6px rgba(15, 23, 42, .06);
 }
-
+.jds-banner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+        radial-gradient(circle at 88% 12%, rgba(255, 255, 255, .22), transparent 42%),
+        radial-gradient(circle at 8% 120%, rgba(255, 255, 255, .12), transparent 40%);
+    pointer-events: none;
+}
+.jds-banner::after {
+    content: '';
+    position: absolute;
+    right: -48px;
+    top: -70px;
+    width: 240px;
+    height: 240px;
+    border-radius: 50%;
+    border: 30px solid rgba(255, 255, 255, .07);
+    z-index: -1;
+    pointer-events: none;
+}
 .jds-banner-emoji {
-    font-size: 40px;
+    flex: 0 0 auto;
+    width: 66px;
+    height: 66px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 34px;
     line-height: 1;
+    background: rgba(255, 255, 255, .16);
+    border: 1px solid rgba(255, 255, 255, .3);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .3), 0 10px 22px -10px rgba(0, 0, 0, .4);
+    backdrop-filter: blur(6px);
 }
-
+.jds-banner-text { min-width: 0; }
+.jds-banner-text::before {
+    content: 'Steve · JDS Products';
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, .74);
+    margin-bottom: 6px;
+}
 .jds-banner-text h3 {
-    margin: 0 0 4px;
-    font-size: 20px;
-    font-weight: 600;
+    margin: 0 0 6px;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -.02em;
+    line-height: 1.2;
 }
-
 .jds-banner-text p {
     margin: 0;
     font-size: 14px;
-    opacity: 0.95;
-    line-height: 1.4;
+    line-height: 1.55;
+    color: rgba(255, 255, 255, .88);
+    max-width: 660px;
 }
 
-/* Empty / error state */
-.jds-empty {
-    padding: 32px 20px;
-    text-align: center;
-    color: #6b7280;
-    font-size: 14px;
-    background: #f9fafb;
-    border: 1px dashed #e5e7eb;
-    border-radius: 10px;
-}
-
-.jds-empty--error {
-    color: #b91c1c;
-    background: #fef2f2;
-    border-color: #fecaca;
-}
-
-/* Section header */
-.jds-section-header {
-    margin: 14px 0 10px;
-    padding-bottom: 6px;
-    border-bottom: 2px solid #f3f4f6;
-    font-size: 13px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: #6b7280;
-}
-
-/* Search bar */
-.jds-search-bar {
-    margin-bottom: 18px;
-}
-
-.jds-search-input {
-    width: 100%;
-    padding: 11px 14px;
-    border: 1.5px solid #d1d5db;
-    border-radius: 10px;
-    font-size: 14px;
-    font-family: inherit;
-    color: #1f2937;
-    box-sizing: border-box;
-    transition: border-color 0.15s, box-shadow 0.15s;
-}
-
-.jds-search-input:focus {
-    outline: none;
-    border-color: #92400e;
-    box-shadow: 0 0 0 3px rgba(146, 64, 14, 0.1);
-}
-
-/* Breadcrumb */
-.jds-breadcrumb {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 14px;
-    font-size: 14px;
-    color: #6b7280;
-}
-
-.jds-breadcrumb-sep {
-    color: #d1d5db;
-}
-
-.jds-breadcrumb-current {
-    color: #1f2937;
-    font-weight: 600;
-}
-
-.jds-link {
-    background: none;
-    border: none;
-    padding: 0;
-    color: #92400e;
-    font-family: inherit;
-    font-size: inherit;
-    text-decoration: underline;
-    cursor: pointer;
-}
-
-.jds-link:hover {
-    color: #5a2a07;
-}
-
-/* ── Category grid (landing) ──────────────────────────────────────────── */
-/* Flex (not grid) so a single-card view doesn't balloon to full container
- * width. Cards keep a tight 200-240px range regardless of count. */
-
-.jds-category-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 14px;
-}
-
-.jds-category-card {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 8px;
-    padding: 14px;
-    background: #fff;
-    border: 1.5px solid #e5e7eb;
-    border-radius: 12px;
-    cursor: pointer;
-    text-align: left;
-    font-family: inherit;
-    transition: all 0.15s;
-    /* Fixed-ish width — flex-grow:0 prevents single-card balloon. */
-    flex: 0 0 220px;
-    max-width: 240px;
-}
-
-.jds-category-card:hover {
-    border-color: #92400e;
-    box-shadow: 0 4px 14px rgba(146, 64, 14, 0.12);
-    transform: translateY(-1px);
-}
-
-/* ── Product grid ─────────────────────────────────────────────────────── */
-/* Same flex pattern — cards stay 200-220px regardless of how many are shown. */
-
-.jds-product-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-}
-
-.jds-product-card {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    padding: 12px;
-    background: #fff;
-    border: 1.5px solid #e5e7eb;
-    border-radius: 10px;
-    cursor: pointer;
-    text-align: left;
-    font-family: inherit;
-    transition: all 0.15s;
-    flex: 0 0 200px;
-    max-width: 220px;
-}
-
-.jds-product-card:hover {
-    border-color: #92400e;
-    box-shadow: 0 4px 14px rgba(146, 64, 14, 0.12);
-    transform: translateY(-1px);
-}
-
-.jds-card-thumb {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    max-height: 220px;
-    background: #f9fafb;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-}
-
-.jds-card-thumb img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-}
-
-.jds-card-thumb-empty {
-    font-size: 36px;
-    color: #d1d5db;
-}
-
-.jds-card-body {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
-.jds-card-name {
-    font-size: 14px;
-    font-weight: 600;
-    color: #1f2937;
-    line-height: 1.3;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-.jds-card-sku {
-    font-size: 12px;
-    color: #92400e;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-}
-
-.jds-card-count {
-    font-size: 12px;
-    color: #9ca3af;
-}
-
-.jds-card-imprint {
-    font-size: 11px;
-    color: #6b7280;
-    background: #fef3c7;
-    border-radius: 4px;
-    padding: 3px 6px;
-    margin-top: 4px;
-    display: inline-block;
-    line-height: 1.3;
-}
-
-/* Family-tile badge — "17 colors / variants" pill on a multi-SKU product family card */
-.jds-card-family-badge {
-    display: inline-block;
-    margin-top: 2px;
-    padding: 3px 8px;
-    background: #92400e;
-    color: #fff;
-    font-size: 11px;
-    font-weight: 600;
-    border-radius: 999px;
-    letter-spacing: 0.02em;
-}
-
-.jds-product-card--family {
-    border-color: #fcd34d;
-}
-
-.jds-product-card--family:hover {
-    border-color: #92400e;
-    background: #fffbeb;
-}
-
-/* ── Selected-product card (form view) ────────────────────────────────── */
-
-.jds-selected-card {
-    display: grid;
-    grid-template-columns: 160px 1fr;
-    gap: 18px;
-    padding: 16px;
-    background: linear-gradient(135deg, #fef3c7 0%, #fef9e6 100%);
-    border: 1.5px solid #fcd34d;
-    border-radius: 12px;
-    margin-bottom: 18px;
-    position: sticky;
-    top: 0;
-    z-index: 5;
-}
-
-.jds-selected-thumb {
-    width: 160px;
-    height: 160px;
-    background: #fff;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    border: 1px solid #fde68a;
-}
-
-.jds-selected-thumb img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-}
-
-.jds-selected-body {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    min-width: 0;
-}
-
-.jds-selected-cat {
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #92400e;
-    font-weight: 600;
-}
-
-.jds-selected-name {
-    font-size: 18px;
-    font-weight: 600;
-    color: #1f2937;
-    line-height: 1.3;
-}
-
-.jds-selected-sku {
-    font-size: 13px;
-    color: #5a2a07;
-}
-
-.jds-selected-imprint {
-    font-size: 13px;
-    color: #1f2937;
-    margin-top: 6px;
-    padding: 6px 10px;
-    background: rgba(255, 255, 255, 0.6);
-    border-radius: 6px;
-    line-height: 1.4;
-}
-
-.jds-change-btn {
-    align-self: flex-start;
-    margin-top: 8px;
-    font-size: 13px;
-}
-
-/* Live block (price + inventory) */
-.jds-live-block {
-    margin-top: 10px;
-    padding: 10px;
-    background: rgba(255, 255, 255, 0.6);
-    border-radius: 8px;
-    font-size: 13px;
-}
-
-.jds-live-loading {
-    color: #92400e;
-    font-style: italic;
-}
-
-.jds-live-warn {
-    color: #92400e;
-    font-size: 12px;
-    line-height: 1.4;
-}
-
-.jds-live-stock {
-    font-weight: 600;
-    color: #047857;
-    margin-bottom: 6px;
-}
-
-.jds-out {
-    color: #b91c1c;
-    font-weight: 600;
-}
-
-.jds-live-tier-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 12px;
-}
-
-.jds-live-tier-table th,
-.jds-live-tier-table td {
-    text-align: left;
-    padding: 4px 8px;
-    border-bottom: 1px solid #fde68a;
-}
-
-.jds-live-tier-table th {
-    color: #6b7280;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 10px;
-    letter-spacing: 0.04em;
-}
-
-.jds-live-tier-table tbody tr:last-child td {
-    border-bottom: none;
-}
-
-.jds-live-tier-table td:last-child {
-    font-weight: 600;
-    color: #1f2937;
-    text-align: right;
-}
-
-/* ── Form card (mirrors .sbf-form-card) ───────────────────────────────── */
-
+/* ── Form card ──────────────────────────────────────────────────────── */
 .jds-form-card {
     background: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-    overflow: hidden;
+    border: 1px solid var(--gray-200, #e5e7eb);
+    border-radius: 18px;
+    box-shadow: var(--shadow-md, 0 2px 4px rgba(15,23,42,.04), 0 4px 12px rgba(15,23,42,.06));
 }
 
 .jds-form-header {
-    padding: 14px 22px;
-    background: #f9fafb;
-    border-bottom: 1px solid #e5e7eb;
-    font-weight: 600;
-    color: #1f2937;
-    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 28px;
+    background: var(--gray-50, #f9fafb);
+    border-bottom: 1px solid var(--gray-200, #e5e7eb);
+    border-radius: 18px 18px 0 0;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--gray-600, #4b5563);
+}
+.jds-form-header::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--fx-accent);
+    box-shadow: 0 0 0 3px var(--fx-ring);
 }
 
-.jds-form-body {
-    padding: 22px;
-}
+.jds-form-body { padding: 26px 28px 28px; }
 
-/* Field grid */
+/* ── Field grid ─────────────────────────────────────────────────────── */
 .jds-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 16px;
+    gap: 0 20px;
 }
-
 .jds-field {
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    margin-bottom: 16px;
+    gap: 6px;
+    margin-bottom: 18px;
+    min-width: 0;
 }
-
 .jds-field-label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
     font-size: 13px;
     font-weight: 600;
-    color: #374151;
-    margin-bottom: 4px;
+    color: var(--gray-700, #374151);
+    letter-spacing: -.005em;
+    line-height: 1.3;
 }
-
-.jds-required {
-    color: #92400e;
-    font-weight: 700;
-    margin-left: 2px;
-}
-
+.jds-required { color: var(--fx-accent); font-weight: 700; }
 .jds-field-hint {
     font-size: 12px;
-    color: #9ca3af;
+    color: var(--gray-500, #6b7280);
+    line-height: 1.45;
     margin-top: 2px;
 }
 
+/* Inputs — one height, one radius, one focus ring */
 .jds-input,
 .jds-select,
 .jds-textarea {
-    padding: 9px 12px;
-    border: 1.5px solid #d1d5db;
-    border-radius: 8px;
-    font-size: 14px;
-    color: #1f2937;
-    background: #fff;
-    font-family: inherit;
-    transition: border-color 0.15s, box-shadow 0.15s;
     width: 100%;
     box-sizing: border-box;
+    min-height: 42px;
+    padding: 10px 13px;
+    border: 1px solid var(--gray-300, #d1d5db);
+    border-radius: 10px;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--gray-900, #111827);
+    background-color: #fff;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, .04);
+    transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
 }
-
+.jds-input:hover,
+.jds-select:hover,
+.jds-textarea:hover { border-color: var(--gray-400, #9ca3af); }
 .jds-input:focus,
 .jds-select:focus,
 .jds-textarea:focus {
     outline: none;
-    border-color: #92400e;
-    box-shadow: 0 0 0 3px rgba(146, 64, 14, 0.1);
+    border-color: var(--fx-accent);
+    box-shadow: 0 0 0 4px var(--fx-ring), 0 1px 2px rgba(15, 23, 42, .04);
 }
-
-.jds-input.jds-error,
-.jds-select.jds-error {
-    border-color: #ef4444;
-    background: #fef2f2;
+.jds-input::placeholder,
+.jds-textarea::placeholder { color: var(--gray-400, #9ca3af); }
+.jds-select {
+    appearance: none;
+    -webkit-appearance: none;
+    padding-right: 38px;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
 }
-
+.jds-input:disabled,
+.jds-select:disabled,
+.jds-input[readonly] {
+    background-color: var(--gray-50, #f9fafb);
+    color: var(--gray-500, #6b7280);
+    cursor: not-allowed;
+    box-shadow: none;
+}
 .jds-textarea {
-    min-height: 80px;
+    min-height: 96px;
     resize: vertical;
+    line-height: 1.5;
 }
-
+.jds-input.jds-error,
+.jds-select.jds-error,
+.jds-textarea.jds-error {
+    border-color: var(--state-danger, #dc2626);
+    background-color: var(--state-danger-bg, #fef2f2);
+    box-shadow: 0 0 0 4px rgba(220, 38, 38, .10);
+}
 .jds-error-msg {
     display: none;
-    font-size: 12px;
-    color: #ef4444;
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--state-danger, #dc2626);
     margin-top: 2px;
+    line-height: 1.4;
 }
 
-/* Tip callout */
-.jds-tip {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 10px 14px;
-    background: #fef3c7;
-    border: 1px solid #fde68a;
-    border-radius: 8px;
-    color: #78350f;
-    font-size: 13px;
-    line-height: 1.5;
-    margin: 8px 0 16px;
-}
-
-.jds-tip-icon {
-    font-size: 16px;
-    flex: 0 0 auto;
-}
-
-/* File drop zone */
+/* ── File drop zone ─────────────────────────────────────────────────── */
 .jds-file-drop {
-    padding: 24px;
-    border: 2px dashed #d1d5db;
-    border-radius: 10px;
+    position: relative;
+    padding: 28px 20px 22px;
+    border: 2px dashed var(--gray-300, #d1d5db);
+    border-radius: 16px;
     text-align: center;
-    color: #6b7280;
-    font-size: 14px;
     cursor: pointer;
-    background: #fafafa;
-    transition: all 0.15s;
+    color: var(--gray-500, #6b7280);
+    font-size: 14px;
+    background: linear-gradient(180deg, #fff 0%, var(--gray-50, #f9fafb) 100%);
+    transition: border-color .2s ease, background .2s ease, box-shadow .2s ease, transform .2s ease;
 }
-
 .jds-file-drop:hover,
 .jds-file-drop--active {
-    border-color: #92400e;
-    background: #fef3c7;
-    color: #92400e;
+    border-color: var(--fx-accent);
+    background: linear-gradient(180deg, #fff 0%, var(--fx-tint) 100%);
+    box-shadow: 0 0 0 4px var(--fx-ring);
 }
-
+.jds-file-drop--active { transform: scale(1.004); }
 .jds-file-drop-icon {
-    width: 44px;
-    height: 38px;
-    margin: 0 auto 8px;
+    width: 52px;
+    height: 46px;
+    margin: 0 auto 10px;
     display: block;
-    color: #9ca3af;
+    color: var(--gray-400, #9ca3af);
+    transition: transform .25s var(--ease-out, cubic-bezier(.2,.8,.2,1));
 }
-
+.jds-file-drop:hover .jds-file-drop-icon,
+.jds-file-drop--active .jds-file-drop-icon { transform: translateY(-3px); }
 .jds-file-drop-cta {
-    font-size: 16px;
-    font-weight: 600;
-    color: #374151;
-    margin-bottom: 4px;
+    font-size: 15.5px;
+    font-weight: 700;
+    color: var(--gray-800, #1f2937);
 }
-
 .jds-file-drop-sub {
     font-size: 13px;
-    color: #6b7280;
-    margin-bottom: 12px;
+    color: var(--gray-500, #6b7280);
+    margin: 4px 0 12px;
 }
-
 .jds-file-drop-dots {
     display: flex;
     justify-content: center;
     gap: 8px;
-    margin-top: 4px;
 }
-
 .jds-file-drop-dot {
     width: 10px;
     height: 10px;
     border-radius: 50%;
     background: transparent;
-    border: 2px solid #d1d5db;
-    transition: background 0.2s, border-color 0.2s, transform 0.2s;
+    border: 2px solid var(--gray-300, #d1d5db);
+    transition: background .2s ease, border-color .2s ease, transform .2s ease, box-shadow .2s ease;
 }
-
 .jds-file-drop-dot--filled {
-    background: #10b981;
-    border-color: #10b981;
+    background: var(--state-success, #059669);
+    border-color: var(--state-success, #059669);
+    box-shadow: 0 0 0 3px rgba(5, 150, 105, .18);
     transform: scale(1.1);
 }
-
 .jds-file-drop-types {
     font-size: 12px;
-    color: #9ca3af;
+    color: var(--gray-500, #6b7280);
     text-align: center;
-    margin-top: 8px;
+    margin-top: 10px;
 }
-
-/* Capacity-reached visual: dim + neutralize hover so it reads as "no more room". */
+/* Capacity reached — reads as "no more room", hover neutralised */
 .jds-file-drop--full {
-    opacity: 0.6;
+    opacity: .55;
     cursor: not-allowed;
-    background: #f3f4f6;
+    background: var(--gray-100, #f3f4f6);
 }
 .jds-file-drop--full:hover,
 .jds-file-drop--full.jds-file-drop--active {
-    border-color: #d1d5db;
-    background: #f3f4f6;
-    color: #6b7280;
-}
-
-/* Legacy hint class kept for backwards compat — superseded by .jds-file-drop-sub. */
-.jds-file-drop-hint {
-    font-size: 12px;
-    color: #9ca3af;
-    margin-top: 6px;
+    border-color: var(--gray-300, #d1d5db);
+    background: var(--gray-100, #f3f4f6);
+    box-shadow: none;
+    transform: none;
 }
 
 .jds-file-list {
     margin-top: 12px;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
 }
-
 .jds-file-item {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 8px 12px;
-    background: #f3f4f6;
-    border-radius: 8px;
+    gap: 12px;
+    padding: 9px 12px 9px 9px;
+    background: #fff;
+    border: 1px solid var(--gray-200, #e5e7eb);
+    border-radius: 12px;
     font-size: 13px;
+    box-shadow: var(--shadow-sm, 0 1px 2px rgba(15,23,42,.04));
 }
-
+.jds-file-item::before {
+    content: '';
+    flex: 0 0 32px;
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    background: var(--fx-tint) url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23b45309' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/%3E%3Cpolyline points='14 2 14 8 20 8'/%3E%3C/svg%3E") center / 16px no-repeat;
+}
 .jds-file-name {
     flex: 1;
-    color: #1f2937;
+    min-width: 0;
+    color: var(--gray-800, #1f2937);
+    font-weight: 500;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
-
 .jds-file-size {
-    color: #6b7280;
+    color: var(--gray-500, #6b7280);
     font-size: 12px;
     flex: 0 0 auto;
+    font-variant-numeric: tabular-nums;
 }
-
 .jds-file-remove {
-    width: 22px;
-    height: 22px;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
     border: none;
-    background: #e5e7eb;
-    color: #6b7280;
+    background: var(--gray-100, #f3f4f6);
+    color: var(--gray-500, #6b7280);
     cursor: pointer;
-    font-size: 14px;
+    font-size: 15px;
     line-height: 1;
     flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .15s ease, color .15s ease;
 }
+.jds-file-remove:hover { background: var(--state-danger, #dc2626); color: #fff; }
 
-.jds-file-remove:hover {
-    background: #ef4444;
-    color: #fff;
-}
-
-/* Rush toggle */
-.jds-rush-row {
-    margin: 8px 0 14px;
-}
-
+/* ── Rush toggle ────────────────────────────────────────────────────── */
 .jds-rush-toggle {
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    padding: 10px 16px;
+    padding: 10px 18px 10px 14px;
     background: #fff;
-    border: 1.5px dashed #d1d5db;
-    border-radius: 10px;
-    color: #6b7280;
+    border: 1.5px dashed var(--gray-300, #d1d5db);
+    border-radius: 999px;
+    color: var(--gray-600, #4b5563);
     font-family: inherit;
     font-size: 14px;
     cursor: pointer;
-    transition: all 0.15s;
+    transition: background .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease;
 }
-
 .jds-rush-toggle:hover {
-    border-color: #ef4444;
-    color: #ef4444;
+    border-color: var(--state-danger, #dc2626);
+    color: var(--state-danger, #dc2626);
+    background: var(--state-danger-bg, #fef2f2);
 }
-
-.jds-rush-toggle--active {
-    background: #fef2f2;
-    border-color: #ef4444;
-    border-style: solid;
-    color: #ef4444;
-}
-
 .jds-rush-icon {
-    font-size: 16px;
+    font-size: 18px;
+    line-height: 1;
+    filter: grayscale(1);
+    opacity: .6;
+    transition: filter .2s ease, opacity .2s ease;
+}
+.jds-rush-label { font-weight: 700; }
+.jds-rush-hint { font-size: 12px; opacity: .8; }
+.jds-rush-toggle--active,
+.jds-rush-toggle--active:hover {
+    background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+    border: 1.5px solid #991b1b;
+    color: #fff;
+    box-shadow: 0 10px 22px -10px rgba(220, 38, 38, .75), 0 0 0 4px rgba(220, 38, 38, .15);
+    animation: jds-rush-pulse 1.8s ease-in-out infinite;
+}
+.jds-rush-toggle--active .jds-rush-icon {
+    filter: none;
+    opacity: 1;
+    animation: jds-rush-flicker 1.1s ease-in-out infinite;
+}
+.jds-rush-toggle--active .jds-rush-hint { opacity: .9; }
+@keyframes jds-rush-pulse {
+    0%, 100% { box-shadow: 0 10px 22px -10px rgba(220, 38, 38, .75), 0 0 0 4px rgba(220, 38, 38, .15); }
+    50%      { box-shadow: 0 10px 22px -10px rgba(220, 38, 38, .75), 0 0 0 9px rgba(220, 38, 38, .06); }
+}
+@keyframes jds-rush-flicker {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.18); }
 }
 
-.jds-rush-label {
-    font-weight: 600;
-}
-
-.jds-rush-hint {
-    font-size: 12px;
-    opacity: 0.85;
-}
-
-/* Submit row */
+/* ── Submit ─────────────────────────────────────────────────────────── */
 .jds-submit-row {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding-top: 8px;
-    border-top: 1px solid #f3f4f6;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding-top: 22px;
+    margin-top: 8px;
+    border-top: 1px solid var(--gray-200, #e5e7eb);
 }
-
 .jds-submit-btn {
-    padding: 12px 26px;
-    background: #92400e;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 13px 30px;
+    background: var(--fx-grad);
     color: #fff;
     border: none;
-    border-radius: 10px;
+    border-radius: 12px;
     font-size: 15px;
-    font-weight: 600;
+    font-weight: 700;
+    letter-spacing: -.005em;
     cursor: pointer;
     font-family: inherit;
-    transition: background 0.15s;
+    box-shadow: 0 10px 22px -10px color-mix(in srgb, var(--fx-accent) 85%, transparent),
+                0 1px 2px rgba(15, 23, 42, .08);
+    transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
 }
-
 .jds-submit-btn:hover {
-    background: #5a2a07;
+    transform: translateY(-1px);
+    filter: brightness(1.06);
+    box-shadow: 0 16px 30px -12px color-mix(in srgb, var(--fx-accent) 90%, transparent),
+                0 1px 2px rgba(15, 23, 42, .08);
 }
-
+.jds-submit-btn:active { transform: translateY(0); filter: none; }
+.jds-submit-btn:focus-visible { outline: none; box-shadow: 0 0 0 4px var(--fx-ring); }
 .jds-submit-btn:disabled {
-    background: #9ca3af;
+    background: var(--gray-300, #d1d5db);
+    color: #fff;
     cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+    filter: none;
 }
+.jds-submit-status { color: var(--gray-500, #6b7280); font-size: 13px; }
 
-.jds-submit-status {
-    color: #6b7280;
-    font-size: 13px;
-}
-
-/* Success state */
+/* ── Success ────────────────────────────────────────────────────────── */
 .jds-success {
     text-align: center;
-    padding: 40px 20px;
+    padding: 56px 20px 48px;
+    animation: jds-fade-up .4s var(--ease-out, cubic-bezier(.2,.8,.2,1));
 }
-
 .jds-success-icon {
-    font-size: 56px;
-    margin-bottom: 12px;
+    width: 92px;
+    height: 92px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 44px;
+    line-height: 1;
+    background: var(--state-success-bg, #ecfdf5);
+    box-shadow: 0 0 0 10px rgba(5, 150, 105, .08), 0 0 0 20px rgba(5, 150, 105, .04);
+    animation: jds-pop .55s cubic-bezier(.2, .8, .2, 1);
 }
-
 .jds-success h3 {
     margin: 0 0 10px;
-    font-size: 22px;
-    color: #059669;
-    font-weight: 600;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -.02em;
+    color: var(--gray-900, #111827);
 }
-
-.jds-success p {
-    color: #4b5563;
-    line-height: 1.5;
-    margin: 0 auto 20px;
-    max-width: 460px;
-}
-
-.jds-success-link {
+.jds-success-id {
     display: inline-block;
-    padding: 10px 20px;
+    margin-left: 6px;
+    padding: 3px 12px;
+    border-radius: 999px;
+    background: var(--fx-tint);
+    color: var(--fx-accent);
+    font-size: 15px;
+    font-weight: 700;
+    vertical-align: middle;
+}
+.jds-success p {
+    color: var(--gray-600, #4b5563);
+    line-height: 1.6;
+    margin: 0 auto 24px;
+    max-width: 480px;
+    font-size: 14.5px;
+}
+.jds-success-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 11px 22px;
     margin: 0 8px 8px 0;
-    background: #059669;
+    background: var(--state-success, #059669);
     color: #fff;
     text-decoration: none;
-    border-radius: 8px;
-    font-weight: 600;
+    border-radius: 10px;
+    font-weight: 700;
     font-size: 14px;
+    box-shadow: 0 8px 18px -8px rgba(5, 150, 105, .7);
+    transition: background .15s ease, transform .15s ease;
 }
-
-.jds-success-link:hover {
-    background: #047857;
-}
-
+.jds-success-link:hover { background: #047857; transform: translateY(-1px); }
 .jds-success-another {
-    padding: 10px 20px;
+    padding: 11px 22px;
     background: #fff;
-    color: #92400e;
-    border: 1.5px solid #92400e;
-    border-radius: 8px;
+    color: var(--fx-accent);
+    border: 1.5px solid var(--fx-accent);
+    border-radius: 10px;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
     font-family: inherit;
+    transition: background .15s ease, color .15s ease;
+}
+.jds-success-another:hover { background: var(--fx-accent); color: #fff; }
+@keyframes jds-pop {
+    0%   { transform: scale(.4); opacity: 0; }
+    60%  { transform: scale(1.08); opacity: 1; }
+    100% { transform: scale(1); }
+}
+@keyframes jds-fade-up {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: none; }
 }
 
-.jds-success-another:hover {
-    background: #92400e;
-    color: #fff;
-}
-
-/* Toast (matches sbf pattern) */
+/* ── Toast (mounted on <body>, so colours are literal, not --fx-*) ──── */
 .jds-toast {
     position: fixed;
     bottom: 24px;
     left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    padding: 12px 22px;
-    border-radius: 8px;
+    transform: translateX(-50%) translateY(16px);
+    padding: 12px 20px 12px 16px;
+    border-radius: 12px;
+    border-left: 4px solid transparent;
     color: #fff;
     font-weight: 500;
     font-size: 14px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+    box-shadow: 0 12px 32px -8px rgba(15, 23, 42, .45);
     opacity: 0;
-    transition: opacity 0.25s, transform 0.25s;
+    transition: opacity .25s ease, transform .25s ease;
     z-index: 9999;
     max-width: 80%;
     text-align: center;
 }
+.jds-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.jds-toast--info    { background: #1f2937; border-left-color: #b45309; }
+.jds-toast--error   { background: #dc2626; border-left-color: #7f1d1d; }
+.jds-toast--success { background: #059669; border-left-color: #064e3b; }
 
-.jds-toast.show {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
+/* ── Empty / error state ────────────────────────────────────────────── */
+.jds-empty {
+    padding: 36px 20px;
+    text-align: center;
+    color: var(--gray-500, #6b7280);
+    font-size: 14px;
+    background: var(--gray-50, #f9fafb);
+    border: 1.5px dashed var(--gray-200, #e5e7eb);
+    border-radius: 14px;
+}
+.jds-empty--error { color: #b91c1c; background: #fef2f2; border-color: #fecaca; }
+
+/* ── Section eyebrow ────────────────────────────────────────────────── */
+.jds-section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 6px 0 14px;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--fx-accent);
+}
+.jds-section-header::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--fx-tint-2), var(--gray-200, #e5e7eb) 60%, transparent);
 }
 
-.jds-toast--info { background: #1f2937; }
-.jds-toast--error { background: #ef4444; }
-.jds-toast--success { background: #059669; }
+/* ── Search ─────────────────────────────────────────────────────────── */
+.jds-search-bar { margin-bottom: 22px; }
+.jds-search-input {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 48px;
+    padding: 12px 16px 12px 46px;
+    border: 1px solid var(--gray-300, #d1d5db);
+    border-radius: 14px;
+    font-size: 15px;
+    font-family: inherit;
+    color: var(--gray-900, #111827);
+    background: #fff url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") 16px center / 18px no-repeat;
+    box-shadow: var(--shadow-sm, 0 1px 2px rgba(15,23,42,.04));
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+.jds-search-input::placeholder { color: var(--gray-400, #9ca3af); }
+.jds-search-input:hover { border-color: var(--gray-400, #9ca3af); }
+.jds-search-input:focus {
+    outline: none;
+    border-color: var(--fx-accent);
+    box-shadow: 0 0 0 4px var(--fx-ring), var(--shadow-sm, 0 1px 2px rgba(15,23,42,.04));
+}
 
-/* AE pill — JDS variant accent (when active uses default red theme via .ae-item-pill.is-active) */
+/* ── Breadcrumb ─────────────────────────────────────────────────────── */
+.jds-breadcrumb {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 16px;
+    font-size: 13.5px;
+    color: var(--gray-500, #6b7280);
+}
+.jds-breadcrumb-sep { color: var(--gray-300, #d1d5db); }
+.jds-breadcrumb-current {
+    color: var(--gray-900, #111827);
+    font-weight: 700;
+    padding: 4px 10px;
+    background: var(--gray-100, #f3f4f6);
+    border-radius: 999px;
+}
+.jds-link {
+    background: none;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 8px;
+    color: var(--fx-accent);
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background .12s ease, color .12s ease;
+}
+.jds-link:hover { background: var(--fx-tint); color: var(--fx-accent-dark); }
 
-/* Responsive */
-@media (max-width: 700px) {
-    .jds-row {
-        grid-template-columns: 1fr;
-        gap: 0;
-    }
-    .jds-banner {
-        flex-direction: column;
-        text-align: center;
-        gap: 10px;
-    }
-    .jds-selected-card {
-        grid-template-columns: 1fr;
-        position: static;
-    }
-    .jds-selected-thumb {
-        width: 100%;
-        height: 220px;
-    }
+/* ── Category + product tiles ───────────────────────────────────────── */
+/* Flex (not grid) so a single-card view doesn't balloon to full width. */
+.jds-category-grid,
+.jds-product-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+.jds-category-card,
+.jds-product-card {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px;
+    background: #fff;
+    border: 1px solid var(--gray-200, #e5e7eb);
+    border-radius: 16px;
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    color: inherit;
+    box-shadow: var(--shadow-sm, 0 1px 2px rgba(15,23,42,.04));
+    transition: transform .2s var(--ease-out, cubic-bezier(.2,.8,.2,1)), box-shadow .2s ease, border-color .2s ease;
+}
+.jds-category-card { flex: 0 0 220px; max-width: 240px; }
+.jds-product-card  { flex: 0 0 204px; max-width: 224px; }
+.jds-category-card:hover,
+.jds-product-card:hover {
+    border-color: var(--fx-accent-light);
+    box-shadow: var(--shadow-lg, 0 8px 24px -8px rgba(15,23,42,.18)), 0 0 0 4px var(--fx-ring);
+    transform: translateY(-3px);
+}
+.jds-category-card:focus-visible,
+.jds-product-card:focus-visible { outline: none; box-shadow: 0 0 0 4px var(--fx-ring); }
+.jds-card-thumb {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    max-height: 220px;
+    background: linear-gradient(180deg, #fff 0%, var(--gray-100, #f3f4f6) 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+.jds-card-thumb img {
+    max-width: 88%;
+    max-height: 88%;
+    object-fit: contain;
+    transition: transform .3s var(--ease-out, cubic-bezier(.2,.8,.2,1));
+}
+.jds-category-card:hover .jds-card-thumb img,
+.jds-product-card:hover .jds-card-thumb img { transform: scale(1.06); }
+.jds-card-thumb-empty { font-size: 36px; color: var(--gray-300, #d1d5db); }
+.jds-card-body { display: flex; flex-direction: column; gap: 3px; padding: 0 2px 2px; }
+.jds-card-name {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gray-900, #111827);
+    line-height: 1.3;
+    letter-spacing: -.01em;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+.jds-category-card .jds-card-name { padding: 0 2px; }
+.jds-card-sku {
+    font-size: 12px;
+    color: var(--fx-accent);
+    font-weight: 700;
+    letter-spacing: .02em;
+    font-variant-numeric: tabular-nums;
+}
+.jds-card-count { font-size: 12px; color: var(--gray-500, #6b7280); padding: 0 2px; }
+.jds-card-imprint {
+    align-self: flex-start;
+    font-size: 11px;
+    color: #78350f;
+    background: var(--fx-tint-2);
+    border-radius: 6px;
+    padding: 3px 7px;
+    margin-top: 4px;
+    line-height: 1.3;
+}
+.jds-card-family-badge {
+    align-self: flex-start;
+    margin-top: 2px;
+    padding: 3px 9px;
+    background: var(--fx-grad);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    border-radius: 999px;
+    letter-spacing: .02em;
+}
+.jds-product-card--family { border-color: var(--fx-tint-2); background: linear-gradient(180deg, #fff 0%, var(--fx-tint) 100%); }
+
+/* ── Selected-product summary card (sticky above the form) ──────────── */
+.jds-selected-card {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    gap: 20px;
+    padding: 16px;
+    background: #fff;
+    border: 1px solid var(--gray-200, #e5e7eb);
+    border-left: 4px solid var(--fx-accent);
+    border-radius: 16px;
+    margin-bottom: 20px;
+    position: sticky;
+    top: 12px;
+    z-index: 5;
+    box-shadow: var(--shadow-lg, 0 8px 24px -8px rgba(15,23,42,.18));
+}
+.jds-selected-thumb {
+    width: 150px;
+    height: 150px;
+    background: linear-gradient(180deg, #fff 0%, var(--gray-100, #f3f4f6) 100%);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 1px solid var(--gray-200, #e5e7eb);
+}
+.jds-selected-thumb img { max-width: 88%; max-height: 88%; object-fit: contain; }
+.jds-selected-body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.jds-selected-cat {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--fx-accent);
+    font-weight: 700;
+}
+.jds-selected-name {
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: -.02em;
+    color: var(--gray-900, #111827);
+    line-height: 1.25;
+}
+.jds-selected-sku { font-size: 13px; color: var(--gray-600, #4b5563); }
+.jds-selected-sku strong { color: var(--gray-900, #111827); font-variant-numeric: tabular-nums; }
+.jds-selected-imprint {
+    font-size: 13px;
+    color: var(--gray-800, #1f2937);
+    margin-top: 6px;
+    padding: 7px 10px;
+    background: var(--fx-tint);
+    border: 1px solid var(--fx-tint-2);
+    border-radius: 8px;
+    line-height: 1.45;
+}
+.jds-change-btn { align-self: flex-start; margin-top: 8px; font-size: 13px; padding-left: 0; }
+
+/* Live block (price + inventory) */
+.jds-live-block {
+    margin-top: 10px;
+    padding: 10px 12px;
+    background: var(--gray-50, #f9fafb);
+    border: 1px solid var(--gray-200, #e5e7eb);
+    border-radius: 10px;
+    font-size: 13px;
+}
+.jds-live-loading { color: var(--gray-500, #6b7280); font-style: italic; }
+.jds-live-warn { color: #92400e; font-size: 12.5px; line-height: 1.45; }
+.jds-live-stock { font-weight: 700; color: #047857; margin-bottom: 8px; }
+.jds-out { color: #b91c1c; font-weight: 700; }
+.jds-live-tier-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.jds-live-tier-table th,
+.jds-live-tier-table td { text-align: left; padding: 5px 6px; border-bottom: 1px solid var(--gray-200, #e5e7eb); }
+.jds-live-tier-table th {
+    color: var(--gray-500, #6b7280);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: .06em;
+}
+.jds-live-tier-table tbody tr:last-child td { border-bottom: none; }
+.jds-live-tier-table td:last-child,
+.jds-live-tier-table th:last-child { text-align: right; }
+.jds-live-tier-table td:last-child { font-weight: 700; color: var(--gray-900, #111827); font-variant-numeric: tabular-nums; }
+
+/* Tip callout */
+.jds-tip {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 14px;
+    background: linear-gradient(180deg, #fffbeb 0%, #fef3c7 100%);
+    border: 1px solid #fde68a;
+    border-radius: 12px;
+    color: #78350f;
+    font-size: 13px;
+    line-height: 1.55;
+    margin: 4px 0 18px;
+}
+.jds-tip-icon {
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
+    border-radius: 9px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border: 1px solid #fde68a;
+    font-size: 15px;
+}
+.jds-rush-row { margin: 4px 0 18px; }
+
+/* Legacy hint class kept for backwards compat — superseded by .jds-file-drop-sub */
+.jds-file-drop-hint { font-size: 12px; color: var(--gray-400, #9ca3af); margin-top: 6px; }
+
+/* ── Responsive ─────────────────────────────────────────────────────── */
+@media (max-width: 760px) {
+    .jds-row { grid-template-columns: 1fr; }
+    .jds-form-body { padding: 20px 18px 22px; }
+    .jds-banner { flex-direction: column; text-align: center; gap: 12px; padding: 22px 18px; }
+    .jds-selected-card { grid-template-columns: 1fr; position: static; }
+    .jds-selected-thumb { width: 100%; height: 200px; }
+    .jds-category-card, .jds-product-card { flex-basis: calc(50% - 7px); max-width: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .jds-rush-toggle--active,
+    .jds-rush-toggle--active .jds-rush-icon,
+    .jds-success,
+    .jds-success-icon { animation: none; }
 }
