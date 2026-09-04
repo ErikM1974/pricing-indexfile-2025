@@ -1,3 +1,8 @@
+## v2026.09.04.2 (2026.09.04)
+
+- AE Dashboard: person colour-coding — Steve green, Ruth purple
+- Deploy v2026.09.04.2: 2 files (ae-dashboard.html, garment-designer.html...)
+
 ## v2026.09.04.1 (2026.09.04)
 
 - AE Dashboard: unified visual redesign across nav + all intake forms
