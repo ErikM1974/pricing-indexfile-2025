@@ -1,46 +1,35 @@
 /* =====================================================
-   STAFF DASHBOARD v3 — TOOL GRID CONTROLLER (2026-07-29)
-   Owns two small jobs on the Quick Access zone:
+   STAFF DASHBOARD v3 — COLLAPSE MEMORY (2026-07-29; trimmed 2026-09-04)
+   One job: remember the open/closed state of every
+   <details data-collapse-key> on the page — the Pride Wall and the
+   "More" folds inside the workspace cards — per browser.
 
-   1. Category count badges, derived from the DOM instead of hand-typed.
-   2. Collapse state for any [data-collapse-key] <details> on the page
-      (Pride Wall, Reference card), persisted per browser.
+   (The category count badges this file also rendered died with the
+   Quick Access grid on 2026-09-03; that code left on 2026-09-04.)
 
    No network. No Caspio. localStorage only.
    ===================================================== */
 
 import { store } from '../core/dashboard-store.js';
 
-/* ── Count badges ────────────────────────────────────────────────────
-   The badges used to be typed by hand and drifted the moment anyone
-   added a link — Specialty Products read "5" over six buttons for two
-   months. Counting unique hrefs (not anchors) matters: the Quoting card
-   lists Quick Quote twice on purpose, once as its own row and once
-   inside "All quoting tools", and it should still count as one tool.
-   Disabled roadmap items are <span>, not <a>, so they fall out for free. */
-function renderCountBadges() {
-    document.querySelectorAll('.quick-access-grid .tool-category').forEach((card) => {
-        const badge = card.querySelector('.tool-category-count');
-        if (!badge) return;
-
-        const hrefs = new Set();
-        card.querySelectorAll('a.tool-btn[href]').forEach((a) => hrefs.add(a.getAttribute('href')));
-        badge.textContent = String(hrefs.size);
-    });
-}
-
-/* ── Persisted collapse for <details> widgets ────────────────────────
-   Same shape as sidebar-controller's applyCollapseState/snapshotState,
-   against the `widgetCollapse` store slot (declared since the store was
-   written, unused until now). Stores OPEN state — the markup ships the
-   sensible default (Pride Wall open, Reference closed) and a saved value
-   only overrides it once someone has actually expressed a preference. */
+/* Stores OPEN state — the markup ships the sensible default (Pride Wall open,
+   folds closed) and a saved value only overrides it once someone has actually
+   expressed a preference. */
 const COLLAPSIBLE_SELECTOR = 'details[data-collapse-key]';
 
+/* On a phone the Pride Wall pushed the first tool ~620px down the page
+   (2026-09-04 review). With no saved preference it starts closed there; one
+   tap opens it and that choice is remembered like any other. */
+const PHONE_CLOSED_BY_DEFAULT = new Set(['prideWall']);
+const PHONE = '(max-width: 768px)';
+
 function applyCollapseState(states) {
+    const onPhone = typeof window.matchMedia === 'function' && window.matchMedia(PHONE).matches;
     document.querySelectorAll(COLLAPSIBLE_SELECTOR).forEach((el) => {
         const key = el.dataset.collapseKey;
-        if (key && key in states) el.open = !!states[key];
+        if (!key) return;
+        if (key in states) el.open = !!states[key];
+        else if (onPhone && PHONE_CLOSED_BY_DEFAULT.has(key)) el.open = false;
     });
 }
 
@@ -67,6 +56,5 @@ function initCollapsibles() {
 }
 
 export function initToolGrid() {
-    renderCountBadges();
     initCollapsibles();
 }

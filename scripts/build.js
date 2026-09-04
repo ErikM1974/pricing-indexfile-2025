@@ -51,14 +51,29 @@ const WATCH = process.argv.includes('--watch');
 // drift — see lib/hashed-pages.js for why each page is on it.
 const { HASHED_PAGES: BUILDER_HTML } = require('../lib/hashed-pages');
 
-// Per-builder ESM entry points (bundled IIFE). outbase keeps the dist path
+// ESM entry points, bundled to IIFE in groups. outbase keeps the dist path
 // mirrored: dist/shared_components/js/builders/emb/index.<hash>.js
-const ENTRY_POINTS = [
-    'shared_components/js/builders/emb/index.js',
-    'shared_components/js/builders/scp/index.js',
-    'shared_components/js/builders/dtf/index.js',
-    'shared_components/js/builders/dtg/index.js',
+const ENTRY_BUNDLES = [
+    {
+        // Per-builder entries.
+        outbase: 'shared_components/js/builders',
+        entries: [
+            'shared_components/js/builders/emb/index.js',
+            'shared_components/js/builders/scp/index.js',
+            'shared_components/js/builders/dtf/index.js',
+            'shared_components/js/builders/dtg/index.js',
+        ],
+    },
+    {
+        // Staff Dashboard (2026-09-04): its ~25-file module graph becomes ONE hashed
+        // file. IIFE inside a <script type="module"> tag is fine — nothing imports
+        // the entry. company-numbers.js still imports the same controllers from
+        // source by absolute path, untouched.
+        outbase: 'shared_components/js/staff-dashboard/core',
+        entries: ['shared_components/js/staff-dashboard/core/dashboard-app.js'],
+    },
 ];
+const ENTRY_POINTS = ENTRY_BUNDLES.flatMap((g) => g.entries);
 
 let esbuild;
 try {
@@ -153,33 +168,35 @@ async function buildClassicAsset(sourceUrl) {
     return [sourceUrl, hashedRel];
 }
 
-/** Bundle the per-builder ESM entries → IIFE with esbuild's own content hash. */
+/** Bundle each ESM entry group → IIFE with esbuild's own content hash. */
 async function buildEntryBundles() {
-    const existing = ENTRY_POINTS.filter((p) => fs.existsSync(path.join(ROOT, p)));
-    if (existing.length === 0) return [];
-    const result = await esbuild.build({
-        absWorkingDir: ROOT,
-        entryPoints: existing,
-        outdir: path.join(DIST, 'shared_components/js/builders'),
-        outbase: 'shared_components/js/builders',
-        entryNames: '[dir]/[name].[hash]',
-        bundle: true,
-        format: 'iife', // keeps explicit window.* assignments page-visible
-        minify: true,
-        sourcemap: 'linked',
-        target: 'es2020',
-        drop: ['debugger'],
-        pure: ['console.log', 'console.debug', 'console.info'],
-        metafile: true,
-        logLevel: VERBOSE ? 'info' : 'warning',
-    });
     const pairs = [];
-    for (const [outFile, meta] of Object.entries(result.metafile.outputs)) {
-        if (!meta.entryPoint || !outFile.endsWith('.js')) continue;
-        const sourceUrl = '/' + meta.entryPoint.replace(/\\/g, '/');
-        const hashedUrl = '/' + path.relative(ROOT, path.resolve(ROOT, outFile)).replace(/\\/g, '/');
-        pairs.push([sourceUrl, hashedUrl]);
-        if (VERBOSE) console.log(`[build] bundle ${sourceUrl} → ${hashedUrl}`);
+    for (const group of ENTRY_BUNDLES) {
+        const existing = group.entries.filter((p) => fs.existsSync(path.join(ROOT, p)));
+        if (existing.length === 0) continue;
+        const result = await esbuild.build({
+            absWorkingDir: ROOT,
+            entryPoints: existing,
+            outdir: path.join(DIST, group.outbase),
+            outbase: group.outbase,
+            entryNames: '[dir]/[name].[hash]',
+            bundle: true,
+            format: 'iife', // keeps explicit window.* assignments page-visible
+            minify: true,
+            sourcemap: 'linked',
+            target: 'es2020',
+            drop: ['debugger'],
+            pure: ['console.log', 'console.debug', 'console.info'],
+            metafile: true,
+            logLevel: VERBOSE ? 'info' : 'warning',
+        });
+        for (const [outFile, meta] of Object.entries(result.metafile.outputs)) {
+            if (!meta.entryPoint || !outFile.endsWith('.js')) continue;
+            const sourceUrl = '/' + meta.entryPoint.replace(/\\/g, '/');
+            const hashedUrl = '/' + path.relative(ROOT, path.resolve(ROOT, outFile)).replace(/\\/g, '/');
+            pairs.push([sourceUrl, hashedUrl]);
+            if (VERBOSE) console.log(`[build] bundle ${sourceUrl} → ${hashedUrl}`);
+        }
     }
     return pairs;
 }

@@ -14,6 +14,7 @@ const {
     BUILDER_PAGES,
     STOREFRONT_PAGES,
     STAFF_PAGES,
+    DASHBOARD_PAGES,
     CALCULATOR_PAGES,
     HASHED_PAGES,
     HASHED_PAGES_UNDER_PAGES_MOUNT,
@@ -41,10 +42,25 @@ describe('hashed page list', () => {
         }
     });
 
-    test('the four tranches together make the full list', () => {
+    test('the five tranches together make the full list', () => {
         expect(HASHED_PAGES).toEqual([
-            ...BUILDER_PAGES, ...STOREFRONT_PAGES, ...STAFF_PAGES, ...CALCULATOR_PAGES,
+            ...BUILDER_PAGES, ...STOREFRONT_PAGES, ...STAFF_PAGES, ...CALCULATOR_PAGES, ...DASHBOARD_PAGES,
         ]);
+    });
+
+    test('the Staff Dashboard is hashed, bundled, and served through sendHashedHtml on every URL', () => {
+        expect(DASHBOARD_PAGES).toEqual(['staff-dashboard-v3/index.html']);
+        // build side: its module entry is a bundle group, not a classic transform
+        expect(buildSrc).toContain("'shared_components/js/staff-dashboard/core/dashboard-app.js'");
+        expect(buildSrc).toMatch(/outbase:\s*'shared_components\/js\/staff-dashboard\/core'/);
+        // serve side: all three routes hand the page to sendHashedHtml AFTER requireStaff
+        for (const route of ["'/staff-dashboard.html'", "'/staff-dashboard-v3/'", "'/staff-dashboard-v3/index.html'"]) {
+            const at = serverSrc.indexOf(`app.get(${route}, requireStaff,`);
+            expect(at).toBeGreaterThan(-1);
+            const handler = serverSrc.slice(at, at + 400);
+            expect(handler).toMatch(/sendHashedHtml\(res, path\.join\(__dirname, 'staff-dashboard-v3', 'index\.html'\)\)/);
+            expect(handler).not.toMatch(/res\.sendFile/);
+        }
     });
 
     test('calculators are all under calculators/, at most one level deep, never archive', () => {

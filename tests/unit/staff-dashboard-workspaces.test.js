@@ -245,8 +245,68 @@ describe('role → default tab (workspace-controller.js)', () => {
         const table = Object.fromEntries([...m[1].matchAll(/(\w+):\s*'(\w+)'/g)].map((x) => [x[1], x[2]]));
         expect(table).toEqual({
             admin: 'sales', sales: 'sales', art: 'art', production: 'production', shipping: 'production', accountant: 'office',
+            staff: 'office', // 2026-09-04: a plain staffer (Jim) lands on Office, not the catch-all
         });
         expect(controllerSrc).toMatch(/const FALLBACK_WS = 'everything';/);
+    });
+});
+
+describe('2026-09-04 review — the things that must not regress', () => {
+    test('Past Due Orders is the header chip plus exactly ONE row (it was five entries)', () => {
+        const rows = dash.querySelectorAll('a.ws-link[href="/dashboards/past-due-orders.html"]');
+        expect(rows.length).toBe(1);
+        expect(rows[0].closest('.ws-panel').dataset.ws).toBe('production');
+        expect(dash.querySelector('.ws-pd[href="/dashboards/past-due-orders.html"]')).not.toBeNull();
+    });
+
+    test('no card leaves a hole: a 2-of-3 span never sits alone on its row', () => {
+        for (const panel of panels) {
+            const cards = [...panel.querySelectorAll(':scope > .ws-grid > .ws-card')];
+            let col = 0;
+            for (const c of cards) {
+                const span = c.classList.contains('ws-card--full') ? 3 : c.classList.contains('ws-card--wide') ? 2 : 1;
+                if (col + span > 3) col = 0;        // wraps to the next row
+                col += span;
+                if (col === 3) col = 0;
+            }
+            // whatever is left on the last row must not be a lone 2-span
+            const last = cards[cards.length - 1];
+            const loneWide = !!(last && last.classList.contains('ws-card--wide') && col === 2);
+            expect({ tab: panel.dataset.ws, loneWide }).toEqual({ tab: panel.dataset.ws, loneWide: false });
+        }
+    });
+
+    test('customer bundle rows use one family (f-store) — colour means person/department', () => {
+        for (const href of ['/DrainPro-Bundle.html', '/streich-bros-bundle.html', '/wcttr-bundle.html', '/christmas-bundles.html']) {
+            expect(dash.querySelector(`a.ws-link[href="${href}"]`).classList.contains('f-store')).toBe(true);
+        }
+        expect(dashboardHtml).not.toMatch(/f-client-|f-mint/);
+    });
+
+    test('search keywords ride on workspace rows (the palette harvests only a.ws-link)', () => {
+        const withKw = [...dash.querySelectorAll('[data-keywords]')];
+        expect(withKw.length).toBeGreaterThan(30);
+        for (const el of withKw) expect(el.classList.contains('ws-link')).toBe(true);
+    });
+
+    test('stylesheets load in cascade order: tokens first, the unlayered overrides after the layered files, workspaces last', () => {
+        const hrefs = [...dash.querySelectorAll('link[rel="stylesheet"][href^="/shared_components/css/staff-dashboard/"]')]
+            .map((l) => l.getAttribute('href').split('/').pop().split('?')[0]);
+        expect(hrefs[0]).toBe('tokens.css');
+        expect(hrefs[hrefs.length - 1]).toBe('workspaces.css');
+        const idx = (n) => hrefs.indexOf(n);
+        for (const layered of ['tokens.css', 'base.css', 'components.css', 'utilities.css']) {
+            expect(idx(layered)).toBeGreaterThan(-1);
+            expect(idx(layered)).toBeLessThan(idx('dashboard-v3-theme.css'));
+        }
+        expect(idx('dashboard-v3-theme.css')).toBeLessThan(idx('dashboard-v3-patch-2.css'));
+    });
+
+    test('the Tweaks FAB and the sidebar controller are gone', () => {
+        const app = readRepo('shared_components/js/staff-dashboard/core/dashboard-app.js');
+        expect(app).not.toMatch(/tweaks-fab/);
+        expect(fs.existsSync(path.join(ROOT, 'shared_components/js/staff-dashboard/widgets/tweaks-fab.js'))).toBe(false);
+        expect(fs.existsSync(path.join(ROOT, 'shared_components/js/staff-dashboard/controllers/sidebar-controller.js'))).toBe(false);
     });
 });
 

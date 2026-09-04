@@ -65,7 +65,14 @@ function harvestRegistry() {
         const card = a.closest('.ws-card')?.querySelector('.ws-card-h h3')?.textContent?.trim() || '';
         const iconEl = a.querySelector('i[class*="fa-"]');
         const icon = iconEl ? iconEl.className.replace(/\bws-[a-z_-]+\b/g, '').trim() : '';
-        out.push({ label, href, icon: icon || 'fas fa-toolbox', tab, card });
+        // 2026-09-04: the description, the tooltip and the link's data-keywords are
+        // searchable too — "blanks" finds Purchase Request, "roster" finds Names &
+        // Numbers, "heat" finds Transfer Queue. Names alone missed how people think.
+        const descEl = a.querySelector('.ws-d');
+        const desc = descEl ? (descEl.textContent || '').replace(/\s+/g, ' ').trim() : '';
+        const keywords = (a.dataset.keywords || '').toLowerCase();
+        const extra = [desc, a.getAttribute('title') || ''].join(' ').toLowerCase();
+        out.push({ label, href, icon: icon || 'fas fa-toolbox', tab, card, desc, keywords, extra });
     }
     // Actions that aren't plain links
     out.push({ label: 'New Quote', href: null, run: () => document.getElementById('quote-start-btn')?.click(), icon: 'fas fa-plus', tab: 'Sales', card: 'Quote' });
@@ -75,14 +82,24 @@ function harvestRegistry() {
 function searchLocal(q) {
     if (!state.registry) state.registry = harvestRegistry();
     const needle = q.toLowerCase();
+    const tokens = needle.split(/\s+/).filter(Boolean);
+    // Word-START matches only for the wider fields, so "heat" never lights up
+    // the Shop Menu because its tooltip says "cheat sheet".
+    const wordStart = (text, w) => new RegExp('(^|[^a-z0-9])' + w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).test(text);
     const scored = [];
     for (const t of state.registry) {
         const hay = t.label.toLowerCase();
+        const keywords = t.keywords || '';
+        const extra = t.extra || '';
+        const place = (t.card + ' ' + t.tab).toLowerCase();
         let score = -1;
         if (hay.startsWith(needle)) score = 0;
         else if (hay.split(/[\s(/·-]+/).some((w) => w.startsWith(needle))) score = 1;   // word start: "quote" → Saved Quotes
         else if (hay.includes(needle)) score = 2;
-        else if ((t.card + ' ' + t.tab).toLowerCase().includes(needle)) score = 3;
+        else if (tokens.every((w) => wordStart(keywords, w))) score = 3;              // curated data-keywords: "blanks" → Purchase Request
+        else if (tokens.every((w) => wordStart(extra, w))) score = 4;                 // description / tooltip
+        else if (place.includes(needle)) score = 5;                                   // card / tab name
+        else if (tokens.length > 1 && tokens.every((w) => wordStart(hay + ' ' + keywords + ' ' + extra + ' ' + place, w))) score = 6; // "bradley blanks"
         if (score >= 0) scored.push({ score, t });
     }
     scored.sort((a, b) => a.score - b.score || a.t.label.localeCompare(b.t.label));
@@ -100,8 +117,9 @@ function buildItems() {
             group: t.run ? 'Actions' : 'Tools & pages',
             icon: `<i class="${escapeHtml(t.icon)}" aria-hidden="true"></i>`,
             title: t.label,
-            meta: [t.tab, t.card].filter(Boolean).join(' · '),
-            hint: '↵ open',
+            // What it is (the description) beats where it lives; the tab moves to the hint.
+            meta: t.desc || [t.tab, t.card].filter(Boolean).join(' · '),
+            hint: t.tab ? `${t.tab} ↵` : '↵ open',
             href: t.href,
             run: t.run || null,
         });
@@ -141,7 +159,7 @@ function render() {
     if (state.q.trim().length < MIN_CHARS) {
         state.flat = [];
         list.innerHTML = '';
-        status.textContent = `Type ${MIN_CHARS}+ letters of a tool or page name — every tab is searched, Enter opens the top match. Can't find it? The Everything tab lists every tool.`;
+        status.textContent = `Type ${MIN_CHARS}+ letters — a tool's name or what it does ("blanks", "roster", "heat") — every tab is searched, Enter opens the top match. Can't find it? The Everything tab lists every tool.`;
         return;
     }
 

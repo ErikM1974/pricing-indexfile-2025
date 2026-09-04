@@ -11,12 +11,11 @@ const STORE_VERSION = 1;
 
 const KEYS = {
     // localStorage (persistent across sessions)
+    // tweaks: read by metrics-controller (Company Numbers) for the default revenue
+    // period. The Tweaks FAB that wrote it left the dashboard 2026-09-04.
     tweaks:                 { storage: 'local',   key: 'nwca-dash:tweaks',         version: STORE_VERSION },
-    sidebarSections:        { storage: 'local',   key: 'nwca-dash:sidebar',        version: STORE_VERSION },
+    // (sidebarSections removed 2026-09-04 with sidebar-controller.js — the sidebar left 2026-09-03.)
     widgetCollapse:         { storage: 'local',   key: 'nwca-dash:widgets',        version: STORE_VERSION },
-    // Workspaces (2026-09-03): { last, byEmail: { email: ws } } — the tab this browser
-    // (and this person, on a shared machine) last used. workspace-controller.js.
-    workspace:              { storage: 'local',   key: 'nwca-dash:workspace',      version: STORE_VERSION },
     // Workspaces (2026-09-03): { last, byEmail: { email: ws } } — the tab this browser
     // (and this person, on a shared machine) last used. workspace-controller.js.
     workspace:              { storage: 'local',   key: 'nwca-dash:workspace',      version: STORE_VERSION },

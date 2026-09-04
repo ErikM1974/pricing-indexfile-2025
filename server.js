@@ -251,7 +251,8 @@ dotenv.config();
 //   L624  Directory-to-static mappings (20+ directories)
 //
 // STAFF DASHBOARD ROUTING (v3 sole survivor — 2026-05-28 cleanup)
-//   L770  /staff-dashboard.html         → v3 canonical (serves staff-dashboard-v3/index.html)
+//   L770  /staff-dashboard.html         → v3 canonical (serves staff-dashboard-v3/index.html via
+//                                          sendHashedHtml — assets content-hashed since 2026-09-04)
 //   L775  /staff-dashboard-v2.html      → 301 redirect → /staff-dashboard.html
 //   L780  /staff-dashboard-legacy.html  → 301 redirect → /staff-dashboard.html
 //   L786  /staff-dashboard-v3/          → v3 dedicated URL (kept for old bookmarks)
@@ -5425,10 +5426,13 @@ function noCacheHeaders(res) {
 //   now 301-redirect to canonical so old bookmarks still land on V3.
 //   Recovery: `git show v2026.05.27.5:staff-dashboard.html` (or :staff-dashboard-legacy.html).
 
-// Canonical URL — serves v3 (gated: verified SAML staff session required)
+// Canonical URL — serves v3 (gated: verified SAML staff session required).
+// 2026-09-04: served through sendHashedHtml (lib/hashed-pages DASHBOARD_PAGES) so
+// its stylesheets + bundled module entry come from /dist, cached for a year;
+// the HTML itself stays no-store. Fails open to the plain file when no manifest.
 app.get('/staff-dashboard.html', requireStaff, (req, res) => {
   noCacheHeaders(res);
-  res.sendFile(path.join(__dirname, 'staff-dashboard-v3', 'index.html'));
+  sendHashedHtml(res, path.join(__dirname, 'staff-dashboard-v3', 'index.html'));
 });
 
 // Old v2 URL → redirect to canonical (file deleted 2026-05-28)
@@ -5451,14 +5455,14 @@ app.get('/quote-builders/dtg-quote-builder-legacy.html', (req, res) => {
 // still resolve to the same content as the canonical URL.
 app.get('/staff-dashboard-v3/', requireStaff, (req, res) => {
   noCacheHeaders(res);
-  res.sendFile(path.join(__dirname, 'staff-dashboard-v3', 'index.html'));
+  sendHashedHtml(res, path.join(__dirname, 'staff-dashboard-v3', 'index.html'));
 });
 app.get('/staff-dashboard-v3', (req, res) => {
   res.redirect(301, '/staff-dashboard-v3/');
 });
 app.get('/staff-dashboard-v3/index.html', requireStaff, (req, res) => {
   noCacheHeaders(res);
-  res.sendFile(path.join(__dirname, 'staff-dashboard-v3', 'index.html'));
+  sendHashedHtml(res, path.join(__dirname, 'staff-dashboard-v3', 'index.html'));
 });
 // Static assets under /staff-dashboard-v3/ (config.js, quote-launcher.js,
 // past-due-badge.js, art-aging-widget.js). Reuse staticOptions so these also
