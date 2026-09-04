@@ -1,3 +1,8 @@
+## v2026.09.04.7 (2026.09.04)
+
+- Names & Numbers = shop-floor blue above the fold; document the colour code
+- Deploy v2026.09.04.7: 2 files (names-numbers-dashboard.html, names-numbers.html...)
+
 ## v2026.09.04.6 (2026.09.04)
 
 - Colour-coding: Personalization + Monogram dashboard = shop-floor blue
