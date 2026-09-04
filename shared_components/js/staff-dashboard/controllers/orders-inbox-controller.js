@@ -180,7 +180,7 @@ export function initOrdersInbox() {
 
 // Periodic re-reads for the Company Numbers 5-minute tick. Cache-honouring
 // (forceRefresh=false) — the proxy's own 5-min cache governs Caspio quota.
-export function refreshOrdersInbox()    { return loadOrdersInbox(false); }
+export function refreshOrdersInbox(force = false) { return loadOrdersInbox(!!force); }
 export function refreshMoneyCollected() { return loadMoneyCollected(); }
 export function refreshSamplePipeline() { return loadSamplePipeline(); }
 

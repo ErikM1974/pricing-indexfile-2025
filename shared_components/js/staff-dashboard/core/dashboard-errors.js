@@ -20,6 +20,8 @@ const ERROR_AREAS = {
     metrics:   { containerId: 'salesTeamList',         label: 'team performance' },
     revenue:   { containerId: 'ytdRevenue',            label: 'revenue' },
     'embroidery-bonus': { containerId: 'embroideryBonusContent', label: 'Q3 embroidery bonus' },
+    // Company Numbers "Production Due" card (2026-09-04) — live ShopWorks due dates.
+    production: { containerId: 'production-due-list', label: 'production due dates' },
     // A showApiError() call with an area missing from this map silently no-ops
     // (unknown-area guard below) — register the area HERE in the same commit
     // that adds the controller call. Retired areas (garment tracker, gap report,

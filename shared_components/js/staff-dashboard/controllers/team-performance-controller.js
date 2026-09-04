@@ -34,6 +34,14 @@ const HOUSE_REPS = new Set([
     'dead',                          // ShopWorks placeholder rep for dead accounts — not a person (2026-09-04)
 ]);
 
+// Where a row goes when clicked (2026-09-04): the rep's own account page. Reps
+// without a page (Ruthie) render as a plain card.
+const REP_PAGES = {
+    'Nika Lao':       { href: '/dashboards/nika-crm.html',       label: "Open Nika's accounts" },
+    'Taneisha Clark': { href: '/dashboards/taneisha-crm.html',   label: "Open Taneisha's accounts" },
+    'House':          { href: '/dashboards/house-accounts.html', label: 'Open the House accounts' },
+};
+
 function normalizeRepName(name) {
     if (!name) return 'Unassigned';
     const k = name.trim().replace(/\s+/g, ' ').toLowerCase();
@@ -110,8 +118,14 @@ function renderTeam(payload, goalRes) {
         const houseSubtitle = r.name === 'House' && r.sources.length
             ? `<div class="rep-subtitle">${escapeHtml(r.sources.slice(0, 4).join(', '))}</div>`
             : '';
+        const page = REP_PAGES[r.name];
+        const tip = `${pct.toFixed(1)}% of team total${goalTip}${page ? ' · ' + page.label : ''}`;
+        const open = page
+            ? `<a class="rep-card rep-card--link" href="${page.href}" title="${escapeHtml(tip)}">`
+            : `<div class="rep-card" title="${escapeHtml(tip)}">`;
+        const close = page ? '</a>' : '</div>';
         return `
-            <div class="rep-card" title="${pct.toFixed(1)}% of team total${escapeHtml(goalTip)}">
+            ${open}
                 <div class="rep-info">
                     <div class="rep-avatar">${escapeHtml(getInitials(r.name))}</div>
                     <div class="rep-name-group">
@@ -126,7 +140,7 @@ function renderTeam(payload, goalRes) {
                     <div class="rep-revenue">${escapeHtml(formatMoney(r.revenue))}</div>
                     <div class="rep-orders num">${r.orders.toLocaleString('en-US')} orders · ${pct.toFixed(1)}% of team</div>
                 </div>
-            </div>
+            ${close}
         `;
     }).join('');
 
@@ -134,6 +148,26 @@ function renderTeam(payload, goalRes) {
         container.insertAdjacentHTML('beforeend',
             `<div class="rep-goal-note" role="status"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> ${escapeHtml(fallbackWarning())}</div>`);
     }
+}
+
+/**
+ * The Revenue card's YTD chip (Company Numbers, 2026-09-04). Revenue is live
+ * ManageOrders windows; Team is the archive. Putting the archive YTD on the
+ * Revenue card gives both cards ONE headline number, labelled with its lag.
+ */
+function fillRevenueYtd(payload) {
+    const wrap = document.getElementById('revenueYtd');
+    if (!wrap) return;
+    if (payload?.totalRevenue == null) { wrap.hidden = true; return; }
+    const value = document.getElementById('revenueYtdValue');
+    const note = document.getElementById('revenueYtdNote');
+    if (value) value.textContent = formatMoney(payload.totalRevenue);
+    if (note) {
+        note.textContent = payload.lastArchivedDate
+            ? `archive through ${payload.lastArchivedDate} — same number as the Team card and the goal chip`
+            : 'from the Caspio archive — same number as the Team card and the goal chip';
+    }
+    wrap.hidden = false;
 }
 
 async function loadTeam(refresh = false) {
@@ -151,6 +185,7 @@ async function loadTeam(refresh = false) {
             fetchAnnualGoal(),
         ]);
         renderTeam(payload, goalRes);
+        fillRevenueYtd(payload);
         // Push the archive's total revenue to the sales-goal banner — this is real
         // YTD (archive runs daily). It's slightly stale (live last few days not yet
         // archived), but vastly better than the "—" placeholder.
@@ -174,9 +209,9 @@ export async function initTeamPerformance() {
     return loadTeam(false);
 }
 
-/** Periodic re-read (Company Numbers 5-minute tick). Same cache rules as init. */
-export function refreshTeamPerformance() {
-    return loadTeam(false);
+/** Periodic re-read (Company Numbers 5-minute tick); force = header Refresh, bypasses caches. */
+export function refreshTeamPerformance(force = false) {
+    return loadTeam(!!force);
 }
 
 register('team-performance:refresh', () => loadTeam(true));

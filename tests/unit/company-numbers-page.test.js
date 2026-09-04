@@ -6,7 +6,7 @@
  *   1. Nothing on the page is typed that the data owns: no "4,631", no "Q3" in the
  *      team-push title, no $3M goal constant in JS, no "46%" prose.
  *   2. Honest freshness: a per-card stamp on every live card, a header stamp, no
- *      fake refresh button on the static Production card, and a data-through line.
+ *      per-card refresh buttons (one header "Refresh now"), and a LIVE Production Due card.
  *   3. Date math: "YYYY-MM-DD" is a calendar day (local), and "Last N days" is N days.
  *   4. The art-aging widget has no inline styles; DEAD folds into House; Money
  *      Collected is named for what it is; the entry is bundled with relative imports.
@@ -30,7 +30,6 @@ const goalChip = read('shared_components/js/staff-dashboard/controllers/sales-go
 const goalService = read('shared_components/js/staff-dashboard/services/company-goal-service.js');
 const bonus = read('shared_components/js/staff-dashboard/controllers/embroidery-bonus-controller.js');
 const production = read('shared_components/js/staff-dashboard/controllers/production-controller.js');
-const stats = read('shared_components/js/production-schedule-stats.js');
 const serverSrc = read('server.js');
 
 // Load an ESM file's pure functions into a sandbox (jest here is CommonJS).
@@ -47,12 +46,17 @@ function loadEsm(src) {
 }
 
 describe('nothing typed that the data owns', () => {
-    test('the Production footer no longer carries a typed record count', () => {
+    test('Production Due is LIVE — the static predictor and its typed record count are gone', () => {
         expect(html).not.toMatch(/4,631/);
-        expect(doc.getElementById('production-record-count').textContent.trim()).toBe('—');
-        expect(doc.getElementById('production-data-through')).not.toBeNull();
-        expect(production).toMatch(/production-data-through/);
-        expect(stats).toMatch(/"dataThrough":\s*"\d{4}-\d{2}"/);
+        expect(html).not.toMatch(/production-schedule-(stats|predictor)/);
+        expect(fs.existsSync(path.join(ROOT, 'shared_components/js/production-schedule-stats.js'))).toBe(false);
+        expect(doc.getElementById('production-due-list')).not.toBeNull();
+        for (const id of ['production-late', 'production-risk', 'production-nopo', 'production-ontrack', 'production-asof']) {
+            expect(doc.getElementById(id)).not.toBeNull();
+        }
+        expect(production).toMatch(/\/api\/crm-proxy\/ae-dashboard\/due-dates-all/);
+        expect(production).toMatch(/showApiError\('production'/);
+        expect(doc.querySelector('.production-widget-card a[href="/dashboards/past-due-orders.html"]')).not.toBeNull();
     });
     test('the team-push title takes its quarter from the API', () => {
         const title = doc.getElementById('embroideryBonusTitle');
@@ -96,14 +100,16 @@ describe('honest freshness', () => {
         expect(entry).toMatch(/refreshSamplePipeline/);
         expect(entry).toMatch(/refreshMetrics/);
         expect(entry).toMatch(/refreshTeamPerformance/);
-        expect(entry).toMatch(/loadEmbroideryBonus\(false\)/);
+        expect(entry).toMatch(/loadEmbroideryBonus\(!!f\)/);
         expect(entry).toMatch(/ArtAgingWidget\.load\(\)/);
         expect(entry).toMatch(/document\.visibilityState === 'visible'/);
     });
-    test('the static Production card has no refresh button and no range tooltips', () => {
-        expect(doc.querySelector('[data-action="production:refresh"]')).toBeNull();
-        expect(production).not.toMatch(/register\('production:refresh'/);
-        expect(production).not.toMatch(/title="Typically/);
+    test('ONE refresh control: the header button, no per-card refresh buttons', () => {
+        expect(doc.getElementById('cn-refresh-all')).not.toBeNull();
+        expect(doc.querySelectorAll('[data-action$=":refresh"]').length).toBe(0);
+        expect(doc.getElementById('artAgingRefresh')).toBeNull();
+        expect(entry).toMatch(/tick\('manual', true\)/);
+        expect(entry).toMatch(/refreshProduction/);
     });
     test('the art-aging widget announces each load for the stamp and exposes load()', () => {
         expect(artWidget).toMatch(/new CustomEvent\('art-aging:loaded'/);
@@ -127,6 +133,30 @@ describe('date math', () => {
     test('"Last N days" spans N calendar days inclusive', () => {
         expect(shopworks).toMatch(/start\.setDate\(start\.getDate\(\) - \(days - 1\)\)/);
         expect(shopworks).toMatch(/currentStart\.setDate\(currentStart\.getDate\(\) - \(days - 1\)\)/);
+    });
+});
+
+describe('second pass (2026-09-04 evening)', () => {
+    test('team rows open the rep account pages', () => {
+        expect(team).toMatch(/\/dashboards\/nika-crm\.html/);
+        expect(team).toMatch(/\/dashboards\/taneisha-crm\.html/);
+        expect(team).toMatch(/\/dashboards\/house-accounts\.html/);
+        expect(team).toMatch(/rep-card rep-card--link/);
+    });
+    test('the Revenue card carries the archive YTD chip filled by the team controller', () => {
+        expect(doc.getElementById('revenueYtd')).not.toBeNull();
+        expect(doc.getElementById('revenueYtdValue')).not.toBeNull();
+        expect(team).toMatch(/function fillRevenueYtd/);
+    });
+    test('art zombies get their own bucket', () => {
+        expect(artWidget).toMatch(/STALE_DAYS = 30/);
+        expect(artWidget).toMatch(/'stale'/);
+        expect(css).toContain('.aa-chip--stale');
+    });
+    test('print sheet and wide-screen layout exist', () => {
+        expect(css).toMatch(/@media print/);
+        expect(css).toMatch(/min-width: 1500px/);
+        expect(css).toMatch(/max-width: 1600px/);
     });
 });
 

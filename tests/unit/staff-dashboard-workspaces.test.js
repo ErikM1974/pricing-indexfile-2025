@@ -210,7 +210,7 @@ describe('gating attributes', () => {
 
 describe('the report widgets moved to Company Numbers', () => {
     const WIDGET_IDS = ['inboxPaidList', 'payToday', 'samplePipelineList', 'ytdRevenue',
-        'salesTeamList', 'artAgingBody', 'production-predictor-grid', 'embroideryBonusContent'];
+        'salesTeamList', 'artAgingBody', 'production-due-list', 'embroideryBonusContent'];
 
     test.each(WIDGET_IDS)('#%s is on Company Numbers and not on the dashboard', (id) => {
         expect(numbers.getElementById(id)).not.toBeNull();

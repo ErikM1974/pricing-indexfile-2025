@@ -34,7 +34,7 @@
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/utilities.css?v=20260514-ai-phase1">
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-theme.css?v=2026.09.03.6">
     <link rel="stylesheet" href="/shared_components/css/staff-dashboard/dashboard-v3-patch-2.css?v=2026.09.04.10">
-    <link rel="stylesheet" href="/dashboards/css/company-numbers.css?v=2026.09.04.10">
+    <link rel="stylesheet" href="/dashboards/css/company-numbers.css?v=2026.09.04.11">
 </head>
 <body>
     <div class="dashboard-container cn-shell">
@@ -50,6 +50,12 @@
                 </div>
                 <div class="header-right">
                     <span class="cn-meta">Live from ShopWorks, Stripe and the Caspio archive · <span id="cn-updated" role="status">loading…</span></span>
+                    <!-- ONE refresh for the whole page (2026-09-04): it runs the same tick the
+                         5-minute timer runs, bypassing the client caches. The per-card buttons
+                         (4 of 7 cards had one) are gone. -->
+                    <button type="button" class="cn-refresh" id="cn-refresh-all" title="Re-read every card now (bypasses the 5-minute caches)">
+                        <i class="fas fa-rotate" aria-hidden="true"></i> Refresh now
+                    </button>
                 </div>
             </header>
 
@@ -63,9 +69,6 @@
                         </h2>
                         <span class="zone-subtitle">Web orders &amp; quote activity, last 7 days</span>
                         <span class="cn-stamp" data-stamp="inbox"></span>
-                        <button type="button" class="zone-refresh" data-action="orders-inbox:refresh" aria-label="Refresh orders inbox">
-                            <i class="fas fa-rotate" aria-hidden="true"></i>
-                        </button>
                     </header>
                     <div id="ordersInboxAlerts"></div>
                     <div class="inbox-columns">
@@ -141,6 +144,14 @@
                             <span class="metrics-comparison-badge" id="ytdGrowth"><i class="fas fa-minus" aria-hidden="true"></i> --</span>
                             <span class="metrics-comparison-label" id="comparisonLabel">vs. last year</span>
                         </div>
+                        <!-- YTD from the Caspio archive — the SAME number the Team card and the
+                             goal chip use, so the two cards share one headline (filled by
+                             team-performance-controller; hidden until the archive lands). -->
+                        <div class="metrics-ytd" id="revenueYtd" hidden>
+                            <span class="metrics-ytd-label">2026 YTD</span>
+                            <span class="metrics-ytd-value num" id="revenueYtdValue">—</span>
+                            <span class="metrics-ytd-note" id="revenueYtdNote"></span>
+                        </div>
                         <div class="metrics-revenue-stats" id="revenueStats" aria-live="polite"></div>
                     </article>
 
@@ -154,9 +165,6 @@
                                 <div class="metrics-date-range" id="teamDateRange">Year-to-date</div>
                             </div>
                             <span class="cn-stamp" data-stamp="team"></span>
-                            <button type="button" class="refresh-btn" data-action="team-performance:refresh" aria-label="Refresh team performance" title="Refresh">
-                                <i class="fas fa-sync-alt" aria-hidden="true"></i>
-                            </button>
                         </header>
                         <div class="rep-list" id="salesTeamList">
                             <!-- Populated by team-performance-controller -->
@@ -176,34 +184,39 @@
                                 <div class="metrics-date-range">Open requests by time sitting in current status</div>
                             </div>
                             <span class="cn-stamp" data-stamp="art"></span>
-                            <button type="button" class="refresh-btn" id="artAgingRefresh" aria-label="Refresh art requests" title="Refresh">
-                                <i class="fas fa-sync-alt" aria-hidden="true"></i>
-                            </button>
                         </header>
                         <div id="artAgingBody">
                             <div class="metrics-date-range">Loading art requests…</div>
                         </div>
                     </article>
 
-                    <!-- Production Schedule Predictor. An ESTIMATE from historical completion
-                         stats bundled in production-schedule-stats.js — not live production data.
-                         Labelled as such (Erik, 2026-09-03) until real completion data exists.
-                         2026-09-04: no refresh button (it re-rendered the same static file) and
-                         the footer prints how old the data is (metadata.dataThrough/updatedAt). -->
+                    <!-- Production Due (2026-09-04). LIVE unshipped ShopWorks orders past their
+                         requested-ship date or due within 7 days, from the same due-dates-all
+                         forwarder the Past Due Orders report reads. Replaced the "Production
+                         Turnaround" predictor, a static estimate compiled Jan 2026 from
+                         completions through Nov 2025 — production logging stopped May 2026, so
+                         that card could never become live again. -->
                     <article class="production-widget-card col-span-full" data-widget="production">
                         <header class="production-header">
                             <h3 class="production-title">
-                                <i class="fas fa-chart-line" aria-hidden="true"></i> Production Turnaround
+                                <i class="fas fa-truck-fast" aria-hidden="true"></i> Production Due
                             </h3>
-                            <span id="production-season-badge" class="season-badge"></span>
-                            <span class="cn-estimate">Estimate from historical completions — not live production data</span>
+                            <span class="cn-sub">Unshipped orders past their ship date or due within 7 days</span>
+                            <span class="cn-stamp" data-stamp="production"></span>
                         </header>
-                        <div id="production-predictor-grid" class="production-predictor-grid">
-                            <div class="production-empty">Loading predictions…</div>
+                        <div class="cn-due-tiles">
+                            <div class="cn-due-tile cn-due-tile--late"><div class="cn-due-num num" id="production-late">—</div><div class="cn-due-label">Past due</div></div>
+                            <div class="cn-due-tile cn-due-tile--risk"><div class="cn-due-num num" id="production-risk">—</div><div class="cn-due-label">At risk · due this week, blanks not in</div></div>
+                            <div class="cn-due-tile cn-due-tile--nopo"><div class="cn-due-num num" id="production-nopo">—</div><div class="cn-due-label">Past due with no PO raised</div></div>
+                            <div class="cn-due-tile cn-due-tile--ok"><div class="cn-due-num num" id="production-ontrack">—</div><div class="cn-due-label">Due this week · on track</div></div>
+                        </div>
+                        <div id="production-due-list" class="cn-due-list">
+                            <div class="production-empty">Loading due dates…</div>
                         </div>
                         <div class="production-footer">
                             <i class="fas fa-database" aria-hidden="true"></i>
-                            Based on <span id="production-record-count" class="num">—</span> historical completions<span id="production-data-through"></span>
+                            <span id="production-asof">ShopWorks ORDER_ODBC mirror</span>
+                            · <a href="/dashboards/past-due-orders.html">Full list by rep →</a>
                         </div>
                     </article>
 
@@ -223,9 +236,6 @@
                             <div class="embroidery-bonus-controls">
                                 <span class="cn-stamp" data-stamp="bonus"></span>
                                 <span class="sync-status num" id="embroideryBonusStatus"></span>
-                                <button type="button" class="refresh-btn" data-action="embroidery-bonus:refresh" aria-label="Refresh embroidery bonus" title="Refresh">
-                                    <i class="fas fa-sync-alt" aria-hidden="true"></i>
-                                </button>
                             </div>
                         </header>
                         <div id="embroideryBonusContent">
@@ -238,22 +248,16 @@
         </main>
     </div>
 
-    <!-- Legacy production-schedule modules (no API calls, just static stats + predictor).
-         Plain script tags before the module entry so production-controller.js can read
-         window.ProductionPredictor + PRODUCTION_STATS at init time. -->
-    <script src="/shared_components/js/production-schedule-stats.js?v=2026.09.04.10"></script>
-    <script src="/shared_components/js/production-schedule-predictor.js?v=2026.08.26.1"></script>
-
     <!-- Caspio timestamp parser (naive Pacific wall-clock → correct Date).
          Needed by the art-aging widget below. -->
     <script src="/shared_components/js/caspio-date-utils.js?v=2026.07.05.4"></script>
     <!-- Art Requests Needing Attention widget — self-contained, lazy (idle-time
          fetch after DOMContentLoaded), GET-only, visible retry state on failure. -->
-    <script src="/staff-dashboard-v3/art-aging-widget.js?v=2026.09.04.10" defer></script>
+    <script src="/staff-dashboard-v3/art-aging-widget.js?v=2026.09.04.11" defer></script>
 
     <!-- APP ENTRY (ES module). Bundled by scripts/build.js (ENTRY_BUNDLES) into one
          hashed file with its whole module graph, so production makes ONE cached
          request instead of the entry + 20 no-store source modules (2026-09-04). -->
-    <script type="module" src="/dashboards/js/company-numbers.js?v=2026.09.04.10"></script>
+    <script type="module" src="/dashboards/js/company-numbers.js?v=2026.09.04.11"></script>
 </body>
 </html>
