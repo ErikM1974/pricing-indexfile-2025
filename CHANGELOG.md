@@ -1,3 +1,9 @@
+## v2026.09.05.37 (2026.09.05)
+
+- Memory: the bundle tables are one page each -- my scope was 4x too high
+- Rep Account CRM review (Nika + Taneisha): 12 items — accounts count set on boot (read 0 beside 474), calendar dates parsed as local days (no more day-early / false Overdue), Retry-able load, announced archive fallback, tier cards as aria-pressed buttons, keyboard cards, labelled dialog with focus return, Rule 3 style toggles, aria-hidden icons, phone layout; lock test
+- Deploy v2026.09.05.37: 2 files (nika-crm.html,taneisha-crm.html) — rep CRM review cache-bust
+
 ## v2026.09.05.35 (2026.09.05)
 
 - Memory: v4 Swagger inspected live -- no cheaper read path, but a new primer
