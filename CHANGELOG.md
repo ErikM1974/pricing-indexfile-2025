@@ -1,3 +1,8 @@
+## v2026.09.05.8 (2026.09.05)
+
+- Rule 3 sweep: move inline <style>/<script> blocks on 15 staff pages into external files
+- Deploy v2026.09.05.8: 15 files (index.html,purchasingform.html,index.html,...)
+
 ## v2026.09.05.6 (2026.09.05)
 
 - Staff identity hydration: StaffAuthHelper.ready() fills the legacy session keys from the SAML session
