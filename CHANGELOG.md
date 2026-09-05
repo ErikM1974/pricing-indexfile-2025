@@ -1,3 +1,10 @@
+## v2026.09.05.18 (2026.09.05)
+
+- Memory: sweep batch 2 fix note (.17)
+- Staff-dashboard sweep batch 3: re-audit follow-ups + Christmas bundle page de-inlined
+- Sweep batch 3 follow-up: label the remaining access-admin and Christmas bundle inputs
+- Deploy v2026.09.05.18: cache-bust — staff-dashboard sweep batch 3 (Christmas bundle de-inlined, h1s, labels)
+
 ## v2026.09.05.17 (2026.09.05)
 
 - Names & Numbers: escape quotes in the delete-roster data-args (esc() only escaped tags, so a roster name broke the JSON attribute)
