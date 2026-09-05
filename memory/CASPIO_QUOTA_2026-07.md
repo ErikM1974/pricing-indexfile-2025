@@ -175,11 +175,37 @@ neither can I. Measure the job, not the snapshot.
 
 - **`sync-supacolor`** runs every 10 min but a 30-min guard makes most runs a `0.0s` no-op.
   Verify before touching.
-- **v2 → v4 for bulk writes.** Bulk ≤1,000 records = **1 billed call** (Caspio support
-  confirmed). But `POST bulk` takes an array while **`PATCH bulk` is `{where, recordValues}`
-  — one value-set for all matches, so it CANNOT do per-row upserts**. And v4 renames
-  everything: `tableId` is an opaque **6-char code** (a wrong code reads the WRONG TABLE
-  silently), `q.where` → `Where`. ~600 call sites: a project, not an edit.
+- **v4 — INSPECTED LIVE 2026-09-05 via Swagger. Verdict: do NOT migrate for cost.**
+  - 🔑 **The query surface is IDENTICAL to v3, just renamed.** v4 GET records takes
+    `Select / Where / GroupBy / OrderBy / Limit / PageNumber / PageSize / SortField /
+    SortDescending`; v3 takes the same list as `q.*`. Same **1000-row page cap**, same
+    `Limit` 1-1000 default 100. **There is no cheaper read path in v4.**
+  - 🔑 **`PATCH .../records/bulk` in v4 is STILL "updates records that match a condition"** —
+    verified against v4's own spec, not inferred from v2/v3. The per-row-upsert limitation
+    is real and permanent. `POST bulk` still takes an array.
+  - `tableId` is a **6-character alphanumeric code** (v3 uses the table NAME) — a wrong code
+    reads the WRONG TABLE silently. ~600 call sites: a project, not an edit.
+
+- ✅ **NEW and worth knowing: `GET /v4/aiManifest`** (also `info.x-caspio-ai-context` in the
+  spec). A ~23 KB machine-readable domain primer for API consumers — sections for querying,
+  writes, files, errors, plus top-level `lenses` (dataManager / designer / automation),
+  `unsupportedByDesign`, `safetyGuards`, `rateLimiting` and `errorReference`. **Read this
+  first** before any new Caspio integration work; it is faster than the 340 KB OpenAPI spec.
+  Both are readable from a logged-in browser session with `credentials:'include'`.
+
+- 🔑 **We ALREADY use `q.groupBy` (25 sites) and SQL aggregates** (`MAX(CASE_PRICE)` in
+  `pricing.js`, `decorated-cap-prices.js`). Server-side aggregation is not an untapped win —
+  do not "discover" it again.
+
+- ⚠️ **`q.getPaginationInfo` exists in v3 and we use it ZERO times.** It returns the total
+  row count, which is the missing guard against `fetchAllCaspioPages` silently truncating at
+  `maxPages`. A correctness win, not a cost one.
+
+- ⚠️ v4 advertises `X-RateLimit-Limit` / `X-RateLimit-Window` response headers for
+  client-side pacing. **Unverified whether v3 sends them too** — worth one check if pacing
+  ever needs to be finer-grained than the daily rollup.
+
+
 - **`pricing-bundle` per-method cache split.** Keyed `{method, styleNumber}`, so
   `Pricing_Tiers`/`Pricing_Rules`/`location`/cost re-fetch for **every style**. Production
   traffic does not justify it; **dev tooling does** — one baseline capture cost ~5,600.
