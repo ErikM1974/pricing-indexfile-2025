@@ -1029,7 +1029,9 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 .quotes-table td.actions-cell { white-space: normal; min-width: 150px; max-width: 170px; line-height: 1; }
 .th-actions { min-width: 150px; }
 .actions-cell .action-btn { margin: 1px 0; }
-.quotes-table td { padding: 10px 12px; }
+.quotes-table td { padding: 10px 9px; }
+.quotes-table th { padding: 12px 9px; }
+.status-badge { white-space: nowrap; }
 .th-right { text-align: right; }
 .quote-id { white-space: nowrap; }
 .quotes-table td { vertical-align: middle; }
