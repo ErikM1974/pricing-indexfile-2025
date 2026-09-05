@@ -39,7 +39,7 @@
             <div class="error-banner" id="error-banner">
                 <i class="fas fa-exclamation-triangle"></i>
                 <span class="error-banner-message" id="error-message"></span>
-                <button class="error-banner-close" aria-label="Dismiss error" onclick="document.getElementById('error-banner').classList.remove('show')">
+                <button class="error-banner-close" aria-label="Dismiss error" data-call="dismissErrorBanner">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -292,6 +292,7 @@
 
     <!-- Dashboard JavaScript -->
     <script src="/shared_components/js/caspio-date-utils.js?v=1"></script>
+    <script src="/shared_components/js/data-call-delegator.js"></script>
     <script src="/dashboards/js/house-accounts.js?v=2026.07.19.12"></script>
 </body>
 </html>

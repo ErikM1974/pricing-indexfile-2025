@@ -631,4 +631,5 @@ function escapeHtml(str) {
 let manualCalc;
 document.addEventListener('DOMContentLoaded', () => {
     manualCalc = new ManualPricingCalculator();
+    window.manualCalc = manualCalc; // data-call targets resolve off window (Rule 3 delegator)
 });

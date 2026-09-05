@@ -44,7 +44,7 @@
     function onClick(event) {
         const t = event.target;
         if (!(t instanceof Element)) return;
-        const el = t.closest('[data-call], [data-href], [data-toggle-hidden]');
+        const el = t.closest('[data-call], [data-href], [data-toggle-hidden], [data-stop]');
         if (!el) return;
         if (el.dataset.selfOnly === '1' && t !== el) return;
         if (el.dataset.stop === '1') event.stopPropagation();

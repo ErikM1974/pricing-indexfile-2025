@@ -62,7 +62,7 @@
              other dashboards. The first external tab gets a small visual
              divider via .tab-button-link--first-external. -->
         <div class="tab-buttons">
-            <button class="tab-button active" onclick="showTab('gallery', event)">Gallery View</button>
+            <button class="tab-button active" data-call="showTab" data-args='["gallery", "$event"]'>Gallery View</button>
             <!-- "Express Submit Form" tab DELETED 2026-08-01. Its Caspio DataPage
                  (a0e1500073092d827fb74d968d9d) wrote straight into ArtRequests,
                  skipping POST /api/artrequests where both submission notifications
@@ -101,10 +101,10 @@
                             &#128218; Reference &#x2197;
                         </a>
                         <div class="view-toggle" id="steve-view-toggle">
-                            <button class="view-toggle-btn active" data-view="grid" onclick="window.toggleKanbanView('grid')">
+                            <button class="view-toggle-btn active" data-view="grid" data-call="toggleKanbanView" data-args='["grid"]'>
                                 <span class="view-toggle-icon">&#9638;</span> Grid
                             </button>
-                            <button class="view-toggle-btn" data-view="board" onclick="window.toggleKanbanView('board')">
+                            <button class="view-toggle-btn" data-view="board" data-call="toggleKanbanView" data-args='["board"]'>
                                 <span class="view-toggle-icon">&#9783;</span> Board
                             </button>
                         </div>
@@ -247,6 +247,7 @@
     <!-- SAML identity → legacy nwca_user_* keys (StaffAuthHelper.ready(), 2026-09-05) -->
     <script src="/shared_components/js/staff-auth-helper.js?v=2026.09.05.6"></script>
     <script src="/shared_components/js/art-hub-steve.js?v=2026.08.05.23"></script>
+    <script src="/shared_components/js/data-call-delegator.js"></script>
     <script src="/shared_components/js/art-hub-steve-gallery.js?v=2026.09.05.15"></script>
     <script src="/dashboards/js/steve-send-supacolor.js?v=5"></script>
     <script src="/dashboards/js/steve-send-screenprint.js?v=2"></script>

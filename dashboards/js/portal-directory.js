@@ -253,7 +253,7 @@
                 + '<div class="pd-card-actions">';
 
             if (hasId) {
-                html += '<button class="pd-btn-copy" onclick="window._pdCopy(' + c.customerId + ', this)" title="Copy portal link">'
+                html += '<button class="pd-btn-copy" data-call="_pdCopy" data-args="' + escapeAttr(JSON.stringify([c.customerId, '$this'])) + '" title="Copy portal link">'
                     + '<i class="fas fa-copy"></i> Copy Link</button>'
                     + '<a class="pd-btn-open" href="' + escapeAttr(portalUrl) + '" target="_blank" rel="noopener" title="Open portal">'
                     + '<i class="fas fa-external-link-alt"></i> Open</a>';

@@ -64,10 +64,10 @@
                 <div class="item-type-group">
                     <label>Item Type</label>
                     <div class="toggle-buttons">
-                        <button class="toggle-btn active" data-type="garment" onclick="manualCalc.setItemType('garment')">
+                        <button class="toggle-btn active" data-type="garment" data-call="manualCalc.setItemType" data-args='["garment"]'>
                             <i class="fas fa-tshirt"></i> Garment
                         </button>
-                        <button class="toggle-btn" data-type="cap" onclick="manualCalc.setItemType('cap')">
+                        <button class="toggle-btn" data-type="cap" data-call="manualCalc.setItemType" data-args='["cap"]'>
                             <i class="fas fa-hat-cowboy"></i> Cap
                         </button>
                     </div>
@@ -75,7 +75,7 @@
 
                 <div class="calculate-group">
                     <label>&nbsp;</label>
-                    <button id="calculateBtn" class="btn-calculate" onclick="manualCalc.calculate()">
+                    <button id="calculateBtn" class="btn-calculate" data-call="manualCalc.calculate">
                         <i class="fas fa-calculator"></i> Calculate
                     </button>
                 </div>
@@ -258,6 +258,7 @@
     <script src="/shared_components/js/dtg-pricing-service.js"></script>
     <script src="/shared_components/js/dtf-pricing-service.js"></script>
     <script src="/shared_components/js/embroidery-pricing-service.js"></script>
+    <script src="/shared_components/js/data-call-delegator.js"></script>
     <script src="/shared_components/js/cap-embroidery-pricing-service.js"></script>
     <script src="/shared_components/js/screenprint-pricing-service.js"></script>
 

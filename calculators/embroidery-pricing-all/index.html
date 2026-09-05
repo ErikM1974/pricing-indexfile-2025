@@ -18,6 +18,7 @@
          standalone page. Redirect old ?tab=contract bookmarks BEFORE the
          page paints so reps with saved links land on the new page.
          Inline + synchronous = no flash of the old corporate page. -->
+    <script src="/shared_components/js/data-call-delegator.js"></script>
     <script src="/calculators/embroidery-pricing-all/embroidery-pricing-all-inline.js?v=2026.09.05.8"></script>
 </head>
 <body>
@@ -61,23 +62,23 @@
             <span><strong>Who supplied the garment?</strong> Pick the matching tier below. Add the Additional Stitches modifier if logo &gt; 10K stitches.</span>
         </div>
         <div class="tab-navigation">
-            <button class="tab-btn active" data-tab="al-retail" onclick="switchTab('al-retail')">
+            <button class="tab-btn active" data-tab="al-retail" data-call="switchTab" data-args='["al-retail"]'>
                 <i class="fas fa-tag"></i>
                 Additional Logo
                 <span class="tab-subtitle">We supply garment</span>
             </button>
-            <button class="tab-btn" data-tab="decg-retail" onclick="switchTab('decg-retail')">
+            <button class="tab-btn" data-tab="decg-retail" data-call="switchTab" data-args='["decg-retail"]'>
                 <i class="fas fa-box-open"></i>
                 Customer Supplied Garments
                 <span class="tab-subtitle">Retail · they bring blanks</span>
             </button>
             <span class="tab-divider" aria-hidden="true"></span>
-            <button class="tab-btn tab-btn--modifier" data-tab="stitch-charges" onclick="switchTab('stitch-charges')">
+            <button class="tab-btn tab-btn--modifier" data-tab="stitch-charges" data-call="switchTab" data-args='["stitch-charges"]'>
                 <i class="fas fa-layer-group"></i>
                 Additional Stitches
                 <span class="tab-subtitle">+ adds to any tier · &gt; 10K stitches</span>
             </button>
-            <button class="tab-btn tab-btn--modifier" data-tab="fullback" onclick="switchTab('fullback')">
+            <button class="tab-btn tab-btn--modifier" data-tab="fullback" data-call="switchTab" data-args='["fullback"]'>
                 <i class="fas fa-expand"></i>
                 Full Back Embroidery
                 <span class="tab-subtitle">Jacket-back &amp; 25K+ designs</span>
@@ -258,7 +259,7 @@
                  moved to its own canonical tab to eliminate duplication. -->
             <div class="fullback-crossref">
                 <i class="fas fa-arrow-right" aria-hidden="true"></i>
-                <a href="?tab=fullback" onclick="switchTab('fullback'); return false;">
+                <a href="?tab=fullback" data-call="switchTab" data-args='["fullback"]' data-prevent="1">
                     <strong>Full Back Embroidery (25K+, DECG-FB)?</strong> Same rate when we supply the garment — see the dedicated <span class="crossref-tab-name">Full Back Embroidery</span> tab →
                 </a>
             </div>
@@ -326,7 +327,7 @@
                      dashboard. This is just a pointer. -->
                 <div class="fullback-crossref">
                     <i class="fas fa-arrow-right" aria-hidden="true"></i>
-                    <a href="?tab=fullback" onclick="switchTab('fullback'); return false;">
+                    <a href="?tab=fullback" data-call="switchTab" data-args='["fullback"]' data-prevent="1">
                         <strong>Looking for Full Back Embroidery (25K+)?</strong> See the dedicated <span class="crossref-tab-name">Full Back Embroidery</span> tab →
                     </a>
                 </div>
@@ -508,7 +509,7 @@
                  moved to its own canonical tab to eliminate duplication. -->
             <div class="fullback-crossref">
                 <i class="fas fa-arrow-right" aria-hidden="true"></i>
-                <a href="?tab=fullback" onclick="switchTab('fullback'); return false;">
+                <a href="?tab=fullback" data-call="switchTab" data-args='["fullback"]' data-prevent="1">
                     <strong>Full Back Embroidery (25K+, DECG-FB)?</strong> Same rate when the customer supplies the garment — see the dedicated <span class="crossref-tab-name">Full Back Embroidery</span> tab →
                 </a>
             </div>
@@ -532,7 +533,7 @@
                 <div>
                     <strong>Full Back Embroidery (DECG-FB):</strong> Priced per 1,000 stitches for designs 25K and up — typically jacket-back logos, school-spirit backs, full-coverage embroidery. One rate for every full back — wholesale (Contract), NWCA-supplied (Add Logo) or customer-supplied all price from this table, and it is the same table the quote builder charges from.
                 </div>
-                <button class="share-link-btn" onclick="copyShareableLink()">
+                <button class="share-link-btn" data-call="copyShareableLink">
                     <i class="fas fa-link"></i> Copy Link
                 </button>
             </div>
