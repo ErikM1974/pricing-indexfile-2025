@@ -1,3 +1,8 @@
+## v2026.09.05.17 (2026.09.05)
+
+- Names & Numbers: escape quotes in the delete-roster data-args (esc() only escaped tags, so a roster name broke the JSON attribute)
+- Deploy v2026.09.05.17: cache-bust — names-numbers data-args escaping fix
+
 ## v2026.09.05.16 (2026.09.05)
 
 - Staff-dashboard sweep batch 2: inline onclick → data-call on 14 pages + 8 rendering modules; Universal Records admin Rule-3 extraction
