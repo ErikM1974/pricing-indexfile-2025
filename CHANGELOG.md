@@ -1,3 +1,8 @@
+## v2026.09.05.3 (2026.09.05)
+
+- Quote Management: actions wrap into a compact block — one long line pushed the table to 1,650px and hid the column
+- Deploy v2026.09.05.3: 2 files (quote-management.html,test-inbound-print.html,...)
+
 ## v2026.09.05.2 (2026.09.05)
 
 - Quote Management review: 10 items — SAML identity, Rule 3 sweep, server window, tiles, modal, freshness
