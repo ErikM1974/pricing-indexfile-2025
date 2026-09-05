@@ -1,3 +1,8 @@
+## v2026.09.05.21 (2026.09.05)
+
+- Customer portal: design column clamp scales with the viewport (table still overflowed by 16px at 1512px)
+- Deploy v2026.09.05.21: cache-bust — portal design column clamp
+
 ## v2026.09.05.20 (2026.09.05)
 
 - LESSONS_LEARNED: JSON-in-attribute quote escaping (sweep .17)
