@@ -1,3 +1,8 @@
+## v2026.09.05.10 (2026.09.05)
+
+- Detail pages: 45 blocking alert() dialogs become toasts; shared toast module styled and XSS-safe
+- Deploy v2026.09.05.10: 5 files (design-gallery.html,art-request-detail.html,invoice.html,...)
+
 ## v2026.09.05.9 (2026.09.05)
 
 - Policies Hub / Detail: load the Caspio auth embed on demand — as a static script it redirected SAML-signed-in staff to the portal login
