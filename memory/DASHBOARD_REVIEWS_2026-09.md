@@ -378,7 +378,7 @@ skeletons, zero-badges hidden, phone bottom nav + off-canvas menu, printable sta
 Left alone on purpose: `$0.00` zero-total orders (real ShopWorks records), the raw sign-in email in the
 Quotes empty state (it explains WHY nothing shows), the JotForm-style statement header wrap.
 
-## Customer product (re-order) page — review, 9 items (2026-09-05, `v2026.09.05.23`)
+## Customer product (re-order) page — review, 9 items (2026-09-05, `v2026.09.05.24`–`.25`)
 
 `/portal/product/:style` (`pages/customer-product.html` + `customer-product.js`; shares `customer-portal.css`
 and the `portal-reorder-list.js` drawer). Reviewed live via `/portal-admin/preview/1276/product/PC54`;
@@ -391,7 +391,8 @@ strong: no onclick, every input labelled, swatches/upgrade table fit, 0 console 
    Header brand is now a div ("Northwest Custom Apparel / Customer portal", same as the portal) and
    `.pp-title` is the page's `<h1>`.
 3. **`document.title` was static** — now `STYLE · Product name | Northwest Custom Apparel`
-   ("Product unavailable | …" on error).
+   ("Product unavailable | …" on error). 🔑 `.25` hotfix: NEVER `esc()` a title — it is plain text, so
+   "Port &amp; Co" showed literally in the tab.
 4. **Rule 3** — 8 template `onerror=` handlers + the reorder drawer's `style="display:none"` /
    `.style.display` toggles → `data-onerror="hide|hide-parent|hide-thumb|noimg|remove"` + ONE
    capture-phase `error` listener; loading/error/content/thumbs/fab/drawer all toggle with `hidden`.
