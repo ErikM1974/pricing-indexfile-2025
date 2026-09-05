@@ -61,23 +61,34 @@
         try { id = decodeURIComponent(rawHash); }
         catch (_) { id = rawHash; } // malformed % in an emailed link — use it raw rather than crash boot
         if (!id) id = new URLSearchParams(location.search).get('id') || '';
+        var refreshBtn = document.getElementById('lw-refresh');
         if (!id) {
             renderFatal('No lead id — open a lead from the <a href="/dashboards/leads.html">Leads board</a>.');
+            if (refreshBtn) refreshBtn.hidden = true;
             return;
         }
+        state.id = id;
+        if (refreshBtn) refreshBtn.addEventListener('click', function () { loadLead(state.id); });
         loadLead(id);
         wireComposer();
     });
 
-    function renderFatal(html) {
+    function renderFatal(html, retryId) {
+        document.title = 'Lead not found - NWCA';
+        document.getElementById('lw-page-title').textContent = 'Lead';
         document.getElementById('lw-title').innerHTML = 'Lead not found';
-        document.getElementById('lw-sub').innerHTML = html;
+        document.getElementById('lw-sub').innerHTML = html +
+            (retryId ? ' <button type="button" id="lw-load-retry" class="ld-btn lw-retry"><i class="fas fa-rotate" aria-hidden="true"></i> Retry</button>' : '');
         document.getElementById('lw-timeline').classList.remove('dash-loading');
         document.getElementById('lw-timeline').innerHTML = '<span class="ld-muted">—</span>';
+        var rb = document.getElementById('lw-load-retry');
+        if (rb) rb.addEventListener('click', function () { loadLead(retryId); });
     }
 
     function loadLead(id) {
         DashPage.hideError();
+        var t = document.getElementById('lw-title');
+        if (t && !state.lead) t.textContent = 'Loading lead…';
         L.crmFetch('/' + encodeURIComponent(id)).then(function (body) {
             state.lead = body.submission;
             if (!state.lead) throw new Error('empty response');
@@ -88,7 +99,7 @@
             console.error('[lead-ws] load failed:', err);
             DashPage.showError('Unable to load lead ' + id + ' (' + err.message + ').');
             renderFatal('Could not load <span class="ld-id">' + esc(id) + '</span> — it may be mistyped or archived. ' +
-                '<a href="/dashboards/leads.html">Back to the Leads board</a>.');
+                '<a href="/dashboards/leads.html">Back to the Leads board</a>.', id);
         });
     }
 
@@ -97,7 +108,11 @@
     function renderHeader() {
         var lead = state.lead;
         document.title = (lead.Company || lead.Contact_Name || lead.Submission_ID) + ' - Lead - NWCA';
-        document.getElementById('lw-title').textContent = lead.Contact_Name || lead.Company || lead.Submission_ID;
+        // The page h1 names the lead (was the static word "Lead" on every lead).
+        document.getElementById('lw-page-title').textContent = lead.Contact_Name || lead.Company || lead.Submission_ID;
+        var titleEl = document.getElementById('lw-title');
+        titleEl.removeAttribute('role');
+        titleEl.textContent = lead.Contact_Name || lead.Company || lead.Submission_ID;
         document.getElementById('lw-sub').textContent =
             (lead.Company || '') + ' · ' + L.sourceTitleOf(lead) + ' · received ' + fmtWhen(lead.Submitted_At) +
             ' · ' + lead.Submission_ID;
@@ -129,10 +144,10 @@
         var el = document.getElementById('lw-head-actions');
         if (!el) return;
         el.innerHTML =
-            '<button type="button" id="lw-edit" class="ld-btn"><i class="fas fa-pen"></i> Edit info</button>' +
-            '<button type="button" id="lw-samples" class="ld-btn"><i class="fas fa-box-open"></i> Send samples</button>' +
-            '<button type="button" id="lw-kit" class="ld-btn"><i class="fas fa-gift"></i> Send kit</button>' +
-            (isAdmin() ? '<button type="button" id="lw-delete" class="ld-btn ld-btn--danger"><i class="fas fa-trash"></i> Delete</button>' : '');
+            '<button type="button" id="lw-edit" class="ld-btn"><i class="fas fa-pen" aria-hidden="true"></i> Edit info</button>' +
+            '<button type="button" id="lw-samples" class="ld-btn"><i class="fas fa-box-open" aria-hidden="true"></i> Send samples</button>' +
+            '<button type="button" id="lw-kit" class="ld-btn"><i class="fas fa-gift" aria-hidden="true"></i> Send kit</button>' +
+            (isAdmin() ? '<button type="button" id="lw-delete" class="ld-btn ld-btn--danger"><i class="fas fa-trash" aria-hidden="true"></i> Delete</button>' : '');
         el.hidden = false;
         document.getElementById('lw-edit').addEventListener('click', function () {
             L.openEditLeadModal(lead, { staffEmail: state.staffEmail, onSaved: function () {
@@ -203,8 +218,8 @@
         modal.setAttribute('aria-modal', 'true');
         modal.setAttribute('aria-label', 'Send a marketing kit');
         modal.innerHTML =
-            '<div class="ld-modal-head"><h2 class="ld-modal-title"><i class="fas fa-gift"></i> Send a marketing kit</h2>' +
-            '<button type="button" class="ld-drawer-close" id="lw-kit-close" aria-label="Close"><i class="fas fa-times"></i></button></div>' +
+            '<div class="ld-modal-head"><h2 class="ld-modal-title"><i class="fas fa-gift" aria-hidden="true"></i> Send a marketing kit</h2>' +
+            '<button type="button" class="ld-drawer-close" id="lw-kit-close" aria-label="Close"><i class="fas fa-times" aria-hidden="true"></i></button></div>' +
             '<div class="ld-modal-body">' +
             '<div class="ld-control-label">What to send</div>' +
             '<div id="lw-kit-items" class="lw-kit-items"><span class="ld-muted">Loading kit items…</span></div>' +
@@ -224,7 +239,7 @@
             '<div class="ld-control"><label class="ld-control-label" for="lw-kit-email">Email</label><input id="lw-kit-email" class="ld-select" type="email"></div>' +
             '</div>' +
             '<div class="ld-control"><label class="ld-control-label" for="lw-kit-notes">Notes for shipping</label><textarea id="lw-kit-notes" class="ld-select" rows="2"></textarea></div>' +
-            '<div class="ld-modal-actions"><button type="button" id="lw-kit-send" class="ld-btn ld-btn--primary"><i class="fas fa-paper-plane"></i> Send to shipping</button><span id="lw-kit-status" class="ld-muted"></span></div>' +
+            '<div class="ld-modal-actions"><button type="button" id="lw-kit-send" class="ld-btn ld-btn--primary"><i class="fas fa-paper-plane" aria-hidden="true"></i> Send to shipping</button><span id="lw-kit-status" class="ld-muted"></span></div>' +
             '</div>';
         overlay.appendChild(modal);
         document.body.appendChild(overlay);
@@ -242,8 +257,18 @@
             if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
             if (prevFocus && document.body.contains(prevFocus)) { try { prevFocus.focus(); } catch (e) { /* gone */ } }
         }
-        function onKey(e) { if (e.key === 'Escape') close(); }
+        function onKey(e) {
+            if (e.key === 'Escape') { close(); return; }
+            if (e.key === 'Tab') { // keep Tab inside the modal (the page behind is not inert)
+                var f = modal.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled])');
+                if (!f.length) return;
+                var first = f[0], last = f[f.length - 1];
+                if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+                else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+            }
+        }
         document.getElementById('lw-kit-close').addEventListener('click', close);
+        setTimeout(function () { var f = document.getElementById('lw-kit-recipient'); if (f) f.focus(); }, 30);
         overlay.addEventListener('click', function (e) { if (e.target === overlay) close(); });
         document.addEventListener('keydown', onKey);
 
@@ -256,7 +281,7 @@
                 return '<label class="lw-kit-item">' +
                     '<input type="checkbox" class="lw-kit-cb" data-code="' + esc(it.Item_Code) + '" data-label="' + esc(it.Label) + '">' +
                     '<span class="lw-kit-item-label">' + esc(it.Label) + '</span>' +
-                    '<input type="number" class="lw-kit-qty" min="1" value="1" aria-label="Quantity">' +
+                    '<input type="number" class="lw-kit-qty" min="1" value="1" aria-label="Quantity of ' + esc(it.Label) + '">' +
                     '</label>';
             }).join('');
         }).catch(function (err) {
@@ -366,7 +391,10 @@
             console.error('[lead-ws] activity load failed:', err);
             var root = document.getElementById('lw-timeline');
             root.classList.remove('dash-loading');
-            root.innerHTML = '<span class="ld-muted">Activity unavailable (' + esc(err.message) + ').</span>';
+            root.innerHTML = '<span class="ld-muted">Activity unavailable (' + esc(err.message) + ').</span>' +
+                '<button type="button" id="lw-activity-retry" class="lw-chip lw-retry">Retry</button>';
+            var rb = document.getElementById('lw-activity-retry');
+            if (rb) rb.addEventListener('click', function () { root.classList.add('dash-loading'); root.textContent = 'Loading activity…'; loadActivities(); });
         });
     }
 
@@ -378,19 +406,19 @@
         if (a.Attachment_URL && L.safeHttpUrl(a.Attachment_URL)) {
             var u = a.Attachment_URL;
             var label = a.Activity_Text || L.fileBasename(u) || 'Attachment';
-            attach = '<div class="ld-links" style="margin-top:6px">' +
+            attach = '<div class="ld-links lw-mt-6">' +
                 (L.isImageUrl(u)
                     ? '<div class="ld-thumbs"><a href="' + esc(L.viewUrl(u)) + '" target="_blank" rel="noopener">' +
                       '<img class="ld-thumb" loading="lazy" alt="Attachment" src="' + esc(L.viewUrl(u)) + '"></a></div>'
                     : '') +
                 '<span class="ld-att"><a href="' + esc(L.viewUrl(u)) + '" target="_blank" rel="noopener">' +
-                '<i class="fas fa-paperclip"></i> ' + esc(label) + '</a>' +
+                '<i class="fas fa-paperclip" aria-hidden="true"></i> ' + esc(label) + '</a>' +
                 '<a class="ld-dl" href="' + esc(L.downloadUrl(u)) + '" title="Download" aria-label="Download attachment">' +
-                '<i class="fas fa-download"></i></a></span></div>';
+                '<i class="fas fa-download" aria-hidden="true"></i></a></span></div>';
         }
         var text = (type === 'attachment' && attach) ? '' : '<div class="lw-item-text">' + esc(a.Activity_Text || '') + '</div>';
         return '<li class="lw-item lw-item--' + esc(type) + '">' +
-            '<span class="lw-item-icon"><i class="fas ' + icon + '"></i></span>' +
+            '<span class="lw-item-icon" role="img" aria-label="' + esc(type) + '"><i class="fas ' + icon + '" aria-hidden="true"></i></span>' +
             '<div class="lw-item-body">' +
             '<div class="lw-item-meta">' + esc(who) + ' · ' + fmtWhenTime(a.Created_At) + '</div>' +
             text + attach +
@@ -402,7 +430,7 @@
         root.classList.remove('dash-loading');
         var lead = state.lead;
         var originItem = '<li class="lw-item lw-item-origin">' +
-            '<span class="lw-item-icon"><i class="fas fa-inbox"></i></span>' +
+            '<span class="lw-item-icon" role="img" aria-label="received"><i class="fas fa-inbox" aria-hidden="true"></i></span>' +
             '<div class="lw-item-body">' +
             '<div class="lw-item-meta">' + fmtWhenTime(lead.Submitted_At) + '</div>' +
             '<div class="lw-item-text">Lead received via ' + esc(L.sourceTitleOf(lead)) +
@@ -415,7 +443,7 @@
         // hide broken thumbnails (extensionless /api/files/ keys can be PDFs)
         Array.prototype.forEach.call(root.querySelectorAll('img.ld-thumb'), function (img) {
             img.addEventListener('error', function () {
-                if (img.parentNode) img.parentNode.style.display = 'none';
+                if (img.parentNode) img.parentNode.hidden = true;
             });
         });
     }
@@ -571,7 +599,7 @@
         root.innerHTML =
             '<div class="lw-outreach-btns">' + OUTREACH_TEMPLATES.map(function (t, i) {
                 return '<button type="button" class="ld-btn lw-outreach-btn" data-tpl="' + i + '">' +
-                    '<i class="fas ' + t.icon + '"></i> ' + t.label + '</button>';
+                    '<i class=\"fas ' + t.icon + '\" aria-hidden=\"true\"></i> ' + t.label + '</button>';
             }).join('') + '</div>' +
             '<div id="lw-outreach-preview"></div>';
         Array.prototype.forEach.call(root.querySelectorAll('[data-tpl]'), function (b) {
@@ -593,7 +621,7 @@
                 '<div class="lw-outreach-body">' + (p.bodyHtml || '') + '</div>' +
                 '<div class="lw-outreach-actions">' +
                 '<button type="button" id="lw-outreach-send" class="ld-btn ld-btn--primary">' +
-                '<i class="fas fa-paper-plane"></i> Send to ' + esc(lead.Email) + '</button>' +
+                '<i class="fas fa-paper-plane" aria-hidden="true"></i> Send to ' + esc(lead.Email) + '</button>' +
                 '<button type="button" id="lw-outreach-cancel" class="lw-chip">Cancel</button>' +
                 '<span id="lw-outreach-note" class="ld-muted"></span>' +
                 '</div></div>';
@@ -603,7 +631,7 @@
                 btn.disabled = true;
                 document.getElementById('lw-outreach-note').textContent = 'Sending…';
                 outreachFetch(outreachBody(lead, tpl, false)).then(function (r) {
-                    box.innerHTML = '<div class="lw-outreach-sent"><i class="fas fa-circle-check"></i> Sent “' +
+                    box.innerHTML = '<div class="lw-outreach-sent"><i class="fas fa-circle-check" aria-hidden="true"></i> Sent “' +
                         esc(r.label || tpl.label) + '” to ' + esc(r.to || lead.Email) + '</div>';
                     // The proxy logged the 'email' activity server-side; mirror it
                     // locally so the timeline updates without a refetch.
@@ -636,11 +664,11 @@
         var root = document.getElementById('lw-panel-followup');
         var overdue = L.isOverdue(lead.Due_Date);
         root.innerHTML =
-            '<input type="date" id="lw-due" class="lw-value-input" value="' + esc(lead.Due_Date || '') + '">' +
-            (overdue ? '<div class="lw-due-overdue"><i class="fas fa-clock"></i> Overdue — was due ' + fmtWhen(lead.Due_Date) + '</div>' : '') +
+            '<input type="date" id="lw-due" class="lw-value-input" aria-label="Follow-up date" value="' + esc(lead.Due_Date || '') + '">' +
+            (overdue ? '<div class="lw-due-overdue"><i class="fas fa-clock" aria-hidden="true"></i> Overdue — was due ' + fmtWhen(lead.Due_Date) + '</div>' : '') +
             '<div class="lw-chips">' +
             [['+1d', 1], ['+3d', 3], ['+1w', 7], ['+2w', 14]].map(function (c) {
-                return '<button type="button" class="lw-chip" data-days="' + c[1] + '">' + c[0] + '</button>';
+                return '<button type="button" class="lw-chip" data-days="' + c[1] + '" aria-label="Follow up in ' + c[1] + ' day' + (c[1] === 1 ? '' : 's') + '">' + c[0] + '</button>';
             }).join('') +
             '</div>';
         document.getElementById('lw-due').addEventListener('change', function () {
@@ -661,7 +689,7 @@
         var root = document.getElementById('lw-panel-value');
         root.innerHTML =
             (lead.Lead_Value ? '<div class="lw-value-big">' + (fmtMoney(lead.Lead_Value) || esc(lead.Lead_Value)) + '</div>' : '') +
-            '<input type="number" id="lw-value" class="lw-value-input" min="0" step="50" placeholder="Estimated $"' +
+            '<input type="number" id="lw-value" class="lw-value-input" min="0" step="50" placeholder="Estimated $" aria-label="Estimated value in dollars"' +
             ' value="' + esc(lead.Lead_Value || '') + '">';
         document.getElementById('lw-value').addEventListener('change', function () {
             var el = this;
@@ -675,11 +703,11 @@
 
         function showProspect(note) {
             root.innerHTML = '<div class="ld-match">' +
-                '<div class="ld-match-head"><span class="ld-pill ld-pill--prospect"><i class="fas fa-user-plus"></i> New prospect</span></div>' +
+                '<div class="ld-match-head"><span class="ld-pill ld-pill--prospect"><i class="fas fa-user-plus" aria-hidden="true"></i> New prospect</span></div>' +
                 '<div class="ld-muted">' + esc(note) + '</div>' +
                 '<div class="ld-match-search">' +
-                '<input type="search" id="lw-match-input" class="ld-search" placeholder="Search ShopWorks…">' +
-                '<button type="button" id="lw-match-btn" class="ld-btn"><i class="fas fa-magnifying-glass"></i></button>' +
+                '<input type="search" id="lw-match-input" class="ld-search" placeholder="Search ShopWorks…" aria-label="Search ShopWorks customers">' +
+                '<button type="button" id="lw-match-btn" class="ld-btn" aria-label="Search ShopWorks"><i class="fas fa-magnifying-glass" aria-hidden="true"></i></button>' +
                 '</div><div class="ld-match-results" id="lw-match-results"></div></div>';
             wireMatchSearch(lead);
             document.getElementById('lw-panel-intel').innerHTML = '';
@@ -725,7 +753,7 @@
 
         if (lead.Matched_ID_Customer) {
             root.innerHTML = '<div class="ld-match ld-match--found">' +
-                '<div class="ld-match-head"><span class="ld-pill ld-pill--customer"><i class="fas fa-circle-check"></i> Existing customer</span>' +
+                '<div class="ld-match-head"><span class="ld-pill ld-pill--customer"><i class="fas fa-circle-check" aria-hidden="true"></i> Existing customer</span>' +
                 '<span class="ld-muted">#' + esc(lead.Matched_ID_Customer) + '</span></div>' +
                 '<div id="lw-match-detail" class="ld-muted">Loading…</div></div>';
             DashPage.fetchJson('/api/company-contacts/by-customer/' + encodeURIComponent(lead.Matched_ID_Customer))
@@ -757,8 +785,8 @@
                 var c = body.contact;
                 if (!c) { showProspect('No ShopWorks contact with ' + lead.Email + '.'); return; }
                 root.innerHTML = '<div class="ld-match ld-match--found">' +
-                    '<div class="ld-match-head"><span class="ld-pill ld-pill--customer"><i class="fas fa-circle-check"></i> Existing customer</span>' +
-                    '<button type="button" class="ld-btn" id="lw-link-btn"><i class="fas fa-link"></i> Link #' + esc(c.id_Customer) + '</button></div>' +
+                    '<div class="ld-match-head"><span class="ld-pill ld-pill--customer"><i class="fas fa-circle-check" aria-hidden="true"></i> Existing customer</span>' +
+                    '<button type="button" class="ld-btn" id="lw-link-btn"><i class="fas fa-link" aria-hidden="true"></i> Link #' + esc(c.id_Customer) + '</button></div>' +
                     '<dl class="ld-kv">' + [
                         ['Company', c.CustomerCompanyName || c.Company_Name],
                         ['AE', c.CustomerCustomerServiceRep || c.Sales_Rep],
@@ -909,8 +937,8 @@
 
         function manualLinkHtml() {
             return '<div class="lw-quote-row">' +
-                '<input type="text" id="lw-quote-id" class="lw-quote-input" placeholder="Quote ID (e.g. EMB0718-1)">' +
-                '<button type="button" id="lw-quote-link" class="ld-btn" aria-label="Link quote"><i class="fas fa-link"></i></button>' +
+                '<input type="text" id="lw-quote-id" class="lw-quote-input" placeholder="Quote ID (e.g. EMB0718-1)" aria-label="Quote ID to link">' +
+                '<button type="button" id="lw-quote-link" class="ld-btn" aria-label="Link quote"><i class="fas fa-link" aria-hidden="true"></i></button>' +
                 '</div>';
         }
 
@@ -955,7 +983,7 @@
             '<div class="lw-intel-title">Start a quote — prefilled with this lead</div>' +
             '<div class="lw-method-grid">' + QUOTE_BUILDERS.map(function (b, i) {
                 return '<button type="button" class="ld-btn lw-method-btn" data-builder="' + i + '">' +
-                    '<i class="fas ' + b.icon + '"></i> ' + b.label + '</button>';
+                    '<i class=\"fas ' + b.icon + '\" aria-hidden=\"true\"></i> ' + b.label + '</button>';
             }).join('') + '</div>' +
             '<div class="lw-intel-title">Recent quotes for this email</div>' +
             '<div id="lw-quote-suggest"></div>' +
@@ -996,11 +1024,11 @@
             return;
         }
         root.innerHTML = '<button type="button" id="lw-load-orders" class="ld-btn">' +
-            '<i class="fas fa-clock-rotate-left"></i> Load recent orders</button>';
+            '<i class="fas fa-clock-rotate-left" aria-hidden="true"></i> Load recent orders</button>';
         var btn = document.getElementById('lw-load-orders');
         var load = function () {
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading…';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading…';
             var params = new URLSearchParams();
             params.set('q.where', 'id_Customer=' + custId);
             params.set('q.orderBy', 'date_OrderPlaced DESC');
@@ -1063,16 +1091,16 @@
             atts.map(function (a, i) {
                 var label = a.name || (L.isJfUpload(a.url) ? L.fileBasename(a.url) : '') || ('Attachment ' + (i + 1));
                 return '<span class="ld-att"><a href="' + esc(L.viewUrl(a.url)) + '" target="_blank" rel="noopener">' +
-                    '<i class="fas fa-paperclip"></i> ' + esc(label) + '</a>' +
-                    '<a class="ld-dl" href="' + esc(L.downloadUrl(a.url)) + '" title="Download ' + esc(label) + '">' +
-                    '<i class="fas fa-download"></i></a></span>';
+                    '<i class="fas fa-paperclip" aria-hidden="true"></i> ' + esc(label) + '</a>' +
+                    '<a class="ld-dl" href="' + esc(L.downloadUrl(a.url)) + '" title="Download ' + esc(label) + '" aria-label="Download ' + esc(label) + '">' +
+                    '<i class="fas fa-download" aria-hidden="true"></i></a></span>';
             }).join('') +
             (jfUrl ? '<a href="' + esc(jfUrl) + '" target="_blank" rel="noopener">' +
-                '<i class="fas fa-arrow-up-right-from-square"></i> View in JotForm</a>' : '') +
+                '<i class="fas fa-arrow-up-right-from-square" aria-hidden="true"></i> View in JotForm</a>' : '') +
             '</div>';
         Array.prototype.forEach.call(root.querySelectorAll('img.ld-thumb'), function (img) {
             img.addEventListener('error', function () {
-                if (img.parentNode) img.parentNode.style.display = 'none';
+                if (img.parentNode) img.parentNode.hidden = true;
             });
         });
     }
@@ -1165,29 +1193,29 @@
         if (!root) return;
         if (lead.Art_Request_ID) {
             root.innerHTML =
-                '<div class="ld-match-head"><span class="ld-pill ld-pill--customer"><i class="fas fa-palette"></i> Art request #' + esc(lead.Art_Request_ID) + '</span>' +
+                '<div class="ld-match-head"><span class="ld-pill ld-pill--customer"><i class="fas fa-palette" aria-hidden="true"></i> Art request #' + esc(lead.Art_Request_ID) + '</span>' +
                 '<a class="ld-btn" href="/art-request/' + encodeURIComponent(lead.Art_Request_ID) + '?view=ae" target="_blank" rel="noopener">Open</a></div>' +
-                '<button type="button" id="lw-art-again" class="lw-chip" style="margin-top:8px">Start another</button>';
+                '<button type="button" id="lw-art-again" class="lw-chip lw-mt-8">Start another</button>';
             document.getElementById('lw-art-again').addEventListener('click', function () { openArtModal(lead); });
             return;
         }
         root.innerHTML =
             '<span class="ld-muted">Hand this lead to Steve/Ruth with the contact info + artwork prefilled.</span>' +
-            '<button type="button" id="lw-art-send" class="ld-btn ld-btn--primary" style="margin-top:8px"><i class="fas fa-palette"></i> Send to the art team</button>';
+            '<button type="button" id="lw-art-send" class="ld-btn ld-btn--primary lw-mt-8"><i class="fas fa-palette" aria-hidden="true"></i> Send to the art team</button>';
         document.getElementById('lw-art-send').addEventListener('click', function () { openArtModal(lead); });
     }
 
     function openArtModal(lead) {
         var btn = document.getElementById('lw-art-send') || document.getElementById('lw-art-again');
         var orig = btn ? btn.innerHTML : '';
-        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading…'; }
+        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading…'; }
         ensureArtFormLoaded().then(function () {
             if (typeof GarmentSubmitForm === 'undefined') throw new Error('art form bundle failed to load');
             var modal = document.getElementById('lw-art-modal');
             GarmentSubmitForm.init('lw-art-form-mount', {
                 prefill: buildArtPrefill(lead),
                 onSubmitted: function (designId) {
-                    if (modal) modal.style.display = 'none';
+                    closeArtModal();
                     if (designId) {
                         saveLeadField('Art_Request_ID', String(designId), null).then(function (ok) {
                             if (!ok) return;
@@ -1198,7 +1226,12 @@
                     }
                 },
             });
-            if (modal) modal.style.display = 'flex';
+            if (modal) {
+                artReturnFocus = btn;
+                modal.hidden = false;
+                var c = document.getElementById('lw-art-modal-close');
+                if (c) c.focus();
+            }
         }).catch(function (err) {
             console.error('[lead-ws] Send to art failed:', err);
             DashPage.showError('Could not open the art form (' + (err && err.message ? err.message : 'unknown error') + ').');
@@ -1208,16 +1241,23 @@
     }
 
     // Wire the art-modal close controls once (the modal markup is static in lead.html).
+    var artReturnFocus = null;
+    function closeArtModal() {
+        var m = document.getElementById('lw-art-modal');
+        if (!m || m.hidden) return;
+        m.hidden = true;
+        if (artReturnFocus && document.body.contains(artReturnFocus)) { try { artReturnFocus.focus(); } catch (e) { /* gone */ } }
+        artReturnFocus = null;
+    }
     (function wireArtModal() {
-        var closeIt = function () { var m = document.getElementById('lw-art-modal'); if (m) m.style.display = 'none'; };
         document.addEventListener('DOMContentLoaded', function () {
             var c = document.getElementById('lw-art-modal-close');
             var b = document.getElementById('lw-art-modal-backdrop');
-            if (c) c.addEventListener('click', closeIt);
-            if (b) b.addEventListener('click', closeIt);
+            if (c) c.addEventListener('click', closeArtModal);
+            if (b) b.addEventListener('click', closeArtModal);
             document.addEventListener('keydown', function (e) {
                 var m = document.getElementById('lw-art-modal');
-                if (e.key === 'Escape' && m && m.style.display !== 'none') closeIt();
+                if (e.key === 'Escape' && m && !m.hidden) closeArtModal();
             });
         });
     })();
