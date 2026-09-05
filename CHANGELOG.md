@@ -1,3 +1,8 @@
+## v2026.09.05.31 (2026.09.05)
+
+- Customer Portals console review: 14 items — LastLogin is finally stamped on customer sign-in (touch-login), hidden + [hidden] rule (no inline style=), real tablist, aria-labelled icon actions, modal focus return + Esc, lookup combobox keyboard nav, Retry, honest delete toast, phone 2-up stats; lock test; LESSONS entry (oldest archived)
+- Deploy v2026.09.05.31: 1 file (customer-portal-admin.html) — portal console review cache-bust
+
 ## v2026.09.05.29 (2026.09.05)
 
 - Vendor portal review: 12 items — [hidden] beats display:flex (error banner was visible on every load), vendored Font Awesome, retryable alert banner, pushState/Back, aria-pressed chips with counts, past-due flag, labels, Ctrl+Enter post, image fallbacks, phone block; lock test; LESSONS entry
