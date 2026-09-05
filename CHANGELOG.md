@@ -1,3 +1,8 @@
+## v2026.09.05.39 (2026.09.05)
+
+- House Accounts review: 13 items — YTD Sales tile no longer empties the grid (data-assignee keyed filter), inline onchange → data-change, 5 labelled dialogs with focus in/out + Esc, hidden toggles (Rule 3), keyboard expanders with aria-expanded, Retry, local calendar dates, audit trail author from session, aria-hidden icons, phone layout; lock test
+- Deploy v2026.09.05.39: 1 file (house-accounts.html) — House Accounts review cache-bust
+
 ## v2026.09.05.37 (2026.09.05)
 
 - Memory: the bundle tables are one page each -- my scope was 4x too high
