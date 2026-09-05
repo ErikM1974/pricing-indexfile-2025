@@ -6440,6 +6440,17 @@ async function fetchPortalAccess(email) {
   } catch (e) { console.error('[customer-login] access lookup error:', e.message); return null; }
 }
 
+// Deep-link carry-through for the magic-link logins: the gate sends the visitor to the login page
+// with ?next=<path>, the page posts it back alongside the email, and the link we email carries it to
+// /verify — which re-validates the prefix before redirecting. Anything not a plain same-site path
+// under the portal prefix is dropped (no open redirect, no scheme, no protocol-relative //).
+function safeLoginNext(raw, prefix) {
+  const s = typeof raw === 'string' ? raw.trim() : '';
+  if (!s || s.length > 400 || !s.startsWith(prefix) || s.startsWith('//') || /[\s\\<>]/.test(s)) return '';
+  if (!/^\/[A-Za-z0-9]/.test(s) || /:\/\//.test(s)) return '';
+  return s;
+}
+
 // Login page (email entry). Public.
 app.get('/customer/login', (req, res) => {
   res.set('Cache-Control', 'no-cache, no-store, must-revalidate');
@@ -6459,7 +6470,8 @@ app.post('/auth/customer/request-link', customerLoginLimiter, express.json(), as
       return ok();
     }
     const token = customerMagicLink.mintToken({ email, idCustomer: access.id_Customer });
-    const link = `${PUBLIC_SITE_ORIGIN}/auth/customer/verify?token=${encodeURIComponent(token)}`;
+    const nextPath = safeLoginNext(req.body && req.body.next, '/portal');
+    const link = `${PUBLIC_SITE_ORIGIN}/auth/customer/verify?token=${encodeURIComponent(token)}` + (nextPath ? `&next=${encodeURIComponent(nextPath)}` : '');
     await sendEmailJSTemplate(CUSTOMER_MAGIC_LINK_TEMPLATE, {
       to_email: email,
       company_name: access.company_name || 'there',
@@ -6494,7 +6506,7 @@ app.get('/auth/customer/verify', async (req, res) => {
       sameSite: 'lax',
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
-    const next = (typeof req.query.next === 'string' && req.query.next.startsWith('/portal')) ? req.query.next : '/portal';
+    const next = safeLoginNext(req.query.next, '/portal') || '/portal';
     return res.redirect(next);
   } catch (e) {
     console.error('[customer-login] verify error:', e.message);
@@ -6607,7 +6619,8 @@ app.post('/auth/vendor/request-link', vendorLoginLimiter, express.json(), async 
       return ok();
     }
     const token = vendorMagicLink.mintToken({ email, vendorName: access.vendor_name });
-    const link = `${PUBLIC_SITE_ORIGIN}/auth/vendor/verify?token=${encodeURIComponent(token)}`;
+    const nextPath = safeLoginNext(req.body && req.body.next, '/vendor');
+    const link = `${PUBLIC_SITE_ORIGIN}/auth/vendor/verify?token=${encodeURIComponent(token)}` + (nextPath ? `&next=${encodeURIComponent(nextPath)}` : '');
     await sendEmailJSTemplate(VENDOR_MAGIC_LINK_TEMPLATE, {
       to_email: email,
       company_name: access.vendor_name,
@@ -6650,7 +6663,7 @@ app.get('/auth/vendor/verify', async (req, res) => {
         body: JSON.stringify({ email: claim.email }),
       }).catch((e) => console.warn('[vendor-login] touch-login failed:', e.message));
     }
-    const next = (typeof req.query.next === 'string' && req.query.next.startsWith('/vendor')) ? req.query.next : '/vendor';
+    const next = safeLoginNext(req.query.next, '/vendor') || '/vendor';
     return res.redirect(next);
   } catch (e) {
     console.error('[vendor-login] verify error:', e.message);

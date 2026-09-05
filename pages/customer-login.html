@@ -3,9 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
   <title>Sign In — Northwest Custom Apparel</title>
   <link rel="icon" href="/favicon.png">
-  <link rel="stylesheet" href="/pages/css/customer-login.css">
+  <link rel="stylesheet" href="/pages/css/customer-login.css?v=2026.09.05.27">
 </head>
 <body>
   <div class="cl-wrap">
@@ -18,22 +19,22 @@
         <p class="cl-sub">Enter your email and we'll send you a secure one-click sign-in link.</p>
         <form id="cl-form" novalidate>
           <label for="cl-email" class="cl-sr">Email address</label>
-          <input type="email" id="cl-email" name="email" placeholder="you@company.com" autocomplete="email" required>
+          <input type="email" id="cl-email" name="email" placeholder="you@company.com" autocomplete="email" autocapitalize="off" spellcheck="false" autofocus required>
           <button type="submit" id="cl-submit">Email me a sign-in link</button>
         </form>
-        <p class="cl-error" id="cl-error" hidden>That link has expired or is no longer valid. Enter your email to get a new one.</p>
+        <p class="cl-error" id="cl-error" role="alert" hidden>That link has expired or is no longer valid. Enter your email to get a new one.</p>
       </div>
 
       <div id="cl-sent-view" hidden>
         <div class="cl-check">&check;</div>
-        <h1>Check your email</h1>
+        <h1 tabindex="-1">Check your email</h1>
         <p class="cl-sub">If your email is on file, a sign-in link is on its way. It expires in 15 minutes.</p>
-        <p class="cl-hint">Didn't get it? Check your spam folder, or <a href="/customer/login">try again</a>.</p>
+        <p class="cl-hint">Didn't get it? Check your spam folder, or <a href="/customer/login" id="cl-again">try again</a>.</p>
       </div>
 
       <p class="cl-foot">Need access? Contact your Northwest Custom Apparel rep.<br><a href="/">&larr; Back to site</a></p>
     </div>
   </div>
-  <script src="/pages/js/customer-login.js"></script>
+  <script src="/pages/js/customer-login.js?v=2026.09.05.27"></script>
 </body>
 </html>
