@@ -12,7 +12,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
     <!-- Dashboard Styles -->
-    <link href="/dashboards/css/house-accounts.css?v=2026.09.05.15" rel="stylesheet">
+    <link href="/dashboards/css/house-accounts.css?v=2026.09.05.38" rel="stylesheet">
 </head>
 <body>
     <div class="house-page">
@@ -25,10 +25,10 @@
             </div>
             <div class="header-right">
                 <a href="/crm-logout" class="back-btn" title="Logout">
-                    <i class="fas fa-sign-out-alt"></i> Logout
+                    <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Logout
                 </a>
                 <a href="/staff-dashboard.html" class="back-btn">
-                    <i class="fas fa-arrow-left"></i> Dashboard
+                    <i class="fas fa-arrow-left" aria-hidden="true"></i> Dashboard
                 </a>
             </div>
         </header>
@@ -37,43 +37,46 @@
         <main class="house-content">
             <!-- Error Banner -->
             <div class="error-banner" id="error-banner">
-                <i class="fas fa-exclamation-triangle"></i>
+                <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
                 <span class="error-banner-message" id="error-message"></span>
-                <button class="error-banner-close" aria-label="Dismiss error" data-call="dismissErrorBanner">
-                    <i class="fas fa-times"></i>
+                <button type="button" class="error-banner-retry" id="error-retry" data-call="houseController.retryLoad" hidden>
+                    <i class="fas fa-rotate" aria-hidden="true"></i> Retry
+                </button>
+                <button type="button" class="error-banner-close" aria-label="Dismiss error" data-call="dismissErrorBanner">
+                    <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             </div>
 
             <!-- Stats Grid - YTD Sales by Assignee -->
-            <div class="stats-grid" id="stats-grid">
-                <div class="stat-card total">
-                    <div class="stat-value" id="stat-total">-</div>
-                    <div class="stat-label">YTD Sales</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="stat-ruthie">-</div>
-                    <div class="stat-label">Ruthie</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="stat-erik">-</div>
-                    <div class="stat-label">Erik</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="stat-web">-</div>
-                    <div class="stat-label">Web</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="stat-jim">-</div>
-                    <div class="stat-label">Jim</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="stat-house">-</div>
-                    <div class="stat-label">House</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="stat-other">-</div>
-                    <div class="stat-label">Other</div>
-                </div>
+            <div class="stats-grid" id="stats-grid" role="group" aria-label="YTD sales by assignee — click a tile to filter">
+                <button type="button" class="stat-card total" data-assignee="" aria-pressed="false" title="Show every house account">
+                    <span class="stat-value" id="stat-total">-</span>
+                    <span class="stat-label">YTD Sales</span>
+                </button>
+                <button type="button" class="stat-card" data-assignee="Ruthie" aria-pressed="false" title="Only accounts assigned to Ruthie">
+                    <span class="stat-value" id="stat-ruthie">-</span>
+                    <span class="stat-label">Ruthie</span>
+                </button>
+                <button type="button" class="stat-card" data-assignee="Erik" aria-pressed="false" title="Only accounts assigned to Erik">
+                    <span class="stat-value" id="stat-erik">-</span>
+                    <span class="stat-label">Erik</span>
+                </button>
+                <button type="button" class="stat-card" data-assignee="Web" aria-pressed="false" title="Only accounts assigned to Web">
+                    <span class="stat-value" id="stat-web">-</span>
+                    <span class="stat-label">Web</span>
+                </button>
+                <button type="button" class="stat-card" data-assignee="Jim" aria-pressed="false" title="Only accounts assigned to Jim">
+                    <span class="stat-value" id="stat-jim">-</span>
+                    <span class="stat-label">Jim</span>
+                </button>
+                <button type="button" class="stat-card" data-assignee="House" aria-pressed="false" title="Only accounts assigned to House">
+                    <span class="stat-value" id="stat-house">-</span>
+                    <span class="stat-label">House</span>
+                </button>
+                <button type="button" class="stat-card" data-assignee="Other" aria-pressed="false" title="Only accounts assigned to Other">
+                    <span class="stat-value" id="stat-other">-</span>
+                    <span class="stat-label">Other</span>
+                </button>
             </div>
 
             <!-- Filters Section -->
@@ -94,42 +97,42 @@
                         <option value="Other">Other</option>
                     </select>
                 </div>
-                <button class="clear-filters-btn" id="clear-filters-btn">
-                    <i class="fas fa-times"></i> Clear
+                <button type="button" class="clear-filters-btn" id="clear-filters-btn">
+                    <i class="fas fa-times" aria-hidden="true"></i> Clear
                 </button>
             </div>
 
             <!-- Accounts Section -->
             <div class="accounts-section">
                 <div class="accounts-header">
-                    <h2><i class="fas fa-home"></i> Accounts</h2>
+                    <h2><i class="fas fa-home" aria-hidden="true"></i> Accounts</h2>
                     <div class="accounts-meta">
                         <span class="accounts-count" id="accounts-count">0 accounts</span>
-                        <button class="gap-report-btn" id="gap-report-btn" title="View all authority conflicts - orders written by wrong rep">
-                            <i class="fas fa-exchange-alt"></i> Gap Report
+                        <button type="button" class="gap-report-btn" id="gap-report-btn" title="View all authority conflicts - orders written by wrong rep">
+                            <i class="fas fa-exchange-alt" aria-hidden="true"></i> Gap Report
                         </button>
-                        <button class="reconcile-btn" id="reconcile-btn" title="Find customers with orders not in any account list">
-                            <i class="fas fa-user-plus"></i> Find Unassigned
+                        <button type="button" class="reconcile-btn" id="reconcile-btn" title="Find customers with orders not in any account list">
+                            <i class="fas fa-user-plus" aria-hidden="true"></i> Find Unassigned
                         </button>
-                        <button class="gap-report-btn" id="sw-todo-btn" title="Dashboard rep assignments you still need to key into ShopWorks by hand (ShopWorks has no write-back — the ODBC mirror auto-confirms once you do)">
-                            <i class="fas fa-clipboard-check"></i> ShopWorks To-Do <span class="sw-todo-count" id="sw-todo-count" hidden></span>
+                        <button type="button" class="gap-report-btn" id="sw-todo-btn" title="Dashboard rep assignments you still need to key into ShopWorks by hand (ShopWorks has no write-back — the ODBC mirror auto-confirms once you do)">
+                            <i class="fas fa-clipboard-check" aria-hidden="true"></i> ShopWorks To-Do <span class="sw-todo-count" id="sw-todo-count" hidden></span>
                         </button>
                         <div class="sync-controls">
-                            <button class="sync-btn primary" id="sync-all-btn" title="Sync ownership and sales for all CRM dashboards (Nika, Taneisha, House)">
-                                <i class="fas fa-sync"></i> Sync All CRM
+                            <button type="button" class="sync-btn primary" id="sync-all-btn" title="Sync ownership and sales for all CRM dashboards (Nika, Taneisha, House)">
+                                <i class="fas fa-sync" aria-hidden="true"></i> Sync All CRM
                             </button>
-                            <button class="sync-btn" id="sync-house-btn" title="Quick sync House accounts sales only">
-                                <i class="fas fa-home"></i> Sync House Only
+                            <button type="button" class="sync-btn" id="sync-house-btn" title="Quick sync House accounts sales only">
+                                <i class="fas fa-home" aria-hidden="true"></i> Sync House Only
                             </button>
                         </div>
-                        <div class="sync-status" id="sync-status">
+                        <div class="sync-status" id="sync-status" role="status" aria-label="Last CRM sync">
                             <!-- Populated by JS: shows last sync time per rep -->
                         </div>
                     </div>
                 </div>
 
                 <!-- Loading Overlay -->
-                <div class="loading-overlay" id="loading-overlay">
+                <div class="loading-overlay" id="loading-overlay" role="status" aria-label="Loading accounts">
                     <div class="loading-spinner"></div>
                 </div>
 
@@ -139,8 +142,8 @@
                 </div>
 
                 <!-- Empty State -->
-                <div class="empty-state" id="empty-state" style="display: none;">
-                    <i class="fas fa-inbox"></i>
+                <div class="empty-state" id="empty-state" role="status" hidden>
+                    <i class="fas fa-inbox" aria-hidden="true"></i>
                     <h3>No Accounts Found</h3>
                     <p>Try adjusting your filters or search criteria</p>
                 </div>
@@ -150,18 +153,18 @@
 
     <!-- ShopWorks To-Do Modal -->
     <div class="modal-overlay" id="sw-todo-modal-overlay">
-        <div class="gap-report-modal">
+        <div class="gap-report-modal" role="dialog" aria-modal="true" aria-labelledby="sw-todo-title">
             <div class="modal-header">
                 <div class="modal-title">
-                    <h2><i class="fas fa-clipboard-check"></i> ShopWorks To-Do</h2>
+                    <h2 id="sw-todo-title"><i class="fas fa-clipboard-check" aria-hidden="true"></i> ShopWorks To-Do</h2>
                     <p class="modal-subtitle">Assignments made in the dashboards that you still need to key into ShopWorks (Cust → Customer Service Rep). The 15-min ODBC mirror auto-clears each row once ShopWorks matches.</p>
                 </div>
                 <div class="modal-header-actions">
-                    <button class="sync-btn" id="sw-todo-copy" title="Copy the list to paste into notes / print for ShopWorks entry">
-                        <i class="fas fa-copy"></i> Copy list
+                    <button type="button" class="sync-btn" id="sw-todo-copy" title="Copy the list to paste into notes / print for ShopWorks entry">
+                        <i class="fas fa-copy" aria-hidden="true"></i> Copy list
                     </button>
-                    <button class="modal-close" aria-label="Close" id="sw-todo-close">
-                        <i class="fas fa-times"></i>
+                    <button type="button" class="modal-close" aria-label="Close" id="sw-todo-close">
+                        <i class="fas fa-times" aria-hidden="true"></i>
                     </button>
                 </div>
             </div>
@@ -173,33 +176,33 @@
 
     <!-- Reconcile Modal -->
     <div class="modal-overlay" id="reconcile-modal-overlay">
-        <div class="reconcile-modal">
+        <div class="reconcile-modal" role="dialog" aria-modal="true" aria-labelledby="reconcile-title">
             <div class="modal-header">
                 <div class="modal-title">
-                    <h2><i class="fas fa-user-plus"></i> Find Unassigned Customers</h2>
+                    <h2 id="reconcile-title"><i class="fas fa-user-plus" aria-hidden="true"></i> Find Unassigned Customers</h2>
                     <p class="modal-subtitle">Customers with orders not in any rep's account list</p>
                 </div>
                 <div class="modal-header-actions">
-                    <button class="refresh-btn" id="reconcile-refresh-btn" title="Refresh data from Caspio">
-                        <i class="fas fa-sync-alt"></i>
+                    <button type="button" class="refresh-btn" id="reconcile-refresh-btn" title="Refresh data from Caspio" aria-label="Refresh unassigned customers">
+                        <i class="fas fa-sync-alt" aria-hidden="true"></i>
                     </button>
-                    <button class="modal-close" aria-label="Close" id="reconcile-modal-close">
-                        <i class="fas fa-times"></i>
+                    <button type="button" class="modal-close" aria-label="Close" id="reconcile-modal-close">
+                        <i class="fas fa-times" aria-hidden="true"></i>
                     </button>
                 </div>
             </div>
             <div class="reconcile-modal-body">
-                <div class="reconcile-loading" id="reconcile-loading">
+                <div class="reconcile-loading" id="reconcile-loading" role="status">
                     <div class="loading-spinner"></div>
                     <p>Checking for unassigned customers...</p>
                 </div>
-                <div class="reconcile-results" id="reconcile-results" style="display: none;">
+                <div class="reconcile-results" id="reconcile-results" hidden>
                     <div class="reconcile-summary" id="reconcile-summary"></div>
                     <div class="reconcile-table-wrapper">
                         <table class="reconcile-table" id="reconcile-table">
                             <thead>
                                 <tr>
-                                    <th class="expand-col"></th>
+                                    <th class="expand-col"><span class="sr-only">Expand</span></th>
                                     <th>Company / ID</th>
                                     <th>Order Rep</th>
                                     <th>ShopWorks Rep</th>
@@ -214,17 +217,17 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="reconcile-empty" id="reconcile-empty" style="display: none;">
-                        <i class="fas fa-check-circle"></i>
+                    <div class="reconcile-empty" id="reconcile-empty" role="status" hidden>
+                        <i class="fas fa-check-circle" aria-hidden="true"></i>
                         <h3>All Synced!</h3>
                         <p>All customers with recent orders are already in an account list.</p>
                     </div>
                 </div>
             </div>
-            <div class="modal-footer" id="reconcile-footer" style="display: none;">
-                <button class="btn-cancel" id="reconcile-cancel">Close</button>
-                <button class="btn-save" id="reconcile-add-all">
-                    <i class="fas fa-plus"></i> Add All to House
+            <div class="modal-footer" id="reconcile-footer" hidden>
+                <button type="button" class="btn-cancel" id="reconcile-cancel">Close</button>
+                <button type="button" class="btn-save" id="reconcile-add-all">
+                    <i class="fas fa-plus" aria-hidden="true"></i> Add All to House
                 </button>
             </div>
         </div>
@@ -232,11 +235,11 @@
 
     <!-- Confirmation Modal -->
     <div class="modal-overlay" id="confirm-modal">
-        <div class="confirm-modal">
+        <div class="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
             <div class="modal-header">
                 <h2 id="confirm-title">Assign Account</h2>
-                <button class="modal-close" aria-label="Close" id="confirm-close">
-                    <i class="fas fa-times"></i>
+                <button type="button" class="modal-close" aria-label="Close" id="confirm-close">
+                    <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             </div>
             <div class="modal-body">
@@ -244,45 +247,45 @@
                 <div class="account-preview" id="confirm-account-preview"></div>
             </div>
             <div class="modal-footer">
-                <button class="btn-cancel" id="confirm-cancel">Cancel</button>
-                <button class="btn-save" id="confirm-submit">
-                    <i class="fas fa-check"></i> Confirm
+                <button type="button" class="btn-cancel" id="confirm-cancel">Cancel</button>
+                <button type="button" class="btn-save" id="confirm-submit">
+                    <i class="fas fa-check" aria-hidden="true"></i> Confirm
                 </button>
             </div>
         </div>
     </div>
 
     <!-- Celebration Toast (for success messages) -->
-    <div class="celebration-toast" id="celebration-toast"></div>
+    <div class="celebration-toast" id="celebration-toast" role="status" aria-live="polite"></div>
 
     <!-- Gap Report Modal -->
     <div class="modal-overlay" id="gap-report-modal-overlay">
-        <div class="gap-report-modal">
+        <div class="gap-report-modal" role="dialog" aria-modal="true" aria-labelledby="gap-report-title">
             <div class="modal-header">
                 <div class="modal-title">
-                    <h2><i class="fas fa-exchange-alt"></i> Full Reconciliation Report</h2>
+                    <h2 id="gap-report-title"><i class="fas fa-exchange-alt" aria-hidden="true"></i> Full Reconciliation Report</h2>
                     <p class="modal-subtitle">Orders where rep doesn't match customer's CRM owner</p>
                 </div>
                 <div class="modal-header-actions">
-                    <button class="refresh-btn" id="gap-report-refresh-btn" title="Refresh report">
-                        <i class="fas fa-sync-alt"></i>
+                    <button type="button" class="refresh-btn" id="gap-report-refresh-btn" title="Refresh report" aria-label="Refresh gap report">
+                        <i class="fas fa-sync-alt" aria-hidden="true"></i>
                     </button>
-                    <button class="modal-close" aria-label="Close" id="gap-report-modal-close">
-                        <i class="fas fa-times"></i>
+                    <button type="button" class="modal-close" aria-label="Close" id="gap-report-modal-close">
+                        <i class="fas fa-times" aria-hidden="true"></i>
                     </button>
                 </div>
             </div>
             <div class="gap-report-modal-body">
-                <div class="gap-report-loading" id="gap-report-loading">
+                <div class="gap-report-loading" id="gap-report-loading" role="status">
                     <div class="loading-spinner"></div>
                     <p>Analyzing order authority conflicts...</p>
                 </div>
-                <div class="gap-report-content" id="gap-report-content" style="display: none;">
+                <div class="gap-report-content" id="gap-report-content" hidden>
                     <!-- Will be populated by JavaScript -->
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn-cancel" id="gap-report-close">Close</button>
+                <button type="button" class="btn-cancel" id="gap-report-close">Close</button>
             </div>
         </div>
     </div>
@@ -293,6 +296,6 @@
     <!-- Dashboard JavaScript -->
     <script src="/shared_components/js/caspio-date-utils.js?v=1"></script>
     <script src="/shared_components/js/data-call-delegator.js"></script>
-    <script src="/dashboards/js/house-accounts.js?v=2026.09.05.16"></script>
+    <script src="/dashboards/js/house-accounts.js?v=2026.09.05.38"></script>
 </body>
 </html>

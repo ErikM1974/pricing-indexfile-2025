@@ -586,3 +586,34 @@ Left alone: GarmentSubmitForm's jsDelivr EmailJS load (shared bundle, same acros
 Left alone: 401 → `/dashboards/staff-login.html?redirect=` (real page; the server uses it too); the
 Sync buttons referenced in the controller have no markup (dead path, harmless).
 
+## House Accounts — review, 13 items (2026-09-05, `v2026.09.05.38`)
+
+`dashboards/house-accounts.html` + `js/house-accounts.js` (2.4k lines) + `css/house-accounts.css`.
+Live: 34 accounts, $20.4k YTD, 0 console errors. Every modal exercised on `static-dist` with fetch stubbed.
+
+1. 🔴 **"YTD Sales" tile emptied the grid** — `filterByStatCard` matched the label text `'Total'`, but
+   the tile's label is "YTD Sales", so clicking it set the assignee filter to "YTD Sales" (0 accounts).
+   Tiles are now `<button data-assignee aria-pressed>`; `''` = show all; clicking the active tile clears.
+2. **Inline `onchange`** on the reconcile Assign dropdown → `data-change="houseController.quickAssignFromSelect"`.
+3. **5 modals** (to-do, reconcile, confirm, gap report, dynamic assign) are `role=dialog aria-modal
+   aria-labelledby`; one `_openOverlay/_closeOverlay` pair moves focus in and back; Esc closes all five
+   (to-do + assign were not covered).
+4. **~30 `style.display` toggles + `style.cssText`** → `hidden` (+ `[hidden]` rule); expander rows
+   `<tr hidden>`; gap section starts open without inline style.
+5. **Expanders keyboard-operable** — customer rows, gap rows and rep headers are `tabindex=0` with
+   `aria-expanded` + named labels; Enter/Space triggers the same data-call click.
+6. **Load failure retryable** — banner Retry (`houseController.retryLoad`) with the real error.
+7. **Dates** — `parseCalendarDate()` (local calendar days) for card "Added" dates, orders, to-do days.
+8. **Audit trail author** was hardcoded `'Erik'` → the signed-in staffer from `/api/crm-session/me`
+   (fallback kept).
+9. **Two icon-only refresh buttons** named; status regions on loading/empty/sync/toast; expand column
+   header has an sr-only name.
+10. **130 icons `aria-hidden`**; all buttons `type=button`.
+11. **Assign modal** rep buttons carry `aria-pressed`; first rep focused on open.
+12. **Phone ≤640** — stat grid 2-up with the total full-width, header actions wrap, sync controls wrap;
+    0 overflow at 375px.
+13. Lock: `tests/unit/house-accounts-page.test.js`.
+
+Left alone: `loadSyncStatus()` fetches every Nika + Taneisha account on each page load just to find the
+latest `Last_Sync_Date` (a proxy-side "last sync" endpoint would be the real fix — Caspio quota, not UI).
+
