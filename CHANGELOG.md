@@ -1,3 +1,8 @@
+## v2026.09.05.16 (2026.09.05)
+
+- Staff-dashboard sweep batch 2: inline onclick → data-call on 14 pages + 8 rendering modules; Universal Records admin Rule-3 extraction
+- Deploy v2026.09.05.16: cache-bust — staff-dashboard sweep batch 2 (data-call delegator, Universal Records extraction)
+
 ## v2026.09.05.15 (2026.09.05)
 
 - Staff-dashboard sweep batch 1: labels, named buttons, single h1s, phone widths, Dashboard links, noopener
