@@ -1024,8 +1024,12 @@ a.inbound-pill:hover { filter: brightness(0.95); }
 /* Table: room for the row, one line for the actions, no wrapped IDs.
    Rows were 167px tall because six icon buttons stacked in an 86px cell. */
 .quotes-table-scroll { overflow-x: auto; }
-.quotes-table td.actions-cell { white-space: nowrap; }
-.th-actions, td.actions-cell { min-width: 250px; }
+/* Actions wrap into a compact 2-row block (~150px) — one long line pushed the table to
+   1,650px in a 1,352px container and hid the column behind a scrollbar. */
+.quotes-table td.actions-cell { white-space: normal; min-width: 150px; max-width: 170px; line-height: 1; }
+.th-actions { min-width: 150px; }
+.actions-cell .action-btn { margin: 1px 0; }
+.quotes-table td { padding: 10px 12px; }
 .th-right { text-align: right; }
 .quote-id { white-space: nowrap; }
 .quotes-table td { vertical-align: middle; }

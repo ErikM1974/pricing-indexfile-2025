@@ -100,7 +100,7 @@ describe('tiles, pipeline, tabs, freshness, phone', () => {
     });
     test('phone: header wraps, low-value columns hide, actions stay on one line', () => {
         expect(css).toMatch(/\.qm-col-phone-hide \{ display: none; \}/);
-        expect(css).toMatch(/td\.actions-cell \{ white-space: nowrap; \}/);
+        expect(css).toMatch(/td.actions-cell { white-space: normal; min-width: 150px/);
         expect(doc.querySelectorAll('th.qm-col-phone-hide').length).toBe(5); // salesperson, items, progress, inbound, created
         expect(doc.querySelector('.quotes-table-scroll')).not.toBeNull();
     });
