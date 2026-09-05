@@ -432,3 +432,35 @@ state on `static-dist` with fetch stubbed (429 / rejected / 404). Shipped:
 Not done: the login form is never SUBMITTED live (that emails a real link) — the sent path was
 proven locally with the POST 404ing and with fetch stubbed.
 
+## Vendor portal `/vendor` — review, 12 items (2026-09-05, `v2026.09.05.28`)
+
+`pages/vendor-portal.html/.js/.css` (Ed Lacey / L&P Screen Printing). No staff mirror exists and the
+vendor's permanent access link is his credential (visiting it stamps a login), so this was reviewed
+on `static-dist` with `/api/vendor/*` stubbed — every state exercised: error→Retry→list, filters,
+search-empty, card open by Space, detail with broken images, Back button, Esc, Ctrl+Enter post,
+375px list + detail. Live check limited to the gate (`/vendor` anon → 302 login?next=). Shipped:
+
+1. 🔴 **Error banner visible on every load since launch** — `.vp-error{display:flex}` beat the
+   `hidden` attribute (see LESSONS 2026-09-05). `[hidden]{display:none!important}` added.
+2. **Font Awesome from cdnjs** on a vendor-facing page → the vendored 6.6.0 copy (same as builders).
+3. **Failures now retryable** — banner is `role=alert` with a Retry that re-runs the failed load
+   (jobs, job, note post); the server's own 503/429 message is shown when present; a 404 job says
+   it was removed/reassigned instead of "refresh".
+4. **Browser Back works** — opening a job `pushState`s `#job=`, `popstate` walks list ↔ job; Esc
+   returns to the list; focus lands on the job heading and returns to the card.
+5. **Filter chips** are `aria-pressed` buttons with live counts (Active 2 · Completed 1 · All 3);
+   empty text names the filter or the search ("No jobs match “zzz”.").
+6. **Past due** — a needed-by date before today on a non-terminal job is flagged red on the card
+   (left rule) and in the work order ("Sep 2, 2026 · past due").
+7. **Labels** on search and message box; Post disabled until text; Ctrl+Enter posts; "Posted — NWCA
+   will see it on the job." confirmation; failure keeps the text.
+8. **Images degrade** — broken mockup thumb → shirt placeholder, file thumb → icon, mockup hero →
+   "preview unavailable, use Download" (`data-onerror`, one capture listener).
+9. **Cards** open on Space as well as Enter; `aria-label="Open job TR-…, Company"`.
+10. **Every icon `aria-hidden`**; loading/empty are `role=status`; `document.title` per view.
+11. **Phone ≤560px** — header user row full-width, tagline hidden, one-column cards, stacked
+    comment form; 0 overflow at 375px in list and detail.
+12. Lock: `tests/unit/vendor-portal-page.test.js`.
+
+Left alone: job ordering (API order), note timeline newest-first, sign-out as a GET link.
+
