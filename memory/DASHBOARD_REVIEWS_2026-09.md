@@ -157,6 +157,29 @@ Releases `v2026.09.04.1 → .9`. Detail here; MEMORY.md carries one line each.
   Existing VQ rows keep sales@ (Erik can edit `SalesRepEmail` on VQ-2026-002 in Caspio).
 - Lock: `tests/unit/ae-mission-control-page.test.js` (runs the harness drift check in the gate).
 
+## Cross-page sweep 1 — identity hydration + favicons (2026-09-05, `v2026.09.05.6`)
+
+- **Root cause of the Quote Management "Guest" bug, generalised**: the staff dashboard mirrors
+  the SAML identity into `sessionStorage.nwca_user_name/email`, but sessionStorage is per TAB.
+  Any bookmarked / typed / `rel=noopener` open of a staff page had NO identity. Affected
+  readers (audit): rep-crm (nika/taneisha pages), quote-view (`isStaff` → staff saw the
+  customer view), quote-audit (gate sent staff to the login card), invoice (toolbar hidden),
+  transfer-detail ("Who are you?" modal), art-request-detail / mockup-detail / art-hub-steve
+  (notes posted as "Staff"), garment-designer (rep email sales@), quote builders
+  (`autoSelectSalesRep` → rep blank → `SalesRepEmail` sales@).
+- Fix in ONE place: `StaffAuthHelper.ready()` (hydrates from `/api/crm-session/me`, kicked at
+  script load, memoised, never throws, `staff-auth:ready` event); `autoSelectSalesRep` retries
+  after hydration; init-time readers `await ready()`; 7 pages that read the keys without
+  loading the helper now load it. Lock: `tests/unit/staff-identity-hydration.test.js`.
+- 8 pages still used the Caspio-CDN favicon → `/favicon.png`. Mission Control hero quarter
+  labels ("Your Q3 embroidery bonus", "Earned · Q3") now follow the API's quarter.
+- 🔑 Audit script (node, inline in the session): per page — onclick=, style=, inline
+  `<script>` bytes, `<style>`, alert/confirm/prompt, legacy identity reads, console.log,
+  favicon, FA version. 61 of 96 dashboard-linked pages flagged; the quote builders (98/73/48
+  onclick each, 4 alerts) and 5 training pages with 1–19 KB inline scripts are the big
+  remaining Rule-3 debt — builders deliberately NOT swept autonomously (pricing-critical,
+  Rule 8 sync ×4). Remaining backlog is in this file's next sections as they ship.
+
 ## Verification gotchas learned today
 
 - Browser pane (`mcp__Claude_Browser`): screenshots of a SCROLLED page come back blank on

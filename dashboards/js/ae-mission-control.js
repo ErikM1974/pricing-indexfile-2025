@@ -2054,6 +2054,13 @@
         var counts = mine.counts || {};
         var bounties = mine.bounties || {};
         countUp(el('aemc-bh-amount'), Number(mine.totalBonus) || 0, money2);
+        // Quarter labels follow the API — the markup said "Q3" and would have kept saying
+        // it on Oct 1 (same fix Company Numbers' team-push title got, 2026-09-05).
+        var qLabel = 'Q' + (mine.quarter || '3');
+        var eyebrow = el('aemc-bh-eyebrow');
+        if (eyebrow) eyebrow.textContent = 'Your ' + qLabel + ' embroidery bonus';
+        var earnedCap = document.querySelector('.aemc-bh-earned-cap');
+        if (earnedCap) earnedCap.textContent = 'Earned · ' + qLabel;
         state.bonusTotal = Number(mine.totalBonus) || 0;
 
         // Always state the goal in DOLLARS. A bare "18.4% of your goal" with no

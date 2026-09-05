@@ -524,7 +524,9 @@ class RepCRMController {
     async init() {
         this.cacheElements();
         this.bindEvents();
-        this.displayWelcomeMessage();
+        // Identity may still be hydrating from the SAML session in a fresh tab (2026-09-05).
+        (typeof StaffAuthHelper !== 'undefined' ? StaffAuthHelper.ready() : Promise.resolve())
+            .then(() => this.displayWelcomeMessage());
 
         try {
             await this.loadAccounts();

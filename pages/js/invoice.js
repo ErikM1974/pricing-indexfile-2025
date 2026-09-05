@@ -160,6 +160,8 @@
         // /invoice/X via a share link should see a clean invoice only — they
         // can still Ctrl+P natively. Staff identified by ?staff=true URL flag
         // OR nwca_user_email sessionStorage (set by staff-dashboard login).
+        // Hydrate the legacy keys from the SAML session first (fresh tab = empty sessionStorage).
+        if (typeof StaffAuthHelper !== 'undefined' && StaffAuthHelper.ready) await StaffAuthHelper.ready();
         const isStaff = new URLSearchParams(window.location.search).get('staff') === 'true'
           || !!sessionStorage.getItem('nwca_user_email')
           || !!sessionStorage.getItem('nwca_user_name');

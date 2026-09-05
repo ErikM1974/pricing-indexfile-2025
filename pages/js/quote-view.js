@@ -110,6 +110,9 @@ class QuoteViewPage {
         // Staff mode is driven ONLY by a real logged-in staff session — never a URL
         // param. `?staff=true` previously let anyone reveal the staff-only controls
         // (ShopWorks sync, push internals) on a customer's quote with no auth.
+        // A bookmarked / new-tab open has no sessionStorage yet — let the helper ask the
+        // SAML session first, or staff saw the customer view of their own quote (2026-09-05).
+        if (typeof StaffAuthHelper !== 'undefined' && StaffAuthHelper.ready) await StaffAuthHelper.ready();
         this.isStaff = (typeof StaffAuthHelper !== 'undefined' && StaffAuthHelper.isLoggedIn());
 
         // Load quote data

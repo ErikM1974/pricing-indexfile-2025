@@ -24,6 +24,36 @@ const StaffAuthHelper = {
     },
 
     /**
+     * SAML hydration (2026-09-05). The staff dashboard mirrors the SAML identity into the
+     * sessionStorage keys below, but sessionStorage is per TAB: a bookmarked, typed or
+     * new-tab (rel=noopener) open of any staff page arrives with nothing — Quote Management
+     * showed "Guest" with every delete disabled, quote builders left the rep unpicked,
+     * detail pages posted notes as "Staff". ready() asks /api/crm-session/me once, writes
+     * the keys, resolves true when signed in. Kicked off at script load; callers that read
+     * identity at init should `await StaffAuthHelper.ready()` (or listen for
+     * 'staff-auth:ready'). Never throws.
+     * @returns {Promise<boolean>} true when a staff session is known
+     */
+    _readyPromise: null,
+    ready() {
+        if (this._readyPromise) return this._readyPromise;
+        if (this.isLoggedIn()) { this._readyPromise = Promise.resolve(true); return this._readyPromise; }
+        if (typeof fetch !== 'function') { this._readyPromise = Promise.resolve(false); return this._readyPromise; }
+        this._readyPromise = fetch('/api/crm-session/me', { credentials: 'same-origin' })
+            .then((r) => (r.ok ? r.json() : null))
+            .then((me) => {
+                if (!me || me.authenticated === false || !(me.name || me.email)) return false;
+                sessionStorage.setItem('nwca_user_name', String(me.name || me.firstName || ''));
+                sessionStorage.setItem('nwca_user_email', String(me.email || ''));
+                if (me.role) sessionStorage.setItem('nwca_user_role', String(me.role));
+                try { document.dispatchEvent(new CustomEvent('staff-auth:ready', { detail: me })); } catch (_) { /* old browsers */ }
+                return true;
+            })
+            .catch(() => false);
+        return this._readyPromise;
+    },
+
+    /**
      * Get the logged-in staff member's email
      * Checks sessionStorage for nwca_user_email or maps from nwca_user_name
      * @returns {string|null} Staff email or null if not logged in
@@ -65,10 +95,13 @@ const StaffAuthHelper = {
      * @param {string} selectId - The ID of the select element (default: 'sales-rep')
      * @returns {boolean} True if auto-selection was successful
      */
-    autoSelectSalesRep(selectId = 'sales-rep') {
+    autoSelectSalesRep(selectId = 'sales-rep', _retried = false) {
         const email = this.getLoggedInStaffEmail();
         if (!email) {
-            console.log('[StaffAuthHelper] No logged-in staff email found');
+            // Not hydrated yet (fresh tab) — pick the rep once the SAML identity lands.
+            // Without this every quote builder opened from a bookmark left the rep blank
+            // and the quote's SalesRepEmail fell to sales@ (2026-09-05).
+            if (!_retried) this.ready().then((ok) => { if (ok) this.autoSelectSalesRep(selectId, true); });
             return false;
         }
 
@@ -105,6 +138,11 @@ const StaffAuthHelper = {
         };
     }
 };
+
+// Hydrate from the SAML session as soon as the script loads (browser only).
+if (typeof window !== 'undefined' && typeof sessionStorage !== 'undefined' && typeof fetch === 'function') {
+    StaffAuthHelper.ready();
+}
 
 // Export for module systems (optional)
 if (typeof module !== 'undefined' && module.exports) {
