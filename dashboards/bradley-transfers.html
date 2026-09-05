@@ -74,7 +74,7 @@
                 <div class="bt-filter-bar">
                     <div class="bt-filter-group">
                         <label class="bt-filter-label">Status:</label>
-                        <select id="bt-filter-status" class="bt-filter-input">
+                        <select id="bt-filter-status" aria-label="Filter by status" class="bt-filter-input">
                             <option value="">All Active</option>
                             <option value="Requested">Requested</option>
                             <option value="Ordered">Ordered</option>
@@ -85,7 +85,7 @@
                     </div>
                     <div class="bt-filter-group">
                         <label class="bt-filter-label">Search:</label>
-                        <input type="text" id="bt-filter-search" class="bt-filter-input" placeholder="Company, design #, rep, transfer ID...">
+                        <input type="text" id="bt-filter-search" aria-label="Search transfers" class="bt-filter-input" placeholder="Company, design #, rep, transfer ID...">
                     </div>
                     <div class="bt-filter-group bt-filter-toggle">
                         <label>
@@ -121,7 +121,7 @@
                     <div class="bt-form-row" style="grid-template-columns:1fr;">
                         <div class="bt-form-field">
                             <label>Reason (for your records) *</label>
-                            <textarea name="reason" rows="2" required placeholder="e.g. duplicate, wrong design, test entry..."></textarea>
+                            <textarea name="reason" rows="2" required aria-label="Reason" placeholder="e.g. duplicate, wrong design, test entry..."></textarea>
                         </div>
                     </div>
                     <div class="bt-form-row" style="grid-template-columns:1fr;">

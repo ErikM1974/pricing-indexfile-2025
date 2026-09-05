@@ -75,19 +75,19 @@
                 <div class="filters-grid">
                     <div class="filter-group">
                         <label>Search</label>
-                        <input type="text" id="searchInput" class="filter-input"
+                        <input type="text" id="searchInput" aria-label="Search monogram quotes" class="filter-input"
                                placeholder="Order # or company name..."
                                onkeyup="filterMonograms()">
                     </div>
                     <div class="filter-group">
                         <label>Sales Rep</label>
-                        <select id="salesRepFilter" class="filter-input filter-select" onchange="filterMonograms()">
+                        <select id="salesRepFilter" aria-label="Sales rep" class="filter-input filter-select" onchange="filterMonograms()">
                             <option value="">All Reps</option>
                         </select>
                     </div>
                     <div class="filter-group">
                         <label>Status</label>
-                        <select id="statusFilter" class="filter-input filter-select" onchange="filterMonograms()">
+                        <select id="statusFilter" aria-label="Status" class="filter-input filter-select" onchange="filterMonograms()">
                             <option value="">All Statuses</option>
                             <option value="Submitted">Submitted</option>
                             <option value="Printed">Printed</option>
@@ -97,11 +97,11 @@
                     </div>
                     <div class="filter-group">
                         <label>From Date</label>
-                        <input type="date" id="dateFrom" class="filter-input" onchange="filterMonograms()">
+                        <input type="date" id="dateFrom" aria-label="From date" class="filter-input" onchange="filterMonograms()">
                     </div>
                     <div class="filter-group">
                         <label>To Date</label>
-                        <input type="date" id="dateTo" class="filter-input" onchange="filterMonograms()">
+                        <input type="date" id="dateTo" aria-label="To date" class="filter-input" onchange="filterMonograms()">
                     </div>
                     <div class="filter-group">
                         <button class="btn btn-primary" onclick="filterMonograms()">

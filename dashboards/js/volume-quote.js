@@ -456,8 +456,8 @@
                 row.className = 'vq-line';
                 row.dataset.id = l.id;
                 row.innerHTML =
-                    '<input type="text" class="vq-line-style" value="' + esc(l.style) + '" placeholder="1566" autocomplete="off">' +
-                    '<input type="number" class="vq-line-qty" min="0" step="1" value="' + (l.qty || '') + '" placeholder="500">' +
+                    '<input type="text" class="vq-line-style" aria-label="Style number" value="' + esc(l.style) + '" placeholder="1566" autocomplete="off">' +
+                    '<input type="number" class="vq-line-qty" aria-label="Quantity" min="0" step="1" value="' + (l.qty || '') + '" placeholder="500">' +
                     '<div class="vq-line-info"></div><div class="vq-line-info"></div><div class="vq-line-info"></div>' +
                     '<button type="button" class="vq-line-remove" title="Remove"><i class="fas fa-times"></i></button>';
                 root.appendChild(row);

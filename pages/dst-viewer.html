@@ -94,7 +94,7 @@
         </div>
         <div class="trace-speed">
           <i class="fas fa-gauge-high"></i>
-          <input type="range" id="traceSpeed" min="1" max="10" value="5">
+          <input type="range" id="traceSpeed" aria-label="Trace speed" min="1" max="10" value="5">
           <span id="traceSpeedLabel">5x</span>
         </div>
       </div>
@@ -184,7 +184,7 @@
             <div class="side-section-head"><h3>Sew time</h3><span class="pill est">estimate</span></div>
             <div class="spm-row">
               <span class="spm-cap">Machine speed</span>
-              <input type="range" id="spmRange" min="400" max="1200" step="25" value="750">
+              <input type="range" id="spmRange" aria-label="Stitches per minute" min="400" max="1200" step="25" value="750">
               <span class="spm-val" id="spmLabel">750 spm</span>
             </div>
             <div class="calc-rows">
@@ -237,7 +237,7 @@
             <div class="chip-row" id="placementChips"></div>
             <div class="spm-row">
               <span class="spm-cap">Scale</span>
-              <input type="range" id="scaleRange" min="25" max="150" step="5" value="100">
+              <input type="range" id="scaleRange" aria-label="Scale" min="25" max="150" step="5" value="100">
               <span class="spm-val" id="scaleLabel">100% · true size</span>
             </div>
             <div class="calc-rows">
@@ -258,16 +258,16 @@
   </div>
 </div>
 
-<input type="file" id="fileInput" accept=".dst" class="visually-hidden">
+<input type="file" id="fileInput" aria-label="DST file" accept=".dst" class="visually-hidden">
 
 <div id="pickerOverlay" class="picker-overlay">
   <div class="picker-modal">
     <div class="picker-head">
       <h3><i class="fas fa-palette"></i> Robison-Anton 40wt</h3>
-      <button type="button" id="pickerClose" class="mini-btn"><i class="fas fa-xmark"></i></button>
+      <button type="button" id="pickerClose" class="mini-btn" aria-label="Close design picker"><i class="fas fa-xmark"></i></button>
     </div>
     <div class="picker-current" id="pickerCurrent"></div>
-    <input type="text" id="pickerSearch" class="picker-search" placeholder="Search name or catalog #…">
+    <input type="text" id="pickerSearch" aria-label="Search designs" class="picker-search" placeholder="Search name or catalog #…">
     <div class="chip-row picker-families" id="pickerFamilies"></div>
     <div class="picker-grid" id="pickerGrid"></div>
   </div>

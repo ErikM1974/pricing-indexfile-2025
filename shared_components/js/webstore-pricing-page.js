@@ -58,7 +58,8 @@ const AI_ENDPOINT = '/api/contract-webstore-ai/chat';
         showFloatingButton();
         // Auto-open the chat shortly after load — same UX as sticker/emblem.
         setTimeout(() => {
-            if (!aiState.opened) openChatPanel();
+            // Desktop only (2026-09-05): on a phone the 100vw panel covered the whole page on load.
+            if (!aiState.opened && window.matchMedia('(min-width: 900px)').matches) openChatPanel();
         }, 600);
     }
 

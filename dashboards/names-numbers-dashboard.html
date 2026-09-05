@@ -8,7 +8,7 @@
     <link rel="icon" href="/favicon.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="/shared_components/css/names-numbers.css?v=2026.09.04.7" rel="stylesheet">
+    <link href="/shared_components/css/names-numbers.css?v=2026.09.05.15" rel="stylesheet">
     <link rel="stylesheet" href="/dashboards/css/names-numbers-dashboard.css?v=2026.09.05.8">
 </head>
 <body>
@@ -50,11 +50,11 @@
         <div class="filter-bar">
             <div class="form-group">
                 <label>Search</label>
-                <input type="text" id="filterSearch" placeholder="Roster name or company...">
+                <input type="text" id="filterSearch" aria-label="Search rosters" placeholder="Roster name or company...">
             </div>
             <div class="form-group">
                 <label>Status</label>
-                <select id="filterStatus">
+                <select id="filterStatus" aria-label="Status">
                     <option value="">All</option>
                     <option value="Draft">Draft</option>
                     <option value="Submitted">Submitted</option>
@@ -64,7 +64,7 @@
             </div>
             <div class="form-group">
                 <label>Sales Rep</label>
-                <input type="text" id="filterRep" placeholder="Rep name...">
+                <input type="text" id="filterRep" aria-label="Sales rep" placeholder="Rep name...">
             </div>
             <button type="button" class="btn-primary" id="filterBtn" style="align-self: end;"><i class="fas fa-search"></i> Filter</button>
             <button type="button" class="btn-secondary" id="clearFilterBtn" style="align-self: end;">Clear</button>
@@ -98,6 +98,6 @@
 
     <script src="/shared_components/js/names-numbers-service.js?v=2026.04.17.1"></script>
     <script src="/shared_components/js/caspio-date-utils.js?v=1"></script>
-    <script src="/shared_components/js/names-numbers-dashboard.js?v=20260430"></script>
+    <script src="/shared_components/js/names-numbers-dashboard.js?v=2026.09.05.15"></script>
 </body>
 </html>

@@ -72,7 +72,8 @@ const AI_ENDPOINT = '/api/contract-emblem-ai/chat';
         // hits the backend. Pricing-grid load state does NOT gate this: the
         // chat prices server-side, so it opens even if the grid fetch failed.
         setTimeout(() => {
-            if (!aiState.opened) openChatPanel();
+            // Desktop only (2026-09-05): on a phone the 100vw panel covered the whole page on load.
+            if (!aiState.opened && window.matchMedia('(min-width: 900px)').matches) openChatPanel();
         }, 600);
     }
 

@@ -86,7 +86,7 @@
                         </div>
                     </div>
                     <textarea
-                        id="commentsBody"
+                        id="commentsBody" aria-label="Comment"
                         class="comments-input"
                         rows="3"
                         placeholder="Share a comment, ask a question, or note an edge case…"

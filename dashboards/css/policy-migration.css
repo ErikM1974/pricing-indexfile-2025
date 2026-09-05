@@ -147,3 +147,13 @@
     font-size: 0.8rem;
     margin-left: auto;
 }
+
+/* Phone (≤640px) — 2026-09-05 staff-dashboard sweep: the page measured wider than the
+   viewport at 375px and panned sideways. */
+@media (max-width: 640px) {
+    .pm-table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+}
+
+@media (max-width: 640px) {
+    .dash-card-header { flex-wrap: wrap; row-gap: 6px; }
+}

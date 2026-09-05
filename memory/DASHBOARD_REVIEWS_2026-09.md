@@ -287,3 +287,43 @@ Review scope was the shell, wiring, dialogs and labels — **pricing logic untou
 `callName()` strips the `()`. The builders are SAML-gated even locally, and the python static
 server serves the raw ESM entry (bundle never boots) → use the new `static-dist` launch entry
 (`scripts/qa-static-server.js`, manifest-rewritten HTML) after `node scripts/build.js`.
+
+## Whole-dashboard sweep — every page linked from the staff dashboard (2026-09-05, standing authorization)
+
+Erik: "keep going on the entire staff dashboard … deploying … don't stop until each page is cleaned up."
+Method: a per-page audit run in Erik's signed-in Chrome over all 108 dashboard links (structure,
+labels, inline handlers, dead text, dead images, console errors) + a phone-width pass on the
+`static-dist` QA server (mobile preset). Findings log: scratchpad `sweep-findings.md` (session).
+
+**Results:** zero JS console errors on any page. Every "2025" hit was legitimate (2025 Freeman Rd
+address, historic data, design names). The Caspio-embed pages (digitized/old designs) carry
+Caspio-injected inline scripts — not ours. Customer bundle pages (`/DrainPro-Bundle`,
+`/streich-bros-bundle`, `/wcttr-bundle`, `/sanmar-vendor-portal`) redirect to the Caspio user
+portal by design.
+
+**Batch 1 (`v2026.09.05.15`)** — ~70 unlabelled inputs given `aria-label`s across 35 pages
+(static HTML + the rendered templates in access-admin, table-usage-audit, volume-quote,
+mockup-ruth, art-hub-steve-gallery, policy-comments); icon-only close/dismiss buttons named;
+duplicate `<h1>` removed (Design Vault boot title, embroidery-pricing print header, 43 chapter
+headings in the Sales Coordinator manual → `h2.chapter-title`); `<img src="">` removed
+(digitized/old designs, christmas bundles — an empty src re-requests the page); `rel="noopener"`
+on blank-target links (calibrate tool, portal-directory rows); Dashboard links added to
+design-queue, gear-publisher, finished-photos, box-labels, custom-tees-calibrate; the AI chat
+panel on webstores/emblem no longer auto-opens on phones (`matchMedia(min-width: 900px)`);
+phone-width fixes for leads, house-accounts, customer-portal-admin, seo-strategy, box-labels,
+names-numbers, customer-service training, sales-coordinator manual, volume-quote,
+policy-migration, embroidery-contract, dtg-contract (`.contact` grid).
+
+🔑 Phone audit gotcha: a table whose right edge passes the viewport is NOT a defect when it sits in
+an `overflow:auto` wrapper — only `innerWidth > 375` (Chrome zooms out to fit real overflow) is.
+Find the culprit with "elements whose right edge > body width, deepest first"; the usual causes were
+a nowrap flex header row, a bare `1fr` grid track, or a fixed-width input.
+
+**Still open after batch 1 (batch 2 = onclick → data-call with the new shared
+`shared_components/js/data-call-delegator.js`):** art-hub-ruth (169 rendered), portal-directory
+(219), names-numbers (15), embroidery-pricing-all (16), monogram (7), universal-records-admin (6),
+screenprint-customer (5), commission-structure / art-hub-steve / manual-pricing (3 each),
+data-entry-guide / old-designs / house-accounts / nika / taneisha (1 each = error-banner close),
+christmas-bundles (28, public). Rule 3 inline scripts still in `admin/universal-records-admin.html`
+(1) and `calculators/christmas-bundles.html` (2). Retiring pages skipped: dst-viewer,
+garment-designer.

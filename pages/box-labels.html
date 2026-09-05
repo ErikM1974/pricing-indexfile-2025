@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="/favicon.png" type="image/png">
   <title>Box Labels - NWCA Shipping &amp; Receiving</title>
-  <link rel="stylesheet" href="/pages/css/box-labels.css?v=2026.08.04.2">
+  <link rel="stylesheet" href="/pages/css/box-labels.css?v=2026.09.05.15">
   <!-- Shared 8.5x11 label styles — the SAME label receiving prints (box-label-template.js) -->
   <link rel="stylesheet" href="/shared_components/css/box-label-print.css?v=2026.08.04.2">
 </head>
@@ -15,7 +15,7 @@
     <div class="bl-header__left">
       <h1 class="bl-header__title">Box Labels</h1>
       <div class="bl-header__search">
-        <input type="text" id="searchInput" class="bl-input bl-input--large" placeholder="Enter PO# or Work Order#" autocomplete="off">
+        <input type="text" id="searchInput" aria-label="Search orders" class="bl-input bl-input--large" placeholder="Enter PO# or Work Order#" autocomplete="off">
         <div class="bl-radio-group">
           <label class="bl-radio"><input type="radio" name="searchType" value="po" checked> SanMar PO#</label>
           <label class="bl-radio"><input type="radio" name="searchType" value="wo"> Work Order#</label>
@@ -24,6 +24,7 @@
       </div>
     </div>
     <div class="bl-header__right">
+      <a class="bl-back" href="/staff-dashboard.html" title="Back to the staff dashboard">&larr; Dashboard</a>
       <div class="bl-header__repacker">
         <label for="repackerName">Repacker:</label>
         <input type="text" id="repackerName" class="bl-input" placeholder="Your name" autocomplete="off">

@@ -41,7 +41,7 @@
           State sick leave legitimately carries over.</p>
       </div>
       <div class="pr-toolbar">
-        <input id="leave-search" class="pr-search" type="search" placeholder="Filter by name or department…" autocomplete="off">
+        <input id="leave-search" aria-label="Search employees" class="pr-search" type="search" placeholder="Filter by name or department…" autocomplete="off">
         <button id="print-slips" class="pr-btn" type="button">🖨️ Print slips to hand out</button>
         <span id="leave-asof" class="pr-asof"></span>
       </div>
@@ -105,7 +105,7 @@
           <option value="packet">Full payroll packet</option>
           <option value="leave">Vacation &amp; sick page only</option>
         </select>
-        <input id="packet-file" class="pr-file" type="file" accept="application/pdf">
+        <input id="packet-file" aria-label="Payroll packet PDF" class="pr-file" type="file" accept="application/pdf">
         <button id="packet-parse" class="pr-btn" type="button" disabled>Read packet</button>
         <span id="packet-note" class="pr-note"></span>
         <!-- Busy indicator lives NEXT TO THE BUTTON, where the eye already is after a click.

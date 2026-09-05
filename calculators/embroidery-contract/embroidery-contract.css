@@ -591,3 +591,9 @@ table.price tfoot td.cell-hi {
 
 .price-foot .print-list-link { flex-basis: 100%; text-align: right; font-size: .85em; font-weight: 600; text-decoration: none; margin-top: 6px; }
 .price-foot .print-list-link:hover { text-decoration: underline; }
+
+/* Phone (≤640px) — 2026-09-05 sweep: the segmented control / tab strip did not wrap. */
+@media (max-width: 640px) {
+    .tabs { flex-wrap: wrap; }
+    .seg { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+}

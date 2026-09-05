@@ -101,7 +101,7 @@
                             DTG (Direct-to-Garment)
                         </h3>
                         <div class="method-card-controls">
-                            <select id="dtgLocation" class="method-select" onchange="manualCalc.onDTGLocationChange()">
+                            <select id="dtgLocation" aria-label="DTG print location" class="method-select" onchange="manualCalc.onDTGLocationChange()">
                                 <!-- Populated by JS: front locations only (LC, FF, JF) -->
                             </select>
                             <div class="ltm-qty-picker">
@@ -135,7 +135,7 @@
                             DTF (Direct-to-Film)
                         </h3>
                         <div class="method-card-controls">
-                            <select id="dtfTransferSize" class="method-select" onchange="manualCalc.onDTFSizeChange()">
+                            <select id="dtfTransferSize" aria-label="DTF transfer size" class="method-select" onchange="manualCalc.onDTFSizeChange()">
                                 <option value="small">Small (5" x 5")</option>
                                 <option value="medium" selected>Medium (9" x 12")</option>
                                 <option value="large">Large (12" x 16.5")</option>
@@ -201,7 +201,7 @@
                             Screen Print
                         </h3>
                         <div class="method-card-controls">
-                            <select id="spColors" class="method-select" onchange="manualCalc.onSPColorChange()">
+                            <select id="spColors" aria-label="Screen print colors" class="method-select" onchange="manualCalc.onSPColorChange()">
                                 <!-- Populated by JS with available color counts -->
                             </select>
                             <div class="ltm-qty-picker">

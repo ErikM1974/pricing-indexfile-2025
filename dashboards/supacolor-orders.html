@@ -92,7 +92,7 @@
                         <label class="bt-filter-label">
                             <i class="fas fa-filter"></i> Status:
                         </label>
-                        <select id="sc-filter-status" class="bt-filter-input">
+                        <select id="sc-filter-status" aria-label="Filter by status" class="bt-filter-input">
                             <option value="">All Statuses</option>
                             <option value="Open">Open</option>
                             <option value="Closed">Closed</option>
@@ -103,7 +103,7 @@
                         <label class="bt-filter-label">
                             <i class="fas fa-search"></i> Search:
                         </label>
-                        <input type="text" id="sc-filter-search" class="bt-filter-input"
+                        <input type="text" id="sc-filter-search" aria-label="Search orders" class="bt-filter-input"
                                placeholder="Search by job #, PO, or description...">
                     </div>
                     <button id="sc-filter-clear" class="bt-btn bt-btn--link">Clear</button>
@@ -151,7 +151,7 @@
                         <p class="sc-paste-hint">Or drag & drop an image file</p>
                     </div>
                     <img id="sc-paste-preview" class="sc-paste-preview" style="display:none;" alt="Pasted screenshot preview">
-                    <input type="file" id="sc-paste-file" accept="image/*" style="display:none;">
+                    <input type="file" id="sc-paste-file" aria-label="Order file" accept="image/*" style="display:none;">
                 </div>
 
                 <div id="sc-extract-status" class="sc-extract-status" style="display:none;"></div>
