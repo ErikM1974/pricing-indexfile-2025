@@ -552,3 +552,37 @@ Shipped:
 
 Left alone: GarmentSubmitForm's jsDelivr EmailJS load (shared bundle, same across pages).
 
+## Rep Account CRM (Nika + Taneisha) — review, 12 items (2026-09-05, `v2026.09.05.36`)
+
+`dashboards/nika-crm.html` + `taneisha-crm.html` (identical apart from tier option values) over shared
+`js/rep-crm.js` + `css/rep-crm.css`. Live: Nika 474 accounts, $1.04M YTD, 0 console errors. Shipped:
+
+1. 🔴 **"0 accounts" beside 474 cards** — `updateAccountsCount()` was never called on boot (only after a
+   filter change). Now part of `retryLoad()`, which init() calls.
+2. 🔴 **Dates a day early / false "Overdue"** — `new Date('YYYY-MM-DD')` is UTC midnight = the previous
+   evening in Pacific, so a follow-up due TODAY showed Overdue and every date displayed a day early.
+   `RepCRMController.parseCalendarDate()` builds calendar-day shapes as local dates (jest-locked with
+   `YYYY-MM-DD`, `T00:00:00`, `T00:00:00.000Z`).
+3. **Load failure is retryable** — banner gained a Retry (`data-call="crmController.retryLoad"`) and the
+   message carries the real error.
+4. **Archive fallback was silent** — when the per-rep archive fails the hint line now says "Per-rep
+   archive unavailable — Total YTD is the sum of the account cards" (amber) instead of nothing.
+5. **Tier cards were clickable `<div>`s** → `<button type=button aria-pressed>` (inner divs → spans);
+   product toggles + At Risk carry `aria-pressed`, all kept in sync on clear.
+6. **Account cards** are `role=button tabindex=0` with "Open {company}", Enter/Space opens.
+7. **Detail modal** is `role=dialog aria-modal aria-labelledby`; focus moves to Close and returns to the
+   card; Escape only acts when open.
+8. **Rule 3** — 4 inline `style=` in each page + `.style.display`/`.style.cssText` in the controller →
+   `hidden` (+ `[hidden]` rule in rep-crm.css), classes for the archive hint / recon line / primary
+   order-type line; the health gauge passes `--fill` as a custom property.
+9. **241 icons `aria-hidden`**; filter labels have `for`; Products toggles are a labelled group;
+   loading/empty/sync are `role=status`.
+10. **`alert()` → toast** for the (currently unwired) ownership-sync success path.
+11. **Phone ≤640** — tier grid 2-up, filters single column, welcome chip hidden, header tightened
+    (was 247px); 0 overflow at 375px.
+12. Lock: `tests/unit/rep-crm-pages.test.js`. 🔑 Verification: the gauge fill has `transition: width`
+    — while the Browser pane is hidden `offsetWidth` reads 0; check the `--fill` custom property instead.
+
+Left alone: 401 → `/dashboards/staff-login.html?redirect=` (real page; the server uses it too); the
+Sync buttons referenced in the controller have no markup (dead path, harmless).
+
