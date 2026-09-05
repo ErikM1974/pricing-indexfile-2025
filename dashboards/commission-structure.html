@@ -530,21 +530,6 @@
     </div>
 
     <!-- Accordion Toggle Script -->
-    <script>
-        function toggleAccordion(header) {
-            var item = header.parentElement;
-            var isOpen = item.classList.contains('open');
-
-            // Close all items
-            document.querySelectorAll('.accordion-item').forEach(function(accordionItem) {
-                accordionItem.classList.remove('open');
-            });
-
-            // Open clicked item if it wasn't already open
-            if (!isOpen) {
-                item.classList.add('open');
-            }
-        }
-    </script>
+    <script src="/dashboards/js/commission-structure.js?v=2026.09.05.7"></script>
 </body>
 </html>
