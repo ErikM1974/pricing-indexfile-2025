@@ -1,3 +1,8 @@
+## v2026.09.05.25 (2026.09.05)
+
+- Customer product page: document.title is plain text (esc() rendered &amp; in the tab)
+- Deploy v2026.09.05.25: 1 file (customer-product.html) — title fix cache-bust
+
 ## v2026.09.05.24 (2026.09.05)
 
 - Memory: portal table-clamp lesson
