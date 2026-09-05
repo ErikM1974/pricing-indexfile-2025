@@ -242,3 +242,9 @@ test that reads the code path, or print the truth from the data (stamps, `dataTh
 a Caspio row from a session is Erik's step, so ship the visible-fallback path first and hand him
 the one-line curl. 🔑 Placeholder reps (DEAD, House-Legacy) live in the archive forever — the
 consolidation set is the only filter; add to it, never to the query.
+
+## 2026-09-05 — JSON-in-attribute broke on the first quote (Names & Numbers delete button, `v2026.09.05.17`)
+**Problem:** after converting `onclick="dashboard.deleteRoster(${id}, '${esc(name)}')"` to `data-args="${esc(JSON.stringify([id, name]))}"`, the attribute read `[10,` — the delete button silently did nothing.
+**Root cause:** that page's `esc()` is the `div.textContent → innerHTML` trick, which escapes `< > &` but NOT `"`, so the JSON's quotes ended the attribute early.
+**Solution:** escape for an attribute (`&amp; &quot; &lt;`) — `JSON.stringify(...).replace(/"/g,'&quot;')`; the quote-builder `escapeHtml()` and portal-directory `escapeAttr()` already do.
+**Prevention:** the delegator reports a bad `data-args` as a visible error (never silent); when writing JSON into a `data-*` attribute inside a template literal, check the page's escaper handles `"` first. Lock: `tests/unit/staff-pages-datacall.test.js`.
