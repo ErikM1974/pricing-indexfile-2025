@@ -319,7 +319,7 @@ an `overflow:auto` wrapper — only `innerWidth > 375` (Chrome zooms out to fit 
 Find the culprit with "elements whose right edge > body width, deepest first"; the usual causes were
 a nowrap flex header row, a bare `1fr` grid track, or a fixed-width input.
 
-**Batch 2 (`v2026.09.05.16`) — inline `onclick=` → `data-call`** via the new shared
+**Batch 2 (`v2026.09.05.16`, fix `.17`) — inline `onclick=` → `data-call`** via the new shared
 `shared_components/js/data-call-delegator.js` on 14 pages (universal-records-admin, embroidery-pricing-all,
 art-hub-ruth, screenprint-customer, names-numbers, art-hub-steve, commission-structure, manual-pricing,
 monogram, data-entry-guide, nika/taneisha CRM, house-accounts, portal-directory) and the 8 modules that render
@@ -329,6 +329,8 @@ monogram-dashboard, universal-records-admin, embroidery-pricing-all). `admin/uni
 🔑 Lexical `let/const` globals (`manualCalc`, `dashboard`) are NOT window properties — the delegator resolves off
 `window`, so expose them (`window.dashboard = dashboard`). `data-stop` on an inner element beats an outer
 `data-call`/`data-href` (the old `event.stopPropagation()` semantics) because both are decided in ONE listener.
+🔴 A `textContent`-based `esc()` does NOT escape quotes — JSON in `data-args` needs `&quot;` (`.17` fixed the
+Names & Numbers delete button, whose roster name truncated the attribute at the first quote).
 
 **Deliberately left:** `calculators/christmas-bundles.html` (public customer page: 41 onclick + 2 inline
 scripts), retiring `dst-viewer` / `garment-designer`, Caspio-injected inline scripts on the design-archive pages.
