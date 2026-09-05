@@ -70,12 +70,16 @@
    side-by-side. Catches all the reps on smaller displays. */
 @media (max-width: 1279px) {
     .dtg-layout {
-        grid-template-columns: 1fr;
+        /* minmax(0, 1fr) — a bare 1fr is minmax(auto, 1fr), so the column grew to the
+           form's min-content (~420px) and widened the whole layout viewport on phones
+           (2026-09-05 builder review item 6). */
+        grid-template-columns: minmax(0, 1fr);
     }
     .dtg-form-column {
         position: static;
         max-height: none;
         overflow: visible;
+        min-width: 0;
     }
 }
 

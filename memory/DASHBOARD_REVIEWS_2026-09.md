@@ -274,7 +274,12 @@ Review scope was the shell, wiring, dialogs and labels — **pricing logic untou
 4. **aria-labels** on the 12 shared `.os-*` order-summary inputs and the DTG form inputs.
 5. **Lock**: `tests/unit/quote-builders-page.test.js` (jsdom behaviour test for the
    delegator + repo scans); `quote-order-summary.test.js` updated to expect `data-call`.
-6. Phone header (152px) — NOT done; left for a later pass.
+6. **Phone layout (`v2026.09.05.14`)** — shared ≤640px block in `quote-builder-shell.css` (trio) mirrored in
+   `dtg-quote-page.css`: header 200→100px (DTG 240→90) as two rows (logo+title / actions+method-switch,
+   subtitle hidden, switch label hidden), and the page no longer widens to 600–750px — the table scrolls
+   inside `.product-table-wrapper` (`body.qb-shell-body` scope beats the Option C `overflow: visible`),
+   DTG `.dtg-layout` ≤1279 uses `minmax(0,1fr)` and the customer-pane `.dcp-row` grid too. 🔑 A bare `1fr`
+   is `minmax(auto,1fr)` — min-content wins and the layout viewport grows; measure with the mobile preset.
 
 🔑 Gotchas: `data-args` inside a JS template literal → `data-args="${escapeHtml(JSON.stringify([…]))}"`
 (never a raw `${rowId}` inside the JSON — it broke the SCP `clearExtendedSize` button once);
