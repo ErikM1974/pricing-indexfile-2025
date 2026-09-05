@@ -528,3 +528,27 @@ Left alone: drag-and-drop has no keyboard path (the drawer's Status select IS th
 the phone header is 155px (two rows) — acceptable for a desktop-first CRM; `lead.html` (the full
 workspace) is its own review.
 
+## Lead workspace `lead.html` — review, 9 items (2026-09-05, `v2026.09.05.34`)
+
+`dashboards/lead.html` + `lead-workspace.js` (+ shared `leads-common.js`). Reviewed live on
+`#JFL0905-9114` and every state on `static-dist` with fetch stubbed. Already strong: quote-plane
+same-origin reads, verify-before-link on quote IDs, timeout-aware outreach send, attacker-safe prefill.
+Shipped:
+
+1. **No way to reload** — the page had no refresh path; a header Refresh re-reads the lead + activity
+   (hidden when there is no id).
+2. **Failures are retryable** — lead load failure ("Lead not found") and activity failure both offer
+   Retry; not-found also sets `document.title`.
+3. **h1 said "Lead" on every lead** — now the contact/company name (the strip title too).
+4. **Rule 3** — art modal `style="display:none"` + 4 `.style.display` toggles → `hidden` (leads.css's
+   `[hidden]` rule applies); `style="margin-top"` ×3 → `.lw-mt-6/.lw-mt-8`; thumb fallbacks → `hidden`.
+5. **26 icons `aria-hidden`**; timeline icons are `role=img` named by type (note / status / received…).
+6. **Labels** — search button (was icon-only), ShopWorks search input, quote-ID input, value and date
+   inputs, follow-up chips ("Follow up in 3 days"), kit quantity ("Quantity of Catalog"), hidden file input.
+7. **Kit modal** traps Tab and focuses Recipient; **art modal** returns focus to its opener and closes
+   via one `closeArtModal()`.
+8. **Phone ≤640** — head controls full width, composer stacked, Refresh icon-only; 0 overflow at 375px.
+9. Lock: `tests/unit/lead-workspace-page.test.js`.
+
+Left alone: GarmentSubmitForm's jsDelivr EmailJS load (shared bundle, same across pages).
+
