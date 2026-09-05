@@ -29,6 +29,7 @@
     <!-- Shared pricing engine (screens/stripes/LTM/tier logic) — one engine, 3+ surfaces -->
     <script src="/shared_components/js/quote-cart-engine.js"></script>
     <!-- Customer Screen Print Quote Service -->
+    <script src="/shared_components/js/data-call-delegator.js"></script>
     <script src="/calculators/screenprint-customer/screenprint-customer-quote-service.js"></script>
     <!-- Screen Print Calculator Class -->
     <script src="/calculators/screenprint-customer/screenprint-customer-calculator.js"></script>
@@ -154,7 +155,7 @@
                     <div class="order-summary" id="orderSummary"></div>
                     <div class="tier-ladder" id="tierLadder" style="display:none;"></div>
                     <div class="quote-actions" id="quoteActions" style="display: none;">
-                        <button type="button" class="btn btn-secondary" onclick="printQuote()">
+                        <button type="button" class="btn btn-secondary" data-call="printQuote">
                             <i class="fas fa-print"></i>
                             Print Quote
                         </button>
@@ -237,7 +238,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="closeQuoteModal()">Cancel</button>
+                <button type="button" class="btn btn-secondary" data-call="closeQuoteModal">Cancel</button>
                 <button type="submit" form="quoteForm" class="btn btn-primary" id="submitQuoteBtn">
                     <i class="fas fa-paper-plane"></i>
                     Send Quote
@@ -274,18 +275,18 @@
                 </div>
                 
                 <div style="text-align: center;">
-                    <button type="button" class="btn btn-secondary" onclick="copyQuoteId()">
+                    <button type="button" class="btn btn-secondary" data-call="copyQuoteId">
                         <i class="fas fa-copy"></i>
                         Copy Quote ID
                     </button>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="printQuote()">
+                <button type="button" class="btn btn-secondary" data-call="printQuote">
                     <i class="fas fa-print"></i>
                     Print Quote
                 </button>
-                <button type="button" class="btn btn-primary" onclick="closeSuccessModal()">
+                <button type="button" class="btn btn-primary" data-call="closeSuccessModal">
                     <i class="fas fa-check"></i>
                     Done
                 </button>

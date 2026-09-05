@@ -529,7 +529,7 @@
             </div>
             <div class="card-footer">
                 <span class="card-date">${submittedDate}</span>
-                <a href="/mockup/${id}" class="card-action-link" onclick="event.stopPropagation();">View Details &rarr;</a>
+                <a href="/mockup/${id}" class="card-action-link" data-stop="1">View Details &rarr;</a>
             </div>
             ${actionsHtml}
         </div>`;
@@ -636,7 +636,7 @@
             queueGrid.innerHTML = `
                 <div class="mockup-error" style="grid-column: 1 / -1;">
                     <strong>Error:</strong> ${escapeHtml(message)}
-                    <br><button onclick="location.reload()" style="margin-top:10px;padding:8px 16px;border:none;border-radius:4px;background:#6B46C1;color:white;cursor:pointer;">Refresh Page</button>
+                    <br><button data-call="location.reload" style="margin-top:10px;padding:8px 16px;border:none;border-radius:4px;background:#6B46C1;color:white;cursor:pointer;">Refresh Page</button>
                 </div>`;
         }
     }
@@ -866,7 +866,7 @@
 
                 var hiddenStyle = hidden ? ' style="display: none"' : '';
                 var rushCls = isRushM ? ' kanban-card--rush' : '';
-                return '<div class="kanban-card' + rushCls + '" data-mockup-id="' + id + '"' + hiddenStyle + ' onclick="window.location.href=\'/mockup/' + id + '\'">'
+                return '<div class="kanban-card' + rushCls + '" data-mockup-id="' + id + '"' + hiddenStyle + ' data-href="/mockup/' + id + '">'
                     + '<div class="kanban-card-company">' + company + kanbanElapsed + '</div>'
                     + (designNum ? '<div class="kanban-card-design">#' + designNum + '</div>' : '')
                     + '<div class="kanban-card-meta">'
@@ -883,7 +883,7 @@
             if (isCompleted && colCards.length > COMPLETED_SHOW_LIMIT) {
                 cardsHtml = colCards.slice(0, COMPLETED_SHOW_LIMIT).map(function (m) { return renderCard(m, false); }).join('');
                 cardsHtml += colCards.slice(COMPLETED_SHOW_LIMIT).map(function (m) { return renderCard(m, true); }).join('');
-                cardsHtml += '<div class="kanban-show-all" onclick="event.stopPropagation(); window.kanbanShowAll(\'' + col.id + '\')">Show all ' + colCards.length + ' items</div>';
+                cardsHtml += '<div class="kanban-show-all" data-stop="1" data-call="kanbanShowAll" data-args="' + JSON.stringify([col.id]).replace(/"/g, '&quot;') + '">Show all ' + colCards.length + ' items</div>';
             } else {
                 cardsHtml = colCards.map(function (m) { return renderCard(m, false); }).join('');
             }
@@ -893,7 +893,7 @@
                 : '';
             var collapseClass = (isCompleted && completedCollapsed) ? ' kanban-column--collapsed' : '';
             var clickHandler = isCompleted
-                ? ' onclick="window.toggleKanbanCollapse(\'' + col.id + '\', \'ruthKanbanCompletedCollapsed\')"'
+                ? ' data-call="toggleKanbanCollapse" data-args="' + JSON.stringify([col.id, 'ruthKanbanCompletedCollapsed']).replace(/"/g, '&quot;') + '"'
                 : '';
 
             return '<div class="kanban-column kanban-column--' + col.id + collapseClass + '">'

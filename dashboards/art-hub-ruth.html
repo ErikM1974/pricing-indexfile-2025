@@ -34,16 +34,16 @@
     <div class="tab-container">
         <!-- Tab Buttons -->
         <div class="tab-buttons">
-            <button class="tab-button active" onclick="showTab('queue')">
+            <button class="tab-button active" data-call="showTab" data-args='["queue"]'>
                 Mockup Queue <span id="queue-count" class="tab-badge">0</span>
             </button>
-            <button class="tab-button" onclick="showTab('completed')">
+            <button class="tab-button" data-call="showTab" data-args='["completed"]'>
                 Completed <span id="completed-count" class="tab-badge">0</span>
             </button>
-            <button class="tab-button" onclick="showTab('on-hold')">
+            <button class="tab-button" data-call="showTab" data-args='["on-hold"]'>
                 On Hold <span id="on-hold-count" class="tab-badge">0</span>
             </button>
-            <button class="tab-button" onclick="showTab('billing')">Billing Codes</button>
+            <button class="tab-button" data-call="showTab" data-args='["billing"]'>Billing Codes</button>
             <a class="tab-button tab-button-link tab-button-link--first-external" href="/dashboards/supacolor-orders.html">Supacolor API Orders</a>
             <a class="tab-button tab-button-link" href="/dashboards/names-numbers-dashboard.html">Names &amp; Numbers</a>
             <a class="tab-button tab-button-link" href="/dashboards/monogram-dashboard.html">Monogram Dashboard</a>
@@ -58,10 +58,10 @@
                 <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
                     <h2 class="tab-title" style="margin-bottom:0;">Mockup Queue</h2>
                     <div class="view-toggle" id="ruth-view-toggle">
-                        <button class="view-toggle-btn active" data-view="grid" onclick="window.toggleKanbanView('grid')">
+                        <button class="view-toggle-btn active" data-view="grid" data-call="toggleKanbanView" data-args='["grid"]'>
                             <span class="view-toggle-icon">&#9638;</span> Grid
                         </button>
-                        <button class="view-toggle-btn" data-view="board" onclick="window.toggleKanbanView('board')">
+                        <button class="view-toggle-btn" data-view="board" data-call="toggleKanbanView" data-args='["board"]'>
                             <span class="view-toggle-icon">&#9783;</span> Board
                         </button>
                     </div>
@@ -194,6 +194,7 @@
     <script src="/shared_components/js/caspio-date-utils.js?v=1"></script>
     <script src="/shared_components/js/elapsed-time-utils.js?v=2"></script>
     <script src="/shared_components/js/box-url.js?v=2026.08.05.23"></script>
-    <script src="/shared_components/js/mockup-ruth.js?v=2026.09.05.15"></script>
+    <script src="/shared_components/js/data-call-delegator.js"></script>
+    <script src="/shared_components/js/mockup-ruth.js?v=2026.09.05.16"></script>
 </body>
 </html>

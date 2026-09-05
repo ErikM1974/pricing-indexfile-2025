@@ -191,7 +191,7 @@
             timeline.innerHTML = `
                 <div class="notes-error">
                     Unable to load notes. Please try again.
-                    <br><button onclick="document.querySelector('#notes-timeline').innerHTML=''; fetchNotesRetry()">Retry</button>
+                    <br><button data-call="notesRetryFromEmpty">Retry</button>
                 </div>`;
             badge.textContent = '!';
         }
@@ -914,7 +914,7 @@
             if (gridView) {
                 var toggleDiv = document.createElement('div');
                 toggleDiv.style.cssText = 'text-align:right;margin-bottom:8px;';
-                toggleDiv.innerHTML = '<button id="archive-toggle-btn" onclick="toggleArchive()" style="padding:6px 14px;font-size:12px;border:1px solid #ccc;border-radius:6px;background:#f9fafb;cursor:pointer;color:#666;">Show Archive</button>';
+                toggleDiv.innerHTML = '<button id="archive-toggle-btn" data-call="toggleArchive" style="padding:6px 14px;font-size:12px;border:1px solid #ccc;border-radius:6px;background:#f9fafb;cursor:pointer;color:#666;">Show Archive</button>';
                 gridView.parentNode.insertBefore(toggleDiv, gridView);
             }
         }
@@ -3202,3 +3202,6 @@
     // ── Expose globals for HTML onclick attributes ────────────────────
     window.showTab = showTab;
 })();
+
+// data-call target (was inline onclick — Rule 3): clear the timeline and refetch notes.
+window.notesRetryFromEmpty = function () { const t = document.querySelector('#notes-timeline'); if (t) t.innerHTML = ''; if (typeof fetchNotesRetry === 'function') fetchNotesRetry(); };

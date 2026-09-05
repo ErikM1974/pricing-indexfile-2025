@@ -881,7 +881,7 @@ function buildKeyAccountSurchargeList() {
         const card = document.createElement('div');
         card.className = 'es-account-card';
         card.innerHTML = `
-            <div class="es-account-hdr" onclick="this.parentElement.classList.toggle('open')">
+            <div class="es-account-hdr" data-call="esToggleAccount" data-args='["$this"]'>
                 <div class="es-account-hdr-left">
                     <div class="es-acct-num">${i + 1}</div>
                     <div>
@@ -1708,3 +1708,6 @@ function copyShareableLink() {
 
 window.copyShareableLink = copyShareableLink;
 
+
+// data-call target (was inline onclick — Rule 3): expand/collapse a stitch-count account row.
+window.esToggleAccount = function (hdr) { if (hdr && hdr.parentElement) hdr.parentElement.classList.toggle('open'); };

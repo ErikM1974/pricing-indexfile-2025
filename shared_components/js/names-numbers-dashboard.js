@@ -92,7 +92,7 @@ class NamesNumbersDashboard {
             const statusCls = (r.Status || 'draft').toLowerCase().replace(/\s+/g, '-');
             // Caspio naive timestamps are Pacific wall-clock — resolve via CaspioDate.
             const modified = window.CaspioDate ? (window.CaspioDate.formatDate(r.ModifiedAt, { fallback: '-' })) : (r.ModifiedAt ? new Date(r.ModifiedAt).toLocaleDateString() : '-');
-            return `<tr onclick="window.location='/pages/names-numbers.html?load=${r.ID_Roster}'">
+            return `<tr data-href="/pages/names-numbers.html?load=${r.ID_Roster}">
                 <td><strong>${this.esc(r.RosterName || 'Untitled')}</strong></td>
                 <td>${this.esc(r.CompanyName || '')}</td>
                 <td>${r.OrderNumber || '-'}</td>
@@ -100,9 +100,9 @@ class NamesNumbersDashboard {
                 <td>${this.esc(r.SalesRep || '')}</td>
                 <td><span class="status-badge status-${statusCls}">${this.esc(r.Status || 'Draft')}</span></td>
                 <td>${modified}</td>
-                <td class="actions" onclick="event.stopPropagation();">
+                <td class="actions" data-stop="1">
                     <a href="/pages/names-numbers.html?load=${r.ID_Roster}" class="btn-secondary btn-sm"><i class="fas fa-edit"></i></a>
-                    <button class="btn-danger btn-sm" aria-label="Delete roster" onclick="dashboard.deleteRoster(${r.ID_Roster}, '${this.esc(r.RosterName || '')}')"><i class="fas fa-trash"></i></button>
+                    <button class="btn-danger btn-sm" aria-label="Delete roster" data-call="dashboard.deleteRoster" data-args="${this.esc(JSON.stringify([r.ID_Roster, r.RosterName || '']))}"><i class="fas fa-trash"></i></button>
                 </td>
             </tr>`;
         }).join('');
@@ -135,3 +135,4 @@ class NamesNumbersDashboard {
 }
 
 const dashboard = new NamesNumbersDashboard();
+window.dashboard = dashboard; // data-call targets resolve off window (Rule 3 delegator)

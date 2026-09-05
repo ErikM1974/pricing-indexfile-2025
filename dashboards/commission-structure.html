@@ -305,7 +305,7 @@
                 <div class="accordion">
                     <!-- Item 1: Maintenance Fee Calculation -->
                     <div class="accordion-item open">
-                        <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <div class="accordion-header" data-call="toggleAccordion" data-args='["$this"]'>
                             <h3 class="accordion-title">
                                 <span class="number">1</span>
                                 Maintenance Fee Calculation
@@ -326,7 +326,7 @@
 
                     <!-- Item 2: New Store Commissions & Setup Bonuses -->
                     <div class="accordion-item">
-                        <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <div class="accordion-header" data-call="toggleAccordion" data-args='["$this"]'>
                             <h3 class="accordion-title">
                                 <span class="number">2</span>
                                 New Store Commissions & Setup Bonuses
@@ -403,7 +403,7 @@
 
                     <!-- Item 3: Account Assignment Rules -->
                     <div class="accordion-item">
-                        <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <div class="accordion-header" data-call="toggleAccordion" data-args='["$this"]'>
                             <h3 class="accordion-title">
                                 <span class="number">3</span>
                                 Account Assignment Rules
@@ -530,6 +530,7 @@
     </div>
 
     <!-- Accordion Toggle Script -->
+    <script src="/shared_components/js/data-call-delegator.js"></script>
     <script src="/dashboards/js/commission-structure.js?v=2026.09.05.8"></script>
 </body>
 </html>

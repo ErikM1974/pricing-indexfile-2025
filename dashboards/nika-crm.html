@@ -56,7 +56,7 @@
             <div class="error-banner" id="error-banner">
                 <i class="fas fa-exclamation-circle"></i>
                 <span class="error-banner-message" id="error-message"></span>
-                <button class="error-banner-close" aria-label="Dismiss error" onclick="window.crmController.hideError()">
+                <button class="error-banner-close" aria-label="Dismiss error" data-call="crmController.hideError">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -236,6 +236,7 @@
     <script src="/dashboards/js/nika-crm.js?v=2026.09.05.8"></script>
     <!-- SAML identity → legacy nwca_user_* keys (StaffAuthHelper.ready(), 2026-09-05) -->
     <script src="/shared_components/js/staff-auth-helper.js?v=2026.09.05.6"></script>
+    <script src="/shared_components/js/data-call-delegator.js"></script>
     <script src="/dashboards/js/rep-crm.js"></script>
 </body>
 </html>

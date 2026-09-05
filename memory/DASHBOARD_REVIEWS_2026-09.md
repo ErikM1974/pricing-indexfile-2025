@@ -319,11 +319,16 @@ an `overflow:auto` wrapper — only `innerWidth > 375` (Chrome zooms out to fit 
 Find the culprit with "elements whose right edge > body width, deepest first"; the usual causes were
 a nowrap flex header row, a bare `1fr` grid track, or a fixed-width input.
 
-**Still open after batch 1 (batch 2 = onclick → data-call with the new shared
-`shared_components/js/data-call-delegator.js`):** art-hub-ruth (169 rendered), portal-directory
-(219), names-numbers (15), embroidery-pricing-all (16), monogram (7), universal-records-admin (6),
-screenprint-customer (5), commission-structure / art-hub-steve / manual-pricing (3 each),
-data-entry-guide / old-designs / house-accounts / nika / taneisha (1 each = error-banner close),
-christmas-bundles (28, public). Rule 3 inline scripts still in `admin/universal-records-admin.html`
-(1) and `calculators/christmas-bundles.html` (2). Retiring pages skipped: dst-viewer,
-garment-designer.
+**Batch 2 (`v2026.09.05.16`) — inline `onclick=` → `data-call`** via the new shared
+`shared_components/js/data-call-delegator.js` on 14 pages (universal-records-admin, embroidery-pricing-all,
+art-hub-ruth, screenprint-customer, names-numbers, art-hub-steve, commission-structure, manual-pricing,
+monogram, data-entry-guide, nika/taneisha CRM, house-accounts, portal-directory) and the 8 modules that render
+their rows (mockup-ruth, names-numbers-dashboard, art-hub-steve, portal-directory, house-accounts,
+monogram-dashboard, universal-records-admin, embroidery-pricing-all). `admin/universal-records-admin.html`'s
+1,300-line inline script/style extracted (Rule 3). Lock: `tests/unit/staff-pages-datacall.test.js`.
+🔑 Lexical `let/const` globals (`manualCalc`, `dashboard`) are NOT window properties — the delegator resolves off
+`window`, so expose them (`window.dashboard = dashboard`). `data-stop` on an inner element beats an outer
+`data-call`/`data-href` (the old `event.stopPropagation()` semantics) because both are decided in ONE listener.
+
+**Deliberately left:** `calculators/christmas-bundles.html` (public customer page: 41 onclick + 2 inline
+scripts), retiring `dst-viewer` / `garment-designer`, Caspio-injected inline scripts on the design-archive pages.

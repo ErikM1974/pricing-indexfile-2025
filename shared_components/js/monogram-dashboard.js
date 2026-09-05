@@ -61,7 +61,7 @@ async function loadMonograms() {
                 <td colspan="7" class="empty-state">
                     <i class="fas fa-exclamation-triangle"></i>
                     <p>Unable to load monograms. Please try again.</p>
-                    <button class="btn btn-primary" onclick="loadMonograms()" style="margin-top: 1rem;">
+                    <button class="btn btn-primary" data-call="loadMonograms" style="margin-top: 1rem;">
                         <i class="fas fa-sync-alt"></i> Retry
                     </button>
                 </td>
@@ -202,20 +202,20 @@ function renderTable(data) {
                 <td>${createdDate}</td>
                 <td style="text-align: center;">${statusBadge}</td>
                 <td>
-                    <button class="action-btn edit" onclick="editMonogram(${orderNum})" title="Edit">
+                    <button class="action-btn edit" data-call="editMonogram" data-args="[${Number(orderNum)}]" title="Edit">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="action-btn print" onclick="printMonogram(${orderNum})" title="Print">
+                    <button class="action-btn print" data-call="printMonogram" data-args="[${Number(orderNum)}]" title="Print">
                         <i class="fas fa-print"></i>
                     </button>
-                    <button class="action-btn proof" onclick="proofMonogram(${orderNum})" title="Customer Proof">
+                    <button class="action-btn proof" data-call="proofMonogram" data-args="[${Number(orderNum)}]" title="Customer Proof">
                         <i class="fas fa-file-signature"></i>
                     </button>
                     ${status !== 'Printed' ? `
-                    <button class="action-btn done" onclick="markPrinted(${idMonogram})" title="Mark as Printed">
+                    <button class="action-btn done" data-call="markPrinted" data-args="[${Number(idMonogram)}]" title="Mark as Printed">
                         <i class="fas fa-check"></i>
                     </button>` : ''}
-                    <button class="action-btn delete" onclick="deleteMonogram(${idMonogram}, ${orderNum})" title="Delete">
+                    <button class="action-btn delete" data-call="deleteMonogram" data-args="[${Number(idMonogram)}, ${Number(orderNum)}]" title="Delete">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>

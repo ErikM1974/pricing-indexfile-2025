@@ -1468,7 +1468,7 @@ class HouseAccountsController {
                     : '<div class="order-item">No order details available</div>';
 
                 return `
-                <tr class="customer-row" data-customer-id="${customer.ID_Customer}" data-company-name="${this.escapeHtml(customer.companyName || '')}" onclick="window.houseController.toggleOrderDetails(this, event)">
+                <tr class="customer-row" data-customer-id="${customer.ID_Customer}" data-company-name="${this.escapeHtml(customer.companyName || '')}" data-call="houseController.toggleOrderDetails" data-args='["$this", "$event"]'>
                     <td class="expand-toggle"><i class="fas fa-chevron-right"></i></td>
                     <td class="company-name ${!customer.companyName || customer.companyName.startsWith('ID:') ? 'unknown-company' : ''}">
                         ${this.escapeHtml(customer.companyName || `ID: ${customer.ID_Customer}`)}
@@ -1481,7 +1481,7 @@ class HouseAccountsController {
                     <td class="sales-amount">${this.formatCurrency(customer.totalSales || 0)}</td>
                     <td class="last-order">${this.formatDate(customer.lastOrderDate)}</td>
                     <td class="actions">
-                        <select class="assign-dropdown" onchange="window.houseController.quickAssign(${customer.ID_Customer}, this.value)" onclick="event.stopPropagation()">
+                        <select class="assign-dropdown" onchange="window.houseController.quickAssign(${customer.ID_Customer}, this.value)" data-stop="1">
                             <option value="">Assign to...</option>
                             <option value="Taneisha Clark">Taneisha Clark</option>
                             <option value="Nika Lao">Nika Lao</option>
@@ -1765,7 +1765,7 @@ class HouseAccountsController {
 
             html += `
                 <div class="gap-rep-section">
-                    <div class="gap-rep-header" onclick="window.houseController.toggleGapRepSection(this)">
+                    <div class="gap-rep-header" data-call="houseController.toggleGapRepSection" data-args='["$this"]'>
                         <div class="gap-rep-info">
                             <span class="gap-rep-avatar">${repInitials}</span>
                             <span class="gap-rep-name">${this.escapeHtml(rep.rep)}</span>
@@ -1869,7 +1869,7 @@ class HouseAccountsController {
         `).join('');
 
         return `
-            <tr class="gap-conflict-row" onclick="window.houseController.toggleGapOrderDetails(this)">
+            <tr class="gap-conflict-row" data-call="houseController.toggleGapOrderDetails" data-args='["$this"]'>
                 <td class="expand-toggle"><i class="fas fa-chevron-right"></i></td>
                 <td class="gap-company">
                     ${this.escapeHtml(conflict.companyName || `ID: ${conflict.ID_Customer}`)}
@@ -1956,7 +1956,7 @@ class HouseAccountsController {
                 <div class="modal-content" style="max-width: 480px;">
                     <div class="modal-header">
                         <h2>Assign Customer</h2>
-                        <button class="close-btn" onclick="window.houseController.closeAssignModal()">
+                        <button class="close-btn" data-call="houseController.closeAssignModal">
                             <i class="fas fa-times"></i>
                         </button>
                     </div>
@@ -1984,13 +1984,13 @@ class HouseAccountsController {
                             </div>
 
                             <div class="assign-rep-buttons">
-                                <button class="btn-assign-rep taneisha" data-rep="Taneisha" onclick="window.houseController.selectAssignRep('Taneisha')">
+                                <button class="btn-assign-rep taneisha" data-rep="Taneisha" data-call="houseController.selectAssignRep" data-args='["Taneisha"]'>
                                     <i class="fas fa-user"></i> Taneisha
                                 </button>
-                                <button class="btn-assign-rep nika" data-rep="Nika" onclick="window.houseController.selectAssignRep('Nika')">
+                                <button class="btn-assign-rep nika" data-rep="Nika" data-call="houseController.selectAssignRep" data-args='["Nika"]'>
                                     <i class="fas fa-user"></i> Nika
                                 </button>
-                                <button class="btn-assign-rep house" data-rep="House" onclick="window.houseController.selectAssignRep('House')">
+                                <button class="btn-assign-rep house" data-rep="House" data-call="houseController.selectAssignRep" data-args='["House"]'>
                                     <i class="fas fa-building"></i> House
                                 </button>
                             </div>
@@ -2009,8 +2009,8 @@ class HouseAccountsController {
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button class="btn-cancel" onclick="window.houseController.closeAssignModal()">Cancel</button>
-                        <button class="btn-save" id="confirm-assign-btn" onclick="window.houseController.confirmAssignFromReconcile()">
+                        <button class="btn-cancel" data-call="houseController.closeAssignModal">Cancel</button>
+                        <button class="btn-save" id="confirm-assign-btn" data-call="houseController.confirmAssignFromReconcile">
                             <i class="fas fa-check"></i> Assign
                         </button>
                     </div>
@@ -2469,3 +2469,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.houseController = houseController; // Expose for onclick handlers
     houseController.init();
 });
+
+// data-call target (was inline onclick — Rule 3).
+window.dismissErrorBanner = function () { const b = document.getElementById('error-banner'); if (b) b.classList.remove('show'); };
