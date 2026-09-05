@@ -1,3 +1,9 @@
+## v2026.09.05.19 (2026.09.05)
+
+- Sweep batch 4: delegator handles data-change; manual-pricing de-inlined (12 onchange + Enter key), h1s on manual-pricing/screenprint-customer, status-select + notes labels, tips link noopener
+- Memory: sweep batch 4 note
+- Deploy v2026.09.05.19: cache-bust — staff-dashboard sweep batch 4 (data-change delegation, manual-pricing de-inlined)
+
 ## v2026.09.05.18 (2026.09.05)
 
 - Memory: sweep batch 2 fix note (.17)
