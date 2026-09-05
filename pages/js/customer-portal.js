@@ -51,6 +51,8 @@
     function escapeAttr(s) {
         return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;');
     }
+    // ShopWorks design names arrive as "Navy ,Black, Red" — tidy the comma spacing for display.
+    function designLabel(v) { return String(v == null ? '' : v).replace(/\s*,\s*/g, ', ').replace(/\s{2,}/g, ' ').trim(); }
     function money(n) {
         var v = Number(n) || 0;
         return '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -171,17 +173,28 @@
         document.title = (S.companyName ? S.companyName + ' · ' : '') + t + ' | NWCA';
     }
 
+    // Focus management: remember what opened a dialog, put it back when the dialog closes.
+    var _focusReturn = null;
+    function rememberFocus() { _focusReturn = document.activeElement && document.activeElement !== document.body ? document.activeElement : null; }
+    function restoreFocus() {
+        var el = _focusReturn; _focusReturn = null;
+        if (el && document.contains(el) && typeof el.focus === 'function') { try { el.focus({ preventScroll: true }); } catch (e) { /* ignore */ } }
+    }
     function openSidebar() {
         var side = byId('cp-side'), bd = byId('cp-side-backdrop'), btn = byId('cp-menu-btn');
         if (!side) return;
         side.classList.add('is-open'); show(bd, true);
         if (btn) btn.setAttribute('aria-expanded', 'true');
+        var first = side.querySelector('#cp-nav a[aria-current="page"], #cp-nav a');
+        if (first) { try { first.focus({ preventScroll: true }); } catch (e) { /* ignore */ } }
     }
     function closeSidebar() {
         var side = byId('cp-side'), bd = byId('cp-side-backdrop'), btn = byId('cp-menu-btn');
         if (!side) return;
+        var wasOpen = side.classList.contains('is-open');
         side.classList.remove('is-open'); show(bd, false);
         if (btn) btn.setAttribute('aria-expanded', 'false');
+        if (wasOpen && btn && side.contains(document.activeElement)) { try { btn.focus({ preventScroll: true }); } catch (e) { /* ignore */ } }
     }
 
     // One delegated click handler for the shell: tabs, chips, retries, request buttons, rows.
@@ -250,8 +263,8 @@
     function hideSearchResults() {
         var box = byId('cp-search-results'), inp = byId('cp-global-search');
         if (box) { box.hidden = true; box.innerHTML = ''; }
-        if (inp) inp.setAttribute('aria-expanded', 'false');
-        _searchItems = [];
+        if (inp) { inp.setAttribute('aria-expanded', 'false'); inp.removeAttribute('aria-activedescendant'); }
+        _searchItems = []; _searchActive = -1;
     }
     function runSearch(q) {
         q = String(q || '').trim().toLowerCase();
@@ -261,7 +274,7 @@
         var hits = [];
         var has = function (v) { return v != null && String(v).toLowerCase().indexOf(q) !== -1; };
         S.orders.forEach(function (o) {
-            if (has(o.orderNumber) || has(o.designName) || has(o.poNumber)) hits.push({ group: 'Orders', icon: 'box', label: 'Order #' + o.orderNumber + (o.designName ? ' · ' + o.designName : ''), sub: formatDateShort(o.orderDate) + ' · ' + money(o.total), act: function () { openOrderDrawer(o.orderNumber); } });
+            if (has(o.orderNumber) || has(o.designName) || has(o.poNumber)) hits.push({ group: 'Orders', icon: 'box', label: 'Order #' + o.orderNumber + (o.designName ? ' · ' + designLabel(o.designName) : ''), sub: formatDateShort(o.orderDate) + ' · ' + money(o.total), act: function () { openOrderDrawer(o.orderNumber); } });
         });
         S.products.forEach(function (p) {
             var hay = [p.title, p.description, p.style, p.designName].concat((p.colors || []).map(function (c) { return c.name; }));
@@ -281,21 +294,40 @@
             if (h.group !== lastGroup) { html += '<div class="cp-search-group">' + escapeHtml(h.group) + '</div>'; lastGroup = h.group; }
             var inner = icon(h.icon) + '<span>' + escapeHtml(h.label) + '</span>' + (h.sub ? '<small>' + escapeHtml(h.sub) + '</small>' : '');
             html += h.href
-                ? '<a class="cp-search-item" role="option" href="' + escapeAttr(h.href) + '" data-sidx="' + i + '">' + inner + '</a>'
-                : '<button class="cp-search-item" role="option" type="button" data-sidx="' + i + '">' + inner + '</button>';
+                ? '<a class="cp-search-item" role="option" aria-selected="false" id="cp-sres-' + i + '" href="' + escapeAttr(h.href) + '" data-sidx="' + i + '">' + inner + '</a>'
+                : '<button class="cp-search-item" role="option" aria-selected="false" id="cp-sres-' + i + '" type="button" data-sidx="' + i + '">' + inner + '</button>';
         });
         box.innerHTML = html; box.hidden = false;
-        if (inp) inp.setAttribute('aria-expanded', 'true');
+        _searchActive = -1;
+        if (inp) { inp.setAttribute('aria-expanded', 'true'); inp.removeAttribute('aria-activedescendant'); }
+    }
+    var _searchActive = -1;
+    function setSearchActive(idx) {
+        var box = byId('cp-search-results'), inp = byId('cp-global-search');
+        var items = box ? box.querySelectorAll('.cp-search-item') : [];
+        if (!items.length) return;
+        if (idx < 0) idx = items.length - 1; if (idx >= items.length) idx = 0;
+        _searchActive = idx;
+        Array.prototype.forEach.call(items, function (it, i) {
+            var on = i === idx; it.setAttribute('aria-selected', on ? 'true' : 'false'); it.classList.toggle('is-active', on);
+            if (on) { if (inp) inp.setAttribute('aria-activedescendant', it.id); try { it.scrollIntoView({ block: 'nearest' }); } catch (e) { /* ignore */ } }
+        });
     }
     (function wireSearch() {
         var inp = byId('cp-global-search'), form = byId('cp-search-form'), box = byId('cp-search-results');
         if (!inp || !form) return;
         inp.addEventListener('input', function () { runSearch(inp.value); });
         inp.addEventListener('focus', function () { if (inp.value.trim().length >= 2) runSearch(inp.value); });
+        inp.addEventListener('keydown', function (e) {
+            if (!box || box.hidden) return;
+            if (e.key === 'ArrowDown') { e.preventDefault(); setSearchActive(_searchActive + 1); }
+            else if (e.key === 'ArrowUp') { e.preventDefault(); setSearchActive(_searchActive - 1); }
+        });
         form.addEventListener('submit', function (e) {
             e.preventDefault();
-            var first = box && box.querySelector('.cp-search-item');
-            if (first) first.click();
+            var items = box ? box.querySelectorAll('.cp-search-item') : [];
+            var pick = _searchActive >= 0 && items[_searchActive] ? items[_searchActive] : items[0];
+            if (pick) pick.click();
         });
         if (box) box.addEventListener('click', function (e) {
             var it = e.target.closest('.cp-search-item'); if (!it) return;
@@ -589,7 +621,7 @@
             else if (!S.orders.length) rec.innerHTML = '<div class="cp-card-body cp-muted">No orders on file yet.</div>';
             else rec.innerHTML = S.orders.slice().sort(byDateDesc('orderDate')).slice(0, 5).map(function (o) {
                 return '<button class="cp-recent-row" type="button" data-open-order="' + escapeAttr(String(o.orderNumber || '')) + '">' +
-                    '<div class="cp-recent-main"><div class="cp-recent-title">#' + escapeHtml(String(o.orderNumber || '')) + (o.designName ? ' &middot; ' + escapeHtml(o.designName) : '') + '</div>' +
+                    '<div class="cp-recent-main"><div class="cp-recent-title">#' + escapeHtml(String(o.orderNumber || '')) + (o.designName ? ' &middot; ' + escapeHtml(designLabel(o.designName)) : '') + '</div>' +
                     '<div class="cp-recent-sub">' + escapeHtml(formatDate(o.orderDate)) + (o.quantity ? ' &middot; ' + escapeHtml(String(o.quantity)) + ' pcs' : '') + '</div></div>' +
                     '<div class="cp-recent-right">' + renderStatusBadge(o.shipDate && o.status !== 'Invoiced' ? 'Shipped' : o.status) + '<span class="cp-recent-amt">' + money(o.total) + '</span>' + icon('chev') + '</div></button>';
             }).join('');
@@ -853,6 +885,7 @@
         if (ap) { ap.setAttribute('href', approve || '#'); ap.hidden = !approve; }
         show(byId('cp-lb-order'), _lbCurrent.kind !== 'finished');
         show(byId('cp-lb-change'), _lbCurrent.kind !== 'finished');
+        if (lb.hidden) rememberFocus();
         lb.hidden = false;
         try { byId('cp-lightbox-close').focus(); } catch (e) { }
     }
@@ -868,7 +901,7 @@
     }
     function closeLogoLightbox() {
         var lb = byId('cp-logo-lightbox');
-        if (lb && !lb.hidden) { lb.hidden = true; var im = byId('cp-lightbox-img'); if (im) im.src = ''; }
+        if (lb && !lb.hidden) { lb.hidden = true; var im = byId('cp-lightbox-img'); if (im) im.src = ''; restoreFocus(); }
     }
     (function wireLightbox() {
         var o = byId('cp-lb-order'); if (o) o.addEventListener('click', function () { var c = _lbCurrent || {}; closeLogoLightbox(); openGenModal('quote', { design: c.design, designName: c.name }); });
@@ -931,12 +964,12 @@
             return '<tr class="is-clickable' + (capped && i >= ROW_CAP ? ' cp-row-extra' : '') + '" data-open-order="' + escapeAttr(String(o.orderNumber || '')) + '">' +
                 '<td><span class="cp-link">#' + escapeHtml(String(o.orderNumber || '')) + '</span></td>' +
                 '<td>' + escapeHtml(formatDate(o.orderDate)) + '</td>' +
-                '<td>' + escapeHtml(o.designName || '—') + (o.poNumber ? '<span class="cp-cell-sub">PO ' + escapeHtml(o.poNumber) + '</span>' : '') + '</td>' +
+                '<td class="cp-cell-design" title="' + escapeAttr(designLabel(o.designName) || '') + '">' + escapeHtml(designLabel(o.designName) || '—') + (o.poNumber ? '<span class="cp-cell-sub">PO ' + escapeHtml(o.poNumber) + '</span>' : '') + '</td>' +
                 '<td class="cp-num">' + escapeHtml(String(o.quantity || '')) + '</td>' +
                 '<td class="cp-num cp-strong">' + money(o.total) + '</td>' +
                 '<td>' + renderStatusBadge(o.status) + shipPill + '</td>' +
                 '<td class="cp-cell-actions"><button type="button" class="cp-btn cp-btn--ghost cp-btn--xs" data-open-order="' + escapeAttr(String(o.orderNumber || '')) + '">Details</button>' +
-                    '<button type="button" class="cp-btn cp-btn--soft cp-btn--xs cp-row-reorder" data-order="' + escapeAttr(String(o.orderNumber || '')) + '" data-design="' + escapeAttr(o.designName || '') + '">Re-order</button></td>' +
+                    '<button type="button" class="cp-btn cp-btn--soft cp-btn--xs cp-row-reorder" data-order="' + escapeAttr(String(o.orderNumber || '')) + '" data-design="' + escapeAttr(designLabel(o.designName) || '') + '">Re-order</button></td>' +
                 '</tr>';
         }).join('');
         wrap.innerHTML = '<table class="cp-table"><thead><tr>' +
@@ -973,7 +1006,7 @@
         var bal = Number(o.balance) || 0;
         byId('cp-drawer-meta').innerHTML =
             '<div><div class="k">Ordered</div><div class="v">' + escapeHtml(formatDate(o.orderDate) || '—') + '</div></div>' +
-            '<div><div class="k">Design</div><div class="v" title="' + escapeAttr(o.designName || '') + '">' + escapeHtml(o.designName || '—') + '</div></div>' +
+            '<div><div class="k">Design</div><div class="v" title="' + escapeAttr(designLabel(o.designName) || '') + '">' + escapeHtml(designLabel(o.designName) || '—') + '</div></div>' +
             '<div><div class="k">PO</div><div class="v">' + escapeHtml(o.poNumber || '—') + '</div></div>' +
             '<div><div class="k">Pieces</div><div class="v">' + escapeHtml(String(o.quantity || '—')) + '</div></div>' +
             '<div><div class="k">Total</div><div class="v">' + money(o.total) + '</div></div>' +
@@ -982,7 +1015,7 @@
         byId('cp-drawer-tracking').innerHTML = '<div class="cp-skel cp-skel-line"></div>';
         var link = byId('cp-drawer-invoice-link'); if (link) link.setAttribute('href', INVOICE_BASE + encodeURIComponent(o.orderNumber));
         var rb = byId('cp-drawer-reorder'); if (rb) { rb.disabled = true; rb.textContent = 'Loading…'; }
-        var dr = byId('cp-drawer'); dr.hidden = false;
+        var dr = byId('cp-drawer'); if (dr.hidden) rememberFocus(); dr.hidden = false;
         try { byId('cp-drawer-panel').focus({ preventScroll: true }); } catch (e) { }
 
         fetch(INVOICE_API_BASE + encodeURIComponent(o.orderNumber), { credentials: 'same-origin' })
@@ -1042,7 +1075,7 @@
             return '<div class="cp-track-row">' + icon('truck') + '<span>' + escapeHtml(t.carrier || 'Carrier') + (rows.length > 1 ? ' · box ' + (t.boxNumber != null ? escapeHtml(String(t.boxNumber)) : (i + 1)) : '') + '</span>' + num + (t.shipDate ? '<small>' + escapeHtml(formatDateShort(t.shipDate)) + '</small>' : '') + '</div>';
         }).join('');
     }
-    function closeOrderDrawer() { var d = byId('cp-drawer'); if (d && !d.hidden) { d.hidden = true; _drawerSeq++; } }
+    function closeOrderDrawer() { var d = byId('cp-drawer'); if (d && !d.hidden) { d.hidden = true; _drawerSeq++; restoreFocus(); } }
     (function wireDrawer() {
         var d = byId('cp-drawer'); if (d) d.addEventListener('click', function (e) { if (e.target === d) closeOrderDrawer(); });
         var c = byId('cp-drawer-close'); if (c) c.addEventListener('click', closeOrderDrawer);
@@ -1093,7 +1126,7 @@
         var rows = list.map(function (o, i) {
             var href = INVOICE_BASE + encodeURIComponent(o.orderNumber);
             return '<tr' + (capped && i >= ROW_CAP ? ' class="cp-row-extra"' : '') + '>' +
-                '<td><a class="cp-link" href="' + escapeAttr(href) + '">#' + escapeHtml(String(o.orderNumber || '')) + '</a>' + (o.designName ? '<span class="cp-cell-sub">' + escapeHtml(o.designName) + '</span>' : '') + '</td>' +
+                '<td><a class="cp-link" href="' + escapeAttr(href) + '">#' + escapeHtml(String(o.orderNumber || '')) + '</a>' + (o.designName ? '<span class="cp-cell-sub">' + escapeHtml(designLabel(o.designName)) + '</span>' : '') + '</td>' +
                 '<td>' + (escapeHtml(formatDate(o.invoiceDate)) || '—') + '</td>' +
                 '<td>' + (escapeHtml(formatDate(o.dueDate)) || '—') + dueWarnBadge(o) + '</td>' +
                 '<td class="cp-num">' + money(o.total) + '</td>' +
@@ -1127,7 +1160,7 @@
             var days = daysUntil(o.dueDate); var over = days == null ? 0 : -days; var bal = Number(o.balance) || 0;
             var age = over <= 0 ? 'Current' : over <= 30 ? '1–30 days' : over <= 60 ? '31–60 days' : over <= 90 ? '61–90 days' : '90+ days';
             if (over <= 0) buckets.current += bal; else if (over <= 30) buckets.d30 += bal; else if (over <= 60) buckets.d60 += bal; else if (over <= 90) buckets.d90 += bal; else buckets.d90p += bal;
-            return '<tr><td>#' + escapeHtml(String(o.orderNumber)) + '</td><td>' + escapeHtml(o.designName || '') + (o.poNumber ? ' <span class="cp-muted">(PO ' + escapeHtml(o.poNumber) + ')</span>' : '') + '</td><td>' + escapeHtml(formatDate(o.invoiceDate) || '—') + '</td><td>' + escapeHtml(formatDate(o.dueDate) || '—') + '</td><td>' + escapeHtml(age) + '</td><td class="num">' + money(o.total) + '</td><td class="num">' + money(o.paid) + '</td><td class="num">' + money(bal) + '</td></tr>';
+            return '<tr><td>#' + escapeHtml(String(o.orderNumber)) + '</td><td>' + escapeHtml(designLabel(o.designName) || '') + (o.poNumber ? ' <span class="cp-muted">(PO ' + escapeHtml(o.poNumber) + ')</span>' : '') + '</td><td>' + escapeHtml(formatDate(o.invoiceDate) || '—') + '</td><td>' + escapeHtml(formatDate(o.dueDate) || '—') + '</td><td>' + escapeHtml(age) + '</td><td class="num">' + money(o.total) + '</td><td class="num">' + money(o.paid) + '</td><td class="num">' + money(bal) + '</td></tr>';
         }).join('');
         var total = open.reduce(function (s, o) { return s + (Number(o.balance) || 0); }, 0);
         var body = byId('cp-statement-body');
@@ -1146,10 +1179,10 @@
                   '</div>'
                 : '<div class="cp-empty" style="margin-top:8px"><div class="cp-empty-icon">&#10003;</div>No open balance &mdash; every invoice on file is paid. Thank you!</div>') +
             '<div class="cp-stmt-foot">Balances reflect payments posted in our system as of the date above. To pay or ask about terms, contact accounting@nwcustomapparel.com or call (253) 922-5793.</div>';
-        byId('cp-statement-modal').hidden = false;
+        var sm = byId('cp-statement-modal'); if (sm.hidden) rememberFocus(); sm.hidden = false;
         try { byId('cp-statement-print').focus(); } catch (e) { }
     }
-    function closeStatement() { var m = byId('cp-statement-modal'); if (m) m.hidden = true; }
+    function closeStatement() { var m = byId('cp-statement-modal'); if (m && !m.hidden) { m.hidden = true; restoreFocus(); } }
     (function wireStatement() {
         var m = byId('cp-statement-modal'); if (m) m.addEventListener('click', function (e) { if (e.target === m) closeStatement(); });
         var c = byId('cp-statement-close'); if (c) c.addEventListener('click', closeStatement);
@@ -1262,9 +1295,10 @@
         renderColorPicker(reqState.style, reqState.color, reqState.image);
         byId('cp-req-note').value = note || '';
         setText('cp-req-error', '');
-        byId('cp-req-modal').hidden = false;
+        var rm = byId('cp-req-modal'); if (rm.hidden) rememberFocus(); rm.hidden = false;
+        var rf = rm.querySelector('.cp-modal-close, button, input, select, textarea'); if (rf) { try { rf.focus({ preventScroll: true }); } catch (e) { } }
     }
-    function closeReqModal() { var m = byId('cp-req-modal'); if (m) m.hidden = true; }
+    function closeReqModal() { var m = byId('cp-req-modal'); if (m && !m.hidden) { m.hidden = true; restoreFocus(); } }
 
     // Quick re-order from an Orders row: pull THAT order's invoice line items (ownership-checked
     // endpoint), derive garment style/color/sizes, open the request modal pre-filled.
@@ -1499,10 +1533,10 @@
             sel.appendChild(o); sel.value = prefill.design;
         }
         setText('cp-gen-error', '');
-        byId('cp-gen-modal').hidden = false;
+        var gm = byId('cp-gen-modal'); if (gm.hidden) rememberFocus(); gm.hidden = false;
         try { desc.focus(); } catch (e) { }
     }
-    function closeGenModal() { var m = byId('cp-gen-modal'); if (m) m.hidden = true; }
+    function closeGenModal() { var m = byId('cp-gen-modal'); if (m && !m.hidden) { m.hidden = true; restoreFocus(); } }
     function postRequest(payload, btn, idleLabel, okMsg, errEl, onOk) {
         if (PREVIEW) { showToast('Staff preview — the customer would send this to their rep.'); if (onOk) onOk(); return; }
         btn.disabled = true; btn.textContent = 'Sending…';
@@ -1646,9 +1680,10 @@
         var sb = byId('cp-redeem-submit'); if (sb) sb.textContent = 'Apply my full ' + money(S.rewardBalance) + ' to my next order';
         setText('cp-redeem-error', '');
         renderRewardHistory();
-        byId('cp-redeem-modal').hidden = false;
+        var rdm = byId('cp-redeem-modal'); if (rdm.hidden) rememberFocus(); rdm.hidden = false;
+        var ra = byId('cp-redeem-amt'); if (ra) { try { ra.focus({ preventScroll: true }); } catch (e) { } }
     }
-    function closeRedeem() { var m = byId('cp-redeem-modal'); if (m) m.hidden = true; }
+    function closeRedeem() { var m = byId('cp-redeem-modal'); if (m && !m.hidden) { m.hidden = true; restoreFocus(); } }
     function submitRedeem() {
         var amt = parseFloat(byId('cp-redeem-amt').value);
         var err = byId('cp-redeem-error'); err.textContent = '';

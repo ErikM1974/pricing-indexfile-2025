@@ -8068,7 +8068,7 @@ function projectPortalRewards(raw, program) {
     entries: entries.slice(0, 20).map((e) => ({
       amount: Number(e.amount) || 0,
       type: e.type || '',
-      reason: e.reason || '',
+      reason: portalCustomerReason(e.reason),
       orderRef: e.orderRef || '',
       created: e.created || '',
     })),
@@ -8090,6 +8090,12 @@ function projectPortalRewards(raw, program) {
 }
 
 // GET /api/portal/rewards — the logged-in customer's reward-dollar balance + recent activity.
+// Ledger reasons are written for STAFF ("Earned on paid order #140568 (12-mo program · band 40+, 20-39.99)").
+// The customer must never see the SanMar cost bands (portal rule: rates yes, cost thresholds never),
+// so strip any parenthetical that names the program mechanics before it leaves this API.
+function portalCustomerReason(reason) {
+  return String(reason || '').replace(/\s*\((?:[^()]*\b(?:band|program|RWD-|already)\b[^()]*)\)/gi, '').replace(/\s{2,}/g, ' ').trim();
+}
 app.get('/api/portal/rewards', portalLimiter, requireCustomer, async (req, res) => {
   try {
     const cid = String(req.customerSession.portalCustomer.idCustomer);

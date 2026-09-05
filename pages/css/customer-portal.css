@@ -535,6 +535,11 @@ img { max-width: 100%; }
 .cp-table td.cp-strong { font-weight: 700; }
 .cp-table .cp-cell-sub { display: block; font-size: 11.5px; color: var(--cp-ink-3); font-weight: 400; margin-top: 1px; }
 .cp-table .cp-cell-actions { text-align: right; }
+/* Long ShopWorks design names ("P1008, Aaberg's - Navy, Black, Red, …") used to push the
+   Status/Actions columns off the right edge even on a 1500px desktop. Clamp + tooltip. */
+.cp-table td.cp-cell-design { max-width: 340px; overflow: hidden; text-overflow: ellipsis; }
+.cp-table td:first-child .cp-cell-sub { max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cp-search-item.is-active, .cp-search-item[aria-selected="true"] { background: var(--cp-green-50); }
 .cp-table .cp-cell-actions .cp-btn + .cp-btn { margin-left: 6px; }
 .cp-link { color: var(--cp-green-700); text-decoration: none; font-weight: 700; font-variant-numeric: tabular-nums; }
 .cp-link:hover { text-decoration: underline; }

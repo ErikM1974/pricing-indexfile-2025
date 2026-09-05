@@ -347,3 +347,28 @@ manual-pricing de-inlined (12 `onchange` + an Enter-key `onkeypress`) with a rea
 **Deliberately left:** retiring `dst-viewer` / `garment-designer` (chips due for removal ~Sept 2026),
 Caspio-injected inline scripts on the design-archive pages (not ours), the JotForm iframe width on the
 Purchasing Request form (third-party embed).
+
+## Customer Portal + login — review, 7 items (2026-09-05, `v2026.09.05.20`)
+
+Reviewed live via the staff mirror `/portal-admin/preview/1276` (Aaberg's Rentals) + phone pass on
+`static-dist` (the page's error states render without the API — every feed shows a red alert + Retry).
+Already strong: dialogs are `role=dialog aria-modal`, Esc closes everything, `hidden` panels,
+skeletons, zero-badges hidden, phone bottom nav + off-canvas menu, printable statement. Items shipped:
+
+1. **Orders/Invoices tables overflowed even at 1500px** — `td{white-space:nowrap}` + long ShopWorks
+   design names ("P1008, Aaberg's - Navy ,Black, Red, …") pushed Status/Actions off the edge. Design
+   cell now `td.cp-cell-design` (max-width 340px, ellipsis, `title` tooltip); invoice sub-line clamped too.
+2. 🔴 **Reward ledger leaked the internal cost bands** ("… (12-mo program · band 40+, 20-39.99)") on the
+   Account tab and in the redeem modal. Server `portalCustomerReason()` strips any parenthetical naming
+   band / program / RWD- / already before `/api/portal/rewards` (and the preview mirror) return it. Rule
+   stays: rates yes, cost thresholds never.
+3. **Global search keyboard** — results now carry `id` + `aria-selected`; ArrowDown/ArrowUp move
+   `aria-activedescendant`, Enter opens the highlighted hit; input is `role=combobox aria-autocomplete=list`.
+4. **Focus return** — `rememberFocus()/restoreFocus()` around lightbox, order drawer, request, generic,
+   redeem and statement modals; the phone menu focuses the current nav link on open and the ☰ button on close.
+5. **Login page** — the email field has a (sr-only) `<label>`; footer sentence no longer dangles a "·".
+6. **Design names** — `designLabel()` tidies "Navy ,Black" → "Navy, Black" everywhere they render.
+7. Lock: `tests/unit/customer-portal-page.test.js` (Rule 3, combobox, focus, clamp, sanitizer, label).
+
+Left alone on purpose: `$0.00` zero-total orders (real ShopWorks records), the raw sign-in email in the
+Quotes empty state (it explains WHY nothing shows), the JotForm-style statement header wrap.
