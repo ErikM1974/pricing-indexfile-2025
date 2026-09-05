@@ -12,7 +12,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 
     <!-- Page Styles -->
-    <link href="/dashboards/css/rep-crm.css" rel="stylesheet">
+    <link href="/dashboards/css/rep-crm.css?v=2026.09.05.37" rel="stylesheet">
 </head>
 <body>
     <div class="crm-page">
@@ -26,25 +26,25 @@
                 <h1 class="header-title">Taneisha's Account CRM</h1>
             </div>
             <div class="header-right">
-                <div class="user-welcome" id="userWelcome" style="display: none;">
+                <div class="user-welcome" id="userWelcome" hidden>
                     <span class="welcome-text">Welcome,</span>
                     <span class="user-name" id="userName"></span>
                 </div>
                 <div class="header-stats">
-                    <button class="header-stat" id="header-total">
+                    <button type="button" class="header-stat" id="header-total" title="Show every account (clears the filters)">
                         <span class="header-stat-value">0</span>
                         <span class="header-stat-label">Total</span>
                     </button>
-                    <button class="header-stat at-risk" id="header-at-risk">
+                    <button type="button" class="header-stat at-risk" id="header-at-risk" aria-pressed="false" title="Only at-risk accounts">
                         <span class="header-stat-value">0</span>
                         <span class="header-stat-label">At Risk</span>
                     </button>
                 </div>
                 <a href="/crm-logout" class="back-btn" title="Logout">
-                    <i class="fas fa-sign-out-alt"></i> Logout
+                    <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Logout
                 </a>
                 <a href="/staff-dashboard.html" class="back-btn">
-                    <i class="fas fa-arrow-left"></i>
+                    <i class="fas fa-arrow-left" aria-hidden="true"></i>
                     Dashboard
                 </a>
             </div>
@@ -54,69 +54,72 @@
         <main class="crm-content">
             <!-- Error Banner -->
             <div class="error-banner" id="error-banner">
-                <i class="fas fa-exclamation-circle"></i>
+                <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
                 <span class="error-banner-message" id="error-message"></span>
-                <button class="error-banner-close" aria-label="Dismiss error" data-call="crmController.hideError">
-                    <i class="fas fa-times"></i>
+                <button type="button" class="error-banner-retry" id="error-retry" data-call="crmController.retryLoad" hidden>
+                    <i class="fas fa-rotate" aria-hidden="true"></i> Retry
+                </button>
+                <button type="button" class="error-banner-close" aria-label="Dismiss error" data-call="crmController.hideError">
+                    <i class="fas fa-times" aria-hidden="true"></i>
                 </button>
             </div>
 
             <!-- Sales Breakdown by Tier -->
             <div class="sales-breakdown-section">
-                <h3 class="section-title"><i class="fas fa-chart-pie"></i> 2026 YTD Sales by Tier</h3>
+                <h3 class="section-title"><i class="fas fa-chart-pie" aria-hidden="true"></i> 2026 YTD Sales by Tier</h3>
                 <div class="sales-total">
                     <span class="total-label">Total YTD</span>
                     <span class="total-value" id="ytd-total">$0</span>
                 </div>
                 <div class="tier-breakdown-grid">
-                    <div class="tier-card gold">
-                        <div class="tier-name">Gold</div>
-                        <div class="tier-revenue" id="gold-revenue">$0</div>
-                        <div class="tier-count" id="gold-count">0 accounts</div>
-                    </div>
-                    <div class="tier-card silver">
-                        <div class="tier-name">Silver</div>
-                        <div class="tier-revenue" id="silver-revenue">$0</div>
-                        <div class="tier-count" id="silver-count">0 accounts</div>
-                    </div>
-                    <div class="tier-card bronze">
-                        <div class="tier-name">Bronze</div>
-                        <div class="tier-revenue" id="bronze-revenue">$0</div>
-                        <div class="tier-count" id="bronze-count">0 accounts</div>
-                    </div>
-                    <div class="tier-card win-back">
-                        <div class="tier-name">Win-Back</div>
-                        <div class="tier-revenue" id="winback-revenue">$0</div>
-                        <div class="tier-count" id="winback-count">0 accounts</div>
-                        <div class="bonus-line">
+                    <button type="button" class="tier-card gold" aria-pressed="false" title="Only gold accounts">
+                        <span class="tier-name">Gold</span>
+                        <span class="tier-revenue" id="gold-revenue">$0</span>
+                        <span class="tier-count" id="gold-count">0 accounts</span>
+                    </button>
+                    <button type="button" class="tier-card silver" aria-pressed="false" title="Only silver accounts">
+                        <span class="tier-name">Silver</span>
+                        <span class="tier-revenue" id="silver-revenue">$0</span>
+                        <span class="tier-count" id="silver-count">0 accounts</span>
+                    </button>
+                    <button type="button" class="tier-card bronze" aria-pressed="false" title="Only bronze accounts">
+                        <span class="tier-name">Bronze</span>
+                        <span class="tier-revenue" id="bronze-revenue">$0</span>
+                        <span class="tier-count" id="bronze-count">0 accounts</span>
+                    </button>
+                    <button type="button" class="tier-card win-back" aria-pressed="false" title="Only win back accounts">
+                        <span class="tier-name">Win-Back</span>
+                        <span class="tier-revenue" id="winback-revenue">$0</span>
+                        <span class="tier-count" id="winback-count">0 accounts</span>
+                        <span class="bonus-line">
                             <span>5% Bonus:</span>
                             <span class="bonus-value" id="winback-bonus">$0</span>
-                        </div>
-                        <div class="bonus-line quarter-payout">
+                        </span>
+                        <span class="bonus-line quarter-payout">
                             <span id="quarter-label">Q1 Payout:</span>
                             <span class="payout-date" id="quarter-payout-date">&mdash;</span>
-                        </div>
-                    </div>
-                    <div class="tier-card unclassified">
-                        <div class="tier-name">Unclassified</div>
-                        <div class="tier-revenue" id="unclassified-revenue">$0</div>
-                        <div class="tier-count" id="unclassified-count">0 accounts</div>
-                    </div>
+                        </span>
+                    </button>
+                    <button type="button" class="tier-card unclassified" aria-pressed="false" title="Only unclassified accounts">
+                        <span class="tier-name">Unclassified</span>
+                        <span class="tier-revenue" id="unclassified-revenue">$0</span>
+                        <span class="tier-count" id="unclassified-count">0 accounts</span>
+                    </button>
                 </div>
             </div>
 
             <!-- Main Layout -->
-            <div class="crm-layout" style="grid-template-columns: 1fr;">
+            <div class="crm-layout crm-layout--single">
                 <!-- Accounts Section -->
                 <div class="accounts-main">
                     <!-- Filters -->
                     <div class="filters-section">
                         <div class="filter-group search-group">
-                            <label>Search</label>
+                            <label for="filter-search">Search</label>
                             <input type="text" id="filter-search" aria-label="Search accounts" placeholder="Search company name...">
                         </div>
                         <div class="filter-group">
-                            <label>Account Tier</label>
+                            <label for="filter-tier">Account Tier</label>
                             <select id="filter-tier" aria-label="Tier">
                                 <option value="">All Tiers</option>
                                 <option value="GOLD '26-TANEISHA">Gold</option>
@@ -126,7 +129,7 @@
                             </select>
                         </div>
                         <div class="filter-group">
-                            <label>Priority</label>
+                            <label for="filter-priority">Priority</label>
                             <select id="filter-priority" aria-label="Priority">
                                 <option value="">All Priorities</option>
                                 <option value="A">A - Highest</option>
@@ -137,7 +140,7 @@
                             </select>
                         </div>
                         <div class="filter-group">
-                            <label>Best Month</label>
+                            <label for="filter-month">Best Month</label>
                             <select id="filter-month" aria-label="Month">
                                 <option value="">All Months</option>
                                 <option value="jan">January</option>
@@ -155,7 +158,7 @@
                             </select>
                         </div>
                         <div class="filter-group">
-                            <label>Trend</label>
+                            <label for="filter-trend">Trend</label>
                             <select id="filter-trend" aria-label="Trend">
                                 <option value="">All Trends</option>
                                 <option value="Active 2025">Active 2025</option>
@@ -166,33 +169,33 @@
                             </select>
                         </div>
                         <div class="filter-group">
-                            <label>Products</label>
-                            <div class="product-toggles">
-                                <button class="product-toggle" data-product="Carhartt">Carhartt</button>
-                                <button class="product-toggle" data-product="Jackets">Jackets</button>
-                                <button class="product-toggle" data-product="Caps">Caps</button>
+                            <label id="products-label">Products</label>
+                            <div class="product-toggles" role="group" aria-labelledby="products-label">
+                                <button type="button" class="product-toggle" data-product="Carhartt" aria-pressed="false">Carhartt</button>
+                                <button type="button" class="product-toggle" data-product="Jackets" aria-pressed="false">Jackets</button>
+                                <button type="button" class="product-toggle" data-product="Caps" aria-pressed="false">Caps</button>
                             </div>
                         </div>
-                        <button class="clear-filters-btn" id="clear-filters-btn">
-                            <i class="fas fa-times"></i> Clear
+                        <button type="button" class="clear-filters-btn" id="clear-filters-btn">
+                            <i class="fas fa-times" aria-hidden="true"></i> Clear
                         </button>
                     </div>
 
                     <!-- Accounts Grid -->
                     <div class="accounts-section">
                         <div class="accounts-header">
-                            <h2><i class="fas fa-building"></i> Accounts</h2>
+                            <h2><i class="fas fa-building" aria-hidden="true"></i> Accounts</h2>
                             <div class="accounts-meta">
                                 <span class="accounts-count" id="accounts-count">0 accounts</span>
                             </div>
                         </div>
 
-                        <div class="loading-overlay" id="loading-overlay">
+                        <div class="loading-overlay" id="loading-overlay" role="status" aria-label="Loading accounts">
                             <div class="loading-spinner"></div>
                         </div>
 
-                        <div class="empty-state" id="empty-state" style="display: none;">
-                            <i class="fas fa-search"></i>
+                        <div class="empty-state" id="empty-state" role="status" hidden>
+                            <i class="fas fa-search" aria-hidden="true"></i>
                             <h3>No accounts found</h3>
                             <p>Try adjusting your filters or search terms</p>
                         </div>
@@ -202,7 +205,7 @@
                         </div>
                     </div>
 
-                    <div class="sync-status" id="sync-status" style="display: none;">
+                    <div class="sync-status" id="sync-status" role="status" hidden>
                         <span id="last-synced"></span>
                     </div>
                 </div>
@@ -211,21 +214,21 @@
 
         <!-- Account Detail Modal -->
         <div class="modal-overlay" id="account-detail-modal-overlay">
-            <div class="account-detail-modal">
+            <div class="account-detail-modal" role="dialog" aria-modal="true" aria-labelledby="account-detail-company">
                 <div class="modal-header">
                     <div class="modal-title">
                         <h2 id="account-detail-company"></h2>
                         <div class="account-detail-badges" id="account-detail-badges"></div>
                     </div>
-                    <button class="modal-close" aria-label="Close" id="account-detail-modal-close">
-                        <i class="fas fa-times"></i>
+                    <button type="button" class="modal-close" aria-label="Close" id="account-detail-modal-close">
+                        <i class="fas fa-times" aria-hidden="true"></i>
                     </button>
                 </div>
                 <div class="account-detail-modal-body" id="account-detail-body">
                     <!-- Content populated by JavaScript -->
                 </div>
                 <div class="modal-footer">
-                    <button class="btn-cancel" id="account-detail-close">Close</button>
+                    <button type="button" class="btn-cancel" id="account-detail-close">Close</button>
                 </div>
             </div>
         </div>
@@ -237,6 +240,6 @@
     <!-- SAML identity → legacy nwca_user_* keys (StaffAuthHelper.ready(), 2026-09-05) -->
     <script src="/shared_components/js/staff-auth-helper.js?v=2026.09.05.6"></script>
     <script src="/shared_components/js/data-call-delegator.js"></script>
-    <script src="/dashboards/js/rep-crm.js"></script>
+    <script src="/dashboards/js/rep-crm.js?v=2026.09.05.37"></script>
 </body>
 </html>

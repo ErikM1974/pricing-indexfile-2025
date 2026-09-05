@@ -351,10 +351,12 @@ class RepCRMService {
             }
 
             if (account.Next_Follow_Up) {
-                const followUpDate = new Date(account.Next_Follow_Up);
-                followUpDate.setHours(0, 0, 0, 0);
-                if (followUpDate < today) {
-                    stats.overdue++;
+                const followUpDate = RepCRMController.parseCalendarDate(account.Next_Follow_Up);
+                if (followUpDate) {
+                    followUpDate.setHours(0, 0, 0, 0);
+                    if (followUpDate < today) {
+                        stats.overdue++;
+                    }
                 }
             }
         });
@@ -528,29 +530,42 @@ class RepCRMController {
         (typeof StaffAuthHelper !== 'undefined' ? StaffAuthHelper.ready() : Promise.resolve())
             .then(() => this.displayWelcomeMessage());
 
+        await this.retryLoad();
+    }
+
+    /**
+     * (Re)load everything — first boot and the error banner's Retry button.
+     */
+    async retryLoad() {
+        this.hideError();
         try {
             await this.loadAccounts();
             this.updateStats();
             this.renderAccounts();
+            this.updateAccountsCount();   // was skipped on boot → header said "0 accounts" beside 474 cards
 
             // Fire per-rep archive fetch in the background — re-render stats when it lands.
             // Non-blocking so the accounts list doesn't wait on a second API round-trip.
             this.loadArchiveYTD().then(() => this.updateStats());
         } catch (error) {
-            this.showError('Unable to load accounts. Please refresh the page or contact support.');
+            console.error('[RepCRM] load failed:', error);
+            this.showError('Unable to load accounts (' + (error && error.message ? error.message : 'unknown error') + ').', true);
         }
     }
 
     /**
      * Load this rep's authoritative YTD total from the per-rep archive.
-     * Silent fallback on failure — display path keeps showing the per-account sum.
+     * On failure the headline falls back to the per-account sum AND SAYS SO (the hint line) —
+     * never a silent fallback (Erik's #1 rule).
      */
     async loadArchiveYTD() {
         try {
             this.archiveYTD = await this.service.fetchYTDPerRepFromArchive();
+            this.archiveFailed = false;
         } catch (error) {
             console.warn('[RepCRM] Per-rep archive fetch failed; falling back to per-account total:', error.message);
             this.archiveYTD = null;
+            this.archiveFailed = true;
         }
     }
 
@@ -565,7 +580,7 @@ class RepCRMController {
             const userWelcomeEl = document.getElementById('userWelcome');
             if (userNameEl && userWelcomeEl) {
                 userNameEl.textContent = firstName;
-                userWelcomeEl.style.display = 'flex';
+                userWelcomeEl.hidden = false;
             }
         }
     }
@@ -578,6 +593,7 @@ class RepCRMController {
             // Error banner
             errorBanner: document.getElementById('error-banner'),
             errorMessage: document.getElementById('error-message'),
+            errorRetry: document.getElementById('error-retry'),
 
             // Header Stats
             headerTotal: document.getElementById('header-total'),
@@ -655,8 +671,9 @@ class RepCRMController {
 
         // Product toggles
         this.elements.productToggles.forEach(toggle => {
-            toggle.addEventListener('click', (e) => {
-                toggle.classList.toggle('active');
+            toggle.addEventListener('click', () => {
+                const on = toggle.classList.toggle('active');
+                toggle.setAttribute('aria-pressed', on ? 'true' : 'false');
                 this.handleFilterChange();
             });
         });
@@ -786,16 +803,19 @@ class RepCRMController {
 
         this.elements.productToggles.forEach(toggle => {
             toggle.classList.remove('active');
+            toggle.setAttribute('aria-pressed', 'false');
         });
 
         // Clear tier card active states
         document.querySelectorAll('.tier-card').forEach(card => {
             card.classList.remove('active');
+            card.setAttribute('aria-pressed', 'false');
         });
 
         // Clear header at-risk active state
         if (this.elements.headerAtRisk) {
             this.elements.headerAtRisk.classList.remove('active');
+            this.elements.headerAtRisk.setAttribute('aria-pressed', 'false');
         }
 
         this.service.filters = {
@@ -854,9 +874,10 @@ class RepCRMController {
         }
 
         // Update UI active states
-        document.querySelectorAll('.tier-card').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.tier-card').forEach(c => { c.classList.remove('active'); c.setAttribute('aria-pressed', 'false'); });
         if (this.service.filters.accountTier) {
-            document.querySelector(`.tier-card.${tier}`)?.classList.add('active');
+            const activeCard = document.querySelector(`.tier-card.${tier}`);
+            if (activeCard) { activeCard.classList.add('active'); activeCard.setAttribute('aria-pressed', 'true'); }
         }
 
         this.applyFilters();
@@ -868,6 +889,7 @@ class RepCRMController {
     toggleAtRiskFilter() {
         this.service.filters.atRisk = !this.service.filters.atRisk;
         this.elements.headerAtRisk?.classList.toggle('active', this.service.filters.atRisk);
+        this.elements.headerAtRisk?.setAttribute('aria-pressed', this.service.filters.atRisk ? 'true' : 'false');
         this.applyFilters();
     }
 
@@ -975,16 +997,21 @@ class RepCRMController {
     _renderArchiveHint() {
         const existing = document.getElementById('crmArchiveHint');
         if (existing) existing.remove();
-        if (!this.archiveYTD || !this.archiveYTD.lastArchivedDate) return;
-
         const sectionTitle = document.querySelector('.sales-breakdown-section .section-title');
         if (!sectionTitle) return;
 
-        const formatted = this._formatArchiveDate(this.archiveYTD.lastArchivedDate);
         const hint = document.createElement('div');
         hint.id = 'crmArchiveHint';
-        hint.style.cssText = 'display:flex;align-items:center;gap:6px;color:#6b7280;font-size:11px;margin:2px 0 6px;';
-        hint.innerHTML = '<i class="fas fa-database" style="font-size:10px;"></i><span>Per-rep archive through ' + this._escape(formatted) + '</span>';
+        hint.className = 'crm-archive-hint';
+        if (this.archiveFailed) {
+            // Visible fallback notice — the headline is the per-account sum, not the archive.
+            hint.classList.add('is-warning');
+            hint.innerHTML = '<i class="fas fa-triangle-exclamation" aria-hidden="true"></i><span>Per-rep archive unavailable — Total YTD is the sum of the account cards (may lag the sync).</span>';
+        } else {
+            if (!this.archiveYTD || !this.archiveYTD.lastArchivedDate) return;
+            const formatted = this._formatArchiveDate(this.archiveYTD.lastArchivedDate);
+            hint.innerHTML = '<i class="fas fa-database" aria-hidden="true"></i><span>Per-rep archive through ' + this._escape(formatted) + '</span>';
+        }
         sectionTitle.insertAdjacentElement('afterend', hint);
     }
 
@@ -1012,7 +1039,7 @@ class RepCRMController {
 
         const line = document.createElement('div');
         line.id = 'crmReconciliationLine';
-        line.style.cssText = 'color:#9ca3af;font-size:11px;margin-top:4px;text-align:right;';
+        line.className = 'crm-recon-line';
         line.textContent = message;
         salesTotal.insertAdjacentElement('afterend', line);
     }
@@ -1048,13 +1075,13 @@ class RepCRMController {
         if (this.filteredAccounts.length === 0) {
             this.elements.accountsGrid.innerHTML = '';
             if (this.elements.emptyState) {
-                this.elements.emptyState.style.display = 'block';
+                this.elements.emptyState.hidden = false;
             }
             return;
         }
 
         if (this.elements.emptyState) {
-            this.elements.emptyState.style.display = 'none';
+            this.elements.emptyState.hidden = true;
         }
 
         this.elements.accountsGrid.innerHTML = this.filteredAccounts.map(account => {
@@ -1065,7 +1092,7 @@ class RepCRMController {
             const priority = (account.Priority_Tier || 'D').toLowerCase();
 
             return `
-                <div class="account-card" data-id="${account.PK_ID}">
+                <div class="account-card" data-id="${account.PK_ID}" role="button" tabindex="0" aria-label="Open ${this.escapeHtml(account.CompanyName || 'account')}">
                     <div class="priority-bar priority-${priority}"></div>
                     <div class="account-card-content">
                         <div class="card-header">
@@ -1073,8 +1100,8 @@ class RepCRMController {
                                 <h3 class="company-name">${this.escapeHtml(account.CompanyName)}</h3>
                                 <div class="card-badges">
                                     ${tierInfo.label ? `<span class="tier-badge ${tierInfo.class}">${tierInfo.label}</span>` : ''}
-                                    ${isAtRisk ? '<span class="status-badge at-risk"><i class="fas fa-exclamation-triangle"></i> At Risk</span>' : ''}
-                                    ${isOverdue ? '<span class="status-badge overdue"><i class="fas fa-clock"></i> Overdue</span>' : ''}
+                                    ${isAtRisk ? '<span class="status-badge at-risk"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> At Risk</span>' : ''}
+                                    ${isOverdue ? '<span class="status-badge overdue"><i class="fas fa-clock" aria-hidden="true"></i> Overdue</span>' : ''}
                                     ${account.Contact_Status ? `<span class="status-badge contact-status">${this.escapeHtml(account.Contact_Status)}</span>` : ''}
                                 </div>
                             </div>
@@ -1083,19 +1110,19 @@ class RepCRMController {
                         <div class="contact-info">
                             ${account.Main_Contact_Name ? `
                                 <div class="contact-name">
-                                    <i class="fas fa-user"></i>
+                                    <i class="fas fa-user" aria-hidden="true"></i>
                                     ${this.escapeHtml(account.Main_Contact_Name)}
                                 </div>
                             ` : ''}
                             <div class="contact-links">
                                 ${account.Main_Contact_Email ? `
                                     <a href="mailto:${this.escapeHtml(account.Main_Contact_Email)}">
-                                        <i class="fas fa-envelope"></i> Email
+                                        <i class="fas fa-envelope" aria-hidden="true"></i> Email
                                     </a>
                                 ` : ''}
                                 ${account.Main_Contact_Phone ? `
                                     <a href="tel:${this.escapeHtml(account.Main_Contact_Phone)}">
-                                        <i class="fas fa-phone"></i> ${this.escapeHtml(account.Main_Contact_Phone)}
+                                        <i class="fas fa-phone" aria-hidden="true"></i> ${this.escapeHtml(account.Main_Contact_Phone)}
                                     </a>
                                 ` : ''}
                             </div>
@@ -1104,19 +1131,19 @@ class RepCRMController {
                         <div class="account-details">
                             ${account.Primary_Month ? `
                                 <div class="detail-item">
-                                    <i class="fas fa-calendar"></i>
+                                    <i class="fas fa-calendar" aria-hidden="true"></i>
                                     Best: <strong>${this.escapeHtml(account.Primary_Month)}</strong>
                                 </div>
                             ` : ''}
                             ${account.Top_Product_1 ? `
                                 <div class="detail-item">
-                                    <i class="fas fa-tshirt"></i>
+                                    <i class="fas fa-tshirt" aria-hidden="true"></i>
                                     Top: <strong>${this.escapeHtml(account.Top_Product_1)}</strong>
                                 </div>
                             ` : ''}
                             ${account.Avg_Annual_Profit ? `
                                 <div class="detail-item">
-                                    <i class="fas fa-dollar-sign"></i>
+                                    <i class="fas fa-dollar-sign" aria-hidden="true"></i>
                                     Avg: <strong>${this.formatCurrency(account.Avg_Annual_Profit)}</strong>
                                 </div>
                             ` : ''}
@@ -1127,7 +1154,7 @@ class RepCRMController {
                             ` : ''}
                             ${account.Days_Since_Last_Order ? `
                                 <div class="detail-item">
-                                    <i class="fas fa-history"></i>
+                                    <i class="fas fa-history" aria-hidden="true"></i>
                                     ${this.formatDuration(account.Days_Since_Last_Order)}
                                 </div>
                             ` : ''}
@@ -1136,7 +1163,7 @@ class RepCRMController {
                         ${account.YTD_Sales_2026 ? `
                             <div class="ytd-sales-row">
                                 <div class="ytd-sales">
-                                    <i class="fas fa-chart-line"></i>
+                                    <i class="fas fa-chart-line" aria-hidden="true"></i>
                                     2026 YTD: ${this.formatCurrency(account.YTD_Sales_2026)}
                                 </div>
                                 ${account.Order_Count_2026 ? `
@@ -1149,17 +1176,21 @@ class RepCRMController {
             `;
         }).join('');
 
-        // Add click handlers to account cards
+        // Add click + keyboard handlers to account cards
         this.elements.accountsGrid.querySelectorAll('.account-card').forEach(card => {
+            const open = () => {
+                const accountId = card.dataset.id;
+                const account = this.filteredAccounts.find(a => String(a.PK_ID) === String(accountId));
+                if (account) this.openAccountDetailModal(account);
+            };
             card.addEventListener('click', (e) => {
                 // Don't open modal if clicking on email/phone links
                 if (e.target.closest('a')) return;
-
-                const accountId = card.dataset.id;
-                const account = this.filteredAccounts.find(a => String(a.PK_ID) === String(accountId));
-                if (account) {
-                    this.openAccountDetailModal(account);
-                }
+                open();
+            });
+            card.addEventListener('keydown', (e) => {
+                if (e.target !== card) return;
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); }
             });
         });
     }
@@ -1170,7 +1201,8 @@ class RepCRMController {
     isOverdue(account) {
         if (!account.Next_Follow_Up) return false;
 
-        const followUpDate = new Date(account.Next_Follow_Up);
+        const followUpDate = RepCRMController.parseCalendarDate(account.Next_Follow_Up);
+        if (!followUpDate) return false;
         followUpDate.setHours(0, 0, 0, 0);
 
         const today = new Date();
@@ -1189,8 +1221,9 @@ class RepCRMController {
         }
 
         if (this.elements.syncStatus) {
+            this.elements.syncStatus.hidden = false;
             this.elements.syncStatus.className = 'sync-status syncing';
-            this.elements.syncStatus.innerHTML = '<i class="fas fa-sync fa-spin"></i> Syncing sales data...';
+            this.elements.syncStatus.innerHTML = '<i class="fas fa-sync fa-spin" aria-hidden="true"></i> Syncing sales data...';
         }
 
         try {
@@ -1198,7 +1231,7 @@ class RepCRMController {
 
             if (this.elements.syncStatus) {
                 this.elements.syncStatus.className = 'sync-status success';
-                this.elements.syncStatus.innerHTML = '<i class="fas fa-check"></i> Sync complete';
+                this.elements.syncStatus.innerHTML = '<i class="fas fa-check" aria-hidden="true"></i> Sync complete';
             }
 
             if (this.elements.lastSynced) {
@@ -1213,13 +1246,13 @@ class RepCRMController {
         } catch (error) {
             if (this.elements.syncStatus) {
                 this.elements.syncStatus.className = 'sync-status error';
-                this.elements.syncStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Sync failed';
+                this.elements.syncStatus.innerHTML = '<i class="fas fa-exclamation-triangle" aria-hidden="true"></i> Sync failed';
             }
             this.showError('Sales sync failed. Please try again later.');
         } finally {
             if (this.elements.syncBtn) {
                 this.elements.syncBtn.disabled = false;
-                this.elements.syncBtn.innerHTML = '<i class="fas fa-sync"></i> Sync Sales';
+                this.elements.syncBtn.innerHTML = '<i class="fas fa-sync" aria-hidden="true"></i> Sync Sales';
             }
         }
     }
@@ -1269,7 +1302,7 @@ class RepCRMController {
         } finally {
             if (btn) {
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-cloud-download-alt"></i> Sync from ShopWorks';
+                btn.innerHTML = '<i class="fas fa-cloud-download-alt" aria-hidden="true"></i> Sync from ShopWorks';
             }
         }
     }
@@ -1280,11 +1313,25 @@ class RepCRMController {
     formatDate(dateStr) {
         if (!dateStr) return '-';
         try {
-            const date = new Date(dateStr);
+            const date = RepCRMController.parseCalendarDate(dateStr);
+            if (!date) return String(dateStr);
             return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
         } catch {
             return dateStr;
         }
+    }
+
+    /**
+     * Caspio date fields arrive as "YYYY-MM-DD" or "YYYY-MM-DDT00:00:00(.000)(Z)". `new Date()` reads
+     * those as UTC midnight, which is the PREVIOUS evening in Pacific — so a follow-up due today showed
+     * "Overdue" and every date displayed a day early. Calendar-day shapes are built as LOCAL dates.
+     */
+    static parseCalendarDate(value) {
+        const s = String(value == null ? '' : value).trim();
+        if (!s) return null;
+        const m = /^(\d{4})-(\d{2})-(\d{2})(?:T00:00:00(?:\.0+)?Z?)?$/.exec(s);
+        const d = m ? new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])) : new Date(s);
+        return isNaN(d.getTime()) ? null : d;
     }
 
     /**
@@ -1307,9 +1354,10 @@ class RepCRMController {
     /**
      * Show error banner
      */
-    showError(message) {
+    showError(message, retryable) {
         if (this.elements.errorBanner && this.elements.errorMessage) {
             this.elements.errorMessage.textContent = message;
+            if (this.elements.errorRetry) this.elements.errorRetry.hidden = !retryable;
             this.elements.errorBanner.classList.add('show');
         }
     }
@@ -1324,11 +1372,10 @@ class RepCRMController {
     }
 
     /**
-     * Show success message (using alert for now, can be enhanced with toast)
+     * Show success message as a toast (was window.alert).
      */
     showSuccess(message) {
-        // Use alert for simplicity - can be replaced with a toast component later
-        alert(message);
+        this.showCelebration(message, 'calls');
     }
 
     /**
@@ -1405,17 +1452,22 @@ class RepCRMController {
             this.elements.accountDetailBody.innerHTML = this.renderAccountDetailContent(account);
         }
 
-        // Show modal
+        // Show modal — remember the opener so focus can return on close.
+        this._modalReturnFocus = document.activeElement;
         this.elements.accountDetailModalOverlay.classList.add('active');
+        if (this.elements.accountDetailModalClose) this.elements.accountDetailModalClose.focus();
     }
 
     /**
      * Close account detail modal
      */
     closeAccountDetailModal() {
-        if (this.elements.accountDetailModalOverlay) {
-            this.elements.accountDetailModalOverlay.classList.remove('active');
-        }
+        const overlay = this.elements.accountDetailModalOverlay;
+        if (!overlay || !overlay.classList.contains('active')) return;
+        overlay.classList.remove('active');
+        const back = this._modalReturnFocus;
+        this._modalReturnFocus = null;
+        if (back && document.body.contains(back) && typeof back.focus === 'function') back.focus();
     }
 
     /**
@@ -1435,11 +1487,11 @@ class RepCRMController {
         }
 
         if (isAtRisk) {
-            badges += '<span class="status-badge at-risk"><i class="fas fa-exclamation-triangle"></i> At Risk</span>';
+            badges += '<span class="status-badge at-risk"><i class="fas fa-exclamation-triangle" aria-hidden="true"></i> At Risk</span>';
         }
 
         if (isOverdue) {
-            badges += '<span class="status-badge overdue"><i class="fas fa-clock"></i> Overdue</span>';
+            badges += '<span class="status-badge overdue"><i class="fas fa-clock" aria-hidden="true"></i> Overdue</span>';
         }
 
         if (account.Trend) {
@@ -1453,7 +1505,7 @@ class RepCRMController {
             badges += `
                 <div class="health-gauge">
                     <div class="health-gauge-bar">
-                        <div class="health-gauge-fill ${healthClass}" style="width: ${healthScore}%"></div>
+                        <div class="health-gauge-fill ${healthClass}" style="--fill: ${healthScore}%"></div>
                     </div>
                     <span class="health-gauge-value ${healthClass}">${healthScore}</span>
                 </div>
@@ -1515,35 +1567,35 @@ class RepCRMController {
 
         return `
             <div class="account-detail-section">
-                <h4 class="account-detail-section-title"><i class="fas fa-user"></i> Contact Information</h4>
+                <h4 class="account-detail-section-title"><i class="fas fa-user" aria-hidden="true"></i> Contact Information</h4>
                 <div class="contact-detail-grid">
                     ${contactName ? `
                         <div class="contact-detail-item">
-                            <i class="fas fa-user"></i>
+                            <i class="fas fa-user" aria-hidden="true"></i>
                             <span>${this.escapeHtml(contactName)}</span>
                         </div>
                     ` : ''}
                     ${email ? `
                         <div class="contact-detail-item">
-                            <i class="fas fa-envelope"></i>
+                            <i class="fas fa-envelope" aria-hidden="true"></i>
                             <a href="mailto:${this.escapeHtml(email)}">${this.escapeHtml(email)}</a>
                         </div>
                     ` : ''}
                     ${phone ? `
                         <div class="contact-detail-item">
-                            <i class="fas fa-phone"></i>
+                            <i class="fas fa-phone" aria-hidden="true"></i>
                             <a href="tel:${this.escapeHtml(phone)}">${this.escapeHtml(phone)}</a>
                         </div>
                     ` : ''}
                     ${lastContact ? `
                         <div class="contact-detail-item">
-                            <i class="fas fa-calendar-check"></i>
+                            <i class="fas fa-calendar-check" aria-hidden="true"></i>
                             <span>Last Contact: ${this.formatDate(lastContact)}</span>
                         </div>
                     ` : ''}
                     ${contactStatus ? `
                         <div class="contact-detail-item">
-                            <i class="fas fa-info-circle"></i>
+                            <i class="fas fa-info-circle" aria-hidden="true"></i>
                             <span>Status: ${this.escapeHtml(contactStatus)}</span>
                         </div>
                     ` : ''}
@@ -1569,7 +1621,7 @@ class RepCRMController {
 
         return `
             <div class="account-detail-section">
-                <h4 class="account-detail-section-title"><i class="fas fa-chart-bar"></i> Financial Summary</h4>
+                <h4 class="account-detail-section-title"><i class="fas fa-chart-bar" aria-hidden="true"></i> Financial Summary</h4>
                 <div class="data-grid">
                     <div class="data-grid-item">
                         <div class="data-grid-value currency">${this.formatCurrency(totalRevenue)}</div>
@@ -1619,7 +1671,7 @@ class RepCRMController {
 
         return `
             <div class="account-detail-section">
-                <h4 class="account-detail-section-title"><i class="fas fa-chart-line"></i> Year-over-Year Comparison</h4>
+                <h4 class="account-detail-section-title"><i class="fas fa-chart-line" aria-hidden="true"></i> Year-over-Year Comparison</h4>
                 <div class="yoy-comparison">
                     <div class="yoy-card">
                         <div class="yoy-card-header">
@@ -1673,7 +1725,7 @@ class RepCRMController {
 
         return `
             <div class="account-detail-section">
-                <h4 class="account-detail-section-title"><i class="fas fa-tshirt"></i> Top Products</h4>
+                <h4 class="account-detail-section-title"><i class="fas fa-tshirt" aria-hidden="true"></i> Top Products</h4>
                 <div class="top-products-list">
                     ${products.map((product, i) => `
                         <div class="top-product-item">
@@ -1707,13 +1759,13 @@ class RepCRMController {
 
         return `
             <div class="account-detail-section">
-                <h4 class="account-detail-section-title"><i class="fas fa-tags"></i> Product Categories</h4>
+                <h4 class="account-detail-section-title"><i class="fas fa-tags" aria-hidden="true"></i> Product Categories</h4>
                 <div class="checkmark-grid">
                     ${categories.map(cat => {
                         const isActive = this.isTruthy(account[cat.key]);
                         return `
                             <div class="checkmark-item ${isActive ? 'active' : ''}">
-                                <i class="fas ${isActive ? 'fa-check' : 'fa-times'}"></i>
+                                <i class="fas ${isActive ? 'fa-check' : 'fa-times'}" aria-hidden="true"></i>
                                 <span>${cat.label}</span>
                             </div>
                         `;
@@ -1749,14 +1801,14 @@ class RepCRMController {
 
         return `
             <div class="account-detail-section">
-                <h4 class="account-detail-section-title"><i class="fas fa-clipboard-list"></i> Order Types</h4>
-                ${primaryType ? `<p style="margin: 0 0 0.75rem; color: var(--text-secondary);"><strong>Primary:</strong> ${this.escapeHtml(primaryType)}</p>` : ''}
+                <h4 class="account-detail-section-title"><i class="fas fa-clipboard-list" aria-hidden="true"></i> Order Types</h4>
+                ${primaryType ? `<p class="order-type-primary"><strong>Primary:</strong> ${this.escapeHtml(primaryType)}</p>` : ''}
                 <div class="checkmark-grid">
                     ${orderTypes.map(type => {
                         const isActive = this.isTruthy(account[type.key]);
                         return `
                             <div class="checkmark-item ${isActive ? 'active' : ''}">
-                                <i class="fas ${isActive ? 'fa-check' : 'fa-times'}"></i>
+                                <i class="fas ${isActive ? 'fa-check' : 'fa-times'}" aria-hidden="true"></i>
                                 <span>${type.label}</span>
                             </div>
                         `;
@@ -1783,7 +1835,7 @@ class RepCRMController {
 
         return `
             <div class="account-detail-section">
-                <h4 class="account-detail-section-title"><i class="fas fa-history"></i> Activity & Timing</h4>
+                <h4 class="account-detail-section-title"><i class="fas fa-history" aria-hidden="true"></i> Activity & Timing</h4>
                 <div class="data-grid">
                     ${firstOrder ? `
                         <div class="data-grid-item">
@@ -1854,7 +1906,7 @@ class RepCRMController {
 
         return `
             <div class="account-detail-section">
-                <h4 class="account-detail-section-title"><i class="fas fa-calendar-alt"></i> Monthly Activity</h4>
+                <h4 class="account-detail-section-title"><i class="fas fa-calendar-alt" aria-hidden="true"></i> Monthly Activity</h4>
                 <div class="monthly-activity-grid">
                     ${months.map(month => {
                         const isActive = this.isTruthy(account[month.key]);
@@ -1884,19 +1936,19 @@ class RepCRMController {
 
         return `
             <div class="account-detail-section">
-                <h4 class="account-detail-section-title"><i class="fas fa-sticky-note"></i> Notes & Follow-up</h4>
+                <h4 class="account-detail-section-title"><i class="fas fa-sticky-note" aria-hidden="true"></i> Notes & Follow-up</h4>
                 ${notes ? `<div class="notes-content">${this.escapeHtml(notes)}</div>` : ''}
                 ${(nextFollowUp || wonBackDate) ? `
                     <div class="follow-up-info">
                         ${nextFollowUp ? `
                             <div class="follow-up-item">
-                                <i class="fas fa-calendar"></i>
+                                <i class="fas fa-calendar" aria-hidden="true"></i>
                                 <span>Next Follow-up: ${this.formatDate(nextFollowUp)}${followUpType ? ` (${this.escapeHtml(followUpType)})` : ''}</span>
                             </div>
                         ` : ''}
                         ${wonBackDate ? `
                             <div class="follow-up-item won-back">
-                                <i class="fas fa-trophy"></i>
+                                <i class="fas fa-trophy" aria-hidden="true"></i>
                                 <span>Won Back: ${this.formatDate(wonBackDate)}</span>
                             </div>
                         ` : ''}

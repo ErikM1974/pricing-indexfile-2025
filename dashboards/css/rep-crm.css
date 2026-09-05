@@ -1993,3 +1993,37 @@ body {
         border: 1px solid #e5e7eb;
     }
 }
+
+/* ── 2026-09-05 review ────────────────────────────────────────────────────── */
+/* `hidden` must beat the display rules above (.user-welcome / .modal-overlay etc.). */
+[hidden] { display: none !important; }
+/* Tier cards are real <button>s now (keyboard + aria-pressed); reset the UA button look. */
+.tier-card { font: inherit; color: inherit; width: 100%; display: block; }
+.tier-card > span { display: block; }
+.tier-card .bonus-line { display: flex; }
+.tier-card[aria-pressed="true"] { outline: 2px solid white; outline-offset: 2px; }
+.tier-card:focus-visible, .account-card:focus-visible, .header-stat:focus-visible, .product-toggle:focus-visible,
+.clear-filters-btn:focus-visible, .modal-close:focus-visible, .btn-cancel:focus-visible, .error-banner-retry:focus-visible,
+.back-btn:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.crm-layout--single { grid-template-columns: 1fr; }
+.crm-archive-hint { display: flex; align-items: center; gap: 6px; color: #6b7280; font-size: 11px; margin: 2px 0 6px; }
+.crm-archive-hint i { font-size: 10px; }
+.crm-archive-hint.is-warning { color: #f59e0b; }
+.crm-recon-line { color: #9ca3af; font-size: 11px; margin-top: 4px; text-align: right; }
+.order-type-primary { margin: 0 0 0.75rem; color: var(--text-secondary); }
+.health-gauge-fill { width: var(--fill, 0%); }
+.error-banner-retry {
+    margin-left: auto; font: inherit; font-size: 0.8rem; font-weight: 600; color: inherit;
+    background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.35); border-radius: 6px;
+    padding: 4px 10px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+}
+.error-banner-retry:hover { background: rgba(255, 255, 255, 0.22); }
+.error-banner-retry + .error-banner-close { margin-left: 8px; }
+@media (max-width: 640px) {
+    .header-right { flex-wrap: wrap; gap: 8px; }
+    .user-welcome { display: none !important; }
+    .crm-header { padding: 0.75rem 1rem; }
+    .header-stat { padding: 0.4rem 0.75rem; }
+    .tier-breakdown-grid { grid-template-columns: 1fr 1fr; }
+    .filters-section { grid-template-columns: 1fr; }
+}

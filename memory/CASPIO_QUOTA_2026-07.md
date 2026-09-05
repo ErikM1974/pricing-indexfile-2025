@@ -106,6 +106,37 @@ absorb them. Measured 2026-08-24: 31 Jul–9 Aug ran **11,135/day**, 10–23 Aug
 I called a false escalation from weekdays alone TWICE (10 Aug, 19 Aug) and recommended work
 off the second one. 🔑 **Judge pacing on a blended ≥7-day rate, never on consecutive weekdays.**
 
+## 🔴 MEASURED 2026-09-05 — the pricing-bundle tables are ONE PAGE EACH
+
+I scoped the bundle cache-split at "~9 redundant calls per style, Embroidery_Costs is ~6
+pages". **Both were wrong.** Measured live against Caspio:
+
+| method | cold | warm | rows tiers/rules/loc/cost |
+|---|---:|---:|---|
+| EMB | 4 | 0 | 5 / 1 / 10 / 13 |
+| CAP | 4 | 0 | 5 / 1 / 4 / 5 |
+| DTG | 4 | 0 | 5 / 1 / 9 / 20 |
+| ScreenPrint | 4 | 0 | 4 / 2 / 2 / 48 |
+| DTF | 4 | 0 | 4 / 1 / 2 / 12 |
+
+**Every one of these tables is a single page.** `Embroidery_Costs` for EMB is **13 rows**, not
+the ~6,000 I inferred. Real saving is **4 calls per extra style in a method**, so ~800-1,200
+calls/day (~25-37K/period), not the 3,100-4,600/day (~100-140K) I quoted. A 3-4 point move on
+the period, not 20.
+
+🔑 **HOW I GOT IT WRONG, for the third time: I inferred page counts from a ratio of per-table
+counts in `/api/admin/metrics`.** `Embroidery_Costs` 1,653 vs `Pricing_Tiers` 261 does NOT
+mean Embroidery_Costs pages 6×; the two are fetched by different sets of callers.
+**`/api/admin/metrics` gives per-table totals ONLY. It cannot yield per-route attribution,
+per-fetch page counts, or table×method cross-tabs. Stop trying to derive them from it —
+measure the job directly (a script that counts `tracker.stats.totalCalls` around real calls
+takes two minutes and is exact).**
+
+⚠️ **Still unattributed: what drives `Embroidery_Costs` to ~1,650 calls/window.** All three
+known consumers are already cached — `catalog-display-price.js` (1 h), `decorated-cap-prices.js`
+(5 min, keyed brand+tier), and now the bundle. Do not guess at a fourth; instrument if it
+ever matters.
+
 ## ADOPTED 2026-08-06 — big table writes go through a CSV data import
 
 Erik's standing instruction after the 5 Aug spike. **Was** listed below as "shelved"; it is
