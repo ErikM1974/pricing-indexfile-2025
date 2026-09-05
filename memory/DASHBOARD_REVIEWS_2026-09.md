@@ -348,7 +348,7 @@ manual-pricing de-inlined (12 `onchange` + an Enter-key `onkeypress`) with a rea
 Caspio-injected inline scripts on the design-archive pages (not ours), the JotForm iframe width on the
 Purchasing Request form (third-party embed).
 
-## Customer Portal + login — review, 7 items (2026-09-05, `v2026.09.05.20` + `.21` clamp tweak)
+## Customer Portal + login — review, 7 items (2026-09-05, `v2026.09.05.20`–`.22`)
 
 Reviewed live via the staff mirror `/portal-admin/preview/1276` (Aaberg's Rentals) + phone pass on
 `static-dist` (the page's error states render without the API — every feed shows a red alert + Retry).
@@ -357,7 +357,9 @@ skeletons, zero-badges hidden, phone bottom nav + off-canvas menu, printable sta
 
 1. **Orders/Invoices tables overflowed even at 1500px** — `td{white-space:nowrap}` + long ShopWorks
    design names ("P1008, Aaberg's - Navy ,Black, Red, …") pushed Status/Actions off the edge. Design
-   cell now `td.cp-cell-design` (max-width 340px, ellipsis, `title` tooltip); invoice sub-line clamped too.
+   cell now `td.cp-cell-design` with the `max-width:0; width:34%` auto-layout trick (absorbs the leftover width,
+   ellipsis, `title` tooltip); invoice sub-line clamped too. 🔑 A px/vw clamp could not know the CARD width —
+   the portal column is centered inside a 2000px window, so `20vw` still overflowed by 16px.
 2. 🔴 **Reward ledger leaked the internal cost bands** ("… (12-mo program · band 40+, 20-39.99)") on the
    Account tab and in the redeem modal. Server `portalCustomerReason()` strips any parenthetical naming
    band / program / RWD- / already before `/api/portal/rewards` (and the preview mirror) return it. Rule
