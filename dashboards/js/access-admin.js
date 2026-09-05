@@ -39,7 +39,7 @@
         var email = esc(row.Email);
         return '<tr data-email="' + email + '">' +
           '<td>' + email + '</td>' +
-          '<td><select class="aa-role-sel">' + roleSelect((row.Role || '').toLowerCase()) + '</select></td>' +
+          '<td><select class="aa-role-sel" aria-label="Role">' + roleSelect((row.Role || '').toLowerCase()) + '</select></td>' +
           '<td class="aa-actions"><button type="button" class="aa-btn aa-save-role">Save</button> ' +
           '<button type="button" class="aa-btn aa-ghost aa-del-role">Remove</button></td></tr>';
       }).join('');

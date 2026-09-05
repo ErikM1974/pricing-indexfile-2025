@@ -130,3 +130,18 @@
     .vq-cq-head { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .vq-cq-table th, .vq-cq-table tfoot td { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 }
+
+/* Phone (≤640px) — 2026-09-05 staff-dashboard sweep: the page measured wider than the
+   viewport at 375px and panned sideways. */
+@media (max-width: 640px) {
+    /* .vq-table already sits in .vq-table-wrap; the customer-quote table did not. */
+    .vq-cq-table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+}
+
+@media (max-width: 640px) {
+    /* Line rows are a 6-column grid sized for a desk; on a phone let the cells wrap. */
+    .vq-lines-head { display: none; }
+    .vq-line { display: flex; flex-wrap: wrap; gap: .4rem .6rem; }
+    .vq-line > * { min-width: 0; }
+    .vq-line-info { flex: 1 1 100%; }
+}

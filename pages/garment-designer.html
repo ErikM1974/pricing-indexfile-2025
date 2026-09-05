@@ -105,7 +105,7 @@
         <button class="tbtn" id="eraseBtn" onclick="toggleEraser()">🧽 Erase white</button>
         <button class="tbtn" id="eraseAllBtn" onclick="eraseAllWhite()" style="display:none">Erase ALL white</button>
         <span class="bgswatches" id="bgSwatches"><span class="lbl">BG:</span></span>
-        <input type="color" id="bgCustom" value="#3a6ea5">
+        <input type="color" id="bgCustom" aria-label="Custom background color" value="#3a6ea5">
         <button class="tbtn" id="eyeBtn" onclick="toggleEyedrop()">💧</button>
         <span id="eyeChip"><span class="dot" id="eyeDot"></span><span id="eyeHex"></span></span>
         <button class="tbtn" id="mockBtn" onclick="toggleMockup()">👕 Mockup</button>
@@ -229,16 +229,16 @@
           </div>
           <div class="ctrl-row">
             <div class="ctrl-head"><label for="pcWidthRange">Print width</label><span id="pcWidthLabel">12 in</span></div>
-            <div class="ctrl-inline"><input type="range" id="pcWidthRange" min="0.5" max="60" step="0.5"><input type="number" id="pcWidthNumber" min="0.5" max="60" step="0.5"></div>
+            <div class="ctrl-inline"><input type="range" id="pcWidthRange" min="0.5" max="60" step="0.5"><input type="number" id="pcWidthNumber" aria-label="Print width" min="0.5" max="60" step="0.5"></div>
           </div>
           <div class="two-col">
             <div class="ctrl-row">
               <div class="ctrl-head"><label for="pcXRange">Left / right</label><span id="pcXLabel">0</span></div>
-              <div class="ctrl-inline"><input type="range" id="pcXRange" min="-220" max="220" step="1"><input type="number" id="pcXNumber" min="-220" max="220" step="1"></div>
+              <div class="ctrl-inline"><input type="range" id="pcXRange" min="-220" max="220" step="1"><input type="number" id="pcXNumber" aria-label="Print X position" min="-220" max="220" step="1"></div>
             </div>
             <div class="ctrl-row">
               <div class="ctrl-head"><label for="pcYRange">Up / down</label><span id="pcYLabel">0</span></div>
-              <div class="ctrl-inline"><input type="range" id="pcYRange" min="-220" max="220" step="1"><input type="number" id="pcYNumber" min="-220" max="220" step="1"></div>
+              <div class="ctrl-inline"><input type="range" id="pcYRange" min="-220" max="220" step="1"><input type="number" id="pcYNumber" aria-label="Print Y position" min="-220" max="220" step="1"></div>
             </div>
           </div>
           <div class="nudge-grid">
@@ -419,8 +419,8 @@
   <div class="tp-foot"><button type="button" class="tp-del" id="tpDelete">Delete</button><button type="button" class="tp-done" id="tpDone">Done</button></div>
 </div>
 
-<input type="file" id="fileInput" multiple accept=".ai,.psd,.psb,.pdf,.eps,.cdr,.dst,image/*" style="display:none;">
-<input type="file" id="photoInput" accept="image/*" multiple style="display:none;">
+<input type="file" id="fileInput" aria-label="Artwork file" multiple accept=".ai,.psd,.psb,.pdf,.eps,.cdr,.dst,image/*" style="display:none;">
+<input type="file" id="photoInput" aria-label="Photo file" accept="image/*" multiple style="display:none;">
 
 <script src="/config/app.config.js"></script>
 <!-- Send-to-Customer email + Send-to-Steve art form (mirrors the AE dashboard mount) -->

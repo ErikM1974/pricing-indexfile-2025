@@ -102,7 +102,7 @@ class NamesNumbersDashboard {
                 <td>${modified}</td>
                 <td class="actions" onclick="event.stopPropagation();">
                     <a href="/pages/names-numbers.html?load=${r.ID_Roster}" class="btn-secondary btn-sm"><i class="fas fa-edit"></i></a>
-                    <button class="btn-danger btn-sm" onclick="dashboard.deleteRoster(${r.ID_Roster}, '${this.esc(r.RosterName || '')}')"><i class="fas fa-trash"></i></button>
+                    <button class="btn-danger btn-sm" aria-label="Delete roster" onclick="dashboard.deleteRoster(${r.ID_Roster}, '${this.esc(r.RosterName || '')}')"><i class="fas fa-trash"></i></button>
                 </td>
             </tr>`;
         }).join('');

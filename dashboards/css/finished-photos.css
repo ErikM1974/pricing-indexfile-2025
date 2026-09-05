@@ -360,3 +360,7 @@ body {
     .fpp-title, .fpp-scan { color: #000; }
     @page { margin: 0.5in; }
 }
+
+/* Back to the staff dashboard (2026-09-05 sweep — the page had no way out). */
+.fp-back { margin-left: auto; color: #fff; text-decoration: none; font-size: 13px; font-weight: 600; opacity: .9; white-space: nowrap; padding: 6px 10px; border: 1px solid rgba(255,255,255,.35); border-radius: 6px; }
+.fp-back:hover { opacity: 1; background: rgba(255,255,255,.12); }

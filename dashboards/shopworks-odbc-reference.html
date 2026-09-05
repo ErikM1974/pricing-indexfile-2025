@@ -154,7 +154,7 @@ Invoke-Command -ComputerName bandit -Credential $cred -ScriptBlock { hostname } 
                 <div class="swo-fieldhead">
                     <h2 class="swo-h swo-h--flush">Field catalog <span class="swo-tag">live schema · pulled 2026-07-16</span></h2>
                     <label class="swo-toggle"><input type="checkbox" id="swoStoredOnly"> stored fields only <span class="swo-toggle-hint">(hide calc/global/summary)</span></label>
-                    <input type="search" id="swoFilter" class="swo-filter" placeholder="Filter 2,630 fields… (e.g. DropDead, Credit, ShipMethod)" autocomplete="off">
+                    <input type="search" id="swoFilter" aria-label="Filter tables and fields" class="swo-filter" placeholder="Filter 2,630 fields… (e.g. DropDead, Credit, ShipMethod)" autocomplete="off">
                 </div>
                 <p class="swo-count" id="swoCount">Loading schema…</p>
                 <div id="swoTables"><div class="swo-empty"><i class="fas fa-spinner fa-spin"></i> Loading field catalog…</div></div>

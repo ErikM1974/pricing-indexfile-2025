@@ -1069,3 +1069,17 @@ body {
     .page-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
     .import-toolbar { flex-direction: column; }
 }
+
+/* Phone (≤640px) — 2026-09-05 staff-dashboard sweep: the page measured wider than the
+   viewport at 375px and panned sideways. */
+@media (max-width: 640px) {
+    .header-right { flex-wrap: wrap; row-gap: 6px; }
+}
+
+@media (max-width: 640px) {
+    .page-header { flex-wrap: wrap; row-gap: .5rem; }
+}
+
+@media (max-width: 640px) {
+    .header-container { flex-wrap: wrap; row-gap: .5rem; }
+}

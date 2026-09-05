@@ -609,7 +609,7 @@
                 </div>
                 <div id="box-picker-error" class="box-picker-error" style="display:none;"></div>
                 <div id="box-paste-fallback" class="box-paste-fallback" style="display:none;">
-                    <input type="url" id="box-paste-url" class="box-paste-input" placeholder="Paste mockup URL...">
+                    <input type="url" id="box-paste-url" aria-label="Box link URL" class="box-paste-input" placeholder="Paste mockup URL...">
                 </div>
             </div>
             <div id="approval-prev-section" style="display:none;">
@@ -618,7 +618,7 @@
                 <div id="approval-no-files" class="approval-no-files" style="display:none;">No mockups sent yet.</div>
             </div>
             <div class="approval-section-label">Message to Sales Rep:</div>
-            <textarea id="approval-message" rows="3" placeholder="Optional: describe what changed or any notes for the rep..."></textarea>
+            <textarea id="approval-message" aria-label="Approval message" rows="3" placeholder="Optional: describe what changed or any notes for the rep..."></textarea>
             <div class="approval-time-section">
                 <div class="approval-section-label">Art Time</div>
                 <div id="approval-prev-time" class="approval-prev-time"></div>
@@ -626,7 +626,7 @@
                     <label>This session:</label>
                     <div class="stepper-row stepper-row--inline">
                         <button type="button" id="approval-minus" class="stepper-btn">-</button>
-                        <input type="number" id="approval-minutes" value="15" min="0" step="15" class="stepper-input stepper-input--sm">
+                        <input type="number" id="approval-minutes" aria-label="Minutes to bill" value="15" min="0" step="15" class="stepper-input stepper-input--sm">
                         <button type="button" id="approval-plus" class="stepper-btn">+</button>
                     </div>
                     <span id="approval-cost" class="approval-cost">= $18.75</span>

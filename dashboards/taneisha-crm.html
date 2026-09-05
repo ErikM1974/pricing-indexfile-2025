@@ -56,7 +56,7 @@
             <div class="error-banner" id="error-banner">
                 <i class="fas fa-exclamation-circle"></i>
                 <span class="error-banner-message" id="error-message"></span>
-                <button class="error-banner-close" onclick="window.crmController.hideError()">
+                <button class="error-banner-close" aria-label="Dismiss error" onclick="window.crmController.hideError()">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
@@ -113,11 +113,11 @@
                     <div class="filters-section">
                         <div class="filter-group search-group">
                             <label>Search</label>
-                            <input type="text" id="filter-search" placeholder="Search company name...">
+                            <input type="text" id="filter-search" aria-label="Search accounts" placeholder="Search company name...">
                         </div>
                         <div class="filter-group">
                             <label>Account Tier</label>
-                            <select id="filter-tier">
+                            <select id="filter-tier" aria-label="Tier">
                                 <option value="">All Tiers</option>
                                 <option value="GOLD '26-TANEISHA">Gold</option>
                                 <option value="SILVER '26-TANEISHA">Silver</option>
@@ -127,7 +127,7 @@
                         </div>
                         <div class="filter-group">
                             <label>Priority</label>
-                            <select id="filter-priority">
+                            <select id="filter-priority" aria-label="Priority">
                                 <option value="">All Priorities</option>
                                 <option value="A">A - Highest</option>
                                 <option value="B">B - High</option>
@@ -138,7 +138,7 @@
                         </div>
                         <div class="filter-group">
                             <label>Best Month</label>
-                            <select id="filter-month">
+                            <select id="filter-month" aria-label="Month">
                                 <option value="">All Months</option>
                                 <option value="jan">January</option>
                                 <option value="feb">February</option>
@@ -156,7 +156,7 @@
                         </div>
                         <div class="filter-group">
                             <label>Trend</label>
-                            <select id="filter-trend">
+                            <select id="filter-trend" aria-label="Trend">
                                 <option value="">All Trends</option>
                                 <option value="Active 2025">Active 2025</option>
                                 <option value="Growing">Growing</option>
@@ -217,7 +217,7 @@
                         <h2 id="account-detail-company"></h2>
                         <div class="account-detail-badges" id="account-detail-badges"></div>
                     </div>
-                    <button class="modal-close" id="account-detail-modal-close">
+                    <button class="modal-close" aria-label="Close" id="account-detail-modal-close">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>

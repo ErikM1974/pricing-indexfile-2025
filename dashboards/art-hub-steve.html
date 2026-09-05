@@ -139,14 +139,14 @@
         </div>
         <div class="notes-panel-form">
             <h4 class="notes-panel-form-title">Add Note</h4>
-            <select id="note-type-select">
+            <select id="note-type-select" aria-label="Note type">
                 <option value="">-- select type --</option>
                 <option value="Status Update">Status Update</option>
                 <option value="Design Update">Design Update</option>
                 <option value="Customer Feedback">Customer Feedback</option>
                 <option value="Internal Note">Internal Note</option>
             </select>
-            <textarea id="note-text" rows="3" placeholder="Write a note..."></textarea>
+            <textarea id="note-text" aria-label="Note text" rows="3" placeholder="Write a note..."></textarea>
             <label class="notes-notify-label">
                 <input type="checkbox" id="note-notify-checkbox" checked>
                 Notify the other party (email + Slack)
@@ -197,7 +197,7 @@
                 <div id="box-picker-error" class="box-picker-error" style="display:none;"></div>
                 <!-- Paste URL fallback -->
                 <div id="box-paste-fallback" class="box-paste-fallback" style="display:none;">
-                    <input type="url" id="box-paste-url" class="box-paste-input" placeholder="Paste mockup URL...">
+                    <input type="url" id="box-paste-url" aria-label="Box link URL" class="box-paste-input" placeholder="Paste mockup URL...">
                 </div>
             </div>
             <!-- Previously Sent Files (from Caspio) -->
@@ -206,7 +206,7 @@
                 <div id="approval-files" class="approval-files-grid approval-files-grid--small"></div>
             </div>
             <div class="approval-section-label">Message to Sales Rep:</div>
-            <textarea id="approval-message" rows="3" placeholder="Optional: describe what changed or any notes for the rep..."></textarea>
+            <textarea id="approval-message" aria-label="Approval message" rows="3" placeholder="Optional: describe what changed or any notes for the rep..."></textarea>
             <div class="approval-time-section">
                 <div class="approval-section-label">Art Time</div>
                 <div id="approval-prev-time" class="approval-prev-time"></div>
@@ -214,7 +214,7 @@
                     <label>This session:</label>
                     <div class="stepper-row stepper-row--inline">
                         <button type="button" id="approval-minus" class="stepper-btn">-</button>
-                        <input type="number" id="approval-minutes" value="15" min="0" step="15" class="stepper-input stepper-input--sm">
+                        <input type="number" id="approval-minutes" aria-label="Minutes to bill" value="15" min="0" step="15" class="stepper-input stepper-input--sm">
                         <button type="button" id="approval-plus" class="stepper-btn">+</button>
                     </div>
                     <span id="approval-cost" class="approval-cost">= $18.75</span>

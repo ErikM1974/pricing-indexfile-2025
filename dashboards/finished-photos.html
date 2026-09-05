@@ -26,6 +26,7 @@
             <h1>Finished Photos</h1>
             <p>Snap the finished piece &rarr; publish it to the customer&rsquo;s portal</p>
         </div>
+        <a class="fp-back" href="/staff-dashboard.html" title="Back to the staff dashboard"><i class="fas fa-arrow-left" aria-hidden="true"></i> Dashboard</a>
     </header>
 
     <main class="fp-main">
@@ -58,7 +59,7 @@
                 <!-- Type the order number -->
                 <div class="fp-pane" id="fp-pane-order" hidden>
                     <div class="fp-orderrow">
-                        <input type="text" id="fp-order-input" class="fp-input" inputmode="numeric" autocomplete="off"
+                        <input type="text" id="fp-order-input" aria-label="Order number" class="fp-input" inputmode="numeric" autocomplete="off"
                                enterkeyhint="search" placeholder="Order # — e.g. 142476">
                         <button type="button" class="fp-btn fp-btn-primary fp-btn-inline" id="fp-order-find">Find</button>
                     </div>
@@ -67,7 +68,7 @@
 
                 <!-- Search company name -->
                 <div class="fp-pane" id="fp-pane-search" hidden>
-                    <input type="search" id="fp-cust-search" class="fp-input" placeholder="Search company name&hellip;" autocomplete="off" autocapitalize="none">
+                    <input type="search" id="fp-cust-search" aria-label="Customer search" class="fp-input" placeholder="Search company name&hellip;" autocomplete="off" autocapitalize="none">
                     <div class="fp-results" id="fp-cust-results" hidden></div>
                 </div>
 
@@ -126,7 +127,7 @@
                 <button type="button" class="fp-cchip" data-cap="Sleeve">Sleeve</button>
                 <button type="button" class="fp-cchip" data-cap="Cap">Cap</button>
             </div>
-            <input type="text" id="fp-caption" class="fp-input" placeholder="Optional caption (e.g. 'Left chest on navy polo')" maxlength="200">
+            <input type="text" id="fp-caption" aria-label="Photo caption" class="fp-input" placeholder="Optional caption (e.g. 'Left chest on navy polo')" maxlength="200">
             <button type="button" class="fp-btn fp-btn-primary" id="fp-upload-btn" disabled>Upload photo</button>
             <div class="fp-status" id="fp-status" role="status" aria-live="polite"></div>
         </section>

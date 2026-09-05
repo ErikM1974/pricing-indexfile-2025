@@ -486,3 +486,9 @@
    Leads tile on the staff dashboard and this header are the same color. Only the
    dash-shell theme hooks — nothing else redefined. */
 :root { --dash-theme: #1a2332; --dash-theme-dark: #141c27; --dash-theme-bg: #eef1f5; }
+
+/* Phone (≤640px) — 2026-09-05 staff-dashboard sweep: the page measured wider than the
+   viewport at 375px and panned sideways. */
+@media (max-width: 640px) {
+    .dash-header-right { flex-wrap: wrap; justify-content: flex-end; row-gap: 6px; }
+}

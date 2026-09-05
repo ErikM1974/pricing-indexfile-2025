@@ -115,7 +115,7 @@
     function decideCell(r) {
         var cur = rv(r.n).dec || '';
         var opts = DECISIONS.map(function (d) { return '<option value="' + d + '"' + (d === cur ? ' selected' : '') + '>' + (d || '—') + '</option>'; }).join('');
-        return '<select class="tua-decide d-' + esc(cur) + '" data-n="' + esc(r.n) + '">' + opts + '</select>';
+        return '<select aria-label="Decision" class="tua-decide d-' + esc(cur) + '" data-n="' + esc(r.n) + '">' + opts + '</select>';
     }
 
     function render() {
@@ -136,7 +136,7 @@
         var body = rows.map(function (r) {
             var st = rv(r.n);
             return '<tr class="' + (st.rev ? 'is-reviewed' : '') + '" data-n="' + esc(r.n) + '">' +
-                '<td><input type="checkbox" class="tua-rev" data-n="' + esc(r.n) + '"' + (st.rev ? ' checked' : '') + '></td>' +
+                '<td><input type="checkbox" class="tua-rev" aria-label="Reviewed" data-n="' + esc(r.n) + '"' + (st.rev ? ' checked' : '') + '></td>' +
                 '<td>' + tierBadge(r) + '</td>' +
                 '<td class="tua-name">' + esc(r.n) + (r._new ? ' <span class="tua-flag flex">new</span>' : '') + '</td>' +
                 '<td>' + fieldCell(r) + '</td>' +
@@ -145,7 +145,7 @@
                 '<td>' + sigChips(r) + '</td>' +
                 '<td>' + flagChips(r) + '</td>' +
                 '<td>' + decideCell(r) + '</td>' +
-                '<td><input type="text" class="tua-note" data-n="' + esc(r.n) + '" value="' + esc(st.note || '') + '" placeholder="…"></td>' +
+                '<td><input type="text" class="tua-note" aria-label="Note" data-n="' + esc(r.n) + '" value="' + esc(st.note || '') + '" placeholder="…"></td>' +
                 (refreshed ? '<td>' + liveCell(r) + '</td>' : '') +
                 '</tr>';
         }).join('');

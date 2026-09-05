@@ -835,3 +835,16 @@ body {
 .bl-split-row label { font-weight: 700; min-width: 48px; }
 .bl-split-row input[type="number"] { width: 80px; padding: 6px 8px; font-size: 16px; border: 2px solid #cbd5e1; border-radius: 6px; }
 .bl-split-row select { padding: 6px 8px; font-size: 15px; border: 2px solid #cbd5e1; border-radius: 6px; }
+
+/* Phone (≤640px) — 2026-09-05 staff-dashboard sweep: the page measured wider than the
+   viewport at 375px and panned sideways. */
+@media (max-width: 640px) {
+    .bl-header, .bl-header__right { flex-wrap: wrap; row-gap: 8px; }
+    .bl-header__search { width: 100%; }
+    #searchInput { min-width: 0; width: 100%; }
+    #printAllBtn { white-space: normal; }
+    .bl-back { color: inherit; text-decoration: none; font-weight: 600; font-size: 13px; }
+}
+
+.bl-back { color: inherit; text-decoration: none; font-weight: 600; font-size: 13px; opacity: .85; margin-right: 8px; }
+.bl-back:hover { opacity: 1; text-decoration: underline; }

@@ -1380,7 +1380,7 @@ body {
     }
     .print-logo { width: 100px; height: auto; }
     .print-title-block { flex: 1; }
-    .print-title-block h1 { font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 700; color: #333; margin: 0 0 2px 0; }
+    .print-title-block h1, .print-title-block .print-company { font-family: 'Poppins', sans-serif; font-size: 18px; font-weight: 700; color: #333; margin: 0 0 2px 0; }
     .print-title-block h2 { font-family: 'Poppins', sans-serif; font-size: 14px; font-weight: 600; color: #4cb354; margin: 0 0 6px 0; }
     .print-title-block p  { font-size: 11px; color: #666; margin: 0; line-height: 1.4; }
 

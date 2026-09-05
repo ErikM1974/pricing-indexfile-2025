@@ -1205,3 +1205,10 @@ table.price tfoot td:first-child {
     .ai-chat-panel { width: 100vw; max-width: 100vw; }
     .ai-chat-panel.is-open::before { right: 0; }
 }
+
+/* Phone (≤640px) — 2026-09-05 staff-dashboard sweep: the page measured wider than the
+   viewport at 375px and panned sideways. */
+@media (max-width: 640px) {
+    .contact { grid-template-columns: minmax(0, 1fr); }
+    table.price { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+}

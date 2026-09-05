@@ -261,6 +261,7 @@
         const input = document.createElement('input');
         input.type = 'text';
         input.id = 'ruth-search-input';
+        input.setAttribute('aria-label', 'Search mockups');
         input.placeholder = 'Search company, design #, rep, or ID...';
         input.style.cssText = 'padding:6px 10px;border:1px solid #d1d5db;border-radius:6px;font-size:13px;font-family:inherit;color:#1e293b;width:260px;';
 

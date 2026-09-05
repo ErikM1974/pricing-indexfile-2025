@@ -175,7 +175,8 @@
             position: relative;
         }
 
-        .content h1 {
+        .content h1,
+        .content h2.chapter-title {
             color: var(--primary-color);
             font-size: 2.5rem;
             margin-bottom: 1rem;
@@ -414,7 +415,8 @@
                 margin-bottom: 2rem;
             }
 
-            .content h1 {
+            .content h1,
+        .content h2.chapter-title {
                 font-size: 2rem;
             }
         }
@@ -497,3 +499,9 @@
             transform: translateX(5px);
             box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
+
+/* Phone (≤640px) — 2026-09-05 staff-dashboard sweep: the page measured wider than the
+   viewport at 375px and panned sideways. */
+@media (max-width: 640px) {
+    .breadcrumb { flex-wrap: wrap; }
+}

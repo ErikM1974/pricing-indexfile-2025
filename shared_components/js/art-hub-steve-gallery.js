@@ -931,7 +931,7 @@
 
         host.innerHTML =
             '<div class="sg-toolbar">' +
-                '<input type="search" id="steve-gallery-search" placeholder="Search company, design #, rep, or ID..." autocomplete="off">' +
+                '<input type="search" id="steve-gallery-search" aria-label="Search gallery" placeholder="Search company, design #, rep, or ID..." autocomplete="off">' +
                 '<button type="button" id="steve-gallery-select" class="sg-btn" title="Select multiple cards for a bulk action">Select</button>' +
                 '<button type="button" id="steve-gallery-archive" class="sg-btn">Show Archive</button>' +
                 '<span id="steve-gallery-count" class="sg-count"></span>' +

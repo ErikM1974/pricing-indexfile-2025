@@ -327,3 +327,9 @@
 /* Page theme (2026-09-03, dashboard Workspaces): the customer family's navy, matching
    Leads, My Accounts and Customer Portals. Only the dash-shell theme hooks. */
 :root { --dash-theme: #1a2332; --dash-theme-dark: #141c27; --dash-theme-bg: #eef1f5; }
+
+/* Phone (≤640px) — 2026-09-05 staff-dashboard sweep: the page measured wider than the
+   viewport at 375px and panned sideways. */
+@media (max-width: 640px) {
+    #cpa-filter, .cpa-search-wrap input { width: 100%; max-width: 100%; box-sizing: border-box; }
+}
