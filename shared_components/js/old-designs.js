@@ -434,9 +434,9 @@
         });
 
         if (chips.length === 0) {
-            stickyBar.innerHTML = '<div class="sticky-content"><span class="sticky-label">Showing all designs</span><button class="sticky-edit-btn" onclick="document.querySelector(\'.caspio-container\').scrollIntoView({behavior:\'smooth\'})">Edit Search</button></div>';
+            stickyBar.innerHTML = '<div class="sticky-content"><span class="sticky-label">Showing all designs</span><button class="sticky-edit-btn" data-call="scrollToCaspioSearch">Edit Search</button></div>';
         } else {
-            stickyBar.innerHTML = '<div class="sticky-content"><span class="sticky-label">Filtered by:</span>' + chips.join('') + '<button class="sticky-edit-btn" onclick="document.querySelector(\'.caspio-container\').scrollIntoView({behavior:\'smooth\'})">Edit Search</button></div>';
+            stickyBar.innerHTML = '<div class="sticky-content"><span class="sticky-label">Filtered by:</span>' + chips.join('') + '<button class="sticky-edit-btn" data-call="scrollToCaspioSearch">Edit Search</button></div>';
         }
     }
 
@@ -471,3 +471,6 @@
     setTimeout(function() { restructureForm(); cleanupResults(); setupStickyBar(); }, 500);
     setTimeout(function() { restructureForm(); cleanupResults(); setupStickyBar(); }, 2000);
 })();
+
+// data-call target (was inline onclick — Rule 3): scroll back to the Caspio search form.
+window.scrollToCaspioSearch = function () { const c = document.querySelector('.caspio-container'); if (c) c.scrollIntoView({ behavior: 'smooth' }); };

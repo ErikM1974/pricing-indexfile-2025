@@ -68,9 +68,9 @@
         var page = esc(row.Page);
         return '<tr data-page="' + page + '">' +
           '<td class="aa-page">' + page + '</td>' +
-          '<td><input class="aa-roles-in" type="text" value="' + esc(row.Allowed_Roles) + '" placeholder="admin,accountant"></td>' +
-          '<td><input class="aa-emails-in" type="text" value="' + esc(row.Allowed_Emails) + '" placeholder="bradley@…"></td>' +
-          '<td><input class="aa-desc-in" type="text" value="' + esc(row.Description) + '" placeholder="note"></td>' +
+          '<td><input class="aa-roles-in" type="text" aria-label="Allowed roles" value="' + esc(row.Allowed_Roles) + '" placeholder="admin,accountant"></td>' +
+          '<td><input class="aa-emails-in" type="text" aria-label="Allowed emails" value="' + esc(row.Allowed_Emails) + '" placeholder="bradley@…"></td>' +
+          '<td><input class="aa-desc-in" type="text" aria-label="Description" value="' + esc(row.Description) + '" placeholder="note"></td>' +
           '<td class="aa-actions"><button type="button" class="aa-btn aa-save-page">Save</button> ' +
           '<button type="button" class="aa-btn aa-ghost aa-del-page">Remove</button></td></tr>';
       }).join('');
