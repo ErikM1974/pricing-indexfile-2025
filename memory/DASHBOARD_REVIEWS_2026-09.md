@@ -377,3 +377,32 @@ skeletons, zero-badges hidden, phone bottom nav + off-canvas menu, printable sta
 
 Left alone on purpose: `$0.00` zero-total orders (real ShopWorks records), the raw sign-in email in the
 Quotes empty state (it explains WHY nothing shows), the JotForm-style statement header wrap.
+
+## Customer product (re-order) page — review, 9 items (2026-09-05, `v2026.09.05.23`)
+
+`/portal/product/:style` (`pages/customer-product.html` + `customer-product.js`; shares `customer-portal.css`
+and the `portal-reorder-list.js` drawer). Reviewed live via `/portal-admin/preview/1276/product/PC54`;
+phone pass on `static-dist` (error state only — the page needs the API for the full render). Already
+strong: no onclick, every input labelled, swatches/upgrade table fit, 0 console errors. Shipped:
+
+1. **Header logo + favicon were a dead Box shared-static PNG** (the portal had already moved to the
+   Caspio CDN logo) — now the site logo + `/favicon.png`; alt is the company name.
+2. **Two h1s / wrong h1** — the header said "Your Account" in an `<h1>` and the product name was a div.
+   Header brand is now a div ("Northwest Custom Apparel / Customer portal", same as the portal) and
+   `.pp-title` is the page's `<h1>`.
+3. **`document.title` was static** — now `STYLE · Product name | Northwest Custom Apparel`
+   ("Product unavailable | …" on error).
+4. **Rule 3** — 8 template `onerror=` handlers + the reorder drawer's `style="display:none"` /
+   `.style.display` toggles → `data-onerror="hide|hide-parent|hide-thumb|noimg|remove"` + ONE
+   capture-phase `error` listener; loading/error/content/thumbs/fab/drawer all toggle with `hidden`.
+   🔑 `.rl-fab` had NO `display` in CSS (it came from the inline `inline-flex`) — added, or `hidden=false` shows nothing.
+5. **Failed load offers Retry** (calls `load()` again); "No product specified" stays retry-less.
+6. **Header back link** ("← Back to your account", "← Account" under 560px) so the phone user is not
+   scrolling to the body link. Header at 375px: 135px → 60px tall, link no longer clips off the edge.
+7. **Availability dots** carry `role=img aria-label` matching the tooltip.
+8. Reorder drawer shared fix also lands on the portal page (same `portal-reorder-list.js`).
+9. Lock: `tests/unit/customer-product-page.test.js`.
+
+Left alone: swatch grid "blank boxes" on first paint are lazy-load timing (82 unique colours, every
+image resolves); the size matrix legitimately scrolls inside its own wrapper on phones.
+

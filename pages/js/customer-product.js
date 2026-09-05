@@ -20,8 +20,24 @@
     var SIZE_ORDER = ['S', 'M', 'L', 'XL', '2XL', '3XL'];
     var state = { data: null, color: '', catalogColor: '', colorInfo: {}, orderedByColor: {}, gallery: { images: [], idx: 0 }, method: '', minBlocked: false };
 
-    var backEl = document.getElementById('pp-back');
-    if (backEl) backEl.setAttribute('href', BACK);
+    ['pp-back', 'pp-back-top'].forEach(function (id) { var el = document.getElementById(id); if (el) el.setAttribute('href', BACK); });
+    // Image fallbacks (was inline onerror= — Rule 3). `error` doesn't bubble → capture phase.
+    document.addEventListener('error', function (e) {
+        var img = e.target;
+        if (!img || img.tagName !== 'IMG' || !img.dataset || !img.dataset.onerror) return;
+        var mode = img.dataset.onerror, parent = img.parentElement;
+        if (mode === 'hide') { img.hidden = true; }
+        else if (mode === 'hide-parent') { if (parent) parent.hidden = true; }
+        else if (mode === 'hide-thumb') { var b = img.closest('.pp-thumb'); if (b) b.hidden = true; }
+        else if (mode === 'noimg') { if (parent) parent.classList.add('pp-noimg'); img.remove(); }
+        else { img.remove(); }
+    }, true);
+    var retryBtn = document.getElementById('pp-error-retry');
+    if (retryBtn) retryBtn.addEventListener('click', function () {
+        document.getElementById('pp-error').hidden = true;
+        document.getElementById('pp-loading').hidden = false;
+        load();
+    });
     if (PREVIEW) showPreviewRibbon();
     load();
 
@@ -33,14 +49,16 @@
                 return r.ok ? r.json() : r.json().then(function (j) { throw new Error((j && j.error) || 'load'); });
             })
             .then(render)
-            .catch(function (e) { if (e.message !== 'auth') showError('We couldn’t load this product. It may not be on file &mdash; call us at (253) 922-5793.'); });
+            .catch(function (e) { if (e.message !== 'auth') showError('We couldn’t load this product. It may not be on file &mdash; call us at (253) 922-5793.', true); });
     }
 
-    function showError(msg) {
-        document.getElementById('pp-loading').style.display = 'none';
+    function showError(msg, retryable) {
+        document.getElementById('pp-loading').hidden = true;
         var box = document.getElementById('pp-error');
         document.getElementById('pp-error-message').innerHTML = msg;
-        box.style.display = 'block';
+        var rb = document.getElementById('pp-error-retry'); if (rb) rb.hidden = !retryable;
+        box.hidden = false;
+        document.title = 'Product unavailable | Northwest Custom Apparel';
     }
 
     function render(d) {
@@ -56,7 +74,7 @@
         var p = d.product;
         var h = '';
         h += '<div class="pp-head">'
-            + '<div class="pp-title">' + esc(p.title) + '</div>'
+            + '<h1 class="pp-title">' + esc(p.title) + '</h1>'
             + '<div class="pp-sub">' + esc([p.brand, p.category, 'Style ' + p.style].filter(Boolean).join(' · ')) + '</div>';
         if (Number(d.ordered.styleTotalQty) > 0) {
             h += '<div class="pp-total">You’ve ordered ' + Number(d.ordered.styleTotalQty).toLocaleString() + ' of this style'
@@ -100,8 +118,9 @@
         }
 
         document.getElementById('pp-body').innerHTML = h;
-        document.getElementById('pp-loading').style.display = 'none';
-        document.getElementById('pp-content').style.display = 'block';
+        document.getElementById('pp-loading').hidden = true;
+        document.getElementById('pp-content').hidden = false;
+        document.title = esc(p.style) + ' · ' + esc(p.title) + ' | Northwest Custom Apparel';
 
         renderSwatches();
         selectColor(state.color);
@@ -118,7 +137,7 @@
         var body = colors.map(function (c) {
             var cells = SIZE_ORDER.map(function (s) { var v = c.sizes[s] || 0; return '<td>' + (v > 0 ? v : '—') + '</td>'; }).join('');
             var sw = c.swatch
-                ? '<img class="cp-swatch" src="' + esc(c.swatch) + '" alt="" onerror="this.style.display=\'none\'">'
+                ? '<img class="cp-swatch" src="' + esc(c.swatch) + '" alt="" data-onerror="hide">'
                 : '<span class="cp-swatch cp-swatch--noimg"></span>';
             return '<tr><td class="pp-mx-c">' + sw + '<span>' + esc(c.name) + '</span></td>' + cells
                 + '<td class="pp-mx-total">' + Number(c.totalQty).toLocaleString() + '</td></tr>';
@@ -171,7 +190,7 @@
         box.innerHTML = enr.map(function (c) {
             var isSel = c.name.toLowerCase() === selKey;
             var sq = c.swatch
-                ? '<span class="cp-swatch-sq"><img src="' + esc(c.swatch) + '" alt="" loading="lazy" onerror="this.remove();"></span>'
+                ? '<span class="cp-swatch-sq"><img src="' + esc(c.swatch) + '" alt="" loading="lazy" data-onerror="remove"></span>'
                 : '<span class="cp-swatch-sq cp-swatch-sq--noimg"></span>';
             var tag = (top && c.name === top) ? '<span class="cp-swatch-tag">Top color</span>' : '';
             var q = c.qty > 0 ? '<span class="cp-swatch-qty">' + Number(c.qty).toLocaleString() + ' ordered</span>' : '';
@@ -211,17 +230,17 @@
             hero.classList.remove('pp-noimg');
             var main = imgs[idx];
             hero.innerHTML = main
-                ? '<img src="' + esc(main.url) + '" alt="' + esc(state.color + (main.label ? ' — ' + main.label : '')) + '" onerror="this.parentElement.classList.add(\'pp-noimg\');this.remove();">'
+                ? '<img src="' + esc(main.url) + '" alt="' + esc(state.color + (main.label ? ' — ' + main.label : '')) + '" data-onerror="noimg">'
                 : '<div class="pp-noimg-ico">&#128085;</div>';
         }
         var th = document.getElementById('pp-thumbs');
         if (!th) return;
-        if (imgs.length < 2) { th.innerHTML = ''; th.style.display = 'none'; return; }
-        th.style.display = '';
+        if (imgs.length < 2) { th.innerHTML = ''; th.hidden = true; return; }
+        th.hidden = false;
         th.innerHTML = imgs.map(function (im, i) {
             var lbl = im.label || ('View ' + (i + 1));
             return '<button type="button" class="pp-thumb' + (i === idx ? ' is-active' : '') + '" data-idx="' + i + '" title="' + esc(lbl) + '" aria-label="' + esc(lbl) + '">'
-                + '<img src="' + esc(im.url) + '" alt="" loading="lazy" onerror="var b=this.closest(\'.pp-thumb\'); if(b){b.style.display=\'none\';}">'
+                + '<img src="' + esc(im.url) + '" alt="" loading="lazy" data-onerror="hide-thumb">'
                 + '</button>';
         }).join('');
     }
@@ -245,7 +264,7 @@
                 var labels = { in: 'in stock', low: 'low stock', out: 'out of stock', na: 'not offered' };
                 box.innerHTML = '<span class="pp-avail-label">Availability</span>' + SIZE_ORDER.map(function (s) {
                     var lv = lights[s] || 'na';
-                    return '<span class="pp-dot pp-dot--' + lv + '" title="' + s + ': ' + labels[lv] + '">' + s + '</span>';
+                    return '<span class="pp-dot pp-dot--' + lv + '" role="img" title="' + s + ': ' + labels[lv] + '" aria-label="' + s + ': ' + labels[lv] + '">' + s + '</span>';
                 }).join('');
             })
             .catch(function () { box.innerHTML = '<span class="pp-avail-note">Availability unavailable &mdash; your rep will confirm.</span>'; });
@@ -380,7 +399,7 @@
         var box = document.getElementById('pp-up-colors-' + i);
         if (box) { var bs = box.querySelectorAll('.pp-up-sw'); for (var j = 0; j < bs.length; j++) bs[j].classList.toggle('is-selected', bs[j].getAttribute('data-color') === c.name); }
         var img = document.getElementById('pp-up-img-' + i);
-        if (img && c.image) img.innerHTML = '<img src="' + esc(c.image) + '" alt="" loading="lazy" onerror="this.remove();">';
+        if (img && c.image) img.innerHTML = '<img src="' + esc(c.image) + '" alt="" loading="lazy" data-onerror="remove">';
     }
     function buildUpSizeGrid(i) {
         var grid = document.getElementById('pp-up-sizes-' + i); if (!grid) return;
@@ -437,16 +456,16 @@
     // ── Upgrade to embroidery module (engine-priced matrix — same engine as Quick Quote, Rule 9) ──
     function upgradesHtml(ups) {
         var banner = (ups[0] && ups[0].pitchImage)
-            ? '<div class="pp-up-banner"><img src="' + esc(ups[0].pitchImage) + '" alt="Custom embroidery" loading="lazy" onerror="this.parentElement.style.display=\'none\'"></div>'
+            ? '<div class="pp-up-banner"><img src="' + esc(ups[0].pitchImage) + '" alt="Custom embroidery" loading="lazy" data-onerror="hide-parent"></div>'
             : '';
         var cards = ups.map(function (u, i) {
             var swBtns = (u.colors || []).map(function (c) {
                 return '<button type="button" class="pp-up-sw" data-up="' + i + '" data-color="' + esc(c.name) + '" title="' + esc(c.name) + '">'
-                    + (c.swatch ? '<img src="' + esc(c.swatch) + '" alt="" loading="lazy" onerror="this.remove();">' : '') + '</button>';
+                    + (c.swatch ? '<img src="' + esc(c.swatch) + '" alt="" loading="lazy" data-onerror="remove">' : '') + '</button>';
             }).join('');
             return '<div class="pp-up-card">'
                 + '<div class="pp-up-top">'
-                + '<div class="pp-up-img" id="pp-up-img-' + i + '">' + (u.image ? '<img src="' + esc(u.image) + '" alt="" loading="lazy" onerror="this.remove();">' : '') + '</div>'
+                + '<div class="pp-up-img" id="pp-up-img-' + i + '">' + (u.image ? '<img src="' + esc(u.image) + '" alt="" loading="lazy" data-onerror="remove">' : '') + '</div>'
                 + '<div class="pp-up-info">'
                 + (u.tier ? '<span class="pp-up-tier">' + esc(u.tier) + '</span>' : '')
                 + '<div class="pp-up-name">' + esc(u.title) + '</div>'

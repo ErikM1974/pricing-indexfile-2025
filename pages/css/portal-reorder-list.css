@@ -5,6 +5,7 @@
    ========================================================================== */
 
 .rl-fab {
+    display: inline-flex;
     position: fixed; right: 18px; bottom: 18px; z-index: 1000;
     align-items: center; gap: 8px;
     background: var(--cp-theme, #2e7d32); color: #fff; border: none; border-radius: 999px;

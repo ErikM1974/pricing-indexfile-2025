@@ -200,3 +200,19 @@ html { scroll-behavior: smooth; }
     .pp-hero-img { height: 300px; }
     .pp-title { font-size: 19px; }
 }
+
+/* 2026-09-05 review: the header brand is a div (the product name is the page's h1). */
+.cp-header-brand { font-family: var(--cp-font-display); font-size: 19px; font-weight: 600; line-height: 1.15; }
+.pp-title { margin: 0; }
+.pp-error-retry { margin-top: 14px; }
+@media (max-width: 560px) {
+    .cp-header { padding: 12px 14px; gap: 10px; }
+    .cp-header-logo { height: 36px; padding: 4px 8px; }
+    .cp-header-text { min-width: 0; }
+    .cp-header-brand { font-size: 15px; }
+    .cp-header-text p { display: none; }
+    .cp-header-actions .cp-header-link { padding: 6px 10px; font-size: 12px; }
+    .cp-header-link .pp-back-long { display: none; }
+}
+.cp-header-link .pp-back-short { display: none; }
+@media (max-width: 560px) { .cp-header-link .pp-back-short { display: inline; } }

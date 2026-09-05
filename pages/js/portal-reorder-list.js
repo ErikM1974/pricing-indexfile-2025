@@ -48,9 +48,9 @@
         if (root) return;
         root = document.createElement('div'); root.className = 'rl-root';
         root.innerHTML =
-            '<button type="button" class="rl-fab" id="rl-fab" style="display:none;" aria-label="Open your re-order list">' +
+            '<button type="button" class="rl-fab" id="rl-fab" hidden aria-label="Open your re-order list">' +
                 '&#129534; Re-order List <span class="rl-fab-badge" id="rl-badge">0</span></button>' +
-            '<div class="rl-drawer" id="rl-drawer" style="display:none;"><div class="rl-panel" role="dialog" aria-label="Your re-order list">' +
+            '<div class="rl-drawer" id="rl-drawer" hidden><div class="rl-panel" role="dialog" aria-label="Your re-order list">' +
                 '<div class="rl-head"><span>Your Re-order List</span><button type="button" class="rl-x" id="rl-close" aria-label="Close">&times;</button></div>' +
                 '<p class="rl-sub">Everything here goes to your rep as one request for a fresh quote.</p>' +
                 '<div class="rl-items" id="rl-items"></div>' +
@@ -77,12 +77,12 @@
         var a = read();
         if (badge) badge.textContent = a.length;
         var fab = document.getElementById('rl-fab');
-        if (fab) fab.style.display = a.length ? 'inline-flex' : 'none';
-        if (!a.length && drawer && drawer.style.display !== 'none') close();
+        if (fab) fab.hidden = !a.length;
+        if (!a.length && drawer && !drawer.hidden) close();
         var box = document.getElementById('rl-items');
         if (box) box.innerHTML = a.length ? a.map(function (it, i) {
             return '<div class="rl-item">' +
-                '<div class="rl-item-img">' + (it.image ? '<img src="' + esc(it.image) + '" alt="" onerror="this.remove();">' : '') + '</div>' +
+                '<div class="rl-item-img">' + (it.image ? '<img src="' + esc(it.image) + '" alt="" data-onerror="remove">' : '') + '</div>' +
                 '<div class="rl-item-body"><div class="rl-item-t">' + esc(it.title) + '</div>' +
                     '<div class="rl-item-s">' + esc([it.color, it.method, (it.qty ? it.qty + ' pcs' : '')].filter(Boolean).join(' · ')) + '</div>' +
                     (it.sizeBreakdown ? '<div class="rl-item-sz">' + esc(it.sizeBreakdown) + '</div>' : '') +
@@ -90,8 +90,10 @@
                 '<button type="button" class="rl-item-x" data-i="' + i + '" aria-label="Remove">&times;</button></div>';
         }).join('') : '<div class="rl-empty">Your list is empty.</div>';
     }
-    function open() { ensureUI(); render(); drawer.style.display = 'flex'; }
-    function close() { if (drawer) drawer.style.display = 'none'; }
+    // Broken thumbnails drop out (was inline onerror= — Rule 3); `error` doesn't bubble → capture.
+    document.addEventListener('error', function (e) { var t = e.target; if (t && t.tagName === 'IMG' && t.dataset && t.dataset.onerror === 'remove' && t.closest('.rl-item-img')) t.remove(); }, true);
+    function open() { ensureUI(); render(); drawer.hidden = false; }
+    function close() { if (drawer) drawer.hidden = true; }
 
     function send() {
         var a = read(); if (!a.length) return;
