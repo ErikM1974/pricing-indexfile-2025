@@ -250,6 +250,9 @@ Releases `v2026.09.04.1 → .9`. Detail here; MEMORY.md carries one line each.
   a 0-byte probe log means "too slow", not "crashed" — probe at 45s. A `for` loop whose last
   statement is `[ $R -ne 0 ] && …` exits 1 on success and silently skips the `&& git commit`
   after it.
+- Chrome `navigate` to the SAME URL that differs only by `#hash` is a same-document navigation — nothing
+  reloads, so a post-deploy check reads the OLD CSS/JS. Add a throwaway `?r=N` query to force a fresh load
+  (cost me an unneeded `.21` on the portal review).
 - Local esbuild hashes differ from Heroku's for CRLF working copies — read the LIVE
   `/dist/asset-manifest.json` for the real names when verifying.
 
