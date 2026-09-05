@@ -106,6 +106,18 @@ absorb them. Measured 2026-08-24: 31 Jul–9 Aug ran **11,135/day**, 10–23 Aug
 I called a false escalation from weekdays alone TWICE (10 Aug, 19 Aug) and recommended work
 off the second one. 🔑 **Judge pacing on a blended ≥7-day rate, never on consecutive weekdays.**
 
+## ✅ SHIPPED 2026-09-05 — pricing-bundle method-keyed cache (proxy `v2026.09.05.4`, Heroku v1119)
+
+Tiers / rules / location / cost-table now come from a keyed 15-min cache in
+`src/utils/caspio-static-tables.js`; only `Sanmar_Bulk` still re-reads per style. The
+method → cost-table switch moved OUT of the route and INTO the helper so the cache key and
+the query are chosen in one place — a key coarser than its query would serve another
+method's prices. Locked by `tests/jest/caspio-static-tables-bundle.test.js` (20 tests,
+incl. all six `Embroidery_Costs` ItemType variants staying distinct). Verified on prod:
+PC61 and PC54 both 200 with 5 tiers / 13 costs / 10 locations, tiers identical across
+styles. ⚠️ `catalog-display-price.js` + `decorated-cap-prices.js` deliberately NOT touched
+(Customer Catalog price surface; both already have their own caches).
+
 ## 🔴 MEASURED 2026-09-05 — the pricing-bundle tables are ONE PAGE EACH
 
 I scoped the bundle cache-split at "~9 redundant calls per style, Embroidery_Costs is ~6
