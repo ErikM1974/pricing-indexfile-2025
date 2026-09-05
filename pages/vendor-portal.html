@@ -6,8 +6,8 @@
   <meta name="robots" content="noindex, nofollow">
   <title>Job Portal — Northwest Custom Apparel</title>
   <link rel="icon" href="/favicon.png">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="/pages/css/vendor-portal.css?v=2026.07.19.15">
+  <link rel="stylesheet" href="/shared_components/vendor/fontawesome/css/all.min.css?v=2026.07.08.8">
+  <link rel="stylesheet" href="/pages/css/vendor-portal.css?v=2026.09.05.28">
 </head>
 <body>
   <header class="vp-header">
@@ -18,52 +18,54 @@
         <span class="vp-header-sub">Screen-print jobs from Northwest Custom Apparel</span>
       </div>
       <div class="vp-header-user">
-        <span id="vp-user-chip" class="vp-user-chip"><i class="fas fa-user"></i> <span id="vp-user-email"></span></span>
-        <a class="vp-btn vp-btn--ghost" href="/auth/vendor/logout"><i class="fas fa-sign-out-alt"></i> Sign out</a>
+        <span id="vp-user-chip" class="vp-user-chip"><i class="fas fa-user" aria-hidden="true"></i> <span id="vp-user-email"></span></span>
+        <a class="vp-btn vp-btn--ghost" href="/auth/vendor/logout"><i class="fas fa-sign-out-alt" aria-hidden="true"></i> Sign out</a>
       </div>
     </div>
   </header>
 
   <main class="vp-container">
     <!-- Error banner (API failures are always VISIBLE — never silent) -->
-    <div id="vp-error" class="vp-error" hidden>
-      <i class="fas fa-exclamation-triangle"></i>
+    <div id="vp-error" class="vp-error" role="alert" hidden>
+      <i class="fas fa-exclamation-triangle" aria-hidden="true"></i>
       <span id="vp-error-text">Unable to load jobs. Please refresh.</span>
+      <button type="button" class="vp-btn vp-btn--ghost vp-btn--sm" id="vp-error-retry" hidden><i class="fas fa-rotate-right" aria-hidden="true"></i> Retry</button>
     </div>
 
     <!-- ── LIST VIEW ─────────────────────────────────────────── -->
     <section id="vp-list-view">
       <div class="vp-toolbar">
-        <div class="vp-filters" id="vp-filters">
-          <button class="vp-chip vp-chip--active" data-filter="active">Active</button>
-          <button class="vp-chip" data-filter="completed">Completed</button>
-          <button class="vp-chip" data-filter="all">All</button>
+        <div class="vp-filters" id="vp-filters" role="group" aria-label="Filter jobs">
+          <button type="button" class="vp-chip vp-chip--active" data-filter="active" aria-pressed="true">Active <span class="vp-chip-count" data-count="active"></span></button>
+          <button type="button" class="vp-chip" data-filter="completed" aria-pressed="false">Completed <span class="vp-chip-count" data-count="completed"></span></button>
+          <button type="button" class="vp-chip" data-filter="all" aria-pressed="false">All <span class="vp-chip-count" data-count="all"></span></button>
         </div>
         <div class="vp-search">
-          <i class="fas fa-search"></i>
-          <input type="search" id="vp-search" placeholder="Search company, design #, job #">
+          <label for="vp-search" class="vp-sr">Search jobs</label>
+          <i class="fas fa-search" aria-hidden="true"></i>
+          <input type="search" id="vp-search" placeholder="Search company, design #, job #" autocomplete="off">
         </div>
       </div>
 
-      <div id="vp-loading" class="vp-loading"><i class="fas fa-spinner fa-spin"></i> Loading jobs…</div>
-      <div id="vp-empty" class="vp-empty" hidden>
-        <i class="fas fa-inbox"></i>
-        <p>No jobs here right now.</p>
+      <div id="vp-loading" class="vp-loading" role="status"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading jobs…</div>
+      <div id="vp-empty" class="vp-empty" role="status" hidden>
+        <i class="fas fa-inbox" aria-hidden="true"></i>
+        <p id="vp-empty-text">No jobs here right now.</p>
       </div>
       <div id="vp-job-grid" class="vp-job-grid"></div>
     </section>
 
     <!-- ── DETAIL VIEW ───────────────────────────────────────── -->
     <section id="vp-detail-view" hidden>
-      <button class="vp-btn vp-btn--ghost vp-back" id="vp-back-btn"><i class="fas fa-arrow-left"></i> All jobs</button>
+      <button type="button" class="vp-btn vp-btn--ghost vp-back" id="vp-back-btn"><i class="fas fa-arrow-left" aria-hidden="true"></i> All jobs</button>
 
-      <div id="vp-detail-loading" class="vp-loading"><i class="fas fa-spinner fa-spin"></i> Loading job…</div>
+      <div id="vp-detail-loading" class="vp-loading" role="status"><i class="fas fa-spinner fa-spin" aria-hidden="true"></i> Loading job…</div>
 
       <div id="vp-detail-main" hidden>
         <div class="vp-detail-header">
           <div>
             <div class="vp-detail-id" id="vp-d-id"></div>
-            <h2 class="vp-detail-company" id="vp-d-company"></h2>
+            <h2 class="vp-detail-company" id="vp-d-company" tabindex="-1"></h2>
             <div class="vp-detail-sub" id="vp-d-sub"></div>
           </div>
           <div class="vp-detail-badges" id="vp-d-badges"></div>
@@ -72,7 +74,7 @@
         <div class="vp-grid">
           <div class="vp-col">
             <div class="vp-card">
-              <div class="vp-card-header"><h3><i class="fas fa-clipboard-list"></i> Work Order</h3></div>
+              <div class="vp-card-header"><h3><i class="fas fa-clipboard-list" aria-hidden="true"></i> Work Order</h3></div>
               <div class="vp-card-body">
                 <dl class="vp-meta" id="vp-d-meta"></dl>
                 <div class="vp-instructions" id="vp-d-instructions" hidden></div>
@@ -80,7 +82,7 @@
             </div>
 
             <div class="vp-card">
-              <div class="vp-card-header"><h3><i class="fas fa-layer-group"></i> Print Lines</h3></div>
+              <div class="vp-card-header"><h3><i class="fas fa-layer-group" aria-hidden="true"></i> Print Lines</h3></div>
               <div class="vp-card-body">
                 <div class="vp-table-scroll">
                   <table class="vp-table" id="vp-d-lines-table">
@@ -95,7 +97,7 @@
             </div>
 
             <div class="vp-card">
-              <div class="vp-card-header"><h3><i class="fas fa-download"></i> Artwork &amp; Working Files</h3></div>
+              <div class="vp-card-header"><h3><i class="fas fa-download" aria-hidden="true"></i> Artwork &amp; Working Files</h3></div>
               <div class="vp-card-body">
                 <div id="vp-d-files" class="vp-files"></div>
                 <div class="vp-empty-panel" id="vp-d-files-empty" hidden>No files attached yet.</div>
@@ -105,19 +107,22 @@
 
           <div class="vp-col">
             <div class="vp-card">
-              <div class="vp-card-header"><h3><i class="fas fa-image"></i> Mockup</h3></div>
+              <div class="vp-card-header"><h3><i class="fas fa-image" aria-hidden="true"></i> Mockup</h3></div>
               <div class="vp-card-body" id="vp-d-mockup">
                 <div class="vp-empty-panel">No mockup attached.</div>
               </div>
             </div>
 
             <div class="vp-card">
-              <div class="vp-card-header"><h3><i class="fas fa-comments"></i> Activity &amp; Messages</h3></div>
+              <div class="vp-card-header"><h3><i class="fas fa-comments" aria-hidden="true"></i> Activity &amp; Messages</h3></div>
               <div class="vp-card-body">
                 <div class="vp-comment-form">
-                  <textarea id="vp-comment-input" rows="2" maxlength="2000" placeholder="Question or update for NWCA? Post it here…"></textarea>
-                  <button class="vp-btn vp-btn--primary" id="vp-comment-btn"><i class="fas fa-paper-plane"></i> Post</button>
+                  <label for="vp-comment-input" class="vp-sr">Message for NWCA</label>
+                  <textarea id="vp-comment-input" rows="2" maxlength="2000" placeholder="Question or update for NWCA? Post it here…" aria-describedby="vp-comment-hint"></textarea>
+                  <button type="button" class="vp-btn vp-btn--primary" id="vp-comment-btn" disabled><i class="fas fa-paper-plane" aria-hidden="true"></i> Post</button>
                 </div>
+                <div class="vp-comment-hint" id="vp-comment-hint">Ctrl+Enter posts. NWCA sees your note on the job.</div>
+                <div class="vp-comment-status" id="vp-comment-status" role="status" hidden></div>
                 <div class="vp-timeline" id="vp-d-notes"></div>
               </div>
             </div>
@@ -132,6 +137,6 @@
   </footer>
 
   <script src="/shared_components/js/caspio-date-utils.js?v=1"></script>
-  <script src="/pages/js/vendor-portal.js?v=2026.07.19.15"></script>
+  <script src="/pages/js/vendor-portal.js?v=2026.09.05.28"></script>
 </body>
 </html>
