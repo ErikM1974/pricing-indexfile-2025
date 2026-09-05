@@ -4412,7 +4412,10 @@ app.get('/api/crm-proxy/embroidery-bonus/call-list',
 // Bradley + requester + status). ANY logged-in staff; no identity injection.
 app.get('/api/crm-proxy/purchasing-portal', requireStaff, async (req, res) => {
   try {
-    const response = await fetch(`${CRM_API_BASE}/api/ae-dashboard/purchasing-all`, {
+    // ?refresh=1 is the portal's Refresh button — forwarded so the proxy rebuilds
+    // instead of re-serving its 15-minute cache (2026-09-05).
+    const refresh = (req.query.refresh === '1' || req.query.refresh === 'true') ? '?refresh=1' : '';
+    const response = await fetch(`${CRM_API_BASE}/api/ae-dashboard/purchasing-all${refresh}`, {
       headers: { 'X-CRM-API-Secret': CRM_API_SECRET }
     });
     const data = await response.json().catch(() => ({ error: 'Bad upstream response' }));

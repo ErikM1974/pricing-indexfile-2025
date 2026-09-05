@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>Purchasing Portal - Northwest Custom Apparel</title>
-    <link rel="icon" href="https://cdn.caspio.com/A0E15000/Safety%20Stripes/NWCA%20Favicon%20for%20TEAMNWCA.com.png?ver=1" type="image/png">
+    <link rel="icon" href="/favicon.png" type="image/png">
 
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="/shared_components/css/art-hub.css">
     <link rel="stylesheet" href="/shared_components/css/dash-shell.css">
     <link rel="stylesheet" href="/shared_components/css/sanmar-invoice-viewer.css?v=2026.07.19.17">
-    <link rel="stylesheet" href="/dashboards/css/purchasing-portal.css?v=2026.09.03.13">
+    <link rel="stylesheet" href="/dashboards/css/purchasing-portal.css?v=2026.09.05.1">
 </head>
 <body>
     <div class="dash-shell">
@@ -54,26 +54,39 @@
                 </button>
             </div>
 
-            <div class="dash-stat-grid">
-                <div class="dash-stat-card dash-stat-card--accent">
+            <!-- Stat tiles are BUTTONS (2026-09-05): clicking one filters the table to that
+                 status; the accent tile clears the filter. The turnaround tile is computed
+                 from the rows (request → PO median, same-day share). -->
+            <div class="dash-stat-grid pp-tiles">
+                <button type="button" class="dash-stat-card dash-stat-card--accent pp-tile" data-filter="" title="Show every request in the window">
                     <div class="dash-stat-value" id="pp-stat-total">—</div>
                     <div class="dash-stat-label">Requests (60d)</div>
-                </div>
-                <div class="dash-stat-card">
+                    <div class="pp-stat-sub" id="pp-stat-total-sub"></div>
+                </button>
+                <button type="button" class="dash-stat-card pp-tile" data-filter="sent" title="Show requests Bradley has not ordered yet">
                     <div class="dash-stat-value" id="pp-stat-sent">—</div>
                     <div class="dash-stat-label">Awaiting Purchase</div>
-                </div>
-                <div class="dash-stat-card">
+                    <div class="pp-stat-sub" id="pp-stat-sent-sub"></div>
+                </button>
+                <button type="button" class="dash-stat-card pp-tile" data-filter="ordered" title="Show ordered requests (partially received listed separately below)">
                     <div class="dash-stat-value" id="pp-stat-ordered">—</div>
                     <div class="dash-stat-label">Ordered</div>
-                </div>
-                <div class="dash-stat-card">
+                    <div class="pp-stat-sub" id="pp-stat-ordered-sub"></div>
+                </button>
+                <button type="button" class="dash-stat-card pp-tile" data-filter="received" title="Show requests whose blanks are all in">
                     <div class="dash-stat-value" id="pp-stat-received">—</div>
                     <div class="dash-stat-label">Received</div>
-                </div>
-                <div class="dash-stat-card">
+                    <div class="pp-stat-sub" id="pp-stat-received-sub"></div>
+                </button>
+                <button type="button" class="dash-stat-card pp-tile" data-filter="done" title="Show finished requests (invoiced or shipped)">
                     <div class="dash-stat-value" id="pp-stat-done">—</div>
                     <div class="dash-stat-label">Invoiced / Shipped</div>
+                    <div class="pp-stat-sub" id="pp-stat-done-sub"></div>
+                </button>
+                <div class="dash-stat-card pp-tile pp-tile--kpi">
+                    <div class="dash-stat-value" id="pp-stat-turnaround">—</div>
+                    <div class="dash-stat-label">Request &rarr; PO, median</div>
+                    <div class="pp-stat-sub" id="pp-stat-turnaround-sub"></div>
                 </div>
             </div>
 
@@ -83,7 +96,7 @@
                     <span class="pp-updated" id="pp-updated"></span>
                 </div>
                 <div class="pp-filters">
-                    <input type="search" id="pp-search" class="pp-input" placeholder="Search WO #, company, PO #…" aria-label="Search">
+                    <input type="search" id="pp-search" class="pp-input" placeholder="Search WO #, company, PO #, vendor…" aria-label="Search">
                     <select id="pp-filter-rep" class="pp-input" aria-label="Filter by requester">
                         <option value="">All requesters</option>
                     </select>
@@ -96,22 +109,32 @@
                         <option value="invoiced">Invoiced</option>
                         <option value="shipped">Shipped</option>
                     </select>
+                    <!-- Open work by default (2026-09-05): 161 of 261 rows were finished, on one
+                         12,000px page. Finished = invoiced or shipped. -->
+                    <label class="pp-toggle" for="pp-show-finished">
+                        <input type="checkbox" id="pp-show-finished">
+                        <span>Show finished <span class="pp-toggle-n" id="pp-finished-n"></span></span>
+                    </label>
+                    <span class="pp-shown" id="pp-shown" role="status"></span>
                 </div>
+                <!-- Filled when the feed says it dropped requests (payload.truncated) — the
+                     tile counted 275 while the table held 250 and nothing said so. -->
+                <div class="pp-trunc" id="pp-trunc" hidden role="alert"></div>
                 <div class="pp-table-scroll">
                     <table class="pp-table">
                         <thead>
                             <tr>
                                 <th>WO #</th>
                                 <th>Company</th>
-                                <th>Requested by</th>
+                                <th class="pp-col-phone-hide">Requested by</th>
                                 <th>Sent</th>
-                                <th>Type</th>
+                                <th class="pp-col-phone-hide">Type</th>
                                 <th>PO #</th>
                                 <th>Vendors</th>
-                                <th>Ordered</th>
-                                <th>Received</th>
+                                <th class="pp-col-phone-hide">Ordered</th>
+                                <th class="pp-col-phone-hide">Received</th>
                                 <th>Status</th>
-                                <th>Invoice</th>
+                                <th>Request · Invoice</th>
                             </tr>
                         </thead>
                         <tbody id="pp-tbody">
@@ -128,6 +151,6 @@
     <script src="/shared_components/js/fetch-timeout.js"></script>
     <script src="/shared_components/js/dash-page-helpers.js"></script>
     <script src="/shared_components/js/sanmar-invoice-viewer.js?v=2026.07.19.17"></script>
-    <script src="/dashboards/js/purchasing-portal.js?v=2026.07.19.17"></script>
+    <script src="/dashboards/js/purchasing-portal.js?v=2026.09.05.1"></script>
 </body>
 </html>
