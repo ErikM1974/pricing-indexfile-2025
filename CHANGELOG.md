@@ -1,3 +1,9 @@
+## v2026.09.05.5 (2026.09.05)
+
+- Memory: Quote Management review release range
+- AE Mission Control review: plural copy, class colours, no alert, 5-min refresh; Volume Quote writes the rep's real email
+- Deploy v2026.09.05.5: 2 files (ae-mission-control.html,test-ae-mission-control.html,...)
+
 ## v2026.09.05.4 (2026.09.05)
 
 - Quote Management: tighter cell padding so the table fits a 1,352px container without a scrollbar
