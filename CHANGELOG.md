@@ -1,3 +1,8 @@
+## v2026.09.05.13 (2026.09.05)
+
+- Quote builders review: data-call delegator replaces ~150 inline onclick handlers, alerts → toasts, aria-labels, page lock
+- Deploy v2026.09.05.13: 4 files (quote-builders/*.html cache-bust — builder review: data-call delegator, toasts, labels)
+
 ## v2026.09.05.12 (2026.09.05)
 
 - Staff-page consistency sweep: 25 more pages extracted, one Font Awesome build, favicons everywhere, manual nav data-driven
