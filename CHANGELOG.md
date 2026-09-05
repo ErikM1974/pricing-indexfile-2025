@@ -1,3 +1,8 @@
+## v2026.09.05.14 (2026.09.05)
+
+- Quote builders item 6: shared phone layout — header 200→100px, no sideways panning (table scrolls in its wrapper; DTG grid minmax(0,1fr))
+- Deploy v2026.09.05.14: 9 files (builder + calculator cache-bust — phone layout for the 4 quote builders)
+
 ## v2026.09.05.13 (2026.09.05)
 
 - Quote builders review: data-call delegator replaces ~150 inline onclick handlers, alerts → toasts, aria-labels, page lock
