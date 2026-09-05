@@ -464,3 +464,36 @@ search-empty, card open by Space, detail with broken images, Back button, Esc, C
 
 Left alone: job ordering (API order), note timeline newest-first, sign-out as a GET link.
 
+## Customer Portals admin console — review, 14 items (2026-09-05, `v2026.09.05.31`)
+
+`dashboards/customer-portal-admin.html/.js/.css` (Admin → Customer Portals; `PORTAL_ADMIN_ROLES`).
+Reviewed live as Erik (141 invites) + every interaction on `static-dist` with `/api/*` stubbed. Shipped:
+
+1. 🔴 **"Have Signed In: 0 / Last Sign-In: Never" for all 141** — nothing ever wrote `LastLogin`
+   (see LESSONS 2026-09-05). Proxy `touch-login` route + app verify call. Counts start from today.
+2. **Rule 3** — 7 inline `style=` (badge, both modals, requests view, rep filters, table wrapper,
+   right-aligned th) + 8 `.style.display` toggles → `hidden` + classes; page CSS gained
+   `[hidden]{display:none!important}` (the modal overlay is `display:flex` — same trap as the
+   vendor portal, caught before it bit).
+3. **Tabs** are a real tablist (`role=tab/tabpanel`, `aria-selected`, ArrowLeft/Right, `document.title`
+   per tab); the New badge is `hidden` at zero and carries "N new requests".
+4. **705 icon-only buttons had only `title`** — each now has an `aria-label` naming the customer
+   ("Remove access for a@x.com", "Preview portal for Aaberg's Rentals"); status selects labelled.
+5. **Modals** — both toggle with `hidden`, return focus (rewards falls back to the re-rendered chip),
+   Esc closes whichever is open; rewards dialog gained `aria-labelledby`; errors are `role=alert`.
+6. **CRM lookup** was a `<div>` list inside a `<label>` (clicking a result re-focused the input) —
+   now a labelled combobox with `role=option` results, ArrowDown/Up highlight, Enter picks.
+7. **Retry** on both failed loads (was "Please refresh").
+8. **Delete toast** said "Access removed" BEFORE the DELETE ran — now "Removing…" then the outcome.
+9. **Empty state** distinguishes "no match" from "none of the invited customers are on your accounts".
+10. **Pressed state** on My customers / My requests / Rewards sort (`aria-pressed`).
+11. **Icons `aria-hidden`**, toast is a `role=status` live region, all buttons `type=button`.
+12. **Phone ≤640px** — tabs wrap (were clipped off the edge), stat cards 2-up (accent full width),
+    controls stretch, modal padding trimmed.
+13. **Focus-visible** rings on buttons, chips, tabs, lookup items.
+14. Lock: `tests/unit/customer-portal-admin-page.test.js` (incl. the cross-repo proxy route assert).
+
+Left alone: `window.confirm` for destructive actions (fine on a staff console), Font Awesome from
+cdnjs (the staff-page consistency lock requires ONE build across staff pages — a move must be all
+pages at once), 5 action buttons per row.
+

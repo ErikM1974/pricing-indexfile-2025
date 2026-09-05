@@ -7,6 +7,9 @@
    --radius-*) come from shared_components/css/art-hub.css. Brand greens are
    local page vars (not in the token palette). NEVER redefine tokens.
    ========================================================================== */
+/* `hidden` must beat the display rules below (.cpa-modal-overlay is display:flex, .cpa-btn inline-flex). */
+[hidden] { display: none !important; }
+
 :root {
   --cpa-green: #3a7c52;
   --cpa-green-dark: #1a472a;
@@ -332,4 +335,26 @@
    viewport at 375px and panned sideways. */
 @media (max-width: 640px) {
     #cpa-filter, .cpa-search-wrap input { width: 100%; max-width: 100%; box-sizing: border-box; }
+}
+
+/* 2026-09-05 review: table wrapper + right-aligned head (were inline style=), visible focus,
+   keyboard-navigable lookup results, pressed-state "My customers". */
+.cpa-table-scroll { overflow-x: auto; }
+.cpa-th-right { text-align: right; }
+.cpa-btn:focus-visible, .cpa-btn-icon:focus-visible, .cpa-tab:focus-visible, .cpa-rw-chip:focus-visible,
+.cpa-th-sort:focus-visible, .cpa-modal-close:focus-visible, .cpa-lookup-item:focus-visible, .dash-error-banner-close:focus-visible {
+  outline: 3px solid var(--cpa-green); outline-offset: 2px;
+}
+.cpa-lookup-item.is-active { border-color: var(--cpa-green); background: var(--cpa-green-soft); }
+.cpa-btn-ghost[aria-pressed="true"] { background: var(--cpa-green-soft); color: var(--cpa-green-dark); border-color: var(--cpa-green); }
+.cpa-empty .cpa-btn { margin-top: 12px; }
+.cpa-lastlogin.cpa-today { color: var(--cpa-green-dark); font-weight: 600; }
+@media (max-width: 640px) {
+  .cpa-tabs { flex-wrap: wrap; }
+  .cpa-tab { padding: 8px 10px; font-size: .86rem; }
+  .dash-stat-grid { grid-template-columns: 1fr 1fr; }
+  .dash-stat-card--accent { grid-column: 1 / -1; }
+  .cpa-controls .cpa-btn { flex: 1 1 auto; justify-content: center; }
+  .cpa-modal-overlay { padding: 2vh 8px; }
+  .cpa-modal-body, .cpa-modal-head, .cpa-modal-foot { padding-left: 14px; padding-right: 14px; }
 }

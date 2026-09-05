@@ -6506,6 +6506,15 @@ app.get('/auth/customer/verify', async (req, res) => {
       sameSite: 'lax',
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
+    // Best-effort LastLogin stamp — never blocks the login. Until 2026-09-05 nothing wrote this,
+    // so the Customer Portals console showed "Have Signed In: 0 / Never" for every customer.
+    if (CRM_API_SECRET) {
+      fetch(`${CRM_API_BASE}/api/customer-portal-access/touch-login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CRM-API-Secret': CRM_API_SECRET },
+        body: JSON.stringify({ email: claim.email }),
+      }).catch((e) => console.warn('[customer-login] touch-login failed:', e.message));
+    }
     const next = safeLoginNext(req.query.next, '/portal') || '/portal';
     return res.redirect(next);
   } catch (e) {

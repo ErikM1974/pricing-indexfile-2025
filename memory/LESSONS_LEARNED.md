@@ -16,35 +16,7 @@ oldest resolved entry to `LESSONS_LEARNED_ARCHIVE.md` once this passes 250.
 ### Quote data plane locked down — 44 caller files, 2 repos (2026-08-26, ARCHIVED 2026-09-02): a gate you cannot flip without a deploy ships scared — mode-switch by config var (off→log→enforce); migrate by ENDPOINT grep never a base swap; a relay must forward the query string verbatim; postures jest-locked in both repos; stage explicit file lists, never `git add -u`, on a shared checkout. Full entry in archive.
 ### Staff-dashboard hardening — PII roster, proxy-direct reads, auth embed (2026-08-26, ARCHIVED 2026-09-03): a staff page gate is `.html`-only, so secrets live in `lib/` behind a route (`lib/staff-roster.js` → `GET /api/staff/employees`); identity = `/api/crm-session/me` (returns `role`), never a third-party auth embed; every proxy-direct read from a staff page is relayed same-origin so the quote-plane gate covers it. Full entry in archive.
 ### /inventorylevels leaked wholesale cost + supplier anonymously (2026-08-27, ARCHIVED 2026-09-03): an anonymous route that must stay open for one public caller gets a field PROJECTION (`INVENTORY_PUBLIC_FIELDS` whitelist), not a gate; jest-lock the projection red-first. Full entry in archive.
-## 2-minute proxy outage: the commit shipped half the change, and the boot probe tested the other half (2026-08-27)
-
-**Problem.** Deleting the legacy box-labels routes crashed the proxy dyno on deploy (H10 on
-customer pricing calls, ~2 min until `heroku releases:rollback`). The slug had the route FILE
-deleted but `server.js` still `require`d it — `Cannot find module` on boot.
-
-**Root Cause.** Two failures stacked: (1) `git add <deleted-file> <edited-files>` — the first
-pathspec matched nothing (the file was already staged by `git rm`), and **git add ABORTS the
-whole command on a bad pathspec, staging NONE of the later files**; the commit went out with
-only the `git rm`. (2) The local boot probe passed because it ran against the WORKING TREE
-(which had the server.js edit), not against what was committed — the exact gap between "my
-checkout works" and "the commit works".
-
-**Solution.** Rollback restored production in seconds; the missing edit was committed with the
-staged diff INSPECTED (`git diff --cached` shows the require removal), boot-probed with
-`tree == HEAD` asserted first, and redeployed clean (proxy `v2026.08.26.6`). Legacy routes now
-404 live; the repack station's `/api/sanmar-orders/label-data` unaffected.
-
-**Prevention.**
-- 🔴 **Never combine pathspecs in one `git add` during a delete+edit change.** One `git add`
-  per file, then `git diff --cached --stat` MUST list every file you meant to ship — read it
-  before committing. An already-`git rm`'d path in the list is the trap that aborts the rest.
-- 🔴 **A boot probe is only honest when `git status --porcelain` shows no tracked dirt** —
-  otherwise it verifies the working tree, not the commit that deploys. Assert clean, THEN probe.
-- 🔑 **Delete a module and its require in the SAME commit, verified in the same staged diff.**
-  The app-side twin of this change survived because its deletion was a single-file block edit.
-- 🔑 The rollback playbook worked exactly as written: slug rollback in seconds, fix landed
-  forward through the normal gated path — no hand-pushes, no `--no-verify`.
-
+### 2-minute proxy outage: the commit shipped half the change, and the boot probe tested the other half (2026-08-27, ARCHIVED 2026-09-05): stage the WHOLE change (a `require` and the file it names land in one commit); the boot probe must exercise the route table, not just `listen`; a 2-minute outage is a half-shipped commit until proven otherwise. Full entry in archive.
 ### Top Sellers "flickers blank, refresh fixes it" (2026-08-26, ARCHIVED 2026-09-02): "works after refresh" = a cold query behind a response cache — time the UNCACHED path first; variant-heavy `limit=48` pages hydrate 10k rows, so partition STYLE IN chunks in parallel; `?isTopSeller=1` is silently ignored (route wants `true`) — validate the result set before trusting a timing. Full entry in archive.
 ## Customer portal redesign + reward-dollar accrual — the self-service portal, and money that must never be computed silently (2026-09-01)
 
@@ -257,4 +229,24 @@ declare `[hidden] { display: none !important; }` itself — the moment any hidde
 class with `display: flex/grid/inline-flex`, the attribute silently stops working. When auditing a
 page, read `getComputedStyle(el).display` on a `hidden` element at least once; `el.hidden === true`
 proves nothing. 🔑 Verification: a JS probe of `.hidden` is a probe of INTENT, not of the pixels.
+
+## 2026-09-05 — Customer Portals console said nobody had ever signed in (141 invites, "Have Signed In: 0")
+
+**Problem.** The staff console's "Have Signed In" tile read 0 and every "Last Sign-In" cell read
+"Never" for all 141 invited customers — including customers known to have used the portal.
+
+**Root cause.** The table has a `LastLogin` column, the proxy PROJECTS it (`last_login`) and the
+console RENDERS it, but nothing ever WROTE it: the customer magic-link verify route never stamped a
+login, and the proxy had no `customer-portal-access/touch-login` route — the vendor portal got both
+(2026-07-19) and the customer side was never mirrored. Three layers displayed a field with no writer.
+
+**Solution.** Proxy `POST /api/customer-portal-access/touch-login` (mirrors vendor); app
+`/auth/customer/verify` calls it fire-and-forget after setting the cookie. Locked in
+`tests/unit/customer-portal-admin-page.test.js` (server call + proxy route, cross-repo when present).
+
+**Prevention.** For every field a page renders, name its WRITER — if the answer is "the table has the
+column", nothing writes it. A stat that reads 0 across 100% of rows is a data-plane gap, not a fact;
+check for the writer before reporting it as truth. Pairs with the deep-link lesson above: a chain
+(write → project → render) needs every hop, and the missing hop is invisible from either end.
+🔑 History before 2026-09-05 is unrecoverable — "Never" for old rows means "not recorded", not "never".
 
