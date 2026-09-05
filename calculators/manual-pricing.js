@@ -633,3 +633,10 @@ document.addEventListener('DOMContentLoaded', () => {
     manualCalc = new ManualPricingCalculator();
     window.manualCalc = manualCalc; // data-call targets resolve off window (Rule 3 delegator)
 });
+
+// Rule 3 (2026-09-05): Enter in the quantity field submits via the Calculate button (was an inline onkeypress).
+document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' || !(e.target instanceof Element) || !e.target.matches('[data-enter-clicks]')) return;
+    const btn = document.getElementById(e.target.getAttribute('data-enter-clicks'));
+    if (btn) { e.preventDefault(); btn.click(); }
+});

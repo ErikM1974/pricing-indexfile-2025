@@ -122,12 +122,15 @@
             }
 
             async loadInitialData() {
-                try {                    
+                try {
+                    
                     // Load all quote sessions
                     const response = await fetch(`${this.baseURL}/api/quote_sessions`);
-                    const quotes = await response.json();                    
+                    const quotes = await response.json();
+                    
                     // Filter out ADR quotes (Adriyella has a separate management system)
-                    this.allRecords = quotes.filter(quote => !quote.QuoteID.startsWith('ADR'));                    
+                    this.allRecords = quotes.filter(quote => !quote.QuoteID.startsWith('ADR'));
+                    
                     // Stats calculation removed - no longer displaying stats section
                     // this.calculateStats();
                     this.applyFilters();
@@ -290,7 +293,7 @@
                             <strong>$${(quote.TotalAmount || 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}</strong>
                         </td>
                         <td>
-                            <select class="status-select ${escapeHtml(String(quote.Status || '').toLowerCase())}"
+                            <select class="status-select ${escapeHtml(String(quote.Status || '').toLowerCase())}" aria-label="Quote status"
                                     data-quote-id="${escapeHtml(quote.QuoteID)}"
                                     data-pk-id="${escapeHtml(quote.PK_ID)}"
                                     data-action="status">

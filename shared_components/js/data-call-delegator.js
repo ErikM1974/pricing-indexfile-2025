@@ -8,6 +8,7 @@
  *   <button data-call="dashboard.deleteRoster" data-args='[12]'>       → window.dashboard.deleteRoster(12)  (this = dashboard)
  *   <a data-href="/dashboards/leads.html">                             → location.href = …
  *   <button data-call="fn" data-args='["$this", "$event"]'>            → the clicked element / the click event
+ *   <select data-change="manualCalc.onTypeChange" data-change-args='["$this"]'>  → called on `change`
  *   data-stop="1"      stopPropagation      data-prevent="1"   preventDefault
  *   data-toggle-hidden="elementId"          toggles .hidden on that element
  *
@@ -81,10 +82,29 @@
         }
     }
 
+    function onChange(event) {
+        const t = event.target;
+        if (!(t instanceof Element)) return;
+        const el = t.closest('[data-change]');
+        if (!el) return;
+        const name = el.dataset.change;
+        let args = [];
+        if (el.dataset.changeArgs) {
+            try { args = JSON.parse(el.dataset.changeArgs); } catch (e) { report(`Bad data-change-args on ${name}`); return; }
+            if (!Array.isArray(args)) args = [args];
+        }
+        const path = name.split('.');
+        const fn = path.reduce((o, k) => (o == null ? o : o[k]), window);
+        if (typeof fn !== 'function') { report(`That action isn't available (${name}) — refresh the page and try again.`); return; }
+        const thisObj = path.length > 1 ? path.slice(0, -1).reduce((o, k) => (o == null ? o : o[k]), window) : window;
+        fn.apply(thisObj, args.map((a) => resolve(a, el, event)));
+    }
+
     function install() {
         if (document.documentElement.dataset.nwcaDelegator === '1') return;
         document.documentElement.dataset.nwcaDelegator = '1';
         document.addEventListener('click', onClick);
+        document.addEventListener('change', onChange);
     }
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', install);
     else install();

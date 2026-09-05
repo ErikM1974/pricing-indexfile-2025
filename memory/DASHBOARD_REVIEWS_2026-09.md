@@ -339,6 +339,11 @@ SanMar Payables row checkboxes labelled, old-designs sticky button → data-call
 `calculators/christmas-bundles.html` fully de-inlined (2 scripts + style extracted to `calculators/{js,css}/`,
 41 `onclick`/`onerror`/`onchange`/`onsubmit` → data-call + a capture-phase `error` listener for image fallbacks).
 
+**Batch 4 (`v2026.09.05.19`)** — compact live re-audit of every page (0 onclick / 0 unlabelled / 1 h1 / 0 console
+errors across the board) surfaced the last few: the delegator now also handles `data-change="fn"` (change events),
+manual-pricing de-inlined (12 `onchange` + an Enter-key `onkeypress`) with a real `<h1>`, screenprint-customer `<h1>`
++ notes label, Universal Records status selects labelled, the quick-tips Caspio link `rel=noopener`.
+
 **Deliberately left:** retiring `dst-viewer` / `garment-designer` (chips due for removal ~Sept 2026),
 Caspio-injected inline scripts on the design-archive pages (not ours), the JotForm iframe width on the
 Purchasing Request form (third-party embed).
