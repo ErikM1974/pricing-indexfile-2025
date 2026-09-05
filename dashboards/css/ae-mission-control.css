@@ -1463,3 +1463,11 @@ a.aemc-row-main:hover { text-decoration: underline; }
    language as .mc-kpi--accent so the two read as one family. */
 .mc-stat--warn { border-top: 3px solid var(--state-warning); }
 .mc-stat--warn .dash-stat-value { color: #b85a00; }
+
+/* 2026-09-05 review: colours that were inline style= on generated markup. */
+.aemc-bh-fill { width: 0; }                       /* JS animates the width; starts empty */
+.mc-sw--late { background: #dc2626; }
+.mc-sw--risk { background: #f59e0b; }
+.mc-sw--ok   { background: #4cb354; }
+.mc-chip.is-fire .mc-chip-dot { background: #dc2626; }
+.mc-chip.is-art  .mc-chip-dot { background: #8b5cf6; }

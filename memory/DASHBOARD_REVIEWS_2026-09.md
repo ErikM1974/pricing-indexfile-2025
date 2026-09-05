@@ -143,6 +143,20 @@ Releases `v2026.09.04.1 → .9`. Detail here; MEMORY.md carries one line each.
   Loaded stamp + 5-min visible-tab refresh. FA 6.4.0 like every other staff page.
 - Lock: `tests/unit/quote-management-page.test.js`.
 
+## AE Mission Control — review (2026-09-05, `v2026.09.05.5`) — already mature, 6 small items
+
+- All 6 tabs loaded clean for Taneisha (view-as), no console errors, stamp fresh, phone layout
+  fine (tablist scrolls inside itself). Kept: DashTabs, harness + `sync-test-harness.js`.
+- Fixed: "1 days past" → `plural()`; swatch/chip inline colours → classes; `style="width:0%"`
+  → CSS; the one `alert` → `DashPage.showError`; **5-min visible-tab re-read** of summary +
+  inbound (a cockpit sits open all day; Refresh stays the forced pull). The remaining `style=`
+  in templates are computed widths/lefts (bar fills, pace markers) — legitimate.
+- 🔴 **Attribution gap found via the Pipeline tab**: it filters quotes on `SalesRepEmail`, and
+  `volume-quote.js` hardcoded `sales@` → Taneisha's $30,959 Braun NW VQ read "no quotes carry
+  your name". Now `repEmailFor(name)` via `StaffAuthHelper.STAFF_EMAIL_MAP` (first name OK).
+  Existing VQ rows keep sales@ (Erik can edit `SalesRepEmail` on VQ-2026-002 in Caspio).
+- Lock: `tests/unit/ae-mission-control-page.test.js` (runs the harness drift check in the gate).
+
 ## Verification gotchas learned today
 
 - Browser pane (`mcp__Claude_Browser`): screenshots of a SCROLLED page come back blank on
