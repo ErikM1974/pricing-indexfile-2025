@@ -122,7 +122,7 @@ Releases `v2026.09.04.1 → .9`. Detail here; MEMORY.md carries one line each.
   Check the wall clock before calling a timestamp stale.
 - Lock: `tests/unit/purchasing-portal-page.test.js`.
 
-## Quote Management — review, 10 items (2026-09-05, `v2026.09.05.2`)
+## Quote Management — review, 10 items (2026-09-05, `v2026.09.05.2–.4`)
 
 - 🔴 **Real defect**: identity came from the legacy Caspio `sessionStorage` keys the SAML
   login never fills → header "Guest", `currentUserEmail` null, EVERY delete button disabled
